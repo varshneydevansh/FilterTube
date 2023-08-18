@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Filter Preferences</title>
+    <link rel="stylesheet" href="../css/popup.css">
+</head>
+
+<body>
+    <header>
+        <img src="../icons/icon-48.png" alt="FilterTube Icon" class="logo-icon">
+        <div class="title">FilterTube</div>
+    </header>
+
+    <div id="info">
+        <label for="keywords">Filter by Keywords (comma separated):</label>
+        <textarea id="keywords" class="input-field" rows="3"></textarea>
+
+        <label for="channels" style="margin-top: 10px;">Filter by Channels (comma separated):</label>
+        <textarea id="channels" class="input-field" rows="3"></textarea>
+    </div>
+
+    <button id="saveBtn" class="button full-btn">Save Preferences</button>
+
+    <!-- Include the script just before the closing body tag to ensure DOM is loaded before JS runs -->
+    <script src="../js/popup.js"></script>
+</body>
+
+</html>

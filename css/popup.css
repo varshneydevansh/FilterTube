@@ -1,0 +1,53 @@
+body {
+    font-family: Lato, Arial, Helvetica Neue, Helvetica, sans-serif;
+    padding: 10px;
+    margin: 0;
+    width: 320px;
+    /* Adjust based on popup width */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+button {
+    padding: 8px 12px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    background-color: #3686e4;
+    color: #ffffff;
+}
+
+button:hover {
+    background-color: #2862a6;
+}
+
+.input-field {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-top: 10px;
+}
+
+header {
+    display: flex;
+    align-items: center;
+    /* Align the icon and the text vertically in the center */
+    gap: 10px;
+    /* Space between icon and title */
+}
+
+.logo-icon {
+    width: 32px;
+    /* Set the width you desire for the icon */
+    height: 32px;
+    /* Set the height you desire for the icon */
+}
+
+.title {
+    font-size: 24px;
+    /* Increase font size as desired */
+    font-weight: bold;
+    /* Make the title bold */
+}

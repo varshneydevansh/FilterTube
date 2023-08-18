@@ -1,0 +1,8 @@
+/* content.css */
+.hidden-video {
+    display: none !important;
+}
+
+.highlight-video {
+    border: 2px solid red !important;
+}
