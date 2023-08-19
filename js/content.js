@@ -1,37 +1,40 @@
-// Define the hide function
 function hideSuggestionsByPreferences(filterKeywords, filterChannels) {
     const suggestions = document.querySelectorAll('ytd-compact-video-renderer, ytd-video-renderer, ytd-grid-video-renderer');
 
+    const trimmedKeywords = filterKeywords.split(',').map(keyword => keyword.trim().toLowerCase());
+    const trimmedChannels = filterChannels.split(',').map(channel => channel.trim().toLowerCase());
+
     suggestions.forEach(suggestion => {
         const videoTitleElement = suggestion.querySelector('#video-title');
-        const videoTitle = videoTitleElement ? videoTitleElement.textContent.toLowerCase() : "";
-
         const channelNameElement = suggestion.querySelector('#channel-name .yt-simple-endpoint');
-        const channelName = channelNameElement ? channelNameElement.textContent.toLowerCase() : "";
 
-        // Check against keywords
-        if (filterKeywords.split(',').some(keyword => videoTitle.includes(keyword.trim().toLowerCase()))) {
+        if (!videoTitleElement || !channelNameElement) {
+            console.warn('YouTube structure might have changed! Please review the extension.');
+            return;
+        }
+
+        const videoTitle = videoTitleElement.textContent.toLowerCase();
+        const channelName = channelNameElement.textContent.toLowerCase();
+
+        if (trimmedKeywords.some(keyword => videoTitle.includes(keyword))) {
             suggestion.classList.add('hidden-video');
             return;
         }
 
-        // Check against channels
-        if (filterChannels.split(',').some(channel => channelName.includes(channel.trim().toLowerCase()))) {
+        if (trimmedChannels.some(channel => channelName.includes(channel))) {
             suggestion.classList.add('hidden-video');
             return;
         }
     });
 }
 
-// Load initial preferences and hide suggestions
-chrome.storage.local.get(['keywords', 'channels'], function (items) {
-    hideSuggestionsByPreferences(items.keywords || '', items.channels || '');
+chrome.storage.local.get(['filterKeywords', 'filterChannels'], function (items) {
+    hideSuggestionsByPreferences(items.filterKeywords || '', items.filterChannels || '');
 });
 
-// Observe changes to the YouTube page and reapply the filters
 const observer = new MutationObserver(() => {
-    chrome.storage.local.get(['keywords', 'channels'], function (items) {
-        hideSuggestionsByPreferences(items.keywords || '', items.channels || '');
+    chrome.storage.local.get(['filterKeywords', 'filterChannels'], function (items) {
+        hideSuggestionsByPreferences(items.filterKeywords || '', items.filterChannels || '');
     });
 });
 
@@ -40,9 +43,8 @@ observer.observe(document.body, {
     subtree: true
 });
 
-// Listen for changes in preferences
 chrome.storage.onChanged.addListener(function (changes) {
-    if (changes.keywords || changes.channels) {
-        hideSuggestionsByPreferences(changes.keywords.newValue || '', changes.channels.newValue || '');
+    if (changes.filterKeywords || changes.filterChannels) {
+        hideSuggestionsByPreferences(changes.filterKeywords.newValue || '', changes.filterChannels.newValue || '');
     }
 });

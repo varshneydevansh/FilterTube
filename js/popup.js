@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
     const saveButton = document.getElementById('saveBtn');
 
-    // Load the current settings.
     loadSettings();
 
     saveButton.addEventListener('click', function () {
@@ -9,24 +8,23 @@ document.addEventListener('DOMContentLoaded', function () {
         const channels = document.getElementById('channels').value;
 
         chrome.storage.local.set({
-            'keywords': keywords,
-            'channels': channels
+            'filterKeywords': keywords,
+            'filterChannels': channels
         }, function () {
-            // Change the button text to "Saved!" for a short duration.
             saveButton.textContent = 'Saved!';
             setTimeout(() => {
                 saveButton.textContent = 'Save Preferences';
-            }, 2000);  // Change the button text back after 2 seconds
+            }, 2000);
         });
     });
 
     function loadSettings() {
-        chrome.storage.local.get(['keywords', 'channels'], function (items) {
-            if (items.keywords) {
-                document.getElementById('keywords').value = items.keywords;
+        chrome.storage.local.get(['filterKeywords', 'filterChannels'], function (items) {
+            if (items.filterKeywords) {
+                document.getElementById('keywords').value = items.filterKeywords;
             }
-            if (items.channels) {
-                document.getElementById('channels').value = items.channels;
+            if (items.filterChannels) {
+                document.getElementById('channels').value = items.filterChannels;
             }
         });
     }
