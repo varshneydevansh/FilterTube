@@ -37,8 +37,13 @@ function hideSuggestions(trimmedKeywords, trimmedChannels, rootNode = document) 
 
     suggestions.forEach(suggestion => {
         const videoTitleElement = suggestion.querySelector('#video-title');
-        const channelNameElement = suggestion.querySelector('#channel-name, .yt-simple-endpoint, .yt-simple-endpoint');
+        let channelNameElement = suggestion.querySelector('#channel-name, .yt-simple-endpoint');
 
+        // Special handling for the channel page to avoid hiding the channel's own name and videos
+        if (window.location.href.includes("/@")) {
+            channelNameElement = suggestion.querySelector('.ytd-channel-name a.yt-simple-endpoint');
+        }
+        
         if (!videoTitleElement || !channelNameElement) {
             console.warn('YouTube structure might have changed! Please review the extension.');
             return;
@@ -47,33 +52,22 @@ function hideSuggestions(trimmedKeywords, trimmedChannels, rootNode = document) 
         const videoTitle = videoTitleElement.textContent.toLowerCase();
         const channelName = channelNameElement.textContent.toLowerCase();
 
-        if (trimmedKeywords.some(keyword => videoTitle.includes(keyword))) {
+        if (trimmedKeywords.some(keyword => videoTitle.includes(keyword)) || trimmedChannels.some(channel => channelName.includes(channel))) {
             suggestion.classList.add('hidden-video');
-            return;
-        }
-
-        if (trimmedChannels.some(channel => channelName.includes(channel))) {
-            suggestion.classList.add('hidden-video');
-            return;
         }
     });
 }
 
 let throttleTimeout = null;
+const FILTER_DELAY = 1500; // 1.5 seconds
 
 const observerCallback = (mutations) => {
     if (throttleTimeout) return;  // If already waiting to run, skip
 
     throttleTimeout = setTimeout(() => {
-        mutations.forEach(mutation => {
-            mutation.addedNodes.forEach(node => {
-                if (node.nodeType === 1) {  // Check if the added node is an element
-                    hideSuggestions(filterKeywords.split(',').map(keyword => keyword.trim().toLowerCase()), filterChannels.split(',').map(channel => channel.trim().toLowerCase()), node);
-                }
-            });
-        });
+        hideSuggestionsByPreferences(filterKeywords, filterChannels);
         throttleTimeout = null;
-    }, 1000);  // Runs once every second
+    }, FILTER_DELAY);  // Runs once every FILTER_DELAY/1000 seconds
 };
 
 const observer = new MutationObserver(observerCallback);
@@ -81,3 +75,8 @@ observer.observe(document.body, {
     childList: true,
     subtree: true
 });
+
+// Handle YouTube's Gradual Page Transitions
+setInterval(() => {
+    hideSuggestionsByPreferences(filterKeywords, filterChannels);
+}, FILTER_DELAY);
