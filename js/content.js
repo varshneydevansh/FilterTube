@@ -1,6 +1,12 @@
 let filterKeywords = '';
 let filterChannels = '';
 
+// Function to clear the cached filter values.
+function clearCache() {
+    filterKeywords = '';
+    filterChannels = '';
+}
+
 // Load initial settings.
 chrome.storage.local.get(['filterKeywords', 'filterChannels'], function (items) {
     filterKeywords = items.filterKeywords || '';
@@ -10,6 +16,7 @@ chrome.storage.local.get(['filterKeywords', 'filterChannels'], function (items) 
 
 // Listen for storage changes and update cached values.
 chrome.storage.onChanged.addListener(function (changes) {
+    clearCache(); // Clear the cache when a change is detected.
     if (changes.filterKeywords) {
         filterKeywords = changes.filterKeywords.newValue || '';
     }
@@ -30,7 +37,7 @@ function hideSuggestions(trimmedKeywords, trimmedChannels, rootNode = document) 
 
     suggestions.forEach(suggestion => {
         const videoTitleElement = suggestion.querySelector('#video-title');
-        const channelNameElement = suggestion.querySelector('#channel-name, .yt-simple-endpoint');
+        const channelNameElement = suggestion.querySelector('#channel-name, .yt-simple-endpoint, .yt-simple-endpoint');
 
         if (!videoTitleElement || !channelNameElement) {
             console.warn('YouTube structure might have changed! Please review the extension.');
@@ -47,6 +54,7 @@ function hideSuggestions(trimmedKeywords, trimmedChannels, rootNode = document) 
 
         if (trimmedChannels.some(channel => channelName.includes(channel))) {
             suggestion.classList.add('hidden-video');
+            return;
         }
     });
 }
