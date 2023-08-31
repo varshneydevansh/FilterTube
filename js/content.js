@@ -52,7 +52,7 @@ function hideSuggestions(trimmedKeywords, trimmedChannels, rootNode = document) 
         const videoTitle = videoTitleElement.textContent.toLowerCase();
         const channelName = channelNameElement.textContent.toLowerCase();
 
-        if (trimmedKeywords.some(keyword => videoTitle.includes(keyword)) || trimmedChannels.some(channel => channelName.includes(channel))) {
+        if (trimmedKeywords.some(keyword => videoTitle.includes(keyword))) {
             suggestion.classList.add('hidden-video');
         }
     });
