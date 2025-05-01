@@ -2,13 +2,41 @@
  * content.css
  *
  * Stylesheet injected by the content script (content.js) into YouTube pages.
- * Used primarily to hide video elements identified by the script.
+ * Hides elements initially and provides a class for JS to reveal wanted content.
  */
 
-/* Class applied to video elements that should be hidden based on filter criteria. */
+/* --- Initial Hiding Rule --- */
+/* Apply display:none immediately to all potential containers */
+ytd-video-renderer,
+ytd-compact-video-renderer,
+ytd-grid-video-renderer,
+ytd-rich-item-renderer,
+ytd-watch-card-compact-video-renderer,
+ytd-channel-video-player-renderer,
+ytd-shelf-renderer,
+ytd-reel-shelf-renderer,
+ytd-horizontal-card-list-renderer,
+ytd-universal-watch-card-renderer,
+ytd-radio-renderer,
+ytd-channel-renderer,
+ytd-grid-channel-renderer,
+ytd-reel-item-renderer,
+ytm-shorts-lockup-view-model {
+    display: none !important; /* Hide by default */
+}
+
+/* --- Reveal Rule --- */
+/* Class added by JS to elements that should be visible */
+.filter-tube-visible {
+    /* display: revert !important; */ /* Revert might not restore layout perfectly */
+    display: block !important; /* Explicitly set display (common for list items) */
+    margin-bottom: 16px !important; /* Add margin to restore vertical spacing */
+}
+
+
+/* --- Legacy/Fallback Hiding Rule (Kept for reference/potential use) --- */
+/* Class applied by JS if we needed explicit hiding *after* initial load (less common now) */
 .hidden-video {
-    /* Setting display to none removes the element from the layout entirely. */
-    /* !important is used to increase specificity and override potential conflicting YouTube styles. */
     display: none !important;
 }
 
@@ -40,5 +68,17 @@
   border-radius: 4px;
   z-index: 10;
   font-weight: bold;
+}
+*/
+
+/* --- Optional Debug Styling (Keep commented) --- */
+/*
+.highlight-video {
+    border: 2px solid red !important;
+}
+
+.filter-tube-visible {
+    border: 2px solid lime !important; /* Add border to visible items */
+    display: revert !important;
 }
 */

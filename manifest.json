@@ -5,7 +5,7 @@
     "version": "1.0",
     "minimum_chrome_version": "49",
     "background": {
-        "service_worker": "js/background.js"
+        "scripts": ["js/background.js"]
     },
     "action": {
         "default_popup": "popup.html",
@@ -29,7 +29,8 @@
             ],
             "css": [
                 "css/content.css"
-            ]
+            ],
+            "run_at": "document_start"
         }
     ],
     "icons": {

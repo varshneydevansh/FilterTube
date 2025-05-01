@@ -124,198 +124,171 @@ function hideVideos(trimmedKeywords, trimmedChannels, rootNode = document) {
     }
 
     suggestions.forEach(suggestion => {
-        // Check if this element itself should be hidden or if it contains a nested video element
-        // ytd-rich-item-renderer often contains another renderer like ytd-grid-video-renderer
         const actualVideoElement = suggestion.matches('ytd-rich-item-renderer')
                                     ? suggestion.querySelector('ytd-grid-video-renderer, ytd-compact-video-renderer, ytd-video-renderer') || suggestion
                                     : suggestion;
 
-        // Attempt to find elements within the actual video container or the broader suggestion container
         const videoTitleElement = actualVideoElement.querySelector('#video-title, #video-title-link yt-formatted-string');
         let channelNameElement = actualVideoElement.querySelector('#channel-name .yt-simple-endpoint, #channel-name a.yt-simple-endpoint, .ytd-channel-name a.yt-simple-endpoint, #channel-name yt-formatted-string');
+
+        // --- SELECTOR REFINEMENT V3 FOR SEARCH RESULTS ---
+        // Description Snippet: Focus specifically on the metadata snippet classes/container
         const descriptionElement = actualVideoElement.querySelector(
-            'div.metadata-snippet-container yt-formatted-string.metadata-snippet-text, /* Search results snippet */' +
-            '.metadata-snippet-text, /* Fallback snippet */' +
-            '#description-text, /* General description */' +
-            '.ytd-video-renderer #description .yt-formatted-string, /* Description within video renderer */' +
-            '#description yt-formatted-string.content, /* Description on channel page */' +
-            '#description-inline-expander' /* Expanded description container */
+            'yt-formatted-string.metadata-snippet-text, ' + // Primary target class
+            '.metadata-snippet-container yt-formatted-string.metadata-snippet-text'
+            // Keep watch page selector as fallback
+            // ', #description-inline-expander .yt-core-attributed-string'
         );
-        // Find hashtags within the broader suggestion container (including info line and description)
-        const hashtagElements = suggestion.querySelectorAll('a.yt-simple-endpoint[href^="/hashtag/"]');
-        // Find game card title within the broader suggestion container
+
+        // Hashtags: Look primarily *inside* the found description snippet, fallback to metadata line
+        let hashtagElements = [];
+        if (descriptionElement) {
+             // Look for hashtags linked within the description snippet element itself
+            hashtagElements = descriptionElement.querySelectorAll('a[href^="/hashtag/"]');
+        }
+        // If none found in snippet, check the metadata line (sibling/nearby element)
+        if (hashtagElements.length === 0) {
+            hashtagElements = actualVideoElement.querySelectorAll('#metadata-line a[href^="/hashtag/"]');
+        }
+         // --- END SELECTOR REFINEMENT ---
+
         const gameCardTitleElement = suggestion.querySelector('ytd-rich-metadata-renderer #title');
 
-        // If no title, it's likely not a standard video item we want to filter directly here
-        if (!videoTitleElement) {
-            // console.log('FilterTube: Skipping element, no title found:', suggestion); // Keep this commented unless debugging non-video items
+        // Skip processing if essential element (like title) isn't found for a video card
+        if (!videoTitleElement && suggestion.matches('ytd-video-renderer, ytd-compact-video-renderer, ytd-grid-video-renderer')) {
+             // console.warn("FilterTube: Skipping potential video item with no title:", suggestion);
             return;
         }
 
-        // Fallback for channel name if primary selectors fail
-        if (!channelNameElement) {
+        // Fallback for channel name
+        if (!channelNameElement && actualVideoElement.querySelector('#channel-name')) { // Added check to avoid error if #channel-name doesn't exist
             channelNameElement = actualVideoElement.querySelector('yt-formatted-string.ytd-channel-name, #channel-name');
         }
 
-        // Extract text content, convert to lowercase, and trim whitespace. Use empty string as default.
+        // Extract text content
         const videoTitle = (videoTitleElement?.textContent || '').toLowerCase().trim();
         const channelName = (channelNameElement?.textContent || '').toLowerCase().trim();
         const descriptionText = (descriptionElement?.textContent || '').toLowerCase().trim();
-        // Combine text from all found hashtags (remove the '#' prefix for matching)
-        const hashtagText = Array.from(hashtagElements)
-                                .map(el => (el.textContent || '').replace(/^#/, '').toLowerCase().trim())
-                                .join(' '); // Join with space to treat as separate words
+        const hashtagRawTexts = Array.from(hashtagElements).map(el => el.textContent || '');
+        const hashtagText = hashtagRawTexts.map(ht => ht.replace(/^#/, '').toLowerCase().trim()).filter(Boolean).join(' ');
         const gameCardTitle = (gameCardTitleElement?.textContent || '').toLowerCase().trim();
+        const combinedDescAndHashtags = (descriptionText + ' ' + hashtagText).trim().toLowerCase();
 
-        // --- Debugging Log ---
+        // --- Debugging Log (Comment out when working) ---
         /*
-        console.log("FilterTube Scan:", {
+        console.log("FilterTube Scan (hideVideos):", {
              Title: videoTitle,
              Channel: channelName,
-             Desc: descriptionText,
-             Hashtags: hashtagText,
+             DescElementFound: descriptionElement ? 'Yes' : 'No',
+             DescRawHTML: descriptionElement?.outerHTML || 'Desc Element Not Found',
+             DescProcessed: descriptionText,
+             HashtagsElementSelectorContext: descriptionElement ? 'Inside Desc Element' : '#metadata-line',
+             HashtagsRaw: hashtagRawTexts.join(', ') || 'No Hashtags Found',
+             HashtagsProcessed: hashtagText,
+             CombinedDescHashtags: combinedDescAndHashtags,
              GameCard: gameCardTitle,
              Element: suggestion
         });
         */
         // --- End Debugging Log ---
 
-        let shouldHide = false;
+        let shouldHide = false; // Determine if it SHOULD be hidden
 
         // 1. Check against blocked channel names.
         if (trimmedChannels.length > 0 && channelName && trimmedChannels.some(blockedChannel => channelName.includes(blockedChannel))) {
-            // console.log(`FilterTube: Hiding [${videoTitle}] due to channel: ${channelName}`);
             shouldHide = true;
         }
 
-        // 2. Check keywords against title, channel name, description, hashtags, and game card title (if not already hidden).
+        // 2. Check keywords against title, channel name, combined desc/hashtags, game card
         if (!shouldHide && trimmedKeywords.length > 0) {
             const checkText = (text) => text && trimmedKeywords.some(keyword => text.includes(keyword));
-
-            if (checkText(videoTitle)) {
-                // console.log(`FilterTube: Hiding [${videoTitle}] due to title keyword.`);
-                shouldHide = true;
-            }
-            else if (checkText(channelName)) {
-                // console.log(`FilterTube: Hiding [${videoTitle}] due to channel name keyword.`);
-                shouldHide = true;
-            }
-            else if (checkText(descriptionText)) {
-                // console.log(`FilterTube: Hiding [${videoTitle}] due to description keyword.`);
-                shouldHide = true;
-            }
-            else if (checkText(hashtagText)) {
-                // console.log(`FilterTube: Hiding [${videoTitle}] due to hashtag keyword.`);
-                shouldHide = true;
-            }
-            else if (checkText(gameCardTitle)) {
-                // console.log(`FilterTube: Hiding [${videoTitle}] due to game card title keyword.`);
+            if (checkText(videoTitle) || checkText(channelName) || (combinedDescAndHashtags && checkText(combinedDescAndHashtags)) || checkText(gameCardTitle)) {
                 shouldHide = true;
             }
         }
 
-        // Apply or remove the 'hidden-video' class to the original container (suggestion)
-        if (shouldHide) {
-            suggestion.classList.add('hidden-video');
+        // --- INVERTED LOGIC --- Apply .filter-tube-visible only if it should NOT be hidden
+        if (!shouldHide) {
+            suggestion.classList.add('filter-tube-visible');
         } else {
-            suggestion.classList.remove('hidden-video');
+            // Ensure it remains hidden (or explicitly hide if needed, though CSS should handle it)
+             suggestion.classList.remove('filter-tube-visible');
+             // suggestion.classList.add('hidden-video'); // Optional: Can explicitly add hidden-video too
         }
     });
 }
 
 /**
- * Finds and hides playlist/shelf elements if their title matches keywords
+ * Finds and hides playlist/shelf/mix elements if their title matches keywords
  * or if their associated channel matches blocked channels.
+ * Updated: Adds .filter-tube-visible class to elements that should NOT be hidden.
  * @param {string[]} trimmedKeywords - Array of lowercase keywords to filter by.
  * @param {string[]} trimmedChannels - Array of lowercase channel names to filter by.
  * @param {Node} rootNode - The root element to search within (defaults to document).
  */
 function hidePlaylistsAndShelves(trimmedKeywords, trimmedChannels, rootNode = document) {
-    // Selectors for playlist/shelf containers - Added ytd-universal-watch-card-renderer
-    const shelfSelectors = [
-        'ytd-shelf-renderer',                   // Generic shelf (e.g., channel page)
-        'ytd-reel-shelf-renderer',              // Shelf containing Shorts
-        'ytd-horizontal-card-list-renderer',    // Another type of horizontal list/shelf
-        'ytd-universal-watch-card-renderer'     // Playlist/Mix card in search results
-        // Removed ytd-watch-card-rich-header-renderer as it's *inside* the universal card
+    const containerSelectors = [
+        'ytd-shelf-renderer',
+        'ytd-reel-shelf-renderer',
+        'ytd-horizontal-card-list-renderer',
+        'ytd-universal-watch-card-renderer',
+        'ytd-radio-renderer'
     ].join(', ');
 
-    let shelves = [];
+    let containers = [];
     try {
-        shelves = rootNode.querySelectorAll(shelfSelectors);
+        containers = rootNode.querySelectorAll(containerSelectors);
     } catch (e) {
-        console.error('FilterTube: Error finding shelf/card elements with selectors:', shelfSelectors, e);
+        console.error('FilterTube: Error finding shelf/card/mix elements:', containerSelectors, e);
         return;
     }
 
-    shelves.forEach(shelf => {
+    containers.forEach(container => {
         let titleElement = null;
         let channelElement = null;
         let titleText = '';
         let channelText = '';
-        let shouldHide = false;
+        let shouldHide = false; // Determine if it SHOULD be hidden
 
-        // --- Logic specific to ytd-universal-watch-card-renderer ---
-        if (shelf.matches('ytd-universal-watch-card-renderer')) {
-            // Try finding the title in the hero section first
-            titleElement = shelf.querySelector('ytd-watch-card-hero-video-renderer #watch-card-title yt-formatted-string');
-            // Try finding the channel name in the header
-            channelElement = shelf.querySelector('ytd-watch-card-rich-header-renderer ytd-channel-name yt-formatted-string#text');
-
+        // Logic to find title/channel and set shouldHide based on type
+        if (container.matches('ytd-universal-watch-card-renderer')) {
+            titleElement = container.querySelector('ytd-watch-card-hero-video-renderer #watch-card-title yt-formatted-string');
+            channelElement = container.querySelector('ytd-watch-card-rich-header-renderer ytd-channel-name yt-formatted-string#text');
             titleText = (titleElement?.textContent || '').toLowerCase().trim();
             channelText = (channelElement?.textContent || '').toLowerCase().trim();
-
-            // Hide if playlist title contains a keyword
-            if (trimmedKeywords.length > 0 && titleText && trimmedKeywords.some(keyword => titleText.includes(keyword))) {
-                // console.log(`FilterTube: Hiding Universal Card [${titleText}] due to keyword in title.`);
+            if (trimmedKeywords.some(keyword => titleText.includes(keyword) || channelText.includes(keyword)) ||
+                trimmedChannels.some(blockedChannel => channelText.includes(blockedChannel))) {
                 shouldHide = true;
             }
-            // Hide if channel name contains a keyword (often the playlist title for official channels)
-            else if (!shouldHide && trimmedKeywords.length > 0 && channelText && trimmedKeywords.some(keyword => channelText.includes(keyword))) {
-                // console.log(`FilterTube: Hiding Universal Card [${titleText || channelText}] due to keyword in channel name.`);
+        } else if (container.matches('ytd-radio-renderer')) {
+            titleElement = container.querySelector('.yt-lockup-metadata-view-model-wiz__title span.yt-core-attributed-string');
+            titleText = (titleElement?.textContent || '').toLowerCase().trim();
+            if (trimmedKeywords.some(keyword => titleText.includes(keyword))) {
                 shouldHide = true;
             }
-            // Hide if channel name is in the blocked list
-            else if (!shouldHide && trimmedChannels.length > 0 && channelText && trimmedChannels.some(blockedChannel => channelText.includes(blockedChannel))) {
-                // console.log(`FilterTube: Hiding Universal Card [${titleText || channelText}] due to blocked channel: ${channelText}`);
-                shouldHide = true;
-            }
-        }
-        // --- Logic for other shelf types ---
-        else {
-            // Find title and channel elements within the shelf (existing logic)
-            titleElement = shelf.querySelector('#title, #shelf-title, .ytd-shelf-renderer #title span'); // Simplified title selector
-            channelElement = shelf.querySelector('ytd-channel-name #text a'); // Common pattern for channel link in headers
-
+        } else { // Other shelf types
+            titleElement = container.querySelector('#title, #shelf-title, .ytd-shelf-renderer #title span');
+            channelElement = container.querySelector('ytd-channel-name #text a');
             titleText = (titleElement?.textContent || '').toLowerCase().trim();
             channelText = (channelElement?.textContent || '').toLowerCase().trim();
-
-            // Hide if shelf title contains a keyword
-            if (trimmedKeywords.length > 0 && titleText && trimmedKeywords.some(keyword => titleText.includes(keyword))) {
-                // console.log(`FilterTube: Hiding Shelf [${titleText}] due to keyword.`);
-                shouldHide = true;
-            }
-            // Hide if shelf's associated channel is blocked
-            else if (!shouldHide && trimmedChannels.length > 0 && channelText && trimmedChannels.some(blockedChannel => channelText.includes(blockedChannel))) {
-                // console.log(`FilterTube: Hiding Shelf [${titleText}] due to blocked channel: ${channelText}`);
+            if (trimmedKeywords.some(keyword => titleText.includes(keyword)) ||
+                trimmedChannels.some(blockedChannel => channelText.includes(blockedChannel))) {
                 shouldHide = true;
             }
         }
 
-
-        // Apply or remove the class based on the check results.
-        if (shouldHide) {
-            shelf.classList.add('hidden-video'); // Reuse class for simplicity
+        // --- INVERTED LOGIC --- Apply .filter-tube-visible only if it should NOT be hidden
+        if (!shouldHide) {
+            container.classList.add('filter-tube-visible');
         } else {
-            // If the shelf itself shouldn't be hidden, ensure it's visible
-            // and let hideVideos handle filtering individual items within it (if applicable).
-            shelf.classList.remove('hidden-video');
+            container.classList.remove('filter-tube-visible');
         }
     });
 }
 
 /**
- * Finds and hides channel elements (links, cards) if the channel name matches.
+ * Finds and hides channel elements (links, cards) if the channel name matches keywords or blocked list.
+ * Updated: Adds .filter-tube-visible class to elements that should NOT be hidden.
  * @param {string[]} trimmedKeywords - Array of lowercase keywords to filter by (check if channel name contains keyword).
  * @param {string[]} trimmedChannels - Array of lowercase channel names to filter by.
  * @param {Node} rootNode - The root element to search within (defaults to document).
@@ -330,42 +303,38 @@ function hideChannelElements(trimmedKeywords, trimmedChannels, rootNode = docume
     try {
         channelElements = rootNode.querySelectorAll(channelSelectors);
     } catch (e) {
-        console.error('FilterTube: Error finding channel elements with selectors:', channelSelectors, e);
+        console.error('FilterTube: Error finding channel elements:', channelSelectors, e);
         return;
     }
 
     channelElements.forEach(channelElement => {
-        const nameElement = channelElement.querySelector('#channel-title, #title'); // Common selectors for channel name within these renderers
+        const nameElement = channelElement.querySelector('#channel-title, #title');
         const channelName = (nameElement?.textContent || '').toLowerCase().trim();
+        let shouldHide = false; // Determine if it SHOULD be hidden
 
-        let shouldHide = false;
-
-        // Hide if channel name is in the blocked channels list
-        if (trimmedChannels.length > 0 && channelName && trimmedChannels.some(blockedChannel => channelName.includes(blockedChannel))) {
-            shouldHide = true;
-        }
-        // Hide if channel name contains a blocked keyword
-        else if (trimmedKeywords.length > 0 && channelName && trimmedKeywords.some(keyword => channelName.includes(keyword))) {
+        if ((trimmedChannels.length > 0 && channelName && trimmedChannels.some(blockedChannel => channelName.includes(blockedChannel))) ||
+            (trimmedKeywords.length > 0 && channelName && trimmedKeywords.some(keyword => channelName.includes(keyword)))) {
             shouldHide = true;
         }
 
-        if (shouldHide) {
-            channelElement.classList.add('hidden-video');
+        // --- INVERTED LOGIC --- Apply .filter-tube-visible only if it should NOT be hidden
+        if (!shouldHide) {
+            channelElement.classList.add('filter-tube-visible');
         } else {
-            channelElement.classList.remove('hidden-video');
+            channelElement.classList.remove('filter-tube-visible');
         }
     });
 }
 
 /**
  * Finds and hides YouTube Shorts elements.
+ * Updated: Adds .filter-tube-visible class to elements that should NOT be hidden.
  * @param {string[]} trimmedKeywords - Array of lowercase keywords to filter by.
  * @param {string[]} trimmedChannels - Array of lowercase channel names to filter by.
  * @param {Node} rootNode - The root element to search within (defaults to document).
  */
 function hideShorts(trimmedKeywords, trimmedChannels, rootNode = document) {
-    // Selector for Shorts items (may need adjustments based on YT updates)
-    const shortsSelector = 'ytd-reel-item-renderer, ytm-shorts-lockup-view-model'; // Covers desktop and potentially mobile web structures
+    const shortsSelector = 'ytd-reel-item-renderer, ytm-shorts-lockup-view-model';
 
     let shortsItems = [];
     try {
@@ -377,60 +346,116 @@ function hideShorts(trimmedKeywords, trimmedChannels, rootNode = document) {
 
     shortsItems.forEach(item => {
         const titleElement = item.querySelector('#video-title, .shortsLockupViewModelHostMetadataTitle');
-        const channelElement = item.querySelector('#channel-name .yt-simple-endpoint, .shortsLockupViewModelHostMetadataTitle'); // Shorts channel name might be less consistently identifiable, sometimes part of title
-
+        const channelElement = item.querySelector('#channel-name .yt-simple-endpoint, .shortsLockupViewModelHostMetadataTitle');
         const titleText = (titleElement?.textContent || '').toLowerCase().trim();
-        // Channel name extraction for shorts might be less reliable
         const channelText = (channelElement && channelElement !== titleElement ? channelElement.textContent : '').toLowerCase().trim();
+        let shouldHide = false; // Determine if it SHOULD be hidden
 
-        let shouldHide = false;
-
-        // Check channel first
-        if (trimmedChannels.length > 0 && channelText && trimmedChannels.some(blockedChannel => channelText.includes(blockedChannel))) {
+        if ((trimmedChannels.length > 0 && channelText && trimmedChannels.some(blockedChannel => channelText.includes(blockedChannel))) ||
+            (trimmedKeywords.length > 0 && titleText && trimmedKeywords.some(keyword => titleText.includes(keyword)))) {
+            // Optional: check channel text again for keywords if relevant
+            // || (trimmedKeywords.length > 0 && channelText && trimmedKeywords.some(keyword => channelText.includes(keyword)))
              shouldHide = true;
         }
 
-        // Check keywords in title (and potentially channel text if extracted)
-        if (!shouldHide && trimmedKeywords.length > 0) {
-            if (titleText && trimmedKeywords.some(keyword => titleText.includes(keyword))) {
-                shouldHide = true;
-            }
-            // Optional: check channel text again for keywords if relevant
-            // else if (channelText && trimmedKeywords.some(keyword => channelText.includes(keyword))) {
-            //    shouldHide = true;
-            // }
-        }
-
-        if (shouldHide) {
-            item.classList.add('hidden-video');
+        // --- INVERTED LOGIC --- Apply .filter-tube-visible only if it should NOT be hidden
+        if (!shouldHide) {
+            item.classList.add('filter-tube-visible');
         } else {
-            item.classList.remove('hidden-video');
+            item.classList.remove('filter-tube-visible');
         }
     });
 }
 
 // --- Dynamic Content Handling (MutationObserver & Interval) ---
 
-// Use throttling to prevent the filter function from running too often during rapid DOM changes.
 let throttleTimeout = null;
-const FILTER_DELAY = 1000; // Reduced delay to 1 second for potentially faster updates
+const FILTER_DELAY = 500; // Shortened delay slightly, as initial hide is faster
+
+/**
+ * Main filtering function called on load and on changes.
+ * Applies the inverted logic (revealing wanted content).
+ */
+function applyFilters(keywords, channels) {
+    const trimmedKeywords = (keywords || '').split(',')
+                                          .map(keyword => keyword.trim().toLowerCase())
+                                          .filter(Boolean);
+    const trimmedChannels = (channels || '').split(',')
+                                           .map(channel => channel.trim().toLowerCase())
+                                           .filter(Boolean);
+
+    // Combine all relevant selectors
+    const allSelectors = [
+        'ytd-video-renderer',
+        'ytd-compact-video-renderer',
+        'ytd-grid-video-renderer',
+        'ytd-rich-item-renderer',
+        'ytd-watch-card-compact-video-renderer',
+        'ytd-channel-video-player-renderer',
+        'ytd-shelf-renderer',
+        'ytd-reel-shelf-renderer',
+        'ytd-horizontal-card-list-renderer',
+        'ytd-universal-watch-card-renderer',
+        'ytd-radio-renderer',
+        'ytd-channel-renderer',
+        'ytd-grid-channel-renderer',
+        'ytd-reel-item-renderer',
+        'ytm-shorts-lockup-view-model'
+    ].join(', ');
+
+    // If no filters are set, reveal ALL initially hidden items
+    if (trimmedKeywords.length === 0 && trimmedChannels.length === 0) {
+        try {
+            document.querySelectorAll(allSelectors).forEach(el => {
+                el.classList.add('filter-tube-visible');
+                el.classList.remove('hidden-video'); // Clean up old class if present
+            });
+        } catch (e) {
+             console.error("FilterTube: Error revealing all elements:", e);
+        }
+        return; // Stop processing if no filters
+    }
+
+    // Run filtering logic for each type of element
+    // These functions now add .filter-tube-visible if item should be shown
+    hideVideos(trimmedKeywords, trimmedChannels); // Renaming is misleading now, but keeps structure
+    hidePlaylistsAndShelves(trimmedKeywords, trimmedChannels);
+    hideChannelElements(trimmedKeywords, trimmedChannels);
+    hideShorts(trimmedKeywords, trimmedChannels);
+}
 
 /**
  * Callback function for the MutationObserver.
- * It throttles the execution of hideSuggestionsByPreferences.
- * @param {MutationRecord[]} mutations - An array of mutation records (not directly used here).
+ * It throttles the execution of applyFilters.
+ * @param {MutationRecord[]} mutations - An array of mutation records.
  * @param {MutationObserver} observer - The observer instance.
  */
 const observerCallback = (mutations, observer) => {
-    // If a timeout is already set, it means filtering is scheduled; do nothing.
+    // Optimization: Check if any added nodes *could* be relevant containers before scheduling
+    let potentiallyRelevantChange = false;
+    for (const mutation of mutations) {
+        if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+            for (const node of mutation.addedNodes) {
+                // Quick check if the added node itself or its children might match our selectors
+                // This is imperfect but avoids running filters for totally unrelated DOM changes
+                if (node.nodeType === Node.ELEMENT_NODE && (
+                    node.matches(allSelectors) || node.querySelector(allSelectors)
+                 )) {
+                    potentiallyRelevantChange = true;
+                    break;
+                }
+            }
+        }
+        if (potentiallyRelevantChange) break;
+    }
+
+    if (!potentiallyRelevantChange) return; // Skip if no relevant nodes were likely added
+
     if (throttleTimeout) return;
 
-    // Set a timeout to run the filtering logic after FILTER_DELAY milliseconds.
     throttleTimeout = setTimeout(() => {
-        console.log("FilterTube: Applying filters due to DOM change."); // Added log
-        // Call the main preference function which now handles all element types
-        hideSuggestionsByPreferences(filterKeywords, filterChannels);
-        // Reset the timeout ID so the next mutation can schedule a new run.
+        console.log("FilterTube: Applying filters due to potential relevant DOM change.");
+        applyFilters(filterKeywords, filterChannels);
         throttleTimeout = null;
     }, FILTER_DELAY);
 };
@@ -439,39 +464,88 @@ const observerCallback = (mutations, observer) => {
 const observer = new MutationObserver(observerCallback);
 
 // Configuration for the observer:
-// - childList: Watch for additions/removals of child nodes.
-// - subtree: Watch for changes in all descendants of the target node.
 const observerConfig = {
     childList: true,
     subtree: true
 };
 
-// Start observing the document body for configured mutations.
-// Using document.body is broad but necessary to catch dynamically loaded content anywhere.
-observer.observe(document.body, observerConfig);
+// Get all selectors for observer check (defined within applyFilters scope)
+const allSelectors = [
+    'ytd-video-renderer',
+    'ytd-compact-video-renderer',
+    'ytd-grid-video-renderer',
+    'ytd-rich-item-renderer',
+    'ytd-watch-card-compact-video-renderer',
+    'ytd-channel-video-player-renderer',
+    'ytd-shelf-renderer',
+    'ytd-reel-shelf-renderer',
+    'ytd-horizontal-card-list-renderer',
+    'ytd-universal-watch-card-renderer',
+    'ytd-radio-renderer',
+    'ytd-channel-renderer',
+    'ytd-grid-channel-renderer',
+    'ytd-reel-item-renderer',
+    'ytm-shorts-lockup-view-model'
+].join(', ');
 
-// Fallback mechanism: Periodically re-apply filters using setInterval.
-// This can catch videos missed by the MutationObserver, especially during complex page transitions or if the observer fails.
-// Note: This adds some overhead, but ensures filters are applied eventually.
+// Start observing the document body
+// Wait for body to exist if running at document_start
+if (document.body) {
+    observer.observe(document.body, observerConfig);
+} else {
+    document.addEventListener('DOMContentLoaded', () => {
+        if(document.body) { // Double check
+             observer.observe(document.body, observerConfig);
+        }
+    });
+}
+
+// Initial load and storage change handling
+function loadAndApplyInitialFilters() {
+    chrome.storage.local.get(['filterKeywords', 'filterChannels'], function (items) {
+        filterKeywords = items.filterKeywords || '';
+        filterChannels = items.filterChannels || '';
+        applyFilters(filterKeywords, filterChannels); // Initial filter application
+    });
+}
+
+// Load initial settings when the script runs (now document_start)
+// Wait slightly for the body to likely exist, or use DOMContentLoaded
+if (document.readyState === 'loading') { // Or 'interactive' or 'complete'
+    document.addEventListener('DOMContentLoaded', loadAndApplyInitialFilters);
+} else {
+    loadAndApplyInitialFilters(); // Already loaded
+}
+
+// Listen for changes in chrome.storage.local
+chrome.storage.onChanged.addListener(function (changes, areaName) {
+    if (areaName === 'local') {
+        let needsRefilter = false;
+        if (changes.filterKeywords) {
+            filterKeywords = changes.filterKeywords.newValue || '';
+            needsRefilter = true;
+        }
+        if (changes.filterChannels) {
+            filterChannels = changes.filterChannels.newValue || '';
+            needsRefilter = true;
+        }
+        if (needsRefilter) {
+            applyFilters(filterKeywords, filterChannels);
+        }
+    }
+});
+
+// Fallback interval check - less critical now but can remain as safety net
 const intervalCheck = setInterval(() => {
-    // console.log("FilterTube: Applying filters via interval check."); // Can be noisy, keep commented unless debugging
-    // Call the main preference function which now handles all element types
-    hideSuggestionsByPreferences(filterKeywords, filterChannels);
-}, FILTER_DELAY * 3); // Run less frequently than the mutation observer throttle delay
+    // console.log("FilterTube: Applying filters via interval check.");
+    applyFilters(filterKeywords, filterChannels);
+}, FILTER_DELAY * 5); // Run much less frequently
 
-// Optional: Clean up observer and interval when the script unloads (e.g., page navigation)
-// This isn't strictly necessary for content scripts usually, but good practice.
 window.addEventListener('unload', () => {
-    if (observer) {
-        observer.disconnect();
-    }
-    if (intervalCheck) {
-        clearInterval(intervalCheck);
-    }
-    if (throttleTimeout) {
-        clearTimeout(throttleTimeout);
-    }
+    if (observer) observer.disconnect();
+    if (intervalCheck) clearInterval(intervalCheck);
+    if (throttleTimeout) clearTimeout(throttleTimeout);
     console.log("FilterTube: Cleaned up observer and interval.");
 });
 
-console.log("FilterTube Content Script Loaded"); // Confirmation message
+console.log("FilterTube Content Script Loaded (run_at=document_start)");
