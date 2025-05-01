@@ -1,53 +1,79 @@
+/*
+ * popup.css
+ *
+ * Stylesheet for the extension's popup window (popup.html).
+ * Defines the appearance and layout of the popup's elements.
+ */
+
 body {
-    font-family: Lato, Arial, Helvetica Neue, Helvetica, sans-serif;
-    padding: 10px;
-    margin: 0;
-    width: 320px;
-    /* Adjust based on popup width */
+    font-family: Lato, Arial, Helvetica Neue, Helvetica, sans-serif; /* Common sans-serif font stack */
+    padding: 15px; /* Add some padding around the content */
+    margin: 0; /* Remove default body margin */
+    width: 350px; /* Set a fixed width for the popup window */
     display: flex;
-    flex-direction: column;
-    gap: 10px;
+    flex-direction: column; /* Stack elements vertically */
+    gap: 15px; /* Space between stacked elements */
+    background-color: #f9f9f9; /* Light background color */
+    color: #333; /* Default text color */
 }
 
-button {
-    padding: 8px 12px;
+label {
+    font-weight: bold;
+    font-size: 0.9em;
+    display: block; /* Ensure label takes full width */
+    margin-bottom: 5px; /* Space below the label */
+}
+
+textarea.input-field {
+    width: calc(100% - 16px); /* Full width minus padding */
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    /* margin-top: 5px; Removed, using gap in body instead */
+    font-size: 0.9em;
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    resize: vertical; /* Allow vertical resizing only */
+    min-height: 60px; /* Set a minimum height */
+}
+
+button#saveBtn {
+    padding: 10px 15px;
     border: none;
     cursor: pointer;
     border-radius: 4px;
-    background-color: #3686e4;
+    background-color: #4285F4; /* Google Blue */
     color: #ffffff;
+    font-size: 1em;
+    font-weight: bold;
+    transition: background-color 0.2s ease; /* Smooth hover effect */
 }
 
-button:hover {
-    background-color: #2862a6;
-}
-
-.input-field {
-    width: 100%;
-    padding: 6px 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    margin-top: 10px;
+button#saveBtn:hover {
+    background-color: #357ABD; /* Darker blue on hover */
 }
 
 header {
     display: flex;
-    align-items: center;
-    /* Align the icon and the text vertically in the center */
-    gap: 10px;
-    /* Space between icon and title */
+    align-items: center; /* Vertically align icon and title */
+    gap: 10px; /* Space between icon and title */
+    border-bottom: 1px solid #eee; /* Separator line */
+    padding-bottom: 10px; /* Space below header */
 }
 
 .logo-icon {
     width: 32px;
-    /* Set the width you desire for the icon */
     height: 32px;
-    /* Set the height you desire for the icon */
 }
 
 .title {
-    font-size: 24px;
-    /* Increase font size as desired */
+    font-size: 1.5em; /* Larger font size */
     font-weight: bold;
-    /* Make the title bold */
+    color: #444;
+}
+
+/* Specific styling for the main content area if needed */
+#info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Space between label/textarea pairs */
 }

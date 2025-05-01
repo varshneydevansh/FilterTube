@@ -4,27 +4,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouTube Filter Preferences</title>
+    <title>FilterTube Preferences</title>
+    <!-- Link to the CSS stylesheet for the popup -->
     <link rel="stylesheet" href="../css/popup.css">
 </head>
 
 <body>
+    <!-- Header section with extension icon and title -->
     <header>
+        <!-- Display the extension icon (adjust path if needed) -->
         <img src="../icons/icon-48.png" alt="FilterTube Icon" class="logo-icon">
+        <!-- Display the extension name -->
         <div class="title">FilterTube</div>
     </header>
 
+    <!-- Main content area for filter inputs -->
     <div id="info">
+        <!-- Label for the keywords input -->
         <label for="keywords">Filter by Keywords (comma separated):</label>
-        <textarea id="keywords" class="input-field" rows="3"></textarea>
+        <!-- Textarea for entering keywords, linked to the label by 'for' and 'id' -->
+        <textarea id="keywords" class="input-field" rows="3" placeholder="e.g., news, politics, specific_topic"></textarea>
 
-        <label for="channels" style="margin-top: 10px;">Filter by Channels (comma separated):</label>
-        <textarea id="channels" class="input-field" rows="3"></textarea>
+        <!-- Label for the channels input -->
+        <label for="channels" style="margin-top: 10px;">Filter by Channels (comma separated, exact match):</label>
+        <!-- Textarea for entering channel names, linked to the label -->
+        <textarea id="channels" class="input-field" rows="3" placeholder="e.g., Channel Name One, Another Channel"></textarea>
     </div>
 
+    <!-- Save button to store the preferences -->
     <button id="saveBtn" class="button full-btn">Save Preferences</button>
 
-    <!-- Include the script just before the closing body tag to ensure DOM is loaded before JS runs -->
+    <!-- Include the popup JavaScript file -->
+    <!-- Placed at the end of the body to ensure the DOM elements are available when the script runs -->
     <script src="../js/popup.js"></script>
 </body>
 

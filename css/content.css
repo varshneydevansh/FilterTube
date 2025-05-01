@@ -1,8 +1,44 @@
-/* content.css */
+/*
+ * content.css
+ *
+ * Stylesheet injected by the content script (content.js) into YouTube pages.
+ * Used primarily to hide video elements identified by the script.
+ */
+
+/* Class applied to video elements that should be hidden based on filter criteria. */
 .hidden-video {
+    /* Setting display to none removes the element from the layout entirely. */
+    /* !important is used to increase specificity and override potential conflicting YouTube styles. */
     display: none !important;
 }
 
+/*
+ * Optional class (currently unused in content.js) for highlighting videos.
+ * Could be useful for debugging selectors or implementing a different feature.
+ */
 .highlight-video {
     border: 2px solid red !important;
 }
+
+/* Optional visual indicator styling - can be uncommented if you want to make the videos 
+   visible but clearly marked as filtered instead of completely hidden */
+/*
+.hidden-video {
+  opacity: 0.3;
+  position: relative;
+}
+
+.hidden-video::before {
+  content: "Filtered";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  z-index: 10;
+  font-weight: bold;
+}
+*/
