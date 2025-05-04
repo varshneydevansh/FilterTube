@@ -1,0 +1,1661 @@
+/* === Base Styles & Variables === */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+:root {
+    --primary-color-start: #f2545b; /* Coral red start */
+    --primary-color-end: #fa8072;   /* Coral red end */
+    --primary-gradient: linear-gradient(135deg, var(--primary-color-start), var(--primary-color-end));
+    --secondary-color: #4a90e2; /* Complementary blue - example */
+    --text-color: #333;
+    --text-color-light: #fff;
+    --bg-color: #f8f9fa; /* Light gray background */
+    --bg-color-alt: #ffffff;
+    /* Enhanced glass backgrounds with gradients */
+    --glass-bg: linear-gradient(to bottom, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.65));
+    --glass-bg-darker: linear-gradient(to bottom, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.55));
+    --glass-bg-card1-overlay: linear-gradient(to bottom, rgba(250, 128, 114, 0.18), transparent 60%); /* Enhanced red overlay for card 1 */
+    --glass-border: rgba(255, 255, 255, 0.5);
+    --glass-shadow: 0 10px 35px 0 rgba(0, 0, 0, 0.15);
+    --glass-shadow-hover: 0 18px 50px 0 rgba(0, 0, 0, 0.25);
+    --font-family: 'Poppins', sans-serif;
+    --border-radius: 18px; /* Slightly larger radius */
+    --transition-speed: 0.3s;
+    /* Breathing background colors */
+    --color1: #a71414; /* Dark red */
+    --color2: #d32f2f; /* Medium red */
+    --color3: #f44336; /* Light red */
+    --color4: #e57373; /* Pale red */
+    --color5: #ffcdd2; /* Very light red */
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--font-family);
+    color: var(--text-color);
+    background-color: var(--bg-color);
+    line-height: 1.6;
+    overflow-x: hidden; /* Prevent horizontal scroll */
+    background-image: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%); /* Subtle gradient background */
+}
+
+h1, h2, h3 {
+    line-height: 1.3;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+h2.section-title {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+    color: var(--primary-color-start);
+}
+
+a {
+    color: var(--primary-color-start);
+    text-decoration: none;
+    transition: color var(--transition-speed) ease;
+}
+
+a:hover {
+    color: var(--primary-color-end);
+}
+
+ul {
+    list-style: none;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.section-padding {
+    padding: 80px 0;
+}
+
+/* === Glassmorphism Card Style (Enhanced) === */
+.glass-card {
+    /* Use the gradient background */
+    background: var(--glass-bg);
+    border-radius: var(--border-radius);
+    padding: 3rem; /* Increased padding */
+    box-shadow: var(--glass-shadow);
+    backdrop-filter: blur(20px); /* Increased blur */
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+    position: relative; /* Needed for potential pseudo-elements or overlays */
+    z-index: 2; /* Ensure cards are above background blobs */
+    overflow: hidden; /* Ensure pseudo elements are contained */
+}
+
+/* Add subtle gradient overlay specifically for card 1 */
+.glass-card.card-left::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--glass-bg-card1-overlay);
+    border-radius: var(--border-radius); /* Match parent */
+    pointer-events: none; /* Allow interaction with card content */
+    z-index: -1; /* Place behind card content but above base bg */
+}
+
+.glass-card:hover {
+    transform: translateY(-8px); /* Keep simple lift on hover */
+    box-shadow: var(--glass-shadow-hover);
+}
+
+/* === Buttons (Enhanced Glassmorphism) === */
+.btn {
+    display: inline-block;
+    padding: 0.8rem 1.8rem;
+    border-radius: var(--border-radius);
+    text-align: center;
+    font-weight: 600;
+    transition: all var(--transition-speed) ease;
+    cursor: pointer;
+    border: 1px solid transparent;
+    font-size: 1rem;
+    margin: 0.5rem;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    box-sizing: border-box; /* Ensure padding doesn't affect width */
+    max-width: 100%; /* Ensure button doesn't overflow container */
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.1);
+    opacity: 0;
+    transition: opacity var(--transition-speed) ease;
+    pointer-events: none;
+}
+
+.btn:hover::before {
+    opacity: 1;
+}
+
+.btn i {
+    margin-right: 0.5rem;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, rgba(242, 84, 91, 0.9), rgba(250, 128, 114, 0.9));
+    color: var(--text-color-light);
+    box-shadow: 0 4px 15px rgba(242, 84, 91, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(242, 84, 91, 0.6);
+    color: var(--text-color-light);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, rgba(85, 85, 85, 0.9), rgba(51, 51, 51, 0.9));
+    color: var(--text-color-light);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-secondary:hover {
+    background: linear-gradient(135deg, rgba(51, 51, 51, 0.9), rgba(34, 34, 34, 0.9));
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    color: var(--text-color-light);
+}
+
+.btn-outline {
+    background: rgba(255, 255, 255, 0.3);
+    color: var(--primary-color-start);
+    border: 2px solid var(--primary-color-start);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+.btn-outline:hover {
+    background: var(--primary-gradient);
+    color: var(--text-color-light);
+    border-color: transparent;
+    transform: translateY(-2px);
+}
+
+/* === Navbar (Enhanced Glass Effect) === */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    padding: 1.2rem 0;
+    transition: all var(--transition-speed) ease;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.navbar .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1400px; /* Increased from 1300px */
+    width: 95%; /* Ensure more responsive width */
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    color: var(--text-color);
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+.logo:hover { color: var(--text-color); }
+
+/* Make FilterTube text in logo red */
+.logo span {
+    color: var(--primary-color-start);
+}
+
+.logo-icon {
+    width: 40px;
+    height: 40px;
+    margin-right: 0.5rem;
+}
+
+.nav-links ul {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap; /* Prevent wrapping by default */
+    gap: 2.5rem; /* Use gap instead of margins for better spacing */
+}
+
+.nav-links li {
+    white-space: nowrap; /* Prevent text wrapping inside links */
+}
+
+.nav-links a {
+    color: var(--text-color);
+    font-weight: 600;
+    padding-bottom: 5px;
+    border-bottom: 2px solid transparent;
+    transition: all var(--transition-speed) ease;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    color: var(--primary-color-start);
+    border-bottom-color: var(--primary-color-start);
+}
+
+.github-link {
+    color: var(--text-color);
+    font-size: 1.8rem;
+    margin-left: 1.5rem;
+}
+
+.mobile-nav-toggle {
+    display: none; /* Hidden by default */
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    cursor: pointer;
+    color: var(--text-color);
+}
+
+/* === Hero Section with Breathing Background === */
+.hero-section {
+    min-height: 100vh; /* Keep full height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: var(--text-color-light);
+    background-color: var(--primary-color-start); /* Fallback solid color */
+    position: relative;
+    overflow: hidden; /* Keep overflow hidden for layered SVGs */
+    padding-top: 80px; /* Adjust for fixed navbar height */
+    perspective: 1000px; /* Add perspective for 3D effect */
+    animation: breathing-bg 15s ease-in-out infinite alternate;
+}
+
+/* Create breathing background effect */
+@keyframes breathing-bg {
+    0% {
+        background-color: var(--color1, #a71414);
+    }
+    25% {
+        background-color: var(--color2, #d32f2f);
+    }
+    50% {
+        background-color: var(--color3, #f44336);
+    }
+    75% {
+        background-color: var(--color4, #e57373);
+    }
+    100% {
+        background-color: var(--color5, #ffcdd2);
+    }
+}
+
+.hero-content {
+    position: relative;
+    z-index: 10; /* Ensure text is above SVG layers */
+}
+
+.hero-content h1 {
+    font-size: 3.5rem;
+    margin-bottom: 1rem;
+    font-weight: 700;
+    text-shadow: 0 2px 5px rgba(0,0,0,0.15); /* Optional text shadow */
+}
+
+.hero-content .tagline {
+    font-size: 1.3rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* New SVG Wave Background Styling */
+.bg-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0; /* Behind hero-content */
+    overflow: hidden; /* Important */
+    pointer-events: none;
+    transform-style: preserve-3d; /* Maintain 3D space for children */
+}
+
+/* Style SVGs inside the layer */
+.bg-layer .wave {
+    position: absolute;
+    width: 120%; /* Increase from 100% to 120% to prevent clipping */
+    left: -10%; /* Offset to center the wave */
+    filter: blur(3px); /* Add slight blur to soften edges */
+    will-change: transform; /* Hint for animation */
+    transition: transform 0.2s ease-out; /* Smooth transition for mouse movement */
+}
+
+/* Position each wave at different depths and positions */
+.wave-1 {
+    top: 0;
+    z-index: 5;
+    transform: translateZ(-10px); /* Push back in 3D space */
+}
+
+.wave-2 {
+    top: 2.5rem;
+    z-index: 4;
+    transform: translateZ(-20px);
+}
+
+.wave-3 {
+    top: 5rem;
+    z-index: 3;
+    transform: translateZ(-30px);
+}
+
+.wave-4 {
+    top: 7.5rem;
+    z-index: 2;
+    transform: translateZ(-40px);
+}
+
+.wave-5 {
+    top: 10rem;
+    z-index: 1;
+    transform: translateZ(-50px);
+}
+
+/* Define Wave Animations with more dynamic movement */
+@keyframes waveMove1 {
+    0% { transform: translateZ(-10px) translateY(0); }
+    50% { transform: translateZ(-10px) translateY(-15px) translateX(5px); }
+    100% { transform: translateZ(-10px) translateY(0); }
+}
+
+@keyframes waveMove2 {
+    0% { transform: translateZ(-20px) translateY(0) translateX(0); }
+    50% { transform: translateZ(-20px) translateY(10px) translateX(-10px); }
+    100% { transform: translateZ(-20px) translateY(0) translateX(0); }
+}
+
+@keyframes waveMove3 {
+    0% { transform: translateZ(-30px) translateY(0); }
+    50% { transform: translateZ(-30px) translateY(15px) translateX(8px); }
+    100% { transform: translateZ(-30px) translateY(0); }
+}
+
+@keyframes waveMove4 {
+    0% { transform: translateZ(-40px) translateY(0) translateX(0); }
+    50% { transform: translateZ(-40px) translateY(-8px) translateX(-5px); }
+    100% { transform: translateZ(-40px) translateY(0) translateX(0); }
+}
+
+@keyframes waveMove5 {
+    0% { transform: translateZ(-50px) translateY(0); }
+    50% { transform: translateZ(-50px) translateY(12px) translateX(10px); }
+    100% { transform: translateZ(-50px) translateY(0); }
+}
+
+/* Apply animations to each SVG layer */
+.wave-1 {
+    animation: waveMove1 25s infinite alternate ease-in-out;
+}
+
+.wave-2 {
+    animation: waveMove2 30s infinite alternate ease-in-out;
+}
+
+.wave-3 {
+    animation: waveMove3 35s infinite alternate ease-in-out;
+}
+
+.wave-4 {
+    animation: waveMove4 40s infinite alternate ease-in-out;
+}
+
+.wave-5 {
+    animation: waveMove5 45s infinite alternate ease-in-out;
+}
+
+/* === Why Section (Enhanced Glass) === */
+.why-section {
+    background-color: var(--bg-color-alt);
+    position: relative;
+    z-index: 1;
+}
+
+.why-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(248, 249, 250, 0.5));
+    z-index: -1;
+}
+
+.why-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+/* Apply enhanced glassmorphism to why items */
+.why-item {
+    background: var(--glass-bg);
+    border-radius: var(--border-radius);
+    padding: 2rem 1.5rem;
+    box-shadow: var(--glass-shadow);
+    backdrop-filter: blur(12px); 
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+}
+
+.why-item:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--glass-shadow-hover);
+}
+
+.icon-why {
+    font-size: 3rem;
+    color: var(--primary-color-start);
+    margin-bottom: 1rem;
+}
+
+.why-item h3 {
+    font-size: 1.4rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Styling for the community link paragraph */
+.community-link {
+    text-align: center;
+    margin-top: 2rem;
+    font-size: 1.1rem;
+    color: #555; /* Slightly muted text color */
+    line-height: 1.7;
+}
+
+.community-link a {
+    font-weight: 600;
+    /* Keep default link color or adjust as needed */
+    /* color: var(--secondary-color); */
+}
+
+/* === Features Section (Enhanced Glass) === */
+.features-section {
+    background-color: var(--bg-color);
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    padding-top: 100px; /* Add top padding to prevent overlap */
+}
+
+.features-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.6), rgba(248, 249, 250, 0.3));
+    z-index: -1;
+}
+
+/* Wrapper for grid and blobs */
+.features-grid-wrapper {
+    position: relative;
+    padding: 2rem 0; /* Add some padding around the grid */
+}
+
+/* Enhanced feature card styling */
+.features-grid {
+    display: grid;
+    grid-template-columns: 1fr; /* Make cards full width to avoid text congestion */
+    gap: 2.5rem;
+    align-items: stretch;
+    position: relative;
+    z-index: 2;
+    max-width: 1200px; /* Added max width to control overall container size */
+    margin: 0 auto; /* Center the grid */
+}
+
+/* Base card style remains in .feature-card, remove positioning */
+.feature-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: auto; /* Allow height to adjust */
+    min-height: auto; /* Reset min-height */
+    padding: 2.5rem; /* Add more padding inside cards */
+}
+
+/* Enhanced feature card styles */
+.card-left {
+    background: linear-gradient(to right, rgba(76, 175, 80, 0.1), rgba(255, 255, 255, 0.8));
+    border-left: 6px solid #4CAF50; /* Green */
+}
+
+.card-right {
+    background: linear-gradient(to right, rgba(33, 150, 243, 0.1), rgba(255, 255, 255, 0.8));
+    border-left: 6px solid #2196F3; /* Blue */
+    margin-top: 1rem; /* Add spacing between the cards */
+}
+
+/* Adjust hover effect */
+.card-left:hover,
+.card-right:hover {
+    transform: translateY(-8px); /* Simple lift */
+    z-index: 4; /* Bring hovered card forward */
+}
+
+/* Keep other feature card content styles */
+.feature-card h3 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    color: var(--primary-color-start);
+}
+
+.feature-description {
+    margin-bottom: 1.5rem;
+    flex-grow: 1;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+.features-list {
+    margin-bottom: 1.5rem;
+    text-align: left;
+    padding-left: 0;
+    flex-grow: 1;
+}
+
+.features-list li {
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: flex-start;
+    position: relative;
+    padding-left: 2.5rem;
+}
+
+.features-list i {
+    color: var(--primary-color-start);
+    position: absolute;
+    left: 0;
+    top: 0.3rem;
+    width: 20px;
+    text-align: center;
+}
+
+.features-list strong {
+    margin-right: 0.3rem;
+}
+
+/* Colorize different feature icons */
+.features-list li:nth-child(1) i { color: #f2545b; }
+.features-list li:nth-child(2) i { color: #4CAF50; }
+.features-list li:nth-child(3) i { color: #FFC107; }
+.features-list li:nth-child(4) i { color: #2196F3; }
+.features-list li:nth-child(5) i { color: #9C27B0; }
+.features-list li:nth-child(6) i { color: #FF5722; }
+.features-list li:nth-child(7) i { color: #607D8B; }
+.features-list li:nth-child(8) i { color: #795548; }
+
+.feature-buttons {
+    margin-top: auto; /* Push buttons to bottom */
+    display: flex; /* Use Flexbox */
+    flex-direction: row; /* Explicitly set direction */
+    justify-content: center; /* Center buttons horizontally */
+    align-items: center; /* Align items vertically if heights differ */
+    flex-wrap: wrap; /* Allow wrapping on small screens if needed */
+    gap: 1rem; /* Add some space between buttons */
+    width: 100%; /* Ensure full width */
+}
+
+/* Ensure buttons don't take full width inherently */
+.feature-buttons .btn {
+    flex-grow: 0; /* Don't allow buttons to grow */
+    flex-shrink: 0; /* Don't allow buttons to shrink excessively if wrapping */
+    width: auto; /* Let buttons size based on content */
+    white-space: nowrap; /* Prevent text wrapping inside buttons */
+}
+
+/* Status badge with enhanced glass effect */
+.status-badge {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    background: linear-gradient(135deg, rgba(33, 150, 243, 0.9), rgba(33, 150, 243, 0.7));
+    color: var(--text-color-light);
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius);
+    font-size: 0.9rem;
+    font-weight: 600;
+    z-index: 5;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.mobile-icon {
+    margin-left: 0.5rem;
+    color: #2196F3;
+}
+
+/* Fix for mobile icon overlapping with Future Vision badge */
+.feature-card.card-right h3 {
+    padding-right: 6rem; /* Provide space for the badge */
+}
+
+/* === How It Works Section (Enhanced for Focus) === */
+.how-it-works-section {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.85), rgba(245, 245, 245, 0.95)), 
+                url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23f2545b' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+    position: relative;
+    overflow: hidden;
+    padding-top: 100px; /* Add more top padding to prevent overlap with header */
+}
+
+.how-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    margin-top: 50px;
+    margin-bottom: 30px;
+}
+
+.how-step {
+    padding: 40px 30px;
+    text-align: center;
+    position: relative;
+    box-shadow: var(--glass-shadow);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: var(--border-radius);
+    transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+    overflow: visible; /* Changed from hidden to visible to allow step number to extend outside */
+}
+
+.how-step:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--glass-shadow-hover);
+}
+
+.step-number {
+    position: absolute;
+    top: -25px; /* Increased from -22px */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px; /* Increased from 44px */
+    height: 50px; /* Increased from 44px */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 22px; /* Increased font size */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); /* Enhanced shadow */
+    z-index: 5; /* Ensure it's on top */
+    border: 3px solid white; /* Added white border for better visibility */
+}
+
+.step-icon {
+    font-size: 45px; /* Increased from 40px */
+    margin-bottom: 20px; /* Increased from 15px */
+}
+
+.how-step h4 {
+    font-size: 1.5rem; /* Increased from 1.4rem */
+    margin-bottom: 18px; /* Increased from 15px */
+    font-weight: 600;
+}
+
+.how-step p {
+    line-height: 1.6; /* Increased from 1.5 */
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+/* Enhanced colorful backgrounds to the steps */
+.how-step:nth-child(1) {
+    border-top: 6px solid #4CAF50; /* Green, increased from 5px */
+    background: linear-gradient(to bottom, rgba(76, 175, 80, 0.15), rgba(255, 255, 255, 0.8));
+}
+
+.how-step:nth-child(2) {
+    border-top: 6px solid #FFC107; /* Yellow/Amber */
+    background: linear-gradient(to bottom, rgba(255, 193, 7, 0.15), rgba(255, 255, 255, 0.8));
+}
+
+.how-step:nth-child(3) {
+    border-top: 6px solid #2196F3; /* Blue */
+    background: linear-gradient(to bottom, rgba(33, 150, 243, 0.15), rgba(255, 255, 255, 0.8));
+}
+
+/* Match step icon colors to the border colors */
+.how-step:nth-child(1) .step-icon {
+    color: #4CAF50;
+}
+
+.how-step:nth-child(2) .step-icon {
+    color: #FFC107;
+}
+
+.how-step:nth-child(3) .step-icon {
+    color: #2196F3;
+}
+
+/* Enhanced colored backgrounds to the step numbers */
+.how-step:nth-child(1) .step-number {
+    background: #4CAF50;
+    color: white;
+}
+
+.how-step:nth-child(2) .step-number {
+    background: #FFC107;
+    color: white;
+}
+
+.how-step:nth-child(3) .step-number {
+    background: #2196F3;
+    color: white;
+}
+
+/* Colorful steps for filtering diagram */
+.filtering-diagram {
+    background: var(--glass-bg);
+    border-radius: var(--border-radius);
+    padding: 2.5rem;
+    margin: 2.5rem 0;
+    text-align: center;
+    box-shadow: var(--glass-shadow);
+    border-left: 6px solid #4CAF50; /* Green accent */
+    background: linear-gradient(to right, rgba(76, 175, 80, 0.1), rgba(255, 255, 255, 0.8));
+}
+
+.filtering-diagram h3 {
+    color: var(--primary-color-start);
+    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
+}
+
+.diagram-box {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 650px;
+    margin: 0 auto;
+}
+
+.diagram-step {
+    background: var(--bg-color-alt);
+    border-radius: 8px;
+    padding: 1rem;
+    position: relative;
+    border: 1px solid rgba(250, 128, 114, 0.3);
+}
+
+.diagram-step:nth-child(1) {
+    border-left: 4px solid #4CAF50;
+    background: linear-gradient(to right, rgba(76, 175, 80, 0.1), rgba(255, 255, 255, 0.8));
+}
+
+.diagram-step:nth-child(3) {
+    border-left: 4px solid #FFC107;
+    background: linear-gradient(to right, rgba(255, 193, 7, 0.1), rgba(255, 255, 255, 0.8));
+}
+
+.diagram-step:nth-child(5) {
+    border-left: 4px solid #2196F3;
+    background: linear-gradient(to right, rgba(33, 150, 243, 0.1), rgba(255, 255, 255, 0.8));
+}
+
+.diagram-step:nth-child(7) {
+    border-left: 4px solid #9C27B0;
+    background: linear-gradient(to right, rgba(156, 39, 176, 0.1), rgba(255, 255, 255, 0.8));
+}
+
+.diagram-step:nth-child(9) {
+    border-left: 4px solid #FF5722;
+    background: linear-gradient(to right, rgba(255, 87, 34, 0.1), rgba(255, 255, 255, 0.8));
+}
+
+.diagram-step strong {
+    color: var(--primary-color-start);
+}
+
+.diagram-arrow {
+    color: var(--primary-color-start);
+    font-size: 1.5rem;
+}
+
+/* Make sure all filters on technical features have consistent and varied styling */
+.tech-feature:nth-child(6) {
+    border-left: 6px solid #673AB7; /* Purple */
+    background: linear-gradient(to right, rgba(103, 58, 183, 0.1), rgba(255, 255, 255, 0.8));
+}
+
+.tech-feature:nth-child(7) {
+    border-left: 6px solid #FF5722; /* Orange */
+    background: linear-gradient(to right, rgba(255, 87, 34, 0.1), rgba(255, 255, 255, 0.8));
+}
+
+.tech-feature:nth-child(8) {
+    border-left: 6px solid #607D8B; /* Blue Grey */
+    background: linear-gradient(to right, rgba(96, 125, 139, 0.1), rgba(255, 255, 255, 0.8));
+}
+
+.tech-feature:nth-child(6) h3 i {
+    color: #673AB7;
+}
+
+.tech-feature:nth-child(7) h3 i {
+    color: #FF5722;
+}
+
+.tech-feature:nth-child(8) h3 i {
+    color: #607D8B;
+}
+
+/* Make filtering methods more colorful and varied */
+.filter-method:nth-child(1) {
+    border-left: 6px solid #4CAF50; /* Green */
+    background: linear-gradient(to right, rgba(76, 175, 80, 0.1), rgba(255, 255, 255, 0.8));
+}
+
+.filter-method:nth-child(5) {
+    border-left: 6px solid #FF5722; /* Orange */
+    background: linear-gradient(to right, rgba(255, 87, 34, 0.1), rgba(255, 255, 255, 0.8));
+}
+
+.filter-method:nth-child(6) {
+    border-left: 6px solid #673AB7; /* Purple */
+    background: linear-gradient(to right, rgba(103, 58, 183, 0.1), rgba(255, 255, 255, 0.8));
+}
+
+.filter-method:nth-child(7) {
+    border-left: 6px solid #607D8B; /* Blue Grey */
+    background: linear-gradient(to right, rgba(96, 125, 139, 0.1), rgba(255, 255, 255, 0.8));
+}
+
+.filter-method:nth-child(5) h3 i {
+    color: #FF5722;
+}
+
+.filter-method:nth-child(6) h3 i {
+    color: #673AB7;
+}
+
+.filter-method:nth-child(7) h3 i {
+    color: #607D8B;
+}
+
+/* === Guides and Content Pages Consistent Styling === */
+
+/* Consistent positioning and spacing for all card containers */
+.guide-content,
+.tech-content,
+.privacy-content,
+.story-section {
+    position: relative;
+    margin-top: -60px;
+    padding: 0 20px;
+    z-index: 5;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Common glass morphic style for all cards */
+.glass-card, .glass-section, .tech-feature, .filter-method {
+    background: var(--glass-bg);
+    border-radius: var(--border-radius);
+    padding: 2.5rem;
+    margin-bottom: 2.5rem;
+    box-shadow: var(--glass-shadow);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid var(--glass-border);
+    transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+}
+
+.glass-card:hover, .glass-section:hover, .tech-feature:hover, .filter-method:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--glass-shadow-hover);
+}
+
+/* Comprehensive Filtering Guide Styling */
+.guide-section h2 {
+    color: var(--primary-color-start);
+    margin-bottom: 1.5rem;
+    font-size: 2.2rem;
+    text-align: center;
+}
+
+.guide-intro {
+    text-align: center;
+    font-size: 1.1rem;
+    max-width: 800px;
+    margin: 0 auto 2rem;
+    line-height: 1.7;
+}
+
+/* Guide container with consistent width */
+.guide-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Style colors for the Privacy page glass sections */
+.glass-section:nth-child(1) {
+    border-left: 6px solid #4CAF50; /* Green */
+    background: linear-gradient(to right, rgba(76, 175, 80, 0.1), rgba(255, 255, 255, 0.8));
+}
+
+.glass-section:nth-child(2) {
+    border-left: 6px solid #FFC107; /* Yellow */
+    background: linear-gradient(to right, rgba(255, 193, 7, 0.1), rgba(255, 255, 255, 0.8));
+}
+
+.glass-section:nth-child(3) {
+    border-left: 6px solid #2196F3; /* Blue */
+    background: linear-gradient(to right, rgba(33, 150, 243, 0.1), rgba(255, 255, 255, 0.8));
+}
+
+.glass-section:nth-child(4) {
+    border-left: 6px solid #9C27B0; /* Purple */
+    background: linear-gradient(to right, rgba(156, 39, 176, 0.1), rgba(255, 255, 255, 0.8));
+}
+
+/* Style colors for the story page */
+.story-section.glass-card {
+    border-left: 6px solid #4CAF50; /* Green */
+    background: linear-gradient(to right, rgba(76, 175, 80, 0.1), rgba(255, 255, 255, 0.8));
+}
+
+/* Consistent colors for filtering guide sections */
+.filter-method:nth-child(1) {
+    border-left: 6px solid #4CAF50; /* Green */
+    background: linear-gradient(to right, rgba(76, 175, 80, 0.1), rgba(255, 255, 255, 0.8));
+}
+
+.filter-method:nth-child(2) {
+    border-left: 6px solid #FFC107; /* Yellow */
+    background: linear-gradient(to right, rgba(255, 193, 7, 0.1), rgba(255, 255, 255, 0.8));
+}
+
+.filter-method:nth-child(3) {
+    border-left: 6px solid #2196F3; /* Blue */
+    background: linear-gradient(to right, rgba(33, 150, 243, 0.1), rgba(255, 255, 255, 0.8));
+}
+
+.filter-method:nth-child(4) {
+    border-left: 6px solid #673AB7; /* Purple */
+    background: linear-gradient(to right, rgba(103, 58, 183, 0.1), rgba(255, 255, 255, 0.8));
+}
+
+.filter-method:nth-child(5) {
+    border-left: 6px solid #FF5722; /* Orange */
+    background: linear-gradient(to right, rgba(255, 87, 34, 0.1), rgba(255, 255, 255, 0.8));
+}
+
+.filter-method:nth-child(6) {
+    border-left: 6px solid #607D8B; /* Blue Grey */
+    background: linear-gradient(to right, rgba(96, 125, 139, 0.1), rgba(255, 255, 255, 0.8));
+}
+
+.filter-method:nth-child(7) {
+    border-left: 6px solid #009688; /* Teal */
+    background: linear-gradient(to right, rgba(0, 150, 136, 0.1), rgba(255, 255, 255, 0.8));
+}
+
+/* Match icon colors to borders */
+.filter-method:nth-child(1) h3 i { color: #4CAF50; }
+.filter-method:nth-child(2) h3 i { color: #FFC107; }
+.filter-method:nth-child(3) h3 i { color: #2196F3; }
+.filter-method:nth-child(4) h3 i { color: #673AB7; }
+.filter-method:nth-child(5) h3 i { color: #FF5722; }
+.filter-method:nth-child(6) h3 i { color: #607D8B; }
+.filter-method:nth-child(7) h3 i { color: #009688; }
+
+/* Formatting for filter method headings */
+.filter-method h3 {
+    color: var(--primary-color-start);
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
+}
+
+.filter-method h3 i {
+    margin-right: 1rem;
+    font-size: 1.8rem;
+}
+
+/* Enhanced filtering diagram */
+.filtering-diagram {
+    background: var(--glass-bg);
+    border-radius: var(--border-radius);
+    padding: 2.5rem;
+    margin: 2.5rem 0;
+    text-align: center;
+    box-shadow: var(--glass-shadow);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid var(--glass-border);
+    border-left: 6px solid #4CAF50; /* Green accent */
+    background: linear-gradient(to right, rgba(76, 175, 80, 0.1), rgba(255, 255, 255, 0.8));
+    transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+}
+
+.filtering-diagram:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--glass-shadow-hover);
+}
+
+.filtering-diagram h3 {
+    color: var(--primary-color-start);
+    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
+}
+
+/* Colorful diagram steps */
+.diagram-step {
+    background: var(--bg-color-alt);
+    border-radius: 8px;
+    padding: 1rem;
+    position: relative;
+    border: 1px solid rgba(250, 128, 114, 0.3);
+}
+
+.diagram-step:nth-child(1) {
+    border-left: 4px solid #4CAF50;
+    background: linear-gradient(to right, rgba(76, 175, 80, 0.1), rgba(255, 255, 255, 0.8));
+}
+
+.diagram-step:nth-child(3) {
+    border-left: 4px solid #FFC107;
+    background: linear-gradient(to right, rgba(255, 193, 7, 0.1), rgba(255, 255, 255, 0.8));
+}
+
+.diagram-step:nth-child(5) {
+    border-left: 4px solid #2196F3;
+    background: linear-gradient(to right, rgba(33, 150, 243, 0.1), rgba(255, 255, 255, 0.8));
+}
+
+.diagram-step:nth-child(7) {
+    border-left: 4px solid #9C27B0;
+    background: linear-gradient(to right, rgba(156, 39, 176, 0.1), rgba(255, 255, 255, 0.8));
+}
+
+.diagram-step:nth-child(9) {
+    border-left: 4px solid #FF5722;
+    background: linear-gradient(to right, rgba(255, 87, 34, 0.1), rgba(255, 255, 255, 0.8));
+}
+
+.diagram-step strong {
+    color: var(--primary-color-start);
+}
+
+/* === Enhanced Footer === */
+.footer {
+    background: linear-gradient(135deg, rgba(51, 51, 51, 0.98), rgba(34, 34, 34, 0.95));
+    color: #ccc;
+    padding: 4rem 0; /* Increased padding */
+    margin-top: 80px;
+    position: relative;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.footer-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Two-column footer layout */
+.footer-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+}
+
+.footer-left {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.footer-right {
+    padding-top: 0.5rem;
+}
+
+.footer-logo {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.footer-logo img {
+    width: 55px; /* Increased from 50px */
+    height: 55px; /* Increased from 50px */
+    margin-right: 1rem;
+}
+
+.footer-logo-text {
+    color: #fff;
+    font-weight: 600;
+    font-size: 1.8rem; /* Increased from 1.5rem */
+}
+
+.footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem; /* Use gap instead of margins */
+}
+
+.footer-links a {
+    color: #eee;
+    font-weight: 500;
+    font-size: 1.1rem;
+    padding: 0.5rem 0;
+    transition: all 0.3s ease;
+}
+
+.footer-links a:hover {
+    color: var(--primary-color-start);
+}
+
+.footer-bottom {
+    text-align: center;
+    width: 100%;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer p {
+    margin-bottom: 0.8rem;
+    color: #ccc;
+}
+
+.footer .disclaimer {
+    font-size: 0.9rem;
+    opacity: 0.7;
+    max-width: 800px;
+    margin: 1rem auto 0;
+    line-height: 1.6;
+}
+
+/* Responsive footer adjustments */
+@media (max-width: 768px) {
+    .footer-top {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .footer-left {
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+    
+    .footer-links {
+        justify-content: center;
+    }
+    
+    .footer-logo {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Make sure all filters on technical features and filtering guide pages have consistent styling */
+.tech-feature:nth-child(6),
+.tech-feature:nth-child(7),
+.tech-feature:nth-child(8) {
+    border-left: 6px solid #673AB7; /* Purple */
+    background: linear-gradient(to right, rgba(103, 58, 183, 0.1), rgba(255, 255, 255, 0.8));
+}
+
+.tech-feature:nth-child(6) h3 i,
+.tech-feature:nth-child(7) h3 i,
+.tech-feature:nth-child(8) h3 i {
+    color: #673AB7;
+}
+
+.filter-method:nth-child(5),
+.filter-method:nth-child(6),
+.filter-method:nth-child(7) {
+    border-left: 6px solid #FF5722; /* Orange */
+    background: linear-gradient(to right, rgba(255, 87, 34, 0.1), rgba(255, 255, 255, 0.8));
+}
+
+.filter-method:nth-child(5) h3 i,
+.filter-method:nth-child(6) h3 i,
+.filter-method:nth-child(7) h3 i {
+    color: #FF5722;
+}
+
+/* Make privacy policy and our story sections aligned consistently with top-padding */
+.privacy-content,
+.story-section {
+    margin-top: 100px;
+}
+
+/* === Animations === */
+.animate-on-scroll {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.animate-on-scroll.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* === Responsive Design === */
+@media (max-width: 992px) {
+    h2.section-title { font-size: 2.2rem; }
+    .hero-content h1 { font-size: 3rem; }
+    .hero-content .tagline { font-size: 1.2rem; }
+
+    /* Ensure features grid stacks correctly */
+    .features-grid {
+        grid-template-columns: 1fr; /* Ensure stacking */
+        gap: 2rem;
+    }
+    /* Remove leftover styles if any */
+    .card-left, .card-right {
+        transform: none !important;
+        margin-bottom: 2rem;
+        z-index: 2 !important;
+    }
+    .card-right { margin-bottom: 0; }
+    .features-grid-wrapper { min-height: auto; } /* Reset min-height */
+
+    .why-grid, .how-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Revert to auto-fit for medium */
+    }
+}
+
+@media (max-width: 768px) {
+    .section-padding { padding: 60px 0; }
+    h2.section-title { font-size: 2rem; margin-bottom: 2rem; }
+    .hero-content h1 { font-size: 2.5rem; }
+    .hero-content .tagline { font-size: 1.1rem; }
+
+    .nav-links {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 5px 10px var(--shadow-color);
+        flex-direction: column;
+        padding: 1rem 0;
+        border-top: 1px solid #eee;
+    }
+
+    .nav-links.active { display: flex; }
+    .nav-links ul { flex-direction: column; width: 100%; }
+    .nav-links li { margin: 0.8rem 0; text-align: center; width: 100%; }
+    .nav-links a { display: block; padding: 0.5rem 0; border-bottom: none; }
+    .nav-links a:hover { background-color: #eee; }
+    .mobile-nav-toggle { display: block; }
+    .github-link { margin-left: auto; margin-right: 1rem; }
+
+    /* Stack why-grid items */
+    .why-grid, .how-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .btn {
+        padding: 0.7rem 1.5rem;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero-content h1 { font-size: 2rem; }
+    .hero-content .tagline { font-size: 1rem; }
+    .footer p { font-size: 0.9rem; }
+    .container { padding: 0 15px; }
+    .glass-card { padding: 1.5rem; }
+    .why-item, .how-step { padding: 1.5rem; }
+    .step-number { width: 30px; height: 30px; font-size: 1rem; } /* Adjust step number size */
+}
+
+/* Add clear rules for feature buttons container */
+.feature-card .feature-buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    width: 100%;
+}
+
+/* Ensure feature card buttons have explicit display */
+.feature-card .feature-buttons .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Direct fix for the extension card buttons */
+.feature-card.card-left .feature-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    width: 100%;
+    margin-top: 1.5rem;
+}
+
+.feature-card.card-left .feature-buttons .btn {
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+}
+
+@media (max-width: 576px) {
+    .feature-card.card-left .feature-buttons {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Ensure nav links don't disappear when active */
+.nav-links li a.active {
+    color: var(--primary-color-start);
+    border-bottom-color: var(--primary-color-start);
+    pointer-events: auto; /* Ensure link remains clickable */
+    opacity: 1; /* Ensure full visibility */
+    display: inline-block; /* Ensure the element doesn't collapse */
+}
+
+/* Make the navigation wrap properly on medium screens before showing mobile menu */
+@media (max-width: 1100px) and (min-width: 769px) {
+    .nav-links ul {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+    
+    .nav-links li {
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* Hero Features */
+.hero-features {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin: 1.5rem 0;
+    flex-wrap: wrap;
+}
+
+.hero-feature {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 0.6rem 1.2rem;
+    border-radius: 30px;
+    color: white;
+    font-weight: 500;
+    font-size: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.hero-feature i {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+@media (max-width: 576px) {
+    .hero-features {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.8rem;
+    }
+}
+
+/* Add colorful backgrounds to the steps */
+.how-step:nth-child(1) {
+    border-top: 5px solid #4CAF50; /* Green */
+    background: linear-gradient(to bottom, rgba(76, 175, 80, 0.1), rgba(255, 255, 255, 0.7));
+}
+
+.how-step:nth-child(2) {
+    border-top: 5px solid #FFC107; /* Yellow/Amber */
+    background: linear-gradient(to bottom, rgba(255, 193, 7, 0.1), rgba(255, 255, 255, 0.7));
+}
+
+.how-step:nth-child(3) {
+    border-top: 5px solid #2196F3; /* Blue */
+    background: linear-gradient(to bottom, rgba(33, 150, 243, 0.1), rgba(255, 255, 255, 0.7));
+}
+
+/* Match step icon colors to the border colors */
+.how-step:nth-child(1) .step-icon {
+    color: #4CAF50;
+}
+
+.how-step:nth-child(2) .step-icon {
+    color: #FFC107;
+}
+
+.how-step:nth-child(3) .step-icon {
+    color: #2196F3;
+}
+
+/* Add colored backgrounds to the step numbers */
+.how-step:nth-child(1) .step-number {
+    background: #4CAF50;
+    color: white;
+    border: 2px solid white;
+}
+
+.how-step:nth-child(2) .step-number {
+    background: #FFC107;
+    color: white;
+    border: 2px solid white;
+}
+
+.how-step:nth-child(3) .step-number {
+    background: #2196F3;
+    color: white;
+    border: 2px solid white;
+}
+
+/* Add colorful background to the how-it-works section */
+.how-it-works-section {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(245, 245, 245, 0.9)), 
+                url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23f2545b' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+    position: relative;
+    overflow: hidden;
+}
+
+/* === Next Section (Enhanced Glass) === */
+.next-section {
+    background-color: var(--bg-color);
+    position: relative;
+    z-index: 1;
+    padding-top: 100px; /* Add padding to prevent overlap */
+}
+
+.next-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.7), rgba(248, 249, 250, 0.4));
+    z-index: -1;
+}
+
+.next-content {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: left;
+    background: var(--glass-bg);
+    border-radius: var(--border-radius);
+    padding: 2.5rem;
+    box-shadow: var(--glass-shadow);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid var(--glass-border);
+    border-left: 6px solid #9C27B0; /* Purple accent */
+}
+
+.next-content p {
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+    text-align: center;
+    color: var(--text-color);
+}
+
+.next-content ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.next-content li {
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding-left: 2.5rem;
+}
+
+.next-content i {
+    position: absolute;
+    left: 0;
+    top: 0.3rem;
+    width: 25px; /* Align icons */
+    text-align: center;
+}
+
+/* Colorize next section icons */
+.next-content li:nth-child(1) i { color: #f2545b; }
+.next-content li:nth-child(2) i { color: #4CAF50; }
+.next-content li:nth-child(3) i { color: #FFC107; }
+.next-content li:nth-child(4) i { color: #2196F3; }
+.next-content li:nth-child(5) i { color: #9C27B0; }
+.next-content li:nth-child(6) i { color: #FF5722; }
+.next-content li:nth-child(7) i { color: #607D8B; }
+
+/* === Privacy Section (Enhanced Glass) === */
+.privacy-section {
+    background-color: var(--bg-color-alt);
+    position: relative;
+    z-index: 1;
+    padding-top: 100px; /* Add padding to prevent overlap */
+}
+
+.privacy-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.7), rgba(248, 249, 250, 0.4));
+    z-index: -1;
+}
+
+.privacy-list {
+    list-style: none;
+    padding-left: 0;
+    margin-bottom: 1.5rem;
+}
+
+.privacy-list li {
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding-left: 2.5rem;
+}
+
+.privacy-list i {
+    position: absolute;
+    left: 0;
+    top: 0.3rem;
+    font-size: 1.4rem;
+    width: 25px; /* Align icons */
+    text-align: center;
+}
+
+.privacy-icon-good {
+    color: #28a745; /* Green */
+}
+
+.privacy-icon-bad {
+    color: var(--primary-color-start); /* Red */
+}
+
+.privacy-link {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 1.1rem;
+} 

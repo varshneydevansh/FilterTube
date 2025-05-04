@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - FilterTube</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Add breathing animation CSS file -->
+    <link rel="stylesheet" href="breathing-animation.css">
+    <!-- Font Awesome CDN (Replace with local setup if preferred later) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="icon" href="../icons/icon-32.png" type="image/png">
+    <style>
+        /* Styles for the privacy policy page */
+        .privacy-content {
+            max-width: 800px;
+            margin: 100px auto 0; /* Added top margin to prevent header overlap */
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .glass-section {
+            background: var(--glass-bg);
+            border-radius: var(--border-radius);
+            padding: 2.5rem;
+            box-shadow: var(--glass-shadow);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            margin-bottom: 2.5rem;
+        }
+        
+        /* Colorful glass sections */
+        .glass-section:nth-child(1) {
+            border-left: 6px solid #4CAF50; /* Green */
+            background: linear-gradient(to right, rgba(76, 175, 80, 0.1), rgba(255, 255, 255, 0.8));
+        }
+        
+        .glass-section:nth-child(2) {
+            border-left: 6px solid #FFC107; /* Yellow */
+            background: linear-gradient(to right, rgba(255, 193, 7, 0.1), rgba(255, 255, 255, 0.8));
+        }
+        
+        .glass-section:nth-child(3) {
+            border-left: 6px solid #2196F3; /* Blue */
+            background: linear-gradient(to right, rgba(33, 150, 243, 0.1), rgba(255, 255, 255, 0.8));
+        }
+        
+        .glass-section:nth-child(4) {
+            border-left: 6px solid #9C27B0; /* Purple */
+            background: linear-gradient(to right, rgba(156, 39, 176, 0.1), rgba(255, 255, 255, 0.8));
+        }
+        
+        .privacy-content h2 {
+            color: var(--primary-color-start);
+            margin-bottom: 1.5rem;
+            margin-top: 2rem;
+            border-bottom: 1px solid rgba(242, 84, 91, 0.2);
+            padding-bottom: 0.7rem;
+            font-size: 1.8rem;
+        }
+        
+        .privacy-content h3 {
+            margin-top: 2rem;
+            color: #333;
+            font-size: 1.4rem;
+        }
+        
+        .privacy-content p, .privacy-content ul {
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+        
+        .privacy-content ul li {
+            margin-bottom: 1rem;
+            position: relative;
+            padding-left: 1.5rem;
+        }
+        
+        .privacy-content ul li::before {
+            content: "•";
+            color: var(--primary-color-start);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+            font-size: 1.5rem;
+            top: -5px;
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(242, 84, 91, 0.1), rgba(250, 128, 114, 0.05));
+            border-left: 4px solid var(--primary-color-start);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+        
+        .icon-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .icon-title i {
+            font-size: 1.8rem;
+            margin-right: 1rem;
+            color: var(--primary-color-start);
+        }
+        
+        /* FAQ Accordion Styles */
+        .faq-item {
+            margin-bottom: 1rem;
+        }
+        
+        .faq-question {
+            background: var(--glass-bg);
+            padding: 1.2rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--glass-shadow);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
+        }
+        
+        .faq-question:hover {
+            background: linear-gradient(to right, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.6));
+        }
+        
+        .faq-question i {
+            transition: transform 0.3s ease;
+        }
+        
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+            padding: 0 1.2rem;
+        }
+        
+        .faq-item.active .faq-question {
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            border-bottom: none;
+        }
+        
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+            padding: 1.2rem;
+            border: 1px solid var(--glass-border);
+            border-top: none;
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+        }
+        
+        .faq-item.active .faq-question i {
+            transform: rotate(180deg);
+        }
+        
+        .last-updated {
+            font-size: 0.9rem;
+            color: #666;
+            text-align: right;
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <img src="../icons/icon-48.png" alt="FilterTube Logo" class="logo-icon">
+                <span class="logo-text" style="color: var(--primary-color-start);">FilterTube</span>
+            </a>
+            <nav class="nav-links">
+                <ul>
+                    <li><a href="index.html#why">Why FilterTube?</a></li>
+                    <li><a href="index.html#features">Features</a></li>
+                    <li><a href="index.html#how-it-works">How it Works</a></li>
+                    <li><a href="index.html#next">What's Next?</a></li>
+                    <li><a href="privacy.html" class="active">Privacy</a></li>
+                    <li><a href="filtering-guide.html">Filtering Guide</a></li>
+                    <li><a href="technical-features.html">Technical Details</a></li>
+                    <li><a href="our-story.html">Our Story</a></li>
+                </ul>
+            </nav>
+            <a href="https://github.com/varshneydevansh/filtertube" target="_blank" class="github-link" aria-label="GitHub Repository">
+                <i class="fab fa-github"></i>
+            </a>
+            <button class="mobile-nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero-section theme-filtertube" style="min-height: 50vh;">
+            <div class="animated-shape"></div>
+            <div class="container hero-content">
+                <h1 class="animate-on-scroll">Privacy Policy</h1>
+                <p class="tagline animate-on-scroll">Your data stays with you. Always.</p>
+            </div>
+            <div class="bg-layer">
+                <!-- Reduced number of waves for smaller hero section -->
+                <svg class="wave wave-1" viewBox="0 0 1440 320">
+                  <path
+                    fill="#f2545b" 
+                    fill-opacity="0.9"
+                    d="M0,160L60,170.7C120,181,240,203,360,181.3C480,160,600,96,720,90.7C840,85,960,139,1080,144C1200,149,1320,107,1380,85.3L1440,64L1440,0L1380,0C1320,0,1200,0,1080,0C960,0,840,0,720,0C600,0,480,0,360,0C240,0,120,0,60,0L0,0Z"
+                  ></path>
+                </svg>
+                <svg class="wave wave-2" viewBox="0 0 1440 320">
+                  <path
+                    fill="#fa8072"
+                    fill-opacity="0.8"
+                    d="M0,224L80,208C160,192,320,160,480,133.3C640,107,800,85,960,90.7C1120,96,1280,128,1360,144L1440,160L1440,0L1360,0C1280,0,1120,0,960,0C800,0,640,0,480,0C320,0,160,0,80,0L0,0Z"
+                  ></path>
+                </svg>
+                <svg class="wave wave-3" viewBox="0 0 1440 320">
+                  <path
+                    fill="#fab6a2"
+                    fill-opacity="0.5"
+                    d="M0,96L48,122.7C96,149,192,203,288,197.3C384,192,480,128,576,122.7C672,117,768,171,864,197.3C960,224,1056,224,1152,213.3C1248,203,1344,181,1392,170.7L1440,160L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"
+                  ></path>
+                </svg>
+            </div>
+        </section>
+
+        <div class="privacy-content" style="position: relative; margin-top: -60px; padding: 0 20px;">
+            <div class="glass-section">
+                <p class="last-updated"><strong>Last Updated:</strong> May 2025</p>
+                
+                <p>Welcome to FilterTube! This Privacy Policy explains our approach to data handling and privacy. The short version: we believe privacy isn't a feature—it's a default.</p>
+                
+                <div class="icon-title">
+                    <i class="fas fa-lock"></i>
+                    <h2>Our Privacy Commitment</h2>
+                </div>
+                
+                <p>FilterTube is built from the ground up with local-first, privacy-respecting design principles. We designed this extension with a clear philosophy: your data should stay with you.</p>
+                
+                <h3>No Cloud, No Collection, No Tracking — Ever</h3>
+                <ul>
+                    <li>FilterTube <strong>does not collect or transmit</strong> any personal data</li>
+                    <li>All filtering operations happen <strong>locally in your browser</strong>. No user behavior is tracked</li>
+                    <li>There are <strong>no remote analytics, no telemetry, no hidden calls</strong> — zero phone-home behavior</li>
+                </ul>
+                
+                <h3>Local Configuration</h3>
+                <ul>
+                    <li>Your keyword lists, blocked channels, and preferences are stored <strong>only on your device</strong> using standard browser storage (chrome.storage.local)</li>
+                    <li>You can edit or delete your filters at any time through the extension popup</li>
+                </ul>
+                
+                <h3>Third-Party Services</h3>
+                <ul>
+                    <li>FilterTube does not rely on or embed any third-party analytics, ad networks, or tracking pixels</li>
+                    <li>Our open-source ethos ensures transparency; <a href="#github-repo" target="_blank">the code is public and auditable</a></li>
+                </ul>
+                
+                <div class="highlight-box">
+                    <p>We cannot share, sell, or misuse your data because we don't collect any. It's that simple.</p>
+                </div>
+            </div>
+            
+            <div class="glass-section">
+                <div class="icon-title">
+                    <i class="fas fa-cogs"></i>
+                    <h2>How FilterTube Works</h2>
+                </div>
+                
+                <p>To perform filtering, FilterTube needs to interact with YouTube™ pages you visit. Here's exactly how it works:</p>
+                
+                <h3>Content Processing</h3>
+                <ul>
+                    <li>When you visit YouTube™, our content script runs to analyze the page structure (DOM)</li>
+                    <li>The extension compares visible content against your locally stored filters</li>
+                    <li>Content matching your filters is hidden using CSS rules</li>
+                    <li>This processing happens <strong>entirely within your browser</strong> — no data leaves your device</li>
+                </ul>
+                
+                <h3>Required Permissions</h3>
+                <ul>
+                    <li><strong>Access to youtube.com pages:</strong> Needed for our content script to identify and hide elements based on your filters</li>
+                    <li><strong>Storage access:</strong> Required to save your filter keywords and channel lists locally on your device</li>
+                </ul>
+                
+                <p>These permissions are used exclusively for delivering the core filtering capabilities.</p>
+            </div>
+            
+            <div class="glass-section">
+                <div class="icon-title">
+                    <i class="fas fa-question-circle"></i>
+                    <h2>Privacy FAQs</h2>
+                </div>
+                
+                <div class="faq-container">
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>Does FilterTube collect any usage data?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>No. FilterTube processes all content locally and does not collect, record, or transmit your browsing activity, filter selections, or any other usage data.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>Where are my filters stored?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Your filters (keywords and channel names) are stored exclusively in your browser's local storage using the standard chrome.storage.local API. This data remains on your device and does not sync to any server.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>Can Google or YouTube™ see my FilterTube settings?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>No. Your FilterTube settings are stored locally and are not accessible to Google, YouTube™, or any third parties. Browser extensions operate in their own isolated environment.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>Does FilterTube use any analytics or tracking?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Absolutely not. FilterTube contains no analytics, tracking code, or telemetry of any kind. We deliberately chose not to implement such features, even anonymous usage statistics.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>How can I verify FilterTube's privacy claims?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>FilterTube is open source, so you (or anyone) can inspect the code directly on our <a href="#github-repo" target="_blank">GitHub repository</a>. Additionally, you can use browser developer tools to monitor network requests while using FilterTube—you'll see it doesn't make any external connections.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question">
+                            <span>What happens if I uninstall FilterTube?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">
+                            <p>Uninstalling FilterTube will remove all your stored filters from your browser's local storage. Since we don't store any data on servers, there's nothing to delete remotely.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="glass-section">
+                <div class="icon-title">
+                    <i class="fas fa-balance-scale"></i>
+                    <h2>Legal Information</h2>
+                </div>
+                
+                <h3>Trademark Notice</h3>
+                <p>YouTube™, YouTube Kids™, and Google™ are trademarks of Google LLC. FilterTube is not affiliated with, endorsed by, or sponsored by Google LLC or its subsidiaries.</p>
+                
+                <h3>Extension Permissions</h3>
+                <p>FilterTube operates solely through standard browser extension APIs and stays within YouTube's™ published user interaction boundaries. It does not circumvent any paywalls, DRM, or protected services. It merely hides unwanted elements from the user's view, which is legally comparable to running an ad blocker or custom stylesheet.</p>
+                
+                <h3>Future Policy Updates</h3>
+                <p>If we make material changes to this policy, we'll notify you by updating the date at the top and, if significant, by adding a notice in the extension itself. We encourage you to review this policy periodically.</p>
+                
+                <h3>Contact Us</h3>
+                <p>If you have questions about this Privacy Policy, please contact us via <a href="#github-repo" target="_blank">our GitHub repository</a>.</p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-top">
+                    <div class="footer-left">
+                        <div class="footer-logo">
+                            <img src="../icons/icon-48.png" alt="FilterTube Logo">
+                            <span class="footer-logo-text">FilterTube</span>
+                        </div>
+                    </div>
+                    <div class="footer-right">
+                        <div class="footer-links">
+                            <a href="privacy.html">Privacy</a>
+                            <a href="filtering-guide.html">Filtering Guide</a>
+                            <a href="technical-features.html">Technical Details</a>
+                            <a href="our-story.html">Our Story</a>
+                            <a href="#" target="_blank">MIT License</a>
+                            <a href="https://github.com/varshneydevansh/FilterTube" target="_blank">GitHub</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <p>© 2024 FilterTube. All Rights Reserved.</p>
+                    <p class="disclaimer">YouTube™ is a trademark of Google LLC. FilterTube is an independent project not affiliated with or endorsed by YouTube or Google LLC.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        // Simple JS for FAQ accordion functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const faqItems = document.querySelectorAll('.faq-item');
+            
+            faqItems.forEach(item => {
+                const question = item.querySelector('.faq-question');
+                
+                question.addEventListener('click', () => {
+                    // Toggle active class on the clicked item
+                    item.classList.toggle('active');
+                    
+                    // Close other open FAQs (optional - for accordion behavior)
+                    faqItems.forEach(otherItem => {
+                        if (otherItem !== item && otherItem.classList.contains('active')) {
+                            otherItem.classList.remove('active');
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

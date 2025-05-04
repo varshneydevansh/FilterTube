@@ -1,0 +1,195 @@
+/*
+ * tab-view.css
+ *
+ * Styles for the extension popup when viewed in a new tab
+ * Using !important to override popup styles
+ */
+
+html, body {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    min-height: 100vh !important;
+    background-color: #f5f5f5 !important;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif !important;
+    color: #333 !important;
+    box-sizing: border-box !important;
+}
+
+/* Main container to center content */
+body.tab-view {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    padding: 0 !important;
+}
+
+/* Content wrapper */
+body.tab-view .content-wrapper {
+    width: 100% !important;
+    max-width: 800px !important;
+    margin: 0 auto !important;
+    padding: 40px 20px !important;
+    box-sizing: border-box !important;
+}
+
+/* Header */
+body.tab-view header {
+    display: flex !important;
+    align-items: center !important;
+    gap: 20px !important;
+    margin-bottom: 40px !important;
+    padding-bottom: 20px !important;
+    border-bottom: 2px solid #e0e0e0 !important;
+    width: 100% !important;
+}
+
+body.tab-view .logo-icon {
+    width: 64px !important;
+    height: 64px !important;
+}
+
+body.tab-view .title {
+    font-size: 32px !important;
+    font-weight: bold !important;
+    color: #333 !important;
+}
+
+/* Hide open in tab button */
+body.tab-view .open-in-tab {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* Main content */
+body.tab-view #info {
+    background-color: white !important;
+    padding: 40px !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1) !important;
+    margin-bottom: 30px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* Form elements */
+body.tab-view label {
+    display: block !important;
+    font-weight: bold !important;
+    font-size: 16px !important;
+    margin-bottom: 10px !important;
+    color: #444 !important;
+}
+
+body.tab-view textarea.input-field {
+    width: 100% !important;
+    min-height: 140px !important;
+    padding: 12px 15px !important;
+    border: 1px solid #ddd !important;
+    border-radius: 8px !important;
+    font-size: 16px !important;
+    box-sizing: border-box !important;
+    resize: vertical !important;
+    font-family: inherit !important;
+    margin-bottom: 30px !important;
+    line-height: 1.5 !important;
+}
+
+body.tab-view textarea.input-field:focus {
+    border-color: #4285F4 !important;
+    outline: none !important;
+    box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2) !important;
+}
+
+/* Comment filtering section */
+body.tab-view .comment-filter-options {
+    margin-top: 30px !important;
+    background-color: #f5f7fa !important;
+    padding: 25px !important;
+    border-radius: 8px !important;
+    border-left: 4px solid #4285F4 !important;
+}
+
+body.tab-view .comment-filter-options > label {
+    margin-bottom: 15px !important;
+    color: #333 !important;
+}
+
+body.tab-view .checkbox-group {
+    margin-top: 10px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 15px !important;
+}
+
+body.tab-view .checkbox-option {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+}
+
+body.tab-view .checkbox-option input[type="checkbox"] {
+    margin: 0 !important;
+    width: 18px !important;
+    height: 18px !important;
+}
+
+body.tab-view .checkbox-option label {
+    margin: 0 !important;
+    font-weight: normal !important;
+    display: inline !important;
+    cursor: pointer !important;
+    font-size: 16px !important;
+}
+
+/* Save button */
+body.tab-view button#saveBtn {
+    padding: 15px 30px !important;
+    border: none !important;
+    cursor: pointer !important;
+    border-radius: 8px !important;
+    background-color: rgba(220, 40, 40, 0.85) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.18) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+    color: #ffffff !important;
+    font-size: 18px !important;
+    font-weight: bold !important;
+    transition: all 0.3s ease !important;
+    position: relative !important;
+    overflow: hidden !important;
+    display: block !important;
+    width: 100% !important;
+    max-width: 300px !important;
+    margin: 0 auto !important;
+}
+
+body.tab-view button#saveBtn:hover {
+    background-color: rgba(200, 30, 30, 0.9) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15) !important;
+}
+
+body.tab-view button#saveBtn.saved {
+    background-color: rgba(40, 167, 69, 0.85) !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    body.tab-view .content-wrapper {
+        padding: 20px !important;
+    }
+    
+    body.tab-view #info {
+        padding: 25px !important;
+    }
+    
+    body.tab-view .title {
+        font-size: 24px !important;
+    }
+} 

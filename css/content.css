@@ -21,7 +21,16 @@ ytd-radio-renderer,
 ytd-channel-renderer,
 ytd-grid-channel-renderer,
 ytd-reel-item-renderer,
-ytm-shorts-lockup-view-model {
+ytm-shorts-lockup-view-model,
+ytd-movie-renderer,
+ytd-mix-renderer,
+ytd-reel-video-renderer,
+ytd-search-refinement-card-renderer,
+ytd-watch-card-rich-header-renderer,
+ytd-watch-card-section-sequence-renderer,
+yt-lockup-metadata-view-model,
+.yt-lockup-metadata-view-model-wiz,
+.yt-lockup-view-model-wiz {
     display: none !important; /* Hide by default */
 }
 
@@ -33,11 +42,112 @@ ytm-shorts-lockup-view-model {
     margin-bottom: 16px !important; /* Add margin to restore vertical spacing */
 }
 
+/* Ensure parent-child hiding relationships work properly */
+ytd-universal-watch-card-renderer:not(.filter-tube-visible) ytd-watch-card-section-sequence-renderer,
+ytd-universal-watch-card-renderer:not(.filter-tube-visible) ytd-watch-card-rich-header-renderer,
+.yt-lockup-view-model-wiz:not(.filter-tube-visible) .yt-lockup-metadata-view-model-wiz,
+.yt-lockup-view-model-wiz:not(.filter-tube-visible) .yt-lockup-view-model-wiz__content-image,
+.yt-lockup-view-model-wiz:not(.filter-tube-visible) yt-collection-thumbnail-view-model {
+    display: none !important;
+}
+
+/* Ensure content image containers are hidden properly */
+.yt-lockup-view-model-wiz__content-image,
+yt-collection-thumbnail-view-model {
+    display: none !important;
+}
+
+.filter-tube-visible .yt-lockup-view-model-wiz__content-image,
+.filter-tube-visible yt-collection-thumbnail-view-model {
+    display: block !important;
+}
 
 /* --- Legacy/Fallback Hiding Rule (Kept for reference/potential use) --- */
 /* Class applied by JS if we needed explicit hiding *after* initial load (less common now) */
 .hidden-video {
     display: none !important;
+}
+
+/* --- Comment Filtering --- */
+/* Hide comments based on user preferences */
+.filter-tube-hidden-comment {
+    display: none !important;
+}
+
+/* Hide entire comment section - now with more specific and forceful selectors */
+.filter-tube-hide-all-comments #comments,
+.filter-tube-hide-all-comments ytd-comments,
+.filter-tube-hide-all-comments #sections[id="sections"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    pointer-events: none !important;
+}
+
+/* --- Fix for channel page layout --- */
+/* Ensure horizontal layout for videos on channel pages */
+ytd-two-column-browse-results-renderer #items.ytd-grid-renderer {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important;
+    grid-gap: 16px !important;
+}
+
+/* Fix for individual grid items on channel pages */
+ytd-grid-video-renderer.filter-tube-visible {
+    width: 100% !important;
+    margin-right: 0 !important;
+    display: block !important;
+}
+
+/* Fix for channel videos displaying vertically instead of in grid */
+ytd-browse[page-subtype="channels"] ytd-rich-grid-renderer,
+ytd-browse[role="main"] ytd-rich-grid-renderer {
+    display: block !important;
+}
+
+/* Enhanced grid layout for channel pages with higher specificity */
+ytd-browse[page-subtype="channels"] #contents.ytd-rich-grid-renderer,
+ytd-browse[role="main"] #contents.ytd-rich-grid-renderer,
+#page-manager ytd-browse #contents.ytd-rich-grid-renderer,
+ytd-page-manager ytd-browse #contents.ytd-rich-grid-renderer {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important;
+    grid-gap: 16px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+/* Ensure proper layout for channel videos in grid */
+ytd-browse[page-subtype="channels"] ytd-rich-item-renderer.filter-tube-visible,
+ytd-browse[role="main"] ytd-rich-item-renderer.filter-tube-visible,
+#page-manager ytd-browse ytd-rich-item-renderer.filter-tube-visible,
+ytd-page-manager ytd-browse ytd-rich-item-renderer.filter-tube-visible {
+    width: 100% !important;
+    margin: 0 !important;
+    display: block !important;
+    position: relative !important;
+    float: none !important;
+}
+
+/* Force correct layout for channel page contents */
+#contents.ytd-rich-grid-renderer,
+#items.ytd-rich-grid-row-renderer {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important;
+    grid-gap: 16px !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+}
+
+/* Ensure shelf items display horizontally */
+ytd-shelf-renderer #items,
+ytd-horizontal-card-list-renderer #items {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    gap: 16px !important;
 }
 
 /*
@@ -78,7 +188,284 @@ ytm-shorts-lockup-view-model {
 }
 
 .filter-tube-visible {
-    border: 2px solid lime !important; /* Add border to visible items */
+    border: 2px solid lime !important; 
     display: revert !important;
 }
 */
+
+/* --- Specific fixes for Mix card layout restoration --- */
+/* Preserve horizontal layout when making elements visible again */
+.yt-lockup-view-model-wiz.filter-tube-visible {
+    display: flex !important; /* Use flex instead of block for these specific mix elements */
+}
+
+/* Ensure content image and metadata maintain proper positioning */
+.filter-tube-visible .yt-lockup-view-model-wiz__content-image,
+.filter-tube-visible .yt-lockup-metadata-view-model-wiz {
+    display: block !important;
+}
+
+/* Fix for vertical watch card list renderer */
+ytd-vertical-watch-card-list-renderer.filter-tube-visible {
+    display: block !important;
+}
+
+/* Make sure horizontal layout is preserved */
+.yt-lockup-view-model-wiz--horizontal.filter-tube-visible {
+    display: flex !important;
+    flex-direction: row !important;
+}
+
+/* Force horizontal layout for watch cards */
+ytd-universal-watch-card-renderer.filter-tube-visible {
+    display: block !important;
+}
+
+/* Force content image to have proper width for horizontal layout */
+.yt-lockup-view-model-wiz--horizontal.filter-tube-visible .yt-lockup-view-model-wiz__content-image {
+    width: 50% !important;
+    flex-shrink: 0 !important;
+}
+
+/* Make sure metadata takes remaining space */
+.yt-lockup-view-model-wiz--horizontal.filter-tube-visible .yt-lockup-view-model-wiz__metadata {
+    flex-grow: 1 !important;
+    width: 50% !important;
+}
+
+/* --- Force channel page grid layouts with stronger specificity and !important --- */
+/* Ultimate fix for channel page vertical layouts */
+ytd-browse[page-subtype="channels"] #primary.ytd-two-column-browse-results-renderer,
+ytd-browse[role="main"] #primary.ytd-two-column-browse-results-renderer,
+ytd-browse[page-type="channel"] #primary.ytd-two-column-browse-results-renderer {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+/* Stronger grid layout for channel pages - use multiple selectors for priority */
+ytd-browse[page-subtype="channels"] #contents.ytd-rich-grid-renderer,
+ytd-browse[role="main"] #contents.ytd-rich-grid-renderer,
+ytd-browse[page-type="channel"] #contents.ytd-rich-grid-renderer,
+#page-manager ytd-browse #contents.ytd-rich-grid-renderer,
+ytd-page-manager ytd-browse #contents.ytd-rich-grid-renderer,
+ytd-browse[page-type="channel"] div#contents.ytd-rich-grid-renderer,
+ytd-browse #contents.ytd-rich-grid-renderer,
+div#contents.ytd-rich-grid-renderer {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important;
+    grid-gap: 16px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    flex-direction: unset !important;
+    flex-wrap: unset !important;
+}
+
+/* Also target the inner containers for grid items */
+ytd-browse #items.ytd-grid-renderer,
+ytd-browse #items.ytd-rich-grid-row-renderer,
+ytd-browse[page-type="channel"] #items.ytd-rich-grid-row-renderer,
+ytd-browse #items.ytd-rich-item-renderer {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important;
+    grid-gap: 16px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    flex-direction: unset !important;
+    flex-wrap: unset !important;
+}
+
+/* Ensure grid items take proper width */
+ytd-grid-video-renderer,
+ytd-rich-item-renderer,
+ytd-grid-video-renderer.ytd-grid-renderer,
+ytd-rich-item-renderer.ytd-rich-grid-row-renderer,
+ytd-rich-item-renderer.ytd-rich-grid-renderer {
+    display: block !important;
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    flex: unset !important;
+    float: none !important;
+    position: relative !important;
+}
+
+/* Explicitly set dimensions for thumbnails to ensure proper layout */
+ytd-grid-video-renderer img,
+ytd-rich-item-renderer img,
+ytd-grid-video-renderer #thumbnail,
+ytd-rich-item-renderer #thumbnail {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 16/9 !important;
+}
+
+/* Ensure visible items maintain proper styling */
+ytd-grid-video-renderer.filter-tube-visible,
+ytd-rich-item-renderer.filter-tube-visible {
+    display: block !important;
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    flex: unset !important;
+    position: relative !important;
+}
+
+/* --- Additional fixes for channel page section list renderer --- */
+/* Target the section list renderer that's causing vertical layout */
+ytd-section-list-renderer,
+.style-scope.ytd-section-list-renderer,
+ytd-item-section-renderer.style-scope.ytd-section-list-renderer {
+    display: block !important;
+    width: 100% !important;
+}
+
+/* Fix grid layout for section lists on channel pages */
+ytd-section-list-renderer #contents,
+ytd-section-list-renderer #contents #items,
+ytd-section-list-renderer ytd-item-section-renderer #contents,
+ytd-section-list-renderer ytd-item-section-renderer #contents #items,
+ytd-section-list-renderer ytd-grid-renderer,
+ytd-section-list-renderer ytd-grid-renderer #items {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important;
+    grid-gap: 16px !important;
+    width: 100% !important;
+    flex-direction: unset !important;
+    flex-wrap: unset !important;
+}
+
+/* Fix individual video items within section list */
+ytd-section-list-renderer ytd-grid-video-renderer,
+ytd-section-list-renderer ytd-grid-video-renderer.ytd-grid-renderer,
+ytd-section-list-renderer ytd-rich-item-renderer {
+    width: 100% !important;
+    margin: 0 !important;
+    display: block !important;
+    position: relative !important;
+    float: none !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+}
+
+/* Force grid for videos tab specifically (which often has different structure) */
+ytd-browse[page-type="channel"] #contents.ytd-section-list-renderer,
+ytd-browse[page-type="channel"] #contents.ytd-item-section-renderer,
+ytd-browse[page-type="channel"] #contents.ytd-rich-grid-renderer,
+ytd-browse[page-type="channel"] ytd-rich-grid-renderer #contents {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important;
+    grid-gap: 16px !important;
+    width: 100% !important;
+}
+
+/* --- CRITICAL CHANNEL PAGE LAYOUT FIX --- */
+/* Ultra-high specificity selectors to force grid layout */
+body.filter-tube-channel-page ytd-browse.ytd-page-manager,
+ytd-browse[page-subtype="channels"],
+ytd-browse[role="main"],
+ytd-browse[page-type="channel"] {
+    --ytd-rich-grid-items-per-row: 4 !important;
+    --ytd-rich-grid-posts-per-row: 4 !important;
+    --ytd-rich-grid-shorts-per-row: 4 !important;
+    --ytd-rich-grid-videos-per-row: 4 !important;
+}
+
+/* Extreme priority override for channel page layout */
+body ytd-browse[page-subtype="channels"] *[page-type="channel"] ytd-rich-grid-renderer,
+body ytd-browse[page-type="channel"] ytd-rich-grid-renderer,
+body ytd-browse[role="main"] ytd-rich-grid-renderer,
+body ytd-browse ytd-section-list-renderer,
+body[filter-tube-fix="true"] ytd-browse[page-type="channel"] ytd-rich-grid-renderer,
+ytd-browse[page-type="channel"] ytd-section-list-renderer #contents,
+ytd-browse[page-type="channel"] #primary ytd-section-list-renderer,
+ytd-browse[page-type="channel"] ytd-two-column-browse-results-renderer,
+ytd-browse[page-type="channel"] #primary,
+ytd-browse[page-type="channel"] #secondary,
+ytd-browse[page-type="channel"] ytd-rich-grid-renderer,
+ytd-browse[page-type="channel"] ytd-rich-section-renderer,
+ytd-browse[page-type="channel"] ytd-shelf-renderer,
+ytd-browse[page-type="channel"] ytd-grid-renderer {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+/* Target all possible content grids with maximum specificity */
+body ytd-browse #contents.ytd-rich-grid-renderer,
+body ytd-browse[page-type="channel"] #contents,
+body ytd-browse[page-type="channel"] #contents.ytd-rich-grid-renderer,
+body ytd-browse[page-type="channel"] ytd-rich-grid-renderer #contents,
+body ytd-browse[page-type="channel"] ytd-section-list-renderer #contents, 
+body ytd-browse[page-type="channel"] ytd-rich-section-renderer #contents,
+body ytd-browse[page-type="channel"] ytd-grid-renderer #items,
+body ytd-browse[page-type="channel"] ytd-rich-grid-row-renderer #items,
+body ytd-browse[page-type="channel"] ytd-rich-grid-row-renderer,
+body ytd-browse[page-type="channel"] ytd-rich-item-renderer,
+body ytd-browse[page-type="channel"] #items,
+body ytd-browse[page-type="channel"] #items.ytd-rich-grid-row-renderer,
+body ytd-browse[page-type="channel"] #items.ytd-rich-grid-renderer,
+body ytd-browse[page-type="channel"] #items.ytd-grid-renderer,
+body ytd-browse[page-type="channel"] ytd-shelf-renderer #items,
+body ytd-browse[page-type="channel"] ytd-section-list-renderer #items,
+ytd-browse #items.ytd-grid-renderer,
+ytd-browse #contents.ytd-rich-grid-renderer,
+ytd-browse ytd-rich-grid-row-renderer #items,
+ytd-browse ytd-rich-section-renderer #contents,
+ytd-browse ytd-section-list-renderer #contents,
+ytd-browse #items.ytd-rich-grid-row-renderer {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)) !important;
+    grid-gap: 16px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    flex-direction: unset !important;
+    flex-wrap: unset !important;
+    transform: none !important;
+    position: relative !important;
+    left: 0 !important;
+    top: 0 !important;
+    padding: 16px !important;
+}
+
+/* Force all video items to be proper grid items */
+body ytd-browse ytd-grid-video-renderer,
+body ytd-browse ytd-rich-item-renderer,
+body ytd-browse[page-type="channel"] ytd-grid-video-renderer,
+body ytd-browse[page-type="channel"] ytd-rich-item-renderer,
+body ytd-browse[page-type="channel"] ytd-rich-grid-media,
+body ytd-browse[page-type="channel"] ytd-grid-renderer ytd-grid-video-renderer,
+body ytd-section-list-renderer ytd-rich-item-renderer,
+body ytd-section-list-renderer ytd-grid-video-renderer,
+ytd-browse[page-type="channel"] ytd-rich-grid-media,
+ytd-browse ytd-rich-item-renderer,
+ytd-browse ytd-grid-video-renderer {
+    display: block !important;
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    flex: unset !important;
+    position: relative !important;
+    left: 0 !important;
+    top: 0 !important;
+    transform: none !important;
+}
+
+/* Force grid on any absolutely positioned content containers */
+ytd-browse[page-type="channel"] [style*="position: absolute"],
+ytd-browse[page-type="channel"] [style*="position:absolute"],
+ytd-rich-grid-row-renderer[style*="position: absolute"],
+ytd-rich-grid-row-renderer[style*="position:absolute"] {
+    position: relative !important;
+    left: 0 !important;
+    top: 0 !important;
+    transform: none !important;
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)) !important;
+    grid-gap: 16px !important;
+}

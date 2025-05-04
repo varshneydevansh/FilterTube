@@ -40,16 +40,80 @@ button#saveBtn {
     padding: 10px 15px;
     border: none;
     cursor: pointer;
-    border-radius: 4px;
-    background-color: #4285F4; /* Google Blue */
+    border-radius: 8px;
+    background-color: rgba(220, 40, 40, 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     color: #ffffff;
     font-size: 1em;
     font-weight: bold;
-    transition: background-color 0.2s ease; /* Smooth hover effect */
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    display: block;
+    width: 100%;
+    max-width: 280px;
+    margin: 20px auto 0;
 }
 
 button#saveBtn:hover {
-    background-color: #357ABD; /* Darker blue on hover */
+    background-color: rgba(200, 30, 30, 0.9);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+button#saveBtn:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+button#saveBtn.saved {
+    background-color: rgba(40, 167, 69, 0.85);
+    animation: pulse 1.5s ease;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+    }
+}
+
+/* Status message with glassmorphism */
+.status-message {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(66, 133, 244, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    z-index: 1000;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    animation: slideUp 0.3s ease forwards;
+}
+
+@keyframes slideUp {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, 20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
 }
 
 header {
@@ -58,6 +122,7 @@ header {
     gap: 10px; /* Space between icon and title */
     border-bottom: 1px solid #eee; /* Separator line */
     padding-bottom: 10px; /* Space below header */
+    position: relative; /* Allow absolute positioning for the toggle button */
 }
 
 .logo-icon {
@@ -69,6 +134,7 @@ header {
     font-size: 1.5em; /* Larger font size */
     font-weight: bold;
     color: #444;
+    flex-grow: 1; /* Allow title to take remaining space */
 }
 
 /* Specific styling for the main content area if needed */
@@ -76,4 +142,94 @@ header {
     display: flex;
     flex-direction: column;
     gap: 10px; /* Space between label/textarea pairs */
+}
+
+/* New styles for the open in tab button */
+.open-in-tab {
+    margin-left: auto; /* Push to right edge */
+}
+
+.icon-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-button:hover {
+    background-color: #eaeaea;
+}
+
+.icon-button svg {
+    fill: #666;
+}
+
+.icon-button:hover svg {
+    fill: #333;
+}
+
+/* Comment filtering options */
+.comment-filter-options {
+    margin-top: 5px;
+    margin-bottom: 15px;
+}
+
+.checkbox-group {
+    margin-top: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.checkbox-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.checkbox-option input[type="checkbox"] {
+    margin: 0;
+}
+
+.checkbox-option label {
+    margin: 0;
+    font-weight: normal;
+    display: inline;
+    cursor: pointer;
+}
+
+/* Make sure only one checkbox can be selected */
+input[type="checkbox"][name="commentFilter"]:checked ~ input[type="checkbox"][name="commentFilter"] {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+/* General button styles */
+.button {
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+/* Full width button */
+.full-btn {
+    display: block;
+    width: 80%;
+    max-width: 200px;
+    margin: 20px auto 10px;
+    text-align: center;
+}
+
+/* Filter notes */
+.filter-note {
+    font-size: 0.8em;
+    color: #666;
+    margin-top: 4px;
+    margin-bottom: 12px;
+    font-style: italic;
 }

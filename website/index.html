@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FilterTube - Declutter Your YouTube Feed</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Add breathing animation CSS file -->
+    <link rel="stylesheet" href="breathing-animation.css">
+    <!-- Font Awesome CDN (Replace with local setup if preferred later) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Consider adding Favicon links here -->
+    <link rel="icon" href="../icons/icon-32.png" type="image/png">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="container">
+            <a href="#hero" class="logo">
+                <img src="../icons/icon-48.png" alt="FilterTube Logo" class="logo-icon">
+                <span class="logo-text" style="color: var(--primary-color-start);">FilterTube</span>
+            </a>
+            <nav class="nav-links">
+                <ul>
+                    <li><a href="#why">Why FilterTube?</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#how-it-works">How it Works</a></li>
+                    <li><a href="#next">What's Next?</a></li>
+                    <li><a href="privacy.html">Privacy</a></li>
+                    <li><a href="filtering-guide.html">Filtering Guide</a></li>
+                    <li><a href="technical-features.html">Technical Details</a></li>
+                    <li><a href="our-story.html">Our Story</a></li>
+                </ul>
+            </nav>
+             <a href="https://github.com/varshneydevansh/FilterTube" target="_blank" class="github-link" aria-label="GitHub Repository">
+                <i class="fab fa-github"></i>
+            </a>
+            <button class="mobile-nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section id="hero" class="hero-section theme-filtertube">
+            <div class="animated-shape"></div>
+            <div class="container hero-content">
+                <h1 class="animate-on-scroll">Declutter Your Feed with FilterTube</h1>
+                <p class="tagline animate-on-scroll">Tired of unwanted videos? Reclaim your focus and hide distracting content on YouTube and Kids' platforms effortlessly.</p>
+                <!-- Optional Buttons Here -->
+                
+                <div class="hero-buttons animate-on-scroll">
+                    <a href="#chrome-store" class="btn btn-primary">Get for Chrome</a>
+                    <a href="#firefox-store" class="btn btn-secondary">Get for Firefox</a>
+                </div>
+                
+            </div>
+            <div class="bg-layer">
+                <!-- Replaced blob SVGs with flowing curve SVGs -->
+                <svg class="wave wave-1" viewBox="0 0 1440 320">
+                  <path
+                    fill="#f2545b" 
+                    fill-opacity="0.9"
+                    d="M0,160L60,170.7C120,181,240,203,360,181.3C480,160,600,96,720,90.7C840,85,960,139,1080,144C1200,149,1320,107,1380,85.3L1440,64L1440,0L1380,0C1320,0,1200,0,1080,0C960,0,840,0,720,0C600,0,480,0,360,0C240,0,120,0,60,0L0,0Z"
+                  ></path>
+                </svg>
+                <svg class="wave wave-2" viewBox="0 0 1440 320">
+                  <path
+                    fill="#fa8072"
+                    fill-opacity="0.8"
+                    d="M0,224L80,208C160,192,320,160,480,133.3C640,107,800,85,960,90.7C1120,96,1280,128,1360,144L1440,160L1440,0L1360,0C1280,0,1120,0,960,0C800,0,640,0,480,0C320,0,160,0,80,0L0,0Z"
+                  ></path>
+                </svg>
+                <svg class="wave wave-3" viewBox="0 0 1440 320">
+                  <path
+                    fill="#fab6a2"
+                    fill-opacity="0.5"
+                    d="M0,96L48,122.7C96,149,192,203,288,197.3C384,192,480,128,576,122.7C672,117,768,171,864,197.3C960,224,1056,224,1152,213.3C1248,203,1344,181,1392,170.7L1440,160L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"
+                  ></path>
+                </svg>
+                <svg class="wave wave-4" viewBox="0 0 1440 320">
+                  <path
+                    fill="#ffffff"
+                    fill-opacity="0.3"
+                    d="M0,192L60,186.7C120,181,240,171,360,160C480,149,600,139,720,154.7C840,171,960,213,1080,218.7C1200,224,1320,192,1380,176L1440,160L1440,0L1380,0C1320,0,1200,0,1080,0C960,0,840,0,720,0C600,0,480,0,360,0C240,0,120,0,60,0L0,0Z"
+                  ></path>
+                </svg>
+                <svg class="wave wave-5" viewBox="0 0 1440 320">
+                  <path
+                    fill="#ffd9b3"
+                    fill-opacity="0.2"
+                    d="M0,128L48,138.7C96,149,192,171,288,186.7C384,203,480,213,576,197.3C672,181,768,139,864,138.7C960,139,1056,181,1152,197.3C1248,213,1344,203,1392,197.3L1440,192L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"
+                  ></path>
+                </svg>
+            </div>
+        </section>
+
+        <!-- Why FilterTube? Section -->
+        <section id="why" class="why-section section-padding">
+            <div class="container">
+                <h2 class="section-title animate-on-scroll">Your Feed, Your Rules. Reclaim Your Sanity.</h2>
+                <div class="why-grid">
+                    <div class="why-item animate-on-scroll">
+                        <i class="fas fa-eye-slash icon-why"></i>
+                        <h3>Overcome Clutter</h3>
+                        <p>Stop the endless scroll of irrelevant thumbnails, clickbait, and noise hijacking your attention.</p>
+                    </div>
+                    <div class="why-item animate-on-scroll">
+                        <i class="fas fa-brain icon-why"></i>
+                        <h3>Empower Your Focus</h3>
+                        <p>Designed for neurodiverse minds (like ADHD) and anyone needing fewer digital distractions.</p>
+                    </div>
+                    <div class="why-item animate-on-scroll">
+                        <i class="fas fa-shield-heart icon-why"></i>
+                        <h3>Protect Your Space</h3>
+                        <p>Gain the meaningful content control demanded by users and parents, often missing elsewhere.</p>
+                    </div>
+                     <div class="why-item animate-on-scroll">
+                        <i class="fas fa-hand-holding-heart icon-why"></i>
+                        <h3>Well-being First</h3>
+                        <p>Built to prioritize your mental clarity and digital peace over engagement algorithms.</p>
+                    </div>
+                    <div class="why-item animate-on-scroll">
+                        <i class="fas fa-users icon-why"></i>
+                        <h3>Community Driven</h3>
+                        <p>Inspired by widespread user frustration demanding simple, reliable filtering tools that work.</p>
+                    </div>
+                     <div class="why-item animate-on-scroll">
+                        <i class="fas fa-puzzle-piece icon-why"></i>
+                        <h3>Reliable Filtering</h3>
+                        <p>Actively maintained to adapt to platform changes and provide consistent blocking.</p>
+                    </div>
+                </div>
+                <!-- Add reference to community demand -->
+                <p class="community-link animate-on-scroll">
+                    You're not alone in seeking better filtering. The need is clear in locked threads like 
+                    <a href="https://support.google.com/youtubekids/thread/54509605/how-to-block-videos-by-keyword-or-tag?hl=en" target="_blank" rel="noopener noreferrer">this one</a> 
+                    requesting basic features.
+                </p>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="features-section section-padding">
+            <!-- Add a container for positioning context -->
+            <div class="features-container container">
+                <h2 class="section-title animate-on-scroll">Filter Across Devices</h2>
+                <!-- Add relative positioning and overflow hidden for blob containment -->
+                <div class="features-grid-wrapper">
+                    <div class="features-blobs">
+                        <div class="blob blob-feature1"></div>
+                        <div class="blob blob-feature2"></div>
+                    </div>
+                    <div class="features-grid">
+                        <!-- Card 1: FilterTube Extension -->
+                        <div class="feature-card glass-card card-left animate-on-scroll">
+                            <h3>FilterTube Extension</h3>
+                            <p class="feature-description">Filters standard YouTube content seamlessly. Support for Kids' content is coming soon!</p>
+                            <ul class="features-list">
+                                <li><i class="fas fa-filter"></i> <strong>Keyword Filtering</strong>: Hide videos by words in title, description, or hashtags</li>
+                                <li><i class="fas fa-user-slash"></i> <strong>Channel Filtering</strong>: Block by channel name, @handle, or channel ID</li>
+                                <li><i class="fas fa-comment-slash"></i> <strong>Comment Filtering</strong>: Hide all comments or just ones with filtered words</li>
+                                <li><i class="fas fa-video-slash"></i> <strong>YouTube™ Shorts Filtering</strong>: Remove distracting short-form content</li>
+                                <li><i class="fas fa-th-large"></i> <strong>Layout Preservation</strong>: Maintains YouTube's design after filtering</li>
+                                <li><i class="fas fa-bolt"></i> <strong>Anti-Flicker Technology</strong>: No visual jumps as content loads</li>
+                                <li><i class="fas fa-expand-arrows-alt"></i> <strong>Tab View Option</strong>: Manage filters in dedicated browser tab</li>
+                                <li><i class="fas fa-sync-alt"></i> <strong>Actively Maintained</strong>: Regular updates to fix YouTube changes</li>
+                            </ul>
+                            <div class="feature-buttons">
+                                <a href="#chrome-store" class="btn btn-primary"><i class="fab fa-chrome"></i> Get for Chrome</a>
+                                <a href="#firefox-store" class="btn btn-secondary"><i class="fab fa-firefox-browser"></i> Get for Firefox</a>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: FilterTube on Mobile (Future Vision) -->
+                        <div class="feature-card glass-card card-right animate-on-scroll">
+                            <div class="status-badge">Future Vision</div>
+                            <h3>FilterTube on Mobile <i class="fas fa-mobile-alt mobile-icon"></i></h3>
+                            <p class="feature-description">Bringing powerful filtering and peace of mind directly to your mobile devices.</p>
+                             <div class="feature-buttons">
+                                 <a href="#notify-mobile" class="btn btn-outline">Notify Me</a>
+                            </div>
+                        </div>
+                    </div> <!-- End features-grid -->
+                 </div> <!-- End features-grid-wrapper -->
+            </div> <!-- End features-container -->
+        </section>
+
+        <!-- How It Works Section -->
+        <section id="how-it-works" class="how-it-works-section section-padding">
+            <div class="container">
+                <h2 class="section-title animate-on-scroll">Seamless Filtering in Action</h2>
+                <div class="how-grid">
+                    <div class="how-step animate-on-scroll" style="border-top: 4px solid #4CAF50;">
+                        <div class="step-number">1</div>
+                        <i class="fas fa-eye-slash step-icon" style="color: #4CAF50;"></i>
+                        <h4>Instant Hide</h4>
+                        <p>Content hidden via CSS <strong>immediately</strong> as page loads</p>
+                    </div>
+                    <div class="how-step animate-on-scroll" style="border-top: 4px solid #FFC107;">
+                         <div class="step-number">2</div>
+                         <i class="fas fa-filter step-icon" style="color: #FFC107;"></i>
+                        <h4>Smart Filter</h4>
+                        <p>Your filters applied in <strong>milliseconds</strong> with no server calls</p>
+                    </div>
+                    <div class="how-step animate-on-scroll" style="border-top: 4px solid #4CAF50;">
+                         <div class="step-number">3</div>
+                         <i class="fas fa-check-circle step-icon" style="color: #4CAF50;"></i>
+                        <h4>Reveal Wanted</h4>
+                        <p>Only <strong>content you want</strong> is revealed, maintaining layout</p>
+                    </div>
+                </div>
+                <div class="cta-link animate-on-scroll" style="text-align: center; margin-top: 30px;">
+                    <a href="filtering-guide.html" class="btn btn-outline">See Complete Filtering Guide</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Upcoming Features Section -->
+        <section id="next" class="next-section section-padding">
+            <div class="container">
+                <h2 class="section-title animate-on-scroll">What's Next?</h2>
+                 <div class="next-content glass-card animate-on-scroll">
+                    <p>We're constantly working to enhance FilterTube based on user needs. Future plans include:</p>
+                    <ul>
+                        <li><i class="fas fa-search-plus"></i> Advanced Semantic Filtering (Understanding context)</li>
+                        <li><i class="fas fa-image"></i> Thumbnail Content Analysis (Blur/Hide Options)</li>
+                        <li><i class="fas fa-mobile-alt"></i> Dedicated Mobile App Development</li>
+                        <li><i class="fas fa-users-cog"></i> Enhanced tools & reliability for Kids' platforms</li>
+                        <li><i class="fas fa-save"></i> Filter Backup & Sync Options</li>
+                        <li><i class="fas fa-tasks"></i> Simple Filter Management Dashboard</li>
+                        <li><i class="fas fa-question-circle"></i> Clearer "Why Hidden?" Indicators (Planned)</li>
+                    </ul>
+                 </div>
+            </div>
+        </section>
+
+        <!-- Privacy First Section -->
+        <section id="privacy" class="privacy-section section-padding">
+            <div class="container">
+                <h2 class="section-title animate-on-scroll">Built Private by Design</h2>
+                <div class="privacy-content glass-card animate-on-scroll">
+                     <ul class="privacy-list">
+                        <li><i class="fas fa-check-circle privacy-icon-good"></i> <strong>Local Processing: </strong> All filtering happens only in your browser.</li>
+                        <li><i class="fas fa-ban privacy-icon-bad"></i> <strong>No Data Collection: </strong> We don't track, collect, or transmit any user data. Ever.</li>
+                        <li><i class="fas fa-ban privacy-icon-bad"></i> <strong>No Third Parties: </strong> Zero analytics, trackers, or ads.</li>
+                        <li><i class="fas fa-code-branch privacy-icon-good"></i> <strong>Open & Transparent: </strong> Code is open source for review.</li>
+                    </ul>
+                    <p class="privacy-link">Read our full <a href="privacy.html">Privacy Policy</a>.</p>
+                 </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-top">
+                    <div class="footer-left">
+                        <div class="footer-logo">
+                            <img src="../icons/icon-48.png" alt="FilterTube Logo">
+                            <span class="footer-logo-text">FilterTube</span>
+                        </div>
+                    </div>
+                    <div class="footer-right">
+                        <div class="footer-links">
+                            <a href="privacy.html">Privacy</a>
+                            <a href="filtering-guide.html">Filtering Guide</a>
+                            <a href="technical-features.html">Technical Details</a>
+                            <a href="our-story.html">Our Story</a>
+                            <a href="#" target="_blank">MIT License</a>
+                            <a href="https://github.com/varshneydevansh/FilterTube" target="_blank">GitHub</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <p>© 2024 FilterTube. All Rights Reserved.</p>
+                    <p class="disclaimer">YouTube™ is a trademark of Google LLC. FilterTube is an independent project not affiliated with or endorsed by YouTube or Google LLC.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html> 

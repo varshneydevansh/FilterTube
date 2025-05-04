@@ -1,64 +1,133 @@
 /**
  * Popup script for FilterTube extension
  * 
- * This script handles the settings popup UI for FilterTube:
- * 1. Loads current filter settings from storage
- * 2. Displays them in the form
- * 3. Saves user changes back to storage
- * 4. Shows success/error messages
+ * This script handles the settings popup UI for FilterTube
  */
 
-// DOM elements we'll interact with
-const filterKeywordsElement = document.getElementById('filterKeywords');
-const filterChannelsElement = document.getElementById('filterChannels');
-const saveButton = document.getElementById('save');
-const statusElement = document.getElementById('status');
+// Wait for DOM to be fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Get references to DOM elements
+    const keywordsElement = document.getElementById('keywords');
+    const channelsElement = document.getElementById('channels');
+    const saveButton = document.getElementById('saveBtn');
+    const openInTabButton = document.getElementById('openInTabBtn');
+    const hideAllCommentsCheckbox = document.getElementById('hideAllComments');
+    const hideFilteredCommentsCheckbox = document.getElementById('hideFilteredComments');
 
-/**
- * Loads the current filter settings from chrome.storage.local
- * and populates them in the form
- */
-function loadSettings() {
-    chrome.storage.local.get(['filterKeywords', 'filterChannels'], function(items) {
-        // If values exist in storage, populate the form fields
-        filterKeywordsElement.value = items.filterKeywords || '';
-        filterChannelsElement.value = items.filterChannels || '';
-    });
-}
+    // Make sure required elements exist
+    if (!keywordsElement || !channelsElement || !saveButton) {
+        console.error('FilterTube: Required DOM elements not found');
+        return;
+    }
 
-/**
- * Saves the current form values to chrome.storage.local
- */
-function saveSettings() {
-    // Get current values from form
-    const filterKeywords = filterKeywordsElement.value.trim();
-    const filterChannels = filterChannelsElement.value.trim();
+    // Load settings from storage
+    loadSettings();
+
+    // Set up checkbox exclusivity
+    if (hideAllCommentsCheckbox && hideFilteredCommentsCheckbox) {
+        setupCommentFilterExclusivity();
+    }
+
+    // Set up button event listeners
+    saveButton.addEventListener('click', saveSettings);
     
-    // Save to chrome.storage.local
-    chrome.storage.local.set({
-        filterKeywords: filterKeywords,
-        filterChannels: filterChannels
-    }, function() {
-        // Show success message
-        showStatus('Settings saved!');
+    // Add the open-in-tab button listener if it exists
+    if (openInTabButton) {
+        openInTabButton.addEventListener('click', openInNewTab);
+    }
+
+    /**
+     * Loads settings from storage
+     */
+    function loadSettings() {
+        chrome.storage.local.get([
+            'filterKeywords', 
+            'filterChannels', 
+            'hideAllComments', 
+            'hideFilteredComments'
+        ], function(items) {
+            // Set form values
+            keywordsElement.value = items.filterKeywords || '';
+            channelsElement.value = items.filterChannels || '';
+            
+            if (hideAllCommentsCheckbox && hideFilteredCommentsCheckbox) {
+                hideAllCommentsCheckbox.checked = items.hideAllComments || false;
+                hideFilteredCommentsCheckbox.checked = items.hideFilteredComments || false;
+                
+                // Ensure only one is checked
+                if (hideAllCommentsCheckbox.checked && hideFilteredCommentsCheckbox.checked) {
+                    hideFilteredCommentsCheckbox.checked = false;
+                }
+            }
+        });
+    }
+
+    /**
+     * Sets up mutual exclusivity for comment filtering checkboxes
+     */
+    function setupCommentFilterExclusivity() {
+        hideAllCommentsCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                hideFilteredCommentsCheckbox.checked = false;
+            }
+        });
         
-        // Clear status message after 2 seconds
-        setTimeout(function() {
-            showStatus('');
-        }, 2000);
-    });
-}
+        hideFilteredCommentsCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                hideAllCommentsCheckbox.checked = false;
+            }
+        });
+    }
 
-/**
- * Displays a status message to the user
- * @param {string} message - The message to display
- */
-function showStatus(message) {
-    statusElement.textContent = message;
-}
+    /**
+     * Saves settings to storage
+     */
+    function saveSettings() {
+        // Get current values
+        const filterKeywords = keywordsElement.value.trim();
+        const filterChannels = channelsElement.value.trim();
+        const hideAllComments = hideAllCommentsCheckbox ? hideAllCommentsCheckbox.checked : false;
+        const hideFilteredComments = hideFilteredCommentsCheckbox ? hideFilteredCommentsCheckbox.checked : false;
+        
+        // Visual feedback - change button appearance
+        const originalButtonText = saveButton.textContent;
+        saveButton.classList.add('saved');
+        saveButton.textContent = 'Saved!';
+        
+        // Save to storage
+        chrome.storage.local.set({
+            filterKeywords: filterKeywords,
+            filterChannels: filterChannels,
+            hideAllComments: hideAllComments,
+            hideFilteredComments: hideFilteredComments
+        }, function() {
+            // Reset button after delay
+            setTimeout(function() {
+                saveButton.classList.remove('saved');
+                saveButton.textContent = originalButtonText;
+            }, 1500);
+        });
+    }
 
-// Initialize the popup by loading settings
-document.addEventListener('DOMContentLoaded', loadSettings);
-
-// Add event listener for save button
-saveButton.addEventListener('click', saveSettings);
+    /**
+     * Opens the extension in a new tab
+     */
+    function openInNewTab() {
+        console.log('Opening FilterTube in new tab');
+        
+        // First try to open our website directly
+        chrome.tabs.create({
+            url: 'https://varshneydevansh.github.io/FilterTube/website/'
+        }, (tab) => {
+            // If successful, we're done
+            console.log('Opened FilterTube website');
+        });
+        
+        // Fallback to the tab view if website isn't available
+        chrome.runtime.openOptionsPage || chrome.tabs.create({
+            url: chrome.runtime.getURL('html/tab-view.html')
+        }, (tab) => {
+            console.log('Opened FilterTube tab view (fallback)');
+        });
+    }
+});

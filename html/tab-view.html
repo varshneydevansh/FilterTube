@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FilterTube Preferences</title>
+    <!-- Link to the CSS stylesheets -->
+    <link rel="stylesheet" href="../css/tab-view.css">
+    <style>
+        /* Override any popup styles */
+        body {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            min-height: 100vh !important;
+            background-color: #f5f5f5 !important;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif !important;
+            color: #333 !important;
+            box-sizing: border-box !important;
+        }
+        
+        /* Main container to center content */
+        body {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            padding: 0 !important;
+        }
+    </style>
+</head>
+
+<body class="tab-view">
+    <div class="content-wrapper">
+        <!-- Header section with extension icon and title -->
+        <header>
+            <!-- Display the extension icon (adjust path if needed) -->
+            <img src="../icons/icon-48.png" alt="FilterTube Icon" class="logo-icon">
+            <!-- Display the extension name -->
+            <div class="title">FilterTube</div>
+            <!-- No "Open in tab" button in the tab view -->
+        </header>
+
+        <!-- Main content area for filter inputs -->
+        <div id="info">
+            <!-- Label for the keywords input -->
+            <label for="keywords">Filter by Keywords (comma separated):</label>
+            <!-- Textarea for entering keywords, linked to the label by 'for' and 'id' -->
+            <textarea id="keywords" class="input-field" rows="3" placeholder="e.g., news, politics, specific_topic"></textarea>
+
+            <!-- Label for the channels input -->
+            <label for="channels">Filter by Channels (comma separated, supports names, @handles & channel IDs):</label>
+            <!-- Textarea for entering channel names, linked to the label -->
+            <textarea id="channels" class="input-field" rows="3" placeholder="e.g., Channel Name, @ChannelHandle, channel/UCtxdfwb9wfkoGocVUAJ-Bmg"></textarea>
+            
+            <!-- Comment filtering options -->
+            <div class="comment-filter-options">
+                <label>Comment Filtering:</label>
+                <div class="checkbox-group">
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="hideAllComments" name="commentFilter" value="all">
+                        <label for="hideAllComments">Hide all comments</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="hideFilteredComments" name="commentFilter" value="filtered">
+                        <label for="hideFilteredComments">Hide comments with filtered words</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Save button to store the preferences -->
+        <button id="saveBtn" class="button full-btn">Save Preferences</button>
+    </div>
+
+    <!-- Include the popup JavaScript file -->
+    <script src="../js/popup.js"></script>
+</body>
+
+</html> 
