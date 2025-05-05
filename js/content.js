@@ -31,7 +31,8 @@ function injectHidingStyles() {
         ytd-universal-watch-card-renderer,
         ytd-secondary-search-container-renderer,
         ytm-shorts-lockup-view-model,
-        ytm-shorts-lockup-view-model-v2 {
+        ytm-shorts-lockup-view-model-v2,
+        ytd-channel-renderer {
             opacity: 0 !important;
             transition: opacity 0.1s ease-in-out !important;
         }
@@ -71,6 +72,18 @@ function injectHidingStyles() {
             border: none !important;
             overflow: hidden !important;
         }
+        
+        /* Ensure channel renderers are properly hidden when filtered */
+        ytd-channel-renderer[data-filter-tube-filtered="true"] {
+            display: none !important;
+            height: 0 !important;
+            min-height: 0 !important;
+            max-height: 0 !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            border: none !important;
+            overflow: hidden !important;
+        }
     `;
     
     // Add style to head as early as possible
@@ -96,7 +109,8 @@ const VIDEO_SELECTORS = [
     'ytd-universal-watch-card-renderer', // Side panel movie/video cards
     'ytd-secondary-search-container-renderer > *', // Additional side panel items
     'ytm-shorts-lockup-view-model',  // Shorts items (new format)
-    'ytm-shorts-lockup-view-model-v2' // Shorts items v2 format
+    'ytm-shorts-lockup-view-model-v2', // Shorts items v2 format
+    'ytd-channel-renderer'           // Channel results in search
 ].join(', ');
 
 // Load settings as early as possible
@@ -212,10 +226,16 @@ function getChannelIdentifiers(element) {
 
 // Ultra-optimized filtering function
 function applyFilters() {
+    // Performance optimization - avoid unnecessary work
+    if (document.hidden) {
+        // Page is not visible, defer intensive processing
+        return;
+    }
+    
     // Make sure styles are injected
     injectHidingStyles();
     
-    // Parse filter settings
+    // Parse filter settings - do this once outside the element loop
     const keywords = filterKeywords.split(',')
         .map(k => k.trim().toLowerCase())
         .filter(k => k.length > 0);
@@ -224,7 +244,7 @@ function applyFilters() {
         .map(c => c.trim().toLowerCase())
         .filter(c => c.length > 0);
     
-    // If no filters, show everything
+    // If no filters, show everything and exit early
     if (keywords.length === 0 && channels.length === 0) {
         // Show all elements
         document.querySelectorAll(VIDEO_SELECTORS).forEach(element => {
@@ -234,113 +254,205 @@ function applyFilters() {
         return;
     }
     
-    // Get all unprocessed elements
+    // Performance optimization - process in smaller batches for smoother UX
     const contentElements = document.querySelectorAll(VIDEO_SELECTORS + ':not([data-filter-tube-allowed="true"]):not([data-filter-tube-filtered="true"])');
     
-    // Process each element
-    contentElements.forEach(element => {
-        const elementText = element.textContent.toLowerCase();
+    // Exit if no new elements to process
+    if (contentElements.length === 0) {
+        return;
+    }
+    
+    // For large batches, process in chunks to prevent UI freezing
+    const BATCH_SIZE = 20; // Process 20 elements at a time
+    
+    // If we have a lot of elements, process in batches
+    if (contentElements.length > BATCH_SIZE) {
+        const processNextBatch = (startIndex) => {
+            const endIndex = Math.min(startIndex + BATCH_SIZE, contentElements.length);
+            
+            for (let i = startIndex; i < endIndex; i++) {
+                processElement(contentElements[i], keywords, channels);
+            }
+            
+            // If more elements to process, schedule next batch
+            if (endIndex < contentElements.length) {
+                setTimeout(() => {
+                    processNextBatch(endIndex);
+                }, 0);
+            } else {
+                // All elements processed, fix shorts layout
+                fixShortsLayout();
+                // Update filters applied flag
+                filtersApplied = true;
+            }
+        };
         
-        // Check if element contains any filtered keywords
-        const matchesKeyword = keywords.some(keyword => elementText.includes(keyword));
+        // Start processing the first batch
+        processNextBatch(0);
+    } else {
+        // Small number of elements, process all at once
+        contentElements.forEach(element => {
+            processElement(element, keywords, channels);
+        });
         
-        // Get all potential channel identifiers
-        const channelIdentifiers = getChannelIdentifiers(element);
+        // Special handling for shorts shelves after filtering
+        fixShortsLayout();
         
-        // Enhanced debug logging for Travis Scott channels
-        if (channels.some(c => c.toLowerCase().includes('travis'))) {
-            if (channelIdentifiers.length > 0) {
-                console.log('Checking content with identifiers:', channelIdentifiers);
-                console.log('Against filters:', channels);
+        // Update filters applied flag
+        filtersApplied = true;
+    }
+}
+
+// Helper function to process a single element
+function processElement(element, keywords, channels) {
+    // Special handling for ytd-channel-renderer elements
+    if (element.tagName === 'YTD-CHANNEL-RENDERER') {
+        processChannelRenderer(element, channels);
+        return;
+    }
+    
+    const elementText = element.textContent.toLowerCase();
+    
+    // Check if element contains any filtered keywords
+    const matchesKeyword = keywords.some(keyword => elementText.includes(keyword));
+    
+    // Get all potential channel identifiers
+    const channelIdentifiers = getChannelIdentifiers(element);
+    
+    // Check if any channel identifier matches filtered channels with improved matching
+    const matchesChannel = channels.length > 0 && channelIdentifiers.length > 0 &&
+        channels.some(channel => {
+            // Exact match check first
+            if (channelIdentifiers.includes(channel)) {
+                return true;
+            }
+            
+            // Check for channel ID match
+            if (channel.startsWith('channel:') && 
+                channelIdentifiers.some(id => id === channel || id === channel.substring(8))) {
+                return true;
+            }
+            
+            // Channel handle/username matching
+            return channelIdentifiers.some(identifier => {
+                // Normalize both strings for comparison by removing @ and converting to lowercase
+                const normalizedIdentifier = identifier.startsWith('@') ? identifier.substring(1).toLowerCase() : identifier.toLowerCase();
+                const normalizedChannel = channel.startsWith('@') ? channel.substring(1).toLowerCase() : channel.toLowerCase();
+                
+                // Direct match after normalization
+                if (normalizedIdentifier === normalizedChannel) {
+                    return true;
+                }
+                
+                // Looser matching for partial channel names
+                if (normalizedIdentifier.includes(normalizedChannel) || normalizedChannel.includes(normalizedIdentifier)) {
+                    return true;
+                }
+                
+                // Original matching logic (keeping as fallback)
+                // If channel filter contains @ but identifier doesn't
+                if (channel.startsWith('@') && !identifier.startsWith('@')) {
+                    return identifier.toLowerCase().includes(channel.substring(1).toLowerCase());
+                }
+                // If identifier contains @ but channel filter doesn't
+                if (identifier.startsWith('@') && !channel.startsWith('@')) {
+                    return identifier.substring(1).toLowerCase().includes(channel.toLowerCase());
+                }
+                
+                return false;
+            });
+        });
+    
+    // Hide or show based on matches
+    if (matchesKeyword || matchesChannel) {
+        // Mark as filtered
+        element.setAttribute('data-filter-tube-filtered', 'true');
+        element.removeAttribute('data-filter-tube-allowed');
+        
+        // Also handle child elements for rich items and nested content
+        if (element.tagName === 'YTD-RICH-ITEM-RENDERER') {
+            const childVideo = element.querySelector('ytd-grid-video-renderer, ytd-video-renderer, ytd-compact-video-renderer');
+            if (childVideo) {
+                childVideo.setAttribute('data-filter-tube-filtered', 'true');
+                childVideo.removeAttribute('data-filter-tube-allowed');
             }
         }
         
-        // Check if any channel identifier matches filtered channels with improved matching
-        const matchesChannel = channels.length > 0 && channelIdentifiers.length > 0 &&
-            channels.some(channel => {
-                // Exact match check first
-                if (channelIdentifiers.includes(channel)) {
-                    return true;
+        // Special handling for playlist/sidebar items
+        if (element.tagName === 'YT-LOCKUP-VIEW-MODEL') {
+            const childElements = element.querySelectorAll('*');
+            childElements.forEach(child => {
+                if (child.nodeType === Node.ELEMENT_NODE) {
+                    child.setAttribute('data-filter-tube-filtered', 'true');
+                    child.removeAttribute('data-filter-tube-allowed');
                 }
-                
-                // Check for channel ID match
-                if (channel.startsWith('channel:') && 
-                    channelIdentifiers.some(id => id === channel || id === channel.substring(8))) {
-                    return true;
-                }
-                
-                // Channel handle/username matching
-                return channelIdentifiers.some(identifier => {
-                    // For debugging
-                    if (identifier.includes('travis') || channel.includes('travis')) {
-                        console.log(`Comparing: "${identifier}" with "${channel}"`);
-                    }
-                    
-                    // Normalize both strings for comparison by removing @ and converting to lowercase
-                    const normalizedIdentifier = identifier.startsWith('@') ? identifier.substring(1).toLowerCase() : identifier.toLowerCase();
-                    const normalizedChannel = channel.startsWith('@') ? channel.substring(1).toLowerCase() : channel.toLowerCase();
-                    
-                    // Direct match after normalization
-                    if (normalizedIdentifier === normalizedChannel) {
-                        return true;
-                    }
-                    
-                    // Looser matching for partial channel names
-                    if (normalizedIdentifier.includes(normalizedChannel) || normalizedChannel.includes(normalizedIdentifier)) {
-                        return true;
-                    }
-                    
-                    // Original matching logic (keeping as fallback)
-                    // If channel filter contains @ but identifier doesn't
-                    if (channel.startsWith('@') && !identifier.startsWith('@')) {
-                        return identifier.toLowerCase().includes(channel.substring(1).toLowerCase());
-                    }
-                    // If identifier contains @ but channel filter doesn't
-                    if (identifier.startsWith('@') && !channel.startsWith('@')) {
-                        return identifier.substring(1).toLowerCase().includes(channel.toLowerCase());
-                    }
-                    
-                    return false;
-                });
             });
-        
-        // Hide or show based on matches
-        if (matchesKeyword || matchesChannel) {
-            // Mark as filtered
-            element.setAttribute('data-filter-tube-filtered', 'true');
-            element.removeAttribute('data-filter-tube-allowed');
-            
-            // Also handle child elements for rich items and nested content
-            if (element.tagName === 'YTD-RICH-ITEM-RENDERER') {
-                const childVideo = element.querySelector('ytd-grid-video-renderer, ytd-video-renderer, ytd-compact-video-renderer');
-                if (childVideo) {
-                    childVideo.setAttribute('data-filter-tube-filtered', 'true');
-                    childVideo.removeAttribute('data-filter-tube-allowed');
-                }
+        }
+    } else {
+        // Mark as allowed
+        element.setAttribute('data-filter-tube-allowed', 'true');
+        element.removeAttribute('data-filter-tube-filtered');
+    }
+}
+
+// Special handler for channel renderer elements
+function processChannelRenderer(element, channels) {
+    // Extract channel info from the element
+    const channelIdentifiers = [];
+    
+    // Get channel name
+    const channelName = element.querySelector('#channel-title yt-formatted-string#text');
+    if (channelName) {
+        channelIdentifiers.push(channelName.textContent.trim().toLowerCase());
+    }
+    
+    // Get @username
+    const usernameElement = element.querySelector('#subscribers');
+    if (usernameElement && usernameElement.textContent.trim().startsWith('@')) {
+        channelIdentifiers.push(usernameElement.textContent.trim().toLowerCase());
+    }
+    
+    // Get channel links
+    const channelLinks = element.querySelectorAll('a.channel-link');
+    channelLinks.forEach(link => {
+        const href = link.getAttribute('href');
+        if (href) {
+            if (href.startsWith('/channel/')) {
+                const channelId = href.split('/channel/')[1].split('?')[0].split('/')[0];
+                channelIdentifiers.push(channelId.toLowerCase());
+                channelIdentifiers.push('channel:' + channelId.toLowerCase());
+            } else if (href.startsWith('/@')) {
+                const username = href.split('/@')[1].split('?')[0].split('/')[0];
+                channelIdentifiers.push('@' + username.toLowerCase());
             }
-            
-            // Special handling for playlist/sidebar items
-            if (element.tagName === 'YT-LOCKUP-VIEW-MODEL') {
-                const childElements = element.querySelectorAll('*');
-                childElements.forEach(child => {
-                    if (child.nodeType === Node.ELEMENT_NODE) {
-                        child.setAttribute('data-filter-tube-filtered', 'true');
-                        child.removeAttribute('data-filter-tube-allowed');
-                    }
-                });
-            }
-        } else {
-            // Mark as allowed
-            element.setAttribute('data-filter-tube-allowed', 'true');
-            element.removeAttribute('data-filter-tube-filtered');
         }
     });
     
-    // Special handling for shorts shelves after filtering
-    fixShortsLayout();
+    // Debug logging
+    if (channelIdentifiers.some(id => id.includes('travis'))) {
+        console.log('Channel renderer identifiers:', [...new Set(channelIdentifiers)]);
+    }
     
-    // Update filters applied flag
-    filtersApplied = true;
+    // Check if this channel should be filtered
+    const shouldFilter = channels.some(channel => {
+        const normalizedChannel = channel.startsWith('@') ? channel.substring(1).toLowerCase() : channel.toLowerCase();
+        
+        return channelIdentifiers.some(identifier => {
+            const normalizedIdentifier = identifier.startsWith('@') ? identifier.substring(1).toLowerCase() : identifier.toLowerCase();
+            
+            return normalizedIdentifier === normalizedChannel || 
+                   normalizedIdentifier.includes(normalizedChannel) || 
+                   normalizedChannel.includes(normalizedIdentifier);
+        });
+    });
+    
+    if (shouldFilter) {
+        element.setAttribute('data-filter-tube-filtered', 'true');
+        element.removeAttribute('data-filter-tube-allowed');
+    } else {
+        element.setAttribute('data-filter-tube-allowed', 'true');
+        element.removeAttribute('data-filter-tube-filtered');
+    }
 }
 
 // Fix shorts layout to ensure container doesn't collapse
@@ -460,7 +572,7 @@ window.addEventListener('unload', () => {
     }
 });
 
-console.log("FilterTube Content Script Loaded - Zero Flash Version v1.3.6");
+console.log("FilterTube Content Script Loaded - Zero Flash Version v1.3.7");
 
 
 

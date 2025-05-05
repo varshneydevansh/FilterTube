@@ -1,5 +1,13 @@
 # FilterTube Changelog
 
+## Version 1.3.7
+- Fixed filtering for channel results in search pages (ytd-channel-renderer)
+- Significantly improved homepage performance with batch processing
+- Added optimizations to prevent UI freezing during filtering
+- Implemented specialized channel renderer detection and filtering
+- Skip processing when tab is not visible for better performance
+- Enhanced CSS to properly hide channel renderer elements
+
 ## Version 1.3.6
 - Fixed channel filtering for @username formats with improved normalization
 - Made @username matching case-insensitive for more reliable filtering

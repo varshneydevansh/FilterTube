@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "FilterTube",
     "description": "Filter YouTube videos based on keywords and channels",
-    "version": "1.3.6",
+    "version": "1.3.7",
     "minimum_chrome_version": "49",
     "background": {
         "scripts": ["js/background.js"]
