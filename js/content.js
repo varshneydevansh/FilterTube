@@ -31,10 +31,11 @@ function injectHidingStyles() {
         ytd-channel-video-player-renderer,
         yt-lockup-view-model,
         ytd-universal-watch-card-renderer,
-        ytd-secondary-search-container-renderer,
+        ytd-secondary-search-container-renderer > *,
         ytm-shorts-lockup-view-model,
         ytm-shorts-lockup-view-model-v2,
-        ytd-channel-renderer {
+        ytd-channel-renderer,
+        ytd-ticket-shelf-renderer {
             opacity: 0 !important;
             transition: opacity 0.1s ease-in-out !important;
         }
@@ -132,7 +133,8 @@ const VIDEO_SELECTORS = [
     'ytd-secondary-search-container-renderer > *', // Additional side panel items
     'ytm-shorts-lockup-view-model',  // Shorts items (new format)
     'ytm-shorts-lockup-view-model-v2', // Shorts items v2 format
-    'ytd-channel-renderer'           // Channel results in search
+    'ytd-channel-renderer',          // Channel results in search
+    'ytd-ticket-shelf-renderer'      // Ticket/event shelf items
 ].join(', ');
 
 // Load settings as early as possible
@@ -254,6 +256,13 @@ function getChannelIdentifiers(element) {
     return [...new Set(identifiers)];
 }
 
+// Helper function to check if a text contains an exact word match
+function containsExactWord(text, word) {
+    // Create a regex that matches the word with word boundaries
+    const regex = new RegExp(`\\b${word}\\b`, 'i');
+    return regex.test(text);
+}
+
 // Ultra-optimized filtering function
 function applyFilters() {
     // Performance optimization - avoid unnecessary work
@@ -261,6 +270,9 @@ function applyFilters() {
         // Page is not visible, defer intensive processing
         return;
     }
+    
+    // Measure performance
+    const startTime = performance.now();
     
     // Make sure styles are injected
     injectHidingStyles();
@@ -275,8 +287,10 @@ function applyFilters() {
         document.documentElement.classList.add('filtertube-filter-comments');
         console.log("FilterTube: Filtering comments");
         
-        // Apply comment filtering
-        applyCommentFilters();
+        // Apply comment filtering - but only if we're on a video page
+        if (location.href.includes('/watch')) {
+            applyCommentFilters();
+        }
     } else {
         // No comment filtering active
         document.documentElement.classList.remove('filtertube-hide-all-comments');
@@ -303,51 +317,67 @@ function applyFilters() {
     }
     
     // Performance optimization - process in smaller batches for smoother UX
+    // Only select elements that haven't been processed yet
     const contentElements = document.querySelectorAll(VIDEO_SELECTORS + ':not([data-filter-tube-allowed="true"]):not([data-filter-tube-filtered="true"])');
     
+    // Cache the length to avoid repeated property lookups
+    const elementsCount = contentElements.length;
+    
     // Exit if no new elements to process
-    if (contentElements.length === 0) {
+    if (elementsCount === 0) {
+        const endTime = performance.now();
+        console.log(`FilterTube: No new elements to process (${(endTime - startTime).toFixed(2)}ms)`);
         return;
     }
     
-    // For large batches, process in chunks to prevent UI freezing
-    const BATCH_SIZE = 20; // Process 20 elements at a time
+    console.log(`FilterTube: Processing ${elementsCount} elements`);
     
-    // If we have a lot of elements, process in batches
-    if (contentElements.length > BATCH_SIZE) {
-        const processNextBatch = (startIndex) => {
-            const endIndex = Math.min(startIndex + BATCH_SIZE, contentElements.length);
+    // For large batches, process in chunks to prevent UI freezing
+    const BATCH_SIZE = 10; // Lower batch size to prevent UI lag
+    
+    // If we have a lot of elements, process in batches with delay between them
+    if (elementsCount > BATCH_SIZE) {
+        let processedCount = 0;
+        
+        const processNextBatch = () => {
+            const endIndex = Math.min(processedCount + BATCH_SIZE, elementsCount);
             
-            for (let i = startIndex; i < endIndex; i++) {
+            for (let i = processedCount; i < endIndex; i++) {
                 processElement(contentElements[i], keywords, channels);
             }
             
-            // If more elements to process, schedule next batch
-            if (endIndex < contentElements.length) {
-                setTimeout(() => {
-                    processNextBatch(endIndex);
-                }, 0);
+            processedCount = endIndex;
+            
+            // If more elements to process, schedule next batch with a small delay
+            if (processedCount < elementsCount) {
+                setTimeout(processNextBatch, 1); // 1ms delay to allow UI updates
             } else {
                 // All elements processed, fix shorts layout
                 fixShortsLayout();
                 // Update filters applied flag
                 filtersApplied = true;
+                
+                const endTime = performance.now();
+                console.log(`FilterTube: Completed processing ${elementsCount} elements in ${(endTime - startTime).toFixed(2)}ms`);
             }
         };
         
         // Start processing the first batch
-        processNextBatch(0);
+        processNextBatch();
     } else {
         // Small number of elements, process all at once
-        contentElements.forEach(element => {
-            processElement(element, keywords, channels);
-        });
+        for (let i = 0; i < elementsCount; i++) {
+            processElement(contentElements[i], keywords, channels);
+        }
         
         // Special handling for shorts shelves after filtering
         fixShortsLayout();
         
         // Update filters applied flag
         filtersApplied = true;
+        
+        const endTime = performance.now();
+        console.log(`FilterTube: Processed ${elementsCount} elements in ${(endTime - startTime).toFixed(2)}ms`);
     }
 }
 
@@ -366,11 +396,28 @@ function processElement(element, keywords, channels) {
         processShortRenderer(element, keywords, channels);
         return;
     }
+
+    // Special handling for ticket shelf elements
+    if (element.tagName === 'YTD-TICKET-SHELF-RENDERER') {
+        const elementText = element.textContent.toLowerCase();
+        
+        // Use exact word matching for ticket shelves
+        const matchesKeyword = keywords.some(keyword => containsExactWord(elementText, keyword));
+        
+        if (matchesKeyword) {
+            element.setAttribute('data-filter-tube-filtered', 'true');
+            element.removeAttribute('data-filter-tube-allowed');
+        } else {
+            element.setAttribute('data-filter-tube-allowed', 'true');
+            element.removeAttribute('data-filter-tube-filtered');
+        }
+        return;
+    }
     
     const elementText = element.textContent.toLowerCase();
     
-    // Check if element contains any filtered keywords
-    const matchesKeyword = keywords.some(keyword => elementText.includes(keyword));
+    // Check if element contains any filtered keywords using exact word matching
+    const matchesKeyword = keywords.some(keyword => containsExactWord(elementText, keyword));
     
     // Get all potential channel identifiers
     const channelIdentifiers = getChannelIdentifiers(element);
@@ -515,8 +562,8 @@ function processChannelRenderer(element, channels) {
 function processShortRenderer(element, keywords, channels) {
     const elementText = element.textContent.toLowerCase();
     
-    // Check if element contains any filtered keywords
-    const matchesKeyword = keywords.some(keyword => elementText.includes(keyword));
+    // Check if element contains any filtered keywords using exact word matching
+    const matchesKeyword = keywords.some(keyword => containsExactWord(elementText, keyword));
     
     // Get channel info using specialized extraction for shorts
     const channelIdentifiers = [];
@@ -891,8 +938,8 @@ function processComment(comment, keywords, channels) {
         console.log('Comment channel identifiers:', [...new Set(channelIdentifiers)]);
     }
     
-    // Check if comment contains filtered keywords
-    const matchesKeyword = keywords.some(keyword => commentText.includes(keyword));
+    // Check if comment contains filtered keywords using exact word matching
+    const matchesKeyword = keywords.some(keyword => containsExactWord(commentText, keyword));
     
     // Check if comment is from a filtered channel
     const matchesChannel = channels.length > 0 && channelIdentifiers.length > 0 &&
@@ -927,7 +974,7 @@ function processComment(comment, keywords, channels) {
     }
 }
 
-console.log("FilterTube Content Script Loaded - Zero Flash Version v1.4.1");
+console.log("FilterTube Content Script Loaded - Zero Flash Version v1.4.2");
 
 
 

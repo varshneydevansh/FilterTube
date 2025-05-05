@@ -1,5 +1,15 @@
 # FilterTube Changelog
 
+## Version 1.4.2
+- Added support for filtering ticket/event shelves in YouTube
+- Changed keyword filtering to use exact word matching instead of partial matching
+- Significantly improved performance with optimized batch processing
+- Added performance metrics logging to help diagnose slowness issues
+- Optimized filtering to reduce UI freezing and improve responsiveness
+- Enhanced comment filtering to only trigger on video pages
+- Fixed channel filtering in side panel content
+- Reduced batch size for smoother UI experience
+
 ## Version 1.4.1
 - Fixed comment filtering to work properly with both options
 - Updated tab-view.html to match the popup UI
