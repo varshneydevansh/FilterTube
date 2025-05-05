@@ -6,6 +6,8 @@
 // Global variables for filter settings
 let filterKeywords = '';
 let filterChannels = '';
+let hideAllComments = false;
+let filterComments = false;
 let observer = null;
 let filtersApplied = false;
 let stylesInjected = false;
@@ -37,6 +39,13 @@ function injectHidingStyles() {
             transition: opacity 0.1s ease-in-out !important;
         }
         
+        /* Comment elements */
+        ytd-comment-thread-renderer,
+        ytd-comment-renderer,
+        ytd-comment-replies-renderer {
+            transition: opacity 0.1s ease-in-out, height 0.3s ease-out !important;
+        }
+        
         /* Show elements marked as allowed */
         [data-filter-tube-allowed="true"] {
             opacity: 1 !important;
@@ -44,6 +53,15 @@ function injectHidingStyles() {
         
         /* Hide filtered elements */
         [data-filter-tube-filtered="true"] {
+            display: none !important;
+        }
+        
+        /* Hide comments section entirely if enabled */
+        .filtertube-hide-all-comments #sections ytd-item-section-renderer#sections {
+            display: none !important;
+        }
+        
+        .filtertube-hide-all-comments #comments {
             display: none !important;
         }
         
@@ -115,9 +133,11 @@ const VIDEO_SELECTORS = [
 
 // Load settings as early as possible
 function loadSettings() {
-    chrome.storage.local.get(['filterKeywords', 'filterChannels'], (items) => {
+    chrome.storage.local.get(['filterKeywords', 'filterChannels', 'hideAllComments', 'filterComments'], (items) => {
         filterKeywords = items.filterKeywords || '';
         filterChannels = items.filterChannels || '';
+        hideAllComments = items.hideAllComments || false;
+        filterComments = items.filterComments || false;
         
         // Start observing for elements
         setupObserver();
@@ -148,6 +168,12 @@ chrome.storage.onChanged.addListener((changes, area) => {
         }
         if (changes.filterChannels) {
             filterChannels = changes.filterChannels.newValue || '';
+        }
+        if (changes.hideAllComments !== undefined) {
+            hideAllComments = changes.hideAllComments.newValue;
+        }
+        if (changes.filterComments !== undefined) {
+            filterComments = changes.filterComments.newValue;
         }
         
         // Reset filtering state
@@ -235,6 +261,18 @@ function applyFilters() {
     // Make sure styles are injected
     injectHidingStyles();
     
+    // Handle comment section visibility based on settings
+    if (hideAllComments) {
+        document.documentElement.classList.add('filtertube-hide-all-comments');
+    } else {
+        document.documentElement.classList.remove('filtertube-hide-all-comments');
+    }
+    
+    // Apply comment filtering if enabled
+    if (filterComments && !hideAllComments) {
+        applyCommentFilters();
+    }
+    
     // Parse filter settings - do this once outside the element loop
     const keywords = filterKeywords.split(',')
         .map(k => k.trim().toLowerCase())
@@ -308,6 +346,14 @@ function processElement(element, keywords, channels) {
     // Special handling for ytd-channel-renderer elements
     if (element.tagName === 'YTD-CHANNEL-RENDERER') {
         processChannelRenderer(element, channels);
+        return;
+    }
+    
+    // Special handling for shorts elements
+    if (element.tagName === 'YTD-REEL-ITEM-RENDERER' || 
+        element.tagName === 'YTM-SHORTS-LOCKUP-VIEW-MODEL' || 
+        element.tagName === 'YTM-SHORTS-LOCKUP-VIEW-MODEL-V2') {
+        processShortRenderer(element, keywords, channels);
         return;
     }
     
@@ -455,6 +501,69 @@ function processChannelRenderer(element, channels) {
     }
 }
 
+// Special handler for shorts elements
+function processShortRenderer(element, keywords, channels) {
+    const elementText = element.textContent.toLowerCase();
+    
+    // Check if element contains any filtered keywords
+    const matchesKeyword = keywords.some(keyword => elementText.includes(keyword));
+    
+    // Get channel info using specialized extraction for shorts
+    const channelIdentifiers = [];
+    
+    // Get channel name from various possible locations in shorts
+    const channelElements = element.querySelectorAll('a[href*="/@"], a[href*="/channel/"], .channel-name, yt-formatted-string[id="text"]');
+    
+    channelElements.forEach(channelEl => {
+        // Extract from the text content
+        const text = channelEl.textContent.trim();
+        if (text && text.length > 0) {
+            channelIdentifiers.push(text.toLowerCase());
+        }
+        
+        // Extract from href attributes
+        const href = channelEl.getAttribute('href');
+        if (href) {
+            if (href.includes('/channel/')) {
+                const channelId = href.split('/channel/')[1].split('?')[0].split('/')[0];
+                channelIdentifiers.push(channelId.toLowerCase());
+                channelIdentifiers.push('channel:' + channelId.toLowerCase());
+            } else if (href.includes('/@')) {
+                const username = href.split('/@')[1].split('?')[0].split('/')[0];
+                channelIdentifiers.push('@' + username.toLowerCase());
+            }
+        }
+    });
+    
+    // Debug logging for shorts by Travis Scott
+    if (channelIdentifiers.some(id => id.includes('travis'))) {
+        console.log('Shorts identifiers:', [...new Set(channelIdentifiers)]);
+    }
+    
+    // Check if any channel identifier matches filtered channels
+    const matchesChannel = channels.length > 0 && channelIdentifiers.length > 0 &&
+        channels.some(channel => {
+            const normalizedChannel = channel.startsWith('@') ? channel.substring(1).toLowerCase() : channel.toLowerCase();
+            
+            return channelIdentifiers.some(identifier => {
+                const normalizedIdentifier = identifier.startsWith('@') ? identifier.substring(1).toLowerCase() : identifier.toLowerCase();
+                
+                return normalizedIdentifier === normalizedChannel || 
+                      normalizedIdentifier.includes(normalizedChannel) || 
+                      normalizedChannel.includes(normalizedIdentifier);
+            });
+        });
+    
+    // Mark as filtered or allowed
+    if (matchesKeyword || matchesChannel) {
+        element.setAttribute('data-filter-tube-filtered', 'true');
+        element.removeAttribute('data-filter-tube-allowed');
+    } else {
+        element.setAttribute('data-filter-tube-allowed', 'true');
+        element.removeAttribute('data-filter-tube-filtered');
+    }
+}
+
 // Fix shorts layout to ensure container doesn't collapse
 function fixShortsLayout() {
     // Process shorts shelves
@@ -548,6 +657,14 @@ function watchForNavigation() {
             setTimeout(applyFilters, 500);
             setTimeout(applyFilters, 1000);
             setTimeout(applyFilters, 2000);
+            
+            // Additional check for comment section appearing later
+            setTimeout(() => {
+                // Apply comment filtering if on a video page and filtering is enabled
+                if (location.href.includes('/watch') && (filterComments || hideAllComments)) {
+                    applyCommentFilters();
+                }
+            }, 3000);
         }
     }, 100);
     
@@ -572,7 +689,112 @@ window.addEventListener('unload', () => {
     }
 });
 
-console.log("FilterTube Content Script Loaded - Zero Flash Version v1.3.7");
+// Apply filters to comments
+function applyCommentFilters() {
+    // Constants for comment selectors
+    const COMMENT_SELECTORS = 'ytd-comment-thread-renderer, ytd-comment-renderer';
+    
+    // Parse filter settings once
+    const keywords = filterKeywords.split(',')
+        .map(k => k.trim().toLowerCase())
+        .filter(k => k.length > 0);
+    
+    const channels = filterChannels.split(',')
+        .map(c => c.trim().toLowerCase())
+        .filter(c => c.length > 0);
+    
+    // Get unprocessed comments
+    const comments = document.querySelectorAll(COMMENT_SELECTORS + ':not([data-filter-tube-allowed="true"]):not([data-filter-tube-filtered="true"])');
+    
+    // Process in batches to prevent UI freezing
+    const BATCH_SIZE = 40; // Comments are smaller, so we can process more at once
+    
+    // If we have a lot of comments, process in batches
+    if (comments.length > BATCH_SIZE) {
+        const processNextBatch = (startIndex) => {
+            const endIndex = Math.min(startIndex + BATCH_SIZE, comments.length);
+            
+            for (let i = startIndex; i < endIndex; i++) {
+                processComment(comments[i], keywords, channels);
+            }
+            
+            // If more comments to process, schedule next batch
+            if (endIndex < comments.length) {
+                setTimeout(() => {
+                    processNextBatch(endIndex);
+                }, 0);
+            }
+        };
+        
+        // Start processing the first batch
+        processNextBatch(0);
+    } else {
+        // Small number of comments, process all at once
+        comments.forEach(comment => {
+            processComment(comment, keywords, channels);
+        });
+    }
+}
+
+// Process an individual comment
+function processComment(comment, keywords, channels) {
+    // Extract comment text
+    const commentText = comment.textContent.toLowerCase();
+    
+    // Get channel info from the comment
+    const channelName = comment.querySelector('#author-text');
+    const channelLinks = comment.querySelectorAll('a[href*="/@"], a[href*="/channel/"]');
+    
+    const channelIdentifiers = [];
+    
+    // Extract channel name
+    if (channelName) {
+        channelIdentifiers.push(channelName.textContent.trim().toLowerCase());
+    }
+    
+    // Extract channel links
+    channelLinks.forEach(link => {
+        const href = link.getAttribute('href');
+        if (href) {
+            if (href.includes('/channel/')) {
+                const channelId = href.split('/channel/')[1].split('?')[0].split('/')[0];
+                channelIdentifiers.push(channelId.toLowerCase());
+                channelIdentifiers.push('channel:' + channelId.toLowerCase());
+            } else if (href.includes('/@')) {
+                const username = href.split('/@')[1].split('?')[0].split('/')[0];
+                channelIdentifiers.push('@' + username.toLowerCase());
+            }
+        }
+    });
+    
+    // Check if comment contains filtered keywords
+    const matchesKeyword = keywords.some(keyword => commentText.includes(keyword));
+    
+    // Check if comment is from a filtered channel
+    const matchesChannel = channels.length > 0 && channelIdentifiers.length > 0 &&
+        channels.some(channel => {
+            const normalizedChannel = channel.startsWith('@') ? channel.substring(1).toLowerCase() : channel.toLowerCase();
+            
+            return channelIdentifiers.some(identifier => {
+                const normalizedIdentifier = identifier.startsWith('@') ? identifier.substring(1).toLowerCase() : identifier.toLowerCase();
+                
+                return normalizedIdentifier === normalizedChannel || 
+                      normalizedIdentifier.includes(normalizedChannel) || 
+                      normalizedChannel.includes(normalizedIdentifier);
+            });
+        });
+    
+    // Hide or show comment based on filters
+    if (matchesKeyword || matchesChannel) {
+        comment.setAttribute('data-filter-tube-filtered', 'true');
+        comment.removeAttribute('data-filter-tube-allowed');
+    } else {
+        comment.setAttribute('data-filter-tube-allowed', 'true');
+        comment.removeAttribute('data-filter-tube-filtered');
+    }
+}
+
+console.log("FilterTube Content Script Loaded - Zero Flash Version v1.4.0");
 
 
 

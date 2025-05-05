@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const logoIcon = document.querySelector('.logo-icon');
     const titleElement = document.querySelector('.title');
     const hideAllCommentsCheckbox = document.getElementById('hideAllComments');
-    const hideFilteredCommentsCheckbox = document.getElementById('hideFilteredComments');
+    const filterCommentsCheckbox = document.getElementById('hideFilteredComments');
 
     // Make sure required elements exist
     if (!keywordsElement || !channelsElement || !saveButton) {
@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
     loadSettings();
 
     // Set up checkbox exclusivity
-    if (hideAllCommentsCheckbox && hideFilteredCommentsCheckbox) {
+    if (hideAllCommentsCheckbox && filterCommentsCheckbox) {
         setupCommentFilterExclusivity();
     }
 
@@ -51,25 +51,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
     /**
      * Loads settings from storage
- */
-function loadSettings() {
+     */
+    function loadSettings() {
         chrome.storage.local.get([
             'filterKeywords', 
             'filterChannels', 
             'hideAllComments', 
-            'hideFilteredComments'
+            'filterComments'
         ], function(items) {
             // Set form values
             keywordsElement.value = items.filterKeywords || '';
             channelsElement.value = items.filterChannels || '';
             
-            if (hideAllCommentsCheckbox && hideFilteredCommentsCheckbox) {
+            if (hideAllCommentsCheckbox && filterCommentsCheckbox) {
                 hideAllCommentsCheckbox.checked = items.hideAllComments || false;
-                hideFilteredCommentsCheckbox.checked = items.hideFilteredComments || false;
+                filterCommentsCheckbox.checked = items.filterComments || false;
                 
-                // Ensure only one is checked
-                if (hideAllCommentsCheckbox.checked && hideFilteredCommentsCheckbox.checked) {
-                    hideFilteredCommentsCheckbox.checked = false;
+                // Ensure only one is checked (hideAllComments takes precedence)
+                if (hideAllCommentsCheckbox.checked && filterCommentsCheckbox.checked) {
+                    filterCommentsCheckbox.checked = false;
                 }
             }
         });
@@ -81,26 +81,26 @@ function loadSettings() {
     function setupCommentFilterExclusivity() {
         hideAllCommentsCheckbox.addEventListener('change', function() {
             if (this.checked) {
-                hideFilteredCommentsCheckbox.checked = false;
+                filterCommentsCheckbox.checked = false;
             }
         });
         
-        hideFilteredCommentsCheckbox.addEventListener('change', function() {
+        filterCommentsCheckbox.addEventListener('change', function() {
             if (this.checked) {
                 hideAllCommentsCheckbox.checked = false;
             }
-    });
-}
+        });
+    }
 
-/**
+    /**
      * Saves settings to storage
- */
-function saveSettings() {
+     */
+    function saveSettings() {
         // Get current values
         const filterKeywords = keywordsElement.value.trim();
         const filterChannels = channelsElement.value.trim();
         const hideAllComments = hideAllCommentsCheckbox ? hideAllCommentsCheckbox.checked : false;
-        const hideFilteredComments = hideFilteredCommentsCheckbox ? hideFilteredCommentsCheckbox.checked : false;
+        const filterComments = filterCommentsCheckbox ? filterCommentsCheckbox.checked : false;
         
         // Visual feedback - change button appearance
         const originalButtonText = saveButton.textContent;
@@ -108,31 +108,31 @@ function saveSettings() {
         saveButton.textContent = 'Saved!';
         
         // Save to storage
-    chrome.storage.local.set({
-        filterKeywords: filterKeywords,
+        chrome.storage.local.set({
+            filterKeywords: filterKeywords,
             filterChannels: filterChannels,
             hideAllComments: hideAllComments,
-            hideFilteredComments: hideFilteredComments
-    }, function() {
+            filterComments: filterComments
+        }, function() {
             // Reset button after delay
-        setTimeout(function() {
+            setTimeout(function() {
                 saveButton.classList.remove('saved');
                 saveButton.textContent = originalButtonText;
             }, 1500);
-    });
-}
+        });
+    }
 
-/**
+    /**
      * Opens the settings in a new tab
- */
+     */
     function openInNewTab() {
         const extensionUrl = chrome.runtime.getURL('html/tab-view.html');
         chrome.tabs.create({ url: extensionUrl });
     }
 
-/**
+    /**
      * Opens the FilterTube website in a new tab
- */
+     */
     function openWebsite() {
         chrome.tabs.create({ url: 'https://github.com/varshneydevansh/FilterTube' });
     }

@@ -1,5 +1,14 @@
 # FilterTube Changelog
 
+## Version 1.4.0
+- Added comment filtering functionality with two options:
+  - Hide all comments option to completely remove the comments section
+  - Filter comments with keywords/channels option to selectively hide matching comments
+- Enhanced shorts filtering with improved @username and channel ID detection
+- Added specialized processor for shorts content for more reliable filtering
+- Updated popup UI with comment filtering checkboxes
+- Fixed inconsistencies in channel filtering across different YouTube components
+
 ## Version 1.3.7
 - Fixed filtering for channel results in search pages (ytd-channel-renderer)
 - Significantly improved homepage performance with batch processing
