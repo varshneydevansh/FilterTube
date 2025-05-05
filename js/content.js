@@ -220,6 +220,7 @@ function hideVideos(trimmedKeywords, trimmedChannels, rootNode = document) {
             '.metadata-snippet-container yt-formatted-string, ' + // Search result descriptions
             '.metadata-snippet-container .metadata-snippet-text, ' + // Alternative class
             '#description-text, ' + // Channel page descriptions
+            '.metadata-snippet-text, ' + // Make sure we catch all metadata snippets
             '#description-inline-expander .yt-core-attributed-string' // Watch page description
         );
 
@@ -288,6 +289,13 @@ function hideVideos(trimmedKeywords, trimmedChannels, rootNode = document) {
             }
         }
         
+        // Additional text to check - find all metadata snippet text elements
+        const allMetadataSnippets = actualVideoElement.querySelectorAll('.metadata-snippet-container yt-formatted-string, .metadata-snippet-text, yt-formatted-string.metadata-snippet-text');
+        let additionalMetadataText = '';
+        allMetadataSnippets.forEach(snippet => {
+            additionalMetadataText += ' ' + (snippet.textContent || '').toLowerCase().trim();
+        });
+        
         // Debug logging for troubleshooting
         /*
         console.log("FilterTube SCAN:", {
@@ -297,8 +305,9 @@ function hideVideos(trimmedKeywords, trimmedChannels, rootNode = document) {
              Channel: channelName,
             Handle: channelHandle,
             Description: descriptionText,
+            AdditionalMetadata: additionalMetadataText,
             Keywords: trimmedKeywords,
-            MatchesKeyword: trimmedKeywords.some(kw => videoTitle.includes(kw) || descriptionText.includes(kw))
+            MatchesKeyword: trimmedKeywords.some(kw => videoTitle.includes(kw) || descriptionText.includes(kw) || additionalMetadataText.includes(kw))
         });
         */
 
@@ -330,7 +339,8 @@ function hideVideos(trimmedKeywords, trimmedChannels, rootNode = document) {
             
             if (checkText(videoTitle) || 
                 checkText(channelName) || 
-                (combinedDescAndHashtags && checkText(combinedDescAndHashtags)) || 
+                checkText(combinedDescAndHashtags) || 
+                checkText(additionalMetadataText) ||
                 checkText(gameCardTitle)) {
                 shouldHide = true;
             }
@@ -374,6 +384,56 @@ function hideVideos(trimmedKeywords, trimmedChannels, rootNode = document) {
                 ) {
                     // console.log("Hiding Mix based on channel match in: " + mixTitle);
                     shouldHide = true;
+                }
+            }
+        }
+
+        // Special case for rich-item-renderer containing mix/playlist elements
+        if (suggestion.matches('ytd-rich-item-renderer')) {
+            // Check if it's a mix card by looking for specific elements
+            const isMixCard = !!suggestion.querySelector('.yt-lockup-view-model-wiz, .yt-lockup-metadata-view-model-wiz, ytd-radio-renderer, ytd-mix-renderer, ytd-playlist-renderer');
+            
+            if (isMixCard) {
+                // For mix cards, we want to do extra checking on all visible text content
+                const allTextElements = suggestion.querySelectorAll('h3, span, yt-formatted-string, .yt-core-attributed-string');
+                let allText = '';
+                
+                allTextElements.forEach(el => {
+                    allText += ' ' + (el.textContent || '').toLowerCase().trim();
+                });
+                
+                if (trimmedKeywords.length > 0) {
+                    for (const keyword of trimmedKeywords) {
+                        if (allText.includes(keyword)) {
+                            shouldHide = true;
+                            console.log(`FilterTube: Hiding mix with keyword "${keyword}" in text: ${allText.substring(0, 50)}...`);
+                            break;
+                        }
+                    }
+                }
+                
+                // If it's a mix and should be hidden, make sure to aggressively hide it
+                if (shouldHide) {
+                    suggestion.classList.remove('filter-tube-visible');
+                    
+                    // Aggressively hide this mix element
+                    suggestion.style.display = 'none !important';
+                    suggestion.style.visibility = 'hidden !important';
+                    suggestion.style.opacity = '0 !important';
+                    suggestion.style.width = '0 !important';
+                    suggestion.style.height = '0 !important';
+                    suggestion.style.position = 'absolute !important';
+                    suggestion.style.pointerEvents = 'none !important';
+                    
+                    // Also hide all thumbnails and images inside
+                    const allImages = suggestion.querySelectorAll('img, yt-thumbnail, yt-img-shadow');
+                    allImages.forEach(img => {
+                        img.style.display = 'none !important';
+                        img.style.visibility = 'hidden !important';
+                        img.style.opacity = '0 !important';
+                    });
+                    
+                    return; // Skip the rest of the processing
                 }
             }
         }
@@ -813,8 +873,16 @@ function hideMixAndPlaylistElements(trimmedKeywords, trimmedChannels, rootNode =
                 }
             }
             
+            // Get all text content from this mix element to ensure we catch everything
+            const allTextNodes = Array.from(mixElement.querySelectorAll('*'))
+                .filter(el => el.childNodes && el.childNodes.length > 0)
+                .flatMap(el => Array.from(el.childNodes))
+                .filter(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim());
+                
+            const allText = allTextNodes.map(node => node.textContent.trim().toLowerCase()).join(' ');
+            
             // Debug log
-            console.log(`FilterTube Mix Check: Title: "${titleText}", Channels: "${channelText}", Handle: "${channelHandle}"`);
+            console.log(`FilterTube Mix Check: Title: "${titleText}", Channels: "${channelText}", Handle: "${channelHandle}", All text: "${allText.substring(0, 100)}..."`);
             
             let shouldHide = false;
             
@@ -840,7 +908,18 @@ function hideMixAndPlaylistElements(trimmedKeywords, trimmedChannels, rootNode =
                 }
             }
             
-            // 3. Check channel filtering by name/handle
+            // 3. Check keywords in all text content
+            if (!shouldHide && trimmedKeywords.length > 0 && allText) {
+                for (const keyword of trimmedKeywords) {
+                    if (allText.includes(keyword)) {
+                        console.log(`FilterTube: Hiding mix - text contains keyword: ${keyword}`);
+                        shouldHide = true;
+                        break;
+                    }
+                }
+            }
+            
+            // 4. Check channel filtering by name/handle
             if (!shouldHide && trimmedChannels.length > 0 && (channelText || channelHandle)) {
                 if (shouldFilterChannel(channelText, channelHandle, trimmedChannels)) {
                     console.log(`FilterTube: Hiding mix "${titleText}" - channel match`);
@@ -856,32 +935,32 @@ function hideMixAndPlaylistElements(trimmedKeywords, trimmedChannels, rootNode =
 
                 // 1. Hide the element itself with display: none
                 mixElement.classList.remove('filter-tube-visible');
-                mixElement.style.display = 'none';
-                mixElement.style.visibility = 'hidden';
-                mixElement.style.opacity = '0';
-                mixElement.style.position = 'absolute';
-                mixElement.style.width = '0';
-                mixElement.style.height = '0';
+                mixElement.style.display = 'none !important';
+                mixElement.style.visibility = 'hidden !important';
+                mixElement.style.opacity = '0 !important';
+                mixElement.style.position = 'absolute !important';
+                mixElement.style.width = '0 !important';
+                mixElement.style.height = '0 !important';
                 
                 // 2. If parent exists, hide it with display: none
                 if (parentRichItem) {
                     parentRichItem.classList.remove('filter-tube-visible');
-                    parentRichItem.style.display = 'none';
-                    parentRichItem.style.visibility = 'hidden';
-                    parentRichItem.style.opacity = '0';
-                    parentRichItem.style.position = 'absolute';
-                    parentRichItem.style.width = '0';
-                    parentRichItem.style.height = '0';
+                    parentRichItem.style.display = 'none !important';
+                    parentRichItem.style.visibility = 'hidden !important';
+                    parentRichItem.style.opacity = '0 !important';
+                    parentRichItem.style.position = 'absolute !important';
+                    parentRichItem.style.width = '0 !important';
+                    parentRichItem.style.height = '0 !important';
                 }
                 
                 // 3. Direct targeting of image elements
                 const allImages = mixElement.querySelectorAll('img');
                 allImages.forEach(img => {
-                    img.style.display = 'none';
-                    img.style.visibility = 'hidden';
-                    img.style.opacity = '0';
-                    img.style.width = '0';
-                    img.style.height = '0';
+                    img.style.display = 'none !important';
+                    img.style.visibility = 'hidden !important';
+                    img.style.opacity = '0 !important';
+                    img.style.width = '0 !important';
+                    img.style.height = '0 !important';
                 });
                 
                 // 4. Target collection stacks specifically (the mix thumbnails)
@@ -895,20 +974,20 @@ function hideMixAndPlaylistElements(trimmedKeywords, trimmedChannels, rootNode =
                 );
                 
                 collectionElements.forEach(el => {
-                    el.style.display = 'none';
-                    el.style.visibility = 'hidden';
-                    el.style.opacity = '0';
-                    el.style.position = 'absolute';
-                    el.style.width = '0';
-                    el.style.height = '0';
+                    el.style.display = 'none !important';
+                    el.style.visibility = 'hidden !important';
+                    el.style.opacity = '0 !important';
+                    el.style.position = 'absolute !important';
+                    el.style.width = '0 !important';
+                    el.style.height = '0 !important';
                 });
                 
                 // 5. Target links that might be loading mix/playlist content
                 const playlistLinks = mixElement.querySelectorAll('a[href*="&list="], a[href*="&start_radio="]');
                 playlistLinks.forEach(link => {
-                    link.style.display = 'none';
-                    link.style.visibility = 'hidden';
-                    link.style.opacity = '0';
+                    link.style.display = 'none !important';
+                    link.style.visibility = 'hidden !important';
+                    link.style.opacity = '0 !important';
                 });
                 
                 // 6. Use the HTML dataset to mark as filtered
@@ -920,8 +999,39 @@ function hideMixAndPlaylistElements(trimmedKeywords, trimmedChannels, rootNode =
                 // 7. Hide all child elements as a last resort
                 const allChildren = mixElement.querySelectorAll('*');
                 allChildren.forEach(child => {
-                    child.style.display = 'none';
+                    child.style.display = 'none !important';
                 });
+                
+                // 8. Also hide by direct attribute modification to bypass CSS overrides
+                mixElement.setAttribute('hidden', 'true');
+                if (parentRichItem) {
+                    parentRichItem.setAttribute('hidden', 'true');
+                }
+                
+                // 9. Remove from DOM flow entirely as last resort
+                try {
+                    if (parentRichItem) {
+                        parentRichItem.style.display = 'none !important';
+                        parentRichItem.setAttribute('aria-hidden', 'true');
+                    }
+                    
+                    // Apply hidden to all parent containers that might be making it visible
+                    let current = mixElement;
+                    for (let i = 0; i < 5; i++) { // Go up to 5 levels up
+                        if (!current.parentElement) break;
+                        current = current.parentElement;
+                        
+                        if (current.classList.contains('yt-lockup-view-model-wiz') || 
+                            current.classList.contains('yt-lockup-metadata-view-model-wiz') ||
+                            current.classList.contains('ytd-rich-item-renderer')) {
+                            current.style.display = 'none !important';
+                            current.style.visibility = 'hidden !important';
+                            current.classList.remove('filter-tube-visible');
+                        }
+                    }
+                } catch (e) {
+                    console.error('Error applying extra hiding', e);
+                }
                 
             } else {
                 // Make the element visible
@@ -934,6 +1044,7 @@ function hideMixAndPlaylistElements(trimmedKeywords, trimmedChannels, rootNode =
                 mixElement.style.height = '';
                 
                 delete mixElement.dataset.filterTubeHidden;
+                mixElement.removeAttribute('hidden');
                 
                 // Also make parent visible if it exists
                 if (parentRichItem) {
@@ -946,6 +1057,7 @@ function hideMixAndPlaylistElements(trimmedKeywords, trimmedChannels, rootNode =
                     parentRichItem.style.height = '';
                     
                     delete parentRichItem.dataset.filterTubeHidden;
+                    parentRichItem.removeAttribute('hidden');
                 }
             }
         });
@@ -958,10 +1070,50 @@ function hideMixAndPlaylistElements(trimmedKeywords, trimmedChannels, rootNode =
     }
 }
 
-// --- Dynamic Content Handling (MutationObserver & Interval) ---
-
-let throttleTimeout = null;
-const FILTER_DELAY = 500; // Shortened delay slightly, as initial hide is faster
+/**
+ * Special handling to ensure watch cards with filtered keywords in description are hidden
+ * @param {string[]} trimmedKeywords - Array of lowercase keywords to filter by
+ * @param {string[]} trimmedChannels - Array of lowercase channel names to filter by
+ */
+function ensureWatchCardKeywordFiltering(trimmedKeywords, trimmedChannels) {
+    if (trimmedKeywords.length === 0) return;
+    
+    const watchCards = document.querySelectorAll('ytd-universal-watch-card-renderer');
+    
+    watchCards.forEach(card => {
+        // Skip if already properly hidden
+        if (!card.classList.contains('filter-tube-visible')) return;
+        
+        // Get all text content from the card
+        const allTextElements = card.querySelectorAll('yt-formatted-string, span, h3, div[id*="title"], div[id*="subtitle"]');
+        let allCardText = '';
+        
+        allTextElements.forEach(el => {
+            allCardText += ' ' + (el.textContent || '').toLowerCase().trim();
+        });
+        
+        // Check if any keyword matches
+        for (const keyword of trimmedKeywords) {
+            if (allCardText.includes(keyword)) {
+                console.log(`FilterTube: Hiding watch card with keyword "${keyword}" in content`);
+                
+                // Remove visible class
+                card.classList.remove('filter-tube-visible');
+                
+                // Also hide all child elements that might have been marked visible
+                const visibleChildren = card.querySelectorAll('.filter-tube-visible');
+                visibleChildren.forEach(child => child.classList.remove('filter-tube-visible'));
+                
+                // Apply aggressive hiding
+                card.style.display = 'none !important';
+                card.style.visibility = 'hidden !important';
+                card.style.opacity = '0 !important';
+                
+                break;
+            }
+        }
+    });
+}
 
 /**
  * Main filtering function called on load and on changes.
@@ -995,14 +1147,43 @@ function applyFilters() {
     hidePlaylistsAndShelves(keywords, channels);
     hideChannelElements(keywords, channels);
     hideShorts(keywords, channels);
+    
+    // More aggressive hiding for mix/playlist elements
     hideMixAndPlaylistElements(keywords, channels);
     
     // Special handlers for sections that need extra processing
     handleWatchCardFiltering(keywords, channels);
     
+    // New: Extra check to ensure watch cards with filtered keywords are hidden
+    ensureWatchCardKeywordFiltering(keywords, channels);
+    
     // Handle comment filtering
     if (window.location.pathname.startsWith('/watch')) {
         applyCommentFiltering();
+    }
+    
+    // Extra cleanup for any remaining mix elements that should be hidden
+    if (keywords.length > 0) {
+        const remainingMixElements = document.querySelectorAll('.filter-tube-visible .yt-lockup-view-model-wiz, .filter-tube-visible .yt-lockup-metadata-view-model-wiz');
+        remainingMixElements.forEach(mix => {
+            const mixTitle = mix.textContent.toLowerCase();
+            
+            for (const keyword of keywords) {
+                if (mixTitle.includes(keyword)) {
+                    console.log(`FilterTube: Hiding mix with keyword "${keyword}" in late cleanup`);
+                    const parentElement = mix.closest('.filter-tube-visible');
+                    if (parentElement) {
+                        parentElement.classList.remove('filter-tube-visible');
+                        parentElement.style.display = 'none !important';
+                        parentElement.style.visibility = 'hidden !important';
+                    }
+                    
+                    mix.classList.remove('filter-tube-visible');
+                    mix.style.display = 'none !important';
+                    break;
+                }
+            }
+        });
     }
     
     // Fix layout issues after filtering
