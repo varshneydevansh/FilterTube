@@ -164,7 +164,8 @@ function getChannelIdentifiers(element) {
         '#text.ytd-channel-name', 
         '#byline', 
         '#owner-text', 
-        'yt-formatted-string[id="text"]'
+        'yt-formatted-string[id="text"]',
+        '#channel-name yt-formatted-string'
     ];
     
     for (const selector of channelNameSelectors) {
@@ -178,7 +179,7 @@ function getChannelIdentifiers(element) {
     }
     
     // Look for @username format in any text element
-    const usernameElements = element.querySelectorAll('yt-formatted-string, span');
+    const usernameElements = element.querySelectorAll('yt-formatted-string, span, #subscribers');
     usernameElements.forEach(element => {
         const text = element.textContent.trim();
         if (text.startsWith('@')) {
@@ -195,6 +196,8 @@ function getChannelIdentifiers(element) {
                 // Extract channel ID
                 const channelId = href.split('/channel/')[1].split('?')[0].split('/')[0];
                 identifiers.push(channelId.toLowerCase());
+                // Also store a version with "channel:" prefix for exact matching
+                identifiers.push('channel:' + channelId.toLowerCase());
             } else if (href.includes('/@')) {
                 // Extract username with @ symbol
                 const username = href.split('/@')[1].split('?')[0].split('/')[0];
@@ -203,7 +206,8 @@ function getChannelIdentifiers(element) {
         }
     });
     
-    return identifiers;
+    // Return unique identifiers only
+    return [...new Set(identifiers)];
 }
 
 // Ultra-optimized filtering function
@@ -243,21 +247,60 @@ function applyFilters() {
         // Get all potential channel identifiers
         const channelIdentifiers = getChannelIdentifiers(element);
         
-        // Check if any channel identifier matches filtered channels
+        // Enhanced debug logging for Travis Scott channels
+        if (channels.some(c => c.toLowerCase().includes('travis'))) {
+            if (channelIdentifiers.length > 0) {
+                console.log('Checking content with identifiers:', channelIdentifiers);
+                console.log('Against filters:', channels);
+            }
+        }
+        
+        // Check if any channel identifier matches filtered channels with improved matching
         const matchesChannel = channels.length > 0 && channelIdentifiers.length > 0 &&
             channels.some(channel => {
-                // Direct match or partial match depending on format
+                // Exact match check first
+                if (channelIdentifiers.includes(channel)) {
+                    return true;
+                }
+                
+                // Check for channel ID match
+                if (channel.startsWith('channel:') && 
+                    channelIdentifiers.some(id => id === channel || id === channel.substring(8))) {
+                    return true;
+                }
+                
+                // Channel handle/username matching
                 return channelIdentifiers.some(identifier => {
-                    // If channel filter contains @ but identifier doesn't, check for inclusion without @
+                    // For debugging
+                    if (identifier.includes('travis') || channel.includes('travis')) {
+                        console.log(`Comparing: "${identifier}" with "${channel}"`);
+                    }
+                    
+                    // Normalize both strings for comparison by removing @ and converting to lowercase
+                    const normalizedIdentifier = identifier.startsWith('@') ? identifier.substring(1).toLowerCase() : identifier.toLowerCase();
+                    const normalizedChannel = channel.startsWith('@') ? channel.substring(1).toLowerCase() : channel.toLowerCase();
+                    
+                    // Direct match after normalization
+                    if (normalizedIdentifier === normalizedChannel) {
+                        return true;
+                    }
+                    
+                    // Looser matching for partial channel names
+                    if (normalizedIdentifier.includes(normalizedChannel) || normalizedChannel.includes(normalizedIdentifier)) {
+                        return true;
+                    }
+                    
+                    // Original matching logic (keeping as fallback)
+                    // If channel filter contains @ but identifier doesn't
                     if (channel.startsWith('@') && !identifier.startsWith('@')) {
-                        return identifier.includes(channel.substring(1));
+                        return identifier.toLowerCase().includes(channel.substring(1).toLowerCase());
                     }
-                    // If identifier contains @ but channel filter doesn't, check for inclusion without @
+                    // If identifier contains @ but channel filter doesn't
                     if (identifier.startsWith('@') && !channel.startsWith('@')) {
-                        return identifier.substring(1).includes(channel);
+                        return identifier.substring(1).toLowerCase().includes(channel.toLowerCase());
                     }
-                    // Otherwise check for direct inclusion
-                    return identifier.includes(channel);
+                    
+                    return false;
                 });
             });
         
@@ -417,7 +460,7 @@ window.addEventListener('unload', () => {
     }
 });
 
-console.log("FilterTube Content Script Loaded - Zero Flash Version v1.3.5");
+console.log("FilterTube Content Script Loaded - Zero Flash Version v1.3.6");
 
 
 

@@ -1,5 +1,15 @@
 # FilterTube Changelog
 
+## Version 1.3.6
+- Fixed channel filtering for @username formats with improved normalization
+- Made @username matching case-insensitive for more reliable filtering
+- Implemented flexible channel handle comparison to catch all variants
+- Added enhanced debug logging for troubleshooting channel filtering
+- Improved detection of channel handles in YouTube search results 
+- Enhanced matching algorithm for channel IDs
+- Fixed filtering of channel elements in search pages
+- Implemented unique identifier collection to prevent duplicate checks
+
 ## Version 1.3.5 (Current)
 - Enhanced channel filtering to properly detect and filter @usernames
 - Added support for channel ID based filtering
