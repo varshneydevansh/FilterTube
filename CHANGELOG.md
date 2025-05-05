@@ -1,5 +1,15 @@
 # FilterTube Changelog
 
+## Version 1.4.1
+- Fixed comment filtering to work properly with both options
+- Updated tab-view.html to match the popup UI
+- Added more robust comment detection for better filtering
+- Improved comment section hiding with multiple detection methods
+- Added dedicated observer for comment sections
+- Enhanced comment filtering logic to handle dynamically loaded comments
+- Added multiple attempts to catch comment sections as they load
+- Fixed inconsistencies in channel detection for comments
+
 ## Version 1.4.0
 - Added comment filtering functionality with two options:
   - Hide all comments option to completely remove the comments section

@@ -57,11 +57,15 @@ function injectHidingStyles() {
         }
         
         /* Hide comments section entirely if enabled */
-        .filtertube-hide-all-comments #sections ytd-item-section-renderer#sections {
+        .filtertube-hide-all-comments #comments,
+        .filtertube-hide-all-comments ytd-comments,
+        .filtertube-hide-all-comments ytd-item-section-renderer[section-identifier="comment-item-section"] {
             display: none !important;
         }
         
-        .filtertube-hide-all-comments #comments {
+        /* Hide filtered comments when in filtered mode */
+        .filtertube-filter-comments ytd-comment-thread-renderer[data-filter-tube-filtered="true"],
+        .filtertube-filter-comments ytd-comment-renderer[data-filter-tube-filtered="true"] {
             display: none !important;
         }
         
@@ -264,13 +268,19 @@ function applyFilters() {
     // Handle comment section visibility based on settings
     if (hideAllComments) {
         document.documentElement.classList.add('filtertube-hide-all-comments');
-    } else {
+        document.documentElement.classList.remove('filtertube-filter-comments');
+        console.log("FilterTube: Hiding all comments");
+    } else if (filterComments) {
         document.documentElement.classList.remove('filtertube-hide-all-comments');
-    }
-    
-    // Apply comment filtering if enabled
-    if (filterComments && !hideAllComments) {
+        document.documentElement.classList.add('filtertube-filter-comments');
+        console.log("FilterTube: Filtering comments");
+        
+        // Apply comment filtering
         applyCommentFilters();
+    } else {
+        // No comment filtering active
+        document.documentElement.classList.remove('filtertube-hide-all-comments');
+        document.documentElement.classList.remove('filtertube-filter-comments');
     }
     
     // Parse filter settings - do this once outside the element loop
@@ -641,11 +651,15 @@ function setupObserver() {
 // Handle YouTube's single-page application navigation
 function watchForNavigation() {
     let lastUrl = location.href;
+    let isVideoPage = location.href.includes('/watch');
     
     // Set up interval to check URL changes
     const urlCheckInterval = setInterval(() => {
-        if (lastUrl !== location.href) {
-            lastUrl = location.href;
+        const currentUrl = location.href;
+        const currentIsVideoPage = currentUrl.includes('/watch');
+        
+        if (lastUrl !== currentUrl) {
+            lastUrl = currentUrl;
             console.log("FilterTube: URL changed, reapplying filters");
             
             // Reset filtering state
@@ -658,13 +672,55 @@ function watchForNavigation() {
             setTimeout(applyFilters, 1000);
             setTimeout(applyFilters, 2000);
             
-            // Additional check for comment section appearing later
-            setTimeout(() => {
-                // Apply comment filtering if on a video page and filtering is enabled
-                if (location.href.includes('/watch') && (filterComments || hideAllComments)) {
-                    applyCommentFilters();
-                }
-            }, 3000);
+            // If we've navigated to a video page, handle comments
+            if (currentIsVideoPage) {
+                isVideoPage = true;
+                
+                // Multiple attempts to catch the comment section as it loads
+                setTimeout(() => {
+                    if (hideAllComments || filterComments) {
+                        console.log("FilterTube: Checking for comments (1st attempt)");
+                        const commentSection = document.querySelector('#comments, ytd-comments');
+                        if (commentSection) {
+                            if (hideAllComments) {
+                                document.documentElement.classList.add('filtertube-hide-all-comments');
+                            } else if (filterComments) {
+                                applyCommentFilters();
+                            }
+                        }
+                    }
+                }, 1000);
+                
+                setTimeout(() => {
+                    if (hideAllComments || filterComments) {
+                        console.log("FilterTube: Checking for comments (2nd attempt)");
+                        const commentSection = document.querySelector('#comments, ytd-comments');
+                        if (commentSection) {
+                            if (hideAllComments) {
+                                document.documentElement.classList.add('filtertube-hide-all-comments');
+                            } else if (filterComments) {
+                                applyCommentFilters();
+                            }
+                        }
+                    }
+                }, 3000);
+                
+                setTimeout(() => {
+                    if (hideAllComments || filterComments) {
+                        console.log("FilterTube: Checking for comments (final attempt)");
+                        const commentSection = document.querySelector('#comments, ytd-comments');
+                        if (commentSection) {
+                            if (hideAllComments) {
+                                document.documentElement.classList.add('filtertube-hide-all-comments');
+                            } else if (filterComments) {
+                                applyCommentFilters();
+                            }
+                        }
+                    }
+                }, 5000);
+            } else {
+                isVideoPage = false;
+            }
         }
     }, 100);
     
@@ -703,8 +759,21 @@ function applyCommentFilters() {
         .map(c => c.trim().toLowerCase())
         .filter(c => c.length > 0);
     
+    // If we're on a video page, ensure comment section is reached
+    const commentsSection = document.querySelector('#comments, ytd-comments');
+    if (commentsSection) {
+        console.log("FilterTube: Found comments section, applying filters");
+    } else {
+        // If not found, check again in a moment
+        console.log("FilterTube: Comments section not found, will retry");
+        setTimeout(applyCommentFilters, 1000);
+        return;
+    }
+    
     // Get unprocessed comments
     const comments = document.querySelectorAll(COMMENT_SELECTORS + ':not([data-filter-tube-allowed="true"]):not([data-filter-tube-filtered="true"])');
+    
+    console.log(`FilterTube: Processing ${comments.length} comments`);
     
     // Process in batches to prevent UI freezing
     const BATCH_SIZE = 40; // Comments are smaller, so we can process more at once
@@ -728,12 +797,52 @@ function applyCommentFilters() {
         
         // Start processing the first batch
         processNextBatch(0);
-    } else {
+    } else if (comments.length > 0) {
         // Small number of comments, process all at once
         comments.forEach(comment => {
             processComment(comment, keywords, channels);
         });
+    } else {
+        // No comments to process, check again in a moment 
+        // (YouTube often loads comments dynamically)
+        if (location.href.includes('/watch')) {
+            setTimeout(applyCommentFilters, 1000);
+        }
     }
+    
+    // Set up observer for comment section to catch dynamically loaded comments
+    setupCommentObserver();
+}
+
+// Set up a dedicated observer for comments
+function setupCommentObserver() {
+    // Try to find the comments section
+    const commentsSection = document.querySelector('#comments, ytd-comments');
+    if (!commentsSection) return;
+    
+    // Create a separate observer for comments
+    const commentObserver = new MutationObserver((mutations) => {
+        let shouldFilter = false;
+        
+        // Check for added nodes that might be comments
+        for (const mutation of mutations) {
+            if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                shouldFilter = true;
+                break;
+            }
+        }
+        
+        // Apply comment filters if new content detected
+        if (shouldFilter && filterComments && !hideAllComments) {
+            setTimeout(applyCommentFilters, 100);
+        }
+    });
+    
+    // Start observing the comments section
+    commentObserver.observe(commentsSection, {
+        childList: true,
+        subtree: true
+    });
 }
 
 // Process an individual comment
@@ -741,31 +850,46 @@ function processComment(comment, keywords, channels) {
     // Extract comment text
     const commentText = comment.textContent.toLowerCase();
     
-    // Get channel info from the comment
-    const channelName = comment.querySelector('#author-text');
-    const channelLinks = comment.querySelectorAll('a[href*="/@"], a[href*="/channel/"]');
+    // Get channel info from the comment - try multiple selectors for robustness
+    const channelSelectors = [
+        '#author-text',                 // Main channel text
+        '#header-author #author-text',  // Header author
+        '.ytd-comment-renderer #author-text', // Comment renderer author
+        '#author-name',                 // Author name
+        'a[href*="/@"]',                // @ handle links
+        'a[href*="/channel/"]'          // Channel ID links
+    ];
     
     const channelIdentifiers = [];
     
-    // Extract channel name
-    if (channelName) {
-        channelIdentifiers.push(channelName.textContent.trim().toLowerCase());
-    }
-    
-    // Extract channel links
-    channelLinks.forEach(link => {
-        const href = link.getAttribute('href');
-        if (href) {
-            if (href.includes('/channel/')) {
-                const channelId = href.split('/channel/')[1].split('?')[0].split('/')[0];
-                channelIdentifiers.push(channelId.toLowerCase());
-                channelIdentifiers.push('channel:' + channelId.toLowerCase());
-            } else if (href.includes('/@')) {
-                const username = href.split('/@')[1].split('?')[0].split('/')[0];
-                channelIdentifiers.push('@' + username.toLowerCase());
+    // Try each selector to find a channel name
+    channelSelectors.forEach(selector => {
+        const elements = comment.querySelectorAll(selector);
+        elements.forEach(element => {
+            // Extract from text content
+            if (element.textContent && element.textContent.trim()) {
+                channelIdentifiers.push(element.textContent.trim().toLowerCase());
             }
-        }
+            
+            // Extract from href attribute if available
+            const href = element.getAttribute('href');
+            if (href) {
+                if (href.includes('/channel/')) {
+                    const channelId = href.split('/channel/')[1].split('?')[0].split('/')[0];
+                    channelIdentifiers.push(channelId.toLowerCase());
+                    channelIdentifiers.push('channel:' + channelId.toLowerCase());
+                } else if (href.includes('/@')) {
+                    const username = href.split('/@')[1].split('?')[0].split('/')[0];
+                    channelIdentifiers.push('@' + username.toLowerCase());
+                }
+            }
+        });
     });
+    
+    // Debug logging for specific channels
+    if (channelIdentifiers.some(id => id.includes('travis'))) {
+        console.log('Comment channel identifiers:', [...new Set(channelIdentifiers)]);
+    }
     
     // Check if comment contains filtered keywords
     const matchesKeyword = keywords.some(keyword => commentText.includes(keyword));
@@ -788,13 +912,22 @@ function processComment(comment, keywords, channels) {
     if (matchesKeyword || matchesChannel) {
         comment.setAttribute('data-filter-tube-filtered', 'true');
         comment.removeAttribute('data-filter-tube-allowed');
+        
+        // If this is a comment thread renderer, also mark its replies
+        if (comment.tagName === 'YTD-COMMENT-THREAD-RENDERER') {
+            const replies = comment.querySelectorAll('ytd-comment-renderer');
+            replies.forEach(reply => {
+                reply.setAttribute('data-filter-tube-filtered', 'true');
+                reply.removeAttribute('data-filter-tube-allowed');
+            });
+        }
     } else {
         comment.setAttribute('data-filter-tube-allowed', 'true');
         comment.removeAttribute('data-filter-tube-filtered');
     }
 }
 
-console.log("FilterTube Content Script Loaded - Zero Flash Version v1.4.0");
+console.log("FilterTube Content Script Loaded - Zero Flash Version v1.4.1");
 
 
 
