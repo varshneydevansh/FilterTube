@@ -1,6 +1,13 @@
 # FilterTube Changelog
 
-## Version 1.3.3 (Current)
+## Version 1.3.4 (Current)
+- Fixed shorts container collapsing issue when filtering shorts
+- Added new CSS approach that makes filtered shorts have zero width
+- Added intelligent shorts layout management
+- Non-matching shorts now automatically shift into view when others are filtered
+- Added automatic position reset for shorts containers
+
+## Version 1.3.3
 - Fixed YouTube Shorts filtering (properly hides shorts with filtered keywords)
 - Preserved shorts shelf scrolling functionality 
 - Added special handling for shorts elements to prevent UI breaking

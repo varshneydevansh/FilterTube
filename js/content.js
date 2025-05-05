@@ -59,6 +59,18 @@ function injectHidingStyles() {
         yt-horizontal-list-renderer {
             opacity: 1 !important;
         }
+        
+        /* For shorts that match filter */
+        ytm-shorts-lockup-view-model[data-filter-tube-filtered="true"],
+        ytm-shorts-lockup-view-model-v2[data-filter-tube-filtered="true"] {
+            width: 0 !important;
+            min-width: 0 !important;
+            max-width: 0 !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            border: none !important;
+            overflow: hidden !important;
+        }
     `;
     
     // Add style to head as early as possible
@@ -208,28 +220,57 @@ function applyFilters() {
                     }
                 });
             }
-            
-            // Special handling for Shorts
-            if (element.tagName === 'YTM-SHORTS-LOCKUP-VIEW-MODEL' || element.tagName === 'YTM-SHORTS-LOCKUP-VIEW-MODEL-V2') {
-                // Don't hide the parent list container, only the shorts item itself
-                element.style.visibility = 'hidden';
-                element.style.height = '10px'; // Collapse but don't remove completely to maintain scroll
-            }
         } else {
             // Mark as allowed
             element.setAttribute('data-filter-tube-allowed', 'true');
             element.removeAttribute('data-filter-tube-filtered');
-            
-            // Remove any inline styles we might have added for shorts
-            if (element.tagName === 'YTM-SHORTS-LOCKUP-VIEW-MODEL' || element.tagName === 'YTM-SHORTS-LOCKUP-VIEW-MODEL-V2') {
-                element.style.visibility = '';
-                element.style.height = '';
-            }
         }
     });
     
+    // Special handling for shorts shelves after filtering
+    fixShortsLayout();
+    
     // Update filters applied flag
     filtersApplied = true;
+}
+
+// Fix shorts layout to ensure container doesn't collapse
+function fixShortsLayout() {
+    // Process shorts shelves
+    const shelves = document.querySelectorAll('ytd-reel-shelf-renderer');
+    shelves.forEach(shelf => {
+        // Check if the shelf has any remaining visible items
+        const visibleItems = shelf.querySelectorAll('ytm-shorts-lockup-view-model:not([data-filter-tube-filtered="true"]), ytm-shorts-lockup-view-model-v2:not([data-filter-tube-filtered="true"])');
+        
+        // If all items are filtered, hide the entire shelf
+        if (visibleItems.length === 0) {
+            shelf.setAttribute('data-filter-tube-filtered', 'true');
+        } else {
+            shelf.setAttribute('data-filter-tube-allowed', 'true');
+            shelf.removeAttribute('data-filter-tube-filtered');
+        }
+        
+        // Find the items container and update its transform to start from the first visible item
+        const itemsContainer = shelf.querySelector('#items');
+        if (itemsContainer) {
+            // Reset any transform first
+            itemsContainer.style.transform = 'translateX(0px)';
+        }
+        
+        // Reset scroll position by clicking left arrow if available and needed
+        if (visibleItems.length > 0 && visibleItems[0] !== shelf.querySelector('ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2')) {
+            const leftArrow = shelf.querySelector('#left-arrow button');
+            if (leftArrow) {
+                // Simulate a click on the left arrow to reset position (only if not already at start)
+                const isAtStart = shelf.querySelector('yt-horizontal-list-renderer[at-start]');
+                if (!isAtStart) {
+                    setTimeout(() => {
+                        leftArrow.click();
+                    }, 100);
+                }
+            }
+        }
+    });
 }
 
 // Set up the MutationObserver for real-time filtering
@@ -310,7 +351,7 @@ window.addEventListener('unload', () => {
     }
 });
 
-console.log("FilterTube Content Script Loaded - Zero Flash Version v1.3.3");
+console.log("FilterTube Content Script Loaded - Zero Flash Version v1.3.4");
 
 
 
