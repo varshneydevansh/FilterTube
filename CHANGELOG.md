@@ -1,13 +1,30 @@
 # FilterTube Changelog
 
+## Version 1.4.4
+- Implemented persistent sidebar video filtering with requestAnimationFrame retry mechanism
+- Enhanced shorts filtering to reliably detect channel @usernames and IDs in search results
+- Added dedicated observers for sidebar and shorts content with optimized processing
+- Improved channel extraction from Polymer data for dynamically loaded elements
+- Enhanced normalized channel matching for more reliable filtering across all YouTube components
+- Fixed filtering issues with @usernames and channel IDs in sidebar videos and shorts
+
+## Version 1.4.3
+- Advanced extraction of channel information from YouTube's internal Polymer data
+- Enhanced channel ID detection for sidebar videos with reliable identification
+- Added direct support for raw 'UC...' channel IDs without prefix
+- Improved debug logging for sidebar channel filtering
+- Better handling of @handles and channel IDs across different YouTube components
+- Fixed matching issues with channel IDs in recommended videos
+
 ## Version 1.4.2
 - Added support for filtering ticket/event shelves in YouTube
+- Implemented extraction of channel IDs and handles from YouTube's polymer data
+- Enhanced sidebar videos filtering with reliable channel identification
 - Changed keyword filtering to use exact word matching instead of partial matching
 - Significantly improved performance with optimized batch processing
 - Added performance metrics logging to help diagnose slowness issues
 - Optimized filtering to reduce UI freezing and improve responsiveness
 - Enhanced comment filtering to only trigger on video pages
-- Fixed channel filtering in side panel content
 - Reduced batch size for smoother UI experience
 
 ## Version 1.4.1

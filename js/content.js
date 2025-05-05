@@ -148,6 +148,10 @@ function loadSettings() {
         // Start observing for elements
         setupObserver();
         
+        // Set up specialized observers for sidebar and shorts
+        setupSidebarObserver();
+        setupShortsObserver();
+        
         // Apply filters to existing elements
         applyFilters();
         
@@ -199,11 +203,89 @@ chrome.storage.onChanged.addListener((changes, area) => {
     }
 });
 
+// Extract channel info from YouTube's polymer component data
+function extractChannelInfoFromPolymer(element) {
+    try {
+        // Find the closest video renderer element
+        const videoElement = element.closest('ytd-compact-video-renderer, ytd-grid-video-renderer, ytd-video-renderer, ytd-rich-item-renderer');
+        if (!videoElement) return null;
+
+        // Try to access the polymer controller or instance
+        const polymerData = videoElement.polymerController || videoElement.inst || videoElement;
+        if (!polymerData || !polymerData.data) return null;
+
+        // Extract channel information from the longBylineText
+        const channelInfo = {
+            id: null,
+            handle: null,
+            name: null
+        };
+
+        // Try to get the runs from longBylineText
+        const runs = polymerData.data.longBylineText?.runs || 
+                    polymerData.data.shortBylineText?.runs ||
+                    polymerData.data.authorText?.runs ||
+                    [];
+
+        // Look through the runs to find navigation endpoints with channel info
+        for (const run of runs) {
+            if (run.navigationEndpoint?.browseEndpoint) {
+                const browseEndpoint = run.navigationEndpoint.browseEndpoint;
+                
+                // Get channel ID (starts with UC)
+                if (browseEndpoint.browseId && browseEndpoint.browseId.startsWith('UC')) {
+                    channelInfo.id = browseEndpoint.browseId;
+                }
+                
+                // Get channel handle or canonical URL
+                if (browseEndpoint.canonicalBaseUrl) {
+                    if (browseEndpoint.canonicalBaseUrl.startsWith('/@')) {
+                        channelInfo.handle = browseEndpoint.canonicalBaseUrl;
+                    } else if (browseEndpoint.canonicalBaseUrl.startsWith('/channel/')) {
+                        channelInfo.id = browseEndpoint.canonicalBaseUrl.split('/channel/')[1];
+                    }
+                }
+                
+                // Get channel name
+                if (run.text) {
+                    channelInfo.name = run.text;
+                }
+            }
+        }
+
+        // Debug logging if we found something
+        if (channelInfo.id || channelInfo.handle || channelInfo.name) {
+            console.log('Found polymer channel info:', channelInfo);
+            return channelInfo;
+        }
+    } catch (error) {
+        // Silently fail if there are any errors accessing polymer data
+        console.debug('Error extracting polymer data:', error);
+    }
+
+    return null;
+}
+
 // Get all potential channel identifiers from an element
 function getChannelIdentifiers(element) {
     const identifiers = [];
     
-    // Try channel name from various selectors
+    // Try to extract channel info from polymer data first (most reliable)
+    const polymerInfo = extractChannelInfoFromPolymer(element);
+    if (polymerInfo) {
+        if (polymerInfo.id) {
+            identifiers.push(polymerInfo.id.toLowerCase());
+            identifiers.push('channel:' + polymerInfo.id.toLowerCase());
+        }
+        if (polymerInfo.handle) {
+            identifiers.push(polymerInfo.handle.toLowerCase());
+        }
+        if (polymerInfo.name) {
+            identifiers.push(polymerInfo.name.toLowerCase());
+        }
+    }
+    
+    // Try channel name from various selectors as fallback
     const channelNameSelectors = [
         '#channel-name', 
         '.ytd-channel-name', 
@@ -211,17 +293,19 @@ function getChannelIdentifiers(element) {
         '#byline', 
         '#owner-text', 
         'yt-formatted-string[id="text"]',
-        '#channel-name yt-formatted-string'
+        '#channel-name yt-formatted-string',
+        '.ytd-video-owner-renderer', // Video page owner
+        '.ytd-video-meta-block' // Common in sidebar
     ];
     
     for (const selector of channelNameSelectors) {
-        const channelElement = element.querySelector(selector);
-        if (channelElement) {
+        const channelElements = element.querySelectorAll(selector);
+        channelElements.forEach(channelElement => {
             const channelName = channelElement.textContent.trim().toLowerCase();
             if (channelName) {
                 identifiers.push(channelName);
             }
-        }
+        });
     }
     
     // Look for @username format in any text element
@@ -242,7 +326,6 @@ function getChannelIdentifiers(element) {
                 // Extract channel ID
                 const channelId = href.split('/channel/')[1].split('?')[0].split('/')[0];
                 identifiers.push(channelId.toLowerCase());
-                // Also store a version with "channel:" prefix for exact matching
                 identifiers.push('channel:' + channelId.toLowerCase());
             } else if (href.includes('/@')) {
                 // Extract username with @ symbol
@@ -414,6 +497,9 @@ function processElement(element, keywords, channels) {
         return;
     }
     
+    // Check for sidebar video elements that would benefit from polymer data
+    const isSidebarVideo = element.tagName === 'YTD-COMPACT-VIDEO-RENDERER';
+    
     const elementText = element.textContent.toLowerCase();
     
     // Check if element contains any filtered keywords using exact word matching
@@ -421,6 +507,25 @@ function processElement(element, keywords, channels) {
     
     // Get all potential channel identifiers
     const channelIdentifiers = getChannelIdentifiers(element);
+    
+    // Debug logging for specific channel filtering
+    if (isSidebarVideo && channels.length > 0 && channelIdentifiers.length > 0) {
+        // Check if this is potentially a match for any channel
+        const potentialMatches = channels.filter(channel => {
+            const normalizedChannel = channel.toLowerCase();
+            return channelIdentifiers.some(id => 
+                id.toLowerCase().includes(normalizedChannel.replace(/^@/, '')) || 
+                normalizedChannel.includes(id.toLowerCase().replace(/^@/, '')));
+        });
+        
+        if (potentialMatches.length > 0) {
+            console.log('Potential sidebar match:', {
+                element: element.tagName,
+                identifiers: channelIdentifiers,
+                filters: potentialMatches
+            });
+        }
+    }
     
     // Check if any channel identifier matches filtered channels with improved matching
     const matchesChannel = channels.length > 0 && channelIdentifiers.length > 0 &&
@@ -430,9 +535,15 @@ function processElement(element, keywords, channels) {
                 return true;
             }
             
-            // Check for channel ID match
+            // Check for channel ID match (most reliable)
             if (channel.startsWith('channel:') && 
                 channelIdentifiers.some(id => id === channel || id === channel.substring(8))) {
+                return true;
+            }
+            
+            // For UC ids without the channel: prefix
+            if (channel.startsWith('UC') && 
+                channelIdentifiers.some(id => id === channel || id === 'channel:' + channel)) {
                 return true;
             }
             
@@ -693,6 +804,217 @@ function setupObserver() {
     
     // Watch for YouTube SPA navigation
     watchForNavigation();
+}
+
+// Set up a persistent sidebar observer for more reliable channel filtering
+function setupSidebarObserver() {
+    const sidebarRoot = document.getElementById("secondary");
+    if (!sidebarRoot) return;
+    
+    // Process existing sidebar videos
+    document.querySelectorAll("ytd-compact-video-renderer").forEach(card => {
+        watchSidebarCard(card);
+    });
+    
+    // Watch for new sidebar videos
+    const sidebarObserver = new MutationObserver(mutations => {
+        for (const mutation of mutations) {
+            for (const node of mutation.addedNodes) {
+                if (node.nodeType === 1 && node.tagName === "YTD-COMPACT-VIDEO-RENDERER") {
+                    watchSidebarCard(node);
+                }
+            }
+        }
+    });
+    
+    sidebarObserver.observe(sidebarRoot, {
+        childList: true,
+        subtree: true
+    });
+    
+    console.log("FilterTube: Sidebar observer initialized");
+}
+
+// Watch a sidebar card with retry mechanism for reliable channel extraction
+function watchSidebarCard(card) {
+    if (processSidebarCard(card)) return;
+    // If not ready yet, try again soon
+    requestAnimationFrame(() => watchSidebarCard(card));
+}
+
+// Process a sidebar card once channel data is available
+function processSidebarCard(card) {
+    const channelIdentifiers = getChannelIdentifiers(card);
+    if (channelIdentifiers.length === 0) return false; // Not ready
+    
+    // Process the card with existing logic
+    const channels = filterChannels.split(',')
+        .map(c => c.trim().toLowerCase())
+        .filter(c => c.length > 0);
+    
+    const matchesChannel = channels.some(channel => {
+        const normalizedChannel = channel.replace(/^@|^channel:/, "").toLowerCase();
+        return channelIdentifiers.some(id => {
+            const normalizedId = id.replace(/^@|^channel:/, "").toLowerCase();
+            return normalizedId === normalizedChannel || 
+                   normalizedId.includes(normalizedChannel) || 
+                   normalizedChannel.includes(normalizedId);
+        });
+    });
+    
+    if (matchesChannel) {
+        card.setAttribute('data-filter-tube-filtered', 'true');
+        card.removeAttribute('data-filter-tube-allowed');
+    } else {
+        card.setAttribute('data-filter-tube-allowed', 'true');
+        card.removeAttribute('data-filter-tube-filtered');
+    }
+    
+    return true; // Successfully processed
+}
+
+// Enhanced shorts filtering for more reliable channel detection
+function setupShortsObserver() {
+    // First handle existing shorts
+    document.querySelectorAll('ytd-reel-item-renderer, ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2').forEach(shortElement => {
+        watchShortElement(shortElement);
+    });
+    
+    // Watch for new shorts elements
+    const shortsObserver = new MutationObserver(mutations => {
+        for (const mutation of mutations) {
+            mutation.addedNodes.forEach(node => {
+                if (node.nodeType !== 1) return;
+                
+                if (node.tagName === 'YTD-REEL-ITEM-RENDERER' || 
+                    node.tagName === 'YTM-SHORTS-LOCKUP-VIEW-MODEL' || 
+                    node.tagName === 'YTM-SHORTS-LOCKUP-VIEW-MODEL-V2') {
+                    watchShortElement(node);
+                }
+            });
+        }
+    });
+    
+    shortsObserver.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+    
+    console.log("FilterTube: Shorts observer initialized");
+}
+
+// Watch a short element with retry for reliable channel data extraction
+function watchShortElement(shortElement) {
+    if (processShortElement(shortElement)) return;
+    // Not ready yet, try again in next frame
+    requestAnimationFrame(() => watchShortElement(shortElement));
+}
+
+// Enhanced short element processing with multiple channel extraction methods
+function processShortElement(shortElement) {
+    // Try multiple methods to extract channel information
+    const channelIdentifiers = [];
+    
+    // First try standard extraction using our existing function
+    const standardIds = getChannelIdentifiers(shortElement);
+    channelIdentifiers.push(...standardIds);
+    
+    // Additional extraction methods specifically for shorts
+    
+    // 1. Try to extract from any text elements that might contain @username
+    const textElements = shortElement.querySelectorAll('span, div, yt-formatted-string');
+    textElements.forEach(el => {
+        const text = el.textContent.trim();
+        if (text.startsWith('@')) {
+            channelIdentifiers.push(text.toLowerCase());
+        }
+    });
+    
+    // 2. Try to extract from Polymer data if available
+    try {
+        const polymerData = shortElement.data || 
+                           (shortElement.querySelector('ytd-rich-grid-media') || {}).data ||
+                           shortElement.polymerController?.data;
+        
+        if (polymerData) {
+            // Try different paths in the polymer data structure
+            const paths = [
+                'shortBylineText.runs',
+                'ownerText.runs',
+                'publishedTimeText.runs',
+                'videoOwnerRenderer.navigationEndpoint.browseEndpoint'
+            ];
+            
+            for (const path of paths) {
+                const parts = path.split('.');
+                let current = polymerData;
+                let found = true;
+                
+                for (const part of parts) {
+                    if (current && current[part]) {
+                        current = current[part];
+                    } else {
+                        found = false;
+                        break;
+                    }
+                }
+                
+                if (found && Array.isArray(current)) {
+                    // Found runs array, extract channel info
+                    for (const run of current) {
+                        if (run.navigationEndpoint?.browseEndpoint?.browseId) {
+                            const browseId = run.navigationEndpoint.browseEndpoint.browseId;
+                            if (browseId.startsWith('UC')) {
+                                channelIdentifiers.push(browseId.toLowerCase());
+                                channelIdentifiers.push('channel:' + browseId.toLowerCase());
+                            }
+                        }
+                        
+                        if (run.navigationEndpoint?.browseEndpoint?.canonicalBaseUrl) {
+                            const url = run.navigationEndpoint.browseEndpoint.canonicalBaseUrl;
+                            if (url.startsWith('/@')) {
+                                channelIdentifiers.push(url.toLowerCase());
+                            }
+                        }
+                        
+                        if (run.text && run.text.startsWith('@')) {
+                            channelIdentifiers.push(run.text.toLowerCase());
+                        }
+                    }
+                }
+            }
+        }
+    } catch (e) {
+        // Silent fail for polymer data extraction
+    }
+    
+    // If we couldn't extract any channel info, not ready yet
+    if (channelIdentifiers.length === 0) return false;
+    
+    // Now filter based on the extracted channel identifiers
+    const channels = filterChannels.split(',')
+        .map(c => c.trim().toLowerCase())
+        .filter(c => c.length > 0);
+    
+    const matchesChannel = channels.some(channel => {
+        const normalizedChannel = channel.replace(/^@|^channel:/, "").toLowerCase();
+        return channelIdentifiers.some(id => {
+            const normalizedId = id.replace(/^@|^channel:/, "").toLowerCase();
+            return normalizedId === normalizedChannel || 
+                   normalizedId.includes(normalizedChannel) || 
+                   normalizedChannel.includes(normalizedId);
+        });
+    });
+    
+    if (matchesChannel) {
+        shortElement.setAttribute('data-filter-tube-filtered', 'true');
+        shortElement.removeAttribute('data-filter-tube-allowed');
+    } else {
+        shortElement.setAttribute('data-filter-tube-allowed', 'true');
+        shortElement.removeAttribute('data-filter-tube-filtered');
+    }
+    
+    return true; // Successfully processed
 }
 
 // Handle YouTube's single-page application navigation
@@ -974,7 +1296,7 @@ function processComment(comment, keywords, channels) {
     }
 }
 
-console.log("FilterTube Content Script Loaded - Zero Flash Version v1.4.2");
+console.log("FilterTube Content Script Loaded - Zero Flash Version v1.4.4");
 
 
 
