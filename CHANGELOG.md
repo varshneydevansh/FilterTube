@@ -8,17 +8,20 @@
 - Enhanced grid layout system for channel pages
 - Added special handling for section list renderers
 - Improved filtering for YouTube Mix elements
+- Implemented whole-word matching for keywords for more precise filtering
 
 ### Bug Fixes
 - Fixed channel ID filtering issue for channels like Travis Scott (UCtxdfwb9wfkoGocVUAJ-Bmg)
 - Fixed inconsistent layout of videos on channel pages
 - Fixed website links to consistently point to varshneydevansh/FilterTube repository
+- Improved keyword matching precision to prevent over-filtering
 
 ### Code Improvements
 - Added aggressive grid layout fixing system using multiple approaches
 - Created dedicated channel info extraction function
 - Implemented mutation observer to maintain proper layouts against YouTube's dynamic changes
 - Added better debug logging for channel detection
+- Added matchesWholeWord function to improve filtering precision
 
 ## Version 1.0.0 (Initial Release)
 **Release Date:** May 2025

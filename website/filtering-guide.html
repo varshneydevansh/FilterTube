@@ -367,18 +367,19 @@
                 <ul>
                     <li>Enter words or phrases separated by commas</li>
                     <li>Not case-sensitive (e.g, "news" will match "News" or "NEWS")</li>
-                    <li>Matches partial words (e.g., "cat" will match "cat" or "category")</li>
+                    <li>Uses whole-word matching for precision (e.g., "cat" will only match "cat" but not "category")</li>
+                    <li>Multi-word phrases use exact phrase matching (e.g., "reaction video" only matches that exact phrase)</li>
                     <li>Useful for filtering topics, genres, or specific content types</li>
                 </ul>
                 
                 <div class="example-box">
                     <strong>Examples:</strong>
-                    <p class="code-example">reaction, unboxing, trailer</p>
-                    <p>This would filter all videos containing these words in their titles or descriptions.</p>
+                    <p class="code-example">reaction video, unboxing, trailer</p>
+                    <p>This would filter videos containing the exact phrase "reaction video" or the whole words "unboxing" or "trailer" in their titles or descriptions.</p>
                 </div>
                 
                 <div class="filter-note">
-                    <i class="fas fa-info-circle"></i> Pro Tip: Be specific with keywords to avoid over-filtering. For example, use "reaction video" instead of just "reaction" if you only want to filter reaction videos but not other videos that might mention reactions.
+                    <i class="fas fa-info-circle"></i> Pro Tip: The whole-word matching system allows more precise filtering. For example, using "cat" will only filter videos about cats, not ones mentioning "category" or "concatenate".
                 </div>
             </div>
 

@@ -119,6 +119,25 @@ chrome.storage.onChanged.addListener(function (changes, areaName) {
 });
 
 /**
+ * Checks if a text contains a keyword as a whole word or phrase
+ * @param {string} text - The text to search in
+ * @param {string} keyword - The keyword to search for
+ * @returns {boolean} - True if the keyword is found as a whole word or phrase
+ */
+function matchesWholeWord(text, keyword) {
+    if (!text || !keyword) return false;
+    
+    // If the keyword has spaces, it's a phrase - do exact phrase matching
+    if (keyword.includes(' ')) {
+        return text.includes(keyword);
+    }
+    
+    // For single words, use word boundary matching
+    const regex = new RegExp(`\\b${keyword.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}\\b`, 'i');
+    return regex.test(text);
+}
+
+/**
  * Prepares filter strings (keywords, channels) by splitting, trimming,
  * and converting to lowercase, then calls the main hiding logic.
  * @param {string} keywords - Comma-separated keywords string.
@@ -336,8 +355,11 @@ function hideVideos(trimmedKeywords, trimmedChannels, rootNode = document) {
 
         // 2. Check keywords against title, channel name, combined desc/hashtags, game card
         if (!shouldHide && trimmedKeywords.length > 0) {
-            const checkText = (text) => text && trimmedKeywords.some(keyword => text.includes(keyword));
-            if (checkText(videoTitle) || checkText(channelName) || (combinedDescAndHashtags && checkText(combinedDescAndHashtags)) || checkText(gameCardTitle)) {
+            // Use whole word matching for keywords
+            if ((videoTitle && trimmedKeywords.some(keyword => matchesWholeWord(videoTitle, keyword))) || 
+                (channelName && trimmedKeywords.some(keyword => matchesWholeWord(channelName, keyword))) || 
+                (combinedDescAndHashtags && trimmedKeywords.some(keyword => matchesWholeWord(combinedDescAndHashtags, keyword))) || 
+                (gameCardTitle && trimmedKeywords.some(keyword => matchesWholeWord(gameCardTitle, keyword)))) {
                 shouldHide = true;
             }
         }
@@ -493,7 +515,7 @@ function hidePlaylistsAndShelves(trimmedKeywords, trimmedChannels, rootNode = do
             channelHandle = (handleElement?.textContent || '').toLowerCase().trim();
             
             // Check keywords first
-            if (trimmedKeywords.some(keyword => titleText.includes(keyword))) {
+            if (trimmedKeywords.some(keyword => matchesWholeWord(titleText, keyword))) {
                 shouldHide = true;
             }
             
@@ -504,7 +526,7 @@ function hidePlaylistsAndShelves(trimmedKeywords, trimmedChannels, rootNode = do
         } else if (container.matches('ytd-radio-renderer')) {
             titleElement = container.querySelector('.yt-lockup-metadata-view-model-wiz__title span.yt-core-attributed-string');
             titleText = (titleElement?.textContent || '').toLowerCase().trim();
-            if (trimmedKeywords.some(keyword => titleText.includes(keyword))) {
+            if (trimmedKeywords.some(keyword => matchesWholeWord(titleText, keyword))) {
                 shouldHide = true;
             }
         } else { // Other shelf types
@@ -526,7 +548,7 @@ function hidePlaylistsAndShelves(trimmedKeywords, trimmedChannels, rootNode = do
             }
             
             // Check keywords first
-            if (trimmedKeywords.some(keyword => titleText.includes(keyword))) {
+            if (trimmedKeywords.some(keyword => matchesWholeWord(titleText, keyword))) {
                 shouldHide = true;
             }
             
@@ -611,9 +633,9 @@ function hideChannelElements(trimmedKeywords, trimmedChannels, rootNode = docume
         // First check for keyword filtering
         if (trimmedKeywords.length > 0) {
             if (
-                (channelName && trimmedKeywords.some(keyword => channelName.includes(keyword))) ||
-                (channelHandle && trimmedKeywords.some(keyword => channelHandle.includes(keyword))) ||
-                (descriptionText && trimmedKeywords.some(keyword => descriptionText.includes(keyword)))
+                (channelName && trimmedKeywords.some(keyword => matchesWholeWord(channelName, keyword))) ||
+                (channelHandle && trimmedKeywords.some(keyword => matchesWholeWord(channelHandle, keyword))) ||
+                (descriptionText && trimmedKeywords.some(keyword => matchesWholeWord(descriptionText, keyword)))
             ) {
                 shouldHide = true;
             }
@@ -665,7 +687,7 @@ function hideShorts(trimmedKeywords, trimmedChannels, rootNode = document) {
         let shouldHide = false; // Determine if it SHOULD be hidden
 
         if ((trimmedChannels.length > 0 && channelText && trimmedChannels.some(blockedChannel => channelText.includes(blockedChannel))) ||
-            (trimmedKeywords.length > 0 && titleText && trimmedKeywords.some(keyword => titleText.includes(keyword)))) {
+            (trimmedKeywords.length > 0 && titleText && trimmedKeywords.some(keyword => matchesWholeWord(titleText, keyword)))) {
             // Optional: check channel text again for keywords if relevant
             // || (trimmedKeywords.length > 0 && channelText && trimmedKeywords.some(keyword => channelText.includes(keyword)))
              shouldHide = true;
@@ -809,9 +831,9 @@ function hideMixElements(trimmedKeywords, trimmedChannels, rootNode = document) 
             // Check if any text matches keywords
             if (trimmedKeywords.length > 0) {
                 if (
-                    (titleText && trimmedKeywords.some(keyword => titleText.includes(keyword))) ||
-                    (metadataText && trimmedKeywords.some(keyword => metadataText.includes(keyword))) ||
-                    (songTexts && trimmedKeywords.some(keyword => songTexts.includes(keyword)))
+                    (titleText && trimmedKeywords.some(keyword => matchesWholeWord(titleText, keyword))) ||
+                    (metadataText && trimmedKeywords.some(keyword => matchesWholeWord(metadataText, keyword))) ||
+                    (songTexts && trimmedKeywords.some(keyword => matchesWholeWord(songTexts, keyword)))
                 ) {
                     console.log(`FilterTube: Mix "${titleText}" matching keywords - hiding`);
                     shouldHide = true;
@@ -996,7 +1018,7 @@ function handlePreviouslyWatchedSection(trimmedKeywords, trimmedChannels) {
             
             // Check against keywords
             if (trimmedKeywords.length > 0 && videoTitle) {
-                if (trimmedKeywords.some(keyword => videoTitle.includes(keyword))) {
+                if (trimmedKeywords.some(keyword => matchesWholeWord(videoTitle, keyword))) {
                     shouldHide = true;
                 }
             }
@@ -1050,7 +1072,7 @@ function handleHomepageElements(trimmedKeywords, trimmedChannels) {
         
         // Check against keywords
         if (!shouldHide && trimmedKeywords.length > 0 && videoTitle) {
-            if (trimmedKeywords.some(keyword => videoTitle.includes(keyword))) {
+            if (trimmedKeywords.some(keyword => matchesWholeWord(videoTitle, keyword))) {
                 shouldHide = true;
             }
         }
