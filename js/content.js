@@ -29,7 +29,9 @@ function injectHidingStyles() {
         ytd-channel-video-player-renderer,
         yt-lockup-view-model,
         ytd-universal-watch-card-renderer,
-        ytd-secondary-search-container-renderer {
+        ytd-secondary-search-container-renderer,
+        ytm-shorts-lockup-view-model,
+        ytm-shorts-lockup-view-model-v2 {
             opacity: 0 !important;
             transition: opacity 0.1s ease-in-out !important;
         }
@@ -42,6 +44,20 @@ function injectHidingStyles() {
         /* Hide filtered elements */
         [data-filter-tube-filtered="true"] {
             display: none !important;
+        }
+        
+        /* IMPORTANT: Don't interfere with scroll functionality */
+        yt-horizontal-list-renderer,
+        #scroll-container,
+        #items,
+        .shortsLockupViewModelHost {
+            opacity: 1 !important;
+        }
+        
+        /* Only apply styling to shorts contents, not their containers */
+        ytd-reel-shelf-renderer,
+        yt-horizontal-list-renderer {
+            opacity: 1 !important;
         }
     `;
     
@@ -66,7 +82,9 @@ const VIDEO_SELECTORS = [
     'ytd-channel-video-player-renderer', // Featured videos on channel pages
     'yt-lockup-view-model',          // Classic YouTube video items
     'ytd-universal-watch-card-renderer', // Side panel movie/video cards
-    'ytd-secondary-search-container-renderer > *' // Additional side panel items
+    'ytd-secondary-search-container-renderer > *', // Additional side panel items
+    'ytm-shorts-lockup-view-model',  // Shorts items (new format)
+    'ytm-shorts-lockup-view-model-v2' // Shorts items v2 format
 ].join(', ');
 
 // Load settings as early as possible
@@ -190,10 +208,23 @@ function applyFilters() {
                     }
                 });
             }
+            
+            // Special handling for Shorts
+            if (element.tagName === 'YTM-SHORTS-LOCKUP-VIEW-MODEL' || element.tagName === 'YTM-SHORTS-LOCKUP-VIEW-MODEL-V2') {
+                // Don't hide the parent list container, only the shorts item itself
+                element.style.visibility = 'hidden';
+                element.style.height = '10px'; // Collapse but don't remove completely to maintain scroll
+            }
         } else {
             // Mark as allowed
             element.setAttribute('data-filter-tube-allowed', 'true');
             element.removeAttribute('data-filter-tube-filtered');
+            
+            // Remove any inline styles we might have added for shorts
+            if (element.tagName === 'YTM-SHORTS-LOCKUP-VIEW-MODEL' || element.tagName === 'YTM-SHORTS-LOCKUP-VIEW-MODEL-V2') {
+                element.style.visibility = '';
+                element.style.height = '';
+            }
         }
     });
     
@@ -279,7 +310,7 @@ window.addEventListener('unload', () => {
     }
 });
 
-console.log("FilterTube Content Script Loaded - Zero Flash Version v1.3.2");
+console.log("FilterTube Content Script Loaded - Zero Flash Version v1.3.3");
 
 
 

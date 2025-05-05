@@ -1,6 +1,12 @@
 # FilterTube Changelog
 
-## Version 1.3.2 (Current)
+## Version 1.3.3 (Current)
+- Fixed YouTube Shorts filtering (properly hides shorts with filtered keywords)
+- Preserved shorts shelf scrolling functionality 
+- Added special handling for shorts elements to prevent UI breaking
+- Used visibility:hidden instead of display:none for shorts to maintain UI layout
+
+## Version 1.3.2
 - Added filtering for additional YouTube UI elements:
   - Side panel movie/video cards (`ytd-universal-watch-card-renderer`)
   - Search page playlists (`yt-lockup-view-model`)

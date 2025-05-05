@@ -28,7 +28,8 @@
 - [ ] Lazy filtering for less visible content
 
 ## Edge Cases
-- [ ] Handle non-standard video layouts
+- [x] Handle YouTube Shorts without breaking UI
+- [x] Maintain horizontal scrolling for shorts/playlists
 - [ ] Support for YouTube Music
 - [ ] Support for YouTube TV
 - [ ] Channel filtering with '@' symbol
