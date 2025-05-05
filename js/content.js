@@ -26,7 +26,10 @@ function injectHidingStyles() {
         ytd-playlist-renderer,
         ytd-radio-renderer,
         ytd-shelf-renderer,
-        ytd-channel-video-player-renderer {
+        ytd-channel-video-player-renderer,
+        yt-lockup-view-model,
+        ytd-universal-watch-card-renderer,
+        ytd-secondary-search-container-renderer {
             opacity: 0 !important;
             transition: opacity 0.1s ease-in-out !important;
         }
@@ -60,7 +63,10 @@ const VIDEO_SELECTORS = [
     'ytd-playlist-renderer',         // Playlists
     'ytd-radio-renderer',            // Mix items
     'ytd-shelf-renderer',            // Shelves (sections on home page)
-    'ytd-channel-video-player-renderer' // Featured videos on channel pages
+    'ytd-channel-video-player-renderer', // Featured videos on channel pages
+    'yt-lockup-view-model',          // Classic YouTube video items
+    'ytd-universal-watch-card-renderer', // Side panel movie/video cards
+    'ytd-secondary-search-container-renderer > *' // Additional side panel items
 ].join(', ');
 
 // Load settings as early as possible
@@ -152,7 +158,7 @@ function applyFilters() {
         const matchesKeyword = keywords.some(keyword => elementText.includes(keyword));
         
         // Get channel name - use multiple selectors for reliability
-        const channelElement = element.querySelector('#channel-name, .ytd-channel-name, #text.ytd-channel-name, #byline, #owner-text');
+        const channelElement = element.querySelector('#channel-name, .ytd-channel-name, #text.ytd-channel-name, #byline, #owner-text, yt-formatted-string[id="text"]');
         const channelText = channelElement ? channelElement.textContent.toLowerCase() : '';
         
         // Check if channel matches
@@ -165,13 +171,24 @@ function applyFilters() {
             element.setAttribute('data-filter-tube-filtered', 'true');
             element.removeAttribute('data-filter-tube-allowed');
             
-            // Also handle child elements for rich items
+            // Also handle child elements for rich items and nested content
             if (element.tagName === 'YTD-RICH-ITEM-RENDERER') {
                 const childVideo = element.querySelector('ytd-grid-video-renderer, ytd-video-renderer, ytd-compact-video-renderer');
                 if (childVideo) {
                     childVideo.setAttribute('data-filter-tube-filtered', 'true');
                     childVideo.removeAttribute('data-filter-tube-allowed');
                 }
+            }
+            
+            // Special handling for playlist/sidebar items
+            if (element.tagName === 'YT-LOCKUP-VIEW-MODEL') {
+                const childElements = element.querySelectorAll('*');
+                childElements.forEach(child => {
+                    if (child.nodeType === Node.ELEMENT_NODE) {
+                        child.setAttribute('data-filter-tube-filtered', 'true');
+                        child.removeAttribute('data-filter-tube-allowed');
+                    }
+                });
             }
         } else {
             // Mark as allowed
@@ -262,7 +279,7 @@ window.addEventListener('unload', () => {
     }
 });
 
-console.log("FilterTube Content Script Loaded - Zero Flash Version");
+console.log("FilterTube Content Script Loaded - Zero Flash Version v1.3.2");
 
 
 

@@ -1,5 +1,25 @@
 # FilterTube Changelog
 
+## Version 1.3.2 (Current)
+- Added filtering for additional YouTube UI elements:
+  - Side panel movie/video cards (`ytd-universal-watch-card-renderer`)
+  - Search page playlists (`yt-lockup-view-model`)
+  - Additional sidebar elements
+- Improved channel name detection with more comprehensive selectors
+- Added special handling for playlist and sidebar items
+
+## Version 1.3.1
+- Complete redesign with zero-flash filtering approach
+- Changed to CSS-based initial hiding and visibility control
+- Elements now hidden by default until processed
+- Fixed performance issues for a smoother experience
+- Set extension to load at document_start for earlier execution
+
+## Version 1.0.0 (Initial)
+- Basic filtering of YouTube content based on keywords
+- Support for channel filtering
+- Popup UI for setting filter preferences
+
 ## Version 1.0.3 (Latest)
 - **Fixed**: Mix/playlist thumbnails now properly hide when filtering by keywords in their content
 - **Fixed**: Videos with filtered keywords in their description now correctly hide
@@ -20,10 +40,6 @@
 - **Fixed**: Channel page layout issues
 - **Added**: Basic filtering for shorts content
 - **Added**: Initial implementation of comment filtering
-
-## Version 1.0.0
-- Initial release with basic keyword and channel filtering
-- Filtering for video titles and channel names
 
 ## Previous Changes
 
