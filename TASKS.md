@@ -30,9 +30,9 @@
 ## Edge Cases
 - [x] Handle YouTube Shorts without breaking UI
 - [x] Maintain horizontal scrolling for shorts/playlists
+- [x] Channel filtering with '@' symbol and channel IDs
 - [ ] Support for YouTube Music
 - [ ] Support for YouTube TV
-- [ ] Channel filtering with '@' symbol
 - [ ] Support for old YouTube layouts
 
 ## Documentation

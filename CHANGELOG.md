@@ -1,6 +1,13 @@
 # FilterTube Changelog
 
-## Version 1.3.4 (Current)
+## Version 1.3.5 (Current)
+- Enhanced channel filtering to properly detect and filter @usernames
+- Added support for channel ID based filtering
+- Added detection of channels in side panel content (artist cards)
+- Improved matching algorithm for channels with and without @ symbols
+- Added direct URL-based channel detection for more reliable filtering
+
+## Version 1.3.4
 - Fixed shorts container collapsing issue when filtering shorts
 - Added new CSS approach that makes filtered shorts have zero width
 - Added intelligent shorts layout management

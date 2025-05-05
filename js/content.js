@@ -153,6 +153,59 @@ chrome.storage.onChanged.addListener((changes, area) => {
     }
 });
 
+// Get all potential channel identifiers from an element
+function getChannelIdentifiers(element) {
+    const identifiers = [];
+    
+    // Try channel name from various selectors
+    const channelNameSelectors = [
+        '#channel-name', 
+        '.ytd-channel-name', 
+        '#text.ytd-channel-name', 
+        '#byline', 
+        '#owner-text', 
+        'yt-formatted-string[id="text"]'
+    ];
+    
+    for (const selector of channelNameSelectors) {
+        const channelElement = element.querySelector(selector);
+        if (channelElement) {
+            const channelName = channelElement.textContent.trim().toLowerCase();
+            if (channelName) {
+                identifiers.push(channelName);
+            }
+        }
+    }
+    
+    // Look for @username format in any text element
+    const usernameElements = element.querySelectorAll('yt-formatted-string, span');
+    usernameElements.forEach(element => {
+        const text = element.textContent.trim();
+        if (text.startsWith('@')) {
+            identifiers.push(text.toLowerCase());
+        }
+    });
+    
+    // Check for channel ID in URLs
+    const links = element.querySelectorAll('a[href*="/channel/"], a[href*="/@"]');
+    links.forEach(link => {
+        const href = link.getAttribute('href');
+        if (href) {
+            if (href.includes('/channel/')) {
+                // Extract channel ID
+                const channelId = href.split('/channel/')[1].split('?')[0].split('/')[0];
+                identifiers.push(channelId.toLowerCase());
+            } else if (href.includes('/@')) {
+                // Extract username with @ symbol
+                const username = href.split('/@')[1].split('?')[0].split('/')[0];
+                identifiers.push('@' + username.toLowerCase());
+            }
+        }
+    });
+    
+    return identifiers;
+}
+
 // Ultra-optimized filtering function
 function applyFilters() {
     // Make sure styles are injected
@@ -187,13 +240,26 @@ function applyFilters() {
         // Check if element contains any filtered keywords
         const matchesKeyword = keywords.some(keyword => elementText.includes(keyword));
         
-        // Get channel name - use multiple selectors for reliability
-        const channelElement = element.querySelector('#channel-name, .ytd-channel-name, #text.ytd-channel-name, #byline, #owner-text, yt-formatted-string[id="text"]');
-        const channelText = channelElement ? channelElement.textContent.toLowerCase() : '';
+        // Get all potential channel identifiers
+        const channelIdentifiers = getChannelIdentifiers(element);
         
-        // Check if channel matches
-        const matchesChannel = channels.length > 0 && channelText && 
-                             channels.some(channel => channelText.includes(channel));
+        // Check if any channel identifier matches filtered channels
+        const matchesChannel = channels.length > 0 && channelIdentifiers.length > 0 &&
+            channels.some(channel => {
+                // Direct match or partial match depending on format
+                return channelIdentifiers.some(identifier => {
+                    // If channel filter contains @ but identifier doesn't, check for inclusion without @
+                    if (channel.startsWith('@') && !identifier.startsWith('@')) {
+                        return identifier.includes(channel.substring(1));
+                    }
+                    // If identifier contains @ but channel filter doesn't, check for inclusion without @
+                    if (identifier.startsWith('@') && !channel.startsWith('@')) {
+                        return identifier.substring(1).includes(channel);
+                    }
+                    // Otherwise check for direct inclusion
+                    return identifier.includes(channel);
+                });
+            });
         
         // Hide or show based on matches
         if (matchesKeyword || matchesChannel) {
@@ -351,7 +417,7 @@ window.addEventListener('unload', () => {
     }
 });
 
-console.log("FilterTube Content Script Loaded - Zero Flash Version v1.3.4");
+console.log("FilterTube Content Script Loaded - Zero Flash Version v1.3.5");
 
 
 
