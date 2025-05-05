@@ -28,16 +28,12 @@
             "js": [
                 "js/content.js"
             ],
-            "css": [
-                "css/filter.css",
-                "css/layout.css"
-            ],
             "run_at": "document_start"
         }
     ],
     "web_accessible_resources": [
         {
-            "resources": ["html/tab-view.html", "css/tab-view.css", "css/filter.css", "css/layout.css", "js/layout.js"],
+            "resources": ["html/tab-view.html", "css/tab-view.css"],
             "matches": ["<all_urls>"]
         }
     ],

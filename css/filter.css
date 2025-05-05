@@ -72,22 +72,3 @@ ytd-universal-watch-card-renderer:not(.filter-tube-visible) ytd-watch-card-rich-
     overflow: hidden !important;
     pointer-events: none !important;
 }
-
-/* Ensure nested mix/playlist text and thumbnails show when parent is visible */
-.filter-tube-visible .yt-lockup-view-model-wiz,
-.filter-tube-visible .yt-lockup-metadata-view-model-wiz,
-.filter-tube-visible .yt-lockup-view-model-wiz__content-image,
-.filter-tube-visible .yt-lockup-metadata-view-model-wiz__metadata-text {
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-}
-
-/* Ensure mix/playlist cards themselves are shown when marked visible */
-.filter-tube-visible ytd-mix-renderer,
-.filter-tube-visible ytd-playlist-renderer,
-.filter-tube-visible ytd-radio-renderer {
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-} 
