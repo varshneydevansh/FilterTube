@@ -9,8 +9,12 @@ let filterChannels = '';
 let hideAllComments = false;
 let filterComments = false;
 let observer = null;
+let sidebarObserver = null;
+let shortsObserver = null;
 let filtersApplied = false;
 let stylesInjected = false;
+let currentPageType = 'unknown';
+let processingBatch = false;
 
 // Immediately inject a style element to hide content until filtering
 function injectHidingStyles() {
@@ -137,6 +141,16 @@ const VIDEO_SELECTORS = [
     'ytd-ticket-shelf-renderer'      // Ticket/event shelf items
 ].join(', ');
 
+// Helper function to determine current page type
+function getPageType() {
+    const url = window.location.href;
+    if (url.includes('/watch')) return 'watch';
+    if (url.includes('/results')) return 'search';
+    if (url.includes('/shorts')) return 'shorts';
+    if (url.includes('/channel/') || url.includes('/@')) return 'channel';
+    return 'home';
+}
+
 // Load settings as early as possible
 function loadSettings() {
     chrome.storage.local.get(['filterKeywords', 'filterChannels', 'hideAllComments', 'filterComments'], (items) => {
@@ -145,19 +159,17 @@ function loadSettings() {
         hideAllComments = items.hideAllComments || false;
         filterComments = items.filterComments || false;
         
+        // Determine current page type
+        currentPageType = getPageType();
+        
         // Start observing for elements
         setupObserver();
-        
-        // Set up specialized observers for sidebar and shorts
-        setupSidebarObserver();
-        setupShortsObserver();
         
         // Apply filters to existing elements
         applyFilters();
         
         // Set up multiple filter passes to catch dynamically loaded content
-        setTimeout(applyFilters, 100);
-        setTimeout(applyFilters, 500);
+        setTimeout(applyFilters, 300);
         setTimeout(applyFilters, 1000);
         setTimeout(applyFilters, 2000);
     });
@@ -778,8 +790,16 @@ function setupObserver() {
         observer.disconnect();
     }
     
-    // Create the observer
+    // Update current page type
+    currentPageType = getPageType();
+    console.log(`FilterTube: Detected page type: ${currentPageType}`);
+    
+    // Create the observer with throttling
+    let timeout = null;
     observer = new MutationObserver((mutations) => {
+        // Skip if we're already processing or the page is hidden
+        if (processingBatch || document.hidden) return;
+        
         let shouldFilter = false;
         
         // Check for added nodes that might be video elements
@@ -790,9 +810,15 @@ function setupObserver() {
             }
         }
         
-        // Apply filters immediately if new content detected
+        // Apply filters with throttling
         if (shouldFilter) {
-            applyFilters();
+            if (timeout) {
+                clearTimeout(timeout);
+            }
+            timeout = setTimeout(() => {
+                timeout = null;
+                applyFilters();
+            }, 100); // Throttle to once every 100ms
         }
     });
     
@@ -802,28 +828,63 @@ function setupObserver() {
         subtree: true
     });
     
+    // Set up specialized observers based on page type
+    if (currentPageType === 'watch') {
+        // On watch pages, we need sidebar and comment observers
+        setupSidebarObserver();
+        
+        // Only set up comment observer if comment filtering is enabled
+        if (hideAllComments || filterComments) {
+            setupCommentObserver();
+        }
+    } else if (currentPageType === 'search' || currentPageType === 'home') {
+        // On search and home pages, we need shorts observer
+        setupShortsObserver();
+    }
+    
     // Watch for YouTube SPA navigation
     watchForNavigation();
 }
 
-// Set up a persistent sidebar observer for more reliable channel filtering
+// Performance-optimized sidebar observer
 function setupSidebarObserver() {
+    // If we're not on a watch page or the observer already exists, skip
+    if (currentPageType !== 'watch' || sidebarObserver) return;
+    
     const sidebarRoot = document.getElementById("secondary");
     if (!sidebarRoot) return;
     
-    // Process existing sidebar videos
-    document.querySelectorAll("ytd-compact-video-renderer").forEach(card => {
-        watchSidebarCard(card);
-    });
+    // Process existing sidebar videos in batches
+    const existingSidebars = document.querySelectorAll("ytd-compact-video-renderer");
+    if (existingSidebars.length > 0) {
+        processSidebarBatch(Array.from(existingSidebars), 0, 10);
+    }
     
-    // Watch for new sidebar videos
-    const sidebarObserver = new MutationObserver(mutations => {
+    // Watch for new sidebar videos with throttling
+    let timeout = null;
+    sidebarObserver = new MutationObserver(mutations => {
+        // Skip if we're already processing or the page is hidden
+        if (processingBatch || document.hidden) return;
+        
+        // Collect added nodes
+        const newSidebarCards = [];
         for (const mutation of mutations) {
             for (const node of mutation.addedNodes) {
                 if (node.nodeType === 1 && node.tagName === "YTD-COMPACT-VIDEO-RENDERER") {
-                    watchSidebarCard(node);
+                    newSidebarCards.push(node);
                 }
             }
+        }
+        
+        // Process in batches with throttling
+        if (newSidebarCards.length > 0) {
+            if (timeout) {
+                clearTimeout(timeout);
+            }
+            timeout = setTimeout(() => {
+                timeout = null;
+                processSidebarBatch(newSidebarCards, 0, 10);
+            }, 100);
         }
     });
     
@@ -833,6 +894,28 @@ function setupSidebarObserver() {
     });
     
     console.log("FilterTube: Sidebar observer initialized");
+}
+
+// Process sidebar cards in batches for better performance
+function processSidebarBatch(cards, startIndex, batchSize) {
+    if (startIndex >= cards.length || document.hidden) return;
+    
+    processingBatch = true;
+    
+    const endIndex = Math.min(startIndex + batchSize, cards.length);
+    
+    for (let i = startIndex; i < endIndex; i++) {
+        watchSidebarCard(cards[i]);
+    }
+    
+    processingBatch = false;
+    
+    // Schedule next batch if needed
+    if (endIndex < cards.length) {
+        requestAnimationFrame(() => {
+            processSidebarBatch(cards, endIndex, batchSize);
+        });
+    }
 }
 
 // Watch a sidebar card with retry mechanism for reliable channel extraction
@@ -873,15 +956,25 @@ function processSidebarCard(card) {
     return true; // Successfully processed
 }
 
-// Enhanced shorts filtering for more reliable channel detection
+// Performance-optimized shorts observer
 function setupShortsObserver() {
-    // First handle existing shorts
-    document.querySelectorAll('ytd-reel-item-renderer, ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2').forEach(shortElement => {
-        watchShortElement(shortElement);
-    });
+    // If the observer already exists, skip
+    if (shortsObserver) return;
     
-    // Watch for new shorts elements
-    const shortsObserver = new MutationObserver(mutations => {
+    // First handle existing shorts in batches
+    const existingShorts = document.querySelectorAll('ytd-reel-item-renderer, ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2');
+    if (existingShorts.length > 0) {
+        processShortsBatch(Array.from(existingShorts), 0, 10);
+    }
+    
+    // Watch for new shorts elements with throttling
+    let timeout = null;
+    shortsObserver = new MutationObserver(mutations => {
+        // Skip if we're already processing or the page is hidden
+        if (processingBatch || document.hidden) return;
+        
+        // Collect added nodes
+        const newShorts = [];
         for (const mutation of mutations) {
             mutation.addedNodes.forEach(node => {
                 if (node.nodeType !== 1) return;
@@ -889,9 +982,20 @@ function setupShortsObserver() {
                 if (node.tagName === 'YTD-REEL-ITEM-RENDERER' || 
                     node.tagName === 'YTM-SHORTS-LOCKUP-VIEW-MODEL' || 
                     node.tagName === 'YTM-SHORTS-LOCKUP-VIEW-MODEL-V2') {
-                    watchShortElement(node);
+                    newShorts.push(node);
                 }
             });
+        }
+        
+        // Process in batches with throttling
+        if (newShorts.length > 0) {
+            if (timeout) {
+                clearTimeout(timeout);
+            }
+            timeout = setTimeout(() => {
+                timeout = null;
+                processShortsBatch(newShorts, 0, 10);
+            }, 100);
         }
     });
     
@@ -901,6 +1005,28 @@ function setupShortsObserver() {
     });
     
     console.log("FilterTube: Shorts observer initialized");
+}
+
+// Process shorts in batches for better performance
+function processShortsBatch(shorts, startIndex, batchSize) {
+    if (startIndex >= shorts.length || document.hidden) return;
+    
+    processingBatch = true;
+    
+    const endIndex = Math.min(startIndex + batchSize, shorts.length);
+    
+    for (let i = startIndex; i < endIndex; i++) {
+        watchShortElement(shorts[i]);
+    }
+    
+    processingBatch = false;
+    
+    // Schedule next batch if needed
+    if (endIndex < shorts.length) {
+        requestAnimationFrame(() => {
+            processShortsBatch(shorts, endIndex, batchSize);
+        });
+    }
 }
 
 // Watch a short element with retry for reliable channel data extraction
@@ -1020,12 +1146,13 @@ function processShortElement(shortElement) {
 // Handle YouTube's single-page application navigation
 function watchForNavigation() {
     let lastUrl = location.href;
-    let isVideoPage = location.href.includes('/watch');
     
     // Set up interval to check URL changes
     const urlCheckInterval = setInterval(() => {
+        // Skip check if page is hidden
+        if (document.hidden) return;
+        
         const currentUrl = location.href;
-        const currentIsVideoPage = currentUrl.includes('/watch');
         
         if (lastUrl !== currentUrl) {
             lastUrl = currentUrl;
@@ -1034,20 +1161,50 @@ function watchForNavigation() {
             // Reset filtering state
             filtersApplied = false;
             
+            // Update page type
+            const newPageType = getPageType();
+            
+            // If page type changed, disconnect specialized observers
+            if (currentPageType !== newPageType) {
+                currentPageType = newPageType;
+                
+                // Disconnect specialized observers
+                if (sidebarObserver) {
+                    sidebarObserver.disconnect();
+                    sidebarObserver = null;
+                }
+                
+                if (shortsObserver) {
+                    shortsObserver.disconnect();
+                    shortsObserver = null;
+                }
+                
+                // Set up appropriate observers for new page type
+                if (currentPageType === 'watch') {
+                    // On watch pages, we need sidebar and comment observers
+                    setupSidebarObserver();
+                    
+                    // Only set up comment observer if comment filtering is enabled
+                    if (hideAllComments || filterComments) {
+                        setupCommentObserver();
+                    }
+                } else if (currentPageType === 'search' || currentPageType === 'home') {
+                    // On search and home pages, we need shorts observer
+                    setupShortsObserver();
+                }
+            }
+            
             // Apply filters multiple times as content loads
             applyFilters();
-            setTimeout(applyFilters, 200);
-            setTimeout(applyFilters, 500);
+            setTimeout(applyFilters, 300);
             setTimeout(applyFilters, 1000);
             setTimeout(applyFilters, 2000);
             
             // If we've navigated to a video page, handle comments
-            if (currentIsVideoPage) {
-                isVideoPage = true;
-                
+            if (currentPageType === 'watch') {
                 // Multiple attempts to catch the comment section as it loads
-                setTimeout(() => {
-                    if (hideAllComments || filterComments) {
+                if (hideAllComments || filterComments) {
+                    setTimeout(() => {
                         console.log("FilterTube: Checking for comments (1st attempt)");
                         const commentSection = document.querySelector('#comments, ytd-comments');
                         if (commentSection) {
@@ -1057,41 +1214,25 @@ function watchForNavigation() {
                                 applyCommentFilters();
                             }
                         }
-                    }
-                }, 1000);
-                
-                setTimeout(() => {
-                    if (hideAllComments || filterComments) {
-                        console.log("FilterTube: Checking for comments (2nd attempt)");
-                        const commentSection = document.querySelector('#comments, ytd-comments');
-                        if (commentSection) {
-                            if (hideAllComments) {
-                                document.documentElement.classList.add('filtertube-hide-all-comments');
-                            } else if (filterComments) {
-                                applyCommentFilters();
+                    }, 1000);
+                    
+                    setTimeout(() => {
+                        if (hideAllComments || filterComments) {
+                            console.log("FilterTube: Checking for comments (final attempt)");
+                            const commentSection = document.querySelector('#comments, ytd-comments');
+                            if (commentSection) {
+                                if (hideAllComments) {
+                                    document.documentElement.classList.add('filtertube-hide-all-comments');
+                                } else if (filterComments) {
+                                    applyCommentFilters();
+                                }
                             }
                         }
-                    }
-                }, 3000);
-                
-                setTimeout(() => {
-                    if (hideAllComments || filterComments) {
-                        console.log("FilterTube: Checking for comments (final attempt)");
-                        const commentSection = document.querySelector('#comments, ytd-comments');
-                        if (commentSection) {
-                            if (hideAllComments) {
-                                document.documentElement.classList.add('filtertube-hide-all-comments');
-                            } else if (filterComments) {
-                                applyCommentFilters();
-                            }
-                        }
-                    }
-                }, 5000);
-            } else {
-                isVideoPage = false;
+                    }, 3000);
+                }
             }
         }
-    }, 100);
+    }, 250); // Reduced frequency from 100ms to 250ms
     
     // Store interval ID for cleanup
     window._filterTubeUrlInterval = urlCheckInterval;
@@ -1297,6 +1438,7 @@ function processComment(comment, keywords, channels) {
 }
 
 console.log("FilterTube Content Script Loaded - Zero Flash Version v1.4.4");
+
 
 
 

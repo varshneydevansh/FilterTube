@@ -73,6 +73,25 @@ FilterTube works by:
 
 The extension operates entirely in your browser - no data is sent to any external servers.
 
+### Limitations of Channel Filtering
+
+**Note on Channel Filtering Reliability**: Due to how YouTube structures its components, channel filtering may work with varying degrees of reliability across different parts of the platform:
+
+- **Main feed videos**: Very reliable filtering by channel name, @handle, or ID
+- **Search results**: Reliable filtering with potential delays as content loads
+- **Sidebar recommendations**: Semi-reliable filtering that improves as you interact with the page
+- **Shorts**: Semi-reliable filtering that depends on YouTube's internal data availability
+
+The extension uses multiple techniques to extract channel information, including:
+- Direct DOM extraction of visible channel elements
+- Access to YouTube's internal Polymer component data
+- Normalized matching algorithms to handle variations in how channels are represented
+
+For the most reliable channel filtering:
+- Use both the channel ID and @handle when possible
+- Use the `channel:UCxxxxx` format for specific channel IDs
+- Refresh the page after changing filter settings
+
 ## Technical Details
 
 ### Files Structure
