@@ -52,6 +52,10 @@ let filterChannels = '';
 let hideAllComments = false;
 let hideFilteredComments = false;
 
+// Main variables for filtering and throttling
+const FILTER_DELAY = 300; // Small delay to batch mutations
+let throttleTimeout = null;
+
 /**
  * Clears the cached filter values.
  * Called when storage changes to ensure fresh values are used.
@@ -146,18 +150,42 @@ function hideSuggestionsByPreferences(keywords, channels) {
 
     // Only proceed if there are actually filters defined.
     if (trimmedKeywords.length > 0 || trimmedChannels.length > 0) {
-        // Hide individual videos first
+        console.log(`FilterTube: Filtering with ${trimmedKeywords.length} keywords and ${trimmedChannels.length} channels`);
+        
+        // Reset processed flag on existing elements to enable reprocessing
+        // This is important when filters change
+        if (window.lastFilterTime && Date.now() - window.lastFilterTime > 5000) {
+            // Only clear processed flags if it's been more than 5 seconds
+            // since last filter to avoid unnecessary reprocessing
+            document.querySelectorAll('[data-filter-tube-processed="true"]').forEach(el => {
+                el.removeAttribute('data-filter-tube-processed');
+            });
+        }
+        
+        // Store timestamp of this filter operation
+        window.lastFilterTime = Date.now();
+        
+        // First, handle the most visible elements
         hideVideos(trimmedKeywords, trimmedChannels);
-        // Then hide relevant playlists/shelves
-        hidePlaylistsAndShelves(trimmedKeywords, trimmedChannels);
-        // Then hide relevant channel elements
-        hideChannelElements(trimmedKeywords, trimmedChannels);
-        // Then hide shorts
         hideShorts(trimmedKeywords, trimmedChannels);
-
+        
+        // Then handle the playlist/mix containers
+        hideMixAndPlaylistElements(trimmedKeywords, trimmedChannels);
+        
+        // Then handle the remaining elements
+        hidePlaylistsAndShelves(trimmedKeywords, trimmedChannels);
+        hideChannelElements(trimmedKeywords, trimmedChannels);
+        
+        // Handle special cases
+        handleWatchCardFiltering(trimmedKeywords, trimmedChannels);
+        
+        // Apply comment filtering if on watch page
+        if (window.location.pathname.startsWith('/watch')) {
+            applyCommentFiltering();
+        }
     } else {
         // Optional: If all filters are removed, unhide previously hidden videos/elements.
-        document.querySelectorAll('.hidden-video').forEach(el => el.classList.remove('hidden-video'));
+        showAllElements();
     }
 }
 
@@ -657,7 +685,8 @@ function hideChannelElements(trimmedKeywords, trimmedChannels, rootNode = docume
  * @param {Node} rootNode - The root element to search within (defaults to document).
  */
 function hideShorts(trimmedKeywords, trimmedChannels, rootNode = document) {
-    const shortsSelector = 'ytd-reel-item-renderer, ytm-shorts-lockup-view-model';
+    // Expanded selector to catch all shorts variants including the new format
+    const shortsSelector = 'ytd-reel-item-renderer, ytm-shorts-lockup-view-model, ytd-shorts, ytd-reel-video-renderer, .shortsLockupViewModelHost, ytm-shorts-lockup-view-model-v2';
 
     let shortsItems = [];
     try {
@@ -667,27 +696,109 @@ function hideShorts(trimmedKeywords, trimmedChannels, rootNode = document) {
         return;
     }
 
-    shortsItems.forEach(item => {
-        const titleElement = item.querySelector('#video-title, .shortsLockupViewModelHostMetadataTitle');
-        const channelElement = item.querySelector('#channel-name .yt-simple-endpoint, .shortsLockupViewModelHostMetadataTitle');
-        const titleText = (titleElement?.textContent || '').toLowerCase().trim();
-        const channelText = (channelElement && channelElement !== titleElement ? channelElement.textContent : '').toLowerCase().trim();
-        let shouldHide = false; // Determine if it SHOULD be hidden
+    if (shortsItems.length === 0) {
+        return; // No shorts found, exit quietly
+    }
+    
+    console.log(`FilterTube: Found ${shortsItems.length} shorts to check`);
 
-        if ((trimmedChannels.length > 0 && channelText && trimmedChannels.some(blockedChannel => channelText.includes(blockedChannel))) ||
-            (trimmedKeywords.length > 0 && titleText && trimmedKeywords.some(keyword => titleText.includes(keyword)))) {
-            // Optional: check channel text again for keywords if relevant
-            // || (trimmedKeywords.length > 0 && channelText && trimmedKeywords.some(keyword => channelText.includes(keyword)))
-             shouldHide = true;
+    for (let i = 0; i < shortsItems.length; i++) {
+        const item = shortsItems[i];
+        
+        // Skip if already processed to avoid duplicate work
+        if (item.dataset.filterTubeProcessed === 'true') {
+            continue;
+        }
+        
+        // More comprehensive selectors to find title and channel elements
+        const titleElement = item.querySelector(
+            '#video-title, ' + 
+            '.shortsLockupViewModelHostMetadataTitle, ' + 
+            'yt-formatted-string.title, ' + 
+            'h3 .yt-core-attributed-string, ' +
+            'span.yt-core-attributed-string'
+        );
+        
+        const channelElement = item.querySelector(
+            '#channel-name .yt-simple-endpoint, ' + 
+            '.shortsLockupViewModelHostChannelTitle, ' + 
+            '.metadata-text, ' + 
+            'yt-formatted-string.ytd-channel-name, ' +
+            '.shortsLockupViewModelHostMetadataSubhead'
+        );
+        
+        // Extract text from elements
+        const titleText = titleElement ? titleElement.textContent.toLowerCase().trim() : '';
+        const channelText = channelElement && channelElement !== titleElement ? channelElement.textContent.toLowerCase().trim() : '';
+        
+        let shouldHide = false;
+
+        // Check for channel match
+        if (trimmedChannels.length > 0 && channelText) {
+            if (trimmedChannels.some(blockedChannel => channelText.includes(blockedChannel))) {
+                console.log(`FilterTube: Hiding shorts by channel: ${channelText}`);
+                shouldHide = true;
+            }
+        }
+        
+        // Check for keyword match in title
+        if (!shouldHide && trimmedKeywords.length > 0 && titleText) {
+            if (trimmedKeywords.some(keyword => titleText.includes(keyword))) {
+                console.log(`FilterTube: Hiding shorts with keyword in title: ${titleText}`);
+                shouldHide = true;
+            }
+        }
+        
+        // Only gather all text if needed (optimization)
+        if (!shouldHide && trimmedKeywords.length > 0) {
+            // Get all visible text content as a single string
+            const allTextElements = item.querySelectorAll('h3, span, a, div[class*="title"], div[class*="metadata"]');
+            let allText = '';
+            
+            for (let j = 0; j < allTextElements.length; j++) {
+                const el = allTextElements[j];
+                allText += ' ' + (el.textContent || '').toLowerCase().trim();
+            }
+            
+            for (const keyword of trimmedKeywords) {
+                if (allText.includes(keyword)) {
+                    console.log(`FilterTube: Hiding shorts with keyword in content: ${keyword}`);
+                    shouldHide = true;
+                    break;
+                }
+            }
         }
 
-        // --- INVERTED LOGIC --- Apply .filter-tube-visible only if it should NOT be hidden
-        if (!shouldHide) {
-            item.classList.add('filter-tube-visible');
-        } else {
+        // Aggressively hide if needed
+        if (shouldHide) {
             item.classList.remove('filter-tube-visible');
+            
+            // Aggressively hide to ensure it's not visible
+            item.style.display = 'none !important';
+            item.style.visibility = 'hidden !important';
+            item.style.opacity = '0 !important';
+            item.style.position = 'absolute !important';
+            item.style.width = '0 !important';
+            item.style.height = '0 !important';
+            
+            // Also hide all thumbnails and images inside
+            const allImages = item.querySelectorAll('img, yt-thumbnail, yt-img-shadow');
+            for (let j = 0; j < allImages.length; j++) {
+                const img = allImages[j];
+                img.style.display = 'none !important';
+                img.style.visibility = 'hidden !important';
+                img.style.opacity = '0 !important';
+            }
+            
+            // Use the HTML dataset to mark as filtered
+            item.dataset.filterTubeHidden = 'true';
+        } else {
+            item.classList.add('filter-tube-visible');
         }
-    });
+        
+        // Mark as processed to avoid redundant checks
+        item.dataset.filterTubeProcessed = 'true';
+    }
 }
 
 /**
@@ -805,269 +916,25 @@ function handleWatchCardFiltering(trimmedKeywords, trimmedChannels) {
 }
 
 /**
- * Dedicated function to specifically target mix/playlist elements
- * Uses the most aggressive approach to ensure complete hiding
- * @param {string[]} trimmedKeywords - Array of lowercase keywords to filter by
- * @param {string[]} trimmedChannels - Array of lowercase channel names to filter by
- * @param {Node} rootNode - The root element to search within (defaults to document)
+ * Simplified mix/playlist filtering for homepage and feed cards.
+ * Only hide if the mix/playlist text contains a filtered keyword.
  */
 function hideMixAndPlaylistElements(trimmedKeywords, trimmedChannels, rootNode = document) {
-    // Target all possible mix/playlist elements
-    const mixSelectors = [
-        'yt-lockup-view-model',
-        '.yt-lockup-view-model-wiz', 
-        'ytd-rich-item-renderer:has(yt-lockup-view-model)',
-        'ytd-rich-item-renderer:has(.yt-lockup-view-model-wiz)',
-        'ytd-radio-renderer',
-        'ytd-playlist-renderer',
-        'ytd-mix-renderer'
-    ].join(', ');
-
-    try {
-        const mixElements = rootNode.querySelectorAll(mixSelectors);
-        
-        if (mixElements.length === 0) {
-            return; // No mix elements found
+    const cards = rootNode.querySelectorAll('ytd-rich-item-renderer');
+    cards.forEach(card => {
+        // Only process items that contain a mix, playlist, or radio renderer
+        if (!card.querySelector('ytd-mix-renderer, ytd-playlist-renderer, ytd-radio-renderer')) return;
+        // Check all text in the card for any keyword or channel matches
+        const text = (card.textContent || '').toLowerCase();
+        const keywordMatch = trimmedKeywords.length > 0 && trimmedKeywords.some(keyword => text.includes(keyword));
+        const channelMatch = trimmedChannels.length > 0 && trimmedChannels.some(channel => text.includes(channel));
+        const shouldHide = keywordMatch || channelMatch;
+        if (shouldHide) {
+            card.classList.remove('filter-tube-visible');
+        } else {
+            card.classList.add('filter-tube-visible');
         }
-        
-        console.log(`FilterTube: Found ${mixElements.length} mix/playlist elements to check`);
-        
-        mixElements.forEach(mixElement => {
-            // Find the title - could be in several different places
-            const titleElements = mixElement.querySelectorAll('.yt-lockup-metadata-view-model-wiz__title, .yt-lockup-view-model-wiz__heading-reset, h3 span, .yt-lockup-metadata-view-model-wiz__heading-reset h3 a span');
-            
-            let titleText = '';
-            for (const el of titleElements) {
-                const text = el.textContent.toLowerCase().trim();
-                if (text) {
-                    titleText += ' ' + text;
-                }
-            }
-            titleText = titleText.trim();
-            
-            // Look for channel names/artists - often in metadata content
-            const metadataElements = mixElement.querySelectorAll('.yt-content-metadata-view-model-wiz__metadata-text, .yt-lockup-view-model-wiz__metadata span');
-            
-            let channelText = '';
-            for (const el of metadataElements) {
-                const text = el.textContent.toLowerCase().trim();
-                if (text) {
-                    channelText += ' ' + text;
-                }
-            }
-            channelText = channelText.trim();
-            
-            // Look for channel handle links
-            let channelHandle = '';
-            const channelLinks = mixElement.querySelectorAll('a[href^="/@"], a[href^="/channel/"]');
-            if (channelLinks.length > 0) {
-                for (const link of channelLinks) {
-                    const href = link.getAttribute('href');
-                    if (href && href.includes('/@')) {
-                        channelHandle = '@' + href.split('/@')[1].split('/')[0].toLowerCase();
-                        break;
-                    } else if (href && href.includes('/channel/')) {
-                        channelHandle = 'channel/' + href.split('/channel/')[1].split('/')[0].toLowerCase();
-                        break;
-                    }
-                }
-            }
-            
-            // Get all text content from this mix element to ensure we catch everything
-            const allTextNodes = Array.from(mixElement.querySelectorAll('*'))
-                .filter(el => el.childNodes && el.childNodes.length > 0)
-                .flatMap(el => Array.from(el.childNodes))
-                .filter(node => node.nodeType === Node.TEXT_NODE && node.textContent.trim());
-                
-            const allText = allTextNodes.map(node => node.textContent.trim().toLowerCase()).join(' ');
-            
-            // Debug log
-            console.log(`FilterTube Mix Check: Title: "${titleText}", Channels: "${channelText}", Handle: "${channelHandle}", All text: "${allText.substring(0, 100)}..."`);
-            
-            let shouldHide = false;
-            
-            // 1. Check keywords in title
-            if (!shouldHide && trimmedKeywords.length > 0 && titleText) {
-                for (const keyword of trimmedKeywords) {
-                    if (titleText.includes(keyword)) {
-                        console.log(`FilterTube: Hiding mix "${titleText}" - title contains keyword: ${keyword}`);
-                        shouldHide = true;
-                        break;
-                    }
-                }
-            }
-            
-            // 2. Check keywords in metadata (artist names, etc)
-            if (!shouldHide && trimmedKeywords.length > 0 && channelText) {
-                for (const keyword of trimmedKeywords) {
-                    if (channelText.includes(keyword)) {
-                        console.log(`FilterTube: Hiding mix "${titleText}" - metadata contains keyword: ${keyword}`);
-                        shouldHide = true;
-                        break;
-                    }
-                }
-            }
-            
-            // 3. Check keywords in all text content
-            if (!shouldHide && trimmedKeywords.length > 0 && allText) {
-                for (const keyword of trimmedKeywords) {
-                    if (allText.includes(keyword)) {
-                        console.log(`FilterTube: Hiding mix - text contains keyword: ${keyword}`);
-                        shouldHide = true;
-                        break;
-                    }
-                }
-            }
-            
-            // 4. Check channel filtering by name/handle
-            if (!shouldHide && trimmedChannels.length > 0 && (channelText || channelHandle)) {
-                if (shouldFilterChannel(channelText, channelHandle, trimmedChannels)) {
-                    console.log(`FilterTube: Hiding mix "${titleText}" - channel match`);
-                    shouldHide = true;
-                }
-            }
-            
-            // Get parent rich-item-renderer to completely hide it if needed
-            const parentRichItem = mixElement.closest('ytd-rich-item-renderer');
-            
-            if (shouldHide) {
-                // Ultra-aggressive hiding approach
-
-                // 1. Hide the element itself with display: none
-                mixElement.classList.remove('filter-tube-visible');
-                mixElement.style.display = 'none !important';
-                mixElement.style.visibility = 'hidden !important';
-                mixElement.style.opacity = '0 !important';
-                mixElement.style.position = 'absolute !important';
-                mixElement.style.width = '0 !important';
-                mixElement.style.height = '0 !important';
-                
-                // 2. If parent exists, hide it with display: none
-                if (parentRichItem) {
-                    parentRichItem.classList.remove('filter-tube-visible');
-                    parentRichItem.style.display = 'none !important';
-                    parentRichItem.style.visibility = 'hidden !important';
-                    parentRichItem.style.opacity = '0 !important';
-                    parentRichItem.style.position = 'absolute !important';
-                    parentRichItem.style.width = '0 !important';
-                    parentRichItem.style.height = '0 !important';
-                }
-                
-                // 3. Direct targeting of image elements
-                const allImages = mixElement.querySelectorAll('img');
-                allImages.forEach(img => {
-                    img.style.display = 'none !important';
-                    img.style.visibility = 'hidden !important';
-                    img.style.opacity = '0 !important';
-                    img.style.width = '0 !important';
-                    img.style.height = '0 !important';
-                });
-                
-                // 4. Target collection stacks specifically (the mix thumbnails)
-                const collectionElements = mixElement.querySelectorAll(
-                    'yt-collection-thumbnail-view-model, ' +
-                    '.yt-collection-thumbnail-view-model, ' +
-                    'yt-collections-stack, ' +
-                    '.collections-stack-wiz, ' +
-                    '.collections-stack-wiz__collection-stack1, ' +
-                    '.collections-stack-wiz__collection-stack2'
-                );
-                
-                collectionElements.forEach(el => {
-                    el.style.display = 'none !important';
-                    el.style.visibility = 'hidden !important';
-                    el.style.opacity = '0 !important';
-                    el.style.position = 'absolute !important';
-                    el.style.width = '0 !important';
-                    el.style.height = '0 !important';
-                });
-                
-                // 5. Target links that might be loading mix/playlist content
-                const playlistLinks = mixElement.querySelectorAll('a[href*="&list="], a[href*="&start_radio="]');
-                playlistLinks.forEach(link => {
-                    link.style.display = 'none !important';
-                    link.style.visibility = 'hidden !important';
-                    link.style.opacity = '0 !important';
-                });
-                
-                // 6. Use the HTML dataset to mark as filtered
-                mixElement.dataset.filterTubeHidden = 'true';
-                if (parentRichItem) {
-                    parentRichItem.dataset.filterTubeHidden = 'true';
-                }
-                
-                // 7. Hide all child elements as a last resort
-                const allChildren = mixElement.querySelectorAll('*');
-                allChildren.forEach(child => {
-                    child.style.display = 'none !important';
-                });
-                
-                // 8. Also hide by direct attribute modification to bypass CSS overrides
-                mixElement.setAttribute('hidden', 'true');
-                if (parentRichItem) {
-                    parentRichItem.setAttribute('hidden', 'true');
-                }
-                
-                // 9. Remove from DOM flow entirely as last resort
-                try {
-                    if (parentRichItem) {
-                        parentRichItem.style.display = 'none !important';
-                        parentRichItem.setAttribute('aria-hidden', 'true');
-                    }
-                    
-                    // Apply hidden to all parent containers that might be making it visible
-                    let current = mixElement;
-                    for (let i = 0; i < 5; i++) { // Go up to 5 levels up
-                        if (!current.parentElement) break;
-                        current = current.parentElement;
-                        
-                        if (current.classList.contains('yt-lockup-view-model-wiz') || 
-                            current.classList.contains('yt-lockup-metadata-view-model-wiz') ||
-                            current.classList.contains('ytd-rich-item-renderer')) {
-                            current.style.display = 'none !important';
-                            current.style.visibility = 'hidden !important';
-                            current.classList.remove('filter-tube-visible');
-                        }
-                    }
-                } catch (e) {
-                    console.error('Error applying extra hiding', e);
-                }
-                
-            } else {
-                // Make the element visible
-                mixElement.classList.add('filter-tube-visible');
-                mixElement.style.display = '';
-                mixElement.style.visibility = '';
-                mixElement.style.opacity = '';
-                mixElement.style.position = '';
-                mixElement.style.width = '';
-                mixElement.style.height = '';
-                
-                delete mixElement.dataset.filterTubeHidden;
-                mixElement.removeAttribute('hidden');
-                
-                // Also make parent visible if it exists
-                if (parentRichItem) {
-                    parentRichItem.classList.add('filter-tube-visible');
-                    parentRichItem.style.display = '';
-                    parentRichItem.style.visibility = '';
-                    parentRichItem.style.opacity = '';
-                    parentRichItem.style.position = '';
-                    parentRichItem.style.width = '';
-                    parentRichItem.style.height = '';
-                    
-                    delete parentRichItem.dataset.filterTubeHidden;
-                    parentRichItem.removeAttribute('hidden');
-                }
-            }
-        });
-        
-        // Force browser layout recalculation to remove gaps
-        document.body.offsetHeight;
-        
-    } catch (e) {
-        console.error('FilterTube: Error finding mix elements:', e);
-    }
+    });
 }
 
 /**
@@ -1160,30 +1027,6 @@ function applyFilters() {
     // Handle comment filtering
     if (window.location.pathname.startsWith('/watch')) {
         applyCommentFiltering();
-    }
-    
-    // Extra cleanup for any remaining mix elements that should be hidden
-    if (keywords.length > 0) {
-        const remainingMixElements = document.querySelectorAll('.filter-tube-visible .yt-lockup-view-model-wiz, .filter-tube-visible .yt-lockup-metadata-view-model-wiz');
-        remainingMixElements.forEach(mix => {
-            const mixTitle = mix.textContent.toLowerCase();
-            
-            for (const keyword of keywords) {
-                if (mixTitle.includes(keyword)) {
-                    console.log(`FilterTube: Hiding mix with keyword "${keyword}" in late cleanup`);
-                    const parentElement = mix.closest('.filter-tube-visible');
-                    if (parentElement) {
-                        parentElement.classList.remove('filter-tube-visible');
-                        parentElement.style.display = 'none !important';
-                        parentElement.style.visibility = 'hidden !important';
-                    }
-                    
-                    mix.classList.remove('filter-tube-visible');
-                    mix.style.display = 'none !important';
-                    break;
-                }
-            }
-        });
     }
     
     // Fix layout issues after filtering
@@ -1434,9 +1277,9 @@ setInterval(checkForUrlChange, 1000);
 
 /**
  * Determines if a channel should be filtered based on the channel name or handle
- * Uses different matching strategies for handles vs. regular channel names
+ * Uses different matching strategies for handles vs. regular names
  * @param {string} channelName - The channel name to check (lowercase)
- * @param {string} channelHandle - The channel handle to check (lowercase, with @)
+ * @param {string} channelHandle - The channel handle to check (lowercase)
  * @param {string[]} trimmedChannels - Array of blocked channel names/handles
  * @returns {boolean} - True if the channel should be filtered
  */
@@ -1449,36 +1292,32 @@ function shouldFilterChannel(channelName, channelHandle, trimmedChannels) {
     channelName = (channelName || '').toLowerCase().trim();
     channelHandle = (channelHandle || '').toLowerCase().trim();
     
-    // Detect if we have a channel ID (looks like /channel/UC...)
+    // Extract channel ID if present in format /channel/ID or channel/ID
     let channelId = '';
     if (channelHandle.includes('/channel/')) {
-        const match = channelHandle.match(/\/channel\/([\w-]+)/);
+        const match = channelHandle.match(/\/channel\/([a-zA-Z0-9_-]+)/);
         if (match && match[1]) {
             channelId = match[1].toLowerCase();
         }
     } else if (channelHandle.startsWith('channel/')) {
         channelId = channelHandle.replace('channel/', '').toLowerCase();
+    } else if (channelHandle.includes('@')) {
+        // Extract handle in the format @username
+        const match = channelHandle.match(/@([a-zA-Z0-9_.-]+)/);
+        if (match && match[1]) {
+            channelHandle = '@' + match[1].toLowerCase();
+        }
     }
     
-    // Debug log when needed
-    // console.log(`FilterTube Debug: Checking channel - Name: "${channelName}", Handle: "${channelHandle}", ID: "${channelId}"`);
-    
-    for (const blockedChannel of trimmedChannels) {
-        const blockedValue = blockedChannel.toLowerCase().trim();
+    // Check against each blocked channel
+    for (let i = 0; i < trimmedChannels.length; i++) {
+        const blockedValue = trimmedChannels[i].toLowerCase().trim();
         
         // Case 1: Blocked value is a handle (starts with @)
         if (blockedValue.startsWith('@')) {
-            // Remove @ for comparison
-            const blockedHandle = blockedValue.substring(1);
-            
-            // If channelHandle has @ remove it for comparison
-            const normalizedHandle = channelHandle.startsWith('@') 
-                ? channelHandle.substring(1) 
-                : channelHandle;
-                
-            // EXACT match for handles - must match completely, not partial
-            if (normalizedHandle === blockedHandle) {
-                console.log(`FilterTube: Filtering channel with exact handle match: ${channelHandle} = ${blockedValue}`);
+            // Direct match for handles
+            if (channelHandle && channelHandle.includes(blockedValue)) {
+                console.log(`FilterTube: Filtering by handle match: ${channelHandle} includes ${blockedValue}`);
                 return true;
             }
         }
@@ -1486,19 +1325,16 @@ function shouldFilterChannel(channelName, channelHandle, trimmedChannels) {
         else if (blockedValue.startsWith('channel/')) {
             const blockedId = blockedValue.replace('channel/', '');
             
-            // EXACT match for channel IDs - must match completely
+            // EXACT match for channel IDs
             if (channelId && channelId === blockedId) {
-                console.log(`FilterTube: Filtering channel with exact ID match: ${channelId} = ${blockedId}`);
+                console.log(`FilterTube: Filtering by channel ID match: ${channelId}`);
                 return true;
             }
         }
         // Case 3: Blocked value is a regular channel name (partial match)
-        else {
-            // Use partial matching for regular channel names
-            if (channelName && channelName.includes(blockedValue)) {
-                console.log(`FilterTube: Filtering channel with name match: ${channelName} contains ${blockedValue}`);
-                return true;
-            }
+        else if (channelName && channelName.includes(blockedValue)) {
+            console.log(`FilterTube: Filtering by channel name: ${channelName} includes ${blockedValue}`);
+            return true;
         }
     }
     
@@ -1535,9 +1371,18 @@ const observerCallback = (mutations, observer) => {
     let highPriorityChange = false;
     let potentiallyRelevantChange = false;
     
-    for (const mutation of mutations) {
+    // Optimize the checking of mutations by sampling
+    // Only check a subset of mutations to determine if filtering is needed
+    const maxMutationsToCheck = Math.min(mutations.length, 10); // Check at most 10 mutations
+    
+    for (let i = 0; i < maxMutationsToCheck; i++) {
+        const mutation = mutations[i];
         if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-            for (const node of mutation.addedNodes) {
+            // Check up to 3 added nodes per mutation
+            const nodesToCheck = Math.min(mutation.addedNodes.length, 3);
+            
+            for (let j = 0; j < nodesToCheck; j++) {
+                const node = mutation.addedNodes[j];
                 if (node.nodeType !== Node.ELEMENT_NODE) continue;
                 
                 // High priority selectors - needs immediate handling
@@ -1545,38 +1390,33 @@ const observerCallback = (mutations, observer) => {
                     'ytd-rich-item-renderer', // Home page items
                     'ytd-grid-video-renderer', // Channel page videos
                     'ytd-video-renderer', // Search results
-                    'ytd-item-section-renderer', // Previously watched section
                     '.yt-lockup-view-model-wiz', // Mix elements with thumbnails
                     'ytd-universal-watch-card-renderer', // Watch cards
                     'ytd-radio-renderer', // Radio/mix cards
-                    'ytd-rich-shelf-renderer[is-shorts]', // Shorts shelf
+                    'ytd-reel-item-renderer', // Shorts items
+                    'ytm-shorts-lockup-view-model', // Mobile shorts
+                    '.shortsLockupViewModelHost', // Another shorts variant
                 ];
                 
-                // Check if the node matches any high priority selector
-                if (highPrioritySelectors.some(selector => {
-                    try {
-                        return node.matches?.(selector) || node.querySelector?.(selector);
-                    } catch (e) {
-                        return false; // Safely handle invalid selectors
-                    }
-                })) {
-                    highPriorityChange = true;
-                    break;
-                }
-                
-                // Regular check for any potentially relevant element
-                try {
-                    // Check if the node itself is a relevant element
-                    const isRelevantNode = node.tagName && (
-                        node.tagName.toLowerCase().startsWith('ytd-') ||
-                        node.tagName.toLowerCase().startsWith('yt-')
-                    );
+                // Fast check - just test tag names first
+                const nodeName = node.nodeName.toLowerCase();
+                if (nodeName.startsWith('ytd-') || nodeName.startsWith('yt-') || nodeName.startsWith('ytm-')) {
+                    potentiallyRelevantChange = true;
                     
-                    if (isRelevantNode) {
-                        potentiallyRelevantChange = true;
+                    // Check against high priority selectors
+                    try {
+                        for (let k = 0; k < highPrioritySelectors.length; k++) {
+                            const selector = highPrioritySelectors[k];
+                            if (node.matches?.(selector) || node.querySelector?.(selector)) {
+                                highPriorityChange = true;
+                                break;
+                            }
+                        }
+                    } catch (e) {
+                        // Safely handle invalid selectors
                     }
-                } catch (e) {
-                    // Ignore errors in selector matching
+                    
+                    if (highPriorityChange) break;
                 }
             }
         }
@@ -1585,14 +1425,14 @@ const observerCallback = (mutations, observer) => {
 
     // If high priority elements were added, filter immediately
     if (highPriorityChange) {
-        console.log("FilterTube: High priority elements detected - filtering immediately");
         // Cancel any pending throttled filtering
         if (throttleTimeout) {
             clearTimeout(throttleTimeout);
             throttleTimeout = null;
         }
-        // Apply filters immediately
-        applyFilters();
+        
+        // Apply specialized filtering instead of full filtering
+        filterPriorityElements();
         return;
     }
 
@@ -1600,11 +1440,186 @@ const observerCallback = (mutations, observer) => {
     if (throttleTimeout) return; // Throttle if already scheduled
 
     throttleTimeout = setTimeout(() => {
-        console.log("FilterTube: Applying filters due to potential relevant DOM change.");
-        applyFilters();
+        hideSuggestionsByPreferences(filterKeywords, filterChannels);
         throttleTimeout = null;
     }, FILTER_DELAY);
 };
+
+/**
+ * Faster filtering method that only targets specific high-priority elements
+ * This is used for immediate response to important DOM changes
+ */
+function filterPriorityElements() {
+    const trimmedKeywords = (filterKeywords || '').split(',')
+                                          .map(keyword => keyword.trim().toLowerCase())
+                                          .filter(Boolean);
+    const trimmedChannels = (filterChannels || '').split(',')
+                                           .map(channel => channel.trim().toLowerCase())
+                                           .filter(Boolean);
+    
+    if (trimmedKeywords.length === 0 && trimmedChannels.length === 0) {
+        return; // No filters defined
+    }
+    
+    // Only filter newly added elements that don't have the processed flag
+    const newElements = document.querySelectorAll(`
+        ytd-rich-item-renderer:not([data-filter-tube-processed]), 
+        ytd-grid-video-renderer:not([data-filter-tube-processed]), 
+        ytd-video-renderer:not([data-filter-tube-processed]),
+        .yt-lockup-view-model-wiz:not([data-filter-tube-processed]),
+        ytd-universal-watch-card-renderer:not([data-filter-tube-processed]),
+        ytd-radio-renderer:not([data-filter-tube-processed]),
+        ytd-reel-item-renderer:not([data-filter-tube-processed]),
+        ytm-shorts-lockup-view-model:not([data-filter-tube-processed]),
+        .shortsLockupViewModelHost:not([data-filter-tube-processed])
+    `);
+    
+    if (newElements.length === 0) {
+        return;
+    }
+    
+    console.log(`FilterTube: Quick filtering ${newElements.length} new elements`);
+    
+    // Process based on element type
+    for (let i = 0; i < newElements.length; i++) {
+        const el = newElements[i];
+        
+        // Process based on element type
+        if (el.matches('ytd-reel-item-renderer, ytm-shorts-lockup-view-model, .shortsLockupViewModelHost')) {
+            // Fast-track shorts filtering
+            processShortsElement(el, trimmedKeywords, trimmedChannels);
+        } 
+        else if (el.matches('.yt-lockup-view-model-wiz, ytd-radio-renderer, ytd-mix-renderer')) {
+            // Fast-track mix filtering
+            processMixElement(el, trimmedKeywords, trimmedChannels);
+        }
+        else {
+            // Standard video filtering
+            processVideoElement(el, trimmedKeywords, trimmedChannels);
+        }
+        
+        // Mark as processed
+        el.dataset.filterTubeProcessed = 'true';
+    }
+}
+
+/**
+ * Helper for quick filtering of shorts elements
+ */
+function processShortsElement(element, trimmedKeywords, trimmedChannels) {
+    // Find title and channel
+    const titleElement = element.querySelector('#video-title, .shortsLockupViewModelHostMetadataTitle, span.yt-core-attributed-string');
+    const channelElement = element.querySelector('#channel-name, .shortsLockupViewModelHostMetadataSubhead');
+    
+    // Get text content
+    const titleText = titleElement ? titleElement.textContent.toLowerCase().trim() : '';
+    const channelText = channelElement ? channelElement.textContent.toLowerCase().trim() : '';
+    
+    let shouldHide = false;
+    
+    // Check keywords in title
+    if (trimmedKeywords.length > 0 && titleText) {
+        for (const keyword of trimmedKeywords) {
+            if (titleText.includes(keyword)) {
+                shouldHide = true;
+                break;
+            }
+        }
+    }
+    
+    // Check channel match
+    if (!shouldHide && trimmedChannels.length > 0 && channelText) {
+        for (const blockedChannel of trimmedChannels) {
+            if (channelText.includes(blockedChannel)) {
+                shouldHide = true;
+                break;
+            }
+        }
+    }
+    
+    // Apply visibility
+    if (shouldHide) {
+        element.classList.remove('filter-tube-visible');
+        element.style.display = 'none !important';
+        element.style.visibility = 'hidden !important';
+        element.dataset.filterTubeHidden = 'true';
+    } else {
+        element.classList.add('filter-tube-visible');
+    }
+}
+
+/**
+ * Helper for quick filtering of mix elements
+ */
+function processMixElement(element, trimmedKeywords, trimmedChannels) {
+    // Find the containing feed card
+    const card = element.closest('ytd-rich-item-renderer');
+    if (!card) return;
+
+    // Combine all visible text in this card
+    const text = (card.textContent || '').toLowerCase().trim();
+    
+    // Determine if should hide based on keywords or channels
+    let shouldHide = false;
+    if (trimmedKeywords.length > 0 && trimmedKeywords.some(kw => text.includes(kw))) {
+        shouldHide = true;
+    }
+    if (!shouldHide && trimmedChannels.length > 0 && trimmedChannels.some(ch => text.includes(ch))) {
+        shouldHide = true;
+    }
+
+    // Toggle visibility on the entire card
+    if (shouldHide) {
+        card.classList.remove('filter-tube-visible');
+    } else {
+        card.classList.add('filter-tube-visible');
+    }
+}
+
+/**
+ * Helper for quick filtering of standard video elements
+ */
+function processVideoElement(element, trimmedKeywords, trimmedChannels) {
+    // Get title and channel
+    const titleElement = element.querySelector('#video-title, .title');
+    const channelElement = element.querySelector('#channel-name, #byline');
+    
+    // Get text content
+    const titleText = titleElement ? titleElement.textContent.toLowerCase().trim() : '';
+    const channelText = channelElement ? channelElement.textContent.toLowerCase().trim() : '';
+    
+    let shouldHide = false;
+    
+    // Check keywords in title
+    if (trimmedKeywords.length > 0 && titleText) {
+        for (const keyword of trimmedKeywords) {
+            if (titleText.includes(keyword)) {
+                shouldHide = true;
+                break;
+            }
+        }
+    }
+    
+    // Check channel match
+    if (!shouldHide && trimmedChannels.length > 0 && channelText) {
+        for (const blockedChannel of trimmedChannels) {
+            if (channelText.includes(blockedChannel)) {
+                shouldHide = true;
+                break;
+            }
+        }
+    }
+    
+    // Apply visibility
+    if (shouldHide) {
+        element.classList.remove('filter-tube-visible');
+        element.style.display = 'none !important';
+        element.style.visibility = 'hidden !important';
+        element.dataset.filterTubeHidden = 'true';
+    } else {
+        element.classList.add('filter-tube-visible');
+    }
+}
 
 // Create a MutationObserver instance with the callback.
 const observer = new MutationObserver(observerCallback);
@@ -1693,5 +1708,7 @@ window.addEventListener('unload', () => {
     if (throttleTimeout) clearTimeout(throttleTimeout);
     console.log("FilterTube: Cleaned up resources on page unload");
 });
+
+
 
 
