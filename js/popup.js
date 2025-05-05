@@ -11,6 +11,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const channelsElement = document.getElementById('channels');
     const saveButton = document.getElementById('saveBtn');
     const openInTabButton = document.getElementById('openInTabBtn');
+    const logoIcon = document.querySelector('.logo-icon');
+    const titleElement = document.querySelector('.title');
     const hideAllCommentsCheckbox = document.getElementById('hideAllComments');
     const hideFilteredCommentsCheckbox = document.getElementById('hideFilteredComments');
 
@@ -35,11 +37,22 @@ document.addEventListener('DOMContentLoaded', function() {
     if (openInTabButton) {
         openInTabButton.addEventListener('click', openInNewTab);
     }
+    
+    // Make logo and title clickable to go to website
+    if (logoIcon) {
+        logoIcon.style.cursor = 'pointer';
+        logoIcon.addEventListener('click', openWebsite);
+    }
+    
+    if (titleElement) {
+        titleElement.style.cursor = 'pointer';
+        titleElement.addEventListener('click', openWebsite);
+    }
 
     /**
      * Loads settings from storage
-     */
-    function loadSettings() {
+ */
+function loadSettings() {
         chrome.storage.local.get([
             'filterKeywords', 
             'filterChannels', 
@@ -76,13 +89,13 @@ document.addEventListener('DOMContentLoaded', function() {
             if (this.checked) {
                 hideAllCommentsCheckbox.checked = false;
             }
-        });
-    }
+    });
+}
 
-    /**
+/**
      * Saves settings to storage
-     */
-    function saveSettings() {
+ */
+function saveSettings() {
         // Get current values
         const filterKeywords = keywordsElement.value.trim();
         const filterChannels = channelsElement.value.trim();
@@ -95,39 +108,32 @@ document.addEventListener('DOMContentLoaded', function() {
         saveButton.textContent = 'Saved!';
         
         // Save to storage
-        chrome.storage.local.set({
-            filterKeywords: filterKeywords,
+    chrome.storage.local.set({
+        filterKeywords: filterKeywords,
             filterChannels: filterChannels,
             hideAllComments: hideAllComments,
             hideFilteredComments: hideFilteredComments
-        }, function() {
+    }, function() {
             // Reset button after delay
-            setTimeout(function() {
+        setTimeout(function() {
                 saveButton.classList.remove('saved');
                 saveButton.textContent = originalButtonText;
             }, 1500);
-        });
+    });
+}
+
+/**
+     * Opens the settings in a new tab
+ */
+    function openInNewTab() {
+        const extensionUrl = chrome.runtime.getURL('html/tab-view.html');
+        chrome.tabs.create({ url: extensionUrl });
     }
 
-    /**
-     * Opens the extension in a new tab
-     */
-    function openInNewTab() {
-        console.log('Opening FilterTube in new tab');
-        
-        // First try to open our website directly
-        chrome.tabs.create({
-            url: 'https://varshneydevansh.github.io/FilterTube/website/'
-        }, (tab) => {
-            // If successful, we're done
-            console.log('Opened FilterTube website');
-        });
-        
-        // Fallback to the tab view if website isn't available
-        chrome.runtime.openOptionsPage || chrome.tabs.create({
-            url: chrome.runtime.getURL('html/tab-view.html')
-        }, (tab) => {
-            console.log('Opened FilterTube tab view (fallback)');
-        });
+/**
+     * Opens the FilterTube website in a new tab
+ */
+    function openWebsite() {
+        chrome.tabs.create({ url: 'https://github.com/varshneydevansh/FilterTube' });
     }
 });

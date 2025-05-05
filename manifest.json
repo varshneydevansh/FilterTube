@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "FilterTube",
     "description": "Filter YouTube videos based on keywords and channels",
-    "version": "1.1.0",
+    "version": "1.0",
     "minimum_chrome_version": "49",
     "background": {
         "scripts": ["js/background.js"]
@@ -29,14 +29,15 @@
                 "js/content.js"
             ],
             "css": [
-                "css/content.css"
+                "css/filter.css",
+                "css/layout.css"
             ],
             "run_at": "document_start"
         }
     ],
     "web_accessible_resources": [
         {
-            "resources": ["html/tab-view.html", "css/tab-view.css"],
+            "resources": ["html/tab-view.html", "css/tab-view.css", "css/filter.css", "css/layout.css", "js/layout.js"],
             "matches": ["<all_urls>"]
         }
     ],

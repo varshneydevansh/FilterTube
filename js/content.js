@@ -10,36 +10,47 @@
  * 6. Filtering comments based on user preferences.
  */
 
+// Dynamically load CSS files (separated into filter & layout)
+function loadCSS(filename) {
+    const link = document.createElement('link');
+    link.href = chrome.runtime.getURL(`css/${filename}`);
+    link.type = 'text/css';
+    link.rel = 'stylesheet';
+    (document.head || document.documentElement).appendChild(link);
+}
+
+// Load the separate CSS files
+loadCSS('filter.css');
+loadCSS('layout.css');
+
+// Dynamically load the layout script
+function loadScript(filename) {
+    return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = chrome.runtime.getURL(`js/${filename}`);
+        script.onload = () => {
+            console.log(`FilterTube: Loaded ${filename}`);
+            resolve();
+        };
+        script.onerror = (error) => {
+            console.error(`FilterTube: Failed to load ${filename}`, error);
+            reject(error);
+        };
+        (document.head || document.documentElement).appendChild(script);
+    });
+}
+
+// Load the layout script
+loadScript('layout.js').catch(error => {
+    console.error('FilterTube: Error loading layout.js. Layout fixes may not work properly.', error);
+});
+
 // Global variables to cache filter settings from storage.
 // Initialized as empty strings and populated by loadSettings.
 let filterKeywords = '';
 let filterChannels = '';
 let hideAllComments = false;
 let hideFilteredComments = false;
-
-/**
- * Channel mapping cache to store relationships between channel IDs and handles
- * Format: { 'channelId': '@handle', 'UCtxdfwb9wfkoGocVUAJ-Bmg': '@TravisScottXX' }
- */
-const channelMappingCache = {};
-
-/**
- * TODO: Future feature - Channel ID to Handle mapping
- * 
- * Potential enhancement: Develop a more robust system to automatically map channel IDs to handles
- * This would allow users to block a channel using either format and have it work consistently
- * 
- * Approach:
- * 1. When encountering a new channel ID, extract handle from page if possible
- * 2. Store the mapping in local storage for persistence across sessions
- * 3. Possibly add an API call to YouTube's API to fetch channel details (would require user API key)
- * 4. Consider building a small community-sourced database of common channel ID to handle mappings
- *
- * Current limitations:
- * - Handle extraction is only possible when the handle is visible in the DOM
- * - There's no persistent storage of mappings between sessions
- * - We can't proactively fetch mappings for channels not yet encountered
- */
 
 /**
  * Clears the cached filter values.
@@ -119,25 +130,6 @@ chrome.storage.onChanged.addListener(function (changes, areaName) {
 });
 
 /**
- * Checks if a text contains a keyword as a whole word or phrase
- * @param {string} text - The text to search in
- * @param {string} keyword - The keyword to search for
- * @returns {boolean} - True if the keyword is found as a whole word or phrase
- */
-function matchesWholeWord(text, keyword) {
-    if (!text || !keyword) return false;
-    
-    // If the keyword has spaces, it's a phrase - do exact phrase matching
-    if (keyword.includes(' ')) {
-        return text.includes(keyword);
-    }
-    
-    // For single words, use word boundary matching
-    const regex = new RegExp(`\\b${keyword.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}\\b`, 'i');
-    return regex.test(text);
-}
-
-/**
  * Prepares filter strings (keywords, channels) by splitting, trimming,
  * and converting to lowercase, then calls the main hiding logic.
  * @param {string} keywords - Comma-separated keywords string.
@@ -167,78 +159,6 @@ function hideSuggestionsByPreferences(keywords, channels) {
         // Optional: If all filters are removed, unhide previously hidden videos/elements.
         document.querySelectorAll('.hidden-video').forEach(el => el.classList.remove('hidden-video'));
     }
-}
-
-/**
- * Extracts channel information (name and handle) more aggressively from various elements
- * @param {HTMLElement} element - The element to extract channel info from
- * @returns {Object} - Object with channelName and channelHandle properties
- */
-function extractChannelInfo(element) {
-    // Default empty values
-    let channelName = '';
-    let channelHandle = '';
-    
-    // Try multiple selectors for channel name
-    const nameSelectors = [
-        '#channel-name .yt-simple-endpoint', 
-        '#channel-name a.yt-simple-endpoint', 
-        '.ytd-channel-name a.yt-simple-endpoint', 
-        '#channel-name yt-formatted-string',
-        '#text'
-    ];
-    
-    // Try each selector until we find one that works
-    for (const selector of nameSelectors) {
-        const nameElement = element.querySelector(selector);
-        if (nameElement && nameElement.textContent.trim()) {
-            channelName = nameElement.textContent.toLowerCase().trim();
-            break;
-        }
-    }
-    
-    // Look for channel links - try multiple types
-    const channelLinks = [...element.querySelectorAll('a[href^="/@"], a[href^="/channel/"], a[href*="/@"], a[href*="/channel/"]')];
-    
-    if (channelLinks.length > 0) {
-        for (const link of channelLinks) {
-            const href = link.getAttribute('href') || '';
-            
-            // Extract handle (@username)
-            if (href && href.includes('/@')) {
-                const handleMatch = href.match(/\/@([^\/\?]+)/);
-                if (handleMatch && handleMatch[1]) {
-                    channelHandle = '@' + handleMatch[1].toLowerCase();
-                    break;
-                }
-            }
-            // Extract channel ID
-            else if (href && href.includes('/channel/')) {
-                const channelIdMatch = href.match(/\/channel\/([\w-]+)/);
-                if (channelIdMatch && channelIdMatch[1]) {
-                    channelHandle = 'channel/' + channelIdMatch[1];
-                    break;
-                }
-            }
-        }
-    }
-    
-    // If no handle found from links, try text content that might contain @ handles
-    if (!channelHandle || !channelHandle.startsWith('@')) {
-        const allTexts = Array.from(element.querySelectorAll('yt-formatted-string, span, a'))
-            .map(el => el.textContent.trim())
-            .filter(text => text.includes('@'));
-        
-        for (const text of allTexts) {
-            const handleMatch = text.match(/@(\w+)/);
-            if (handleMatch && handleMatch[1]) {
-                channelHandle = '@' + handleMatch[1].toLowerCase();
-                break;
-            }
-        }
-    }
-    
-    return { channelName, channelHandle };
 }
 
 /**
@@ -280,20 +200,27 @@ function hideVideos(trimmedKeywords, trimmedChannels, rootNode = document) {
                                     ? suggestion.querySelector('ytd-grid-video-renderer, ytd-compact-video-renderer, ytd-video-renderer') || suggestion
                                     : suggestion;
 
-        const videoTitleElement = actualVideoElement.querySelector('#video-title, #video-title-link yt-formatted-string');
+        // Get title element with improved selectors for search results
+        const videoTitleElement = actualVideoElement.querySelector('#video-title, #video-title-link yt-formatted-string, .title yt-formatted-string, h3 yt-formatted-string');
         
-        // Use enhanced channel extraction
-        const channelInfo = extractChannelInfo(actualVideoElement);
-        const channelName = channelInfo.channelName;
-        const channelHandle = channelInfo.channelHandle;
-        
-        // --- SELECTOR REFINEMENT V3 FOR SEARCH RESULTS ---
+        // Get channel name with improved selectors for search results
+        let channelNameElement = actualVideoElement.querySelector(
+            '#channel-name .yt-simple-endpoint, ' + 
+            '#channel-name a.yt-simple-endpoint, ' + 
+            '.ytd-channel-name a.yt-simple-endpoint, ' + 
+            '#channel-name yt-formatted-string, ' +
+            '#text-container yt-formatted-string, ' +
+            '.text-wrapper #text'
+        );
+
+        // --- SELECTOR REFINEMENT FOR SEARCH RESULTS ---
         // Description Snippet: Focus specifically on the metadata snippet classes/container
         const descriptionElement = actualVideoElement.querySelector(
             'yt-formatted-string.metadata-snippet-text, ' + // Primary target class
-            '.metadata-snippet-container yt-formatted-string.metadata-snippet-text'
-            // Keep watch page selector as fallback
-            // ', #description-inline-expander .yt-core-attributed-string'
+            '.metadata-snippet-container yt-formatted-string, ' + // Search result descriptions
+            '.metadata-snippet-container .metadata-snippet-text, ' + // Alternative class
+            '#description-text, ' + // Channel page descriptions
+            '#description-inline-expander .yt-core-attributed-string' // Watch page description
         );
 
         // Hashtags: Look primarily *inside* the found description snippet, fallback to metadata line
@@ -316,32 +243,64 @@ function hideVideos(trimmedKeywords, trimmedChannels, rootNode = document) {
             return;
         }
 
+        // Fallback for channel name
+        if (!channelNameElement && actualVideoElement.querySelector('#channel-name')) { // Added check to avoid error if #channel-name doesn't exist
+            channelNameElement = actualVideoElement.querySelector('yt-formatted-string.ytd-channel-name, #channel-name');
+        }
+
         // Extract text content
         const videoTitle = (videoTitleElement?.textContent || '').toLowerCase().trim();
+        const channelName = (channelNameElement?.textContent || '').toLowerCase().trim();
         const descriptionText = (descriptionElement?.textContent || '').toLowerCase().trim();
         const hashtagRawTexts = Array.from(hashtagElements).map(el => el.textContent || '');
         const hashtagText = hashtagRawTexts.map(ht => ht.replace(/^#/, '').toLowerCase().trim()).filter(Boolean).join(' ');
         const gameCardTitle = (gameCardTitleElement?.textContent || '').toLowerCase().trim();
         const combinedDescAndHashtags = (descriptionText + ' ' + hashtagText).trim().toLowerCase();
 
-        // --- Debugging Log (Comment out when working) ---
+        // Extract channel text (prioritize yt-formatted-string in channel-info)
+        const channelElement = actualVideoElement.querySelector('#channel-info yt-formatted-string, #channel-name yt-formatted-string, #byline-container');
+        const channelText = (channelElement ? channelElement.textContent : '').toLowerCase().trim();
+        
+        let channelHandle = '';
+        // Check for channel links - new improved method to get handle or ID
+        const channelLinks = actualVideoElement.querySelectorAll('a[href^="/@"], a[href^="/channel/"], a[href*="/@"]');
+        
+        if (channelLinks.length > 0) {
+            for (const link of channelLinks) {
+                const href = link.getAttribute('href');
+                
+                // Extract handle (@username)
+                if (href && href.includes('/@')) {
+                    const handleMatch = href.match(/\/@([^\/\?]+)/);
+                    if (handleMatch && handleMatch[1]) {
+                        channelHandle = '@' + handleMatch[1].toLowerCase();
+                        break;
+                    }
+                }
+                // Extract channel ID
+                else if (href && href.includes('/channel/')) {
+                    const channelIdMatch = href.match(/\/channel\/([\w-]+)/);
+                    if (channelIdMatch && channelIdMatch[1]) {
+                        channelHandle = 'channel/' + channelIdMatch[1];
+                        break;
+                    }
+                }
+            }
+        }
+        
+        // Debug logging for troubleshooting
         /*
-        console.log("FilterTube Scan (hideVideos):", {
+        console.log("FilterTube SCAN:", {
+            Element: suggestion,
+            Type: suggestion.tagName,
              Title: videoTitle,
              Channel: channelName,
-             ChannelHandle: channelHandle,
-             DescElementFound: descriptionElement ? 'Yes' : 'No',
-             DescRawHTML: descriptionElement?.outerHTML || 'Desc Element Not Found',
-             DescProcessed: descriptionText,
-             HashtagsElementSelectorContext: descriptionElement ? 'Inside Desc Element' : '#metadata-line',
-             HashtagsRaw: hashtagRawTexts.join(', ') || 'No Hashtags Found',
-             HashtagsProcessed: hashtagText,
-             CombinedDescHashtags: combinedDescAndHashtags,
-             GameCard: gameCardTitle,
-             Element: suggestion
+            Handle: channelHandle,
+            Description: descriptionText,
+            Keywords: trimmedKeywords,
+            MatchesKeyword: trimmedKeywords.some(kw => videoTitle.includes(kw) || descriptionText.includes(kw))
         });
         */
-        // --- End Debugging Log ---
 
         let shouldHide = false; // Determine if it SHOULD be hidden
 
@@ -349,17 +308,30 @@ function hideVideos(trimmedKeywords, trimmedChannels, rootNode = document) {
         if (trimmedChannels.length > 0 && (channelName || channelHandle)) {
             // Use our new channel filtering logic
             if (shouldFilterChannel(channelName, channelHandle, trimmedChannels)) {
-                shouldHide = true;
+            shouldHide = true;
+                // Debug
+                // console.log(`FilterTube: Hiding video with channel: ${channelName || channelHandle}`);
             }
         }
 
         // 2. Check keywords against title, channel name, combined desc/hashtags, game card
         if (!shouldHide && trimmedKeywords.length > 0) {
-            // Use whole word matching for keywords
-            if ((videoTitle && trimmedKeywords.some(keyword => matchesWholeWord(videoTitle, keyword))) || 
-                (channelName && trimmedKeywords.some(keyword => matchesWholeWord(channelName, keyword))) || 
-                (combinedDescAndHashtags && trimmedKeywords.some(keyword => matchesWholeWord(combinedDescAndHashtags, keyword))) || 
-                (gameCardTitle && trimmedKeywords.some(keyword => matchesWholeWord(gameCardTitle, keyword)))) {
+            const checkText = (text) => {
+                if (!text) return false;
+                for (const keyword of trimmedKeywords) {
+                    if (text.includes(keyword)) {
+                        // Debug
+                        // console.log(`FilterTube: Hiding video with keyword "${keyword}" in text: ${text.substring(0, 50)}...`);
+                        return true;
+                    }
+                }
+                return false;
+            };
+            
+            if (checkText(videoTitle) || 
+                checkText(channelName) || 
+                (combinedDescAndHashtags && checkText(combinedDescAndHashtags)) || 
+                checkText(gameCardTitle)) {
                 shouldHide = true;
             }
         }
@@ -373,7 +345,7 @@ function hideVideos(trimmedKeywords, trimmedChannels, rootNode = document) {
             // Check if mix title matches keywords
             if (!shouldHide && trimmedKeywords.length > 0) {
                 if (trimmedKeywords.some(keyword => mixTitle.includes(keyword))) {
-                    console.log("Hiding Mix based on title match: " + mixTitle);
+                    // console.log("Hiding Mix based on title match: " + mixTitle);
                     shouldHide = true;
                 }
             }
@@ -400,72 +372,28 @@ function hideVideos(trimmedKeywords, trimmedChannels, rootNode = document) {
                     // Check song links for artist names
                     trimmedChannels.some(blockedChannel => songTexts.includes(blockedChannel))
                 ) {
-                    console.log("Hiding Mix based on channel match in: " + mixTitle);
+                    // console.log("Hiding Mix based on channel match in: " + mixTitle);
                     shouldHide = true;
                 }
-            }
-        }
-        
-        // Also check for special Mix elements at a higher level if we haven't determined to hide yet
-        if (!shouldHide && suggestion.matches('yt-lockup-metadata-view-model, .yt-lockup-metadata-view-model-wiz')) {
-            // This is a top-level Mix element that might not have been caught by the earlier check
-            const mixTitleText = suggestion.querySelector('.yt-lockup-metadata-view-model-wiz__title')?.textContent.toLowerCase() || '';
-            const mixMetadataText = suggestion.querySelector('.yt-content-metadata-view-model-wiz__metadata-text')?.textContent.toLowerCase() || '';
-            
-            // Collect all text from song links
-            const songLinks = suggestion.querySelectorAll('.yt-core-attributed-string__link');
-            let songTexts = '';
-            songLinks.forEach(link => {
-                songTexts += ' ' + (link.textContent || '').toLowerCase();
-            });
-            
-            // Check if any text matches keywords
-            if (trimmedKeywords.length > 0) {
-                if (
-                    trimmedKeywords.some(keyword => mixTitleText.includes(keyword)) ||
-                    trimmedKeywords.some(keyword => mixMetadataText.includes(keyword)) ||
-                    trimmedKeywords.some(keyword => songTexts.includes(keyword))
-                ) {
-                    console.log("Hiding Mix (top-level) based on keyword match: " + mixTitleText);
-                    shouldHide = true;
-                }
-            }
-            
-            // Check if any text matches channel names
-            if (!shouldHide && trimmedChannels.length > 0) {
-                if (
-                    trimmedChannels.some(blockedChannel => mixTitleText.includes(blockedChannel)) ||
-                    trimmedChannels.some(blockedChannel => mixMetadataText.includes(blockedChannel)) ||
-                    trimmedChannels.some(blockedChannel => songTexts.includes(blockedChannel))
-                ) {
-                    console.log("Hiding Mix (top-level) based on channel match: " + mixTitleText);
-                    shouldHide = true;
-                }
-            }
-        }
-        
-        // Special handling for YouTube Movies content
-        const isMovieContent = suggestion.matches('ytd-movie-renderer');
-        if (isMovieContent && !shouldHide && trimmedKeywords.length > 0) {
-            // For movie content, check the title and description more thoroughly
-            const movieTitle = suggestion.querySelector('#video-title')?.textContent.toLowerCase().trim() || '';
-            const movieDescription = suggestion.querySelector('#description-text')?.textContent.toLowerCase().trim() || '';
-            
-            if (
-                trimmedKeywords.some(keyword => movieTitle.includes(keyword)) ||
-                trimmedKeywords.some(keyword => movieDescription.includes(keyword))
-            ) {
-                shouldHide = true;
             }
         }
 
         // --- INVERTED LOGIC --- Apply .filter-tube-visible only if it should NOT be hidden
         if (!shouldHide) {
             suggestion.classList.add('filter-tube-visible');
+            // Also make any direct child video renderers visible
+            const childRenderer = suggestion.querySelector('ytd-grid-video-renderer, ytd-compact-video-renderer, ytd-video-renderer');
+            if (childRenderer) {
+                childRenderer.classList.add('filter-tube-visible');
+            }
         } else {
-            // Ensure it remains hidden (or explicitly hide if needed, though CSS should handle it)
+            // Ensure it remains hidden
              suggestion.classList.remove('filter-tube-visible');
-             // suggestion.classList.add('hidden-video'); // Optional: Can explicitly add hidden-video too
+            // Also hide any child renderers
+            const childRenderer = suggestion.querySelector('ytd-grid-video-renderer, ytd-compact-video-renderer, ytd-video-renderer');
+            if (childRenderer) {
+                childRenderer.classList.remove('filter-tube-visible');
+            }
         }
     });
 }
@@ -515,7 +443,7 @@ function hidePlaylistsAndShelves(trimmedKeywords, trimmedChannels, rootNode = do
             channelHandle = (handleElement?.textContent || '').toLowerCase().trim();
             
             // Check keywords first
-            if (trimmedKeywords.some(keyword => matchesWholeWord(titleText, keyword))) {
+            if (trimmedKeywords.some(keyword => titleText.includes(keyword))) {
                 shouldHide = true;
             }
             
@@ -526,7 +454,7 @@ function hidePlaylistsAndShelves(trimmedKeywords, trimmedChannels, rootNode = do
         } else if (container.matches('ytd-radio-renderer')) {
             titleElement = container.querySelector('.yt-lockup-metadata-view-model-wiz__title span.yt-core-attributed-string');
             titleText = (titleElement?.textContent || '').toLowerCase().trim();
-            if (trimmedKeywords.some(keyword => matchesWholeWord(titleText, keyword))) {
+            if (trimmedKeywords.some(keyword => titleText.includes(keyword))) {
                 shouldHide = true;
             }
         } else { // Other shelf types
@@ -548,7 +476,7 @@ function hidePlaylistsAndShelves(trimmedKeywords, trimmedChannels, rootNode = do
             }
             
             // Check keywords first
-            if (trimmedKeywords.some(keyword => matchesWholeWord(titleText, keyword))) {
+            if (trimmedKeywords.some(keyword => titleText.includes(keyword))) {
                 shouldHide = true;
             }
             
@@ -633,11 +561,11 @@ function hideChannelElements(trimmedKeywords, trimmedChannels, rootNode = docume
         // First check for keyword filtering
         if (trimmedKeywords.length > 0) {
             if (
-                (channelName && trimmedKeywords.some(keyword => matchesWholeWord(channelName, keyword))) ||
-                (channelHandle && trimmedKeywords.some(keyword => matchesWholeWord(channelHandle, keyword))) ||
-                (descriptionText && trimmedKeywords.some(keyword => matchesWholeWord(descriptionText, keyword)))
+                (channelName && trimmedKeywords.some(keyword => channelName.includes(keyword))) ||
+                (channelHandle && trimmedKeywords.some(keyword => channelHandle.includes(keyword))) ||
+                (descriptionText && trimmedKeywords.some(keyword => descriptionText.includes(keyword)))
             ) {
-                shouldHide = true;
+            shouldHide = true;
             }
         }
         
@@ -645,7 +573,7 @@ function hideChannelElements(trimmedKeywords, trimmedChannels, rootNode = docume
         if (!shouldHide && trimmedChannels.length > 0) {
             shouldHide = shouldFilterChannel(channelName, channelHandle, trimmedChannels);
         }
-        
+
         // --- INVERTED LOGIC --- Apply .filter-tube-visible only if it should NOT be hidden
         if (!shouldHide) {
             channelElement.classList.add('filter-tube-visible');
@@ -687,7 +615,7 @@ function hideShorts(trimmedKeywords, trimmedChannels, rootNode = document) {
         let shouldHide = false; // Determine if it SHOULD be hidden
 
         if ((trimmedChannels.length > 0 && channelText && trimmedChannels.some(blockedChannel => channelText.includes(blockedChannel))) ||
-            (trimmedKeywords.length > 0 && titleText && trimmedKeywords.some(keyword => matchesWholeWord(titleText, keyword)))) {
+            (trimmedKeywords.length > 0 && titleText && trimmedKeywords.some(keyword => titleText.includes(keyword)))) {
             // Optional: check channel text again for keywords if relevant
             // || (trimmedKeywords.length > 0 && channelText && trimmedKeywords.some(keyword => channelText.includes(keyword)))
              shouldHide = true;
@@ -715,34 +643,83 @@ function handleWatchCardFiltering(trimmedKeywords, trimmedChannels) {
     watchCards.forEach(watchCard => {
         // Check if the header is already filtered (might have been done in hideChannelElements)
         const header = watchCard.querySelector('ytd-watch-card-rich-header-renderer');
-        const isHeaderFiltered = header && !header.classList.contains('filter-tube-visible');
         
-        if (isHeaderFiltered) {
-            // If header is filtered, ensure the whole card is hidden
-            watchCard.classList.remove('filter-tube-visible');
-            return;
-        }
+        // Get channel info from the header
+        const channelName = header?.querySelector('#channel-name yt-formatted-string#text')?.textContent.toLowerCase().trim() || '';
+        const channelHandle = header?.querySelector('#badge-row yt-formatted-string')?.textContent.toLowerCase().trim() || '';
         
-        // Extract channel info from the header
-        const channelInfo = extractChannelInfo(header);
-        const channelName = channelInfo.channelName;
-        const channelHandle = channelInfo.channelHandle;
+        // Get title from the hero video
+        const heroVideo = watchCard.querySelector('ytd-watch-card-hero-video-renderer');
+        const heroTitle = heroVideo?.querySelector('#watch-card-title')?.textContent.toLowerCase().trim() || '';
+        const heroSubtitle = heroVideo?.querySelector('#watch-card-subtitle')?.textContent.toLowerCase().trim() || '';
+        
+        // Check the compact videos in vertical list
+        const compactVideos = watchCard.querySelectorAll('ytd-watch-card-compact-video-renderer');
+        
+        // Assume card should be visible by default
+        let shouldHideCard = false;
         
         // Check if channel should be filtered
-        let shouldFilterCard = false;
         if (trimmedChannels.length > 0 && (channelName || channelHandle)) {
             if (shouldFilterChannel(channelName, channelHandle, trimmedChannels)) {
                 console.log(`Filtering watch card for channel: ${channelName || channelHandle}`);
-                shouldFilterCard = true;
+                shouldHideCard = true;
             }
         }
         
-        if (shouldFilterCard) {
+        // Check if any keywords match the hero title
+        if (!shouldHideCard && trimmedKeywords.length > 0 && heroTitle) {
+            if (trimmedKeywords.some(keyword => heroTitle.includes(keyword))) {
+                console.log(`Filtering watch card for keyword match in title: ${heroTitle}`);
+                shouldHideCard = true;
+            }
+        }
+        
+        // Check if all compact videos should be filtered
+        // Only filter the whole card if ALL compact videos would be filtered
+        if (!shouldHideCard && compactVideos.length > 0) {
+            let filteredVideosCount = 0;
+            
+            compactVideos.forEach(video => {
+                const videoTitle = video.querySelector('.title')?.textContent.toLowerCase().trim() || '';
+                const videoChannel = video.querySelector('.byline')?.textContent.toLowerCase().trim() || '';
+                
+                let shouldHideVideo = false;
+                
+                // Check keywords for video title
+                if (trimmedKeywords.length > 0 && videoTitle) {
+                    if (trimmedKeywords.some(keyword => videoTitle.includes(keyword))) {
+                        shouldHideVideo = true;
+                    }
+                }
+                
+                // Check channel name filtering
+                if (!shouldHideVideo && trimmedChannels.length > 0 && videoChannel) {
+                    if (shouldFilterChannel(videoChannel, '', trimmedChannels)) {
+                        shouldHideVideo = true;
+                    }
+                }
+                
+                if (shouldHideVideo) {
+                    filteredVideosCount++;
+                    video.classList.remove('filter-tube-visible');
+                } else {
+                    video.classList.add('filter-tube-visible');
+                }
+            });
+            
+            // If all videos would be filtered, hide the whole card
+            if (filteredVideosCount === compactVideos.length) {
+                shouldHideCard = true;
+            }
+        }
+        
+        if (shouldHideCard) {
             // Hide the entire card and its components
             watchCard.classList.remove('filter-tube-visible');
             
             // Also ensure child components are not visible
-            const components = watchCard.querySelectorAll('ytd-watch-card-rich-header-renderer, ytd-watch-card-section-sequence-renderer, ytd-vertical-watch-card-list-renderer');
+            const components = watchCard.querySelectorAll('ytd-watch-card-rich-header-renderer, ytd-watch-card-section-sequence-renderer, ytd-vertical-watch-card-list-renderer, ytd-watch-card-hero-video-renderer');
             components.forEach(component => {
                 component.classList.remove('filter-tube-visible');
             });
@@ -750,43 +727,40 @@ function handleWatchCardFiltering(trimmedKeywords, trimmedChannels) {
             // Card passes filter, make it visible
             watchCard.classList.add('filter-tube-visible');
             
-            // Also make sure all child components are visible
-            const components = watchCard.querySelectorAll('ytd-watch-card-rich-header-renderer, ytd-watch-card-section-sequence-renderer, ytd-vertical-watch-card-list-renderer');
-            components.forEach(component => {
-                component.classList.add('filter-tube-visible');
-            });
+            // Also make sure all child components are visible (except already filtered videos)
+            if (header) header.classList.add('filter-tube-visible');
+            
+            // Make section sequence renderer visible
+            const sectionSequence = watchCard.querySelector('ytd-watch-card-section-sequence-renderer');
+            if (sectionSequence) sectionSequence.classList.add('filter-tube-visible');
+            
+            // Make vertical list renderer visible
+            const verticalList = watchCard.querySelector('ytd-vertical-watch-card-list-renderer');
+            if (verticalList) verticalList.classList.add('filter-tube-visible');
+            
+            // Make hero video visible if it exists
+            if (heroVideo) heroVideo.classList.add('filter-tube-visible');
         }
-    });
-    
-    // Specifically handle vertical watch card list renderers
-    const verticalLists = document.querySelectorAll('ytd-vertical-watch-card-list-renderer');
-    verticalLists.forEach(list => {
-        // If parent container is filtered, don't override it
-        const parentCard = list.closest('ytd-universal-watch-card-renderer');
-        if (parentCard && !parentCard.classList.contains('filter-tube-visible')) {
-            return;
-        }
-        
-        // Otherwise ensure it's visible
-        list.classList.add('filter-tube-visible');
     });
 }
 
 /**
- * Dedicated function to specifically target mix elements in YouTube's interface
- * This is needed because they have a unique structure that other filters might miss
+ * Dedicated function to specifically target mix/playlist elements
+ * Uses the most aggressive approach to ensure complete hiding
  * @param {string[]} trimmedKeywords - Array of lowercase keywords to filter by
  * @param {string[]} trimmedChannels - Array of lowercase channel names to filter by
  * @param {Node} rootNode - The root element to search within (defaults to document)
  */
-function hideMixElements(trimmedKeywords, trimmedChannels, rootNode = document) {
+function hideMixAndPlaylistElements(trimmedKeywords, trimmedChannels, rootNode = document) {
+    // Target all possible mix/playlist elements
     const mixSelectors = [
-        'yt-lockup-metadata-view-model', 
-        '.yt-lockup-metadata-view-model-wiz',
-        'ytd-mix-renderer',
-        // Add parent wrapper containers that include the thumbnails
-        '.yt-lockup-view-model-wiz',
-        'ytd-radio-renderer'
+        'yt-lockup-view-model',
+        '.yt-lockup-view-model-wiz', 
+        'ytd-rich-item-renderer:has(yt-lockup-view-model)',
+        'ytd-rich-item-renderer:has(.yt-lockup-view-model-wiz)',
+        'ytd-radio-renderer',
+        'ytd-playlist-renderer',
+        'ytd-mix-renderer'
     ].join(', ');
 
     try {
@@ -796,116 +770,191 @@ function hideMixElements(trimmedKeywords, trimmedChannels, rootNode = document) 
             return; // No mix elements found
         }
         
-        console.log(`FilterTube: Found ${mixElements.length} mix elements to check`);
+        console.log(`FilterTube: Found ${mixElements.length} mix/playlist elements to check`);
         
         mixElements.forEach(mixElement => {
-            // Get all text from mix title
-            const titleElement = mixElement.querySelector('.yt-lockup-metadata-view-model-wiz__title, ytd-mix-renderer #video-title, .yt-lockup-view-model-wiz__heading-reset');
-            const titleText = (titleElement?.textContent || '').toLowerCase().trim();
+            // Find the title - could be in several different places
+            const titleElements = mixElement.querySelectorAll('.yt-lockup-metadata-view-model-wiz__title, .yt-lockup-view-model-wiz__heading-reset, h3 span, .yt-lockup-metadata-view-model-wiz__heading-reset h3 a span');
             
-            // Get text from metadata lines
-            const metadataElement = mixElement.querySelector('.yt-content-metadata-view-model-wiz__metadata-text, .yt-lockup-view-model-wiz__metadata');
-            const metadataText = (metadataElement?.textContent || '').toLowerCase().trim();
+            let titleText = '';
+            for (const el of titleElements) {
+                const text = el.textContent.toLowerCase().trim();
+                if (text) {
+                    titleText += ' ' + text;
+                }
+            }
+            titleText = titleText.trim();
             
-            // Get all text from song links
-            const songLinks = mixElement.querySelectorAll('.yt-core-attributed-string__link');
-            let songTexts = '';
-            let channelHandles = [];
+            // Look for channel names/artists - often in metadata content
+            const metadataElements = mixElement.querySelectorAll('.yt-content-metadata-view-model-wiz__metadata-text, .yt-lockup-view-model-wiz__metadata span');
             
-            songLinks.forEach(link => {
-                const linkText = (link.textContent || '').toLowerCase();
-                songTexts += ' ' + linkText;
-                
-                // Look for channel handles in links
-                const href = link.getAttribute('href');
-                if (href && href.includes('/@')) {
-                    const handleMatch = href.match(/\/@([^\/\?]+)/);
-                    if (handleMatch && handleMatch[1]) {
-                        channelHandles.push('@' + handleMatch[1].toLowerCase());
+            let channelText = '';
+            for (const el of metadataElements) {
+                const text = el.textContent.toLowerCase().trim();
+                if (text) {
+                    channelText += ' ' + text;
+                }
+            }
+            channelText = channelText.trim();
+            
+            // Look for channel handle links
+            let channelHandle = '';
+            const channelLinks = mixElement.querySelectorAll('a[href^="/@"], a[href^="/channel/"]');
+            if (channelLinks.length > 0) {
+                for (const link of channelLinks) {
+                    const href = link.getAttribute('href');
+                    if (href && href.includes('/@')) {
+                        channelHandle = '@' + href.split('/@')[1].split('/')[0].toLowerCase();
+                        break;
+                    } else if (href && href.includes('/channel/')) {
+                        channelHandle = 'channel/' + href.split('/channel/')[1].split('/')[0].toLowerCase();
+                        break;
                     }
                 }
-            });
+            }
+            
+            // Debug log
+            console.log(`FilterTube Mix Check: Title: "${titleText}", Channels: "${channelText}", Handle: "${channelHandle}"`);
             
             let shouldHide = false;
             
-            // Check if any text matches keywords
-            if (trimmedKeywords.length > 0) {
-                if (
-                    (titleText && trimmedKeywords.some(keyword => matchesWholeWord(titleText, keyword))) ||
-                    (metadataText && trimmedKeywords.some(keyword => matchesWholeWord(metadataText, keyword))) ||
-                    (songTexts && trimmedKeywords.some(keyword => matchesWholeWord(songTexts, keyword)))
-                ) {
-                    console.log(`FilterTube: Mix "${titleText}" matching keywords - hiding`);
-                    shouldHide = true;
-                }
-            }
-            
-            // Check if any text matches channel names (use exact matching for handles)
-            if (!shouldHide && trimmedChannels.length > 0) {
-                // Check for channel names in metadata and title using partial matching
-                if (
-                    (titleText && trimmedChannels.some(blockedChannel => !blockedChannel.startsWith('@') && titleText.includes(blockedChannel))) ||
-                    (metadataText && trimmedChannels.some(blockedChannel => !blockedChannel.startsWith('@') && metadataText.includes(blockedChannel))) ||
-                    (songTexts && trimmedChannels.some(blockedChannel => !blockedChannel.startsWith('@') && songTexts.includes(blockedChannel)))
-                ) {
-                    console.log(`FilterTube: Mix "${titleText}" matching channel name filter - hiding`);
-                    shouldHide = true;
-                }
-                
-                // Check handles with exact matching
-                if (!shouldHide && channelHandles.length > 0) {
-                    for (const handle of channelHandles) {
-                        if (shouldFilterChannel('', handle, trimmedChannels)) {
-                            console.log(`FilterTube: Mix "${titleText}" matching handle ${handle} - hiding`);
-                            shouldHide = true;
-                            break;
-                        }
+            // 1. Check keywords in title
+            if (!shouldHide && trimmedKeywords.length > 0 && titleText) {
+                for (const keyword of trimmedKeywords) {
+                    if (titleText.includes(keyword)) {
+                        console.log(`FilterTube: Hiding mix "${titleText}" - title contains keyword: ${keyword}`);
+                        shouldHide = true;
+                        break;
                     }
                 }
             }
             
-            // Apply visibility classes
-            if (!shouldHide) {
-                mixElement.classList.add('filter-tube-visible');
-                
-                // Preserve special layout classes when restoring visibility
-                if (mixElement.classList.contains('yt-lockup-view-model-wiz--horizontal')) {
-                    // Make sure to preserve the horizontal layout
-                    const imageContainer = mixElement.querySelector('.yt-lockup-view-model-wiz__content-image');
-                    const metadataContainer = mixElement.querySelector('.yt-lockup-view-model-wiz__metadata');
-                    
-                    // Ensure these elements are also visible
-                    if (imageContainer) imageContainer.classList.add('filter-tube-visible');
-                    if (metadataContainer) metadataContainer.classList.add('filter-tube-visible');
-                }
-                
-                // Handle parent containers properly
-                const parentContainer = mixElement.closest('.yt-lockup-view-model-wiz, ytd-radio-renderer, ytd-mix-renderer');
-                if (parentContainer && parentContainer !== mixElement) {
-                    parentContainer.classList.add('filter-tube-visible');
-                    
-                    // If parent has horizontal layout, preserve it
-                    if (parentContainer.classList.contains('yt-lockup-view-model-wiz--horizontal')) {
-                        // Ensure child components maintain proper layout
-                        const parentImageContainer = parentContainer.querySelector('.yt-lockup-view-model-wiz__content-image');
-                        const parentMetadataContainer = parentContainer.querySelector('.yt-lockup-view-model-wiz__metadata');
-                        
-                        if (parentImageContainer) parentImageContainer.classList.add('filter-tube-visible');
-                        if (parentMetadataContainer) parentMetadataContainer.classList.add('filter-tube-visible');
+            // 2. Check keywords in metadata (artist names, etc)
+            if (!shouldHide && trimmedKeywords.length > 0 && channelText) {
+                for (const keyword of trimmedKeywords) {
+                    if (channelText.includes(keyword)) {
+                        console.log(`FilterTube: Hiding mix "${titleText}" - metadata contains keyword: ${keyword}`);
+                        shouldHide = true;
+                        break;
                     }
                 }
-            } else {
+            }
+            
+            // 3. Check channel filtering by name/handle
+            if (!shouldHide && trimmedChannels.length > 0 && (channelText || channelHandle)) {
+                if (shouldFilterChannel(channelText, channelHandle, trimmedChannels)) {
+                    console.log(`FilterTube: Hiding mix "${titleText}" - channel match`);
+                    shouldHide = true;
+                }
+            }
+            
+            // Get parent rich-item-renderer to completely hide it if needed
+            const parentRichItem = mixElement.closest('ytd-rich-item-renderer');
+            
+            if (shouldHide) {
+                // Ultra-aggressive hiding approach
+
+                // 1. Hide the element itself with display: none
                 mixElement.classList.remove('filter-tube-visible');
+                mixElement.style.display = 'none';
+                mixElement.style.visibility = 'hidden';
+                mixElement.style.opacity = '0';
+                mixElement.style.position = 'absolute';
+                mixElement.style.width = '0';
+                mixElement.style.height = '0';
                 
-                // If this is a child element (e.g., metadata), also hide parent container with thumbnail
-                const parentContainer = mixElement.closest('.yt-lockup-view-model-wiz, ytd-radio-renderer, ytd-mix-renderer');
-                if (parentContainer && parentContainer !== mixElement) {
-                    parentContainer.classList.remove('filter-tube-visible');
+                // 2. If parent exists, hide it with display: none
+                if (parentRichItem) {
+                    parentRichItem.classList.remove('filter-tube-visible');
+                    parentRichItem.style.display = 'none';
+                    parentRichItem.style.visibility = 'hidden';
+                    parentRichItem.style.opacity = '0';
+                    parentRichItem.style.position = 'absolute';
+                    parentRichItem.style.width = '0';
+                    parentRichItem.style.height = '0';
+                }
+                
+                // 3. Direct targeting of image elements
+                const allImages = mixElement.querySelectorAll('img');
+                allImages.forEach(img => {
+                    img.style.display = 'none';
+                    img.style.visibility = 'hidden';
+                    img.style.opacity = '0';
+                    img.style.width = '0';
+                    img.style.height = '0';
+                });
+                
+                // 4. Target collection stacks specifically (the mix thumbnails)
+                const collectionElements = mixElement.querySelectorAll(
+                    'yt-collection-thumbnail-view-model, ' +
+                    '.yt-collection-thumbnail-view-model, ' +
+                    'yt-collections-stack, ' +
+                    '.collections-stack-wiz, ' +
+                    '.collections-stack-wiz__collection-stack1, ' +
+                    '.collections-stack-wiz__collection-stack2'
+                );
+                
+                collectionElements.forEach(el => {
+                    el.style.display = 'none';
+                    el.style.visibility = 'hidden';
+                    el.style.opacity = '0';
+                    el.style.position = 'absolute';
+                    el.style.width = '0';
+                    el.style.height = '0';
+                });
+                
+                // 5. Target links that might be loading mix/playlist content
+                const playlistLinks = mixElement.querySelectorAll('a[href*="&list="], a[href*="&start_radio="]');
+                playlistLinks.forEach(link => {
+                    link.style.display = 'none';
+                    link.style.visibility = 'hidden';
+                    link.style.opacity = '0';
+                });
+                
+                // 6. Use the HTML dataset to mark as filtered
+                mixElement.dataset.filterTubeHidden = 'true';
+                if (parentRichItem) {
+                    parentRichItem.dataset.filterTubeHidden = 'true';
+                }
+                
+                // 7. Hide all child elements as a last resort
+                const allChildren = mixElement.querySelectorAll('*');
+                allChildren.forEach(child => {
+                    child.style.display = 'none';
+                });
+                
+            } else {
+                // Make the element visible
+                mixElement.classList.add('filter-tube-visible');
+                mixElement.style.display = '';
+                mixElement.style.visibility = '';
+                mixElement.style.opacity = '';
+                mixElement.style.position = '';
+                mixElement.style.width = '';
+                mixElement.style.height = '';
+                
+                delete mixElement.dataset.filterTubeHidden;
+                
+                // Also make parent visible if it exists
+                if (parentRichItem) {
+                    parentRichItem.classList.add('filter-tube-visible');
+                    parentRichItem.style.display = '';
+                    parentRichItem.style.visibility = '';
+                    parentRichItem.style.opacity = '';
+                    parentRichItem.style.position = '';
+                    parentRichItem.style.width = '';
+                    parentRichItem.style.height = '';
+                    
+                    delete parentRichItem.dataset.filterTubeHidden;
                 }
             }
         });
+        
+        // Force browser layout recalculation to remove gaps
+        document.body.offsetHeight;
+        
     } catch (e) {
-        console.error('FilterTube: Error finding Mix elements:', e);
+        console.error('FilterTube: Error finding mix elements:', e);
     }
 }
 
@@ -918,15 +967,80 @@ const FILTER_DELAY = 500; // Shortened delay slightly, as initial hide is faster
  * Main filtering function called on load and on changes.
  * Applies the inverted logic (revealing wanted content).
  */
-function applyFilters(keywords, channels) {
-    const trimmedKeywords = (keywords || '').split(',')
-                                         .map(keyword => keyword.trim().toLowerCase())
-                                         .filter(Boolean);
-    const trimmedChannels = (channels || '').split(',')
-                                          .map(channel => channel.trim().toLowerCase())
-                                          .filter(Boolean);
+function applyFilters() {
+    console.log('FilterTube: Applying filters');
+    
+    // Get the filter values from global variables to avoid reference issues
+    const keywords = (filterKeywords || '').split(',')
+        .map(k => k.trim())
+        .filter(k => k.length > 0)
+        .map(k => k.toLowerCase());
+    
+    const channels = (filterChannels || '').split(',')
+        .map(c => c.trim())
+        .filter(c => c.length > 0)
+        .map(c => c.toLowerCase());
+    
+    console.log(`FilterTube: Filtering with keywords=[${keywords.join(', ')}], channels=[${channels.join(', ')}]`);
+    
+    // If no filters set, show all elements
+    if (keywords.length === 0 && channels.length === 0) {
+        console.log('FilterTube: No filters set, showing all elements');
+        showAllElements();
+        return;
+    }
+    
+    // Apply filters to different element types
+    hideVideos(keywords, channels);
+    hidePlaylistsAndShelves(keywords, channels);
+    hideChannelElements(keywords, channels);
+    hideShorts(keywords, channels);
+    hideMixAndPlaylistElements(keywords, channels);
+    
+    // Special handlers for sections that need extra processing
+    handleWatchCardFiltering(keywords, channels);
+    
+    // Handle comment filtering
+    if (window.location.pathname.startsWith('/watch')) {
+        applyCommentFiltering();
+    }
+    
+    // Fix layout issues after filtering
+    if (window.filterTubeLayout) {
+        console.log('FilterTube: Applying layout fixes after filtering');
+        
+        // Fix search results layout
+        if (typeof window.filterTubeLayout.fixSearchResultsLayout === 'function') {
+            window.filterTubeLayout.fixSearchResultsLayout();
+        }
+        
+        // Fix shorts layout 
+        if (typeof window.filterTubeLayout.fixShortsLayout === 'function') {
+            window.filterTubeLayout.fixShortsLayout();
+        }
+        
+        // Fix homepage shorts specifically
+        if (typeof window.filterTubeLayout.fixHomepageShorts === 'function') {
+            window.filterTubeLayout.fixHomepageShorts();
+        }
+        
+        // Apply any general layout fixes
+        if (typeof window.filterTubeLayout.fixLayoutAfterFiltering === 'function') {
+            window.filterTubeLayout.fixLayoutAfterFiltering();
+        }
+    } else {
+        // Fallback if layout module isn't available
+        console.log('FilterTube: Layout module not available, using fallback');
+        fixSearchResultsLayout();
+    }
+    
+    console.log('FilterTube: Filters applied successfully');
+}
 
-    // Combine all relevant selectors
+/**
+ * Shows all elements by adding the .filter-tube-visible class to everything
+ */
+function showAllElements() {
     const allSelectors = [
         'ytd-video-renderer',
         'ytd-compact-video-renderer',
@@ -950,318 +1064,40 @@ function applyFilters(keywords, channels) {
         'ytd-watch-card-rich-header-renderer',
         'ytd-watch-card-section-sequence-renderer',
         'ytd-vertical-watch-card-list-renderer',
-        'yt-lockup-metadata-view-model',
-        '.yt-lockup-metadata-view-model-wiz',
-        '.yt-lockup-view-model-wiz'
+        'ytd-playlist-renderer',
+        'yt-lockup-view-model',
+        '.yt-lockup-view-model-wiz',
+        '.yt-lockup-metadata-view-model-wiz'
     ].join(', ');
 
-    // If no filters are set, reveal ALL initially hidden items
-    if (trimmedKeywords.length === 0 && trimmedChannels.length === 0) {
         try {
             document.querySelectorAll(allSelectors).forEach(el => {
                 el.classList.add('filter-tube-visible');
-                el.classList.remove('hidden-video'); // Clean up old class if present
-            });
+            el.classList.remove('hidden-video'); // Clean up old class
             
-            // Fix layout issues after revealing everything
-            fixSearchResultsLayout();
-        } catch (e) {
-             console.error("FilterTube: Error revealing all elements:", e);
-        }
-        return; // Stop processing if no filters
-    }
-
-    // Run filtering logic for each type of element
-    // These functions now add .filter-tube-visible if item should be shown
-    hideVideos(trimmedKeywords, trimmedChannels); // Renaming is misleading now, but keeps structure
-    hidePlaylistsAndShelves(trimmedKeywords, trimmedChannels);
-    hideChannelElements(trimmedKeywords, trimmedChannels);
-    hideShorts(trimmedKeywords, trimmedChannels);
-    hideMixElements(trimmedKeywords, trimmedChannels); // Add our new Mix elements filter
-    
-    // Special handlers for sections that need extra processing
-    handleWatchCardFiltering(trimmedKeywords, trimmedChannels);
-    handlePreviouslyWatchedSection(trimmedKeywords, trimmedChannels);
-    handleHomepageElements(trimmedKeywords, trimmedChannels);
-    
-    // Fix any layout issues
-    fixSearchResultsLayout();
-}
-
-/**
- * Special handler for the "Previously Watched" section which may have different DOM
- * @param {string[]} trimmedKeywords - Array of lowercase keywords to filter by
- * @param {string[]} trimmedChannels - Array of lowercase channel names to filter by
- */
-function handlePreviouslyWatchedSection(trimmedKeywords, trimmedChannels) {
-    // Find sections that might contain "Previously Watched" videos
-    const sections = document.querySelectorAll('ytd-item-section-renderer');
-    
-    sections.forEach(section => {
-        // Find all video renderers inside this section
-        const videos = section.querySelectorAll('ytd-video-renderer');
-        
-        videos.forEach(video => {
-            // Extract channel information more aggressively
-            const channelInfo = extractChannelInfo(video);
-            const channelName = channelInfo.channelName;
-            const channelHandle = channelInfo.channelHandle;
-            
-            // Extract title
-            const videoTitle = video.querySelector('#video-title')?.textContent.toLowerCase().trim();
-            
-            // Check if should hide
-            let shouldHide = false;
-            
-            // Debug log (uncomment when needed)
-            //console.log(`FilterTube Debug: Checking previously watched video - Title: ${videoTitle}, Channel: ${channelName}, Handle: ${channelHandle}`);
-            
-            // Check against keywords
-            if (trimmedKeywords.length > 0 && videoTitle) {
-                if (trimmedKeywords.some(keyword => matchesWholeWord(videoTitle, keyword))) {
-                    shouldHide = true;
-                }
-            }
-            
-            // Check against channels
-            if (!shouldHide && trimmedChannels.length > 0 && (channelName || channelHandle)) {
-                // Use our new channel filtering logic
-                if (shouldFilterChannel(channelName, channelHandle, trimmedChannels)) {
-                    shouldHide = true;
-                }
-            }
-            
-            // Apply visibility class
-            if (!shouldHide) {
-                video.classList.add('filter-tube-visible');
-            } else {
-                video.classList.remove('filter-tube-visible');
-                // Also hide any parent sections if needed
-                const parentSection = video.closest('ytd-item-section-renderer');
-                if (parentSection && parentSection.classList.contains('ytd-previously-watched')) {
-                    parentSection.classList.remove('filter-tube-visible');
-                }
-            }
+            // Remove any inline styles that might be causing visibility issues
+            el.style.display = '';
+            el.style.visibility = '';
+            el.style.position = '';
+            el.style.width = '';
+            el.style.height = '';
+            el.style.margin = '';
+            el.style.padding = '';
+            el.style.overflow = '';
         });
-    });
-}
-
-/**
- * Special handler for homepage items which often have unique structures
- * @param {string[]} trimmedKeywords - Array of lowercase keywords to filter by
- * @param {string[]} trimmedChannels - Array of lowercase channel names to filter by
- */
-function handleHomepageElements(trimmedKeywords, trimmedChannels) {
-    // Target rich-item-renderers which are commonly used on homepage
-    const homepageItems = document.querySelectorAll('ytd-rich-item-renderer, ytd-rich-grid-renderer ytd-rich-grid-media');
-    
-    homepageItems.forEach(item => {
-        // Find channel information
-        const channelInfo = extractChannelInfo(item);
-        const channelName = channelInfo.channelName;
-        const channelHandle = channelInfo.channelHandle;
         
-        // Extract video title
-        const videoTitle = item.querySelector('#video-title, #video-title-link yt-formatted-string')?.textContent.toLowerCase().trim();
-        
-        // Check if should hide
-        let shouldHide = false;
-        
-        // Debug log
-        //console.log(`FilterTube Home: Title: ${videoTitle}, Channel: ${channelName}, Handle: ${channelHandle}`);
-        
-        // Check against keywords
-        if (!shouldHide && trimmedKeywords.length > 0 && videoTitle) {
-            if (trimmedKeywords.some(keyword => matchesWholeWord(videoTitle, keyword))) {
-                shouldHide = true;
-            }
-        }
-        
-        // Check against channels
-        if (!shouldHide && trimmedChannels.length > 0 && (channelName || channelHandle)) {
-            // Use our new channel filtering logic
-            if (shouldFilterChannel(channelName, channelHandle, trimmedChannels)) {
-                shouldHide = true;
-            }
-        }
-        
-        // Apply visibility
-        if (!shouldHide) {
-            item.classList.add('filter-tube-visible');
+        // Fix layout after showing all elements
+        if (window.filterTubeLayout && typeof window.filterTubeLayout.fixLayoutAfterFiltering === 'function') {
+            window.filterTubeLayout.fixLayoutAfterFiltering();
         } else {
-            item.classList.remove('filter-tube-visible');
+            fixSearchResultsLayout();
         }
-    });
-}
-
-/**
- * Callback function for the MutationObserver.
- * It throttles the execution of applyFilters.
- * @param {MutationRecord[]} mutations - An array of mutation records.
- * @param {MutationObserver} observer - The observer instance.
- */
-const observerCallback = (mutations, observer) => {
-    // Check for specific high-priority elements that need immediate filtering
-    let highPriorityChange = false;
-    let potentiallyRelevantChange = false;
-    
-    for (const mutation of mutations) {
-        if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-            for (const node of mutation.addedNodes) {
-                if (node.nodeType !== Node.ELEMENT_NODE) continue;
-                
-                // High priority selectors - needs immediate handling
-                const highPrioritySelectors = [
-                    'ytd-rich-item-renderer', // Home page items
-                    'ytd-grid-video-renderer', // Channel page videos
-                    'ytd-video-renderer', // Search results
-                    'ytd-item-section-renderer', // Previously watched section
-                    '.yt-lockup-view-model-wiz', // Mix elements with thumbnails
-                    'ytd-universal-watch-card-renderer', // Watch cards
-                    'ytd-radio-renderer', // Radio/mix cards
-                ];
-                
-                // Check if the node is a high priority element
-                if (highPrioritySelectors.some(selector => 
-                    node.matches?.(selector) || node.querySelector?.(selector)
-                )) {
-                    highPriorityChange = true;
-                    break;
-                }
-                
-                // Regular check for any potentially relevant element
-                if (node.matches?.(allSelectors) || node.querySelector?.(allSelectors)) {
-                    potentiallyRelevantChange = true;
-                }
-            }
-        }
-        if (highPriorityChange) break;
+        
+        console.log('FilterTube: All elements shown');
+        } catch (e) {
+        console.error('FilterTube: Error showing all elements:', e);
     }
-
-    // If high priority elements were added, filter immediately
-    if (highPriorityChange) {
-        console.log("FilterTube: High priority elements detected - filtering immediately");
-        // Cancel any pending throttled filtering
-        if (throttleTimeout) {
-            clearTimeout(throttleTimeout);
-            throttleTimeout = null;
-        }
-        // Apply filters immediately
-        applyFilters(filterKeywords, filterChannels);
-        return;
-    }
-    
-    if (!potentiallyRelevantChange) return; // Skip if no relevant nodes were likely added
-    if (throttleTimeout) return; // Throttle if already scheduled
-
-    throttleTimeout = setTimeout(() => {
-        console.log("FilterTube: Applying filters due to potential relevant DOM change.");
-        applyFilters(filterKeywords, filterChannels);
-        throttleTimeout = null;
-    }, FILTER_DELAY);
-};
-
-// Create a MutationObserver instance with the callback.
-const observer = new MutationObserver(observerCallback);
-
-// Configuration for the observer:
-const observerConfig = {
-    childList: true,
-    subtree: true,
-    attributes: true, // Also observe attribute changes that might reveal content
-    attributeFilter: ['class'] // Only care about class changes which reveal visibility
-};
-
-// Get all selectors for observer check (defined within applyFilters scope)
-const allSelectors = [
-    'ytd-video-renderer',
-    'ytd-compact-video-renderer',
-    'ytd-grid-video-renderer',
-    'ytd-rich-item-renderer',
-    'ytd-watch-card-compact-video-renderer',
-    'ytd-channel-video-player-renderer',
-    'ytd-shelf-renderer',
-    'ytd-reel-shelf-renderer',
-    'ytd-horizontal-card-list-renderer',
-    'ytd-universal-watch-card-renderer',
-    'ytd-radio-renderer',
-    'ytd-channel-renderer',
-    'ytd-grid-channel-renderer',
-    'ytd-reel-item-renderer',
-    'ytm-shorts-lockup-view-model',
-    'ytd-movie-renderer',
-    'ytd-mix-renderer',
-    'ytd-reel-video-renderer',
-    'ytd-search-refinement-card-renderer',
-    'ytd-watch-card-rich-header-renderer',
-    'ytd-watch-card-section-sequence-renderer',
-    'ytd-vertical-watch-card-list-renderer',
-    'yt-lockup-metadata-view-model',
-    '.yt-lockup-metadata-view-model-wiz',
-    '.yt-lockup-view-model-wiz'
-].join(', ');
-
-// Start observing the document body
-// Wait for body to exist if running at document_start
-if (document.body) {
-    observer.observe(document.body, observerConfig);
-} else {
-    document.addEventListener('DOMContentLoaded', () => {
-        if(document.body) { // Double check
-             observer.observe(document.body, observerConfig);
-        }
-    });
 }
-
-// Initial load and storage change handling
-function loadAndApplyInitialFilters() {
-    chrome.storage.local.get(['filterKeywords', 'filterChannels'], function (items) {
-        filterKeywords = items.filterKeywords || '';
-        filterChannels = items.filterChannels || '';
-        applyFilters(filterKeywords, filterChannels); // Initial filter application
-    });
-}
-
-// Load initial settings when the script runs (now document_start)
-// Wait slightly for the body to likely exist, or use DOMContentLoaded
-if (document.readyState === 'loading') { // Or 'interactive' or 'complete'
-    document.addEventListener('DOMContentLoaded', loadAndApplyInitialFilters);
-} else {
-    loadAndApplyInitialFilters(); // Already loaded
-}
-
-// Listen for changes in chrome.storage.local
-chrome.storage.onChanged.addListener(function (changes, areaName) {
-    if (areaName === 'local') {
-        let needsRefilter = false;
-        if (changes.filterKeywords) {
-            filterKeywords = changes.filterKeywords.newValue || '';
-            needsRefilter = true;
-        }
-        if (changes.filterChannels) {
-            filterChannels = changes.filterChannels.newValue || '';
-            needsRefilter = true;
-        }
-        if (needsRefilter) {
-            applyFilters(filterKeywords, filterChannels);
-        }
-    }
-});
-
-// Fallback interval check - less critical now but can remain as safety net
-const intervalCheck = setInterval(() => {
-    // console.log("FilterTube: Applying filters via interval check.");
-    applyFilters(filterKeywords, filterChannels);
-}, FILTER_DELAY * 5); // Run much less frequently
-
-window.addEventListener('unload', () => {
-    if (observer) observer.disconnect();
-    if (intervalCheck) clearInterval(intervalCheck);
-    if (throttleTimeout) clearTimeout(throttleTimeout);
-    console.log("FilterTube: Cleaned up observer and interval.");
-});
-
-console.log("FilterTube Content Script Loaded (run_at=document_start)");
 
 /**
  * Applies comment filtering based on user preferences
@@ -1428,591 +1264,253 @@ function shouldFilterChannel(channelName, channelHandle, trimmedChannels) {
         return false;
     }
     
-    // Debug log for channel ID filtering
-    console.log(`FilterTube debug - channelName: "${channelName}", channelHandle: "${channelHandle}"`);
+    // Normalize inputs
+    channelName = (channelName || '').toLowerCase().trim();
+    channelHandle = (channelHandle || '').toLowerCase().trim();
     
-    // Explicit check for Travis Scott channel ID (fallback solution)
-    if (channelHandle && (
-        channelHandle.includes('UCtxdfwb9wfkoGocVUAJ-Bmg') || 
-        channelHandle.includes('channel/UCtxdfwb9wfkoGocVUAJ-Bmg') ||
-        channelHandle.includes('@TravisScottXX'))) {
-        console.log('FilterTube: Explicitly blocked Travis Scott channel');
-        return true;
+    // Detect if we have a channel ID (looks like /channel/UC...)
+    let channelId = '';
+    if (channelHandle.includes('/channel/')) {
+        const match = channelHandle.match(/\/channel\/([\w-]+)/);
+        if (match && match[1]) {
+            channelId = match[1].toLowerCase();
+        }
+    } else if (channelHandle.startsWith('channel/')) {
+        channelId = channelHandle.replace('channel/', '').toLowerCase();
     }
     
-    // Check channel name with partial matching (traditional behavior)
-    if (channelName) {
-        for (const blockedChannel of trimmedChannels) {
-            // Skip @ handles and channel IDs when checking channel name
-            if (blockedChannel.startsWith('@') || blockedChannel.startsWith('channel/')) continue;
+    // Debug log when needed
+    // console.log(`FilterTube Debug: Checking channel - Name: "${channelName}", Handle: "${channelHandle}", ID: "${channelId}"`);
+    
+    for (const blockedChannel of trimmedChannels) {
+        const blockedValue = blockedChannel.toLowerCase().trim();
+        
+        // Case 1: Blocked value is a handle (starts with @)
+        if (blockedValue.startsWith('@')) {
+            // Remove @ for comparison
+            const blockedHandle = blockedValue.substring(1);
             
+            // If channelHandle has @ remove it for comparison
+            const normalizedHandle = channelHandle.startsWith('@') 
+                ? channelHandle.substring(1) 
+                : channelHandle;
+                
+            // EXACT match for handles - must match completely, not partial
+            if (normalizedHandle === blockedHandle) {
+                console.log(`FilterTube: Filtering channel with exact handle match: ${channelHandle} = ${blockedValue}`);
+                return true;
+            }
+        }
+        // Case 2: Blocked value is a channel ID (starts with "channel/")
+        else if (blockedValue.startsWith('channel/')) {
+            const blockedId = blockedValue.replace('channel/', '');
+            
+            // EXACT match for channel IDs - must match completely
+            if (channelId && channelId === blockedId) {
+                console.log(`FilterTube: Filtering channel with exact ID match: ${channelId} = ${blockedId}`);
+                return true;
+            }
+        }
+        // Case 3: Blocked value is a regular channel name (partial match)
+        else {
             // Use partial matching for regular channel names
-            if (channelName.includes(blockedChannel)) {
+            if (channelName && channelName.includes(blockedValue)) {
+                console.log(`FilterTube: Filtering channel with name match: ${channelName} contains ${blockedValue}`);
                 return true;
             }
         }
     }
     
-    // Check channel handle with exact matching
-    if (channelHandle) {
-        const cleanHandle = channelHandle.replace(/^@/, '').toLowerCase();
-        
-        for (const blockedChannel of trimmedChannels) {
-            // If blocked item starts with @, it's a handle - use exact match
-            if (blockedChannel.startsWith('@')) {
-                const cleanBlockedHandle = blockedChannel.replace(/^@/, '').toLowerCase();
-                
-                // Exact match only - normalized to remove @ symbol
-                if (cleanHandle === cleanBlockedHandle) {
-                    console.log(`Filtering exactly matched handle: ${channelHandle} = ${blockedChannel}`);
-                    return true;
-                }
-            }
-            // Check for channel ID format with more robust matching
-            else if (blockedChannel.startsWith('channel/')) {
-                const blockedChannelId = blockedChannel.replace('channel/', '');
-                
-                // Log for debugging channel ID issues
-                console.log(`FilterTube checking channelID: Comparing '${channelHandle}' with blocked ID '${blockedChannelId}'`);
-                
-                // More aggressive check for channel ID - use includes for more flexibility
-                if (channelHandle.includes(blockedChannelId)) {
-                    console.log(`FilterTube: Blocked channel by ID match in handle: ${channelHandle} contains ${blockedChannelId}`);
-                    return true;
-                }
-                
-                // Also check if handle contains "/channel/" format and extract ID for comparison
-                const channelIdMatch = channelHandle.match(/channel\/([\w-]+)/);
-                if (channelIdMatch && channelIdMatch[1]) {
-                    const channelId = channelIdMatch[1];
-                    console.log(`FilterTube extracted ID: '${channelId}' from '${channelHandle}'`);
-                    
-                    // Exact match for channel IDs
-                    if (channelId === blockedChannelId) {
-                        console.log(`FilterTube: Blocked channel by exact ID match: ${channelId}`);
-                        return true;
-                    }
-                }
-                
-                // Additional check for bare channel ID string without "channel/" prefix
-                if (channelHandle === blockedChannelId) {
-                    console.log(`FilterTube: Blocked channel by exact ID match (no prefix): ${channelHandle}`);
-                    return true;
-                }
-            }
-        }
-    }
-    
     return false;
 }
 
-/**
- * Special function to fix layout issues in search results after filtering
- * Especially for Mix elements that need horizontal layout restored
- */
+// Replace the existing function with a wrapper that calls the layout module
 function fixSearchResultsLayout() {
-    // Attempt to restore horizontal layouts in search results
-    const searchMixElements = document.querySelectorAll('.yt-lockup-view-model-wiz--horizontal');
+    // Check if our layout module is loaded
+    if (window.filterTubeLayout && typeof window.filterTubeLayout.fixSearchResultsLayout === 'function') {
+        // Call the layout module
+        window.filterTubeLayout.fixSearchResultsLayout();
+    } else {
+        console.warn('FilterTube: Layout module not loaded yet. Layout fixes may not work properly.');
+        // Try again after a short delay in case the script is still loading
+        setTimeout(() => {
+            if (window.filterTubeLayout && typeof window.filterTubeLayout.fixSearchResultsLayout === 'function') {
+                window.filterTubeLayout.fixSearchResultsLayout();
+            }
+        }, 500);
+    }
+}
+
+console.log("FilterTube Content Script Loaded (run_at=document_start)");
+
+/**
+ * Callback function for the MutationObserver.
+ * It throttles the execution of applyFilters.
+ * @param {MutationRecord[]} mutations - An array of mutation records.
+ * @param {MutationObserver} observer - The observer instance.
+ */
+const observerCallback = (mutations, observer) => {
+    // Check for specific high-priority elements that need immediate filtering
+    let highPriorityChange = false;
+    let potentiallyRelevantChange = false;
     
-    searchMixElements.forEach(mixElement => {
-        if (mixElement.classList.contains('filter-tube-visible')) {
-            // Ensure content image and metadata containers are visible too
-            const imageContainer = mixElement.querySelector('.yt-lockup-view-model-wiz__content-image');
-            const metadataContainer = mixElement.querySelector('.yt-lockup-view-model-wiz__metadata');
-            
-            if (imageContainer) {
-                imageContainer.style.display = 'block';
-                imageContainer.classList.add('filter-tube-visible');
-            }
-            
-            if (metadataContainer) {
-                metadataContainer.style.display = 'block';
-                metadataContainer.classList.add('filter-tube-visible');
-            }
-            
-            // Force horizontal layout with flex
-            mixElement.style.display = 'flex';
-            mixElement.style.flexDirection = 'row';
-            
-            // Set proper widths
-            if (imageContainer) {
-                imageContainer.style.width = '50%';
-            }
-            
-            if (metadataContainer) {
-                metadataContainer.style.width = '50%';
-            }
-        }
-    });
-    
-    // Fix vertical watch card lists
-    const verticalLists = document.querySelectorAll('ytd-vertical-watch-card-list-renderer');
-    verticalLists.forEach(list => {
-        if (!list.classList.contains('filter-tube-visible')) {
-            // If the parent is visible, make this visible too
-            const parent = list.closest('ytd-universal-watch-card-renderer');
-            if (parent && parent.classList.contains('filter-tube-visible')) {
-                list.classList.add('filter-tube-visible');
-                list.style.display = 'block';
-            }
-        }
-    });
-    
-    // Fix channel page grid layout - ensure videos are in grid format
-    if (window.location.pathname.includes('/channel/') || 
-        window.location.pathname.includes('/@') || 
-        document.querySelector('ytd-browse[page-subtype="channels"]')) {
-        
-        // Add explicit detection of channel page with logging
-        console.log("FilterTube: Channel page detected, applying grid layout fixes");
-        
-        // Apply a class to the body for broader style targeting
-        document.body.classList.add('filter-tube-channel-page');
-        
-        // Fix section list layouts specifically
-        fixChannelSectionListLayouts();
-        
-        // Find grid containers with broader selectors to catch all possible channel layouts
-        const gridContainers = document.querySelectorAll([
-            'ytd-browse[page-subtype="channels"] #contents.ytd-rich-grid-renderer', 
-            'ytd-browse[role="main"] #contents.ytd-rich-grid-renderer',
-            '#page-manager ytd-browse #contents.ytd-rich-grid-renderer',
-            'ytd-page-manager ytd-browse #contents.ytd-rich-grid-renderer',
-            '#contents.ytd-rich-grid-renderer',
-            '#items.ytd-rich-grid-row-renderer',
-            // Add more specific selectors for Travis Scott channel
-            'div#contents.ytd-rich-grid-renderer',
-            'ytd-browse[page-type="channel"] div#contents.ytd-rich-grid-renderer'
-        ].join(', '));
-        
-        // Log the number of grid containers found
-        console.log(`FilterTube: Found ${gridContainers.length} grid containers to fix on channel page`);
-        
-        // Apply strong grid layout fixes
-        gridContainers.forEach(grid => {
-            // Force grid display with !important via setAttribute to override any inline styles
-            grid.setAttribute('style', 'display: grid !important; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important; grid-gap: 16px !important; width: 100% !important;');
-            
-            // Make sure visible items have proper styling
-            const visibleItems = grid.querySelectorAll('.filter-tube-visible');
-            visibleItems.forEach(item => {
-                item.setAttribute('style', 'width: 100% !important; margin: 0 !important; display: block !important; position: relative !important; float: none !important;');
-            });
-            
-            // Also check parent elements that might need layout fixing
-            const parentRows = document.querySelectorAll('ytd-rich-grid-row');
-            parentRows.forEach(row => {
-                const rowItems = row.querySelector('#items');
-                if (rowItems) {
-                    rowItems.setAttribute('style', 'display: grid !important; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important; grid-gap: 16px !important;');
-                }
-            });
-            
-            // Apply direct style to parent container
-            const parentContainer = grid.closest('ytd-rich-grid-renderer');
-            if (parentContainer) {
-                parentContainer.setAttribute('style', 'display: block !important; width: 100% !important;');
-            }
-        });
-        
-        // If no grid containers found, try to insert our own styles
-        if (gridContainers.length === 0) {
-            console.log("FilterTube: No grid containers found, applying emergency grid styles");
-            
-            // Create and inject a stylesheet
-            const styleEl = document.createElement('style');
-            styleEl.textContent = `
-                /* FilterTube emergency grid styles */
-                div#contents.ytd-rich-grid-renderer,
-                #contents.ytd-rich-grid-renderer,
-                #items.ytd-rich-grid-row-renderer,
-                ytd-browse[page-type="channel"] div#contents.ytd-rich-grid-renderer {
-                    display: grid !important;
-                    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important;
-                    grid-gap: 16px !important;
-                    width: 100% !important;
+    for (const mutation of mutations) {
+        if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+            for (const node of mutation.addedNodes) {
+                if (node.nodeType !== Node.ELEMENT_NODE) continue;
+                
+                // High priority selectors - needs immediate handling
+                const highPrioritySelectors = [
+                    'ytd-rich-item-renderer', // Home page items
+                    'ytd-grid-video-renderer', // Channel page videos
+                    'ytd-video-renderer', // Search results
+                    'ytd-item-section-renderer', // Previously watched section
+                    '.yt-lockup-view-model-wiz', // Mix elements with thumbnails
+                    'ytd-universal-watch-card-renderer', // Watch cards
+                    'ytd-radio-renderer', // Radio/mix cards
+                    'ytd-rich-shelf-renderer[is-shorts]', // Shorts shelf
+                ];
+                
+                // Check if the node matches any high priority selector
+                if (highPrioritySelectors.some(selector => {
+                    try {
+                        return node.matches?.(selector) || node.querySelector?.(selector);
+                    } catch (e) {
+                        return false; // Safely handle invalid selectors
+                    }
+                })) {
+                    highPriorityChange = true;
+                    break;
                 }
                 
-                ytd-rich-item-renderer,
-                ytd-grid-video-renderer {
-                    width: 100% !important;
-                    margin: 0 !important;
-                    display: block !important;
+                // Regular check for any potentially relevant element
+                try {
+                    // Check if the node itself is a relevant element
+                    const isRelevantNode = node.tagName && (
+                        node.tagName.toLowerCase().startsWith('ytd-') ||
+                        node.tagName.toLowerCase().startsWith('yt-')
+                    );
+                    
+                    if (isRelevantNode) {
+                        potentiallyRelevantChange = true;
+                    }
+                } catch (e) {
+                    // Ignore errors in selector matching
                 }
-            `;
-            document.head.appendChild(styleEl);
+            }
         }
+        if (highPriorityChange) break;
     }
-}
 
-/**
- * Special function for fixing channel page section list layouts
- * Specifically targets the ytd-section-list-renderer elements that might not be caught by other layout fixes
- */
-function fixChannelSectionListLayouts() {
-    // Find all section list renderers that might contain videos
-    const sectionLists = document.querySelectorAll('ytd-section-list-renderer');
-    
-    if (sectionLists.length === 0) {
-        return; // No section lists found
+    // If high priority elements were added, filter immediately
+    if (highPriorityChange) {
+        console.log("FilterTube: High priority elements detected - filtering immediately");
+        // Cancel any pending throttled filtering
+        if (throttleTimeout) {
+            clearTimeout(throttleTimeout);
+            throttleTimeout = null;
+        }
+        // Apply filters immediately
+        applyFilters();
+        return;
     }
-    
-    console.log(`FilterTube: Found ${sectionLists.length} section lists to fix`);
-    
-    sectionLists.forEach(section => {
-        // Apply grid layout to contents
-        const contents = section.querySelectorAll('#contents, #items');
-        contents.forEach(container => {
-            container.setAttribute('style', 
-                'display: grid !important; ' +
-                'grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important; ' +
-                'grid-gap: 16px !important; ' +
-                'width: 100% !important;'
-            );
-        });
-        
-        // Fix grid renderers inside section
-        const gridRenderers = section.querySelectorAll('ytd-grid-renderer');
-        gridRenderers.forEach(grid => {
-            grid.setAttribute('style', 'display: block !important; width: 100% !important;');
-            
-            // Fix the items container inside grid renderer
-            const itemsContainers = grid.querySelectorAll('#items');
-            itemsContainers.forEach(items => {
-                items.setAttribute('style', 
-                    'display: grid !important; ' +
-                    'grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important; ' +
-                    'grid-gap: 16px !important; ' +
-                    'width: 100% !important;'
-                );
-            });
-        });
-        
-        // Fix individual video renderers
-        const videoRenderers = section.querySelectorAll('ytd-grid-video-renderer');
-        videoRenderers.forEach(video => {
-            video.setAttribute('style',
-                'width: 100% !important; ' +
-                'margin: 0 !important; ' +
-                'display: block !important; ' +
-                'position: relative !important; ' +
-                'float: none !important;'
-            );
-        });
-    });
-    
-    // Add the ultra-aggressive layout fix
-    forceChannelGridLayout();
-    
-    // Create a style tag to inject styles directly
-    const styleEl = document.createElement('style');
-    styleEl.id = 'filter-tube-channel-fix';
-    styleEl.textContent = `
-        /* Ultra-aggressive inline CSS fix */
-        ytd-browse[page-type="channel"] #contents,
-        ytd-browse[page-type="channel"] #items,
-        ytd-section-list-renderer #contents,
-        ytd-rich-grid-renderer #contents,
-        ytd-grid-renderer #items,
-        ytd-shelf-renderer #items {
-            display: grid !important;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)) !important;
-            grid-gap: 16px !important;
-            width: 100% !important;
-        }
-        
-        ytd-browse[page-type="channel"] ytd-grid-video-renderer,
-        ytd-browse[page-type="channel"] ytd-rich-item-renderer,
-        ytd-section-list-renderer ytd-grid-video-renderer,
-        ytd-section-list-renderer ytd-rich-item-renderer {
-            width: 100% !important;
-            display: block !important;
-            position: relative !important;
-            margin: 0 !important;
-        }
-        
-        ytd-rich-grid-row-renderer[style*="position: absolute"],
-        ytd-rich-grid-row-renderer[style*="position:absolute"] {
-            position: relative !important;
-            top: 0 !important;
-            left: 0 !important;
-            transform: none !important;
-        }
-    `;
-    
-    // Only add if not already present
-    if (!document.getElementById('filter-tube-channel-fix')) {
-        document.head.appendChild(styleEl);
-    }
-    
-    // Setup a mutation observer to catch YouTube's layout changes and override them
-    setupChannelLayoutObserver();
-}
 
-/**
- * Set up a mutation observer to continuously fix channel page layouts
- * This helps override YouTube's dynamic layout changes
- */
-function setupChannelLayoutObserver() {
-    // If we already have an observer, don't set up another one
-    if (window.filterTubeChannelLayoutObserver) {
+    if (!potentiallyRelevantChange) return; // Skip if no relevant nodes were likely added
+    if (throttleTimeout) return; // Throttle if already scheduled
+
+    throttleTimeout = setTimeout(() => {
+        console.log("FilterTube: Applying filters due to potential relevant DOM change.");
+        applyFilters();
+        throttleTimeout = null;
+    }, FILTER_DELAY);
+};
+
+// Create a MutationObserver instance with the callback.
+const observer = new MutationObserver(observerCallback);
+
+// Configuration for the observer:
+const observerConfig = {
+    childList: true,
+    subtree: true,
+    attributes: false  // No need to observe attributes, focus on element additions
+};
+
+// Start observing the document body
+function startObserver() {
+    if (!document.body) {
+        console.log("FilterTube: Document body not ready yet, retrying in 100ms");
+        setTimeout(startObserver, 100);
         return;
     }
     
-    const observer = new MutationObserver((mutations) => {
-        let needsLayoutFix = false;
-        
-        for (const mutation of mutations) {
-            // Check if this is a style change or DOM addition that might affect layout
-            if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
-                const element = mutation.target;
-                const tagName = element.tagName.toLowerCase();
-                
-                // If this is a grid row or container with absolute positioning, fix it
-                if (tagName === 'ytd-rich-grid-row-renderer' || 
-                    tagName === 'ytd-rich-grid-renderer' ||
-                    tagName === 'ytd-section-list-renderer' ||
-                    element.id === 'contents' ||
-                    element.id === 'items') {
-                    
-                    needsLayoutFix = true;
-                    break;
-                }
-            } 
-            // Also check for added nodes that might need layout fixing
-            else if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-                for (const node of mutation.addedNodes) {
-                    if (node.nodeType !== Node.ELEMENT_NODE) continue;
-                    
-                    // If this is a video element or container, fix layout
-                    if (node.matches?.('ytd-grid-video-renderer, ytd-rich-item-renderer, ytd-rich-grid-row-renderer')) {
-                        needsLayoutFix = true;
-                        break;
-                    }
-                    
-                    // Check if it contains any relevant elements
-                    if (node.querySelector?.('ytd-grid-video-renderer, ytd-rich-item-renderer, ytd-rich-grid-row-renderer, #contents, #items')) {
-                        needsLayoutFix = true;
-                        break;
-                    }
-                }
-                
-                if (needsLayoutFix) break;
-            }
-        }
-        
-        // Apply layout fixes if needed
-        if (needsLayoutFix) {
-            console.log("FilterTube: Layout changes detected, reapplying grid fixes");
-            forceChannelGridLayout();
-        }
-    });
-    
-    // Observe the entire browse area for changes that might affect layout
-    const browseElement = document.querySelector('ytd-browse[page-type="channel"]');
-    if (browseElement) {
-        observer.observe(browseElement, {
-            childList: true,
-            subtree: true,
-            attributes: true,
-            attributeFilter: ['style']
-        });
-        
-        console.log("FilterTube: Channel layout observer started");
-        window.filterTubeChannelLayoutObserver = observer;
+    try {
+    observer.observe(document.body, observerConfig);
+        console.log("FilterTube: MutationObserver started successfully");
+    } catch (e) {
+        console.error("FilterTube: Error starting MutationObserver:", e);
     }
 }
 
-/**
- * Apply extremely aggressive channel page layout fixes
- * This uses direct DOM manipulation to force grid layout
- */
-function forceChannelGridLayout() {
-    // Mark the body for CSS targeting
-    document.body.setAttribute('filter-tube-fix', 'true');
-    
-    // Find all row renderers that YouTube might be positioning absolutely
-    const rowRenderers = document.querySelectorAll('ytd-rich-grid-row-renderer');
-    
-    rowRenderers.forEach(row => {
-        // Remove all transform, position, width styles
-        row.style.position = 'relative';
-        row.style.transform = 'none';
-        row.style.left = '0';
-        row.style.top = '0';
-        row.style.width = '100%';
+// Initial load and setup
+function initialize() {
+    // Load settings
+    chrome.storage.local.get(['filterKeywords', 'filterChannels'], function (items) {
+        filterKeywords = items.filterKeywords || '';
+        filterChannels = items.filterChannels || '';
         
-        // Apply grid styles to the items container
-        const items = row.querySelector('#items');
-        if (items) {
-            items.style.display = 'grid';
-            items.style.gridTemplateColumns = 'repeat(auto-fill, minmax(240px, 1fr))';
-            items.style.gridGap = '16px';
-            items.style.width = '100%';
-        }
-    });
-    
-    // Find all grid containers
-    const contentContainers = document.querySelectorAll([
-        'ytd-browse[page-type="channel"] #contents',
-        'ytd-browse[page-type="channel"] #items',
-        'ytd-section-list-renderer #contents',
-        'ytd-rich-grid-renderer #contents',
-        'ytd-grid-renderer #items',
-        'ytd-shelf-renderer #items'
-    ].join(', '));
-    
-    contentContainers.forEach(container => {
-        // Override CSS layout with direct style injection
-        container.style.display = 'grid';
-        container.style.gridTemplateColumns = 'repeat(auto-fill, minmax(240px, 1fr))';
-        container.style.gridGap = '16px';
-        container.style.width = '100%';
-        container.style.maxWidth = '100%';
+        console.log(`FilterTube: Loaded settings - Keywords: "${filterKeywords}", Channels: "${filterChannels}"`);
         
-        // For items parent elements
-        const parentGrid = container.closest('ytd-rich-grid-renderer, ytd-grid-renderer, ytd-shelf-renderer');
-        if (parentGrid) {
-            parentGrid.style.width = '100%';
-            parentGrid.style.display = 'block';
-        }
+        // Start the observer
+        startObserver();
+        
+        // Initial filter application
+        applyFilters();
     });
-    
-    // Fix individual video items
-    const videoItems = document.querySelectorAll([
-        'ytd-browse[page-type="channel"] ytd-grid-video-renderer',
-        'ytd-browse[page-type="channel"] ytd-rich-item-renderer',
-        'ytd-section-list-renderer ytd-grid-video-renderer',
-        'ytd-section-list-renderer ytd-rich-item-renderer'
-    ].join(', '));
-    
-    videoItems.forEach(item => {
-        item.style.width = '100%';
-        item.style.display = 'block';
-        item.style.position = 'relative';
-        item.style.margin = '0';
-    });
-    
-    // Override absolute positioning that YouTube uses for virtual scrolling
-    const absolutePositionedElements = document.querySelectorAll('[style*="position: absolute"], [style*="position:absolute"]');
-    absolutePositionedElements.forEach(element => {
-        // Only target elements within the channel page structure
-        if (element.closest('ytd-browse[page-type="channel"]')) {
-            element.style.position = 'relative';
-            element.style.top = '0';
-            element.style.left = '0';
-            element.style.transform = 'none';
-            
-            // If this is a grid row, also fix its items container
-            if (element.tagName.toLowerCase() === 'ytd-rich-grid-row-renderer') {
-                const items = element.querySelector('#items');
-                if (items) {
-                    items.style.display = 'grid';
-                    items.style.gridTemplateColumns = 'repeat(auto-fill, minmax(240px, 1fr))';
-                    items.style.gridGap = '16px';
-                    items.style.width = '100%';
-                }
-            }
-        }
-    });
-    
-    console.log("FilterTube: Applied ultra-aggressive channel grid layout fixes");
 }
 
-/**
- * Attempts to extract a channel handle from channel information displayed on page
- * and map it to the channel ID for future filtering
- * @param {string} channelId - The channel ID (without channel/ prefix)
- * @param {HTMLElement} rootElement - Element to search within (could be channel cards, etc.)
- */
-function mapChannelIdToHandle(channelId, rootElement = document) {
-    // Skip if we already have this mapping
-    if (channelMappingCache[channelId]) {
-        return channelMappingCache[channelId];
-    }
-    
-    // First look for channel link with @ pattern
-    const handleLinks = rootElement.querySelectorAll('a[href*="/@"]');
-    for (const link of handleLinks) {
-        const href = link.getAttribute('href');
-        const handleMatch = href.match(/\/@([^\/\?]+)/);
-        if (handleMatch && handleMatch[1]) {
-            const handle = '@' + handleMatch[1].toLowerCase();
-            // Store in cache for future use
-            channelMappingCache[channelId] = handle;
-            console.log(`FilterTube: Mapped channel ID ${channelId} to handle ${handle}`);
-            return handle;
-        }
-    }
-    
-    // Look for any text that might contain @ handles
-    const allTexts = Array.from(rootElement.querySelectorAll('yt-formatted-string, span, a'))
-        .map(el => el.textContent.trim())
-        .filter(text => text.includes('@'));
-    
-    for (const text of allTexts) {
-        const handleMatch = text.match(/@(\w+)/);
-        if (handleMatch && handleMatch[1]) {
-            const handle = '@' + handleMatch[1].toLowerCase();
-            // Store in cache for future use
-            channelMappingCache[channelId] = handle;
-            console.log(`FilterTube: Mapped channel ID ${channelId} to handle ${handle} (from text)`);
-            return handle;
-        }
-    }
-    
-    // Look in 'More info' sections that often contain the handle
-    const moreInfoLinks = rootElement.querySelectorAll('a[href*="/@"]');
-    for (const link of moreInfoLinks) {
-        const href = link.getAttribute('href');
-        const handleMatch = href.match(/\/@([^\/\?]+)/);
-        if (handleMatch && handleMatch[1]) {
-            const handle = '@' + handleMatch[1].toLowerCase();
-            // Store in cache for future use
-            channelMappingCache[channelId] = handle;
-            console.log(`FilterTube: Mapped channel ID ${channelId} to handle ${handle} (from more info)`);
-            return handle;
-        }
-    }
-    
-    return null; // No mapping found
+// Initialize as soon as possible
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initialize);
+} else {
+    initialize();
 }
 
-// Enhance the shouldFilterChannel function to use the mapping
-const originalShouldFilterChannel = shouldFilterChannel;
-shouldFilterChannel = function(channelName, channelHandle, trimmedChannels) {
-    // Try standard filtering first
-    if (originalShouldFilterChannel(channelName, channelHandle, trimmedChannels)) {
-        return true;
-    }
-    
-    // Extra check for channel IDs and handle mapping
-    if (channelHandle && channelHandle.includes('/channel/')) {
-        const channelIdMatch = channelHandle.match(/channel\/([\w-]+)/);
-        if (channelIdMatch && channelIdMatch[1]) {
-            const channelId = channelIdMatch[1];
-            
-            // First try to find this in our cache or extract from the page
-            const mappedHandle = mapChannelIdToHandle(channelId, document);
-            
-            if (mappedHandle) {
-                // Check if this handle is blocked
-                const cleanMappedHandle = mappedHandle.replace(/^@/, '').toLowerCase();
-                
-                for (const blockedChannel of trimmedChannels) {
-                    if (blockedChannel.startsWith('@')) {
-                        const cleanBlockedHandle = blockedChannel.replace(/^@/, '').toLowerCase();
-                        if (cleanMappedHandle === cleanBlockedHandle) {
-                            console.log(`FilterTube: Blocking channel ID ${channelId} via mapped handle ${mappedHandle}`);
-                            return true;
-                        }
-                    }
-                }
-            }
+// Listen for storage changes
+chrome.storage.onChanged.addListener(function (changes, areaName) {
+    if (areaName === 'local') {
+        let needsRefilter = false;
+        
+        if (changes.filterKeywords) {
+            filterKeywords = changes.filterKeywords.newValue || '';
+            console.log(`FilterTube: Keywords changed to "${filterKeywords}"`);
+            needsRefilter = true;
+        }
+        
+        if (changes.filterChannels) {
+            filterChannels = changes.filterChannels.newValue || '';
+            console.log(`FilterTube: Channels changed to "${filterChannels}"`);
+            needsRefilter = true;
+        }
+        
+        if (needsRefilter) {
+            // Re-apply filters with updated values
+            console.log("FilterTube: Reapplying filters due to settings change");
+            applyFilters();
         }
     }
-    
-    return false;
-};
+});
+
+// Fallback interval check to ensure filtering is consistently applied
+const intervalCheck = setInterval(() => {
+    applyFilters();
+}, 5000); // Check every 5 seconds as a safety net
+
+// Clean up when the page is unloaded
+window.addEventListener('unload', () => {
+    if (observer) observer.disconnect();
+    if (intervalCheck) clearInterval(intervalCheck);
+    if (throttleTimeout) clearTimeout(throttleTimeout);
+    console.log("FilterTube: Cleaned up resources on page unload");
+});
 
 

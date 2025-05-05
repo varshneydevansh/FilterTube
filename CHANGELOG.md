@@ -1,48 +1,83 @@
 # FilterTube Changelog
 
-## Version 1.1.0 (Upcoming)
-**Release Date:** June 2025
-
-### New Features
-- Added channel ID to handle mapping for more consistent filtering
-- Enhanced grid layout system for channel pages
-- Added special handling for section list renderers
-- Improved filtering for YouTube Mix elements
-- Implemented whole-word matching for keywords for more precise filtering
+## Version 1.0.2 (Latest)
 
 ### Bug Fixes
-- Fixed channel ID filtering issue for channels like Travis Scott (UCtxdfwb9wfkoGocVUAJ-Bmg)
-- Fixed inconsistent layout of videos on channel pages
-- Fixed website links to consistently point to varshneydevansh/FilterTube repository
-- Improved keyword matching precision to prevent over-filtering
+- **Fixed Shorts Overlapping Issue**: Adjusted the shorts container width to prevent overlapping with other videos on the homepage
+- **Fixed Mix/Playlist Thumbnails Visibility**: Implemented ultra-aggressive thumbnail hiding when filtering by channel ID or handle
+- **Enhanced Element Hiding**: Added multiple redundant hiding techniques using both CSS and JavaScript for improved reliability
 
-### Code Improvements
-- Added aggressive grid layout fixing system using multiple approaches
-- Created dedicated channel info extraction function
-- Implemented mutation observer to maintain proper layouts against YouTube's dynamic changes
-- Added better debug logging for channel detection
-- Added matchesWholeWord function to improve filtering precision
+## Version 1.0.1 (Current)
 
-## Version 1.0.0 (Initial Release)
-**Release Date:** May 2025
+### Major Improvements
 
-### Features
-- Basic filtering functionality based on keywords and channel names
-- Support for filtering main feed, search results, recommendations, and watch page
-- Efficient filter implementation with inverted-visibility approach for better performance
-- Comment filtering options (hide all or filter by keywords)
-- Popup interface for managing filters
-- Clean and responsive website
+#### Layout Fixes
+- **Fixed YouTube Channel Page Layout**: Corrected the issue where channel page videos displayed vertically instead of in a horizontal grid format.
+- **Fixed Search Results Layout**: Ensured video details appear properly to the right of thumbnails, not below them.
+- **Fixed Shorts Layout**: 
+  - Corrected shorts display to maintain original YouTube horizontal format.
+  - Made shorts section span the full page width for native appearance.
+  - Properly sized shorts thumbnails to maintain aspect ratio.
+- **Fixed Mix/Playlist Layout**: Ensured mix and playlist items display properly when visible, and completely disappear when filtered.
 
-### Technical Features
-- Manifest V3 compatible
-- CSS-based visibility system for smooth filtering
-- MutationObserver-based content scanning for dynamic page content
-- Storage sync for saved preferences
+#### Filtering Logic Improvements
+- **Enhanced Channel Filtering**:
+  - Implemented exact matching for `@handle` filtering (will only hide exact handle matches).
+  - Implemented exact matching for `channel/ID` filtering (will only hide that specific channel ID).
+  - Maintained partial matching for regular channel names for flexibility.
+- **Fixed Mix/Playlist Filtering**:
+  - Thoroughly hides mixes/playlists that match filtering criteria.
+  - Fixed issue where thumbnails remained visible even when text was hidden.
+  - Properly identifies and filters mixes/playlists in various YouTube layouts.
+- **Comment Filtering**: Added comprehensive comment filtering options.
 
-### Website
-- Landing page with feature highlights
-- Filtering guide for users
-- Privacy documentation
-- Technical features explanation
-- About page with project background 
+#### UI Enhancements
+- **Tab View**: Added the ability to open extension in a new tab for better usability.
+- **Glassmorphism Effect**: Added modern UI effects for extension components.
+- **Save Button**: Improved save button appearance and positioning.
+
+#### Code Architecture
+- **Modular Approach**:
+  - Separated layout fixes into dedicated `layout.js` file.
+  - Created separate CSS files for filters and layout.
+- **Reliability Improvements**:
+  - Enhanced MutationObserver implementation for reliable filtering as YouTube loads content.
+  - Added fallback interval check as a safety net for dynamic content.
+  - Improved error handling and added debugging logs.
+
+### Bug Fixes
+- **Fixed Infinite Loading**: Corrected issue where certain filter settings caused the page to continuously load.
+- **Fixed Blank Spaces**: Eliminated gaps left behind when items are hidden.
+- **Fixed Search Page Layouts**: Corrected watch card compact videos and channel results display.
+- **Fixed Homepage Shorts**: Corrected issues with shorts display on the homepage.
+- **Fixed Channel ID Filtering**: Resolved issue where channel ID filtering was breaking the page.
+
+### Technical Implementation Details
+- **CSS Improvements**:
+  - Added extensive use of `!important` to override YouTube's internal styles.
+  - Implemented more specific CSS selectors for precise targeting.
+  - Used `:has()` selectors for parent-child relationship targeting.
+  - Implemented full-width container styling for shorts.
+- **JavaScript Logic**:
+  - Enhanced `shouldFilterChannel` function with normalized input handling.
+  - Improved `hideMixAndPlaylistElements` with deep hiding for all child elements.
+  - Created robust `showAllElements` function to restore visibility when filters are removed.
+  - Refactored `applyFilters` function to handle error cases better.
+
+### Structure Changes
+- Created separate files for different concerns:
+  - `filter.css` - For hiding/showing filtered elements
+  - `layout.css` - For layout fixes after filtering
+  - `content.js` - Main filtering logic
+  - `layout.js` - Layout repair functionality
+  - `popup.js` - Extension UI functionality
+  - Added `tab-view.html` and `tab-view.css` for dedicated tab view
+
+## Previous Changes
+
+### Initial Release (Version 1.0.0)
+- Basic filtering functionality for YouTube videos
+- Keyword-based filtering
+- Channel-based filtering
+- Basic popup interface
+- Initial implementation of layout preservation 

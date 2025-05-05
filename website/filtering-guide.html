@@ -289,21 +289,21 @@
             <!-- Reduced number of waves for smaller hero section -->
             <svg class="wave wave-1" viewBox="0 0 1440 320">
               <path
-                fill="#f78192" 
-                fill-opacity="0.8"
+                fill="#f2545b" 
+                fill-opacity="0.9"
                 d="M0,160L60,170.7C120,181,240,203,360,181.3C480,160,600,96,720,90.7C840,85,960,139,1080,144C1200,149,1320,107,1380,85.3L1440,64L1440,0L1380,0C1320,0,1200,0,1080,0C960,0,840,0,720,0C600,0,480,0,360,0C240,0,120,0,60,0L0,0Z"
               ></path>
             </svg>
             <svg class="wave wave-2" viewBox="0 0 1440 320">
               <path
-                fill="#ffb3b3"
-                fill-opacity="0.7"
+                fill="#fa8072"
+                fill-opacity="0.8"
                 d="M0,224L80,208C160,192,320,160,480,133.3C640,107,800,85,960,90.7C1120,96,1280,128,1360,144L1440,160L1440,0L1360,0C1280,0,1120,0,960,0C800,0,640,0,480,0C320,0,160,0,80,0L0,0Z"
               ></path>
             </svg>
             <svg class="wave wave-3" viewBox="0 0 1440 320">
               <path
-                fill="#ffd6cc"
+                fill="#fab6a2"
                 fill-opacity="0.5"
                 d="M0,96L48,122.7C96,149,192,203,288,197.3C384,192,480,128,576,122.7C672,117,768,171,864,197.3C960,224,1056,224,1152,213.3C1248,203,1344,181,1392,170.7L1440,160L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"
               ></path>
@@ -367,19 +367,18 @@
                 <ul>
                     <li>Enter words or phrases separated by commas</li>
                     <li>Not case-sensitive (e.g, "news" will match "News" or "NEWS")</li>
-                    <li>Uses whole-word matching for precision (e.g., "cat" will only match "cat" but not "category")</li>
-                    <li>Multi-word phrases use exact phrase matching (e.g., "reaction video" only matches that exact phrase)</li>
+                    <li>Matches partial words (e.g., "cat" will match "cat" or "category")</li>
                     <li>Useful for filtering topics, genres, or specific content types</li>
                 </ul>
                 
                 <div class="example-box">
                     <strong>Examples:</strong>
-                    <p class="code-example">reaction video, unboxing, trailer</p>
-                    <p>This would filter videos containing the exact phrase "reaction video" or the whole words "unboxing" or "trailer" in their titles or descriptions.</p>
+                    <p class="code-example">reaction, unboxing, trailer</p>
+                    <p>This would filter all videos containing these words in their titles or descriptions.</p>
                 </div>
                 
                 <div class="filter-note">
-                    <i class="fas fa-info-circle"></i> Pro Tip: The whole-word matching system allows more precise filtering. For example, using "cat" will only filter videos about cats, not ones mentioning "category" or "concatenate".
+                    <i class="fas fa-info-circle"></i> Pro Tip: Be specific with keywords to avoid over-filtering. For example, use "reaction video" instead of just "reaction" if you only want to filter reaction videos but not other videos that might mention reactions.
                 </div>
             </div>
 

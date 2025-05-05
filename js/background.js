@@ -1,27 +1,18 @@
 // background.js
 
 /**
- * Background script for FilterTube - handles:
- * - Browser action click
- * - Installation/update events
- * - Message passing between extension components
+ * Background script for FilterTube extension
+ *
+ * This script runs in the background as a service worker.
+ * Currently minimal functionality is needed here, but it could be extended to:
+ * - Handle messages from content script
+ * - Manage extension state across browser tabs
+ * - Implement storage change listeners
+ * - Implement optional features in the future
  */
 
 // Log when the background script loads
 console.log('FilterTube background script loaded');
-
-// Handle clicks on the extension icon
-chrome.action.onClicked.addListener(function(tab) {
-    // Open the popup interface by default
-    // This is a fallback if the popup doesn't open automatically
-    
-    // First try to open our website directly
-    chrome.tabs.create({
-        url: 'https://varshneydevansh.github.io/FilterTube/website/'
-    }, (tab) => {
-        console.log('Opened FilterTube website from icon click');
-    });
-});
 
 // Example event listener for when the extension is installed or updated
 chrome.runtime.onInstalled.addListener(function(details) {

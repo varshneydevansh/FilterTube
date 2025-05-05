@@ -141,7 +141,7 @@ function highlightNavLink() {
 window.addEventListener('scroll', highlightNavLink);
 document.addEventListener('DOMContentLoaded', highlightNavLink); // Initial highlight
 
-console.log('FilterTube Website Script Loaded');
+console.log('FilterTube Website Script Loaded'); 
 
 document.addEventListener('DOMContentLoaded', function() {
     // Mobile Navigation Toggle
