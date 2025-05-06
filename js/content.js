@@ -8,6 +8,11 @@ let filterKeywords = '';
 let filterChannels = '';
 let hideAllComments = false;
 let filterComments = false;
+let hideAllShorts = false;
+let enableYoutubeKids = false;
+let syncFilters = false;
+let kidsKeywords = '';
+let kidsChannels = '';
 let observer = null;
 let sidebarObserver = null;
 let shortsObserver = null;
@@ -15,8 +20,45 @@ let filtersApplied = false;
 let stylesInjected = false;
 let currentPageType = 'unknown';
 let processingBatch = false;
+let isYoutubeKids = window.location.hostname.includes('youtubekids.com');
+let isVideoPlaying = false;
+let lastPolymerExtraction = 0;
+let polymerExtractionThrottle = 500; // Limit polymer extraction calls to once per 500ms
+let isSidebarItem = false;
 
-// Add cleanup functions near the unload event handler
+// Performance optimization flags
+const OPTIMIZE_FOR_PLAYBACK = true; // Reduce processing during video playback
+const USE_LIGHTWEIGHT_CHANNEL_DETECTION = true; // Don't use polymer data for channel detection during video playback
+const LIMIT_POLYMER_EXTRACTIONS = true; // Limit how often we extract polymer data
+
+// Add event listener for video playing state
+document.addEventListener('play', function(e) {
+    if (e.target.tagName === 'VIDEO') {
+        isVideoPlaying = true;
+        console.log("FilterTube: Video playback detected, reducing processing");
+    }
+}, true);
+
+document.addEventListener('pause', function(e) {
+    if (e.target.tagName === 'VIDEO') {
+        isVideoPlaying = false;
+        console.log("FilterTube: Video paused, resuming normal processing");
+    }
+}, true);
+
+// Handle video minimize/maximize without affecting playback
+let videoStateChangeHandled = false;
+const originalRequestAnimationFrame = window.requestAnimationFrame;
+window.requestAnimationFrame = function(callback) {
+    // Only intercept on video pages
+    if (window.location.href.includes('/watch') && !videoStateChangeHandled) {
+        // Delay by 50ms to avoid interfering with video state changes
+        setTimeout(() => {
+            videoStateChangeHandled = false;
+        }, 50);
+    }
+    return originalRequestAnimationFrame(callback);
+};
 
 // Clean up on unload
 window.addEventListener('unload', () => {
@@ -58,7 +100,34 @@ window.addEventListener('unload', () => {
     if (window._filterTubeTimeouts) {
         window._filterTubeTimeouts.forEach(id => clearTimeout(id));
     }
+
+    // Restore original requestAnimationFrame
+    window.requestAnimationFrame = originalRequestAnimationFrame;
 });
+
+// Get active keywords and channels based on current domain
+function getActiveFilters() {
+    let activeKeywords = filterKeywords;
+    let activeChannels = filterChannels;
+    
+    if (isYoutubeKids && enableYoutubeKids) {
+        if (!syncFilters) {
+            // Use YouTube Kids specific filters
+            activeKeywords = kidsKeywords;
+            activeChannels = kidsChannels;
+        }
+        // If syncFilters is true, use the main YouTube filters (default)
+    }
+    
+    return {
+        keywords: activeKeywords.split(',')
+            .map(k => k.trim().toLowerCase())
+            .filter(k => k.length > 0),
+        channels: activeChannels.split(',')
+            .map(c => c.trim().toLowerCase())
+            .filter(c => c.length > 0)
+    };
+}
 
 // Add better timeout management
 window._filterTubeTimeouts = [];
@@ -187,8 +256,7 @@ function watchForNavigation() {
 // Global cache to store filtering results
 let filterCache = {
     elements: new Map(), // Element -> isFiltered
-    lastKeywords: '',
-    lastChannels: '',
+    lastFilters: ''
 };
 
 // Update applyFilters function to use caching
@@ -196,6 +264,17 @@ function applyFilters() {
     // Performance optimization - avoid unnecessary work
     if (document.hidden) {
         // Page is not visible, defer intensive processing
+        return;
+    }
+
+    // If YouTube Kids is disabled on YouTube Kids domain, exit early
+    if (isYoutubeKids && !enableYoutubeKids) {
+        return;
+    }
+
+    // If video is playing and we're optimizing, do minimal work
+    if (OPTIMIZE_FOR_PLAYBACK && isVideoPlaying) {
+        // Just maintain hiding/showing of already processed elements
         return;
     }
 
@@ -209,11 +288,9 @@ function applyFilters() {
     if (hideAllComments) {
         document.documentElement.classList.add('filtertube-hide-all-comments');
         document.documentElement.classList.remove('filtertube-filter-comments');
-        console.log("FilterTube: Hiding all comments");
     } else if (filterComments) {
         document.documentElement.classList.remove('filtertube-hide-all-comments');
         document.documentElement.classList.add('filtertube-filter-comments');
-        console.log("FilterTube: Filtering comments");
         
         // Apply comment filtering - but only if we're on a video page
         if (location.href.includes('/watch')) {
@@ -225,25 +302,21 @@ function applyFilters() {
         document.documentElement.classList.remove('filtertube-filter-comments');
     }
     
-    // Parse filter settings - do this once outside the element loop
-    const keywords = filterKeywords.split(',')
-        .map(k => k.trim().toLowerCase())
-        .filter(k => k.length > 0);
+    // Always remove shorts hiding classes to prevent UI issues
+    document.documentElement.classList.remove('filtertube-hide-all-shorts');
+    document.documentElement.classList.remove('filtertube-shorts-page');
     
-    const channels = filterChannels.split(',')
-        .map(c => c.trim().toLowerCase())
-        .filter(c => c.length > 0);
+    // Get active filters based on current domain
+    const { keywords, channels } = getActiveFilters();
     
     // Check if filters have changed since last run
-    const currentFilters = filterKeywords + "|" + filterChannels;
-    const filtersChanged = currentFilters !== (filterCache.lastKeywords + "|" + filterCache.lastChannels);
+    const currentFilters = (isYoutubeKids ? "kids:" : "") + keywords.join(',') + "|" + channels.join(',');
+    const filtersChanged = currentFilters !== (filterCache.lastFilters || "");
     
     // If filters changed, invalidate cache
     if (filtersChanged) {
-        console.log("FilterTube: Filters changed, invalidating cache");
         filterCache.elements.clear();
-        filterCache.lastKeywords = filterKeywords;
-        filterCache.lastChannels = filterChannels;
+        filterCache.lastFilters = currentFilters;
     }
     
     // If no filters, show everything and exit early
@@ -268,21 +341,22 @@ function applyFilters() {
     
     // Exit if no new elements to process
     if (elementsCount === 0) {
-        const endTime = performance.now();
-        console.log(`FilterTube: No new elements to process (${(endTime - startTime).toFixed(2)}ms)`);
         return;
     }
     
-    console.log(`FilterTube: Processing ${elementsCount} elements`);
-    
     // For large batches, process in chunks to prevent UI freezing
-    const BATCH_SIZE = 10; // Lower batch size to prevent UI lag
+    const BATCH_SIZE = 5; // Even smaller batch size to prevent UI lag
     
     // If we have a lot of elements, process in batches with delay between them
     if (elementsCount > BATCH_SIZE) {
         let processedCount = 0;
         
         const processNextBatch = () => {
+            // If video started playing, pause processing
+            if (OPTIMIZE_FOR_PLAYBACK && isVideoPlaying) {
+                return;
+            }
+            
             const endIndex = Math.min(processedCount + BATCH_SIZE, elementsCount);
             
             for (let i = processedCount; i < endIndex; i++) {
@@ -313,15 +387,10 @@ function applyFilters() {
             
             // If more elements to process, schedule next batch with a small delay
             if (processedCount < elementsCount) {
-                createFilterTimeout(processNextBatch, 1); // 1ms delay to allow UI updates
+                createFilterTimeout(processNextBatch, 5); // Larger delay to prevent UI lag
             } else {
-                // All elements processed, fix shorts layout
-                fixShortsLayout();
                 // Update filters applied flag
                 filtersApplied = true;
-                
-                const endTime = performance.now();
-                console.log(`FilterTube: Completed processing ${elementsCount} elements in ${(endTime - startTime).toFixed(2)}ms`);
             }
         };
         
@@ -353,14 +422,8 @@ function applyFilters() {
             }
         }
         
-        // Special handling for shorts shelves after filtering
-        fixShortsLayout();
-        
         // Update filters applied flag
         filtersApplied = true;
-        
-        const endTime = performance.now();
-        console.log(`FilterTube: Processed ${elementsCount} elements in ${(endTime - startTime).toFixed(2)}ms`);
     }
     
     // Periodically clean up cache to prevent memory leaks
@@ -470,9 +533,6 @@ function setupObserver() {
         if (hideAllComments || filterComments) {
             setupCommentObserver();
         }
-    } else if (currentPageType === 'search' || currentPageType === 'home') {
-        // On search and home pages, we need shorts observer
-        setupShortsObserver();
     }
     
     // Watch for YouTube SPA navigation
@@ -551,18 +611,6 @@ function injectHidingStyles() {
             opacity: 1 !important;
         }
         
-        /* For shorts that match filter */
-        ytm-shorts-lockup-view-model[data-filter-tube-filtered="true"],
-        ytm-shorts-lockup-view-model-v2[data-filter-tube-filtered="true"] {
-            width: 0 !important;
-            min-width: 0 !important;
-            max-width: 0 !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            border: none !important;
-            overflow: hidden !important;
-        }
-        
         /* Ensure channel renderers are properly hidden when filtered */
         ytd-channel-renderer[data-filter-tube-filtered="true"] {
             display: none !important;
@@ -616,11 +664,36 @@ function getPageType() {
 
 // Load settings as early as possible
 function loadSettings() {
-    chrome.storage.local.get(['filterKeywords', 'filterChannels', 'hideAllComments', 'filterComments'], (items) => {
+    chrome.storage.local.get([
+        'filterKeywords', 
+        'filterChannels', 
+        'hideAllComments', 
+        'filterComments', 
+        'enableYoutubeKids',
+        'syncFilters',
+        'kidsKeywords',
+        'kidsChannels'
+    ], (items) => {
         filterKeywords = items.filterKeywords || '';
         filterChannels = items.filterChannels || '';
         hideAllComments = items.hideAllComments || false;
         filterComments = items.filterComments || false;
+        hideAllShorts = false; // Force disable shorts filtering due to UI issues
+        enableYoutubeKids = items.enableYoutubeKids || false;
+        syncFilters = items.syncFilters || false;
+        kidsKeywords = items.kidsKeywords || '';
+        kidsChannels = items.kidsChannels || '';
+        
+        // Add YouTube Kids indicator to console
+        if (isYoutubeKids) {
+            console.log("FilterTube: Running on YouTube Kids domain");
+            if (enableYoutubeKids) {
+                console.log("FilterTube: YouTube Kids filtering is enabled");
+            } else {
+                console.log("FilterTube: YouTube Kids filtering is disabled");
+                return; // Exit early if YouTube Kids filtering is disabled
+            }
+        }
         
         // Determine current page type
         currentPageType = getPageType();
@@ -638,6 +711,69 @@ function loadSettings() {
     });
 }
 
+// Filter settings have changed, apply filters
+chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === 'local') {
+        let settingsChanged = false;
+        
+        if (changes.filterKeywords) {
+            filterKeywords = changes.filterKeywords.newValue || '';
+            settingsChanged = true;
+        }
+        if (changes.filterChannels) {
+            filterChannels = changes.filterChannels.newValue || '';
+            settingsChanged = true;
+        }
+        if (changes.hideAllComments !== undefined) {
+            hideAllComments = changes.hideAllComments.newValue;
+            settingsChanged = true;
+        }
+        if (changes.filterComments !== undefined) {
+            filterComments = changes.filterComments.newValue;
+            settingsChanged = true;
+        }
+        if (changes.enableYoutubeKids !== undefined) {
+            enableYoutubeKids = changes.enableYoutubeKids.newValue;
+            settingsChanged = true;
+        }
+        if (changes.syncFilters !== undefined) {
+            syncFilters = changes.syncFilters.newValue;
+            settingsChanged = true;
+        }
+        if (changes.kidsKeywords) {
+            kidsKeywords = changes.kidsKeywords.newValue || '';
+            settingsChanged = true;
+        }
+        if (changes.kidsChannels) {
+            kidsChannels = changes.kidsChannels.newValue || '';
+            settingsChanged = true;
+        }
+        
+        if (settingsChanged) {
+            // If we're on YouTube Kids but it's disabled, exit
+            if (isYoutubeKids && !enableYoutubeKids) {
+                console.log("FilterTube: YouTube Kids filtering disabled, not applying filters");
+                return;
+            }
+            
+            // Reset filtering state
+            filtersApplied = false;
+            
+            // Clear existing marks
+            document.querySelectorAll('[data-filter-tube-allowed="true"], [data-filter-tube-filtered="true"]').forEach(el => {
+                el.removeAttribute('data-filter-tube-allowed');
+                el.removeAttribute('data-filter-tube-filtered');
+            });
+            
+            // Apply filters immediately
+            applyFilters();
+            
+            // And once more after a delay
+            setTimeout(applyFilters, 300);
+        }
+    }
+});
+
 // Load settings immediately if possible
 if (document.readyState !== 'loading') {
     loadSettings();
@@ -645,42 +781,25 @@ if (document.readyState !== 'loading') {
     document.addEventListener('DOMContentLoaded', loadSettings);
 }
 
-// Filter settings have changed, apply filters
-chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === 'local') {
-        if (changes.filterKeywords) {
-            filterKeywords = changes.filterKeywords.newValue || '';
-        }
-        if (changes.filterChannels) {
-            filterChannels = changes.filterChannels.newValue || '';
-        }
-        if (changes.hideAllComments !== undefined) {
-            hideAllComments = changes.hideAllComments.newValue;
-        }
-        if (changes.filterComments !== undefined) {
-            filterComments = changes.filterComments.newValue;
-        }
-        
-        // Reset filtering state
-        filtersApplied = false;
-        
-        // Clear existing marks
-        document.querySelectorAll('[data-filter-tube-allowed="true"], [data-filter-tube-filtered="true"]').forEach(el => {
-            el.removeAttribute('data-filter-tube-allowed');
-            el.removeAttribute('data-filter-tube-filtered');
-        });
-        
-        // Apply filters immediately
-        applyFilters();
-        
-        // And once more after a delay
-        setTimeout(applyFilters, 300);
-    }
-});
+// Log the version based on where we're running
+console.log(`FilterTube Content Script v1.4.7 Loaded on ${isYoutubeKids ? 'YouTube Kids' : 'YouTube'}`);
 
-// Extract channel info from YouTube's polymer component data
+// Extract channel info from YouTube's polymer component data (optimized)
 function extractChannelInfoFromPolymer(element) {
     try {
+        // Performance optimization: Throttle polymer extraction calls
+        const now = Date.now();
+        if (LIMIT_POLYMER_EXTRACTIONS && now - lastPolymerExtraction < polymerExtractionThrottle) {
+            return null;
+        }
+        
+        // Skip expensive polymer extraction during video playback if optimization is enabled
+        if (OPTIMIZE_FOR_PLAYBACK && isVideoPlaying && !isSidebarItem) {
+            return null;
+        }
+        
+        lastPolymerExtraction = now;
+        
         // Find the closest video renderer element
         const videoElement = element.closest('ytd-compact-video-renderer, ytd-grid-video-renderer, ytd-video-renderer, ytd-rich-item-renderer');
         if (!videoElement) return null;
@@ -730,19 +849,34 @@ function extractChannelInfoFromPolymer(element) {
 
         // Debug logging if we found something
         if (channelInfo.id || channelInfo.handle || channelInfo.name) {
-            console.log('Found polymer channel info:', channelInfo);
             return channelInfo;
         }
     } catch (error) {
         // Silently fail if there are any errors accessing polymer data
-        console.debug('Error extracting polymer data:', error);
     }
 
     return null;
 }
 
-// Get all potential channel identifiers from an element
+// Get all potential channel identifiers from an element (optimized)
 function getChannelIdentifiers(element) {
+    // Skip expensive processing during video playback if optimization is enabled
+    if (OPTIMIZE_FOR_PLAYBACK && isVideoPlaying && !isSidebarItem && USE_LIGHTWEIGHT_CHANNEL_DETECTION) {
+        // Use a lightweight channel detection during video playback
+        const identifiers = [];
+        
+        // Try channel name from basic selectors
+        const channelNameElements = element.querySelectorAll('#channel-name, #text.ytd-channel-name, #byline');
+        channelNameElements.forEach(channelElement => {
+            const channelName = channelElement.textContent.trim().toLowerCase();
+            if (channelName) {
+                identifiers.push(channelName);
+            }
+        });
+        
+        return [...new Set(identifiers)];
+    }
+    
     const identifiers = [];
     
     // Try to extract channel info from polymer data first (most reliable)
@@ -1202,9 +1336,17 @@ function processSidebarBatch(cards, startIndex, batchSize) {
 
 // Watch a sidebar card with retry mechanism for reliable channel extraction
 function watchSidebarCard(card) {
-    if (processSidebarCard(card)) return;
-    // If not ready yet, try again soon
-    requestAnimationFrame(() => watchSidebarCard(card));
+    isSidebarItem = true;
+    if (processSidebarCard(card)) {
+        isSidebarItem = false;
+        return;
+    }
+    // If not ready yet, try again soon but with limits
+    setTimeout(() => {
+        isSidebarItem = true;
+        processSidebarCard(card);
+        isSidebarItem = false;
+    }, 100);
 }
 
 // Process a sidebar card once channel data is available
@@ -1363,7 +1505,7 @@ function processShortElement(shortElement) {
                         current = current[part];
                     } else {
                         found = false;
-                        break;
+                            break;
                     }
                 }
                 
@@ -1505,10 +1647,10 @@ function setupCommentObserver() {
         let shouldFilter = false;
         
         // Check for added nodes that might be comments
-        for (const mutation of mutations) {
-            if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+    for (const mutation of mutations) {
+        if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
                 shouldFilter = true;
-                break;
+                    break;
             }
         }
         
@@ -1607,7 +1749,7 @@ function processComment(comment, keywords, channels) {
     }
 }
 
-console.log("FilterTube Content Script Loaded - Zero Flash Version v1.4.4");
+console.log("FilterTube Content Script Loaded - Zero Flash Version v1.4.7");
 
 
 

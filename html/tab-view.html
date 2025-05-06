@@ -19,6 +19,7 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif !important;
             color: #333 !important;
             box-sizing: border-box !important;
+            background-image: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%) !important;
         }
         
         /* Main container to center content */
@@ -34,6 +35,220 @@
         .logo-icon, .title {
             cursor: pointer;
         }
+        
+        /* Glass morphic styling */
+        .content-wrapper {
+            background: rgba(255, 255, 255, 0.85) !important;
+            backdrop-filter: blur(10px) !important;
+            -webkit-backdrop-filter: blur(10px) !important;
+            border-radius: 16px !important;
+            border: 1px solid rgba(255, 255, 255, 0.18) !important;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1) !important;
+            padding: 40px !important;
+            margin: 40px 20px !important;
+            max-width: 900px !important;
+        }
+        
+        header {
+            margin-bottom: 40px !important;
+            padding-bottom: 25px !important;
+            border-bottom: 1px solid rgba(230, 230, 230, 0.8) !important;
+        }
+        
+        /* Tabs styling */
+        .tabs-container {
+            width: 100%;
+            margin-bottom: 30px;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            width: 100%;
+            border-bottom: 1px solid rgba(220, 220, 220, 0.8);
+            margin-bottom: 30px;
+            padding: 0 !important;
+            gap: 5px;
+        }
+        
+        .tab-button {
+            padding: 15px 30px;
+            background-color: rgba(240, 240, 240, 0.5);
+            border: none;
+            cursor: pointer;
+            flex: 1;
+            text-align: center;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            border-radius: 8px 8px 0 0;
+            position: relative;
+            color: #555;
+        }
+        
+        .tab-button:hover {
+            background-color: rgba(230, 230, 230, 0.8);
+        }
+        
+        .tab-button.active {
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #4285f4;
+        }
+        
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: #4285f4;
+        }
+        
+        .tab-content {
+            display: none;
+            width: 100%;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Text input styling */
+        .input-field {
+            padding: 15px !important;
+            border-radius: 10px !important;
+            border: 1px solid rgba(200, 200, 200, 0.5) !important;
+            background: rgba(255, 255, 255, 0.9) !important;
+            font-size: 16px !important;
+            transition: all 0.3s ease !important;
+            margin-bottom: 30px !important;
+        }
+        
+        .input-field:focus {
+            border-color: #4285f4 !important;
+            box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.2) !important;
+            outline: none !important;
+        }
+        
+        /* Settings button in header */
+        .settings-button {
+            margin-left: auto;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+        }
+        
+        .settings-button svg {
+            width: 24px;
+            height: 24px;
+            fill: #555;
+        }
+        
+        /* Styles for advanced settings sections */
+        .advanced-section {
+            margin-top: 25px;
+            padding: 25px;
+            border-radius: 12px;
+            background-color: rgba(245, 245, 245, 0.5);
+            width: 100%;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(230, 230, 230, 0.8);
+        }
+        
+        .advanced-section:hover {
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+        }
+        
+        .advanced-section h3 {
+            margin-top: 0;
+            color: #333;
+            font-size: 18px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(220, 220, 220, 0.8);
+            margin-bottom: 20px;
+        }
+        
+        .button-row {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .button-row button {
+            flex: 1;
+            padding: 12px;
+            background-color: rgba(240, 240, 240, 0.7);
+            border: 1px solid rgba(200, 200, 200, 0.5);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .button-row button:hover {
+            background-color: rgba(230, 230, 230, 0.9);
+            transform: translateY(-2px);
+        }
+        
+        .password-field {
+            margin-top: 15px;
+        }
+        
+        .password-field input {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(200, 200, 200, 0.5);
+            width: 100%;
+            margin-top: 8px;
+        }
+        
+        .password-hint {
+            font-size: 13px;
+            color: #777;
+            margin-top: 10px;
+            font-style: italic;
+        }
+        
+        /* Checkbox styles */
+        .checkbox-option {
+            margin-bottom: 12px !important;
+        }
+        
+        .checkbox-option label {
+            font-weight: normal !important;
+            margin-left: 10px !important;
+        }
+        
+        /* Save button */
+        #saveBtn {
+            background: linear-gradient(135deg, #4285f4, #3367d6) !important;
+            color: white !important;
+            padding: 15px 35px !important;
+            border: none !important;
+            border-radius: 10px !important;
+            font-size: 16px !important;
+            font-weight: bold !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            box-shadow: 0 4px 15px rgba(66, 133, 244, 0.3) !important;
+            width: 200px !important;
+            margin-top: 20px !important;
+        }
+        
+        #saveBtn:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 20px rgba(66, 133, 244, 0.4) !important;
+        }
+        
+        #saveBtn.saved {
+            background: linear-gradient(135deg, #34a853, #28874d) !important;
+        }
+        
+        /* Hide YouTube Shorts option temporarily */
+        .shorts-filter-options {
+            display: none !important;
+        }
     </style>
 </head>
 
@@ -45,37 +260,147 @@
             <img src="../icons/icon-48.png" alt="FilterTube Icon" class="logo-icon">
             <!-- Display the extension name -->
             <div class="title">FilterTube</div>
-            <!-- No "Open in tab" button in the tab view -->
         </header>
 
-        <!-- Main content area for filter inputs -->
-        <div id="info">
-            <!-- Label for the keywords input -->
-            <label for="keywords">Filter by Keywords (comma separated):</label>
-            <!-- Textarea for entering keywords, linked to the label by 'for' and 'id' -->
-            <textarea id="keywords" class="input-field" rows="3" placeholder="e.g., news, politics, specific_topic"></textarea>
-
-            <!-- Label for the channels input -->
-            <label for="channels">Filter by Channels (comma separated):</label>
-            <!-- Textarea for entering channel names, linked to the label -->
-            <textarea id="channels" class="input-field" rows="3" placeholder="e.g., Channel Name, @ChannelHandle, channel/UCtxdfwb9wfkoGocVUAJ-Bmg (supports names, @handles & channel IDs)"></textarea>
-            
-            <!-- Note about filtering behavior -->
-            <div class="filter-note">
-                Note: @handles use exact matching, channel names use partial matching
+        <!-- Tabs navigation -->
+        <div class="tabs-container">
+            <div class="tab-buttons">
+                <button class="tab-button active" data-tab="youtube">YouTube</button>
+                <button class="tab-button" data-tab="youtube-kids">YouTube Kids</button>
+                <button class="tab-button" data-tab="settings">Settings</button>
             </div>
             
-            <!-- Comment filtering options -->
-            <div class="comment-filter-options">
-                <label>Comment Filtering:</label>
-                <div class="checkbox-group">
-                    <div class="checkbox-option">
-                        <input type="checkbox" id="hideAllComments" name="commentFilter" value="all">
-                        <label for="hideAllComments">Hide all comments</label>
+            <!-- YouTube Tab Content -->
+            <div id="youtube" class="tab-content active">
+                <!-- Label for the keywords input -->
+                <label for="keywords">Filter by Keywords (comma separated):</label>
+                <!-- Textarea for entering keywords, linked to the label by 'for' and 'id' -->
+                <textarea id="keywords" class="input-field" rows="3" placeholder="e.g., news, politics, specific_topic"></textarea>
+
+                <!-- Label for the channels input -->
+                <label for="channels">Filter by Channels (comma separated):</label>
+                <!-- Textarea for entering channel names, linked to the label -->
+                <textarea id="channels" class="input-field" rows="3" placeholder="e.g., Channel Name, @ChannelHandle, channel/UCtxdfwb9wfkoGocVUAJ-Bmg (supports names, @handles & channel IDs)"></textarea>
+                
+                <!-- Note about filtering behavior -->
+                <div class="filter-note">
+                    Note: @handles use exact matching, channel names use partial matching
+                </div>
+                
+                <!-- Comment filtering options -->
+                <div class="comment-filter-options">
+                    <label>Comment Filtering:</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="hideAllComments" name="commentFilter" value="all">
+                            <label for="hideAllComments">Hide all comments</label>
+                        </div>
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="hideFilteredComments" name="commentFilter" value="filtered">
+                            <label for="hideFilteredComments">Filter comments with keywords/channels</label>
+                        </div>
                     </div>
+                </div>
+                
+                <!-- Shorts filtering options (temporarily hidden) -->
+                <div class="shorts-filter-options" style="display: none;">
+                    <label>Shorts Filtering:</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="hideAllShorts" name="shortsFilter" value="all">
+                            <label for="hideAllShorts">Hide all YouTube Shorts</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- YouTube Kids Tab Content -->
+            <div id="youtube-kids" class="tab-content">
+                <div class="youtube-kids-header">
+                    <h3>YouTube Kids Filtering</h3>
                     <div class="checkbox-option">
-                        <input type="checkbox" id="hideFilteredComments" name="commentFilter" value="filtered">
-                        <label for="hideFilteredComments">Filter comments with keywords/channels</label>
+                        <input type="checkbox" id="enableYoutubeKids" name="youtubeKids" value="enable">
+                        <label for="enableYoutubeKids">Enable filtering on YouTube Kids</label>
+                    </div>
+                </div>
+                
+                <div class="filtering-options">
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="syncFilters" name="youtubeKids" value="sync">
+                        <label for="syncFilters">Use the same filters as YouTube</label>
+                    </div>
+                    
+                    <div id="kidsFiltersContainer">
+                        <!-- Label for the kids keywords input -->
+                        <label for="kidsKeywords">Filter by Keywords (comma separated):</label>
+                        <textarea id="kidsKeywords" class="input-field" rows="3" placeholder="e.g., scary, inappropriate, mature"></textarea>
+
+                        <!-- Label for the kids channels input -->
+                        <label for="kidsChannels">Filter by Channels (comma separated):</label>
+                        <textarea id="kidsChannels" class="input-field" rows="3" placeholder="Enter channel names to filter from YouTube Kids"></textarea>
+                    </div>
+                </div>
+                
+                <div class="filter-note">
+                    Note: YouTube Kids filtering works the same way as YouTube filtering
+                </div>
+            </div>
+            
+            <!-- Settings Tab Content -->
+            <div id="settings" class="tab-content">
+                <!-- UI Preferences -->
+                <div class="ui-preferences">
+                    <label>UI Preferences:</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="openInNewTab" name="uiPreference" value="newtab">
+                            <label for="openInNewTab">Always open FilterTube in a new tab</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Export/Import Settings Section -->
+                <div class="advanced-section">
+                    <h3>Export/Import Settings</h3>
+                    <p>Save your filters and preferences or restore from a backup.</p>
+                    <div class="button-row">
+                        <button id="exportSettingsBtn">Export Settings</button>
+                        <button id="importSettingsBtn">Import Settings</button>
+                    </div>
+                    <!-- Hidden file input for import -->
+                    <input type="file" id="settingsFileInput" style="display: none;" accept=".json">
+                </div>
+                
+                <!-- Password Protection Section -->
+                <div class="advanced-section">
+                    <h3>Password Protection</h3>
+                    <p>Protect your FilterTube settings with a password. Useful for parental controls.</p>
+                    <div class="password-field">
+                        <label for="settingsPassword">Settings Password:</label>
+                        <input type="password" id="settingsPassword" placeholder="Enter password">
+                    </div>
+                    <div class="button-row">
+                        <button id="setPasswordBtn">Set Password</button>
+                        <button id="clearPasswordBtn">Clear Password</button>
+                    </div>
+                    <div class="password-hint">
+                        Forgot your password? Use the master password "FilterTube" to reset.
+                    </div>
+                </div>
+                
+                <!-- Performance Settings Section -->
+                <div class="advanced-section">
+                    <h3>Performance Settings</h3>
+                    <p>Adjust settings to improve performance when watching videos.</p>
+                    <div class="checkbox-group">
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="optimizePlayback" name="performance" value="optimize" checked>
+                            <label for="optimizePlayback">Reduce filtering during video playback (recommended)</label>
+                        </div>
+                        <div class="checkbox-option">
+                            <input type="checkbox" id="lightweightChannelDetection" name="performance" value="lightweight" checked>
+                            <label for="lightweightChannelDetection">Use lightweight channel detection (improves performance)</label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -88,6 +413,66 @@
     <!-- Include the popup JavaScript file -->
     <!-- Placed at the end of the body to ensure the DOM elements are available when the script runs -->
     <script src="../js/popup.js"></script>
+
+    <script>
+        // Tab switching functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            // Enable/disable YouTube Kids specific filters based on checkbox states
+            const enableYoutubeKids = document.getElementById('enableYoutubeKids');
+            const syncFilters = document.getElementById('syncFilters');
+            const kidsFiltersContainer = document.getElementById('kidsFiltersContainer');
+            
+            function updateKidsFiltersVisibility() {
+                if (!enableYoutubeKids || !syncFilters || !kidsFiltersContainer) return;
+                
+                if (enableYoutubeKids.checked && !syncFilters.checked) {
+                    kidsFiltersContainer.style.display = 'block';
+                } else {
+                    kidsFiltersContainer.style.display = 'none';
+                }
+            }
+            
+            // Initial setup
+            updateKidsFiltersVisibility();
+            
+            if (enableYoutubeKids) {
+                enableYoutubeKids.addEventListener('change', updateKidsFiltersVisibility);
+            }
+            
+            if (syncFilters) {
+                syncFilters.addEventListener('change', updateKidsFiltersVisibility);
+            }
+            
+            // Tab switching - Improved to ensure it works
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabName = button.getAttribute('data-tab');
+                    console.log('Tab clicked:', tabName);
+                    
+                    // Remove active class from all buttons and tabs
+                    tabButtons.forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    
+                    // Add active class to clicked button and corresponding tab
+                    button.classList.add('active');
+                    const tabContent = document.getElementById(tabName);
+                    if (tabContent) {
+                        tabContent.classList.add('active');
+                    } else {
+                        console.error('Tab content not found:', tabName);
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 
 </html> 

@@ -1,5 +1,29 @@
 # FilterTube Changelog
 
+## Version 1.4.7
+- Temporarily disabled "Hide All YouTube Shorts" feature due to UI issues (will be fixed in future update)
+- Added performance optimization features:
+  - Reduced processing during video playback
+  - Added throttling for polymer data extraction
+  - Implemented lightweight channel detection mode
+  - Added debouncing for video state changes
+  - Reduced logging and unnecessary processing
+- Improved tab switching functionality in tab view interface
+- Enhanced UI with glass morphic styling and more spacious layout
+- Fixed YouTube Kids tab compatibility
+- Added performance settings controls in Settings tab
+- Fixed password protection workflow
+- Fixed video playback issues when minimizing/maximizing
+
+## Version 1.4.6
+- Added "Hide All YouTube Shorts" option to completely remove shorts content
+- Added "Always Open in New Tab" preference for popup UI
+- Added Export/Import settings functionality for easier backup and transfer
+- Added Password Protection system with master password recovery
+- Enhanced tab-view with advanced settings section
+- Improved UI consistency between popup and tab view
+- Added special handling for Shorts pages when shorts are hidden
+
 ## Version 1.4.5
 - Fixed performance issues on video pages with optimized observer configuration
 - Added cache-based filtering to improve performance for repeated elements
