@@ -23,7 +23,8 @@
     "content_scripts": [
         {
             "matches": [
-                "*://*.youtube.com/*"
+                "*://*.youtube.com/*",
+                "*://*.youtubekids.com/*"
             ],
             "js": [
                 "js/content.js"
@@ -44,6 +45,7 @@
         "128": "icons/icon-128.png"
     },
     "host_permissions": [
-        "*://*.youtube.com/*"
+        "*://*.youtube.com/*",
+        "*://*.youtubekids.com/*"
     ]
 } 
