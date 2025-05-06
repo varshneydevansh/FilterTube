@@ -16,6 +16,469 @@ let stylesInjected = false;
 let currentPageType = 'unknown';
 let processingBatch = false;
 
+// Add cleanup functions near the unload event handler
+
+// Clean up on unload
+window.addEventListener('unload', () => {
+    if (observer) {
+        observer.disconnect();
+    }
+    
+    if (sidebarObserver) {
+        sidebarObserver.disconnect();
+    }
+    
+    if (shortsObserver) {
+        shortsObserver.disconnect();
+    }
+    
+    if (window._filterTubeUrlInterval) {
+        clearInterval(window._filterTubeUrlInterval);
+    }
+    
+    // Pause any playing videos to prevent them from continuing after tab close
+    const videos = document.querySelectorAll('video');
+    videos.forEach(video => {
+        try {
+            if (!video.paused) {
+                video.pause();
+            }
+        } catch (e) {
+            // Silent catch for any errors
+        }
+    });
+    
+    // Remove style element
+    const style = document.getElementById('filter-tube-styles');
+    if (style) {
+        style.remove();
+    }
+    
+    // Clear any pending timeouts
+    if (window._filterTubeTimeouts) {
+        window._filterTubeTimeouts.forEach(id => clearTimeout(id));
+    }
+});
+
+// Add better timeout management
+window._filterTubeTimeouts = [];
+
+function createFilterTimeout(callback, delay) {
+    const id = setTimeout(() => {
+        // Remove from tracking array when executed
+        window._filterTubeTimeouts = window._filterTubeTimeouts.filter(timeoutId => timeoutId !== id);
+        callback();
+    }, delay);
+    
+    // Track the timeout ID
+    window._filterTubeTimeouts.push(id);
+    
+    return id;
+}
+
+// Replace the watchForNavigation function with a more optimal version
+function watchForNavigation() {
+    let lastUrl = location.href;
+    
+    // Set up interval to check URL changes
+    const urlCheckInterval = setInterval(() => {
+        // Skip check if page is hidden
+        if (document.hidden) return;
+        
+        const currentUrl = location.href;
+        
+        if (lastUrl !== currentUrl) {
+            lastUrl = currentUrl;
+            console.log("FilterTube: URL changed, reapplying filters");
+            
+            // Clean up any video elements from the previous page
+            const videos = document.querySelectorAll('video');
+            videos.forEach(video => {
+                try {
+                    if (!video.paused) {
+                        video.pause();
+                    }
+                } catch (e) {
+                    // Silent catch
+                }
+            });
+            
+            // Reset filtering state
+            filtersApplied = false;
+            
+            // Update page type
+            const newPageType = getPageType();
+            
+            // If page type changed, disconnect specialized observers
+            if (currentPageType !== newPageType) {
+                currentPageType = newPageType;
+                
+                // Disconnect specialized observers
+                if (sidebarObserver) {
+                    sidebarObserver.disconnect();
+                    sidebarObserver = null;
+                }
+                
+                if (shortsObserver) {
+                    shortsObserver.disconnect();
+                    shortsObserver = null;
+                }
+                
+                // Set up appropriate observers for new page type
+                if (currentPageType === 'watch') {
+                    // On watch pages, we need sidebar and comment observers
+                    setupSidebarObserver();
+                    
+                    // Only set up comment observer if comment filtering is enabled
+                    if (hideAllComments || filterComments) {
+                        setupCommentObserver();
+                    }
+                } else if (currentPageType === 'search' || currentPageType === 'home') {
+                    // On search and home pages, we need shorts observer
+                    setupShortsObserver();
+                }
+            }
+            
+            // Apply filters multiple times as content loads, using our managed timeouts
+            applyFilters();
+            createFilterTimeout(applyFilters, 300);
+            createFilterTimeout(applyFilters, 1000);
+            createFilterTimeout(applyFilters, 2000);
+            
+            // If we've navigated to a video page, handle comments
+            if (currentPageType === 'watch') {
+                // Multiple attempts to catch the comment section as it loads
+                if (hideAllComments || filterComments) {
+                    createFilterTimeout(() => {
+                        console.log("FilterTube: Checking for comments (1st attempt)");
+                        const commentSection = document.querySelector('#comments, ytd-comments');
+                        if (commentSection) {
+                            if (hideAllComments) {
+                                document.documentElement.classList.add('filtertube-hide-all-comments');
+                            } else if (filterComments) {
+                                applyCommentFilters();
+                            }
+                        }
+                    }, 1000);
+                    
+                    createFilterTimeout(() => {
+                        if (hideAllComments || filterComments) {
+                            console.log("FilterTube: Checking for comments (final attempt)");
+                            const commentSection = document.querySelector('#comments, ytd-comments');
+                            if (commentSection) {
+                                if (hideAllComments) {
+                                    document.documentElement.classList.add('filtertube-hide-all-comments');
+                                } else if (filterComments) {
+                                    applyCommentFilters();
+                                }
+                            }
+                        }
+                    }, 3000);
+                }
+            }
+        }
+    }, 250); // Reduced frequency from 100ms to 250ms
+    
+    // Store interval ID for cleanup
+    window._filterTubeUrlInterval = urlCheckInterval;
+}
+
+// Add optimization for cache-based filtering
+// Global cache to store filtering results
+let filterCache = {
+    elements: new Map(), // Element -> isFiltered
+    lastKeywords: '',
+    lastChannels: '',
+};
+
+// Update applyFilters function to use caching
+function applyFilters() {
+    // Performance optimization - avoid unnecessary work
+    if (document.hidden) {
+        // Page is not visible, defer intensive processing
+        return;
+    }
+
+    // Measure performance
+    const startTime = performance.now();
+    
+    // Make sure styles are injected
+    injectHidingStyles();
+    
+    // Handle comment section visibility based on settings
+    if (hideAllComments) {
+        document.documentElement.classList.add('filtertube-hide-all-comments');
+        document.documentElement.classList.remove('filtertube-filter-comments');
+        console.log("FilterTube: Hiding all comments");
+    } else if (filterComments) {
+        document.documentElement.classList.remove('filtertube-hide-all-comments');
+        document.documentElement.classList.add('filtertube-filter-comments');
+        console.log("FilterTube: Filtering comments");
+        
+        // Apply comment filtering - but only if we're on a video page
+        if (location.href.includes('/watch')) {
+            applyCommentFilters();
+        }
+    } else {
+        // No comment filtering active
+        document.documentElement.classList.remove('filtertube-hide-all-comments');
+        document.documentElement.classList.remove('filtertube-filter-comments');
+    }
+    
+    // Parse filter settings - do this once outside the element loop
+    const keywords = filterKeywords.split(',')
+        .map(k => k.trim().toLowerCase())
+        .filter(k => k.length > 0);
+    
+    const channels = filterChannels.split(',')
+        .map(c => c.trim().toLowerCase())
+        .filter(c => c.length > 0);
+    
+    // Check if filters have changed since last run
+    const currentFilters = filterKeywords + "|" + filterChannels;
+    const filtersChanged = currentFilters !== (filterCache.lastKeywords + "|" + filterCache.lastChannels);
+    
+    // If filters changed, invalidate cache
+    if (filtersChanged) {
+        console.log("FilterTube: Filters changed, invalidating cache");
+        filterCache.elements.clear();
+        filterCache.lastKeywords = filterKeywords;
+        filterCache.lastChannels = filterChannels;
+    }
+    
+    // If no filters, show everything and exit early
+    if (keywords.length === 0 && channels.length === 0) {
+        // Show all elements
+        document.querySelectorAll(VIDEO_SELECTORS).forEach(element => {
+            element.setAttribute('data-filter-tube-allowed', 'true');
+            element.removeAttribute('data-filter-tube-filtered');
+            
+            // Update cache
+            filterCache.elements.set(element, false); // Not filtered
+        });
+        return;
+    }
+    
+    // Performance optimization - process in smaller batches for smoother UX
+    // Only select elements that haven't been processed yet and aren't in cache
+    const contentElements = document.querySelectorAll(VIDEO_SELECTORS + ':not([data-filter-tube-allowed="true"]):not([data-filter-tube-filtered="true"])');
+    
+    // Cache the length to avoid repeated property lookups
+    const elementsCount = contentElements.length;
+    
+    // Exit if no new elements to process
+    if (elementsCount === 0) {
+        const endTime = performance.now();
+        console.log(`FilterTube: No new elements to process (${(endTime - startTime).toFixed(2)}ms)`);
+        return;
+    }
+    
+    console.log(`FilterTube: Processing ${elementsCount} elements`);
+    
+    // For large batches, process in chunks to prevent UI freezing
+    const BATCH_SIZE = 10; // Lower batch size to prevent UI lag
+    
+    // If we have a lot of elements, process in batches with delay between them
+    if (elementsCount > BATCH_SIZE) {
+        let processedCount = 0;
+        
+        const processNextBatch = () => {
+            const endIndex = Math.min(processedCount + BATCH_SIZE, elementsCount);
+            
+            for (let i = processedCount; i < endIndex; i++) {
+                const element = contentElements[i];
+                
+                // Check cache first
+                if (filterCache.elements.has(element) && !filtersChanged) {
+                    const isFiltered = filterCache.elements.get(element);
+                    if (isFiltered) {
+                        element.setAttribute('data-filter-tube-filtered', 'true');
+                        element.removeAttribute('data-filter-tube-allowed');
+                    } else {
+                        element.setAttribute('data-filter-tube-allowed', 'true');
+                        element.removeAttribute('data-filter-tube-filtered');
+                    }
+                } else {
+                    processElement(element, keywords, channels);
+                    
+                    // Cache the result
+                    filterCache.elements.set(
+                        element, 
+                        element.getAttribute('data-filter-tube-filtered') === 'true'
+                    );
+                }
+            }
+            
+            processedCount = endIndex;
+            
+            // If more elements to process, schedule next batch with a small delay
+            if (processedCount < elementsCount) {
+                createFilterTimeout(processNextBatch, 1); // 1ms delay to allow UI updates
+            } else {
+                // All elements processed, fix shorts layout
+                fixShortsLayout();
+                // Update filters applied flag
+                filtersApplied = true;
+                
+                const endTime = performance.now();
+                console.log(`FilterTube: Completed processing ${elementsCount} elements in ${(endTime - startTime).toFixed(2)}ms`);
+            }
+        };
+        
+        // Start processing the first batch
+        processNextBatch();
+    } else {
+        // Small number of elements, process all at once
+        for (let i = 0; i < elementsCount; i++) {
+            const element = contentElements[i];
+            
+            // Check cache first
+            if (filterCache.elements.has(element) && !filtersChanged) {
+                const isFiltered = filterCache.elements.get(element);
+                if (isFiltered) {
+                    element.setAttribute('data-filter-tube-filtered', 'true');
+                    element.removeAttribute('data-filter-tube-allowed');
+                } else {
+                    element.setAttribute('data-filter-tube-allowed', 'true');
+                    element.removeAttribute('data-filter-tube-filtered');
+                }
+            } else {
+                processElement(element, keywords, channels);
+                
+                // Cache the result
+                filterCache.elements.set(
+                    element, 
+                    element.getAttribute('data-filter-tube-filtered') === 'true'
+                );
+            }
+        }
+        
+        // Special handling for shorts shelves after filtering
+        fixShortsLayout();
+        
+        // Update filters applied flag
+        filtersApplied = true;
+        
+        const endTime = performance.now();
+        console.log(`FilterTube: Processed ${elementsCount} elements in ${(endTime - startTime).toFixed(2)}ms`);
+    }
+    
+    // Periodically clean up cache to prevent memory leaks
+    cleanupCache();
+}
+
+// Add cache cleanup function
+function cleanupCache() {
+    // Only clean up occasionally to avoid overhead
+    if (Math.random() < 0.1) { // 10% chance on each call
+        console.log("FilterTube: Cleaning up element cache");
+        
+        // Remove elements that are no longer in the DOM
+        for (const [element] of filterCache.elements) {
+            if (!document.contains(element)) {
+                filterCache.elements.delete(element);
+            }
+        }
+        
+        // Limit cache size to prevent memory issues
+        if (filterCache.elements.size > 1000) {
+            console.log("FilterTube: Cache too large, clearing oldest entries");
+            // Convert to array, keep most recent 500 entries
+            const entries = Array.from(filterCache.elements.entries());
+            filterCache.elements = new Map(entries.slice(entries.length - 500));
+        }
+    }
+}
+
+// Update setupObserver function to be more selective on video pages
+function setupObserver() {
+    // Disconnect previous observer if exists
+    if (observer) {
+        observer.disconnect();
+    }
+    
+    // Update current page type
+    currentPageType = getPageType();
+    console.log(`FilterTube: Detected page type: ${currentPageType}`);
+    
+    // Create the observer with throttling
+    let timeout = null;
+    observer = new MutationObserver((mutations) => {
+        // Skip if we're already processing or the page is hidden
+        if (processingBatch || document.hidden) return;
+        
+        // On video pages, be more selective about what we process
+        if (currentPageType === 'watch') {
+            let shouldFilter = false;
+            
+            // Only check specific containers on video pages
+            const relevantContainers = [
+                'ytd-watch-next-secondary-results-renderer',
+                'ytd-comments',
+                '#related',
+                '#secondary'
+            ];
+            
+            for (const mutation of mutations) {
+                if (mutation.type !== 'childList' || mutation.addedNodes.length === 0) continue;
+                
+                // Check if mutation is in a relevant container
+                const container = mutation.target.closest(relevantContainers.join(','));
+                if (container) {
+                    shouldFilter = true;
+                    break;
+                }
+            }
+            
+            if (!shouldFilter) return;
+        } else {
+            // For other page types, check any added nodes
+            let shouldFilter = false;
+            
+            for (const mutation of mutations) {
+                if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                    shouldFilter = true;
+                    break;
+                }
+            }
+            
+            if (!shouldFilter) return;
+        }
+        
+        // Apply filters with throttling
+        if (timeout) {
+            clearTimeout(timeout);
+        }
+        timeout = setTimeout(() => {
+            timeout = null;
+            applyFilters();
+        }, 100); // Throttle to once every 100ms
+    });
+    
+    // Start observing the document
+    observer.observe(document.documentElement, {
+        childList: true,
+        subtree: true
+    });
+    
+    // Set up specialized observers based on page type
+    if (currentPageType === 'watch') {
+        // On watch pages, we need sidebar and comment observers
+        setupSidebarObserver();
+        
+        // Only set up comment observer if comment filtering is enabled
+        if (hideAllComments || filterComments) {
+            setupCommentObserver();
+        }
+    } else if (currentPageType === 'search' || currentPageType === 'home') {
+        // On search and home pages, we need shorts observer
+        setupShortsObserver();
+    }
+    
+    // Watch for YouTube SPA navigation
+    watchForNavigation();
+}
+
 // Immediately inject a style element to hide content until filtering
 function injectHidingStyles() {
     if (stylesInjected) return;
@@ -358,124 +821,6 @@ function containsExactWord(text, word) {
     return regex.test(text);
 }
 
-// Ultra-optimized filtering function
-function applyFilters() {
-    // Performance optimization - avoid unnecessary work
-    if (document.hidden) {
-        // Page is not visible, defer intensive processing
-        return;
-    }
-    
-    // Measure performance
-    const startTime = performance.now();
-    
-    // Make sure styles are injected
-    injectHidingStyles();
-    
-    // Handle comment section visibility based on settings
-    if (hideAllComments) {
-        document.documentElement.classList.add('filtertube-hide-all-comments');
-        document.documentElement.classList.remove('filtertube-filter-comments');
-        console.log("FilterTube: Hiding all comments");
-    } else if (filterComments) {
-        document.documentElement.classList.remove('filtertube-hide-all-comments');
-        document.documentElement.classList.add('filtertube-filter-comments');
-        console.log("FilterTube: Filtering comments");
-        
-        // Apply comment filtering - but only if we're on a video page
-        if (location.href.includes('/watch')) {
-            applyCommentFilters();
-        }
-    } else {
-        // No comment filtering active
-        document.documentElement.classList.remove('filtertube-hide-all-comments');
-        document.documentElement.classList.remove('filtertube-filter-comments');
-    }
-    
-    // Parse filter settings - do this once outside the element loop
-    const keywords = filterKeywords.split(',')
-        .map(k => k.trim().toLowerCase())
-        .filter(k => k.length > 0);
-    
-    const channels = filterChannels.split(',')
-        .map(c => c.trim().toLowerCase())
-        .filter(c => c.length > 0);
-    
-    // If no filters, show everything and exit early
-    if (keywords.length === 0 && channels.length === 0) {
-        // Show all elements
-        document.querySelectorAll(VIDEO_SELECTORS).forEach(element => {
-            element.setAttribute('data-filter-tube-allowed', 'true');
-            element.removeAttribute('data-filter-tube-filtered');
-        });
-        return;
-    }
-    
-    // Performance optimization - process in smaller batches for smoother UX
-    // Only select elements that haven't been processed yet
-    const contentElements = document.querySelectorAll(VIDEO_SELECTORS + ':not([data-filter-tube-allowed="true"]):not([data-filter-tube-filtered="true"])');
-    
-    // Cache the length to avoid repeated property lookups
-    const elementsCount = contentElements.length;
-    
-    // Exit if no new elements to process
-    if (elementsCount === 0) {
-        const endTime = performance.now();
-        console.log(`FilterTube: No new elements to process (${(endTime - startTime).toFixed(2)}ms)`);
-        return;
-    }
-    
-    console.log(`FilterTube: Processing ${elementsCount} elements`);
-    
-    // For large batches, process in chunks to prevent UI freezing
-    const BATCH_SIZE = 10; // Lower batch size to prevent UI lag
-    
-    // If we have a lot of elements, process in batches with delay between them
-    if (elementsCount > BATCH_SIZE) {
-        let processedCount = 0;
-        
-        const processNextBatch = () => {
-            const endIndex = Math.min(processedCount + BATCH_SIZE, elementsCount);
-            
-            for (let i = processedCount; i < endIndex; i++) {
-                processElement(contentElements[i], keywords, channels);
-            }
-            
-            processedCount = endIndex;
-            
-            // If more elements to process, schedule next batch with a small delay
-            if (processedCount < elementsCount) {
-                setTimeout(processNextBatch, 1); // 1ms delay to allow UI updates
-            } else {
-                // All elements processed, fix shorts layout
-                fixShortsLayout();
-                // Update filters applied flag
-                filtersApplied = true;
-                
-                const endTime = performance.now();
-                console.log(`FilterTube: Completed processing ${elementsCount} elements in ${(endTime - startTime).toFixed(2)}ms`);
-            }
-        };
-        
-        // Start processing the first batch
-        processNextBatch();
-    } else {
-        // Small number of elements, process all at once
-        for (let i = 0; i < elementsCount; i++) {
-            processElement(contentElements[i], keywords, channels);
-        }
-        
-        // Special handling for shorts shelves after filtering
-        fixShortsLayout();
-        
-        // Update filters applied flag
-        filtersApplied = true;
-        
-        const endTime = performance.now();
-        console.log(`FilterTube: Processed ${elementsCount} elements in ${(endTime - startTime).toFixed(2)}ms`);
-    }
-}
-
 // Helper function to process a single element
 function processElement(element, keywords, channels) {
     // Special handling for ytd-channel-renderer elements
@@ -783,69 +1128,6 @@ function fixShortsLayout() {
     });
 }
 
-// Set up the MutationObserver for real-time filtering
-function setupObserver() {
-    // Disconnect previous observer if exists
-    if (observer) {
-        observer.disconnect();
-    }
-    
-    // Update current page type
-    currentPageType = getPageType();
-    console.log(`FilterTube: Detected page type: ${currentPageType}`);
-    
-    // Create the observer with throttling
-    let timeout = null;
-    observer = new MutationObserver((mutations) => {
-        // Skip if we're already processing or the page is hidden
-        if (processingBatch || document.hidden) return;
-        
-        let shouldFilter = false;
-        
-        // Check for added nodes that might be video elements
-        for (const mutation of mutations) {
-            if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-                shouldFilter = true;
-                break;
-            }
-        }
-        
-        // Apply filters with throttling
-        if (shouldFilter) {
-            if (timeout) {
-                clearTimeout(timeout);
-            }
-            timeout = setTimeout(() => {
-                timeout = null;
-                applyFilters();
-            }, 100); // Throttle to once every 100ms
-        }
-    });
-    
-    // Start observing the document
-    observer.observe(document.documentElement, {
-        childList: true,
-        subtree: true
-    });
-    
-    // Set up specialized observers based on page type
-    if (currentPageType === 'watch') {
-        // On watch pages, we need sidebar and comment observers
-        setupSidebarObserver();
-        
-        // Only set up comment observer if comment filtering is enabled
-        if (hideAllComments || filterComments) {
-            setupCommentObserver();
-        }
-    } else if (currentPageType === 'search' || currentPageType === 'home') {
-        // On search and home pages, we need shorts observer
-        setupShortsObserver();
-    }
-    
-    // Watch for YouTube SPA navigation
-    watchForNavigation();
-}
-
 // Performance-optimized sidebar observer
 function setupSidebarObserver() {
     // If we're not on a watch page or the observer already exists, skip
@@ -1142,118 +1424,6 @@ function processShortElement(shortElement) {
     
     return true; // Successfully processed
 }
-
-// Handle YouTube's single-page application navigation
-function watchForNavigation() {
-    let lastUrl = location.href;
-    
-    // Set up interval to check URL changes
-    const urlCheckInterval = setInterval(() => {
-        // Skip check if page is hidden
-        if (document.hidden) return;
-        
-        const currentUrl = location.href;
-        
-        if (lastUrl !== currentUrl) {
-            lastUrl = currentUrl;
-            console.log("FilterTube: URL changed, reapplying filters");
-            
-            // Reset filtering state
-            filtersApplied = false;
-            
-            // Update page type
-            const newPageType = getPageType();
-            
-            // If page type changed, disconnect specialized observers
-            if (currentPageType !== newPageType) {
-                currentPageType = newPageType;
-                
-                // Disconnect specialized observers
-                if (sidebarObserver) {
-                    sidebarObserver.disconnect();
-                    sidebarObserver = null;
-                }
-                
-                if (shortsObserver) {
-                    shortsObserver.disconnect();
-                    shortsObserver = null;
-                }
-                
-                // Set up appropriate observers for new page type
-                if (currentPageType === 'watch') {
-                    // On watch pages, we need sidebar and comment observers
-                    setupSidebarObserver();
-                    
-                    // Only set up comment observer if comment filtering is enabled
-                    if (hideAllComments || filterComments) {
-                        setupCommentObserver();
-                    }
-                } else if (currentPageType === 'search' || currentPageType === 'home') {
-                    // On search and home pages, we need shorts observer
-                    setupShortsObserver();
-                }
-            }
-            
-            // Apply filters multiple times as content loads
-            applyFilters();
-            setTimeout(applyFilters, 300);
-            setTimeout(applyFilters, 1000);
-            setTimeout(applyFilters, 2000);
-            
-            // If we've navigated to a video page, handle comments
-            if (currentPageType === 'watch') {
-                // Multiple attempts to catch the comment section as it loads
-                if (hideAllComments || filterComments) {
-                    setTimeout(() => {
-                        console.log("FilterTube: Checking for comments (1st attempt)");
-                        const commentSection = document.querySelector('#comments, ytd-comments');
-                        if (commentSection) {
-                            if (hideAllComments) {
-                                document.documentElement.classList.add('filtertube-hide-all-comments');
-                            } else if (filterComments) {
-                                applyCommentFilters();
-                            }
-                        }
-                    }, 1000);
-                    
-                    setTimeout(() => {
-                        if (hideAllComments || filterComments) {
-                            console.log("FilterTube: Checking for comments (final attempt)");
-                            const commentSection = document.querySelector('#comments, ytd-comments');
-                            if (commentSection) {
-                                if (hideAllComments) {
-                                    document.documentElement.classList.add('filtertube-hide-all-comments');
-                                } else if (filterComments) {
-                                    applyCommentFilters();
-                                }
-                            }
-                        }
-                    }, 3000);
-                }
-            }
-        }
-    }, 250); // Reduced frequency from 100ms to 250ms
-    
-    // Store interval ID for cleanup
-    window._filterTubeUrlInterval = urlCheckInterval;
-}
-
-// Clean up on unload
-window.addEventListener('unload', () => {
-    if (observer) {
-        observer.disconnect();
-    }
-    
-    if (window._filterTubeUrlInterval) {
-        clearInterval(window._filterTubeUrlInterval);
-    }
-    
-    // Remove style element
-    const style = document.getElementById('filter-tube-styles');
-    if (style) {
-        style.remove();
-    }
-});
 
 // Apply filters to comments
 function applyCommentFilters() {

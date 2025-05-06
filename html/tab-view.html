@@ -56,9 +56,14 @@
             <textarea id="keywords" class="input-field" rows="3" placeholder="e.g., news, politics, specific_topic"></textarea>
 
             <!-- Label for the channels input -->
-            <label for="channels">Filter by Channels (comma separated, supports names, @handles & channel IDs):</label>
+            <label for="channels">Filter by Channels (comma separated):</label>
             <!-- Textarea for entering channel names, linked to the label -->
-            <textarea id="channels" class="input-field" rows="3" placeholder="e.g., Channel Name, @ChannelHandle, channel/UCtxdfwb9wfkoGocVUAJ-Bmg"></textarea>
+            <textarea id="channels" class="input-field" rows="3" placeholder="e.g., Channel Name, @ChannelHandle, channel/UCtxdfwb9wfkoGocVUAJ-Bmg (supports names, @handles & channel IDs)"></textarea>
+            
+            <!-- Note about filtering behavior -->
+            <div class="filter-note">
+                Note: @handles use exact matching, channel names use partial matching
+            </div>
             
             <!-- Comment filtering options -->
             <div class="comment-filter-options">
@@ -81,6 +86,7 @@
     </div>
 
     <!-- Include the popup JavaScript file -->
+    <!-- Placed at the end of the body to ensure the DOM elements are available when the script runs -->
     <script src="../js/popup.js"></script>
 </body>
 

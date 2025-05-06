@@ -1,5 +1,14 @@
 # FilterTube Changelog
 
+## Version 1.4.5
+- Fixed performance issues on video pages with optimized observer configuration
+- Added cache-based filtering to improve performance for repeated elements
+- Implemented better memory management to prevent memory leaks during long sessions
+- Fixed issue with videos continuing to play after tab close
+- Added selective processing for watch pages to reduce CPU usage
+- Improved timeout management for cleaner handling of async operations
+- Reduced the volume of unnecessary reprocessing events
+
 ## Version 1.4.4
 - Implemented persistent sidebar video filtering with requestAnimationFrame retry mechanism
 - Enhanced shorts filtering to reliably detect channel @usernames and IDs in search results

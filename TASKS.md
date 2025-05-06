@@ -26,7 +26,8 @@
 - [x] Optimized MutationObserver usage
 - [x] Performance throttling for video pages
 - [x] Batch processing for better UI responsiveness
-- [ ] Cache filtering results
+- [x] Cache filtering results
+- [x] Better memory management for long sessions
 - [ ] Lazy filtering for less visible content
 
 ## Edge Cases
@@ -35,6 +36,7 @@
 - [x] Channel filtering with '@' symbol and channel IDs
 - [x] Sidebar video channel filtering with Polymer data extraction
 - [x] Reliable channel detection for dynamically loaded content
+- [x] Fix video continuing to play after tab close
 - [ ] Support for YouTube Music
 - [ ] Support for YouTube TV
 - [ ] Support for old YouTube layouts
@@ -42,11 +44,11 @@
 ## Documentation
 - [x] Create CHANGELOG.md
 - [x] Create TASKS.md
+- [x] Create technical documentation for code structure
+- [x] Document Polymer-based channel extraction
+- [x] Add architectural diagrams
 - [ ] Improve README with usage instructions
 - [ ] Add screenshots to README
-- [ ] Create technical documentation for code structure
-- [ ] Document Polymer-based channel extraction
-- [ ] Add architectural diagrams
 
 ## Development Process
 - [x] Set up Git workflow with proper commit messages
