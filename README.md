@@ -1,21 +1,28 @@
-# FilterTube
+<div align="center">
+  <img src="https://github.com/varshneydevansh/FilterTube/blob/master/icons/icon-128.png" alt="FilterTube Icon">
+  <h1>FilterTube</h1>
+  <p>Filter YouTube videos by keywords, channels, categories, and more.</p>
+</div>
 
-A browser extension that filters YouTube videos, playlists, channels, and comments based on keywords and channel names.
+## Overview
+
+A browser extension that filters YouTube content (videos, shorts, playlists, channels, comments) based on keywords and channel names.
 
 ## Features
 
 ### Content Filtering
-- **Keyword-based Filtering**: Hide videos containing specific keywords in titles, descriptions, or metadata
+- **Keyword-based Filtering**: Hide videos containing specific keywords in titles
+  - Uses partial matching (e.g., "apex" will match "apex legends" and "apexlegends")
 - **Channel-based Filtering**: Hide content from specific channels using:
   - Channel names (partial matching)
   - @handles (exact matching)
-  - Channel IDs (exact matching with format `channel/ID`)
+  - Channel IDs (exact matching with format `channel/ID` or `UC...`)
 - **Multi-format Support**: Filter various YouTube content types:
   - Regular videos
   - Shorts
-  - Playlists
-  - Mixes
-  - Channel recommendations
+  - Playlists and mixes
+  - Channel recommendations and channel cards
+  - Search results
 
 ### Comment Filtering
 - **Hide All Comments**: Option to completely hide the comments section
@@ -26,6 +33,8 @@ A browser extension that filters YouTube videos, playlists, channels, and commen
 - **Tab View**: Open in a dedicated tab for more comfortable settings adjustment
 - **Real-time Filtering**: Filters are applied instantly without page refresh
 - **Visual Feedback**: Clear indication when settings are saved
+- **Password Protection**: Optional password protection for parental control
+- **Import/Export**: Save and restore your filter settings
 
 ## Installation
 
@@ -61,36 +70,30 @@ A browser extension that filters YouTube videos, playlists, channels, and commen
 ### Comment Filtering
 1. Click the FilterTube icon
 2. Toggle "Hide all comments" to completely hide comments
-3. Or use the filter box to specify keywords for comment filtering
+3. Or select "Filter comments with keywords/channels" to hide only matching comments
 
 ## How It Works
 
 FilterTube works by:
-1. Scanning YouTube page content for videos, playlists, and channels
+1. Scanning YouTube page content for videos, playlists, channels, and comments
 2. Comparing titles, channel names, and other metadata against your filters
 3. Hiding elements that match your filter criteria
 4. Preserving YouTube's original layout after filtering
 
 The extension operates entirely in your browser - no data is sent to any external servers.
 
-### Limitations of Channel Filtering
+### Channel Filtering Details
 
-**Note on Channel Filtering Reliability**: Due to how YouTube structures its components, channel filtering may work with varying degrees of reliability across different parts of the platform:
-
-- **Main feed videos**: Very reliable filtering by channel name, @handle, or ID
-- **Search results**: Reliable filtering with potential delays as content loads
-- **Sidebar recommendations**: Semi-reliable filtering that improves as you interact with the page
-- **Shorts**: Semi-reliable filtering that depends on YouTube's internal data availability
-
-The extension uses multiple techniques to extract channel information, including:
-- Direct DOM extraction of visible channel elements
-- Access to YouTube's internal Polymer component data
-- Normalized matching algorithms to handle variations in how channels are represented
+The extension uses multiple techniques to extract and match channel information:
+- DOM extraction of visible channel elements
+- Access to YouTube's internal component data when available
+- Caching to improve performance and consistency
+- Normalized matching algorithms to handle variations in channel representation
 
 For the most reliable channel filtering:
 - Use both the channel ID and @handle when possible
-- Use the `channel:UCxxxxx` format for specific channel IDs
-- Refresh the page after changing filter settings
+- Use the exact format from the channel URL for specific channels
+- Include distinctive parts of channel names for partial matching
 
 ## Technical Details
 
@@ -101,13 +104,12 @@ For the most reliable channel filtering:
   - tab-view.html: Full-page interface
 - **css/**: Styling files
   - filter.css: Styles for hiding/showing elements
-  - layout.css: Styles for fixing layout issues
   - popup.css: Styles for the popup UI
   - tab-view.css: Styles for the tab view
 - **js/**: JavaScript files
   - content.js: Main filtering logic
-  - layout.js: Layout repair functionality
   - popup.js: UI interaction logic
+  - background.js: Background service worker
 
 ### Permissions
 - **tabs**: For opening the tab view
@@ -126,10 +128,8 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 See [CHANGELOG.md](CHANGELOG.md) for a detailed history of changes and improvements.
 
-<div align="center">
-  <img src="https://github.com/varshneydevansh/FilterTube/blob/master/icons/icon-128.png" alt="FilterTube Icon">
-  <h1>FilterTube</h1>
-  <h2>Filter YouTube videos by keywords, channels, and categories.</h2>
-</div>
+---
 
-### Why this extension?
+### Why FilterTube?
+
+YouTube's recommendation algorithms can sometimes surface unwanted content. FilterTube gives you control over what appears in your feed, allowing for a more focused and pleasant viewing experience without distractions or unwanted content.

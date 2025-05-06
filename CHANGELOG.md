@@ -1,5 +1,16 @@
 # FilterTube Changelog
 
+## Version 1.4.8
+- Added exact word matching option to keyword filtering
+- Enhanced channel card filtering in search results (ytd-channel-about-renderer)
+- Improved word matching logic with two distinct methods:
+  - Exact word matching (with word boundaries)
+  - Partial word matching (substring-based)
+- Added user preference toggle in popup and tab-view interfaces
+- Enhanced channel extraction from links with improved @handle detection
+- Optimized performance with improved sidebar caching system
+- Fixed channel filtering in search results for more reliable filtering
+
 ## Version 1.4.7
 - Temporarily disabled "Hide All YouTube Shorts" feature due to UI issues (will be fixed in future update)
 - Added performance optimization features:

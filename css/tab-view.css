@@ -192,4 +192,27 @@ body.tab-view button#saveBtn.saved {
     body.tab-view .title {
         font-size: 24px !important;
     }
+}
+
+/* Styles for the keyword matching options */
+.matching-options {
+    margin-top: 15px;
+    padding: 15px;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.matching-options label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.matching-options .filter-note {
+    font-size: 13px;
+    color: #666;
+    margin-top: 8px;
+    font-style: italic;
 } 
