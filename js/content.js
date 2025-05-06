@@ -669,6 +669,7 @@ function loadSettings() {
         'filterChannels', 
         'hideAllComments', 
         'filterComments', 
+        'hideAllShorts',
         'enableYoutubeKids',
         'syncFilters',
         'kidsKeywords',
@@ -678,7 +679,7 @@ function loadSettings() {
         filterChannels = items.filterChannels || '';
         hideAllComments = items.hideAllComments || false;
         filterComments = items.filterComments || false;
-        hideAllShorts = false; // Force disable shorts filtering due to UI issues
+        hideAllShorts = items.hideAllShorts || false;
         enableYoutubeKids = items.enableYoutubeKids || false;
         syncFilters = items.syncFilters || false;
         kidsKeywords = items.kidsKeywords || '';
@@ -782,7 +783,7 @@ if (document.readyState !== 'loading') {
 }
 
 // Log the version based on where we're running
-console.log(`FilterTube Content Script v1.4.7 Loaded on ${isYoutubeKids ? 'YouTube Kids' : 'YouTube'}`);
+console.log(`FilterTube Content Script v1.4.4 Loaded on ${isYoutubeKids ? 'YouTube Kids' : 'YouTube'}`);
 
 // Extract channel info from YouTube's polymer component data (optimized)
 function extractChannelInfoFromPolymer(element) {
@@ -1749,7 +1750,7 @@ function processComment(comment, keywords, channels) {
     }
 }
 
-console.log("FilterTube Content Script Loaded - Zero Flash Version v1.4.7");
+console.log("FilterTube Content Script Loaded - Zero Flash Version v1.4.4");
 
 
 

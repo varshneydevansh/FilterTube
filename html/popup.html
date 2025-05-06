@@ -26,6 +26,47 @@
             });
         }
     </script>
+    <style>
+        /* Improved styling for popup view */
+        .content-wrapper {
+            padding: 15px;
+            max-width: 380px;
+        }
+        
+        .section-header {
+            margin-top: 25px;
+            margin-bottom: 15px;
+            border-left: 4px solid #4285f4;
+            padding-left: 10px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .filter-note {
+            background: rgba(245, 245, 245, 0.7);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 20px;
+            border-left: 3px solid #4285f4;
+        }
+        
+        .checkbox-option {
+            margin-bottom: 12px;
+        }
+        
+        .checkbox-option input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+        }
+        
+        .checkbox-option label {
+            font-weight: normal;
+            font-size: 14px;
+        }
+    </style>
 </head>
 
 <body>
@@ -54,53 +95,42 @@
         <textarea id="keywords" class="input-field" rows="3" placeholder="e.g., news, politics, specific_topic"></textarea>
 
         <!-- Label for the channels input -->
-            <label for="channels">Filter by Channels (comma separated):</label>
+        <label for="channels">Filter by Channels (comma separated):</label>
         <!-- Textarea for entering channel names, linked to the label -->
-            <textarea id="channels" class="input-field" rows="3" placeholder="e.g., Channel Name, @ChannelHandle, channel/UCtxdfwb9wfkoGocVUAJ-Bmg (supports names, @handles & channel IDs)"></textarea>
+        <textarea id="channels" class="input-field" rows="3" placeholder="e.g., Channel Name, @ChannelHandle, channel/UCtxdfwb9wfkoGocVUAJ-Bmg (supports names, @handles & channel IDs)"></textarea>
             
-            <div class="filter-note">
-                Note: @handles use exact matching, channel names use partial matching
-            </div>
+        <div class="filter-note">
+            Note: @handles use exact matching, channel names use partial matching
+        </div>
 
-            <!-- Comment filtering options -->
-            <div class="comment-filter-options">
-                <label>Comment Filtering:</label>
-                <div class="checkbox-group">
-                    <div class="checkbox-option">
-                        <input type="checkbox" id="hideAllComments" name="commentFilter" value="all">
-                        <label for="hideAllComments">Hide all comments</label>
-                    </div>
-                    <div class="checkbox-option">
-                        <input type="checkbox" id="hideFilteredComments" name="commentFilter" value="filtered">
-                        <label for="hideFilteredComments">Filter comments with keywords/channels</label>
-                    </div>
+        <!-- Comment filtering options -->
+        <div class="section-header">Comment Filtering Options</div>
+        <div class="comment-filter-options">
+            <div class="checkbox-group">
+                <div class="checkbox-option">
+                    <input type="checkbox" id="hideAllComments" name="commentFilter" value="all">
+                    <label for="hideAllComments">Hide all comments</label>
+                </div>
+                <div class="checkbox-option">
+                    <input type="checkbox" id="hideFilteredComments" name="commentFilter" value="filtered">
+                    <label for="hideFilteredComments">Filter comments with keywords/channels</label>
                 </div>
             </div>
+        </div>
             
-            <!-- Shorts filtering options -->
-            <div class="shorts-filter-options" style="display: none;">
-                <label>Shorts Filtering:</label>
-                <div class="checkbox-group">
-                    <div class="checkbox-option">
-                        <input type="checkbox" id="hideAllShorts" name="shortsFilter" value="all">
-                        <label for="hideAllShorts">Hide all YouTube Shorts</label>
-                    </div>
+        <!-- YouTube Kids option -->
+        <div class="section-header">YouTube Kids</div>
+        <div class="youtube-kids-option">
+            <div class="checkbox-group">
+                <div class="checkbox-option">
+                    <input type="checkbox" id="enableYoutubeKids" name="youtubeKids" value="enable">
+                    <label for="enableYoutubeKids">Enable filters on YouTube Kids</label>
                 </div>
             </div>
-            
-            <!-- YouTube Kids option -->
-            <div class="youtube-kids-option" style="display: none;">
-                <label>YouTube Kids:</label>
-                <div class="checkbox-group">
-                    <div class="checkbox-option">
-                        <input type="checkbox" id="enableYoutubeKids" name="youtubeKids" value="enable">
-                        <label for="enableYoutubeKids">Enable filters on YouTube Kids</label>
-                    </div>
-                </div>
-                <div class="filter-note">
-                    Open in tab view for advanced YouTube Kids settings
-                </div>
+            <div class="filter-note">
+                Open in tab view for advanced YouTube Kids settings
             </div>
+        </div>
     </div>
 
     <!-- Save button to store the preferences -->
@@ -108,7 +138,6 @@
     </div>
 
     <!-- Include the popup JavaScript file -->
-    <!-- Placed at the end of the body to ensure the DOM elements are available when the script runs -->
     <script src="../js/popup.js"></script>
 </body>
 

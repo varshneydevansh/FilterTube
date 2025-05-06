@@ -98,9 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
             'enableYoutubeKids',
             'syncFilters',
             'kidsKeywords',
-            'kidsChannels',
-            'optimizePlayback',
-            'lightweightChannelDetection'
+            'kidsChannels'
         ], function(items) {
             // Set form values
             keywordsElement.value = items.filterKeywords || '';
@@ -146,18 +144,6 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (kidsChannelsTextarea) {
                 kidsChannelsTextarea.value = items.kidsChannels || '';
-            }
-            
-            // Performance settings
-            const optimizePlaybackCheckbox = document.getElementById('optimizePlayback');
-            const lightweightChannelDetectionCheckbox = document.getElementById('lightweightChannelDetection');
-            
-            if (optimizePlaybackCheckbox) {
-                optimizePlaybackCheckbox.checked = items.optimizePlayback !== undefined ? items.optimizePlayback : true;
-            }
-            
-            if (lightweightChannelDetectionCheckbox) {
-                lightweightChannelDetectionCheckbox.checked = items.lightweightChannelDetection !== undefined ? items.lightweightChannelDetection : true;
             }
             
             // Check if settings are password protected
@@ -232,7 +218,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const filterChannels = channelsElement.value.trim();
         const hideAllComments = hideAllCommentsCheckbox ? hideAllCommentsCheckbox.checked : false;
         const filterComments = filterCommentsCheckbox ? filterCommentsCheckbox.checked : false;
-        const hideAllShorts = false; // Force disable shorts filtering due to UI issues
+        const hideAllShorts = hideAllShortsCheckbox ? hideAllShortsCheckbox.checked : false;
         const openInNewTab = openInNewTabCheckbox ? openInNewTabCheckbox.checked : false;
         
         // YouTube Kids settings
@@ -243,13 +229,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const enableYoutubeKids = enableYoutubeKidsElement ? enableYoutubeKidsElement.checked : false;
         const syncFilters = syncFiltersElement ? syncFiltersElement.checked : false;
-        
-        // Performance settings
-        const optimizePlaybackElement = document.getElementById('optimizePlayback');
-        const lightweightChannelDetectionElement = document.getElementById('lightweightChannelDetection');
-        
-        const optimizePlayback = optimizePlaybackElement ? optimizePlaybackElement.checked : true;
-        const lightweightChannelDetection = lightweightChannelDetectionElement ? lightweightChannelDetectionElement.checked : true;
         
         // Get YouTube Kids filter values
         let kidsKeywords = '';
@@ -276,14 +255,12 @@ document.addEventListener('DOMContentLoaded', function() {
             filterChannels: filterChannels,
             hideAllComments: hideAllComments,
             filterComments: filterComments,
-            hideAllShorts: hideAllShorts, // Always save as false
+            hideAllShorts: hideAllShorts,
             openInNewTab: openInNewTab,
             enableYoutubeKids: enableYoutubeKids,
             syncFilters: syncFilters,
             kidsKeywords: kidsKeywords,
-            kidsChannels: kidsChannels,
-            optimizePlayback: optimizePlayback,
-            lightweightChannelDetection: lightweightChannelDetection
+            kidsChannels: kidsChannels
         }, function() {
             // Reset button after delay
             setTimeout(function() {
