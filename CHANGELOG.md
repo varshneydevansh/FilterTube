@@ -1,5 +1,49 @@
 # FilterTube Changelog
 
+## Version 1.4.8
+- Added exact word matching option to keyword filtering
+- Enhanced channel card filtering in search results (ytd-channel-about-renderer)
+- Improved word matching logic with two distinct methods:
+  - Exact word matching (with word boundaries)
+  - Partial word matching (substring-based)
+- Added user preference toggle in popup and tab-view interfaces
+- Enhanced channel extraction from links with improved @handle detection
+- Optimized performance with improved sidebar caching system
+- Fixed channel filtering in search results for more reliable filtering
+
+## Version 1.4.7
+- Temporarily disabled "Hide All YouTube Shorts" feature due to UI issues (will be fixed in future update)
+- Added performance optimization features:
+  - Reduced processing during video playback
+  - Added throttling for polymer data extraction
+  - Implemented lightweight channel detection mode
+  - Added debouncing for video state changes
+  - Reduced logging and unnecessary processing
+- Improved tab switching functionality in tab view interface
+- Enhanced UI with glass morphic styling and more spacious layout
+- Fixed YouTube Kids tab compatibility
+- Added performance settings controls in Settings tab
+- Fixed password protection workflow
+- Fixed video playback issues when minimizing/maximizing
+
+## Version 1.4.6
+- Added "Hide All YouTube Shorts" option to completely remove shorts content
+- Added "Always Open in New Tab" preference for popup UI
+- Added Export/Import settings functionality for easier backup and transfer
+- Added Password Protection system with master password recovery
+- Enhanced tab-view with advanced settings section
+- Improved UI consistency between popup and tab view
+- Added special handling for Shorts pages when shorts are hidden
+
+## Version 1.4.5
+- Fixed performance issues on video pages with optimized observer configuration
+- Added cache-based filtering to improve performance for repeated elements
+- Implemented better memory management to prevent memory leaks during long sessions
+- Fixed issue with videos continuing to play after tab close
+- Added selective processing for watch pages to reduce CPU usage
+- Improved timeout management for cleaner handling of async operations
+- Reduced the volume of unnecessary reprocessing events
+
 ## Version 1.4.4
 - Implemented persistent sidebar video filtering with requestAnimationFrame retry mechanism
 - Enhanced shorts filtering to reliably detect channel @usernames and IDs in search results
