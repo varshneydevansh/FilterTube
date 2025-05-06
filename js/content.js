@@ -8,7 +8,6 @@ let filterKeywords = '';
 let filterChannels = '';
 let hideAllComments = false;
 let filterComments = false;
-let hideAllShorts = false;
 let enableYoutubeKids = false;
 let syncFilters = false;
 let kidsKeywords = '';
@@ -669,7 +668,6 @@ function loadSettings() {
         'filterChannels', 
         'hideAllComments', 
         'filterComments', 
-        'hideAllShorts',
         'enableYoutubeKids',
         'syncFilters',
         'kidsKeywords',
@@ -679,7 +677,6 @@ function loadSettings() {
         filterChannels = items.filterChannels || '';
         hideAllComments = items.hideAllComments || false;
         filterComments = items.filterComments || false;
-        hideAllShorts = items.hideAllShorts || false;
         enableYoutubeKids = items.enableYoutubeKids || false;
         syncFilters = items.syncFilters || false;
         kidsKeywords = items.kidsKeywords || '';

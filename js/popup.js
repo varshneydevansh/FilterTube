@@ -15,7 +15,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const titleElement = document.querySelector('.title');
     const hideAllCommentsCheckbox = document.getElementById('hideAllComments');
     const filterCommentsCheckbox = document.getElementById('hideFilteredComments');
-    const hideAllShortsCheckbox = document.getElementById('hideAllShorts');
     const openInNewTabCheckbox = document.getElementById('openInNewTab');
 
     // Advanced settings elements - may not exist in popup view
@@ -91,7 +90,6 @@ document.addEventListener('DOMContentLoaded', function() {
             'filterChannels', 
             'hideAllComments', 
             'filterComments',
-            'hideAllShorts',
             'openInNewTab',
             'passwordHash',
             'passwordProtected',
@@ -112,11 +110,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (hideAllCommentsCheckbox.checked && filterCommentsCheckbox.checked) {
                     filterCommentsCheckbox.checked = false;
                 }
-            }
-            
-            // Set shorts filter value if element exists
-            if (hideAllShortsCheckbox) {
-                hideAllShortsCheckbox.checked = items.hideAllShorts || false;
             }
             
             // Set open in new tab preference if element exists
@@ -218,7 +211,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const filterChannels = channelsElement.value.trim();
         const hideAllComments = hideAllCommentsCheckbox ? hideAllCommentsCheckbox.checked : false;
         const filterComments = filterCommentsCheckbox ? filterCommentsCheckbox.checked : false;
-        const hideAllShorts = hideAllShortsCheckbox ? hideAllShortsCheckbox.checked : false;
         const openInNewTab = openInNewTabCheckbox ? openInNewTabCheckbox.checked : false;
         
         // YouTube Kids settings
@@ -249,24 +241,25 @@ document.addEventListener('DOMContentLoaded', function() {
         saveButton.classList.add('saved');
         saveButton.textContent = 'Saved!';
         
-        // Save to storage
+        // Store settings
         chrome.storage.local.set({
             filterKeywords: filterKeywords,
             filterChannels: filterChannels,
             hideAllComments: hideAllComments,
             filterComments: filterComments,
-            hideAllShorts: hideAllShorts,
             openInNewTab: openInNewTab,
             enableYoutubeKids: enableYoutubeKids,
             syncFilters: syncFilters,
             kidsKeywords: kidsKeywords,
             kidsChannels: kidsChannels
         }, function() {
-            // Reset button after delay
+            console.log('Settings saved');
+            
+            // Reset button appearance after delay
             setTimeout(function() {
                 saveButton.classList.remove('saved');
                 saveButton.textContent = originalButtonText;
-            }, 1500);
+            }, 2000);
         });
     }
 
@@ -308,7 +301,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 'filterChannels',
                 'hideAllComments',
                 'filterComments',
-                'hideAllShorts',
                 'openInNewTab',
                 'passwordProtected',
                 'passwordHash'
