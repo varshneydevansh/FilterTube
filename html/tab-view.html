@@ -74,6 +74,20 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- Keyword matching method options -->
+            <div class="matching-options">
+                <label>Keyword Matching Method:</label>
+                <div class="checkbox-group">
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="useExactWordMatching" name="matchingMethod" value="exact">
+                        <label for="useExactWordMatching">Use exact word matching (e.g., "apex" won't match "apexlegends")</label>
+                    </div>
+                </div>
+                <div class="filter-note">
+                    When disabled (default), partial matching is used (e.g., "apex" will match "apexlegends")
+                </div>
+            </div>
         </div>
 
         <!-- Save button to store the preferences -->

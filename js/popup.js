@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const titleElement = document.querySelector('.title');
     const hideAllCommentsCheckbox = document.getElementById('hideAllComments');
     const filterCommentsCheckbox = document.getElementById('hideFilteredComments');
+    const useExactWordMatchingCheckbox = document.getElementById('useExactWordMatching');
 
     // Make sure required elements exist
     if (!keywordsElement || !channelsElement || !saveButton) {
@@ -57,7 +58,8 @@ document.addEventListener('DOMContentLoaded', function() {
             'filterKeywords', 
             'filterChannels', 
             'hideAllComments', 
-            'filterComments'
+            'filterComments',
+            'useExactWordMatching'
         ], function(items) {
             // Set form values
             keywordsElement.value = items.filterKeywords || '';
@@ -71,6 +73,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (hideAllCommentsCheckbox.checked && filterCommentsCheckbox.checked) {
                     filterCommentsCheckbox.checked = false;
                 }
+            }
+            
+            // Set exact word matching option
+            if (useExactWordMatchingCheckbox) {
+                useExactWordMatchingCheckbox.checked = items.useExactWordMatching || false;
             }
         });
     }
@@ -101,6 +108,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const filterChannels = channelsElement.value.trim();
         const hideAllComments = hideAllCommentsCheckbox ? hideAllCommentsCheckbox.checked : false;
         const filterComments = filterCommentsCheckbox ? filterCommentsCheckbox.checked : false;
+        const useExactWordMatching = useExactWordMatchingCheckbox ? useExactWordMatchingCheckbox.checked : false;
         
         // Visual feedback - change button appearance
         const originalButtonText = saveButton.textContent;
@@ -112,7 +120,8 @@ document.addEventListener('DOMContentLoaded', function() {
             filterKeywords: filterKeywords,
             filterChannels: filterChannels,
             hideAllComments: hideAllComments,
-            filterComments: filterComments
+            filterComments: filterComments,
+            useExactWordMatching: useExactWordMatching
         }, function() {
             // Reset button after delay
             setTimeout(function() {

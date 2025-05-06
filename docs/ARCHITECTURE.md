@@ -6,7 +6,7 @@ This document provides visual diagrams and explanations of FilterTube's architec
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                          FilterTube Extension                            │
+│                          FilterTube Extension                           │
 │                                                                         │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐     │
 │  │ Popup UI    │  │ Tab View UI │  │ Background  │  │ Content     │     │
@@ -126,7 +126,7 @@ This document provides visual diagrams and explanations of FilterTube's architec
 │  ┌─────────────────────┐  ┌─────────────────────┐  ┌─────────────────┐  │
 │  │ DOM-based           │  │ Polymer-based       │  │ URL-based       │  │
 │  │ Extraction          │  │ Extraction          │  │ Extraction      │  │
-│  │                     │  │                     │  │                  │  │
+│  │                     │  │                     │  │                 │  │
 │  │ - Channel name      │  │ - Internal data     │  │ - href          │  │
 │  │   selectors         │  │   structures        │  │   attributes    │  │
 │  │ - Text content      │  │ - Navigation        │  │ - Channel ID    │  │
@@ -158,7 +158,7 @@ This document provides visual diagrams and explanations of FilterTube's architec
 │  ┌─────────────────────┐  ┌─────────────────────┐  ┌─────────────────┐  │
 │  │ DOM-level           │  │ Processing-level    │  │ Observer-level  │  │
 │  │ Optimizations       │  │ Optimizations       │  │ Optimizations   │  │
-│  │                     │  │                     │  │                  │  │
+│  │                     │  │                     │  │                 │  │
 │  │ - CSS-based hiding  │  │ - Batch processing  │  │ - Throttling    │  │
 │  │ - Attribute-based   │  │ - Processing only   │  │ - Specialized   │  │
 │  │   marking           │  │   when visible      │  │   observers     │  │
@@ -169,12 +169,12 @@ This document provides visual diagrams and explanations of FilterTube's architec
 │  ┌─────────────────────────────────────────────────────────────────┐    │
 │  │ Page-aware Optimization                                         │    │
 │  │                                                                 │    │
-│  │ Home Page    │ Watch Page   │ Search Page  │ Shorts Page       │    │
+│  │ Home Page    │ Watch Page   │ Search Page  │ Shorts Page        │    │
 │  │              │              │              │                    │    │
-│  │ - Grid items │ - Sidebar    │ - Results    │ - Vertical        │    │
-│  │ - Shorts     │ - Comments   │ - Channels   │   scrolling       │    │
-│  │ - Shelves    │ - Related    │ - Shorts     │ - Minimal         │    │
-│  │              │   videos     │   results    │   metadata        │    │
+│  │ - Grid items │ - Sidebar    │ - Results    │ - Vertical         │    │
+│  │ - Shorts     │ - Comments   │ - Channels   │   scrolling        │    │
+│  │ - Shelves    │ - Related    │ - Shorts     │ - Minimal          │    │
+│  │              │   videos     │   results    │   metadata         │    │
 │  └─────────────────────────────────────────────────────────────────┘    │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
@@ -189,12 +189,12 @@ This document provides visual diagrams and explanations of FilterTube's architec
 │  Load Start       CSS Injection       DOM Ready         First Paint     │
 │  ┌───────┐        ┌───────┐          ┌───────┐         ┌───────┐        │
 │  │       │        │       │          │       │         │       │        │
-│──┘       └────────┘       └──────────┘       └─────────┘       └────────▶│
+│──┘       └────────┘       └──────────┘       └─────────┘       └───────▶│
 │                                                                         │
 │                                                                         │
 │  ┌─────────────────────┐  ┌─────────────────────┐  ┌─────────────────┐  │
 │  │ "Pre-Hide" Phase    │  │ "Processing" Phase  │  │ "Reveal" Phase  │  │
-│  │                     │  │                     │  │                  │  │
+│  │                     │  │                     │  │                 │  │
 │  │ - Inject style      │  │ - Load settings     │  │ - Elements      │  │
 │  │   element early     │  │ - Setup observers   │  │   marked as     │  │
 │  │ - Hide all          │  │ - Extract channel   │  │   allowed are   │  │
@@ -215,7 +215,7 @@ This document provides visual diagrams and explanations of FilterTube's architec
 │                                                                         │
 │  ┌─────────────────────┐  ┌─────────────────────┐  ┌─────────────────┐  │
 │  │ Video Elements      │  │ Channel Elements    │  │ Shorts Elements │  │
-│  │                     │  │                     │  │                  │  │
+│  │                     │  │                     │  │                 │  │
 │  │ - ytd-video-        │  │ - ytd-channel-      │  │ - ytd-reel-     │  │
 │  │   renderer          │  │   renderer          │  │   item-renderer │  │
 │  │ - ytd-grid-video-   │  │ - channel-link      │  │ - ytm-shorts-   │  │
@@ -228,7 +228,7 @@ This document provides visual diagrams and explanations of FilterTube's architec
 │                                                                         │
 │  ┌─────────────────────┐  ┌─────────────────────┐  ┌─────────────────┐  │
 │  │ Playlist Elements   │  │ Comment Elements    │  │ Misc Elements   │  │
-│  │                     │  │                     │  │                  │  │
+│  │                     │  │                     │  │                 │  │
 │  │ - ytd-playlist-     │  │ - ytd-comment-      │  │ - ytd-shelf-    │  │
 │  │   renderer          │  │   thread-renderer   │  │   renderer      │  │
 │  │ - ytd-radio-        │  │ - ytd-comment-      │  │ - ytd-channel-  │  │

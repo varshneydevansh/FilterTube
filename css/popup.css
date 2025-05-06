@@ -233,3 +233,21 @@ input[type="checkbox"][name="commentFilter"]:checked ~ input[type="checkbox"][na
     margin-bottom: 12px;
     font-style: italic;
 }
+
+/* Add styles for the matching options */
+.matching-options.compact {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #eee;
+}
+
+.matching-options.compact .checkbox-option {
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.matching-options.compact .checkbox-option label {
+    font-size: 13px;
+    opacity: 0.8;
+}
