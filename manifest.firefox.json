@@ -1,17 +1,14 @@
 {
-    "___README___": "This manifest.json file is a placeholder. For development, use 'npm run dev:chrome' or 'npm run dev:firefox' to copy the appropriate manifest file. For production builds, use 'npm run build'.",
     "manifest_version": 3,
     "name": "FilterTube",
     "description": "Filter YouTube videos based on keywords and channels",
     "version": "1.4.9",
-    "minimum_chrome_version": "88",
     "background": {
-        "service_worker": "js/background.js",
         "scripts": ["js/background.js"]
     },
     "browser_specific_settings": {
         "gecko": {
-            "id": "filtertube@filtertube.extension",
+            "id": "filtertube@varshneydevansh.github.io",
             "strict_min_version": "109.0"
         }
     },

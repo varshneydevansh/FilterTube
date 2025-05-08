@@ -1,5 +1,17 @@
 # FilterTube Changelog
 
+## Version 1.4.9
+- Added Firefox compatibility with optimized performance
+- Implemented browser-specific manifest files for Chrome and Firefox
+- Added browser detection to conditionally disable Polymer extraction on Firefox
+- Enhanced DOM-based channel extraction for better Firefox performance
+- Improved sidebar video filtering for Firefox compatibility
+- Enhanced channel name matching for more reliable filtering across browsers
+- Added Firefox-specific performance optimizations (batch sizes, timeouts)
+- Added debugging helper tool for Firefox troubleshooting
+- Created Node.js build system for packaging browser-specific versions
+- Updated background script to handle both Firefox and Chrome APIs
+
 ## Version 1.4.8
 - Added exact word matching option to keyword filtering
 - Enhanced channel card filtering in search results (ytd-channel-about-renderer)
