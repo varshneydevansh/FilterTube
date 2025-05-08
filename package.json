@@ -1,0 +1,33 @@
+{
+  "name": "filtertube",
+  "version": "1.4.9",
+  "description": "Filter YouTube videos based on keywords and channels",
+  "main": "js/background.js",
+  "scripts": {
+    "build": "node build.js",
+    "build:chrome": "node build.js chrome",
+    "build:firefox": "node build.js firefox",
+    "dev:chrome": "cp manifest.chrome.json manifest.json",
+    "dev:firefox": "cp manifest.firefox.json manifest.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/varshneydevansh/FilterTube.git"
+  },
+  "keywords": [
+    "youtube",
+    "filter",
+    "extension",
+    "browser"
+  ],
+  "author": "Devansh Varshney",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/varshneydevansh/FilterTube/issues"
+  },
+  "homepage": "https://github.com/varshneydevansh/FilterTube",
+  "devDependencies": {
+    "archiver": "^5.3.1",
+    "fs-extra": "^11.1.1"
+  }
+} 

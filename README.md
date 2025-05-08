@@ -133,3 +133,50 @@ See [CHANGELOG.md](CHANGELOG.md) for a detailed history of changes and improveme
 ### Why FilterTube?
 
 YouTube's recommendation algorithms can sometimes surface unwanted content. FilterTube gives you control over what appears in your feed, allowing for a more focused and pleasant viewing experience without distractions or unwanted content.
+
+## Development
+
+### Cross-Browser Compatibility
+
+FilterTube supports both Chrome and Firefox through a browser-specific build process:
+
+- Chrome uses the standard Manifest V3 with `service_worker` for background scripts
+- Firefox uses Manifest V3 with the `scripts` array for background scripts (Firefox MV3 compatibility)
+
+#### Development Setup
+
+1. Install dependencies:
+   ```
+   npm install
+   ```
+
+2. For Chrome development:
+   ```
+   npm run dev:chrome
+   ```
+
+3. For Firefox development:
+   ```
+   npm run dev:firefox
+   ```
+
+These commands copy the appropriate manifest file to `manifest.json` for local development.
+
+#### Building for Distribution
+
+To build packages for both browsers:
+```
+npm run build
+```
+
+This creates:
+- `dist/chrome/` - Chrome extension files
+- `dist/firefox/` - Firefox extension files
+- `dist/filtertube-chrome-v*.*.*.zip` - Chrome package
+- `dist/filtertube-firefox-v*.*.*.zip` - Firefox package
+
+To build for a specific browser:
+```
+npm run build:chrome
+npm run build:firefox
+```
