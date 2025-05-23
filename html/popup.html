@@ -7,25 +7,8 @@
     <title>FilterTube Preferences</title>
     <!-- Link to the CSS stylesheet for the popup -->
     <link rel="stylesheet" href="../css/popup.css">
-    <!-- The tab view stylesheet will be loaded dynamically if needed -->
-    <script>
-        // Detect if we're in a tab view and load the appropriate stylesheet
-        if (window.innerWidth > 600 || window.location.search.includes('tab=true')) {
-            // Load the tab-view CSS
-            const linkElement = document.createElement('link');
-            linkElement.rel = 'stylesheet';
-            linkElement.href = '../css/tab-view.css';
-            document.head.appendChild(linkElement);
-            
-            // Add class to body for CSS targeting
-            document.addEventListener('DOMContentLoaded', function() {
-                document.body.classList.add('tab-view');
-                
-                // Log for debugging
-                console.log('Tab view detected, CSS should be applied');
-            });
-        }
-    </script>
+    <!-- External script to load tab-view CSS if needed -->
+    <script src="../js/popup_init.js"></script>
 </head>
 
 <body>
@@ -53,37 +36,48 @@
         <!-- Textarea for entering keywords, linked to the label by 'for' and 'id' -->
         <textarea id="keywords" class="input-field" rows="3" placeholder="e.g., news, politics, specific_topic"></textarea>
 
-        <!-- Label for the channels input -->
-            <label for="channels">Filter by Channels (comma separated):</label>
-        <!-- Textarea for entering channel names, linked to the label -->
-            <textarea id="channels" class="input-field" rows="3" placeholder="e.g., Channel Name, @ChannelHandle, channel/UCtxdfwb9wfkoGocVUAJ-Bmg (supports names, @handles & channel IDs)"></textarea>
-            
-            <div class="filter-note">
-                Note: @handles use exact matching, channel names use partial matching
+        <!-- Keyword matching toggle (compact for popup view) -->
+        <div class="matching-options compact">
+            <div class="checkbox-option">
+                <input type="checkbox" id="useExactWordMatching" name="matchingMethod" value="exact">
+                <label for="useExactWordMatching">Use exact word matching</label>
             </div>
+        </div>
 
-            <!-- Comment filtering options -->
-            <div class="comment-filter-options">
-                <label>Comment Filtering:</label>
-                <div class="checkbox-group">
-                    <div class="checkbox-option">
-                        <input type="checkbox" id="hideAllComments" name="commentFilter" value="all">
-                        <label for="hideAllComments">Hide all comments</label>
-                    </div>
-                    <div class="checkbox-option">
-                        <input type="checkbox" id="hideFilteredComments" name="commentFilter" value="filtered">
-                        <label for="hideFilteredComments">Filter comments with keywords/channels</label>
-                    </div>
-                </div>
-            </div>
+        <!-- Label for the channels input -->
+        <label for="channels">Filter by Channels (comma separated):</label>
+        <!-- Textarea for entering channel names, linked to the label -->
+        <textarea id="channels" class="input-field" rows="3" placeholder="e.g., Channel Name, @ChannelHandle, channel/UCtxdfwb9wfkoGocVUAJ-Bmg (supports names, @handles & channel IDs)"></textarea>
             
-            <!-- Keyword matching toggle (compact for popup view) -->
-            <div class="matching-options compact">
+        <div class="filter-note">
+            Note: @handles use exact matching, channel names use partial matching
+        </div>
+            
+        <!-- Comment filtering options -->
+        <div class="comment-filter-options">
+            <label>Comment Filtering:</label>
+            <div class="checkbox-group">
                 <div class="checkbox-option">
-                    <input type="checkbox" id="useExactWordMatching" name="matchingMethod" value="exact">
-                    <label for="useExactWordMatching">Use exact word matching</label>
+                    <input type="checkbox" id="hideAllComments" name="commentFilter" value="all">
+                    <label for="hideAllComments">Hide all comments</label>
+                </div>
+                <div class="checkbox-option">
+                    <input type="checkbox" id="hideFilteredComments" name="commentFilter" value="filtered">
+                    <label for="hideFilteredComments">Filter comments with keywords/channels</label>
                 </div>
             </div>
+        </div>
+            
+        <!-- Shorts filtering option -->
+        <div class="shorts-filter-options">
+            <label>Shorts Filtering:</label>
+            <div class="checkbox-group">
+                <div class="checkbox-option">
+                    <input type="checkbox" id="hideAllShorts" name="shortsFilter" value="all">
+                    <label for="hideAllShorts">Hide all YouTube Shorts</label>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Save button to store the preferences -->

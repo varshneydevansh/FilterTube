@@ -74,13 +74,46 @@ A browser extension that filters YouTube content (videos, shorts, playlists, cha
 
 ## How It Works
 
-FilterTube works by:
+### Version 2.0.0 - The "Zero DOM" Data Interception Architecture
+
+In version 2.0.0, FilterTube has been completely refactored to use a revolutionary "Data Interception" approach inspired by successful extensions like BlockTube, fetch-fiddler, Requestly etc. but with completely independent implementation:
+
+1. **Data Interception Before Rendering**: FilterTube now intercepts YouTube's raw JSON data *before* it gets processed and rendered to the DOM. This provides:
+   - **True "zero-flash" filtering**: Content never appears before being filtered
+   - **Dramatic performance improvement**: No DOM scanning/manipulation required
+   - **More reliable filtering**: Works directly with YouTube's data structures
+   - **Resilience against YouTube UI changes**: DOM-independent filtering
+   - **Cross-browser compatibility**: Works identically on Chrome and Firefox
+
+2. **Multi-World Script Architecture**:
+   - **seed.js**: Runs in MAIN world at document_start to establish early data hooks before YouTube scripts load
+   - **content_bridge.js**: Runs in isolated extension context, orchestrates script injection and settings relay  
+   - **filter_logic.js**: Comprehensive filtering engine with rules for all YouTube renderer types
+   - **injector.js**: Coordinates MAIN world filtering and communicates with bridge
+   - **background.js**: Manages settings storage and compiles filter rules for optimal performance
+
+3. **Comprehensive Data Sources Hooked**:
+   - `window.ytInitialData`: YouTube's initial page data (home, search, watch pages)
+   - `window.ytInitialPlayerResponse`: Video player initial data
+   - `window.fetch`: YouTube's API calls for dynamic content loading
+   - `XMLHttpRequest`: Fallback for additional dynamic content
+
+4. **Advanced Filtering Engine**:
+   - **Renderer-based filtering**: Supports all YouTube content types (`videoRenderer`, `richItemRenderer`, `channelRenderer`, `commentRenderer`, etc.)
+   - **Multi-path data extraction**: Robust extraction with multiple fallback paths for each data type
+   - **Intelligent channel matching**: Handles @handles, channel IDs, and partial name matching
+   - **RegExp keyword filtering**: Compiled patterns for efficient keyword matching
+   - **Recursive JSON traversal**: Processes deeply nested YouTube data structures
+
+The extension still operates entirely in your browser - no data is sent to any external servers. All filtering happens locally with dramatically improved performance and reliability.
+
+### Legacy Architecture (Pre-2.0.0)
+
+Prior to version 2.0.0, FilterTube worked by:
 1. Scanning YouTube page content for videos, playlists, channels, and comments
 2. Comparing titles, channel names, and other metadata against your filters
-3. Hiding elements that match your filter criteria
+3. Hiding elements that match your filter criteria using CSS
 4. Preserving YouTube's original layout after filtering
-
-The extension operates entirely in your browser - no data is sent to any external servers.
 
 ### Channel Filtering Details
 
@@ -98,18 +131,36 @@ For the most reliable channel filtering:
 ## Technical Details
 
 ### Files Structure
-- **manifest.json**: Extension configuration
-- **html/**: UI files
-  - popup.html: Extension popup interface
-  - tab-view.html: Full-page interface
-- **css/**: Styling files
-  - filter.css: Styles for hiding/showing elements
-  - popup.css: Styles for the popup UI
-  - tab-view.css: Styles for the tab view
+
+#### Version 2.0.0 Architecture
+- **manifest.chrome.json & manifest.firefox.json**: Browser-specific MV3 configurations
 - **js/**: JavaScript files
-  - content.js: Main filtering logic
-  - popup.js: UI interaction logic
-  - background.js: Background service worker
+  - **background.js**: Settings management, compiles filter rules
+  - **content_bridge.js**: Isolated world script that injects MAIN world scripts
+  - **seed.js**: Early-running script that hooks YouTube data sources
+  - **injector.js**: Main script that processes intercepted data
+  - **filter_logic.js**: Filtering algorithms for YouTube's JSON data
+  - **popup.js**: UI interaction logic
+- **html/**: UI files
+  - **popup.html**: Extension popup interface
+  - **tab-view.html**: Full-page interface
+- **css/**: Styling files
+- **build.sh**: Build script for creating Chrome and Firefox packages
+
+### Build Process
+
+FilterTube now uses a dedicated build script to create packages for both Chrome and Firefox:
+
+```bash
+# Build for both browsers
+./build.sh
+
+# This creates:
+# - dist/filtertube-chrome.zip
+# - dist/filtertube-firefox.zip
+# - dist/filtertube-chrome/ (unpacked)
+# - dist/filtertube-firefox/ (unpacked)
+```
 
 ### Permissions
 - **tabs**: For opening the tab view

@@ -1,6 +1,6 @@
 {
   "name": "filtertube",
-  "version": "1.4.9",
+  "version": "2.0.0 ",
   "description": "Filter YouTube videos based on keywords and channels",
   "main": "js/background.js",
   "scripts": {

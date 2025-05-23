@@ -20,7 +20,7 @@ const archiver = require('archiver');
 
 // Configuration
 const ALL_BROWSER_TARGETS = ['chrome', 'firefox'];
-const VERSION = '1.4.9'; // Read from manifest or package.json in production
+const VERSION = '2.0.0'; // Read from manifest or package.json in production
 const COMMON_DIRS = ['js', 'css', 'html', 'icons', 'docs'];
 const COMMON_FILES = ['README.md', 'CHANGELOG.md', 'LICENSE'];
 
