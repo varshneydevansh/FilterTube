@@ -1,19 +1,11 @@
 {
-    "___README___": "This manifest.json file is a placeholder. For development, use 'npm run dev:chrome' or 'npm run dev:firefox' to copy the appropriate manifest file. For production builds, use 'npm run build'.",
     "manifest_version": 3,
     "name": "FilterTube",
-    "description": "Filter YouTube videos based on keywords and channels",
-    "version": "1.4.9",
+    "description": "Filter YouTube videos by keywords and channels",
+    "version": "2.0.0",
     "minimum_chrome_version": "88",
     "background": {
-        "service_worker": "js/background.js",
-        "scripts": ["js/background.js"]
-    },
-    "browser_specific_settings": {
-        "gecko": {
-            "id": "filtertube@filtertube.extension",
-            "strict_min_version": "109.0"
-        }
+        "service_worker": "js/background.js"
     },
     "action": {
         "default_popup": "html/popup.html",
@@ -26,23 +18,37 @@
     "permissions": [
         "storage",
         "activeTab",
+        "scripting",
         "tabs"
     ],
     "content_scripts": [
         {
             "matches": [
-                "*://*.youtube.com/*"
+                "*://*.youtube.com/*",
+                "*://*.youtubekids.com/*"
             ],
             "js": [
-                "js/content.js"
+                "js/seed.js"
             ],
-            "run_at": "document_start"
+            "run_at": "document_start",
+            "world": "MAIN"
+        },
+        {
+            "matches": [
+                "*://*.youtube.com/*",
+                "*://*.youtubekids.com/*"
+            ],
+            "js": [
+                "js/content_bridge.js"
+            ],
+            "run_at": "document_start",
+            "world": "ISOLATED"
         }
     ],
     "web_accessible_resources": [
         {
-            "resources": ["html/tab-view.html", "css/tab-view.css"],
-            "matches": ["<all_urls>"]
+            "resources": ["js/injector.js", "js/filter_logic.js", "js/seed.js"],
+            "matches": ["*://*.youtube.com/*", "*://*.youtubekids.com/*"]
         }
     ],
     "icons": {
@@ -52,6 +58,8 @@
         "128": "icons/icon-128.png"
     },
     "host_permissions": [
-        "*://*.youtube.com/*"
+        "*://*.youtube.com/*",
+        "*://*.youtube-nocookie.com/*",
+        "*://*.youtubekids.com/*"
     ]
 } 

@@ -6,7 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FilterTube Preferences</title>
     <!-- Link to the CSS stylesheets -->
+    <link rel="stylesheet" href="../css/popup.css">
     <link rel="stylesheet" href="../css/tab-view.css">
+    <script src="../js/popup_init.js"></script>
     <style>
         /* Override any popup styles */
         body {
@@ -55,6 +57,20 @@
             <!-- Textarea for entering keywords, linked to the label by 'for' and 'id' -->
             <textarea id="keywords" class="input-field" rows="3" placeholder="e.g., news, politics, specific_topic"></textarea>
 
+            <!-- Keyword matching toggle -->
+            <div class="matching-options">
+                <label>Keyword Matching Method:</label>
+                <div class="checkbox-group">
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="useExactWordMatching" name="matchingMethod" value="exact">
+                        <label for="useExactWordMatching">Use exact word matching (e.g., "apex" won't match "apexlegends")</label>
+                    </div>
+                </div>
+                <div class="filter-note">
+                    When disabled (default), partial matching is used (e.g., "apex" will match "apexlegends")
+                </div>
+            </div>
+
             <!-- Label for the channels input -->
             <label for="channels">Filter by Channels (comma separated, supports names, @handles & channel IDs):</label>
             <!-- Textarea for entering channel names, linked to the label -->
@@ -75,17 +91,17 @@
                 </div>
             </div>
             
-            <!-- Keyword matching method options -->
-            <div class="matching-options">
-                <label>Keyword Matching Method:</label>
+            <!-- Shorts filtering options -->
+            <div class="shorts-filter-options">
+                <label>Shorts Filtering:</label>
                 <div class="checkbox-group">
                     <div class="checkbox-option">
-                        <input type="checkbox" id="useExactWordMatching" name="matchingMethod" value="exact">
-                        <label for="useExactWordMatching">Use exact word matching (e.g., "apex" won't match "apexlegends")</label>
+                        <input type="checkbox" id="hideAllShorts" name="shortsFilter" value="all">
+                        <label for="hideAllShorts">Hide all YouTube Shorts</label>
                     </div>
                 </div>
                 <div class="filter-note">
-                    When disabled (default), partial matching is used (e.g., "apex" will match "apexlegends")
+                    When enabled, all Shorts content will be completely hidden from your YouTube experience
                 </div>
             </div>
         </div>

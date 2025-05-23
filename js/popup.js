@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const titleElement = document.querySelector('.title');
     const hideAllCommentsCheckbox = document.getElementById('hideAllComments');
     const filterCommentsCheckbox = document.getElementById('hideFilteredComments');
+    const hideAllShortsCheckbox = document.getElementById('hideAllShorts');
     const useExactWordMatchingCheckbox = document.getElementById('useExactWordMatching');
 
     // Make sure required elements exist
@@ -59,7 +60,8 @@ document.addEventListener('DOMContentLoaded', function() {
             'filterChannels', 
             'hideAllComments', 
             'filterComments',
-            'useExactWordMatching'
+            'useExactWordMatching',
+            'hideAllShorts'
         ], function(items) {
             // Set form values
             keywordsElement.value = items.filterKeywords || '';
@@ -73,6 +75,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (hideAllCommentsCheckbox.checked && filterCommentsCheckbox.checked) {
                     filterCommentsCheckbox.checked = false;
                 }
+            }
+            
+            // Set shorts filtering option
+            if (hideAllShortsCheckbox) {
+                hideAllShortsCheckbox.checked = items.hideAllShorts || false;
             }
             
             // Set exact word matching option
@@ -108,6 +115,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const filterChannels = channelsElement.value.trim();
         const hideAllComments = hideAllCommentsCheckbox ? hideAllCommentsCheckbox.checked : false;
         const filterComments = filterCommentsCheckbox ? filterCommentsCheckbox.checked : false;
+        const hideAllShorts = hideAllShortsCheckbox ? hideAllShortsCheckbox.checked : false;
         const useExactWordMatching = useExactWordMatchingCheckbox ? useExactWordMatchingCheckbox.checked : false;
         
         // Visual feedback - change button appearance
@@ -121,6 +129,7 @@ document.addEventListener('DOMContentLoaded', function() {
             filterChannels: filterChannels,
             hideAllComments: hideAllComments,
             filterComments: filterComments,
+            hideAllShorts: hideAllShorts,
             useExactWordMatching: useExactWordMatching
         }, function() {
             // Reset button after delay
