@@ -68,6 +68,7 @@
 *   [ ] Create technical documentation for the new code structure and data flow.
 *   [ ] Add architectural diagrams.
 
+
 ## Development Process
 *   [x] Set up Git workflow with proper commit messages.
 *   [x] Create build script for both Chrome and Firefox versions.
