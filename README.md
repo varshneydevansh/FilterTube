@@ -4,6 +4,8 @@
   <p>Filter YouTube videos by keywords, channels, categories, and more.</p>
 </div>
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/varshneydevansh/FilterTube)
+
 ## Overview
 
 A browser extension that filters YouTube content (videos, shorts, playlists, channels, comments) based on keywords and channel names.
