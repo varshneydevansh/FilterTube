@@ -4,88 +4,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FilterTube Preferences</title>
-    <!-- Link to the CSS stylesheet for the popup -->
+    <title>FilterTube</title>
+    <link rel="stylesheet" href="../css/design_tokens.css">
     <link rel="stylesheet" href="../css/popup.css">
-    <!-- External script to load tab-view CSS if needed -->
-    <script src="../js/popup_init.js"></script>
 </head>
 
 <body>
-    <div class="content-wrapper">
-    <!-- Header section with extension icon and title -->
-    <header>
-        <!-- Display the extension icon (adjust path if needed) -->
-        <img src="../icons/icon-48.png" alt="FilterTube Icon" class="logo-icon">
-        <!-- Display the extension name -->
-        <div class="title">FilterTube</div>
-            <!-- Open in new tab toggle -->
-            <div class="open-in-tab">
-                <button id="openInTabBtn" class="icon-button" title="Open in new tab">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 16 16">
-                        <path d="M14 3v2H8V3h6M1 3v10h14V7h-2v4H3V5h4V3H1z"/>
-                    </svg>
-                </button>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="brand">
+                <img src="../icons/icon-48.png" alt="FilterTube" class="logo-icon">
+                <h1 class="app-title">FilterTube</h1>
             </div>
-    </header>
+            <button id="openInTabBtn" class="icon-button" title="Open Full Settings" aria-label="Open Full Settings">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                    <polyline points="15 3 21 3 21 9"></polyline>
+                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+            </button>
+        </header>
 
-    <!-- Main content area for filter inputs -->
-    <div id="info">
-        <!-- Label for the keywords input -->
-        <label for="keywords">Filter by Keywords (comma separated):</label>
-        <!-- Textarea for entering keywords, linked to the label by 'for' and 'id' -->
-        <textarea id="keywords" class="input-field" rows="3" placeholder="e.g., news, politics, specific_topic"></textarea>
+        <!-- Main Content -->
+        <main class="app-content">
 
-        <!-- Keyword matching toggle (compact for popup view) -->
-        <div class="matching-options compact">
-            <div class="checkbox-option">
-                <input type="checkbox" id="useExactWordMatching" name="matchingMethod" value="exact">
-                <label for="useExactWordMatching">Use exact word matching</label>
+            <!-- Status Card -->
+            <div class="card status-card">
+                <div class="status-indicator active"></div>
+                <span class="status-text">Filtering Active</span>
             </div>
-        </div>
 
-        <!-- Label for the channels input -->
-        <label for="channels">Filter by Channels (comma separated):</label>
-        <!-- Textarea for entering channel names, linked to the label -->
-        <textarea id="channels" class="input-field" rows="3" placeholder="e.g., Channel Name, @ChannelHandle, channel/UCtxdfwb9wfkoGocVUAJ-Bmg (supports names, @handles & channel IDs)"></textarea>
-            
-        <div class="filter-note">
-            Note: @handles use exact matching, channel names use partial matching
-        </div>
-            
-        <!-- Comment filtering options -->
-        <div class="comment-filter-options">
-            <label>Comment Filtering:</label>
-            <div class="checkbox-group">
-                <div class="checkbox-option">
-                    <input type="checkbox" id="hideAllComments" name="commentFilter" value="all">
-                    <label for="hideAllComments">Hide all comments</label>
+            <!-- Quick Filters Card -->
+            <section class="card filter-card">
+                <h2 class="card-title">Blocked Keywords</h2>
+
+                <div class="input-group">
+                    <div class="add-keyword-row">
+                        <input type="text" id="newKeywordInput" class="text-input" placeholder="Add keyword..." />
+                        <button id="addKeywordBtn" class="btn btn-small btn-secondary">Add</button>
+                    </div>
+
+                    <div id="keywordList" class="keyword-list">
+                        <!-- Keywords will be injected here -->
+                        <div class="empty-state">No keywords added</div>
+                    </div>
+
+                    <!-- Clear All moved to Advanced Settings (Tab View) -->
                 </div>
-                <div class="checkbox-option">
-                    <input type="checkbox" id="hideFilteredComments" name="commentFilter" value="filtered">
-                    <label for="hideFilteredComments">Filter comments with keywords/channels</label>
+
+                <div class="input-group">
+                    <label for="channels">Blocked Channels</label>
+                    <textarea id="channels" class="text-input" placeholder="e.g. @MrBeast, ChannelName"
+                        rows="2"></textarea>
                 </div>
+            </section>
+
+            <!-- Content Control Card -->
+            <section class="card control-card">
+                <h2 class="card-title">Content Control</h2>
+
+                <div class="toggle-row">
+                    <label for="hideAllShorts" class="toggle-label">
+                        <span class="toggle-title">Hide Shorts</span>
+                        <span class="toggle-desc">Remove all Shorts from feed</span>
+                    </label>
+                    <label class="switch">
+                        <input type="checkbox" id="hideAllShorts">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-row">
+                    <label for="hideAllComments" class="toggle-label">
+                        <span class="toggle-title">Hide All Comments</span>
+                        <span class="toggle-desc">Remove comment sections entirely</span>
+                    </label>
+                    <label class="switch">
+                        <input type="checkbox" id="hideAllComments">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+
+                <div class="toggle-row">
+                    <label for="filterComments" class="toggle-label">
+                        <span class="toggle-title">Filter Comments</span>
+                        <span class="toggle-desc">Hide only comments with keywords</span>
+                    </label>
+                    <label class="switch">
+                        <input type="checkbox" id="filterComments">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </section>
+
+            <!-- Action Bar -->
+            <div class="action-bar">
+                <button id="saveBtn" class="btn btn-primary">Save Changes</button>
             </div>
-        </div>
-            
-        <!-- Shorts filtering option -->
-        <div class="shorts-filter-options">
-            <label>Shorts Filtering:</label>
-            <div class="checkbox-group">
-                <div class="checkbox-option">
-                    <input type="checkbox" id="hideAllShorts" name="shortsFilter" value="all">
-                    <label for="hideAllShorts">Hide all YouTube Shorts</label>
-                </div>
-            </div>
-        </div>
+        </main>
     </div>
 
-    <!-- Save button to store the preferences -->
-    <button id="saveBtn" class="button full-btn">Save Preferences</button>
-    </div>
-
-    <!-- Include the popup JavaScript file -->
-    <!-- Placed at the end of the body to ensure the DOM elements are available when the script runs -->
     <script src="../js/popup.js"></script>
 </body>
 

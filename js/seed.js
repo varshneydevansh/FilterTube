@@ -23,6 +23,8 @@
     let cachedSettings = null;
     let pendingDataQueue = [];
     let dataHooksEstablished = false;
+    let rawYtInitialData = null;
+    let rawYtInitialPlayerResponse = null;
     
     // Debug logging with sequence numbers
     let seedDebugSequence = 0;
@@ -55,6 +57,23 @@
     /**
      * Process data using the comprehensive filtering engine
      */
+    function cloneData(data) {
+        if (!data) return null;
+        if (typeof structuredClone === 'function') {
+            try {
+                return structuredClone(data);
+            } catch (err) {
+                seedDebugLog('⚠️ structuredClone failed, falling back to JSON clone', err.message);
+            }
+        }
+        try {
+            return JSON.parse(JSON.stringify(data));
+        } catch (err) {
+            seedDebugLog('❌ JSON clone failed:', err.message);
+            return null;
+        }
+    }
+
     function processWithEngine(data, dataName) {
         if (!data) {
             seedDebugLog(`⚠️ No data to process for ${dataName}`);
@@ -178,10 +197,12 @@
         // Check if data already exists and process it immediately
         if (originalYtInitialData && typeof originalYtInitialData === 'object') {
             seedDebugLog("🎯 ytInitialData already exists, processing immediately");
+            rawYtInitialData = cloneData(originalYtInitialData);
             const processed = processWithEngine(originalYtInitialData, 'ytInitialData-existing');
             window.ytInitialData = processed;
             if (window.filterTube) {
                 window.filterTube.lastYtInitialData = processed;
+                window.filterTube.rawYtInitialData = cloneData(rawYtInitialData);
             }
         }
 
@@ -212,10 +233,12 @@
         // Check if data already exists and process it immediately
         if (originalYtInitialPlayerResponse && typeof originalYtInitialPlayerResponse === 'object') {
             seedDebugLog("🎯 ytInitialPlayerResponse already exists, processing immediately");
+            rawYtInitialPlayerResponse = cloneData(originalYtInitialPlayerResponse);
             const processed = processWithEngine(originalYtInitialPlayerResponse, 'ytInitialPlayerResponse-existing');
             window.ytInitialPlayerResponse = processed;
             if (window.filterTube) {
                 window.filterTube.lastYtInitialPlayerResponse = processed;
+                window.filterTube.rawYtInitialPlayerResponse = cloneData(rawYtInitialPlayerResponse);
             }
         }
 
@@ -354,15 +377,20 @@
             
             for (const item of queue) {
                 seedDebugLog(`🔄 Processing queued ${item.name} (queued ${Date.now() - item.timestamp}ms ago)`);
-                const processed = processWithEngine(item.data, `${item.name}-queued`);
+                const sourceData = cloneData(item.data) || item.data;
+                const processed = processWithEngine(sourceData, `${item.name}-queued`);
                 
                 // Update the appropriate global variable
                 if (item.name.includes('ytInitialData')) {
                     window.ytInitialData = processed;
-                    if (window.filterTube) window.filterTube.lastYtInitialData = processed;
+                    if (window.filterTube) {
+                        window.filterTube.lastYtInitialData = processed;
+                    }
                 } else if (item.name.includes('ytInitialPlayerResponse')) {
                     window.ytInitialPlayerResponse = processed;
-                    if (window.filterTube) window.filterTube.lastYtInitialPlayerResponse = processed;
+                    if (window.filterTube) {
+                        window.filterTube.lastYtInitialPlayerResponse = processed;
+                    }
                 }
             }
             
@@ -371,16 +399,18 @@
         
         // Reprocess existing data if available (for settings changes)
         if (window.filterTube) {
-            if (window.filterTube.lastYtInitialData) {
-                seedDebugLog('🔄 Reprocessing existing ytInitialData with new settings');
-                const reprocessed = processWithEngine(window.filterTube.lastYtInitialData, 'ytInitialData-reprocess');
+            const sourceInitialData = rawYtInitialData ? cloneData(rawYtInitialData) : (window.filterTube.rawYtInitialData ? cloneData(window.filterTube.rawYtInitialData) : null);
+            if (sourceInitialData) {
+                seedDebugLog('🔄 Reprocessing stored ytInitialData snapshot with new settings');
+                const reprocessed = processWithEngine(sourceInitialData, 'ytInitialData-reprocess');
                 window.ytInitialData = reprocessed;
                 window.filterTube.lastYtInitialData = reprocessed;
             }
-            
-            if (window.filterTube.lastYtInitialPlayerResponse) {
-                seedDebugLog('🔄 Reprocessing existing ytInitialPlayerResponse with new settings');
-                const reprocessed = processWithEngine(window.filterTube.lastYtInitialPlayerResponse, 'ytInitialPlayerResponse-reprocess');
+
+            const sourcePlayerResponse = rawYtInitialPlayerResponse ? cloneData(rawYtInitialPlayerResponse) : (window.filterTube.rawYtInitialPlayerResponse ? cloneData(window.filterTube.rawYtInitialPlayerResponse) : null);
+            if (sourcePlayerResponse) {
+                seedDebugLog('🔄 Reprocessing stored ytInitialPlayerResponse snapshot with new settings');
+                const reprocessed = processWithEngine(sourcePlayerResponse, 'ytInitialPlayerResponse-reprocess');
                 window.ytInitialPlayerResponse = reprocessed;
                 window.filterTube.lastYtInitialPlayerResponse = reprocessed;
             }
@@ -398,6 +428,8 @@
         settings: null,
         lastYtInitialData: null,
         lastYtInitialPlayerResponse: null,
+        rawYtInitialData: null,
+        rawYtInitialPlayerResponse: null,
         updateSettings: updateSettings,
         
         // Advanced processing functions (can be overridden by injector.js)

@@ -262,3 +262,25 @@ The **CURSOR_AI_IMPLEMENTATION_PROMPT.md** serves as a complete methodology guid
 ---
 
 **The FilterTube v2.0 refactoring represents a complete paradigm shift from reactive DOM manipulation to proactive data interception, resulting in a more performant, reliable, and maintainable browser extension architecture.** 
+
+## Latest Maintenance Notes (Nov 20, 2025)
+
+- **Immediate settings propagation**
+  - Popup (`js/popup.js`) now normalizes channel input, compiles keywords, persists `uiChannels`, and broadcasts a `FilterTube_ApplySettings` message so the first save hides content without a reload.
+  - Dashboard tab (`js/tab-view.js`, already aligned) shares the same broadcast flow.
+  - Background (`js/background.js`) rebroadcasts `FilterTube_ApplySettings` to every YouTube tab for parity with popup saves.
+
+- **Seed snapshotting & retries**
+  - `js/seed.js` keeps deep clones of the last `ytInitialData` / `ytInitialPlayerResponse` payloads so removing a keyword reprocesses pristine JSON instead of leaving blank cards.
+  - `js/content_bridge.js` queues settings until `seed.js` fires `filterTubeSeedReady`, ensuring late injection still receives the newest filters.
+
+- **DOM fallback polish**
+  - Added Mix/lockup selectors plus richer title/channel extraction, so shelves such as "Mix – BTS" hide immediately.
+  - Added chip filtering (`yt-chip-cloud-chip-renderer`) so keyword pills (e.g., BTS) vanish with the filter.
+  - Added a sweep that hides `ytd-rich-item-renderer` shells whose `#content` is empty, eliminating blank cards during infinite scroll.
+
+- **Theme control**
+  - `css/design_tokens.css` now honors manual light/dark overrides by scoping `prefers-color-scheme` rules to `:root:not([data-theme])`.
+
+- **Known gap**
+  - Home feed filtering + restore flow is stable, but on home page if we are opening from teh chip teh filter seems to be not wokring and search-result restoration on the very first load still needs work (user deferred to future session).
