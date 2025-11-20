@@ -74,6 +74,44 @@
         }
     }
 
+    function shouldSkipEngineProcessing(data, dataName) {
+        if (!data || !dataName) return false;
+
+        const isBrowseFetch = typeof dataName === 'string' && dataName.startsWith('fetch:/youtubei/v1/browse');
+        if (!isBrowseFetch) return false;
+
+        const path = document.location?.pathname || '';
+        const isOnHomeFeed = path === '/' && !isMobileInterface;
+        if (!isOnHomeFeed) return false;
+
+        const actionCollections = data.onResponseReceivedActions || data.onResponseReceivedEndpoints;
+        if (!Array.isArray(actionCollections)) return false;
+
+        const continuationKeys = ['appendContinuationItemsAction', 'reloadContinuationItemsCommand', 'replaceContinuationItemsCommand'];
+
+        return actionCollections.some(action => {
+            for (const key of continuationKeys) {
+                const continuationItems = action?.[key]?.continuationItems;
+                if (!Array.isArray(continuationItems)) continue;
+
+                const hasRichGridContent = continuationItems.some(item => !!(
+                    item?.richItemRenderer ||
+                    item?.richSectionRenderer ||
+                    item?.richShelfRenderer ||
+                    item?.gridVideoRenderer ||
+                    item?.compactVideoRenderer ||
+                    item?.lockupViewModel ||
+                    item?.lockupMetadataViewModel
+                ));
+
+                if (hasRichGridContent) {
+                    return true;
+                }
+            }
+            return false;
+        });
+    }
+
     function processWithEngine(data, dataName) {
         if (!data) {
             seedDebugLog(`⚠️ No data to process for ${dataName}`);
@@ -84,6 +122,11 @@
             seedDebugLog(`⚠️ No settings available for processing ${dataName}, queueing`);
             pendingDataQueue.push({ data: data, name: dataName, timestamp: Date.now() });
             return data; // Return unmodified data
+        }
+
+        if (shouldSkipEngineProcessing(data, dataName)) {
+            seedDebugLog(`⏭️ Skipping engine processing for ${dataName} (home feed rich grid) to allow DOM-based restore`);
+            return data;
         }
 
         seedDebugLog(`🔧 Starting to process ${dataName}...`);
