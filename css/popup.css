@@ -373,9 +373,12 @@ input:checked+.slider:before {
     border-color: var(--ft-color-text-secondary);
 }
 
-.btn.saved {
+.btn.saved,
+.btn-success-flash,
+.btn-secondary.btn-success-flash {
     background-color: var(--ft-color-status-success) !important;
     color: white !important;
+    border-color: var(--ft-color-status-success) !important;
 }
 
 /* Dark Mode Support (Media Query + Data Attribute) */

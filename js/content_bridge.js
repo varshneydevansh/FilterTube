@@ -48,8 +48,13 @@ function incrementHiddenStats() {
 
     statsCountToday++;
 
-    // Estimate: average video is ~10 minutes, so time saved = count * 10
-    const minutesSaved = statsCountToday * 10;
+    // Conservative estimate:
+    // - Average time to evaluate a video (read title, see thumbnail, decide) = ~3-5 seconds
+    // - We estimate 4 seconds per filtered video
+    // - This represents the time you would have spent considering content you don't want to see
+    // - Formula: (hidden_count * 4 seconds) / 60 = minutes saved
+    const secondsSaved = statsCountToday * 4;
+    const minutesSaved = Math.floor(secondsSaved / 60);
 
     // Save to storage (debounced to avoid excessive writes)
     if (chrome && chrome.storage) {
@@ -650,6 +655,12 @@ function handleCommentsFallback(settings) {
         // 2. Restore if global hide disabled
         if (!settings.filterComments && !settings.hideAllComments) {
             toggleVisibility(section, false);
+
+            // Also restore all individual comments that were hidden by keyword filtering
+            const comments = section.querySelectorAll('ytd-comment-view-model, ytd-comment-renderer, ytd-comment-thread-renderer');
+            comments.forEach(comment => {
+                toggleVisibility(comment, false);
+            });
         }
 
         // 3. Content Filtering

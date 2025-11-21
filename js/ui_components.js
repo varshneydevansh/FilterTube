@@ -57,14 +57,20 @@ const UIComponents = (() => {
 
         const originalText = button.textContent;
         const originalBg = button.style.backgroundColor;
+        const originalColor = button.style.color;
+        const originalBorder = button.style.borderColor;
 
         button.textContent = successText;
         button.style.backgroundColor = Colors.statusSuccess;
+        button.style.color = 'white';
+        button.style.borderColor = Colors.statusSuccess;
         button.classList.add('btn-success-flash');
 
         setTimeout(() => {
             button.textContent = originalText;
             button.style.backgroundColor = originalBg;
+            button.style.color = originalColor;
+            button.style.borderColor = originalBorder;
             button.classList.remove('btn-success-flash');
         }, duration);
     }

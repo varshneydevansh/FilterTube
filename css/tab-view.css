@@ -200,6 +200,13 @@ body {
     border-radius: var(--ft-radius-lg);
     box-shadow: var(--ft-shadow-floating);
     text-align: center;
+    transition: box-shadow var(--ft-transition-fast), transform var(--ft-transition-fast);
+    cursor: default;
+}
+
+.stat-card[title]:hover {
+    box-shadow: var(--ft-shadow-elevated);
+    transform: translateY(-2px);
 }
 
 .stat-value {

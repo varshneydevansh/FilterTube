@@ -318,31 +318,38 @@ input:checked+.slider:before {
 
 .tab-content {
     width: 100%;
+    position: relative;
 }
 
 .tab-pane {
     display: none;
-    animation: fadeIn 0.2s ease;
 }
 
 .tab-pane.active {
     display: block;
+    animation: tabFadeIn 0.2s ease;
 }
 
-@keyframes fadeIn {
+.tabs-container {
+    position: relative;
+}
+
+@keyframes tabFadeIn {
     from {
         opacity: 0;
-        transform: translateY(5px);
     }
     to {
         opacity: 1;
-        transform: translateY(0);
     }
 }
 
 /* --- Button Success Flash --- */
-.btn-success-flash {
-    transition: background-color 0.3s ease !important;
+.btn-success-flash,
+.btn-secondary.btn-success-flash {
+    background-color: var(--ft-color-status-success) !important;
+    color: white !important;
+    border-color: var(--ft-color-status-success) !important;
+    transition: all 0.3s ease !important;
 }
 
 /* --- Toast Notifications --- */
