@@ -557,6 +557,7 @@ function toggleVisibility(element, shouldHide, reason = '') {
 function updateContainerVisibility(container, childSelector) {
     if (!container) return;
     if (container.hasAttribute('data-filtertube-hidden-by-shelf-title')) return;
+    if (container.hasAttribute('data-filtertube-hidden-by-hide-all-shorts')) return;
 
     const children = container.querySelectorAll(childSelector);
     if (children.length === 0) return; // Don't hide empty containers that might be loading
@@ -622,7 +623,10 @@ function applyDOMFallback(settings, options = {}) {
 
     currentSettings = effectiveSettings;
 
-    const { forceReprocess = false } = options;
+    const { forceReprocess = false, preserveScroll = true } = options;
+    const scrollingElement = document.scrollingElement || document.documentElement || document.body;
+    const previousScrollTop = scrollingElement ? scrollingElement.scrollTop : window.pageYOffset;
+    const previousScrollLeft = scrollingElement ? scrollingElement.scrollLeft : window.pageXOffset;
     ensureStyles();
 
     // 1. Video/Content Filtering
@@ -697,8 +701,26 @@ function applyDOMFallback(settings, options = {}) {
 
         // Determine Visibility
         const elementTag = element.tagName.toLowerCase();
+        const shortThumbnailAnchor = element.querySelector('#thumbnail[href^="/shorts"], #video-title[href^="/shorts"], a[href^="/shorts/"]');
+        const shortOverlay = element.querySelector('ytd-thumbnail-overlay-time-status-renderer[overlay-style="SHORTS"], badge-shape[aria-label="Shorts"]');
+        const shortBadgeText = element.querySelector('.yt-badge-shape__text')?.textContent?.trim()?.toLowerCase() || '';
+        const shortBadgeDetected = shortBadgeText.includes('short');
+
+        const isShortVideoRenderer = elementTag === 'ytd-video-renderer' && (
+            element.hasAttribute('is-shorts-video') ||
+            Boolean(shortThumbnailAnchor) ||
+            Boolean(shortOverlay) ||
+            shortBadgeDetected
+        );
+
+        if (isShortVideoRenderer) {
+            element.setAttribute('data-filtertube-short', 'true');
+        } else {
+            element.removeAttribute('data-filtertube-short');
+        }
+
         const skipKeywordFiltering = CHANNEL_ONLY_TAGS.has(elementTag);
-        const shouldHide = shouldHideContent(title, channel, effectiveSettings, {
+        const matchesFilters = shouldHideContent(title, channel, effectiveSettings, {
             skipKeywords: skipKeywordFiltering,
             channelHref,
             channelMeta
@@ -714,7 +736,29 @@ function applyDOMFallback(settings, options = {}) {
             if (parent) targetToHide = parent;
         }
 
-        toggleVisibility(targetToHide, shouldHide, `Content: ${title}`);
+        let hideReason = `Content: ${title}`;
+        let shouldHide = matchesFilters;
+
+        if (isShortVideoRenderer) {
+            const hideByGlobalShorts = Boolean(effectiveSettings.hideAllShorts);
+
+            if (hideByGlobalShorts) {
+                shouldHide = true;
+                hideReason = 'Shorts hidden globally';
+                targetToHide.setAttribute('data-filtertube-hidden-by-hide-all-shorts', 'true');
+                targetToHide.removeAttribute('data-filtertube-hidden-by-keyword');
+            } else {
+                targetToHide.removeAttribute('data-filtertube-hidden-by-hide-all-shorts');
+
+                if (matchesFilters) {
+                    targetToHide.setAttribute('data-filtertube-hidden-by-keyword', 'true');
+                } else {
+                    targetToHide.removeAttribute('data-filtertube-hidden-by-keyword');
+                }
+            }
+        }
+
+        toggleVisibility(targetToHide, shouldHide, hideReason);
         element.setAttribute('data-filtertube-processed', 'true');
     });
 
@@ -754,20 +798,77 @@ function applyDOMFallback(settings, options = {}) {
     });
 
     // 3. Shorts Filtering
-    const shortsSelectors = 'ytd-reel-item-renderer, ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2, ytd-rich-shelf-renderer[is-shorts]';
+    const shortsContainerSelectors = 'grid-shelf-view-model, ytd-rich-shelf-renderer[is-shorts], ytd-reel-shelf-renderer';
+    const shortContainers = document.querySelectorAll(shortsContainerSelectors);
+
+    if (effectiveSettings.hideAllShorts) {
+        shortContainers.forEach(container => {
+            container.setAttribute('data-filtertube-hidden-by-hide-all-shorts', 'true');
+            toggleVisibility(container, true, 'Hide Shorts container');
+        });
+    } else {
+        shortContainers.forEach(container => {
+            if (container.hasAttribute('data-filtertube-hidden-by-hide-all-shorts')) {
+                container.removeAttribute('data-filtertube-hidden-by-hide-all-shorts');
+                if (!container.hasAttribute('data-filtertube-hidden-by-shelf-title')) {
+                    toggleVisibility(container, false);
+                }
+            }
+        });
+    }
+
+    const shortsSelectors = 'ytd-reel-item-renderer, ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2';
     document.querySelectorAll(shortsSelectors).forEach(element => {
         let target = element;
         const parent = element.closest('ytd-rich-item-renderer');
         if (parent) target = parent;
 
-        if (effectiveSettings.hideAllShorts) {
-            toggleVisibility(target, true, 'Hide All Shorts');
-        } else {
-            // Only restore if not hidden by specific keyword
-            if (!target.hasAttribute('data-filtertube-hidden-by-keyword')) {
-                toggleVisibility(target, false);
+        let title = '';
+        const titleSelectors = [
+            '#video-title',
+            '.shortsLockupViewModelHostMetadataTitle',
+            '.shortsLockupViewModelHostOutsideMetadataTitle',
+            'a[title]',
+            'h3',
+            'yt-formatted-string[role="text"]',
+            'span[role="text"]'
+        ];
+
+        for (const selector of titleSelectors) {
+            const node = element.querySelector(selector);
+            const text = node?.textContent?.trim();
+            if (text) {
+                title = text;
+                break;
             }
         }
+
+        if (!title) {
+            const ariaLabel = element.getAttribute('aria-label');
+            if (ariaLabel) title = ariaLabel.trim();
+        }
+
+        const channelAnchor = element.querySelector('a[href*="/channel"], a[href^="/@"], a[href*="/user/"], a[href*="/c/"]');
+        const channelText = channelAnchor?.textContent?.trim() || '';
+        const channelHref = channelAnchor?.getAttribute('href') || channelAnchor?.href || '';
+        const channelMeta = extractChannelMetadataFromElement(element, channelText, channelHref, {
+            cacheTarget: channelAnchor || element
+        });
+
+        const hideByKeywords = shouldHideContent(title, channelText, effectiveSettings, {
+            channelHref,
+            channelMeta
+        });
+
+        if (hideByKeywords) {
+            target.setAttribute('data-filtertube-hidden-by-keyword', 'true');
+        } else if (!effectiveSettings.hideAllShorts) {
+            target.removeAttribute('data-filtertube-hidden-by-keyword');
+        }
+
+        const shouldHideShort = effectiveSettings.hideAllShorts || hideByKeywords;
+        const reason = effectiveSettings.hideAllShorts ? 'Hide All Shorts' : `Short: ${title || channelText}`;
+        toggleVisibility(target, shouldHideShort, reason);
     });
 
     // 4. Comments Filtering
@@ -791,8 +892,16 @@ function applyDOMFallback(settings, options = {}) {
             toggleVisibility(shelf, false);
         }
 
-        updateContainerVisibility(shelf, 'ytd-rich-item-renderer, ytd-grid-video-renderer, ytd-video-renderer, ytd-reel-item-renderer, yt-lockup-view-model');
+        updateContainerVisibility(shelf, 'ytd-rich-item-renderer, ytd-grid-video-renderer, ytd-video-renderer, ytd-reel-item-renderer, yt-lockup-view-model, ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2');
     });
+
+    if (preserveScroll && scrollingElement) {
+        if (typeof scrollingElement.scrollTo === 'function') {
+            scrollingElement.scrollTo({ top: previousScrollTop, left: previousScrollLeft, behavior: 'instant' });
+        } else {
+            window.scrollTo(previousScrollLeft, previousScrollTop);
+        }
+    }
 }
 
 // Helper function to check if content should be hidden

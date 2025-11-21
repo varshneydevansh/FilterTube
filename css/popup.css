@@ -248,10 +248,10 @@ label {
 }
 
 .exact-toggle.active {
-    background-color: var(--ft-color-brand-secondary);
+    background-color: var(--ft-color-status-success);
     color: var(--ft-color-text-inverse);
-    border-color: var(--ft-color-brand-secondary);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-color: var(--ft-color-status-success);
+    box-shadow: 0 2px 4px rgba(47, 122, 99, 0.2);
 }
 
 .delete-btn {
