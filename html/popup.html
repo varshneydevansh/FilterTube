@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="../css/design_tokens.css">
     <link rel="stylesheet" href="../css/components.css">
     <link rel="stylesheet" href="../css/popup.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Crimson+Pro:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
 </head>
 
 <body>
@@ -16,7 +19,7 @@
         <header class="app-header">
             <div class="brand">
                 <img src="../icons/icon-48.png" alt="FilterTube" class="logo-icon">
-                <h1 class="app-title">FilterTube</h1>
+                <h1 class="app-title">Filter<span class="title-accent">Tube</span></h1>
             </div>
             <button id="openInTabBtn" class="icon-button" title="Open Full Settings" aria-label="Open Full Settings">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -38,27 +41,10 @@
 
             <!-- Quick Filters Card -->
             <section class="card filter-card">
-                <h2 class="card-title">Blocked Keywords</h2>
+                <h2 class="card-title">Filters</h2>
 
-                <div class="input-group">
-                    <div class="add-keyword-row">
-                        <input type="text" id="newKeywordInput" class="text-input" placeholder="Add keyword..." />
-                        <button id="addKeywordBtn" class="btn btn-small btn-secondary">Add</button>
-                    </div>
-
-                    <div id="keywordList" class="keyword-list">
-                        <!-- Keywords will be injected here -->
-                        <div class="empty-state">No keywords added</div>
-                    </div>
-
-                    <!-- Clear All moved to Advanced Settings (Tab View) -->
-                </div>
-
-                <div class="input-group">
-                    <label for="channels">Blocked Channels</label>
-                    <textarea id="channels" class="text-input" placeholder="e.g. @MrBeast, ChannelName"
-                        rows="2"></textarea>
-                </div>
+                <!-- Tabs will be injected here by JavaScript -->
+                <div id="popupFiltersTabsContainer"></div>
             </section>
 
             <!-- Content Control Card -->
@@ -106,6 +92,7 @@
         </main>
     </div>
 
+    <script src="../js/ui_components.js"></script>
     <script src="../js/popup.js"></script>
 </body>
 

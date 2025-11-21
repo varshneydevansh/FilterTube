@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="../css/components.css">
     <link rel="stylesheet" href="../css/tab-view.css">
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Crimson+Pro:wght@400;500;600;700&display=swap"
         rel="stylesheet">
 </head>
 
@@ -18,11 +18,8 @@
         <!-- Sidebar Navigation -->
         <nav class="sidebar">
             <a href="https://filtertube.in" target="_blank" class="brand" style="text-decoration: none;">
-                <div class="logo-icon">
-                    <img src="../icons/icon-128.png" alt="FilterTube Logo"
-                        style="width: 100%; height: 100%; object-fit: contain;">
-                </div>
-                <span class="brand-name">FilterTube</span>
+                <img src="../icons/icon-128.png" alt="FilterTube Logo" class="logo-icon">
+                <span class="brand-name">Filter<span class="brand-accent">Tube</span></span>
             </a>
 
             <ul class="nav-list">
@@ -163,63 +160,8 @@
 
                 <!-- Filters View -->
                 <div id="filtersView" class="view-section">
-                    <div class="card full-width">
-                        <div class="card-header">
-                            <h3>Keyword Management</h3>
-                            <div class="card-actions">
-                                <button id="clearAllKeywordsBtn" class="btn-text danger">Clear All</button>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="input-row">
-                                <input type="text" id="advancedKeywordInput" class="text-input"
-                                    placeholder="Add a keyword to filter...">
-                                <button id="advancedAddBtn" class="btn-primary">Add</button>
-                            </div>
-
-                            <div class="filter-controls">
-                                <input type="text" id="searchKeywords" class="search-input"
-                                    placeholder="Search your keywords...">
-                                <div class="sort-controls">
-                                    <span class="label">Sort by:</span>
-                                    <select id="sortKeywords" class="select-input">
-                                        <option value="newest">Newest</option>
-                                        <option value="oldest">Oldest</option>
-                                        <option value="az">A-Z</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div id="advancedKeywordList" class="advanced-list">
-                                <!-- Keywords injected here -->
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Channel Management -->
-                    <div class="card full-width" style="margin-top: 24px;">
-                        <div class="card-header">
-                            <h3>Channel Management</h3>
-                            <div class="sort-controls">
-                                <span class="label">Sort by:</span>
-                                <select id="channelSort" class="select-input">
-                                    <option value="newest">Newest</option>
-                                    <option value="oldest">Oldest</option>
-                                    <option value="az">A-Z</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="input-row">
-                                <input type="text" id="channelInput" class="text-input"
-                                    placeholder="Add channel name or ID...">
-                                <button id="addChannelBtn" class="btn-primary">Add</button>
-                            </div>
-                            <div id="channelList" class="advanced-list">
-                                <!-- Channels injected here -->
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Tabs will be injected here by JavaScript -->
+                    <div id="filtersTabsContainer"></div>
                 </div>
 
                 <!-- Semantic View (Placeholder) -->
@@ -304,6 +246,7 @@
             </div>
         </main>
     </div>
+    <script src="../js/ui_components.js"></script>
     <script src="../js/tab-view.js"></script>
 </body>
 

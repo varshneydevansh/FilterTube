@@ -10,8 +10,12 @@ body {
     padding: 0;
     width: 360px;
     font-family: var(--ft-font-family-base);
+    font-size: var(--ft-font-size-base);
+    line-height: var(--ft-line-height-base);
+    font-weight: var(--ft-font-weight-normal);
     background-color: var(--ft-color-bg-base);
     color: var(--ft-color-text-primary);
+    letter-spacing: var(--ft-letter-spacing-normal);
     -webkit-font-smoothing: antialiased;
 }
 
@@ -48,10 +52,16 @@ body {
 .app-title {
     font-family: var(--ft-font-family-serif);
     font-size: var(--ft-font-size-h3);
-    font-weight: 600;
+    font-weight: var(--ft-font-weight-semibold);
     margin: 0;
     color: var(--ft-color-text-primary);
-    letter-spacing: -0.02em;
+    letter-spacing: var(--ft-letter-spacing-tight);
+    line-height: var(--ft-line-height-tight);
+}
+
+.title-accent {
+    color: var(--ft-color-brand-primary);
+    font-weight: var(--ft-font-weight-bold);
 }
 
 .icon-button {
@@ -94,9 +104,11 @@ body {
 .card-title {
     font-family: var(--ft-font-family-serif);
     font-size: var(--ft-font-size-subtitle);
-    font-weight: 600;
+    font-weight: var(--ft-font-weight-semibold);
     margin: 0 0 var(--ft-space-md) 0;
     color: var(--ft-color-text-primary);
+    letter-spacing: var(--ft-letter-spacing-tight);
+    line-height: var(--ft-line-height-tight);
 }
 
 /* Status Card */
@@ -123,10 +135,10 @@ body {
 
 .status-text {
     font-size: var(--ft-font-size-caption);
-    font-weight: 500;
+    font-weight: var(--ft-font-weight-medium);
     color: var(--ft-color-text-secondary);
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
 }
 
 /* Inputs */
@@ -141,11 +153,11 @@ body {
 label {
     display: block;
     font-size: var(--ft-font-size-caption);
-    font-weight: 600;
+    font-weight: var(--ft-font-weight-semibold);
     color: var(--ft-color-text-secondary);
     margin-bottom: var(--ft-space-xs);
     text-transform: uppercase;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.06em;
 }
 
 /* Keyword List Styles */
@@ -183,10 +195,13 @@ label {
 }
 
 .keyword-text {
+    font-family: var(--ft-font-family-base);
     font-size: var(--ft-font-size-body);
+    font-weight: var(--ft-font-weight-medium);
     color: var(--ft-color-text-primary);
     flex: 1;
     margin-right: var(--ft-space-sm);
+    line-height: var(--ft-line-height-base);
 }
 
 .keyword-controls {
@@ -242,8 +257,9 @@ label {
 
 .toggle-title {
     font-size: var(--ft-font-size-body);
-    font-weight: 500;
+    font-weight: var(--ft-font-weight-medium);
     color: var(--ft-color-text-primary);
+    line-height: var(--ft-line-height-base);
 }
 
 .toggle-desc {
@@ -325,7 +341,8 @@ input:checked+.slider:before {
     border-radius: var(--ft-radius-md);
     font-family: var(--ft-font-family-base);
     font-size: var(--ft-font-size-body);
-    font-weight: 600;
+    font-weight: var(--ft-font-weight-semibold);
+    letter-spacing: var(--ft-letter-spacing-wide);
     cursor: pointer;
     transition: transform 0.1s ease, box-shadow 0.2s ease;
 }
@@ -345,8 +362,20 @@ input:checked+.slider:before {
     transform: scale(0.98);
 }
 
+.btn-secondary {
+    background-color: var(--ft-color-bg-panel);
+    color: var(--ft-color-text-primary);
+    border: 1px solid var(--ft-color-sem-neutral-border);
+}
+
+.btn-secondary:hover {
+    background-color: var(--ft-color-sem-neutral-bg);
+    border-color: var(--ft-color-text-secondary);
+}
+
 .btn.saved {
-    background-color: var(--ft-color-status-success);
+    background-color: var(--ft-color-status-success) !important;
+    color: white !important;
 }
 
 /* Dark Mode Support (Media Query + Data Attribute) */
@@ -417,6 +446,18 @@ input:checked+.slider:before {
     html:not([data-theme="light"]) .exact-toggle:hover {
         color: var(--ft-color-brand-secondary);
         border-color: var(--ft-color-brand-secondary);
+    }
+
+    html:not([data-theme="light"]) .exact-toggle.active {
+        background-color: rgba(74, 157, 127, 0.2);
+        color: #4A9D7F;
+        border-color: #4A9D7F;
+    }
+
+    html:not([data-theme="light"]) .exact-toggle.active:hover {
+        background-color: rgba(74, 157, 127, 0.3);
+        color: #4A9D7F;
+        border-color: #4A9D7F;
     }
 
     html:not([data-theme="light"]) .status-card {
@@ -492,6 +533,18 @@ html[data-theme="dark"] .exact-toggle {
 html[data-theme="dark"] .exact-toggle:hover {
     color: var(--ft-color-brand-secondary);
     border-color: var(--ft-color-brand-secondary);
+}
+
+html[data-theme="dark"] .exact-toggle.active {
+    background-color: rgba(74, 157, 127, 0.2);
+    color: #4A9D7F;
+    border-color: #4A9D7F;
+}
+
+html[data-theme="dark"] .exact-toggle.active:hover {
+    background-color: rgba(74, 157, 127, 0.3);
+    color: #4A9D7F;
+    border-color: #4A9D7F;
 }
 
 html[data-theme="dark"] .status-card {

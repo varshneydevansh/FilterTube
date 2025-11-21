@@ -1,41 +1,84 @@
 /**
  * Popup script for FilterTube extension
- * 
+ *
  * This script handles the settings popup UI for FilterTube
  */
 
+/**
+ * Initialize the tabbed interface for popup Filters section
+ */
+function initializePopupFiltersTabs() {
+    const container = document.getElementById('popupFiltersTabsContainer');
+    if (!container) return;
+
+    // Create Keywords tab content
+    const keywordsContent = document.createElement('div');
+    keywordsContent.innerHTML = `
+        <div class="input-group">
+            <div class="add-keyword-row">
+                <input type="text" id="newKeywordInput" class="text-input" placeholder="Add keyword..." />
+                <button id="addKeywordBtn" class="btn btn-small btn-secondary">Add</button>
+            </div>
+
+            <div id="keywordList" class="keyword-list">
+                <!-- Keywords will be injected here -->
+                <div class="empty-state">No keywords added</div>
+            </div>
+        </div>
+    `;
+
+    // Create Channels tab content
+    const channelsContent = document.createElement('div');
+    channelsContent.innerHTML = `
+        <div class="input-group">
+            <div class="add-keyword-row">
+                <input type="text" id="channelInput" class="text-input" placeholder="Add @handle or channel ID..." />
+                <button id="addChannelBtn" class="btn btn-small btn-secondary">Add</button>
+            </div>
+
+            <div id="channelList" class="keyword-list">
+                <!-- Channels will be injected here -->
+                <div class="empty-state">No channels blocked</div>
+            </div>
+        </div>
+    `;
+
+    // Create tabs using UIComponents
+    const tabs = UIComponents.createTabs({
+        tabs: [
+            { id: 'keywords', label: 'Keywords', content: keywordsContent },
+            { id: 'channels', label: 'Channels', content: channelsContent }
+        ],
+        defaultTab: 'keywords',
+        onTabChange: (tabId) => {
+            console.log('Popup: Switched to tab:', tabId);
+        }
+    });
+
+    container.appendChild(tabs.container);
+}
+
 document.addEventListener('DOMContentLoaded', function () {
+    // Initialize tabs first
+    initializePopupFiltersTabs();
     // UI Elements
     const newKeywordInput = document.getElementById('newKeywordInput');
     const addKeywordBtn = document.getElementById('addKeywordBtn');
     const keywordList = document.getElementById('keywordList');
     const clearKeywordsBtn = document.getElementById('clearKeywordsBtn');
 
-    const channelsInput = document.getElementById('channels');
+    const channelInput = document.getElementById('channelInput');
+    const addChannelBtn = document.getElementById('addChannelBtn');
+    const channelListEl = document.getElementById('channelList');
     const hideAllShortsCheckbox = document.getElementById('hideAllShorts');
     const hideAllCommentsCheckbox = document.getElementById('hideAllComments');
     const filterCommentsCheckbox = document.getElementById('filterComments');
     const saveBtn = document.getElementById('saveBtn');
     const openInTabBtn = document.getElementById('openInTabBtn');
 
-    // Auto-expand textarea based on content
-    function autoExpandTextarea(textarea) {
-        if (!textarea) return;
-        textarea.style.height = 'auto';
-        textarea.style.height = Math.max(textarea.scrollHeight, 48) + 'px'; // Min 2 rows worth
-    }
-
     // State
     let keywords = []; // Array of { word: string, exact: boolean }
-    let uiChannels = [];
-
-    function normalizeChannelsInput(value) {
-        if (!value) return [];
-        return value
-            .split(/[\n,]/)
-            .map(entry => entry.trim())
-            .filter(Boolean);
-    }
+    let channels = []; // Array of { name: string, id: string }
 
     function compileKeywords(list) {
         return list.map(k => {
@@ -47,11 +90,10 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    function buildCompiledSettings({ hideAllShorts, hideAllComments, filterComments, channels }) {
-        const channelList = channels.map(ch => ch.toLowerCase());
+    function buildCompiledSettings({ hideAllShorts, hideAllComments, filterComments }) {
         return {
             filterKeywords: compileKeywords(keywords),
-            filterChannels: channelList,
+            filterChannels: channels.map(ch => ch.id), // Send only IDs to content script
             hideAllShorts,
             hideAllComments,
             filterComments
@@ -104,34 +146,31 @@ document.addEventListener('DOMContentLoaded', function () {
             keywords = legacyKeywords.map(k => ({ word: k, exact: false }));
         } else if (Array.isArray(result.filterKeywords)) {
             // Fallback if uiKeywords missing but filterKeywords exists as array (rare)
-            // We can't easily reverse regex to exact/not-exact perfectly without metadata, 
+            // We can't easily reverse regex to exact/not-exact perfectly without metadata,
             // but we can try.
-            keywords = result.filterKeywords.map(k => {
-                if (k.pattern) {
-                    const isExact = k.pattern.startsWith('\\b') && k.pattern.endsWith('\\b');
-                    const word = k.pattern.replace(/\\b/g, '').replace(/\\/g, ''); // Rough cleanup
+            keywords = result.filterKeywords.map(entry => {
+                if (entry && entry.pattern) {
+                    const isExact = entry.pattern.startsWith('\\b') && entry.pattern.endsWith('\\b');
+                    const word = entry.pattern.replace(/\\b/g, '').replace(/\\/g, ''); // Rough cleanup
                     return { word: word, exact: isExact };
                 }
                 return null;
-            }).filter(k => k);
+            }).filter(entry => entry !== null);
         }
 
         renderKeywords();
 
-        if (result.uiChannels && Array.isArray(result.uiChannels)) {
-            uiChannels = result.uiChannels.map(ch => ch.trim()).filter(Boolean);
-        } else if (result.filterChannels) {
-            const normalized = Array.isArray(result.filterChannels)
-                ? result.filterChannels
-                : normalizeChannelsInput(result.filterChannels)
-                    .map(ch => ch.toLowerCase());
-            uiChannels = normalized;
+        // Load Channels
+        if (result.filterChannels && Array.isArray(result.filterChannels)) {
+            channels = result.filterChannels.map(ch => {
+                if (typeof ch === 'string') {
+                    return { name: ch, id: ch };
+                }
+                return ch;
+            });
         }
 
-        if (channelsInput) {
-            channelsInput.value = uiChannels.join(', ');
-            autoExpandTextarea(channelsInput);
-        }
+        renderChannels();
 
         if (hideAllShortsCheckbox) hideAllShortsCheckbox.checked = result.hideAllShorts || false;
         if (hideAllCommentsCheckbox) {
@@ -193,6 +232,41 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // Render Channel List
+    function renderChannels() {
+        if (!channelListEl) return;
+
+        channelListEl.innerHTML = '';
+
+        if (channels.length === 0) {
+            channelListEl.innerHTML = '<div class="empty-state">No channels blocked</div>';
+            return;
+        }
+
+        channels.forEach((ch, index) => {
+            const item = document.createElement('div');
+            item.className = 'keyword-item'; // Reuse same styling
+
+            const text = document.createElement('span');
+            text.className = 'keyword-text';
+            text.textContent = ch.name || ch.id;
+
+            const controls = document.createElement('div');
+            controls.className = 'keyword-controls';
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-btn';
+            deleteBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
+            deleteBtn.onclick = () => deleteChannel(index);
+
+            controls.appendChild(deleteBtn);
+
+            item.appendChild(text);
+            item.appendChild(controls);
+            channelListEl.appendChild(item);
+        });
+    }
+
     // Actions
     function addKeyword() {
         const word = newKeywordInput.value.trim();
@@ -202,6 +276,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 keywords.push({ word: word, exact: false });
                 newKeywordInput.value = '';
                 renderKeywords();
+
+                // Flash success feedback
+                if (addKeywordBtn) {
+                    UIComponents.flashButtonSuccess(addKeywordBtn, 'Added!', 1200);
+                }
             }
         }
     }
@@ -216,12 +295,42 @@ document.addEventListener('DOMContentLoaded', function () {
         renderKeywords();
     }
 
+    function addChannel() {
+        const val = channelInput.value.trim();
+        if (val) {
+            // Check for duplicates
+            if (!channels.some(ch => ch.id === val)) {
+                channels.push({ name: val, id: val });
+                channelInput.value = '';
+                renderChannels();
+
+                // Flash success feedback
+                if (addChannelBtn) {
+                    UIComponents.flashButtonSuccess(addChannelBtn, 'Added!', 1200);
+                }
+            }
+        }
+    }
+
+    function deleteChannel(index) {
+        channels.splice(index, 1);
+        renderChannels();
+    }
+
     // Event Listeners
     if (addKeywordBtn) addKeywordBtn.addEventListener('click', addKeyword);
 
     if (newKeywordInput) {
         newKeywordInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') addKeyword();
+        });
+    }
+
+    if (addChannelBtn) addChannelBtn.addEventListener('click', addChannel);
+
+    if (channelInput) {
+        channelInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addChannel();
         });
     }
 
@@ -236,7 +345,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (saveBtn) {
         saveBtn.addEventListener('click', function () {
-            uiChannels = normalizeChannelsInput(channelsInput ? channelsInput.value : '');
             const hideAllShorts = hideAllShortsCheckbox ? hideAllShortsCheckbox.checked : false;
             const hideAllComments = hideAllCommentsCheckbox ? hideAllCommentsCheckbox.checked : false;
             const filterComments = filterCommentsCheckbox ? filterCommentsCheckbox.checked : false;
@@ -247,14 +355,12 @@ document.addEventListener('DOMContentLoaded', function () {
             const compiledSettings = buildCompiledSettings({
                 hideAllShorts,
                 hideAllComments,
-                filterComments: computedFilterComments,
-                channels: uiChannels
+                filterComments: computedFilterComments
             });
 
             chrome.storage.local.set({
                 uiKeywords: keywords, // Save source state
                 filterKeywords: compiledSettings.filterKeywords, // Save compiled state
-                uiChannels,
                 filterChannels: compiledSettings.filterChannels,
                 hideAllShorts: hideAllShorts,
                 hideAllComments: hideAllComments,
@@ -278,13 +384,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if (openInTabBtn) {
         openInTabBtn.addEventListener('click', function () {
             chrome.tabs.create({ url: 'html/tab-view.html' });
-        });
-    }
-
-    // Auto-expand channels textarea as user types
-    if (channelsInput) {
-        channelsInput.addEventListener('input', function () {
-            autoExpandTextarea(channelsInput);
         });
     }
 

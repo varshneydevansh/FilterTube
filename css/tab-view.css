@@ -9,10 +9,14 @@ body {
     margin: 0;
     padding: 0;
     font-family: var(--ft-font-family-base);
+    font-size: var(--ft-font-size-base);
+    line-height: var(--ft-line-height-base);
+    font-weight: var(--ft-font-weight-normal);
     background-color: var(--ft-color-bg-base);
     color: var(--ft-color-text-primary);
     height: 100vh;
     overflow: hidden;
+    letter-spacing: var(--ft-letter-spacing-normal);
 }
 
 .app-container {
@@ -40,17 +44,23 @@ body {
 }
 
 .logo-icon {
-    width: 24px;
-    height: 24px;
-    background-color: var(--ft-color-brand-primary);
-    border-radius: 6px;
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
 }
 
 .brand-name {
     font-family: var(--ft-font-family-serif);
-    font-weight: 700;
-    font-size: var(--ft-font-size-h3);
+    font-weight: var(--ft-font-weight-semibold);
+    font-size: var(--ft-font-size-h2);
     color: var(--ft-color-text-primary);
+    letter-spacing: var(--ft-letter-spacing-tight);
+    line-height: var(--ft-line-height-tight);
+}
+
+.brand-accent {
+    color: var(--ft-color-brand-primary);
+    font-weight: var(--ft-font-weight-bold);
 }
 
 .nav-list {
@@ -71,7 +81,9 @@ body {
     cursor: pointer;
     color: var(--ft-color-text-secondary);
     transition: var(--ft-transition-fast);
-    font-weight: 500;
+    font-weight: var(--ft-font-weight-medium);
+    font-size: var(--ft-font-size-body);
+    letter-spacing: var(--ft-letter-spacing-normal);
 }
 
 .nav-item:hover {
@@ -82,7 +94,7 @@ body {
 .nav-item.active {
     background-color: var(--ft-color-bg-panel);
     color: var(--ft-color-brand-primary);
-    font-weight: 600;
+    font-weight: var(--ft-font-weight-semibold);
 }
 
 .nav-icon {
@@ -122,8 +134,11 @@ body {
 .top-bar h1 {
     font-family: var(--ft-font-family-serif);
     font-size: var(--ft-font-size-h1);
+    font-weight: var(--ft-font-weight-semibold);
     margin: 0;
     color: var(--ft-color-text-primary);
+    letter-spacing: var(--ft-letter-spacing-tight);
+    line-height: var(--ft-line-height-tight);
 }
 
 .icon-btn {

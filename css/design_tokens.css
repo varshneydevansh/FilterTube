@@ -1,6 +1,13 @@
 /* FilterTube Design Tokens - "Calm & Premium" Aesthetic */
 /* Aligned with General Intelligence / Physical Intelligence Vibe */
 
+/* Global Font Rendering */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
 :root {
   /* =========================================
      Color Palette - Neuroinclusive & Calm
@@ -65,26 +72,40 @@
      ========================================= */
 
   /* Font Families */
-  --ft-font-family-base: "Inter", "Segoe UI", "Roboto", sans-serif;
-  --ft-font-family-serif: "Playfair Display", "Georgia", "Times New Roman", serif;
+  --ft-font-family-base: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue", sans-serif;
+  --ft-font-family-serif: "Crimson Pro", "Playfair Display", "Georgia", "Times New Roman", serif;
+  --ft-font-family-display: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
 
   /* Scale */
-  --ft-font-size-caption: 0.75rem;
-  /* 12px */
-  --ft-font-size-body: 0.875rem;
-  /* 14px */
+  --ft-font-size-caption: 0.8125rem;
+  /* 13px - slightly larger for better readability */
+  --ft-font-size-body: 0.9375rem;
+  /* 15px - more comfortable reading size */
   --ft-font-size-base: 1rem;
   /* 16px */
   --ft-font-size-subtitle: 1.125rem;
   /* 18px */
-  --ft-font-size-h3: 1.25rem;
-  /* 20px */
-  --ft-font-size-h2: 1.5rem;
-  /* 24px */
-  --ft-font-size-h1: 2rem;
-  /* 32px */
+  --ft-font-size-h3: 1.375rem;
+  /* 22px - better hierarchy */
+  --ft-font-size-h2: 1.75rem;
+  /* 28px - more presence */
+  --ft-font-size-h1: 2.25rem;
+  /* 36px - stronger impact */
 
-  --ft-line-height-base: 1.6;
+  --ft-line-height-base: 1.65;
+  --ft-line-height-tight: 1.35;
+  --ft-line-height-relaxed: 1.75;
+
+  /* Font Weights */
+  --ft-font-weight-normal: 400;
+  --ft-font-weight-medium: 500;
+  --ft-font-weight-semibold: 600;
+  --ft-font-weight-bold: 700;
+
+  /* Letter Spacing for elegance */
+  --ft-letter-spacing-tight: -0.02em;
+  --ft-letter-spacing-normal: 0em;
+  --ft-letter-spacing-wide: 0.025em;
 
   /* =========================================
      Spacing & Layout

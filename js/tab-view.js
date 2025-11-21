@@ -1,6 +1,108 @@
 // js/tab-view.js
 
+/**
+ * Initialize the tabbed interface for Filters page
+ */
+function initializeFiltersTabs() {
+    const container = document.getElementById('filtersTabsContainer');
+    if (!container) return;
+
+    // Create Keywords tab content
+    const keywordsContent = document.createElement('div');
+    keywordsContent.innerHTML = `
+        <div class="card full-width">
+            <div class="card-header">
+                <h3>Keyword Management</h3>
+                <div class="card-actions">
+                    <button id="clearAllKeywordsBtn" class="btn-text danger">Clear All</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="input-row">
+                    <input type="text" id="advancedKeywordInput" class="text-input"
+                        placeholder="Add a keyword to filter...">
+                    <button id="advancedAddBtn" class="btn-primary">Add</button>
+                </div>
+
+                <div class="filter-controls">
+                    <input type="text" id="searchKeywords" class="search-input"
+                        placeholder="Search your keywords...">
+                    <div class="sort-controls">
+                        <span class="label">Sort by:</span>
+                        <select id="sortKeywords" class="select-input">
+                            <option value="newest">Newest</option>
+                            <option value="oldest">Oldest</option>
+                            <option value="az">A-Z</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="advancedKeywordList" class="advanced-list">
+                    <!-- Keywords injected here -->
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Create Channels tab content
+    const channelsContent = document.createElement('div');
+    channelsContent.innerHTML = `
+        <div class="card full-width">
+            <div class="card-header">
+                <h3>Channel Management</h3>
+                <div class="card-actions">
+                    <button id="clearAllChannelsBtn" class="btn-text danger">Clear All</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="input-row">
+                    <input type="text" id="channelInput" class="text-input"
+                        placeholder="Add channel @handle or ID...">
+                    <button id="addChannelBtn" class="btn-primary">Add</button>
+                </div>
+
+                <div class="filter-controls">
+                    <input type="text" id="searchChannels" class="search-input"
+                        placeholder="Search your channels...">
+                    <div class="sort-controls">
+                        <span class="label">Sort by:</span>
+                        <select id="channelSort" class="select-input">
+                            <option value="newest">Newest</option>
+                            <option value="oldest">Oldest</option>
+                            <option value="az">A-Z</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="channelList" class="advanced-list">
+                    <!-- Channels injected here -->
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Create tabs using UIComponents
+    const tabs = UIComponents.createTabs({
+        tabs: [
+            { id: 'keywords', label: 'Keywords', content: keywordsContent },
+            { id: 'channels', label: 'Channels', content: channelsContent }
+        ],
+        defaultTab: 'keywords',
+        onTabChange: (tabId) => {
+            // Optional: track tab changes
+            console.log('Switched to tab:', tabId);
+        }
+    });
+
+    container.appendChild(tabs.container);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    /**
+     * Initialize Filters Tabs (Keywords | Channels)
+     */
+    initializeFiltersTabs();
+
     /**
      * Navigation handling
      */
@@ -46,6 +148,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const channelInput = document.getElementById('channelInput');
     const addChannelBtn = document.getElementById('addChannelBtn');
     const channelSort = document.getElementById('channelSort');
+    const searchChannels = document.getElementById('searchChannels');
+    const clearChannelsBtn = document.getElementById('clearAllChannelsBtn');
     const hideShortsToggle = document.getElementById('settingHideShorts');
     const hideCommentsToggle = document.getElementById('settingHideComments');
     const filterCommentsToggle = document.getElementById('settingFilterComments');
@@ -345,6 +449,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (keywordInput) keywordInput.value = '';
             saveSettings();
             renderKeywordList();
+
+            // Flash success feedback
+            UIComponents.flashButtonSuccess(addKeywordBtn, 'Added!', 1200);
         });
     }
 
@@ -352,9 +459,19 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!channelListEl) return;
         channelListEl.innerHTML = '';
 
+        // Filter Channels by search term
+        const searchTerm = (searchChannels?.value || '').trim().toLowerCase();
+        let displayChannels = [...state.channels];
+
+        if (searchTerm) {
+            displayChannels = displayChannels.filter(ch => {
+                const name = (ch.name || ch.id || '').toLowerCase();
+                return name.includes(searchTerm);
+            });
+        }
+
         // Sort Channels
         const sortMode = channelSort ? channelSort.value : 'newest';
-        let displayChannels = [...state.channels];
 
         if (sortMode === 'az') {
             displayChannels.sort((a, b) => a.name.localeCompare(b.name));
@@ -409,6 +526,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (channelInput) channelInput.value = '';
                 saveSettings();
                 renderChannelList();
+
+                // Flash success feedback
+                UIComponents.flashButtonSuccess(addChannelBtn, 'Added!', 1200);
             }
         });
     }
@@ -416,6 +536,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (keywordInput) {
         keywordInput.addEventListener('keypress', event => {
             if (event.key === 'Enter') addKeywordBtn?.click();
+        });
+    }
+
+    if (channelInput) {
+        channelInput.addEventListener('keypress', event => {
+            if (event.key === 'Enter') addChannelBtn?.click();
         });
     }
 
@@ -429,8 +555,22 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    if (clearChannelsBtn) {
+        clearChannelsBtn.addEventListener('click', () => {
+            if (!state.channels.length) return;
+            if (!confirm('Delete all blocked channels? This cannot be undone.')) return;
+            state.channels = [];
+            saveSettings();
+            renderChannelList();
+        });
+    }
+
     if (searchInput) {
         searchInput.addEventListener('input', renderKeywordList);
+    }
+
+    if (searchChannels) {
+        searchChannels.addEventListener('input', renderChannelList);
     }
 
     if (sortSelect) {
