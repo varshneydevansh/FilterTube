@@ -13,6 +13,428 @@ function debugLog(message, ...args) {
     // console.log(`[${debugSequence}] FilterTube (Bridge ${IS_FIREFOX_BRIDGE ? 'Fx' : 'Cr'}):`, message, ...args);
 }
 
+const CHANNEL_ONLY_TAGS = new Set([
+    'ytd-channel-renderer',
+    'ytd-grid-channel-renderer',
+    'ytm-channel-renderer',
+    'ytd-universal-watch-card-renderer',
+    'ytm-universal-watch-card-renderer'
+]);
+
+function extractHandleFromString(value) {
+    if (!value || typeof value !== 'string') return '';
+    const match = value.match(/@([A-Za-z0-9._-]+)/);
+    return match ? `@${match[1].toLowerCase()}` : '';
+}
+
+function extractChannelIdFromString(value) {
+    if (!value || typeof value !== 'string') return '';
+    const match = value.match(/UC[0-9A-Za-z_-]{22}/i);
+    return match ? match[0].toLowerCase() : '';
+}
+
+function normalizeHrefForParsing(href) {
+    if (!href || typeof href !== 'string') return '';
+    try {
+        const url = new URL(href, document.location?.origin || 'https://www.youtube.com');
+        return url.pathname || '';
+    } catch (e) {
+        return href;
+    }
+}
+
+function buildChannelMetadata(channelText = '', channelHref = '') {
+    const normalizedHref = normalizeHrefForParsing(channelHref);
+    const handle = extractHandleFromString(channelText) || extractHandleFromString(normalizedHref);
+    const id = extractChannelIdFromString(normalizedHref) || extractChannelIdFromString(channelText);
+    return { handle, id };
+}
+
+function collectDatasetValues(element) {
+    if (!element || !element.dataset) return '';
+    return Object.values(element.dataset).join(' ');
+}
+
+function collectAttributeValues(element) {
+    if (!element || typeof element.getAttributeNames !== 'function') return '';
+    return element.getAttributeNames()
+        .map(name => element.getAttribute(name))
+        .filter(Boolean)
+        .join(' ');
+}
+
+function scanDataForChannelIdentifiers(root) {
+    const result = { handle: '', id: '' };
+    if (!root || typeof root !== 'object') return result;
+
+    const visited = new Set();
+    const queue = [root];
+    const MAX_ITERATIONS = 2000;
+    let iterations = 0;
+
+    while (queue.length && iterations < MAX_ITERATIONS && (!result.handle || !result.id)) {
+        const current = queue.shift();
+        iterations++;
+
+        if (!current || typeof current !== 'object') continue;
+        if (visited.has(current)) continue;
+        visited.add(current);
+
+        if (Array.isArray(current)) {
+            for (const item of current) {
+                if (typeof item === 'string') {
+                    if (!result.handle) {
+                        const handle = extractHandleFromString(item);
+                        if (handle) result.handle = handle;
+                    }
+                    if (!result.id) {
+                        const id = extractChannelIdFromString(item);
+                        if (id) result.id = id;
+                    }
+                } else if (item && typeof item === 'object' && !visited.has(item) && !(item instanceof Element) && !(item instanceof Node) && item !== window) {
+                    queue.push(item);
+                }
+                if (result.handle && result.id) break;
+            }
+            continue;
+        }
+
+        for (const value of Object.values(current)) {
+            if (typeof value === 'string') {
+                if (!result.handle) {
+                    const handle = extractHandleFromString(value);
+                    if (handle) result.handle = handle;
+                }
+                if (!result.id) {
+                    const id = extractChannelIdFromString(value);
+                    if (id) result.id = id;
+                }
+            } else if (value && typeof value === 'object' && !visited.has(value) && !(value instanceof Element) && !(value instanceof Node) && value !== window) {
+                queue.push(value);
+            }
+
+            if (result.handle && result.id) break;
+        }
+    }
+
+    return result;
+}
+
+function extractChannelMetadataFromElement(element, channelText = '', channelHref = '', options = {}) {
+    const cacheTarget = options.cacheTarget || element || null;
+    const relatedElements = Array.isArray(options.relatedElements) ? options.relatedElements.filter(Boolean) : [];
+
+    if (!element && !cacheTarget && relatedElements.length === 0) {
+        return buildChannelMetadata(channelText, channelHref);
+    }
+
+    const cacheSource = cacheTarget || element || relatedElements[0] || null;
+
+    const cachedHandle = cacheSource?.getAttribute?.('data-filtertube-channel-handle');
+    const cachedId = cacheSource?.getAttribute?.('data-filtertube-channel-id');
+    if ((cachedHandle && cachedHandle !== '') || (cachedId && cachedId !== '')) {
+        return {
+            handle: cachedHandle || '',
+            id: cachedId || ''
+        };
+    }
+
+    const meta = buildChannelMetadata(channelText, channelHref);
+
+    if (!meta.handle || !meta.id) {
+        const datasetValues = [...new Set([element, cacheTarget, ...relatedElements])]
+            .filter(src => src && src.dataset)
+            .map(src => collectDatasetValues(src))
+            .filter(Boolean)
+            .join(' ');
+
+        const attributeValues = [...new Set([element, cacheTarget, ...relatedElements])]
+            .filter(src => src)
+            .map(src => collectAttributeValues(src))
+            .filter(Boolean)
+            .join(' ');
+
+        if (datasetValues) {
+            if (!meta.handle) {
+                const dsHandle = extractHandleFromString(datasetValues);
+                if (dsHandle) meta.handle = dsHandle;
+            }
+            if (!meta.id) {
+                const dsId = extractChannelIdFromString(datasetValues);
+                if (dsId) meta.id = dsId;
+            }
+        }
+
+        if (attributeValues) {
+            if (!meta.handle) {
+                const attrHandle = extractHandleFromString(attributeValues);
+                if (attrHandle) meta.handle = attrHandle;
+            }
+            if (!meta.id) {
+                const attrId = extractChannelIdFromString(attributeValues);
+                if (attrId) meta.id = attrId;
+            }
+        }
+    }
+
+    if (!meta.handle || !meta.id) {
+        const possibleSources = new Set();
+        const addSource = source => {
+            if (!source || typeof source !== 'object') return;
+            if (source instanceof Element || source instanceof Node || source === window) return;
+            possibleSources.add(source);
+        };
+
+        const potentialElements = [...new Set([element, cacheTarget, ...relatedElements].filter(Boolean))];
+
+        potentialElements.forEach(el => {
+            addSource(el?.data);
+            addSource(el?.data?.data);
+            addSource(el?.data?.content);
+            addSource(el?.data?.metadata);
+            addSource(el?.data?.renderer);
+            addSource(el?.__data);
+            addSource(el?.__data?.data);
+            addSource(el?.__data?.content);
+            addSource(el?.__data?.metadata);
+            addSource(el?.__dataHost);
+            addSource(el?.__dataHost?.data);
+        });
+
+        const parentCandidates = [
+            cacheTarget?.closest?.('ytd-rich-item-renderer'),
+            cacheTarget?.closest?.('ytd-video-renderer'),
+            cacheTarget?.closest?.('ytd-playlist-renderer'),
+            cacheTarget?.closest?.('ytd-radio-renderer'),
+            cacheTarget?.closest?.('ytd-grid-video-renderer'),
+            cacheTarget?.closest?.('yt-lockup-view-model'),
+            cacheTarget?.closest?.('yt-lockup-metadata-view-model')
+        ];
+
+        parentCandidates.forEach(parent => {
+            if (!parent) return;
+            addSource(parent.data);
+            addSource(parent.data?.data);
+            addSource(parent.data?.content);
+            addSource(parent.__data);
+            addSource(parent.__data?.data);
+        });
+
+        for (const source of possibleSources) {
+            const identifiers = scanDataForChannelIdentifiers(source);
+            if (!meta.handle && identifiers.handle) meta.handle = identifiers.handle;
+            if (!meta.id && identifiers.id) meta.id = identifiers.id;
+            if (meta.handle && meta.id) break;
+        }
+    }
+
+    if (!meta.handle || !meta.id) {
+        const anchorCandidates = new Set();
+        const elementForAnchors = [...new Set([element, cacheTarget, ...relatedElements].filter(el => el && typeof el.querySelectorAll === 'function'))];
+
+        elementForAnchors.forEach(el => {
+            el.querySelectorAll('a[href]').forEach(anchor => anchorCandidates.add(anchor));
+        });
+
+        for (const anchor of anchorCandidates) {
+            const href = anchor.getAttribute('href') || anchor.href || '';
+            if (href) {
+                const normalizedHref = normalizeHrefForParsing(href);
+                if (!meta.handle) {
+                    const handleFromHref = extractHandleFromString(href) || extractHandleFromString(normalizedHref);
+                    if (handleFromHref) meta.handle = handleFromHref;
+                }
+                if (!meta.id) {
+                    const idFromHref = extractChannelIdFromString(href) || extractChannelIdFromString(normalizedHref);
+                    if (idFromHref) meta.id = idFromHref;
+                }
+            }
+
+            if (!meta.handle) {
+                const anchorDatasetValues = collectDatasetValues(anchor);
+                if (anchorDatasetValues) {
+                    const dsHandle = extractHandleFromString(anchorDatasetValues);
+                    if (dsHandle) meta.handle = dsHandle;
+                }
+            }
+
+            if (!meta.id) {
+                const anchorDatasetValues = collectDatasetValues(anchor);
+                if (anchorDatasetValues) {
+                    const dsId = extractChannelIdFromString(anchorDatasetValues);
+                    if (dsId) meta.id = dsId;
+                }
+            }
+
+            if (!meta.handle) {
+                const anchorAttributeValues = collectAttributeValues(anchor);
+                if (anchorAttributeValues) {
+                    const attrHandle = extractHandleFromString(anchorAttributeValues);
+                    if (attrHandle) meta.handle = attrHandle;
+                }
+            }
+
+            if (!meta.id) {
+                const anchorAttributeValues = collectAttributeValues(anchor);
+                if (anchorAttributeValues) {
+                    const attrId = extractChannelIdFromString(anchorAttributeValues);
+                    if (attrId) meta.id = attrId;
+                }
+            }
+
+            if (!meta.handle) {
+                const anchorText = anchor.textContent || '';
+                if (anchorText) {
+                    const textHandle = extractHandleFromString(anchorText);
+                    if (textHandle) meta.handle = textHandle;
+                }
+            }
+
+            if (meta.handle && meta.id) break;
+        }
+    }
+
+    if (!meta.handle) {
+        const fallbackSources = [...new Set([channelText, cacheTarget?.innerText, element?.innerText, ...relatedElements.map(el => el?.innerText)].filter(Boolean))];
+        for (const sourceText of fallbackSources) {
+            const fallbackHandle = extractHandleFromString(sourceText);
+            if (fallbackHandle) {
+                meta.handle = fallbackHandle;
+                break;
+            }
+        }
+    }
+
+    if (meta.handle) {
+        meta.handle = meta.handle.toLowerCase();
+        if (!meta.handle.startsWith('@') && meta.handle) {
+            meta.handle = `@${meta.handle.replace(/^@+/, '')}`;
+        }
+    }
+
+    if (meta.id) {
+        meta.id = meta.id.toLowerCase();
+    }
+
+    if (cacheSource) {
+        if (meta.handle) {
+            cacheSource.setAttribute('data-filtertube-channel-handle', meta.handle);
+        } else {
+            cacheSource.removeAttribute?.('data-filtertube-channel-handle');
+        }
+
+        if (meta.id) {
+            cacheSource.setAttribute('data-filtertube-channel-id', meta.id);
+        } else {
+            cacheSource.removeAttribute?.('data-filtertube-channel-id');
+        }
+    }
+
+    return meta;
+}
+
+function channelMatchesFilter(meta, filterChannel) {
+    if (!filterChannel || typeof filterChannel !== 'string') return false;
+    const normalized = filterChannel.trim().toLowerCase();
+    if (!normalized) return false;
+
+    if (normalized.startsWith('@')) {
+        return !!meta.handle && meta.handle === normalized;
+    }
+
+    if (normalized.startsWith('uc')) {
+        return !!meta.id && meta.id === normalized;
+    }
+
+    return false;
+}
+
+function normalizeTextForMatching(value) {
+    if (!value || typeof value !== 'string') return '';
+
+    let normalized = value;
+    try {
+        normalized = value.normalize('NFKD');
+    } catch (error) {
+        // Some environments may not support String.prototype.normalize
+        normalized = value;
+    }
+
+    // Strip combining marks and zero-width joiners/variation selectors that can interfere with matching
+    normalized = normalized.replace(/[\u0300-\u036f]/g, '');
+    normalized = normalized.replace(/[\u200D\uFE0E\uFE0F]/g, '');
+    return normalized;
+}
+
+function extractPlainKeyword(keywordData) {
+    if (!keywordData) return '';
+
+    if (keywordData instanceof RegExp) {
+        return keywordData.source.replace(/\\b/g, '').replace(/\\/g, '');
+    }
+
+    if (keywordData.pattern) {
+        return keywordData.pattern.replace(/\\b/g, '').replace(/\\/g, '');
+    }
+
+    if (typeof keywordData === 'string') {
+        return keywordData;
+    }
+
+    return '';
+}
+
+function isAlphanumeric(char) {
+    if (!char) return false;
+
+    if (char.length !== 1) return false;
+
+    const code = char.charCodeAt(0);
+    if ((code >= 48 && code <= 57) || (code >= 65 && code <= 90) || (code >= 97 && code <= 122)) {
+        return true;
+    }
+
+    // Basic heuristic for extended Unicode letters
+    return char.toUpperCase() !== char.toLowerCase();
+}
+
+function matchesKeyword(regex, rawText, keywordData) {
+    if (!rawText) return false;
+
+    regex.lastIndex = 0;
+    if (regex.test(rawText)) {
+        return true;
+    }
+
+    const normalized = normalizeTextForMatching(rawText);
+    if (normalized && normalized !== rawText) {
+        regex.lastIndex = 0;
+        return regex.test(normalized);
+    }
+
+    const plainKeyword = extractPlainKeyword(keywordData);
+    if (plainKeyword) {
+        const normalizedKeyword = normalizeTextForMatching(plainKeyword).toLowerCase();
+        const normalizedText = normalized.toLowerCase();
+
+        if (normalizedKeyword && normalizedText.includes(normalizedKeyword)) {
+            const index = normalizedText.indexOf(normalizedKeyword);
+            const beforeChar = index > 0 ? normalizedText[index - 1] : '';
+            const afterCharIndex = index + normalizedKeyword.length;
+            const afterChar = afterCharIndex < normalizedText.length ? normalizedText[afterCharIndex] : '';
+
+            const hasLeftBoundary = !beforeChar || !isAlphanumeric(beforeChar);
+            const hasRightBoundary = !afterChar || !isAlphanumeric(afterChar);
+
+            if (hasLeftBoundary || hasRightBoundary) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
 // ============================================================================
 // DOM MANIPULATION HELPERS (SOFT HIDE)
 // ============================================================================
@@ -136,7 +558,11 @@ function applyDOMFallback(settings, options = {}) {
         'yt-lockup-view-model',
         'yt-lockup-metadata-view-model',
         'ytd-channel-renderer',
-        'ytd-rich-grid-media'
+        'ytd-grid-channel-renderer',
+        'ytd-rich-grid-media',
+        'ytd-universal-watch-card-renderer',
+        'ytd-channel-video-player-renderer',
+        'ytd-channel-featured-content-renderer'
     ].join(', ');
 
     const elements = document.querySelectorAll(VIDEO_SELECTORS);
@@ -150,28 +576,61 @@ function applyDOMFallback(settings, options = {}) {
         }
 
         // Extract Metadata
-        const titleElement = element.querySelector('#video-title, .ytd-video-meta-block #video-title, h3 a, .metadata-snippet-container #video-title, #video-title-link, .yt-lockup-metadata-view-model-wiz__title, .yt-lockup-metadata-view-model__title, .yt-lockup-metadata-view-model__heading-reset');
-        const channelElement = element.querySelector('#channel-name a, .ytd-channel-name a, #text, .ytd-video-owner-renderer a, .yt-lockup-metadata-view-model-wiz__metadata, .yt-content-metadata-view-model__metadata-text');
+        const titleElement = element.querySelector('#video-title, .ytd-video-meta-block #video-title, h3 a, .metadata-snippet-container #video-title, #video-title-link, .yt-lockup-metadata-view-model-wiz__title, .yt-lockup-metadata-view-model__title, .yt-lockup-metadata-view-model__heading-reset, yt-formatted-string#title');
+        const channelElement = element.querySelector('#channel-name a, .ytd-channel-name a, ytd-channel-name a, #text, .ytd-video-owner-renderer a, .yt-lockup-metadata-view-model-wiz__metadata, .yt-content-metadata-view-model__metadata-text, yt-formatted-string[slot="subtitle"], .watch-card-tertiary-text a');
+        const channelSubtitleElement = element.querySelector('#watch-card-subtitle, #watch-card-subtitle yt-formatted-string');
+        const channelAnchor = (channelElement || channelSubtitleElement)?.closest('a') || element.querySelector('a[href*="/channel"], a[href^="/@"], a[href*="/user/"], a[href*="/c/"]');
 
         const title = titleElement?.textContent?.trim() || element.innerText || '';
-        const channel = channelElement?.textContent?.trim() || '';
+        const channelPrimaryText = channelElement?.textContent?.trim() || '';
+        const channelSubtitleText = channelSubtitleElement?.textContent?.trim() || '';
+        const channel = [channelPrimaryText, channelSubtitleText].filter(Boolean).join(' | ');
+        const channelHref = channelAnchor?.getAttribute('href') || channelAnchor?.href || '';
+        const relatedElements = [channelAnchor, channelElement, channelSubtitleElement];
+        const channelMeta = extractChannelMetadataFromElement(element, channel, channelHref, {
+            cacheTarget: channelAnchor || element,
+            relatedElements
+        });
 
         // Determine Visibility
-        const shouldHide = shouldHideContent(title, channel, effectiveSettings);
+        const elementTag = element.tagName.toLowerCase();
+        const skipKeywordFiltering = CHANNEL_ONLY_TAGS.has(elementTag);
+        const shouldHide = shouldHideContent(title, channel, effectiveSettings, {
+            skipKeywords: skipKeywordFiltering,
+            channelHref,
+            channelMeta
+        });
 
         // Handle Container Logic (e.g., rich-grid-media inside rich-item)
         let targetToHide = element;
-        const tagName = element.tagName.toLowerCase();
-        if (tagName === 'ytd-rich-grid-media') {
+        if (elementTag === 'ytd-rich-grid-media') {
             const parent = element.closest('ytd-rich-item-renderer');
             if (parent) targetToHide = parent;
-        } else if (tagName === 'yt-lockup-view-model' || tagName === 'yt-lockup-metadata-view-model') {
+        } else if (elementTag === 'yt-lockup-view-model' || elementTag === 'yt-lockup-metadata-view-model') {
             const parent = element.closest('ytd-rich-item-renderer');
             if (parent) targetToHide = parent;
         }
 
         toggleVisibility(targetToHide, shouldHide, `Content: ${title}`);
         element.setAttribute('data-filtertube-processed', 'true');
+    });
+
+    // Inline survey containers embed filtered videos; hide shell when everything inside is hidden
+    document.querySelectorAll('ytd-inline-survey-renderer').forEach(survey => {
+        const embeddedItems = survey.querySelectorAll('ytd-compact-video-renderer, ytd-video-renderer, ytd-rich-grid-media, ytd-rich-item-renderer');
+        if (embeddedItems.length === 0) return;
+
+        const hasVisibleItem = Array.from(embeddedItems).some(item =>
+            !(item.classList.contains('filtertube-hidden') || item.hasAttribute('data-filtertube-hidden'))
+        );
+
+        const shouldHideSurvey = !hasVisibleItem;
+        toggleVisibility(survey, shouldHideSurvey, 'Inline Survey Shell');
+
+        const sectionContainer = survey.closest('ytd-rich-section-renderer');
+        if (sectionContainer) {
+            toggleVisibility(sectionContainer, shouldHideSurvey, 'Inline Survey Section');
+        }
     });
 
     // 2. Chip Filtering (Home/Search chip bars)
@@ -220,11 +679,15 @@ function applyDOMFallback(settings, options = {}) {
 }
 
 // Helper function to check if content should be hidden
-function shouldHideContent(title, channel, settings) {
+function shouldHideContent(title, channel, settings, options = {}) {
     if (!title && !channel) return false;
 
-    // Check keywords
-    if (settings.filterKeywords && settings.filterKeywords.length > 0) {
+    const { skipKeywords = false, channelHref = '', channelMeta: providedChannelMeta = null } = options;
+    const channelMeta = providedChannelMeta || buildChannelMetadata(channel, channelHref);
+    const hasChannelIdentity = Boolean(channelMeta.handle || channelMeta.id);
+
+    // Keyword filtering
+    if (!skipKeywords && settings.filterKeywords && settings.filterKeywords.length > 0) {
         for (const keywordData of settings.filterKeywords) {
             let regex;
             try {
@@ -235,21 +698,21 @@ function shouldHideContent(title, channel, settings) {
                 } else {
                     regex = new RegExp(keywordData.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
                 }
-            } catch (e) {
+            } catch (error) {
+                debugLog('⚠️ Invalid keyword regex in settings:', keywordData, error);
                 continue;
             }
 
-            if (regex.test(title) || regex.test(channel)) {
+            if (matchesKeyword(regex, title) || matchesKeyword(regex, channel)) {
                 return true;
             }
         }
     }
 
-    // Check channels
-    if (settings.filterChannels && settings.filterChannels.length > 0) {
-        const channelLower = channel.toLowerCase();
+    // Channel filtering
+    if (settings.filterChannels && settings.filterChannels.length > 0 && hasChannelIdentity) {
         for (const filterChannel of settings.filterChannels) {
-            if (channelLower.includes(filterChannel)) {
+            if (channelMatchesFilter(channelMeta, filterChannel)) {
                 return true;
             }
         }
@@ -458,8 +921,44 @@ async function initializeDOMFallback(settings) {
             applyDOMFallback(null);
         }, 200);
 
-        const observer = new MutationObserver(debouncedFallback);
-        observer.observe(document.body, { childList: true, subtree: true });
+        let immediateFallbackScheduled = false;
+        function scheduleImmediateFallback() {
+            if (immediateFallbackScheduled) return;
+            immediateFallbackScheduled = true;
+            requestAnimationFrame(() => {
+                immediateFallbackScheduled = false;
+                applyDOMFallback(null);
+            });
+        }
+
+        const observer = new MutationObserver(mutations => {
+            let hasNewContent = false;
+            for (const mutation of mutations) {
+                if (mutation.addedNodes && mutation.addedNodes.length > 0) {
+                    hasNewContent = true;
+                    break;
+                }
+            }
+
+            if (hasNewContent) {
+                scheduleImmediateFallback();
+            } else {
+                debouncedFallback();
+            }
+        });
+        const observeTarget = () => {
+            const target = document.body || document.documentElement;
+            if (!target) return false;
+            observer.observe(target, { childList: true, subtree: true });
+            return true;
+        };
+
+        if (!observeTarget()) {
+            document.addEventListener('DOMContentLoaded', () => {
+                if (!observeTarget()) return;
+                scheduleImmediateFallback();
+            }, { once: true });
+        }
     }
 }
 

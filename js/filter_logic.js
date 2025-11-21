@@ -253,6 +253,12 @@
         viewCount: ['viewCountText.simpleText', 'shortViewCountText.simpleText']
     };
 
+    const CHANNEL_ONLY_RENDERERS = new Set([
+        'channelRenderer',
+        'gridChannelRenderer',
+        'universalWatchCardRenderer'
+    ]);
+
     // Comprehensive filter rules for all YouTube renderer types
     const FILTER_RULES = {
         // ------------------------------------------------------------------
@@ -585,6 +591,7 @@
             const channelInfo = this._extractChannelInfo(item, rules);
             const description = this._extractDescription(item, rules);
             const videoId = rules.videoId ? getByPath(item, rules.videoId) : '';
+            const skipKeywordFiltering = CHANNEL_ONLY_RENDERERS.has(rendererType);
 
             // Log extraction results for debugging
             if (this.debugEnabled && (title || channelInfo.name || channelInfo.id || description)) {
@@ -609,7 +616,7 @@
             }
 
             // Keyword filtering (check title AND description)
-            if (this.settings.filterKeywords.length > 0 && (title || description)) {
+            if (!skipKeywordFiltering && this.settings.filterKeywords.length > 0 && (title || description)) {
                 const textToSearch = `${title} ${description}`.trim();
 
                 for (const keywordRegex of this.settings.filterKeywords) {
@@ -800,14 +807,6 @@
             // Channel ID matching (UC...)
             if (filter.startsWith('uc') && channelInfo.id) {
                 if (channelInfo.id.toLowerCase() === filter) {
-                    return true;
-                }
-            }
-
-            // Partial name matching
-            if (channelInfo.name) {
-                const lowerName = channelInfo.name.toLowerCase();
-                if (lowerName.includes(filter) || filter.includes(lowerName)) {
                     return true;
                 }
             }

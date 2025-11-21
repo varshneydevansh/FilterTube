@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         if (channelsInput) {
-            channelsInput.value = uiChannels.join('\n');
+            channelsInput.value = uiChannels.join(', ');
         }
 
         if (hideAllShortsCheckbox) hideAllShortsCheckbox.checked = result.hideAllShorts || false;

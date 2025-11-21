@@ -77,10 +77,55 @@
     function shouldSkipEngineProcessing(data, dataName) {
         if (!data || !dataName) return false;
 
+        const path = document.location?.pathname || '';
+        const isSearchResultsPath = path.startsWith('/results');
+
+        const searchActionCollections = data.onResponseReceivedCommands || data.onResponseReceivedActions || data.onResponseReceivedEndpoints;
+        const hasSearchLayout = Boolean(
+            data?.contents?.twoColumnSearchResultsRenderer ||
+            data?.contents?.twoColumnSearchResults ||
+            data?.header?.searchHeaderRenderer ||
+            (Array.isArray(searchActionCollections) && searchActionCollections.some(action => {
+                const continuationKeys = ['appendContinuationItemsAction', 'reloadContinuationItemsCommand', 'replaceContinuationItemsCommand'];
+
+                return continuationKeys.some(key => {
+                    const payload = action?.[key];
+                    if (!payload) return false;
+
+                    const continuationItems = payload.continuationItems;
+                    if (Array.isArray(continuationItems)) {
+                        return continuationItems.some(item => !!(
+                            item?.itemSectionRenderer ||
+                            item?.videoRenderer ||
+                            item?.channelRenderer ||
+                            item?.lockupViewModel ||
+                            item?.lockupMetadataViewModel ||
+                            item?.gridShelfViewModel ||
+                            item?.shelfRenderer ||
+                            item?.richItemRenderer
+                        ));
+                    }
+
+                    return Boolean(
+                        payload?.sectionListRenderer ||
+                        payload?.gridRenderer ||
+                        payload?.richGridRenderer
+                    );
+                });
+            }))
+        );
+
+        if (isSearchResultsPath) {
+            const isSearchFetch = typeof dataName === 'string' && dataName.startsWith('fetch:/youtubei/v1/search');
+            if (isSearchFetch || hasSearchLayout) {
+                seedDebugLog(`⏭️ Skipping engine processing for ${dataName} (search results) to allow DOM-based restore`);
+                return true;
+            }
+        }
+
         const isBrowseFetch = typeof dataName === 'string' && dataName.startsWith('fetch:/youtubei/v1/browse');
         if (!isBrowseFetch) return false;
 
-        const path = document.location?.pathname || '';
         const isOnHomeFeed = path === '/' && !isMobileInterface;
         if (!isOnHomeFeed) return false;
 
