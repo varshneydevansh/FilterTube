@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FilterTube Dashboard</title>
     <link rel="stylesheet" href="../css/design_tokens.css">
+    <link rel="stylesheet" href="../css/components.css">
     <link rel="stylesheet" href="../css/tab-view.css">
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap"
@@ -16,30 +17,72 @@
     <div class="app-container">
         <!-- Sidebar Navigation -->
         <nav class="sidebar">
-            <div class="brand">
-                <div class="logo-icon"></div>
+            <a href="https://filtertube.in" target="_blank" class="brand" style="text-decoration: none;">
+                <div class="logo-icon">
+                    <img src="../icons/icon-128.png" alt="FilterTube Logo"
+                        style="width: 100%; height: 100%; object-fit: contain;">
+                </div>
                 <span class="brand-name">FilterTube</span>
-            </div>
+            </a>
 
             <ul class="nav-list">
                 <li class="nav-item active" data-tab="dashboard">
-                    <span class="nav-icon">📊</span>
+                    <span class="nav-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                        </svg>
+                    </span>
                     <span class="nav-label">Dashboard</span>
                 </li>
                 <li class="nav-item" data-tab="filters">
-                    <span class="nav-icon">🛡️</span>
+                    <span class="nav-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                        </svg>
+                    </span>
                     <span class="nav-label">Filters</span>
                 </li>
                 <li class="nav-item" data-tab="semantic">
-                    <span class="nav-icon">🧠</span>
-                    <span class="nav-label">Semantic</span>
+                    <span class="nav-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="2" y1="12" x2="22" y2="12"></line>
+                            <path
+                                d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
+                            </path>
+                        </svg>
+                    </span>
+                    <span class="nav-label">Semantic ML</span>
                 </li>
                 <li class="nav-item" data-tab="kids">
-                    <span class="nav-icon">🧸</span>
+                    <span class="nav-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4.5 9.5V4a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v5.5"></path>
+                            <path d="M2 20v-5h20v5"></path>
+                            <path d="M12 15v5"></path>
+                            <path d="M6 15v5"></path>
+                            <path d="M18 15v5"></path>
+                        </svg>
+                    </span>
                     <span class="nav-label">Kids Mode</span>
                 </li>
                 <li class="nav-item" data-tab="settings">
-                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path
+                                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                            </path>
+                        </svg>
+                    </span>
                     <span class="nav-label">Settings</span>
                 </li>
             </ul>
@@ -56,7 +99,10 @@
                 <h1 id="pageTitle">Dashboard</h1>
                 <div class="actions">
                     <button id="themeToggle" class="icon-btn" title="Toggle Theme">
-                        🌙
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
                     </button>
                 </div>
             </header>
@@ -76,6 +122,10 @@
                             <div class="stat-label">Active Keywords</div>
                         </div>
                         <div class="stat-card">
+                            <div class="stat-value" id="statFilteredChannels">0</div>
+                            <div class="stat-label">Filtered Channels</div>
+                        </div>
+                        <div class="stat-card">
                             <div class="stat-value" id="statSavedTime">0m</div>
                             <div class="stat-label">Est. Time Saved</div>
                         </div>
@@ -86,11 +136,26 @@
                     </div>
                     <div class="quick-actions-grid">
                         <button class="action-card" id="quickAddKeywordBtn">
-                            <span class="icon">➕</span>
+                            <span class="icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                            </span>
                             <span class="label">Add Keyword</span>
                         </button>
                         <button class="action-card" id="quickKidsModeBtn">
-                            <span class="icon">🧸</span>
+                            <span class="icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M4.5 9.5V4a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v5.5"></path>
+                                    <path d="M2 20v-5h20v5"></path>
+                                    <path d="M12 15v5"></path>
+                                    <path d="M6 15v5"></path>
+                                    <path d="M18 15v5"></path>
+                                </svg>
+                            </span>
                             <span class="label">Toggle Kids Mode</span>
                         </button>
                     </div>
@@ -129,38 +194,68 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Channel Management -->
+                    <div class="card full-width" style="margin-top: 24px;">
+                        <div class="card-header">
+                            <h3>Channel Management</h3>
+                            <div class="sort-controls">
+                                <span class="label">Sort by:</span>
+                                <select id="channelSort" class="select-input">
+                                    <option value="newest">Newest</option>
+                                    <option value="oldest">Oldest</option>
+                                    <option value="az">A-Z</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="input-row">
+                                <input type="text" id="channelInput" class="text-input"
+                                    placeholder="Add channel name or ID...">
+                                <button id="addChannelBtn" class="btn-primary">Add</button>
+                            </div>
+                            <div id="channelList" class="advanced-list">
+                                <!-- Channels injected here -->
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Semantic View (Placeholder) -->
                 <div id="semanticView" class="view-section">
                     <div class="empty-state-large">
-                        <div class="icon">🧠</div>
-                        <h2>Semantic Filtering</h2>
-                        <p>Coming soon. Visualize and manage related concepts.</p>
+                        <div class="icon">
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="2" y1="12" x2="22" y2="12"></line>
+                                <path
+                                    d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
+                                </path>
+                            </svg>
+                        </div>
+                        <h2>Semantic ML Filtering</h2>
+                        <p>Coming Soon. Advanced AI-powered filtering running locally on your device.</p>
+                        <p class="sub-text">Privacy-first analysis of video titles, descriptions, and thumbnails.</p>
                     </div>
                 </div>
 
                 <!-- Kids Mode View (Placeholder) -->
                 <div id="kidsView" class="view-section">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>Parental Controls</h3>
+                    <div class="empty-state-large">
+                        <div class="icon">
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4.5 9.5V4a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v5.5"></path>
+                                <path d="M2 20v-5h20v5"></path>
+                                <path d="M12 15v5"></path>
+                                <path d="M6 15v5"></path>
+                                <path d="M18 15v5"></path>
+                            </svg>
                         </div>
-                        <div class="card-body">
-                            <div class="toggle-row">
-                                <div class="toggle-info">
-                                    <span class="toggle-title">Enable Kids Mode</span>
-                                    <span class="toggle-desc">Restrict content to whitelisted channels only.</span>
-                                </div>
-                                <label class="switch">
-                                    <input type="checkbox" id="kidsModeToggle">
-                                    <span class="slider round"></span>
-                                </label>
-                            </div>
-                            <div class="pin-setup">
-                                <button class="btn-secondary">Set PIN Code</button>
-                            </div>
-                        </div>
+                        <h2>Kids Mode</h2>
+                        <p>Coming Soon. Create a safe, whitelisted environment for children.</p>
+                        <p class="sub-text">PIN-protected access and strict channel controls.</p>
                     </div>
                 </div>
 

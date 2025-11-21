@@ -42,11 +42,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('searchKeywords');
     const sortSelect = document.getElementById('sortKeywords');
 
+    const channelListEl = document.getElementById('channelList');
+    const channelInput = document.getElementById('channelInput');
+    const addChannelBtn = document.getElementById('addChannelBtn');
+    const channelSort = document.getElementById('channelSort');
     const hideShortsToggle = document.getElementById('settingHideShorts');
     const hideCommentsToggle = document.getElementById('settingHideComments');
     const filterCommentsToggle = document.getElementById('settingFilterComments');
 
     const statActiveKeywords = document.getElementById('statActiveKeywords');
+    const statFilteredChannels = document.getElementById('statFilteredChannels'); // New stat
     const statHiddenToday = document.getElementById('statHiddenToday');
     const statSavedTime = document.getElementById('statSavedTime');
 
@@ -98,15 +103,15 @@ document.addEventListener('DOMContentLoaded', () => {
     function normalizeChannels(rawChannels) {
         if (Array.isArray(rawChannels)) {
             return rawChannels
-                .map(ch => typeof ch === 'string' ? ch.trim() : '')
+                .map(ch => typeof ch === 'string' ? { name: ch.trim(), id: ch.trim() } : ch) // Assume ch is already an object if not string
                 .filter(Boolean);
         }
 
         if (typeof rawChannels === 'string') {
             return rawChannels
                 .split(',')
-                .map(ch => ch.trim())
-                .filter(Boolean);
+                .map(ch => ({ name: ch.trim(), id: ch.trim() }))
+                .filter(ch => ch.name);
         }
 
         return [];
@@ -125,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function buildCompiledSettings({ hideShorts, hideComments, filterCommentsOverride }) {
         return {
             filterKeywords: compileKeywords(state.keywords),
-            filterChannels: [...state.channels],
+            filterChannels: state.channels.map(ch => ch.id), // Send only IDs to content script
             hideAllShorts: hideShorts,
             hideAllComments: hideComments,
             filterComments: filterCommentsOverride
@@ -170,20 +175,30 @@ document.addEventListener('DOMContentLoaded', () => {
             'filterChannels',
             'hideAllShorts',
             'hideAllComments',
-            'filterComments'
+            'filterComments',
+            'stats' // Load stats object
         ], result => {
             state.keywords = normalizeKeywords(result.uiKeywords, result.filterKeywords);
             state.channels = normalizeChannels(result.filterChannels);
+            state.stats = result.stats || { hiddenCount: 0, savedMinutes: 0 }; // Default stats
 
             if (hideShortsToggle) hideShortsToggle.checked = !!result.hideAllShorts;
-            if (hideCommentsToggle) hideCommentsToggle.checked = !!result.hideAllComments;
-            if (filterCommentsToggle) filterCommentsToggle.checked = !result.hideAllComments && !!result.filterComments;
+            if (hideCommentsToggle) {
+                hideCommentsToggle.checked = !!result.hideAllComments;
+                state.hideAllComments = !!result.hideAllComments; // Initialize state for new toggle logic
+            }
+            if (filterCommentsToggle) {
+                filterCommentsToggle.checked = !result.hideAllComments && !!result.filterComments;
+                filterCommentsToggle.disabled = !!result.hideAllComments; // Disable if hide all is on
+                state.filterComments = !result.hideAllComments && !!result.filterComments; // Initialize state
+            }
 
             if (sortSelect && sortSelect.value) {
                 state.sort = sortSelect.value;
             }
 
             renderKeywordList();
+            renderChannelList();
             updateStats();
         });
     }
@@ -272,6 +287,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderKeywordList();
             });
 
+            const semanticToggle = document.createElement('div');
+            semanticToggle.className = `exact-toggle ${entry.semantic ? 'active' : ''}`; // Reusing exact-toggle class for now
+            semanticToggle.textContent = 'Semantic';
+            semanticToggle.title = 'Enable semantic matching (Coming Soon)';
+            semanticToggle.style.opacity = '0.5'; // Visual cue that it's not fully active yet
+            semanticToggle.style.cursor = 'not-allowed';
+            // semanticToggle.addEventListener('click', () => { ... }); // Future wiring
+
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'btn-text danger';
             deleteBtn.textContent = 'Remove';
@@ -282,6 +305,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             controls.appendChild(exactToggle);
+            controls.appendChild(semanticToggle);
             controls.appendChild(deleteBtn);
 
             item.appendChild(left);
@@ -292,8 +316,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateStats() {
         if (statActiveKeywords) statActiveKeywords.textContent = String(state.keywords.length);
-        if (statHiddenToday) statHiddenToday.textContent = '—';
-        if (statSavedTime) statSavedTime.textContent = '—';
+
+        // New Channel Stat
+        if (statFilteredChannels) statFilteredChannels.textContent = String(state.channels.length);
+
+        // Real Stats from Storage
+        const hidden = state.stats ? state.stats.hiddenCount : 0;
+        const saved = state.stats ? state.stats.savedMinutes : 0;
+
+        if (statHiddenToday) statHiddenToday.textContent = String(hidden);
+        if (statSavedTime) statSavedTime.textContent = `${saved}m`;
     }
 
     /**
@@ -309,6 +341,71 @@ document.addEventListener('DOMContentLoaded', () => {
             if (keywordInput) keywordInput.value = '';
             saveSettings();
             renderKeywordList();
+        });
+    }
+
+    function renderChannelList() {
+        if (!channelListEl) return;
+        channelListEl.innerHTML = '';
+
+        // Sort Channels
+        const sortMode = channelSort ? channelSort.value : 'newest';
+        let displayChannels = [...state.channels];
+
+        if (sortMode === 'az') {
+            displayChannels.sort((a, b) => a.name.localeCompare(b.name));
+        } else if (sortMode === 'oldest') {
+            // Assuming array order is chronological
+            // No-op for oldest first
+        } else {
+            // Newest first (default)
+            displayChannels.reverse();
+        }
+
+        if (displayChannels.length === 0) {
+            channelListEl.innerHTML = '<div class="empty-state-large" style="padding: 20px;">No channels filtered</div>';
+            return;
+        }
+
+        displayChannels.forEach((channel, index) => {
+            // Find original index for deletion
+            const originalIndex = state.channels.indexOf(channel);
+
+            const item = document.createElement('div');
+            item.className = 'list-item';
+
+            const left = document.createElement('div');
+            left.className = 'item-word';
+            left.textContent = channel.name || channel.id;
+
+            const controls = document.createElement('div');
+            controls.className = 'item-controls';
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-btn'; // Use shared class
+            deleteBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
+            deleteBtn.addEventListener('click', () => {
+                state.channels.splice(originalIndex, 1);
+                saveSettings();
+                renderChannelList();
+            });
+
+            controls.appendChild(deleteBtn);
+            item.appendChild(left);
+            item.appendChild(controls);
+            channelListEl.appendChild(item);
+        });
+    }
+
+    if (addChannelBtn) {
+        addChannelBtn.addEventListener('click', () => {
+            const val = (channelInput?.value || '').trim();
+            if (val && !state.channels.some(ch => ch.id === val)) {
+                state.channels.push({ name: val, id: val }); // Store as object
+                if (channelInput) channelInput.value = '';
+                saveSettings();
+                renderChannelList();
+            }
         });
     }
 
@@ -340,18 +437,41 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     hideShortsToggle?.addEventListener('change', saveSettings);
-    hideCommentsToggle?.addEventListener('change', () => {
-        if (hideCommentsToggle.checked && filterCommentsToggle) {
-            filterCommentsToggle.checked = false;
-        }
-        saveSettings();
-    });
-    filterCommentsToggle?.addEventListener('change', () => {
-        if (filterCommentsToggle.checked && hideCommentsToggle) {
-            hideCommentsToggle.checked = false;
-        }
-        saveSettings();
-    });
+    // --- Toggle Logic ---
+    if (hideCommentsToggle && filterCommentsToggle) {
+        hideCommentsToggle.addEventListener('change', () => {
+            state.hideAllComments = hideCommentsToggle.checked;
+
+            // Instant Feedback: Disable filter toggle if hide all is on
+            if (state.hideAllComments) {
+                filterCommentsToggle.checked = false;
+                filterCommentsToggle.disabled = true;
+                state.filterComments = false; // Force state update
+            } else {
+                filterCommentsToggle.disabled = false;
+            }
+
+            saveSettings();
+        });
+
+        filterCommentsToggle.addEventListener('change', () => {
+            state.filterComments = filterCommentsToggle.checked;
+            saveSettings();
+        });
+    }
+
+    // --- Sorting Logic ---
+    if (sortSelect) {
+        sortSelect.addEventListener('change', () => {
+            renderKeywordList();
+        });
+    }
+
+    if (channelSort) {
+        channelSort.addEventListener('change', () => {
+            renderChannelList();
+        });
+    }
 
     quickAddKeywordBtn?.addEventListener('click', () => {
         navItems.find(nav => nav.getAttribute('data-tab') === 'filters')?.click();

@@ -1,0 +1,269 @@
+/* =========================================
+   FilterTube Shared Components
+   "React-like" Reusable UI Elements
+   ========================================= */
+
+/* --- Cards --- */
+.card {
+    background-color: var(--ft-color-bg-surface);
+    border-radius: var(--ft-radius-lg);
+    box-shadow: var(--ft-shadow-floating);
+    border: 1px solid var(--ft-color-sem-neutral-border);
+    transition: box-shadow var(--ft-transition-normal);
+    overflow: hidden;
+}
+
+.card:hover {
+    box-shadow: var(--ft-shadow-elevated);
+}
+
+.card-header {
+    padding: var(--ft-space-md);
+    border-bottom: 1px solid var(--ft-color-sem-neutral-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-body {
+    padding: var(--ft-space-md);
+}
+
+/* --- Inputs & Forms --- */
+.input-row {
+    display: flex;
+    gap: var(--ft-space-sm);
+    margin-bottom: var(--ft-space-md);
+}
+
+.text-input {
+    flex: 1;
+    padding: var(--ft-space-sm) var(--ft-space-md);
+    border: 1px solid var(--ft-color-sem-neutral-border);
+    border-radius: var(--ft-radius-md);
+    background-color: var(--ft-color-bg-base);
+    color: var(--ft-color-text-primary);
+    font-family: var(--ft-font-family-base);
+    transition: border-color var(--ft-transition-fast);
+}
+
+.text-input:focus {
+    outline: none;
+    border-color: var(--ft-color-focus-outline);
+    box-shadow: var(--ft-shadow-focus-ring);
+}
+
+/* --- Buttons --- */
+.btn-primary {
+    padding: var(--ft-space-sm) var(--ft-space-lg);
+    background-color: var(--ft-color-brand-primary);
+    color: white;
+    border: none;
+    border-radius: var(--ft-radius-md);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color var(--ft-transition-fast);
+}
+
+.btn-primary:hover {
+    background-color: var(--ft-color-brand-primary-hover);
+}
+
+.btn-secondary {
+    padding: var(--ft-space-sm) var(--ft-space-md);
+    background-color: transparent;
+    border: 1px solid var(--ft-color-sem-neutral-border);
+    color: var(--ft-color-text-primary);
+    border-radius: var(--ft-radius-md);
+    cursor: pointer;
+    transition: all var(--ft-transition-fast);
+}
+
+.btn-secondary:hover {
+    background-color: var(--ft-color-bg-panel);
+    border-color: var(--ft-color-text-secondary);
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--ft-color-text-secondary);
+    padding: var(--ft-space-sm);
+    border-radius: var(--ft-radius-md);
+    transition: color var(--ft-transition-fast), background-color var(--ft-transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-btn:hover {
+    color: var(--ft-color-text-primary);
+    background-color: var(--ft-color-bg-panel);
+}
+
+/* --- Toggles (Switch) --- */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    /* Fallback */
+    background-color: var(--ft-color-sem-neutral-border);
+    transition: .4s;
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+input:checked+.slider {
+    background-color: var(--ft-color-status-success);
+}
+
+input:focus+.slider {
+    box-shadow: 0 0 1px var(--ft-color-status-success);
+}
+
+input:checked+.slider:before {
+    transform: translateX(20px);
+}
+
+/* --- Lists (Keywords/Channels) --- */
+.advanced-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ft-space-xs);
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 4px;
+    /* Space for scrollbar */
+}
+
+.list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--ft-space-sm) var(--ft-space-md);
+    background-color: var(--ft-color-bg-base);
+    border-radius: var(--ft-radius-md);
+    border: 1px solid transparent;
+    transition: all var(--ft-transition-fast);
+}
+
+.list-item:hover {
+    border-color: var(--ft-color-sem-neutral-border);
+    background-color: var(--ft-color-bg-panel);
+}
+
+.item-word {
+    font-weight: 500;
+    font-size: var(--ft-font-size-base);
+    color: var(--ft-color-text-primary);
+}
+
+.item-controls {
+    display: flex;
+    gap: var(--ft-space-sm);
+    align-items: center;
+}
+
+/* --- Exact Toggle Badge --- */
+.exact-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--ft-color-sem-neutral-border);
+    background: transparent;
+    color: var(--ft-color-text-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all var(--ft-transition-fast);
+}
+
+.exact-toggle:hover {
+    border-color: var(--ft-color-brand-secondary);
+    color: var(--ft-color-brand-secondary);
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.exact-toggle.active {
+    background-color: rgba(47, 122, 99, 0.1);
+    color: var(--ft-color-status-success);
+    border-color: var(--ft-color-status-success);
+}
+
+/* --- Delete Button --- */
+.delete-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--ft-color-text-muted);
+    padding: 4px;
+    border-radius: 4px;
+    transition: all var(--ft-transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.delete-btn:hover {
+    color: var(--ft-color-status-danger);
+    background-color: rgba(180, 67, 57, 0.1);
+}
+
+/* --- Scrollbar --- */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--ft-color-sem-neutral-border);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--ft-color-text-muted);
+}

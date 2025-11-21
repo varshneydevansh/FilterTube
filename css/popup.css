@@ -148,26 +148,6 @@ label {
     letter-spacing: 0.02em;
 }
 
-.text-input {
-    width: 100%;
-    padding: var(--ft-space-sm);
-    border: 1px solid var(--ft-color-sem-neutral-border);
-    border-radius: var(--ft-radius-sm);
-    font-family: var(--ft-font-family-base);
-    font-size: var(--ft-font-size-body);
-    color: var(--ft-color-text-primary);
-    background-color: var(--ft-color-bg-base);
-    resize: vertical;
-    box-sizing: border-box;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.text-input:focus {
-    outline: none;
-    border-color: var(--ft-color-focus-outline);
-    box-shadow: 0 0 0 2px rgba(46, 134, 171, 0.1);
-}
-
 /* Keyword List Styles */
 .add-keyword-row {
     display: flex;
@@ -181,19 +161,8 @@ label {
     white-space: nowrap;
 }
 
-.btn-secondary {
-    background-color: var(--ft-color-bg-panel);
-    color: var(--ft-color-text-primary);
-    border: 1px solid var(--ft-color-sem-neutral-border);
-}
-
-.btn-secondary:hover {
-    background-color: var(--ft-color-bg-base);
-    border-color: var(--ft-color-text-secondary);
-}
-
 .keyword-list {
-    max-height: 150px;
+    max-height: 300px;
     overflow-y: auto;
     border: 1px solid var(--ft-color-sem-neutral-border);
     border-radius: var(--ft-radius-sm);
@@ -224,49 +193,6 @@ label {
     display: flex;
     align-items: center;
     gap: var(--ft-space-sm);
-}
-
-.exact-toggle {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    cursor: pointer;
-    font-size: 10px;
-    color: var(--ft-color-text-secondary);
-    text-transform: uppercase;
-    font-weight: 700;
-    padding: 4px 8px;
-    border-radius: 4px;
-    background-color: var(--ft-color-bg-panel);
-    border: 1px solid var(--ft-color-sem-neutral-border);
-    transition: all 0.2s ease;
-}
-
-.exact-toggle:hover {
-    border-color: var(--ft-color-brand-secondary);
-    color: var(--ft-color-brand-secondary);
-}
-
-.exact-toggle.active {
-    background-color: var(--ft-color-status-success);
-    color: var(--ft-color-text-inverse);
-    border-color: var(--ft-color-status-success);
-    box-shadow: 0 2px 4px rgba(47, 122, 99, 0.2);
-}
-
-.delete-btn {
-    background: none;
-    border: none;
-    color: var(--ft-color-text-muted);
-    cursor: pointer;
-    padding: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.delete-btn:hover {
-    color: var(--ft-color-status-error);
 }
 
 .empty-state {
@@ -423,77 +349,152 @@ input:checked+.slider:before {
     background-color: var(--ft-color-status-success);
 }
 
-/* Dark Mode Support */
+/* Dark Mode Support (Media Query + Data Attribute) */
 @media (prefers-color-scheme: dark) {
-    body {
+    html:not([data-theme="light"]) body {
         background-color: #1a1a1a;
         color: #e0e0e0;
     }
 
-    .app-header,
-    .app-content,
-    .action-bar {
+    html:not([data-theme="light"]) .app-header,
+    html:not([data-theme="light"]) .app-content,
+    html:not([data-theme="light"]) .action-bar {
         background-color: #1a1a1a;
         border-color: #333;
     }
 
-    .card {
+    html:not([data-theme="light"]) .card {
         background-color: #242424;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
 
-    .card:hover {
+    html:not([data-theme="light"]) .card:hover {
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     }
 
-    .card-title,
-    .app-title,
-    .toggle-title {
+    html:not([data-theme="light"]) .card-title,
+    html:not([data-theme="light"]) .app-title,
+    html:not([data-theme="light"]) .toggle-title {
         color: #f0f0f0;
     }
 
-    .text-input {
+    html:not([data-theme="light"]) .text-input {
         background-color: #2a2a2a;
         border-color: #444;
         color: #fff;
     }
 
-    .keyword-list {
+    html:not([data-theme="light"]) .keyword-list {
         background-color: #2a2a2a;
         border-color: #444;
+        color: #fff;
     }
 
-    .keyword-item {
+    html:not([data-theme="light"]) .keyword-item {
         border-color: #444;
     }
 
-    .keyword-text {
+    html:not([data-theme="light"]) .keyword-text {
         color: #e0e0e0;
     }
 
-    .btn-secondary {
+    html:not([data-theme="light"]) .btn-secondary {
         background-color: #333;
         color: #e0e0e0;
         border-color: #444;
     }
 
-    .btn-secondary:hover {
+    html:not([data-theme="light"]) .btn-secondary:hover {
         background-color: #444;
     }
 
-    .exact-toggle {
+    html:not([data-theme="light"]) .exact-toggle {
         background-color: #333;
         color: #aaa;
         border-color: #444;
     }
 
-    .exact-toggle:hover {
+    html:not([data-theme="light"]) .exact-toggle:hover {
         color: var(--ft-color-brand-secondary);
         border-color: var(--ft-color-brand-secondary);
     }
 
-    .status-card {
+    html:not([data-theme="light"]) .status-card {
         background-color: #242424;
         border-color: #333;
     }
+}
+
+/* Explicit Dark Theme Override */
+html[data-theme="dark"] body {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+}
+
+html[data-theme="dark"] .app-header,
+html[data-theme="dark"] .app-content,
+html[data-theme="dark"] .action-bar {
+    background-color: #1a1a1a;
+    border-color: #333;
+}
+
+html[data-theme="dark"] .card {
+    background-color: #242424;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+html[data-theme="dark"] .card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+html[data-theme="dark"] .card-title,
+html[data-theme="dark"] .app-title,
+html[data-theme="dark"] .toggle-title {
+    color: #f0f0f0;
+}
+
+html[data-theme="dark"] .text-input {
+    background-color: #2a2a2a;
+    border-color: #444;
+    color: #fff;
+}
+
+html[data-theme="dark"] .keyword-list {
+    background-color: #2a2a2a;
+    border-color: #444;
+    color: #fff;
+}
+
+html[data-theme="dark"] .keyword-item {
+    border-color: #444;
+}
+
+html[data-theme="dark"] .keyword-text {
+    color: #e0e0e0;
+}
+
+html[data-theme="dark"] .btn-secondary {
+    background-color: #333;
+    color: #e0e0e0;
+    border-color: #444;
+}
+
+html[data-theme="dark"] .btn-secondary:hover {
+    background-color: #444;
+}
+
+html[data-theme="dark"] .exact-toggle {
+    background-color: #333;
+    color: #aaa;
+    border-color: #444;
+}
+
+html[data-theme="dark"] .exact-toggle:hover {
+    color: var(--ft-color-brand-secondary);
+    border-color: var(--ft-color-brand-secondary);
+}
+
+html[data-theme="dark"] .status-card {
+    background-color: #242424;
+    border-color: #333;
 }
