@@ -13,10 +13,83 @@ function debugLog(message, ...args) {
     // console.log(`[${debugSequence}] FilterTube (Bridge ${IS_FIREFOX_BRIDGE ? 'Fx' : 'Cr'}):`, message, ...args);
 }
 
+function extractShelfTitle(shelf) {
+    if (!shelf || typeof shelf.querySelector !== 'function') return '';
+
+    const header = shelf.querySelector(':scope #title-container, :scope #header, :scope ytd-shelf-header-renderer, :scope .grid-subheader, :scope .shelf-title-row, :scope h2');
+    const headerTextCandidates = [];
+
+    if (header) {
+        headerTextCandidates.push(
+            header.querySelector('#title'),
+            header.querySelector('#title-text'),
+            header.querySelector('yt-formatted-string#title'),
+            header.querySelector('span#title'),
+            header.querySelector('h2')
+        );
+    }
+
+    headerTextCandidates.push(
+        shelf.querySelector(':scope > #dismissible #title'),
+        shelf.querySelector(':scope > #dismissible #title-text'),
+        shelf.querySelector(':scope > h2')
+    );
+
+    for (const candidate of headerTextCandidates) {
+        const text = candidate?.textContent?.trim();
+        if (text) return text;
+    }
+
+    const headerAria = header?.getAttribute?.('aria-label');
+    if (headerAria?.trim()) return headerAria.trim();
+
+    const shelfAria = shelf.getAttribute('aria-label');
+    if (shelfAria?.trim()) return shelfAria.trim();
+
+    return '';
+}
+
+function handleMediaPlayback(element, shouldHide) {
+    if (!element || typeof element.querySelectorAll !== 'function') return;
+
+    const mediaElements = element.querySelectorAll('video, audio');
+    mediaElements.forEach(media => {
+        try {
+            if (shouldHide) {
+                if (!media.dataset.filtertubeStoredAutoplay && (media.autoplay || media.hasAttribute('autoplay'))) {
+                    media.dataset.filtertubeStoredAutoplay = 'true';
+                }
+                if (typeof media.pause === 'function') {
+                    media.pause();
+                }
+                media.autoplay = false;
+            } else {
+                if (media.dataset.filtertubeStoredAutoplay === 'true') {
+                    media.autoplay = true;
+                }
+            }
+        } catch (error) {
+            debugLog('⚠️ Failed to adjust media playback', error);
+        }
+    });
+
+    if (shouldHide) {
+        const moviePlayer = element.querySelector('#movie_player');
+        if (moviePlayer) {
+            try {
+                if (typeof moviePlayer.pauseVideo === 'function') {
+                    moviePlayer.pauseVideo();
+                } else if (typeof moviePlayer.stopVideo === 'function') {
+                    moviePlayer.stopVideo();
+                }
+            } catch (error) {
+                debugLog('⚠️ Failed to pause movie player', error);
+            }
+        }
+    }
+}
+
 const CHANNEL_ONLY_TAGS = new Set([
-    'ytd-channel-renderer',
-    'ytd-grid-channel-renderer',
-    'ytm-channel-renderer',
     'ytd-universal-watch-card-renderer',
     'ytm-universal-watch-card-renderer'
 ]);
@@ -467,12 +540,14 @@ function toggleVisibility(element, shouldHide, reason = '') {
             element.setAttribute('data-filtertube-hidden', 'true');
             // debugLog(`🚫 Hiding: ${reason}`);
         }
+        handleMediaPlayback(element, true);
     } else {
         if (element.classList.contains('filtertube-hidden')) {
             element.classList.remove('filtertube-hidden');
             element.removeAttribute('data-filtertube-hidden');
             // debugLog(`✅ Restoring element`);
         }
+        handleMediaPlayback(element, false);
     }
 }
 
@@ -481,6 +556,7 @@ function toggleVisibility(element, shouldHide, reason = '') {
  */
 function updateContainerVisibility(container, childSelector) {
     if (!container) return;
+    if (container.hasAttribute('data-filtertube-hidden-by-shelf-title')) return;
 
     const children = container.querySelectorAll(childSelector);
     if (children.length === 0) return; // Don't hide empty containers that might be loading
@@ -495,6 +571,10 @@ function updateContainerVisibility(container, childSelector) {
         container.classList.add('filtertube-hidden-shelf');
     } else {
         container.classList.remove('filtertube-hidden-shelf');
+        if (container.classList.contains('filtertube-hidden')) {
+            container.classList.remove('filtertube-hidden');
+            container.removeAttribute('data-filtertube-hidden');
+        }
     }
 }
 
@@ -554,7 +634,6 @@ function applyDOMFallback(settings, options = {}) {
         'ytd-reel-item-renderer',
         'ytd-playlist-renderer',
         'ytd-radio-renderer',
-        'ytd-shelf-renderer',
         'yt-lockup-view-model',
         'yt-lockup-metadata-view-model',
         'ytd-channel-renderer',
@@ -576,12 +655,36 @@ function applyDOMFallback(settings, options = {}) {
         }
 
         // Extract Metadata
-        const titleElement = element.querySelector('#video-title, .ytd-video-meta-block #video-title, h3 a, .metadata-snippet-container #video-title, #video-title-link, .yt-lockup-metadata-view-model-wiz__title, .yt-lockup-metadata-view-model__title, .yt-lockup-metadata-view-model__heading-reset, yt-formatted-string#title');
+        const titleElement = element.querySelector('#video-title, .ytd-video-meta-block #video-title, h3 a, .metadata-snippet-container #video-title, #video-title-link, .yt-lockup-metadata-view-model-wiz__title, .yt-lockup-metadata-view-model__title, .yt-lockup-metadata-view-model__heading-reset, yt-formatted-string#title, span#title');
         const channelElement = element.querySelector('#channel-name a, .ytd-channel-name a, ytd-channel-name a, #text, .ytd-video-owner-renderer a, .yt-lockup-metadata-view-model-wiz__metadata, .yt-content-metadata-view-model__metadata-text, yt-formatted-string[slot="subtitle"], .watch-card-tertiary-text a');
         const channelSubtitleElement = element.querySelector('#watch-card-subtitle, #watch-card-subtitle yt-formatted-string');
         const channelAnchor = (channelElement || channelSubtitleElement)?.closest('a') || element.querySelector('a[href*="/channel"], a[href^="/@"], a[href*="/user/"], a[href*="/c/"]');
 
-        const title = titleElement?.textContent?.trim() || element.innerText || '';
+        let title = titleElement?.textContent?.trim() || '';
+        if (!title) {
+            const ownAriaLabel = element.getAttribute('aria-label');
+            if (ownAriaLabel) {
+                title = ownAriaLabel.trim();
+            }
+        }
+        if (!title) {
+            const labelledById = element.getAttribute('aria-labelledby');
+            if (labelledById) {
+                const labelSource = document.getElementById(labelledById.trim());
+                if (labelSource?.textContent) {
+                    title = labelSource.textContent.trim();
+                }
+            }
+        }
+        if (!title) {
+            const titledAnchor = element.querySelector('a[title]');
+            if (titledAnchor?.getAttribute) {
+                const anchorTitle = titledAnchor.getAttribute('title');
+                if (anchorTitle) {
+                    title = anchorTitle.trim();
+                }
+            }
+        }
         const channelPrimaryText = channelElement?.textContent?.trim() || '';
         const channelSubtitleText = channelSubtitleElement?.textContent?.trim() || '';
         const channel = [channelPrimaryText, channelSubtitleText].filter(Boolean).join(' | ');
@@ -674,6 +777,20 @@ function applyDOMFallback(settings, options = {}) {
     // Hide shelves if all their items are hidden
     const shelves = document.querySelectorAll('ytd-shelf-renderer, ytd-rich-shelf-renderer, ytd-item-section-renderer, grid-shelf-view-model');
     shelves.forEach(shelf => {
+        const shelfTitle = extractShelfTitle(shelf);
+        const shelfTitleMatches = shelfTitle && shouldHideContent(shelfTitle, '', effectiveSettings);
+
+        if (shelfTitleMatches) {
+            shelf.setAttribute('data-filtertube-hidden-by-shelf-title', 'true');
+            toggleVisibility(shelf, true, `Shelf title: ${shelfTitle}`);
+            return;
+        }
+
+        if (shelf.hasAttribute('data-filtertube-hidden-by-shelf-title')) {
+            shelf.removeAttribute('data-filtertube-hidden-by-shelf-title');
+            toggleVisibility(shelf, false);
+        }
+
         updateContainerVisibility(shelf, 'ytd-rich-item-renderer, ytd-grid-video-renderer, ytd-video-renderer, ytd-reel-item-renderer, yt-lockup-view-model');
     });
 }

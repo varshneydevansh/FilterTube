@@ -79,6 +79,7 @@
 
         const path = document.location?.pathname || '';
         const isSearchResultsPath = path.startsWith('/results');
+        const isChannelPath = /^(\/(@|channel\/|c\/))/i.test(path);
 
         const searchActionCollections = data.onResponseReceivedCommands || data.onResponseReceivedActions || data.onResponseReceivedEndpoints;
         const hasSearchLayout = Boolean(
@@ -119,6 +120,26 @@
             const isSearchFetch = typeof dataName === 'string' && dataName.startsWith('fetch:/youtubei/v1/search');
             if (isSearchFetch || hasSearchLayout) {
                 seedDebugLog(`⏭️ Skipping engine processing for ${dataName} (search results) to allow DOM-based restore`);
+                return true;
+            }
+        }
+
+        if (isChannelPath) {
+            const channelIndicators = Boolean(
+                data?.metadata?.channelMetadataRenderer ||
+                data?.header?.c4TabbedHeaderRenderer ||
+                data?.contents?.twoColumnBrowseResultsRenderer ||
+                data?.contents?.twoColumnBrowseResults
+            );
+
+            const isChannelDataName = typeof dataName === 'string' && (
+                dataName === 'ytInitialData' ||
+                dataName.startsWith('fetch:/youtubei/v1/browse') ||
+                dataName.startsWith('fetch:/youtubei/v1/next')
+            );
+
+            if (channelIndicators && isChannelDataName) {
+                seedDebugLog(`⏭️ Skipping engine processing for ${dataName} (channel page) to allow DOM-based restore`);
                 return true;
             }
         }
