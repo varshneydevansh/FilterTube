@@ -18,6 +18,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const saveBtn = document.getElementById('saveBtn');
     const openInTabBtn = document.getElementById('openInTabBtn');
 
+    // Auto-expand textarea based on content
+    function autoExpandTextarea(textarea) {
+        if (!textarea) return;
+        textarea.style.height = 'auto';
+        textarea.style.height = Math.max(textarea.scrollHeight, 48) + 'px'; // Min 2 rows worth
+    }
+
     // State
     let keywords = []; // Array of { word: string, exact: boolean }
     let uiChannels = [];
@@ -123,11 +130,25 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (channelsInput) {
             channelsInput.value = uiChannels.join(', ');
+            autoExpandTextarea(channelsInput);
         }
 
         if (hideAllShortsCheckbox) hideAllShortsCheckbox.checked = result.hideAllShorts || false;
-        if (hideAllCommentsCheckbox) hideAllCommentsCheckbox.checked = result.hideAllComments || false;
-        if (filterCommentsCheckbox) filterCommentsCheckbox.checked = result.filterComments || false;
+        if (hideAllCommentsCheckbox) {
+            hideAllCommentsCheckbox.checked = result.hideAllComments || false;
+            // Initialize filter comments state based on hide all comments
+            if (filterCommentsCheckbox) {
+                if (result.hideAllComments) {
+                    filterCommentsCheckbox.checked = false;
+                    filterCommentsCheckbox.disabled = true;
+                } else {
+                    filterCommentsCheckbox.checked = result.filterComments || false;
+                    filterCommentsCheckbox.disabled = false;
+                }
+            }
+        } else if (filterCommentsCheckbox) {
+            filterCommentsCheckbox.checked = result.filterComments || false;
+        }
     });
 
     // Render Keyword List
@@ -257,6 +278,27 @@ document.addEventListener('DOMContentLoaded', function () {
     if (openInTabBtn) {
         openInTabBtn.addEventListener('click', function () {
             chrome.tabs.create({ url: 'html/tab-view.html' });
+        });
+    }
+
+    // Auto-expand channels textarea as user types
+    if (channelsInput) {
+        channelsInput.addEventListener('input', function () {
+            autoExpandTextarea(channelsInput);
+        });
+    }
+
+    // Instant toggle interactions
+    if (hideAllCommentsCheckbox && filterCommentsCheckbox) {
+        hideAllCommentsCheckbox.addEventListener('change', function () {
+            if (hideAllCommentsCheckbox.checked) {
+                // When "Hide All Comments" is ON, turn off and disable "Filter Comments"
+                filterCommentsCheckbox.checked = false;
+                filterCommentsCheckbox.disabled = true;
+            } else {
+                // When "Hide All Comments" is OFF, enable "Filter Comments"
+                filterCommentsCheckbox.disabled = false;
+            }
         });
     }
 });

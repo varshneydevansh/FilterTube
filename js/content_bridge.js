@@ -13,6 +13,56 @@ function debugLog(message, ...args) {
     // console.log(`[${debugSequence}] FilterTube (Bridge ${IS_FIREFOX_BRIDGE ? 'Fx' : 'Cr'}):`, message, ...args);
 }
 
+// Statistics tracking
+let statsCountToday = 0;
+let statsLastDate = new Date().toDateString();
+let statsInitialized = false;
+
+// Initialize stats from storage
+function initializeStats() {
+    if (statsInitialized || !chrome || !chrome.storage) return;
+    statsInitialized = true;
+
+    chrome.storage.local.get(['stats'], (result) => {
+        const today = new Date().toDateString();
+        if (result.stats && result.stats.lastDate === today) {
+            // Same day, restore count
+            statsCountToday = result.stats.hiddenCount || 0;
+            statsLastDate = result.stats.lastDate;
+        } else {
+            // New day or no stats, reset
+            statsCountToday = 0;
+            statsLastDate = today;
+        }
+    });
+}
+
+function incrementHiddenStats() {
+    const today = new Date().toDateString();
+
+    // Reset if it's a new day
+    if (today !== statsLastDate) {
+        statsCountToday = 0;
+        statsLastDate = today;
+    }
+
+    statsCountToday++;
+
+    // Estimate: average video is ~10 minutes, so time saved = count * 10
+    const minutesSaved = statsCountToday * 10;
+
+    // Save to storage (debounced to avoid excessive writes)
+    if (chrome && chrome.storage) {
+        chrome.storage.local.set({
+            stats: {
+                hiddenCount: statsCountToday,
+                savedMinutes: minutesSaved,
+                lastDate: today
+            }
+        });
+    }
+}
+
 function extractShelfTitle(shelf) {
     if (!shelf || typeof shelf.querySelector !== 'function') return '';
 
@@ -535,10 +585,14 @@ function toggleVisibility(element, shouldHide, reason = '') {
     if (!element) return;
 
     if (shouldHide) {
-        if (!element.classList.contains('filtertube-hidden')) {
+        const wasAlreadyHidden = element.classList.contains('filtertube-hidden');
+        if (!wasAlreadyHidden) {
             element.classList.add('filtertube-hidden');
             element.setAttribute('data-filtertube-hidden', 'true');
             // debugLog(`🚫 Hiding: ${reason}`);
+
+            // Increment stats only for newly hidden items (not already hidden)
+            incrementHiddenStats();
         }
         handleMediaPlayback(element, true);
     } else {
@@ -1122,6 +1176,7 @@ function handleStorageChanges(changes, area) {
 
 async function initialize() {
     try {
+        initializeStats(); // Initialize statistics tracking
         await injectMainWorldScripts();
         const response = await requestSettingsFromBackground();
         if (response?.success) {

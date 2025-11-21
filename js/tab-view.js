@@ -242,7 +242,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (state.sort === 'az') {
             filtered.sort((a, b) => a.word.localeCompare(b.word));
+        } else if (state.sort === 'oldest') {
+            // Keep original order (oldest first)
+            // No-op - array is already in chronological order
         } else {
+            // Newest first (default)
             filtered.reverse();
         }
 

@@ -32,6 +32,8 @@
   /* Muted, sophisticated Red */
   --ft-color-brand-primary-hover: #A93226;
   /* Darker Muted Red */
+  --ft-color-brand-secondary: #2F7A63;
+  /* Deep Green for toggles/accents */
   --ft-color-brand-subtle: #F2D7D5;
   /* Light wash of red */
 
@@ -124,6 +126,9 @@
   --ft-color-text-muted: #606060;
   --ft-color-text-inverse: #121212;
 
+  --ft-color-brand-secondary: #4A9D7F;
+  /* Brighter green for dark mode */
+
   --ft-color-sem-neutral-border: #333333;
   --ft-color-sem-neutral-bg: #2C2C2C;
 }
@@ -140,6 +145,9 @@
     --ft-color-text-secondary: #A0A0A0;
     --ft-color-text-muted: #606060;
     --ft-color-text-inverse: #121212;
+
+    --ft-color-brand-secondary: #4A9D7F;
+    /* Brighter green for dark mode */
 
     --ft-color-sem-neutral-border: #333333;
     --ft-color-sem-neutral-bg: #2C2C2C;
