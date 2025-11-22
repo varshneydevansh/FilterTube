@@ -59,6 +59,8 @@ graph TD
 
 The following diagram illustrates the complete interaction between all FilterTube components, matching the logical flow of the system:
 
+```ascii
+
 
 +-------------------------------------------------------+          +--------------------------------------------------+
 |              Settings Management Pipeline             |          |                Extension Bootstrap               |
@@ -141,6 +143,8 @@ The following diagram illustrates the complete interaction between all FilterTub
 +-------------------------------------------------------+          +--------------------------------------------------+
 
 
+```
+
 ## 1. Extension Initialization & Script Injection Flow
 
 **Motivation:**
@@ -150,6 +154,9 @@ FilterTube needs to filter YouTube content *before* it appears on screen to prev
 Imagine FilterTube as a security guard. Instead of waiting for people (videos) to enter the building (the screen) and then kicking them out, FilterTube stands at the front door (the data connection) and checks everyone's ID before they even get inside. To do this, FilterTube has to arrive at the door *before* YouTube opens for business.
 
 **Technical Flow:**
+
+```text
+
 
 +----------------------------+
 |  Browser Loads Extension   |
@@ -184,6 +191,8 @@ Imagine FilterTube as a security guard. Instead of waiting for people (videos) t
 +----------------+
 
 
+```
+
 ## 2. Settings Compilation & Distribution Pipeline
 
 **Motivation:**
@@ -193,6 +202,9 @@ FilterTube needs to distribute user filter settings across multiple isolated exe
 When you change a setting, it's like sending a letter. You drop it in the mailbox (Popup). The post office (Background) stamps it and checks the address. Then a mail carrier (Content Bridge) takes it to the house (Page). Finally, the person inside (Filter Engine) reads it and updates their "Do Not Admit" list.
 
 **Technical Flow:**
+
+```text
+
 
 +---------+       +------------+
 | User UI | ----> | Background |
@@ -220,6 +232,9 @@ When you change a setting, it's like sending a letter. You drop it in the mailbo
                                        |  seed.js   |
                                        | (Reprocess)|
                                        +------------+
+
+
+```
 
 
 ## Component Breakdown
