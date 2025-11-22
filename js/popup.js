@@ -277,9 +277,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 newKeywordInput.value = '';
                 renderKeywords();
 
-                // Flash success feedback
+                // Flash success feedback (same as Save button)
                 if (addKeywordBtn) {
-                    UIComponents.flashButtonSuccess(addKeywordBtn, 'Added!', 1200);
+                    const originalText = addKeywordBtn.textContent;
+                    addKeywordBtn.textContent = 'Added!';
+                    addKeywordBtn.classList.add('saved');
+
+                    setTimeout(() => {
+                        addKeywordBtn.textContent = originalText;
+                        addKeywordBtn.classList.remove('saved');
+                    }, 1200);
                 }
             }
         }
@@ -304,9 +311,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 channelInput.value = '';
                 renderChannels();
 
-                // Flash success feedback
+                // Flash success feedback (same as Save button)
                 if (addChannelBtn) {
-                    UIComponents.flashButtonSuccess(addChannelBtn, 'Added!', 1200);
+                    const originalText = addChannelBtn.textContent;
+                    addChannelBtn.textContent = 'Added!';
+                    addChannelBtn.classList.add('saved');
+
+                    setTimeout(() => {
+                        addChannelBtn.textContent = originalText;
+                        addChannelBtn.classList.remove('saved');
+                    }, 1200);
                 }
             }
         }

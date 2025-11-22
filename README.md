@@ -76,9 +76,9 @@ A browser extension that filters YouTube content (videos, shorts, playlists, cha
 
 ## How It Works
 
-### Version 2.0.0 - The "Zero DOM" Data Interception Architecture
+### Version 3.0.0 - The "Zero DOM" Data Interception Architecture
 
-In version 2.0.0, FilterTube has been completely refactored to use a revolutionary "Data Interception" approach inspired by successful extensions like BlockTube, fetch-fiddler, Requestly etc. but with completely independent implementation:
+In version 3.0.0, FilterTube has been completely refactored to use a robust **Hybrid Filtering Architecture** that combines preemptive Data Interception with a resilient DOM Fallback:
 
 1. **Data Interception Before Rendering**: FilterTube now intercepts YouTube's raw JSON data *before* it gets processed and rendered to the DOM. This provides:
    - **True "zero-flash" filtering**: Content never appears before being filtered
@@ -107,11 +107,16 @@ In version 2.0.0, FilterTube has been completely refactored to use a revolutiona
    - **RegExp keyword filtering**: Compiled patterns for efficient keyword matching
    - **Recursive JSON traversal**: Processes deeply nested YouTube data structures
 
+5. **DOM Fallback Layer (Visual Guard)**:
+   - **Safety Net**: Monitors the DOM using `MutationObserver` to catch any content that might bypass the data layer (e.g., client-side hydration)
+   - **Visual Hiding**: Applies CSS-based hiding to ensure 100% coverage without breaking layout
+   - **Hybrid Reliability**: Combines the speed of data interception with the reliability of DOM inspection
+
 The extension still operates entirely in your browser - no data is sent to any external servers. All filtering happens locally with dramatically improved performance and reliability.
 
-### Legacy Architecture (Pre-2.0.0)
+### Legacy Architecture (Pre-3.0.0)
 
-Prior to version 2.0.0, FilterTube worked by:
+Prior to version 3.0.0, FilterTube worked by:
 1. Scanning YouTube page content for videos, playlists, channels, and comments
 2. Comparing titles, channel names, and other metadata against your filters
 3. Hiding elements that match your filter criteria using CSS
@@ -126,15 +131,16 @@ The extension uses multiple techniques to extract and match channel information:
 - Normalized matching algorithms to handle variations in channel representation
 
 For the most reliable channel filtering:
-- Use both the channel ID and @handle when possible
-- Use the exact format from the channel URL for specific channels
-- Include distinctive parts of channel names for partial matching
+- **Important Note**: YouTube channels are identified by both `@Handle` and `ChannelID`. Some channels may still be identified internally by their legacy `ChannelID` even if they display a `@Handle` on their page.
+- **Recommendation**: For critical blocks, we recommend adding **both** the `@Handle` (e.g., `@ChannelName`) and the `ChannelID` (e.g., `UC...`) to your filter list until FilterTube can automatically sync these identifiers.
+- Use the exact format from the channel URL for specific channels.
+- Include distinctive parts of channel names for partial matching.
 
 ## Technical Details
 
 ### Files Structure
 
-#### Version 2.0.0 Architecture
+#### Version 3.0.0 Architecture
 - **manifest.chrome.json & manifest.firefox.json**: Browser-specific MV3 configurations
 - **js/**: JavaScript files
   - **background.js**: Settings management, compiles filter rules

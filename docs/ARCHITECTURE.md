@@ -1,332 +1,250 @@
-# FilterTube v2.0 Architecture Documentation
+# FilterTube v3.0 Architecture Documentation
 
 ## Executive Summary
 
-FilterTube v2.0 implements a sophisticated **data interception architecture** that filters YouTube content at the data level before it's rendered, achieving true zero-flash filtering with exceptional performance. This approach represents a fundamental paradigm shift from traditional DOM-based filtering to preemptive data manipulation.
+FilterTube v3.0 implements a robust **Hybrid Filtering Architecture** that combines preemptive **Data Interception** with a resilient **DOM Fallback** mechanism. This dual-layer approach ensures comprehensive content filtering across all YouTube surfaces (Home, Search, Watch, Shorts) while maintaining high performance and a "Zero Flash" user experience.
 
 ## Architecture Overview
 
-### **Core Philosophy: "Zero DOM" Data Interception**
+### **Hybrid Filtering Strategy**
 
-FilterTube v2.0 operates on the principle of intercepting and filtering YouTube's raw JSON data before it reaches YouTube's rendering engine. This approach provides:
+FilterTube operates on two synchronized layers:
 
-- **True Zero-Flash Filtering**: Blocked content never renders
-- **No UI Lag**: Zero DOM manipulation during page operation  
-- **Minimal Memory Usage**: No mutation observers or DOM watchers
-- **Scalable Performance**: Handles thousands of items efficiently
+1.  **Primary Layer: Data Interception ("Zero DOM")**
+    *   Intercepts YouTube's raw JSON data (via `ytInitialData`, `ytInitialPlayerResponse`, and `fetch`/`XHR` overrides) before it reaches the rendering engine.
+    *   Modifies the data structure to remove blocked content *before* it is ever created in the DOM.
+    *   **Benefit:** True zero-flash filtering, high performance, no layout shift.
+
+2.  **Secondary Layer: DOM Fallback (Visual Guard)**
+    *   Monitors the DOM using efficient `MutationObserver`s.
+    *   Catches any content that might bypass the data layer (e.g., client-side hydration updates, complex dynamic loading).
+    *   Applies visual hiding (CSS) to blocked elements.
+    *   **Benefit:** Reliability, handles edge cases and dynamic updates.
 
 ### **Multi-World Extension Architecture**
 
+FilterTube leverages the modern "Isolated World" vs. "Main World" concept to bridge the gap between extension security and page access.
+
+```mermaid
+graph TD
+    subgraph "Extension Context (Isolated World)"
+        BG[Background Service Worker]
+        CB[Content Bridge]
+        Storage[(Settings Storage)]
+    end
+
+    subgraph "Page Context (Main World)"
+        Seed[Seed Script]
+        Engine[Filter Logic Engine]
+        Injector[Injector Coordinator]
+        YT[YouTube App]
+    end
+
+    User((User)) -->|Update Settings| Storage
+    Storage -->|Changes| BG
+    BG -->|Compile RegExp| BG
+    BG -->|Serialized Settings| CB
+    CB -->|PostMessage| Injector
+    Injector -->|Apply| Engine
+    
+    YT -->|Request Data| Seed
+    Seed -->|Intercept| Engine
+    Engine -->|Filter| Seed
+    Seed -->|Clean Data| YT
+    
+    CB -.->|DOM Fallback| YT
 ```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────────┐
-│   Background    │    │   Content Bridge │    │   MAIN World        │
-│   (Isolated)    │    │   (Isolated)     │    │   (Page Context)    │
-├─────────────────┤    ├──────────────────┤    ├─────────────────────┤
-│ • Settings      │◄──►│ • Script         │◄──►│ • filter_logic.js   │
-│   Storage       │    │   Injection      │    │ • seed.js           │
-│ • RegExp        │    │ • Message        │    │ • injector.js       │
-│   Compilation   │    │   Relay          │    │                     │
-│ • Cross-browser │    │ • API Detection  │    │ • Data Hooks        │
-│   Compatibility │    │                  │    │ • Content Processing│
-└─────────────────┘    └──────────────────┘    └─────────────────────┘
-```
+
+## Unified System Map
+
+The following diagram illustrates the complete interaction between all FilterTube components, matching the logical flow of the system:
+
+
++-------------------------------------------------------+          +--------------------------------------------------+
+|              Settings Management Pipeline             |          |                Extension Bootstrap               |
+|                                                       |          |                                                  |
+|   +-------------+                                     |          |   +-------------+                                |
+|   | 2a: popup.js|                                     |          |   | 1a: Manifest|                                |
+|   |  User Input |                                     |          |   |  (Declares) |                                |
+|   +------+------+                                     |          |   +------+------+                                |
+|          | saves to                                   |          |          |                                       |
+|   +------v------+                                     |          |          +--------------------+                  |
+|   |2b:background|                                     |          |          | declares           | declares         |
+|   |Compile Regex|                                     |          |   +------v------+      +------v------+           |
+|   +------+------+                                     |          |   | 1b: Content |      | 1c: seed.js |           |
+|          | compiles                                   |          |   |   Bridge    |      | (Main World)|           |
+|          v                                            |          |   |  (Isolated) |      |    Hooks    |           |
+|   +-------------+      +-------------+                |          |   +------+------+      +-------------+           |
+|   | 2c: Storage |----->| 2d: Bridge  |                |          |          |                    |                  |
+|   |  OnChanged  |      | Req Settings|                |          |          | injects            |                  |
+|   +-------------+      +------+------+                |          |   +------v------+             |                  |
+|                               | sends (postMessage)   |          |   | 1d: Injector|             |                  |
+|                               v                       |          |   | Coordinator |             |                  |
+|                        +-------------+                |          |   +------+------+             |                  |
+|                        | 2e: Injector|                |          |          |                    |                  |
+|                        | Recv Setting|                |          +----------+--------------------+                  |
+|                        +------+------+                |                     |                                       |
+|                               | calls                 |                     | injects                               |
+|                               v                       |                     v                                       |
+|                        +-------------+                |          +----------+---------------------------------------+
+|                        | 2f: seed.js |                |          |                                                  |
+|                        |Cache Setting|                |          |                                                  |
+|                        +------+------+                |          |                                                  |
+|                               | updates               |          |                                                  |
+|                               v                       |          |                                                  |
++-------------------------------+-----------------------+          |                                                  |
+                                |                                  |                                                  |
++-------------------------------+-----------------------+          |                                                  |
+|                Data Interception Layer                |<---------+                                                  |
+|                                                       |                                                             |
+|   +-------------+            +-------------+          |                                                             |
+|   | 4a: seed.js |            | 3a: seed.js |          |                                                             |
+|   | Fetch Proxy |            |ytInitialData|          |                                                             |
+|   +------+------+            +------+------+          |                                                             |
+|          | intercepts               | intercepts      |                                                             |
+|          v                          v                 |                                                             |
+|   +----------------------------------------+          |                                                             |
+|   |        3b: processWithEngine           |          |                                                             |
+|   |             (Call Filter)              |          |                                                             |
+|   +------------------+---------------------+          |                                                             |
+|                      | calls                          |                                                             |
++----------------------+--------------------------------+                                                             |
+                       |                                                                                              |
+                       v                                                                                              |
++-------------------------------------------------------+          +--------------------------------------------------+
+|                 Filtering Engine Core                 |<---------+               DOM Fallback Layer                 |
+|                                                       |          |                                                  |
+|   +-------------+                                     |          |   +-------------+                                |
+|   | 5a: Entry   |                                     |          |   | 6a: Observer|                                |
+|   | processData |                                     |          |   |  Watch DOM  |                                |
+|   +------+------+                                     |          |   +------+------+                                |
+|          | instantiates                               |          |          | detects nodes                         |
+|   +------v------+                                     |          |   +------v------+                                |
+|   | 5b: Filter  |                                     |          |   | 6b: Apply   |                                |
+|   |  Instance   |                                     |          |   |  Fallback   |                                |
+|   +------+------+                                     |          |   +------+------+                                |
+|          | processes                                  |          |          | scans                                 |
+|   +------v------+                                     |          |   +------v------+                                |
+|   | 5c: Traverse|                                     |          |   | 6c: Match   |                                |
+|   |  Recursive  |                                     |          |   |   Content   |                                |
+|   +------+------+                                     |          |   +------+------+                                |
+|          | evaluates                                  |          |          | hides                                 |
+|   +------v------+                                     |          |   +------v------+                                |
+|   | 5d: Decision|<------------------------------------|----------|---| 6d: Toggle  |                                |
+|   | _shouldBlock|          uses engine logic          |          |   | Visibility  |                                |
+|   +------+------+                                     |          |   +-------------+                                |
+|          | extracts                                   |          |                                                  |
+|   +------v------+                                     |          |                                                  |
+|   | 7a: Metadata|                                     |          |                                                  |
+|   | _extractInfo|                                     |          |                                                  |
+|   +-------------+                                     |          |                                                  |
++-------------------------------------------------------+          +--------------------------------------------------+
+
+
+## 1. Extension Initialization & Script Injection Flow
+
+**Motivation:**
+FilterTube needs to filter YouTube content *before* it appears on screen to prevent unwanted videos from flashing briefly. The traditional approach of scanning the DOM is too slow. The solution is **data interception**: hooking into YouTube's JSON data structures before they're rendered. This requires injecting JavaScript into YouTube's page context (the "MAIN world") at the earliest possible moment.
+
+**How it works (Simplified):**
+Imagine FilterTube as a security guard. Instead of waiting for people (videos) to enter the building (the screen) and then kicking them out, FilterTube stands at the front door (the data connection) and checks everyone's ID before they even get inside. To do this, FilterTube has to arrive at the door *before* YouTube opens for business.
+
+**Technical Flow:**
+
++----------------------------+
+|  Browser Loads Extension   |
++----------------------------+
+             |
+             v
++----------------------------+
+|      manifest.json         |
++----------------------------+
+      |              |
+      | (Main)       | (Isolated)
+      v              v
++-----------+  +------------------+
+|  seed.js  |  | content_bridge.js|
++-----------+  +------------------+
+      |                  |
+      |                  v
+      |        +------------------+
+      |        |  Request Settings|
+      |        +------------------+
+      |                  |
+      v                  v
++----------------+ +------------------+
+| Establish Hooks| |Init DOM Fallback |
+| (ytInitialData)| |(MutationObserver)|
++----------------+ +------------------+
+      |
+      v
++----------------+
+|  Wait for      |
+|  Filter Engine |
++----------------+
+
+
+## 2. Settings Compilation & Distribution Pipeline
+
+**Motivation:**
+FilterTube needs to distribute user filter settings across multiple isolated execution contexts. When a user adds a keyword like "spoilers", that setting must reach the background (for storage), the content bridge (for DOM fallback), and the main world scripts (for data interception). Chrome's security model prevents direct access, so a pipeline is needed.
+
+**How it works (Simplified):**
+When you change a setting, it's like sending a letter. You drop it in the mailbox (Popup). The post office (Background) stamps it and checks the address. Then a mail carrier (Content Bridge) takes it to the house (Page). Finally, the person inside (Filter Engine) reads it and updates their "Do Not Admit" list.
+
+**Technical Flow:**
+
++---------+       +------------+
+| User UI | ----> | Background |
+| (Popup) |       | (Storage)  |
++---------+       +------------+
+                        |
+                   (OnChanged)
+                        |
+                        v
+                  +------------+
+                  |  Compile   |
+                  |  Settings  |
+                  +------------+
+                        |
+                        v
+                  +------------+       +------------+
+                  |  Content   | ----> |  Injector  |
+                  |  Bridge    |       | (Main World)|
+                  +------------+       +------------+
+                                             |
+                                       (postMessage)
+                                             |
+                                             v
+                                       +------------+
+                                       |  seed.js   |
+                                       | (Reprocess)|
+                                       +------------+
+
 
 ## Component Breakdown
 
-### **1. Background Script (`background.js`)**
-**World**: Isolated  
-**Runtime**: Service Worker (Chrome) / Background Scripts (Firefox)
-
-**Responsibilities**:
-- Settings storage and retrieval
-- RegExp compilation for cross-world transfer
-- Cross-browser compatibility handling
-- Extension lifecycle management
-
-**Key Functions**:
-```javascript
-getCompiledSettings() // Compiles filters into executable RegExp objects
-handleStorageChanges() // Responds to user setting changes
-crossBrowserCompatibility() // Handles Chrome/Firefox differences
-```
+### **1. Background Service (`background.js`)**
+*   **Context:** Background Service Worker.
+*   **Role:** Central State Manager & Validator.
+*   **Key Responsibilities:** Manages storage, compiles regex patterns to prevent crashes, and handles cross-browser compatibility.
 
 ### **2. Content Bridge (`content_bridge.js`)**
-**World**: Isolated  
-**Runtime**: Content Script (document_start)
-
-**Responsibilities**:
-- MAIN world script injection coordination
-- Cross-world message relay
-- API detection and fallback handling
-- Settings propagation management
-
-**Key Functions**:
-```javascript
-injectMainWorldScripts() // Handles Chrome API vs Firefox fallback
-handleMainWorldMessages() // Relays logs and signals
-sendSettingsToMainWorld() // Propagates compiled settings
-```
-
-**Critical Features**:
-- **Chrome**: Uses `chrome.scripting.executeScript` with `world: 'MAIN'`
-- **Firefox**: Falls back to `<script>` tag injection
-- **Error Recovery**: Automatic fallback if Chrome API fails
-- **State Management**: Prevents duplicate injections
+*   **Context:** Isolated World.
+*   **Role:** The Bridge & The Enforcer.
+*   **Key Responsibilities:** Injects Main World scripts, relays settings, and runs the DOM Fallback (MutationObserver) to catch any missed content.
 
 ### **3. Seed Script (`seed.js`)**
-**World**: MAIN (Page Context)  
-**Runtime**: Early document_start injection
-
-**Responsibilities**:
-- Earliest possible data interception
-- YouTube data hook establishment
-- Global FilterTube object creation
-- Data queuing before settings arrive
-
-**Critical Hooks**:
-```javascript
-// Primary data interception
-Object.defineProperty(window, 'ytInitialData', { ... });
-Object.defineProperty(window, 'ytInitialPlayerResponse', { ... });
-
-// Network interception
-window.fetch = new Proxy(originalFetch, { ... });
-XMLHttpRequest.prototype.open = new Proxy(originalOpen, { ... });
-```
-
-**Data Sources Intercepted**:
-- `window.ytInitialData` - Home page, search results, channel pages
-- `window.ytInitialPlayerResponse` - Video player metadata
-- `fetch(/youtubei/v1/*)` - Dynamic content loading
-- `XMLHttpRequest` - Legacy content requests
+*   **Context:** Main World.
+*   **Role:** The Interceptor.
+*   **Key Responsibilities:** Hooks global objects (`ytInitialData`, `fetch`) immediately at startup to intercept data before YouTube sees it.
 
 ### **4. Filter Logic Engine (`filter_logic.js`)**
-**World**: MAIN (Page Context)  
-**Runtime**: Injected before seed.js processes data
+*   **Context:** Main World.
+*   **Role:** The Brain.
+*   **Key Responsibilities:** Recursively processes JSON, identifies video renderers, and applies filtering rules.
 
-**Responsibilities**:
-- Comprehensive YouTube renderer processing
-- Multi-path data extraction
-- Intelligent content filtering
-- Performance-optimized algorithms
-
-**Core Engine**:
-```javascript
-window.FilterTubeEngine = {
-    processData(data, settings, context) {
-        // Recursive processing of YouTube JSON structures
-        // Supports 20+ renderer types
-        // Multi-path extraction with fallbacks
-        // Intelligent channel matching
-    }
-};
-```
-
-**Supported Renderers** (Comprehensive List):
-- `richItemRenderer` - Home page videos (critical)
-- `videoRenderer` - Search results, recommendations
-- `channelRenderer` - Channel listings
-- `gridVideoRenderer` - Grid layouts
-- `compactVideoRenderer` - Sidebar recommendations
-- `playlistRenderer` - Playlist content
-- `shelfRenderer` - Content shelves
-- `lockupViewModel` - Modern YouTube layouts
-- `universalWatchCardRenderer` - Watch page content
-- `channelVideoPlayerRenderer` - Channel video players
-- And 10+ additional renderer types
-
-### **5. Injector Coordinator (`injector.js`)**
-**World**: MAIN (Page Context)  
-**Runtime**: Injected after filter_logic.js
-
-**Responsibilities**:
-- Settings reception and propagation
-- FilterTubeEngine coordination
-- Fallback data hook management
-- System readiness signaling
-
-## Data Flow Architecture
-
-### **Startup Sequence**
-```
-1. background.js initializes
-2. content_bridge.js loads (document_start)
-3. content_bridge.js injects:
-   - filter_logic.js (defines FilterTubeEngine)
-   - seed.js (sets up data hooks) [Chrome: via manifest, Firefox: via injection]
-   - injector.js (coordinates everything)
-4. Settings compiled and sent to MAIN world
-5. Data interception begins
-6. All YouTube content filtered before rendering
-```
-
-### **Settings Propagation Flow**
-```
-User Changes Settings
-       ↓
-Background Script (compiles RegExp)
-       ↓
-Content Bridge (receives compiled settings)
-       ↓
-MAIN World Scripts (settings applied to filters)
-       ↓
-Immediate Data Processing (existing content refiltered)
-```
-
-### **Data Processing Pipeline**
-```
-YouTube JSON Data
-       ↓
-Seed.js Interception Hooks
-       ↓
-FilterTubeEngine.processData()
-       ↓
-Recursive Renderer Processing
-       ↓
-Multi-path Content Extraction
-       ↓
-Filter Application (keywords, channels, etc.)
-       ↓
-Filtered Data → YouTube Rendering Engine
-       ↓
-Clean Page (blocked content never rendered)
-```
-
-## Cross-Browser Compatibility
-
-### **Chrome Implementation**
-- Uses modern `chrome.scripting.executeScript` with `world: 'MAIN'`
-- Seed.js loaded via manifest `content_scripts` for optimal timing
-- Full MV3 compatibility with service worker background
-
-### **Firefox Implementation**  
-- Uses fallback `<script>` tag injection for MAIN world access
-- All scripts injected dynamically via content_bridge.js
-- MV3 compatibility with background scripts
-- Enhanced error handling for CSP restrictions
-
-### **Unified Features**
-- Identical filtering logic across browsers
-- Same performance characteristics  
-- Consistent user experience
-- Shared codebase with browser-specific optimizations
-
-## Performance Characteristics
-
-### **Memory Usage**
-- **Baseline**: ~2-5MB (minimal extension overhead)
-- **No DOM Observers**: Zero mutation observer memory
-- **Efficient Data Structures**: Optimized RegExp compilation
-- **Garbage Collection Friendly**: Minimal object retention
-
-### **CPU Usage**
-- **Data Processing**: ~5-15ms per page load
-- **Zero Ongoing Cost**: No continuous DOM monitoring
-- **Network Interception**: ~1-3ms per request
-- **Highly Scalable**: Performance independent of content volume
-
-### **Network Impact**
-- **No Additional Requests**: All processing client-side
-- **Bandwidth Savings**: Blocked content not downloaded
-- **Reduced Payload**: Smaller JSON responses to YouTube
-
-## Security & Privacy
-
-### **Data Handling**
-- **Local Processing Only**: No data sent to external servers
-- **Privacy Preserving**: User filters stored locally
-- **Secure Context**: Operates within browser security model
-- **No Tracking**: Zero analytics or telemetry
-
-### **Cross-Origin Security**
-- **Isolated Worlds**: Settings isolated from page context
-- **Message Validation**: All cross-world communication validated
-- **CSP Compliance**: Respects Content Security Policy
-- **Sandboxed Execution**: Each component properly sandboxed
-
-## Comparison with Traditional DOM-Based Approaches
-
-### **Traditional DOM Filtering (FilterTube v1.x)**
-```
-❌ Flash of blocked content before hiding
-❌ UI lag during page load and scrolling  
-❌ Complex layout management required
-❌ High memory usage (mutation observers)
-❌ Performance degradation with scale
-❌ Brittle CSS selectors
-```
-
-### **FilterTube v2.0 Data Interception**
-```
-✅ True zero-flash filtering
-✅ Zero UI lag (no DOM manipulation)
-✅ Minimal memory footprint
-✅ Excellent performance at any scale  
-✅ Future-proof (works with data structure changes)
-✅ Clean, maintainable architecture
-```
-
-## Extension Points & Modularity
-
-### **Filter Engine Extensibility**
-The FilterTubeEngine is designed for easy extension:
-```javascript
-// Adding new renderer support
-FILTER_RULES.newRendererType = {
-    title: ['new.title.path'],
-    channel: ['new.channel.path'], 
-    id: ['new.id.path']
-};
-```
-
-### **Data Source Expansion**
-New YouTube data sources can be easily added:
-```javascript
-// New API endpoint interception
-const newEndpoints = ['/youtubei/v1/new_endpoint'];
-// Automatic integration with existing pipeline
-```
-
-### **Cross-Platform Adaptation**
-The architecture supports easy adaptation to other platforms:
-- Different video platforms (with different JSON structures)
-- Different browsers (with different APIs)
-- Different extension frameworks
-
-## Validation & Testing
-
-### **Architecture Validation**
-This data interception approach:
-- **Represents best practices** - modern extension development patterns
-- **Is widely documented** - standard data interception methodologies
-- **Is future-proof** - adapts to platform changes
-
-### **Performance Testing**
-- Tested with 1000+ items on page
-- Sub-16ms processing time maintained
-- Memory usage remains constant
-- No performance degradation over time
-
-### **Compatibility Testing**
-- Chrome 88+ (when MV3 scripting API stabilized)
-- Firefox 109+ (when MV3 became stable)
-- Cross-platform settings synchronization
-- All YouTube layout variations
-
-## Future Roadmap
-
-### **Immediate Enhancements**
-- Advanced filter operators (AND, OR, NOT)
-- Regex pattern support for power users  
-- Import/export filter configurations
-- Enhanced debugging tools
-
-### **Architectural Evolution**
-- WebAssembly integration for ultra-high performance
-- Machine learning content classification
-- Distributed filter rule sharing
-- Real-time collaborative filtering
-
-## Conclusion
-
-FilterTube v2.0's data interception architecture represents a significant advancement in browser extension design, providing superior performance, user experience, and maintainability compared to traditional DOM-based approaches. The architecture is designed for longevity, extensibility, and cross-browser compatibility while maintaining the highest standards of security and privacy. 
+### **5. Injector (`injector.js`)**
+*   **Context:** Main World.
+*   **Role:** The Coordinator.
+*   **Key Responsibilities:** Initializes the engine and coordinates settings updates.

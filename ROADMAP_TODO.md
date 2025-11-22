@@ -9,7 +9,7 @@ _Last updated: 2025-11-18_
 4. Append meeting notes or external analyses in the "References" block so future collaborators stay aligned.
 
 ## Context Snapshot (Nov 2025)
-- Architecture: Data interception v2.0 (see @js/filter_logic.js) with renderer coverage tracked in @docs/youtube_renderer_inventory.md.
+- Architecture: Data interception v3.0 (see @js/filter_logic.js) with renderer coverage tracked in @docs/youtube_renderer_inventory.md.
 - Recent work: Phase A/B renderer reorder + coverage for chips, community posts, notifications, podcasts, playlist overlays.@js/filter_logic.js#126-460
 - Outstanding renderers (non-ad): `watchCardHeroVideoRenderer`, `watchCardSectionSequenceRenderer`, `compactAutoplayRenderer`, `reelShelfRenderer`, `sharedPostRenderer`, `endScreenVideoRenderer`.
 - UI direction: Neuroinclusive theme aligning with red logo, serene illustrated accents, simple typography. Kids mode planned with teal variant and PIN gating.

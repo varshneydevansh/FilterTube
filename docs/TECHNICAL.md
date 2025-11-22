@@ -1,364 +1,175 @@
-# FilterTube Technical Documentation
-
-This document provides a technical overview of the FilterTube extension's architecture, code structure, and key implementation details.
-
-## Architecture Overview
-
-FilterTube uses a content script-based approach for filtering YouTube content with zero flashing. The extension works by:
-
-1. Injecting CSS rules immediately (before DOM ready) to hide all potential video elements
-2. Processing video elements as they appear in the DOM
-3. Marking elements as allowed or filtered based on user settings
-4. Managing YouTube's layout to preserve UI integrity
-5. Implementing efficient caching to improve performance
-
-## Key Components
-
-```
-┌────────────────────┐       ┌─────────────────┐       ┌───────────────────┐
-│  CSS Injection     │       │  Content Script │       │  Storage API      │
-│  (Hide Everything) │◄─────►│  (Filter Logic) │◄─────►│  (User Settings)  │
-└────────────────────┘       └─────────────────┘       └───────────────────┘
-                                     │
-                                     ▼
-┌────────────────────┐       ┌─────────────────┐       ┌───────────────────┐
-│  MutationObserver  │       │  Polymer & Cache│       │  DOM Manipulation │
-│  (Content Changes) │◄─────►│  (Channel Info) │──────►│  (Show/Hide)      │
-└────────────────────┘       └─────────────────┘       └───────────────────┘
-                                     │
-                                     ▼
-┌────────────────────┐       
-│  YouTube           │       
-│  Filtering         │       
-└────────────────────┘       
-```
-
-### 1. CSS Injection System
-
-The extension injects CSS rules at `document_start` to immediately hide potentially filterable content:
-
-```css
-/* Example of injected CSS */
-ytd-video-renderer, ytd-grid-video-renderer {
-    opacity: 0 !important;
-    transition: opacity 0.1s ease-in-out !important;
-}
-
-[data-filter-tube-allowed="true"] {
-    opacity: 1 !important;
-}
-
-[data-filter-tube-filtered="true"] {
-    display: none !important;
-}
-```
-
-This approach eliminates the "flash of unfiltered content" by hiding elements until they can be properly evaluated.
-
-### 2. Observer System
-
-FilterTube uses multiple specialized MutationObservers:
-
-1. **Main Observer**: Watches the entire document for new video elements
-2. **Sidebar Observer**: Specifically watches for sidebar recommendation videos
-3. **Shorts Observer**: Specifically targets Shorts elements
-4. **Comment Observer**: Monitors and filters comment threads
-
-Each observer is throttled and optimized to minimize performance impact:
-
-```javascript
-// Simplified observer implementation
-const observer = new MutationObserver((mutations) => {
-    // Use throttling to prevent excessive processing
-    if (timeout) clearTimeout(timeout);
-    timeout = setTimeout(() => {
-        applyFilters();
-    }, 100);
-});
-```
-
-### 3. YouTube Polymer Integration and Caching
-
-The most complex aspect of FilterTube is extracting reliable channel information from YouTube's Polymer components and efficiently caching the results.
-
-#### How YouTube Structures Content
-
-YouTube uses Polymer (a web component framework) to build its UI. Each video element is a Polymer component with:
-
-1. A visible DOM that users see
-2. Internal data structures that contain the complete video information
-3. Connection points between these two layers
-
-```
-┌──────────────────────────────────────┐
-│ YouTube Video Element                │
-│  ┌────────────────┐   ┌────────────┐ │
-│  │ Visible DOM    │   │ Polymer    │ │
-│  │ - Thumbnail    │◄─►│ Controller │ │
-│  │ - Title        │   │            │ │
-│  │ - Channel Name │   │ .data      │ │
-│  └────────────────┘   └────────────┘ │
-└──────────────────────────────────────┘
-```
-
-#### Accessing Polymer Data
-
-FilterTube extracts channel information from Polymer components by:
-
-1. Finding the element's Polymer controller instance
-2. Accessing internal data structures
-3. Extracting channel IDs, handles, and other identifiers
-4. Caching results by video ID for efficient reuse
-
-```javascript
-// Example of Polymer data extraction with caching
-function extractChannelInfoFromPolymer(element) {
-    try {
-        // Element-specific throttling for performance
-        if (element._lastPolymerAttempt && 
-            (Date.now() - element._lastPolymerAttempt < 100)) {
-            return null;
-        }
-        element._lastPolymerAttempt = Date.now();
-        
-        // Find the video element with a Polymer controller
-        const videoElement = element.tagName.includes('VIDEO-RENDERER') ? 
-                            element : 
-                            element.closest('ytd-compact-video-renderer');
-        if (!videoElement) return null;
-
-        // Access its Polymer data
-        const polymerData = videoElement.data || 
-                          videoElement.polymerController?.data || 
-                          videoElement.inst?.data;
-        if (!polymerData) return null;
-        
-        // Check cache by video ID
-        const videoId = polymerData.videoId;
-        if (videoId && sidebarCache.has(videoId)) {
-            return sidebarCache.get(videoId);
-        }
-
-        // Extract channel information
-        const channelInfo = {
-            id: null,
-            handle: null,
-            name: null
-        };
-        
-        // Extract from multiple possible paths
-        if (polymerData.videoOwnerRenderer?.navigationEndpoint?.browseEndpoint?.browseId) {
-            channelInfo.id = polymerData.videoOwnerRenderer.navigationEndpoint.browseEndpoint.browseId;
-        }
-
-        // Try to get channel data from various data paths
-        const runs = polymerData.longBylineText?.runs || 
-                    polymerData.shortBylineText?.runs ||
-                    polymerData.authorText?.runs || [];
-                    
-        // Extract channel data from runs
-        for (const run of runs) {
-            if (run.navigationEndpoint?.browseEndpoint) {
-                const browseEndpoint = run.navigationEndpoint.browseEndpoint;
-                
-                // Get channel ID (starts with UC)
-                if (browseEndpoint.browseId && browseEndpoint.browseId.startsWith('UC')) {
-                    channelInfo.id = browseEndpoint.browseId;
-                }
-                
-                // Get channel handle
-                if (browseEndpoint.canonicalBaseUrl) {
-                    if (browseEndpoint.canonicalBaseUrl.startsWith('/@')) {
-                        channelInfo.handle = browseEndpoint.canonicalBaseUrl;
-                    }
-                }
-                
-                // Get channel name
-                if (run.text) {
-                    channelInfo.name = run.text;
-                }
-            }
-        }
-
-        // Cache the results if we have a video ID
-        if (videoId && (channelInfo.id || channelInfo.handle || channelInfo.name)) {
-            sidebarCache.set(videoId, channelInfo);
-        }
-
-        return channelInfo;
-    } catch (error) {
-        // Silently fail if there are any errors
-        return null;
-    }
-}
-```
-
-#### Cache Management
-
-To prevent memory issues, the cache size is limited and old entries are removed:
-
-```javascript
-// Cache management implementation
-function manageCacheSize() {
-    if (sidebarCache.size > maxCacheSize) {
-        // Convert to array of [key, value] pairs
-        const entries = Array.from(sidebarCache.entries());
-        // Remove oldest entries
-        const entriesToRemove = Math.floor(maxCacheSize * 0.2);
-        entries.slice(0, entriesToRemove).forEach(([key, _]) => {
-            sidebarCache.delete(key);
-        });
-    }
-}
-```
-
-### 4. Word Matching Algorithms
-
-FilterTube employs two different text matching approaches:
-
-#### Exact Word Matching
-
-Used for comment filtering and most video content. Ensures words match only when they are distinct:
-
-```javascript
-function containsExactWord(text, word) {
-    // Create a regex that matches the word with word boundaries
-    const regex = new RegExp(`\\b${word}\\b`, 'i');
-    return regex.test(text);
-}
-```
-
-#### Partial Word Matching
-
-Used for channel cards, search results, and other scenarios where more flexible matching is needed:
-
-```javascript
-function containsPartialWord(text, word) {
-    return text.toLowerCase().includes(word.toLowerCase());
-}
-```
-
-### 5. Channel Cards and Search Result Filtering
-
-FilterTube provides comprehensive filtering for channel cards in search results:
-
-1. **Detection**: Identifies `ytd-channel-renderer` and `ytd-channel-about-renderer` elements
-2. **Text Extraction**: Gets channel names, handles, and descriptions
-3. **Dual Filtering**: Applies both keyword and channel filtering logic
-4. **Special Handling**: Custom selectors for various channel card layouts
-
-```javascript
-function processChannelRenderer(element, keywords, channels) {
-    // Extract channel info from the element
-    const channelIdentifiers = [];
-    
-    // Check text content for keyword matching
-    const elementText = element.textContent.toLowerCase();
-    const matchesKeyword = keywords.some(keyword => 
-        containsPartialWord(elementText, keyword));
-    
-    // Extract channel identifiers from various possible locations
-    const channelName = element.querySelector('#channel-title, #channel-name');
-    if (channelName) {
-        channelIdentifiers.push(channelName.textContent.trim().toLowerCase());
-    }
-    
-    // Check if this channel should be filtered based on keyword or channel
-    const shouldFilter = matchesKeyword || channels.some(channel => {
-        // Channel matching logic
-    });
-    
-    // Apply filtering
-    if (shouldFilter) {
-        element.setAttribute('data-filter-tube-filtered', 'true');
-    } else {
-        element.setAttribute('data-filter-tube-allowed', 'true');
-    }
-}
-```
-
-## Performance Optimizations
-
-To maintain smooth performance, FilterTube implements:
-
-1. **Page Type Detection**: Different filtering strategies based on page type (home, watch, search)
-2. **Batch Processing**: Processing elements in small batches with delays between them
-3. **Visibility Checks**: Skipping processing when the page is hidden
-4. **Throttling**: Limiting the frequency of filtering operations
-5. **Cached Selectors**: Reusing DOM queries when possible
-6. **Video ID Caching**: Storing channel information by video ID to avoid redundant processing
-7. **Element-specific Throttling**: Preventing repeated polymer extraction attempts on the same element
-8. **Cache Size Management**: Cleaning up old cache entries to prevent memory issues
-
-### Channel Matching Algorithm
-
-Matching channels reliably is challenging due to inconsistencies in how YouTube represents channel information:
-
-```javascript
-// Example of normalized channel matching
-const matchesChannel = channels.some(channel => {
-    const normalizedChannel = channel.replace(/^@|^channel:/, "").toLowerCase();
-    return channelIdentifiers.some(id => {
-        const normalizedId = id.replace(/^@|^channel:/, "").toLowerCase();
-        return normalizedId === normalizedChannel || 
-               normalizedId.includes(normalizedChannel) || 
-               normalizedChannel.includes(normalizedId);
-    });
-});
-```
-
-This algorithm handles various channel formats:
-- Raw channel names: `Channel Name`
-- Handles: `@ChannelHandle`
-- IDs: `UCxxxxxxxxxxxxx`
-- Prefixed IDs: `channel:UCxxxxxxxxxxxxx`
-
-## Technical Challenges
-
-### 1. YouTube's Dynamic Content
-
-YouTube uses a Single Page Application (SPA) architecture where content is loaded dynamically. FilterTube handles this by:
-
-1. Watching for URL changes to detect navigation
-2. Re-initializing appropriate observers on page type changes
-3. Applying filters multiple times as content loads
-4. Clearing caches when navigating between videos
-
-### 2. Shorts Rendering
-
-YouTube Shorts have unique rendering characteristics:
-
-1. They appear in horizontal scrolling containers
-2. Elements have minimal visible metadata
-3. Channel information is often loaded after initial rendering
-
-FilterTube implements special handling for shorts containers to maintain layout integrity after filtering.
-
-### 3. Sidebar Videos
-
-Sidebar videos (recommendations) present challenges:
-
-1. They load progressively as the user scrolls
-2. Channel information may not be immediately visible
-3. Their Polymer data structure differs from main feed videos
-
-The solution includes:
-- Efficient caching by video ID
-- Element-specific throttling
-- Hybrid polymer/DOM approach
-- Clearing cache on navigation
-
-## Future Technical Directions
-
-1. **Caching**: Store filtering results to avoid redundant processing
-2. **Worker-based Processing**: Move filtering logic to a Web Worker for better performance
-3. **Element Recycling**: Detect YouTube's element recycling patterns for more efficient filtering
-4. **Specialized Component Handlers**: Create dedicated handlers for each YouTube component type
-
-## Glossary
-
-- **Polymer**: Web component framework used by YouTube
-- **Zero Flash**: Technique to hide elements before they are visible to users
-- **SPA**: Single Page Application architecture used by YouTube
-- **Element Caching**: Storing processed filtering results by video ID
-- **Partial Word Matching**: Matching keywords without requiring word boundaries 
+# FilterTube v3.0 Technical Documentation
+
+This document provides a deep technical dive into the implementation of FilterTube's hybrid filtering engine.
+
+## Core Technologies
+
+*   **JavaScript (ES6+)**: Core logic.
+*   **Manifest V3**: The extension standard used.
+*   **Proxy & Object.defineProperty**: Used for hooking global browser APIs.
+*   **MutationObserver**: Used for the DOM fallback layer.
+*   **Custom Events / postMessage**: Used for cross-world communication.
+
+## 1. Data Interception: `ytInitialData` Hook
+
+**Motivation:**
+YouTube loads content by injecting JSON data into the page. Traditional filtering waits for the DOM, causing a "flash of content". FilterTube intercepts this data *before* it renders.
+
+**How it works (Simplified):**
+YouTube tries to hand a list of videos to the webpage. FilterTube steps in the middle, takes the list, crosses out the videos you don't want, and then hands the cleaned list to the webpage. The webpage never knows those videos existed.
+
+**Technical Flow:**
+
++-----------+      +-------------+      +-------------+
+|  YouTube  | ---> |   seed.js   | ---> | FilterTube  |
+| (Page Load)|     | (Hook Set)  |      |   Engine    |
++-----------+      +-------------+      +-------------+
+      |                   |                    |
+      v                   v                    v
++-----------+      +-------------+      +-------------+
+| Sets Data | ---> | Intercepts  | ---> |  Process    |
+|           |      | Assignment  |      |  Data       |
++-----------+      +-------------+      +-------------+
+                                               |
+                                               v
++-----------+      +-------------+      +-------------+
+|  Renders  | <--- |   Clean     | <--- |  Remove     |
+|  Content  |      |   Data      |      |  Blocked    |
++-----------+      +-------------+      +-------------+
+
+## 2. Data Interception: Fetch Hook
+
+**Motivation:**
+YouTube loads more content as you scroll (infinite scroll) using `fetch` requests. FilterTube must intercept these dynamic requests to ensure new content is also filtered.
+
+**How it works (Simplified):**
+When you scroll down, YouTube asks its server for "more videos". FilterTube listens for this request. When the server replies with the new videos, FilterTube quickly checks them, removes the bad ones, and then gives the rest to YouTube to show you.
+
+**Technical Flow:**
+
++-----------+      +-------------+      +-------------+
+|  YouTube  | ---> | window.fetch| ---> |  Original   |
+|  (Scroll) |      |   (Proxy)   |      |   Fetch     |
++-----------+      +-------------+      +-------------+
+                                               |
+                                               v
++-----------+      +-------------+      +-------------+
+|  Receive  | <--- | New Response| <--- |   Clone &   |
+| Filtered  |      | (Filtered)  |      |   Parse     |
++-----------+      +-------------+      +-------------+
+                                               |
+                                               v
+                                        +-------------+
+                                        | FilterTube  |
+                                        |   Engine    |
+                                        +-------------+
+
+
+## 3. Filtering Engine: Recursive Blocking Decision
+
+**Motivation:**
+YouTube's data structure is complex and nested. Videos can appear inside "shelves", "grids", or "lists". The engine must find every video, extract its details (title, channel), and check if it matches your filters.
+
+**How it works (Simplified):**
+The engine acts like a meticulous inspector. It opens every box (data object) YouTube sends. If it finds a video inside, it reads the label (title/channel). If the label is on your "Block List", it throws the video in the trash. If it's a box of boxes (a playlist or shelf), it opens those too and checks everything inside.
+
+**Technical Flow:**
+
++-------------+
+| processData |
++-------------+
+       |
+       v
++-------------+       +-------------+
+|  Traverse   | ----> | Check Type  |
+|  JSON Tree  |       | (Renderer?) |
++-------------+       +-------------+
+       ^                     | Yes
+       |                     v
+       |              +-------------+
+    (Recurse)         |   Extract   |
+       |              |   Metadata  |
+       |              +-------------+
+       |                     |
+       |                     v
++-------------+       +-------------+
+| Keep Item   | <---- | Match Rules?|
++-------------+  No   +-------------+
+                             | Yes
+                             v
+                      +-------------+
+                      | Block Item  |
+                      | (Set Null)  |
+                      +-------------+
+
+
+## 4. DOM Fallback System
+
+**Motivation:**
+Sometimes data interception misses something (e.g., complex updates). The DOM Fallback is a safety net that watches the screen itself and hides anything that slipped through.
+
+**How it works (Simplified):**
+This is the backup security guard patrolling the building. If a banned video somehow snuck past the front door check, this guard spots it on the wall (the screen) and immediately throws a "Do Not Display" sheet over it so you can't see it.
+
+**Technical Flow:**
+
++-------------+
+|  Mutation   |
+|  Observer   |
++-------------+
+       |
+       v
++-------------+       +-------------+
+|  New Node   | ----> | Is Video?   |
+|  Detected   |       | (Selector)  |
++-------------+       +-------------+
+                             | Yes
+                             v
+                      +-------------+
+                      |   Extract   |
+                      |   Data      |
+                      +-------------+
+                             |
+                             v
++-------------+       +-------------+
+|  Do Nothing | <---- | Match Rules?|
++-------------+  No   +-------------+
+                             | Yes
+                             v
+                      +-------------+
+                      |  Apply CSS  |
+                      |  (Hide)     |
+                      +-------------+
+
+
+## 5. Channel Matching Algorithm
+
+**Motivation:**
+Channels can be identified by Name ("My Channel"), Handle ("@mychannel"), or ID ("UC..."). Users might use any of these. The algorithm must normalize and match correctly.
+
+**How it works (Simplified):**
+If you ban "@coolguy", the system needs to know that "Cool Guy Vlogs" is the same person. It looks at the video's "ID card" which lists their Name, Handle, and ID number. It checks if any of those match what you banned.
+
+**Technical Flow:**
+
++-------------+
+| Channel In  |
+| (Name/ID/@) |
++-------------+
+       |
+       v
++-------------+       +-------------+
+|  Normalize  | ----> |  Compare    |
+|  (Lowercase)|       |  (Rules)    |
++-------------+       +-------------+
+                             |
+                             v
+                      +-------------+
+                      | Match Type? |
+                      +-------------+
+                       /     |     \
+                  (@Handle) (ID)  (Name)
+                     /       |       \
+             +-------+   +-------+   +-------+
+             | Exact |   | Exact |   |Partial|
+             +-------+   +-------+   +-------+

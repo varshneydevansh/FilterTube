@@ -1,8 +1,8 @@
-# FilterTube v2.0 - Current Functionality Documentation
+# FilterTube v3.0 - Current Functionality Documentation
 
 ## Overview
 
-FilterTube v2.0 implements an advanced **data interception filtering system** that blocks YouTube content at the data source level before it's rendered. This revolutionary approach provides true zero-flash filtering with exceptional performance.
+FilterTube v3.0 implements an advanced **data interception filtering system** that blocks YouTube content at the data source level before it's rendered. This revolutionary approach provides true zero-flash filtering with exceptional performance.
 
 ## Core Filtering Capabilities
 
@@ -20,7 +20,7 @@ FilterTube v2.0 implements an advanced **data interception filtering system** th
 ## Technical Implementation
 
 ### **Data Interception Architecture**
-FilterTube v2.0 operates by intercepting YouTube's JSON data at multiple points:
+FilterTube v3.0 operates by intercepting YouTube's JSON data at multiple points:
 
 1. **Initial Page Data** (`window.ytInitialData`)
    - Home page video feeds

@@ -20,13 +20,13 @@ const archiver = require('archiver');
 
 // Configuration
 const ALL_BROWSER_TARGETS = ['chrome', 'firefox'];
-const VERSION = '2.0.0'; // Read from manifest or package.json in production
+const VERSION = '3.0.0'; // Read from manifest or package.json in production
 const COMMON_DIRS = ['js', 'css', 'html', 'icons', 'docs'];
 const COMMON_FILES = ['README.md', 'CHANGELOG.md', 'LICENSE'];
 
 // Determine which browsers to build for based on command line arguments
 const targetBrowser = process.argv[2]; // Get the first argument
-const BROWSER_TARGETS = targetBrowser && ALL_BROWSER_TARGETS.includes(targetBrowser) 
+const BROWSER_TARGETS = targetBrowser && ALL_BROWSER_TARGETS.includes(targetBrowser)
     ? [targetBrowser]  // Build for specific browser if specified
     : ALL_BROWSER_TARGETS; // Build for all browsers by default
 
@@ -36,11 +36,11 @@ fs.existsSync('dist') || fs.mkdirSync('dist');
 // Process each browser target
 BROWSER_TARGETS.forEach(browser => {
     console.log(`\n🔧 Building for ${browser}...`);
-    
+
     const targetDir = path.join('dist', browser);
     fs.removeSync(targetDir); // Clean previous build
     fs.mkdirSync(targetDir);
-    
+
     // 1. Copy common directories
     COMMON_DIRS.forEach(dir => {
         if (fs.existsSync(dir)) {
@@ -50,7 +50,7 @@ BROWSER_TARGETS.forEach(browser => {
             console.log(`  ⚠️ Warning: ${dir}/ directory not found, skipping`);
         }
     });
-    
+
     // 2. Copy common files
     COMMON_FILES.forEach(file => {
         if (fs.existsSync(file)) {
@@ -60,7 +60,7 @@ BROWSER_TARGETS.forEach(browser => {
             console.log(`  ⚠️ Warning: ${file} not found, skipping`);
         }
     });
-    
+
     // 3. Copy browser-specific manifest
     const manifestFile = `manifest.${browser}.json`;
     if (fs.existsSync(manifestFile)) {
@@ -71,7 +71,7 @@ BROWSER_TARGETS.forEach(browser => {
         console.error(`  ❌ Build for ${browser} failed.`);
         return;
     }
-    
+
     // 4. Create ZIP archive
     createZip(browser, targetDir, VERSION);
 });
@@ -82,21 +82,21 @@ BROWSER_TARGETS.forEach(browser => {
 function createZip(browser, sourceDir, version) {
     const zipName = `filtertube-${browser}-v${version}.zip`;
     const zipPath = path.join('dist', zipName);
-    
+
     console.log(`\n📦 Creating ${zipName}...`);
-    
+
     const output = fs.createWriteStream(zipPath);
     const archive = archiver('zip', { zlib: { level: 9 } });
-    
+
     output.on('close', () => {
         const size = (archive.pointer() / 1024 / 1024).toFixed(2);
         console.log(`✅ ${zipName} created (${size} MB)`);
     });
-    
+
     archive.on('error', (err) => {
         throw err;
     });
-    
+
     archive.pipe(output);
     archive.directory(sourceDir, false);
     archive.finalize();
