@@ -1,7 +1,7 @@
 {
   "name": "filtertube",
   "version": "3.0.0",
-  "description": "Filter YouTube videos based on keywords and channels",
+  "description": "Restore peace of mind to your digital video experience.",
   "main": "js/background.js",
   "scripts": {
     "build": "node build.js",
@@ -16,6 +16,7 @@
   },
   "keywords": [
     "youtube",
+    "youtubekids",
     "filter",
     "extension",
     "browser"

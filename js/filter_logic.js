@@ -804,10 +804,20 @@
                 }
             }
 
-            // Channel ID matching (UC...)
-            if (filter.startsWith('uc') && channelInfo.id) {
-                if (channelInfo.id.toLowerCase() === filter) {
-                    return true;
+            // Channel ID matching (UC... or channel/UC...)
+            if (channelInfo.id) {
+                const channelId = channelInfo.id.toLowerCase();
+
+                // Support both "UCxxxxx" and "channel/UCxxxxx" formats
+                if (filter.startsWith('channel/')) {
+                    const filterIdPart = filter.substring(8); // Remove "channel/" prefix
+                    if (channelId === filterIdPart) {
+                        return true;
+                    }
+                } else if (filter.startsWith('uc')) {
+                    if (channelId === filter) {
+                        return true;
+                    }
                 }
             }
 
