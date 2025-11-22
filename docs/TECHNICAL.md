@@ -20,6 +20,7 @@ YouTube tries to hand a list of videos to the webpage. FilterTube steps in the m
 
 **Technical Flow:**
 
+```ascii
 +-----------+      +-------------+      +-------------+
 |  YouTube  | ---> |   seed.js   | ---> | FilterTube  |
 | (Page Load)|     | (Hook Set)  |      |   Engine    |
@@ -37,6 +38,8 @@ YouTube tries to hand a list of videos to the webpage. FilterTube steps in the m
 |  Content  |      |   Data      |      |  Blocked    |
 +-----------+      +-------------+      +-------------+
 
+```
+
 ## 2. Data Interception: Fetch Hook
 
 **Motivation:**
@@ -46,6 +49,8 @@ YouTube loads more content as you scroll (infinite scroll) using `fetch` request
 When you scroll down, YouTube asks its server for "more videos". FilterTube listens for this request. When the server replies with the new videos, FilterTube quickly checks them, removes the bad ones, and then gives the rest to YouTube to show you.
 
 **Technical Flow:**
+
+```ascii
 
 +-----------+      +-------------+      +-------------+
 |  YouTube  | ---> | window.fetch| ---> |  Original   |
@@ -65,6 +70,8 @@ When you scroll down, YouTube asks its server for "more videos". FilterTube list
                                         +-------------+
 
 
+```
+
 ## 3. Filtering Engine: Recursive Blocking Decision
 
 **Motivation:**
@@ -74,6 +81,8 @@ YouTube's data structure is complex and nested. Videos can appear inside "shelve
 The engine acts like a meticulous inspector. It opens every box (data object) YouTube sends. If it finds a video inside, it reads the label (title/channel). If the label is on your "Block List", it throws the video in the trash. If it's a box of boxes (a playlist or shelf), it opens those too and checks everything inside.
 
 **Technical Flow:**
+
+```ascii
 
 +-------------+
 | processData |
@@ -102,6 +111,8 @@ The engine acts like a meticulous inspector. It opens every box (data object) Yo
                       | (Set Null)  |
                       +-------------+
 
+```
+
 
 ## 4. DOM Fallback System
 
@@ -112,6 +123,8 @@ Sometimes data interception misses something (e.g., complex updates). The DOM Fa
 This is the backup security guard patrolling the building. If a banned video somehow snuck past the front door check, this guard spots it on the wall (the screen) and immediately throws a "Do Not Display" sheet over it so you can't see it.
 
 **Technical Flow:**
+
+```ascii
 
 +-------------+
 |  Mutation   |
@@ -141,6 +154,8 @@ This is the backup security guard patrolling the building. If a banned video som
                       |  (Hide)     |
                       +-------------+
 
+```
+
 
 ## 5. Channel Matching Algorithm
 
@@ -151,6 +166,8 @@ Channels can be identified by Name ("My Channel"), Handle ("@mychannel"), or ID 
 If you ban "@coolguy", the system needs to know that "Cool Guy Vlogs" is the same person. It looks at the video's "ID card" which lists their Name, Handle, and ID number. It checks if any of those match what you banned.
 
 **Technical Flow:**
+
+```ascii
 
 +-------------+
 | Channel In  |
@@ -173,3 +190,6 @@ If you ban "@coolguy", the system needs to know that "Cool Guy Vlogs" is the sam
              +-------+   +-------+   +-------+
              | Exact |   | Exact |   |Partial|
              +-------+   +-------+   +-------+
+
+
+```
