@@ -13,6 +13,63 @@ function debugLog(message, ...args) {
     // console.log(`[${debugSequence}] FilterTube (Bridge ${IS_FIREFOX_BRIDGE ? 'Fx' : 'Cr'}):`, message, ...args);
 }
 
+// ==========================================
+// ACTIVE RESOLVER - Fetches UC ID for @handles
+// ==========================================
+const resolvedHandleCache = new Map();
+
+async function fetchIdForHandle(handle) {
+    const cleanHandle = handle.toLowerCase().replace('@', '');
+    if (!cleanHandle) return null;
+
+    // If we already have a result, return it
+    if (resolvedHandleCache.has(cleanHandle)) {
+        return resolvedHandleCache.get(cleanHandle);
+    }
+
+    // Mark as pending to prevent Loop
+    resolvedHandleCache.set(cleanHandle, 'PENDING');
+
+    try {
+        // console.log(`FilterTube: 🕵️ Actively resolving ID for @${cleanHandle}...`);
+        const response = await fetch(`https://www.youtube.com/@${cleanHandle}/about`);
+        const text = await response.text();
+
+        const match = text.match(/channel\/(UC[\w-]{22})/);
+        if (match && match[1]) {
+            const id = match[1];
+
+            // Update Cache
+            resolvedHandleCache.set(cleanHandle, id);
+
+            // Broadcast to Background (Permanent Storage)
+            window.postMessage({
+                type: 'FilterTube_UpdateChannelMap',
+                payload: [{ id: id, handle: `@${cleanHandle}` }],
+                source: 'content_bridge'
+            }, '*');
+
+            console.log(`FilterTube: ✅ Resolved @${cleanHandle} -> ${id}`);
+
+            // DO NOT CALL applyDOMFallback HERE. 
+            // The next scroll event or mutation observer will pick up the new cache value naturally.
+            // This prevents the Infinite Loop.
+            // Safe re-process: This triggers the filter again to hide the content immediately.
+            // Because the cache is now set to the ID (not PENDING), the next pass won't fetch again.
+            setTimeout(() => {
+                if (typeof applyDOMFallback === 'function') {
+                    applyDOMFallback(currentSettings, { forceReprocess: true });
+                }
+            }, 50);
+            return id;
+        }
+    } catch (e) {
+        console.warn(`FilterTube: Failed to resolve @${cleanHandle}`, e);
+        resolvedHandleCache.delete(cleanHandle); // Delete so we can retry later if it was just a network blip
+    }
+    return null;
+}
+
 // Statistics tracking
 let statsCountToday = 0;
 let statsLastDate = new Date().toDateString();
@@ -461,17 +518,80 @@ function extractChannelMetadataFromElement(element, channelText = '', channelHre
     return meta;
 }
 
-function channelMatchesFilter(meta, filterChannel) {
+function channelMatchesFilter(meta, filterChannel, channelMap = {}) {
+    // Handle new object format: { name, id, handle }
+    if (typeof filterChannel === 'object' && filterChannel !== null) {
+        const filterId = (filterChannel.id || '').toLowerCase();
+        const filterHandle = (filterChannel.handle || '').toLowerCase();
+
+        // Direct match by UC ID
+        if (filterId && meta.id && meta.id.toLowerCase() === filterId) {
+            return true;
+        }
+
+        // Direct match by handle
+        if (filterHandle && meta.handle && meta.handle.toLowerCase() === filterHandle) {
+            return true;
+        }
+
+        // Cross-match using channelMap: blocking UC ID should also block its handle
+        if (filterId && meta.handle) {
+            const mappedHandle = channelMap[filterId];
+            if (mappedHandle && meta.handle.toLowerCase() === mappedHandle) {
+                return true;
+            }
+        }
+
+        // Cross-match using channelMap: blocking handle should also block its UC ID
+        if (filterHandle && meta.id) {
+            const mappedId = channelMap[filterHandle];
+            if (mappedId && meta.id.toLowerCase() === mappedId) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // Legacy string format
     if (!filterChannel || typeof filterChannel !== 'string') return false;
     const normalized = filterChannel.trim().toLowerCase();
     if (!normalized) return false;
 
+    // Direct handle match
     if (normalized.startsWith('@')) {
-        return !!meta.handle && meta.handle === normalized;
+        if (meta.handle && meta.handle === normalized) {
+            return true;
+        }
+
+        // Check channelMap: if filter is a handle, get its UC ID and match
+        // Keep the @ in the key to match filter_logic.js convention
+        const mappedId = channelMap[normalized];
+        if (mappedId && meta.id && meta.id.toLowerCase() === mappedId) {
+            return true;
+        }
     }
 
+    // Direct UC ID match
     if (normalized.startsWith('uc')) {
-        return !!meta.id && meta.id === normalized;
+        if (meta.id && meta.id === normalized) {
+            return true;
+        }
+
+        // Check channelMap: if filter is UC ID, also match its handle
+        const mappedHandle = channelMap[normalized];
+        if (mappedHandle && meta.handle && meta.handle.toLowerCase() === mappedHandle) {
+            return true;
+        }
+    }
+
+    // Reverse check: if meta has handle, check if mapped ID matches filter
+    if (meta.handle && normalized.startsWith('uc')) {
+        const handleLower = meta.handle.toLowerCase();
+        const mappedId = channelMap[handleLower];
+        if (mappedId && mappedId === normalized) {
+            return true;
+        }
     }
 
     return false;
@@ -990,7 +1110,7 @@ function shouldHideContent(title, channel, settings, options = {}) {
                     regex = new RegExp(keywordData.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
                 }
             } catch (error) {
-                debugLog('⚠️ Invalid keyword regex in settings:', keywordData, error);
+                // debugLog('⚠️ Invalid keyword regex:', error);
                 continue;
             }
 
@@ -1002,9 +1122,59 @@ function shouldHideContent(title, channel, settings, options = {}) {
 
     // Channel filtering
     if (settings.filterChannels && settings.filterChannels.length > 0 && hasChannelIdentity) {
+        const channelMap = settings.channelMap || {};
+
+        // 1. Normal Check (Fast path - direct match or existing channelMap lookup)
         for (const filterChannel of settings.filterChannels) {
-            if (channelMatchesFilter(channelMeta, filterChannel)) {
+            if (channelMatchesFilter(channelMeta, filterChannel, channelMap)) {
                 return true;
+            }
+        }
+
+        // 2. Active Resolution (Safety net for missing mappings)
+        // This runs when the blocklist has a Handle (e.g. @shakira) 
+        // but the content on screen only shows a UC ID (UC...)
+        if (channelMeta.id && !channelMeta.handle) {
+            const contentId = channelMeta.id.toLowerCase();
+
+            // Iterate through our blocked channels to see if we need to fetch any IDs
+            for (const filterChannel of settings.filterChannels) {
+                let filterHandle = null;
+
+                // Extract handle from filter object/string
+                if (typeof filterChannel === 'string' && filterChannel.startsWith('@')) {
+                    filterHandle = filterChannel.toLowerCase();
+                } else if (filterChannel && filterChannel.handle) {
+                    filterHandle = filterChannel.handle.toLowerCase();
+                }
+
+                if (filterHandle) {
+                    const handleKey = filterHandle.replace('@', ''); // "shakira"
+
+                    // Check if we ALREADY know the ID for this blocked handle
+                    // Try both format keys for safety
+                    const knownId = channelMap[`@${handleKey}`] || channelMap[handleKey];
+
+                    if (knownId) {
+                        // If we have a map, 'channelMatchesFilter' (Step 1) would have caught it 
+                        // if it matched. Since it didn't, this filter doesn't match this content.
+                        continue;
+                    }
+
+                    // We DON'T know the ID for this blocked handle. 
+                    // We must fetch it to see if it matches the current content ID.
+                    const cachedState = resolvedHandleCache.get(handleKey);
+
+                    if (!cachedState) {
+                        // Not known, not fetching. Start async fetch now.
+                        fetchIdForHandle(filterHandle);
+                    } else if (cachedState !== 'PENDING') {
+                        // We just resolved it in memory! Check if it matches.
+                        if (cachedState.toLowerCase() === contentId) {
+                            return true; // Match found via active resolution
+                        }
+                    }
+                }
             }
         }
     }
@@ -1165,19 +1335,25 @@ function handleMainWorldMessages(event) {
     if (event.source !== window || !event.data?.type?.startsWith('FilterTube_')) return;
     if (event.data.source === 'content_bridge') return;
 
-    const { type } = event.data;
+    const { type, payload } = event.data;
     if (type === 'FilterTube_InjectorToBridge_Ready') {
         requestSettingsFromBackground();
     } else if (type === 'FilterTube_Refresh') {
         requestSettingsFromBackground().then(result => {
             if (result?.success) applyDOMFallback(result.settings, { forceReprocess: true });
         });
+    } else if (type === 'FilterTube_UpdateChannelMap') {
+        // Forward learned channel mappings to background for persistence
+        browserAPI_BRIDGE.runtime.sendMessage({
+            action: "updateChannelMap",
+            mappings: payload
+        });
     }
 }
 
 function handleStorageChanges(changes, area) {
     if (area !== 'local') return;
-    const relevantKeys = ['filterKeywords', 'filterChannels', 'uiChannels', 'hideAllComments', 'filterComments', 'hideAllShorts'];
+    const relevantKeys = ['filterKeywords', 'filterChannels', 'uiChannels', 'channelMap', 'hideAllComments', 'filterComments', 'hideAllShorts'];
     if (Object.keys(changes).some(key => relevantKeys.includes(key))) {
         requestSettingsFromBackground().then(result => {
             if (result?.success) applyDOMFallback(result.settings, { forceReprocess: true });

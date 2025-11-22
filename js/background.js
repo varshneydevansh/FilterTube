@@ -27,6 +27,7 @@ async function getCompiledSettings() {
             'filterKeywords',
             'uiKeywords',
             'filterChannels',
+            'channelMap',
             'hideAllComments',
             'filterComments',
             'useExactWordMatching',
@@ -91,20 +92,37 @@ async function getCompiledSettings() {
                 browserAPI.storage.local.set(storageUpdates);
             }
 
-            // Compile channels into lowercase strings
+            // Compile channels - preserve objects with name, id, handle
             const storedChannels = items.filterChannels;
             let compiledChannels = [];
 
             if (Array.isArray(storedChannels)) {
-                compiledChannels = storedChannels
-                    .map(ch => typeof ch === 'string' ? ch.trim().toLowerCase() : '')
-                    .filter(Boolean);
+                compiledChannels = storedChannels.map(ch => {
+                    if (typeof ch === 'string') {
+                        // Legacy string format - convert to object format
+                        return {
+                            name: ch.trim(),
+                            id: ch.trim().toLowerCase(),
+                            handle: null
+                        };
+                    } else if (ch && typeof ch === 'object') {
+                        // New object format - preserve the structure but lowercase the IDs
+                        return {
+                            name: ch.name,
+                            id: (ch.id || '').toLowerCase(),
+                            handle: (ch.handle || '').toLowerCase() || null
+                        };
+                    }
+                    return null;
+                }).filter(Boolean);
+
                 if (!storedUiChannels) {
                     storageUpdates.uiChannels = storedChannels
-                        .map(ch => typeof ch === 'string' ? ch.trim() : '')
+                        .map(ch => typeof ch === 'string' ? ch.trim() : ch)
                         .filter(Boolean);
                 }
             } else if (typeof storedChannels === 'string') {
+                // Legacy string format
                 compiledChannels = storedChannels
                     .split(',')
                     .map(c => c.trim().toLowerCase())
@@ -115,13 +133,16 @@ async function getCompiledSettings() {
 
             compiledSettings.filterChannels = compiledChannels;
 
+            // Pass through the channel map (UC ID <-> @handle mappings)
+            compiledSettings.channelMap = items.channelMap || {};
+
             // Pass through boolean flags
             compiledSettings.hideAllComments = items.hideAllComments || false;
             compiledSettings.filterComments = items.filterComments || false;
             compiledSettings.useExactWordMatching = useExact;
             compiledSettings.hideAllShorts = items.hideAllShorts || false;
 
-            console.log('FilterTube Background: Compiled settings:', JSON.stringify(compiledSettings));
+            console.log(`FilterTube Background: Compiled ${compiledChannels.length} channels, ${Object.keys(compiledSettings.channelMap).length / 2} mappings`);
 
             resolve(compiledSettings);
         });
@@ -228,6 +249,26 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
         });
         sendResponse({ acknowledged: true });
         return false;
+    } else if (request.action === "updateChannelMap") {
+        // Handle learned ID/Handle mappings from filter_logic
+        browserAPI.storage.local.get(['channelMap'], (result) => {
+            const currentMap = result.channelMap || {};
+            let hasChange = false;
+
+            request.mappings.forEach(m => {
+                if (currentMap[m.id] !== m.handle) {
+                    currentMap[m.id] = m.handle; // UC... -> @handle
+                    currentMap[m.handle] = m.id; // @handle -> UC...
+                    hasChange = true;
+                }
+            });
+
+            if (hasChange) {
+                browserAPI.storage.local.set({ channelMap: currentMap });
+                console.log("FilterTube Background: Channel map updated in storage");
+            }
+        });
+        return false; // No response needed
     }
 
     // Handle any browser-specific actions if needed

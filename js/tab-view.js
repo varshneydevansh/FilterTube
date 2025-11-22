@@ -57,9 +57,12 @@ function initializeFiltersTabs() {
             <div class="card-body">
                 <div class="input-row">
                     <input type="text" id="channelInput" class="text-input"
-                        placeholder="Add channel @handle or ID...">
+                        placeholder="Add @handle or UCxxxxx... (we'll fetch the name!)">
                     <button id="addChannelBtn" class="btn-primary">Add</button>
                 </div>
+                <p class="hint-text" style="margin-top: 8px; font-size: 0.85em; opacity: 0.7;">
+                    💡 Enter a channel UC ID and we'll automatically fetch the channel name for you!
+                </p>
 
                 <div class="filter-controls">
                     <input type="text" id="searchChannels" class="search-input"
@@ -207,14 +210,27 @@ document.addEventListener('DOMContentLoaded', () => {
     function normalizeChannels(rawChannels) {
         if (Array.isArray(rawChannels)) {
             return rawChannels
-                .map(ch => typeof ch === 'string' ? { name: ch.trim(), id: ch.trim() } : ch) // Assume ch is already an object if not string
+                .map(ch => {
+                    if (typeof ch === 'string') {
+                        // Legacy string format - convert to object
+                        return { name: ch.trim(), id: ch.trim(), handle: null };
+                    } else if (ch && typeof ch === 'object') {
+                        // Already an object - ensure it has all fields
+                        return {
+                            name: ch.name || ch.id,
+                            id: ch.id,
+                            handle: ch.handle || null
+                        };
+                    }
+                    return null;
+                })
                 .filter(Boolean);
         }
 
         if (typeof rawChannels === 'string') {
             return rawChannels
                 .split(',')
-                .map(ch => ({ name: ch.trim(), id: ch.trim() }))
+                .map(ch => ({ name: ch.trim(), id: ch.trim(), handle: null }))
                 .filter(ch => ch.name);
         }
 
@@ -234,7 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function buildCompiledSettings({ hideShorts, hideComments, filterCommentsOverride }) {
         return {
             filterKeywords: compileKeywords(state.keywords),
-            filterChannels: state.channels.map(ch => ch.id), // Send only IDs to content script
+            filterChannels: state.channels, // Send full channel objects with name, id, and handle
             hideAllShorts: hideShorts,
             hideAllComments: hideComments,
             filterComments: filterCommentsOverride
@@ -459,14 +475,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!channelListEl) return;
         channelListEl.innerHTML = '';
 
-        // Filter Channels by search term
+        // Filter Channels by search term (search both name and ID)
         const searchTerm = (searchChannels?.value || '').trim().toLowerCase();
         let displayChannels = [...state.channels];
 
         if (searchTerm) {
             displayChannels = displayChannels.filter(ch => {
-                const name = (ch.name || ch.id || '').toLowerCase();
-                return name.includes(searchTerm);
+                const name = (ch.name || '').toLowerCase();
+                const id = (ch.id || '').toLowerCase();
+                return name.includes(searchTerm) || id.includes(searchTerm);
             });
         }
 
@@ -497,7 +514,47 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const left = document.createElement('div');
             left.className = 'item-word';
-            left.textContent = channel.name || channel.id;
+
+            // Display format based on whether we have a fetched name
+            const channelId = channel.id || '';
+            const channelName = channel.name || '';
+            const channelHandle = channel.handle || '';
+
+            // If name is different from ID and looks like a UC ID, show "Name (@handle) [UCxxx]"
+            const isUCId = channelId.toLowerCase().startsWith('uc');
+            const hasDistinctName = channelName !== channelId;
+
+            if (isUCId && hasDistinctName) {
+                // Show as "Channel Name (@handle) [UCxxx]" or "Channel Name [UCxxx]" if no handle
+                const nameSpan = document.createElement('span');
+                nameSpan.textContent = channelName;
+                nameSpan.style.fontWeight = '500';
+
+                left.appendChild(nameSpan);
+
+                // Add handle if available
+                if (channelHandle) {
+                    const handleSpan = document.createElement('span');
+                    handleSpan.textContent = ` ${channelHandle}`;
+                    handleSpan.style.opacity = '0.75';
+                    handleSpan.style.fontSize = '0.9em';
+                    handleSpan.style.color = 'var(--ft-color-brand-primary, #0066cc)';
+                    handleSpan.style.fontWeight = '400';
+                    left.appendChild(handleSpan);
+                }
+
+                // Add UC ID
+                const idSpan = document.createElement('span');
+                idSpan.textContent = ` [${channelId}]`;
+                idSpan.style.opacity = '0.5';
+                idSpan.style.fontSize = '0.85em';
+                idSpan.style.fontWeight = '400';
+
+                left.appendChild(idSpan);
+            } else {
+                // Show as-is for @handles or plain text
+                left.textContent = channelName || channelId;
+            }
 
             const controls = document.createElement('div');
             controls.className = 'item-controls';
@@ -518,18 +575,202 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    if (addChannelBtn) {
-        addChannelBtn.addEventListener('click', () => {
-            const val = (channelInput?.value || '').trim();
-            if (val && !state.channels.some(ch => ch.id === val)) {
-                state.channels.push({ name: val, id: val }); // Store as object
-                if (channelInput) channelInput.value = '';
-                saveSettings();
-                renderChannelList();
+    /**
+     * Fetch channel name and handle from YouTube using channel ID
+     * Uses YouTube's internal API for reliable data extraction
+     */
+    async function fetchChannelInfo(channelId) {
+        try {
+            // Normalize the channel ID
+            const cleanId = channelId.replace(/^channel\//i, '');
 
-                // Flash success feedback
-                UIComponents.flashButtonSuccess(addChannelBtn, 'Added!', 1200);
+            console.log('FilterTube: Fetching channel info for:', cleanId);
+
+            // Use YouTube's internal browse API
+            const apiUrl = 'https://www.youtube.com/youtubei/v1/browse';
+            const apiKey = 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'; // Public YouTube API key used by web client
+
+            const requestBody = {
+                context: {
+                    client: {
+                        clientName: 'WEB',
+                        clientVersion: '2.20231212.01.00'
+                    }
+                },
+                browseId: cleanId
+            };
+
+            const response = await fetch(`${apiUrl}?key=${apiKey}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            if (!response.ok) {
+                console.error('FilterTube: API request failed:', response.status);
+                return null;
             }
+
+            const data = await response.json();
+            console.log('FilterTube: Full API response:', data);
+
+            // First try to get data from metadata (most reliable)
+            const metadata = data?.metadata?.channelMetadataRenderer;
+
+            let channelName = null;
+            let channelHandle = null;
+
+            if (metadata) {
+                console.log('FilterTube: Found metadata:', metadata);
+                // Get channel name from metadata
+                channelName = metadata.title;
+
+                // Get handle from vanityChannelUrl or ownerUrls
+                if (metadata.vanityChannelUrl) {
+                    const match = metadata.vanityChannelUrl.match(/@([^/]+)/);
+                    if (match) {
+                        channelHandle = '@' + match[1];
+                    }
+                } else if (metadata.ownerUrls && metadata.ownerUrls.length > 0) {
+                    const match = metadata.ownerUrls[0].match(/@([^/]+)/);
+                    if (match) {
+                        channelHandle = '@' + match[1];
+                    }
+                }
+            }
+
+            // Fallback to header data if metadata didn't work
+            if (!channelName || !channelHandle) {
+                const header = data?.header?.c4TabbedHeaderRenderer || data?.header?.pageHeaderRenderer;
+                console.log('FilterTube: Trying header data:', header);
+
+                if (header) {
+                    // Try different paths for channel name
+                    if (!channelName) {
+                        channelName = header.title ||
+                            header.channelTitle?.simpleText ||
+                            header.pageTitle;
+                    }
+
+                    // Try to find the handle from various locations
+                    if (!channelHandle) {
+                        if (header.channelHandleText?.runs?.[0]?.text) {
+                            channelHandle = header.channelHandleText.runs[0].text;
+                        } else if (header.handle?.simpleText) {
+                            channelHandle = header.handle.simpleText;
+                        }
+                    }
+                }
+            }
+
+            console.log('FilterTube: Extracted -', 'Name:', channelName, 'Handle:', channelHandle);
+
+            return {
+                name: channelName,
+                handle: channelHandle
+            };
+        } catch (error) {
+            console.error('FilterTube: Failed to fetch channel info:', error);
+            return null;
+        }
+    }
+
+    if (addChannelBtn) {
+        addChannelBtn.addEventListener('click', async () => {
+            const val = (channelInput?.value || '').trim();
+            if (!val) return;
+
+            // Normalize the ID first (remove channel/ prefix if present)
+            const normalizedId = val.toLowerCase().replace(/^channel\//i, '');
+
+            // Check for duplicates (check both raw input and normalized ID)
+            if (state.channels.some(ch => ch.id === normalizedId || ch.id === val.toLowerCase() || ch.handle === val)) {
+                alert('This channel is already in your filter list!');
+                return;
+            }
+
+            // Show loading state
+            const originalText = addChannelBtn.textContent;
+            addChannelBtn.textContent = 'Fetching...';
+            addChannelBtn.disabled = true;
+
+            let channelName = val;
+            let channelHandle = null;
+            let channelId = normalizedId;
+
+            const isUCId = normalizedId.startsWith('uc');
+            const isHandle = val.startsWith('@');
+
+            // Fetch channel info from YouTube API
+            if (isUCId) {
+                console.log('FilterTube: Fetching info for UC ID:', normalizedId);
+                const channelInfo = await fetchChannelInfo(normalizedId);
+                console.log('FilterTube: API Response:', channelInfo);
+
+                if (channelInfo && channelInfo.name) {
+                    channelName = channelInfo.name;
+                    channelHandle = channelInfo.handle;
+                    console.log('FilterTube: Successfully fetched - Name:', channelName, 'Handle:', channelHandle);
+                } else {
+                    console.warn('FilterTube: Could not fetch channel name, using ID as name');
+                }
+            } else if (isHandle) {
+                // For handles, we'll store as-is and use it as both name and handle
+                channelName = val;
+                channelHandle = val;
+                channelId = val.toLowerCase(); // Keep handle as ID for filtering (normalized)
+
+                // Try to proactively fetch the UC ID to populate channelMap
+                // This is non-blocking - if it fails, we still save the handle
+                try {
+                    const handleWithoutAt = val.replace('@', '');
+                    const aboutUrl = `https://www.youtube.com/@${handleWithoutAt}/about`;
+                    const response = await fetch(aboutUrl);
+                    const text = await response.text();
+                    const match = text.match(/channel\/(UC[\w-]{22})/);
+                    if (match && match[1]) {
+                        const resolvedId = match[1];
+                        console.log(`FilterTube: ✅ Resolved ${val} -> ${resolvedId}`);
+                        // We found the UC ID! Store it in channelMap for future use
+                        chrome.storage.local.get(['channelMap'], (result) => {
+                            const currentMap = result.channelMap || {};
+                            const normHandle = val.startsWith('@') ? val.toLowerCase() : `@${val.toLowerCase()}`;  // Keep the @ in the key!
+                            const normId = resolvedId.toLowerCase();
+                            currentMap[normId] = normHandle;     // UC... -> @handle
+                            currentMap[normHandle] = normId;     // @handle -> UC...
+                            chrome.storage.local.set({ channelMap: currentMap });
+                            console.log('FilterTube: Updated channelMap with new mapping:', normId, '<->', normHandle);
+                        });
+                    }
+                } catch (err) {
+                    console.warn('FilterTube: Could not resolve handle to UC ID:', err);
+                    // No problem - we'll still save the handle and resolve it later if needed
+                }
+            }
+
+            console.log('FilterTube: Final channel entry:', { name: channelName, id: channelId, handle: channelHandle });
+
+            // Store with name, id, and handle
+            const channelEntry = {
+                name: channelName,
+                id: channelId,
+                handle: channelHandle
+            };
+
+            state.channels.push(channelEntry);
+            if (channelInput) channelInput.value = '';
+
+            // Re-enable button
+            addChannelBtn.disabled = false;
+            addChannelBtn.textContent = originalText;
+
+            saveSettings();
+            renderChannelList();
+
+            // Flash success feedback
+            UIComponents.flashButtonSuccess(addChannelBtn, 'Added!', 1200);
         });
     }
 

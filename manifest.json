@@ -1,18 +1,11 @@
 {
     "manifest_version": 3,
     "name": "FilterTube",
-    "description": "Peace of Mind for your Digital Space",
+    "description": "Filter YouTube videos by keywords and channels",
     "version": "3.0.0",
+    "minimum_chrome_version": "88",
     "background": {
-        "scripts": [
-            "js/background.js"
-        ]
-    },
-    "browser_specific_settings": {
-        "gecko": {
-            "id": "filtertube@devanshvarshney.com",
-            "strict_min_version": "109.0"
-        }
+        "service_worker": "js/background.js"
     },
     "action": {
         "default_popup": "html/popup.html",
@@ -35,9 +28,21 @@
                 "*://*.youtubekids.com/*"
             ],
             "js": [
+                "js/seed.js"
+            ],
+            "run_at": "document_start",
+            "world": "MAIN"
+        },
+        {
+            "matches": [
+                "*://*.youtube.com/*",
+                "*://*.youtubekids.com/*"
+            ],
+            "js": [
                 "js/content_bridge.js"
             ],
-            "run_at": "document_start"
+            "run_at": "document_start",
+            "world": "ISOLATED"
         }
     ],
     "web_accessible_resources": [

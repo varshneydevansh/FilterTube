@@ -146,7 +146,7 @@ See [CHANGELOG.md](CHANGELOG.md) for a detailed history of changes and improveme
 YouTube's recommendation algorithms can sometimes surface unwanted content. FilterTube gives you control over what appears in your feed, allowing for a more focused and pleasant viewing experience without distractions or unwanted content.
 
 **It all started with this thread on Google's support forum:**
-When a parent said that he is helpless and his kid is just kept crying and screaming because of the content on YouTube, and he asked me if I can create a tool to block videos by keyword or tag.
+When a parent said that he is helpless and his kid is just kept crying and screaming because of the content on YouTubeKids, and he asked me if I can create a tool to block videos by keyword or tag.
 And when Later YouTube Forum maintaner deleted mine and other parents comments and locked the thread, I decided to create FilterTube.
 
 [https://support.google.com/youtubekids/thread/54509605/how-to-block-videos-by-keyword-or-tag?hl=en](https://support.google.com/youtubekids/thread/54509605/how-to-block-videos-by-keyword-or-tag?hl=en)

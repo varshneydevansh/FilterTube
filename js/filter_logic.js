@@ -519,6 +519,7 @@
     class YouTubeDataFilter {
         constructor(settings) {
             this.settings = this._processSettings(settings);
+            this.channelMap = settings.channelMap || {}; // UC ID <-> @handle mappings
             this.blockedCount = 0;
             this.debugEnabled = true;
         }
@@ -560,6 +561,97 @@
             }
 
             return processed;
+        }
+
+        /**
+         * Harvest channel ID/Handle mappings from YouTube data
+         * This learns the connection between UC IDs and @handles automatically
+         */
+        _harvestChannelData(data) {
+            if (!data || typeof data !== 'object') return;
+
+            // 1. Check Channel Metadata (appears on channel pages)
+            const meta = data?.metadata?.channelMetadataRenderer;
+            if (meta?.externalId) {
+                const id = meta.externalId;
+                let handle = null;
+
+                // Method A: Check vanityChannelUrl (Standard)
+                if (meta.vanityChannelUrl) {
+                    const match = meta.vanityChannelUrl.match(/@[\w.-]+/);
+                    if (match) handle = match[0];
+                }
+
+                // Method B: Check ownerUrls (Alternative location, used by Shakira's channel)
+                if (!handle && meta.ownerUrls && Array.isArray(meta.ownerUrls)) {
+                    for (const url of meta.ownerUrls) {
+                        const match = url.match(/@[\w.-]+/);
+                        if (match) {
+                            handle = match[0];
+                            break;
+                        }
+                    }
+                }
+
+                if (id && handle) {
+                    this._registerMapping(id, handle);
+                }
+            }
+
+            // 2. Check Microformat (appears in video/channel responses)
+            const micro = data?.microformat?.microformatDataRenderer;
+            if (micro?.urlCanonical && (micro?.vanityChannelUrl || micro?.ownerProfileUrl)) {
+                const idMatch = micro.urlCanonical.match(/channel\/(UC[\w-]{22})/);
+                // Sometimes it's in vanityChannelUrl, sometimes ownerProfileUrl
+                const handleUrl = micro.vanityChannelUrl || micro.ownerProfileUrl;
+                const handleMatch = handleUrl ? handleUrl.match(/@[\w.-]+/) : null;
+
+                if (idMatch && handleMatch) {
+                    this._registerMapping(idMatch[1], handleMatch[0]);
+                }
+            }
+
+            // 3. Check response context (sometimes contains channel info)
+            const responseContext = data?.responseContext;
+            if (responseContext?.webResponseContextExtensionData?.ytConfigData) {
+                const ytConfig = responseContext.webResponseContextExtensionData.ytConfigData;
+                if (ytConfig.channelId && ytConfig.channelName) {
+                    // Try to find handle from canonicalBaseUrl
+                    const handleMatch = ytConfig.canonicalBaseUrl?.match(/@[\w.-]+/);
+                    if (handleMatch) {
+                        this._registerMapping(ytConfig.channelId, handleMatch[0]);
+                    }
+                }
+            }
+        }
+
+        /**
+         * Register a bidirectional mapping between UC ID and handle
+         */
+        _registerMapping(id, handle) {
+            if (!id || !handle) return;
+
+            const normId = id.toLowerCase();
+            const normHandle = handle.toLowerCase();
+
+            // Only save if this is a new mapping
+            if (this.channelMap[normId] !== normHandle) {
+                this.channelMap[normId] = normHandle;   // UC... -> @handle
+                this.channelMap[normHandle] = normId;   // @handle -> UC...
+
+                postLogToBridge('log', `🧠 LEARNED MAPPING: ${id} <-> ${handle}`);
+
+                // Send to background via content_bridge to persist in storage
+                try {
+                    window.postMessage({
+                        type: 'FilterTube_UpdateChannelMap',
+                        payload: [{ id: normId, handle: normHandle }],
+                        source: 'filter_logic'
+                    }, '*');
+                } catch (e) {
+                    console.warn('FilterTube: Failed to send channel map update', e);
+                }
+            }
         }
 
         /**
@@ -788,15 +880,58 @@
 
         /**
          * Check if a channel matches a filter with comprehensive logic
+         * Handles both legacy string filters and new object filters with name/id/handle
          */
         _matchesChannel(filterChannel, channelInfo) {
-            const filter = filterChannel.toLowerCase();
+            // Handle new object format: { name, id, handle }
+            if (typeof filterChannel === 'object' && filterChannel !== null) {
+                const filterId = (filterChannel.id || '').toLowerCase();
+                const filterHandle = (filterChannel.handle || '').toLowerCase();
+
+                // Direct match by UC ID
+                if (filterId && channelInfo.id && channelInfo.id.toLowerCase() === filterId) {
+                    return true;
+                }
+
+                // Direct match by handle
+                if (filterHandle && channelInfo.handle && channelInfo.handle.toLowerCase() === filterHandle) {
+                    return true;
+                }
+
+                // Use channelMap to cross-match: if we're blocking UC ID, also block its handle
+                if (filterId && channelInfo.handle) {
+                    const mappedHandle = this.channelMap[filterId];
+                    if (mappedHandle && channelInfo.handle.toLowerCase() === mappedHandle) {
+                        return true;
+                    }
+                }
+
+                // Use channelMap to cross-match: if we're blocking handle, also block its UC ID
+                if (filterHandle && channelInfo.id) {
+                    const mappedId = this.channelMap[filterHandle];
+                    if (mappedId && channelInfo.id.toLowerCase() === mappedId) {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            // Legacy string format
+            const filter = String(filterChannel).toLowerCase();
 
             // Direct handle matching (@username)
             if (filter.startsWith('@')) {
                 if (channelInfo.handle && channelInfo.handle.toLowerCase() === filter) {
                     return true;
                 }
+
+                // Check channelMap: if filter is a handle, get its UC ID and match
+                const mappedId = this.channelMap[filter];
+                if (mappedId && channelInfo.id && channelInfo.id.toLowerCase() === mappedId) {
+                    return true;
+                }
+
                 // Also check if channel name matches without @
                 const filterWithoutAt = filter.substring(1);
                 if (channelInfo.name && channelInfo.name.toLowerCase() === filterWithoutAt) {
@@ -814,10 +949,31 @@
                     if (channelId === filterIdPart) {
                         return true;
                     }
+
+                    // Check channelMap for cross-matching
+                    const mappedHandle = this.channelMap[filterIdPart];
+                    if (mappedHandle && channelInfo.handle && channelInfo.handle.toLowerCase() === mappedHandle) {
+                        return true;
+                    }
                 } else if (filter.startsWith('uc')) {
                     if (channelId === filter) {
                         return true;
                     }
+
+                    // Check channelMap: if filter is UC ID, also match its handle
+                    const mappedHandle = this.channelMap[filter];
+                    if (mappedHandle && channelInfo.handle && channelInfo.handle.toLowerCase() === mappedHandle) {
+                        return true;
+                    }
+                }
+            }
+
+            // Reverse check: if channelInfo has handle, check if mapped ID matches filter
+            if (channelInfo.handle && filter.startsWith('uc')) {
+                const handleLower = channelInfo.handle.toLowerCase();
+                const mappedId = this.channelMap[handleLower];
+                if (mappedId && mappedId === filter) {
+                    return true;
                 }
             }
 
@@ -876,6 +1032,14 @@
                 return data;
             }
 
+            // 1. HARVEST FIRST: Learn ID/Handle mappings before filtering
+            try {
+                this._harvestChannelData(data);
+            } catch (e) {
+                console.warn('FilterTube: Harvesting failed', e);
+            }
+
+            // 2. THEN FILTER
             this._log(`🔄 Starting to filter ${dataName}`);
             this.blockedCount = 0;
 
