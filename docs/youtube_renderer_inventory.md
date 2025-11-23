@@ -74,6 +74,8 @@ This document tracks which YouTube renderers/selectors FilterTube currently targ
 | `<ytd-vertical-watch-card-list-renderer>` | Watch card list container | ⚠️ **NEW** – No renderer mapping | Identify JSON key (`watchCardSectionSequenceRenderer`?) to recurse through nested items |
 | `<ytd-watch-card-rich-header-renderer>` | `watchCardRichHeaderRenderer` | ⚠️ **NEW** – missing | Header exposes channel title/handle; extend rules beyond `universalWatchCardRenderer` wrapper |
 | `<ytd-watch-card-section-sequence-renderer>` | `watchCardSectionSequenceRenderer` | ⚠️ **NEW** – missing | Sequencer groups hero + vertical list; ensure recursion so nested compact videos filter |
+| `<ytd-watch-card-rhs-panel-renderer>` | `watchCardRHPanelRenderer` | ❌ **NEW** – not parsed | New right-hand hero layout; add renderer coverage if JSON structure differs from existing watch cards |
+| `<ytd-watch-card-rhs-panel-video-renderer>` | `watchCardRHPanelVideoRenderer` | ❌ **NEW** – not parsed | Companion compact entries inside the RHS panel; map JSON keys for title/channel extraction |
 | `<ytd-horizontal-card-list-renderer>` | `horizontalCardListRenderer` | ⚠️ **NEW** – missing | Album shelf with refinement chips; need renderer coverage for card metadata |
 | `<ytd-title-and-button-list-header-renderer>` | `titleAndButtonListHeaderRenderer` | ℹ️ **NEW** | Header text like “Albums”; low priority unless chip titles require filtering |
 | `<ytd-search-refinement-card-renderer>` | `searchRefinementCardRenderer` | ❌ **NEW** – not parsed | Album/playlist cards include titles; add rules if we must block refinement results |

@@ -134,8 +134,14 @@ document.addEventListener('DOMContentLoaded', () => {
      * Shared state & element references
      */
     const state = {
+        userKeywords: [],
         keywords: [],
         channels: [],
+        hideShorts: false,
+        hideComments: false,
+        filterComments: false,
+        stats: { hiddenCount: 0, savedMinutes: 0 },
+        channelMap: {},
         sort: 'newest',
         theme: 'light'
     };
@@ -146,6 +152,22 @@ document.addEventListener('DOMContentLoaded', () => {
     // Ensure settings are loaded before performing write operations
     let settingsReady = false;
     let settingsLoadingPromise = null;
+    let isSaving = false;
+    let isInitializing = true;
+
+    const SettingsAPI = window.FilterTubeSettings || {};
+    const {
+        loadSettings: sharedLoadSettings,
+        saveSettings: sharedSaveSettings,
+        syncFilterAllKeywords: sharedSyncFilterAllKeywords,
+        extractUserKeywords: sharedExtractUserKeywords,
+        applyThemePreference: sharedApplyThemePreference,
+        setThemePreference: sharedSetThemePreference,
+        getThemePreference: sharedGetThemePreference,
+        isSettingsChange: sharedIsSettingsChange,
+        isThemeChange: sharedIsThemeChange,
+        getThemeFromChange: sharedGetThemeFromChange
+    } = SettingsAPI;
 
     const keywordListEl = document.getElementById('advancedKeywordList');
     const keywordInput = document.getElementById('advancedKeywordInput');
@@ -182,154 +204,129 @@ document.addEventListener('DOMContentLoaded', () => {
     /**
      * Settings load/save helpers
      */
-    function normalizeKeywords(rawKeywords, compiledKeywords) {
-        if (Array.isArray(rawKeywords)) {
-            return rawKeywords
-                .map(entry => {
-                    if (!entry || !entry.word) return null;
-                    const word = entry.word.trim();
-                    if (!word) return null;
-                    return {
-                        word,
-                        exact: !!entry.exact,
-                        semantic: !!entry.semantic,
-                        source: entry.source === 'channel' ? 'channel' : 'user',
-                        channelRef: entry.channelRef || null
-                    };
-                })
-                .filter(Boolean);
-        }
+    const fallbackGetChannelDerivedKey = SettingsAPI.getChannelDerivedKey || function (channel) {
+        return (channel?.id || channel?.handle || channel?.originalInput || channel?.name || '').toLowerCase();
+    };
 
-        if (Array.isArray(compiledKeywords)) {
-            return compiledKeywords
-                .map(entry => {
-                    if (!entry || typeof entry.pattern !== 'string') return null;
-                    const isExact = entry.pattern.startsWith('\\b') && entry.pattern.endsWith('\\b');
-                    const raw = entry.pattern
-                        .replace(/^\\b/, '')
-                        .replace(/\\b$/, '')
-                        .replace(/\\(.)/g, '$1');
-                    return raw ? {
-                        word: raw,
-                        exact: isExact,
-                        semantic: !!entry.semantic,
-                        source: 'user',
-                        channelRef: null
-                    } : null;
-                })
-                .filter(Boolean);
-        }
-
-        if (typeof compiledKeywords === 'string') {
-            return compiledKeywords
-                .split(',')
-                .map(k => k.trim())
-                .filter(Boolean)
-                .map(word => ({ word, exact: false, semantic: false, source: 'user', channelRef: null }));
-        }
-
-        return [];
-    }
-
-    function normalizeChannels(rawChannels) {
-        if (Array.isArray(rawChannels)) {
-            return rawChannels
-                .map(ch => {
-                    if (typeof ch === 'string') {
-                        const trimmed = ch.trim();
-                        // Legacy string format - convert to object
-                        return { name: trimmed, id: trimmed, handle: null, logo: null, filterAll: false, originalInput: trimmed };
-                    } else if (ch && typeof ch === 'object') {
-                        // Already an object - ensure it has all fields including filterAll and logo
-                        return {
-                            name: ch.name || ch.id,
-                            id: ch.id,
-                            handle: ch.handle || null,
-                            logo: ch.logo || null,
-                            filterAll: !!ch.filterAll, // Preserve filterAll property
-                            originalInput: ch.originalInput || ch.id || ch.handle || null
-                        };
-                    }
-                    return null;
-                })
-                .filter(Boolean);
-        }
-
-        if (typeof rawChannels === 'string') {
-            return rawChannels
-                .split(',')
-                .map(ch => {
-                    const trimmed = ch.trim();
-                    return { name: trimmed, id: trimmed, handle: null, logo: null, filterAll: false, originalInput: trimmed };
-                })
-                .filter(ch => ch.name);
-        }
-
-        return [];
-    }
-
-    function compileKeywords(keywords) {
-        return keywords
-            .filter(k => k && k.word)
-            .map(k => {
-                const escaped = k.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                return {
-                    pattern: k.exact ? `\\b${escaped}\\b` : escaped,
-                    flags: 'i'
-                };
-            });
-    }
-
-    function getChannelDerivedKey(channel) {
-        return (channel.id || channel.handle || channel.originalInput || channel.name || '').toLowerCase();
-    }
-
-    function getChannelKeywordWord(channel) {
-        if (channel.name && channel.name !== channel.id) {
-            return channel.name;
-        }
-        if (channel.handle) {
-            return channel.handle;
-        }
+    const fallbackGetChannelKeywordWord = SettingsAPI.getChannelKeywordWord || function (channel) {
+        if (!channel) return '';
+        if (channel.name && channel.name !== channel.id) return channel.name;
+        if (channel.handle) return channel.handle;
         return channel.id || channel.originalInput || '';
-    }
+    };
 
-    function syncFilterAllKeywords() {
-        if (!Array.isArray(state.channels)) return;
-
-        const activeKeys = new Set();
-
-        state.channels.forEach(channel => {
-            if (!channel || !channel.filterAll) return;
-            const key = getChannelDerivedKey(channel);
-            if (!key) return;
-            activeKeys.add(key);
-
-            const word = getChannelKeywordWord(channel);
-            if (!word) return;
-
-            const existing = state.keywords.find(entry => entry.source === 'channel' && entry.channelRef === key);
-
-            if (existing) {
-                existing.word = word;
-            } else {
-                state.keywords.push({
+    function recomputeKeywords() {
+        if (sharedSyncFilterAllKeywords) {
+            state.keywords = sharedSyncFilterAllKeywords(state.userKeywords, state.channels);
+        } else {
+            const userOnly = state.userKeywords.slice();
+            const derived = [];
+            const seen = new Set();
+            state.channels.forEach(channel => {
+                if (!channel?.filterAll) return;
+                const key = fallbackGetChannelDerivedKey(channel);
+                if (!key || seen.has(key)) return;
+                const word = fallbackGetChannelKeywordWord(channel);
+                if (!word) return;
+                seen.add(key);
+                derived.push({
                     word,
                     exact: false,
                     semantic: false,
                     source: 'channel',
                     channelRef: key
                 });
-            }
-        });
+            });
+            state.keywords = userOnly.concat(derived);
+        }
+    }
 
-        // Remove stale channel-derived keywords
-        if (activeKeys.size > 0 || state.keywords.some(entry => entry.source === 'channel')) {
-            state.keywords = state.keywords.filter(entry => {
-                if (entry.source !== 'channel') return true;
-                return activeKeys.has(entry.channelRef);
+    function sanitizeUserKeywords(keywords) {
+        if (sharedExtractUserKeywords) {
+            return sharedExtractUserKeywords(keywords);
+        }
+
+        return (keywords || [])
+            .filter(entry => entry && entry.source !== 'channel')
+            .map(entry => ({
+                word: entry.word,
+                exact: !!entry.exact,
+                semantic: !!entry.semantic,
+                source: 'user',
+                channelRef: null
+            }));
+    }
+
+    function setUserKeywords(nextKeywords) {
+        state.userKeywords = sanitizeUserKeywords(nextKeywords);
+        recomputeKeywords();
+    }
+
+    function findUserKeywordIndex(word) {
+        if (!word) return -1;
+        const target = word.toLowerCase();
+        return state.userKeywords.findIndex(entry => entry.word.toLowerCase() === target);
+    }
+
+    function applyTheme(nextTheme) {
+        const normalized = sharedApplyThemePreference ? sharedApplyThemePreference(nextTheme) : (nextTheme === 'dark' ? 'dark' : 'light');
+        state.theme = normalized;
+        if (!sharedApplyThemePreference) {
+            document.documentElement.setAttribute('data-theme', normalized);
+        }
+        if (themeToggle) {
+            themeToggle.textContent = normalized === 'dark' ? '☀️' : '🌙';
+        }
+    }
+
+    function initializeTheme() {
+        if (!themeToggle) return;
+        if (sharedGetThemePreference) {
+            sharedGetThemePreference().then(theme => {
+                state.theme = theme || state.theme;
+                applyTheme(state.theme);
             });
         }
+    }
+
+    function applyLoadedSettings(data) {
+        console.log('FilterTube Tab View: Applying loaded settings', {
+            channels: data?.channels?.length,
+            userKeywords: data?.userKeywords?.length,
+            keywords: data?.keywords?.length
+        });
+
+        setUserKeywords(data?.userKeywords || []);
+
+        // Explicitly set keywords from loaded data to ensure channel-derived keywords are included
+        if (Array.isArray(data?.keywords)) {
+            state.keywords = data.keywords.map(k => ({ ...k }));
+            console.log('FilterTube Tab View: Set keywords from loaded data', state.keywords);
+        }
+
+        state.channels = (data?.channels || []).slice();
+        state.hideShorts = !!data?.hideShorts;
+        state.hideComments = !!data?.hideComments;
+        state.filterComments = !!data?.filterComments;
+        state.stats = data?.stats || { hiddenCount: 0, savedMinutes: 0 };
+        state.channelMap = data.channelMap || {};
+        globalChannelMap = state.channelMap;
+
+        if (hideShortsToggle) hideShortsToggle.checked = state.hideShorts;
+        if (hideCommentsToggle) hideCommentsToggle.checked = state.hideComments;
+        if (filterCommentsToggle) {
+            filterCommentsToggle.checked = state.filterComments;
+            filterCommentsToggle.disabled = state.hideComments;
+        }
+
+        if (typeof data?.theme === 'string') {
+            state.theme = data.theme;
+            applyTheme(state.theme);
+        }
+
+        renderKeywordList();
+        renderChannelList();
+        updateStats();
     }
 
     function deriveChannelMapping(channel) {
@@ -368,17 +365,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function findChannelByDerivedKey(key) {
         if (!key) return null;
-        return state.channels.find(channel => getChannelDerivedKey(channel) === key) || null;
-    }
-
-    function buildCompiledSettings({ hideShorts, hideComments, filterCommentsOverride }) {
-        return {
-            filterKeywords: compileKeywords(state.keywords),
-            filterChannels: state.channels, // Send full channel objects with name, id, and handle
-            hideAllShorts: hideShorts,
-            hideAllComments: hideComments,
-            filterComments: filterCommentsOverride
-        };
+        return state.channels.find(channel => fallbackGetChannelDerivedKey(channel) === key) || null;
     }
 
     function broadcastSettings(compiledSettings) {
@@ -395,67 +382,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function initializeTheme() {
-        if (!themeToggle) return;
-        chrome.storage?.local.get(['ftThemePreference'], ({ ftThemePreference }) => {
-            const savedTheme = ftThemePreference === 'dark' ? 'dark' : 'light';
-            applyTheme(savedTheme);
-        });
-    }
-
-    function applyTheme(nextTheme) {
-        state.theme = nextTheme;
-        const root = document.documentElement;
-        root.setAttribute('data-theme', nextTheme);
-        if (themeToggle) {
-            themeToggle.textContent = nextTheme === 'dark' ? '☀️' : '🌙';
-        }
-    }
-
     function loadSettings() {
         if (settingsReady) return Promise.resolve();
         if (settingsLoadingPromise) return settingsLoadingPromise;
 
-        settingsLoadingPromise = new Promise(resolve => {
-            chrome.storage.local.get([
-                'uiKeywords',
-                'filterKeywords',
-                'filterChannels',
-                'hideAllShorts',
-                'hideAllComments',
-                'filterComments',
-                'stats', // Load stats object
-                'channelMap' // Load channelMap for visual node mapping
-            ], result => {
-                state.keywords = normalizeKeywords(result.uiKeywords, result.filterKeywords);
-                state.channels = normalizeChannels(result.filterChannels);
-                state.stats = result.stats || { hiddenCount: 0, savedMinutes: 0 }; // Default stats
-                globalChannelMap = result.channelMap || {}; // Load channelMap
+        if (!sharedLoadSettings) {
+            console.warn('FilterTube Tab View: sharedLoadSettings unavailable');
+            settingsReady = true;
+            isInitializing = false;
+            return Promise.resolve();
+        }
 
-                if (hideShortsToggle) hideShortsToggle.checked = !!result.hideAllShorts;
-                if (hideCommentsToggle) {
-                    hideCommentsToggle.checked = !!result.hideAllComments;
-                    state.hideAllComments = !!result.hideAllComments; // Initialize state for new toggle logic
-                }
-                if (filterCommentsToggle) {
-                    filterCommentsToggle.checked = !result.hideAllComments && !!result.filterComments;
-                    filterCommentsToggle.disabled = !!result.hideAllComments; // Disable if hide all is on
-                    state.filterComments = !result.hideAllComments && !!result.filterComments; // Initialize state
-                }
-
-                if (sortSelect && sortSelect.value) {
-                    state.sort = sortSelect.value;
-                }
-
-                syncFilterAllKeywords();
-
-                renderKeywordList();
-                renderChannelList();
-                updateStats();
-
-                settingsReady = true;
-                resolve();
-            });
+        settingsLoadingPromise = sharedLoadSettings().then(data => {
+            applyLoadedSettings(data);
+            settingsReady = true;
+            isInitializing = false;
         }).finally(() => {
             settingsLoadingPromise = null;
         });
@@ -468,40 +409,31 @@ document.addEventListener('DOMContentLoaded', () => {
         await loadSettings();
     }
 
-    async function saveSettings() {
+    async function saveSettings({ broadcast = true } = {}) {
         await ensureSettingsLoaded();
-        const hideShorts = hideShortsToggle ? hideShortsToggle.checked : false;
-        const hideComments = hideCommentsToggle ? hideCommentsToggle.checked : false;
-        const filterComments = hideComments ? false : (filterCommentsToggle ? filterCommentsToggle.checked : false);
+        if (!sharedSaveSettings) return;
 
-        syncFilterAllKeywords();
+        if (isSaving) return;
+        isSaving = true;
 
-        const compiledSettings = buildCompiledSettings({
-            hideShorts,
-            hideComments,
-            filterCommentsOverride: filterComments
+        recomputeKeywords();
+
+        const { compiledSettings, error } = await sharedSaveSettings({
+            keywords: state.keywords,
+            channels: state.channels,
+            hideShorts: state.hideShorts,
+            hideComments: state.hideComments,
+            filterComments: state.filterComments
         });
 
-        const userKeywords = state.keywords.filter(entry => entry.source !== 'channel');
+        if (error) {
+            console.error('FilterTube Tab View: Failed to save settings', error);
+        } else if (broadcast && compiledSettings) {
+            broadcastSettings(compiledSettings);
+            updateStats();
+        }
 
-        await new Promise(resolve => {
-            chrome.storage.local.set({
-                uiKeywords: userKeywords,
-                filterKeywords: compiledSettings.filterKeywords,
-                filterChannels: compiledSettings.filterChannels,
-                hideAllShorts: hideShorts,
-                hideAllComments: hideComments,
-                filterComments: filterComments
-            }, () => {
-                if (chrome.runtime.lastError) {
-                    console.error('FilterTube Tab View: Failed to save settings', chrome.runtime.lastError);
-                } else {
-                    broadcastSettings(compiledSettings);
-                    updateStats();
-                }
-                resolve();
-            });
-        });
+        isSaving = false;
     }
 
     /**
@@ -517,11 +449,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (state.sort === 'az') {
             filtered.sort((a, b) => a.word.localeCompare(b.word));
         } else if (state.sort === 'oldest') {
-            // Keep original order (oldest first)
-            // No-op - array is already in chronological order
-        } else {
-            // Newest first (default)
+            // Reverse to show oldest first (array is naturally newest-first)
             filtered.reverse();
+        } else {
+            // Newest first (default) - no-op, array is already newest-first
+            // Keep natural order
         }
 
         return filtered;
@@ -561,12 +493,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 const badge = document.createElement('span');
                 badge.className = 'channel-derived-badge';
                 badge.textContent = 'Filter All';
+                badge.title = 'This keyword was automatically added from "Filter All Content" on a channel';
                 left.appendChild(badge);
 
                 if (channel) {
                     const originLabel = document.createElement('span');
                     originLabel.className = 'channel-derived-origin';
                     originLabel.textContent = `Linked to ${channel.name || channel.handle || channel.id}`;
+                    originLabel.title = `This keyword filters content mentioning "${entry.word}" - automatically synced with channel's "Filter All Content" setting`;
                     left.appendChild(originLabel);
                 }
 
@@ -578,10 +512,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 const exactToggle = document.createElement('div');
                 exactToggle.className = `exact-toggle ${entry.exact ? 'active' : ''}`;
                 exactToggle.textContent = 'Exact';
-                exactToggle.title = 'Toggle exact match';
-                exactToggle.addEventListener('click', () => {
-                    state.keywords[originalIndex].exact = !state.keywords[originalIndex].exact;
-                    saveSettings();
+                exactToggle.title = entry.exact
+                    ? `Exact match enabled: Only filters when "${entry.word}" appears as a complete word`
+                    : `Partial match enabled: Filters "${entry.word}" anywhere in text (e.g., "Shakira" matches "Shakira Concert")`;
+                exactToggle.addEventListener('click', async () => {
+                    if (entry.source === 'channel') return;
+                    const userIndex = findUserKeywordIndex(entry.word);
+                    if (userIndex === -1) return;
+                    state.userKeywords[userIndex].exact = !state.userKeywords[userIndex].exact;
+                    recomputeKeywords();
+                    await saveSettings();
                     renderKeywordList();
                 });
 
@@ -596,9 +536,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const deleteBtn = document.createElement('button');
                 deleteBtn.className = 'btn-text danger';
                 deleteBtn.textContent = 'Remove';
-                deleteBtn.addEventListener('click', () => {
-                    state.keywords.splice(originalIndex, 1);
-                    saveSettings();
+                deleteBtn.addEventListener('click', async () => {
+                    if (entry.source === 'channel') return;
+                    const userIndex = findUserKeywordIndex(entry.word);
+                    if (userIndex === -1) return;
+                    state.userKeywords.splice(userIndex, 1);
+                    recomputeKeywords();
+                    await saveSettings();
                     renderKeywordList();
                 });
 
@@ -631,14 +575,15 @@ document.addEventListener('DOMContentLoaded', () => {
      * Event wiring
      */
     if (addKeywordBtn) {
-        addKeywordBtn.addEventListener('click', () => {
+        addKeywordBtn.addEventListener('click', async () => {
             const word = (keywordInput?.value || '').trim();
             if (!word) return;
-            if (state.keywords.some(k => k.source !== 'channel' && k.word.toLowerCase() === word.toLowerCase())) return;
+            if (state.userKeywords.some(k => k.word.toLowerCase() === word.toLowerCase())) return;
 
-            state.keywords.push({ word, exact: false, semantic: false, source: 'user', channelRef: null });
+            state.userKeywords.unshift({ word, exact: false, semantic: false, source: 'user', channelRef: null }); // Add to beginning for newest-first order
+            recomputeKeywords();
             if (keywordInput) keywordInput.value = '';
-            saveSettings();
+            await saveSettings();
             renderKeywordList();
 
             // Flash success feedback
@@ -678,11 +623,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (sortMode === 'az') {
             displayChannels.sort((a, b) => (a.name || a.id).localeCompare(b.name || b.id));
         } else if (sortMode === 'oldest') {
-            // Assuming array order is chronological
-            // No-op for oldest first
-        } else {
-            // Newest first (default)
+            // Reverse to show oldest first (array is naturally newest-first)
             displayChannels.reverse();
+        } else {
+            // Newest first (default) - no-op, array is already newest-first
+            // Keep natural order
         }
 
         if (displayChannels.length === 0) {
@@ -731,8 +676,8 @@ document.addEventListener('DOMContentLoaded', () => {
             deleteBtn.addEventListener('click', async () => {
                 await ensureSettingsLoaded();
                 state.channels.splice(originalIndex, 1);
-                syncFilterAllKeywords();
-                saveSettings();
+                recomputeKeywords();
+                await saveSettings();
                 renderChannelList();
                 renderKeywordList();
             });
@@ -772,6 +717,7 @@ document.addEventListener('DOMContentLoaded', () => {
             sourceText.className = 'node-source-text';
             const sourceLabel = mapping.source || channel.originalInput || channel.handle || channel.id || channel.name || '';
             sourceText.textContent = sourceLabel;
+            sourceText.title = `What you entered: ${sourceLabel}`;
 
             // CONNECTOR (Green Arrow - only show if we have a mapping)
             if (partnerValue) {
@@ -785,6 +731,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const targetBadge = document.createElement('span');
                 targetBadge.className = 'node-badge resolved';
                 targetBadge.textContent = partnerValue;
+                targetBadge.title = mapping.target === channel.id
+                    ? `Channel UC ID: ${partnerValue} (auto-resolved)`
+                    : `Channel Handle: ${partnerValue} (auto-resolved)`;
                 nodeContainer.appendChild(targetBadge);
             } else {
                 // No mapping yet - just show source
@@ -807,12 +756,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span class="pill-icon">${channel.filterAll ? '✓' : '○'}</span>
                 <span class="pill-text">Filter all content</span>
             `;
-            pillBtn.title = 'Also block videos mentioning this channel name';
+            pillBtn.title = `${channel.filterAll ? 'Enabled' : 'Disabled'}: Also filter videos that mention "${channel.name || channel.handle || channel.id}" in title/description (uses partial/substring matching)`;
             pillBtn.addEventListener('click', async () => {
                 await ensureSettingsLoaded();
                 state.channels[originalIndex].filterAll = !state.channels[originalIndex].filterAll;
-                syncFilterAllKeywords();
-                saveSettings();
+                recomputeKeywords();
+                await saveSettings(); // Wait for save to complete before rendering
                 renderChannelList(); // Re-render to update style
                 renderKeywordList();
             });
@@ -937,7 +886,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 originalInput: val // Store the original user input
             };
 
-            state.channels.push(channelEntry);
+            state.channels.unshift(channelEntry); // Add to beginning for newest-first order
             if (channelInput) channelInput.value = '';
 
             // Re-enable button
@@ -945,7 +894,7 @@ document.addEventListener('DOMContentLoaded', () => {
             addChannelBtn.textContent = originalText;
 
             // Save settings first
-            syncFilterAllKeywords();
+            recomputeKeywords();
             saveSettings();
 
             // Reload the channelMap from storage to get the latest mappings
@@ -976,11 +925,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (clearKeywordsBtn) {
-        clearKeywordsBtn.addEventListener('click', () => {
-            if (!state.keywords.length) return;
+        clearKeywordsBtn.addEventListener('click', async () => {
+            if (!state.userKeywords.length) return;
             if (!confirm('Delete all keywords? This cannot be undone.')) return;
-            state.keywords = [];
-            saveSettings();
+            setUserKeywords([]);
+            await saveSettings();
             renderKeywordList();
         });
     }
@@ -991,8 +940,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!state.channels.length) return;
             if (!confirm('Delete all blocked channels? This cannot be undone.')) return;
             state.channels = [];
-            syncFilterAllKeywords();
-            saveSettings();
+            recomputeKeywords();
+            await saveSettings();
             renderChannelList();
             renderKeywordList();
         });
@@ -1013,15 +962,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    hideShortsToggle?.addEventListener('change', saveSettings);
+    if (hideShortsToggle) {
+        hideShortsToggle.addEventListener('change', async () => {
+            await ensureSettingsLoaded();
+            state.hideShorts = hideShortsToggle.checked;
+            await saveSettings();
+        });
+    }
     // --- Toggle Logic ---
     if (hideCommentsToggle && filterCommentsToggle) {
         hideCommentsToggle.addEventListener('change', async () => {
             await ensureSettingsLoaded();
-            state.hideAllComments = hideCommentsToggle.checked;
+            state.hideComments = hideCommentsToggle.checked;
 
             // Instant Feedback: Disable filter toggle if hide all is on
-            if (state.hideAllComments) {
+            if (state.hideComments) {
                 filterCommentsToggle.checked = false;
                 filterCommentsToggle.disabled = true;
                 state.filterComments = false; // Force state update
@@ -1029,14 +984,118 @@ document.addEventListener('DOMContentLoaded', () => {
                 filterCommentsToggle.disabled = false;
             }
 
-            saveSettings();
+            await saveSettings();
         });
 
         filterCommentsToggle.addEventListener('change', async () => {
             await ensureSettingsLoaded();
             state.filterComments = filterCommentsToggle.checked;
-            saveSettings();
+            await saveSettings();
         });
     }
+
+    // Listen for storage changes from popup or other sources
+    chrome.storage.onChanged.addListener(async (changes, area) => {
+        if (area !== 'local' || isSaving || isInitializing) return;
+
+        const hasSettingsChange = sharedIsSettingsChange ? sharedIsSettingsChange(changes) : Object.keys(changes).some(key => ['uiKeywords', 'filterKeywords', 'filterChannels', 'hideAllShorts', 'hideAllComments', 'filterComments', 'stats', 'channelMap'].includes(key));
+        const hasThemeChange = sharedIsThemeChange ? sharedIsThemeChange(changes) : changes.hasOwnProperty('ftThemePreference');
+
+        if (hasThemeChange) {
+            const newTheme = sharedGetThemeFromChange ? sharedGetThemeFromChange(changes) : (changes.ftThemePreference?.newValue || 'light');
+            applyTheme(newTheme);
+        }
+
+        if (hasSettingsChange) {
+            console.log('FilterTube Tab View: Detected settings change from popup/external source');
+
+            // Reload settings from storage
+            const data = await (sharedLoadSettings ? sharedLoadSettings() : Promise.resolve({}));
+            if (!data) return;
+
+            // Only update channels if they changed
+            if (changes.filterChannels) {
+                const newChannels = data.channels || [];
+                let enriched = false;
+
+                // Enrich any channels that need fetching (added from popup without details)
+                for (let i = 0; i < newChannels.length; i++) {
+                    const channel = newChannels[i];
+
+                    // If channel doesn't have enriched data and looks like it needs fetching
+                    if (channel && (!channel.logo || channel.name === channel.id)) {
+                        const originalInput = channel.originalInput || channel.id || channel.handle;
+
+                        if (!originalInput) continue;
+
+                        try {
+                            const response = await chrome.runtime.sendMessage({
+                                action: "fetchChannelDetails",
+                                channelIdOrHandle: originalInput
+                            });
+
+                            if (response.success && response.id) {
+                                // Update the channel with fetched data while PRESERVING originalInput
+                                newChannels[i] = {
+                                    ...channel,
+                                    name: response.name || channel.name,
+                                    id: response.id,
+                                    handle: response.handle || channel.handle,
+                                    logo: response.logo || channel.logo,
+                                    originalInput: originalInput // PRESERVE what user entered
+                                };
+
+                                console.log('FilterTube Tab View: Enriched channel from popup:', newChannels[i]);
+                                enriched = true;
+
+                                // Update channelMap
+                                if (response.handle && response.id) {
+                                    const currentMap = globalChannelMap || {};
+                                    const keyId = response.id.toLowerCase();
+                                    const keyHandle = response.handle.toLowerCase();
+                                    currentMap[keyId] = response.handle;
+                                    currentMap[keyHandle] = response.id;
+                                    globalChannelMap = currentMap;
+                                    await chrome.storage.local.set({ channelMap: currentMap });
+                                }
+                            }
+                        } catch (error) {
+                            console.warn('FilterTube Tab View: Could not enrich channel:', error);
+                        }
+                    }
+                }
+
+                // Update state and save enriched channels back to storage
+                state.channels = newChannels;
+                state.channelMap = data.channelMap || {};
+                globalChannelMap = state.channelMap;
+
+                // Save the enriched channels back (without triggering another save loop)
+                if (enriched) {
+                    await chrome.storage.local.set({ filterChannels: newChannels });
+                }
+            }
+
+            // Update other state from loaded data
+            applyLoadedSettings(data);
+        }
+    });
+
+    if (themeToggle) {
+        themeToggle.addEventListener('click', async () => {
+            await ensureSettingsLoaded();
+            const nextTheme = state.theme === 'dark' ? 'light' : 'dark';
+            state.theme = nextTheme;
+            applyTheme(nextTheme);
+            if (sharedSetThemePreference) {
+                await sharedSetThemePreference(nextTheme);
+            } else {
+                chrome.storage?.local.set({ [SettingsAPI.THEME_KEY || 'ftThemePreference']: nextTheme });
+            }
+        });
+    }
+
+    // Kick off initial state load so the tab view reflects saved settings immediately
+    loadSettings();
 });
 
