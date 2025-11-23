@@ -553,11 +553,21 @@
                 }).filter(regex => regex !== null);
             }
 
-            // Process channel names to lowercase for matching
+            // Ensure filterChannels are objects with all properties, and can be matched case-insensitively
             if (settings.filterChannels && Array.isArray(settings.filterChannels)) {
-                processed.filterChannels = settings.filterChannels.map(ch =>
-                    typeof ch === 'string' ? ch.toLowerCase() : ch
-                ).filter(ch => ch);
+                processed.filterChannels = settings.filterChannels.map(ch => {
+                    // Convert legacy string format to object if necessary
+                    if (typeof ch === 'string') {
+                        return { name: ch, id: ch, handle: null, logo: null, filterAll: false };
+                    }
+                    // For objects, ensure properties exist for later matching (e.g., lowercasing for internal checks)
+                    return {
+                        ...ch,
+                        id: ch.id ? ch.id.toLowerCase() : '',
+                        handle: ch.handle ? ch.handle.toLowerCase() : '',
+                        name: ch.name ? ch.name.toLowerCase() : '', // Lowercase name for internal matching consistency
+                    };
+                }).filter(ch => ch);
             }
 
             return processed;

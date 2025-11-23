@@ -416,9 +416,10 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: var(--ft-space-md);
     padding: var(--ft-space-md);
-    background-color: var(--ft-color-bg-base);
     border-radius: var(--ft-radius-md);
+    background-color: var(--ft-color-bg-surface);
     border: 1px solid transparent;
 }
 
@@ -430,6 +431,51 @@ body {
 .item-word {
     font-weight: 500;
     font-size: var(--ft-font-size-base);
+}
+
+.list-item.channel-derived {
+    border-color: rgba(34, 197, 94, 0.25);
+    background: rgba(220, 252, 231, 0.6);
+}
+
+:root[data-theme="dark"] .list-item.channel-derived {
+    border-color: rgba(34, 197, 94, 0.45);
+    background: rgba(21, 128, 61, 0.22);
+}
+
+.list-item.channel-derived .item-left {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
+}
+
+.channel-derived-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    background: rgba(34, 197, 94, 0.2);
+    color: #166534;
+}
+
+:root[data-theme="dark"] .channel-derived-badge {
+    background: rgba(34, 197, 94, 0.35);
+    color: #bbf7d0;
+}
+
+.channel-derived-origin {
+    font-size: 12px;
+    color: var(--ft-color-text-secondary);
+}
+
+:root[data-theme="dark"] .channel-derived-origin {
+    color: #cbd5f5;
 }
 
 .item-controls {
@@ -678,7 +724,7 @@ input:checked+.slider:before {
     font-family: 'Roboto Mono', 'Courier New', monospace;
     font-size: 13px;
     font-weight: 600;
-    color: #1e293b;
+    color: var(--ft-color-text-primary);
 }
 
 /* Connector Arrow */
@@ -724,7 +770,7 @@ input:checked+.slider:before {
     border-radius: 6px;
     font-weight: 600;
     background: #dcfce7;
-    color: #15803d;
+    color: #166534;
     border: 1px solid #86efac;
     box-shadow: 0 1px 2px rgba(0,0,0,0.05);
     max-width: 180px;
@@ -733,11 +779,22 @@ input:checked+.slider:before {
     white-space: nowrap;
 }
 
+:root[data-theme="dark"] .node-badge.resolved {
+    background: rgba(34, 197, 94, 0.18);
+    color: #bbf7d0;
+    border-color: rgba(34, 197, 94, 0.45);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
 /* Pending text */
 .node-pending-text {
     color: #94a3b8;
     font-style: italic;
     font-size: 13px;
+}
+
+:root[data-theme="dark"] .node-pending-text {
+    color: #cbd5f5;
 }
 
 /* 2. The Pill Button */
@@ -766,6 +823,18 @@ input:checked+.slider:before {
     background: #fff1f2;
     border-color: #fda4af;
     color: #e11d48;
+}
+
+:root[data-theme="dark"] .filter-pill {
+    background: rgba(148, 163, 184, 0.1);
+    border-color: rgba(148, 163, 184, 0.35);
+    color: var(--ft-color-text-secondary);
+}
+
+:root[data-theme="dark"] .filter-pill.active {
+    background: rgba(244, 114, 182, 0.2);
+    border-color: rgba(244, 114, 182, 0.5);
+    color: #fbcfe8;
 }
 
 .filter-pill .pill-icon {

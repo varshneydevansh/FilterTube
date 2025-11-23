@@ -100,20 +100,25 @@ async function getCompiledSettings() {
             if (Array.isArray(storedChannels)) {
                 compiledChannels = storedChannels.map(ch => {
                     if (typeof ch === 'string') {
+                        const trimmed = ch.trim();
                         // Legacy string format - convert to object format
                         return {
-                            name: ch.trim(),
-                            id: ch.trim(), // Preserve case for UC IDs
+                            name: trimmed,
+                            id: trimmed, // Preserve case for UC IDs
                             handle: null,
-                            filterAll: false
+                            logo: null,
+                            filterAll: false,
+                            originalInput: trimmed
                         };
                     } else if (ch && typeof ch === 'object') {
                         // New object format - preserve the original case for IDs
                         const channelObj = {
                             name: ch.name,
                             id: ch.id || '', // Preserve case for UC IDs
-                            handle: (ch.handle || '').toLowerCase() || null, // Lowercase handles for consistency
-                            filterAll: !!ch.filterAll
+                            handle: ch.handle ? ch.handle.toLowerCase() : null, // Lowercase handles for consistency
+                            logo: ch.logo || null,
+                            filterAll: !!ch.filterAll,
+                            originalInput: ch.originalInput || ch.id || ch.handle || ch.name || null
                         };
 
                         // If filterAll is enabled, add the channel name to keywords
@@ -299,6 +304,17 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
         return false; // No response needed
     }
 
+    else if (request.action === "fetchChannelDetails") {
+        console.log("FilterTube Background: Received fetchChannelDetails request for:", request.channelIdOrHandle);
+        fetchChannelInfo(request.channelIdOrHandle).then(channelInfo => {
+            sendResponse(channelInfo);
+        }).catch(error => {
+            console.error("FilterTube Background: Error fetching channel details:", error);
+            sendResponse({ success: false, error: error.message || "Failed to fetch channel details." });
+        });
+        return true; // Indicates that the response is sent asynchronously.
+    }
+
     // Handle any browser-specific actions if needed
     if (request.action === "getBrowserInfo") {
         sendResponse({
@@ -332,6 +348,329 @@ browserAPI.storage.onChanged.addListener((changes, area) => {
         }
     }
 });
+
+// Listen for storage changes to re-compile settings
+browserAPI.storage.onChanged.addListener((changes, area) => {
+    if (area === 'local') {
+        const relevantKeys = ['filterKeywords', 'filterChannels', 'hideAllComments', 'filterComments', 'useExactWordMatching', 'hideAllShorts'];
+        let settingsChanged = false;
+        for (const key of relevantKeys) {
+            if (changes[key]) {
+                settingsChanged = true;
+                console.log(`FilterTube Background: Setting changed - ${key}:`, changes[key]);
+                break;
+            }
+        }
+
+        if (settingsChanged) {
+            console.log('FilterTube Background: Settings changed, re-compiling.');
+            getCompiledSettings().then(compiledSettings => {
+                console.log('FilterTube Background: New compiled settings ready');
+                // The content_bridge.js will request these updated settings on its own
+                // via storage.onChanged listener and chrome.runtime.sendMessage
+            });
+        }
+    }
+});
+
+/**
+ * Fetch channel name and handle from YouTube by scraping the channel page
+ * More reliable than API calls which can be blocked
+ */
+async function fetchChannelInfo(channelIdOrHandle) {
+    try {
+        // Determine if it's a handle or a UC ID
+        const isHandle = channelIdOrHandle.startsWith('@');
+        let cleanId = channelIdOrHandle.replace(/^channel\//i, ''); // cleanId is input without "channel/"
+        let channelUrl = '';
+        let resolvedChannelId = null; // Initialize early
+
+        // If the input itself is a UC ID, use it directly as the resolved ID and construct canonical URL
+        if (cleanId.toUpperCase().startsWith('UC') && cleanId.length === 24) { // UC + 22 chars
+            resolvedChannelId = cleanId;
+            channelUrl = `https://www.youtube.com/channel/${resolvedChannelId}`;
+        } else if (isHandle) {
+            // For handles, construct URL for the /about page to resolve to UC ID
+            const handleWithoutAt = cleanId.substring(1);
+            channelUrl = `https://www.youtube.com/@${handleWithoutAt}/about`;
+        } else {
+            // If it's not a handle and not a direct UC ID, assume it's a malformed URL or invalid ID initially
+            // We'll still try to fetch, but resolvedChannelId will remain null unless found in page data
+            channelUrl = `https://www.youtube.com/channel/${cleanId}`; // Best guess for URL
+        }
+
+        console.log('FilterTube Background: Fetching channel info for:', cleanId);
+
+        // Fetch the channel page HTML
+        const response = await fetch(channelUrl);
+
+        if (!response.ok) {
+            console.error('FilterTube Background: Failed to fetch channel page:', response.status, response.statusText);
+            return { success: false, error: `Failed to fetch channel page: ${response.status}` };
+        }
+
+        const html = await response.text();
+
+        // Extract ytInitialData from the page using a more robust method
+        let data = null;
+
+        // Helper function to extract JSON with balanced braces
+        function extractJSON(text, startPattern) {
+            const startIndex = text.search(startPattern);
+            if (startIndex === -1) return null;
+
+            const jsonStart = text.indexOf('{', startIndex);
+            if (jsonStart === -1) return null;
+
+            let depth = 0;
+            let inString = false;
+            let escapeNext = false;
+
+            for (let i = jsonStart; i < text.length; i++) {
+                const char = text[i];
+
+                if (escapeNext) {
+                    escapeNext = false;
+                    continue;
+                }
+
+                if (char === '\\') {
+                    escapeNext = true;
+                    continue;
+                }
+
+                if (char === '"') {
+                    inString = !inString;
+                    continue;
+                    }
+
+                if (!inString) {
+                    if (char === '{') depth++;
+                    else if (char === '}') {
+                        depth--;
+                        if (depth === 0) {
+                            return text.substring(jsonStart, i + 1);
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        // Try different patterns
+        const patterns = [
+            /var ytInitialData\s*=/,
+            /window\["ytInitialData"\]\s*=/,
+            /ytInitialData"\s*:/
+        ];
+
+        for (const pattern of patterns) {
+            const jsonStr = extractJSON(html, pattern);
+            if (jsonStr) {
+                try {
+                    data = JSON.parse(jsonStr);
+                    console.log('FilterTube Background: Successfully extracted ytInitialData using pattern:', pattern);
+                    break;
+                } catch (e) {
+                    console.warn('FilterTube Background: Failed to parse JSON for pattern:', pattern, e.message);
+                }
+            }
+        }
+
+        if (!data) {
+            console.error('FilterTube Background: Could not extract ytInitialData from page');
+            return { success: false, error: 'Could not extract channel data' };
+        }
+
+        let channelName = null;
+        let channelHandle = null;
+        let channelLogo = null;
+
+        // --- BLOCK 1: Metadata Renderer (Standard & Most Reliable) ---
+        const metadata = data?.metadata?.channelMetadataRenderer;
+        if (metadata) {
+            console.log('FilterTube Background: Found metadata:', metadata);
+
+            // Name
+            if (metadata.title) {
+                channelName = metadata.title;
+                console.log('FilterTube Background: Got name from metadata:', channelName);
+            }
+
+            // Handle from vanityChannelUrl
+            if (metadata.vanityChannelUrl) {
+                const match = metadata.vanityChannelUrl.match(/@([^/]+)/);
+                if (match) {
+                    channelHandle = '@' + match[1];
+                    console.log('FilterTube Background: Got handle from metadata:', channelHandle);
+                }
+            }
+
+            // Resolved Channel ID (from the canonical link)
+            if (metadata.canonicalUrl) {
+                const match = metadata.canonicalUrl.match(/channel\/(UC[\w-]{22})/);
+                if (match) {
+                    resolvedChannelId = match[1];
+                    console.log('FilterTube Background: Got resolvedChannelId from metadata:', resolvedChannelId);
+                }
+            }
+
+            // Logo (Avatar)
+            if (metadata.avatar?.thumbnails?.length > 0) {
+                channelLogo = metadata.avatar.thumbnails[metadata.avatar.thumbnails.length - 1].url;
+                console.log('FilterTube Background: Got logo from metadata:', channelLogo);
+            }
+        } else {
+            console.log('FilterTube Background: No metadata block found');
+        }
+
+        // --- BLOCK 2: Page Header ViewModel (New YouTube Structure) ---
+        if (!channelName || !channelLogo || !resolvedChannelId) {
+            const pageHeader = data?.header?.pageHeaderRenderer?.content?.pageHeaderViewModel;
+
+            if (pageHeader) {
+                console.log('FilterTube Background: Found pageHeaderViewModel:', pageHeader);
+
+                // Name from ViewModel
+                if (!channelName && pageHeader.title?.dynamicTextViewModel?.text?.content) {
+                    channelName = pageHeader.title.dynamicTextViewModel.text.content;
+                }
+
+                // Handle from metadata rows
+                if (!channelHandle) {
+                    const metadataRows = pageHeader.metadata?.contentMetadataViewModel?.metadataRows;
+                    if (metadataRows && metadataRows.length > 0) {
+                        const handlePart = metadataRows[0]?.metadataParts?.[0]?.text?.content;
+                        if (handlePart && handlePart.startsWith('@')) {
+                            channelHandle = handlePart;
+                        }
+                    }
+                }
+
+                // Resolved Channel ID from ViewModel
+                if (!resolvedChannelId) {
+                    const canonicalUrl = pageHeader.actions?.channelHeaderMenuViewModel?.primaryNavigationButtons?.[0]?.buttonViewModel?.command?.urlEndpoint?.url;
+                    if (canonicalUrl) {
+                        const match = canonicalUrl.match(/channel\/(UC[\w-]{22})/);
+                        if (match) {
+                            resolvedChannelId = match[1];
+                        }
+                    }
+                }
+
+                // Logo from decoratedAvatarViewModel
+                if (!channelLogo) {
+                    const sources = pageHeader.image?.decoratedAvatarViewModel?.avatar?.avatarViewModel?.image?.sources;
+                    if (sources && sources.length > 0) {
+                        channelLogo = sources[sources.length - 1].url;
+                    }
+                }
+            }
+        }
+
+        // --- BLOCK 3: Legacy Headers (c4TabbedHeaderRenderer / pageHeaderRenderer) ---
+        if (!channelName || !channelLogo || !resolvedChannelId) {
+            const header = data?.header?.c4TabbedHeaderRenderer || data?.header?.pageHeaderRenderer;
+            if (header) {
+                console.log('FilterTube Background: Trying legacy header:', header);
+
+                // Name
+                if (!channelName) {
+                    channelName = header.title || header.channelTitle?.simpleText || header.pageTitle;
+                }
+
+                // Handle
+                if (!channelHandle) {
+                    if (header.channelHandleText?.runs?.[0]?.text) {
+                        channelHandle = header.channelHandleText.runs[0].text;
+                    } else if (header.handle?.simpleText) {
+                        channelHandle = header.handle.simpleText;
+                    }
+                }
+
+                // Resolved Channel ID
+                if (!resolvedChannelId && header.channelId) { // c4TabbedHeaderRenderer has channelId directly
+                    resolvedChannelId = header.channelId;
+                } else if (!resolvedChannelId && header.url) { // pageHeaderRenderer might have it in URL
+                    const match = header.url.match(/channel\/(UC[\w-]{22})/);
+                    if (match) {
+                        resolvedChannelId = match[1];
+                    }
+                }
+
+                // Logo
+                if (!channelLogo && header.avatar?.thumbnails?.length > 0) {
+                    channelLogo = header.avatar.thumbnails[header.avatar.thumbnails.length - 1].url;
+                }
+            }
+        }
+
+        // --- BLOCK 4: Microformat (Backup) ---
+        if (!channelName || !channelHandle || !resolvedChannelId) {
+            const microformat = data?.microformat?.microformatDataRenderer;
+            if (microformat) {
+                console.log('FilterTube Background: Trying microformat:', microformat);
+
+                if (!channelName) {
+                    channelName = microformat.title;
+                }
+
+                if (!channelHandle && microformat.vanityChannelUrl) {
+                    const match = microformat.vanityChannelUrl.match(/@([^/]+)/);
+                    if (match) channelHandle = '@' + match[1];
+                }
+
+                if (!resolvedChannelId && microformat.url) {
+                    const match = microformat.url.match(/channel\/(UC[\w-]{22})/);
+                    if (match) {
+                        resolvedChannelId = match[1];
+                    }
+                }
+
+                if (!channelLogo && microformat.thumbnail?.thumbnails?.length > 0) {
+                    channelLogo = microformat.thumbnail.thumbnails[microformat.thumbnail.thumbnails.length - 1].url;
+                }
+            }
+        }
+
+        // --- Try to find UC ID directly in HTML if not found yet (especially for handles) ---
+        if (!resolvedChannelId) {
+            const match = html.match(/\/channel\/(UC[\w-]{22})/);
+            if (match && match[1]) {
+                resolvedChannelId = match[1];
+                console.log('FilterTube Background: Got resolvedChannelId from direct HTML match:', resolvedChannelId);
+            }
+        }
+
+        // Fallback to original cleanId if it looks like a UC ID and resolvedChannelId is still missing
+        // This is now less critical as direct UC ID is handled at the start
+        if (!resolvedChannelId && cleanId.toUpperCase().startsWith('UC') && cleanId.length === 24) {
+             resolvedChannelId = cleanId;
+             console.log('FilterTube Background: Falling back to cleanId as resolvedChannelId:', resolvedChannelId);
+        }
+
+
+        console.log('FilterTube Background: Extracted -', { name: channelName, handle: channelHandle, logo: channelLogo, resolvedChannelId: resolvedChannelId });
+
+        if (!resolvedChannelId) {
+            console.error('FilterTube Background: Could not resolve actual Channel ID from page data.');
+            return { success: false, error: 'Could not resolve actual Channel ID.' };
+        }
+
+        return {
+            success: true,
+            name: channelName || resolvedChannelId, // Fallback to ID if name fails
+            id: resolvedChannelId,
+            handle: channelHandle,
+            logo: channelLogo
+        };
+    } catch (error) {
+        console.error('FilterTube Background: Failed to fetch channel info:', error);
+        return { success: false, error: error.message || 'Unknown error during channel info fetch.' };
+    }
+}
+
 
 console.log(`FilterTube Background ${IS_FIREFOX ? 'Script' : 'Service Worker'} loaded and ready to serve filtered content.`);
 

@@ -143,6 +143,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Global channelMap for visual node mapping
     let globalChannelMap = {};
 
+    // Ensure settings are loaded before performing write operations
+    let settingsReady = false;
+    let settingsLoadingPromise = null;
+
     const keywordListEl = document.getElementById('advancedKeywordList');
     const keywordInput = document.getElementById('advancedKeywordInput');
     const addKeywordBtn = document.getElementById('advancedAddBtn');
@@ -181,7 +185,18 @@ document.addEventListener('DOMContentLoaded', () => {
     function normalizeKeywords(rawKeywords, compiledKeywords) {
         if (Array.isArray(rawKeywords)) {
             return rawKeywords
-                .map(entry => (entry && entry.word ? { word: entry.word.trim(), exact: !!entry.exact } : null))
+                .map(entry => {
+                    if (!entry || !entry.word) return null;
+                    const word = entry.word.trim();
+                    if (!word) return null;
+                    return {
+                        word,
+                        exact: !!entry.exact,
+                        semantic: !!entry.semantic,
+                        source: entry.source === 'channel' ? 'channel' : 'user',
+                        channelRef: entry.channelRef || null
+                    };
+                })
                 .filter(Boolean);
         }
 
@@ -194,7 +209,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         .replace(/^\\b/, '')
                         .replace(/\\b$/, '')
                         .replace(/\\(.)/g, '$1');
-                    return raw ? { word: raw, exact: isExact } : null;
+                    return raw ? {
+                        word: raw,
+                        exact: isExact,
+                        semantic: !!entry.semantic,
+                        source: 'user',
+                        channelRef: null
+                    } : null;
                 })
                 .filter(Boolean);
         }
@@ -204,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 .split(',')
                 .map(k => k.trim())
                 .filter(Boolean)
-                .map(word => ({ word, exact: false }));
+                .map(word => ({ word, exact: false, semantic: false, source: 'user', channelRef: null }));
         }
 
         return [];
@@ -215,8 +236,9 @@ document.addEventListener('DOMContentLoaded', () => {
             return rawChannels
                 .map(ch => {
                     if (typeof ch === 'string') {
+                        const trimmed = ch.trim();
                         // Legacy string format - convert to object
-                        return { name: ch.trim(), id: ch.trim(), handle: null, logo: null, filterAll: false };
+                        return { name: trimmed, id: trimmed, handle: null, logo: null, filterAll: false, originalInput: trimmed };
                     } else if (ch && typeof ch === 'object') {
                         // Already an object - ensure it has all fields including filterAll and logo
                         return {
@@ -224,7 +246,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             id: ch.id,
                             handle: ch.handle || null,
                             logo: ch.logo || null,
-                            filterAll: !!ch.filterAll // Preserve filterAll property
+                            filterAll: !!ch.filterAll, // Preserve filterAll property
+                            originalInput: ch.originalInput || ch.id || ch.handle || null
                         };
                     }
                     return null;
@@ -235,7 +258,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (typeof rawChannels === 'string') {
             return rawChannels
                 .split(',')
-                .map(ch => ({ name: ch.trim(), id: ch.trim(), handle: null, logo: null, filterAll: false }))
+                .map(ch => {
+                    const trimmed = ch.trim();
+                    return { name: trimmed, id: trimmed, handle: null, logo: null, filterAll: false, originalInput: trimmed };
+                })
                 .filter(ch => ch.name);
         }
 
@@ -243,13 +269,106 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function compileKeywords(keywords) {
-        return keywords.map(k => {
-            const escaped = k.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            return {
-                pattern: k.exact ? `\\b${escaped}\\b` : escaped,
-                flags: 'i'
-            };
+        return keywords
+            .filter(k => k && k.word)
+            .map(k => {
+                const escaped = k.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                return {
+                    pattern: k.exact ? `\\b${escaped}\\b` : escaped,
+                    flags: 'i'
+                };
+            });
+    }
+
+    function getChannelDerivedKey(channel) {
+        return (channel.id || channel.handle || channel.originalInput || channel.name || '').toLowerCase();
+    }
+
+    function getChannelKeywordWord(channel) {
+        if (channel.name && channel.name !== channel.id) {
+            return channel.name;
+        }
+        if (channel.handle) {
+            return channel.handle;
+        }
+        return channel.id || channel.originalInput || '';
+    }
+
+    function syncFilterAllKeywords() {
+        if (!Array.isArray(state.channels)) return;
+
+        const activeKeys = new Set();
+
+        state.channels.forEach(channel => {
+            if (!channel || !channel.filterAll) return;
+            const key = getChannelDerivedKey(channel);
+            if (!key) return;
+            activeKeys.add(key);
+
+            const word = getChannelKeywordWord(channel);
+            if (!word) return;
+
+            const existing = state.keywords.find(entry => entry.source === 'channel' && entry.channelRef === key);
+
+            if (existing) {
+                existing.word = word;
+            } else {
+                state.keywords.push({
+                    word,
+                    exact: false,
+                    semantic: false,
+                    source: 'channel',
+                    channelRef: key
+                });
+            }
         });
+
+        // Remove stale channel-derived keywords
+        if (activeKeys.size > 0 || state.keywords.some(entry => entry.source === 'channel')) {
+            state.keywords = state.keywords.filter(entry => {
+                if (entry.source !== 'channel') return true;
+                return activeKeys.has(entry.channelRef);
+            });
+        }
+    }
+
+    function deriveChannelMapping(channel) {
+        const original = channel.originalInput || channel.handle || channel.id || channel.name || '';
+        const normalizedOriginal = original.toLowerCase();
+        const resolvedId = channel.id || '';
+        const resolvedHandle = channel.handle || '';
+
+        let target = '';
+
+        if (original.startsWith('@')) {
+            target = resolvedId || '';
+        } else if (normalizedOriginal.startsWith('channel/')) {
+            target = resolvedHandle || resolvedId || '';
+        } else if (normalizedOriginal.startsWith('uc')) {
+            target = resolvedHandle || '';
+        }
+
+        if (!target) {
+            if (resolvedId && resolvedId.toLowerCase() !== normalizedOriginal) {
+                target = resolvedId;
+            } else if (resolvedHandle && resolvedHandle.toLowerCase() !== normalizedOriginal) {
+                target = resolvedHandle;
+            }
+        }
+
+        if (!target && channel.name && channel.name.toLowerCase() !== normalizedOriginal) {
+            target = channel.name;
+        }
+
+        return {
+            source: original,
+            target: target || null
+        };
+    }
+
+    function findChannelByDerivedKey(key) {
+        if (!key) return null;
+        return state.channels.find(channel => getChannelDerivedKey(channel) === key) || null;
     }
 
     function buildCompiledSettings({ hideShorts, hideComments, filterCommentsOverride }) {
@@ -294,66 +413,94 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function loadSettings() {
-        chrome.storage.local.get([
-            'uiKeywords',
-            'filterKeywords',
-            'filterChannels',
-            'hideAllShorts',
-            'hideAllComments',
-            'filterComments',
-            'stats', // Load stats object
-            'channelMap' // Load channelMap for visual node mapping
-        ], result => {
-            state.keywords = normalizeKeywords(result.uiKeywords, result.filterKeywords);
-            state.channels = normalizeChannels(result.filterChannels);
-            state.stats = result.stats || { hiddenCount: 0, savedMinutes: 0 }; // Default stats
-            globalChannelMap = result.channelMap || {}; // Load channelMap
+        if (settingsReady) return Promise.resolve();
+        if (settingsLoadingPromise) return settingsLoadingPromise;
 
-            if (hideShortsToggle) hideShortsToggle.checked = !!result.hideAllShorts;
-            if (hideCommentsToggle) {
-                hideCommentsToggle.checked = !!result.hideAllComments;
-                state.hideAllComments = !!result.hideAllComments; // Initialize state for new toggle logic
-            }
-            if (filterCommentsToggle) {
-                filterCommentsToggle.checked = !result.hideAllComments && !!result.filterComments;
-                filterCommentsToggle.disabled = !!result.hideAllComments; // Disable if hide all is on
-                state.filterComments = !result.hideAllComments && !!result.filterComments; // Initialize state
-            }
+        settingsLoadingPromise = new Promise(resolve => {
+            chrome.storage.local.get([
+                'uiKeywords',
+                'filterKeywords',
+                'filterChannels',
+                'hideAllShorts',
+                'hideAllComments',
+                'filterComments',
+                'stats', // Load stats object
+                'channelMap' // Load channelMap for visual node mapping
+            ], result => {
+                state.keywords = normalizeKeywords(result.uiKeywords, result.filterKeywords);
+                state.channels = normalizeChannels(result.filterChannels);
+                state.stats = result.stats || { hiddenCount: 0, savedMinutes: 0 }; // Default stats
+                globalChannelMap = result.channelMap || {}; // Load channelMap
 
-            if (sortSelect && sortSelect.value) {
-                state.sort = sortSelect.value;
-            }
+                if (hideShortsToggle) hideShortsToggle.checked = !!result.hideAllShorts;
+                if (hideCommentsToggle) {
+                    hideCommentsToggle.checked = !!result.hideAllComments;
+                    state.hideAllComments = !!result.hideAllComments; // Initialize state for new toggle logic
+                }
+                if (filterCommentsToggle) {
+                    filterCommentsToggle.checked = !result.hideAllComments && !!result.filterComments;
+                    filterCommentsToggle.disabled = !!result.hideAllComments; // Disable if hide all is on
+                    state.filterComments = !result.hideAllComments && !!result.filterComments; // Initialize state
+                }
 
-            renderKeywordList();
-            renderChannelList();
-            updateStats();
+                if (sortSelect && sortSelect.value) {
+                    state.sort = sortSelect.value;
+                }
+
+                syncFilterAllKeywords();
+
+                renderKeywordList();
+                renderChannelList();
+                updateStats();
+
+                settingsReady = true;
+                resolve();
+            });
+        }).finally(() => {
+            settingsLoadingPromise = null;
         });
+
+        return settingsLoadingPromise;
     }
 
-    function saveSettings() {
+    async function ensureSettingsLoaded() {
+        if (settingsReady) return;
+        await loadSettings();
+    }
+
+    async function saveSettings() {
+        await ensureSettingsLoaded();
         const hideShorts = hideShortsToggle ? hideShortsToggle.checked : false;
         const hideComments = hideCommentsToggle ? hideCommentsToggle.checked : false;
         const filterComments = hideComments ? false : (filterCommentsToggle ? filterCommentsToggle.checked : false);
+
+        syncFilterAllKeywords();
+
         const compiledSettings = buildCompiledSettings({
             hideShorts,
             hideComments,
             filterCommentsOverride: filterComments
         });
 
-        chrome.storage.local.set({
-            uiKeywords: state.keywords,
-            filterKeywords: compiledSettings.filterKeywords,
-            filterChannels: compiledSettings.filterChannels,
-            hideAllShorts: hideShorts,
-            hideAllComments: hideComments,
-            filterComments: filterComments
-        }, () => {
-            if (chrome.runtime.lastError) {
-                console.error('FilterTube Tab View: Failed to save settings', chrome.runtime.lastError);
-                return;
-            }
-            broadcastSettings(compiledSettings);
-            updateStats();
+        const userKeywords = state.keywords.filter(entry => entry.source !== 'channel');
+
+        await new Promise(resolve => {
+            chrome.storage.local.set({
+                uiKeywords: userKeywords,
+                filterKeywords: compiledSettings.filterKeywords,
+                filterChannels: compiledSettings.filterChannels,
+                hideAllShorts: hideShorts,
+                hideAllComments: hideComments,
+                filterComments: filterComments
+            }, () => {
+                if (chrome.runtime.lastError) {
+                    console.error('FilterTube Tab View: Failed to save settings', chrome.runtime.lastError);
+                } else {
+                    broadcastSettings(compiledSettings);
+                    updateStats();
+                }
+                resolve();
+            });
         });
     }
 
@@ -394,8 +541,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const originalIndex = state.keywords.indexOf(entry);
             if (originalIndex === -1) return;
 
+            const isChannelDerived = entry.source === 'channel';
+
             const item = document.createElement('div');
             item.className = 'list-item';
+            if (isChannelDerived) item.classList.add('channel-derived');
 
             const left = document.createElement('div');
             left.className = 'item-left';
@@ -405,42 +555,60 @@ document.addEventListener('DOMContentLoaded', () => {
             word.textContent = entry.word;
             left.appendChild(word);
 
-            const controls = document.createElement('div');
-            controls.className = 'item-controls';
+            if (isChannelDerived) {
+                const channel = findChannelByDerivedKey(entry.channelRef);
 
-            const exactToggle = document.createElement('div');
-            exactToggle.className = `exact-toggle ${entry.exact ? 'active' : ''}`;
-            exactToggle.textContent = 'Exact';
-            exactToggle.title = 'Toggle exact match';
-            exactToggle.addEventListener('click', () => {
-                state.keywords[originalIndex].exact = !state.keywords[originalIndex].exact;
-                saveSettings();
-                renderKeywordList();
-            });
+                const badge = document.createElement('span');
+                badge.className = 'channel-derived-badge';
+                badge.textContent = 'Filter All';
+                left.appendChild(badge);
 
-            const semanticToggle = document.createElement('div');
-            semanticToggle.className = `exact-toggle ${entry.semantic ? 'active' : ''}`; // Reusing exact-toggle class for now
-            semanticToggle.textContent = 'Semantic';
-            semanticToggle.title = 'Enable semantic matching (Coming Soon)';
-            semanticToggle.style.opacity = '0.5'; // Visual cue that it's not fully active yet
-            semanticToggle.style.cursor = 'not-allowed';
-            // semanticToggle.addEventListener('click', () => { ... }); // Future wiring
+                if (channel) {
+                    const originLabel = document.createElement('span');
+                    originLabel.className = 'channel-derived-origin';
+                    originLabel.textContent = `Linked to ${channel.name || channel.handle || channel.id}`;
+                    left.appendChild(originLabel);
+                }
 
-            const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'btn-text danger';
-            deleteBtn.textContent = 'Remove';
-            deleteBtn.addEventListener('click', () => {
-                state.keywords.splice(originalIndex, 1);
-                saveSettings();
-                renderKeywordList();
-            });
+                item.appendChild(left);
+            } else {
+                const controls = document.createElement('div');
+                controls.className = 'item-controls';
 
-            controls.appendChild(exactToggle);
-            controls.appendChild(semanticToggle);
-            controls.appendChild(deleteBtn);
+                const exactToggle = document.createElement('div');
+                exactToggle.className = `exact-toggle ${entry.exact ? 'active' : ''}`;
+                exactToggle.textContent = 'Exact';
+                exactToggle.title = 'Toggle exact match';
+                exactToggle.addEventListener('click', () => {
+                    state.keywords[originalIndex].exact = !state.keywords[originalIndex].exact;
+                    saveSettings();
+                    renderKeywordList();
+                });
 
-            item.appendChild(left);
-            item.appendChild(controls);
+                const semanticToggle = document.createElement('div');
+                semanticToggle.className = `exact-toggle ${entry.semantic ? 'active' : ''}`; // Reusing exact-toggle class for now
+                semanticToggle.textContent = 'Semantic';
+                semanticToggle.title = 'Enable semantic matching (Coming Soon)';
+                semanticToggle.style.opacity = '0.5'; // Visual cue that it's not fully active yet
+                semanticToggle.style.cursor = 'not-allowed';
+                // semanticToggle.addEventListener('click', () => { ... }); // Future wiring
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'btn-text danger';
+                deleteBtn.textContent = 'Remove';
+                deleteBtn.addEventListener('click', () => {
+                    state.keywords.splice(originalIndex, 1);
+                    saveSettings();
+                    renderKeywordList();
+                });
+
+                controls.appendChild(exactToggle);
+                controls.appendChild(semanticToggle);
+                controls.appendChild(deleteBtn);
+
+                item.appendChild(left);
+                item.appendChild(controls);
+            }
             keywordListEl.appendChild(item);
         });
     }
@@ -466,9 +634,9 @@ document.addEventListener('DOMContentLoaded', () => {
         addKeywordBtn.addEventListener('click', () => {
             const word = (keywordInput?.value || '').trim();
             if (!word) return;
-            if (state.keywords.some(k => k.word.toLowerCase() === word.toLowerCase())) return;
+            if (state.keywords.some(k => k.source !== 'channel' && k.word.toLowerCase() === word.toLowerCase())) return;
 
-            state.keywords.push({ word, exact: false });
+            state.keywords.push({ word, exact: false, semantic: false, source: 'user', channelRef: null });
             if (keywordInput) keywordInput.value = '';
             saveSettings();
             renderKeywordList();
@@ -560,10 +728,13 @@ document.addEventListener('DOMContentLoaded', () => {
             deleteBtn.className = 'delete-btn';
             deleteBtn.innerHTML = '×';
             deleteBtn.title = 'Remove channel';
-            deleteBtn.addEventListener('click', () => {
+            deleteBtn.addEventListener('click', async () => {
+                await ensureSettingsLoaded();
                 state.channels.splice(originalIndex, 1);
+                syncFilterAllKeywords();
                 saveSettings();
                 renderChannelList();
+                renderKeywordList();
             });
 
             headerRow.appendChild(infoGroup);
@@ -579,21 +750,28 @@ document.addEventListener('DOMContentLoaded', () => {
             nodeContainer.className = 'channel-node-container';
 
             // Logic: Find Partner mapping
-            const rawId = channel.id.toLowerCase();
-            let partnerValue = null;
+            const mapping = deriveChannelMapping(channel);
+            const rawId = (channel.id || '').toLowerCase();
+            let partnerValue = mapping.target;
 
-            // Try to find mapping in globalChannelMap
-            if (globalChannelMap[rawId]) {
-                partnerValue = globalChannelMap[rawId];
-            } else if (rawId.startsWith('@')) {
-                // Try without @
-                partnerValue = globalChannelMap[rawId.replace('@', '')];
+            if (!partnerValue) {
+                if (globalChannelMap[rawId]) {
+                    partnerValue = globalChannelMap[rawId];
+                } else if (mapping.source && mapping.source.startsWith('@')) {
+                    const stripped = mapping.source.replace('@', '').toLowerCase();
+                    partnerValue = globalChannelMap[stripped] || partnerValue;
+                } else if (channel.handle && channel.handle.toLowerCase() !== rawId) {
+                    partnerValue = channel.handle;
+                } else if (channel.name && channel.name !== mapping.source) {
+                    partnerValue = channel.name;
+                }
             }
 
             // SOURCE (What user entered - NO BOX, just plain text)
             const sourceText = document.createElement('span');
             sourceText.className = 'node-source-text';
-            sourceText.textContent = channel.id;
+            const sourceLabel = mapping.source || channel.originalInput || channel.handle || channel.id || channel.name || '';
+            sourceText.textContent = sourceLabel;
 
             // CONNECTOR (Green Arrow - only show if we have a mapping)
             if (partnerValue) {
@@ -630,10 +808,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span class="pill-text">Filter all content</span>
             `;
             pillBtn.title = 'Also block videos mentioning this channel name';
-            pillBtn.addEventListener('click', () => {
+            pillBtn.addEventListener('click', async () => {
+                await ensureSettingsLoaded();
                 state.channels[originalIndex].filterAll = !state.channels[originalIndex].filterAll;
+                syncFilterAllKeywords();
                 saveSettings();
                 renderChannelList(); // Re-render to update style
+                renderKeywordList();
             });
 
             bodyRow.appendChild(pillBtn);
@@ -643,231 +824,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    /**
-     * Fetch channel name and handle from YouTube by scraping the channel page
-     * More reliable than API calls which can be blocked
-     */
-    async function fetchChannelInfo(channelId) {
-        try {
-            // Normalize the channel ID
-            const cleanId = channelId.replace(/^channel\//i, '');
-
-            console.log('FilterTube: Fetching channel info for:', cleanId);
-
-            // Fetch the channel page HTML
-            const channelUrl = `https://www.youtube.com/channel/${cleanId}`;
-            const response = await fetch(channelUrl);
-
-            if (!response.ok) {
-                console.error('FilterTube: Failed to fetch channel page:', response.status);
-                return null;
-            }
-
-            const html = await response.text();
-
-            // Extract ytInitialData from the page using a more robust method
-            let data = null;
-
-            // Helper function to extract JSON with balanced braces
-            function extractJSON(text, startPattern) {
-                const startIndex = text.search(startPattern);
-                if (startIndex === -1) return null;
-
-                const jsonStart = text.indexOf('{', startIndex);
-                if (jsonStart === -1) return null;
-
-                let depth = 0;
-                let inString = false;
-                let escapeNext = false;
-
-                for (let i = jsonStart; i < text.length; i++) {
-                    const char = text[i];
-
-                    if (escapeNext) {
-                        escapeNext = false;
-                        continue;
-                    }
-
-                    if (char === '\\') {
-                        escapeNext = true;
-                        continue;
-                    }
-
-                    if (char === '"') {
-                        inString = !inString;
-                        continue;
-                    }
-
-                    if (!inString) {
-                        if (char === '{') depth++;
-                        else if (char === '}') {
-                            depth--;
-                            if (depth === 0) {
-                                return text.substring(jsonStart, i + 1);
-                            }
-                        }
-                    }
-                }
-
-                return null;
-            }
-
-            // Try different patterns
-            const patterns = [
-                /var ytInitialData\s*=/,
-                /window\["ytInitialData"\]\s*=/,
-                /ytInitialData"\s*:/
-            ];
-
-            for (const pattern of patterns) {
-                const jsonStr = extractJSON(html, pattern);
-                if (jsonStr) {
-                    try {
-                        data = JSON.parse(jsonStr);
-                        console.log('FilterTube: Successfully extracted ytInitialData using pattern:', pattern);
-                        break;
-                    } catch (e) {
-                        console.warn('FilterTube: Failed to parse JSON for pattern:', pattern, e.message);
-                    }
-                }
-            }
-
-            if (!data) {
-                console.error('FilterTube: Could not extract ytInitialData from page');
-                return null;
-            }
-
-            let channelName = null;
-            let channelHandle = null;
-            let channelLogo = null;
-
-            // --- BLOCK 1: Metadata Renderer (Standard & Most Reliable) ---
-            const metadata = data?.metadata?.channelMetadataRenderer;
-            if (metadata) {
-                console.log('FilterTube: Found metadata:', metadata);
-
-                // Name
-                if (metadata.title) {
-                    channelName = metadata.title;
-                    console.log('FilterTube: Got name from metadata:', channelName);
-                }
-
-                // Handle from vanityChannelUrl
-                if (metadata.vanityChannelUrl) {
-                    const match = metadata.vanityChannelUrl.match(/@([^/]+)/);
-                    if (match) {
-                        channelHandle = '@' + match[1];
-                        console.log('FilterTube: Got handle from metadata:', channelHandle);
-                    }
-                }
-
-                // Logo (Avatar)
-                if (metadata.avatar?.thumbnails?.length > 0) {
-                    channelLogo = metadata.avatar.thumbnails[metadata.avatar.thumbnails.length - 1].url;
-                    console.log('FilterTube: Got logo from metadata:', channelLogo);
-                }
-            } else {
-                console.log('FilterTube: No metadata block found');
-            }
-
-            // --- BLOCK 2: Page Header ViewModel (New YouTube Structure) ---
-            if (!channelName || !channelLogo) {
-                const pageHeader = data?.header?.pageHeaderRenderer?.content?.pageHeaderViewModel;
-
-                if (pageHeader) {
-                    console.log('FilterTube: Found pageHeaderViewModel:', pageHeader);
-
-                    // Name from ViewModel
-                    if (!channelName && pageHeader.title?.dynamicTextViewModel?.text?.content) {
-                        channelName = pageHeader.title.dynamicTextViewModel.text.content;
-                    }
-
-                    // Handle from metadata rows
-                    if (!channelHandle) {
-                        const metadataRows = pageHeader.metadata?.contentMetadataViewModel?.metadataRows;
-                        if (metadataRows && metadataRows.length > 0) {
-                            const handlePart = metadataRows[0]?.metadataParts?.[0]?.text?.content;
-                            if (handlePart && handlePart.startsWith('@')) {
-                                channelHandle = handlePart;
-                            }
-                        }
-                    }
-
-                    // Logo from decoratedAvatarViewModel
-                    if (!channelLogo) {
-                        const sources = pageHeader.image?.decoratedAvatarViewModel?.avatar?.avatarViewModel?.image?.sources;
-                        if (sources && sources.length > 0) {
-                            channelLogo = sources[sources.length - 1].url;
-                        }
-                    }
-                }
-            }
-
-            // --- BLOCK 3: Legacy Headers (c4TabbedHeaderRenderer / pageHeaderRenderer) ---
-            if (!channelName || !channelLogo) {
-                const header = data?.header?.c4TabbedHeaderRenderer || data?.header?.pageHeaderRenderer;
-                if (header) {
-                    console.log('FilterTube: Trying legacy header:', header);
-
-                    // Name
-                    if (!channelName) {
-                        channelName = header.title || header.channelTitle?.simpleText || header.pageTitle;
-                    }
-
-                    // Handle
-                    if (!channelHandle) {
-                        if (header.channelHandleText?.runs?.[0]?.text) {
-                            channelHandle = header.channelHandleText.runs[0].text;
-                        } else if (header.handle?.simpleText) {
-                            channelHandle = header.handle.simpleText;
-                        }
-                    }
-
-                    // Logo
-                    if (!channelLogo && header.avatar?.thumbnails?.length > 0) {
-                        channelLogo = header.avatar.thumbnails[header.avatar.thumbnails.length - 1].url;
-                    }
-                }
-            }
-
-            // --- BLOCK 4: Microformat (Backup) ---
-            if (!channelName || !channelHandle) {
-                const microformat = data?.microformat?.microformatDataRenderer;
-                if (microformat) {
-                    console.log('FilterTube: Trying microformat:', microformat);
-
-                    if (!channelName) {
-                        channelName = microformat.title;
-                    }
-
-                    if (!channelHandle && microformat.vanityChannelUrl) {
-                        const match = microformat.vanityChannelUrl.match(/@([^/]+)/);
-                        if (match) channelHandle = '@' + match[1];
-                    }
-
-                    if (!channelLogo && microformat.thumbnail?.thumbnails?.length > 0) {
-                        channelLogo = microformat.thumbnail.thumbnails[microformat.thumbnail.thumbnails.length - 1].url;
-                    }
-                }
-            }
-
-            console.log('FilterTube: Extracted -', { name: channelName, handle: channelHandle, logo: channelLogo });
-
-            return {
-                name: channelName || cleanId, // Fallback to ID if name fails
-                handle: channelHandle,
-                logo: channelLogo
-            };
-        } catch (error) {
-            console.error('FilterTube: Failed to fetch channel info:', error);
-            return null;
-        }
-    }
-
     if (addChannelBtn) {
         addChannelBtn.addEventListener('click', async () => {
             const val = (channelInput?.value || '').trim();
             if (!val) return;
+
+            await ensureSettingsLoaded();
 
             // Validate input format
             if (!val.startsWith('@') && !val.toLowerCase().startsWith('uc') && !val.toLowerCase().startsWith('channel/uc')) {
@@ -917,95 +879,50 @@ document.addEventListener('DOMContentLoaded', () => {
             let channelLogo = null;
             let channelId = normalizedId;
 
-            const isUCId = normalizedId.toLowerCase().startsWith('uc');
-            const isHandle = val.startsWith('@');
+            try {
+                const response = await chrome.runtime.sendMessage({
+                    action: "fetchChannelDetails",
+                    channelIdOrHandle: normalizedId // Send the case-preserved normalizedId
+                });
 
-            // Fetch channel info from YouTube API
-            if (isUCId) {
-                console.log('FilterTube: Fetching info for UC ID:', normalizedId);
-                const channelInfo = await fetchChannelInfo(normalizedId);
-                console.log('FilterTube: API Response:', channelInfo);
+                if (response.success && response.id) {
+                    channelName = response.name;
+                    channelHandle = response.handle;
+                    channelLogo = response.logo;
+                    channelId = response.id; // Use the resolved ID from the background script
+                    console.log('FilterTube Tab View: Successfully fetched - Name:', channelName, 'Handle:', channelHandle, 'Logo:', channelLogo, 'ID:', channelId);
 
-                if (channelInfo && channelInfo.name) {
-                    channelName = channelInfo.name;
-                    channelHandle = channelInfo.handle;
-                    channelLogo = channelInfo.logo;
-                    console.log('FilterTube: Successfully fetched - Name:', channelName, 'Handle:', channelHandle, 'Logo:', channelLogo);
-
-                    // Store the UC ID -> Handle mapping in channelMap (use Promise for async)
-                    if (channelHandle) {
+                    // Update channelMap with new mappings
+                    if (channelHandle && channelId) {
                         await new Promise((resolve) => {
                             chrome.storage.local.get(['channelMap'], (result) => {
                                 const currentMap = result.channelMap || {};
-                                // Keys are lowercase for case-insensitive lookup
-                                // Values preserve ORIGINAL case from YouTube
-                                const keyId = normalizedId.toLowerCase();
+                                const keyId = channelId.toLowerCase();
                                 const keyHandle = channelHandle.toLowerCase();
                                 currentMap[keyId] = channelHandle;      // UC... -> @BTS (original case)
-                                currentMap[keyHandle] = normalizedId;   // @bts -> UCLkAepWjdylmXSltofFvsYQ (original case)
+                                currentMap[keyHandle] = channelId;      // @bts -> UCLkAepWjdylmXSltofFvsYQ (original case)
 
-                                // Update global map immediately in memory
                                 globalChannelMap = currentMap;
 
                                 chrome.storage.local.set({ channelMap: currentMap }, () => {
-                                    console.log('FilterTube: Updated channelMap with new mapping:', keyId, '<->', channelHandle, 'and', keyHandle, '<->', normalizedId);
+                                    console.log('FilterTube Tab View: Updated channelMap with new mapping:', keyId, '<->', channelHandle, 'and', keyHandle, '<->', channelId);
                                     resolve();
                                 });
                             });
                         });
                     }
                 } else {
-                    console.warn('FilterTube: Could not fetch channel name, using ID as name');
+                    alert(`Failed to fetch channel details: ${response.error || 'Unknown error'}`);
+                    console.error('FilterTube Tab View: Failed to fetch channel details', response);
+                    return; // Stop processing if fetching failed
                 }
-            } else if (isHandle) {
-                // For handles, we need to resolve to UC ID and then fetch full channel info
-                channelHandle = val;
-                channelId = val.toLowerCase(); // Temporarily use handle as ID
-
-                // Try to proactively fetch the UC ID to populate channelMap
-                try {
-                    const handleWithoutAt = val.replace('@', '');
-                    const aboutUrl = `https://www.youtube.com/@${handleWithoutAt}/about`;
-                    const response = await fetch(aboutUrl);
-                    const text = await response.text();
-                    const match = text.match(/channel\/(UC[\w-]{22})/);
-                    if (match && match[1]) {
-                        const resolvedId = match[1];
-                        console.log(`FilterTube: ✅ Resolved ${val} -> ${resolvedId}`);
-
-                        // Now fetch the full channel info using the UC ID
-                        const channelInfo = await fetchChannelInfo(resolvedId);
-                        if (channelInfo && channelInfo.name) {
-                            channelName = channelInfo.name;
-                            channelLogo = channelInfo.logo;
-                            console.log('FilterTube: Fetched channel info - Name:', channelName, 'Logo:', channelLogo);
-                        } else {
-                            channelName = val; // Fallback to handle
-                        }
-
-                        // Store the mapping in channelMap
-                        chrome.storage.local.get(['channelMap'], (result) => {
-                            const currentMap = result.channelMap || {};
-                            // Keys are lowercase for case-insensitive lookup
-                            // Values preserve ORIGINAL case from YouTube
-                            const keyHandle = val.toLowerCase();
-                            const keyId = resolvedId.toLowerCase();
-                            currentMap[keyId] = val;          // UC... -> @shakira (original case from user input)
-                            currentMap[keyHandle] = resolvedId;  // @shakira -> UCYLNGLIzMhRTi6ZOLjAPSmw (original case from YouTube)
-
-                            // Update global map immediately in memory
-                            globalChannelMap = currentMap;
-
-                            chrome.storage.local.set({ channelMap: currentMap });
-                            console.log('FilterTube: Updated channelMap with new mapping:', keyId, '<->', val, 'and', keyHandle, '<->', resolvedId);
-                        });
-                    } else {
-                        channelName = val; // Fallback to handle
-                    }
-                } catch (err) {
-                    console.warn('FilterTube: Could not resolve handle to UC ID:', err);
-                    channelName = val; // Fallback to handle
-                }
+            } catch (error) {
+                alert('Error communicating with background script. Please try again.');
+                console.error('FilterTube Tab View: Error fetching channel details via background script:', error);
+                return; // Stop processing if communication failed
+            } finally {
+                addChannelBtn.disabled = false;
+                addChannelBtn.textContent = originalText;
             }
 
             console.log('FilterTube: Final channel entry:', { name: channelName, id: channelId, handle: channelHandle, logo: channelLogo });
@@ -1016,7 +933,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 id: channelId,
                 handle: channelHandle,
                 logo: channelLogo,
-                filterAll: false // Default to false
+                filterAll: false, // Default to false
+                originalInput: val // Store the original user input
             };
 
             state.channels.push(channelEntry);
@@ -1027,6 +945,7 @@ document.addEventListener('DOMContentLoaded', () => {
             addChannelBtn.textContent = originalText;
 
             // Save settings first
+            syncFilterAllKeywords();
             saveSettings();
 
             // Reload the channelMap from storage to get the latest mappings
@@ -1036,6 +955,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Now render the list with updated mapping
                 renderChannelList();
+                renderKeywordList();
             });
 
             // Flash success feedback
@@ -1066,12 +986,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (clearChannelsBtn) {
-        clearChannelsBtn.addEventListener('click', () => {
+        clearChannelsBtn.addEventListener('click', async () => {
+            await ensureSettingsLoaded();
             if (!state.channels.length) return;
             if (!confirm('Delete all blocked channels? This cannot be undone.')) return;
             state.channels = [];
+            syncFilterAllKeywords();
             saveSettings();
             renderChannelList();
+            renderKeywordList();
         });
     }
 
@@ -1093,7 +1016,8 @@ document.addEventListener('DOMContentLoaded', () => {
     hideShortsToggle?.addEventListener('change', saveSettings);
     // --- Toggle Logic ---
     if (hideCommentsToggle && filterCommentsToggle) {
-        hideCommentsToggle.addEventListener('change', () => {
+        hideCommentsToggle.addEventListener('change', async () => {
+            await ensureSettingsLoaded();
             state.hideAllComments = hideCommentsToggle.checked;
 
             // Instant Feedback: Disable filter toggle if hide all is on
@@ -1108,122 +1032,11 @@ document.addEventListener('DOMContentLoaded', () => {
             saveSettings();
         });
 
-        filterCommentsToggle.addEventListener('change', () => {
+        filterCommentsToggle.addEventListener('change', async () => {
+            await ensureSettingsLoaded();
             state.filterComments = filterCommentsToggle.checked;
             saveSettings();
         });
     }
-
-    // --- Sorting Logic ---
-    if (sortSelect) {
-        sortSelect.addEventListener('change', () => {
-            renderKeywordList();
-        });
-    }
-
-    if (channelSort) {
-        channelSort.addEventListener('change', () => {
-            renderChannelList();
-        });
-    }
-
-    quickAddKeywordBtn?.addEventListener('click', () => {
-        navItems.find(nav => nav.getAttribute('data-tab') === 'filters')?.click();
-        keywordInput?.focus();
-    });
-
-    quickKidsModeBtn?.addEventListener('click', () => {
-        navItems.find(nav => nav.getAttribute('data-tab') === 'kids')?.click();
-    });
-
-    themeToggle?.addEventListener('click', () => {
-        const nextTheme = state.theme === 'dark' ? 'light' : 'dark';
-        applyTheme(nextTheme);
-        chrome.storage?.local.set({ ftThemePreference: nextTheme });
-    });
-
-    loadSettings();
-
-    // Listen for storage changes from popup or other sources
-    chrome.storage.onChanged.addListener(async (changes, area) => {
-        if (area === 'local') {
-            // If channels or channelMap changed, process and re-render
-            if (changes.filterChannels) {
-                console.log('FilterTube Tab View: Detected channel change from popup/external source');
-
-                // Load the new channels from storage
-                const newChannels = normalizeChannels(changes.filterChannels.newValue);
-
-                // Check if any new channels need info fetching
-                for (let i = 0; i < newChannels.length; i++) {
-                    const channel = newChannels[i];
-
-                    // If channel doesn't have a proper name (name == id) and looks like it needs fetching
-                    if (channel.name === channel.id && !channel.logo) {
-                        const isUCId = channel.id.toLowerCase().startsWith('uc');
-                        const isHandle = channel.id.startsWith('@');
-
-                        if (isUCId) {
-                            // Fetch info for UC ID
-                            console.log('FilterTube: Fetching info for UC ID from popup add:', channel.id);
-                            const channelInfo = await fetchChannelInfo(channel.id);
-                            if (channelInfo && channelInfo.name) {
-                                newChannels[i].name = channelInfo.name;
-                                newChannels[i].handle = channelInfo.handle;
-                                newChannels[i].logo = channelInfo.logo;
-                            }
-                        } else if (isHandle) {
-                            // Resolve handle to UC ID and fetch info
-                            console.log('FilterTube: Resolving handle from popup add:', channel.id);
-                            try {
-                                const handleWithoutAt = channel.id.replace('@', '');
-                                const aboutUrl = `https://www.youtube.com/@${handleWithoutAt}/about`;
-                                const response = await fetch(aboutUrl);
-                                const text = await response.text();
-                                const match = text.match(/channel\/(UC[\w-]{22})/);
-
-                                if (match && match[1]) {
-                                    const resolvedId = match[1];
-                                    console.log(`FilterTube: ✅ Resolved ${channel.id} -> ${resolvedId}`);
-
-                                    const channelInfo = await fetchChannelInfo(resolvedId);
-                                    if (channelInfo && channelInfo.name) {
-                                        newChannels[i].name = channelInfo.name;
-                                        newChannels[i].logo = channelInfo.logo;
-                                    }
-
-                                    // Update channelMap
-                                    chrome.storage.local.get(['channelMap'], (result) => {
-                                        const currentMap = result.channelMap || {};
-                                        const normHandle = channel.id.toLowerCase();
-                                        const normId = resolvedId.toLowerCase();
-                                        currentMap[normId] = normHandle;
-                                        currentMap[normHandle] = normId;
-                                        chrome.storage.local.set({ channelMap: currentMap });
-                                    });
-                                }
-                            } catch (err) {
-                                console.warn('FilterTube: Could not resolve handle:', err);
-                            }
-                        }
-                    }
-                }
-
-                // Update state and save back to storage with enriched data
-                state.channels = newChannels;
-                chrome.storage.local.set({ filterChannels: newChannels });
-
-                // Reload channelMap and re-render
-                chrome.storage.local.get(['channelMap'], (result) => {
-                    globalChannelMap = result.channelMap || {};
-                    renderChannelList();
-                });
-            } else if (changes.channelMap) {
-                // Just reload the map and re-render
-                console.log('FilterTube Tab View: Detected channelMap change');
-                globalChannelMap = changes.channelMap.newValue || {};
-                renderChannelList();
-            }
-        }
-    });
 });
+

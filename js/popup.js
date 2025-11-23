@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function buildCompiledSettings({ hideAllShorts, hideAllComments, filterComments }) {
         return {
             filterKeywords: compileKeywords(keywords),
-            filterChannels: channels.map(ch => ch.id), // Send only IDs to content script
+            filterChannels: channels, // Send full channel objects to content script
             hideAllShorts,
             hideAllComments,
             filterComments
@@ -302,27 +302,93 @@ document.addEventListener('DOMContentLoaded', function () {
         renderKeywords();
     }
 
-    function addChannel() {
+    async function addChannel() {
         const val = channelInput.value.trim();
-        if (val) {
-            // Check for duplicates
-            if (!channels.some(ch => ch.id === val)) {
-                channels.push({ name: val, id: val });
+        if (!val) return;
+
+        // Validate input format (similar to tab-view.js)
+        if (!val.startsWith('@') && !val.toLowerCase().startsWith('uc') && !val.toLowerCase().startsWith('channel/uc')) {
+            alert('Please enter a valid channel identifier:\n- @handle (e.g., @shakira)\n- UC ID (e.g., UCYLNGLIzMhRTi6ZOLjAPSmw)\n- channel/UC ID');
+            return;
+        }
+
+        // Remove channel/ prefix but preserve case for UC IDs
+        const channelIdOrHandle = val.replace(/^channel\//i, '');
+
+        // Check for duplicates - (This part will need to be refined once globalChannelMap is available, for now basic check)
+        // For simplicity in popup, we'll only check against currently stored IDs and names directly.
+        if (channels.some(ch => ch.id === channelIdOrHandle || ch.handle === channelIdOrHandle || ch.name === channelIdOrHandle)) {
+            alert('This channel is already in your filter list!');
+            return;
+        }
+
+        // Show loading state
+        const originalText = addChannelBtn.textContent;
+        addChannelBtn.textContent = 'Fetching...';
+        addChannelBtn.disabled = true;
+
+        try {
+            const response = await chrome.runtime.sendMessage({
+                action: "fetchChannelDetails",
+                channelIdOrHandle: channelIdOrHandle
+            });
+
+            if (response.success && response.id) {
+                const channelEntry = {
+                    name: response.name,
+                    id: response.id,
+                    handle: response.handle,
+                    logo: response.logo,
+                    filterAll: false // Default to false
+                };
+                channels.push(channelEntry);
                 channelInput.value = '';
                 renderChannels();
+                // Since this is adding to the in-memory array, we need to explicitly save settings
+                // The existing saveBtn click handler includes broadcasting, so we can reuse that logic
+                const hideAllShorts = hideAllShortsCheckbox ? hideAllShortsCheckbox.checked : false;
+                const hideAllComments = hideAllCommentsCheckbox ? hideAllCommentsCheckbox.checked : false;
+                const filterComments = filterCommentsCheckbox ? filterCommentsCheckbox.checked : false;
 
-                // Flash success feedback (same as Save button)
+                const computedFilterComments = hideAllComments ? false : filterComments;
+
+                const compiledSettings = buildCompiledSettings({
+                    hideAllShorts,
+                    hideAllComments,
+                    filterComments: computedFilterComments
+                });
+
+                chrome.storage.local.set({
+                    uiKeywords: keywords, // Save source state
+                    filterKeywords: compiledSettings.filterKeywords, // Save compiled state
+                    filterChannels: compiledSettings.filterChannels,
+                    hideAllShorts: hideAllShorts,
+                    hideAllComments: hideAllComments,
+                    filterComments: computedFilterComments
+                }, () => {
+                    broadcastSettings(compiledSettings);
+                });
+
+
+                // Flash success feedback
                 if (addChannelBtn) {
-                    const originalText = addChannelBtn.textContent;
                     addChannelBtn.textContent = 'Added!';
                     addChannelBtn.classList.add('saved');
-
                     setTimeout(() => {
                         addChannelBtn.textContent = originalText;
                         addChannelBtn.classList.remove('saved');
                     }, 1200);
                 }
+            } else {
+                alert(`Failed to fetch channel details: ${response.error || 'Unknown error'}`);
+                console.error('FilterTube Popup: Failed to fetch channel details', response);
             }
+        } catch (error) {
+            alert('Error communicating with background script. Please try again.');
+            console.error('FilterTube Popup: Error fetching channel details via background script:', error);
+        } finally {
+            addChannelBtn.disabled = false;
+            addChannelBtn.textContent = originalText;
         }
     }
 
