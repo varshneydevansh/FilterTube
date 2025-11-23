@@ -43,11 +43,52 @@ function initializePopupFiltersTabs() {
         </div>
     `;
 
+    // Create Content tab content
+    const contentControlHtml = `
+        <div class="toggle-group">
+            <div class="toggle-row">
+                <label for="hideAllShorts" class="toggle-label">
+                    <span class="toggle-title">Hide Shorts</span>
+                    <span class="toggle-desc">Remove all Shorts from feed</span>
+                </label>
+                <label class="switch">
+                    <input type="checkbox" id="hideAllShorts">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+
+            <div class="toggle-row">
+                <label for="hideAllComments" class="toggle-label">
+                    <span class="toggle-title">Hide All Comments</span>
+                    <span class="toggle-desc">Remove comment sections entirely</span>
+                </label>
+                <label class="switch">
+                    <input type="checkbox" id="hideAllComments">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+
+            <div class="toggle-row">
+                <label for="filterComments" class="toggle-label">
+                    <span class="toggle-title">Filter Comments</span>
+                    <span class="toggle-desc">Hide only comments with keywords</span>
+                </label>
+                <label class="switch">
+                    <input type="checkbox" id="filterComments">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+        </div>
+    `;
+    const contentTab = document.createElement('div');
+    contentTab.innerHTML = contentControlHtml;
+
     // Create tabs using UIComponents
     const tabs = UIComponents.createTabs({
         tabs: [
             { id: 'keywords', label: 'Keywords', content: keywordsContent },
-            { id: 'channels', label: 'Channels', content: channelsContent }
+            { id: 'channels', label: 'Channels', content: channelsContent },
+            { id: 'content', label: 'Content', content: contentTab }
         ],
         defaultTab: 'keywords',
         onTabChange: (tabId) => {

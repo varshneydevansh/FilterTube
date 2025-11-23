@@ -84,11 +84,54 @@ function initializeFiltersTabs() {
         </div>
     `;
 
+    // Create Content tab content
+    const contentTab = document.createElement('div');
+    contentTab.innerHTML = `
+        <div class="card full-width">
+            <div class="card-header">
+                <h3>Content Control</h3>
+            </div>
+            <div class="card-body">
+                <div class="toggle-row">
+                    <div class="toggle-info">
+                        <span class="toggle-title">Hide Shorts</span>
+                        <span class="toggle-desc">Remove Shorts shelves and tab.</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="settingHideShorts">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="toggle-row">
+                    <div class="toggle-info">
+                        <span class="toggle-title">Hide Comments</span>
+                        <span class="toggle-desc">Remove comment sections entirely.</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="settingHideComments">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="toggle-row">
+                    <div class="toggle-info">
+                        <span class="toggle-title">Filter Comments</span>
+                        <span class="toggle-desc">Hide only comments matching your keywords.</span>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" id="settingFilterComments">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    `;
+
     // Create tabs using UIComponents
     const tabs = UIComponents.createTabs({
         tabs: [
             { id: 'keywords', label: 'Keywords', content: keywordsContent },
-            { id: 'channels', label: 'Channels', content: channelsContent }
+            { id: 'channels', label: 'Channels', content: channelsContent },
+            { id: 'content', label: 'Content', content: contentTab }
         ],
         defaultTab: 'keywords',
         onTabChange: (tabId) => {
