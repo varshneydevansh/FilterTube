@@ -103,7 +103,10 @@ function initializePopupFiltersTabs() {
     container.appendChild(tabs.container);
 }
 
-document.addEventListener('DOMContentLoaded', function () {
+// Global state to prevent race conditions
+let isSaving = false;
+
+document.addEventListener('DOMContentLoaded', async () => {
     initializePopupFiltersTabs();
 
     const newKeywordInput = document.getElementById('newKeywordInput');

@@ -192,6 +192,8 @@ body {
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: var(--ft-space-lg);
     margin-bottom: var(--ft-space-xl);
+    padding-top: var(--ft-space-md);
+    /* Prevent tooltip clipping */
 }
 
 .stat-card {
@@ -204,6 +206,7 @@ body {
     cursor: default;
 }
 
+.stat-card[data-tooltip]:hover,
 .stat-card[title]:hover {
     box-shadow: var(--ft-shadow-elevated);
     transform: translateY(-2px);
@@ -860,7 +863,7 @@ input:checked+.slider:before {
     font-weight: 600;
 }
 
-/* Custom Fast Tooltips */
+/* Custom Glassmorphism Tooltips */
 [data-tooltip] {
     position: relative;
     cursor: help;
@@ -871,34 +874,40 @@ input:checked+.slider:before {
     position: absolute;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.15s ease-in-out;
-    transition-delay: 0.05s;
-    /* Very fast response */
-    z-index: 1000;
+    transition: opacity 0.2s ease-in-out;
+    transition-delay: 0.1s;
+    z-index: 99999;
+    /* Very high to appear above everything */
 }
 
 [data-tooltip]::before {
     content: attr(data-tooltip);
-    background: rgba(0, 0, 0, 0.9);
-    color: #fff;
-    padding: 6px 10px;
-    border-radius: 4px;
-    font-size: 12px;
-    line-height: 1.4;
-    white-space: nowrap;
-    max-width: 300px;
-    bottom: calc(100% + 8px);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: var(--ft-color-text-primary);
+    padding: 10px 14px;
+    border-radius: var(--ft-radius-md);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    font-size: 13px;
+    line-height: 1.5;
+    font-weight: 500;
+    white-space: normal;
+    max-width: 280px;
+    bottom: calc(100% + 10px);
     left: 50%;
     transform: translateX(-50%);
 }
 
 [data-tooltip]::after {
     content: '';
-    border: 5px solid transparent;
-    border-top-color: rgba(0, 0, 0, 0.9);
-    bottom: calc(100% + 3px);
+    border: 6px solid transparent;
+    border-top-color: rgba(255, 255, 255, 0.95);
+    bottom: calc(100% + 4px);
     left: 50%;
     transform: translateX(-50%);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
 [data-tooltip]:hover::before,
@@ -908,10 +917,14 @@ input:checked+.slider:before {
 
 /* Dark theme tooltip */
 :root[data-theme="dark"] [data-tooltip]::before {
-    background: rgba(255, 255, 255, 0.95);
-    color: #000;
+    background: rgba(30, 30, 30, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: var(--ft-color-text-primary);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 :root[data-theme="dark"] [data-tooltip]::after {
-    border-top-color: rgba(255, 255, 255, 0.95);
+    border-top-color: rgba(30, 30, 30, 0.95);
 }
