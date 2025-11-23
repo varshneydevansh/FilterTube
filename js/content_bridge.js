@@ -252,53 +252,49 @@ function scanDataForChannelIdentifiers(root) {
     const result = { handle: '', id: '' };
     if (!root || typeof root !== 'object') return result;
 
-    const visited = new Set();
-    const queue = [root];
-    const MAX_ITERATIONS = 2000;
-    let iterations = 0;
+    // Direct check on the object first (most common case)
+    // Check for channelId, browseId (often channel ID), canonicalBaseUrl (often /channel/...)
+    if (root.channelId) result.id = root.channelId;
+    else if (root.browseId && root.browseId.startsWith('UC')) result.id = root.browseId;
 
-    while (queue.length && iterations < MAX_ITERATIONS && (!result.handle || !result.id)) {
-        const current = queue.shift();
-        iterations++;
+    if (root.canonicalBaseUrl && root.canonicalBaseUrl.includes('/@')) {
+        const match = root.canonicalBaseUrl.match(/@([A-Za-z0-9._-]+)/);
+        if (match) result.handle = `@${match[1].toLowerCase()}`;
+    }
 
-        if (!current || typeof current !== 'object') continue;
-        if (visited.has(current)) continue;
-        visited.add(current);
+    if (result.id && result.handle) return result;
 
-        if (Array.isArray(current)) {
-            for (const item of current) {
-                if (typeof item === 'string') {
-                    if (!result.handle) {
-                        const handle = extractHandleFromString(item);
-                        if (handle) result.handle = handle;
+    // Shallow scan of specific known properties to avoid deep recursion into related items
+    // We explicitly avoid 'items', 'contents', 'results' which usually contain OTHER videos/channels
+    const safeProperties = ['navigationEndpoint', 'command', 'browseEndpoint', 'urlEndpoint', 'owner', 'channelName', 'shortBylineText', 'longBylineText', 'runs', 'text'];
+
+    for (const prop of safeProperties) {
+        if (root[prop]) {
+            const val = root[prop];
+            if (typeof val === 'object') {
+                // Check nested navigation endpoint
+                if (val.browseId && val.browseId.startsWith('UC')) {
+                    if (!result.id) result.id = val.browseId;
+                }
+                if (val.url && val.url.includes('/@')) {
+                    const match = val.url.match(/@([A-Za-z0-9._-]+)/);
+                    if (match && !result.handle) result.handle = `@${match[1].toLowerCase()}`;
+                }
+                // Check text runs for handles
+                if (Array.isArray(val)) {
+                    for (const run of val) {
+                        if (run.text && run.text.startsWith('@') && !result.handle) {
+                            result.handle = run.text.toLowerCase();
+                        }
+                        if (run.navigationEndpoint) {
+                            const nav = run.navigationEndpoint;
+                            if (nav.browseEndpoint && nav.browseEndpoint.browseId && nav.browseEndpoint.browseId.startsWith('UC') && !result.id) {
+                                result.id = nav.browseEndpoint.browseId;
+                            }
+                        }
                     }
-                    if (!result.id) {
-                        const id = extractChannelIdFromString(item);
-                        if (id) result.id = id;
-                    }
-                } else if (item && typeof item === 'object' && !visited.has(item) && !(item instanceof Element) && !(item instanceof Node) && item !== window) {
-                    queue.push(item);
                 }
-                if (result.handle && result.id) break;
             }
-            continue;
-        }
-
-        for (const value of Object.values(current)) {
-            if (typeof value === 'string') {
-                if (!result.handle) {
-                    const handle = extractHandleFromString(value);
-                    if (handle) result.handle = handle;
-                }
-                if (!result.id) {
-                    const id = extractChannelIdFromString(value);
-                    if (id) result.id = id;
-                }
-            } else if (value && typeof value === 'object' && !visited.has(value) && !(value instanceof Element) && !(value instanceof Node) && value !== window) {
-                queue.push(value);
-            }
-
-            if (result.handle && result.id) break;
         }
     }
 
@@ -393,16 +389,21 @@ function extractChannelMetadataFromElement(element, channelText = '', channelHre
             cacheTarget?.closest?.('ytd-radio-renderer'),
             cacheTarget?.closest?.('ytd-grid-video-renderer'),
             cacheTarget?.closest?.('yt-lockup-view-model'),
-            cacheTarget?.closest?.('yt-lockup-metadata-view-model')
+            cacheTarget?.closest?.('yt-lockup-metadata-view-model'),
+            // Add specific check for channel page header
+            cacheTarget?.closest?.('ytd-channel-name')
         ];
 
         parentCandidates.forEach(parent => {
             if (!parent) return;
-            addSource(parent.data);
-            addSource(parent.data?.data);
-            addSource(parent.data?.content);
-            addSource(parent.__data);
-            addSource(parent.__data?.data);
+            // Prioritize direct data properties
+            if (parent.data) addSource(parent.data);
+            if (parent.__data) addSource(parent.__data);
+
+            // Only go deeper if it's a channel name renderer
+            if (parent.tagName === 'YTD-CHANNEL-NAME') {
+                addSource(parent.data?.channelName);
+            }
         });
 
         for (const source of possibleSources) {

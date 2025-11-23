@@ -390,9 +390,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     async function saveSettings({ broadcast = true } = {}) {
-        if (!sharedSaveSettings) return;
+        if (!sharedSaveSettings) return { compiledSettings: null, error: 'Settings module not available' };
         await ensureSettingsLoaded();
-        if (isSaving) return;
+        if (isSaving) return { compiledSettings: null, error: null }; // Already saving
 
         syncToggleStateFromInputs();
         recomputeKeywords();
@@ -408,9 +408,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (error) {
             console.error('FilterTube Popup: Failed to save settings', error);
-        } else if (broadcast && compiledSettings) {
-            broadcastSettings(compiledSettings);
         }
+        // Note: chrome.storage.onChanged listeners handle broadcasting to content scripts
 
         isSaving = false;
 
@@ -466,7 +465,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        state.userKeywords.push({ word, exact: false, semantic: false, source: 'user', channelRef: null });
+        state.userKeywords.unshift({ word, exact: false, semantic: false, source: 'user', channelRef: null }); // Add to beginning for newest-first order
         if (newKeywordInput) newKeywordInput.value = '';
 
         recomputeKeywords();
@@ -576,20 +575,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    if (saveBtn) {
-        saveBtn.addEventListener('click', async () => {
-            const { error } = await saveSettings({ broadcast: true });
-            if (error) return;
 
-            const originalText = saveBtn.textContent;
-            saveBtn.textContent = 'Saved!';
-            saveBtn.classList.add('saved');
-            setTimeout(() => {
-                saveBtn.textContent = originalText;
-                saveBtn.classList.remove('saved');
-            }, 1500);
-        });
-    }
 
     if (openInTabBtn) {
         openInTabBtn.addEventListener('click', () => {

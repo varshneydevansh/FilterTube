@@ -858,3 +858,57 @@ input:checked+.slider:before {
     letter-spacing: 0.03em;
     font-weight: 600;
 }
+/* Custom Fast Tooltips */
+[data-tooltip] {
+    position: relative;
+    cursor: help;
+}
+
+[data-tooltip]::before,
+[data-tooltip]::after {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease-in-out;
+    transition-delay: 0.2s; /* Faster than browser default (typically 0.5-1s) */
+    z-index: 1000;
+}
+
+[data-tooltip]::before {
+    content: attr(data-tooltip);
+    background: rgba(0, 0, 0, 0.9);
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    line-height: 1.4;
+    white-space: nowrap;
+    max-width: 300px;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+[data-tooltip]::after {
+    content: '';
+    border: 5px solid transparent;
+    border-top-color: rgba(0, 0, 0, 0.9);
+    bottom: calc(100% + 3px);
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+[data-tooltip]:hover::before,
+[data-tooltip]:hover::after {
+    opacity: 1;
+}
+
+/* Dark theme tooltip */
+:root[data-theme="dark"] [data-tooltip]::before {
+    background: rgba(255, 255, 255, 0.95);
+    color: #000;
+}
+
+:root[data-theme="dark"] [data-tooltip]::after {
+    border-top-color: rgba(255, 255, 255, 0.95);
+}

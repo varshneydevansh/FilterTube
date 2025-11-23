@@ -610,10 +610,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 const mappedHandle = globalChannelMap[handle];
 
                 return name.includes(searchTerm) ||
-                       id.includes(searchTerm) ||
-                       handle.includes(searchTerm) ||
-                       (mappedId && mappedId.toLowerCase().includes(searchTerm)) ||
-                       (mappedHandle && mappedHandle.toLowerCase().includes(searchTerm));
+                    id.includes(searchTerm) ||
+                    handle.includes(searchTerm) ||
+                    (mappedId && mappedId.toLowerCase().includes(searchTerm)) ||
+                    (mappedHandle && mappedHandle.toLowerCase().includes(searchTerm));
             });
         }
 
@@ -893,9 +893,9 @@ document.addEventListener('DOMContentLoaded', () => {
             addChannelBtn.disabled = false;
             addChannelBtn.textContent = originalText;
 
-            // Save settings first
+            // Save settings first and wait for completion
             recomputeKeywords();
-            saveSettings();
+            await saveSettings();
 
             // Reload the channelMap from storage to get the latest mappings
             chrome.storage.local.get(['channelMap'], (result) => {
@@ -952,7 +952,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (searchChannels) {
-        searchChannels.addEventListener('input', renderChannelList);
+        let debounceTimer;
+        searchChannels.addEventListener('input', () => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(renderChannelList, 300);
+        });
     }
 
     if (sortSelect) {
@@ -1013,70 +1017,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await (sharedLoadSettings ? sharedLoadSettings() : Promise.resolve({}));
             if (!data) return;
 
-            // Only update channels if they changed
-            if (changes.filterChannels) {
-                const newChannels = data.channels || [];
-                let enriched = false;
-
-                // Enrich any channels that need fetching (added from popup without details)
-                for (let i = 0; i < newChannels.length; i++) {
-                    const channel = newChannels[i];
-
-                    // If channel doesn't have enriched data and looks like it needs fetching
-                    if (channel && (!channel.logo || channel.name === channel.id)) {
-                        const originalInput = channel.originalInput || channel.id || channel.handle;
-
-                        if (!originalInput) continue;
-
-                        try {
-                            const response = await chrome.runtime.sendMessage({
-                                action: "fetchChannelDetails",
-                                channelIdOrHandle: originalInput
-                            });
-
-                            if (response.success && response.id) {
-                                // Update the channel with fetched data while PRESERVING originalInput
-                                newChannels[i] = {
-                                    ...channel,
-                                    name: response.name || channel.name,
-                                    id: response.id,
-                                    handle: response.handle || channel.handle,
-                                    logo: response.logo || channel.logo,
-                                    originalInput: originalInput // PRESERVE what user entered
-                                };
-
-                                console.log('FilterTube Tab View: Enriched channel from popup:', newChannels[i]);
-                                enriched = true;
-
-                                // Update channelMap
-                                if (response.handle && response.id) {
-                                    const currentMap = globalChannelMap || {};
-                                    const keyId = response.id.toLowerCase();
-                                    const keyHandle = response.handle.toLowerCase();
-                                    currentMap[keyId] = response.handle;
-                                    currentMap[keyHandle] = response.id;
-                                    globalChannelMap = currentMap;
-                                    await chrome.storage.local.set({ channelMap: currentMap });
-                                }
-                            }
-                        } catch (error) {
-                            console.warn('FilterTube Tab View: Could not enrich channel:', error);
-                        }
-                    }
-                }
-
-                // Update state and save enriched channels back to storage
-                state.channels = newChannels;
-                state.channelMap = data.channelMap || {};
-                globalChannelMap = state.channelMap;
-
-                // Save the enriched channels back (without triggering another save loop)
-                if (enriched) {
-                    await chrome.storage.local.set({ filterChannels: newChannels });
-                }
-            }
-
-            // Update other state from loaded data
+            // Update state from loaded data
             applyLoadedSettings(data);
         }
     });
