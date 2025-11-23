@@ -213,7 +213,7 @@ const UIComponents = (() => {
             // Create button
             const btn = document.createElement('button');
             btn.className = `tab-button ${tab.id === currentTab ? 'active' : ''}`;
-            btn.textContent = tab.label;
+            btn.innerHTML = tab.label;
             btn.setAttribute('data-tab-id', tab.id);
             btn.setAttribute('role', 'tab');
             btn.setAttribute('aria-selected', tab.id === currentTab);

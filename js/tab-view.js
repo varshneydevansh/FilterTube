@@ -235,8 +235,43 @@ document.addEventListener('DOMContentLoaded', () => {
     const statSavedTime = document.getElementById('statSavedTime');
 
     const themeToggle = document.getElementById('themeToggle');
-    const quickAddKeywordBtn = document.getElementById('quickAddKeywordBtn');
-    const quickKidsModeBtn = document.getElementById('quickKidsModeBtn');
+    if (quickAddKeywordBtn) {
+        quickAddKeywordBtn.addEventListener('click', () => {
+            // Switch to Filters tab
+            const filtersTab = document.querySelector('.nav-item[data-tab="filters"]');
+            if (filtersTab) filtersTab.click();
+
+            // Switch to Keywords sub-tab (if not already)
+            setTimeout(() => {
+                const keywordTabBtn = document.querySelector('.tab-button[data-tab-id="keywords"]');
+                if (keywordTabBtn) keywordTabBtn.click();
+                if (keywordInput) keywordInput.focus();
+            }, 100);
+        });
+    }
+
+    const quickAddChannelBtn = document.getElementById('quickAddChannelBtn');
+    if (quickAddChannelBtn) {
+        quickAddChannelBtn.addEventListener('click', () => {
+            // Switch to Filters tab
+            const filtersTab = document.querySelector('.nav-item[data-tab="filters"]');
+            if (filtersTab) filtersTab.click();
+
+            // Switch to Channels sub-tab
+            setTimeout(() => {
+                const channelTabBtn = document.querySelector('.tab-button[data-tab-id="channels"]');
+                if (channelTabBtn) channelTabBtn.click();
+                if (channelInput) channelInput.focus();
+            }, 100);
+        });
+    }
+
+    if (quickKidsModeBtn) {
+        quickKidsModeBtn.addEventListener('click', () => {
+            const kidsTab = document.querySelector('.nav-item[data-tab="kids"]');
+            if (kidsTab) kidsTab.click();
+        });
+    }
 
     if (sortSelect && sortSelect.value) {
         state.sort = sortSelect.value;
@@ -608,7 +643,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Real Stats from Storage
         const hidden = state.stats ? state.stats.hiddenCount : 0;
-        const saved = state.stats ? state.stats.savedMinutes : 0;
+        let saved = 0;
+
+        if (state.stats && state.stats.savedSeconds) {
+            // Use precise seconds if available
+            saved = Math.round(state.stats.savedSeconds / 60);
+        } else {
+            // Fallback to estimate (4 seconds per hidden item)
+            saved = Math.round((hidden || 0) * 4 / 60);
+        }
+
+        console.log('FilterTube Tab View: Stats updated - Hidden:', hidden, 'Saved Seconds:', state.stats?.savedSeconds, 'Display Minutes:', saved);
 
         if (statHiddenToday) statHiddenToday.textContent = String(hidden);
         if (statSavedTime) statSavedTime.textContent = `${saved}m`;
@@ -833,38 +878,41 @@ document.addEventListener('DOMContentLoaded', () => {
             const normalizedId = val.replace(/^channel\//i, '');
 
             // Check for duplicates - need to check against channelMap too
-            const isDuplicate = state.channels.some(ch => {
-                const chId = ch.id.toLowerCase();
-                const chHandle = (ch.handle || '').toLowerCase();
-                const inputLower = normalizedId.toLowerCase(); // Lowercase for comparison
-
-                // Direct match
-                if (chId === inputLower || chHandle === inputLower) return true;
-
-                // Check if the input maps to an existing channel via channelMap
-                const mappedValue = globalChannelMap[inputLower];
-                if (mappedValue && (mappedValue === chId || mappedValue === chHandle)) {
-                    return true;
-                }
-
-                // Check if existing channel maps to the input
-                const existingMapped = globalChannelMap[chId] || globalChannelMap[chHandle];
-                if (existingMapped === inputLower) {
-                    return true;
-                }
-
-                return false;
-            });
+            // Check for duplicates
+            const normalizedIdLower = normalizedId.toLowerCase();
+            const isDuplicate = state.channels.some(ch =>
+                ch.id.toLowerCase() === normalizedIdLower ||
+                (ch.handle && ch.handle.toLowerCase() === normalizedIdLower) ||
+                (ch.originalInput && ch.originalInput.toLowerCase() === normalizedIdLower)
+            );
 
             if (isDuplicate) {
-                alert('This channel is already in your filter list!');
+                alert('Channel already added!');
                 return;
             }
+
+            isAddingChannel = true; // Start critical section
 
             // Show loading state
             const originalText = addChannelBtn.textContent;
             addChannelBtn.textContent = 'Fetching...';
             addChannelBtn.disabled = true;
+
+            // OPTIMISTIC UPDATE: Add a temporary entry immediately
+            const tempId = 'temp-' + Date.now();
+            const tempEntry = {
+                name: val, // Use input as name initially
+                id: normalizedId,
+                handle: val.startsWith('@') ? val : null,
+                logo: null, // No logo yet
+                filterAll: false,
+                originalInput: val,
+                isPending: true // Flag to indicate pending state
+            };
+
+            state.channels.unshift(tempEntry);
+            if (channelInput) channelInput.value = '';
+            renderChannelList(); // Render immediately
 
             let channelName = val;
             let channelHandle = null;
@@ -876,6 +924,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     action: "fetchChannelDetails",
                     channelIdOrHandle: normalizedId // Send the case-preserved normalizedId
                 });
+
+                // Remove the temporary entry
+                state.channels = state.channels.filter(ch => ch !== tempEntry);
 
                 if (response.success && response.id) {
                     channelName = response.name;
@@ -904,13 +955,22 @@ document.addEventListener('DOMContentLoaded', () => {
                         });
                     }
                 } else {
+                    // If fetch failed, we removed the temp entry, so we should alert the user
+                    // But maybe we want to keep it as a "raw" entry? 
+                    // For now, let's keep the behavior of alerting on failure, but we already removed the optimistic entry.
                     alert(`Failed to fetch channel details: ${response.error || 'Unknown error'}`);
                     console.error('FilterTube Tab View: Failed to fetch channel details', response);
+                    renderChannelList(); // Re-render to remove the temp entry
                     return; // Stop processing if fetching failed
                 }
             } catch (error) {
+                // Remove temp entry on error
+                state.channels = state.channels.filter(ch => ch !== tempEntry);
+                renderChannelList();
+
                 alert('Error communicating with background script. Please try again.');
                 console.error('FilterTube Tab View: Error fetching channel details via background script:', error);
+                isAddingChannel = false;
                 return; // Stop processing if communication failed
             } finally {
                 addChannelBtn.disabled = false;
@@ -930,15 +990,12 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             state.channels.unshift(channelEntry); // Add to beginning for newest-first order
-            if (channelInput) channelInput.value = '';
-
-            // Re-enable button
-            addChannelBtn.disabled = false;
-            addChannelBtn.textContent = originalText;
 
             // Save settings first and wait for completion
             recomputeKeywords();
             await saveSettings();
+
+            isAddingChannel = false; // End critical section
 
             // Reload the channelMap from storage to get the latest mappings
             chrome.storage.local.get(['channelMap'], (result) => {
@@ -949,7 +1006,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderChannelList();
                 renderKeywordList();
             });
-
             // Flash success feedback
             UIComponents.flashButtonSuccess(addChannelBtn, 'Added!', 1200);
         });
@@ -1055,6 +1111,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (hasSettingsChange) {
             console.log('FilterTube Tab View: Detected settings change from popup/external source');
+
+            // Prevent overwriting optimistic updates during channel addition
+            if (isAddingChannel) {
+                console.log('FilterTube Tab View: Skipping settings reload because channel addition is in progress');
+                return;
+            }
 
             // Reload settings from storage
             const data = await (sharedLoadSettings ? sharedLoadSettings() : Promise.resolve({}));

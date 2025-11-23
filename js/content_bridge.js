@@ -944,6 +944,19 @@ function applyDOMFallback(settings, options = {}) {
             }
         }
 
+        // Track Time Saved
+        if (shouldHide && !targetToHide.hasAttribute('data-filtertube-time-saved')) {
+            const duration = extractVideoDuration(element);
+            if (duration > 0) {
+                chrome.runtime.sendMessage({
+                    action: "recordTimeSaved",
+                    seconds: duration
+                });
+                targetToHide.setAttribute('data-filtertube-time-saved', 'true');
+                console.log(`FilterTube: Saved ${duration} seconds from "${title}"`);
+            }
+        }
+
         toggleVisibility(targetToHide, shouldHide, hideReason);
         element.setAttribute('data-filtertube-processed', 'true');
     });
@@ -1449,3 +1462,40 @@ try {
 } catch (e) { }
 
 setTimeout(() => initialize(), 50);
+
+function extractVideoDuration(element) {
+    // Selectors for time duration
+    const selectors = [
+        'ytd-thumbnail-overlay-time-status-renderer',
+        '.yt-badge-shape__text',
+        'badge-shape.yt-badge-shape--thumbnail-badge .yt-badge-shape__text',
+        'yt-thumbnail-overlay-badge-view-model .yt-badge-shape__text'
+    ];
+
+    let timeText = '';
+    for (const selector of selectors) {
+        const el = element.querySelector(selector);
+        if (el && el.textContent) {
+            timeText = el.textContent.trim();
+            break;
+        }
+    }
+
+    // Handle "Mix" playlists or other non-time badges
+    if (!timeText || isNaN(parseInt(timeText[0]))) return 0;
+
+    // Parse time (H:MM:SS or M:SS)
+    const parts = timeText.split(':').map(part => parseInt(part, 10));
+    let seconds = 0;
+
+    if (parts.length === 3) {
+        seconds = parts[0] * 3600 + parts[1] * 60 + parts[2];
+    } else if (parts.length === 2) {
+        seconds = parts[0] * 60 + parts[1];
+    } else if (parts.length === 1) {
+        // Just seconds? Unlikely but possible
+        seconds = parts[0];
+    }
+
+    return isNaN(seconds) ? 0 : seconds;
+}

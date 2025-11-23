@@ -88,7 +88,11 @@ function initializePopupFiltersTabs() {
         tabs: [
             { id: 'keywords', label: 'Keywords', content: keywordsContent },
             { id: 'channels', label: 'Channels', content: channelsContent },
-            { id: 'content', label: 'Content', content: contentTab }
+            {
+                id: 'content',
+                label: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>',
+                content: contentTab
+            }
         ],
         defaultTab: 'keywords',
         onTabChange: (tabId) => {
@@ -624,41 +628,74 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    if (hideAllShortsCheckbox) {
-        hideAllShortsCheckbox.addEventListener('change', () => {
-            state.hideShorts = hideAllShortsCheckbox.checked;
+    if (hideShortsToggle) {
+        hideShortsToggle.addEventListener('change', async () => {
+            await ensureSettingsLoaded();
+            state.hideShorts = hideShortsToggle.checked;
+            await saveSettings();
         });
     }
 
-    if (hideAllCommentsCheckbox && filterCommentsCheckbox) {
-        hideAllCommentsCheckbox.addEventListener('change', () => {
-            syncToggleStateFromInputs();
+    if (hideCommentsToggle && filterCommentsToggle) {
+        hideCommentsToggle.addEventListener('change', async () => {
+            await ensureSettingsLoaded();
+            state.hideComments = hideCommentsToggle.checked;
+
+            // Instant Feedback: Disable filter toggle if hide all is on
+            if (state.hideComments) {
+                filterCommentsToggle.checked = false;
+                filterCommentsToggle.disabled = true;
+                state.filterComments = false; // Force state update
+            } else {
+                filterCommentsToggle.disabled = false;
+            }
+
+            await saveSettings();
         });
 
-        filterCommentsCheckbox.addEventListener('change', () => {
-            state.filterComments = filterCommentsCheckbox.checked;
+        filterCommentsToggle.addEventListener('change', async () => {
+            await ensureSettingsLoaded();
+            state.filterComments = filterCommentsToggle.checked;
+            await saveSettings();
         });
     }
 
-    chrome.storage.onChanged.addListener(async (changes, area) => {
-        if (area !== 'local' || isSaving) return;
+    if (themeToggle) {
+        themeToggle.addEventListener('click', async () => {
+            await ensureSettingsLoaded();
+            const nextTheme = state.theme === 'dark' ? 'light' : 'dark';
+            state.theme = nextTheme;
+            applyTheme(nextTheme);
+            if (sharedSetThemePreference) {
+                await sharedSetThemePreference(nextTheme);
+            } else {
+                chrome.storage?.local.set({ [SettingsAPI.THEME_KEY || 'ftThemePreference']: nextTheme });
+            }
+        });
+    }
 
-        const hasSettingsChange = sharedIsSettingsChange ? sharedIsSettingsChange(changes) : Object.keys(changes).some(key =>
-            ['uiKeywords', 'filterKeywords', 'filterChannels', 'hideAllShorts', 'hideAllComments', 'filterComments', 'stats', 'channelMap'].includes(key)
-        );
-        const hasThemeChange = sharedIsThemeChange ? sharedIsThemeChange(changes) : Object.prototype.hasOwnProperty.call(changes, SettingsAPI.THEME_KEY || 'ftThemePreference');
-
-        if (hasThemeChange) {
-            const newTheme = sharedGetThemeFromChange ? sharedGetThemeFromChange(changes) : (changes?.ftThemePreference?.newValue || 'light');
-            applyTheme(newTheme);
-        }
-
-        if (hasSettingsChange && sharedLoadSettings) {
-            console.log('FilterTube Popup: Storage change detected, reloading settings', Object.keys(changes));
-            const data = await sharedLoadSettings();
-            applyLoadedSettings(data);
-        }
-    });
-
+    // Initial load
     loadSettings();
 });
+chrome.storage.onChanged.addListener(async (changes, area) => {
+    if (area !== 'local' || isSaving) return;
+
+    const hasSettingsChange = sharedIsSettingsChange ? sharedIsSettingsChange(changes) : Object.keys(changes).some(key =>
+        ['uiKeywords', 'filterKeywords', 'filterChannels', 'hideAllShorts', 'hideAllComments', 'filterComments', 'stats', 'channelMap'].includes(key)
+    );
+    const hasThemeChange = sharedIsThemeChange ? sharedIsThemeChange(changes) : Object.prototype.hasOwnProperty.call(changes, SettingsAPI.THEME_KEY || 'ftThemePreference');
+
+    if (hasThemeChange) {
+        const newTheme = sharedGetThemeFromChange ? sharedGetThemeFromChange(changes) : (changes?.ftThemePreference?.newValue || 'light');
+        applyTheme(newTheme);
+    }
+
+    if (hasSettingsChange && sharedLoadSettings) {
+        console.log('FilterTube Popup: Storage change detected, reloading settings', Object.keys(changes));
+        const data = await sharedLoadSettings();
+        applyLoadedSettings(data);
+    }
+});
+
+
+

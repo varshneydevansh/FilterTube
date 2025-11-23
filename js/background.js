@@ -302,6 +302,14 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
             }
         });
         return false; // No response needed
+    } else if (request.action === "recordTimeSaved") {
+        // Accumulate saved time
+        browserAPI.storage.local.get(['stats'], (result) => {
+            const stats = result.stats || { savedSeconds: 0, hiddenCount: 0 };
+            stats.savedSeconds = (stats.savedSeconds || 0) + (request.seconds || 0);
+            browserAPI.storage.local.set({ stats });
+        });
+        return false;
     }
 
     else if (request.action === "fetchChannelDetails") {
@@ -442,7 +450,7 @@ async function fetchChannelInfo(channelIdOrHandle) {
                 if (char === '"') {
                     inString = !inString;
                     continue;
-                    }
+                }
 
                 if (!inString) {
                     if (char === '{') depth++;
@@ -646,8 +654,8 @@ async function fetchChannelInfo(channelIdOrHandle) {
         // Fallback to original cleanId if it looks like a UC ID and resolvedChannelId is still missing
         // This is now less critical as direct UC ID is handled at the start
         if (!resolvedChannelId && cleanId.toUpperCase().startsWith('UC') && cleanId.length === 24) {
-             resolvedChannelId = cleanId;
-             console.log('FilterTube Background: Falling back to cleanId as resolvedChannelId:', resolvedChannelId);
+            resolvedChannelId = cleanId;
+            console.log('FilterTube Background: Falling back to cleanId as resolvedChannelId:', resolvedChannelId);
         }
 
 
