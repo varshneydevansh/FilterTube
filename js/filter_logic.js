@@ -631,13 +631,15 @@
         _registerMapping(id, handle) {
             if (!id || !handle) return;
 
-            const normId = id.toLowerCase();
-            const normHandle = handle.toLowerCase();
+            // Keys are lowercase for case-insensitive lookup
+            // Values preserve ORIGINAL case from YouTube
+            const keyId = id.toLowerCase();
+            const keyHandle = handle.toLowerCase();
 
             // Only save if this is a new mapping
-            if (this.channelMap[normId] !== normHandle) {
-                this.channelMap[normId] = normHandle;   // UC... -> @handle
-                this.channelMap[normHandle] = normId;   // @handle -> UC...
+            if (this.channelMap[keyId] !== handle) {
+                this.channelMap[keyId] = handle;      // UC... -> @BTS (original case)
+                this.channelMap[keyHandle] = id;      // @bts -> UCLkAepWjdylmXSltofFvsYQ (original case)
 
                 postLogToBridge('log', `🧠 LEARNED MAPPING: ${id} <-> ${handle}`);
 
@@ -645,7 +647,7 @@
                 try {
                     window.postMessage({
                         type: 'FilterTube_UpdateChannelMap',
-                        payload: [{ id: normId, handle: normHandle }],
+                        payload: [{ id: id, handle: handle }],  // Send original case
                         source: 'filter_logic'
                     }, '*');
                 } catch (e) {

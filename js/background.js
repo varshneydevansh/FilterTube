@@ -103,16 +103,16 @@ async function getCompiledSettings() {
                         // Legacy string format - convert to object format
                         return {
                             name: ch.trim(),
-                            id: ch.trim().toLowerCase(),
+                            id: ch.trim(), // Preserve case for UC IDs
                             handle: null,
                             filterAll: false
                         };
                     } else if (ch && typeof ch === 'object') {
-                        // New object format - preserve the structure but lowercase the IDs
+                        // New object format - preserve the original case for IDs
                         const channelObj = {
                             name: ch.name,
-                            id: (ch.id || '').toLowerCase(),
-                            handle: (ch.handle || '').toLowerCase() || null,
+                            id: ch.id || '', // Preserve case for UC IDs
+                            handle: (ch.handle || '').toLowerCase() || null, // Lowercase handles for consistency
                             filterAll: !!ch.filterAll
                         };
 
@@ -139,7 +139,7 @@ async function getCompiledSettings() {
                 // Legacy string format
                 compiledChannels = storedChannels
                     .split(',')
-                    .map(c => c.trim().toLowerCase())
+                    .map(c => c.trim()) // Preserve case for UC IDs
                     .filter(Boolean)
                     .map(c => ({ name: c, id: c, handle: null, filterAll: false }));
                 storageUpdates.filterChannels = compiledChannels;
@@ -279,9 +279,14 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
             let hasChange = false;
 
             request.mappings.forEach(m => {
-                if (currentMap[m.id] !== m.handle) {
-                    currentMap[m.id] = m.handle; // UC... -> @handle
-                    currentMap[m.handle] = m.id; // @handle -> UC...
+                // Keys are lowercase for case-insensitive lookup
+                // Values preserve ORIGINAL case from YouTube
+                const keyId = m.id.toLowerCase();
+                const keyHandle = m.handle.toLowerCase();
+
+                if (currentMap[keyId] !== m.handle) {
+                    currentMap[keyId] = m.handle;    // UC... -> @BTS (original case)
+                    currentMap[keyHandle] = m.id;    // @bts -> UCLkAepWjdylmXSltofFvsYQ (original case)
                     hasChange = true;
                 }
             });

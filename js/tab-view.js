@@ -665,14 +665,77 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const html = await response.text();
 
-            // Extract ytInitialData from the page
-            const ytInitialDataMatch = html.match(/var ytInitialData = ({.+?});/);
-            if (!ytInitialDataMatch) {
-                console.error('FilterTube: Could not find ytInitialData in page');
+            // Extract ytInitialData from the page using a more robust method
+            let data = null;
+
+            // Helper function to extract JSON with balanced braces
+            function extractJSON(text, startPattern) {
+                const startIndex = text.search(startPattern);
+                if (startIndex === -1) return null;
+
+                const jsonStart = text.indexOf('{', startIndex);
+                if (jsonStart === -1) return null;
+
+                let depth = 0;
+                let inString = false;
+                let escapeNext = false;
+
+                for (let i = jsonStart; i < text.length; i++) {
+                    const char = text[i];
+
+                    if (escapeNext) {
+                        escapeNext = false;
+                        continue;
+                    }
+
+                    if (char === '\\') {
+                        escapeNext = true;
+                        continue;
+                    }
+
+                    if (char === '"') {
+                        inString = !inString;
+                        continue;
+                    }
+
+                    if (!inString) {
+                        if (char === '{') depth++;
+                        else if (char === '}') {
+                            depth--;
+                            if (depth === 0) {
+                                return text.substring(jsonStart, i + 1);
+                            }
+                        }
+                    }
+                }
+
                 return null;
             }
 
-            const data = JSON.parse(ytInitialDataMatch[1]);
+            // Try different patterns
+            const patterns = [
+                /var ytInitialData\s*=/,
+                /window\["ytInitialData"\]\s*=/,
+                /ytInitialData"\s*:/
+            ];
+
+            for (const pattern of patterns) {
+                const jsonStr = extractJSON(html, pattern);
+                if (jsonStr) {
+                    try {
+                        data = JSON.parse(jsonStr);
+                        console.log('FilterTube: Successfully extracted ytInitialData using pattern:', pattern);
+                        break;
+                    } catch (e) {
+                        console.warn('FilterTube: Failed to parse JSON for pattern:', pattern, e.message);
+                    }
+                }
+            }
+
+            if (!data) {
+                console.error('FilterTube: Could not extract ytInitialData from page');
+                return null;
+            }
 
             let channelName = null;
             let channelHandle = null;
@@ -684,18 +747,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log('FilterTube: Found metadata:', metadata);
 
                 // Name
-                channelName = metadata.title;
+                if (metadata.title) {
+                    channelName = metadata.title;
+                    console.log('FilterTube: Got name from metadata:', channelName);
+                }
 
                 // Handle from vanityChannelUrl
                 if (metadata.vanityChannelUrl) {
                     const match = metadata.vanityChannelUrl.match(/@([^/]+)/);
-                    if (match) channelHandle = '@' + match[1];
+                    if (match) {
+                        channelHandle = '@' + match[1];
+                        console.log('FilterTube: Got handle from metadata:', channelHandle);
+                    }
                 }
 
                 // Logo (Avatar)
                 if (metadata.avatar?.thumbnails?.length > 0) {
                     channelLogo = metadata.avatar.thumbnails[metadata.avatar.thumbnails.length - 1].url;
+                    console.log('FilterTube: Got logo from metadata:', channelLogo);
                 }
+            } else {
+                console.log('FilterTube: No metadata block found');
             }
 
             // --- BLOCK 2: Page Header ViewModel (New YouTube Structure) ---
@@ -797,11 +869,40 @@ document.addEventListener('DOMContentLoaded', () => {
             const val = (channelInput?.value || '').trim();
             if (!val) return;
 
-            // Normalize the ID first (remove channel/ prefix if present)
-            const normalizedId = val.toLowerCase().replace(/^channel\//i, '');
+            // Validate input format
+            if (!val.startsWith('@') && !val.toLowerCase().startsWith('uc') && !val.toLowerCase().startsWith('channel/uc')) {
+                alert('Please enter a valid channel identifier:\n- @handle (e.g., @shakira)\n- UC ID (e.g., UCYLNGLIzMhRTi6ZOLjAPSmw)\n- channel/UC ID');
+                return;
+            }
 
-            // Check for duplicates (check both raw input and normalized ID)
-            if (state.channels.some(ch => ch.id === normalizedId || ch.id === val.toLowerCase() || ch.handle === val)) {
+            // Remove channel/ prefix but preserve case for UC IDs
+            const normalizedId = val.replace(/^channel\//i, '');
+
+            // Check for duplicates - need to check against channelMap too
+            const isDuplicate = state.channels.some(ch => {
+                const chId = ch.id.toLowerCase();
+                const chHandle = (ch.handle || '').toLowerCase();
+                const inputLower = normalizedId.toLowerCase(); // Lowercase for comparison
+
+                // Direct match
+                if (chId === inputLower || chHandle === inputLower) return true;
+
+                // Check if the input maps to an existing channel via channelMap
+                const mappedValue = globalChannelMap[inputLower];
+                if (mappedValue && (mappedValue === chId || mappedValue === chHandle)) {
+                    return true;
+                }
+
+                // Check if existing channel maps to the input
+                const existingMapped = globalChannelMap[chId] || globalChannelMap[chHandle];
+                if (existingMapped === inputLower) {
+                    return true;
+                }
+
+                return false;
+            });
+
+            if (isDuplicate) {
                 alert('This channel is already in your filter list!');
                 return;
             }
@@ -816,7 +917,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let channelLogo = null;
             let channelId = normalizedId;
 
-            const isUCId = normalizedId.startsWith('uc');
+            const isUCId = normalizedId.toLowerCase().startsWith('uc');
             const isHandle = val.startsWith('@');
 
             // Fetch channel info from YouTube API
@@ -830,6 +931,29 @@ document.addEventListener('DOMContentLoaded', () => {
                     channelHandle = channelInfo.handle;
                     channelLogo = channelInfo.logo;
                     console.log('FilterTube: Successfully fetched - Name:', channelName, 'Handle:', channelHandle, 'Logo:', channelLogo);
+
+                    // Store the UC ID -> Handle mapping in channelMap (use Promise for async)
+                    if (channelHandle) {
+                        await new Promise((resolve) => {
+                            chrome.storage.local.get(['channelMap'], (result) => {
+                                const currentMap = result.channelMap || {};
+                                // Keys are lowercase for case-insensitive lookup
+                                // Values preserve ORIGINAL case from YouTube
+                                const keyId = normalizedId.toLowerCase();
+                                const keyHandle = channelHandle.toLowerCase();
+                                currentMap[keyId] = channelHandle;      // UC... -> @BTS (original case)
+                                currentMap[keyHandle] = normalizedId;   // @bts -> UCLkAepWjdylmXSltofFvsYQ (original case)
+
+                                // Update global map immediately in memory
+                                globalChannelMap = currentMap;
+
+                                chrome.storage.local.set({ channelMap: currentMap }, () => {
+                                    console.log('FilterTube: Updated channelMap with new mapping:', keyId, '<->', channelHandle, 'and', keyHandle, '<->', normalizedId);
+                                    resolve();
+                                });
+                            });
+                        });
+                    }
                 } else {
                     console.warn('FilterTube: Could not fetch channel name, using ID as name');
                 }
@@ -862,12 +986,18 @@ document.addEventListener('DOMContentLoaded', () => {
                         // Store the mapping in channelMap
                         chrome.storage.local.get(['channelMap'], (result) => {
                             const currentMap = result.channelMap || {};
-                            const normHandle = val.startsWith('@') ? val.toLowerCase() : `@${val.toLowerCase()}`;
-                            const normId = resolvedId.toLowerCase();
-                            currentMap[normId] = normHandle;     // UC... -> @handle
-                            currentMap[normHandle] = normId;     // @handle -> UC...
+                            // Keys are lowercase for case-insensitive lookup
+                            // Values preserve ORIGINAL case from YouTube
+                            const keyHandle = val.toLowerCase();
+                            const keyId = resolvedId.toLowerCase();
+                            currentMap[keyId] = val;          // UC... -> @shakira (original case from user input)
+                            currentMap[keyHandle] = resolvedId;  // @shakira -> UCYLNGLIzMhRTi6ZOLjAPSmw (original case from YouTube)
+
+                            // Update global map immediately in memory
+                            globalChannelMap = currentMap;
+
                             chrome.storage.local.set({ channelMap: currentMap });
-                            console.log('FilterTube: Updated channelMap with new mapping:', normId, '<->', normHandle);
+                            console.log('FilterTube: Updated channelMap with new mapping:', keyId, '<->', val, 'and', keyHandle, '<->', resolvedId);
                         });
                     } else {
                         channelName = val; // Fallback to handle
