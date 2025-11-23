@@ -595,3 +595,188 @@ input:checked+.slider:before {
     font-size: var(--ft-font-size-caption);
     color: var(--ft-color-text-muted);
 }
+
+/* --- CHANNEL CARD CONTAINER --- */
+.channel-item {
+    display: flex;
+    flex-direction: column;
+    padding: 16px !important;
+    gap: 12px;
+    background: var(--ft-color-bg-base, #ffffff);
+    border-bottom: 1px solid var(--ft-color-sem-neutral-border, #e5e7eb);
+    align-items: stretch;
+}
+
+.channel-item:hover {
+    background-color: var(--ft-color-bg-panel, #f9fafb);
+}
+
+/* --- ROW 1: HEADER (Logo + Name + Delete) --- */
+.channel-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.channel-info-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.channel-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    flex-shrink: 0;
+}
+
+.channel-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.delete-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    color: #9ca3af;
+    font-size: 24px;
+    line-height: 1;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.delete-btn:hover {
+    background-color: #fee2e2;
+    color: #ef4444;
+}
+
+/* --- ROW 2: BODY (Node + Controls) --- */
+.channel-body-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding-left: 44px; /* Indent to align with name (32px logo + 12px gap) */
+}
+
+/* 1. The Node Map Container */
+.channel-node-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Source Text (NO BOX - just plain text, bold) */
+.node-source-text {
+    font-family: 'Roboto Mono', 'Courier New', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+/* Connector Arrow */
+.node-connector {
+    color: #cbd5e1;
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding: 0 8px;
+}
+
+/* Active Green Arrow with longer connection line */
+.node-connector.active {
+    color: #16a34a;
+    filter: drop-shadow(0 0 2px rgba(22, 163, 74, 0.3));
+}
+
+.node-connector.active::before {
+    content: '';
+    position: absolute;
+    left: -10px;
+    right: 50%;
+    top: 50%;
+    height: 2px;
+    background: linear-gradient(to right, transparent, #16a34a);
+}
+
+.node-connector.active::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    right: -10px;
+    top: 50%;
+    height: 2px;
+    background: linear-gradient(to left, transparent, #16a34a);
+}
+
+/* Target Badge (GREEN BOX around fetched ID only) */
+.node-badge.resolved {
+    font-family: 'Roboto Mono', 'Courier New', monospace;
+    font-size: 12px;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-weight: 600;
+    background: #dcfce7;
+    color: #15803d;
+    border: 1px solid #86efac;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Pending text */
+.node-pending-text {
+    color: #94a3b8;
+    font-style: italic;
+    font-size: 13px;
+}
+
+/* 2. The Pill Button */
+.filter-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 99px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    color: #64748b;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.2s;
+    height: 32px;
+}
+
+.filter-pill:hover {
+    border-color: #cbd5e1;
+    background: #f1f5f9;
+}
+
+.filter-pill.active {
+    background: #fff1f2;
+    border-color: #fda4af;
+    color: #e11d48;
+}
+
+.filter-pill .pill-icon {
+    font-weight: bold;
+    font-size: 14px;
+    line-height: 0;
+}
+
+.filter-pill .pill-text {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    font-weight: 600;
+}

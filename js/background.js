@@ -92,9 +92,10 @@ async function getCompiledSettings() {
                 browserAPI.storage.local.set(storageUpdates);
             }
 
-            // Compile channels - preserve objects with name, id, handle
+            // Compile channels - preserve objects with name, id, handle, filterAll
             const storedChannels = items.filterChannels;
             let compiledChannels = [];
+            const additionalKeywordsFromChannels = [];
 
             if (Array.isArray(storedChannels)) {
                 compiledChannels = storedChannels.map(ch => {
@@ -103,15 +104,28 @@ async function getCompiledSettings() {
                         return {
                             name: ch.trim(),
                             id: ch.trim().toLowerCase(),
-                            handle: null
+                            handle: null,
+                            filterAll: false
                         };
                     } else if (ch && typeof ch === 'object') {
                         // New object format - preserve the structure but lowercase the IDs
-                        return {
+                        const channelObj = {
                             name: ch.name,
                             id: (ch.id || '').toLowerCase(),
-                            handle: (ch.handle || '').toLowerCase() || null
+                            handle: (ch.handle || '').toLowerCase() || null,
+                            filterAll: !!ch.filterAll
                         };
+
+                        // If filterAll is enabled, add the channel name to keywords
+                        if (channelObj.filterAll && channelObj.name && channelObj.name !== channelObj.id) {
+                            const escaped = channelObj.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                            additionalKeywordsFromChannels.push({
+                                pattern: escaped,
+                                flags: 'i'
+                            });
+                        }
+
+                        return channelObj;
                     }
                     return null;
                 }).filter(Boolean);
@@ -126,12 +140,21 @@ async function getCompiledSettings() {
                 compiledChannels = storedChannels
                     .split(',')
                     .map(c => c.trim().toLowerCase())
-                    .filter(Boolean);
+                    .filter(Boolean)
+                    .map(c => ({ name: c, id: c, handle: null, filterAll: false }));
                 storageUpdates.filterChannels = compiledChannels;
-                storageUpdates.uiChannels = compiledChannels.map(ch => ch);
+                storageUpdates.uiChannels = compiledChannels.map(ch => ch.name);
             }
 
             compiledSettings.filterChannels = compiledChannels;
+
+            // Merge channel-based keywords with existing keywords
+            if (additionalKeywordsFromChannels.length > 0) {
+                compiledSettings.filterKeywords = [
+                    ...compiledSettings.filterKeywords,
+                    ...additionalKeywordsFromChannels
+                ];
+            }
 
             // Pass through the channel map (UC ID <-> @handle mappings)
             compiledSettings.channelMap = items.channelMap || {};
