@@ -718,7 +718,8 @@ input:checked+.slider:before {
     align-items: center;
     gap: 16px;
     flex-wrap: wrap;
-    padding-left: 44px; /* Indent to align with name (32px logo + 12px gap) */
+    padding-left: 44px;
+    /* Indent to align with name (32px logo + 12px gap) */
 }
 
 /* 1. The Node Map Container */
@@ -781,7 +782,7 @@ input:checked+.slider:before {
     background: #dcfce7;
     color: #166534;
     border: 1px solid #86efac;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     max-width: 180px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -858,6 +859,7 @@ input:checked+.slider:before {
     letter-spacing: 0.03em;
     font-weight: 600;
 }
+
 /* Custom Fast Tooltips */
 [data-tooltip] {
     position: relative;
@@ -870,7 +872,8 @@ input:checked+.slider:before {
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.15s ease-in-out;
-    transition-delay: 0.2s; /* Faster than browser default (typically 0.5-1s) */
+    transition-delay: 0.05s;
+    /* Very fast response */
     z-index: 1000;
 }
 

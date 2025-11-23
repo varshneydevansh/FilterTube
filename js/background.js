@@ -306,7 +306,11 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
         // Accumulate saved time
         browserAPI.storage.local.get(['stats'], (result) => {
             const stats = result.stats || { savedSeconds: 0, hiddenCount: 0 };
-            stats.savedSeconds = (stats.savedSeconds || 0) + (request.seconds || 0);
+            const oldSeconds = stats.savedSeconds || 0;
+            stats.savedSeconds = oldSeconds + (request.seconds || 0);
+
+            // console.log(`FilterTube Background: Time Saved Updated. Added: ${request.seconds}s. Total: ${stats.savedSeconds}s`);
+
             browserAPI.storage.local.set({ stats });
         });
         return false;

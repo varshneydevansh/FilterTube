@@ -1469,33 +1469,67 @@ function extractVideoDuration(element) {
         'ytd-thumbnail-overlay-time-status-renderer',
         '.yt-badge-shape__text',
         'badge-shape.yt-badge-shape--thumbnail-badge .yt-badge-shape__text',
-        'yt-thumbnail-overlay-badge-view-model .yt-badge-shape__text'
+        'yt-thumbnail-overlay-badge-view-model .yt-badge-shape__text',
+        // Accessibility labels often contain the full text
+        '[aria-label*="minutes"], [aria-label*="seconds"]'
     ];
 
     let timeText = '';
     for (const selector of selectors) {
         const el = element.querySelector(selector);
-        if (el && el.textContent) {
-            timeText = el.textContent.trim();
-            break;
+        if (el) {
+            // Prefer aria-label if available as it's often more complete/structured
+            if (el.getAttribute('aria-label')) {
+                timeText = el.getAttribute('aria-label');
+                break;
+            }
+            if (el.textContent) {
+                timeText = el.textContent.trim();
+                break;
+            }
         }
     }
 
-    // Handle "Mix" playlists or other non-time badges
-    if (!timeText || isNaN(parseInt(timeText[0]))) return 0;
-
-    // Parse time (H:MM:SS or M:SS)
-    const parts = timeText.split(':').map(part => parseInt(part, 10));
-    let seconds = 0;
-
-    if (parts.length === 3) {
-        seconds = parts[0] * 3600 + parts[1] * 60 + parts[2];
-    } else if (parts.length === 2) {
-        seconds = parts[0] * 60 + parts[1];
-    } else if (parts.length === 1) {
-        // Just seconds? Unlikely but possible
-        seconds = parts[0];
+    // Fallback: Check the main element's aria-label if no child found
+    if (!timeText && element.getAttribute('aria-label')) {
+        timeText = element.getAttribute('aria-label');
     }
 
-    return isNaN(seconds) ? 0 : seconds;
+    if (!timeText) return 0;
+
+    console.log('FilterTube: Extracting duration from text:', timeText);
+
+    // Try parsing "H:MM:SS" or "M:SS" format first using strict regex
+    // Matches: 1:02:30 (3 groups) or 12:30 (2 groups)
+    const timeMatch = timeText.match(/(?:(\d+):)?(\d{1,2}):(\d{2})/);
+
+    if (timeMatch) {
+        let seconds = 0;
+        const p1 = timeMatch[1] ? parseInt(timeMatch[1], 10) : 0;
+        const p2 = parseInt(timeMatch[2], 10);
+        const p3 = parseInt(timeMatch[3], 10);
+
+        if (timeMatch[1]) {
+            // Format H:MM:SS -> p1=Hours, p2=Minutes, p3=Seconds
+            seconds = p1 * 3600 + p2 * 60 + p3;
+        } else {
+            // Format M:SS -> p2=Minutes, p3=Seconds
+            seconds = p2 * 60 + p3;
+        }
+        return seconds;
+    }
+
+    // Try parsing verbose format "X minutes, Y seconds"
+    // Regex to capture hours, minutes, seconds
+    const hoursMatch = timeText.match(/(\d+)\s*(?:hour|hr)/i);
+    const minutesMatch = timeText.match(/(\d+)\s*(?:minute|min)/i);
+    const secondsMatch = timeText.match(/(\d+)\s*(?:second|sec)/i);
+
+    let totalSeconds = 0;
+    if (hoursMatch) totalSeconds += parseInt(hoursMatch[1], 10) * 3600;
+    if (minutesMatch) totalSeconds += parseInt(minutesMatch[1], 10) * 60;
+    if (secondsMatch) totalSeconds += parseInt(secondsMatch[1], 10);
+
+    return totalSeconds;
 }
+

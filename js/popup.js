@@ -628,38 +628,39 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    if (hideShortsToggle) {
-        hideShortsToggle.addEventListener('change', async () => {
+    if (hideAllShortsCheckbox) {
+        hideAllShortsCheckbox.addEventListener('change', async () => {
             await ensureSettingsLoaded();
-            state.hideShorts = hideShortsToggle.checked;
+            state.hideShorts = hideAllShortsCheckbox.checked;
             await saveSettings();
         });
     }
 
-    if (hideCommentsToggle && filterCommentsToggle) {
-        hideCommentsToggle.addEventListener('change', async () => {
+    if (hideAllCommentsCheckbox && filterCommentsCheckbox) {
+        hideAllCommentsCheckbox.addEventListener('change', async () => {
             await ensureSettingsLoaded();
-            state.hideComments = hideCommentsToggle.checked;
+            state.hideComments = hideAllCommentsCheckbox.checked;
 
             // Instant Feedback: Disable filter toggle if hide all is on
             if (state.hideComments) {
-                filterCommentsToggle.checked = false;
-                filterCommentsToggle.disabled = true;
+                filterCommentsCheckbox.checked = false;
+                filterCommentsCheckbox.disabled = true;
                 state.filterComments = false; // Force state update
             } else {
-                filterCommentsToggle.disabled = false;
+                filterCommentsCheckbox.disabled = false;
             }
 
             await saveSettings();
         });
 
-        filterCommentsToggle.addEventListener('change', async () => {
+        filterCommentsCheckbox.addEventListener('change', async () => {
             await ensureSettingsLoaded();
-            state.filterComments = filterCommentsToggle.checked;
+            state.filterComments = filterCommentsCheckbox.checked;
             await saveSettings();
         });
     }
 
+    const themeToggle = document.getElementById('themeToggle');
     if (themeToggle) {
         themeToggle.addEventListener('click', async () => {
             await ensureSettingsLoaded();

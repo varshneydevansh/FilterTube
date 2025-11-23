@@ -197,6 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let settingsLoadingPromise = null;
     let isSaving = false;
     let isInitializing = true;
+    let isAddingChannel = false; // Flag to prevent race conditions during channel addition
 
     const SettingsAPI = window.FilterTubeSettings || {};
     const {
