@@ -206,7 +206,6 @@ body {
     cursor: default;
 }
 
-.stat-card[data-tooltip]:hover,
 .stat-card[title]:hover {
     box-shadow: var(--ft-shadow-elevated);
     transform: translateY(-2px);
@@ -279,6 +278,7 @@ body {
     box-shadow: var(--ft-shadow-floating);
     margin-bottom: var(--ft-space-lg);
     overflow: hidden;
+    /* Allow tooltips to escape */
 }
 
 .card-header {
@@ -861,70 +861,4 @@ input:checked+.slider:before {
     text-transform: uppercase;
     letter-spacing: 0.03em;
     font-weight: 600;
-}
-
-/* Custom Glassmorphism Tooltips */
-[data-tooltip] {
-    position: relative;
-    cursor: help;
-}
-
-[data-tooltip]::before,
-[data-tooltip]::after {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s ease-in-out;
-    transition-delay: 0.1s;
-    z-index: 99999;
-    /* Very high to appear above everything */
-}
-
-[data-tooltip]::before {
-    content: attr(data-tooltip);
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    color: var(--ft-color-text-primary);
-    padding: 10px 14px;
-    border-radius: var(--ft-radius-md);
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-    font-size: 13px;
-    line-height: 1.5;
-    font-weight: 500;
-    white-space: normal;
-    max-width: 280px;
-    bottom: calc(100% + 10px);
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-[data-tooltip]::after {
-    content: '';
-    border: 6px solid transparent;
-    border-top-color: rgba(255, 255, 255, 0.95);
-    bottom: calc(100% + 4px);
-    left: 50%;
-    transform: translateX(-50%);
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
-}
-
-[data-tooltip]:hover::before,
-[data-tooltip]:hover::after {
-    opacity: 1;
-}
-
-/* Dark theme tooltip */
-:root[data-theme="dark"] [data-tooltip]::before {
-    background: rgba(30, 30, 30, 0.95);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    color: var(--ft-color-text-primary);
-    border-color: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-}
-
-:root[data-theme="dark"] [data-tooltip]::after {
-    border-top-color: rgba(30, 30, 30, 0.95);
 }

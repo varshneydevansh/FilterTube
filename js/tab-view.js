@@ -572,14 +572,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 const badge = document.createElement('span');
                 badge.className = 'channel-derived-badge';
                 badge.textContent = 'Filter All';
-                badge.setAttribute('data-tooltip', 'This keyword was automatically added from "Filter All Content" on a channel');
+                badge.title = 'This keyword was automatically added from "Filter All Content" on a channel';
                 left.appendChild(badge);
 
                 if (channel) {
                     const originLabel = document.createElement('span');
                     originLabel.className = 'channel-derived-origin';
                     originLabel.textContent = `Linked to ${channel.name || channel.handle || channel.id}`;
-                    originLabel.setAttribute('data-tooltip', `This keyword filters content mentioning "${entry.word}" - automatically synced with channel's "Filter All Content" setting`);
+                    originLabel.title = `This keyword filters content mentioning "${entry.word}" - automatically synced with channel's "Filter All Content" setting`;
                     left.appendChild(originLabel);
                 }
 
@@ -591,9 +591,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const exactToggle = document.createElement('div');
                 exactToggle.className = `exact-toggle ${entry.exact ? 'active' : ''}`;
                 exactToggle.textContent = 'Exact';
-                exactToggle.setAttribute('data-tooltip', entry.exact
+                exactToggle.title = entry.exact
                     ? `Exact match enabled: Only filters when "${entry.word}" appears as a complete word`
-                    : `Partial match enabled: Filters "${entry.word}" anywhere in text (e.g., "Shakira" matches "Shakira Concert")`);
+                    : `Partial match enabled: Filters "${entry.word}" anywhere in text (e.g., "Shakira" matches "Shakira Concert")`;
                 exactToggle.addEventListener('click', async () => {
                     if (entry.source === 'channel') return;
                     const userIndex = findUserKeywordIndex(entry.word);
@@ -607,7 +607,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const semanticToggle = document.createElement('div');
                 semanticToggle.className = `exact-toggle ${entry.semantic ? 'active' : ''}`; // Reusing exact-toggle class for now
                 semanticToggle.textContent = 'Semantic';
-                semanticToggle.setAttribute('data-tooltip', 'Enable semantic matching (Coming Soon)');
+                semanticToggle.title = 'Enable semantic matching (Coming Soon)';
                 semanticToggle.style.opacity = '0.5'; // Visual cue that it's not fully active yet
                 semanticToggle.style.cursor = 'not-allowed';
                 // semanticToggle.addEventListener('click', () => { ... }); // Future wiring
@@ -761,7 +761,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'delete-btn';
             deleteBtn.innerHTML = '×';
-            deleteBtn.setAttribute('data-tooltip', 'Remove channel');
             deleteBtn.addEventListener('click', async () => {
                 await ensureSettingsLoaded();
                 state.channels.splice(originalIndex, 1);
@@ -806,7 +805,7 @@ document.addEventListener('DOMContentLoaded', () => {
             sourceText.className = 'node-source-text';
             const sourceLabel = mapping.source || channel.originalInput || channel.handle || channel.id || channel.name || '';
             sourceText.textContent = sourceLabel;
-            sourceText.setAttribute('data-tooltip', `What you entered: ${sourceLabel}`);
+            sourceText.title = `What you entered: ${sourceLabel}`;
 
             // CONNECTOR (Green Arrow - only show if we have a mapping)
             if (partnerValue) {
@@ -820,9 +819,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const targetBadge = document.createElement('span');
                 targetBadge.className = 'node-badge resolved';
                 targetBadge.textContent = partnerValue;
-                targetBadge.setAttribute('data-tooltip', mapping.target === channel.id
+                targetBadge.title = mapping.target === channel.id
                     ? `Channel UC ID: ${partnerValue} (auto-resolved)`
-                    : `Channel Handle: ${partnerValue} (auto-resolved)`);
+                    : `Channel Handle: ${partnerValue} (auto-resolved)`;
                 nodeContainer.appendChild(targetBadge);
             } else {
                 // No mapping yet - just show source
@@ -845,7 +844,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span class="pill-icon">${channel.filterAll ? '✓' : '○'}</span>
                 <span class="pill-text">Filter all content</span>
             `;
-            pillBtn.setAttribute('data-tooltip', `${channel.filterAll ? 'Enabled' : 'Disabled'}: Also filter videos that mention "${channel.name || channel.handle || channel.id}" in title/description (uses partial/substring matching)`);
+            pillBtn.title = `${channel.filterAll ? 'Enabled' : 'Disabled'}: Also filter videos that mention "${channel.name || channel.handle || channel.id}" in title/description (uses partial/substring matching)`;
             pillBtn.addEventListener('click', async () => {
                 await ensureSettingsLoaded();
                 state.channels[originalIndex].filterAll = !state.channels[originalIndex].filterAll;
