@@ -249,13 +249,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (statSavedTime) {
-            const minutes = state.stats?.savedMinutes || 0;
-            if (minutes < 60) {
-                statSavedTime.textContent = `${minutes}m`;
+            const totalSeconds = state.stats?.savedSeconds || 0;
+
+            if (totalSeconds < 60) {
+                // Less than 1 minute: show seconds
+                statSavedTime.textContent = `${totalSeconds}s`;
+            } else if (totalSeconds < 3600) {
+                // Less than 1 hour: show minutes and seconds
+                const mins = Math.floor(totalSeconds / 60);
+                const secs = totalSeconds % 60;
+                statSavedTime.textContent = secs > 0 ? `${mins}m ${secs}s` : `${mins}m`;
             } else {
-                const hours = Math.floor(minutes / 60);
-                const mins = minutes % 60;
-                statSavedTime.textContent = mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
+                // 1 hour or more: show hours, minutes, and optionally seconds
+                const hours = Math.floor(totalSeconds / 3600);
+                const mins = Math.floor((totalSeconds % 3600) / 60);
+                const secs = totalSeconds % 60;
+
+                if (secs > 0) {
+                    statSavedTime.textContent = `${hours}h ${mins}m ${secs}s`;
+                } else if (mins > 0) {
+                    statSavedTime.textContent = `${hours}h ${mins}m`;
+                } else {
+                    statSavedTime.textContent = `${hours}h`;
+                }
             }
         }
     }

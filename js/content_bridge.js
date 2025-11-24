@@ -72,6 +72,7 @@ async function fetchIdForHandle(handle) {
 
 // Statistics tracking
 let statsCountToday = 0;
+let statsTotalSeconds = 0; // Track total seconds saved instead of using multiplier
 let statsLastDate = new Date().toDateString();
 let statsInitialized = false;
 
@@ -83,47 +84,232 @@ function initializeStats() {
     chrome.storage.local.get(['stats'], (result) => {
         const today = new Date().toDateString();
         if (result.stats && result.stats.lastDate === today) {
-            // Same day, restore count
+            // Same day, restore count and seconds
             statsCountToday = result.stats.hiddenCount || 0;
+            statsTotalSeconds = result.stats.savedSeconds || 0;
             statsLastDate = result.stats.lastDate;
         } else {
             // New day or no stats, reset
             statsCountToday = 0;
+            statsTotalSeconds = 0;
             statsLastDate = today;
         }
     });
 }
 
-function incrementHiddenStats() {
+/**
+ * Extract video duration from element
+ * @param {HTMLElement} element - The video element
+ * @returns {number|null} Duration in seconds, or null if not found
+ */
+function extractVideoDuration(element) {
+    if (!element) return null;
+
+    // Check cache first to avoid redundant extractions
+    const cached = element.getAttribute('data-filtertube-duration');
+    if (cached !== null) {
+        return cached === '' ? null : parseInt(cached, 10);
+    }
+
+    // Try multiple selectors for duration
+    const durationSelectors = [
+        '.yt-badge-shape__text',
+        'ytd-thumbnail-overlay-time-status-renderer span',
+        '#time-status span',
+        '.ytd-thumbnail-overlay-time-status-renderer',
+        'span.ytd-thumbnail-overlay-time-status-renderer'
+    ];
+
+    for (const selector of durationSelectors) {
+        const durationEl = element.querySelector(selector);
+        if (durationEl) {
+            const durationText = durationEl.textContent?.trim();
+            if (durationText) {
+                const seconds = parseDuration(durationText);
+                if (seconds > 0) {
+                    // Cache the result
+                    element.setAttribute('data-filtertube-duration', seconds.toString());
+                    return seconds;
+                }
+            }
+        }
+    }
+
+    // Cache null result to avoid re-querying
+    element.setAttribute('data-filtertube-duration', '');
+    return null;
+}
+
+/**
+ * Parse duration string (e.g., "1:38:14" or "2:47") to seconds
+ * @param {string} durationText - Duration string
+ * @returns {number} Duration in seconds
+ */
+function parseDuration(durationText) {
+    if (!durationText) return 0;
+
+    const parts = durationText.split(':').map(Number);
+
+    if (parts.length === 3) {
+        // HH:MM:SS
+        return parts[0] * 3600 + parts[1] * 60 + parts[2];
+    } else if (parts.length === 2) {
+        // MM:SS
+        return parts[0] * 60 + parts[1];
+    } else if (parts.length === 1) {
+        // SS
+        return parts[0];
+    }
+
+    return 0;
+}
+
+/**
+ * Determine content type from element
+ * @param {HTMLElement} element - The content element
+ * @returns {string} Content type: 'video', 'short', 'comment', 'chip', 'shelf'
+ */
+function getContentType(element) {
+    if (!element) return 'video';
+
+    const tagName = element.tagName?.toLowerCase();
+
+    // Shorts
+    if (tagName === 'ytd-reel-item-renderer' ||
+        tagName === 'ytd-shorts-lockup-view-model' ||
+        element.closest('ytd-reel-shelf-renderer')) {
+        return 'short';
+    }
+
+    // Comments
+    if (tagName === 'ytd-comment-view-model' ||
+        tagName === 'ytd-comment-renderer' ||
+        tagName === 'ytd-comment-thread-renderer') {
+        return 'comment';
+    }
+
+    // Chips (topic filters)
+    if (tagName === 'yt-chip-cloud-chip-renderer' ||
+        element.classList?.contains('chip')) {
+        return 'chip';
+    }
+
+    // Shelves (containers)
+    if (tagName === 'ytd-rich-section-renderer' ||
+        tagName === 'ytd-shelf-renderer' ||
+        element.classList?.contains('filtertube-hidden-shelf')) {
+        return 'shelf';
+    }
+
+    // Default to video
+    return 'video';
+}
+
+/**
+ * Estimate time saved based on content type and duration
+ * @param {string} contentType - Type of content
+ * @param {number|null} duration - Video duration in seconds (if available)
+ * @returns {number} Estimated seconds saved
+ */
+function estimateTimeSaved(contentType, duration = null) {
+    // Don't count shelves (they're containers, not content)
+    if (contentType === 'shelf') return 0;
+
+    // Comments and chips take minimal time to evaluate
+    if (contentType === 'comment') return 1;
+    if (contentType === 'chip') return 0.5;
+
+    // Shorts are quick to evaluate
+    if (contentType === 'short') return 2;
+
+    // Videos: use duration-based estimate if available
+    if (contentType === 'video' && duration) {
+        // Longer videos take more time to evaluate
+        if (duration < 60) return 2;        // <1 min: 2 sec
+        if (duration < 300) return 3;       // <5 min: 3 sec
+        if (duration < 600) return 4;       // <10 min: 4 sec
+        if (duration < 1800) return 5;      // <30 min: 5 sec
+        return 6;                           // 30+ min: 6 sec
+    }
+
+    // Default fallback for videos without duration
+    return 4;
+}
+
+/**
+ * Increment hidden stats when content is hidden
+ * @param {HTMLElement} element - The hidden element
+ */
+function incrementHiddenStats(element) {
     const today = new Date().toDateString();
 
     // Reset if it's a new day
     if (today !== statsLastDate) {
         statsCountToday = 0;
+        statsTotalSeconds = 0;
         statsLastDate = today;
     }
 
-    statsCountToday++;
+    // Determine content type and duration
+    const contentType = getContentType(element);
+    const duration = extractVideoDuration(element);
+    const secondsSaved = estimateTimeSaved(contentType, duration);
 
-    // Conservative estimate:
-    // - Average time to evaluate a video (read title, see thumbnail, decide) = ~3-5 seconds
-    // - We estimate 4 seconds per filtered video
-    // - This represents the time you would have spent considering content you don't want to see
-    // - Formula: (hidden_count * 4 seconds) / 60 = minutes saved
-    const secondsSaved = statsCountToday * 4;
-    const minutesSaved = Math.floor(secondsSaved / 60);
+    // Only increment if we're actually saving time
+    if (secondsSaved > 0) {
+        statsCountToday++;
+        statsTotalSeconds += secondsSaved;
 
-    // Save to storage (debounced to avoid excessive writes)
+        // Store the time saved on the element for potential decrement later
+        if (element) {
+            element.setAttribute('data-filtertube-time-saved', secondsSaved.toString());
+        }
+
+        saveStats();
+    }
+}
+
+/**
+ * Decrement hidden stats when content is unhidden
+ * @param {HTMLElement} element - The unhidden element
+ */
+function decrementHiddenStats(element) {
+    if (statsCountToday <= 0) return;
+
+    // Get the time that was saved when this element was hidden
+    const savedTime = parseFloat(element?.getAttribute('data-filtertube-time-saved') || '0');
+
+    if (savedTime > 0) {
+        statsCountToday = Math.max(0, statsCountToday - 1);
+        statsTotalSeconds = Math.max(0, statsTotalSeconds - savedTime);
+
+        // Remove the attribute
+        if (element) {
+            element.removeAttribute('data-filtertube-time-saved');
+        }
+
+        saveStats();
+    }
+}
+
+/**
+ * Save stats to storage
+ */
+function saveStats() {
+    const minutesSaved = Math.floor(statsTotalSeconds / 60);
+
     if (chrome && chrome.storage) {
         chrome.storage.local.set({
             stats: {
                 hiddenCount: statsCountToday,
                 savedMinutes: minutesSaved,
-                lastDate: today
+                savedSeconds: statsTotalSeconds,
+                lastDate: statsLastDate
             }
         });
     }
 }
+
 
 function extractShelfTitle(shelf) {
     if (!shelf || typeof shelf.querySelector !== 'function') return '';
@@ -718,14 +904,18 @@ function toggleVisibility(element, shouldHide, reason = '') {
             // debugLog(`🚫 Hiding: ${reason}`);
 
             // Increment stats only for newly hidden items (not already hidden)
-            incrementHiddenStats();
+            incrementHiddenStats(element);
         }
         handleMediaPlayback(element, true);
     } else {
-        if (element.classList.contains('filtertube-hidden')) {
+        const wasHidden = element.classList.contains('filtertube-hidden');
+        if (wasHidden) {
             element.classList.remove('filtertube-hidden');
             element.removeAttribute('data-filtertube-hidden');
             // debugLog(`✅ Restoring element`);
+
+            // Decrement stats when unhiding content
+            decrementHiddenStats(element);
         }
         handleMediaPlayback(element, false);
     }
@@ -1463,73 +1653,4 @@ try {
 
 setTimeout(() => initialize(), 50);
 
-function extractVideoDuration(element) {
-    // Selectors for time duration
-    const selectors = [
-        'ytd-thumbnail-overlay-time-status-renderer',
-        '.yt-badge-shape__text',
-        'badge-shape.yt-badge-shape--thumbnail-badge .yt-badge-shape__text',
-        'yt-thumbnail-overlay-badge-view-model .yt-badge-shape__text',
-        // Accessibility labels often contain the full text
-        '[aria-label*="minutes"], [aria-label*="seconds"]'
-    ];
-
-    let timeText = '';
-    for (const selector of selectors) {
-        const el = element.querySelector(selector);
-        if (el) {
-            // Prefer aria-label if available as it's often more complete/structured
-            if (el.getAttribute('aria-label')) {
-                timeText = el.getAttribute('aria-label');
-                break;
-            }
-            if (el.textContent) {
-                timeText = el.textContent.trim();
-                break;
-            }
-        }
-    }
-
-    // Fallback: Check the main element's aria-label if no child found
-    if (!timeText && element.getAttribute('aria-label')) {
-        timeText = element.getAttribute('aria-label');
-    }
-
-    if (!timeText) return 0;
-
-    console.log('FilterTube: Extracting duration from text:', timeText);
-
-    // Try parsing "H:MM:SS" or "M:SS" format first using strict regex
-    // Matches: 1:02:30 (3 groups) or 12:30 (2 groups)
-    const timeMatch = timeText.match(/(?:(\d+):)?(\d{1,2}):(\d{2})/);
-
-    if (timeMatch) {
-        let seconds = 0;
-        const p1 = timeMatch[1] ? parseInt(timeMatch[1], 10) : 0;
-        const p2 = parseInt(timeMatch[2], 10);
-        const p3 = parseInt(timeMatch[3], 10);
-
-        if (timeMatch[1]) {
-            // Format H:MM:SS -> p1=Hours, p2=Minutes, p3=Seconds
-            seconds = p1 * 3600 + p2 * 60 + p3;
-        } else {
-            // Format M:SS -> p2=Minutes, p3=Seconds
-            seconds = p2 * 60 + p3;
-        }
-        return seconds;
-    }
-
-    // Try parsing verbose format "X minutes, Y seconds"
-    // Regex to capture hours, minutes, seconds
-    const hoursMatch = timeText.match(/(\d+)\s*(?:hour|hr)/i);
-    const minutesMatch = timeText.match(/(\d+)\s*(?:minute|min)/i);
-    const secondsMatch = timeText.match(/(\d+)\s*(?:second|sec)/i);
-
-    let totalSeconds = 0;
-    if (hoursMatch) totalSeconds += parseInt(hoursMatch[1], 10) * 3600;
-    if (minutesMatch) totalSeconds += parseInt(minutesMatch[1], 10) * 60;
-    if (secondsMatch) totalSeconds += parseInt(secondsMatch[1], 10);
-
-    return totalSeconds;
-}
-
+// Duplicate function removed - using the version at line 105
