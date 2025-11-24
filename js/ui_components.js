@@ -326,6 +326,183 @@ const UIComponents = (() => {
     }
 
     // ============================================================================
+    // CHECKBOXES & SWITCHES
+    // ============================================================================
+
+    /**
+     * Create a checkbox with label and description
+     * @param {Object} options - Checkbox options
+     * @param {string} options.id - Checkbox ID
+     * @param {string} options.label - Label text
+     * @param {string} options.description - Description text (optional)
+     * @param {boolean} options.checked - Initial checked state
+     * @param {Function} options.onChange - Change handler
+     * @param {boolean} options.disabled - Disabled state
+     * @returns {HTMLElement} Checkbox container
+     */
+    function createCheckbox({ id, label, description, checked = false, onChange, disabled = false }) {
+        const container = document.createElement('div');
+        container.className = 'toggle-row';
+
+        const labelContainer = document.createElement('div');
+        labelContainer.className = 'toggle-label';
+
+        const titleSpan = document.createElement('span');
+        titleSpan.className = 'toggle-title';
+        titleSpan.textContent = label;
+        labelContainer.appendChild(titleSpan);
+
+        if (description) {
+            const descSpan = document.createElement('span');
+            descSpan.className = 'toggle-desc';
+            descSpan.textContent = description;
+            labelContainer.appendChild(descSpan);
+        }
+
+        // Create switch
+        const switchLabel = document.createElement('label');
+        switchLabel.className = 'switch';
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = id;
+        checkbox.checked = checked;
+        checkbox.disabled = disabled;
+
+        if (onChange) {
+            checkbox.addEventListener('change', (e) => onChange(e.target.checked));
+        }
+
+        const slider = document.createElement('span');
+        slider.className = 'slider round';
+
+        switchLabel.appendChild(checkbox);
+        switchLabel.appendChild(slider);
+
+        container.appendChild(labelContainer);
+        container.appendChild(switchLabel);
+
+        return container;
+    }
+
+    // ============================================================================
+    // SELECT DROPDOWNS
+    // ============================================================================
+
+    /**
+     * Create a select dropdown
+     * @param {Object} options - Select options
+     * @param {string} options.id - Select ID
+     * @param {Array} options.options - Array of {value, label}
+     * @param {string} options.value - Initial value
+     * @param {Function} options.onChange - Change handler
+     * @param {string} options.className - Additional classes
+     * @returns {HTMLSelectElement}
+     */
+    function createSelect({ id, options = [], value, onChange, className = '' }) {
+        const select = document.createElement('select');
+        select.className = `select-input ${className}`.trim();
+        if (id) select.id = id;
+
+        options.forEach(opt => {
+            const option = document.createElement('option');
+            option.value = opt.value;
+            option.textContent = opt.label;
+            if (opt.value === value) option.selected = true;
+            select.appendChild(option);
+        });
+
+        if (onChange) {
+            select.addEventListener('change', (e) => onChange(e.target.value));
+        }
+
+        return select;
+    }
+
+    // ============================================================================
+    // ICON BUTTONS
+    // ============================================================================
+
+    /**
+     * Create an icon button
+     * @param {Object} options - Icon button options
+     * @param {string} options.icon - SVG icon HTML
+     * @param {string} options.title - Tooltip title
+     * @param {Function} options.onClick - Click handler
+     * @param {string} options.className - Additional classes
+     * @returns {HTMLButtonElement}
+     */
+    function createIconButton({ icon, title, onClick, className = '' }) {
+        const btn = document.createElement('button');
+        btn.className = `icon-btn ${className}`.trim();
+        btn.innerHTML = icon;
+        if (title) btn.title = title;
+        if (onClick) btn.addEventListener('click', onClick);
+        return btn;
+    }
+
+    // ============================================================================
+    // BADGES & LABELS
+    // ============================================================================
+
+    /**
+     * Create a badge
+     * @param {Object} options - Badge options
+     * @param {string} options.text - Badge text
+     * @param {string} options.variant - Badge variant: 'success', 'warning', 'info', 'danger'
+     * @param {string} options.title - Tooltip title
+     * @param {string} options.className - Additional classes
+     * @returns {HTMLElement}
+     */
+    function createBadge({ text, variant = 'info', title, className = '' }) {
+        const badge = document.createElement('span');
+        badge.className = `badge badge-${variant} ${className}`.trim();
+        badge.textContent = text;
+        if (title) badge.title = title;
+        return badge;
+    }
+
+    /**
+     * Create a channel logo image
+     * @param {Object} options - Logo options
+     * @param {string} options.src - Image source URL
+     * @param {string} options.alt - Alt text
+     * @param {string} options.size - Size: 'small', 'medium', 'large'
+     * @returns {HTMLImageElement}
+     */
+    function createChannelLogo({ src, alt = 'Channel logo', size = 'medium' }) {
+        const img = document.createElement('img');
+        img.className = `channel-logo channel-logo-${size}`;
+
+        const defaultAvatar = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23cbd5e1"%3E%3Cpath d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/%3E%3C/svg%3E';
+
+        img.src = src || defaultAvatar;
+        img.alt = alt;
+        img.onerror = () => { img.src = defaultAvatar; };
+
+        return img;
+    }
+
+    // ============================================================================
+    // COMPOSITE COMPONENTS
+    // ============================================================================
+
+    /**
+     * Create an input row with input and button
+     * @param {Object} options - Input row options
+     * @param {HTMLInputElement} options.input - Input element
+     * @param {HTMLButtonElement} options.button - Button element
+     * @returns {HTMLElement}
+     */
+    function createInputRow({ input, button }) {
+        const row = document.createElement('div');
+        row.className = 'input-row';
+        if (input) row.appendChild(input);
+        if (button) row.appendChild(button);
+        return row;
+    }
+
+    // ============================================================================
     // UTILITIES
     // ============================================================================
 
@@ -368,6 +545,12 @@ const UIComponents = (() => {
         createDeleteButton,
         createInput,
         createSearchInput,
+        createCheckbox,
+        createSelect,
+        createIconButton,
+        createBadge,
+        createChannelLogo,
+        createInputRow,
         createTabs,
         createListItem,
         createEmptyState,
