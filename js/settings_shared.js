@@ -32,14 +32,25 @@
             exact: !!entry.exact,
             semantic: !!entry.semantic,
             source: overrides.source || (entry.source === 'channel' ? 'channel' : 'user'),
-            channelRef: overrides.channelRef || entry.channelRef || null
+            channelRef: overrides.channelRef || entry.channelRef || null,
+            addedAt: overrides.addedAt || entry.addedAt || Date.now() // Track insertion time
         };
     }
 
     function normalizeKeywords(rawKeywords, compiledKeywords) {
         if (Array.isArray(rawKeywords)) {
+            // For existing keywords without timestamps, assign them based on array position
+            // This ensures older entries get older timestamps
+            const now = Date.now();
             return rawKeywords
-                .map(entry => sanitizeKeywordEntry(entry, { source: 'user', channelRef: null }))
+                .map((entry, index) => {
+                    // Preserve source and channelRef if they exist (for channel-derived keywords)
+                    const source = entry.source === 'channel' ? 'channel' : 'user';
+                    const channelRef = entry.source === 'channel' ? entry.channelRef : null;
+                    // If no timestamp exists, assign based on position (newer items have higher timestamps)
+                    const addedAt = entry.addedAt || (now - index * 1000);
+                    return sanitizeKeywordEntry(entry, { source, channelRef, addedAt });
+                })
                 .filter(Boolean);
         }
 
@@ -77,7 +88,8 @@
                 handle: null,
                 logo: null,
                 filterAll: false,
-                originalInput: trimmed
+                originalInput: trimmed,
+                addedAt: Date.now()
             };
         }
 
@@ -94,7 +106,8 @@
             handle,
             logo: entry.logo || null,
             filterAll: !!entry.filterAll,
-            originalInput
+            originalInput,
+            addedAt: entry.addedAt || Date.now()
         };
     }
 
@@ -159,28 +172,64 @@
     }
 
     function syncFilterAllKeywords(keywords, channels) {
-        const userKeywords = extractUserKeywords(keywords);
         const sanitizedChannels = sanitizeChannelsList(channels);
-        const derived = [];
-        const seen = new Set();
+
+        // Create a set of channel keys that should have keywords
+        const activeChannelKeys = new Set();
+        const channelKeywordMap = new Map();
 
         sanitizedChannels.forEach(channel => {
             if (!channel || !channel.filterAll) return;
             const key = getChannelDerivedKey(channel);
-            if (!key || seen.has(key)) return;
+            if (!key) return;
             const word = getChannelKeywordWord(channel);
             if (!word) return;
-            seen.add(key);
-            derived.push({
+
+            activeChannelKeys.add(key);
+            channelKeywordMap.set(key, {
                 word,
                 exact: false,
                 semantic: false,
                 source: 'channel',
-                channelRef: key
+                channelRef: key,
+                addedAt: channel.addedAt || Date.now() // Use channel timestamp if available
             });
         });
 
-        return userKeywords.concat(derived);
+        // Filter existing keywords and preserve order with timestamps
+        const result = [];
+
+        // First pass: keep existing keywords (both user and channel-derived) in their current order
+        if (Array.isArray(keywords)) {
+            keywords.forEach(entry => {
+                if (!entry) return;
+
+                // If it's a user keyword, always keep it
+                if (entry.source !== 'channel') {
+                    result.push(entry);
+                    return;
+                }
+
+                // If it's a channel-derived keyword, only keep if channel still has filterAll
+                if (entry.channelRef && activeChannelKeys.has(entry.channelRef)) {
+                    result.push(entry);
+                    activeChannelKeys.delete(entry.channelRef); // Mark as already added
+                }
+            });
+        }
+
+        // Second pass: add new channel-derived keywords
+        activeChannelKeys.forEach(key => {
+            const keyword = channelKeywordMap.get(key);
+            if (keyword) {
+                result.push(keyword);
+            }
+        });
+
+        // Sort by addedAt timestamp to maintain true insertion order (newest first = reverse chronological)
+        result.sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0));
+
+        return result;
     }
 
     function buildCompiledSettings({ keywords, channels, hideShorts, hideComments, filterComments }) {
@@ -198,9 +247,16 @@
     function loadSettings() {
         return new Promise(resolve => {
             STORAGE_NAMESPACE?.get([...SETTINGS_KEYS, THEME_KEY], result => {
-                const userKeywords = normalizeKeywords(result.uiKeywords, result.filterKeywords);
+                // Load all keywords (user + channel-derived) from storage
+                const allKeywords = normalizeKeywords(result.uiKeywords, result.filterKeywords);
                 const channels = normalizeChannels(result.filterChannels);
-                const keywords = syncFilterAllKeywords(userKeywords, channels);
+
+                // Sync keywords with current channel filterAll state (preserves order)
+                const keywords = syncFilterAllKeywords(allKeywords, channels);
+
+                // Extract just user keywords for compatibility
+                const userKeywords = extractUserKeywords(keywords);
+
                 const hideAllComments = !!result.hideAllComments;
                 const filterComments = !hideAllComments && !!result.filterComments;
                 const theme = result[THEME_KEY] === 'dark' ? 'dark' : 'light';
@@ -232,7 +288,7 @@
         });
 
         const payload = {
-            uiKeywords: extractUserKeywords(sanitizedKeywords),
+            uiKeywords: sanitizedKeywords, // Save ALL keywords (user + channel-derived) to preserve order
             filterKeywords: compiledSettings.filterKeywords,
             filterChannels: compiledSettings.filterChannels,
             hideAllShorts: compiledSettings.hideAllShorts,

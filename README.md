@@ -8,57 +8,51 @@
 
 ## Overview
 
-A browser extension that filters content (videos, shorts, playlists, channels, comments) based on keywords and channel names.
+FilterTube is a browser extension that gives you control over your YouTube feed. Filter videos, shorts, channels, and comments using keywords and smart rules—all processing happens privately on your device.
 
 ## Features
 
 ### Content Filtering
-- **Keyword-based Filtering**: Hide videos containing specific keywords in titles
-  - Supports **Exact Match** option (e.g., "car" won't match "scar")
-  - Default is partial matching (e.g., "apex" will match "apex legends")
-- **Channel-based Filtering**: Hide content from specific channels using:
-  - @handles (e.g., `@ChannelName`)
-  - Channel IDs (e.g., `UCxxxxxxxx` or `channel/UCxxxxxxxx`)
-- **Multi-format Support**: Filter various YouTube content types:
-  - Regular videos
-  - Shorts
-  - Playlists and mixes
-  - Channel recommendations and channel cards
-  - Search results
+- **Block by Keyword**: Hide videos with specific words in the title.
+- **Block Channels**: Filter by Channel Name, @Handle, or ID.
+- **Hide Shorts**: Optional toggle to remove all Shorts from your feed.
+- **Smart Matching**: Supports both partial matches (default) and exact word matching.
 
-### Comment Filtering
-- **Hide All Comments**: Option to completely hide the comments section
-- **Keyword-based Comment Filtering**: Hide specific comments containing filtered words
+### Comment Control
+- **Hide All Comments**: Remove the comments section entirely for a cleaner interface.
+- **Filter Comments**: Hide specific comments containing unwanted keywords.
 
-### User Interface
-- **Popup Mode**: Quick access via the extension popup
-- **Tab View**: Open in a dedicated tab for more comfortable settings adjustment
-- **Real-time Filtering**: Filters are applied instantly without page refresh
-- **Visual Feedback**: Clear indication when settings are saved
-- **Password Protection**: Optional password protection for parental control
-- **Import/Export**: Save and restore your filter settings
+### Stats & Insights
+- **Time Saved**: See how much time you've saved by blocking distractions.
+- **Daily Tracker**: Count of videos hidden today.
+
+### Performance & Privacy
+- **Zero Flash**: Filters content *before* it renders on screen.
+- **100% Private**: No data leaves your browser. No analytics. No tracking.
 
 ## Installation
 
-FilterTube is available for all major browsers:
+### For Users
+The easiest way to install FilterTube is via our official website:
+👉 **[Install FilterTube](https://filtertube.in)** (Available for Chrome, Firefox, Edge, Brave, Opera)
 
-### Chrome, Firefox, Edge, Brave, and Opera
-Install from the [FilterTube.in](https://filtertube.in)
+### For Developers
+If you want to contribute or build from source:
 
-### Manual Installation (For Developers)
-**Chrome/Edge/Brave/Opera:**
-1. Download or clone this repository
-2. Run `npm run dev:chrome` to prepare the extension
-3. Go to `chrome://extensions/` (or your browser's equivalent)
-4. Enable "Developer mode"
-5. Click "Load unpacked" and select the FilterTube directory
+1.  **Clone the repository**
+    ```bash
+    git clone https://github.com/varshneydevansh/FilterTube.git
+    cd FilterTube
+    npm install
+    ```
 
-**Firefox:**
-1. Download or clone this repository
-2. Run `npm run dev:firefox` to prepare the extension
-3. Go to `about:debugging#/runtime/this-firefox`
-4. Click "Load Temporary Add-on..."
-5. Select the `manifest.json` file from the FilterTube directory
+2.  **Run in Developer Mode**
+    *   **Chrome/Edge/Brave**: `npm run dev:chrome`
+    *   **Firefox**: `npm run dev:firefox`
+
+3.  **Load Extension**
+    *   **Chrome**: Go to `chrome://extensions`, enable **Developer mode**, click **Load unpacked**, and select the `FilterTube` folder.
+    *   **Firefox**: Go to `about:debugging`, click **This Firefox**, then **Load Temporary Add-on**, and select `manifest.json`.
 
 ## Usage
 
@@ -119,17 +113,14 @@ FilterTube filters unwanted content **before** it appears on your screen, giving
 
 ## Privacy & Permissions
 
-FilterTube only requests the minimal permissions needed to function:
+We believe in privacy by design.
+*   **Storage**: To save your settings locally.
+*   **Active Tab**: To scan the YouTube page you are viewing.
+*   **No External Requests**: FilterTube does not talk to any servers other than YouTube (for the content you requested).
 
-- **Storage** - Save your keyword and channel filters locally on your device
-- **Active Tab** - Read YouTube page content to apply filters
-- **Tabs** - Open the full dashboard in a new tab
+## Support
 
-**Your data never leaves your browser.** All filtering happens locally on your device.
-
-## Support & Feedback
-
-If you encounter any issues or have suggestions for improvements, please open an issue on GitHub.
+Found a bug or have a feature request? [Open an issue on GitHub](https://github.com/varshneydevansh/FilterTube/issues).
 
 ## License
 

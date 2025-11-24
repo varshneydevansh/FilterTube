@@ -295,35 +295,10 @@ label {
     transition: transform 0.1s ease, box-shadow 0.2s ease;
 }
 
-.btn-primary {
-    background-color: var(--ft-color-brand-primary);
-    color: var(--ft-color-text-inverse);
-    box-shadow: var(--ft-shadow-floating);
-}
 
-.btn-primary:hover {
-    background-color: var(--ft-color-brand-primary-hover);
-    box-shadow: var(--ft-shadow-elevated);
-}
 
-.btn-primary:active {
-    transform: scale(0.98);
-}
-
-.btn-secondary {
-    background-color: var(--ft-color-bg-panel);
-    color: var(--ft-color-text-primary);
-    border: 1px solid var(--ft-color-sem-neutral-border);
-}
-
-.btn-secondary:hover {
-    background-color: var(--ft-color-sem-neutral-bg);
-    border-color: var(--ft-color-text-secondary);
-}
-
-.btn.saved,
-.btn-success-flash,
-.btn-secondary.btn-success-flash {
+/* Button styles moved to components.css */
+.btn.saved {
     background-color: var(--ft-color-status-success) !important;
     color: white !important;
     border-color: var(--ft-color-status-success) !important;

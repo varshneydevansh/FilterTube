@@ -1190,15 +1190,22 @@ function applyDOMFallback(settings, options = {}) {
     const shortsContainerSelectors = 'grid-shelf-view-model, ytd-rich-shelf-renderer[is-shorts], ytd-reel-shelf-renderer';
     const shortContainers = document.querySelectorAll(shortsContainerSelectors);
 
+    // Also target the Shorts guide entry in the sidebar
+    const shortsGuideEntries = document.querySelectorAll('ytd-guide-entry-renderer a[title="Shorts"]');
+    const shortsGuideRenderers = Array.from(shortsGuideEntries).map(a => a.closest('ytd-guide-entry-renderer')).filter(Boolean);
+
+    const allShortsElements = [...shortContainers, ...shortsGuideRenderers];
+
     if (effectiveSettings.hideAllShorts) {
-        shortContainers.forEach(container => {
+        allShortsElements.forEach(container => {
             container.setAttribute('data-filtertube-hidden-by-hide-all-shorts', 'true');
             toggleVisibility(container, true, 'Hide Shorts container');
         });
     } else {
-        shortContainers.forEach(container => {
+        allShortsElements.forEach(container => {
             if (container.hasAttribute('data-filtertube-hidden-by-hide-all-shorts')) {
                 container.removeAttribute('data-filtertube-hidden-by-hide-all-shorts');
+                // Only unhide if it's not also hidden by a shelf title
                 if (!container.hasAttribute('data-filtertube-hidden-by-shelf-title')) {
                     toggleVisibility(container, false);
                 }

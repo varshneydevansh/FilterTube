@@ -269,3 +269,15 @@ These chips originate from the YouTube UI rather than API payloads we currently 
 5. Evaluate whether to expose the newly parsed playlist overlays (`WATCHED`, `Resume watching`, `Now playing`) as user-facing toggles.
 6. Add renderer coverage for `channelSubMenuRenderer` / `sortFilterSubMenuRenderer` if playlist menu text needs filtering.
 7. Monitor backstage header/menu strings for future filtering requirements and confirm metadata-row helper coverage across other `contentMetadataViewModel` instances.
+
+## Sidebar & Navigation (2025-11-24 sample, NEW)
+
+| DOM tag / component | Underlying renderer / data source | Status | Notes |
+| --- | --- | --- | --- |
+| `<ytd-guide-entry-renderer>` | `guideEntryRenderer` | ✅ Covered | Sidebar navigation items (e.g., "Shorts"). Now targeted for hiding when "Hide All Shorts" is active. |
+
+## AI & Experimental Features (2025-11-24 sample, NEW)
+
+| DOM tag / component | Underlying renderer / data source | Status | Notes |
+| --- | --- | --- | --- |
+| `<yt-button-view-model>` | `buttonViewModel` | ℹ️ **NEW** | "Ask" button (AI feature). Potential future target for category filtering. |

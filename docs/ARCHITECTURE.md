@@ -69,24 +69,23 @@ The following diagram illustrates the complete interaction between all FilterTub
 |   | 2a: popup.js|                                     |          |   | 1a: Manifest|                                |
 |   |  User Input |                                     |          |   |  (Declares) |                                |
 |   +------+------+                                     |          |   +------+------+                                |
-|          | saves to                                   |          |          |                                       |
+|          | saves via                                  |          |          |                                       |
 |   +------v------+                                     |          |          +--------------------+                  |
-|   |2b:background|                                     |          |          | declares           | declares         |
-|   |Compile Regex|                                     |          |   +------v------+      +------v------+           |
-|   +------+------+                                     |          |   | 1b: Content |      | 1c: seed.js |           |
-|          | compiles                                   |          |   |   Bridge    |      | (Main World)|           |
-|          v                                            |          |   |  (Isolated) |      |    Hooks    |           |
-|   +-------------+      +-------------+                |          |   +------+------+      +-------------+           |
-|   | 2c: Storage |----->| 2d: Bridge  |                |          |          |                    |                  |
-|   |  OnChanged  |      | Req Settings|                |          |          | injects            |                  |
-|   +-------------+      +------+------+                |          |   +------v------+             |                  |
-|                               | sends (postMessage)   |          |   | 1d: Injector|             |                  |
-|                               v                       |          |   | Coordinator |             |                  |
-|                        +-------------+                |          |   +------+------+             |                  |
-|                        | 2e: Injector|                |          |          |                    |                  |
-|                        | Recv Setting|                |          +----------+--------------------+                  |
-|                        +------+------+                |                     |                                       |
-|                               | calls                 |                     | injects                               |
+|   | StateManager|                                     |          |          | declares           | declares         |
+|   +------+------+                                     |          |   +------v------+      +------v------+           |
+|          | persists                                   |          |   | 1b: Content |      | 1c: seed.js |           |
+|          v                                            |          |   |   Bridge    |      | (Main World)|           |
+|   +-------------+      +-------------+                |          |   |  (Isolated) |      |    Hooks    |           |
+|   | 2c: Storage |----->| 2d: Bridge  |                |          |   +------+------+      +-------------+           |
+|   |  OnChanged  |      | Req Settings|                |          |          |                    |                  |
+|   +-------------+      +------+------+                |          |          | injects            |                  |
+|                               | sends (postMessage)   |          |   +------v------+             |                  |
+|                               v                       |          |   | 1d: Injector|             |                  |
+|                        +-------------+                |          |   | Coordinator |             |                  |
+|                        | 2e: Injector|                |          |   +------+------+             |                  |
+|                        | Recv Setting|                |          |          |                    |                  |
+|                        +------+------+                |          +----------+--------------------+                  |
+|                               | calls                 |                     |                                       |
 |                               v                       |                     v                                       |
 |                        +-------------+                |          +----------+---------------------------------------+
 |                        | 2f: seed.js |                |          |                                                  |
@@ -263,3 +262,8 @@ When you change a setting, it's like sending a letter. You drop it in the mailbo
 *   **Context:** Main World.
 *   **Role:** The Coordinator.
 *   **Key Responsibilities:** Initializes the engine and coordinates settings updates.
+
+### **6. State Manager (`state_manager.js`)**
+*   **Context:** UI Contexts.
+*   **Role:** The Truth.
+*   **Key Responsibilities:** Centralizes all state operations (load, save, update) to ensure consistency across the UI.

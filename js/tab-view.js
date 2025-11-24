@@ -339,13 +339,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 if (result.success) {
                     if (channelInput) channelInput.value = '';
+                    // Reset button text BEFORE flashing success message
+                    addChannelBtn.textContent = originalText;
+                    addChannelBtn.disabled = false;
                     UIComponents.flashButtonSuccess(addChannelBtn, 'Added!', 1200);
                 } else {
+                    addChannelBtn.textContent = originalText;
+                    addChannelBtn.disabled = false;
                     UIComponents.showToast(result.error || 'Failed to add channel', 'error');
                 }
-            } finally {
+            } catch (error) {
                 addChannelBtn.textContent = originalText;
                 addChannelBtn.disabled = false;
+                UIComponents.showToast('Failed to add channel: ' + error.message, 'error');
             }
         });
     }
@@ -432,33 +438,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // ============================================================================
-    // STORAGE CHANGE LISTENER
+    // INITIALIZATION
     // ============================================================================
 
-    chrome.storage.onChanged.addListener(async (changes, area) => {
+    // Listen for external storage changes (from popup or other contexts)
+    chrome.storage.onChanged.addListener((changes, area) => {
         if (area !== 'local') return;
 
-        const SettingsAPI = window.FilterTubeSettings || {};
-        const hasSettingsChange = SettingsAPI.isSettingsChange ?
-            SettingsAPI.isSettingsChange(changes) :
-            Object.keys(changes).some(key =>
-                ['uiKeywords', 'filterKeywords', 'filterChannels', 'hideAllShorts', 'hideAllComments', 'filterComments', 'stats'].includes(key)
-            );
+        // Reload settings when they change externally
+        const settingKeys = ['uiKeywords', 'filterKeywords', 'filterChannels', 'hideAllShorts', 'hideAllComments', 'filterComments'];
+        const hasChanges = settingKeys.some(key => changes[key]);
 
-        const hasThemeChange = SettingsAPI.isThemeChange ?
-            SettingsAPI.isThemeChange(changes) :
-            Object.prototype.hasOwnProperty.call(changes, 'ftThemePreference');
-
-        if (hasThemeChange) {
-            const newTheme = SettingsAPI.getThemeFromChange ?
-                SettingsAPI.getThemeFromChange(changes) :
-                (changes?.ftThemePreference?.newValue || 'light');
-            await StateManager.setTheme(newTheme);
-        }
-
-        if (hasSettingsChange) {
-            console.log('Tab-View: Storage change detected, reloading settings');
-            await StateManager.loadSettings();
+        if (hasChanges) {
+            console.log('Tab View: Detected external settings change, reloading...');
+            StateManager.loadSettings();
         }
     });
 });

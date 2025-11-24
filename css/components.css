@@ -51,6 +51,78 @@
     padding: var(--ft-space-sm) var(--ft-space-md);
     border: 1px solid var(--ft-color-sem-neutral-border);
     border-radius: var(--ft-radius-md);
+    background-color: var(--ft-color-bg-surface);
+    color: var(--ft-color-text-primary);
+    font-family: var(--ft-font-family-base);
+    font-size: var(--ft-font-size-body);
+    transition: border-color var(--ft-transition-fast);
+}
+
+.text-input:focus {
+    outline: none;
+    border-color: var(--ft-color-brand-primary);
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+}
+
+/* --- Buttons --- */
+.btn-primary {
+    background-color: var(--ft-color-brand-primary);
+    color: var(--ft-color-text-inverse);
+    border: none;
+    padding: var(--ft-space-sm) var(--ft-space-xl);
+    border-radius: var(--ft-radius-md);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+    box-shadow: var(--ft-shadow-floating);
+}
+
+.btn-primary:hover {
+    background-color: var(--ft-color-brand-primary-hover);
+    box-shadow: var(--ft-shadow-elevated);
+}
+
+.btn-primary:active {
+    transform: scale(0.98);
+}
+
+.btn-secondary {
+    background-color: var(--ft-color-bg-panel);
+    color: var(--ft-color-text-primary);
+    border: 1px solid var(--ft-color-sem-neutral-border);
+    padding: var(--ft-space-sm) var(--ft-space-lg);
+    border-radius: var(--ft-radius-md);
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.btn-secondary:hover {
+    background-color: var(--ft-color-sem-neutral-bg);
+    border-color: var(--ft-color-text-secondary);
+}
+
+.btn-success-flash,
+.btn-secondary.btn-success-flash {
+    background-color: var(--ft-color-status-success) !important;
+    color: white !important;
+    border-color: var(--ft-color-status-success) !important;
+}
+
+html[data-theme="dark"] .btn-secondary {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+html[data-theme="dark"] .btn-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.text-input {
+    padding: var(--ft-space-sm) var(--ft-space-md);
+    border: 1px solid var(--ft-color-sem-neutral-border);
+    border-radius: var(--ft-radius-md);
     background-color: var(--ft-color-bg-base);
     color: var(--ft-color-text-primary);
     font-family: var(--ft-font-family-base);

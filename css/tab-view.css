@@ -323,30 +323,9 @@ body {
     box-shadow: var(--ft-shadow-focus-ring);
 }
 
-.btn-primary {
-    background-color: var(--ft-color-brand-primary);
-    color: var(--ft-color-text-inverse);
-    border: none;
-    padding: 0 var(--ft-space-xl);
-    border-radius: var(--ft-radius-md);
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
 
-.btn-primary:hover {
-    background-color: var(--ft-color-brand-primary-hover);
-}
 
-.btn-secondary {
-    background-color: var(--ft-color-bg-panel);
-    color: var(--ft-color-text-primary);
-    border: 1px solid var(--ft-color-sem-neutral-border);
-    padding: var(--ft-space-sm) var(--ft-space-lg);
-    border-radius: var(--ft-radius-md);
-    cursor: pointer;
-    font-weight: 500;
-}
+/* Button styles moved to components.css */
 
 .btn-text.danger {
     background: none;

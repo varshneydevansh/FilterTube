@@ -12,6 +12,11 @@ FilterTube v3.0 implements an advanced **data interception filtering system** th
 - **Comments Filtering**: Removes comment sections entirely when hideAllComments is enabled
 - **Shorts Filtering**: Blocks YouTube Shorts content when hideAllShorts is enabled
 
+### **Stats Tracking**
+- **Time Saved**: Calculates and displays the estimated time saved by blocking unwanted videos.
+- **Videos Hidden**: Tracks the total number of videos blocked daily.
+- **Visual Badges**: Shows stats directly on the extension icon.
+
 ### **Advanced Matching**
 - **Multi-Path Extraction**: Uses multiple fallback data paths to extract content information
 - **Fuzzy Channel Matching**: Matches partial channel names and handles case variations
@@ -160,6 +165,11 @@ YouTube JSON Data → FilterTubeEngine.processData() → Filtered Data → YouTu
 - **Real-time Preview**: Immediate feedback on filter changes
 - **Status Indicators**: Shows current filtering state
 
+### **Tab View (Advanced Dashboard)**
+- **Channel Management**: Dedicated interface for managing blocked channels.
+- **Keyword Management**: Advanced keyword list editing.
+- **Stats Dashboard**: Detailed view of time saved and videos hidden.
+
 ### **Advanced Settings**
 - **Detailed Configuration**: Access to all filtering options
 - **Import/Export**: Settings backup and sharing capabilities
@@ -201,4 +211,4 @@ YouTube JSON Data → FilterTubeEngine.processData() → Filtered Data → YouTu
 - **Cross-Origin Protection**: Secure communication between extension components
 - **CSP Compliance**: Respects all Content Security Policy restrictions
 
-This data interception approach represents a significant advancement over traditional DOM-based filtering, providing superior performance, user experience, and future-proof operation. 
+This data interception approach represents a significant advancement over traditional DOM-based filtering, providing superior performance, user experience, and future-proof operation.

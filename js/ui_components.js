@@ -55,7 +55,10 @@ const UIComponents = (() => {
     function flashButtonSuccess(button, successText = 'Saved!', duration = 1500) {
         if (!button) return;
 
-        const originalText = button.textContent;
+        // Store original text in dataset if not already stored
+        if (!button.dataset.originalText) {
+            button.dataset.originalText = button.textContent;
+        }
         const originalBg = button.style.backgroundColor;
         const originalColor = button.style.color;
         const originalBorder = button.style.borderColor;
@@ -67,7 +70,8 @@ const UIComponents = (() => {
         button.classList.add('btn-success-flash');
 
         setTimeout(() => {
-            button.textContent = originalText;
+            button.textContent = button.dataset.originalText; // Restore from dataset
+            delete button.dataset.originalText; // Clean up dataset
             button.style.backgroundColor = originalBg;
             button.style.color = originalColor;
             button.style.borderColor = originalBorder;

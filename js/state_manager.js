@@ -151,7 +151,8 @@ const StateManager = (() => {
             exact: options.exact || false,
             semantic: options.semantic || false,
             source: 'user',
-            channelRef: null
+            channelRef: null,
+            addedAt: Date.now() // Timestamp for proper ordering
         });
 
         recomputeKeywords();
@@ -247,7 +248,8 @@ const StateManager = (() => {
             handle: null,
             logo: null,
             filterAll: false,
-            originalInput: rawValue
+            originalInput: rawValue,
+            addedAt: Date.now()
         };
 
         // Fetch channel details
@@ -457,6 +459,49 @@ const StateManager = (() => {
             }
         });
     }
+
+    // ============================================================================
+    // STORAGE SYNC
+    // ============================================================================
+
+    /**
+     * Handle storage changes from other contexts
+     */
+    function setupStorageListener() {
+        if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.onChanged) {
+            chrome.storage.onChanged.addListener(async (changes, area) => {
+                if (area !== 'local' || isSaving) return;
+
+                // Check for theme changes
+                if (changes.ftThemePreference) {
+                    const newTheme = changes.ftThemePreference.newValue || 'light';
+                    if (state.theme !== newTheme) {
+                        state.theme = newTheme;
+                        if (SettingsAPI.applyThemePreference) {
+                            SettingsAPI.applyThemePreference(newTheme);
+                        }
+                        notifyListeners('themeChanged', { theme: newTheme });
+                    }
+                }
+
+                // Check for settings changes using actual storage keys
+                const storageKeys = ['uiKeywords', 'filterKeywords', 'filterChannels', 'hideAllShorts', 'hideAllComments', 'filterComments', 'stats', 'channelMap'];
+                const hasSettingsChange = storageKeys.some(key => changes[key]);
+
+                if (hasSettingsChange) {
+                    console.log('StateManager: Detected external settings change, reloading...');
+
+                    // Reload all settings from storage to ensure sync
+                    await loadSettings();
+
+                    notifyListeners('externalUpdate', state);
+                }
+            });
+        }
+    }
+
+    // Initialize listener
+    setupStorageListener();
 
     // ============================================================================
     // PUBLIC API
