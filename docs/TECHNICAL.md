@@ -168,12 +168,14 @@ Users want to know how much time they've saved by not watching unwanted content.
 graph TD
     A[Video Blocked] --> B{Has Duration?}
     B -- Yes --> C[Parse Duration]
-    B -- No --> D[Use Average (5m)]
+    B -- No --> D[Use Default: 3m for videos, 30s for shorts]
     C --> E[Add to Total Stats]
     D --> E
     E --> F[Save to Storage]
     F --> G[Update UI Badge]
 ```
+
+**Note (v3.0.1):** FilterTube now tracks actual video durations extracted from YouTube's metadata whenever available, providing accurate time saved calculations instead of generic estimates.
 
 ## 6. Centralized State Management
 

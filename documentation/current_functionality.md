@@ -13,7 +13,7 @@ FilterTube v3.0 implements an advanced **data interception filtering system** th
 - **Shorts Filtering**: Blocks YouTube Shorts content when hideAllShorts is enabled
 
 ### **Stats Tracking**
-- **Time Saved**: Calculates and displays the estimated time saved by blocking unwanted videos.
+- **Time Saved**: Calculates and displays the time saved by blocking unwanted videos using actual video durations extracted from YouTube metadata (falls back to 3 minutes for videos, 30 seconds for shorts when duration unavailable).
 - **Videos Hidden**: Tracks the total number of videos blocked daily.
 - **Visual Badges**: Shows stats directly on the extension icon.
 
