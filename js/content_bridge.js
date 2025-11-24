@@ -219,20 +219,21 @@ function estimateTimeSaved(contentType, duration = null) {
     if (contentType === 'comment') return 1;
     if (contentType === 'chip') return 0.5;
 
-    // Shorts are quick to evaluate
-    if (contentType === 'short') return 2;
-
-    // Videos: use duration-based estimate if available
-    if (contentType === 'video' && duration) {
-        // Longer videos take more time to evaluate
-        if (duration < 60) return 2;        // <1 min: 2 sec
-        if (duration < 300) return 3;       // <5 min: 3 sec
-        if (duration < 600) return 4;       // <10 min: 4 sec
-        if (duration < 1800) return 5;      // <30 min: 5 sec
-        return 6;                           // 30+ min: 6 sec
+    // Shorts: use actual duration if available, otherwise estimate
+    if (contentType === 'short') {
+        return duration && duration > 0 ? duration : 30; // Default 30 sec for shorts
     }
 
-    // Default fallback for videos without duration
+    // Videos: use actual duration when available
+    if (contentType === 'video') {
+        if (duration && duration > 0) {
+            return duration; // Return the actual video duration
+        }
+        // Fallback estimate if no duration available
+        return 180; // Default 3 minutes estimate
+    }
+
+    // Default fallback
     return 4;
 }
 
@@ -263,6 +264,13 @@ function incrementHiddenStats(element) {
         // Store the time saved on the element for potential decrement later
         if (element) {
             element.setAttribute('data-filtertube-time-saved', secondsSaved.toString());
+        }
+
+        // Log time saved (especially useful for videos with actual durations)
+        if (contentType === 'video' || contentType === 'short') {
+            const titleEl = element.querySelector('#video-title, .ytd-video-meta-block #video-title, h3 a, yt-formatted-string#title, span#title');
+            const title = titleEl?.textContent?.trim() || element.getAttribute('aria-label') || 'Unknown';
+            console.log(`FilterTube: Saved ${secondsSaved} seconds from "${title}"`);
         }
 
         saveStats();
@@ -1131,19 +1139,6 @@ function applyDOMFallback(settings, options = {}) {
                 } else {
                     targetToHide.removeAttribute('data-filtertube-hidden-by-keyword');
                 }
-            }
-        }
-
-        // Track Time Saved
-        if (shouldHide && !targetToHide.hasAttribute('data-filtertube-time-saved')) {
-            const duration = extractVideoDuration(element);
-            if (duration > 0) {
-                chrome.runtime.sendMessage({
-                    action: "recordTimeSaved",
-                    seconds: duration
-                });
-                targetToHide.setAttribute('data-filtertube-time-saved', 'true');
-                console.log(`FilterTube: Saved ${duration} seconds from "${title}"`);
             }
         }
 
