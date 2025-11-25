@@ -506,6 +506,47 @@ ytd-rich-shelf-renderer[is-shorts] #contents ytd-rich-item-renderer {
     position: relative !important;
 }
 
+/* IMPORTANT: Hide filtered shorts completely - higher specificity to override above rules */
+ytd-rich-shelf-renderer[is-shorts] #contents ytd-rich-item-renderer:not(.filter-tube-visible),
+ytd-rich-shelf-renderer[is-shorts] #contents ytd-rich-item-renderer.filtertube-hidden,
+ytd-rich-section-renderer ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer:not(.filter-tube-visible),
+ytd-rich-section-renderer ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer.filtertube-hidden {
+    display: none !important;
+    width: 0 !important;
+    min-width: 0 !important;
+    max-width: 0 !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    max-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    position: absolute !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    flex: 0 0 0 !important;
+}
+
+/* Hide filtered shorts in mobile/grid shelf format (ytGridShelfViewModelGridShelfItem) */
+.ytGridShelfViewModelGridShelfItem.filtertube-hidden,
+.ytGridShelfViewModelGridShelfItem:not(.filter-tube-visible) {
+    display: none !important;
+    width: 0 !important;
+    min-width: 0 !important;
+    max-width: 0 !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    max-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    position: absolute !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
 /* Direct targeting for shorts models */
 .shortsLockupViewModelHost,
 ytm-shorts-lockup-view-model-v2,
@@ -513,6 +554,25 @@ ytm-shorts-lockup-view-model {
     display: inline-block !important;
     width: 176px !important;
     height: auto !important;
+}
+
+/* Hide filtered shorts lockup models */
+.shortsLockupViewModelHost.filtertube-hidden,
+.shortsLockupViewModelHost:not(.filter-tube-visible),
+ytm-shorts-lockup-view-model-v2.filtertube-hidden,
+ytm-shorts-lockup-view-model-v2:not(.filter-tube-visible),
+ytm-shorts-lockup-view-model.filtertube-hidden,
+ytm-shorts-lockup-view-model:not(.filter-tube-visible) {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    position: absolute !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
 }
 
 /* Direct targeting for shorts thumbnails */

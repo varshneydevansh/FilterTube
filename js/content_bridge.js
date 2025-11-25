@@ -1211,7 +1211,8 @@ function applyDOMFallback(settings, options = {}) {
     const shortsSelectors = 'ytd-reel-item-renderer, ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2';
     document.querySelectorAll(shortsSelectors).forEach(element => {
         let target = element;
-        const parent = element.closest('ytd-rich-item-renderer');
+        // Check for various parent containers (desktop and mobile formats)
+        const parent = element.closest('ytd-rich-item-renderer, .ytGridShelfViewModelGridShelfItem');
         if (parent) target = parent;
 
         let title = '';
