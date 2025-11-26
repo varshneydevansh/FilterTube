@@ -411,7 +411,8 @@ function saveStats() {
 function extractShelfTitle(shelf) {
     if (!shelf || typeof shelf.querySelector !== 'function') return '';
 
-    const header = shelf.querySelector(':scope #title-container, :scope #header, :scope ytd-shelf-header-renderer, :scope .grid-subheader, :scope .shelf-title-row, :scope h2');
+    // Standard headers
+    const header = shelf.querySelector(':scope #title-container, :scope #header, :scope ytd-shelf-header-renderer, :scope .grid-subheader, :scope .shelf-title-row, :scope h2, :scope yt-section-header-view-model');
     const headerTextCandidates = [];
 
     if (header) {
@@ -420,14 +421,17 @@ function extractShelfTitle(shelf) {
             header.querySelector('#title-text'),
             header.querySelector('yt-formatted-string#title'),
             header.querySelector('span#title'),
-            header.querySelector('h2')
+            header.querySelector('h2'),
+            header.querySelector('.yt-shelf-header-layout__title')
         );
     }
 
+    // Direct children checks (fallback)
     headerTextCandidates.push(
         shelf.querySelector(':scope > #dismissible #title'),
         shelf.querySelector(':scope > #dismissible #title-text'),
-        shelf.querySelector(':scope > h2')
+        shelf.querySelector(':scope > h2'),
+        shelf.querySelector('.yt-shelf-header-layout__title')
     );
 
     for (const candidate of headerTextCandidates) {
@@ -1062,13 +1066,14 @@ function updateContainerVisibility(container, childSelector) {
     );
 
     if (allHidden) {
+        // FIX: Use toggleVisibility to actually hide the shelf with display: none
+        // SKIP STATS: This is container cleanup, not content filtering
         container.classList.add('filtertube-hidden-shelf');
+        toggleVisibility(container, true, 'All children hidden', true);
     } else {
         container.classList.remove('filtertube-hidden-shelf');
-        if (container.classList.contains('filtertube-hidden')) {
-            container.classList.remove('filtertube-hidden');
-            container.removeAttribute('data-filtertube-hidden');
-        }
+        // FIX: Use toggleVisibility to properly restore the shelf
+        toggleVisibility(container, false, '', true);
     }
 }
 
@@ -1400,7 +1405,7 @@ function applyDOMFallback(settings, options = {}) {
 
     // 5. Container Cleanup (Shelves, Grids)
     // Hide shelves if all their items are hidden
-    const shelves = document.querySelectorAll('ytd-shelf-renderer, ytd-rich-shelf-renderer, ytd-item-section-renderer, grid-shelf-view-model');
+    const shelves = document.querySelectorAll('ytd-shelf-renderer, ytd-rich-shelf-renderer, ytd-item-section-renderer, grid-shelf-view-model, yt-section-header-view-model');
     shelves.forEach(shelf => {
         const shelfTitle = extractShelfTitle(shelf);
         const shelfTitleMatches = shelfTitle && shouldHideContent(shelfTitle, '', effectiveSettings);
@@ -1713,8 +1718,12 @@ function handleStorageChanges(changes, area) {
     if (area !== 'local') return;
     const relevantKeys = ['filterKeywords', 'filterChannels', 'uiChannels', 'channelMap', 'hideAllComments', 'filterComments', 'hideAllShorts'];
     if (Object.keys(changes).some(key => relevantKeys.includes(key))) {
+        // FIX: Apply changes IMMEDIATELY without debounce
         requestSettingsFromBackground().then(result => {
-            if (result?.success) applyDOMFallback(result.settings, { forceReprocess: true });
+            if (result?.success) {
+                // Force immediate reprocess with no scroll preservation for instant feedback
+                applyDOMFallback(result.settings, { forceReprocess: true, preserveScroll: false });
+            }
         });
     }
 }

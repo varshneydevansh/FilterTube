@@ -243,11 +243,16 @@ const StateManager = (() => {
             });
 
             if (response && response.success) {
-                // Manually update local state so UI updates instantly if popup is still open
-                // (If popup is closed, this part won't run, but that doesn't matter because next open will load from storage)
-                state.channels.unshift(response.channel);
-                recomputeKeywords();
-                notifyListeners('channelAdded', { channel: response.channel });
+                // FIX: Check if channel was already added via storage sync mechanism
+                // to prevent duplicate entries (Race Condition Fix)
+                const alreadyExists = state.channels.some(ch => ch.id === response.channel.id);
+
+                if (!alreadyExists) {
+                    state.channels.unshift(response.channel);
+                    recomputeKeywords();
+                    notifyListeners('channelAdded', { channel: response.channel });
+                }
+
                 return { success: true, channel: response.channel };
             } else {
                 return { success: false, error: response?.error || 'Unknown error' };

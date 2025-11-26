@@ -153,12 +153,26 @@ async function getCompiledSettings() {
 
             compiledSettings.filterChannels = compiledChannels;
 
-            // Merge channel-based keywords with existing keywords
+            // Merge channel-based keywords with existing keywords (with deduplication)
             if (additionalKeywordsFromChannels.length > 0) {
-                compiledSettings.filterKeywords = [
-                    ...compiledSettings.filterKeywords,
-                    ...additionalKeywordsFromChannels
-                ];
+                // Create a Set of existing patterns for deduplication
+                const existingPatterns = new Set(
+                    compiledSettings.filterKeywords.map(kw => kw.pattern.toLowerCase())
+                );
+
+                // Only add channel keywords that don't already exist
+                const uniqueChannelKeywords = additionalKeywordsFromChannels.filter(kw => {
+                    return !existingPatterns.has(kw.pattern.toLowerCase());
+                });
+
+                if (uniqueChannelKeywords.length > 0) {
+                    compiledSettings.filterKeywords = [
+                        ...compiledSettings.filterKeywords,
+                        ...uniqueChannelKeywords
+                    ];
+                }
+
+                console.log(`FilterTube Background: Added ${uniqueChannelKeywords.length} unique channel-based keywords (${additionalKeywordsFromChannels.length - uniqueChannelKeywords.length} duplicates skipped)`);
             }
 
             // Pass through the channel map (UC ID <-> @handle mappings)
@@ -170,7 +184,7 @@ async function getCompiledSettings() {
             compiledSettings.useExactWordMatching = useExact;
             compiledSettings.hideAllShorts = items.hideAllShorts || false;
 
-            console.log(`FilterTube Background: Compiled ${compiledChannels.length} channels, ${Object.keys(compiledSettings.channelMap).length / 2} mappings`);
+            console.log(`FilterTube Background: Compiled ${compiledChannels.length} channels, ${compiledSettings.filterKeywords.length} total keywords (${compiledSettings.filterKeywords.length - additionalKeywordsFromChannels.length} user keywords + ${additionalKeywordsFromChannels.length} channel-based), ${Object.keys(compiledSettings.channelMap).length / 2} mappings`);
 
             resolve(compiledSettings);
         });

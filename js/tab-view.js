@@ -436,24 +436,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             setTimeout(() => channelInput?.focus(), 100);
         });
     }
-
-    // ============================================================================
-    // INITIALIZATION
-    // ============================================================================
-
-    // Listen for external storage changes (from popup or other contexts)
-    chrome.storage.onChanged.addListener((changes, area) => {
-        if (area !== 'local') return;
-
-        // Reload settings when they change externally
-        const settingKeys = ['uiKeywords', 'filterKeywords', 'filterChannels', 'hideAllShorts', 'hideAllComments', 'filterComments'];
-        const hasChanges = settingKeys.some(key => changes[key]);
-
-        if (hasChanges) {
-            console.log('Tab View: Detected external settings change, reloading...');
-            StateManager.loadSettings();
-        }
-    });
 });
 
 // ============================================================================

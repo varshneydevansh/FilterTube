@@ -290,22 +290,4 @@ document.addEventListener('DOMContentLoaded', async () => {
             chrome.tabs.create({ url: 'html/tab-view.html' });
         });
     }
-
-    // ============================================================================
-    // STORAGE CHANGE LISTENER
-    // ============================================================================
-
-    // Listen for external storage changes (from tab-view or other contexts)
-    chrome.storage.onChanged.addListener((changes, area) => {
-        if (area !== 'local') return;
-
-        // Reload settings when they change externally
-        const settingKeys = ['uiKeywords', 'filterKeywords', 'filterChannels', 'hideAllShorts', 'hideAllComments', 'filterComments'];
-        const hasChanges = settingKeys.some(key => changes[key]);
-
-        if (hasChanges) {
-            console.log('Popup: Detected external settings change, reloading...');
-            StateManager.loadSettings();
-        }
-    });
 });
