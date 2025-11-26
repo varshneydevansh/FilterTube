@@ -1056,7 +1056,9 @@ function updateContainerVisibility(container, childSelector) {
     // Check if all children are hidden
     const allHidden = Array.from(children).every(child =>
         child.classList.contains('filtertube-hidden') ||
-        child.hasAttribute('data-filtertube-hidden')
+        child.hasAttribute('data-filtertube-hidden') ||
+        // FIX: Also check if the child is inside a wrapper we already hidden
+        child.closest('.filtertube-hidden') !== null
     );
 
     if (allHidden) {
@@ -1331,9 +1333,19 @@ function applyDOMFallback(settings, options = {}) {
     const shortsSelectors = 'ytd-reel-item-renderer, ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2';
     document.querySelectorAll(shortsSelectors).forEach(element => {
         let target = element;
-        // Check for various parent containers (desktop and mobile formats)
-        const parent = element.closest('ytd-rich-item-renderer, .ytGridShelfViewModelGridShelfItem');
-        if (parent) target = parent;
+        // 1. Check for Desktop container (ytd-rich-item-renderer)
+        const richItemParent = element.closest('ytd-rich-item-renderer');
+        if (richItemParent) {
+            target = richItemParent;
+        }
+        // 2. Check for Grid Shelf container (The specific issue you found)
+        // This div holds the width/margin styles, so we MUST hide this to collapse the gap
+        else {
+            const gridShelfItem = element.closest('.ytGridShelfViewModelGridShelfItem');
+            if (gridShelfItem) {
+                target = gridShelfItem;
+            }
+        }
 
         let title = '';
         const titleSelectors = [
@@ -1404,7 +1416,7 @@ function applyDOMFallback(settings, options = {}) {
             toggleVisibility(shelf, false);
         }
 
-        updateContainerVisibility(shelf, 'ytd-rich-item-renderer, ytd-grid-video-renderer, ytd-video-renderer, ytd-reel-item-renderer, yt-lockup-view-model, ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2');
+        updateContainerVisibility(shelf, 'ytd-rich-item-renderer, ytd-grid-video-renderer, ytd-video-renderer, ytd-reel-item-renderer, yt-lockup-view-model, ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2, .ytGridShelfViewModelGridShelfItem');
     });
 
     if (preserveScroll && scrollingElement) {
