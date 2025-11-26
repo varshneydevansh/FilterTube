@@ -264,6 +264,64 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
             // For now, we'll let content scripts handle filtering
         }
         return false; // No response needed
+    } else if (request.action === "addChannelPersistent") {
+        const input = request.input;
+        console.log(`FilterTube Background: persistent add request for "${input}"`);
+
+        // Keep service worker alive while processing
+        (async () => {
+            try {
+                // 1. Get current channels
+                const data = await new Promise(resolve => browserAPI.storage.local.get(['filterChannels'], resolve));
+                let channels = data.filterChannels || [];
+
+                // Normalize legacy string arrays to objects if necessary
+                if (Array.isArray(channels) && typeof channels[0] === 'string') {
+                    channels = channels.map(c => ({ name: c, id: c, handle: null, filterAll: false, addedAt: Date.now() }));
+                }
+
+                // 2. Check duplicates (Fast check before fetch)
+                const normalizedInput = input.replace(/^channel\//i, '').toLowerCase();
+                const exists = channels.some(ch => {
+                    return (ch.id || '').toLowerCase() === normalizedInput ||
+                        (ch.handle || '').toLowerCase() === normalizedInput ||
+                        (ch.name || '').toLowerCase() === normalizedInput;
+                });
+
+                if (exists) {
+                    sendResponse({ success: false, error: 'Channel already exists' });
+                    return;
+                }
+
+                // 3. Fetch details (This is the slow part that was getting killed)
+                const details = await fetchChannelInfo(input);
+
+                // 4. Construct entry
+                const newEntry = {
+                    name: details.success ? (details.name || details.handle || input) : input,
+                    id: details.success ? (details.id || input) : input,
+                    handle: details.success ? details.handle : (input.startsWith('@') ? input : null),
+                    logo: details.success ? details.logo : null,
+                    filterAll: false,
+                    originalInput: input,
+                    addedAt: Date.now()
+                };
+
+                // 5. Add to list and save
+                channels.unshift(newEntry); // Add to top
+
+                await new Promise(resolve => browserAPI.storage.local.set({ filterChannels: channels }, resolve));
+
+                console.log("FilterTube Background: Persistent add success", newEntry);
+                sendResponse({ success: true, channel: newEntry });
+
+            } catch (err) {
+                console.error("FilterTube Background: Persistent add failed", err);
+                sendResponse({ success: false, error: err.message });
+            }
+        })();
+
+        return true; // Keep message channel open for async response
     } else if (request.action === 'FilterTube_ApplySettings' && request.settings) {
         // Forward compiled settings to all relevant tabs for immediate application
         browserAPI.tabs.query({ url: ["*://*.youtube.com/*", "*://*.youtubekids.com/*"] }, tabs => {

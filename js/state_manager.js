@@ -214,7 +214,7 @@ const StateManager = (() => {
     // ============================================================================
 
     /**
-     * Add a channel to the filter list
+     * Add a channel to the filter list (Delegates to Background for persistence)
      * @param {string} input - Channel identifier (@handle or UC ID)
      * @returns {Promise<Object>} Result with success status and channel data
      */
@@ -234,56 +234,28 @@ const StateManager = (() => {
             };
         }
 
-        const normalizedInput = rawValue.replace(/^channel\//i, '');
-
-        // Check for duplicates
-        if (isDuplicateChannel(normalizedInput)) {
-            return { success: false, error: 'Channel already exists' };
-        }
-
-        // Create initial channel entry
-        let channelEntry = {
-            name: normalizedInput,
-            id: normalizedInput,
-            handle: null,
-            logo: null,
-            filterAll: false,
-            originalInput: rawValue,
-            addedAt: Date.now()
-        };
-
-        // Fetch channel details
+        // DELEGATE TO BACKGROUND SCRIPT
+        // This ensures the fetch+save completes even if the popup is closed immediately
         try {
             const response = await chrome.runtime.sendMessage({
-                action: 'fetchChannelDetails',
-                channelIdOrHandle: normalizedInput
+                action: 'addChannelPersistent',
+                input: rawValue
             });
 
-            if (response?.success && response.id) {
-                channelEntry = {
-                    ...channelEntry,
-                    name: response.name || channelEntry.name,
-                    id: response.id,
-                    handle: response.handle || channelEntry.handle,
-                    logo: response.logo || channelEntry.logo
-                };
-
-                // Persist channel mapping
-                if (response.handle && response.id) {
-                    await persistChannelMap(response.id, response.handle);
-                }
+            if (response && response.success) {
+                // Manually update local state so UI updates instantly if popup is still open
+                // (If popup is closed, this part won't run, but that doesn't matter because next open will load from storage)
+                state.channels.unshift(response.channel);
+                recomputeKeywords();
+                notifyListeners('channelAdded', { channel: response.channel });
+                return { success: true, channel: response.channel };
+            } else {
+                return { success: false, error: response?.error || 'Unknown error' };
             }
         } catch (error) {
-            console.warn('StateManager: Error fetching channel details', error);
-            // Continue with basic channel entry
+            console.error('StateManager: Background delegation failed', error);
+            return { success: false, error: 'Connection to background failed' };
         }
-
-        state.channels.unshift(channelEntry);
-        recomputeKeywords();
-        await saveSettings();
-        notifyListeners('channelAdded', { channel: channelEntry });
-
-        return { success: true, channel: channelEntry };
     }
 
     /**
