@@ -445,7 +445,8 @@ const RenderEngine = (() => {
                 onToggle: async () => {
                     await StateManager?.toggleChannelFilterAll(index);
                 },
-                className: 'toggle-variant-red'
+                className: 'toggle-variant-red',
+                title: `Automatically adds "${channel.name || channel.handle || channel.id}" as a fuzzy keyword filter - hides any content mentioning this channel name`
             }) :
             createFallbackFilterAllToggle(channel, index);
 
@@ -460,6 +461,7 @@ const RenderEngine = (() => {
         const toggle = document.createElement('div');
         toggle.className = `exact-toggle toggle-variant-red ${channel.filterAll ? 'active' : ''}`;
         toggle.textContent = 'Filter All Content';
+        toggle.title = `Automatically adds "${channel.name || channel.handle || channel.id}" as a fuzzy keyword filter - hides any content mentioning this channel name`;
         toggle.addEventListener('click', async () => {
             await StateManager?.toggleChannelFilterAll(index);
         });

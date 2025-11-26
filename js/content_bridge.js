@@ -1722,7 +1722,7 @@ function handleStorageChanges(changes, area) {
         requestSettingsFromBackground().then(result => {
             if (result?.success) {
                 // Force immediate reprocess with no scroll preservation for instant feedback
-                applyDOMFallback(result.settings, { forceReprocess: true, preserveScroll: false });
+                applyDOMFallback(result.settings, { forceReprocess: true });
             }
         });
     }
