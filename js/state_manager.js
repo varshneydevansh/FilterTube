@@ -226,11 +226,15 @@ const StateManager = (() => {
             return { success: false, error: 'Empty input' };
         }
 
-        // Validate format
-        if (!rawValue.startsWith('@') && !rawValue.toLowerCase().startsWith('uc') && !rawValue.toLowerCase().startsWith('channel/uc')) {
+        // Validate format - Allow @handle, UC ID, or YouTube URLs
+        const isHandle = rawValue.startsWith('@');
+        const isUcId = rawValue.toLowerCase().startsWith('uc') || rawValue.toLowerCase().startsWith('channel/uc');
+        const isUrl = rawValue.includes('youtube.com') || rawValue.includes('youtu.be');
+
+        if (!isHandle && !isUcId && !isUrl) {
             return {
                 success: false,
-                error: 'Invalid format. Use @handle or UC ID'
+                error: 'Invalid format. Use @handle, Channel ID, or YouTube URL'
             };
         }
 

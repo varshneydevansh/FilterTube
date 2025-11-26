@@ -282,6 +282,53 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
         const input = request.input;
         console.log(`FilterTube Background: persistent add request for "${input}"`);
 
+        // Helper to normalize input (URL/Handle/ID) -> @handle or UC...
+        const normalizeChannelInput = (rawInput) => {
+            if (!rawInput) return '';
+            let cleaned = rawInput.trim();
+
+            // Handle full URLs
+            try {
+                const url = new URL(cleaned);
+                const path = url.pathname; // e.g. /@handle, /channel/UC..., /c/User
+
+                // Case 1: /channel/UC...
+                if (path.match(/^\/channel\/(UC[\w-]{22})/)) {
+                    return path.match(/^\/channel\/(UC[\w-]{22})/)[1];
+                }
+
+                // Case 2: /@handle
+                if (path.startsWith('/@')) {
+                    return '@' + path.substring(2).split('/')[0];
+                }
+
+                // Case 3: /c/User or /user/User (Legacy) - return as is for search fallback
+                if (path.startsWith('/c/') || path.startsWith('/user/')) {
+                    return path.split('/')[2];
+                }
+
+                // Case 4: Just the path (fallback)
+                return path.substring(1);
+            } catch (e) {
+                // Not a URL, treat as string
+            }
+
+            // Handle "youtube.com/..." without protocol
+            if (cleaned.includes('youtube.com/') || cleaned.includes('youtu.be/')) {
+                const parts = cleaned.split('/');
+                const lastPart = parts[parts.length - 1];
+                const secondLast = parts[parts.length - 2];
+
+                if (secondLast === 'channel' && lastPart.startsWith('UC')) return lastPart;
+                if (lastPart.startsWith('@')) return lastPart;
+            }
+
+            // Handle direct inputs
+            if (cleaned.startsWith('channel/')) return cleaned.replace('channel/', '');
+
+            return cleaned;
+        };
+
         // Keep service worker alive while processing
         (async () => {
             try {
@@ -294,12 +341,17 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
                     channels = channels.map(c => ({ name: c, id: c, handle: null, filterAll: false, addedAt: Date.now() }));
                 }
 
-                // 2. Check duplicates (Fast check before fetch)
-                const normalizedInput = input.replace(/^channel\//i, '').toLowerCase();
+                // 2. Normalize Input & Check duplicates
+                const normalizedInput = normalizeChannelInput(input);
+                console.log(`FilterTube Background: Normalized "${input}" -> "${normalizedInput}"`);
+
                 const exists = channels.some(ch => {
-                    return (ch.id || '').toLowerCase() === normalizedInput ||
-                        (ch.handle || '').toLowerCase() === normalizedInput ||
-                        (ch.name || '').toLowerCase() === normalizedInput;
+                    const normId = (ch.id || '').toLowerCase();
+                    const normHandle = (ch.handle || '').toLowerCase();
+                    const normName = (ch.name || '').toLowerCase();
+                    const checkInput = normalizedInput.toLowerCase();
+
+                    return normId === checkInput || normHandle === checkInput || normName === checkInput;
                 });
 
                 if (exists) {
@@ -308,16 +360,16 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
                 }
 
                 // 3. Fetch details (This is the slow part that was getting killed)
-                const details = await fetchChannelInfo(input);
+                const details = await fetchChannelInfo(normalizedInput);
 
                 // 4. Construct entry
                 const newEntry = {
-                    name: details.success ? (details.name || details.handle || input) : input,
-                    id: details.success ? (details.id || input) : input,
-                    handle: details.success ? details.handle : (input.startsWith('@') ? input : null),
+                    name: details.success ? (details.name || details.handle || normalizedInput) : normalizedInput,
+                    id: details.success ? (details.id || normalizedInput) : normalizedInput,
+                    handle: details.success ? details.handle : (normalizedInput.startsWith('@') ? normalizedInput : null),
                     logo: details.success ? details.logo : null,
                     filterAll: false,
-                    originalInput: input,
+                    originalInput: normalizedInput, // Store normalized value, not the raw URL
                     addedAt: Date.now()
                 };
 
