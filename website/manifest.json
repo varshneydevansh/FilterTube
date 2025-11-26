@@ -1,0 +1,16 @@
+{
+    "name": "FilterTube",
+    "short_name": "FilterTube",
+    "description": "Advanced content filtering for a peaceful digital existence",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0a0a0a",
+    "theme_color": "#ff3333",
+    "icons": [
+        {
+            "src": "/assets/images/logo.png",
+            "sizes": "128x128",
+            "type": "image/png"
+        }
+    ]
+}

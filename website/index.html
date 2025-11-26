@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FilterTube - Advanced YouTube Content Filter</title>
+    <meta name="description" content="Advanced content filtering for a peaceful digital existence">
+    <meta name="theme-color" content="#ff3333">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="assets/images/logo.png" type="image/png">
+    <link rel="manifest" href="manifest.json">
+    <script>
+        // Set theme immediately from localStorage
+        const theme = localStorage.getItem('filtertube-theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+    </script>
+</head>
+
+<body>
+    <div class="scanlines"></div>
+    <div class="noise"></div>
+
+    <nav class="glass-panel">
+        <div class="logo-container">
+            <img src="assets/images/logo.png" alt="FilterTube Logo" class="logo">
+            <span class="brand-name">FILTERTUBE</span>
+        </div>
+        <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#how-it-works">How it Works</a>
+            <a href="kids.html">Kids</a>
+            <a href="ml.html">ML & AI</a>
+            <a href="mobile.html">Mobile</a>
+            <button id="theme-toggle" class="theme-toggle">LIGHT MODE</button>
+            <a href="#download" class="cta-button">Download</a>
+        </div>
+        <div class="mobile-menu-toggle">
+            <span></span><span></span><span></span>
+        </div>
+    </nav>
+
+    <main>
+        <section id="hero" class="hero-section">
+            <div class="hero-content">
+                <h1 class="glitch" data-text="Reclaim Your Focus">Reclaim Your Focus</h1>
+                <p class="hero-subtitle">Advanced content filtering for a peaceful digital existence.</p>
+                <div class="hero-badges">
+                    <span class="badge">✓ Free & Open Source</span>
+                    <span class="badge">✓ Privacy First</span>
+                </div>
+                <div class="hero-actions">
+                    <a href="#download" class="primary-btn">Add to Browser</a>
+                    <a href="#how-it-works" class="secondary-btn">Learn More</a>
+                </div>
+                <div class="supported-browsers-hero">
+                    <span>Supported on:</span>
+                    <div class="browser-icons">
+                        <img src="https://cdnjs.cloudflare.com/ajax/libs/browser-logos/74.1.0/chrome/chrome_24x24.png"
+                            alt="Chrome" title="Chrome">
+                        <img src="https://cdnjs.cloudflare.com/ajax/libs/browser-logos/74.1.0/edge/edge_24x24.png"
+                            alt="Edge" title="Edge">
+                        <img src="https://cdnjs.cloudflare.com/ajax/libs/browser-logos/74.1.0/brave/brave_24x24.png"
+                            alt="Brave" title="Brave">
+                        <img src="https://cdnjs.cloudflare.com/ajax/libs/browser-logos/74.1.0/opera/opera_24x24.png"
+                            alt="Opera" title="Opera">
+                    </div>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <canvas id="hero-canvas"></canvas>
+            </div>
+        </section>
+
+        <section id="features" class="features-section">
+            <h2 class="section-title">Technical Features</h2>
+            <div class="grid-container">
+                <div class="card glass-panel">
+                    <h3>Regex Filtering</h3>
+                    <p>Powerful regular expression support for advanced pattern matching in titles and comments.</p>
+                </div>
+                <div class="card glass-panel">
+                    <h3>Channel Whitelist</h3>
+                    <p>Strict mode to only allow content from specific, trusted creators.</p>
+                </div>
+                <div class="card glass-panel">
+                    <h3>Comment Blocker</h3>
+                    <p>Remove toxicity by completely hiding the comments section.</p>
+                </div>
+                <div class="card glass-panel">
+                    <h3>Shorts Blocker</h3>
+                    <p>Disable YouTube Shorts to prevent doom-scrolling and regain your time.</p>
+                </div>
+                <div class="card glass-panel">
+                    <h3>Zero-Flash Filtering</h3>
+                    <p>Content is blocked before it renders on screen. No jarring flashes of unwanted videos.</p>
+                </div>
+                <div class="card glass-panel">
+                    <h3>Performance</h3>
+                    <p>Optimized for zero latency. Filters are applied instantly before rendering.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="how-it-works" class="how-it-works-section">
+            <h2 class="section-title">How It Works</h2>
+            <div class="pipeline-container">
+                <div class="pipeline-step">
+                    <div class="step-number">01</div>
+                    <h3>INTERCEPT</h3>
+                    <p>initialData → FilterTube Hook</p>
+                </div>
+                <div class="pipeline-arrow">→</div>
+                <div class="pipeline-step">
+                    <div class="step-number">02</div>
+                    <h3>ANALYZE</h3>
+                    <p>processData(videos, userFilters)</p>
+                </div>
+                <div class="pipeline-arrow">→</div>
+                <div class="pipeline-step">
+                    <div class="step-number">03</div>
+                    <h3>BLOCK</h3>
+                    <p>blocked.forEach(v → null)</p>
+                </div>
+                <div class="pipeline-arrow">→</div>
+                <div class="pipeline-step">
+                    <div class="step-number">04</div>
+                    <h3>RENDER</h3>
+                    <p>return cleanData // Zero flash</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="architecture" class="architecture-section">
+            <h2 class="section-title">Architecture</h2>
+            <div class="grid-container">
+                <div class="card glass-panel">
+                    <h3>Extension Context</h3>
+                    <p>Manages settings, storage, and background processes securely isolated from the page.</p>
+                </div>
+                <div class="card glass-panel">
+                    <h3>Page Context</h3>
+                    <p>Injects lightweight scripts to intercept network requests and DOM mutations in real-time.</p>
+                </div>
+                <div class="card glass-panel">
+                    <h3>Storage Sync</h3>
+                    <p>Uses `chrome.storage.sync` to keep your filters consistent across all your devices.</p>
+                </div>
+                <div class="card glass-panel">
+                    <h3>Event Bus</h3>
+                    <p>High-performance message passing between the popup, background, and content scripts.</p>
+                </div>
+                <div class="card glass-panel">
+                    <h3>Documentation</h3>
+                    <p>Comprehensive guides available in `docs/` covering architecture, UX, and technical details.</p>
+                </div>
+                <div class="card glass-panel">
+                    <h3>UX Guidelines</h3>
+                    <p>Follows strict accessibility and design principles as outlined in our UX Guide.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="privacy" class="privacy-section">
+            <h2 class="section-title">Privacy First</h2>
+            <div class="grid-container">
+                <div class="card glass-panel">
+                    <h3>Local Processing</h3>
+                    <p>All filtering logic runs 100% on your device. No video data is sent to our servers.</p>
+                </div>
+                <div class="card glass-panel">
+                    <h3>Open Source</h3>
+                    <p>The code is fully open source on GitHub. Audit it yourself to verify our claims.</p>
+                </div>
+                <div class="card glass-panel">
+                    <h3>Zero Tracking</h3>
+                    <p>We do not track your watch history, search queries, or any personal data.</p>
+                </div>
+                <div class="card glass-panel">
+                    <h3>Manifest V3</h3>
+                    <p>Built on the latest secure extension standard, ensuring better privacy and performance.</p>
+                </div>
+                <div class="card glass-panel">
+                    <h3>No Analytics</h3>
+                    <p>We don't use Google Analytics, Mixpanel, or any other tracking scripts on this site or extension.
+                    </p>
+                </div>
+                <div class="card glass-panel">
+                    <h3>Cross-Device Sync?</h3>
+                    <p>We're exploring ways to sync your settings across devices without using third-party servers.
+                        Native browser sync is one option we're considering.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="story" class="story-section">
+            <h2 class="section-title">Our Story</h2>
+            <div class="story-content glass-panel">
+                <div class="story-block">
+                    <h3>Why FilterTube?</h3>
+                    <p>YouTube's recommendation algorithms can sometimes surface unwanted content. FilterTube gives you
+                        control over what appears in your feed, allowing for a more focused and pleasant viewing
+                        experience without distractions or unwanted content.</p>
+                </div>
+
+                <div class="story-divider"></div>
+
+                <div class="story-block">
+                    <h3>The Core Burning Fire Behind FilterTube</h3>
+                    <p>Real parent requests that YouTube ignored—until one parent asked if any programmer could build a
+                        solution.</p>
+                </div>
+
+                <div class="story-quote-box">
+                    <p>It all started with this thread on Google's support forum: When a parent said that he is helpless
+                        and his kid is just kept crying and screaming because of the content on YouTubeKids, and he
+                        asked me if I can create a tool to block videos by keyword or tag.</p>
+                    <p>When YouTube Forum maintainers deleted mine and other parents' comments and locked the thread, I
+                        decided to create FilterTube.</p>
+                    <a href="https://support.google.com/youtubekids/thread/54509605/how-to-block-videos-by-keyword-or-tag?hl=en"
+                        target="_blank" class="story-link">→ View Original Thread (Locked)</a>
+                </div>
+
+                <div class="evidence-box">
+                    <h4>Evidence of Censorship</h4>
+                    <p>YouTube staff actively removed parent comments and locked the thread. Many replies now show
+                        <strong>"This reply is no longer available"</strong> — clear evidence that genuine requests for
+                        child safety features are being silenced.
+                    </p>
+                </div>
+
+                <div class="story-divider"></div>
+
+                <div class="creator-quote">
+                    <p>"I built FilterTube because I was tired of the algorithm dictating my attention. I wanted a tool
+                        that gave me back control without compromising the utility of YouTube."</p>
+                    <cite>— Devansh Varshney, Creator</cite>
+                </div>
+            </div>
+        </section>
+
+        <section id="download" class="download-section">
+            <h2 class="section-title">Get Started</h2>
+            <p>Take back control of your feed today.</p>
+            <div class="browser-grid">
+                <a href="#" class="browser-link">
+                    <img src="https://cdnjs.cloudflare.com/ajax/libs/browser-logos/74.1.0/chrome/chrome_48x48.png"
+                        alt="Chrome">
+                    <span>Chrome</span>
+                </a>
+                <a href="#" class="browser-link">
+                    <img src="https://cdnjs.cloudflare.com/ajax/libs/browser-logos/74.1.0/edge/edge_48x48.png"
+                        alt="Edge">
+                    <span>Edge</span>
+                </a>
+                <a href="#" class="browser-link">
+                    <img src="https://cdnjs.cloudflare.com/ajax/libs/browser-logos/74.1.0/firefox/firefox_48x48.png"
+                        alt="Firefox">
+                    <span>Firefox</span>
+                </a>
+                <a href="#" class="browser-link">
+                    <img src="https://cdnjs.cloudflare.com/ajax/libs/browser-logos/74.1.0/opera/opera_48x48.png"
+                        alt="Opera">
+                    <span>Opera</span>
+                </a>
+                <a href="#" class="browser-link">
+                    <img src="https://cdnjs.cloudflare.com/ajax/libs/browser-logos/74.1.0/brave/brave_48x48.png"
+                        alt="Brave">
+                    <span>Brave</span>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-col">
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+                    <img src="assets/images/logo.png" alt="FilterTube" style="width: 32px; height: 32px;">
+                    <h4 style="margin: 0;">FilterTube</h4>
+                </div>
+                <p>Free & Open Source content filtering.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Resources</h4>
+                <a href="#">Documentation</a>
+                <a href="#">Privacy Policy</a>
+                <a href="#">MIT License</a>
+            </div>
+            <div class="footer-col">
+                <h4>Connect</h4>
+                <a href="https://github.com/varshneydevansh/FilterTube">GitHub</a>
+                <a href="mailto:hello@filtertube.in">hello@filtertube.in</a>
+                <a href="#">Report Issues</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 FilterTube. Free & Open Source.</p>
+            <p style="margin-top: 0.5rem;">Made with <span style="color: var(--accent-color);">♥</span> for mental
+                health</p>
+        </div>
+    </footer>
+
+
+    <script src="js/script.js"></script>
+</body>
+
+</html>

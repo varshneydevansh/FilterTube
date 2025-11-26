@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FilterTube Mobile - iPad & iOS</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="assets/images/logo.png" type="image/png">
+    <script>
+        // Set theme immediately from localStorage
+        const theme = localStorage.getItem('filtertube-theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+    </script>
+</head>
+
+<body data-page="mobile">
+    <div class="scanlines"></div>
+    <div class="noise"></div>
+
+    <nav class="glass-panel">
+        <div class="logo-container">
+            <a href="index.html" style="display: flex; align-items: center; gap: 1rem; text-decoration: none;">
+                <img src="assets/images/logo.png" alt="FilterTube Logo" class="logo">
+                <span class="brand-name">FILTERTUBE</span>
+            </a>
+        </div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="kids.html">Kids</a>
+            <a href="ml.html">ML & AI</a>
+            <a href="mobile.html" class="active">Mobile</a>
+            <button id="theme-toggle" class="theme-toggle">LIGHT MODE</button>
+            <a href="index.html#download" class="cta-button">Download</a>
+        </div>
+        <div class="mobile-menu-toggle">
+            <span></span><span></span><span></span>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero-section">
+            <div class="hero-content">
+                <h1 class="glitch" data-text="FilterTube Everywhere">FilterTube Everywhere</h1>
+                <p class="hero-subtitle">Bringing advanced filtering to your iPad and Mobile devices.</p>
+                <div class="hero-badges">
+                    <span class="badge">PLANNED 2026</span>
+                    <span class="badge">iOS & iPadOS</span>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div style="font-size: 10rem; color: var(--accent-color);">📱</div>
+            </div>
+        </section>
+
+        <section class="features-section">
+            <h2 class="section-title">The Future is Mobile</h2>
+            <div class="grid-container">
+                <div class="card glass-panel">
+                    <h3>Dedicated Web App</h3>
+                    <p>A standalone web application optimized for iPad and Mobile, providing a filtered YouTube
+                        interface.</p>
+                </div>
+                <div class="card glass-panel">
+                    <h3>Safari Extension</h3>
+                    <p>Native Safari extension for iOS and macOS to integrate filtering directly into the browser.
+                    </p>
+                </div>
+                <div class="card glass-panel">
+                    <h3>Sync Across Devices</h3>
+                    <p>Your filters and settings will sync securely between your desktop extension and mobile app.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section class="story-section">
+            <h2 class="section-title">Why Wait?</h2>
+            <div style="max-width: 800px; margin: 0 auto;">
+                <p>Mobile platforms are more locked down than desktops, making extension development challenging. We
+                    are
+                    building a robust solution that complies with App Store rules while delivering the protection
+                    you
+                    need.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-col">
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+                    <img src="assets/images/logo.png" alt="FilterTube" style="width: 32px; height: 32px;">
+                    <h4 style="margin: 0;">FilterTube</h4>
+                </div>
+                <p>Free & Open Source content filtering.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Resources</h4>
+                <a href="#">Documentation</a>
+                <a href="#">Privacy Policy</a>
+                <a href="#">MIT License</a>
+            </div>
+            <div class="footer-col">
+                <h4>Connect</h4>
+                <a href="https://github.com/varshneydevansh/FilterTube">GitHub</a>
+                <a href="mailto:hello@filtertube.in">hello@filtertube.in</a>
+                <a href="#">Report Issues</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 FilterTube. Free & Open Source.</p>
+            <p style="margin-top: 0.5rem;">Made with <span style="color: var(--accent-color);">♥</span> for mental
+                health</p>
+        </div>
+    </footer>
+
+
+    <script src="js/script.js"></script>
+</body>
+
+</html>
