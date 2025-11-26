@@ -98,46 +98,92 @@ function initializeStats() {
 }
 
 /**
- * Extract video duration from element
+ * Extract video duration from element - UPDATED for YouTube 2025
  * @param {HTMLElement} element - The video element
  * @returns {number|null} Duration in seconds, or null if not found
  */
 function extractVideoDuration(element) {
     if (!element) return null;
 
-    // Check cache first to avoid redundant extractions
+    // Check cache first
     const cached = element.getAttribute('data-filtertube-duration');
-    if (cached !== null) {
-        return cached === '' ? null : parseInt(cached, 10);
+    if (cached !== null && cached !== '') {
+        return parseInt(cached, 10);
     }
 
-    // Try multiple selectors for duration
-    const durationSelectors = [
-        '.yt-badge-shape__text',
-        'ytd-thumbnail-overlay-time-status-renderer span',
-        '#time-status span',
-        '.ytd-thumbnail-overlay-time-status-renderer',
-        'span.ytd-thumbnail-overlay-time-status-renderer'
+    // 1. NEW: Check for badge-shape text (e.g., "3:54")
+    // Path: badge-shape -> div.yt-badge-shape__text
+    const badgeText = element.querySelector('.yt-badge-shape__text');
+    if (badgeText) {
+        const seconds = parseDuration(badgeText.textContent.trim());
+        if (seconds > 0) {
+            element.setAttribute('data-filtertube-duration', seconds.toString());
+            return seconds;
+        }
+    }
+
+    // 2. NEW: Check for badge-shape aria-label (e.g., "3 minutes, 54 seconds")
+    const badgeAria = element.querySelector('badge-shape[aria-label]');
+    if (badgeAria) {
+        const seconds = parseAriaLabelDuration(badgeAria.getAttribute('aria-label'));
+        if (seconds > 0) {
+            element.setAttribute('data-filtertube-duration', seconds.toString());
+            return seconds;
+        }
+    }
+
+    // 3. LEGACY: Old span selectors
+    const legacySelectors = [
+        'ytd-thumbnail-overlay-time-status-renderer span#text',
+        'span.ytd-thumbnail-overlay-time-status-renderer',
+        '#time-status span'
     ];
 
-    for (const selector of durationSelectors) {
-        const durationEl = element.querySelector(selector);
-        if (durationEl) {
-            const durationText = durationEl.textContent?.trim();
-            if (durationText) {
-                const seconds = parseDuration(durationText);
-                if (seconds > 0) {
-                    // Cache the result
-                    element.setAttribute('data-filtertube-duration', seconds.toString());
-                    return seconds;
-                }
+    for (const selector of legacySelectors) {
+        const el = element.querySelector(selector);
+        if (el && el.textContent) {
+            const seconds = parseDuration(el.textContent.trim());
+            if (seconds > 0) {
+                element.setAttribute('data-filtertube-duration', seconds.toString());
+                return seconds;
             }
         }
     }
 
-    // Cache null result to avoid re-querying
+    // Cache failure to prevent re-querying
     element.setAttribute('data-filtertube-duration', '');
     return null;
+}
+
+/**
+ * Parse duration from aria-label format (e.g., "7 minutes, 51 seconds")
+ * @param {string} ariaLabel - Aria label text
+ * @returns {number} Duration in seconds
+ */
+function parseAriaLabelDuration(ariaLabel) {
+    if (!ariaLabel) return 0;
+
+    let totalSeconds = 0;
+
+    // Extract hours
+    const hoursMatch = ariaLabel.match(/(\d+)\s*hour/i);
+    if (hoursMatch) {
+        totalSeconds += parseInt(hoursMatch[1], 10) * 3600;
+    }
+
+    // Extract minutes
+    const minutesMatch = ariaLabel.match(/(\d+)\s*minute/i);
+    if (minutesMatch) {
+        totalSeconds += parseInt(minutesMatch[1], 10) * 60;
+    }
+
+    // Extract seconds
+    const secondsMatch = ariaLabel.match(/(\d+)\s*second/i);
+    if (secondsMatch) {
+        totalSeconds += parseInt(secondsMatch[1], 10);
+    }
+
+    return totalSeconds;
 }
 
 /**
@@ -167,7 +213,7 @@ function parseDuration(durationText) {
 /**
  * Determine content type from element
  * @param {HTMLElement} element - The content element
- * @returns {string} Content type: 'video', 'short', 'comment', 'chip', 'shelf'
+ * @returns {string} Content type: 'video', 'short', 'comment', 'chip', 'shelf', 'playlist', 'mix'
  */
 function getContentType(element) {
     if (!element) return 'video';
@@ -194,9 +240,19 @@ function getContentType(element) {
         return 'chip';
     }
 
+    // Playlists and Mixes (these are containers, not individual videos)
+    if (tagName === 'ytd-playlist-renderer' ||
+        tagName === 'ytd-radio-renderer' ||
+        element.querySelector('[aria-label*="Mix"]') ||
+        element.querySelector('[title*="Mix"]')) {
+        return 'playlist';
+    }
+
     // Shelves (containers)
     if (tagName === 'ytd-rich-section-renderer' ||
         tagName === 'ytd-shelf-renderer' ||
+        tagName === 'ytd-rich-shelf-renderer' ||
+        tagName === 'grid-shelf-view-model' ||
         element.classList?.contains('filtertube-hidden-shelf')) {
         return 'shelf';
     }
@@ -212,8 +268,8 @@ function getContentType(element) {
  * @returns {number} Estimated seconds saved
  */
 function estimateTimeSaved(contentType, duration = null) {
-    // Don't count shelves (they're containers, not content)
-    if (contentType === 'shelf') return 0;
+    // Don't count containers (they're just wrappers, not actual content)
+    if (contentType === 'shelf' || contentType === 'playlist') return 0;
 
     // Comments and chips take minimal time to evaluate
     if (contentType === 'comment') return 1;
@@ -244,34 +300,67 @@ function estimateTimeSaved(contentType, duration = null) {
 function incrementHiddenStats(element) {
     const today = new Date().toDateString();
 
-    // Reset if it's a new day
     if (today !== statsLastDate) {
         statsCountToday = 0;
         statsTotalSeconds = 0;
         statsLastDate = today;
     }
 
-    // Determine content type and duration
+    // Determine content type
     const contentType = getContentType(element);
-    const duration = extractVideoDuration(element);
-    const secondsSaved = estimateTimeSaved(contentType, duration);
 
-    // Only increment if we're actually saving time
+    // 1. Extract Title
+    const titleEl = element.querySelector('#video-title, .ytd-video-meta-block #video-title, h3 a, yt-formatted-string#title, span#title');
+    const title = titleEl?.textContent?.trim() || element.getAttribute('aria-label') || 'Unknown';
+
+    // 2. IMMEDIATE REJECTIONS (Layout Cleanup)
+    // If it's "Unknown", "Albums", or "Results with...", it is NOT a video.
+    if (title === 'Unknown' || title === 'Albums' || title.startsWith('Results with') || title.startsWith('Results for')) {
+        return;
+    }
+
+    // 3. CRITICAL: LINK CHECK
+    // Real videos MUST have a link to watch them. Headers do not.
+    // If it's not a short, and it doesn't have a watch link, ignore it.
+    const hasVideoLink = element.querySelector('a[href*="/watch?"]');
+    const hasShortsLink = element.querySelector('a[href*="/shorts/"]');
+
+    if (contentType !== 'short' && !hasVideoLink && !hasShortsLink) {
+        return; // It's a container/header, not a video
+    }
+
+    // 4. Ignore Container Types
+    if (contentType === 'shelf' || contentType === 'playlist' || contentType === 'mix') {
+        return;
+    }
+
+    // 5. Get Duration
+    const duration = extractVideoDuration(element);
+    let secondsSaved = 0;
+
+    // Calculate time
+    if (duration && duration > 0) {
+        secondsSaved = duration;
+    } else if (contentType === 'short' || hasShortsLink) {
+        secondsSaved = 45; // Average short
+    } else if (contentType === 'video') {
+        secondsSaved = 180; // Fallback for videos
+    }
+
+    // Only increment if valid
     if (secondsSaved > 0) {
         statsCountToday++;
         statsTotalSeconds += secondsSaved;
 
-        // Store the time saved on the element for potential decrement later
         if (element) {
             element.setAttribute('data-filtertube-time-saved', secondsSaved.toString());
         }
 
-        // Log time saved (especially useful for videos with actual durations)
-        if (contentType === 'video' || contentType === 'short') {
-            const titleEl = element.querySelector('#video-title, .ytd-video-meta-block #video-title, h3 a, yt-formatted-string#title, span#title');
-            const title = titleEl?.textContent?.trim() || element.getAttribute('aria-label') || 'Unknown';
-            console.log(`FilterTube: Saved ${secondsSaved} seconds from "${title}"`);
-        }
+        // Formatting for log
+        const channelEl = element.querySelector('#channel-name a, .ytd-channel-name a, ytd-channel-name a');
+        const channelInfo = element.getAttribute('data-filtertube-channel-handle') || channelEl?.textContent?.trim() || '';
+
+        console.log(`FilterTube: Saved ${secondsSaved}s from "${title}"${channelInfo ? ' - ' + channelInfo : ''}`);
 
         saveStats();
     }
@@ -714,10 +803,16 @@ function extractChannelMetadataFromElement(element, channelText = '', channelHre
 }
 
 function channelMatchesFilter(meta, filterChannel, channelMap = {}) {
+    // Safety: Don't match against empty or invalid filters
+    if (!filterChannel) return false;
+
     // Handle new object format: { name, id, handle }
     if (typeof filterChannel === 'object' && filterChannel !== null) {
         const filterId = (filterChannel.id || '').toLowerCase();
         const filterHandle = (filterChannel.handle || '').toLowerCase();
+
+        // Safety: If both ID and handle are empty, don't match anything
+        if (!filterId && !filterHandle) return false;
 
         // Direct match by UC ID
         if (filterId && meta.id && meta.id.toLowerCase() === filterId) {
@@ -900,30 +995,48 @@ function ensureStyles() {
 /**
  * Toggles visibility of an element using CSS classes.
  * This allows for immediate restoration without page reload.
+ * @param {HTMLElement} element - Element to toggle
+ * @param {boolean} shouldHide - Whether to hide the element
+ * @param {string} reason - Debug reason for the toggle
+ * @param {boolean} skipStats - If true, do not affect statistics (used for cleanup/containers)
  */
-function toggleVisibility(element, shouldHide, reason = '') {
+function toggleVisibility(element, shouldHide, reason = '', skipStats = false) {
     if (!element) return;
 
     if (shouldHide) {
         const wasAlreadyHidden = element.classList.contains('filtertube-hidden');
+
         if (!wasAlreadyHidden) {
+            // IMPORTANT: Extract duration BEFORE hiding the element
+            // This ensures we can access all DOM elements before any visual changes
+            if (!skipStats) {
+                const duration = extractVideoDuration(element);
+            }
+
+            // Now hide the element
             element.classList.add('filtertube-hidden');
             element.setAttribute('data-filtertube-hidden', 'true');
             // debugLog(`🚫 Hiding: ${reason}`);
 
             // Increment stats only for newly hidden items (not already hidden)
-            incrementHiddenStats(element);
+            // AND only if skipStats is false (meaning this is a direct filter hit, not a container cleanup)
+            if (!skipStats) {
+                incrementHiddenStats(element);
+            }
         }
         handleMediaPlayback(element, true);
     } else {
         const wasHidden = element.classList.contains('filtertube-hidden');
+
         if (wasHidden) {
             element.classList.remove('filtertube-hidden');
             element.removeAttribute('data-filtertube-hidden');
             // debugLog(`✅ Restoring element`);
 
-            // Decrement stats when unhiding content
-            decrementHiddenStats(element);
+            // Decrement stats when unhiding content (only if we had counted it)
+            if (!skipStats) {
+                decrementHiddenStats(element);
+            }
         }
         handleMediaPlayback(element, false);
     }
@@ -1008,6 +1121,8 @@ function applyDOMFallback(settings, options = {}) {
     currentSettings = effectiveSettings;
 
     const { forceReprocess = false, preserveScroll = true } = options;
+
+    // Removed diagnostic logging - issue identified and fixed
     const scrollingElement = document.scrollingElement || document.documentElement || document.body;
     const previousScrollTop = scrollingElement ? scrollingElement.scrollTop : window.pageYOffset;
     const previousScrollLeft = scrollingElement ? scrollingElement.scrollLeft : window.pageXOffset;
@@ -1037,9 +1152,8 @@ function applyDOMFallback(settings, options = {}) {
     elements.forEach(element => {
         // Optimization: Skip if already processed and not forced
         if (!forceReprocess && element.hasAttribute('data-filtertube-processed')) {
-            // But if we are in a "restore" scenario (settings changed), we might need to re-check
-            // For robustness, we'll re-check visibility logic but maybe skip heavy text extraction if possible
-            // For now, let's just re-run to be safe.
+            // Skip already processed elements to avoid duplicate counting
+            return;
         }
 
         // Extract Metadata
@@ -1156,11 +1270,13 @@ function applyDOMFallback(settings, options = {}) {
         );
 
         const shouldHideSurvey = !hasVisibleItem;
-        toggleVisibility(survey, shouldHideSurvey, 'Inline Survey Shell');
+        // SKIP STATS: This is just a wrapper/container cleanup
+        toggleVisibility(survey, shouldHideSurvey, 'Inline Survey Shell', true);
 
         const sectionContainer = survey.closest('ytd-rich-section-renderer');
         if (sectionContainer) {
-            toggleVisibility(sectionContainer, shouldHideSurvey, 'Inline Survey Section');
+            // SKIP STATS: Wrapper cleanup
+            toggleVisibility(sectionContainer, shouldHideSurvey, 'Inline Survey Section', true);
         }
     });
 
@@ -1177,7 +1293,9 @@ function applyDOMFallback(settings, options = {}) {
         if (!contentEl) return;
         const hasVisibleChild = Array.from(contentEl.children).some(child => child.offsetParent !== null);
         if (!hasVisibleChild && !item.hasAttribute('data-filtertube-hidden')) {
-            toggleVisibility(item, true, 'Empty Rich Item');
+            // SKIP STATS: This is container cleanup, not actual content filtering
+            // The actual video inside was already counted when it was hidden
+            toggleVisibility(item, true, 'Empty Rich Item', true);
         }
     });
 
@@ -1194,7 +1312,8 @@ function applyDOMFallback(settings, options = {}) {
     if (effectiveSettings.hideAllShorts) {
         allShortsElements.forEach(container => {
             container.setAttribute('data-filtertube-hidden-by-hide-all-shorts', 'true');
-            toggleVisibility(container, true, 'Hide Shorts container');
+            // SKIP STATS: Container hiding - individual shorts inside are counted separately
+            toggleVisibility(container, true, 'Hide Shorts container', true);
         });
     } else {
         allShortsElements.forEach(container => {
@@ -1202,7 +1321,8 @@ function applyDOMFallback(settings, options = {}) {
                 container.removeAttribute('data-filtertube-hidden-by-hide-all-shorts');
                 // Only unhide if it's not also hidden by a shelf title
                 if (!container.hasAttribute('data-filtertube-hidden-by-shelf-title')) {
-                    toggleVisibility(container, false);
+                    // SKIP STATS: Container unhiding
+                    toggleVisibility(container, false, '', true);
                 }
             }
         });
@@ -1303,6 +1423,18 @@ function shouldHideContent(title, channel, settings, options = {}) {
     const channelMeta = providedChannelMeta || buildChannelMetadata(channel, channelHref);
     const hasChannelIdentity = Boolean(channelMeta.handle || channelMeta.id);
 
+    // Debug logging (disabled by default - set to true for troubleshooting)
+    const debugFiltering = false;
+    if (debugFiltering && (channelMeta.handle || channelMeta.id)) {
+        console.log(`FilterTube DEBUG: Checking "${title.substring(0, 50)}..."`, {
+            channelHandle: channelMeta.handle,
+            channelId: channelMeta.id,
+            hasFilters: settings.filterChannels?.length || 0,
+            filterChannelsArray: settings.filterChannels,
+            keywords: settings.filterKeywords?.length || 0
+        });
+    }
+
     // Keyword filtering
     if (!skipKeywords && settings.filterKeywords && settings.filterKeywords.length > 0) {
         for (const keywordData of settings.filterKeywords) {
@@ -1333,6 +1465,13 @@ function shouldHideContent(title, channel, settings, options = {}) {
         // 1. Normal Check (Fast path - direct match or existing channelMap lookup)
         for (const filterChannel of settings.filterChannels) {
             if (channelMatchesFilter(channelMeta, filterChannel, channelMap)) {
+                if (debugFiltering) {
+                    console.log(`FilterTube DEBUG: MATCH FOUND! Video will be hidden.`, {
+                        title: title.substring(0, 50),
+                        videoChannel: channelMeta,
+                        matchedFilter: filterChannel
+                    });
+                }
                 return true;
             }
         }
