@@ -1061,19 +1061,17 @@ function updateContainerVisibility(container, childSelector) {
     const allHidden = Array.from(children).every(child =>
         child.classList.contains('filtertube-hidden') ||
         child.hasAttribute('data-filtertube-hidden') ||
-        // FIX: Also check if the child is inside a wrapper we already hidden
         child.closest('.filtertube-hidden') !== null
     );
 
     if (allHidden) {
-        // FIX: Use toggleVisibility to actually hide the shelf with display: none
-        // SKIP STATS: This is container cleanup, not content filtering
         container.classList.add('filtertube-hidden-shelf');
-        toggleVisibility(container, true, 'All children hidden', true);
     } else {
         container.classList.remove('filtertube-hidden-shelf');
-        // FIX: Use toggleVisibility to properly restore the shelf
-        toggleVisibility(container, false, '', true);
+        if (container.classList.contains('filtertube-hidden')) {
+            container.classList.remove('filtertube-hidden');
+            container.removeAttribute('data-filtertube-hidden');
+        }
     }
 }
 
