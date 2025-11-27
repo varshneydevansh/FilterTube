@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - FilterTube</title>
+    <meta name="description" content="FilterTube Privacy Policy - We don't collect any data">
+    <meta name="theme-color" content="#ff3333">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="assets/images/logo.png" type="image/png">
+    <script src="js/script.js"></script>
+    <style>
+        .privacy-section {
+            padding: 80px 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .privacy-section h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .privacy-section .last-updated {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+
+        .privacy-section h2 {
+            font-size: 1.8rem;
+            margin-top: 3rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .privacy-section h3 {
+            font-size: 1.3rem;
+            margin-top: 2rem;
+            margin-bottom: 0.8rem;
+            color: var(--text-primary);
+        }
+
+        .privacy-section p,
+        .privacy-section li {
+            line-height: 1.8;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .privacy-section ul,
+        .privacy-section ol {
+            margin-left: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .privacy-section li {
+            margin-bottom: 0.5rem;
+        }
+
+        .highlight-box {
+            background: rgba(var(--accent-rgb), 0.1);
+            border-left: 4px solid var(--accent-color);
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-radius: 8px;
+        }
+
+        .highlight-box strong {
+            color: var(--accent-color);
+        }
+
+        .contact-box {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            margin-top: 3rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .contact-box a {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+
+        .contact-box a:hover {
+            text-decoration: underline;
+        }
+
+        code {
+            background: var(--card-bg);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: var(--accent-color);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="scanlines"></div>
+    <div class="noise"></div>
+
+    <nav class="glass-panel">
+        <div class="logo-container">
+            <img src="assets/images/logo.png" alt="FilterTube Logo" class="logo">
+            <span class="brand-name">FILTERTUBE</span>
+        </div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="index.html#features">Features</a>
+            <a href="kids.html">Kids</a>
+            <a href="ml.html">ML & AI</a>
+            <a href="mobile.html">Mobile</a>
+            <button id="theme-toggle" class="theme-toggle">LIGHT MODE</button>
+            <a href="index.html#download" class="cta-button">Download</a>
+        </div>
+        <div class="mobile-menu-toggle">
+            <span></span><span></span><span></span>
+        </div>
+    </nav>
+
+    <main>
+        <section class="privacy-section">
+            <h1>Privacy Policy</h1>
+            <p class="last-updated">Last Updated: November 27, 2025</p>
+
+            <div class="highlight-box">
+                <strong>TL;DR:</strong> FilterTube does not collect, store, or transmit any of your personal data. All
+                filtering happens locally on your device. Your privacy is 100% protected.
+            </div>
+
+            <h2>1. Introduction</h2>
+            <p>
+                FilterTube ("we", "our", or "the extension") is committed to protecting your privacy. This Privacy
+                Policy explains how FilterTube handles user data and what information, if any, is collected when you use
+                our browser extension.
+            </p>
+
+            <h2>2. Data Collection</h2>
+            <h3>2.1 What We DON'T Collect</h3>
+            <p>FilterTube does NOT collect, store, or transmit:</p>
+            <ul>
+                <li>Personally identifiable information (name, email, address, etc.)</li>
+                <li>Browsing history or web activity</li>
+                <li>YouTube watch history or viewing habits</li>
+                <li>Search queries or keywords you enter</li>
+                <li>Channel names or video titles you filter</li>
+                <li>Any data about your YouTube account</li>
+                <li>Location data or IP addresses</li>
+                <li>Financial or payment information</li>
+                <li>Authentication credentials</li>
+            </ul>
+
+            <h3>2.2 What We DO Store (Locally Only)</h3>
+            <p>FilterTube stores the following data <strong>exclusively on your device</strong> using Chrome's local
+                storage API:</p>
+            <ul>
+                <li><strong>Filter Rules:</strong> Keywords and channel names you choose to filter</li>
+                <li><strong>Settings:</strong> Your preferences (e.g., "Hide All Shorts", "Filter Comments")</li>
+                <li><strong>Statistics:</strong> Local counters for filtered content (stored only on your device)</li>
+                <li><strong>Theme Preference:</strong> Your choice of light or dark mode</li>
+            </ul>
+
+            <div class="highlight-box">
+                <strong>Important:</strong> All data is stored locally using <code>chrome.storage.local</code>. This
+                data never leaves your device and is not accessible to us or any third party.
+            </div>
+
+            <h2>3. How FilterTube Works</h2>
+            <p>FilterTube operates entirely on your device:</p>
+            <ol>
+                <li>You define filtering rules (keywords, channels, content types)</li>
+                <li>The extension reads the YouTube page content <strong>locally</strong></li>
+                <li>Matching content is hidden using CSS (display: none)</li>
+                <li>No data is sent to external servers or analytics services</li>
+            </ol>
+
+            <h2>4. Permissions Explained</h2>
+            <p>FilterTube requests the following permissions, and here's why:</p>
+
+            <h3>4.1 Storage Permission</h3>
+            <p>
+                Used to save your filter rules and preferences locally on your device. This data is never synchronized
+                or transmitted anywhere.
+            </p>
+
+            <h3>4.2 ActiveTab Permission</h3>
+            <p>
+                Allows the extension to apply filters to the currently active YouTube tab when you interact with the
+                extension popup. It does not access other tabs or websites.
+            </p>
+
+            <h3>4.3 Scripting Permission</h3>
+            <p>
+                Required to inject content scripts that hide filtered content on YouTube pages. These scripts run only
+                on YouTube and do not collect any data.
+            </p>
+
+            <h3>4.4 Tabs Permission</h3>
+            <p>
+                Used only to detect when you navigate to YouTube so filters can be applied. The extension does not read,
+                store, or analyze content from your tabs.
+            </p>
+
+            <h3>4.5 Host Permissions (youtube.com)</h3>
+            <p>
+                Allows the extension to read and modify YouTube pages locally to hide content according to your rules.
+                No data is collected or transmitted.
+            </p>
+
+            <h2>5. Third-Party Services</h2>
+            <p>
+                FilterTube does <strong>not</strong> use any third-party services, analytics, tracking, or advertising
+                networks. There are no external API calls, no telemetry, and no data sharing of any kind.
+            </p>
+
+            <h2>6. Data Sharing and Sale</h2>
+            <p>
+                We do not sell, trade, or transfer your data to third parties because <strong>we don't collect any data
+                    in the first place</strong>. Your filtering preferences remain private and local to your device.
+            </p>
+
+            <h2>7. Children's Privacy</h2>
+            <p>
+                FilterTube does not knowingly collect data from anyone, including children under 13. Since no data is
+                collected at all, the extension is safe for users of all ages.
+            </p>
+
+            <h2>8. Data Security</h2>
+            <p>
+                Your filter rules and preferences are stored securely using Chrome's built-in storage API, which is
+                sandboxed and protected by the browser's security model. Since data never leaves your device, there is
+                no risk of interception or unauthorized access.
+            </p>
+
+            <h2>9. Your Rights</h2>
+            <p>You have complete control over your data:</p>
+            <ul>
+                <li><strong>Access:</strong> View your filters anytime in the extension popup or settings</li>
+                <li><strong>Modify:</strong> Edit or delete filters at any time</li>
+                <li><strong>Delete:</strong> Uninstalling the extension removes all stored data from your device</li>
+                <li><strong>Export:</strong> You can manually copy your filter rules if needed</li>
+            </ul>
+
+            <h2>10. Changes to This Privacy Policy</h2>
+            <p>
+                We may update this Privacy Policy from time to time. Any changes will be posted on this page with an
+                updated "Last Updated" date. Continued use of FilterTube after changes constitutes acceptance of the
+                updated policy.
+            </p>
+
+            <h2>11. Open Source Transparency</h2>
+            <p>
+                FilterTube is open source. You can review the complete source code on GitHub to verify that no data
+                collection occurs:
+                <br>
+                <a href="https://github.com/varshneydevansh/FilterTube" target="_blank"
+                    style="color: var(--accent-color);">https://github.com/varshneydevansh/FilterTube</a>
+            </p>
+
+            <h2>12. Compliance</h2>
+            <p>FilterTube complies with:</p>
+            <ul>
+                <li>Chrome Web Store Developer Program Policies</li>
+                <li>General Data Protection Regulation (GDPR)</li>
+                <li>California Consumer Privacy Act (CCPA)</li>
+            </ul>
+
+            <div class="contact-box">
+                <h2>13. Contact Us</h2>
+                <p>
+                    If you have any questions about this Privacy Policy or FilterTube's data practices, please contact
+                    us:
+                </p>
+                <p>
+                    <strong>Email:</strong> <a href="mailto:hello@filtertube.in">hello@filtertube.in</a><br>
+                    <strong>GitHub:</strong> <a href="https://github.com/varshneydevansh/FilterTube/issues"
+                        target="_blank">Report an Issue</a>
+                </p>
+            </div>
+
+            <h2 style="margin-top: 3rem;">Summary for Chrome Web Store</h2>
+            <div class="highlight-box">
+                <p><strong>Data Collection:</strong> None</p>
+                <p><strong>Data Usage:</strong> N/A (no data collected)</p>
+                <p><strong>Data Sharing:</strong> N/A (no data collected)</p>
+                <p><strong>Data Sale:</strong> N/A (no data collected)</p>
+                <p style="margin-bottom: 0;"><strong>Certification:</strong> We certify that FilterTube does not
+                    collect, use, sell, or transfer any user data.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-col">
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+                    <img src="assets/images/logo.png" alt="FilterTube" style="width: 32px; height: 32px;">
+                    <h4 style="margin: 0;">FilterTube</h4>
+                </div>
+                <p>Free & Open Source content filtering.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Resources</h4>
+                <a href="https://github.com/varshneydevansh/FilterTube/tree/master/docs">Documentation</a>
+                <a href="privacy.html">Privacy Policy</a>
+                <a href="https://github.com/varshneydevansh/FilterTube/blob/master/LICENSE">MIT License</a>
+            </div>
+            <div class="footer-col">
+                <h4>Connect</h4>
+                <a href="https://github.com/varshneydevansh/FilterTube">GitHub</a>
+                <a href="mailto:hello@filtertube.in">hello@filtertube.in</a>
+                <a href="https://github.com/varshneydevansh/FilterTube/issues">Report Issues</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 FilterTube. Free & Open Source.</p>
+            <p style="margin-top: 0.5rem;">Made with <span style="color: var(--accent-color);">♥</span> for mental
+                health</p>
+        </div>
+    </footer>
+</body>
+
+</html>
