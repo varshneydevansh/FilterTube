@@ -1932,12 +1932,23 @@ function extractChannelFromCard(card) {
         if (isShortsCard) {
             console.log('FilterTube: Detected SHORTS card, using special extraction');
 
-            // For shorts, try to find channel info in the shorts-specific structure
-            // Shorts often have channel info in different places
+            // Method 1: Try data-filtertube attributes added by filter_logic.js
+            const dataHandle = card.getAttribute('data-filtertube-channel-handle') ||
+                card.querySelector('[data-filtertube-channel-handle]')?.getAttribute('data-filtertube-channel-handle');
+            const dataId = card.getAttribute('data-filtertube-channel-id') ||
+                card.querySelector('[data-filtertube-channel-id]')?.getAttribute('data-filtertube-channel-id');
+
+            if (dataHandle || dataId) {
+                console.log('FilterTube: Found SHORTS channel from data attributes:', { handle: dataHandle, id: dataId });
+                return { handle: dataHandle, id: dataId, name: undefined };
+            }
+
+            // Method 2: Try to find channel link in DOM
             const shortsChannelLink = card.querySelector(
-                'a[href*="/@"]:not([href*="/shorts"]), ' +  // Channel link but not shorts link
+                'a[href*="/@"]:not([href*="/shorts"]):not([href*="/watch"]), ' +
                 'ytm-shorts-lockup-view-model a[href*="/@"], ' +
-                '.shortsLockupViewModelHostOutsideMetadata a[href*="/@"]'
+                '.shortsLockupViewModelHostOutsideMetadata a[href*="/@"], ' +
+                'a.yt-simple-endpoint[href*="/@"]'
             );
 
             if (shortsChannelLink) {
@@ -1951,34 +1962,23 @@ function extractChannelFromCard(card) {
                 }
             }
 
-            // CRITICAL: For home page shorts, channel info is in ytInitialData, not in the DOM
-            // Extract video ID and search ytInitialData
-            const shortsLink = card.querySelector('a[href*="/shorts/"]');
-            if (shortsLink) {
-                const shortsUrl = shortsLink.getAttribute('href');
-                const videoIdMatch = shortsUrl?.match(/\/shorts\/([\w-]{11})/);
-                if (videoIdMatch) {
-                    const videoId = videoIdMatch[1];
-                    console.log('FilterTube: Extracted shorts video ID:', videoId);
-
-                    // Try to find channel info in ytInitialData
-                    try {
-                        if (window.ytInitialData) {
-                            const channelInfo = searchYtInitialDataForVideoChannel(videoId);
-                            if (channelInfo) {
-                                console.log('FilterTube: Found channel in ytInitialData:', channelInfo);
-                                return channelInfo;
-                            }
-                        }
-                    } catch (error) {
-                        console.error('FilterTube: Error searching ytInitialData:', error);
+            // Method 3: Look for channel info in parent/sibling elements
+            const parentContainer = card.closest('ytd-rich-section-renderer, ytd-item-section-renderer');
+            if (parentContainer) {
+                const channelLinkNearby = parentContainer.querySelector('a[href*="/@"]:not([href*="/shorts"])');
+                if (channelLinkNearby) {
+                    const href = channelLinkNearby.getAttribute('href');
+                    const handleMatch = href?.match(/@([\w-]+)/);
+                    if (handleMatch) {
+                        console.log('FilterTube: Found SHORTS channel in parent container');
+                        return { handle: `@${handleMatch[1]}`, name: channelLinkNearby.textContent?.trim() };
                     }
-
-                    console.warn('FilterTube: Found shorts video ID but no channel info:', videoId);
-                    // Return null - we can't block without channel info
-                    return null;
                 }
             }
+
+            console.warn('FilterTube: SHORTS card detected but no channel info found - skipping menu injection');
+            // Return null - we can't block without channel info
+            return null;
         }
 
         // Method 1: Check for data attributes (added by FilterTube's own processing)
@@ -2477,6 +2477,12 @@ function addFilterAllContentCheckbox(menuItem, channelData) {
 let lastClickedMenuButton = null;
 
 /**
+ * Track which dropdowns we've already injected into (prevent flashing)
+ * Map: dropdown -> videoCard ID
+ */
+const injectedDropdowns = new WeakMap();
+
+/**
  * Observe dropdowns and inject FilterTube menu items
  */
 function setupMenuObserver() {
@@ -2596,15 +2602,48 @@ function handleDropdownAppeared(dropdown) {
         'ytm-video-with-context-renderer, ' +
         'ytd-post-renderer, ' +                          // ← YouTube Posts
         'ytd-playlist-panel-video-renderer, ' +         // ← Playlist videos
-        'ytd-playlist-video-renderer'                    // ← Playlist videos (alternate)
+        'ytd-playlist-video-renderer, ' +               // ← Playlist videos (alternate)
+        'ytm-shorts-lockup-view-model, ' +              // ← Shorts in mobile/search
+        'ytm-shorts-lockup-view-model-v2, ' +           // ← Shorts variant
+        'ytm-item-section-renderer, ' +                 // ← Container for shorts
+        'ytd-rich-shelf-renderer'                       // ← Shelf containing shorts
     );
 
     if (videoCard) {
         console.log('FilterTube: Found video card:', videoCard.tagName);
 
-        // Store reference to dropdown for cleanup
-        videoCard.setAttribute('data-filtertube-dropdown-id', Math.random().toString(36));
-        dropdown.setAttribute('data-filtertube-card-id', videoCard.getAttribute('data-filtertube-dropdown-id'));
+        // Get unique ID for this video card
+        let videoCardId = videoCard.getAttribute('data-filtertube-unique-id');
+        if (!videoCardId) {
+            // Try to extract video ID from links
+            const videoLink = videoCard.querySelector('a[href*="/watch?v="], a[href*="/shorts/"]');
+            const videoIdMatch = videoLink?.href.match(/(?:watch\?v=|shorts\/)([a-zA-Z0-9_-]{11})/);
+
+            if (videoIdMatch) {
+                videoCardId = videoIdMatch[1];
+            } else {
+                // Fallback: generate random ID
+                videoCardId = `card-${Math.random().toString(36).substr(2, 9)}`;
+            }
+            videoCard.setAttribute('data-filtertube-unique-id', videoCardId);
+        }
+
+        // CRITICAL: Check if this dropdown is being reused for a DIFFERENT video
+        const previousCardId = injectedDropdowns.get(dropdown);
+
+        if (previousCardId === videoCardId) {
+            // Same video - dropdown just re-appeared (don't re-inject, prevents flashing)
+            console.log('FilterTube: Dropdown already injected for this video, skipping');
+            return;
+        }
+
+        if (previousCardId && previousCardId !== videoCardId) {
+            console.log('FilterTube: Dropdown reused for different video - cleaning old items');
+            // Old items will be removed by injectFilterTubeMenuItem automatically
+        }
+
+        // Mark this dropdown as injected for THIS video card (prevents multiple injections)
+        injectedDropdowns.set(dropdown, videoCardId);
 
         // Watch for card removal (video hidden) and close dropdown
         const observer = new MutationObserver((mutations) => {
@@ -2634,6 +2673,14 @@ function handleDropdownAppeared(dropdown) {
         }, delay);
     } else {
         console.log('FilterTube: Could not find video card from button');
+
+        // CRITICAL: Clean up any stale FilterTube items from dropdown
+        // (prevents old "✓ Channel Blocked" showing when we can't identify the video)
+        const oldItems = dropdown.querySelectorAll('.filtertube-block-channel-item');
+        if (oldItems.length > 0) {
+            console.log('FilterTube: Removing stale FilterTube items from dropdown');
+            oldItems.forEach(item => item.remove());
+        }
     }
 }
 
