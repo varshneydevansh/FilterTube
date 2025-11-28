@@ -808,5 +808,142 @@ async function fetchChannelInfo(channelIdOrHandle) {
 }
 
 
+// ==========================================
+// MESSAGE HANDLERS - Support 3-Dot Menu Feature
+// ==========================================
+
+browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    console.log('FilterTube Background: Received message:', message.type);
+
+    if (message.type === 'addFilteredChannel') {
+        handleAddFilteredChannel(message.input, message.filterAll).then(sendResponse);
+        return true; // Keep channel open for async response
+    }
+
+    if (message.type === 'toggleChannelFilterAll') {
+        handleToggleChannelFilterAll(message.channelId, message.value).then(sendResponse);
+        return true;
+    }
+
+    return false;
+});
+
+/**
+ * Handle adding a filtered channel (from 3-dot menu)
+ * @param {string} input - Channel identifier (@handle or UC ID)
+ * @param {boolean} filterAll - Whether to enable Filter All for this channel
+ * @returns {Promise<Object>} Result with success status
+ */
+async function handleAddFilteredChannel(input, filterAll = false) {
+    try {
+        const rawValue = input.trim();
+        if (!rawValue) {
+            return { success: false, error: 'Empty input' };
+        }
+
+        // Validate format
+        const isHandle = rawValue.startsWith('@');
+        const isUcId = rawValue.toLowerCase().startsWith('uc') || rawValue.toLowerCase().startsWith('channel/uc');
+
+        if (!isHandle && !isUcId) {
+            return { success: false, error: 'Invalid channel identifier' };
+        }
+
+        // Fetch channel info
+        console.log('FilterTube Background: Fetching channel info for:', rawValue);
+        const channelInfo = await fetchChannelInfo(rawValue);
+
+        if (!channelInfo.success) {
+            return { success: false, error: channelInfo.error || 'Failed to fetch channel info' };
+        }
+
+        // Get existing channels
+        const storage = await new Promise(resolve => {
+            browserAPI.storage.local.get(['filterChannels'], resolve);
+        });
+
+        const channels = Array.isArray(storage.filterChannels) ? storage.filterChannels : [];
+
+        // Check if already exists
+        const exists = channels.some(ch =>
+            ch.id === channelInfo.id || ch.handle === channelInfo.handle
+        );
+
+        if (exists) {
+            return { success: false, error: 'Channel already blocked' };
+        }
+
+        // Add new channel
+        const newChannel = {
+            id: channelInfo.id,
+            handle: channelInfo.handle,
+            name: channelInfo.name,
+            logo: channelInfo.logo,
+            filterAll: filterAll // Use provided value
+        };
+
+        // Add to beginning (newest first)
+        channels.unshift(newChannel);
+
+        // Save to storage
+        await new Promise(resolve => {
+            browserAPI.storage.local.set({ filterChannels: channels }, resolve);
+        });
+
+        console.log('FilterTube Background: Successfully added channel:', newChannel);
+
+        return {
+            success: true,
+            channelData: newChannel
+        };
+
+    } catch (error) {
+        console.error('FilterTube Background: Error adding channel:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+/**
+ * Handle toggling Filter All Content for a channel
+ * @param {string} channelId - Channel ID or handle
+ * @param {boolean} value - New filterAll value
+ * @returns {Promise<Object>} Result with success status
+ */
+async function handleToggleChannelFilterAll(channelId, value) {
+    try {
+        // Get existing channels
+        const storage = await new Promise(resolve => {
+            browserAPI.storage.local.get(['filterChannels'], resolve);
+        });
+
+        const channels = Array.isArray(storage.filterChannels) ? storage.filterChannels : [];
+
+        // Find channel by ID or handle
+        const channelIndex = channels.findIndex(ch =>
+            ch.id === channelId || ch.handle === channelId
+        );
+
+        if (channelIndex === -1) {
+            return { success: false, error: 'Channel not found' };
+        }
+
+        // Toggle filterAll
+        channels[channelIndex].filterAll = value;
+
+        // Save to storage
+        await new Promise(resolve => {
+            browserAPI.storage.local.set({ filterChannels: channels }, resolve);
+        });
+
+        console.log('FilterTube Background: Toggled filterAll for channel:', channelId, 'to:', value);
+
+        return { success: true };
+
+    } catch (error) {
+        console.error('FilterTube Background: Error toggling filterAll:', error);
+        return { success: false, error: error.message };
+    }
+}
+
 console.log(`FilterTube Background ${IS_FIREFOX ? 'Script' : 'Service Worker'} loaded and ready to serve filtered content.`);
 

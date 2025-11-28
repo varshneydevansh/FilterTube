@@ -50,7 +50,8 @@
             "resources": [
                 "js/injector.js",
                 "js/filter_logic.js",
-                "js/seed.js"
+                "js/seed.js",
+                "icons/file.svg"
             ],
             "matches": [
                 "*://*.youtube.com/*",
