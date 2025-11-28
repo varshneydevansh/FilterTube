@@ -7,8 +7,10 @@
     "build": "node build.js",
     "build:chrome": "node build.js chrome",
     "build:firefox": "node build.js firefox",
+    "build:opera": "node build.js opera",
     "dev:chrome": "cp manifest.chrome.json manifest.json",
-    "dev:firefox": "cp manifest.firefox.json manifest.json"
+    "dev:firefox": "cp manifest.firefox.json manifest.json",
+    "dev:opera": "cp manifest.opera.json manifest.json"
   },
   "repository": {
     "type": "git",

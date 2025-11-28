@@ -3,21 +3,13 @@
     "name": "FilterTube",
     "description": "Restore peace of mind to your digital video experience.",
     "version": "3.0.2",
-    "background": {
-        "scripts": [
-            "js/background.js"
-        ]
+    "minimum_chrome_version": "111",
+    "developer": {
+        "name": "Devansh Varshney",
+        "url": "https://filtertube.in"
     },
-    "browser_specific_settings": {
-        "gecko": {
-            "id": "hello@filtertube.in",
-            "strict_min_version": "109.0",
-            "data_collection_permissions": {
-                "required": [
-                    "none"
-                ]
-            }
-        }
+    "background": {
+        "service_worker": "js/background.js"
     },
     "action": {
         "default_popup": "html/popup.html",
@@ -34,6 +26,16 @@
         "tabs"
     ],
     "content_scripts": [
+        {
+            "matches": [
+                "*://*.youtube.com/*",
+                "*://*.youtubekids.com/*"
+            ],
+            "js": [
+                "js/seed.js"
+            ],
+            "run_at": "document_start"
+        },
         {
             "matches": [
                 "*://*.youtube.com/*",

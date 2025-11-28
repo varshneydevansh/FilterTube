@@ -12,6 +12,7 @@
  * - node build.js           # Build for all browsers
  * - node build.js chrome    # Build only for Chrome
  * - node build.js firefox   # Build only for Firefox
+ * - node build.js opera     # Build only for Opera
  */
 
 const fs = require('fs-extra');
@@ -19,7 +20,7 @@ const path = require('path');
 const archiver = require('archiver');
 
 // Configuration
-const ALL_BROWSER_TARGETS = ['chrome', 'firefox'];
+const ALL_BROWSER_TARGETS = ['chrome', 'firefox', 'opera'];
 const VERSION = '3.0.2'; // Matches manifest
 const COMMON_DIRS = ['js', 'css', 'html', 'icons', 'docs'];
 const COMMON_FILES = ['README.md', 'CHANGELOG.md', 'LICENSE'];
@@ -30,10 +31,11 @@ const BROWSER_TARGETS = targetBrowser && ALL_BROWSER_TARGETS.includes(targetBrow
     : ALL_BROWSER_TARGETS;
 
 // Clean and create dist directory
-if (fs.existsSync('dist')) {
+// Only clean if we are building everything, otherwise we wipe previous specific builds
+if (!targetBrowser && fs.existsSync('dist')) {
     fs.rmSync('dist', { recursive: true, force: true });
 }
-fs.mkdirSync('dist');
+fs.existsSync('dist') || fs.mkdirSync('dist');
 
 // Stronger filter function for fs.copySync
 const filterFunc = (src) => {
@@ -48,6 +50,10 @@ BROWSER_TARGETS.forEach(browser => {
     console.log(`\n🔧 Building for ${browser}...`);
 
     const targetDir = path.join('dist', browser);
+    // Clean specific target dir if it exists
+    if (fs.existsSync(targetDir)) {
+        fs.rmSync(targetDir, { recursive: true, force: true });
+    }
     fs.mkdirSync(targetDir);
 
     // 1. Copy common directories
