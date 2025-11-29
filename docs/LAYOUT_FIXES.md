@@ -258,4 +258,29 @@ To ensure maximum stability and reliability:
 
 This layout fix system represents a significant enhancement to FilterTube, addressing complex layout preservation challenges in YouTube's dynamic interface. By combining CSS rules, targeted JavaScript manipulation, and comprehensive element detection, we've created a robust solution that maintains YouTube's intended layouts while still providing powerful content filtering capabilities.
 
-The implementation is designed to be maintainable, extensible, and resilient against YouTube's evolving interface, ensuring a seamless user experience when filtering content. 
+## 6. Shorts Container Handling
+
+**Problem:**
+Blocking a Short often left a blank space because we were hiding the inner `ytm-shorts-lockup-view-model` but not its parent container (`ytd-rich-item-renderer` or `.ytGridShelfViewModelGridShelfItem`).
+
+**Solution:**
+We implemented intelligent container detection in `handleBlockChannelClick`.
+
+```javascript
+if (videoCard.tagName.toLowerCase().includes('shorts-lockup-view-model')) {
+    let parentContainer = videoCard.closest('ytd-rich-item-renderer');
+    
+    if (!parentContainer) {
+        // Handle grid layouts (Search results, Channel pages)
+        parentContainer = videoCard.closest('.ytGridShelfViewModelGridShelfItem');
+    }
+    
+    if (parentContainer) {
+        containerToHide = parentContainer;
+    }
+}
+```
+
+This ensures that when a Short is blocked, the entire grid slot is removed, allowing YouTube's grid layout to reflow naturally and eliminate gaps.
+
+The implementation is designed to be maintainable, extensible, and resilient against YouTube's evolving interface, ensuring a seamless user experience when filtering content.

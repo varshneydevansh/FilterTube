@@ -1,5 +1,11 @@
 # Changelog
 
+## Version 3.0.4 - Shorts Blocking & Layout Fixes (November 2025)
+- **Feature**: Enhanced Shorts blocking with immediate visual feedback (no more waiting).
+- **Fix**: Resolved "blank space" issue where blocked Shorts left empty gaps in the grid.
+- **Fix**: Improved channel extraction for handles with dots (e.g., `@user.name`).
+- **Docs**: Added detailed ASCII flowcharts for Shorts blocking architecture.
+
 ## Version 3.0.3 - Shorts Menu Fixes & Stability (November 2025)
 - **Feature**: Added "Block Channel" option to the 3-dot menu for YouTube Shorts, Posts, and Playlists.
 - **Fix**: Resolved "ghost dropdown" issue where the menu remained visible after blocking.

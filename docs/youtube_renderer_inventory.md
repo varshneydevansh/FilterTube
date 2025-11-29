@@ -69,11 +69,11 @@ This document tracks which YouTube renderers/selectors FilterTube currently targ
 | --- | --- | --- | --- |
 | `<ytd-video-renderer>` | `videoRenderer` search result card | ✅ Covered — **NEW** DOM tag surfaced in latest layout | Title, channel, snippet text still arrive via existing `descriptionSnippet` / `detailedMetadataSnippets` paths |
 | `<ytd-universal-watch-card-renderer>` | `universalWatchCardRenderer` (secondary column hero) | ✅ Covered — **NEW** | Continue to verify nested header/title extraction works with rich header fields |
-| `<ytd-watch-card-hero-video-renderer>` | `watchCardHeroVideoRenderer` | ⚠️ **NEW** – Missing explicit rules | Add renderer entry to capture hero title/description for secondary cards |
+| `<ytd-watch-card-hero-video-renderer>` | `watchCardHeroVideoRenderer` | ✅ Targeted (Layout Fix) | Handled in `js/layout.js` to ensure visibility propagation |
 | `<ytd-watch-card-compact-video-renderer>` | `watchCardCompactVideoRenderer` | ✅ Covered — **NEW** | Matches existing sidebar rules; confirm snippet paths |
-| `<ytd-vertical-watch-card-list-renderer>` | Watch card list container | ⚠️ **NEW** – No renderer mapping | Identify JSON key (`watchCardSectionSequenceRenderer`?) to recurse through nested items |
+| `<ytd-vertical-watch-card-list-renderer>` | Watch card list container | ✅ Targeted (Layout Fix) | Handled in `js/layout.js` to ensure visibility propagation |
 | `<ytd-watch-card-rich-header-renderer>` | `watchCardRichHeaderRenderer` | ⚠️ **NEW** – missing | Header exposes channel title/handle; extend rules beyond `universalWatchCardRenderer` wrapper |
-| `<ytd-watch-card-section-sequence-renderer>` | `watchCardSectionSequenceRenderer` | ⚠️ **NEW** – missing | Sequencer groups hero + vertical list; ensure recursion so nested compact videos filter |
+| `<ytd-watch-card-section-sequence-renderer>` | `watchCardSectionSequenceRenderer` | ✅ Targeted (Layout Fix) | Handled in `js/layout.js` to ensure visibility propagation |
 | `<ytd-watch-card-rhs-panel-renderer>` | `watchCardRHPanelRenderer` | ❌ **NEW** – not parsed | New right-hand hero layout; add renderer coverage if JSON structure differs from existing watch cards |
 | `<ytd-watch-card-rhs-panel-video-renderer>` | `watchCardRHPanelVideoRenderer` | ❌ **NEW** – not parsed | Companion compact entries inside the RHS panel; map JSON keys for title/channel extraction |
 | `<ytd-horizontal-card-list-renderer>` | `horizontalCardListRenderer` | ⚠️ **NEW** – missing | Album shelf with refinement chips; need renderer coverage for card metadata |

@@ -223,3 +223,48 @@ If you ban "@coolguy", the system needs to know that "Cool Guy Vlogs" is the sam
 
 
 ```
+
+## 8. Shorts Blocking Architecture (Hybrid Model)
+
+**Motivation:**
+Shorts are unique because they often lack channel information in the initial DOM. To ensure **Zero Content Leakage**, we prioritize robustness over speed. We *always* resolve the canonical channel ID before finalizing a block.
+
+**How it works:**
+1.  **User Action**: User clicks "Block Channel" in 3 dots menu.
+2.  **Shorts Resolution (Extra Step)**: For Shorts, we first fetch the video's page to extract the initial Channel ID (since it's missing from the card).
+3.  **Canonical Resolution (All Videos)**: We *always* fetch the channel's "About" metadata to resolve the canonical "UC..." ID. This ensures that blocking `@user` also blocks `@Handle` and `UCID`.
+4.  **Finalize**: Only after this verification (approx. 1s) is the channel added to the block list and the content hidden.
+
+So, for Shorts we have an additioanl overhead(1s - 1.5s) of prefetching the channel ID and then resolving the canonical ID. This is to ensure that blocking a channel also blocks all its content, not just the short. Which makes 3 dot UI Blocking for shorts about 2s to 2.5s and rest assured if you have clicked "Block Channel" it will get blocked you can browse freely.
+
+**Technical Flow:**
+
+```ascii
+[User Click "Block"]
+       |
+       v
++-----------------------+
+|  1. Identify Type     |
++-----------------------+
+       |
+       +--------(If Short)-------+
+       |                         |
+       v                         v
++--------------------+    +----------------------+
+| 2. Fetch Short URL |    | (Standard Video)     |
+| -> Get Channel ID  |    | Have Channel ID      |
++--------------------+    +----------------------+
+       |                         |
+       +-----------+-------------+
+                   |
+                   v
++-----------------------------------+
+| 3. Fetch Canonical ID (Robustness)| <--- "The 1-sec Safety Check"
+| -> Resolve to unique UC ID        |      (Ensures Zero Leakage)
++-----------------------------------+
+                   |
+                   v
++-----------------------------------+
+| 4. Update Block List & Hide Card  |
++-----------------------------------+
+```

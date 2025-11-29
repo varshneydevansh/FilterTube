@@ -118,6 +118,37 @@ We believe in privacy by design.
 *   **Active Tab**: To scan the YouTube page you are viewing.
 *   **No External Requests**: FilterTube does not talk to any servers other than YouTube (for the content you requested).
 
+## 🎬 Shorts Blocking Experience
+
+FilterTube v3.0 introduces a robust, hybrid blocking mechanism for YouTube Shorts. We prioritize **Zero Content Leakage** by verifying every channel before blocking.
+
+```ascii
+[User Clicks "Block"]
+        |
+        v
++-----------------------+
+|  1. Fetch Channel ID  | (Extra step for Shorts)
++-----------------------+
+        |
+        v
++-----------------------+
+|  2. Verify Identity   | (Resolve Canonical ID)
++-----------------------+
+        |
+        v
++-----------------------+
+|  3. Block & Hide      |
++-----------------------+
+```
+
+- **Robust Verification**: We perform a multi-step check (approx. 1s) to ensure we have the correct, unique Channel ID.
+- **Zero Leakage**: By resolving the canonical ID, we ensure that blocking a Short also blocks the channel's long-form videos and posts.
+- **Smart Layouts**: Automatically adjusts the grid to prevent awkward blank spaces.
+
+> [!NOTE]
+> **Why the slight delay?**
+> For Shorts we have an additioanl overhead(1s - 1.5s) of prefetching the channel ID and then resolving the canonical ID. This is to ensure that blocking a channel also blocks all its content, not just the short. Which makes 3 dot UI Blocking for shorts about 2s to 2.5s and rest assured if you have clicked "Block Channel" it will get blocked you can browse freely.
+
 ## Support
 
 Found a bug or have a feature request? [Open an issue on GitHub](https://github.com/varshneydevansh/FilterTube/issues).

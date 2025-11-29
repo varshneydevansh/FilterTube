@@ -18,6 +18,7 @@ FilterTube operates on two synchronized layers:
 2.  **Secondary Layer: DOM Fallback (Visual Guard)**
     *   Monitors the DOM using efficient `MutationObserver`s.
     *   Catches any content that might bypass the data layer (e.g., client-side hydration updates, complex dynamic loading).
+    *   **Hybrid Blocking:** For Shorts, it combines DOM manipulation (immediate hiding) with background data fetching to ensure robust channel blocking even when metadata is missing.
     *   Applies visual hiding (CSS) to blocked elements.
     *   **Benefit:** Reliability, handles edge cases and dynamic updates.
 

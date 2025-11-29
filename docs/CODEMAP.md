@@ -52,6 +52,9 @@ FilterTube/
 | `incrementHiddenStats()` | Increments the blocked counter and calculates "time saved". |
 | `extractVideoDuration()` | Parses video duration for accurate time saved calculation. |
 | `applyDOMFallback(settings)` | Scans the DOM for video elements and applies filters (secondary layer). |
+| `fetchChannelFromShortsUrl(videoId)` | Fetches Shorts page in background to extract channel info. |
+| `handleBlockChannelClick()` | Orchestrates the blocking flow: immediate hide + background block. |
+| `injectFilterTubeMenuItem()` | Injects the "Block Channel" option into YouTube's 3-dot menu. |
 
 ### `js/filter_logic.js`
 **Context:** Main World
