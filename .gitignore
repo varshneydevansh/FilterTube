@@ -2,9 +2,9 @@
 node_modules/
 
 # Build output
-dist/
 build/
 *.zip
+!dist/*.zip
 
 # IDE/Editor files
 .vscode/
