@@ -281,3 +281,19 @@ These chips originate from the YouTube UI rather than API payloads we currently 
 | DOM tag / component | Underlying renderer / data source | Status | Notes |
 | --- | --- | --- | --- |
 | `<yt-button-view-model>` | `buttonViewModel` | ℹ️ **NEW** | "Ask" button (AI feature). Potential future target for category filtering. |
+
+## 3-Dot Menu Blocking Targets (v3.0.3)
+
+FilterTube now injects a "Block Channel" option into the 3-dot menu for the following content types. This allows users to block channels directly from the UI without visiting the channel page.
+
+| Content Type | Targeted DOM Elements | Notes |
+| --- | --- | --- |
+| **Standard Videos** | `ytd-rich-item-renderer`, `ytd-video-renderer`, `ytd-grid-video-renderer`, `ytd-compact-video-renderer` | Covers Home, Search, Channel Videos, and Sidebar suggestions. |
+| **Shorts** | `ytd-reel-item-renderer`, `ytd-reel-video-renderer`, `reel-item-endpoint`, `ytm-shorts-lockup-view-model`, `ytm-shorts-lockup-view-model-v2` | Covers Shorts Shelf, Shorts Player, and Mobile/Search Shorts. Uses async fetch for channel info. |
+| **Posts** | `ytd-post-renderer` | Community posts on Home and Channel pages. |
+| **Playlists** | `ytd-playlist-panel-video-renderer`, `ytd-playlist-video-renderer` | Videos within a playlist view. |
+| **Mobile/Compact** | `ytd-compact-promoted-video-renderer`, `ytm-compact-video-renderer`, `ytm-video-with-context-renderer` | Mobile web and specific compact layouts. |
+| **Containers** | `ytm-item-section-renderer`, `ytd-rich-shelf-renderer` | Shelves and sections containing shorts/videos. |
+
+**Technical Note:**
+The injection logic uses a `MutationObserver` to detect when a dropdown menu (`tp-yt-iron-dropdown` or `ytd-menu-popup-renderer`) appears. It then traces back to the `lastClickedMenuButton` to identify the parent video card from the list above. For Shorts, an asynchronous background fetch is often required to resolve the channel handle/ID from the video URL.
