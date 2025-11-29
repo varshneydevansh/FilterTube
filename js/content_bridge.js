@@ -1918,9 +1918,98 @@ function searchYtInitialDataForVideoChannel(videoId) {
 }
 
 /**
+ * Fetch channel information from a shorts URL
+ * @param {string} videoId - The shorts video ID
+ * @returns {Promise<Object|null>} - {handle, name} or null
+ */
+async function fetchChannelFromShortsUrl(videoId) {
+    try {
+        console.log('FilterTube: Fetching shorts page for video:', videoId);
+        const response = await fetch(`https://www.youtube.com/shorts/${videoId}`, {
+            credentials: 'same-origin',
+            headers: {
+                'Accept': 'text/html'
+            }
+        });
+
+        if (!response.ok) {
+            console.error('FilterTube: Failed to fetch shorts page:', response.status);
+            return null;
+        }
+
+        const html = await response.text();
+
+        // Method 1: Extract from ytInitialData JSON in the HTML
+        const ytInitialDataMatch = html.match(/var ytInitialData = ({.+?});/);
+        if (ytInitialDataMatch) {
+            try {
+                const ytInitialData = JSON.parse(ytInitialDataMatch[1]);
+
+                // Look for channel info in various locations
+                const engagementPanels = ytInitialData?.engagementPanels;
+                const overlay = ytInitialData?.overlay?.reelPlayerOverlayRenderer;
+                const contents = ytInitialData?.contents;
+
+                // Try to find channel info in engagement panels (common location)
+                if (engagementPanels && Array.isArray(engagementPanels)) {
+                    for (const panel of engagementPanels) {
+                        const header = panel?.engagementPanelSectionListRenderer?.header?.engagementPanelTitleHeaderRenderer;
+                        if (header?.menu?.menuRenderer?.items) {
+                            for (const item of header.menu.menuRenderer.items) {
+                                const endpoint = item?.menuNavigationItemRenderer?.navigationEndpoint?.browseEndpoint;
+                                if (endpoint?.browseId && endpoint?.canonicalBaseUrl) {
+                                    const handle = endpoint.canonicalBaseUrl.replace('/user/', '@').replace(/^\//, '');
+                                    console.log('FilterTube: Found channel in ytInitialData (engagement panel):', handle);
+                                    return { handle, name: '' };
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Try overlay data
+                if (overlay?.reelPlayerHeaderSupportedRenderers?.reelPlayerHeaderRenderer) {
+                    const headerRenderer = overlay.reelPlayerHeaderSupportedRenderers.reelPlayerHeaderRenderer;
+                    const channelNavEndpoint = headerRenderer?.channelNavigationEndpoint?.browseEndpoint;
+                    if (channelNavEndpoint?.browseId && channelNavEndpoint?.canonicalBaseUrl) {
+                        const handle = channelNavEndpoint.canonicalBaseUrl.replace('/user/', '@').replace(/^\//, '');
+                        console.log('FilterTube: Found channel in ytInitialData (overlay):', handle);
+                        return { handle, name: headerRenderer.channelTitleText?.runs?.[0]?.text || '' };
+                    }
+                }
+            } catch (e) {
+                console.warn('FilterTube: Failed to parse ytInitialData from shorts page:', e);
+            }
+        }
+
+        // Method 2: Extract from meta tags
+        const channelUrlMatch = html.match(/<link rel="canonical" href="https:\/\/www\.youtube\.com\/@([\w-]+)"/);
+        if (channelUrlMatch) {
+            const handle = `@${channelUrlMatch[1]}`;
+            console.log('FilterTube: Found channel in canonical link:', handle);
+            return { handle, name: '' };
+        }
+
+        // Method 3: Extract from page owner link
+        const ownerLinkMatch = html.match(/<link itemprop="url" href="https?:\/\/www\.youtube\.com\/@([\w-]+)">/);
+        if (ownerLinkMatch) {
+            const handle = `@${ownerLinkMatch[1]}`;
+            console.log('FilterTube: Found channel in owner link:', handle);
+            return { handle, name: '' };
+        }
+
+        console.warn('FilterTube: Could not extract channel info from shorts page');
+        return null;
+    } catch (error) {
+        console.error('FilterTube: Error fetching shorts page:', error);
+        return null;
+    }
+}
+
+/**
  * Extract channel information from a video/short card
  * @param {Element} card - The video or short card element
- * @returns {Object|null} - {id, handle, name} or null
+ * @returns {Object|null|Promise<Object|null>} - {id, handle, name}, {videoId, needsFetch: true}, or null
  */
 function extractChannelFromCard(card) {
     if (!card) return null;
@@ -1962,21 +2051,21 @@ function extractChannelFromCard(card) {
                 }
             }
 
-            // Method 3: Look for channel info in parent/sibling elements
-            const parentContainer = card.closest('ytd-rich-section-renderer, ytd-item-section-renderer');
-            if (parentContainer) {
-                const channelLinkNearby = parentContainer.querySelector('a[href*="/@"]:not([href*="/shorts"])');
-                if (channelLinkNearby) {
-                    const href = channelLinkNearby.getAttribute('href');
-                    const handleMatch = href?.match(/@([\w-]+)/);
-                    if (handleMatch) {
-                        console.log('FilterTube: Found SHORTS channel in parent container');
-                        return { handle: `@${handleMatch[1]}`, name: channelLinkNearby.textContent?.trim() };
-                    }
+            // Method 3: Extract from shorts URL (fetch the page)
+            console.log('FilterTube: Attempting to extract channel from shorts URL');
+            const shortsLink = card.querySelector('a[href*="/shorts/"]');
+            if (shortsLink) {
+                const href = shortsLink.getAttribute('href');
+                const videoIdMatch = href?.match(/\/shorts\/([a-zA-Z0-9_-]{11})/);
+                if (videoIdMatch) {
+                    const videoId = videoIdMatch[1];
+                    console.log('FilterTube: Extracted shorts video ID:', videoId);
+                    // Return a promise marker - we'll need to handle this async
+                    return { videoId, needsFetch: true };
                 }
             }
 
-            console.warn('FilterTube: SHORTS card detected but no channel info found - skipping menu injection');
+            console.warn('FilterTube: SHORTS card detected but no channel info found in card - skipping menu injection');
             // Return null - we can't block without channel info
             return null;
         }
@@ -2075,17 +2164,27 @@ function extractChannelFromCard(card) {
  * @param {Element} dropdown - The dropdown menu element
  * @param {Element} videoCard - The video/short card that was clicked
  */
-function injectFilterTubeMenuItem(dropdown, videoCard) {
+async function injectFilterTubeMenuItem(dropdown, videoCard) {
     if (!dropdown || !videoCard) return;
 
     // ALWAYS remove old FilterTube items first (prevents state persistence)
     const oldItems = dropdown.querySelectorAll('.filtertube-block-channel-item');
     oldItems.forEach(item => item.remove());
 
-    const channelInfo = extractChannelFromCard(videoCard);
+    let channelInfo = extractChannelFromCard(videoCard);
     if (!channelInfo) {
         console.log('FilterTube: Could not extract channel info from card');
         return;
+    }
+
+    // Handle async fetch case for shorts without channel info in DOM
+    if (channelInfo.needsFetch && channelInfo.videoId) {
+        console.log('FilterTube: Fetching channel info for shorts video:', channelInfo.videoId);
+        channelInfo = await fetchChannelFromShortsUrl(channelInfo.videoId);
+        if (!channelInfo) {
+            console.log('FilterTube: Failed to fetch channel info from shorts URL');
+            return;
+        }
     }
 
     console.log('FilterTube: Extracted channel info:', channelInfo);
@@ -2212,6 +2311,9 @@ function injectIntoNewMenu(menuList, channelInfo) {
     // Insert at the TOP of the menu (as first child)
     menuList.insertBefore(filterTubeItem, menuList.firstChild);
 
+    // Check if channel is already blocked and update UI accordingly
+    checkIfChannelBlocked(channelInfo, filterTubeItem);
+
     console.log('FilterTube: Injected NEW menu item at TOP');
 }
 
@@ -2319,7 +2421,47 @@ function injectIntoOldMenu(menuContainer, channelInfo) {
     // Insert at the TOP of the menu (as first child)
     menuList.insertBefore(filterTubeItem, menuList.firstChild);
 
+    // Check if channel is already blocked and update UI accordingly
+    checkIfChannelBlocked(channelInfo, filterTubeItem);
+
     console.log('FilterTube: Injected OLD menu item at TOP');
+}
+
+/**
+ * Check if a channel is already blocked and update the menu item UI
+ * @param {Object} channelInfo - {id, handle, name}
+ * @param {Element} menuItem - The menu item element
+ */
+async function checkIfChannelBlocked(channelInfo, menuItem) {
+    try {
+        // Get current filtered channels from storage
+        const result = await browserAPI_BRIDGE.storage.local.get(['filteredChannels']);
+        const channels = result.filteredChannels || [];
+
+        // Check if this channel is already in the list (by handle or ID)
+        const input = channelInfo.handle || channelInfo.id;
+        const isBlocked = channels.some(channel => {
+            // Match by handle (case-insensitive) or by ID
+            if (input.startsWith('@')) {
+                return channel.handle && channel.handle.toLowerCase() === input.toLowerCase();
+            } else {
+                return channel.id === input;
+            }
+        });
+
+        if (isBlocked) {
+            // Channel is already blocked - show success state
+            const titleSpan = menuItem.querySelector('.filtertube-menu-title');
+            if (titleSpan) {
+                titleSpan.textContent = '✓ Channel Blocked';
+                titleSpan.style.color = '#10b981'; // green
+                menuItem.style.pointerEvents = 'none'; // Disable clicks
+            }
+            console.log('FilterTube: Channel already blocked:', channelInfo);
+        }
+    } catch (error) {
+        console.error('FilterTube: Error checking if channel is blocked:', error);
+    }
 }
 
 /**
