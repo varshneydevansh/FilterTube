@@ -8,7 +8,9 @@
 body {
     margin: 0;
     padding: 0;
-    width: 400px;
+    width: 100%;
+    max-width: 400px;
+    min-width: 320px;
     font-family: var(--ft-font-family-base);
     font-size: var(--ft-font-size-base);
     line-height: var(--ft-line-height-base);

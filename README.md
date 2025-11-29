@@ -54,6 +54,11 @@ If you want to contribute or build from source:
     *   **Chrome**: Go to `chrome://extensions`, enable **Developer mode**, click **Load unpacked**, and select the `FilterTube` folder.
     *   **Firefox**: Go to `about:debugging`, click **This Firefox**, then **Load Temporary Add-on**, and select `manifest.json`.
 
+### 📱 Firefox for Android
+1.  **Set up**: Connect your Android device to your computer via USB.
+2.  **Install**: You can install the **same** `filtertube-firefox-v3.0.4.zip` file.
+3.  **Debug**: Follow Mozilla's guide to [debug extensions on Android](https://extensionworkshop.com/documentation/develop/developing-extensions-for-firefox-for-android/) using `web-ext` or remote debugging.
+
 ## Usage
 
 ### Basic Filtering
