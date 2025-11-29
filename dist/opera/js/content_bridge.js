@@ -2624,8 +2624,26 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             // IMMEDIATELY hide the video card for instant feedback
             if (videoCard) {
                 console.log('FilterTube: Hiding video card immediately');
-                videoCard.style.display = 'none';
-                videoCard.setAttribute('data-filtertube-hidden', 'true');
+
+                // For shorts, find the parent ytd-rich-item-renderer container
+                // For regular videos, the videoCard itself is usually the right container
+                let containerToHide = videoCard;
+
+                // Check if this is a shorts lockup model nested in a rich-item-renderer
+                if (videoCard.tagName.toLowerCase().includes('shorts-lockup-view-model')) {
+                    const parentContainer = videoCard.closest('ytd-rich-item-renderer');
+                    if (parentContainer) {
+                        containerToHide = parentContainer;
+                        console.log('FilterTube: Found parent container for shorts:', containerToHide.tagName);
+                    }
+                }
+
+                // Immediate hiding: Apply direct styles + class to ensure it's hidden right away
+                // The storage change event will trigger proper re-filtering shortly after
+                containerToHide.style.display = 'none';
+                containerToHide.classList.add('filtertube-hidden');
+                containerToHide.setAttribute('data-filtertube-hidden', 'true');
+                console.log('FilterTube: Applied immediate hiding to:', containerToHide.tagName);
 
                 // Close the dropdown since the video is now hidden
                 const dropdown = menuItem.closest('tp-yt-iron-dropdown');

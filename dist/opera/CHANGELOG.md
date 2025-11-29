@@ -1,5 +1,12 @@
 # Changelog
 
+## Version 3.0.3 - Shorts Menu Fixes & Stability (November 2025)
+- **Feature**: Added "Block Channel" option to the 3-dot menu for YouTube Shorts, Posts, and Playlists.
+- **Fix**: Resolved "ghost dropdown" issue where the menu remained visible after blocking.
+- **Fix**: Fixed "Unable to block" error by implementing async channel fetching for Shorts.
+- **Fix**: Silenced error logs for unsupported card types (Mixes/Playlists).
+- **UX**: Immediate visual feedback (video hides instantly) when blocking via the menu.
+
 ## Version 3.0.0 - Hybrid Architecture & Documentation Overhaul (CURRENT)
 - **Architecture**: Formalized the "Hybrid Filtering Architecture" combining Data Interception (Primary) with DOM Fallback (Secondary).
 - **Documentation**: Major overhaul of `ARCHITECTURE.md`, `TECHNICAL.md`, and `CODEMAP.md` with detailed ASCII diagrams.
