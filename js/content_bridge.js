@@ -1923,87 +1923,104 @@ function searchYtInitialDataForVideoChannel(videoId) {
  * @returns {Promise<Object|null>} - {handle, name} or null
  */
 async function fetchChannelFromShortsUrl(videoId) {
-    try {
-        console.log('FilterTube: Fetching shorts page for video:', videoId);
-        const response = await fetch(`https://www.youtube.com/shorts/${videoId}`, {
-            credentials: 'same-origin',
-            headers: {
-                'Accept': 'text/html'
+    // Check if there's already a pending fetch for this video
+    if (pendingShortsFetches.has(videoId)) {
+        console.log('FilterTube: Reusing existing fetch for shorts video:', videoId);
+        return await pendingShortsFetches.get(videoId);
+    }
+
+    // Create new fetch promise
+    const fetchPromise = (async () => {
+        try {
+            console.log('FilterTube: Fetching shorts page for video:', videoId);
+            const response = await fetch(`https://www.youtube.com/shorts/${videoId}`, {
+                credentials: 'same-origin',
+                headers: {
+                    'Accept': 'text/html'
+                }
+            });
+
+            if (!response.ok) {
+                console.error('FilterTube: Failed to fetch shorts page:', response.status);
+                return null;
             }
-        });
 
-        if (!response.ok) {
-            console.error('FilterTube: Failed to fetch shorts page:', response.status);
-            return null;
-        }
+            const html = await response.text();
 
-        const html = await response.text();
+            // Method 1: Extract from ytInitialData JSON in the HTML
+            const ytInitialDataMatch = html.match(/var ytInitialData = ({.+?});/);
+            if (ytInitialDataMatch) {
+                try {
+                    const ytInitialData = JSON.parse(ytInitialDataMatch[1]);
 
-        // Method 1: Extract from ytInitialData JSON in the HTML
-        const ytInitialDataMatch = html.match(/var ytInitialData = ({.+?});/);
-        if (ytInitialDataMatch) {
-            try {
-                const ytInitialData = JSON.parse(ytInitialDataMatch[1]);
+                    // Look for channel info in various locations
+                    const engagementPanels = ytInitialData?.engagementPanels;
+                    const overlay = ytInitialData?.overlay?.reelPlayerOverlayRenderer;
+                    const contents = ytInitialData?.contents;
 
-                // Look for channel info in various locations
-                const engagementPanels = ytInitialData?.engagementPanels;
-                const overlay = ytInitialData?.overlay?.reelPlayerOverlayRenderer;
-                const contents = ytInitialData?.contents;
-
-                // Try to find channel info in engagement panels (common location)
-                if (engagementPanels && Array.isArray(engagementPanels)) {
-                    for (const panel of engagementPanels) {
-                        const header = panel?.engagementPanelSectionListRenderer?.header?.engagementPanelTitleHeaderRenderer;
-                        if (header?.menu?.menuRenderer?.items) {
-                            for (const item of header.menu.menuRenderer.items) {
-                                const endpoint = item?.menuNavigationItemRenderer?.navigationEndpoint?.browseEndpoint;
-                                if (endpoint?.browseId && endpoint?.canonicalBaseUrl) {
-                                    const handle = endpoint.canonicalBaseUrl.replace('/user/', '@').replace(/^\//, '');
-                                    console.log('FilterTube: Found channel in ytInitialData (engagement panel):', handle);
-                                    return { handle, name: '' };
+                    // Try to find channel info in engagement panels (common location)
+                    if (engagementPanels && Array.isArray(engagementPanels)) {
+                        for (const panel of engagementPanels) {
+                            const header = panel?.engagementPanelSectionListRenderer?.header?.engagementPanelTitleHeaderRenderer;
+                            if (header?.menu?.menuRenderer?.items) {
+                                for (const item of header.menu.menuRenderer.items) {
+                                    const endpoint = item?.menuNavigationItemRenderer?.navigationEndpoint?.browseEndpoint;
+                                    if (endpoint?.browseId && endpoint?.canonicalBaseUrl) {
+                                        const handle = endpoint.canonicalBaseUrl.replace('/user/', '@').replace(/^\//, '');
+                                        console.log('FilterTube: Found channel in ytInitialData (engagement panel):', handle);
+                                        return { handle, name: '' };
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
-                // Try overlay data
-                if (overlay?.reelPlayerHeaderSupportedRenderers?.reelPlayerHeaderRenderer) {
-                    const headerRenderer = overlay.reelPlayerHeaderSupportedRenderers.reelPlayerHeaderRenderer;
-                    const channelNavEndpoint = headerRenderer?.channelNavigationEndpoint?.browseEndpoint;
-                    if (channelNavEndpoint?.browseId && channelNavEndpoint?.canonicalBaseUrl) {
-                        const handle = channelNavEndpoint.canonicalBaseUrl.replace('/user/', '@').replace(/^\//, '');
-                        console.log('FilterTube: Found channel in ytInitialData (overlay):', handle);
-                        return { handle, name: headerRenderer.channelTitleText?.runs?.[0]?.text || '' };
+                    // Try overlay data
+                    if (overlay?.reelPlayerHeaderSupportedRenderers?.reelPlayerHeaderRenderer) {
+                        const headerRenderer = overlay.reelPlayerHeaderSupportedRenderers.reelPlayerHeaderRenderer;
+                        const channelNavEndpoint = headerRenderer?.channelNavigationEndpoint?.browseEndpoint;
+                        if (channelNavEndpoint?.browseId && channelNavEndpoint?.canonicalBaseUrl) {
+                            const handle = channelNavEndpoint.canonicalBaseUrl.replace('/user/', '@').replace(/^\//, '');
+                            console.log('FilterTube: Found channel in ytInitialData (overlay):', handle);
+                            return { handle, name: headerRenderer.channelTitleText?.runs?.[0]?.text || '' };
+                        }
                     }
+                } catch (e) {
+                    console.warn('FilterTube: Failed to parse ytInitialData from shorts page:', e);
                 }
-            } catch (e) {
-                console.warn('FilterTube: Failed to parse ytInitialData from shorts page:', e);
             }
-        }
 
-        // Method 2: Extract from meta tags
-        const channelUrlMatch = html.match(/<link rel="canonical" href="https:\/\/www\.youtube\.com\/@([\w-]+)"/);
-        if (channelUrlMatch) {
-            const handle = `@${channelUrlMatch[1]}`;
-            console.log('FilterTube: Found channel in canonical link:', handle);
-            return { handle, name: '' };
-        }
+            // Method 2: Extract from meta tags
+            const channelUrlMatch = html.match(/<link rel="canonical" href="https:\/\/www\.youtube\.com\/@([\w-]+)"/);
+            if (channelUrlMatch) {
+                const handle = `@${channelUrlMatch[1]}`;
+                console.log('FilterTube: Found channel in canonical link:', handle);
+                return { handle, name: '' };
+            }
 
-        // Method 3: Extract from page owner link
-        const ownerLinkMatch = html.match(/<link itemprop="url" href="https?:\/\/www\.youtube\.com\/@([\w-]+)">/);
-        if (ownerLinkMatch) {
-            const handle = `@${ownerLinkMatch[1]}`;
-            console.log('FilterTube: Found channel in owner link:', handle);
-            return { handle, name: '' };
-        }
+            // Method 3: Extract from page owner link
+            const ownerLinkMatch = html.match(/<link itemprop="url" href="https?:\/\/www\.youtube\.com\/@([\w-]+)">/);
+            if (ownerLinkMatch) {
+                const handle = `@${ownerLinkMatch[1]}`;
+                console.log('FilterTube: Found channel in owner link:', handle);
+                return { handle, name: '' };
+            }
 
-        console.warn('FilterTube: Could not extract channel info from shorts page');
-        return null;
-    } catch (error) {
-        console.error('FilterTube: Error fetching shorts page:', error);
-        return null;
-    }
+            console.warn('FilterTube: Could not extract channel info from shorts page');
+            return null;
+        } catch (error) {
+            console.error('FilterTube: Error fetching shorts page:', error);
+            return null;
+        } finally {
+            // Clean up pending fetch
+            pendingShortsFetches.delete(videoId);
+        }
+    })();
+
+    // Store the promise
+    pendingShortsFetches.set(videoId, fetchPromise);
+
+    return await fetchPromise;
 }
 
 /**
@@ -2167,9 +2184,12 @@ function extractChannelFromCard(card) {
 async function injectFilterTubeMenuItem(dropdown, videoCard) {
     if (!dropdown || !videoCard) return;
 
-    // ALWAYS remove old FilterTube items first (prevents state persistence)
+    // ALWAYS remove old FilterTube items first (prevents stale UI from previous videos)
     const oldItems = dropdown.querySelectorAll('.filtertube-block-channel-item');
-    oldItems.forEach(item => item.remove());
+    if (oldItems.length > 0) {
+        console.log('FilterTube: Removing', oldItems.length, 'old menu items');
+        oldItems.forEach(item => item.remove());
+    }
 
     let channelInfo = extractChannelFromCard(videoCard);
     if (!channelInfo) {
@@ -2195,10 +2215,10 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
 
     if (newMenuList) {
         console.log('FilterTube: Detected NEW menu structure');
-        injectIntoNewMenu(newMenuList, channelInfo);
+        injectIntoNewMenu(newMenuList, channelInfo, videoCard);
     } else if (oldMenuList) {
         console.log('FilterTube: Detected OLD menu structure');
-        injectIntoOldMenu(oldMenuList, channelInfo);
+        injectIntoOldMenu(oldMenuList, channelInfo, videoCard);
     } else {
         console.log('FilterTube: Could not detect menu structure');
         return;
@@ -2208,7 +2228,7 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
 /**
  * Inject into NEW menu structure (yt-list-view-model)
  */
-function injectIntoNewMenu(menuList, channelInfo) {
+function injectIntoNewMenu(menuList, channelInfo, videoCard) {
     // Create FilterTube menu item (NEW structure)
     const filterTubeItem = document.createElement('yt-list-item-view-model');
     filterTubeItem.className = 'yt-list-item-view-model filtertube-block-channel-item';
@@ -2305,7 +2325,7 @@ function injectIntoNewMenu(menuList, channelInfo) {
     filterTubeItem.addEventListener('click', async (e) => {
         e.stopPropagation();
         const filterAll = toggle.classList.contains('active');
-        await handleBlockChannelClick(channelInfo, filterTubeItem, filterAll);
+        await handleBlockChannelClick(channelInfo, filterTubeItem, filterAll, videoCard);
     });
 
     // Insert at the TOP of the menu (as first child)
@@ -2320,7 +2340,7 @@ function injectIntoNewMenu(menuList, channelInfo) {
 /**
  * Inject into OLD menu structure (tp-yt-paper-listbox)
  */
-function injectIntoOldMenu(menuContainer, channelInfo) {
+function injectIntoOldMenu(menuContainer, channelInfo, videoCard) {
     const menuList = menuContainer.querySelector('tp-yt-paper-listbox') || menuContainer;
 
     // Inline SVG for FilterTube logo (user-provided SVG)
@@ -2415,7 +2435,7 @@ function injectIntoOldMenu(menuContainer, channelInfo) {
     filterTubeItem.addEventListener('click', async (e) => {
         e.stopPropagation();
         const filterAll = toggle.classList.contains('active');
-        await handleBlockChannelClick(channelInfo, filterTubeItem, filterAll);
+        await handleBlockChannelClick(channelInfo, filterTubeItem, filterAll, videoCard);
     });
 
     // Insert at the TOP of the menu (as first child)
@@ -2469,8 +2489,9 @@ async function checkIfChannelBlocked(channelInfo, menuItem) {
  * @param {Object} channelInfo - {id, handle, name}
  * @param {Element} menuItem - The menu item element
  * @param {boolean} filterAll - Whether to enable Filter All for this channel
+ * @param {Element} videoCard - The video card element to hide after blocking
  */
-async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false) {
+async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false, videoCard = null) {
     const titleSpan = menuItem.querySelector('.filtertube-menu-title');
     if (!titleSpan) return;
 
@@ -2494,6 +2515,22 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false)
             titleSpan.style.color = '#10b981'; // green
 
             console.log('FilterTube: Successfully blocked channel:', channelInfo, 'filterAll:', filterAll);
+
+            // IMMEDIATELY hide the video card for instant feedback
+            if (videoCard) {
+                console.log('FilterTube: Hiding video card immediately');
+                videoCard.style.display = 'none';
+                videoCard.setAttribute('data-filtertube-hidden', 'true');
+
+                // Close the dropdown since the video is now hidden
+                const dropdown = menuItem.closest('tp-yt-iron-dropdown');
+                if (dropdown) {
+                    dropdown.style.display = 'none';
+                    dropdown.setAttribute('aria-hidden', 'true');
+                }
+            }
+
+            // The storage change event will trigger a full page re-filter automatically
         } else {
             // Error state
             titleSpan.textContent = '✗ Failed to block';
@@ -2620,9 +2657,15 @@ let lastClickedMenuButton = null;
 
 /**
  * Track which dropdowns we've already injected into (prevent flashing)
- * Map: dropdown -> videoCard ID
+ * Map: dropdown -> {videoCardId, isProcessing}
  */
 const injectedDropdowns = new WeakMap();
+
+/**
+ * Track pending async channel fetches for shorts (prevents duplicates)
+ * Map: videoId -> Promise
+ */
+const pendingShortsFetches = new Map();
 
 /**
  * Observe dropdowns and inject FilterTube menu items
@@ -2672,7 +2715,10 @@ function setupMenuObserver() {
 
                     if (dropdown) {
                         console.log('FilterTube: Dropdown added to DOM');
-                        handleDropdownAppeared(dropdown);
+                        // Call async function without awaiting (fire and forget)
+                        handleDropdownAppeared(dropdown).catch(err => {
+                            console.error('FilterTube: Error in handleDropdownAppeared:', err);
+                        });
                     }
                 }
 
@@ -2683,7 +2729,10 @@ function setupMenuObserver() {
 
                     if (isVisible) {
                         console.log('FilterTube: Dropdown became visible (attribute change)');
-                        handleDropdownAppeared(dropdown);
+                        // Call async function without awaiting (fire and forget)
+                        handleDropdownAppeared(dropdown).catch(err => {
+                            console.error('FilterTube: Error in handleDropdownAppeared:', err);
+                        });
                     }
                 }
             }
@@ -2713,7 +2762,10 @@ function tryInjectIntoVisibleDropdown() {
 
         if (isVisible) {
             console.log('FilterTube: Found visible dropdown');
-            handleDropdownAppeared(dropdown);
+            // Call async function without awaiting (fire and forget)
+            handleDropdownAppeared(dropdown).catch(err => {
+                console.error('FilterTube: Error in handleDropdownAppeared:', err);
+            });
             break; // Only inject into first visible one
         }
     }
@@ -2722,7 +2774,7 @@ function tryInjectIntoVisibleDropdown() {
 /**
  * Handle when a dropdown appears (either added or made visible)
  */
-function handleDropdownAppeared(dropdown) {
+async function handleDropdownAppeared(dropdown) {
     if (!lastClickedMenuButton) {
         console.log('FilterTube: No button reference, skipping injection');
         return;
@@ -2770,22 +2822,27 @@ function handleDropdownAppeared(dropdown) {
             videoCard.setAttribute('data-filtertube-unique-id', videoCardId);
         }
 
-        // CRITICAL: Check if this dropdown is being reused for a DIFFERENT video
-        const previousCardId = injectedDropdowns.get(dropdown);
+        // CRITICAL: Check if this dropdown is already being processed for this video
+        const dropdownState = injectedDropdowns.get(dropdown);
 
-        if (previousCardId === videoCardId) {
-            // Same video - dropdown just re-appeared (don't re-inject, prevents flashing)
-            console.log('FilterTube: Dropdown already injected for this video, skipping');
-            return;
+        if (dropdownState?.videoCardId === videoCardId) {
+            if (dropdownState.isProcessing) {
+                console.log('FilterTube: Dropdown already processing for this video, skipping');
+                return;
+            }
+            if (dropdownState.isComplete) {
+                console.log('FilterTube: Dropdown already injected for this video, skipping');
+                return;
+            }
         }
 
-        if (previousCardId && previousCardId !== videoCardId) {
-            console.log('FilterTube: Dropdown reused for different video - cleaning old items');
+        if (dropdownState && dropdownState.videoCardId !== videoCardId) {
+            console.log('FilterTube: Dropdown reused for different video - will clean and reinject');
             // Old items will be removed by injectFilterTubeMenuItem automatically
         }
 
-        // Mark this dropdown as injected for THIS video card (prevents multiple injections)
-        injectedDropdowns.set(dropdown, videoCardId);
+        // Mark as being processed IMMEDIATELY (prevents duplicate calls)
+        injectedDropdowns.set(dropdown, { videoCardId, isProcessing: true, isComplete: false });
 
         // Watch for card removal (video hidden) and close dropdown
         const observer = new MutationObserver((mutations) => {
@@ -2805,14 +2862,22 @@ function handleDropdownAppeared(dropdown) {
             observer.observe(videoCard.parentElement, { childList: true });
         }
 
-        // Delay slightly to let YouTube populate the menu
-        // Use longer delay for shorts to prevent flash-and-disappear
-        const isShorts = videoCard.tagName.toLowerCase().includes('reel');
-        const delay = isShorts ? 250 : 100;
+        // Determine if this is a shorts card
+        const isShorts = videoCard.tagName.toLowerCase().includes('shorts') ||
+            videoCard.tagName.toLowerCase().includes('reel');
 
-        setTimeout(() => {
-            injectFilterTubeMenuItem(dropdown, videoCard);
-        }, delay);
+        try {
+            // For shorts, we might need to wait for async channel fetch
+            // Do the injection WITHOUT setTimeout to avoid race conditions
+            await injectFilterTubeMenuItem(dropdown, videoCard);
+
+            // Mark as complete
+            injectedDropdowns.set(dropdown, { videoCardId, isProcessing: false, isComplete: true });
+        } catch (error) {
+            console.error('FilterTube: Error injecting menu item:', error);
+            // Reset state on error so it can be retried
+            injectedDropdowns.set(dropdown, { videoCardId, isProcessing: false, isComplete: false });
+        }
     } else {
         console.log('FilterTube: Could not find video card from button');
 
