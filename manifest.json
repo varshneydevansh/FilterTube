@@ -1,9 +1,9 @@
 {
     "manifest_version": 3,
     "name": "FilterTube",
-    "description": "Restore peace of mind to your digital video experience",
-    "version": "3.0.1",
-    "minimum_chrome_version": "88",
+    "description": "Restore peace of mind to your digital video experience.",
+    "version": "3.0.4",
+    "minimum_chrome_version": "111",
     "background": {
         "service_worker": "js/background.js"
     },
@@ -50,7 +50,8 @@
             "resources": [
                 "js/injector.js",
                 "js/filter_logic.js",
-                "js/seed.js"
+                "js/seed.js",
+                "icons/file.svg"
             ],
             "matches": [
                 "*://*.youtube.com/*",

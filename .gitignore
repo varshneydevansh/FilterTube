@@ -5,7 +5,7 @@ node_modules/
 build/
 dist/
 *.zip
-!dist/*.zip
+
 
 # IDE/Editor files
 .vscode/
