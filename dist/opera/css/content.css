@@ -1,0 +1,263 @@
+/*
+ * content.css
+ *
+ * FALLBACK STYLESHEET in case dynamic loading of filter.css and layout.css fails
+ * Contains minimal essential styles to hide unwanted elements
+ */
+
+/* --- Initial Hiding Rule --- */
+/* Apply display:none immediately to all potential containers */
+ytd-video-renderer,
+ytd-compact-video-renderer,
+ytd-grid-video-renderer,
+ytd-rich-item-renderer,
+ytd-watch-card-compact-video-renderer,
+ytd-channel-video-player-renderer,
+ytd-shelf-renderer,
+ytd-reel-shelf-renderer,
+ytd-horizontal-card-list-renderer,
+ytd-universal-watch-card-renderer,
+ytd-radio-renderer,
+ytd-channel-renderer,
+ytd-grid-channel-renderer,
+ytd-reel-item-renderer,
+ytm-shorts-lockup-view-model,
+ytd-movie-renderer,
+ytd-mix-renderer,
+ytd-reel-video-renderer,
+ytd-search-refinement-card-renderer,
+ytd-watch-card-rich-header-renderer,
+ytd-watch-card-section-sequence-renderer,
+yt-lockup-metadata-view-model,
+.yt-lockup-metadata-view-model-wiz,
+.yt-lockup-view-model-wiz {
+    display: none !important; /* Hide by default */
+}
+
+/* --- Reveal Rule --- */
+/* Class added by JS to elements that should be visible */
+.filter-tube-visible {
+    display: block !important; /* Explicitly set display */
+    margin-bottom: 16px !important; /* Add spacing */
+}
+
+/* Basic layout fixes for search results */
+ytd-search ytd-video-renderer.filter-tube-visible {
+    display: flex !important;
+    width: 100% !important;
+    max-width: 862px !important;
+}
+
+/* Basic layout fixes for shorts */
+ytd-reel-shelf-renderer.filter-tube-visible #items {
+    display: flex !important;
+    flex-direction: row !important;
+    overflow-x: auto !important;
+}
+
+/* --- Comment Filtering --- */
+/* Hide comments based on user preferences */
+.filter-tube-hidden-comment {
+    display: none !important;
+}
+
+/* Hide entire comment section */
+.filter-tube-hide-all-comments #comments {
+    display: none !important;
+}
+
+/* Ensure parent-child hiding relationships work properly */
+ytd-universal-watch-card-renderer:not(.filter-tube-visible) ytd-watch-card-section-sequence-renderer,
+ytd-universal-watch-card-renderer:not(.filter-tube-visible) ytd-watch-card-rich-header-renderer,
+.yt-lockup-view-model-wiz:not(.filter-tube-visible) .yt-lockup-metadata-view-model-wiz,
+.yt-lockup-view-model-wiz:not(.filter-tube-visible) .yt-lockup-view-model-wiz__content-image,
+.yt-lockup-view-model-wiz:not(.filter-tube-visible) yt-collection-thumbnail-view-model {
+    display: none !important;
+}
+
+/* Ensure content image containers are hidden properly */
+.yt-lockup-view-model-wiz__content-image,
+yt-collection-thumbnail-view-model {
+    display: none !important;
+}
+
+.filter-tube-visible .yt-lockup-view-model-wiz__content-image,
+.filter-tube-visible yt-collection-thumbnail-view-model {
+    display: block !important;
+}
+
+/* --- Legacy/Fallback Hiding Rule (Kept for reference/potential use) --- */
+/* Class applied by JS if we needed explicit hiding *after* initial load (less common now) */
+.hidden-video {
+    display: none !important;
+}
+
+/* --- Fix for channel page layout --- */
+/* Ensure horizontal layout for videos on channel pages */
+ytd-two-column-browse-results-renderer #items.ytd-grid-renderer {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important;
+    grid-gap: 16px !important;
+}
+
+/* Fix for individual grid items on channel pages */
+ytd-grid-video-renderer.filter-tube-visible {
+    width: 100% !important;
+    margin-right: 0 !important;
+    display: block !important;
+}
+
+/* Fix for channel videos displaying vertically instead of in grid */
+ytd-browse[page-subtype="channels"] ytd-rich-grid-renderer,
+ytd-browse[role="main"] ytd-rich-grid-renderer,
+ytd-browse[page-subtype="channels"] #items,
+ytd-browse[role="main"] #items,
+ytd-browse:not([page-subtype="channels"]) ytd-rich-grid-renderer,
+ytd-browse:not([page-subtype="channels"]) ytd-rich-grid-row-renderer,
+ytd-browse[page-subtype="subscriptions"] ytd-rich-grid-renderer {
+    display: block !important;
+}
+
+ytd-browse[page-subtype="channels"] #contents.ytd-rich-grid-renderer,
+ytd-browse[role="main"] #contents.ytd-rich-grid-renderer,
+ytd-browse:not([page-subtype="channels"]) #contents.ytd-rich-grid-renderer,
+ytd-browse[page-subtype="subscriptions"] #contents.ytd-rich-grid-renderer,
+ytd-search #contents.ytd-section-list-renderer {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important;
+    grid-gap: 16px !important;
+}
+
+/* Ensure proper layout for channel videos in grid */
+ytd-browse[page-subtype="channels"] ytd-rich-item-renderer.filter-tube-visible,
+ytd-browse[role="main"] ytd-rich-item-renderer.filter-tube-visible,
+ytd-browse:not([page-subtype="channels"]) ytd-rich-item-renderer.filter-tube-visible,
+ytd-browse[page-subtype="subscriptions"] ytd-rich-item-renderer.filter-tube-visible,
+ytd-search ytd-video-renderer.filter-tube-visible {
+    width: 100% !important;
+    margin: 0 !important;
+    display: block !important;
+}
+
+/* Force grid for search pages */
+ytd-search ytd-item-section-renderer.ytd-section-list-renderer {
+    margin: 0 !important;
+}
+
+/* Fix for YouTube search results layout */
+ytd-search #primary > ytd-section-list-renderer {
+    max-width: 100% !important;
+}
+
+/* Ensure shelf items display horizontally */
+ytd-shelf-renderer #items,
+ytd-horizontal-card-list-renderer #items {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    gap: 16px !important;
+}
+
+/*
+ * Optional class (currently unused in content.js) for highlighting videos.
+ * Could be useful for debugging selectors or implementing a different feature.
+ */
+.highlight-video {
+    border: 2px solid red !important;
+}
+
+/* Optional debug styling - can be uncommented for testing */
+/*
+.highlight-video {
+    border: 2px solid red !important;
+}
+
+.filter-tube-visible {
+    border: 2px solid lime !important; 
+    display: revert !important;
+}
+*/
+
+/* --- Specific fixes for Mix card layout restoration --- */
+/* Preserve horizontal layout when making elements visible again */
+.yt-lockup-view-model-wiz.filter-tube-visible {
+    display: flex !important; /* Use flex instead of block for these specific mix elements */
+}
+
+/* Ensure content image and metadata maintain proper positioning */
+.filter-tube-visible .yt-lockup-view-model-wiz__content-image,
+.filter-tube-visible .yt-lockup-metadata-view-model-wiz {
+    display: block !important;
+}
+
+/* Fix for vertical watch card list renderer */
+ytd-vertical-watch-card-list-renderer.filter-tube-visible {
+    display: block !important;
+}
+
+/* Make sure horizontal layout is preserved */
+.yt-lockup-view-model-wiz--horizontal.filter-tube-visible {
+    display: flex !important;
+    flex-direction: row !important;
+}
+
+/* Force horizontal layout for watch cards */
+ytd-universal-watch-card-renderer.filter-tube-visible {
+    display: block !important;
+}
+
+/* Force content image to have proper width for horizontal layout */
+.yt-lockup-view-model-wiz--horizontal.filter-tube-visible .yt-lockup-view-model-wiz__content-image {
+    width: 50% !important;
+    flex-shrink: 0 !important;
+}
+
+/* Make sure metadata takes remaining space */
+.yt-lockup-view-model-wiz--horizontal.filter-tube-visible .yt-lockup-view-model-wiz__metadata {
+    flex-grow: 1 !important;
+    width: 50% !important;
+}
+
+/* --- Fix for shorts shelves layout --- */
+/* Ensure horizontal layout for shorts (reel shelves) */
+ytd-reel-shelf-renderer.filter-tube-visible #contents,
+ytd-reel-shelf-renderer.filter-tube-visible yt-horizontal-list-renderer {
+    display: block !important;
+    width: 100% !important;
+}
+
+ytd-reel-shelf-renderer.filter-tube-visible #items,
+ytd-reel-shelf-renderer.filter-tube-visible yt-horizontal-list-renderer #items {
+    display: flex !important;
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    gap: 16px !important;
+}
+
+/* Fix for shorts in search results */
+ytd-search ytd-reel-shelf-renderer.filter-tube-visible,
+ytd-search ytd-reel-item-renderer.filter-tube-visible,
+ytd-search ytm-shorts-lockup-view-model.filter-tube-visible {
+    display: block !important;
+    margin-bottom: 16px !important;
+}
+
+/* Target the shortsLockupViewModelHost elements to ensure they're not stacked vertically */
+.shortsLockupViewModelHost.filter-tube-visible {
+    display: inline-block !important;
+    vertical-align: top !important;
+    margin-right: 8px !important;
+    width: auto !important;
+}
+
+/* Fix for horizontal list scroll container */
+yt-horizontal-list-renderer.filter-tube-visible #scroll-container {
+    overflow-x: auto !important;
+}
+
+/* Force items inside shorts to maintain original layout */
+.shortsLockupViewModelHostThumbnailContainer.filter-tube-visible {
+    width: 200px !important;
+    height: 356px !important; /* Maintain aspect ratio */
+    margin-right: 8px !important;
+}

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FilterTube Dashboard</title>
+    <link rel="stylesheet" href="../css/design_tokens.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/tab-view.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Crimson+Pro:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <a href="https://filtertube.in" target="_blank" class="brand" style="text-decoration: none;">
+                <img src="../icons/icon-128.png" alt="FilterTube Logo" class="logo-icon">
+                <span class="brand-name">Filter<span class="brand-accent">Tube</span></span>
+            </a>
+
+            <ul class="nav-list">
+                <li class="nav-item active" data-tab="dashboard">
+                    <span class="nav-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                        </svg>
+                    </span>
+                    <span class="nav-label">Dashboard</span>
+                </li>
+                <li class="nav-item" data-tab="filters">
+                    <span class="nav-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                        </svg>
+                    </span>
+                    <span class="nav-label">Filters</span>
+                </li>
+                <li class="nav-item" data-tab="semantic">
+                    <span class="nav-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="2" y1="12" x2="22" y2="12"></line>
+                            <path
+                                d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
+                            </path>
+                        </svg>
+                    </span>
+                    <span class="nav-label">Semantic ML</span>
+                </li>
+                <li class="nav-item" data-tab="kids">
+                    <span class="nav-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4.5 9.5V4a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v5.5"></path>
+                            <path d="M2 20v-5h20v5"></path>
+                            <path d="M12 15v5"></path>
+                            <path d="M6 15v5"></path>
+                            <path d="M18 15v5"></path>
+                        </svg>
+                    </span>
+                    <span class="nav-label">Kids Mode</span>
+                </li>
+                <li class="nav-item" data-tab="settings">
+                    <span class="nav-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path
+                                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+                            </path>
+                        </svg>
+                    </span>
+                    <span class="nav-label">Settings</span>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <div class="version-info">v3.0.1</div>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="top-bar">
+                <h1 id="pageTitle">Dashboard</h1>
+                <div class="actions">
+                    <button id="themeToggle" class="icon-btn" title="Toggle Theme">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Views -->
+            <div id="viewContainer" class="view-container">
+
+                <!-- Dashboard View -->
+                <div id="dashboardView" class="view-section active">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="statHiddenToday">0</div>
+                            <div class="stat-label">Content Hidden Today</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="statActiveKeywords">0</div>
+                            <div class="stat-label">Active Keywords</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="statFilteredChannels">0</div>
+                            <div class="stat-label">Filtered Channels</div>
+                        </div>
+                        <div class="stat-card" title="Total duration of all videos hidden by your filters">
+                            <div class="stat-value" id="statSavedTime">0m</div>
+                            <div class="stat-label">Est. Time Saved</div>
+                        </div>
+                    </div>
+
+                    <div class="section-header">
+                        <h2>Quick Actions</h2>
+                    </div>
+                    <div class="quick-actions-grid">
+                        <button class="action-card" id="quickAddKeywordBtn">
+                            <span class="icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                            </span>
+                            <span class="label">Add Keyword</span>
+                        </button>
+
+                        <button class="action-card" id="quickAddChannelBtn">
+                            <span class="icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                            </span>
+                            <span class="label">Add Channel</span>
+                        </button>
+                        <button class="action-card" id="quickKidsModeBtn">
+                            <span class="icon">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M4.5 9.5V4a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v5.5"></path>
+                                    <path d="M2 20v-5h20v5"></path>
+                                    <path d="M12 15v5"></path>
+                                    <path d="M6 15v5"></path>
+                                    <path d="M18 15v5"></path>
+                                </svg>
+                            </span>
+                            <span class="label">Toggle Kids Mode</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filters View -->
+                <div id="filtersView" class="view-section">
+                    <!-- Tabs will be injected here by JavaScript -->
+                    <div id="filtersTabsContainer"></div>
+                </div>
+
+                <!-- Semantic View (Placeholder) -->
+                <div id="semanticView" class="view-section">
+                    <div class="empty-state-large">
+                        <div class="icon">
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="2" y1="12" x2="22" y2="12"></line>
+                                <path
+                                    d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
+                                </path>
+                            </svg>
+                        </div>
+                        <h2>Semantic ML Filtering</h2>
+                        <p>Coming Soon. Advanced AI-powered filtering running locally on your device.</p>
+                        <p class="sub-text">Privacy-first analysis of video titles, descriptions, and thumbnails.</p>
+                    </div>
+                </div>
+
+                <!-- Kids Mode View (Placeholder) -->
+                <div id="kidsView" class="view-section">
+                    <div class="empty-state-large">
+                        <div class="icon">
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4.5 9.5V4a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v5.5"></path>
+                                <path d="M2 20v-5h20v5"></path>
+                                <path d="M12 15v5"></path>
+                                <path d="M6 15v5"></path>
+                                <path d="M18 15v5"></path>
+                            </svg>
+                        </div>
+                        <h2>Kids Mode</h2>
+                        <p>Coming Soon. Create a safe, whitelisted environment for children.</p>
+                        <p class="sub-text">PIN-protected access and strict channel controls.</p>
+                    </div>
+                </div>
+
+                <!-- Settings View -->
+                <div id="settingsView" class="view-section">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>General Settings</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="empty-state">
+                                <p>Global settings coming soon.</p>
+                                <p class="sub-text">Import/Export and other advanced options will appear here.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+    <script src="../js/settings_shared.js"></script>
+    <script src="../js/ui_components.js"></script>
+    <script src="../js/state_manager.js"></script>
+    <script src="../js/render_engine.js"></script>
+    <script src="../js/tab-view.js"></script>
+</body>
+
+</html>

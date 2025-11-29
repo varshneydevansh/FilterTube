@@ -1,0 +1,74 @@
+{
+    "manifest_version": 3,
+    "name": "FilterTube",
+    "description": "Restore peace of mind to your digital video experience.",
+    "version": "3.0.3",
+    "minimum_chrome_version": "111",
+    "developer": {
+        "name": "Devansh Varshney",
+        "url": "https://filtertube.in"
+    },
+    "background": {
+        "service_worker": "js/background.js"
+    },
+    "action": {
+        "default_popup": "html/popup.html",
+        "default_icon": {
+            "16": "icons/icon-16.png",
+            "48": "icons/icon-48.png",
+            "128": "icons/icon-128.png"
+        }
+    },
+    "permissions": [
+        "storage",
+        "activeTab",
+        "scripting",
+        "tabs"
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                "*://*.youtube.com/*",
+                "*://*.youtubekids.com/*"
+            ],
+            "js": [
+                "js/seed.js"
+            ],
+            "run_at": "document_start"
+        },
+        {
+            "matches": [
+                "*://*.youtube.com/*",
+                "*://*.youtubekids.com/*"
+            ],
+            "js": [
+                "js/content_bridge.js"
+            ],
+            "run_at": "document_start"
+        }
+    ],
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "js/injector.js",
+                "js/filter_logic.js",
+                "js/seed.js"
+            ],
+            "matches": [
+                "*://*.youtube.com/*",
+                "*://*.youtubekids.com/*"
+            ]
+        }
+    ],
+    "icons": {
+        "16": "icons/icon-16.png",
+        "32": "icons/icon-32.png",
+        "48": "icons/icon-48.png",
+        "128": "icons/icon-128.png"
+    },
+    "host_permissions": [
+        "*://*.youtube.com/*",
+        "*://*.youtube-nocookie.com/*",
+        "*://*.youtubekids.com/*"
+    ]
+}

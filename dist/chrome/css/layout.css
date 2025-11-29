@@ -1,0 +1,803 @@
+/*
+ * layout.css
+ *
+ * CSS responsible for fixing layout issues after filtering.
+ * This file contains only the styles related to positioning and layout.
+ */
+
+/* --- Fix for channel page layout --- */
+/* Ensure horizontal layout for videos on channel pages */
+ytd-two-column-browse-results-renderer #items.ytd-grid-renderer {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important;
+    grid-gap: 16px !important;
+}
+
+/* Fix for individual grid items on channel pages */
+ytd-grid-video-renderer.filter-tube-visible {
+    width: 100% !important;
+    margin-right: 0 !important;
+    display: block !important;
+}
+
+/* Fix for channel videos displaying vertically instead of in grid */
+ytd-browse[page-subtype="channels"] ytd-rich-grid-renderer,
+ytd-browse[role="main"] ytd-rich-grid-renderer,
+ytd-browse[page-subtype="channels"] #items,
+ytd-browse[role="main"] #items,
+ytd-browse:not([page-subtype="channels"]) ytd-rich-grid-renderer,
+ytd-browse:not([page-subtype="channels"]) ytd-rich-grid-row-renderer,
+ytd-browse[page-subtype="subscriptions"] ytd-rich-grid-renderer {
+    display: block !important;
+}
+
+ytd-browse[page-subtype="channels"] #contents.ytd-rich-grid-renderer,
+ytd-browse[role="main"] #contents.ytd-rich-grid-renderer,
+ytd-browse:not([page-subtype="channels"]) #contents.ytd-rich-grid-renderer,
+ytd-browse[page-subtype="subscriptions"] #contents.ytd-rich-grid-renderer,
+ytd-search #contents.ytd-section-list-renderer {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important;
+    grid-gap: 16px !important;
+}
+
+/* Ensure proper layout for channel videos in grid */
+ytd-browse[page-subtype="channels"] ytd-rich-item-renderer.filter-tube-visible,
+ytd-browse[role="main"] ytd-rich-item-renderer.filter-tube-visible,
+ytd-browse:not([page-subtype="channels"]) ytd-rich-item-renderer.filter-tube-visible,
+ytd-browse[page-subtype="subscriptions"] ytd-rich-item-renderer.filter-tube-visible,
+ytd-search ytd-video-renderer.filter-tube-visible {
+    width: 100% !important;
+    margin: 0 !important;
+    display: block !important;
+}
+
+/* Force grid for search pages */
+ytd-search ytd-item-section-renderer.ytd-section-list-renderer {
+    margin: 0 !important;
+}
+
+/* Fix for YouTube search results layout */
+ytd-search #primary > ytd-section-list-renderer {
+    max-width: 100% !important;
+}
+
+/* Ensure shelf items display horizontally */
+ytd-shelf-renderer #items,
+ytd-horizontal-card-list-renderer #items {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    gap: 16px !important;
+}
+
+/* --- Specific fixes for Mix card layout restoration --- */
+/* Preserve horizontal layout when making elements visible again */
+.yt-lockup-view-model-wiz.filter-tube-visible {
+    display: flex !important; /* Use flex instead of block for these specific mix elements */
+}
+
+/* Ensure content image and metadata maintain proper positioning */
+.filter-tube-visible .yt-lockup-view-model-wiz__content-image,
+.filter-tube-visible .yt-lockup-metadata-view-model-wiz {
+    display: block !important;
+}
+
+/* Fix for vertical watch card list renderer */
+ytd-vertical-watch-card-list-renderer.filter-tube-visible {
+    display: block !important;
+}
+
+/* Make sure horizontal layout is preserved */
+.yt-lockup-view-model-wiz--horizontal.filter-tube-visible {
+    display: flex !important;
+    flex-direction: row !important;
+}
+
+/* Force horizontal layout for watch cards */
+ytd-universal-watch-card-renderer.filter-tube-visible {
+    display: block !important;
+}
+
+/* Force content image to have proper width for horizontal layout */
+.yt-lockup-view-model-wiz--horizontal.filter-tube-visible .yt-lockup-view-model-wiz__content-image {
+    width: 50% !important;
+    flex-shrink: 0 !important;
+}
+
+/* Make sure metadata takes remaining space */
+.yt-lockup-view-model-wiz--horizontal.filter-tube-visible .yt-lockup-view-model-wiz__metadata {
+    flex-grow: 1 !important;
+    width: 50% !important;
+}
+
+/* --- Fix for shorts shelves layout --- */
+/* Ensure horizontal layout for shorts (reel shelves) */
+ytd-reel-shelf-renderer.filter-tube-visible {
+    display: block !important;
+    width: 100% !important;
+    margin-bottom: 24px !important;
+    overflow: visible !important;
+}
+
+ytd-reel-shelf-renderer.filter-tube-visible #contents,
+ytd-reel-shelf-renderer.filter-tube-visible yt-horizontal-list-renderer {
+    display: block !important;
+    width: 100% !important;
+}
+
+ytd-reel-shelf-renderer.filter-tube-visible yt-horizontal-list-renderer #scroll-container {
+    overflow-x: auto !important;
+}
+
+ytd-reel-shelf-renderer.filter-tube-visible #items,
+ytd-reel-shelf-renderer.filter-tube-visible yt-horizontal-list-renderer #items {
+    display: flex !important;
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    gap: 8px !important;
+    transform: none !important; /* Remove any transform that could break layout */
+    scroll-snap-type: x mandatory !important;
+}
+
+/* Fix for shorts items */
+.shortsLockupViewModelHost.filter-tube-visible,
+ytm-shorts-lockup-view-model-v2.filter-tube-visible,
+ytm-shorts-lockup-view-model.filter-tube-visible {
+    display: inline-block !important;
+    vertical-align: top !important;
+    margin-right: 8px !important;
+    width: auto !important;
+    scroll-snap-align: start !important;
+}
+
+/* Fix for shorts thumbnails */
+.shortsLockupViewModelHostThumbnailContainer.filter-tube-visible,
+.shortsLockupViewModelHostThumbnailContainerRounded.filter-tube-visible {
+    display: block !important;
+    width: 176px !important; /* YouTube's original width for shorts thumbnails */
+    height: 312px !important; /* Maintain aspect ratio */
+    border-radius: 12px !important;
+    overflow: hidden !important;
+}
+
+/* Fix for shorts metadata */
+.shortsLockupViewModelHostOutsideMetadata.filter-tube-visible,
+.shortsLockupViewModelHostMetadataRounded.filter-tube-visible {
+    display: block !important;
+    width: 176px !important; /* Match thumbnail width */
+    margin-top: 8px !important;
+    padding: 0 !important;
+}
+
+/* Fix arrow buttons in shorts carousel */
+ytd-reel-shelf-renderer.filter-tube-visible #left-arrow,
+ytd-reel-shelf-renderer.filter-tube-visible #right-arrow {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 2 !important;
+    position: absolute !important;
+}
+
+ytd-reel-shelf-renderer.filter-tube-visible #left-arrow {
+    left: 0 !important;
+}
+
+ytd-reel-shelf-renderer.filter-tube-visible #right-arrow {
+    right: 0 !important;
+}
+
+/* Fix specifically for shorts in search results */
+ytd-search ytd-reel-item-renderer.filter-tube-visible,
+ytd-search ytm-shorts-lockup-view-model.filter-tube-visible,
+ytd-search ytd-reel-video-renderer.filter-tube-visible {
+    width: auto !important;
+    margin-right: 8px !important;
+    display: inline-block !important;
+}
+
+ytd-search ytd-reel-item-renderer.filter-tube-visible ytd-thumbnail,
+ytd-search ytd-reel-video-renderer.filter-tube-visible ytd-thumbnail {
+    width: 176px !important;
+    height: 312px !important;
+    margin-right: 0 !important;
+}
+
+/* Force shorts thumbnails to be proper size on search pages */
+ytd-search ytd-thumbnail[size="custom"],
+ytd-search ytd-reel-item-renderer ytd-thumbnail[size="custom"],
+ytd-search ytd-reel-video-renderer ytd-thumbnail[size="custom"] {
+    width: 176px !important;
+    height: 312px !important;
+}
+
+/* --- Fix for search results layout --- */
+/* Restore original dimensions and layout for search result videos */
+ytd-search ytd-video-renderer.filter-tube-visible,
+ytd-search ytd-video-renderer.filter-tube-visible #dismissible {
+    width: 100% !important;
+    max-width: 862px !important; /* YouTube's original max width */
+    margin-bottom: 16px !important;
+    display: flex !important; /* Force flex display for proper layout */
+}
+
+/* Ensure thumbnails maintain original size */
+ytd-search ytd-video-renderer.filter-tube-visible ytd-thumbnail {
+    width: 360px !important;
+    min-width: 360px !important; /* Prevent shrinking */
+    height: 202px !important;
+    margin-right: 16px !important;
+    flex: 0 0 auto !important;
+}
+
+/* Fix text wrapper layout */
+ytd-search ytd-video-renderer.filter-tube-visible .text-wrapper {
+    flex: 1 1 auto !important;
+    padding-left: 16px !important;
+    display: block !important;
+    align-self: flex-start !important; /* Align to top */
+}
+
+/* Ensure proper layout for search page grid */
+ytd-search #contents.ytd-section-list-renderer {
+    display: block !important; /* Override the grid layout for search results */
+    max-width: 1096px !important; /* YouTube's original max width */
+}
+
+/* Ensure title and details have proper width */
+ytd-search ytd-video-renderer.filter-tube-visible #video-title,
+ytd-search ytd-video-renderer.filter-tube-visible #meta {
+    width: 100% !important;
+    max-width: calc(100% - 16px) !important; 
+}
+
+/* Ensure search result dismissible container has proper layout */
+ytd-search ytd-video-renderer.filter-tube-visible #dismissible {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: flex-start !important;
+}
+
+/* --- Fix for watch cards layout --- */
+/* Ensure proper layout for watch card compact videos */
+ytd-watch-card-compact-video-renderer.filter-tube-visible {
+    display: flex !important;
+    flex-direction: row !important;
+    width: 100% !important;
+    margin-bottom: 8px !important;
+    align-items: flex-start !important;
+}
+
+/* Fix thumbnail size for watch card compact videos */
+ytd-watch-card-compact-video-renderer.filter-tube-visible ytd-thumbnail {
+    width: 120px !important;
+    min-width: 120px !important;
+    height: 68px !important; /* Fixed height instead of auto */
+    margin-right: 8px !important;
+    flex: 0 0 auto !important;
+    display: block !important; /* Ensure display block */
+}
+
+/* Make sure inner thumbnail elements are visible */
+ytd-watch-card-compact-video-renderer.filter-tube-visible ytd-thumbnail a,
+ytd-watch-card-compact-video-renderer.filter-tube-visible ytd-thumbnail yt-image,
+ytd-watch-card-compact-video-renderer.filter-tube-visible ytd-thumbnail img {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+}
+
+/* Fix text wrapper for watch card compact videos */
+ytd-watch-card-compact-video-renderer.filter-tube-visible .text-wrapper {
+    flex: 1 1 auto !important;
+    padding-left: 8px !important;
+    display: block !important;
+    align-self: flex-start !important;
+}
+
+/* Fix for the time overlay */
+ytd-watch-card-compact-video-renderer.filter-tube-visible ytd-thumbnail ytd-thumbnail-overlay-time-status-renderer {
+    display: block !important;
+}
+
+/* Fix for vertical watch card list container */
+ytd-vertical-watch-card-list-renderer.filter-tube-visible {
+    display: block !important;
+    width: 100% !important;
+    margin-bottom: 16px !important;
+}
+
+ytd-vertical-watch-card-list-renderer.filter-tube-visible #items {
+    display: block !important;
+    width: 100% !important;
+}
+
+/* Fix for watch card section sequence renderer */
+ytd-watch-card-section-sequence-renderer.filter-tube-visible {
+    display: block !important;
+    width: 100% !important;
+    margin-bottom: 16px !important;
+}
+
+ytd-watch-card-section-sequence-renderer.filter-tube-visible #lists {
+    display: block !important;
+    width: 100% !important;
+}
+
+/* Fix for watch card rich header */
+ytd-watch-card-rich-header-renderer.filter-tube-visible {
+    display: block !important;
+    width: 100% !important;
+    margin-bottom: 12px !important;
+}
+
+ytd-watch-card-rich-header-renderer.filter-tube-visible #container {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+}
+
+ytd-watch-card-rich-header-renderer.filter-tube-visible #body {
+    flex: 1 1 auto !important;
+}
+
+/* Fix for universal watch card renderer */
+ytd-universal-watch-card-renderer.filter-tube-visible {
+    display: block !important;
+    width: 100% !important;
+    max-width: 862px !important;
+    margin-bottom: 24px !important;
+}
+
+/* Fix for hero video title container */
+ytd-watch-card-hero-video-renderer.filter-tube-visible .title-container {
+    width: 100% !important;
+    padding: 12px !important;
+}
+
+ytd-watch-card-hero-video-renderer.filter-tube-visible #watch-card-title {
+    font-size: 16px !important;
+    line-height: 22px !important;
+    margin-bottom: 4px !important;
+}
+
+/* Make sure parent container is hidden if children don't match filter */
+ytd-universal-watch-card-renderer:not(.filter-tube-visible) ytd-watch-card-rich-header-renderer,
+ytd-universal-watch-card-renderer:not(.filter-tube-visible) ytd-watch-card-section-sequence-renderer,
+ytd-universal-watch-card-renderer:not(.filter-tube-visible) ytd-vertical-watch-card-list-renderer,
+ytd-universal-watch-card-renderer:not(.filter-tube-visible) ytd-watch-card-hero-video-renderer {
+    display: none !important;
+}
+
+/* Make sure parent container is visible if children match filter */
+ytd-universal-watch-card-renderer ytd-watch-card-rich-header-renderer.filter-tube-visible,
+ytd-universal-watch-card-renderer ytd-watch-card-section-sequence-renderer.filter-tube-visible {
+    display: block !important;
+}
+
+/* Fix for shorts videos on home page to ensure consistent size */
+.shortsLockupViewModelHost.filter-tube-visible {
+    display: inline-block !important;
+    vertical-align: top !important;
+    margin-right: 8px !important;
+    width: 176px !important; /* Fixed width for all shorts */
+    scroll-snap-align: start !important;
+}
+
+/* Ensure shorts thumbnails always show */
+.shortsLockupViewModelHostThumbnail {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+}
+
+/* Make sure shorts shelf on homepage always has consistent layout */
+ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer {
+    width: 176px !important;
+    margin-right: 8px !important;
+}
+
+ytd-rich-shelf-renderer[is-shorts] #items,
+ytd-rich-shelf-renderer[is-shorts] #contents {
+    display: flex !important;
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    gap: 8px !important;
+    transform: none !important;
+}
+
+/* Force inline display for all shorts items */
+ytm-shorts-lockup-view-model-v2,
+ytm-shorts-lockup-view-model {
+    display: inline-block !important;
+    width: 176px !important;
+}
+
+/* ---- Fix for shorts on home page ---- */
+/* Main shorts shelf container */
+ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[is-shorts]) {
+    display: block !important;
+    width: 100% !important;
+    margin-bottom: 24px !important;
+}
+
+/* Ensure shorts shelf displays horizontally */
+ytd-rich-section-renderer ytd-rich-shelf-renderer[is-shorts] {
+    display: block !important;
+    width: 100% !important;
+}
+
+ytd-rich-section-renderer ytd-rich-shelf-renderer[is-shorts] #dismissible {
+    display: block !important;
+    width: 100% !important;
+}
+
+ytd-rich-section-renderer ytd-rich-shelf-renderer[is-shorts] #contents {
+    display: flex !important;
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    gap: 8px !important;
+    transform: none !important;
+    width: 100% !important;
+}
+
+/* Fix the rich item renderers that contain shorts */
+ytd-rich-section-renderer ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer {
+    width: 176px !important;
+    min-width: 176px !important;
+    max-width: 176px !important;
+    margin-right: 8px !important;
+    display: inline-block !important;
+    flex-shrink: 0 !important;
+    vertical-align: top !important;
+}
+
+/* Ensure shorts containers have proper styling */
+ytd-rich-section-renderer .shortsLockupViewModelHost {
+    width: 176px !important;
+    display: inline-block !important;
+    vertical-align: top !important;
+}
+
+ytd-rich-section-renderer .shortsLockupViewModelHostThumbnailContainer,
+ytd-rich-section-renderer .shortsLockupViewModelHostThumbnailContainerRounded {
+    width: 176px !important;
+    height: 312px !important;
+    display: block !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+}
+
+/* ---- Direct targeting for shorts on home page ---- */
+/* Direct targeting for shorts containers */
+ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[is-shorts]),
+ytd-rich-section-renderer ytd-rich-shelf-renderer[is-shorts],
+ytd-rich-shelf-renderer[is-shorts] {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-bottom: 24px !important;
+}
+
+/* Target the content directly in shorts shelf */
+ytd-rich-shelf-renderer[is-shorts] #dismissible,
+ytd-rich-shelf-renderer[is-shorts] #contents {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    flex-direction: row !important;
+    transform: none !important;
+}
+
+/* Target the individual shorts items */
+ytd-rich-shelf-renderer[is-shorts] #contents ytd-rich-item-renderer {
+    display: inline-block !important;
+    width: 176px !important;
+    min-width: 176px !important;
+    max-width: 176px !important;
+    flex: 0 0 auto !important;
+    margin-right: 8px !important;
+    position: relative !important;
+}
+
+/* IMPORTANT: Hide filtered shorts completely - higher specificity to override above rules */
+ytd-rich-shelf-renderer[is-shorts] #contents ytd-rich-item-renderer:not(.filter-tube-visible),
+ytd-rich-shelf-renderer[is-shorts] #contents ytd-rich-item-renderer.filtertube-hidden,
+ytd-rich-section-renderer ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer:not(.filter-tube-visible),
+ytd-rich-section-renderer ytd-rich-shelf-renderer[is-shorts] ytd-rich-item-renderer.filtertube-hidden {
+    display: none !important;
+    width: 0 !important;
+    min-width: 0 !important;
+    max-width: 0 !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    max-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    position: absolute !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    flex: 0 0 0 !important;
+}
+
+/* Hide filtered shorts in mobile/grid shelf format (ytGridShelfViewModelGridShelfItem) */
+.ytGridShelfViewModelGridShelfItem.filtertube-hidden,
+.ytGridShelfViewModelGridShelfItem:not(.filter-tube-visible) {
+    display: none !important;
+    width: 0 !important;
+    min-width: 0 !important;
+    max-width: 0 !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    max-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    position: absolute !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* Direct targeting for shorts models */
+.shortsLockupViewModelHost,
+ytm-shorts-lockup-view-model-v2,
+ytm-shorts-lockup-view-model {
+    display: inline-block !important;
+    width: 176px !important;
+    height: auto !important;
+}
+
+/* Hide filtered shorts lockup models */
+.shortsLockupViewModelHost.filtertube-hidden,
+.shortsLockupViewModelHost:not(.filter-tube-visible),
+ytm-shorts-lockup-view-model-v2.filtertube-hidden,
+ytm-shorts-lockup-view-model-v2:not(.filter-tube-visible),
+ytm-shorts-lockup-view-model.filtertube-hidden,
+ytm-shorts-lockup-view-model:not(.filter-tube-visible) {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    position: absolute !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* Direct targeting for shorts thumbnails */
+.shortsLockupViewModelHostThumbnailContainer,
+.shortsLockupViewModelHostThumbnailContainerRounded,
+.shortsLockupViewModelHostThumbnailContainerAspectRatioTwoByThree {
+    display: block !important;
+    width: 176px !important;
+    height: 312px !important;
+    border-radius: 12px !important;
+    overflow: hidden !important;
+}
+
+/* Direct targeting for shorts thumbnails images */
+.shortsLockupViewModelHostThumbnail {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+}
+
+/* Direct targeting for shorts metadata */
+.shortsLockupViewModelHostOutsideMetadata,
+.shortsLockupViewModelHostMetadataRounded {
+    display: block !important;
+    width: 100% !important;
+}
+
+/* ---- More aggressive fix for Mix/Playlist elements ---- */
+/* Directly hide elements that aren't visible - with zero dimension */
+ytd-rich-item-renderer:has(.yt-lockup-view-model-wiz):not(.filter-tube-visible),
+ytd-rich-item-renderer:has(.yt-lockup-metadata-view-model-wiz):not(.filter-tube-visible),
+ytd-rich-item-renderer:has(ytd-radio-renderer):not(.filter-tube-visible),
+ytd-rich-item-renderer:has(ytd-mix-renderer):not(.filter-tube-visible),
+ytd-rich-item-renderer:has(ytd-playlist-renderer):not(.filter-tube-visible),
+ytd-radio-renderer:not(.filter-tube-visible),
+ytd-mix-renderer:not(.filter-tube-visible),
+ytd-playlist-renderer:not(.filter-tube-visible),
+.yt-lockup-view-model-wiz:not(.filter-tube-visible),
+.yt-lockup-metadata-view-model-wiz:not(.filter-tube-visible) {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    max-width: 0 !important;
+    max-height: 0 !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    overflow: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    position: absolute !important;
+    visibility: hidden !important;
+}
+
+/* Support for grid containers - ensure grid-auto-flow is dense to fill gaps */
+ytd-browse[page-subtype="home"] #contents.ytd-rich-grid-renderer,
+ytd-browse #contents.ytd-rich-grid-renderer,
+ytd-browse[page-subtype="subscriptions"] #contents.ytd-rich-grid-renderer {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important;
+    grid-gap: 16px !important;
+    grid-auto-flow: dense !important;
+}
+
+/* ---- Fix for rich grid items to prevent empty spaces ---- */
+ytd-rich-grid-renderer #contents ytd-rich-item-renderer:not(.filter-tube-visible) {
+    display: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: 0 !important;
+    width: 0 !important;
+    overflow: hidden !important;
+}
+
+/* ---- Fix for hidden elements to prevent blank spaces ---- */
+/* Any element that doesn't have filter-tube-visible should be completely removed from the flow */
+ytd-video-renderer:not(.filter-tube-visible),
+ytd-grid-video-renderer:not(.filter-tube-visible),
+ytd-rich-item-renderer:not(.filter-tube-visible),
+ytd-compact-video-renderer:not(.filter-tube-visible),
+ytd-radio-renderer:not(.filter-tube-visible),
+ytd-mix-renderer:not(.filter-tube-visible),
+ytd-playlist-renderer:not(.filter-tube-visible),
+ytd-shelf-renderer:not(.filter-tube-visible),
+ytd-horizontal-card-list-renderer:not(.filter-tube-visible),
+ytd-universal-watch-card-renderer:not(.filter-tube-visible),
+ytd-channel-renderer:not(.filter-tube-visible),
+ytd-grid-channel-renderer:not(.filter-tube-visible),
+ytd-reel-item-renderer:not(.filter-tube-visible),
+ytd-reel-shelf-renderer:not(.filter-tube-visible) {
+    display: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    max-height: 0 !important;
+    width: 0 !important;
+    min-width: 0 !important;
+    max-width: 0 !important;
+    overflow: hidden !important;
+    position: absolute !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* Special handling for grid containers to ensure proper flow */
+ytd-browse #contents.ytd-rich-grid-renderer {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important;
+    grid-gap: 16px !important;
+    grid-auto-flow: dense !important; /* This helps fill in gaps */
+}
+
+/* ---- Fix for Shorts in YouTube Homepage ---- */
+/* Make shorts fit within YouTube's content width instead of full viewport width */
+ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[is-shorts]) {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+}
+
+/* Section header and controls */
+ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[is-shorts]) #header {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+    box-sizing: border-box !important;
+}
+
+/* Shelf styles */
+ytd-rich-section-renderer ytd-rich-shelf-renderer[is-shorts],
+ytd-rich-shelf-renderer[is-shorts] {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+}
+
+/* Contents container */
+ytd-rich-shelf-renderer[is-shorts] #dismissible,
+ytd-rich-shelf-renderer[is-shorts] #contents {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    flex-direction: row !important;
+    transform: none !important;
+    scroll-padding: 24px !important;
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+    box-sizing: border-box !important;
+}
+
+/* ---- Extreme solution for Mix/Playlist thumbnails ---- */
+/* Force immediate parent element to be display:none to cut off all content */
+ytd-rich-item-renderer:has(.yt-lockup-view-model-wiz):not(.filter-tube-visible),
+ytd-rich-item-renderer:has(.yt-lockup-metadata-view-model-wiz):not(.filter-tube-visible),
+ytd-rich-item-renderer:has(ytd-radio-renderer):not(.filter-tube-visible),
+ytd-rich-item-renderer:has(ytd-mix-renderer):not(.filter-tube-visible),
+ytd-rich-item-renderer:has(ytd-playlist-renderer):not(.filter-tube-visible) {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    position: absolute !important;
+    pointer-events: none !important;
+    clip: rect(0, 0, 0, 0) !important;
+    clip-path: inset(50%) !important;
+}
+
+/* Target direct mix components with force-display: none */
+ytd-radio-renderer:not(.filter-tube-visible),
+ytd-mix-renderer:not(.filter-tube-visible),
+ytd-playlist-renderer:not(.filter-tube-visible),
+.yt-lockup-view-model-wiz:not(.filter-tube-visible),
+.yt-lockup-metadata-view-model-wiz:not(.filter-tube-visible) {
+    display: none !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+/* Aggressive specific targeting for mix thumbnails */
+ytd-rich-item-renderer:not(.filter-tube-visible) a[href*="&list="],
+ytd-rich-item-renderer:not(.filter-tube-visible) a[href*="&start_radio="],
+ytd-rich-item-renderer:not(.filter-tube-visible) .yt-lockup-view-model-wiz__content-image,
+ytd-rich-item-renderer:not(.filter-tube-visible) yt-collection-thumbnail-view-model,
+ytd-rich-item-renderer:not(.filter-tube-visible) .yt-collection-thumbnail-view-model,
+ytd-rich-item-renderer:not(.filter-tube-visible) .collections-stack-wiz,
+ytd-rich-item-renderer:not(.filter-tube-visible) .collections-stack-wiz__collection-stack1,
+ytd-rich-item-renderer:not(.filter-tube-visible) .collections-stack-wiz__collection-stack2,
+ytd-rich-item-renderer:not(.filter-tube-visible) yt-thumbnail-view-model,
+ytd-rich-item-renderer:not(.filter-tube-visible) .yt-thumbnail-view-model {
+    display: none !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    height: 0 !important;
+    opacity: 0 !important;
+}
+
+/* Catch-all for ALL mix/playlist images - most aggressive approach */
+ytd-rich-item-renderer:not(.filter-tube-visible) img,
+ytd-rich-item-renderer:not(.filter-tube-visible) picture,
+ytd-radio-renderer:not(.filter-tube-visible) img,
+ytd-mix-renderer:not(.filter-tube-visible) img,
+ytd-playlist-renderer:not(.filter-tube-visible) img,
+.yt-lockup-view-model-wiz:not(.filter-tube-visible) img,
+.yt-lockup-metadata-view-model-wiz:not(.filter-tube-visible) img {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    position: absolute !important;
+    pointer-events: none !important;
+    width: 0 !important;
+    height: 0 !important;
+} 

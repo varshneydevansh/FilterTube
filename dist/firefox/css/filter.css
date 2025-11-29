@@ -1,0 +1,74 @@
+/*
+ * filter.css
+ *
+ * CSS responsible for hiding/showing filtered elements.
+ * This file contains only the styles related to visibility.
+ */
+
+/* --- Initial Hiding Rule --- */
+/* Apply display:none immediately to all potential containers */
+ytd-video-renderer,
+ytd-compact-video-renderer,
+ytd-grid-video-renderer,
+ytd-rich-item-renderer,
+ytd-watch-card-compact-video-renderer,
+ytd-channel-video-player-renderer,
+ytd-shelf-renderer,
+ytd-reel-shelf-renderer,
+ytd-horizontal-card-list-renderer,
+ytd-universal-watch-card-renderer,
+ytd-radio-renderer,
+ytd-channel-renderer,
+ytd-grid-channel-renderer,
+ytd-reel-item-renderer,
+ytm-shorts-lockup-view-model,
+ytd-movie-renderer,
+ytd-mix-renderer,
+ytd-reel-video-renderer,
+ytd-search-refinement-card-renderer,
+ytd-watch-card-rich-header-renderer,
+ytd-watch-card-section-sequence-renderer,
+yt-lockup-metadata-view-model,
+.yt-lockup-metadata-view-model-wiz,
+.yt-lockup-view-model-wiz {
+    display: none !important; /* Hide by default */
+}
+
+/* --- Reveal Rule --- */
+/* Class added by JS to elements that should be visible */
+.filter-tube-visible {
+    display: block !important; /* Explicitly set display (common for list items) */
+    margin-bottom: 16px !important; /* Add margin to restore vertical spacing */
+}
+
+/* Ensure parent-child hiding relationships work properly */
+ytd-universal-watch-card-renderer:not(.filter-tube-visible) ytd-watch-card-section-sequence-renderer,
+ytd-universal-watch-card-renderer:not(.filter-tube-visible) ytd-watch-card-rich-header-renderer,
+.yt-lockup-view-model-wiz:not(.filter-tube-visible) .yt-lockup-metadata-view-model-wiz,
+.yt-lockup-view-model-wiz:not(.filter-tube-visible) .yt-lockup-view-model-wiz__content-image,
+.yt-lockup-view-model-wiz:not(.filter-tube-visible) yt-collection-thumbnail-view-model {
+    display: none !important;
+}
+
+/* Legacy/Fallback Hiding Rule */
+.hidden-video {
+    display: none !important;
+}
+
+/* --- Comment Filtering --- */
+/* Hide comments based on user preferences */
+.filter-tube-hidden-comment {
+    display: none !important;
+}
+
+/* Hide entire comment section */
+.filter-tube-hide-all-comments #comments,
+.filter-tube-hide-all-comments ytd-comments,
+.filter-tube-hide-all-comments #sections[id="sections"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    pointer-events: none !important;
+}
