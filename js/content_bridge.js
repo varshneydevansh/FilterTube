@@ -2200,21 +2200,64 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
 
     console.log('FilterTube: Initial channel info:', initialChannelInfo);
 
-    // Detect menu structure type (new vs old) - COMPREHENSIVE DETECTION
-    const newMenuList = dropdown.querySelector('yt-list-view-model');
-    const oldMenuList = dropdown.querySelector(
-        'tp-yt-paper-listbox, ' +
-        'ytd-menu-popup-renderer, ' +
-        'ytd-menu-service-item-renderer, ' +
-        '#items.ytd-menu-popup-renderer, ' +
-        '#items.style-scope.ytd-menu-popup-renderer'
-    );
+    // Wait for menu to be populated by YouTube (with timeout)
+    const waitForMenu = () => {
+        return new Promise((resolve) => {
+            const checkMenu = () => {
+                // Detect menu structure type (new vs old) - COMPREHENSIVE DETECTION
+                const newMenuList = dropdown.querySelector('yt-list-view-model');
+                const oldMenuList = dropdown.querySelector(
+                    'tp-yt-paper-listbox, ' +
+                    'ytd-menu-popup-renderer, ' +
+                    'ytd-menu-service-item-renderer, ' +
+                    '#items.ytd-menu-popup-renderer, ' +
+                    '#items.style-scope.ytd-menu-popup-renderer'
+                );
 
-    // Debug: Log what we found
-    console.log('FilterTube: Menu detection - newMenuList:', !!newMenuList, 'oldMenuList:', !!oldMenuList);
-    if (!newMenuList && !oldMenuList) {
-        console.log('FilterTube: Dropdown HTML:', dropdown.innerHTML.substring(0, 500));
-    }
+                if (newMenuList || oldMenuList) {
+                    console.log('FilterTube: Menu detected - newMenuList:', !!newMenuList, 'oldMenuList:', !!oldMenuList);
+                    resolve({ newMenuList, oldMenuList });
+                    return true;
+                }
+                return false;
+            };
+
+            // Try immediately first
+            if (checkMenu()) return;
+
+            // If not found, observe for menu to be added
+            console.log('FilterTube: Menu not ready, waiting for YouTube to populate...');
+            let attempts = 0;
+            const maxAttempts = 20; // 2 seconds max wait
+
+            const observer = new MutationObserver(() => {
+                attempts++;
+                if (checkMenu()) {
+                    observer.disconnect();
+                } else if (attempts >= maxAttempts) {
+                    console.warn('FilterTube: Menu not populated after waiting, giving up');
+                    console.log('FilterTube: Dropdown HTML:', dropdown.innerHTML.substring(0, 500));
+                    observer.disconnect();
+                    resolve({ newMenuList: null, oldMenuList: null });
+                }
+            });
+
+            observer.observe(dropdown, { childList: true, subtree: true });
+
+            // Also set a timeout as backup
+            setTimeout(() => {
+                observer.disconnect();
+                const result = checkMenu();
+                if (!result) {
+                    console.warn('FilterTube: Timeout waiting for menu');
+                    resolve({ newMenuList: null, oldMenuList: null });
+                }
+            }, 2000);
+        });
+    };
+
+    // Wait for menu to be ready
+    const { newMenuList, oldMenuList } = await waitForMenu();
 
     // IMMEDIATELY inject menu item with initial info (instant UI feedback)
     if (newMenuList) {
@@ -2224,7 +2267,7 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
         console.log('FilterTube: Detected OLD menu structure - injecting immediately');
         injectIntoOldMenu(oldMenuList, initialChannelInfo, videoCard);
     } else {
-        console.log('FilterTube: Could not detect menu structure');
+        console.log('FilterTube: Could not detect menu structure after waiting');
         return;
     }
 
