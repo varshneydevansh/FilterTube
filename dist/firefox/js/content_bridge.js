@@ -1999,10 +1999,26 @@ async function fetchChannelFromShortsUrl(videoId) {
             }
 
             // Method 3: Extract from page owner link
-            const ownerLinkMatch = html.match(/<link itemprop="url" href="https?:\/\/www\.youtube\.com\/@([\w-]+)">/);
+            const ownerLinkMatch = html.match(/<link itemprop="url" href="https?:\/\/www\.youtube\.com\/@([\w.-]+)">/);
             if (ownerLinkMatch) {
                 const handle = `@${ownerLinkMatch[1]}`;
                 console.log('FilterTube: Found channel in owner link:', handle);
+                return { handle, name: '' };
+            }
+
+            // Method 4: Extract from channel bar link (more flexible)
+            const channelBarMatch = html.match(/href="\/@([\w.-]+)\/shorts"/);
+            if (channelBarMatch) {
+                const handle = `@${channelBarMatch[1]}`;
+                console.log('FilterTube: Found channel in channel bar link:', handle);
+                return { handle, name: '' };
+            }
+
+            // Method 5: Extract from any @handle link (handling both /shorts and direct links)
+            const anyHandleMatch = html.match(/href="\/@([\w.-]+)(?:\/shorts|")/);
+            if (anyHandleMatch) {
+                const handle = `@${anyHandleMatch[1]}`;
+                console.log('FilterTube: Found channel in href attribute:', handle);
                 return { handle, name: '' };
             }
 
@@ -2625,16 +2641,23 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             if (videoCard) {
                 console.log('FilterTube: Hiding video card immediately');
 
-                // For shorts, find the parent ytd-rich-item-renderer container
+                // For shorts, find the parent container
                 // For regular videos, the videoCard itself is usually the right container
                 let containerToHide = videoCard;
 
-                // Check if this is a shorts lockup model nested in a rich-item-renderer
+                // Check if this is a shorts lockup model nested in a container
                 if (videoCard.tagName.toLowerCase().includes('shorts-lockup-view-model')) {
-                    const parentContainer = videoCard.closest('ytd-rich-item-renderer');
+                    // Try homepage container (ytd-rich-item-renderer)
+                    let parentContainer = videoCard.closest('ytd-rich-item-renderer');
+
+                    // If not found, try search page container (div.ytGridShelfViewModelGridShelfItem)
+                    if (!parentContainer) {
+                        parentContainer = videoCard.closest('.ytGridShelfViewModelGridShelfItem');
+                    }
+
                     if (parentContainer) {
                         containerToHide = parentContainer;
-                        console.log('FilterTube: Found parent container for shorts:', containerToHide.tagName);
+                        console.log('FilterTube: Found parent container for shorts:', containerToHide.tagName || containerToHide.className);
                     }
                 }
 
@@ -2643,7 +2666,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                 containerToHide.style.display = 'none';
                 containerToHide.classList.add('filtertube-hidden');
                 containerToHide.setAttribute('data-filtertube-hidden', 'true');
-                console.log('FilterTube: Applied immediate hiding to:', containerToHide.tagName);
+                console.log('FilterTube: Applied immediate hiding to:', containerToHide.tagName || containerToHide.className);
 
                 // Close the dropdown since the video is now hidden
                 const dropdown = menuItem.closest('tp-yt-iron-dropdown');
