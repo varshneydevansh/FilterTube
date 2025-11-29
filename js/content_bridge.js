@@ -2191,38 +2191,80 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
         oldItems.forEach(item => item.remove());
     }
 
-    let channelInfo = extractChannelFromCard(videoCard);
-    if (!channelInfo) {
+    // Extract initial channel info (synchronous from DOM)
+    let initialChannelInfo = extractChannelFromCard(videoCard);
+    if (!initialChannelInfo) {
         console.log('FilterTube: Could not extract channel info from card');
         return;
     }
 
-    // Handle async fetch case for shorts without channel info in DOM
-    if (channelInfo.needsFetch && channelInfo.videoId) {
-        console.log('FilterTube: Fetching channel info for shorts video:', channelInfo.videoId);
-        channelInfo = await fetchChannelFromShortsUrl(channelInfo.videoId);
-        if (!channelInfo) {
-            console.log('FilterTube: Failed to fetch channel info from shorts URL');
-            return;
-        }
+    console.log('FilterTube: Initial channel info:', initialChannelInfo);
+
+    // Detect menu structure type (new vs old) - COMPREHENSIVE DETECTION
+    const newMenuList = dropdown.querySelector('yt-list-view-model');
+    const oldMenuList = dropdown.querySelector(
+        'tp-yt-paper-listbox, ' +
+        'ytd-menu-popup-renderer, ' +
+        'ytd-menu-service-item-renderer, ' +
+        '#items.ytd-menu-popup-renderer, ' +
+        '#items.style-scope.ytd-menu-popup-renderer'
+    );
+
+    // Debug: Log what we found
+    console.log('FilterTube: Menu detection - newMenuList:', !!newMenuList, 'oldMenuList:', !!oldMenuList);
+    if (!newMenuList && !oldMenuList) {
+        console.log('FilterTube: Dropdown HTML:', dropdown.innerHTML.substring(0, 500));
     }
 
-    console.log('FilterTube: Extracted channel info:', channelInfo);
-
-    // Detect menu structure type (new vs old)
-    const newMenuList = dropdown.querySelector('yt-list-view-model');
-    const oldMenuList = dropdown.querySelector('tp-yt-paper-listbox, ytd-menu-popup-renderer');
-
+    // IMMEDIATELY inject menu item with initial info (instant UI feedback)
     if (newMenuList) {
-        console.log('FilterTube: Detected NEW menu structure');
-        injectIntoNewMenu(newMenuList, channelInfo, videoCard);
+        console.log('FilterTube: Detected NEW menu structure - injecting immediately');
+        injectIntoNewMenu(newMenuList, initialChannelInfo, videoCard);
     } else if (oldMenuList) {
-        console.log('FilterTube: Detected OLD menu structure');
-        injectIntoOldMenu(oldMenuList, channelInfo, videoCard);
+        console.log('FilterTube: Detected OLD menu structure - injecting immediately');
+        injectIntoOldMenu(oldMenuList, initialChannelInfo, videoCard);
     } else {
         console.log('FilterTube: Could not detect menu structure');
         return;
     }
+
+    // Start background fetch for complete channel info (non-blocking)
+    const fetchPromise = (async () => {
+        let finalChannelInfo = initialChannelInfo;
+
+        // For shorts, fetch channel info from shorts URL
+        if (initialChannelInfo.needsFetch && initialChannelInfo.videoId) {
+            console.log('FilterTube: Background fetch - shorts channel info for:', initialChannelInfo.videoId);
+            const fetchedInfo = await fetchChannelFromShortsUrl(initialChannelInfo.videoId);
+            if (fetchedInfo) {
+                finalChannelInfo = fetchedInfo;
+                console.log('FilterTube: Background fetch complete - shorts channel:', fetchedInfo);
+            } else {
+                console.warn('FilterTube: Background fetch failed for shorts');
+            }
+        }
+
+        // For all videos (including shorts after fetch), resolve @handle to UC ID
+        if (finalChannelInfo.handle && finalChannelInfo.handle.startsWith('@')) {
+            console.log('FilterTube: Background fetch - resolving @handle to UC ID:', finalChannelInfo.handle);
+            const ucId = await fetchIdForHandle(finalChannelInfo.handle);
+            if (ucId) {
+                finalChannelInfo.id = ucId;
+                console.log('FilterTube: Background fetch complete - resolved to UC ID:', ucId);
+            }
+        }
+
+        return finalChannelInfo;
+    })();
+
+    // Store the fetch promise for later use (when user clicks "Block Channel")
+    pendingDropdownFetches.set(dropdown, {
+        channelInfoPromise: fetchPromise,
+        cancelled: false,
+        initialChannelInfo: initialChannelInfo
+    });
+
+    console.log('FilterTube: Menu injected immediately, fetch running in background');
 }
 
 /**
@@ -2497,10 +2539,30 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
 
     const originalText = titleSpan.textContent;
 
-    // Show "Fetching..." state (matching existing UI)
+    // Show "Fetching..." state IMMEDIATELY for instant user feedback
     titleSpan.textContent = 'Fetching...';
     titleSpan.style.color = '#9ca3af'; // gray
     menuItem.style.pointerEvents = 'none';
+
+    // Get the dropdown to check for pending fetches
+    const dropdown = menuItem.closest('tp-yt-iron-dropdown, ytd-menu-popup-renderer');
+
+    // Check if there's a background fetch in progress with complete channel info
+    const fetchData = dropdown ? pendingDropdownFetches.get(dropdown) : null;
+    if (fetchData && !fetchData.cancelled && fetchData.channelInfoPromise) {
+        console.log('FilterTube: Waiting for background fetch to complete...');
+        try {
+            // Wait for the background fetch to complete (likely already done by now)
+            const fetchedChannelInfo = await fetchData.channelInfoPromise;
+            if (fetchedChannelInfo && (fetchedChannelInfo.id || fetchedChannelInfo.handle)) {
+                console.log('FilterTube: Using pre-fetched channel info:', fetchedChannelInfo);
+                channelInfo = fetchedChannelInfo;
+            }
+        } catch (error) {
+            console.warn('FilterTube: Background fetch failed, using initial channel info:', error);
+            // Fall back to initial channelInfo passed to this function
+        }
+    }
 
     try {
         // Use the channel identifier (handle or ID)
@@ -2666,6 +2728,12 @@ const injectedDropdowns = new WeakMap();
  * Map: videoId -> Promise
  */
 const pendingShortsFetches = new Map();
+
+/**
+ * Track pending channel info fetches per dropdown (for instant UI + background fetch)
+ * WeakMap: dropdown -> {channelInfoPromise, cancelled, initialChannelInfo}
+ */
+const pendingDropdownFetches = new WeakMap();
 
 /**
  * Observe dropdowns and inject FilterTube menu items
@@ -2861,6 +2929,25 @@ async function handleDropdownAppeared(dropdown) {
         if (videoCard.parentElement) {
             observer.observe(videoCard.parentElement, { childList: true });
         }
+
+        // Watch for dropdown closing (to cancel pending fetches if user doesn't block)
+        const dropdownObserver = new MutationObserver((mutations) => {
+            for (const mutation of mutations) {
+                if (mutation.attributeName === 'aria-hidden') {
+                    const isHidden = dropdown.getAttribute('aria-hidden') === 'true';
+                    if (isHidden) {
+                        // Dropdown closed - mark any pending fetch as cancelled
+                        const fetchData = pendingDropdownFetches.get(dropdown);
+                        if (fetchData) {
+                            fetchData.cancelled = true;
+                            console.log('FilterTube: Dropdown closed, marked fetch as cancelled');
+                        }
+                        dropdownObserver.disconnect();
+                    }
+                }
+            }
+        });
+        dropdownObserver.observe(dropdown, { attributes: true, attributeFilter: ['aria-hidden'] });
 
         // Determine if this is a shorts card
         const isShorts = videoCard.tagName.toLowerCase().includes('shorts') ||
