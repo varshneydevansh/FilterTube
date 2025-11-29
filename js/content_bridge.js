@@ -2983,8 +2983,16 @@ async function handleDropdownAppeared(dropdown) {
                 return;
             }
             if (dropdownState.isComplete) {
-                console.log('FilterTube: Dropdown already injected for this video, skipping');
-                return;
+                // Verify menu item still exists in DOM before skipping
+                const existingMenuItem = dropdown.querySelector('.filtertube-block-channel-item');
+                if (existingMenuItem) {
+                    console.log('FilterTube: Dropdown already injected for this video, skipping');
+                    return;
+                } else {
+                    console.log('FilterTube: State says complete but menu item missing, re-injecting');
+                    // Reset state and continue to re-inject
+                    injectedDropdowns.delete(dropdown);
+                }
             }
         }
 
