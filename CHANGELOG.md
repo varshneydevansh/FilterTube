@@ -1,4 +1,6 @@
 # Changelog
+## Version 3.0.6
+- **Fix**: Fixed the Popup UI width for desktop and updated the website.
 
 ## Version 3.0.5
 
