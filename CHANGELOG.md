@@ -1,4 +1,20 @@
 # Changelog
+## Version 3.0.7 (Unreleased)
+
+### New Features
+- **Posts Support**: Added proper channel extraction for YouTube community posts
+  - "Block Channel" menu now works correctly on posts via 3-dot menu
+  - Extracts channel info from post author links and thumbnails
+- **Collaboration Videos**: Added support for videos with multiple channel collaborators
+  - Detects and extracts all collaborating channels from `attributed-channel-name` element
+  - Blocks video if ANY collaborator is in your blocked channels list
+  - Menu shows "(Collab)" indicator for collaboration videos
+  - Blocking a collaboration video blocks ALL collaborators automatically
+
+### Documentation
+- Updated `youtube_renderer_inventory.md` with collaboration videos section
+- Marked posts as fully covered for menu blocking
+
 ## Version 3.0.6
 - **Fix**: Fixed the Popup UI width for desktop and updated the website.
 
@@ -28,7 +44,7 @@
 - **Fix**: Silenced error logs for unsupported card types (Mixes/Playlists).
 - **UX**: Immediate visual feedback (video hides instantly) when blocking via the menu.
 
-## Version 3.0.0 - Hybrid Architecture & Documentation Overhaul (CURRENT)
+## Version 3.0.0 - Hybrid Architecture & Documentation (November 2025)
 - **Architecture**: Formalized the "Hybrid Filtering Architecture" combining Data Interception (Primary) with DOM Fallback (Secondary).
 - **Documentation**: Major overhaul of `ARCHITECTURE.md`, `TECHNICAL.md`, and `CODEMAP.md` with detailed ASCII diagrams.
 - **Visuals**: Added "Box-and-Line" ASCII diagrams for all major technical flows.

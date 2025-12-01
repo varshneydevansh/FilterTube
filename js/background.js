@@ -816,7 +816,7 @@ browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
     console.log('FilterTube Background: Received message:', message.type);
 
     if (message.type === 'addFilteredChannel') {
-        handleAddFilteredChannel(message.input, message.filterAll).then(sendResponse);
+        handleAddFilteredChannel(message.input, message.filterAll, message.collaborationWith).then(sendResponse);
         return true; // Keep channel open for async response
     }
 
@@ -832,9 +832,10 @@ browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
  * Handle adding a filtered channel (from 3-dot menu)
  * @param {string} input - Channel identifier (@handle or UC ID)
  * @param {boolean} filterAll - Whether to enable Filter All for this channel
+ * @param {Array<string>} collaborationWith - Optional list of handles/names this channel is collaborating with
  * @returns {Promise<Object>} Result with success status
  */
-async function handleAddFilteredChannel(input, filterAll = false) {
+async function handleAddFilteredChannel(input, filterAll = false, collaborationWith = null) {
     try {
         const rawValue = input.trim();
         if (!rawValue) {
@@ -879,7 +880,8 @@ async function handleAddFilteredChannel(input, filterAll = false) {
             handle: channelInfo.handle,
             name: channelInfo.name,
             logo: channelInfo.logo,
-            filterAll: filterAll // Use provided value
+            filterAll: filterAll, // Use provided value
+            collaborationWith: collaborationWith || [] // Store collaboration metadata
         };
 
         // Add to beginning (newest first)

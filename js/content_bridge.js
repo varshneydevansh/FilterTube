@@ -1814,7 +1814,7 @@ function debounce(func, delay) {
 /**
  * Recursively search ytInitialData for channel info associated with a video ID
  * @param {string} videoId - The YouTube video ID to search for
- * @returns {Object|null} - {handle, name} or {id, name} or null
+ * @returns {Object|null} - {handle, name} or {id, name} or {isCollaboration, allCollaborators: [...]} or null
  */
 function searchYtInitialDataForVideoChannel(videoId) {
     if (!window.ytInitialData || !videoId) {
@@ -1834,6 +1834,72 @@ function searchYtInitialDataForVideoChannel(videoId) {
             foundVideoObject = true;
             console.log('FilterTube: Found video object at path:', path);
             console.log('FilterTube: Video object keys:', Object.keys(obj));
+
+            // PRIORITY: Check for collaboration video (showDialogCommand in byline)
+            const bylineText = obj.shortBylineText || obj.longBylineText;
+            if (bylineText?.runs) {
+                for (const run of bylineText.runs) {
+                    // Look for showDialogCommand which indicates a collaboration video
+                    const showDialogCommand = run.navigationEndpoint?.showDialogCommand;
+                    if (showDialogCommand) {
+                        console.log('FilterTube: Detected COLLABORATION video via showDialogCommand');
+
+                        // Extract all collaborating channels from listItems
+                        const listItems = showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems;
+
+                        if (listItems && Array.isArray(listItems)) {
+                            const collaborators = [];
+
+                            for (const item of listItems) {
+                                const listItemViewModel = item.listItemViewModel;
+                                if (listItemViewModel) {
+                                    const browseEndpoint = listItemViewModel.rendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint;
+                                    const title = listItemViewModel.title?.content;
+                                    const subtitle = listItemViewModel.subtitle?.content;
+
+                                    if (browseEndpoint) {
+                                        const browseId = browseEndpoint.browseId;
+                                        const canonicalBaseUrl = browseEndpoint.canonicalBaseUrl;
+
+                                        let channelInfo = { name: title };
+
+                                        // Extract handle from canonicalBaseUrl
+                                        if (canonicalBaseUrl) {
+                                            const handleMatch = canonicalBaseUrl.match(/@([\w-]+)/);
+                                            if (handleMatch) {
+                                                channelInfo.handle = `@${handleMatch[1]}`;
+                                            }
+                                        }
+
+                                        // Extract UC ID
+                                        if (browseId?.startsWith('UC')) {
+                                            channelInfo.id = browseId;
+                                        }
+
+                                        if (channelInfo.handle || channelInfo.id) {
+                                            collaborators.push(channelInfo);
+                                            console.log('FilterTube: Extracted collaborator:', channelInfo);
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (collaborators.length > 1) {
+                                console.log('FilterTube: Found', collaborators.length, 'collaborating channels:', collaborators);
+                                return {
+                                    ...collaborators[0],
+                                    isCollaboration: true,
+                                    allCollaborators: collaborators
+                                };
+                            } else if (collaborators.length === 1) {
+                                // Single channel, not a collaboration
+                                console.log('FilterTube: Single channel found in showDialogCommand:', collaborators[0]);
+                                return collaborators[0];
+                            }
+                        }
+                    }
+                }
+            }
 
             // Look for browseEndpoint with channel or @handle
             if (obj.navigationEndpoint?.browseEndpoint?.browseId) {
@@ -2103,7 +2169,124 @@ function extractChannelFromCard(card) {
             return null;
         }
 
-        // Method 1: Check for data attributes (added by FilterTube's own processing)
+        // SPECIAL CASE: Detect if this is a Post card
+        const isPostCard = card.tagName.toLowerCase() === 'ytd-post-renderer';
+
+        if (isPostCard) {
+            console.log('FilterTube: Detected POST card, using special extraction');
+
+            // Method 1: Try author link in header
+            const authorLink = card.querySelector('#author-text.yt-simple-endpoint, a#author-text');
+            if (authorLink) {
+                const href = authorLink.getAttribute('href');
+                const name = authorLink.textContent?.trim();
+
+                if (href) {
+                    const handleMatch = href.match(/@([\w-]+)/);
+                    if (handleMatch) {
+                        const handle = `@${handleMatch[1]}`;
+                        console.log('FilterTube: Extracted from POST author link:', { handle, name });
+                        return { handle, name };
+                    }
+
+                    const ucMatch = href.match(/\/(UC[\w-]{22})/);
+                    if (ucMatch) {
+                        const id = ucMatch[1];
+                        console.log('FilterTube: Extracted from POST author link (UC):', { id, name });
+                        return { id, name };
+                    }
+                }
+            }
+
+            // Method 2: Try author thumbnail link
+            const authorThumbnail = card.querySelector('#author-thumbnail a');
+            if (authorThumbnail) {
+                const href = authorThumbnail.getAttribute('href');
+                const name = card.querySelector('#author span')?.textContent?.trim();
+
+                if (href) {
+                    const handleMatch = href.match(/@([\w-]+)/);
+                    if (handleMatch) {
+                        const handle = `@${handleMatch[1]}`;
+                        console.log('FilterTube: Extracted from POST thumbnail:', { handle, name });
+                        return { handle, name };
+                    }
+                }
+            }
+
+            console.warn('FilterTube: POST card detected but no channel info found');
+            return null;
+        }
+
+        // Method 1: PRIORITY - Check for collaboration videos FIRST (attributed-channel-name)
+        const attributedChannelName = card.querySelector('#attributed-channel-name, [id="attributed-channel-name"]');
+
+        if (attributedChannelName) {
+            console.log('FilterTube: Detected COLLABORATION video');
+
+            // Extract all channel names and badges
+            const ytTextViewModel = attributedChannelName.querySelector('yt-text-view-model');
+
+            if (ytTextViewModel) {
+                // Parse the attributed string which contains multiple channels
+                const attributedString = ytTextViewModel.querySelector('.yt-core-attributed-string');
+
+                if (attributedString) {
+                    const collaborators = [];
+
+                    // Get the full text content and split by " and "
+                    const fullText = attributedString.textContent || '';
+                    // Remove badge/icon content and split by " and "
+                    const channelNames = fullText
+                        .split(' and ')
+                        .map(name => name.trim())
+                        .filter(name => name.length > 0 && name !== 'and');
+
+                    console.log('FilterTube: Parsed channel names from attributed string:', channelNames);
+
+                    // Create collaborator objects from channel names
+                    for (const name of channelNames) {
+                        collaborators.push({ name });
+                    }
+
+                    // Try to find links for handles/IDs
+                    const links = card.querySelectorAll('a[href*="/@"], a[href*="/channel/"]');
+                    let linkIndex = 0;
+
+                    for (const link of links) {
+                        if (linkIndex >= collaborators.length) break;
+
+                        const href = link.getAttribute('href');
+                        if (href && !href.includes('/shorts/') && !href.includes('/watch')) {
+                            const handleMatch = href.match(/@([\w-]+)/);
+                            if (handleMatch) {
+                                collaborators[linkIndex].handle = `@${handleMatch[1]}`;
+                            }
+
+                            const ucMatch = href.match(/\/(UC[\w-]{22})/);
+                            if (ucMatch) {
+                                collaborators[linkIndex].id = ucMatch[1];
+                            }
+
+                            linkIndex++;
+                        }
+                    }
+
+                    if (collaborators.length > 0) {
+                        console.log('FilterTube: Extracted collaboration channels:', collaborators);
+                        // Return first collaborator as primary channel
+                        // Store all collaborators in a special property
+                        return {
+                            ...collaborators[0],
+                            isCollaboration: true,
+                            allCollaborators: collaborators
+                        };
+                    }
+                }
+            }
+        }
+
+        // Method 2: Check for data attributes (added by FilterTube's own processing)
         const dataHandle = card.getAttribute('data-filtertube-channel-handle') ||
             card.querySelector('[data-filtertube-channel-handle]')?.getAttribute('data-filtertube-channel-handle');
         if (dataHandle) {
@@ -2112,7 +2295,7 @@ function extractChannelFromCard(card) {
             return { handle: dataHandle, name };
         }
 
-        // Method 2: Find ANY link with channel info (comprehensive selectors)
+        // Method 3: Find ANY link with channel info (comprehensive selectors)
         const channelLink = card.querySelector(
             'a[href*="/@"]:not([href*="/shorts"]), ' +  // Not a shorts link
             'a[href*="/channel/"], ' +
@@ -2152,7 +2335,7 @@ function extractChannelFromCard(card) {
             }
         }
 
-        // Method 3: Fallback - search deeper in metadata
+        // Method 4: Fallback - search deeper in metadata
         const channelNameEl = card.querySelector(
             '#channel-name .yt-simple-endpoint, ' +
             'ytd-channel-name a, ' +
@@ -2276,15 +2459,59 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
     const { newMenuList, oldMenuList } = await waitForMenu();
 
     // IMMEDIATELY inject menu item with initial info (instant UI feedback)
-    if (newMenuList) {
-        console.log('FilterTube: Detected NEW menu structure - injecting immediately');
-        injectIntoNewMenu(newMenuList, initialChannelInfo, videoCard);
-    } else if (oldMenuList) {
-        console.log('FilterTube: Detected OLD menu structure - injecting immediately');
-        injectIntoOldMenu(oldMenuList, initialChannelInfo, videoCard);
+    // IMMEDIATELY inject menu item with initial info (instant UI feedback)
+    if (initialChannelInfo.isCollaboration && initialChannelInfo.allCollaborators && initialChannelInfo.allCollaborators.length >= 2) {
+        console.log('FilterTube: Injecting COLLABORATION menu with multiple options');
+        const collaborators = initialChannelInfo.allCollaborators;
+
+        if (newMenuList) {
+            // Option 1: Block First Channel
+            injectIntoNewMenu(newMenuList, collaborators[0], videoCard, {
+                collaborationWith: collaborators.slice(1).map(c => c.handle || c.name)
+            });
+
+            // Option 2: Block Second Channel
+            injectIntoNewMenu(newMenuList, collaborators[1], videoCard, {
+                collaborationWith: [collaborators[0].handle || collaborators[0].name]
+            });
+
+            // Option 3: Block Both
+            injectIntoNewMenu(newMenuList, {
+                name: 'Both',
+                isBothOption: true,
+                allCollaborators: collaborators
+            }, videoCard);
+
+        } else if (oldMenuList) {
+            // Option 1: Block First Channel
+            injectIntoOldMenu(oldMenuList, collaborators[0], videoCard, {
+                collaborationWith: collaborators.slice(1).map(c => c.handle || c.name)
+            });
+
+            // Option 2: Block Second Channel
+            injectIntoOldMenu(oldMenuList, collaborators[1], videoCard, {
+                collaborationWith: [collaborators[0].handle || collaborators[0].name]
+            });
+
+            // Option 3: Block Both
+            injectIntoOldMenu(oldMenuList, {
+                name: 'Both',
+                isBothOption: true,
+                allCollaborators: collaborators
+            }, videoCard);
+        }
     } else {
-        console.log('FilterTube: Could not detect menu structure after waiting');
-        return;
+        // Standard single channel injection
+        if (newMenuList) {
+            console.log('FilterTube: Detected NEW menu structure - injecting immediately');
+            injectIntoNewMenu(newMenuList, initialChannelInfo, videoCard);
+        } else if (oldMenuList) {
+            console.log('FilterTube: Detected OLD menu structure - injecting immediately');
+            injectIntoOldMenu(oldMenuList, initialChannelInfo, videoCard);
+        } else {
+            console.log('FilterTube: Could not detect menu structure after waiting');
+            return;
+        }
     }
 
     // Start background fetch for complete channel info (non-blocking)
@@ -2329,7 +2556,7 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
 /**
  * Inject into NEW menu structure (yt-list-view-model)
  */
-function injectIntoNewMenu(menuList, channelInfo, videoCard) {
+function injectIntoNewMenu(menuList, channelInfo, videoCard, collaborationMetadata = null) {
     // Create FilterTube menu item (NEW structure)
     const filterTubeItem = document.createElement('yt-list-item-view-model');
     filterTubeItem.className = 'yt-list-item-view-model filtertube-block-channel-item';
@@ -2341,6 +2568,14 @@ function injectIntoNewMenu(menuList, channelInfo, videoCard) {
         <path fill="#FF3333" d="M53.004837,77.261787 C55.004650,68.586563 48.961483,63.525127 45.151901,57.831970 C36.636456,45.106262 27.572891,32.747910 18.776752,20.208942 C17.048302,17.745022 18.246574,14.746576 21.199722,14.076863 C22.310389,13.824986 23.520674,14.001245 24.685543,14.001154 C51.482349,13.999036 78.279152,13.997606 105.075958,14.002748 C107.511017,14.003215 110.410080,13.422483 111.785439,15.933891 C113.178085,18.476864 111.026321,20.660681 109.690315,22.593620 C99.594292,37.200588 89.433075,51.763405 79.158081,66.244827 C77.520378,68.552994 76.925735,70.848900 76.965294,73.583061 C77.066391,80.572067 76.851021,87.568138 77.069214,94.551788 C77.160759,97.481934 76.221825,99.467453 74.122963,101.447235 C69.040611,106.241264 64.241066,111.333801 59.229191,116.204849 C58.138329,117.265060 57.330574,119.514366 55.379189,118.670372 C53.447678,117.834984 52.933788,115.906029 52.954082,113.675346 C53.063110,101.692680 53.005142,89.708488 53.004837,77.261787 z"/>
         <path fill="#FF0000" d="M63.316730,58.295921 C61.783310,59.317360 60.616657,60.253048 59.307014,60.898705 C55.871113,62.592613 54.045387,61.557888 54.023708,57.807045 C53.960236,46.824589 53.943741,35.841064 54.033154,24.858967 C54.064426,21.018126 56.738575,19.503649 60.024136,21.659582 C67.653084,26.665573 75.198029,31.814018 82.579330,37.176819 C86.212624,39.816536 85.950592,42.679234 82.150856,45.360466 C76.029831,49.679680 69.801399,53.846684 63.316730,58.295921 z"/>
     </svg>`;
+
+
+    let menuTitle = 'Block Channel';
+    if (channelInfo.isBothOption) {
+        menuTitle = 'Block Both Channels';
+    } else if (channelInfo.name) {
+        menuTitle = `Block ${channelInfo.name}`;
+    }
 
     filterTubeItem.innerHTML = `
         <div class="yt-list-item-view-model__label yt-list-item-view-model__container yt-list-item-view-model__container--compact yt-list-item-view-model__container--tappable yt-list-item-view-model__container--in-popup">
@@ -2361,7 +2596,7 @@ function injectIntoNewMenu(menuList, channelInfo, videoCard) {
                         white-space: nowrap !important;
                         overflow: visible !important;
                         flex-shrink: 0 !important;
-                    ">Block Channel</span>
+                    ">${menuTitle}</span>
                     <div class="filtertube-filter-all-toggle" style="
                         display: inline-flex;
                         align-items: center;
@@ -2393,11 +2628,16 @@ function injectIntoNewMenu(menuList, channelInfo, videoCard) {
     const titleSpan = filterTubeItem.querySelector('.filtertube-menu-title');
     if (titleSpan) {
         // Force text content
-        titleSpan.textContent = 'Block Channel';
+        titleSpan.textContent = menuTitle;
         // Add additional inline styles as backup
         titleSpan.style.setProperty('min-width', '100px', 'important');
         titleSpan.style.setProperty('display', 'inline-block', 'important');
         titleSpan.style.setProperty('flex-shrink', '0', 'important');
+    }
+
+    // Store collaboration metadata
+    if (collaborationMetadata) {
+        filterTubeItem.setAttribute('data-collaboration-with', JSON.stringify(collaborationMetadata.collaborationWith));
     }
 
     // Get toggle button
@@ -2441,7 +2681,7 @@ function injectIntoNewMenu(menuList, channelInfo, videoCard) {
 /**
  * Inject into OLD menu structure (tp-yt-paper-listbox)
  */
-function injectIntoOldMenu(menuContainer, channelInfo, videoCard) {
+function injectIntoOldMenu(menuContainer, channelInfo, videoCard, collaborationMetadata = null) {
     const menuList = menuContainer.querySelector('tp-yt-paper-listbox') || menuContainer;
 
     // Inline SVG for FilterTube logo (user-provided SVG)
@@ -2449,6 +2689,14 @@ function injectIntoOldMenu(menuContainer, channelInfo, videoCard) {
         <path fill="#FF3333" d="M53.004837,77.261787 C55.004650,68.586563 48.961483,63.525127 45.151901,57.831970 C36.636456,45.106262 27.572891,32.747910 18.776752,20.208942 C17.048302,17.745022 18.246574,14.746576 21.199722,14.076863 C22.310389,13.824986 23.520674,14.001245 24.685543,14.001154 C51.482349,13.999036 78.279152,13.997606 105.075958,14.002748 C107.511017,14.003215 110.410080,13.422483 111.785439,15.933891 C113.178085,18.476864 111.026321,20.660681 109.690315,22.593620 C99.594292,37.200588 89.433075,51.763405 79.158081,66.244827 C77.520378,68.552994 76.925735,70.848900 76.965294,73.583061 C77.066391,80.572067 76.851021,87.568138 77.069214,94.551788 C77.160759,97.481934 76.221825,99.467453 74.122963,101.447235 C69.040611,106.241264 64.241066,111.333801 59.229191,116.204849 C58.138329,117.265060 57.330574,119.514366 55.379189,118.670372 C53.447678,117.834984 52.933788,115.906029 52.954082,113.675346 C53.063110,101.692680 53.005142,89.708488 53.004837,77.261787 z"/>
         <path fill="#FF0000" d="M63.316730,58.295921 C61.783310,59.317360 60.616657,60.253048 59.307014,60.898705 C55.871113,62.592613 54.045387,61.557888 54.023708,57.807045 C53.960236,46.824589 53.943741,35.841064 54.033154,24.858967 C54.064426,21.018126 56.738575,19.503649 60.024136,21.659582 C67.653084,26.665573 75.198029,31.814018 82.579330,37.176819 C86.212624,39.816536 85.950592,42.679234 82.150856,45.360466 C76.029831,49.679680 69.801399,53.846684 63.316730,58.295921 z"/>
     </svg>`;
+
+
+    let menuTitle = 'Block Channel';
+    if (channelInfo.isBothOption) {
+        menuTitle = 'Block Both Channels';
+    } else if (channelInfo.name) {
+        menuTitle = `Block ${channelInfo.name}`;
+    }
 
     // Create FilterTube menu item (OLD structure)
     const filterTubeItem = document.createElement('ytd-menu-service-item-renderer');
@@ -2475,7 +2723,7 @@ function injectIntoOldMenu(menuContainer, channelInfo, videoCard) {
                 white-space: nowrap !important;
                 overflow: visible !important;
                 flex-shrink: 0 !important;
-            ">Block Channel</span>
+            ">${menuTitle}</span>
             <div class="filtertube-filter-all-toggle" style="
                 display: inline-flex;
                 align-items: center;
@@ -2503,11 +2751,16 @@ function injectIntoOldMenu(menuContainer, channelInfo, videoCard) {
     // Get title span and ensure text is set
     const titleSpan = filterTubeItem.querySelector('.filtertube-menu-title');
     if (titleSpan) {
-        titleSpan.textContent = 'Block Channel';
+        titleSpan.textContent = menuTitle;
         // Add additional inline styles as backup
         titleSpan.style.setProperty('min-width', '100px', 'important');
         titleSpan.style.setProperty('display', 'inline-block', 'important');
         titleSpan.style.setProperty('flex-shrink', '0', 'important');
+    }
+
+    // Store collaboration metadata
+    if (collaborationMetadata) {
+        filterTubeItem.setAttribute('data-collaboration-with', JSON.stringify(collaborationMetadata.collaborationWith));
     }
 
     // Get toggle button
@@ -2593,15 +2846,83 @@ async function checkIfChannelBlocked(channelInfo, menuItem) {
  * @param {Element} videoCard - The video card element to hide after blocking
  */
 async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false, videoCard = null) {
-    const titleSpan = menuItem.querySelector('.filtertube-menu-title');
-    if (!titleSpan) return;
+    console.log('FilterTube: Block Channel clicked', { channelInfo, filterAll });
 
-    const originalText = titleSpan.textContent;
+    const titleSpan = menuItem.querySelector('.filtertube-menu-title') ||
+        menuItem.querySelector('.yt-core-attributed-string');
+
+    const originalText = titleSpan ? titleSpan.textContent : '';
 
     // Show "Fetching..." state IMMEDIATELY for instant user feedback
-    titleSpan.textContent = 'Fetching...';
-    titleSpan.style.color = '#9ca3af'; // gray
+    if (titleSpan) {
+        titleSpan.textContent = 'Fetching...';
+        titleSpan.style.color = '#9ca3af'; // gray
+    }
     menuItem.style.pointerEvents = 'none';
+
+    // Handle "Block Both" option
+    if (channelInfo.isBothOption && channelInfo.allCollaborators) {
+        if (titleSpan) titleSpan.textContent = `Blocking ${channelInfo.allCollaborators.length} channels...`;
+
+        let successCount = 0;
+        for (let i = 0; i < channelInfo.allCollaborators.length; i++) {
+            const collaborator = channelInfo.allCollaborators[i];
+            const input = collaborator.handle || collaborator.id;
+
+            if (input) {
+                // Get collaboration metadata (other channels)
+                const otherChannels = channelInfo.allCollaborators
+                    .filter((_, idx) => idx !== i)
+                    .map(c => c.handle || c.name);
+
+                const result = await addChannelDirectly(input, filterAll, otherChannels);
+                if (result.success) successCount++;
+            }
+        }
+
+        if (titleSpan) {
+            titleSpan.textContent = `✓ Blocked ${successCount} channels`;
+            titleSpan.style.color = '#10b981'; // green
+        }
+
+        // Hide the video card immediately
+        if (videoCard) {
+            console.log('FilterTube: Hiding video card immediately (Block Both)');
+            let containerToHide = videoCard;
+            if (videoCard.tagName.toLowerCase().includes('shorts-lockup-view-model')) {
+                let parentContainer = videoCard.closest('ytd-rich-item-renderer');
+                if (!parentContainer) {
+                    parentContainer = videoCard.closest('.ytGridShelfViewModelGridShelfItem');
+                }
+                if (parentContainer) {
+                    containerToHide = parentContainer;
+                }
+            }
+            containerToHide.style.display = 'none';
+            containerToHide.classList.add('filtertube-hidden');
+            containerToHide.setAttribute('data-filtertube-hidden', 'true');
+        }
+
+        // Close dropdown
+        const dropdown = menuItem.closest('ytd-menu-popup-renderer, tp-yt-iron-dropdown, .ytd-menu-popup-renderer');
+        if (dropdown) {
+            setTimeout(() => {
+                // Simulate Escape key to close dropdown naturally
+                const escapeEvent = new KeyboardEvent('keydown', {
+                    key: 'Escape',
+                    code: 'Escape',
+                    keyCode: 27,
+                    which: 27,
+                    bubbles: true,
+                    cancelable: true
+                });
+                dropdown.dispatchEvent(escapeEvent);
+                document.dispatchEvent(escapeEvent);
+            }, 50);
+        }
+
+        return;
+    }
 
     // Get the dropdown to check for pending fetches
     const dropdown = menuItem.closest('tp-yt-iron-dropdown, ytd-menu-popup-renderer');
@@ -2624,113 +2945,129 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
     }
 
     try {
+        // Single channel blocking (normal case)
         // Use the channel identifier (handle or ID)
         const input = channelInfo.handle || channelInfo.id;
 
-        // Add channel via background script with filterAll preference
-        const result = await addChannelDirectly(input, filterAll);
+        // Get collaboration metadata from menu item attribute
+        const collaborationWithAttr = menuItem.getAttribute('data-collaboration-with');
+        const collaborationWith = collaborationWithAttr ? JSON.parse(collaborationWithAttr) : null;
 
-        if (result.success) {
-            // Success state (matching existing UI)
+        // Add channel via background script with filterAll preference and collaboration metadata
+        const result = await addChannelDirectly(input, filterAll, collaborationWith);
+
+        if (!result.success) {
+            // Error state
+            if (titleSpan) {
+                titleSpan.textContent = '✗ Failed to block';
+                titleSpan.style.color = '#ef4444'; // red
+            }
+            console.error('FilterTube: Failed to block channel:', result.error);
+            setTimeout(() => {
+                if (titleSpan) {
+                    titleSpan.textContent = originalText;
+                    titleSpan.style.color = '#ef4444';
+                }
+                menuItem.style.pointerEvents = 'auto';
+            }, 2000);
+            return;
+        }
+
+        // Success state (matching existing UI)
+        if (titleSpan) {
             titleSpan.textContent = '✓ Channel Blocked';
             titleSpan.style.color = '#10b981'; // green
+        }
 
-            console.log('FilterTube: Successfully blocked channel:', channelInfo, 'filterAll:', filterAll);
+        console.log('FilterTube: Successfully blocked channel:', channelInfo, 'filterAll:', filterAll);
 
-            // IMMEDIATELY hide the video card for instant feedback
-            if (videoCard) {
-                console.log('FilterTube: Hiding video card immediately');
+        // IMMEDIATELY hide the video card for instant feedback
+        if (videoCard) {
+            console.log('FilterTube: Hiding video card immediately');
 
-                // For shorts, find the parent container
-                // For regular videos, the videoCard itself is usually the right container
-                let containerToHide = videoCard;
+            // For shorts, find the parent container
+            // For regular videos, the videoCard itself is usually the right container
+            let containerToHide = videoCard;
 
-                // Check if this is a shorts lockup model nested in a container
-                if (videoCard.tagName.toLowerCase().includes('shorts-lockup-view-model')) {
-                    // Try homepage container (ytd-rich-item-renderer)
-                    let parentContainer = videoCard.closest('ytd-rich-item-renderer');
+            // Check if this is a shorts lockup model nested in a container
+            if (videoCard.tagName.toLowerCase().includes('shorts-lockup-view-model')) {
+                // Try homepage container (ytd-rich-item-renderer)
+                let parentContainer = videoCard.closest('ytd-rich-item-renderer');
 
-                    // If not found, try search page container (div.ytGridShelfViewModelGridShelfItem)
-                    if (!parentContainer) {
-                        parentContainer = videoCard.closest('.ytGridShelfViewModelGridShelfItem');
-                    }
-
-                    if (parentContainer) {
-                        containerToHide = parentContainer;
-                        console.log('FilterTube: Found parent container for shorts:', containerToHide.tagName || containerToHide.className);
-                    }
+                // If not found, try search page container (div.ytGridShelfViewModelGridShelfItem)
+                if (!parentContainer) {
+                    parentContainer = videoCard.closest('.ytGridShelfViewModelGridShelfItem');
                 }
 
-                // Immediate hiding: Apply direct styles + class to ensure it's hidden right away
-                // The storage change event will trigger proper re-filtering shortly after
-                containerToHide.style.display = 'none';
-                containerToHide.classList.add('filtertube-hidden');
-                containerToHide.setAttribute('data-filtertube-hidden', 'true');
-                console.log('FilterTube: Applied immediate hiding to:', containerToHide.tagName || containerToHide.className);
-
-                // Close the dropdown since the video is now hidden
-                const dropdown = menuItem.closest('tp-yt-iron-dropdown');
-                if (dropdown) {
-                    // Strategy 1: Simulate Escape key to close dropdown naturally
-                    const escapeEvent = new KeyboardEvent('keydown', {
-                        key: 'Escape',
-                        code: 'Escape',
-                        keyCode: 27,
-                        which: 27,
-                        bubbles: true,
-                        cancelable: true
-                    });
-                    dropdown.dispatchEvent(escapeEvent);
-                    document.dispatchEvent(escapeEvent);
-
-                    // Strategy 2: Remove focus trap
-                    const activeElement = document.activeElement;
-                    if (activeElement && dropdown.contains(activeElement)) {
-                        activeElement.blur();
-                    }
-
-                    // Strategy 3: Try YouTube's close method
-                    if (typeof dropdown.close === 'function') {
-                        dropdown.close();
-                    }
-
-                    // Strategy 4: Force hide
-                    dropdown.style.display = 'none';
-                    dropdown.setAttribute('aria-hidden', 'true');
-
-                    // Strategy 5: Click elsewhere to steal focus (simulate user clicking on page)
-                    setTimeout(() => {
-                        const ytdApp = document.querySelector('ytd-app');
-                        if (ytdApp) {
-                            const clickEvent = new MouseEvent('click', {
-                                bubbles: true,
-                                cancelable: true,
-                                view: window
-                            });
-                            ytdApp.dispatchEvent(clickEvent);
-                        }
-                    }, 50);
+                if (parentContainer) {
+                    containerToHide = parentContainer;
+                    console.log('FilterTube: Found parent container for shorts:', containerToHide.tagName || containerToHide.className);
                 }
             }
 
-            // The storage change event will trigger a full page re-filter automatically
-        } else {
-            // Error state
-            titleSpan.textContent = '✗ Failed to block';
-            titleSpan.style.color = '#ef4444'; // red
-            setTimeout(() => {
-                titleSpan.textContent = originalText;
-                titleSpan.style.color = '#ef4444';
-                menuItem.style.pointerEvents = 'auto';
-            }, 2000);
+            // Immediate hiding: Apply direct styles + class to ensure it's hidden right away
+            // The storage change event will trigger proper re-filtering shortly after
+            containerToHide.style.display = 'none';
+            containerToHide.classList.add('filtertube-hidden');
+            containerToHide.setAttribute('data-filtertube-hidden', 'true');
+            console.log('FilterTube: Applied immediate hiding to:', containerToHide.tagName || containerToHide.className);
+
+            // Close the dropdown since the video is now hidden
+            const dropdown = menuItem.closest('tp-yt-iron-dropdown');
+            if (dropdown) {
+                // Strategy 1: Simulate Escape key to close dropdown naturally
+                const escapeEvent = new KeyboardEvent('keydown', {
+                    key: 'Escape',
+                    code: 'Escape',
+                    keyCode: 27,
+                    which: 27,
+                    bubbles: true,
+                    cancelable: true
+                });
+                dropdown.dispatchEvent(escapeEvent);
+                document.dispatchEvent(escapeEvent);
+
+                // Strategy 2: Remove focus trap
+                const activeElement = document.activeElement;
+                if (activeElement && dropdown.contains(activeElement)) {
+                    activeElement.blur();
+                }
+
+                // Strategy 3: Try YouTube's close method
+                if (typeof dropdown.close === 'function') {
+                    dropdown.close();
+                }
+
+                // Strategy 4: Force hide
+                dropdown.style.display = 'none';
+                dropdown.setAttribute('aria-hidden', 'true');
+
+                // Strategy 5: Click elsewhere to steal focus (simulate user clicking on page)
+                setTimeout(() => {
+                    const ytdApp = document.querySelector('ytd-app');
+                    if (ytdApp) {
+                        const clickEvent = new MouseEvent('click', {
+                            bubbles: true,
+                            cancelable: true,
+                            view: window
+                        });
+                        ytdApp.dispatchEvent(clickEvent);
+                    }
+                }, 50);
+            }
         }
+
     } catch (error) {
         console.error('FilterTube: Error blocking channel:', error);
-        titleSpan.textContent = '✗ Error';
-        titleSpan.style.color = '#ef4444';
-        setTimeout(() => {
-            titleSpan.textContent = originalText;
+        if (titleSpan) {
+            titleSpan.textContent = '✗ Error';
             titleSpan.style.color = '#ef4444';
+        }
+        setTimeout(() => {
+            if (titleSpan) {
+                titleSpan.textContent = originalText;
+                titleSpan.style.color = '#ef4444';
+            }
             menuItem.style.pointerEvents = 'auto';
         }, 2000);
     }
@@ -2742,7 +3079,14 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
  * @param {boolean} filterAll - Whether to enable Filter All for this channel
  * @returns {Promise<Object>} Result with success status
  */
-async function addChannelDirectly(input, filterAll = false) {
+/**
+ * Add channel directly using chrome.storage (bypassing StateManager for content script)
+ * @param {string} input - Channel identifier (@handle or UC ID)
+ * @param {boolean} filterAll - Whether to enable Filter All for this channel
+ * @param {Array<string>} collaborationWith - Optional list of handles/names this channel is collaborating with
+ * @returns {Promise<Object>} Result with success status
+ */
+async function addChannelDirectly(input, filterAll = false, collaborationWith = null) {
     try {
         const rawValue = input.trim();
         if (!rawValue) {
@@ -2754,7 +3098,8 @@ async function addChannelDirectly(input, filterAll = false) {
             browserAPI_BRIDGE.runtime.sendMessage({
                 type: 'addFilteredChannel',
                 input: rawValue,
-                filterAll: filterAll
+                filterAll: filterAll,
+                collaborationWith: collaborationWith
             }, (response) => {
                 resolve(response || { success: false, error: 'No response from background' });
             });

@@ -27,7 +27,7 @@ This document tracks which YouTube renderers/selectors FilterTube currently targ
 | --- | --- | --- | --- |
 | `<ytd-rich-section-renderer>` | `richSectionRenderer` | ℹ️ **NEW** – layout | Container around shelf; ensure recursion reaches embedded shelf contents |
 | `<ytd-rich-shelf-renderer is-post>` | `richShelfRenderer` | ℹ️ **NEW** – layout | Hosts post cards; relies on nested `richItemRenderer` data already intercepted |
-| `<ytd-post-renderer>` | `backstagePostRenderer` | ❌ **NEW** – not parsed | Home community posts surface author + body text; add renderer coverage alongside channel posts |
+| `<ytd-post-renderer>` | `backstagePostRenderer` | ✅ Covered | Home community posts now properly extracted for menu blocking; channel info extracted from author links |
 | `<ytd-expander id="expander">` | `backstagePostRenderer.content` | ⚠️ **NEW** – partial | Expanded post text lives here when collapsed; confirm JSON contains same text or add DOM fallback |
 | `<yt-formatted-string id="home-content-text">` | DOM-only | ℹ️ **NEW** | Displays post body when expander hidden; monitor as potential fallback source |
 | `<ytd-backstage-image-renderer>` | `backstageImageRenderer` | ℹ️ **NEW** | Image attachment metadata minimal; rely on parent post text for filtering |
@@ -43,8 +43,14 @@ This document tracks which YouTube renderers/selectors FilterTube currently targ
 | `<yt-thumbnail-badge-view-model>` (LIVE / duration) | `thumbnailBadgeViewModel` | ⚠️ **NEW** – not parsed | “LIVE” and runtime badges exposed here; evaluate if we need keyword rules to treat live streams differently |
 | `<yt-content-metadata-view-model>` | `contentMetadataViewModel` | ⚠️ **NEW** – partial | Shows “2 watching”, “1 hour ago”; ensure renderer extraction captures live viewer counts in addition to view tallies |
 | `<button-view-model>` | `buttonViewModel` | ℹ️ **NEW** | Drives overflow menus per card; UI text only today |
-| `<ytd-subscription-notification-toggle-button-renderer-next>` | `subscriptionNotificationToggleButtonRenderer` | ℹ️ **NEW** | Notification bell states; strings limited to UI (“Subscribed”); track in case filters target notification text |
-| `<ytd-badge-supported-renderer>` (verified badge) | `metadataBadgeRenderer` | ℹ️ **NEW** | Badge exposes “Official Artist Channel”; low priority unless badges become filter inputs |
+| `<ytd-subscription-notification-toggle-button-renderer-next>` | `subscriptionNotificationToggleButtonRenderer` | ℹ️ **NEW** | Notification bell states; strings limited to UI ("Subscribed"); track in case filters target notification text |
+| `<ytd-badge-supported-renderer>` (verified badge) | `metadataBadgeRenderer` | ℹ️ **NEW** | Badge exposes "Official Artist Channel"; low priority unless badges become filter inputs |
+
+### Collaboration Videos (2025-12-01 sample, NEW)
+| DOM tag / component | Underlying renderer / data source | Status | Notes |
+| --- | --- | --- | --- |
+| `<div id="attributed-channel-name">` | `attributedChannelName` in `lockupViewModel.byline` | ✅ Covered | Extracts all collaborating channels; blocks if ANY collaborator is blocked |
+| `<yt-text-view-model>` with attributed string | DOM-only collaboration display | ✅ Covered | Parses "Channel A ✓ and Channel B ✓" format; extracts names, handles, and IDs for all collaborators |
 
 ### Podcasts shelf (Podcasts tab, 2025-11-18 sample)
 | DOM tag / component | Underlying renderer / data source | Status | Notes |

@@ -697,10 +697,19 @@
             const videoId = rules.videoId ? getByPath(item, rules.videoId) : '';
             const skipKeywordFiltering = CHANNEL_ONLY_RENDERERS.has(rendererType);
 
+            // Handle collaboration videos (channelInfo is an array)
+            const isCollaboration = Array.isArray(channelInfo);
+            const collaborators = isCollaboration ? channelInfo : [channelInfo];
+
             // Log extraction results for debugging
-            if (this.debugEnabled && (title || channelInfo.name || channelInfo.id || description)) {
+            if (this.debugEnabled && (title || (channelInfo && (Array.isArray(channelInfo) || channelInfo.name || channelInfo.id)) || description)) {
                 const descPreview = description ? description.substring(0, 50) + '...' : '';
-                this._log(`📋 Extracted - Title: "${title}", Channel: "${channelInfo.name}", ID: "${channelInfo.id}", Desc: "${descPreview}", Type: ${rendererType}`);
+                if (isCollaboration) {
+                    const channelNames = collaborators.map(c => c.name || c.handle || c.id).join(' & ');
+                    this._log(`📋 Extracted COLLABORATION - Title: "${title}", Channels: "${channelNames}", Type: ${rendererType}`);
+                } else {
+                    this._log(`📋 Extracted - Title: "${channelInfo.name}", ID: "${channelInfo.id}", Desc: "${descPreview}", Type: ${rendererType}`);
+                }
             }
 
             // Shorts filtering
@@ -710,11 +719,20 @@
             }
 
             // Channel filtering with comprehensive matching
-            if (this.settings.filterChannels.length > 0 && (channelInfo.name || channelInfo.id || channelInfo.handle)) {
-                for (const filterChannel of this.settings.filterChannels) {
-                    if (this._matchesChannel(filterChannel, channelInfo)) {
-                        this._log(`🚫 Blocking channel: ${channelInfo.name || channelInfo.id || channelInfo.handle} (matched filter: ${filterChannel})`);
-                        return true;
+            // For collaboration videos, block if ANY of the collaborators match a filter
+            if (this.settings.filterChannels.length > 0) {
+                for (const collaborator of collaborators) {
+                    if (collaborator.name || collaborator.id || collaborator.handle) {
+                        for (const filterChannel of this.settings.filterChannels) {
+                            if (this._matchesChannel(filterChannel, collaborator)) {
+                                if (isCollaboration) {
+                                    this._log(`🚫 Blocking COLLABORATION video: "${title}" (collaborator "${collaborator.name || collaborator.handle || collaborator.id}" matched filter)`);
+                                } else {
+                                    this._log(`🚫 Blocking channel: ${collaborator.name || collaborator.id || collaborator.handle} (matched filter: ${filterChannel})`);
+                                }
+                                return true;
+                            }
+                        }
                     }
                 }
             }
@@ -758,10 +776,12 @@
                     }
 
                     // Apply channel filters to comment authors
-                    if ((channelInfo.name || channelInfo.id || channelInfo.handle) && this.settings.filterChannels.length > 0) {
+                    // For comments, channelInfo should always be a single object, not an array
+                    const commentChannelInfo = isCollaboration ? collaborators[0] : channelInfo;
+                    if ((commentChannelInfo.name || commentChannelInfo.id || commentChannelInfo.handle) && this.settings.filterChannels.length > 0) {
                         for (const filterChannel of this.settings.filterChannels) {
-                            if (this._matchesChannel(filterChannel, channelInfo)) {
-                                this._log(`🚫 Blocking comment by author: ${channelInfo.name || channelInfo.id || channelInfo.handle}`);
+                            if (this._matchesChannel(filterChannel, commentChannelInfo)) {
+                                this._log(`🚫 Blocking comment by author: ${commentChannelInfo.name || commentChannelInfo.id || commentChannelInfo.handle}`);
                                 return true;
                             }
                         }
@@ -829,9 +849,96 @@
 
         /**
          * Extract comprehensive channel information
+         * For collaboration videos, returns an array of all collaborating channels
          */
         _extractChannelInfo(item, rules) {
             const channelInfo = { name: '', id: '', handle: '' };
+
+            // PRIORITY: Check for collaboration video (showDialogCommand in byline)
+            const bylineText = item.shortBylineText || item.longBylineText;
+
+            // DEBUG: Log when we're checking byline
+            if (bylineText) {
+                const bylineTextContent = flattenText(bylineText);
+                if (bylineTextContent && (bylineTextContent.includes(' and ') || bylineTextContent.includes(' & '))) {
+                    postLogToBridge('log', '[COLLAB DEBUG] Found potential collaboration byline:', bylineTextContent);
+                    postLogToBridge('log', '[COLLAB DEBUG] Byline has runs?', !!bylineText.runs, 'runs length:', bylineText.runs?.length);
+                }
+            }
+
+            if (bylineText?.runs) {
+                for (const run of bylineText.runs) {
+                    // DEBUG: Log run structure
+                    if (run.text && (run.text.includes(' and ') || run.text.includes(' & '))) {
+                        postLogToBridge('log', '[COLLAB DEBUG] Checking run with text:', run.text);
+                        postLogToBridge('log', '[COLLAB DEBUG] Has navigationEndpoint?', !!run.navigationEndpoint);
+                        postLogToBridge('log', '[COLLAB DEBUG] Has showDialogCommand?', !!run.navigationEndpoint?.showDialogCommand);
+                    }
+
+                    // Look for showDialogCommand which indicates a collaboration video
+                    const showDialogCommand = run.navigationEndpoint?.showDialogCommand;
+                    if (showDialogCommand) {
+                        postLogToBridge('log', '🎯 Detected COLLABORATION video via showDialogCommand in filter_logic');
+
+                        // Extract all collaborating channels from listItems
+                        const listItems = showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems;
+
+                        if (listItems && Array.isArray(listItems)) {
+                            const collaborators = [];
+
+                            for (const item of listItems) {
+                                const listItemViewModel = item.listItemViewModel;
+                                if (listItemViewModel) {
+                                    const browseEndpoint = listItemViewModel.rendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint;
+                                    const title = listItemViewModel.title?.content;
+
+                                    if (browseEndpoint) {
+                                        const browseId = browseEndpoint.browseId;
+                                        const canonicalBaseUrl = browseEndpoint.canonicalBaseUrl;
+
+                                        let collabChannelInfo = { name: title || '', id: '', handle: '' };
+
+                                        // Extract handle from canonicalBaseUrl
+                                        if (canonicalBaseUrl) {
+                                            const handleMatch = canonicalBaseUrl.match(/@([\w-]+)/);
+                                            if (handleMatch) {
+                                                collabChannelInfo.handle = `@${handleMatch[1]}`;
+                                            }
+                                        }
+
+                                        // Extract UC ID
+                                        if (browseId?.startsWith('UC')) {
+                                            collabChannelInfo.id = browseId;
+                                        }
+
+                                        if (collabChannelInfo.handle || collabChannelInfo.id) {
+                                            collaborators.push(collabChannelInfo);
+                                            postLogToBridge('log', '✅ Extracted collaborator in filter_logic:', collabChannelInfo);
+
+                                            // Register mapping for this collaborator
+                                            if (collabChannelInfo.id && collabChannelInfo.handle) {
+                                                this._registerMapping(collabChannelInfo.id, collabChannelInfo.handle);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (collaborators.length > 1) {
+                                postLogToBridge('log', '🎉 Found', collaborators.length, 'collaborating channels:', collaborators);
+                                // Return an array of all collaborators for special handling
+                                return collaborators;
+                            } else if (collaborators.length === 1) {
+                                // Single channel, not a collaboration
+                                postLogToBridge('log', '⚠️ Only 1 collaborator found, treating as single channel');
+                                return collaborators[0];
+                            }
+                        } else {
+                            postLogToBridge('log', '⚠️ showDialogCommand found but no listItems');
+                        }
+                    }
+                }
+            }
 
             // Extract using rules
             if (rules.channelName) {
