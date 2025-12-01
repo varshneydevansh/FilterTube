@@ -816,7 +816,12 @@ browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
     console.log('FilterTube Background: Received message:', message.type);
 
     if (message.type === 'addFilteredChannel') {
-        handleAddFilteredChannel(message.input, message.filterAll, message.collaborationWith).then(sendResponse);
+        handleAddFilteredChannel(
+            message.input, 
+            message.filterAll, 
+            message.collaborationWith,
+            message.collaborationGroupId
+        ).then(sendResponse);
         return true; // Keep channel open for async response
     }
 
@@ -833,9 +838,10 @@ browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
  * @param {string} input - Channel identifier (@handle or UC ID)
  * @param {boolean} filterAll - Whether to enable Filter All for this channel
  * @param {Array<string>} collaborationWith - Optional list of handles/names this channel is collaborating with
+ * @param {string} collaborationGroupId - Optional UUID linking channels blocked together
  * @returns {Promise<Object>} Result with success status
  */
-async function handleAddFilteredChannel(input, filterAll = false, collaborationWith = null) {
+async function handleAddFilteredChannel(input, filterAll = false, collaborationWith = null, collaborationGroupId = null) {
     try {
         const rawValue = input.trim();
         if (!rawValue) {
@@ -881,7 +887,8 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             name: channelInfo.name,
             logo: channelInfo.logo,
             filterAll: filterAll, // Use provided value
-            collaborationWith: collaborationWith || [] // Store collaboration metadata
+            collaborationWith: collaborationWith || [], // Store collaboration metadata
+            collaborationGroupId: collaborationGroupId || null // UUID for group operations
         };
 
         // Add to beginning (newest first)

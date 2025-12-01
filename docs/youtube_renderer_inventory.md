@@ -47,10 +47,65 @@ This document tracks which YouTube renderers/selectors FilterTube currently targ
 | `<ytd-badge-supported-renderer>` (verified badge) | `metadataBadgeRenderer` | ℹ️ **NEW** | Badge exposes "Official Artist Channel"; low priority unless badges become filter inputs |
 
 ### Collaboration Videos (2025-12-01 sample, NEW)
+
+YouTube collaboration videos can feature up to **5 collaborating channels + 1 uploader** (6 total). This requires special handling in both data extraction and UI.
+
+#### Data Sources
+
+| Source | Location | Data Available | Status |
+| --- | --- | --- | --- |
+| **ytInitialData (Primary)** | `videoRenderer.longBylineText.runs[].navigationEndpoint.showDialogCommand.panelLoadingStrategy.inlineContent.dialogViewModel.customContent.listViewModel.listItems[]` | Full channel info for ALL collaborators | ✅ Covered |
+| **DOM Fallback** | `#attributed-channel-name > yt-text-view-model` | Channel names, partial handles (first channel only has direct link) | ✅ Covered |
+
+#### ytInitialData Structure for Collaborators
+
+Each collaborator in `listItems[].listItemViewModel`:
+| Field Path | Data | Example |
+| --- | --- | --- |
+| `title.content` | Channel name | `"fern"` |
+| `subtitle.content` | Handle + subscriber count (Unicode wrapped) | `"‎⁨@fern-tv⁩ • ⁨42.7 lakh subscribers⁩"` |
+| `rendererContext.commandContext.onTap.innertubeCommand.browseEndpoint.browseId` | UC ID | `"UCODHrzPMGbNv67e84WDZhQQ"` |
+
+**Note:** `canonicalBaseUrl` is NOT present inside `showDialogCommand` - the `@handle` must be extracted from `subtitle.content` using regex.
+
+#### DOM Elements
+
 | DOM tag / component | Underlying renderer / data source | Status | Notes |
 | --- | --- | --- | --- |
-| `<div id="attributed-channel-name">` | `attributedChannelName` in `lockupViewModel.byline` | ✅ Covered | Extracts all collaborating channels; blocks if ANY collaborator is blocked |
-| `<yt-text-view-model>` with attributed string | DOM-only collaboration display | ✅ Covered | Parses "Channel A ✓ and Channel B ✓" format; extracts names, handles, and IDs for all collaborators |
+| `<div id="attributed-channel-name">` | `attributedChannelName` in `lockupViewModel.byline` | ✅ Covered | Detects collaboration videos; triggers special handling |
+| `<yt-text-view-model>` with attributed string | DOM-only collaboration display | ✅ Covered | Parses "Channel A ✓ and Channel B ✓" format |
+| `<yt-core-attributed-string>` | Contains channel spans | ✅ Covered | Each span has channel name |
+| `<a href="/@handle">` | Direct channel link | ⚠️ Partial | Only FIRST channel has direct link in DOM; others require ytInitialData lookup |
+
+#### 3-Dot Menu UI for Collaborations
+
+| Menu Option | When Shown | Behavior |
+| --- | --- | --- |
+| Block [Channel 1] | 2+ collaborators | Blocks individual channel, stores `collaborationWith` metadata |
+| Block [Channel 2] | 2+ collaborators | Blocks individual channel, stores `collaborationWith` metadata |
+| Block [Channel 3-6] | 3-6 collaborators | Dynamic options for each additional collaborator |
+| Block All Collaborators | 2+ collaborators | Blocks ALL channels independently with shared `collaborationGroupId` |
+
+#### Storage Schema for Collaboration Entries
+
+```javascript
+{
+  id: "UCxxxxxx",           // UC ID
+  handle: "@channelname",   // @handle
+  name: "Channel Name",     // Display name
+  filterAll: true/false,    // Filter All toggle state
+  collaborationWith: ["@other1", "@other2"],  // Other collaborators (for UI display)
+  collaborationGroupId: "uuid-xxx"            // Links related entries (for group operations)
+}
+```
+
+#### Cross-World Communication
+
+Since content_bridge.js runs in **Isolated World** (no `ytInitialData` access), collaboration data requires message-based lookup:
+1. DOM extraction detects collaboration video
+2. If collaborator data incomplete → request from Main World via `FilterTube_RequestCollaboratorInfo`
+3. injector.js (Main World) searches `ytInitialData` and responds with `FilterTube_CollaboratorInfoResponse`
+4. content_bridge.js enriches collaborator data and injects menu options
 
 ### Podcasts shelf (Podcasts tab, 2025-11-18 sample)
 | DOM tag / component | Underlying renderer / data source | Status | Notes |

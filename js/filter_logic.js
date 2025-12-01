@@ -712,6 +712,23 @@
                 }
             }
 
+            // Send collaboration data to Main World for caching
+            if (isCollaboration && videoId && collaborators.length > 1) {
+                try {
+                    window.postMessage({
+                        type: 'FilterTube_CacheCollaboratorInfo',
+                        payload: {
+                            videoId: videoId,
+                            collaborators: collaborators
+                        },
+                        source: 'filter_logic'
+                    }, '*');
+                    postLogToBridge('log', `📤 Sent collaboration data to Main World for caching: ${videoId}`);
+                } catch (e) {
+                    postLogToBridge('warn', 'Failed to send collaboration data to Main World:', e);
+                }
+            }
+
             // Shorts filtering
             if (this.settings.hideAllShorts && (rendererType === 'reelItemRenderer' || rendererType === 'shortsLockupViewModel' || rendererType === 'shortsLockupViewModelV2')) {
                 this._log(`🚫 Blocking Shorts: ${title || 'Unknown'}`);
@@ -926,6 +943,11 @@
 
                             if (collaborators.length > 1) {
                                 postLogToBridge('log', '🎉 Found', collaborators.length, 'collaborating channels:', collaborators);
+
+                                // Send collaboration data to Main World for caching
+                                // Note: We need the videoId to cache this, but we don't have it here
+                                // The videoId will be available in _shouldBlock, so we'll send it from there
+
                                 // Return an array of all collaborators for special handling
                                 return collaborators;
                             } else if (collaborators.length === 1) {
