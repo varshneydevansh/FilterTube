@@ -884,6 +884,148 @@ function extractChannelMetadataFromElement(element, channelText = '', channelHre
     return meta;
 }
 
+function extractCollaboratorMetadataFromElement(element) {
+    if (!element || typeof element.getAttribute !== 'function') return [];
+
+    const cached = element.getAttribute('data-filtertube-collaborators');
+    if (cached) {
+        try {
+            const parsed = JSON.parse(cached);
+            if (Array.isArray(parsed)) {
+                return parsed;
+            }
+        } catch (err) {
+            console.warn('FilterTube: Failed to parse cached collaborator metadata:', err);
+        }
+    }
+
+    const collaborators = [];
+    
+    // Method 1: Check for #attributed-channel-name (collaboration indicator)
+    const attributedContainer = element.querySelector('#attributed-channel-name, [id="attributed-channel-name"]');
+
+    if (attributedContainer) {
+        // Check for yt-text-view-model structure (newer YouTube layout)
+        const ytTextViewModel = attributedContainer.querySelector('yt-text-view-model');
+        
+        if (ytTextViewModel) {
+            const attributedString = ytTextViewModel.querySelector('.yt-core-attributed-string');
+            
+            if (attributedString) {
+                // Get the full text content and split by " and "
+                const fullText = attributedString.textContent || '';
+                const channelNames = fullText
+                    .split(' and ')
+                    .map(name => name.trim())
+                    .filter(name => name.length > 0 && name !== 'and');
+
+                // Create collaborator objects from channel names
+                for (const name of channelNames) {
+                    collaborators.push({ name, handle: '', id: '' });
+                }
+
+                // Try to find links for handles/IDs - look in the entire element, not just attributedContainer
+                const links = element.querySelectorAll('a[href*="/@"]:not([href*="/shorts"]):not([href*="/watch"]), a[href*="/channel/UC"]');
+                let linkIndex = 0;
+
+                for (const link of links) {
+                    if (linkIndex >= collaborators.length) break;
+
+                    const href = link.getAttribute('href') || '';
+                    if (href) {
+                        const handleMatch = href.match(/@([\w-]+)/);
+                        if (handleMatch) {
+                            collaborators[linkIndex].handle = `@${handleMatch[1].toLowerCase()}`;
+                        }
+
+                        const ucMatch = href.match(/\/(UC[\w-]{22})/);
+                        if (ucMatch) {
+                            collaborators[linkIndex].id = ucMatch[1].toLowerCase();
+                        }
+
+                        linkIndex++;
+                    }
+                }
+            }
+        }
+        
+        // Fallback: Direct link extraction from attributedContainer
+        if (collaborators.length === 0) {
+            const linkSelectors = 'a[href*="/@"]:not([href*="/shorts"]):not([href*="/watch"]), a[href*="/channel/UC"], a[href*="/user/"], a[href*="/c/"]';
+            const links = attributedContainer.querySelectorAll(linkSelectors);
+            const seenKeys = new Set();
+
+            links.forEach(link => {
+                const href = link.getAttribute('href') || link.href || '';
+                const name = link.textContent?.trim() || '';
+                const handle = (extractHandleFromString(href) || extractHandleFromString(name) || '').toLowerCase();
+                const id = (extractChannelIdFromString(href) || '').toLowerCase();
+                const key = handle || id || name.toLowerCase();
+                if (!key || seenKeys.has(key)) return;
+
+                collaborators.push({
+                    name,
+                    handle: handle.startsWith('@') ? handle : (handle ? `@${handle}` : ''),
+                    id
+                });
+                seenKeys.add(key);
+            });
+        }
+    }
+    
+    // Method 2: Check for " and " in channel name text (fallback for different DOM structures)
+    if (collaborators.length === 0) {
+        const channelNameEl = element.querySelector('#channel-name, ytd-channel-name, .ytd-channel-name');
+        if (channelNameEl) {
+            const channelText = channelNameEl.textContent?.trim() || '';
+            if (channelText.includes(' and ')) {
+                const channelNames = channelText
+                    .split(' and ')
+                    .map(name => name.trim())
+                    .filter(name => name.length > 0 && name !== 'and');
+                
+                if (channelNames.length > 1) {
+                    // This is a collaboration - extract what we can
+                    const links = element.querySelectorAll('a[href*="/@"]:not([href*="/shorts"]):not([href*="/watch"]), a[href*="/channel/UC"]');
+                    let linkIndex = 0;
+                    
+                    for (const name of channelNames) {
+                        const collaborator = { name, handle: '', id: '' };
+                        
+                        // Try to match with a link
+                        if (linkIndex < links.length) {
+                            const link = links[linkIndex];
+                            const href = link.getAttribute('href') || '';
+                            const handleMatch = href.match(/@([\w-]+)/);
+                            if (handleMatch) {
+                                collaborator.handle = `@${handleMatch[1].toLowerCase()}`;
+                            }
+                            const ucMatch = href.match(/\/(UC[\w-]{22})/);
+                            if (ucMatch) {
+                                collaborator.id = ucMatch[1].toLowerCase();
+                            }
+                            linkIndex++;
+                        }
+                        
+                        collaborators.push(collaborator);
+                    }
+                }
+            }
+        }
+    }
+
+    if (collaborators.length > 0) {
+        try {
+            element.setAttribute('data-filtertube-collaborators', JSON.stringify(collaborators));
+            console.log('FilterTube: Extracted collaborators from DOM:', collaborators);
+        } catch (err) {
+            console.warn('FilterTube: Failed to cache collaborator metadata:', err);
+        }
+    }
+
+    return collaborators;
+}
+
 function channelMatchesFilter(meta, filterChannel, channelMap = {}) {
     // Safety: Don't match against empty or invalid filters
     if (!filterChannel) return false;
@@ -892,32 +1034,59 @@ function channelMatchesFilter(meta, filterChannel, channelMap = {}) {
     if (typeof filterChannel === 'object' && filterChannel !== null) {
         const filterId = (filterChannel.id || '').toLowerCase();
         const filterHandle = (filterChannel.handle || '').toLowerCase();
+        const filterName = (filterChannel.name || '').toLowerCase().trim();
 
-        // Safety: If both ID and handle are empty, don't match anything
-        if (!filterId && !filterHandle) return false;
+        // Safety: If ID, handle, and name are all empty, don't match anything
+        if (!filterId && !filterHandle && !filterName) return false;
+
+        const metaId = (meta.id || '').toLowerCase();
+        const metaHandle = (meta.handle || '').toLowerCase();
+        const metaName = (meta.name || '').toLowerCase().trim();
 
         // Direct match by UC ID
-        if (filterId && meta.id && meta.id.toLowerCase() === filterId) {
+        if (filterId && metaId && metaId === filterId) {
             return true;
         }
 
         // Direct match by handle
-        if (filterHandle && meta.handle && meta.handle.toLowerCase() === filterHandle) {
+        if (filterHandle && metaHandle && metaHandle === filterHandle) {
             return true;
         }
 
+        // Name-based matching (for collaborators where we only have names)
+        // Match if filter name matches meta name, or if filter name matches meta handle without @
+        if (filterName && metaName && filterName === metaName) {
+            return true;
+        }
+        
+        // Match filter name against meta handle (e.g., filter "Veritasium" matches @veritasium)
+        if (filterName && metaHandle) {
+            const handleWithoutAt = metaHandle.replace(/^@/, '');
+            if (filterName === handleWithoutAt) {
+                return true;
+            }
+        }
+        
+        // Match filter handle against meta name (e.g., filter @veritasium matches name "Veritasium")
+        if (filterHandle && metaName) {
+            const handleWithoutAt = filterHandle.replace(/^@/, '');
+            if (handleWithoutAt === metaName) {
+                return true;
+            }
+        }
+
         // Cross-match using channelMap: blocking UC ID should also block its handle
-        if (filterId && meta.handle) {
+        if (filterId && metaHandle) {
             const mappedHandle = channelMap[filterId];
-            if (mappedHandle && meta.handle.toLowerCase() === mappedHandle) {
+            if (mappedHandle && metaHandle === mappedHandle) {
                 return true;
             }
         }
 
         // Cross-match using channelMap: blocking handle should also block its UC ID
-        if (filterHandle && meta.id) {
+        if (filterHandle && metaId) {
             const mappedId = channelMap[filterHandle];
-            if (mappedId && meta.id.toLowerCase() === mappedId) {
+            if (mappedId && metaId === mappedId) {
                 return true;
             }
         }
@@ -1118,6 +1287,8 @@ function toggleVisibility(element, shouldHide, reason = '', skipStats = false) {
         if (wasHidden) {
             element.classList.remove('filtertube-hidden');
             element.removeAttribute('data-filtertube-hidden');
+            // CRITICAL: Reset inline style.display that was set during hiding
+            element.style.display = '';
             // debugLog(`✅ Restoring element`);
 
             // Record for tracking (only for non-container items)
@@ -1292,6 +1463,7 @@ function applyDOMFallback(settings, options = {}) {
             cacheTarget: channelAnchor || element,
             relatedElements
         });
+        const collaboratorMetas = extractCollaboratorMetadataFromElement(element);
 
         // Determine Visibility
         const elementTag = element.tagName.toLowerCase();
@@ -1317,7 +1489,8 @@ function applyDOMFallback(settings, options = {}) {
         const matchesFilters = shouldHideContent(title, channel, effectiveSettings, {
             skipKeywords: skipKeywordFiltering,
             channelHref,
-            channelMeta
+            channelMeta,
+            collaborators: collaboratorMetas
         });
 
         // Handle Container Logic (e.g., rich-grid-media inside rich-item)
@@ -1529,10 +1702,15 @@ function applyDOMFallback(settings, options = {}) {
 function shouldHideContent(title, channel, settings, options = {}) {
     if (!title && !channel) return false;
 
-    const { skipKeywords = false, channelHref = '', channelMeta: providedChannelMeta = null } = options;
+    const {
+        skipKeywords = false,
+        channelHref = '',
+        channelMeta: providedChannelMeta = null,
+        collaborators = []
+    } = options;
     const channelMeta = providedChannelMeta || buildChannelMetadata(channel, channelHref);
     const hasChannelIdentity = Boolean(channelMeta.handle || channelMeta.id);
-
+    
     // Debug logging (disabled by default - set to true for troubleshooting)
     const debugFiltering = false;
     if (debugFiltering && (channelMeta.handle || channelMeta.id)) {
@@ -1569,12 +1747,14 @@ function shouldHideContent(title, channel, settings, options = {}) {
     }
 
     // Channel filtering
-    if (settings.filterChannels && settings.filterChannels.length > 0 && hasChannelIdentity) {
+    if (settings.filterChannels && settings.filterChannels.length > 0 && (hasChannelIdentity || collaborators.length > 0)) {
         const channelMap = settings.channelMap || {};
+
+        const collaboratorMetas = Array.isArray(collaborators) ? collaborators : [];
 
         // 1. Normal Check (Fast path - direct match or existing channelMap lookup)
         for (const filterChannel of settings.filterChannels) {
-            if (channelMatchesFilter(channelMeta, filterChannel, channelMap)) {
+            if (hasChannelIdentity && channelMatchesFilter(channelMeta, filterChannel, channelMap)) {
                 if (debugFiltering) {
                     console.log(`FilterTube DEBUG: MATCH FOUND! Video will be hidden.`, {
                         title: title.substring(0, 50),
@@ -1583,6 +1763,20 @@ function shouldHideContent(title, channel, settings, options = {}) {
                     });
                 }
                 return true;
+            }
+
+            if (collaboratorMetas.length > 0) {
+                const collaboratorMatched = collaboratorMetas.some(collaborator => channelMatchesFilter(collaborator, filterChannel, channelMap));
+                if (collaboratorMatched) {
+                    if (debugFiltering) {
+                        console.log(`FilterTube DEBUG: Collaborator match found. Video will be hidden.`, {
+                            title: title.substring(0, 50),
+                            collaborators: collaboratorMetas,
+                            matchedFilter: filterChannel
+                        });
+                    }
+                    return true;
+                }
             }
         }
 
@@ -1822,6 +2016,106 @@ function requestCollaboratorInfoFromMainWorld(videoId) {
 
         console.log('FilterTube: Sent collaborator info request to Main World for video:', videoId);
     });
+}
+
+/**
+ * Normalize collaborator names for comparison
+ * @param {string} name
+ * @returns {string}
+ */
+function normalizeCollaboratorName(name) {
+    if (!name) return '';
+    return name.trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
+/**
+ * Merge collaborator data from Main World into the DOM-derived structures
+ * @param {Object} initialChannelInfo
+ * @param {Array} mainWorldCollaborators
+ */
+function mergeCollaboratorsWithMainWorld(initialChannelInfo, mainWorldCollaborators) {
+    if (!initialChannelInfo?.allCollaborators || initialChannelInfo.allCollaborators.length === 0) {
+        return;
+    }
+
+    if (!Array.isArray(mainWorldCollaborators) || mainWorldCollaborators.length === 0) {
+        return;
+    }
+
+    const usedIndices = new Set();
+    const tryMatch = (predicate) => {
+        for (let i = 0; i < mainWorldCollaborators.length; i++) {
+            if (usedIndices.has(i)) continue;
+            const candidate = mainWorldCollaborators[i];
+            if (predicate(candidate)) {
+                usedIndices.add(i);
+                return candidate;
+            }
+        }
+        return null;
+    };
+
+    initialChannelInfo.allCollaborators.forEach(collaborator => {
+        if (!collaborator) return;
+
+        const normalizedHandle = collaborator.handle?.toLowerCase();
+        const normalizedId = collaborator.id?.toLowerCase();
+        const normalizedName = normalizeCollaboratorName(collaborator.name);
+
+        let match = null;
+        if (normalizedHandle) {
+            match = tryMatch(candidate => candidate.handle && candidate.handle.toLowerCase() === normalizedHandle);
+        }
+        if (!match && normalizedId) {
+            match = tryMatch(candidate => candidate.id && candidate.id.toLowerCase() === normalizedId);
+        }
+        if (!match && normalizedName) {
+            match = tryMatch(candidate => normalizeCollaboratorName(candidate.name) === normalizedName);
+        }
+        if (!match) {
+            match = tryMatch(() => true);
+        }
+
+        if (match) {
+            if (match.handle) collaborator.handle = match.handle;
+            if (match.id) collaborator.id = match.id;
+            if (match.name) collaborator.name = match.name;
+        }
+    });
+
+    const primary = initialChannelInfo.allCollaborators[0];
+    if (primary) {
+        initialChannelInfo.handle = primary.handle || initialChannelInfo.handle;
+        initialChannelInfo.id = primary.id || initialChannelInfo.id;
+        initialChannelInfo.name = primary.name || initialChannelInfo.name;
+    }
+
+    initialChannelInfo.needsEnrichment = false;
+}
+
+/**
+ * Ensure collaborator data is enriched from ytInitialData (Main World)
+ * @param {Object} initialChannelInfo
+ * @returns {Promise<Array|null>}
+ */
+async function enrichCollaboratorsWithMainWorld(initialChannelInfo) {
+    if (!initialChannelInfo?.isCollaboration || !initialChannelInfo.videoId) {
+        return null;
+    }
+
+    try {
+        const mainWorldCollaborators = await requestCollaboratorInfoFromMainWorld(initialChannelInfo.videoId);
+        if (mainWorldCollaborators && mainWorldCollaborators.length > 0) {
+            console.log('FilterTube: Received collaborator info from Main World:', mainWorldCollaborators);
+            mergeCollaboratorsWithMainWorld(initialChannelInfo, mainWorldCollaborators);
+        } else {
+            console.log('FilterTube: No collaborator info received from Main World');
+        }
+        return mainWorldCollaborators;
+    } catch (error) {
+        console.error('FilterTube: Error enriching collaborator info from Main World:', error);
+        return null;
+    }
 }
 
 function handleMainWorldMessages(event) {
@@ -2643,59 +2937,10 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
 
     console.log('FilterTube: Initial channel info:', initialChannelInfo);
 
-    // ASYNC ENRICHMENT: If collaboration video is missing handle/id for some collaborators,
-    // request the data from Main World (where ytInitialData is accessible)
-    if (initialChannelInfo.isCollaboration && initialChannelInfo.needsEnrichment && initialChannelInfo.videoId) {
-        console.log('FilterTube: Collaboration needs enrichment, requesting from Main World...');
-
-        try {
-            const mainWorldCollaborators = await requestCollaboratorInfoFromMainWorld(initialChannelInfo.videoId);
-
-            if (mainWorldCollaborators && Array.isArray(mainWorldCollaborators) && mainWorldCollaborators.length > 0) {
-                console.log('FilterTube: Received collaborator info from Main World:', mainWorldCollaborators);
-
-                // Merge the Main World data with our DOM-extracted collaborators by matching names
-                for (let i = 0; i < initialChannelInfo.allCollaborators.length; i++) {
-                    const domCollaborator = initialChannelInfo.allCollaborators[i];
-
-                    // Only enrich if missing handle AND id
-                    if (!domCollaborator.handle && !domCollaborator.id) {
-                        // Find matching collaborator from Main World by name
-                        const match = mainWorldCollaborators.find(
-                            mwc => mwc.name && domCollaborator.name &&
-                                mwc.name.toLowerCase() === domCollaborator.name.toLowerCase()
-                        );
-
-                        if (match) {
-                            if (match.handle) domCollaborator.handle = match.handle;
-                            if (match.id) domCollaborator.id = match.id;
-                            console.log('FilterTube: Enriched collaborator:', domCollaborator);
-                        }
-                    } else if (!domCollaborator.id && domCollaborator.handle) {
-                        // Has handle but missing ID - try to get ID
-                        const match = mainWorldCollaborators.find(
-                            mwc => mwc.handle === domCollaborator.handle
-                        );
-                        if (match?.id) {
-                            domCollaborator.id = match.id;
-                            console.log('FilterTube: Added missing ID to collaborator:', domCollaborator);
-                        }
-                    }
-                }
-
-                // Also update the primary channel info
-                if (initialChannelInfo.allCollaborators[0]) {
-                    initialChannelInfo.handle = initialChannelInfo.allCollaborators[0].handle;
-                    initialChannelInfo.id = initialChannelInfo.allCollaborators[0].id;
-                }
-
-                console.log('FilterTube: Enriched channel info:', initialChannelInfo);
-            } else {
-                console.log('FilterTube: No collaborator info received from Main World');
-            }
-        } catch (err) {
-            console.error('FilterTube: Error enriching collaborator info:', err);
-        }
+    // Kick off collaborator enrichment (non-blocking) so handles/IDs stay accurate regardless of DOM ordering
+    let collaboratorEnrichmentPromise = null;
+    if (initialChannelInfo.isCollaboration && initialChannelInfo.videoId) {
+        collaboratorEnrichmentPromise = enrichCollaboratorsWithMainWorld(initialChannelInfo);
     }
 
     // Wait for menu to be populated by YouTube (with timeout)
@@ -2860,6 +3105,7 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
     // Store the fetch promise for later use (when user clicks "Block Channel")
     pendingDropdownFetches.set(dropdown, {
         channelInfoPromise: fetchPromise,
+        collaboratorPromise: collaboratorEnrichmentPromise,
         cancelled: false,
         initialChannelInfo: initialChannelInfo
     });
@@ -3234,22 +3480,52 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             titleSpan.style.color = '#10b981'; // green
         }
 
-        // Hide the video card immediately
+        // Hide ALL instances of this video card immediately
         if (videoCard) {
             console.log('FilterTube: Hiding video card immediately (Block All Collaborators)');
-            let containerToHide = videoCard;
-            if (videoCard.tagName.toLowerCase().includes('shorts-lockup-view-model')) {
-                let parentContainer = videoCard.closest('ytd-rich-item-renderer');
-                if (!parentContainer) {
-                    parentContainer = videoCard.closest('.ytGridShelfViewModelGridShelfItem');
-                }
-                if (parentContainer) {
-                    containerToHide = parentContainer;
-                }
+
+            // Extract videoId to find all instances of this video
+            const videoId = extractVideoIdFromCard(videoCard);
+            console.log('FilterTube: Video ID for hiding:', videoId);
+
+            // Find all cards with this videoId
+            let cardsToHide = [];
+
+            if (videoId) {
+                // Find all video cards on the page
+                const allVideoCards = document.querySelectorAll('ytd-video-renderer, ytd-grid-video-renderer, ytd-compact-video-renderer, ytd-rich-item-renderer');
+
+                allVideoCards.forEach(card => {
+                    const cardVideoId = extractVideoIdFromCard(card);
+                    if (cardVideoId === videoId) {
+                        cardsToHide.push(card);
+                    }
+                });
+
+                console.log(`FilterTube: Found ${cardsToHide.length} instance(s) of video ${videoId} to hide`);
+            } else {
+                // Fallback: just hide the current card if we can't extract videoId
+                cardsToHide = [videoCard];
+                console.log('FilterTube: Could not extract videoId, hiding only current card');
             }
-            containerToHide.style.display = 'none';
-            containerToHide.classList.add('filtertube-hidden');
-            containerToHide.setAttribute('data-filtertube-hidden', 'true');
+
+            // Hide all instances
+            cardsToHide.forEach((card, index) => {
+                let containerToHide = card;
+                if (card.tagName.toLowerCase().includes('shorts-lockup-view-model')) {
+                    let parentContainer = card.closest('ytd-rich-item-renderer');
+                    if (!parentContainer) {
+                        parentContainer = card.closest('.ytGridShelfViewModelGridShelfItem');
+                    }
+                    if (parentContainer) {
+                        containerToHide = parentContainer;
+                    }
+                }
+                containerToHide.style.display = 'none';
+                containerToHide.classList.add('filtertube-hidden');
+                containerToHide.setAttribute('data-filtertube-hidden', 'true');
+                console.log(`FilterTube: Applied immediate hiding to instance ${index + 1}:`, containerToHide.tagName || containerToHide.className);
+            });
         }
 
         // Close dropdown
@@ -3278,6 +3554,13 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
 
     // Check if there's a background fetch in progress with complete channel info
     const fetchData = dropdown ? pendingDropdownFetches.get(dropdown) : null;
+    if (fetchData?.collaboratorPromise) {
+        try {
+            await fetchData.collaboratorPromise;
+        } catch (error) {
+            console.warn('FilterTube: Collaborator enrichment failed, continuing with DOM data:', error);
+        }
+    }
     if (fetchData && !fetchData.cancelled && fetchData.channelInfoPromise) {
         console.log('FilterTube: Waiting for background fetch to complete...');
         try {
@@ -3330,36 +3613,65 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
 
         console.log('FilterTube: Successfully blocked channel:', channelInfo, 'filterAll:', filterAll);
 
-        // IMMEDIATELY hide the video card for instant feedback
+        // IMMEDIATELY hide ALL instances of this video card for instant feedback
+        // (YouTube sometimes shows the same collaboration video multiple times in search results)
         if (videoCard) {
             console.log('FilterTube: Hiding video card immediately');
 
-            // For shorts, find the parent container
-            // For regular videos, the videoCard itself is usually the right container
-            let containerToHide = videoCard;
+            // Extract videoId to find all instances of this video
+            const videoId = extractVideoIdFromCard(videoCard);
+            console.log('FilterTube: Video ID for hiding:', videoId);
 
-            // Check if this is a shorts lockup model nested in a container
-            if (videoCard.tagName.toLowerCase().includes('shorts-lockup-view-model')) {
-                // Try homepage container (ytd-rich-item-renderer)
-                let parentContainer = videoCard.closest('ytd-rich-item-renderer');
+            // Find all cards with this videoId
+            let cardsToHide = [];
 
-                // If not found, try search page container (div.ytGridShelfViewModelGridShelfItem)
-                if (!parentContainer) {
-                    parentContainer = videoCard.closest('.ytGridShelfViewModelGridShelfItem');
-                }
+            if (videoId) {
+                // Find all video cards on the page
+                const allVideoCards = document.querySelectorAll('ytd-video-renderer, ytd-grid-video-renderer, ytd-compact-video-renderer, ytd-rich-item-renderer');
 
-                if (parentContainer) {
-                    containerToHide = parentContainer;
-                    console.log('FilterTube: Found parent container for shorts:', containerToHide.tagName || containerToHide.className);
-                }
+                allVideoCards.forEach(card => {
+                    const cardVideoId = extractVideoIdFromCard(card);
+                    if (cardVideoId === videoId) {
+                        cardsToHide.push(card);
+                    }
+                });
+
+                console.log(`FilterTube: Found ${cardsToHide.length} instance(s) of video ${videoId} to hide`);
+            } else {
+                // Fallback: just hide the current card if we can't extract videoId
+                cardsToHide = [videoCard];
+                console.log('FilterTube: Could not extract videoId, hiding only current card');
             }
 
-            // Immediate hiding: Apply direct styles + class to ensure it's hidden right away
-            // The storage change event will trigger proper re-filtering shortly after
-            containerToHide.style.display = 'none';
-            containerToHide.classList.add('filtertube-hidden');
-            containerToHide.setAttribute('data-filtertube-hidden', 'true');
-            console.log('FilterTube: Applied immediate hiding to:', containerToHide.tagName || containerToHide.className);
+            // Hide all instances
+            cardsToHide.forEach((card, index) => {
+                // For shorts, find the parent container
+                // For regular videos, the card itself is usually the right container
+                let containerToHide = card;
+
+                // Check if this is a shorts lockup model nested in a container
+                if (card.tagName.toLowerCase().includes('shorts-lockup-view-model')) {
+                    // Try homepage container (ytd-rich-item-renderer)
+                    let parentContainer = card.closest('ytd-rich-item-renderer');
+
+                    // If not found, try search page container (div.ytGridShelfViewModelGridShelfItem)
+                    if (!parentContainer) {
+                        parentContainer = card.closest('.ytGridShelfViewModelGridShelfItem');
+                    }
+
+                    if (parentContainer) {
+                        containerToHide = parentContainer;
+                    }
+                }
+
+                // Immediate hiding: Apply direct styles + class to ensure it's hidden right away
+                // The storage change event will trigger proper re-filtering shortly after
+                containerToHide.style.display = 'none';
+                containerToHide.classList.add('filtertube-hidden');
+                containerToHide.setAttribute('data-filtertube-hidden', 'true');
+                console.log(`FilterTube: Applied immediate hiding to instance ${index + 1}:`, containerToHide.tagName || containerToHide.className);
+            });
+
 
             // Close the dropdown since the video is now hidden
             const dropdown = menuItem.closest('tp-yt-iron-dropdown');
