@@ -579,8 +579,9 @@ function extractHandleFromString(value) {
 
 function extractChannelIdFromString(value) {
     if (!value || typeof value !== 'string') return '';
-    const match = value.match(/UC[0-9A-Za-z_-]{22}/i);
-    return match ? match[0].toLowerCase() : '';
+    // Channel IDs are case-sensitive - preserve original case (typically UCxxxxxxx)
+    const match = value.match(/UC[0-9A-Za-z_-]{22}/);
+    return match ? match[0] : '';
 }
 
 function normalizeHrefForParsing(href) {
@@ -863,9 +864,8 @@ function extractChannelMetadataFromElement(element, channelText = '', channelHre
         }
     }
 
-    if (meta.id) {
-        meta.id = meta.id.toLowerCase();
-    }
+    // Note: Channel IDs are case-sensitive and must NOT be lowercased
+    // They typically start with "UC" in uppercase
 
     if (cacheSource) {
         if (meta.handle) {
@@ -940,7 +940,7 @@ function extractCollaboratorMetadataFromElement(element) {
 
                         const ucMatch = href.match(/\/(UC[\w-]{22})/);
                         if (ucMatch) {
-                            collaborators[linkIndex].id = ucMatch[1].toLowerCase();
+                            collaborators[linkIndex].id = ucMatch[1]; // Keep original case
                         }
 
                         linkIndex++;
@@ -959,7 +959,7 @@ function extractCollaboratorMetadataFromElement(element) {
                 const href = link.getAttribute('href') || link.href || '';
                 const name = link.textContent?.trim() || '';
                 const handle = (extractHandleFromString(href) || extractHandleFromString(name) || '').toLowerCase();
-                const id = (extractChannelIdFromString(href) || '').toLowerCase();
+                const id = extractChannelIdFromString(href) || ''; // Keep original case for channel IDs
                 const key = handle || id || name.toLowerCase();
                 if (!key || seenKeys.has(key)) return;
 
@@ -1002,7 +1002,7 @@ function extractCollaboratorMetadataFromElement(element) {
                             }
                             const ucMatch = href.match(/\/(UC[\w-]{22})/);
                             if (ucMatch) {
-                                collaborator.id = ucMatch[1].toLowerCase();
+                                collaborator.id = ucMatch[1]; // Keep original case
                             }
                             linkIndex++;
                         }
@@ -3937,8 +3937,10 @@ function ensureFilterTubeMenuStyles() {
         padding: 8px 12px !important;
         width: 100% !important;
         box-sizing: border-box !important;
+        background: transparent !important;
     }
 
+    tp-yt-paper-item.filtertube-menu-item,
     tp-yt-paper-item.filtertube-menu-item[focused],
     tp-yt-paper-item.filtertube-menu-item[active],
     tp-yt-paper-item.filtertube-menu-item:focus,
@@ -3947,49 +3949,43 @@ function ensureFilterTubeMenuStyles() {
         background: transparent !important;
     }
 
+    tp-yt-paper-item.filtertube-menu-item::before,
+    tp-yt-paper-item.filtertube-menu-item::after,
+    .filtertube-menu-item::before,
+    .filtertube-menu-item::after {
+        background: transparent !important;
+    }
+
     .filtertube-menu-title-wrapper {
         display: flex !important;
         align-items: flex-start !important;
-        gap: 8px !important;
+        justify-content: space-between !important;
         width: 100% !important;
     }
 
     .filtertube-menu-title {
-        word-wrap: break-word !important;
-        white-space: normal !important;
-        line-height: 1.35 !important;
-        padding-right: 8px !important;
-        flex: 1 !important;
+        flex: 1 1 auto !important;
         min-width: 0 !important;
+        max-width: calc(100% - 85px) !important;
         font-size: 14px !important;
-        display: inline-flex !important;
-        align-items: baseline !important;
-        gap: 6px !important;
-        flex-wrap: nowrap !important;
+        line-height: 1.4 !important;
+        padding-right: 12px !important;
     }
 
     .filtertube-menu-label {
         color: #f87171 !important;
         font-weight: 600 !important;
-        font-size: 14px !important;
-        flex: 0 0 auto !important;
-        white-space: nowrap !important;
     }
 
     .filtertube-menu-separator {
         color: #f87171 !important;
         opacity: 0.6 !important;
-        flex: 0 0 auto !important;
-        white-space: nowrap !important;
+        margin: 0 4px !important;
     }
 
     .filtertube-channel-name {
         font-weight: 500 !important;
         color: #fef3c7 !important;
-        flex: 1 1 auto !important;
-        min-width: 0 !important;
-        white-space: normal !important;
-        overflow-wrap: break-word !important;
     }
 
     .filtertube-filter-all-toggle {
