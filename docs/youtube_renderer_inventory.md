@@ -126,6 +126,20 @@ Since content_bridge.js runs in **Isolated World** (no `ytInitialData` access), 
 | `secondarySearchContainerRenderer` | Container around secondary results | ✅ Covered @js/filter_logic.js#232-235 |
 
 ### DOM elements from 2025-11-17 sample (NEW)
+
+**⚠️ CRITICAL: Search page `ytd-video-renderer` structure differs from home page `yt-lockup-view-model`**
+
+On **home page** (`yt-lockup-view-model`):
+- `data-filtertube-channel-handle` is on the channel link inside `.yt-lockup-metadata-view-model__metadata`
+- Channel name text is in the same element
+
+On **search page** (`ytd-video-renderer`):
+- `data-filtertube-channel-handle` is on the **thumbnail link** (`#thumbnail a`)
+- Thumbnail link contains **overlay text** (duration like "25:31", "Now playing")
+- Channel name is in a **separate location**: `#channel-info > ytd-channel-name > a`
+
+**Solution**: When extracting channel name with data attributes present, ALWAYS query `#channel-info ytd-channel-name a` first, never rely on the data-attribute element's textContent.
+
 | DOM tag / component | Underlying renderer / data source | Status | Notes |
 | --- | --- | --- | --- |
 | `<ytd-video-renderer>` | `videoRenderer` search result card | ✅ Covered — **NEW** DOM tag surfaced in latest layout | Title, channel, snippet text still arrive via existing `descriptionSnippet` / `detailedMetadataSnippets` paths |

@@ -2608,8 +2608,44 @@ function extractChannelFromCard(card) {
     if (!card) return null;
 
     try {
-        // SPECIAL CASE: Detect if this is a Shorts card
+        // SPECIAL CASE: Detect if this is a Shorts card (compact format only)
         const isShortsCard = card.querySelector('ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2, .reel-item-endpoint');
+        
+        // Only detect as "Shorts in full card" if explicitly marked by FilterTube
+        // Do NOT use href detection as regular videos may have /shorts/ links in related content
+        const isShortsInFullCard = card.getAttribute('data-filtertube-short') === 'true';
+
+        // Handle Shorts displayed as full video cards (only when explicitly marked)
+        if (isShortsInFullCard && !isShortsCard) {
+            console.log('FilterTube: Detected SHORTS in full video card format');
+            
+            // For Shorts in full card, extract channel from #channel-name or channel link
+            // IMPORTANT: Avoid picking up text from thumbnail overlays (SHORTS badge, Now playing)
+            const channelNameEl = card.querySelector('#channel-info #channel-name a, #channel-name #text a, ytd-channel-name #text a');
+            if (channelNameEl) {
+                const href = channelNameEl.getAttribute('href');
+                const name = channelNameEl.textContent?.trim();
+                
+                if (href) {
+                    const handleMatch = href.match(/@([\w-]+)/);
+                    if (handleMatch) {
+                        const handle = `@${handleMatch[1]}`;
+                        console.log('FilterTube: Extracted from SHORTS full card:', { handle, name });
+                        return { handle, name };
+                    }
+                }
+            }
+            
+            // Fallback: Try data attributes
+            const dataHandle = card.getAttribute('data-filtertube-channel-handle') ||
+                card.querySelector('[data-filtertube-channel-handle]')?.getAttribute('data-filtertube-channel-handle');
+            if (dataHandle) {
+                // Get channel name from #channel-name, avoiding overlay text
+                const channelName = card.querySelector('#channel-info #channel-name a, #channel-name #text a, ytd-channel-name #text a')?.textContent?.trim();
+                console.log('FilterTube: Extracted from SHORTS full card data attr:', { handle: dataHandle, name: channelName });
+                return { handle: dataHandle, name: channelName };
+            }
+        }
 
         if (isShortsCard) {
             console.log('FilterTube: Detected SHORTS card, using special extraction');
@@ -2805,86 +2841,140 @@ function extractChannelFromCard(card) {
             card.querySelector('[data-filtertube-channel-id]')?.getAttribute('data-filtertube-channel-id');
 
         if (dataHandle || dataId) {
-            // Try multiple ways to get the channel name
-            const channelLinkWithAttr = card.querySelector('[data-filtertube-channel-handle], [data-filtertube-channel-id]');
             let name = null;
-
-            // First try: Get text from the element with the data attribute
-            if (channelLinkWithAttr) {
-                // Get only direct text content (avoid nested badge spans)
-                const textNodes = Array.from(channelLinkWithAttr.childNodes)
-                    .filter(n => n.nodeType === Node.TEXT_NODE)
-                    .map(n => n.textContent.trim())
-                    .filter(t => t.length > 0);
-                if (textNodes.length > 0) {
-                    name = textNodes.join('');
-                } else {
-                    // Fallback to full textContent but clean it up
-                    name = channelLinkWithAttr.textContent?.trim();
-                }
+            
+            // IMPORTANT: On search pages, data-filtertube-channel-handle is on the THUMBNAIL link,
+            // which contains overlay text (duration, "Now playing"). We must get the name from
+            // the actual channel name element, NOT from the element with the data attribute.
+            
+            // First try: Get name from proper channel name elements (ALWAYS do this first)
+            const channelNameEl = card.querySelector(
+                '#channel-info ytd-channel-name a, ' +
+                '#channel-info #channel-name a, ' +
+                'ytd-video-meta-block ytd-channel-name a, ' +
+                '#byline-container ytd-channel-name a, ' +
+                'ytd-channel-name #text a, ' +
+                '.yt-lockup-metadata-view-model__metadata a[href*="/@"]'
+            );
+            if (channelNameEl) {
+                name = channelNameEl.textContent?.trim();
             }
-
-            // Second try: Standard selectors
+            
+            // Second try: Only if no name found, try the data-attribute element itself
+            // BUT validate it doesn't contain overlay garbage
             if (!name) {
-                name = card.querySelector('#channel-name, ytd-channel-name, .channel-name, .yt-lockup-metadata-view-model__metadata a')?.textContent?.trim();
+                const channelLinkWithAttr = card.querySelector('[data-filtertube-channel-handle], [data-filtertube-channel-id]');
+                if (channelLinkWithAttr) {
+                    const candidateName = channelLinkWithAttr.textContent?.trim();
+                    // Reject if it looks like overlay text (duration or "Now playing")
+                    if (candidateName && 
+                        !candidateName.includes('Now playing') && 
+                        !/^\d+:\d+/.test(candidateName) &&
+                        !/\d+:\d+\s*Now playing/i.test(candidateName)) {
+                        name = candidateName;
+                    }
+                }
             }
 
             console.log('FilterTube: Extracted from data attribute:', { handle: dataHandle, id: dataId, name });
             return { handle: dataHandle, id: dataId, name };
         }
 
-        // Method 3: Find ANY link with channel info (comprehensive selectors)
-        const channelLink = card.querySelector(
-            'a[href*="/@"]:not([href*="/shorts"]), ' +  // Not a shorts link
-            'a[href*="/channel/"], ' +
-            '#avatar-link, ' +
-            '#channel-info a, ' +
-            '#metadata a[href^="/@"], ' +
-            '.ytd-channel-name a, ' +
-            'ytd-channel-name a, ' +
-            '#owner a, ' +
-            '#channel-thumbnail, ' +
-            '.reel-item-endpoint a[href*="/@"]'
+        // Method 3: Find channel link - PRIORITIZE specific metadata areas over generic selectors
+        // This prevents picking up links from thumbnail overlays (duration, "Now playing", etc.)
+        
+        // Priority 1: Channel name elements (most reliable for search results)
+        const channelNameLink = card.querySelector(
+            '#channel-info ytd-channel-name a[href*="/@"], ' +
+            '#channel-info ytd-channel-name a[href*="/channel/"], ' +
+            'ytd-video-meta-block ytd-channel-name a[href*="/@"], ' +
+            '#byline-container ytd-channel-name a[href*="/@"], ' +
+            'ytd-channel-name #text a[href*="/@"], ' +
+            '.yt-lockup-metadata-view-model__metadata a[href*="/@"]'
         );
-
-        if (channelLink) {
-            const href = channelLink.getAttribute('href');
+        
+        if (channelNameLink) {
+            const href = channelNameLink.getAttribute('href');
+            const name = channelNameLink.textContent?.trim();
             if (href) {
-                // Extract @handle
                 const handleMatch = href.match(/@([\w-]+)/);
                 if (handleMatch) {
-                    const handle = `@${handleMatch[1]}`;
-                    // Try multiple selectors for channel name
-                    const channelName = channelLink.textContent?.trim() ||
-                        card.querySelector('#channel-name, ytd-channel-name, .ytd-channel-name, #text, .channel-name')?.textContent?.trim();
-                    console.log('FilterTube: Extracted from link:', { handle, name: channelName });
-                    return { handle, name: channelName };
+                    console.log('FilterTube: Extracted from channel name link:', { handle: `@${handleMatch[1]}`, name });
+                    return { handle: `@${handleMatch[1]}`, name };
                 }
-
-                // Extract UC ID
                 const ucMatch = href.match(/\/(UC[\w-]{22})/);
                 if (ucMatch) {
-                    const id = ucMatch[1];
-                    const channelName = channelLink.textContent?.trim() ||
-                        card.querySelector('#channel-name, ytd-channel-name, .ytd-channel-name')?.textContent?.trim();
-                    console.log('FilterTube: Extracted from link (UC):', { id, name: channelName });
-                    return { id, name: channelName };
+                    console.log('FilterTube: Extracted from channel name link (UC):', { id: ucMatch[1], name });
+                    return { id: ucMatch[1], name };
+                }
+            }
+        }
+        
+        // Priority 2: Avatar/thumbnail links (have href but no text - get name separately)
+        const avatarLink = card.querySelector(
+            '#channel-thumbnail[href*="/@"], ' +
+            '#avatar-link[href*="/@"], ' +
+            '#owner a[href*="/@"]'
+        );
+        
+        if (avatarLink) {
+            const href = avatarLink.getAttribute('href');
+            if (href) {
+                const handleMatch = href.match(/@([\w-]+)/);
+                if (handleMatch) {
+                    // Get name from channel name element
+                    const nameEl = card.querySelector(
+                        '#channel-info ytd-channel-name a, ' +
+                        'ytd-channel-name #text a, ' +
+                        'ytd-video-meta-block ytd-channel-name a'
+                    );
+                    const name = nameEl?.textContent?.trim();
+                    console.log('FilterTube: Extracted from avatar link:', { handle: `@${handleMatch[1]}`, name });
+                    return { handle: `@${handleMatch[1]}`, name };
+                }
+            }
+        }
+        
+        // Priority 3: Generic channel links (last resort, but exclude thumbnail/overlay areas)
+        const genericChannelLink = card.querySelector(
+            '#metadata a[href*="/@"]:not([id="video-title"]), ' +
+            '.reel-item-endpoint a[href*="/@"]'
+        );
+        
+        if (genericChannelLink) {
+            const href = genericChannelLink.getAttribute('href');
+            if (href) {
+                const handleMatch = href.match(/@([\w-]+)/);
+                if (handleMatch) {
+                    let channelName = genericChannelLink.textContent?.trim();
+                    // Validate name doesn't contain overlay text
+                    if (!channelName || channelName.includes('Now playing') || /^\d+:\d+/.test(channelName)) {
+                        const nameEl = card.querySelector('#channel-info ytd-channel-name a, ytd-channel-name #text a');
+                        channelName = nameEl?.textContent?.trim() || channelName;
+                    }
+                    console.log('FilterTube: Extracted from generic link:', { handle: `@${handleMatch[1]}`, name: channelName });
+                    return { handle: `@${handleMatch[1]}`, name: channelName };
                 }
             }
         }
 
-        // Method 4: Fallback - search deeper in metadata
+        // Method 4: Fallback - search deeper in metadata (use specific selectors to avoid overlays)
         const channelNameEl = card.querySelector(
-            '#channel-name .yt-simple-endpoint, ' +
-            'ytd-channel-name a, ' +
-            '.ytd-channel-name a, ' +
-            '#owner-name a, ' +
-            '#metadata #channel-name a'
+            '#channel-info ytd-channel-name a, ' +
+            'ytd-video-meta-block ytd-channel-name a, ' +
+            '#byline-container ytd-channel-name a, ' +
+            '#metadata ytd-channel-name a, ' +
+            '#owner-name a'
         );
 
         if (channelNameEl) {
             const href = channelNameEl.getAttribute('href');
-            const name = channelNameEl.textContent?.trim();
+            let name = channelNameEl.textContent?.trim();
+            
+            // Validate name doesn't contain overlay text
+            if (name && (name.includes('Now playing') || /^\d+:\d+/.test(name))) {
+                name = null; // Invalid, will use handle as fallback
+            }
 
             if (href) {
                 const handleMatch = href.match(/@([\w-]+)/);
@@ -3007,6 +3097,9 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
         console.log('FilterTube: Injecting COLLABORATION menu with multiple options');
         const collaborators = initialChannelInfo.allCollaborators;
         const collaboratorCount = Math.min(collaborators.length, 6); // Max 6 individual channels
+        
+        // For 3+ collaborators, use multi-step blocking (defer hide until "Done")
+        const isMultiStep = collaboratorCount >= 3;
 
         if (newMenuList) {
             // Generate UUID for this collaboration group (used if user selects "Block All")
@@ -3022,16 +3115,18 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
 
                 injectIntoNewMenu(newMenuList, collaborator, videoCard, {
                     collaborationWith: otherChannels,
-                    collaborationGroupId: groupId
+                    collaborationGroupId: groupId,
+                    isMultiStep: isMultiStep
                 });
             }
 
-            // Add "Block All Collaborators" option
+            // Add "Block All Collaborators" option (or "Done" placeholder for multi-step)
             injectIntoNewMenu(newMenuList, {
                 name: collaboratorCount === 2 ? 'Both Channels' : `All ${collaboratorCount} Collaborators`,
                 isBlockAllOption: true,
                 allCollaborators: collaborators.slice(0, collaboratorCount),
-                collaborationGroupId: groupId
+                collaborationGroupId: groupId,
+                isMultiStep: isMultiStep
             }, videoCard);
 
         } else if (oldMenuList) {
@@ -3047,16 +3142,18 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
 
                 injectIntoOldMenu(oldMenuList, collaborator, videoCard, {
                     collaborationWith: otherChannels,
-                    collaborationGroupId: groupId
+                    collaborationGroupId: groupId,
+                    isMultiStep: isMultiStep
                 });
             }
 
-            // Add "Block All Collaborators" option
+            // Add "Block All Collaborators" option (or "Done" placeholder for multi-step)
             injectIntoOldMenu(oldMenuList, {
                 name: collaboratorCount === 2 ? 'Both Channels' : `All ${collaboratorCount} Collaborators`,
                 isBlockAllOption: true,
                 allCollaborators: collaborators.slice(0, collaboratorCount),
-                collaborationGroupId: groupId
+                collaborationGroupId: groupId,
+                isMultiStep: isMultiStep
             }, videoCard);
         }
     } else {
@@ -3204,6 +3301,17 @@ function injectIntoNewMenu(menuList, channelInfo, videoCard, collaborationMetada
         if (collaborationMetadata.collaborationGroupId) {
             filterTubeItem.setAttribute('data-collaboration-group-id', collaborationMetadata.collaborationGroupId);
         }
+        if (collaborationMetadata.isMultiStep) {
+            filterTubeItem.setAttribute('data-multi-step', 'true');
+        }
+    }
+    
+    // Store isBlockAllOption flag for click handler
+    if (channelInfo.isBlockAllOption) {
+        filterTubeItem.setAttribute('data-is-block-all', 'true');
+    }
+    if (channelInfo.isMultiStep) {
+        filterTubeItem.setAttribute('data-multi-step', 'true');
     }
 
     // Get toggle button
@@ -3334,6 +3442,17 @@ function injectIntoOldMenu(menuContainer, channelInfo, videoCard, collaborationM
         if (collaborationMetadata.collaborationGroupId) {
             filterTubeItem.setAttribute('data-collaboration-group-id', collaborationMetadata.collaborationGroupId);
         }
+        if (collaborationMetadata.isMultiStep) {
+            filterTubeItem.setAttribute('data-multi-step', 'true');
+        }
+    }
+    
+    // Store isBlockAllOption flag for click handler
+    if (channelInfo.isBlockAllOption) {
+        filterTubeItem.setAttribute('data-is-block-all', 'true');
+    }
+    if (channelInfo.isMultiStep) {
+        filterTubeItem.setAttribute('data-multi-step', 'true');
     }
 
     // Get toggle button
@@ -3434,9 +3553,19 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
     }
     menuItem.style.pointerEvents = 'none';
 
-    // Handle "Block All Collaborators" option (was "Block Both")
+    // Handle "Block All Collaborators" option (was "Block Both") OR "Done (Hide Video)" button
+    const isDoneButton = menuItem.getAttribute('data-is-done-button') === 'true';
     if (channelInfo.isBlockAllOption && channelInfo.allCollaborators) {
         const collaboratorCount = channelInfo.allCollaborators.length;
+        
+        // If this is the "Done" button, skip blocking (channels already blocked individually)
+        if (isDoneButton) {
+            console.log('FilterTube: Done button clicked - hiding video without blocking more channels');
+            if (titleSpan) {
+                titleSpan.textContent = '✓ Done';
+                titleSpan.style.color = '#10b981';
+            }
+        } else {
         if (titleSpan) titleSpan.textContent = `Blocking ${collaboratorCount} channels...`;
 
         // Get groupId from channelInfo (generated when menu was created)
@@ -3479,6 +3608,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             titleSpan.textContent = `✓ Blocked ${successCount} channels`;
             titleSpan.style.color = '#10b981'; // green
         }
+        } // End of else block (not isDoneButton)
 
         // Hide ALL instances of this video card immediately
         if (videoCard) {
@@ -3612,6 +3742,32 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
         }
 
         console.log('FilterTube: Successfully blocked channel:', channelInfo, 'filterAll:', filterAll);
+
+        // Check if this is multi-step mode (3+ collaborators)
+        const isMultiStep = menuItem.getAttribute('data-multi-step') === 'true';
+        
+        if (isMultiStep) {
+            // Multi-step mode: Don't hide video yet, transform "Block All" to "Done (Hide Video)"
+            console.log('FilterTube: Multi-step mode - deferring hide, updating Block All to Done');
+            
+            // Find the "Block All" menu item and transform it to "Done (Hide Video)"
+            const dropdown = menuItem.closest('tp-yt-iron-dropdown, ytd-menu-popup-renderer');
+            if (dropdown) {
+                const blockAllItem = dropdown.querySelector('[data-is-block-all="true"]');
+                if (blockAllItem) {
+                    const blockAllTitle = blockAllItem.querySelector('.filtertube-menu-title') ||
+                        blockAllItem.querySelector('.yt-core-attributed-string');
+                    if (blockAllTitle && !blockAllTitle.textContent.includes('Done')) {
+                        blockAllTitle.textContent = 'Done (Hide Video)';
+                        blockAllTitle.style.color = '#10b981'; // green
+                        blockAllItem.setAttribute('data-is-done-button', 'true');
+                    }
+                }
+            }
+            
+            // Don't hide video or close dropdown - let user select more channels
+            return;
+        }
 
         // IMMEDIATELY hide ALL instances of this video card for instant feedback
         // (YouTube sometimes shows the same collaboration video multiple times in search results)
@@ -3847,6 +4003,12 @@ let lastClickedMenuButton = null;
 const injectedDropdowns = new WeakMap();
 
 /**
+ * Synchronous lock to prevent race conditions when multiple mutation events fire
+ * Set: dropdown elements currently being processed
+ */
+const processingDropdowns = new WeakSet();
+
+/**
  * Track pending async channel fetches for shorts (prevents duplicates)
  * Map: videoId -> Promise
  */
@@ -3924,6 +4086,12 @@ function setupMenuObserver() {
                         handleDropdownAppeared(dropdown).catch(err => {
                             console.error('FilterTube: Error in handleDropdownAppeared:', err);
                         });
+                    } else {
+                        // Dropdown hidden - clear cached state so next open re-injects fresh
+                        if (injectedDropdowns.has(dropdown)) {
+                            console.log('FilterTube: Dropdown hidden, clearing cached state');
+                            injectedDropdowns.delete(dropdown);
+                        }
                     }
                 }
             }
@@ -3966,6 +4134,25 @@ function tryInjectIntoVisibleDropdown() {
  * Handle when a dropdown appears (either added or made visible)
  */
 async function handleDropdownAppeared(dropdown) {
+    // Synchronous lock to prevent race conditions from multiple mutation events
+    if (processingDropdowns.has(dropdown)) {
+        console.log('FilterTube: Dropdown already being processed (sync lock), skipping');
+        return;
+    }
+    processingDropdowns.add(dropdown);
+    
+    try {
+        await handleDropdownAppearedInternal(dropdown);
+    } finally {
+        // Release lock after processing completes
+        processingDropdowns.delete(dropdown);
+    }
+}
+
+/**
+ * Internal handler for dropdown appearance (called after sync lock acquired)
+ */
+async function handleDropdownAppearedInternal(dropdown) {
     if (!lastClickedMenuButton) {
         console.log('FilterTube: No button reference, skipping injection');
         return;
@@ -4025,8 +4212,19 @@ async function handleDropdownAppeared(dropdown) {
                 // Verify menu item still exists in DOM before skipping
                 const existingMenuItem = dropdown.querySelector('.filtertube-block-channel-item');
                 if (existingMenuItem) {
-                    console.log('FilterTube: Dropdown already injected for this video, skipping');
-                    return;
+                    // Check if the menu item has stale state (e.g., "✓ Channel Blocked" or "✓ Blocked")
+                    const titleSpan = existingMenuItem.querySelector('.filtertube-menu-title');
+                    const titleText = titleSpan?.textContent || '';
+                    const isStaleState = titleText.includes('✓') || titleText.includes('Fetching') || titleText.includes('Blocking');
+                    
+                    if (isStaleState) {
+                        console.log('FilterTube: Menu item has stale state, re-injecting fresh');
+                        injectedDropdowns.delete(dropdown);
+                        // Continue to re-inject
+                    } else {
+                        console.log('FilterTube: Dropdown already injected for this video, skipping');
+                        return;
+                    }
                 } else {
                     console.log('FilterTube: State says complete but menu item missing, re-injecting');
                     // Reset state and continue to re-inject
