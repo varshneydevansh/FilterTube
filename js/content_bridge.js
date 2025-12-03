@@ -900,17 +900,17 @@ function extractCollaboratorMetadataFromElement(element) {
     }
 
     const collaborators = [];
-    
+
     // Method 1: Check for #attributed-channel-name (collaboration indicator)
     const attributedContainer = element.querySelector('#attributed-channel-name, [id="attributed-channel-name"]');
 
     if (attributedContainer) {
         // Check for yt-text-view-model structure (newer YouTube layout)
         const ytTextViewModel = attributedContainer.querySelector('yt-text-view-model');
-        
+
         if (ytTextViewModel) {
             const attributedString = ytTextViewModel.querySelector('.yt-core-attributed-string');
-            
+
             if (attributedString) {
                 // Get the full text content and split by " and "
                 const fullText = attributedString.textContent || '';
@@ -948,7 +948,7 @@ function extractCollaboratorMetadataFromElement(element) {
                 }
             }
         }
-        
+
         // Fallback: Direct link extraction from attributedContainer
         if (collaborators.length === 0) {
             const linkSelectors = 'a[href*="/@"]:not([href*="/shorts"]):not([href*="/watch"]), a[href*="/channel/UC"], a[href*="/user/"], a[href*="/c/"]';
@@ -972,7 +972,7 @@ function extractCollaboratorMetadataFromElement(element) {
             });
         }
     }
-    
+
     // Method 2: Check for " and " in channel name text (fallback for different DOM structures)
     if (collaborators.length === 0) {
         const channelNameEl = element.querySelector('#channel-name, ytd-channel-name, .ytd-channel-name');
@@ -983,15 +983,15 @@ function extractCollaboratorMetadataFromElement(element) {
                     .split(' and ')
                     .map(name => name.trim())
                     .filter(name => name.length > 0 && name !== 'and');
-                
+
                 if (channelNames.length > 1) {
                     // This is a collaboration - extract what we can
                     const links = element.querySelectorAll('a[href*="/@"]:not([href*="/shorts"]):not([href*="/watch"]), a[href*="/channel/UC"]');
                     let linkIndex = 0;
-                    
+
                     for (const name of channelNames) {
                         const collaborator = { name, handle: '', id: '' };
-                        
+
                         // Try to match with a link
                         if (linkIndex < links.length) {
                             const link = links[linkIndex];
@@ -1006,7 +1006,7 @@ function extractCollaboratorMetadataFromElement(element) {
                             }
                             linkIndex++;
                         }
-                        
+
                         collaborators.push(collaborator);
                     }
                 }
@@ -1058,7 +1058,7 @@ function channelMatchesFilter(meta, filterChannel, channelMap = {}) {
         if (filterName && metaName && filterName === metaName) {
             return true;
         }
-        
+
         // Match filter name against meta handle (e.g., filter "Veritasium" matches @veritasium)
         if (filterName && metaHandle) {
             const handleWithoutAt = metaHandle.replace(/^@/, '');
@@ -1066,7 +1066,7 @@ function channelMatchesFilter(meta, filterChannel, channelMap = {}) {
                 return true;
             }
         }
-        
+
         // Match filter handle against meta name (e.g., filter @veritasium matches name "Veritasium")
         if (filterHandle && metaName) {
             const handleWithoutAt = filterHandle.replace(/^@/, '');
@@ -1710,7 +1710,7 @@ function shouldHideContent(title, channel, settings, options = {}) {
     } = options;
     const channelMeta = providedChannelMeta || buildChannelMetadata(channel, channelHref);
     const hasChannelIdentity = Boolean(channelMeta.handle || channelMeta.id);
-    
+
     // Debug logging (disabled by default - set to true for troubleshooting)
     const debugFiltering = false;
     if (debugFiltering && (channelMeta.handle || channelMeta.id)) {
@@ -2610,7 +2610,7 @@ function extractChannelFromCard(card) {
     try {
         // SPECIAL CASE: Detect if this is a Shorts card (compact format only)
         const isShortsCard = card.querySelector('ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2, .reel-item-endpoint');
-        
+
         // Only detect as "Shorts in full card" if explicitly marked by FilterTube
         // Do NOT use href detection as regular videos may have /shorts/ links in related content
         const isShortsInFullCard = card.getAttribute('data-filtertube-short') === 'true';
@@ -2618,14 +2618,14 @@ function extractChannelFromCard(card) {
         // Handle Shorts displayed as full video cards (only when explicitly marked)
         if (isShortsInFullCard && !isShortsCard) {
             console.log('FilterTube: Detected SHORTS in full video card format');
-            
+
             // For Shorts in full card, extract channel from #channel-name or channel link
             // IMPORTANT: Avoid picking up text from thumbnail overlays (SHORTS badge, Now playing)
             const channelNameEl = card.querySelector('#channel-info #channel-name a, #channel-name #text a, ytd-channel-name #text a');
             if (channelNameEl) {
                 const href = channelNameEl.getAttribute('href');
                 const name = channelNameEl.textContent?.trim();
-                
+
                 if (href) {
                     const handleMatch = href.match(/@([\w-]+)/);
                     if (handleMatch) {
@@ -2635,7 +2635,7 @@ function extractChannelFromCard(card) {
                     }
                 }
             }
-            
+
             // Fallback: Try data attributes
             const dataHandle = card.getAttribute('data-filtertube-channel-handle') ||
                 card.querySelector('[data-filtertube-channel-handle]')?.getAttribute('data-filtertube-channel-handle');
@@ -2842,11 +2842,11 @@ function extractChannelFromCard(card) {
 
         if (dataHandle || dataId) {
             let name = null;
-            
+
             // IMPORTANT: On search pages, data-filtertube-channel-handle is on the THUMBNAIL link,
             // which contains overlay text (duration, "Now playing"). We must get the name from
             // the actual channel name element, NOT from the element with the data attribute.
-            
+
             // First try: Get name from proper channel name elements (ALWAYS do this first)
             const channelNameEl = card.querySelector(
                 '#channel-info ytd-channel-name a, ' +
@@ -2859,7 +2859,7 @@ function extractChannelFromCard(card) {
             if (channelNameEl) {
                 name = channelNameEl.textContent?.trim();
             }
-            
+
             // Second try: Only if no name found, try the data-attribute element itself
             // BUT validate it doesn't contain overlay garbage
             if (!name) {
@@ -2867,8 +2867,8 @@ function extractChannelFromCard(card) {
                 if (channelLinkWithAttr) {
                     const candidateName = channelLinkWithAttr.textContent?.trim();
                     // Reject if it looks like overlay text (duration or "Now playing")
-                    if (candidateName && 
-                        !candidateName.includes('Now playing') && 
+                    if (candidateName &&
+                        !candidateName.includes('Now playing') &&
                         !/^\d+:\d+/.test(candidateName) &&
                         !/\d+:\d+\s*Now playing/i.test(candidateName)) {
                         name = candidateName;
@@ -2882,7 +2882,7 @@ function extractChannelFromCard(card) {
 
         // Method 3: Find channel link - PRIORITIZE specific metadata areas over generic selectors
         // This prevents picking up links from thumbnail overlays (duration, "Now playing", etc.)
-        
+
         // Priority 1: Channel name elements (most reliable for search results)
         const channelNameLink = card.querySelector(
             '#channel-info ytd-channel-name a[href*="/@"], ' +
@@ -2892,7 +2892,7 @@ function extractChannelFromCard(card) {
             'ytd-channel-name #text a[href*="/@"], ' +
             '.yt-lockup-metadata-view-model__metadata a[href*="/@"]'
         );
-        
+
         if (channelNameLink) {
             const href = channelNameLink.getAttribute('href');
             const name = channelNameLink.textContent?.trim();
@@ -2909,14 +2909,14 @@ function extractChannelFromCard(card) {
                 }
             }
         }
-        
+
         // Priority 2: Avatar/thumbnail links (have href but no text - get name separately)
         const avatarLink = card.querySelector(
             '#channel-thumbnail[href*="/@"], ' +
             '#avatar-link[href*="/@"], ' +
             '#owner a[href*="/@"]'
         );
-        
+
         if (avatarLink) {
             const href = avatarLink.getAttribute('href');
             if (href) {
@@ -2934,13 +2934,13 @@ function extractChannelFromCard(card) {
                 }
             }
         }
-        
+
         // Priority 3: Generic channel links (last resort, but exclude thumbnail/overlay areas)
         const genericChannelLink = card.querySelector(
             '#metadata a[href*="/@"]:not([id="video-title"]), ' +
             '.reel-item-endpoint a[href*="/@"]'
         );
-        
+
         if (genericChannelLink) {
             const href = genericChannelLink.getAttribute('href');
             if (href) {
@@ -2970,7 +2970,7 @@ function extractChannelFromCard(card) {
         if (channelNameEl) {
             const href = channelNameEl.getAttribute('href');
             let name = channelNameEl.textContent?.trim();
-            
+
             // Validate name doesn't contain overlay text
             if (name && (name.includes('Now playing') || /^\d+:\d+/.test(name))) {
                 name = null; // Invalid, will use handle as fallback
@@ -3097,7 +3097,7 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
         console.log('FilterTube: Injecting COLLABORATION menu with multiple options');
         const collaborators = initialChannelInfo.allCollaborators;
         const collaboratorCount = Math.min(collaborators.length, 6); // Max 6 individual channels
-        
+
         // For 3+ collaborators, use multi-step blocking (defer hide until "Done")
         const isMultiStep = collaboratorCount >= 3;
 
@@ -3227,54 +3227,25 @@ function injectIntoNewMenu(menuList, channelInfo, videoCard, collaborationMetada
     </svg>`;
 
 
-    let menuTitle = 'Block Channel';
-    if (channelInfo.isBlockAllOption) {
-        // Dynamic title: "Block Both Channels" or "Block All X Collaborators"
-        menuTitle = `Block ${channelInfo.name}`;
-    } else if (channelInfo.name) {
-        menuTitle = `Block ${channelInfo.name}`;
-    }
+    // Ensure styles are injected
+    ensureFilterTubeMenuStyles();
+
+    // Build channel display name
+    const channelName = escapeHtml(channelInfo.name || 'Channel');
 
     filterTubeItem.innerHTML = `
-        <div class="yt-list-item-view-model__label yt-list-item-view-model__container yt-list-item-view-model__container--compact yt-list-item-view-model__container--tappable yt-list-item-view-model__container--in-popup">
+        <div class="yt-list-item-view-model__label yt-list-item-view-model__container yt-list-item-view-model__container--compact yt-list-item-view-model__container--tappable yt-list-item-view-model__container--in-popup filtertube-menu-item">
             <div aria-hidden="true" class="yt-list-item-view-model__image-container yt-list-item-view-model__leading" style="display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; flex-shrink: 0;">
                 ${filterTubeSvg}
             </div>
             <div class="yt-list-item-view-model__text-wrapper" style="flex: 1; min-width: 0;">
-                <div class="yt-list-item-view-model__title-wrapper" style="display: flex !important; align-items: center; gap: 8px; width: 100%;">
-                    <span class="yt-core-attributed-string yt-list-item-view-model__title yt-core-attributed-string--white-space-pre-wrap filtertube-menu-title" role="text" style="
-                        min-width: 100px !important;
-                        max-width: 150px !important;
-                        font-size: 14px !important;
-                        color: #ef4444 !important;
-                        font-weight: 500 !important;
-                        display: inline-block !important;
-                        visibility: visible !important;
-                        opacity: 1 !important;
-                        white-space: nowrap !important;
-                        overflow: visible !important;
-                        flex-shrink: 0 !important;
-                    ">${menuTitle}</span>
-                    <div class="filtertube-filter-all-toggle" style="
-                        display: inline-flex;
-                        align-items: center;
-                        justify-content: center;
-                        padding: 4px 10px;
-                        border-radius: 999px;
-                        border: 1px solid #d0d0d0;
-                        background: transparent;
-                        color: #606060;
-                        font-size: 11px;
-                        font-weight: 600;
-                        text-transform: uppercase;
-                        letter-spacing: 0.06em;
-                        cursor: pointer;
-                        transition: all 0.2s;
-                        flex-shrink: 0;
-                        user-select: none;
-                        white-space: nowrap;
-                        margin-left: auto;
-                    ">
+                <div class="yt-list-item-view-model__title-wrapper filtertube-menu-title-wrapper">
+                    <span class="filtertube-menu-title" role="text">
+                        <span class="filtertube-menu-label">Block</span>
+                        <span class="filtertube-menu-separator">•</span>
+                        <span class="filtertube-channel-name">${channelName}</span>
+                    </span>
+                    <div class="filtertube-filter-all-toggle exact-toggle toggle-variant-red">
                         Filter All
                     </div>
                 </div>
@@ -3282,16 +3253,8 @@ function injectIntoNewMenu(menuList, channelInfo, videoCard, collaborationMetada
         </div>
     `;
 
-    // Get title span and ensure it's visible
+    // Get title span reference for later updates
     const titleSpan = filterTubeItem.querySelector('.filtertube-menu-title');
-    if (titleSpan) {
-        // Force text content
-        titleSpan.textContent = menuTitle;
-        // Add additional inline styles as backup
-        titleSpan.style.setProperty('min-width', '100px', 'important');
-        titleSpan.style.setProperty('display', 'inline-block', 'important');
-        titleSpan.style.setProperty('flex-shrink', '0', 'important');
-    }
 
     // Store collaboration metadata
     if (collaborationMetadata) {
@@ -3305,7 +3268,7 @@ function injectIntoNewMenu(menuList, channelInfo, videoCard, collaborationMetada
             filterTubeItem.setAttribute('data-multi-step', 'true');
         }
     }
-    
+
     // Store isBlockAllOption flag for click handler
     if (channelInfo.isBlockAllOption) {
         filterTubeItem.setAttribute('data-is-block-all', 'true');
@@ -3317,23 +3280,11 @@ function injectIntoNewMenu(menuList, channelInfo, videoCard, collaborationMetada
     // Get toggle button
     const toggle = filterTubeItem.querySelector('.filtertube-filter-all-toggle');
 
-    // Toggle click handler (prevent menu item click and provide visual feedback)
+    // Toggle click handler (CSS handles visual feedback via .active class)
     toggle.addEventListener('click', (e) => {
         e.stopPropagation();
-        const isActive = toggle.classList.toggle('active');
-
-        // Update styles for visual feedback
-        if (isActive) {
-            toggle.style.backgroundColor = 'rgba(180, 67, 57, 0.2)';
-            toggle.style.color = '#dc2626';
-            toggle.style.borderColor = '#dc2626';
-        } else {
-            toggle.style.backgroundColor = 'transparent';
-            toggle.style.color = '#606060';
-            toggle.style.borderColor = '#d0d0d0';
-        }
-
-        console.log('FilterTube: Filter All toggled:', isActive);
+        toggle.classList.toggle('active');
+        console.log('FilterTube: Filter All toggled:', toggle.classList.contains('active'));
     });
 
     // Menu item click handler (block channel)
@@ -3366,13 +3317,11 @@ function injectIntoOldMenu(menuContainer, channelInfo, videoCard, collaborationM
     </svg>`;
 
 
-    let menuTitle = 'Block Channel';
-    if (channelInfo.isBlockAllOption) {
-        // Dynamic title: "Block Both Channels" or "Block All X Collaborators"
-        menuTitle = `Block ${channelInfo.name}`;
-    } else if (channelInfo.name) {
-        menuTitle = `Block ${channelInfo.name}`;
-    }
+    // Ensure styles are injected
+    ensureFilterTubeMenuStyles();
+
+    // Build channel display name
+    const channelName = escapeHtml(channelInfo.name || 'Channel');
 
     // Create FilterTube menu item (OLD structure)
     const filterTubeItem = document.createElement('ytd-menu-service-item-renderer');
@@ -3383,56 +3332,23 @@ function injectIntoOldMenu(menuContainer, channelInfo, videoCard, collaborationM
     filterTubeItem.setAttribute('tabindex', '-1');
 
     filterTubeItem.innerHTML = `
-        <tp-yt-paper-item class="style-scope ytd-menu-service-item-renderer" style-target="host" role="option" tabindex="0" aria-disabled="false" style="display: flex; align-items: center; gap: 8px; padding: 8px 16px;">
-            <div style="width: 24px; height: 24px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+        <tp-yt-paper-item class="style-scope ytd-menu-service-item-renderer filtertube-menu-item" style-target="host" role="option" tabindex="0" aria-disabled="false">
+            <div style="width: 24px; height: 24px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; margin-top: 2px;">
                 ${filterTubeSvg}
             </div>
-            <span class="filtertube-menu-title" style="
-                min-width: 100px !important;
-                max-width: 150px !important;
-                font-size: 14px !important;
-                color: #ef4444 !important;
-                font-weight: 500 !important;
-                display: inline-block !important;
-                visibility: visible !important;
-                opacity: 1 !important;
-                white-space: nowrap !important;
-                overflow: visible !important;
-                flex-shrink: 0 !important;
-            ">${menuTitle}</span>
-            <div class="filtertube-filter-all-toggle" style="
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                padding: 4px 10px;
-                border-radius: 999px;
-                border: 1px solid #d0d0d0;
-                background: transparent;
-                color: #606060;
-                font-size: 11px;
-                font-weight: 600;
-                text-transform: uppercase;
-                letter-spacing: 0.06em;
-                cursor: pointer;
-                transition: all 0.2s;
-                flex-shrink: 0;
-                user-select: none;
-                margin-left: auto;
-            ">
+            <span class="filtertube-menu-title" role="text">
+                <span class="filtertube-menu-label">Block</span>
+                <span class="filtertube-menu-separator">•</span>
+                <span class="filtertube-channel-name">${channelName}</span>
+            </span>
+            <div class="filtertube-filter-all-toggle exact-toggle toggle-variant-red">
                 Filter All
             </div>
         </tp-yt-paper-item>
     `;
 
-    // Get title span and ensure text is set
+    // Get title span reference for later updates
     const titleSpan = filterTubeItem.querySelector('.filtertube-menu-title');
-    if (titleSpan) {
-        titleSpan.textContent = menuTitle;
-        // Add additional inline styles as backup
-        titleSpan.style.setProperty('min-width', '100px', 'important');
-        titleSpan.style.setProperty('display', 'inline-block', 'important');
-        titleSpan.style.setProperty('flex-shrink', '0', 'important');
-    }
 
     // Store collaboration metadata
     if (collaborationMetadata) {
@@ -3446,7 +3362,7 @@ function injectIntoOldMenu(menuContainer, channelInfo, videoCard, collaborationM
             filterTubeItem.setAttribute('data-multi-step', 'true');
         }
     }
-    
+
     // Store isBlockAllOption flag for click handler
     if (channelInfo.isBlockAllOption) {
         filterTubeItem.setAttribute('data-is-block-all', 'true');
@@ -3458,23 +3374,11 @@ function injectIntoOldMenu(menuContainer, channelInfo, videoCard, collaborationM
     // Get toggle button
     const toggle = filterTubeItem.querySelector('.filtertube-filter-all-toggle');
 
-    // Toggle click handler (prevent menu item click and provide visual feedback)
+    // Toggle click handler (CSS handles visual feedback via .active class)
     toggle.addEventListener('click', (e) => {
         e.stopPropagation();
-        const isActive = toggle.classList.toggle('active');
-
-        // Update styles for visual feedback
-        if (isActive) {
-            toggle.style.backgroundColor = 'rgba(180, 67, 57, 0.2)';
-            toggle.style.color = '#dc2626';
-            toggle.style.borderColor = '#dc2626';
-        } else {
-            toggle.style.backgroundColor = 'transparent';
-            toggle.style.color = '#606060';
-            toggle.style.borderColor = '#d0d0d0';
-        }
-
-        console.log('FilterTube: Filter All toggled:', isActive);
+        toggle.classList.toggle('active');
+        console.log('FilterTube: Filter All toggled:', toggle.classList.contains('active'));
     });
 
     // Menu item click handler (block channel)
@@ -3557,7 +3461,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
     const isDoneButton = menuItem.getAttribute('data-is-done-button') === 'true';
     if (channelInfo.isBlockAllOption && channelInfo.allCollaborators) {
         const collaboratorCount = channelInfo.allCollaborators.length;
-        
+
         // If this is the "Done" button, skip blocking (channels already blocked individually)
         if (isDoneButton) {
             console.log('FilterTube: Done button clicked - hiding video without blocking more channels');
@@ -3566,48 +3470,48 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                 titleSpan.style.color = '#10b981';
             }
         } else {
-        if (titleSpan) titleSpan.textContent = `Blocking ${collaboratorCount} channels...`;
+            if (titleSpan) titleSpan.textContent = `Blocking ${collaboratorCount} channels...`;
 
-        // Get groupId from channelInfo (generated when menu was created)
-        const groupId = channelInfo.collaborationGroupId || generateCollaborationGroupId();
+            // Get groupId from channelInfo (generated when menu was created)
+            const groupId = channelInfo.collaborationGroupId || generateCollaborationGroupId();
 
-        let successCount = 0;
-        for (let i = 0; i < collaboratorCount; i++) {
-            const collaborator = channelInfo.allCollaborators[i];
-            let input = collaborator.handle || collaborator.id;
+            let successCount = 0;
+            for (let i = 0; i < collaboratorCount; i++) {
+                const collaborator = channelInfo.allCollaborators[i];
+                let input = collaborator.handle || collaborator.id;
 
-            // Fallback: If no handle/id, try to construct @handle from name
-            if (!input && collaborator.name) {
-                // For well-known channels, the handle is often the name in lowercase without spaces
-                // We'll try using the name as a handle - background will resolve it
-                const guessedHandle = `@${collaborator.name.toLowerCase().replace(/\s+/g, '')}`;
-                console.log(`FilterTube: No handle/id for "${collaborator.name}", trying guessed handle: ${guessedHandle}`);
-                input = guessedHandle;
-            }
-
-            if (input) {
-                // Get collaboration metadata (other channels)
-                const otherChannels = channelInfo.allCollaborators
-                    .filter((_, idx) => idx !== i)
-                    .map(c => c.handle || c.name);
-
-                console.log(`FilterTube: Blocking collaborator ${i + 1}/${collaboratorCount}: ${input}`);
-                const result = await addChannelDirectly(input, filterAll, otherChannels, groupId);
-                if (result.success) {
-                    successCount++;
-                    console.log(`FilterTube: Successfully blocked ${input}`);
-                } else {
-                    console.error(`FilterTube: Failed to block ${input}:`, result.error);
+                // Fallback: If no handle/id, try to construct @handle from name
+                if (!input && collaborator.name) {
+                    // For well-known channels, the handle is often the name in lowercase without spaces
+                    // We'll try using the name as a handle - background will resolve it
+                    const guessedHandle = `@${collaborator.name.toLowerCase().replace(/\s+/g, '')}`;
+                    console.log(`FilterTube: No handle/id for "${collaborator.name}", trying guessed handle: ${guessedHandle}`);
+                    input = guessedHandle;
                 }
-            } else {
-                console.error(`FilterTube: Cannot block collaborator - no identifier available:`, collaborator);
-            }
-        }
 
-        if (titleSpan) {
-            titleSpan.textContent = `✓ Blocked ${successCount} channels`;
-            titleSpan.style.color = '#10b981'; // green
-        }
+                if (input) {
+                    // Get collaboration metadata (other channels)
+                    const otherChannels = channelInfo.allCollaborators
+                        .filter((_, idx) => idx !== i)
+                        .map(c => c.handle || c.name);
+
+                    console.log(`FilterTube: Blocking collaborator ${i + 1}/${collaboratorCount}: ${input}`);
+                    const result = await addChannelDirectly(input, filterAll, otherChannels, groupId);
+                    if (result.success) {
+                        successCount++;
+                        console.log(`FilterTube: Successfully blocked ${input}`);
+                    } else {
+                        console.error(`FilterTube: Failed to block ${input}:`, result.error);
+                    }
+                } else {
+                    console.error(`FilterTube: Cannot block collaborator - no identifier available:`, collaborator);
+                }
+            }
+
+            if (titleSpan) {
+                titleSpan.textContent = `✓ Blocked ${successCount} channels`;
+                titleSpan.style.color = '#10b981'; // green
+            }
         } // End of else block (not isDoneButton)
 
         // Hide ALL instances of this video card immediately
@@ -3735,21 +3639,28 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             return;
         }
 
-        // Success state (matching existing UI)
+        // Success state - show checkmark with channel name for multi-step, or generic for single
+        const isMultiStep = menuItem.getAttribute('data-multi-step') === 'true';
+
         if (titleSpan) {
-            titleSpan.textContent = '✓ Channel Blocked';
+            if (isMultiStep && channelInfo.name) {
+                // Multi-step: Show "✓ ChannelName" to indicate selection
+                titleSpan.textContent = `✓ ${channelInfo.name}`;
+            } else {
+                titleSpan.textContent = '✓ Channel Blocked';
+            }
             titleSpan.style.color = '#10b981'; // green
         }
 
+        // Add blocked styling class to the menu item
+        menuItem.classList.add('filtertube-blocked');
+
         console.log('FilterTube: Successfully blocked channel:', channelInfo, 'filterAll:', filterAll);
 
-        // Check if this is multi-step mode (3+ collaborators)
-        const isMultiStep = menuItem.getAttribute('data-multi-step') === 'true';
-        
         if (isMultiStep) {
             // Multi-step mode: Don't hide video yet, transform "Block All" to "Done (Hide Video)"
             console.log('FilterTube: Multi-step mode - deferring hide, updating Block All to Done');
-            
+
             // Find the "Block All" menu item and transform it to "Done (Hide Video)"
             const dropdown = menuItem.closest('tp-yt-iron-dropdown, ytd-menu-popup-renderer');
             if (dropdown) {
@@ -3764,7 +3675,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                     }
                 }
             }
-            
+
             // Don't hide video or close dropdown - let user select more channels
             return;
         }
@@ -4001,6 +3912,162 @@ let lastClickedMenuButton = null;
  * Map: dropdown -> {videoCardId, isProcessing}
  */
 const injectedDropdowns = new WeakMap();
+let filterTubeMenuStylesInjected = false;
+
+function escapeHtml(str = '') {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function ensureFilterTubeMenuStyles() {
+    if (filterTubeMenuStylesInjected) {
+        return;
+    }
+
+    const styleContent = `
+    .filtertube-menu-item {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+        min-height: 36px !important;
+        padding: 8px 12px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    tp-yt-paper-item.filtertube-menu-item[focused],
+    tp-yt-paper-item.filtertube-menu-item[active],
+    tp-yt-paper-item.filtertube-menu-item:focus,
+    .filtertube-menu-item.yt-list-item-view-model__container--active,
+    .filtertube-menu-item:focus-visible {
+        background: transparent !important;
+    }
+
+    .filtertube-menu-title-wrapper {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 8px !important;
+        width: 100% !important;
+    }
+
+    .filtertube-menu-title {
+        word-wrap: break-word !important;
+        white-space: normal !important;
+        line-height: 1.35 !important;
+        padding-right: 8px !important;
+        flex: 1 !important;
+        min-width: 0 !important;
+        font-size: 14px !important;
+        display: inline-flex !important;
+        align-items: baseline !important;
+        gap: 6px !important;
+        flex-wrap: nowrap !important;
+    }
+
+    .filtertube-menu-label {
+        color: #f87171 !important;
+        font-weight: 600 !important;
+        font-size: 14px !important;
+        flex: 0 0 auto !important;
+        white-space: nowrap !important;
+    }
+
+    .filtertube-menu-separator {
+        color: #f87171 !important;
+        opacity: 0.6 !important;
+        flex: 0 0 auto !important;
+        white-space: nowrap !important;
+    }
+
+    .filtertube-channel-name {
+        font-weight: 500 !important;
+        color: #fef3c7 !important;
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+        white-space: normal !important;
+        overflow-wrap: break-word !important;
+    }
+
+    .filtertube-filter-all-toggle {
+        margin-left: auto !important;
+        align-self: flex-start !important;
+        margin-top: 2px !important;
+        white-space: nowrap !important;
+        user-select: none !important;
+    }
+
+    .filtertube-filter-all-toggle.exact-toggle {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 4px !important;
+        padding: 4px 12px !important;
+        border-radius: 999px !important;
+        border: 1px solid rgba(148, 163, 184, 0.7) !important;
+        background: rgba(15, 23, 42, 0.02) !important;
+        color: rgba(226, 232, 240, 0.85) !important;
+        font-size: 11px !important;
+        font-weight: 600 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.08em !important;
+        cursor: pointer !important;
+        transition: all 0.2s ease !important;
+        box-shadow: none !important;
+    }
+
+    .filtertube-filter-all-toggle.exact-toggle:hover {
+        border-color: #dc2626 !important;
+        color: #dc2626 !important;
+        background: rgba(255, 255, 255, 0.04) !important;
+    }
+
+    .filtertube-filter-all-toggle.exact-toggle.active {
+        background-color: rgba(180, 67, 57, 0.2) !important;
+        color: #dc2626 !important;
+        border-color: #dc2626 !important;
+    }
+
+    .filtertube-filter-all-toggle.exact-toggle.active:hover {
+        background-color: rgba(180, 67, 57, 0.25) !important;
+    }
+
+    .filtertube-block-channel-item.filtertube-blocked {
+        background: rgba(16, 185, 129, 0.12) !important;
+    }
+
+    .filtertube-block-channel-item.filtertube-blocked .filtertube-menu-title {
+        color: #10b981 !important;
+    }
+
+    html[dark="false"] .filtertube-filter-all-toggle.exact-toggle {
+        background: rgba(255, 255, 255, 0.9) !important;
+        border: 1px solid rgba(148, 163, 184, 0.8) !important;
+        color: #1f2937 !important;
+    }
+
+    html[dark="false"] .filtertube-filter-all-toggle.exact-toggle:hover {
+        border-color: #dc2626 !important;
+        color: #dc2626 !important;
+        background: rgba(252, 165, 165, 0.15) !important;
+    }
+
+    html[dark="false"] .filtertube-filter-all-toggle.exact-toggle.active {
+        background-color: rgba(248, 113, 113, 0.25) !important;
+        color: #b91c1c !important;
+        border-color: #b91c1c !important;
+    }
+    `;
+
+    const styleTag = document.createElement('style');
+    styleTag.id = 'filtertube-menu-styles';
+    styleTag.textContent = styleContent;
+    document.documentElement.appendChild(styleTag);
+    filterTubeMenuStylesInjected = true;
+}
 
 /**
  * Synchronous lock to prevent race conditions when multiple mutation events fire
@@ -4140,7 +4207,7 @@ async function handleDropdownAppeared(dropdown) {
         return;
     }
     processingDropdowns.add(dropdown);
-    
+
     try {
         await handleDropdownAppearedInternal(dropdown);
     } finally {
@@ -4216,7 +4283,7 @@ async function handleDropdownAppearedInternal(dropdown) {
                     const titleSpan = existingMenuItem.querySelector('.filtertube-menu-title');
                     const titleText = titleSpan?.textContent || '';
                     const isStaleState = titleText.includes('✓') || titleText.includes('Fetching') || titleText.includes('Blocking');
-                    
+
                     if (isStaleState) {
                         console.log('FilterTube: Menu item has stale state, re-injecting fresh');
                         injectedDropdowns.delete(dropdown);

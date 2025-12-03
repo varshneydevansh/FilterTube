@@ -881,6 +881,11 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
         }
 
         // Add new channel
+        // Build allCollaborators array from collaborationWith for popup grouping
+        const allCollaborators = collaborationWith && collaborationWith.length > 0
+            ? [{ handle: channelInfo.handle, name: channelInfo.name }, ...collaborationWith.map(h => ({ handle: h }))]
+            : [];
+        
         const newChannel = {
             id: channelInfo.id,
             handle: channelInfo.handle,
@@ -888,7 +893,8 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             logo: channelInfo.logo,
             filterAll: filterAll, // Use provided value
             collaborationWith: collaborationWith || [], // Store collaboration metadata
-            collaborationGroupId: collaborationGroupId || null // UUID for group operations
+            collaborationGroupId: collaborationGroupId || null, // UUID for group operations
+            allCollaborators: allCollaborators // Full list of all collaborators for popup grouping
         };
 
         // Add to beginning (newest first)

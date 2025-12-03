@@ -479,3 +479,82 @@ html[data-theme="dark"] .status-card {
     background-color: #242424;
     border-color: #333;
 }
+
+/* ============================================================================
+   Collaboration Group Styling
+   ============================================================================ */
+
+/* Collaboration group container - solid yellow border */
+.collaboration-group {
+    border: 2px solid #fbbf24;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 12px;
+    background: rgba(251, 191, 36, 0.05);
+}
+
+/* Partial group - dashed yellow border */
+.collaboration-group.partial {
+    border-style: dashed;
+}
+
+/* Group header */
+.collaboration-group-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #fbbf24;
+    font-size: 14px;
+}
+
+/* Channel rows inside group */
+.collaboration-group .channel-row {
+    margin-bottom: 8px;
+}
+
+.collaboration-group .channel-row:last-of-type {
+    margin-bottom: 0;
+}
+
+/* Warning for partial groups */
+.collaboration-group-warning {
+    font-size: 12px;
+    color: #f59e0b;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed rgba(251, 191, 36, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Dark mode adjustments for collaboration groups */
+@media (prefers-color-scheme: dark) {
+    html:not([data-theme="light"]) .collaboration-group {
+        background: rgba(251, 191, 36, 0.08);
+    }
+    
+    html:not([data-theme="light"]) .collaboration-group-header {
+        color: #fcd34d;
+    }
+    
+    html:not([data-theme="light"]) .collaboration-group-warning {
+        color: #fbbf24;
+        border-top-color: rgba(251, 191, 36, 0.2);
+    }
+}
+
+html[data-theme="dark"] .collaboration-group {
+    background: rgba(251, 191, 36, 0.08);
+}
+
+html[data-theme="dark"] .collaboration-group-header {
+    color: #fcd34d;
+}
+
+html[data-theme="dark"] .collaboration-group-warning {
+    color: #fbbf24;
+    border-top-color: rgba(251, 191, 36, 0.2);
+}

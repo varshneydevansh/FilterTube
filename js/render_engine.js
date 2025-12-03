@@ -259,12 +259,96 @@ const RenderEngine = (() => {
             return;
         }
 
-        // Render each channel
-        displayChannels.forEach((channel, displayIndex) => {
+        // Group channels by collaborationGroupId
+        const { groups, individual } = groupChannelsByCollaboration(displayChannels);
+        
+        // Render collaboration groups first
+        groups.forEach((groupChannels, groupId) => {
+            const groupEl = createCollaborationGroup(groupChannels, groupId, state.channels, { minimal, showNodeMapping });
+            container.appendChild(groupEl);
+        });
+        
+        // Render individual (non-collaboration) channels
+        individual.forEach((channel) => {
             const originalIndex = state.channels.indexOf(channel);
             const item = createChannelListItem(channel, originalIndex, { minimal, showNodeMapping });
             container.appendChild(item);
         });
+    }
+    
+    /**
+     * Group channels by collaborationGroupId
+     * @param {Array} channels - Array of channel objects
+     * @returns {Object} { groups: Map<groupId, channels[]>, individual: channels[] }
+     */
+    function groupChannelsByCollaboration(channels) {
+        const groups = new Map(); // groupId -> channels[]
+        const individual = [];
+        
+        channels.forEach(channel => {
+            if (channel.collaborationGroupId) {
+                if (!groups.has(channel.collaborationGroupId)) {
+                    groups.set(channel.collaborationGroupId, []);
+                }
+                groups.get(channel.collaborationGroupId).push(channel);
+            } else {
+                individual.push(channel);
+            }
+        });
+        
+        return { groups, individual };
+    }
+    
+    /**
+     * Create a collaboration group container with yellow border
+     * @param {Array} channels - Channels in this group
+     * @param {string} groupId - The collaboration group ID
+     * @param {Array} allChannels - All channels in state (for index lookup)
+     * @param {Object} config - Configuration options
+     * @returns {HTMLElement} Group container element
+     */
+    function createCollaborationGroup(channels, groupId, allChannels, config = {}) {
+        const { minimal = false, showNodeMapping = false } = config;
+        
+        // Detect if partial (some collaborators removed)
+        const allCollaborators = channels[0]?.allCollaborators || [];
+        const isPartial = allCollaborators.length > 0 && channels.length < allCollaborators.length;
+        
+        const groupEl = document.createElement('div');
+        groupEl.className = `collaboration-group ${isPartial ? 'partial' : ''}`;
+        groupEl.setAttribute('data-group-id', groupId);
+        
+        // Header
+        const header = document.createElement('div');
+        header.className = 'collaboration-group-header';
+        header.innerHTML = `🤝 Collaboration Group ${isPartial ? '(Partial)' : ''}`;
+        groupEl.appendChild(header);
+        
+        // Channel rows
+        channels.forEach(channel => {
+            const originalIndex = allChannels.indexOf(channel);
+            const item = createChannelListItem(channel, originalIndex, { minimal, showNodeMapping });
+            item.classList.add('channel-row');
+            groupEl.appendChild(item);
+        });
+        
+        // Warning for partial groups
+        if (isPartial) {
+            const currentHandles = channels.map(ch => ch.handle);
+            const missing = allCollaborators.filter(
+                collab => !currentHandles.includes(collab.handle)
+            );
+            
+            if (missing.length > 0) {
+                const warning = document.createElement('div');
+                warning.className = 'collaboration-group-warning';
+                const missingNames = missing.map(c => c.handle || c.name).join(', ');
+                warning.innerHTML = `⚠️ Originally blocked with ${missingNames}`;
+                groupEl.appendChild(warning);
+            }
+        }
+        
+        return groupEl;
     }
 
     /**

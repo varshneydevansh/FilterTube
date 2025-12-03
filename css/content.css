@@ -31,14 +31,17 @@ ytd-watch-card-section-sequence-renderer,
 yt-lockup-metadata-view-model,
 .yt-lockup-metadata-view-model-wiz,
 .yt-lockup-view-model-wiz {
-    display: none !important; /* Hide by default */
+    display: none !important;
+    /* Hide by default */
 }
 
 /* --- Reveal Rule --- */
 /* Class added by JS to elements that should be visible */
 .filter-tube-visible {
-    display: block !important; /* Explicitly set display */
-    margin-bottom: 16px !important; /* Add spacing */
+    display: block !important;
+    /* Explicitly set display */
+    margin-bottom: 16px !important;
+    /* Add spacing */
 }
 
 /* Basic layout fixes for search results */
@@ -145,7 +148,7 @@ ytd-search ytd-item-section-renderer.ytd-section-list-renderer {
 }
 
 /* Fix for YouTube search results layout */
-ytd-search #primary > ytd-section-list-renderer {
+ytd-search #primary>ytd-section-list-renderer {
     max-width: 100% !important;
 }
 
@@ -181,7 +184,8 @@ ytd-horizontal-card-list-renderer #items {
 /* --- Specific fixes for Mix card layout restoration --- */
 /* Preserve horizontal layout when making elements visible again */
 .yt-lockup-view-model-wiz.filter-tube-visible {
-    display: flex !important; /* Use flex instead of block for these specific mix elements */
+    display: flex !important;
+    /* Use flex instead of block for these specific mix elements */
 }
 
 /* Ensure content image and metadata maintain proper positioning */
@@ -258,6 +262,124 @@ yt-horizontal-list-renderer.filter-tube-visible #scroll-container {
 /* Force items inside shorts to maintain original layout */
 .shortsLockupViewModelHostThumbnailContainer.filter-tube-visible {
     width: 200px !important;
-    height: 356px !important; /* Maintain aspect ratio */
+    height: 356px !important;
+    /* Maintain aspect ratio */
     margin-right: 8px !important;
+}
+
+/* ============================================================================
+   FilterTube 3-Dot Menu Styling
+   ============================================================================ */
+
+/* Menu item container - allow height expansion for wrapped text */
+.filtertube-block-channel-item {
+    min-height: 36px !important;
+    padding: 8px 12px !important;
+}
+
+/* Title wrapper - flex layout for text + pill alignment */
+.filtertube-block-channel-item .yt-list-item-view-model__title-wrapper {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+    width: 100% !important;
+    flex-wrap: nowrap !important;
+}
+
+/* Menu title text - allow wrapping for long channel names */
+.filtertube-menu-title {
+    max-width: 380px !important;
+    /* Increased from 260px for longer names */
+    word-wrap: break-word !important;
+    white-space: normal !important;
+    line-height: 1.4 !important;
+    padding-right: 12px !important;
+    flex: 1 !important;
+    min-width: 0 !important;
+}
+
+/* Add visual separation between "Block" and channel name */
+.filtertube-menu-title::after {
+    content: " •" !important;
+    margin: 0 4px !important;
+    opacity: 0.5 !important;
+    font-weight: normal !important;
+}
+
+/* FILTER ALL pill - default state with STRONG visibility */
+.filtertube-filter-all-toggle {
+    flex-shrink: 0 !important;
+    margin-left: auto !important;
+    align-self: flex-start !important;
+    margin-top: 2px !important;
+    background: rgba(59, 130, 246, 0.25) !important;
+    /* Increased from 0.15 */
+    border: 2px solid rgba(59, 130, 246, 0.6) !important;
+    /* Thicker border, increased from 0.4 */
+    color: rgba(255, 255, 255, 0.95) !important;
+    /* Brighter text */
+    transition: all 0.2s ease !important;
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.5) !important;
+    /* Stronger glow */
+    font-weight: 500 !important;
+    /* Slightly bolder */
+}
+
+/* FILTER ALL pill - hover state (VERY CLEAR highlighting) */
+.filtertube-block-channel-item:hover .filtertube-filter-all-toggle {
+    background: rgba(59, 130, 246, 0.45) !important;
+    /* Much brighter */
+    border-color: rgba(59, 130, 246, 0.9) !important;
+    /* Almost solid */
+    color: #ffffff !important;
+    box-shadow: 0 0 16px rgba(59, 130, 246, 0.8) !important;
+    /* Strong glow */
+    transform: translateY(-1px) scale(1.05) !important;
+    /* Slight zoom */
+}
+
+/* FILTER ALL pill - active/selected state (BRIGHT RED) */
+.filtertube-filter-all-toggle.active {
+    background: rgba(255, 68, 68, 0.95) !important;
+    /* Almost solid red */
+    border-color: #ff4444 !important;
+    color: white !important;
+    font-weight: 600 !important;
+    box-shadow: 0 0 16px rgba(255, 68, 68, 0.7) !important;
+    /* Strong red glow */
+}
+
+/* Blocked collaborator item - success styling */
+.filtertube-block-channel-item.filtertube-blocked {
+    background: rgba(16, 185, 129, 0.1) !important;
+}
+
+.filtertube-block-channel-item.filtertube-blocked .filtertube-menu-title {
+    color: #10b981 !important;
+}
+
+/* Light mode overrides for YouTube's light theme */
+html[dark="false"] .filtertube-filter-all-toggle,
+ytd-popup-container:not([dark]) .filtertube-filter-all-toggle {
+    background: rgba(59, 130, 246, 0.2) !important;
+    /* Increased visibility */
+    border: 2px solid rgba(59, 130, 246, 0.5) !important;
+    /* Thicker border */
+    color: rgba(15, 23, 42, 0.9) !important;
+    /* Darker text */
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.4) !important;
+    /* Stronger glow */
+}
+
+html[dark="false"] .filtertube-block-channel-item:hover .filtertube-filter-all-toggle,
+ytd-popup-container:not([dark]) .filtertube-block-channel-item:hover .filtertube-filter-all-toggle {
+    background: rgba(59, 130, 246, 0.35) !important;
+    /* Much brighter */
+    border-color: rgba(59, 130, 246, 0.7) !important;
+    /* Almost solid */
+    color: rgba(15, 23, 42, 1) !important;
+    /* Fully opaque */
+    box-shadow: 0 0 16px rgba(59, 130, 246, 0.6) !important;
+    /* Strong glow */
+    transform: translateY(-1px) scale(1.05) !important;
 }
