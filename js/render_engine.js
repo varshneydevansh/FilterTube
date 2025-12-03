@@ -209,6 +209,7 @@ const RenderEngine = (() => {
 
         const StateManager = getStateManager();
         const state = StateManager?.getState() || { channels: [] };
+        const { groups: collaborationGroups } = groupChannelsByCollaboration(state.channels);
 
         const {
             showSearch = false,
@@ -259,19 +260,28 @@ const RenderEngine = (() => {
             return;
         }
 
-        // Group channels by collaborationGroupId
-        const { groups, individual } = groupChannelsByCollaboration(displayChannels);
-        
-        // Render collaboration groups first
-        groups.forEach((groupChannels, groupId) => {
-            const groupEl = createCollaborationGroup(groupChannels, groupId, state.channels, { minimal, showNodeMapping });
-            container.appendChild(groupEl);
-        });
-        
-        // Render individual (non-collaboration) channels
-        individual.forEach((channel) => {
+        const renderChannelRow = (channel) => {
             const originalIndex = state.channels.indexOf(channel);
-            const item = createChannelListItem(channel, originalIndex, { minimal, showNodeMapping });
+            const collaborationMeta = buildCollaborationMeta(channel, collaborationGroups);
+            return createChannelListItem(channel, originalIndex, {
+                minimal,
+                showNodeMapping,
+                collaborationMeta
+            });
+        };
+
+        // Popup/minimal mode renders a flat list with subtle indicators only
+        if (minimal) {
+            displayChannels.forEach(channel => {
+                const item = renderChannelRow(channel);
+                container.appendChild(item);
+            });
+            return;
+        }
+
+        // Render channels in the exact order of the filtered/sorted list.
+        displayChannels.forEach(channel => {
+            const item = renderChannelRow(channel);
             container.appendChild(item);
         });
     }
@@ -298,6 +308,78 @@ const RenderEngine = (() => {
         
         return { groups, individual };
     }
+
+    function buildCollaborationMeta(channel, groups) {
+        const groupId = channel?.collaborationGroupId;
+        if (!groupId || !groups?.has(groupId)) return null;
+
+        const currentMembers = groups.get(groupId) || [];
+        const allCollaborators = Array.isArray(channel.allCollaborators) && channel.allCollaborators.length > 0
+            ? channel.allCollaborators
+            : currentMembers.map(member => ({ handle: member.handle, name: member.name, id: member.id }));
+
+        const missingNames = [];
+        const presentNames = [];
+
+        allCollaborators.forEach(collab => {
+            const displayName = collab.handle || collab.name || collab.id || 'Unknown';
+            if (currentMembers.some(member => matchesCollaborator(member, collab))) {
+                presentNames.push(displayName);
+            } else {
+                missingNames.push(displayName);
+            }
+        });
+
+        const totalCount = allCollaborators.length || currentMembers.length;
+        const presentCount = totalCount > 0
+            ? totalCount - missingNames.length
+            : currentMembers.length;
+
+        const tooltipParts = [];
+        if (allCollaborators.length > 0) {
+            tooltipParts.push(`Originally blocked with: ${allCollaborators.map(c => c.handle || c.name || c.id || 'Unknown').join(', ')}`);
+        }
+        if (presentNames.length > 0) {
+            tooltipParts.push(`Still blocked: ${presentNames.join(', ')}`);
+        }
+        if (missingNames.length > 0) {
+            tooltipParts.push(`Missing now: ${missingNames.join(', ')}`);
+        }
+
+        return {
+            groupId,
+            totalCount: totalCount || presentCount,
+            presentCount: presentCount || currentMembers.length,
+            missingNames,
+            isPartial: missingNames.length > 0,
+            tooltip: tooltipParts.join('\n').trim()
+        };
+    }
+
+    function matchesCollaborator(channel, collaborator) {
+        if (!channel || !collaborator) return false;
+        const channelHandle = (channel.handle || '').toLowerCase();
+        const collabHandle = (collaborator.handle || '').toLowerCase();
+        if (channelHandle && collabHandle && channelHandle === collabHandle) return true;
+
+        if (channel.id && collaborator.id && channel.id === collaborator.id) return true;
+
+        const channelName = (channel.name || '').toLowerCase();
+        const collabName = (collaborator.name || '').toLowerCase();
+        return !!channelName && !!collabName && channelName === collabName;
+    }
+
+    function createCollaborationBadge(meta) {
+        if (!meta) return null;
+        const badge = document.createElement('span');
+        badge.className = 'collaboration-badge';
+        badge.innerHTML = '<span class="icon">🤝</span>' +
+            `<span class="badge-count">${meta.presentCount}/${meta.totalCount}</span>`;
+        if (meta.tooltip) {
+            badge.setAttribute('title', meta.tooltip);
+        }
+        return badge;
+    }
     
     /**
      * Create a collaboration group container with yellow border
@@ -307,50 +389,6 @@ const RenderEngine = (() => {
      * @param {Object} config - Configuration options
      * @returns {HTMLElement} Group container element
      */
-    function createCollaborationGroup(channels, groupId, allChannels, config = {}) {
-        const { minimal = false, showNodeMapping = false } = config;
-        
-        // Detect if partial (some collaborators removed)
-        const allCollaborators = channels[0]?.allCollaborators || [];
-        const isPartial = allCollaborators.length > 0 && channels.length < allCollaborators.length;
-        
-        const groupEl = document.createElement('div');
-        groupEl.className = `collaboration-group ${isPartial ? 'partial' : ''}`;
-        groupEl.setAttribute('data-group-id', groupId);
-        
-        // Header
-        const header = document.createElement('div');
-        header.className = 'collaboration-group-header';
-        header.innerHTML = `🤝 Collaboration Group ${isPartial ? '(Partial)' : ''}`;
-        groupEl.appendChild(header);
-        
-        // Channel rows
-        channels.forEach(channel => {
-            const originalIndex = allChannels.indexOf(channel);
-            const item = createChannelListItem(channel, originalIndex, { minimal, showNodeMapping });
-            item.classList.add('channel-row');
-            groupEl.appendChild(item);
-        });
-        
-        // Warning for partial groups
-        if (isPartial) {
-            const currentHandles = channels.map(ch => ch.handle);
-            const missing = allCollaborators.filter(
-                collab => !currentHandles.includes(collab.handle)
-            );
-            
-            if (missing.length > 0) {
-                const warning = document.createElement('div');
-                warning.className = 'collaboration-group-warning';
-                const missingNames = missing.map(c => c.handle || c.name).join(', ');
-                warning.innerHTML = `⚠️ Originally blocked with ${missingNames}`;
-                groupEl.appendChild(warning);
-            }
-        }
-        
-        return groupEl;
-    }
-
     /**
      * Create a single channel list item
      * @param {Object} channel - Channel data
@@ -359,26 +397,40 @@ const RenderEngine = (() => {
      * @returns {HTMLElement} List item element
      */
     function createChannelListItem(channel, index, config = {}) {
-        const { minimal = false, showNodeMapping = false } = config;
+        const {
+            minimal = false,
+            showNodeMapping = false,
+            collaborationMeta = null
+        } = config;
         const StateManager = getStateManager();
         const UIComponents = getUIComponents();
 
         if (minimal) {
-            return createMinimalChannelItem(channel, index);
+            return createMinimalChannelItem(channel, index, collaborationMeta);
         } else {
-            return createFullChannelItem(channel, index, showNodeMapping);
+            return createFullChannelItem(channel, index, showNodeMapping, collaborationMeta);
         }
     }
 
     /**
      * Create minimal channel item (for popup)
      */
-    function createMinimalChannelItem(channel, index) {
+    function createMinimalChannelItem(channel, index, collaborationMeta) {
         const StateManager = getStateManager();
         const UIComponents = getUIComponents();
 
         const item = document.createElement('div');
         item.className = 'keyword-item';
+        if (channel.collaborationGroupId) {
+            item.classList.add('collaboration-member');
+            item.setAttribute('data-collaboration-group-id', channel.collaborationGroupId);
+        }
+        if (collaborationMeta?.isPartial) {
+            item.classList.add('collaboration-partial');
+        }
+        if (collaborationMeta?.tooltip) {
+            item.setAttribute('title', collaborationMeta.tooltip);
+        }
 
         const text = document.createElement('span');
         text.className = 'keyword-text';
@@ -409,12 +461,21 @@ const RenderEngine = (() => {
     /**
      * Create full channel item (for tab-view)
      */
-    function createFullChannelItem(channel, index, showNodeMapping) {
+    function createFullChannelItem(channel, index, showNodeMapping, collaborationMeta) {
         const StateManager = getStateManager();
         const Settings = getSettings();
 
         const item = document.createElement('div');
         item.className = 'list-item channel-item';
+        if (collaborationMeta) {
+            item.classList.add('collaboration-entry');
+            if (collaborationMeta.isPartial) {
+                item.classList.add('collaboration-partial');
+            }
+            if (collaborationMeta.tooltip) {
+                item.setAttribute('title', collaborationMeta.tooltip);
+            }
+        }
 
         // Header row: Logo + Name + Delete
         const headerRow = document.createElement('div');
@@ -439,6 +500,13 @@ const RenderEngine = (() => {
 
         infoGroup.appendChild(logoImg);
         infoGroup.appendChild(nameSpan);
+
+        if (collaborationMeta) {
+            const badge = createCollaborationBadge(collaborationMeta);
+            if (badge) {
+                infoGroup.appendChild(badge);
+            }
+        }
 
         // Delete button
         const deleteBtn = document.createElement('button');

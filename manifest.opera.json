@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "FilterTube",
     "description": "Restore peace of mind to your digital video experience.",
-    "version": "3.0.6",
+    "version": "3.0.7",
     "minimum_chrome_version": "111",
     "developer": {
         "name": "Devansh Varshney",

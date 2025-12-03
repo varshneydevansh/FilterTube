@@ -55,6 +55,8 @@ FilterTube/
 | `fetchChannelFromShortsUrl(videoId)` | Fetches Shorts page in background to extract channel info. |
 | `handleBlockChannelClick()` | Orchestrates the blocking flow: immediate hide + background block. |
 | `injectFilterTubeMenuItem()` | Injects the "Block Channel" option into YouTube's 3-dot menu. |
+| `enrichCollaboratorsWithMainWorld()` | Bridges collaborator requests between DOM and Main world, ensuring `allCollaborators` is populated. |
+| `generateCollaborationGroupId()` | Creates deterministic IDs so grouped channels remain linked across storage/UI. |
 
 ### `js/filter_logic.js`
 **Context:** Main World
@@ -71,6 +73,11 @@ FilterTube/
 ### `js/render_engine.js`
 **Context:** UI Contexts
 **Purpose:** Handles DOM updates and rendering of lists (keywords, channels).
+| Function | Description |
+| :--- | :--- |
+| `buildCollaborationMeta()` | Computes present vs. missing collaborators, badge counts, and tooltip copy per row. |
+| `createCollaborationBadge()` | Renders the 🤝 badge with `presentCount/totalCount`. |
+| `createFullChannelItem()` | Applies yellow/dashed rails, tooltips, and per-entry controls without altering FCFS order. |
 
 ### `js/ui_components.js`
 **Context:** UI Contexts

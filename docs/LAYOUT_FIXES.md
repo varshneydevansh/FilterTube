@@ -284,3 +284,31 @@ if (videoCard.tagName.toLowerCase().includes('shorts-lockup-view-model')) {
 This ensures that when a Short is blocked, the entire grid slot is removed, allowing YouTube's grid layout to reflow naturally and eliminate gaps.
 
 The implementation is designed to be maintainable, extensible, and resilient against YouTube's evolving interface, ensuring a seamless user experience when filtering content.
+
+## 7. Collaboration Entry UI Layout
+
+**Problem:**
+Early collaboration experiments rendered shared group containers above the list. When users searched or sorted, those containers clipped the rest of the list, broke FCFS ordering, and truncated tooltips.
+
+**Solution:**
+We moved every collaboration indicator **inline** with its channel card. Layout responsibilities are shared between `tab-view.css`, `popup.css`, and the render engine:
+
+```ascii
+
+list-item.channel-item.collaboration-entry
+  ├─ border-left: 4px solid var(--ft-color-collab-border)
+  ├─ padding-left adjusted so the rail doesn't shift content
+  ├─ &.collaboration-partial → border-left: dashed + subtle bg tint
+  └─ .collaboration-badge (🤝 2/3)
+        • inline-flex pill
+        • inherits tooltip text via `title`
+
+```
+
+For partial rosters, the row receives `collaboration-partial`, producing a dashed rail in both tab view and popup while the tooltip copy (“Originally blocked with / Still blocked / Missing now”) clarifies who left the group.
+
+**Popup Considerations:**
+- `.keyword-item.collaboration-member` reuses the same rail approach, but keeps the row compact for the extension popup.
+- Partial groups add a translucent background so missing collaborators are still visible even without hovering.
+
+This design keeps the DOM tree stable (one card per channel) while surfacing collaboration metadata purely through styling, which avoids reflows during search/sort operations.

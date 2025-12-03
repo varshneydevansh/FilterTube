@@ -66,6 +66,13 @@
   --ft-color-sem-neutral-border: #E0E0E0;
   --ft-color-sem-neutral-bg: #F0EFEA;
   --ft-color-focus-outline: #2E86AB;
+  
+  /* Collaboration Groups */
+  --ft-color-collab-border: #fbbf24;
+  --ft-color-collab-bg: #fef3c7;
+  --ft-color-collab-text: #92400e;
+  --ft-color-collab-warning-bg: #fffbeb;
+  --ft-color-collab-warning-text: #92400e;
 
   /* =========================================
      Typography - "Academic & Modern"
@@ -136,6 +143,7 @@
   --ft-transition-normal: 250ms ease;
 }
 
+/* Dark Mode Overrides (Manual override) */
 :root[data-theme="dark"] {
   --ft-color-bg-base: #121212;
   --ft-color-bg-surface: #1E1E1E;
@@ -152,6 +160,13 @@
 
   --ft-color-sem-neutral-border: #333333;
   --ft-color-sem-neutral-bg: #2C2C2C;
+
+  /* Collaboration Groups */
+  --ft-color-collab-border: #fbbf24;
+  --ft-color-collab-bg: rgba(251, 191, 36, 0.15);
+  --ft-color-collab-text: #fbbf24;
+  --ft-color-collab-warning-bg: rgba(251, 191, 36, 0.1);
+  --ft-color-collab-warning-text: #fde68a;
 }
 
 /* Dark Mode Overrides (Auto-detect when no manual override is set) */
@@ -172,5 +187,12 @@
 
     --ft-color-sem-neutral-border: #333333;
     --ft-color-sem-neutral-bg: #2C2C2C;
+
+    /* Collaboration Groups */
+    --ft-color-collab-border: #fbbf24;
+    --ft-color-collab-bg: rgba(251, 191, 36, 0.15);
+    --ft-color-collab-text: #fbbf24;
+    --ft-color-collab-warning-bg: rgba(251, 191, 36, 0.1);
+    --ft-color-collab-warning-text: #fde68a;
   }
 }

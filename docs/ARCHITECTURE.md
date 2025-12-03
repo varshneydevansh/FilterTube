@@ -145,6 +145,79 @@ The following diagram illustrates the complete interaction between all FilterTub
 
 ```
 
+## Collaboration Filtering Lifecycle (2025 Refactor)
+
+The collaboration pipeline spans **all three execution worlds** so that multi-channel uploads can be detected, stored, and rendered consistently. The flow below tracks a user invoking "Block All Collaborators" from the YouTube 3-dot menu:
+
+```mermaid
+sequenceDiagram
+    participant DOM as content_bridge.js<br/>(Isolated World)
+    participant MW as injector.js + filter_logic.js<br/>(Main World)
+    participant BG as background.js (SW)
+    participant UI as tab-view.js + render_engine.js
+
+    DOM->>DOM: Detect #attributed-channel-name<br/>parse collaborators
+    DOM->>MW: postMessage FilterTube_RequestCollaboratorInfo
+    MW->>MW: searchYtInitialDataForVideoChannel<br/>enrich handles + UC IDs
+    MW-->>DOM: FilterTube_CollaboratorInfoResponse<br/>allCollaborators[] payload
+    DOM->>BG: chrome.runtime.sendMessage handleAddFilteredChannel<br/>collaborationGroupId + collaborationWith
+    BG->>BG: sanitizeChannelEntry → persist allCollaborators
+    BG-->>UI: StateManager.broadcast('channelAdded')
+    UI->>UI: render_engine.buildCollaborationMeta<br/>badge + tooltip + dashed rail
+```
+
+### Architectural Guarantees
+1. **Deterministic grouping** – `content_bridge.js` creates a `collaborationGroupId` before storage, so every UI can reassemble the exact roster after reloads and across browsers.
+2. **Lossless collaborator roster** – `allCollaborators` travels with each saved channel entry, allowing tooltips to show present vs. missing members without re-querying YouTube.
+3. **Cross-world enrichment** – When the DOM only exposes the first collaborator link, the Request/Response hop to the Main World fills remaining handles/IDs directly from `ytInitialData`.
+4. **FCFS rendering with inline metadata** – `render_engine.js` drops floating group containers and instead decorates each row in-place (badge, yellow rail, tooltip), preserving the filtered/sorted order defined by the user.
+
+The collaboration lifecycle reuses the existing Hybrid Filtering channels (`window.postMessage`, `chrome.runtime` messaging, StateManager broadcasts), ensuring the new metadata behaves like any other persisted filter entry.
+
+### Message Bus & Storage Hand-off
+
+```ascii
+
+  (Isolated World)                 (Main World)                    (Service Worker)              (UI Contexts)
+
+  content_bridge.js        injector.js / filter_logic.js          background.js            tab-view.js / popup.js
+         |                               |                              |                             |
+         | 1. DOM parse                  |                              |                             |
+         |------------------------------>|                              |                             |
+         | FilterTube_RequestCollabInfo  |                              |                             |
+         |                               | 2. searchYtInitialData()     |                             |
+         |                               |----------------------------->|                             |
+         |                               | 3. Response w/ allCollaborators                            |
+         |<------------------------------|                              |                             |
+         | 4. chrome.runtime.sendMessage (handleAddFilteredChannel)     |                             |
+         |------------------------------------------------------------->|                             |
+         |                               |                              | 5. sanitizeChannelEntry()   |
+         |                               |                              |    persist + broadcast      |
+         |                               |                              |---------------------------->|
+         |                               |                              |             channelAdded    |
+         |                               |                              |                             | 6. render_engine.buildCollaborationMeta()
+         |                               |                              |                             v
+
+```
+
+*Every hop carries the `collaborationGroupId`, `collaborationWith[]`, and `allCollaborators[]`, so downstream consumers never have to re-parse the DOM or `ytInitialData` for that upload.*
+
+### Shorts Flow overlay
+
+```ascii
+
+User "Block channel" (Short) → content_bridge detects ytd-shorts-lockup →
+  1. Fetch shorts watch URL (to resolve initial handle/id)
+  2. Post FilterTube_RequestCollaboratorInfo if collab markers exist
+  3. Await canonical UC ID via fetchIdForHandle() / /about scrape
+  4. Send handleAddFilteredChannel to background with `isShorts: true`
+  5. Background persists, broadcasts -> DOM fallback removes parent container (rich-item renderer) to avoid blank slots
+
+```
+
+This hybrid path keeps **Zero-Flash** guarantees for Shorts even though their cards lack canonical IDs up front: the DOM fallback hides immediately while the async canonical resolution finishes (<2.5s worst case).
+
+
 ## 1. Extension Initialization & Script Injection Flow
 
 **Motivation:**

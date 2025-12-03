@@ -76,6 +76,7 @@ Each collaborator in `listItems[].listItemViewModel`:
 | `<yt-text-view-model>` with attributed string | DOM-only collaboration display | ✅ Covered | Parses "Channel A ✓ and Channel B ✓" format |
 | `<yt-core-attributed-string>` | Contains channel spans | ✅ Covered | Each span has channel name |
 | `<a href="/@handle">` | Direct channel link | ⚠️ Partial | Only FIRST channel has direct link in DOM; others require ytInitialData lookup |
+| `badge-shape[title*="•"]` | DOM-only badges | ✅ Covered | Regex `@([A-Za-z0-9._-]+)` extracts handles even when encoded as `@foo.bar` |
 
 #### 3-Dot Menu UI for Collaborations
 
@@ -106,6 +107,24 @@ Since content_bridge.js runs in **Isolated World** (no `ytInitialData` access), 
 2. If collaborator data incomplete → request from Main World via `FilterTube_RequestCollaboratorInfo`
 3. injector.js (Main World) searches `ytInitialData` and responds with `FilterTube_CollaboratorInfoResponse`
 4. content_bridge.js enriches collaborator data and injects menu options
+5. background.js persists `collaborationGroupId`, `collaborationWith`, `allCollaborators`; UI renders dashed/yellow rails via `render_engine.js`
+
+#### Renderer/UI Mapping
+| Layer | Responsibility |
+| --- | --- |
+| `filter_logic.js` | Extracts collaborator listItems, normalizes handles (lowercase, dots/underscores allowed) |
+| `content_bridge.js` | Generates group IDs, injects block-all menu entries, and hides DOM nodes immediately |
+| `render_engine.js` | Computes `presentCount/totalCount`, adds 🤝 badge + tooltip text |
+
+### Shorts Collaborations & Canonical IDs (2025-12 sample)
+
+| Source | Path / Selector | Notes |
+| --- | --- | --- |
+| DOM | `ytd-shorts-lockup-view-model`, `.reel-item` | Shorts cards often omit UC IDs; only handle is available |
+| Fetch | `https://www.youtube.com/shorts/<id>` | Used to extract uploader handle when missing from DOM |
+| Fetch | `https://www.youtube.com/@handle/about` | Resolves canonical `UC...` ID via regex `channel/(UC[\w-]{22})` |
+
+**Flow Recap:** detect Short → hide container → resolve handle → resolve UC ID → persist → broadcast so interceptors catch future cards.
 
 ### Podcasts shelf (Podcasts tab, 2025-11-18 sample)
 | DOM tag / component | Underlying renderer / data source | Status | Notes |

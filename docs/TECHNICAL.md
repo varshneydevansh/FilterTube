@@ -107,6 +107,82 @@ The engine acts like a meticulous inspector. It opens every box (data object) Yo
 
 ```
 
+## 9. Collaboration Detection & Cross-World Synchronization
+
+Collaboration filtering relies on coordinated logic across all three execution worlds. The end-to-end detection pipeline is:
+
+```ascii
+
+YouTube DOM (Isolated World)
+  └─ content_bridge.js
+      • Detect #attributed-channel-name / yt-text-view-model strings
+      • Parse links, badges, and inline text to build initial collaborators[]
+      • If data missing → post FilterTube_RequestCollaboratorInfo →
+
+Main World
+  └─ injector.js / filter_logic.js
+      • searchYtInitialDataForVideoChannel(videoId)
+      • Extract listItems[].listItemViewModel entries (name, handle, UC ID)
+      • Respond with allCollaborators[] payload →
+
+Isolated World (resume)
+  • Generate collaborationGroupId (UUID)
+  • Send chrome.runtime.sendMessage(handleAddFilteredChannel, {
+        input, filterAll, collaborationWith, collaborationGroupId,
+        allCollaborators
+    }) →
+
+Background Service Worker
+  • sanitizeChannelEntry() persists full metadata
+  • Broadcasts StateManager events to every UI context
+
+UI Contexts (tab-view.js, popup.js)
+  • render_engine.buildCollaborationMeta() groups rows by collaborationGroupId
+  • A 🤝 badge + tooltip summarizes present/missing collaborators
+
+```
+
+### Data Structures Propagated
+- `collaborationGroupId`: deterministic link between channels blocked in the same action.
+- `collaborationWith[]`: per-channel "other members" list used for warnings and tooltips.
+- `allCollaborators[]`: canonical roster (name/handle/id) stored on each channel row so the UI can reason about partial groups even after reordering or searching.
+
+## 10. Collaboration UI & Storage Semantics
+
+- **Storage (`background.js` + `settings_shared.js`)**: `sanitizeChannelEntry` preserves `collaborationGroupId`, `collaborationWith`, and `allCollaborators`, meaning compiled settings always contain the metadata necessary for UI rehydration.
+- **Render Engine**: `buildCollaborationMeta` compares the stored roster with currently filtered entries, computes `presentCount/totalCount`, and emits:
+  - `collaboration-entry` + yellow rail (full groups)
+  - `collaboration-partial` + dashed rail (missing members)
+  - `title` attribute tooltips with “Originally blocked with / Still blocked / Missing now” copy.
+- **Search & Sort Integrity**: Because every collaborator remains an independent row, FCFS ordering, keyword search, and sort toggles behave exactly as non-collab entries, avoiding clipping issues seen with floating group containers.
+
+## 11. Handle Normalization & Regex Improvements
+
+- **Pattern**: `extractHandleFromString` and friends normalize any string with `@([A-Za-z0-9._-]+)` so handles like `@dr.one` or `@Studio_Name` survive DOM scraping, dataset scanning, and URL parsing.
+- **Canonicalization**: `normalizeChannelHandle` strips URLs, querystrings, and enforces lowercase so duplicates and mixed input sources converge to the same key.
+- **Storage Sync**: `fetchIdForHandle` (Isolated World) resolves the canonical `UC...` ID via `/@handle/about` fetch, caches it, and notifies the background worker via `FilterTube_UpdateChannelMap`, preventing repeated network lookups.
+- **Regex Compilation**: `compileKeywords` escapes user input but keeps literal dots/underscores intact, ensuring collaboration-derived keywords like `@foo.bar` remain matchable.
+
+## 12. Shorts Canonical Resolution (Detailed)
+
+Shorts cards rarely embed canonical IDs, so FilterTube performs a two-phase resolution:
+
+```mermaid
+sequenceDiagram
+    participant DOM as content_bridge.js (Shorts UI)
+    participant FETCH as Remote Fetches
+    participant BG as background.js
+
+    DOM->>DOM: Detect ytd-reel-item / ytd-shorts-lockup
+    DOM->>FETCH: fetch shorts watch URL (resolve uploader handle)
+    DOM->>FETCH: fetch https://www.youtube.com/@handle/about (resolve UC ID)
+    DOM->>BG: handleAddFilteredChannel({ id, handle, isShorts:true })
+    BG->>BG: Persist channel, broadcast state update
+    DOM->>DOM: hide container (parent rich-item) immediately → zero blank slots
+```
+
+- **Grace Period**: While the canonical lookup runs (~1–2.5s), DOM fallback hides the Short so the user never sees it again.
+- **Stats Integrity**: Once the canonical ID is known, subsequent interceptors (data + DOM) recognize the entry on every surface, so Shorts, long-form videos, and recommendations from that channel stay filtered without extra fetches.
 
 ## 4. DOM Fallback System
 

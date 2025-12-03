@@ -192,6 +192,24 @@ label {
     border-bottom: 1px solid var(--ft-color-sem-neutral-border);
 }
 
+.keyword-item.collaboration-member {
+    border-left: 4px solid var(--ft-color-collab-border, #fbbf24);
+    padding-left: calc(var(--ft-space-sm) - 4px);
+}
+
+html[data-theme="dark"] .keyword-item.collaboration-member {
+    border-left-color: #fbbf24;
+}
+
+.keyword-item.collaboration-partial {
+    border-left-style: dashed;
+    background: rgba(250, 204, 21, 0.08);
+}
+
+html[data-theme="dark"] .keyword-item.collaboration-partial {
+    background: rgba(250, 204, 21, 0.12);
+}
+
 .keyword-item:last-child {
     border-bottom: none;
 }

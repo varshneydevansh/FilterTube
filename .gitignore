@@ -24,6 +24,7 @@ ARCHITECTURE_VALIDATION.md
 .Trashes
 ehthumbs.db
 Thumbs.db
+logs.json
 
 # Logs
 *.log

@@ -88,6 +88,8 @@ YouTube JSON Data → FilterTubeEngine.processData() → Filtered Data → YouTu
 - **Channel ID Support**: Blocks channels by YouTube channel IDs (UC...)
 - **Channel Name Support**: Blocks channels by display names
 - **Fuzzy Matching**: Handles variations in channel name formats
+- **Collaboration Awareness**: Adds a shared `collaborationGroupId` when the user blocks multi-author videos; the UI reflects missing collaborators via dashed rails + tooltips without altering sort order.
+- **Handle Regex Upgrades**: Accepts dots/underscores/dashes in @handles (regex `@([A-Za-z0-9._-]+)`) so channels like `@mr.engineer` stay matched everywhere.
 
 ### **Comment Filtering**
 - **Complete Removal**: Removes entire comment sections
@@ -98,6 +100,8 @@ YouTube JSON Data → FilterTubeEngine.processData() → Filtered Data → YouTu
 - **Shorts Detection**: Identifies and blocks YouTube Shorts content
 - **Multiple Layouts**: Handles Shorts in various YouTube layouts
 - **Mobile Compatibility**: Works across desktop and mobile interfaces
+- **Canonical Resolution**: Every Shorts block performs a hidden fetch to resolve the canonical UC ID before persisting, guaranteeing that long-form uploads from the same channel are also filtered.
+- **Zero-Gap Removal**: DOM fallback hides the entire parent `ytd-rich-item-renderer`/grid slot so blocked Shorts never leave blank placeholders.
 
 ## Performance Characteristics
 

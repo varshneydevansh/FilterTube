@@ -99,6 +99,28 @@
         const handle = typeof entry.handle === 'string' ? entry.handle : null;
         const name = entry.name || id || handle || entry.originalInput || '';
         const originalInput = entry.originalInput || handle || id || name || '';
+        const collaborationGroupId = typeof entry.collaborationGroupId === 'string'
+            ? entry.collaborationGroupId
+            : null;
+        const collaborationWith = Array.isArray(entry.collaborationWith)
+            ? entry.collaborationWith.filter(Boolean)
+            : [];
+        const allCollaborators = Array.isArray(entry.allCollaborators)
+            ? entry.allCollaborators
+                .map(collab => {
+                    if (!collab || typeof collab !== 'object') return null;
+                    const collabHandle = typeof collab.handle === 'string' ? collab.handle : null;
+                    const collabName = collab.name || collabHandle || collab.id || null;
+                    const collabId = typeof collab.id === 'string' ? collab.id : null;
+                    if (!collabHandle && !collabName && !collabId) return null;
+                    return {
+                        handle: collabHandle,
+                        name: collabName,
+                        id: collabId
+                    };
+                })
+                .filter(Boolean)
+            : [];
 
         return {
             name: name || id,
@@ -107,7 +129,10 @@
             logo: entry.logo || null,
             filterAll: !!entry.filterAll,
             originalInput,
-            addedAt: entry.addedAt || Date.now()
+            addedAt: entry.addedAt || Date.now(),
+            collaborationGroupId,
+            collaborationWith,
+            allCollaborators
         };
     }
 

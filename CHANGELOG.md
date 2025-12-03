@@ -1,5 +1,5 @@
 # Changelog
-## Version 3.0.7 (Unreleased)
+## Version 3.0.7
 
 ### New Features
 - **Posts Support**: Added proper channel extraction for YouTube community posts

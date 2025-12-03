@@ -69,7 +69,7 @@ body {
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: var(--ft-space-xs);
+    gap: var(--ft-space-md);
 }
 
 .nav-item {
@@ -390,7 +390,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: var(--ft-space-xs);
-    max-height: 500px;
+    max-height: min(75vh, 860px);
     overflow-y: auto;
 }
 
@@ -442,6 +442,72 @@ body {
 
 :root[data-theme="dark"] .channel-derived-origin {
     color: #cbd5f5;
+}
+
+/* Collaboration Entries */
+.channel-item.collaboration-entry {
+    border-left: 4px solid var(--ft-color-collab-border, #facc15);
+    padding-left: calc(16px - 4px);
+    position: relative;
+}
+
+.channel-item.collaboration-entry.collaboration-partial {
+    border-left-style: dashed;
+    background: rgba(250, 204, 21, 0.08);
+}
+
+:root[data-theme="dark"] .channel-item.collaboration-entry {
+    border-left-color: #facc15;
+}
+
+:root[data-theme="dark"] .channel-item.collaboration-entry.collaboration-partial {
+    background: rgba(234, 179, 8, 0.08);
+}
+
+.collaboration-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    background: var(--ft-color-collab-bg, #fef3c7);
+    color: var(--ft-color-collab-text, #92400e);
+    border: 1px solid var(--ft-color-collab-border, rgba(250, 204, 21, 0.8));
+    line-height: 1.2;
+}
+
+.collaboration-badge .icon {
+    font-size: 13px;
+}
+
+:root[data-theme="dark"] .collaboration-badge {
+    background: rgba(250, 204, 21, 0.15);
+    color: #fefce8;
+    border-color: rgba(250, 204, 21, 0.5);
+}
+
+.collaboration-warning {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: var(--ft-radius-sm);
+    font-size: var(--ft-font-size-caption);
+    background: var(--ft-color-collab-warning-bg, #fffbeb);
+    color: var(--ft-color-collab-warning-text, #92400e);
+    border: 1px solid rgba(250, 204, 21, 0.35);
+}
+
+.collaboration-warning .icon {
+    font-size: 14px;
+}
+
+:root[data-theme="dark"] .collaboration-warning {
+    background: rgba(250, 204, 21, 0.1);
+    color: #fde68a;
+    border-color: rgba(250, 204, 21, 0.4);
 }
 
 .item-controls {
