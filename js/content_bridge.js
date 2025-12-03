@@ -1639,6 +1639,52 @@ function applyDOMFallback(settings, options = {}) {
             if (ariaLabel) title = ariaLabel.trim();
         }
 
+        // Check if this element was blocked via 3-dot menu (has blocked channel attributes)
+        const blockedChannelId = target.getAttribute('data-filtertube-blocked-channel-id');
+        const blockedChannelHandle = target.getAttribute('data-filtertube-blocked-channel-handle');
+        const blockedChannelState = target.getAttribute('data-filtertube-blocked-state');
+        const blockedTimestamp = parseInt(target.getAttribute('data-filtertube-blocked-ts') || '0', 10);
+        const blockAgeMs = blockedTimestamp ? Date.now() - blockedTimestamp : Number.POSITIVE_INFINITY;
+        
+        // If this card was blocked via 3-dot UI, honour pending/confirmed states
+        if (blockedChannelId || blockedChannelHandle) {
+            const isStillBlocked = effectiveSettings.filterChannels?.some(fc => {
+                if (typeof fc === 'object') {
+                    return (blockedChannelId && fc.id?.toLowerCase() === blockedChannelId.toLowerCase()) ||
+                           (blockedChannelHandle && fc.handle?.toLowerCase() === blockedChannelHandle.toLowerCase());
+                }
+                const normalized = (fc || '').toLowerCase();
+                return normalized === blockedChannelId?.toLowerCase() || normalized === blockedChannelHandle?.toLowerCase();
+            });
+            
+            if (isStillBlocked) {
+                // Keep it hidden - mark as confirmed so future passes don't treat it as pending
+                markElementAsBlocked(target, {
+                    id: blockedChannelId,
+                    handle: blockedChannelHandle
+                }, 'confirmed');
+                toggleVisibility(target, true, `Blocked channel: ${blockedChannelHandle || blockedChannelId}`);
+                return; // Skip further processing for this element
+            } else {
+                // If blocklist no longer contains this channel but the state is still pending,
+                // keep it hidden for a short grace period to avoid flicker while background saves
+                const waitForConfirmation = blockedChannelState === 'pending' && blockAgeMs < 2000;
+                if (waitForConfirmation) {
+                    toggleVisibility(target, true, `Pending channel block: ${blockedChannelHandle || blockedChannelId}`);
+                    return;
+                }
+
+                // Channel was unblocked, remove the attributes and let normal filtering proceed
+                target.removeAttribute('data-filtertube-blocked-channel-id');
+                target.removeAttribute('data-filtertube-blocked-channel-handle');
+                target.removeAttribute('data-filtertube-blocked-state');
+                target.removeAttribute('data-filtertube-blocked-ts');
+
+                // Immediately restore visibility so layout snaps back before keyword logic reruns
+                toggleVisibility(target, false, '', true);
+            }
+        }
+
         const channelAnchor = element.querySelector('a[href*="/channel"], a[href^="/@"], a[href*="/user/"], a[href*="/c/"]');
         const channelText = channelAnchor?.textContent?.trim() || '';
         const channelHref = channelAnchor?.getAttribute('href') || channelAnchor?.href || '';
@@ -3435,6 +3481,59 @@ async function checkIfChannelBlocked(channelInfo, menuItem) {
     }
 }
 
+function markElementAsBlocked(element, channelInfo, state = 'pending') {
+    if (!element || !channelInfo) return;
+
+    if (channelInfo.id) {
+        element.setAttribute('data-filtertube-blocked-channel-id', channelInfo.id);
+    }
+    if (channelInfo.handle) {
+        element.setAttribute('data-filtertube-blocked-channel-handle', channelInfo.handle);
+    }
+    if (channelInfo.name) {
+        element.setAttribute('data-filtertube-blocked-channel-name', channelInfo.name);
+    }
+    element.setAttribute('data-filtertube-blocked-state', state);
+    element.setAttribute('data-filtertube-blocked-ts', Date.now().toString());
+}
+
+function clearBlockedElementAttributes(element) {
+    if (!element) return;
+    element.removeAttribute('data-filtertube-blocked-channel-id');
+    element.removeAttribute('data-filtertube-blocked-channel-handle');
+    element.removeAttribute('data-filtertube-blocked-channel-name');
+    element.removeAttribute('data-filtertube-blocked-state');
+    element.removeAttribute('data-filtertube-blocked-ts');
+}
+
+function syncBlockedElementsWithFilters(effectiveSettings) {
+    const filterChannels = effectiveSettings?.filterChannels || [];
+    const channelMap = effectiveSettings?.channelMap || {};
+    const blockedElements = document.querySelectorAll('[data-filtertube-blocked-channel-id], [data-filtertube-blocked-channel-handle]');
+    if (blockedElements.length === 0) return;
+
+    const isStillBlocked = (meta) => {
+        if (!meta.handle && !meta.id) return false;
+        return filterChannels.some(filterChannel => channelMatchesFilter(meta, filterChannel, channelMap));
+    };
+
+    blockedElements.forEach(element => {
+        const meta = {
+            id: element.getAttribute('data-filtertube-blocked-channel-id') || '',
+            handle: element.getAttribute('data-filtertube-blocked-channel-handle') || '',
+            name: element.getAttribute('data-filtertube-blocked-channel-name') || ''
+        };
+
+        if (filterChannels.length > 0 && isStillBlocked(meta)) {
+            markElementAsBlocked(element, meta, 'confirmed');
+            toggleVisibility(element, true, `Blocked channel: ${meta.handle || meta.id}`);
+        } else {
+            clearBlockedElementAttributes(element);
+            toggleVisibility(element, false, '', true);
+        }
+    });
+}
+
 /**
  * Handle click on "Block Channel" menu item
  * @param {Object} channelInfo - {id, handle, name}
@@ -3543,6 +3642,8 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                 console.log('FilterTube: Could not extract videoId, hiding only current card');
             }
 
+            const blockedMetadata = channelInfo.allCollaborators?.[0] || channelInfo;
+
             // Hide all instances
             cardsToHide.forEach((card, index) => {
                 let containerToHide = card;
@@ -3555,6 +3656,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                         containerToHide = parentContainer;
                     }
                 }
+                markElementAsBlocked(containerToHide, blockedMetadata, 'pending');
                 containerToHide.style.display = 'none';
                 containerToHide.classList.add('filtertube-hidden');
                 containerToHide.setAttribute('data-filtertube-hidden', 'true');
@@ -3685,59 +3787,50 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
         if (videoCard) {
             console.log('FilterTube: Hiding video card immediately');
 
-            // Extract videoId to find all instances of this video
-            const videoId = extractVideoIdFromCard(videoCard);
-            console.log('FilterTube: Video ID for hiding:', videoId);
+            // Check if this is a shorts card
+            const isShorts = videoCard.tagName.toLowerCase().includes('shorts-lockup-view-model') ||
+                             videoCard.tagName.toLowerCase().includes('reel');
 
-            // Find all cards with this videoId
-            let cardsToHide = [];
-
-            if (videoId) {
-                // Find all video cards on the page
-                const allVideoCards = document.querySelectorAll('ytd-video-renderer, ytd-grid-video-renderer, ytd-compact-video-renderer, ytd-rich-item-renderer');
-
-                allVideoCards.forEach(card => {
-                    const cardVideoId = extractVideoIdFromCard(card);
-                    if (cardVideoId === videoId) {
-                        cardsToHide.push(card);
-                    }
-                });
-
-                console.log(`FilterTube: Found ${cardsToHide.length} instance(s) of video ${videoId} to hide`);
-            } else {
-                // Fallback: just hide the current card if we can't extract videoId
-                cardsToHide = [videoCard];
-                console.log('FilterTube: Could not extract videoId, hiding only current card');
+            // For shorts, find the correct parent container to hide
+            let containerToHide = videoCard;
+            if (isShorts) {
+                // Try homepage container (ytd-rich-item-renderer)
+                let parentContainer = videoCard.closest('ytd-rich-item-renderer');
+                // If not found, try search page container (div.ytGridShelfViewModelGridShelfItem)
+                if (!parentContainer) {
+                    parentContainer = videoCard.closest('.ytGridShelfViewModelGridShelfItem');
+                }
+                if (parentContainer) {
+                    containerToHide = parentContainer;
+                }
+                console.log('FilterTube: Shorts detected, hiding container:', containerToHide.tagName || containerToHide.className);
             }
 
-            // Hide all instances
-            cardsToHide.forEach((card, index) => {
-                // For shorts, find the parent container
-                // For regular videos, the card itself is usually the right container
-                let containerToHide = card;
+            // Immediate hiding: Apply direct styles + class to ensure it's hidden right away
+            markElementAsBlocked(containerToHide, channelInfo, 'pending');
+            containerToHide.style.display = 'none';
+            containerToHide.classList.add('filtertube-hidden');
+            containerToHide.setAttribute('data-filtertube-hidden', 'true');
+            console.log('FilterTube: Applied immediate hiding to:', containerToHide.tagName || containerToHide.className);
 
-                // Check if this is a shorts lockup model nested in a container
-                if (card.tagName.toLowerCase().includes('shorts-lockup-view-model')) {
-                    // Try homepage container (ytd-rich-item-renderer)
-                    let parentContainer = card.closest('ytd-rich-item-renderer');
-
-                    // If not found, try search page container (div.ytGridShelfViewModelGridShelfItem)
-                    if (!parentContainer) {
-                        parentContainer = card.closest('.ytGridShelfViewModelGridShelfItem');
-                    }
-
-                    if (parentContainer) {
-                        containerToHide = parentContainer;
-                    }
+            // For non-shorts, also try to find other instances of the same video
+            if (!isShorts) {
+                const videoId = extractVideoIdFromCard(videoCard);
+                if (videoId) {
+                    const allVideoCards = document.querySelectorAll('ytd-video-renderer, ytd-grid-video-renderer, ytd-compact-video-renderer, ytd-rich-item-renderer');
+                    allVideoCards.forEach(card => {
+                        if (card === containerToHide) return; // Already hidden
+                        const cardVideoId = extractVideoIdFromCard(card);
+                        if (cardVideoId === videoId) {
+                            markElementAsBlocked(card, channelInfo, 'pending');
+                            card.style.display = 'none';
+                            card.classList.add('filtertube-hidden');
+                            card.setAttribute('data-filtertube-hidden', 'true');
+                            console.log('FilterTube: Also hiding duplicate video card');
+                        }
+                    });
                 }
-
-                // Immediate hiding: Apply direct styles + class to ensure it's hidden right away
-                // The storage change event will trigger proper re-filtering shortly after
-                containerToHide.style.display = 'none';
-                containerToHide.classList.add('filtertube-hidden');
-                containerToHide.setAttribute('data-filtertube-hidden', 'true');
-                console.log(`FilterTube: Applied immediate hiding to instance ${index + 1}:`, containerToHide.tagName || containerToHide.className);
-            });
+            }
 
 
             // Close the dropdown since the video is now hidden
