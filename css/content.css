@@ -188,6 +188,23 @@ ytd-horizontal-card-list-renderer #items {
     /* Use flex instead of block for these specific mix elements */
 }
 
+/* Keep watch playlist (Mix queue) rows aligned so the default 3-dot menu stays visible */
+ytd-playlist-panel-video-renderer.filter-tube-visible {
+    display: flex !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+}
+
+ytd-playlist-panel-video-renderer.filter-tube-visible #meta {
+    flex: 1 1 auto !important;
+}
+
+ytd-playlist-panel-video-renderer.filter-tube-visible #menu {
+    display: flex !important;
+    margin-left: auto !important;
+    align-items: center !important;
+}
+
 /* Ensure content image and metadata maintain proper positioning */
 .filter-tube-visible .yt-lockup-view-model-wiz__content-image,
 .filter-tube-visible .yt-lockup-metadata-view-model-wiz {

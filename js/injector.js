@@ -8,6 +8,130 @@
         console.warn('FilterTube (Injector): Already initialized, skipping');
         return; // Now legal because it's inside a function
     }
+
+    function searchYtInitialDataForChannelInfo(videoId) {
+        if (!window.ytInitialData || !videoId) {
+            postLog('log', 'Channel lookup skipped - no ytInitialData or videoId');
+            return null;
+        }
+
+        // Helper to extract channel info from a browseEndpoint
+        function extractFromBrowseEndpoint(endpoint, nameHint) {
+            if (!endpoint) return null;
+            const channelInfo = {};
+            if (endpoint.browseId?.startsWith('UC')) {
+                channelInfo.id = endpoint.browseId;
+            }
+            if (endpoint.canonicalBaseUrl) {
+                const handleMatch = endpoint.canonicalBaseUrl.match(/@([\w.-]+)/);
+                if (handleMatch) {
+                    channelInfo.handle = `@${handleMatch[1]}`;
+                }
+            }
+            if (nameHint) {
+                channelInfo.name = nameHint;
+            }
+            return (channelInfo.handle || channelInfo.id) ? channelInfo : null;
+        }
+
+        function searchObject(obj) {
+            if (!obj || typeof obj !== 'object') return null;
+
+            // PATTERN 1: Standard Renderer with videoId (videoRenderer, compactVideoRenderer, etc.)
+            if (obj.videoId === videoId) {
+                const bylineText = obj.shortBylineText || obj.longBylineText;
+                if (bylineText?.runs) {
+                    for (const run of bylineText.runs) {
+                        const browseEndpoint = run.navigationEndpoint?.browseEndpoint;
+                        const result = extractFromBrowseEndpoint(browseEndpoint, run.text || obj.ownerText?.runs?.[0]?.text);
+                        if (result) return result;
+                    }
+                }
+
+                const thumbnailRenderer = obj.channelThumbnailSupportedRenderers?.channelThumbnailWithLinkRenderer;
+                if (thumbnailRenderer?.navigationEndpoint?.browseEndpoint) {
+                    const result = extractFromBrowseEndpoint(
+                        thumbnailRenderer.navigationEndpoint.browseEndpoint,
+                        obj.ownerText?.runs?.[0]?.text || obj.shortBylineText?.runs?.[0]?.text
+                    );
+                    if (result) return result;
+                }
+            }
+
+            // PATTERN 2: lockupViewModel with contentId (watch page suggestions)
+            if (obj.contentId === videoId) {
+                const lockupMetadata = obj.metadata?.lockupMetadataViewModel;
+                if (lockupMetadata) {
+                    // Try avatar click endpoint
+                    const avatarEndpoint = lockupMetadata.metadata?.avatarViewModel?.avatarRendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint;
+                    if (avatarEndpoint) {
+                        const nameFromMetadata = lockupMetadata.metadata?.contentMetadataViewModel?.metadataRows?.[0]?.metadataParts?.[0]?.text?.content;
+                        const result = extractFromBrowseEndpoint(avatarEndpoint, nameFromMetadata);
+                        if (result) return result;
+                    }
+
+                    // Try metadata rows command runs
+                    const metadataRows = lockupMetadata.metadata?.contentMetadataViewModel?.metadataRows;
+                    if (metadataRows && Array.isArray(metadataRows)) {
+                        for (const row of metadataRows) {
+                            const parts = row.metadataParts;
+                            if (parts && Array.isArray(parts)) {
+                                for (const part of parts) {
+                                    const commandRuns = part.text?.commandRuns;
+                                    if (commandRuns && Array.isArray(commandRuns)) {
+                                        for (const cmd of commandRuns) {
+                                            const browseEndpoint = cmd.onTap?.innertubeCommand?.browseEndpoint;
+                                            if (browseEndpoint) {
+                                                const result = extractFromBrowseEndpoint(browseEndpoint, part.text?.content);
+                                                if (result) return result;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Try byline command runs
+                    const bylineRuns = lockupMetadata.byline?.commandRuns;
+                    if (bylineRuns && Array.isArray(bylineRuns)) {
+                        for (const cmd of bylineRuns) {
+                            const browseEndpoint = cmd.onTap?.innertubeCommand?.browseEndpoint;
+                            if (browseEndpoint) {
+                                const result = extractFromBrowseEndpoint(browseEndpoint, lockupMetadata.byline?.content);
+                                if (result) return result;
+                            }
+                        }
+                    }
+                }
+
+                // Try rendererContext at root level
+                const rootEndpoint = obj.rendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint;
+                if (rootEndpoint) {
+                    const result = extractFromBrowseEndpoint(rootEndpoint);
+                    if (result) return result;
+                }
+            }
+
+            // Recurse into child objects
+            for (const key in obj) {
+                const value = obj[key];
+                if (Array.isArray(value)) {
+                    for (const item of value) {
+                        const result = searchObject(item);
+                        if (result) return result;
+                    }
+                } else if (typeof value === 'object' && value !== null) {
+                    const result = searchObject(value);
+                    if (result) return result;
+                }
+            }
+
+            return null;
+        }
+
+        return searchObject(window.ytInitialData);
+    }
     window.filterTubeInjectorHasRun = true;
 
     // Debug logging with sequence numbers and bridge relay
@@ -49,6 +173,7 @@
 
     // Cache for collaboration data from filter_logic.js
     var collaboratorCache = new Map(); // videoId -> collaborators array
+    var channelCache = new Map(); // videoId -> channel info
 
     // Listen for settings from content_bridge
     window.addEventListener('message', (event) => {
@@ -87,6 +212,14 @@
             }
         }
 
+        if (type === 'FilterTube_CacheChannelInfo' && source === 'filter_logic') {
+            const { videoId, channel } = payload || {};
+            if (videoId && channel) {
+                channelCache.set(videoId, channel);
+                postLog('log', `📥 Cached channel info for video: ${videoId}`);
+            }
+        }
+
         // Handle collaborator info request from content_bridge (Isolated World)
         if (type === 'FilterTube_RequestCollaboratorInfo' && source === 'content_bridge') {
             const { videoId, requestId } = payload;
@@ -112,6 +245,31 @@
             }, '*');
 
             postLog('log', `Sent collaborator info response:`, collaboratorInfo?.length || 0, 'collaborators');
+        }
+
+        if (type === 'FilterTube_RequestChannelInfo' && source === 'content_bridge') {
+            const { videoId, requestId } = payload || {};
+            postLog('log', `Received channel info request for video: ${videoId}`);
+
+            let channelInfo = channelCache.get(videoId);
+            if (!channelInfo) {
+                channelInfo = searchYtInitialDataForChannelInfo(videoId);
+                if (channelInfo) {
+                    channelCache.set(videoId, channelInfo);
+                }
+            }
+
+            window.postMessage({
+                type: 'FilterTube_ChannelInfoResponse',
+                payload: {
+                    videoId,
+                    requestId,
+                    channel: channelInfo || null
+                },
+                source: 'injector'
+            }, '*');
+
+            postLog('log', `Sent channel info response for ${videoId}:`, channelInfo ? 'found' : 'missing');
         }
     });
 

@@ -285,6 +285,27 @@
             videoId: 'contentId',
             title: ['metadata.lockupMetadataViewModel.title.content', 'accessibilityText'],
             channelName: ['metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.0.metadataParts.0.text.content'],
+            // Channel ID/Handle for watch page suggestions - ViewModel structure
+            channelId: [
+                // Via avatar click endpoint
+                'metadata.lockupMetadataViewModel.metadata.avatarViewModel.avatarRendererContext.commandContext.onTap.innertubeCommand.browseEndpoint.browseId',
+                // Via metadata rows navigation
+                'metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.0.metadataParts.0.text.commandRuns.0.onTap.innertubeCommand.browseEndpoint.browseId',
+                // Via byline in lockup metadata
+                'metadata.lockupMetadataViewModel.byline.commandRuns.0.onTap.innertubeCommand.browseEndpoint.browseId',
+                // Direct rendererContext path (common in ViewModels)
+                'rendererContext.commandContext.onTap.innertubeCommand.browseEndpoint.browseId'
+            ],
+            channelHandle: [
+                // Via avatar click endpoint
+                'metadata.lockupMetadataViewModel.metadata.avatarViewModel.avatarRendererContext.commandContext.onTap.innertubeCommand.browseEndpoint.canonicalBaseUrl',
+                // Via metadata rows navigation
+                'metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.0.metadataParts.0.text.commandRuns.0.onTap.innertubeCommand.browseEndpoint.canonicalBaseUrl',
+                // Via byline in lockup metadata
+                'metadata.lockupMetadataViewModel.byline.commandRuns.0.onTap.innertubeCommand.browseEndpoint.canonicalBaseUrl',
+                // Direct rendererContext path
+                'rendererContext.commandContext.onTap.innertubeCommand.browseEndpoint.canonicalBaseUrl'
+            ],
             metadataRows: ['metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows']
         },
 
@@ -300,6 +321,19 @@
 
         // ------------------------------------------------------------------
         // Watch page related modules & secondary surfaces
+        playlistPanelVideoRenderer: {
+            videoId: 'videoId',
+            title: ['title.simpleText', 'title.runs'],
+            channelName: ['shortBylineText.simpleText', 'shortBylineText.runs', 'longBylineText.simpleText', 'longBylineText.runs'],
+            channelId: [
+                'shortBylineText.runs.0.navigationEndpoint.browseEndpoint.browseId',
+                'longBylineText.runs.0.navigationEndpoint.browseEndpoint.browseId'
+            ],
+            channelHandle: [
+                'shortBylineText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl',
+                'longBylineText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl'
+            ]
+        },
         universalWatchCardRenderer: {
             videoId: 'watchCardRichHeaderRenderer.navigationEndpoint.videoId',
             title: ['watchCardRichHeaderRenderer.title.simpleText'],
@@ -729,6 +763,25 @@
                 }
             }
 
+            // Cache single-channel metadata for later lookup (watch page playlists, etc.)
+            if (!isCollaboration && videoId && collaborators[0]) {
+                const primaryChannel = collaborators[0];
+                if (primaryChannel.handle || primaryChannel.id || primaryChannel.name) {
+                    try {
+                        window.postMessage({
+                            type: 'FilterTube_CacheChannelInfo',
+                            payload: {
+                                videoId,
+                                channel: primaryChannel
+                            },
+                            source: 'filter_logic'
+                        }, '*');
+                    } catch (e) {
+                        postLogToBridge('warn', 'Failed to send channel data to Main World:', e);
+                    }
+                }
+            }
+
             // Shorts filtering
             if (this.settings.hideAllShorts && (rendererType === 'reelItemRenderer' || rendererType === 'shortsLockupViewModel' || rendererType === 'shortsLockupViewModelV2')) {
                 this._log(`🚫 Blocking Shorts: ${title || 'Unknown'}`);
@@ -969,7 +1022,15 @@
             }
 
             if (rules.channelId) {
-                channelInfo.id = getByPath(item, rules.channelId);
+                // Handle both single path and array of paths
+                const idPaths = Array.isArray(rules.channelId) ? rules.channelId : [rules.channelId];
+                for (const path of idPaths) {
+                    const id = getByPath(item, path);
+                    if (id && typeof id === 'string' && id.startsWith('UC')) {
+                        channelInfo.id = id;
+                        break;
+                    }
+                }
             }
 
             if (rules.channelHandle) {
@@ -979,7 +1040,7 @@
 
             // Additional fallback extraction attempts
             if (!channelInfo.name || !channelInfo.id) {
-                // Try common paths for channel data
+                // Try common paths for channel data (Renderer patterns)
                 const fallbackNamePaths = [
                     'shortBylineText.runs.0.text',
                     'longBylineText.runs.0.text',
@@ -993,7 +1054,10 @@
                     'longBylineText.runs.0.navigationEndpoint.browseEndpoint.browseId',
                     'ownerText.runs.0.navigationEndpoint.browseEndpoint.browseId',
                     'authorEndpoint.browseEndpoint.browseId',
-                    'channelId'
+                    'channelId',
+                    // ViewModel-specific paths
+                    'metadata.lockupMetadataViewModel.metadata.avatarViewModel.avatarRendererContext.commandContext.onTap.innertubeCommand.browseEndpoint.browseId',
+                    'rendererContext.commandContext.onTap.innertubeCommand.browseEndpoint.browseId'
                 ];
 
                 if (!channelInfo.name) {
@@ -1009,14 +1073,74 @@
                         'shortBylineText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl',
                         'longBylineText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl',
                         'ownerText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl',
-                        'navigationEndpoint.browseEndpoint.canonicalBaseUrl'
+                        'navigationEndpoint.browseEndpoint.canonicalBaseUrl',
+                        // ViewModel-specific paths
+                        'metadata.lockupMetadataViewModel.metadata.avatarViewModel.avatarRendererContext.commandContext.onTap.innertubeCommand.browseEndpoint.canonicalBaseUrl',
+                        'rendererContext.commandContext.onTap.innertubeCommand.browseEndpoint.canonicalBaseUrl'
                     ];
 
                     channelInfo.handle = extractChannelHandleFromPaths(item, fallbackHandlePaths);
                 }
             }
 
+            // LAST RESORT: Recursive search for browseEndpoint in ViewModels
+            if (!channelInfo.id && !channelInfo.handle) {
+                const found = this._findBrowseEndpointRecursive(item, 3); // Max depth 3
+                if (found) {
+                    if (found.browseId?.startsWith('UC') && !channelInfo.id) {
+                        channelInfo.id = found.browseId;
+                    }
+                    if (found.canonicalBaseUrl && !channelInfo.handle) {
+                        channelInfo.handle = normalizeChannelHandle(found.canonicalBaseUrl);
+                    }
+                }
+            }
+
             return channelInfo;
+        }
+
+        /**
+         * Recursively search for browseEndpoint in an object (for ViewModels)
+         * @param {Object} obj - Object to search
+         * @param {number} maxDepth - Maximum recursion depth
+         * @param {number} currentDepth - Current recursion depth
+         * @returns {Object|null} - browseEndpoint object or null
+         */
+        _findBrowseEndpointRecursive(obj, maxDepth = 3, currentDepth = 0) {
+            if (!obj || typeof obj !== 'object' || currentDepth > maxDepth) return null;
+
+            // Check if this object IS a browseEndpoint
+            if (obj.browseId?.startsWith('UC') || obj.canonicalBaseUrl?.includes('/@')) {
+                return obj;
+            }
+
+            // Skip arrays and certain keys to avoid performance issues
+            if (Array.isArray(obj)) {
+                for (const item of obj.slice(0, 5)) { // Only check first 5 items
+                    const result = this._findBrowseEndpointRecursive(item, maxDepth, currentDepth + 1);
+                    if (result) return result;
+                }
+                return null;
+            }
+
+            // Check for browseEndpoint property directly
+            if (obj.browseEndpoint) {
+                const endpoint = obj.browseEndpoint;
+                if (endpoint.browseId?.startsWith('UC') || endpoint.canonicalBaseUrl?.includes('/@')) {
+                    return endpoint;
+                }
+            }
+
+            // Recurse into specific ViewModel paths that likely contain channel info
+            const priorityKeys = ['metadata', 'rendererContext', 'avatarViewModel', 'byline', 'onTap', 'innertubeCommand'];
+            for (const key of priorityKeys) {
+                if (obj[key] && typeof obj[key] === 'object') {
+                    const result = this._findBrowseEndpointRecursive(obj[key], maxDepth, currentDepth + 1);
+                    if (result) return result;
+                }
+            }
+
+            return null;
         }
 
         /**
