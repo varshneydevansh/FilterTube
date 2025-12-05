@@ -25,6 +25,7 @@ ARCHITECTURE_VALIDATION.md
 ehthumbs.db
 Thumbs.db
 logs.json
+watchpage.json
 
 # Logs
 *.log

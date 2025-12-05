@@ -41,6 +41,9 @@
 
     /**
      * Get nested object property by dot-notation path
+     * Enhanced to handle arrays: when encountering an array, finds the first
+     * element that contains the next key (enables paths without explicit indices).
+     * Also supports bracket notation like "metadataRows[0]" for explicit access.
      * @param {Object} obj - Source object
      * @param {string|Array} path - Property path (e.g., 'title.simpleText' or ['title', 'simpleText'])
      * @param {*} defaultValue - Default value if path not found
@@ -52,11 +55,47 @@
         const keys = Array.isArray(path) ? path : path.split('.');
         let current = obj;
 
-        for (const key of keys) {
-            if (current === null || current === undefined || !(key in current)) {
+        for (let i = 0; i < keys.length; i++) {
+            const key = keys[i];
+            if (current === null || current === undefined) {
                 return defaultValue;
             }
-            current = current[key];
+
+            // Handle bracket notation like "metadataRows[0]" or "metadataRows[1]"
+            if (/\[\d+\]/.test(key)) {
+                const parts = key.match(/^([^\[]+)(?:\[(\d+)\])+$/);
+                if (parts) {
+                    const baseName = parts[1];
+                    const indices = [...key.matchAll(/\[(\d+)\]/g)].map(m => parseInt(m[1], 10));
+                    
+                    if (baseName && baseName in current) {
+                        current = current[baseName];
+                    } else if (baseName) {
+                        return defaultValue;
+                    }
+                    
+                    for (const idx of indices) {
+                        if (!Array.isArray(current) || idx >= current.length) {
+                            return defaultValue;
+                        }
+                        current = current[idx];
+                    }
+                    continue;
+                }
+            }
+
+            // If current is an array and key is not a number, find first element with that key
+            if (Array.isArray(current)) {
+                const found = current.find(item => item && typeof item === 'object' && key in item);
+                if (found === undefined) {
+                    return defaultValue;
+                }
+                current = found[key];
+            } else if (key in current) {
+                current = current[key];
+            } else {
+                return defaultValue;
+            }
         }
 
         return current;
@@ -97,6 +136,116 @@
             }
         }
         return '';
+    }
+
+    function getFirstValueByPaths(obj, paths) {
+        for (const path of paths) {
+            const value = getByPath(obj, path);
+            if (value !== undefined && value !== null) {
+                return value;
+            }
+        }
+        return undefined;
+    }
+
+    function extractBrowseEndpoint(candidate) {
+        if (!candidate || typeof candidate !== 'object') return null;
+
+        if (candidate.browseEndpoint) return candidate.browseEndpoint;
+        if (candidate.navigationEndpoint?.browseEndpoint) return candidate.navigationEndpoint.browseEndpoint;
+        if (candidate.onTap) {
+            const tapCommand = candidate.onTap.innertubeCommand || candidate.onTap;
+            if (tapCommand?.browseEndpoint) {
+                return tapCommand.browseEndpoint;
+            }
+        }
+        if (candidate.commandContext?.onTap) {
+            const nested = extractBrowseEndpoint(candidate.commandContext.onTap);
+            if (nested) return nested;
+        }
+        if (candidate.innertubeCommand?.browseEndpoint) {
+            return candidate.innertubeCommand.browseEndpoint;
+        }
+
+        return null;
+    }
+
+    function applyBrowseEndpointToChannelInfo(channelInfo, endpoint) {
+        if (!endpoint) return false;
+        let changed = false;
+
+        const browseId = endpoint.browseId;
+        if (!channelInfo.id && typeof browseId === 'string' && browseId.startsWith('UC')) {
+            channelInfo.id = browseId;
+            changed = true;
+        }
+
+        if (!channelInfo.handle && endpoint.canonicalBaseUrl) {
+            const normalizedHandle = normalizeChannelHandle(endpoint.canonicalBaseUrl);
+            if (normalizedHandle) {
+                channelInfo.handle = normalizedHandle;
+                changed = true;
+            }
+        }
+
+        return changed;
+    }
+
+    function extractBrowseEndpointFromRuns(runs) {
+        if (!Array.isArray(runs)) return null;
+        for (const run of runs) {
+            const endpoint = extractBrowseEndpoint(run);
+            if (endpoint) return endpoint;
+
+            if (run.commandRuns) {
+                const nested = extractBrowseEndpointFromCommandRuns(run.commandRuns);
+                if (nested) return nested;
+            }
+        }
+        return null;
+    }
+
+    function extractBrowseEndpointFromCommandRuns(commandRuns) {
+        if (!Array.isArray(commandRuns)) return null;
+        for (const commandRun of commandRuns) {
+            const endpoint = extractBrowseEndpoint(commandRun);
+            if (endpoint) return endpoint;
+        }
+        return null;
+    }
+
+    function extractBrowseEndpointFromMetadataRows(rows) {
+        if (!rows) return null;
+        let processedRows = rows;
+        if (!Array.isArray(processedRows)) {
+            processedRows = processedRows.metadataRows || processedRows.rows || [];
+        }
+
+        if (!Array.isArray(processedRows)) return null;
+
+        for (const row of processedRows) {
+            if (!row) continue;
+
+            if (Array.isArray(row.metadataParts)) {
+                for (const part of row.metadataParts) {
+                    if (!part) continue;
+                    const direct = extractBrowseEndpoint(part);
+                    if (direct) return direct;
+
+                    const textEndpoint = extractBrowseEndpoint(part.text);
+                    if (textEndpoint) return textEndpoint;
+
+                    const commandRuns = part.text?.commandRuns;
+                    const nested = extractBrowseEndpointFromCommandRuns(commandRuns);
+                    if (nested) return nested;
+                }
+            }
+
+            const rowCommands = extractBrowseEndpointFromCommandRuns(row.commandRuns);
+            if (rowCommands) return rowCommands;
+        }
+
+        return null;
     }
 
     function normalizeChannelHandle(rawHandle) {
@@ -284,25 +433,33 @@
         lockupViewModel: {
             videoId: 'contentId',
             title: ['metadata.lockupMetadataViewModel.title.content', 'accessibilityText'],
-            channelName: ['metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.0.metadataParts.0.text.content'],
-            // Channel ID/Handle for watch page suggestions - ViewModel structure
+            // Channel name from metadata rows (auto-traverses arrays with enhanced getByPath)
+            channelName: [
+                'metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.metadataParts.text.content',
+                'metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.0.metadataParts.0.text.content'
+            ],
+            // Channel ID extraction paths (ordered by reliability)
             channelId: [
-                // Via avatar click endpoint
-                'metadata.lockupMetadataViewModel.metadata.avatarViewModel.avatarRendererContext.commandContext.onTap.innertubeCommand.browseEndpoint.browseId',
-                // Via metadata rows navigation
+                // Primary: via decorated avatar image link
+                'metadata.lockupMetadataViewModel.image.decoratedAvatarViewModel.rendererContext.commandContext.onTap.innertubeCommand.browseEndpoint.browseId',
+                // Via metadata rows (auto-traverses arrays)
+                'metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.metadataParts.text.commandRuns.onTap.innertubeCommand.browseEndpoint.browseId',
+                // Explicit array indices as fallback
                 'metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.0.metadataParts.0.text.commandRuns.0.onTap.innertubeCommand.browseEndpoint.browseId',
-                // Via byline in lockup metadata
-                'metadata.lockupMetadataViewModel.byline.commandRuns.0.onTap.innertubeCommand.browseEndpoint.browseId',
-                // Direct rendererContext path (common in ViewModels)
+                // Via byline
+                'metadata.lockupMetadataViewModel.byline.commandRuns.onTap.innertubeCommand.browseEndpoint.browseId',
+                // Direct rendererContext path
                 'rendererContext.commandContext.onTap.innertubeCommand.browseEndpoint.browseId'
             ],
             channelHandle: [
-                // Via avatar click endpoint
-                'metadata.lockupMetadataViewModel.metadata.avatarViewModel.avatarRendererContext.commandContext.onTap.innertubeCommand.browseEndpoint.canonicalBaseUrl',
-                // Via metadata rows navigation
+                // Primary: via decorated avatar image link
+                'metadata.lockupMetadataViewModel.image.decoratedAvatarViewModel.rendererContext.commandContext.onTap.innertubeCommand.browseEndpoint.canonicalBaseUrl',
+                // Via metadata rows (auto-traverses arrays)
+                'metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.metadataParts.text.commandRuns.onTap.innertubeCommand.browseEndpoint.canonicalBaseUrl',
+                // Explicit array indices as fallback
                 'metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.0.metadataParts.0.text.commandRuns.0.onTap.innertubeCommand.browseEndpoint.canonicalBaseUrl',
-                // Via byline in lockup metadata
-                'metadata.lockupMetadataViewModel.byline.commandRuns.0.onTap.innertubeCommand.browseEndpoint.canonicalBaseUrl',
+                // Via byline
+                'metadata.lockupMetadataViewModel.byline.commandRuns.onTap.innertubeCommand.browseEndpoint.canonicalBaseUrl',
                 // Direct rendererContext path
                 'rendererContext.commandContext.onTap.innertubeCommand.browseEndpoint.canonicalBaseUrl'
             ],
@@ -325,11 +482,18 @@
             videoId: 'videoId',
             title: ['title.simpleText', 'title.runs'],
             channelName: ['shortBylineText.simpleText', 'shortBylineText.runs', 'longBylineText.simpleText', 'longBylineText.runs'],
+            // Channel ID paths (auto-traverses arrays for flexible extraction)
             channelId: [
+                'shortBylineText.runs.navigationEndpoint.browseEndpoint.browseId',
+                'longBylineText.runs.navigationEndpoint.browseEndpoint.browseId',
+                // Explicit indices as fallback
                 'shortBylineText.runs.0.navigationEndpoint.browseEndpoint.browseId',
                 'longBylineText.runs.0.navigationEndpoint.browseEndpoint.browseId'
             ],
             channelHandle: [
+                'shortBylineText.runs.navigationEndpoint.browseEndpoint.canonicalBaseUrl',
+                'longBylineText.runs.navigationEndpoint.browseEndpoint.canonicalBaseUrl',
+                // Explicit indices as fallback
                 'shortBylineText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl',
                 'longBylineText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl'
             ]
@@ -587,19 +751,19 @@
                 }).filter(regex => regex !== null);
             }
 
-            // Ensure filterChannels are objects with all properties, and can be matched case-insensitively
+            // Ensure filterChannels are objects with all properties
             if (settings.filterChannels && Array.isArray(settings.filterChannels)) {
                 processed.filterChannels = settings.filterChannels.map(ch => {
                     // Convert legacy string format to object if necessary
                     if (typeof ch === 'string') {
                         return { name: ch, id: ch, handle: null, logo: null, filterAll: false };
                     }
-                    // For objects, ensure properties exist for later matching (e.g., lowercasing for internal checks)
+                    // For objects, ensure properties exist (case is preserved; matching code lowercases when needed)
                     return {
                         ...ch,
-                        id: ch.id ? ch.id.toLowerCase() : '',
-                        handle: ch.handle ? ch.handle.toLowerCase() : '',
-                        name: ch.name ? ch.name.toLowerCase() : '', // Lowercase name for internal matching consistency
+                        id: ch.id || '',
+                        handle: ch.handle || '',
+                        name: ch.name || '',
                     };
                 }).filter(ch => ch);
             }
@@ -743,6 +907,22 @@
                     this._log(`📋 Extracted COLLABORATION - Title: "${title}", Channels: "${channelNames}", Type: ${rendererType}`);
                 } else {
                     this._log(`📋 Extracted - Title: "${channelInfo.name}", ID: "${channelInfo.id}", Desc: "${descPreview}", Type: ${rendererType}`);
+                }
+            }
+
+            // Watch page diagnostics: surface when channel extraction failed for playlist/right-rail renderers
+            if (this.debugEnabled && !isCollaboration && (!channelInfo?.id && !channelInfo?.handle)) {
+                const isWatchRenderer = rendererType === 'playlistPanelVideoRenderer' || rendererType === 'lockupViewModel';
+                if (isWatchRenderer) {
+                    this._log(
+                        `🕵️ Watch renderer missing channel identity: ${rendererType}`,
+                        {
+                            titlePreview: title?.substring(0, 60) || 'N/A',
+                            hasByline: Boolean(item.shortBylineText || item.longBylineText),
+                            hasMetadataRows: Boolean(item.metadata?.lockupMetadataViewModel || item.metadataRows),
+                            videoId
+                        }
+                    );
                 }
             }
 
@@ -1076,6 +1256,7 @@
                         'navigationEndpoint.browseEndpoint.canonicalBaseUrl',
                         // ViewModel-specific paths
                         'metadata.lockupMetadataViewModel.metadata.avatarViewModel.avatarRendererContext.commandContext.onTap.innertubeCommand.browseEndpoint.canonicalBaseUrl',
+                        'metadata.lockupMetadataViewModel.image.decoratedAvatarViewModel.avatar.avatarViewModel.rendererContext.commandContext.onTap.innertubeCommand.browseEndpoint.canonicalBaseUrl',
                         'rendererContext.commandContext.onTap.innertubeCommand.browseEndpoint.canonicalBaseUrl'
                     ];
 
@@ -1083,9 +1264,77 @@
                 }
             }
 
+            // Attempt to extract browse endpoint references for watch-page ViewModels
+            if (!channelInfo.id || !channelInfo.handle) {
+                const runPaths = [
+                    'shortBylineText.runs',
+                    'longBylineText.runs',
+                    'ownerText.runs',
+                    'channelName.runs',
+                    'attributedChannelName.runs'
+                ];
+
+                for (const path of runPaths) {
+                    const runs = getByPath(item, path);
+                    const endpoint = extractBrowseEndpointFromRuns(runs);
+                    if (endpoint && applyBrowseEndpointToChannelInfo(channelInfo, endpoint)) {
+                        if (channelInfo.id && channelInfo.handle) break;
+                    }
+                }
+
+                if (!channelInfo.id || !channelInfo.handle) {
+                    const commandRunPaths = [
+                        'metadata.lockupMetadataViewModel.byline.commandRuns',
+                        'byline.commandRuns'
+                    ];
+                    for (const path of commandRunPaths) {
+                        const commandRuns = getByPath(item, path);
+                        const endpoint = extractBrowseEndpointFromCommandRuns(commandRuns);
+                        if (endpoint && applyBrowseEndpointToChannelInfo(channelInfo, endpoint)) {
+                            if (channelInfo.id && channelInfo.handle) break;
+                        }
+                    }
+                }
+
+                if (!channelInfo.id || !channelInfo.handle) {
+                    const metadataRowsPaths = [];
+                    if (rules.metadataRows) {
+                        const ruleMetadataPaths = Array.isArray(rules.metadataRows) ? rules.metadataRows : [rules.metadataRows];
+                        metadataRowsPaths.push(...ruleMetadataPaths);
+                    }
+                    metadataRowsPaths.push('metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows');
+                    metadataRowsPaths.push('metadata.contentMetadataViewModel.metadataRows');
+                    metadataRowsPaths.push('metadataRows');
+
+                    const metadataRowsValue = getFirstValueByPaths(item, metadataRowsPaths);
+                    const endpoint = extractBrowseEndpointFromMetadataRows(metadataRowsValue);
+                    if (endpoint) {
+                        applyBrowseEndpointToChannelInfo(channelInfo, endpoint);
+                    }
+                }
+
+                if (!channelInfo.id || !channelInfo.handle) {
+                    const directEndpointPaths = [
+                        'metadata.lockupMetadataViewModel.metadata.avatarViewModel.avatarRendererContext.commandContext.onTap',
+                        'metadata.lockupMetadataViewModel.image.decoratedAvatarViewModel.avatar.avatarViewModel.rendererContext.commandContext.onTap',
+                        'channelThumbnailSupportedRenderers.channelThumbnailWithLinkRenderer.navigationEndpoint',
+                        'channelThumbnailSupportedRenderers.channelThumbnailWithLinkRenderer',
+                        'navigationEndpoint'
+                    ];
+
+                    for (const path of directEndpointPaths) {
+                        const candidate = getByPath(item, path);
+                        const endpoint = extractBrowseEndpoint(candidate);
+                        if (endpoint && applyBrowseEndpointToChannelInfo(channelInfo, endpoint)) {
+                            if (channelInfo.id && channelInfo.handle) break;
+                        }
+                    }
+                }
+            }
+
             // LAST RESORT: Recursive search for browseEndpoint in ViewModels
             if (!channelInfo.id && !channelInfo.handle) {
-                const found = this._findBrowseEndpointRecursive(item, 3); // Max depth 3
+                const found = this._findBrowseEndpointRecursive(item, 4); // Max depth 4 for watch page payloads
                 if (found) {
                     if (found.browseId?.startsWith('UC') && !channelInfo.id) {
                         channelInfo.id = found.browseId;
@@ -1094,6 +1343,25 @@
                         channelInfo.handle = normalizeChannelHandle(found.canonicalBaseUrl);
                     }
                 }
+            }
+
+            if (!Array.isArray(channelInfo)) {
+                if (channelInfo.id && !channelInfo.handle) {
+                    const mappedHandle = this.channelMap[channelInfo.id.toLowerCase()];
+                    if (mappedHandle?.startsWith('@')) {
+                        channelInfo.handle = mappedHandle;
+                    }
+                }
+                if (channelInfo.handle && !channelInfo.id) {
+                    const mappedId = this.channelMap[channelInfo.handle.toLowerCase()];
+                    if (mappedId?.startsWith('UC')) {
+                        channelInfo.id = mappedId;
+                    }
+                }
+            }
+
+            if (!Array.isArray(channelInfo) && channelInfo.id && channelInfo.handle) {
+                this._registerMapping(channelInfo.id, channelInfo.handle);
             }
 
             return channelInfo;
@@ -1147,34 +1415,106 @@
          * Check if a channel matches a filter with comprehensive logic
          * Handles both legacy string filters and new object filters with name/id/handle
          */
-        _matchesChannel(filterChannel, channelInfo) {
-            // Handle new object format: { name, id, handle }
-            if (typeof filterChannel === 'object' && filterChannel !== null) {
+        _matchesChannel(filterChannel, channelInfo = {}) {
+            const candidateHandle = (channelInfo.handle || '').toLowerCase();
+            const candidateId = (channelInfo.id || '').toLowerCase();
+            const candidateName = (channelInfo.name || '').trim().toLowerCase();
+
+            // New object format (has id/handle/name fields)
+            if (filterChannel && typeof filterChannel === 'object') {
                 const filterId = (filterChannel.id || '').toLowerCase();
                 const filterHandle = (filterChannel.handle || '').toLowerCase();
+                const filterName = (filterChannel.name || '').trim().toLowerCase();
 
-                // Direct match by UC ID
-                if (filterId && channelInfo.id && channelInfo.id.toLowerCase() === filterId) {
-                    return true;
-                }
+                if (filterId && candidateId === filterId) return true;
+                if (filterHandle && candidateHandle === filterHandle) return true;
 
-                // Direct match by handle
-                if (filterHandle && channelInfo.handle && channelInfo.handle.toLowerCase() === filterHandle) {
-                    return true;
-                }
-
-                // Use channelMap to cross-match: if we're blocking UC ID, also block its handle
-                if (filterId && channelInfo.handle) {
+                if (filterId && candidateHandle) {
                     const mappedHandle = this.channelMap[filterId];
-                    if (mappedHandle && channelInfo.handle.toLowerCase() === mappedHandle) {
+                    if (typeof mappedHandle === 'string' && candidateHandle === mappedHandle.toLowerCase()) {
                         return true;
                     }
                 }
 
-                // Use channelMap to cross-match: if we're blocking handle, also block its UC ID
-                if (filterHandle && channelInfo.id) {
+                if (filterHandle && candidateId) {
                     const mappedId = this.channelMap[filterHandle];
-                    if (mappedId && channelInfo.id.toLowerCase() === mappedId) {
+                    if (typeof mappedId === 'string' && candidateId === mappedId.toLowerCase()) {
+                        return true;
+                    }
+                }
+
+                if (filterName && candidateName && filterName === candidateName) {
+                    return true;
+                }
+
+                // Cross-matching: If candidate only has name, check channelMap for filter's known name
+                if (candidateName && !candidateId && !candidateHandle) {
+                    // Try ID -> Name lookup (store name in channelMap too)
+                    if (filterId) {
+                        const mappedData = this.channelMap[filterId.toUpperCase()];
+                        if (mappedData && typeof mappedData === 'object' && mappedData.name) {
+                            if (candidateName === mappedData.name.toLowerCase()) {
+                                return true;
+                            }
+                        }
+                    }
+                    // Try Handle -> Name lookup
+                    if (filterHandle) {
+                        const mappedData = this.channelMap[filterHandle];
+                        if (mappedData && typeof mappedData === 'object' && mappedData.name) {
+                            if (candidateName === mappedData.name.toLowerCase()) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+
+                return false;
+            }
+
+            // Legacy string filter
+            const filter = String(filterChannel || '').trim().toLowerCase();
+            if (!filter) return false;
+
+            if (filter.startsWith('@')) {
+                if (candidateHandle === filter) return true;
+
+                const mappedId = this.channelMap[filter];
+                if (typeof mappedId === 'string' && candidateId === mappedId.toLowerCase()) {
+                    return true;
+                }
+
+                const filterWithoutAt = filter.substring(1);
+                if (candidateName && candidateName === filterWithoutAt) {
+                    return true;
+                }
+
+                return false;
+            }
+
+            if (filter.startsWith('channel/')) {
+                const filterIdPart = filter.substring(8);
+                if (candidateId === filterIdPart) return true;
+
+                const mappedHandle = this.channelMap[filterIdPart];
+                if (typeof mappedHandle === 'string' && candidateHandle === mappedHandle.toLowerCase()) {
+                    return true;
+                }
+
+                return false;
+            }
+
+            if (filter.startsWith('uc')) {
+                if (candidateId === filter) return true;
+
+                const mappedHandle = this.channelMap[filter];
+                if (typeof mappedHandle === 'string' && candidateHandle === mappedHandle.toLowerCase()) {
+                    return true;
+                }
+
+                if (candidateHandle) {
+                    const mappedId = this.channelMap[candidateHandle];
+                    if (typeof mappedId === 'string' && mappedId.toLowerCase() === filter) {
                         return true;
                     }
                 }
@@ -1182,72 +1522,13 @@
                 return false;
             }
 
-            // Legacy string format
-            const filter = String(filterChannel).toLowerCase();
-
-            // Direct handle matching (@username)
-            if (filter.startsWith('@')) {
-                if (channelInfo.handle && channelInfo.handle.toLowerCase() === filter) {
-                    return true;
-                }
-
-                // Check channelMap: if filter is a handle, get its UC ID and match
-                const mappedId = this.channelMap[filter];
-                if (mappedId && channelInfo.id && channelInfo.id.toLowerCase() === mappedId) {
-                    return true;
-                }
-
-                // Also check if channel name matches without @
-                const filterWithoutAt = filter.substring(1);
-                if (channelInfo.name && channelInfo.name.toLowerCase() === filterWithoutAt) {
-                    return true;
-                }
-            }
-
-            // Channel ID matching (UC... or channel/UC...)
-            if (channelInfo.id) {
-                const channelId = channelInfo.id.toLowerCase();
-
-                // Support both "UCxxxxx" and "channel/UCxxxxx" formats
-                if (filter.startsWith('channel/')) {
-                    const filterIdPart = filter.substring(8); // Remove "channel/" prefix
-                    if (channelId === filterIdPart) {
-                        return true;
-                    }
-
-                    // Check channelMap for cross-matching
-                    const mappedHandle = this.channelMap[filterIdPart];
-                    if (mappedHandle && channelInfo.handle && channelInfo.handle.toLowerCase() === mappedHandle) {
-                        return true;
-                    }
-                } else if (filter.startsWith('uc')) {
-                    if (channelId === filter) {
-                        return true;
-                    }
-
-                    // Check channelMap: if filter is UC ID, also match its handle
-                    const mappedHandle = this.channelMap[filter];
-                    if (mappedHandle && channelInfo.handle && channelInfo.handle.toLowerCase() === mappedHandle) {
-                        return true;
-                    }
-                }
-            }
-
-            // Reverse check: if channelInfo has handle, check if mapped ID matches filter
-            if (channelInfo.handle && filter.startsWith('uc')) {
-                const handleLower = channelInfo.handle.toLowerCase();
-                const mappedId = this.channelMap[handleLower];
-                if (mappedId && mappedId === filter) {
-                    return true;
-                }
+            if (candidateName && filter && candidateName === filter) {
+                return true;
             }
 
             return false;
         }
 
-        /**
-         * Recursively filter a YouTube data object
-         */
         filter(obj, path = 'root') {
             if (!obj || typeof obj !== 'object') {
                 return obj;
@@ -1266,7 +1547,10 @@
             }
 
             // Handle objects - check if this object should be filtered
-            const rendererTypes = Object.keys(obj).filter(key => key.endsWith('Renderer') || key.endsWith('ViewModel'));
+            // Extract renderer types from this object's keys
+            const rendererTypes = Object.keys(obj).filter(key => 
+                key.endsWith('Renderer') || key.endsWith('ViewModel')
+            );
 
             for (const rendererType of rendererTypes) {
                 if (this._shouldBlock(obj[rendererType], rendererType)) {

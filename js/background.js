@@ -817,8 +817,8 @@ browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     if (message.type === 'addFilteredChannel') {
         handleAddFilteredChannel(
-            message.input, 
-            message.filterAll, 
+            message.input,
+            message.filterAll,
             message.collaborationWith,
             message.collaborationGroupId
         ).then(sendResponse);
@@ -848,17 +848,23 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             return { success: false, error: 'Empty input' };
         }
 
-        // Validate format
-        const isHandle = rawValue.startsWith('@');
-        const isUcId = rawValue.toLowerCase().startsWith('uc') || rawValue.toLowerCase().startsWith('channel/uc');
+        // Validate format and normalize input
+        let isHandle = rawValue.startsWith('@');
+        let isUcId = rawValue.toLowerCase().startsWith('uc') || rawValue.toLowerCase().startsWith('channel/uc');
+        let normalizedValue = rawValue;
 
+        // If not a recognized format, assume it's a channel NAME and guess the handle
         if (!isHandle && !isUcId) {
-            return { success: false, error: 'Invalid channel identifier' };
+            // Convert "HYBE LABELS" -> "@hybelabels" as a guess
+            const guessedHandle = `@${rawValue.toLowerCase().replace(/\s+/g, '')}`;
+            console.log(`FilterTube Background: Unknown format "${rawValue}", guessing handle: ${guessedHandle}`);
+            normalizedValue = guessedHandle;
+            isHandle = true;
         }
 
         // Fetch channel info
-        console.log('FilterTube Background: Fetching channel info for:', rawValue);
-        const channelInfo = await fetchChannelInfo(rawValue);
+        console.log('FilterTube Background: Fetching channel info for:', normalizedValue);
+        const channelInfo = await fetchChannelInfo(normalizedValue);
 
         if (!channelInfo.success) {
             return { success: false, error: channelInfo.error || 'Failed to fetch channel info' };
@@ -885,7 +891,7 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
         const allCollaborators = collaborationWith && collaborationWith.length > 0
             ? [{ handle: channelInfo.handle, name: channelInfo.name }, ...collaborationWith.map(h => ({ handle: h }))]
             : [];
-        
+
         const newChannel = {
             id: channelInfo.id,
             handle: channelInfo.handle,

@@ -279,15 +279,15 @@ On **search page** (`ytd-video-renderer`):
 ### Existing coverage
 | JSON renderer key | Purpose | Status |
 | --- | --- | --- |
-| `playlistPanelRenderer` | Watch-page mini playlist (Up Next queue) | ⚠️ Partial @js/filter_logic.js#206-215 |
-| `playlistPanelVideoRenderer` | Individual playlist items within panel | ✅ Covered @js/filter_logic.js#129-133 |
+| `playlistPanelRenderer` | Watch-page mini playlist (Up Next queue) | Partial @js/filter_logic.js#206-215 |
+| `playlistPanelVideoRenderer` | Individual playlist items within panel | Covered — enhanced watch/playlist extraction (2025-12-04) | lockup-style browseEndpoints from metadata rows + commandRuns now populate UC/@ for caching and blocking |
 
 ### DOM elements from 2025-11-18 sample (NEW)
 | DOM tag / component | Underlying renderer / data source | Status | Notes |
 | --- | --- | --- | --- |
-| `<ytd-playlist-panel-renderer>` | `playlistPanelRenderer` | ⚠️ **NEW** – missing metadata parsing | Header exposes playlist title/channel; confirm JSON paths for keyword scan and consider DOM fallback |
-| `<ytd-playlist-panel-video-renderer>` | `playlistPanelVideoRenderer` | ✅ Covered — **NEW** | Titles/bylines map to existing renderer rules; ensure resume-progress DOM doesn’t hide filtered items |
-| Playlist action controls (`ytd-playlist-loop-button-renderer`, shuffle toggle) | DOM-only | ℹ️ **NEW** | UI buttons only; no filtering required |
+| `<ytd-playlist-panel-renderer>` | `playlistPanelRenderer` | **NEW** – missing metadata parsing | Header exposes playlist title/channel; confirm JSON paths for keyword scan and consider DOM fallback |
+| `<ytd-playlist-panel-video-renderer>` | `playlistPanelVideoRenderer` | Covered — **NEW** | Titles/bylines map to existing renderer rules; ensure resume-progress DOM doesn’t hide filtered items |
+| Playlist action controls (`ytd-playlist-loop-button-renderer`, shuffle toggle) | DOM-only | **NEW** | UI buttons only; no filtering required |
 
 ### Lockup / Shelf Playlists (Related section)
 | JSON renderer key | Purpose | Status |

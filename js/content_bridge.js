@@ -17,6 +17,7 @@ function debugLog(message, ...args) {
 // ACTIVE RESOLVER - Fetches UC ID for @handles
 // ==========================================
 const resolvedHandleCache = new Map();
+const activeFetches = {}; // Tracks in-flight resolution fetches to prevent duplicates
 
 async function fetchIdForHandle(handle) {
     const cleanHandle = handle.toLowerCase().replace('@', '');
@@ -1680,7 +1681,7 @@ function applyDOMFallback(settings, options = {}) {
         const blockedChannelState = target.getAttribute('data-filtertube-blocked-state');
         const blockedTimestamp = parseInt(target.getAttribute('data-filtertube-blocked-ts') || '0', 10);
         const blockAgeMs = blockedTimestamp ? Date.now() - blockedTimestamp : Number.POSITIVE_INFINITY;
-        
+
         // If this card was blocked via 3-dot UI, honour pending/confirmed states
         if (blockedChannelId || blockedChannelHandle) {
             const isStillBlocked = effectiveSettings.filterChannels?.some(fc => {
@@ -1691,7 +1692,7 @@ function applyDOMFallback(settings, options = {}) {
                 const normalized = (fc || '').toLowerCase();
                 return normalized === blockedChannelId?.toLowerCase() || normalized === blockedChannelHandle?.toLowerCase();
             });
-            
+
             if (isStillBlocked) {
                 // Keep it hidden - mark as confirmed so future passes don't treat it as pending
                 markElementAsBlocked(target, {
@@ -2243,11 +2244,118 @@ function handleMainWorldMessages(event) {
             if (result?.success) applyDOMFallback(result.settings, { forceReprocess: true });
         });
     } else if (type === 'FilterTube_UpdateChannelMap') {
-        // Forward learned channel mappings to background for persistence
-        browserAPI_BRIDGE.runtime.sendMessage({
-            action: "updateChannelMap",
-            mappings: payload
-        });
+        const { mapping } = payload || {};
+        if (mapping && typeof mapping === 'object') {
+            Object.entries(mapping).forEach(([key, value]) => {
+                if (key && value) {
+                    // Normalize keys to support both directions
+                    if (key.startsWith('UC')) {
+                        // ID -> Handle
+                        resolvedHandleCache.set(key, value);
+                        if (!channelMap.idToHandle[key]) channelMap.idToHandle[key] = value;
+                    } else if (key.startsWith('@')) {
+                        // Handle -> ID
+                        const normalizedHandle = key.toLowerCase();
+                        if (!channelMap.handleToId[normalizedHandle]) channelMap.handleToId[normalizedHandle] = value;
+                    }
+                }
+            });
+            console.log('FilterTube: Updated channel map from background', {
+                idCount: Object.keys(channelMap.idToHandle).length,
+                handleCount: Object.keys(channelMap.handleToId).length
+            });
+        }
+    } else if (type === 'FilterTube_RequestChannelResolution') {
+        // Handle channel resolution requests from filter_logic (Watch Page / Data-Scarce Renderers)
+        const { videoId, name, missingId, missingHandle } = payload || {};
+
+        if (videoId && (missingId || missingHandle)) {
+            // 1. Check internal caches first
+            let resolvedId = null;
+            let resolvedHandle = null;
+
+            // Check cache by name if possible (weak link, but useful)
+            // Implementation note: we don't map name->id directly usually, 
+            // relying on fetch below is safer for collisions.
+
+            const cacheKey = `resolution_${videoId}`;
+            if (activeFetches[cacheKey]) return; // Already dealing with it
+
+            console.log(`FilterTube: Attempting to resolve channel for video ${videoId} (${name || 'Unknown'})`);
+            activeFetches[cacheKey] = true;
+
+            fetch(`https://www.youtube.com/watch?v=${videoId}`)
+                .then(r => r.text())
+                .then(html => {
+                    const doc = new DOMParser().parseFromString(html, 'text/html');
+                    let extractedId = null;
+                    let extractedHandle = null;
+                    let collaborators = [];
+
+                    // Extract from Meta tags (Reliable for primary channel)
+                    const channelUrl = doc.querySelector('link[itemprop="url"][href*="/channel/UC"]')?.getAttribute('href');
+                    if (channelUrl) extractedId = channelUrl.split('/').pop();
+
+                    const handleUrl = doc.querySelector('link[itemprop="url"][href*="/@"]')?.getAttribute('href');
+                    if (handleUrl) extractedHandle = handleUrl.split('/').pop();
+
+                    // Fallback: Scripts (ytInitialPlayerResponse)
+                    if (!extractedId || !extractedHandle) {
+                        const scripts = Array.from(doc.getElementsByTagName('script'));
+                        for (const script of scripts) {
+                            if (script.textContent && script.textContent.includes('videoDetails')) {
+                                try {
+                                    // Basic Regex extract (safer than eval)
+                                    const channelIdMatch = script.textContent.match(/"channelId":"(UC[\w-]+)"/);
+                                    if (channelIdMatch) extractedId = channelIdMatch[1];
+
+                                    // Handle might not be in videoDetails directly in some formats, but Author is
+                                    const authorMatch = script.textContent.match(/"author":"([^"]+)"/);
+                                    // Note: "author" is usually the Name, not handle.
+                                } catch (e) { /* ignore */ }
+                            }
+                        }
+                    }
+
+                    // Collaboration Check (Important for blocking ANY collaborator)
+                    // We look for multiple bylines or structured credits if possible, 
+                    // but for now, resolving the MAIN channel is the priority to fix the "broken bridge".
+                    // If complex collaboration logic is needed here, we would parse ytInitialData from the HTML.
+
+                    if (extractedId || extractedHandle) {
+                        console.log(`FilterTube: Resolved ${videoId} -> ${extractedId} / ${extractedHandle}`);
+
+                        // Broadcast update
+                        if (extractedId) resolvedHandleCache.set(extractedId, extractedHandle || name);
+
+                        // Send back to filter logic / update maps
+                        window.postMessage({
+                            type: 'FilterTube_UpdateChannelMap',
+                            payload: {
+                                mapping: {
+                                    [extractedId]: extractedHandle,
+                                    [extractedHandle]: extractedId
+                                }
+                            },
+                            source: 'content_bridge'
+                        }, '*');
+
+                        // Trigger a re-process of the DOM to apply filters now that we have data
+                        // Slight delay to allow map update to propagate
+                        setTimeout(() => {
+                            requestSettingsFromBackground().then(result => {
+                                if (result?.success) applyDOMFallback(result.settings, { forceReprocess: true });
+                            });
+                        }, 500);
+                    } else {
+                        console.warn(`FilterTube: Could not resolve channel for ${videoId}`);
+                    }
+                })
+                .catch(err => console.error('FilterTube: Resolution fetch failed', err))
+                .finally(() => {
+                    delete activeFetches[cacheKey];
+                });
+        }
     } else if (type === 'FilterTube_CollaboratorInfoResponse') {
         // Handle response from Main World with collaborator info
         const { requestId, collaborators, videoId } = payload;
@@ -2943,7 +3051,7 @@ function extractChannelFromCard(card) {
             // Fallback: use playlist metadata from ytInitialData via video ID lookup
             const playlistVideoId = extractVideoIdFromCard(card);
             const bylineText = card.querySelector('#byline')?.textContent?.trim();
-            
+
             if (playlistVideoId) {
                 // Request channel info from Main World (async) - will cache on card when received
                 requestChannelInfoFromMainWorld(playlistVideoId).then(channelInfo => {
@@ -3769,19 +3877,38 @@ function syncBlockedElementsWithFilters(effectiveSettings) {
     const blockedElements = document.querySelectorAll('[data-filtertube-blocked-channel-id], [data-filtertube-blocked-channel-handle]');
     if (blockedElements.length === 0) return;
 
-    const isStillBlocked = (meta, element) => {
+    const normalizeName = (value = '') => value.trim().toLowerCase();
+
+    const isStillBlocked = (meta) => {
         if (!meta.handle && !meta.id) {
-            // No handle/id but has a name - check if any filter matches by name
-            // This handles guessed handles that haven't been resolved yet
-            if (meta.name) {
-                const guessedHandle = `@${meta.name.toLowerCase().replace(/[^a-z0-9_-]/g, '')}`;
-                return filterChannels.some(filterChannel => {
-                    const filterHandle = (typeof filterChannel === 'string' ? filterChannel : filterChannel?.handle || '').toLowerCase();
-                    return filterHandle === guessedHandle.toLowerCase();
-                });
+            const normalizedName = meta.name ? normalizeName(meta.name) : '';
+            if (!normalizedName) {
+                return false;
             }
-            return false;
+
+            return filterChannels.some(filterChannel => {
+                const filterObj = typeof filterChannel === 'string'
+                    ? { handle: filterChannel }
+                    : filterChannel || {};
+
+                const filterHandle = normalizeName(filterObj.handle || '');
+                if (filterHandle) {
+                    const guessedHandle = normalizeName(`@${normalizedName.replace(/[^a-z0-9_-]/g, '')}`);
+                    if (guessedHandle && filterHandle === guessedHandle) {
+                        return true;
+                    }
+                }
+
+                const filterName = normalizeName(filterObj.name || '');
+                if (filterName && filterName === normalizedName) {
+                    return true;
+                }
+
+                // No direct match by name/guessed handle
+                return false;
+            });
         }
+
         return filterChannels.some(filterChannel => channelMatchesFilter(meta, filterChannel, channelMap));
     };
 
@@ -3800,20 +3927,23 @@ function syncBlockedElementsWithFilters(effectiveSettings) {
         const isWithinGracePeriod = blockedTs > 0 && (now - blockedTs) < GRACE_PERIOD_MS;
         const state = element.getAttribute('data-filtertube-blocked-state');
 
-        // Keep hidden if within grace period and state is 'pending'
-        if (isWithinGracePeriod && state === 'pending') {
-            console.log('FilterTube: Keeping element hidden (grace period):', meta.name || meta.handle);
-            toggleVisibility(element, true, `Blocked channel (pending): ${meta.handle || meta.name}`);
+        // Keep hidden while we wait for resolution if state is pending and we still lack identifiers
+        const RESOLUTION_TIMEOUT_MS = 15000;
+        const hasIdentity = Boolean(meta.id || meta.handle);
+        const waitingForResolution = state === 'pending' && !hasIdentity && (now - blockedTs) < RESOLUTION_TIMEOUT_MS;
+
+        if (waitingForResolution || (isWithinGracePeriod && state === 'pending')) {
+            toggleVisibility(element, true, `Blocked channel (pending): ${meta.handle || meta.name || 'Resolving'}`);
             return;
         }
 
-        if (filterChannels.length > 0 && isStillBlocked(meta, element)) {
+        if (filterChannels.length > 0 && isStillBlocked(meta)) {
             markElementAsBlocked(element, meta, 'confirmed');
             toggleVisibility(element, true, `Blocked channel: ${meta.handle || meta.id}`);
-        } else {
-            clearBlockedElementAttributes(element);
-            toggleVisibility(element, false, '', true);
+            return;
         }
+        clearBlockedElementAttributes(element);
+        toggleVisibility(element, false, '', true);
     });
 }
 
@@ -3997,8 +4127,8 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
 
     try {
         // Single channel blocking (normal case)
-        // Use the channel identifier (handle or ID), or guessed handle if we only have name
-        const input = channelInfo.handle || channelInfo.id || channelInfo.guessedHandle;
+        // Use the channel identifier (handle or ID), fallback to name (will be converted to guessed handle in background)
+        const input = channelInfo.handle || channelInfo.id || channelInfo.guessedHandle || channelInfo.name;
 
         // Get collaboration metadata from menu item attribute
         const collaborationWithAttr = menuItem.getAttribute('data-collaboration-with');
