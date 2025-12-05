@@ -4245,6 +4245,51 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                 }
             }
 
+            // WATCH PAGE: Hide all playlist panel items and lockup suggestions from this channel
+            // This ensures immediate hiding on watch page without refresh
+            console.log('FilterTube: Checking watch page for channel content to hide...');
+            
+            // Query all watch page renderers
+            const watchPageItems = document.querySelectorAll('ytd-playlist-panel-video-renderer, yt-lockup-view-model');
+            let watchPageHiddenCount = 0;
+            
+            watchPageItems.forEach(item => {
+                // Extract channel info from this item
+                const itemChannelInfo = extractChannelFromCard(item);
+                
+                // Check if this item matches the blocked channel
+                let shouldHideItem = false;
+                
+                if (itemChannelInfo) {
+                    // Match by ID
+                    if (channelInfo.id && itemChannelInfo.id && 
+                        channelInfo.id.toLowerCase() === itemChannelInfo.id.toLowerCase()) {
+                        shouldHideItem = true;
+                    }
+                    // Match by handle
+                    else if (channelInfo.handle && itemChannelInfo.handle && 
+                             channelInfo.handle.toLowerCase() === itemChannelInfo.handle.toLowerCase()) {
+                        shouldHideItem = true;
+                    }
+                    // Match by name (fallback for items with only name)
+                    else if (channelInfo.name && itemChannelInfo.name && 
+                             channelInfo.name.toLowerCase() === itemChannelInfo.name.toLowerCase()) {
+                        shouldHideItem = true;
+                    }
+                }
+                
+                if (shouldHideItem) {
+                    markElementAsBlocked(item, channelInfo, 'pending');
+                    item.style.display = 'none';
+                    item.classList.add('filtertube-hidden');
+                    item.setAttribute('data-filtertube-hidden', 'true');
+                    watchPageHiddenCount++;
+                }
+            });
+            
+            if (watchPageHiddenCount > 0) {
+                console.log(`FilterTube: Hidden ${watchPageHiddenCount} watch page item(s) from channel ${channelInfo.name || channelInfo.handle || channelInfo.id}`);
+            }
 
             // Close the dropdown since the video is now hidden
             const dropdown = menuItem.closest('tp-yt-iron-dropdown');
