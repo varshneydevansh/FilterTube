@@ -28,6 +28,7 @@ async function getCompiledSettings() {
             'uiKeywords',
             'filterChannels',
             'channelMap',
+            'channelNames',
             'hideAllComments',
             'filterComments',
             'useExactWordMatching',
@@ -177,6 +178,9 @@ async function getCompiledSettings() {
 
             // Pass through the channel map (UC ID <-> @handle mappings)
             compiledSettings.channelMap = items.channelMap || {};
+
+            // Pass through the channel names dictionary (UC ID -> { name, handle })
+            compiledSettings.channelNames = items.channelNames || {};
 
             // Pass through boolean flags
             compiledSettings.hideAllComments = items.hideAllComments || false;
@@ -402,10 +406,12 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
         sendResponse({ acknowledged: true });
         return false;
     } else if (request.action === "updateChannelMap") {
-        // Handle learned ID/Handle mappings from filter_logic
-        browserAPI.storage.local.get(['channelMap'], (result) => {
+        // Handle learned ID/Handle/Name mappings from filter_logic
+        browserAPI.storage.local.get(['channelMap', 'channelNames'], (result) => {
             const currentMap = result.channelMap || {};
-            let hasChange = false;
+            const currentNames = result.channelNames || {};
+            let hasMapChange = false;
+            let hasNameChange = false;
 
             request.mappings.forEach(m => {
                 // Keys are lowercase for case-insensitive lookup
@@ -416,13 +422,36 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
                 if (currentMap[keyId] !== m.handle) {
                     currentMap[keyId] = m.handle;    // UC... -> @BTS (original case)
                     currentMap[keyHandle] = m.id;    // @bts -> UCLkAepWjdylmXSltofFvsYQ (original case)
-                    hasChange = true;
+                    hasMapChange = true;
+                }
+
+                // Store channel name in channelNames dictionary (keyed by UC ID)
+                if (m.name && m.id) {
+                    const existingEntry = currentNames[m.id];
+                    if (!existingEntry || existingEntry.name !== m.name) {
+                        currentNames[m.id] = {
+                            name: m.name,
+                            handle: m.handle || existingEntry?.handle || ''
+                        };
+                        hasNameChange = true;
+                    }
                 }
             });
 
-            if (hasChange) {
-                browserAPI.storage.local.set({ channelMap: currentMap });
-                console.log("FilterTube Background: Channel map updated in storage");
+            const updates = {};
+            if (hasMapChange) {
+                updates.channelMap = currentMap;
+            }
+            if (hasNameChange) {
+                updates.channelNames = currentNames;
+            }
+
+            if (Object.keys(updates).length > 0) {
+                browserAPI.storage.local.set(updates);
+                console.log("FilterTube Background: Channel map/names updated in storage", {
+                    mapEntries: Object.keys(currentMap).length,
+                    nameEntries: Object.keys(currentNames).length
+                });
             }
         });
         return false; // No response needed
@@ -906,12 +935,39 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
         // Add to beginning (newest first)
         channels.unshift(newChannel);
 
-        // Save to storage
+        // Also update channelNames dictionary for name-based matching on watch page
+        const channelNamesStorage = await new Promise(resolve => {
+            browserAPI.storage.local.get(['channelNames', 'channelMap'], resolve);
+        });
+        const channelNames = channelNamesStorage.channelNames || {};
+        const channelMap = channelNamesStorage.channelMap || {};
+
+        // Add name mapping if we have ID and name
+        if (channelInfo.id && channelInfo.name) {
+            channelNames[channelInfo.id] = {
+                name: channelInfo.name,
+                handle: channelInfo.handle || ''
+            };
+        }
+
+        // Also update channelMap for ID<->handle bidirectional lookup
+        if (channelInfo.id && channelInfo.handle) {
+            const keyId = channelInfo.id.toLowerCase();
+            const keyHandle = channelInfo.handle.toLowerCase();
+            channelMap[keyId] = channelInfo.handle;
+            channelMap[keyHandle] = channelInfo.id;
+        }
+
+        // Save to storage (filterChannels + channelNames + channelMap)
         await new Promise(resolve => {
-            browserAPI.storage.local.set({ filterChannels: channels }, resolve);
+            browserAPI.storage.local.set({ 
+                filterChannels: channels,
+                channelNames: channelNames,
+                channelMap: channelMap
+            }, resolve);
         });
 
-        console.log('FilterTube Background: Successfully added channel:', newChannel);
+        console.log('FilterTube Background: Successfully added channel:', newChannel, 'channelNames entries:', Object.keys(channelNames).length);
 
         return {
             success: true,

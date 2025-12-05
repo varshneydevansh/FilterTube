@@ -17,7 +17,6 @@ function debugLog(message, ...args) {
 // ACTIVE RESOLVER - Fetches UC ID for @handles
 // ==========================================
 const resolvedHandleCache = new Map();
-const activeFetches = {}; // Tracks in-flight resolution fetches to prevent duplicates
 
 async function fetchIdForHandle(handle) {
     const cleanHandle = handle.toLowerCase().replace('@', '');
@@ -1043,7 +1042,7 @@ function extractCollaboratorMetadataFromElement(element) {
     return collaborators;
 }
 
-function channelMatchesFilter(meta, filterChannel, channelMap = {}) {
+function channelMatchesFilter(meta, filterChannel, channelMap = {}, channelNames = {}) {
     // Safety: Don't match against empty or invalid filters
     if (!filterChannel) return false;
 
@@ -1105,6 +1104,27 @@ function channelMatchesFilter(meta, filterChannel, channelMap = {}) {
             const mappedId = channelMap[filterHandle];
             if (mappedId && metaId === mappedId) {
                 return true;
+            }
+        }
+
+        // Name-only fallback: If meta only has name, check channelNames for stored name matches
+        if (metaName && !metaId && !metaHandle) {
+            // Check if filter's ID has a stored name that matches meta name
+            if (filterId) {
+                const nameData = channelNames[filterId] || channelNames[filterId.toUpperCase()];
+                if (nameData && nameData.name && nameData.name.toLowerCase() === metaName) {
+                    return true;
+                }
+            }
+            // Check if filter's handle maps to an ID with a stored name
+            if (filterHandle) {
+                const mappedId = channelMap[filterHandle];
+                if (mappedId) {
+                    const nameData = channelNames[mappedId] || channelNames[mappedId.toLowerCase()];
+                    if (nameData && nameData.name && nameData.name.toLowerCase() === metaName) {
+                        return true;
+                    }
+                }
             }
         }
 
@@ -1678,16 +1698,48 @@ function applyDOMFallback(settings, options = {}) {
         // Check if this element was blocked via 3-dot menu (has blocked channel attributes)
         const blockedChannelId = target.getAttribute('data-filtertube-blocked-channel-id');
         const blockedChannelHandle = target.getAttribute('data-filtertube-blocked-channel-handle');
+        const blockedChannelName = target.getAttribute('data-filtertube-blocked-channel-name');
         const blockedChannelState = target.getAttribute('data-filtertube-blocked-state');
         const blockedTimestamp = parseInt(target.getAttribute('data-filtertube-blocked-ts') || '0', 10);
         const blockAgeMs = blockedTimestamp ? Date.now() - blockedTimestamp : Number.POSITIVE_INFINITY;
 
         // If this card was blocked via 3-dot UI, honour pending/confirmed states
-        if (blockedChannelId || blockedChannelHandle) {
+        if (blockedChannelId || blockedChannelHandle || blockedChannelName) {
+            const channelMap = effectiveSettings.channelMap || {};
+            const channelNames = effectiveSettings.channelNames || {};
+            
             const isStillBlocked = effectiveSettings.filterChannels?.some(fc => {
                 if (typeof fc === 'object') {
-                    return (blockedChannelId && fc.id?.toLowerCase() === blockedChannelId.toLowerCase()) ||
-                           (blockedChannelHandle && fc.handle?.toLowerCase() === blockedChannelHandle.toLowerCase());
+                    // Direct ID match
+                    if (blockedChannelId && fc.id?.toLowerCase() === blockedChannelId.toLowerCase()) {
+                        return true;
+                    }
+                    // Direct handle match
+                    if (blockedChannelHandle && fc.handle?.toLowerCase() === blockedChannelHandle.toLowerCase()) {
+                        return true;
+                    }
+                    // Direct name match
+                    if (blockedChannelName && fc.name?.toLowerCase() === blockedChannelName.toLowerCase()) {
+                        return true;
+                    }
+                    // Cross-match: filter has ID, check if channelNames has matching name
+                    if (blockedChannelName && fc.id) {
+                        const nameData = channelNames[fc.id] || channelNames[fc.id.toUpperCase()];
+                        if (nameData && nameData.name?.toLowerCase() === blockedChannelName.toLowerCase()) {
+                            return true;
+                        }
+                    }
+                    // Cross-match: filter has handle, resolve to ID and check channelNames
+                    if (blockedChannelName && fc.handle) {
+                        const mappedId = channelMap[fc.handle.toLowerCase()];
+                        if (mappedId) {
+                            const nameData = channelNames[mappedId] || channelNames[mappedId.toLowerCase()];
+                            if (nameData && nameData.name?.toLowerCase() === blockedChannelName.toLowerCase()) {
+                                return true;
+                            }
+                        }
+                    }
+                    return false;
                 }
                 const normalized = (fc || '').toLowerCase();
                 return normalized === blockedChannelId?.toLowerCase() || normalized === blockedChannelHandle?.toLowerCase();
@@ -1697,22 +1749,24 @@ function applyDOMFallback(settings, options = {}) {
                 // Keep it hidden - mark as confirmed so future passes don't treat it as pending
                 markElementAsBlocked(target, {
                     id: blockedChannelId,
-                    handle: blockedChannelHandle
+                    handle: blockedChannelHandle,
+                    name: blockedChannelName
                 }, 'confirmed');
-                toggleVisibility(target, true, `Blocked channel: ${blockedChannelHandle || blockedChannelId}`);
+                toggleVisibility(target, true, `Blocked channel: ${blockedChannelName || blockedChannelHandle || blockedChannelId}`);
                 return; // Skip further processing for this element
             } else {
                 // If blocklist no longer contains this channel but the state is still pending,
                 // keep it hidden for a short grace period to avoid flicker while background saves
                 const waitForConfirmation = blockedChannelState === 'pending' && blockAgeMs < 2000;
                 if (waitForConfirmation) {
-                    toggleVisibility(target, true, `Pending channel block: ${blockedChannelHandle || blockedChannelId}`);
+                    toggleVisibility(target, true, `Pending channel block: ${blockedChannelName || blockedChannelHandle || blockedChannelId}`);
                     return;
                 }
 
                 // Channel was unblocked, remove the attributes and let normal filtering proceed
                 target.removeAttribute('data-filtertube-blocked-channel-id');
                 target.removeAttribute('data-filtertube-blocked-channel-handle');
+                target.removeAttribute('data-filtertube-blocked-channel-name');
                 target.removeAttribute('data-filtertube-blocked-state');
                 target.removeAttribute('data-filtertube-blocked-ts');
 
@@ -1831,12 +1885,13 @@ function shouldHideContent(title, channel, settings, options = {}) {
     // Channel filtering
     if (settings.filterChannels && settings.filterChannels.length > 0 && (hasChannelIdentity || collaborators.length > 0)) {
         const channelMap = settings.channelMap || {};
+        const channelNames = settings.channelNames || {};
 
         const collaboratorMetas = Array.isArray(collaborators) ? collaborators : [];
 
         // 1. Normal Check (Fast path - direct match or existing channelMap lookup)
         for (const filterChannel of settings.filterChannels) {
-            if (hasChannelIdentity && channelMatchesFilter(channelMeta, filterChannel, channelMap)) {
+            if (hasChannelIdentity && channelMatchesFilter(channelMeta, filterChannel, channelMap, channelNames)) {
                 if (debugFiltering) {
                     console.log(`FilterTube DEBUG: MATCH FOUND! Video will be hidden.`, {
                         title: title.substring(0, 50),
@@ -1848,7 +1903,7 @@ function shouldHideContent(title, channel, settings, options = {}) {
             }
 
             if (collaboratorMetas.length > 0) {
-                const collaboratorMatched = collaboratorMetas.some(collaborator => channelMatchesFilter(collaborator, filterChannel, channelMap));
+                const collaboratorMatched = collaboratorMetas.some(collaborator => channelMatchesFilter(collaborator, filterChannel, channelMap, channelNames));
                 if (collaboratorMatched) {
                     if (debugFiltering) {
                         console.log(`FilterTube DEBUG: Collaborator match found. Video will be hidden.`, {
@@ -2244,117 +2299,27 @@ function handleMainWorldMessages(event) {
             if (result?.success) applyDOMFallback(result.settings, { forceReprocess: true });
         });
     } else if (type === 'FilterTube_UpdateChannelMap') {
-        const { mapping } = payload || {};
-        if (mapping && typeof mapping === 'object') {
-            Object.entries(mapping).forEach(([key, value]) => {
-                if (key && value) {
-                    // Normalize keys to support both directions
-                    if (key.startsWith('UC')) {
-                        // ID -> Handle
-                        resolvedHandleCache.set(key, value);
-                        if (!channelMap.idToHandle[key]) channelMap.idToHandle[key] = value;
-                    } else if (key.startsWith('@')) {
-                        // Handle -> ID
-                        const normalizedHandle = key.toLowerCase();
-                        if (!channelMap.handleToId[normalizedHandle]) channelMap.handleToId[normalizedHandle] = value;
-                    }
+        // payload is an array of { id, handle, name } from filter_logic
+        const mappings = Array.isArray(payload) ? payload : [];
+        if (mappings.length > 0) {
+            // Forward to background for persistent storage
+            browserAPI_BRIDGE.runtime.sendMessage({
+                action: "updateChannelMap",
+                mappings: mappings
+            });
+
+            // Also update local cache
+            mappings.forEach(m => {
+                if (m.id && m.handle) {
+                    resolvedHandleCache.set(m.id, m.handle);
+                    resolvedHandleCache.set(m.handle.toLowerCase().replace('@', ''), m.id);
                 }
             });
-            console.log('FilterTube: Updated channel map from background', {
-                idCount: Object.keys(channelMap.idToHandle).length,
-                handleCount: Object.keys(channelMap.handleToId).length
+
+            console.log('FilterTube: Forwarded channel map update to background', {
+                count: mappings.length,
+                sample: mappings[0]
             });
-        }
-    } else if (type === 'FilterTube_RequestChannelResolution') {
-        // Handle channel resolution requests from filter_logic (Watch Page / Data-Scarce Renderers)
-        const { videoId, name, missingId, missingHandle } = payload || {};
-
-        if (videoId && (missingId || missingHandle)) {
-            // 1. Check internal caches first
-            let resolvedId = null;
-            let resolvedHandle = null;
-
-            // Check cache by name if possible (weak link, but useful)
-            // Implementation note: we don't map name->id directly usually, 
-            // relying on fetch below is safer for collisions.
-
-            const cacheKey = `resolution_${videoId}`;
-            if (activeFetches[cacheKey]) return; // Already dealing with it
-
-            console.log(`FilterTube: Attempting to resolve channel for video ${videoId} (${name || 'Unknown'})`);
-            activeFetches[cacheKey] = true;
-
-            fetch(`https://www.youtube.com/watch?v=${videoId}`)
-                .then(r => r.text())
-                .then(html => {
-                    const doc = new DOMParser().parseFromString(html, 'text/html');
-                    let extractedId = null;
-                    let extractedHandle = null;
-                    let collaborators = [];
-
-                    // Extract from Meta tags (Reliable for primary channel)
-                    const channelUrl = doc.querySelector('link[itemprop="url"][href*="/channel/UC"]')?.getAttribute('href');
-                    if (channelUrl) extractedId = channelUrl.split('/').pop();
-
-                    const handleUrl = doc.querySelector('link[itemprop="url"][href*="/@"]')?.getAttribute('href');
-                    if (handleUrl) extractedHandle = handleUrl.split('/').pop();
-
-                    // Fallback: Scripts (ytInitialPlayerResponse)
-                    if (!extractedId || !extractedHandle) {
-                        const scripts = Array.from(doc.getElementsByTagName('script'));
-                        for (const script of scripts) {
-                            if (script.textContent && script.textContent.includes('videoDetails')) {
-                                try {
-                                    // Basic Regex extract (safer than eval)
-                                    const channelIdMatch = script.textContent.match(/"channelId":"(UC[\w-]+)"/);
-                                    if (channelIdMatch) extractedId = channelIdMatch[1];
-
-                                    // Handle might not be in videoDetails directly in some formats, but Author is
-                                    const authorMatch = script.textContent.match(/"author":"([^"]+)"/);
-                                    // Note: "author" is usually the Name, not handle.
-                                } catch (e) { /* ignore */ }
-                            }
-                        }
-                    }
-
-                    // Collaboration Check (Important for blocking ANY collaborator)
-                    // We look for multiple bylines or structured credits if possible, 
-                    // but for now, resolving the MAIN channel is the priority to fix the "broken bridge".
-                    // If complex collaboration logic is needed here, we would parse ytInitialData from the HTML.
-
-                    if (extractedId || extractedHandle) {
-                        console.log(`FilterTube: Resolved ${videoId} -> ${extractedId} / ${extractedHandle}`);
-
-                        // Broadcast update
-                        if (extractedId) resolvedHandleCache.set(extractedId, extractedHandle || name);
-
-                        // Send back to filter logic / update maps
-                        window.postMessage({
-                            type: 'FilterTube_UpdateChannelMap',
-                            payload: {
-                                mapping: {
-                                    [extractedId]: extractedHandle,
-                                    [extractedHandle]: extractedId
-                                }
-                            },
-                            source: 'content_bridge'
-                        }, '*');
-
-                        // Trigger a re-process of the DOM to apply filters now that we have data
-                        // Slight delay to allow map update to propagate
-                        setTimeout(() => {
-                            requestSettingsFromBackground().then(result => {
-                                if (result?.success) applyDOMFallback(result.settings, { forceReprocess: true });
-                            });
-                        }, 500);
-                    } else {
-                        console.warn(`FilterTube: Could not resolve channel for ${videoId}`);
-                    }
-                })
-                .catch(err => console.error('FilterTube: Resolution fetch failed', err))
-                .finally(() => {
-                    delete activeFetches[cacheKey];
-                });
         }
     } else if (type === 'FilterTube_CollaboratorInfoResponse') {
         // Handle response from Main World with collaborator info
@@ -3874,7 +3839,8 @@ function clearBlockedElementAttributes(element) {
 function syncBlockedElementsWithFilters(effectiveSettings) {
     const filterChannels = effectiveSettings?.filterChannels || [];
     const channelMap = effectiveSettings?.channelMap || {};
-    const blockedElements = document.querySelectorAll('[data-filtertube-blocked-channel-id], [data-filtertube-blocked-channel-handle]');
+    const channelNames = effectiveSettings?.channelNames || {};
+    const blockedElements = document.querySelectorAll('[data-filtertube-blocked-channel-id], [data-filtertube-blocked-channel-handle], [data-filtertube-blocked-channel-name]');
     if (blockedElements.length === 0) return;
 
     const normalizeName = (value = '') => value.trim().toLowerCase();
@@ -3904,12 +3870,21 @@ function syncBlockedElementsWithFilters(effectiveSettings) {
                     return true;
                 }
 
+                // Check channelNames for stored name matches
+                const filterId = normalizeName(filterObj.id || '');
+                if (filterId) {
+                    const nameData = channelNames[filterId] || channelNames[filterId.toUpperCase()];
+                    if (nameData && nameData.name && normalizeName(nameData.name) === normalizedName) {
+                        return true;
+                    }
+                }
+
                 // No direct match by name/guessed handle
                 return false;
             });
         }
 
-        return filterChannels.some(filterChannel => channelMatchesFilter(meta, filterChannel, channelMap));
+        return filterChannels.some(filterChannel => channelMatchesFilter(meta, filterChannel, channelMap, channelNames));
     };
 
     // Grace period: Don't restore elements that were just blocked (within 5 seconds)

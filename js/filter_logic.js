@@ -718,6 +718,7 @@
         constructor(settings) {
             this.settings = this._processSettings(settings);
             this.channelMap = settings.channelMap || {}; // UC ID <-> @handle mappings
+            this.channelNames = settings.channelNames || {}; // UC ID -> { name, handle } for name-based fallback matching
             this.blockedCount = 0;
             this.debugEnabled = true;
         }
@@ -835,8 +836,11 @@
 
         /**
          * Register a bidirectional mapping between UC ID and handle
+         * @param {string} id - Channel UC ID
+         * @param {string} handle - Channel @handle
+         * @param {string} [name] - Optional channel display name
          */
-        _registerMapping(id, handle) {
+        _registerMapping(id, handle, name = '') {
             if (!id || !handle) return;
 
             // Keys are lowercase for case-insensitive lookup
@@ -849,13 +853,14 @@
                 this.channelMap[keyId] = handle;      // UC... -> @BTS (original case)
                 this.channelMap[keyHandle] = id;      // @bts -> UCLkAepWjdylmXSltofFvsYQ (original case)
 
-                postLogToBridge('log', `🧠 LEARNED MAPPING: ${id} <-> ${handle}`);
+                postLogToBridge('log', `🧠 LEARNED MAPPING: ${id} <-> ${handle}${name ? ` (${name})` : ''}`);
 
                 // Send to background via content_bridge to persist in storage
+                // Include name so background can build channelNames dictionary
                 try {
                     window.postMessage({
                         type: 'FilterTube_UpdateChannelMap',
-                        payload: [{ id: id, handle: handle }],  // Send original case
+                        payload: [{ id: id, handle: handle, name: name || '' }],  // Send original case + name
                         source: 'filter_logic'
                     }, '*');
                 } catch (e) {
@@ -1165,9 +1170,9 @@
                                             collaborators.push(collabChannelInfo);
                                             postLogToBridge('log', '✅ Extracted collaborator in filter_logic:', collabChannelInfo);
 
-                                            // Register mapping for this collaborator
+                                            // Register mapping for this collaborator (include name)
                                             if (collabChannelInfo.id && collabChannelInfo.handle) {
-                                                this._registerMapping(collabChannelInfo.id, collabChannelInfo.handle);
+                                                this._registerMapping(collabChannelInfo.id, collabChannelInfo.handle, collabChannelInfo.name || '');
                                             }
                                         }
                                     }
@@ -1361,7 +1366,7 @@
             }
 
             if (!Array.isArray(channelInfo) && channelInfo.id && channelInfo.handle) {
-                this._registerMapping(channelInfo.id, channelInfo.handle);
+                this._registerMapping(channelInfo.id, channelInfo.handle, channelInfo.name || '');
             }
 
             return channelInfo;
@@ -1447,22 +1452,35 @@
                     return true;
                 }
 
-                // Cross-matching: If candidate only has name, check channelMap for filter's known name
+                // Cross-matching: If candidate only has name, check channelNames for filter's known name
                 if (candidateName && !candidateId && !candidateHandle) {
-                    // Try ID -> Name lookup (store name in channelMap too)
+                    // Try ID -> Name lookup via channelNames dictionary
                     if (filterId) {
-                        const mappedData = this.channelMap[filterId.toUpperCase()];
-                        if (mappedData && typeof mappedData === 'object' && mappedData.name) {
-                            if (candidateName === mappedData.name.toLowerCase()) {
+                        const nameData = this.channelNames[filterId] || this.channelNames[filterId.toUpperCase()];
+                        if (nameData && nameData.name) {
+                            if (candidateName === nameData.name.toLowerCase()) {
                                 return true;
                             }
                         }
                     }
-                    // Try Handle -> Name lookup
+                    // Try Handle -> Name lookup via channelNames
                     if (filterHandle) {
-                        const mappedData = this.channelMap[filterHandle];
-                        if (mappedData && typeof mappedData === 'object' && mappedData.name) {
-                            if (candidateName === mappedData.name.toLowerCase()) {
+                        // Look up the ID for this handle, then check channelNames
+                        const mappedId = this.channelMap[filterHandle];
+                        if (mappedId) {
+                            const nameData = this.channelNames[mappedId] || this.channelNames[mappedId.toLowerCase()];
+                            if (nameData && nameData.name) {
+                                if (candidateName === nameData.name.toLowerCase()) {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                    // Also check if filterName matches any stored name in channelNames
+                    if (filterName) {
+                        for (const [id, data] of Object.entries(this.channelNames)) {
+                            if (data.name && data.name.toLowerCase() === candidateName) {
+                                // Found a match - the candidate name matches a known channel
                                 return true;
                             }
                         }
