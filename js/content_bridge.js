@@ -1840,6 +1840,12 @@ function applyDOMFallback(settings, options = {}) {
 
     // Log hide/restore summary
     filteringTracker.logSummary();
+    
+    // Check if the currently playing playlist video is now hidden and needs to be skipped
+    // This handles cases where filtering settings changed while a video is playing
+    if (typeof checkAndSkipHiddenVideo === 'function') {
+        checkAndSkipHiddenVideo();
+    }
 }
 
 // Helper function to check if content should be hidden
@@ -2446,6 +2452,234 @@ function debounce(func, delay) {
             timeoutId = null;
         }, delay);
     };
+}
+
+// ==========================================
+// PLAYLIST SKIP LOGIC - Skip hidden videos in playlists
+// ==========================================
+
+let playlistSkipInitialized = false;
+let lastSkippedVideoId = null;
+let skipInProgress = false;
+
+/**
+ * Initialize playlist skip functionality
+ * This monitors for video changes and skips hidden videos in playlists
+ */
+function initializePlaylistSkip() {
+    if (playlistSkipInitialized) return;
+    playlistSkipInitialized = true;
+    
+    console.log('FilterTube: Initializing playlist skip functionality');
+    
+    // Method 1: Monitor URL changes (works for most navigation)
+    let lastUrl = window.location.href;
+    const urlObserver = new MutationObserver(() => {
+        if (window.location.href !== lastUrl) {
+            lastUrl = window.location.href;
+            // Small delay to let YouTube update the DOM
+            setTimeout(() => checkAndSkipHiddenVideo(), 300);
+        }
+    });
+    
+    urlObserver.observe(document.body, { childList: true, subtree: true });
+    
+    // Method 2: Monitor the video element for 'ended' event
+    function attachVideoEndListener() {
+        const video = document.querySelector('video.html5-main-video');
+        if (video && !video._filtertubeEndListener) {
+            video._filtertubeEndListener = true;
+            video.addEventListener('ended', () => {
+                console.log('FilterTube: Video ended, checking for hidden next video');
+                // Delay to let YouTube start its navigation
+                setTimeout(() => checkAndSkipHiddenVideo(), 500);
+            });
+            console.log('FilterTube: Attached video end listener');
+        }
+    }
+    
+    // Try to attach immediately and also watch for video element changes
+    attachVideoEndListener();
+    
+    const videoObserver = new MutationObserver(() => {
+        attachVideoEndListener();
+    });
+    
+    const playerContainer = document.querySelector('#player-container, #movie_player');
+    if (playerContainer) {
+        videoObserver.observe(playerContainer, { childList: true, subtree: true });
+    }
+    
+    // Method 3: Monitor for the "selected" attribute on playlist items
+    // YouTube marks the currently playing video with [selected]
+    const playlistObserver = new MutationObserver((mutations) => {
+        for (const mutation of mutations) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'selected') {
+                const target = mutation.target;
+                if (target.hasAttribute('selected') && target.matches('ytd-playlist-panel-video-renderer')) {
+                    // A new video was selected in the playlist
+                    setTimeout(() => checkAndSkipHiddenVideo(), 100);
+                }
+            }
+        }
+    });
+    
+    // Observe playlist panel for attribute changes
+    function observePlaylistPanel() {
+        const playlistPanel = document.querySelector('ytd-playlist-panel-renderer #items');
+        if (playlistPanel) {
+            playlistObserver.observe(playlistPanel, { 
+                attributes: true, 
+                attributeFilter: ['selected'],
+                subtree: true 
+            });
+            console.log('FilterTube: Observing playlist panel for selection changes');
+        }
+    }
+    
+    observePlaylistPanel();
+    
+    // Re-observe when playlist panel appears
+    const panelObserver = new MutationObserver(() => {
+        observePlaylistPanel();
+    });
+    panelObserver.observe(document.body, { childList: true, subtree: true });
+    
+    // Initial check on page load
+    setTimeout(() => checkAndSkipHiddenVideo(), 1000);
+}
+
+/**
+ * Check if the currently selected/playing video in a playlist is hidden
+ * If so, skip to the next non-hidden video
+ */
+function checkAndSkipHiddenVideo() {
+    // Only run on watch pages with playlists
+    if (!window.location.pathname.includes('/watch')) return;
+    if (!window.location.search.includes('list=')) return;
+    
+    // Prevent concurrent skips
+    if (skipInProgress) {
+        console.log('FilterTube: Skip already in progress, waiting...');
+        return;
+    }
+    
+    // Find the currently selected playlist item
+    const selectedItem = document.querySelector('ytd-playlist-panel-video-renderer[selected]');
+    if (!selectedItem) {
+        console.log('FilterTube: No selected playlist item found');
+        return;
+    }
+    
+    // Check if the selected item is hidden by FilterTube
+    const isHidden = selectedItem.getAttribute('data-filtertube-hidden') === 'true' ||
+                     selectedItem.style.display === 'none' ||
+                     selectedItem.classList.contains('filtertube-hidden');
+    
+    if (!isHidden) {
+        // Current video is not hidden, nothing to do
+        return;
+    }
+    
+    // Get the video ID of the hidden video to prevent skip loops
+    const hiddenVideoLink = selectedItem.querySelector('a[href*="/watch"]');
+    const hiddenVideoIdMatch = hiddenVideoLink?.href?.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
+    const hiddenVideoId = hiddenVideoIdMatch ? hiddenVideoIdMatch[1] : null;
+    
+    // Prevent infinite loops - don't skip the same video twice in a row
+    if (hiddenVideoId && hiddenVideoId === lastSkippedVideoId) {
+        console.log('FilterTube: Already tried to skip this video, stopping to prevent loop');
+        return;
+    }
+    
+    console.log('FilterTube: Currently playing video is hidden, looking for next non-hidden video');
+    skipInProgress = true;
+    lastSkippedVideoId = hiddenVideoId;
+    
+    // Find all playlist items
+    const allPlaylistItems = document.querySelectorAll('ytd-playlist-panel-video-renderer');
+    let foundSelected = false;
+    let nextNonHiddenItem = null;
+    
+    // Find the next non-hidden item after the selected one
+    for (const item of allPlaylistItems) {
+        if (item.hasAttribute('selected')) {
+            foundSelected = true;
+            continue;
+        }
+        
+        if (foundSelected) {
+            const itemHidden = item.getAttribute('data-filtertube-hidden') === 'true' ||
+                              item.style.display === 'none' ||
+                              item.classList.contains('filtertube-hidden');
+            
+            if (!itemHidden) {
+                nextNonHiddenItem = item;
+                break;
+            }
+        }
+    }
+    
+    if (nextNonHiddenItem) {
+        // Click on the next non-hidden item to play it
+        const link = nextNonHiddenItem.querySelector('a[href*="/watch"]');
+        if (link) {
+            console.log('FilterTube: Skipping to next non-hidden video in playlist');
+            
+            // Use YouTube's navigation by clicking the link
+            link.click();
+            
+            // Reset skip state after a delay
+            setTimeout(() => {
+                skipInProgress = false;
+            }, 2000);
+            
+            return;
+        }
+    }
+    
+    // If no next non-hidden item found, try to find any non-hidden item (wrap around or previous)
+    for (const item of allPlaylistItems) {
+        const itemHidden = item.getAttribute('data-filtertube-hidden') === 'true' ||
+                          item.style.display === 'none' ||
+                          item.classList.contains('filtertube-hidden');
+        
+        if (!itemHidden && !item.hasAttribute('selected')) {
+            const link = item.querySelector('a[href*="/watch"]');
+            if (link) {
+                console.log('FilterTube: No next non-hidden video, playing first available non-hidden video');
+                link.click();
+                
+                setTimeout(() => {
+                    skipInProgress = false;
+                }, 2000);
+                
+                return;
+            }
+        }
+    }
+    
+    // All videos are hidden - stop playback or let it continue
+    console.log('FilterTube: All playlist videos are hidden, cannot skip');
+    skipInProgress = false;
+}
+
+/**
+ * Force re-check playlist items after settings change or channel block
+ * This ensures newly hidden items trigger a skip if currently playing
+ */
+function recheckPlaylistAfterHide() {
+    // Small delay to ensure DOM is updated
+    setTimeout(() => {
+        checkAndSkipHiddenVideo();
+    }, 200);
+}
+
+// Initialize playlist skip when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializePlaylistSkip);
+} else {
+    setTimeout(initializePlaylistSkip, 500);
 }
 
 // ==========================================
@@ -4363,6 +4597,8 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             
             if (watchPageHiddenCount > 0) {
                 console.log(`FilterTube: Hidden ${watchPageHiddenCount} watch page item(s) from channel ${channelInfo.name || channelInfo.handle || channelInfo.id}`);
+                // Trigger playlist skip check in case the currently playing video was just hidden
+                recheckPlaylistAfterHide();
             }
             
             // Schedule a delayed re-check to catch any items that were added during async operations
@@ -4415,6 +4651,8 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                 
                 if (delayedHiddenCount > 0) {
                     console.log(`FilterTube: Delayed hide caught ${delayedHiddenCount} additional item(s) from channel ${channelInfo.name || channelInfo.handle || channelInfo.id}`);
+                    // Trigger playlist skip check in case the currently playing video was just hidden
+                    recheckPlaylistAfterHide();
                 }
             }, 500);
 
