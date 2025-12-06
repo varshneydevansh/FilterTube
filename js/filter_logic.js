@@ -916,19 +916,21 @@
             }
 
             // Watch page diagnostics: surface when channel extraction failed for playlist/right-rail renderers
-            if (this.debugEnabled && !isCollaboration && (!channelInfo?.id && !channelInfo?.handle)) {
-                const isWatchRenderer = rendererType === 'playlistPanelVideoRenderer' || rendererType === 'lockupViewModel';
-                if (isWatchRenderer) {
-                    this._log(
-                        `🕵️ Watch renderer missing channel identity: ${rendererType}`,
-                        {
-                            titlePreview: title?.substring(0, 60) || 'N/A',
-                            hasByline: Boolean(item.shortBylineText || item.longBylineText),
-                            hasMetadataRows: Boolean(item.metadata?.lockupMetadataViewModel || item.metadataRows),
-                            videoId
-                        }
-                    );
-                }
+            const isWatchRenderer = rendererType === 'playlistPanelVideoRenderer' || rendererType === 'lockupViewModel';
+            if (isWatchRenderer) {
+                // Always log watch renderer extraction for debugging
+                this._log(
+                    `🕵️ Watch renderer channel extraction: ${rendererType}`,
+                    {
+                        titlePreview: title?.substring(0, 60) || 'N/A',
+                        channelName: channelInfo?.name || 'N/A',
+                        channelId: channelInfo?.id || 'N/A',
+                        channelHandle: channelInfo?.handle || 'N/A',
+                        hasByline: Boolean(item.shortBylineText || item.longBylineText),
+                        bylineText: item.shortBylineText?.simpleText || (item.shortBylineText?.runs?.[0]?.text) || 'N/A',
+                        videoId
+                    }
+                );
             }
 
             // Send collaboration data to Main World for caching
@@ -978,6 +980,10 @@
             if (this.settings.filterChannels.length > 0) {
                 for (const collaborator of collaborators) {
                     if (collaborator.name || collaborator.id || collaborator.handle) {
+                        // Debug: Log channel matching attempt for watch renderers
+                        if (isWatchRenderer) {
+                            this._log(`🔍 Attempting channel match for: ${collaborator.name || collaborator.id || collaborator.handle} against ${this.settings.filterChannels.length} filters`);
+                        }
                         for (const filterChannel of this.settings.filterChannels) {
                             if (this._matchesChannel(filterChannel, collaborator)) {
                                 if (isCollaboration) {

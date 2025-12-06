@@ -598,7 +598,13 @@ function buildChannelMetadata(channelText = '', channelHref = '') {
     const normalizedHref = normalizeHrefForParsing(channelHref);
     const handle = extractHandleFromString(channelText) || extractHandleFromString(normalizedHref);
     const id = extractChannelIdFromString(normalizedHref) || extractChannelIdFromString(channelText);
-    return { handle, id };
+    // Include channel name for name-based matching (watch page items often only have name)
+    // Use channelText as name if it's not a handle or ID
+    let name = '';
+    if (channelText && !channelText.startsWith('@') && !channelText.startsWith('UC')) {
+        name = channelText.trim();
+    }
+    return { handle, id, name };
 }
 
 function collectDatasetValues(element) {
@@ -679,10 +685,12 @@ function extractChannelMetadataFromElement(element, channelText = '', channelHre
 
     const cachedHandle = cacheSource?.getAttribute?.('data-filtertube-channel-handle');
     const cachedId = cacheSource?.getAttribute?.('data-filtertube-channel-id');
-    if ((cachedHandle && cachedHandle !== '') || (cachedId && cachedId !== '')) {
+    const cachedName = cacheSource?.getAttribute?.('data-filtertube-channel-name');
+    if ((cachedHandle && cachedHandle !== '') || (cachedId && cachedId !== '') || (cachedName && cachedName !== '')) {
         return {
             handle: cachedHandle || '',
-            id: cachedId || ''
+            id: cachedId || '',
+            name: cachedName || channelText || ''
         };
     }
 
@@ -1845,7 +1853,8 @@ function shouldHideContent(title, channel, settings, options = {}) {
         collaborators = []
     } = options;
     const channelMeta = providedChannelMeta || buildChannelMetadata(channel, channelHref);
-    const hasChannelIdentity = Boolean(channelMeta.handle || channelMeta.id);
+    // Include name in identity check - watch page items often only have channel name
+    const hasChannelIdentity = Boolean(channelMeta.handle || channelMeta.id || channelMeta.name);
 
     // Debug logging (disabled by default - set to true for troubleshooting)
     const debugFiltering = false;
@@ -3046,6 +3055,15 @@ function extractChannelFromCard(card) {
         if (isLockupViewModel) {
             console.log('FilterTube: Detected LOCKUP VIEW MODEL card (watch page suggestion)');
 
+            // First check for cached metadata (from previous Main World responses)
+            const cachedId = card.getAttribute('data-filtertube-channel-id');
+            const cachedHandle = card.getAttribute('data-filtertube-channel-handle');
+            const cachedName = card.getAttribute('data-filtertube-channel-name');
+            if (cachedId || cachedHandle) {
+                console.log('FilterTube: Using cached lockup channel info:', { id: cachedId, handle: cachedHandle, name: cachedName });
+                return { id: cachedId, handle: cachedHandle, name: cachedName };
+            }
+
             // The channel name is in the metadata row as plain text
             // Structure: .yt-lockup-view-model__metadata > yt-lockup-metadata-view-model > .yt-content-metadata-view-model__metadata-row
             const metadataRows = card.querySelectorAll('.yt-content-metadata-view-model__metadata-row');
@@ -3062,6 +3080,30 @@ function extractChannelFromCard(card) {
                         console.log('FilterTube: Extracted channel name from lockup metadata:', channelName);
                     } else {
                         channelName = null;
+                    }
+                }
+            }
+
+            // Fallback: Try other selectors for channel name
+            if (!channelName) {
+                // Try the title element
+                const titleEl = card.querySelector('.yt-lockup-metadata-view-model__title, [class*="metadata"] .yt-core-attributed-string');
+                if (titleEl) {
+                    // Skip - this is the video title, not channel name
+                }
+                
+                // Try any attributed string in metadata that's not the title
+                const allMetaStrings = card.querySelectorAll('yt-lockup-metadata-view-model .yt-core-attributed-string');
+                for (const str of allMetaStrings) {
+                    const text = str.textContent?.trim();
+                    // Skip if it looks like a title, view count, or date
+                    if (text && text.length < 100 && 
+                        !/^\d+[KMB]?\s*(views?|subscribers?)/i.test(text) && 
+                        !/ago$/i.test(text) &&
+                        !str.closest('.yt-lockup-metadata-view-model__title')) {
+                        channelName = text;
+                        console.log('FilterTube: Extracted channel name from lockup (fallback):', channelName);
+                        break;
                     }
                 }
             }
@@ -3085,6 +3127,11 @@ function extractChannelFromCard(card) {
             if (channelName) {
                 console.log('FilterTube: Lockup card - using metadata text as channel name (async resolution pending):', channelName);
                 return { name: channelName, videoId: lockupVideoId, needsResolution: true };
+            }
+            
+            // Even if no channel name, return with video ID so we can still try to match
+            if (lockupVideoId) {
+                return { videoId: lockupVideoId, needsResolution: true };
             }
 
             console.warn('FilterTube: Lockup view model card detected but no channel info found');
@@ -4230,26 +4277,78 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             
             watchPageItems.forEach(item => {
                 // Extract channel info from this item
-                const itemChannelInfo = extractChannelFromCard(item);
+                let itemChannelInfo = extractChannelFromCard(item);
+                
+                // Also check for cached metadata on the element (from previous Main World responses)
+                const cachedId = item.getAttribute('data-filtertube-channel-id');
+                const cachedHandle = item.getAttribute('data-filtertube-channel-handle');
+                const cachedName = item.getAttribute('data-filtertube-channel-name');
+                
+                // Merge cached data with extracted data
+                if (cachedId || cachedHandle || cachedName) {
+                    itemChannelInfo = {
+                        id: cachedId || itemChannelInfo?.id || '',
+                        handle: cachedHandle || itemChannelInfo?.handle || '',
+                        name: cachedName || itemChannelInfo?.name || ''
+                    };
+                }
+                
+                // Fallback: Extract byline text directly for playlist items
+                if (!itemChannelInfo?.name && item.tagName.toLowerCase() === 'ytd-playlist-panel-video-renderer') {
+                    const bylineText = item.querySelector('#byline')?.textContent?.trim();
+                    if (bylineText) {
+                        itemChannelInfo = itemChannelInfo || {};
+                        itemChannelInfo.name = bylineText;
+                    }
+                }
+                
+                // Fallback: Extract metadata text for lockup items
+                if (!itemChannelInfo?.name && item.tagName.toLowerCase() === 'yt-lockup-view-model') {
+                    const metadataRow = item.querySelector('.yt-content-metadata-view-model__metadata-row .yt-core-attributed-string');
+                    const text = metadataRow?.textContent?.trim();
+                    if (text && !/^\d+[KMB]?\s*(views?|subscribers?)/i.test(text) && !/ago$/i.test(text)) {
+                        itemChannelInfo = itemChannelInfo || {};
+                        itemChannelInfo.name = text;
+                    }
+                }
                 
                 // Check if this item matches the blocked channel
                 let shouldHideItem = false;
                 
                 if (itemChannelInfo) {
+                    const blockedId = (channelInfo.id || '').toLowerCase();
+                    const blockedHandle = (channelInfo.handle || '').toLowerCase();
+                    const blockedName = (channelInfo.name || '').toLowerCase();
+                    const itemId = (itemChannelInfo.id || '').toLowerCase();
+                    const itemHandle = (itemChannelInfo.handle || '').toLowerCase();
+                    const itemName = (itemChannelInfo.name || '').toLowerCase();
+                    
                     // Match by ID
-                    if (channelInfo.id && itemChannelInfo.id && 
-                        channelInfo.id.toLowerCase() === itemChannelInfo.id.toLowerCase()) {
+                    if (blockedId && itemId && blockedId === itemId) {
                         shouldHideItem = true;
                     }
                     // Match by handle
-                    else if (channelInfo.handle && itemChannelInfo.handle && 
-                             channelInfo.handle.toLowerCase() === itemChannelInfo.handle.toLowerCase()) {
+                    else if (blockedHandle && itemHandle && blockedHandle === itemHandle) {
                         shouldHideItem = true;
                     }
-                    // Match by name (fallback for items with only name)
-                    else if (channelInfo.name && itemChannelInfo.name && 
-                             channelInfo.name.toLowerCase() === itemChannelInfo.name.toLowerCase()) {
+                    // Match by name - ALWAYS check if names match (not just as fallback)
+                    // This handles cases where item only has name but blocked channel has id/handle/name
+                    else if (blockedName && itemName && blockedName === itemName) {
                         shouldHideItem = true;
+                    }
+                    // Cross-match: blocked handle without @ matches item name
+                    else if (blockedHandle && itemName) {
+                        const handleWithoutAt = blockedHandle.replace(/^@/, '');
+                        if (handleWithoutAt === itemName) {
+                            shouldHideItem = true;
+                        }
+                    }
+                    // Cross-match: item handle without @ matches blocked name
+                    else if (itemHandle && blockedName) {
+                        const handleWithoutAt = itemHandle.replace(/^@/, '');
+                        if (handleWithoutAt === blockedName) {
+                            shouldHideItem = true;
+                        }
                     }
                 }
                 
@@ -4265,6 +4364,59 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             if (watchPageHiddenCount > 0) {
                 console.log(`FilterTube: Hidden ${watchPageHiddenCount} watch page item(s) from channel ${channelInfo.name || channelInfo.handle || channelInfo.id}`);
             }
+            
+            // Schedule a delayed re-check to catch any items that were added during async operations
+            // or items whose channel info was resolved after the initial pass
+            setTimeout(() => {
+                const delayedItems = document.querySelectorAll('ytd-playlist-panel-video-renderer:not([data-filtertube-hidden="true"]), yt-lockup-view-model:not([data-filtertube-hidden="true"])');
+                let delayedHiddenCount = 0;
+                
+                const blockedId = (channelInfo.id || '').toLowerCase();
+                const blockedHandle = (channelInfo.handle || '').toLowerCase();
+                const blockedName = (channelInfo.name || '').toLowerCase();
+                
+                delayedItems.forEach(item => {
+                    // Check cached metadata first
+                    const cachedId = item.getAttribute('data-filtertube-channel-id');
+                    const cachedHandle = item.getAttribute('data-filtertube-channel-handle');
+                    let cachedName = item.getAttribute('data-filtertube-channel-name');
+                    
+                    // Fallback: Extract byline/metadata text directly
+                    if (!cachedName) {
+                        if (item.tagName.toLowerCase() === 'ytd-playlist-panel-video-renderer') {
+                            cachedName = item.querySelector('#byline')?.textContent?.trim() || '';
+                        } else if (item.tagName.toLowerCase() === 'yt-lockup-view-model') {
+                            const metadataRow = item.querySelector('.yt-content-metadata-view-model__metadata-row .yt-core-attributed-string');
+                            const text = metadataRow?.textContent?.trim();
+                            if (text && !/^\d+[KMB]?\s*(views?|subscribers?)/i.test(text) && !/ago$/i.test(text)) {
+                                cachedName = text;
+                            }
+                        }
+                    }
+                    
+                    const itemId = (cachedId || '').toLowerCase();
+                    const itemHandle = (cachedHandle || '').toLowerCase();
+                    const itemName = (cachedName || '').toLowerCase();
+                    
+                    let shouldHide = false;
+                    if (blockedId && itemId && blockedId === itemId) shouldHide = true;
+                    else if (blockedHandle && itemHandle && blockedHandle === itemHandle) shouldHide = true;
+                    else if (blockedName && itemName && blockedName === itemName) shouldHide = true;
+                    else if (blockedHandle && itemName && blockedHandle.replace(/^@/, '') === itemName) shouldHide = true;
+                    
+                    if (shouldHide) {
+                        markElementAsBlocked(item, channelInfo, 'pending');
+                        item.style.display = 'none';
+                        item.classList.add('filtertube-hidden');
+                        item.setAttribute('data-filtertube-hidden', 'true');
+                        delayedHiddenCount++;
+                    }
+                });
+                
+                if (delayedHiddenCount > 0) {
+                    console.log(`FilterTube: Delayed hide caught ${delayedHiddenCount} additional item(s) from channel ${channelInfo.name || channelInfo.handle || channelInfo.id}`);
+                }
+            }, 500);
 
             // Close the dropdown since the video is now hidden
             const dropdown = menuItem.closest('tp-yt-iron-dropdown');
