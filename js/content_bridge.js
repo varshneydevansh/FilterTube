@@ -669,6 +669,93 @@ function sanitizeCollaboratorList(collaborators = []) {
     return sanitized;
 }
 
+function getCollaboratorListQuality(list = []) {
+    if (!Array.isArray(list) || list.length === 0) return 0;
+    return list.reduce((score, collaborator) => {
+        if (!collaborator) return score;
+        let entryScore = 10; // prioritize length first
+        if (collaborator.name) entryScore += 1;
+        if (collaborator.handle) entryScore += 3;
+        if (collaborator.id) entryScore += 5;
+        return score + entryScore;
+    }, 0);
+}
+
+function extractCollaboratorsFromAvatarStackElement(stackElement) {
+    if (!stackElement) return [];
+    const avatars = stackElement.querySelectorAll('img');
+    const collaborators = [];
+    const seen = new Set();
+
+    avatars.forEach(img => {
+        if (!img) return;
+        let altText = (img.getAttribute('alt') || '').trim();
+        if (!altText && img.getAttribute('aria-label')) {
+            altText = img.getAttribute('aria-label').trim();
+        }
+        if (!altText) return;
+
+        // Remove trailing sentences like ". Go to channel."
+        altText = altText.replace(/\.\s*Go to channel\.?$/i, '').trim();
+
+        if (!altText) return;
+
+        const anchor = img.closest('a[href]');
+        const href = anchor?.getAttribute('href') || '';
+        const handle = normalizeHandleValue(extractHandleFromString(href));
+        const id = extractChannelIdFromString(href);
+
+        const key = (id || handle || altText.toLowerCase());
+        if (seen.has(key)) return;
+        seen.add(key);
+
+        collaborators.push({
+            name: altText,
+            handle,
+            id
+        });
+    });
+
+    return collaborators;
+}
+
+function mergeCollaboratorLists(primary = [], supplemental = []) {
+    const baseList = Array.isArray(primary) ? primary.map(collab => ({ ...collab })) : [];
+    const extras = Array.isArray(supplemental) ? supplemental : [];
+    if (baseList.length === 0) {
+        return sanitizeCollaboratorList(extras.map(collab => ({ ...collab })));
+    }
+
+    extras.forEach(extra => {
+        if (!extra) return;
+        const normalizedHandle = extra.handle?.toLowerCase();
+        const normalizedId = extra.id?.toLowerCase();
+        const normalizedName = normalizeCollaboratorName?.(extra.name) || extra.name?.trim().toLowerCase();
+
+        let match = baseList.find(existing => {
+            if (!existing) return false;
+            const existingHandle = existing.handle?.toLowerCase();
+            const existingId = existing.id?.toLowerCase();
+            const existingName = normalizeCollaboratorName?.(existing.name) || existing.name?.trim().toLowerCase();
+
+            return (normalizedHandle && existingHandle && normalizedHandle === existingHandle) ||
+                (normalizedId && existingId && normalizedId === existingId) ||
+                (normalizedName && existingName && normalizedName === existingName);
+        });
+
+        if (!match) {
+            baseList.push({ ...extra });
+            return;
+        }
+
+        if (!match.handle && extra.handle) match.handle = extra.handle;
+        if (!match.id && extra.id) match.id = extra.id;
+        if (!match.name && extra.name) match.name = extra.name;
+    });
+
+    return sanitizeCollaboratorList(baseList);
+}
+
 function getCachedCollaboratorsFromCard(card) {
     if (!card || typeof card.getAttribute !== 'function') return [];
     const cached = card.getAttribute('data-filtertube-collaborators');
@@ -893,6 +980,7 @@ function resolveCollabEntryForDialog(collaborators) {
     const primaryHandle = primary.handle?.toLowerCase();
     const primaryName = primary.name?.toLowerCase();
 
+    const matchingEntries = [];
     for (const entry of pendingCollabCards.values()) {
         if (!entry?.card?.isConnected) continue;
         const partialMatches = entry.partialCollaborators || [];
@@ -902,10 +990,36 @@ function resolveCollabEntryForDialog(collaborators) {
             return (primaryHandle && partialHandle && partialHandle === primaryHandle) ||
                 (primaryName && partialName && partialName === primaryName);
         });
-        if (hasMatch) return entry;
+        if (hasMatch) {
+            matchingEntries.push(entry);
+        }
     }
 
-    return null;
+    if (matchingEntries.length === 0) {
+        return null;
+    }
+
+    if (matchingEntries.length === 1) {
+        return matchingEntries[0];
+    }
+
+    return matchingEntries.reduce((best, entry) => {
+        if (!best) return entry;
+        const bestExpected = best.expectedCollaboratorCount || 0;
+        const entryExpected = entry.expectedCollaboratorCount || 0;
+        if (entryExpected !== bestExpected) {
+            return entryExpected > bestExpected ? entry : best;
+        }
+
+        const bestScore = getCollaboratorListQuality(best.partialCollaborators);
+        const entryScore = getCollaboratorListQuality(entry.partialCollaborators);
+        if (entryScore !== bestScore) {
+            return entryScore > bestScore ? entry : best;
+        }
+
+        // Prefer the most recent entry if all else ties
+        return (entry.timestamp || 0) > (best.timestamp || 0) ? entry : best;
+    }, null);
 }
 
 function applyCollaboratorsToCard(entry, collaborators) {
@@ -917,6 +1031,14 @@ function applyCollaboratorsToCard(entry, collaborators) {
         return;
     }
 
+    const existing = getCachedCollaboratorsFromCard(entry.card);
+    const existingScore = getCollaboratorListQuality(existing);
+    const incomingScore = getCollaboratorListQuality(sanitizedCollaborators);
+    if (existingScore > incomingScore) {
+        console.log('FilterTube: Skipping collaborator overwrite because existing data is richer.');
+        return;
+    }
+
     let serializedCollaborators = '';
     try {
         serializedCollaborators = JSON.stringify(sanitizedCollaborators);
@@ -925,14 +1047,26 @@ function applyCollaboratorsToCard(entry, collaborators) {
         console.warn('FilterTube: Failed to cache dialog collaborator metadata:', error);
     }
 
+    const expectedCount = Math.max(
+        entry.expectedCollaboratorCount || 0,
+        sanitizedCollaborators.length,
+        parseInt(entry.card.getAttribute('data-filtertube-expected-collaborators') || '0', 10) || 0
+    );
+    if (expectedCount > 0) {
+        entry.card.setAttribute('data-filtertube-expected-collaborators', String(expectedCount));
+    }
+
     entry.card.removeAttribute('data-filtertube-collab-awaiting-dialog');
     entry.card.setAttribute('data-filtertube-collab-state', 'resolved');
     if (entry.videoId) {
         entry.card.setAttribute('data-filtertube-video-id', entry.videoId);
         propagateCollaboratorsToMatchingCards(entry.videoId, serializedCollaborators, entry.card);
-        resolvedCollaboratorsByVideoId.set(entry.videoId, sanitizedCollaborators);
+        const resolvedScore = getCollaboratorListQuality(resolvedCollaboratorsByVideoId.get(entry.videoId));
+        if (incomingScore >= resolvedScore) {
+            resolvedCollaboratorsByVideoId.set(entry.videoId, sanitizedCollaborators);
+        }
         refreshActiveCollaborationMenu(entry.videoId, sanitizedCollaborators, {
-            expectedCount: entry.expectedCollaboratorCount
+            expectedCount
         });
     }
     entry.card.removeAttribute('data-filtertube-collab-requested');
@@ -964,6 +1098,13 @@ function applyResolvedCollaborators(videoId, collaborators, options = {}) {
     const sanitized = sanitizeCollaboratorList(collaborators);
     if (sanitized.length === 0) return false;
 
+    const incomingScore = getCollaboratorListQuality(sanitized);
+    const cachedScore = getCollaboratorListQuality(resolvedCollaboratorsByVideoId.get(videoId));
+    if (cachedScore > incomingScore && !options.force) {
+        console.log('FilterTube: Skipping resolved collaborator update; existing roster is richer.');
+        return false;
+    }
+
     let serialized = '[]';
     try {
         serialized = JSON.stringify(sanitized);
@@ -973,20 +1114,32 @@ function applyResolvedCollaborators(videoId, collaborators, options = {}) {
 
     let updated = false;
     const cards = document.querySelectorAll(`[data-filtertube-video-id="${videoId}"]`);
-    if (cards.length > 0) {
-        cards.forEach(card => {
-            card.setAttribute('data-filtertube-collaborators', serialized);
-            card.setAttribute('data-filtertube-collab-state', 'resolved');
-            card.removeAttribute('data-filtertube-collab-awaiting-dialog');
-            card.removeAttribute('data-filtertube-collab-requested');
-        });
-        updated = true;
-    } else if (options.sourceCard) {
-        const card = options.sourceCard;
+    const applyToCard = (card) => {
+        const currentScore = getCollaboratorListQuality(getCachedCollaboratorsFromCard(card));
+        if (currentScore > incomingScore) return;
         card.setAttribute('data-filtertube-collaborators', serialized);
         card.setAttribute('data-filtertube-collab-state', 'resolved');
         card.removeAttribute('data-filtertube-collab-awaiting-dialog');
         card.removeAttribute('data-filtertube-collab-requested');
+        if (options.expectedCount || sanitized.length) {
+            const expected = Math.max(
+                options.expectedCount || 0,
+                sanitized.length,
+                parseInt(card.getAttribute('data-filtertube-expected-collaborators') || '0', 10) || 0
+            );
+            if (expected > 0) {
+                card.setAttribute('data-filtertube-expected-collaborators', String(expected));
+            }
+        }
+    };
+
+    if (cards.length > 0) {
+        cards.forEach(card => {
+            applyToCard(card);
+        });
+        updated = true;
+    } else if (options.sourceCard) {
+        applyToCard(options.sourceCard);
         updated = true;
     }
 
@@ -995,9 +1148,11 @@ function applyResolvedCollaborators(videoId, collaborators, options = {}) {
     const expectedAttr = cards[0]?.getAttribute('data-filtertube-expected-collaborators') ||
         options.sourceCard?.getAttribute?.('data-filtertube-expected-collaborators') ||
         '';
-    const expectedCount = options.expectedCount ||
-        parseInt(expectedAttr || sanitized.length, 10) ||
-        sanitized.length;
+    const expectedCount = Math.max(
+        options.expectedCount || 0,
+        parseInt(expectedAttr || '0', 10) || 0,
+        sanitized.length
+    );
 
     refreshActiveCollaborationMenu(videoId, sanitized, {
         expectedCount
@@ -1006,25 +1161,78 @@ function applyResolvedCollaborators(videoId, collaborators, options = {}) {
     return updated;
 }
 
-function applyCollaboratorsByVideoId(videoId, collaborators) {
-    if (!videoId || !collaborators || collaborators.length === 0) return false;
+function applyCollaboratorsByVideoId(videoId, collaborators, options = {}) {
+    if (!videoId || !Array.isArray(collaborators) || collaborators.length === 0) return false;
+    const sanitized = sanitizeCollaboratorList(collaborators);
+    if (sanitized.length === 0) return false;
+    const incomingScore = getCollaboratorListQuality(sanitized);
+
     const key = `vid:${videoId}`;
     let entry = pendingCollabCards.get(key);
     if (!entry) {
         const card = document.querySelector(`[data-filtertube-video-id="${videoId}"]`);
-        if (!card) return false;
-        entry = {
-            key,
-            card,
-            videoId,
-            partialCollaborators: [],
-            timestamp: Date.now(),
-            expiryTimeout: null
-        };
-        pendingCollabCards.set(key, entry);
+        if (card) {
+            entry = {
+                key,
+                card,
+                videoId,
+                partialCollaborators: [],
+                timestamp: Date.now(),
+                expiryTimeout: null,
+                expectedCollaboratorCount: parseInt(card.getAttribute('data-filtertube-expected-collaborators') || '0', 10) || 0
+            };
+            pendingCollabCards.set(key, entry);
+        }
     }
-    applyCollaboratorsToCard(entry, collaborators);
-    return true;
+
+    const existingResolved = resolvedCollaboratorsByVideoId.get(videoId);
+    if (!options.force && getCollaboratorListQuality(existingResolved) > incomingScore) {
+        console.log('FilterTube: applyCollaboratorsByVideoId skipped; richer roster already stored.');
+        return false;
+    }
+
+    resolvedCollaboratorsByVideoId.set(videoId, sanitized);
+
+    let updatedAnyCard = false;
+    const serialized = JSON.stringify(sanitized);
+    const cards = document.querySelectorAll(`[data-filtertube-video-id="${videoId}"]`);
+
+    const updateCard = (card) => {
+        if (!card?.isConnected) return;
+        const currentScore = getCollaboratorListQuality(getCachedCollaboratorsFromCard(card));
+        if (currentScore > incomingScore && !options.force) return;
+        card.setAttribute('data-filtertube-collaborators', serialized);
+        card.setAttribute('data-filtertube-collab-state', 'resolved');
+        card.removeAttribute('data-filtertube-collab-awaiting-dialog');
+        card.removeAttribute('data-filtertube-collab-requested');
+        const expected = Math.max(
+            options.expectedCount || sanitized.length,
+            parseInt(card.getAttribute('data-filtertube-expected-collaborators') || '0', 10) || 0
+        );
+        if (expected > 0) {
+            card.setAttribute('data-filtertube-expected-collaborators', String(expected));
+        }
+        updatedAnyCard = true;
+    };
+
+    if (cards.length > 0) {
+        cards.forEach(updateCard);
+    } else if (options.sourceCard) {
+        updateCard(options.sourceCard);
+    } else if (entry?.card) {
+        updateCard(entry.card);
+    }
+
+    if (entry) {
+        applyCollaboratorsToCard(entry, sanitized);
+    }
+
+    refreshActiveCollaborationMenu(videoId, sanitized, {
+        expectedCount: options.expectedCount || sanitized.length,
+        force: options.force
+    });
+
+    return updatedAnyCard;
 }
 
 function extractCollaboratorsFromDialog(dialogNode) {
@@ -1880,6 +2088,11 @@ function extractCollaboratorMetadataFromElement(element) {
     let requiresDialogExtraction = false;
     let partialCollaboratorsForEnrichment = [];
     const linkScope = card || element;
+    const cacheTarget = card || element;
+    let expectedCollaboratorCount = 0;
+    if (card?.getAttribute) {
+        expectedCollaboratorCount = parseInt(card.getAttribute('data-filtertube-expected-collaborators') || '0', 10) || 0;
+    }
 
     /**
      * Assign handles/IDs from anchor elements to collaborators sequentially.
@@ -1918,25 +2131,77 @@ function extractCollaboratorMetadataFromElement(element) {
         });
     }
 
-    function cacheResultAndMaybeEnrich(triggerEnrichment = false) {
+        function cacheResultAndMaybeEnrich({
+        triggerEnrichment = false,
+        expectedCountHint = 0,
+        partialCollaborators = [],
+        videoIdHint = '',
+        videoCardRef = null
+    } = {}) {
+        const cacheTarget = card || element;
+        const targetCard = videoCardRef || card || (cacheTarget ? findVideoCardElement(cacheTarget) : null);
         const sanitized = sanitizeCollaboratorList(collaborators);
-        collaborators.length = 0;
-        Array.prototype.push.apply(collaborators, sanitized);
+        let bestList = sanitized;
 
-        if (collaborators.length > 0) {
-            try {
-                const cacheTarget = card || element;
-                cacheTarget?.setAttribute('data-filtertube-collaborators', JSON.stringify(collaborators));
-            } catch (err) {
-                console.warn('FilterTube: Failed to cache collaborator metadata:', err);
+        if (cacheTarget) {
+            const existing = getCachedCollaboratorsFromCard(cacheTarget);
+            if (existing.length > 0) {
+                const newScore = getCollaboratorListQuality(sanitized);
+                const existingScore = getCollaboratorListQuality(existing);
+                if (existingScore > newScore) {
+                    bestList = existing;
+                }
+            }
+
+            if (bestList.length > 0) {
+                try {
+                    cacheTarget.setAttribute('data-filtertube-collaborators', JSON.stringify(bestList));
+                } catch (err) {
+                    console.warn('FilterTube: Failed to cache collaborator metadata:', err);
+                }
+            }
+
+            const resolvedExpected = Math.max(
+                expectedCountHint || 0,
+                parseInt(cacheTarget.getAttribute('data-filtertube-expected-collaborators') || '0', 10) || 0,
+                bestList.length
+            );
+
+            if (resolvedExpected > 0) {
+                cacheTarget.setAttribute('data-filtertube-expected-collaborators', String(resolvedExpected));
             }
         }
 
-        if (triggerEnrichment && (card || element)) {
-            const enrichmentTarget = card || element;
-            const videoId = ensureVideoIdForCard(enrichmentTarget);
-            partialCollaboratorsForEnrichment = collaborators.length > 0 ? collaborators.slice(0, 1) : partialCollaboratorsForEnrichment;
-            requestCollaboratorEnrichment(enrichmentTarget, videoId, partialCollaboratorsForEnrichment);
+        collaborators.length = 0;
+        Array.prototype.push.apply(collaborators, bestList);
+
+        const resolvedExpected = Math.max(
+            expectedCountHint || 0,
+            parseInt(cacheTarget?.getAttribute?.('data-filtertube-expected-collaborators') || '0', 10) || 0,
+            bestList.length
+        );
+
+        if (!triggerEnrichment && targetCard && bestList.length > 0) {
+            const resolvedVideoId = videoIdHint || ensureVideoIdForCard(targetCard);
+            if (resolvedVideoId) {
+                const existingResolved = resolvedCollaboratorsByVideoId.get(resolvedVideoId);
+                if (getCollaboratorListQuality(bestList) >= getCollaboratorListQuality(existingResolved)) {
+                    resolvedCollaboratorsByVideoId.set(resolvedVideoId, bestList);
+                }
+                applyResolvedCollaborators(resolvedVideoId, bestList, {
+                    expectedCount: resolvedExpected,
+                    sourceCard: targetCard
+                });
+            }
+        }
+
+        if (triggerEnrichment && cacheTarget) {
+            const enrichmentTarget = cacheTarget;
+            const videoId = videoIdHint || (targetCard ? ensureVideoIdForCard(targetCard) : ensureVideoIdForCard(cacheTarget));
+            const enrichmentSeed = partialCollaborators.length > 0
+                ? partialCollaborators
+                : (bestList.length > 0 ? bestList.slice(0, Math.min(bestList.length, 2)) : []);
+            requestCollaboratorEnrichment(cacheTarget, videoId, enrichmentSeed);
         }
     }
 
@@ -1953,6 +2218,7 @@ function extractCollaboratorMetadataFromElement(element) {
                     parsed.names.forEach(name => collaborators.push({ name, handle: '', id: '' }));
                     hydrateCollaboratorsFromLinks(collaborators);
                     requiresDialogExtraction = requiresDialogExtraction || parsed.hasHiddenCollaborators;
+                    expectedCollaboratorCount = Math.max(expectedCollaboratorCount, parsed.names.length + parsed.hiddenCount);
                 }
             }
         }
@@ -1977,6 +2243,9 @@ function extractCollaboratorMetadataFromElement(element) {
                 });
                 seenKeys.add(key);
             });
+            if (collaborators.length > 0) {
+                expectedCollaboratorCount = Math.max(expectedCollaboratorCount, collaborators.length);
+            }
         }
     }
 
@@ -1989,30 +2258,48 @@ function extractCollaboratorMetadataFromElement(element) {
                 parsed.names.forEach(name => collaborators.push({ name, handle: '', id: '' }));
                 hydrateCollaboratorsFromLinks(collaborators);
                 requiresDialogExtraction = requiresDialogExtraction || parsed.hasHiddenCollaborators;
+                expectedCollaboratorCount = Math.max(expectedCollaboratorCount, parsed.names.length + parsed.hiddenCount);
             }
         }
     }
 
-    // Method 3: Avatar stack detection (if card already marked)
-    if (collaborators.length === 0 && card?.querySelector?.('yt-avatar-stack-view-model')) {
-        const title = getCardTitle(card);
-        if (title && title.includes(',')) {
-            const channelText = card.querySelector('.yt-content-metadata-view-model__metadata-text')?.textContent || '';
-            const parsed = parseCollaboratorNames(channelText);
-            if (parsed.names.length > 1) {
-                parsed.names.forEach(name => collaborators.push({ name, handle: '', id: '' }));
-                hydrateCollaboratorsFromLinks(collaborators);
-                requiresDialogExtraction = requiresDialogExtraction || parsed.hasHiddenCollaborators;
+    // Method 3: Avatar stack detection / enrichment
+    const avatarStack = card?.querySelector?.('yt-avatar-stack-view-model');
+    if (avatarStack) {
+        const stackCollaborators = extractCollaboratorsFromAvatarStackElement(avatarStack);
+        if (stackCollaborators.length > 0) {
+            if (collaborators.length === 0) {
+                Array.prototype.push.apply(collaborators, stackCollaborators);
+            } else {
+                const merged = mergeCollaboratorLists(collaborators, stackCollaborators);
+                collaborators.length = 0;
+                Array.prototype.push.apply(collaborators, merged);
             }
+            expectedCollaboratorCount = Math.max(expectedCollaboratorCount, stackCollaborators.length, expectedCollaboratorCount);
         }
     }
 
-    if (requiresDialogExtraction && (card || element)) {
-        partialCollaboratorsForEnrichment = collaborators.length > 0 ? collaborators.slice(0, 1) : partialCollaboratorsForEnrichment;
-        cacheResultAndMaybeEnrich(true);
-    } else if (collaborators.length > 0) {
-        cacheResultAndMaybeEnrich(false);
+    if (collaborators.length > 0) {
+        const missingIdentifiers = collaborators.some(c => !c.handle && !c.id);
+        const needsMoreCollaborators = expectedCollaboratorCount > 0 && collaborators.length < expectedCollaboratorCount;
+        if (missingIdentifiers || needsMoreCollaborators) {
+            requiresDialogExtraction = true;
+        }
+    } else if (expectedCollaboratorCount > 0) {
+        requiresDialogExtraction = true;
     }
+
+    const enrichmentSeed = collaborators.length > 0
+        ? collaborators.slice(0, Math.min(collaborators.length, 2))
+        : partialCollaboratorsForEnrichment;
+
+    cacheResultAndMaybeEnrich({
+        triggerEnrichment: requiresDialogExtraction && Boolean(card || element),
+        expectedCountHint: expectedCollaboratorCount,
+        partialCollaborators: enrichmentSeed,
+        videoIdHint: card ? ensureVideoIdForCard(card) : '',
+        videoCardRef: card
+    });
 
     return collaborators;
 }
@@ -3167,7 +3454,15 @@ function handleMainWorldMessages(event) {
         }
 
         if (videoId && Array.isArray(collaborators) && collaborators.length > 0) {
-            applyResolvedCollaborators(videoId, collaborators);
+            const expectedAttr = document.querySelector(`[data-filtertube-video-id="${videoId}"]`)?.getAttribute('data-filtertube-expected-collaborators') || '';
+            const expectedCount = Math.max(
+                parseInt(expectedAttr || '0', 10) || 0,
+                collaborators.length
+            );
+            applyResolvedCollaborators(videoId, collaborators, {
+                expectedCount,
+                force: true
+            });
         }
     }
 }
@@ -3252,6 +3547,30 @@ async function initializeDOMFallback(settings) {
                 scheduleImmediateFallback();
             }, { once: true });
         }
+    }
+}
+
+function injectCollaboratorPlaceholderMenu(newMenuList, oldMenuList) {
+    const placeholderText = 'Fetching collaborators...';
+    const placeholderChannel = {
+        name: placeholderText,
+        handle: '',
+        id: '',
+        isCollaboration: true,
+        isPlaceholder: true,
+        allCollaborators: [{
+            name: placeholderText,
+            handle: '',
+            id: ''
+        }]
+    };
+
+    const options = { preventNativeClick: true };
+
+    if (newMenuList) {
+        injectIntoNewMenu(newMenuList, placeholderChannel, null, null, options);
+    } else if (oldMenuList) {
+        injectIntoOldMenu(oldMenuList, placeholderChannel, null, null, options);
     }
 }
 
@@ -3355,17 +3674,9 @@ function searchYtInitialDataForVideoChannel(videoId) {
                                 }
                             }
 
-                            if (collaborators.length > 1) {
-                                console.log('FilterTube: Found', collaborators.length, 'collaborating channels:', collaborators);
-                                return {
-                                    ...collaborators[0],
-                                    isCollaboration: true,
-                                    allCollaborators: collaborators
-                                };
-                            } else if (collaborators.length === 1) {
-                                // Single channel, not a collaboration
-                                console.log('FilterTube: Single channel found in showDialogCommand:', collaborators[0]);
-                                return collaborators[0];
+                            if (browseId?.startsWith('UC')) {
+                                console.log('FilterTube: Extracted UC ID from byline:', browseId);
+                                return {id: browseId, name };
                             }
                         }
                     }
@@ -4165,10 +4476,42 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
         const sourceCollaborators = (cachedResolved && cachedResolved.length > 0)
             ? cachedResolved
             : initialChannelInfo.allCollaborators || [];
-        const sanitizedCollaborators = sanitizeCollaboratorList(sourceCollaborators);
-        const expectedCollaboratorCount = initialChannelInfo.expectedCollaboratorCount ||
-            expectedFromCard ||
-            sanitizedCollaborators.length;
+        let sanitizedCollaborators = sanitizeCollaboratorList(sourceCollaborators);
+
+        const avatarStackElement = videoCard.querySelector('yt-avatar-stack-view-model');
+        let avatarStackCollaborators = [];
+        if (avatarStackElement) {
+            avatarStackCollaborators = extractCollaboratorsFromAvatarStackElement(avatarStackElement);
+            if (avatarStackCollaborators.length > 0) {
+                const mergedList = mergeCollaboratorLists(sanitizedCollaborators, avatarStackCollaborators);
+                if (getCollaboratorListQuality(mergedList) > getCollaboratorListQuality(sanitizedCollaborators)) {
+                    sanitizedCollaborators = mergedList;
+                }
+            }
+        }
+
+        if (sanitizedCollaborators.length > 0) {
+            const cachedOnCard = getCachedCollaboratorsFromCard(videoCard);
+            if (getCollaboratorListQuality(sanitizedCollaborators) > getCollaboratorListQuality(cachedOnCard)) {
+                try {
+                    videoCard.setAttribute('data-filtertube-collaborators', JSON.stringify(sanitizedCollaborators));
+                } catch (error) {
+                    console.warn('FilterTube: Failed to prime card collaborator cache:', error);
+                }
+            }
+        }
+
+        const expectedCollaboratorCount = Math.max(
+            initialChannelInfo.expectedCollaboratorCount || 0,
+            expectedFromCard,
+            sanitizedCollaborators.length,
+            avatarStackCollaborators.length
+        );
+        if (expectedCollaboratorCount > 0 &&
+            parseInt(videoCard.getAttribute('data-filtertube-expected-collaborators') || '0', 10) !== expectedCollaboratorCount) {
+            videoCard.setAttribute('data-filtertube-expected-collaborators', String(expectedCollaboratorCount));
+        }
+
         const rosterComplete = hasCompleteCollaboratorRoster(sanitizedCollaborators, expectedCollaboratorCount);
         const channelInfoForMenu = {
             ...initialChannelInfo,
@@ -4258,7 +4601,37 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
 /**
  * Inject into NEW menu structure (yt-list-view-model)
  */
-function injectIntoNewMenu(menuList, channelInfo, videoCard, collaborationMetadata = null) {
+function attachFilterTubeMenuHandlers({ menuItem, toggle, channelInfo, videoCard, injectionOptions = {} }) {
+    if (!menuItem) return;
+
+    const handleInteraction = async (event) => {
+        const isToggleTarget = toggle && (toggle === event.target || toggle.contains(event.target));
+        if (isToggleTarget) {
+            // Let the toggle's own handler run
+            return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+
+        if (injectionOptions.preventNativeClick || channelInfo?.isPlaceholder) {
+            return;
+        }
+
+        const filterAll = toggle?.classList.contains('active');
+        await handleBlockChannelClick(channelInfo, menuItem, filterAll, videoCard);
+    };
+
+    menuItem.addEventListener('click', handleInteraction, { capture: true });
+    menuItem.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            handleInteraction(event);
+        }
+    });
+}
+
+function injectIntoNewMenu(menuList, channelInfo, videoCard, collaborationMetadata = null, injectionOptions = {}) {
     // Create FilterTube menu item (NEW structure)
     const filterTubeItem = document.createElement('yt-list-item-view-model');
     filterTubeItem.className = 'yt-list-item-view-model filtertube-block-channel-item';
@@ -4337,11 +4710,12 @@ function injectIntoNewMenu(menuList, channelInfo, videoCard, collaborationMetada
     });
 
     // Menu item click handler (block channel)
-    filterTubeItem.addEventListener('click', async (e) => {
-        e.stopPropagation();
-        e.preventDefault(); // Prevent YouTube's default handler from accessing serviceEndpoint
-        const filterAll = toggle.classList.contains('active');
-        await handleBlockChannelClick(channelInfo, filterTubeItem, filterAll, videoCard);
+    attachFilterTubeMenuHandlers({
+        menuItem: filterTubeItem,
+        toggle,
+        channelInfo,
+        videoCard,
+        injectionOptions
     });
 
     // Insert at the TOP of the menu (as first child)
@@ -4351,12 +4725,14 @@ function injectIntoNewMenu(menuList, channelInfo, videoCard, collaborationMetada
     checkIfChannelBlocked(channelInfo, filterTubeItem);
 
     console.log('FilterTube: Injected NEW menu item at TOP');
+
+    return filterTubeItem;
 }
 
 /**
  * Inject into OLD menu structure (tp-yt-paper-listbox)
  */
-function injectIntoOldMenu(menuContainer, channelInfo, videoCard, collaborationMetadata = null) {
+function injectIntoOldMenu(menuContainer, channelInfo, videoCard, collaborationMetadata = null, injectionOptions = {}) {
     const menuList = menuContainer.querySelector('tp-yt-paper-listbox') || menuContainer;
 
     // Inline SVG for FilterTube logo (user-provided SVG)
@@ -4445,6 +4821,8 @@ function injectIntoOldMenu(menuContainer, channelInfo, videoCard, collaborationM
     checkIfChannelBlocked(channelInfo, filterTubeItem);
 
     console.log('FilterTube: Injected OLD menu item at TOP');
+
+    return filterTubeItem;
 }
 
 /**

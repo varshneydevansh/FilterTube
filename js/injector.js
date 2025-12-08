@@ -50,6 +50,32 @@
     // Cache for collaboration data from filter_logic.js
     var collaboratorCache = new Map(); // videoId -> collaborators array
 
+    function getCollaboratorListQuality(list) {
+        if (!Array.isArray(list) || list.length === 0) return 0;
+        return list.reduce((score, collaborator) => {
+            if (!collaborator) return score;
+            let entryScore = 10;
+            if (collaborator.name) entryScore += 1;
+            if (collaborator.handle) entryScore += 3;
+            if (collaborator.id) entryScore += 5;
+            return score + entryScore;
+        }, 0);
+    }
+
+    function cacheCollaboratorsIfBetter(videoId, collaborators = []) {
+        if (!videoId || !Array.isArray(collaborators) || collaborators.length === 0) {
+            return collaboratorCache.get(videoId) || null;
+        }
+        const incomingScore = getCollaboratorListQuality(collaborators);
+        const existing = collaboratorCache.get(videoId);
+        const existingScore = getCollaboratorListQuality(existing);
+        if (!existing || incomingScore >= existingScore) {
+            collaboratorCache.set(videoId, collaborators);
+            return collaborators;
+        }
+        return existing;
+    }
+
     // Listen for settings from content_bridge
     window.addEventListener('message', (event) => {
         if (event.source !== window || !event.data) return;
@@ -81,9 +107,13 @@
         // Handle collaboration data caching from filter_logic.js
         if (type === 'FilterTube_CacheCollaboratorInfo' && source === 'filter_logic') {
             const { videoId, collaborators } = payload;
-            if (videoId && collaborators && Array.isArray(collaborators)) {
-                collaboratorCache.set(videoId, collaborators);
-                postLog('log', `📥 Cached collaboration data for video: ${videoId}, collaborators: ${collaborators.length}`);
+            if (videoId && Array.isArray(collaborators) && collaborators.length > 0) {
+                const cached = cacheCollaboratorsIfBetter(videoId, collaborators);
+                if (cached === collaborators) {
+                    postLog('log', `📥 Cached collaboration data for video: ${videoId}, collaborators: ${collaborators.length}`);
+                } else {
+                    postLog('log', `📥 Ignored poorer collaboration cache for video: ${videoId}`);
+                }
             }
         }
 
@@ -94,10 +124,17 @@
 
             // First check cache (for dynamically loaded videos)
             let collaboratorInfo = collaboratorCache.get(videoId);
+            let collaboratorScore = getCollaboratorListQuality(collaboratorInfo);
 
-            // If not in cache, search ytInitialData (for initial page load videos)
-            if (!collaboratorInfo) {
-                collaboratorInfo = searchYtInitialDataForCollaborators(videoId);
+            // If not in cache, or ytInitialData has richer data, search ytInitialData
+            const ytInitialDataCollaborators = searchYtInitialDataForCollaborators(videoId);
+            const ytScore = getCollaboratorListQuality(ytInitialDataCollaborators);
+            if (ytScore > collaboratorScore) {
+                collaboratorInfo = cacheCollaboratorsIfBetter(videoId, ytInitialDataCollaborators);
+                collaboratorScore = ytScore;
+            } else if (!collaboratorInfo && Array.isArray(ytInitialDataCollaborators)) {
+                collaboratorInfo = cacheCollaboratorsIfBetter(videoId, ytInitialDataCollaborators);
+                collaboratorScore = ytScore;
             }
 
             // Send response back to content_bridge
@@ -106,7 +143,7 @@
                 payload: {
                     videoId,
                     requestId,
-                    collaborators: collaboratorInfo
+                    collaborators: collaboratorInfo || null
                 },
                 source: 'injector'
             }, '*');
@@ -116,132 +153,198 @@
     });
 
     /**
-     * Search ytInitialData for collaborator info for a specific video
-     * @param {string} videoId - The YouTube video ID to search for
-     * @returns {Array|null} - Array of collaborator objects or null
+     * Extract collaborators from a raw renderer/data object
+     * Works for both cached ytInitialData objects and live DOM component data
+     * @param {Object} obj
+     * @returns {Array|null}
+     */
+    function extractCollaboratorsFromDataObject(obj) {
+        if (!obj || typeof obj !== 'object') return null;
+
+        let renderer = obj;
+        if (renderer.content?.videoRenderer) {
+            renderer = renderer.content.videoRenderer;
+        } else if (renderer.richItemRenderer?.content?.videoRenderer) {
+            renderer = renderer.richItemRenderer.content.videoRenderer;
+        } else if (renderer.gridVideoRenderer) {
+            renderer = renderer.gridVideoRenderer;
+        } else if (renderer.playlistVideoRenderer) {
+            renderer = renderer.playlistVideoRenderer;
+        } else if (renderer.videoRenderer) {
+            renderer = renderer.videoRenderer;
+        } else if (renderer.data?.content?.videoRenderer) {
+            renderer = renderer.data.content.videoRenderer;
+        }
+
+        if (!renderer || typeof renderer !== 'object') return null;
+
+        const bylineText = renderer.shortBylineText || renderer.longBylineText;
+        if (bylineText?.runs) {
+            for (const run of bylineText.runs) {
+                const showDialogCommand = run.navigationEndpoint?.showDialogCommand;
+                if (!showDialogCommand) continue;
+
+                const listItems = showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems;
+                if (!Array.isArray(listItems) || listItems.length === 0) continue;
+
+                const collaborators = [];
+                for (const item of listItems) {
+                    const viewModel = item.listItemViewModel;
+                    if (!viewModel) continue;
+
+                    const title = viewModel.title?.content;
+                    const subtitle = viewModel.subtitle?.content;
+                    const browseEndpoint = viewModel.rendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint;
+
+                    const collab = { name: title };
+                    if (browseEndpoint?.canonicalBaseUrl) {
+                        const handleMatch = browseEndpoint.canonicalBaseUrl.match(/@([\w.-]+)/);
+                        if (handleMatch) {
+                            collab.handle = `@${handleMatch[1]}`;
+                        }
+                    }
+                    if (!collab.handle && subtitle) {
+                        const handleMatch = subtitle.match(/@([\w.-]+)/);
+                        if (handleMatch) {
+                            collab.handle = `@${handleMatch[1]}`;
+                        }
+                    }
+                    if (browseEndpoint?.browseId?.startsWith('UC')) {
+                        collab.id = browseEndpoint.browseId;
+                    }
+
+                    if (collab.handle || collab.id || collab.name) {
+                        collaborators.push(collab);
+                    }
+                }
+
+                if (collaborators.length > 0) {
+                    return collaborators;
+                }
+            }
+        }
+
+        const ownerRuns = renderer.ownerText?.runs || bylineText?.runs;
+        if (ownerRuns) {
+            for (const run of ownerRuns) {
+                const browseEndpoint = run.navigationEndpoint?.browseEndpoint;
+                if (!browseEndpoint) continue;
+
+                const fallback = {
+                    id: browseEndpoint.browseId,
+                    name: run.text
+                };
+                if (browseEndpoint.canonicalBaseUrl) {
+                    const handleMatch = browseEndpoint.canonicalBaseUrl.match(/@([\w.-]+)/);
+                    if (handleMatch) {
+                        fallback.handle = `@${handleMatch[1]}`;
+                    }
+                }
+
+                if (fallback.id || fallback.handle || fallback.name) {
+                    return [fallback];
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Hybrid search for collaborator info (global cache + DOM hydration)
+     * @param {string} videoId
+     * @returns {Array|null}
      */
     function searchYtInitialDataForCollaborators(videoId) {
-        if (!window.ytInitialData || !videoId) {
-            postLog('log', 'ytInitialData search skipped - no data or videoId');
+        if (!videoId) {
+            postLog('log', 'Collaborator search skipped - missing videoId');
             return null;
         }
 
-        postLog('log', 'Searching ytInitialData for video collaborators:', videoId);
+        postLog('log', `Searching collaborators for ${videoId}...`);
 
-        // Recursively search for video ID and extract collaborator info
-        function searchObject(obj, path = '') {
-            if (!obj || typeof obj !== 'object') return null;
+        let result = null;
+        if (window.ytInitialData) {
+            const visited = new WeakSet();
+            function searchObject(obj, depth = 0) {
+                if (!obj || typeof obj !== 'object' || visited.has(obj) || depth > 12) return null;
+                visited.add(obj);
 
-            // Check if this object contains our video ID
-            if (obj.videoId === videoId) {
-                postLog('log', 'Found video object at path:', path);
-
-                // Check for collaboration video (showDialogCommand in byline)
-                const bylineText = obj.shortBylineText || obj.longBylineText;
-                if (bylineText?.runs) {
-                    for (const run of bylineText.runs) {
-                        const showDialogCommand = run.navigationEndpoint?.showDialogCommand;
-                        if (showDialogCommand) {
-                            postLog('log', 'Detected COLLABORATION video via showDialogCommand');
-
-                            // Extract all collaborating channels from listItems
-                            const listItems = showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems;
-
-                            if (listItems && Array.isArray(listItems)) {
-                                const collaborators = [];
-
-                                for (const item of listItems) {
-                                    const listItemViewModel = item.listItemViewModel;
-                                    if (listItemViewModel) {
-                                        const browseEndpoint = listItemViewModel.rendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint;
-                                        const title = listItemViewModel.title?.content;
-                                        const subtitle = listItemViewModel.subtitle?.content;
-
-                                        let channelInfo = { name: title };
-
-                                        // Extract handle from canonicalBaseUrl first
-                                        if (browseEndpoint?.canonicalBaseUrl) {
-                                            const handleMatch = browseEndpoint.canonicalBaseUrl.match(/@([\w-]+)/);
-                                            if (handleMatch) {
-                                                channelInfo.handle = `@${handleMatch[1]}`;
-                                            }
-                                        }
-
-                                        // Fallback: Extract handle from subtitle (format: "‎⁨@fern-tv⁩ • ⁨42.7 lakh subscribers⁩")
-                                        if (!channelInfo.handle && subtitle) {
-                                            const handleMatch = subtitle.match(/@([\w-]+)/);
-                                            if (handleMatch) {
-                                                channelInfo.handle = `@${handleMatch[1]}`;
-                                            }
-                                        }
-
-                                        // Extract UC ID from browseId
-                                        if (browseEndpoint?.browseId?.startsWith('UC')) {
-                                            channelInfo.id = browseEndpoint.browseId;
-                                        }
-
-                                        if (channelInfo.handle || channelInfo.id || channelInfo.name) {
-                                            collaborators.push(channelInfo);
-                                            postLog('log', 'Extracted collaborator:', channelInfo);
-                                        }
-                                    }
-                                }
-
-                                if (collaborators.length > 0) {
-                                    postLog('log', `Found ${collaborators.length} collaborators for video ${videoId}`);
-                                    return collaborators;
-                                }
-                            }
-                        }
+                if (obj.videoId === videoId) {
+                    const extracted = extractCollaboratorsFromDataObject(obj);
+                    if (Array.isArray(extracted) && extracted.length > 0) {
+                        postLog('log', '✅ Found collaborators via global ytInitialData');
+                        return extracted;
                     }
                 }
 
-                // Single channel video - extract from channelThumbnailWithLinkRenderer or similar
-                if (obj.channelThumbnailSupportedRenderers?.channelThumbnailWithLinkRenderer) {
-                    const renderer = obj.channelThumbnailSupportedRenderers.channelThumbnailWithLinkRenderer;
-                    const browseEndpoint = renderer.navigationEndpoint?.browseEndpoint;
-                    if (browseEndpoint) {
-                        const channelInfo = {};
-                        if (browseEndpoint.browseId?.startsWith('UC')) {
-                            channelInfo.id = browseEndpoint.browseId;
-                        }
-                        if (browseEndpoint.canonicalBaseUrl) {
-                            const handleMatch = browseEndpoint.canonicalBaseUrl.match(/@([\w-]+)/);
-                            if (handleMatch) {
-                                channelInfo.handle = `@${handleMatch[1]}`;
-                            }
-                        }
-                        const ownerText = obj.ownerText?.runs?.[0]?.text || obj.shortBylineText?.runs?.[0]?.text;
-                        if (ownerText) {
-                            channelInfo.name = ownerText;
-                        }
-                        if (channelInfo.handle || channelInfo.id) {
-                            return [channelInfo];
-                        }
-                    }
-                }
-            }
-
-            // Recursively search arrays and objects
-            for (const key in obj) {
-                if (obj.hasOwnProperty(key)) {
+                for (const key in obj) {
+                    if (!Object.prototype.hasOwnProperty.call(obj, key)) continue;
                     const value = obj[key];
+                    if (!value || typeof value !== 'object') continue;
                     if (Array.isArray(value)) {
                         for (let i = 0; i < value.length; i++) {
-                            const result = searchObject(value[i], `${path}.${key}[${i}]`);
-                            if (result) return result;
+                            const nested = searchObject(value[i], depth + 1);
+                            if (nested) return nested;
                         }
-                    } else if (typeof value === 'object' && value !== null) {
-                        const result = searchObject(value, `${path}.${key}`);
-                        if (result) return result;
+                    } else {
+                        const nested = searchObject(value, depth + 1);
+                        if (nested) return nested;
                     }
                 }
+
+                return null;
             }
 
+            result = searchObject(window.ytInitialData);
+            if (result) {
+                return result;
+            }
+        }
+
+        postLog('log', '⚠️ Global search failed. Attempting DOM hydration…');
+        if (typeof document === 'undefined') {
+            postLog('warn', 'DOM hydration unavailable - document not defined');
             return null;
         }
 
-        return searchObject(window.ytInitialData);
+        const candidates = [];
+        const selector = `[data-filtertube-video-id="${videoId}"]`;
+        const baseElement = document.querySelector(selector);
+        if (baseElement) {
+            candidates.push(baseElement);
+            const wrapper = baseElement.closest('ytd-rich-item-renderer, ytd-grid-video-renderer, ytd-compact-video-renderer, ytd-playlist-video-renderer, ytd-video-renderer');
+            if (wrapper && wrapper !== baseElement) {
+                candidates.push(wrapper);
+            }
+        } else {
+            postLog('warn', `❌ Could not find DOM element for ${videoId}`);
+        }
+
+        const attemptExtraction = (element, label) => {
+            if (!element) return null;
+            const dataCandidates = [
+                element.data,
+                element.__data?.data,
+                element.__data?.item,
+                element.__data
+            ];
+            for (const candidate of dataCandidates) {
+                const extracted = extractCollaboratorsFromDataObject(candidate);
+                if (Array.isArray(extracted) && extracted.length > 0) {
+                    postLog('log', `✅ Hydrated collaborators from ${label} .data`);
+                    return extracted;
+                }
+            }
+            return null;
+        };
+
+        for (const element of candidates) {
+            result = attemptExtraction(element, element === baseElement ? 'element' : 'ancestor');
+            if (result) return result;
+        }
+
+        return null;
     }
 
     // Function to update seed.js settings
