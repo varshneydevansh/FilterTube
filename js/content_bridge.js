@@ -13,6 +13,298 @@ function debugLog(message, ...args) {
     // console.log(`[${debugSequence}] FilterTube (Bridge ${IS_FIREFOX_BRIDGE ? 'Fx' : 'Cr'}):`, message, ...args);
 }
 
+function registerActiveCollaborationMenu(videoId, dropdown, videoCard, state = {}) {
+    if (!videoId || !dropdown) return;
+    const context = {
+        dropdown,
+        videoCard,
+        awaitingFullRender: Boolean(state.awaitingFullRender),
+        expectedCount: state.expectedCount || 0,
+        lastSignature: state.lastSignature || '',
+        channelInfo: state.channelInfo || null,
+        groupId: state.groupId || null
+    };
+    activeCollaborationDropdowns.set(videoId, context);
+    dropdown.setAttribute('data-filtertube-collab-video-id', videoId);
+    if (context.groupId) {
+        dropdown.setAttribute('data-filtertube-collab-group-id', context.groupId);
+    } else {
+        dropdown.removeAttribute('data-filtertube-collab-group-id');
+    }
+    if (videoCard) {
+        if (context.expectedCount) {
+            videoCard.setAttribute('data-filtertube-expected-collaborators', String(context.expectedCount));
+        } else {
+            videoCard.removeAttribute('data-filtertube-expected-collaborators');
+        }
+    }
+}
+
+function unregisterActiveCollaborationMenu(videoId, dropdown) {
+    if (!videoId) return;
+    const existing = activeCollaborationDropdowns.get(videoId);
+    if (existing && (!dropdown || existing.dropdown === dropdown)) {
+        activeCollaborationDropdowns.delete(videoId);
+    }
+    if (dropdown?.getAttribute('data-filtertube-collab-video-id') === videoId) {
+        dropdown.removeAttribute('data-filtertube-collab-video-id');
+    }
+    clearFilterTubeMenuItems(dropdown);
+}
+
+function cleanupDropdownState(dropdown) {
+    if (!dropdown) return;
+    if (injectedDropdowns.has(dropdown)) {
+        injectedDropdowns.delete(dropdown);
+    }
+    const fetchData = pendingDropdownFetches.get(dropdown);
+    if (fetchData) {
+        fetchData.cancelled = true;
+        pendingDropdownFetches.delete(dropdown);
+    }
+    const trackedVideoId = dropdown.getAttribute('data-filtertube-collab-video-id');
+    if (trackedVideoId) {
+        unregisterActiveCollaborationMenu(trackedVideoId, dropdown);
+    }
+    clearMultiStepStateForDropdown(dropdown);
+}
+
+function forceCloseDropdown(dropdown) {
+    if (!dropdown) return;
+    cleanupDropdownState(dropdown);
+
+    const escapeEvent = new KeyboardEvent('keydown', {
+        key: 'Escape',
+        code: 'Escape',
+        keyCode: 27,
+        which: 27,
+        bubbles: true,
+        cancelable: true
+    });
+    dropdown.dispatchEvent(escapeEvent);
+    document.dispatchEvent(escapeEvent);
+
+    const activeElement = document.activeElement;
+    if (activeElement && dropdown.contains(activeElement)) {
+        activeElement.blur();
+    }
+
+    if (typeof dropdown.close === 'function') {
+        try {
+            dropdown.close();
+        } catch (error) {
+            console.warn('FilterTube: Failed to call dropdown.close()', error);
+        }
+    }
+
+    dropdown.style.display = 'none';
+    dropdown.setAttribute('aria-hidden', 'true');
+
+    // Click elsewhere to release focus trap
+    setTimeout(() => {
+        const ytdApp = document.querySelector('ytd-app');
+        if (ytdApp) {
+            const clickEvent = new MouseEvent('click', {
+                bubbles: true,
+                cancelable: true,
+                view: window
+            });
+            ytdApp.dispatchEvent(clickEvent);
+        }
+    }, 50);
+}
+
+function clearFilterTubeMenuItems(dropdown) {
+    if (!dropdown) return;
+    dropdown.querySelectorAll('.filtertube-block-channel-item').forEach(item => item.remove());
+}
+
+function injectCollaboratorPlaceholderMenu(newMenuList, oldMenuList, message = 'Fetching collaborators…') {
+    const blockAllMessage = 'Block All (pending…)';
+    const newStructure = Boolean(newMenuList);
+
+    const buildPlaceholderContent = (primaryText, secondaryText) => `
+        <div class="filtertube-menu-title-wrapper filtertube-menu-title-wrapper--placeholder">
+            <span class="filtertube-menu-title" role="text" style="color: rgba(226, 232, 240, 0.7);">
+                <span class="filtertube-menu-label">Block</span>
+                <span class="filtertube-menu-separator">•</span>
+                <span class="filtertube-channel-name">${escapeHtml(primaryText)}</span>
+                ${secondaryText ? `<div style="font-size:12px;color:rgba(148,163,184,0.9);margin-top:4px;">${escapeHtml(secondaryText)}</div>` : ''}
+            </span>
+        </div>
+    `;
+
+    if (newStructure) {
+        const makeItem = (primary, secondary) => {
+            const item = document.createElement('yt-list-item-view-model');
+            item.className = 'yt-list-item-view-model filtertube-block-channel-item filtertube-collab-placeholder';
+            item.setAttribute('role', 'menuitem');
+            item.setAttribute('tabindex', '-1');
+            item.style.opacity = '0.6';
+            item.style.pointerEvents = 'none';
+            item.innerHTML = `
+                <div class="yt-list-item-view-model__label filtertube-menu-item" style="padding:8px 12px;">
+                    ${buildPlaceholderContent(primary, secondary)}
+                </div>
+            `;
+            return item;
+        };
+
+        newMenuList.insertBefore(makeItem(message, 'Please wait…'), newMenuList.firstChild);
+        newMenuList.insertBefore(makeItem(blockAllMessage, 'Awaiting collaborator list'), newMenuList.firstChild.nextSibling);
+    } else if (oldMenuList) {
+        const menuList = oldMenuList.querySelector('tp-yt-paper-listbox') || oldMenuList;
+        const makeItem = (primary, secondary) => {
+            const item = document.createElement('ytd-menu-service-item-renderer');
+            item.className = 'style-scope ytd-menu-popup-renderer filtertube-block-channel-item filtertube-collab-placeholder';
+            item.setAttribute('role', 'menuitem');
+            item.setAttribute('tabindex', '-1');
+            item.style.opacity = '0.6';
+            item.style.pointerEvents = 'none';
+            item.innerHTML = `
+                <tp-yt-paper-item class="style-scope ytd-menu-service-item-renderer filtertube-menu-item" role="option" tabindex="-1">
+                    ${buildPlaceholderContent(primary, secondary)}
+                </tp-yt-paper-item>
+            `;
+            return item;
+        };
+
+        menuList.insertBefore(makeItem(message, 'Please wait…'), menuList.firstChild);
+        menuList.insertBefore(makeItem(blockAllMessage, 'Awaiting collaborator list'), menuList.firstChild.nextSibling);
+    }
+}
+
+function getMenuContainers(dropdown, existingNew, existingOld) {
+    if (existingNew || existingOld) {
+        return { newMenuList: existingNew, oldMenuList: existingOld };
+    }
+    const newMenuList = dropdown.querySelector('yt-list-view-model');
+    const oldMenuList = dropdown.querySelector(
+        'tp-yt-paper-listbox, ' +
+        'ytd-menu-popup-renderer, ' +
+        'ytd-menu-service-item-renderer, ' +
+        '#items.ytd-menu-popup-renderer, ' +
+        '#items.style-scope.ytd-menu-popup-renderer'
+    );
+    return { newMenuList, oldMenuList };
+}
+
+function renderFilterTubeMenuEntries({ dropdown, newMenuList, oldMenuList, channelInfo, videoCard, placeholder = false }) {
+    if (!dropdown) return;
+    const containers = getMenuContainers(dropdown, newMenuList, oldMenuList);
+    const targetMenu = containers.newMenuList || containers.oldMenuList;
+    if (!targetMenu) return;
+
+    clearFilterTubeMenuItems(dropdown);
+    clearMultiStepStateForDropdown(dropdown);
+
+    if (placeholder) {
+        injectCollaboratorPlaceholderMenu(containers.newMenuList, containers.oldMenuList);
+        return;
+    }
+
+    if (channelInfo.isCollaboration && channelInfo.allCollaborators && channelInfo.allCollaborators.length >= 2) {
+        const collaborators = channelInfo.allCollaborators;
+        const collaboratorCount = Math.min(collaborators.length, 6);
+        const isMultiStep = collaboratorCount >= 3;
+        const groupId = generateCollaborationGroupId();
+
+        if (containers.newMenuList) {
+            for (let i = 0; i < collaboratorCount; i++) {
+                const collaborator = collaborators[i];
+                const otherChannels = collaborators
+                    .filter((_, idx) => idx !== i)
+                    .map(c => c.handle || c.name);
+
+                injectIntoNewMenu(containers.newMenuList, collaborator, videoCard, {
+                    collaborationWith: otherChannels,
+                    collaborationGroupId: groupId,
+                    isMultiStep
+                });
+            }
+
+            injectIntoNewMenu(containers.newMenuList, {
+                name: collaboratorCount === 2 ? 'Both Channels' : `All ${collaboratorCount} Collaborators`,
+                isBlockAllOption: true,
+                allCollaborators: collaborators.slice(0, collaboratorCount),
+                collaborationGroupId: groupId,
+                isMultiStep
+            }, videoCard);
+            setupMultiStepMenu(dropdown, groupId, collaborators.slice(0, collaboratorCount));
+        } else if (containers.oldMenuList) {
+            for (let i = 0; i < collaboratorCount; i++) {
+                const collaborator = collaborators[i];
+                const otherChannels = collaborators
+                    .filter((_, idx) => idx !== i)
+                    .map(c => c.handle || c.name);
+
+                injectIntoOldMenu(containers.oldMenuList, collaborator, videoCard, {
+                    collaborationWith: otherChannels,
+                    collaborationGroupId: groupId,
+                    isMultiStep
+                });
+            }
+
+            injectIntoOldMenu(containers.oldMenuList, {
+                name: collaboratorCount === 2 ? 'Both Channels' : `All ${collaboratorCount} Collaborators`,
+                isBlockAllOption: true,
+                allCollaborators: collaborators.slice(0, collaboratorCount),
+                collaborationGroupId: groupId,
+                isMultiStep
+            }, videoCard);
+            setupMultiStepMenu(dropdown, groupId, collaborators.slice(0, collaboratorCount));
+        }
+        return;
+    }
+
+    if (containers.newMenuList) {
+        injectIntoNewMenu(containers.newMenuList, channelInfo, videoCard);
+    } else if (containers.oldMenuList) {
+        injectIntoOldMenu(containers.oldMenuList, channelInfo, videoCard);
+    }
+}
+
+function refreshActiveCollaborationMenu(videoId, collaborators, options = {}) {
+    if (!videoId) return;
+    const context = activeCollaborationDropdowns.get(videoId);
+    if (!context) return;
+    if (!context.dropdown?.isConnected) {
+        activeCollaborationDropdowns.delete(videoId);
+        return;
+    }
+
+    const sanitized = sanitizeCollaboratorList(collaborators);
+    if (sanitized.length === 0) return;
+
+    const signature = buildCollaboratorSignature(sanitized);
+    const expectedCount = options.expectedCount || context.expectedCount || 0;
+    const rosterComplete = hasCompleteCollaboratorRoster(sanitized, expectedCount);
+
+    if (signature && signature === context.lastSignature && rosterComplete && !context.awaitingFullRender) {
+        return;
+    }
+
+    const channelInfo = {
+        ...(context.channelInfo || {}),
+        isCollaboration: true,
+        allCollaborators: sanitized,
+        needsEnrichment: false,
+        expectedCollaboratorCount: expectedCount
+    };
+
+    renderFilterTubeMenuEntries({
+        dropdown: context.dropdown,
+        channelInfo,
+        videoCard: context.videoCard,
+        placeholder: false
+    });
+
+    context.lastSignature = signature;
+    context.awaitingFullRender = !rosterComplete;
+    context.expectedCount = expectedCount;
+    context.channelInfo = channelInfo;
+}
+
 // ==========================================
 // ACTIVE RESOLVER - Fetches UC ID for @handles
 // ==========================================
@@ -75,6 +367,32 @@ let statsCountToday = 0;
 let statsTotalSeconds = 0; // Track total seconds saved instead of using multiplier
 let statsLastDate = new Date().toDateString();
 let statsInitialized = false;
+
+const VIDEO_CARD_SELECTORS = [
+    'ytd-rich-item-renderer',
+    'ytd-rich-grid-media',
+    'ytd-video-renderer',
+    'ytd-grid-video-renderer',
+    'ytd-compact-video-renderer',
+    'ytd-reel-item-renderer',
+    'ytd-playlist-renderer',
+    'ytd-radio-renderer',
+    'yt-lockup-view-model',
+    'yt-lockup-metadata-view-model',
+    'ytd-channel-renderer',
+    'ytd-grid-channel-renderer',
+    'ytd-universal-watch-card-renderer',
+    'ytd-channel-video-player-renderer',
+    'ytd-channel-featured-content-renderer'
+].join(', ');
+let collabTriggerListenersAttached = false;
+
+function ensureCollabTriggerListeners() {
+    if (collabTriggerListenersAttached) return;
+    collabTriggerListenersAttached = true;
+    document.addEventListener('click', handlePotentialCollabTrigger, true);
+    document.addEventListener('keydown', handlePotentialCollabTriggerKeydown, true);
+}
 
 // ==========================================
 // HIDE/RESTORE TRACKING FOR DEBUGGING
@@ -152,6 +470,669 @@ function generateCollaborationGroupId() {
         const v = c === 'x' ? r : (r & 0x3 | 0x8);
         return v.toString(16);
     });
+}
+
+// ==========================
+// COLLABORATION DIALOG STATE
+// ==========================
+
+const COLLAB_MULTI_MORE_PATTERN = /\band\s+\d+\s+more\b/i;
+const COLLAB_DIALOG_TITLE_PATTERN = /collaborator/i;
+const COLLAB_MORE_TOKEN_PATTERN = /^\d+\s+more$/i;
+const COLLAB_PLACEHOLDER_NAME_PATTERN = /^(?:and\s+|block\s+)?\d+\s+more(?:\s+(?:collaborators?|channels?))?$/i;
+const pendingCollabCards = new Map(); // key -> entry
+let pendingCollabDialogTrigger = null;
+let pendingCollabDialogTriggerTimeoutId = null;
+let collabDialogObserver = null;
+let collabDialogObserverInitialized = false;
+let pendingCollaboratorRefresh = false;
+const activeCollaborationDropdowns = new Map();
+const resolvedCollaboratorsByVideoId = new Map();
+const multiStepSelectionState = new Map();
+const dropdownCleanupTimers = new WeakMap();
+
+function scheduleDropdownCleanup(dropdown, delay = 250) {
+    if (!dropdown) return;
+    if (dropdownCleanupTimers.has(dropdown)) return;
+    const timerId = setTimeout(() => {
+        dropdownCleanupTimers.delete(dropdown);
+        const isHidden = dropdown.getAttribute('aria-hidden') === 'true' ||
+            dropdown.style.display === 'none' ||
+            !dropdown.isConnected;
+        if (isHidden) {
+            cleanupDropdownState(dropdown);
+        }
+    }, delay);
+    dropdownCleanupTimers.set(dropdown, timerId);
+}
+
+function cancelDropdownCleanup(dropdown) {
+    if (!dropdown) return;
+    const timerId = dropdownCleanupTimers.get(dropdown);
+    if (timerId) {
+        clearTimeout(timerId);
+        dropdownCleanupTimers.delete(dropdown);
+    }
+}
+
+function getCollaboratorKey(channelInfo) {
+    if (!channelInfo) return '';
+    const value = channelInfo.id || channelInfo.handle || channelInfo.name || '';
+    return value.trim().toLowerCase();
+}
+
+function clearMultiStepStateForDropdown(dropdown) {
+    if (!dropdown) return;
+    for (const [groupId, state] of multiStepSelectionState.entries()) {
+        if (state.dropdown === dropdown) {
+            multiStepSelectionState.delete(groupId);
+        }
+    }
+}
+
+function updateMultiStepActionLabel(state) {
+    if (!state || !state.blockAllItem) return;
+    const selectedCount = state.selected?.size || 0;
+    const label = state.blockAllItem.querySelector('.filtertube-menu-label');
+    const channelName = state.blockAllItem.querySelector('.filtertube-channel-name');
+    if (selectedCount > 0) {
+        if (label) label.textContent = 'Done';
+        if (channelName) channelName.textContent = `Block ${selectedCount}`;
+        state.blockAllItem.setAttribute('data-is-done-button', 'true');
+        state.blockAllItem.classList.add('filtertube-multistep-ready');
+    } else {
+        if (label) label.textContent = state.defaultLabel || 'Block';
+        if (channelName) {
+            channelName.textContent = state.defaultChannelName ||
+                `All ${state.total || 0} Collaborators`;
+        }
+        state.blockAllItem.removeAttribute('data-is-done-button');
+        state.blockAllItem.classList.remove('filtertube-multistep-ready');
+    }
+}
+
+function refreshMultiStepSelections(groupId) {
+    const state = multiStepSelectionState.get(groupId);
+    if (!state || !state.dropdown) return;
+    if (!state.selected) state.selected = new Set();
+    state.selected.clear();
+    const collaboratorItems = state.dropdown.querySelectorAll(`.filtertube-block-channel-item[data-collaboration-group-id="${groupId}"]:not([data-is-block-all="true"])`);
+    collaboratorItems.forEach(item => {
+        const key = item.getAttribute('data-collab-key');
+        if (!key) return;
+        if (item.classList.contains('filtertube-blocked') || item.classList.contains('filtertube-collab-selected')) {
+            state.selected.add(key);
+            item.classList.add('filtertube-collab-selected');
+        } else {
+            item.classList.remove('filtertube-collab-selected');
+        }
+    });
+    updateMultiStepActionLabel(state);
+}
+
+function setupMultiStepMenu(dropdown, groupId, collaborators = []) {
+    if (!dropdown || !groupId) return;
+    clearMultiStepStateForDropdown(dropdown);
+    const blockAllItem = dropdown.querySelector(`.filtertube-block-channel-item[data-is-block-all="true"][data-collaboration-group-id="${groupId}"]`);
+    const state = {
+        groupId,
+        dropdown,
+        total: collaborators.length,
+        selected: new Set(),
+        blockAllItem,
+        defaultLabel: blockAllItem?.querySelector('.filtertube-menu-label')?.textContent || 'Block',
+        defaultChannelName: blockAllItem?.querySelector('.filtertube-channel-name')?.textContent ||
+            `All ${collaborators.length} Collaborators`
+    };
+    multiStepSelectionState.set(groupId, state);
+    updateMultiStepActionLabel(state);
+    requestAnimationFrame(() => refreshMultiStepSelections(groupId));
+}
+
+function markMultiStepSelection(groupId, channelInfo, menuItem) {
+    if (!groupId) return;
+    const state = multiStepSelectionState.get(groupId);
+    if (!state) return;
+    const key = getCollaboratorKey(channelInfo);
+    if (!key) return;
+
+    if (!menuItem && state.dropdown) {
+        const items = state.dropdown.querySelectorAll(`.filtertube-block-channel-item[data-collaboration-group-id="${groupId}"]`);
+        menuItem = Array.from(items).find(item => item.getAttribute('data-collab-key') === key);
+    }
+
+    if (menuItem) {
+        menuItem.classList.add('filtertube-collab-selected');
+    }
+
+    if (!state.selected) {
+        state.selected = new Set();
+    }
+    state.selected.add(key);
+    updateMultiStepActionLabel(state);
+}
+
+function scheduleCollaboratorRefresh() {
+    if (pendingCollaboratorRefresh) return;
+    pendingCollaboratorRefresh = true;
+    requestAnimationFrame(() => {
+        pendingCollaboratorRefresh = false;
+        applyDOMFallback(null, { preserveScroll: true, forceReprocess: true });
+    });
+}
+
+function normalizeHandleValue(handle) {
+    if (!handle) return '';
+    let normalized = handle.trim();
+    if (!normalized) return '';
+    // Strip any leading @ characters
+    normalized = normalized.replace(/^@+/, '');
+    // Remove everything after the first slash (handles embedded in URLs like "channel/@foo/videos")
+    normalized = normalized.split('/')[0];
+    // Collapse whitespace (unlikely but safe)
+    normalized = normalized.replace(/\s+/g, '');
+    if (!normalized) return '';
+    return `@${normalized.toLowerCase()}`;
+}
+
+function isPlaceholderCollaboratorEntry(collaborator) {
+    if (!collaborator || typeof collaborator !== 'object') return true;
+    if (collaborator.id && collaborator.id.startsWith('UC')) return false;
+    const label = (collaborator.handle || collaborator.name || '').trim();
+    if (!label) return false;
+    const normalized = label.replace(/^@+/, '').toLowerCase();
+    return COLLAB_PLACEHOLDER_NAME_PATTERN.test(normalized);
+}
+
+function sanitizeCollaboratorList(collaborators = []) {
+    if (!Array.isArray(collaborators)) return [];
+    const sanitized = [];
+    const seenKeys = new Set();
+
+    collaborators.forEach(collab => {
+        if (!collab || typeof collab !== 'object') return;
+        const normalized = {
+            name: (collab.name || '').trim(),
+            handle: normalizeHandleValue(collab.handle),
+            id: typeof collab.id === 'string' ? collab.id.trim() : ''
+        };
+
+        if (!normalized.name && !normalized.handle && !normalized.id) return;
+        if (isPlaceholderCollaboratorEntry(normalized)) return;
+
+        const key = (normalized.id || normalized.handle || normalized.name.toLowerCase());
+        if (!key || seenKeys.has(key)) return;
+        seenKeys.add(key);
+        sanitized.push(normalized);
+    });
+
+    return sanitized;
+}
+
+function getCachedCollaboratorsFromCard(card) {
+    if (!card || typeof card.getAttribute !== 'function') return [];
+    const cached = card.getAttribute('data-filtertube-collaborators');
+    if (!cached) return [];
+    try {
+        const parsed = JSON.parse(cached);
+        return sanitizeCollaboratorList(parsed);
+    } catch (error) {
+        console.warn('FilterTube: Failed to parse cached collaborators from card:', error);
+        return [];
+    }
+}
+
+function buildCollaboratorSignature(collaborators = []) {
+    if (!Array.isArray(collaborators) || collaborators.length === 0) return '';
+    return collaborators
+        .map(collab => (collab.id || collab.handle || collab.name || '').toLowerCase())
+        .filter(Boolean)
+        .join('|');
+}
+
+function hasCompleteCollaboratorRoster(collaborators = [], expectedCount = 0) {
+    if (!Array.isArray(collaborators) || collaborators.length === 0) return false;
+    const identifiersReady = collaborators.every(collab => Boolean(collab?.id || collab?.handle));
+    const meetsExpected = !expectedCount || collaborators.length >= expectedCount;
+    return identifiersReady && meetsExpected;
+}
+
+function parseCollaboratorNames(rawText = '') {
+    if (!rawText || typeof rawText !== 'string') {
+        return { names: [], hasHiddenCollaborators: false, hiddenCount: 0 };
+    }
+
+    const tokens = rawText.split(/\s+(?:and|&)\s+/i);
+    const names = [];
+    let hasHidden = COLLAB_MULTI_MORE_PATTERN.test(rawText);
+    let hiddenCount = 0;
+
+    tokens.forEach(token => {
+        if (!token) return;
+        const cleaned = token.replace(/^[\s,]+|[\s,]+$/g, '').trim();
+        if (!cleaned) return;
+        const lower = cleaned.toLowerCase();
+        if (lower === 'and') return;
+        if (COLLAB_MORE_TOKEN_PATTERN.test(lower) || lower.endsWith(' more') || lower.startsWith('more ')) {
+            hasHidden = true;
+            const countMatch = lower.match(/(\d+)\s+more/);
+            if (countMatch) {
+                const parsedCount = parseInt(countMatch[1], 10);
+                if (!isNaN(parsedCount)) {
+                    hiddenCount += parsedCount;
+                }
+            } else {
+                hiddenCount += 1;
+            }
+            return;
+        }
+        names.push(cleaned);
+    });
+
+    return { names, hasHiddenCollaborators: hasHidden, hiddenCount };
+}
+
+function ensureVideoIdForCard(card) {
+    if (!card || typeof card.getAttribute !== 'function') return '';
+    let videoId = card.getAttribute('data-filtertube-video-id');
+    if (videoId) return videoId;
+    videoId = extractVideoIdFromCard(card);
+    if (videoId) {
+        card.setAttribute('data-filtertube-video-id', videoId);
+    }
+    return videoId;
+}
+
+function getCardTitle(card) {
+    if (!card || typeof card.querySelector !== 'function') return '';
+    const titleElement = card.querySelector('#video-title, .yt-lockup-metadata-view-model__title, .yt-lockup-metadata-view-model__heading-reset, h3 a, yt-formatted-string#title, span#title');
+    if (titleElement?.textContent?.trim()) {
+        return titleElement.textContent.trim();
+    }
+    const ariaLabel = card.getAttribute?.('aria-label');
+    if (ariaLabel) return ariaLabel.trim();
+    const labelledById = card.getAttribute?.('aria-labelledby');
+    if (labelledById) {
+        const labelSource = document.getElementById(labelledById.trim());
+        if (labelSource?.textContent) {
+            return labelSource.textContent.trim();
+        }
+    }
+    return '';
+}
+
+function findVideoCardElement(element) {
+    if (!element || !(element instanceof Element)) return null;
+    if (element.matches(VIDEO_CARD_SELECTORS)) return element;
+    return element.closest(VIDEO_CARD_SELECTORS) || element;
+}
+
+function generateCollabEntryKey(card, videoId) {
+    if (videoId) return `vid:${videoId}`;
+    const existing = card.getAttribute('data-filtertube-collab-key');
+    if (existing) return existing;
+    const derived = card.getAttribute('data-filtertube-unique-id') ||
+        card.dataset?.filtertubeUniqueId ||
+        `card-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    card.setAttribute('data-filtertube-collab-key', derived);
+    return derived;
+}
+
+function markCardForDialogEnrichment(element, videoId, partialCollaborators = []) {
+    const card = findVideoCardElement(element);
+    if (!card) return;
+    if (card.getAttribute('data-filtertube-collab-state') === 'resolved') {
+        return;
+    }
+
+    const key = generateCollabEntryKey(card, videoId);
+    if (pendingCollabCards.has(key)) {
+        const existing = pendingCollabCards.get(key);
+        if (partialCollaborators?.length) {
+            existing.partialCollaborators = partialCollaborators;
+        }
+        if (!existing.expectedCollaboratorCount) {
+            existing.expectedCollaboratorCount = parseInt(card.getAttribute('data-filtertube-expected-collaborators') || '0', 10) || 0;
+        }
+        return;
+    }
+
+    card.setAttribute('data-filtertube-collab-awaiting-dialog', 'true');
+    card.setAttribute('data-filtertube-collab-state', 'pending');
+    if (videoId) {
+        card.setAttribute('data-filtertube-video-id', videoId);
+    }
+    ensureCollabTriggerListeners();
+
+    const entry = {
+        key,
+        card,
+        videoId,
+        partialCollaborators: partialCollaborators || [],
+        timestamp: Date.now(),
+        expiryTimeout: null,
+        expectedCollaboratorCount: parseInt(card.getAttribute('data-filtertube-expected-collaborators') || '0', 10) || 0
+    };
+
+    entry.expiryTimeout = setTimeout(() => {
+        if (!pendingCollabCards.has(key)) return;
+        const tracked = pendingCollabCards.get(key);
+        if (tracked !== entry) return;
+        pendingCollabCards.delete(key);
+        card.removeAttribute('data-filtertube-collab-awaiting-dialog');
+        card.removeAttribute('data-filtertube-collab-state');
+    }, 20000);
+
+    pendingCollabCards.set(key, entry);
+    ensureCollabDialogObserver();
+}
+
+function requestCollaboratorEnrichment(element, videoId, partialCollaborators = []) {
+    if (!element) return;
+    markCardForDialogEnrichment(element, videoId, partialCollaborators);
+
+    if (!videoId) return;
+    const existingState = element.getAttribute('data-filtertube-collab-requested');
+    if (existingState && existingState.includes('mainworld')) return;
+
+    element.setAttribute('data-filtertube-collab-requested', 'mainworld');
+
+    requestCollaboratorInfoFromMainWorld(videoId)
+        .then(collaborators => {
+            if (Array.isArray(collaborators) && collaborators.length > 0) {
+                const videoCard = findVideoCardElement(element);
+                const expectedCount = parseInt(videoCard?.getAttribute('data-filtertube-expected-collaborators') || '0', 10) ||
+                    parseInt(element.getAttribute?.('data-filtertube-expected-collaborators') || '0', 10) ||
+                    collaborators.length;
+                applyResolvedCollaborators(videoId, collaborators, {
+                    expectedCount,
+                    sourceCard: videoCard
+                });
+            }
+        })
+        .catch(error => {
+            console.warn('FilterTube: Collaborator enrichment request failed:', error);
+        });
+}
+
+function ensureCollabDialogObserver() {
+    if (collabDialogObserverInitialized) return;
+    collabDialogObserverInitialized = true;
+    collabDialogObserver = new MutationObserver(mutations => {
+        for (const mutation of mutations) {
+            mutation.addedNodes?.forEach(node => {
+                if (!(node instanceof HTMLElement)) return;
+                if (node.matches('tp-yt-paper-dialog')) {
+                    handleCollaborationDialog(node);
+                } else {
+                    const dialog = node.querySelector?.('tp-yt-paper-dialog');
+                    if (dialog) {
+                        handleCollaborationDialog(dialog);
+                    }
+                }
+            });
+        }
+    });
+
+    collabDialogObserver.observe(document.documentElement || document.body, {
+        childList: true,
+        subtree: true
+    });
+}
+
+function resolveCollabEntryForDialog(collaborators) {
+    if (pendingCollabDialogTrigger) {
+        const triggeredEntry = pendingCollabCards.get(pendingCollabDialogTrigger.key);
+        if (triggeredEntry) {
+            return triggeredEntry;
+        }
+    }
+
+    if (!collaborators || collaborators.length === 0) return null;
+    const primary = collaborators[0];
+    const primaryHandle = primary.handle?.toLowerCase();
+    const primaryName = primary.name?.toLowerCase();
+
+    for (const entry of pendingCollabCards.values()) {
+        if (!entry?.card?.isConnected) continue;
+        const partialMatches = entry.partialCollaborators || [];
+        const hasMatch = partialMatches.some(partial => {
+            const partialHandle = partial.handle?.toLowerCase();
+            const partialName = partial.name?.toLowerCase();
+            return (primaryHandle && partialHandle && partialHandle === primaryHandle) ||
+                (primaryName && partialName && partialName === primaryName);
+        });
+        if (hasMatch) return entry;
+    }
+
+    return null;
+}
+
+function applyCollaboratorsToCard(entry, collaborators) {
+    if (!entry || !entry.card || !collaborators || collaborators.length === 0) return;
+
+    const sanitizedCollaborators = sanitizeCollaboratorList(collaborators);
+    if (sanitizedCollaborators.length === 0) {
+        console.warn('FilterTube: No valid collaborators after sanitization.');
+        return;
+    }
+
+    let serializedCollaborators = '';
+    try {
+        serializedCollaborators = JSON.stringify(sanitizedCollaborators);
+        entry.card.setAttribute('data-filtertube-collaborators', serializedCollaborators);
+    } catch (error) {
+        console.warn('FilterTube: Failed to cache dialog collaborator metadata:', error);
+    }
+
+    entry.card.removeAttribute('data-filtertube-collab-awaiting-dialog');
+    entry.card.setAttribute('data-filtertube-collab-state', 'resolved');
+    if (entry.videoId) {
+        entry.card.setAttribute('data-filtertube-video-id', entry.videoId);
+        propagateCollaboratorsToMatchingCards(entry.videoId, serializedCollaborators, entry.card);
+        resolvedCollaboratorsByVideoId.set(entry.videoId, sanitizedCollaborators);
+        refreshActiveCollaborationMenu(entry.videoId, sanitizedCollaborators, {
+            expectedCount: entry.expectedCollaboratorCount
+        });
+    }
+    entry.card.removeAttribute('data-filtertube-collab-requested');
+
+    if (entry.expiryTimeout) {
+        clearTimeout(entry.expiryTimeout);
+        entry.expiryTimeout = null;
+    }
+
+    pendingCollabCards.delete(entry.key);
+    pendingCollabDialogTrigger = null;
+    scheduleCollaboratorRefresh();
+}
+
+function propagateCollaboratorsToMatchingCards(videoId, serializedCollaborators, sourceCard) {
+    if (!videoId || !serializedCollaborators) return;
+    const cards = document.querySelectorAll(`[data-filtertube-video-id="${videoId}"]`);
+    cards.forEach(card => {
+        if (card === sourceCard) return;
+        card.setAttribute('data-filtertube-collaborators', serializedCollaborators);
+        card.setAttribute('data-filtertube-collab-state', 'resolved');
+        card.removeAttribute('data-filtertube-collab-awaiting-dialog');
+        card.removeAttribute('data-filtertube-collab-requested');
+    });
+}
+
+function applyResolvedCollaborators(videoId, collaborators, options = {}) {
+    if (!videoId || !Array.isArray(collaborators) || collaborators.length === 0) return false;
+    const sanitized = sanitizeCollaboratorList(collaborators);
+    if (sanitized.length === 0) return false;
+
+    let serialized = '[]';
+    try {
+        serialized = JSON.stringify(sanitized);
+    } catch (error) {
+        console.warn('FilterTube: Failed to serialize collaborators:', error);
+    }
+
+    let updated = false;
+    const cards = document.querySelectorAll(`[data-filtertube-video-id="${videoId}"]`);
+    if (cards.length > 0) {
+        cards.forEach(card => {
+            card.setAttribute('data-filtertube-collaborators', serialized);
+            card.setAttribute('data-filtertube-collab-state', 'resolved');
+            card.removeAttribute('data-filtertube-collab-awaiting-dialog');
+            card.removeAttribute('data-filtertube-collab-requested');
+        });
+        updated = true;
+    } else if (options.sourceCard) {
+        const card = options.sourceCard;
+        card.setAttribute('data-filtertube-collaborators', serialized);
+        card.setAttribute('data-filtertube-collab-state', 'resolved');
+        card.removeAttribute('data-filtertube-collab-awaiting-dialog');
+        card.removeAttribute('data-filtertube-collab-requested');
+        updated = true;
+    }
+
+    resolvedCollaboratorsByVideoId.set(videoId, sanitized);
+
+    const expectedAttr = cards[0]?.getAttribute('data-filtertube-expected-collaborators') ||
+        options.sourceCard?.getAttribute?.('data-filtertube-expected-collaborators') ||
+        '';
+    const expectedCount = options.expectedCount ||
+        parseInt(expectedAttr || sanitized.length, 10) ||
+        sanitized.length;
+
+    refreshActiveCollaborationMenu(videoId, sanitized, {
+        expectedCount
+    });
+
+    return updated;
+}
+
+function applyCollaboratorsByVideoId(videoId, collaborators) {
+    if (!videoId || !collaborators || collaborators.length === 0) return false;
+    const key = `vid:${videoId}`;
+    let entry = pendingCollabCards.get(key);
+    if (!entry) {
+        const card = document.querySelector(`[data-filtertube-video-id="${videoId}"]`);
+        if (!card) return false;
+        entry = {
+            key,
+            card,
+            videoId,
+            partialCollaborators: [],
+            timestamp: Date.now(),
+            expiryTimeout: null
+        };
+        pendingCollabCards.set(key, entry);
+    }
+    applyCollaboratorsToCard(entry, collaborators);
+    return true;
+}
+
+function extractCollaboratorsFromDialog(dialogNode) {
+    if (!dialogNode) return [];
+    const items = dialogNode.querySelectorAll('yt-list-item-view-model');
+    const collaborators = [];
+
+    items.forEach(item => {
+        const collaborator = { name: '', handle: '', id: '' };
+        const titleNode = item.querySelector('.yt-list-item-view-model__title') ||
+            item.querySelector('a[href*="/@"]') ||
+            item.querySelector('a');
+        collaborator.name = titleNode?.textContent?.trim() ||
+            item.getAttribute('aria-label')?.split('-')?.[0]?.trim() ||
+            '';
+
+        const link = item.querySelector('a[href]');
+        const href = link?.getAttribute('href') || '';
+        if (href) {
+            const handleFromHref = extractHandleFromString(href);
+            if (handleFromHref) collaborator.handle = handleFromHref;
+            const idFromHref = extractChannelIdFromString(href);
+            if (idFromHref) collaborator.id = idFromHref;
+        }
+
+        const subtitleText = item.querySelector('.yt-list-item-view-model__subtitle')?.textContent ||
+            item.getAttribute('aria-label') ||
+            '';
+        if (!collaborator.handle) {
+            const handleFromSubtitle = extractHandleFromString(subtitleText);
+            if (handleFromSubtitle) collaborator.handle = handleFromSubtitle;
+        }
+
+        const dataSources = [
+            item.listItemViewModel,
+            item.data,
+            item.__data,
+            item.__data?.data
+        ];
+        for (const source of dataSources) {
+            if (!source) continue;
+            const identifiers = scanDataForChannelIdentifiers(source);
+            if (!collaborator.handle && identifiers.handle) collaborator.handle = identifiers.handle;
+            if (!collaborator.id && identifiers.id) collaborator.id = identifiers.id;
+            if (!collaborator.name && identifiers.name) collaborator.name = identifiers.name;
+            const titleContent = source?.title?.content;
+            if (!collaborator.name && titleContent) collaborator.name = titleContent;
+        }
+
+        if (collaborator.handle) collaborator.handle = normalizeHandleValue(collaborator.handle);
+        if (collaborator.name || collaborator.handle || collaborator.id) {
+            collaborators.push(collaborator);
+        }
+    });
+
+    return collaborators;
+}
+
+function handleCollaborationDialog(dialogNode) {
+    if (!dialogNode || !(dialogNode instanceof HTMLElement)) return;
+
+    const titleText = dialogNode.querySelector('yt-dialog-header-view-model, h2, [role="heading"]')?.textContent || '';
+    if (titleText && !COLLAB_DIALOG_TITLE_PATTERN.test(titleText)) return;
+
+    const collaborators = extractCollaboratorsFromDialog(dialogNode);
+    if (!collaborators || collaborators.length < 2) return;
+
+    const entry = resolveCollabEntryForDialog(collaborators);
+    if (!entry) return;
+
+    applyCollaboratorsToCard(entry, collaborators);
+}
+
+function queuePendingDialogTrigger(card) {
+    if (!card) return;
+    const key = card.getAttribute('data-filtertube-collab-key');
+    if (!key || !pendingCollabCards.has(key)) return;
+
+    pendingCollabDialogTrigger = { key, timestamp: Date.now() };
+    if (pendingCollabDialogTriggerTimeoutId) {
+        clearTimeout(pendingCollabDialogTriggerTimeoutId);
+    }
+    pendingCollabDialogTriggerTimeoutId = setTimeout(() => {
+        pendingCollabDialogTrigger = null;
+    }, 5000);
+}
+
+function isCollabDialogTriggerTarget(target) {
+    if (!(target instanceof Element)) return null;
+    const clickable = target.closest('yt-avatar-stack-view-model, .yt-avatar-stack-view-model, #attributed-channel-name, [aria-label*="Collaboration"]');
+    if (!clickable) return null;
+    const card = clickable.closest('[data-filtertube-collab-awaiting-dialog="true"]');
+    return card || null;
+}
+
+function handlePotentialCollabTrigger(event) {
+    const card = isCollabDialogTriggerTarget(event.target);
+    if (card) {
+        queuePendingDialogTrigger(card);
+    }
+}
+
+function handlePotentialCollabTriggerKeydown(event) {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    const card = isCollabDialogTriggerTarget(event.target);
+    if (card) {
+        queuePendingDialogTrigger(card);
+    }
 }
 
 // Initialize stats from storage
@@ -887,69 +1868,95 @@ function extractChannelMetadataFromElement(element, channelText = '', channelHre
 function extractCollaboratorMetadataFromElement(element) {
     if (!element || typeof element.getAttribute !== 'function') return [];
 
-    const cached = element.getAttribute('data-filtertube-collaborators');
-    if (cached) {
-        try {
-            const parsed = JSON.parse(cached);
-            if (Array.isArray(parsed)) {
-                return parsed;
-            }
-        } catch (err) {
-            console.warn('FilterTube: Failed to parse cached collaborator metadata:', err);
+    const card = findVideoCardElement(element);
+    if (card) {
+        const cachedCollaborators = getCachedCollaboratorsFromCard(card);
+        if (cachedCollaborators.length > 0) {
+            return cachedCollaborators;
         }
     }
 
     const collaborators = [];
+    let requiresDialogExtraction = false;
+    let partialCollaboratorsForEnrichment = [];
+    const linkScope = card || element;
+
+    /**
+     * Assign handles/IDs from anchor elements to collaborators sequentially.
+     * This matches YouTube's DOM ordering where the first name corresponds to the first anchor, etc.
+     */
+    function hydrateCollaboratorsFromLinks(targetCollaborators) {
+        if (!targetCollaborators || targetCollaborators.length === 0) return;
+        const linkSelectors = 'a[href*="/@"]:not([href*="/shorts"]):not([href*="/watch"]), a[href*="/channel/UC"], a[href*="/c/"], a[href*="/user/"]';
+        const links = linkScope?.querySelectorAll(linkSelectors) || [];
+        if (links.length === 0) return;
+
+        let linkIndex = 0;
+        targetCollaborators.forEach(collaborator => {
+            while (linkIndex < links.length) {
+                const link = links[linkIndex++];
+                if (!link) continue;
+                const href = link.getAttribute('href') || link.href || '';
+                if (!href) continue;
+
+                if (!collaborator.handle) {
+                    const handleMatch = href.match(/@([\w.-]+)/);
+                    if (handleMatch) {
+                        collaborator.handle = `@${handleMatch[1].toLowerCase()}`;
+                    }
+                }
+
+                if (!collaborator.id) {
+                    const ucMatch = href.match(/\/(UC[\w-]{22})/);
+                    if (ucMatch) {
+                        collaborator.id = ucMatch[1]; // Preserve original case
+                    }
+                }
+
+                break;
+            }
+        });
+    }
+
+    function cacheResultAndMaybeEnrich(triggerEnrichment = false) {
+        const sanitized = sanitizeCollaboratorList(collaborators);
+        collaborators.length = 0;
+        Array.prototype.push.apply(collaborators, sanitized);
+
+        if (collaborators.length > 0) {
+            try {
+                const cacheTarget = card || element;
+                cacheTarget?.setAttribute('data-filtertube-collaborators', JSON.stringify(collaborators));
+            } catch (err) {
+                console.warn('FilterTube: Failed to cache collaborator metadata:', err);
+            }
+        }
+
+        if (triggerEnrichment && (card || element)) {
+            const enrichmentTarget = card || element;
+            const videoId = ensureVideoIdForCard(enrichmentTarget);
+            partialCollaboratorsForEnrichment = collaborators.length > 0 ? collaborators.slice(0, 1) : partialCollaboratorsForEnrichment;
+            requestCollaboratorEnrichment(enrichmentTarget, videoId, partialCollaboratorsForEnrichment);
+        }
+    }
 
     // Method 1: Check for #attributed-channel-name (collaboration indicator)
     const attributedContainer = element.querySelector('#attributed-channel-name, [id="attributed-channel-name"]');
 
     if (attributedContainer) {
-        // Check for yt-text-view-model structure (newer YouTube layout)
         const ytTextViewModel = attributedContainer.querySelector('yt-text-view-model');
-
         if (ytTextViewModel) {
             const attributedString = ytTextViewModel.querySelector('.yt-core-attributed-string');
-
             if (attributedString) {
-                // Get the full text content and split by " and "
-                const fullText = attributedString.textContent || '';
-                const channelNames = fullText
-                    .split(' and ')
-                    .map(name => name.trim())
-                    .filter(name => name.length > 0 && name !== 'and');
-
-                // Create collaborator objects from channel names
-                for (const name of channelNames) {
-                    collaborators.push({ name, handle: '', id: '' });
-                }
-
-                // Try to find links for handles/IDs - look in the entire element, not just attributedContainer
-                const links = element.querySelectorAll('a[href*="/@"]:not([href*="/shorts"]):not([href*="/watch"]), a[href*="/channel/UC"]');
-                let linkIndex = 0;
-
-                for (const link of links) {
-                    if (linkIndex >= collaborators.length) break;
-
-                    const href = link.getAttribute('href') || '';
-                    if (href) {
-                        const handleMatch = href.match(/@([\w-]+)/);
-                        if (handleMatch) {
-                            collaborators[linkIndex].handle = `@${handleMatch[1].toLowerCase()}`;
-                        }
-
-                        const ucMatch = href.match(/\/(UC[\w-]{22})/);
-                        if (ucMatch) {
-                            collaborators[linkIndex].id = ucMatch[1]; // Keep original case
-                        }
-
-                        linkIndex++;
-                    }
+                const parsed = parseCollaboratorNames(attributedString.textContent || '');
+                if (parsed.names.length > 0) {
+                    parsed.names.forEach(name => collaborators.push({ name, handle: '', id: '' }));
+                    hydrateCollaboratorsFromLinks(collaborators);
+                    requiresDialogExtraction = requiresDialogExtraction || parsed.hasHiddenCollaborators;
                 }
             }
         }
 
-        // Fallback: Direct link extraction from attributedContainer
         if (collaborators.length === 0) {
             const linkSelectors = 'a[href*="/@"]:not([href*="/shorts"]):not([href*="/watch"]), a[href*="/channel/UC"], a[href*="/user/"], a[href*="/c/"]';
             const links = attributedContainer.querySelectorAll(linkSelectors);
@@ -958,14 +1965,14 @@ function extractCollaboratorMetadataFromElement(element) {
             links.forEach(link => {
                 const href = link.getAttribute('href') || link.href || '';
                 const name = link.textContent?.trim() || '';
-                const handle = (extractHandleFromString(href) || extractHandleFromString(name) || '').toLowerCase();
-                const id = extractChannelIdFromString(href) || ''; // Keep original case for channel IDs
-                const key = handle || id || name.toLowerCase();
+                const handleValue = normalizeHandleValue(extractHandleFromString(href) || extractHandleFromString(name));
+                const id = extractChannelIdFromString(href) || '';
+                const key = (handleValue || '').toLowerCase() || id || name.toLowerCase();
                 if (!key || seenKeys.has(key)) return;
 
                 collaborators.push({
                     name,
-                    handle: handle.startsWith('@') ? handle : (handle ? `@${handle}` : ''),
+                    handle: handleValue || '',
                     id
                 });
                 seenKeys.add(key);
@@ -973,54 +1980,38 @@ function extractCollaboratorMetadataFromElement(element) {
         }
     }
 
-    // Method 2: Check for " and " in channel name text (fallback for different DOM structures)
+    // Method 2: Fallback via #channel-name
     if (collaborators.length === 0) {
         const channelNameEl = element.querySelector('#channel-name, ytd-channel-name, .ytd-channel-name');
         if (channelNameEl) {
-            const channelText = channelNameEl.textContent?.trim() || '';
-            if (channelText.includes(' and ')) {
-                const channelNames = channelText
-                    .split(' and ')
-                    .map(name => name.trim())
-                    .filter(name => name.length > 0 && name !== 'and');
-
-                if (channelNames.length > 1) {
-                    // This is a collaboration - extract what we can
-                    const links = element.querySelectorAll('a[href*="/@"]:not([href*="/shorts"]):not([href*="/watch"]), a[href*="/channel/UC"]');
-                    let linkIndex = 0;
-
-                    for (const name of channelNames) {
-                        const collaborator = { name, handle: '', id: '' };
-
-                        // Try to match with a link
-                        if (linkIndex < links.length) {
-                            const link = links[linkIndex];
-                            const href = link.getAttribute('href') || '';
-                            const handleMatch = href.match(/@([\w-]+)/);
-                            if (handleMatch) {
-                                collaborator.handle = `@${handleMatch[1].toLowerCase()}`;
-                            }
-                            const ucMatch = href.match(/\/(UC[\w-]{22})/);
-                            if (ucMatch) {
-                                collaborator.id = ucMatch[1]; // Keep original case
-                            }
-                            linkIndex++;
-                        }
-
-                        collaborators.push(collaborator);
-                    }
-                }
+            const parsed = parseCollaboratorNames(channelNameEl.textContent?.trim() || '');
+            if (parsed.names.length > 1) {
+                parsed.names.forEach(name => collaborators.push({ name, handle: '', id: '' }));
+                hydrateCollaboratorsFromLinks(collaborators);
+                requiresDialogExtraction = requiresDialogExtraction || parsed.hasHiddenCollaborators;
             }
         }
     }
 
-    if (collaborators.length > 0) {
-        try {
-            element.setAttribute('data-filtertube-collaborators', JSON.stringify(collaborators));
-            console.log('FilterTube: Extracted collaborators from DOM:', collaborators);
-        } catch (err) {
-            console.warn('FilterTube: Failed to cache collaborator metadata:', err);
+    // Method 3: Avatar stack detection (if card already marked)
+    if (collaborators.length === 0 && card?.querySelector?.('yt-avatar-stack-view-model')) {
+        const title = getCardTitle(card);
+        if (title && title.includes(',')) {
+            const channelText = card.querySelector('.yt-content-metadata-view-model__metadata-text')?.textContent || '';
+            const parsed = parseCollaboratorNames(channelText);
+            if (parsed.names.length > 1) {
+                parsed.names.forEach(name => collaborators.push({ name, handle: '', id: '' }));
+                hydrateCollaboratorsFromLinks(collaborators);
+                requiresDialogExtraction = requiresDialogExtraction || parsed.hasHiddenCollaborators;
+            }
         }
+    }
+
+    if (requiresDialogExtraction && (card || element)) {
+        partialCollaboratorsForEnrichment = collaborators.length > 0 ? collaborators.slice(0, 1) : partialCollaboratorsForEnrichment;
+        cacheResultAndMaybeEnrich(true);
+    } else if (collaborators.length > 0) {
+        cacheResultAndMaybeEnrich(false);
     }
 
     return collaborators;
@@ -1396,27 +2387,9 @@ function applyDOMFallback(settings, options = {}) {
     ensureStyles();
 
     // 1. Video/Content Filtering
-    const VIDEO_SELECTORS = [
-        'ytd-video-renderer',
-        'ytd-grid-video-renderer',
-        'ytd-rich-item-renderer',
-        'ytd-compact-video-renderer',
-        'ytd-reel-item-renderer',
-        'ytd-playlist-renderer',
-        'ytd-radio-renderer',
-        'yt-lockup-view-model',
-        'yt-lockup-metadata-view-model',
-        'ytd-channel-renderer',
-        'ytd-grid-channel-renderer',
-        'ytd-rich-grid-media',
-        'ytd-universal-watch-card-renderer',
-        'ytd-channel-video-player-renderer',
-        'ytd-channel-featured-content-renderer'
-    ].join(', ');
+    const videoElements = document.querySelectorAll(VIDEO_CARD_SELECTORS);
 
-    const elements = document.querySelectorAll(VIDEO_SELECTORS);
-
-    elements.forEach(element => {
+    videoElements.forEach(element => {
         // Optimization: Skip if already processed and not forced
         if (!forceReprocess && element.hasAttribute('data-filtertube-processed')) {
             // Skip already processed elements to avoid duplicate counting
@@ -1645,18 +2618,18 @@ function applyDOMFallback(settings, options = {}) {
         const blockedChannelState = target.getAttribute('data-filtertube-blocked-state');
         const blockedTimestamp = parseInt(target.getAttribute('data-filtertube-blocked-ts') || '0', 10);
         const blockAgeMs = blockedTimestamp ? Date.now() - blockedTimestamp : Number.POSITIVE_INFINITY;
-        
+
         // If this card was blocked via 3-dot UI, honour pending/confirmed states
         if (blockedChannelId || blockedChannelHandle) {
             const isStillBlocked = effectiveSettings.filterChannels?.some(fc => {
                 if (typeof fc === 'object') {
                     return (blockedChannelId && fc.id?.toLowerCase() === blockedChannelId.toLowerCase()) ||
-                           (blockedChannelHandle && fc.handle?.toLowerCase() === blockedChannelHandle.toLowerCase());
+                        (blockedChannelHandle && fc.handle?.toLowerCase() === blockedChannelHandle.toLowerCase());
                 }
                 const normalized = (fc || '').toLowerCase();
                 return normalized === blockedChannelId?.toLowerCase() || normalized === blockedChannelHandle?.toLowerCase();
             });
-            
+
             if (isStillBlocked) {
                 // Keep it hidden - mark as confirmed so future passes don't treat it as pending
                 markElementAsBlocked(target, {
@@ -2192,6 +3165,10 @@ function handleMainWorldMessages(event) {
             console.log('FilterTube: Received collaborator info response for video:', videoId, 'collaborators:', collaborators);
             pending.resolve(collaborators);
         }
+
+        if (videoId && Array.isArray(collaborators) && collaborators.length > 0) {
+            applyResolvedCollaborators(videoId, collaborators);
+        }
     }
 }
 
@@ -2654,6 +3631,8 @@ function extractChannelFromCard(card) {
     if (!card) return null;
 
     try {
+        let expectedCollaboratorCount = 0;
+        card.removeAttribute('data-filtertube-expected-collaborators');
         // SPECIAL CASE: Detect if this is a Shorts card (compact format only)
         const isShortsCard = card.querySelector('ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2, .reel-item-endpoint');
 
@@ -2820,14 +3799,9 @@ function extractChannelFromCard(card) {
 
                 if (attributedString) {
                     const collaborators = [];
-
-                    // Get the full text content and split by " and "
-                    const fullText = attributedString.textContent || '';
-                    // Remove badge/icon content and split by " and "
-                    const channelNames = fullText
-                        .split(' and ')
-                        .map(name => name.trim())
-                        .filter(name => name.length > 0 && name !== 'and');
+                    const parsedNames = parseCollaboratorNames(attributedString.textContent || '');
+                    const channelNames = parsedNames.names;
+                    const hiddenCount = parsedNames.hiddenCount;
 
                     console.log('FilterTube: Parsed channel names from attributed string:', channelNames);
 
@@ -2862,9 +3836,15 @@ function extractChannelFromCard(card) {
                     if (collaborators.length > 0) {
                         console.log('FilterTube: Extracted collaboration channels:', collaborators);
 
+                        expectedCollaboratorCount = Math.max(expectedCollaboratorCount, channelNames.length + hiddenCount, collaborators.length);
+                        if (expectedCollaboratorCount > 0) {
+                            card.setAttribute('data-filtertube-expected-collaborators', String(expectedCollaboratorCount));
+                        }
+
                         // Check if any collaborator is missing handle/id - will need async enrichment
                         const hasMissingData = collaborators.some(c => !c.handle && !c.id);
                         const videoId = extractVideoIdFromCard(card);
+                        const needsMoreCollaborators = expectedCollaboratorCount > 0 && collaborators.length < expectedCollaboratorCount;
 
                         // Return first collaborator as primary channel with enrichment flag
                         // Store all collaborators in a special property
@@ -2872,7 +3852,8 @@ function extractChannelFromCard(card) {
                             ...collaborators[0],
                             isCollaboration: true,
                             allCollaborators: collaborators,
-                            needsEnrichment: hasMissingData,
+                            needsEnrichment: hasMissingData || needsMoreCollaborators,
+                            expectedCollaboratorCount,
                             videoId: videoId
                         };
                     }
@@ -3057,13 +4038,6 @@ function extractChannelFromCard(card) {
 async function injectFilterTubeMenuItem(dropdown, videoCard) {
     if (!dropdown || !videoCard) return;
 
-    // ALWAYS remove old FilterTube items first (prevents stale UI from previous videos)
-    const oldItems = dropdown.querySelectorAll('.filtertube-block-channel-item');
-    if (oldItems.length > 0) {
-        console.log('FilterTube: Removing', oldItems.length, 'old menu items');
-        oldItems.forEach(item => item.remove());
-    }
-
     // Extract initial channel info (synchronous from DOM)
     let initialChannelInfo = extractChannelFromCard(videoCard);
     if (!initialChannelInfo) {
@@ -3072,6 +4046,19 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
     }
 
     console.log('FilterTube: Initial channel info:', initialChannelInfo);
+
+    if (initialChannelInfo.isCollaboration) {
+        const cachedCollaborators = getCachedCollaboratorsFromCard(videoCard);
+        if (cachedCollaborators.length >= 2) {
+            console.log('FilterTube: Using cached collaborators from card for immediate render');
+            initialChannelInfo = {
+                ...initialChannelInfo,
+                allCollaborators: cachedCollaborators,
+                needsEnrichment: false,
+                expectedCollaboratorCount: parseInt(videoCard.getAttribute('data-filtertube-expected-collaborators') || cachedCollaborators.length, 10) || cachedCollaborators.length
+            };
+        }
+    }
 
     // Kick off collaborator enrichment (non-blocking) so handles/IDs stay accurate regardless of DOM ordering
     let collaboratorEnrichmentPromise = null;
@@ -3137,83 +4124,61 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
 
     // Wait for menu to be ready
     const { newMenuList, oldMenuList } = await waitForMenu();
+    if (!newMenuList && !oldMenuList) {
+        console.warn('FilterTube: Could not detect menu structure after waiting');
+        return;
+    }
 
-    // IMMEDIATELY inject menu item with initial info (instant UI feedback)
-    if (initialChannelInfo.isCollaboration && initialChannelInfo.allCollaborators && initialChannelInfo.allCollaborators.length >= 2) {
-        console.log('FilterTube: Injecting COLLABORATION menu with multiple options');
-        const collaborators = initialChannelInfo.allCollaborators;
-        const collaboratorCount = Math.min(collaborators.length, 6); // Max 6 individual channels
+    const videoId = initialChannelInfo.videoId || ensureVideoIdForCard(videoCard);
+    if (videoId && !initialChannelInfo.videoId) {
+        initialChannelInfo.videoId = videoId;
+    }
 
-        // For 3+ collaborators, use multi-step blocking (defer hide until "Done")
-        const isMultiStep = collaboratorCount >= 3;
+    const expectedFromCard = parseInt(videoCard.getAttribute('data-filtertube-expected-collaborators') || '0', 10) || 0;
+    const menuRenderOptions = {
+        dropdown,
+        newMenuList,
+        oldMenuList,
+        videoCard
+    };
 
-        if (newMenuList) {
-            // Generate UUID for this collaboration group (used if user selects "Block All")
-            const groupId = generateCollaborationGroupId();
+    if (initialChannelInfo.isCollaboration && videoId) {
+        const cachedResolved = resolvedCollaboratorsByVideoId.get(videoId);
+        const sourceCollaborators = (cachedResolved && cachedResolved.length > 0)
+            ? cachedResolved
+            : initialChannelInfo.allCollaborators || [];
+        const sanitizedCollaborators = sanitizeCollaboratorList(sourceCollaborators);
+        const expectedCollaboratorCount = initialChannelInfo.expectedCollaboratorCount ||
+            expectedFromCard ||
+            sanitizedCollaborators.length;
+        const rosterComplete = hasCompleteCollaboratorRoster(sanitizedCollaborators, expectedCollaboratorCount);
+        const channelInfoForMenu = {
+            ...initialChannelInfo,
+            allCollaborators: sanitizedCollaborators,
+            needsEnrichment: !rosterComplete
+        };
 
-            // Add individual channel options (up to 6)
-            for (let i = 0; i < collaboratorCount; i++) {
-                const collaborator = collaborators[i];
-                // collaborationWith = all OTHER channels (not including current one)
-                const otherChannels = collaborators
-                    .filter((_, idx) => idx !== i)
-                    .map(c => c.handle || c.name);
+        registerActiveCollaborationMenu(videoId, dropdown, videoCard, {
+            awaitingFullRender: !rosterComplete,
+            expectedCount: expectedCollaboratorCount,
+            lastSignature: rosterComplete ? buildCollaboratorSignature(sanitizedCollaborators) : '',
+            channelInfo: channelInfoForMenu
+        });
 
-                injectIntoNewMenu(newMenuList, collaborator, videoCard, {
-                    collaborationWith: otherChannels,
-                    collaborationGroupId: groupId,
-                    isMultiStep: isMultiStep
-                });
-            }
-
-            // Add "Block All Collaborators" option (or "Done" placeholder for multi-step)
-            injectIntoNewMenu(newMenuList, {
-                name: collaboratorCount === 2 ? 'Both Channels' : `All ${collaboratorCount} Collaborators`,
-                isBlockAllOption: true,
-                allCollaborators: collaborators.slice(0, collaboratorCount),
-                collaborationGroupId: groupId,
-                isMultiStep: isMultiStep
-            }, videoCard);
-
-        } else if (oldMenuList) {
-            // Generate UUID for this collaboration group
-            const groupId = generateCollaborationGroupId();
-
-            // Add individual channel options (up to 6)
-            for (let i = 0; i < collaboratorCount; i++) {
-                const collaborator = collaborators[i];
-                const otherChannels = collaborators
-                    .filter((_, idx) => idx !== i)
-                    .map(c => c.handle || c.name);
-
-                injectIntoOldMenu(oldMenuList, collaborator, videoCard, {
-                    collaborationWith: otherChannels,
-                    collaborationGroupId: groupId,
-                    isMultiStep: isMultiStep
-                });
-            }
-
-            // Add "Block All Collaborators" option (or "Done" placeholder for multi-step)
-            injectIntoOldMenu(oldMenuList, {
-                name: collaboratorCount === 2 ? 'Both Channels' : `All ${collaboratorCount} Collaborators`,
-                isBlockAllOption: true,
-                allCollaborators: collaborators.slice(0, collaboratorCount),
-                collaborationGroupId: groupId,
-                isMultiStep: isMultiStep
-            }, videoCard);
-        }
+        renderFilterTubeMenuEntries({
+            ...menuRenderOptions,
+            channelInfo: channelInfoForMenu,
+            placeholder: !rosterComplete
+        });
     } else {
-        // Standard single channel injection
-        if (newMenuList) {
-            console.log('FilterTube: Detected NEW menu structure - injecting immediately');
-            injectIntoNewMenu(newMenuList, initialChannelInfo, videoCard);
-        } else if (oldMenuList) {
-            console.log('FilterTube: Detected OLD menu structure - injecting immediately');
-            injectIntoOldMenu(oldMenuList, initialChannelInfo, videoCard);
-        } else {
-            console.log('FilterTube: Could not detect menu structure after waiting');
-            return;
+        if (videoId) {
+            unregisterActiveCollaborationMenu(videoId, dropdown);
         }
+        renderFilterTubeMenuEntries({
+            ...menuRenderOptions,
+            channelInfo: initialChannelInfo,
+            placeholder: false
+        });
     }
 
     // Start background fetch for complete channel info (non-blocking)
@@ -3252,6 +4217,22 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
         cancelled: false,
         initialChannelInfo: initialChannelInfo
     });
+
+    if (collaboratorEnrichmentPromise && videoId) {
+        collaboratorEnrichmentPromise
+            .then(collaborators => {
+                if (!Array.isArray(collaborators) || collaborators.length === 0) return;
+                const sanitized = sanitizeCollaboratorList(collaborators);
+                if (sanitized.length === 0) return;
+                resolvedCollaboratorsByVideoId.set(videoId, sanitized);
+                refreshActiveCollaborationMenu(videoId, sanitized, {
+                    expectedCount: initialChannelInfo.expectedCollaboratorCount || expectedFromCard || sanitized.length
+                });
+            })
+            .catch(error => {
+                console.warn('FilterTube: Collaborator enrichment promise failed:', error);
+            });
+    }
 
     console.log('FilterTube: Menu injected immediately, fetch running in background');
 }
@@ -3321,6 +4302,10 @@ function injectIntoNewMenu(menuList, channelInfo, videoCard, collaborationMetada
     }
     if (channelInfo.isMultiStep) {
         filterTubeItem.setAttribute('data-multi-step', 'true');
+    }
+    const collaboratorKeyNew = getCollaboratorKey(channelInfo);
+    if (collaboratorKeyNew && !channelInfo.isBlockAllOption) {
+        filterTubeItem.setAttribute('data-collab-key', collaboratorKeyNew);
     }
 
     // Get toggle button
@@ -3548,6 +4533,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
         menuItem.querySelector('.yt-core-attributed-string');
 
     const originalText = titleSpan ? titleSpan.textContent : '';
+    const collaborationGroupId = menuItem.getAttribute('data-collaboration-group-id') || '';
 
     // Show "Fetching..." state IMMEDIATELY for instant user feedback
     if (titleSpan) {
@@ -3710,6 +4696,12 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             console.warn('FilterTube: Background fetch failed, using initial channel info:', error);
             // Fall back to initial channelInfo passed to this function
         }
+        if (channelInfo.isBlockAllOption && channelInfo.allCollaborators) {
+            const updated = fetchData.initialChannelInfo?.allCollaborators;
+            if (updated && updated.length > channelInfo.allCollaborators.length) {
+                channelInfo.allCollaborators = updated;
+            }
+        }
     }
 
     try {
@@ -3760,24 +4752,11 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
         console.log('FilterTube: Successfully blocked channel:', channelInfo, 'filterAll:', filterAll);
 
         if (isMultiStep) {
-            // Multi-step mode: Don't hide video yet, transform "Block All" to "Done (Hide Video)"
-            console.log('FilterTube: Multi-step mode - deferring hide, updating Block All to Done');
-
-            // Find the "Block All" menu item and transform it to "Done (Hide Video)"
-            const dropdown = menuItem.closest('tp-yt-iron-dropdown, ytd-menu-popup-renderer');
-            if (dropdown) {
-                const blockAllItem = dropdown.querySelector('[data-is-block-all="true"]');
-                if (blockAllItem) {
-                    const blockAllTitle = blockAllItem.querySelector('.filtertube-menu-title') ||
-                        blockAllItem.querySelector('.yt-core-attributed-string');
-                    if (blockAllTitle && !blockAllTitle.textContent.includes('Done')) {
-                        blockAllTitle.textContent = 'Done (Hide Video)';
-                        blockAllTitle.style.color = '#10b981'; // green
-                        blockAllItem.setAttribute('data-is-done-button', 'true');
-                    }
-                }
+            if (collaborationGroupId) {
+                markMultiStepSelection(collaborationGroupId, channelInfo, menuItem);
+            } else {
+                menuItem.classList.add('filtertube-collab-selected');
             }
-
             // Don't hide video or close dropdown - let user select more channels
             return;
         }
@@ -3789,7 +4768,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
 
             // Check if this is a shorts card
             const isShorts = videoCard.tagName.toLowerCase().includes('shorts-lockup-view-model') ||
-                             videoCard.tagName.toLowerCase().includes('reel');
+                videoCard.tagName.toLowerCase().includes('reel');
 
             // For shorts, find the correct parent container to hide
             let containerToHide = videoCard;
@@ -4042,6 +5021,11 @@ function ensureFilterTubeMenuStyles() {
         background: transparent !important;
     }
 
+    .filtertube-collab-placeholder .filtertube-channel-name {
+        font-style: italic !important;
+        color: rgba(226, 232, 240, 0.7) !important;
+    }
+
     tp-yt-paper-item.filtertube-menu-item::before,
     tp-yt-paper-item.filtertube-menu-item::after,
     .filtertube-menu-item::before,
@@ -4132,6 +5116,24 @@ function ensureFilterTubeMenuStyles() {
         color: #10b981 !important;
     }
 
+    .filtertube-block-channel-item.filtertube-collab-selected:not(.filtertube-blocked) {
+        background: rgba(248, 113, 113, 0.18) !important;
+        border-left: 3px solid #dc2626 !important;
+    }
+
+    .filtertube-block-channel-item.filtertube-collab-selected:not(.filtertube-blocked) .filtertube-menu-title {
+        color: #dc2626 !important;
+    }
+
+    .filtertube-block-channel-item.filtertube-multistep-ready {
+        background: rgba(16, 185, 129, 0.12) !important;
+    }
+
+    .filtertube-block-channel-item.filtertube-multistep-ready .filtertube-menu-title {
+        color: #10b981 !important;
+        font-weight: 600 !important;
+    }
+
     html[dark="false"] .filtertube-filter-all-toggle.exact-toggle {
         background: rgba(255, 255, 255, 0.9) !important;
         border: 1px solid rgba(148, 163, 184, 0.8) !important;
@@ -4148,6 +5150,10 @@ function ensureFilterTubeMenuStyles() {
         background-color: rgba(248, 113, 113, 0.25) !important;
         color: #b91c1c !important;
         border-color: #b91c1c !important;
+    }
+
+    html[dark="false"] .filtertube-collab-placeholder .filtertube-channel-name {
+        color: rgba(30, 41, 59, 0.8) !important;
     }
     `;
 
