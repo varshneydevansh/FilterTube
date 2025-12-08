@@ -3790,6 +3790,24 @@ function extractChannelFromCard(card) {
         if (attributedChannelName) {
             console.log('FilterTube: Detected COLLABORATION video');
 
+            const cachedCollaborators = getCachedCollaboratorsFromCard(card);
+            if (cachedCollaborators.length > 0) {
+                expectedCollaboratorCount = Number(card.getAttribute('data-filtertube-expected-collaborators')) || cachedCollaborators.length;
+                const videoId = extractVideoIdFromCard(card);
+                const needsMoreCollaborators = expectedCollaboratorCount > 0 && cachedCollaborators.length < expectedCollaboratorCount;
+                const rosterIncomplete = cachedCollaborators.some(c => !c.handle && !c.id) || needsMoreCollaborators;
+
+                console.log('FilterTube: Using cached collaborators for immediate render:', cachedCollaborators);
+                return {
+                    ...cachedCollaborators[0],
+                    isCollaboration: true,
+                    allCollaborators: cachedCollaborators,
+                    needsEnrichment: rosterIncomplete,
+                    expectedCollaboratorCount,
+                    videoId
+                };
+            }
+
             // Extract all channel names and badges
             const ytTextViewModel = attributedChannelName.querySelector('yt-text-view-model');
 
