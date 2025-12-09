@@ -276,11 +276,68 @@ function refreshActiveCollaborationMenu(videoId, collaborators, options = {}) {
         return;
     }
 
-    const sanitized = sanitizeCollaboratorList(collaborators);
+    const paramList = Array.isArray(collaborators) ? collaborators : [];
+    // Use validated cache to detect stale DOM elements
+    const cardList = context.videoCard ? getValidatedCachedCollaborators(context.videoCard) : [];
+    const resolvedList = resolvedCollaboratorsByVideoId.get(videoId) || [];
+
+    const candidates = [
+        sanitizeCollaboratorList(paramList),
+        sanitizeCollaboratorList(cardList),
+        sanitizeCollaboratorList(resolvedList)
+    ].filter(list => list.length > 0);
+
+    if (candidates.length === 0) return;
+
+    let sanitized = candidates[0];
+    for (let i = 1; i < candidates.length; i++) {
+        const candidate = candidates[i];
+        if (candidate.length > sanitized.length ||
+            (candidate.length === sanitized.length &&
+                getCollaboratorListQuality(candidate) > getCollaboratorListQuality(sanitized))) {
+            sanitized = candidate;
+        }
+    }
+
+    let avatarStackCollaborators = [];
+    const avatarStackElement = context.videoCard?.querySelector('yt-avatar-stack-view-model');
+    if (avatarStackElement) {
+        avatarStackCollaborators = extractCollaboratorsFromAvatarStackElement(avatarStackElement);
+        if (avatarStackCollaborators.length > 0) {
+            const merged = mergeCollaboratorLists(sanitized, avatarStackCollaborators);
+            if (getCollaboratorListQuality(merged) > getCollaboratorListQuality(sanitized)) {
+                sanitized = merged;
+            }
+        }
+    }
+
     if (sanitized.length === 0) return;
 
+    if (context.videoCard) {
+        const cachedOnCard = getValidatedCachedCollaborators(context.videoCard);
+        if (getCollaboratorListQuality(sanitized) > getCollaboratorListQuality(cachedOnCard)) {
+            try {
+                context.videoCard.setAttribute('data-filtertube-collaborators', JSON.stringify(sanitized));
+            } catch (error) {
+                console.warn('FilterTube: Failed to update card collaborator cache during refresh:', error);
+            }
+        }
+    }
+
+    const expectedFromCard = context.videoCard
+        ? parseInt(context.videoCard.getAttribute('data-filtertube-expected-collaborators') || '0', 10) || 0
+        : 0;
+
+    const expectedCount = Math.max(
+        options.expectedCount || 0,
+        context.expectedCount || 0,
+        expectedFromCard,
+        sanitized.length,
+        avatarStackCollaborators.length,
+        context.channelInfo?.expectedCollaboratorCount || 0
+    );
+
     const signature = buildCollaboratorSignature(sanitized);
-    const expectedCount = options.expectedCount || context.expectedCount || 0;
     const rosterComplete = hasCompleteCollaboratorRoster(sanitized, expectedCount);
 
     if (signature && signature === context.lastSignature && rosterComplete && !context.awaitingFullRender) {
@@ -951,6 +1008,65 @@ function getCachedCollaboratorsFromCard(card) {
         console.warn('FilterTube: Failed to parse cached collaborators from card:', error);
         return [];
     }
+}
+
+/**
+ * Get cached collaborators ONLY if the cached video ID matches the current video displayed in the card.
+ * YouTube recycles DOM elements, so a card may have stale data-filtertube-* attributes from a previous video.
+ * This function extracts the current video ID from hrefs and validates it against the cached video ID.
+ * If there's a mismatch, it clears stale attributes and returns an empty array.
+ * @param {Element} card - The video card element
+ * @returns {Array} - Valid cached collaborators or empty array if stale
+ */
+function getValidatedCachedCollaborators(card) {
+    if (!card || typeof card.getAttribute !== 'function') return [];
+
+    // Extract the CURRENT video ID from the card's href links (source of truth)
+    const currentVideoId = extractVideoIdFromCard(card);
+    if (!currentVideoId) {
+        // Can't validate without a video ID - return cached data as-is (legacy behavior)
+        return getCachedCollaboratorsFromCard(card);
+    }
+
+    // Get the cached video ID
+    const cachedVideoId = card.getAttribute('data-filtertube-video-id');
+
+    // If no cached video ID, the data might be fresh from initial extraction
+    if (!cachedVideoId) {
+        return getCachedCollaboratorsFromCard(card);
+    }
+
+    // VALIDATION: Check if cached video ID matches current video ID
+    if (cachedVideoId !== currentVideoId) {
+        console.log(`FilterTube: Detected stale DOM element - cached videoId: ${cachedVideoId}, current videoId: ${currentVideoId}. Clearing stale attributes.`);
+
+        // Clear ALL stale FilterTube attributes - YouTube has recycled this DOM element
+        card.removeAttribute('data-filtertube-collaborators');
+        card.removeAttribute('data-filtertube-video-id');
+        card.removeAttribute('data-filtertube-expected-collaborators');
+        card.removeAttribute('data-filtertube-collab-state');
+        card.removeAttribute('data-filtertube-collab-awaiting-dialog');
+        card.removeAttribute('data-filtertube-collab-requested');
+        card.removeAttribute('data-filtertube-processed');
+        card.removeAttribute('data-filtertube-unique-id');
+        card.removeAttribute('data-filtertube-blocked-channel-id');
+        card.removeAttribute('data-filtertube-blocked-channel-handle');
+        card.removeAttribute('data-filtertube-blocked-channel-name');
+        card.removeAttribute('data-filtertube-blocked-state');
+        card.removeAttribute('data-filtertube-blocked-ts');
+        card.removeAttribute('data-filtertube-duration');
+
+        // Also clear from the global resolved map if it had stale data
+        if (resolvedCollaboratorsByVideoId.has(cachedVideoId)) {
+            // Only delete if the current video is different
+            // The stale video's data might still be valid for other cards
+        }
+
+        return [];
+    }
+
+    // Video IDs match - cached data is valid
+    return getCachedCollaboratorsFromCard(card);
 }
 
 function buildCollaboratorSignature(collaborators = []) {
@@ -2261,8 +2377,9 @@ function extractCollaboratorMetadataFromElement(element) {
     if (!element || typeof element.getAttribute !== 'function') return [];
 
     const card = findVideoCardElement(element);
+    // Use validated cache to detect stale DOM elements
     if (card) {
-        const cachedCollaborators = getCachedCollaboratorsFromCard(card);
+        const cachedCollaborators = getValidatedCachedCollaborators(card);
         if (cachedCollaborators.length > 0) {
             return cachedCollaborators;
         }
@@ -2315,7 +2432,7 @@ function extractCollaboratorMetadataFromElement(element) {
         });
     }
 
-        function cacheResultAndMaybeEnrich({
+    function cacheResultAndMaybeEnrich({
         triggerEnrichment = false,
         expectedCountHint = 0,
         partialCollaborators = [],
@@ -3860,7 +3977,7 @@ function searchYtInitialDataForVideoChannel(videoId) {
 
                             if (browseId?.startsWith('UC')) {
                                 console.log('FilterTube: Extracted UC ID from byline:', browseId);
-                                return {id: browseId, name };
+                                return { id: browseId, name };
                             }
                         }
                     }
@@ -4285,14 +4402,15 @@ function extractChannelFromCard(card) {
         if (attributedChannelName) {
             console.log('FilterTube: Detected COLLABORATION video');
 
-            const cachedCollaborators = getCachedCollaboratorsFromCard(card);
+            // Use validated cache to detect stale DOM elements (YouTube recycles DOM)
+            const cachedCollaborators = getValidatedCachedCollaborators(card);
             if (cachedCollaborators.length > 0) {
                 expectedCollaboratorCount = Number(card.getAttribute('data-filtertube-expected-collaborators')) || cachedCollaborators.length;
                 const videoId = extractVideoIdFromCard(card);
                 const needsMoreCollaborators = expectedCollaboratorCount > 0 && cachedCollaborators.length < expectedCollaboratorCount;
                 const rosterIncomplete = cachedCollaborators.some(c => !c.handle && !c.id) || needsMoreCollaborators;
 
-                console.log('FilterTube: Using cached collaborators for immediate render:', cachedCollaborators);
+                console.log('FilterTube: Using validated cached collaborators for immediate render:', cachedCollaborators);
                 return {
                     ...cachedCollaborators[0],
                     isCollaboration: true,
@@ -4608,9 +4726,10 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
     console.log('FilterTube: Initial channel info:', initialChannelInfo);
 
     if (initialChannelInfo.isCollaboration) {
-        const cachedCollaborators = getCachedCollaboratorsFromCard(videoCard);
+        // Use validated cache to prevent stale data from DOM element recycling
+        const cachedCollaborators = getValidatedCachedCollaborators(videoCard);
         if (cachedCollaborators.length >= 2) {
-            console.log('FilterTube: Using cached collaborators from card for immediate render');
+            console.log('FilterTube: Using validated cached collaborators from card for immediate render');
             initialChannelInfo = {
                 ...initialChannelInfo,
                 allCollaborators: cachedCollaborators,
@@ -4703,11 +4822,32 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
     };
 
     if (initialChannelInfo.isCollaboration && videoId) {
+        // Prefer the freshest collaborator list from the DOM (card cache/stack),
+        // only using the in-memory resolved cache when it clearly improves quality
+        // without losing collaborators.
+        const cardCollaborators = Array.isArray(initialChannelInfo.allCollaborators)
+            ? initialChannelInfo.allCollaborators
+            : [];
+
         const cachedResolved = resolvedCollaboratorsByVideoId.get(videoId);
-        const sourceCollaborators = (cachedResolved && cachedResolved.length > 0)
-            ? cachedResolved
-            : initialChannelInfo.allCollaborators || [];
-        let sanitizedCollaborators = sanitizeCollaboratorList(sourceCollaborators);
+        let sanitizedCollaborators;
+
+        if (cachedResolved && cachedResolved.length > 0) {
+            const sanitizedResolved = sanitizeCollaboratorList(cachedResolved);
+            const sanitizedCard = sanitizeCollaboratorList(cardCollaborators);
+
+            // Choose the list with MORE collaborators; if equal length, fall back
+            // to the one with higher quality score.
+            if (sanitizedResolved.length > sanitizedCard.length ||
+                (sanitizedResolved.length === sanitizedCard.length &&
+                    getCollaboratorListQuality(sanitizedResolved) > getCollaboratorListQuality(sanitizedCard))) {
+                sanitizedCollaborators = sanitizedResolved;
+            } else {
+                sanitizedCollaborators = sanitizedCard;
+            }
+        } else {
+            sanitizedCollaborators = sanitizeCollaboratorList(cardCollaborators);
+        }
 
         const avatarStackElement = videoCard.querySelector('yt-avatar-stack-view-model');
         let avatarStackCollaborators = [];
@@ -4722,7 +4862,8 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
         }
 
         if (sanitizedCollaborators.length > 0) {
-            const cachedOnCard = getCachedCollaboratorsFromCard(videoCard);
+            // Use validated cache to detect stale DOM elements
+            const cachedOnCard = getValidatedCachedCollaborators(videoCard);
             if (getCollaboratorListQuality(sanitizedCollaborators) > getCollaboratorListQuality(cachedOnCard)) {
                 try {
                     videoCard.setAttribute('data-filtertube-collaborators', JSON.stringify(sanitizedCollaborators));
@@ -5401,6 +5542,12 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                 containerToHide.setAttribute('data-filtertube-hidden', 'true');
                 console.log(`FilterTube: Applied immediate hiding to instance ${index + 1}:`, containerToHide.tagName || containerToHide.className);
             });
+
+            // After a Block All/Done operation, clear any stale collaborator cache for this video
+            const cacheVideoId = ensureVideoIdForCard(videoCard);
+            if (cacheVideoId) {
+                resolvedCollaboratorsByVideoId.delete(cacheVideoId);
+            }
         }
 
         // Close dropdown
