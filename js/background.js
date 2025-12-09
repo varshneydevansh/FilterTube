@@ -871,21 +871,63 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
 
         const channels = Array.isArray(storage.filterChannels) ? storage.filterChannels : [];
 
-        // Check if already exists
-        const exists = channels.some(ch =>
-            ch.id === channelInfo.id || ch.handle === channelInfo.handle
-        );
-
-        if (exists) {
-            return { success: false, error: 'Channel already blocked' };
-        }
-
-        // Add new channel
         // Build allCollaborators array from collaborationWith for popup grouping
         const allCollaborators = collaborationWith && collaborationWith.length > 0
             ? [{ handle: channelInfo.handle, name: channelInfo.name }, ...collaborationWith.map(h => ({ handle: h }))]
             : [];
-        
+
+        // Check if channel already exists; if so, upgrade instead of rejecting
+        const existingIndex = channels.findIndex(ch =>
+            ch && (ch.id === channelInfo.id || ch.handle === channelInfo.handle)
+        );
+
+        if (existingIndex !== -1) {
+            const existing = channels[existingIndex] || {};
+            const updated = {
+                ...existing,
+                // Ensure core identity fields are populated
+                id: existing.id || channelInfo.id,
+                handle: existing.handle || channelInfo.handle,
+                name: existing.name || channelInfo.name,
+                logo: existing.logo || channelInfo.logo
+            };
+
+            // Upgrade Filter All: once true, it stays true unless user turns it off in UI
+            if (filterAll && !existing.filterAll) {
+                updated.filterAll = true;
+            }
+
+            // Merge collaboration metadata when provided
+            if (Array.isArray(collaborationWith) && collaborationWith.length > 0) {
+                const existingWith = Array.isArray(existing.collaborationWith) ? existing.collaborationWith : [];
+                const mergedWith = [...new Set([...existingWith, ...collaborationWith])];
+                updated.collaborationWith = mergedWith;
+
+                // Rebuild allCollaborators snapshot for UI grouping
+                updated.allCollaborators = allCollaborators;
+            }
+
+            if (collaborationGroupId) {
+                updated.collaborationGroupId = collaborationGroupId;
+            }
+
+            channels[existingIndex] = updated;
+
+            // Save to storage
+            await new Promise(resolve => {
+                browserAPI.storage.local.set({ filterChannels: channels }, resolve);
+            });
+
+            console.log('FilterTube Background: Updated existing channel:', updated);
+
+            return {
+                success: true,
+                channelData: updated,
+                updated: true
+            };
+        }
+
+        // Add new channel
         const newChannel = {
             id: channelInfo.id,
             handle: channelInfo.handle,

@@ -689,7 +689,6 @@ function setupMultiStepMenu(dropdown, groupId, collaborators = [], blockAllItemR
         selected: new Set(),
         // --- FIX: Initialize state properties ---
         filterAllMap: new Map(),
-        masterFilterAll: false,
         // ---------------------------------------
         blockAllItem,
         collaborators,
@@ -4919,12 +4918,16 @@ function injectIntoNewMenu(menuList, channelInfo, videoCard, collaborationMetada
         if (collaborationMetadata.collaborationWith) {
             filterTubeItem.setAttribute('data-collaboration-with', JSON.stringify(collaborationMetadata.collaborationWith));
         }
-        if (collaborationMetadata.collaborationGroupId) {
-            filterTubeItem.setAttribute('data-collaboration-group-id', collaborationMetadata.collaborationGroupId);
-        }
         if (collaborationMetadata.isMultiStep) {
             filterTubeItem.setAttribute('data-multi-step', 'true');
         }
+    }
+
+    const collaborationGroupIdFromMeta = collaborationMetadata && collaborationMetadata.collaborationGroupId;
+    const collaborationGroupIdFromChannel = channelInfo && channelInfo.collaborationGroupId;
+    const effectiveGroupIdNew = collaborationGroupIdFromMeta || collaborationGroupIdFromChannel;
+    if (effectiveGroupIdNew) {
+        filterTubeItem.setAttribute('data-collaboration-group-id', effectiveGroupIdNew);
     }
 
     // Store isBlockAllOption flag for click handler
@@ -5190,10 +5193,16 @@ function syncBlockedElementsWithFilters(effectiveSettings) {
  * Handle click on "Block Channel" menu item
  * @param {Object} channelInfo - {id, handle, name}
  * @param {Element} menuItem - The menu item element
- * @param {boolean} filterAll - Whether to enable Filter All for this channel
+ * @param {boolean} filterAll - Hint for Filter All state (will be recomputed from DOM)
  * @param {Element} videoCard - The video card element to hide after blocking
  */
 async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false, videoCard = null) {
+    // Always derive effective Filter All state from the DOM toggle to avoid
+    // any mismatch between passed arguments and actual UI state.
+    const domToggle = menuItem?.querySelector?.('.filtertube-filter-all-toggle');
+    if (domToggle) {
+        filterAll = isFilterAllToggleActive(domToggle);
+    }
     console.log('FilterTube: Block Channel clicked', { channelInfo, filterAll });
 
     const titleSpan = menuItem.querySelector('.filtertube-menu-title') ||
@@ -5227,7 +5236,11 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
         const groupId = channelInfo.collaborationGroupId || collaborationGroupId || generateCollaborationGroupId();
         const state = multiStepSelectionState.get(groupId);
         const resolveFilterAllPreference = (collaborator) => {
-            const fallback = typeof state?.masterFilterAll === 'boolean' ? state.masterFilterAll : false;
+            // Prefer explicit per-collaborator or master state when available,
+            // otherwise fall back to the Filter All flag from the clicked menu item.
+            const fallback = typeof state?.masterFilterAll === 'boolean'
+                ? state.masterFilterAll
+                : filterAll;
             return getFilterAllPreferenceForCollaborator(collaborator, groupId, fallback);
         };
 
@@ -5320,7 +5333,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                         .map(c => c.handle || c.name);
                     const collaboratorFilterAll = resolveFilterAllPreference(collaborator);
 
-                    console.log(`FilterTube: Blocking collaborator ${i + 1}/${collaboratorCount}: ${input}`);
+                    console.log(`FilterTube: Blocking collaborator ${i + 1}/${collaboratorCount}: ${input}`, 'filterAll:', collaboratorFilterAll);
                     const result = await addChannelDirectly(input, collaboratorFilterAll, otherChannels, groupId);
                     if (result.success) {
                         successCount++;
