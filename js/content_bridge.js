@@ -5255,12 +5255,12 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                         .map(c => c.handle || c.name);
 
                     // Execute block
-                    let result = await addChannelDirectly(identifier, useFilterAll, otherChannels, null);
+                    let result = await addChannelDirectly(identifier, useFilterAll, otherChannels, groupId);
 
                     // --- FIX: Add retry logic for robustness ---
                     if (!result.success && collaborator.id && collaborator.id !== identifier) {
                         console.log(`FilterTube: Retrying block for ${collaborator.name} using ID ${collaborator.id}`);
-                        result = await addChannelDirectly(collaborator.id, useFilterAll, otherChannels, null);
+                        result = await addChannelDirectly(collaborator.id, useFilterAll, otherChannels, groupId);
                     }
                     // -------------------------------------------
 
@@ -5461,7 +5461,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             });
         };
 
-        let result = await addChannelDirectly(input, filterAll, collaborationWith);
+        let result = await addChannelDirectly(input, filterAll, collaborationWith, menuItem.getAttribute('data-collaboration-group-id'));
 
         if (!result.success && /Failed to fetch channel page: 404/i.test(result.error || '') && channelInfo.videoId) {
             console.warn('FilterTube: Initial block failed with 404. Attempting shorts fallback for', channelInfo.videoId);
@@ -5475,7 +5475,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                     if (cacheTarget) {
                         cacheTarget.setAttribute('data-filtertube-channel-handle', normalizedHandle);
                     }
-                    result = await addChannelDirectly(normalizedHandle, filterAll, collaborationWith);
+                    result = await addChannelDirectly(normalizedHandle, filterAll, collaborationWith, menuItem.getAttribute('data-collaboration-group-id'));
                 }
             }
         }
