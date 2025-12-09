@@ -5043,6 +5043,12 @@ function injectIntoOldMenu(menuContainer, channelInfo, videoCard, collaborationM
         filterTubeItem.setAttribute('data-multi-step', 'true');
     }
 
+    // Store collaborator key for multi-step state tracking (non-block-all items)
+    const collaboratorKeyOld = getCollaboratorKey(channelInfo);
+    if (collaboratorKeyOld && !channelInfo.isBlockAllOption) {
+        filterTubeItem.setAttribute('data-collab-key', collaboratorKeyOld);
+    }
+
     // Get toggle button
     const toggle = filterTubeItem.querySelector('.filtertube-filter-all-toggle');
     toggle.addEventListener('click', (e) => {
