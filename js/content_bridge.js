@@ -451,9 +451,6 @@ let filteringTracker = {
 
             if (this.restoredItems.length > 0) {
                 console.log(`%c✅ RESTORED: ${this.restoredItems.length} items`, 'color: #44FF44; font-weight: bold;');
-                this.restoredItems.forEach((item, i) => {
-                    console.log(`  ${i + 1}. "${item.title}" ${item.channel ? `[${item.channel}]` : ''}`);
-                });
             }
 
             console.log(`%c📈 Net change: ${this.hiddenItems.length - this.restoredItems.length > 0 ? '+' : ''}${this.hiddenItems.length - this.restoredItems.length} hidden`,
@@ -493,6 +490,22 @@ const activeCollaborationDropdowns = new Map();
 const resolvedCollaboratorsByVideoId = new Map();
 const multiStepSelectionState = new Map();
 const dropdownCleanupTimers = new WeakMap();
+
+function findStoredChannelEntry(channelInfo) {
+    if (!channelInfo || !currentSettings?.filterChannels) return null;
+    const channels = currentSettings.filterChannels;
+    const handle = channelInfo.handle?.toLowerCase();
+    const id = channelInfo.id?.toLowerCase();
+    for (const entry of channels) {
+        if (!entry) continue;
+        const entryHandle = entry.handle?.toLowerCase();
+        const entryId = entry.id?.toLowerCase();
+        if ((handle && entryHandle === handle) || (id && entryId === id)) {
+            return entry;
+        }
+    }
+    return null;
+}
 
 function scheduleDropdownCleanup(dropdown, delay = 250) {
     if (!dropdown) return;
@@ -544,23 +557,101 @@ function updateMultiStepActionLabel(state) {
         }
     }
     if (!state.blockAllItem) return;
-    const selectedCount = state.selected?.size || 0;
+
     const label = state.blockAllItem.querySelector('.filtertube-menu-label');
     const channelName = state.blockAllItem.querySelector('.filtertube-channel-name');
+    const titleSpan = state.blockAllItem.querySelector('.filtertube-menu-title');
+    const selectedCount = state.selected?.size || 0;
+
+    const setTitleParts = (primary, secondary) => {
+        if (label) label.textContent = primary;
+        if (channelName) channelName.textContent = secondary;
+        if (!label || !channelName) {
+            const composite = secondary ? `${primary} • ${secondary}` : primary;
+            if (titleSpan) {
+                titleSpan.textContent = composite;
+            } else {
+                state.blockAllItem.textContent = composite;
+            }
+        }
+    };
+
     if (selectedCount > 0) {
-        if (label) label.textContent = 'Done';
-        if (channelName) channelName.textContent = `Block ${selectedCount} Selected`;
+        setTitleParts('Done', `Block ${selectedCount} Selected`);
         state.blockAllItem.setAttribute('data-is-done-button', 'true');
         state.blockAllItem.classList.add('filtertube-multistep-ready');
     } else {
-        if (label) label.textContent = state.defaultLabel || 'Block';
-        if (channelName) {
-            channelName.textContent = state.defaultChannelName ||
-                `All ${state.total || 0} Collaborators`;
-        }
+        setTitleParts(state.defaultLabel || 'Block',
+            state.defaultChannelName || `All ${state.total || 0} Collaborators`);
         state.blockAllItem.removeAttribute('data-is-done-button');
         state.blockAllItem.classList.remove('filtertube-multistep-ready');
     }
+}
+
+function isFilterAllToggleActive(toggleEl) {
+    if (!toggleEl) return false;
+    if (toggleEl instanceof HTMLInputElement) {
+        return Boolean(toggleEl.checked);
+    }
+    return toggleEl.classList.contains('active');
+}
+
+function applyFilterAllStateToToggle(toggleEl, isActive = false) {
+    if (!toggleEl) return;
+    const shouldActivate = Boolean(isActive);
+    if (toggleEl instanceof HTMLInputElement) {
+        toggleEl.checked = shouldActivate;
+    }
+    toggleEl.classList.toggle('active', shouldActivate);
+}
+
+function persistFilterAllStateForMenuItem(menuItem, isActive = false) {
+    if (!menuItem) return;
+    const groupId = menuItem.getAttribute('data-collaboration-group-id');
+    if (!groupId) return;
+    const state = multiStepSelectionState.get(groupId);
+    if (!state) return;
+    if (!state.filterAllMap) {
+        state.filterAllMap = new Map();
+    }
+    const isBlockAll = menuItem.getAttribute('data-is-block-all') === 'true';
+    if (isBlockAll) {
+        state.masterFilterAll = Boolean(isActive);
+        return;
+    }
+    const key = menuItem.getAttribute('data-collab-key');
+    if (!key) return;
+    state.filterAllMap.set(key, Boolean(isActive));
+}
+
+function hydrateFilterAllToggle(menuItem, channelInfo) {
+    if (!menuItem || !channelInfo) return;
+    const toggleEl = menuItem.querySelector('.filtertube-filter-all-toggle');
+    if (!toggleEl) return;
+    const storedEntry = findStoredChannelEntry(channelInfo);
+    if (!storedEntry) return;
+    applyFilterAllStateToToggle(toggleEl, storedEntry.filterAll);
+    persistFilterAllStateForMenuItem(menuItem, storedEntry.filterAll);
+}
+
+function getFilterAllPreference(groupId, collaboratorKey, fallback = false) {
+    if (!groupId) return fallback;
+    const state = multiStepSelectionState.get(groupId);
+    if (!state) return fallback;
+    const map = state.filterAllMap;
+    if (collaboratorKey && map?.has(collaboratorKey)) {
+        return Boolean(map.get(collaboratorKey));
+    }
+    if (typeof state.masterFilterAll === 'boolean') {
+        return Boolean(state.masterFilterAll);
+    }
+    return fallback;
+}
+
+function getFilterAllPreferenceForCollaborator(collaborator, groupId, fallback = false) {
+    if (!collaborator) return fallback;
+    const key = getCollaboratorKey(collaborator);
+    return getFilterAllPreference(groupId, key, fallback);
 }
 
 function refreshMultiStepSelections(groupId) {
@@ -585,23 +676,47 @@ function refreshMultiStepSelections(groupId) {
 function setupMultiStepMenu(dropdown, groupId, collaborators = [], blockAllItemRef = null) {
     if (!dropdown || !groupId) return;
     clearMultiStepStateForDropdown(dropdown);
+
     let blockAllItem = blockAllItemRef;
     if (!blockAllItem || !blockAllItem.isConnected) {
         blockAllItem = dropdown.querySelector(`.filtertube-block-channel-item[data-is-block-all="true"][data-collaboration-group-id="${groupId}"]`);
     }
+
     const state = {
         groupId,
         dropdown,
         total: collaborators.length,
         selected: new Set(),
+        // --- FIX: Initialize state properties ---
+        filterAllMap: new Map(),
+        masterFilterAll: false,
+        // ---------------------------------------
         blockAllItem,
         collaborators,
         defaultLabel: blockAllItem?.querySelector('.filtertube-menu-label')?.textContent || 'Block',
         defaultChannelName: blockAllItem?.querySelector('.filtertube-channel-name')?.textContent ||
             `All ${collaborators.length} Collaborators`
     };
+
     multiStepSelectionState.set(groupId, state);
     updateMultiStepActionLabel(state);
+
+    if (!state.blockAllItem) {
+        requestAnimationFrame(() => {
+            const storedState = multiStepSelectionState.get(groupId);
+            if (!storedState) return;
+            if (!storedState.blockAllItem || !storedState.blockAllItem.isConnected) {
+                storedState.blockAllItem = storedState.dropdown?.querySelector(`.filtertube-block-channel-item[data-is-block-all="true"][data-collaboration-group-id="${groupId}"]`) || null;
+                if (storedState.blockAllItem) {
+                    storedState.defaultLabel = storedState.blockAllItem.querySelector('.filtertube-menu-label')?.textContent || storedState.defaultLabel || 'Block';
+                    storedState.defaultChannelName = storedState.blockAllItem.querySelector('.filtertube-channel-name')?.textContent ||
+                        storedState.defaultChannelName || `All ${storedState.total || 0} Collaborators`;
+                    updateMultiStepActionLabel(storedState);
+                }
+            }
+        });
+    }
+
     requestAnimationFrame(() => refreshMultiStepSelections(groupId));
 }
 
@@ -4744,7 +4859,7 @@ function attachFilterTubeMenuHandlers({ menuItem, toggle, channelInfo, videoCard
             return;
         }
 
-        const filterAll = toggle?.classList.contains('active');
+        const filterAll = isFilterAllToggleActive(toggle);
         await handleBlockChannelClick(channelInfo, menuItem, filterAll, videoCard);
     };
 
@@ -4826,13 +4941,20 @@ function injectIntoNewMenu(menuList, channelInfo, videoCard, collaborationMetada
 
     // Get toggle button
     const toggle = filterTubeItem.querySelector('.filtertube-filter-all-toggle');
+    if (toggle) {
+        toggle.addEventListener('click', (e) => {
+            e.stopPropagation();
 
-    // Toggle click handler (CSS handles visual feedback via .active class)
-    toggle.addEventListener('click', (e) => {
-        e.stopPropagation();
-        toggle.classList.toggle('active');
-        console.log('FilterTube: Filter All toggled:', toggle.classList.contains('active'));
-    });
+            // Update visual state and get new active state
+            const isActive = !isFilterAllToggleActive(toggle);
+            applyFilterAllStateToToggle(toggle, isActive);
+
+            // --- FIX: Persist the new state to the in-memory map ---
+            persistFilterAllStateForMenuItem(filterTubeItem, isActive);
+
+            console.log('FilterTube: Filter All toggled:', isActive);
+        });
+    }
 
     // Menu item click handler (block channel)
     attachFilterTubeMenuHandlers({
@@ -4848,7 +4970,7 @@ function injectIntoNewMenu(menuList, channelInfo, videoCard, collaborationMetada
 
     // Check if channel is already blocked and update UI accordingly
     checkIfChannelBlocked(channelInfo, filterTubeItem);
-
+    hydrateFilterAllToggle(filterTubeItem, channelInfo);
     console.log('FilterTube: Injected NEW menu item at TOP');
 
     return filterTubeItem;
@@ -4923,12 +5045,17 @@ function injectIntoOldMenu(menuContainer, channelInfo, videoCard, collaborationM
 
     // Get toggle button
     const toggle = filterTubeItem.querySelector('.filtertube-filter-all-toggle');
-
-    // Toggle click handler (CSS handles visual feedback via .active class)
     toggle.addEventListener('click', (e) => {
         e.stopPropagation();
-        toggle.classList.toggle('active');
-        console.log('FilterTube: Filter All toggled:', toggle.classList.contains('active'));
+
+        // Update visual state and get new active state
+        const isActive = !isFilterAllToggleActive(toggle);
+        applyFilterAllStateToToggle(toggle, isActive);
+
+        // --- FIX: Persist the new state to the in-memory map ---
+        persistFilterAllStateForMenuItem(filterTubeItem, isActive);
+
+        console.log('FilterTube: Filter All toggled:', isActive);
     });
 
     attachFilterTubeMenuHandlers({
@@ -4944,7 +5071,7 @@ function injectIntoOldMenu(menuContainer, channelInfo, videoCard, collaborationM
 
     // Check if channel is already blocked and update UI accordingly
     checkIfChannelBlocked(channelInfo, filterTubeItem);
-
+    hydrateFilterAllToggle(filterTubeItem, channelInfo);
     console.log('FilterTube: Injected OLD menu item at TOP');
 
     return filterTubeItem;
@@ -4960,6 +5087,15 @@ async function checkIfChannelBlocked(channelInfo, menuItem) {
         // Get current filtered channels from storage
         const result = await browserAPI_BRIDGE.storage.local.get(['filteredChannels']);
         const channels = result.filteredChannels || [];
+        const storedEntry = findStoredChannelEntry(channelInfo) ||
+            channels.find(ch => {
+                if (!ch) return false;
+                const chHandle = ch.handle?.toLowerCase();
+                const chId = ch.id?.toLowerCase();
+                const inputHandle = (channelInfo.handle || '').toLowerCase();
+                const inputId = (channelInfo.id || '').toLowerCase();
+                return (inputHandle && chHandle === inputHandle) || (inputId && chId === inputId);
+            });
 
         // Check if this channel is already in the list (by handle or ID)
         const input = channelInfo.handle || channelInfo.id;
@@ -4979,6 +5115,10 @@ async function checkIfChannelBlocked(channelInfo, menuItem) {
                 titleSpan.textContent = '✓ Channel Blocked';
                 titleSpan.style.color = '#10b981'; // green
                 menuItem.style.pointerEvents = 'none'; // Disable clicks
+            }
+            if (storedEntry) {
+                applyFilterAllStateToToggle(menuItem.querySelector('.filtertube-filter-all-toggle'), storedEntry.filterAll);
+                addFilterAllContentCheckbox(menuItem, storedEntry);
             }
             console.log('FilterTube: Channel already blocked:', channelInfo);
         }
@@ -5079,9 +5219,13 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
     if (channelInfo.isBlockAllOption && channelInfo.allCollaborators) {
         const collaboratorCount = channelInfo.allCollaborators.length;
         const groupId = channelInfo.collaborationGroupId || collaborationGroupId || generateCollaborationGroupId();
+        const state = multiStepSelectionState.get(groupId);
+        const resolveFilterAllPreference = (collaborator) => {
+            const fallback = typeof state?.masterFilterAll === 'boolean' ? state.masterFilterAll : false;
+            return getFilterAllPreferenceForCollaborator(collaborator, groupId, fallback);
+        };
 
         if (isDoneButton) {
-            const state = multiStepSelectionState.get(groupId);
             const selectedKeys = Array.from(state?.selected || []);
             if (selectedKeys.length === 0) {
                 menuItem.setAttribute('data-is-done-button', 'false');
@@ -5099,10 +5243,27 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                         console.error('FilterTube: Cannot block collaborator - no identifier', collaborator);
                         continue;
                     }
+
+                    // --- FIX: Read the 'filterAll' state from the in-memory map ---
+                    const key = getCollaboratorKey(collaborator);
+                    const useFilterAll = getFilterAllPreference(groupId, key, filterAll);
+                    console.log(`FilterTube: Executing block for ${key} with filterAll: ${useFilterAll}`);
+                    // -----------------------------------------------------------------
+
                     const otherChannels = collaboratorSource
                         .filter(other => other !== collaborator)
                         .map(c => c.handle || c.name);
-                    const result = await addChannelDirectly(identifier, filterAll, otherChannels, null);
+
+                    // Execute block
+                    let result = await addChannelDirectly(identifier, useFilterAll, otherChannels, null);
+
+                    // --- FIX: Add retry logic for robustness ---
+                    if (!result.success && collaborator.id && collaborator.id !== identifier) {
+                        console.log(`FilterTube: Retrying block for ${collaborator.name} using ID ${collaborator.id}`);
+                        result = await addChannelDirectly(collaborator.id, useFilterAll, otherChannels, null);
+                    }
+                    // -------------------------------------------
+
                     if (result.success) {
                         successCount++;
                         const selector = `.filtertube-block-channel-item[data-collab-key="${getCollaboratorKey(collaborator)}"][data-collaboration-group-id="${groupId}"]`;
@@ -5114,7 +5275,9 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                     }
                 }
 
-                updateMultiStepActionLabel(state);
+                if (state) {
+                    updateMultiStepActionLabel(state);
+                }
 
                 if (titleSpan) {
                     if (successCount > 0) {
@@ -5149,9 +5312,10 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                     const otherChannels = channelInfo.allCollaborators
                         .filter((_, idx) => idx !== i)
                         .map(c => c.handle || c.name);
+                    const collaboratorFilterAll = resolveFilterAllPreference(collaborator);
 
                     console.log(`FilterTube: Blocking collaborator ${i + 1}/${collaboratorCount}: ${input}`);
-                    const result = await addChannelDirectly(input, filterAll, otherChannels, groupId);
+                    const result = await addChannelDirectly(input, collaboratorFilterAll, otherChannels, groupId);
                     if (result.success) {
                         successCount++;
                         console.log(`FilterTube: Successfully blocked ${input}`);
@@ -5284,7 +5448,37 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
         const collaborationWith = collaborationWithAttr ? JSON.parse(collaborationWithAttr) : null;
 
         // Add channel via background script with filterAll preference and collaboration metadata
-        const result = await addChannelDirectly(input, filterAll, collaborationWith);
+        const filterAllSelections = new Map();
+        const captureFilterAllSelection = () => {
+            const groupId = menuItem.getAttribute('data-collaboration-group-id');
+            if (!groupId) return;
+            const state = multiStepSelectionState.get(groupId);
+            if (!state?.selected) return;
+            state.selected.forEach(key => {
+                const collaboratorItem = state.dropdown?.querySelector(`.filtertube-block-channel-item[data-collab-key="${key}"][data-collaboration-group-id="${groupId}"]`);
+                const toggleEl = collaboratorItem?.querySelector('.filtertube-filter-all-toggle');
+                filterAllSelections.set(key, isFilterAllToggleActive(toggleEl));
+            });
+        };
+
+        let result = await addChannelDirectly(input, filterAll, collaborationWith);
+
+        if (!result.success && /Failed to fetch channel page: 404/i.test(result.error || '') && channelInfo.videoId) {
+            console.warn('FilterTube: Initial block failed with 404. Attempting shorts fallback for', channelInfo.videoId);
+            const fallbackInfo = await fetchChannelFromShortsUrl(channelInfo.videoId);
+            if (fallbackInfo && fallbackInfo.handle) {
+                const normalizedHandle = normalizeHandleValue(fallbackInfo.handle);
+                if (normalizedHandle) {
+                    console.log('FilterTube: Retrying block with fallback handle:', normalizedHandle);
+                    channelInfo.handle = normalizedHandle;
+                    const cacheTarget = videoCard || document.querySelector(`ytd-rich-item-renderer a[href*="${channelInfo.videoId}"]`)?.closest('[data-filtertube-channel-handle]');
+                    if (cacheTarget) {
+                        cacheTarget.setAttribute('data-filtertube-channel-handle', normalizedHandle);
+                    }
+                    result = await addChannelDirectly(normalizedHandle, filterAll, collaborationWith);
+                }
+            }
+        }
 
         if (!result.success) {
             // Error state
@@ -5323,7 +5517,24 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
 
         if (isMultiStep) {
             if (collaborationGroupId) {
+                captureFilterAllSelection();
                 markMultiStepSelection(collaborationGroupId, channelInfo, menuItem);
+                const state = multiStepSelectionState.get(collaborationGroupId);
+                if (state && filterAllSelections.size > 0) {
+                    state.selected.forEach(key => {
+                        if (filterAllSelections.has(key)) {
+                            const targetItem = state.dropdown?.querySelector(`.filtertube-block-channel-item[data-collab-key="${key}"][data-collaboration-group-id="${collaborationGroupId}"]`);
+                            const toggleEl = targetItem?.querySelector('.filtertube-filter-all-toggle');
+                            if (toggleEl) {
+                                if (filterAllSelections.get(key)) {
+                                    toggleEl.classList.add('active');
+                                } else {
+                                    toggleEl.classList.remove('active');
+                                }
+                            }
+                        }
+                    });
+                }
             } else {
                 menuItem.classList.add('filtertube-collab-selected');
             }
@@ -5520,6 +5731,7 @@ function addFilterAllContentCheckbox(menuItem, channelData) {
     });
 
     // Add change event to handle the toggle
+    checkbox.dataset.userOverride = 'true';
     checkbox.addEventListener('change', (e) => {
         e.stopPropagation();
         const checked = checkbox.checked;
@@ -5542,6 +5754,8 @@ function addFilterAllContentCheckbox(menuItem, channelData) {
 
     container.appendChild(checkboxWrapper);
     console.log('FilterTube: Added Filter All Content checkbox');
+
+    applyFilterAllStateToToggle(checkbox, channelData?.filterAll);
 }
 
 /**
