@@ -224,14 +224,14 @@ function renderFilterTubeMenuEntries({ dropdown, newMenuList, oldMenuList, chann
                 });
             }
 
-            injectIntoNewMenu(containers.newMenuList, {
+            const blockAllMenuItem = injectIntoNewMenu(containers.newMenuList, {
                 name: collaboratorCount === 2 ? 'Both Channels' : `All ${collaboratorCount} Collaborators`,
                 isBlockAllOption: true,
                 allCollaborators: collaborators.slice(0, collaboratorCount),
                 collaborationGroupId: groupId,
                 isMultiStep
             }, videoCard);
-            setupMultiStepMenu(dropdown, groupId, collaborators.slice(0, collaboratorCount));
+            setupMultiStepMenu(dropdown, groupId, collaborators.slice(0, collaboratorCount), blockAllMenuItem);
         } else if (containers.oldMenuList) {
             for (let i = 0; i < collaboratorCount; i++) {
                 const collaborator = collaborators[i];
@@ -246,14 +246,14 @@ function renderFilterTubeMenuEntries({ dropdown, newMenuList, oldMenuList, chann
                 });
             }
 
-            injectIntoOldMenu(containers.oldMenuList, {
+            const blockAllMenuItem = injectIntoOldMenu(containers.oldMenuList, {
                 name: collaboratorCount === 2 ? 'Both Channels' : `All ${collaboratorCount} Collaborators`,
                 isBlockAllOption: true,
                 allCollaborators: collaborators.slice(0, collaboratorCount),
                 collaborationGroupId: groupId,
                 isMultiStep
             }, videoCard);
-            setupMultiStepMenu(dropdown, groupId, collaborators.slice(0, collaboratorCount));
+            setupMultiStepMenu(dropdown, groupId, collaborators.slice(0, collaboratorCount), blockAllMenuItem);
         }
         forceDropdownResize(dropdown);
         return;
@@ -534,7 +534,16 @@ function clearMultiStepStateForDropdown(dropdown) {
 }
 
 function updateMultiStepActionLabel(state) {
-    if (!state || !state.blockAllItem) return;
+    if (!state) return;
+    if (!state.blockAllItem || !state.blockAllItem.isConnected) {
+        state.blockAllItem = state.dropdown?.querySelector(`.filtertube-block-channel-item[data-is-block-all="true"][data-collaboration-group-id="${state.groupId}"]`) || null;
+        if (state.blockAllItem && (!state.defaultLabel || !state.defaultChannelName)) {
+            state.defaultLabel = state.defaultLabel || state.blockAllItem.querySelector('.filtertube-menu-label')?.textContent || 'Block';
+            state.defaultChannelName = state.defaultChannelName || state.blockAllItem.querySelector('.filtertube-channel-name')?.textContent ||
+                `All ${state.total || 0} Collaborators`;
+        }
+    }
+    if (!state.blockAllItem) return;
     const selectedCount = state.selected?.size || 0;
     const label = state.blockAllItem.querySelector('.filtertube-menu-label');
     const channelName = state.blockAllItem.querySelector('.filtertube-channel-name');
@@ -573,10 +582,13 @@ function refreshMultiStepSelections(groupId) {
     updateMultiStepActionLabel(state);
 }
 
-function setupMultiStepMenu(dropdown, groupId, collaborators = []) {
+function setupMultiStepMenu(dropdown, groupId, collaborators = [], blockAllItemRef = null) {
     if (!dropdown || !groupId) return;
     clearMultiStepStateForDropdown(dropdown);
-    const blockAllItem = dropdown.querySelector(`.filtertube-block-channel-item[data-is-block-all="true"][data-collaboration-group-id="${groupId}"]`);
+    let blockAllItem = blockAllItemRef;
+    if (!blockAllItem || !blockAllItem.isConnected) {
+        blockAllItem = dropdown.querySelector(`.filtertube-block-channel-item[data-is-block-all="true"][data-collaboration-group-id="${groupId}"]`);
+    }
     const state = {
         groupId,
         dropdown,
