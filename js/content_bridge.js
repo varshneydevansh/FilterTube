@@ -1096,24 +1096,28 @@ function parseCollaboratorNames(rawText = '') {
 
     tokens.forEach(token => {
         if (!token) return;
-        const cleaned = token.replace(/^[\s,]+|[\s,]+$/g, '').trim();
-        if (!cleaned) return;
-        const lower = cleaned.toLowerCase();
-        if (lower === 'and') return;
-        if (COLLAB_MORE_TOKEN_PATTERN.test(lower) || lower.endsWith(' more') || lower.startsWith('more ')) {
-            hasHidden = true;
-            const countMatch = lower.match(/(\d+)\s+more/);
-            if (countMatch) {
-                const parsedCount = parseInt(countMatch[1], 10);
-                if (!isNaN(parsedCount)) {
-                    hiddenCount += parsedCount;
+        const subTokens = token.split(',');
+        subTokens.forEach(part => {
+            if (!part) return;
+            const cleaned = part.replace(/^[\s,]+|[\s,]+$/g, '').trim();
+            if (!cleaned) return;
+            const lower = cleaned.toLowerCase();
+            if (lower === 'and') return;
+            if (COLLAB_MORE_TOKEN_PATTERN.test(lower) || lower.endsWith(' more') || lower.startsWith('more ')) {
+                hasHidden = true;
+                const countMatch = lower.match(/(\d+)\s+more/);
+                if (countMatch) {
+                    const parsedCount = parseInt(countMatch[1], 10);
+                    if (!isNaN(parsedCount)) {
+                        hiddenCount += parsedCount;
+                    }
+                } else {
+                    hiddenCount += 1;
                 }
-            } else {
-                hiddenCount += 1;
+                return;
             }
-            return;
-        }
-        names.push(cleaned);
+            names.push(cleaned);
+        });
     });
 
     return { names, hasHiddenCollaborators: hasHidden, hiddenCount };
@@ -4739,6 +4743,19 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
         }
     }
 
+    // Ensure the card is stamped with a videoId before requesting enrichment so
+    // the main world can reliably hydrate collaborators via DOM.
+    if (initialChannelInfo.videoId) {
+        if (!videoCard.getAttribute('data-filtertube-video-id')) {
+            videoCard.setAttribute('data-filtertube-video-id', initialChannelInfo.videoId);
+        }
+    } else {
+        const ensuredVideoId = ensureVideoIdForCard(videoCard);
+        if (ensuredVideoId) {
+            initialChannelInfo.videoId = ensuredVideoId;
+        }
+    }
+
     // Kick off collaborator enrichment (non-blocking) so handles/IDs stay accurate regardless of DOM ordering
     let collaboratorEnrichmentPromise = null;
     if (initialChannelInfo.isCollaboration && initialChannelInfo.videoId) {
@@ -5545,7 +5562,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
 
             // After a Block All/Done operation, clear any stale collaborator cache for this video
             const cacheVideoId = ensureVideoIdForCard(videoCard);
-            if (cacheVideoId) {
+            if (cacheVideoId && !resolvedCollaboratorsByVideoId.has(cacheVideoId)) {
                 resolvedCollaboratorsByVideoId.delete(cacheVideoId);
             }
         }
