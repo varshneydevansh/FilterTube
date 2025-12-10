@@ -287,7 +287,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Open in tab
     if (openInTabBtn) {
         openInTabBtn.addEventListener('click', () => {
-            chrome.tabs.create({ url: 'html/tab-view.html' });
+            chrome.tabs.create({ url: chrome.runtime.getURL('html/tab-view.html') });
         });
     }
 });
