@@ -633,6 +633,103 @@
                     }
                 }
             }
+
+            // 4. Harvest mappings from per-video renderers in generic data blobs
+            //    (e.g., search results, watch suggestions, lockupViewModel trees).
+            //    This allows us to learn UC ID <-> @handle pairs such as
+            //    browseId "UCM6nZ84qXYFWPWzlO_zpkWw" + canonicalBaseUrl
+            //    "/@Santasmusicroom.Official" directly from ytInitialData.
+            try {
+                this._harvestRendererChannelMappings(data);
+            } catch (e) {
+                console.warn('FilterTube: Renderer channel harvest failed', e);
+            }
+        }
+
+        /**
+         * Recursively scan a data tree for video-like renderers and register
+         * any UC ID <-> @handle pairs found in their byline navigation endpoints.
+         */
+        _harvestRendererChannelMappings(root) {
+            if (!root || typeof root !== 'object') return;
+
+            const visited = new WeakSet();
+
+            const visit = (node) => {
+                if (!node || typeof node !== 'object' || visited.has(node)) return;
+                visited.add(node);
+
+                // Unwrap common renderer containers to normalize shape
+                let candidate = node;
+                if (candidate.videoRenderer) {
+                    candidate = candidate.videoRenderer;
+                } else if (candidate.gridVideoRenderer) {
+                    candidate = candidate.gridVideoRenderer;
+                } else if (candidate.compactVideoRenderer) {
+                    candidate = candidate.compactVideoRenderer;
+                } else if (candidate.playlistVideoRenderer) {
+                    candidate = candidate.playlistVideoRenderer;
+                } else if (candidate.richItemRenderer?.content?.videoRenderer) {
+                    candidate = candidate.richItemRenderer.content.videoRenderer;
+                } else if (candidate.content?.videoRenderer) {
+                    candidate = candidate.content.videoRenderer;
+                }
+
+                this._harvestFromRendererByline(candidate);
+
+                for (const key in node) {
+                    if (!Object.prototype.hasOwnProperty.call(node, key)) continue;
+                    const value = node[key];
+                    if (value && typeof value === 'object') {
+                        visit(value);
+                    }
+                }
+            };
+
+            visit(root);
+        }
+
+        /**
+         * Given a normalized video renderer object, extract channel browseId and
+         * canonicalBaseUrl/@handle from its byline/owner fields and register
+         * a mapping when possible.
+         */
+        _harvestFromRendererByline(renderer) {
+            if (!renderer || typeof renderer !== 'object') return;
+
+            const byline = renderer.shortBylineText || renderer.longBylineText || renderer.ownerText;
+            if (!byline || !Array.isArray(byline.runs)) return;
+
+            for (const run of byline.runs) {
+                if (!run || typeof run !== 'object') continue;
+
+                const browse = run.navigationEndpoint?.browseEndpoint;
+                if (!browse) continue;
+
+                const browseId = browse.browseId;
+                if (!browseId || typeof browseId !== 'string' || !browseId.startsWith('UC')) continue;
+
+                let handle = null;
+
+                const canonical = browse.canonicalBaseUrl || browse.canonicalUrl || browse.url;
+                if (typeof canonical === 'string') {
+                    const match = canonical.match(/@([\w.-]+)/);
+                    if (match) {
+                        handle = `@${match[1]}`;
+                    }
+                }
+
+                if (!handle && typeof run.text === 'string') {
+                    const textMatch = run.text.match(/@([\w.-]+)/);
+                    if (textMatch) {
+                        handle = `@${textMatch[1]}`;
+                    }
+                }
+
+                if (handle) {
+                    this._registerMapping(browseId, handle);
+                }
+            }
         }
 
         /**
@@ -1201,9 +1298,24 @@
     // Export the filtering functionality globally
     window.FilterTubeEngine = {
         YouTubeDataFilter,
+
+        // Full processing: harvest + filtering
         processData: function (data, settings, dataName = 'data') {
             const filter = new YouTubeDataFilter(settings);
             return filter.processData(data, dataName);
+        },
+
+        // Harvest-only entry point used when seed.js wants to learn
+        // UC ID <-> @handle mappings from ytInitialData/fetch blobs
+        // without mutating the data (e.g., search results, home feed).
+        harvestOnly: function (data, settings) {
+            if (!data) return;
+            try {
+                const filter = new YouTubeDataFilter(settings || { filterChannels: [], filterKeywords: [] });
+                filter._harvestChannelData(data);
+            } catch (e) {
+                console.warn('FilterTube: harvestOnly failed', e);
+            }
         }
     };
 

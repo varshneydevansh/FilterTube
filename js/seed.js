@@ -191,7 +191,21 @@
         }
 
         if (shouldSkipEngineProcessing(data, dataName)) {
-            seedDebugLog(`⏭️ Skipping engine processing for ${dataName} (home feed rich grid) to allow DOM-based restore`);
+            // For search/home/channel layouts we skip MUTATING the data to allow DOM-based
+            // restore, but we still want to LEARN UC ID <-> @handle mappings from the
+            // same blobs so that channelMap stays fresh for 3-dot menu blocking.
+            if (window.FilterTubeEngine && typeof window.FilterTubeEngine.harvestOnly === 'function') {
+                seedDebugLog(`🧠 Harvest-only pass for ${dataName} (skip filtering)`);
+                try {
+                    window.FilterTubeEngine.harvestOnly(data, cachedSettings || { filterChannels: [], filterKeywords: [] });
+                } catch (e) {
+                    seedDebugLog(`❌ Harvest-only failed for ${dataName}:`, e);
+                }
+            } else {
+                seedDebugLog(`⚠️ FilterTubeEngine.harvestOnly not available for ${dataName}`);
+            }
+
+            seedDebugLog(`⏭️ Skipping engine filtering for ${dataName} to allow DOM-based restore`);
             return data;
         }
 

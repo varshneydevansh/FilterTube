@@ -374,9 +374,15 @@ async function fetchIdForHandle(handle) {
     const cleanHandle = handle.toLowerCase().replace('@', '');
     if (!cleanHandle) return null;
 
-    // If we already have a result, return it
+    // If we already have a result, return it.
+    // Never leak the internal 'PENDING' sentinel to callers – treat it as
+    // "not yet resolved" so callers see a simple "no ID yet" (null).
     if (resolvedHandleCache.has(cleanHandle)) {
-        return resolvedHandleCache.get(cleanHandle);
+        const cached = resolvedHandleCache.get(cleanHandle);
+        if (cached === 'PENDING') {
+            return null;
+        }
+        return cached;
     }
 
     // Try resolving from persisted channelMap first to avoid hitting broken /about pages
@@ -4041,6 +4047,93 @@ async function fetchChannelFromShortsUrl(videoId) {
                                 name: headerRenderer.channelTitleText?.runs?.[0]?.text || ''
                             };
                         }
+                    }
+
+                    // Deep search: scan Shorts ytInitialData for any video/shorts/lockup
+                    // renderer that exposes browseEndpoint.browseId + @handle.
+                    const visited = new WeakSet();
+
+                    function searchNode(node) {
+                        if (!node || typeof node !== 'object' || visited.has(node)) return null;
+                        visited.add(node);
+
+                        // Normalize common shorts/home/watch renderer wrappers
+                        let candidate = node;
+                        if (candidate.videoRenderer) {
+                            candidate = candidate.videoRenderer;
+                        } else if (candidate.gridVideoRenderer) {
+                            candidate = candidate.gridVideoRenderer;
+                        } else if (candidate.compactVideoRenderer) {
+                            candidate = candidate.compactVideoRenderer;
+                        } else if (candidate.playlistVideoRenderer) {
+                            candidate = candidate.playlistVideoRenderer;
+                        } else if (candidate.reelItemRenderer) {
+                            candidate = candidate.reelItemRenderer;
+                        } else if (candidate.shortsLockupViewModel) {
+                            candidate = candidate.shortsLockupViewModel;
+                        } else if (candidate.shortsLockupViewModelV2) {
+                            candidate = candidate.shortsLockupViewModelV2;
+                        } else if (candidate.lockupViewModel) {
+                            candidate = candidate.lockupViewModel;
+                        } else if (candidate.richItemRenderer?.content?.videoRenderer) {
+                            candidate = candidate.richItemRenderer.content.videoRenderer;
+                        } else if (candidate.content?.videoRenderer) {
+                            candidate = candidate.content.videoRenderer;
+                        }
+
+                        // Try byline/owner-style fields similar to filter_logic.js
+                        const byline = candidate.shortBylineText || candidate.longBylineText || candidate.ownerText;
+                        if (byline?.runs && Array.isArray(byline.runs)) {
+                            for (const run of byline.runs) {
+                                const browse = run?.navigationEndpoint?.browseEndpoint;
+                                if (!browse) continue;
+
+                                const browseId = browse.browseId;
+                                if (!browseId || typeof browseId !== 'string' || !browseId.startsWith('UC')) continue;
+
+                                let handle = null;
+                                const canonical = browse.canonicalBaseUrl || browse.canonicalUrl || browse.url;
+                                if (typeof canonical === 'string') {
+                                    const m = canonical.match(/@([\w.-]+)/);
+                                    if (m) handle = `@${m[1]}`;
+                                }
+
+                                if (!handle && typeof run.text === 'string') {
+                                    const m2 = run.text.match(/@([\w.-]+)/);
+                                    if (m2) handle = `@${m2[1]}`;
+                                }
+
+                                if (handle) {
+                                    const name = run.text || '';
+                                    console.log('FilterTube: Found channel in ytInitialData (deep shorts search):', { handle, id: browseId });
+                                    return { handle, id: browseId, name };
+                                }
+                            }
+                        }
+
+                        // Recurse
+                        if (Array.isArray(node)) {
+                            for (const child of node) {
+                                const found = searchNode(child);
+                                if (found) return found;
+                            }
+                        } else {
+                            for (const key in node) {
+                                if (!Object.prototype.hasOwnProperty.call(node, key)) continue;
+                                const value = node[key];
+                                if (value && typeof value === 'object') {
+                                    const found = searchNode(value);
+                                    if (found) return found;
+                                }
+                            }
+                        }
+
+                        return null;
+                    }
+
+                    const deepResult = searchNode(ytInitialData);
+                    if (deepResult) {
+                        return deepResult;
                     }
                 } catch (e) {
                     console.warn('FilterTube: Failed to parse ytInitialData from shorts page:', e);
