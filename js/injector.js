@@ -76,7 +76,7 @@
         return existing;
     }
 
-    // Listen for settings from content_bridge
+    // Listen for settings and data requests from content_bridge
     window.addEventListener('message', (event) => {
         if (event.source !== window || !event.data) return;
 
@@ -149,6 +149,33 @@
             }, '*');
 
             postLog('log', `Sent collaborator info response:`, collaboratorInfo?.length || 0, 'collaborators');
+        }
+
+        // Handle single-channel info request from content_bridge (for UC ID + handle lookup)
+        if (type === 'FilterTube_RequestChannelInfo' && source === 'content_bridge') {
+            const { videoId, requestId } = payload || {};
+            postLog('log', `Received channel info request for video: ${videoId}`);
+
+            let channel = null;
+            if (videoId) {
+                channel = searchYtInitialDataForVideoChannel(videoId);
+            }
+
+            window.postMessage({
+                type: 'FilterTube_ChannelInfoResponse',
+                payload: {
+                    videoId,
+                    requestId,
+                    channel
+                },
+                source: 'injector'
+            }, '*');
+
+            if (channel) {
+                postLog('log', 'Sent channel info response:', channel);
+            } else {
+                postLog('log', 'No channel info found for video:', videoId);
+            }
         }
     });
 
@@ -248,6 +275,120 @@
         }
 
         return null;
+    }
+
+    /**
+     * Search ytInitialData (MAIN world) for channel info associated with a video ID
+     * Returns { id, handle, name } when possible.
+     * This lives in injector.js because content_bridge (Isolated World) cannot
+     * read window.ytInitialData directly.
+     * @param {string} videoId
+     * @returns {Object|null}
+     */
+    function searchYtInitialDataForVideoChannel(videoId) {
+        if (!videoId) {
+            postLog('log', 'Channel search skipped - missing videoId');
+            return null;
+        }
+
+        if (!window.ytInitialData) {
+            postLog('log', 'Channel search skipped - ytInitialData not available');
+            return null;
+        }
+
+        postLog('log', `Searching ytInitialData for channel of video: ${videoId}`);
+
+        let foundVideoObject = false;
+        const visited = new WeakSet();
+
+        function searchObject(obj, path) {
+            if (!obj || typeof obj !== 'object' || visited.has(obj)) return null;
+            visited.add(obj);
+
+            // Direct hit: object with our videoId
+            if (obj.videoId === videoId) {
+                foundVideoObject = true;
+
+                // Priority 1: navigationEndpoint.browseEndpoint on the video renderer
+                const nav = obj.navigationEndpoint && obj.navigationEndpoint.browseEndpoint;
+                if (nav) {
+                    const browseId = nav.browseId;
+                    const canonicalBaseUrl = nav.canonicalBaseUrl;
+                    const name = (obj.shortBylineText?.runs?.[0]?.text) || (obj.longBylineText?.runs?.[0]?.text) || undefined;
+
+                    if (canonicalBaseUrl) {
+                        const handleMatch = canonicalBaseUrl.match(/@([\w.-]+)/);
+                        const handle = handleMatch ? `@${handleMatch[1]}` : null;
+                        if (handle && browseId && browseId.startsWith('UC')) {
+                            return { id: browseId, handle, name };
+                        }
+                        if (handle) {
+                            return { handle, name };
+                        }
+                    }
+
+                    if (browseId && browseId.startsWith('UC')) {
+                        return { id: browseId, name };
+                    }
+                }
+
+                // Priority 2: byline runs
+                const byline = obj.shortBylineText || obj.longBylineText;
+                if (byline?.runs) {
+                    for (const run of byline.runs) {
+                        const browseEndpoint = run.navigationEndpoint?.browseEndpoint;
+                        if (!browseEndpoint) continue;
+
+                        const browseId = browseEndpoint.browseId;
+                        const canonicalBaseUrl = browseEndpoint.canonicalBaseUrl;
+                        const name = run.text;
+
+                        if (canonicalBaseUrl) {
+                            const handleMatch = canonicalBaseUrl.match(/@([\w.-]+)/);
+                            const handle = handleMatch ? `@${handleMatch[1]}` : null;
+                            if (handle && browseId && browseId.startsWith('UC')) {
+                                return { id: browseId, handle, name };
+                            }
+                            if (handle) {
+                                return { handle, name };
+                            }
+                        }
+
+                        if (browseId && browseId.startsWith('UC')) {
+                            return { id: browseId, name };
+                        }
+                    }
+                }
+            }
+
+            // Recurse
+            if (Array.isArray(obj)) {
+                for (let i = 0; i < obj.length; i++) {
+                    const result = searchObject(obj[i], `${path}[${i}]`);
+                    if (result) return result;
+                }
+            } else {
+                for (const key in obj) {
+                    if (!Object.prototype.hasOwnProperty.call(obj, key)) continue;
+                    const value = obj[key];
+                    if (!value || typeof value !== 'object') continue;
+                    const result = searchObject(value, `${path}.${key}`);
+                    if (result) return result;
+                }
+            }
+
+            return null;
+        }
+
+        const result = searchObject(window.ytInitialData, 'root');
+
+        if (!foundVideoObject) {
+            postLog('log', `Channel search: video ID not found in ytInitialData: ${videoId}`);
+        } else if (!result) {
+            postLog('log', `Channel search: video found but no channel info extracted for: ${videoId}`);
+        }
+
+        return result;
     }
 
     /**

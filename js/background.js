@@ -855,10 +855,44 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
         if (!isHandle && !isUcId) {
             return { success: false, error: 'Invalid channel identifier' };
         }
+        // Prefer canonical UC IDs via channelMap when available, especially for @handles
+        let lookupValue = rawValue;
+        let mappedId = null;
 
-        // Fetch channel info
-        console.log('FilterTube Background: Fetching channel info for:', rawValue);
-        const channelInfo = await fetchChannelInfo(rawValue);
+        if (isHandle) {
+            try {
+                const mapStorage = await new Promise(resolve => {
+                    browserAPI.storage.local.get(['channelMap'], resolve);
+                });
+                const channelMap = mapStorage.channelMap || {};
+                const lowerHandle = rawValue.toLowerCase();
+                const candidateId = channelMap[lowerHandle];
+
+                if (candidateId && candidateId.toUpperCase().startsWith('UC')) {
+                    mappedId = candidateId;
+                    lookupValue = candidateId;
+                    console.log('FilterTube Background: Using mapped UC ID for handle', rawValue, '->', mappedId);
+                }
+            } catch (e) {
+                console.warn('FilterTube Background: Failed to read channelMap for handle resolution:', e);
+            }
+        }
+
+        // Fetch channel info (by UC ID when possible, otherwise by original input)
+        console.log('FilterTube Background: Fetching channel info for:', lookupValue);
+        let channelInfo = await fetchChannelInfo(lookupValue);
+
+        // If scraping failed for a handle but we know a UC ID from channelMap, synthesize a minimal entry
+        if (!channelInfo.success && isHandle && mappedId) {
+            console.warn('FilterTube Background: fetchChannelInfo failed, falling back to mapped UC ID for handle', rawValue);
+            channelInfo = {
+                success: true,
+                id: mappedId,
+                handle: rawValue,
+                name: rawValue,
+                logo: null
+            };
+        }
 
         if (!channelInfo.success) {
             return { success: false, error: channelInfo.error || 'Failed to fetch channel info' };

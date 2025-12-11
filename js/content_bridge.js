@@ -379,6 +379,22 @@ async function fetchIdForHandle(handle) {
         return resolvedHandleCache.get(cleanHandle);
     }
 
+    // Try resolving from persisted channelMap first to avoid hitting broken /about pages
+    try {
+        const storage = await browserAPI_BRIDGE.storage.local.get(['channelMap']);
+        const channelMap = storage.channelMap || {};
+        const keyHandle = (`@${cleanHandle}`).toLowerCase();
+        const mappedId = channelMap[keyHandle];
+
+        if (mappedId && mappedId.toUpperCase().startsWith('UC')) {
+            resolvedHandleCache.set(cleanHandle, mappedId);
+            console.log(`FilterTube: Resolved @${cleanHandle} from channelMap -> ${mappedId}`);
+            return mappedId;
+        }
+    } catch (e) {
+        console.warn('FilterTube: Failed to read channelMap while resolving handle', e);
+    }
+
     // Mark as pending to prevent Loop
     resolvedHandleCache.set(cleanHandle, 'PENDING');
 
@@ -3595,6 +3611,10 @@ function sendSettingsToMainWorld(settings) {
 const pendingCollaboratorRequests = new Map();
 let collaboratorRequestId = 0;
 
+// Pending single-channel info requests (for ytInitialData lookup in MAIN world)
+const pendingChannelInfoRequests = new Map();
+let channelInfoRequestId = 0;
+
 /**
  * Request collaborator info from Main World (injector.js) via message passing
  * This is needed because content_bridge.js runs in Isolated World and cannot access window.ytInitialData
@@ -3626,6 +3646,32 @@ function requestCollaboratorInfoFromMainWorld(videoId) {
         }, '*');
 
         console.log('FilterTube: Sent collaborator info request to Main World for video:', videoId);
+    });
+}
+
+function requestChannelInfoFromMainWorld(videoId) {
+    return new Promise((resolve) => {
+        const requestId = ++channelInfoRequestId;
+        const timeoutMs = 2000; // 2 second timeout
+
+        const timeoutId = setTimeout(() => {
+            const pending = pendingChannelInfoRequests.get(requestId);
+            if (pending) {
+                pendingChannelInfoRequests.delete(requestId);
+                console.log('FilterTube: Channel info request timed out for video:', videoId);
+                resolve(null);
+            }
+        }, timeoutMs);
+
+        pendingChannelInfoRequests.set(requestId, { resolve, timeoutId, videoId });
+
+        window.postMessage({
+            type: 'FilterTube_RequestChannelInfo',
+            payload: { videoId, requestId },
+            source: 'content_bridge'
+        }, '*');
+
+        console.log('FilterTube: Sent channel info request to Main World for video:', videoId);
     });
 }
 
@@ -3769,6 +3815,17 @@ function handleMainWorldMessages(event) {
                 force: true
             });
         }
+    } else if (type === 'FilterTube_ChannelInfoResponse') {
+        // Handle response from Main World with single-channel info
+        const { requestId, channel, videoId } = payload || {};
+        const pending = pendingChannelInfoRequests.get(requestId);
+
+        if (pending) {
+            clearTimeout(pending.timeoutId);
+            pendingChannelInfoRequests.delete(requestId);
+            console.log('FilterTube: Received channel info response for video:', videoId, 'channel:', channel);
+            pending.resolve(channel || null);
+        }
     }
 }
 
@@ -3897,177 +3954,17 @@ function debounce(func, delay) {
 
 /**
  * Recursively search ytInitialData for channel info associated with a video ID
+ * NOTE: The actual search runs in MAIN world (injector.js); this function simply
+ * proxies the request via postMessage and returns the result.
  * @param {string} videoId - The YouTube video ID to search for
- * @returns {Object|null} - {handle, name} or {id, name} or {isCollaboration, allCollaborators: [...]} or null
+ * @returns {Promise<Object|null>} - {handle, name} or {id, name} or null
  */
-function searchYtInitialDataForVideoChannel(videoId) {
-    if (!window.ytInitialData || !videoId) {
-        console.log('FilterTube: ytInitialData search skipped - no data or videoId');
+async function searchYtInitialDataForVideoChannel(videoId) {
+    if (!videoId) {
+        console.log('FilterTube: ytInitialData search skipped - no videoId');
         return null;
     }
-
-    console.log('FilterTube: Searching ytInitialData for video:', videoId);
-    let foundVideoObject = false;
-
-    // Recursively search for video ID and associated channel browse endpoint
-    function searchObject(obj, path = '') {
-        if (!obj || typeof obj !== 'object') return null;
-
-        // Check if this object contains our video ID
-        if (obj.videoId === videoId) {
-            foundVideoObject = true;
-            console.log('FilterTube: Found video object at path:', path);
-            console.log('FilterTube: Video object keys:', Object.keys(obj));
-
-            // PRIORITY: Check for collaboration video (showDialogCommand in byline)
-            const bylineText = obj.shortBylineText || obj.longBylineText;
-            if (bylineText?.runs) {
-                for (const run of bylineText.runs) {
-                    // Look for showDialogCommand which indicates a collaboration video
-                    const showDialogCommand = run.navigationEndpoint?.showDialogCommand;
-                    if (showDialogCommand) {
-                        console.log('FilterTube: Detected COLLABORATION video via showDialogCommand');
-
-                        // Extract all collaborating channels from listItems
-                        const listItems = showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems;
-
-                        if (listItems && Array.isArray(listItems)) {
-                            const collaborators = [];
-
-                            for (const item of listItems) {
-                                const listItemViewModel = item.listItemViewModel;
-                                if (listItemViewModel) {
-                                    const browseEndpoint = listItemViewModel.rendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint;
-                                    const title = listItemViewModel.title?.content;
-                                    const subtitle = listItemViewModel.subtitle?.content;
-
-                                    if (browseEndpoint) {
-                                        const browseId = browseEndpoint.browseId;
-                                        const canonicalBaseUrl = browseEndpoint.canonicalBaseUrl;
-
-                                        let channelInfo = { name: title };
-
-                                        // Extract handle - Priority 1: canonicalBaseUrl (if exists)
-                                        if (canonicalBaseUrl) {
-                                            const handleMatch = canonicalBaseUrl.match(/@([\w-]+)/);
-                                            if (handleMatch) {
-                                                channelInfo.handle = `@${handleMatch[1]}`;
-                                            }
-                                        }
-
-                                        // Extract handle - Priority 2: subtitle content (has @handle with Unicode markers)
-                                        // Subtitle format: "‎⁨@fern-tv⁩ • ⁨42.7 lakh subscribers⁩"
-                                        if (!channelInfo.handle && subtitle) {
-                                            // Match @handle accounting for possible Unicode direction markers
-                                            const handleMatch = subtitle.match(/@([\w-]+)/);
-                                            if (handleMatch) {
-                                                channelInfo.handle = `@${handleMatch[1]}`;
-                                                console.log('FilterTube: Extracted handle from subtitle:', channelInfo.handle);
-                                            }
-                                        }
-
-                                        // Extract UC ID
-                                        if (browseId?.startsWith('UC')) {
-                                            channelInfo.id = browseId;
-                                        }
-
-                                        if (channelInfo.handle || channelInfo.id) {
-                                            collaborators.push(channelInfo);
-                                            console.log('FilterTube: Extracted collaborator:', channelInfo);
-                                        }
-                                    }
-                                }
-                            }
-
-                            if (browseId?.startsWith('UC')) {
-                                console.log('FilterTube: Extracted UC ID from byline:', browseId);
-                                return { id: browseId, name };
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Look for browseEndpoint with channel or @handle
-            if (obj.navigationEndpoint?.browseEndpoint?.browseId) {
-                const browseId = obj.navigationEndpoint.browseEndpoint.browseId;
-                const canonicalBaseUrl = obj.navigationEndpoint.browseEndpoint.canonicalBaseUrl;
-
-                console.log('FilterTube: Found navigationEndpoint:', { browseId, canonicalBaseUrl });
-
-                // Extract handle from canonicalBaseUrl
-                if (canonicalBaseUrl) {
-                    const handleMatch = canonicalBaseUrl.match(/@([\w-]+)/);
-                    if (handleMatch) {
-                        console.log('FilterTube: Extracted handle from navigationEndpoint:', `@${handleMatch[1]}`);
-                        return { handle: `@${handleMatch[1]}`, name: undefined };
-                    }
-                }
-
-                // If browseId is a channel ID (starts with UC)
-                if (browseId?.startsWith('UC')) {
-                    console.log('FilterTube: Extracted UC ID from navigationEndpoint:', browseId);
-                    return { id: browseId, name: undefined };
-                }
-            }
-
-            // Check for ownerBadges (indicates we're in the right object)
-            if (obj.ownerBadges || obj.shortBylineText || obj.longBylineText) {
-                console.log('FilterTube: Found byline/owner info');
-                // Look for channel info in byline text
-                const bylineText = obj.shortBylineText || obj.longBylineText;
-                if (bylineText?.runs) {
-                    console.log('FilterTube: Checking byline runs:', bylineText.runs.length);
-                    for (const run of bylineText.runs) {
-                        if (run.navigationEndpoint?.browseEndpoint) {
-                            const browseId = run.navigationEndpoint.browseEndpoint.browseId;
-                            const canonicalBaseUrl = run.navigationEndpoint.browseEndpoint.canonicalBaseUrl;
-                            const name = run.text;
-
-                            console.log('FilterTube: Found byline endpoint:', { browseId, canonicalBaseUrl, name });
-
-                            if (canonicalBaseUrl) {
-                                const handleMatch = canonicalBaseUrl.match(/@([\w-]+)/);
-                                if (handleMatch) {
-                                    console.log('FilterTube: Extracted handle from byline:', `@${handleMatch[1]}`);
-                                    return { handle: `@${handleMatch[1]}`, name };
-                                }
-                            }
-                            if (browseId?.startsWith('UC')) {
-                                console.log('FilterTube: Extracted UC ID from byline:', browseId);
-                                return { id: browseId, name };
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // Recursively search nested objects and arrays
-        if (Array.isArray(obj)) {
-            for (let i = 0; i < obj.length; i++) {
-                const result = searchObject(obj[i], `${path}[${i}]`);
-                if (result) return result;
-            }
-        } else {
-            for (const key in obj) {
-                const result = searchObject(obj[key], `${path}.${key}`);
-                if (result) return result;
-            }
-        }
-
-        return null;
-    }
-
-    const result = searchObject(window.ytInitialData);
-
-    if (!foundVideoObject) {
-        console.warn('FilterTube: Video ID not found in ytInitialData:', videoId);
-    } else if (!result) {
-        console.warn('FilterTube: Video found but no channel info extracted for:', videoId);
-    }
-
-    return result;
+    return await requestChannelInfoFromMainWorld(videoId);
 }
 
 /**
@@ -4109,7 +4006,6 @@ async function fetchChannelFromShortsUrl(videoId) {
                     // Look for channel info in various locations
                     const engagementPanels = ytInitialData?.engagementPanels;
                     const overlay = ytInitialData?.overlay?.reelPlayerOverlayRenderer;
-                    const contents = ytInitialData?.contents;
 
                     // Try to find channel info in engagement panels (common location)
                     if (engagementPanels && Array.isArray(engagementPanels)) {
@@ -4120,8 +4016,9 @@ async function fetchChannelFromShortsUrl(videoId) {
                                     const endpoint = item?.menuNavigationItemRenderer?.navigationEndpoint?.browseEndpoint;
                                     if (endpoint?.browseId && endpoint?.canonicalBaseUrl) {
                                         const handle = endpoint.canonicalBaseUrl.replace('/user/', '@').replace(/^\//, '');
-                                        console.log('FilterTube: Found channel in ytInitialData (engagement panel):', handle);
-                                        return { handle, name: '' };
+                                        const id = endpoint.browseId && endpoint.browseId.startsWith('UC') ? endpoint.browseId : null;
+                                        console.log('FilterTube: Found channel in ytInitialData (engagement panel):', { handle, id });
+                                        return { handle, id, name: '' };
                                     }
                                 }
                             }
@@ -4134,8 +4031,15 @@ async function fetchChannelFromShortsUrl(videoId) {
                         const channelNavEndpoint = headerRenderer?.channelNavigationEndpoint?.browseEndpoint;
                         if (channelNavEndpoint?.browseId && channelNavEndpoint?.canonicalBaseUrl) {
                             const handle = channelNavEndpoint.canonicalBaseUrl.replace('/user/', '@').replace(/^\//, '');
-                            console.log('FilterTube: Found channel in ytInitialData (overlay):', handle);
-                            return { handle, name: headerRenderer.channelTitleText?.runs?.[0]?.text || '' };
+                            const id = channelNavEndpoint.browseId && channelNavEndpoint.browseId.startsWith('UC')
+                                ? channelNavEndpoint.browseId
+                                : null;
+                            console.log('FilterTube: Found channel in ytInitialData (overlay):', { handle, id });
+                            return {
+                                handle,
+                                id,
+                                name: headerRenderer.channelTitleText?.runs?.[0]?.text || ''
+                            };
                         }
                     }
                 } catch (e) {
@@ -5623,8 +5527,8 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
 
     try {
         // Single channel blocking (normal case)
-        // Use the channel identifier (handle or ID)
-        const input = channelInfo.handle || channelInfo.id;
+        // Prefer canonical UC ID when available, fall back to handle
+        const input = channelInfo.id || channelInfo.handle;
 
         // Get collaboration metadata from menu item attribute
         const collaborationWithAttr = menuItem.getAttribute('data-collaboration-with');
@@ -5646,19 +5550,109 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
 
         let result = await addChannelDirectly(input, filterAll, collaborationWith, menuItem.getAttribute('data-collaboration-group-id'));
 
+        // If the background could not fetch the channel page (e.g., /@handle/about returns 404),
+        // try to recover using ytInitialData for this video, then fall back to the Shorts URL helper.
         if (!result.success && /Failed to fetch channel page: 404/i.test(result.error || '') && channelInfo.videoId) {
-            console.warn('FilterTube: Initial block failed with 404. Attempting shorts fallback for', channelInfo.videoId);
-            const fallbackInfo = await fetchChannelFromShortsUrl(channelInfo.videoId);
-            if (fallbackInfo && fallbackInfo.handle) {
-                const normalizedHandle = normalizeHandleValue(fallbackInfo.handle);
-                if (normalizedHandle) {
-                    console.log('FilterTube: Retrying block with fallback handle:', normalizedHandle);
-                    channelInfo.handle = normalizedHandle;
-                    const cacheTarget = videoCard || document.querySelector(`ytd-rich-item-renderer a[href*="${channelInfo.videoId}"]`)?.closest('[data-filtertube-channel-handle]');
-                    if (cacheTarget) {
-                        cacheTarget.setAttribute('data-filtertube-channel-handle', normalizedHandle);
+            console.warn('FilterTube: Initial block failed with 404. Attempting ytInitialData + shorts fallback for', channelInfo.videoId);
+
+            // 1) Try resolving the channel directly from ytInitialData (search/watch responses)
+            try {
+                const ytChannel = await searchYtInitialDataForVideoChannel(channelInfo.videoId);
+                if (ytChannel && (ytChannel.id || ytChannel.handle)) {
+                    let retryInput = '';
+
+                    // Prefer UC ID when available
+                    if (ytChannel.id && ytChannel.id.startsWith('UC')) {
+                        retryInput = ytChannel.id;
+                        channelInfo.id = ytChannel.id;
                     }
-                    result = await addChannelDirectly(normalizedHandle, filterAll, collaborationWith, menuItem.getAttribute('data-collaboration-group-id'));
+
+                    // Fallback to a normalized handle from ytInitialData if no UC ID
+                    if (!retryInput && ytChannel.handle) {
+                        const normalizedFromYt = normalizeHandleValue(ytChannel.handle);
+                        if (normalizedFromYt) {
+                            retryInput = normalizedFromYt;
+                            channelInfo.handle = normalizedFromYt;
+                        }
+                    }
+
+                    if (retryInput) {
+                        console.log('FilterTube: Retrying block with ytInitialData identifier:', retryInput);
+
+                        // Cache the resolved handle/ID on a nearby card element to help future passes
+                        const cacheTarget = videoCard || document.querySelector(`ytd-rich-item-renderer a[href*="${channelInfo.videoId}"]`)?.closest('[data-filtertube-channel-handle],[data-filtertube-channel-id]');
+                        if (cacheTarget) {
+                            if (channelInfo.handle) {
+                                cacheTarget.setAttribute('data-filtertube-channel-handle', channelInfo.handle);
+                            }
+                            if (channelInfo.id) {
+                                cacheTarget.setAttribute('data-filtertube-channel-id', channelInfo.id);
+                            }
+                        }
+
+                        result = await addChannelDirectly(retryInput, filterAll, collaborationWith, menuItem.getAttribute('data-collaboration-group-id'));
+                    }
+                }
+            } catch (e) {
+                console.warn('FilterTube: ytInitialData channel lookup failed, continuing to Shorts fallback:', e);
+            }
+
+            // 2) If ytInitialData path did not succeed, fall back to Shorts-specific helper
+            if (!result.success) {
+                const fallbackInfo = await fetchChannelFromShortsUrl(channelInfo.videoId);
+                if (fallbackInfo && (fallbackInfo.id || fallbackInfo.handle)) {
+                    let retryInput = null;
+
+                    // Prefer UC ID from Shorts page when available
+                    if (fallbackInfo.id && typeof fallbackInfo.id === 'string' && fallbackInfo.id.startsWith('UC')) {
+                        channelInfo.id = fallbackInfo.id;
+                        retryInput = fallbackInfo.id;
+                    }
+
+                    // Normalize handle from Shorts page if present
+                    let normalizedHandle = null;
+                    if (fallbackInfo.handle) {
+                        normalizedHandle = normalizeHandleValue(fallbackInfo.handle);
+                        if (normalizedHandle) {
+                            channelInfo.handle = normalizedHandle;
+                        }
+                    }
+
+                    // If we have both UC ID and handle, broadcast mapping to Background for persistence
+                    if (channelInfo.id && channelInfo.handle) {
+                        try {
+                            window.postMessage({
+                                type: 'FilterTube_UpdateChannelMap',
+                                payload: [{ id: channelInfo.id, handle: channelInfo.handle }],
+                                source: 'content_bridge'
+                            }, '*');
+                        } catch (e) {
+                            console.warn('FilterTube: Failed to broadcast Shorts channel mapping', e);
+                        }
+                    }
+
+                    // If no UC ID, fall back to handle as last resort
+                    if (!retryInput) {
+                        retryInput = normalizedHandle;
+                    }
+
+                    if (retryInput) {
+                        console.log('FilterTube: Retrying block with Shorts identifier:', retryInput);
+
+                        // Cache the resolved handle/ID on a nearby card element to help future passes
+                        const cacheTarget = videoCard || document
+                            .querySelector(`ytd-rich-item-renderer a[href*="${channelInfo.videoId}"]`)?.closest('[data-filtertube-channel-handle],[data-filtertube-channel-id]');
+                        if (cacheTarget) {
+                            if (channelInfo.handle) {
+                                cacheTarget.setAttribute('data-filtertube-channel-handle', channelInfo.handle);
+                            }
+                            if (channelInfo.id) {
+                                cacheTarget.setAttribute('data-filtertube-channel-id', channelInfo.id);
+                            }
+                        }
+
+                        result = await addChannelDirectly(retryInput, filterAll, collaborationWith, menuItem.getAttribute('data-collaboration-group-id'));
+                    }
                 }
             }
         }
