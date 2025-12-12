@@ -50,6 +50,42 @@
     // Cache for collaboration data from filter_logic.js
     var collaboratorCache = new Map(); // videoId -> collaborators array
 
+    const HANDLE_TERMINATOR_REGEX = /[\/\s?#"'<>\u2022\u00B7]/;
+    function extractRawHandle(value) {
+        if (!value || typeof value !== 'string') return '';
+        let working = value.trim();
+        if (!working) return '';
+        const atIndex = working.indexOf('@');
+        if (atIndex === -1) return '';
+        working = working.substring(atIndex + 1);
+        if (!working) return '';
+
+        let buffer = '';
+        for (let i = 0; i < working.length; i++) {
+            const char = working[i];
+            if (char === '%' && i + 2 < working.length && /[0-9A-Fa-f]{2}/.test(working.substring(i + 1, i + 3))) {
+                buffer += working.substring(i, i + 3);
+                i += 2;
+                continue;
+            }
+            if (HANDLE_TERMINATOR_REGEX.test(char)) {
+                break;
+            }
+            buffer += char;
+        }
+
+        if (!buffer) return '';
+        try {
+            buffer = decodeURIComponent(buffer);
+        } catch (err) {
+            // ignore
+        }
+        buffer = buffer.replace(/[\u200B-\u200F\u202A-\u202E\u2066-\u2069\uFEFF]/g, '');
+        buffer = buffer.trim();
+        if (!buffer) return '';
+        return `@${buffer}`;
+    }
+
     function getCollaboratorListQuality(list) {
         if (!Array.isArray(list) || list.length === 0) return 0;
         return list.reduce((score, collaborator) => {
@@ -153,12 +189,15 @@
 
         // Handle single-channel info request from content_bridge (for UC ID + handle lookup)
         if (type === 'FilterTube_RequestChannelInfo' && source === 'content_bridge') {
-            const { videoId, requestId } = payload || {};
+            const { videoId, requestId, expectedHandle, expectedName } = payload || {};
             postLog('log', `Received channel info request for video: ${videoId}`);
 
             let channel = null;
             if (videoId) {
-                channel = searchYtInitialDataForVideoChannel(videoId);
+                channel = searchYtInitialDataForVideoChannel(videoId, {
+                    expectedHandle: extractRawHandle(expectedHandle) || expectedHandle,
+                    expectedName
+                });
             }
 
             window.postMessage({
@@ -225,16 +264,12 @@
 
                     const collab = { name: title };
                     if (browseEndpoint?.canonicalBaseUrl) {
-                        const handleMatch = browseEndpoint.canonicalBaseUrl.match(/@([\w.-]+)/);
-                        if (handleMatch) {
-                            collab.handle = `@${handleMatch[1]}`;
-                        }
+                        const extracted = extractRawHandle(browseEndpoint.canonicalBaseUrl);
+                        if (extracted) collab.handle = extracted;
                     }
                     if (!collab.handle && subtitle) {
-                        const handleMatch = subtitle.match(/@([\w.-]+)/);
-                        if (handleMatch) {
-                            collab.handle = `@${handleMatch[1]}`;
-                        }
+                        const extracted = extractRawHandle(subtitle);
+                        if (extracted) collab.handle = extracted;
                     }
                     if (browseEndpoint?.browseId?.startsWith('UC')) {
                         collab.id = browseEndpoint.browseId;
@@ -262,10 +297,8 @@
                     name: run.text
                 };
                 if (browseEndpoint.canonicalBaseUrl) {
-                    const handleMatch = browseEndpoint.canonicalBaseUrl.match(/@([\w.-]+)/);
-                    if (handleMatch) {
-                        fallback.handle = `@${handleMatch[1]}`;
-                    }
+                    const extracted = extractRawHandle(browseEndpoint.canonicalBaseUrl);
+                    if (extracted) fallback.handle = extracted;
                 }
 
                 if (fallback.id || fallback.handle || fallback.name) {
@@ -285,7 +318,12 @@
      * @param {string} videoId
      * @returns {Object|null}
      */
-    function searchYtInitialDataForVideoChannel(videoId) {
+    function normalizeChannelName(value) {
+        if (!value || typeof value !== 'string') return '';
+        return value.trim().toLowerCase().replace(/\s+/g, ' ');
+    }
+
+    function searchYtInitialDataForVideoChannel(videoId, options = {}) {
         if (!videoId) {
             postLog('log', 'Channel search skipped - missing videoId');
             return null;
@@ -300,25 +338,50 @@
 
         let foundVideoObject = false;
         const visited = new WeakSet();
+        const normalizedExpectedHandle = typeof options.expectedHandle === 'string'
+            ? (extractRawHandle(options.expectedHandle) || options.expectedHandle).trim().toLowerCase()
+            : '';
+        const normalizedExpectedName = normalizeChannelName(options.expectedName);
+        const hasExpectations = Boolean(normalizedExpectedHandle || normalizedExpectedName);
+        let fallbackCandidate = null;
 
-        function searchObject(obj, path) {
-            if (!obj || typeof obj !== 'object' || visited.has(obj)) return null;
-            visited.add(obj);
+        function matchesExpectations(candidate) {
+            if (!candidate) return false;
+            if (!hasExpectations) return true;
+            if (normalizedExpectedHandle) {
+                const candidateHandle = candidate.handle ? candidate.handle.toLowerCase() : '';
+                // Only enforce when candidate has a handle; some ytInitialData nodes provide UC ID only.
+                if (candidateHandle && candidateHandle !== normalizedExpectedHandle) {
+                    return false;
+                }
+            }
+            if (normalizedExpectedName) {
+                const candidateName = normalizeChannelName(candidate.name);
+                // Only enforce when candidate has a name; some nodes omit byline text.
+                if (candidateName && candidateName !== normalizedExpectedName) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function searchNode(node) {
+            if (!node || typeof node !== 'object' || visited.has(node)) return null;
+            visited.add(node);
 
             // Direct hit: object with our videoId
-            if (obj.videoId === videoId) {
+            if (node.videoId === videoId) {
                 foundVideoObject = true;
 
                 // Priority 1: navigationEndpoint.browseEndpoint on the video renderer
-                const nav = obj.navigationEndpoint && obj.navigationEndpoint.browseEndpoint;
+                const nav = node.navigationEndpoint && node.navigationEndpoint.browseEndpoint;
                 if (nav) {
                     const browseId = nav.browseId;
                     const canonicalBaseUrl = nav.canonicalBaseUrl;
-                    const name = (obj.shortBylineText?.runs?.[0]?.text) || (obj.longBylineText?.runs?.[0]?.text) || undefined;
+                    const name = (node.shortBylineText?.runs?.[0]?.text) || (node.longBylineText?.runs?.[0]?.text) || undefined;
 
                     if (canonicalBaseUrl) {
-                        const handleMatch = canonicalBaseUrl.match(/@([\w.-]+)/);
-                        const handle = handleMatch ? `@${handleMatch[1]}` : null;
+                        const handle = extractRawHandle(canonicalBaseUrl) || null;
                         if (handle && browseId && browseId.startsWith('UC')) {
                             return { id: browseId, handle, name };
                         }
@@ -333,62 +396,61 @@
                 }
 
                 // Priority 2: byline runs
-                const byline = obj.shortBylineText || obj.longBylineText;
-                if (byline?.runs) {
+                const byline = node.shortBylineText || node.longBylineText || node.ownerText;
+                if (byline?.runs && Array.isArray(byline.runs)) {
                     for (const run of byline.runs) {
-                        const browseEndpoint = run.navigationEndpoint?.browseEndpoint;
-                        if (!browseEndpoint) continue;
+                        const browse = run?.navigationEndpoint?.browseEndpoint;
+                        if (!browse) continue;
 
-                        const browseId = browseEndpoint.browseId;
-                        const canonicalBaseUrl = browseEndpoint.canonicalBaseUrl;
+                        const browseId = browse.browseId;
+                        const canonicalBaseUrl = browse.canonicalBaseUrl;
                         const name = run.text;
 
                         if (canonicalBaseUrl) {
-                            const handleMatch = canonicalBaseUrl.match(/@([\w.-]+)/);
-                            const handle = handleMatch ? `@${handleMatch[1]}` : null;
-                            if (handle && browseId && browseId.startsWith('UC')) {
-                                return { id: browseId, handle, name };
-                            }
+                            const handle = extractRawHandle(canonicalBaseUrl) || null;
                             if (handle) {
-                                return { handle, name };
+                                console.log('FilterTube: Found channel in ytInitialData (deep search):', { handle, id: browseId });
+                                const candidate = { handle, id: browseId, name };
+                                if (!hasExpectations || matchesExpectations(candidate)) {
+                                    return candidate;
+                                }
+                                if (!fallbackCandidate) {
+                                    fallbackCandidate = candidate;
+                                }
+                            } else if (browseId && browseId.startsWith('UC')) {
+                                const candidate = { id: browseId, name };
+                                if (!hasExpectations || matchesExpectations(candidate)) {
+                                    return candidate;
+                                }
+                                if (!fallbackCandidate) {
+                                    fallbackCandidate = candidate;
+                                }
                             }
-                        }
-
-                        if (browseId && browseId.startsWith('UC')) {
-                            return { id: browseId, name };
                         }
                     }
                 }
             }
 
             // Recurse
-            if (Array.isArray(obj)) {
-                for (let i = 0; i < obj.length; i++) {
-                    const result = searchObject(obj[i], `${path}[${i}]`);
-                    if (result) return result;
-                }
-            } else {
-                for (const key in obj) {
-                    if (!Object.prototype.hasOwnProperty.call(obj, key)) continue;
-                    const value = obj[key];
-                    if (!value || typeof value !== 'object') continue;
-                    const result = searchObject(value, `${path}.${key}`);
-                    if (result) return result;
+            if (Array.isArray(node)) {
+                for (const child of node) {
+                    const found = searchNode(child);
+                    if (found) return found;
                 }
             }
 
             return null;
         }
 
-        const result = searchObject(window.ytInitialData, 'root');
+        const result = searchNode(window.ytInitialData);
 
         if (!foundVideoObject) {
             postLog('log', `Channel search: video ID not found in ytInitialData: ${videoId}`);
-        } else if (!result) {
+        } else if (!result && !fallbackCandidate) {
             postLog('log', `Channel search: video found but no channel info extracted for: ${videoId}`);
         }
 
-        return result;
+        return result || fallbackCandidate;
     }
 
     /**

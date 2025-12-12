@@ -13,6 +13,38 @@ function debugLog(message, ...args) {
     // console.log(`[${debugSequence}] FilterTube (Bridge ${IS_FIREFOX_BRIDGE ? 'Fx' : 'Cr'}):`, message, ...args);
 }
 
+function buildChannelMetadataPayload(channelInfo = {}) {
+    const canonical = channelInfo.canonicalHandle || channelInfo.handleDisplay || channelInfo.handle || '';
+    const display = channelInfo.handleDisplay || canonical || channelInfo.name || '';
+    return {
+        canonicalHandle: canonical || null,
+        handleDisplay: display || null,
+        channelName: channelInfo.name || null
+    };
+}
+
+function upsertFilterChannel(channelData) {
+    if (!channelData) return;
+    if (!currentSettings || typeof currentSettings !== 'object') {
+        currentSettings = { filterChannels: [channelData] };
+        return;
+    }
+    const existing = Array.isArray(currentSettings.filterChannels) ? [...currentSettings.filterChannels] : [];
+    const incomingId = (channelData.id || '').toLowerCase();
+    const incomingHandle = (channelData.handle || '').toLowerCase();
+    const idx = existing.findIndex(ch => {
+        const chId = (ch.id || '').toLowerCase();
+        const chHandle = (ch.handle || '').toLowerCase();
+        return (incomingId && chId === incomingId) || (incomingHandle && chHandle === incomingHandle);
+    });
+    if (idx !== -1) {
+        existing[idx] = { ...existing[idx], ...channelData };
+    } else {
+        existing.unshift(channelData);
+    }
+    currentSettings.filterChannels = existing;
+}
+
 function registerActiveCollaborationMenu(videoId, dropdown, videoCard, state = {}) {
     if (!videoId || !dropdown) return;
     const context = {
@@ -370,8 +402,10 @@ function refreshActiveCollaborationMenu(videoId, collaborators, options = {}) {
 // ==========================================
 const resolvedHandleCache = new Map();
 
-async function fetchIdForHandle(handle) {
-    const cleanHandle = handle.toLowerCase().replace('@', '');
+async function fetchIdForHandle(handle, options = {}) {
+    const { skipNetwork = false } = options;
+    const normalizedHandle = normalizeHandleValue(handle);
+    const cleanHandle = normalizedHandle ? normalizedHandle.replace(/^@/, '') : '';
     if (!cleanHandle) return null;
 
     // If we already have a result, return it.
@@ -379,10 +413,9 @@ async function fetchIdForHandle(handle) {
     // "not yet resolved" so callers see a simple "no ID yet" (null).
     if (resolvedHandleCache.has(cleanHandle)) {
         const cached = resolvedHandleCache.get(cleanHandle);
-        if (cached === 'PENDING') {
-            return null;
+        if (cached !== 'PENDING') {
+            return cached;
         }
-        return cached;
     }
 
     // Try resolving from persisted channelMap first to avoid hitting broken /about pages
@@ -401,22 +434,44 @@ async function fetchIdForHandle(handle) {
         console.warn('FilterTube: Failed to read channelMap while resolving handle', e);
     }
 
+    if (resolvedHandleCache.has(cleanHandle) && resolvedHandleCache.get(cleanHandle) === 'PENDING') {
+        return null;
+    }
+
+    if (skipNetwork) {
+        // Remove the pending marker so future non-skip calls can attempt network fetch
+        resolvedHandleCache.delete(cleanHandle);
+        return null;
+    }
+
     // Mark as pending to prevent Loop
     resolvedHandleCache.set(cleanHandle, 'PENDING');
 
     try {
-        // console.log(`FilterTube: 🕵️ Actively resolving ID for @${cleanHandle}...`);
-        const response = await fetch(`https://www.youtube.com/@${cleanHandle}/about`);
+        const rawCandidate = extractRawHandle(handle);
+        const networkHandleCore = rawCandidate
+            ? rawCandidate.replace(/^@+/, '').split(/[/?#]/)[0].trim()
+            : cleanHandle;
+        const encodedHandle = encodeURIComponent(networkHandleCore);
+        let response = await fetch(`https://www.youtube.com/@${encodedHandle}/about`);
+
+        if (!response.ok) {
+            response = await fetch(`https://www.youtube.com/@${encodedHandle}`);
+        }
+
+        if (!response.ok) {
+            resolvedHandleCache.delete(cleanHandle);
+            return null;
+        }
+
         const text = await response.text();
 
         const match = text.match(/channel\/(UC[\w-]{22})/);
         if (match && match[1]) {
             const id = match[1];
 
-            // Update Cache
             resolvedHandleCache.set(cleanHandle, id);
 
-            // Broadcast to Background (Permanent Storage)
             window.postMessage({
                 type: 'FilterTube_UpdateChannelMap',
                 payload: [{ id: id, handle: `@${cleanHandle}` }],
@@ -425,11 +480,6 @@ async function fetchIdForHandle(handle) {
 
             console.log(`FilterTube: ✅ Resolved @${cleanHandle} -> ${id}`);
 
-            // DO NOT CALL applyDOMFallback HERE. 
-            // The next scroll event or mutation observer will pick up the new cache value naturally.
-            // This prevents the Infinite Loop.
-            // Safe re-process: This triggers the filter again to hide the content immediately.
-            // Because the cache is now set to the ID (not PENDING), the next pass won't fetch again.
             setTimeout(() => {
                 if (typeof applyDOMFallback === 'function') {
                     applyDOMFallback(currentSettings, { forceReprocess: true });
@@ -437,9 +487,10 @@ async function fetchIdForHandle(handle) {
             }, 50);
             return id;
         }
+        resolvedHandleCache.delete(cleanHandle);
     } catch (e) {
         console.warn(`FilterTube: Failed to resolve @${cleanHandle}`, e);
-        resolvedHandleCache.delete(cleanHandle); // Delete so we can retry later if it was just a network blip
+        resolvedHandleCache.delete(cleanHandle);
     }
     return null;
 }
@@ -884,18 +935,124 @@ function scheduleCollaboratorRefresh() {
     });
 }
 
+const HANDLE_TERMINATOR_REGEX = /[\/\s?#"'<>\&]/;
+const HANDLE_GLYPH_NORMALIZERS = [
+    { pattern: /[\u2018\u2019\u201A\u201B\u2032\uFF07]/g, replacement: '\'' },
+    { pattern: /[\u201C\u201D\u2033\uFF02]/g, replacement: '"' },
+    { pattern: /[\u2013\u2014]/g, replacement: '-' },
+    { pattern: /\uFF0E/g, replacement: '.' },
+    { pattern: /\uFF3F/g, replacement: '_' }
+];
+
+function persistChannelMappings(mappings = []) {
+    if (!Array.isArray(mappings) || mappings.length === 0) return;
+    try {
+        browserAPI_BRIDGE.runtime.sendMessage({
+            action: "updateChannelMap",
+            mappings
+        });
+    } catch (error) {
+        console.warn('FilterTube: Failed to persist channel mapping', error);
+    }
+
+    if (!currentSettings || typeof currentSettings !== 'object') return;
+    if (!currentSettings.channelMap || typeof currentSettings.channelMap !== 'object') {
+        currentSettings.channelMap = {};
+    }
+    const map = currentSettings.channelMap;
+    mappings.forEach(mapping => {
+        if (!mapping || !mapping.id || !mapping.handle) return;
+        const idKey = mapping.id.toLowerCase();
+        const handleKey = mapping.handle.toLowerCase();
+        map[idKey] = mapping.handle;
+        map[handleKey] = mapping.id;
+    });
+}
+
+function normalizeHandleGlyphs(value) {
+    let normalized = value;
+    HANDLE_GLYPH_NORMALIZERS.forEach(({ pattern, replacement }) => {
+        normalized = normalized.replace(pattern, replacement);
+    });
+    return normalized;
+}
+
+function extractRawHandle(value) {
+    if (!value || typeof value !== 'string') return '';
+    let working = value.trim();
+    if (!working) return '';
+
+    const atIndex = working.indexOf('@');
+    if (atIndex === -1) return '';
+
+    working = working.substring(atIndex + 1);
+    if (!working) return '';
+
+    let buffer = '';
+    for (let i = 0; i < working.length; i++) {
+        const char = working[i];
+        if (char === '%' && i + 2 < working.length && /[0-9A-Fa-f]{2}/.test(working.substring(i + 1, i + 3))) {
+            buffer += working.substring(i, i + 3);
+            i += 2;
+            continue;
+        }
+        if (HANDLE_TERMINATOR_REGEX.test(char)) {
+            break;
+        }
+        buffer += char;
+    }
+
+    if (!buffer) return '';
+
+    try {
+        buffer = decodeURIComponent(buffer);
+    } catch (err) {
+        // Ignore decode failures; fall back to raw string
+    }
+
+    buffer = normalizeHandleGlyphs(buffer);
+    if (!buffer) return '';
+    return `@${buffer}`;
+}
+
 function normalizeHandleValue(handle) {
     if (!handle) return '';
     let normalized = handle.trim();
     if (!normalized) return '';
-    // Strip any leading @ characters
+
+    // Always operate on the raw decoded handle to avoid mismatched cases/encodings
+    const rawHandle = extractRawHandle(normalized);
+    if (rawHandle) {
+        normalized = rawHandle;
+    }
+
     normalized = normalized.replace(/^@+/, '');
-    // Remove everything after the first slash (handles embedded in URLs like "channel/@foo/videos")
     normalized = normalized.split('/')[0];
-    // Collapse whitespace (unlikely but safe)
     normalized = normalized.replace(/\s+/g, '');
     if (!normalized) return '';
     return `@${normalized.toLowerCase()}`;
+}
+
+function extractHandleFromString(value) {
+    const raw = extractRawHandle(value);
+    return raw ? normalizeHandleValue(raw) : '';
+}
+
+function applyHandleMetadata(target, candidateHandle, options = {}) {
+    if (!target || !candidateHandle) return '';
+    const { force = false } = options;
+    const rawHandle = extractRawHandle(candidateHandle) || (candidateHandle.startsWith('@') ? candidateHandle : '');
+    if (rawHandle && (force || !target.handleDisplay)) {
+        target.handleDisplay = rawHandle;
+    }
+    if (rawHandle && (force || !target.canonicalHandle)) {
+        target.canonicalHandle = rawHandle;
+    }
+    const normalized = normalizeHandleValue(rawHandle || candidateHandle);
+    if (normalized && (force || !target.handle)) {
+        target.handle = normalized;
+    }
+    return normalized || '';
 }
 
 function isPlaceholderCollaboratorEntry(collaborator) {
@@ -1077,6 +1234,10 @@ function getValidatedCachedCollaborators(card) {
         card.removeAttribute('data-filtertube-blocked-state');
         card.removeAttribute('data-filtertube-blocked-ts');
         card.removeAttribute('data-filtertube-duration');
+        // Also clear any cached channel identifiers attached to the card
+        card.removeAttribute('data-filtertube-channel-id');
+        card.removeAttribute('data-filtertube-channel-handle');
+        card.removeAttribute('data-filtertube-channel-name');
 
         // Also clear from the global resolved map if it had stale data
         if (resolvedCollaboratorsByVideoId.has(cachedVideoId)) {
@@ -2086,15 +2247,8 @@ const CHANNEL_ONLY_TAGS = new Set([
     'ytm-universal-watch-card-renderer'
 ]);
 
-function extractHandleFromString(value) {
-    if (!value || typeof value !== 'string') return '';
-    const match = value.match(/@([A-Za-z0-9._-]+)/);
-    return match ? `@${match[1].toLowerCase()}` : '';
-}
-
 function extractChannelIdFromString(value) {
     if (!value || typeof value !== 'string') return '';
-    // Channel IDs are case-sensitive - preserve original case (typically UCxxxxxxx)
     const match = value.match(/UC[0-9A-Za-z_-]{22}/);
     return match ? match[0] : '';
 }
@@ -2139,8 +2293,8 @@ function scanDataForChannelIdentifiers(root) {
     else if (root.browseId && root.browseId.startsWith('UC')) result.id = root.browseId;
 
     if (root.canonicalBaseUrl && root.canonicalBaseUrl.includes('/@')) {
-        const match = root.canonicalBaseUrl.match(/@([A-Za-z0-9._-]+)/);
-        if (match) result.handle = `@${match[1].toLowerCase()}`;
+        const handle = extractHandleFromString(root.canonicalBaseUrl);
+        if (handle) result.handle = handle;
     }
 
     if (result.id && result.handle) return result;
@@ -2158,14 +2312,15 @@ function scanDataForChannelIdentifiers(root) {
                     if (!result.id) result.id = val.browseId;
                 }
                 if (val.url && val.url.includes('/@')) {
-                    const match = val.url.match(/@([A-Za-z0-9._-]+)/);
-                    if (match && !result.handle) result.handle = `@${match[1].toLowerCase()}`;
+                    const handle = extractHandleFromString(val.url);
+                    if (handle && !result.handle) result.handle = handle;
                 }
                 // Check text runs for handles
                 if (Array.isArray(val)) {
                     for (const run of val) {
                         if (run.text && run.text.startsWith('@') && !result.handle) {
-                            result.handle = run.text.toLowerCase();
+                            const normalized = normalizeHandleValue(run.text);
+                            if (normalized) result.handle = normalized;
                         }
                         if (run.navigationEndpoint) {
                             const nav = run.navigationEndpoint;
@@ -2194,10 +2349,32 @@ function extractChannelMetadataFromElement(element, channelText = '', channelHre
 
     const cachedHandle = cacheSource?.getAttribute?.('data-filtertube-channel-handle');
     const cachedId = cacheSource?.getAttribute?.('data-filtertube-channel-id');
-    if ((cachedHandle && cachedHandle !== '') || (cachedId && cachedId !== '')) {
+
+    const normalizedHref = normalizeHrefForParsing(channelHref);
+    const hrefHandle = extractHandleFromString(normalizedHref) || extractHandleFromString(channelHref);
+    const hrefId = extractChannelIdFromString(normalizedHref) || extractChannelIdFromString(channelHref);
+
+    const normalizedCachedHandle = cachedHandle ? normalizeHandleValue(cachedHandle) : '';
+    const shouldTrustCachedHandle = Boolean(
+        normalizedCachedHandle &&
+        (!hrefHandle || normalizedCachedHandle === normalizeHandleValue(hrefHandle))
+    );
+    const shouldTrustCachedId = Boolean(
+        cachedId &&
+        (!hrefId || cachedId === hrefId)
+    );
+
+    if (cachedHandle && !shouldTrustCachedHandle) {
+        cacheSource?.removeAttribute?.('data-filtertube-channel-handle');
+    }
+    if (cachedId && !shouldTrustCachedId) {
+        cacheSource?.removeAttribute?.('data-filtertube-channel-id');
+    }
+
+    if (shouldTrustCachedHandle || shouldTrustCachedId) {
         return {
-            handle: cachedHandle || '',
-            id: cachedId || ''
+            handle: shouldTrustCachedHandle ? normalizedCachedHandle : '',
+            id: shouldTrustCachedId ? (cachedId || '') : ''
         };
     }
 
@@ -2305,55 +2482,68 @@ function extractChannelMetadataFromElement(element, channelText = '', channelHre
 
         for (const anchor of anchorCandidates) {
             const href = anchor.getAttribute('href') || anchor.href || '';
+            const normalizedHref = href ? normalizeHrefForParsing(href) : '';
+            const isChannelLink = Boolean(normalizedHref && (
+                normalizedHref.startsWith('/@') ||
+                normalizedHref.startsWith('/channel/') ||
+                normalizedHref.startsWith('/c/') ||
+                normalizedHref.startsWith('/user/')
+            ));
+
             if (href) {
-                const normalizedHref = normalizeHrefForParsing(href);
+                const idFromHref = extractChannelIdFromString(href) || extractChannelIdFromString(normalizedHref);
+                if (!meta.id && idFromHref) {
+                    meta.id = idFromHref;
+                }
+
+                const handleFromHref = isChannelLink
+                    ? (extractHandleFromString(href) || extractHandleFromString(normalizedHref))
+                    : '';
+
+                if (handleFromHref) {
+                    meta.handle = handleFromHref;
+                }
+            }
+
+            if (isChannelLink) {
                 if (!meta.handle) {
-                    const handleFromHref = extractHandleFromString(href) || extractHandleFromString(normalizedHref);
-                    if (handleFromHref) meta.handle = handleFromHref;
+                    const anchorDatasetValues = collectDatasetValues(anchor);
+                    if (anchorDatasetValues) {
+                        const dsHandle = extractHandleFromString(anchorDatasetValues);
+                        if (dsHandle) meta.handle = dsHandle;
+                    }
                 }
+
                 if (!meta.id) {
-                    const idFromHref = extractChannelIdFromString(href) || extractChannelIdFromString(normalizedHref);
-                    if (idFromHref) meta.id = idFromHref;
+                    const anchorDatasetValues = collectDatasetValues(anchor);
+                    if (anchorDatasetValues) {
+                        const dsId = extractChannelIdFromString(anchorDatasetValues);
+                        if (dsId) meta.id = dsId;
+                    }
                 }
-            }
 
-            if (!meta.handle) {
-                const anchorDatasetValues = collectDatasetValues(anchor);
-                if (anchorDatasetValues) {
-                    const dsHandle = extractHandleFromString(anchorDatasetValues);
-                    if (dsHandle) meta.handle = dsHandle;
+                if (!meta.handle) {
+                    const anchorAttributeValues = collectAttributeValues(anchor);
+                    if (anchorAttributeValues) {
+                        const attrHandle = extractHandleFromString(anchorAttributeValues);
+                        if (attrHandle) meta.handle = attrHandle;
+                    }
                 }
-            }
 
-            if (!meta.id) {
-                const anchorDatasetValues = collectDatasetValues(anchor);
-                if (anchorDatasetValues) {
-                    const dsId = extractChannelIdFromString(anchorDatasetValues);
-                    if (dsId) meta.id = dsId;
+                if (!meta.id) {
+                    const anchorAttributeValues = collectAttributeValues(anchor);
+                    if (anchorAttributeValues) {
+                        const attrId = extractChannelIdFromString(anchorAttributeValues);
+                        if (attrId) meta.id = attrId;
+                    }
                 }
-            }
 
-            if (!meta.handle) {
-                const anchorAttributeValues = collectAttributeValues(anchor);
-                if (anchorAttributeValues) {
-                    const attrHandle = extractHandleFromString(anchorAttributeValues);
-                    if (attrHandle) meta.handle = attrHandle;
-                }
-            }
-
-            if (!meta.id) {
-                const anchorAttributeValues = collectAttributeValues(anchor);
-                if (anchorAttributeValues) {
-                    const attrId = extractChannelIdFromString(anchorAttributeValues);
-                    if (attrId) meta.id = attrId;
-                }
-            }
-
-            if (!meta.handle) {
-                const anchorText = anchor.textContent || '';
-                if (anchorText) {
-                    const textHandle = extractHandleFromString(anchorText);
-                    if (textHandle) meta.handle = textHandle;
+                if (!meta.handle) {
+                    const anchorText = anchor.textContent || '';
+                    if (anchorText) {
+                        const textHandle = extractHandleFromString(anchorText);
+                        if (textHandle) meta.handle = textHandle;
+                    }
                 }
             }
 
@@ -2373,10 +2563,7 @@ function extractChannelMetadataFromElement(element, channelText = '', channelHre
     }
 
     if (meta.handle) {
-        meta.handle = meta.handle.toLowerCase();
-        if (!meta.handle.startsWith('@') && meta.handle) {
-            meta.handle = `@${meta.handle.replace(/^@+/, '')}`;
-        }
+        meta.handle = normalizeHandleValue(meta.handle);
     }
 
     // Note: Channel IDs are case-sensitive and must NOT be lowercased
@@ -2440,9 +2627,9 @@ function extractCollaboratorMetadataFromElement(element) {
                 if (!href) continue;
 
                 if (!collaborator.handle) {
-                    const handleMatch = href.match(/@([\w.-]+)/);
-                    if (handleMatch) {
-                        collaborator.handle = `@${handleMatch[1].toLowerCase()}`;
+                    const extracted = extractRawHandle(href);
+                    if (extracted) {
+                        collaborator.handle = normalizeHandleValue(extracted);
                     }
                 }
 
@@ -2631,9 +2818,30 @@ function extractCollaboratorMetadataFromElement(element) {
     return collaborators;
 }
 
+function normalizeHandleForComparison(handle) {
+    if (!handle || typeof handle !== 'string') return '';
+    const normalized = normalizeHandleValue(handle);
+    return normalized ? normalized.toLowerCase() : '';
+}
+
 function channelMatchesFilter(meta, filterChannel, channelMap = {}) {
     // Safety: Don't match against empty or invalid filters
     if (!filterChannel) return false;
+
+    const metaHandles = new Set();
+    const addMetaHandle = (value) => {
+        const normalized = normalizeHandleForComparison(value);
+        if (normalized) metaHandles.add(normalized);
+    };
+    addMetaHandle(meta.handle);
+    addMetaHandle(meta.canonicalHandle);
+    addMetaHandle(meta.handleDisplay);
+
+    const filterHandles = new Set();
+    const addFilterHandle = (value) => {
+        const normalized = normalizeHandleForComparison(value);
+        if (normalized) filterHandles.add(normalized);
+    };
 
     // Handle new object format: { name, id, handle }
     if (typeof filterChannel === 'object' && filterChannel !== null) {
@@ -2641,8 +2849,12 @@ function channelMatchesFilter(meta, filterChannel, channelMap = {}) {
         const filterHandle = (filterChannel.handle || '').toLowerCase();
         const filterName = (filterChannel.name || '').toLowerCase().trim();
 
+        addFilterHandle(filterChannel.handle);
+        addFilterHandle(filterChannel.canonicalHandle);
+        addFilterHandle(filterChannel.handleDisplay);
+
         // Safety: If ID, handle, and name are all empty, don't match anything
-        if (!filterId && !filterHandle && !filterName) return false;
+        if (!filterId && filterHandles.size === 0 && !filterName) return false;
 
         const metaId = (meta.id || '').toLowerCase();
         const metaHandle = (meta.handle || '').toLowerCase();
@@ -2653,7 +2865,18 @@ function channelMatchesFilter(meta, filterChannel, channelMap = {}) {
             return true;
         }
 
-        // Direct match by handle
+        // Direct match by any handle variant
+        if (filterHandles.size > 0 && metaHandles.size > 0) {
+            for (const handle of filterHandles) {
+                if (metaHandles.has(handle)) {
+                    return true;
+                }
+            }
+        }
+
+        if (!filterId && filterHandles.size === 0 && !filterName) return false;
+
+        // Backwards compatibility: filterHandle stored separately
         if (filterHandle && metaHandle && metaHandle === filterHandle) {
             return true;
         }
@@ -2665,34 +2888,43 @@ function channelMatchesFilter(meta, filterChannel, channelMap = {}) {
         }
 
         // Match filter name against meta handle (e.g., filter "Veritasium" matches @veritasium)
-        if (filterName && metaHandle) {
-            const handleWithoutAt = metaHandle.replace(/^@/, '');
-            if (filterName === handleWithoutAt) {
-                return true;
+        if (filterName && metaHandles.size > 0) {
+            for (const handle of metaHandles) {
+                const handleWithoutAt = handle.replace(/^@/, '');
+                if (filterName === handleWithoutAt) {
+                    return true;
+                }
             }
         }
 
-        // Match filter handle against meta name (e.g., filter @veritasium matches name "Veritasium")
-        if (filterHandle && metaName) {
-            const handleWithoutAt = filterHandle.replace(/^@/, '');
-            if (handleWithoutAt === metaName) {
-                return true;
+        if (filterHandles.size > 0 && metaName) {
+            const normalizedMetaName = metaName.toLowerCase();
+            for (const handle of filterHandles) {
+                const handleWithoutAt = handle.replace(/^@/, '');
+                if (handleWithoutAt === normalizedMetaName) {
+                    return true;
+                }
             }
         }
 
-        // Cross-match using channelMap: blocking UC ID should also block its handle
-        if (filterId && metaHandle) {
+        // Cross-match using channelMap: blocking UC ID should also block its handles
+        if (filterId && metaHandles.size > 0) {
             const mappedHandle = channelMap[filterId];
-            if (mappedHandle && metaHandle === mappedHandle) {
-                return true;
+            if (mappedHandle) {
+                const normalizedMappedHandle = normalizeHandleForComparison(mappedHandle);
+                if (normalizedMappedHandle && metaHandles.has(normalizedMappedHandle)) {
+                    return true;
+                }
             }
         }
 
         // Cross-match using channelMap: blocking handle should also block its UC ID
-        if (filterHandle && metaId) {
-            const mappedId = channelMap[filterHandle];
-            if (mappedId && metaId === mappedId) {
-                return true;
+        if (filterHandles.size > 0 && metaId) {
+            for (const handle of filterHandles) {
+                const mappedId = channelMap[handle];
+                if (mappedId && mappedId.toLowerCase() === metaId) {
+                    return true;
+                }
             }
         }
 
@@ -2706,14 +2938,15 @@ function channelMatchesFilter(meta, filterChannel, channelMap = {}) {
 
     // Direct handle match
     if (normalized.startsWith('@')) {
-        if (meta.handle && meta.handle === normalized) {
+        const normalizedHandle = normalizeHandleForComparison(normalized);
+        if (normalizedHandle && metaHandles.has(normalizedHandle)) {
             return true;
         }
 
         // Check channelMap: if filter is a handle, get its UC ID and match
         // Keep the @ in the key to match filter_logic.js convention
         const mappedId = channelMap[normalized];
-        if (mappedId && meta.id && meta.id.toLowerCase() === mappedId) {
+        if (mappedId && meta.id && meta.id.toLowerCase() === mappedId.toLowerCase()) {
             return true;
         }
     }
@@ -3655,7 +3888,7 @@ function requestCollaboratorInfoFromMainWorld(videoId) {
     });
 }
 
-function requestChannelInfoFromMainWorld(videoId) {
+function requestChannelInfoFromMainWorld(videoId, options = {}) {
     return new Promise((resolve) => {
         const requestId = ++channelInfoRequestId;
         const timeoutMs = 2000; // 2 second timeout
@@ -3673,11 +3906,16 @@ function requestChannelInfoFromMainWorld(videoId) {
 
         window.postMessage({
             type: 'FilterTube_RequestChannelInfo',
-            payload: { videoId, requestId },
+            payload: {
+                videoId,
+                requestId,
+                expectedHandle: options.expectedHandle || null,
+                expectedName: options.expectedName || null
+            },
             source: 'content_bridge'
         }, '*');
 
-        console.log('FilterTube: Sent channel info request to Main World for video:', videoId);
+        console.log('FilterTube: Sent channel info request to Main World for video:', videoId, 'expectedName:', options.expectedName || 'n/a');
     });
 }
 
@@ -3794,10 +4032,7 @@ function handleMainWorldMessages(event) {
         });
     } else if (type === 'FilterTube_UpdateChannelMap') {
         // Forward learned channel mappings to background for persistence
-        browserAPI_BRIDGE.runtime.sendMessage({
-            action: "updateChannelMap",
-            mappings: payload
-        });
+        persistChannelMappings(payload);
     } else if (type === 'FilterTube_CollaboratorInfoResponse') {
         // Handle response from Main World with collaborator info
         const { requestId, collaborators, videoId } = payload;
@@ -3965,12 +4200,30 @@ function debounce(func, delay) {
  * @param {string} videoId - The YouTube video ID to search for
  * @returns {Promise<Object|null>} - {handle, name} or {id, name} or null
  */
-async function searchYtInitialDataForVideoChannel(videoId) {
+async function searchYtInitialDataForVideoChannel(videoId, options = null) {
     if (!videoId) {
         console.log('FilterTube: ytInitialData search skipped - no videoId');
         return null;
     }
-    return await requestChannelInfoFromMainWorld(videoId);
+    const resolvedOptions = typeof options === 'object' && options !== null
+        ? options
+        : { expectedHandle: options };
+    const result = await requestChannelInfoFromMainWorld(videoId, resolvedOptions);
+    if (!result) return null;
+
+    if (resolvedOptions.expectedHandle) {
+        const normalizedExpected = normalizeHandleValue(resolvedOptions.expectedHandle);
+        const normalizedFound = normalizeHandleValue(result.handle);
+        if (normalizedExpected && normalizedFound && normalizedExpected !== normalizedFound) {
+            console.warn('FilterTube: ytInitialData handle mismatch, rejecting result', {
+                expected: normalizedExpected,
+                found: normalizedFound,
+                videoId
+            });
+            return null;
+        }
+    }
+    return result;
 }
 
 /**
@@ -4030,13 +4283,13 @@ function extractChannelFromInitialData(initialData) {
                 let handle = null;
                 const canonical = browse.canonicalBaseUrl || browse.canonicalUrl || browse.url;
                 if (typeof canonical === 'string') {
-                    const m = canonical.match(/@([\w.-]+)/);
-                    if (m) handle = `@${m[1]}`;
+                    const extracted = extractRawHandle(canonical);
+                    if (extracted) handle = extracted;
                 }
 
                 if (!handle && typeof run.text === 'string') {
-                    const m2 = run.text.match(/@([\w.-]+)/);
-                    if (m2) handle = `@${m2[1]}`;
+                    const extracted = extractRawHandle(run.text);
+                    if (extracted) handle = extracted;
                 }
 
                 if (handle) {
@@ -4075,7 +4328,7 @@ function extractChannelFromInitialData(initialData) {
  * @param {string} videoId - The shorts video ID
  * @returns {Promise<Object|null>} - {handle, name} or null
  */
-async function fetchChannelFromShortsUrl(videoId) {
+async function fetchChannelFromShortsUrl(videoId, requestedHandle = null) {
     // Check if there's already a pending fetch for this video
     if (pendingShortsFetches.has(videoId)) {
         console.log('FilterTube: Reusing existing fetch for shorts video:', videoId);
@@ -4100,6 +4353,8 @@ async function fetchChannelFromShortsUrl(videoId) {
 
             const html = await response.text();
 
+            const normalizedExpected = normalizeHandleValue(requestedHandle);
+
             // Method 1: Extract from ytInitialData JSON in the HTML
             const ytInitialDataMatch = html.match(/var ytInitialData = ({.+?});/);
             if (ytInitialDataMatch) {
@@ -4121,6 +4376,13 @@ async function fetchChannelFromShortsUrl(videoId) {
                                         const handle = endpoint.canonicalBaseUrl.replace('/user/', '@').replace(/^\//, '');
                                         const id = endpoint.browseId && endpoint.browseId.startsWith('UC') ? endpoint.browseId : null;
                                         console.log('FilterTube: Found channel in ytInitialData (engagement panel):', { handle, id });
+                                        if (normalizedExpected) {
+                                            const normalizedFound = normalizeHandleValue(handle);
+                                            if (!normalizedFound || normalizedFound !== normalizedExpected) {
+                                                console.warn('FilterTube: Shorts engagement panel handle mismatch, rejecting', { expected: normalizedExpected, found: normalizedFound });
+                                                continue;
+                                            }
+                                        }
                                         return { handle, id, name: '' };
                                     }
                                 }
@@ -4138,18 +4400,34 @@ async function fetchChannelFromShortsUrl(videoId) {
                                 ? channelNavEndpoint.browseId
                                 : null;
                             console.log('FilterTube: Found channel in ytInitialData (overlay):', { handle, id });
-                            return {
-                                handle,
-                                id,
-                                name: headerRenderer.channelTitleText?.runs?.[0]?.text || ''
-                            };
+                            if (normalizedExpected) {
+                                const normalizedFound = normalizeHandleValue(handle);
+                                if (!normalizedFound || normalizedFound !== normalizedExpected) {
+                                    console.warn('FilterTube: Shorts overlay handle mismatch, rejecting', { expected: normalizedExpected, found: normalizedFound });
+                                } else {
+                                    return {
+                                        handle,
+                                        id,
+                                        name: headerRenderer.channelTitleText?.runs?.[0]?.text || ''
+                                    };
+                                }
+                            } else {
+                                return {
+                                    handle,
+                                    id,
+                                    name: headerRenderer.channelTitleText?.runs?.[0]?.text || ''
+                                };
+                            }
                         }
                     }
 
                     // Generic deep search over ytInitialData using renderer-style traversal
-                    const deepResult = extractChannelFromInitialData(ytInitialData);
-                    if (deepResult) {
-                        return deepResult;
+                    // Skip this when we have an expected handle because it often returns unrelated channels.
+                    if (!normalizedExpected) {
+                        const deepResult = extractChannelFromInitialData(ytInitialData);
+                        if (deepResult) {
+                            return deepResult;
+                        }
                     }
                 } catch (e) {
                     console.warn('FilterTube: Failed to parse ytInitialData from shorts page:', e);
@@ -4157,35 +4435,55 @@ async function fetchChannelFromShortsUrl(videoId) {
             }
 
             // Method 2: Extract from meta tags
-            const channelUrlMatch = html.match(/<link rel="canonical" href="https:\/\/www\.youtube\.com\/@([\w-]+)"/);
+            const channelUrlMatch = html.match(/<link rel="canonical" href="https:\/\/www\.youtube\.com\/(@[^"]+)"/);
             if (channelUrlMatch) {
-                const handle = `@${channelUrlMatch[1]}`;
-                console.log('FilterTube: Found channel in canonical link:', handle);
-                return { handle, name: '' };
+                const handle = extractRawHandle(channelUrlMatch[1]);
+                const normalizedFound = normalizeHandleValue(handle);
+                if (!normalizedExpected || normalizedFound === normalizedExpected) {
+                    console.log('FilterTube: Found channel in canonical link:', handle);
+                    return { handle, name: '' };
+                } else {
+                    console.warn('FilterTube: Shorts canonical handle mismatch, rejecting', { expected: normalizedExpected, found: normalizedFound });
+                }
             }
 
             // Method 3: Extract from page owner link
-            const ownerLinkMatch = html.match(/<link itemprop="url" href="https?:\/\/www\.youtube\.com\/@([\w.-]+)">/);
+            const ownerLinkMatch = html.match(/<link itemprop="url" href="https?:\/\/www\.youtube\.com\/(@[^">]+)">/);
             if (ownerLinkMatch) {
-                const handle = `@${ownerLinkMatch[1]}`;
-                console.log('FilterTube: Found channel in owner link:', handle);
-                return { handle, name: '' };
+                const handle = extractRawHandle(ownerLinkMatch[1]);
+                const normalizedFound = normalizeHandleValue(handle);
+                if (!normalizedExpected || normalizedFound === normalizedExpected) {
+                    console.log('FilterTube: Found channel in owner link:', handle);
+                    return { handle, name: '' };
+                } else {
+                    console.warn('FilterTube: Shorts owner link handle mismatch, rejecting', { expected: normalizedExpected, found: normalizedFound });
+                }
             }
 
             // Method 4: Extract from channel bar link (more flexible)
-            const channelBarMatch = html.match(/href="\/@([\w.-]+)\/shorts"/);
+            const channelBarMatch = html.match(/href="\/(@[^"\/]+)\/shorts"/);
             if (channelBarMatch) {
-                const handle = `@${channelBarMatch[1]}`;
-                console.log('FilterTube: Found channel in channel bar link:', handle);
-                return { handle, name: '' };
+                const handle = extractRawHandle(channelBarMatch[1]);
+                const normalizedFound = normalizeHandleValue(handle);
+                if (!normalizedExpected || normalizedFound === normalizedExpected) {
+                    console.log('FilterTube: Found channel in channel bar link:', handle);
+                    return { handle, name: '' };
+                } else {
+                    console.warn('FilterTube: Shorts channel bar handle mismatch, rejecting', { expected: normalizedExpected, found: normalizedFound });
+                }
             }
 
             // Method 5: Extract from any @handle link (handling both /shorts and direct links)
-            const anyHandleMatch = html.match(/href="\/@([\w.-]+)(?:\/shorts|")/);
+            const anyHandleMatch = html.match(/href="\/(@[^"\/]+)(?:\/shorts|")/);
             if (anyHandleMatch) {
-                const handle = `@${anyHandleMatch[1]}`;
-                console.log('FilterTube: Found channel in href attribute:', handle);
-                return { handle, name: '' };
+                const handle = extractRawHandle(anyHandleMatch[1]);
+                const normalizedFound = normalizeHandleValue(handle);
+                if (!normalizedExpected || normalizedFound === normalizedExpected) {
+                    console.log('FilterTube: Found channel in href attribute:', handle);
+                    return { handle, name: '' };
+                } else {
+                    console.warn('FilterTube: Shorts href handle mismatch, rejecting', { expected: normalizedExpected, found: normalizedFound });
+                }
             }
 
             console.warn('FilterTube: Could not extract channel info from shorts page');
@@ -4281,11 +4579,10 @@ function extractChannelFromCard(card) {
                 const name = channelNameEl.textContent?.trim();
 
                 if (href) {
-                    const handleMatch = href.match(/@([\w-]+)/);
-                    if (handleMatch) {
-                        const handle = `@${handleMatch[1]}`;
-                        console.log('FilterTube: Extracted from SHORTS full card:', { handle, name });
-                        return { handle, name };
+                    const extracted = extractRawHandle(href);
+                    if (extracted) {
+                        console.log('FilterTube: Extracted from SHORTS full card:', { handle: extracted, name });
+                        return { handle: extracted, name };
                     }
                 }
             }
@@ -4336,12 +4633,11 @@ function extractChannelFromCard(card) {
 
             if (shortsChannelLink) {
                 const href = shortsChannelLink.getAttribute('href');
-                const handleMatch = href?.match(/@([\w-]+)/);
-                if (handleMatch) {
-                    const handle = `@${handleMatch[1]}`;
+                const extracted = extractRawHandle(href);
+                if (extracted) {
                     const name = shortsChannelLink.textContent?.trim();
-                    console.log('FilterTube: Extracted from SHORTS DOM link:', { handle, name });
-                    return { handle, name };
+                    console.log('FilterTube: Extracted from SHORTS DOM link:', { handle: extracted, name });
+                    return { handle: extracted, name };
                 }
             }
 
@@ -4377,11 +4673,10 @@ function extractChannelFromCard(card) {
                 const name = authorLink.textContent?.trim();
 
                 if (href) {
-                    const handleMatch = href.match(/@([\w-]+)/);
-                    if (handleMatch) {
-                        const handle = `@${handleMatch[1]}`;
-                        console.log('FilterTube: Extracted from POST author link:', { handle, name });
-                        return { handle, name };
+                    const extracted = extractRawHandle(href);
+                    if (extracted) {
+                        console.log('FilterTube: Extracted from POST author link:', { handle: extracted, name });
+                        return { handle: extracted, name };
                     }
 
                     const ucMatch = href.match(/\/(UC[\w-]{22})/);
@@ -4400,11 +4695,10 @@ function extractChannelFromCard(card) {
                 const name = card.querySelector('#author span')?.textContent?.trim();
 
                 if (href) {
-                    const handleMatch = href.match(/@([\w-]+)/);
-                    if (handleMatch) {
-                        const handle = `@${handleMatch[1]}`;
-                        console.log('FilterTube: Extracted from POST thumbnail:', { handle, name });
-                        return { handle, name };
+                    const extracted = extractRawHandle(href);
+                    if (extracted) {
+                        console.log('FilterTube: Extracted from POST thumbnail:', { handle: extracted, name });
+                        return { handle: extracted, name };
                     }
                 }
             }
@@ -4467,9 +4761,9 @@ function extractChannelFromCard(card) {
 
                         const href = link.getAttribute('href');
                         if (href && !href.includes('/shorts/') && !href.includes('/watch')) {
-                            const handleMatch = href.match(/@([\w-]+)/);
-                            if (handleMatch) {
-                                collaborators[linkIndex].handle = `@${handleMatch[1]}`;
+                            const extracted = extractRawHandle(href);
+                            if (extracted) {
+                                collaborators[linkIndex].handle = extracted;
                             }
 
                             const ucMatch = href.match(/\/(UC[\w-]{22})/);
@@ -4538,9 +4832,8 @@ function extractChannelFromCard(card) {
 
                 const href = channelNameEl.getAttribute('href') || channelNameEl.href || '';
                 if (href) {
-                    const handleMatch = href.match(/@([\w.-]+)/);
-                    if (handleMatch) {
-                        const domHandle = `@${handleMatch[1]}`;
+                    const domHandle = extractRawHandle(href);
+                    if (domHandle) {
                         if (handle && handle.toLowerCase() !== domHandle.toLowerCase()) {
                             handle = domHandle;
                             id = undefined;
@@ -4593,10 +4886,10 @@ function extractChannelFromCard(card) {
             const href = channelNameLink.getAttribute('href');
             const name = channelNameLink.textContent?.trim();
             if (href) {
-                const handleMatch = href.match(/@([\w-]+)/);
-                if (handleMatch) {
-                    console.log('FilterTube: Extracted from channel name link:', { handle: `@${handleMatch[1]}`, name });
-                    return { handle: `@${handleMatch[1]}`, name };
+                const extracted = extractRawHandle(href);
+                if (extracted) {
+                    console.log('FilterTube: Extracted from channel name link:', { handle: extracted, name });
+                    return { handle: extracted, name };
                 }
                 const ucMatch = href.match(/\/(UC[\w-]{22})/);
                 if (ucMatch) {
@@ -4616,8 +4909,8 @@ function extractChannelFromCard(card) {
         if (avatarLink) {
             const href = avatarLink.getAttribute('href');
             if (href) {
-                const handleMatch = href.match(/@([\w-]+)/);
-                if (handleMatch) {
+                const extracted = extractRawHandle(href);
+                if (extracted) {
                     // Get name from channel name element
                     const nameEl = card.querySelector(
                         '#channel-info ytd-channel-name a, ' +
@@ -4625,8 +4918,8 @@ function extractChannelFromCard(card) {
                         'ytd-video-meta-block ytd-channel-name a'
                     );
                     const name = nameEl?.textContent?.trim();
-                    console.log('FilterTube: Extracted from avatar link:', { handle: `@${handleMatch[1]}`, name });
-                    return { handle: `@${handleMatch[1]}`, name };
+                    console.log('FilterTube: Extracted from avatar link:', { handle: extracted, name });
+                    return { handle: extracted, name };
                 }
             }
         }
@@ -4640,16 +4933,16 @@ function extractChannelFromCard(card) {
         if (genericChannelLink) {
             const href = genericChannelLink.getAttribute('href');
             if (href) {
-                const handleMatch = href.match(/@([\w-]+)/);
-                if (handleMatch) {
+                const extracted = extractRawHandle(href);
+                if (extracted) {
                     let channelName = genericChannelLink.textContent?.trim();
                     // Validate name doesn't contain overlay text
                     if (!channelName || channelName.includes('Now playing') || /^\d+:\d+/.test(channelName)) {
                         const nameEl = card.querySelector('#channel-info ytd-channel-name a, ytd-channel-name #text a');
                         channelName = nameEl?.textContent?.trim() || channelName;
                     }
-                    console.log('FilterTube: Extracted from generic link:', { handle: `@${handleMatch[1]}`, name: channelName });
-                    return { handle: `@${handleMatch[1]}`, name: channelName };
+                    console.log('FilterTube: Extracted from generic link:', { handle: extracted, name: channelName });
+                    return { handle: extracted, name: channelName };
                 }
             }
         }
@@ -4673,10 +4966,10 @@ function extractChannelFromCard(card) {
             }
 
             if (href) {
-                const handleMatch = href.match(/@([\w-]+)/);
-                if (handleMatch) {
-                    console.log('FilterTube: Extracted from metadata:', { handle: `@${handleMatch[1]}`, name });
-                    return { handle: `@${handleMatch[1]}`, name };
+                const extracted = extractRawHandle(href);
+                if (extracted) {
+                    console.log('FilterTube: Extracted from metadata:', { handle: extracted, name });
+                    return { handle: extracted, name };
                 }
 
                 const ucMatch = href.match(/\/(UC[\w-]{22})/);
@@ -4699,10 +4992,10 @@ function extractChannelFromCard(card) {
                     const nearbyHandle = lockupMetadata.querySelector('.yt-core-attributed-string__link[href*="/@"]');
                     if (nearbyHandle) {
                         const href = nearbyHandle.getAttribute('href');
-                        const handleMatch = href?.match(/@([\w-]+)/);
-                        if (handleMatch) {
-                            console.log('FilterTube: Extracted from lockup avatar/link:', { handle: `@${handleMatch[1]}`, name: avatarAlt });
-                            return { handle: `@${handleMatch[1]}`, name: avatarAlt };
+                        const extracted = extractRawHandle(href);
+                        if (extracted) {
+                            console.log('FilterTube: Extracted from lockup avatar/link:', { handle: extracted, name: avatarAlt });
+                            return { handle: extracted, name: avatarAlt };
                         }
                     }
                     console.log('FilterTube: Extracted channel name from lockup avatar alt:', { name: avatarAlt });
@@ -4718,10 +5011,10 @@ function extractChannelFromCard(card) {
                     const href = link.getAttribute('href');
                     const text = link.textContent?.trim();
                     if (!href) continue;
-                    const handleMatch = href.match(/@([\w-]+)/);
-                    if (handleMatch) {
-                        console.log('FilterTube: Extracted from lockup metadata link:', { handle: `@${handleMatch[1]}`, name: text });
-                        return { handle: `@${handleMatch[1]}`, name: text };
+                    const extracted = extractRawHandle(href);
+                    if (extracted) {
+                        console.log('FilterTube: Extracted from lockup metadata link:', { handle: extracted, name: text });
+                        return { handle: extracted, name: text };
                     }
                     const ucMatch = href.match(/\/(UC[\w-]{22})/);
                     if (ucMatch) {
@@ -4736,6 +5029,25 @@ function extractChannelFromCard(card) {
         console.warn('FilterTube: Failed to extract channel. Card type:', card.tagName,
             'Is Shorts?:', !!isShortsCard,
             'Card HTML:', card.outerHTML.substring(0, 2000));
+
+        const fallbackVideoId = ensureVideoIdForCard(card);
+        if (fallbackVideoId) {
+            const fallbackName = card.querySelector(
+                '#channel-info ytd-channel-name a, ' +
+                '#channel-info #channel-name a, ' +
+                '.yt-lockup-metadata-view-model__metadata a[href*="/@"]'
+            )?.textContent?.trim() || '';
+            const fallbackHandleHref = card.querySelector('.yt-core-attributed-string__link[href*="/@"]')?.getAttribute('href') || '';
+            const fallbackHandle = extractRawHandle(fallbackHandleHref);
+            console.log('FilterTube: Falling back to main-world lookup for video:', fallbackVideoId, 'expectedName:', fallbackName || 'n/a');
+            return {
+                videoId: fallbackVideoId,
+                needsFetch: true,
+                fetchStrategy: 'mainworld',
+                expectedChannelName: fallbackName || null,
+                expectedHandle: fallbackHandle || null
+            };
+        }
 
     } catch (error) {
         console.error('FilterTube: Error extracting channel from card:', error);
@@ -4755,6 +5067,51 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
     // Extract initial channel info (synchronous from DOM)
     let initialChannelInfo = extractChannelFromCard(videoCard);
     if (!initialChannelInfo) {
+        initialChannelInfo = {};
+    } else if (initialChannelInfo.handle) {
+        applyHandleMetadata(initialChannelInfo, initialChannelInfo.handle, { force: true });
+    } else if (initialChannelInfo.handleDisplay) {
+        applyHandleMetadata(initialChannelInfo, initialChannelInfo.handleDisplay, { force: true });
+    }
+    // If YouTube recycled this card, ensure stale channel attrs are cleared
+    if (initialChannelInfo && videoCard) {
+        const currentVideoId = ensureVideoIdForCard(videoCard);
+        const cachedVideoId = videoCard.getAttribute('data-filtertube-video-id');
+        if (currentVideoId && cachedVideoId && currentVideoId !== cachedVideoId) {
+            clearBlockedElementAttributes(videoCard);
+            videoCard.removeAttribute('data-filtertube-channel-id');
+            videoCard.removeAttribute('data-filtertube-channel-handle');
+            videoCard.removeAttribute('data-filtertube-channel-name');
+        }
+    }
+    // Prefer fresh DOM identifiers over any cached collaborator-derived data
+    const domHandleAttr = videoCard.getAttribute('data-filtertube-channel-handle');
+    const domIdAttr = videoCard.getAttribute('data-filtertube-channel-id');
+    const domHandleCandidate =
+        extractRawHandle(domHandleAttr) ||
+        extractRawHandle(
+            videoCard
+                .querySelector('#channel-info ytd-channel-name a[href*="/@"], ytd-channel-name #text a[href*="/@"]')
+                ?.getAttribute('href') || ''
+        ) ||
+        extractRawHandle(
+            videoCard.querySelector('a#thumbnail[data-filtertube-channel-handle]')?.getAttribute('data-filtertube-channel-handle') || ''
+        );
+
+    if (domHandleCandidate) {
+        applyHandleMetadata(initialChannelInfo, domHandleCandidate, { force: true });
+    }
+
+    const domId = domIdAttr ||
+        extractChannelIdFromString(
+            videoCard.querySelector('#channel-info ytd-channel-name a[href*="/channel/UC"], a#thumbnail[href*="/channel/UC"]')?.getAttribute('href') || ''
+        );
+
+    if (domId) {
+        initialChannelInfo.id = domId;
+    }
+
+    if (!initialChannelInfo || (!initialChannelInfo.handle && !initialChannelInfo.id && !initialChannelInfo.isCollaboration && !initialChannelInfo.needsFetch)) {
         console.log('FilterTube: Could not extract channel info from card');
         clearFilterTubeMenuItems(dropdown);
         return;
@@ -4983,7 +5340,9 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
         // For all videos (including shorts after fetch), resolve @handle to UC ID
         if (finalChannelInfo.handle && finalChannelInfo.handle.startsWith('@')) {
             console.log('FilterTube: Background fetch - resolving @handle to UC ID:', finalChannelInfo.handle);
-            const ucId = await fetchIdForHandle(finalChannelInfo.handle);
+            // Avoid network fetches during menu hover/open; we only need best-effort
+            // enrichment here and network calls can be noisy for broken handles.
+            const ucId = await fetchIdForHandle(finalChannelInfo.handle, { skipNetwork: true });
             if (ucId) {
                 finalChannelInfo.id = ucId;
                 console.log('FilterTube: Background fetch complete - resolved to UC ID:', ucId);
@@ -5285,20 +5644,20 @@ function injectIntoOldMenu(menuContainer, channelInfo, videoCard, collaborationM
 async function checkIfChannelBlocked(channelInfo, menuItem) {
     try {
         // Get current filtered channels from storage
-        const result = await browserAPI_BRIDGE.storage.local.get(['filteredChannels']);
-        const channels = result.filteredChannels || [];
+        const result = await browserAPI_BRIDGE.storage.local.get(['filterChannels']);
+        const channels = result.filterChannels || [];
         const storedEntry = findStoredChannelEntry(channelInfo) ||
             channels.find(ch => {
                 if (!ch) return false;
                 const chHandle = ch.handle?.toLowerCase();
                 const chId = ch.id?.toLowerCase();
-                const inputHandle = (channelInfo.handle || '').toLowerCase();
+                const inputHandle = normalizeHandleValue(channelInfo.handle || '').toLowerCase();
                 const inputId = (channelInfo.id || '').toLowerCase();
                 return (inputHandle && chHandle === inputHandle) || (inputId && chId === inputId);
             });
 
         // Check if this channel is already in the list (by handle or ID)
-        const input = channelInfo.handle || channelInfo.id;
+        const input = normalizeHandleValue(channelInfo.handle || '') || channelInfo.id;
         const isBlocked = channels.some(channel => {
             // Match by handle (case-insensitive) or by ID
             if (input.startsWith('@')) {
@@ -5397,8 +5756,14 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
     console.log('FilterTube: Block Channel clicked', { channelInfo, filterAll });
 
     let requestedHandle = '';
-    if (channelInfo?.handle) {
-        const normalizedClickedHandle = normalizeHandleValue(channelInfo.handle);
+    let requestedHandleForNetwork = '';
+    if (channelInfo?.handle || channelInfo?.canonicalHandle || channelInfo?.handleDisplay) {
+        const rawCandidate = extractRawHandle(channelInfo.canonicalHandle || channelInfo.handleDisplay || channelInfo.handle);
+        if (rawCandidate) {
+            requestedHandleForNetwork = rawCandidate;
+        }
+
+        const normalizedClickedHandle = normalizeHandleValue(channelInfo.handle || rawCandidate);
         if (normalizedClickedHandle) {
             channelInfo.handle = normalizedClickedHandle;
             requestedHandle = normalizedClickedHandle;
@@ -5474,12 +5839,13 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                         .map(c => c.handle || c.name);
 
                     // Execute block
-                    let result = await addChannelDirectly(identifier, useFilterAll, otherChannels, groupId);
+                    const collaboratorMetadata = buildChannelMetadataPayload(collaborator);
+                    let result = await addChannelDirectly(identifier, useFilterAll, otherChannels, groupId, collaboratorMetadata);
 
                     // --- FIX: Add retry logic for robustness ---
                     if (!result.success && collaborator.id && collaborator.id !== identifier) {
                         console.log(`FilterTube: Retrying block for ${collaborator.name} using ID ${collaborator.id}`);
-                        result = await addChannelDirectly(collaborator.id, useFilterAll, otherChannels, groupId);
+                        result = await addChannelDirectly(collaborator.id, useFilterAll, otherChannels, groupId, collaboratorMetadata);
                     }
                     // -------------------------------------------
 
@@ -5534,7 +5900,8 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                     const collaboratorFilterAll = resolveFilterAllPreference(collaborator);
 
                     console.log(`FilterTube: Blocking collaborator ${i + 1}/${collaboratorCount}: ${input}`, 'filterAll:', collaboratorFilterAll);
-                    const result = await addChannelDirectly(input, collaboratorFilterAll, otherChannels, groupId);
+                    const collaboratorMetadata = buildChannelMetadataPayload(collaborator);
+                    const result = await addChannelDirectly(input, collaboratorFilterAll, otherChannels, groupId, collaboratorMetadata);
                     if (result.success) {
                         successCount++;
                         console.log(`FilterTube: Successfully blocked ${input}`);
@@ -5678,11 +6045,13 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
     const broadcastChannelMapping = (id, handle) => {
         if (!id || !handle) return;
         try {
+            const mapping = { id, handle };
             window.postMessage({
                 type: 'FilterTube_UpdateChannelMap',
-                payload: [{ id, handle }],
+                payload: [mapping],
                 source: 'content_bridge'
             }, '*');
+            persistChannelMappings([mapping]);
         } catch (err) {
             console.warn('FilterTube: Failed to broadcast resolved channel mapping', err);
         }
@@ -5691,7 +6060,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
     try {
         // Single channel blocking (normal case)
         // Prefer canonical UC ID when available, fall back to handle
-        const input = channelInfo.id || channelInfo.handle;
+        const input = channelInfo.id || requestedHandleForNetwork || channelInfo.handle;
 
         // Get collaboration metadata from menu item attribute
         const collaborationWithAttr = menuItem.getAttribute('data-collaboration-with');
@@ -5711,7 +6080,13 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             });
         };
 
-        let result = await addChannelDirectly(input, filterAll, collaborationWith, menuItem.getAttribute('data-collaboration-group-id'));
+        let result = await addChannelDirectly(
+            input,
+            filterAll,
+            collaborationWith,
+            menuItem.getAttribute('data-collaboration-group-id'),
+            buildChannelMetadataPayload(channelInfo)
+        );
         let handleResolutionFailed404 = false;
 
         // If the background could not fetch the channel page (e.g., /@handle/about returns 404),
@@ -5740,6 +6115,15 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                         }
                     }
 
+                    // If we only have a handle, attempt channelMap resolution before retrying.
+                    if (!retryInput && channelInfo.handle) {
+                        const mappedId = await fetchIdForHandle(channelInfo.handle, { skipNetwork: true });
+                        if (mappedId) {
+                            channelInfo.id = mappedId;
+                            retryInput = mappedId;
+                        }
+                    }
+
                     if (retryInput) {
                         console.log('FilterTube: Retrying block with ytInitialData identifier:', retryInput);
 
@@ -5757,7 +6141,13 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                             broadcastChannelMapping(channelInfo.id, channelInfo.handle || requestedHandle);
                         }
 
-                        result = await addChannelDirectly(retryInput, filterAll, collaborationWith, menuItem.getAttribute('data-collaboration-group-id'));
+                        result = await addChannelDirectly(
+                            retryInput,
+                            filterAll,
+                            collaborationWith,
+                            menuItem.getAttribute('data-collaboration-group-id'),
+                            buildChannelMetadataPayload(channelInfo)
+                        );
                     }
                 }
             } catch (e) {
@@ -5782,6 +6172,15 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                         normalizedHandle = normalizeHandleValue(fallbackInfo.handle);
                         if (normalizedHandle) {
                             channelInfo.handle = normalizedHandle;
+                        }
+                    }
+
+                    // If Shorts only gave us a handle, attempt to resolve UC ID via channelMap.
+                    if (!retryInput && channelInfo.handle) {
+                        const mappedId = await fetchIdForHandle(channelInfo.handle, { skipNetwork: true });
+                        if (mappedId) {
+                            channelInfo.id = mappedId;
+                            retryInput = mappedId;
                         }
                     }
 
@@ -5810,7 +6209,13 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                             }
                         }
 
-                        result = await addChannelDirectly(retryInput, filterAll, collaborationWith, menuItem.getAttribute('data-collaboration-group-id'));
+                        result = await addChannelDirectly(
+                            retryInput,
+                            filterAll,
+                            collaborationWith,
+                            menuItem.getAttribute('data-collaboration-group-id'),
+                            buildChannelMetadataPayload(channelInfo)
+                        );
                     }
                 }
             }
@@ -5847,6 +6252,14 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                 menuItem.style.pointerEvents = 'auto';
             }, 2000);
             return;
+        }
+
+        // At this point we succeeded. If we still don't have a UC ID, warn reach may be limited.
+        if (!channelInfo.id && channelInfo.handle) {
+            console.warn('FilterTube: Blocked using handle only; no UC ID was resolved. Other videos may remain until a UC ID is learned.', {
+                handle: channelInfo.handle,
+                videoId: channelInfo.videoId || null
+            });
         }
 
         // Success state - show checkmark with channel name for multi-step, or generic for single
@@ -5990,6 +6403,23 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             }
         }
 
+        // After storage is updated, pull fresh settings (to include the new channel) and re-run DOM pass
+        let refreshedSettings = null;
+        try {
+            const refreshed = await requestSettingsFromBackground();
+            if (refreshed?.success && refreshed.settings) {
+                refreshedSettings = refreshed.settings;
+                currentSettings = refreshed.settings;
+            }
+        } catch (settingsError) {
+            console.warn('FilterTube: Failed to refresh settings after blocking channel', settingsError);
+        }
+        try {
+            applyDOMFallback(refreshedSettings || currentSettings, { forceReprocess: true, preserveScroll: true });
+        } catch (domError) {
+            console.warn('FilterTube: DOM fallback re-run failed after blocking channel', domError);
+        }
+
     } catch (error) {
         console.error('FilterTube: Error blocking channel:', error);
         if (titleSpan) {
@@ -6014,7 +6444,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
  * @param {string} collaborationGroupId - Optional UUID linking channels blocked together via "Block All"
  * @returns {Promise<Object>} Result with success status
  */
-async function addChannelDirectly(input, filterAll = false, collaborationWith = null, collaborationGroupId = null) {
+async function addChannelDirectly(input, filterAll = false, collaborationWith = null, collaborationGroupId = null, metadata = {}) {
     try {
         const rawValue = input.trim();
         if (!rawValue) {
@@ -6028,7 +6458,10 @@ async function addChannelDirectly(input, filterAll = false, collaborationWith = 
                 input: rawValue,
                 filterAll: filterAll,
                 collaborationWith: collaborationWith,
-                collaborationGroupId: collaborationGroupId
+                collaborationGroupId: collaborationGroupId,
+                displayHandle: metadata.handleDisplay || null,
+                canonicalHandle: metadata.canonicalHandle || null,
+                channelName: metadata.channelName || null
             }, (response) => {
                 resolve(response || { success: false, error: 'No response from background' });
             });

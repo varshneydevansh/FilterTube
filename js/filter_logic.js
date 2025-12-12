@@ -119,7 +119,15 @@
         const handleCore = candidate.substring(atIndex + 1).split(/[/?#]/)[0];
         if (!handleCore) return '';
 
-        return `@${handleCore}`;
+        let decoded = handleCore;
+        try {
+            decoded = decodeURIComponent(decoded);
+        } catch (e) {
+            // ignore decode failures
+        }
+        decoded = decoded.replace(/[\u200B-\u200F\u202A-\u202E\u2066-\u2069\uFEFF]/g, '').trim();
+        if (!decoded) return '';
+        return `@${decoded}`;
     }
 
     function findHandleInValue(value) {
@@ -588,18 +596,17 @@
 
                 // Method A: Check vanityChannelUrl (Standard)
                 if (meta.vanityChannelUrl) {
-                    const match = meta.vanityChannelUrl.match(/@[\w.-]+/);
-                    if (match) handle = match[0];
+                    const normalized = normalizeChannelHandle(meta.vanityChannelUrl);
+                    if (normalized) handle = normalized;
                 }
 
                 // Method B: Check ownerUrls (Alternative location, used by Shakira's channel)
                 if (!handle && meta.ownerUrls && Array.isArray(meta.ownerUrls)) {
                     for (const url of meta.ownerUrls) {
-                        const match = url.match(/@[\w.-]+/);
-                        if (match) {
-                            handle = match[0];
-                            break;
-                        }
+                        const normalized = normalizeChannelHandle(url);
+                        if (!normalized) continue;
+                        handle = normalized;
+                        break;
                     }
                 }
 
@@ -614,10 +621,10 @@
                 const idMatch = micro.urlCanonical.match(/channel\/(UC[\w-]{22})/);
                 // Sometimes it's in vanityChannelUrl, sometimes ownerProfileUrl
                 const handleUrl = micro.vanityChannelUrl || micro.ownerProfileUrl;
-                const handleMatch = handleUrl ? handleUrl.match(/@[\w.-]+/) : null;
 
-                if (idMatch && handleMatch) {
-                    this._registerMapping(idMatch[1], handleMatch[0]);
+                const handle = handleUrl ? normalizeChannelHandle(handleUrl) : '';
+                if (idMatch && handle) {
+                    this._registerMapping(idMatch[1], handle);
                 }
             }
 
@@ -627,9 +634,9 @@
                 const ytConfig = responseContext.webResponseContextExtensionData.ytConfigData;
                 if (ytConfig.channelId && ytConfig.channelName) {
                     // Try to find handle from canonicalBaseUrl
-                    const handleMatch = ytConfig.canonicalBaseUrl?.match(/@[\w.-]+/);
-                    if (handleMatch) {
-                        this._registerMapping(ytConfig.channelId, handleMatch[0]);
+                    const handle = normalizeChannelHandle(ytConfig.canonicalBaseUrl);
+                    if (handle) {
+                        this._registerMapping(ytConfig.channelId, handle);
                     }
                 }
             }
@@ -713,17 +720,13 @@
 
                 const canonical = browse.canonicalBaseUrl || browse.canonicalUrl || browse.url;
                 if (typeof canonical === 'string') {
-                    const match = canonical.match(/@([\w.-]+)/);
-                    if (match) {
-                        handle = `@${match[1]}`;
-                    }
+                    const normalized = normalizeChannelHandle(canonical);
+                    if (normalized) handle = normalized;
                 }
 
                 if (!handle && typeof run.text === 'string') {
-                    const textMatch = run.text.match(/@([\w.-]+)/);
-                    if (textMatch) {
-                        handle = `@${textMatch[1]}`;
-                    }
+                    const normalized = normalizeChannelHandle(run.text);
+                    if (normalized) handle = normalized;
                 }
 
                 if (handle) {
@@ -1014,9 +1017,9 @@
 
                                         // Extract handle from canonicalBaseUrl
                                         if (canonicalBaseUrl) {
-                                            const handleMatch = canonicalBaseUrl.match(/@([\w-]+)/);
-                                            if (handleMatch) {
-                                                collabChannelInfo.handle = `@${handleMatch[1]}`;
+                                            const normalized = normalizeChannelHandle(canonicalBaseUrl);
+                                            if (normalized) {
+                                                collabChannelInfo.handle = normalized;
                                             }
                                         }
 
