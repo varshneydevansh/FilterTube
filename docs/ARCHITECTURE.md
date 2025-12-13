@@ -202,6 +202,45 @@ The collaboration lifecycle reuses the existing Hybrid Filtering channels (`wind
 
 *Every hop carries the `collaborationGroupId`, `collaborationWith[]`, and `allCollaborators[]`, so downstream consumers never have to re-parse the DOM or `ytInitialData` for that upload.*
 
+## Channel Identity Resolution & 404 Recovery (2025 Hardening)
+
+YouTube now rate-limits `/@handle/about` and intermittently returns `404` on the first block attempt. To guarantee that every block resolves to a canonical UC ID, the architecture adds a four-layer safety net:
+
+```ascii
+        +-------------------+
+        | 1. Cache-first    |
+        | channelMap lookup |
+        +---------+---------+
+                  |
+   miss           | hit
+     |            v
+     v     (pre-seeded UC id)
++----+------------------------------+
+| 2. Main-world replay via ytInitial|
+|    data (searchYtInitialData...)  |
++----+------------------------------+
+     | success
+     |                      failure
+     v                          |
++----+---------------------------+--------+
+| 3. Shorts/handle helpers + bidirectional|
+|    FilterTube_UpdateChannelMap broadcast|
++----+---------------------------+--------+
+     | success
+     v
++----+-------------------------------+
+| 4. DOM cache invalidation & forced |
+|    reprocessing (applyDOMFallback) |
++------------------------------------+
+```
+
+1. **Cache-first lookups (`background.js`)** – `handleAddFilteredChannel` checks `channelMap` (fed by `filter_logic.js` + main-world injectors) before issuing any network fetch, so previously learned handles map instantly to UC IDs.
+2. **Main-world replay (`injector.js` + `seed.js`)** – When `/@handle/about` fails, `content_bridge.js` replays the block request with `searchYtInitialDataForVideoChannel(videoId)` and Shorts helpers, reusing the data that already rendered the card.
+3. **Bidirectional broadcast** – Any newly learned `(handle ↔ UC ID)` pair is posted via `FilterTube_UpdateChannelMap`, persisted by the background worker, and replayed into future tabs so both interception and DOM layers stay in sync.
+4. **DOM cache invalidation** – `applyDOMFallback` now tracks `data-filtertube-last-processed-id`. When a reused card swaps to a different video, cached `data-filtertube-channel-*` attributes are purged, forcing a fresh extraction with the latest mapping.
+
+These steps keep channel identity deterministic even for collaboration uploads, Shorts feeds, and navigation refreshes that previously produced 404 loops.
+
 ### Shorts Flow overlay
 
 ```ascii

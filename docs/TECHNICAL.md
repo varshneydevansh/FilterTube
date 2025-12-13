@@ -155,6 +155,7 @@ UI Contexts (tab-view.js, popup.js)
   - `collaboration-partial` + dashed rail (missing members)
   - `title` attribute tooltips with “Originally blocked with / Still blocked / Missing now” copy.
 - **Search & Sort Integrity**: Because every collaborator remains an independent row, FCFS ordering, keyword search, and sort toggles behave exactly as non-collab entries, avoiding clipping issues seen with floating group containers.
+- **Home Feed Menu Parity**: The 3-dot menu watcher now treats `button-view-model` wrappers as click anchors, so collaboration-aware menu injection (multi-channel + Block All) works on lockup-based home cards, grid shelves, and Shorts shelves alike.
 
 ## 11. Handle Normalization & Regex Improvements
 
@@ -183,6 +184,7 @@ sequenceDiagram
 
 - **Grace Period**: While the canonical lookup runs (~1–2.5s), DOM fallback hides the Short so the user never sees it again.
 - **Stats Integrity**: Once the canonical ID is known, subsequent interceptors (data + DOM) recognize the entry on every surface, so Shorts, long-form videos, and recommendations from that channel stay filtered without extra fetches.
+- **Collaborator Harvesting**: When Shorts expose the avatar stack, `extractCollaboratorsFromAvatarStackElement` seeds collaborator names/handles and the main-world hop fills UC IDs. The same multi-select UI appears regardless of layout.
 
 ## 4. DOM Fallback System
 

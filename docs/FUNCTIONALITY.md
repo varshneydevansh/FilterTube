@@ -90,6 +90,7 @@ YouTube JSON Data → FilterTubeEngine.processData() → Filtered Data → YouTu
 - **Fuzzy Matching**: Handles variations in channel name formats
 - **Collaboration Awareness**: Adds a shared `collaborationGroupId` when the user blocks multi-author videos; the UI reflects missing collaborators via dashed rails + tooltips without altering sort order.
 - **Handle Regex Upgrades**: Accepts dots/underscores/dashes in @handles (regex `@([A-Za-z0-9._-]+)`) so channels like `@mr.engineer` stay matched everywhere.
+- **404 Recovery Pipeline**: Every block request runs through a cache-first lookup, ytInitialData replay, Shorts helpers, and DOM cache invalidation so handles never persist without a canonical UC ID—even when `/@handle/about` returns 404.
 
 ### **Comment Filtering**
 - **Complete Removal**: Removes entire comment sections
@@ -102,6 +103,7 @@ YouTube JSON Data → FilterTubeEngine.processData() → Filtered Data → YouTu
 - **Mobile Compatibility**: Works across desktop and mobile interfaces
 - **Canonical Resolution**: Every Shorts block performs a hidden fetch to resolve the canonical UC ID before persisting, guaranteeing that long-form uploads from the same channel are also filtered.
 - **Zero-Gap Removal**: DOM fallback hides the entire parent `ytd-rich-item-renderer`/grid slot so blocked Shorts never leave blank placeholders.
+- **Collaboration Support**: When Shorts include the avatar stack UI, FilterTube requests collaborator metadata from the main world so the same multi-channel 3-dot menu appears on Shorts shelves and the watch page.
 
 ## Performance Characteristics
 

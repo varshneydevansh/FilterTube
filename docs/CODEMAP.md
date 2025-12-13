@@ -51,11 +51,11 @@ FilterTube/
 | :--- | :--- |
 | `incrementHiddenStats()` | Increments the blocked counter and calculates "time saved". |
 | `extractVideoDuration()` | Parses video duration for accurate time saved calculation. |
-| `applyDOMFallback(settings)` | Scans the DOM for video elements and applies filters (secondary layer). |
-| `fetchChannelFromShortsUrl(videoId)` | Fetches Shorts page in background to extract channel info. |
-| `handleBlockChannelClick()` | Orchestrates the blocking flow: immediate hide + background block. |
-| `injectFilterTubeMenuItem()` | Injects the "Block Channel" option into YouTube's 3-dot menu. |
-| `enrichCollaboratorsWithMainWorld()` | Bridges collaborator requests between DOM and Main world, ensuring `allCollaborators` is populated. |
+| `applyDOMFallback(settings)` | Scans the DOM for video elements and applies filters (secondary layer). Tracks `data-filtertube-last-processed-id` to invalidate stale channel caches when YouTube reuses DOM nodes. |
+| `fetchChannelFromShortsUrl(videoId)` | Fetches Shorts page in background to extract channel info (handles canonical UC resolution fallback). |
+| `handleBlockChannelClick()` | Orchestrates the blocking flow: immediate hide + background block + multi-layer 404 recovery (ytInitialData replay, Shorts helpers, channelMap broadcast). |
+| `injectFilterTubeMenuItem()` | Injects the "Block Channel" option into YouTube's 3-dot menu (new selectors cover `button-view-model` home cards). |
+| `enrichCollaboratorsWithMainWorld()` | Bridges collaborator requests between DOM and Main world, ensuring `allCollaborators` is populated for every surface. |
 | `generateCollaborationGroupId()` | Creates deterministic IDs so grouped channels remain linked across storage/UI. |
 
 ### `js/filter_logic.js`
@@ -63,8 +63,10 @@ FilterTube/
 **Purpose:** The core filtering engine.
 | Class / Object | Description |
 | :--- | :--- |
-| `FILTER_RULES` | Defines how to extract data from each YouTube "Renderer" type. |
+| `FILTER_RULES` | Defines how to extract data from each YouTube "Renderer" type (includes lockup/attributed channel + collab dialog listItems). |
 | `FilterTubeEngine.processData(data)` | The public entry point called by `seed.js` to filter a data payload. |
+| `_harvestPlayerOwnerData(data)` | Extracts channel IDs/handles from `ytInitialPlayerResponse`, playlist panels, and lockup metadata to keep the channel map warm even when the DOM omits handles. |
+| `_registerMapping(id, handle)` | Writes every discovered `(UC ↔ handle)` pair to the cross-world `channelMap`, feeding background cache-first lookups. |
 
 ### `js/popup.js` & `js/tab-view.js`
 **Context:** UI Contexts

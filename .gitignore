@@ -25,6 +25,15 @@ ARCHITECTURE_VALIDATION.md
 ehthumbs.db
 Thumbs.db
 logs.json
+text.txt
+playlist.json
+watchpage.json
+collab.json
+collab.html
+playlist.json
+playlist.js
+playlist.html
+collab_on_homepage.html
 
 # Logs
 *.log

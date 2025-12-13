@@ -1,4 +1,17 @@
 # Changelog
+## Version 3.0.8
+
+### Channel Blocking Hardening
+- **404 Recovery Pipeline**: Added a four-layer strategy (cache-first lookup, ytInitialData replay, Shorts helpers, DOM cache reset) so blocking always resolves a UC ID even when `/@handle/about` fails.
+
+- **DOM Reprocessing**: Cards now re-run the fallback when their `data-filtertube-last-processed-id` changes, preventing stale metadata from skipping new videos.
+
+### Documentation
+- Added `docs/handle-404-remediation.md` playbook and updated architecture/tech docs to reflect the new recovery flow.
+- Expanded `CONTENT_HIDING_PLAYBOOK.md` and `CHANNEL_BLOCKING_SYSTEM.md` with channel identity guidance for Shorts/home surfaces.
+
+---
+
 ## Version 3.0.7
 
 ### New Features

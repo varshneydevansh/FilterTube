@@ -21,7 +21,7 @@ const archiver = require('archiver');
 
 // Configuration
 const ALL_BROWSER_TARGETS = ['chrome', 'firefox', 'opera'];
-const VERSION = '3.0.7'; // Matches manifest
+const VERSION = '3.0.8'; // Matches manifest
 const COMMON_DIRS = ['js', 'css', 'html', 'icons'];
 const COMMON_FILES = ['README.md', 'CHANGELOG.md', 'LICENSE'];
 
