@@ -2586,6 +2586,28 @@ function extractChannelMetadataFromElement(element, channelText = '', channelHre
     return meta;
 }
 
+function clearCachedChannelMetadata(root) {
+    if (!root || typeof root.querySelectorAll !== 'function') {
+        if (root?.removeAttribute) {
+            root.removeAttribute('data-filtertube-channel-handle');
+            root.removeAttribute('data-filtertube-channel-id');
+        }
+        return;
+    }
+
+    const targets = new Set([root]);
+    root.querySelectorAll('[data-filtertube-channel-handle],[data-filtertube-channel-id]').forEach(el => targets.add(el));
+
+    targets.forEach(el => {
+        try {
+            el.removeAttribute('data-filtertube-channel-handle');
+            el.removeAttribute('data-filtertube-channel-id');
+        } catch (e) {
+            // ignore
+        }
+    });
+}
+
 function extractCollaboratorMetadataFromElement(element) {
     if (!element || typeof element.getAttribute !== 'function') return [];
 
@@ -3237,8 +3259,20 @@ function applyDOMFallback(settings, options = {}) {
     const videoElements = document.querySelectorAll(VIDEO_CARD_SELECTORS);
 
     videoElements.forEach(element => {
-        // Optimization: Skip if already processed and not forced
-        if (!forceReprocess && element.hasAttribute('data-filtertube-processed')) {
+        const alreadyProcessed = element.hasAttribute('data-filtertube-processed');
+        const uniqueId = element.getAttribute('data-filtertube-unique-id') || extractVideoIdFromCard(element) || '';
+        const lastProcessedId = element.getAttribute('data-filtertube-last-processed-id') || '';
+        const contentChanged = alreadyProcessed && uniqueId && lastProcessedId && uniqueId !== lastProcessedId;
+
+        if ((forceReprocess || contentChanged) && alreadyProcessed) {
+            element.removeAttribute('data-filtertube-processed');
+            element.removeAttribute('data-filtertube-last-processed-id');
+            clearCachedChannelMetadata(element);
+        } else if (contentChanged) {
+            clearCachedChannelMetadata(element);
+        }
+
+        if (alreadyProcessed && !forceReprocess && !contentChanged) {
             // Skip already processed elements to avoid duplicate counting
             return;
         }
@@ -3347,6 +3381,11 @@ function applyDOMFallback(settings, options = {}) {
 
         toggleVisibility(targetToHide, shouldHide, hideReason);
         element.setAttribute('data-filtertube-processed', 'true');
+        if (uniqueId) {
+            element.setAttribute('data-filtertube-last-processed-id', uniqueId);
+        } else {
+            element.removeAttribute('data-filtertube-last-processed-id');
+        }
     });
 
     // Inline survey containers embed filtered videos; hide shell when everything inside is hidden
