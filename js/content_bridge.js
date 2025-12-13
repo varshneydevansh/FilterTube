@@ -5746,15 +5746,18 @@ async function checkIfChannelBlocked(channelInfo, menuItem) {
             });
 
         // Check if this channel is already in the list (by handle or ID)
-        const input = normalizeHandleValue(channelInfo.handle || '') || channelInfo.id;
-        const isBlocked = channels.some(channel => {
-            // Match by handle (case-insensitive) or by ID
-            if (input.startsWith('@')) {
-                return channel.handle && channel.handle.toLowerCase() === input.toLowerCase();
-            } else {
-                return channel.id === input;
-            }
-        });
+        const normalizedHandle = normalizeHandleValue(channelInfo.handle || '');
+        const input = normalizedHandle || channelInfo.id || '';
+        const isBlocked = input
+            ? channels.some(channel => {
+                // Match by handle (case-insensitive) or by ID
+                if (input.startsWith('@')) {
+                    return channel.handle && channel.handle.toLowerCase() === input.toLowerCase();
+                } else {
+                    return channel.id === input;
+                }
+            })
+            : false;
 
         if (isBlocked) {
             // Channel is already blocked - show success state
