@@ -301,6 +301,12 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
             if (!rawInput) return '';
             let cleaned = rawInput.trim();
 
+            try {
+                cleaned = decodeURIComponent(cleaned);
+            } catch (e) {
+                // ignore
+            }
+
             // Handle full URLs
             try {
                 const url = new URL(cleaned);
@@ -359,6 +365,9 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
                 const normalizedInput = normalizeChannelInput(input);
                 console.log(`FilterTube Background: Normalized "${input}" -> "${normalizedInput}"`);
 
+                const isHandle = typeof normalizedInput === 'string' && normalizedInput.startsWith('@');
+                const isUcId = typeof normalizedInput === 'string' && normalizedInput.toUpperCase().startsWith('UC') && normalizedInput.length === 24;
+
                 const exists = channels.some(ch => {
                     const normId = (ch.id || '').toLowerCase();
                     const normHandle = (ch.handle || '').toLowerCase();
@@ -374,14 +383,52 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
                 }
 
                 // 3. Fetch details (This is the slow part that was getting killed)
-                const details = await fetchChannelInfo(normalizedInput);
+                let lookupValue = normalizedInput;
+                let mappedId = null;
+                if (isHandle) {
+                    try {
+                        const mapStorage = await new Promise(resolve => browserAPI.storage.local.get(['channelMap'], resolve));
+                        const channelMap = mapStorage.channelMap || {};
+                        const candidateId = channelMap[normalizedInput.toLowerCase()];
+                        if (candidateId && typeof candidateId === 'string' && candidateId.toUpperCase().startsWith('UC')) {
+                            mappedId = candidateId;
+                            lookupValue = candidateId;
+                            console.log('FilterTube Background: Using mapped UC ID for handle', normalizedInput, '->', mappedId);
+                        }
+                    } catch (e) {
+                        console.warn('FilterTube Background: Failed to read channelMap for persistent handle resolution:', e);
+                    }
+                }
+
+                let details = await fetchChannelInfo(lookupValue);
+
+                if (!details.success && isHandle && mappedId) {
+                    console.warn('FilterTube Background: fetchChannelInfo failed, falling back to mapped UC ID for handle', normalizedInput);
+                    details = {
+                        success: true,
+                        id: mappedId,
+                        handle: normalizedInput,
+                        name: normalizedInput,
+                        logo: null
+                    };
+                }
+
+                if (!details.success) {
+                    sendResponse({ success: false, error: details.error || 'Failed to fetch channel info' });
+                    return;
+                }
+
+                if (!details.id || typeof details.id !== 'string' || !details.id.toUpperCase().startsWith('UC')) {
+                    sendResponse({ success: false, error: 'Failed to resolve channel UC ID' });
+                    return;
+                }
 
                 // 4. Construct entry
                 const newEntry = {
-                    name: details.success ? (details.name || details.handle || normalizedInput) : normalizedInput,
-                    id: details.success ? (details.id || normalizedInput) : normalizedInput,
-                    handle: details.success ? details.handle : (normalizedInput.startsWith('@') ? normalizedInput : null),
-                    logo: details.success ? details.logo : null,
+                    name: details.name || details.handle || normalizedInput,
+                    id: details.id,
+                    handle: isHandle ? (details.handle || normalizedInput) : (details.handle || null),
+                    logo: details.logo || null,
                     filterAll: false,
                     originalInput: normalizedInput, // Store normalized value, not the raw URL
                     addedAt: Date.now()

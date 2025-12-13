@@ -3877,12 +3877,25 @@ function requestCollaboratorInfoFromMainWorld(videoId) {
         // Store the pending request
         pendingCollaboratorRequests.set(requestId, { resolve, timeoutId, videoId });
 
-        // Send request to Main World
-        window.postMessage({
-            type: 'FilterTube_RequestCollaboratorInfo',
-            payload: { videoId, requestId },
-            source: 'content_bridge'
-        }, '*');
+        const sendRequest = () => {
+            window.postMessage({
+                type: 'FilterTube_RequestCollaboratorInfo',
+                payload: { videoId, requestId },
+                source: 'content_bridge'
+            }, '*');
+        };
+
+        sendRequest();
+        setTimeout(() => {
+            if (pendingCollaboratorRequests.has(requestId)) {
+                sendRequest();
+            }
+        }, 250);
+        setTimeout(() => {
+            if (pendingCollaboratorRequests.has(requestId)) {
+                sendRequest();
+            }
+        }, 1000);
 
         console.log('FilterTube: Sent collaborator info request to Main World for video:', videoId);
     });
@@ -3904,16 +3917,30 @@ function requestChannelInfoFromMainWorld(videoId, options = {}) {
 
         pendingChannelInfoRequests.set(requestId, { resolve, timeoutId, videoId });
 
-        window.postMessage({
-            type: 'FilterTube_RequestChannelInfo',
-            payload: {
-                videoId,
-                requestId,
-                expectedHandle: options.expectedHandle || null,
-                expectedName: options.expectedName || null
-            },
-            source: 'content_bridge'
-        }, '*');
+        const sendRequest = () => {
+            window.postMessage({
+                type: 'FilterTube_RequestChannelInfo',
+                payload: {
+                    videoId,
+                    requestId,
+                    expectedHandle: options.expectedHandle || null,
+                    expectedName: options.expectedName || null
+                },
+                source: 'content_bridge'
+            }, '*');
+        };
+
+        sendRequest();
+        setTimeout(() => {
+            if (pendingChannelInfoRequests.has(requestId)) {
+                sendRequest();
+            }
+        }, 250);
+        setTimeout(() => {
+            if (pendingChannelInfoRequests.has(requestId)) {
+                sendRequest();
+            }
+        }, 1000);
 
         console.log('FilterTube: Sent channel info request to Main World for video:', videoId, 'expectedName:', options.expectedName || 'n/a');
     });
@@ -4512,13 +4539,26 @@ function extractVideoIdFromCard(card) {
     if (!card) return null;
 
     try {
+        const extractFromHref = (href) => {
+            if (!href || typeof href !== 'string') return null;
+            const watchMatch = href.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
+            if (watchMatch) return watchMatch[1];
+            const shortsMatch = href.match(/\/shorts\/([a-zA-Z0-9_-]{11})/);
+            if (shortsMatch) return shortsMatch[1];
+            const liveMatch = href.match(/\/live\/([a-zA-Z0-9_-]{11})/);
+            if (liveMatch) return liveMatch[1];
+            const embedMatch = href.match(/\/embed\/([a-zA-Z0-9_-]{11})/);
+            if (embedMatch) return embedMatch[1];
+            return null;
+        };
+
         // Method 1: From thumbnail link href
         const thumbnailLink = card.querySelector('a#thumbnail, a[href*="/watch"]');
         if (thumbnailLink) {
             const href = thumbnailLink.getAttribute('href');
             if (href) {
-                const match = href.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
-                if (match) return match[1];
+                const match = extractFromHref(href);
+                if (match) return match;
             }
         }
 
@@ -4527,8 +4567,8 @@ function extractVideoIdFromCard(card) {
         if (titleLink) {
             const href = titleLink.getAttribute('href');
             if (href) {
-                const match = href.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
-                if (match) return match[1];
+                const match = extractFromHref(href);
+                if (match) return match;
             }
         }
 
@@ -4537,8 +4577,18 @@ function extractVideoIdFromCard(card) {
         if (anyWatchLink) {
             const href = anyWatchLink.getAttribute('href');
             if (href) {
-                const match = href.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
-                if (match) return match[1];
+                const match = extractFromHref(href);
+                if (match) return match;
+            }
+        }
+
+        // Method 4: Shorts-style links
+        const anyShortsLink = card.querySelector('a[href*="/shorts/"]');
+        if (anyShortsLink) {
+            const href = anyShortsLink.getAttribute('href');
+            if (href) {
+                const match = extractFromHref(href);
+                if (match) return match;
             }
         }
 

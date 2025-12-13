@@ -365,7 +365,7 @@
             return true;
         }
 
-        function searchNode(node) {
+        function searchNode(node, visited) {
             if (!node || typeof node !== 'object' || visited.has(node)) return null;
             visited.add(node);
 
@@ -434,7 +434,7 @@
             // Recurse
             if (Array.isArray(node)) {
                 for (const child of node) {
-                    const found = searchNode(child);
+                    const found = searchNode(child, visited);
                     if (found) return found;
                 }
             }
@@ -442,12 +442,46 @@
             return null;
         }
 
-        const result = searchNode(window.ytInitialData);
+        function searchRoot(root, label) {
+            if (!root || typeof root !== 'object') return null;
+            postLog('log', `Channel search: looking in ${label}`);
+            const visited = new WeakSet();
+            const result = searchNode(root, visited);
+            if (!foundVideoObject) {
+                postLog('log', `Channel search: video ID not found in ${label}: ${videoId}`);
+            } else if (result) {
+                postLog('log', `Channel search: found channel in ${label}`);
+                return result;
+            }
+            return null;
+        }
 
-        if (!foundVideoObject) {
-            postLog('log', `Channel search: video ID not found in ytInitialData: ${videoId}`);
-        } else if (!result && !fallbackCandidate) {
-            postLog('log', `Channel search: video found but no channel info extracted for: ${videoId}`);
+        const searchTargets = [];
+        if (window.ytInitialData) {
+            searchTargets.push({ root: window.ytInitialData, label: 'ytInitialData' });
+        }
+
+        const ftPlayer = window.filterTube?.lastYtInitialPlayerResponse || window.filterTube?.rawYtInitialPlayerResponse;
+        if (ftPlayer) {
+            searchTargets.push({ root: ftPlayer, label: 'filterTube.lastYtInitialPlayerResponse' });
+        } else if (window.ytInitialPlayerResponse) {
+            searchTargets.push({ root: window.ytInitialPlayerResponse, label: 'ytInitialPlayerResponse' });
+        }
+
+        let result = null;
+        for (const target of searchTargets) {
+            // Reset per-root flags while preserving global fallback
+            const prevFoundFlag = foundVideoObject;
+            result = searchRoot(target.root, target.label);
+            if (result) break;
+            if (!foundVideoObject) {
+                // reset so other roots can log properly
+                foundVideoObject = prevFoundFlag;
+            }
+        }
+
+        if (!result && !fallbackCandidate) {
+            postLog('log', `Channel search: no channel info extracted for ${videoId} across ${searchTargets.length} roots`);
         }
 
         return result || fallbackCandidate;

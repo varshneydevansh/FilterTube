@@ -588,6 +588,9 @@
         _harvestChannelData(data) {
             if (!data || typeof data !== 'object') return;
 
+            // Player/watch responses (ytInitialPlayerResponse, /player fetch) expose direct owner metadata
+            this._harvestPlayerOwnerData(data);
+
             // 1. Check Channel Metadata (appears on channel pages)
             const meta = data?.metadata?.channelMetadataRenderer;
             if (meta?.externalId) {
@@ -650,6 +653,77 @@
                 this._harvestRendererChannelMappings(data);
             } catch (e) {
                 console.warn('FilterTube: Renderer channel harvest failed', e);
+            }
+        }
+
+        /**
+         * Harvest mappings from ytInitialPlayerResponse / player fetch payloads
+         * that include explicit videoOwnerChannelId + ownerProfileUrl.
+         */
+        _harvestPlayerOwnerData(data) {
+            const videoDetails = data?.videoDetails;
+            const playerMicroformat = data?.microformat?.playerMicroformatRenderer;
+
+            let ownerId = null;
+            let ownerHandle = null;
+
+            if (videoDetails) {
+                ownerId =
+                    videoDetails.videoOwnerChannelId ||
+                    videoDetails.channelId ||
+                    videoDetails.externalChannelId ||
+                    videoDetails.authorExternalChannelId ||
+                    ownerId;
+            }
+
+            if (!ownerId && playerMicroformat) {
+                ownerId =
+                    playerMicroformat.externalChannelId ||
+                    playerMicroformat.channelId ||
+                    playerMicroformat.ownerChannelId ||
+                    ownerId;
+            }
+
+            if (playerMicroformat) {
+                ownerHandle =
+                    normalizeChannelHandle(playerMicroformat.ownerProfileUrl) ||
+                    normalizeChannelHandle(playerMicroformat.canonicalBaseUrl) ||
+                    normalizeChannelHandle(playerMicroformat.navigationEndpoint?.browseEndpoint?.canonicalBaseUrl) ||
+                    ownerHandle;
+            }
+
+            if (!ownerHandle && typeof videoDetails?.author === 'string') {
+                ownerHandle = normalizeChannelHandle(videoDetails.author);
+            }
+
+            if (ownerId && ownerHandle) {
+                this._registerMapping(ownerId, ownerHandle);
+            }
+
+            const playlistContents =
+                data?.playlist?.contents ||
+                data?.playlistPanel?.contents ||
+                data?.contents?.twoColumnWatchNextResults?.playlist?.playlist?.contents ||
+                data?.contents?.playlistPanelRenderer?.contents ||
+                [];
+
+            if (Array.isArray(playlistContents) && playlistContents.length > 0) {
+                playlistContents.forEach(entry => {
+                    const renderer =
+                        entry?.playlistPanelVideoRenderer ||
+                        entry?.playlistPanelVideoWrapperRenderer?.primaryRenderer;
+                    if (!renderer) return;
+
+                    const browse = renderer?.shortBylineText?.runs?.[0]?.navigationEndpoint?.browseEndpoint;
+                    const browseId = browse?.browseId;
+                    const canonical = browse?.canonicalBaseUrl;
+                    const normalizedHandle = normalizeChannelHandle(
+                        canonical || renderer?.shortBylineText?.runs?.[0]?.text || ''
+                    );
+                    if (browseId && normalizedHandle) {
+                        this._registerMapping(browseId, normalizedHandle);
+                    }
+                });
             }
         }
 
