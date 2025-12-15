@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "FilterTube",
     "description": "Restore peace of mind to your digital video experience.",
-    "version": "3.0.8",
+    "version": "3.0.9",
     "minimum_chrome_version": "111",
     "background": {
         "service_worker": "js/background.js"
@@ -39,6 +39,12 @@
                 "*://*.youtubekids.com/*"
             ],
             "js": [
+                "js/shared/identity.js",
+                "js/content/menu.js",
+                "js/content/dom_helpers.js",
+                "js/content/dom_extractors.js",
+                "js/content/dom_fallback.js",
+                "js/content/block_channel.js",
                 "js/content_bridge.js"
             ],
             "run_at": "document_start",
@@ -51,6 +57,7 @@
                 "js/injector.js",
                 "js/filter_logic.js",
                 "js/seed.js",
+                "js/shared/identity.js",
                 "icons/file.svg"
             ],
             "matches": [

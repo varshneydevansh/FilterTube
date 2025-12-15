@@ -114,9 +114,14 @@ Collaboration filtering relies on coordinated logic across all three execution w
 ```ascii
 
 YouTube DOM (Isolated World)
+  ├─ js/content/* (loaded before content_bridge.js)
+  │   • dom_extractors.js / dom_helpers.js (videoId, duration, card lookup)
+  │   • dom_fallback.js (MutationObserver fallback hide/restore)
+  │   • block_channel.js (3-dot dropdown observer + card resolver)
   └─ content_bridge.js
-      • Detect #attributed-channel-name / yt-text-view-model strings
-      • Parse links, badges, and inline text to build initial collaborators[]
+      • Settings sync + main-world injection
+      • Parse collaboration signals (#attributed-channel-name / yt-text-view-model / avatar stack)
+      • Inject menu items + handle clicks (Block Channel / Filter All / Block All Collaborators)
       • If data missing → post FilterTube_RequestCollaboratorInfo →
 
 Main World
@@ -155,7 +160,7 @@ UI Contexts (tab-view.js, popup.js)
   - `collaboration-partial` + dashed rail (missing members)
   - `title` attribute tooltips with “Originally blocked with / Still blocked / Missing now” copy.
 - **Search & Sort Integrity**: Because every collaborator remains an independent row, FCFS ordering, keyword search, and sort toggles behave exactly as non-collab entries, avoiding clipping issues seen with floating group containers.
-- **Home Feed Menu Parity**: The 3-dot menu watcher now treats `button-view-model` wrappers as click anchors, so collaboration-aware menu injection (multi-channel + Block All) works on lockup-based home cards, grid shelves, and Shorts shelves alike.
+- **Home Feed Menu Parity**: `block_channel.js` watcher treats `button-view-model` wrappers as click anchors, so collaboration-aware menu injection (multi-channel + Block All) works on lockup-based home cards, grid shelves, and Shorts shelves alike.
 
 ## 11. Handle Normalization & Regex Improvements
 
@@ -170,7 +175,7 @@ Shorts cards rarely embed canonical IDs, so FilterTube performs a two-phase reso
 
 ```mermaid
 sequenceDiagram
-    participant DOM as content_bridge.js (Shorts UI)
+    participant DOM as block_channel.js + content_bridge.js (Shorts UI)
     participant FETCH as Remote Fetches
     participant BG as background.js
 

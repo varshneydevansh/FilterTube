@@ -11,7 +11,15 @@ FilterTube/
 ├── html/                 # HTML for Popup and Tab View
 ├── js/                   # Core JavaScript Logic
 │   ├── background.js     # Extension Service Worker
-│   ├── content_bridge.js # Isolated World Script (DOM Fallback & Stats)
+│   ├── content_bridge.js # Isolated World Script (bridge + menu rendering + blocking orchestration)
+│   ├── content/          # Isolated World helpers (loaded by manifest ordering)
+│   │   ├── block_channel.js   # 3-dot dropdown observer + injection entry-point
+│   │   ├── dom_extractors.js  # DOM extraction helpers (videoId, duration, card lookup)
+│   │   ├── dom_fallback.js    # DOM fallback filtering layer
+│   │   ├── dom_helpers.js     # Small DOM helpers
+│   │   └── menu.js            # Menu styles + UI helpers
+│   ├── shared/
+│   │   └── identity.js    # Shared identity helpers exposed as window.FilterTubeIdentity
 │   ├── filter_logic.js   # Main World Script (Filter Engine)
 │   ├── injector.js       # Main World Script (Coordinator)
 │   ├── popup.js          # Popup UI Logic
@@ -46,17 +54,30 @@ FilterTube/
 
 ### `js/content_bridge.js`
 **Context:** Isolated World
-**Purpose:** Script injection, DOM fallback, and stats tracking.
+**Purpose:** Script injection, bridge messaging, menu rendering/click handling, and blocking orchestration.
 | Function | Description |
 | :--- | :--- |
 | `incrementHiddenStats()` | Increments the blocked counter and calculates "time saved". |
-| `extractVideoDuration()` | Parses video duration for accurate time saved calculation. |
-| `applyDOMFallback(settings)` | Scans the DOM for video elements and applies filters (secondary layer). Tracks `data-filtertube-last-processed-id` to invalidate stale channel caches when YouTube reuses DOM nodes. |
 | `fetchChannelFromShortsUrl(videoId)` | Fetches Shorts page in background to extract channel info (handles canonical UC resolution fallback). |
 | `handleBlockChannelClick()` | Orchestrates the blocking flow: immediate hide + background block + multi-layer 404 recovery (ytInitialData replay, Shorts helpers, channelMap broadcast). |
 | `injectFilterTubeMenuItem()` | Injects the "Block Channel" option into YouTube's 3-dot menu (new selectors cover `button-view-model` home cards). |
 | `enrichCollaboratorsWithMainWorld()` | Bridges collaborator requests between DOM and Main world, ensuring `allCollaborators` is populated for every surface. |
 | `generateCollaborationGroupId()` | Creates deterministic IDs so grouped channels remain linked across storage/UI. |
+
+### `js/content/dom_fallback.js`
+**Context:** Isolated World
+**Purpose:** DOM fallback filtering layer (MutationObserver + hide/restore).
+| Function | Description |
+| :--- | :--- |
+| `applyDOMFallback(settings, options)` | Scans the DOM for video elements and applies fallback hiding/restoring. Tracks `data-filtertube-last-processed-id` and clears stale `data-filtertube-channel-*` metadata when YouTube reuses DOM nodes. |
+
+### `js/content/block_channel.js`
+**Context:** Isolated World
+**Purpose:** Detect YouTube 3-dot dropdown openings, locate the associated card from the last clicked menu button, and call `injectFilterTubeMenuItem(dropdown, card)`.
+
+### `js/content/dom_extractors.js`
+**Context:** Isolated World
+**Purpose:** Shared DOM extraction utilities (e.g., `ensureVideoIdForCard`, `extractVideoDuration`, `findVideoCardElement`).
 
 ### `js/filter_logic.js`
 **Context:** Main World

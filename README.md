@@ -204,3 +204,25 @@ npm run build:firefox      # Firefox only
 ```
 
 For detailed technical documentation, see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/TECHNICAL.md](docs/TECHNICAL.md).
+
+## Maintainer Notes: Script Layout
+
+FilterTube runs code in two JavaScript contexts on YouTube:
+
+### Isolated World (content scripts: DOM + UI)
+
+The following scripts are loaded as content scripts (see `manifest*.json` for the authoritative load order):
+
+- `js/shared/identity.js` – Shared channel identity helpers exposed as `window.FilterTubeIdentity`.
+- `js/content/menu.js` – Menu styles + menu DOM helpers.
+- `js/content/dom_helpers.js` – Small DOM helpers used by fallback logic.
+- `js/content/dom_extractors.js` – DOM extraction helpers (video IDs, durations, card lookup).
+- `js/content/dom_fallback.js` – DOM fallback filtering layer.
+- `js/content/block_channel.js` – 3-dot menu observer/entry-point (detect dropdown + locate clicked card).
+- `js/content_bridge.js` – Settings sync, bridge messaging, menu rendering/click handling, and blocking orchestration.
+
+### Main World (page context: data interception)
+
+- `js/seed.js` – Hook/override entry points for `ytInitialData`, `fetch`, and XHR.
+- `js/injector.js` – Coordinator + main-world search helpers (e.g., `ytInitialData` lookups).
+- `js/filter_logic.js` – Filtering engine that removes blocked content from YouTube’s JSON before render.

@@ -13,6 +13,18 @@
  * - Implement optional features in the future
  */
 
+
+// Load shared identity helpers in MV3 service worker environments (Chrome/Opera).
+// Firefox MV3 can also load `js/shared/identity.js` via manifest ordering.
+try {
+    if (typeof importScripts === 'function' && !globalThis.FilterTubeIdentity) {
+        importScripts('shared/identity.js');
+    }
+} catch (e) {
+    console.warn('FilterTube Background: Failed to load shared identity helpers', e);
+}
+
+
 // Browser detection for compatibility
 const IS_FIREFOX = typeof browser !== 'undefined' && !!browser.runtime;
 const browserAPI = IS_FIREFOX ? browser : chrome;

@@ -20,7 +20,7 @@ This document is an *operator playbook* for answering:
   - Not every surface routes through a convenient JSON response.
   - DOM recycling and client-side hydration can still surface items that need DOM fallback.
 
-### 1.2 DOM Fallback (Isolated World): `content_bridge.js`
+### 1.2 DOM Fallback (Isolated World): `js/content/dom_fallback.js` (invoked by `content_bridge.js`)
 - **Purpose**
   - Hide/restore already-rendered elements.
   - Handle SPA navigation, late hydration, and recycled DOM nodes.
@@ -31,7 +31,7 @@ This document is an *operator playbook* for answering:
   - Can only hide *after* elements exist.
   - Channel identity may be incomplete in the DOM (common on Shorts).
 
-### 1.3 Menu-click Blocking (User Action): 3-dot menu injection in `content_bridge.js`
+### 1.3 Menu-click Blocking (User Action): 3-dot menu injection (`block_channel.js` + `content_bridge.js`)
 - **Purpose**
   - Persist a new blocked channel entry (via background)
   - Hide the clicked card instantly for UX feedback

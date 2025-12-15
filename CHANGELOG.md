@@ -1,4 +1,18 @@
 # Changelog
+## Version 3.0.9
+
+### Refactor
+- **3-dot menu module split**: Moved the dropdown observer/bootstrap logic into `js/content/block_channel.js` (loaded before `content_bridge.js`).
+
+### Cleanup
+- **Legacy observer removal**: Removed the old/disabled dropdown observer code from `content_bridge.js` after validating the new `block_channel.js` entry-point.
+
+### Documentation
+- Updated docs to reflect the new isolated-world module structure + load order.
+- Expanded `docs/youtube_renderer_inventory.md` with additional menu DOM variants used by the 3-dot injection pipeline.
+
+---
+
 ## Version 3.0.8
 
 ### Channel Blocking Hardening

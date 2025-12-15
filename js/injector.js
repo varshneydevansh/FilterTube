@@ -52,6 +52,10 @@
 
     const HANDLE_TERMINATOR_REGEX = /[\/\s?#"'<>\u2022\u00B7]/;
     function extractRawHandle(value) {
+        const sharedExtractRawHandle = window.FilterTubeIdentity?.extractRawHandle;
+        if (typeof sharedExtractRawHandle === 'function') {
+            return sharedExtractRawHandle(value);
+        }
         if (!value || typeof value !== 'string') return '';
         let working = value.trim();
         if (!working) return '';

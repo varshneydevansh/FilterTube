@@ -22,11 +22,13 @@ FilterTube runs in multiple JavaScript “worlds”:
 - **Background** (`js/background.js`)
   - Owns persistence (Chrome storage) and network fetches that shouldn’t depend on page lifecycle.
 
-- **Isolated World** (`js/content_bridge.js`)
-  - Runs as a content script.
+- **Isolated World** (`js/content/*` + `js/content_bridge.js`)
+  - Runs as content scripts.
   - Can access the DOM.
   - Cannot directly access `window.ytInitialData` (Main World objects) reliably.
-  - Injects the 3-dot menu UI and performs DOM fallback hide/restore.
+  - `js/content/block_channel.js` detects 3-dot dropdown openings and resolves the clicked card.
+  - `js/content/dom_fallback.js` implements `applyDOMFallback(...)` (hide/restore logic).
+  - `js/content_bridge.js` renders menu entries and orchestrates block/persist/hide flows (and schedules DOM fallback reprocessing).
 
 - **Main World** (`js/seed.js`, `js/filter_logic.js`, `js/injector.js`)
   - Runs in the page context.
@@ -107,8 +109,9 @@ This is the most reliable “no-network” source when YouTube actually supplies
 ## 4. Blocking Flow (3-dot Menu → Persist → Hide)
 
 ### 4.1 Menu injection and click
-- `content_bridge.js` injects a “Block channel” menu item into YouTube’s overflow menu.
-- On click, `handleBlockChannelClick(channelInfo, ...)` runs.
+- `js/content/block_channel.js` detects the overflow dropdown and resolves the associated card.
+- It then calls `content_bridge.js:injectFilterTubeMenuItem(dropdown, videoCard)` to render the “Block channel” menu entry.
+- On click, `content_bridge.js:handleBlockChannelClick(channelInfo, ...)` runs.
 
 ### 4.2 Resolve missing identifiers (best-effort)
 - If only a handle is known, attempt to resolve UC ID via:
@@ -255,7 +258,7 @@ This section answers:
   - Modern UI variants: `yt-lockup-view-model`, `yt-lockup-metadata-view-model`
 
 - **Extraction path**
-  - `content_bridge.js:applyDOMFallback()` enumerates `VIDEO_CARD_SELECTORS` and calls:
+  - `js/content/dom_fallback.js:applyDOMFallback()` enumerates `VIDEO_CARD_SELECTORS` and calls:
     - `extractChannelMetadataFromElement(...)` (best-effort id/handle)
     - `extractCollaboratorMetadataFromElement(...)` for collaborations
   - The engine (`seed.js` + `filter_logic.js`) may pre-stamp `data-filtertube-channel-handle/id` onto DOM nodes.
@@ -331,7 +334,7 @@ This section answers “where is content hidden and by what mechanism?”
 
 ### 11.2 DOM fallback (visual guard)
 
-- **Where:** Isolated world `content_bridge.js`
+- **Where:** Isolated world (`js/content/dom_fallback.js` + `content_bridge.js`)
 - **Entry point:** `applyDOMFallback(settings, {forceReprocess})`
   - Enumerates `VIDEO_CARD_SELECTORS`
   - Extracts:

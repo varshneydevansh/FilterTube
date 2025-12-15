@@ -75,6 +75,7 @@ Each collaborator in `listItems[].listItemViewModel`:
 | `<div id="attributed-channel-name">` | `attributedChannelName` in `lockupViewModel.byline` | ✅ Covered | Detects collaboration videos; triggers special handling |
 | `<yt-text-view-model>` with attributed string | DOM-only collaboration display | ✅ Covered | Parses "Channel A ✓ and Channel B ✓" format |
 | `<yt-core-attributed-string>` | Contains channel spans | ✅ Covered | Each span has channel name |
+| `<yt-avatar-stack-view-model>` | DOM-only (avatar stack) | ✅ Covered | Used to seed collaborator lists and detect collaboration dialog triggers when present |
 | `<a href="/@handle">` | Direct channel link | ⚠️ Partial | Only FIRST channel has direct link in DOM; others require ytInitialData lookup |
 | `badge-shape[title*="•"]` | DOM-only badges | ✅ Covered | Regex `@([A-Za-z0-9._-]+)` extracts handles even when encoded as `@foo.bar` |
 
@@ -376,7 +377,7 @@ These chips originate from the YouTube UI rather than API payloads we currently 
 | --- | --- | --- | --- |
 | `<yt-button-view-model>` | `buttonViewModel` | ℹ️ **NEW** | "Ask" button (AI feature). Potential future target for category filtering. |
 
-## 3-Dot Menu Blocking Targets (v3.0.3)
+## 3-Dot Menu Blocking Targets (v3.0.9)
 
 FilterTube now injects a "Block Channel" option into the 3-dot menu for the following content types. This allows users to block channels directly from the UI without visiting the channel page.
 
@@ -389,5 +390,16 @@ FilterTube now injects a "Block Channel" option into the 3-dot menu for the foll
 | **Mobile/Compact** | `ytd-compact-promoted-video-renderer`, `ytm-compact-video-renderer`, `ytm-video-with-context-renderer` | Mobile web and specific compact layouts. |
 | **Containers** | `ytm-item-section-renderer`, `ytd-rich-shelf-renderer` | Shelves and sections containing shorts/videos. |
 
+### Menu DOM Variants (New + Legacy)
+
+| Layer | Targeted DOM Elements | Notes |
+| --- | --- | --- |
+| **Dropdown Container** | `tp-yt-iron-dropdown`, `ytd-menu-popup-renderer` | Observer watches dropdown insertion + visibility changes. |
+| **Menu List (New)** | `yt-list-view-model` | Newer YouTube menu structure; FilterTube injects a `yt-list-item-view-model`. |
+| **Menu List (Legacy)** | `tp-yt-paper-listbox` | Older menu structure inside `ytd-menu-popup-renderer`. |
+| **Injected Menu Item** | `yt-list-item-view-model`, `ytd-menu-service-item-renderer` | FilterTube inserts whichever matches the detected menu structure. |
+
 **Technical Note:**
-The injection logic uses a `MutationObserver` to detect when a dropdown menu (`tp-yt-iron-dropdown` or `ytd-menu-popup-renderer`) appears. It then traces back to the `lastClickedMenuButton` to identify the parent video card from the list above. For Shorts, an asynchronous background fetch is often required to resolve the channel handle/ID from the video URL.
+The dropdown observer lives in `js/content/block_channel.js` and uses a `MutationObserver` to detect when a dropdown container (typically `tp-yt-iron-dropdown`) is added or becomes visible. It traces back to the `lastClickedMenuButton` to identify the parent video card from the list above, then calls `content_bridge.js:injectFilterTubeMenuItem(dropdown, card)`.
+
+Inside `injectFilterTubeMenuItem`, FilterTube waits for YouTube to populate either the **new menu list** (`yt-list-view-model`) or the **legacy menu list** (`tp-yt-paper-listbox` / `ytd-menu-popup-renderer`) before inserting the menu entry. For Shorts, an asynchronous background fetch is often required to resolve the channel handle/ID from the video URL.

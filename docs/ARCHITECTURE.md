@@ -151,7 +151,7 @@ The collaboration pipeline spans **all three execution worlds** so that multi-ch
 
 ```mermaid
 sequenceDiagram
-    participant DOM as content_bridge.js<br/>(Isolated World)
+    participant DOM as block_channel.js + content_bridge.js<br/>(Isolated World)
     participant MW as injector.js + filter_logic.js<br/>(Main World)
     participant BG as background.js (SW)
     participant UI as tab-view.js + render_engine.js
@@ -180,7 +180,7 @@ The collaboration lifecycle reuses the existing Hybrid Filtering channels (`wind
 
   (Isolated World)                 (Main World)                    (Service Worker)              (UI Contexts)
 
-  content_bridge.js        injector.js / filter_logic.js          background.js            tab-view.js / popup.js
+  block_channel.js + content_bridge.js        injector.js / filter_logic.js          background.js            tab-view.js / popup.js
          |                               |                              |                             |
          | 1. DOM parse                  |                              |                             |
          |------------------------------>|                              |                             |
@@ -281,9 +281,11 @@ Imagine FilterTube as a security guard. Instead of waiting for people (videos) t
       |              |
       | (Main)       | (Isolated)
       v              v
-+-----------+  +------------------+
-|  seed.js  |  | content_bridge.js|
-+-----------+  +------------------+
++-----------+  +----------------------------------------------+
+|  seed.js  |  | Isolated World content scripts (ordered load) |
++-----------+  | identity.js → menu.js → dom_*.js →            |
+               | block_channel.js → content_bridge.js          |
+               +----------------------------------------------+
       |                  |
       |                  v
       |        +------------------+
@@ -359,7 +361,7 @@ When you change a setting, it's like sending a letter. You drop it in the mailbo
 ### **2. Content Bridge (`content_bridge.js`)**
 *   **Context:** Isolated World.
 *   **Role:** The Bridge & The Enforcer.
-*   **Key Responsibilities:** Injects Main World scripts, relays settings, and runs the DOM Fallback (MutationObserver) to catch any missed content.
+*   **Key Responsibilities:** Injects Main World scripts, relays settings, and wires the Isolated World helper modules (`js/content/*`) that implement DOM fallback and 3-dot menu blocking.
 
 ### **3. Seed Script (`seed.js`)**
 *   **Context:** Main World.

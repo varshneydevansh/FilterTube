@@ -101,6 +101,11 @@
 
     function normalizeChannelHandle(rawHandle) {
         if (typeof rawHandle !== 'string') return '';
+
+        const sharedExtractRawHandle = window.FilterTubeIdentity?.extractRawHandle;
+        if (typeof sharedExtractRawHandle === 'function') {
+            return sharedExtractRawHandle(rawHandle) || '';
+        }
         let candidate = rawHandle.trim();
         if (!candidate) return '';
 
@@ -1198,6 +1203,10 @@
          * Handles both legacy string filters and new object filters with name/id/handle
          */
         _matchesChannel(filterChannel, channelInfo) {
+            const sharedChannelMatchesFilter = window.FilterTubeIdentity?.channelMatchesFilter;
+            if (typeof sharedChannelMatchesFilter === 'function') {
+                return sharedChannelMatchesFilter(channelInfo, filterChannel, this.channelMap);
+            }
             // Handle new object format: { name, id, handle }
             if (typeof filterChannel === 'object' && filterChannel !== null) {
                 const filterId = (filterChannel.id || '').toLowerCase();
