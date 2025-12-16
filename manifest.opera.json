@@ -48,6 +48,10 @@
                 "js/content/dom_extractors.js",
                 "js/content/dom_fallback.js",
                 "js/content/block_channel.js",
+                "js/content/bridge_injection.js",
+                "js/content/bridge_settings.js",
+                "js/content/handle_resolver.js",
+                "js/content/collab_dialog.js",
                 "js/content_bridge.js"
             ],
             "run_at": "document_start"

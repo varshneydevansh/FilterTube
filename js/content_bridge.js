@@ -2,17 +2,6 @@
 
 console.log("FilterTube: content_bridge.js loaded (Isolated World)");
 
-const IS_FIREFOX_BRIDGE = typeof browser !== 'undefined' && !!browser.runtime;
-const browserAPI_BRIDGE = IS_FIREFOX_BRIDGE ? browser : chrome;
-
-// Debug counter for tracking
-let debugSequence = 0;
-let currentSettings = null;
-function debugLog(message, ...args) {
-    debugSequence++;
-    // console.log(`[${debugSequence}] FilterTube (Bridge ${IS_FIREFOX_BRIDGE ? 'Fx' : 'Cr'}):`, message, ...args);
-}
-
 function buildChannelMetadataPayload(channelInfo = {}) {
     const canonical = channelInfo.canonicalHandle || channelInfo.handleDisplay || channelInfo.handle || '';
     const display = channelInfo.handleDisplay || canonical || channelInfo.name || '';
@@ -397,117 +386,12 @@ function refreshActiveCollaborationMenu(videoId, collaborators, options = {}) {
     context.channelInfo = channelInfo;
 }
 
-// ==========================================
-// ACTIVE RESOLVER - Fetches UC ID for @handles
-// ==========================================
-const resolvedHandleCache = new Map();
-
-async function fetchIdForHandle(handle, options = {}) {
-    const { skipNetwork = false } = options;
-    const normalizedHandle = normalizeHandleValue(handle);
-    const cleanHandle = normalizedHandle ? normalizedHandle.replace(/^@/, '') : '';
-    if (!cleanHandle) return null;
-
-    // If we already have a result, return it.
-    // Never leak the internal 'PENDING' sentinel to callers – treat it as
-    // "not yet resolved" so callers see a simple "no ID yet" (null).
-    if (resolvedHandleCache.has(cleanHandle)) {
-        const cached = resolvedHandleCache.get(cleanHandle);
-        if (cached !== 'PENDING') {
-            return cached;
-        }
-    }
-
-    // Try resolving from persisted channelMap first to avoid hitting broken /about pages
-    try {
-        const storage = await browserAPI_BRIDGE.storage.local.get(['channelMap']);
-        const channelMap = storage.channelMap || {};
-        const keyHandle = (`@${cleanHandle}`).toLowerCase();
-        const mappedId = channelMap[keyHandle];
-
-        if (mappedId && mappedId.toUpperCase().startsWith('UC')) {
-            resolvedHandleCache.set(cleanHandle, mappedId);
-            console.log(`FilterTube: Resolved @${cleanHandle} from channelMap -> ${mappedId}`);
-            return mappedId;
-        }
-    } catch (e) {
-        console.warn('FilterTube: Failed to read channelMap while resolving handle', e);
-    }
-
-    if (resolvedHandleCache.has(cleanHandle) && resolvedHandleCache.get(cleanHandle) === 'PENDING') {
-        return null;
-    }
-
-    if (skipNetwork) {
-        // Remove the pending marker so future non-skip calls can attempt network fetch
-        resolvedHandleCache.delete(cleanHandle);
-        return null;
-    }
-
-    // Mark as pending to prevent Loop
-    resolvedHandleCache.set(cleanHandle, 'PENDING');
-
-    try {
-        const rawCandidate = extractRawHandle(handle);
-        const networkHandleCore = rawCandidate
-            ? rawCandidate.replace(/^@+/, '').split(/[/?#]/)[0].trim()
-            : cleanHandle;
-        const encodedHandle = encodeURIComponent(networkHandleCore);
-        let response = await fetch(`https://www.youtube.com/@${encodedHandle}/about`);
-
-        if (!response.ok) {
-            response = await fetch(`https://www.youtube.com/@${encodedHandle}`);
-        }
-
-        if (!response.ok) {
-            resolvedHandleCache.delete(cleanHandle);
-            return null;
-        }
-
-        const text = await response.text();
-
-        const match = text.match(/channel\/(UC[\w-]{22})/);
-        if (match && match[1]) {
-            const id = match[1];
-
-            resolvedHandleCache.set(cleanHandle, id);
-
-            window.postMessage({
-                type: 'FilterTube_UpdateChannelMap',
-                payload: [{ id: id, handle: `@${cleanHandle}` }],
-                source: 'content_bridge'
-            }, '*');
-
-            console.log(`FilterTube: ✅ Resolved @${cleanHandle} -> ${id}`);
-
-            setTimeout(() => {
-                if (typeof applyDOMFallback === 'function') {
-                    applyDOMFallback(currentSettings, { forceReprocess: true });
-                }
-            }, 50);
-            return id;
-        }
-        resolvedHandleCache.delete(cleanHandle);
-    } catch (e) {
-        console.warn(`FilterTube: Failed to resolve @${cleanHandle}`, e);
-        resolvedHandleCache.delete(cleanHandle);
-    }
-    return null;
-}
-
 // Statistics tracking
 let statsCountToday = 0;
 let statsTotalSeconds = 0; // Track total seconds saved instead of using multiplier
 let statsLastDate = new Date().toDateString();
 let statsInitialized = false;
-let collabTriggerListenersAttached = false;
 
-function ensureCollabTriggerListeners() {
-    if (collabTriggerListenersAttached) return;
-    collabTriggerListenersAttached = true;
-    document.addEventListener('click', handlePotentialCollabTrigger, true);
-    document.addEventListener('keydown', handlePotentialCollabTriggerKeydown, true);
-}
 
 // ==========================================
 // HIDE/RESTORE TRACKING FOR DEBUGGING
@@ -589,15 +473,9 @@ function generateCollaborationGroupId() {
 // ==========================
 
 const COLLAB_MULTI_MORE_PATTERN = /\band\s+\d+\s+more\b/i;
-const COLLAB_DIALOG_TITLE_PATTERN = /collaborator/i;
 const COLLAB_MORE_TOKEN_PATTERN = /^\d+\s+more$/i;
 const COLLAB_PLACEHOLDER_NAME_PATTERN = /^(?:and\s+|block\s+)?\d+\s+more(?:\s+(?:collaborators?|channels?))?$/i;
 const pendingCollabCards = new Map(); // key -> entry
-let pendingCollabDialogTrigger = null;
-let pendingCollabDialogTriggerTimeoutId = null;
-let collabDialogObserver = null;
-let collabDialogObserverInitialized = false;
-let pendingCollaboratorRefresh = false;
 const activeCollaborationDropdowns = new Map();
 const resolvedCollaboratorsByVideoId = new Map();
 const multiStepSelectionState = new Map();
@@ -908,125 +786,6 @@ function markMultiStepSelection(groupId, channelInfo, menuItem) {
     updateMultiStepActionLabel(state);
 }
 
-function scheduleCollaboratorRefresh() {
-    if (pendingCollaboratorRefresh) return;
-    pendingCollaboratorRefresh = true;
-    requestAnimationFrame(() => {
-        pendingCollaboratorRefresh = false;
-        applyDOMFallback(null, { preserveScroll: true, forceReprocess: true });
-    });
-}
-
-const HANDLE_TERMINATOR_REGEX = /[\/\s?#"'<>\&]/;
-const HANDLE_GLYPH_NORMALIZERS = [
-    { pattern: /[\u2018\u2019\u201A\u201B\u2032\uFF07]/g, replacement: '\'' },
-    { pattern: /[\u201C\u201D\u2033\uFF02]/g, replacement: '"' },
-    { pattern: /[\u2013\u2014]/g, replacement: '-' },
-    { pattern: /\uFF0E/g, replacement: '.' },
-    { pattern: /\uFF3F/g, replacement: '_' }
-];
-
-function persistChannelMappings(mappings = []) {
-    if (!Array.isArray(mappings) || mappings.length === 0) return;
-    try {
-        browserAPI_BRIDGE.runtime.sendMessage({
-            action: "updateChannelMap",
-            mappings
-        });
-    } catch (error) {
-        console.warn('FilterTube: Failed to persist channel mapping', error);
-    }
-
-    if (!currentSettings || typeof currentSettings !== 'object') return;
-    if (!currentSettings.channelMap || typeof currentSettings.channelMap !== 'object') {
-        currentSettings.channelMap = {};
-    }
-    const map = currentSettings.channelMap;
-    mappings.forEach(mapping => {
-        if (!mapping || !mapping.id || !mapping.handle) return;
-        const idKey = mapping.id.toLowerCase();
-        const handleKey = mapping.handle.toLowerCase();
-        map[idKey] = mapping.handle;
-        map[handleKey] = mapping.id;
-    });
-}
-
-function normalizeHandleGlyphs(value) {
-    let normalized = value;
-    HANDLE_GLYPH_NORMALIZERS.forEach(({ pattern, replacement }) => {
-        normalized = normalized.replace(pattern, replacement);
-    });
-    return normalized;
-}
-
-function extractRawHandle(value) {
-    const sharedExtractRawHandle = window.FilterTubeIdentity?.extractRawHandle;
-    if (typeof sharedExtractRawHandle === 'function') {
-        return sharedExtractRawHandle(value);
-    }
-    if (!value || typeof value !== 'string') return '';
-    let working = value.trim();
-    if (!working) return '';
-
-    const atIndex = working.indexOf('@');
-    if (atIndex === -1) return '';
-
-    working = working.substring(atIndex + 1);
-    if (!working) return '';
-
-    let buffer = '';
-    for (let i = 0; i < working.length; i++) {
-        const char = working[i];
-        if (char === '%' && i + 2 < working.length && /[0-9A-Fa-f]{2}/.test(working.substring(i + 1, i + 3))) {
-            buffer += working.substring(i, i + 3);
-            i += 2;
-            continue;
-        }
-        if (HANDLE_TERMINATOR_REGEX.test(char)) {
-            break;
-        }
-        buffer += char;
-    }
-
-    if (!buffer) return '';
-
-    try {
-        buffer = decodeURIComponent(buffer);
-    } catch (err) {
-        // Ignore decode failures; fall back to raw string
-    }
-
-    buffer = normalizeHandleGlyphs(buffer);
-    if (!buffer) return '';
-    return `@${buffer}`;
-}
-
-function normalizeHandleValue(handle) {
-    const sharedNormalizeHandleValue = window.FilterTubeIdentity?.normalizeHandleValue;
-    if (typeof sharedNormalizeHandleValue === 'function') {
-        return sharedNormalizeHandleValue(handle);
-    }
-    if (!handle) return '';
-    let normalized = handle.trim();
-    if (!normalized) return '';
-
-    // Always operate on the raw decoded handle to avoid mismatched cases/encodings
-    const rawHandle = extractRawHandle(normalized);
-    if (rawHandle) {
-        normalized = rawHandle;
-    }
-
-    normalized = normalized.replace(/^@+/, '');
-    normalized = normalized.split('/')[0];
-    normalized = normalized.replace(/\s+/g, '');
-    if (!normalized) return '';
-    return `@${normalized.toLowerCase()}`;
-}
-
-function extractHandleFromString(value) {
-    const raw = extractRawHandle(value);
-    return raw ? normalizeHandleValue(raw) : '';
-}
 
 function applyHandleMetadata(target, candidateHandle, options = {}) {
     if (!target || !candidateHandle) return '';
@@ -1331,7 +1090,6 @@ function markCardForDialogEnrichment(element, videoId, partialCollaborators = []
     if (videoId) {
         card.setAttribute('data-filtertube-video-id', videoId);
     }
-    ensureCollabTriggerListeners();
 
     const entry = {
         key,
@@ -1353,7 +1111,6 @@ function markCardForDialogEnrichment(element, videoId, partialCollaborators = []
     }, 20000);
 
     pendingCollabCards.set(key, entry);
-    ensureCollabDialogObserver();
 }
 
 function requestCollaboratorEnrichment(element, videoId, partialCollaborators = []) {
@@ -1519,8 +1276,7 @@ function applyCollaboratorsToCard(entry, collaborators) {
     }
 
     pendingCollabCards.delete(entry.key);
-    pendingCollabDialogTrigger = null;
-    scheduleCollaboratorRefresh();
+    // scheduleCollaboratorRefresh() and pendingCollabDialogTrigger are now handled in collab_dialog.js
 }
 
 function propagateCollaboratorsToMatchingCards(videoId, serializedCollaborators, sourceCard) {
@@ -2446,154 +2202,9 @@ function channelMatchesFilter(meta, filterChannel, channelMap = {}) {
 
 // Moved to `js/content/dom_fallback.js` (loaded before this file via manifest ordering).
 
-// ============================================================================
+// ==========================================================================
 // COMMUNICATION & INIT
-// ============================================================================
-
-browserAPI_BRIDGE.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (!request) return;
-
-    if (request.action === 'FilterTube_RefreshNow') {
-        debugLog('🔄 Refresh requested via runtime messaging');
-        requestSettingsFromBackground().then(result => {
-            if (result?.success) {
-                applyDOMFallback(result.settings, { forceReprocess: true });
-            }
-        });
-        sendResponse?.({ acknowledged: true });
-    } else if (request.action === 'FilterTube_ApplySettings' && request.settings) {
-        debugLog('⚡ Applying settings pushed from UI');
-        sendSettingsToMainWorld(request.settings);
-        applyDOMFallback(request.settings, { forceReprocess: true });
-        sendResponse?.({ acknowledged: true });
-    }
-});
-
-let scriptsInjected = false;
-let injectionInProgress = false;
-let pendingSeedSettings = null;
-let seedListenerAttached = false;
-
-async function injectMainWorldScripts() {
-    if (scriptsInjected || injectionInProgress) return;
-    injectionInProgress = true;
-
-    const scriptsToInject = ['shared/identity', 'filter_logic'];
-    if (IS_FIREFOX_BRIDGE) scriptsToInject.push('seed');
-    scriptsToInject.push('injector');
-
-    try {
-        if (!IS_FIREFOX_BRIDGE && browserAPI_BRIDGE.scripting?.executeScript) {
-            await injectViaScriptingAPI(scriptsToInject);
-        } else {
-            await injectViaFallback(scriptsToInject);
-        }
-        scriptsInjected = true;
-        setTimeout(() => requestSettingsFromBackground(), 100);
-    } catch (error) {
-        debugLog("❌ Script injection failed:", error);
-        injectionInProgress = false;
-    }
-    injectionInProgress = false;
-}
-
-async function injectViaScriptingAPI(scripts) {
-    return new Promise((resolve, reject) => {
-        browserAPI_BRIDGE.runtime.sendMessage({
-            action: "injectScripts",
-            scripts: scripts
-        }, (response) => {
-            if (browserAPI_BRIDGE.runtime.lastError || !response?.success) {
-                reject(new Error(browserAPI_BRIDGE.runtime.lastError?.message || response?.error));
-            } else {
-                resolve();
-            }
-        });
-    });
-}
-
-async function injectViaFallback(scripts) {
-    return new Promise((resolve) => {
-        let currentIndex = 0;
-        function injectNext() {
-            if (currentIndex >= scripts.length) {
-                resolve();
-                return;
-            }
-            const scriptName = scripts[currentIndex];
-            const script = document.createElement('script');
-            script.src = browserAPI_BRIDGE.runtime.getURL(`js/${scriptName}.js`);
-            script.onload = () => {
-                currentIndex++;
-                setTimeout(injectNext, 50);
-            };
-            (document.head || document.documentElement).appendChild(script);
-        }
-        injectNext();
-    });
-}
-
-function requestSettingsFromBackground() {
-    return new Promise((resolve) => {
-        browserAPI_BRIDGE.runtime.sendMessage({ action: "getCompiledSettings" }, (response) => {
-            if (response && !response.error) {
-                sendSettingsToMainWorld(response);
-                resolve({ success: true, settings: response });
-            } else {
-                resolve({ success: false });
-            }
-        });
-    });
-}
-
-function tryApplySettingsToSeed(settings) {
-    if (window.filterTube?.updateSettings) {
-        try {
-            window.filterTube.updateSettings(settings);
-            pendingSeedSettings = null;
-            return true;
-        } catch (error) {
-            debugLog('❌ Failed to forward settings to seed.js:', error);
-        }
-    }
-    return false;
-}
-
-function ensureSeedReadyListener() {
-    if (seedListenerAttached) return;
-    seedListenerAttached = true;
-    window.addEventListener('filterTubeSeedReady', () => {
-        if (pendingSeedSettings) {
-            tryApplySettingsToSeed(pendingSeedSettings);
-        }
-    });
-}
-
-function scheduleSeedRetry() {
-    setTimeout(() => {
-        if (pendingSeedSettings) {
-            if (!tryApplySettingsToSeed(pendingSeedSettings)) {
-                scheduleSeedRetry();
-            }
-        }
-    }, 250);
-}
-
-function sendSettingsToMainWorld(settings) {
-    latestSettings = settings;
-    currentSettings = settings;
-    window.postMessage({
-        type: 'FilterTube_SettingsToInjector',
-        payload: settings,
-        source: 'content_bridge'
-    }, '*');
-
-    if (!tryApplySettingsToSeed(settings)) {
-        pendingSeedSettings = settings;
-        ensureSeedReadyListener();
-        scheduleSeedRetry();
-    }
-}
+// ==========================================================================
 
 // Pending collaborator info requests (for async message-based lookup)
 const pendingCollaboratorRequests = new Map();
@@ -2843,20 +2454,6 @@ function handleMainWorldMessages(event) {
             console.log('FilterTube: Received channel info response for video:', videoId, 'channel:', channel);
             pending.resolve(channel || null);
         }
-    }
-}
-
-function handleStorageChanges(changes, area) {
-    if (area !== 'local') return;
-    const relevantKeys = ['filterKeywords', 'filterChannels', 'uiChannels', 'channelMap', 'hideAllComments', 'filterComments', 'hideAllShorts'];
-    if (Object.keys(changes).some(key => relevantKeys.includes(key))) {
-        // FIX: Apply changes IMMEDIATELY without debounce
-        requestSettingsFromBackground().then(result => {
-            if (result?.success) {
-                // Force immediate reprocess with no scroll preservation for instant feedback
-                applyDOMFallback(result.settings, { forceReprocess: true });
-            }
-        });
     }
 }
 
@@ -5289,9 +4886,6 @@ function addFilterAllContentCheckbox(menuItem, channelData) {
 }
 
 window.addEventListener('message', handleMainWorldMessages, false);
-try {
-    browserAPI_BRIDGE.storage.onChanged.addListener(handleStorageChanges);
-} catch (e) { }
 
 setTimeout(() => initialize(), 50);
 
