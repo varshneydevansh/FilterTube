@@ -14,7 +14,12 @@
 // - `pendingCollabCards`, `pendingCollabDialogTrigger` (shared with content_bridge.js)
 
 const COLLAB_DIALOG_TITLE_PATTERN = /collaborator/i;
-const pendingCollabDialogTrigger = null;
+if (!window.pendingCollabCards) {
+    window.pendingCollabCards = new Map();
+}
+if (window.pendingCollabDialogTrigger === undefined) {
+    window.pendingCollabDialogTrigger = null;
+}
 let pendingCollabDialogTriggerTimeoutId = null;
 let collabDialogObserver = null;
 let collabDialogObserverInitialized = false;
@@ -74,6 +79,187 @@ function ensureCollabTriggerListeners() {
     document.addEventListener('keydown', handlePotentialCollabTriggerKeydown, true);
 }
 
+function resolveCollabEntryForDialog(collaborators) {
+    if (window.pendingCollabDialogTrigger) {
+        const triggeredEntry = window.pendingCollabCards.get(window.pendingCollabDialogTrigger.key);
+        if (triggeredEntry) {
+            return triggeredEntry;
+        }
+    }
+
+    if (!collaborators || collaborators.length === 0) return null;
+    const primary = collaborators[0];
+    const primaryHandle = primary.handle?.toLowerCase();
+    const primaryName = primary.name?.toLowerCase();
+
+    const matchingEntries = [];
+    for (const entry of window.pendingCollabCards.values()) {
+        if (!entry?.card?.isConnected) continue;
+        const partialMatches = entry.partialCollaborators || [];
+        const hasMatch = partialMatches.some(partial => {
+            const partialHandle = partial.handle?.toLowerCase();
+            const partialName = partial.name?.toLowerCase();
+            return (primaryHandle && partialHandle && partialHandle === primaryHandle) ||
+                (primaryName && partialName && partialName === primaryName);
+        });
+        if (hasMatch) {
+            matchingEntries.push(entry);
+        }
+    }
+
+    if (matchingEntries.length === 0) {
+        return null;
+    }
+
+    if (matchingEntries.length === 1) {
+        return matchingEntries[0];
+    }
+
+    return matchingEntries.reduce((best, entry) => {
+        if (!best) return entry;
+        const bestExpected = best.expectedCollaboratorCount || 0;
+        const entryExpected = entry.expectedCollaboratorCount || 0;
+        if (entryExpected !== bestExpected) {
+            return entryExpected > bestExpected ? entry : best;
+        }
+
+        const bestScore = getCollaboratorListQuality(best.partialCollaborators);
+        const entryScore = getCollaboratorListQuality(entry.partialCollaborators);
+        if (entryScore !== bestScore) {
+            return entryScore > bestScore ? entry : best;
+        }
+
+        // Prefer the most recent entry if all else ties
+        return (entry.timestamp || 0) > (best.timestamp || 0) ? entry : best;
+    }, null);
+}
+
+function propagateCollaboratorsToMatchingCards(videoId, serializedCollaborators, sourceCard) {
+    if (!videoId || !serializedCollaborators) return;
+    const cards = document.querySelectorAll(`[data-filtertube-video-id="${videoId}"]`);
+    cards.forEach(card => {
+        if (card === sourceCard) return;
+        card.setAttribute('data-filtertube-collaborators', serializedCollaborators);
+        card.setAttribute('data-filtertube-collab-state', 'resolved');
+        card.removeAttribute('data-filtertube-collab-awaiting-dialog');
+        card.removeAttribute('data-filtertube-collab-requested');
+    });
+}
+
+function applyCollaboratorsToCard(entry, collaborators) {
+    if (!entry || !entry.card || !collaborators || collaborators.length === 0) return;
+
+    const sanitizedCollaborators = sanitizeCollaboratorList(collaborators);
+    if (sanitizedCollaborators.length === 0) {
+        console.warn('FilterTube: No valid collaborators after sanitization.');
+        return;
+    }
+
+    const existing = getCachedCollaboratorsFromCard(entry.card);
+    const existingScore = getCollaboratorListQuality(existing);
+    const incomingScore = getCollaboratorListQuality(sanitizedCollaborators);
+    if (existingScore > incomingScore) {
+        console.log('FilterTube: Skipping collaborator overwrite because existing data is richer.');
+        return;
+    }
+
+    let serializedCollaborators = '';
+    try {
+        serializedCollaborators = JSON.stringify(sanitizedCollaborators);
+        entry.card.setAttribute('data-filtertube-collaborators', serializedCollaborators);
+    } catch (error) {
+        console.warn('FilterTube: Failed to cache dialog collaborator metadata:', error);
+    }
+
+    const expectedCount = Math.max(
+        entry.expectedCollaboratorCount || 0,
+        sanitizedCollaborators.length,
+        parseInt(entry.card.getAttribute('data-filtertube-expected-collaborators') || '0', 10) || 0
+    );
+    if (expectedCount > 0) {
+        entry.card.setAttribute('data-filtertube-expected-collaborators', String(expectedCount));
+    }
+
+    entry.card.removeAttribute('data-filtertube-collab-awaiting-dialog');
+    entry.card.setAttribute('data-filtertube-collab-state', 'resolved');
+    if (entry.videoId) {
+        entry.card.setAttribute('data-filtertube-video-id', entry.videoId);
+        propagateCollaboratorsToMatchingCards(entry.videoId, serializedCollaborators, entry.card);
+        const resolvedScore = getCollaboratorListQuality(resolvedCollaboratorsByVideoId.get(entry.videoId));
+        if (incomingScore >= resolvedScore) {
+            resolvedCollaboratorsByVideoId.set(entry.videoId, sanitizedCollaborators);
+        }
+        refreshActiveCollaborationMenu(entry.videoId, sanitizedCollaborators, {
+            expectedCount
+        });
+    }
+    entry.card.removeAttribute('data-filtertube-collab-requested');
+
+    if (entry.expiryTimeout) {
+        clearTimeout(entry.expiryTimeout);
+        entry.expiryTimeout = null;
+    }
+
+    window.pendingCollabCards.delete(entry.key);
+    // scheduleCollaboratorRefresh() and pendingCollabDialogTrigger are now handled in collab_dialog.js
+}
+
+function extractCollaboratorsFromDialog(dialogNode) {
+    if (!dialogNode) return [];
+    const items = dialogNode.querySelectorAll('yt-list-item-view-model');
+    const collaborators = [];
+
+    items.forEach(item => {
+        const collaborator = { name: '', handle: '', id: '' };
+        const titleNode = item.querySelector('.yt-list-item-view-model__title') ||
+            item.querySelector('a[href*="/@"]') ||
+            item.querySelector('a');
+        collaborator.name = titleNode?.textContent?.trim() ||
+            item.getAttribute('aria-label')?.split('-')?.[0]?.trim() ||
+            '';
+
+        const link = item.querySelector('a[href]');
+        const href = link?.getAttribute('href') || '';
+        if (href) {
+            const handleFromHref = extractHandleFromString(href);
+            if (handleFromHref) collaborator.handle = handleFromHref;
+            const idFromHref = extractChannelIdFromString(href);
+            if (idFromHref) collaborator.id = idFromHref;
+        }
+
+        const subtitleText = item.querySelector('.yt-list-item-view-model__subtitle')?.textContent ||
+            item.getAttribute('aria-label') ||
+            '';
+        if (!collaborator.handle) {
+            const handleFromSubtitle = extractHandleFromString(subtitleText);
+            if (handleFromSubtitle) collaborator.handle = handleFromSubtitle;
+        }
+
+        const dataSources = [
+            item.listItemViewModel,
+            item.data,
+            item.__data,
+            item.__data?.data
+        ];
+        for (const source of dataSources) {
+            if (!source) continue;
+            const identifiers = scanDataForChannelIdentifiers(source);
+            if (!collaborator.handle && identifiers.handle) collaborator.handle = identifiers.handle;
+            if (!collaborator.id && identifiers.id) collaborator.id = identifiers.id;
+            if (!collaborator.name && identifiers.name) collaborator.name = identifiers.name;
+            const titleContent = source?.title?.content;
+            if (!collaborator.name && titleContent) collaborator.name = titleContent;
+        }
+
+        if (collaborator.handle) collaborator.handle = normalizeHandleValue(collaborator.handle);
+        if (collaborator.name || collaborator.handle || collaborator.id) {
+            collaborators.push(collaborator);
+        }
+    });
+
+    return collaborators;
+}
+
 function handleCollaborationDialog(dialogNode) {
     if (!dialogNode || !(dialogNode instanceof HTMLElement)) return;
 
@@ -125,5 +311,6 @@ document.addEventListener('DOMContentLoaded', () => {
 window.collabDialogModule = {
     ensureCollabDialogObserver,
     ensureCollabTriggerListeners,
-    scheduleCollaboratorRefresh
+    scheduleCollaboratorRefresh,
+    applyCollaboratorsToCard
 };

@@ -475,7 +475,9 @@ function generateCollaborationGroupId() {
 const COLLAB_MULTI_MORE_PATTERN = /\band\s+\d+\s+more\b/i;
 const COLLAB_MORE_TOKEN_PATTERN = /^\d+\s+more$/i;
 const COLLAB_PLACEHOLDER_NAME_PATTERN = /^(?:and\s+|block\s+)?\d+\s+more(?:\s+(?:collaborators?|channels?))?$/i;
-const pendingCollabCards = new Map(); // key -> entry
+if (!window.pendingCollabCards) {
+    window.pendingCollabCards = new Map(); // key -> entry
+}
 const activeCollaborationDropdowns = new Map();
 const resolvedCollaboratorsByVideoId = new Map();
 const multiStepSelectionState = new Map();
@@ -1074,8 +1076,8 @@ function markCardForDialogEnrichment(element, videoId, partialCollaborators = []
     }
 
     const key = generateCollabEntryKey(card, videoId);
-    if (pendingCollabCards.has(key)) {
-        const existing = pendingCollabCards.get(key);
+    if (window.pendingCollabCards.has(key)) {
+        const existing = window.pendingCollabCards.get(key);
         if (partialCollaborators?.length) {
             existing.partialCollaborators = partialCollaborators;
         }
@@ -1102,15 +1104,15 @@ function markCardForDialogEnrichment(element, videoId, partialCollaborators = []
     };
 
     entry.expiryTimeout = setTimeout(() => {
-        if (!pendingCollabCards.has(key)) return;
-        const tracked = pendingCollabCards.get(key);
+        if (!window.pendingCollabCards.has(key)) return;
+        const tracked = window.pendingCollabCards.get(key);
         if (tracked !== entry) return;
-        pendingCollabCards.delete(key);
+        window.pendingCollabCards.delete(key);
         card.removeAttribute('data-filtertube-collab-awaiting-dialog');
         card.removeAttribute('data-filtertube-collab-state');
     }, 20000);
 
-    pendingCollabCards.set(key, entry);
+    window.pendingCollabCards.set(key, entry);
 }
 
 function requestCollaboratorEnrichment(element, videoId, partialCollaborators = []) {
@@ -1140,157 +1142,6 @@ function requestCollaboratorEnrichment(element, videoId, partialCollaborators = 
             console.warn('FilterTube: Collaborator enrichment request failed:', error);
         });
 }
-
-function ensureCollabDialogObserver() {
-    if (collabDialogObserverInitialized) return;
-    collabDialogObserverInitialized = true;
-    collabDialogObserver = new MutationObserver(mutations => {
-        for (const mutation of mutations) {
-            mutation.addedNodes?.forEach(node => {
-                if (!(node instanceof HTMLElement)) return;
-                if (node.matches('tp-yt-paper-dialog')) {
-                    handleCollaborationDialog(node);
-                } else {
-                    const dialog = node.querySelector?.('tp-yt-paper-dialog');
-                    if (dialog) {
-                        handleCollaborationDialog(dialog);
-                    }
-                }
-            });
-        }
-    });
-
-    collabDialogObserver.observe(document.documentElement || document.body, {
-        childList: true,
-        subtree: true
-    });
-}
-
-function resolveCollabEntryForDialog(collaborators) {
-    if (pendingCollabDialogTrigger) {
-        const triggeredEntry = pendingCollabCards.get(pendingCollabDialogTrigger.key);
-        if (triggeredEntry) {
-            return triggeredEntry;
-        }
-    }
-
-    if (!collaborators || collaborators.length === 0) return null;
-    const primary = collaborators[0];
-    const primaryHandle = primary.handle?.toLowerCase();
-    const primaryName = primary.name?.toLowerCase();
-
-    const matchingEntries = [];
-    for (const entry of pendingCollabCards.values()) {
-        if (!entry?.card?.isConnected) continue;
-        const partialMatches = entry.partialCollaborators || [];
-        const hasMatch = partialMatches.some(partial => {
-            const partialHandle = partial.handle?.toLowerCase();
-            const partialName = partial.name?.toLowerCase();
-            return (primaryHandle && partialHandle && partialHandle === primaryHandle) ||
-                (primaryName && partialName && partialName === primaryName);
-        });
-        if (hasMatch) {
-            matchingEntries.push(entry);
-        }
-    }
-
-    if (matchingEntries.length === 0) {
-        return null;
-    }
-
-    if (matchingEntries.length === 1) {
-        return matchingEntries[0];
-    }
-
-    return matchingEntries.reduce((best, entry) => {
-        if (!best) return entry;
-        const bestExpected = best.expectedCollaboratorCount || 0;
-        const entryExpected = entry.expectedCollaboratorCount || 0;
-        if (entryExpected !== bestExpected) {
-            return entryExpected > bestExpected ? entry : best;
-        }
-
-        const bestScore = getCollaboratorListQuality(best.partialCollaborators);
-        const entryScore = getCollaboratorListQuality(entry.partialCollaborators);
-        if (entryScore !== bestScore) {
-            return entryScore > bestScore ? entry : best;
-        }
-
-        // Prefer the most recent entry if all else ties
-        return (entry.timestamp || 0) > (best.timestamp || 0) ? entry : best;
-    }, null);
-}
-
-function applyCollaboratorsToCard(entry, collaborators) {
-    if (!entry || !entry.card || !collaborators || collaborators.length === 0) return;
-
-    const sanitizedCollaborators = sanitizeCollaboratorList(collaborators);
-    if (sanitizedCollaborators.length === 0) {
-        console.warn('FilterTube: No valid collaborators after sanitization.');
-        return;
-    }
-
-    const existing = getCachedCollaboratorsFromCard(entry.card);
-    const existingScore = getCollaboratorListQuality(existing);
-    const incomingScore = getCollaboratorListQuality(sanitizedCollaborators);
-    if (existingScore > incomingScore) {
-        console.log('FilterTube: Skipping collaborator overwrite because existing data is richer.');
-        return;
-    }
-
-    let serializedCollaborators = '';
-    try {
-        serializedCollaborators = JSON.stringify(sanitizedCollaborators);
-        entry.card.setAttribute('data-filtertube-collaborators', serializedCollaborators);
-    } catch (error) {
-        console.warn('FilterTube: Failed to cache dialog collaborator metadata:', error);
-    }
-
-    const expectedCount = Math.max(
-        entry.expectedCollaboratorCount || 0,
-        sanitizedCollaborators.length,
-        parseInt(entry.card.getAttribute('data-filtertube-expected-collaborators') || '0', 10) || 0
-    );
-    if (expectedCount > 0) {
-        entry.card.setAttribute('data-filtertube-expected-collaborators', String(expectedCount));
-    }
-
-    entry.card.removeAttribute('data-filtertube-collab-awaiting-dialog');
-    entry.card.setAttribute('data-filtertube-collab-state', 'resolved');
-    if (entry.videoId) {
-        entry.card.setAttribute('data-filtertube-video-id', entry.videoId);
-        propagateCollaboratorsToMatchingCards(entry.videoId, serializedCollaborators, entry.card);
-        const resolvedScore = getCollaboratorListQuality(resolvedCollaboratorsByVideoId.get(entry.videoId));
-        if (incomingScore >= resolvedScore) {
-            resolvedCollaboratorsByVideoId.set(entry.videoId, sanitizedCollaborators);
-        }
-        refreshActiveCollaborationMenu(entry.videoId, sanitizedCollaborators, {
-            expectedCount
-        });
-    }
-    entry.card.removeAttribute('data-filtertube-collab-requested');
-
-    if (entry.expiryTimeout) {
-        clearTimeout(entry.expiryTimeout);
-        entry.expiryTimeout = null;
-    }
-
-    pendingCollabCards.delete(entry.key);
-    // scheduleCollaboratorRefresh() and pendingCollabDialogTrigger are now handled in collab_dialog.js
-}
-
-function propagateCollaboratorsToMatchingCards(videoId, serializedCollaborators, sourceCard) {
-    if (!videoId || !serializedCollaborators) return;
-    const cards = document.querySelectorAll(`[data-filtertube-video-id="${videoId}"]`);
-    cards.forEach(card => {
-        if (card === sourceCard) return;
-        card.setAttribute('data-filtertube-collaborators', serializedCollaborators);
-        card.setAttribute('data-filtertube-collab-state', 'resolved');
-        card.removeAttribute('data-filtertube-collab-awaiting-dialog');
-        card.removeAttribute('data-filtertube-collab-requested');
-    });
-}
-
 function applyResolvedCollaborators(videoId, collaborators, options = {}) {
     if (!videoId || !Array.isArray(collaborators) || collaborators.length === 0) return false;
     const sanitized = sanitizeCollaboratorList(collaborators);
@@ -1366,7 +1217,7 @@ function applyCollaboratorsByVideoId(videoId, collaborators, options = {}) {
     const incomingScore = getCollaboratorListQuality(sanitized);
 
     const key = `vid:${videoId}`;
-    let entry = pendingCollabCards.get(key);
+    let entry = window.pendingCollabCards.get(key);
     if (!entry) {
         const card = document.querySelector(`[data-filtertube-video-id="${videoId}"]`);
         if (card) {
@@ -1379,7 +1230,7 @@ function applyCollaboratorsByVideoId(videoId, collaborators, options = {}) {
                 expiryTimeout: null,
                 expectedCollaboratorCount: parseInt(card.getAttribute('data-filtertube-expected-collaborators') || '0', 10) || 0
             };
-            pendingCollabCards.set(key, entry);
+            window.pendingCollabCards.set(key, entry);
         }
     }
 
@@ -1422,7 +1273,7 @@ function applyCollaboratorsByVideoId(videoId, collaborators, options = {}) {
     }
 
     if (entry) {
-        applyCollaboratorsToCard(entry, sanitized);
+        window.collabDialogModule?.applyCollaboratorsToCard?.(entry, sanitized);
     }
 
     refreshActiveCollaborationMenu(videoId, sanitized, {
@@ -1431,114 +1282,6 @@ function applyCollaboratorsByVideoId(videoId, collaborators, options = {}) {
     });
 
     return updatedAnyCard;
-}
-
-function extractCollaboratorsFromDialog(dialogNode) {
-    if (!dialogNode) return [];
-    const items = dialogNode.querySelectorAll('yt-list-item-view-model');
-    const collaborators = [];
-
-    items.forEach(item => {
-        const collaborator = { name: '', handle: '', id: '' };
-        const titleNode = item.querySelector('.yt-list-item-view-model__title') ||
-            item.querySelector('a[href*="/@"]') ||
-            item.querySelector('a');
-        collaborator.name = titleNode?.textContent?.trim() ||
-            item.getAttribute('aria-label')?.split('-')?.[0]?.trim() ||
-            '';
-
-        const link = item.querySelector('a[href]');
-        const href = link?.getAttribute('href') || '';
-        if (href) {
-            const handleFromHref = extractHandleFromString(href);
-            if (handleFromHref) collaborator.handle = handleFromHref;
-            const idFromHref = extractChannelIdFromString(href);
-            if (idFromHref) collaborator.id = idFromHref;
-        }
-
-        const subtitleText = item.querySelector('.yt-list-item-view-model__subtitle')?.textContent ||
-            item.getAttribute('aria-label') ||
-            '';
-        if (!collaborator.handle) {
-            const handleFromSubtitle = extractHandleFromString(subtitleText);
-            if (handleFromSubtitle) collaborator.handle = handleFromSubtitle;
-        }
-
-        const dataSources = [
-            item.listItemViewModel,
-            item.data,
-            item.__data,
-            item.__data?.data
-        ];
-        for (const source of dataSources) {
-            if (!source) continue;
-            const identifiers = scanDataForChannelIdentifiers(source);
-            if (!collaborator.handle && identifiers.handle) collaborator.handle = identifiers.handle;
-            if (!collaborator.id && identifiers.id) collaborator.id = identifiers.id;
-            if (!collaborator.name && identifiers.name) collaborator.name = identifiers.name;
-            const titleContent = source?.title?.content;
-            if (!collaborator.name && titleContent) collaborator.name = titleContent;
-        }
-
-        if (collaborator.handle) collaborator.handle = normalizeHandleValue(collaborator.handle);
-        if (collaborator.name || collaborator.handle || collaborator.id) {
-            collaborators.push(collaborator);
-        }
-    });
-
-    return collaborators;
-}
-
-function handleCollaborationDialog(dialogNode) {
-    if (!dialogNode || !(dialogNode instanceof HTMLElement)) return;
-
-    const titleText = dialogNode.querySelector('yt-dialog-header-view-model, h2, [role="heading"]')?.textContent || '';
-    if (titleText && !COLLAB_DIALOG_TITLE_PATTERN.test(titleText)) return;
-
-    const collaborators = extractCollaboratorsFromDialog(dialogNode);
-    if (!collaborators || collaborators.length < 2) return;
-
-    const entry = resolveCollabEntryForDialog(collaborators);
-    if (!entry) return;
-
-    applyCollaboratorsToCard(entry, collaborators);
-}
-
-function queuePendingDialogTrigger(card) {
-    if (!card) return;
-    const key = card.getAttribute('data-filtertube-collab-key');
-    if (!key || !pendingCollabCards.has(key)) return;
-
-    pendingCollabDialogTrigger = { key, timestamp: Date.now() };
-    if (pendingCollabDialogTriggerTimeoutId) {
-        clearTimeout(pendingCollabDialogTriggerTimeoutId);
-    }
-    pendingCollabDialogTriggerTimeoutId = setTimeout(() => {
-        pendingCollabDialogTrigger = null;
-    }, 5000);
-}
-
-function isCollabDialogTriggerTarget(target) {
-    if (!(target instanceof Element)) return null;
-    const clickable = target.closest('yt-avatar-stack-view-model, .yt-avatar-stack-view-model, #attributed-channel-name, [aria-label*="Collaboration"]');
-    if (!clickable) return null;
-    const card = clickable.closest('[data-filtertube-collab-awaiting-dialog="true"]');
-    return card || null;
-}
-
-function handlePotentialCollabTrigger(event) {
-    const card = isCollabDialogTriggerTarget(event.target);
-    if (card) {
-        queuePendingDialogTrigger(card);
-    }
-}
-
-function handlePotentialCollabTriggerKeydown(event) {
-    if (event.key !== 'Enter' && event.key !== ' ') return;
-    const card = isCollabDialogTriggerTarget(event.target);
-    if (card) {
-        queuePendingDialogTrigger(card);
-    }
 }
 
 // Initialize stats from storage
@@ -2207,12 +1950,20 @@ function channelMatchesFilter(meta, filterChannel, channelMap = {}) {
 // ==========================================================================
 
 // Pending collaborator info requests (for async message-based lookup)
-const pendingCollaboratorRequests = new Map();
-let collaboratorRequestId = 0;
+if (!(window.pendingCollaboratorRequests instanceof Map)) {
+    window.pendingCollaboratorRequests = new Map();
+}
+if (typeof window.collaboratorRequestId !== 'number' || !isFinite(window.collaboratorRequestId)) {
+    window.collaboratorRequestId = 0;
+}
 
 // Pending single-channel info requests (for ytInitialData lookup in MAIN world)
-const pendingChannelInfoRequests = new Map();
-let channelInfoRequestId = 0;
+if (!(window.pendingChannelInfoRequests instanceof Map)) {
+    window.pendingChannelInfoRequests = new Map();
+}
+if (typeof window.channelInfoRequestId !== 'number' || !isFinite(window.channelInfoRequestId)) {
+    window.channelInfoRequestId = 0;
+}
 
 /**
  * Request collaborator info from Main World (injector.js) via message passing
@@ -2222,20 +1973,20 @@ let channelInfoRequestId = 0;
  */
 function requestCollaboratorInfoFromMainWorld(videoId) {
     return new Promise((resolve) => {
-        const requestId = ++collaboratorRequestId;
+        const requestId = ++window.collaboratorRequestId;
         const timeoutMs = 2000; // 2 second timeout
 
         // Set up timeout
         const timeoutId = setTimeout(() => {
-            if (pendingCollaboratorRequests.has(requestId)) {
-                pendingCollaboratorRequests.delete(requestId);
+            if (window.pendingCollaboratorRequests.has(requestId)) {
+                window.pendingCollaboratorRequests.delete(requestId);
                 console.log('FilterTube: Collaborator info request timed out for video:', videoId);
                 resolve(null);
             }
         }, timeoutMs);
 
         // Store the pending request
-        pendingCollaboratorRequests.set(requestId, { resolve, timeoutId, videoId });
+        window.pendingCollaboratorRequests.set(requestId, { resolve, timeoutId, videoId });
 
         const sendRequest = () => {
             window.postMessage({
@@ -2247,12 +1998,12 @@ function requestCollaboratorInfoFromMainWorld(videoId) {
 
         sendRequest();
         setTimeout(() => {
-            if (pendingCollaboratorRequests.has(requestId)) {
+            if (window.pendingCollaboratorRequests.has(requestId)) {
                 sendRequest();
             }
         }, 250);
         setTimeout(() => {
-            if (pendingCollaboratorRequests.has(requestId)) {
+            if (window.pendingCollaboratorRequests.has(requestId)) {
                 sendRequest();
             }
         }, 1000);
@@ -2263,19 +2014,19 @@ function requestCollaboratorInfoFromMainWorld(videoId) {
 
 function requestChannelInfoFromMainWorld(videoId, options = {}) {
     return new Promise((resolve) => {
-        const requestId = ++channelInfoRequestId;
+        const requestId = ++window.channelInfoRequestId;
         const timeoutMs = 2000; // 2 second timeout
 
         const timeoutId = setTimeout(() => {
-            const pending = pendingChannelInfoRequests.get(requestId);
+            const pending = window.pendingChannelInfoRequests.get(requestId);
             if (pending) {
-                pendingChannelInfoRequests.delete(requestId);
+                window.pendingChannelInfoRequests.delete(requestId);
                 console.log('FilterTube: Channel info request timed out for video:', videoId);
                 resolve(null);
             }
         }, timeoutMs);
 
-        pendingChannelInfoRequests.set(requestId, { resolve, timeoutId, videoId });
+        window.pendingChannelInfoRequests.set(requestId, { resolve, timeoutId, videoId });
 
         const sendRequest = () => {
             window.postMessage({
@@ -2292,12 +2043,12 @@ function requestChannelInfoFromMainWorld(videoId, options = {}) {
 
         sendRequest();
         setTimeout(() => {
-            if (pendingChannelInfoRequests.has(requestId)) {
+            if (window.pendingChannelInfoRequests.has(requestId)) {
                 sendRequest();
             }
         }, 250);
         setTimeout(() => {
-            if (pendingChannelInfoRequests.has(requestId)) {
+            if (window.pendingChannelInfoRequests.has(requestId)) {
                 sendRequest();
             }
         }, 1000);
@@ -2423,11 +2174,11 @@ function handleMainWorldMessages(event) {
     } else if (type === 'FilterTube_CollaboratorInfoResponse') {
         // Handle response from Main World with collaborator info
         const { requestId, collaborators, videoId } = payload;
-        const pending = pendingCollaboratorRequests.get(requestId);
+        const pending = window.pendingCollaboratorRequests.get(requestId);
 
         if (pending) {
             clearTimeout(pending.timeoutId);
-            pendingCollaboratorRequests.delete(requestId);
+            window.pendingCollaboratorRequests.delete(requestId);
             console.log('FilterTube: Received collaborator info response for video:', videoId, 'collaborators:', collaborators);
             pending.resolve(collaborators);
         }
@@ -2446,11 +2197,11 @@ function handleMainWorldMessages(event) {
     } else if (type === 'FilterTube_ChannelInfoResponse') {
         // Handle response from Main World with single-channel info
         const { requestId, channel, videoId } = payload || {};
-        const pending = pendingChannelInfoRequests.get(requestId);
+        const pending = window.pendingChannelInfoRequests.get(requestId);
 
         if (pending) {
             clearTimeout(pending.timeoutId);
-            pendingChannelInfoRequests.delete(requestId);
+            window.pendingChannelInfoRequests.delete(requestId);
             console.log('FilterTube: Received channel info response for video:', videoId, 'channel:', channel);
             pending.resolve(channel || null);
         }
@@ -3485,6 +3236,32 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
     // Wait for menu to be populated by YouTube (with timeout)
     const waitForMenu = () => {
         return new Promise((resolve) => {
+            let settled = false;
+            let observer = null;
+            let closeObserver = null;
+            let timeoutId = null;
+
+            const isDropdownOpen = () => {
+                if (!dropdown?.isConnected) return false;
+                if (dropdown.getAttribute('aria-hidden') === 'true') return false;
+
+                const style = window.getComputedStyle(dropdown);
+                if (style.display === 'none' || style.visibility === 'hidden') return false;
+
+                return true;
+            };
+
+            const finalize = (payload) => {
+                if (settled) return;
+                settled = true;
+
+                if (observer) observer.disconnect();
+                if (closeObserver) closeObserver.disconnect();
+                if (timeoutId) clearTimeout(timeoutId);
+
+                resolve(payload);
+            };
+
             const checkMenu = () => {
                 // Detect menu structure type (new vs old) - COMPREHENSIVE DETECTION
                 const newMenuList = dropdown.querySelector('yt-list-view-model');
@@ -3498,7 +3275,7 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
 
                 if (newMenuList || oldMenuList) {
                     console.log('FilterTube: Menu detected - newMenuList:', !!newMenuList, 'oldMenuList:', !!oldMenuList);
-                    resolve({ newMenuList, oldMenuList });
+                    finalize({ newMenuList, oldMenuList, status: 'ready' });
                     return true;
                 }
                 return false;
@@ -3507,41 +3284,62 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
             // Try immediately first
             if (checkMenu()) return;
 
+            // Dropdown can close before YouTube populates menu (benign)
+            if (!isDropdownOpen()) {
+                finalize({ newMenuList: null, oldMenuList: null, status: 'closed' });
+                return;
+            }
+
             // If not found, observe for menu to be added
             console.log('FilterTube: Menu not ready, waiting for YouTube to populate...');
             let attempts = 0;
             const maxAttempts = 20; // 2 seconds max wait
 
-            const observer = new MutationObserver(() => {
+            observer = new MutationObserver(() => {
+                if (settled) return;
+                if (!isDropdownOpen()) {
+                    finalize({ newMenuList: null, oldMenuList: null, status: 'closed' });
+                    return;
+                }
+
                 attempts++;
                 if (checkMenu()) {
-                    observer.disconnect();
+                    return;
                 } else if (attempts >= maxAttempts) {
-                    console.warn('FilterTube: Menu not populated after waiting, giving up');
-                    console.log('FilterTube: Dropdown HTML:', dropdown.innerHTML.substring(0, 500));
-                    observer.disconnect();
-                    resolve({ newMenuList: null, oldMenuList: null });
+                    finalize({ newMenuList: null, oldMenuList: null, status: 'timeout' });
                 }
             });
 
             observer.observe(dropdown, { childList: true, subtree: true });
 
-            // Also set a timeout as backup
-            setTimeout(() => {
-                observer.disconnect();
-                const result = checkMenu();
-                if (!result) {
-                    console.warn('FilterTube: Timeout waiting for menu');
-                    resolve({ newMenuList: null, oldMenuList: null });
+            closeObserver = new MutationObserver(() => {
+                if (settled) return;
+                if (!isDropdownOpen()) {
+                    finalize({ newMenuList: null, oldMenuList: null, status: 'closed' });
                 }
+            });
+
+            closeObserver.observe(dropdown, { attributes: true, attributeFilter: ['style', 'aria-hidden'] });
+
+            // Also set a timeout as backup
+            timeoutId = setTimeout(() => {
+                if (settled) return;
+                if (checkMenu()) return;
+                if (!isDropdownOpen()) {
+                    finalize({ newMenuList: null, oldMenuList: null, status: 'closed' });
+                    return;
+                }
+                finalize({ newMenuList: null, oldMenuList: null, status: 'timeout' });
             }, 2000);
         });
     };
 
     // Wait for menu to be ready
-    const { newMenuList, oldMenuList } = await waitForMenu();
+    const { newMenuList, oldMenuList, status } = await waitForMenu();
     if (!newMenuList && !oldMenuList) {
-        console.warn('FilterTube: Could not detect menu structure after waiting');
+        if (status !== 'closed') {
+            console.warn('FilterTube: Could not detect menu structure after waiting');
+        }
         return;
     }
 

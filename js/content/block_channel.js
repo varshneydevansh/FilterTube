@@ -77,11 +77,15 @@ function setupMenuObserver() {
                     const dropdown = node.matches?.('tp-yt-iron-dropdown') ? node : node.querySelector?.('tp-yt-iron-dropdown');
 
                     if (dropdown) {
-                        console.log('FilterTube: Dropdown added to DOM');
-                        // Call async function without awaiting (fire and forget)
-                        handleDropdownAppeared(dropdown).catch(err => {
-                            console.error('FilterTube: Error in handleDropdownAppeared:', err);
-                        });
+                        const isVisible = dropdown.style.display !== 'none' && dropdown.getAttribute('aria-hidden') !== 'true';
+
+                        if (isVisible) {
+                            console.log('FilterTube: Dropdown added to DOM');
+                            // Call async function without awaiting (fire and forget)
+                            handleDropdownAppeared(dropdown).catch(err => {
+                                console.error('FilterTube: Error in handleDropdownAppeared:', err);
+                            });
+                        }
                     }
                 }
 

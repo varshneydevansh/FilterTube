@@ -73,15 +73,56 @@ BROWSER_TARGETS.forEach(browser => {
     // 3. Copy manifest
     const manifestFile = `manifest.${browser}.json`;
     if (fs.existsSync(manifestFile)) {
-        fs.copySync(manifestFile, path.join(targetDir, 'manifest.json'));
+        let manifestJSON = null;
+        try {
+            manifestJSON = fs.readJsonSync(manifestFile);
+        } catch (err) {
+            console.error(`❌ Error: failed to read ${manifestFile}:`, err);
+            return;
+        }
+
+        ensureCollabDialogScriptOrder(manifestJSON);
+
+        try {
+            fs.writeJsonSync(path.join(targetDir, 'manifest.json'), manifestJSON, { spaces: 4 });
+        } catch (err) {
+            console.error(`❌ Error: failed to write dist/${browser}/manifest.json:`, err);
+            return;
+        }
+
+        const versionForZip = typeof manifestJSON?.version === 'string' && manifestJSON.version.trim()
+            ? manifestJSON.version.trim()
+            : VERSION;
+
+        // 4. Create ZIP
+        createZip(browser, targetDir, versionForZip);
     } else {
         console.error(`❌ Error: ${manifestFile} not found!`);
         return;
     }
-
-    // 4. Create ZIP
-    createZip(browser, targetDir, VERSION);
 });
+
+function ensureCollabDialogScriptOrder(manifestJSON) {
+    if (!manifestJSON || typeof manifestJSON !== 'object') return;
+    if (!Array.isArray(manifestJSON.content_scripts)) return;
+
+    const collabDialogPath = 'js/content/collab_dialog.js';
+    const contentBridgePath = 'js/content_bridge.js';
+
+    for (const entry of manifestJSON.content_scripts) {
+        if (!entry || !Array.isArray(entry.js)) continue;
+        const bridgeIndex = entry.js.indexOf(contentBridgePath);
+        if (bridgeIndex === -1) continue;
+
+        const collabIndex = entry.js.indexOf(collabDialogPath);
+        if (collabIndex === -1) {
+            entry.js.splice(bridgeIndex, 0, collabDialogPath);
+        } else if (collabIndex > bridgeIndex) {
+            entry.js.splice(collabIndex, 1);
+            entry.js.splice(bridgeIndex, 0, collabDialogPath);
+        }
+    }
+}
 
 function createZip(browser, sourceDir, version) {
     const zipName = `filtertube-${browser}-v${version}.zip`;
