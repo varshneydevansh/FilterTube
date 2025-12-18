@@ -25,6 +25,12 @@ const processingDropdowns = new WeakSet();
 const pendingShortsFetches = new Map();
 
 /**
+ * Track pending async channel fetches from /watch?v=ID pages (prevents duplicates)
+ * Map: videoId -> Promise
+ */
+const pendingWatchFetches = new Map();
+
+/**
  * Track pending channel info fetches per dropdown (for instant UI + background fetch)
  * WeakMap: dropdown -> {channelInfoPromise, cancelled, initialChannelInfo}
  */

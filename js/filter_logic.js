@@ -846,6 +846,39 @@
         }
 
         /**
+         * Register a mapping between customUrl (c/Name or user/Name) and UC ID
+         */
+        _registerCustomUrlMapping(id, customUrl) {
+            if (!id || !customUrl) return;
+
+            // Normalize customUrl: decode and lowercase for key
+            let normalizedCustomUrl = customUrl.toLowerCase();
+            try {
+                normalizedCustomUrl = decodeURIComponent(normalizedCustomUrl).toLowerCase();
+            } catch (e) {
+                // ignore
+            }
+
+            // Only save if this is a new mapping
+            if (this.channelMap[normalizedCustomUrl] !== id) {
+                this.channelMap[normalizedCustomUrl] = id;  // c/name -> UC... (original case)
+
+                postLogToBridge('log', `🧠 LEARNED CUSTOM URL MAPPING: ${customUrl} -> ${id}`);
+
+                // Send to background via content_bridge to persist in storage
+                try {
+                    window.postMessage({
+                        type: 'FilterTube_UpdateCustomUrlMap',
+                        payload: { customUrl: normalizedCustomUrl, id: id },
+                        source: 'filter_logic'
+                    }, '*');
+                } catch (e) {
+                    console.warn('FilterTube: Failed to send custom URL map update', e);
+                }
+            }
+        }
+
+        /**
          * Debug logging function
          */
         _log(message, ...args) {
@@ -1048,7 +1081,7 @@
          * For collaboration videos, returns an array of all collaborating channels
          */
         _extractChannelInfo(item, rules) {
-            const channelInfo = { name: '', id: '', handle: '' };
+            const channelInfo = { name: '', id: '', handle: '', customUrl: '' };
 
             // PRIORITY: Check for collaboration video (showDialogCommand in byline)
             const bylineText = item.shortBylineText || item.longBylineText;
@@ -1092,13 +1125,25 @@
                                         const browseId = browseEndpoint.browseId;
                                         const canonicalBaseUrl = browseEndpoint.canonicalBaseUrl;
 
-                                        let collabChannelInfo = { name: title || '', id: '', handle: '' };
+                                        let collabChannelInfo = { name: title || '', id: '', handle: '', customUrl: '' };
 
-                                        // Extract handle from canonicalBaseUrl
+                                        // Extract handle or customUrl from canonicalBaseUrl
                                         if (canonicalBaseUrl) {
-                                            const normalized = normalizeChannelHandle(canonicalBaseUrl);
-                                            if (normalized) {
-                                                collabChannelInfo.handle = normalized;
+                                            if (canonicalBaseUrl.startsWith('/@')) {
+                                                const normalized = normalizeChannelHandle(canonicalBaseUrl);
+                                                if (normalized) {
+                                                    collabChannelInfo.handle = normalized;
+                                                }
+                                            } else if (canonicalBaseUrl.startsWith('/c/')) {
+                                                const slug = canonicalBaseUrl.split('/')[2];
+                                                if (slug) {
+                                                    collabChannelInfo.customUrl = 'c/' + slug;
+                                                }
+                                            } else if (canonicalBaseUrl.startsWith('/user/')) {
+                                                const slug = canonicalBaseUrl.split('/')[2];
+                                                if (slug) {
+                                                    collabChannelInfo.customUrl = 'user/' + slug;
+                                                }
                                             }
                                         }
 
@@ -1107,13 +1152,17 @@
                                             collabChannelInfo.id = browseId;
                                         }
 
-                                        if (collabChannelInfo.handle || collabChannelInfo.id) {
+                                        if (collabChannelInfo.handle || collabChannelInfo.id || collabChannelInfo.customUrl) {
                                             collaborators.push(collabChannelInfo);
                                             postLogToBridge('log', '✅ Extracted collaborator in filter_logic:', collabChannelInfo);
 
                                             // Register mapping for this collaborator
                                             if (collabChannelInfo.id && collabChannelInfo.handle) {
                                                 this._registerMapping(collabChannelInfo.id, collabChannelInfo.handle);
+                                            }
+                                            // Also register customUrl → UC ID mapping
+                                            if (collabChannelInfo.id && collabChannelInfo.customUrl) {
+                                                this._registerCustomUrlMapping(collabChannelInfo.id, collabChannelInfo.customUrl);
                                             }
                                         }
                                     }
@@ -1183,7 +1232,7 @@
                     channelInfo.id = getTextFromPaths(item, fallbackIdPaths);
                 }
 
-                if (!channelInfo.handle) {
+                if (!channelInfo.handle || !channelInfo.customUrl) {
                     const fallbackHandlePaths = [
                         'shortBylineText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl',
                         'longBylineText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl',
@@ -1191,7 +1240,30 @@
                         'navigationEndpoint.browseEndpoint.canonicalBaseUrl'
                     ];
 
-                    channelInfo.handle = extractChannelHandleFromPaths(item, fallbackHandlePaths);
+                    // Try to extract handle or customUrl from canonicalBaseUrl
+                    for (const path of fallbackHandlePaths) {
+                        const canonicalBaseUrl = getByPath(item, path);
+                        if (canonicalBaseUrl && typeof canonicalBaseUrl === 'string') {
+                            if (!channelInfo.handle && canonicalBaseUrl.startsWith('/@')) {
+                                const normalized = normalizeChannelHandle(canonicalBaseUrl);
+                                if (normalized) {
+                                    channelInfo.handle = normalized;
+                                }
+                            } else if (!channelInfo.customUrl && canonicalBaseUrl.startsWith('/c/')) {
+                                const slug = canonicalBaseUrl.split('/')[2];
+                                if (slug) {
+                                    channelInfo.customUrl = 'c/' + slug;
+                                }
+                            } else if (!channelInfo.customUrl && canonicalBaseUrl.startsWith('/user/')) {
+                                const slug = canonicalBaseUrl.split('/')[2];
+                                if (slug) {
+                                    channelInfo.customUrl = 'user/' + slug;
+                                }
+                            }
+                        }
+                        // Stop if we have what we need
+                        if (channelInfo.handle && channelInfo.customUrl) break;
+                    }
                 }
             }
 
@@ -1207,10 +1279,17 @@
             if (typeof sharedChannelMatchesFilter === 'function') {
                 return sharedChannelMatchesFilter(channelInfo, filterChannel, this.channelMap);
             }
-            // Handle new object format: { name, id, handle }
+            // Handle new object format: { name, id, handle, customUrl }
             if (typeof filterChannel === 'object' && filterChannel !== null) {
                 const filterId = (filterChannel.id || '').toLowerCase();
                 const filterHandle = (filterChannel.handle || '').toLowerCase();
+                let filterCustomUrl = (filterChannel.customUrl || '').toLowerCase();
+                // Decode percent-encoding in customUrl for matching
+                try {
+                    filterCustomUrl = decodeURIComponent(filterCustomUrl).toLowerCase();
+                } catch (e) {
+                    // ignore
+                }
 
                 // Direct match by UC ID
                 if (filterId && channelInfo.id && channelInfo.id.toLowerCase() === filterId) {
@@ -1220,6 +1299,19 @@
                 // Direct match by handle
                 if (filterHandle && channelInfo.handle && channelInfo.handle.toLowerCase() === filterHandle) {
                     return true;
+                }
+
+                // Direct match by customUrl (c/Name or user/Name)
+                if (filterCustomUrl && channelInfo.customUrl) {
+                    let infoCustomUrl = channelInfo.customUrl.toLowerCase();
+                    try {
+                        infoCustomUrl = decodeURIComponent(infoCustomUrl).toLowerCase();
+                    } catch (e) {
+                        // ignore
+                    }
+                    if (infoCustomUrl === filterCustomUrl) {
+                        return true;
+                    }
                 }
 
                 // Use channelMap to cross-match: if we're blocking UC ID, also block its handle
@@ -1234,6 +1326,28 @@
                 if (filterHandle && channelInfo.id) {
                     const mappedId = this.channelMap[filterHandle];
                     if (mappedId && channelInfo.id.toLowerCase() === mappedId) {
+                        return true;
+                    }
+                }
+
+                // Use channelMap to cross-match: if we're blocking customUrl, match its UC ID
+                if (filterCustomUrl && channelInfo.id) {
+                    const mappedId = this.channelMap[filterCustomUrl];
+                    if (mappedId && channelInfo.id.toLowerCase() === mappedId.toLowerCase()) {
+                        return true;
+                    }
+                }
+
+                // Use channelMap to cross-match: if channelInfo has customUrl, check if its mapped UC ID matches filterId
+                if (filterId && channelInfo.customUrl) {
+                    let infoCustomUrl = channelInfo.customUrl.toLowerCase();
+                    try {
+                        infoCustomUrl = decodeURIComponent(infoCustomUrl).toLowerCase();
+                    } catch (e) {
+                        // ignore
+                    }
+                    const mappedId = this.channelMap[infoCustomUrl];
+                    if (mappedId && mappedId.toLowerCase() === filterId) {
                         return true;
                     }
                 }

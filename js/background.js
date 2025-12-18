@@ -331,12 +331,37 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
 
                 // Case 2: /@handle
                 if (path.startsWith('/@')) {
-                    return '@' + path.substring(2).split('/')[0];
+                    const handlePart = path.substring(2).split('/')[0];
+                    let decodedHandle = handlePart;
+                    try {
+                        decodedHandle = decodeURIComponent(handlePart);
+                    } catch (e) {
+                        // ignore
+                    }
+                    return '@' + decodedHandle;
                 }
 
                 // Case 3: /c/User or /user/User (Legacy) - return as is for search fallback
-                if (path.startsWith('/c/') || path.startsWith('/user/')) {
-                    return path.split('/')[2];
+                if (path.startsWith('/c/')) {
+                    const slug = path.split('/')[2];
+                    let decodedSlug = slug;
+                    try {
+                        decodedSlug = decodeURIComponent(slug);
+                    } catch (e) {
+                        // ignore
+                    }
+                    return decodedSlug ? `c/${decodedSlug}` : '';
+                }
+
+                if (path.startsWith('/user/')) {
+                    const slug = path.split('/')[2];
+                    let decodedSlug = slug;
+                    try {
+                        decodedSlug = decodeURIComponent(slug);
+                    } catch (e) {
+                        // ignore
+                    }
+                    return decodedSlug ? `user/${decodedSlug}` : '';
                 }
 
                 // Case 4: Just the path (fallback)
@@ -347,16 +372,29 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
 
             // Handle "youtube.com/..." without protocol
             if (cleaned.includes('youtube.com/') || cleaned.includes('youtu.be/')) {
-                const parts = cleaned.split('/');
+                const cleanedPath = cleaned.split(/[?#]/)[0];
+                const parts = cleanedPath.split('/');
                 const lastPart = parts[parts.length - 1];
                 const secondLast = parts[parts.length - 2];
 
                 if (secondLast === 'channel' && lastPart.startsWith('UC')) return lastPart;
                 if (lastPart.startsWith('@')) return lastPart;
+                if (secondLast === 'c' && lastPart) return `c/${lastPart}`;
+                if (secondLast === 'user' && lastPart) return `user/${lastPart}`;
             }
 
             // Handle direct inputs
             if (cleaned.startsWith('channel/')) return cleaned.replace('channel/', '');
+            if (cleaned.startsWith('c/')) return cleaned;
+            if (cleaned.startsWith('user/')) return cleaned;
+            if (cleaned.startsWith('/c/')) {
+                const slug = cleaned.split('/')[2];
+                return slug ? `c/${slug}` : '';
+            }
+            if (cleaned.startsWith('/user/')) {
+                const slug = cleaned.split('/')[2];
+                return slug ? `user/${slug}` : '';
+            }
 
             return cleaned;
         };
@@ -594,10 +632,14 @@ browserAPI.storage.onChanged.addListener((changes, area) => {
 async function fetchChannelInfo(channelIdOrHandle) {
     try {
         // Determine if it's a handle or a UC ID
-        const isHandle = channelIdOrHandle.startsWith('@');
-        let cleanId = channelIdOrHandle.replace(/^channel\//i, ''); // cleanId is input without "channel/"
+        const safeValue = String(channelIdOrHandle || '').trim();
+        const isHandle = safeValue.startsWith('@');
+        let cleanId = safeValue.replace(/^channel\//i, ''); // cleanId is input without "channel/"
         let channelUrl = '';
         let resolvedChannelId = null; // Initialize early
+        const lowerCleanId = cleanId.toLowerCase();
+        const isCustomUrl = lowerCleanId.startsWith('c/');
+        const isUserUrl = lowerCleanId.startsWith('user/');
 
         // If the input itself is a UC ID, use it directly as the resolved ID and construct canonical URL
         if (cleanId.toUpperCase().startsWith('UC') && cleanId.length === 24) { // UC + 22 chars
@@ -612,6 +654,34 @@ async function fetchChannelInfo(channelIdOrHandle) {
                 .trim();
             const encodedHandle = encodeURIComponent(handleWithoutAt);
             channelUrl = `https://www.youtube.com/@${encodedHandle}/about`;
+        } else if (isCustomUrl) {
+            const slug = cleanId
+                .substring(2)
+                .replace(/^\//, '')
+                .split(/[/?#]/)[0]
+                .trim();
+            let decodedSlug = slug;
+            try {
+                decodedSlug = decodeURIComponent(slug);
+            } catch (e) {
+                // ignore
+            }
+            const encodedSlug = encodeURIComponent(decodedSlug);
+            channelUrl = `https://www.youtube.com/c/${encodedSlug}`;
+        } else if (isUserUrl) {
+            const slug = cleanId
+                .substring(5)
+                .replace(/^\//, '')
+                .split(/[/?#]/)[0]
+                .trim();
+            let decodedSlug = slug;
+            try {
+                decodedSlug = decodeURIComponent(slug);
+            } catch (e) {
+                // ignore
+            }
+            const encodedSlug = encodeURIComponent(decodedSlug);
+            channelUrl = `https://www.youtube.com/user/${encodedSlug}`;
         } else {
             // If it's not a handle and not a direct UC ID, assume it's a malformed URL or invalid ID initially
             // We'll still try to fetch, but resolvedChannelId will remain null unless found in page data
@@ -738,6 +808,27 @@ async function fetchChannelInfo(channelIdOrHandle) {
                 if (match) {
                     channelHandle = '@' + match[1];
                     console.log('FilterTube Background: Got handle from metadata:', channelHandle);
+                }
+            }
+
+            if (!resolvedChannelId && metadata.externalId && typeof metadata.externalId === 'string' && metadata.externalId.toUpperCase().startsWith('UC')) {
+                resolvedChannelId = metadata.externalId;
+                console.log('FilterTube Background: Got resolvedChannelId from metadata.externalId:', resolvedChannelId);
+            }
+
+            if (!resolvedChannelId && metadata.channelUrl && typeof metadata.channelUrl === 'string') {
+                const match = metadata.channelUrl.match(/channel\/(UC[\w-]{22})/);
+                if (match) {
+                    resolvedChannelId = match[1];
+                    console.log('FilterTube Background: Got resolvedChannelId from metadata.channelUrl:', resolvedChannelId);
+                }
+            }
+
+            if (!resolvedChannelId && metadata.rssUrl && typeof metadata.rssUrl === 'string') {
+                const match = metadata.rssUrl.match(/channel_id=(UC[\w-]{22})/);
+                if (match) {
+                    resolvedChannelId = match[1];
+                    console.log('FilterTube Background: Got resolvedChannelId from metadata.rssUrl:', resolvedChannelId);
                 }
             }
 
@@ -922,7 +1013,8 @@ browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
             {
                 displayHandle: message.displayHandle,
                 canonicalHandle: message.canonicalHandle,
-                channelName: message.channelName
+                channelName: message.channelName,
+                customUrl: message.customUrl  // c/Name or user/Name for legacy channels
             }
         ).then(sendResponse);
         return true; // Keep channel open for async response
@@ -947,20 +1039,111 @@ browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
  */
 async function handleAddFilteredChannel(input, filterAll = false, collaborationWith = null, collaborationGroupId = null, metadata = {}) {
     try {
-        const rawValue = input.trim();
+        const normalizeChannelInput = (rawInput) => {
+            if (!rawInput) return '';
+            let cleaned = String(rawInput).trim();
+
+            try {
+                cleaned = decodeURIComponent(cleaned);
+            } catch (e) {
+                // ignore
+            }
+
+            try {
+                const url = new URL(cleaned);
+                const path = url.pathname;
+
+                if (path.match(/^\/channel\/(UC[\w-]{22})/)) {
+                    return path.match(/^\/channel\/(UC[\w-]{22})/)[1];
+                }
+
+                if (path.startsWith('/@')) {
+                    const handlePart = path.substring(2).split('/')[0];
+                    let decodedHandle = handlePart;
+                    try {
+                        decodedHandle = decodeURIComponent(handlePart);
+                    } catch (e) {
+                        // ignore
+                    }
+                    return '@' + decodedHandle;
+                }
+
+                if (path.startsWith('/c/')) {
+                    const slug = path.split('/')[2];
+                    let decodedSlug = slug;
+                    try {
+                        decodedSlug = decodeURIComponent(slug);
+                    } catch (e) {
+                        // ignore
+                    }
+                    return decodedSlug ? `c/${decodedSlug}` : '';
+                }
+
+                if (path.startsWith('/user/')) {
+                    const slug = path.split('/')[2];
+                    let decodedSlug = slug;
+                    try {
+                        decodedSlug = decodeURIComponent(slug);
+                    } catch (e) {
+                        // ignore
+                    }
+                    return decodedSlug ? `user/${decodedSlug}` : '';
+                }
+
+                return path.substring(1);
+            } catch (e) {
+                // Not a URL, treat as string
+            }
+
+            if (cleaned.includes('youtube.com/') || cleaned.includes('youtu.be/')) {
+                const cleanedPath = cleaned.split(/[?#]/)[0];
+                const parts = cleanedPath.split('/');
+                const lastPart = parts[parts.length - 1];
+                const secondLast = parts[parts.length - 2];
+
+                if (secondLast === 'channel' && lastPart.startsWith('UC')) return lastPart;
+                if (lastPart.startsWith('@')) return lastPart;
+                if (secondLast === 'c' && lastPart) return `c/${lastPart}`;
+                if (secondLast === 'user' && lastPart) return `user/${lastPart}`;
+            }
+
+            if (cleaned.startsWith('channel/')) return cleaned.replace('channel/', '');
+            if (cleaned.startsWith('c/')) return cleaned;
+            if (cleaned.startsWith('user/')) return cleaned;
+            if (cleaned.startsWith('/c/')) {
+                const slug = cleaned.split('/')[2];
+                return slug ? `c/${slug}` : '';
+            }
+            if (cleaned.startsWith('/user/')) {
+                const slug = cleaned.split('/')[2];
+                return slug ? `user/${slug}` : '';
+            }
+
+            return cleaned;
+        };
+
+        const rawValue = String(input || '').trim();
         if (!rawValue) {
             return { success: false, error: 'Empty input' };
         }
 
-        // Validate format
-        const isHandle = rawValue.startsWith('@');
-        const isUcId = rawValue.toLowerCase().startsWith('uc') || rawValue.toLowerCase().startsWith('channel/uc');
+        const normalizedValue = normalizeChannelInput(rawValue);
+        if (!normalizedValue) {
+            return { success: false, error: 'Invalid channel identifier' };
+        }
 
-        if (!isHandle && !isUcId) {
+        // Validate format
+        const isHandle = normalizedValue.startsWith('@');
+        const lowerNormalized = normalizedValue.toLowerCase();
+        const isUcId = lowerNormalized.startsWith('uc') || lowerNormalized.startsWith('channel/uc');
+        const isCustomUrl = lowerNormalized.startsWith('c/');
+        const isUserUrl = lowerNormalized.startsWith('user/');
+
+        if (!isHandle && !isUcId && !isCustomUrl && !isUserUrl) {
             return { success: false, error: 'Invalid channel identifier' };
         }
         // Prefer canonical UC IDs via channelMap when available, especially for @handles
-        let lookupValue = rawValue;
+        let lookupValue = normalizedValue;
         let mappedId = null;
 
         if (isHandle) {
@@ -969,13 +1152,13 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                     browserAPI.storage.local.get(['channelMap'], resolve);
                 });
                 const channelMap = mapStorage.channelMap || {};
-                const lowerHandle = rawValue.toLowerCase();
+                const lowerHandle = normalizedValue.toLowerCase();
                 const candidateId = channelMap[lowerHandle];
 
                 if (candidateId && candidateId.toUpperCase().startsWith('UC')) {
                     mappedId = candidateId;
                     lookupValue = candidateId;
-                    console.log('FilterTube Background: Using mapped UC ID for handle', rawValue, '->', mappedId);
+                    console.log('FilterTube Background: Using mapped UC ID for handle', normalizedValue, '->', mappedId);
                 }
             } catch (e) {
                 console.warn('FilterTube Background: Failed to read channelMap for handle resolution:', e);
@@ -988,12 +1171,12 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
 
         // If scraping failed for a handle but we know a UC ID from channelMap, synthesize a minimal entry
         if (!channelInfo.success && isHandle && mappedId) {
-            console.warn('FilterTube Background: fetchChannelInfo failed, falling back to mapped UC ID for handle', rawValue);
+            console.warn('FilterTube Background: fetchChannelInfo failed, falling back to mapped UC ID for handle', normalizedValue);
             channelInfo = {
                 success: true,
                 id: mappedId,
-                handle: rawValue,
-                name: rawValue,
+                handle: normalizedValue,
+                name: normalizedValue,
                 logo: null
             };
         }
@@ -1043,6 +1226,9 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
 
         if (existingIndex !== -1) {
             const existing = channels[existingIndex] || {};
+            // Determine customUrl from metadata, channelInfo, or existing
+            const customUrl = metadata.customUrl || channelInfo.customUrl || existing.customUrl || null;
+
             const updated = {
                 ...existing,
                 // Ensure core identity fields are populated
@@ -1051,7 +1237,8 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                 handleDisplay: existing.handleDisplay || channelInfo.handleDisplay,
                 canonicalHandle: existing.canonicalHandle || channelInfo.canonicalHandle,
                 name: existing.name || finalChannelName,
-                logo: existing.logo || channelInfo.logo
+                logo: existing.logo || channelInfo.logo,
+                customUrl: existing.customUrl || customUrl  // Preserve or add customUrl
             };
 
             // Upgrade Filter All: once true, it stays true unless user turns it off in UI
@@ -1075,6 +1262,34 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
 
             channels[existingIndex] = updated;
 
+            // Update channelMap with customUrl → UC ID mapping if we have a new customUrl
+            if (customUrl && updated.id && !existing.customUrl) {
+                try {
+                    const mapStorage = await new Promise(resolve => {
+                        browserAPI.storage.local.get(['channelMap'], resolve);
+                    });
+                    const channelMap = mapStorage.channelMap || {};
+
+                    let normalizedCustomUrl = customUrl.toLowerCase();
+                    try {
+                        normalizedCustomUrl = decodeURIComponent(normalizedCustomUrl).toLowerCase();
+                    } catch (e) {
+                        // ignore
+                    }
+
+                    if (!channelMap[normalizedCustomUrl]) {
+                        channelMap[normalizedCustomUrl] = updated.id;
+                        console.log('FilterTube Background: Added customUrl mapping (update):', normalizedCustomUrl, '->', updated.id);
+
+                        await new Promise(resolve => {
+                            browserAPI.storage.local.set({ channelMap: channelMap }, resolve);
+                        });
+                    }
+                } catch (e) {
+                    console.warn('FilterTube Background: Failed to update channelMap with customUrl:', e);
+                }
+            }
+
             // Save to storage
             await new Promise(resolve => {
                 browserAPI.storage.local.set({ filterChannels: channels }, resolve);
@@ -1090,6 +1305,9 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
         }
 
         // Add new channel
+        // Determine customUrl from metadata or channelInfo
+        const customUrl = metadata.customUrl || channelInfo.customUrl || null;
+
         const newChannel = {
             id: channelInfo.id,
             handle: channelInfo.handle,
@@ -1100,8 +1318,39 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             filterAll: filterAll, // Use provided value
             collaborationWith: collaborationWith || [], // Store collaboration metadata
             collaborationGroupId: collaborationGroupId || null, // UUID for group operations
-            allCollaborators: allCollaborators // Full list of all collaborators for popup grouping
+            allCollaborators: allCollaborators, // Full list of all collaborators for popup grouping
+            customUrl: customUrl // c/Name or user/Name for legacy channels
         };
+
+        // Update channelMap with customUrl → UC ID mapping if available
+        if (customUrl && channelInfo.id) {
+            try {
+                const mapStorage = await new Promise(resolve => {
+                    browserAPI.storage.local.get(['channelMap'], resolve);
+                });
+                const channelMap = mapStorage.channelMap || {};
+
+                // Normalize customUrl for case-insensitive lookup (decode + lowercase)
+                let normalizedCustomUrl = customUrl.toLowerCase();
+                try {
+                    normalizedCustomUrl = decodeURIComponent(normalizedCustomUrl).toLowerCase();
+                } catch (e) {
+                    // ignore
+                }
+
+                // Add mapping: c/name → UC ID
+                if (!channelMap[normalizedCustomUrl] || channelMap[normalizedCustomUrl] !== channelInfo.id) {
+                    channelMap[normalizedCustomUrl] = channelInfo.id;
+                    console.log('FilterTube Background: Added customUrl mapping:', normalizedCustomUrl, '->', channelInfo.id);
+
+                    await new Promise(resolve => {
+                        browserAPI.storage.local.set({ channelMap: channelMap }, resolve);
+                    });
+                }
+            } catch (e) {
+                console.warn('FilterTube Background: Failed to update channelMap with customUrl:', e);
+            }
+        }
 
         // Add to beginning (newest first)
         channels.unshift(newChannel);
