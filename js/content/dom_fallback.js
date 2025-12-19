@@ -447,9 +447,24 @@ function applyDOMFallback(settings, options = {}) {
         const channelAnchor = element.querySelector('a[href*="/channel"], a[href^="/@"], a[href*="/user/"], a[href*="/c/"]');
         const channelText = channelAnchor?.textContent?.trim() || '';
         const channelHref = channelAnchor?.getAttribute('href') || channelAnchor?.href || '';
-        const channelMeta = extractChannelMetadataFromElement(element, channelText, channelHref, {
+        let channelMeta = extractChannelMetadataFromElement(element, channelText, channelHref, {
             cacheTarget: channelAnchor || element
         });
+
+        // For Shorts without channel identity, try videoChannelMap lookup
+        const hasChannelIdentity = Boolean(channelMeta.handle || channelMeta.id || channelMeta.customUrl);
+        if (!hasChannelIdentity && effectiveSettings.videoChannelMap) {
+            // Extract videoId from Shorts card
+            const shortsLink = element.querySelector('a[href*="/shorts/"]');
+            const shortsHref = shortsLink?.getAttribute('href') || '';
+            const videoIdMatch = shortsHref.match(/\/shorts\/([a-zA-Z0-9_-]{11})/);
+            const videoId = videoIdMatch ? videoIdMatch[1] : null;
+            
+            if (videoId && effectiveSettings.videoChannelMap[videoId]) {
+                // Found channel ID from videoChannelMap
+                channelMeta = { ...channelMeta, id: effectiveSettings.videoChannelMap[videoId] };
+            }
+        }
 
         const hideByKeywords = shouldHideContent(title, channelText, effectiveSettings, {
             channelHref,
@@ -514,7 +529,7 @@ function shouldHideContent(title, channel, settings, options = {}) {
         collaborators = []
     } = options;
     const channelMeta = providedChannelMeta || buildChannelMetadata(channel, channelHref);
-    const hasChannelIdentity = Boolean(channelMeta.handle || channelMeta.id);
+    const hasChannelIdentity = Boolean(channelMeta.handle || channelMeta.id || channelMeta.customUrl);
 
     // Debug logging (disabled by default - set to true for troubleshooting)
     const debugFiltering = false;

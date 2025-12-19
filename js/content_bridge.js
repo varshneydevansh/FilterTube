@@ -3071,8 +3071,8 @@ function extractChannelFromCard(card) {
                         collaborators.push({ name });
                     }
 
-                    // Try to find links for handles/IDs
-                    const links = card.querySelectorAll('a[href*="/@"], a[href*="/channel/"]');
+                    // Try to find links for handles/IDs (including /c/ and /user/ custom URLs)
+                    const links = card.querySelectorAll('a[href*="/@"], a[href*="/channel/"], a[href*="/c/"], a[href*="/user/"]');
                     let linkIndex = 0;
 
                     for (const link of links) {
@@ -3090,6 +3090,26 @@ function extractChannelFromCard(card) {
                                 collaborators[linkIndex].id = ucMatch[1];
                             }
 
+                            // Handle /c/ and /user/ custom URLs
+                            if (!collaborators[linkIndex].handle && !collaborators[linkIndex].id) {
+                                let path = href;
+                                try {
+                                    if (/^https?:\/\//i.test(path)) {
+                                        path = new URL(path).pathname;
+                                    }
+                                } catch (e) { /* ignore */ }
+                                if (!path.startsWith('/')) path = '/' + path;
+                                path = path.split(/[?#]/)[0];
+
+                                if (path.startsWith('/c/')) {
+                                    const slug = path.split('/')[2];
+                                    if (slug) collaborators[linkIndex].customUrl = `c/${slug}`;
+                                } else if (path.startsWith('/user/')) {
+                                    const slug = path.split('/')[2];
+                                    if (slug) collaborators[linkIndex].customUrl = `user/${slug}`;
+                                }
+                            }
+
                             linkIndex++;
                         }
                     }
@@ -3102,8 +3122,8 @@ function extractChannelFromCard(card) {
                             card.setAttribute('data-filtertube-expected-collaborators', String(expectedCollaboratorCount));
                         }
 
-                        // Check if any collaborator is missing handle/id - will need async enrichment
-                        const hasMissingData = collaborators.some(c => !c.handle && !c.id);
+                        // Check if any collaborator is missing handle/id/customUrl - will need async enrichment
+                        const hasMissingData = collaborators.some(c => !c.handle && !c.id && !c.customUrl);
                         const videoId = extractVideoIdFromCard(card);
                         const needsMoreCollaborators = expectedCollaboratorCount > 0 && collaborators.length < expectedCollaboratorCount;
 
@@ -3118,6 +3138,70 @@ function extractChannelFromCard(card) {
                             videoId: videoId
                         };
                     }
+                }
+            }
+
+            // Fallback: ytTextViewModel not found or parsing failed
+            // Try to extract collaborators directly from links inside attributedChannelName
+            console.log('FilterTube: Collaboration detected but ytTextViewModel parsing failed, trying direct link extraction');
+            const collabLinks = attributedChannelName.querySelectorAll('a[href*="/@"], a[href*="/channel/"], a[href*="/c/"], a[href*="/user/"]');
+            if (collabLinks.length >= 1) {
+                const fallbackCollaborators = [];
+                for (const link of collabLinks) {
+                    const href = link.getAttribute('href');
+                    const name = link.textContent?.trim();
+                    if (!href || !name) continue;
+
+                    const collaborator = { name };
+                    const extracted = extractRawHandle(href);
+                    if (extracted) {
+                        collaborator.handle = extracted;
+                    }
+
+                    const ucMatch = href.match(/\/(UC[\w-]{22})/);
+                    if (ucMatch) {
+                        collaborator.id = ucMatch[1];
+                    }
+
+                    // Handle /c/ and /user/ custom URLs
+                    if (!collaborator.handle && !collaborator.id) {
+                        let path = href;
+                        try {
+                            if (/^https?:\/\//i.test(path)) {
+                                path = new URL(path).pathname;
+                            }
+                        } catch (e) { /* ignore */ }
+                        if (!path.startsWith('/')) path = '/' + path;
+                        path = path.split(/[?#]/)[0];
+
+                        if (path.startsWith('/c/')) {
+                            const slug = path.split('/')[2];
+                            if (slug) collaborator.customUrl = `c/${slug}`;
+                        } else if (path.startsWith('/user/')) {
+                            const slug = path.split('/')[2];
+                            if (slug) collaborator.customUrl = `user/${slug}`;
+                        }
+                    }
+
+                    fallbackCollaborators.push(collaborator);
+                }
+
+                if (fallbackCollaborators.length >= 1) {
+                    console.log('FilterTube: Extracted collaborators via direct link fallback:', fallbackCollaborators);
+                    const videoId = extractVideoIdFromCard(card);
+                    const hasMissingData = fallbackCollaborators.some(c => !c.handle && !c.id && !c.customUrl);
+                    
+                    // If only 1 collaborator found, mark for enrichment to find more
+                    const needsMoreCollaborators = fallbackCollaborators.length < 2;
+                    
+                    return {
+                        ...fallbackCollaborators[0],
+                        isCollaboration: fallbackCollaborators.length >= 2,
+                        allCollaborators: fallbackCollaborators,
+                        needsEnrichment: hasMissingData || needsMoreCollaborators,
+                        expectedCollaboratorCount: Math.max(2, fallbackCollaborators.length),
+                        videoId
+                    };
                 }
             }
         }
@@ -4927,6 +5011,15 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
         menuItem.classList.add('filtertube-blocked');
 
         console.log('FilterTube: Successfully blocked channel:', channelInfo, 'filterAll:', filterAll);
+
+        // Store videoId → channelId mapping for Shorts persistence after refresh
+        if (channelInfo.videoId && channelInfo.id) {
+            browserAPI_BRIDGE.runtime.sendMessage({
+                action: 'updateVideoChannelMap',
+                videoId: channelInfo.videoId,
+                channelId: channelInfo.id
+            });
+        }
 
         if (isMultiStep) {
             if (collaborationGroupId) {

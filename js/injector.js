@@ -441,6 +441,21 @@
                     const found = searchNode(child, visited);
                     if (found) return found;
                 }
+            } else {
+                for (const key in node) {
+                    if (!Object.prototype.hasOwnProperty.call(node, key)) continue;
+                    const value = node[key];
+                    if (!value || typeof value !== 'object') continue;
+                    if (Array.isArray(value)) {
+                        for (const child of value) {
+                            const found = searchNode(child, visited);
+                            if (found) return found;
+                        }
+                    } else {
+                        const found = searchNode(value, visited);
+                        if (found) return found;
+                    }
+                }
             }
 
             return null;

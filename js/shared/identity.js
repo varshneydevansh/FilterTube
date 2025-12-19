@@ -213,6 +213,18 @@
         const metaName = typeof meta?.name === 'string' ? meta.name.toLowerCase().trim() : '';
         const metaHandles = collectHandleVariants(meta);
 
+        // Helper to normalize customUrl for comparison (decode percent-encoding, lowercase)
+        const normalizeCustomUrl = (url) => {
+            if (!url || typeof url !== 'string') return '';
+            try {
+                return decodeURIComponent(url).toLowerCase().trim();
+            } catch (e) {
+                return url.toLowerCase().trim();
+            }
+        };
+
+        const metaCustomUrl = normalizeCustomUrl(meta?.customUrl);
+
         const lookupChannelMap = (key) => {
             if (!channelMap || typeof channelMap !== 'object') return '';
             if (!key || typeof key !== 'string') return '';
@@ -223,8 +235,9 @@
             const filterId = normalizeUcIdForComparison(filterChannel.id || '');
             const filterName = typeof filterChannel.name === 'string' ? filterChannel.name.toLowerCase().trim() : '';
             const filterHandles = collectHandleVariants(filterChannel);
+            const filterCustomUrl = normalizeCustomUrl(filterChannel.customUrl);
 
-            if (!filterId && !filterName && filterHandles.length === 0) return false;
+            if (!filterId && !filterName && filterHandles.length === 0 && !filterCustomUrl) return false;
 
             if (filterId && metaId && filterId === metaId) {
                 return true;
@@ -273,6 +286,29 @@
                     if (normalizedMappedId && normalizedMappedId === metaId) {
                         return true;
                     }
+                }
+            }
+
+            // Direct customUrl match (c/Name or user/Name)
+            if (filterCustomUrl && metaCustomUrl && filterCustomUrl === metaCustomUrl) {
+                return true;
+            }
+
+            // Cross-match: if filterChannel has customUrl, check if channelMap maps it to metaId
+            if (filterCustomUrl && metaId) {
+                const mappedId = lookupChannelMap(filterCustomUrl);
+                const normalizedMappedId = normalizeUcIdForComparison(mappedId);
+                if (normalizedMappedId && normalizedMappedId === metaId) {
+                    return true;
+                }
+            }
+
+            // Cross-match: if meta has customUrl, check if channelMap maps it to filterId
+            if (metaCustomUrl && filterId) {
+                const mappedId = lookupChannelMap(metaCustomUrl);
+                const normalizedMappedId = normalizeUcIdForComparison(mappedId);
+                if (normalizedMappedId && normalizedMappedId === filterId) {
+                    return true;
                 }
             }
 

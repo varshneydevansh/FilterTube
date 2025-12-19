@@ -796,11 +796,25 @@
                 if (!browseId || typeof browseId !== 'string' || !browseId.startsWith('UC')) continue;
 
                 let handle = null;
+                let customUrl = null;
 
                 const canonical = browse.canonicalBaseUrl || browse.canonicalUrl || browse.url;
                 if (typeof canonical === 'string') {
+                    // Check for @handle
                     const normalized = normalizeChannelHandle(canonical);
-                    if (normalized) handle = normalized;
+                    if (normalized) {
+                        handle = normalized;
+                    }
+                    // Check for /c/Name or /user/Name customUrl
+                    if (!handle) {
+                        if (canonical.startsWith('/c/')) {
+                            const slug = canonical.split('/')[2];
+                            if (slug) customUrl = `c/${slug.split('?')[0].split('#')[0]}`;
+                        } else if (canonical.startsWith('/user/')) {
+                            const slug = canonical.split('/')[2];
+                            if (slug) customUrl = `user/${slug.split('?')[0].split('#')[0]}`;
+                        }
+                    }
                 }
 
                 if (!handle && typeof run.text === 'string') {
@@ -808,8 +822,13 @@
                     if (normalized) handle = normalized;
                 }
 
+                // Register handle → UC ID mapping
                 if (handle) {
                     this._registerMapping(browseId, handle);
+                }
+                // Register customUrl → UC ID mapping for c/Name channels
+                if (customUrl) {
+                    this._registerCustomUrlMapping(browseId, customUrl);
                 }
             }
         }
@@ -912,6 +931,16 @@
             // Handle collaboration videos (channelInfo is an array)
             const isCollaboration = Array.isArray(channelInfo);
             const collaborators = isCollaboration ? channelInfo : [channelInfo];
+
+            // Register mappings for all extracted channel info (including customUrl → UC ID)
+            for (const collaborator of collaborators) {
+                if (collaborator.id && collaborator.handle) {
+                    this._registerMapping(collaborator.id, collaborator.handle);
+                }
+                if (collaborator.id && collaborator.customUrl) {
+                    this._registerCustomUrlMapping(collaborator.id, collaborator.customUrl);
+                }
+            }
 
             // Log extraction results for debugging
             if (this.debugEnabled && (title || (channelInfo && (Array.isArray(channelInfo) || channelInfo.name || channelInfo.id)) || description)) {

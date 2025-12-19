@@ -245,7 +245,29 @@ function buildChannelMetadata(channelText = '', channelHref = '') {
     const normalizedHref = normalizeHrefForParsing(channelHref);
     const handle = extractHandleFromString(channelText) || extractHandleFromString(normalizedHref);
     const id = extractChannelIdFromString(normalizedHref) || extractChannelIdFromString(channelText);
-    return { handle, id };
+    
+    // Extract customUrl for /c/ and /user/ type channels
+    let customUrl = null;
+    if (normalizedHref) {
+        let path = normalizedHref;
+        try {
+            if (/^https?:\/\//i.test(path)) {
+                path = new URL(path).pathname;
+            }
+        } catch (e) { /* ignore */ }
+        if (!path.startsWith('/')) path = '/' + path;
+        path = path.split(/[?#]/)[0];
+        
+        if (path.startsWith('/c/')) {
+            const slug = path.split('/')[2];
+            if (slug) customUrl = `c/${slug}`;
+        } else if (path.startsWith('/user/')) {
+            const slug = path.split('/')[2];
+            if (slug) customUrl = `user/${slug}`;
+        }
+    }
+    
+    return { handle, id, customUrl };
 }
 
 function collectDatasetValues(element) {
@@ -350,9 +372,12 @@ function extractChannelMetadataFromElement(element, channelText = '', channelHre
     }
 
     if (shouldTrustCachedHandle || shouldTrustCachedId) {
+        // Still extract customUrl from href even when using cached handle/id
+        const cachedMeta = buildChannelMetadata(channelText, channelHref);
         return {
             handle: shouldTrustCachedHandle ? normalizedCachedHandle : '',
-            id: shouldTrustCachedId ? (cachedId || '') : ''
+            id: shouldTrustCachedId ? (cachedId || '') : '',
+            customUrl: cachedMeta.customUrl || null
         };
     }
 
@@ -484,6 +509,17 @@ function extractChannelMetadataFromElement(element, channelText = '', channelHre
             }
 
             if (isChannelLink) {
+                // Extract customUrl for /c/ and /user/ type channels
+                if (!meta.customUrl && normalizedHref) {
+                    if (normalizedHref.startsWith('/c/')) {
+                        const slug = normalizedHref.split('/')[2];
+                        if (slug) meta.customUrl = `c/${slug.split('?')[0].split('#')[0]}`;
+                    } else if (normalizedHref.startsWith('/user/')) {
+                        const slug = normalizedHref.split('/')[2];
+                        if (slug) meta.customUrl = `user/${slug.split('?')[0].split('#')[0]}`;
+                    }
+                }
+
                 if (!meta.handle) {
                     const anchorDatasetValues = collectDatasetValues(anchor);
                     if (anchorDatasetValues) {

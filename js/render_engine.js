@@ -643,9 +643,11 @@ const RenderEngine = (() => {
      * Derive channel mapping for visualization
      */
     function deriveChannelMapping(channel, channelMap = {}) {
-        const originalInput = channel.originalInput || channel.handle || channel.id;
+        // Prioritize customUrl for c/Name channels, then handle, then id
+        const originalInput = channel.originalInput || channel.customUrl || channel.handle || channel.id;
         const fetchedId = channel.id;
-        const fetchedHandle = channel.handle; // Get the handle available in the object
+        const fetchedHandle = channel.handle;
+        const customUrl = channel.customUrl;
 
         let source = originalInput;
         let target = fetchedId;
@@ -653,15 +655,20 @@ const RenderEngine = (() => {
 
         // Check if we successfully fetched details
         if (fetchedId && fetchedId !== originalInput) {
-            // Case 1: Input was @handle, resolved to ID
+            // Case 1: Input was @handle or c/Name, resolved to UC ID
             isResolved = true;
             target = fetchedId;
-        } else if (originalInput.startsWith('UC') && fetchedHandle) {
+        } else if (originalInput && originalInput.toUpperCase().startsWith('UC') && fetchedHandle) {
             // Case 2: Input was UC ID, resolved to @handle (Better visualization)
             isResolved = true;
             target = fetchedHandle;
-        } else if (channelMap && channelMap[originalInput.toLowerCase()]) {
-            // Case 3: Fallback to map
+        } else if (originalInput && originalInput.toUpperCase().startsWith('UC') && customUrl) {
+            // Case 3: Input was UC ID, but we have customUrl - show customUrl → UC ID
+            source = customUrl;
+            target = fetchedId;
+            isResolved = true;
+        } else if (channelMap && originalInput && channelMap[originalInput.toLowerCase()]) {
+            // Case 4: Fallback to map
             isResolved = true;
             target = channelMap[originalInput.toLowerCase()];
         }

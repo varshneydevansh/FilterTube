@@ -40,6 +40,7 @@ async function getCompiledSettings() {
             'uiKeywords',
             'filterChannels',
             'channelMap',
+            'videoChannelMap',
             'hideAllComments',
             'filterComments',
             'useExactWordMatching',
@@ -126,8 +127,10 @@ async function getCompiledSettings() {
                         };
                     } else if (ch && typeof ch === 'object') {
                         // New object format - preserve the original case for IDs and handles
-                        const canonicalHandle = ch.canonicalHandle || ch.handleDisplay || ch.handle || '';
-                        const normalizedHandle = ch.handle ? ch.handle.toLowerCase() : (canonicalHandle ? canonicalHandle.toLowerCase() : null);
+                        // canonicalHandle should only come from actual handle sources, not channel name
+                        const canonicalHandle = ch.canonicalHandle || ch.handle || '';
+                        // normalizedHandle must only be set if there's an actual @handle, never from channel name
+                        const normalizedHandle = ch.handle ? ch.handle.toLowerCase() : (ch.canonicalHandle ? ch.canonicalHandle.toLowerCase() : null);
                         const displayHandle = ch.handleDisplay || canonicalHandle || ch.name || '';
                         const channelObj = {
                             name: ch.name,
@@ -137,7 +140,8 @@ async function getCompiledSettings() {
                             canonicalHandle: canonicalHandle || null,
                             logo: ch.logo || null,
                             filterAll: !!ch.filterAll,
-                            originalInput: ch.originalInput || ch.id || ch.handle || ch.name || null
+                            originalInput: ch.originalInput || ch.id || ch.handle || ch.name || null,
+                            customUrl: ch.customUrl || null  // c/Name or user/Name for legacy channels
                         };
 
                         // If filterAll is enabled, add the channel name to keywords
@@ -203,6 +207,9 @@ async function getCompiledSettings() {
 
             // Pass through the channel map (UC ID <-> @handle mappings)
             compiledSettings.channelMap = items.channelMap || {};
+
+            // Pass through the video-channel map (videoId -> channelId for Shorts persistence)
+            compiledSettings.videoChannelMap = items.videoChannelMap || {};
 
             // Pass through boolean flags
             compiledSettings.hideAllComments = items.hideAllComments || false;
@@ -474,6 +481,19 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
                 }
 
                 // 4. Construct entry
+                // Determine customUrl: from fetchChannelInfo result OR from normalizedInput if it's a c/Name or user/Name
+                // Decode for unicode consistency (like handles)
+                let customUrl = details.customUrl || null;
+                const lowerInput = normalizedInput.toLowerCase();
+                if (!customUrl && (lowerInput.startsWith('c/') || lowerInput.startsWith('user/'))) {
+                    customUrl = normalizedInput; // The input itself is the customUrl
+                }
+                if (customUrl) {
+                    try {
+                        customUrl = decodeURIComponent(customUrl);
+                    } catch (e) { /* already decoded or invalid */ }
+                }
+
                 const newEntry = {
                     name: details.name || details.handle || normalizedInput,
                     id: details.id,
@@ -481,10 +501,30 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
                     logo: details.logo || null,
                     filterAll: false,
                     originalInput: normalizedInput, // Store normalized value, not the raw URL
+                    customUrl: customUrl, // c/Name or user/Name for legacy channels
                     addedAt: Date.now()
                 };
 
-                // 5. Add to list and save
+                // 5. Update channelMap with customUrl → UC ID mapping if available
+                if (customUrl && details.id) {
+                    try {
+                        const mapStorage = await new Promise(resolve => browserAPI.storage.local.get(['channelMap'], resolve));
+                        const channelMap = mapStorage.channelMap || {};
+                        let normalizedCustomUrl = customUrl.toLowerCase();
+                        try {
+                            normalizedCustomUrl = decodeURIComponent(normalizedCustomUrl).toLowerCase();
+                        } catch (e) { /* ignore */ }
+                        if (!channelMap[normalizedCustomUrl]) {
+                            channelMap[normalizedCustomUrl] = details.id;
+                            console.log('FilterTube Background: Added customUrl mapping (popup):', normalizedCustomUrl, '->', details.id);
+                            await new Promise(resolve => browserAPI.storage.local.set({ channelMap: channelMap }, resolve));
+                        }
+                    } catch (e) {
+                        console.warn('FilterTube Background: Failed to update channelMap with customUrl:', e);
+                    }
+                }
+
+                // 6. Add to list and save
                 channels.unshift(newEntry); // Add to top
 
                 await new Promise(resolve => browserAPI.storage.local.set({ filterChannels: channels }, resolve));
@@ -542,6 +582,29 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
             }
         });
         return false; // No response needed
+    } else if (request.action === "updateVideoChannelMap") {
+        // Store videoId → channelId mappings for Shorts persistence after refresh
+        if (request.videoId && request.channelId) {
+            browserAPI.storage.local.get(['videoChannelMap'], (result) => {
+                const currentMap = result.videoChannelMap || {};
+                
+                // Only add if not already mapped
+                if (!currentMap[request.videoId]) {
+                    currentMap[request.videoId] = request.channelId;
+                    
+                    // Limit map size to prevent unbounded growth (keep last 1000 entries)
+                    const keys = Object.keys(currentMap);
+                    if (keys.length > 1000) {
+                        // Remove oldest 100 entries (simple FIFO-ish cleanup)
+                        keys.slice(0, 100).forEach(k => delete currentMap[k]);
+                    }
+                    
+                    browserAPI.storage.local.set({ videoChannelMap: currentMap });
+                    console.log("FilterTube Background: Video-channel mapping stored:", request.videoId, "->", request.channelId);
+                }
+            });
+        }
+        return false;
     } else if (request.action === "recordTimeSaved") {
         // Accumulate saved time
         browserAPI.storage.local.get(['stats'], (result) => {
@@ -637,6 +700,7 @@ async function fetchChannelInfo(channelIdOrHandle) {
         let cleanId = safeValue.replace(/^channel\//i, ''); // cleanId is input without "channel/"
         let channelUrl = '';
         let resolvedChannelId = null; // Initialize early
+        let customUrl = null; // Track if this is a c/Name or user/Name channel
         const lowerCleanId = cleanId.toLowerCase();
         const isCustomUrl = lowerCleanId.startsWith('c/');
         const isUserUrl = lowerCleanId.startsWith('user/');
@@ -666,6 +730,7 @@ async function fetchChannelInfo(channelIdOrHandle) {
             } catch (e) {
                 // ignore
             }
+            customUrl = `c/${decodedSlug}`; // Store the customUrl
             const encodedSlug = encodeURIComponent(decodedSlug);
             channelUrl = `https://www.youtube.com/c/${encodedSlug}`;
         } else if (isUserUrl) {
@@ -680,6 +745,7 @@ async function fetchChannelInfo(channelIdOrHandle) {
             } catch (e) {
                 // ignore
             }
+            customUrl = `user/${decodedSlug}`; // Store the customUrl
             const encodedSlug = encodeURIComponent(decodedSlug);
             channelUrl = `https://www.youtube.com/user/${encodedSlug}`;
         } else {
@@ -988,7 +1054,8 @@ async function fetchChannelInfo(channelIdOrHandle) {
             name: channelName || resolvedChannelId, // Fallback to ID if name fails
             id: resolvedChannelId,
             handle: channelHandle,
-            logo: channelLogo
+            logo: channelLogo,
+            customUrl: customUrl // c/Name or user/Name if that was the input
         };
     } catch (error) {
         console.error('FilterTube Background: Failed to fetch channel info:', error);
@@ -1226,8 +1293,13 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
 
         if (existingIndex !== -1) {
             const existing = channels[existingIndex] || {};
-            // Determine customUrl from metadata, channelInfo, or existing
-            const customUrl = metadata.customUrl || channelInfo.customUrl || existing.customUrl || null;
+            // Determine customUrl from metadata, channelInfo, or existing (decode for unicode consistency)
+            let customUrl = metadata.customUrl || channelInfo.customUrl || existing.customUrl || null;
+            if (customUrl) {
+                try {
+                    customUrl = decodeURIComponent(customUrl);
+                } catch (e) { /* already decoded or invalid */ }
+            }
 
             const updated = {
                 ...existing,
@@ -1238,7 +1310,8 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                 canonicalHandle: existing.canonicalHandle || channelInfo.canonicalHandle,
                 name: existing.name || finalChannelName,
                 logo: existing.logo || channelInfo.logo,
-                customUrl: existing.customUrl || customUrl  // Preserve or add customUrl
+                customUrl: existing.customUrl || customUrl,  // Preserve or add customUrl
+                originalInput: existing.originalInput || customUrl || channelInfo.handle || channelInfo.id || rawValue // Track original input
             };
 
             // Upgrade Filter All: once true, it stays true unless user turns it off in UI
@@ -1305,8 +1378,13 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
         }
 
         // Add new channel
-        // Determine customUrl from metadata or channelInfo
-        const customUrl = metadata.customUrl || channelInfo.customUrl || null;
+        // Determine customUrl from metadata or channelInfo (decode for unicode consistency)
+        let customUrl = metadata.customUrl || channelInfo.customUrl || null;
+        if (customUrl) {
+            try {
+                customUrl = decodeURIComponent(customUrl);
+            } catch (e) { /* already decoded or invalid */ }
+        }
 
         const newChannel = {
             id: channelInfo.id,
@@ -1319,7 +1397,9 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             collaborationWith: collaborationWith || [], // Store collaboration metadata
             collaborationGroupId: collaborationGroupId || null, // UUID for group operations
             allCollaborators: allCollaborators, // Full list of all collaborators for popup grouping
-            customUrl: customUrl // c/Name or user/Name for legacy channels
+            customUrl: customUrl, // c/Name or user/Name for legacy channels
+            originalInput: customUrl || channelInfo.handle || channelInfo.id || rawValue, // Track what user originally blocked
+            addedAt: Date.now()
         };
 
         // Update channelMap with customUrl → UC ID mapping if available
