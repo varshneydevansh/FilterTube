@@ -350,4 +350,6 @@ So, for Shorts we have an additioanl overhead(1s - 1.5s) of prefetching the chan
 +-----------------------------------+
 | 4. Update Block List & Hide Card  |
 +-----------------------------------+
+| 5. Update videoChannelMap (Global)|
++-----------------------------------+
 ```

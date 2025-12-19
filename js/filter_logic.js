@@ -1288,15 +1288,15 @@
                                 if (normalized) {
                                     channelInfo.handle = normalized;
                                 }
-                            } else if (!channelInfo.customUrl && canonicalBaseUrl.startsWith('/c/')) {
-                                const slug = canonicalBaseUrl.split('/')[2];
-                                if (slug) {
-                                    channelInfo.customUrl = 'c/' + slug;
-                                }
-                            } else if (!channelInfo.customUrl && canonicalBaseUrl.startsWith('/user/')) {
-                                const slug = canonicalBaseUrl.split('/')[2];
-                                if (slug) {
-                                    channelInfo.customUrl = 'user/' + slug;
+                            } else if (!channelInfo.customUrl && (canonicalBaseUrl.startsWith('/c/') || canonicalBaseUrl.startsWith('/user/'))) {
+                                // Use extractCustomUrlFromPath if available, otherwise fallback
+                                if (typeof window.FilterTubeIdentity?.extractCustomUrlFromPath === 'function') {
+                                    channelInfo.customUrl = window.FilterTubeIdentity.extractCustomUrlFromPath(canonicalBaseUrl);
+                                } else {
+                                    const parts = canonicalBaseUrl.split('/');
+                                    const type = parts[1]; // 'c' or 'user'
+                                    const slug = parts[2] ? parts[2].split(/[?#]/)[0] : '';
+                                    if (slug) channelInfo.customUrl = `${type}/${slug}`;
                                 }
                             }
                         }
@@ -1450,6 +1450,32 @@
                 const handleLower = channelInfo.handle.toLowerCase();
                 const mappedId = this.channelMap[handleLower];
                 if (mappedId && mappedId === filter) {
+                    return true;
+                }
+            }
+
+            // Handle c/ChannelName and user/Name strings
+            if (filter.includes('/c/') || filter.includes('/user/') || filter.startsWith('c/') || filter.startsWith('user/')) {
+                let filterCustom = filter;
+                try {
+                    if (filter.includes('/c/')) filterCustom = 'c/' + filter.split('/c/')[1].split(/[?#]/)[0];
+                    else if (filter.includes('/user/')) filterCustom = 'user/' + filter.split('/user/')[1].split(/[?#]/)[0];
+                    filterCustom = decodeURIComponent(filterCustom).toLowerCase().trim();
+                } catch (e) {
+                    filterCustom = filter.toLowerCase().trim();
+                }
+
+                if (channelInfo.customUrl) {
+                    let infoCustom = channelInfo.customUrl.toLowerCase().trim();
+                    try {
+                        infoCustom = decodeURIComponent(infoCustom).toLowerCase().trim();
+                    } catch (e) { /* ignore */ }
+                    if (infoCustom === filterCustom) return true;
+                }
+
+                // Cross-match: if filter is customUrl, check if mapped UC ID matches channelInfo.id
+                const mappedId = this.channelMap[filterCustom];
+                if (mappedId && channelInfo.id && channelInfo.id.toLowerCase() === mappedId.toLowerCase()) {
                     return true;
                 }
             }

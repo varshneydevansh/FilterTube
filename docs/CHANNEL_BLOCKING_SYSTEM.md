@@ -41,34 +41,37 @@ This separation is the reason we have explicit cross-world message passing (via 
 
 ## 2. Channel Identity Model
 
-### 2.1 Primary identifiers
 - **UC ID** (e.g. `UCM6nZ84qXYFWPWzlO_zpkWw`)
   - Most stable identifier.
   - Many YouTube surfaces expose this in JSON (`browseEndpoint.browseId`).
 
-- **@handle** (e.g. `@Santasmusicroom.Official`, `@CorridosdeOroNorteños`)
-  - Human-friendly.
-  - May be **percent-encoded** in URLs (e.g. `@CorridosdeOroNorte%C3%B1os`).
-  - May 404 on YouTube (YouTube bug).
+- **@handle** (e.g. `@Santasmusicroom.Official`)
+  - Human-friendly alias.
+  - May be **percent-encoded** in URLs.
+
+- **customUrl** (e.g. `c/VídeoseMensagens`, `user/LegacyName`)
+  - Legacy custom URLs (pre-2022).
+  - Often found in `browseEndpoint.canonicalBaseUrl`.
+  - Stored as `c/slug` or `user/slug`.
 
 ### 2.2 Stored representations
 In storage (background-managed `filterChannels`) channel entries can contain:
 - `id`: UC ID
-- `handle`: normalized handle used for matching (often lowercased)
-- `handleDisplay`: UI/display handle (original glyphs/case)
-- `canonicalHandle`: best-known canonical handle string
-- `name`: channel name (byline)
-- `filterAll`: whether to derive keyword rules for “filter all content”
-- collaboration metadata (`collaborationWith`, `collaborationGroupId`, `allCollaborators`)
+- `handle`: normalized handle used for matching
+- `customUrl`: normalized legacy URL slug
+- `handleDisplay`: UI/display handle
+- `name`: channel name
+- `originalInput`: what the user actually typed or clicked
+- `filterAll`: boolean
+- collaboration metadata
 
-### 2.3 `channelMap`
-A bidirectional lookup persisted in storage:
-- `channelMap[lowercaseHandle] -> UCID`
-- `channelMap[lowercaseUCID] -> handle`
+### 2.3 Persistence Maps
+The system maintains two bidirectional lookup maps in local storage:
 
-This mapping is critical for:
-- Converting handle-only contexts into UC IDs (more robust hiding).
-- Recovering from YouTube handle URL failures (404).
+1. **`channelMap`**: `(handle | customUrl) <-> UC ID`.
+   - Critical for converting aliases into stable UC IDs.
+2. **`videoChannelMap`**: `videoId -> UC ID`.
+   - Used for Shorts. Since many Shorts cards lack identity, we store the mapping after the first successful resolution so it works offline/instantly on next load.
 
 ---
 
@@ -176,9 +179,9 @@ Impact:
 - handle → UC resolution fails.
 - blocking may succeed only after refresh if UC mapping is learned later via other channels.
 - mitigation (Dec 2025):
-  - Cache-first lookup (`channelMap`) happens before any fetch.
-  - Failed blocks automatically retry via `searchYtInitialDataForVideoChannel` and Shorts helpers.
-  - Successful lookups broadcast `(handle ↔ UC ID)` so future surfaces work offline.
+  - **Mapping Sync**: `background.js` listens for changes to `channelMap` and immediately re-compiles settings for all tabs. New mappings are broadcast instantly.
+  - **videoChannelMap**: Shorts mappings are cached per video ID to bypass network resolution on repeat encounters.
+  - **Truth in Extraction**: `identity.js` provides `extractCustomUrlFromPath` to ensure `/c/` and `/user/` paths are parsed identically in all worlds.
 
 ### 6.2 Unicode / percent-encoded handles
 Example: `@CorridosdeOroNorte%C3%B1os`.
@@ -289,9 +292,10 @@ This section answers:
 
 - **Why Shorts are special**
   - Many Shorts cards do not reliably expose UC ID in DOM.
-  - So FilterTube uses a two-phase approach:
-    - **Immediate hide** (DOM fallback)
-    - **Identity enrichment** (Main world or `https://www.youtube.com/shorts/<videoId>` fetch)
+  - So FilterTube uses a three-phase approach:
+    - **Immediate hide** (DOM fallback using `videoChannelMap` if known).
+    - **Asynchronous Enrichment**: `enrichVisibleShortsWithChannelInfo()` scans current visible Shorts, fetches missing IDs, and updates the maps.
+    - **Identity Resolution**: `https://www.youtube.com/shorts/<videoId>` fetch as a last resort.
 
 - **Key functions**
   - `content_bridge.js:extractChannelFromCard()` → returns `{videoId, needsFetch: true}` for Shorts when needed.

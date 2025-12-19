@@ -246,6 +246,7 @@ function extractCollaboratorsFromDialog(dialogNode) {
             const identifiers = scanDataForChannelIdentifiers(source);
             if (!collaborator.handle && identifiers.handle) collaborator.handle = identifiers.handle;
             if (!collaborator.id && identifiers.id) collaborator.id = identifiers.id;
+            if (!collaborator.customUrl && identifiers.customUrl) collaborator.customUrl = identifiers.customUrl;
             if (!collaborator.name && identifiers.name) collaborator.name = identifiers.name;
             const titleContent = source?.title?.content;
             if (!collaborator.name && titleContent) collaborator.name = titleContent;
@@ -278,7 +279,7 @@ function handleCollaborationDialog(dialogNode) {
 function ensureCollabDialogObserver() {
     if (collabDialogObserverInitialized) return;
     collabDialogObserverInitialized = true;
-    
+
     collabDialogObserver = new MutationObserver(mutations => {
         for (const mutation of mutations) {
             mutation.addedNodes?.forEach(node => {

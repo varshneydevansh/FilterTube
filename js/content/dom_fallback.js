@@ -367,6 +367,51 @@ function applyDOMFallback(settings, options = {}) {
     }
 
     const shortsSelectors = 'ytd-reel-item-renderer, ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2';
+
+    // Helper: robustly extract Shorts videoId from multiple attribute patterns
+    function extractShortsVideoId(node) {
+        if (!node) return null;
+
+        // 1) Direct data attributes commonly used in yt-lockup
+        const directAttrs = ['data-video-id', 'video-id', 'data-videoid'];
+        for (const attr of directAttrs) {
+            const val = node.getAttribute(attr);
+            if (val && /^[a-zA-Z0-9_-]{11}$/.test(val)) return val;
+        }
+
+        // 2) Anchors with shorts links
+        const linkSelectors = [
+            'a[href*="/shorts/"]',
+            'a[href^="/shorts/"]',
+            'a[href*="shorts/"]'
+        ];
+        for (const sel of linkSelectors) {
+            const link = node.querySelector(sel);
+            const href = link?.getAttribute('href') || link?.href || '';
+            if (href) {
+                const m = href.match(/\/shorts\/([a-zA-Z0-9_-]{11})/);
+                if (m && m[1]) return m[1];
+            }
+        }
+
+        // 3) Any attribute value containing a shorts URL
+        for (const attr of node.getAttributeNames ? node.getAttributeNames() : []) {
+            const val = node.getAttribute(attr) || '';
+            if (typeof val === 'string') {
+                const m = val.match(/\/shorts\/([a-zA-Z0-9_-]{11})/);
+                if (m && m[1]) return m[1];
+            }
+        }
+
+        // 4) Fallback: search child anchors generically
+        const anyLink = node.querySelector('a[href]');
+        const href = anyLink?.getAttribute('href') || anyLink?.href || '';
+        const m = href.match(/\/shorts\/([a-zA-Z0-9_-]{11})/);
+        if (m && m[1]) return m[1];
+
+        return null;
+    }
+
     document.querySelectorAll(shortsSelectors).forEach(element => {
         let target = element;
         // 1. Check for Desktop container (ytd-rich-item-renderer)
@@ -411,91 +456,53 @@ function applyDOMFallback(settings, options = {}) {
         // Check if this element was blocked via 3-dot menu (has blocked channel attributes)
         const blockedChannelId = target.getAttribute('data-filtertube-blocked-channel-id');
         const blockedChannelHandle = target.getAttribute('data-filtertube-blocked-channel-handle');
+        const blockedChannelCustom = target.getAttribute('data-filtertube-blocked-channel-custom');
         const blockedChannelState = target.getAttribute('data-filtertube-blocked-state');
         const blockedTimestamp = parseInt(target.getAttribute('data-filtertube-blocked-ts') || '0', 10);
         const blockAgeMs = blockedTimestamp ? Date.now() - blockedTimestamp : Number.POSITIVE_INFINITY;
 
         // If this card was blocked via 3-dot UI, honour pending/confirmed states
-        if (blockedChannelId || blockedChannelHandle) {
+        if (blockedChannelId || blockedChannelHandle || blockedChannelCustom) {
             const isStillBlocked = effectiveSettings.filterChannels?.some(fc => {
                 if (typeof fc === 'object') {
                     return (blockedChannelId && fc.id?.toLowerCase() === blockedChannelId.toLowerCase()) ||
-                        (blockedChannelHandle && fc.handle?.toLowerCase() === blockedChannelHandle.toLowerCase());
+                        (blockedChannelHandle && fc.handle?.toLowerCase() === blockedChannelHandle.toLowerCase()) ||
+                        (blockedChannelCustom && fc.customUrl?.toLowerCase() === blockedChannelCustom.toLowerCase());
                 }
                 const normalized = (fc || '').toLowerCase();
-                return normalized === blockedChannelId?.toLowerCase() || normalized === blockedChannelHandle?.toLowerCase();
+                return normalized === blockedChannelId?.toLowerCase() ||
+                    normalized === blockedChannelHandle?.toLowerCase() ||
+                    normalized === blockedChannelCustom?.toLowerCase();
             });
 
             if (isStillBlocked) {
                 // Keep it hidden - mark as confirmed so future passes don't treat it as pending
                 markElementAsBlocked(target, {
                     id: blockedChannelId,
-                    handle: blockedChannelHandle
+                    handle: blockedChannelHandle,
+                    customUrl: blockedChannelCustom
                 }, 'confirmed');
-                toggleVisibility(target, true, `Blocked channel: ${blockedChannelHandle || blockedChannelId}`);
+                toggleVisibility(target, true, `Blocked channel: ${blockedChannelHandle || blockedChannelCustom || blockedChannelId}`);
                 return; // Skip further processing for this element
             } else {
                 // If blocklist no longer contains this channel but the state is still pending,
                 // keep it hidden for a short grace period to avoid flicker while background saves
                 const waitForConfirmation = blockedChannelState === 'pending' && blockAgeMs < 2000;
                 if (waitForConfirmation) {
-                    toggleVisibility(target, true, `Pending channel block: ${blockedChannelHandle || blockedChannelId}`);
+                    toggleVisibility(target, true, `Pending channel block: ${blockedChannelHandle || blockedChannelCustom || blockedChannelId}`);
                     return;
                 }
 
                 // Channel was unblocked, remove the attributes and let normal filtering proceed
-                target.removeAttribute('data-filtertube-blocked-channel-id');
-                target.removeAttribute('data-filtertube-blocked-channel-handle');
-                target.removeAttribute('data-filtertube-blocked-state');
-                target.removeAttribute('data-filtertube-blocked-ts');
+                clearBlockedElementAttributes(target);
+                // Also clear it on the card itself if the target was a container
+                if (target !== element) {
+                    clearBlockedElementAttributes(element);
+                }
 
                 // Immediately restore visibility so layout snaps back before keyword logic reruns
                 toggleVisibility(target, false, '', true);
             }
-        }
-
-        // Helper: robustly extract Shorts videoId from multiple attribute patterns
-        function extractShortsVideoId(node) {
-            if (!node) return null;
-
-            // 1) Direct data attributes commonly used in yt-lockup
-            const directAttrs = ['data-video-id', 'video-id', 'data-videoid'];
-            for (const attr of directAttrs) {
-                const val = node.getAttribute(attr);
-                if (val && /^[a-zA-Z0-9_-]{11}$/.test(val)) return val;
-            }
-
-            // 2) Anchors with shorts links
-            const linkSelectors = [
-                'a[href*="/shorts/"]',
-                'a[href^="/shorts/"]',
-                'a[href*="shorts/"]'
-            ];
-            for (const sel of linkSelectors) {
-                const link = node.querySelector(sel);
-                const href = link?.getAttribute('href') || link?.href || '';
-                if (href) {
-                    const m = href.match(/\/shorts\/([a-zA-Z0-9_-]{11})/);
-                    if (m && m[1]) return m[1];
-                }
-            }
-
-            // 3) Any attribute value containing a shorts URL
-            for (const attr of node.getAttributeNames ? node.getAttributeNames() : []) {
-                const val = node.getAttribute(attr) || '';
-                if (typeof val === 'string') {
-                    const m = val.match(/\/shorts\/([a-zA-Z0-9_-]{11})/);
-                    if (m && m[1]) return m[1];
-                }
-            }
-
-            // 4) Fallback: search child anchors generically
-            const anyLink = node.querySelector('a[href]');
-            const href = anyLink?.getAttribute('href') || anyLink?.href || '';
-            const m = href.match(/\/shorts\/([a-zA-Z0-9_-]{11})/);
-            if (m && m[1]) return m[1];
-
-            return null;
         }
 
         const channelAnchor = element.querySelector('a[href*="/channel"], a[href^="/@"], a[href*="/user/"], a[href*="/c/"]');

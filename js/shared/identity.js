@@ -319,6 +319,7 @@
         const normalizedFilter = filterChannel.trim();
         if (!normalizedFilter) return false;
 
+        // Handle @handle strings
         if (normalizedFilter.startsWith('@')) {
             const filterHandle = normalizeHandleForComparison(normalizedFilter);
             if (filterHandle && metaHandles.length > 0) {
@@ -343,6 +344,20 @@
             return false;
         }
 
+        // Handle c/ChannelName and user/Name strings
+        if (normalizedFilter.includes('/c/') || normalizedFilter.includes('/user/') || normalizedFilter.startsWith('c/') || normalizedFilter.startsWith('user/')) {
+            const filterCustom = normalizeCustomUrl(normalizedFilter);
+            if (filterCustom && metaCustomUrl && filterCustom === metaCustomUrl) return true;
+
+            // Cross-match: if filter is customUrl, check if channelMap maps it to metaId
+            if (filterCustom && metaId) {
+                const mappedId = lookupChannelMap(filterCustom);
+                const normalizedMappedId = normalizeUcIdForComparison(mappedId);
+                if (normalizedMappedId && normalizedMappedId === metaId) return true;
+            }
+        }
+
+        // Handle UC ID strings
         const filterId = normalizeUcIdForComparison(normalizedFilter);
         if (filterId && metaId && filterId === metaId) {
             return true;
@@ -371,6 +386,37 @@
         return false;
     }
 
+    function extractCustomUrlFromPath(path) {
+        if (!path || typeof path !== 'string') return '';
+        let working = path;
+        try {
+            if (/^https?:\/\//i.test(working)) {
+                working = new URL(working).pathname;
+            }
+        } catch (e) { /* ignore */ }
+
+        if (!working.startsWith('/')) working = '/' + working;
+
+        // Normalize: remove trailing slash and common query/fragment markers
+        working = working.split(/[?#]/)[0].replace(/\/$/, '');
+
+        if (working.startsWith('/c/')) {
+            const parts = working.split('/');
+            if (parts[2]) return `c/${parts[2]}`;
+        } else if (working.startsWith('/user/')) {
+            const parts = working.split('/');
+            if (parts[2]) return `user/${parts[2]}`;
+        }
+
+        return '';
+    }
+
+    function extractChannelIdFromPath(path) {
+        if (!path || typeof path !== 'string') return '';
+        const match = path.match(/(UC[\w-]{22})/i);
+        return match ? match[1] : '';
+    }
+
     /**
      * True if `channelInfo` matches any entry in `filterChannels`.
      */
@@ -386,7 +432,9 @@
         isUcId,
         canonicalizeChannelInput,
         channelMatchesFilter,
-        isChannelBlocked
+        isChannelBlocked,
+        extractCustomUrlFromPath,
+        extractChannelIdFromPath
     };
 
     const existing = root.FilterTubeIdentity && typeof root.FilterTubeIdentity === 'object'

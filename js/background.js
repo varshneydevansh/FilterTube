@@ -587,18 +587,18 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
         if (request.videoId && request.channelId) {
             browserAPI.storage.local.get(['videoChannelMap'], (result) => {
                 const currentMap = result.videoChannelMap || {};
-                
+
                 // Only add if not already mapped
                 if (!currentMap[request.videoId]) {
                     currentMap[request.videoId] = request.channelId;
-                    
+
                     // Limit map size to prevent unbounded growth (keep last 1000 entries)
                     const keys = Object.keys(currentMap);
                     if (keys.length > 1000) {
                         // Remove oldest 100 entries (simple FIFO-ish cleanup)
                         keys.slice(0, 100).forEach(k => delete currentMap[k]);
                     }
-                    
+
                     browserAPI.storage.local.set({ videoChannelMap: currentMap });
                     console.log("FilterTube Background: Video-channel mapping stored:", request.videoId, "->", request.channelId);
                 }
@@ -643,7 +643,16 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
 // Listen for storage changes to re-compile settings
 browserAPI.storage.onChanged.addListener((changes, area) => {
     if (area === 'local') {
-        const relevantKeys = ['filterKeywords', 'filterChannels', 'hideAllComments', 'filterComments', 'useExactWordMatching', 'hideAllShorts'];
+        const relevantKeys = [
+            'filterKeywords',
+            'filterChannels',
+            'hideAllComments',
+            'filterComments',
+            'useExactWordMatching',
+            'hideAllShorts',
+            'channelMap',
+            'videoChannelMap'
+        ];
         let settingsChanged = false;
         for (const key of relevantKeys) {
             if (changes[key]) {
@@ -657,32 +666,6 @@ browserAPI.storage.onChanged.addListener((changes, area) => {
             console.log('FilterTube Background: Settings changed, re-compiling.');
             getCompiledSettings().then(compiledSettings => {
                 console.log('FilterTube Background: New compiled settings ready');
-                // The content_bridge.js will request these updated settings on its own
-                // via storage.onChanged listener and chrome.runtime.sendMessage
-            });
-        }
-    }
-});
-
-// Listen for storage changes to re-compile settings
-browserAPI.storage.onChanged.addListener((changes, area) => {
-    if (area === 'local') {
-        const relevantKeys = ['filterKeywords', 'filterChannels', 'hideAllComments', 'filterComments', 'useExactWordMatching', 'hideAllShorts'];
-        let settingsChanged = false;
-        for (const key of relevantKeys) {
-            if (changes[key]) {
-                settingsChanged = true;
-                console.log(`FilterTube Background: Setting changed - ${key}:`, changes[key]);
-                break;
-            }
-        }
-
-        if (settingsChanged) {
-            console.log('FilterTube Background: Settings changed, re-compiling.');
-            getCompiledSettings().then(compiledSettings => {
-                console.log('FilterTube Background: New compiled settings ready');
-                // The content_bridge.js will request these updated settings on its own
-                // via storage.onChanged listener and chrome.runtime.sendMessage
             });
         }
     }

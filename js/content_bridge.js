@@ -2521,36 +2521,36 @@ function extractChannelFromInitialData(initialData, options = {}) {
  */
 async function enrichVisibleShortsWithChannelInfo(blockedChannelId, settings) {
     if (!blockedChannelId) return;
-    
+
     const shortsSelectors = [
         'ytm-shorts-lockup-view-model',
         'ytm-shorts-lockup-view-model-v2',
         'ytd-reel-item-renderer',
         '[data-filtertube-short="true"]'
     ].join(', ');
-    
+
     const shortsElements = document.querySelectorAll(shortsSelectors);
     if (shortsElements.length === 0) {
         console.log('FilterTube: No Shorts found to enrich');
         return;
     }
-    
+
     console.log(`FilterTube: Enriching ${shortsElements.length} Shorts with channel info`);
-    
+
     const videoChannelMap = settings?.videoChannelMap || {};
     const videoIdsToFetch = [];
     const elementsByVideoId = new Map();
-    
+
     // Collect videoIds that need fetching
     for (const el of shortsElements) {
         // Skip already hidden elements
         if (el.classList.contains('filtertube-hidden') || el.hasAttribute('data-filtertube-hidden')) {
             continue;
         }
-        
+
         // Extract videoId from Shorts card
         let videoId = null;
-        
+
         // Try data attributes first
         for (const attr of ['data-video-id', 'video-id', 'data-videoid']) {
             const val = el.getAttribute(attr);
@@ -2559,7 +2559,7 @@ async function enrichVisibleShortsWithChannelInfo(blockedChannelId, settings) {
                 break;
             }
         }
-        
+
         // Try anchor hrefs
         if (!videoId) {
             const link = el.querySelector('a[href*="/shorts/"]');
@@ -2567,7 +2567,7 @@ async function enrichVisibleShortsWithChannelInfo(blockedChannelId, settings) {
             const m = href.match(/\/shorts\/([a-zA-Z0-9_-]{11})/);
             if (m && m[1]) videoId = m[1];
         }
-        
+
         // Try any attribute with shorts URL
         if (!videoId) {
             for (const attr of el.getAttributeNames ? el.getAttributeNames() : []) {
@@ -2581,30 +2581,30 @@ async function enrichVisibleShortsWithChannelInfo(blockedChannelId, settings) {
                 }
             }
         }
-        
+
         if (!videoId) continue;
-        
+
         // Skip if already in videoChannelMap
         if (videoChannelMap[videoId]) continue;
-        
+
         videoIdsToFetch.push(videoId);
         if (!elementsByVideoId.has(videoId)) {
             elementsByVideoId.set(videoId, []);
         }
         elementsByVideoId.get(videoId).push(el);
     }
-    
+
     if (videoIdsToFetch.length === 0) {
         console.log('FilterTube: All visible Shorts already have channel mappings');
         return;
     }
-    
+
     console.log(`FilterTube: Fetching channel info for ${videoIdsToFetch.length} Shorts`);
-    
+
     // Limit concurrent fetches to avoid overwhelming the network
     const MAX_CONCURRENT = 3;
     let anyMatchesFound = false;
-    
+
     for (let i = 0; i < videoIdsToFetch.length; i += MAX_CONCURRENT) {
         const batch = videoIdsToFetch.slice(i, i + MAX_CONCURRENT);
         const fetchPromises = batch.map(async (videoId) => {
@@ -2617,7 +2617,7 @@ async function enrichVisibleShortsWithChannelInfo(blockedChannelId, settings) {
                         videoId: videoId,
                         channelId: info.id
                     });
-                    
+
                     // Check if this Short belongs to the blocked channel
                     if (info.id.toLowerCase() === blockedChannelId.toLowerCase()) {
                         anyMatchesFound = true;
@@ -2625,8 +2625,8 @@ async function enrichVisibleShortsWithChannelInfo(blockedChannelId, settings) {
                         const elements = elementsByVideoId.get(videoId) || [];
                         for (const el of elements) {
                             let container = el.closest('ytd-rich-item-renderer') ||
-                                           el.closest('.ytGridShelfViewModelGridShelfItem') ||
-                                           el;
+                                el.closest('.ytGridShelfViewModelGridShelfItem') ||
+                                el;
                             container.style.display = 'none';
                             container.classList.add('filtertube-hidden');
                             container.setAttribute('data-filtertube-hidden', 'true');
@@ -2638,10 +2638,10 @@ async function enrichVisibleShortsWithChannelInfo(blockedChannelId, settings) {
                 console.warn(`FilterTube: Failed to fetch channel for Short ${videoId}:`, e);
             }
         });
-        
+
         await Promise.all(fetchPromises);
     }
-    
+
     // Re-run DOM fallback with fresh settings if we found matches
     if (anyMatchesFound) {
         console.log('FilterTube: Found Shorts from blocked channel, refreshing settings and re-running DOM fallback');
@@ -3337,10 +3337,10 @@ function extractChannelFromCard(card) {
                     console.log('FilterTube: Extracted collaborators via direct link fallback:', fallbackCollaborators);
                     const videoId = extractVideoIdFromCard(card);
                     const hasMissingData = fallbackCollaborators.some(c => !c.handle && !c.id && !c.customUrl);
-                    
+
                     // If only 1 collaborator found, mark for enrichment to find more
                     const needsMoreCollaborators = fallbackCollaborators.length < 2;
-                    
+
                     return {
                         ...fallbackCollaborators[0],
                         isCollaboration: fallbackCollaborators.length >= 2,
@@ -4485,6 +4485,9 @@ function markElementAsBlocked(element, channelInfo, state = 'pending') {
     if (channelInfo.handle) {
         element.setAttribute('data-filtertube-blocked-channel-handle', channelInfo.handle);
     }
+    if (channelInfo.customUrl) {
+        element.setAttribute('data-filtertube-blocked-channel-custom', channelInfo.customUrl);
+    }
     if (channelInfo.name) {
         element.setAttribute('data-filtertube-blocked-channel-name', channelInfo.name);
     }
@@ -4496,6 +4499,7 @@ function clearBlockedElementAttributes(element) {
     if (!element) return;
     element.removeAttribute('data-filtertube-blocked-channel-id');
     element.removeAttribute('data-filtertube-blocked-channel-handle');
+    element.removeAttribute('data-filtertube-blocked-channel-custom');
     element.removeAttribute('data-filtertube-blocked-channel-name');
     element.removeAttribute('data-filtertube-blocked-state');
     element.removeAttribute('data-filtertube-blocked-ts');
@@ -5377,19 +5381,19 @@ function addFilterAllContentCheckbox(menuItem, channelData) {
     let container = menuItem.querySelector('.yt-list-item-view-model__text-wrapper');
 
     // Fallback to OLD menu structure
-     if (!container) {
-         container = menuItem.querySelector('tp-yt-paper-item');
-     }
+    if (!container) {
+        container = menuItem.querySelector('tp-yt-paper-item');
+    }
 
-     if (!container) {
-         console.error('FilterTube: Could not find container for checkbox');
-         return;
-     }
+    if (!container) {
+        console.error('FilterTube: Could not find container for checkbox');
+        return;
+    }
 
-     // Don't add if already exists
-     if (container.querySelector('.filtertube-filter-all-checkbox')) {
-         return;
-     }
+    // Don't add if already exists
+    if (container.querySelector('.filtertube-filter-all-checkbox')) {
+        return;
+    }
 
     const checkboxWrapper = document.createElement('div');
     checkboxWrapper.className = 'filtertube-filter-all-checkbox';

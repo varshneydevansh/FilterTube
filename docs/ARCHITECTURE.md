@@ -120,12 +120,12 @@ The following diagram illustrates the complete interaction between all FilterTub
 |   | 5a: Entry   |                                     |          |   | 6a: Observer|                                |
 |   | processData |                                     |          |   |  Watch DOM  |                                |
 |   +------+------+                                     |          |   +------+------+                                |
-|          | instantiates                               |          |          | detects nodes                         |
-|   +------v------+                                     |          |   +------v------+                                |
-|   | 5b: Filter  |                                     |          |   | 6b: Apply   |                                |
-|   |  Instance   |                                     |          |   |  Fallback   |                                |
-|   +------+------+                                     |          |   +------+------+                                |
-|          | processes                                  |          |          | scans                                 |
+|          | uses mappings                              |          |          | detects nodes                         |
+|   +------v------+      +-------------------+          |          |   +------v------+                                |
+|   | 5b: Identity| <--- | 5e: videoChannel  |          |          |   | 6b: Apply   |                                |
+|   | Resolution  |      |     Map Lookup    |          |          |   |  Fallback   |                                |
+|   +------+------+      +-------------------+          |          |   +------+------+                                |
+|          |                                            |          |          | scans                                 |
 |   +------v------+                                     |          |   +------v------+                                |
 |   | 5c: Traverse|                                     |          |   | 6c: Match   |                                |
 |   |  Recursive  |                                     |          |   |   Content   |                                |
@@ -241,20 +241,67 @@ YouTube now rate-limits `/@handle/about` and intermittently returns `404` on the
 
 These steps keep channel identity deterministic even for collaboration uploads, Shorts feeds, and navigation refreshes that previously produced 404 loops.
 
-### Shorts Flow overlay
+### Shorts Flow & Identity Convergence
 
-```ascii
+Shorts are unique because their cards often lack canonical IDs up front. The system uses a multi-layered convergence strategy:
 
-User "Block channel" (Short) → content_bridge detects ytd-shorts-lockup →
-  1. Fetch shorts watch URL (to resolve initial handle/id)
-  2. Post FilterTube_RequestCollaboratorInfo if collab markers exist
-  3. Await canonical UC ID via fetchIdForHandle() / /about scrape
-  4. Send handleAddFilteredChannel to background with `isShorts: true`
-  5. Background persists, broadcasts -> DOM fallback removes parent container (rich-item renderer) to avoid blank slots
+```mermaid
+sequenceDiagram
+    participant CB as content_bridge.js
+    participant DF as dom_fallback.js
+    participant FL as filter_logic.js
+    participant BG as background.js
+    participant YT as YouTube API
 
+    Note over CB,BG: Phase 1: Immediate Interaction
+    CB->>BG: Block Channel Clicked
+    BG->>BG: Persist in filterChannels + channelMap
+    BG->>CB: Broadcast Settings Change
+
+    Note over DF,FL: Phase 2: Instant Hiding
+    DF->>DF: extractShortsVideoId()
+    DF-->>BG: Query videoChannelMap
+    DF->>DF: hide element (Zero Flash)
+
+    Note over CB,YT: Phase 3: Enrichment
+    CB->>CB: enrichVisibleShortsWithChannelInfo()
+    CB->>YT: fetchChannelFromShortsUrl(videoId)
+    YT-->>CB: Returns UC ID
+    CB->>BG: updateVideoChannelMap(videoId -> UC ID)
+    BG->>BG: storage.onChanged (recompileSettings)
+    BG-->>CB: All Tabs: Sync refreshed settings
 ```
 
-This hybrid path keeps **Zero-Flash** guarantees for Shorts even though their cards lack canonical IDs up front: the DOM fallback hides immediately while the async canonical resolution finishes (<2.5s worst case).
+This hybrid path keeps **Zero-Flash** guarantees for Shorts even when metadata is missing: the DOM fallback hides immediately while the async canonical resolution finishes and broadcasts via `background.js`.
+
+### Bidirectional Mapping Synchronization
+
+To ensure that a newly learned identity (e.g., resolving a `c/Name` to a UC ID) is available instantly across all open YouTube tabs, FilterTube implements a bidirectional sync loop:
+
+```ascii
++-----------------------+      +-----------------------+      +-----------------------+
+|   1. Main World       |      |   2. Content Bridge   |      |   3. Background SW    |
+|   (Learning)          | ===> |   (Isolated World)    | ===> |   (Storage Manager)   |
+| Intercepts JSON, finds|      | Receives mapping via  |      | Persists to           |
+| mapping (Slug -> UC)  |      | postMessage           |      | channelMap            |
++-----------------------+      +-----------------------+      +-----------+-----------+
+                                                                          |
+                                                                          | trigger
+                                                                          v
++-----------------------+      +-----------------------+      +-----------+-----------+
+|   6. All Other Tabs   |      |   5. Settings Broadcast|      |   4. recompileSettings|
+|   (Instant Update)    | <=== | Background sends      | <=== | storage.onChanged     |
+| DOM Fallback re-runs  |      | FilterTube_Refreshed  |      | detects map update    |
+| with new mappings     |      | to all tabs           |      |                       |
++-----------------------+      +-----------------------+      +-----------------------+
+```
+
+1. **Learning**: `filter_logic.js` or `injector.js` finds a previously unknown association between a legacy URL and a UC ID.
+2. **Propagation**: The mapping is sent to the Isolated World.
+3. **Persistence**: `background.js` saves it to `channelMap`.
+4. **Trigger**: `background.js` has a `storage.onChanged` listener that detects updates to `channelMap` or `videoChannelMap`.
+5. **Broadcast**: The background script immediately re-compiles settings and broadcasts them.
+6. **Enforcement**: All tabs receive the update and immediately re-run their DOM filters to hide any content that matches the new mapping.
 
 
 ## 1. Extension Initialization & Script Injection Flow

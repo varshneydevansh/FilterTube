@@ -243,32 +243,42 @@ function normalizeHrefForParsing(href) {
     }
 }
 
+function extractCustomUrlFromPath(path) {
+    if (!path || typeof path !== 'string') return '';
+    let working = path;
+    try {
+        if (/^https?:\/\//i.test(working)) {
+            working = new URL(working).pathname;
+        }
+    } catch (e) { /* ignore */ }
+
+    if (!working.startsWith('/')) working = '/' + working;
+
+    // Normalize: remove trailing slash and common query/fragment markers
+    working = working.split(/[?#]/)[0].replace(/\/$/, '');
+
+    if (working.startsWith('/c/')) {
+        const parts = working.split('/');
+        if (parts[2]) return `c/${parts[2]}`;
+    } else if (working.startsWith('/user/')) {
+        const parts = working.split('/');
+        if (parts[2]) return `user/${parts[2]}`;
+    }
+
+    // Some legacy URLs might be just /ChannelName (rare but possible if not a handle)
+    // We only match these if they aren't common YouTube paths or @handles
+    if (working.includes('/@') || working.startsWith('/channel/')) return '';
+
+    // We already handled /c/ and /user/
+    return '';
+}
+
 function buildChannelMetadata(channelText = '', channelHref = '') {
     const normalizedHref = normalizeHrefForParsing(channelHref);
     const handle = extractHandleFromString(channelText) || extractHandleFromString(normalizedHref);
     const id = extractChannelIdFromString(normalizedHref) || extractChannelIdFromString(channelText);
-    
-    // Extract customUrl for /c/ and /user/ type channels
-    let customUrl = null;
-    if (normalizedHref) {
-        let path = normalizedHref;
-        try {
-            if (/^https?:\/\//i.test(path)) {
-                path = new URL(path).pathname;
-            }
-        } catch (e) { /* ignore */ }
-        if (!path.startsWith('/')) path = '/' + path;
-        path = path.split(/[?#]/)[0];
-        
-        if (path.startsWith('/c/')) {
-            const slug = path.split('/')[2];
-            if (slug) customUrl = `c/${slug}`;
-        } else if (path.startsWith('/user/')) {
-            const slug = path.split('/')[2];
-            if (slug) customUrl = `user/${slug}`;
-        }
-    }
-    
+    const customUrl = extractCustomUrlFromPath(normalizedHref) || extractCustomUrlFromPath(channelHref);
+
     return { handle, id, customUrl };
 }
 
@@ -286,7 +296,7 @@ function collectAttributeValues(element) {
 }
 
 function scanDataForChannelIdentifiers(root) {
-    const result = { handle: '', id: '' };
+    const result = { handle: '', id: '', customUrl: '' };
     if (!root || typeof root !== 'object') return result;
 
     // Direct check on the object first (most common case)
@@ -294,12 +304,17 @@ function scanDataForChannelIdentifiers(root) {
     if (root.channelId) result.id = root.channelId;
     else if (root.browseId && root.browseId.startsWith('UC')) result.id = root.browseId;
 
-    if (root.canonicalBaseUrl && root.canonicalBaseUrl.includes('/@')) {
-        const handle = extractHandleFromString(root.canonicalBaseUrl);
-        if (handle) result.handle = handle;
+    if (root.canonicalBaseUrl) {
+        if (root.canonicalBaseUrl.includes('/@')) {
+            const handle = extractHandleFromString(root.canonicalBaseUrl);
+            if (handle) result.handle = handle;
+        } else {
+            const custom = extractCustomUrlFromPath(root.canonicalBaseUrl);
+            if (custom) result.customUrl = custom;
+        }
     }
 
-    if (result.id && result.handle) return result;
+    if (result.id && (result.handle || result.customUrl)) return result;
 
     // Shallow scan of specific known properties to avoid deep recursion into related items
     // We explicitly avoid 'items', 'contents', 'results' which usually contain OTHER videos/channels
@@ -313,10 +328,18 @@ function scanDataForChannelIdentifiers(root) {
                 if (val.browseId && val.browseId.startsWith('UC')) {
                     if (!result.id) result.id = val.browseId;
                 }
-                if (val.url && val.url.includes('/@')) {
-                    const handle = extractHandleFromString(val.url);
-                    if (handle && !result.handle) result.handle = handle;
+
+                const url = val.url || (val.browseEndpoint && val.browseEndpoint.canonicalBaseUrl);
+                if (url) {
+                    if (url.includes('/@')) {
+                        const handle = extractHandleFromString(url);
+                        if (handle && !result.handle) result.handle = handle;
+                    } else if (!result.customUrl) {
+                        const custom = extractCustomUrlFromPath(url);
+                        if (custom) result.customUrl = custom;
+                    }
                 }
+
                 // Check text runs for handles
                 if (Array.isArray(val)) {
                     for (const run of val) {
@@ -326,8 +349,14 @@ function scanDataForChannelIdentifiers(root) {
                         }
                         if (run.navigationEndpoint) {
                             const nav = run.navigationEndpoint;
-                            if (nav.browseEndpoint && nav.browseEndpoint.browseId && nav.browseEndpoint.browseId.startsWith('UC') && !result.id) {
-                                result.id = nav.browseEndpoint.browseId;
+                            if (nav.browseEndpoint) {
+                                if (nav.browseEndpoint.browseId && nav.browseEndpoint.browseId.startsWith('UC') && !result.id) {
+                                    result.id = nav.browseEndpoint.browseId;
+                                }
+                                if (nav.browseEndpoint.canonicalBaseUrl && !result.customUrl) {
+                                    const custom = extractCustomUrlFromPath(nav.browseEndpoint.canonicalBaseUrl);
+                                    if (custom) result.customUrl = custom;
+                                }
                             }
                         }
                     }
@@ -473,7 +502,8 @@ function extractChannelMetadataFromElement(element, channelText = '', channelHre
             const identifiers = scanDataForChannelIdentifiers(source);
             if (!meta.handle && identifiers.handle) meta.handle = identifiers.handle;
             if (!meta.id && identifiers.id) meta.id = identifiers.id;
-            if (meta.handle && meta.id) break;
+            if (!meta.customUrl && identifiers.customUrl) meta.customUrl = identifiers.customUrl;
+            if (meta.handle && meta.id && meta.customUrl) break;
         }
     }
 
