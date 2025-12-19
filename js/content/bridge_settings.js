@@ -98,7 +98,16 @@ function sendSettingsToMainWorld(settings) {
 
 function handleStorageChanges(changes, area) {
     if (area !== 'local') return;
-    const relevantKeys = ['filterKeywords', 'filterChannels', 'uiChannels', 'channelMap', 'hideAllComments', 'filterComments', 'hideAllShorts'];
+    const relevantKeys = [
+        'filterKeywords',
+        'filterChannels',
+        'uiChannels',
+        'channelMap',
+        'videoChannelMap', // Needed so Shorts videoId → channelId updates re-apply settings
+        'hideAllComments',
+        'filterComments',
+        'hideAllShorts'
+    ];
     if (Object.keys(changes).some(key => relevantKeys.includes(key))) {
         // FIX: Apply changes IMMEDIATELY without debounce
         requestSettingsFromBackground().then(result => {

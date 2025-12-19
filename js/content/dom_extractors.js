@@ -22,7 +22,9 @@ const VIDEO_CARD_SELECTORS = [
     'ytd-grid-channel-renderer',
     'ytd-universal-watch-card-renderer',
     'ytd-channel-video-player-renderer',
-    'ytd-channel-featured-content-renderer'
+    'ytd-channel-featured-content-renderer',
+    'ytm-shorts-lockup-view-model',
+    'ytm-shorts-lockup-view-model-v2'
 ].join(', ');
 
 function ensureVideoIdForCard(card) {

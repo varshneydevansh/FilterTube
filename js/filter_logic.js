@@ -928,6 +928,16 @@
             const videoId = rules.videoId ? getByPath(item, rules.videoId) : '';
             const skipKeywordFiltering = CHANNEL_ONLY_RENDERERS.has(rendererType);
 
+            // Shorts: if no channel identity present, try videoChannelMap (populated when user blocked Shorts)
+            if (
+                (!channelInfo.id && !channelInfo.handle && !channelInfo.customUrl) &&
+                videoId &&
+                this.settings.videoChannelMap &&
+                this.settings.videoChannelMap[videoId]
+            ) {
+                channelInfo.id = this.settings.videoChannelMap[videoId];
+            }
+
             // Handle collaboration videos (channelInfo is an array)
             const isCollaboration = Array.isArray(channelInfo);
             const collaborators = isCollaboration ? channelInfo : [channelInfo];

@@ -213,11 +213,21 @@ function applyDOMFallback(settings, options = {}) {
         const channel = [channelPrimaryText, channelSubtitleText].filter(Boolean).join(' | ');
         const channelHref = channelAnchor?.getAttribute('href') || channelAnchor?.href || '';
         const relatedElements = [channelAnchor, channelElement, channelSubtitleElement];
-        const channelMeta = extractChannelMetadataFromElement(element, channel, channelHref, {
+        let channelMeta = extractChannelMetadataFromElement(element, channel, channelHref, {
             cacheTarget: channelAnchor || element,
             relatedElements
         });
         const collaboratorMetas = extractCollaboratorMetadataFromElement(element);
+
+        // For Shorts/Reels without channel identity, try videoChannelMap lookup
+        const hasChannelIdentity = Boolean(channelMeta.handle || channelMeta.id || channelMeta.customUrl);
+        if (!hasChannelIdentity && effectiveSettings.videoChannelMap) {
+            // Extract videoId from card
+            let videoId = element.getAttribute('data-filtertube-video-id') || extractVideoIdFromCard(element);
+            if (videoId && effectiveSettings.videoChannelMap[videoId]) {
+                channelMeta = { ...channelMeta, id: effectiveSettings.videoChannelMap[videoId] };
+            }
+        }
 
         // Determine Visibility
         const elementTag = element.tagName.toLowerCase();
@@ -444,6 +454,50 @@ function applyDOMFallback(settings, options = {}) {
             }
         }
 
+        // Helper: robustly extract Shorts videoId from multiple attribute patterns
+        function extractShortsVideoId(node) {
+            if (!node) return null;
+
+            // 1) Direct data attributes commonly used in yt-lockup
+            const directAttrs = ['data-video-id', 'video-id', 'data-videoid'];
+            for (const attr of directAttrs) {
+                const val = node.getAttribute(attr);
+                if (val && /^[a-zA-Z0-9_-]{11}$/.test(val)) return val;
+            }
+
+            // 2) Anchors with shorts links
+            const linkSelectors = [
+                'a[href*="/shorts/"]',
+                'a[href^="/shorts/"]',
+                'a[href*="shorts/"]'
+            ];
+            for (const sel of linkSelectors) {
+                const link = node.querySelector(sel);
+                const href = link?.getAttribute('href') || link?.href || '';
+                if (href) {
+                    const m = href.match(/\/shorts\/([a-zA-Z0-9_-]{11})/);
+                    if (m && m[1]) return m[1];
+                }
+            }
+
+            // 3) Any attribute value containing a shorts URL
+            for (const attr of node.getAttributeNames ? node.getAttributeNames() : []) {
+                const val = node.getAttribute(attr) || '';
+                if (typeof val === 'string') {
+                    const m = val.match(/\/shorts\/([a-zA-Z0-9_-]{11})/);
+                    if (m && m[1]) return m[1];
+                }
+            }
+
+            // 4) Fallback: search child anchors generically
+            const anyLink = node.querySelector('a[href]');
+            const href = anyLink?.getAttribute('href') || anyLink?.href || '';
+            const m = href.match(/\/shorts\/([a-zA-Z0-9_-]{11})/);
+            if (m && m[1]) return m[1];
+
+            return null;
+        }
+
         const channelAnchor = element.querySelector('a[href*="/channel"], a[href^="/@"], a[href*="/user/"], a[href*="/c/"]');
         const channelText = channelAnchor?.textContent?.trim() || '';
         const channelHref = channelAnchor?.getAttribute('href') || channelAnchor?.href || '';
@@ -454,12 +508,9 @@ function applyDOMFallback(settings, options = {}) {
         // For Shorts without channel identity, try videoChannelMap lookup
         const hasChannelIdentity = Boolean(channelMeta.handle || channelMeta.id || channelMeta.customUrl);
         if (!hasChannelIdentity && effectiveSettings.videoChannelMap) {
-            // Extract videoId from Shorts card
-            const shortsLink = element.querySelector('a[href*="/shorts/"]');
-            const shortsHref = shortsLink?.getAttribute('href') || '';
-            const videoIdMatch = shortsHref.match(/\/shorts\/([a-zA-Z0-9_-]{11})/);
-            const videoId = videoIdMatch ? videoIdMatch[1] : null;
-            
+            // Extract videoId from Shorts card (support lockup/home/search variants)
+            const videoId = extractShortsVideoId(element);
+
             if (videoId && effectiveSettings.videoChannelMap[videoId]) {
                 // Found channel ID from videoChannelMap
                 channelMeta = { ...channelMeta, id: effectiveSettings.videoChannelMap[videoId] };

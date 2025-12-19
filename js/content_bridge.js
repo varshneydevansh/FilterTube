@@ -2511,6 +2511,153 @@ function extractChannelFromInitialData(initialData, options = {}) {
 }
 
 /**
+ * Enrich all visible Shorts on the page with channel info.
+ * After blocking a channel, Shorts from that channel may still be visible because
+ * they don't have channel identity in DOM. This function fetches channel info for
+ * those Shorts and stores videoId → channelId mappings so DOM fallback can hide them.
+ * 
+ * @param {string} blockedChannelId - The UC ID of the channel that was just blocked
+ * @param {Object} settings - Current settings including videoChannelMap
+ */
+async function enrichVisibleShortsWithChannelInfo(blockedChannelId, settings) {
+    if (!blockedChannelId) return;
+    
+    const shortsSelectors = [
+        'ytm-shorts-lockup-view-model',
+        'ytm-shorts-lockup-view-model-v2',
+        'ytd-reel-item-renderer',
+        '[data-filtertube-short="true"]'
+    ].join(', ');
+    
+    const shortsElements = document.querySelectorAll(shortsSelectors);
+    if (shortsElements.length === 0) {
+        console.log('FilterTube: No Shorts found to enrich');
+        return;
+    }
+    
+    console.log(`FilterTube: Enriching ${shortsElements.length} Shorts with channel info`);
+    
+    const videoChannelMap = settings?.videoChannelMap || {};
+    const videoIdsToFetch = [];
+    const elementsByVideoId = new Map();
+    
+    // Collect videoIds that need fetching
+    for (const el of shortsElements) {
+        // Skip already hidden elements
+        if (el.classList.contains('filtertube-hidden') || el.hasAttribute('data-filtertube-hidden')) {
+            continue;
+        }
+        
+        // Extract videoId from Shorts card
+        let videoId = null;
+        
+        // Try data attributes first
+        for (const attr of ['data-video-id', 'video-id', 'data-videoid']) {
+            const val = el.getAttribute(attr);
+            if (val && /^[a-zA-Z0-9_-]{11}$/.test(val)) {
+                videoId = val;
+                break;
+            }
+        }
+        
+        // Try anchor hrefs
+        if (!videoId) {
+            const link = el.querySelector('a[href*="/shorts/"]');
+            const href = link?.getAttribute('href') || link?.href || '';
+            const m = href.match(/\/shorts\/([a-zA-Z0-9_-]{11})/);
+            if (m && m[1]) videoId = m[1];
+        }
+        
+        // Try any attribute with shorts URL
+        if (!videoId) {
+            for (const attr of el.getAttributeNames ? el.getAttributeNames() : []) {
+                const val = el.getAttribute(attr) || '';
+                if (typeof val === 'string') {
+                    const m = val.match(/\/shorts\/([a-zA-Z0-9_-]{11})/);
+                    if (m && m[1]) {
+                        videoId = m[1];
+                        break;
+                    }
+                }
+            }
+        }
+        
+        if (!videoId) continue;
+        
+        // Skip if already in videoChannelMap
+        if (videoChannelMap[videoId]) continue;
+        
+        videoIdsToFetch.push(videoId);
+        if (!elementsByVideoId.has(videoId)) {
+            elementsByVideoId.set(videoId, []);
+        }
+        elementsByVideoId.get(videoId).push(el);
+    }
+    
+    if (videoIdsToFetch.length === 0) {
+        console.log('FilterTube: All visible Shorts already have channel mappings');
+        return;
+    }
+    
+    console.log(`FilterTube: Fetching channel info for ${videoIdsToFetch.length} Shorts`);
+    
+    // Limit concurrent fetches to avoid overwhelming the network
+    const MAX_CONCURRENT = 3;
+    let anyMatchesFound = false;
+    
+    for (let i = 0; i < videoIdsToFetch.length; i += MAX_CONCURRENT) {
+        const batch = videoIdsToFetch.slice(i, i + MAX_CONCURRENT);
+        const fetchPromises = batch.map(async (videoId) => {
+            try {
+                const info = await fetchChannelFromShortsUrl(videoId, null);
+                if (info && info.id) {
+                    // Store in videoChannelMap via background
+                    browserAPI_BRIDGE.runtime.sendMessage({
+                        action: 'updateVideoChannelMap',
+                        videoId: videoId,
+                        channelId: info.id
+                    });
+                    
+                    // Check if this Short belongs to the blocked channel
+                    if (info.id.toLowerCase() === blockedChannelId.toLowerCase()) {
+                        anyMatchesFound = true;
+                        // Immediately hide these elements
+                        const elements = elementsByVideoId.get(videoId) || [];
+                        for (const el of elements) {
+                            let container = el.closest('ytd-rich-item-renderer') ||
+                                           el.closest('.ytGridShelfViewModelGridShelfItem') ||
+                                           el;
+                            container.style.display = 'none';
+                            container.classList.add('filtertube-hidden');
+                            container.setAttribute('data-filtertube-hidden', 'true');
+                            console.log(`FilterTube: Hiding Short ${videoId} from blocked channel`);
+                        }
+                    }
+                }
+            } catch (e) {
+                console.warn(`FilterTube: Failed to fetch channel for Short ${videoId}:`, e);
+            }
+        });
+        
+        await Promise.all(fetchPromises);
+    }
+    
+    // Re-run DOM fallback with fresh settings if we found matches
+    if (anyMatchesFound) {
+        console.log('FilterTube: Found Shorts from blocked channel, refreshing settings and re-running DOM fallback');
+        try {
+            const refreshed = await requestSettingsFromBackground();
+            if (refreshed?.success && refreshed.settings) {
+                currentSettings = refreshed.settings;
+                applyDOMFallback(refreshed.settings, { forceReprocess: true, preserveScroll: true });
+            }
+        } catch (e) {
+            console.warn('FilterTube: Failed to refresh after Shorts enrichment:', e);
+        }
+    }
+}
+
+/**
  * Fetch channel information from a shorts URL
  * @param {string} videoId - The shorts video ID
  * @returns {Promise<Object|null>} - {handle, name} or null
@@ -5159,6 +5306,12 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             applyDOMFallback(refreshedSettings || currentSettings, { forceReprocess: true, preserveScroll: true });
         } catch (domError) {
             console.warn('FilterTube: DOM fallback re-run failed after blocking channel', domError);
+        }
+
+        // Enrich all Shorts on the page with channel info so they can be matched to the blocked channel
+        // This is async and will re-run DOM fallback after enrichment completes
+        if (channelInfo.id) {
+            enrichVisibleShortsWithChannelInfo(channelInfo.id, refreshedSettings || currentSettings);
         }
 
     } catch (error) {
