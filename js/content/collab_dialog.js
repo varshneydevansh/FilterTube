@@ -167,6 +167,7 @@ function applyCollaboratorsToCard(entry, collaborators) {
     try {
         serializedCollaborators = JSON.stringify(sanitizedCollaborators);
         entry.card.setAttribute('data-filtertube-collaborators', serializedCollaborators);
+        entry.card.setAttribute('data-filtertube-collaborators-source', 'dialog');
     } catch (error) {
         console.warn('FilterTube: Failed to cache dialog collaborator metadata:', error);
     }
@@ -201,7 +202,33 @@ function applyCollaboratorsToCard(entry, collaborators) {
     }
 
     window.pendingCollabCards.delete(entry.key);
+    broadcastCollabDialogData({
+        entry,
+        collaborators: sanitizedCollaborators,
+        expectedCount
+    });
     // scheduleCollaboratorRefresh() and pendingCollabDialogTrigger are now handled in collab_dialog.js
+}
+
+function broadcastCollabDialogData({ entry, collaborators, expectedCount }) {
+    if (!Array.isArray(collaborators) || collaborators.length === 0) return;
+    const payload = {
+        videoId: entry?.videoId || entry?.card?.getAttribute('data-filtertube-video-id') || '',
+        collabKey: entry?.key || null,
+        collaborators,
+        expectedCount: expectedCount || collaborators.length,
+        timestamp: Date.now()
+    };
+
+    try {
+        window.postMessage({
+            type: 'FilterTube_CollabDialogData',
+            payload,
+            source: 'collab_dialog'
+        }, '*');
+    } catch (error) {
+        console.warn('FilterTube: Failed to broadcast collab dialog data:', error);
+    }
 }
 
 function extractCollaboratorsFromDialog(dialogNode) {

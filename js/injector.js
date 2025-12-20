@@ -231,11 +231,49 @@
     function extractCollaboratorsFromDataObject(obj) {
         if (!obj || typeof obj !== 'object') return null;
 
+        const extractFromShowDialogCommand = (showDialogCommand) => {
+            const listItems = showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems;
+            if (!Array.isArray(listItems) || listItems.length === 0) return null;
+
+            const collaborators = [];
+            for (const item of listItems) {
+                const viewModel = item?.listItemViewModel;
+                if (!viewModel) continue;
+
+                const title = viewModel.title?.content;
+                const subtitle = viewModel.subtitle?.content;
+                const browseEndpoint = viewModel.rendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint;
+
+                const collab = { name: title };
+                if (browseEndpoint?.canonicalBaseUrl) {
+                    const extracted = extractRawHandle(browseEndpoint.canonicalBaseUrl);
+                    if (extracted) collab.handle = extracted;
+                }
+                if (!collab.handle && subtitle) {
+                    const extracted = extractRawHandle(subtitle);
+                    if (extracted) collab.handle = extracted;
+                }
+                if (browseEndpoint?.browseId?.startsWith('UC')) {
+                    collab.id = browseEndpoint.browseId;
+                }
+
+                if (collab.handle || collab.id || collab.name) {
+                    collaborators.push(collab);
+                }
+            }
+
+            return collaborators.length > 0 ? collaborators : null;
+        };
+
         let renderer = obj;
         if (renderer.content?.videoRenderer) {
             renderer = renderer.content.videoRenderer;
         } else if (renderer.richItemRenderer?.content?.videoRenderer) {
             renderer = renderer.richItemRenderer.content.videoRenderer;
+        } else if (renderer.richItemRenderer?.content?.lockupViewModel) {
+            renderer = renderer.richItemRenderer.content.lockupViewModel;
+        } else if (renderer.lockupViewModel) {
+            renderer = renderer.lockupViewModel;
         } else if (renderer.gridVideoRenderer) {
             renderer = renderer.gridVideoRenderer;
         } else if (renderer.playlistVideoRenderer) {
@@ -244,6 +282,8 @@
             renderer = renderer.videoRenderer;
         } else if (renderer.data?.content?.videoRenderer) {
             renderer = renderer.data.content.videoRenderer;
+        } else if (renderer.data?.content?.lockupViewModel) {
+            renderer = renderer.data.content.lockupViewModel;
         }
 
         if (!renderer || typeof renderer !== 'object') return null;
@@ -254,41 +294,44 @@
                 const showDialogCommand = run.navigationEndpoint?.showDialogCommand;
                 if (!showDialogCommand) continue;
 
-                const listItems = showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems;
-                if (!Array.isArray(listItems) || listItems.length === 0) continue;
-
-                const collaborators = [];
-                for (const item of listItems) {
-                    const viewModel = item.listItemViewModel;
-                    if (!viewModel) continue;
-
-                    const title = viewModel.title?.content;
-                    const subtitle = viewModel.subtitle?.content;
-                    const browseEndpoint = viewModel.rendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint;
-
-                    const collab = { name: title };
-                    if (browseEndpoint?.canonicalBaseUrl) {
-                        const extracted = extractRawHandle(browseEndpoint.canonicalBaseUrl);
-                        if (extracted) collab.handle = extracted;
-                    }
-                    if (!collab.handle && subtitle) {
-                        const extracted = extractRawHandle(subtitle);
-                        if (extracted) collab.handle = extracted;
-                    }
-                    if (browseEndpoint?.browseId?.startsWith('UC')) {
-                        collab.id = browseEndpoint.browseId;
-                    }
-
-                    if (collab.handle || collab.id || collab.name) {
-                        collaborators.push(collab);
-                    }
-                }
-
-                if (collaborators.length > 0) {
-                    return collaborators;
-                }
+                const collaborators = extractFromShowDialogCommand(showDialogCommand);
+                if (collaborators) return collaborators;
             }
         }
+
+        // Home lockupViewModel often doesn't expose bylineText runs; fall back to a bounded deep scan
+        // for showDialogCommand anywhere inside the renderer.
+        const visited = new WeakSet();
+        function deepScanForShowDialog(node, depth = 0) {
+            if (!node || typeof node !== 'object' || visited.has(node) || depth > 10) return null;
+            visited.add(node);
+
+            if (node.showDialogCommand) {
+                const collaborators = extractFromShowDialogCommand(node.showDialogCommand);
+                if (collaborators) return collaborators;
+            }
+
+            if (Array.isArray(node)) {
+                for (const child of node.slice(0, 25)) {
+                    const found = deepScanForShowDialog(child, depth + 1);
+                    if (found) return found;
+                }
+                return null;
+            }
+
+            for (const key in node) {
+                if (!Object.prototype.hasOwnProperty.call(node, key)) continue;
+                const value = node[key];
+                if (!value || typeof value !== 'object') continue;
+                const found = deepScanForShowDialog(value, depth + 1);
+                if (found) return found;
+            }
+
+            return null;
+        }
+
+        const deepScanned = deepScanForShowDialog(renderer);
+        if (deepScanned) return deepScanned;
 
         const ownerRuns = renderer.ownerText?.runs || bylineText?.runs;
         if (ownerRuns) {
@@ -526,7 +569,7 @@
                 if (!obj || typeof obj !== 'object' || visited.has(obj) || depth > 12) return null;
                 visited.add(obj);
 
-                if (obj.videoId === videoId) {
+                if (obj.videoId === videoId || obj.contentId === videoId) {
                     const extracted = extractCollaboratorsFromDataObject(obj);
                     if (Array.isArray(extracted) && extracted.length > 0) {
                         postLog('log', '✅ Found collaborators via global ytInitialData');

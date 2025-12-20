@@ -198,6 +198,7 @@ async function handleDropdownAppearedInternal(dropdown) {
         'ytm-shorts-lockup-view-model, ' +              // ← Shorts in mobile/search
         'ytm-shorts-lockup-view-model-v2, ' +           // ← Shorts variant
         'ytm-item-section-renderer, ' +                 // ← Container for shorts
+        'yt-lockup-view-model, ' +                      // ← Modern video lockup (collabs)
         'ytd-rich-shelf-renderer'                       // ← Shelf containing shorts
     );
 
@@ -234,8 +235,7 @@ async function handleDropdownAppearedInternal(dropdown) {
                 if (existingMenuItem) {
                     // Check if the menu item has stale state (e.g., "✓ Channel Blocked" or "✓ Blocked")
                     const titleSpan = existingMenuItem.querySelector('.filtertube-menu-title');
-                    const titleText = titleSpan?.textContent || '';
-                    const isStaleState = titleText.includes('✓') || titleText.includes('Fetching') || titleText.includes('Blocking');
+                    const isStaleState = titleSpan?.textContent?.includes('✓') || titleSpan?.textContent?.includes('Blocking');
 
                     if (isStaleState) {
                         console.log('FilterTube: Menu item has stale state, re-injecting fresh');

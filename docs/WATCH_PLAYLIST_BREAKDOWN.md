@@ -238,6 +238,38 @@ if (filterId && resolvedId === filterId) {
 
 ---
 
+## Reference: Reverted Watch Patch (Dec 4, 2025)
+
+Although the Dec 4 patch was reverted, its ideas are still relevant for documenting the watch-playlist story. Key concepts to capture for future work:
+
+1. **Stable playlist layout so menus stay usable.**  
+   - `ytd-playlist-panel-video-renderer.filter-tube-visible` forced the row into a flex layout that preserved the stock 3‑dot menu alignment when FilterTube hid/showed nodes, preventing clipped menus during SPA inserts.@css/content.css#188-207
+
+2. **Channel metadata caching with timestamps.**  
+   - `cacheChannelMetadata()` stamped `data-filtertube-channel-id/handle/name` plus `data-filtertube-metadata-ts` so we could tell whether attributes were stale before trusting them again.@js/content_bridge.js#884-941  
+   - Playlist rows intentionally cached nothing except the byline to avoid “current video” bleed-through.
+
+3. **Grace-period + restore guardrails in DOM fallback.**  
+   - `applyDOMFallback()` skipped items recently marked `data-filtertube-blocked-state="pending"` and ran `syncBlockedElementsWithFilters()` + `restoreWatchPagePlaylistItems()` up front, ensuring freshly blocked playlist rows didn’t flicker back during reflows.@js/content_bridge.js#1411-1900
+
+4. **Reverse lookup for playlist refilter + mutation coverage.**  
+   - `refilterPlaylistItems()` built `nameToId` from `channelNames`, compared byline text to both handles (without `@`) and resolved IDs, and logged why each match occurred.  
+   - The playlist observer watched both `attributes` and `childList`, debounced refiltering (100 ms), and kicked off an immediate scan whenever new nodes appeared.@js/content_bridge.js#2638-3200
+
+5. **Player coordination + skip journal.**  
+   - `stopMainPlayerPlayback()` paused/muted the movie player before navigating.  
+   - `checkAndSkipHiddenVideo()` tracked last indices, preferred skip direction, and recent attempts to avoid looped skips, then retried via DOM click or player APIs before falling back to pausing everything.@js/content_bridge.js#2557-3356
+
+6. **Main‑world lookups for sparse cards.**  
+   - `requestChannelInfoFromMainWorld()` and injector-side caches served playlist rows and `yt-lockup-view-model` cards by videoId, optionally using byline hints to verify collaborator matches before persisting the response.@js/content_bridge.js#2029-2205 @js/injector.js#8-226
+
+7. **Blocked-element reconciliation heuristics.**  
+   - Elements lacking an ID/handle derived a “guessed handle” from the byline so they could stay hidden until the async lookup completed, closing the restore gap documented above.@js/content_bridge.js#3487-3780
+
+Documenting these behaviors keeps the rationale visible even though the implementation is currently absent, and it frames the requirements for any future watch-page rework.
+
+---
+
 ### Summary: What We Want vs What Happens
 
 | Desired Behavior | Current Behavior |

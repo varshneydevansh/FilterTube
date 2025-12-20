@@ -52,3 +52,30 @@
 3. Refactor playlist refilter/restore to ignore cached IDs and rely on `channelNames` reverse lookup only.
 4. Normalize storage logic to keep both UC ID and @ handle in lockstep (background + channelMap).
 5. Add targeted console diagnostics & manual test matrix (BTS, Shakira collaborations, non-collab playlist items).
+
+---
+
+## Appendix A – Reverted Watch Patch Artifacts (Dec 4, 2025)
+
+The reverted watch-page patch already experimented with most of the remedies listed above. We no longer ship this code, but documenting the behavior clarifies what “good” looked like:
+
+1. **`requestChannelInfoFromMainWorld(videoId, expectedName)`**  
+   - Isolated world bundled the byline name with the videoId so injector.js could pick the collaborator whose `name`/`handle` matched that byline before responding.  
+   - Prevented caching Pitbull’s ID onto BTS rows when playlists mixed channels.
+
+2. **`cacheChannelMetadata(element, meta)` with timestamps**  
+   - Added `data-filtertube-metadata-ts` to detect stale attributes and skipped caching for playlist-panel rows until both handle + ID had been verified against the byline hint.
+
+3. **“Confirmed source” vs “guess” attributes**  
+   - Playlist rows only stored the byline (`data-filtertube-channel-name`) unless the async lookup returned a matching ID/handle. Watch right-rail cards marked `data-filtertube-channel-source="main-world"` so DOM refilter logic could ignore guessed handles.
+
+4. **Pending-channel grace period**  
+   - Elements newly marked as blocked set `data-filtertube-blocked-state="pending"` + timestamp, and DOM fallback refused to “restore” them for 5 s. This kept the queue from flickering when handles arrived late.
+
+5. **Reverse lookup table + dialog hints**  
+   - `channelNames` stored `{ id, handle, name }`, enabling `nameToId` resolution inside playlist refilter, while `expectedName` ensured the lookup only succeeded if names actually matched.
+
+6. **Injector caches**  
+   - `FilterTube_CacheChannelInfo` messages sent from `filter_logic.js` populated a `channelCache` map keyed by videoId. Each `FilterTube_RequestChannelInfo` first hit that cache, then fell back to scanning `ytInitialData` with the provided expected name/handle hints.
+
+When we port these ideas back into home collab fixes, we should call out whether we need the full set (e.g., timestamped cache metadata) or just the byline hint plumbing to keep channel identity sane.
