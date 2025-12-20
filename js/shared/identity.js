@@ -417,6 +417,81 @@
         return match ? match[1] : '';
     }
 
+    function fastExtractIdentityFromHtmlChunk(htmlChunk) {
+        if (!htmlChunk || typeof htmlChunk !== 'string') return null;
+
+        const result = {};
+
+        const idMatch = htmlChunk.match(/"browseId":"(UC[\w-]{22})"/i);
+        if (idMatch && idMatch[1]) {
+            result.id = idMatch[1];
+        }
+
+        const canonicalBaseMatch = htmlChunk.match(/"canonicalBaseUrl":"(\/[^"]+)"/i);
+        if (canonicalBaseMatch && canonicalBaseMatch[1]) {
+            assignCanonicalPathIdentity(canonicalBaseMatch[1], result);
+        }
+
+        const canonicalLinkMatch = htmlChunk.match(/<link rel="canonical" href="https:\/\/www\.youtube\.com\/([^"]+)"/i);
+        if (canonicalLinkMatch && canonicalLinkMatch[1]) {
+            assignCanonicalPathIdentity(`/${canonicalLinkMatch[1]}`, result);
+        }
+
+        const ownerLinkMatch = htmlChunk.match(/<link itemprop="url" href="https?:\/\/www\.youtube\.com\/([^">]+)">/i);
+        if (ownerLinkMatch && ownerLinkMatch[1]) {
+            assignCanonicalPathIdentity(`/${ownerLinkMatch[1]}`, result);
+        }
+
+        if (!result.handle) {
+            const genericHandleMatch = htmlChunk.match(/href="\/(@[^"\/]+)(?:\/shorts|")/i);
+            if (genericHandleMatch && genericHandleMatch[1]) {
+                result.handle = extractRawHandle(genericHandleMatch[1]);
+            }
+        }
+
+        if (!result.id) {
+            const ucMetaMatch = htmlChunk.match(/<meta itemprop="channelId" content="(UC[\w-]{22})"/i);
+            if (ucMetaMatch && ucMetaMatch[1]) {
+                result.id = ucMetaMatch[1];
+            }
+        }
+
+        if (!result.name) {
+            const titleMatch = htmlChunk.match(/"channelTitleText":\{"runs":\[\{"text":"([^"]+)"/i) ||
+                htmlChunk.match(/"title":{"simpleText":"([^"]+)"}/i) ||
+                htmlChunk.match(/"ownerChannelName":"([^"]+)"/i);
+            if (titleMatch && titleMatch[1]) {
+                result.name = titleMatch[1];
+            }
+        }
+
+        if (!result.id && !result.handle && !result.customUrl) {
+            return null;
+        }
+
+        return result;
+    }
+
+    function assignCanonicalPathIdentity(rawPath, result) {
+        if (!rawPath || typeof rawPath !== 'string') return;
+        const cleaned = rawPath.trim();
+        if (!cleaned) return;
+
+        if (cleaned.startsWith('/@')) {
+            const handle = extractRawHandle(cleaned);
+            if (handle) {
+                result.handle = handle;
+            }
+            return;
+        }
+
+        const normalizedPath = cleaned.replace(/^\//, '');
+        if (!normalizedPath) return;
+        if (normalizedPath.startsWith('c/') || normalizedPath.startsWith('user/')) {
+            result.customUrl = normalizedPath;
+        }
+    }
+
     /**
      * True if `channelInfo` matches any entry in `filterChannels`.
      */
@@ -434,7 +509,8 @@
         channelMatchesFilter,
         isChannelBlocked,
         extractCustomUrlFromPath,
-        extractChannelIdFromPath
+        extractChannelIdFromPath,
+        fastExtractIdentityFromHtmlChunk
     };
 
     const existing = root.FilterTubeIdentity && typeof root.FilterTubeIdentity === 'object'

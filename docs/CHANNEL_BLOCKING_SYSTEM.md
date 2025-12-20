@@ -73,6 +73,12 @@ The system maintains two bidirectional lookup maps in local storage:
 2. **`videoChannelMap`**: `videoId -> UC ID`.
    - Used for Shorts. Since many Shorts cards lack identity, we store the mapping after the first successful resolution so it works offline/instantly on next load.
 
+### 2.4 Custom URL normalization (`/c/Name`, `/user/Name`)
+- All worlds call into the helpers in `js/shared/identity.js` to normalize canonicalBaseUrl strings into predictable keys (`c/<slug>` or `user/<slug>`, percent-decoding as needed).
+- `background.js:fetchChannelInfo()` now fetches `/c/<slug>` or `/user/<slug>` directly and records the resulting UC ID back into `channelMap`.
+- `content_bridge.js` and `filter_logic.js` both consult `channelMap` before falling back to network, so DOM-only custom URL cards still hide immediately once a mapping is learned.
+- Prefetch (section 5.4) persists any newly learned mapping into `videoChannelMap`, so future encounters are zero-network even on poor connections.
+
 ---
 
 ## 3. Data Sources for Channel Info (Where IDs/Handles Come From)
@@ -168,6 +174,23 @@ Therefore, the system is hybrid:
 - resolve identity asynchronously (Shorts page fetch / about fetch / ytInitialData)
 - persist mapping
 
+### 5.4 Flash reduction & prefetch (Dec 2025 hardening)
+- **Observer & queue parameters** (all in `js/content_bridge.js`):
+  - IntersectionObserver with `rootMargin: 400px 0px 800px 0px` and `threshold: 0` so we start resolving ~1–2 viewports before a card becomes visible.
+  - At most 60 cards are observed per scan (`attachPrefetchObservers`) to keep overhead low on long feeds.
+  - Prefetch queue is capped at 10 pending entries, concurrency at 2, and each fetch has a 5 s timeout. The queue pauses automatically when the tab is hidden.
+- **Handle → UC pre-stamp**:
+  - `queuePrefetchForCard()` first calls `resetCardIdentityIfStale()` / `getValidatedCachedCollaborators()` to clear recycled DOM nodes.
+  - If the card already exposes a handle, we consult `channelMap` immediately (`resolveIdFromHandle`). On a hit we stamp the UC ID, persist it via `persistVideoChannelMapping()`, and skip any network fetch.
+- **Network fallback path**:
+  - Shorts cards hit `fetchChannelFromShortsUrl()` (background streaming fetch with early abort); everything else calls `fetchChannelFromWatchUrl()`.
+  - Results are merged with any known handle/customUrl before stamping to maximize UC coverage.
+- **Double refilter**: every call to `stampChannelIdentity()` fires `applyDOMFallback(null)` twice (0 ms and ~60 ms later) to catch late paints/layout settle. Collaboration stamping (`applyResolvedCollaborators`, `applyCollaboratorsByVideoId`) does the same with `{ forceReprocess: true }`.
+- **Stale cleanup & collaboration sync**:
+  - `resetCardIdentityIfStale()` drops all FilterTube attributes if `data-filtertube-video-id` mismatches the current card videoId.
+  - `getValidatedCachedCollaborators()` ensures collaboration metadata matches the current video; otherwise it clears cached rosters and re-requests dialog/main-world data.
+  - `propagateCollaboratorsToMatchingCards()` reuses resolved rosters across recycled cards, so collaborator-heavy videos hide instantly after the first resolution.
+
 ---
 
 ## 6. Known Failure Modes (Current)
@@ -198,6 +221,21 @@ Risk areas:
 ### 6.4 Stale cached card attributes
 - Cards may be recycled by YouTube SPA.
 - If `data-filtertube-channel-id/handle/name` survives recycling, future matching can be wrong.
+
+Mitigation (Dec 2025):
+- `resetCardIdentityIfStale()` detects mismatched `data-filtertube-video-id` and clears all FilterTube attrs before the card is queued for prefetch.
+- Collaboration cards additionally call `getValidatedCachedCollaborators()` to wipe stale collaborator rosters before requesting dialog data.
+
+### 6.5 Custom URL (`/c/Name`, `/user/Name`) handling gaps
+- Legacy channels often expose only `canonicalBaseUrl` (e.g., `/c/VídeoseMensagens`).
+- Historically inconsistencies between background/content extraction caused missing UC mappings.
+
+Mitigation:
+- `filter_logic.js`, `content_bridge.js`, and `background.js` now normalize custom URLs into `c/<slug>` or `user/<slug>` via shared helpers (`identity.js`) and push them into `channelMap`.
+- When a card surfaces only a custom URL, prefetch resolves via `channelMap` before any network fetch and persists the UC ID in `videoChannelMap` so future encounters hide immediately (even offline).
+
+Remaining gap:
+- If a brand-new `/c/` slug is encountered and no UC mapping exists anywhere, we still need to fetch the channel page (`background.js:fetchChannelInfo`). This flow is unchanged; just be aware of potential latency.
 
 ---
 

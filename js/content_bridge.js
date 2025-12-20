@@ -141,6 +141,17 @@ function clearFilterTubeMenuItems(dropdown) {
     dropdown.querySelectorAll('.filtertube-block-channel-item').forEach(item => item.remove());
 }
 
+function waitForNextFrameDelay(delayMs = 0) {
+    return new Promise((resolve) => {
+        const schedule = () => setTimeout(resolve, Math.max(0, delayMs));
+        if (typeof requestAnimationFrame === 'function') {
+            requestAnimationFrame(schedule);
+        } else {
+            schedule();
+        }
+    });
+}
+
 function injectCollaboratorPlaceholderMenu(newMenuList, oldMenuList, message = 'Fetching collaborators…') {
     const blockAllMessage = 'Block All (pending…)';
     const newStructure = Boolean(newMenuList);
@@ -393,6 +404,236 @@ let statsTotalSeconds = 0; // Track total seconds saved instead of using multipl
 let statsLastDate = new Date().toDateString();
 let statsInitialized = false;
 
+// ==========================
+// PREFETCH / HYDRATION QUEUE
+// ==========================
+const PREFETCH_MAX_QUEUE = 10;
+const PREFETCH_CONCURRENCY = 2;
+const PREFETCH_TIMEOUT_MS = 5000;
+let prefetchQueue = [];
+let prefetchActive = 0;
+const prefetchSeen = new Set();
+let prefetchObserver = null;
+let prefetchPaused = false;
+const observedPrefetchCards = new WeakSet();
+let prefetchScanScheduled = false;
+
+function schedulePrefetchScan() {
+    if (prefetchScanScheduled) return;
+    prefetchScanScheduled = true;
+    requestAnimationFrame(() => {
+        prefetchScanScheduled = false;
+        attachPrefetchObservers();
+    });
+}
+
+function attachPrefetchObservers() {
+    if (!prefetchObserver || typeof document.querySelectorAll !== 'function') return;
+    const cards = document.querySelectorAll(typeof VIDEO_CARD_SELECTORS === 'string' ? VIDEO_CARD_SELECTORS : 'ytd-rich-item-renderer');
+    let attached = 0;
+    for (const card of cards) {
+        if (observedPrefetchCards.has(card)) continue;
+        observedPrefetchCards.add(card);
+        prefetchObserver.observe(card);
+        attached++;
+        if (attached >= 60) break;
+    }
+}
+
+function startCardPrefetchObserver() {
+    if (prefetchObserver || typeof IntersectionObserver !== 'function') return;
+
+    prefetchObserver = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            queuePrefetchForCard(entry.target);
+        }
+    }, {
+        root: null,
+        rootMargin: '400px 0px 800px 0px',
+        threshold: 0
+    });
+
+    document.addEventListener('visibilitychange', () => {
+        prefetchPaused = document.hidden;
+        if (!prefetchPaused) drainPrefetchQueue();
+    });
+
+    attachPrefetchObservers();
+}
+
+function queuePrefetchForCard(card) {
+    const videoId = ensureVideoIdForCard(card);
+    if (!videoId) return;
+
+    resetCardIdentityIfStale(card, videoId);
+    // Also clear stale collaborator metadata if this DOM node was recycled
+    getValidatedCachedCollaborators(card);
+
+    const existingId = card.getAttribute('data-filtertube-channel-id');
+    const existingHandle = card.getAttribute('data-filtertube-channel-handle');
+
+    // If we already have an ID, persist and skip
+    if (existingId) {
+        persistVideoChannelMapping(videoId, existingId);
+        return;
+    }
+
+    // If we only have a handle, try to resolve to UC ID immediately using channelMap
+    if (!existingId && existingHandle) {
+        const resolvedId = resolveIdFromHandle(existingHandle);
+        if (resolvedId) {
+            stampChannelIdentity(card, { id: resolvedId, handle: existingHandle });
+            persistVideoChannelMapping(videoId, resolvedId);
+            return;
+        }
+    }
+
+    const key = videoId;
+    if (prefetchSeen.has(key)) return;
+    prefetchSeen.add(key);
+
+    prefetchQueue.push({ videoId, card });
+    if (prefetchQueue.length > PREFETCH_MAX_QUEUE) {
+        prefetchQueue.shift();
+    }
+    drainPrefetchQueue();
+}
+
+function drainPrefetchQueue() {
+    if (prefetchPaused || document.hidden) return;
+    while (prefetchActive < PREFETCH_CONCURRENCY && prefetchQueue.length > 0) {
+        const item = prefetchQueue.shift();
+        prefetchActive++;
+        prefetchIdentityForCard(item).finally(() => {
+            prefetchActive--;
+            drainPrefetchQueue();
+        });
+    }
+}
+
+function withTimeout(promise, ms) {
+    return Promise.race([
+        promise,
+        new Promise((resolve) => setTimeout(() => resolve(null), ms))
+    ]);
+}
+
+async function prefetchIdentityForCard({ videoId, card }) {
+    try {
+        if (!card || !card.isConnected) return;
+
+        // If settings already know this mapping, bail early
+        if (currentSettings?.videoChannelMap && currentSettings.videoChannelMap[videoId]) {
+            return;
+        }
+
+        // Light DOM extraction first (no logging on failure)
+        try {
+            const info = extractChannelFromCard(card);
+            if (info?.id || info?.handle || info?.customUrl) {
+                stampChannelIdentity(card, info);
+                if (info.id) {
+                    currentSettings = currentSettings || {};
+                    currentSettings.videoChannelMap = currentSettings.videoChannelMap || {};
+                    currentSettings.videoChannelMap[videoId] = info.id;
+                    browserAPI_BRIDGE.runtime.sendMessage({
+                        action: 'updateVideoChannelMap',
+                        videoId,
+                        channelId: info.id
+                    });
+                }
+                return;
+            }
+        } catch (e) {
+            // swallow; prefetch should stay silent
+        }
+
+        const isShorts = card.tagName.toLowerCase().includes('shorts') || card.tagName.toLowerCase().includes('reel');
+        const fetchPromise = isShorts
+            ? fetchChannelFromShortsUrl(videoId, null)
+            : fetchChannelFromWatchUrl(videoId, null);
+
+        const result = await withTimeout(fetchPromise, PREFETCH_TIMEOUT_MS);
+        if (result && (result.id || result.handle || result.customUrl)) {
+            // If no id but have handle, try resolve via channelMap
+            if (!result.id && result.handle) {
+                const resolvedId = resolveIdFromHandle(result.handle);
+                if (resolvedId) {
+                    result.id = resolvedId;
+                }
+            }
+            stampChannelIdentity(card, result);
+            if (result.id) {
+                persistVideoChannelMapping(videoId, result.id);
+            }
+        }
+    } catch (e) {
+        // keep silent in prefetch
+    }
+}
+
+function stampChannelIdentity(card, info) {
+    if (!card || !info) return;
+    if (info.id) card.setAttribute('data-filtertube-channel-id', info.id);
+    if (info.handle) card.setAttribute('data-filtertube-channel-handle', info.handle);
+    if (info.customUrl) card.setAttribute('data-filtertube-channel-custom', info.customUrl);
+
+    // Trigger a light refilter so already-rendered cards hide without waiting for next DOM mutation
+    if (typeof applyDOMFallback === 'function') {
+        setTimeout(() => {
+            try {
+                applyDOMFallback(null);
+            } catch (e) {
+                // ignore
+            }
+        }, 0);
+        // Second pass a hair later to catch late paints/layout settle
+        setTimeout(() => {
+            try {
+                applyDOMFallback(null);
+            } catch (e) {
+                // ignore
+            }
+        }, 60);
+    }
+}
+
+function resetCardIdentityIfStale(card, videoId) {
+    if (!card) return;
+    const cachedId = card.getAttribute('data-filtertube-video-id');
+    if (cachedId && videoId && cachedId !== videoId) {
+        clearBlockedElementAttributes(card);
+        card.removeAttribute('data-filtertube-channel-id');
+        card.removeAttribute('data-filtertube-channel-handle');
+        card.removeAttribute('data-filtertube-channel-custom');
+    }
+    if (!cachedId && videoId) {
+        card.setAttribute('data-filtertube-video-id', videoId);
+    }
+}
+
+function resolveIdFromHandle(handle) {
+    if (!handle) return '';
+    const normalized = normalizeHandleValue(handle);
+    if (!normalized) return '';
+    const map = currentSettings?.channelMap || {};
+    const direct = map[normalized] || map[normalized.toLowerCase()];
+    if (direct && direct.startsWith('UC')) return direct;
+    return '';
+}
+
+function persistVideoChannelMapping(videoId, channelId) {
+    if (!videoId || !channelId) return;
+    currentSettings = currentSettings || {};
+    currentSettings.videoChannelMap = currentSettings.videoChannelMap || {};
+    currentSettings.videoChannelMap[videoId] = channelId;
+    browserAPI_BRIDGE.runtime.sendMessage({
+        action: 'updateVideoChannelMap',
+        videoId,
+        channelId
+    });
+}
 
 // ==========================================
 // HIDE/RESTORE TRACKING FOR DEBUGGING
@@ -1208,6 +1449,16 @@ function applyResolvedCollaborators(videoId, collaborators, options = {}) {
         expectedCount
     });
 
+    if (typeof applyDOMFallback === 'function') {
+        setTimeout(() => {
+            try {
+                applyDOMFallback(null, { preserveScroll: true, forceReprocess: true });
+            } catch (e) {
+                // ignore
+            }
+        }, 0);
+    }
+
     return updated;
 }
 
@@ -1281,6 +1532,16 @@ function applyCollaboratorsByVideoId(videoId, collaborators, options = {}) {
         expectedCount: options.expectedCount || sanitized.length,
         force: options.force
     });
+
+    if (typeof applyDOMFallback === 'function') {
+        setTimeout(() => {
+            try {
+                applyDOMFallback(null, { preserveScroll: true, forceReprocess: true });
+            } catch (e) {
+                // ignore
+            }
+        }, 0);
+    }
 
     return updatedAnyCard;
 }
@@ -2288,6 +2549,11 @@ async function initializeDOMFallback(settings) {
                 scheduleImmediateFallback();
             }, { once: true });
         }
+
+        // Start prefetch observer once DOM fallback is initialized
+        startCardPrefetchObserver();
+        // Schedule a scan to attach observer to existing cards
+        schedulePrefetchScan();
     }
 }
 
@@ -2663,181 +2929,170 @@ async function enrichVisibleShortsWithChannelInfo(blockedChannelId, settings) {
  * @returns {Promise<Object|null>} - {handle, name} or null
  */
 async function fetchChannelFromShortsUrl(videoId, requestedHandle = null) {
-    // Check if there's already a pending fetch for this video
+    if (!videoId || typeof videoId !== 'string') return null;
+
     if (pendingShortsFetches.has(videoId)) {
         console.log('FilterTube: Reusing existing fetch for shorts video:', videoId);
-        return await pendingShortsFetches.get(videoId);
+        return pendingShortsFetches.get(videoId);
     }
 
-    // Create new fetch promise
     const fetchPromise = (async () => {
+        const normalizedExpected = normalizeHandleValue(requestedHandle);
         try {
-            console.log('FilterTube: Fetching shorts page for video:', videoId);
-            const response = await fetch(`https://www.youtube.com/shorts/${videoId}`, {
-                credentials: 'same-origin',
-                headers: {
-                    'Accept': 'text/html'
-                }
+            const response = await browserAPI_BRIDGE.runtime.sendMessage({
+                action: 'fetchShortsIdentity',
+                type: 'fetchShortsIdentity',
+                videoId,
+                expectedHandle: normalizedExpected || ''
             });
 
-            if (!response.ok) {
-                console.error('FilterTube: Failed to fetch shorts page:', response.status);
-                return null;
+            if (response?.success && response.identity) {
+                const identity = response.identity;
+                const candidateHandle = identity.handle || identity.canonicalHandle || '';
+                const normalizedFound = normalizeHandleValue(candidateHandle);
+
+                if (!normalizedExpected || !normalizedFound || normalizedFound === normalizedExpected) {
+                    return {
+                        id: identity.id || null,
+                        handle: candidateHandle || null,
+                        name: identity.name || '',
+                        customUrl: identity.customUrl || null,
+                        videoId
+                    };
+                }
             }
+        } catch (error) {
+            console.debug('FilterTube: Background shorts identity fetch failed, falling back to direct fetch', error);
+        }
 
-            const html = await response.text();
+        return await fetchChannelFromShortsUrlDirect(videoId, requestedHandle, normalizedExpected);
+    })().finally(() => {
+        pendingShortsFetches.delete(videoId);
+    });
 
-            const normalizedExpected = normalizeHandleValue(requestedHandle);
+    pendingShortsFetches.set(videoId, fetchPromise);
+    return fetchPromise;
+}
 
-            // Method 1: Extract from ytInitialData JSON in the HTML
-            const ytInitialDataMatch = html.match(/var ytInitialData = ({.+?});/);
-            if (ytInitialDataMatch) {
-                try {
-                    const ytInitialData = JSON.parse(ytInitialDataMatch[1]);
+async function fetchChannelFromShortsUrlDirect(videoId, requestedHandle = null, normalizedExpected = null) {
+    try {
+        console.log('FilterTube: Fetching shorts page directly for video:', videoId);
+        const response = await fetch(`https://www.youtube.com/shorts/${videoId}`, {
+            credentials: 'same-origin',
+            headers: {
+                'Accept': 'text/html'
+            }
+        });
 
-                    // Look for channel info in various locations (engagement panels, overlay, etc.)
-                    const engagementPanels = ytInitialData?.engagementPanels;
-                    const overlay = ytInitialData?.overlay?.reelPlayerOverlayRenderer;
+        if (!response.ok) {
+            console.debug('FilterTube: Direct shorts fetch failed:', response.status);
+            return null;
+        }
 
-                    // Try to find channel info in engagement panels (common location)
-                    if (engagementPanels && Array.isArray(engagementPanels)) {
-                        for (const panel of engagementPanels) {
-                            const header = panel?.engagementPanelSectionListRenderer?.header?.engagementPanelTitleHeaderRenderer;
-                            if (header?.menu?.menuRenderer?.items) {
-                                for (const item of header.menu.menuRenderer.items) {
-                                    const endpoint = item?.menuNavigationItemRenderer?.navigationEndpoint?.browseEndpoint;
-                                    if (endpoint?.browseId && endpoint?.canonicalBaseUrl) {
-                                        const handle = endpoint.canonicalBaseUrl.replace('/user/', '@').replace(/^\//, '');
-                                        const id = endpoint.browseId && endpoint.browseId.startsWith('UC') ? endpoint.browseId : null;
-                                        console.log('FilterTube: Found channel in ytInitialData (engagement panel):', { handle, id });
-                                        if (normalizedExpected) {
-                                            const normalizedFound = normalizeHandleValue(handle);
-                                            if (!normalizedFound || normalizedFound !== normalizedExpected) {
-                                                console.warn('FilterTube: Shorts engagement panel handle mismatch, rejecting', { expected: normalizedExpected, found: normalizedFound });
-                                                continue;
-                                            }
-                                        }
+        const html = await response.text();
+        const normalizedHandleExpectation = normalizedExpected || normalizeHandleValue(requestedHandle);
+
+        const ytInitialDataMatch = html.match(/var ytInitialData = ({.+?});/);
+        if (ytInitialDataMatch) {
+            try {
+                const ytInitialData = JSON.parse(ytInitialDataMatch[1]);
+                const engagementPanels = ytInitialData?.engagementPanels;
+                const overlay = ytInitialData?.overlay?.reelPlayerOverlayRenderer;
+
+                if (engagementPanels && Array.isArray(engagementPanels)) {
+                    for (const panel of engagementPanels) {
+                        const header = panel?.engagementPanelSectionListRenderer?.header?.engagementPanelTitleHeaderRenderer;
+                        if (header?.menu?.menuRenderer?.items) {
+                            for (const item of header.menu.menuRenderer.items) {
+                                const endpoint = item?.menuNavigationItemRenderer?.navigationEndpoint?.browseEndpoint;
+                                if (endpoint?.browseId && endpoint?.canonicalBaseUrl) {
+                                    const handle = endpoint.canonicalBaseUrl.replace('/user/', '@').replace(/^\//, '');
+                                    const id = endpoint.browseId && endpoint.browseId.startsWith('UC') ? endpoint.browseId : null;
+                                    const normalizedFound = normalizeHandleValue(handle);
+                                    if (!normalizedHandleExpectation || normalizedFound === normalizedHandleExpectation) {
                                         return { handle, id, name: '' };
                                     }
                                 }
                             }
                         }
                     }
+                }
 
-                    // Try overlay data
-                    if (overlay?.reelPlayerHeaderSupportedRenderers?.reelPlayerHeaderRenderer) {
-                        const headerRenderer = overlay.reelPlayerHeaderSupportedRenderers.reelPlayerHeaderRenderer;
-                        const channelNavEndpoint = headerRenderer?.channelNavigationEndpoint?.browseEndpoint;
-                        if (channelNavEndpoint?.browseId && channelNavEndpoint?.canonicalBaseUrl) {
-                            const handle = channelNavEndpoint.canonicalBaseUrl.replace('/user/', '@').replace(/^\//, '');
-                            const id = channelNavEndpoint.browseId && channelNavEndpoint.browseId.startsWith('UC')
-                                ? channelNavEndpoint.browseId
-                                : null;
-                            console.log('FilterTube: Found channel in ytInitialData (overlay):', { handle, id });
-                            if (normalizedExpected) {
-                                const normalizedFound = normalizeHandleValue(handle);
-                                if (!normalizedFound || normalizedFound !== normalizedExpected) {
-                                    console.warn('FilterTube: Shorts overlay handle mismatch, rejecting', { expected: normalizedExpected, found: normalizedFound });
-                                } else {
-                                    return {
-                                        handle,
-                                        id,
-                                        name: headerRenderer.channelTitleText?.runs?.[0]?.text || ''
-                                    };
-                                }
-                            } else {
-                                return {
-                                    handle,
-                                    id,
-                                    name: headerRenderer.channelTitleText?.runs?.[0]?.text || ''
-                                };
-                            }
+                if (overlay?.reelPlayerHeaderSupportedRenderers?.reelPlayerHeaderRenderer) {
+                    const headerRenderer = overlay.reelPlayerHeaderSupportedRenderers.reelPlayerHeaderRenderer;
+                    const channelNavEndpoint = headerRenderer?.channelNavigationEndpoint?.browseEndpoint;
+                    if (channelNavEndpoint?.browseId && channelNavEndpoint?.canonicalBaseUrl) {
+                        const handle = channelNavEndpoint.canonicalBaseUrl.replace('/user/', '@').replace(/^\//, '');
+                        const id = channelNavEndpoint.browseId && channelNavEndpoint.browseId.startsWith('UC')
+                            ? channelNavEndpoint.browseId
+                            : null;
+                        const normalizedFound = normalizeHandleValue(handle);
+                        if (!normalizedHandleExpectation || normalizedFound === normalizedHandleExpectation) {
+                            return {
+                                handle,
+                                id,
+                                name: headerRenderer.channelTitleText?.runs?.[0]?.text || ''
+                            };
                         }
                     }
+                }
 
-                    // Generic deep search over ytInitialData using renderer-style traversal
-                    // Skip this when we have an expected handle because it often returns unrelated channels.
-                    if (!normalizedExpected) {
-                        const deepResult = extractChannelFromInitialData(ytInitialData, {
-                            videoId,
-                            expectedHandle: requestedHandle
-                        });
-                        if (deepResult) {
-                            return deepResult;
-                        }
+                if (!normalizedHandleExpectation) {
+                    const deepResult = extractChannelFromInitialData(ytInitialData, {
+                        videoId,
+                        expectedHandle: requestedHandle
+                    });
+                    if (deepResult) {
+                        return deepResult;
                     }
-                } catch (e) {
-                    console.warn('FilterTube: Failed to parse ytInitialData from shorts page:', e);
                 }
+            } catch (e) {
+                console.debug('FilterTube: Failed to parse ytInitialData from shorts page:', e);
             }
-
-            // Method 2: Extract from meta tags
-            const channelUrlMatch = html.match(/<link rel="canonical" href="https:\/\/www\.youtube\.com\/(@[^"]+)"/);
-            if (channelUrlMatch) {
-                const handle = extractRawHandle(channelUrlMatch[1]);
-                const normalizedFound = normalizeHandleValue(handle);
-                if (!normalizedExpected || normalizedFound === normalizedExpected) {
-                    console.log('FilterTube: Found channel in canonical link:', handle);
-                    return { handle, name: '' };
-                } else {
-                    console.warn('FilterTube: Shorts canonical handle mismatch, rejecting', { expected: normalizedExpected, found: normalizedFound });
-                }
-            }
-
-            // Method 3: Extract from page owner link
-            const ownerLinkMatch = html.match(/<link itemprop="url" href="https?:\/\/www\.youtube\.com\/(@[^">]+)">/);
-            if (ownerLinkMatch) {
-                const handle = extractRawHandle(ownerLinkMatch[1]);
-                const normalizedFound = normalizeHandleValue(handle);
-                if (!normalizedExpected || normalizedFound === normalizedExpected) {
-                    console.log('FilterTube: Found channel in owner link:', handle);
-                    return { handle, name: '' };
-                } else {
-                    console.warn('FilterTube: Shorts owner link handle mismatch, rejecting', { expected: normalizedExpected, found: normalizedFound });
-                }
-            }
-
-            // Method 4: Extract from channel bar link (more flexible)
-            const channelBarMatch = html.match(/href="\/(@[^"\/]+)\/shorts"/);
-            if (channelBarMatch) {
-                const handle = extractRawHandle(channelBarMatch[1]);
-                const normalizedFound = normalizeHandleValue(handle);
-                if (!normalizedExpected || normalizedFound === normalizedExpected) {
-                    console.log('FilterTube: Found channel in channel bar link:', handle);
-                    return { handle, name: '' };
-                } else {
-                    console.warn('FilterTube: Shorts channel bar handle mismatch, rejecting', { expected: normalizedExpected, found: normalizedFound });
-                }
-            }
-
-            // Method 5: Extract from any @handle link (handling both /shorts and direct links)
-            const anyHandleMatch = html.match(/href="\/(@[^"\/]+)(?:\/shorts|")/);
-            if (anyHandleMatch) {
-                const handle = extractRawHandle(anyHandleMatch[1]);
-                const normalizedFound = normalizeHandleValue(handle);
-                if (!normalizedExpected || normalizedFound === normalizedExpected) {
-                    console.log('FilterTube: Found channel in href attribute:', handle);
-                    return { handle, name: '' };
-                } else {
-                    console.warn('FilterTube: Shorts href handle mismatch, rejecting', { expected: normalizedExpected, found: normalizedFound });
-                }
-            }
-
-            console.warn('FilterTube: Could not extract channel info from shorts page');
-            return null;
-        } catch (error) {
-            console.error('FilterTube: Error fetching shorts page:', error);
-            return null;
-        } finally {
-            // Clean up pending fetch
-            pendingShortsFetches.delete(videoId);
         }
-    })();
 
-    // Store the promise
-    pendingShortsFetches.set(videoId, fetchPromise);
+        const channelUrlMatch = html.match(/<link rel="canonical" href="https:\/\/www\.youtube\.com\/(@[^"]+)"/);
+        if (channelUrlMatch) {
+            const handle = extractRawHandle(channelUrlMatch[1]);
+            const normalizedFound = normalizeHandleValue(handle);
+            if (!normalizedHandleExpectation || normalizedFound === normalizedHandleExpectation) {
+                return { handle, name: '' };
+            }
+        }
 
-    return await fetchPromise;
+        const ownerLinkMatch = html.match(/<link itemprop="url" href="https?:\/\/www\.youtube\.com\/(@[^">]+)">/);
+        if (ownerLinkMatch) {
+            const handle = extractRawHandle(ownerLinkMatch[1]);
+            const normalizedFound = normalizeHandleValue(handle);
+            if (!normalizedHandleExpectation || normalizedFound === normalizedHandleExpectation) {
+                return { handle, name: '' };
+            }
+        }
+
+        const channelBarMatch = html.match(/href="\/(@[^"\/]+)\/shorts"/);
+        if (channelBarMatch) {
+            const handle = extractRawHandle(channelBarMatch[1]);
+            const normalizedFound = normalizeHandleValue(handle);
+            if (!normalizedHandleExpectation || normalizedFound === normalizedHandleExpectation) {
+                return { handle, name: '' };
+            }
+        }
+
+        const anyHandleMatch = html.match(/href="\/(@[^"\/]+)(?:\/shorts|")/);
+        if (anyHandleMatch) {
+            const handle = extractRawHandle(anyHandleMatch[1]);
+            const normalizedFound = normalizeHandleValue(handle);
+            if (!normalizedHandleExpectation || normalizedFound === normalizedHandleExpectation) {
+                return { handle, name: '' };
+            }
+        }
+
+        console.debug('FilterTube: Could not extract channel info from shorts page directly');
+        return null;
+    } catch (error) {
+        console.debug('FilterTube: Error fetching shorts page directly:', error);
+        return null;
+    }
 }
 
 /**
@@ -3713,8 +3968,43 @@ function extractChannelFromCard(card) {
             }
         }
 
+        // Additional extraction for rich-grid lockup view models (new YouTube markup)
+        const lockup = card.querySelector('.yt-lockup-view-model');
+        if (lockup) {
+            const dataHandle = lockup.getAttribute('data-filtertube-channel-handle');
+            const dataId = lockup.getAttribute('data-filtertube-channel-id');
+            const metaHandleLink = lockup.querySelector('.yt-lockup-metadata-view-model__metadata a[href*="/@"]');
+            const metaIdLink = lockup.querySelector('.yt-lockup-metadata-view-model__metadata a[href*="/channel/UC"]');
+
+            if (metaIdLink) {
+                const href = metaIdLink.getAttribute('href') || '';
+                const idMatch = href.match(/\/(UC[\w-]{22})/);
+                if (idMatch && idMatch[1]) {
+                    const name = metaIdLink.textContent?.trim() || '';
+                    console.log('FilterTube: Extracted from lockup meta (UC):', { id: idMatch[1], name });
+                    return { id: idMatch[1], name };
+                }
+            }
+
+            if (metaHandleLink) {
+                const href = metaHandleLink.getAttribute('href') || '';
+                const handle = extractRawHandle(href);
+                const name = metaHandleLink.textContent?.trim() || '';
+                if (handle) {
+                    console.log('FilterTube: Extracted from lockup meta (handle):', { handle, name });
+                    return { handle, name };
+                }
+            }
+
+            if (dataHandle || dataId) {
+                const name = lockup.querySelector('.yt-lockup-metadata-view-model__metadata')?.textContent?.trim() || '';
+                console.log('FilterTube: Extracted from lockup data attrs:', { handle: dataHandle, id: dataId, name });
+                return { handle: dataHandle || null, id: dataId || null, name };
+            }
+        }
+
         // Debug: Log card structure to help identify missing selectors
-        console.warn('FilterTube: Failed to extract channel. Card type:', card.tagName,
+        console.debug('FilterTube: Failed to extract channel. Card type:', card.tagName,
             'Is Shorts?:', !!isShortsCard,
             'Card HTML:', card.outerHTML.substring(0, 2000));
 
@@ -3945,7 +4235,20 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
     const { newMenuList, oldMenuList, status } = await waitForMenu();
     if (!newMenuList && !oldMenuList) {
         if (status !== 'closed') {
-            console.warn('FilterTube: Could not detect menu structure after waiting');
+            await waitForNextFrameDelay(250);
+            const retryNew = dropdown.querySelector('yt-list-view-model');
+            const retryOld = dropdown.querySelector(
+                'tp-yt-paper-listbox, ' +
+                'ytd-menu-popup-renderer, ' +
+                'ytd-menu-service-item-renderer, ' +
+                '#items.ytd-menu-popup-renderer, ' +
+                '#items.style-scope.ytd-menu-popup-renderer'
+            );
+            if (retryNew || retryOld) {
+                console.log('FilterTube: Menu detected on delayed retry');
+                return await injectFilterTubeMenuItem(dropdown, videoCard);
+            }
+            console.debug('FilterTube: Could not detect menu structure after waiting (soft)');
         }
         return;
     }

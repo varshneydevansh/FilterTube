@@ -28,6 +28,10 @@ try {
 // Browser detection for compatibility
 const IS_FIREFOX = typeof browser !== 'undefined' && !!browser.runtime;
 const browserAPI = IS_FIREFOX ? browser : chrome;
+const SHORTS_PARTIAL_STREAM_LIMIT = 51200;
+const SHORTS_FETCH_TIMEOUT_MS = 8000;
+const pendingShortsIdentityFetches = new Map();
+const shortsIdentitySessionCache = new Map();
 
 // Log when the background script loads with browser info
 console.log(`FilterTube background script loaded in ${IS_FIREFOX ? 'Firefox' : 'Chrome/Edge/Other'}`);
@@ -240,13 +244,143 @@ browserAPI.runtime.onInstalled.addListener(function (details) {
         });
     } else if (details.reason === 'update') {
         console.log('FilterTube extension updated from version ' + details.previousVersion);
-
         // You could handle migration of settings between versions here if needed
     }
 });
 
+function handleFetchShortsIdentityMessage(request, sendResponse) {
+    const videoId = typeof request.videoId === 'string' ? request.videoId.trim() : '';
+    if (!videoId || !/^[a-zA-Z0-9_-]{11}$/.test(videoId)) {
+        sendResponse({ success: false, error: 'invalid_video_id' });
+        return;
+    }
+
+    const normalizedHandle = typeof FilterTubeIdentity?.normalizeHandleValue === 'function'
+        ? FilterTubeIdentity.normalizeHandleValue(request.expectedHandle || '')
+        : '';
+    const cacheKey = normalizedHandle ? `${videoId}:${normalizedHandle}` : videoId;
+
+    if (shortsIdentitySessionCache.has(cacheKey)) {
+        sendResponse({ success: true, identity: shortsIdentitySessionCache.get(cacheKey) });
+        return;
+    }
+
+    if (pendingShortsIdentityFetches.has(cacheKey)) {
+        pendingShortsIdentityFetches.get(cacheKey).then(sendResponse);
+        return;
+    }
+
+    const fetchPromise = (async () => {
+        try {
+            const identity = await performShortsIdentityFetch(videoId, normalizedHandle);
+            if (identity) {
+                shortsIdentitySessionCache.set(cacheKey, identity);
+                return { success: true, identity };
+            }
+            return { success: false, identity: null, error: 'not_found' };
+        } catch (error) {
+            console.debug('FilterTube Background: fetchShortsIdentity failed', error);
+            return { success: false, error: 'shorts_fetch_failed' };
+        } finally {
+            pendingShortsIdentityFetches.delete(cacheKey);
+        }
+    })();
+
+    pendingShortsIdentityFetches.set(cacheKey, fetchPromise);
+    fetchPromise.then(sendResponse);
+}
+
+function storageGet(keys) {
+    return new Promise((resolve) => browserAPI.storage.local.get(keys, resolve));
+}
+
+async function performShortsIdentityFetch(videoId, normalizedHandle) {
+    const stored = await storageGet(['videoChannelMap']);
+    const storedId = stored?.videoChannelMap?.[videoId];
+    if (storedId) {
+        return { id: storedId, videoId, source: 'videoChannelMap' };
+    }
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort('timeout'), SHORTS_FETCH_TIMEOUT_MS);
+    try {
+        const response = await fetch(`https://www.youtube.com/shorts/${videoId}`, {
+            credentials: 'include',
+            headers: { 'Accept': 'text/html' },
+            signal: controller.signal
+        });
+
+        if (!response.ok || !response.body) {
+            console.debug('FilterTube Background: Shorts response not usable', response.status);
+            return null;
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let previewBuffer = '';
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            previewBuffer += decoder.decode(value, { stream: true });
+            const quickIdentity = extractIdentityFromPreview(previewBuffer, normalizedHandle);
+            if (quickIdentity) {
+                controller.abort('identity_found');
+                quickIdentity.partial = true;
+                quickIdentity.videoId = videoId;
+                return quickIdentity;
+            }
+
+            if (previewBuffer.length >= SHORTS_PARTIAL_STREAM_LIMIT) {
+                await reader.cancel();
+                controller.abort('preview_limit');
+                break;
+            }
+        }
+
+        previewBuffer += decoder.decode();
+        const fallbackIdentity = extractIdentityFromPreview(previewBuffer, normalizedHandle);
+        if (fallbackIdentity) {
+            fallbackIdentity.videoId = videoId;
+            return fallbackIdentity;
+        }
+
+        return null;
+    } catch (error) {
+        if (error?.name === 'AbortError') {
+            console.debug('FilterTube Background: Shorts fetch aborted', error?.message || '');
+        } else {
+            console.debug('FilterTube Background: Shorts fetch exception', error);
+        }
+        return null;
+    } finally {
+        clearTimeout(timeoutId);
+    }
+}
+
+function extractIdentityFromPreview(preview, normalizedHandle) {
+    if (!preview || typeof FilterTubeIdentity?.fastExtractIdentityFromHtmlChunk !== 'function') {
+        return null;
+    }
+    const identity = FilterTubeIdentity.fastExtractIdentityFromHtmlChunk(preview);
+    if (!identity) return null;
+
+    const normalizedFound = typeof FilterTubeIdentity.normalizeHandleValue === 'function'
+        ? FilterTubeIdentity.normalizeHandleValue(identity.handle || '')
+        : '';
+
+    if (normalizedHandle && normalizedFound && normalizedFound !== normalizedHandle) {
+        return null;
+    }
+
+    return identity;
+}
+
 // Listen for messages sent from other parts of the extension (e.g., content scripts, popup).
 browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+    const action = request?.action || request?.type;
+
     if (request.action === "getCompiledSettings") {
         console.log("FilterTube Background: Received getCompiledSettings message.");
         getCompiledSettings().then(compiledSettings => {

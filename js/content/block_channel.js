@@ -156,7 +156,7 @@ function tryInjectIntoVisibleDropdown() {
 async function handleDropdownAppeared(dropdown) {
     // Synchronous lock to prevent race conditions from multiple mutation events
     if (processingDropdowns.has(dropdown)) {
-        console.log('FilterTube: Dropdown already being processed (sync lock), skipping');
+        console.debug('FilterTube: Dropdown already being processed (sync lock), skipping');
         return;
     }
     processingDropdowns.add(dropdown);
@@ -225,7 +225,7 @@ async function handleDropdownAppearedInternal(dropdown) {
 
         if (dropdownState?.videoCardId === videoCardId) {
             if (dropdownState.isProcessing) {
-                console.log('FilterTube: Dropdown already processing for this video, skipping');
+                console.debug('FilterTube: Dropdown already processing for this video, skipping');
                 return;
             }
             if (dropdownState.isComplete) {
