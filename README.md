@@ -30,6 +30,9 @@ FilterTube is a browser extension that gives you control over your YouTube feed.
 - **Zero Flash**: Filters content *before* it renders on screen.
 - **100% Private**: No data leaves your browser. No analytics. No tracking.
 
+### Help & Documentation
+- **Help Page (Dashboard)**: In the new tab UI, a dedicated Help section explains every feature and toggle.
+
 ## Installation
 
 ### For Users
@@ -56,7 +59,7 @@ If you want to contribute or build from source:
 
 ### 📱 Firefox for Android
 1.  **Set up**: Connect your Android device to your computer via USB.
-2.  **Install**: You can install the **same** `filtertube-firefox-v3.0.4.zip` file.
+2.  **Install**: Use the Firefox build zip produced by `npm run build:firefox`.
 3.  **Debug**: Follow Mozilla's guide to [debug extensions on Android](https://extensionworkshop.com/documentation/develop/developing-extensions-for-firefox-for-android/) using `web-ext` or remote debugging.
 
 ## Usage

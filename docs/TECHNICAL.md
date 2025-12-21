@@ -1,6 +1,6 @@
-# FilterTube v3.0 Technical Documentation
+# FilterTube v3.1.1 Technical Documentation
 
-This document provides a deep technical dive into the implementation of FilterTube's hybrid filtering engine.
+This document provides a deep technical dive into the implementation of FilterTube's hybrid filtering engine as of v3.1.1.
 
 ## Core Technologies
 
@@ -164,14 +164,14 @@ UI Contexts (tab-view.js, popup.js)
 
 ## 11. Handle Normalization & Regex Improvements
 
-- **Pattern**: `extractHandleFromString` and friends normalize any string with `@([A-Za-z0-9._-]+)` so handles like `@dr.one` or `@Studio_Name` survive DOM scraping, dataset scanning, and URL parsing.
-- **Canonicalization**: `normalizeChannelHandle` strips URLs, querystrings, and enforces lowercase so duplicates and mixed input sources converge to the same key.
-- **Storage Sync**: `fetchIdForHandle` (Isolated World) resolves the canonical `UC...` ID via `/@handle/about` fetch, caches it, and notifies the background worker via `FilterTube_UpdateChannelMap`, preventing repeated network lookups.
+- **Extraction + decoding**: handle parsing is percent-decoding + unicode-aware, so unicode handles and encoded links normalize consistently across DOM scraping and URL parsing.
+- **Canonicalization**: normalization strips URLs/querystrings and enforces lowercase so duplicates and mixed input sources converge to the same key.
+- **Storage sync**: once an association is learned (handle ↔ UC ID, and custom URL ↔ UC ID), it is persisted in `channelMap` so future matching avoids network calls.
 - **Regex Compilation**: `compileKeywords` escapes user input but keeps literal dots/underscores intact, ensuring collaboration-derived keywords like `@foo.bar` remain matchable.
 
 ## 12. Shorts Canonical Resolution (Detailed)
 
-Shorts cards rarely embed canonical IDs, so FilterTube performs a two-phase resolution:
+Shorts cards rarely embed canonical IDs, so FilterTube performs a resolution pipeline that prefers cache + main-world data before network:
 
 ```mermaid
 sequenceDiagram
@@ -181,14 +181,15 @@ sequenceDiagram
 
     DOM->>DOM: Detect ytd-reel-item / ytd-shorts-lockup
     DOM->>FETCH: fetch shorts watch URL (resolve uploader handle)
-    DOM->>FETCH: fetch https://www.youtube.com/@handle/about (resolve UC ID)
+    DOM->>DOM: try channelMap / ytInitialData replay (no network)
+    DOM->>FETCH: fetch handle/customUrl pages only as a fallback
     DOM->>BG: handleAddFilteredChannel({ id, handle, isShorts:true })
     BG->>BG: Persist channel, broadcast state update
     DOM->>DOM: hide container (parent rich-item) immediately → zero blank slots
 ```
 
-- **Grace Period**: While the canonical lookup runs (~1–2.5s), DOM fallback hides the Short so the user never sees it again.
-- **Stats Integrity**: Once the canonical ID is known, subsequent interceptors (data + DOM) recognize the entry on every surface, so Shorts, long-form videos, and recommendations from that channel stay filtered without extra fetches.
+- **Grace period**: while identity enrichment runs, DOM fallback can hide immediately so the user does not see blocked content.
+- **Convergence**: once the canonical UC ID is known, subsequent interceptors (data + DOM) recognize the entry on every surface without repeated fetches.
 - **Collaborator Harvesting**: When Shorts expose the avatar stack, `extractCollaboratorsFromAvatarStackElement` seeds collaborator names/handles and the main-world hop fills UC IDs. The same multi-select UI appears regardless of layout.
 
 ## 4. DOM Fallback System
@@ -310,15 +311,16 @@ If you ban "@coolguy", the system needs to know that "Cool Guy Vlogs" is the sam
 ## 8. Shorts Blocking Architecture (Hybrid Model)
 
 **Motivation:**
-Shorts are unique because they often lack channel information in the initial DOM. To ensure **Zero Content Leakage**, we prioritize robustness over speed. We *always* resolve the canonical channel ID before finalizing a block.
+Shorts are unique because they often lack channel information in the initial DOM. To ensure robust blocking, the system uses cache-first + main-world recovery to resolve a canonical UC ID whenever possible.
 
 **How it works:**
 1.  **User Action**: User clicks "Block Channel" in 3 dots menu.
-2.  **Shorts Resolution (Extra Step)**: For Shorts, we first fetch the video's page to extract the initial Channel ID (since it's missing from the card).
-3.  **Canonical Resolution (All Videos)**: We *always* fetch the channel's "About" metadata to resolve the canonical "UC..." ID. This ensures that blocking `@user` also blocks `@Handle` and `UCID`.
-4.  **Finalize**: Only after this verification (approx. 1s) is the channel added to the block list and the content hidden.
+2.  **Cache-first resolution**: resolve using `channelMap` (handle/customUrl ↔ UC ID) when possible.
+3.  **Main-world recovery**: if a `videoId` is available, query main-world `ytInitialData` for the uploader identity.
+4.  **Network fallback**: fetch handle/customUrl pages only when necessary.
+5.  **Finalize**: persist the channel keyed by UC ID; the DOM fallback provides immediate visual feedback while enrichment completes.
 
-So, for Shorts we have an additioanl overhead(1s - 1.5s) of prefetching the channel ID and then resolving the canonical ID. This is to ensure that blocking a channel also blocks all its content, not just the short. Which makes 3 dot UI Blocking for shorts about 2s to 2.5s and rest assured if you have clicked "Block Channel" it will get blocked you can browse freely.
+The exact latency depends on which fallback path is needed (cache/main-world/network). The goal is that blocks remain correct and converge quickly to a canonical UC ID.
 
 **Technical Flow:**
 

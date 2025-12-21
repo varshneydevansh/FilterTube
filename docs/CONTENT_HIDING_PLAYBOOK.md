@@ -48,6 +48,9 @@ This document is an *operator playbook* for answering:
 - **Canonical identity is UC ID** (`UCxxxxxxxxxxxxxxxxxxxxxx`).
 - `@handle` is an alias, useful for display and as a lookup hint.
 
+Additional supported aliases:
+- `customUrl` (`/c/<slug>` and `/user/<slug>`) is treated as a persisted alias that can be resolved to a UC ID via `channelMap`.
+
 ### 2.2 `channelMap` (alias cache)
 Stored in local extension storage as a bidirectional map:
 - `channelMap[lowercaseHandle] -> UCID`
@@ -69,10 +72,13 @@ When trying to resolve `{ id, handle, name }` for a channel:
    - `injector.js` searches `window.ytInitialData` and returns `{ id, handle, name }`.
 3. **`channelMap` handle→UC mapping**
    - Fast, no network.
-4. **Shorts page fetch (`/shorts/<videoId>`)**
+4. **`channelMap` customUrl→UC mapping**
+   - Fast, no network.
+5. **Shorts page fetch (`/shorts/<videoId>`)**
    - Parses embedded `ytInitialData` / header renderers / canonical links.
-5. **Handle page fetch**
+6. **Handle/customUrl page fetch**
    - `https://www.youtube.com/@<handle>/about`, then fallback to `https://www.youtube.com/@<handle>`
+   - `https://www.youtube.com/c/<slug>` / `https://www.youtube.com/user/<slug>`
    - This is the most fragile due to YouTube’s 404 bug for some handles.
 
 
@@ -104,6 +110,10 @@ When trying to resolve `{ id, handle, name }` for a channel:
   - `ytInitialData` is usually strong.
   - DOM byline sometimes lacks UC ID.
 
+Watch-page playlists (`list=...`):
+- Playlist panel row identity is often incomplete, so `videoChannelMap` is learned via prioritized prefetch and then reused to hide playlist items deterministically.
+- Next/Prev navigation is guarded so blocked items are skipped without visible playback.
+
 ### 4.4 Shorts shelf / Shorts cards
 - **Hide path**
   - Mostly DOM fallback (many Shorts cards are DOM-heavy and inconsistent).
@@ -122,6 +132,9 @@ When trying to resolve `{ id, handle, name }` for a channel:
 - **Identity sources**
   - `injector.js` collaborator extraction from ytInitialData.
   - Expected handle/name hints are used to avoid picking the wrong collaborator.
+
+Mix cards:
+- Mix cards are treated as playlists (container items), but they are not collaborations. Seed-artist text such as “A and more” must not be interpreted as channel collaborators.
 
 
 ## 5) Why 3-dot Blocking Could Still Fail to Recover UC ID

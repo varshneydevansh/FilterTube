@@ -1,5 +1,18 @@
 # Changelog
-# Changelog
+## Version 3.1.1
+
+### Watch Page (Playlists)
+- Watch-page playlist panel rows now hide deterministically for blocked channels (playlist items are enriched via `videoChannelMap`).
+- Next/Prev navigation skips blocked playlist items without visible playback flash.
+
+### UI
+- Added a Help section in the dashboard (new tab UI) documenting all features/toggles.
+
+### Identity & Robustness
+- Improved channel identity convergence (handle/customUrl ↔ UC ID mapping) so blocking is resilient to `/@handle/about` failures.
+
+---
+
 ## Version 3.1.0
 
 ### Watch Page & Docs

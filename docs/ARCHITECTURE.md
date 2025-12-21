@@ -1,8 +1,8 @@
-# FilterTube v3.0 Architecture Documentation
+# FilterTube v3.1.1 Architecture Documentation
 
 ## Executive Summary
 
-FilterTube v3.0 implements a robust **Hybrid Filtering Architecture** that combines preemptive **Data Interception** with a resilient **DOM Fallback** mechanism. This dual-layer approach ensures comprehensive content filtering across all YouTube surfaces (Home, Search, Watch, Shorts) while maintaining high performance and a "Zero Flash" user experience.
+FilterTube v3.1.1 implements a robust **Hybrid Filtering Architecture** that combines preemptive **Data Interception (Main World)** with a resilient **DOM Fallback (Isolated World)**. This dual-layer approach ensures comprehensive content filtering across all YouTube surfaces (Home, Search, Watch, Shorts) while maintaining high performance and a "Zero Flash" user experience when YouTube routes content through JSON.
 
 ## Architecture Overview
 
@@ -10,15 +10,15 @@ FilterTube v3.0 implements a robust **Hybrid Filtering Architecture** that combi
 
 FilterTube operates on two synchronized layers:
 
-1.  **Primary Layer: Data Interception ("Zero DOM")**
+1.  **Primary Layer: Data Interception (Main World engine)**
     *   Intercepts YouTube's raw JSON data (via `ytInitialData`, `ytInitialPlayerResponse`, and `fetch`/`XHR` overrides) before it reaches the rendering engine.
     *   Modifies the data structure to remove blocked content *before* it is ever created in the DOM.
     *   **Benefit:** True zero-flash filtering, high performance, no layout shift.
 
 2.  **Secondary Layer: DOM Fallback (Visual Guard)**
     *   Monitors the DOM using efficient `MutationObserver`s.
-    *   Catches any content that might bypass the data layer (e.g., client-side hydration updates, complex dynamic loading).
-    *   **Hybrid Blocking:** For Shorts, it combines DOM manipulation (immediate hiding) with background data fetching to ensure robust channel blocking even when metadata is missing.
+    *   Catches any content that might bypass the data layer (e.g., client-side hydration updates, complex dynamic loading, watch-playlist playlist panel handling).
+    *   **Hybrid blocking surfaces:** Shorts and some playlist/mix surfaces may require a DOM-first hide combined with async identity enrichment.
     *   Applies visual hiding (CSS) to blocked elements.
     *   **Benefit:** Reliability, handles edge cases and dynamic updates.
 
@@ -204,7 +204,7 @@ The collaboration lifecycle reuses the existing Hybrid Filtering channels (`wind
 
 ## Channel Identity Resolution & 404 Recovery (2025 Hardening)
 
-YouTube now rate-limits `/@handle/about` and intermittently returns `404` on the first block attempt. To guarantee that every block resolves to a canonical UC ID, the architecture adds a four-layer safety net:
+YouTube intermittently rate-limits `/@handle/about` and can return `404` on the first block attempt. To keep blocking deterministic, the system uses a cache-first + main-world recovery approach so blocks can still resolve to a canonical UC ID:
 
 ```ascii
         +-------------------+
@@ -234,10 +234,10 @@ YouTube now rate-limits `/@handle/about` and intermittently returns `404` on the
 +------------------------------------+
 ```
 
-1. **Cache-first lookups (`background.js`)** – `handleAddFilteredChannel` checks `channelMap` (fed by `filter_logic.js` + main-world injectors) before issuing any network fetch, so previously learned handles map instantly to UC IDs.
-2. **Main-world replay (`injector.js` + `seed.js`)** – When `/@handle/about` fails, `content_bridge.js` replays the block request with `searchYtInitialDataForVideoChannel(videoId)` and Shorts helpers, reusing the data that already rendered the card.
-3. **Bidirectional broadcast** – Any newly learned `(handle ↔ UC ID)` pair is posted via `FilterTube_UpdateChannelMap`, persisted by the background worker, and replayed into future tabs so both interception and DOM layers stay in sync.
-4. **DOM cache invalidation** – `applyDOMFallback` now tracks `data-filtertube-last-processed-id`. When a reused card swaps to a different video, cached `data-filtertube-channel-*` attributes are purged, forcing a fresh extraction with the latest mapping.
+1. **Cache-first lookups (`background.js`)** – `handleAddFilteredChannel` checks `channelMap` before issuing any network fetch, so previously learned handles map instantly to UC IDs.
+2. **Main-world replay (`injector.js` + `seed.js`)** – When metadata is missing or handle fetches fail, `content_bridge.js` can re-run a lookup using `searchYtInitialDataForVideoChannel(videoId)` to reuse the data that already rendered the card.
+3. **Bidirectional broadcast** – Newly learned `(handle ↔ UC ID)` pairs are posted via `FilterTube_UpdateChannelMap`, persisted by the background worker, and replayed into future tabs so both interception and DOM layers stay in sync.
+4. **DOM cache invalidation** – The DOM fallback tracks `data-filtertube-last-processed-id`. When a reused card swaps to a different video, stale `data-filtertube-channel-*` attributes are purged, forcing a fresh extraction with the latest mapping.
 
 These steps keep channel identity deterministic even for collaboration uploads, Shorts feeds, and navigation refreshes that previously produced 404 loops.
 
@@ -273,6 +273,13 @@ sequenceDiagram
 ```
 
 This hybrid path keeps **Zero-Flash** guarantees for Shorts even when metadata is missing: the DOM fallback hides immediately while the async canonical resolution finishes and broadcasts via `background.js`.
+
+### Watch-page playlists (panel rows + no-flash Next/Prev)
+
+Watch pages with `list=...` require additional guarantees beyond feed/search filtering:
+
+1. **Playlist panel deterministic hiding**: playlist panel row elements are prioritized for prefetch observers, allowing the extension to learn `videoChannelMap[videoId] -> UC ID` for playlist items even when the DOM lacks full channel identity.
+2. **Navigation guard**: when Next/Prev selects a blocked channel, the watch page auto-skips to the next allowed item without a visible playback flash.
 
 ### Bidirectional Mapping Synchronization
 
