@@ -1,4 +1,16 @@
 # Changelog
+# Changelog
+## Version 3.1.0
+
+### Watch Page & Docs
+- Documented that watch-page 3-dot menus now mirror Home/Search collaborator behavior and clarified the remaining single-channel label gap plus Shorts coverage (`docs/home_watch_collab_plan.md`, `docs/CHANNEL_BLOCKING_SYSTEM.md`, `docs/youtube_renderer_inventory.md`).
+- Captured the outstanding playlist/mix regression (hidden rows reappearing after hard refresh) so it stays visible in watch-page plans.
+
+### Misc
+- Version bump to keep manifests, build tooling, and UI footer aligned with the new release.
+
+---
+
 ## Version 3.0.9
 
 ### Refactor

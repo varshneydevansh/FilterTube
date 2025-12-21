@@ -3,13 +3,16 @@
 ## 0. Goal & Non-Goals
 
 ### Goal
+
 FilterTube must be able to:
+
 - Identify the **channel identity** for a piece of content (preferably a stable **UC channel ID**, and also capture the **@handle** when available).
 - Persist blocked channels in extension storage.
 - Hide (and optionally keyword-filter) all content attributable to those blocked channels.
 - Work reliably across YouTube surfaces (Home, Search, Shorts, Watch, etc.), including SPA navigation and DOM recycling.
 
 ### Non-goals (for this doc)
+
 - This document does **not** implement new behavior.
 - Watch-page playlist specifics are documented elsewhere and will be handled as a separate workstream.
 
@@ -322,7 +325,24 @@ This section answers:
       - `#channel-info ytd-channel-name a` (or equivalent)
     - Handle is parsed from `href` using `extractRawHandle()`.
 
-### 10.3 Shorts shelf / Shorts cards
+### 10.3 Watch page (main video, right rail, playlist, Shorts shell)
+
+- **Primary containers**
+  - `ytd-watch-metadata` / `ytd-video-owner-renderer` for the active video
+  - Right-rail `yt-lockup-view-model`, `ytd-compact-video-renderer`, and new `watchCard*` renderers
+  - Playlist queue rows (`ytd-playlist-panel-video-renderer`)
+  - Embedded Shorts tiles rendered inside the watch column
+
+- **3-dot menu / collaboration status (v3.1.0)**
+  - The watch page now reuses the same collaborator roster cache as Home/Search, so any card with ≥2 collaborators immediately renders per-channel menu rows (plus “Block All”) with accurate names/handles.
+  - Shorts tiles opened inside the watch shell mark `fetchStrategy: 'shorts'`; we run the `/shorts/<id>` fetch before falling back to `fetchChannelFromWatchUrl`, which is why collaborator menus work even on Shorts surfaced in the watch experience.
+  - Non-collaboration rows still show the generic “Block Channel” label because the synchronous DOM scrape rarely includes the channel name. Follow-up work is tracked to probe `ytd-watch-metadata`/`ytd-video-owner-renderer` synchronously so we can display names everywhere.
+
+- **Playlist/mix gap (still open)**
+  - After a hard refresh the playlist/mix queue can leak hidden videos when SPA navigation rehydrates stale rows; the hidden track may briefly play (~1–1.5 s) or reappear after pressing Next/Prev.
+  - Root causes and reproduction steps remain documented in `docs/WATCH_PLAYLIST_BREAKDOWN.md`; that file still tracks the refilter crash/restore bugs to resolve post-3.1.0.
+
+### 10.4 Shorts shelf / Shorts cards
 
 - **Containers**
   - `ytm-shorts-lockup-view-model` / `ytm-shorts-lockup-view-model-v2`
@@ -339,7 +359,7 @@ This section answers:
   - `content_bridge.js:extractChannelFromCard()` → returns `{videoId, needsFetch: true}` for Shorts when needed.
   - `content_bridge.js:fetchChannelFromShortsUrl(videoId, requestedHandle)` parses the Shorts HTML.
 
-### 10.4 Community posts (ytd-post-renderer)
+### 10.5 Community posts (ytd-post-renderer)
 
 - **Container**
   - `ytd-post-renderer`
@@ -348,7 +368,7 @@ This section answers:
   - `#author-text` / `#author-thumbnail a` links.
   - Handle extracted from `href` via `extractRawHandle()`.
 
-### 10.5 Collaboration videos
+### 10.6 Collaboration videos
 
 - **Detection**
   - `#attributed-channel-name` is used as a collaboration signal.

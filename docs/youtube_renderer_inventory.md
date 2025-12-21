@@ -46,7 +46,7 @@ This document tracks which YouTube renderers/selectors FilterTube currently targ
 | `<ytd-subscription-notification-toggle-button-renderer-next>` | `subscriptionNotificationToggleButtonRenderer` | ℹ️ **NEW** | Notification bell states; strings limited to UI ("Subscribed"); track in case filters target notification text |
 | `<ytd-badge-supported-renderer>` (verified badge) | `metadataBadgeRenderer` | ℹ️ **NEW** | Badge exposes "Official Artist Channel"; low priority unless badges become filter inputs |
 
-### Collaboration Videos (2025-12-01 sample, NEW)
+### Collaboration Videos + Watch Page (2025-12-21 snapshot, NEW)
 
 YouTube collaboration videos can feature up to **5 collaborating channels + 1 uploader** (6 total). This requires special handling in both data extraction and UI.
 
@@ -83,10 +83,16 @@ Each collaborator in `listItems[].listItemViewModel`:
 
 | Menu Option | When Shown | Behavior |
 | --- | --- | --- |
-| Block [Channel 1] | 2+ collaborators | Blocks individual channel, stores `collaborationWith` metadata |
-| Block [Channel 2] | 2+ collaborators | Blocks individual channel, stores `collaborationWith` metadata |
-| Block [Channel 3-6] | 3-6 collaborators | Dynamic options for each additional collaborator |
+| Block [Channel N] | 2+ collaborators | Blocks individual channel, stores `collaborationWith` metadata |
 | Block All Collaborators | 2+ collaborators | Blocks ALL channels independently with shared `collaborationGroupId` |
+| Done • Block X Selected | 3-6 collaborators | Appears after selecting rows in multi-step mode; persists only selections |
+
+#### Watch page notes (v3.1.0)
+
+- **Main video + right rail:** Watch-page dropdowns now consume the same collaborator cache as Home/Search, so per-channel menu rows (and “Block All”) appear with names/handles even when the DOM only exposed “Channel A and 3 more”.
+- **Embedded Shorts:** Shorts surfaced inside the watch column mark `fetchStrategy: 'shorts'`; we prefetch `/shorts/<videoId>` before falling back to `/watch?v=` so collaborator menus and UC IDs hydrate reliably.
+- **Single-channel rows:** Still display “Block Channel” because the DOM scrape rarely includes the channel name; follow-up work is tracking synchronous name probes from `ytd-watch-metadata`.
+- **Playlist/mix gap:** Playlist queue rows can still leak hidden videos after hard refresh; see `docs/WATCH_PLAYLIST_BREAKDOWN.md` for the refilter/skip bugs we still need to close.
 
 **Multi-select note (3+ collaborators):**
 When there are 3–6 collaborators, individual rows act as “select” toggles first. The bottom row becomes:
