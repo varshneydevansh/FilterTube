@@ -87,12 +87,15 @@ Each collaborator in `listItems[].listItemViewModel`:
 | Block All Collaborators | 2+ collaborators | Blocks ALL channels independently with shared `collaborationGroupId` |
 | Done • Block X Selected | 3-6 collaborators | Appears after selecting rows in multi-step mode; persists only selections |
 
-#### Watch page notes (v3.1.1)
+#### Watch page notes (v3.1.2)
 
 - **Main video + right rail:** Watch-page dropdowns consume the same collaborator cache as Home/Search, so per-channel menu rows (and “Block All”) appear with names/handles even when the DOM only exposed “Channel A and 3 more”.
 - **Embedded Shorts:** Shorts surfaced inside the watch column mark `fetchStrategy: 'shorts'`; we prefetch `/shorts/<videoId>` before falling back to `/watch?v=` so collaborator menus and UC IDs hydrate reliably.
 - **Single-channel rows:** Still display “Block Channel” in some cases when the DOM scrape does not include the channel name.
 - **Watch playlist panel:** Playlist panel rows now hide deterministically for blocked channels (prefetch enriches `videoChannelMap` for playlist items), and Next/Prev navigation skips blocked items without visible playback flash.
+- **Watch playlist autoplay:** Autoplay uses an `ended`-event safety net to trigger a Next-click only when the immediate next playlist row is blocked, preventing blocked items from briefly playing.
+- **Playlist reprocessing robustness:** Previously hidden playlist rows are kept hidden during identity gaps (sticky-hide) to prevent restored blocked items from becoming playable during async enrichment.
+- **Dropdown close behavior:** The 3-dot dropdown close logic avoids closing `ytd-miniplayer` when a miniplayer is visible.
 
 **Multi-select note (3+ collaborators):**
 When there are 3–6 collaborators, individual rows act as “select” toggles first. The bottom row becomes:

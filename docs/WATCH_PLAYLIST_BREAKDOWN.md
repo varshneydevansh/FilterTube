@@ -1,4 +1,4 @@
-# Watch Playlist – Current Implementation (v3.1.1)
+# Watch Playlist – Current Implementation (v3.1.2)
 
 ## Goal
 
@@ -29,6 +29,10 @@
 - `js/content/dom_fallback.js` installs a capture-phase click interceptor on `.ytp-next-button` / `.ytp-prev-button`.
 - If the immediate next/prev playlist row is already hidden, the click is intercepted and redirected to the next visible playlist item.
 - A second guard runs after each DOM fallback pass: if the currently selected playlist item is hidden (autoplay or external navigation), FilterTube immediately redirects to the next visible item.
+
+Autoplay additionally uses an `ended`-event guard that triggers a Next-click only when the immediate next playlist row is blocked, preventing “fraction of a second” playback of blocked items.
+
+Sticky-hide: if a playlist row was already hidden but its channel identity is temporarily unavailable during a reprocess (DOM extraction gap while async enrichment is pending), the row is kept hidden to prevent restored blocked items from becoming playable.
 
 
 ## Notes on matching when playlist rows have no identity

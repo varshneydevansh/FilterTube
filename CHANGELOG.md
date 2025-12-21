@@ -1,4 +1,15 @@
 # Changelog
+## Version 3.1.2
+
+### Watch Page (Playlists)
+- Autoplay now skips blocked playlist items by triggering a safe Next-click only when the immediate next playlist row is hidden.
+- Watch-page playlist panel rows are sticky-hidden across reprocessing cycles when identity is temporarily unresolved (prevents restored blocked items becoming playable).
+
+### 3-Dot Menu UX
+- Closing the YouTube 3-dot dropdown after blocking no longer closes/interrupts an active miniplayer.
+
+---
+
 ## Version 3.1.1
 
 ### Watch Page (Playlists)

@@ -171,6 +171,13 @@ DOM fallback must be careful about:
 - identifying the correct container to hide (e.g., Shorts inside `ytd-rich-item-renderer`)
 - not poisoning future matches with stale `data-filtertube-channel-*` attributes
 
+Watch-playlist hardening (v3.1.2):
+- Autoplay uses a targeted `ended`-event guard to avoid landing on blocked playlist items.
+- Playlist panel rows are sticky-hidden across reprocessing cycles when identity is temporarily unresolved.
+
+3-dot menu UX (v3.1.2):
+- Dropdown close logic avoids globally dispatching Escape/click when a visible `ytd-miniplayer` exists, preventing the miniplayer from being closed as a side effect.
+
 ### 5.3 Shorts special-case
 Shorts are special because many Shorts cards do not expose UC IDs in DOM.
 Therefore, the system is hybrid:

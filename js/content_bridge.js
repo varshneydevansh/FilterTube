@@ -95,6 +95,20 @@ function forceCloseDropdown(dropdown) {
     if (!dropdown) return;
     cleanupDropdownState(dropdown);
 
+    const hasVisibleMiniplayer = () => {
+        try {
+            const miniplayer = document.querySelector('ytd-miniplayer');
+            if (!miniplayer) return false;
+            if (miniplayer.getAttribute('hidden') !== null) return false;
+            if (miniplayer.getAttribute('aria-hidden') === 'true') return false;
+            const className = (miniplayer.getAttribute('class') || '').toLowerCase();
+            if (className.includes('visible')) return true;
+            return miniplayer.style.display !== 'none';
+        } catch (e) {
+            return false;
+        }
+    };
+
     const escapeEvent = new KeyboardEvent('keydown', {
         key: 'Escape',
         code: 'Escape',
@@ -104,7 +118,6 @@ function forceCloseDropdown(dropdown) {
         cancelable: true
     });
     dropdown.dispatchEvent(escapeEvent);
-    document.dispatchEvent(escapeEvent);
 
     const activeElement = document.activeElement;
     if (activeElement && dropdown.contains(activeElement)) {
@@ -124,6 +137,7 @@ function forceCloseDropdown(dropdown) {
 
     // Click elsewhere to release focus trap
     setTimeout(() => {
+        if (hasVisibleMiniplayer()) return;
         const ytdApp = document.querySelector('ytd-app');
         if (ytdApp) {
             const clickEvent = new MouseEvent('click', {
@@ -5465,17 +5479,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
         const dropdown = menuItem.closest('ytd-menu-popup-renderer, tp-yt-iron-dropdown, .ytd-menu-popup-renderer');
         if (dropdown) {
             setTimeout(() => {
-                // Simulate Escape key to close dropdown naturally
-                const escapeEvent = new KeyboardEvent('keydown', {
-                    key: 'Escape',
-                    code: 'Escape',
-                    keyCode: 27,
-                    which: 27,
-                    bubbles: true,
-                    cancelable: true
-                });
-                dropdown.dispatchEvent(escapeEvent);
-                document.dispatchEvent(escapeEvent);
+                forceCloseDropdown(dropdown);
             }, 50);
         }
 
@@ -6029,45 +6033,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             // Close the dropdown since the video is now hidden
             const dropdown = menuItem.closest('tp-yt-iron-dropdown');
             if (dropdown) {
-                // Strategy 1: Simulate Escape key to close dropdown naturally
-                const escapeEvent = new KeyboardEvent('keydown', {
-                    key: 'Escape',
-                    code: 'Escape',
-                    keyCode: 27,
-                    which: 27,
-                    bubbles: true,
-                    cancelable: true
-                });
-                dropdown.dispatchEvent(escapeEvent);
-                document.dispatchEvent(escapeEvent);
-
-                // Strategy 2: Remove focus trap
-                const activeElement = document.activeElement;
-                if (activeElement && dropdown.contains(activeElement)) {
-                    activeElement.blur();
-                }
-
-                // Strategy 3: Try YouTube's close method
-                if (typeof dropdown.close === 'function') {
-                    dropdown.close();
-                }
-
-                // Strategy 4: Force hide
-                dropdown.style.display = 'none';
-                dropdown.setAttribute('aria-hidden', 'true');
-
-                // Strategy 5: Click elsewhere to steal focus (simulate user clicking on page)
-                setTimeout(() => {
-                    const ytdApp = document.querySelector('ytd-app');
-                    if (ytdApp) {
-                        const clickEvent = new MouseEvent('click', {
-                            bubbles: true,
-                            cancelable: true,
-                            view: window
-                        });
-                        ytdApp.dispatchEvent(clickEvent);
-                    }
-                }, 50);
+                forceCloseDropdown(dropdown);
             }
         }
 

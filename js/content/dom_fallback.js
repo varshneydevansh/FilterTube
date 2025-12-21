@@ -220,6 +220,48 @@ function applyDOMFallback(settings, options = {}) {
             } catch (e) {
             }
         }, true);
+
+        if (!window.__filtertubePlaylistAutoplayGuardInstalled) {
+            window.__filtertubePlaylistAutoplayGuardInstalled = true;
+            document.addEventListener('ended', (event) => {
+                try {
+                    const target = event?.target;
+                    if (!(target instanceof HTMLVideoElement)) return;
+
+                    const isWatch = (document.location?.pathname || '').startsWith('/watch');
+                    const params = new URLSearchParams(document.location?.search || '');
+                    const isPlaylistWatch = params.has('list');
+                    if (!isWatch || !isPlaylistWatch) return;
+
+                    // Let YouTube handle normal autoplay, but when the immediate next playlist item
+                    // is hidden, force a Next click so our click-guard can skip deterministically.
+                    const playlistPanel = document.querySelector('ytd-playlist-panel-renderer');
+                    if (!playlistPanel) return;
+                    const items = Array.from(playlistPanel.querySelectorAll('ytd-playlist-panel-video-renderer'));
+                    if (items.length === 0) return;
+                    const selected = items.find(el => el.hasAttribute('selected') || el.getAttribute('aria-selected') === 'true') || null;
+                    if (!selected) return;
+                    const idx = items.indexOf(selected);
+                    if (idx < 0) return;
+
+                    const nextItem = items[idx + 1];
+                    const nextHidden = nextItem && (nextItem.classList.contains('filtertube-hidden') || nextItem.hasAttribute('data-filtertube-hidden'));
+                    if (!nextHidden) return;
+
+                    const nextBtn = document.querySelector('.ytp-next-button');
+                    if (!nextBtn) return;
+
+                    // Defer to avoid racing YouTube's internal end-of-video transition.
+                    setTimeout(() => {
+                        try {
+                            nextBtn.click();
+                        } catch (e) {
+                        }
+                    }, 0);
+                } catch (e) {
+                }
+            }, true);
+        }
     }
 
     videoElements.forEach(element => {
@@ -309,13 +351,15 @@ function applyDOMFallback(settings, options = {}) {
             });
             const collaboratorMetas = extractCollaboratorMetadataFromElement(element);
 
-            // For Shorts/Reels without channel identity, try videoChannelMap lookup
+            // If channel identity is missing, try videoChannelMap lookup (Shorts + playlist panels + other DOM-heavy cards).
+            const isPlaylistPanelRow = (elementTag === 'ytd-playlist-panel-video-renderer' || elementTag === 'ytd-playlist-panel-video-wrapper-renderer');
             const hasChannelIdentity = Boolean(channelMeta.handle || channelMeta.id || channelMeta.customUrl);
+            let mappedChannelId = '';
             if (!hasChannelIdentity && effectiveSettings.videoChannelMap) {
-                // Extract videoId from card
-                let videoId = element.getAttribute('data-filtertube-video-id') || extractVideoIdFromCard(element);
+                const videoId = element.getAttribute('data-filtertube-video-id') || extractVideoIdFromCard(element);
                 if (videoId && effectiveSettings.videoChannelMap[videoId]) {
-                    channelMeta = { ...channelMeta, id: effectiveSettings.videoChannelMap[videoId] };
+                    mappedChannelId = effectiveSettings.videoChannelMap[videoId];
+                    channelMeta = { ...channelMeta, id: mappedChannelId };
                 }
             }
 
@@ -362,6 +406,18 @@ function applyDOMFallback(settings, options = {}) {
 
             let hideReason = `Content: ${title}`;
             let shouldHide = matchesFilters;
+
+            // Sticky-hide for watch-playlist panel rows:
+            // If a row was already hidden, and we can't currently resolve identity, do NOT restore it.
+            // This prevents temporarily restored-but-blocked items from becoming playable during enrichment.
+            if (isPlaylistPanelRow) {
+                const wasHidden = targetToHide.classList.contains('filtertube-hidden') || targetToHide.hasAttribute('data-filtertube-hidden');
+                const identityResolvedNow = Boolean(hasChannelIdentity || mappedChannelId);
+                if (wasHidden && !identityResolvedNow && !shouldHide) {
+                    shouldHide = true;
+                    hideReason = hideReason || 'Playlist row (pending identity)';
+                }
+            }
 
             if (isShortVideoRenderer) {
                 const hideByGlobalShorts = Boolean(effectiveSettings.hideAllShorts);
