@@ -74,7 +74,8 @@ The system maintains two bidirectional lookup maps in local storage:
 1. **`channelMap`**: `(handle | customUrl) <-> UC ID`.
    - Critical for converting aliases into stable UC IDs.
 2. **`videoChannelMap`**: `videoId -> UC ID`.
-   - Used for Shorts. Since many Shorts cards lack identity, we store the mapping after the first successful resolution so it works offline/instantly on next load.
+   - Used for Shorts and watch-page playlist panels (and any surface where DOM metadata is incomplete).
+   - Since many cards lack identity, we store the mapping after the first successful resolution so it works offline/instantly on next load.
 
 ### 2.4 Custom URL normalization (`/c/Name`, `/user/Name`)
 - All worlds call into the helpers in `js/shared/identity.js` to normalize canonicalBaseUrl strings into predictable keys (`c/<slug>` or `user/<slug>`, percent-decoding as needed).
@@ -180,7 +181,8 @@ Therefore, the system is hybrid:
 ### 5.4 Flash reduction & prefetch (Dec 2025 hardening)
 - **Observer & queue parameters** (all in `js/content_bridge.js`):
   - IntersectionObserver with `rootMargin: 400px 0px 800px 0px` and `threshold: 0` so we start resolving ~1–2 viewports before a card becomes visible.
-  - At most 60 cards are observed per scan (`attachPrefetchObservers`) to keep overhead low on long feeds.
+  - At most 120 cards are observed per scan (`attachPrefetchObservers`) to keep overhead low on long feeds.
+  - On watch pages with `list=...`, playlist panel rows are prioritized for observation so the mapping is learned deterministically for playlist items.
   - Prefetch queue is capped at 10 pending entries, concurrency at 2, and each fetch has a 5 s timeout. The queue pauses automatically when the tab is hidden.
 - **Handle → UC pre-stamp**:
   - `queuePrefetchForCard()` first calls `resetCardIdentityIfStale()` / `getValidatedCachedCollaborators()` to clear recycled DOM nodes.
@@ -215,6 +217,9 @@ Example: `@CorridosdeOroNorte%C3%B1os`.
 Risk areas:
 - Regex patterns like `/@([\w.-]+)/` are ASCII/underscore biased and can truncate or fail.
 - If handle normalization drops unicode glyphs, stored handle won’t match DOM/JSON handle.
+
+Mitigation (current):
+- Handle parsing/normalization is centralized in `js/shared/identity.js` and is percent-decoding + unicode-aware.
 
 ### 6.3 Collaboration ambiguity
 - A single video can belong to multiple collaborators.

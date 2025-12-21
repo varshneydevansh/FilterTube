@@ -82,10 +82,21 @@
                     </span>
                     <span class="nav-label">Settings</span>
                 </li>
+                <li class="nav-item" data-tab="help">
+                    <span class="nav-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M9.09 9a3 3 0 0 1 5.82 1c0 2-3 3-3 3"></path>
+                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                        </svg>
+                    </span>
+                    <span class="nav-label">Help</span>
+                </li>
             </ul>
 
             <div class="sidebar-footer">
-                <div class="version-info">v3.1.0</div>
+                <div class="version-info">v3.1.1</div>
             </div>
         </nav>
 
@@ -224,6 +235,133 @@
                             <div class="empty-state">
                                 <p>Global settings coming soon.</p>
                                 <p class="sub-text">Import/Export and other advanced options will appear here.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="helpView" class="view-section">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>How FilterTube Works</h3>
+                        </div>
+                        <div class="card-body">
+                            <p>FilterTube uses a hybrid approach to hide content across YouTube:</p>
+                            <div class="help-list">
+                                <div class="help-item">
+                                    <div class="help-item-title">Data interception (Zero-flash when possible)</div>
+                                    <div class="help-item-body">When YouTube loads content via JSON, FilterTube removes blocked items before they render.</div>
+                                </div>
+                                <div class="help-item">
+                                    <div class="help-item-title">DOM fallback (Safety net)</div>
+                                    <div class="help-item-body">For SPA navigation, hydration, and recycled DOM nodes, FilterTube scans the page and hides blocked elements.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Channel Identifiers</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="help-list">
+                                <div class="help-item">
+                                    <div class="help-item-title">UC Channel ID (recommended)</div>
+                                    <div class="help-item-body">A stable identifier like <code>UCxjr9iAaC5QaIbp5hlERHDQ</code>. This is the most reliable way to block a channel.</div>
+                                </div>
+                                <div class="help-item">
+                                    <div class="help-item-title">@handle (supports unicode)</div>
+                                    <div class="help-item-body">Handles like <code>@감동메모리</code>. FilterTube normalizes percent-encoding and unicode so handles match everywhere.</div>
+                                </div>
+                                <div class="help-item">
+                                    <div class="help-item-title">Legacy channel URLs</div>
+                                    <div class="help-item-body">Some channels appear as <code>/c/Name</code> or <code>/user/Name</code>. FilterTube stores them as normalized <code>c/name</code> or <code>user/name</code> and maps them to a UC ID when possible.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Filters</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="help-list">
+                                <div class="help-item">
+                                    <div class="help-item-title">Keywords</div>
+                                    <div class="help-item-body">Add keywords to hide videos (and optionally comments) whose title/text matches your list.</div>
+                                </div>
+                                <div class="help-item">
+                                    <div class="help-item-title">Exact</div>
+                                    <div class="help-item-body">When enabled, keyword matching is stricter (useful for short words that cause false matches).</div>
+                                </div>
+                                <div class="help-item">
+                                    <div class="help-item-title">Channels</div>
+                                    <div class="help-item-body">Add a channel by <code>UC...</code> or <code>@handle</code>. Channels blocked from the YouTube 3-dot menu will appear here automatically.</div>
+                                </div>
+                                <div class="help-item">
+                                    <div class="help-item-title">Filter All Content (per-channel)</div>
+                                    <div class="help-item-body">Adds the channel name as a keyword source so content mentioning that channel is also hidden (useful for Mixes, reposts, and recommendations).</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Content Controls</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="help-list">
+                                <div class="help-item">
+                                    <div class="help-item-title">Hide Shorts</div>
+                                    <div class="help-item-body">Hides Shorts cards across YouTube surfaces.</div>
+                                </div>
+                                <div class="help-item">
+                                    <div class="help-item-title">Hide All Comments</div>
+                                    <div class="help-item-body">Removes comment sections entirely.</div>
+                                </div>
+                                <div class="help-item">
+                                    <div class="help-item-title">Filter Comments</div>
+                                    <div class="help-item-body">Hides only comments that match your keywords (disabled if Hide All Comments is enabled).</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Watch Page Playlists</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="help-list">
+                                <div class="help-item">
+                                    <div class="help-item-title">Playlist panel hiding</div>
+                                    <div class="help-item-body">FilterTube hides blocked-channel rows inside the watch-page playlist panel, including after refresh and scroll/load-more.</div>
+                                </div>
+                                <div class="help-item">
+                                    <div class="help-item-title">No-flash Next/Prev skipping</div>
+                                    <div class="help-item-body">When Next/Prev would land on a blocked item, FilterTube redirects to the next visible item before playback is visible.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Troubleshooting</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="help-list">
+                                <div class="help-item">
+                                    <div class="help-item-title">"Failed to fetch" while blocking</div>
+                                    <div class="help-item-body">If FilterTube already knows the channel UC ID, it can still persist the block even if fetching the logo/name fails. Try reloading if the UI doesn’t update immediately.</div>
+                                </div>
+                                <div class="help-item">
+                                    <div class="help-item-title">Blocked channel still appears</div>
+                                    <div class="help-item-body">YouTube sometimes reuses DOM nodes during SPA navigation. FilterTube re-scans and clears stale cached metadata, but a hard refresh can help confirm persistence.</div>
+                                </div>
                             </div>
                         </div>
                     </div>

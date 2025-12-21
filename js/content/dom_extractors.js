@@ -16,6 +16,8 @@ const VIDEO_CARD_SELECTORS = [
     'ytd-watch-card-compact-video-renderer',
     'ytd-watch-card-hero-video-renderer',
     'ytd-watch-card-rhs-panel-video-renderer',
+    'ytd-playlist-panel-video-renderer',
+    'ytd-playlist-panel-video-wrapper-renderer',
     'ytd-reel-item-renderer',
     'ytd-playlist-renderer',
     'ytd-radio-renderer',

@@ -1366,6 +1366,36 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
         }
 
         if (!channelInfo.success) {
+            const fetchError = channelInfo.error || null;
+            const fallbackId = (mappedId && String(mappedId).toUpperCase().startsWith('UC'))
+                ? mappedId
+                : (normalizedValue && String(normalizedValue).toUpperCase().startsWith('UC') ? normalizedValue
+                    : (lookupValue && String(lookupValue).toUpperCase().startsWith('UC') ? lookupValue : ''));
+
+            if (fallbackId) {
+                const candidateHandle = (metadata.canonicalHandle || metadata.displayHandle || '').trim();
+                const normalizedHandle = candidateHandle && candidateHandle.startsWith('@') ? candidateHandle.toLowerCase()
+                    : (isHandle ? normalizedValue.toLowerCase() : '');
+
+                const candidateName = (metadata.channelName || '').trim();
+                channelInfo = {
+                    success: true,
+                    id: fallbackId,
+                    handle: normalizedHandle || null,
+                    name: candidateName || normalizedHandle || fallbackId,
+                    logo: null,
+                    customUrl: metadata.customUrl || null
+                };
+                console.warn('FilterTube Background: fetchChannelInfo failed; persisting minimal channel entry with UC ID', {
+                    input: rawValue,
+                    lookupValue,
+                    id: fallbackId,
+                    error: fetchError
+                });
+            }
+        }
+
+        if (!channelInfo.success) {
             return { success: false, error: channelInfo.error || 'Failed to fetch channel info' };
         }
 

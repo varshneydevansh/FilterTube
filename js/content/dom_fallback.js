@@ -90,7 +90,6 @@ function matchesKeyword(regex, rawText, keywordData) {
             }
         }
     }
-
     return false;
 }
 
@@ -158,143 +157,239 @@ function applyDOMFallback(settings, options = {}) {
     // 1. Video/Content Filtering
     const videoElements = document.querySelectorAll(VIDEO_CARD_SELECTORS);
 
+    if (!window.__filtertubePlaylistNavGuardInstalled) {
+        window.__filtertubePlaylistNavGuardInstalled = true;
+        document.addEventListener('click', (event) => {
+            try {
+                const target = event?.target;
+                if (!(target instanceof Element)) return;
+                const btn = target.closest('.ytp-next-button, .ytp-prev-button');
+                if (!btn) return;
+
+                const isWatch = (document.location?.pathname || '').startsWith('/watch');
+                const params = new URLSearchParams(document.location?.search || '');
+                const isPlaylistWatch = params.has('list');
+                if (!isWatch || !isPlaylistWatch) return;
+
+                const playlistPanel = document.querySelector('ytd-playlist-panel-renderer');
+                if (!playlistPanel) return;
+                const items = Array.from(playlistPanel.querySelectorAll('ytd-playlist-panel-video-renderer'));
+                if (items.length === 0) return;
+
+                const selected = items.find(el => el.hasAttribute('selected') || el.getAttribute('aria-selected') === 'true') || null;
+                if (!selected) return;
+                const idx = items.indexOf(selected);
+                if (idx < 0) return;
+
+                const state = window.__filtertubePlaylistSkipState || (window.__filtertubePlaylistSkipState = { lastAttemptTs: 0, lastSelectedVideoId: '', lastDirection: 1 });
+                const direction = btn.classList.contains('ytp-prev-button') ? -1 : 1;
+                state.lastDirection = direction;
+
+                const pickNext = (start, step) => {
+                    for (let i = start; i >= 0 && i < items.length; i += step) {
+                        const cand = items[i];
+                        if (!cand) continue;
+                        const candHidden = cand.classList.contains('filtertube-hidden') || cand.hasAttribute('data-filtertube-hidden');
+                        if (candHidden) continue;
+                        const link = cand.querySelector('a[href*="watch?v="]');
+                        if (link) return link;
+                    }
+                    return null;
+                };
+
+                const immediate = items[idx + direction];
+                const immediateHidden = immediate && (immediate.classList.contains('filtertube-hidden') || immediate.hasAttribute('data-filtertube-hidden'));
+                if (!immediateHidden) return;
+
+                const targetLink = pickNext(idx + direction, direction);
+                if (!targetLink) return;
+
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                event.stopPropagation();
+
+                try {
+                    const video = document.querySelector('video.html5-main-video');
+                    if (video && typeof video.pause === 'function') {
+                        video.pause();
+                    }
+                } catch (e) {
+                }
+
+                targetLink.click();
+            } catch (e) {
+            }
+        }, true);
+    }
+
     videoElements.forEach(element => {
-        const alreadyProcessed = element.hasAttribute('data-filtertube-processed');
-        const uniqueId = element.getAttribute('data-filtertube-unique-id') || extractVideoIdFromCard(element) || '';
-        const lastProcessedId = element.getAttribute('data-filtertube-last-processed-id') || '';
-        const contentChanged = alreadyProcessed && uniqueId && lastProcessedId && uniqueId !== lastProcessedId;
+        try {
+            const elementTag = (element.tagName || '').toLowerCase();
+            const alreadyProcessed = element.hasAttribute('data-filtertube-processed');
+            const uniqueId = element.getAttribute('data-filtertube-unique-id') || extractVideoIdFromCard(element) || '';
+            const lastProcessedId = element.getAttribute('data-filtertube-last-processed-id') || '';
+            const contentChanged = alreadyProcessed && uniqueId && lastProcessedId && uniqueId !== lastProcessedId;
 
-        if ((forceReprocess || contentChanged) && alreadyProcessed) {
-            element.removeAttribute('data-filtertube-processed');
-            element.removeAttribute('data-filtertube-last-processed-id');
-            clearCachedChannelMetadata(element);
-        } else if (contentChanged) {
-            clearCachedChannelMetadata(element);
-        }
-
-        if (alreadyProcessed && !forceReprocess && !contentChanged) {
-            // Skip already processed elements to avoid duplicate counting
-            return;
-        }
-
-        // Extract Metadata
-        const titleElement = element.querySelector('#video-title, .ytd-video-meta-block #video-title, h3 a, .metadata-snippet-container #video-title, #video-title-link, .yt-lockup-metadata-view-model-wiz__title, .yt-lockup-metadata-view-model__title, .yt-lockup-metadata-view-model__heading-reset, yt-formatted-string#title, span#title');
-        const channelElement = element.querySelector('#channel-name a, .ytd-channel-name a, ytd-channel-name a, #text, .ytd-video-owner-renderer a, .yt-lockup-metadata-view-model-wiz__metadata, .yt-content-metadata-view-model__metadata-text, yt-formatted-string[slot="subtitle"], .watch-card-tertiary-text a');
-        const channelSubtitleElement = element.querySelector('#watch-card-subtitle, #watch-card-subtitle yt-formatted-string');
-        const channelAnchor = (channelElement || channelSubtitleElement)?.closest('a') || element.querySelector('a[href*="/channel"], a[href^="/@"], a[href*="/user/"], a[href*="/c/"]');
-
-        let title = titleElement?.textContent?.trim() || '';
-        if (!title) {
-            const ownAriaLabel = element.getAttribute('aria-label');
-            if (ownAriaLabel) {
-                title = ownAriaLabel.trim();
+            if ((forceReprocess || contentChanged) && alreadyProcessed) {
+                element.removeAttribute('data-filtertube-processed');
+                element.removeAttribute('data-filtertube-last-processed-id');
+                clearCachedChannelMetadata(element);
+            } else if (contentChanged) {
+                clearCachedChannelMetadata(element);
             }
-        }
-        if (!title) {
-            const labelledById = element.getAttribute('aria-labelledby');
-            if (labelledById) {
-                const labelSource = document.getElementById(labelledById.trim());
-                if (labelSource?.textContent) {
-                    title = labelSource.textContent.trim();
+
+            if (alreadyProcessed && !forceReprocess && !contentChanged) {
+                // Skip already processed elements to avoid duplicate counting
+                return;
+            }
+
+            // Extract Metadata
+            const titleElement = element.querySelector('#video-title, .ytd-video-meta-block #video-title, h3 a, .metadata-snippet-container #video-title, #video-title-link, .yt-lockup-metadata-view-model-wiz__title, .yt-lockup-metadata-view-model__title, .yt-lockup-metadata-view-model__heading-reset, yt-formatted-string#title, span#title');
+            let channelElement = null;
+            if (elementTag === 'ytd-playlist-panel-video-renderer' || elementTag === 'ytd-playlist-panel-video-wrapper-renderer') {
+                channelElement = element.querySelector('#byline, #byline-container #byline');
+            }
+            if (!channelElement) {
+                channelElement = element.querySelector(
+                    '#channel-name a, ' +
+                    '.ytd-channel-name a, ' +
+                    'ytd-channel-name a, ' +
+                    '#byline-container #byline, ' +
+                    '#text, ' +
+                    '.ytd-video-owner-renderer a, ' +
+                    '.yt-lockup-metadata-view-model-wiz__metadata, ' +
+                    '.yt-content-metadata-view-model__metadata-text, ' +
+                    'yt-formatted-string[slot="subtitle"], ' +
+                    '.watch-card-tertiary-text a'
+                );
+            }
+            const channelSubtitleElement = element.querySelector('#watch-card-subtitle, #watch-card-subtitle yt-formatted-string');
+            const channelAnchor = (channelElement || channelSubtitleElement)?.closest('a') || element.querySelector('a[href*="/channel"], a[href^="/@"], a[href*="/user/"], a[href*="/c/"]');
+
+            let title = titleElement?.textContent?.trim() || '';
+            if (!title) {
+                const ownAriaLabel = element.getAttribute('aria-label');
+                if (ownAriaLabel) {
+                    title = ownAriaLabel.trim();
                 }
             }
-        }
-        if (!title) {
-            const titledAnchor = element.querySelector('a[title]');
-            if (titledAnchor?.getAttribute) {
-                const anchorTitle = titledAnchor.getAttribute('title');
-                if (anchorTitle) {
-                    title = anchorTitle.trim();
+            if (!title) {
+                const labelledById = element.getAttribute('aria-labelledby');
+                if (labelledById) {
+                    const labelSource = document.getElementById(labelledById.trim());
+                    if (labelSource?.textContent) {
+                        title = labelSource.textContent.trim();
+                    }
                 }
             }
-        }
-        const channelPrimaryText = channelElement?.textContent?.trim() || '';
-        const channelSubtitleText = channelSubtitleElement?.textContent?.trim() || '';
-        const channel = [channelPrimaryText, channelSubtitleText].filter(Boolean).join(' | ');
-        const channelHref = channelAnchor?.getAttribute('href') || channelAnchor?.href || '';
-        const relatedElements = [channelAnchor, channelElement, channelSubtitleElement];
-        let channelMeta = extractChannelMetadataFromElement(element, channel, channelHref, {
-            cacheTarget: channelAnchor || element,
-            relatedElements
-        });
-        const collaboratorMetas = extractCollaboratorMetadataFromElement(element);
-
-        // For Shorts/Reels without channel identity, try videoChannelMap lookup
-        const hasChannelIdentity = Boolean(channelMeta.handle || channelMeta.id || channelMeta.customUrl);
-        if (!hasChannelIdentity && effectiveSettings.videoChannelMap) {
-            // Extract videoId from card
-            let videoId = element.getAttribute('data-filtertube-video-id') || extractVideoIdFromCard(element);
-            if (videoId && effectiveSettings.videoChannelMap[videoId]) {
-                channelMeta = { ...channelMeta, id: effectiveSettings.videoChannelMap[videoId] };
+            if (!title) {
+                const titledAnchor = element.querySelector('a[title]');
+                if (titledAnchor?.getAttribute) {
+                    const anchorTitle = titledAnchor.getAttribute('title');
+                    if (anchorTitle) {
+                        title = anchorTitle.trim();
+                    }
+                }
             }
-        }
+            const channelPrimaryText = channelElement?.textContent?.trim() || '';
+            const channelSubtitleText = channelSubtitleElement?.textContent?.trim() || '';
+            let channel = [channelPrimaryText, channelSubtitleText].filter(Boolean).join(' | ');
+            if (elementTag === 'ytd-playlist-panel-video-renderer' || elementTag === 'ytd-playlist-panel-video-wrapper-renderer') {
+                const compact = channelPrimaryText
+                    .split('\n')[0]
+                    .split('•')[0]
+                    .trim();
+                channel = compact;
+            }
+            const channelHref = channelAnchor?.getAttribute('href') || channelAnchor?.href || '';
+            const relatedElements = [channelAnchor, channelElement, channelSubtitleElement];
+            let channelMeta = extractChannelMetadataFromElement(element, channel, channelHref, {
+                cacheTarget: channelAnchor || element,
+                relatedElements
+            });
+            const collaboratorMetas = extractCollaboratorMetadataFromElement(element);
 
-        // Determine Visibility
-        const elementTag = element.tagName.toLowerCase();
-        const shortThumbnailAnchor = element.querySelector('#thumbnail[href^="/shorts"], #video-title[href^="/shorts"], a[href^="/shorts/"]');
-        const shortOverlay = element.querySelector('ytd-thumbnail-overlay-time-status-renderer[overlay-style="SHORTS"], badge-shape[aria-label="Shorts"]');
-        const shortBadgeText = element.querySelector('.yt-badge-shape__text')?.textContent?.trim()?.toLowerCase() || '';
-        const shortBadgeDetected = shortBadgeText.includes('short');
+            // For Shorts/Reels without channel identity, try videoChannelMap lookup
+            const hasChannelIdentity = Boolean(channelMeta.handle || channelMeta.id || channelMeta.customUrl);
+            if (!hasChannelIdentity && effectiveSettings.videoChannelMap) {
+                // Extract videoId from card
+                let videoId = element.getAttribute('data-filtertube-video-id') || extractVideoIdFromCard(element);
+                if (videoId && effectiveSettings.videoChannelMap[videoId]) {
+                    channelMeta = { ...channelMeta, id: effectiveSettings.videoChannelMap[videoId] };
+                }
+            }
 
-        const isShortVideoRenderer = elementTag === 'ytd-video-renderer' && (
-            element.hasAttribute('is-shorts-video') ||
-            Boolean(shortThumbnailAnchor) ||
-            Boolean(shortOverlay) ||
-            shortBadgeDetected
-        );
+            // Determine Visibility
+            const shortThumbnailAnchor = element.querySelector('#thumbnail[href^="/shorts"], #video-title[href^="/shorts"], a[href^="/shorts/"]');
+            const shortOverlay = element.querySelector('ytd-thumbnail-overlay-time-status-renderer[overlay-style="SHORTS"], badge-shape[aria-label="Shorts"]');
+            const shortBadgeText = element.querySelector('.yt-badge-shape__text')?.textContent?.trim()?.toLowerCase() || '';
+            const shortBadgeDetected = shortBadgeText.includes('short');
 
-        if (isShortVideoRenderer) {
-            element.setAttribute('data-filtertube-short', 'true');
-        } else {
-            element.removeAttribute('data-filtertube-short');
-        }
+            const isShortVideoRenderer = elementTag === 'ytd-video-renderer' && (
+                element.hasAttribute('is-shorts-video') ||
+                Boolean(shortThumbnailAnchor) ||
+                Boolean(shortOverlay) ||
+                shortBadgeDetected
+            );
 
-        const skipKeywordFiltering = CHANNEL_ONLY_TAGS.has(elementTag);
-        const matchesFilters = shouldHideContent(title, channel, effectiveSettings, {
-            skipKeywords: skipKeywordFiltering,
-            channelHref,
-            channelMeta,
-            collaborators: collaboratorMetas
-        });
-
-        // Handle Container Logic (e.g., rich-grid-media inside rich-item)
-        let targetToHide = element;
-        if (elementTag === 'ytd-rich-grid-media') {
-            const parent = element.closest('ytd-rich-item-renderer');
-            if (parent) targetToHide = parent;
-        } else if (elementTag === 'yt-lockup-view-model' || elementTag === 'yt-lockup-metadata-view-model') {
-            const parent = element.closest('ytd-rich-item-renderer');
-            if (parent) targetToHide = parent;
-        }
-
-        let hideReason = `Content: ${title}`;
-        let shouldHide = matchesFilters;
-
-        if (isShortVideoRenderer) {
-            const hideByGlobalShorts = Boolean(effectiveSettings.hideAllShorts);
-
-            if (hideByGlobalShorts) {
-                shouldHide = true;
-                hideReason = 'Shorts hidden globally';
-                targetToHide.setAttribute('data-filtertube-hidden-by-hide-all-shorts', 'true');
-                targetToHide.removeAttribute('data-filtertube-hidden-by-keyword');
+            if (isShortVideoRenderer) {
+                element.setAttribute('data-filtertube-short', 'true');
             } else {
-                targetToHide.removeAttribute('data-filtertube-hidden-by-hide-all-shorts');
+                element.removeAttribute('data-filtertube-short');
+            }
 
-                if (matchesFilters) {
-                    targetToHide.setAttribute('data-filtertube-hidden-by-keyword', 'true');
-                } else {
+            const skipKeywordFiltering = CHANNEL_ONLY_TAGS.has(elementTag);
+            const matchesFilters = shouldHideContent(title, channel, effectiveSettings, {
+                skipKeywords: skipKeywordFiltering,
+                channelHref,
+                channelMeta,
+                collaborators: collaboratorMetas,
+                contentTag: elementTag
+            });
+
+            // Handle Container Logic (e.g., rich-grid-media inside rich-item)
+            let targetToHide = element;
+            if (elementTag === 'ytd-rich-grid-media') {
+                const parent = element.closest('ytd-rich-item-renderer');
+                if (parent) targetToHide = parent;
+            } else if (elementTag === 'yt-lockup-view-model' || elementTag === 'yt-lockup-metadata-view-model') {
+                const parent = element.closest('ytd-rich-item-renderer');
+                if (parent) targetToHide = parent;
+            } else if (elementTag === 'ytd-playlist-panel-video-renderer') {
+                const wrapper = element.closest('ytd-playlist-panel-video-wrapper-renderer');
+                if (wrapper) targetToHide = wrapper;
+            }
+
+            let hideReason = `Content: ${title}`;
+            let shouldHide = matchesFilters;
+
+            if (isShortVideoRenderer) {
+                const hideByGlobalShorts = Boolean(effectiveSettings.hideAllShorts);
+
+                if (hideByGlobalShorts) {
+                    shouldHide = true;
+                    hideReason = 'Shorts hidden globally';
+                    targetToHide.setAttribute('data-filtertube-hidden-by-hide-all-shorts', 'true');
                     targetToHide.removeAttribute('data-filtertube-hidden-by-keyword');
+                } else {
+                    targetToHide.removeAttribute('data-filtertube-hidden-by-hide-all-shorts');
+
+                    if (matchesFilters) {
+                        targetToHide.setAttribute('data-filtertube-hidden-by-keyword', 'true');
+                    } else {
+                        targetToHide.removeAttribute('data-filtertube-hidden-by-keyword');
+                    }
                 }
             }
-        }
 
-        toggleVisibility(targetToHide, shouldHide, hideReason);
-        element.setAttribute('data-filtertube-processed', 'true');
-        if (uniqueId) {
-            element.setAttribute('data-filtertube-last-processed-id', uniqueId);
-        } else {
-            element.removeAttribute('data-filtertube-last-processed-id');
+            toggleVisibility(targetToHide, shouldHide, hideReason);
+            element.setAttribute('data-filtertube-processed', 'true');
+            if (uniqueId) {
+                element.setAttribute('data-filtertube-last-processed-id', uniqueId);
+            } else {
+                element.removeAttribute('data-filtertube-last-processed-id');
+            }
+        } catch (e) {
         }
     });
 
@@ -574,6 +669,67 @@ function applyDOMFallback(settings, options = {}) {
 
     // Log hide/restore summary
     filteringTracker.logSummary();
+
+    try {
+        if (!window.__filtertubePlaylistSkipState) {
+            window.__filtertubePlaylistSkipState = { lastAttemptTs: 0, lastSelectedVideoId: '', lastDirection: 1 };
+        }
+        const state = window.__filtertubePlaylistSkipState;
+        const now = Date.now();
+        if (now - (state.lastAttemptTs || 0) > 80) {
+            const isWatch = (document.location?.pathname || '').startsWith('/watch');
+            const params = new URLSearchParams(document.location?.search || '');
+            const isPlaylistWatch = params.has('list');
+            const playlistPanel = document.querySelector('ytd-playlist-panel-renderer');
+            if (isWatch && isPlaylistWatch && playlistPanel) {
+                const items = Array.from(playlistPanel.querySelectorAll('ytd-playlist-panel-video-renderer'));
+                if (items.length > 0) {
+                    const selected = items.find(el => el.hasAttribute('selected') || el.getAttribute('aria-selected') === 'true') || null;
+                    const isHidden = selected && (selected.classList.contains('filtertube-hidden') || selected.hasAttribute('data-filtertube-hidden'));
+                    if (selected && isHidden) {
+                        const selectedHref = selected.querySelector('a[href*="watch?v="]')?.getAttribute('href') || '';
+                        const selectedVid = (selectedHref.match(/[?&]v=([a-zA-Z0-9_-]{11})/) || [])[1] || '';
+                        if (!selectedVid || state.lastSelectedVideoId !== selectedVid) {
+                            const idx = items.indexOf(selected);
+                            const pickNext = (start, step) => {
+                                for (let i = start; i >= 0 && i < items.length; i += step) {
+                                    const cand = items[i];
+                                    if (!cand) continue;
+                                    const candHidden = cand.classList.contains('filtertube-hidden') || cand.hasAttribute('data-filtertube-hidden');
+                                    if (candHidden) continue;
+                                    const link = cand.querySelector('a[href*="watch?v="]');
+                                    if (link) return link;
+                                }
+                                return null;
+                            };
+
+                            const direction = state.lastDirection === -1 ? -1 : 1;
+                            const preferred = pickNext(idx + direction, direction);
+                            const fallback = preferred ? null : pickNext(idx - direction, -direction);
+                            const target = preferred || fallback;
+                            if (target) {
+                                try {
+                                    const video = document.querySelector('video.html5-main-video');
+                                    if (video && typeof video.pause === 'function') {
+                                        video.pause();
+                                        if (typeof video.currentTime === 'number') {
+                                            video.currentTime = 0;
+                                        }
+                                    }
+                                } catch (e) {
+                                }
+                                state.lastAttemptTs = now;
+                                state.lastSelectedVideoId = selectedVid;
+                                target.click();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    } catch (e) {
+        // ignore
+    }
 }
 
 // Helper function to check if content should be hidden
@@ -584,7 +740,8 @@ function shouldHideContent(title, channel, settings, options = {}) {
         skipKeywords = false,
         channelHref = '',
         channelMeta: providedChannelMeta = null,
-        collaborators = []
+        collaborators = [],
+        contentTag = ''
     } = options;
     const channelMeta = providedChannelMeta || buildChannelMetadata(channel, channelHref);
     const hasChannelIdentity = Boolean(channelMeta.handle || channelMeta.id || channelMeta.customUrl);
@@ -620,6 +777,29 @@ function shouldHideContent(title, channel, settings, options = {}) {
 
             if (matchesKeyword(regex, title) || matchesKeyword(regex, channel)) {
                 return true;
+            }
+        }
+    }
+
+    if (settings.filterChannels && settings.filterChannels.length > 0 && !hasChannelIdentity && (!collaborators || collaborators.length === 0)) {
+        const normalizedChannelName = (value) => {
+            if (!value || typeof value !== 'string') return '';
+            return value.trim().toLowerCase().replace(/\s+/g, ' ');
+        };
+
+        const tag = (contentTag || '').toLowerCase();
+        const isPlaylistPanelItem = tag === 'ytd-playlist-panel-video-renderer' || tag === 'ytd-playlist-panel-video-wrapper-renderer';
+        if (isPlaylistPanelItem) {
+            const candidate = normalizedChannelName(channel);
+            if (candidate) {
+                for (const filterChannel of settings.filterChannels) {
+                    if (!filterChannel || typeof filterChannel !== 'object') continue;
+                    const blockedName = normalizedChannelName(filterChannel.name || filterChannel.handleDisplay || '');
+                    if (!blockedName) continue;
+                    if (candidate === blockedName) {
+                        return true;
+                    }
+                }
             }
         }
     }

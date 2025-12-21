@@ -1,8 +1,10 @@
-# FilterTube v3.0 - Current Functionality Documentation
+# FilterTube v3.x - Current Functionality Documentation
 
 ## Overview
 
-FilterTube v3.0 implements an advanced **data interception filtering system** that blocks YouTube content at the data source level before it's rendered. This revolutionary approach provides true zero-flash filtering with exceptional performance.
+FilterTube v3.x implements a **hybrid filtering system**:
+- A primary **data interception layer** removes blocked items from YouTube JSON responses before render when possible.
+- A secondary **DOM fallback layer** hides/restores already-rendered elements for SPA navigation, DOM recycling, and edge cases.
 
 ## Core Filtering Capabilities
 
@@ -25,7 +27,7 @@ FilterTube v3.0 implements an advanced **data interception filtering system** th
 ## Technical Implementation
 
 ### **Data Interception Architecture**
-FilterTube v3.0 operates by intercepting YouTube's JSON data at multiple points:
+FilterTube v3.x operates by intercepting YouTube's JSON data at multiple points:
 
 1. **Initial Page Data** (`window.ytInitialData`)
    - Home page video feeds
@@ -48,11 +50,10 @@ FilterTube v3.0 operates by intercepting YouTube's JSON data at multiple points:
 YouTube JSON Data → FilterTubeEngine.processData() → Filtered Data → YouTube Renderer
 ```
 
-### **Zero-Flash Technology**
-- **Pre-Render Filtering**: Content is filtered before YouTube's rendering engine processes it
-- **No DOM Manipulation**: Zero ongoing DOM changes or observers
-- **Instant Results**: Blocked content never appears, even momentarily
-- **Smooth Performance**: No UI lag or layout shifts
+### **Zero-Flash Technology (best-effort)**
+- **Pre-Render Filtering**: When content arrives via intercepted JSON, blocked items are removed before render.
+- **DOM Safety Net**: When YouTube inserts content via hydration or recycled nodes, DOM fallback hides it as soon as it exists.
+- **Watch Playlist Protection**: On `/watch?...&list=...`, Next/Prev navigation is guarded so the player does not visibly land on blocked playlist items.
 
 ## Supported YouTube Components
 
@@ -84,12 +85,12 @@ YouTube JSON Data → FilterTubeEngine.processData() → Filtered Data → YouTu
 - **Multiple Keywords**: Supports filtering by multiple keyword patterns
 
 ### **Channel Filtering**
-- **@Handle Support**: Blocks channels by their @username handles
-- **Channel ID Support**: Blocks channels by YouTube channel IDs (UC...)
-- **Channel Name Support**: Blocks channels by display names
-- **Fuzzy Matching**: Handles variations in channel name formats
+- **UC ID Support**: Blocks channels by canonical channel IDs (`UC...`).
+- **@Handle Support**: Blocks channels by `@handle` aliases, including unicode/percent-encoded handles.
+- **Legacy URL Support**: Blocks channels by `/c/<name>` and `/user/<name>` via normalized `customUrl` keys.
+- **Name Matching (conservative)**: Some surfaces (notably watch-page playlist panels) expose only byline names; FilterTube uses strict name matching only as a fallback.
 - **Collaboration Awareness**: Adds a shared `collaborationGroupId` when the user blocks multi-author videos; the UI reflects missing collaborators via dashed rails + tooltips without altering sort order.
-- **Handle Regex Upgrades**: Accepts dots/underscores/dashes in @handles (regex `@([A-Za-z0-9._-]+)`) so channels like `@mr.engineer` stay matched everywhere.
+- **Handle Normalization**: Handle parsing is unicode-safe and percent-decoding aware (`js/shared/identity.js`), so handles like `@감동메모리` and percent-encoded variants remain matchable across surfaces.
 - **404 Recovery Pipeline**: Every block request runs through a cache-first lookup, ytInitialData replay, Shorts helpers, and DOM cache invalidation so handles never persist without a canonical UC ID—even when `/@handle/about` returns 404.
 
 ### **Comment Filtering**

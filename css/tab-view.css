@@ -299,6 +299,31 @@ body {
     padding: var(--ft-space-lg);
 }
 
+.help-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ft-space-md);
+}
+
+.help-item {
+    padding: var(--ft-space-md);
+    border: 1px solid var(--ft-color-sem-neutral-border);
+    border-radius: var(--ft-radius-md);
+    background-color: var(--ft-color-bg-base);
+}
+
+.help-item-title {
+    font-weight: 600;
+    color: var(--ft-color-text-primary);
+    margin-bottom: 6px;
+}
+
+.help-item-body {
+    color: var(--ft-color-text-secondary);
+    font-size: var(--ft-font-size-body);
+    line-height: 1.5;
+}
+
 /* Inputs & Buttons */
 .input-row {
     display: flex;

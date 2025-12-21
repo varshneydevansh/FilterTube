@@ -471,7 +471,8 @@ function setupNavigation() {
             'filters': 'Filters',
             'semantic': 'Semantic ML',
             'kids': 'Kids Mode',
-            'settings': 'Settings'
+            'settings': 'Settings',
+            'help': 'Help'
         };
         if (pageTitle && titles[viewId]) {
             pageTitle.textContent = titles[viewId];

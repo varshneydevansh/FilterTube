@@ -24,6 +24,9 @@ User clicks "Block" →
 - Map contains entries learned by `filter_logic.js` & injector from `ytInitialData`, playlist panels, lockup metadata, etc.
 - Prevents repeated `/@handle/about` calls and instantly resolves resurrected handles.
 
+Additional guarantee:
+- If a canonical UC ID is already available (directly or via `channelMap`) but the follow-up fetch for name/logo fails (network, rate-limit), blocking still succeeds by persisting a minimal channel entry keyed by UC ID.
+
 ### 2. Main-World Replay (`injector.js`, `seed.js`)
 
 - `content_bridge.js` retries failed blocks by querying `searchYtInitialDataForVideoChannel(videoId, expectedHandle)`.

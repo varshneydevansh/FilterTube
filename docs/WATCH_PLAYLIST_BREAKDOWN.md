@@ -1,4 +1,45 @@
-## Watch Playlist – Hidden Videos Leak-Through (Dec 6, 2025)
+# Watch Playlist – Current Implementation (v3.1.1)
+
+## Goal
+
+- Ensure all videos from blocked channels stay hidden inside the watch-page playlist panel (`/watch?v=...&list=...`) even after hard refresh and SPA navigation.
+- Ensure Next/Prev/autoplay never lands on a blocked playlist item (no visible playback flash).
+
+
+## How it works now
+
+### 1) Hiding playlist panel items (DOM fallback)
+
+- Playlist panel rows are scanned by `applyDOMFallback()` in `js/content/dom_fallback.js`.
+- For playlist items, channel extraction prefers `#byline` (not `#text`) to avoid accidentally reading the video title.
+- When a playlist row is hidden, FilterTube hides the wrapper container (`ytd-playlist-panel-video-wrapper-renderer`) when present to avoid leaving a “clickable ghost row”.
+
+
+### 2) Deterministic identity for playlist items (prefetch → videoChannelMap)
+
+- Many playlist rows only expose channel *name* (no handle/UC id). For deterministic filtering, FilterTube enriches playlist items using the same prefetch/hydration queue used for Shorts.
+- `js/content_bridge.js`:
+  - Attaches an `IntersectionObserver` prefetcher.
+  - On watch pages with `list=...`, playlist panel rows are prioritized for observation so they get enriched early.
+  - Prefetch resolves `videoId -> channelId` and persists it into `videoChannelMap`, enabling reliable “same-channel” hiding (e.g., multiple Pitbull entries).
+
+
+### 3) No-flash skipping for blocked Next/Prev/autoplay
+
+- `js/content/dom_fallback.js` installs a capture-phase click interceptor on `.ytp-next-button` / `.ytp-prev-button`.
+- If the immediate next/prev playlist row is already hidden, the click is intercepted and redirected to the next visible playlist item.
+- A second guard runs after each DOM fallback pass: if the currently selected playlist item is hidden (autoplay or external navigation), FilterTube immediately redirects to the next visible item.
+
+
+## Notes on matching when playlist rows have no identity
+
+- If a playlist item does not expose `UC...` or `@handle`, FilterTube uses a strict byline-name fallback match for playlist rows only.
+- This is intentionally conservative to avoid false positives.
+
+
+---
+
+## Historical Notes (pre-v3.1.1)
 
 ### What the user sees
 - Playlist items blocked by channel/keyword briefly play for ~1–1.5s before skipping.

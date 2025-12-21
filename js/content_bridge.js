@@ -452,14 +452,30 @@ function schedulePrefetchScan() {
 
 function attachPrefetchObservers() {
     if (!prefetchObserver || typeof document.querySelectorAll !== 'function') return;
-    const cards = document.querySelectorAll(typeof VIDEO_CARD_SELECTORS === 'string' ? VIDEO_CARD_SELECTORS : 'ytd-rich-item-renderer');
+    const list = [];
+
+    try {
+        const isWatch = (document.location?.pathname || '').startsWith('/watch');
+        const params = new URLSearchParams(document.location?.search || '');
+        const isPlaylistWatch = params.has('list');
+        const playlistPanel = isWatch && isPlaylistWatch ? document.querySelector('ytd-playlist-panel-renderer') : null;
+        if (playlistPanel) {
+            list.push(...playlistPanel.querySelectorAll('ytd-playlist-panel-video-wrapper-renderer, ytd-playlist-panel-video-renderer'));
+        }
+    } catch (e) {
+        // ignore
+    }
+
+    list.push(...document.querySelectorAll(typeof VIDEO_CARD_SELECTORS === 'string' ? VIDEO_CARD_SELECTORS : 'ytd-rich-item-renderer'));
+
     let attached = 0;
-    for (const card of cards) {
+    const maxAttach = 120;
+    for (const card of list) {
         if (observedPrefetchCards.has(card)) continue;
         observedPrefetchCards.add(card);
         prefetchObserver.observe(card);
         attached++;
-        if (attached >= 60) break;
+        if (attached >= maxAttach) break;
     }
 }
 
@@ -483,6 +499,52 @@ function startCardPrefetchObserver() {
     });
 
     attachPrefetchObservers();
+}
+
+let playlistPanelPrefetchHookInstalled = false;
+
+function installPlaylistPanelPrefetchHook() {
+    if (playlistPanelPrefetchHookInstalled) return;
+    playlistPanelPrefetchHookInstalled = true;
+
+    const schedule = () => {
+        try {
+            schedulePrefetchScan();
+        } catch (e) {
+            // ignore
+        }
+    };
+
+    document.addEventListener('scroll', (event) => {
+        const target = event?.target;
+        if (!(target instanceof Element)) return;
+        if (target.closest('ytd-playlist-panel-renderer')) {
+            schedule();
+        }
+    }, true);
+
+    const observer = new MutationObserver(() => {
+        schedule();
+    });
+
+    const attach = () => {
+        const panel = document.querySelector('ytd-playlist-panel-renderer');
+        if (!panel) return false;
+        observer.observe(panel, { childList: true, subtree: true });
+        schedule();
+        return true;
+    };
+
+    if (!attach()) {
+        document.addEventListener('yt-navigate-finish', () => {
+            try {
+                observer.disconnect();
+            } catch (e) {
+                // ignore
+            }
+            attach();
+        });
+    }
 }
 
 function queuePrefetchForCard(card) {
@@ -1315,7 +1377,7 @@ function parseCollaboratorNames(rawText = '') {
             if (!cleaned) return;
             const lower = cleaned.toLowerCase();
             if (lower === 'and') return;
-            if (COLLAB_MORE_TOKEN_PATTERN.test(lower) || lower.endsWith(' more') || lower.startsWith('more ')) {
+            if (lower === 'more' || COLLAB_MORE_TOKEN_PATTERN.test(lower) || lower.endsWith(' more') || lower.startsWith('more ')) {
                 hasHidden = true;
                 const countMatch = lower.match(/(\d+)\s+more/);
                 if (countMatch) {
@@ -1333,6 +1395,20 @@ function parseCollaboratorNames(rawText = '') {
     });
 
     return { names, hasHiddenCollaborators: hasHidden, hiddenCount };
+}
+
+function isMixCardElement(element) {
+    if (!element || typeof element.querySelector !== 'function') return false;
+    const root = findVideoCardElement(element) || element;
+    const href = root.querySelector('a[href*="list=RDMM"], a[href*="start_radio=1"]')?.getAttribute('href') || '';
+    if (href && (href.includes('list=RDMM') || href.includes('start_radio=1'))) {
+        return true;
+    }
+    const badgeText = root.querySelector('yt-thumbnail-overlay-badge-view-model badge-shape .yt-badge-shape__text')?.textContent?.trim() || '';
+    if (badgeText.toLowerCase() === 'mix') {
+        return true;
+    }
+    return false;
 }
 
 function generateCollabEntryKey(card, videoId) {
@@ -2063,6 +2139,12 @@ function hydrateCollaboratorsFromRendererData(card) {
 
 function extractCollaboratorMetadataFromElement(element) {
     if (!element || typeof element.getAttribute !== 'function') return [];
+
+    // Mix cards (collection stacks / "My Mix") are not true collaborations.
+    // They list seed artists like "Nine Inch Nails and more", which must NOT be treated as channels.
+    if (isMixCardElement(element)) {
+        return [];
+    }
 
     const card = findVideoCardElement(element);
     if (card) {
@@ -2941,6 +3023,7 @@ async function initializeDOMFallback(settings) {
 
         // Start prefetch observer once DOM fallback is initialized
         startCardPrefetchObserver();
+        installPlaylistPanelPrefetchHook();
         // Schedule a scan to attach observer to existing cards
         schedulePrefetchScan();
     }
@@ -5526,6 +5609,22 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
         }
 
         let input = channelInfo.id || channelInfo.customUrl || requestedHandleForNetwork || channelInfo.handle;
+
+        if (!input && channelInfo?.name) {
+            const collabKey = (menuItem.getAttribute('data-collab-key') || '').trim();
+            const collabGroup = (menuItem.getAttribute('data-collaboration-group-id') || '').trim();
+            if (collabKey || collabGroup) {
+                const guessedHandle = `@${String(channelInfo.name).trim().toLowerCase().replace(/\s+/g, '')}`;
+                const normalizedGuess = normalizeHandleValue(guessedHandle);
+                if (normalizedGuess) {
+                    channelInfo.handle = normalizedGuess;
+                    requestedHandle = requestedHandle || normalizedGuess;
+                    requestedHandleForNetwork = requestedHandleForNetwork || normalizedGuess;
+                    applyHandleMetadata(channelInfo, normalizedGuess, { force: true });
+                    input = normalizedGuess;
+                }
+            }
+        }
 
         // Get collaboration metadata from menu item attribute
         const collaborationWithAttr = menuItem.getAttribute('data-collaboration-with');
