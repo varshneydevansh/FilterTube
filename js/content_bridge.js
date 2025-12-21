@@ -249,7 +249,7 @@ function renderFilterTubeMenuEntries({ dropdown, newMenuList, oldMenuList, chann
         const collaboratorCount = Math.min(collaborators.length, 6);
         const isMultiStep = collaboratorCount >= 3;
         const groupId = generateCollaborationGroupId();
-        const hasIdentifier = (c) => Boolean(c?.handle || c?.id);
+        const hasIdentifier = (c) => Boolean(c?.handle || c?.id || c?.customUrl);
         const anyMissingIdentifiers = collaborators.some(c => !hasIdentifier(c));
 
         if (containers.newMenuList) {
@@ -257,7 +257,7 @@ function renderFilterTubeMenuEntries({ dropdown, newMenuList, oldMenuList, chann
                 const collaborator = collaborators[i];
                 const otherChannels = collaborators
                     .filter((_, idx) => idx !== i)
-                    .map(c => c.handle || c.name);
+                    .map(c => c.handle || c.id || c.customUrl || c.name);
 
                 injectIntoNewMenu(containers.newMenuList, collaborator, videoCard, {
                     collaborationWith: otherChannels,
@@ -286,7 +286,7 @@ function renderFilterTubeMenuEntries({ dropdown, newMenuList, oldMenuList, chann
                 const collaborator = collaborators[i];
                 const otherChannels = collaborators
                     .filter((_, idx) => idx !== i)
-                    .map(c => c.handle || c.name);
+                    .map(c => c.handle || c.id || c.customUrl || c.name);
 
                 injectIntoOldMenu(containers.oldMenuList, collaborator, videoCard, {
                     collaborationWith: otherChannels,
@@ -790,7 +790,7 @@ function cancelDropdownCleanup(dropdown) {
 
 function getCollaboratorKey(channelInfo) {
     if (!channelInfo) return '';
-    const value = channelInfo.id || channelInfo.handle || channelInfo.name || '';
+    const value = channelInfo.id || channelInfo.handle || channelInfo.customUrl || channelInfo.name || '';
     return value.trim().toLowerCase();
 }
 
@@ -1074,6 +1074,7 @@ function applyHandleMetadata(target, candidateHandle, options = {}) {
 function isPlaceholderCollaboratorEntry(collaborator) {
     if (!collaborator || typeof collaborator !== 'object') return true;
     if (collaborator.id && collaborator.id.startsWith('UC')) return false;
+    if (collaborator.customUrl) return false;
     const label = (collaborator.handle || collaborator.name || '').trim();
     if (!label) return false;
     const normalized = label.replace(/^@+/, '').toLowerCase();
@@ -1090,13 +1091,14 @@ function sanitizeCollaboratorList(collaborators = []) {
         const normalized = {
             name: (collab.name || '').trim(),
             handle: normalizeHandleValue(collab.handle),
-            id: typeof collab.id === 'string' ? collab.id.trim() : ''
+            id: typeof collab.id === 'string' ? collab.id.trim() : '',
+            customUrl: typeof collab.customUrl === 'string' ? collab.customUrl.trim() : ''
         };
 
-        if (!normalized.name && !normalized.handle && !normalized.id) return;
+        if (!normalized.name && !normalized.handle && !normalized.id && !normalized.customUrl) return;
         if (isPlaceholderCollaboratorEntry(normalized)) return;
 
-        const key = (normalized.id || normalized.handle || normalized.name.toLowerCase());
+        const key = (normalized.id || normalized.handle || normalized.customUrl || normalized.name.toLowerCase());
         if (!key || seenKeys.has(key)) return;
         seenKeys.add(key);
         sanitized.push(normalized);
@@ -1141,14 +1143,25 @@ function extractCollaboratorsFromAvatarStackElement(stackElement) {
         const handle = normalizeHandleValue(extractHandleFromString(href));
         const id = extractChannelIdFromString(href);
 
-        const key = (id || handle || altText.toLowerCase());
+        let customUrl = '';
+        const match = href.match(/\/(c|user)\/([^/?#]+)/);
+        if (match && match[1] && match[2]) {
+            try {
+                customUrl = `${match[1]}/${decodeURIComponent(match[2])}`;
+            } catch (_) {
+                customUrl = `${match[1]}/${match[2]}`;
+            }
+        }
+
+        const key = (id || handle || customUrl || altText.toLowerCase());
         if (seen.has(key)) return;
         seen.add(key);
 
         collaborators.push({
             name: altText,
             handle,
-            id
+            id,
+            customUrl
         });
     });
 
@@ -1271,14 +1284,14 @@ function getValidatedCachedCollaborators(card) {
 function buildCollaboratorSignature(collaborators = []) {
     if (!Array.isArray(collaborators) || collaborators.length === 0) return '';
     return collaborators
-        .map(collab => (collab.id || collab.handle || collab.name || '').toLowerCase())
+        .map(collab => (collab.id || collab.handle || collab.customUrl || collab.name || '').toLowerCase())
         .filter(Boolean)
         .join('|');
 }
 
 function hasCompleteCollaboratorRoster(collaborators = [], expectedCount = 0) {
     if (!Array.isArray(collaborators) || collaborators.length === 0) return false;
-    const identifiersReady = collaborators.every(collab => Boolean(collab?.id || collab?.handle));
+    const identifiersReady = collaborators.every(collab => Boolean(collab?.id || collab?.handle || collab?.customUrl));
     const meetsExpected = !expectedCount || collaborators.length >= expectedCount;
     return identifiersReady && meetsExpected;
 }
@@ -1903,13 +1916,25 @@ function extractCollaboratorMetadataFromRenderer(rendererCandidate) {
             const collab = {
                 name: viewModel.title?.content || '',
                 handle: '',
-                id: ''
+                id: '',
+                customUrl: ''
             };
 
             if (browseEndpoint?.canonicalBaseUrl) {
-                const extracted = extractRawHandle(browseEndpoint.canonicalBaseUrl);
-                if (extracted) {
-                    collab.handle = normalizeHandleValue(extracted);
+                const baseUrl = browseEndpoint.canonicalBaseUrl;
+                if (typeof baseUrl === 'string') {
+                    if (baseUrl.startsWith('/@')) {
+                        const extracted = extractRawHandle(baseUrl);
+                        if (extracted) {
+                            collab.handle = normalizeHandleValue(extracted);
+                        }
+                    } else if (baseUrl.startsWith('/c/')) {
+                        const slug = baseUrl.split('/')[2];
+                        if (slug) collab.customUrl = `c/${slug}`;
+                    } else if (baseUrl.startsWith('/user/')) {
+                        const slug = baseUrl.split('/')[2];
+                        if (slug) collab.customUrl = `user/${slug}`;
+                    }
                 }
             }
 
@@ -2122,6 +2147,17 @@ function extractCollaboratorMetadataFromElement(element) {
                 const href = link.getAttribute('href') || link.href || '';
                 if (!href) continue;
 
+                if (!collaborator.customUrl) {
+                    const match = href.match(/\/(c|user)\/([^/?#]+)/);
+                    if (match && match[1] && match[2]) {
+                        try {
+                            collaborator.customUrl = `${match[1]}/${decodeURIComponent(match[2])}`;
+                        } catch (_) {
+                            collaborator.customUrl = `${match[1]}/${match[2]}`;
+                        }
+                    }
+                }
+
                 if (!collaborator.handle) {
                     const extracted = extractRawHandle(href);
                     if (extracted) {
@@ -2245,10 +2281,19 @@ function extractCollaboratorMetadataFromElement(element) {
                 const name = link.textContent?.trim() || '';
                 const handleValue = normalizeHandleValue(extractHandleFromString(href) || extractHandleFromString(name));
                 const id = extractChannelIdFromString(href) || '';
+                let customUrl = '';
+                const match = href.match(/\/(c|user)\/([^/?#]+)/);
+                if (match && match[1] && match[2]) {
+                    try {
+                        customUrl = `${match[1]}/${decodeURIComponent(match[2])}`;
+                    } catch (_) {
+                        customUrl = `${match[1]}/${match[2]}`;
+                    }
+                }
                 const key = (handleValue || '').toLowerCase() || id || name.toLowerCase();
                 if (!key || seenKeys.has(key)) return;
 
-                collaborators.push({ name, handle: handleValue || '', id });
+                collaborators.push({ name, handle: handleValue || '', id, customUrl });
                 seenKeys.add(key);
             });
             if (collaborators.length > 0) {
@@ -2321,7 +2366,7 @@ function extractCollaboratorMetadataFromElement(element) {
     }
 
     if (collaborators.length > 0) {
-        const missingIdentifiers = collaborators.some(c => !c.handle && !c.id);
+        const missingIdentifiers = collaborators.some(c => !c.handle && !c.id && !c.customUrl);
         const needsMoreCollaborators = expectedCollaboratorCount > 0 && collaborators.length < expectedCollaboratorCount;
         if (missingIdentifiers || needsMoreCollaborators) {
             requiresDialogExtraction = true;
@@ -4709,24 +4754,24 @@ function attachFilterTubeMenuHandlers({ menuItem, toggle, channelInfo, videoCard
     }
 
     const handleInteraction = async (event) => {
-        event.preventDefault();
-        event.stopPropagation();
         if (menuItem.getAttribute('data-filtertube-disabled') === 'true') {
             return;
         }
 
-        if (toggle) {
-            toggle.blur();
-        }
         const isToggleTarget = toggle && (toggle === event.target || toggle.contains(event.target));
         if (isToggleTarget) {
-            // Let the toggle's own handler run
+            // Do NOT intercept toggle clicks. This handler is registered in capture phase,
+            // so calling stopPropagation here would prevent the toggle's own click handler.
             return;
         }
 
         event.preventDefault();
         event.stopPropagation();
         event.stopImmediatePropagation();
+
+        if (toggle) {
+            toggle.blur();
+        }
 
         if (injectionOptions.preventNativeClick || channelInfo?.isPlaceholder) {
             return;
@@ -5170,7 +5215,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                 );
 
                 for (const collaborator of selectedCollaborators) {
-                    const identifier = collaborator.handle || collaborator.id || collaborator.name;
+                    const identifier = collaborator.handle || collaborator.id || collaborator.customUrl || collaborator.name;
                     if (!identifier) {
                         console.error('FilterTube: Cannot block collaborator - no identifier', collaborator);
                         continue;
@@ -5184,7 +5229,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
 
                     const otherChannels = collaboratorSource
                         .filter(other => other !== collaborator)
-                        .map(c => c.handle || c.name);
+                        .map(c => c.handle || c.id || c.customUrl || c.name);
 
                     // Execute block
                     const collaboratorMetadata = buildChannelMetadataPayload(collaborator);
@@ -5233,7 +5278,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             let successCount = 0;
             for (let i = 0; i < collaboratorCount; i++) {
                 const collaborator = channelInfo.allCollaborators[i];
-                let input = collaborator.handle || collaborator.id;
+                let input = collaborator.handle || collaborator.id || collaborator.customUrl;
 
                 if (!input && collaborator.name) {
                     const guessedHandle = `@${collaborator.name.toLowerCase().replace(/\s+/g, '')}`;
@@ -5244,7 +5289,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                 if (input) {
                     const otherChannels = channelInfo.allCollaborators
                         .filter((_, idx) => idx !== i)
-                        .map(c => c.handle || c.name);
+                        .map(c => c.handle || c.id || c.customUrl || c.name);
                     const collaboratorFilterAll = resolveFilterAllPreference(collaborator);
 
                     console.log(`FilterTube: Blocking collaborator ${i + 1}/${collaboratorCount}: ${input}`, 'filterAll:', collaboratorFilterAll);
@@ -5292,7 +5337,16 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                 console.log(`FilterTube: Found ${cardsToHide.length} instance(s) of video ${videoId} to hide`);
             } else {
                 // Fallback: just hide the current card if we can't extract videoId
-                cardsToHide = [videoCard];
+                // Prefer a stable container for home lockup cards so restore can revert it later.
+                let fallbackTarget = videoCard;
+                const tagName = (videoCard.tagName || '').toLowerCase();
+                if (tagName.includes('lockup-view-model')) {
+                    const parentContainer = videoCard.closest('ytd-rich-item-renderer');
+                    if (parentContainer) {
+                        fallbackTarget = parentContainer;
+                    }
+                }
+                cardsToHide = [fallbackTarget];
                 console.log('FilterTube: Could not extract videoId, hiding only current card');
             }
 
@@ -5364,7 +5418,58 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             const fetchedChannelInfo = await fetchData.channelInfoPromise;
             if (fetchedChannelInfo && (fetchedChannelInfo.id || fetchedChannelInfo.handle)) {
                 console.log('FilterTube: Using pre-fetched channel info:', fetchedChannelInfo);
-                channelInfo = fetchedChannelInfo;
+
+                const clickedKey = (menuItem.getAttribute('data-collab-key') || '').trim().toLowerCase();
+                const preserveIdentity = (incoming) => {
+                    if (!incoming || typeof incoming !== 'object') return;
+                    const { id, handle, name, customUrl, canonicalHandle, handleDisplay, ...rest } = incoming;
+                    channelInfo = { ...rest, ...channelInfo };
+                };
+
+                if (
+                    clickedKey &&
+                    Array.isArray(fetchedChannelInfo.allCollaborators) &&
+                    fetchedChannelInfo.allCollaborators.length > 0
+                ) {
+                    const matchedCollaborator = fetchedChannelInfo.allCollaborators.find(c => getCollaboratorKey(c) === clickedKey) ||
+                        fetchedChannelInfo.allCollaborators.find(c => {
+                            if (!c) return false;
+                            const cId = (c.id || '').trim();
+                            if (channelInfo?.id && cId && channelInfo.id === cId) return true;
+                            const cHandle = normalizeHandleValue(c.handle || '') || '';
+                            if (requestedHandle && cHandle && requestedHandle === cHandle) return true;
+                            if (channelInfo?.handle) {
+                                const clickedHandleNorm = normalizeHandleValue(channelInfo.handle) || '';
+                                if (clickedHandleNorm && cHandle && clickedHandleNorm === cHandle) return true;
+                            }
+                            return false;
+                        });
+
+                    if (matchedCollaborator) {
+                        channelInfo = { ...fetchedChannelInfo, ...channelInfo, ...matchedCollaborator };
+                    } else {
+                        preserveIdentity(fetchedChannelInfo);
+                    }
+                } else {
+                    const fetchedId = (fetchedChannelInfo.id || '').trim();
+                    const clickedId = (channelInfo?.id || '').trim();
+                    const fetchedHandle = normalizeHandleValue(fetchedChannelInfo.handle || '') || '';
+                    const clickedHandle = normalizeHandleValue(channelInfo?.handle || '') || '';
+                    const sameIdentity = (clickedId && fetchedId && clickedId === fetchedId) ||
+                        (clickedHandle && fetchedHandle && clickedHandle === fetchedHandle);
+
+                    if (sameIdentity) {
+                        channelInfo = { ...fetchedChannelInfo, ...channelInfo };
+                    } else {
+                        preserveIdentity(fetchedChannelInfo);
+                    }
+                }
+
+                // Ensure canonicalHandle/handleDisplay do not leak from the primary card channel
+                // when blocking a collaborator. These fields influence what Background persists.
+                if (channelInfo?.handle) {
+                    applyHandleMetadata(channelInfo, channelInfo.handle, { force: true });
+                }
             }
         } catch (error) {
             console.warn('FilterTube: Background fetch failed, using initial channel info:', error);
@@ -5410,6 +5515,16 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
         // Prefer canonical UC ID when available, fall back to handle
         const expectedHandle = requestedHandle || channelInfo?.expectedHandle || null;
         const expectedName = channelInfo?.expectedChannelName || channelInfo?.name || null;
+
+        // Identity integrity: ensure canonicalHandle/handleDisplay align with the handle we intend
+        // to persist (especially important for collaborator rows, where prefetch data can carry
+        // the primary card channel's canonical handle).
+        if (requestedHandle) {
+            applyHandleMetadata(channelInfo, requestedHandle, { force: true });
+        } else if (channelInfo?.handle) {
+            applyHandleMetadata(channelInfo, channelInfo.handle, { force: true });
+        }
+
         let input = channelInfo.id || channelInfo.customUrl || requestedHandleForNetwork || channelInfo.handle;
 
         // Get collaboration metadata from menu item attribute
@@ -5762,7 +5877,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             const isShorts = videoCard.tagName.toLowerCase().includes('shorts-lockup-view-model') ||
                 videoCard.tagName.toLowerCase().includes('reel');
 
-            // For shorts, find the correct parent container to hide
+            // For shorts and home lockups, find the correct parent container to hide
             let containerToHide = videoCard;
             if (isShorts) {
                 // Try homepage container (ytd-rich-item-renderer)
@@ -5775,6 +5890,14 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                     containerToHide = parentContainer;
                 }
                 console.log('FilterTube: Shorts detected, hiding container:', containerToHide.tagName || containerToHide.className);
+            } else {
+                const isHomeLockup = videoCard.tagName.toLowerCase().includes('lockup-view-model');
+                if (isHomeLockup) {
+                    const parentContainer = videoCard.closest('ytd-rich-item-renderer');
+                    if (parentContainer) {
+                        containerToHide = parentContainer;
+                    }
+                }
             }
 
             // Immediate hiding: Apply direct styles + class to ensure it's hidden right away

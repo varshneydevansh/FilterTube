@@ -88,18 +88,46 @@ Each collaborator in `listItems[].listItemViewModel`:
 | Block [Channel 3-6] | 3-6 collaborators | Dynamic options for each additional collaborator |
 | Block All Collaborators | 2+ collaborators | Blocks ALL channels independently with shared `collaborationGroupId` |
 
+**Multi-select note (3+ collaborators):**
+When there are 3–6 collaborators, individual rows act as “select” toggles first. The bottom row becomes:
+`Done • Block X Selected` and will persist only those selected collaborators.
+
 #### Storage Schema for Collaboration Entries
 
 ```javascript
 {
   id: "UCxxxxxx",           // UC ID
   handle: "@channelname",   // @handle
+  customUrl: "c/LegacyName", // legacy channel URL (optional)
   name: "Channel Name",     // Display name
   filterAll: true/false,    // Filter All toggle state
   collaborationWith: ["@other1", "@other2"],  // Other collaborators (for UI display)
   collaborationGroupId: "uuid-xxx"            // Links related entries (for group operations)
 }
 ```
+
+#### Collaboration DOM + Cache Attributes (important)
+
+FilterTube stamps/caches collaborator rosters on cards so collaboration menus can render immediately even before Main World enrichment finishes.
+
+| Attribute | Where | Meaning |
+| --- | --- | --- |
+| `data-filtertube-video-id` | card + wrapper | Stable video ID used for cache validation and Main World lookups |
+| `data-filtertube-collaborators` | card | JSON string of `{name, handle, id, customUrl}` for collaborators |
+| `data-filtertube-collaborators-source` | card | Source tag: e.g. `lockup`, `dialog`, `mainworld` |
+| `data-filtertube-collaborators-ts` | card | Timestamp for stale-cache detection |
+| `data-filtertube-expected-collaborators` | card | Expected collaborator count (supports “+ N more”) |
+| `data-filtertube-channel-custom` | card | Legacy channel identifier (`c/<slug>` or `user/<slug>`) |
+
+#### Collaboration Menu Item Attributes
+
+| Attribute | Where | Meaning |
+| --- | --- | --- |
+| `data-collab-key` | menu row | Key for the collaborator row (derived from `id` or `@handle` or `customUrl`) |
+| `data-collaboration-with` | menu row | JSON of “other collaborators” for UI grouping |
+| `data-collaboration-group-id` | menu row | Group ID used to connect related collaboration entries |
+| `data-is-block-all="true"` | menu row | Marks the “All collaborators / Done” row |
+| `data-multi-step="true"` | menu row | Enables multi-select behavior for 3+ collaborators |
 
 #### Cross-World Communication
 

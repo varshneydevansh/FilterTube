@@ -358,9 +358,49 @@ This section answers:
     - a primary channel (first collaborator)
     - `allCollaborators[]` with best-effort `{name, handle, id}` for each collaborator
 
+- **3-dot menu behavior (2+ collaborators)**
+  - For collaboration cards, FilterTube injects one menu row per collaborator.
+  - It also injects a final row:
+    - **2 collaborators:** “Both Channels”
+    - **3–6 collaborators:** “All N Collaborators”
+
+- **Multi-select behavior (3–6 collaborators)**
+  - When there are 3+ collaborators, FilterTube uses a **multi-step selection UI**:
+    - Clicking an individual collaborator row **selects** it (does not immediately persist or hide).
+    - The bottom row label becomes **“Done • Block X Selected”**.
+    - Clicking **Done** persists *only the selected collaborators*.
+  - For 2 collaborators, multi-select is not used (each row blocks immediately; “Both Channels” blocks both).
+
+- **N collaborator limit**
+  - The collaboration menu is currently capped to **6 total channels** (YouTube typically shows up to 5 collaborators + 1 uploader).
+  - This is enforced in `content_bridge.js` so the menu stays usable and matches YouTube’s UI expectations.
+
+- **Identity integrity (important)**
+  - When blocking a collaborator, FilterTube treats the following as identity keys:
+    - `id` (UC ID)
+    - `handle` (@handle)
+    - `customUrl` (`c/<slug>` or `user/<slug>`)
+  - FilterTube avoids persisting “mixed identity” entries (example: UC ID from collaborator A but @handle from collaborator B).
+  - If a collaborator is only known via legacy `/c/` or `/user/` URLs, the system can still persist and later resolve that identity via `channelMap`.
+
 - **Enrichment path**
   - Isolated world gathers best-effort collaborator list from DOM.
   - Main world (`injector.js`) can extract collaborator list from `ytInitialData` and/or DOM hydration.
+
+- **Surface differences: Home vs Search vs Shorts**
+  - **Home (lockup cards)**
+    - Collaboration display may only show names.
+    - We attempt:
+      - lockup renderer data (`showDialogCommand` list items),
+      - avatar stacks,
+      - metadata rows,
+      - and finally Main World `ytInitialData` lookup by `videoId`.
+  - **Search (ytd-video-renderer)**
+    - Collaboration display is often under `#attributed-channel-name`.
+    - The first collaborator often has a direct `/@handle` link; others require dialog/ytInitialData.
+  - **Shorts**
+    - Shorts cards can be handle-only; collaboration extraction is more limited.
+    - If needed, we resolve identity via `/shorts/<id>` or `/watch?v=<id>` fallbacks and update `videoChannelMap`.
 
 ---
 
