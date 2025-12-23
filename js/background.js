@@ -1311,6 +1311,20 @@ browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
  */
 async function handleAddFilteredChannel(input, filterAll = false, collaborationWith = null, collaborationGroupId = null, metadata = {}) {
     try {
+        const isHandleLike = (value) => {
+            if (!value || typeof value !== 'string') return false;
+            return value.trim().startsWith('@');
+        };
+
+        const pickBetterName = (...candidates) => {
+            const cleaned = candidates
+                .map(v => (typeof v === 'string' ? v.trim() : ''))
+                .filter(Boolean);
+            if (cleaned.length === 0) return '';
+            const preferred = cleaned.find(v => !isHandleLike(v));
+            return preferred || cleaned[0];
+        };
+
         const normalizeChannelInput = (rawInput) => {
             if (!rawInput) return '';
             let cleaned = String(rawInput).trim();
@@ -1513,7 +1527,7 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
         const canonicalHandle = (metadata.canonicalHandle || channelInfo.canonicalHandle || channelInfo.handle || (isHandle ? rawValue : '') || '').trim();
         const normalizedHandle = canonicalHandle ? canonicalHandle.toLowerCase() : (channelInfo.handle ? channelInfo.handle.toLowerCase() : '');
         const handleDisplay = metadata.displayHandle || channelInfo.handleDisplay || canonicalHandle || (metadata.channelName || channelInfo.name) || '';
-        const finalChannelName = metadata.channelName || channelInfo.name;
+        const finalChannelName = pickBetterName(metadata.channelName, channelInfo.name, handleDisplay, canonicalHandle, normalizedValue);
         if (normalizedHandle) {
             channelInfo.handle = normalizedHandle;
         }
@@ -1543,7 +1557,9 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                 handle: existing.handle || channelInfo.handle,
                 handleDisplay: existing.handleDisplay || channelInfo.handleDisplay,
                 canonicalHandle: existing.canonicalHandle || channelInfo.canonicalHandle,
-                name: existing.name || finalChannelName,
+                name: (existing.name && !(isHandleLike(existing.name) && !isHandleLike(finalChannelName)))
+                    ? existing.name
+                    : finalChannelName,
                 logo: existing.logo || channelInfo.logo,
                 customUrl: existing.customUrl || customUrl,  // Preserve or add customUrl
                 source: existing.source || metadata.source || null,

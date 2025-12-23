@@ -14,12 +14,14 @@ function initializePopupFiltersTabs() {
     const keywordsContent = document.createElement('div');
     keywordsContent.innerHTML = `
         <div class="input-group">
+            <div class="search-row">
+                <input type="text" id="searchKeywordsPopup" class="text-input search-input" placeholder="Search keywords..." />
+            </div>
+
             <div class="add-keyword-row">
                 <input type="text" id="newKeywordInput" class="text-input" placeholder="Add keyword..." />
                 <button id="addKeywordBtn" class="btn btn-small btn-primary">Add</button>
             </div>
-
-            <input type="text" id="searchKeywordsPopup" class="search-input" placeholder="Search keywords..." />
 
             <div id="keywordList" class="keyword-list">
                 <div class="empty-state">No keywords added</div>
@@ -31,12 +33,14 @@ function initializePopupFiltersTabs() {
     const channelsContent = document.createElement('div');
     channelsContent.innerHTML = `
         <div class="input-group">
+            <div class="search-row">
+                <input type="text" id="searchChannelsPopup" class="text-input search-input" placeholder="Search channels..." />
+            </div>
+
             <div class="add-keyword-row">
                 <input type="text" id="channelInput" class="text-input" placeholder="Add @handle or channel ID..." />
                 <button id="addChannelBtn" class="btn btn-small btn-primary">Add</button>
             </div>
-
-            <input type="text" id="searchChannelsPopup" class="search-input" placeholder="Search channels..." />
 
             <div id="channelList" class="keyword-list">
                 <div class="empty-state">No channels blocked</div>
@@ -47,31 +51,62 @@ function initializePopupFiltersTabs() {
     // Create Content tab content
     const contentTab = document.createElement('div');
 
+    const contentSearchRow = document.createElement('div');
+    contentSearchRow.className = 'search-row';
+
     const contentControlsSearch = document.createElement('input');
     contentControlsSearch.type = 'text';
     contentControlsSearch.id = 'searchContentControlsPopup';
-    contentControlsSearch.className = 'search-input';
+    contentControlsSearch.className = 'text-input search-input';
     contentControlsSearch.placeholder = 'Search content controls...';
-    contentControlsSearch.style.marginBottom = '10px';
-    contentTab.appendChild(contentControlsSearch);
+
+    contentSearchRow.appendChild(contentControlsSearch);
+    contentTab.appendChild(contentSearchRow);
 
     const catalog = window.FilterTubeContentControlsCatalog?.getCatalog?.() || [];
+
+    function hexToRgba(hex, alpha) {
+        if (!hex || typeof hex !== 'string') return '';
+        const sanitized = hex.replace('#', '');
+        const bigint = parseInt(sanitized.length === 3
+            ? sanitized.split('').map(ch => ch + ch).join('')
+            : sanitized, 16);
+        if (Number.isNaN(bigint)) return '';
+        const r = (bigint >> 16) & 255;
+        const g = (bigint >> 8) & 255;
+        const b = bigint & 255;
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    function applyControlGroupTheme(groupEl, accentColor) {
+        if (!groupEl || !accentColor) return;
+        groupEl.style.setProperty('--ft-control-accent', accentColor);
+        groupEl.style.setProperty('--ft-control-accent-border', hexToRgba(accentColor, 0.35));
+        groupEl.style.setProperty('--ft-control-accent-bg', hexToRgba(accentColor, 0.08));
+        groupEl.style.setProperty('--ft-control-accent-row-border', hexToRgba(accentColor, 0.28));
+        groupEl.style.setProperty('--ft-control-accent-row-bg', hexToRgba(accentColor, 0.08));
+        groupEl.style.setProperty('--ft-control-accent-row-hover-bg', hexToRgba(accentColor, 0.14));
+    }
 
     catalog.forEach(group => {
         const groupEl = document.createElement('div');
         groupEl.setAttribute('data-ft-control-group', 'true');
         groupEl.setAttribute('data-ft-group-title', group?.title || '');
-        if (group?.accentColor) {
-            groupEl.style.borderLeft = `3px solid ${group.accentColor}`;
-            groupEl.style.paddingLeft = '10px';
-        }
-        groupEl.style.marginBottom = '12px';
+        groupEl.className = 'content-control-group';
+        applyControlGroupTheme(groupEl, group?.accentColor);
+
+        const headerEl = document.createElement('div');
+        headerEl.className = 'content-control-group__header';
 
         const titleEl = document.createElement('div');
-        titleEl.className = 'toggle-title';
+        titleEl.className = 'content-control-group__title';
         titleEl.textContent = group?.title || '';
-        titleEl.style.marginBottom = '8px';
-        groupEl.appendChild(titleEl);
+
+        headerEl.appendChild(titleEl);
+        groupEl.appendChild(headerEl);
+
+        const rowsContainer = document.createElement('div');
+        rowsContainer.className = 'content-control-group__rows';
 
         (group.controls || []).forEach(control => {
             const row = document.createElement('div');
@@ -85,7 +120,6 @@ function initializePopupFiltersTabs() {
             label.className = 'toggle-label';
             label.innerHTML = `
                 <span class="toggle-title">${control.title || ''}</span>
-                <span class="toggle-desc">${control.description || ''}</span>
             `;
 
             const switchLabel = document.createElement('label');
@@ -104,9 +138,10 @@ function initializePopupFiltersTabs() {
 
             row.appendChild(label);
             row.appendChild(switchLabel);
-            groupEl.appendChild(row);
+            rowsContainer.appendChild(row);
         });
 
+        groupEl.appendChild(rowsContainer);
         contentTab.appendChild(groupEl);
     });
 

@@ -100,31 +100,62 @@ function initializeFiltersTabs() {
     // Content tab with checkboxes
     const contentTab = document.createElement('div');
 
+    const contentSearchRow = document.createElement('div');
+    contentSearchRow.className = 'search-row';
+
     const contentControlsSearch = document.createElement('input');
     contentControlsSearch.type = 'text';
     contentControlsSearch.id = 'searchContentControls';
-    contentControlsSearch.className = 'search-input';
+    contentControlsSearch.className = 'text-input search-input';
     contentControlsSearch.placeholder = 'Search content controls...';
-    contentControlsSearch.style.marginBottom = '12px';
-    contentTab.appendChild(contentControlsSearch);
+
+    contentSearchRow.appendChild(contentControlsSearch);
+    contentTab.appendChild(contentSearchRow);
 
     const catalog = window.FilterTubeContentControlsCatalog?.getCatalog?.() || [];
+
+    function hexToRgba(hex, alpha) {
+        if (!hex || typeof hex !== 'string') return '';
+        const sanitized = hex.replace('#', '');
+        const bigint = parseInt(sanitized.length === 3
+            ? sanitized.split('').map(ch => ch + ch).join('')
+            : sanitized, 16);
+        if (Number.isNaN(bigint)) return '';
+        const r = (bigint >> 16) & 255;
+        const g = (bigint >> 8) & 255;
+        const b = bigint & 255;
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    function applyControlGroupTheme(groupEl, accentColor) {
+        if (!groupEl || !accentColor) return;
+        groupEl.style.setProperty('--ft-control-accent', accentColor);
+        groupEl.style.setProperty('--ft-control-accent-border', hexToRgba(accentColor, 0.35));
+        groupEl.style.setProperty('--ft-control-accent-bg', hexToRgba(accentColor, 0.08));
+        groupEl.style.setProperty('--ft-control-accent-row-border', hexToRgba(accentColor, 0.28));
+        groupEl.style.setProperty('--ft-control-accent-row-bg', hexToRgba(accentColor, 0.08));
+        groupEl.style.setProperty('--ft-control-accent-row-hover-bg', hexToRgba(accentColor, 0.14));
+    }
 
     catalog.forEach(group => {
         const groupEl = document.createElement('div');
         groupEl.setAttribute('data-ft-control-group', 'true');
         groupEl.setAttribute('data-ft-group-title', group?.title || '');
-        if (group?.accentColor) {
-            groupEl.style.borderLeft = `3px solid ${group.accentColor}`;
-            groupEl.style.paddingLeft = '12px';
-        }
-        groupEl.style.marginBottom = '18px';
+        groupEl.className = 'content-control-group';
+        applyControlGroupTheme(groupEl, group?.accentColor);
+
+        const headerEl = document.createElement('div');
+        headerEl.className = 'content-control-group__header';
 
         const titleEl = document.createElement('div');
-        titleEl.className = 'toggle-title';
+        titleEl.className = 'content-control-group__title';
         titleEl.textContent = group?.title || '';
-        titleEl.style.marginBottom = '10px';
-        groupEl.appendChild(titleEl);
+
+        headerEl.appendChild(titleEl);
+        groupEl.appendChild(headerEl);
+
+        const rowsContainer = document.createElement('div');
+        rowsContainer.className = 'content-control-group__rows';
 
         (group.controls || []).forEach(control => {
             const row = document.createElement('div');
@@ -139,12 +170,15 @@ function initializeFiltersTabs() {
             t.className = 'toggle-title';
             t.textContent = control.title || '';
 
-            const d = document.createElement('div');
-            d.className = 'toggle-desc';
-            d.textContent = control.description || '';
-
-            info.appendChild(t);
-            info.appendChild(d);
+            if (control.description) {
+                const infoWrapper = document.createElement('div');
+                infoWrapper.className = 'toggle-info-text';
+                infoWrapper.setAttribute('title', control.description);
+                infoWrapper.appendChild(t);
+                info.appendChild(infoWrapper);
+            } else {
+                info.appendChild(t);
+            }
 
             const switchLabel = document.createElement('label');
             switchLabel.className = 'switch';
@@ -162,9 +196,10 @@ function initializeFiltersTabs() {
 
             row.appendChild(info);
             row.appendChild(switchLabel);
-            groupEl.appendChild(row);
+            rowsContainer.appendChild(row);
         });
 
+        groupEl.appendChild(rowsContainer);
         contentTab.appendChild(groupEl);
     });
 

@@ -1465,6 +1465,32 @@ function parseCollaboratorNames(rawText = '') {
     return { names, hasHiddenCollaborators: hasHidden, hiddenCount };
 }
 
+function countDistinctChannelLinks(root) {
+    if (!root || typeof root.querySelectorAll !== 'function') return 0;
+    const linkSelectors = 'a[href*="/@"]:not([href*="/shorts"]):not([href*="/watch"]), a[href*="/channel/UC"], a[href*="/c/"], a[href*="/user/"]';
+    const links = root.querySelectorAll(linkSelectors);
+    const seen = new Set();
+    for (const link of links) {
+        const href = link?.getAttribute?.('href') || '';
+        if (!href) continue;
+        const handle = normalizeHandleValue(extractHandleFromString(href));
+        const id = extractChannelIdFromString(href);
+        let customUrl = '';
+        const match = href.match(/\/(c|user)\/([^/?#]+)/);
+        if (match && match[1] && match[2]) {
+            try {
+                customUrl = `${match[1]}/${decodeURIComponent(match[2])}`;
+            } catch (_) {
+                customUrl = `${match[1]}/${match[2]}`;
+            }
+        }
+        const key = (id || handle || customUrl || href).toLowerCase();
+        if (!key) continue;
+        seen.add(key);
+    }
+    return seen.size;
+}
+
 function isMixCardElement(element) {
     if (!element || typeof element.querySelector !== 'function') return false;
     const root = findVideoCardElement(element) || element;
@@ -2240,6 +2266,7 @@ function extractCollaboratorMetadataFromElement(element) {
     let partialCollaboratorsForEnrichment = [];
     const linkScope = card || element;
     const cacheTarget = card || element;
+    const avatarStackSignal = Boolean(card?.querySelector?.('yt-avatar-stack-view-model'));
     let expectedCollaboratorCount = 0;
     if (card?.getAttribute) {
         expectedCollaboratorCount = parseInt(card.getAttribute('data-filtertube-expected-collaborators') || '0', 10) || 0;
@@ -2469,6 +2496,19 @@ function extractCollaboratorMetadataFromElement(element) {
             }
             // Check if it contains collaboration keywords
             if (normalized.includes(' and ') || normalized.includes(' & ') || /\d+\s+more/i.test(normalized)) {
+                // Golden rule: only treat "and" as collaborator separator if YouTube is rendering the avatar stack.
+                // Otherwise a single channel like "The Institute of Art and Ideas" would be misdetected.
+                if (!avatarStackSignal && !/\d+\s+more/i.test(normalized)) {
+                    continue;
+                }
+                // If avatar stack is present, trust collaboration text even if links are missing (watch/home lockups).
+                // Otherwise, require 2+ distinct channel identities linked to avoid false positives.
+                if (!avatarStackSignal) {
+                    const distinctLinks = countDistinctChannelLinks(row);
+                    if (distinctLinks < 2 && !/\d+\s+more/i.test(normalized)) {
+                        continue;
+                    }
+                }
                 channelRowText = text.replace(/\s+/g, ' ').trim();
                 break;
             }
@@ -2489,12 +2529,22 @@ function extractCollaboratorMetadataFromElement(element) {
     if (collaborators.length === 0) {
         const channelNameEl = (card || element).querySelector('#channel-name, ytd-channel-name, .ytd-channel-name');
         if (channelNameEl) {
-            const parsed = parseCollaboratorNames(channelNameEl.textContent?.trim() || '');
-            if (parsed.names.length > 1 || parsed.hasHiddenCollaborators) {
-                parsed.names.forEach(name => collaborators.push({ name, handle: '', id: '' }));
-                hydrateCollaboratorsFromLinks(collaborators);
-                requiresDialogExtraction = true;
-                expectedCollaboratorCount = Math.max(expectedCollaboratorCount, parsed.names.length + parsed.hiddenCount);
+            const rawText = channelNameEl.textContent?.trim() || '';
+            if (!avatarStackSignal && !/\d+\s+more/i.test(rawText)) {
+                // Without avatar stack, do not split on "and" to avoid breaking channels that contain it.
+                // Collab videos will have avatar stack and will pass this gate.
+                return collaborators;
+            }
+            // If avatar stack is present, trust the text even if links are missing.
+            const distinctLinks = avatarStackSignal ? 2 : countDistinctChannelLinks(channelNameEl);
+            if (distinctLinks >= 2 || /\d+\s+more/i.test(rawText)) {
+                const parsed = parseCollaboratorNames(rawText);
+                if (parsed.names.length > 1 || parsed.hasHiddenCollaborators) {
+                    parsed.names.forEach(name => collaborators.push({ name, handle: '', id: '' }));
+                    hydrateCollaboratorsFromLinks(collaborators);
+                    requiresDialogExtraction = true;
+                    expectedCollaboratorCount = Math.max(expectedCollaboratorCount, parsed.names.length + parsed.hiddenCount);
+                }
             }
         }
     }
@@ -3847,11 +3897,16 @@ function extractChannelFromCard(card) {
             const normalizeNameCandidate = (value) => {
                 if (!value || typeof value !== 'string') return '';
                 // Comments markup sometimes includes extra lines (e.g. display name + handle).
-                const singleLine = value
+                let singleLine = value
                     .replace(/\s+/g, ' ')
                     .replace(/\s*\n\s*/g, ' ')
                     .replace(/\.\s*Go to channel\.?$/i, '')
                     .trim();
+
+                // Strip relative timestamps often found in ARIA labels (e.g. "User Name 2 hours ago").
+                if (/\s+\d+\s+(second|minute|hour|day|week|month|year)s?\s+ago$/i.test(singleLine)) {
+                    singleLine = singleLine.replace(/\s+\d+\s+(second|minute|hour|day|week|month|year)s?\s+ago$/i, '').trim();
+                }
 
                 // If the candidate includes both a display name and a handle, strip the handle.
                 const handleSuffixMatch = singleLine.match(/^(.*?)(\s+@[^\s]+.*)$/);
@@ -3871,11 +3926,10 @@ function extractChannelFromCard(card) {
 
             const nameCandidates = [
                 rawTextFromAnchorSpan,
-                rawTextFromAnchor,
                 rawTextFromContainerSpan,
+                rawTextFromAria,
+                rawTextFromAnchor,
                 rawTextFromContainer
-                ,
-                rawTextFromAria
             ].map(normalizeNameCandidate).filter(Boolean);
 
             const pickBestName = () => {
@@ -4954,9 +5008,33 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
     })();
 
     fetchPromise
-        .then((finalChannelInfo) => {
+        .then(async (finalChannelInfo) => {
             if (!finalChannelInfo || pendingDropdownFetches.get(dropdown)?.cancelled) return;
-            updateInjectedMenuChannelName(dropdown, finalChannelInfo);
+
+            const isHandleLike = (value) => {
+                if (!value || typeof value !== 'string') return false;
+                return value.trim().startsWith('@');
+            };
+
+            let enrichedInfo = finalChannelInfo;
+            const needsNameEnrichment = !enrichedInfo?.name || isHandleLike(enrichedInfo.name);
+            const lookup = enrichedInfo?.id || enrichedInfo?.handle || null;
+
+            if (needsNameEnrichment && lookup) {
+                try {
+                    const details = await browserAPI_BRIDGE.runtime.sendMessage({
+                        action: 'fetchChannelDetails',
+                        channelIdOrHandle: lookup
+                    });
+                    if (details && details.success) {
+                        enrichedInfo = { ...enrichedInfo, ...details };
+                    }
+                } catch (e) {
+                }
+            }
+
+            if (!enrichedInfo || pendingDropdownFetches.get(dropdown)?.cancelled) return;
+            updateInjectedMenuChannelName(dropdown, enrichedInfo);
         })
         .catch(() => {
         });

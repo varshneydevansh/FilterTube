@@ -54,6 +54,10 @@ const StateManager = (() => {
         isLoaded: false
     };
 
+     const channelEnrichmentAttempted = new Set();
+     let channelEnrichmentCount = 0;
+     const MAX_CHANNEL_ENRICHMENTS_PER_SESSION = 10;
+
     let isSaving = false;
     let listeners = [];
 
@@ -110,8 +114,73 @@ const StateManager = (() => {
         state.isLoaded = true;
 
         notifyListeners('load', state);
+
+         scheduleChannelNameEnrichment();
         return state;
     }
+
+     function scheduleChannelNameEnrichment() {
+         try {
+             setTimeout(() => {
+                 enrichStoredChannelNames();
+             }, 0);
+         } catch (e) {
+         }
+     }
+
+     function isHandleLike(value) {
+         return typeof value === 'string' && value.trim().startsWith('@');
+     }
+
+     function shouldEnrichChannel(channel) {
+         if (!channel || typeof channel !== 'object') return false;
+         const name = typeof channel.name === 'string' ? channel.name.trim() : '';
+         const id = typeof channel.id === 'string' ? channel.id.trim() : '';
+         const handle = typeof channel.handle === 'string' ? channel.handle.trim() : '';
+         const customUrl = typeof channel.customUrl === 'string' ? channel.customUrl.trim() : '';
+         const hasLookup = !!(id || handle || customUrl);
+         if (!hasLookup) return false;
+         if (!name) return true;
+         if (id && name === id) return true;
+         if (isHandleLike(name)) return true;
+         return false;
+     }
+
+     async function enrichStoredChannelNames() {
+         if (!Array.isArray(state.channels) || state.channels.length === 0) return;
+         if (channelEnrichmentCount >= MAX_CHANNEL_ENRICHMENTS_PER_SESSION) return;
+
+         for (const channel of state.channels) {
+             if (channelEnrichmentCount >= MAX_CHANNEL_ENRICHMENTS_PER_SESSION) return;
+             if (!shouldEnrichChannel(channel)) continue;
+
+             const key = String(channel.id || channel.handle || channel.customUrl || '').toLowerCase();
+             if (!key || channelEnrichmentAttempted.has(key)) continue;
+             channelEnrichmentAttempted.add(key);
+
+             const input = channel.id || channel.handle || channel.customUrl;
+             if (!input) continue;
+
+             try {
+                 channelEnrichmentCount += 1;
+                 await chrome.runtime.sendMessage({
+                     type: 'addFilteredChannel',
+                     input,
+                     filterAll: false,
+                     collaborationWith: null,
+                     collaborationGroupId: null,
+                     displayHandle: channel.handleDisplay || null,
+                     canonicalHandle: channel.canonicalHandle || null,
+                     channelName: null,
+                     customUrl: channel.customUrl || null,
+                     source: channel.source || null
+                 });
+             } catch (error) {
+                 channelEnrichmentCount -= 1;
+                 channelEnrichmentAttempted.delete(key);
+             }
+         }
+     }
 
     /**
      * Save current state to storage

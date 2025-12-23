@@ -31,6 +31,21 @@ const RenderEngine = (() => {
         return badge;
     }
 
+    function applySourceClasses(element, { channelDerived = false, sourceKey = null } = {}) {
+        if (!element) return;
+        if (channelDerived) element.classList.add('channel-derived');
+        if (sourceKey === 'comments') element.classList.add('source-comments');
+    }
+
+    function createSourceBadge({ sourceKey, title }) {
+        const isFromComments = sourceKey === 'comments';
+        return createPillBadge({
+            text: isFromComments ? 'From Comments' : 'From Channel',
+            title,
+            variantClass: isFromComments ? 'badge-variant-comments' : ''
+        });
+    }
+
     /**
      * Render keyword list with adaptive UI
      * @param {HTMLElement} container - Container element
@@ -130,11 +145,16 @@ const RenderEngine = (() => {
         const Settings = getSettings();
 
         const isChannelDerived = entry.source === 'channel';
+        const linkedChannel = isChannelDerived ? findChannelByRef(entry.channelRef) : null;
+        const channelDerivedSourceKey = 'channel';
 
         // Create item container
         const item = document.createElement('div');
         item.className = minimal ? 'keyword-item' : 'list-item';
-        if (isChannelDerived) item.classList.add('channel-derived');
+        applySourceClasses(item, {
+            channelDerived: isChannelDerived,
+            sourceKey: null
+        });
 
         // Left side: word and badges
         const left = document.createElement('div');
@@ -202,19 +222,11 @@ const RenderEngine = (() => {
         // Channel-derived keywords are now toggleable (persisted on the channel entry).
 
         if (isChannelDerived) {
-            // Channel-derived keyword: show badge only
-            const linkedChannel = findChannelByRef(entry.channelRef);
-            const isFromComments = linkedChannel?.source === 'comments';
-            const badge = createPillBadge({
-                text: isFromComments ? 'From Comments' : 'From Channel',
-                title: 'Auto-added by "Filter All Content" - managed in Channel Management',
-                variantClass: isFromComments ? 'badge-variant-comments' : ''
+            const badge = createSourceBadge({
+                sourceKey: channelDerivedSourceKey,
+                title: 'Auto-added by "Filter All Content" - managed in Channel Management'
             });
             controls.appendChild(commentsToggle);
-
-            if (minimal && isFromComments) {
-                item.classList.add('source-comments');
-            }
 
             if (!minimal) {
                 controls.appendChild(badge);
@@ -529,6 +541,7 @@ const RenderEngine = (() => {
 
         const item = document.createElement('div');
         item.className = 'keyword-item';
+        applySourceClasses(item, { sourceKey: channel?.source === 'comments' ? 'comments' : null });
         if (channel.collaborationGroupId) {
             item.classList.add('collaboration-member');
             item.setAttribute('data-collaboration-group-id', channel.collaborationGroupId);
@@ -549,10 +562,6 @@ const RenderEngine = (() => {
 
         const controls = document.createElement('div');
         controls.className = 'keyword-controls';
-
-        if (channel?.source === 'comments') {
-            item.classList.add('source-comments');
-        }
 
         const deleteBtn = UIComponents?.createDeleteButton ?
             UIComponents.createDeleteButton(async () => {
@@ -579,6 +588,7 @@ const RenderEngine = (() => {
 
         const item = document.createElement('div');
         item.className = 'list-item channel-item';
+        applySourceClasses(item, { sourceKey: channel?.source === 'comments' ? 'comments' : null });
         if (collaborationMeta) {
             item.classList.add('collaboration-entry');
             if (collaborationMeta.isPartial) {
@@ -614,12 +624,10 @@ const RenderEngine = (() => {
         infoGroup.appendChild(nameSpan);
 
         if (channel?.source === 'comments') {
-            const badge = createPillBadge({
-                text: 'From Comments',
-                title: 'This channel was blocked from the YouTube comments menu',
-                variantClass: 'badge-variant-comments'
-            });
-            infoGroup.appendChild(badge);
+            infoGroup.appendChild(createSourceBadge({
+                sourceKey: 'comments',
+                title: 'This channel was blocked from the YouTube comments menu'
+            }));
         }
 
         if (collaborationMeta) {
