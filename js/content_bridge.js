@@ -14,6 +14,35 @@ function buildChannelMetadataPayload(channelInfo = {}) {
     };
 }
 
+function pickMenuChannelDisplayName(channelInfo, injectionOptions = {}) {
+    const displayCandidate = typeof injectionOptions.displayName === 'string'
+        ? injectionOptions.displayName.trim()
+        : '';
+    const nameCandidate = typeof channelInfo?.name === 'string'
+        ? channelInfo.name.trim()
+        : '';
+
+    const isHandleLike = (value) => {
+        if (!value || typeof value !== 'string') return false;
+        return value.trim().startsWith('@');
+    };
+
+    const preferred = (!isHandleLike(displayCandidate) && displayCandidate)
+        ? displayCandidate
+        : ((!isHandleLike(nameCandidate) && nameCandidate)
+            ? nameCandidate
+            : (displayCandidate || nameCandidate));
+
+    return (
+        preferred ||
+        channelInfo?.handleDisplay ||
+        channelInfo?.handle ||
+        channelInfo?.customUrl ||
+        channelInfo?.id ||
+        'Channel'
+    );
+}
+
 function upsertFilterChannel(channelData) {
     if (!channelData) return;
     if (!currentSettings || typeof currentSettings !== 'object') {
@@ -336,6 +365,30 @@ function renderFilterTubeMenuEntries({ dropdown, newMenuList, oldMenuList, chann
         injectIntoOldMenu(containers.oldMenuList, channelInfo, videoCard);
     }
     forceDropdownResize(dropdown);
+}
+
+function updateInjectedMenuChannelName(dropdown, channelInfo) {
+    if (!dropdown || !channelInfo) return;
+    const menuItem = dropdown.querySelector('.filtertube-block-channel-item');
+    if (!menuItem) return;
+
+    const nameEl = menuItem.querySelector('.filtertube-channel-name');
+    if (!nameEl) return;
+
+    const current = (nameEl.textContent || '').trim();
+    const next = pickMenuChannelDisplayName(channelInfo, {}) || '';
+    if (!next) return;
+
+    // Avoid thrashing if already up to date
+    if (current === next) return;
+
+    // Only replace handle-like values with a better human name (or non-empty).
+    const isHandleLike = (value) => (typeof value === 'string' && value.trim().startsWith('@'));
+    if (isHandleLike(current) && !isHandleLike(next)) {
+        nameEl.textContent = next;
+    } else if (!current) {
+        nameEl.textContent = next;
+    }
 }
 
 function refreshActiveCollaborationMenu(videoId, collaborators, options = {}) {
@@ -3786,6 +3839,7 @@ function extractChannelFromCard(card) {
             const rawTextFromAnchorSpan = authorAnchor?.querySelector?.('span')?.textContent?.trim() || '';
             const rawTextFromContainerSpan = card.querySelector('#author-text span')?.textContent?.trim() || '';
             const rawTextFromContainer = card.querySelector('#author-text')?.textContent?.trim() || '';
+            const rawTextFromAria = authorAnchor?.getAttribute?.('aria-label')?.trim?.() || '';
 
             const rawHandle = extractRawHandle(href) || extractRawHandle(rawTextFromAnchor) || extractRawHandle(rawTextFromContainer);
             const handle = rawHandle ? normalizeHandleValue(rawHandle) : '';
@@ -3796,7 +3850,22 @@ function extractChannelFromCard(card) {
                 const singleLine = value
                     .replace(/\s+/g, ' ')
                     .replace(/\s*\n\s*/g, ' ')
+                    .replace(/\.\s*Go to channel\.?$/i, '')
                     .trim();
+
+                // If the candidate includes both a display name and a handle, strip the handle.
+                const handleSuffixMatch = singleLine.match(/^(.*?)(\s+@[^\s]+.*)$/);
+                if (handleSuffixMatch && handleSuffixMatch[1]) {
+                    const prefix = handleSuffixMatch[1].trim();
+                    if (prefix && !prefix.startsWith('@')) return prefix;
+                }
+
+                const embeddedHandleIdx = singleLine.search(/\s@[^\s]+/);
+                if (embeddedHandleIdx > 0) {
+                    const prefix = singleLine.slice(0, embeddedHandleIdx).trim();
+                    if (prefix && !prefix.startsWith('@')) return prefix;
+                }
+
                 return singleLine;
             };
 
@@ -3805,6 +3874,8 @@ function extractChannelFromCard(card) {
                 rawTextFromAnchor,
                 rawTextFromContainerSpan,
                 rawTextFromContainer
+                ,
+                rawTextFromAria
             ].map(normalizeNameCandidate).filter(Boolean);
 
             const pickBestName = () => {
@@ -3833,7 +3904,7 @@ function extractChannelFromCard(card) {
                     id: id || '',
                     customUrl: customUrl || '',
                     source: 'comments',
-                    name: name || handle || id || customUrl || ''
+                    name: name || ''
                 };
             }
         }
@@ -4882,6 +4953,14 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
         return finalChannelInfo;
     })();
 
+    fetchPromise
+        .then((finalChannelInfo) => {
+            if (!finalChannelInfo || pendingDropdownFetches.get(dropdown)?.cancelled) return;
+            updateInjectedMenuChannelName(dropdown, finalChannelInfo);
+        })
+        .catch(() => {
+        });
+
     // Store the fetch promise for later use (when user clicks "Block Channel")
     pendingDropdownFetches.set(dropdown, {
         channelInfoPromise: fetchPromise,
@@ -4985,7 +5064,7 @@ function injectIntoNewMenu(menuList, channelInfo, videoCard, collaborationMetada
     ensureFilterTubeMenuStyles();
 
     // Build channel display name
-    const channelName = escapeHtml(injectionOptions.displayName || channelInfo.name || 'Channel');
+    const channelName = escapeHtml(pickMenuChannelDisplayName(channelInfo, injectionOptions));
 
     filterTubeItem.innerHTML = `
         <div class="yt-list-item-view-model__label yt-list-item-view-model__container yt-list-item-view-model__container--compact yt-list-item-view-model__container--tappable yt-list-item-view-model__container--in-popup filtertube-menu-item">
@@ -5093,7 +5172,7 @@ function injectIntoOldMenu(menuContainer, channelInfo, videoCard, collaborationM
     ensureFilterTubeMenuStyles();
 
     // Build channel display name
-    const channelName = escapeHtml(injectionOptions.displayName || channelInfo.name || 'Channel');
+    const channelName = escapeHtml(pickMenuChannelDisplayName(channelInfo, injectionOptions));
 
     // Create FilterTube menu item (OLD structure)
     const filterTubeItem = document.createElement('ytd-menu-service-item-renderer');

@@ -499,6 +499,20 @@ function applyDOMFallback(settings, options = {}) {
     ensureStyles();
     ensureContentControlStyles(effectiveSettings);
 
+    if (effectiveSettings.enabled === false) {
+        try {
+            const contentControlStyle = document.getElementById('filtertube-content-controls-style');
+            if (contentControlStyle) {
+                contentControlStyle.textContent = '';
+            }
+            document.querySelectorAll('[data-filtertube-hidden], .filtertube-hidden').forEach(el => {
+                toggleVisibility(el, false, '', true);
+            });
+        } catch (e) {
+        }
+        return;
+    }
+
     // 1. Video/Content Filtering
     const videoElements = document.querySelectorAll(VIDEO_CARD_SELECTORS);
 

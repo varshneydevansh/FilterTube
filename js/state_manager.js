@@ -17,6 +17,7 @@ const StateManager = (() => {
     // ============================================================================
 
     let state = {
+        enabled: true,
         keywords: [],
         userKeywords: [],
         channels: [],
@@ -72,6 +73,7 @@ const StateManager = (() => {
 
         const data = await SettingsAPI.loadSettings();
 
+        state.enabled = data.enabled !== false;
         state.keywords = data.keywords || [];
         state.userKeywords = data.userKeywords || [];
         state.channels = data.channels || [];
@@ -130,6 +132,7 @@ const StateManager = (() => {
             const result = await SettingsAPI.saveSettings({
                 keywords: state.keywords,
                 channels: state.channels,
+                enabled: state.enabled,
                 hideShorts: state.hideShorts,
                 hideComments: state.hideComments,
                 filterComments: state.filterComments,
@@ -400,6 +403,42 @@ const StateManager = (() => {
     }
 
     /**
+     * Toggle whether a channel-derived keyword should apply to comment filtering.
+     * This persists on the channel entry itself (filterAllComments).
+     */
+    async function toggleChannelFilterAllCommentsByRef(channelRef) {
+        await ensureLoaded();
+
+        if (!channelRef) return false;
+        const Settings = SettingsAPI || {};
+        const getKey = Settings.getChannelDerivedKey;
+
+        const index = state.channels.findIndex(ch => {
+            if (!ch) return false;
+            if (typeof getKey === 'function') {
+                return getKey(ch) === channelRef;
+            }
+            const fallbackKey = (ch.id || ch.handle || ch.originalInput || ch.name || '').toLowerCase();
+            return fallbackKey === channelRef;
+        });
+
+        if (index === -1) return false;
+
+        const current = state.channels[index];
+        const currentValue = (typeof current.filterAllComments === 'boolean') ? current.filterAllComments : true;
+        current.filterAllComments = !currentValue;
+
+        recomputeKeywords();
+        await saveSettings();
+        notifyListeners('channelUpdated', {
+            channel: current,
+            index,
+            filterAllComments: current.filterAllComments
+        });
+        return current.filterAllComments;
+    }
+
+    /**
      * Check if a channel already exists
      * @param {string} input - Channel identifier
      * @returns {boolean} True if duplicate
@@ -453,6 +492,7 @@ const StateManager = (() => {
         await ensureLoaded();
 
         const validKeys = [
+            'enabled',
             'hideShorts',
             'hideComments',
             'filterComments',
@@ -481,6 +521,7 @@ const StateManager = (() => {
             'hideSubscriptions',
             'hideSearchShelves'
         ];
+
         if (!validKeys.includes(key)) {
             console.warn(`StateManager: Invalid setting key: ${key}`);
             return;
@@ -588,8 +629,10 @@ const StateManager = (() => {
 
                 // Check for settings changes using actual storage keys
                 const storageKeys = [
+                    'enabled',
                     'uiKeywords',
                     'filterKeywords',
+                    'filterKeywordsComments',
                     'filterChannels',
                     'hideAllShorts',
                     'hideAllComments',
@@ -604,6 +647,7 @@ const StateManager = (() => {
                     'hideLiveChat',
                     'hideVideoInfo',
                     'hideVideoButtonsBar',
+                    'hideAskButton',
                     'hideVideoChannelRow',
                     'hideVideoDescription',
                     'hideMerchTicketsOffers',
@@ -661,6 +705,7 @@ const StateManager = (() => {
         addChannel,
         removeChannel,
         toggleChannelFilterAll,
+        toggleChannelFilterAllCommentsByRef,
 
         // Settings
         updateSetting,

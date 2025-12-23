@@ -190,6 +190,11 @@
             return data; // Return unmodified data
         }
 
+        if (cachedSettings.enabled === false) {
+            seedDebugLog(`⏸️ Filtering disabled (enabled=false), skipping processing for ${dataName}`);
+            return data;
+        }
+
         if (shouldSkipEngineProcessing(data, dataName)) {
             // For search/home/channel layouts we skip MUTATING the data to allow DOM-based
             // restore, but we still want to LEARN UC ID <-> @handle mappings from the
@@ -253,6 +258,10 @@
      */
     function basicProcessing(data, dataName) {
         if (!cachedSettings) return data;
+
+        if (cachedSettings.enabled === false) {
+            return data;
+        }
         
         let modified = false;
         seedDebugLog(`🔧 Basic processing ${dataName}`);

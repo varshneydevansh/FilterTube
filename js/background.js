@@ -40,6 +40,7 @@ console.log(`FilterTube background script loaded in ${IS_FIREFOX ? 'Firefox' : '
 async function getCompiledSettings() {
     return new Promise((resolve) => {
         browserAPI.storage.local.get([
+            'enabled',
             'filterKeywords',
             'filterKeywordsComments',
             'uiKeywords',
@@ -277,6 +278,7 @@ async function getCompiledSettings() {
             compiledSettings.videoChannelMap = items.videoChannelMap || {};
 
             // Pass through boolean flags
+            compiledSettings.enabled = items.enabled !== false;
             compiledSettings.hideAllComments = items.hideAllComments || false;
             compiledSettings.filterComments = items.filterComments || false;
             compiledSettings.useExactWordMatching = useExact;

@@ -11,8 +11,10 @@
 
     const THEME_KEY = 'ftThemePreference';
     const SETTINGS_KEYS = [
+        'enabled',
         'uiKeywords',
         'filterKeywords',
+        'filterKeywordsComments',
         'filterChannels',
         'hideAllShorts',
         'hideAllComments',
@@ -142,6 +144,10 @@
         const canonicalHandle = typeof entry.canonicalHandle === 'string' ? entry.canonicalHandle : null;
         const customUrl = typeof entry.customUrl === 'string' ? entry.customUrl : null;
         const source = overrides.source || (typeof entry.source === 'string' ? entry.source : null);
+        const filterAllCommentsCandidate = Object.prototype.hasOwnProperty.call(overrides, 'filterAllComments')
+            ? overrides.filterAllComments
+            : entry.filterAllComments;
+        const filterAllComments = (typeof filterAllCommentsCandidate === 'boolean') ? filterAllCommentsCandidate : true;
         const name = entry.name || id || handle || entry.originalInput || '';
         const originalInput = entry.originalInput || customUrl || handle || id || name || '';
         const collaborationGroupId = typeof entry.collaborationGroupId === 'string'
@@ -183,6 +189,7 @@
             logo: entry.logo || null,
             customUrl,
             filterAll: !!entry.filterAll,
+            filterAllComments,
             source,
             originalInput,
             addedAt,
@@ -325,6 +332,7 @@
     function buildCompiledSettings({
         keywords,
         channels,
+        enabled,
         hideShorts,
         hideComments,
         filterComments,
@@ -356,6 +364,7 @@
         const sanitizedChannels = sanitizeChannelsList(channels);
         const sanitizedKeywords = syncFilterAllKeywords(keywords, sanitizedChannels);
         return {
+            enabled: enabled !== false,
             filterKeywords: compileKeywords(sanitizedKeywords),
             filterKeywordsComments: compileKeywords(sanitizedKeywords, entry => entry.comments !== false),
             filterChannels: sanitizedChannels,
@@ -407,6 +416,7 @@
                 const theme = result[THEME_KEY] === 'dark' ? 'dark' : 'light';
 
                 resolve({
+                    enabled: result.enabled !== false,
                     keywords,
                     userKeywords,
                     channels,
@@ -448,6 +458,7 @@
     function saveSettings({
         keywords,
         channels,
+        enabled,
         hideShorts,
         hideComments,
         filterComments,
@@ -481,6 +492,7 @@
         const compiledSettings = buildCompiledSettings({
             keywords: sanitizedKeywords,
             channels: sanitizedChannels,
+            enabled,
             hideShorts,
             hideComments,
             filterComments,
@@ -511,6 +523,7 @@
         });
 
         const payload = {
+            enabled: compiledSettings.enabled,
             uiKeywords: sanitizedKeywords, // Save ALL keywords (user + channel-derived) to preserve order
             filterKeywords: compiledSettings.filterKeywords,
             filterKeywordsComments: compiledSettings.filterKeywordsComments,

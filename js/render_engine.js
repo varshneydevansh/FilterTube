@@ -155,13 +155,16 @@ const RenderEngine = (() => {
         controls.className = minimal ? 'keyword-controls' : 'item-controls';
 
         const commentsEnabled = entry.comments !== false;
+        const commentsToggleText = minimal ? 'C' : 'Comment';
         const commentsToggle = UIComponents?.createToggleButton
             ? UIComponents.createToggleButton({
-                text: 'C',
+                text: commentsToggleText,
                 active: commentsEnabled,
                 onToggle: async () => {
-                    // Channel-derived keywords are managed via Channel Management.
-                    if (isChannelDerived) return;
+                    if (isChannelDerived) {
+                        await StateManager?.toggleChannelFilterAllCommentsByRef?.(entry.channelRef);
+                        return;
+                    }
                     await StateManager?.toggleKeywordComments(entry.word);
                 },
                 className: 'toggle-variant-blue'
@@ -169,18 +172,24 @@ const RenderEngine = (() => {
             : (() => {
                 const toggle = document.createElement('div');
                 toggle.className = `exact-toggle toggle-variant-blue ${commentsEnabled ? 'active' : ''}`.trim();
-                toggle.textContent = 'C';
+                toggle.textContent = commentsToggleText;
                 toggle.setAttribute('role', 'button');
                 toggle.setAttribute('aria-pressed', commentsEnabled);
                 toggle.setAttribute('tabindex', '0');
                 toggle.addEventListener('click', async () => {
-                    if (isChannelDerived) return;
+                    if (isChannelDerived) {
+                        await StateManager?.toggleChannelFilterAllCommentsByRef?.(entry.channelRef);
+                        return;
+                    }
                     await StateManager?.toggleKeywordComments(entry.word);
                 });
                 toggle.addEventListener('keydown', async (e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
-                        if (isChannelDerived) return;
+                        if (isChannelDerived) {
+                            await StateManager?.toggleChannelFilterAllCommentsByRef?.(entry.channelRef);
+                            return;
+                        }
                         await StateManager?.toggleKeywordComments(entry.word);
                     }
                 });
@@ -190,10 +199,7 @@ const RenderEngine = (() => {
         commentsToggle.title = commentsEnabled
             ? 'Keyword applies to comment filtering'
             : 'Keyword does not apply to comment filtering';
-        if (isChannelDerived) {
-            commentsToggle.style.opacity = '0.6';
-            commentsToggle.style.cursor = 'not-allowed';
-        }
+        // Channel-derived keywords are now toggleable (persisted on the channel entry).
 
         if (isChannelDerived) {
             // Channel-derived keyword: show badge only
@@ -205,7 +211,14 @@ const RenderEngine = (() => {
                 variantClass: isFromComments ? 'badge-variant-comments' : ''
             });
             controls.appendChild(commentsToggle);
-            controls.appendChild(badge);
+
+            if (minimal && isFromComments) {
+                item.classList.add('source-comments');
+            }
+
+            if (!minimal) {
+                controls.appendChild(badge);
+            }
 
             // In full UI, show channel origin
             if (!minimal) {
@@ -222,9 +235,10 @@ const RenderEngine = (() => {
             // User keyword: show exact toggle and delete button
 
             // Exact toggle
+            const exactToggleText = minimal ? 'E' : 'Exact';
             const exactToggle = UIComponents?.createToggleButton ?
                 UIComponents.createToggleButton({
-                    text: 'Exact',
+                    text: exactToggleText,
                     active: entry.exact,
                     onToggle: async () => {
                         await StateManager?.toggleKeywordExact(entry.word);
@@ -244,9 +258,13 @@ const RenderEngine = (() => {
                     await StateManager?.removeKeyword(entry.word);
                 });
 
-            controls.appendChild(exactToggle);
-
-            controls.appendChild(commentsToggle);
+            if (minimal) {
+                controls.appendChild(commentsToggle);
+                controls.appendChild(exactToggle);
+            } else {
+                controls.appendChild(commentsToggle);
+                controls.appendChild(exactToggle);
+            }
 
             // In full UI, add semantic toggle (disabled for now)
             if (!minimal) {
@@ -533,12 +551,7 @@ const RenderEngine = (() => {
         controls.className = 'keyword-controls';
 
         if (channel?.source === 'comments') {
-            const badge = createPillBadge({
-                text: 'From Comments',
-                title: 'This channel was blocked from the YouTube comments menu',
-                variantClass: 'badge-variant-comments'
-            });
-            controls.appendChild(badge);
+            item.classList.add('source-comments');
         }
 
         const deleteBtn = UIComponents?.createDeleteButton ?
@@ -790,7 +803,7 @@ const RenderEngine = (() => {
     function createFallbackExactToggle(entry, minimal) {
         const exactToggle = document.createElement('div');
         exactToggle.className = `exact-toggle ${entry.exact ? 'active' : ''}`;
-        exactToggle.textContent = 'Exact';
+        exactToggle.textContent = minimal ? 'E' : 'Exact';
         exactToggle.title = entry.exact
             ? `Exact match: Only filters "${entry.word}" as a complete word`
             : `Partial match: Filters "${entry.word}" anywhere in text`;

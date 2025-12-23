@@ -99,6 +99,7 @@ function sendSettingsToMainWorld(settings) {
 function handleStorageChanges(changes, area) {
     if (area !== 'local') return;
     const relevantKeys = [
+        'enabled',
         'filterKeywords',
         'filterKeywordsComments',
         'filterChannels',

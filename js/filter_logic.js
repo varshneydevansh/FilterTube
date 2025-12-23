@@ -1546,6 +1546,13 @@
                 console.warn('FilterTube: Harvesting failed', e);
             }
 
+            // Global kill-switch: allow the extension to stay installed but stop mutating YouTube data.
+            // We still harvest mappings above so 3-dot menu / resolver stays warm.
+            if (this.settings.enabled === false) {
+                this._log(`⏸️ Filtering disabled (settings.enabled=false); skipping ${dataName}`);
+                return data;
+            }
+
             // 2. THEN FILTER
             this._log(`🔄 Starting to filter ${dataName}`);
             this.blockedCount = 0;

@@ -130,6 +130,23 @@ body {
     border-radius: var(--ft-radius-md);
 }
 
+button.status-card {
+    cursor: pointer;
+}
+
+button.status-card:hover {
+    box-shadow: var(--ft-shadow-floating);
+}
+
+.status-card.is-disabled {
+    border-color: rgba(239, 68, 68, 0.5);
+}
+
+.status-card.is-disabled .status-indicator {
+    background-color: #ef4444;
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+
 .status-indicator {
     width: 8px;
     height: 8px;
@@ -197,6 +214,22 @@ label {
     justify-content: space-between;
     padding: var(--ft-space-xs) var(--ft-space-sm);
     border-bottom: 1px solid var(--ft-color-sem-neutral-border);
+}
+
+.keyword-item.channel-derived {
+    background: rgba(47, 122, 99, 0.08);
+}
+
+html[data-theme="dark"] .keyword-item.channel-derived {
+    background: rgba(47, 122, 99, 0.16);
+}
+
+.keyword-item.source-comments {
+    background: rgba(140, 92, 38, 0.12);
+}
+
+html[data-theme="dark"] .keyword-item.source-comments {
+    background: rgba(140, 92, 38, 0.18);
 }
 
 .keyword-item.collaboration-member {

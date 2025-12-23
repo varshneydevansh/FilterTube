@@ -149,6 +149,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         : [];
 
     const openInTabBtn = document.getElementById('openInTabBtn');
+    const toggleEnabledBtn = document.getElementById('toggleEnabledBtn');
 
     let keywordSearchValue = '';
     let channelSearchValue = '';
@@ -253,6 +254,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (filterCommentsEl) {
             filterCommentsEl.checked = state.hideComments ? false : !!state.filterComments;
             filterCommentsEl.disabled = !!state.hideComments;
+        }
+
+        if (toggleEnabledBtn) {
+            const enabled = state.enabled !== false;
+            const indicator = toggleEnabledBtn.querySelector('.status-indicator');
+            const textEl = toggleEnabledBtn.querySelector('.status-text');
+
+            toggleEnabledBtn.classList.toggle('is-disabled', !enabled);
+            toggleEnabledBtn.setAttribute('aria-pressed', enabled ? 'true' : 'false');
+
+            if (indicator) {
+                indicator.classList.toggle('active', enabled);
+            }
+            if (textEl) {
+                textEl.textContent = enabled ? 'Filtering Active' : 'Filtering Paused';
+            }
         }
     }
 
@@ -362,6 +379,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (openInTabBtn) {
         openInTabBtn.addEventListener('click', () => {
             chrome.tabs.create({ url: chrome.runtime.getURL('html/tab-view.html') });
+        });
+    }
+
+    if (toggleEnabledBtn) {
+        toggleEnabledBtn.addEventListener('click', async () => {
+            const state = StateManager.getState();
+            const enabled = state.enabled !== false;
+            await StateManager.updateSetting('enabled', !enabled);
+            updateCheckboxes();
         });
     }
 });
