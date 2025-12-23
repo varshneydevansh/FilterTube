@@ -459,6 +459,46 @@ html[data-theme="dark"] .exact-toggle.toggle-variant-purple.active:hover {
     border-color: #e9d5ff !important;
 }
 
+/* Blue variant (Comments toggle) */
+.exact-toggle.toggle-variant-blue {
+    color: var(--ft-color-text-muted);
+}
+
+.exact-toggle.toggle-variant-blue:hover {
+    border-color: #0ea5e9;
+    color: #0ea5e9;
+}
+
+.exact-toggle.toggle-variant-blue.active {
+    background-color: rgba(14, 165, 233, 0.2);
+    color: #0284c7;
+    border-color: #0284c7;
+}
+
+.exact-toggle.toggle-variant-blue.active:hover {
+    background-color: rgba(14, 165, 233, 0.25);
+    color: #0284c7;
+    border-color: #0284c7;
+}
+
+html[data-theme="dark"] .exact-toggle.toggle-variant-blue:hover {
+    border-color: #38bdf8 !important;
+    color: #38bdf8 !important;
+    background-color: rgba(56, 189, 248, 0.1) !important;
+}
+
+html[data-theme="dark"] .exact-toggle.toggle-variant-blue.active {
+    background-color: rgba(56, 189, 248, 0.25) !important;
+    color: #bae6fd !important;
+    border-color: #bae6fd !important;
+}
+
+html[data-theme="dark"] .exact-toggle.toggle-variant-blue.active:hover {
+    background-color: rgba(56, 189, 248, 0.3) !important;
+    color: #bae6fd !important;
+    border-color: #bae6fd !important;
+}
+
 /* --- Channel Derived Badge --- */
 .channel-derived-badge {
     display: inline-flex;
@@ -474,9 +514,20 @@ html[data-theme="dark"] .exact-toggle.toggle-variant-purple.active:hover {
     color: #15803d;
 }
 
+/* Variant: Comments source */
+.channel-derived-badge.badge-variant-comments {
+    background: rgba(245, 158, 11, 0.15);
+    color: #92400e;
+}
+
 html[data-theme="dark"] .channel-derived-badge {
     background: rgba(34, 197, 94, 0.25);
     color: #86efac;
+}
+
+html[data-theme="dark"] .channel-derived-badge.badge-variant-comments {
+    background: rgba(251, 191, 36, 0.2);
+    color: #fde68a;
 }
 
 /* --- Delete Button --- */

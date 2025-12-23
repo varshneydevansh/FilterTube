@@ -180,8 +180,15 @@ async function handleDropdownAppearedInternal(dropdown) {
 
     console.log('FilterTube: Dropdown appeared, finding video card...');
 
+    // Prefer comment-thread context first (YouTube comments 3-dot menu).
+    // This lets us reuse the same injection/block pipeline while hiding the whole thread.
+    const commentThread = lastClickedMenuButton.closest(
+        'ytd-comment-thread-renderer, ' +
+        'ytm-comment-thread-renderer'
+    );
+
     // Find the associated video/short card from the button (comprehensive selectors)
-    const videoCard = lastClickedMenuButton.closest(
+    const videoCard = commentThread || lastClickedMenuButton.closest(
         'ytd-rich-item-renderer, ' +
         'ytd-video-renderer, ' +
         'ytd-grid-video-renderer, ' +
@@ -192,14 +199,14 @@ async function handleDropdownAppearedInternal(dropdown) {
         'ytd-compact-promoted-video-renderer, ' +
         'ytm-compact-video-renderer, ' +
         'ytm-video-with-context-renderer, ' +
-        'ytd-post-renderer, ' +                          // ← YouTube Posts
-        'ytd-playlist-panel-video-renderer, ' +         // ← Playlist videos
-        'ytd-playlist-video-renderer, ' +               // ← Playlist videos (alternate)
-        'ytm-shorts-lockup-view-model, ' +              // ← Shorts in mobile/search
-        'ytm-shorts-lockup-view-model-v2, ' +           // ← Shorts variant
-        'ytm-item-section-renderer, ' +                 // ← Container for shorts
-        'yt-lockup-view-model, ' +                      // ← Modern video lockup (collabs)
-        'ytd-rich-shelf-renderer'                       // ← Shelf containing shorts
+        'ytd-post-renderer, ' +                          // YouTube Posts
+        'ytd-playlist-panel-video-renderer, ' +         // Playlist videos
+        'ytd-playlist-video-renderer, ' +               // Playlist videos (alternate)
+        'ytm-shorts-lockup-view-model, ' +              // Shorts in mobile/search
+        'ytm-shorts-lockup-view-model-v2, ' +           // Shorts variant
+        'ytm-item-section-renderer, ' +                 // Container for shorts
+        'yt-lockup-view-model, ' +                      // Modern video lockup (collabs)
+        'ytd-rich-shelf-renderer'                       // Shelf containing shorts
     );
 
     if (videoCard) {

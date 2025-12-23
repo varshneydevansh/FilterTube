@@ -9,7 +9,8 @@ function buildChannelMetadataPayload(channelInfo = {}) {
         canonicalHandle: canonical || null,
         handleDisplay: display || null,
         channelName: channelInfo.name || null,
-        customUrl: channelInfo.customUrl || null  // c/Name or user/Name for legacy channels
+        customUrl: channelInfo.customUrl || null,  // c/Name or user/Name for legacy channels
+        source: channelInfo.source || null
     };
 }
 
@@ -3765,6 +3766,78 @@ function extractChannelFromCard(card) {
     if (!card) return null;
 
     try {
+        const cardTag = (card.tagName || '').toLowerCase();
+
+        // SPECIAL CASE: Comment thread (ytd-comment-thread-renderer)
+        // Used to support "Block channel" injection inside the comment 3-dot menu.
+        if (cardTag === 'ytd-comment-thread-renderer' || cardTag === 'ytm-comment-thread-renderer') {
+            const authorAnchor = card.querySelector(
+                '#author-text.yt-simple-endpoint, ' +
+                'a#author-text, ' +
+                '#author-text a, ' +
+                'a[href*="/@"]#author-text, ' +
+                'a[href*="/channel/UC"]#author-text, ' +
+                'a[href*="/c/"]#author-text, ' +
+                'a[href*="/user/"]#author-text'
+            );
+
+            const href = authorAnchor?.getAttribute?.('href') || authorAnchor?.href || '';
+            const rawTextFromAnchor = authorAnchor?.textContent?.trim() || '';
+            const rawTextFromAnchorSpan = authorAnchor?.querySelector?.('span')?.textContent?.trim() || '';
+            const rawTextFromContainerSpan = card.querySelector('#author-text span')?.textContent?.trim() || '';
+            const rawTextFromContainer = card.querySelector('#author-text')?.textContent?.trim() || '';
+
+            const rawHandle = extractRawHandle(href) || extractRawHandle(rawTextFromAnchor) || extractRawHandle(rawTextFromContainer);
+            const handle = rawHandle ? normalizeHandleValue(rawHandle) : '';
+
+            const normalizeNameCandidate = (value) => {
+                if (!value || typeof value !== 'string') return '';
+                // Comments markup sometimes includes extra lines (e.g. display name + handle).
+                const singleLine = value
+                    .replace(/\s+/g, ' ')
+                    .replace(/\s*\n\s*/g, ' ')
+                    .trim();
+                return singleLine;
+            };
+
+            const nameCandidates = [
+                rawTextFromAnchorSpan,
+                rawTextFromAnchor,
+                rawTextFromContainerSpan,
+                rawTextFromContainer
+            ].map(normalizeNameCandidate).filter(Boolean);
+
+            const pickBestName = () => {
+                if (nameCandidates.length === 0) return '';
+                // Prefer a candidate that is not the handle.
+                const preferred = nameCandidates.find(n => !n.startsWith('@') && (!handle || n.toLowerCase() !== handle.toLowerCase()));
+                return preferred || nameCandidates[0];
+            };
+
+            const name = pickBestName();
+            const id = extractChannelIdFromString(href) || '';
+
+            let customUrl = '';
+            const match = href.match(/\/(c|user)\/([^/?#]+)/);
+            if (match && match[1] && match[2]) {
+                try {
+                    customUrl = `${match[1]}/${decodeURIComponent(match[2])}`;
+                } catch (_) {
+                    customUrl = `${match[1]}/${match[2]}`;
+                }
+            }
+
+            if (handle || id || customUrl) {
+                return {
+                    handle: handle || '',
+                    id: id || '',
+                    customUrl: customUrl || '',
+                    source: 'comments',
+                    name: name || handle || id || customUrl || ''
+                };
+            }
+        }
+
         let expectedCollaboratorCount = 0;
         card.removeAttribute('data-filtertube-expected-collaborators');
         // SPECIAL CASE: Detect if this is a Shorts card (compact format only)
@@ -5213,6 +5286,7 @@ function syncBlockedElementsWithFilters(effectiveSettings) {
     };
 
     blockedElements.forEach(element => {
+        const tag = (element.tagName || '').toLowerCase();
         const meta = {
             id: element.getAttribute('data-filtertube-blocked-channel-id') || '',
             handle: element.getAttribute('data-filtertube-blocked-channel-handle') || '',
@@ -5221,7 +5295,11 @@ function syncBlockedElementsWithFilters(effectiveSettings) {
 
         if (filterChannels.length > 0 && isStillBlocked(meta)) {
             markElementAsBlocked(element, meta, 'confirmed');
-            toggleVisibility(element, true, `Blocked channel: ${meta.handle || meta.id}`);
+            if (tag === 'ytd-comment-thread-renderer' || tag === 'ytm-comment-thread-renderer') {
+                toggleVisibility(element, true, `Blocked comment author: ${meta.handle || meta.id}`);
+            } else {
+                toggleVisibility(element, true, `Blocked channel: ${meta.handle || meta.id}`);
+            }
         } else {
             clearBlockedElementAttributes(element);
             toggleVisibility(element, false, '', true);
@@ -5971,9 +6049,25 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             return;
         }
 
+        // IMMEDIATELY hide comment thread for instant feedback (comment 3-dot menu)
+        const videoCardTag = (videoCard?.tagName || '').toLowerCase();
+        if (videoCard && (videoCardTag === 'ytd-comment-thread-renderer' || videoCardTag === 'ytm-comment-thread-renderer')) {
+            console.log('FilterTube: Hiding comment thread immediately');
+            markElementAsBlocked(videoCard, channelInfo, 'pending');
+            videoCard.style.display = 'none';
+            videoCard.classList.add('filtertube-hidden');
+            videoCard.setAttribute('data-filtertube-hidden', 'true');
+
+            // Close the dropdown since the thread is now hidden
+            const dropdown = menuItem.closest('tp-yt-iron-dropdown');
+            if (dropdown) {
+                forceCloseDropdown(dropdown);
+            }
+        }
+
         // IMMEDIATELY hide ALL instances of this video card for instant feedback
         // (YouTube sometimes shows the same collaboration video multiple times in search results)
-        if (videoCard) {
+        if (videoCard && !(videoCardTag === 'ytd-comment-thread-renderer' || videoCardTag === 'ytm-comment-thread-renderer')) {
             console.log('FilterTube: Hiding video card immediately');
 
             // Check if this is a shorts card
@@ -6102,7 +6196,8 @@ async function addChannelDirectly(input, filterAll = false, collaborationWith = 
                 displayHandle: metadata.handleDisplay || null,
                 canonicalHandle: metadata.canonicalHandle || null,
                 channelName: metadata.channelName || null,
-                customUrl: metadata.customUrl || null  // c/Name or user/Name for legacy channels
+                customUrl: metadata.customUrl || null,  // c/Name or user/Name for legacy channels
+                source: metadata.source || null
             }, (response) => {
                 resolve(response || { success: false, error: 'No response from background' });
             });

@@ -1033,9 +1033,13 @@
                 if (this.settings.filterComments) {
                     const commentText = rules.commentText ? getTextFromPaths(item, Array.isArray(rules.commentText) ? rules.commentText : [rules.commentText]) : '';
 
+                    const commentKeywords = Array.isArray(this.settings.filterKeywordsComments)
+                        ? this.settings.filterKeywordsComments
+                        : this.settings.filterKeywords;
+
                     // Apply keyword filters to comments
-                    if (commentText && this.settings.filterKeywords.length > 0) {
-                        for (const keywordRegex of this.settings.filterKeywords) {
+                    if (commentText && commentKeywords.length > 0) {
+                        for (const keywordRegex of commentKeywords) {
                             if (keywordRegex.test(commentText)) {
                                 this._log(`🚫 Blocking comment by keyword: ${commentText.substring(0, 50)}...`);
                                 return true;

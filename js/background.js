@@ -41,6 +41,7 @@ async function getCompiledSettings() {
     return new Promise((resolve) => {
         browserAPI.storage.local.get([
             'filterKeywords',
+            'filterKeywordsComments',
             'uiKeywords',
             'filterChannels',
             'channelMap',
@@ -48,7 +49,31 @@ async function getCompiledSettings() {
             'hideAllComments',
             'filterComments',
             'useExactWordMatching',
-            'hideAllShorts'
+            'hideAllShorts',
+            'hideHomeFeed',
+            'hideSponsoredCards',
+            'hideWatchPlaylistPanel',
+            'hidePlaylistCards',
+            'hideMixPlaylists',
+            'hideVideoSidebar',
+            'hideRecommended',
+            'hideLiveChat',
+            'hideVideoInfo',
+            'hideVideoButtonsBar',
+            'hideAskButton',
+            'hideVideoChannelRow',
+            'hideVideoDescription',
+            'hideMerchTicketsOffers',
+            'hideEndscreenVideowall',
+            'hideEndscreenCards',
+            'disableAutoplay',
+            'disableAnnotations',
+            'hideTopHeader',
+            'hideNotificationBell',
+            'hideExploreTrending',
+            'hideMoreFromYouTube',
+            'hideSubscriptions',
+            'hideSearchShelves'
         ], (items) => {
             const compiledSettings = {};
             const storageUpdates = {};
@@ -102,6 +127,42 @@ async function getCompiledSettings() {
                 storageUpdates.uiKeywords = parsedKeywords.map(keyword => ({ word: keyword, exact: useExact }));
             } else {
                 compiledSettings.filterKeywords = [];
+            }
+
+            // Comments-only keyword list (defaults to the full list if not present)
+            const storedCompiledComments = items.filterKeywordsComments;
+            if (Array.isArray(storedCompiledComments)) {
+                compiledSettings.filterKeywordsComments = sanitizeCompiledList(storedCompiledComments);
+            } else if (storedUiKeywords && Array.isArray(compiledSettings.filterKeywords) && compiledSettings.filterKeywords.length) {
+                // Best-effort reconstruction from uiKeywords when possible.
+                // If a uiKeywords entry has comments:false, exclude it.
+                const uiKeywords = storedUiKeywords;
+                const includeWords = new Set(
+                    uiKeywords
+                        .filter(k => k && typeof k.word === 'string' && (k.comments !== false))
+                        .map(k => k.word.trim().toLowerCase())
+                        .filter(Boolean)
+                );
+                if (includeWords.size > 0) {
+                    compiledSettings.filterKeywordsComments = compiledSettings.filterKeywords.filter(kw => {
+                        try {
+                            const raw = typeof kw.pattern === 'string' ? kw.pattern : '';
+                            const unwrapped = raw
+                                .replace(/^\\b/, '')
+                                .replace(/\\b$/, '')
+                                .replace(/\\(.)/g, '$1')
+                                .trim()
+                                .toLowerCase();
+                            return includeWords.has(unwrapped);
+                        } catch (e) {
+                            return true;
+                        }
+                    });
+                } else {
+                    compiledSettings.filterKeywordsComments = compiledSettings.filterKeywords;
+                }
+            } else {
+                compiledSettings.filterKeywordsComments = compiledSettings.filterKeywords;
             }
 
             // Persist any migrations we calculated
@@ -220,6 +281,30 @@ async function getCompiledSettings() {
             compiledSettings.filterComments = items.filterComments || false;
             compiledSettings.useExactWordMatching = useExact;
             compiledSettings.hideAllShorts = items.hideAllShorts || false;
+            compiledSettings.hideHomeFeed = items.hideHomeFeed || false;
+            compiledSettings.hideSponsoredCards = items.hideSponsoredCards || false;
+            compiledSettings.hideWatchPlaylistPanel = items.hideWatchPlaylistPanel || false;
+            compiledSettings.hidePlaylistCards = items.hidePlaylistCards || false;
+            compiledSettings.hideMixPlaylists = items.hideMixPlaylists || false;
+            compiledSettings.hideVideoSidebar = items.hideVideoSidebar || false;
+            compiledSettings.hideRecommended = items.hideRecommended || false;
+            compiledSettings.hideLiveChat = items.hideLiveChat || false;
+            compiledSettings.hideVideoInfo = items.hideVideoInfo || false;
+            compiledSettings.hideVideoButtonsBar = items.hideVideoButtonsBar || false;
+            compiledSettings.hideAskButton = items.hideAskButton || false;
+            compiledSettings.hideVideoChannelRow = items.hideVideoChannelRow || false;
+            compiledSettings.hideVideoDescription = items.hideVideoDescription || false;
+            compiledSettings.hideMerchTicketsOffers = items.hideMerchTicketsOffers || false;
+            compiledSettings.hideEndscreenVideowall = items.hideEndscreenVideowall || false;
+            compiledSettings.hideEndscreenCards = items.hideEndscreenCards || false;
+            compiledSettings.disableAutoplay = items.disableAutoplay || false;
+            compiledSettings.disableAnnotations = items.disableAnnotations || false;
+            compiledSettings.hideTopHeader = items.hideTopHeader || false;
+            compiledSettings.hideNotificationBell = items.hideNotificationBell || false;
+            compiledSettings.hideExploreTrending = items.hideExploreTrending || false;
+            compiledSettings.hideMoreFromYouTube = items.hideMoreFromYouTube || false;
+            compiledSettings.hideSubscriptions = items.hideSubscriptions || false;
+            compiledSettings.hideSearchShelves = items.hideSearchShelves || false;
 
             console.log(`FilterTube Background: Compiled ${compiledChannels.length} channels, ${compiledSettings.filterKeywords.length} total keywords (${compiledSettings.filterKeywords.length - additionalKeywordsFromChannels.length} user keywords + ${additionalKeywordsFromChannels.length} channel-based), ${Object.keys(compiledSettings.channelMap).length / 2} mappings`);
 
@@ -1198,7 +1283,8 @@ browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 displayHandle: message.displayHandle,
                 canonicalHandle: message.canonicalHandle,
                 channelName: message.channelName,
-                customUrl: message.customUrl  // c/Name or user/Name for legacy channels
+                customUrl: message.customUrl,  // c/Name or user/Name for legacy channels
+                source: message.source || null
             }
         ).then(sendResponse);
         return true; // Keep channel open for async response
@@ -1458,6 +1544,7 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                 name: existing.name || finalChannelName,
                 logo: existing.logo || channelInfo.logo,
                 customUrl: existing.customUrl || customUrl,  // Preserve or add customUrl
+                source: existing.source || metadata.source || null,
                 originalInput: existing.originalInput || customUrl || channelInfo.handle || channelInfo.id || rawValue // Track original input
             };
 
@@ -1545,6 +1632,7 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             collaborationGroupId: collaborationGroupId || null, // UUID for group operations
             allCollaborators: allCollaborators, // Full list of all collaborators for popup grouping
             customUrl: customUrl, // c/Name or user/Name for legacy channels
+            source: metadata.source || null,
             originalInput: customUrl || channelInfo.handle || channelInfo.id || rawValue, // Track what user originally blocked
             addedAt: Date.now()
         };

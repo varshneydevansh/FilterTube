@@ -8,6 +8,279 @@ const CHANNEL_ONLY_TAGS = new Set([
     'ytm-universal-watch-card-renderer'
 ]);
 
+function channelMatchesFilter(meta, filterChannel, channelMap = {}) {
+    const sharedChannelMatchesFilter = window.FilterTubeIdentity?.channelMatchesFilter;
+    if (typeof sharedChannelMatchesFilter === 'function') {
+        return sharedChannelMatchesFilter(meta, filterChannel, channelMap);
+    }
+    return false;
+}
+
+function markElementAsBlocked(element, channelInfo, state = 'pending') {
+    if (!element || !channelInfo) return;
+
+    if (channelInfo.id) {
+        element.setAttribute('data-filtertube-blocked-channel-id', channelInfo.id);
+    }
+    if (channelInfo.handle) {
+        element.setAttribute('data-filtertube-blocked-channel-handle', channelInfo.handle);
+    }
+    if (channelInfo.customUrl) {
+        element.setAttribute('data-filtertube-blocked-channel-custom', channelInfo.customUrl);
+    }
+    if (channelInfo.name) {
+        element.setAttribute('data-filtertube-blocked-channel-name', channelInfo.name);
+    }
+    element.setAttribute('data-filtertube-blocked-state', state);
+    element.setAttribute('data-filtertube-blocked-ts', Date.now().toString());
+}
+
+function clearBlockedElementAttributes(element) {
+    if (!element) return;
+    element.removeAttribute('data-filtertube-blocked-channel-id');
+    element.removeAttribute('data-filtertube-blocked-channel-handle');
+    element.removeAttribute('data-filtertube-blocked-channel-custom');
+    element.removeAttribute('data-filtertube-blocked-channel-name');
+    element.removeAttribute('data-filtertube-blocked-state');
+    element.removeAttribute('data-filtertube-blocked-ts');
+}
+
+function ensureContentControlStyles(settings) {
+    if (!settings || typeof settings !== 'object') return;
+    if (!document.head) return;
+
+    const styleId = 'filtertube-content-controls-style';
+    let style = document.getElementById(styleId);
+    if (!style) {
+        style = document.createElement('style');
+        style.id = styleId;
+        document.head.appendChild(style);
+    }
+
+    const rules = [];
+
+    if (settings.hideHomeFeed) {
+        rules.push(`
+            ytd-browse[page-subtype="home"] .ytd-rich-grid-renderer,
+            ytd-browse[page-subtype="home"] ytd-rich-grid-renderer {
+                display: none !important;
+            }
+        `);
+    }
+
+    if (settings.hideSponsoredCards) {
+        rules.push(`
+            ytd-ad-slot-renderer,
+            ytd-in-feed-ad-layout-renderer,
+            ytd-promoted-sparkles-web-renderer,
+            ytd-promoted-sparkles-text-search-renderer,
+            ytd-search-pyv-renderer,
+            ytd-display-ad-renderer,
+            ytd-companion-slot-renderer,
+            ytd-action-companion-ad-renderer,
+            ytd-engagement-panel-section-list-renderer[target-id="engagement-panel-ads"] {
+                display: none !important;
+            }
+        `);
+    }
+
+    if (settings.hideWatchPlaylistPanel) {
+        rules.push(`
+            ytd-playlist-panel-renderer {
+                display: none !important;
+            }
+        `);
+    }
+
+    if (settings.hidePlaylistCards) {
+        rules.push(`
+            ytd-playlist-renderer,
+            ytd-grid-playlist-renderer,
+            ytd-compact-playlist-renderer {
+                display: none !important;
+            }
+        `);
+    }
+
+    if (settings.hideMixPlaylists) {
+        rules.push(`
+            ytd-radio-renderer,
+            ytd-compact-radio-renderer,
+            ytd-rich-item-renderer:has(a[href*="start_radio=1"]),
+            yt-lockup-view-model:has(a[href*="start_radio=1"]),
+            a[href*="start_radio=1"],
+            .ytp-videowall-still[data-is-mix="true"] {
+                display: none !important;
+            }
+        `);
+    }
+
+    if (settings.hideVideoSidebar) {
+        rules.push(`
+            #secondary.ytd-watch-flexy {
+                display: none !important;
+            }
+        `);
+    }
+
+    if (settings.hideRecommended) {
+        rules.push(`
+            #related,
+            #items.ytd-watch-next-secondary-results-renderer {
+                display: none !important;
+            }
+        `);
+    }
+
+    if (settings.hideLiveChat) {
+        rules.push(`
+            ytd-live-chat-frame#chat,
+            #chat-container {
+                display: none !important;
+            }
+        `);
+    }
+
+    const hideInfoMaster = !!settings.hideVideoInfo;
+
+    if (hideInfoMaster || settings.hideVideoButtonsBar) {
+        rules.push(`
+            #actions.ytd-watch-metadata,
+            #info > #menu-container {
+                display: none !important;
+            }
+        `);
+    }
+
+    if (hideInfoMaster || settings.hideAskButton) {
+        rules.push(`
+            a[aria-label="Ask"],
+            button[aria-label="Ask"] {
+                display: none !important;
+            }
+        `);
+    }
+
+    if (hideInfoMaster || settings.hideVideoChannelRow) {
+        rules.push(`
+            #owner.ytd-watch-metadata,
+            #top-row.ytd-video-secondary-info-renderer {
+                display: none !important;
+            }
+        `);
+    }
+
+    if (hideInfoMaster || settings.hideVideoDescription) {
+        rules.push(`
+            #description.ytd-watch-metadata,
+            ytd-expander.ytd-video-secondary-info-renderer {
+                display: none !important;
+            }
+        `);
+    }
+
+    if (hideInfoMaster || settings.hideMerchTicketsOffers) {
+        rules.push(`
+            #ticket-shelf,
+            ytd-merch-shelf-renderer,
+            #offer-module,
+            #clarify-box {
+                display: none !important;
+            }
+        `);
+    }
+
+    if (settings.hideEndscreenVideowall) {
+        rules.push(`
+            #movie_player .ytp-endscreen-content,
+            #movie_player .ytp-fullscreen-grid-stills-container {
+                display: none !important;
+            }
+        `);
+    }
+
+    if (settings.hideEndscreenCards) {
+        rules.push(`
+            #movie_player .ytp-ce-element {
+                display: none !important;
+            }
+        `);
+    }
+
+    if (settings.disableAutoplay) {
+        rules.push(`
+            button[data-tooltip-target-id="ytp-autonav-toggle-button"],
+            .autonav-endscreen {
+                display: none !important;
+            }
+        `);
+    }
+
+    if (settings.disableAnnotations) {
+        rules.push(`
+            .annotation,
+            .iv-branding {
+                display: none !important;
+            }
+        `);
+    }
+
+    if (settings.hideTopHeader) {
+        rules.push(`
+            #masthead-container {
+                display: none !important;
+            }
+        `);
+    }
+
+    if (settings.hideNotificationBell) {
+        rules.push(`
+            ytd-notification-topbar-button-renderer,
+            ytd-notification-topbar-button-shape-renderer {
+                display: none !important;
+            }
+        `);
+    }
+
+    if (settings.hideExploreTrending) {
+        rules.push(`
+            .yt-simple-endpoint[href^="/feed/explore"],
+            .yt-simple-endpoint[href^="/feed/trending"],
+            ytd-browse[page-subtype="trending"] {
+                display: none !important;
+            }
+        `);
+    }
+
+    if (settings.hideMoreFromYouTube) {
+        rules.push(`
+            #sections > ytd-guide-section-renderer:nth-last-child(2) {
+                display: none !important;
+            }
+        `);
+    }
+
+    if (settings.hideSubscriptions) {
+        rules.push(`
+            .yt-simple-endpoint[href^="/feed/subscriptions"],
+            ytd-browse[page-subtype="subscriptions"] {
+                display: none !important;
+            }
+        `);
+    }
+
+    if (settings.hideSearchShelves) {
+        rules.push(`
+            #primary > .ytd-two-column-search-results-renderer ytd-shelf-renderer,
+            #primary > .ytd-two-column-search-results-renderer ytd-horizontal-card-list-renderer {
+                display: none !important;
+            }
+        `);
+    }
+
+    style.textContent = rules.join('\n');
+}
+
 function normalizeTextForMatching(value) {
     if (!value || typeof value !== 'string') return '';
 
@@ -98,41 +371,112 @@ function matchesKeyword(regex, rawText, keywordData) {
 // ============================================================================
 
 function handleCommentsFallback(settings) {
-    const commentSections = document.querySelectorAll('#comments, ytd-comments, ytd-item-section-renderer[section-identifier="comment-item-section"], ytd-comment-thread-renderer');
+    const commentContainers = document.querySelectorAll(
+        '#comments, ytd-comments, ytd-item-section-renderer[section-identifier="comment-item-section"]'
+    );
+    const commentThreads = document.querySelectorAll('ytd-comment-thread-renderer, ytm-comment-thread-renderer');
 
-    commentSections.forEach(section => {
-        // 1. Global Hide
-        if (settings.hideAllComments) {
-            toggleVisibility(section, true, 'Hide All Comments');
+    // 1. Global Hide
+    if (settings.hideAllComments) {
+        commentContainers.forEach(container => {
+            toggleVisibility(container, true, 'Hide All Comments');
+        });
+        commentThreads.forEach(thread => {
+            toggleVisibility(thread, true, 'Hide All Comments');
+        });
+        return;
+    }
+
+    // 2. Ensure containers are visible when not globally hidden
+    commentContainers.forEach(container => {
+        toggleVisibility(container, false, '', true);
+    });
+
+    const hasChannelFilters = Array.isArray(settings.filterChannels) && settings.filterChannels.length > 0;
+    const commentKeywordList = Array.isArray(settings.filterKeywordsComments)
+        ? settings.filterKeywordsComments
+        : settings.filterKeywords;
+    const shouldFilterKeywords = Boolean(settings.filterComments && commentKeywordList?.length > 0);
+
+    // 3. Per-thread filtering
+    commentThreads.forEach(thread => {
+        const authorAnchor = thread.querySelector(
+            '#author-text.yt-simple-endpoint, ' +
+            'a#author-text, ' +
+            '#author-text a'
+        );
+
+        const channelName = authorAnchor?.textContent?.trim() || thread.querySelector('#author-text')?.textContent?.trim() || '';
+        const channelHref = authorAnchor?.getAttribute?.('href') || authorAnchor?.href || '';
+        const channelMeta = buildChannelMetadata(channelName, channelHref);
+
+        // Honour pending/confirmed hides from the 3-dot UI, even if keyword filtering is off.
+        const blockedChannelId = thread.getAttribute('data-filtertube-blocked-channel-id') || '';
+        const blockedChannelHandle = thread.getAttribute('data-filtertube-blocked-channel-handle') || '';
+        const blockedChannelCustom = thread.getAttribute('data-filtertube-blocked-channel-custom') || '';
+        const blockedChannelState = thread.getAttribute('data-filtertube-blocked-state') || '';
+        const blockedTimestamp = parseInt(thread.getAttribute('data-filtertube-blocked-ts') || '0', 10);
+        const blockAgeMs = blockedTimestamp ? Date.now() - blockedTimestamp : Number.POSITIVE_INFINITY;
+
+        if (blockedChannelId || blockedChannelHandle || blockedChannelCustom) {
+            const isStillBlocked = hasChannelFilters && settings.filterChannels.some(fc => {
+                if (typeof fc === 'object') {
+                    return (blockedChannelId && fc.id?.toLowerCase() === blockedChannelId.toLowerCase()) ||
+                        (blockedChannelHandle && fc.handle?.toLowerCase() === blockedChannelHandle.toLowerCase()) ||
+                        (blockedChannelCustom && fc.customUrl?.toLowerCase() === blockedChannelCustom.toLowerCase());
+                }
+                const normalized = (fc || '').toLowerCase();
+                return normalized === blockedChannelId.toLowerCase() ||
+                    normalized === blockedChannelHandle.toLowerCase() ||
+                    normalized === blockedChannelCustom.toLowerCase();
+            });
+
+            if (isStillBlocked) {
+                markElementAsBlocked(thread, {
+                    id: blockedChannelId,
+                    handle: blockedChannelHandle,
+                    customUrl: blockedChannelCustom
+                }, 'confirmed');
+                toggleVisibility(thread, true, `Blocked comment author: ${blockedChannelHandle || blockedChannelCustom || blockedChannelId}`);
+                return;
+            }
+
+            const waitForConfirmation = blockedChannelState === 'pending' && blockAgeMs < 2000;
+            if (waitForConfirmation) {
+                toggleVisibility(thread, true, `Pending channel block: ${blockedChannelHandle || blockedChannelCustom || blockedChannelId}`);
+                return;
+            }
+
+            clearBlockedElementAttributes(thread);
+            toggleVisibility(thread, false, '', true);
+        }
+
+        // If nothing is enabled, restore and stop.
+        if (!hasChannelFilters && !shouldFilterKeywords) {
+            toggleVisibility(thread, false, '', true);
             return;
         }
 
-        // 2. Restore if global hide disabled
-        if (!settings.filterComments && !settings.hideAllComments) {
-            toggleVisibility(section, false);
+        const commentText = thread.textContent || '';
+        const shouldHide = shouldHideContent(commentText, channelName, {
+            ...settings,
+            filterKeywords: commentKeywordList
+        }, {
+            skipKeywords: !shouldFilterKeywords,
+            channelHref,
+            channelMeta,
+            contentTag: (thread.tagName || '').toLowerCase()
+        });
 
-            // Also restore all individual comments that were hidden by keyword filtering
-            const comments = section.querySelectorAll('ytd-comment-view-model, ytd-comment-renderer, ytd-comment-thread-renderer');
-            comments.forEach(comment => {
-                toggleVisibility(comment, false);
-            });
+        let reason = 'Comment Filter';
+        if (shouldHide && hasChannelFilters && (channelMeta.handle || channelMeta.id || channelMeta.customUrl)) {
+            const blockedLabel = channelMeta.handle || channelMeta.customUrl || channelMeta.id;
+            if (blockedLabel) {
+                reason = `Blocked comment author: ${blockedLabel}`;
+            }
         }
 
-        // 3. Content Filtering
-        if (settings.filterComments && settings.filterKeywords?.length > 0) {
-            const comments = section.querySelectorAll('ytd-comment-view-model, ytd-comment-renderer, ytd-comment-thread-renderer');
-            let visibleCount = 0;
-
-            comments.forEach(comment => {
-                const commentText = comment.textContent || '';
-                const channelName = comment.querySelector('#author-text, #channel-name, yt-formatted-string')?.textContent || '';
-
-                const shouldHide = shouldHideContent(commentText, channelName, settings);
-                toggleVisibility(comment, shouldHide, 'Comment Filter');
-
-                if (!shouldHide) visibleCount++;
-            });
-        }
+        toggleVisibility(thread, shouldHide, reason);
     });
 }
 
@@ -153,6 +497,7 @@ function applyDOMFallback(settings, options = {}) {
     const previousScrollTop = scrollingElement ? scrollingElement.scrollTop : window.pageYOffset;
     const previousScrollLeft = scrollingElement ? scrollingElement.scrollLeft : window.pageXOffset;
     ensureStyles();
+    ensureContentControlStyles(effectiveSettings);
 
     // 1. Video/Content Filtering
     const videoElements = document.querySelectorAll(VIDEO_CARD_SELECTORS);

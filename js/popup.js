@@ -19,6 +19,8 @@ function initializePopupFiltersTabs() {
                 <button id="addKeywordBtn" class="btn btn-small btn-primary">Add</button>
             </div>
 
+            <input type="text" id="searchKeywordsPopup" class="search-input" placeholder="Search keywords..." />
+
             <div id="keywordList" class="keyword-list">
                 <div class="empty-state">No keywords added</div>
             </div>
@@ -34,6 +36,8 @@ function initializePopupFiltersTabs() {
                 <button id="addChannelBtn" class="btn btn-small btn-primary">Add</button>
             </div>
 
+            <input type="text" id="searchChannelsPopup" class="search-input" placeholder="Search channels..." />
+
             <div id="channelList" class="keyword-list">
                 <div class="empty-state">No channels blocked</div>
             </div>
@@ -42,42 +46,69 @@ function initializePopupFiltersTabs() {
 
     // Create Content tab content
     const contentTab = document.createElement('div');
-    contentTab.innerHTML = `
-        <div class="toggle-group">
-            <div class="toggle-row">
-                <label for="hideAllShorts" class="toggle-label">
-                    <span class="toggle-title">Hide Shorts</span>
-                    <span class="toggle-desc">Remove all Shorts from feed</span>
-                </label>
-                <label class="switch">
-                    <input type="checkbox" id="hideAllShorts">
-                    <span class="slider round"></span>
-                </label>
-            </div>
 
-            <div class="toggle-row">
-                <label for="hideAllComments" class="toggle-label">
-                    <span class="toggle-title">Hide All Comments</span>
-                    <span class="toggle-desc">Remove comment sections entirely</span>
-                </label>
-                <label class="switch">
-                    <input type="checkbox" id="hideAllComments">
-                    <span class="slider round"></span>
-                </label>
-            </div>
+    const contentControlsSearch = document.createElement('input');
+    contentControlsSearch.type = 'text';
+    contentControlsSearch.id = 'searchContentControlsPopup';
+    contentControlsSearch.className = 'search-input';
+    contentControlsSearch.placeholder = 'Search content controls...';
+    contentControlsSearch.style.marginBottom = '10px';
+    contentTab.appendChild(contentControlsSearch);
 
-            <div class="toggle-row">
-                <label for="filterComments" class="toggle-label">
-                    <span class="toggle-title">Filter Comments</span>
-                    <span class="toggle-desc">Hide only comments with keywords</span>
-                </label>
-                <label class="switch">
-                    <input type="checkbox" id="filterComments">
-                    <span class="slider round"></span>
-                </label>
-            </div>
-        </div>
-    `;
+    const catalog = window.FilterTubeContentControlsCatalog?.getCatalog?.() || [];
+
+    catalog.forEach(group => {
+        const groupEl = document.createElement('div');
+        groupEl.setAttribute('data-ft-control-group', 'true');
+        groupEl.setAttribute('data-ft-group-title', group?.title || '');
+        if (group?.accentColor) {
+            groupEl.style.borderLeft = `3px solid ${group.accentColor}`;
+            groupEl.style.paddingLeft = '10px';
+        }
+        groupEl.style.marginBottom = '12px';
+
+        const titleEl = document.createElement('div');
+        titleEl.className = 'toggle-title';
+        titleEl.textContent = group?.title || '';
+        titleEl.style.marginBottom = '8px';
+        groupEl.appendChild(titleEl);
+
+        (group.controls || []).forEach(control => {
+            const row = document.createElement('div');
+            row.className = 'toggle-row';
+            row.setAttribute('data-ft-control-row', 'true');
+            row.setAttribute('data-ft-search', `${control.title || ''} ${control.description || ''}`.toLowerCase());
+
+            const label = document.createElement('label');
+            const checkboxId = `popupSetting_${control.key}`;
+            label.setAttribute('for', checkboxId);
+            label.className = 'toggle-label';
+            label.innerHTML = `
+                <span class="toggle-title">${control.title || ''}</span>
+                <span class="toggle-desc">${control.description || ''}</span>
+            `;
+
+            const switchLabel = document.createElement('label');
+            switchLabel.className = 'switch';
+
+            const input = document.createElement('input');
+            input.type = 'checkbox';
+            input.id = checkboxId;
+            input.setAttribute('data-ft-setting', control.key);
+
+            const slider = document.createElement('span');
+            slider.className = 'slider round';
+
+            switchLabel.appendChild(input);
+            switchLabel.appendChild(slider);
+
+            row.appendChild(label);
+            row.appendChild(switchLabel);
+            groupEl.appendChild(row);
+        });
+
+        contentTab.appendChild(groupEl);
+    });
 
     // Create tabs using UIComponents
     const tabs = UIComponents.createTabs({
@@ -105,16 +136,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     const newKeywordInput = document.getElementById('newKeywordInput');
     const addKeywordBtn = document.getElementById('addKeywordBtn');
     const keywordList = document.getElementById('keywordList');
+    const searchKeywordsPopup = document.getElementById('searchKeywordsPopup');
 
     const channelInput = document.getElementById('channelInput');
     const addChannelBtn = document.getElementById('addChannelBtn');
     const channelListEl = document.getElementById('channelList');
+    const searchChannelsPopup = document.getElementById('searchChannelsPopup');
 
-    const hideAllShortsCheckbox = document.getElementById('hideAllShorts');
-    const hideAllCommentsCheckbox = document.getElementById('hideAllComments');
-    const filterCommentsCheckbox = document.getElementById('filterComments');
+    const contentControlsContainer = document.getElementById('popupFiltersTabsContainer');
+    const contentControlCheckboxes = contentControlsContainer
+        ? contentControlsContainer.querySelectorAll('input[type="checkbox"][data-ft-setting]')
+        : [];
 
     const openInTabBtn = document.getElementById('openInTabBtn');
+
+    let keywordSearchValue = '';
+    let channelSearchValue = '';
 
     // ============================================================================
     // STATE MANAGEMENT (using StateManager)
@@ -162,8 +199,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!keywordList) return;
         RenderEngine.renderKeywordList(keywordList, {
             minimal: true,
-            showSearch: false,
-            showSort: false
+            showSearch: true,
+            showSort: false,
+            searchValue: keywordSearchValue,
+            sortValue: 'newest'
         });
     }
 
@@ -171,26 +210,49 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!channelListEl) return;
         RenderEngine.renderChannelList(channelListEl, {
             minimal: true,
-            showSearch: false,
+            showSearch: true,
             showSort: false,
-            showNodeMapping: false
+            showNodeMapping: false,
+            searchValue: channelSearchValue,
+            sortValue: 'newest'
+        });
+    }
+
+    function filterContentControlsPopup() {
+        const input = document.getElementById('searchContentControlsPopup');
+        const q = (input?.value || '').trim().toLowerCase();
+        const groups = contentControlsContainer?.querySelectorAll('[data-ft-control-group]') || [];
+
+        groups.forEach(groupEl => {
+            const groupTitle = (groupEl.getAttribute('data-ft-group-title') || '').toLowerCase();
+            const groupMatches = q ? groupTitle.includes(q) : false;
+            const rows = groupEl.querySelectorAll('[data-ft-control-row]');
+
+            let anyVisible = false;
+            rows.forEach(row => {
+                const text = row.getAttribute('data-ft-search') || '';
+                const show = !q || groupMatches || text.includes(q);
+                row.style.display = show ? '' : 'none';
+                if (show) anyVisible = true;
+            });
+
+            groupEl.style.display = (!q || anyVisible) ? '' : 'none';
         });
     }
 
     function updateCheckboxes() {
         const state = StateManager.getState();
 
-        if (hideAllShortsCheckbox) {
-            hideAllShortsCheckbox.checked = state.hideShorts;
-        }
+        contentControlCheckboxes.forEach(el => {
+            const key = el.getAttribute('data-ft-setting');
+            if (!key) return;
+            el.checked = !!state[key];
+        });
 
-        if (hideAllCommentsCheckbox) {
-            hideAllCommentsCheckbox.checked = state.hideComments;
-        }
-
-        if (filterCommentsCheckbox) {
-            filterCommentsCheckbox.checked = state.hideComments ? false : state.filterComments;
-            filterCommentsCheckbox.disabled = state.hideComments;
+        const filterCommentsEl = contentControlsContainer?.querySelector('input[data-ft-setting="filterComments"]') || null;
+        if (filterCommentsEl) {
+            filterCommentsEl.checked = state.hideComments ? false : !!state.filterComments;
+            filterCommentsEl.disabled = !!state.hideComments;
         }
     }
 
@@ -198,10 +260,32 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderKeywords();
     renderChannels();
     updateCheckboxes();
+    filterContentControlsPopup();
 
     // ============================================================================
     // EVENT HANDLERS
     // ============================================================================
+
+    if (searchKeywordsPopup) {
+        searchKeywordsPopup.addEventListener('input', () => {
+            keywordSearchValue = searchKeywordsPopup.value || '';
+            renderKeywords();
+        });
+    }
+
+    if (searchChannelsPopup) {
+        searchChannelsPopup.addEventListener('input', () => {
+            channelSearchValue = searchChannelsPopup.value || '';
+            renderChannels();
+        });
+    }
+
+    const searchContentControlsPopup = document.getElementById('searchContentControlsPopup');
+    if (searchContentControlsPopup) {
+        searchContentControlsPopup.addEventListener('input', () => {
+            filterContentControlsPopup();
+        });
+    }
 
     // Add keyword
     if (addKeywordBtn) {
@@ -266,23 +350,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Checkbox handlers
-    if (hideAllShortsCheckbox) {
-        hideAllShortsCheckbox.addEventListener('change', async () => {
-            await StateManager.updateSetting('hideShorts', hideAllShortsCheckbox.checked);
+    contentControlCheckboxes.forEach(el => {
+        el.addEventListener('change', async () => {
+            const key = el.getAttribute('data-ft-setting');
+            if (!key) return;
+            await StateManager.updateSetting(key, el.checked);
         });
-    }
-
-    if (hideAllCommentsCheckbox) {
-        hideAllCommentsCheckbox.addEventListener('change', async () => {
-            await StateManager.updateSetting('hideComments', hideAllCommentsCheckbox.checked);
-        });
-    }
-
-    if (filterCommentsCheckbox) {
-        filterCommentsCheckbox.addEventListener('change', async () => {
-            await StateManager.updateSetting('filterComments', filterCommentsCheckbox.checked);
-        });
-    }
+    });
 
     // Open in tab
     if (openInTabBtn) {

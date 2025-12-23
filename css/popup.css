@@ -40,6 +40,12 @@ body {
     z-index: 10;
 }
 
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--ft-space-sm);
+}
+
 .brand {
     display: flex;
     align-items: center;
@@ -121,6 +127,7 @@ body {
     padding: var(--ft-space-sm) var(--ft-space-md);
     background-color: var(--ft-color-bg-panel);
     border: 1px solid var(--ft-color-sem-neutral-border);
+    border-radius: var(--ft-radius-md);
 }
 
 .status-indicator {

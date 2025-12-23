@@ -23,6 +23,30 @@ const StateManager = (() => {
         hideShorts: false,
         hideComments: false,
         filterComments: false,
+        hideHomeFeed: false,
+        hideSponsoredCards: false,
+        hideWatchPlaylistPanel: false,
+        hidePlaylistCards: false,
+        hideMixPlaylists: false,
+        hideVideoSidebar: false,
+        hideRecommended: false,
+        hideLiveChat: false,
+        hideVideoInfo: false,
+        hideVideoButtonsBar: false,
+        hideAskButton: false,
+        hideVideoChannelRow: false,
+        hideVideoDescription: false,
+        hideMerchTicketsOffers: false,
+        hideEndscreenVideowall: false,
+        hideEndscreenCards: false,
+        disableAutoplay: false,
+        disableAnnotations: false,
+        hideTopHeader: false,
+        hideNotificationBell: false,
+        hideExploreTrending: false,
+        hideMoreFromYouTube: false,
+        hideSubscriptions: false,
+        hideSearchShelves: false,
         stats: { hiddenCount: 0, savedMinutes: 0 },
         channelMap: {},
         theme: 'light',
@@ -54,6 +78,30 @@ const StateManager = (() => {
         state.hideShorts = data.hideShorts || false;
         state.hideComments = data.hideComments || false;
         state.filterComments = data.filterComments || false;
+        state.hideHomeFeed = data.hideHomeFeed || false;
+        state.hideSponsoredCards = data.hideSponsoredCards || false;
+        state.hideWatchPlaylistPanel = data.hideWatchPlaylistPanel || false;
+        state.hidePlaylistCards = data.hidePlaylistCards || false;
+        state.hideMixPlaylists = data.hideMixPlaylists || false;
+        state.hideVideoSidebar = data.hideVideoSidebar || false;
+        state.hideRecommended = data.hideRecommended || false;
+        state.hideLiveChat = data.hideLiveChat || false;
+        state.hideVideoInfo = data.hideVideoInfo || false;
+        state.hideVideoButtonsBar = data.hideVideoButtonsBar || false;
+        state.hideAskButton = data.hideAskButton || false;
+        state.hideVideoChannelRow = data.hideVideoChannelRow || false;
+        state.hideVideoDescription = data.hideVideoDescription || false;
+        state.hideMerchTicketsOffers = data.hideMerchTicketsOffers || false;
+        state.hideEndscreenVideowall = data.hideEndscreenVideowall || false;
+        state.hideEndscreenCards = data.hideEndscreenCards || false;
+        state.disableAutoplay = data.disableAutoplay || false;
+        state.disableAnnotations = data.disableAnnotations || false;
+        state.hideTopHeader = data.hideTopHeader || false;
+        state.hideNotificationBell = data.hideNotificationBell || false;
+        state.hideExploreTrending = data.hideExploreTrending || false;
+        state.hideMoreFromYouTube = data.hideMoreFromYouTube || false;
+        state.hideSubscriptions = data.hideSubscriptions || false;
+        state.hideSearchShelves = data.hideSearchShelves || false;
         state.stats = data.stats || { hiddenCount: 0, savedMinutes: 0 };
         state.channelMap = data.channelMap || {};
         state.theme = data.theme || 'light';
@@ -84,7 +132,31 @@ const StateManager = (() => {
                 channels: state.channels,
                 hideShorts: state.hideShorts,
                 hideComments: state.hideComments,
-                filterComments: state.filterComments
+                filterComments: state.filterComments,
+                hideHomeFeed: state.hideHomeFeed,
+                hideSponsoredCards: state.hideSponsoredCards,
+                hideWatchPlaylistPanel: state.hideWatchPlaylistPanel,
+                hidePlaylistCards: state.hidePlaylistCards,
+                hideMixPlaylists: state.hideMixPlaylists,
+                hideVideoSidebar: state.hideVideoSidebar,
+                hideRecommended: state.hideRecommended,
+                hideLiveChat: state.hideLiveChat,
+                hideVideoInfo: state.hideVideoInfo,
+                hideVideoButtonsBar: state.hideVideoButtonsBar,
+                hideAskButton: state.hideAskButton,
+                hideVideoChannelRow: state.hideVideoChannelRow,
+                hideVideoDescription: state.hideVideoDescription,
+                hideMerchTicketsOffers: state.hideMerchTicketsOffers,
+                hideEndscreenVideowall: state.hideEndscreenVideowall,
+                hideEndscreenCards: state.hideEndscreenCards,
+                disableAutoplay: state.disableAutoplay,
+                disableAnnotations: state.disableAnnotations,
+                hideTopHeader: state.hideTopHeader,
+                hideNotificationBell: state.hideNotificationBell,
+                hideExploreTrending: state.hideExploreTrending,
+                hideMoreFromYouTube: state.hideMoreFromYouTube,
+                hideSubscriptions: state.hideSubscriptions,
+                hideSearchShelves: state.hideSearchShelves
             });
 
             if (broadcast && result.compiledSettings) {
@@ -111,18 +183,13 @@ const StateManager = (() => {
      * Broadcast settings to content scripts
      */
     function broadcastSettings(compiledSettings) {
-        chrome.tabs?.query({}, (tabs) => {
-            tabs.forEach(tab => {
-                if (tab.id && tab.url?.startsWith('http')) {
-                    chrome.tabs.sendMessage(tab.id, {
-                        action: 'settingsUpdated',
-                        settings: compiledSettings
-                    }).catch(() => {
-                        // Ignore errors for tabs that don't have content script
-                    });
-                }
+        try {
+            chrome.runtime?.sendMessage({
+                action: 'FilterTube_ApplySettings',
+                settings: compiledSettings
             });
-        });
+        } catch (e) {
+        }
     }
 
     // ============================================================================
@@ -152,6 +219,7 @@ const StateManager = (() => {
             semantic: options.semantic || false,
             source: 'user',
             channelRef: null,
+            comments: Object.prototype.hasOwnProperty.call(options, 'comments') ? !!options.comments : true,
             addedAt: Date.now() // Timestamp for proper ordering
         });
 
@@ -159,6 +227,31 @@ const StateManager = (() => {
         await saveSettings();
         notifyListeners('keywordAdded', { word: trimmed });
         return true;
+    }
+
+    /**
+     * Toggle whether a keyword should apply to comment filtering
+     * @param {string} word - Keyword to toggle
+     * @returns {Promise<boolean>} New comments state
+     */
+    async function toggleKeywordComments(word) {
+        await ensureLoaded();
+
+        let index = state.userKeywords.findIndex(k => k.word === word);
+        if (index === -1) {
+            // If the entry isn't in userKeywords (e.g., channel-derived), we don't currently
+            // persist keyword-level overrides separately.
+            return false;
+        }
+
+        const current = state.userKeywords[index];
+        const nextValue = (typeof current.comments === 'boolean') ? !current.comments : false;
+        state.userKeywords[index].comments = nextValue;
+
+        recomputeKeywords();
+        await saveSettings();
+        notifyListeners('keywordUpdated', { word, comments: nextValue });
+        return nextValue;
     }
 
     /**
@@ -359,7 +452,35 @@ const StateManager = (() => {
     async function updateSetting(key, value) {
         await ensureLoaded();
 
-        const validKeys = ['hideShorts', 'hideComments', 'filterComments'];
+        const validKeys = [
+            'hideShorts',
+            'hideComments',
+            'filterComments',
+            'hideHomeFeed',
+            'hideSponsoredCards',
+            'hideWatchPlaylistPanel',
+            'hidePlaylistCards',
+            'hideMixPlaylists',
+            'hideVideoSidebar',
+            'hideRecommended',
+            'hideLiveChat',
+            'hideVideoInfo',
+            'hideVideoButtonsBar',
+            'hideAskButton',
+            'hideVideoChannelRow',
+            'hideVideoDescription',
+            'hideMerchTicketsOffers',
+            'hideEndscreenVideowall',
+            'hideEndscreenCards',
+            'disableAutoplay',
+            'disableAnnotations',
+            'hideTopHeader',
+            'hideNotificationBell',
+            'hideExploreTrending',
+            'hideMoreFromYouTube',
+            'hideSubscriptions',
+            'hideSearchShelves'
+        ];
         if (!validKeys.includes(key)) {
             console.warn(`StateManager: Invalid setting key: ${key}`);
             return;
@@ -466,7 +587,39 @@ const StateManager = (() => {
                 }
 
                 // Check for settings changes using actual storage keys
-                const storageKeys = ['uiKeywords', 'filterKeywords', 'filterChannels', 'hideAllShorts', 'hideAllComments', 'filterComments', 'stats', 'channelMap'];
+                const storageKeys = [
+                    'uiKeywords',
+                    'filterKeywords',
+                    'filterChannels',
+                    'hideAllShorts',
+                    'hideAllComments',
+                    'filterComments',
+                    'hideHomeFeed',
+                    'hideSponsoredCards',
+                    'hideWatchPlaylistPanel',
+                    'hidePlaylistCards',
+                    'hideMixPlaylists',
+                    'hideVideoSidebar',
+                    'hideRecommended',
+                    'hideLiveChat',
+                    'hideVideoInfo',
+                    'hideVideoButtonsBar',
+                    'hideVideoChannelRow',
+                    'hideVideoDescription',
+                    'hideMerchTicketsOffers',
+                    'hideEndscreenVideowall',
+                    'hideEndscreenCards',
+                    'disableAutoplay',
+                    'disableAnnotations',
+                    'hideTopHeader',
+                    'hideNotificationBell',
+                    'hideExploreTrending',
+                    'hideMoreFromYouTube',
+                    'hideSubscriptions',
+                    'hideSearchShelves',
+                    'stats',
+                    'channelMap'
+                ];
                 const hasSettingsChange = storageKeys.some(key => changes[key]);
 
                 if (hasSettingsChange) {
@@ -502,6 +655,7 @@ const StateManager = (() => {
         addKeyword,
         removeKeyword,
         toggleKeywordExact,
+        toggleKeywordComments,
 
         // Channels
         addChannel,
@@ -522,5 +676,5 @@ const StateManager = (() => {
 
 // Export for use in other scripts
 if (typeof window !== 'undefined') {
-    window.StateManager = StateManager;
+    globalThis.StateManager = StateManager;
 }

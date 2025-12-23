@@ -19,6 +19,18 @@ const RenderEngine = (() => {
     // KEYWORD RENDERING
     // ============================================================================
 
+    function safeTimestamp(value) {
+        return (typeof value === 'number' && Number.isFinite(value)) ? value : 0;
+    }
+
+    function createPillBadge({ text, title, variantClass = '' }) {
+        const badge = document.createElement('span');
+        badge.className = `channel-derived-badge ${variantClass}`.trim();
+        badge.textContent = text;
+        if (title) badge.title = title;
+        return badge;
+    }
+
     /**
      * Render keyword list with adaptive UI
      * @param {HTMLElement} container - Container element
@@ -40,7 +52,9 @@ const RenderEngine = (() => {
             showSort = false,
             minimal = false,
             searchValue = '',
-            sortValue = 'newest'
+            sortValue = 'newest',
+            dateFrom = null,
+            dateTo = null
         } = options;
 
         // Filter and sort keywords
@@ -54,14 +68,28 @@ const RenderEngine = (() => {
             );
         }
 
+        // Apply date filter
+        if ((typeof dateFrom === 'number' && Number.isFinite(dateFrom)) || (typeof dateTo === 'number' && Number.isFinite(dateTo))) {
+            const from = (typeof dateFrom === 'number' && Number.isFinite(dateFrom)) ? dateFrom : null;
+            const to = (typeof dateTo === 'number' && Number.isFinite(dateTo)) ? dateTo : null;
+            displayKeywords = displayKeywords.filter(entry => {
+                const ts = safeTimestamp(entry.addedAt);
+                if (from !== null && ts < from) return false;
+                if (to !== null && ts > to) return false;
+                return true;
+            });
+        }
+
         // Apply sorting
         if (showSort) {
             if (sortValue === 'az') {
                 displayKeywords.sort((a, b) => a.word.localeCompare(b.word));
             } else if (sortValue === 'oldest') {
-                displayKeywords.reverse();
+                displayKeywords.sort((a, b) => safeTimestamp(a.addedAt) - safeTimestamp(b.addedAt));
+            } else {
+                // newest
+                displayKeywords.sort((a, b) => safeTimestamp(b.addedAt) - safeTimestamp(a.addedAt));
             }
-            // 'newest' is default order (no change needed)
         }
 
         // Clear container
@@ -126,19 +154,62 @@ const RenderEngine = (() => {
         const controls = document.createElement('div');
         controls.className = minimal ? 'keyword-controls' : 'item-controls';
 
+        const commentsEnabled = entry.comments !== false;
+        const commentsToggle = UIComponents?.createToggleButton
+            ? UIComponents.createToggleButton({
+                text: 'C',
+                active: commentsEnabled,
+                onToggle: async () => {
+                    // Channel-derived keywords are managed via Channel Management.
+                    if (isChannelDerived) return;
+                    await StateManager?.toggleKeywordComments(entry.word);
+                },
+                className: 'toggle-variant-blue'
+            })
+            : (() => {
+                const toggle = document.createElement('div');
+                toggle.className = `exact-toggle toggle-variant-blue ${commentsEnabled ? 'active' : ''}`.trim();
+                toggle.textContent = 'C';
+                toggle.setAttribute('role', 'button');
+                toggle.setAttribute('aria-pressed', commentsEnabled);
+                toggle.setAttribute('tabindex', '0');
+                toggle.addEventListener('click', async () => {
+                    if (isChannelDerived) return;
+                    await StateManager?.toggleKeywordComments(entry.word);
+                });
+                toggle.addEventListener('keydown', async (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        if (isChannelDerived) return;
+                        await StateManager?.toggleKeywordComments(entry.word);
+                    }
+                });
+                return toggle;
+            })();
+
+        commentsToggle.title = commentsEnabled
+            ? 'Keyword applies to comment filtering'
+            : 'Keyword does not apply to comment filtering';
+        if (isChannelDerived) {
+            commentsToggle.style.opacity = '0.6';
+            commentsToggle.style.cursor = 'not-allowed';
+        }
+
         if (isChannelDerived) {
             // Channel-derived keyword: show badge only
-            const badge = document.createElement('span');
-            badge.className = 'channel-derived-badge';
-            badge.textContent = 'From Channel';
-            badge.title = 'Auto-added by "Filter All Content" - managed in Channel Management';
-
-
+            const linkedChannel = findChannelByRef(entry.channelRef);
+            const isFromComments = linkedChannel?.source === 'comments';
+            const badge = createPillBadge({
+                text: isFromComments ? 'From Comments' : 'From Channel',
+                title: 'Auto-added by "Filter All Content" - managed in Channel Management',
+                variantClass: isFromComments ? 'badge-variant-comments' : ''
+            });
+            controls.appendChild(commentsToggle);
             controls.appendChild(badge);
 
             // In full UI, show channel origin
             if (!minimal) {
-                const channel = findChannelByRef(entry.channelRef);
+                const channel = linkedChannel;
                 if (channel) {
                     const originLabel = document.createElement('span');
                     originLabel.className = 'channel-derived-origin';
@@ -174,6 +245,8 @@ const RenderEngine = (() => {
                 });
 
             controls.appendChild(exactToggle);
+
+            controls.appendChild(commentsToggle);
 
             // In full UI, add semantic toggle (disabled for now)
             if (!minimal) {
@@ -217,7 +290,9 @@ const RenderEngine = (() => {
             showNodeMapping = false,
             minimal = false,
             searchValue = '',
-            sortValue = 'newest'
+            sortValue = 'newest',
+            dateFrom = null,
+            dateTo = null
         } = options;
 
         // Filter and sort channels
@@ -234,12 +309,27 @@ const RenderEngine = (() => {
             });
         }
 
+        // Apply date filter
+        if ((typeof dateFrom === 'number' && Number.isFinite(dateFrom)) || (typeof dateTo === 'number' && Number.isFinite(dateTo))) {
+            const from = (typeof dateFrom === 'number' && Number.isFinite(dateFrom)) ? dateFrom : null;
+            const to = (typeof dateTo === 'number' && Number.isFinite(dateTo)) ? dateTo : null;
+            displayChannels = displayChannels.filter(entry => {
+                const ts = safeTimestamp(entry.addedAt);
+                if (from !== null && ts < from) return false;
+                if (to !== null && ts > to) return false;
+                return true;
+            });
+        }
+
         // Apply sorting
         if (showSort) {
             if (sortValue === 'az') {
                 displayChannels.sort((a, b) => (a.name || a.id).localeCompare(b.name || b.id));
             } else if (sortValue === 'oldest') {
-                displayChannels.reverse();
+                displayChannels.sort((a, b) => safeTimestamp(a.addedAt) - safeTimestamp(b.addedAt));
+            } else {
+                // newest
+                displayChannels.sort((a, b) => safeTimestamp(b.addedAt) - safeTimestamp(a.addedAt));
             }
         }
 
@@ -442,6 +532,15 @@ const RenderEngine = (() => {
         const controls = document.createElement('div');
         controls.className = 'keyword-controls';
 
+        if (channel?.source === 'comments') {
+            const badge = createPillBadge({
+                text: 'From Comments',
+                title: 'This channel was blocked from the YouTube comments menu',
+                variantClass: 'badge-variant-comments'
+            });
+            controls.appendChild(badge);
+        }
+
         const deleteBtn = UIComponents?.createDeleteButton ?
             UIComponents.createDeleteButton(async () => {
                 await StateManager?.removeChannel(index);
@@ -500,6 +599,15 @@ const RenderEngine = (() => {
 
         infoGroup.appendChild(logoImg);
         infoGroup.appendChild(nameSpan);
+
+        if (channel?.source === 'comments') {
+            const badge = createPillBadge({
+                text: 'From Comments',
+                title: 'This channel was blocked from the YouTube comments menu',
+                variantClass: 'badge-variant-comments'
+            });
+            infoGroup.appendChild(badge);
+        }
 
         if (collaborationMeta) {
             const badge = createCollaborationBadge(collaborationMeta);
@@ -592,7 +700,7 @@ const RenderEngine = (() => {
         // Use pill toggle with red variant (no label text)
         const pillToggle = UIComponents?.createToggleButton ?
             UIComponents.createToggleButton({
-                text: 'Filter All Content',
+                text: 'Filter All',
                 active: channel.filterAll || false,
                 onToggle: async () => {
                     await StateManager?.toggleChannelFilterAll(index);
@@ -612,7 +720,7 @@ const RenderEngine = (() => {
         const StateManager = getStateManager();
         const toggle = document.createElement('div');
         toggle.className = `exact-toggle toggle-variant-red ${channel.filterAll ? 'active' : ''}`;
-        toggle.textContent = 'Filter All Content';
+        toggle.textContent = 'Filter All';
         toggle.title = `Automatically adds "${channel.name || channel.handle || channel.id}" as a fuzzy keyword filter - hides any content mentioning this channel name`;
         toggle.addEventListener('click', async () => {
             await StateManager?.toggleChannelFilterAll(index);

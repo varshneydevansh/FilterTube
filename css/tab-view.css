@@ -396,6 +396,47 @@ body {
     font-weight: 500;
 }
 
+.date-filter-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--ft-space-md);
+    margin-bottom: var(--ft-space-md);
+    flex-wrap: wrap;
+}
+
+.date-range-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--ft-space-sm);
+}
+
+.date-range-controls .label {
+    font-size: var(--ft-font-size-caption);
+    color: var(--ft-color-text-secondary);
+    font-weight: 500;
+}
+
+.date-inputs {
+    display: flex;
+    align-items: center;
+    gap: var(--ft-space-sm);
+    flex-wrap: wrap;
+}
+
+.date-input.select-input {
+    padding: var(--ft-space-sm) var(--ft-space-md);
+}
+
+.date-sep {
+    font-size: var(--ft-font-size-caption);
+    color: var(--ft-color-text-secondary);
+}
+
+.date-clear-btn {
+    padding: var(--ft-space-sm) var(--ft-space-md);
+}
+
 .select-input {
     padding: var(--ft-space-sm) var(--ft-space-md);
     border: 1px solid var(--ft-color-sem-neutral-border);

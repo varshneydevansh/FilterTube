@@ -100,13 +100,38 @@ function handleStorageChanges(changes, area) {
     if (area !== 'local') return;
     const relevantKeys = [
         'filterKeywords',
+        'filterKeywordsComments',
         'filterChannels',
         'uiChannels',
         'channelMap',
         'videoChannelMap', // Needed so Shorts videoId → channelId updates re-apply settings
         'hideAllComments',
         'filterComments',
-        'hideAllShorts'
+        'hideAllShorts',
+        'hideHomeFeed',
+        'hideSponsoredCards',
+        'hideWatchPlaylistPanel',
+        'hidePlaylistCards',
+        'hideMixPlaylists',
+        'hideVideoSidebar',
+        'hideRecommended',
+        'hideLiveChat',
+        'hideVideoInfo',
+        'hideVideoButtonsBar',
+        'hideAskButton',
+        'hideVideoChannelRow',
+        'hideVideoDescription',
+        'hideMerchTicketsOffers',
+        'hideEndscreenVideowall',
+        'hideEndscreenCards',
+        'disableAutoplay',
+        'disableAnnotations',
+        'hideTopHeader',
+        'hideNotificationBell',
+        'hideExploreTrending',
+        'hideMoreFromYouTube',
+        'hideSubscriptions',
+        'hideSearchShelves'
     ];
     if (Object.keys(changes).some(key => relevantKeys.includes(key))) {
         // FIX: Apply changes IMMEDIATELY without debounce

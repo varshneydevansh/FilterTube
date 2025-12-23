@@ -17,6 +17,30 @@
         'hideAllShorts',
         'hideAllComments',
         'filterComments',
+        'hideHomeFeed',
+        'hideSponsoredCards',
+        'hideWatchPlaylistPanel',
+        'hidePlaylistCards',
+        'hideMixPlaylists',
+        'hideVideoSidebar',
+        'hideRecommended',
+        'hideLiveChat',
+        'hideVideoInfo',
+        'hideVideoButtonsBar',
+        'hideAskButton',
+        'hideVideoChannelRow',
+        'hideVideoDescription',
+        'hideMerchTicketsOffers',
+        'hideEndscreenVideowall',
+        'hideEndscreenCards',
+        'disableAutoplay',
+        'disableAnnotations',
+        'hideTopHeader',
+        'hideNotificationBell',
+        'hideExploreTrending',
+        'hideMoreFromYouTube',
+        'hideSubscriptions',
+        'hideSearchShelves',
         'stats',
         'channelMap'
     ];
@@ -27,13 +51,26 @@
         if (!entry) return null;
         const word = typeof entry.word === 'string' ? entry.word.trim() : '';
         if (!word) return null;
+
+        const addedAtCandidate = Object.prototype.hasOwnProperty.call(overrides, 'addedAt')
+            ? overrides.addedAt
+            : entry.addedAt;
+        const addedAt = (typeof addedAtCandidate === 'number' && Number.isFinite(addedAtCandidate))
+            ? addedAtCandidate
+            : Date.now();
+
+        const commentsCandidate = Object.prototype.hasOwnProperty.call(overrides, 'comments')
+            ? overrides.comments
+            : entry.comments;
+        const comments = (typeof commentsCandidate === 'boolean') ? commentsCandidate : true;
         return {
             word,
             exact: !!entry.exact,
             semantic: !!entry.semantic,
             source: overrides.source || (entry.source === 'channel' ? 'channel' : 'user'),
             channelRef: overrides.channelRef || entry.channelRef || null,
-            addedAt: overrides.addedAt || entry.addedAt || Date.now() // Track insertion time
+            comments,
+            addedAt // Track insertion time
         };
     }
 
@@ -78,7 +115,7 @@
         return [];
     }
 
-    function sanitizeChannelEntry(entry) {
+    function sanitizeChannelEntry(entry, overrides = {}) {
         if (typeof entry === 'string') {
             const trimmed = entry.trim();
             if (!trimmed) return null;
@@ -86,10 +123,14 @@
                 name: trimmed,
                 id: trimmed,
                 handle: null,
+                handleDisplay: null,
+                canonicalHandle: null,
                 logo: null,
+                customUrl: null,
                 filterAll: false,
+                source: overrides.source || null,
                 originalInput: trimmed,
-                addedAt: Date.now()
+                addedAt: overrides.addedAt || Date.now()
             };
         }
 
@@ -97,8 +138,12 @@
 
         const id = typeof entry.id === 'string' ? entry.id.trim() : (entry.id || '');
         const handle = typeof entry.handle === 'string' ? entry.handle : null;
+        const handleDisplay = typeof entry.handleDisplay === 'string' ? entry.handleDisplay : null;
+        const canonicalHandle = typeof entry.canonicalHandle === 'string' ? entry.canonicalHandle : null;
+        const customUrl = typeof entry.customUrl === 'string' ? entry.customUrl : null;
+        const source = overrides.source || (typeof entry.source === 'string' ? entry.source : null);
         const name = entry.name || id || handle || entry.originalInput || '';
-        const originalInput = entry.originalInput || handle || id || name || '';
+        const originalInput = entry.originalInput || customUrl || handle || id || name || '';
         const collaborationGroupId = typeof entry.collaborationGroupId === 'string'
             ? entry.collaborationGroupId
             : null;
@@ -122,14 +167,25 @@
                 .filter(Boolean)
             : [];
 
+        const addedAtCandidate = Object.prototype.hasOwnProperty.call(overrides, 'addedAt')
+            ? overrides.addedAt
+            : entry.addedAt;
+        const addedAt = (typeof addedAtCandidate === 'number' && Number.isFinite(addedAtCandidate))
+            ? addedAtCandidate
+            : Date.now();
+
         return {
             name: name || id,
             id,
             handle,
+            handleDisplay,
+            canonicalHandle,
             logo: entry.logo || null,
+            customUrl,
             filterAll: !!entry.filterAll,
+            source,
             originalInput,
-            addedAt: entry.addedAt || Date.now(),
+            addedAt,
             collaborationGroupId,
             collaborationWith,
             allCollaborators
@@ -138,15 +194,22 @@
 
     function normalizeChannels(rawChannels) {
         if (Array.isArray(rawChannels)) {
+            const now = Date.now();
             return rawChannels
-                .map(sanitizeChannelEntry)
+                .map((entry, index) => {
+                    const addedAtRaw = entry && typeof entry === 'object' ? entry.addedAt : null;
+                    const addedAt = (typeof addedAtRaw === 'number' && Number.isFinite(addedAtRaw))
+                        ? addedAtRaw
+                        : (now - index * 1000);
+                    return sanitizeChannelEntry(entry, { addedAt });
+                })
                 .filter(Boolean);
         }
 
         if (typeof rawChannels === 'string') {
             return rawChannels
                 .split(',')
-                .map(sanitizeChannelEntry)
+                .map(entry => sanitizeChannelEntry(entry))
                 .filter(Boolean);
         }
 
@@ -166,10 +229,11 @@
             .filter(Boolean);
     }
 
-    function compileKeywords(keywords) {
+    function compileKeywords(keywords, predicate = null) {
         return (keywords || [])
-            .map(entry => sanitizeKeywordEntry(entry, { source: entry?.source, channelRef: entry?.channelRef }))
+            .map(entry => sanitizeKeywordEntry(entry, { source: entry?.source, channelRef: entry?.channelRef, comments: entry?.comments }))
             .filter(Boolean)
+            .filter(entry => (typeof predicate === 'function' ? predicate(entry) : true))
             .map(entry => {
                 const escaped = entry.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                 return {
@@ -197,6 +261,8 @@
     }
 
     function syncFilterAllKeywords(keywords, channels) {
+        // Existing keywords (user + channel-derived)
+        const existing = Array.isArray(keywords) ? keywords : [];
         const sanitizedChannels = sanitizeChannelsList(channels);
 
         // Create a set of channel keys that should have keywords
@@ -204,19 +270,18 @@
         const channelKeywordMap = new Map();
 
         sanitizedChannels.forEach(channel => {
-            if (!channel || !channel.filterAll) return;
+            if (!channel.filterAll) return;
             const key = getChannelDerivedKey(channel);
             if (!key) return;
-            const word = getChannelKeywordWord(channel);
-            if (!word) return;
 
             activeChannelKeys.add(key);
             channelKeywordMap.set(key, {
-                word,
+                word: getChannelKeywordWord(channel),
                 exact: false,
                 semantic: false,
                 source: 'channel',
                 channelRef: key,
+                comments: (typeof channel.filterAllComments === 'boolean') ? channel.filterAllComments : true,
                 addedAt: channel.addedAt || Date.now() // Use channel timestamp if available
             });
         });
@@ -257,15 +322,70 @@
         return result;
     }
 
-    function buildCompiledSettings({ keywords, channels, hideShorts, hideComments, filterComments }) {
+    function buildCompiledSettings({
+        keywords,
+        channels,
+        hideShorts,
+        hideComments,
+        filterComments,
+        hideHomeFeed,
+        hideSponsoredCards,
+        hideWatchPlaylistPanel,
+        hidePlaylistCards,
+        hideMixPlaylists,
+        hideVideoSidebar,
+        hideRecommended,
+        hideLiveChat,
+        hideVideoInfo,
+        hideVideoButtonsBar,
+        hideAskButton,
+        hideVideoChannelRow,
+        hideVideoDescription,
+        hideMerchTicketsOffers,
+        hideEndscreenVideowall,
+        hideEndscreenCards,
+        disableAutoplay,
+        disableAnnotations,
+        hideTopHeader,
+        hideNotificationBell,
+        hideExploreTrending,
+        hideMoreFromYouTube,
+        hideSubscriptions,
+        hideSearchShelves
+    }) {
         const sanitizedChannels = sanitizeChannelsList(channels);
         const sanitizedKeywords = syncFilterAllKeywords(keywords, sanitizedChannels);
         return {
             filterKeywords: compileKeywords(sanitizedKeywords),
+            filterKeywordsComments: compileKeywords(sanitizedKeywords, entry => entry.comments !== false),
             filterChannels: sanitizedChannels,
             hideAllShorts: !!hideShorts,
             hideAllComments: !!hideComments,
-            filterComments: hideComments ? false : !!filterComments
+            filterComments: hideComments ? false : !!filterComments,
+            hideHomeFeed: !!hideHomeFeed,
+            hideSponsoredCards: !!hideSponsoredCards,
+            hideWatchPlaylistPanel: !!hideWatchPlaylistPanel,
+            hidePlaylistCards: !!hidePlaylistCards,
+            hideMixPlaylists: !!hideMixPlaylists,
+            hideVideoSidebar: !!hideVideoSidebar,
+            hideRecommended: !!hideRecommended,
+            hideLiveChat: !!hideLiveChat,
+            hideVideoInfo: !!hideVideoInfo,
+            hideVideoButtonsBar: !!hideVideoButtonsBar,
+            hideAskButton: !!hideAskButton,
+            hideVideoChannelRow: !!hideVideoChannelRow,
+            hideVideoDescription: !!hideVideoDescription,
+            hideMerchTicketsOffers: !!hideMerchTicketsOffers,
+            hideEndscreenVideowall: !!hideEndscreenVideowall,
+            hideEndscreenCards: !!hideEndscreenCards,
+            disableAutoplay: !!disableAutoplay,
+            disableAnnotations: !!disableAnnotations,
+            hideTopHeader: !!hideTopHeader,
+            hideNotificationBell: !!hideNotificationBell,
+            hideExploreTrending: !!hideExploreTrending,
+            hideMoreFromYouTube: !!hideMoreFromYouTube,
+            hideSubscriptions: !!hideSubscriptions,
+            hideSearchShelves: !!hideSearchShelves
         };
     }
 
@@ -293,6 +413,30 @@
                     hideShorts: !!result.hideAllShorts,
                     hideComments: hideAllComments,
                     filterComments,
+                    hideHomeFeed: !!result.hideHomeFeed,
+                    hideSponsoredCards: !!result.hideSponsoredCards,
+                    hideWatchPlaylistPanel: !!result.hideWatchPlaylistPanel,
+                    hidePlaylistCards: !!result.hidePlaylistCards,
+                    hideMixPlaylists: !!result.hideMixPlaylists,
+                    hideVideoSidebar: !!result.hideVideoSidebar,
+                    hideRecommended: !!result.hideRecommended,
+                    hideLiveChat: !!result.hideLiveChat,
+                    hideVideoInfo: !!result.hideVideoInfo,
+                    hideVideoButtonsBar: !!result.hideVideoButtonsBar,
+                    hideAskButton: !!result.hideAskButton,
+                    hideVideoChannelRow: !!result.hideVideoChannelRow,
+                    hideVideoDescription: !!result.hideVideoDescription,
+                    hideMerchTicketsOffers: !!result.hideMerchTicketsOffers,
+                    hideEndscreenVideowall: !!result.hideEndscreenVideowall,
+                    hideEndscreenCards: !!result.hideEndscreenCards,
+                    disableAutoplay: !!result.disableAutoplay,
+                    disableAnnotations: !!result.disableAnnotations,
+                    hideTopHeader: !!result.hideTopHeader,
+                    hideNotificationBell: !!result.hideNotificationBell,
+                    hideExploreTrending: !!result.hideExploreTrending,
+                    hideMoreFromYouTube: !!result.hideMoreFromYouTube,
+                    hideSubscriptions: !!result.hideSubscriptions,
+                    hideSearchShelves: !!result.hideSearchShelves,
                     stats: result.stats || { hiddenCount: 0, savedMinutes: 0 },
                     channelMap: result.channelMap || {},
                     theme
@@ -301,7 +445,37 @@
         });
     }
 
-    function saveSettings({ keywords, channels, hideShorts, hideComments, filterComments }) {
+    function saveSettings({
+        keywords,
+        channels,
+        hideShorts,
+        hideComments,
+        filterComments,
+        hideHomeFeed,
+        hideSponsoredCards,
+        hideWatchPlaylistPanel,
+        hidePlaylistCards,
+        hideMixPlaylists,
+        hideVideoSidebar,
+        hideRecommended,
+        hideLiveChat,
+        hideVideoInfo,
+        hideVideoButtonsBar,
+        hideAskButton,
+        hideVideoChannelRow,
+        hideVideoDescription,
+        hideMerchTicketsOffers,
+        hideEndscreenVideowall,
+        hideEndscreenCards,
+        disableAutoplay,
+        disableAnnotations,
+        hideTopHeader,
+        hideNotificationBell,
+        hideExploreTrending,
+        hideMoreFromYouTube,
+        hideSubscriptions,
+        hideSearchShelves
+    }) {
         const sanitizedChannels = sanitizeChannelsList(channels);
         const sanitizedKeywords = syncFilterAllKeywords(keywords, sanitizedChannels);
         const compiledSettings = buildCompiledSettings({
@@ -309,16 +483,65 @@
             channels: sanitizedChannels,
             hideShorts,
             hideComments,
-            filterComments
+            filterComments,
+            hideHomeFeed,
+            hideSponsoredCards,
+            hideWatchPlaylistPanel,
+            hidePlaylistCards,
+            hideMixPlaylists,
+            hideVideoSidebar,
+            hideRecommended,
+            hideLiveChat,
+            hideVideoInfo,
+            hideVideoButtonsBar,
+            hideAskButton,
+            hideVideoChannelRow,
+            hideVideoDescription,
+            hideMerchTicketsOffers,
+            hideEndscreenVideowall,
+            hideEndscreenCards,
+            disableAutoplay,
+            disableAnnotations,
+            hideTopHeader,
+            hideNotificationBell,
+            hideExploreTrending,
+            hideMoreFromYouTube,
+            hideSubscriptions,
+            hideSearchShelves
         });
 
         const payload = {
             uiKeywords: sanitizedKeywords, // Save ALL keywords (user + channel-derived) to preserve order
             filterKeywords: compiledSettings.filterKeywords,
+            filterKeywordsComments: compiledSettings.filterKeywordsComments,
             filterChannels: compiledSettings.filterChannels,
             hideAllShorts: compiledSettings.hideAllShorts,
             hideAllComments: compiledSettings.hideAllComments,
-            filterComments: compiledSettings.filterComments
+            filterComments: compiledSettings.filterComments,
+            hideHomeFeed: compiledSettings.hideHomeFeed,
+            hideSponsoredCards: compiledSettings.hideSponsoredCards,
+            hideWatchPlaylistPanel: compiledSettings.hideWatchPlaylistPanel,
+            hidePlaylistCards: compiledSettings.hidePlaylistCards,
+            hideMixPlaylists: compiledSettings.hideMixPlaylists,
+            hideVideoSidebar: compiledSettings.hideVideoSidebar,
+            hideRecommended: compiledSettings.hideRecommended,
+            hideLiveChat: compiledSettings.hideLiveChat,
+            hideVideoInfo: compiledSettings.hideVideoInfo,
+            hideVideoButtonsBar: compiledSettings.hideVideoButtonsBar,
+            hideAskButton: compiledSettings.hideAskButton,
+            hideVideoChannelRow: compiledSettings.hideVideoChannelRow,
+            hideVideoDescription: compiledSettings.hideVideoDescription,
+            hideMerchTicketsOffers: compiledSettings.hideMerchTicketsOffers,
+            hideEndscreenVideowall: compiledSettings.hideEndscreenVideowall,
+            hideEndscreenCards: compiledSettings.hideEndscreenCards,
+            disableAutoplay: compiledSettings.disableAutoplay,
+            disableAnnotations: compiledSettings.disableAnnotations,
+            hideTopHeader: compiledSettings.hideTopHeader,
+            hideNotificationBell: compiledSettings.hideNotificationBell,
+            hideExploreTrending: compiledSettings.hideExploreTrending,
+            hideMoreFromYouTube: compiledSettings.hideMoreFromYouTube,
+            hideSubscriptions: compiledSettings.hideSubscriptions,
+            hideSearchShelves: compiledSettings.hideSearchShelves
         };
 
         return new Promise(resolve => {

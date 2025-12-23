@@ -33,6 +33,25 @@ function initializeFiltersTabs() {
             </div>
         </div>
 
+        <div class="date-filter-controls">
+            <div class="date-range-controls">
+                <span class="label">Date:</span>
+                <select id="keywordDatePreset" class="select-input">
+                    <option value="all">All time</option>
+                    <option value="today">Today</option>
+                    <option value="7d">Last 7 days</option>
+                    <option value="30d">Last 30 days</option>
+                    <option value="custom">Custom</option>
+                </select>
+            </div>
+            <div class="date-inputs">
+                <input type="date" id="keywordDateFrom" class="select-input date-input" />
+                <span class="date-sep">to</span>
+                <input type="date" id="keywordDateTo" class="select-input date-input" />
+                <button id="keywordDateClear" class="btn-secondary date-clear-btn" type="button">Clear</button>
+            </div>
+        </div>
+
         <div id="keywordListEl" class="advanced-list"></div>
     `;
 
@@ -56,45 +75,98 @@ function initializeFiltersTabs() {
             </div>
         </div>
 
+        <div class="date-filter-controls">
+            <div class="date-range-controls">
+                <span class="label">Date:</span>
+                <select id="channelDatePreset" class="select-input">
+                    <option value="all">All time</option>
+                    <option value="today">Today</option>
+                    <option value="7d">Last 7 days</option>
+                    <option value="30d">Last 30 days</option>
+                    <option value="custom">Custom</option>
+                </select>
+            </div>
+            <div class="date-inputs">
+                <input type="date" id="channelDateFrom" class="select-input date-input" />
+                <span class="date-sep">to</span>
+                <input type="date" id="channelDateTo" class="select-input date-input" />
+                <button id="channelDateClear" class="btn-secondary date-clear-btn" type="button">Clear</button>
+            </div>
+        </div>
+
         <div id="channelListEl" class="advanced-list"></div>
     `;
 
     // Content tab with checkboxes
     const contentTab = document.createElement('div');
-    contentTab.innerHTML = `
-        <div class="toggle-row">
-            <div class="toggle-info">
-                <div class="toggle-title">Hide Shorts</div>
-                <div class="toggle-desc">Remove all YouTube Shorts from your feed</div>
-            </div>
-            <label class="switch">
-                <input type="checkbox" id="settingHideShorts">
-                <span class="slider round"></span>
-            </label>
-        </div>
 
-        <div class="toggle-row">
-            <div class="toggle-info">
-                <div class="toggle-title">Hide All Comments</div>
-                <div class="toggle-desc">Remove comment sections entirely</div>
-            </div>
-            <label class="switch">
-                <input type="checkbox" id="settingHideComments">
-                <span class="slider round"></span>
-            </label>
-        </div>
+    const contentControlsSearch = document.createElement('input');
+    contentControlsSearch.type = 'text';
+    contentControlsSearch.id = 'searchContentControls';
+    contentControlsSearch.className = 'search-input';
+    contentControlsSearch.placeholder = 'Search content controls...';
+    contentControlsSearch.style.marginBottom = '12px';
+    contentTab.appendChild(contentControlsSearch);
 
-        <div class="toggle-row">
-            <div class="toggle-info">
-                <div class="toggle-title">Filter Comments</div>
-                <div class="toggle-desc">Hide only comments containing your keywords</div>
-            </div>
-            <label class="switch">
-                <input type="checkbox" id="settingFilterComments">
-                <span class="slider round"></span>
-            </label>
-        </div>
-    `;
+    const catalog = window.FilterTubeContentControlsCatalog?.getCatalog?.() || [];
+
+    catalog.forEach(group => {
+        const groupEl = document.createElement('div');
+        groupEl.setAttribute('data-ft-control-group', 'true');
+        groupEl.setAttribute('data-ft-group-title', group?.title || '');
+        if (group?.accentColor) {
+            groupEl.style.borderLeft = `3px solid ${group.accentColor}`;
+            groupEl.style.paddingLeft = '12px';
+        }
+        groupEl.style.marginBottom = '18px';
+
+        const titleEl = document.createElement('div');
+        titleEl.className = 'toggle-title';
+        titleEl.textContent = group?.title || '';
+        titleEl.style.marginBottom = '10px';
+        groupEl.appendChild(titleEl);
+
+        (group.controls || []).forEach(control => {
+            const row = document.createElement('div');
+            row.className = 'toggle-row';
+            row.setAttribute('data-ft-control-row', 'true');
+            row.setAttribute('data-ft-search', `${control.title || ''} ${control.description || ''}`.toLowerCase());
+
+            const info = document.createElement('div');
+            info.className = 'toggle-info';
+
+            const t = document.createElement('div');
+            t.className = 'toggle-title';
+            t.textContent = control.title || '';
+
+            const d = document.createElement('div');
+            d.className = 'toggle-desc';
+            d.textContent = control.description || '';
+
+            info.appendChild(t);
+            info.appendChild(d);
+
+            const switchLabel = document.createElement('label');
+            switchLabel.className = 'switch';
+
+            const input = document.createElement('input');
+            input.type = 'checkbox';
+            input.id = `setting_${control.key}`;
+            input.setAttribute('data-ft-setting', control.key);
+
+            const slider = document.createElement('span');
+            slider.className = 'slider round';
+
+            switchLabel.appendChild(input);
+            switchLabel.appendChild(slider);
+
+            row.appendChild(info);
+            row.appendChild(switchLabel);
+            groupEl.appendChild(row);
+        });
+
+        contentTab.appendChild(groupEl);
+    });
 
     // Create tabs
     const tabs = UIComponents.createTabs({
@@ -125,15 +197,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     const searchKeywords = document.getElementById('searchKeywords');
     const keywordSort = document.getElementById('keywordSort');
 
+    const keywordDatePreset = document.getElementById('keywordDatePreset');
+    const keywordDateFrom = document.getElementById('keywordDateFrom');
+    const keywordDateTo = document.getElementById('keywordDateTo');
+    const keywordDateClear = document.getElementById('keywordDateClear');
+
     const channelInput = document.getElementById('channelInput');
     const addChannelBtn = document.getElementById('addChannelBtn');
     const channelListEl = document.getElementById('channelListEl');
     const searchChannels = document.getElementById('searchChannels');
     const channelSort = document.getElementById('channelSort');
 
-    const settingHideShorts = document.getElementById('settingHideShorts');
-    const settingHideComments = document.getElementById('settingHideComments');
-    const settingFilterComments = document.getElementById('settingFilterComments');
+    const channelDatePreset = document.getElementById('channelDatePreset');
+    const channelDateFrom = document.getElementById('channelDateFrom');
+    const channelDateTo = document.getElementById('channelDateTo');
+    const channelDateClear = document.getElementById('channelDateClear');
+
+    const contentControlsContainer = document.getElementById('filtersTabsContainer');
+    const contentControlCheckboxes = contentControlsContainer
+        ? contentControlsContainer.querySelectorAll('input[type="checkbox"][data-ft-setting]')
+        : [];
 
     const themeToggle = document.getElementById('themeToggle');
 
@@ -142,6 +225,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     let keywordSortValue = 'newest';
     let channelSearchValue = '';
     let channelSortValue = 'newest';
+
+    let keywordDateFromTs = null;
+    let keywordDateToTs = null;
+    let channelDateFromTs = null;
+    let channelDateToTs = null;
+
+    const searchContentControls = document.getElementById('searchContentControls');
 
     // ============================================================================
     // STATE MANAGEMENT
@@ -187,6 +277,53 @@ document.addEventListener('DOMContentLoaded', async () => {
     // RENDERING
     // ============================================================================
 
+    function toDateInputValue(dateObj) {
+        if (!(dateObj instanceof Date) || Number.isNaN(dateObj.getTime())) return '';
+        const y = String(dateObj.getFullYear());
+        const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const d = String(dateObj.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+    }
+
+    function parseDateInput(dateStr, endOfDay = false) {
+        if (!dateStr || typeof dateStr !== 'string') return null;
+        const parts = dateStr.split('-').map(n => Number(n));
+        if (parts.length !== 3) return null;
+        const [year, month, day] = parts;
+        if (!year || !month || !day) return null;
+        const date = endOfDay
+            ? new Date(year, month - 1, day, 23, 59, 59, 999)
+            : new Date(year, month - 1, day, 0, 0, 0, 0);
+        const ts = date.getTime();
+        return Number.isFinite(ts) ? ts : null;
+    }
+
+    function applyPresetToDateControls(preset, fromEl, toEl) {
+        const now = new Date();
+        const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+        const endToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+
+        if (preset === 'today') {
+            fromEl.value = toDateInputValue(startToday);
+            toEl.value = toDateInputValue(endToday);
+            return;
+        }
+
+        if (preset === '7d' || preset === '30d') {
+            const days = preset === '7d' ? 7 : 30;
+            const from = new Date(startToday);
+            from.setDate(from.getDate() - (days - 1));
+            fromEl.value = toDateInputValue(from);
+            toEl.value = toDateInputValue(endToday);
+            return;
+        }
+
+        if (preset === 'all') {
+            fromEl.value = '';
+            toEl.value = '';
+        }
+    }
+
     function renderKeywords() {
         if (!keywordListEl) return;
         RenderEngine.renderKeywordList(keywordListEl, {
@@ -194,7 +331,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             showSearch: true,
             showSort: true,
             searchValue: keywordSearchValue,
-            sortValue: keywordSortValue
+            sortValue: keywordSortValue,
+            dateFrom: keywordDateFromTs,
+            dateTo: keywordDateToTs
         });
     }
 
@@ -206,25 +345,47 @@ document.addEventListener('DOMContentLoaded', async () => {
             showSort: true,
             showNodeMapping: true,
             searchValue: channelSearchValue,
-            sortValue: channelSortValue
+            sortValue: channelSortValue,
+            dateFrom: channelDateFromTs,
+            dateTo: channelDateToTs
         });
     }
 
     function updateCheckboxes() {
         const state = StateManager.getState();
 
-        if (settingHideShorts) {
-            settingHideShorts.checked = state.hideShorts;
-        }
+        contentControlCheckboxes.forEach(el => {
+            const key = el.getAttribute('data-ft-setting');
+            if (!key) return;
+            el.checked = !!state[key];
+        });
 
-        if (settingHideComments) {
-            settingHideComments.checked = state.hideComments;
+        const filterCommentsEl = contentControlsContainer?.querySelector('input[data-ft-setting="filterComments"]') || null;
+        if (filterCommentsEl) {
+            filterCommentsEl.checked = state.hideComments ? false : !!state.filterComments;
+            filterCommentsEl.disabled = !!state.hideComments;
         }
+    }
 
-        if (settingFilterComments) {
-            settingFilterComments.checked = state.hideComments ? false : state.filterComments;
-            settingFilterComments.disabled = state.hideComments;
-        }
+    function filterContentControls() {
+        const q = (searchContentControls?.value || '').trim().toLowerCase();
+        const groups = contentControlsContainer?.querySelectorAll('[data-ft-control-group]') || [];
+
+        groups.forEach(groupEl => {
+            const groupTitle = (groupEl.getAttribute('data-ft-group-title') || '').toLowerCase();
+            const groupMatches = q ? groupTitle.includes(q) : false;
+            const rows = groupEl.querySelectorAll('[data-ft-control-row]');
+
+            let anyVisible = false;
+            rows.forEach(row => {
+                const text = row.getAttribute('data-ft-search') || '';
+                const show = !q || groupMatches || text.includes(q);
+                row.style.display = show ? '' : 'none';
+                if (show) anyVisible = true;
+            });
+
+            groupEl.style.display = (!q || anyVisible) ? '' : 'none';
+        });
     }
 
     function updateStats() {
@@ -280,6 +441,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderKeywords();
     renderChannels();
     updateCheckboxes();
+    filterContentControls();
     updateStats();
 
     // ============================================================================
@@ -318,6 +480,55 @@ document.addEventListener('DOMContentLoaded', async () => {
         keywordSort.addEventListener('change', (e) => {
             keywordSortValue = e.target.value;
             renderKeywords();
+        });
+    }
+
+    function updateKeywordDateFilterFromInputs() {
+        keywordDateFromTs = parseDateInput(keywordDateFrom?.value || '', false);
+        keywordDateToTs = parseDateInput(keywordDateTo?.value || '', true);
+        renderKeywords();
+    }
+
+    if (keywordDatePreset) {
+        keywordDatePreset.addEventListener('change', (e) => {
+            const preset = e.target.value;
+            if (preset !== 'custom') {
+                applyPresetToDateControls(preset, keywordDateFrom, keywordDateTo);
+                keywordDateFromTs = parseDateInput(keywordDateFrom?.value || '', false);
+                keywordDateToTs = parseDateInput(keywordDateTo?.value || '', true);
+                renderKeywords();
+            }
+        });
+    }
+
+    if (keywordDateFrom) {
+        keywordDateFrom.addEventListener('change', () => {
+            if (keywordDatePreset) keywordDatePreset.value = 'custom';
+            updateKeywordDateFilterFromInputs();
+        });
+    }
+
+    if (keywordDateTo) {
+        keywordDateTo.addEventListener('change', () => {
+            if (keywordDatePreset) keywordDatePreset.value = 'custom';
+            updateKeywordDateFilterFromInputs();
+        });
+    }
+
+    if (keywordDateClear) {
+        keywordDateClear.addEventListener('click', () => {
+            if (keywordDatePreset) keywordDatePreset.value = 'all';
+            if (keywordDateFrom) keywordDateFrom.value = '';
+            if (keywordDateTo) keywordDateTo.value = '';
+            keywordDateFromTs = null;
+            keywordDateToTs = null;
+            renderKeywords();
+        });
+    }
+
+    if (searchContentControls) {
+        searchContentControls.addEventListener('input', () => {
+            filterContentControls();
         });
     }
 
@@ -378,27 +589,60 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    function updateChannelDateFilterFromInputs() {
+        channelDateFromTs = parseDateInput(channelDateFrom?.value || '', false);
+        channelDateToTs = parseDateInput(channelDateTo?.value || '', true);
+        renderChannels();
+    }
+
+    if (channelDatePreset) {
+        channelDatePreset.addEventListener('change', (e) => {
+            const preset = e.target.value;
+            if (preset !== 'custom') {
+                applyPresetToDateControls(preset, channelDateFrom, channelDateTo);
+                channelDateFromTs = parseDateInput(channelDateFrom?.value || '', false);
+                channelDateToTs = parseDateInput(channelDateTo?.value || '', true);
+                renderChannels();
+            }
+        });
+    }
+
+    if (channelDateFrom) {
+        channelDateFrom.addEventListener('change', () => {
+            if (channelDatePreset) channelDatePreset.value = 'custom';
+            updateChannelDateFilterFromInputs();
+        });
+    }
+
+    if (channelDateTo) {
+        channelDateTo.addEventListener('change', () => {
+            if (channelDatePreset) channelDatePreset.value = 'custom';
+            updateChannelDateFilterFromInputs();
+        });
+    }
+
+    if (channelDateClear) {
+        channelDateClear.addEventListener('click', () => {
+            if (channelDatePreset) channelDatePreset.value = 'all';
+            if (channelDateFrom) channelDateFrom.value = '';
+            if (channelDateTo) channelDateTo.value = '';
+            channelDateFromTs = null;
+            channelDateToTs = null;
+            renderChannels();
+        });
+    }
+
     // ============================================================================
     // EVENT HANDLERS - Settings
     // ============================================================================
 
-    if (settingHideShorts) {
-        settingHideShorts.addEventListener('change', async () => {
-            await StateManager.updateSetting('hideShorts', settingHideShorts.checked);
+    contentControlCheckboxes.forEach(el => {
+        el.addEventListener('change', async () => {
+            const key = el.getAttribute('data-ft-setting');
+            if (!key) return;
+            await StateManager.updateSetting(key, el.checked);
         });
-    }
-
-    if (settingHideComments) {
-        settingHideComments.addEventListener('change', async () => {
-            await StateManager.updateSetting('hideComments', settingHideComments.checked);
-        });
-    }
-
-    if (settingFilterComments) {
-        settingFilterComments.addEventListener('change', async () => {
-            await StateManager.updateSetting('filterComments', settingFilterComments.checked);
-        });
-    }
+    });
 
     // ============================================================================
     // EVENT HANDLERS - Theme
