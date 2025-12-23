@@ -1,11 +1,24 @@
 # Changelog
+
+## Version 3.1.3
+
+### UI/UX
+
+- Aligned popup and tab search bars to full-width row sizing; added clearer pill/tooling docs in the Help page with accurate Exact/Comment/Filter All behavior and C/E chip samples.
+- Popup content controls hide descriptions for a cleaner view; tab content controls now use title-only tooltips (not row-wide) for descriptions.
+- Help legend updated to document badge tints (channel/comment/collab) and pill behaviors with matching colors/shapes.
+
+---
+
 ## Version 3.1.2
 
 ### Watch Page (Playlists)
+
 - Autoplay now skips blocked playlist items by triggering a safe Next-click only when the immediate next playlist row is hidden.
 - Watch-page playlist panel rows are sticky-hidden across reprocessing cycles when identity is temporarily unresolved (prevents restored blocked items becoming playable).
 
 ### 3-Dot Menu UX
+
 - Closing the YouTube 3-dot dropdown after blocking no longer closes/interrupts an active miniplayer.
 
 ---
