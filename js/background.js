@@ -327,8 +327,33 @@ browserAPI.runtime.onInstalled.addListener(function (details) {
             useExactWordMatching: false,
             hideAllComments: false,
             filterComments: false,
-            hideAllShorts: false
+            hideAllShorts: false,
+            firstRunRefreshNeeded: true
         });
+
+        // Proactively inject the first-run prompt into already-open YouTube tabs
+        try {
+            browserAPI.tabs.query({ url: ['*://*.youtube.com/*', '*://*.youtubekids.com/*'] }, (tabs) => {
+                if (browserAPI.runtime.lastError) {
+                    console.warn('FilterTube: tabs.query failed', browserAPI.runtime.lastError);
+                    return;
+                }
+                tabs?.forEach(tab => {
+                    if (!tab?.id || !browserAPI.scripting?.executeScript) return;
+                    browserAPI.scripting.executeScript({
+                        target: { tabId: tab.id },
+                        world: 'ISOLATED',
+                        files: ['js/content/first_run_prompt.js']
+                    }, () => {
+                        if (browserAPI.runtime.lastError) {
+                            console.warn('FilterTube: failed to inject first_run_prompt', browserAPI.runtime.lastError);
+                        }
+                    });
+                });
+            });
+        } catch (e) {
+            console.warn('FilterTube: failed to inject first-run prompt on install', e);
+        }
     } else if (details.reason === 'update') {
         console.log('FilterTube extension updated from version ' + details.previousVersion);
         // You could handle migration of settings between versions here if needed
@@ -484,6 +509,23 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
             sendResponse({ error: error.message || "Unknown error occurred while compiling settings." });
         });
         return true; // Indicates that the response is sent asynchronously.
+    } else if (request.action === "injectScripts") {
+        // Handle script injection via Chrome scripting API
+        console.log("FilterTube Background: Received injectScripts request for:", request.scripts);
+        sendResponse({ acknowledged: true });
+        return;
+    } else if (action === 'FilterTube_FirstRunCheck') {
+        browserAPI.storage.local.get(['firstRunRefreshNeeded'], (result) => {
+            sendResponse({
+                needed: Boolean(result?.firstRunRefreshNeeded)
+            });
+        });
+        return true;
+    } else if (action === 'FilterTube_FirstRunComplete') {
+        browserAPI.storage.local.set({ firstRunRefreshNeeded: false }, () => {
+            sendResponse({ ok: true });
+        });
+        return true;
     } else if (request.action === "injectScripts") {
         // Handle script injection via Chrome scripting API
         console.log("FilterTube Background: Received injectScripts request for:", request.scripts);

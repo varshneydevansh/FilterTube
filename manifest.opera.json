@@ -52,6 +52,7 @@
                 "js/content/bridge_settings.js",
                 "js/content/handle_resolver.js",
                 "js/content/collab_dialog.js",
+                "js/content/first_run_prompt.js",
                 "js/content_bridge.js"
             ],
             "run_at": "document_start"
