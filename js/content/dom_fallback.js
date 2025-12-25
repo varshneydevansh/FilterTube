@@ -49,6 +49,14 @@ function ensureContentControlStyles(settings) {
     if (!settings || typeof settings !== 'object') return;
     if (!document.head) return;
 
+    const supportsHasSelector = (() => {
+        try {
+            return typeof CSS !== 'undefined' && typeof CSS.supports === 'function' && CSS.supports('selector(:has(*))');
+        } catch (e) {
+            return false;
+        }
+    })();
+
     const styleId = 'filtertube-content-controls-style';
     let style = document.getElementById(styleId);
     if (!style) {
@@ -96,7 +104,14 @@ function ensureContentControlStyles(settings) {
         rules.push(`
             ytd-playlist-renderer,
             ytd-grid-playlist-renderer,
-            ytd-compact-playlist-renderer {
+            ytd-compact-playlist-renderer,
+            /* New lockup-based playlist cards (Home/Search) */
+            /* Avoid matching Mix/Radio lockups (they are also collection stacks) */
+            yt-lockup-view-model.yt-lockup-view-model--collection-stack-2:has(yt-collection-thumbnail-view-model):not(:has(a[href*="start_radio=1"])),
+            yt-lockup-view-model:has(yt-collections-stack):not(:has(a[href*="start_radio=1"])),
+            /* Playlist shelves on channel/home using lockup stacks */
+            ytd-horizontal-list-renderer:has(yt-lockup-view-model.yt-lockup-view-model--collection-stack-2):not(:has(a[href*="start_radio=1"])),
+            ytd-shelf-renderer:has(yt-lockup-view-model.yt-lockup-view-model--collection-stack-2):not(:has(a[href*="start_radio=1"])) {
                 display: none !important;
             }
         `);
@@ -113,6 +128,29 @@ function ensureContentControlStyles(settings) {
                 display: none !important;
             }
         `);
+    }
+
+    if (settings.hideMembersOnly) {
+        rules.push(`
+            /* Feed and shelf cards with Members-only badge */
+            ytd-grid-video-renderer:has(.yt-badge-shape--membership),
+            ytd-rich-grid-media:has(.yt-badge-shape--membership),
+            yt-lockup-view-model:has(.yt-badge-shape--membership),
+            ytd-rich-item-renderer:has(.yt-badge-shape--membership),
+            ytd-video-renderer:has(.yt-badge-shape--membership),
+            ytd-playlist-video-renderer:has(.yt-badge-shape--membership),
+            /* Members-only shelf containers */
+            ytd-shelf-renderer:has(.yt-badge-shape--membership) {
+                display: none !important;
+            }
+        `);
+    }
+
+    // If :has() isn't supported (common in some Firefox versions), the CSS rules above won't apply.
+    // In that case we rely on a JS fallback in applyDOMFallback().
+    if (!supportsHasSelector) {
+        // Keep CSS empty for these features to avoid giving a false sense of support.
+        // (Other non-:has rules still apply.)
     }
 
     if (settings.hideVideoSidebar) {
@@ -485,6 +523,14 @@ function applyDOMFallback(settings, options = {}) {
     const effectiveSettings = settings || currentSettings;
     if (!effectiveSettings || typeof effectiveSettings !== 'object') return;
 
+    const supportsHasSelector = (() => {
+        try {
+            return typeof CSS !== 'undefined' && typeof CSS.supports === 'function' && CSS.supports('selector(:has(*))');
+        } catch (e) {
+            return false;
+        }
+    })();
+
     currentSettings = effectiveSettings;
 
     const { forceReprocess = false, preserveScroll = true } = options;
@@ -498,6 +544,89 @@ function applyDOMFallback(settings, options = {}) {
     const previousScrollLeft = scrollingElement ? scrollingElement.scrollLeft : window.pageXOffset;
     ensureStyles();
     ensureContentControlStyles(effectiveSettings);
+
+    // Robust DOM-based passes (needed because :has() support varies across browsers and YouTube markup).
+    // We run these even if :has() is supported, because they are cheap and ensure consistent behavior.
+    try {
+        if (effectiveSettings.hideMembersOnly) {
+            const badgeNodes = document.querySelectorAll('.yt-badge-shape--membership');
+            badgeNodes.forEach(badge => {
+                const host = badge.closest(
+                    'ytd-grid-video-renderer, ytd-rich-grid-media, ytd-rich-item-renderer, ytd-video-renderer, yt-lockup-view-model, ytd-playlist-video-renderer'
+                );
+                if (host) {
+                    host.style.setProperty('display', 'none', 'important');
+                    host.setAttribute('data-filtertube-hidden', 'true');
+
+                    const shelf = host.closest('ytd-shelf-renderer');
+                    if (shelf) {
+                        shelf.style.setProperty('display', 'none', 'important');
+                        shelf.setAttribute('data-filtertube-hidden', 'true');
+                    }
+                }
+            });
+
+            // Members-only shelf can also be represented as a named playlist section.
+            const memberShelfLinks = document.querySelectorAll('a[href*="list=UUMO"], a[title="Members-only videos"]');
+            memberShelfLinks.forEach(a => {
+                const shelf = a.closest('ytd-shelf-renderer');
+                if (shelf) {
+                    shelf.style.setProperty('display', 'none', 'important');
+                    shelf.setAttribute('data-filtertube-hidden', 'true');
+                }
+            });
+        }
+
+        if (effectiveSettings.hidePlaylistCards) {
+            // Hide playlist lockups but exclude Mix/Radio (start_radio=1)
+            const lockups = document.querySelectorAll('yt-lockup-view-model.yt-lockup-view-model--collection-stack-2');
+            lockups.forEach(lockup => {
+                const isRadio = !!lockup.querySelector('a[href*="start_radio=1"]');
+                if (isRadio) return;
+                const hasStack = !!lockup.querySelector('yt-collections-stack, yt-collection-thumbnail-view-model');
+                if (!hasStack) return;
+                const a = lockup.querySelector('a[href*="list="]');
+                const href = a?.getAttribute('href') || '';
+                if (!href.includes('list=')) return;
+                lockup.style.setProperty('display', 'none', 'important');
+                lockup.setAttribute('data-filtertube-hidden', 'true');
+
+                const shelf = lockup.closest('ytd-shelf-renderer');
+                if (shelf) {
+                    shelf.style.setProperty('display', 'none', 'important');
+                    shelf.setAttribute('data-filtertube-hidden', 'true');
+                }
+                const horiz = lockup.closest('ytd-horizontal-list-renderer');
+                if (horiz) {
+                    horiz.style.setProperty('display', 'none', 'important');
+                    horiz.setAttribute('data-filtertube-hidden', 'true');
+                }
+            });
+        }
+
+        if (effectiveSettings.hideMixPlaylists) {
+            // Hide the "Mixes" filter chip on Home when mixes are hidden.
+            const chips = document.querySelectorAll('yt-chip-cloud-chip-renderer');
+            chips.forEach(chip => {
+                const txt = (chip.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase();
+                if (txt === 'mixes') {
+                    chip.style.setProperty('display', 'none', 'important');
+                    chip.setAttribute('data-filtertube-hidden', 'true');
+                }
+            });
+        } else {
+            // Restore any previously hidden Mixes chip when the toggle is off.
+            const hiddenMixChips = document.querySelectorAll('yt-chip-cloud-chip-renderer[data-filtertube-hidden]');
+            hiddenMixChips.forEach(chip => {
+                const txt = (chip.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase();
+                if (txt === 'mixes') {
+                    chip.style.removeProperty('display');
+                    chip.removeAttribute('data-filtertube-hidden');
+                }
+            });
+        }
+    } catch (e) {
+    }
 
     if (effectiveSettings.enabled === false) {
         try {

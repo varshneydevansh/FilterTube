@@ -1,5 +1,25 @@
 # Changelog
 
+## Version 3.1.4
+
+### UI/UX & Responsiveness
+
+- Added mobile-friendly tab view: hamburger nav toggle, overlay, tighter paddings, and responsive grids/inputs for smaller screens.
+- Refined filter/search/input rows to wrap gracefully and keep buttons aligned on mobile.
+- Tweaked toggle styling (lighter track, crisper borders, centered thumb) for better contrast in light/dark modes.
+- Content control cards now use cleaner dividers/hover states and stronger headings while preserving per-group accents.
+
+### Playlist/Mix Controls
+
+- Playlist hiding now excludes Mix/Radio items (start_radio=1) while keeping standard playlists hidden.
+- Mix/Radio toggle now also hides the “Mixes” chip in the filter bar when enabled.
+
+### Note
+
+- UI toggle for “Hide Members-only videos” is temporarily hidden; functionality remains wired for future release.
+
+---
+
 ## Version 3.1.3
 
 ### UI/UX

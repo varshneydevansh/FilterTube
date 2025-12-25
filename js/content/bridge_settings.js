@@ -113,6 +113,7 @@ function handleStorageChanges(changes, area) {
         'hideSponsoredCards',
         'hideWatchPlaylistPanel',
         'hidePlaylistCards',
+        'hideMembersOnly',
         'hideMixPlaylists',
         'hideVideoSidebar',
         'hideRecommended',

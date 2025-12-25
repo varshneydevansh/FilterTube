@@ -42,19 +42,20 @@ async function getCompiledSettings() {
         browserAPI.storage.local.get([
             'enabled',
             'filterKeywords',
-            'filterKeywordsComments',
             'uiKeywords',
             'filterChannels',
-            'channelMap',
-            'videoChannelMap',
+            'useExactWordMatching',
+            'filterKeywordsComments',
+            'filterChannelsAdditionalKeywords',
+            'uiChannels',
+            'hideAllShorts',
             'hideAllComments',
             'filterComments',
-            'useExactWordMatching',
-            'hideAllShorts',
             'hideHomeFeed',
             'hideSponsoredCards',
             'hideWatchPlaylistPanel',
             'hidePlaylistCards',
+            'hideMembersOnly',
             'hideMixPlaylists',
             'hideVideoSidebar',
             'hideRecommended',
@@ -74,7 +75,10 @@ async function getCompiledSettings() {
             'hideExploreTrending',
             'hideMoreFromYouTube',
             'hideSubscriptions',
-            'hideSearchShelves'
+            'hideSearchShelves',
+            'channelMap',
+            'videoChannelMap',
+            'stats'
         ], (items) => {
             const compiledSettings = {};
             const storageUpdates = {};
@@ -287,6 +291,7 @@ async function getCompiledSettings() {
             compiledSettings.hideSponsoredCards = items.hideSponsoredCards || false;
             compiledSettings.hideWatchPlaylistPanel = items.hideWatchPlaylistPanel || false;
             compiledSettings.hidePlaylistCards = items.hidePlaylistCards || false;
+            compiledSettings.hideMembersOnly = items.hideMembersOnly || false;
             compiledSettings.hideMixPlaylists = items.hideMixPlaylists || false;
             compiledSettings.hideVideoSidebar = items.hideVideoSidebar || false;
             compiledSettings.hideRecommended = items.hideRecommended || false;

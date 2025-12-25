@@ -132,9 +132,11 @@ function initializeFiltersTabs() {
         groupEl.style.setProperty('--ft-control-accent', accentColor);
         groupEl.style.setProperty('--ft-control-accent-border', hexToRgba(accentColor, 0.35));
         groupEl.style.setProperty('--ft-control-accent-bg', hexToRgba(accentColor, 0.08));
+        groupEl.style.setProperty('--ft-control-accent-bg-dark', hexToRgba(accentColor, 0.10));
         groupEl.style.setProperty('--ft-control-accent-row-border', hexToRgba(accentColor, 0.28));
         groupEl.style.setProperty('--ft-control-accent-row-bg', hexToRgba(accentColor, 0.08));
         groupEl.style.setProperty('--ft-control-accent-row-hover-bg', hexToRgba(accentColor, 0.14));
+        groupEl.style.setProperty('--ft-control-accent-row-hover-dark', hexToRgba(accentColor, 0.12));
     }
 
     catalog.forEach(group => {
@@ -162,6 +164,9 @@ function initializeFiltersTabs() {
             row.className = 'toggle-row';
             row.setAttribute('data-ft-control-row', 'true');
             row.setAttribute('data-ft-search', `${control.title || ''} ${control.description || ''}`.toLowerCase());
+            if (control.description) {
+                row.setAttribute('title', control.description);
+            }
 
             const info = document.createElement('div');
             info.className = 'toggle-info';
@@ -173,7 +178,6 @@ function initializeFiltersTabs() {
             if (control.description) {
                 const infoWrapper = document.createElement('div');
                 infoWrapper.className = 'toggle-info-text';
-                infoWrapper.setAttribute('title', control.description);
                 infoWrapper.appendChild(t);
                 info.appendChild(infoWrapper);
             } else {
@@ -214,6 +218,42 @@ function initializeFiltersTabs() {
     });
 
     container.appendChild(tabs.container);
+
+    // Responsive nav toggle for mobile
+    const navToggle = document.getElementById('navToggle');
+    const sidebar = document.getElementById('sidebarNav');
+    const overlay = document.getElementById('sidebarOverlay');
+
+    function closeSidebar() {
+        sidebar?.classList.remove('open');
+        overlay?.classList.remove('visible');
+    }
+
+    function closeOnWide() {
+        if (window.innerWidth > 900) {
+            closeSidebar();
+        }
+    }
+
+    navToggle?.addEventListener('click', () => {
+        sidebar?.classList.toggle('open');
+        overlay?.classList.toggle('visible');
+    });
+
+    overlay?.addEventListener('click', () => {
+        closeSidebar();
+    });
+
+    window.addEventListener('resize', closeOnWide);
+    closeOnWide();
+
+    // Close sidebar on tab switch (for mobile)
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+        item.addEventListener('click', () => {
+            closeSidebar();
+        });
+    });
 }
 
 // ============================================================================
@@ -695,6 +735,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const quickAddKeywordBtn = document.getElementById('quickAddKeywordBtn');
     const quickAddChannelBtn = document.getElementById('quickAddChannelBtn');
+    const quickContentControlsBtn = document.getElementById('quickContentControlsBtn');
 
     if (quickAddKeywordBtn) {
         quickAddKeywordBtn.addEventListener('click', () => {
@@ -710,9 +751,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         quickAddChannelBtn.addEventListener('click', () => {
             switchView('filters');
             const tabs = document.querySelector('.tab-buttons');
-            const channelTab = tabs?.querySelector('[data-tab-id="channels"]');
-            if (channelTab) channelTab.click();
-            setTimeout(() => channelInput?.focus(), 100);
+            const channelsTab = tabs?.querySelector('[data-tab-id="channels"]');
+            channelsTab?.click();
+            setTimeout(() => document.getElementById('channelInput')?.focus(), 50);
+        });
+    }
+
+    if (quickContentControlsBtn) {
+        quickContentControlsBtn.addEventListener('click', () => {
+            switchView('filters');
+            const tabs = document.querySelector('.tab-buttons');
+            const contentTabBtn = tabs?.querySelector('[data-tab-id="content"]');
+            contentTabBtn?.click();
+            // slight delay to ensure tab render, then focus search
+            setTimeout(() => document.getElementById('searchContentControls')?.focus(), 50);
         });
     }
 });

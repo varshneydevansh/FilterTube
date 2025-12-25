@@ -41,8 +41,8 @@
                 },
                 {
                     key: 'hidePlaylistCards',
-                    title: 'Hide Playlist cards (Home/Search)',
-                    description: 'Remove playlist cards from Home and Search'
+                    title: 'Hide Playlist cards',
+                    description: 'Remove playlist cards across YouTube'
                 },
                 {
                     key: 'hideMixPlaylists',

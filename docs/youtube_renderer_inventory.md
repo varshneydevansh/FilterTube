@@ -21,6 +21,7 @@ This document tracks which YouTube renderers/selectors FilterTube currently targ
 | `<yt-collection-thumbnail-view-model>` / `<yt-collections-stack>` | Visual mix thumbnail stack | ℹ️ Visual only; no keyword-bearing text | No filtering required unless we hide thumbnails later |
 | `<yt-thumbnail-view-model>` | Thumbnail container | ℹ️ Covered indirectly when we hide filtered cards |
 | `<yt-thumbnail-overlay-badge-view-model>` (Mix badge) | Badge text like “Mix” | ⚠️ Not parsed; consider adding to keyword scan if badges become relevant |
+| `yt-chip-cloud-chip-renderer` (filter chips) | DOM-only | ✅ Mixes chip hidden when `hideMixPlaylists` is enabled |
 
 ### Home shelf: “Latest YouTube posts” (2025-11-18 sample, NEW)
 | DOM tag / component | Underlying renderer / data source | Status | Notes |
@@ -169,7 +170,7 @@ Since content_bridge.js runs in **Isolated World** (no `ytInitialData` access), 
 | --- | --- | --- | --- |
 | `<ytd-rich-shelf-renderer layout="podcasts">` | `richShelfRenderer` | ℹ️ Layout | Container for podcasts shelf; traversal reaches nested `podcastRenderer` entries |
 | `<ytd-rich-item-renderer is-shelf-item>` | `podcastRenderer` payload | ✅ Covered | Podcast title/description + publisher captured, including metadata rows |
-| `<yt-collection-thumbnail-view-model>` | `lockupViewModel.collectionThumbnailViewModel` | ℹ️ | Stack thumbnail + square art; no additional text beyond badges |
+| `<yt-collection-thumbnail-view-model>` | `lockupViewModel.collectionThumbnailViewModel` | ℹ️ | Stack thumbnail + square art; no additional text beyond badges (playlist lockups hidden when `hidePlaylistCards` is on, but Mix/Radio lockups are excluded via `start_radio=1`) |
 | `<yt-thumbnail-overlay-badge-view-model>` | `thumbnailBadgeViewModel` | ⚠️ Partial | Badge text like “1 episode”; evaluate keyword needs later |
 | `<yt-content-metadata-view-model>` | `contentMetadataViewModel` | ✅ Covered | Metadata rows now parsed via helper fallback |
 

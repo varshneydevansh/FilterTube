@@ -28,6 +28,7 @@ const StateManager = (() => {
         hideSponsoredCards: false,
         hideWatchPlaylistPanel: false,
         hidePlaylistCards: false,
+        hideMembersOnly: false,
         hideMixPlaylists: false,
         hideVideoSidebar: false,
         hideRecommended: false,
@@ -88,6 +89,7 @@ const StateManager = (() => {
         state.hideSponsoredCards = data.hideSponsoredCards || false;
         state.hideWatchPlaylistPanel = data.hideWatchPlaylistPanel || false;
         state.hidePlaylistCards = data.hidePlaylistCards || false;
+        state.hideMembersOnly = data.hideMembersOnly || false;
         state.hideMixPlaylists = data.hideMixPlaylists || false;
         state.hideVideoSidebar = data.hideVideoSidebar || false;
         state.hideRecommended = data.hideRecommended || false;
