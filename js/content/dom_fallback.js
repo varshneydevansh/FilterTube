@@ -132,15 +132,41 @@ function ensureContentControlStyles(settings) {
 
     if (settings.hideMembersOnly) {
         rules.push(`
-            /* Feed and shelf cards with Members-only badge */
+            /* Feed and shelf cards with Members-only badge or aria label */
             ytd-grid-video-renderer:has(.yt-badge-shape--membership),
+            ytd-grid-video-renderer:has([aria-label*="Members only"]),
+            ytd-grid-video-renderer:has([aria-label*="Member-only"]),
             ytd-rich-grid-media:has(.yt-badge-shape--membership),
+            ytd-rich-grid-media:has([aria-label*="Members only"]),
+            ytd-rich-grid-media:has([aria-label*="Member-only"]),
             yt-lockup-view-model:has(.yt-badge-shape--membership),
+            yt-lockup-view-model:has([aria-label*="Members only"]),
+            yt-lockup-view-model:has([aria-label*="Member-only"]),
             ytd-rich-item-renderer:has(.yt-badge-shape--membership),
+            ytd-rich-item-renderer:has([aria-label*="Members only"]),
+            ytd-rich-item-renderer:has([aria-label*="Member-only"]),
             ytd-video-renderer:has(.yt-badge-shape--membership),
+            ytd-video-renderer:has([aria-label*="Members only"]),
+            ytd-video-renderer:has([aria-label*="Member-only"]),
+            ytd-compact-video-renderer:has(.yt-badge-shape--membership),
+            ytd-compact-video-renderer:has([aria-label*="Members only"]),
+            ytd-compact-video-renderer:has([aria-label*="Member-only"]),
             ytd-playlist-video-renderer:has(.yt-badge-shape--membership),
-            /* Members-only shelf containers */
-            ytd-shelf-renderer:has(.yt-badge-shape--membership) {
+            ytd-playlist-video-renderer:has([aria-label*="Members only"]),
+            ytd-playlist-video-renderer:has([aria-label*="Member-only"]),
+            /* Metadata block fallback */
+            ytd-video-meta-block:has([aria-label*="Members only"]),
+            ytd-video-meta-block:has([aria-label*="Member-only"]),
+            /* Watch page containers with Members-only badge */
+            ytd-watch-flexy:has(.yt-badge-shape--membership),
+            ytd-watch-metadata:has(.yt-badge-shape--membership),
+            ytd-video-primary-info-renderer:has(.yt-badge-shape--membership),
+            /* Members-only shelves/playlists */
+            ytd-shelf-renderer:has(.yt-badge-shape--membership),
+            ytd-shelf-renderer:has([aria-label*="Members only"]),
+            ytd-shelf-renderer:has([aria-label*="Member-only"]),
+            ytd-shelf-renderer:has(a[href*="list=UUMO"]),
+            ytd-playlist-video-renderer:has(a[href*="list=UUMO"]) {
                 display: none !important;
             }
         `);
@@ -549,31 +575,83 @@ function applyDOMFallback(settings, options = {}) {
     // We run these even if :has() is supported, because they are cheap and ensure consistent behavior.
     try {
         if (effectiveSettings.hideMembersOnly) {
-            const badgeNodes = document.querySelectorAll('.yt-badge-shape--membership');
-            badgeNodes.forEach(badge => {
-                const host = badge.closest(
-                    'ytd-grid-video-renderer, ytd-rich-grid-media, ytd-rich-item-renderer, ytd-video-renderer, yt-lockup-view-model, ytd-playlist-video-renderer'
-                );
-                if (host) {
-                    host.style.setProperty('display', 'none', 'important');
-                    host.setAttribute('data-filtertube-hidden', 'true');
-
-                    const shelf = host.closest('ytd-shelf-renderer');
-                    if (shelf) {
-                        shelf.style.setProperty('display', 'none', 'important');
-                        shelf.setAttribute('data-filtertube-hidden', 'true');
+            // 1) Aria-label on titles (most reliable; includes watch sidebar)
+            const titleNodes = document.querySelectorAll('#video-title, #video-title-link, .yt-lockup-metadata-view-model__title');
+            titleNodes.forEach(titleNode => {
+                const aria = (titleNode.getAttribute('aria-label') || '').toLowerCase();
+                if (aria.includes('members only') || aria.includes('member-only') || aria.includes('member only')) {
+                    const host = titleNode.closest(
+                        'ytd-grid-video-renderer, ytd-rich-grid-media, ytd-rich-item-renderer, ' +
+                        'ytd-video-renderer, ytd-compact-video-renderer, yt-lockup-view-model, ' +
+                        'ytd-playlist-video-renderer, ytd-watch-card-compact-video-renderer'
+                    );
+                    if (host) {
+                        host.style.setProperty('display', 'none', 'important');
+                        host.setAttribute('data-filtertube-hidden', 'true');
+                        host.setAttribute('data-filtertube-members-only-hidden', 'true');
                     }
                 }
             });
 
-            // Members-only shelf can also be represented as a named playlist section.
-            const memberShelfLinks = document.querySelectorAll('a[href*="list=UUMO"], a[title="Members-only videos"]');
-            memberShelfLinks.forEach(a => {
-                const shelf = a.closest('ytd-shelf-renderer');
+            // 1) Badge/aria detection on cards (includes compact/watch sidebar and lockups)
+            const membershipBadges = document.querySelectorAll('.yt-badge-shape--membership, [aria-label="Members only"], .badge-style-type-membership, ytd-badge-supported-renderer, .yt-badge-shape');
+            membershipBadges.forEach(badge => {
+                const text = (badge.textContent || '').toLowerCase();
+                const aria = (badge.getAttribute('aria-label') || '').toLowerCase();
+                const isMembership = badge.classList.contains('yt-badge-shape--membership') ||
+                    text.includes('members only') ||
+                    text.includes('member-only') ||
+                    aria.includes('members only');
+                if (!isMembership) return;
+
+                const host = badge.closest(
+                    'ytd-grid-video-renderer, ytd-rich-grid-media, ytd-rich-item-renderer, ytd-video-renderer, ytd-compact-video-renderer, yt-lockup-view-model, ytd-playlist-video-renderer, ytd-watch-flexy, ytd-watch-metadata, ytd-video-primary-info-renderer'
+                );
+                if (host) {
+                    host.style.setProperty('display', 'none', 'important');
+                    host.setAttribute('data-filtertube-hidden', 'true');
+                    host.setAttribute('data-filtertube-members-only-hidden', 'true');
+
+                    const shelf = host.closest('ytd-shelf-renderer, ytd-horizontal-list-renderer, ytd-rich-section-renderer, ytd-item-section-renderer');
+                    if (shelf) {
+                        shelf.style.setProperty('display', 'none', 'important');
+                        shelf.setAttribute('data-filtertube-hidden', 'true');
+                        shelf.setAttribute('data-filtertube-members-only-hidden', 'true');
+                    }
+                }
+            });
+
+            // 2) Shelves/playlists identified by UUMO playlist id or label text
+            const membershipLinks = document.querySelectorAll('a[href*="list=UUMO"], a[title="Members-only videos"], a[href*="Members-only videos"]');
+            membershipLinks.forEach(link => {
+                const shelf = link.closest('ytd-shelf-renderer, ytd-horizontal-list-renderer, ytd-rich-section-renderer, ytd-item-section-renderer');
                 if (shelf) {
                     shelf.style.setProperty('display', 'none', 'important');
                     shelf.setAttribute('data-filtertube-hidden', 'true');
+                    shelf.setAttribute('data-filtertube-members-only-hidden', 'true');
                 }
+            });
+
+            // 3) Shelf title fallback
+            const memberShelfTitles = document.querySelectorAll('ytd-shelf-renderer h2, ytd-shelf-renderer #title');
+            memberShelfTitles.forEach(titleNode => {
+                const txt = (titleNode.textContent || '').toLowerCase();
+                if (txt.includes('members-only') || txt.includes('members only')) {
+                    const shelf = titleNode.closest('ytd-shelf-renderer');
+                    if (shelf) {
+                        shelf.style.setProperty('display', 'none', 'important');
+                        shelf.setAttribute('data-filtertube-hidden', 'true');
+                        shelf.setAttribute('data-filtertube-members-only-hidden', 'true');
+                    }
+                }
+            });
+        } else {
+            // Restore anything we hid for members-only when the toggle is off.
+            const previouslyHidden = document.querySelectorAll('[data-filtertube-members-only-hidden]');
+            previouslyHidden.forEach(el => {
+                el.style.removeProperty('display');
+                el.removeAttribute('data-filtertube-hidden');
+                el.removeAttribute('data-filtertube-members-only-hidden');
             });
         }
 
@@ -1005,7 +1083,36 @@ function applyDOMFallback(settings, options = {}) {
         });
     }
 
-    const shortsSelectors = 'ytd-reel-item-renderer, ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2';
+    // Detect Shorts that are rendered as normal video cards (e.g., watch sidebar)
+    const disguisedShortsSelectors = 'ytd-video-renderer, ytd-compact-video-renderer, ytd-grid-video-renderer, ytd-watch-card-compact-video-renderer';
+    document.querySelectorAll(disguisedShortsSelectors).forEach(card => {
+        // Skip if already marked as a Short
+        if (card.getAttribute('data-filtertube-short') === 'true') return;
+
+        const hrefShort = card.querySelector('a#thumbnail[href*="/shorts/"], a#video-title[href*="/shorts/"], a.yt-simple-endpoint[href*="/shorts/"]');
+        const ariaLabel = card.querySelector('#video-title')?.getAttribute('aria-label') || '';
+        const overlayStyle = card.querySelector('ytd-thumbnail-overlay-time-status-renderer')?.getAttribute('overlay-style') || '';
+
+        const isShortLike = Boolean(
+            hrefShort ||
+            (ariaLabel && ariaLabel.toLowerCase().includes('play short')) ||
+            (overlayStyle && overlayStyle.toUpperCase().includes('SHORTS'))
+        );
+
+        if (isShortLike) {
+            card.setAttribute('data-filtertube-short', 'true');
+        }
+    });
+
+    const shortsSelectors = [
+        'ytd-reel-item-renderer',
+        'ytm-shorts-lockup-view-model',
+        'ytm-shorts-lockup-view-model-v2',
+        'ytd-video-renderer[data-filtertube-short]',
+        'ytd-grid-video-renderer[data-filtertube-short]',
+        'ytd-compact-video-renderer[data-filtertube-short]',
+        'ytd-watch-card-compact-video-renderer[data-filtertube-short]'
+    ].join(', ');
 
     // Helper: robustly extract Shorts videoId from multiple attribute patterns
     function extractShortsVideoId(node) {

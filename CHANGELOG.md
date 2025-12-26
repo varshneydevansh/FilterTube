@@ -1,5 +1,15 @@
 # Changelog
 
+## Version 3.1.5
+
+### Fixes: Shorts + Members-only (Watch/Sidebar)
+
+- Watch-page sidebar now hides Shorts that are rendered as normal compact videos by checking `/shorts/` hrefs, SHORTS overlays, and aria-label hints before cards render.
+- Members-only hiding hardened: detects via title aria-labels, badges, and UUMO membership playlists across compact/watch/sidebar/lockup renderers; shelves hide deterministically.
+- Members-only toggle now persists correctly (StateManager save/broadcast path and background recompile) so UI selections stick across contexts.
+
+---
+
 ## Version 3.1.4
 
 ### UI/UX & Responsiveness

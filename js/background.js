@@ -914,10 +914,12 @@ browserAPI.storage.onChanged.addListener((changes, area) => {
         const relevantKeys = [
             'filterKeywords',
             'filterChannels',
-            'hideAllComments',
-            'filterComments',
-            'useExactWordMatching',
+            'hideMembersOnly',
             'hideAllShorts',
+            'hideComments',
+            'filterComments',
+            'hideHomeFeed',
+            'hideSponsoredCards',
             'channelMap',
             'videoChannelMap'
         ];
@@ -932,7 +934,7 @@ browserAPI.storage.onChanged.addListener((changes, area) => {
 
         if (settingsChanged) {
             console.log('FilterTube Background: Settings changed, re-compiling.');
-            getCompiledSettings().then(compiledSettings => {
+            getCompiledSettings().then(() => {
                 console.log('FilterTube Background: New compiled settings ready');
             });
         }

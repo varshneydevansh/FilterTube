@@ -45,6 +45,11 @@
                     description: 'Remove playlist cards across YouTube'
                 },
                 {
+                    key: 'hideMembersOnly',
+                    title: 'Hide Members-only videos',
+                    description: 'Hide videos marked with the Members-only badge across feeds and watch'
+                },
+                {
                     key: 'hideMixPlaylists',
                     title: 'Hide Mix / Radio playlists',
                     description: 'Hide Mix and radio playlist items'
