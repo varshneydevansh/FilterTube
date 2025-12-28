@@ -55,9 +55,9 @@ const StateManager = (() => {
         isLoaded: false
     };
 
-     const channelEnrichmentAttempted = new Set();
-     let channelEnrichmentCount = 0;
-     const MAX_CHANNEL_ENRICHMENTS_PER_SESSION = 10;
+    const channelEnrichmentAttempted = new Set();
+    const channelEnrichmentQueue = [];
+    let isEnriching = false;
 
     let isSaving = false;
     let listeners = [];
@@ -121,68 +121,87 @@ const StateManager = (() => {
         return state;
     }
 
-     function scheduleChannelNameEnrichment() {
-         try {
-             setTimeout(() => {
-                 enrichStoredChannelNames();
-             }, 0);
-         } catch (e) {
-         }
-     }
+    function scheduleChannelNameEnrichment() {
+        try {
+            setTimeout(() => {
+                enqueueChannelEnrichment();
+            }, 0);
+        } catch (e) {
+        }
+    }
 
-     function isHandleLike(value) {
-         return typeof value === 'string' && value.trim().startsWith('@');
-     }
+    function isHandleLike(value) {
+        return typeof value === 'string' && value.trim().startsWith('@');
+    }
 
-     function shouldEnrichChannel(channel) {
-         if (!channel || typeof channel !== 'object') return false;
-         const name = typeof channel.name === 'string' ? channel.name.trim() : '';
-         const id = typeof channel.id === 'string' ? channel.id.trim() : '';
-         const handle = typeof channel.handle === 'string' ? channel.handle.trim() : '';
-         const customUrl = typeof channel.customUrl === 'string' ? channel.customUrl.trim() : '';
-         const hasLookup = !!(id || handle || customUrl);
-         if (!hasLookup) return false;
-         if (!name) return true;
-         if (id && name === id) return true;
-         if (isHandleLike(name)) return true;
-         return false;
-     }
+    function shouldEnrichChannel(channel) {
+        if (!channel || typeof channel !== 'object') return false;
+        const name = typeof channel.name === 'string' ? channel.name.trim() : '';
+        const id = typeof channel.id === 'string' ? channel.id.trim() : '';
+        const handle = typeof channel.handle === 'string' ? channel.handle.trim() : '';
+        const customUrl = typeof channel.customUrl === 'string' ? channel.customUrl.trim() : '';
+        const hasLookup = !!(id || handle || customUrl);
+        if (!hasLookup) return false;
+        if (!name) return true;
+        if (id && name === id) return true;
+        if (isHandleLike(name)) return true;
+        if (!channel.handle || !channel.logo) return true;
+        return false;
+    }
 
-     async function enrichStoredChannelNames() {
-         if (!Array.isArray(state.channels) || state.channels.length === 0) return;
-         if (channelEnrichmentCount >= MAX_CHANNEL_ENRICHMENTS_PER_SESSION) return;
+    async function enqueueChannelEnrichment() {
+        if (!Array.isArray(state.channels) || state.channels.length === 0) return;
 
-         for (const channel of state.channels) {
-             if (channelEnrichmentCount >= MAX_CHANNEL_ENRICHMENTS_PER_SESSION) return;
-             if (!shouldEnrichChannel(channel)) continue;
+        for (const channel of state.channels) {
+            if (!shouldEnrichChannel(channel)) continue;
 
-             const key = String(channel.id || channel.handle || channel.customUrl || '').toLowerCase();
-             if (!key || channelEnrichmentAttempted.has(key)) continue;
-             channelEnrichmentAttempted.add(key);
+            const key = String(channel.id || channel.handle || channel.customUrl || '').toLowerCase();
+            if (!key || channelEnrichmentAttempted.has(key)) continue;
+            channelEnrichmentAttempted.add(key);
 
-             const input = channel.id || channel.handle || channel.customUrl;
-             if (!input) continue;
+            channelEnrichmentQueue.push({
+                input: channel.id || channel.handle || channel.customUrl,
+                handleDisplay: channel.handleDisplay || null,
+                canonicalHandle: channel.canonicalHandle || null,
+                customUrl: channel.customUrl || null,
+                source: channel.source || null
+            });
+        }
 
-             try {
-                 channelEnrichmentCount += 1;
-                 await chrome.runtime.sendMessage({
-                     type: 'addFilteredChannel',
-                     input,
-                     filterAll: false,
-                     collaborationWith: null,
-                     collaborationGroupId: null,
-                     displayHandle: channel.handleDisplay || null,
-                     canonicalHandle: channel.canonicalHandle || null,
-                     channelName: null,
-                     customUrl: channel.customUrl || null,
-                     source: channel.source || null
-                 });
-             } catch (error) {
-                 channelEnrichmentCount -= 1;
-                 channelEnrichmentAttempted.delete(key);
-             }
-         }
-     }
+        processChannelEnrichmentQueue();
+    }
+
+    function processChannelEnrichmentQueue() {
+        if (isEnriching) return;
+        if (channelEnrichmentQueue.length === 0) return;
+
+        const task = channelEnrichmentQueue.shift();
+        if (!task || !task.input) {
+            setTimeout(processChannelEnrichmentQueue, 0);
+            return;
+        }
+
+        isEnriching = true;
+
+        chrome.runtime.sendMessage({
+            type: 'addFilteredChannel',
+            input: task.input,
+            filterAll: false,
+            collaborationWith: null,
+            collaborationGroupId: null,
+            displayHandle: task.handleDisplay,
+            canonicalHandle: task.canonicalHandle,
+            channelName: null,
+            customUrl: task.customUrl,
+            source: task.source || null
+        }, () => {
+            // throttle to avoid hammering
+            setTimeout(() => {
+                isEnriching = false;
+                processChannelEnrichmentQueue();
+            }, 2000);
+        });
+    }
 
     /**
      * Save current state to storage
@@ -395,14 +414,17 @@ const StateManager = (() => {
         }
 
         // Validate format - Allow @handle, UC ID, or YouTube URLs
+        const lowerValue = rawValue.toLowerCase();
         const isHandle = rawValue.startsWith('@');
-        const isUcId = rawValue.toLowerCase().startsWith('uc') || rawValue.toLowerCase().startsWith('channel/uc');
+        const isUcId = lowerValue.startsWith('uc') || lowerValue.startsWith('channel/uc');
         const isUrl = rawValue.includes('youtube.com') || rawValue.includes('youtu.be');
+        const isCustomUrl = lowerValue.startsWith('c/') || lowerValue.startsWith('/c/') ||
+            lowerValue.startsWith('user/') || lowerValue.startsWith('/user/');
 
-        if (!isHandle && !isUcId && !isUrl) {
+        if (!isHandle && !isUcId && !isUrl && !isCustomUrl) {
             return {
                 success: false,
-                error: 'Invalid format. Use @handle, Channel ID, or YouTube URL'
+                error: 'Invalid format. Use @handle, Channel ID, legacy c/ChannelName, or YouTube URL'
             };
         }
 

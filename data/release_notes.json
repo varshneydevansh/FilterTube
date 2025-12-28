@@ -1,0 +1,84 @@
+[
+  {
+    "_comment": "Shared release notes source for the dashboard What’s New tab and the YouTube release banner. Keep entries sorted newest-first by version."
+  },
+  {
+    "version": "3.1.6",
+    "headline": "Import/Export support + Release banner",
+    "summary": "Banner CTA now deep-links into the What’s New dashboard, curated cards load from the same JSON, and imports better honor c/ChannelName + merge rules.",
+    "bannerSummary": "Release banner opens the in-extension What’s New tab and import/export now documents the full flow.",
+    "highlights": [
+      "Release notes JSON hydrates both the dashboard cards and the YouTube banner (single source of truth).",
+      "CTA opens tab-view via background messaging so blockers never intercept chrome-extension:// links.",
+      "Import/export doc + code clarify how UC/handle/c/ChannelName inputs normalize before merging."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.6"
+  },
+  {
+    "version": "3.1.5",
+    "headline": "Shorts + Members-only are actually gone",
+    "summary": "Watch page + sidebar now hide Shorts renderers and members-only shelves before they flash, and the toggle state finally sticks.",
+    "bannerSummary": "Members-only + Shorts hiding hardened across watch and sidebar so blocked rows stop resurfacing.",
+    "highlights": [
+      "Sidebar checks /shorts/ hrefs, overlays, and aria-labels before cards render.",
+      "Members-only detection covers compact, watch, and shelf rows with new badges + playlist heuristics.",
+      "Members-only toggle persistence bug fixed so state survives reloads."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.5"
+  },
+  {
+    "version": "3.1.4",
+    "headline": "Dashboard goes responsive",
+    "summary": "Navigation collapses cleanly on mobile, inputs wrap gracefully, and playlist/mix controls get clearer toggles.",
+    "highlights": [
+      "Hamburger nav + overlay for small screens with refined grid spacing.",
+      "Toggles get lighter tracks, centered thumbs, and better dark-mode contrast.",
+      "Mix/Radio chip hides when Mix toggle is on; playlist hiding skips radio items."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.4"
+  },
+  {
+    "version": "3.1.3",
+    "headline": "Help legend makeover",
+    "summary": "Cards, pills, and tooltips document exactly what Exact / Comment / Filter All do, matching the refreshed dashboard styling.",
+    "highlights": [
+      "Help tab shows badge tints and collaboration labels with matching colors.",
+      "Popup + tab search bars align to the same full-width rhythm.",
+      "Content control descriptions move into hover tooltips for clarity."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.3"
+  },
+  {
+    "version": "3.1.2",
+    "headline": "Playlist autoplay hardening",
+    "summary": "Autoplay now leaps past blocked playlist rows without flashing them, and sticky hiding survives YouTube reprocessing.",
+    "highlights": [
+      "Next-click only fires when the next playlist row is actually visible.",
+      "Watch playlist panel rows stay hidden even if identity is briefly unresolved.",
+      "3-dot menu closes cleanly after blocking so the miniplayer keeps playing."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/commit/1224715a84c48ee6d3ddd93b13cc62e487574a31"
+  },
+  {
+    "version": "3.1.1",
+    "headline": "Help tab + identity fixes",
+    "summary": "A dedicated Help tab lands in the dashboard while UC ↔ handle ↔ custom URL mapping gets more resilient.",
+    "highlights": [
+      "Help reference documents all toggles, badges, and keyword behaviors.",
+      "Playlist navigation skips blocked rows without playback flashes.",
+      "Handle/custom URL fallback locks onto the correct UC ID more reliably."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/commit/1b2e442831a40c52148bc9ff830c70c2e6aa909c"
+  },
+  {
+    "version": "3.1.0",
+    "headline": "Docs + hybrid filtering clarity",
+    "summary": "Captured the hybrid interception + DOM fallback architecture with diagrams so you know how FilterTube enforces blocks.",
+    "highlights": [
+      "Documented watch-page 3-dot parity with home/search collaborators.",
+      "Catalogued outstanding playlist regressions so fixes stay visible.",
+      "Synced manifests, build tooling, and UI footer with the 3.1.0 bump."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/commit/076baa2ecb14a3e8f5bdf420caa1af7096548f15"
+  }
+]

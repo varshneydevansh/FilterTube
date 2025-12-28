@@ -394,6 +394,20 @@ These chips originate from the YouTube UI rather than API payloads we currently 
 | `<ytd-menu-renderer>` (notification actions) | `menuRenderer` | ℹ️ | Action menu labels (“Turn off”, “Hide this notification”); UI-only for now |
 | `<ytd-comments>` / `<ytd-comment-thread-renderer>` | `commentThreadRenderer` | ✅ Covered | Notifications drawer reuses comment components; existing rules should filter replies once data is intercepted |
 
+## YouTube Kids (DOM samples, 2025-12)
+
+| DOM tag / component | Location / purpose | Status | Notes |
+| --- | --- | --- | --- |
+| `<ytk-compact-video-renderer> > <ytk-menu-renderer>` with `<tp-yt-paper-icon-button id="menu-button">` | Per-card overflow (3-dot) on video thumbnails | ❌ DOM-only | Hosts native Kids overflow. Need observer hook to intercept native “Block this video” selection and mirror into FilterTube Kids list. |
+| `<ytk-menu-popup-renderer>` inside `<ytk-popup-container>` | Dropdown panel rendered after clicking 3-dot | ❌ DOM-only | Contains `Block this video` list item (`<ytk-menu-service-item-renderer>`). Blocking shows toast “Video blocked” with `UNDO` button. |
+| `<ytk-popup-container> > <ytk-notification-action-renderer> > <tp-yt-paper-toast id="toast">` | Confirmation toast after block | ❌ DOM-only | Text “Video blocked”; includes undo button. Useful for confirming interception success. |
+| `<ytk-masthead>` with `<ytk-kids-category-tab-renderer>` | Home masthead category tabs (Recommended, etc.) | ℹ️ Layout | Category nav; not filterable but relevant if mode/state affects renderer traversal. |
+| `<ytk-compact-video-renderer>` | Home/search/watch-right-rail video items | ❌ DOM-only | Title lives in `<span>`; overlay duration badge; menu as above. Need videoId extraction + channel attribution (via card link or mainworld lookup). |
+| `<ytk-compact-playlist-renderer>` | Playlist promos on Kids home | ❌ DOM-only | Shows playlist title + video-count overlay; needs playlist/channel capture for blocking playlists or channels. |
+| `<ytk-compact-channel-renderer>` | Channel tiles (home/search/music) | ❌ DOM-only | Channel title + thumbnail; 3-dot menu present. Must capture channelId from href `/channel/UC...`. |
+| `<ytk-two-column-watch-next-results-renderer>` | Watch-page right rail container | ℹ️ Layout | Contains `ytk-compact-video-renderer` items; observer hook needed to filter next-up rows. |
+| `<ytk-slim-video-metadata-renderer>` | Watch-page header (title + owner) | ❌ DOM-only | Title in `#video-title`; channel name in `#video-owner`. Use to seed channel and video title when JSON unavailable. |
+
 ## Action Items
 1. Add renderer support for `compactAutoplayRenderer`, `watchCardHeroVideoRenderer`, and `watchCardSectionSequenceRenderer`.
 2. Confirm extraction of search snippet text (`metadata-snippet-text`, AI summaries) and extend keyword scanning if JSON does not carry full descriptions.

@@ -1,4 +1,4 @@
-# FilterTube v3.1.1 Technical Documentation
+# FilterTube v3.1.6 Technical Documentation
 
 This document provides a deep technical dive into the implementation of FilterTube's hybrid filtering engine as of v3.1.1.
 
@@ -148,6 +148,7 @@ UI Contexts (tab-view.js, popup.js)
 ```
 
 ### Data Structures Propagated
+
 - `collaborationGroupId`: deterministic link between channels blocked in the same action.
 - `collaborationWith[]`: per-channel "other members" list used for warnings and tooltips.
 - `allCollaborators[]`: canonical roster (name/handle/id) stored on each channel row so the UI can reason about partial groups even after reordering or searching.
@@ -192,7 +193,7 @@ sequenceDiagram
 - **Convergence**: once the canonical UC ID is known, subsequent interceptors (data + DOM) recognize the entry on every surface without repeated fetches.
 - **Collaborator Harvesting**: When Shorts expose the avatar stack, `extractCollaboratorsFromAvatarStackElement` seeds collaborator names/handles and the main-world hop fills UC IDs. The same multi-select UI appears regardless of layout.
 
-## 4. DOM Fallback System
+## 4. DOM Fallback System (Safety Net)
 
 **Motivation:**
 Sometimes data interception misses something (e.g., complex updates). The DOM Fallback is a safety net that watches the screen itself and hides anything that slipped through.
@@ -309,6 +310,121 @@ If you ban "@coolguy", the system needs to know that "Cool Guy Vlogs" is the sam
 ```
 
 ## 8. Shorts Blocking Architecture (Hybrid Model)
+
+## 13. Release Notes System (v3.1.6)
+
+The release notes experience is now shared between the banner that appears on YouTube and the new “What’s New” tab in the dashboard. Both consume `data/release_notes.json`.
+
+### 13.1 Data Flow Overview
+
+```mermaid
+graph TD
+    A[release_notes.json] --> B[background.js]
+    B -->|buildReleaseNotesPayload| C[chrome.storage.local releaseNotesPayload]
+    C --> D[content/release_notes_prompt.js]
+    A --> E[tab-view.js loadReleaseNotesIntoDashboard]
+```
+
+### 13.2 Banner CTA flow
+
+```mermaid
+sequenceDiagram
+    participant CS as release_notes_prompt.js
+    participant BG as background.js
+    participant TAB as Browser Tabs
+
+    CS->>BG: FilterTube_OpenWhatsNew (target URL)
+    BG->>TAB: query tab-view.html*
+    alt tab exists
+        BG->>TAB: tabs.update(id, url=?view=whatsnew, active=true)
+    else new tab
+        BG->>TAB: tabs.create(url=?view=whatsnew)
+    end
+```
+
+### 13.3 What’s New tab behavior
+
+- `tab-view.js` reads both the hash and `?view=` query param so deep links select the correct nav item and scroll it into view.
+- `data/release_notes.json` entries support `bannerSummary`, `highlights[]`, and `detailsUrl`. Dashboard cards render the highlights list; the banner uses `bannerSummary`.
+- Import/export doc updates reference this shared file so future releases update one source.
+
+## 14. Import/Export Implementation Details (v3.1.6)
+
+### 14.1 Module responsibilities
+
+| Module | Responsibility |
+| --- | --- |
+| `js/io_manager.js` | Normalizes keywords/channels, adapters, merge logic, and v3 schema builder. |
+| `state_manager.js` + `FilterTubeSettings` | Entry points that read/write storage so compilation remains centralized. |
+| `html/tab-view.html` + `tab-view.js` | Provide UI controls (file picker, merge/replace). |
+
+### 14.2 ASCII dataflow (Export)
+
+```text
+Tab View Export Button
+    |
+    v
+StateManager.loadSettings()
+    |
+    v
+io_manager.js::buildV3Export()
+    |
+    v
+Blob + FileSaver
+```
+
+### 14.3 ASCII dataflow (Import Merge)
+
+```text
+User selects JSON
+    |
+    v
+io_manager.js::importV3()
+    |
+    v
+normalizeIncomingV3()
+    |
+    v
+mergeChannelLists() / mergeKeywordLists()
+    |
+    v
+FilterTubeSettings.saveSettings()
+```
+
+### 14.4 Notes on custom channels
+
+- Inputs such as `https://www.youtube.com/c/Filmy_Gyaan` normalize to `c/filmy_gyaan`.
+- Merge priority: `UCID > @handle > customUrl > name/originalInput`.
+- When both a handle and custom URL are present, `sanitizeChannelEntry` retains both to improve lookups across surfaces.
+
+### 14.5 Channel enrichment queue & throttling
+
+Imported backups often contain bare IDs/handles without canonical metadata (logo, custom URL, collaboration hints). To avoid hammering YouTube for every entry simultaneously, the UI defers enrichment through a queue managed inside `state_manager.js`:
+
+```mermaid
+sequenceDiagram
+    participant Import as importV3 / merge logic
+    participant SM as StateManager
+    participant Queue as channelEnrichmentQueue
+    participant BG as background.js
+    participant YT as youtube.com
+
+    Import->>SM: saveSettings({ channels })
+    SM->>Queue: enqueue channels lacking canonical metadata
+    Note over Queue: Deduplicate via channelEnrichmentAttempted Set
+    Queue->>BG: handleAddFilteredChannel (one entry)
+    BG->>YT: best-effort fetch (handle/custom URL lookup)
+    BG-->>SM: sanitized channel metadata
+    SM->>Queue: wait 2s, pop next item (prevents floods/DDOS)
+```
+
+Key behaviors:
+
+- **Deduping:** `channelEnrichmentAttempted` ensures each unique handle/ID is only fetched once per session.
+- **Throttle:** `processChannelEnrichmentQueue` sleeps ~2 seconds between requests, preventing burst traffic after large imports.
+- **Auto-drain:** Once the queue is empty, enrichment stops until the next import or manual add; nothing persists that would keep pinging YouTube.
+- **Fallback safe:** If a fetch fails (network/offline), the entry stays without enriched data but the queue still advances—avoiding infinite retries.
+
 
 **Motivation:**
 Shorts are unique because they often lack channel information in the initial DOM. To ensure robust blocking, the system uses cache-first + main-world recovery to resolve a canonical UC ID whenever possible.

@@ -1,16 +1,13 @@
 // background.js
 
 /**
- * Background script for FilterTube extension
+ * Background / service worker entrypoint.
  *
- * This script runs in the background as a service worker in Chrome,
- * and as a background script in Firefox MV3.
- *
- * Currently minimal functionality is needed here, but it could be extended to:
- * - Handle messages from content script
- * - Manage extension state across browser tabs
- * - Implement storage change listeners
- * - Implement optional features in the future
+ * Responsibilities in this file now include:
+ * - Hydrating release notes payloads from data/release_notes.json
+ * - Tracking whether the current version’s release notes have been seen
+ * - Opening the dashboard tab in response to CTA clicks from the content banner
+ * - (Plus the long-standing storage + messaging plumbing below)
  */
 
 
@@ -32,6 +29,60 @@ const SHORTS_PARTIAL_STREAM_LIMIT = 51200;
 const SHORTS_FETCH_TIMEOUT_MS = 8000;
 const pendingShortsIdentityFetches = new Map();
 const shortsIdentitySessionCache = new Map();
+const CURRENT_VERSION = (browserAPI.runtime.getManifest()?.version || '').trim();
+// Deep link into the tab-view dashboard; query param avoids hash-only navigation
+// so we can reliably parse intent even when hash stripping occurs.
+const WHATS_NEW_PAGE_URL = browserAPI.runtime.getURL('html/tab-view.html?view=whatsnew');
+const RELEASE_NOTES_TEMPLATE = {
+    headline: 'FilterTube just updated',
+    body: 'Open the dashboard → What’s New tab to see the latest highlights.',
+    link: WHATS_NEW_PAGE_URL,
+    ctaLabel: 'Open What’s New'
+};
+let releaseNotesCache = null;
+
+/**
+ * Lazy-loads the curated release_notes.json file and caches it for the lifetime
+ * of the service worker (until it’s terminated by MV3).
+ */
+async function loadReleaseNotesData() {
+    if (releaseNotesCache) return releaseNotesCache;
+    try {
+        const url = browserAPI.runtime.getURL('data/release_notes.json');
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        releaseNotesCache = await response.json();
+    } catch (error) {
+        console.warn('FilterTube Background: Failed to load release notes data', error);
+        releaseNotesCache = [];
+    }
+    return releaseNotesCache;
+}
+
+/**
+ * Looks up the given version in release_notes.json and builds the payload used
+ * both in the dashboard cards and the YouTube banner CTA.
+ */
+async function buildReleaseNotesPayload(version) {
+    try {
+        const data = await loadReleaseNotesData();
+        if (Array.isArray(data)) {
+            const entry = data.find(note => note?.version === version);
+            if (entry) {
+                return {
+                    version,
+                    headline: entry.headline || RELEASE_NOTES_TEMPLATE.headline,
+                    body: entry.bannerSummary || entry.summary || entry.body || RELEASE_NOTES_TEMPLATE.body,
+                    link: WHATS_NEW_PAGE_URL,
+                    ctaLabel: entry.ctaLabel || RELEASE_NOTES_TEMPLATE.ctaLabel
+                };
+            }
+        }
+    } catch (error) {
+        console.warn('FilterTube Background: buildReleaseNotesPayload failed', error);
+    }
+    return Object.assign({ version, link: WHATS_NEW_PAGE_URL }, RELEASE_NOTES_TEMPLATE);
+}
 
 // Log when the background script loads with browser info
 console.log(`FilterTube background script loaded in ${IS_FIREFOX ? 'Firefox' : 'Chrome/Edge/Other'}`);
@@ -333,7 +384,9 @@ browserAPI.runtime.onInstalled.addListener(function (details) {
             hideAllComments: false,
             filterComments: false,
             hideAllShorts: false,
-            firstRunRefreshNeeded: true
+            firstRunRefreshNeeded: true,
+            releaseNotesSeenVersion: CURRENT_VERSION,
+            releaseNotesPayload: null
         });
 
         // Proactively inject the first-run prompt into already-open YouTube tabs
@@ -361,6 +414,13 @@ browserAPI.runtime.onInstalled.addListener(function (details) {
         }
     } else if (details.reason === 'update') {
         console.log('FilterTube extension updated from version ' + details.previousVersion);
+        buildReleaseNotesPayload(CURRENT_VERSION).then((payload) => {
+            browserAPI.storage.local.set({
+                releaseNotesPayload: payload
+            });
+        }).catch(error => {
+            console.warn('FilterTube Background: unable to prepare release notes payload', error);
+        });
         // You could handle migration of settings between versions here if needed
     }
 });
@@ -530,6 +590,75 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
         browserAPI.storage.local.set({ firstRunRefreshNeeded: false }, () => {
             sendResponse({ ok: true });
         });
+        return true;
+    } else if (action === 'FilterTube_ReleaseNotesCheck') {
+        // Content script ping: “Do I need to show the banner right now?”
+        browserAPI.storage.local.get(['releaseNotesPayload', 'releaseNotesSeenVersion'], async (result) => {
+            let payload = result?.releaseNotesPayload;
+            const seenVersion = result?.releaseNotesSeenVersion;
+            if (!payload?.version && CURRENT_VERSION) {
+                try {
+                    payload = await buildReleaseNotesPayload(CURRENT_VERSION);
+                    await new Promise(resolve => browserAPI.storage.local.set({ releaseNotesPayload: payload }, resolve));
+                } catch (error) {
+                    console.warn('FilterTube Background: Unable to hydrate release notes payload on demand', error);
+                }
+            }
+            const shouldShow = payload && payload.version && payload.version !== seenVersion;
+            sendResponse({
+                needed: Boolean(shouldShow),
+                payload: shouldShow ? payload : null
+            });
+        });
+        return true;
+    } else if (action === 'FilterTube_ReleaseNotesAck') {
+        // Banner dismissed – remember the version so we don’t prompt repeatedly.
+        const version = typeof request?.version === 'string' ? request.version : null;
+        if (!version) {
+            sendResponse({ ok: false, error: 'missing_version' });
+            return;
+        }
+        browserAPI.storage.local.set({ releaseNotesSeenVersion: version, releaseNotesPayload: null }, () => {
+            sendResponse({ ok: true });
+        });
+        return true;
+    } else if (action === 'FilterTube_OpenWhatsNew') {
+        // CTA from the YouTube banner – open or focus the dashboard’s What’s New view.
+        const requestedUrl = typeof request?.url === 'string' && request.url.trim()
+            ? request.url
+            : WHATS_NEW_PAGE_URL;
+        const finalUrl = requestedUrl || WHATS_NEW_PAGE_URL;
+
+        const focusExistingTab = () => {
+            browserAPI.tabs.query({
+                url: browserAPI.runtime.getURL('html/tab-view.html*')
+            }, (tabs) => {
+                if (browserAPI.runtime.lastError) {
+                    console.warn('FilterTube Background: tabs.query failed', browserAPI.runtime.lastError);
+                }
+                const existing = Array.isArray(tabs) ? tabs[0] : null;
+                if (existing?.id) {
+                    browserAPI.tabs.update(existing.id, { active: true, url: finalUrl }, () => {
+                        if (browserAPI.runtime.lastError) {
+                            console.warn('FilterTube Background: tabs.update failed', browserAPI.runtime.lastError);
+                            browserAPI.tabs.create({ url: finalUrl });
+                        }
+                        sendResponse({ ok: true, reused: true });
+                    });
+                } else {
+                    browserAPI.tabs.create({ url: finalUrl }, () => {
+                        if (browserAPI.runtime.lastError) {
+                            console.warn('FilterTube Background: tabs.create failed', browserAPI.runtime.lastError);
+                            sendResponse({ ok: false, error: browserAPI.runtime.lastError.message });
+                        } else {
+                            sendResponse({ ok: true, reused: false });
+                        }
+                    });
+                }
+            });
+        };
+
+        focusExistingTab();
         return true;
     } else if (request.action === "injectScripts") {
         // Handle script injection via Chrome scripting API
@@ -748,6 +877,14 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
                     return;
                 }
 
+                const normalizedResolvedId = details.id.toUpperCase();
+                const existingById = channels.find(ch => (ch.id || '').toUpperCase() === normalizedResolvedId);
+                if (existingById) {
+                    console.log('FilterTube Background: Channel already exists (matched by UC ID), skipping duplicate add:', normalizedResolvedId);
+                    sendResponse({ success: false, error: 'Channel already exists' });
+                    return;
+                }
+
                 // 4. Construct entry
                 // Determine customUrl: from fetchChannelInfo result OR from normalizedInput if it's a c/Name or user/Name
                 // Decode for unicode consistency (like handles)
@@ -945,6 +1082,35 @@ browserAPI.storage.onChanged.addListener((changes, area) => {
  * Fetch channel name and handle from YouTube by scraping the channel page
  * More reliable than API calls which can be blocked
  */
+function extractCustomUrlFromPath(path) {
+    if (!path || typeof path !== 'string') return '';
+    let working = path;
+    try {
+        if (/^https?:\/\//i.test(working)) {
+            working = new URL(working).pathname;
+        }
+    } catch (e) { /* ignore */ }
+
+    if (!working.startsWith('/')) working = '/' + working;
+    working = working.split(/[?#]/)[0];
+
+    if (working.startsWith('/c/')) {
+        const parts = working.split('/');
+        if (parts[2]) {
+            try { return `c/${decodeURIComponent(parts[2])}`; }
+            catch (e) { return `c/${parts[2]}`; }
+        }
+    } else if (working.startsWith('/user/')) {
+        const parts = working.split('/');
+        if (parts[2]) {
+            try { return `user/${decodeURIComponent(parts[2])}`; }
+            catch (e) { return `user/${parts[2]}`; }
+        }
+    }
+
+    return '';
+}
+
 async function fetchChannelInfo(channelIdOrHandle) {
     try {
         // Determine if it's a handle or a UC ID
@@ -957,6 +1123,12 @@ async function fetchChannelInfo(channelIdOrHandle) {
         const lowerCleanId = cleanId.toLowerCase();
         const isCustomUrl = lowerCleanId.startsWith('c/');
         const isUserUrl = lowerCleanId.startsWith('user/');
+
+        const assignCustomUrl = (value) => {
+            if (!value || customUrl) return;
+            const extracted = extractCustomUrlFromPath(value);
+            if (extracted) customUrl = extracted;
+        };
 
         // If the input itself is a UC ID, use it directly as the resolved ID and construct canonical URL
         if (cleanId.toUpperCase().startsWith('UC') && cleanId.length === 24) { // UC + 22 chars
@@ -1126,8 +1298,13 @@ async function fetchChannelInfo(channelIdOrHandle) {
                 const match = metadata.vanityChannelUrl.match(/@([^/]+)/);
                 if (match) {
                     channelHandle = '@' + match[1];
-                    console.log('FilterTube Background: Got handle from metadata:', channelHandle);
                 }
+                assignCustomUrl(metadata.vanityChannelUrl);
+            }
+
+            if (!customUrl && metadata.channelUrl) assignCustomUrl(metadata.channelUrl);
+            if (!customUrl && Array.isArray(metadata.ownerUrls)) {
+                metadata.ownerUrls.forEach(assignCustomUrl);
             }
 
             if (!resolvedChannelId && metadata.externalId && typeof metadata.externalId === 'string' && metadata.externalId.toUpperCase().startsWith('UC')) {
@@ -1188,6 +1365,12 @@ async function fetchChannelInfo(channelIdOrHandle) {
                         const handlePart = metadataRows[0]?.metadataParts?.[0]?.text?.content;
                         if (handlePart && handlePart.startsWith('@')) {
                             channelHandle = handlePart;
+                        } else {
+                            const canonicalUrl = metadataRows[0]?.metadataParts?.[0]?.navigationEndpoint?.urlEndpoint?.url;
+                            if (canonicalUrl && canonicalUrl.startsWith('/@')) {
+                                channelHandle = canonicalUrl;
+                            }
+                            assignCustomUrl(canonicalUrl);
                         }
                     }
                 }
@@ -1200,6 +1383,7 @@ async function fetchChannelInfo(channelIdOrHandle) {
                         if (match) {
                             resolvedChannelId = match[1];
                         }
+                        assignCustomUrl(canonicalUrl);
                     }
                 }
 
@@ -1241,6 +1425,7 @@ async function fetchChannelInfo(channelIdOrHandle) {
                     if (match) {
                         resolvedChannelId = match[1];
                     }
+                    assignCustomUrl(header.url);
                 }
 
                 // Logo
@@ -1263,6 +1448,7 @@ async function fetchChannelInfo(channelIdOrHandle) {
                 if (!channelHandle && microformat.vanityChannelUrl) {
                     const match = microformat.vanityChannelUrl.match(/@([^/]+)/);
                     if (match) channelHandle = '@' + match[1];
+                    assignCustomUrl(microformat.vanityChannelUrl);
                 }
 
                 if (!resolvedChannelId && microformat.url) {
@@ -1270,6 +1456,7 @@ async function fetchChannelInfo(channelIdOrHandle) {
                     if (match) {
                         resolvedChannelId = match[1];
                     }
+                    assignCustomUrl(microformat.url);
                 }
 
                 if (!channelLogo && microformat.thumbnail?.thumbnails?.length > 0) {
@@ -1284,6 +1471,17 @@ async function fetchChannelInfo(channelIdOrHandle) {
             if (match && match[1]) {
                 resolvedChannelId = match[1];
                 console.log('FilterTube Background: Got resolvedChannelId from direct HTML match:', resolvedChannelId);
+            }
+        }
+
+        if (!customUrl) {
+            const canonicalMatch = html.match(/"canonicalBaseUrl":"(\/(?:c|user)\/[^"]+)"/);
+            if (canonicalMatch && canonicalMatch[1]) {
+                const extracted = extractCustomUrlFromPath(canonicalMatch[1]);
+                if (extracted) {
+                    customUrl = extracted;
+                    console.log('FilterTube Background: Learned customUrl from HTML canonicalBaseUrl:', customUrl);
+                }
             }
         }
 
@@ -1378,12 +1576,28 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             if (!rawInput) return '';
             let cleaned = String(rawInput).trim();
 
+            // decode percent-encoded unicode handles/custom URLs
             try {
                 cleaned = decodeURIComponent(cleaned);
             } catch (e) {
                 // ignore
             }
 
+            const extractSlug = (path, marker) => {
+                const rx = new RegExp(`/${marker}/([^/?#]+)`, 'i');
+                const m = path.match(rx);
+                if (m && m[1]) {
+                    try { return decodeURIComponent(m[1]); } catch (e) { return m[1]; }
+                }
+                const parts = path.split('/').filter(Boolean);
+                const idx = parts.findIndex(p => p.toLowerCase() === marker.toLowerCase());
+                if (idx !== -1 && parts[idx + 1]) {
+                    try { return decodeURIComponent(parts[idx + 1]); } catch (e) { return parts[idx + 1]; }
+                }
+                return '';
+            };
+
+            // URL form
             try {
                 const url = new URL(cleaned);
                 const path = url.pathname;
@@ -1404,7 +1618,7 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                 }
 
                 if (path.startsWith('/c/')) {
-                    const slug = path.split('/')[2];
+                    const slug = extractSlug(path, 'c');
                     let decodedSlug = slug;
                     try {
                         decodedSlug = decodeURIComponent(slug);
@@ -1415,7 +1629,7 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                 }
 
                 if (path.startsWith('/user/')) {
-                    const slug = path.split('/')[2];
+                    const slug = extractSlug(path, 'user');
                     let decodedSlug = slug;
                     try {
                         decodedSlug = decodeURIComponent(slug);
@@ -1432,14 +1646,16 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
 
             if (cleaned.includes('youtube.com/') || cleaned.includes('youtu.be/')) {
                 const cleanedPath = cleaned.split(/[?#]/)[0];
-                const parts = cleanedPath.split('/');
-                const lastPart = parts[parts.length - 1];
-                const secondLast = parts[parts.length - 2];
+                const cSlug = extractSlug(cleanedPath, 'c');
+                if (cSlug) return `c/${cSlug}`;
+                const userSlug = extractSlug(cleanedPath, 'user');
+                if (userSlug) return `user/${userSlug}`;
 
-                if (secondLast === 'channel' && lastPart.startsWith('UC')) return lastPart;
-                if (lastPart.startsWith('@')) return lastPart;
-                if (secondLast === 'c' && lastPart) return `c/${lastPart}`;
-                if (secondLast === 'user' && lastPart) return `user/${lastPart}`;
+                const ucMatch = cleanedPath.match(/\/channel\/(UC[\w-]{22})/i);
+                if (ucMatch && ucMatch[1]) return ucMatch[1];
+
+                const handleMatch = cleanedPath.match(/\/@([^/?#]+)/);
+                if (handleMatch && handleMatch[1]) return '@' + handleMatch[1];
             }
 
             if (cleaned.startsWith('channel/')) return cleaned.replace('channel/', '');

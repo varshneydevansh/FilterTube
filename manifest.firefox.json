@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "FilterTube",
     "description": "Restore peace of mind to your digital video experience.",
-    "version": "3.1.5",
+    "version": "3.1.6",
     "background": {
         "scripts": [
             "js/shared/identity.js",
@@ -54,6 +54,7 @@
                 "js/content/bridge_settings.js",
                 "js/content/handle_resolver.js",
                 "js/content/collab_dialog.js",
+                "js/content/release_notes_prompt.js",
                 "js/content/first_run_prompt.js",
                 "js/content_bridge.js"
             ],

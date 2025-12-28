@@ -198,6 +198,19 @@ label {
 .search-row .text-input {
     flex: 1;
     min-width: 0;
+    border: 1px solid rgba(250, 204, 21, 0.9);
+    box-shadow: 0 0 0 1px rgba(250, 204, 21, 0.25);
+    padding: calc(var(--ft-space-xs) + 1px) calc(var(--ft-space-sm) - 2px);
+    border-radius: var(--ft-radius-sm);
+    background-color: rgba(250, 204, 21, 0.05);
+    transition: border-color var(--ft-transition-fast), box-shadow var(--ft-transition-fast), background-color var(--ft-transition-fast);
+    font-size: 0.85rem;
+}
+
+.search-row .text-input:focus {
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.35);
+    background-color: rgba(245, 158, 11, 0.08);
 }
 
 .search-row.search-row--with-spacer::after {

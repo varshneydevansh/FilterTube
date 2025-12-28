@@ -1,4 +1,4 @@
-# FilterTube v3.1.1 Architecture Documentation
+# FilterTube v3.1.6 Architecture Documentation
 
 ## Executive Summary
 
@@ -21,6 +21,43 @@ FilterTube operates on two synchronized layers:
     *   **Hybrid blocking surfaces:** Shorts and some playlist/mix surfaces may require a DOM-first hide combined with async identity enrichment.
     *   Applies visual hiding (CSS) to blocked elements.
     *   **Benefit:** Reliability, handles edge cases and dynamic updates.
+
+### **Release Notes + What’s New Surface (v3.1.6 addition)**
+
+FilterTube now ships an internal “What’s New” dashboard tab that shares a single data source (`data/release_notes.json`) with the release banner injected on YouTube. The flow is lightweight and doesn’t require network access beyond loading the packaged JSON.
+
+```mermaid
+graph TD
+    RN[data/release_notes.json] --> BG[background.js]
+    BG -->|buildReleaseNotesPayload| Storage[(releaseNotesPayload)]
+    Storage --> Banner[content/release_notes_prompt.js<br/>(YouTube CTA)]
+    RN --> Dashboard[tab-view.js<br/>loadReleaseNotesIntoDashboard]
+```
+
+- **Background** hydrates the payload when the extension updates or the banner pings `FilterTube_ReleaseNotesCheck`.
+- **Content script** handles CTA clicks by messaging `FilterTube_OpenWhatsNew`; the background script focuses or spawns `tab-view.html?view=whatsnew`.
+- **Tab view** reads both hash and `?view=` parameters, ensuring deep links land on the What’s New tab and scroll it into view.
+
+This keeps announcements self-contained inside the extension, avoiding blocked `chrome-extension://` navigations or offsite changelog links.
+
+### Import / Export & Data Portability (v3.1.6 addition)
+
+`js/io_manager.js` became the canonical normalization/adapter layer. Both UI (Tab View) and future sync tooling call into this module, preventing subtle drift between import/export flows. Key points:
+
+- All inbound identifiers funnel through `normalizeChannelInput`, handling `UC…`, `@handles`, `/c/<slug>`, `/user/<slug>`, and plain names.
+- Merge behavior is deterministic (`UCID > handle > customUrl > originalInput`) with earliest `addedAt` preserved so backups retain ordering.
+- Export flow reads `StateManager` + `chrome.storage.local` (channel/keyword lists, channelMap) and emits a portable v3 schema.
+- Import flow (`importV3`) supports native FilterTube exports, BlockTube JSON, and plaintext lists via adapters.
+
+ASCII overview:
+
+```text
+File Input → io_manager.importV3()
+            → normalizeIncomingV3()
+            → mergeChannelLists / mergeKeywordLists
+            → FilterTubeSettings.saveSettings()
+            → StateManager broadcasts + recompiles
+```
 
 ### **Multi-World Extension Architecture**
 

@@ -82,6 +82,21 @@
                     </span>
                     <span class="nav-label">Settings</span>
                 </li>
+                <li class="nav-item" data-tab="whatsnew">
+                    <span class="nav-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 20v-6"></path>
+                            <path d="M6 20V10"></path>
+                            <path d="M18 20v-8"></path>
+                            <path d="M2 20h20"></path>
+                            <path d="M4 10h4"></path>
+                            <path d="M10 14h4"></path>
+                            <path d="M16 12h4"></path>
+                        </svg>
+                    </span>
+                    <span class="nav-label">What’s New</span>
+                </li>
                 <li class="nav-item" data-tab="help">
                     <span class="nav-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -96,7 +111,7 @@
             </ul>
 
             <div class="sidebar-footer">
-                <div class="version-info">v3.1.5</div>
+                <div class="version-info">v3.1.6</div>
             </div>
         </nav>
 
@@ -251,12 +266,68 @@
                 <div id="settingsView" class="view-section">
                     <div class="card">
                         <div class="card-header">
-                            <h3>General Settings</h3>
+                            <h3>Import / Export</h3>
                         </div>
                         <div class="card-body">
-                            <div class="empty-state">
-                                <p>Global settings coming soon.</p>
-                                <p class="sub-text">Import/Export and other advanced options will appear here.</p>
+                            <div class="help-list">
+                                <div class="help-item">
+                                    <div class="help-item-title">Export backup</div>
+                                    <div class="help-item-body import-export-row">
+                                        <div class="import-export-text">
+                                            <span class="import-export-summary">
+                                                Snapshot of channels, keywords, kids profiles, and themes.</br>
+                                            </span>
+                                            <span class="import-export-hint">
+                                                Saved as <code>filtertube_backup_YYYY-MM-DD.json</code>
+                                            </span>
+                                            <span class="info-hint" title="Download a portable JSON that includes every FilterTube list (channels, keywords, kids settings, design preferences, kids profiles, and more).">
+                                                Details
+                                            </span>
+                                        </div>
+                                        <div class="import-export-actions">
+                                            <button id="ftExportV3Btn" class="btn-primary" type="button">Download JSON</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="help-item">
+                                    <div class="help-item-title">Import backup</div>
+                                    <div class="help-item-body import-export-row">
+                                        <div class="import-export-text">
+                                            <span class="import-export-summary">
+                                                Merge a saved FilterTube export or compatible JSON.</br>
+                                            </span>
+                                            <span class="import-export-hint">
+                                                Existing entries stay put; matching channels/keywords are merged
+                                            </span>
+                                            <span class="info-hint" title="Bring in data from FilterTube backups, BlockTube exports, or other structured JSON tools. Matching channels/keywords are merged; everything else is appended.">
+                                                Details
+                                            </span>
+                                        </div>
+                                        <div class="import-export-actions">
+                                            <input id="ftImportV3File" type="file" accept="application/json,.json" style="display:none;" />
+                                            <button id="ftImportV3Btn" class="btn-secondary btn-import" type="button" title="Import a FilterTube export or any compatible JSON (BlockTube, other tools, etc.)">
+                                                Choose JSON
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div id="whatsnewView" class="view-section">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>What’s New</h3>
+                        </div>
+                        <div class="card-body">
+                            <p class="whats-new-intro">
+                                FilterTube evolves constantly. Here are the highlights from recent releases so you can discover new tools without digging through the full changelog.
+                            </p>
+                            <div id="releaseNotesList" class="release-notes-list">
+                                <div class="release-notes-empty">Loading release notes…</div>
                             </div>
                         </div>
                     </div>
@@ -420,6 +491,39 @@
 
                     <div class="card">
                         <div class="card-header">
+                            <h3>Import &amp; Export backups</h3>
+                        </div>
+                        <div class="card-body">
+                            <p style="margin-bottom:12px;">
+                                Keep a private copy of your FilterTube setup or move it to another browser in seconds. Exports generate a single JSON that bundles every keyword, channel, Kids profile, and design preference. Imports merge the JSON into your current profile—nothing is overwritten unless the same channel or keyword already exists.
+                            </p>
+                            <div class="help-list">
+                                <div class="help-item">
+                                    <div class="help-item-title">Export</div>
+                                    <div class="help-item-body">
+                                        <ul>
+                                            <li>Click <strong>Download JSON</strong> to capture the latest channels, keywords, Kids settings, and theme choices.</li>
+                                            <li>File name follows <code>filtertube_backup_YYYY-MM-DD.json</code> so you can keep multiple snapshots.</li>
+                                            <li>Store it anywhere private (cloud drive, USB) for quick restores.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="help-item">
+                                    <div class="help-item-title">Import</div>
+                                    <div class="help-item-body">
+                                        <ul>
+                                            <li>Choose any FilterTube backup or compatible JSON (BlockTube/others work too).</li>
+                                            <li>Channels and keywords are merged; duplicates update in place while new entries append.</li>
+                                            <li>Kids Mode and design preferences are layered on top of your current profile without wiping existing data.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
                             <h3>Troubleshooting</h3>
                         </div>
                         <div class="card-body">
@@ -447,6 +551,7 @@
  
  
     <script src="../js/settings_shared.js"></script>
+    <script src="../js/io_manager.js"></script>
     <script src="../js/content_controls_catalog.js"></script>
     <script src="../js/ui_components.js"></script>
     <script src="../js/state_manager.js"></script>

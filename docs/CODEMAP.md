@@ -34,6 +34,24 @@ FilterTube/
 
 ## Key Files & Functions
 
+### `data/release_notes.json`
+**Context:** Packaged asset (shared between background + UI)
+**Purpose:** Single source of truth for release notes surfaced in both the banner and the dashboard.
+| Field | Description |
+| :--- | :--- |
+| `version` | Semantic version string (e.g., `3.1.6`). |
+| `headline`, `summary`, `bannerSummary` | Copy shown in dashboard cards vs. banner CTA. |
+| `highlights[]` | Bullet list rendered in the “What’s New” tab. |
+| `detailsUrl` | External release URL (GitHub tag/commit). |
+
+### `js/content/release_notes_prompt.js`
+**Context:** Isolated World (YouTube pages)
+**Purpose:** Shows the “FilterTube updated” banner once per version, using the payload stored by the background worker. CTA calls `FilterTube_OpenWhatsNew`, which focuses `tab-view.html?view=whatsnew` via background messaging so blockers never intercept `chrome-extension://` URLs.
+
+### `js/io_manager.js`
+**Context:** UI contexts (Tab View) + future sync modules
+**Purpose:** Canonical import/export engine. Normalizes channel/keyword entries, merges imports (UC IDs, @handles, `c/slug`), adapts BlockTube/plaintext formats, and emits the versioned portable schema consumed by future sync tooling.
+
 ### `js/state_manager.js`
 **Context:** UI Contexts (Popup, Tab View)
 **Purpose:** The Single Source of Truth for application state.
@@ -92,6 +110,11 @@ FilterTube/
 ### `js/popup.js` & `js/tab-view.js`
 **Context:** UI Contexts
 **Purpose:** Entry points for the UI, initializing `StateManager` and `RenderEngine`.
+
+#### Tab view additions (v3.1.6)
+- Adds a “What’s New” navigation tab that loads cards from `data/release_notes.json`.
+- Reads both hash (`#whatsnew`) and query parameters (`?view=whatsnew`) so banner deep-links auto-select the correct view.
+- Import/Export card calls into `io_manager.js` for all serialization logic.
 
 ### `js/render_engine.js`
 **Context:** UI Contexts

@@ -5847,6 +5847,12 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             applyHandleMetadata(channelInfo, channelInfo.handle, { force: true });
         }
 
+        // Preserve custom URL identity if that's all we have
+        if (!channelInfo.customUrl) {
+            const attrCustom = videoCard?.getAttribute?.('data-filtertube-channel-custom');
+            if (attrCustom) channelInfo.customUrl = attrCustom;
+        }
+
         let input = channelInfo.id || channelInfo.customUrl || requestedHandleForNetwork || channelInfo.handle;
 
         if (!input && channelInfo?.name) {

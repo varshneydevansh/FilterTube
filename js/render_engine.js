@@ -772,36 +772,63 @@ const RenderEngine = (() => {
      * Derive channel mapping for visualization
      */
     function deriveChannelMapping(channel, channelMap = {}) {
-        // Prioritize customUrl for c/Name channels, then handle, then id
+        // Prefer to show what the user typed (originalInput) → what we resolved (id/handle/customUrl)
         const originalInput = channel.originalInput || channel.customUrl || channel.handle || channel.id;
         const fetchedId = channel.id;
         const fetchedHandle = channel.handle;
         const customUrl = channel.customUrl;
 
         let source = originalInput;
-        let target = fetchedId;
+        let target = null;
         let isResolved = false;
 
-        // Check if we successfully fetched details
-        if (fetchedId && fetchedId !== originalInput) {
-            // Case 1: Input was @handle or c/Name, resolved to UC ID
-            isResolved = true;
-            target = fetchedId;
-        } else if (originalInput && originalInput.toUpperCase().startsWith('UC') && fetchedHandle) {
-            // Case 2: Input was UC ID, resolved to @handle (Better visualization)
-            isResolved = true;
+        const inputLooksLikeUc = Boolean(originalInput && originalInput.toUpperCase().startsWith('UC'));
+        const hasCustomUrl = Boolean(customUrl);
+
+        // Case: input was UC ID, resolved to handle
+        if (inputLooksLikeUc && fetchedHandle) {
+            source = originalInput;
             target = fetchedHandle;
-        } else if (originalInput && originalInput.toUpperCase().startsWith('UC') && customUrl) {
-            // Case 3: Input was UC ID, but we have customUrl - show customUrl → UC ID
+            isResolved = true;
+        }
+        // Case: input was handle, resolved to UC ID
+        else if (originalInput && originalInput.startsWith('@') && fetchedId && fetchedId !== originalInput) {
+            source = originalInput;
+            target = fetchedId;
+            isResolved = true;
+        }
+        // Case: input was UC ID, no handle but we learned customUrl
+        else if (inputLooksLikeUc && hasCustomUrl) {
+            source = originalInput;
+            target = customUrl;
+            isResolved = true;
+        }
+        // Case: input was customUrl c/ or user/, resolved to UC ID
+        else if (originalInput && (originalInput.startsWith('c/') || originalInput.startsWith('user/')) && fetchedId) {
+            source = originalInput;
+            target = fetchedId;
+            isResolved = true;
+        }
+        // Case: we learned customUrl separately; show it if the input was something else
+        else if (customUrl && fetchedId && customUrl !== originalInput) {
             source = customUrl;
             target = fetchedId;
             isResolved = true;
-        } else if (channelMap && originalInput && channelMap[originalInput.toLowerCase()]) {
-            // Case 4: Fallback to map
-            isResolved = true;
+        }
+        // Fallback to channelMap if we have a mapping
+        else if (channelMap && originalInput && channelMap[originalInput.toLowerCase()]) {
+            source = originalInput;
             target = channelMap[originalInput.toLowerCase()];
+            isResolved = true;
         }
 
+        // If source and target are identical (e.g., UC... -> UC...), treat as unresolved to avoid noisy arrow
+        if (target === source) {
+            target = null;
+            isResolved = false;
+        }
+
+        // If nothing resolved, still show source
         return { source, target, isResolved };
     }
 

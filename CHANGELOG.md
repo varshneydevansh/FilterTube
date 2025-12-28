@@ -1,5 +1,21 @@
 # Changelog
 
+## Version 3.1.6
+
+### Release Notes Experience
+
+- Added a curated “What’s New” tab in the dashboard fed by `data/release_notes.json`, sharing the same content as the release banner.
+- Release banner CTA now routes through the background script and lands inside `tab-view.html?view=whatsnew`, so no chrome-extension:// links are blocked by content blockers.
+- Banner + dashboard documentation now lives in `/docs`, including UI/UX guidance on when the CTA appears and which fields drive the cards.
+
+### Import / Export & Data Portability
+
+- Documented the full import/export pipeline (including c/ChannelName normalization, merge rules, and adapters) with ASCII + Mermaid diagrams.
+- `js/io_manager.js` centralizes sanitization helpers, making merge vs. replace imports reliable for UC IDs, @handles, and `/c/slug` values.
+- Added contextual comments throughout IO helpers so future schema changes remain self-documented.
+
+---
+
 ## Version 3.1.5
 
 ### Fixes: Shorts + Members-only (Watch/Sidebar)
@@ -76,8 +92,6 @@
 ### Misc
 - Version bump to keep manifests, build tooling, and UI footer aligned with the new release.
 
----
-
 ## Version 3.0.9
 
 ### Refactor
@@ -90,8 +104,6 @@
 - Updated docs to reflect the new isolated-world module structure + load order.
 - Expanded `docs/youtube_renderer_inventory.md` with additional menu DOM variants used by the 3-dot injection pipeline.
 
----
-
 ## Version 3.0.8
 
 ### Channel Blocking Hardening
@@ -102,8 +114,6 @@
 ### Documentation
 - Added `docs/handle-404-remediation.md` playbook and updated architecture/tech docs to reflect the new recovery flow.
 - Expanded `CONTENT_HIDING_PLAYBOOK.md` and `CHANNEL_BLOCKING_SYSTEM.md` with channel identity guidance for Shorts/home surfaces.
-
----
 
 ## Version 3.0.7
 

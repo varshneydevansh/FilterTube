@@ -13,31 +13,54 @@ FilterTube is a browser extension that gives you control over your YouTube feed.
 ## Features
 
 ### Content Filtering
+
 - **Block by Keyword**: Hide videos with specific words in the title.
-- **Block Channels**: Filter by Channel Name, @Handle, or ID.
-- **Hide Shorts**: Optional toggle to remove all Shorts from your feed.
-- **Smart Matching**: Supports both partial matches (default) and exact word matching.
+- **Block Channels**: Paste Channel Name, `@handle`, `UCID`, or even `c/CustomURL`—FilterTube normalizes them all.
+- **Hide Shorts**: Optional toggle to remove every Shorts shelf and player hand-off.
+- **Smart Matching**: Choose partial or whole-word matching to stay strict or flexible.
+- **Shelf & Playlist Cleanup**: Refilters shelves and playlists so blocked creators stay gone even after navigation.
+
+### Channel & Data Management
+
+- **Import / Export**: One-click backups keep filters synced across browsers with schema-v3 JSON.
+- **Handle Enrichment Queue**: Newly imported channels are resolved slowly in the background to avoid hammering YouTube.
+- **Kids Mode Profiles**: Maintain a separate, safer rule set for YouTube Kids without mixing it with the main profile.
 
 ### Comment Control
+
 - **Hide All Comments**: Remove the comments section entirely for a cleaner interface.
 - **Filter Comments**: Hide specific comments containing unwanted keywords.
 
+### Release Awareness
+
+- **Release Notes Banner**: Non-intrusive toast in YouTube surfaces highlights new capabilities.
+- **“What’s New” Dashboard Tab**: Full changelog with deep links so you can jump straight to the feature that shipped.
+
 ### Stats & Insights
+
 - **Time Saved**: See how much time you've saved by blocking distractions.
 - **Daily Tracker**: Count of videos hidden today.
 
 ### Performance & Privacy
+
 - **Zero Flash**: Filters content *before* it renders on screen.
 - **100% Private**: No data leaves your browser. No analytics. No tracking.
 
 ### Help & Documentation
-- **Help Page (Dashboard)**: In the new tab UI, a dedicated Help section explains every feature and toggle.
+
+- **Help Page (Dashboard)**: In the new tab UI, a dedicated Help section explains every feature, import/export flow, and troubleshooting tip.
 
 ## Installation
 
 ### For Users
 The easiest way to install FilterTube is via our official website:
-👉 **[Install FilterTube](https://filtertube.in)** (Available for Chrome, Firefox, Edge, Brave, Opera)
+👉 **[Install FilterTube.in](https://filtertube.in)** (Available for Chrome, Firefox, Edge, Brave, Opera)
+
+Prefer a direct store link? Pick your browser:
+
+- **Chrome / Brave**: [Chrome Web Store listing](https://chromewebstore.google.com/detail/filtertube/cjmdggnnpmpchholgnkfokibidbbnfgc)
+- **Firefox**: [Firefox Add-ons listing](https://addons.mozilla.org/en-US/firefox/addon/filtertube/)
+- **Edge**: [Microsoft Edge Add-ons listing](https://microsoftedge.microsoft.com/addons/detail/filtertube/lgeflbmplcmljnhffmoghkoccflhlbem)
 
 ### For Developers
 If you want to contribute or build from source:

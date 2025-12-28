@@ -38,7 +38,7 @@ function initializePopupFiltersTabs() {
             </div>
 
             <div class="add-keyword-row">
-                <input type="text" id="channelInput" class="text-input" placeholder="Add @handle or channel ID..." />
+                <input type="text" id="channelInput" class="text-input" placeholder="Add @handle, Channel ID.. or c/ChannelName" />
                 <button id="addChannelBtn" class="btn btn-small btn-primary">Add</button>
             </div>
 

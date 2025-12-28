@@ -59,7 +59,7 @@ function initializeFiltersTabs() {
     const channelsContent = document.createElement('div');
     channelsContent.innerHTML = `
         <div class="input-row">
-            <input type="text" id="channelInput" class="text-input" placeholder="@handle or Channel ID..." />
+            <input type="text" id="channelInput" class="text-input" placeholder="@handle, Channel ID.. or c/ChannelName" />
             <button id="addChannelBtn" class="btn-primary">Add Channel</button>
         </div>
 
@@ -260,6 +260,160 @@ function initializeFiltersTabs() {
 // MAIN INITIALIZATION
 // ============================================================================
 
+const runtimeAPI = (typeof browser !== 'undefined' && browser.runtime) ? browser : (typeof chrome !== 'undefined' ? chrome : null);
+const manifestVersion = runtimeAPI?.runtime?.getManifest()?.version || '';
+
+/**
+ * Parses either the hash (#whatsnew) or query parameter (?view=whatsnew) so the
+ * dashboard can deep-link into specific tabs (used by banner CTA, docs, etc.).
+ */
+function resolveRequestedView() {
+    const hash = (window.location.hash || '').replace('#', '').toLowerCase();
+    const searchParams = new URLSearchParams(window.location.search || '');
+    const queryView = (searchParams.get('view') || '').toLowerCase();
+    const candidate = hash || queryView;
+    if (!candidate) return null;
+    const normalized = candidate.replace(/\s+/g, '');
+    const viewMap = {
+        'dashboard': 'dashboard',
+        'filters': 'filters',
+        'semantic': 'semantic',
+        'kids': 'kids',
+        'settings': 'settings',
+        'whatsnew': 'whatsnew',
+        'whats-new': 'whatsnew',
+        'help': 'help'
+    };
+    return viewMap[normalized] || null;
+}
+
+/**
+ * Switches to the requested view (if any) and scrolls it into view. Separated
+ * so we can reuse it for DOMContentLoaded, hashchange, and popstate events.
+ */
+function handleNavigationIntent() {
+    const viewId = resolveRequestedView();
+    if (!viewId) return;
+    if (typeof window.switchView === 'function') {
+        window.switchView(viewId);
+    }
+    if (viewId === 'whatsnew') {
+        const view = document.getElementById('whatsnewView');
+        if (view) {
+            requestAnimationFrame(() => view.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+        }
+    }
+}
+
+/**
+ * Hydrates the “What’s New” tab with curated release note cards pulled from
+ * data/release_notes.json. Shared content with the release banner.
+ */
+async function loadReleaseNotesIntoDashboard() {
+    const listEl = document.getElementById('releaseNotesList');
+    if (!listEl) return;
+
+    function showEmptyState(message) {
+        listEl.innerHTML = `<div class="release-notes-empty">${message}</div>`;
+    }
+
+    try {
+        const url = runtimeAPI?.runtime?.getURL
+            ? runtimeAPI.runtime.getURL('data/release_notes.json')
+            : 'data/release_notes.json';
+        const response = await fetch(url);
+        if (!response.ok) {
+            showEmptyState('Unable to load release notes right now.');
+            return;
+        }
+        const notes = await response.json();
+        if (!Array.isArray(notes) || notes.length === 0) {
+            showEmptyState('No release notes available yet.');
+            return;
+        }
+
+        listEl.innerHTML = '';
+
+        const validNotes = notes.filter(note => note && typeof note.version === 'string' && note.version.trim());
+        if (validNotes.length === 0) {
+            showEmptyState('Release notes will appear here once available.');
+            return;
+        }
+
+        validNotes.forEach(note => {
+            const card = document.createElement('article');
+            card.className = 'release-note-card';
+            const isCurrent = note.version === manifestVersion;
+            if (isCurrent) {
+                card.classList.add('release-note-card--current');
+            }
+
+            const header = document.createElement('div');
+            header.className = 'release-note-card__header';
+
+            const versionTag = document.createElement('span');
+            versionTag.className = 'release-note-card__version';
+            versionTag.textContent = `v${note.version || '—'}`;
+            header.appendChild(versionTag);
+
+            if (isCurrent) {
+                const status = document.createElement('span');
+                status.className = 'release-note-card__status';
+                status.textContent = 'Current';
+                header.appendChild(status);
+            }
+
+            const title = document.createElement('h4');
+            title.className = 'release-note-card__title';
+            title.textContent = note.headline || 'New update';
+
+            const summary = document.createElement('p');
+            summary.className = 'release-note-card__summary';
+            summary.textContent = note.summary || note.body || 'Details coming soon.';
+
+            const highlights = Array.isArray(note.highlights) ? note.highlights.filter(Boolean) : [];
+            let highlightsList = null;
+            if (highlights.length) {
+                highlightsList = document.createElement('ul');
+                highlightsList.className = 'release-note-card__highlights';
+                highlights.slice(0, 4).forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = item;
+                    highlightsList.appendChild(li);
+                });
+            }
+
+            const actions = document.createElement('div');
+            actions.className = 'release-note-card__actions';
+
+            if (note.detailsUrl) {
+                const link = document.createElement('a');
+                link.className = 'release-note-card__link';
+                link.href = note.detailsUrl;
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                link.textContent = 'View changelog';
+                actions.appendChild(link);
+            }
+
+            card.appendChild(header);
+            card.appendChild(title);
+            card.appendChild(summary);
+            if (highlightsList) {
+                card.appendChild(highlightsList);
+            }
+            if (actions.childElementCount > 0) {
+                card.appendChild(actions);
+            }
+
+            listEl.appendChild(card);
+        });
+    } catch (error) {
+        console.error('Tab-View: Failed to load release notes', error);
+        showEmptyState('Unable to load release notes right now.');
+    }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     // Initialize UI
     initializeFiltersTabs();
@@ -294,6 +448,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         : [];
 
     const themeToggle = document.getElementById('themeToggle');
+
+    const ftExportV3Btn = document.getElementById('ftExportV3Btn');
+    const ftImportV3Btn = document.getElementById('ftImportV3Btn');
+    const ftImportV3File = document.getElementById('ftImportV3File');
 
     // State for search/sort
     let keywordSearchValue = '';
@@ -347,6 +505,86 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Theme already applied by StateManager
         }
     });
+
+    // ============================================================================
+    // IMPORT / EXPORT (V3)
+    // ============================================================================
+
+    function downloadJsonFile(filename, obj) {
+        const json = JSON.stringify(obj, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 250);
+    }
+
+    async function runExportV3() {
+        const io = window.FilterTubeIO;
+        if (!io || typeof io.exportV3 !== 'function') {
+            UIComponents.showToast('Export unavailable (FilterTubeIO not loaded)', 'error');
+            return;
+        }
+        try {
+            const payload = await io.exportV3();
+            const date = new Date();
+            const stamp = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+            downloadJsonFile(`filtertube_export_v3_${stamp}.json`, payload);
+            UIComponents.showToast('Exported JSON', 'success');
+        } catch (e) {
+            UIComponents.showToast('Export failed', 'error');
+            console.error('Export V3 failed', e);
+        }
+    }
+
+    async function runImportV3FromFile(file) {
+        if (!file) return;
+        const io = window.FilterTubeIO;
+        if (!io || typeof io.importV3 !== 'function') {
+            UIComponents.showToast('Import unavailable (FilterTubeIO not loaded)', 'error');
+            return;
+        }
+
+        try {
+            const text = await file.text();
+            const parsed = JSON.parse(text);
+            await io.importV3(parsed, { strategy: 'merge' });
+
+            await StateManager.loadSettings();
+            const state = StateManager.getState();
+            const SettingsAPI = window.FilterTubeSettings || {};
+            if (SettingsAPI.applyThemePreference) {
+                SettingsAPI.applyThemePreference(state.theme);
+            }
+
+            UIComponents.showToast('Import complete', 'success');
+        } catch (e) {
+            UIComponents.showToast('Import failed (invalid file?)', 'error');
+            console.error('Import V3 failed', e);
+        }
+    }
+
+    if (ftExportV3Btn) {
+        ftExportV3Btn.addEventListener('click', () => {
+            runExportV3();
+        });
+    }
+
+    if (ftImportV3Btn && ftImportV3File) {
+        ftImportV3Btn.addEventListener('click', () => {
+            ftImportV3File.click();
+        });
+
+        ftImportV3File.addEventListener('change', async (e) => {
+            const file = e.target?.files?.[0] || null;
+            await runImportV3FromFile(file);
+            e.target.value = '';
+        });
+    }
 
     // ============================================================================
     // RENDERING
@@ -767,6 +1005,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             setTimeout(() => document.getElementById('searchContentControls')?.focus(), 50);
         });
     }
+
+    await loadReleaseNotesIntoDashboard();
+    handleNavigationIntent();
+    window.addEventListener('hashchange', handleNavigationIntent);
+    window.addEventListener('popstate', handleNavigationIntent);
 });
 
 // ============================================================================
@@ -777,6 +1020,7 @@ function setupNavigation() {
     const navItems = document.querySelectorAll('.nav-item');
     const viewSections = document.querySelectorAll('.view-section');
     const pageTitle = document.getElementById('pageTitle');
+    const viewContainer = document.querySelector('.view-container');
 
     navItems.forEach(item => {
         item.addEventListener('click', () => {
@@ -794,7 +1038,14 @@ function setupNavigation() {
         // Update view sections
         viewSections.forEach(section => {
             section.classList.toggle('active', section.id === `${viewId}View`);
+            if (section.id === `${viewId}View`) {
+                section.scrollTop = 0;
+            }
         });
+
+        if (viewContainer) {
+            viewContainer.scrollTop = 0;
+        }
 
         // Update page title
         const titles = {
@@ -803,6 +1054,7 @@ function setupNavigation() {
             'semantic': 'Semantic ML',
             'kids': 'Kids Mode',
             'settings': 'Settings',
+            'whatsnew': 'What’s New',
             'help': 'Help'
         };
         if (pageTitle && titles[viewId]) {
