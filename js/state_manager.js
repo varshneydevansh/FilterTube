@@ -52,12 +52,23 @@ const StateManager = (() => {
         stats: { hiddenCount: 0, savedMinutes: 0 },
         channelMap: {},
         theme: 'light',
-        isLoaded: false
+        isLoaded: false,
+        kids: {
+            blockedKeywords: [],
+            blockedChannels: [],
+            whitelistedChannels: [],
+            whitelistedKeywords: [],
+            mode: 'whitelist',
+            strictMode: true,
+            videoIds: [],
+            subscriptions: []
+        }
     };
 
     const channelEnrichmentAttempted = new Set();
     const channelEnrichmentQueue = [];
     let isEnriching = false;
+    let lastEnrichmentSignature = '';
 
     let isSaving = false;
     let listeners = [];
@@ -77,6 +88,15 @@ const StateManager = (() => {
         }
 
         const data = await SettingsAPI.loadSettings();
+        const io = window.FilterTubeIO || {};
+        let profilesV3 = null;
+        if (io && typeof io.loadProfilesV3 === 'function') {
+            try {
+                profilesV3 = await io.loadProfilesV3();
+            } catch (e) {
+                console.warn('StateManager: loadProfilesV3 failed', e);
+            }
+        }
 
         state.enabled = data.enabled !== false;
         state.keywords = data.keywords || [];
@@ -113,11 +133,26 @@ const StateManager = (() => {
         state.stats = data.stats || { hiddenCount: 0, savedMinutes: 0 };
         state.channelMap = data.channelMap || {};
         state.theme = data.theme || 'light';
+        if (profilesV3 && profilesV3.kids) {
+            state.kids = {
+                blockedKeywords: profilesV3.kids.blockedKeywords || [],
+                blockedChannels: profilesV3.kids.blockedChannels || [],
+                whitelistedChannels: profilesV3.kids.whitelistedChannels || [],
+                whitelistedKeywords: profilesV3.kids.whitelistedKeywords || [],
+                mode: profilesV3.kids.mode || 'whitelist',
+                strictMode: profilesV3.kids.strictMode !== false,
+                videoIds: profilesV3.kids.videoIds || [],
+                subscriptions: profilesV3.kids.subscriptions || []
+            };
+        }
+        // Reset enrichment state so re-imports can re-run enrichment
+        resetEnrichmentState();
+        lastEnrichmentSignature = computeChannelSignature();
         state.isLoaded = true;
 
         notifyListeners('load', state);
-
-         scheduleChannelNameEnrichment();
+        // Kick off async channel name enrichment after initial load
+        scheduleChannelNameEnrichment();
         return state;
     }
 
@@ -128,6 +163,28 @@ const StateManager = (() => {
             }, 0);
         } catch (e) {
         }
+    }
+
+    function resetEnrichmentState() {
+        channelEnrichmentQueue.length = 0;
+        channelEnrichmentAttempted.clear();
+        isEnriching = false;
+    }
+
+    function getKidsState() {
+        if (!state.kids) {
+            state.kids = {
+                blockedKeywords: [],
+                blockedChannels: [],
+                whitelistedChannels: [],
+                whitelistedKeywords: [],
+                mode: 'whitelist',
+                strictMode: true,
+                videoIds: [],
+                subscriptions: []
+            };
+        }
+        return state.kids;
     }
 
     function isHandleLike(value) {
@@ -149,26 +206,53 @@ const StateManager = (() => {
         return false;
     }
 
+    function channelEnrichmentKey(channel) {
+        return String(channel?.id || channel?.handle || channel?.customUrl || '').toLowerCase();
+    }
+
+    function computeChannelSignature() {
+        if (!Array.isArray(state.channels)) return '';
+        return state.channels
+            .map(ch => channelEnrichmentKey(ch))
+            .filter(Boolean)
+            .sort()
+            .join('|');
+    }
+
+    function queueChannelForEnrichment(channel) {
+        if (!shouldEnrichChannel(channel)) return;
+        const key = channelEnrichmentKey(channel);
+        if (!key || channelEnrichmentAttempted.has(key)) return;
+        channelEnrichmentAttempted.add(key);
+
+        channelEnrichmentQueue.push({
+            input: channel.id || channel.handle || channel.customUrl,
+            handleDisplay: channel.handleDisplay || null,
+            canonicalHandle: channel.canonicalHandle || null,
+            customUrl: channel.customUrl || null,
+            source: channel.source || null
+        });
+    }
+
+    function triggerChannelEnrichmentRefresh() {
+        resetEnrichmentState();
+        enqueueChannelEnrichment();
+        lastEnrichmentSignature = computeChannelSignature();
+    }
+
     async function enqueueChannelEnrichment() {
         if (!Array.isArray(state.channels) || state.channels.length === 0) return;
-
         for (const channel of state.channels) {
-            if (!shouldEnrichChannel(channel)) continue;
-
-            const key = String(channel.id || channel.handle || channel.customUrl || '').toLowerCase();
-            if (!key || channelEnrichmentAttempted.has(key)) continue;
-            channelEnrichmentAttempted.add(key);
-
-            channelEnrichmentQueue.push({
-                input: channel.id || channel.handle || channel.customUrl,
-                handleDisplay: channel.handleDisplay || null,
-                canonicalHandle: channel.canonicalHandle || null,
-                customUrl: channel.customUrl || null,
-                source: channel.source || null
-            });
+            queueChannelForEnrichment(channel);
         }
-
         processChannelEnrichmentQueue();
+    }
+
+    function maybeRefreshEnrichmentFromChannels() {
+        const sig = computeChannelSignature();
+        if (sig !== lastEnrichmentSignature) {
+            triggerChannelEnrichmentRefresh();
+        }
     }
 
     function processChannelEnrichmentQueue() {
@@ -183,6 +267,13 @@ const StateManager = (() => {
 
         isEnriching = true;
 
+        const startedAt = Date.now();
+        console.log('FilterTube StateManager: channel enrichment start', {
+            input: task.input,
+            queueLength: channelEnrichmentQueue.length,
+            startedAt
+        });
+
         chrome.runtime.sendMessage({
             type: 'addFilteredChannel',
             input: task.input,
@@ -196,11 +287,108 @@ const StateManager = (() => {
             source: task.source || null
         }, () => {
             // throttle to avoid hammering
+            const durationMs = Date.now() - startedAt;
+            const delayMs = 5000 + Math.floor(Math.random() * 2000); // 5-7s backoff to reduce request burstiness
+            console.log('FilterTube StateManager: channel enrichment complete', {
+                input: task.input,
+                durationMs,
+                nextDelayMs: delayMs,
+                remainingQueue: channelEnrichmentQueue.length
+            });
             setTimeout(() => {
                 isEnriching = false;
                 processChannelEnrichmentQueue();
-            }, 2000);
+            }, delayMs);
         });
+    }
+
+    // ============================================================================
+    // KIDS PROFILE MANAGEMENT (Keywords + Channels)
+    // ============================================================================
+
+    async function addKidsKeyword(word) {
+        await ensureLoaded();
+
+        const trimmed = (word || '').trim();
+        if (!trimmed) return false;
+
+        const lower = trimmed.toLowerCase();
+        const kids = getKidsState();
+        if (kids.blockedKeywords.some(entry => (entry.word || '').toLowerCase() === lower)) {
+            return false;
+        }
+
+        const entry = {
+            word: trimmed,
+            exact: false,
+            semantic: false,
+            comments: false,
+            source: 'user',
+            addedAt: Date.now()
+        };
+
+        kids.blockedKeywords = [entry, ...kids.blockedKeywords];
+        state.kids = { ...kids };
+        await persistKidsProfiles(state.kids);
+        notifyListeners('kidsKeywordAdded', { word: trimmed });
+        return true;
+    }
+
+    async function removeKidsKeyword(word) {
+        await ensureLoaded();
+        const kids = getKidsState();
+        const before = kids.blockedKeywords.length;
+        kids.blockedKeywords = kids.blockedKeywords.filter(entry => (entry.word || '') !== word);
+        if (kids.blockedKeywords.length === before) return false;
+        state.kids = { ...kids };
+        await persistKidsProfiles(state.kids);
+        notifyListeners('kidsKeywordRemoved', { word });
+        return true;
+    }
+
+    function normalizeKidsChannelInput(input) {
+        const raw = (input || '').trim();
+        if (!raw) return null;
+        const lower = raw.toLowerCase();
+        return {
+            name: raw,
+            id: raw,
+            handle: lower.startsWith('@') ? raw : null,
+            customUrl: lower.startsWith('c/') || lower.startsWith('/c/') ? raw.replace(/^\/?c\//i, 'c/') : null,
+            originalInput: raw,
+            addedAt: Date.now(),
+            source: 'user'
+        };
+    }
+
+    async function addKidsChannel(input) {
+        await ensureLoaded();
+        const entry = normalizeKidsChannelInput(input);
+        if (!entry) return { success: false, error: 'Empty input' };
+
+        const kids = getKidsState();
+        const exists = kids.blockedChannels.some(ch => (ch.id || ch.originalInput || '').toLowerCase() === (entry.id || entry.originalInput).toLowerCase());
+        if (exists) {
+            return { success: false, error: 'Channel already exists' };
+        }
+
+        kids.blockedChannels = [entry, ...kids.blockedChannels];
+        state.kids = { ...kids };
+        await persistKidsProfiles(state.kids);
+        notifyListeners('kidsChannelAdded', { channel: entry });
+        return { success: true, channel: entry };
+    }
+
+    async function removeKidsChannel(index) {
+        await ensureLoaded();
+        const kids = getKidsState();
+        if (index < 0 || index >= kids.blockedChannels.length) return false;
+        const channel = kids.blockedChannels[index];
+        kids.blockedChannels.splice(index, 1);
+        state.kids = { ...kids };
+        await persistKidsProfiles(state.kids);
+        notifyListeners('kidsChannelRemoved', { channel, index });
+        return true;
     }
 
     /**
@@ -270,6 +458,28 @@ const StateManager = (() => {
     async function ensureLoaded() {
         if (!state.isLoaded) {
             await loadSettings();
+        }
+    }
+
+    async function persistKidsProfiles(nextKids) {
+        const io = window.FilterTubeIO || {};
+        if (!io || typeof io.saveProfilesV3 !== 'function' || typeof io.loadProfilesV3 !== 'function') {
+            console.warn('StateManager: FilterTubeIO not available for kids persistence');
+            return;
+        }
+
+        try {
+            const existing = await io.loadProfilesV3();
+            const merged = {
+                ...existing,
+                kids: {
+                    ...existing?.kids,
+                    ...nextKids
+                }
+            };
+            await io.saveProfilesV3(merged);
+        } catch (e) {
+            console.warn('StateManager: Failed to persist kids profiles', e);
         }
     }
 
@@ -444,6 +654,8 @@ const StateManager = (() => {
                 if (!alreadyExists) {
                     state.channels.unshift(response.channel);
                     recomputeKeywords();
+                    queueChannelForEnrichment(response.channel);
+                    processChannelEnrichmentQueue();
                     notifyListeners('channelAdded', { channel: response.channel });
                 }
 
@@ -790,18 +1002,23 @@ const StateManager = (() => {
         loadSettings,
         saveSettings,
         ensureLoaded,
+        getKidsState,
 
         // Keywords
         addKeyword,
         removeKeyword,
         toggleKeywordExact,
         toggleKeywordComments,
+        addKidsKeyword,
+        removeKidsKeyword,
 
         // Channels
         addChannel,
         removeChannel,
         toggleChannelFilterAll,
         toggleChannelFilterAllCommentsByRef,
+        addKidsChannel,
+        removeKidsChannel,
 
         // Settings
         updateSetting,

@@ -415,15 +415,25 @@ sequenceDiagram
     Queue->>BG: handleAddFilteredChannel (one entry)
     BG->>YT: best-effort fetch (handle/custom URL lookup)
     BG-->>SM: sanitized channel metadata
-    SM->>Queue: wait 2s, pop next item (prevents floods/DDOS)
+    SM->>Queue: wait ~6s, pop next item (prevents floods/DDOS)
 ```
 
 Key behaviors:
 
 - **Deduping:** `channelEnrichmentAttempted` ensures each unique handle/ID is only fetched once per session.
-- **Throttle:** `processChannelEnrichmentQueue` sleeps ~2 seconds between requests, preventing burst traffic after large imports.
+- **Throttle:** `processChannelEnrichmentQueue` now sleeps a randomized 5–7 seconds between requests, preventing burst traffic after large imports.
 - **Auto-drain:** Once the queue is empty, enrichment stops until the next import or manual add; nothing persists that would keep pinging YouTube.
 - **Fallback safe:** If a fetch fails (network/offline), the entry stays without enriched data but the queue still advances—avoiding infinite retries.
+- **Instrumentation:** Every dequeued entry logs `channel enrichment start`/`complete` with queue depth, duration, and the next randomized delay so QA can confirm pacing without extra tooling.
+
+### 14.6 Kids Mode profile + UI
+
+FilterTube maintains a second profile that mirrors the main blocklists but targets **YouTube Kids** domains:
+
+- **Separate storage:** `state_manager.js` exposes `getKidsState`, `addKidsKeyword`, `addKidsChannel`, etc., which persist to `FilterTubeIO.saveProfilesV3()` under the `kids` key so main filters never leak into kids browsing.
+- **Dashboard tabs:** `tab-view.js` renders `initializeKidsTabs()` with keyword/channel managers, search & sort controls, and the same calendar presets used in the main Filters view—users can curate Kids lists without touching the main ones.
+- **Passive capture on youtubekids.com:** `content/block_channel.js` detects the native “Block this video” toast. When a parent blocks content directly inside YouTube Kids, FilterTube synthesizes a minimal channel entry and sends it to `FilterTube_KidsBlockChannel`, keeping the Kids profile in sync even if the extension UI is never opened.
+- **Shared enrichment safety:** the regular enrichment queue runs for Kids entries too, but because Kids browsing happens on a distinct domain, the throttle + logging described above prevent the passive capture flow from overwhelming background requests.
 
 
 **Motivation:**

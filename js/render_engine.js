@@ -60,7 +60,7 @@ const RenderEngine = (() => {
         if (!container) return;
 
         const StateManager = getStateManager();
-        const state = StateManager?.getState() || { keywords: [] };
+        const state = StateManager?.getState() || { keywords: [], kids: { blockedKeywords: [] } };
 
         const {
             showSearch = false,
@@ -69,11 +69,15 @@ const RenderEngine = (() => {
             searchValue = '',
             sortValue = 'newest',
             dateFrom = null,
-            dateTo = null
+            dateTo = null,
+            profile = 'main',
+            includeToggles = true,
+            onDelete = null
         } = options;
 
         // Filter and sort keywords
-        let displayKeywords = [...state.keywords];
+        const keywordsSource = profile === 'kids' ? (state.kids?.blockedKeywords || []) : state.keywords;
+        let displayKeywords = [...keywordsSource];
 
         // Apply search filter
         if (showSearch && searchValue) {
@@ -126,7 +130,7 @@ const RenderEngine = (() => {
 
         // Render each keyword
         displayKeywords.forEach(entry => {
-            const item = createKeywordListItem(entry, { minimal });
+            const item = createKeywordListItem(entry, { minimal, profile, includeToggles, onDelete });
             container.appendChild(item);
         });
     }
@@ -139,7 +143,12 @@ const RenderEngine = (() => {
      * @returns {HTMLElement} List item element
      */
     function createKeywordListItem(entry, config = {}) {
-        const { minimal = false } = config;
+        const {
+            minimal = false,
+            profile = 'main',
+            includeToggles = true,
+            onDelete = null
+        } = config;
         const StateManager = getStateManager();
         const UIComponents = getUIComponents();
         const Settings = getSettings();
@@ -174,59 +183,63 @@ const RenderEngine = (() => {
         const controls = document.createElement('div');
         controls.className = minimal ? 'keyword-controls' : 'item-controls';
 
+        const shouldShowToggles = includeToggles && profile !== 'kids';
+
         const commentsEnabled = entry.comments !== false;
-        const commentsToggleText = minimal ? 'C' : 'Comment';
-        const commentsToggle = UIComponents?.createToggleButton
-            ? UIComponents.createToggleButton({
-                text: commentsToggleText,
-                active: commentsEnabled,
-                onToggle: async () => {
-                    if (isChannelDerived) {
-                        await StateManager?.toggleChannelFilterAllCommentsByRef?.(entry.channelRef);
-                        return;
-                    }
-                    await StateManager?.toggleKeywordComments(entry.word);
-                },
-                className: 'toggle-variant-blue'
-            })
-            : (() => {
-                const toggle = document.createElement('div');
-                toggle.className = `exact-toggle toggle-variant-blue ${commentsEnabled ? 'active' : ''}`.trim();
-                toggle.textContent = commentsToggleText;
-                toggle.setAttribute('role', 'button');
-                toggle.setAttribute('aria-pressed', commentsEnabled);
-                toggle.setAttribute('tabindex', '0');
-                toggle.addEventListener('click', async () => {
-                    if (isChannelDerived) {
-                        await StateManager?.toggleChannelFilterAllCommentsByRef?.(entry.channelRef);
-                        return;
-                    }
-                    await StateManager?.toggleKeywordComments(entry.word);
-                });
-                toggle.addEventListener('keydown', async (e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
+        let commentsToggle = null;
+        if (shouldShowToggles) {
+            const commentsToggleText = minimal ? 'C' : 'Comment';
+            commentsToggle = UIComponents?.createToggleButton
+                ? UIComponents.createToggleButton({
+                    text: commentsToggleText,
+                    active: commentsEnabled,
+                    onToggle: async () => {
                         if (isChannelDerived) {
                             await StateManager?.toggleChannelFilterAllCommentsByRef?.(entry.channelRef);
                             return;
                         }
                         await StateManager?.toggleKeywordComments(entry.word);
-                    }
-                });
-                return toggle;
-            })();
+                    },
+                    className: 'toggle-variant-blue'
+                })
+                : (() => {
+                    const toggle = document.createElement('div');
+                    toggle.className = `exact-toggle toggle-variant-blue ${commentsEnabled ? 'active' : ''}`.trim();
+                    toggle.textContent = commentsToggleText;
+                    toggle.setAttribute('role', 'button');
+                    toggle.setAttribute('aria-pressed', commentsEnabled);
+                    toggle.setAttribute('tabindex', '0');
+                    toggle.addEventListener('click', async () => {
+                        if (isChannelDerived) {
+                            await StateManager?.toggleChannelFilterAllCommentsByRef?.(entry.channelRef);
+                            return;
+                        }
+                        await StateManager?.toggleKeywordComments(entry.word);
+                    });
+                    toggle.addEventListener('keydown', async (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            if (isChannelDerived) {
+                                await StateManager?.toggleChannelFilterAllCommentsByRef?.(entry.channelRef);
+                                return;
+                            }
+                            await StateManager?.toggleKeywordComments(entry.word);
+                        }
+                    });
+                    return toggle;
+                })();
 
-        commentsToggle.title = commentsEnabled
-            ? 'Keyword applies to comment filtering'
-            : 'Keyword does not apply to comment filtering';
-        // Channel-derived keywords are now toggleable (persisted on the channel entry).
+            commentsToggle.title = commentsEnabled
+                ? 'Keyword applies to comment filtering'
+                : 'Keyword does not apply to comment filtering';
+        }
 
-        if (isChannelDerived) {
+        if (isChannelDerived && shouldShowToggles) {
             const badge = createSourceBadge({
                 sourceKey: channelDerivedSourceKey,
                 title: 'Auto-added by "Filter All Content" - managed in Channel Management'
             });
-            controls.appendChild(commentsToggle);
+            if (commentsToggle) controls.appendChild(commentsToggle);
 
             if (!minimal) {
                 controls.appendChild(badge);
@@ -243,7 +256,7 @@ const RenderEngine = (() => {
                     left.appendChild(originLabel);
                 }
             }
-        } else {
+        } else if (!isChannelDerived && shouldShowToggles) {
             // User keyword: show exact toggle and delete button
 
             // Exact toggle
@@ -290,6 +303,24 @@ const RenderEngine = (() => {
             }
 
             controls.appendChild(deleteBtn);
+        } else {
+            // Kids profile: simple delete-only control
+            const deleteBtn = UIComponents?.createDeleteButton
+                ? UIComponents.createDeleteButton(async () => {
+                    if (typeof onDelete === 'function') {
+                        await onDelete(entry.word);
+                    } else {
+                        await StateManager?.removeKidsKeyword?.(entry.word);
+                    }
+                })
+                : createFallbackDeleteButton(async () => {
+                    if (typeof onDelete === 'function') {
+                        await onDelete(entry.word);
+                    } else {
+                        await StateManager?.removeKidsKeyword?.(entry.word);
+                    }
+                });
+            controls.appendChild(deleteBtn);
         }
 
         item.appendChild(left);
@@ -311,8 +342,7 @@ const RenderEngine = (() => {
         if (!container) return;
 
         const StateManager = getStateManager();
-        const state = StateManager?.getState() || { channels: [] };
-        const { groups: collaborationGroups } = groupChannelsByCollaboration(state.channels);
+        const state = StateManager?.getState() || { channels: [], kids: { blockedChannels: [] } };
 
         const {
             showSearch = false,
@@ -322,11 +352,18 @@ const RenderEngine = (() => {
             searchValue = '',
             sortValue = 'newest',
             dateFrom = null,
-            dateTo = null
+            dateTo = null,
+            profile = 'main',
+            onDelete = null
         } = options;
 
+        const channelsSource = profile === 'kids'
+            ? (state.kids?.blockedChannels || [])
+            : state.channels;
+        const { groups: collaborationGroups } = groupChannelsByCollaboration(state.channels);
+
         // Filter and sort channels
-        let displayChannels = [...state.channels];
+        let displayChannels = [...channelsSource];
 
         // Apply search filter
         if (showSearch && searchValue) {
@@ -386,7 +423,9 @@ const RenderEngine = (() => {
             return createChannelListItem(channel, originalIndex, {
                 minimal,
                 showNodeMapping,
-                collaborationMeta
+                collaborationMeta,
+                profile,
+                onDelete
             });
         };
 

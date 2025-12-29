@@ -559,20 +559,24 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
     const action = request?.action || request?.type;
 
     if (request.action === "getCompiledSettings") {
-        console.log("FilterTube Background: Received getCompiledSettings message.");
-        getCompiledSettings().then(compiledSettings => {
-            // Check for runtime.lastError to catch any errors during storage access within getCompiledSettings
-            if (browserAPI.runtime.lastError) {
-                console.error("FilterTube Background: Error retrieving settings from storage:", browserAPI.runtime.lastError);
-                sendResponse({ error: browserAPI.runtime.lastError.message });
-            } else {
-                sendResponse(compiledSettings);
-            }
-        }).catch(error => {
-            // Catch any other errors from the promise chain
-            console.error("FilterTube Background: Unhandled error in getCompiledSettings promise:", error);
-            sendResponse({ error: error.message || "Unknown error occurred while compiling settings." });
-        });
+        if (compiledSettingsCache) {
+            sendResponse({ settings: compiledSettingsCache });
+        } else {
+            console.log("FilterTube Background: Received getCompiledSettings message.");
+            getCompiledSettings().then(compiledSettings => {
+                // Check for runtime.lastError to catch any errors during storage access within getCompiledSettings
+                if (browserAPI.runtime.lastError) {
+                    console.error("FilterTube Background: Error retrieving settings from storage:", browserAPI.runtime.lastError);
+                    sendResponse({ error: browserAPI.runtime.lastError.message });
+                } else {
+                    sendResponse(compiledSettings);
+                }
+            }).catch(error => {
+                // Catch any other errors from the promise chain
+                console.error("FilterTube Background: Unhandled error in getCompiledSettings promise:", error);
+                sendResponse({ error: error.message || "Unknown error occurred while compiling settings." });
+            });
+        }
         return true; // Indicates that the response is sent asynchronously.
     } else if (request.action === "injectScripts") {
         // Handle script injection via Chrome scripting API

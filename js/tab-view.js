@@ -256,6 +256,108 @@ function initializeFiltersTabs() {
     });
 }
 
+// Kids Mode tabs (mirrors Filters tabs but without content controls/comments)
+function initializeKidsTabs() {
+    const container = document.getElementById('kidsTabsContainer');
+    if (!container) return;
+
+    // Kids Keywords tab
+    const kidsKeywordsContent = document.createElement('div');
+    kidsKeywordsContent.innerHTML = `
+        <div class="input-row">
+            <input type="text" id="kidsKeywordInput" class="text-input" placeholder="Enter keyword to block on Kids..." />
+            <button id="kidsAddKeywordBtn" class="btn-primary">Add Keyword</button>
+        </div>
+
+        <div class="filter-controls">
+            <input type="text" id="kidsSearchKeywords" class="search-input" placeholder="Search keywords..." />
+            <div class="sort-controls">
+                <span class="label">Sort by:</span>
+                <select id="kidsKeywordSort" class="select-input">
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="az">A-Z</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="date-filter-controls">
+            <div class="date-range-controls">
+                <span class="label">Date:</span>
+                <select id="kidsKeywordDatePreset" class="select-input">
+                    <option value="all">All time</option>
+                    <option value="today">Today</option>
+                    <option value="7d">Last 7 days</option>
+                    <option value="30d">Last 30 days</option>
+                    <option value="custom">Custom</option>
+                </select>
+            </div>
+            <div class="date-inputs">
+                <input type="date" id="kidsKeywordDateFrom" class="select-input date-input" />
+                <span class="date-sep">to</span>
+                <input type="date" id="kidsKeywordDateTo" class="select-input date-input" />
+                <button id="kidsKeywordDateClear" class="btn-secondary date-clear-btn" type="button">Clear</button>
+            </div>
+        </div>
+
+        <div id="kidsKeywordListEl" class="advanced-list"></div>
+    `;
+
+    // Kids Channels tab
+    const kidsChannelsContent = document.createElement('div');
+    kidsChannelsContent.innerHTML = `
+        <div class="input-row">
+            <input type="text" id="kidsChannelInput" class="text-input" placeholder="@handle, Channel ID, or c/ChannelName" />
+            <button id="kidsAddChannelBtn" class="btn-primary">Add Channel</button>
+        </div>
+
+        <div class="filter-controls">
+            <input type="text" id="kidsSearchChannels" class="search-input" placeholder="Search channels..." />
+            <div class="sort-controls">
+                <span class="label">Sort by:</span>
+                <select id="kidsChannelSort" class="select-input">
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="az">A-Z</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="date-filter-controls">
+            <div class="date-range-controls">
+                <span class="label">Date:</span>
+                <select id="kidsChannelDatePreset" class="select-input">
+                    <option value="all">All time</option>
+                    <option value="today">Today</option>
+                    <option value="7d">Last 7 days</option>
+                    <option value="30d">Last 30 days</option>
+                    <option value="custom">Custom</option>
+                </select>
+            </div>
+            <div class="date-inputs">
+                <input type="date" id="kidsChannelDateFrom" class="select-input date-input" />
+                <span class="date-sep">to</span>
+                <input type="date" id="kidsChannelDateTo" class="select-input date-input" />
+                <button id="kidsChannelDateClear" class="btn-secondary date-clear-btn" type="button">Clear</button>
+            </div>
+        </div>
+
+        <div id="kidsChannelListEl" class="advanced-list"></div>
+    `;
+
+    const tabs = UIComponents.createTabs({
+        tabs: [
+            { id: 'kidsKeywords', label: 'Keyword Management', content: kidsKeywordsContent },
+            { id: 'kidsChannels', label: 'Channel Management', content: kidsChannelsContent }
+        ],
+        defaultTab: 'kidsKeywords'
+    });
+
+    container.appendChild(tabs.container);
+}
+// Expose for safety in case other modules call it
+window.initializeKidsTabs = initializeKidsTabs;
+
 // ============================================================================
 // MAIN INITIALIZATION
 // ============================================================================
@@ -417,6 +519,7 @@ async function loadReleaseNotesIntoDashboard() {
 document.addEventListener('DOMContentLoaded', async () => {
     // Initialize UI
     initializeFiltersTabs();
+    initializeKidsTabs();
     setupNavigation();
 
     // Get DOM elements
@@ -495,6 +598,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             renderChannels();
             renderKeywords(); // Re-render keywords in case channel-derived keywords changed
             updateStats();
+        }
+
+        if (['kidsKeywordAdded', 'kidsKeywordRemoved', 'load', 'save'].includes(eventType)) {
+            renderKidsKeywords();
+        }
+
+        if (['kidsChannelAdded', 'kidsChannelRemoved', 'load', 'save'].includes(eventType)) {
+            renderKidsChannels();
         }
 
         if (eventType === 'settingUpdated') {
@@ -586,6 +697,36 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    // Kids UI refs & state
+    const kidsKeywordInput = document.getElementById('kidsKeywordInput');
+    const kidsAddKeywordBtn = document.getElementById('kidsAddKeywordBtn');
+    const kidsKeywordListEl = document.getElementById('kidsKeywordListEl');
+    const kidsSearchKeywords = document.getElementById('kidsSearchKeywords');
+    const kidsKeywordSort = document.getElementById('kidsKeywordSort');
+    const kidsKeywordDatePreset = document.getElementById('kidsKeywordDatePreset');
+    const kidsKeywordDateFrom = document.getElementById('kidsKeywordDateFrom');
+    const kidsKeywordDateTo = document.getElementById('kidsKeywordDateTo');
+    const kidsKeywordDateClear = document.getElementById('kidsKeywordDateClear');
+
+    const kidsChannelInput = document.getElementById('kidsChannelInput');
+    const kidsAddChannelBtn = document.getElementById('kidsAddChannelBtn');
+    const kidsChannelListEl = document.getElementById('kidsChannelListEl');
+    const kidsSearchChannels = document.getElementById('kidsSearchChannels');
+    const kidsChannelSort = document.getElementById('kidsChannelSort');
+    const kidsChannelDatePreset = document.getElementById('kidsChannelDatePreset');
+    const kidsChannelDateFrom = document.getElementById('kidsChannelDateFrom');
+    const kidsChannelDateTo = document.getElementById('kidsChannelDateTo');
+    const kidsChannelDateClear = document.getElementById('kidsChannelDateClear');
+
+    let kidsKeywordSearchValue = '';
+    let kidsKeywordSortValue = 'newest';
+    let kidsKeywordDateFromTs = null;
+    let kidsKeywordDateToTs = null;
+    let kidsChannelSearchValue = '';
+    let kidsChannelSortValue = 'newest';
+    let kidsChannelDateFromTs = null;
+    let kidsChannelDateToTs = null;
+
     // ============================================================================
     // RENDERING
     // ============================================================================
@@ -661,6 +802,36 @@ document.addEventListener('DOMContentLoaded', async () => {
             sortValue: channelSortValue,
             dateFrom: channelDateFromTs,
             dateTo: channelDateToTs
+        });
+    }
+
+    function renderKidsKeywords() {
+        if (!kidsKeywordListEl) return;
+        RenderEngine.renderKeywordList(kidsKeywordListEl, {
+            minimal: false,
+            showSearch: true,
+            showSort: true,
+            searchValue: kidsKeywordSearchValue,
+            sortValue: kidsKeywordSortValue,
+            dateFrom: kidsKeywordDateFromTs,
+            dateTo: kidsKeywordDateToTs,
+            profile: 'kids',
+            includeToggles: false
+        });
+    }
+
+    function renderKidsChannels() {
+        if (!kidsChannelListEl) return;
+        RenderEngine.renderChannelList(kidsChannelListEl, {
+            minimal: false,
+            showSearch: true,
+            showSort: true,
+            showNodeMapping: false,
+            searchValue: kidsChannelSearchValue,
+            sortValue: kidsChannelSortValue,
+            dateFrom: kidsChannelDateFromTs,
+            dateTo: kidsChannelDateToTs,
+            profile: 'kids'
         });
     }
 
@@ -753,6 +924,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Initial render
     renderKeywords();
     renderChannels();
+    renderKidsKeywords();
+    renderKidsChannels();
     updateCheckboxes();
     filterContentControls();
     updateStats();
@@ -942,6 +1115,163 @@ document.addEventListener('DOMContentLoaded', async () => {
             channelDateFromTs = null;
             channelDateToTs = null;
             renderChannels();
+        });
+    }
+
+    // Kids event handlers
+    if (kidsAddKeywordBtn) {
+        kidsAddKeywordBtn.addEventListener('click', async () => {
+            const word = (kidsKeywordInput?.value || '').trim();
+            if (!word) return;
+            const success = await StateManager.addKidsKeyword(word);
+            if (success) {
+                if (kidsKeywordInput) kidsKeywordInput.value = '';
+                UIComponents.flashButtonSuccess(kidsAddKeywordBtn, 'Added!', 1200);
+            }
+        });
+    }
+
+    if (kidsKeywordInput) {
+        kidsKeywordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && kidsAddKeywordBtn) {
+                kidsAddKeywordBtn.click();
+            }
+        });
+    }
+
+    if (kidsSearchKeywords) {
+        kidsSearchKeywords.addEventListener('input', (e) => {
+            kidsKeywordSearchValue = e.target.value;
+            renderKidsKeywords();
+        });
+    }
+
+    if (kidsKeywordSort) {
+        kidsKeywordSort.addEventListener('change', (e) => {
+            kidsKeywordSortValue = e.target.value;
+            renderKidsKeywords();
+        });
+    }
+
+    function updateKidsKeywordDateFilterFromInputs() {
+        kidsKeywordDateFromTs = parseDateInput(kidsKeywordDateFrom?.value || '', false);
+        kidsKeywordDateToTs = parseDateInput(kidsKeywordDateTo?.value || '', true);
+        renderKidsKeywords();
+    }
+
+    if (kidsKeywordDatePreset) {
+        kidsKeywordDatePreset.addEventListener('change', (e) => {
+            const preset = e.target.value;
+            if (preset !== 'custom') {
+                applyPresetToDateControls(preset, kidsKeywordDateFrom, kidsKeywordDateTo);
+                kidsKeywordDateFromTs = parseDateInput(kidsKeywordDateFrom?.value || '', false);
+                kidsKeywordDateToTs = parseDateInput(kidsKeywordDateTo?.value || '', true);
+                renderKidsKeywords();
+            }
+        });
+    }
+
+    if (kidsKeywordDateFrom) {
+        kidsKeywordDateFrom.addEventListener('change', () => {
+            if (kidsKeywordDatePreset) kidsKeywordDatePreset.value = 'custom';
+            updateKidsKeywordDateFilterFromInputs();
+        });
+    }
+
+    if (kidsKeywordDateTo) {
+        kidsKeywordDateTo.addEventListener('change', () => {
+            if (kidsKeywordDatePreset) kidsKeywordDatePreset.value = 'custom';
+            updateKidsKeywordDateFilterFromInputs();
+        });
+    }
+
+    if (kidsKeywordDateClear) {
+        kidsKeywordDateClear.addEventListener('click', () => {
+            if (kidsKeywordDatePreset) kidsKeywordDatePreset.value = 'all';
+            if (kidsKeywordDateFrom) kidsKeywordDateFrom.value = '';
+            if (kidsKeywordDateTo) kidsKeywordDateTo.value = '';
+            kidsKeywordDateFromTs = null;
+            kidsKeywordDateToTs = null;
+            renderKidsKeywords();
+        });
+    }
+
+    if (kidsAddChannelBtn) {
+        kidsAddChannelBtn.addEventListener('click', async () => {
+            const input = (kidsChannelInput?.value || '').trim();
+            if (!input) return;
+            const result = await StateManager.addKidsChannel(input);
+            if (result.success) {
+                if (kidsChannelInput) kidsChannelInput.value = '';
+                UIComponents.flashButtonSuccess(kidsAddChannelBtn, 'Added!', 1200);
+            } else {
+                UIComponents.showToast(result.error || 'Failed to add channel', 'error');
+            }
+        });
+    }
+
+    if (kidsChannelInput) {
+        kidsChannelInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && kidsAddChannelBtn) {
+                kidsAddChannelBtn.click();
+            }
+        });
+    }
+
+    if (kidsSearchChannels) {
+        kidsSearchChannels.addEventListener('input', (e) => {
+            kidsChannelSearchValue = e.target.value;
+            renderKidsChannels();
+        });
+    }
+
+    if (kidsChannelSort) {
+        kidsChannelSort.addEventListener('change', (e) => {
+            kidsChannelSortValue = e.target.value;
+            renderKidsChannels();
+        });
+    }
+
+    function updateKidsChannelDateFilterFromInputs() {
+        kidsChannelDateFromTs = parseDateInput(kidsChannelDateFrom?.value || '', false);
+        kidsChannelDateToTs = parseDateInput(kidsChannelDateTo?.value || '', true);
+        renderKidsChannels();
+    }
+
+    if (kidsChannelDatePreset) {
+        kidsChannelDatePreset.addEventListener('change', (e) => {
+            const preset = e.target.value;
+            if (preset !== 'custom') {
+                applyPresetToDateControls(preset, kidsChannelDateFrom, kidsChannelDateTo);
+                kidsChannelDateFromTs = parseDateInput(kidsChannelDateFrom?.value || '', false);
+                kidsChannelDateToTs = parseDateInput(kidsChannelDateTo?.value || '', true);
+                renderKidsChannels();
+            }
+        });
+    }
+
+    if (kidsChannelDateFrom) {
+        kidsChannelDateFrom.addEventListener('change', () => {
+            if (kidsChannelDatePreset) kidsChannelDatePreset.value = 'custom';
+            updateKidsChannelDateFilterFromInputs();
+        });
+    }
+
+    if (kidsChannelDateTo) {
+        kidsChannelDateTo.addEventListener('change', () => {
+            if (kidsChannelDatePreset) kidsChannelDatePreset.value = 'custom';
+            updateKidsChannelDateFilterFromInputs();
+        });
+    }
+
+    if (kidsChannelDateClear) {
+        kidsChannelDateClear.addEventListener('click', () => {
+            if (kidsChannelDatePreset) kidsChannelDatePreset.value = 'all';
+            if (kidsChannelDateFrom) kidsChannelDateFrom.value = '';
+            if (kidsChannelDateTo) kidsChannelDateTo.value = '';
+            kidsChannelDateFromTs = null;
+            kidsChannelDateToTs = null;
+            renderKidsChannels();
         });
     }
 

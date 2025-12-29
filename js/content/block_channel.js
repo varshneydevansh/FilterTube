@@ -2,6 +2,7 @@
  * Track the last clicked 3-dot button to find associated video card
  */
 let lastClickedMenuButton = null;
+const isKidsSite = typeof location !== 'undefined' && location.hostname.includes('youtubekids.com');
 
 /**
  * Track which dropdowns we've already injected into (prevent flashing)
@@ -40,6 +41,11 @@ const pendingDropdownFetches = new WeakMap();
  * Observe dropdowns and inject FilterTube menu items
  */
 function setupMenuObserver() {
+    if (isKidsSite) {
+        setupKidsPassiveBlockListener();
+        return;
+    }
+
     // Track clicks on 3-dot buttons (comprehensive selectors for all YouTube contexts)
     document.addEventListener('click', (e) => {
         const menuButton = e.target.closest(
@@ -128,6 +134,59 @@ function setupMenuObserver() {
     };
 
     startObserver();
+}
+
+/**
+ * YouTube Kids: passively listen to native "Block this video" toast and sync to kids profile.
+ * We do NOT inject custom menu items on Kids; we only piggyback on the native block action.
+ */
+function setupKidsPassiveBlockListener() {
+    document.addEventListener('click', (e) => {
+        const menuButton = e.target.closest('ytk-menu-renderer tp-yt-paper-icon-button, tp-yt-paper-icon-button#menu-button');
+        if (menuButton) {
+            lastClickedMenuButton = menuButton;
+        }
+    }, true);
+
+    const waitBody = () => {
+        if (!document.body) return void setTimeout(waitBody, 100);
+        const observer = new MutationObserver((mutations) => {
+            for (const m of mutations) {
+                for (const node of m.addedNodes) {
+                    if (!(node instanceof Element)) continue;
+                    const toast = node.matches?.('tp-yt-paper-toast#toast') ? node : node.querySelector?.('tp-yt-paper-toast#toast');
+                    if (toast && toast.textContent?.toLowerCase().includes('video blocked')) {
+                        handleKidsNativeBlock().catch(err => console.error('FilterTube: Kids native block handler error', err));
+                    }
+                }
+            }
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+    };
+    waitBody();
+}
+
+async function handleKidsNativeBlock() {
+    if (!lastClickedMenuButton) return;
+    const card = lastClickedMenuButton.closest('ytk-compact-video-renderer, ytk-grid-video-renderer, ytk-video-renderer');
+    if (!card) return;
+
+    const title = (card.querySelector('#video-title, .title, h3, h4')?.textContent || '').trim();
+    const channelText = (card.querySelector('[href*="/channel/"], [href*="/user/"], .metadata, .byline, .channel-name')?.textContent || '').trim();
+    const channelEntry = channelText || title || 'Blocked from YT Kids';
+
+    chrome.runtime?.sendMessage({
+        action: 'FilterTube_KidsBlockChannel',
+        channel: {
+            name: channelEntry,
+            id: channelEntry,
+            handle: null,
+            customUrl: null,
+            originalInput: channelEntry,
+            source: 'kidsNative',
+            addedAt: Date.now()
+        }
+    });
 }
 
 /**
