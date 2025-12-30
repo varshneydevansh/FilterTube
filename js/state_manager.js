@@ -346,6 +346,54 @@ const StateManager = (() => {
         return true;
     }
 
+    /**
+     * Toggle "comments" flag for a Kids keyword entry.
+     * Mirrors main behavior, but persists inside ftProfilesV3.kids.blockedKeywords.
+     */
+    async function toggleKidsKeywordComments(word) {
+        await ensureLoaded();
+        const kids = getKidsState();
+        const index = kids.blockedKeywords.findIndex(k => (k?.word || '') === word);
+        if (index < 0) return null;
+
+        const entry = kids.blockedKeywords[index] && typeof kids.blockedKeywords[index] === 'object'
+            ? { ...kids.blockedKeywords[index] }
+            : null;
+        if (!entry) return null;
+
+        // Default is comments enabled (same as main)
+        const current = entry.comments !== false;
+        entry.comments = !current;
+        kids.blockedKeywords[index] = entry;
+        state.kids = { ...kids };
+        await persistKidsProfiles(state.kids);
+        notifyListeners('kidsKeywordUpdated', { word, comments: entry.comments !== false });
+        return entry.comments !== false;
+    }
+
+    /**
+     * Toggle "exact" flag for a Kids keyword entry.
+     * Mirrors main behavior, but persists inside ftProfilesV3.kids.blockedKeywords.
+     */
+    async function toggleKidsKeywordExact(word) {
+        await ensureLoaded();
+        const kids = getKidsState();
+        const index = kids.blockedKeywords.findIndex(k => (k?.word || '') === word);
+        if (index < 0) return null;
+
+        const entry = kids.blockedKeywords[index] && typeof kids.blockedKeywords[index] === 'object'
+            ? { ...kids.blockedKeywords[index] }
+            : null;
+        if (!entry) return null;
+
+        entry.exact = !entry.exact;
+        kids.blockedKeywords[index] = entry;
+        state.kids = { ...kids };
+        await persistKidsProfiles(state.kids);
+        notifyListeners('kidsKeywordUpdated', { word, exact: !!entry.exact });
+        return !!entry.exact;
+    }
+
     function normalizeKidsChannelInput(input) {
         const raw = (input || '').trim();
         if (!raw) return null;
@@ -389,6 +437,32 @@ const StateManager = (() => {
         await persistKidsProfiles(state.kids);
         notifyListeners('kidsChannelRemoved', { channel, index });
         return true;
+    }
+
+    /**
+     * Toggle "Filter All Content" for a Kids channel.
+     * This mirrors main behavior, but persists inside ftProfilesV3.kids.blockedChannels.
+     */
+    async function toggleKidsChannelFilterAll(index) {
+        await ensureLoaded();
+        const kids = getKidsState();
+        if (index < 0 || index >= kids.blockedChannels.length) return false;
+
+        const existing = kids.blockedChannels[index] && typeof kids.blockedChannels[index] === 'object'
+            ? kids.blockedChannels[index]
+            : null;
+        if (!existing) return false;
+
+        existing.filterAll = !existing.filterAll;
+        kids.blockedChannels[index] = { ...existing };
+        state.kids = { ...kids };
+        await persistKidsProfiles(state.kids);
+        notifyListeners('kidsChannelUpdated', {
+            channel: kids.blockedChannels[index],
+            index,
+            filterAll: kids.blockedChannels[index].filterAll
+        });
+        return kids.blockedChannels[index].filterAll;
     }
 
     /**
@@ -1011,6 +1085,8 @@ const StateManager = (() => {
         toggleKeywordComments,
         addKidsKeyword,
         removeKidsKeyword,
+        toggleKidsKeywordExact,
+        toggleKidsKeywordComments,
 
         // Channels
         addChannel,
@@ -1019,6 +1095,7 @@ const StateManager = (() => {
         toggleChannelFilterAllCommentsByRef,
         addKidsChannel,
         removeKidsChannel,
+        toggleKidsChannelFilterAll,
 
         // Settings
         updateSetting,

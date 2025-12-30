@@ -676,6 +676,12 @@ async function prefetchIdentityForCard({ videoId, card }) {
     try {
         if (!card || !card.isConnected) return;
 
+        // YouTube Kids runs on a different origin. Fetching www.youtube.com/watch from
+        // youtubekids.com is blocked by CORS, and Kids identity is handled via native flows.
+        if (typeof location !== 'undefined' && String(location.hostname || '').includes('youtubekids.com')) {
+            return;
+        }
+
         // If settings already know this mapping, bail early
         if (currentSettings?.videoChannelMap && currentSettings.videoChannelMap[videoId]) {
             return;
@@ -3693,6 +3699,11 @@ async function fetchChannelFromShortsUrlDirect(videoId, requestedHandle = null, 
  * @returns {Promise<Object|null>} - {id, handle, name, customUrl} or null
  */
 async function fetchChannelFromWatchUrl(videoId, requestedHandle = null) {
+    // Never attempt cross-origin watch fetch on YouTube Kids.
+    if (typeof location !== 'undefined' && String(location.hostname || '').includes('youtubekids.com')) {
+        return null;
+    }
+
     if (!videoId || typeof videoId !== 'string' || videoId.length !== 11) {
         console.warn('FilterTube: Invalid videoId for watch fetch:', videoId);
         return null;

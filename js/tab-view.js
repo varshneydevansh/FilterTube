@@ -816,7 +816,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             dateFrom: kidsKeywordDateFromTs,
             dateTo: kidsKeywordDateToTs,
             profile: 'kids',
-            includeToggles: false
+            includeToggles: true
         });
     }
 
@@ -826,7 +826,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             minimal: false,
             showSearch: true,
             showSort: true,
-            showNodeMapping: false,
+            showNodeMapping: true,
             searchValue: kidsChannelSearchValue,
             sortValue: kidsChannelSortValue,
             dateFrom: kidsChannelDateFromTs,

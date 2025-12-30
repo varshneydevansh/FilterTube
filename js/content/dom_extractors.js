@@ -29,7 +29,14 @@ const VIDEO_CARD_SELECTORS = [
     'ytd-channel-video-player-renderer',
     'ytd-channel-featured-content-renderer',
     'ytm-shorts-lockup-view-model',
-    'ytm-shorts-lockup-view-model-v2'
+    'ytm-shorts-lockup-view-model-v2',
+
+    // YouTube Kids (DOM-only)
+    'ytk-compact-video-renderer',
+    'ytk-grid-video-renderer',
+    'ytk-video-renderer',
+    'ytk-compact-channel-renderer',
+    'ytk-compact-playlist-renderer'
 ].join(', ');
 
 function ensureVideoIdForCard(card) {

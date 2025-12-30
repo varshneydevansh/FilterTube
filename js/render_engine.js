@@ -183,7 +183,7 @@ const RenderEngine = (() => {
         const controls = document.createElement('div');
         controls.className = minimal ? 'keyword-controls' : 'item-controls';
 
-        const shouldShowToggles = includeToggles && profile !== 'kids';
+        const shouldShowToggles = includeToggles;
 
         const commentsEnabled = entry.comments !== false;
         let commentsToggle = null;
@@ -196,6 +196,11 @@ const RenderEngine = (() => {
                     onToggle: async () => {
                         if (isChannelDerived) {
                             await StateManager?.toggleChannelFilterAllCommentsByRef?.(entry.channelRef);
+                            return;
+                        }
+
+                        if (profile === 'kids') {
+                            await StateManager?.toggleKidsKeywordComments?.(entry.word);
                             return;
                         }
                         await StateManager?.toggleKeywordComments(entry.word);
@@ -214,6 +219,11 @@ const RenderEngine = (() => {
                             await StateManager?.toggleChannelFilterAllCommentsByRef?.(entry.channelRef);
                             return;
                         }
+
+                        if (profile === 'kids') {
+                            await StateManager?.toggleKidsKeywordComments?.(entry.word);
+                            return;
+                        }
                         await StateManager?.toggleKeywordComments(entry.word);
                     });
                     toggle.addEventListener('keydown', async (e) => {
@@ -221,6 +231,11 @@ const RenderEngine = (() => {
                             e.preventDefault();
                             if (isChannelDerived) {
                                 await StateManager?.toggleChannelFilterAllCommentsByRef?.(entry.channelRef);
+                                return;
+                            }
+
+                            if (profile === 'kids') {
+                                await StateManager?.toggleKidsKeywordComments?.(entry.word);
                                 return;
                             }
                             await StateManager?.toggleKeywordComments(entry.word);
@@ -234,7 +249,7 @@ const RenderEngine = (() => {
                 : 'Keyword does not apply to comment filtering';
         }
 
-        if (isChannelDerived && shouldShowToggles) {
+        if (isChannelDerived && shouldShowToggles && profile !== 'kids') {
             const badge = createSourceBadge({
                 sourceKey: channelDerivedSourceKey,
                 title: 'Auto-added by "Filter All Content" - managed in Channel Management'
@@ -266,6 +281,10 @@ const RenderEngine = (() => {
                     text: exactToggleText,
                     active: entry.exact,
                     onToggle: async () => {
+                        if (profile === 'kids') {
+                            await StateManager?.toggleKidsKeywordExact?.(entry.word);
+                            return;
+                        }
                         await StateManager?.toggleKeywordExact(entry.word);
                         // Re-render will be triggered by state change listener
                     },
@@ -276,10 +295,18 @@ const RenderEngine = (() => {
             // Delete button
             const deleteBtn = UIComponents?.createDeleteButton ?
                 UIComponents.createDeleteButton(async () => {
+                    if (profile === 'kids') {
+                        await StateManager?.removeKidsKeyword?.(entry.word);
+                        return;
+                    }
                     await StateManager?.removeKeyword(entry.word);
                     // Re-render will be triggered by state change listener
                 }) :
                 createFallbackDeleteButton(async () => {
+                    if (profile === 'kids') {
+                        await StateManager?.removeKidsKeyword?.(entry.word);
+                        return;
+                    }
                     await StateManager?.removeKeyword(entry.word);
                 });
 
@@ -292,7 +319,7 @@ const RenderEngine = (() => {
             }
 
             // In full UI, add semantic toggle (disabled for now)
-            if (!minimal) {
+            if (!minimal && profile !== 'kids') {
                 const semanticToggle = document.createElement('div');
                 semanticToggle.className = 'exact-toggle toggle-variant-purple';
                 semanticToggle.textContent = 'Semantic';
@@ -304,7 +331,7 @@ const RenderEngine = (() => {
 
             controls.appendChild(deleteBtn);
         } else {
-            // Kids profile: simple delete-only control
+            // Channel-derived entries in Kids profile: show delete-only control
             const deleteBtn = UIComponents?.createDeleteButton
                 ? UIComponents.createDeleteButton(async () => {
                     if (typeof onDelete === 'function') {
@@ -417,10 +444,11 @@ const RenderEngine = (() => {
             return;
         }
 
-        const renderChannelRow = (channel) => {
+        const renderChannelRow = (channel, displayIndex) => {
             const originalIndex = state.channels.indexOf(channel);
-            const collaborationMeta = buildCollaborationMeta(channel, collaborationGroups);
-            return createChannelListItem(channel, originalIndex, {
+            const listIndex = (profile === 'kids') ? displayIndex : originalIndex;
+            const collaborationMeta = (profile === 'kids') ? null : buildCollaborationMeta(channel, collaborationGroups);
+            return createChannelListItem(channel, listIndex, {
                 minimal,
                 showNodeMapping,
                 collaborationMeta,
@@ -431,16 +459,16 @@ const RenderEngine = (() => {
 
         // Popup/minimal mode renders a flat list with subtle indicators only
         if (minimal) {
-            displayChannels.forEach(channel => {
-                const item = renderChannelRow(channel);
+            displayChannels.forEach((channel, displayIndex) => {
+                const item = renderChannelRow(channel, displayIndex);
                 container.appendChild(item);
             });
             return;
         }
 
         // Render channels in the exact order of the filtered/sorted list.
-        displayChannels.forEach(channel => {
-            const item = renderChannelRow(channel);
+        displayChannels.forEach((channel, displayIndex) => {
+            const item = renderChannelRow(channel, displayIndex);
             container.appendChild(item);
         });
     }
@@ -559,22 +587,23 @@ const RenderEngine = (() => {
         const {
             minimal = false,
             showNodeMapping = false,
-            collaborationMeta = null
+            collaborationMeta = null,
+            profile = 'main'
         } = config;
         const StateManager = getStateManager();
         const UIComponents = getUIComponents();
 
         if (minimal) {
-            return createMinimalChannelItem(channel, index, collaborationMeta);
+            return createMinimalChannelItem(channel, index, collaborationMeta, profile);
         } else {
-            return createFullChannelItem(channel, index, showNodeMapping, collaborationMeta);
+            return createFullChannelItem(channel, index, showNodeMapping, collaborationMeta, profile);
         }
     }
 
     /**
      * Create minimal channel item (for popup)
      */
-    function createMinimalChannelItem(channel, index, collaborationMeta) {
+    function createMinimalChannelItem(channel, index, collaborationMeta, profile) {
         const StateManager = getStateManager();
         const UIComponents = getUIComponents();
 
@@ -602,13 +631,17 @@ const RenderEngine = (() => {
         const controls = document.createElement('div');
         controls.className = 'keyword-controls';
 
-        const deleteBtn = UIComponents?.createDeleteButton ?
-            UIComponents.createDeleteButton(async () => {
-                await StateManager?.removeChannel(index);
-            }) :
-            createFallbackDeleteButton(async () => {
-                await StateManager?.removeChannel(index);
-            });
+        const deleteHandler = async () => {
+            if (profile === 'kids') {
+                await StateManager?.removeKidsChannel?.(index);
+                return;
+            }
+            await StateManager?.removeChannel(index);
+        };
+
+        const deleteBtn = UIComponents?.createDeleteButton
+            ? UIComponents.createDeleteButton(deleteHandler)
+            : createFallbackDeleteButton(deleteHandler);
 
         controls.appendChild(deleteBtn);
 
@@ -621,7 +654,7 @@ const RenderEngine = (() => {
     /**
      * Create full channel item (for tab-view)
      */
-    function createFullChannelItem(channel, index, showNodeMapping, collaborationMeta) {
+    function createFullChannelItem(channel, index, showNodeMapping, collaborationMeta, profile) {
         const StateManager = getStateManager();
         const Settings = getSettings();
 
@@ -681,6 +714,10 @@ const RenderEngine = (() => {
         deleteBtn.className = 'delete-btn';
         deleteBtn.innerHTML = '×';
         deleteBtn.addEventListener('click', async () => {
+            if (profile === 'kids') {
+                await StateManager?.removeKidsChannel?.(index);
+                return;
+            }
             await StateManager?.removeChannel(index);
         });
 
@@ -699,7 +736,7 @@ const RenderEngine = (() => {
         }
 
         // Filter All toggle
-        const filterAllToggle = createFilterAllToggle(channel, index);
+        const filterAllToggle = createFilterAllToggle(channel, index, profile);
         bodyRow.appendChild(filterAllToggle);
 
         item.appendChild(bodyRow);
@@ -753,7 +790,7 @@ const RenderEngine = (() => {
     /**
      * Create Filter All Content toggle
      */
-    function createFilterAllToggle(channel, index) {
+    function createFilterAllToggle(channel, index, profile = 'main') {
         const StateManager = getStateManager();
         const UIComponents = getUIComponents();
 
@@ -763,12 +800,16 @@ const RenderEngine = (() => {
                 text: 'Filter All',
                 active: channel.filterAll || false,
                 onToggle: async () => {
+                    if (profile === 'kids') {
+                        await StateManager?.toggleKidsChannelFilterAll?.(index);
+                        return;
+                    }
                     await StateManager?.toggleChannelFilterAll(index);
                 },
                 className: 'toggle-variant-red',
                 title: `Automatically adds "${channel.name || channel.handle || channel.id}" as a fuzzy keyword filter - hides any content mentioning this channel name`
             }) :
-            createFallbackFilterAllToggle(channel, index);
+            createFallbackFilterAllToggle(channel, index, profile);
 
         return pillToggle;
     }
@@ -776,13 +817,17 @@ const RenderEngine = (() => {
     /**
      * Fallback Filter All toggle
      */
-    function createFallbackFilterAllToggle(channel, index) {
+    function createFallbackFilterAllToggle(channel, index, profile = 'main') {
         const StateManager = getStateManager();
         const toggle = document.createElement('div');
         toggle.className = `exact-toggle toggle-variant-red ${channel.filterAll ? 'active' : ''}`;
         toggle.textContent = 'Filter All';
         toggle.title = `Automatically adds "${channel.name || channel.handle || channel.id}" as a fuzzy keyword filter - hides any content mentioning this channel name`;
         toggle.addEventListener('click', async () => {
+            if (profile === 'kids') {
+                await StateManager?.toggleKidsChannelFilterAll?.(index);
+                return;
+            }
             await StateManager?.toggleChannelFilterAll(index);
         });
         return toggle;

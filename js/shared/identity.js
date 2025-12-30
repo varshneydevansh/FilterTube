@@ -422,7 +422,7 @@
 
         const result = {};
 
-        const idMatch = htmlChunk.match(/"browseId":"(UC[\w-]{22})"/i);
+        const idMatch = htmlChunk.match(/"(?:browseId|externalChannelId|channelId|ownerChannelId|ownerDocid|externalId)":"(UC[\w-]{22})"/i);
         if (idMatch && idMatch[1]) {
             result.id = idMatch[1];
         }

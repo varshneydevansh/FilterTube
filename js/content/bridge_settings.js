@@ -104,6 +104,7 @@ function handleStorageChanges(changes, area) {
         'filterKeywordsComments',
         'filterChannels',
         'uiChannels',
+        'ftProfilesV3',
         'channelMap',
         'videoChannelMap', // Needed so Shorts videoId → channelId updates re-apply settings
         'hideAllComments',
