@@ -600,15 +600,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             updateStats();
         }
 
-        if (['kidsKeywordAdded', 'kidsKeywordRemoved', 'load', 'save'].includes(eventType)) {
+        if (['kidsKeywordAdded', 'kidsKeywordRemoved', 'kidsKeywordUpdated', 'load', 'save'].includes(eventType)) {
             renderKidsKeywords();
         }
 
-        if (['kidsChannelAdded', 'kidsChannelRemoved', 'load', 'save'].includes(eventType)) {
+        if (['kidsChannelAdded', 'kidsChannelRemoved', 'kidsChannelUpdated', 'load', 'save'].includes(eventType)) {
             renderKidsChannels();
+            renderKidsKeywords();
         }
 
-        if (eventType === 'settingUpdated') {
+        if (eventType === 'settingUpdated' || eventType === 'externalUpdate') {
             updateCheckboxes();
         }
 

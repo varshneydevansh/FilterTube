@@ -398,11 +398,19 @@ const StateManager = (() => {
         const raw = (input || '').trim();
         if (!raw) return null;
         const lower = raw.toLowerCase();
+        const isUc = lower.startsWith('uc');
+        const isHandle = lower.startsWith('@');
+        const customUrl = lower.startsWith('c/') || lower.startsWith('/c/')
+            ? raw.replace(/^\/?c\//i, 'c/')
+            : (lower.startsWith('user/') || lower.startsWith('/user/')
+                ? raw.replace(/^\/?user\//i, 'user/')
+                : null);
         return {
             name: raw,
-            id: raw,
-            handle: lower.startsWith('@') ? raw : null,
-            customUrl: lower.startsWith('c/') || lower.startsWith('/c/') ? raw.replace(/^\/?c\//i, 'c/') : null,
+            // Keep id non-empty for legacy compilation paths, but treat @handles as handle-only during matching.
+            id: isUc ? raw : (customUrl || raw),
+            handle: isHandle ? raw : null,
+            customUrl,
             originalInput: raw,
             addedAt: Date.now(),
             source: 'user'
@@ -415,8 +423,53 @@ const StateManager = (() => {
         if (!entry) return { success: false, error: 'Empty input' };
 
         const kids = getKidsState();
-        const exists = kids.blockedChannels.some(ch => (ch.id || ch.originalInput || '').toLowerCase() === (entry.id || entry.originalInput).toLowerCase());
-        if (exists) {
+
+        const channelMap = state.channelMap && typeof state.channelMap === 'object' ? state.channelMap : {};
+        const normalizeString = (v) => (typeof v === 'string' ? v.trim() : '');
+        const normalizeHandle = (v) => {
+            const fn = window.FilterTubeIdentity?.normalizeHandleValue;
+            if (typeof fn === 'function') return fn(v);
+            return normalizeString(v);
+        };
+
+        const makeKey = (ch) => {
+            const rawId = normalizeString(ch?.id);
+            const idLower = rawId.toLowerCase();
+            const custom = normalizeString(ch?.customUrl).toLowerCase();
+            const handle = normalizeHandle(ch?.handle).toLowerCase();
+
+            // Treat "@handle" stored in id as handle-only, not a true id.
+            const handleFromId = rawId && rawId.startsWith('@') ? normalizeHandle(rawId).toLowerCase() : '';
+            const effectiveHandle = handle || handleFromId;
+
+            // Prefer stable UC identity when available.
+            if (rawId && rawId.toUpperCase().startsWith('UC')) return `id:${idLower}`;
+
+            // Cross-match handle/customUrl through channelMap to get a UC key.
+            if (effectiveHandle) {
+                const mappedId = channelMap[effectiveHandle];
+                if (mappedId && String(mappedId).toUpperCase().startsWith('UC')) {
+                    return `id:${String(mappedId).toLowerCase()}`;
+                }
+            }
+            if (custom) {
+                const mappedId = channelMap[custom];
+                if (mappedId && String(mappedId).toUpperCase().startsWith('UC')) {
+                    return `id:${String(mappedId).toLowerCase()}`;
+                }
+            }
+
+            // Fall back to handle/customUrl keys.
+            if (effectiveHandle) return `handle:${effectiveHandle}`;
+            if (custom) return `custom:${custom}`;
+
+            const original = normalizeString(ch?.originalInput).toLowerCase();
+            return original ? `orig:${original}` : '';
+        };
+
+        const incomingKey = makeKey(entry);
+        const existsIndex = incomingKey ? kids.blockedChannels.findIndex(ch => makeKey(ch) === incomingKey) : -1;
+        if (existsIndex >= 0) {
             return { success: false, error: 'Channel already exists' };
         }
 

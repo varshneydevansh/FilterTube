@@ -60,7 +60,8 @@ const RenderEngine = (() => {
         if (!container) return;
 
         const StateManager = getStateManager();
-        const state = StateManager?.getState() || { keywords: [], kids: { blockedKeywords: [] } };
+        const state = StateManager?.getState() || { keywords: [], kids: { blockedKeywords: [], blockedChannels: [] } };
+        const Settings = getSettings();
 
         const {
             showSearch = false,
@@ -76,7 +77,11 @@ const RenderEngine = (() => {
         } = options;
 
         // Filter and sort keywords
-        const keywordsSource = profile === 'kids' ? (state.kids?.blockedKeywords || []) : state.keywords;
+        const keywordsSource = profile === 'kids'
+            ? (typeof Settings?.syncFilterAllKeywords === 'function'
+                ? Settings.syncFilterAllKeywords(state.kids?.blockedKeywords || [], state.kids?.blockedChannels || [])
+                : (state.kids?.blockedKeywords || []))
+            : state.keywords;
         let displayKeywords = [...keywordsSource];
 
         // Apply search filter
@@ -131,7 +136,9 @@ const RenderEngine = (() => {
         // Render each keyword
         displayKeywords.forEach(entry => {
             const item = createKeywordListItem(entry, { minimal, profile, includeToggles, onDelete });
-            container.appendChild(item);
+            if (item instanceof Node) {
+                container.appendChild(item);
+            }
         });
     }
 
@@ -184,10 +191,11 @@ const RenderEngine = (() => {
         controls.className = minimal ? 'keyword-controls' : 'item-controls';
 
         const shouldShowToggles = includeToggles;
+        const shouldShowCommentsToggle = shouldShowToggles && profile !== 'kids';
 
         const commentsEnabled = entry.comments !== false;
         let commentsToggle = null;
-        if (shouldShowToggles) {
+        if (shouldShowCommentsToggle) {
             const commentsToggleText = minimal ? 'C' : 'Comment';
             commentsToggle = UIComponents?.createToggleButton
                 ? UIComponents.createToggleButton({
@@ -196,11 +204,6 @@ const RenderEngine = (() => {
                     onToggle: async () => {
                         if (isChannelDerived) {
                             await StateManager?.toggleChannelFilterAllCommentsByRef?.(entry.channelRef);
-                            return;
-                        }
-
-                        if (profile === 'kids') {
-                            await StateManager?.toggleKidsKeywordComments?.(entry.word);
                             return;
                         }
                         await StateManager?.toggleKeywordComments(entry.word);
@@ -219,11 +222,6 @@ const RenderEngine = (() => {
                             await StateManager?.toggleChannelFilterAllCommentsByRef?.(entry.channelRef);
                             return;
                         }
-
-                        if (profile === 'kids') {
-                            await StateManager?.toggleKidsKeywordComments?.(entry.word);
-                            return;
-                        }
                         await StateManager?.toggleKeywordComments(entry.word);
                     });
                     toggle.addEventListener('keydown', async (e) => {
@@ -231,11 +229,6 @@ const RenderEngine = (() => {
                             e.preventDefault();
                             if (isChannelDerived) {
                                 await StateManager?.toggleChannelFilterAllCommentsByRef?.(entry.channelRef);
-                                return;
-                            }
-
-                            if (profile === 'kids') {
-                                await StateManager?.toggleKidsKeywordComments?.(entry.word);
                                 return;
                             }
                             await StateManager?.toggleKeywordComments(entry.word);
@@ -249,7 +242,27 @@ const RenderEngine = (() => {
                 : 'Keyword does not apply to comment filtering';
         }
 
-        if (isChannelDerived && shouldShowToggles && profile !== 'kids') {
+        if (isChannelDerived && shouldShowToggles && profile === 'kids') {
+            const badge = createSourceBadge({
+                sourceKey: channelDerivedSourceKey,
+                title: 'Auto-added by "Filter All" - managed in Channel Management'
+            });
+
+            if (!minimal) {
+                if (badge instanceof Node) controls.appendChild(badge);
+            }
+
+            if (!minimal) {
+                const channel = linkedChannel;
+                if (channel) {
+                    const originLabel = document.createElement('span');
+                    originLabel.className = 'channel-derived-origin';
+                    originLabel.textContent = `Linked to ${channel.name || channel.handle || channel.id}`;
+                    originLabel.title = `This keyword is automatically synced with channel's "Filter All" setting`;
+                    left.appendChild(originLabel);
+                }
+            }
+        } else if (isChannelDerived && shouldShowToggles && profile !== 'kids') {
             const badge = createSourceBadge({
                 sourceKey: channelDerivedSourceKey,
                 title: 'Auto-added by "Filter All Content" - managed in Channel Management'
@@ -257,7 +270,7 @@ const RenderEngine = (() => {
             if (commentsToggle) controls.appendChild(commentsToggle);
 
             if (!minimal) {
-                controls.appendChild(badge);
+                if (badge instanceof Node) controls.appendChild(badge);
             }
 
             // In full UI, show channel origin
@@ -290,7 +303,7 @@ const RenderEngine = (() => {
                     },
                     className: minimal ? '' : ''
                 }) :
-                createFallbackExactToggle(entry, minimal);
+                createFallbackExactToggle(entry, minimal, profile);
 
             // Delete button
             const deleteBtn = UIComponents?.createDeleteButton ?
@@ -310,13 +323,8 @@ const RenderEngine = (() => {
                     await StateManager?.removeKeyword(entry.word);
                 });
 
-            if (minimal) {
-                controls.appendChild(commentsToggle);
-                controls.appendChild(exactToggle);
-            } else {
-                controls.appendChild(commentsToggle);
-                controls.appendChild(exactToggle);
-            }
+            if (commentsToggle) controls.appendChild(commentsToggle);
+            if (exactToggle instanceof Node) controls.appendChild(exactToggle);
 
             // In full UI, add semantic toggle (disabled for now)
             if (!minimal && profile !== 'kids') {
@@ -329,25 +337,7 @@ const RenderEngine = (() => {
                 controls.appendChild(semanticToggle);
             }
 
-            controls.appendChild(deleteBtn);
-        } else {
-            // Channel-derived entries in Kids profile: show delete-only control
-            const deleteBtn = UIComponents?.createDeleteButton
-                ? UIComponents.createDeleteButton(async () => {
-                    if (typeof onDelete === 'function') {
-                        await onDelete(entry.word);
-                    } else {
-                        await StateManager?.removeKidsKeyword?.(entry.word);
-                    }
-                })
-                : createFallbackDeleteButton(async () => {
-                    if (typeof onDelete === 'function') {
-                        await onDelete(entry.word);
-                    } else {
-                        await StateManager?.removeKidsKeyword?.(entry.word);
-                    }
-                });
-            controls.appendChild(deleteBtn);
+            if (deleteBtn instanceof Node) controls.appendChild(deleteBtn);
         }
 
         item.appendChild(left);
@@ -444,9 +434,11 @@ const RenderEngine = (() => {
             return;
         }
 
-        const renderChannelRow = (channel, displayIndex) => {
-            const originalIndex = state.channels.indexOf(channel);
-            const listIndex = (profile === 'kids') ? displayIndex : originalIndex;
+        const renderChannelRow = (channel) => {
+            const originalIndex = (profile === 'kids')
+                ? channelsSource.indexOf(channel)
+                : state.channels.indexOf(channel);
+            const listIndex = originalIndex;
             const collaborationMeta = (profile === 'kids') ? null : buildCollaborationMeta(channel, collaborationGroups);
             return createChannelListItem(channel, listIndex, {
                 minimal,
@@ -459,20 +451,20 @@ const RenderEngine = (() => {
 
         // Popup/minimal mode renders a flat list with subtle indicators only
         if (minimal) {
-            displayChannels.forEach((channel, displayIndex) => {
-                const item = renderChannelRow(channel, displayIndex);
+            displayChannels.forEach(channel => {
+                const item = renderChannelRow(channel);
                 container.appendChild(item);
             });
             return;
         }
 
         // Render channels in the exact order of the filtered/sorted list.
-        displayChannels.forEach((channel, displayIndex) => {
-            const item = renderChannelRow(channel, displayIndex);
+        displayChannels.forEach(channel => {
+            const item = renderChannelRow(channel);
             container.appendChild(item);
         });
     }
-    
+
     /**
      * Group channels by collaborationGroupId
      * @param {Array} channels - Array of channel objects
@@ -481,7 +473,7 @@ const RenderEngine = (() => {
     function groupChannelsByCollaboration(channels) {
         const groups = new Map(); // groupId -> channels[]
         const individual = [];
-        
+
         channels.forEach(channel => {
             if (channel.collaborationGroupId) {
                 if (!groups.has(channel.collaborationGroupId)) {
@@ -492,7 +484,7 @@ const RenderEngine = (() => {
                 individual.push(channel);
             }
         });
-        
+
         return { groups, individual };
     }
 
@@ -567,7 +559,7 @@ const RenderEngine = (() => {
         }
         return badge;
     }
-    
+
     /**
      * Create a collaboration group container with yellow border
      * @param {Array} channels - Channels in this group
@@ -841,12 +833,16 @@ const RenderEngine = (() => {
      * Find channel by channelRef
      */
     function findChannelByRef(channelRef) {
-        const state = getStateManager()?.getState() || { channels: [] };
+        const state = getStateManager()?.getState() || { channels: [], kids: { blockedChannels: [] } };
         const Settings = getSettings();
 
         if (!channelRef || !Settings.getChannelDerivedKey) return null;
 
-        return state.channels.find(ch => {
+        const mainChannels = Array.isArray(state.channels) ? state.channels : [];
+        const kidsChannels = Array.isArray(state.kids?.blockedChannels) ? state.kids.blockedChannels : [];
+        const allChannels = [...mainChannels, ...kidsChannels];
+
+        return allChannels.find(ch => {
             const key = Settings.getChannelDerivedKey(ch);
             return key === channelRef;
         });
@@ -906,7 +902,7 @@ const RenderEngine = (() => {
             isResolved = true;
         }
 
-        // If source and target are identical (e.g., UC... -> UC...), treat as unresolved to avoid noisy arrow
+        // If source and target are identical (e.g., UC... → UC...), treat as unresolved to avoid noisy arrow
         if (target === source) {
             target = null;
             isResolved = false;
@@ -919,18 +915,33 @@ const RenderEngine = (() => {
     /**
      * Fallback exact toggle (if UIComponents not available)
      */
-    function createFallbackExactToggle(entry, minimal) {
-        const exactToggle = document.createElement('div');
-        exactToggle.className = `exact-toggle ${entry.exact ? 'active' : ''}`;
-        exactToggle.textContent = minimal ? 'E' : 'Exact';
-        exactToggle.title = entry.exact
-            ? `Exact match: Only filters "${entry.word}" as a complete word`
-            : `Partial match: Filters "${entry.word}" anywhere in text`;
-        exactToggle.addEventListener('click', async () => {
-            const StateManager = getStateManager();
+    function createFallbackExactToggle(entry, minimal, profile = 'main') {
+        const StateManager = getStateManager();
+        const toggle = document.createElement('div');
+        toggle.className = `exact-toggle ${entry.exact ? 'active' : ''}`;
+        toggle.textContent = minimal ? 'E' : 'Exact';
+        toggle.title = 'Exact word matching';
+        toggle.addEventListener('click', async () => {
+            if (profile === 'kids') {
+                await StateManager?.toggleKidsKeywordExact?.(entry.word);
+                return;
+            }
             await StateManager?.toggleKeywordExact(entry.word);
         });
-        return exactToggle;
+        toggle.addEventListener('keydown', async (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                if (profile === 'kids') {
+                    await StateManager?.toggleKidsKeywordExact?.(entry.word);
+                    return;
+                }
+                await StateManager?.toggleKeywordExact(entry.word);
+            }
+        });
+        toggle.setAttribute('role', 'button');
+        toggle.setAttribute('tabindex', '0');
+        toggle.setAttribute('aria-pressed', entry.exact ? 'true' : 'false');
+        return toggle;
     }
 
     /**
