@@ -46,6 +46,10 @@ function toggleVisibility(element, shouldHide, reason = '', skipStats = false) {
             // Now hide the element
             element.classList.add('filtertube-hidden');
             element.setAttribute('data-filtertube-hidden', 'true');
+            try {
+                element.style.setProperty('display', 'none', 'important');
+            } catch (e) {
+            }
             // debugLog(`🚫 Hiding: ${reason}`);
 
             // Record for tracking (only for non-container items)
@@ -67,7 +71,11 @@ function toggleVisibility(element, shouldHide, reason = '', skipStats = false) {
             element.classList.remove('filtertube-hidden');
             element.removeAttribute('data-filtertube-hidden');
             // CRITICAL: Reset inline style.display that was set during hiding
-            element.style.display = '';
+            try {
+                element.style.removeProperty('display');
+            } catch (e) {
+                element.style.display = '';
+            }
             // debugLog(`✅ Restoring element`);
 
             // Record for tracking (only for non-container items)

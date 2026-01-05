@@ -35,6 +35,42 @@
 
     postLogToBridge('log', 'filter_logic.js loaded and initializing FilterTubeEngine');
 
+    const pendingVideoChannelUpdates = [];
+    const seenVideoChannelUpdates = new Map();
+    let pendingVideoChannelFlush = null;
+    function queueVideoChannelMapping(videoId, channelId) {
+        if (!videoId || typeof videoId !== 'string' || !/^[a-zA-Z0-9_-]{11}$/.test(videoId)) return;
+        if (!channelId || typeof channelId !== 'string' || !channelId.startsWith('UC')) return;
+
+        const key = `${videoId}:${channelId}`;
+        if (seenVideoChannelUpdates.has(key)) return;
+        seenVideoChannelUpdates.set(key, Date.now());
+
+        if (seenVideoChannelUpdates.size > 4000) {
+            const keys = Array.from(seenVideoChannelUpdates.keys());
+            keys.slice(0, 1000).forEach(k => seenVideoChannelUpdates.delete(k));
+        }
+
+        pendingVideoChannelUpdates.push({ videoId, channelId });
+
+        if (pendingVideoChannelFlush) return;
+        pendingVideoChannelFlush = setTimeout(() => {
+            pendingVideoChannelFlush = null;
+            if (pendingVideoChannelUpdates.length === 0) return;
+
+            const batch = pendingVideoChannelUpdates.splice(0, pendingVideoChannelUpdates.length);
+            try {
+                window.postMessage({
+                    type: 'FilterTube_UpdateVideoChannelMap',
+                    payload: batch,
+                    source: 'filter_logic'
+                }, '*');
+            } catch (e) {
+                // ignore
+            }
+        }, 50);
+    }
+
     // ============================================================================
     // UTILITY FUNCTIONS
     // ============================================================================
@@ -671,8 +707,13 @@
 
             let ownerId = null;
             let ownerHandle = null;
+            let videoId = null;
 
             if (videoDetails) {
+                videoId =
+                    videoDetails.videoId ||
+                    videoDetails.encryptedVideoId ||
+                    videoId;
                 ownerId =
                     videoDetails.videoOwnerChannelId ||
                     videoDetails.channelId ||
@@ -703,6 +744,10 @@
 
             if (ownerId && ownerHandle) {
                 this._registerMapping(ownerId, ownerHandle);
+            }
+
+            if (videoId && ownerId && ownerId.startsWith('UC')) {
+                this._registerVideoChannelMapping(videoId, ownerId);
             }
 
             const playlistContents =
@@ -762,6 +807,7 @@
                 }
 
                 this._harvestFromRendererByline(candidate);
+                this._harvestVideoOwnerFromRenderer(candidate);
 
                 for (const key in node) {
                     if (!Object.prototype.hasOwnProperty.call(node, key)) continue;
@@ -773,6 +819,40 @@
             };
 
             visit(root);
+        }
+
+        _harvestVideoOwnerFromRenderer(renderer) {
+            if (!renderer || typeof renderer !== 'object') return;
+
+            const videoId = renderer.videoId || renderer.navigationEndpoint?.watchEndpoint?.videoId || '';
+            if (!videoId || typeof videoId !== 'string' || !/^[a-zA-Z0-9_-]{11}$/.test(videoId)) return;
+
+            const ownerId =
+                renderer?.kidsVideoOwnerExtension?.externalChannelId ||
+                renderer?.kidsVideoOwnerExtension?.channelId ||
+                '';
+
+            if (ownerId && typeof ownerId === 'string' && ownerId.startsWith('UC')) {
+                this._registerVideoChannelMapping(videoId, ownerId);
+                return;
+            }
+
+            const byline = renderer.shortBylineText || renderer.longBylineText || renderer.ownerText;
+            const browseId = byline?.runs?.[0]?.navigationEndpoint?.browseEndpoint?.browseId || '';
+            if (browseId && typeof browseId === 'string' && browseId.startsWith('UC')) {
+                this._registerVideoChannelMapping(videoId, browseId);
+            }
+        }
+
+        _registerVideoChannelMapping(videoId, channelId) {
+            if (!videoId || !channelId) return;
+
+            const current = this.settings?.videoChannelMap && typeof this.settings.videoChannelMap === 'object'
+                ? this.settings.videoChannelMap
+                : null;
+            if (current && current[videoId] === channelId) return;
+
+            queueVideoChannelMapping(videoId, channelId);
         }
 
         /**

@@ -45,10 +45,84 @@ const RELEASE_NOTES_TEMPLATE = {
     ctaLabel: 'Open What’s New'
 };
 let releaseNotesCache = null;
-let compiledSettingsCache = null;
+let compiledSettingsCache = { main: null, kids: null };
+
+let videoChannelMapCache = null;
+let videoChannelMapLoadPromise = null;
+let videoChannelMapFlushPromise = Promise.resolve();
+let videoChannelMapFlushTimer = null;
+const pendingVideoChannelMapUpdates = new Map();
 
 function isKidsUrl(url) {
     return typeof url === 'string' && url.includes('youtubekids.com');
+}
+
+function ensureVideoChannelMapCache() {
+    if (videoChannelMapCache && typeof videoChannelMapCache === 'object') {
+        return Promise.resolve(videoChannelMapCache);
+    }
+    if (videoChannelMapLoadPromise) return videoChannelMapLoadPromise;
+
+    videoChannelMapLoadPromise = storageGet(['videoChannelMap']).then(result => {
+        const stored = result?.videoChannelMap;
+        videoChannelMapCache = stored && typeof stored === 'object' ? { ...stored } : {};
+        videoChannelMapLoadPromise = null;
+        return videoChannelMapCache;
+    }).catch(() => {
+        videoChannelMapCache = {};
+        videoChannelMapLoadPromise = null;
+        return videoChannelMapCache;
+    });
+
+    return videoChannelMapLoadPromise;
+}
+
+function enforceVideoChannelMapCap(map) {
+    if (!map || typeof map !== 'object') return;
+    const keys = Object.keys(map);
+    if (keys.length <= 1000) return;
+    keys.slice(0, 100).forEach(k => {
+        try {
+            delete map[k];
+        } catch (e) {
+        }
+    });
+}
+
+function flushVideoChannelMapUpdates() {
+    videoChannelMapFlushPromise = videoChannelMapFlushPromise.then(async () => {
+        if (pendingVideoChannelMapUpdates.size === 0) return;
+        const map = await ensureVideoChannelMapCache();
+        for (const [videoId, channelId] of pendingVideoChannelMapUpdates.entries()) {
+            if (!videoId || !channelId) continue;
+            map[videoId] = channelId;
+        }
+        pendingVideoChannelMapUpdates.clear();
+        enforceVideoChannelMapCap(map);
+        await browserAPI.storage.local.set({ videoChannelMap: map });
+    }).catch(() => {
+    });
+    return videoChannelMapFlushPromise;
+}
+
+function scheduleVideoChannelMapFlush() {
+    if (videoChannelMapFlushTimer) return;
+    videoChannelMapFlushTimer = setTimeout(() => {
+        videoChannelMapFlushTimer = null;
+        flushVideoChannelMapUpdates();
+    }, 50);
+}
+
+function enqueueVideoChannelMapUpdate(videoId, channelId) {
+    const v = typeof videoId === 'string' ? videoId.trim() : '';
+    const c = typeof channelId === 'string' ? channelId.trim() : '';
+    if (!v || !c) return;
+    pendingVideoChannelMapUpdates.set(v, c);
+
+    if (videoChannelMapCache && typeof videoChannelMapCache === 'object') {
+        videoChannelMapCache[v] = c;
+    }
+    scheduleVideoChannelMapFlush();
 }
 
 /**
@@ -98,7 +172,16 @@ async function buildReleaseNotesPayload(version) {
 console.log(`FilterTube background script loaded in ${IS_FIREFOX ? 'Firefox' : 'Chrome/Edge/Other'}`);
 
 // Function to compile settings from storage
-async function getCompiledSettings(sender = null) {
+// Function to compile settings from storage
+async function getCompiledSettings(sender = null, profileType = null) {
+    const senderUrl = sender?.tab?.url || sender?.url || '';
+    const targetProfile = profileType === 'kids' || isKidsUrl(senderUrl) ? 'kids' : 'main';
+
+    // Return cached settings if available
+    if (compiledSettingsCache[targetProfile]) {
+        return compiledSettingsCache[targetProfile];
+    }
+
     return new Promise((resolve) => {
         browserAPI.storage.local.get([
             'enabled',
@@ -145,8 +228,7 @@ async function getCompiledSettings(sender = null) {
             const compiledSettings = {};
             const storageUpdates = {};
 
-            const senderUrl = sender?.tab?.url || sender?.url || '';
-            const shouldUseKidsProfile = isKidsUrl(senderUrl);
+            const shouldUseKidsProfile = targetProfile === 'kids';
 
             const storedCompiled = items.filterKeywords;
             const storedUiKeywords = Array.isArray(items.uiKeywords) ? items.uiKeywords : null;
@@ -424,12 +506,16 @@ async function getCompiledSettings(sender = null) {
             compiledSettings.hideSubscriptions = items.hideSubscriptions || false;
             compiledSettings.hideSearchShelves = items.hideSearchShelves || false;
 
-            console.log(`FilterTube Background: Compiled ${compiledChannels.length} channels, ${compiledSettings.filterKeywords.length} total keywords (${compiledSettings.filterKeywords.length - additionalKeywordsFromChannels.length} user keywords + ${additionalKeywordsFromChannels.length} channel-based), ${Object.keys(compiledSettings.channelMap).length / 2} mappings`);
+            console.log(`FilterTube Background: Compiled ${targetProfile} settings: ${compiledChannels.length} channels, ${compiledSettings.filterKeywords.length} keywords`);
+
+            // Update cache
+            compiledSettingsCache[targetProfile] = compiledSettings;
 
             resolve(compiledSettings);
         });
     });
 }
+
 
 // Extension installed or updated handler
 browserAPI.runtime.onInstalled.addListener(function (details) {
@@ -525,6 +611,34 @@ function handleFetchShortsIdentityMessage(request, sendResponse) {
 
     pendingShortsIdentityFetches.set(cacheKey, fetchPromise);
     fetchPromise.then(sendResponse);
+}
+
+function handleFetchWatchIdentityMessage(request, sendResponse) {
+    const videoId = typeof request.videoId === 'string' ? request.videoId.trim() : '';
+    if (!videoId || !/^[a-zA-Z0-9_-]{11}$/.test(videoId)) {
+        sendResponse({ success: false, error: 'invalid_video_id' });
+        return;
+    }
+
+    const profileType = request?.profileType === 'kids' ? 'kids' : 'main';
+
+    (async () => {
+        try {
+            const identity = profileType === 'kids'
+                ? (await performKidsWatchIdentityFetch(videoId) || await performWatchIdentityFetch(videoId))
+                : await performWatchIdentityFetch(videoId);
+
+            if (identity) {
+                sendResponse({ success: true, identity });
+                return;
+            }
+
+            sendResponse({ success: false, identity: null, error: 'not_found' });
+        } catch (error) {
+            console.debug('FilterTube Background: fetchWatchIdentity failed', error);
+            sendResponse({ success: false, error: 'watch_fetch_failed' });
+        }
+    })();
 }
 
 function storageGet(keys) {
@@ -633,6 +747,12 @@ function extractKidsWatchIdentityFromPreview(preview) {
 async function performKidsWatchIdentityFetch(videoId) {
     if (!videoId || typeof videoId !== 'string' || !/^[a-zA-Z0-9_-]{11}$/.test(videoId)) {
         return null;
+    }
+
+    const stored = await storageGet(['videoChannelMap']);
+    const storedId = stored?.videoChannelMap?.[videoId];
+    if (storedId) {
+        return { id: storedId, videoId, source: 'videoChannelMap' };
     }
 
     if (kidsWatchIdentitySessionCache.has(videoId)) {
@@ -809,13 +929,22 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
     const action = request?.action || request?.type;
 
     if (action === "getCompiledSettings") {
-        console.log("FilterTube Background: Received getCompiledSettings message.");
-        getCompiledSettings(sender).then(compiledSettings => {
+        const senderUrl = sender?.tab?.url || sender?.url || '';
+        const requestedProfile = request.profileType;
+        const profileType = requestedProfile === 'kids' ? 'kids' : (requestedProfile === 'main' ? 'main' : (isKidsUrl(senderUrl) ? 'kids' : 'main'));
+
+        if (compiledSettingsCache[profileType] && !request.forceRefresh) {
+            sendResponse(compiledSettingsCache[profileType]);
+            return;
+        }
+
+        console.log(`FilterTube Background: Received getCompiledSettings message for profile: ${profileType} (force: ${!!request.forceRefresh})`);
+        getCompiledSettings(sender, profileType).then(compiledSettings => {
             if (browserAPI.runtime.lastError) {
                 console.error("FilterTube Background: Error retrieving settings from storage:", browserAPI.runtime.lastError);
                 sendResponse({ error: browserAPI.runtime.lastError.message });
             } else {
-                compiledSettingsCache = compiledSettings;
+                compiledSettingsCache[profileType] = compiledSettings;
                 sendResponse(compiledSettings);
             }
         }).catch(error => {
@@ -823,6 +952,12 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
             sendResponse({ error: error.message || "Unknown error occurred while compiling settings." });
         });
         return true; // Indicates that the response is sent asynchronously.
+    } else if (action === 'fetchShortsIdentity') {
+        handleFetchShortsIdentityMessage(request, sendResponse);
+        return true;
+    } else if (action === 'fetchWatchIdentity') {
+        handleFetchWatchIdentityMessage(request, sendResponse);
+        return true;
     } else if (request.action === "injectScripts") {
         // Handle script injection via Chrome scripting API
         console.log("FilterTube Background: Received injectScripts request for:", request.scripts);
@@ -831,238 +966,33 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
     } else if (action === 'FilterTube_KidsBlockChannel') {
         const channel = request?.channel && typeof request.channel === 'object' ? request.channel : null;
         if (!channel) {
-            sendResponse?.({ ok: false, error: 'missing_channel' });
+            sendResponse?.({ success: false, error: 'missing_channel' });
             return;
         }
 
         const requestVideoId = (typeof request.videoId === 'string' ? request.videoId.trim() : '');
-        if (requestVideoId) {
-            console.log('FilterTube Background: Kids block request received for videoId:', requestVideoId);
-        }
 
-        const normalizeString = (value) => (typeof value === 'string' ? value.trim() : '');
-        const normalizeHandle = (value) => {
-            const fn = FilterTubeIdentity?.normalizeHandleValue;
-            if (typeof fn === 'function') return fn(value);
-            return normalizeString(value);
-        };
-
-        const incomingCustomUrl = normalizeString(channel.customUrl) || '';
-        const incomingHandleNorm = normalizeHandle(channel.handle) || '';
-
-        const nextChannel = {
-            name: normalizeString(channel.name) || normalizeString(channel.handleDisplay) || incomingHandleNorm || incomingCustomUrl || normalizeString(channel.id) || 'Channel',
-            id: normalizeString(channel.id) || incomingCustomUrl || incomingHandleNorm,
-            handle: normalizeHandle(channel.handle) || '',
-            handleDisplay: normalizeString(channel.handleDisplay) || null,
-            canonicalHandle: normalizeString(channel.canonicalHandle) || null,
-            customUrl: normalizeString(channel.customUrl) || null,
-            originalInput: normalizeString(channel.originalInput) || null,
-            source: normalizeString(channel.source) || 'kidsNative',
-            addedAt: (typeof channel.addedAt === 'number' && Number.isFinite(channel.addedAt)) ? channel.addedAt : Date.now()
-        };
-
-        (async () => {
-            try {
-                if (requestVideoId && (!nextChannel.id || !nextChannel.id.toUpperCase().startsWith('UC'))) {
-                    const watchIdentity = await performWatchIdentityFetch(requestVideoId) || await performKidsWatchIdentityFetch(requestVideoId);
-                    if (watchIdentity?.id && typeof watchIdentity.id === 'string') {
-                        nextChannel.id = watchIdentity.id;
-                    }
-                    if (!nextChannel.handle && watchIdentity?.handle) {
-                        nextChannel.handle = normalizeHandle(watchIdentity.handle) || '';
-                        nextChannel.handleDisplay = nextChannel.handleDisplay || watchIdentity.handle;
-                        const canonicalCandidate = (nextChannel.handleDisplay && nextChannel.handleDisplay.startsWith('@'))
-                            ? nextChannel.handleDisplay
-                            : nextChannel.handle;
-                        nextChannel.canonicalHandle = nextChannel.canonicalHandle || canonicalCandidate;
-                    }
-                    if (!nextChannel.customUrl && watchIdentity?.customUrl) {
-                        nextChannel.customUrl = normalizeString(watchIdentity.customUrl) || null;
-                    }
-                    if ((!nextChannel.name || nextChannel.name === 'Channel') && watchIdentity?.name) {
-                        nextChannel.name = normalizeString(watchIdentity.name) || nextChannel.name;
-                    }
-
-                    if (!nextChannel.id) {
-                        nextChannel.id = nextChannel.customUrl || nextChannel.handle || '';
-                    }
-
-                    if (nextChannel.id && nextChannel.id.toUpperCase().startsWith('UC')) {
-                        try {
-                            const storedMaps = await storageGet(['videoChannelMap']);
-                            const videoChannelMap = storedMaps?.videoChannelMap && typeof storedMaps.videoChannelMap === 'object'
-                                ? storedMaps.videoChannelMap
-                                : {};
-                            if (!videoChannelMap[requestVideoId]) {
-                                browserAPI.storage.local.set({ videoChannelMap: { ...videoChannelMap, [requestVideoId]: nextChannel.id } });
-                            }
-                        } catch (e) {
-                        }
-                    }
-                }
-
-                const enrichInput = nextChannel.id || nextChannel.handle || nextChannel.customUrl || '';
-                if (enrichInput) {
-                    try {
-                        const enriched = await fetchChannelInfo(enrichInput);
-                        if (enriched?.success) {
-                            nextChannel.id = normalizeString(enriched.id) || nextChannel.id;
-                            nextChannel.name = normalizeString(enriched.name) || nextChannel.name;
-                            const enrichedHandle = normalizeHandle(enriched.handle);
-                            if (enrichedHandle) {
-                                nextChannel.handle = enrichedHandle;
-                                nextChannel.handleDisplay = nextChannel.handleDisplay || enriched.handle;
-                                const canonicalCandidate = (nextChannel.handleDisplay && nextChannel.handleDisplay.startsWith('@'))
-                                    ? nextChannel.handleDisplay
-                                    : enrichedHandle;
-                                nextChannel.canonicalHandle = nextChannel.canonicalHandle || canonicalCandidate;
-                            }
-                            nextChannel.customUrl = normalizeString(enriched.customUrl) || nextChannel.customUrl;
-                            nextChannel.logo = enriched.logo || nextChannel.logo || null;
-                        }
-                    } catch (e) {
-                    }
-                }
-
-                // Normalize Kids entry identity fields so UI node mapping matches main:
-                // - originalInput should prefer @handle (what humans recognize), not watch:<videoId>
-                // - canonicalHandle should prefer display-case handle when available
-                try {
-                    const handleForUi = (normalizeString(nextChannel.handleDisplay) && nextChannel.handleDisplay.startsWith('@'))
-                        ? nextChannel.handleDisplay
-                        : normalizeHandle(nextChannel.handle);
-
-                    if (!nextChannel.canonicalHandle && handleForUi) {
-                        nextChannel.canonicalHandle = handleForUi;
-                    }
-
-                    const original = normalizeString(nextChannel.originalInput);
-                    if (!original || original.startsWith('watch:')) {
-                        if (handleForUi) {
-                            // For mapping UI we want @handle (consistent with main)
-                            nextChannel.originalInput = normalizeHandle(handleForUi) || handleForUi;
-                        } else if (nextChannel.id && String(nextChannel.id).toUpperCase().startsWith('UC')) {
-                            nextChannel.originalInput = nextChannel.id;
-                        } else if (nextChannel.customUrl) {
-                            nextChannel.originalInput = nextChannel.customUrl;
-                        }
-                    }
-                } catch (e) {
-                }
-
-                // Persist identity mappings (UC <-> @handle, customUrl -> UC) for future resolution.
-                try {
-                    const resolvedUc = normalizeString(nextChannel.id);
-                    const resolvedHandle = normalizeHandle(nextChannel.handle);
-                    const resolvedHandleDisplay = normalizeString(nextChannel.handleDisplay);
-                    const resolvedCustomUrl = normalizeString(nextChannel.customUrl);
-
-                    if (resolvedUc && resolvedUc.toUpperCase().startsWith('UC')) {
-                        const mapStorage = await storageGet(['channelMap']);
-                        const currentMap = mapStorage?.channelMap && typeof mapStorage.channelMap === 'object'
-                            ? mapStorage.channelMap
-                            : {};
-                        let hasChange = false;
-
-                        if (resolvedHandle) {
-                            const keyId = resolvedUc.toLowerCase();
-                            const keyHandle = resolvedHandle.toLowerCase();
-
-                            // UC -> @HandleDisplay (preferred) for UI node mapping, fallback to normalized handle.
-                            const preferredHandleValue = (resolvedHandleDisplay && resolvedHandleDisplay.startsWith('@'))
-                                ? resolvedHandleDisplay
-                                : resolvedHandle;
-                            if (preferredHandleValue && currentMap[keyId] !== preferredHandleValue) {
-                                currentMap[keyId] = preferredHandleValue;
-                                hasChange = true;
-                            }
-                            if (currentMap[keyHandle] !== resolvedUc) {
-                                currentMap[keyHandle] = resolvedUc;
-                                hasChange = true;
-                            }
-                        }
-
-                        if (resolvedCustomUrl) {
-                            const keyCustom = resolvedCustomUrl.toLowerCase();
-                            if (currentMap[keyCustom] !== resolvedUc) {
-                                currentMap[keyCustom] = resolvedUc;
-                                hasChange = true;
-                            }
-                        }
-
-                        if (hasChange) {
-                            browserAPI.storage.local.set({ channelMap: currentMap });
-                        }
-                    }
-                } catch (e) {
-                }
-
-                if (!nextChannel.id) {
-                    nextChannel.id = nextChannel.customUrl || nextChannel.handle || '';
-                }
-
-                if (!nextChannel.id) {
-                    console.warn('FilterTube Background: Kids block aborted – unresolved channel identity', {
-                        videoId: requestVideoId,
-                        nextChannel
-                    });
-                    sendResponse?.({ ok: false, error: 'unresolved_channel' });
-                    return;
-                }
-
-                const stored = await new Promise(resolve => browserAPI.storage.local.get(['ftProfilesV3'], resolve));
-                const profiles = stored?.ftProfilesV3 && typeof stored.ftProfilesV3 === 'object' ? stored.ftProfilesV3 : {};
-                const kids = profiles?.kids && typeof profiles.kids === 'object' ? profiles.kids : {};
-                const blockedChannels = Array.isArray(kids.blockedChannels) ? [...kids.blockedChannels] : [];
-
-                const makeKey = (entry) => {
-                    const id = normalizeString(entry?.id).toLowerCase();
-                    if (id) return `id:${id}`;
-                    const handle = normalizeHandle(entry?.handle).toLowerCase();
-                    if (handle) return `handle:${handle}`;
-                    const customUrl = normalizeString(entry?.customUrl).toLowerCase();
-                    if (customUrl) return `custom:${customUrl}`;
-                    const name = normalizeString(entry?.name).toLowerCase();
-                    return name ? `name:${name}` : '';
-                };
-
-                const incomingKey = makeKey(nextChannel);
-                const idx = incomingKey ? blockedChannels.findIndex(ch => makeKey(ch) === incomingKey) : -1;
-
-                if (idx >= 0) {
-                    blockedChannels[idx] = { ...blockedChannels[idx], ...nextChannel };
-                } else {
-                    blockedChannels.unshift(nextChannel);
-                }
-
-                const merged = {
-                    ...profiles,
-                    kids: {
-                        ...kids,
-                        blockedChannels
-                    }
-                };
-
-                await new Promise(resolve => browserAPI.storage.local.set({ ftProfilesV3: merged }, resolve));
-
-                try {
-                    browserAPI.tabs.query({ url: ['*://*.youtubekids.com/*'] }, tabs => {
-                        (tabs || []).forEach(tab => {
-                            if (!tab?.id) return;
-                            browserAPI.tabs.sendMessage(tab.id, { action: 'FilterTube_RefreshNow' }, () => {
-                            });
-                        });
-                    });
-                } catch (e) {
-                }
-
-                sendResponse?.({ ok: true });
-            } catch (e) {
-                sendResponse?.({ ok: false, error: 'persist_failed' });
+        handleAddFilteredChannel(
+            channel.id || channel.handle || channel.customUrl || channel.originalInput,
+            false, // filterAll
+            null,  // collaborationWith
+            null,  // collaborationGroupId
+            {
+                displayHandle: channel.handleDisplay,
+                canonicalHandle: channel.canonicalHandle,
+                channelName: channel.name,
+                customUrl: channel.customUrl,
+                source: channel.source || 'kidsNative'
+            },
+            'kids',
+            requestVideoId
+        ).then(result => {
+            if (result.success) {
+                sendResponse?.({ success: true, channel: result.channelData });
+            } else {
+                sendResponse?.({ success: false, error: result.error });
             }
-        })();
-
+        });
         return true;
     } else if (action === 'FilterTube_FirstRunCheck') {
         browserAPI.storage.local.get(['firstRunRefreshNeeded'], (result) => {
@@ -1430,8 +1360,15 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
 
         return true; // Keep message channel open for async response
     } else if (request.action === 'FilterTube_ApplySettings' && request.settings) {
-        // Forward compiled settings to all relevant tabs for immediate application
-        browserAPI.tabs.query({ url: ["*://*.youtube.com/*", "*://*.youtubekids.com/*"] }, tabs => {
+        // Forward compiled settings to all relevant tabs for immediate application.
+        // request.profile should be passed from the UI (popup/tab-view) to avoid cross-domain leaks.
+        const targetProfile = request.profile === 'kids' ? 'kids' : 'main';
+        const urlPattern = targetProfile === 'kids' ? ["*://*.youtubekids.com/*"] : ["*://*.youtube.com/*"];
+
+        // Update cache
+        compiledSettingsCache[targetProfile] = request.settings;
+
+        browserAPI.tabs.query({ url: urlPattern }, tabs => {
             tabs.forEach(tab => {
                 browserAPI.tabs.sendMessage(tab.id, { action: 'FilterTube_ApplySettings', settings: request.settings }, () => {
                     if (browserAPI.runtime.lastError && !/Receiving end does not exist/i.test(browserAPI.runtime.lastError.message)) {
@@ -1475,24 +1412,8 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
     } else if (request.action === "updateVideoChannelMap") {
         // Store videoId → channelId mappings for Shorts persistence after refresh
         if (request.videoId && request.channelId) {
-            browserAPI.storage.local.get(['videoChannelMap'], (result) => {
-                const currentMap = result.videoChannelMap || {};
-
-                // Only add if not already mapped
-                if (!currentMap[request.videoId]) {
-                    currentMap[request.videoId] = request.channelId;
-
-                    // Limit map size to prevent unbounded growth (keep last 1000 entries)
-                    const keys = Object.keys(currentMap);
-                    if (keys.length > 1000) {
-                        // Remove oldest 100 entries (simple FIFO-ish cleanup)
-                        keys.slice(0, 100).forEach(k => delete currentMap[k]);
-                    }
-
-                    browserAPI.storage.local.set({ videoChannelMap: currentMap });
-                    console.log("FilterTube Background: Video-channel mapping stored:", request.videoId, "->", request.channelId);
-                }
-            });
+            enqueueVideoChannelMapUpdate(request.videoId, request.channelId);
+            console.log("FilterTube Background: Video-channel mapping stored:", request.videoId, "->", request.channelId);
         }
         return false;
     } else if (request.action === "recordTimeSaved") {
@@ -1556,10 +1477,14 @@ browserAPI.storage.onChanged.addListener((changes, area) => {
         }
 
         if (settingsChanged) {
-            console.log('FilterTube Background: Settings changed, re-compiling.');
-            getCompiledSettings().then(() => {
-                console.log('FilterTube Background: New compiled settings ready');
-            });
+            console.log('FilterTube Background: Settings changed, invalidating caches and re-compiling.');
+            compiledSettingsCache.main = null;
+            compiledSettingsCache.kids = null;
+
+            // Re-compile both to be safe, though this won't broadcast automatically.
+            // Content scripts will re-request via their own onChanged listeners.
+            getCompiledSettings({ url: 'https://www.youtube.com/' });
+            getCompiledSettings({ url: 'https://www.youtubekids.com/' });
         }
     }
 });
@@ -2020,7 +1945,7 @@ async function fetchChannelInfo(channelIdOrHandle) {
 // ==========================================
 
 browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    console.log('FilterTube Background: Received message:', message.type);
+    console.log('FilterTube Background: Received message:', message?.type || message?.action);
 
     if (message.type === 'addFilteredChannel') {
         handleAddFilteredChannel(
@@ -2032,11 +1957,13 @@ browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 displayHandle: message.displayHandle,
                 canonicalHandle: message.canonicalHandle,
                 channelName: message.channelName,
-                customUrl: message.customUrl,  // c/Name or user/Name for legacy channels
+                customUrl: message.customUrl,
                 source: message.source || null
-            }
+            },
+            message.profile || 'main',
+            message.videoId || ''
         ).then(sendResponse);
-        return true; // Keep channel open for async response
+        return true;
     }
 
     if (message.type === 'toggleChannelFilterAll') {
@@ -2048,15 +1975,17 @@ browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 /**
- * Handle adding a filtered channel (from 3-dot menu)
+ * Handle adding a filtered channel (from 3-dot menu or enrichment queue)
  * @param {string} input - Channel identifier (@handle or UC ID)
  * @param {boolean} filterAll - Whether to enable Filter All for this channel
  * @param {Array<string>} collaborationWith - Optional list of handles/names this channel is collaborating with
  * @param {string} collaborationGroupId - Optional UUID linking channels blocked together
  * @param {Object} metadata - Optional metadata about the channel (display handle, canonical handle, etc.)
+ * @param {string} profile - 'main' or 'kids'
+ * @param {string} videoId - Optional video ID to help with identity resolution
  * @returns {Promise<Object>} Result with success status
  */
-async function handleAddFilteredChannel(input, filterAll = false, collaborationWith = null, collaborationGroupId = null, metadata = {}) {
+async function handleAddFilteredChannel(input, filterAll = false, collaborationWith = null, collaborationGroupId = null, metadata = {}, profile = 'main', videoId = '') {
     try {
         const isHandleLike = (value) => {
             if (!value || typeof value !== 'string') return false;
@@ -2068,7 +1997,7 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                 .map(v => (typeof v === 'string' ? v.trim() : ''))
                 .filter(Boolean);
             if (cleaned.length === 0) return '';
-            const preferred = cleaned.find(v => !isHandleLike(v));
+            const preferred = cleaned.find(v => !isHandleLike(v) && v.toLowerCase() !== 'channel');
             return preferred || cleaned[0];
         };
 
@@ -2178,30 +2107,48 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             return { success: false, error: 'Empty input' };
         }
 
+        // Support Kids/native flows that send `watch:<videoId>` as a placeholder identifier
+        // when channel identity isn't available on the client.
+        let videoIdFromInput = '';
+        if (rawValue.startsWith('watch:')) {
+            const candidate = rawValue.slice('watch:'.length).trim();
+            if (/^[a-zA-Z0-9_-]{11}$/.test(candidate)) {
+                videoIdFromInput = candidate;
+            }
+        } else if (/^[a-zA-Z0-9_-]{11}$/.test(rawValue)) {
+            // Allow callers to pass a bare videoId as input.
+            videoIdFromInput = rawValue;
+        }
+
         const normalizedValue = normalizeChannelInput(rawValue);
         if (!normalizedValue) {
             return { success: false, error: 'Invalid channel identifier' };
         }
 
-        // Validate format
+        // Validate format (but allow resolution by videoId when provided)
         const isHandle = normalizedValue.startsWith('@');
         const lowerNormalized = normalizedValue.toLowerCase();
         const isUcId = lowerNormalized.startsWith('uc') || lowerNormalized.startsWith('channel/uc');
         const isCustomUrl = lowerNormalized.startsWith('c/');
         const isUserUrl = lowerNormalized.startsWith('user/');
 
+        const effectiveVideoId = (typeof videoId === 'string' && videoId.trim())
+            ? videoId.trim()
+            : videoIdFromInput;
+
         if (!isHandle && !isUcId && !isCustomUrl && !isUserUrl) {
-            return { success: false, error: 'Invalid channel identifier' };
+            if (!effectiveVideoId) {
+                return { success: false, error: 'Invalid channel identifier' };
+            }
         }
+
         // Prefer canonical UC IDs via channelMap when available, especially for @handles
         let lookupValue = normalizedValue;
         let mappedId = null;
 
         if (isHandle) {
             try {
-                const mapStorage = await new Promise(resolve => {
-                    browserAPI.storage.local.get(['channelMap'], resolve);
-                });
+                const mapStorage = await storageGet(['channelMap']);
                 const channelMap = mapStorage.channelMap || {};
                 const lowerHandle = normalizedValue.toLowerCase();
                 const candidateId = channelMap[lowerHandle];
@@ -2213,6 +2160,44 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                 }
             } catch (e) {
                 console.warn('FilterTube Background: Failed to read channelMap for handle resolution:', e);
+            }
+        }
+
+        // If we have a videoId and NO UC ID yet, try to resolve from the video page (Shorts, Watch, Kids)
+        if (effectiveVideoId && (!lookupValue || !lookupValue.toUpperCase().startsWith('UC'))) {
+            try {
+                const isKids = profile === 'kids';
+                const resolution = isKids
+                    ? (await performKidsWatchIdentityFetch(effectiveVideoId) || await performWatchIdentityFetch(effectiveVideoId))
+                    : await performWatchIdentityFetch(effectiveVideoId);
+
+                if (resolution?.id && resolution.id.toUpperCase().startsWith('UC')) {
+                    mappedId = resolution.id;
+                    lookupValue = resolution.id;
+                    if (!metadata.channelName && resolution.name) metadata.channelName = resolution.name;
+                    if (!metadata.displayHandle && resolution.handle) metadata.displayHandle = resolution.handle;
+                    console.log('FilterTube Background: Resolved UC ID from videoId:', effectiveVideoId, '->', mappedId);
+
+                    try {
+                        enqueueVideoChannelMapUpdate(effectiveVideoId, mappedId);
+                    } catch (e) {
+                    }
+
+                    // If we have both handle and ID now, persist to channelMap
+                    const resolvedHandle = (resolution.handle || (isHandle ? normalizedValue : '')).toLowerCase();
+                    if (resolvedHandle && resolvedHandle.startsWith('@')) {
+                        try {
+                            const mapStorage = await storageGet(['channelMap']);
+                            const currentMap = mapStorage.channelMap || {};
+                            if (currentMap[resolvedHandle] !== mappedId) {
+                                currentMap[resolvedHandle] = mappedId;
+                                await browserAPI.storage.local.set({ channelMap: currentMap });
+                            }
+                        } catch (e) { }
+                    }
+                }
+            } catch (e) {
+                console.warn('FilterTube Background: Resolution from videoId failed:', e);
             }
         }
 
@@ -2277,12 +2262,20 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             return { success: false, error: 'Failed to resolve channel UC ID' };
         }
 
-        // Get existing channels
-        const storage = await new Promise(resolve => {
-            browserAPI.storage.local.get(['filterChannels'], resolve);
-        });
+        // Get existing channels from the correct profile
+        const isKids = profile === 'kids';
+        const storageKeys = isKids ? ['ftProfilesV3'] : ['filterChannels'];
+        const storage = await storageGet(storageKeys);
 
-        const channels = Array.isArray(storage.filterChannels) ? storage.filterChannels : [];
+        let channels = [];
+        let profilesV3 = null;
+        if (isKids) {
+            profilesV3 = storage.ftProfilesV3 || {};
+            const kidsProfile = profilesV3.kids || {};
+            channels = Array.isArray(kidsProfile.blockedChannels) ? kidsProfile.blockedChannels : [];
+        } else {
+            channels = Array.isArray(storage.filterChannels) ? storage.filterChannels : [];
+        }
 
         // Build allCollaborators array from collaborationWith for popup grouping
         const allCollaborators = collaborationWith && collaborationWith.length > 0
@@ -2293,6 +2286,7 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
         const normalizedHandle = canonicalHandle ? canonicalHandle.toLowerCase() : (channelInfo.handle ? channelInfo.handle.toLowerCase() : '');
         const handleDisplay = metadata.displayHandle || channelInfo.handleDisplay || canonicalHandle || (metadata.channelName || channelInfo.name) || '';
         const finalChannelName = pickBetterName(metadata.channelName, channelInfo.name, handleDisplay, canonicalHandle, normalizedValue);
+
         if (normalizedHandle) {
             channelInfo.handle = normalizedHandle;
         }
@@ -2304,6 +2298,8 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
         const existingIndex = channels.findIndex(ch =>
             ch && (ch.id === channelInfo.id || ch.handle === channelInfo.handle)
         );
+
+        let finalChannelData = null;
 
         if (existingIndex !== -1) {
             const existing = channels[existingIndex] || {};
@@ -2317,7 +2313,6 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
 
             const updated = {
                 ...existing,
-                // Ensure core identity fields are populated
                 id: existing.id || channelInfo.id,
                 handle: existing.handle || channelInfo.handle,
                 handleDisplay: existing.handleDisplay || channelInfo.handleDisplay,
@@ -2326,23 +2321,20 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                     ? existing.name
                     : finalChannelName,
                 logo: existing.logo || channelInfo.logo,
-                customUrl: existing.customUrl || customUrl,  // Preserve or add customUrl
+                customUrl: existing.customUrl || customUrl,
                 source: existing.source || metadata.source || null,
-                originalInput: existing.originalInput || customUrl || channelInfo.handle || channelInfo.id || rawValue // Track original input
+                originalInput: existing.originalInput || customUrl || channelInfo.handle || channelInfo.id || rawValue,
+                addedAt: existing.addedAt || Date.now()
             };
 
-            // Upgrade Filter All: once true, it stays true unless user turns it off in UI
             if (filterAll && !existing.filterAll) {
                 updated.filterAll = true;
             }
 
-            // Merge collaboration metadata when provided
             if (Array.isArray(collaborationWith) && collaborationWith.length > 0) {
                 const existingWith = Array.isArray(existing.collaborationWith) ? existing.collaborationWith : [];
                 const mergedWith = [...new Set([...existingWith, ...collaborationWith])];
                 updated.collaborationWith = mergedWith;
-
-                // Rebuild allCollaborators snapshot for UI grouping
                 updated.allCollaborators = allCollaborators;
             }
 
@@ -2351,118 +2343,82 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             }
 
             channels[existingIndex] = updated;
-
-            // Update channelMap with customUrl → UC ID mapping if we have a new customUrl
-            if (customUrl && updated.id && !existing.customUrl) {
+            finalChannelData = updated;
+            console.log(`FilterTube Background: Updated existing channel (${profile}):`, updated);
+        } else {
+            // Add new channel
+            let customUrl = metadata.customUrl || channelInfo.customUrl || null;
+            if (customUrl) {
                 try {
-                    const mapStorage = await new Promise(resolve => {
-                        browserAPI.storage.local.get(['channelMap'], resolve);
-                    });
-                    const channelMap = mapStorage.channelMap || {};
-
-                    let normalizedCustomUrl = customUrl.toLowerCase();
-                    try {
-                        normalizedCustomUrl = decodeURIComponent(normalizedCustomUrl).toLowerCase();
-                    } catch (e) {
-                        // ignore
-                    }
-
-                    if (!channelMap[normalizedCustomUrl]) {
-                        channelMap[normalizedCustomUrl] = updated.id;
-                        console.log('FilterTube Background: Added customUrl mapping (update):', normalizedCustomUrl, '->', updated.id);
-
-                        await new Promise(resolve => {
-                            browserAPI.storage.local.set({ channelMap: channelMap }, resolve);
-                        });
-                    }
-                } catch (e) {
-                    console.warn('FilterTube Background: Failed to update channelMap with customUrl:', e);
-                }
+                    customUrl = decodeURIComponent(customUrl);
+                } catch (e) { /* already decoded or invalid */ }
             }
 
-            // Save to storage
-            await new Promise(resolve => {
-                browserAPI.storage.local.set({ filterChannels: channels }, resolve);
-            });
-
-            console.log('FilterTube Background: Updated existing channel:', updated);
-
-            return {
-                success: true,
-                channelData: updated,
-                updated: true
+            const newChannel = {
+                id: channelInfo.id,
+                handle: channelInfo.handle,
+                handleDisplay: channelInfo.handleDisplay || null,
+                canonicalHandle: channelInfo.canonicalHandle || null,
+                name: finalChannelName,
+                logo: channelInfo.logo,
+                filterAll: filterAll,
+                collaborationWith: collaborationWith || [],
+                collaborationGroupId: collaborationGroupId || null,
+                allCollaborators: allCollaborators,
+                customUrl: customUrl || null,
+                source: metadata.source || (isKids ? 'user' : null),
+                originalInput: customUrl || channelInfo.handle || channelInfo.id || rawValue,
+                addedAt: Date.now()
             };
-        }
 
-        // Add new channel
-        // Determine customUrl from metadata or channelInfo (decode for unicode consistency)
-        let customUrl = metadata.customUrl || channelInfo.customUrl || null;
-        if (customUrl) {
-            try {
-                customUrl = decodeURIComponent(customUrl);
-            } catch (e) { /* already decoded or invalid */ }
+            channels.unshift(newChannel);
+            finalChannelData = newChannel;
+            console.log(`FilterTube Background: Successfully added channel (${profile}):`, newChannel);
         }
-
-        const newChannel = {
-            id: channelInfo.id,
-            handle: channelInfo.handle,
-            handleDisplay: channelInfo.handleDisplay || null,
-            canonicalHandle: channelInfo.canonicalHandle || null,
-            name: finalChannelName,
-            logo: channelInfo.logo,
-            filterAll: filterAll, // Use provided value
-            collaborationWith: collaborationWith || [], // Store collaboration metadata
-            collaborationGroupId: collaborationGroupId || null, // UUID for group operations
-            allCollaborators: allCollaborators, // Full list of all collaborators for popup grouping
-            customUrl: customUrl, // c/Name or user/Name for legacy channels
-            source: metadata.source || null,
-            originalInput: customUrl || channelInfo.handle || channelInfo.id || rawValue, // Track what user originally blocked
-            addedAt: Date.now()
-        };
 
         // Update channelMap with customUrl → UC ID mapping if available
-        if (customUrl && channelInfo.id) {
+        const customUrlToMap = finalChannelData.customUrl || metadata.customUrl || channelInfo.customUrl;
+        if (customUrlToMap && finalChannelData.id) {
             try {
-                const mapStorage = await new Promise(resolve => {
-                    browserAPI.storage.local.get(['channelMap'], resolve);
-                });
+                const mapStorage = await storageGet(['channelMap']);
                 const channelMap = mapStorage.channelMap || {};
-
-                // Normalize customUrl for case-insensitive lookup (decode + lowercase)
-                let normalizedCustomUrl = customUrl.toLowerCase();
+                let normalizedCustomUrl = customUrlToMap.toLowerCase();
                 try {
                     normalizedCustomUrl = decodeURIComponent(normalizedCustomUrl).toLowerCase();
-                } catch (e) {
-                    // ignore
-                }
+                } catch (e) { }
 
-                // Add mapping: c/name → UC ID
-                if (!channelMap[normalizedCustomUrl] || channelMap[normalizedCustomUrl] !== channelInfo.id) {
-                    channelMap[normalizedCustomUrl] = channelInfo.id;
-                    console.log('FilterTube Background: Added customUrl mapping:', normalizedCustomUrl, '->', channelInfo.id);
-
-                    await new Promise(resolve => {
-                        browserAPI.storage.local.set({ channelMap: channelMap }, resolve);
-                    });
+                if (!channelMap[normalizedCustomUrl] || channelMap[normalizedCustomUrl] !== finalChannelData.id) {
+                    channelMap[normalizedCustomUrl] = finalChannelData.id;
+                    await browserAPI.storage.local.set({ channelMap: channelMap });
+                    console.log('FilterTube Background: Added customUrl mapping:', normalizedCustomUrl, '->', finalChannelData.id);
                 }
-            } catch (e) {
-                console.warn('FilterTube Background: Failed to update channelMap with customUrl:', e);
-            }
+            } catch (e) { }
         }
 
-        // Add to beginning (newest first)
-        channels.unshift(newChannel);
+        // Save back to storage
+        if (isKids) {
+            profilesV3.kids = {
+                ...(profilesV3.kids || {}),
+                blockedChannels: channels
+            };
+            await browserAPI.storage.local.set({ ftProfilesV3: profilesV3 });
 
-        // Save to storage
-        await new Promise(resolve => {
-            browserAPI.storage.local.set({ filterChannels: channels }, resolve);
-        });
-
-        console.log('FilterTube Background: Successfully added channel:', newChannel);
+            // Broadcast refresh for Kids
+            try {
+                browserAPI.tabs.query({ url: ['*://*.youtubekids.com/*'] }, tabs => {
+                    (tabs || []).forEach(tab => {
+                        if (tab?.id) browserAPI.tabs.sendMessage(tab.id, { action: 'FilterTube_RefreshNow' }, () => { });
+                    });
+                });
+            } catch (e) { }
+        } else {
+            await browserAPI.storage.local.set({ filterChannels: channels });
+        }
 
         return {
             success: true,
-            channelData: newChannel
+            channelData: finalChannelData,
+            updated: existingIndex !== -1
         };
 
     } catch (error) {

@@ -25,6 +25,46 @@
     let dataHooksEstablished = false;
     let rawYtInitialData = null;
     let rawYtInitialPlayerResponse = null;
+
+    let replayTimer = null;
+    let replayAttempts = 0;
+
+    function replayPendingQueueIfReady() {
+        try {
+            if (!cachedSettings) return;
+            if (!Array.isArray(pendingDataQueue) || pendingDataQueue.length === 0) return;
+
+            const engine = window.FilterTubeEngine;
+            const hasEngine = Boolean(engine && (typeof engine.processData === 'function' || typeof engine.harvestOnly === 'function'));
+            if (!hasEngine) {
+                replayAttempts++;
+                if (replayAttempts > 50) return;
+                scheduleReplay();
+                return;
+            }
+
+            replayAttempts = 0;
+
+            const queue = [...pendingDataQueue];
+            pendingDataQueue = [];
+            for (const item of queue) {
+                try {
+                    const sourceData = cloneData(item.data) || item.data;
+                    processWithEngine(sourceData, `${item.name}-replay`);
+                } catch (e) {
+                }
+            }
+        } catch (e) {
+        }
+    }
+
+    function scheduleReplay() {
+        if (replayTimer) return;
+        replayTimer = setTimeout(() => {
+            replayTimer = null;
+            replayPendingQueueIfReady();
+        }, 250);
+    }
     
     // Debug logging with sequence numbers
     let seedDebugSequence = 0;
@@ -183,6 +223,17 @@
             seedDebugLog(`⚠️ No data to process for ${dataName}`);
             return data;
         }
+
+        const queueForLater = (reason) => {
+            try {
+                pendingDataQueue.push({ data: data, name: dataName, timestamp: Date.now(), reason: reason || '' });
+                if (pendingDataQueue.length > 60) {
+                    pendingDataQueue = pendingDataQueue.slice(-40);
+                }
+                scheduleReplay();
+            } catch (e) {
+            }
+        };
         
         if (!cachedSettings) {
             seedDebugLog(`⚠️ No settings available for processing ${dataName}, queueing`);
@@ -208,6 +259,7 @@
                 }
             } else {
                 seedDebugLog(`⚠️ FilterTubeEngine.harvestOnly not available for ${dataName}`);
+                queueForLater('harvestOnly-missing');
             }
 
             seedDebugLog(`⏭️ Skipping engine filtering for ${dataName} to allow DOM-based restore`);
@@ -249,7 +301,8 @@
         } else {
             seedDebugLog(`⚠️ FilterTubeEngine not available yet`);
             seedDebugLog(`Available on window:`, Object.keys(window).filter(k => k.includes('Filter')));
-            return basicProcessing(data, dataName);
+            queueForLater('engine-missing');
+            return data;
         }
     }
 
@@ -415,11 +468,21 @@
             '/youtubei/v1/player'
         ];
 
+        const getPathname = (rawUrl) => {
+            try {
+                return new URL(String(rawUrl || ''), document.location?.origin || 'https://www.youtube.com').pathname;
+            } catch (e) {
+                const fallback = String(rawUrl || '');
+                return fallback.split('?')[0] || fallback;
+            }
+        };
+
         const originalFetch = window.fetch;
         window.fetch = function(resource, init) {
             const url = resource instanceof Request ? resource.url : resource;
-            
-            if (!fetchEndpoints.some(endpoint => url.includes(endpoint))) {
+            const urlStr = typeof url === 'string' ? url : String(url || '');
+
+            if (!fetchEndpoints.some(endpoint => urlStr.includes(endpoint))) {
                 return originalFetch.apply(this, arguments);
             }
 
@@ -465,7 +528,7 @@
                     }
                     
                     // Normal processing for non-comment or non-hideAllComments requests
-                    const processed = processWithEngine(jsonData, `fetch:${new URL(url).pathname}`);
+                    const processed = processWithEngine(jsonData, `fetch:${getPathname(urlStr)}`);
                     return new Response(JSON.stringify(processed), {
                         status: response.status,
                         statusText: response.statusText,
@@ -480,6 +543,84 @@
         };
 
         seedDebugLog("✅ Fetch interception established");
+    }
+
+    function setupXhrInterception() {
+        try {
+            if (window.__filtertubeXhrInterceptionInstalled) return;
+            window.__filtertubeXhrInterceptionInstalled = true;
+
+            const xhrEndpoints = [
+                '/youtubei/v1/search',
+                '/youtubei/v1/guide',
+                '/youtubei/v1/browse',
+                '/youtubei/v1/next',
+                '/youtubei/v1/player'
+            ];
+
+            const proto = window.XMLHttpRequest && window.XMLHttpRequest.prototype;
+            if (!proto) return;
+
+            const originalOpen = proto.open;
+            const originalSend = proto.send;
+            if (typeof originalOpen !== 'function' || typeof originalSend !== 'function') return;
+
+            const getPathname = (rawUrl) => {
+                try {
+                    return new URL(String(rawUrl || ''), document.location?.origin || 'https://www.youtube.com').pathname;
+                } catch (e) {
+                    const fallback = String(rawUrl || '');
+                    return fallback.split('?')[0] || fallback;
+                }
+            };
+
+            proto.open = function(method, url) {
+                try {
+                    this.__filtertube_url = url;
+                } catch (e) {
+                }
+                return originalOpen.apply(this, arguments);
+            };
+
+            proto.send = function() {
+                try {
+                    const rawUrl = this.__filtertube_url;
+                    const urlStr = typeof rawUrl === 'string' ? rawUrl : String(rawUrl || '');
+                    if (urlStr && xhrEndpoints.some(endpoint => urlStr.includes(endpoint))) {
+                        this.addEventListener('load', () => {
+                            try {
+                                if (!cachedSettings) return;
+                                if (cachedSettings.enabled === false) return;
+
+                                const responseType = this.responseType || '';
+                                if (responseType && responseType !== 'text') return;
+
+                                const text = this.responseText;
+                                if (!text || typeof text !== 'string') return;
+                                const trimmed = text.trim();
+                                if (!trimmed || (trimmed[0] !== '{' && trimmed[0] !== '[')) return;
+
+                                let jsonData = null;
+                                try {
+                                    jsonData = JSON.parse(trimmed);
+                                } catch (e) {
+                                    return;
+                                }
+
+                                processWithEngine(jsonData, `xhr:${getPathname(urlStr)}`);
+                            } catch (e) {
+                            }
+                        }, { once: true });
+                    }
+                } catch (e) {
+                }
+
+                return originalSend.apply(this, arguments);
+            };
+
+            seedDebugLog("✅ XHR interception established");
+        } catch (e) {
+        }
     }
 
     // ============================================================================
@@ -589,6 +730,8 @@
     
     // Set up fetch interception
     setupFetchInterception();
+
+    setupXhrInterception();
     
     // Mark as ready and dispatch event
     window.ftSeedInitialized = true;

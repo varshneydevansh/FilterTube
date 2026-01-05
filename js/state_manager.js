@@ -134,9 +134,30 @@ const StateManager = (() => {
         state.channelMap = data.channelMap || {};
         state.theme = data.theme || 'light';
         if (profilesV3 && profilesV3.kids) {
+            // Cleanup legacy "Blocked Video (Kids)" entries that have no valid ID/handle
+            const cleanBlockedChannels = (profilesV3.kids.blockedChannels || []).filter(ch => {
+                const id = (ch.id || '').trim();
+                const handle = (ch.handle || '').trim();
+                const customUrl = (ch.customUrl || '').trim();
+                const name = (ch.name || '').trim();
+
+                // If it has a valid identifier (UC ID, handle, customUrl), keep it for enrichment
+                if (id.toUpperCase().startsWith('UC') || (handle && handle.startsWith('@')) || customUrl) {
+                    return true;
+                }
+
+                // If it's a legacy placeholder with no identifier, drop it
+                if (name === 'Blocked Video (Kids)' || name === 'Channel') {
+                    return false;
+                }
+
+                // Keep if it has a non-placeholder name (it might be a text-based ID we can resolve)
+                return !!name;
+            });
+
             state.kids = {
                 blockedKeywords: profilesV3.kids.blockedKeywords || [],
-                blockedChannels: profilesV3.kids.blockedChannels || [],
+                blockedChannels: cleanBlockedChannels,
                 whitelistedChannels: profilesV3.kids.whitelistedChannels || [],
                 whitelistedKeywords: profilesV3.kids.whitelistedKeywords || [],
                 mode: profilesV3.kids.mode || 'whitelist',
@@ -206,22 +227,35 @@ const StateManager = (() => {
         return false;
     }
 
-    function channelEnrichmentKey(channel) {
-        return String(channel?.id || channel?.handle || channel?.customUrl || '').toLowerCase();
+    function channelEnrichmentKey(channel, profile = 'main') {
+        const baseKey = String(channel?.id || channel?.handle || channel?.customUrl || '').toLowerCase();
+        if (!baseKey) return '';
+        return `${profile}:${baseKey}`;
     }
 
     function computeChannelSignature() {
-        if (!Array.isArray(state.channels)) return '';
-        return state.channels
-            .map(ch => channelEnrichmentKey(ch))
+        const mainChannels = Array.isArray(state.channels) ? state.channels : [];
+        const kids = state.kids || {};
+        const kidsChannels = Array.isArray(kids.blockedChannels) ? kids.blockedChannels : [];
+
+        const mainSig = mainChannels
+            .map(ch => channelEnrichmentKey(ch, 'main'))
             .filter(Boolean)
             .sort()
             .join('|');
+
+        const kidsSig = kidsChannels
+            .map(ch => channelEnrichmentKey(ch, 'kids'))
+            .filter(Boolean)
+            .sort()
+            .join('|');
+
+        return `${mainSig}|||${kidsSig}`;
     }
 
-    function queueChannelForEnrichment(channel) {
+    function queueChannelForEnrichment(channel, profile = 'main') {
         if (!shouldEnrichChannel(channel)) return;
-        const key = channelEnrichmentKey(channel);
+        const key = channelEnrichmentKey(channel, profile);
         if (!key || channelEnrichmentAttempted.has(key)) return;
         channelEnrichmentAttempted.add(key);
 
@@ -230,7 +264,8 @@ const StateManager = (() => {
             handleDisplay: channel.handleDisplay || null,
             canonicalHandle: channel.canonicalHandle || null,
             customUrl: channel.customUrl || null,
-            source: channel.source || null
+            source: channel.source || null,
+            profile: profile
         });
     }
 
@@ -241,9 +276,18 @@ const StateManager = (() => {
     }
 
     async function enqueueChannelEnrichment() {
-        if (!Array.isArray(state.channels) || state.channels.length === 0) return;
-        for (const channel of state.channels) {
-            queueChannelForEnrichment(channel);
+        // Main channels
+        if (Array.isArray(state.channels)) {
+            for (const channel of state.channels) {
+                queueChannelForEnrichment(channel, 'main');
+            }
+        }
+        // Kids channels
+        const kids = state.kids || {};
+        if (Array.isArray(kids.blockedChannels)) {
+            for (const channel of kids.blockedChannels) {
+                queueChannelForEnrichment(channel, 'kids');
+            }
         }
         processChannelEnrichmentQueue();
     }
@@ -284,7 +328,8 @@ const StateManager = (() => {
             canonicalHandle: task.canonicalHandle,
             channelName: null,
             customUrl: task.customUrl,
-            source: task.source || null
+            source: task.source || null,
+            profile: task.profile || 'main'
         }, () => {
             // throttle to avoid hammering
             const durationMs = Date.now() - startedAt;
@@ -330,6 +375,7 @@ const StateManager = (() => {
         kids.blockedKeywords = [entry, ...kids.blockedKeywords];
         state.kids = { ...kids };
         await persistKidsProfiles(state.kids);
+        await requestRefresh('kids');
         notifyListeners('kidsKeywordAdded', { word: trimmed });
         return true;
     }
@@ -342,6 +388,7 @@ const StateManager = (() => {
         if (kids.blockedKeywords.length === before) return false;
         state.kids = { ...kids };
         await persistKidsProfiles(state.kids);
+        await requestRefresh('kids');
         notifyListeners('kidsKeywordRemoved', { word });
         return true;
     }
@@ -367,6 +414,7 @@ const StateManager = (() => {
         kids.blockedKeywords[index] = entry;
         state.kids = { ...kids };
         await persistKidsProfiles(state.kids);
+        await requestRefresh('kids');
         notifyListeners('kidsKeywordUpdated', { word, comments: entry.comments !== false });
         return entry.comments !== false;
     }
@@ -390,6 +438,7 @@ const StateManager = (() => {
         kids.blockedKeywords[index] = entry;
         state.kids = { ...kids };
         await persistKidsProfiles(state.kids);
+        await requestRefresh('kids');
         notifyListeners('kidsKeywordUpdated', { word, exact: !!entry.exact });
         return !!entry.exact;
     }
@@ -419,65 +468,68 @@ const StateManager = (() => {
 
     async function addKidsChannel(input) {
         await ensureLoaded();
-        const entry = normalizeKidsChannelInput(input);
-        if (!entry) return { success: false, error: 'Empty input' };
+        const rawValue = (input || '').trim();
+        if (!rawValue) return { success: false, error: 'Empty input' };
+
+        // Validate format - Allow @handle, UC ID, or YouTube URLs
+        const lowerValue = rawValue.toLowerCase();
+        const isHandle = rawValue.startsWith('@');
+        const isUcId = lowerValue.startsWith('uc') || lowerValue.startsWith('channel/uc');
+        const isUrl = rawValue.includes('youtube.com') || rawValue.includes('youtu.be');
+        const isCustomUrl = lowerValue.startsWith('c/') || lowerValue.startsWith('/c/') ||
+            lowerValue.startsWith('user/') || lowerValue.startsWith('/user/');
+
+        if (!isHandle && !isUcId && !isUrl && !isCustomUrl) {
+            return {
+                success: false,
+                error: 'Invalid format. Use @handle, Channel ID, legacy c/ChannelName'
+            };
+        }
 
         const kids = getKidsState();
 
         const channelMap = state.channelMap && typeof state.channelMap === 'object' ? state.channelMap : {};
-        const normalizeString = (v) => (typeof v === 'string' ? v.trim() : '');
-        const normalizeHandle = (v) => {
-            const fn = window.FilterTubeIdentity?.normalizeHandleValue;
+
+        // Helper to normalize UC ID
+        const normalizeUcId = (v) => {
+            const fn = window.FilterTubeIdentity?.normalizeUcIdForComparison;
             if (typeof fn === 'function') return fn(v);
-            return normalizeString(v);
+            return (v || '').trim().toLowerCase();
         };
 
-        const makeKey = (ch) => {
-            const rawId = normalizeString(ch?.id);
-            const idLower = rawId.toLowerCase();
-            const custom = normalizeString(ch?.customUrl).toLowerCase();
-            const handle = normalizeHandle(ch?.handle).toLowerCase();
-
-            // Treat "@handle" stored in id as handle-only, not a true id.
-            const handleFromId = rawId && rawId.startsWith('@') ? normalizeHandle(rawId).toLowerCase() : '';
-            const effectiveHandle = handle || handleFromId;
-
-            // Prefer stable UC identity when available.
-            if (rawId && rawId.toUpperCase().startsWith('UC')) return `id:${idLower}`;
-
-            // Cross-match handle/customUrl through channelMap to get a UC key.
-            if (effectiveHandle) {
-                const mappedId = channelMap[effectiveHandle];
-                if (mappedId && String(mappedId).toUpperCase().startsWith('UC')) {
-                    return `id:${String(mappedId).toLowerCase()}`;
-                }
+        // Duplicate check via channelMap
+        const keySource = rawValue.startsWith('@') ? rawValue : (window.FilterTubeIdentity?.isUcId?.(rawValue) ? rawValue : null);
+        if (keySource) {
+            const mappedId = channelMap[keySource.toLowerCase()];
+            if (mappedId) {
+                const normMappedId = normalizeUcId(mappedId);
+                const alreadyExists = kids.blockedChannels.some(c =>
+                    (c.id && normalizeUcId(c.id) === normMappedId)
+                );
+                if (alreadyExists) return { success: false, error: 'Channel already exists' };
             }
-            if (custom) {
-                const mappedId = channelMap[custom];
-                if (mappedId && String(mappedId).toUpperCase().startsWith('UC')) {
-                    return `id:${String(mappedId).toLowerCase()}`;
-                }
-            }
-
-            // Fall back to handle/customUrl keys.
-            if (effectiveHandle) return `handle:${effectiveHandle}`;
-            if (custom) return `custom:${custom}`;
-
-            const original = normalizeString(ch?.originalInput).toLowerCase();
-            return original ? `orig:${original}` : '';
-        };
-
-        const incomingKey = makeKey(entry);
-        const existsIndex = incomingKey ? kids.blockedChannels.findIndex(ch => makeKey(ch) === incomingKey) : -1;
-        if (existsIndex >= 0) {
-            return { success: false, error: 'Channel already exists' };
         }
 
-        kids.blockedChannels = [entry, ...kids.blockedChannels];
-        state.kids = { ...kids };
-        await persistKidsProfiles(state.kids);
-        notifyListeners('kidsChannelAdded', { channel: entry });
-        return { success: true, channel: entry };
+        try {
+            const response = await chrome.runtime.sendMessage({
+                action: 'FilterTube_KidsBlockChannel',
+                channel: {
+                    originalInput: rawValue,
+                    source: 'user'
+                }
+            });
+
+            if (response && response.success) {
+                // Background handles persistence. We re-load settings to sync local state.
+                await loadSettings();
+                return { success: true, channel: response.channel };
+            } else {
+                return { success: false, error: response?.error || 'Failed to add Kids channel' };
+            }
+        } catch (e) {
+            console.error('FilterTube: addKidsChannel background call failed', e);
+            return { success: false, error: 'Connection to background failed' };
+        }
     }
 
     async function removeKidsChannel(index) {
@@ -488,6 +540,7 @@ const StateManager = (() => {
         kids.blockedChannels.splice(index, 1);
         state.kids = { ...kids };
         await persistKidsProfiles(state.kids);
+        await requestRefresh('kids');
         notifyListeners('kidsChannelRemoved', { channel, index });
         return true;
     }
@@ -510,6 +563,7 @@ const StateManager = (() => {
         kids.blockedChannels[index] = { ...existing };
         state.kids = { ...kids };
         await persistKidsProfiles(state.kids);
+        await requestRefresh('kids');
         notifyListeners('kidsChannelUpdated', {
             channel: kids.blockedChannels[index],
             index,
@@ -524,7 +578,7 @@ const StateManager = (() => {
      * @param {boolean} options.broadcast - Whether to broadcast to other contexts
      * @returns {Promise<Object>} Result of save operation
      */
-    async function saveSettings({ broadcast = true } = {}) {
+    async function saveSettings({ broadcast = true, profile = 'main' } = {}) {
         if (isSaving) return;
         if (!SettingsAPI.saveSettings) {
             console.warn('StateManager: SettingsAPI.saveSettings not available');
@@ -569,7 +623,7 @@ const StateManager = (() => {
             });
 
             if (broadcast && result.compiledSettings) {
-                broadcastSettings(result.compiledSettings);
+                broadcastSettings(result.compiledSettings, profile);
             }
 
             notifyListeners('save', state);
@@ -613,14 +667,34 @@ const StateManager = (() => {
     /**
      * Broadcast settings to content scripts
      */
-    function broadcastSettings(compiledSettings) {
+    function broadcastSettings(compiledSettings, profile = 'main') {
         try {
             chrome.runtime?.sendMessage({
                 action: 'FilterTube_ApplySettings',
-                settings: compiledSettings
+                settings: compiledSettings,
+                profile: profile
             });
         } catch (e) {
         }
+    }
+
+    /**
+     * Explicitly request background to re-compile and broadcast settings for a given profile.
+     * Used for Kids profile actions where we don't compile locally in StateManager.
+     */
+    async function requestRefresh(profile = 'main') {
+        return new Promise((resolve) => {
+            chrome.runtime?.sendMessage({
+                action: 'getCompiledSettings',
+                profileType: profile,
+                forceRefresh: true
+            }, (compiled) => {
+                if (compiled && !compiled.error) {
+                    broadcastSettings(compiled, profile);
+                }
+                resolve(compiled);
+            });
+        });
     }
 
     // ============================================================================
@@ -1097,7 +1171,8 @@ const StateManager = (() => {
                     'hideSubscriptions',
                     'hideSearchShelves',
                     'stats',
-                    'channelMap'
+                    'channelMap',
+                    'ftProfilesV3'
                 ];
                 const hasSettingsChange = storageKeys.some(key => changes[key]);
 

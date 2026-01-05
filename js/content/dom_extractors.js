@@ -307,6 +307,40 @@ function collectAttributeValues(element) {
         .join(' ');
 }
 
+function scanDataForVideoId(root) {
+    if (!root || typeof root !== 'object') return '';
+
+    const directVideoId = root.videoId;
+    if (typeof directVideoId === 'string' && /^[a-zA-Z0-9_-]{11}$/.test(directVideoId)) {
+        return directVideoId;
+    }
+
+    const directEncrypted = root.encryptedVideoId;
+    if (typeof directEncrypted === 'string' && /^[a-zA-Z0-9_-]{11}$/.test(directEncrypted)) {
+        return directEncrypted;
+    }
+
+    const navWatchId = root?.navigationEndpoint?.watchEndpoint?.videoId;
+    if (typeof navWatchId === 'string' && /^[a-zA-Z0-9_-]{11}$/.test(navWatchId)) {
+        return navWatchId;
+    }
+
+    const watchId = root?.watchEndpoint?.videoId;
+    if (typeof watchId === 'string' && /^[a-zA-Z0-9_-]{11}$/.test(watchId)) {
+        return watchId;
+    }
+
+    const updateItems = root?.updateKidsBlacklistEndpoint?.items;
+    if (Array.isArray(updateItems) && updateItems.length > 0) {
+        const candidate = updateItems[0]?.encryptedVideoId;
+        if (typeof candidate === 'string' && /^[a-zA-Z0-9_-]{11}$/.test(candidate)) {
+            return candidate;
+        }
+    }
+
+    return '';
+}
+
 function scanDataForChannelIdentifiers(root) {
     const result = { handle: '', id: '', customUrl: '' };
     if (!root || typeof root !== 'object') return result;
@@ -683,6 +717,8 @@ function extractVideoIdFromCard(card) {
             if (!href || typeof href !== 'string') return null;
             const watchMatch = href.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
             if (watchMatch) return watchMatch[1];
+            const watchPathMatch = href.match(/\/watch\/([a-zA-Z0-9_-]{11})(?:[/?#]|$)/);
+            if (watchPathMatch) return watchPathMatch[1];
             const shortsMatch = href.match(/\/shorts\/([a-zA-Z0-9_-]{11})/);
             if (shortsMatch) return shortsMatch[1];
             const liveMatch = href.match(/\/live\/([a-zA-Z0-9_-]{11})/);
@@ -691,6 +727,17 @@ function extractVideoIdFromCard(card) {
             if (embedMatch) return embedMatch[1];
             return null;
         };
+
+        // YouTube Kids: anchor structure differs; scan all links aggressively.
+        const tag = (card.tagName || '').toLowerCase();
+        if (tag.startsWith('ytk-')) {
+            const anchors = card.querySelectorAll('a[href]');
+            for (const anchor of anchors) {
+                const href = anchor.getAttribute('href') || '';
+                const match = extractFromHref(href);
+                if (match) return match;
+            }
+        }
 
         // Method 1: From thumbnail link href
         const thumbnailLink = card.querySelector('a#thumbnail, a[href*="/watch"]');
@@ -730,6 +777,42 @@ function extractVideoIdFromCard(card) {
                 const match = extractFromHref(href);
                 if (match) return match;
             }
+        }
+
+        const datasetValues = collectDatasetValues(card);
+        if (datasetValues) {
+            const match = extractFromHref(datasetValues);
+            if (match) return match;
+        }
+
+        const attrValues = collectAttributeValues(card);
+        if (attrValues) {
+            const match = extractFromHref(attrValues);
+            if (match) return match;
+        }
+
+        const possibleSources = new Set();
+        const addSource = source => {
+            if (!source || typeof source !== 'object') return;
+            if (source instanceof Element || source instanceof Node || source === window) return;
+            possibleSources.add(source);
+        };
+
+        addSource(card?.data);
+        addSource(card?.data?.data);
+        addSource(card?.data?.content);
+        addSource(card?.data?.metadata);
+        addSource(card?.data?.renderer);
+        addSource(card?.__data);
+        addSource(card?.__data?.data);
+        addSource(card?.__data?.content);
+        addSource(card?.__data?.metadata);
+        addSource(card?.__dataHost);
+        addSource(card?.__dataHost?.data);
+
+        for (const source of possibleSources) {
+            const found = scanDataForVideoId(source);
+            if (found) return found;
         }
 
         return null;

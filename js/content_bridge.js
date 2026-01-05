@@ -676,9 +676,36 @@ async function prefetchIdentityForCard({ videoId, card }) {
     try {
         if (!card || !card.isConnected) return;
 
-        // YouTube Kids runs on a different origin. Fetching www.youtube.com/watch from
-        // youtubekids.com is blocked by CORS, and Kids identity is handled via native flows.
         if (typeof location !== 'undefined' && String(location.hostname || '').includes('youtubekids.com')) {
+            if (currentSettings?.videoChannelMap && currentSettings.videoChannelMap[videoId]) {
+                stampChannelIdentity(card, { id: currentSettings.videoChannelMap[videoId] });
+                return;
+            }
+
+            const result = await withTimeout(
+                browserAPI_BRIDGE.runtime.sendMessage({
+                    action: 'fetchWatchIdentity',
+                    videoId,
+                    profileType: 'kids'
+                }),
+                PREFETCH_TIMEOUT_MS
+            );
+
+            const identity = result?.identity || null;
+            if (identity && (identity.id || identity.handle || identity.customUrl)) {
+                if (!identity.id && identity.handle) {
+                    const resolvedId = resolveIdFromHandle(identity.handle);
+                    if (resolvedId) {
+                        identity.id = resolvedId;
+                    }
+                }
+
+                stampChannelIdentity(card, identity);
+                if (identity.id) {
+                    persistVideoChannelMapping(videoId, identity.id);
+                }
+            }
+
             return;
         }
 
@@ -3000,6 +3027,27 @@ function handleMainWorldMessages(event) {
     } else if (type === 'FilterTube_UpdateChannelMap') {
         // Forward learned channel mappings to background for persistence
         persistChannelMappings(payload);
+    } else if (type === 'FilterTube_UpdateVideoChannelMap') {
+        // Persist learned videoId → channelId mappings (Kids browse/search + player payloads)
+        const updates = Array.isArray(payload) ? payload : (payload ? [payload] : []);
+        let didPersist = false;
+        for (const entry of updates) {
+            const videoId = entry?.videoId;
+            const channelId = entry?.channelId;
+            if (!videoId || !channelId) continue;
+            persistVideoChannelMapping(videoId, channelId);
+            didPersist = true;
+        }
+
+        if (didPersist && typeof applyDOMFallback === 'function') {
+            requestAnimationFrame(() => {
+                try {
+                    applyDOMFallback(null);
+                } catch (e) {
+                    // ignore
+                }
+            });
+        }
     } else if (type === 'FilterTube_UpdateCustomUrlMap') {
         // Forward learned customUrl → UC ID mappings to background for persistence
         if (payload && payload.customUrl && payload.id) {

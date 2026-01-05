@@ -847,8 +847,24 @@ function applyDOMFallback(settings, options = {}) {
             }
 
             if (alreadyProcessed && !forceReprocess && !contentChanged) {
-                // Skip already processed elements to avoid duplicate counting
-                return;
+                const hasIdentityAttr =
+                    element.hasAttribute('data-filtertube-channel-id') ||
+                    element.hasAttribute('data-filtertube-channel-handle') ||
+                    element.hasAttribute('data-filtertube-channel-custom');
+
+                if (!hasIdentityAttr && elementTag.startsWith('ytk-') && effectiveSettings.videoChannelMap) {
+                    const videoId = element.getAttribute('data-filtertube-video-id') || extractVideoIdFromCard(element);
+                    if (videoId && effectiveSettings.videoChannelMap[videoId]) {
+                        element.removeAttribute('data-filtertube-processed');
+                        element.removeAttribute('data-filtertube-last-processed-id');
+                    } else {
+                        // Skip already processed elements to avoid duplicate counting
+                        return;
+                    }
+                } else {
+                    // Skip already processed elements to avoid duplicate counting
+                    return;
+                }
             }
 
             // Extract Metadata
@@ -902,6 +918,34 @@ function applyDOMFallback(settings, options = {}) {
             const channelPrimaryText = channelElement?.textContent?.trim() || '';
             const channelSubtitleText = channelSubtitleElement?.textContent?.trim() || '';
             let channel = [channelPrimaryText, channelSubtitleText].filter(Boolean).join(' | ');
+
+            // YouTube Kids specific extraction from aria-label
+            if (!channel && elementTag.startsWith('ytk-')) {
+                const labelElement = element.querySelector('[aria-label]') || (element.getAttribute('aria-label') ? element : null);
+                const label = labelElement?.getAttribute?.('aria-label') || '';
+                if (label) {
+                    // Pattern 1: "... by [Channel Name] [Stats/Duration]"
+                    const byMatch = label.match(/\s+by\s+(.+?)(?:\s+\d|$)/i);
+                    if (byMatch && byMatch[1]) {
+                        channel = byMatch[1].trim();
+                    }
+                    // Pattern 2: "Video [Title] I [Channel Name] I [Duration]"
+                    else if (label.includes(' I ')) {
+                        const parts = label.split(' I ');
+                        if (parts.length >= 2) {
+                            channel = parts[1].trim();
+                        }
+                    }
+                    // Pattern 3: "Channel [Name]"
+                    else if (label.toLowerCase().startsWith('channel ')) {
+                        channel = label.substring(8).trim();
+                    }
+                    // Pattern 4: Fallback for channel card
+                    else if (elementTag === 'ytk-compact-channel-renderer') {
+                        channel = label.replace(/^Channel\s+/i, '').trim();
+                    }
+                }
+            }
             if (elementTag === 'ytd-playlist-panel-video-renderer' || elementTag === 'ytd-playlist-panel-video-wrapper-renderer') {
                 const compact = channelPrimaryText
                     .split('\n')[0]
@@ -926,6 +970,10 @@ function applyDOMFallback(settings, options = {}) {
                 if (videoId && effectiveSettings.videoChannelMap[videoId]) {
                     mappedChannelId = effectiveSettings.videoChannelMap[videoId];
                     channelMeta = { ...channelMeta, id: mappedChannelId };
+                    try {
+                        element.setAttribute('data-filtertube-channel-id', mappedChannelId);
+                    } catch (e) {
+                    }
                 }
             }
 
@@ -959,8 +1007,24 @@ function applyDOMFallback(settings, options = {}) {
 
             // Handle Container Logic (e.g., rich-grid-media inside rich-item)
             let targetToHide = element;
-            if (elementTag === 'ytd-rich-grid-media') {
-                const parent = element.closest('ytd-rich-item-renderer');
+            if (elementTag.startsWith('ytk-')) {
+                // YouTube Kids frequently uses component nodes that act like display: contents.
+                // In that case, hiding the component itself may not hide the visually-rendered box.
+                // Prefer a real layout wrapper when possible.
+                const listItem = element.closest('[role="listitem"]');
+                if (listItem) {
+                    targetToHide = listItem;
+                } else {
+                    try {
+                        const computed = window.getComputedStyle(element);
+                        if (computed && computed.display === 'contents' && element.parentElement) {
+                            targetToHide = element.parentElement;
+                        }
+                    } catch (e) {
+                    }
+                }
+            } else if (elementTag === 'ytd-rich-grid-media') {
+                const parent = element.closest('ytd-rich-item-renderer, ytd-item-section-renderer');
                 if (parent) targetToHide = parent;
             } else if (elementTag === 'yt-lockup-view-model' || elementTag === 'yt-lockup-metadata-view-model') {
                 const parent = element.closest('ytd-rich-item-renderer');

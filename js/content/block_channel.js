@@ -7,6 +7,8 @@ const isKidsSite = typeof location !== 'undefined' && location.hostname.includes
 let lastKidsMenuContext = null;
 const KIDS_MENU_CONTEXT_TTL_MS = 15000;
 let lastKidsBlockActionTs = 0;
+let lastKidsBlockClickTs = 0; // Track when user clicked block to suppress toast double-fire
+const handledKidsBlockActions = new Set(); // Set of "videoId" or "channelId" recently handled
 
 /**
  * Track which dropdowns we've already injected into (prevent flashing)
@@ -157,9 +159,9 @@ function setupKidsPassiveBlockListener() {
             const text = (menuItem.textContent || '').trim().toLowerCase();
             if (text.includes('block this video') || text.includes('block this channel')) {
                 const blockType = text.includes('block this channel') ? 'channel' : 'video';
-                setTimeout(() => {
-                    handleKidsNativeBlock(blockType).catch(err => console.error('FilterTube: Kids native block handler error', err));
-                }, 50);
+                lastKidsBlockClickTs = Date.now();
+                // Trigger immediately on click - toast will be ignored if this succeeds
+                handleKidsNativeBlock(blockType, { source: 'click' }).catch(err => console.error('FilterTube: Kids native block handler error', err));
             }
         }
     }, true);
@@ -173,8 +175,14 @@ function setupKidsPassiveBlockListener() {
                     const toast = node.matches?.('tp-yt-paper-toast#toast') ? node : node.querySelector?.('tp-yt-paper-toast#toast');
                     const text = toast?.textContent || '';
                     if (toast && /(video|channel)\s+blocked/i.test(text)) {
+                        // Suppress toast if click handler recently did it
+                        if (Date.now() - lastKidsBlockClickTs < 2000) {
+                            console.log('FilterTube: Kids block toast suppressed (click recently handled)');
+                            return;
+                        }
                         const blockType = /channel\s+blocked/i.test(text) ? 'channel' : 'video';
-                        handleKidsNativeBlock(blockType).catch(err => console.error('FilterTube: Kids native block handler error', err));
+                        // The toast is a fallback if the click listener missed it or if it took a while
+                        handleKidsNativeBlock(blockType, { source: 'toast' }).catch(err => console.error('FilterTube: Kids native block handler error', err));
                     }
                 }
             }
@@ -210,7 +218,37 @@ function captureKidsMenuContext(menuButton) {
                 context.channelId = window.FilterTubeIdentity.extractChannelIdFromPath(href) || '';
             }
             const channelName = channelAnchor?.textContent?.trim() || '';
-            if (channelName) context.channelName = channelName;
+            if (channelName) {
+                context.channelName = channelName;
+            } else {
+                // Fallback: extract from aria-label of the card or its main link
+                const labelElement = card.querySelector('[aria-label]') || card;
+                const label = labelElement?.getAttribute('aria-label') || '';
+                if (label) {
+                    // Pattern 1: "... by [Channel Name] [Stats/Duration]"
+                    const byMatch = label.match(/\s+by\s+(.+?)(?:\s+\d|$)/i);
+                    if (byMatch && byMatch[1]) {
+                        context.channelName = byMatch[1].trim();
+                    }
+                    // Pattern 2: "Video [Title] I [Channel Name] I [Duration]"
+                    else if (label.includes(' I ')) {
+                        const parts = label.split(' I ');
+                        if (parts.length >= 2) {
+                            // If it starts with "Video ", title is 0, channel is 1.
+                            if (parts[0].startsWith('Video ')) {
+                                context.channelName = parts[1].trim();
+                            } else {
+                                // Fallback to last but one or just 1
+                                context.channelName = parts[1].trim();
+                            }
+                        }
+                    }
+                    // Pattern 3: "Channel [Name]"
+                    else if (label.toLowerCase().startsWith('channel ')) {
+                        context.channelName = label.substring(8).trim();
+                    }
+                }
+            }
         }
     } catch (e) {
     }
@@ -251,14 +289,11 @@ function captureKidsMenuContext(menuButton) {
     return context;
 }
 
-async function handleKidsNativeBlock(blockType = 'video') {
-    const ts = Date.now();
-    if (ts - lastKidsBlockActionTs < 1000) {
+async function handleKidsNativeBlock(blockType = 'video', options = {}) {
+    const now = Date.now();
+    if (now - lastKidsBlockActionTs < 1000) {
         return;
     }
-    lastKidsBlockActionTs = ts;
-
-    const now = Date.now();
 
     const ctx = (lastKidsMenuContext && (now - (lastKidsMenuContext.ts || 0) < KIDS_MENU_CONTEXT_TTL_MS))
         ? lastKidsMenuContext
@@ -271,6 +306,31 @@ async function handleKidsNativeBlock(blockType = 'video') {
     const channelId = (channelIdHint || '').trim();
 
     if (!videoId && !channelId && !channelName) return;
+
+    // Deduplication logic: prevents infinite loop from toast detection
+    // Build a unique key based on what we know
+    let dedupKey = '';
+    if (videoId) {
+        dedupKey = `v:${videoId}`;
+    } else if (channelId && channelId.startsWith('UC')) {
+        dedupKey = `c:${channelId.toLowerCase()}`;
+    } else if (channelName) {
+        dedupKey = `n:${channelName.toLowerCase()}`;
+    }
+
+    if (!dedupKey) return;
+
+    if (handledKidsBlockActions.has(dedupKey)) {
+        console.log(`FilterTube: Kids block for "${dedupKey}" already handled (${options.source || 'event'})`);
+        return;
+    }
+
+    // Mark as handled for 10 seconds to cover late toasts
+    handledKidsBlockActions.add(dedupKey);
+    lastKidsBlockActionTs = now;
+    setTimeout(() => handledKidsBlockActions.delete(dedupKey), 10000);
+
+    console.log(`FilterTube: Handling Kids native ${blockType} block for:`, dedupKey);
 
     chrome.runtime?.sendMessage({
         action: 'FilterTube_KidsBlockChannel',
@@ -285,6 +345,14 @@ async function handleKidsNativeBlock(blockType = 'video') {
             originalInput: videoId ? `watch:${videoId}` : (channelId || channelName),
             source: blockType === 'channel' ? 'kidsNativeChannel' : 'kidsNativeVideo',
             addedAt: Date.now()
+        }
+    }, (response) => {
+        if (chrome.runtime?.lastError) {
+            console.warn('FilterTube: Kids block message failed:', chrome.runtime.lastError.message);
+            return;
+        }
+        if (!response?.success) {
+            console.warn('FilterTube: Kids block message rejected:', response);
         }
     });
 }
