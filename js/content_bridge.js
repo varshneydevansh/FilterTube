@@ -66,6 +66,9 @@ function pickMenuChannelDisplayName(channelInfo, injectionOptions = {}) {
         const lower = trimmed.toLowerCase();
         if (lower === 'channel') return true;
         if (lower.startsWith('mix')) return true;
+        if (lower.startsWith('my mix')) return true;
+        if (/^my\s*mix/i.test(trimmed)) return true;
+        if (/\band more\b/i.test(trimmed) && /mix/i.test(trimmed)) return true;
         if (lower.includes('mix') && trimmed.includes('–')) return true;
         return false;
     };
@@ -445,6 +448,9 @@ function updateInjectedMenuChannelName(dropdown, channelInfo) {
         const lower = trimmed.toLowerCase();
         if (lower === 'channel') return true;
         if (lower.startsWith('mix')) return true;
+        if (lower.startsWith('my mix')) return true;
+        if (/^my\s*mix/i.test(trimmed)) return true;
+        if (/\band more\b/i.test(trimmed) && /mix/i.test(trimmed)) return true;
         if (lower.includes('mix') && trimmed.includes('–')) return true;
         return false;
     };
@@ -6539,6 +6545,20 @@ async function addChannelDirectly(input, filterAll = false, collaborationWith = 
                 source: metadata.source || null
             }, (response) => {
                 resolve(response || { success: false, error: 'No response from background' });
+                
+                // Trigger auto-backup after successful channel addition
+                if (response && response.success) {
+                    try {
+                        const action = 'FilterTube_ScheduleAutoBackup';
+                        if (browserAPI_BRIDGE?.runtime?.sendMessage) {
+                            browserAPI_BRIDGE.runtime.sendMessage({ action, triggerType: 'channel_added', delay: 1000 }, () => { });
+                        } else if (typeof window.FilterTubeIO !== 'undefined' && window.FilterTubeIO.scheduleAutoBackup) {
+                            window.FilterTubeIO.scheduleAutoBackup('channel_added');
+                        }
+                    } catch (e) {
+                        console.warn('FilterTube: Failed to schedule backup:', e);
+                    }
+                }
             });
         });
 

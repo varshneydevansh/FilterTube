@@ -12,12 +12,33 @@ const StateManager = (() => {
     // Import shared settings utilities
     const SettingsAPI = window.FilterTubeSettings || {};
 
+    function scheduleAutoBackup(triggerType, delay = 1000) {
+        try {
+            const action = 'FilterTube_ScheduleAutoBackup';
+            const trigger = typeof triggerType === 'string' ? triggerType : 'unknown';
+
+            if (typeof chrome !== 'undefined' && chrome.runtime && typeof chrome.runtime.sendMessage === 'function') {
+                chrome.runtime.sendMessage({ action, triggerType: trigger, delay }, () => {
+                    // ignore errors; backups should be best-effort
+                });
+                return;
+            }
+
+            if (typeof window.FilterTubeIO !== 'undefined' && window.FilterTubeIO.scheduleAutoBackup) {
+                window.FilterTubeIO.scheduleAutoBackup(trigger, delay);
+            }
+        } catch (e) {
+            console.warn('FilterTube: Failed to schedule backup:', e);
+        }
+    }
+
     // ============================================================================
     // STATE
     // ============================================================================
 
     let state = {
         enabled: true,
+        autoBackupEnabled: true,
         keywords: [],
         userKeywords: [],
         channels: [],
@@ -99,6 +120,7 @@ const StateManager = (() => {
         }
 
         state.enabled = data.enabled !== false;
+        state.autoBackupEnabled = data.autoBackupEnabled !== false;
         state.keywords = data.keywords || [];
         state.userKeywords = data.userKeywords || [];
         state.channels = data.channels || [];
@@ -377,6 +399,10 @@ const StateManager = (() => {
         await persistKidsProfiles(state.kids);
         await requestRefresh('kids');
         notifyListeners('kidsKeywordAdded', { word: trimmed });
+        
+        // Trigger auto-backup after successful Kids keyword addition
+        scheduleAutoBackup('kids_keyword_added');
+        
         return true;
     }
 
@@ -390,6 +416,10 @@ const StateManager = (() => {
         await persistKidsProfiles(state.kids);
         await requestRefresh('kids');
         notifyListeners('kidsKeywordRemoved', { word });
+        
+        // Trigger auto-backup after successful Kids keyword removal
+        scheduleAutoBackup('kids_keyword_removed');
+        
         return true;
     }
 
@@ -416,6 +446,10 @@ const StateManager = (() => {
         await persistKidsProfiles(state.kids);
         await requestRefresh('kids');
         notifyListeners('kidsKeywordUpdated', { word, comments: entry.comments !== false });
+        
+        // Trigger auto-backup after Kids keyword comments toggle
+        scheduleAutoBackup('kids_keyword_comments_toggled');
+        
         return entry.comments !== false;
     }
 
@@ -440,6 +474,10 @@ const StateManager = (() => {
         await persistKidsProfiles(state.kids);
         await requestRefresh('kids');
         notifyListeners('kidsKeywordUpdated', { word, exact: !!entry.exact });
+        
+        // Trigger auto-backup after Kids keyword exact toggle
+        scheduleAutoBackup('kids_keyword_exact_toggled');
+        
         return !!entry.exact;
     }
 
@@ -522,6 +560,10 @@ const StateManager = (() => {
             if (response && response.success) {
                 // Background handles persistence. We re-load settings to sync local state.
                 await loadSettings();
+                
+                // Trigger auto-backup after successful Kids channel addition
+                scheduleAutoBackup('kids_channel_added');
+                
                 return { success: true, channel: response.channel };
             } else {
                 return { success: false, error: response?.error || 'Failed to add Kids channel' };
@@ -542,6 +584,10 @@ const StateManager = (() => {
         await persistKidsProfiles(state.kids);
         await requestRefresh('kids');
         notifyListeners('kidsChannelRemoved', { channel, index });
+        
+        // Trigger auto-backup after successful Kids channel removal
+        scheduleAutoBackup('kids_channel_removed');
+        
         return true;
     }
 
@@ -569,6 +615,10 @@ const StateManager = (() => {
             index,
             filterAll: kids.blockedChannels[index].filterAll
         });
+        
+        // Trigger auto-backup after Kids Filter All toggle
+        scheduleAutoBackup('kids_filter_all_toggled');
+        
         return kids.blockedChannels[index].filterAll;
     }
 
@@ -592,6 +642,7 @@ const StateManager = (() => {
                 keywords: state.keywords,
                 channels: state.channels,
                 enabled: state.enabled,
+                autoBackupEnabled: state.autoBackupEnabled,
                 hideShorts: state.hideShorts,
                 hideComments: state.hideComments,
                 filterComments: state.filterComments,
@@ -731,6 +782,10 @@ const StateManager = (() => {
         recomputeKeywords();
         await saveSettings();
         notifyListeners('keywordAdded', { word: trimmed });
+        
+        // Trigger auto-backup after successful keyword addition
+        scheduleAutoBackup('keyword_added');
+        
         return true;
     }
 
@@ -756,6 +811,10 @@ const StateManager = (() => {
         recomputeKeywords();
         await saveSettings();
         notifyListeners('keywordUpdated', { word, comments: nextValue });
+        
+        // Trigger auto-backup after keyword comments toggle
+        scheduleAutoBackup('keyword_comments_toggled');
+        
         return nextValue;
     }
 
@@ -774,6 +833,10 @@ const StateManager = (() => {
         recomputeKeywords();
         await saveSettings();
         notifyListeners('keywordRemoved', { word });
+        
+        // Trigger auto-backup after successful keyword removal
+        scheduleAutoBackup('keyword_removed');
+        
         return true;
     }
 
@@ -792,6 +855,10 @@ const StateManager = (() => {
         recomputeKeywords();
         await saveSettings();
         notifyListeners('keywordUpdated', { word, exact: state.userKeywords[index].exact });
+        
+        // Trigger auto-backup after keyword exact toggle
+        scheduleAutoBackup('keyword_exact_toggled');
+        
         return state.userKeywords[index].exact;
     }
 
@@ -885,6 +952,10 @@ const StateManager = (() => {
         recomputeKeywords();
         await saveSettings();
         notifyListeners('channelRemoved', { channel, index });
+        
+        // Trigger auto-backup after successful channel removal
+        scheduleAutoBackup('channel_removed');
+        
         return true;
     }
 
@@ -906,6 +977,10 @@ const StateManager = (() => {
             index,
             filterAll: state.channels[index].filterAll
         });
+        
+        // Trigger auto-backup after Filter All toggle
+        scheduleAutoBackup('filter_all_toggled');
+        
         return state.channels[index].filterAll;
     }
 
@@ -942,6 +1017,10 @@ const StateManager = (() => {
             index,
             filterAllComments: current.filterAllComments
         });
+        
+        // Trigger auto-backup after comment filter toggle
+        scheduleAutoBackup('comment_filter_toggled');
+        
         return current.filterAllComments;
     }
 
@@ -1000,6 +1079,7 @@ const StateManager = (() => {
 
         const validKeys = [
             'enabled',
+            'autoBackupEnabled',
             'hideShorts',
             'hideComments',
             'filterComments',
@@ -1044,6 +1124,12 @@ const StateManager = (() => {
 
         await saveSettings();
         notifyListeners('settingUpdated', { key, value: state[key] });
+        
+        // Trigger auto-backup for major settings changes
+        const majorSettings = ['enabled', 'hideShorts', 'hideComments', 'filterComments', 'hideHomeFeed'];
+        if (majorSettings.includes(key) && key !== 'autoBackupEnabled') {
+            scheduleAutoBackup('setting_updated');
+        }
     }
 
     // ============================================================================

@@ -1,5 +1,20 @@
 # Changelog
 
+## Version 3.1.7
+
+### YouTube Kids & Backup support
+
+- Added complete Channel & Keyword based blocking on YT Kids it block channels by passive listening to 3 dot menu UI in YT Kids content card i.e. "Block this video" and "Block this channel".
+- Added a Settings toggle to enable/disable auto backups.
+- Auto backups now save into `Downloads/FilterTube Backup/`.
+- Manual exports now download into `Downloads/FilterTube Export/`.
+
+### Fixes
+
+- Hardened 3-dot menu channel-name labeling on watch Mix cards so Mix metadata strings don't replace channel names.
+
+---
+
 ## Version 3.1.6
 
 ### Release Notes Experience
@@ -72,13 +87,16 @@
 ## Version 3.1.1
 
 ### Watch Page (Playlists)
+
 - Watch-page playlist panel rows now hide deterministically for blocked channels (playlist items are enriched via `videoChannelMap`).
 - Next/Prev navigation skips blocked playlist items without visible playback flash.
 
 ### UI
+
 - Added a Help section in the dashboard (new tab UI) documenting all features/toggles.
 
 ### Identity & Robustness
+
 - Improved channel identity convergence (handle/customUrl ↔ UC ID mapping) so blocking is resilient to `/@handle/about` failures.
 
 ---
@@ -86,38 +104,52 @@
 ## Version 3.1.0
 
 ### Watch Page & Docs
+
 - Documented that watch-page 3-dot menus now mirror Home/Search collaborator behavior and clarified the remaining single-channel label gap plus Shorts coverage (`docs/home_watch_collab_plan.md`, `docs/CHANNEL_BLOCKING_SYSTEM.md`, `docs/youtube_renderer_inventory.md`).
 - Captured the outstanding playlist/mix regression (hidden rows reappearing after hard refresh) so it stays visible in watch-page plans.
 
 ### Misc
+
 - Version bump to keep manifests, build tooling, and UI footer aligned with the new release.
+
+---
 
 ## Version 3.0.9
 
 ### Refactor
+
 - **3-dot menu module split**: Moved the dropdown observer/bootstrap logic into `js/content/block_channel.js` (loaded before `content_bridge.js`).
 
 ### Cleanup
+
 - **Legacy observer removal**: Removed the old/disabled dropdown observer code from `content_bridge.js` after validating the new `block_channel.js` entry-point.
 
 ### Documentation
+
 - Updated docs to reflect the new isolated-world module structure + load order.
 - Expanded `docs/youtube_renderer_inventory.md` with additional menu DOM variants used by the 3-dot injection pipeline.
+
+---
 
 ## Version 3.0.8
 
 ### Channel Blocking Hardening
+
 - **404 Recovery Pipeline**: Added a four-layer strategy (cache-first lookup, ytInitialData replay, Shorts helpers, DOM cache reset) so blocking always resolves a UC ID even when `/@handle/about` fails.
 
 - **DOM Reprocessing**: Cards now re-run the fallback when their `data-filtertube-last-processed-id` changes, preventing stale metadata from skipping new videos.
 
 ### Documentation
+
 - Added `docs/handle-404-remediation.md` playbook and updated architecture/tech docs to reflect the new recovery flow.
 - Expanded `CONTENT_HIDING_PLAYBOOK.md` and `CHANNEL_BLOCKING_SYSTEM.md` with channel identity guidance for Shorts/home surfaces.
+
+---
 
 ## Version 3.0.7
 
 ### New Features
+
 - **Posts Support**: Added proper channel extraction for YouTube community posts
   - "Block Channel" menu now works correctly on posts via 3-dot menu
   - Extracts channel info from post author links and thumbnails

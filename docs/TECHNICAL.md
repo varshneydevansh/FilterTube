@@ -1,6 +1,6 @@
-# FilterTube v3.1.6 Technical Documentation
+# FilterTube v3.1.7 Technical Documentation
 
-This document provides a deep technical dive into implementation of FilterTube's hybrid filtering engine as of v3.1.6.
+This document provides a deep technical dive into implementation of FilterTube's hybrid filtering engine as of v3.1.7.
 
 ## Core Technologies
 

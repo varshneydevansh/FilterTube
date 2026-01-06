@@ -2,13 +2,13 @@
 
 ## Overview
 
-FilterTube v3.1.6 introduces native integration with YouTube Kids, allowing users to block channels directly from Kids UI while maintaining the same filtering power available on YouTube Main.
+FilterTube v3.1.7 introduces native integration with YouTube Kids, allowing users to block channels directly from Kids UI while maintaining the same filtering power available on YouTube Main.
 
 ## Architecture
 
 ### Dual-Profile System
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────────────┐
 │                    FilterTube Extension                             │
 ├─────────────────────────────────────────────────────────────────────┤
@@ -289,7 +289,7 @@ function enqueueVideoChannelMapUpdate(videoId, channelId) {
 
 ### CORS Limitations
 
-YouTube Kids blocks cross-origin requests from www.youtube.com. FilterTube handles this by:
+YouTube Kids blocks cross-origin requests from https://www.youtube.com. FilterTube handles this by:
 
 1. **Using Kids watch pages** when possible
 2. **Falling back to main-world extraction** from Kids page HTML
@@ -297,7 +297,7 @@ YouTube Kids blocks cross-origin requests from www.youtube.com. FilterTube handl
 
 ### Fallback Strategy
 
-```
+```text
 Kids Native Block
 ├── Context Capture (videoId, channelId, channelName)
 ├── videoChannelMap Lookup (fast path)

@@ -10,6 +10,7 @@
     }
 
     const THEME_KEY = 'ftThemePreference';
+    const AUTO_BACKUP_KEY = 'ftAutoBackupEnabled';
     const SETTINGS_KEYS = [
         'enabled',
         'filterKeywords',
@@ -47,7 +48,7 @@
         'channelMap'
     ];
 
-    const SETTINGS_CHANGE_KEYS = new Set(SETTINGS_KEYS);
+    const SETTINGS_CHANGE_KEYS = new Set([...SETTINGS_KEYS, THEME_KEY, AUTO_BACKUP_KEY]);
 
     function sanitizeKeywordEntry(entry, overrides = {}) {
         if (!entry) return null;
@@ -402,7 +403,7 @@
 
     function loadSettings() {
         return new Promise(resolve => {
-            STORAGE_NAMESPACE?.get([...SETTINGS_KEYS, THEME_KEY], result => {
+            STORAGE_NAMESPACE?.get([...SETTINGS_KEYS, THEME_KEY, AUTO_BACKUP_KEY], result => {
                 // Load all keywords (user + channel-derived) from storage
                 const allKeywords = normalizeKeywords(result.uiKeywords, result.filterKeywords);
                 const channels = normalizeChannels(result.filterChannels);
@@ -416,6 +417,7 @@
                 const hideAllComments = !!result.hideAllComments;
                 const filterComments = !hideAllComments && !!result.filterComments;
                 const theme = result[THEME_KEY] === 'dark' ? 'dark' : 'light';
+                const autoBackupEnabled = result?.[AUTO_BACKUP_KEY] !== false;
 
                 resolve({
                     enabled: result.enabled !== false,
@@ -452,7 +454,8 @@
                     hideSearchShelves: !!result.hideSearchShelves,
                     stats: result.stats || { hiddenCount: 0, savedMinutes: 0 },
                     channelMap: result.channelMap || {},
-                    theme
+                    theme,
+                    autoBackupEnabled
                 });
             });
         });
@@ -489,7 +492,8 @@
         hideExploreTrending,
         hideMoreFromYouTube,
         hideSubscriptions,
-        hideSearchShelves
+        hideSearchShelves,
+        autoBackupEnabled
     }) {
         const sanitizedChannels = sanitizeChannelsList(channels);
         const sanitizedKeywords = syncFilterAllKeywords(keywords, sanitizedChannels);
@@ -560,7 +564,8 @@
             hideExploreTrending: compiledSettings.hideExploreTrending,
             hideMoreFromYouTube: compiledSettings.hideMoreFromYouTube,
             hideSubscriptions: compiledSettings.hideSubscriptions,
-            hideSearchShelves: compiledSettings.hideSearchShelves
+            hideSearchShelves: compiledSettings.hideSearchShelves,
+            [AUTO_BACKUP_KEY]: autoBackupEnabled !== false
         };
 
         return new Promise(resolve => {
@@ -611,6 +616,7 @@
     global.FilterTubeSettings = {
         STORAGE_KEYS: SETTINGS_KEYS,
         THEME_KEY,
+        AUTO_BACKUP_KEY,
         normalizeKeywords,
         normalizeChannels,
         compileKeywords,

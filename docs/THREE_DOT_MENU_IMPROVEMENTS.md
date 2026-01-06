@@ -2,11 +2,11 @@
 
 ## Overview
 
-FilterTube v3.1.6 significantly improves the 3-dot menu experience across YouTube Main and YouTube Kids, ensuring accurate channel names are displayed and blocking actions work reliably for Shorts, Mixes, Playlists, and Watch page videos.
+FilterTube v3.1.7 significantly improves the 3-dot menu experience across YouTube Main and YouTube Kids, ensuring accurate channel names are displayed and blocking actions work reliably for Shorts, Mixes, Playlists, and Watch page videos.
 
 ## Problem Statement
 
-Prior to v3.1.6, users experienced:
+Prior to v3.1.7, users experienced:
 1. **UC IDs displayed**: 3-dot menu showed `UCxxxxxxxx...` instead of human-readable channel names
 2. **Mix titles as channel names**: Mix/playlist cards showed video titles instead of actual channel names
 3. **Metadata strings as names**: Watch right-pane showed strings like "Title • 1.2M views • 2 days ago"
@@ -379,7 +379,7 @@ Track label resolution performance:
 
 ### From Previous Versions
 
-Users upgrading to v3.1.6 will see:
+Users upgrading to v3.1.7 will see:
 - Immediate improvement in Mix/playlist label accuracy
 - Better Shorts channel name resolution
 - More consistent behavior across all surfaces

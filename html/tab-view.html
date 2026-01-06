@@ -111,7 +111,7 @@
             </ul>
 
             <div class="sidebar-footer">
-                <div class="version-info">v3.1.6</div>
+                <div class="version-info">v3.1.7</div>
             </div>
         </nav>
 
@@ -268,7 +268,7 @@
                                                 Snapshot of channels, keywords, kids profiles, and themes.</br>
                                             </span>
                                             <span class="import-export-hint">
-                                                Saved as <code>filtertube_backup_YYYY-MM-DD.json</code>
+                                                Saved to <code>Downloads/FilterTube Export/</code>
                                             </span>
                                             <span class="info-hint" title="Download a portable JSON that includes every FilterTube list (channels, keywords, kids settings, design preferences, kids profiles, and more).">
                                                 Details
@@ -301,6 +301,26 @@
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Backups</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="toggle-row" title="When enabled, FilterTube will automatically save timestamped backups after you add/remove channels or keywords and after major settings changes.">
+                                <div class="toggle-info">
+                                    <div class="toggle-title">Enable Auto Backup</div>
+                                </div>
+                                <label class="switch">
+                                    <input id="setting_autoBackupEnabled" type="checkbox" data-ft-setting="autoBackupEnabled" />
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                            <div class="import-export-hint" style="margin-top:10px;">
+                                Auto backups are saved to <code>Downloads/FilterTube Backup/</code>.
                             </div>
                         </div>
                     </div>
@@ -493,7 +513,7 @@
                                     <div class="help-item-body">
                                         <ul>
                                             <li>Click <strong>Download JSON</strong> to capture the latest channels, keywords, Kids settings, and theme choices.</li>
-                                            <li>File name follows <code>filtertube_backup_YYYY-MM-DD.json</code> so you can keep multiple snapshots.</li>
+                                            <li>Export is saved to <code>Downloads/FilterTube Export/</code> (file name follows <code>filtertube_export_v3_YYYY-MM-DD.json</code>).</li>
                                             <li>Store it anywhere private (cloud drive, USB) for quick restores.</li>
                                         </ul>
                                     </div>
@@ -514,13 +534,47 @@
 
                     <div class="card">
                         <div class="card-header">
+                            <h3>YouTube Kids Integration</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="help-list">
+                                <div class="help-item">
+                                    <div class="help-item-title">Passive Listening on YouTube Kids</div>
+                                    <div class="help-item-body">FilterTube provides complete Channel & Keyword based blocking on YouTube Kids by passively listening to the 3-dot menu UI in YT Kids content cards ("Block this video" and "Block this channel").</div>
+                                </div>
+                                <div class="help-item">
+                                    <div class="help-item-title">YouTube's Native Blocking vs FilterTube</div>
+                                    <div class="help-item-body">When parents block channels using YouTube Kids' native 3-dot menu, those blocks are managed by YouTube's system. FilterTube maintains its own separate blocklist for Kids Mode, giving you additional control and backup options.</div>
+                                </div>
+                                <div class="help-item">
+                                    <div class="help-item-title">Understanding Channel Blocking Behavior</div>
+                                    <div class="help-item-body">
+                                        <p>Parents should understand YouTube's complex channel blocking system:</p>
+                                        <ul style="margin: 8px 0; padding-left: 20px;">
+                                            <li>Channels blocked via YouTube Kids' native UI are managed by YouTube's system</li>
+                                            <li>FilterTube's passive listener creates entries in its own Kids Mode blocklist</li>
+                                            <li>If a channel doesn't appear after removing from FilterTube's list, it may still be blocked by YouTube's native system</li>
+                                            <li>Use YouTube's official unblocking process for native blocks: <a href="https://support.google.com/youtubekids/answer/7178746?hl=en#zippy=%2Cunblock-individual-channels-from-youtube-using-your-linked-parent-account" target="_blank" rel="noopener noreferrer">Unblock channels from YouTube using your linked parent account</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="help-item">
+                                    <div class="help-item-title">Parent Account Integration</div>
+                                    <div class="help-item-body">YouTube Kids blocking requires a verified parent account. Parents can block content from their child's YouTube Kids profile and share content from YouTube to their child's profile. See <a href="https://support.google.com/youtubekids/answer/7178746?hl=en" target="_blank" rel="noopener noreferrer">YouTube Kids Help Center</a> for complete details.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
                             <h3>Troubleshooting</h3>
                         </div>
                         <div class="card-body">
                             <div class="help-list">
                                 <div class="help-item">
                                     <div class="help-item-title">"Failed to fetch" while blocking</div>
-                                    <div class="help-item-body">If FilterTube already knows the channel UC ID, it can still persist the block even if fetching the logo/name fails. Try reloading if the UI doesn’t update immediately.</div>
+                                    <div class="help-item-body">If FilterTube already knows the channel UC ID, it can still persist the block even if fetching the logo/name fails. Try reloading if the UI doesn't update immediately.</div>
                                 </div>
                                 <div class="help-item">
                                     <div class="help-item-title">Blocked channel still appears</div>

@@ -766,10 +766,206 @@
         return { ok: true, result };
     }
 
+    // ============================================================================
+    // AUTO-BACKUP SYSTEM
+    // ============================================================================
+
+    /**
+     * Creates an automatic backup of current FilterTube settings
+     * @param {string} triggerType - What triggered this backup ('channel_added', 'keyword_added', etc.)
+     * @param {Object} options - Additional backup options
+     */
+    async function createAutoBackup(triggerType, options = {}) {
+        try {
+            // Only create backups if user has enabled them (default: enabled)
+            const SettingsAPI = window.FilterTubeSettings || {};
+            if (typeof SettingsAPI.loadSettings !== 'function') {
+                return { ok: false, reason: 'SettingsAPI unavailable' };
+            }
+
+            const settings = await SettingsAPI.loadSettings();
+            const profilesV3 = await loadProfilesV3();
+
+            // Build backup data (same as export but without transient data)
+            const backupData = buildV3Export({
+                mainSettings: settings,
+                mainKeywords: settings.keywords || [],
+                mainChannels: settings.channels || [],
+                channelMap: settings.channelMap || {},
+                profilesV3
+            });
+
+            // Mark as backup with metadata
+            backupData.meta.backupType = 'auto';
+            backupData.meta.trigger = triggerType;
+            backupData.meta.backupLocation = await getBackupDirectory();
+
+            // Generate filename with timestamp
+            const now = new Date();
+            const timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, 19);
+            const filename = `FilterTube-Backup-${timestamp}.json`;
+
+            // Create backup file
+            const result = await saveBackupFile(backupData, filename, options);
+
+            // Rotate old backups (keep last 10)
+            if (result.ok && !options.skipRotation) {
+                await rotateBackups(10);
+            }
+
+            return result;
+        } catch (error) {
+            console.warn('FilterTube: Auto-backup failed', error);
+            return { ok: false, reason: error.message };
+        }
+    }
+
+    /**
+     * Determines the best backup directory location
+     * @returns {Promise<string>} Directory path
+     */
+    async function getBackupDirectory() {
+        // Chrome downloads API can only save to Downloads folder
+        // We'll use Downloads/FilterTube Backup/ as our backup location
+        try {
+            if (chrome && chrome.downloads) {
+                // Test if we can write to Downloads/FilterTube Backup
+                const testPath = 'FilterTube Backup/.test';
+                await new Promise((resolve, reject) => {
+                    chrome.downloads.download({
+                        url: 'data:text/plain;charset=utf-8,test',
+                        filename: testPath,
+                        saveAs: false
+                    }, (downloadId) => {
+                        if (chrome.runtime.lastError) {
+                            reject(new Error(chrome.runtime.lastError.message));
+                        } else {
+                            // Clean up test file
+                            chrome.downloads.erase({ id: downloadId });
+                            resolve(downloadId);
+                        }
+                    });
+                });
+                console.log('FilterTube: Using Downloads/FilterTube Backup/ for backups');
+                return 'FilterTube Backup';
+            }
+        } catch (e) {
+            console.warn('FilterTube: Cannot create FilterTube Backup folder, using Downloads root');
+        }
+
+        // Fallback to Downloads root
+        return '.';
+    }
+
+    /**
+     * Saves backup file using Chrome downloads API
+     * @param {Object} data - Backup data
+     * @param {string} filename - Filename
+     * @param {Object} options - Save options
+     * @returns {Promise<Object>} Result
+     */
+    async function saveBackupFile(data, filename, options = {}) {
+        return new Promise(async (resolve) => {
+            if (!chrome || !chrome.downloads) {
+                resolve({ ok: false, reason: 'Downloads API unavailable' });
+                return;
+            }
+
+            const jsonData = JSON.stringify(data, null, 2);
+            const dataUrl = `data:application/json;charset=utf-8,${encodeURIComponent(jsonData)}`;
+
+            // Get backup directory and construct full path
+            const backupDir = await getBackupDirectory();
+            const fullPath = backupDir === '.' ? filename : `${backupDir}/${filename}`;
+
+            chrome.downloads.download({
+                url: dataUrl,
+                filename: fullPath,
+                saveAs: false // Silent save
+            }, (downloadId) => {
+                const error = chrome.runtime.lastError;
+                if (error) {
+                    resolve({ ok: false, reason: error.message, downloadId: null });
+                } else {
+                    console.log(`FilterTube: Auto-backup created: ${fullPath}`);
+                    resolve({ ok: true, filename: fullPath, downloadId });
+                }
+            });
+        });
+    }
+
+    /**
+     * Rotates backup files, keeping only the most recent ones
+     * @param {number} keepCount - Number of backups to keep
+     */
+    async function rotateBackups(keepCount = 10) {
+        try {
+            if (!chrome || !chrome.downloads) return;
+
+            // Get all FilterTube backup files
+            const downloads = await new Promise((resolve) => {
+                chrome.downloads.search({
+                    query: 'FilterTube-Backup-',
+                    limit: 100 // Get recent files
+                }, resolve);
+            });
+
+            // Filter for backup files and sort by date (newest first)
+            const backupFiles = downloads
+                .filter(item => item.filename && item.filename.includes('FilterTube-Backup-'))
+                .sort((a, b) => (b.endTime || 0) - (a.endTime || 0));
+
+            // Delete old backups beyond keepCount
+            const toDelete = backupFiles.slice(keepCount);
+            for (const file of toDelete) {
+                try {
+                    await new Promise((resolve) => {
+                        chrome.downloads.erase({ id: file.id }, resolve);
+                    });
+                    console.log(`FilterTube: Deleted old backup: ${file.filename}`);
+                } catch (e) {
+                    console.warn(`FilterTube: Failed to delete backup ${file.filename}:`, e);
+                }
+            }
+        } catch (error) {
+            console.warn('FilterTube: Backup rotation failed:', error);
+        }
+    }
+
+    /**
+     * Schedules a backup with debouncing to avoid too frequent saves
+     */
+    let backupScheduleTimer = null;
+    let pendingBackupTrigger = null;
+
+    function scheduleAutoBackup(triggerType, delay = 1000) {
+        pendingBackupTrigger = triggerType;
+        
+        if (backupScheduleTimer) {
+            clearTimeout(backupScheduleTimer);
+        }
+
+        backupScheduleTimer = setTimeout(async () => {
+            if (pendingBackupTrigger) {
+                await createAutoBackup(pendingBackupTrigger);
+                pendingBackupTrigger = null;
+                backupScheduleTimer = null;
+            }
+        }, delay);
+    }
+
+    // ============================================================================
+    // PUBLIC API
+    // ============================================================================
+
     global.FilterTubeIO = {
         exportV3,
         importV3,
         loadProfilesV3,
-        saveProfilesV3
+        saveProfilesV3,
+        // Auto-backup functions
+        createAutoBackup,
+        scheduleAutoBackup,
+        rotateBackups
     };
 })(typeof window !== 'undefined' ? window : this);

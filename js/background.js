@@ -21,6 +21,305 @@ try {
     console.warn('FilterTube Background: Failed to load shared identity helpers', e);
 }
 
+function safeArray(value) {
+    return Array.isArray(value) ? value : [];
+}
+
+function safeObject(value) {
+    return value && typeof value === 'object' ? value : {};
+}
+
+function nowTs() {
+    return Date.now();
+}
+
+function buildAutoBackupPayload({ settings, profilesV3, theme }) {
+    const s = safeObject(settings);
+    const p = safeObject(profilesV3);
+    const mainProfile = safeObject(p.main);
+    const kidsProfile = safeObject(p.kids);
+
+    return {
+        meta: {
+            version: 3,
+            timestamp: nowTs(),
+            application: 'FilterTube',
+            exportType: 'full'
+        },
+        settings: {
+            theme: theme === 'dark' ? 'dark' : 'light',
+            sync: {
+                enabled: false,
+                deviceName: null
+            },
+            main: {
+                mode: typeof mainProfile.mode === 'string' ? mainProfile.mode : 'blocklist',
+                hideShorts: !!s.hideShorts,
+                hideComments: !!s.hideComments,
+                filterComments: !!s.filterComments,
+                hideHomeFeed: !!s.hideHomeFeed,
+                hideSponsoredCards: !!s.hideSponsoredCards,
+                hideWatchPlaylistPanel: !!s.hideWatchPlaylistPanel,
+                hidePlaylistCards: !!s.hidePlaylistCards,
+                hideMembersOnly: !!s.hideMembersOnly,
+                hideMixPlaylists: !!s.hideMixPlaylists,
+                hideVideoSidebar: !!s.hideVideoSidebar,
+                hideRecommended: !!s.hideRecommended,
+                hideLiveChat: !!s.hideLiveChat,
+                hideVideoInfo: !!s.hideVideoInfo,
+                hideVideoButtonsBar: !!s.hideVideoButtonsBar,
+                hideAskButton: !!s.hideAskButton,
+                hideVideoChannelRow: !!s.hideVideoChannelRow,
+                hideVideoDescription: !!s.hideVideoDescription,
+                hideMerchTicketsOffers: !!s.hideMerchTicketsOffers,
+                hideEndscreenVideowall: !!s.hideEndscreenVideowall,
+                hideEndscreenCards: !!s.hideEndscreenCards,
+                disableAutoplay: !!s.disableAutoplay,
+                disableAnnotations: !!s.disableAnnotations,
+                hideTopHeader: !!s.hideTopHeader,
+                hideNotificationBell: !!s.hideNotificationBell,
+                hideExploreTrending: !!s.hideExploreTrending,
+                hideMoreFromYouTube: !!s.hideMoreFromYouTube,
+                hideSubscriptions: !!s.hideSubscriptions,
+                hideSearchShelves: !!s.hideSearchShelves,
+                applyKidsRulesOnMain: !!mainProfile.applyKidsRulesOnMain
+            },
+            kids: {
+                mode: typeof kidsProfile.mode === 'string' ? kidsProfile.mode : 'whitelist',
+                strictMode: kidsProfile.strictMode !== false,
+                enableSearch: true
+            }
+        },
+        profiles: {
+            main: {
+                channels: safeArray(s.channels),
+                keywords: safeArray(s.keywords),
+                videoIds: safeArray(mainProfile.videoIds),
+                whitelistedChannels: safeArray(mainProfile.whitelistedChannels),
+                whitelistedKeywords: safeArray(mainProfile.whitelistedKeywords),
+                subscriptions: safeArray(mainProfile.subscriptions)
+            },
+            kids: {
+                blockedChannels: safeArray(kidsProfile.blockedChannels),
+                blockedKeywords: safeArray(kidsProfile.blockedKeywords),
+                whitelistedChannels: safeArray(kidsProfile.whitelistedChannels),
+                whitelistedKeywords: safeArray(kidsProfile.whitelistedKeywords),
+                videoIds: safeArray(kidsProfile.videoIds),
+                subscriptions: safeArray(kidsProfile.subscriptions)
+            }
+        },
+        intelligence: {
+            thumbnail: {
+                blurNsfw: false,
+                blurClickbait: false
+            },
+            semantic: {
+                enabled: false,
+                rules: []
+            }
+        },
+        maps: {
+            channelMap: safeObject(s.channelMap)
+        }
+    };
+}
+
+function readAutoBackupState() {
+    return new Promise(resolve => {
+        browserAPI.storage.local.get([
+            'enabled',
+            'uiKeywords',
+            'filterChannels',
+            'hideAllShorts',
+            'hideAllComments',
+            'filterComments',
+            'hideHomeFeed',
+            'hideSponsoredCards',
+            'hideWatchPlaylistPanel',
+            'hidePlaylistCards',
+            'hideMembersOnly',
+            'hideMixPlaylists',
+            'hideVideoSidebar',
+            'hideRecommended',
+            'hideLiveChat',
+            'hideVideoInfo',
+            'hideVideoButtonsBar',
+            'hideAskButton',
+            'hideVideoChannelRow',
+            'hideVideoDescription',
+            'hideMerchTicketsOffers',
+            'hideEndscreenVideowall',
+            'hideEndscreenCards',
+            'disableAutoplay',
+            'disableAnnotations',
+            'hideTopHeader',
+            'hideNotificationBell',
+            'hideExploreTrending',
+            'hideMoreFromYouTube',
+            'hideSubscriptions',
+            'hideSearchShelves',
+            'channelMap',
+            'ftProfilesV3',
+            'ftThemePreference'
+        ], items => {
+            const theme = items?.ftThemePreference === 'dark' ? 'dark' : 'light';
+            const settings = {
+                enabled: items?.enabled !== false,
+                channels: safeArray(items?.filterChannels),
+                keywords: safeArray(items?.uiKeywords),
+                hideShorts: !!items?.hideAllShorts,
+                hideComments: !!items?.hideAllComments,
+                filterComments: !!items?.filterComments,
+                hideHomeFeed: !!items?.hideHomeFeed,
+                hideSponsoredCards: !!items?.hideSponsoredCards,
+                hideWatchPlaylistPanel: !!items?.hideWatchPlaylistPanel,
+                hidePlaylistCards: !!items?.hidePlaylistCards,
+                hideMembersOnly: !!items?.hideMembersOnly,
+                hideMixPlaylists: !!items?.hideMixPlaylists,
+                hideVideoSidebar: !!items?.hideVideoSidebar,
+                hideRecommended: !!items?.hideRecommended,
+                hideLiveChat: !!items?.hideLiveChat,
+                hideVideoInfo: !!items?.hideVideoInfo,
+                hideVideoButtonsBar: !!items?.hideVideoButtonsBar,
+                hideAskButton: !!items?.hideAskButton,
+                hideVideoChannelRow: !!items?.hideVideoChannelRow,
+                hideVideoDescription: !!items?.hideVideoDescription,
+                hideMerchTicketsOffers: !!items?.hideMerchTicketsOffers,
+                hideEndscreenVideowall: !!items?.hideEndscreenVideowall,
+                hideEndscreenCards: !!items?.hideEndscreenCards,
+                disableAutoplay: !!items?.disableAutoplay,
+                disableAnnotations: !!items?.disableAnnotations,
+                hideTopHeader: !!items?.hideTopHeader,
+                hideNotificationBell: !!items?.hideNotificationBell,
+                hideExploreTrending: !!items?.hideExploreTrending,
+                hideMoreFromYouTube: !!items?.hideMoreFromYouTube,
+                hideSubscriptions: !!items?.hideSubscriptions,
+                hideSearchShelves: !!items?.hideSearchShelves,
+                channelMap: safeObject(items?.channelMap),
+                theme
+            };
+            const profilesV3 = safeObject(items?.ftProfilesV3);
+            resolve({ settings, profilesV3, theme });
+        });
+    });
+}
+
+function rotateAutoBackups(keepCount = 10) {
+    return new Promise(resolve => {
+        if (!browserAPI.downloads || typeof browserAPI.downloads.search !== 'function') {
+            resolve();
+            return;
+        }
+
+        browserAPI.downloads.search({
+            query: 'FilterTube-Backup-',
+            limit: 100
+        }, results => {
+            const items = Array.isArray(results) ? results : [];
+            const backups = items
+                .filter(d => (d?.filename || '').includes('FilterTube-Backup-'))
+                .sort((a, b) => {
+                    const at = (a?.endTime ? new Date(a.endTime).getTime() : 0);
+                    const bt = (b?.endTime ? new Date(b.endTime).getTime() : 0);
+                    return bt - at;
+                });
+
+            const toDelete = backups.slice(keepCount);
+            if (toDelete.length === 0) {
+                resolve();
+                return;
+            }
+
+            let remaining = toDelete.length;
+            toDelete.forEach(file => {
+                try {
+                    browserAPI.downloads.erase({ id: file.id }, () => {
+                        remaining -= 1;
+                        if (remaining <= 0) resolve();
+                    });
+                } catch (e) {
+                    remaining -= 1;
+                    if (remaining <= 0) resolve();
+                }
+            });
+        });
+    });
+}
+
+async function createAutoBackupInBackground(triggerType, options = {}) {
+    if (!browserAPI.downloads || typeof browserAPI.downloads.download !== 'function') {
+        return { ok: false, reason: 'downloads_unavailable' };
+    }
+
+    try {
+        const flag = await new Promise(resolve => {
+            browserAPI.storage.local.get(['ftAutoBackupEnabled'], items => {
+                resolve(items?.ftAutoBackupEnabled !== false);
+            });
+        });
+        if (!flag) {
+            return { ok: true, skipped: true, reason: 'disabled' };
+        }
+    } catch (e) {
+    }
+
+    const { settings, profilesV3, theme } = await readAutoBackupState();
+    const payload = buildAutoBackupPayload({ settings, profilesV3, theme });
+
+    payload.meta.backupType = 'auto';
+    payload.meta.trigger = triggerType || 'unknown';
+    payload.meta.backupLocation = 'FilterTube Backup';
+
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    const fileName = `FilterTube-Backup-${timestamp}.json`;
+    const fullPath = `FilterTube Backup/${fileName}`;
+
+    const jsonData = JSON.stringify(payload, null, 2);
+    const dataUrl = `data:application/json;charset=utf-8,${encodeURIComponent(jsonData)}`;
+
+    return new Promise(resolve => {
+        browserAPI.downloads.download({
+            url: dataUrl,
+            filename: fullPath,
+            saveAs: false
+        }, downloadId => {
+            const err = browserAPI.runtime?.lastError;
+            if (err) {
+                resolve({ ok: false, reason: err.message || 'download_failed' });
+                return;
+            }
+
+            if (!options?.skipRotation) {
+                rotateAutoBackups(10).finally(() => resolve({ ok: true, filename: fullPath, downloadId }));
+            } else {
+                resolve({ ok: true, filename: fullPath, downloadId });
+            }
+        });
+    });
+}
+
+function scheduleAutoBackupInBackground(triggerType, options = {}, delay = 1000) {
+    pendingAutoBackupTrigger = triggerType;
+    pendingAutoBackupOptions = options;
+
+    if (autoBackupTimer) {
+        clearTimeout(autoBackupTimer);
+    }
+
+    autoBackupTimer = setTimeout(async () => {
+        const trigger = pendingAutoBackupTrigger;
+        const opts = pendingAutoBackupOptions;
+        pendingAutoBackupTrigger = null;
+        pendingAutoBackupOptions = null;
+        autoBackupTimer = null;
+        try {
+            await createAutoBackupInBackground(trigger, opts || {});
+        } catch (e) {
+            console.warn('FilterTube Background: Auto-backup failed', e);
+        }
+    }, delay);
+}
+
 
 // Browser detection for compatibility
 const IS_FIREFOX = typeof browser !== 'undefined' && !!browser.runtime;
@@ -52,6 +351,10 @@ let videoChannelMapLoadPromise = null;
 let videoChannelMapFlushPromise = Promise.resolve();
 let videoChannelMapFlushTimer = null;
 const pendingVideoChannelMapUpdates = new Map();
+
+let autoBackupTimer = null;
+let pendingAutoBackupTrigger = null;
+let pendingAutoBackupOptions = null;
 
 function isKidsUrl(url) {
     return typeof url === 'string' && url.includes('youtubekids.com');
@@ -952,6 +1255,17 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
             sendResponse({ error: error.message || "Unknown error occurred while compiling settings." });
         });
         return true; // Indicates that the response is sent asynchronously.
+    } else if (action === 'FilterTube_ScheduleAutoBackup') {
+        try {
+            const triggerType = typeof request?.triggerType === 'string' ? request.triggerType : 'unknown';
+            const delay = typeof request?.delay === 'number' && Number.isFinite(request.delay) ? request.delay : 1000;
+            const options = request?.options && typeof request.options === 'object' ? request.options : {};
+            scheduleAutoBackupInBackground(triggerType, options, delay);
+            sendResponse?.({ ok: true });
+        } catch (e) {
+            sendResponse?.({ ok: false, error: e?.message || 'failed' });
+        }
+        return true;
     } else if (action === 'fetchShortsIdentity') {
         handleFetchShortsIdentityMessage(request, sendResponse);
         return true;
@@ -988,6 +1302,10 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
             requestVideoId
         ).then(result => {
             if (result.success) {
+                try {
+                    scheduleAutoBackupInBackground('kids_channel_added');
+                } catch (e) {
+                }
                 sendResponse?.({ success: true, channel: result.channelData });
             } else {
                 sendResponse?.({ success: false, error: result.error });
@@ -1350,6 +1668,10 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
                 await new Promise(resolve => browserAPI.storage.local.set({ filterChannels: channels }, resolve));
 
                 console.log("FilterTube Background: Persistent add success", newEntry);
+                try {
+                    scheduleAutoBackupInBackground('channel_added');
+                } catch (e) {
+                }
                 sendResponse({ success: true, channel: newEntry });
 
             } catch (err) {
@@ -1962,12 +2284,28 @@ browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
             },
             message.profile || 'main',
             message.videoId || ''
-        ).then(sendResponse);
+        ).then(result => {
+            try {
+                if (result && result.success) {
+                    scheduleAutoBackupInBackground((message.profile === 'kids') ? 'kids_channel_added' : 'channel_added');
+                }
+            } catch (e) {
+            }
+            sendResponse(result);
+        });
         return true;
     }
 
     if (message.type === 'toggleChannelFilterAll') {
-        handleToggleChannelFilterAll(message.channelId, message.value).then(sendResponse);
+        handleToggleChannelFilterAll(message.channelId, message.value).then(result => {
+            try {
+                if (result && result.success) {
+                    scheduleAutoBackupInBackground('filter_all_toggled');
+                }
+            } catch (e) {
+            }
+            sendResponse(result);
+        });
         return true;
     }
 

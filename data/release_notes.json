@@ -3,6 +3,19 @@
     "_comment": "Shared release notes source for the dashboard What’s New tab and the YouTube release banner. Keep entries sorted newest-first by version."
   },
   {
+    "version": "3.1.7",
+    "headline": "YT Kids + Auto-backup support",
+    "summary": "Block channel based content on YT Kids & Auto backups can now be toggled on/off",
+    "bannerSummary": "New setting: enable/disable auto backups. Exports now save into Downloads/FilterTube Export/.",
+    "highlights": [
+      "Added complete Channel & Keyword based blocking on YT Kids it block channels by passive listening to 3 dot menu UI in YT Kids",
+      "Added a Settings toggle to enable/disable auto backups (best-effort; no Save As prompts).",
+      "Auto backups save into Downloads/FilterTube Backup/ with rotation (latest files kept).",
+      "Manual exports now download silently into Downloads/FilterTube Export/."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.7"
+  },
+  {
     "version": "3.1.6",
     "headline": "Import/Export support + Release banner",
     "summary": "Banner CTA now deep-links into the What’s New dashboard, curated cards load from the same JSON, and imports better honor c/ChannelName + merge rules.",

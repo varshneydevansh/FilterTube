@@ -550,6 +550,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         ? contentControlsContainer.querySelectorAll('input[type="checkbox"][data-ft-setting]')
         : [];
 
+    const allSettingCheckboxes = document.querySelectorAll('input[type="checkbox"][data-ft-setting]');
+
     const themeToggle = document.getElementById('themeToggle');
 
     const ftExportV3Btn = document.getElementById('ftExportV3Btn');
@@ -622,17 +624,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     // IMPORT / EXPORT (V3)
     // ============================================================================
 
-    function downloadJsonFile(filename, obj) {
-        const json = JSON.stringify(obj, null, 2);
-        const blob = new Blob([json], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        setTimeout(() => URL.revokeObjectURL(url), 250);
+    function downloadJsonToDownloadsFolder(folder, filename, obj) {
+        return new Promise((resolve, reject) => {
+            try {
+                if (!chrome?.downloads?.download) {
+                    reject(new Error('Downloads API unavailable'));
+                    return;
+                }
+
+                const json = JSON.stringify(obj, null, 2);
+                const dataUrl = `data:application/json;charset=utf-8,${encodeURIComponent(json)}`;
+                const safeFolder = (typeof folder === 'string' && folder.trim()) ? folder.trim().replace(/\/+$/, '') : '';
+                const fullPath = safeFolder ? `${safeFolder}/${filename}` : filename;
+
+                chrome.downloads.download({
+                    url: dataUrl,
+                    filename: fullPath,
+                    saveAs: false
+                }, (downloadId) => {
+                    const err = chrome.runtime?.lastError;
+                    if (err) {
+                        reject(new Error(err.message || 'Download failed'));
+                        return;
+                    }
+                    resolve({ downloadId, filename: fullPath });
+                });
+            } catch (e) {
+                reject(e);
+            }
+        });
     }
 
     async function runExportV3() {
@@ -645,8 +665,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             const payload = await io.exportV3();
             const date = new Date();
             const stamp = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-            downloadJsonFile(`filtertube_export_v3_${stamp}.json`, payload);
-            UIComponents.showToast('Exported JSON', 'success');
+            const filename = `filtertube_export_v3_${stamp}.json`;
+            await downloadJsonToDownloadsFolder('FilterTube Export', filename, payload);
+            UIComponents.showToast('Exported JSON to Downloads/FilterTube Export/', 'success');
         } catch (e) {
             UIComponents.showToast('Export failed', 'error');
             console.error('Export V3 failed', e);
@@ -839,7 +860,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function updateCheckboxes() {
         const state = StateManager.getState();
 
-        contentControlCheckboxes.forEach(el => {
+        allSettingCheckboxes.forEach(el => {
             const key = el.getAttribute('data-ft-setting');
             if (!key) return;
             el.checked = !!state[key];
@@ -1280,7 +1301,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // EVENT HANDLERS - Settings
     // ============================================================================
 
-    contentControlCheckboxes.forEach(el => {
+    allSettingCheckboxes.forEach(el => {
         el.addEventListener('change', async () => {
             const key = el.getAttribute('data-ft-setting');
             if (!key) return;

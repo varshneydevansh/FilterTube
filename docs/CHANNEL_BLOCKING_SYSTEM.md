@@ -1,4 +1,4 @@
-# Channel Blocking System (v3.1.6)
+# Channel Blocking System (v3.1.7)
 
 ## 0. Goal & Non-Goals
 
@@ -132,7 +132,7 @@ This is most reliable "no-network" source when YouTube supplies browse endpoint.
 - It calls `content_bridge.js:injectFilterTubeMenuItem(dropdown, videoCard)` to render "Block channel" menu entry.
 - On click, `content_bridge.js:handleBlockChannelClick(channelInfo, ...)` runs.
 
-### 4.2 Identity resolution pipeline (v3.1.6 enhanced)
+### 4.2 Identity resolution pipeline (v3.1.7 enhanced)
 
 #### Initial extraction (synchronous):
 ```javascript
@@ -233,7 +233,7 @@ DOM fallback must be careful about:
 - Separate storage namespace (`ftProfilesV3.kids`)
 - DOM fallback uses videoChannelMap mappings from Kids browse/search
 
-### 5.4 3-Dot Menu Label Resolution (v3.1.6)
+### 5.4 3-Dot Menu Label Resolution (v3.1.7)
 
 The 3-dot menu now intelligently upgrades placeholder labels to real channel names:
 
