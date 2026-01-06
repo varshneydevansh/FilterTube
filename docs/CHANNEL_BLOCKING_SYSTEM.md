@@ -1,4 +1,4 @@
-# Channel Blocking System (Current State)
+# Channel Blocking System (v3.1.6)
 
 ## 0. Goal & Non-Goals
 
@@ -6,10 +6,11 @@
 
 FilterTube must be able to:
 
-- Identify the **channel identity** for a piece of content (preferably a stable **UC channel ID**, and also capture the **@handle** when available).
+- Identify **channel identity** for a piece of content (preferably a stable **UC channel ID**, and also capture **@handle** when available).
 - Persist blocked channels in extension storage.
 - Hide (and optionally keyword-filter) all content attributable to those blocked channels.
-- Work reliably across YouTube surfaces (Home, Search, Shorts, Watch, etc.), including SPA navigation and DOM recycling.
+- Work reliably across YouTube surfaces (Home, Search, Shorts, Watch, Kids), including SPA navigation and DOM recycling.
+- Provide accurate channel names in 3-dot menus, upgrading from UC IDs/handles to human-readable names.
 
 ### Non-goals (for this doc)
 
@@ -87,13 +88,14 @@ The system maintains two bidirectional lookup maps in local storage:
 
 ## 3. Data Sources for Channel Info (Where IDs/Handles Come From)
 
-FilterTube uses several sources, prioritized differently depending on surface.
+FilterTube uses several sources, prioritized differently depending on surface and profile.
 
 ### 3.1 DOM extraction (Isolated World)
-- `content_bridge.js` attempts to extract channel metadata from the DOM card.
-- On **Search** page, channel name is often in `#channel-info ytd-channel-name a`, while other parts (thumbnail overlays) may contain misleading text.
+- `content_bridge.js` attempts to extract channel metadata from DOM card.
+- On **Search** page, channel name is in `#channel-info ytd-channel-name a`, while thumbnail overlays may contain misleading text.
 - On **Home** page (lockup view-model), channel link may be `href="/@handle"` or `href="/channel/UC..."`.
-- On some surfaces, DOM only has **byline name** (no handle/UC ID).
+- On **Shorts** cards, often only handle/videoId is available initially.
+- On **Kids** pages, extraction follows native UI patterns (`ytk-compact-video-renderer`).
 
 ### 3.2 `ytInitialData` deep search (Main World via `injector.js`)
 - `content_bridge.js` sends `FilterTube_RequestChannelInfo` with `videoId`.
@@ -102,106 +104,189 @@ FilterTube uses several sources, prioritized differently depending on surface.
   - `browseEndpoint.canonicalBaseUrl` (handle)
   - byline run `text` (channel name)
 
-This is the most reliable “no-network” source when YouTube actually supplies the browse endpoint.
+This is most reliable "no-network" source when YouTube supplies browse endpoint.
 
-### 3.3 `/@handle/about` scrape (network)
-- Historically used to resolve `@handle -> UC ID` by fetching:
-  - `https://www.youtube.com/@<handle>/about`
-- Can fail when:
-  - The handle URL is broken on YouTube (404), even though the same channel may exist under UC ID.
-  - The handle includes unicode/percent-encoding and gets normalized incorrectly.
+### 3.3 Network fetch strategies (profile-aware)
 
-### 3.4 Shorts page fetch (network)
-- For Shorts cards that often lack channel identity in DOM:
-  - Fetch `https://www.youtube.com/shorts/<videoId>`
-  - Parse embedded `ytInitialData` / header renderers / canonical links.
-- Used as a last resort when `ytInitialData` in the current page context doesn’t help.
+#### YouTube Main:
+- **Watch page fetch**: `https://www.youtube.com/watch?v=<videoId>` for standard videos
+- **Shorts page fetch**: `https://www.youtube.com/shorts/<videoId>` for Shorts resolution
+- **Channel about fetch**: `https://www.youtube.com/@<handle>/about` (last resort)
+
+#### YouTube Kids:
+- **Kids watch fetch**: `https://www.youtubekids.com/watch?v=<videoId>` (CORS-limited)
+- Falls back to main-world extraction when Kids fetch fails
+
+### 3.4 Caching layers
+- **`videoChannelMap`**: `videoId -> UC ID` mappings for persistence
+- **`channelMap`**: `(handle | customUrl) <-> UC ID` bidirectional lookups
+- **Session caches**: In-memory caches for active browsing session
+- **Race-safe updates**: Debounced writes to prevent storage conflicts
 
 ---
 
-## 4. Blocking Flow (3-dot Menu → Persist → Hide)
+## 4. Blocking Flow (3-dot Menu → Resolve → Persist → Hide)
 
-### 4.1 Menu injection and click
-- `js/content/block_channel.js` detects the overflow dropdown and resolves the associated card.
-- It then calls `content_bridge.js:injectFilterTubeMenuItem(dropdown, videoCard)` to render the “Block channel” menu entry.
+### 4.1 Menu injection and click detection
+- `js/content/block_channel.js` detects overflow dropdown opening and resolves associated card.
+- It calls `content_bridge.js:injectFilterTubeMenuItem(dropdown, videoCard)` to render "Block channel" menu entry.
 - On click, `content_bridge.js:handleBlockChannelClick(channelInfo, ...)` runs.
 
-### 4.2 Resolve missing identifiers (best-effort)
-- If only a handle is known, attempt to resolve UC ID via:
-  - local cache / `channelMap`
-  - network fetch (`/about`) if needed
-- If initial background fetch fails with 404, attempt fallback:
-  - `searchYtInitialDataForVideoChannel(videoId, expected...)`
-  - `fetchChannelFromShortsUrl(videoId, requestedHandle)`
+### 4.2 Identity resolution pipeline (v3.1.6 enhanced)
 
-### 4.3 Persist in background
-- `content_bridge.js` calls `addChannelDirectly()` → `chrome.runtime.sendMessage({ type: 'addFilteredChannel', ... })`
-- `background.js:handleAddFilteredChannel()`:
-  - validates input
-  - prefers UC ID via `channelMap` when possible
-  - calls `fetchChannelInfo()`
-  - merges/updates existing channel entries
-  - stores `filterChannels`
+#### Initial extraction (synchronous):
+```javascript
+// Extract what's available from DOM
+let initialChannelInfo = extractChannelFromCard(videoCard);
+// Returns: { id?, handle?, name?, videoId?, needsFetch? }
+```
 
-### 4.4 Refresh settings + re-run DOM fallback
-After success:
-- `content_bridge.js` calls `requestSettingsFromBackground()`
-- Updates `currentSettings`
-- Calls `applyDOMFallback(..., { forceReprocess: true })`
+#### Background enrichment (asynchronous):
+```javascript
+// Kick off enrichment if needed
+const fetchPromise = (async () => {
+    let enrichedInfo = initialChannelInfo;
+    
+    // Determine if network fetch is needed
+    const needsEnrichment = !enrichedInfo?.id || isHandleLike(enrichedInfo?.name);
+    
+    if (needsEnrichment && enrichedInfo?.videoId) {
+        // Route to appropriate fetch handler
+        if (isKidsUrl) {
+            enrichedInfo = await performKidsWatchIdentityFetch(videoId);
+        } else if (enrichedInfo.fetchStrategy === 'shorts') {
+            enrichedInfo = await fetchChannelFromShortsUrl(videoId);
+        } else {
+            enrichedInfo = await fetchChannelFromWatchUrl(videoId);
+        }
+    }
+    
+    return enrichedInfo;
+})();
+```
 
-This is the mechanism intended to ensure the newly blocked channel hides immediately without requiring page refresh.
+#### Label update (upgrade placeholders):
+```javascript
+// Update menu label when enrichment completes
+fetchPromise.then(finalChannelInfo => {
+    if (!finalChannelInfo) return;
+    
+    // Upgrade UC IDs, Mix titles, metadata strings to real names
+    updateInjectedMenuChannelName(dropdown, finalChannelInfo);
+});
+```
+
+### 4.3 Profile-aware persistence
+- **Main profile**: Stores in `filterChannels` array
+- **Kids profile**: Stores in `ftProfilesV3.kids.blockedChannels`
+- `background.js:handleAddFilteredChannel()` routes based on sender URL:
+```javascript
+const isKids = isKidsUrl(sender.tab?.url);
+const targetProfile = isKids ? 'kids' : 'main';
+
+if (targetProfile === 'kids') {
+    // Store in kids profile
+    await addToKidsProfile(channelData);
+} else {
+    // Store in main profile
+    await addToMainProfile(channelData);
+}
+```
 
 ---
 
 ## 5. Filtering/Hiding Strategies (Why Different Surfaces Differ)
 
-### 5.1 Data interception (Main World)
-- `seed.js` intercepts YouTube JSON before render.
+### 5.1 Data interception (Main World) - Zero Flash
+- `seed.js` intercepts YouTube JSON before render via `fetch` and `XMLHttpRequest` hooks.
 - `filter_logic.js` applies blocking rules to remove items from JSON.
+- **XHR endpoints monitored**:
+  - `/youtubei/v1/search` - Search results
+  - `/youtubei/v1/browse` - Home feed, channel pages
+  - `/youtubei/v1/next` - Infinite scroll pagination
+  - `/youtubei/v1/guide` - Sidebar recommendations
+  - `/youtubei/v1/player` - Video player data
 
-**Important nuance:** For Search + Channel pages, engine filtering is sometimes skipped to allow DOM restore behavior, but the engine should still learn mappings ("harvest only").
+**Important nuance**: For Search + Channel pages, engine filtering is sometimes skipped to allow DOM restore behavior, but the engine should still learn mappings ("harvest only").
 
-### 5.2 DOM fallback (Isolated World)
+### 5.2 DOM fallback (Isolated World) - Visual Guard
 - DOM fallback exists because YouTube can:
-  - hydrate client-side
-  - recycle DOM nodes
-  - or render elements that bypass data interception.
+  - hydrate client-side after initial render
+  - recycle DOM nodes during SPA navigation
+  - render elements that bypass data interception.
 
 DOM fallback must be careful about:
 - identifying the correct container to hide (e.g., Shorts inside `ytd-rich-item-renderer`)
 - not poisoning future matches with stale `data-filtertube-channel-*` attributes
+- handling Mix/playlist cards where video titles might be confused with channel names
 
-Watch-playlist hardening (v3.1.2):
-- Autoplay uses a targeted `ended`-event guard to avoid landing on blocked playlist items.
-- Playlist panel rows are sticky-hidden across reprocessing cycles when identity is temporarily unresolved.
+### 5.3 Profile-specific handling
 
-3-dot menu UX (v3.1.2):
-- Dropdown close logic avoids globally dispatching Escape/click when a visible `ytd-miniplayer` exists, preventing the miniplayer from being closed as a side effect.
+#### YouTube Main:
+- Standard filtering engine applies
+- 3-dot menu uses full enrichment pipeline
+- All surface types supported (Home, Search, Watch, Shorts, Posts)
 
-### 5.3 Shorts special-case
-Shorts are special because many Shorts cards do not expose UC IDs in DOM.
-Therefore, the system is hybrid:
-- hide immediately via DOM fallback
-- resolve identity asynchronously (Shorts page fetch / about fetch / ytInitialData)
-- persist mapping
+#### YouTube Kids:
+- Native UI integration via passive event listeners
+- Limited CORS handling for network requests
+- Separate storage namespace (`ftProfilesV3.kids`)
+- DOM fallback uses videoChannelMap mappings from Kids browse/search
 
-### 5.4 Flash reduction & prefetch (Dec 2025 hardening)
-- **Observer & queue parameters** (all in `js/content_bridge.js`):
-  - IntersectionObserver with `rootMargin: 400px 0px 800px 0px` and `threshold: 0` so we start resolving ~1–2 viewports before a card becomes visible.
-  - At most 120 cards are observed per scan (`attachPrefetchObservers`) to keep overhead low on long feeds.
-  - On watch pages with `list=...`, playlist panel rows are prioritized for observation so the mapping is learned deterministically for playlist items.
-  - Prefetch queue is capped at 10 pending entries, concurrency at 2, and each fetch has a 5 s timeout. The queue pauses automatically when the tab is hidden.
-- **Handle → UC pre-stamp**:
-  - `queuePrefetchForCard()` first calls `resetCardIdentityIfStale()` / `getValidatedCachedCollaborators()` to clear recycled DOM nodes.
-  - If the card already exposes a handle, we consult `channelMap` immediately (`resolveIdFromHandle`). On a hit we stamp the UC ID, persist it via `persistVideoChannelMapping()`, and skip any network fetch.
-- **Network fallback path**:
-  - Shorts cards hit `fetchChannelFromShortsUrl()` (background streaming fetch with early abort); everything else calls `fetchChannelFromWatchUrl()`.
-  - Results are merged with any known handle/customUrl before stamping to maximize UC coverage.
-- **Double refilter**: every call to `stampChannelIdentity()` fires `applyDOMFallback(null)` twice (0 ms and ~60 ms later) to catch late paints/layout settle. Collaboration stamping (`applyResolvedCollaborators`, `applyCollaboratorsByVideoId`) does the same with `{ forceReprocess: true }`.
-- **Stale cleanup & collaboration sync**:
-  - `resetCardIdentityIfStale()` drops all FilterTube attributes if `data-filtertube-video-id` mismatches the current card videoId.
-  - `getValidatedCachedCollaborators()` ensures collaboration metadata matches the current video; otherwise it clears cached rosters and re-requests dialog/main-world data.
-  - `propagateCollaboratorsToMatchingCards()` reuses resolved rosters across recycled cards, so collaborator-heavy videos hide instantly after the first resolution.
+### 5.4 3-Dot Menu Label Resolution (v3.1.6)
+
+The 3-dot menu now intelligently upgrades placeholder labels to real channel names:
+
+#### Placeholder detection:
+```javascript
+// Detect values that should be upgraded
+const isUcIdLike = (value) => /^UC[a-zA-Z0-9_-]{22}$/.test(value.trim());
+
+const isProbablyNotChannelName = (value) => {
+    if (!value || typeof value !== 'string') return true;
+    const trimmed = value.trim();
+    if (!trimmed) return true;
+    if (isUcIdLike(trimmed)) return true;
+    if (trimmed.includes('•')) return true;    // Metadata separator
+    if (/\bviews?\b/i.test(trimmed)) return true;  // View count
+    if (/\bago\b/i.test(trimmed)) return true;     // Time ago
+    if (/\bwatching\b/i.test(trimmed)) return true;  // Watching count
+    const lower = trimmed.toLowerCase();
+    if (lower.startsWith('mix')) return true;
+    if (lower.includes('mix') && trimmed.includes('–')) return true;
+    return false;
+};
+```
+
+#### Surface-specific extraction:
+
+**Shorts cards:**
+- Initial: Often only `@handle` or `videoId`
+- Enrichment: Fetch from `/shorts/<videoId>` page
+- Result: Human-readable channel name replaces handle
+
+**Mix/Playlist cards:**
+- Detection: `isMixCardElement()` identifies by URL patterns (`list=RDMM`) or badge text
+- Extraction: Never use video title; extract from actual channel links
+- Result: Real channel name, not "Mix - Artist Name"
+
+**Watch page right pane:**
+- Challenge: Playlist items show metadata like "Title • 1.2M views • 2 days ago"
+- Solution: Extract from dedicated channel links, ignore metadata text
+- Result: Channel name only, clean display
+
+#### Label update flow:
+```javascript
+function updateInjectedMenuChannelName(dropdown, channelInfo) {
+    const current = nameEl.textContent.trim();
+    const next = pickMenuChannelDisplayName(channelInfo, {});
+    
+    // Only replace placeholders with better names
+    if (isUcIdLike(current) || isProbablyNotChannelName(current)) {
+        nameEl.textContent = next;
+    }
+}
+```
 
 ---
 

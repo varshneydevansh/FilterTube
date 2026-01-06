@@ -1,6 +1,6 @@
 # FilterTube v3.1.6 Technical Documentation
 
-This document provides a deep technical dive into the implementation of FilterTube's hybrid filtering engine as of v3.1.1.
+This document provides a deep technical dive into implementation of FilterTube's hybrid filtering engine as of v3.1.6.
 
 ## Core Technologies
 
@@ -42,7 +42,7 @@ sequenceDiagram
 YouTube loads more content as you scroll (infinite scroll) using `fetch` requests. FilterTube must intercept these dynamic requests to ensure new content is also filtered.
 
 **How it works (Simplified):**
-When you scroll down, YouTube asks its server for "more videos". FilterTube listens for this request. When the server replies with the new videos, FilterTube quickly checks them, removes the bad ones, and then gives the rest to YouTube to show you.
+When you scroll down, YouTube asks its server for "more videos". FilterTube listens for this request. When the server replies with new videos, FilterTube quickly checks them, removes the bad ones, and then gives the rest to YouTube to show you.
 
 **Technical Flow:**
 
@@ -60,11 +60,67 @@ When you scroll down, YouTube asks its server for "more videos". FilterTube list
 +-----------+      +-------------+      +-------------+
                                                |
                                                v
-                                        +-------------+
                                         | FilterTube  |
                                         |   Engine    |
                                         +-------------+
 ```
+
+## 3. Data Interception: XHR Hook
+
+**Motivation:**
+YouTube also uses `XMLHttpRequest` for critical API endpoints (search, browse, guide, next, player). FilterTube intercepts these to ensure comprehensive coverage.
+
+**How it works:**
+FilterTube overrides the `XMLHttpRequest.prototype.open` and `send` methods to monitor specific YouTube API endpoints. When a matching request completes, it parses the JSON response and runs it through the filter engine before YouTube can process it.
+
+**Technical Implementation:**
+
+```javascript
+// In js/seed.js - setupXhrInterception()
+const xhrEndpoints = [
+    '/youtubei/v1/search',      // Search results
+    '/youtubei/v1/guide',      // Sidebar recommendations  
+    '/youtubei/v1/browse',      // Home feed, channel pages
+    '/youtubei/v1/next',       // Infinite scroll pagination
+    '/youtubei/v1/player'       // Video player data
+];
+
+// Override XMLHttpRequest prototype
+const proto = window.XMLHttpRequest.prototype;
+const originalOpen = proto.open;
+const originalSend = proto.send;
+
+proto.open = function(method, url) {
+    this.__filtertube_url = url;  // Store URL for later use
+    return originalOpen.apply(this, arguments);
+};
+
+proto.send = function() {
+    const urlStr = String(this.__filtertube_url || '');
+    
+    if (xhrEndpoints.some(endpoint => urlStr.includes(endpoint))) {
+        this.addEventListener('load', () => {
+            try {
+                const text = this.responseText;
+                const jsonData = JSON.parse(text);
+                processWithEngine(jsonData, `xhr:${getPathname(urlStr)}`);
+            } catch (e) {
+                // Silently handle parsing errors
+            }
+        }, { once: true });
+    }
+    
+    return originalSend.apply(this, arguments);
+};
+```
+
+**Key XHR Endpoints Monitored:**
+
+- `/youtubei/v1/search` - Search results and autocomplete
+- `/youtubei/v1/browse` - Home feed, channel pages, recommendations
+- `/youtubei/v1/next` - Infinite scroll pagination (load more)
+- `/youtubei/v1/guide` - Sidebar guide recommendations
+- `/youtubei/v1/player` - Video player metadata and related videos
 
 ## 3. Filtering Engine: Recursive Blocking Decision
 
@@ -107,7 +163,132 @@ The engine acts like a meticulous inspector. It opens every box (data object) Yo
 
 ```
 
-## 9. Collaboration Detection & Cross-World Synchronization
+## 4. 3-Dot Menu System & Channel Resolution
+
+### 4.1 Menu Injection Flow
+
+When user clicks 3-dot menu on any video card, FilterTube injects a "Block Channel" option:
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Menu as 3-dot Dropdown
+    participant Card as Video Card
+    participant CB as content_bridge.js
+    participant BG as background.js
+    participant Storage
+
+    User->>Menu: Clicks 3-dot menu
+    Menu->>CB: Detects dropdown opening
+    CB->>Card: extractChannelFromCard(videoCard)
+    Note over Card: Returns initial info (may be incomplete)
+    CB->>CB: injectFilterTubeMenuItem(dropdown, videoCard)
+    Note over CB: Renders menu with initial label
+    User->>Menu: Clicks "Block Channel"
+    CB->>CB: handleBlockChannelClick(channelInfo)
+    CB->>BG: sendMessage(addFilteredChannel, channelInfo)
+    BG->>BG: Resolves identity (if needed)
+    BG->>Storage: Persists channel
+    BG->>CB: Broadcasts settings update
+    CB->>Card: Hides blocked card immediately
+```
+
+### 4.2 Channel Identity Resolution
+
+FilterTube uses a multi-layer approach to resolve channel identities:
+
+#### Layer 1: DOM Extraction (Immediate)
+```javascript
+// Extract what's available from DOM
+function extractChannelFromCard(card) {
+    // Try multiple selectors based on card type
+    const channelLink = card.querySelector('a[href*="/channel/"], a[href*="/@"]');
+    const nameElement = card.querySelector('ytd-channel-name a, #channel-info a');
+    
+    return {
+        id: extractChannelId(channelLink?.href),
+        handle: extractRawHandle(channelLink?.href),
+        name: nameElement?.textContent?.trim(),
+        videoId: extractVideoId(card),
+        needsFetch: !id || !name  // Requires network if missing key info
+    };
+}
+```
+
+#### Layer 2: Main World Lookup (Fast)
+```javascript
+// Request data from main world (injector.js)
+function requestChannelInfo(videoId) {
+    window.postMessage({
+        type: 'FilterTube_RequestChannelInfo',
+        videoId: videoId,
+        expectedHandle: extractedHandle,
+        expectedName: extractedName
+    });
+    
+    // Listen for response
+    window.addEventListener('message', (event) => {
+        if (event.data.type === 'FilterTube_ChannelInfoResponse') {
+            return event.data.channelInfo;
+        }
+    });
+}
+```
+
+#### Layer 3: Network Fetch (Fallback)
+```javascript
+// Fetch from YouTube pages when needed
+async function fetchChannelFromWatchUrl(videoId) {
+    const response = await fetch(`https://www.youtube.com/watch?v=${videoId}`);
+    const html = await response.text();
+    
+    // Parse channel info from HTML
+    const channelMatch = html.match(/"channelId":"(UC[\w-]{22})"/);
+    const nameMatch = html.match(/"author":"([^"]+)"/);
+    
+    return {
+        id: channelMatch?.[1],
+        name: nameMatch?.[1],
+        source: 'watch-fetch'
+    };
+}
+```
+
+### 4.3 Label Upgrade System
+
+The 3-dot menu intelligently upgrades placeholder labels:
+
+```javascript
+// Initial render - may show placeholder
+renderFilterTubeMenuEntries({
+    channelInfo: { name: '@handle', id: null },  // Placeholder
+    placeholder: true
+});
+
+// After enrichment - upgrade to real name
+updateInjectedMenuChannelName(dropdown, {
+    name: 'Actual Channel Name',
+    id: 'UCxxxxxxxx...'
+});
+```
+
+**Placeholder Detection Rules:**
+- UC IDs: `/^UC[\w-]{22}$/`
+- Mix titles: `/^mix\s+-/i` or contains `•` separator
+- Metadata strings: Contains `views`, `ago`, `watching`
+- Handles only: Starts with `@` and no actual name
+
+### 4.4 Profile-Aware Resolution
+
+**YouTube Main:**
+- Uses standard fetch pipeline
+- Caches in `videoChannelMap` and `channelMap`
+- Full enrichment features available
+
+**YouTube Kids:**
+- Limited CORS for network requests
+- Falls back to main-world extraction
+- Uses `ftProfilesV3.kids` storage namespace
 
 Collaboration filtering relies on coordinated logic across all three execution worlds. The end-to-end detection pipeline is:
 

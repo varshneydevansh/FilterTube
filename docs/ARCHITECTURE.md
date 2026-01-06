@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-FilterTube v3.1.1 implements a robust **Hybrid Filtering Architecture** that combines preemptive **Data Interception (Main World)** with a resilient **DOM Fallback (Isolated World)**. This dual-layer approach ensures comprehensive content filtering across all YouTube surfaces (Home, Search, Watch, Shorts) while maintaining high performance and a "Zero Flash" user experience when YouTube routes content through JSON.
+FilterTube v3.1.6 implements a robust **Hybrid Filtering Architecture** that combines preemptive **Data Interception (Main World)** with a resilient **DOM Fallback (Isolated World)**. This dual-layer approach ensures comprehensive content filtering across all YouTube surfaces (Home, Search, Watch, Shorts) while maintaining high performance and a "Zero Flash" user experience when YouTube routes content through JSON.
 
 ## Architecture Overview
 
@@ -12,12 +12,12 @@ FilterTube operates on two synchronized layers:
 
 1.  **Primary Layer: Data Interception (Main World engine)**
     *   Intercepts YouTube's raw JSON data (via `ytInitialData`, `ytInitialPlayerResponse`, and `fetch`/`XHR` overrides) before it reaches the rendering engine.
-    *   Modifies the data structure to remove blocked content *before* it is ever created in the DOM.
+    *   Modifies data structure to remove blocked content *before* it is ever created in the DOM.
     *   **Benefit:** True zero-flash filtering, high performance, no layout shift.
 
 2.  **Secondary Layer: DOM Fallback (Visual Guard)**
     *   Monitors the DOM using efficient `MutationObserver`s.
-    *   Catches any content that might bypass the data layer (e.g., client-side hydration updates, complex dynamic loading, watch-playlist playlist panel handling).
+    *   Catches any content that might bypass the data layer (e.g., client-side hydration updates, complex dynamic loading, watch-playlist panel handling).
     *   **Hybrid blocking surfaces:** Shorts and some playlist/mix surfaces may require a DOM-first hide combined with async identity enrichment.
     *   Applies visual hiding (CSS) to blocked elements.
     *   **Benefit:** Reliability, handles edge cases and dynamic updates.

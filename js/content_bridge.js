@@ -4,11 +4,33 @@ console.log("FilterTube: content_bridge.js loaded (Isolated World)");
 
 function buildChannelMetadataPayload(channelInfo = {}) {
     const canonical = channelInfo.canonicalHandle || channelInfo.handleDisplay || channelInfo.handle || '';
-    const display = channelInfo.handleDisplay || canonical || channelInfo.name || '';
+
+    const isUcIdLike = (value) => {
+        if (!value || typeof value !== 'string') return false;
+        return /^UC[a-zA-Z0-9_-]{22}$/.test(value.trim());
+    };
+
+    const isProbablyNotChannelName = (value) => {
+        if (!value || typeof value !== 'string') return true;
+        const trimmed = value.trim();
+        if (!trimmed) return true;
+        if (isUcIdLike(trimmed)) return true;
+        if (trimmed.includes('•')) return true;
+        if (/\bviews?\b/i.test(trimmed)) return true;
+        if (/\bago\b/i.test(trimmed)) return true;
+        if (/\bwatching\b/i.test(trimmed)) return true;
+        const lower = trimmed.toLowerCase();
+        if (lower.startsWith('mix')) return true;
+        if (lower.includes('mix') && trimmed.includes('–')) return true;
+        return false;
+    };
+
+    const safeName = !isProbablyNotChannelName(channelInfo.name) ? String(channelInfo.name).trim() : '';
+    const display = channelInfo.handleDisplay || canonical || safeName || '';
     return {
         canonicalHandle: canonical || null,
         handleDisplay: display || null,
-        channelName: channelInfo.name || null,
+        channelName: safeName || null,
         customUrl: channelInfo.customUrl || null,  // c/Name or user/Name for legacy channels
         source: channelInfo.source || null
     };
@@ -27,11 +49,35 @@ function pickMenuChannelDisplayName(channelInfo, injectionOptions = {}) {
         return value.trim().startsWith('@');
     };
 
-    const preferred = (!isHandleLike(displayCandidate) && displayCandidate)
+    const isUcIdLike = (value) => {
+        if (!value || typeof value !== 'string') return false;
+        return /^UC[a-zA-Z0-9_-]{22}$/.test(value.trim());
+    };
+
+    const isProbablyNotChannelName = (value) => {
+        if (!value || typeof value !== 'string') return true;
+        const trimmed = value.trim();
+        if (!trimmed) return true;
+        if (isUcIdLike(trimmed)) return true;
+        if (trimmed.includes('•')) return true;
+        if (/\bviews?\b/i.test(trimmed)) return true;
+        if (/\bago\b/i.test(trimmed)) return true;
+        if (/\bwatching\b/i.test(trimmed)) return true;
+        const lower = trimmed.toLowerCase();
+        if (lower === 'channel') return true;
+        if (lower.startsWith('mix')) return true;
+        if (lower.includes('mix') && trimmed.includes('–')) return true;
+        return false;
+    };
+
+    const safeDisplay = (!isHandleLike(displayCandidate) && displayCandidate && !isProbablyNotChannelName(displayCandidate))
         ? displayCandidate
-        : ((!isHandleLike(nameCandidate) && nameCandidate)
-            ? nameCandidate
-            : (displayCandidate || nameCandidate));
+        : '';
+    const safeName = (!isHandleLike(nameCandidate) && nameCandidate && !isProbablyNotChannelName(nameCandidate))
+        ? nameCandidate
+        : '';
+
+    const preferred = safeDisplay || safeName || '';
 
     return (
         preferred ||
@@ -382,12 +428,39 @@ function updateInjectedMenuChannelName(dropdown, channelInfo) {
     // Avoid thrashing if already up to date
     if (current === next) return;
 
-    // Only replace handle-like values with a better human name (or non-empty).
     const isHandleLike = (value) => (typeof value === 'string' && value.trim().startsWith('@'));
+    const isUcIdLike = (value) => {
+        if (!value || typeof value !== 'string') return false;
+        return /^UC[a-zA-Z0-9_-]{22}$/.test(value.trim());
+    };
+    const isProbablyNotChannelName = (value) => {
+        if (!value || typeof value !== 'string') return true;
+        const trimmed = value.trim();
+        if (!trimmed) return true;
+        if (trimmed.includes('•')) return true;
+        if (/\bviews?\b/i.test(trimmed)) return true;
+        if (/\bago\b/i.test(trimmed)) return true;
+        if (/\bwatching\b/i.test(trimmed)) return true;
+        if (isUcIdLike(trimmed)) return true;
+        const lower = trimmed.toLowerCase();
+        if (lower === 'channel') return true;
+        if (lower.startsWith('mix')) return true;
+        if (lower.includes('mix') && trimmed.includes('–')) return true;
+        return false;
+    };
+
+    const nextIsSafe = next && !isUcIdLike(next) && next.toLowerCase() !== 'channel';
+    if (!nextIsSafe) return;
+
+    // Replace placeholder-ish values (handles, UC IDs, mix titles, or metadata strings) once enrichment delivers a real name.
     if (isHandleLike(current) && !isHandleLike(next)) {
         nameEl.textContent = next;
-    } else if (!current) {
+        return;
+    }
+
+    if (isUcIdLike(current) || isProbablyNotChannelName(current)) {
         nameEl.textContent = next;
+        return;
     }
 }
 
@@ -4602,7 +4675,30 @@ function extractChannelFromCard(card) {
             }
 
             if (dataHandle || dataId) {
-                const name = lockup.querySelector('.yt-lockup-metadata-view-model__metadata')?.textContent?.trim() || '';
+                let name = '';
+                const channelLink = lockup.querySelector(
+                    '.yt-lockup-metadata-view-model__metadata a[href*="/@"], ' +
+                    '.yt-lockup-metadata-view-model__metadata a[href*="/channel/UC"], ' +
+                    '.yt-lockup-metadata-view-model__metadata a[href*="/c/"], ' +
+                    '.yt-lockup-metadata-view-model__metadata a[href*="/user/"]'
+                );
+                if (channelLink) {
+                    name = channelLink.textContent?.trim() || '';
+                }
+
+                if (!name) {
+                    const avatarImg = lockup.querySelector('yt-avatar-shape img, img.yt-avatar-shape__image');
+                    const avatarAlt = avatarImg?.getAttribute('alt')?.trim() || '';
+                    if (avatarAlt && !/go to channel/i.test(avatarAlt)) {
+                        name = avatarAlt;
+                    }
+                }
+
+                // Never treat lockup metadata text (which includes title + view count) as a channel name.
+                if (name && name.includes('•')) {
+                    name = '';
+                }
+
                 console.log('FilterTube: Extracted from lockup data attrs:', { handle: dataHandle, id: dataId, name });
                 return { handle: dataHandle || null, id: dataId || null, name };
             }
@@ -5075,8 +5171,29 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
                 return value.trim().startsWith('@');
             };
 
+            const isUcIdLike = (value) => {
+                if (!value || typeof value !== 'string') return false;
+                return /^UC[a-zA-Z0-9_-]{22}$/.test(value.trim());
+            };
+
+            const isProbablyNotChannelName = (value) => {
+                if (!value || typeof value !== 'string') return true;
+                const trimmed = value.trim();
+                if (!trimmed) return true;
+                if (trimmed.includes('•')) return true;
+                if (/\bviews?\b/i.test(trimmed)) return true;
+                if (/\bago\b/i.test(trimmed)) return true;
+                if (/\bwatching\b/i.test(trimmed)) return true;
+                if (isUcIdLike(trimmed)) return true;
+                const lower = trimmed.toLowerCase();
+                if (lower === 'channel') return true;
+                if (lower.startsWith('mix')) return true;
+                if (lower.includes('mix') && trimmed.includes('–')) return true;
+                return false;
+            };
+
             let enrichedInfo = finalChannelInfo;
-            const needsNameEnrichment = !enrichedInfo?.name || isHandleLike(enrichedInfo.name);
+            const needsNameEnrichment = !enrichedInfo?.name || isHandleLike(enrichedInfo.name) || isProbablyNotChannelName(enrichedInfo.name);
             const lookup = enrichedInfo?.id || enrichedInfo?.handle || null;
 
             if (needsNameEnrichment && lookup) {
