@@ -106,12 +106,33 @@ FilterTube uses several sources, prioritized differently depending on surface an
 
 This is most reliable "no-network" source when YouTube supplies browse endpoint.
 
+### 3.2.1 Player payload harvesting (Main World, no extra fetch)
+
+In addition to `ytInitialData`, FilterTube now passively learns identity from **player payloads** intercepted by `seed.js`:
+
+- `window.ytInitialPlayerResponse` (defineProperty setter hook)
+- `/youtubei/v1/player` responses (fetch/XHR interception)
+
+These frequently expose explicit owner fields (e.g. `videoDetails.videoOwnerChannelId`, `videoDetails.channelId`, `microformat.playerMicroformatRenderer.externalChannelId`).
+
+When detected, `filter_logic.js` registers:
+
+- **`videoChannelMap`**: `videoId -> UC...`
+- **`channelMap`**: `UC... <-> @handle` and `c/<slug>/user/<slug> -> UC...` when canonical URLs are present
+
+This makes **Shorts and Watch surfaces converge to UC IDs without page HTML fetches** in many cases.
+
 ### 3.3 Network fetch strategies (profile-aware)
 
 #### YouTube Main:
-- **Watch page fetch**: `https://www.youtube.com/watch?v=<videoId>` for standard videos
-- **Shorts page fetch**: `https://www.youtube.com/shorts/<videoId>` for Shorts resolution
+- **Watch page fetch**: `https://www.youtube.com/watch?v=<videoId>` (fallback)
+- **Shorts page fetch**: `https://www.youtube.com/shorts/<videoId>` (fallback)
 - **Channel about fetch**: `https://www.youtube.com/@<handle>/about` (last resort)
+
+**Important:** these fetches are increasingly used only when:
+
+- the clicked card does not expose `/channel/UC...` in DOM,
+- and `videoChannelMap` has not yet been learned for that `videoId` via Main World interception.
 
 #### YouTube Kids:
 - **Kids watch fetch**: `https://www.youtubekids.com/watch?v=<videoId>` (CORS-limited)
@@ -141,6 +162,13 @@ let initialChannelInfo = extractChannelFromCard(videoCard);
 // Returns: { id?, handle?, name?, videoId?, needsFetch? }
 ```
 
+**Important:** `content_bridge.js` also explicitly prefers fresh DOM attributes when present:
+
+- `data-filtertube-channel-id` (or `/channel/UC...` anchors)
+- `data-filtertube-channel-handle`
+
+So if the card already exposes `UC...`, the menu can render and block immediately without additional enrichment.
+
 #### Background enrichment (asynchronous):
 ```javascript
 // Kick off enrichment if needed
@@ -164,6 +192,12 @@ const fetchPromise = (async () => {
     return enrichedInfo;
 })();
 ```
+
+**Current behavior note:** enrichment is now **multi-path** and is not always a network fetch.
+
+- If `fetchStrategy === "mainworld"`, the menu enrichment path prefers a `ytInitialData` lookup (`searchYtInitialDataForVideoChannel(videoId, { expectedHandle, expectedName })`).
+- Shorts/watch HTML fetches are used as fallbacks when the main-world lookup is not applicable or fails.
+- Handle → UC ID resolution uses the persisted `channelMap` first; network is avoided during menu open where possible.
 
 #### Label update (upgrade placeholders):
 ```javascript
@@ -432,7 +466,8 @@ This section answers:
 
 - **3-dot menu / collaboration status (v3.1.0)**
   - The watch page now reuses the same collaborator roster cache as Home/Search, so any card with ≥2 collaborators immediately renders per-channel menu rows (plus “Block All”) with accurate names/handles.
-  - Shorts tiles opened inside the watch shell mark `fetchStrategy: 'shorts'`; we run the `/shorts/<id>` fetch before falling back to `fetchChannelFromWatchUrl`, which is why collaborator menus work even on Shorts surfaced in the watch experience.
+  - Shorts tiles opened inside the watch shell may mark `fetchStrategy: 'shorts'`; when identity is not already known via DOM extraction or `videoChannelMap`, we can fall back to `/shorts/<id>` fetch (and then `fetchChannelFromWatchUrl`) to guarantee a canonical UC ID.
+  - In many cases, the UC ID is already known by the time the menu opens because FilterTube harvests ownership from `ytInitialPlayerResponse` and `/youtubei/v1/player` payloads and persists `videoId -> UC...` into `videoChannelMap`.
   - Non-collaboration rows still show the generic “Block Channel” label because the synchronous DOM scrape rarely includes the channel name. Follow-up work is tracked to probe `ytd-watch-metadata`/`ytd-video-owner-renderer` synchronously so we can display names everywhere.
 
 - **Playlist/mix gap (still open)**
@@ -449,12 +484,13 @@ This section answers:
   - Many Shorts cards do not reliably expose UC ID in DOM.
   - So FilterTube uses a three-phase approach:
     - **Immediate hide** (DOM fallback using `videoChannelMap` if known).
-    - **Asynchronous Enrichment**: `enrichVisibleShortsWithChannelInfo()` scans current visible Shorts, fetches missing IDs, and updates the maps.
-    - **Identity Resolution**: `https://www.youtube.com/shorts/<videoId>` fetch as a last resort.
+    - **Asynchronous enrichment**: as Shorts are browsed, FilterTube learns `videoId -> UC...` from intercepted YouTube JSON (notably `ytInitialPlayerResponse` and `/youtubei/v1/player`) and persists those mappings.
+    - **Identity resolution (fallback)**: `https://www.youtube.com/shorts/<videoId>` fetch is used only when the UC ID is not available via DOM extraction, `videoChannelMap`, or main-world lookups.
 
 - **Key functions**
-  - `content_bridge.js:extractChannelFromCard()` → returns `{videoId, needsFetch: true}` for Shorts when needed.
-  - `content_bridge.js:fetchChannelFromShortsUrl(videoId, requestedHandle)` parses the Shorts HTML.
+  - `content_bridge.js:extractChannelFromCard()` → may return `{id: 'UC...', videoId}` immediately when the DOM exposes `/channel/UC...`.
+  - If the card only exposes `{videoId, needsFetch: true}`, `content_bridge.js` first consults `videoChannelMap` (persisted `videoId -> UC...`).
+  - `content_bridge.js:fetchChannelFromShortsUrl(videoId, requestedHandle)` parses Shorts HTML as a last resort.
 
 ### 10.5 Community posts (ytd-post-renderer)
 

@@ -42,16 +42,24 @@ sequenceDiagram
 
     UI->>Content: User clicks 3-dot menu
     Content->>Content: extractChannelFromCard()
-    Note over Content: Returns {needsFetch: true}
+    Note over Content: Often returns {id: "UC..."} (DOM), otherwise {needsFetch: true}
     Content->>Background: Request channel enrichment
     Background->>Cache: Check videoChannelMap
     alt Cache has mapping
-    Cache-->>Background: Return cached channelId
-    Background->>API: Fetch channel details
-    API-->>Background: Return channel info
+        Cache-->>Background: Return cached channelId
+    else No mapping
+        Background->>API: Fetch channel details
+        API-->>Background: Return channel info
+    end
     Background->>Content: Update menu label
     Content->>UI: Display updated channel name
 ```
+
+**Important update (current behavior):** the diagram above shows the *menu enrichment* request flow, but in practice **FilterTube often already knows the UC channel ID before the user opens the menu**.
+
+- **Main World interception (preferred):** `js/seed.js` intercepts `ytInitialData`, `ytInitialPlayerResponse`, and `/youtubei/v1/*` fetch/XHR payloads. `js/filter_logic.js` harvests `videoId -> UC...` and posts it via `window.postMessage({ type: 'FilterTube_UpdateVideoChannelMap' })`.
+- **Persistence:** `js/content_bridge.js` receives `FilterTube_UpdateVideoChannelMap` and forwards it to `background.js` (`action: 'updateVideoChannelMap'`). This makes Shorts/Watch identity available *on future renders* and across surfaces.
+- **DOM-first shortcut (now common):** many cards (including Shorts surfaces) now expose `/channel/UC...` anchors, so `extractChannelFromCard()` can return a UC ID immediately, meaning `needsFetch` is often false.
 
 ### 2. Request Types
 
@@ -81,6 +89,18 @@ async function searchYtInitialDataForVideoChannel(videoId, options = {}) {
 }
 ```
 
+#### A2. Main World player payload harvesting (Watch + Shorts)
+
+In addition to `ytInitialData`, the **player response** is now a major identity source:
+
+- `window.ytInitialPlayerResponse` (defineProperty hook in `js/seed.js`)
+- `/youtubei/v1/player` (fetch/XHR interception in `js/seed.js`)
+
+These commonly include explicit fields such as `videoDetails.videoOwnerChannelId` / `videoDetails.channelId` or `microformat.playerMicroformatRenderer.externalChannelId`, allowing `filter_logic.js` to register:
+
+- `channelMap` mappings (UC ID ↔ handle/customUrl)
+- `videoChannelMap` mappings (videoId → UC ID)
+
 #### B. YouTube Watch Page Fetch
 ```javascript
 // Reliable fallback for Main profile
@@ -107,6 +127,11 @@ async function fetchChannelFromWatchUrl(videoId, requestedHandle = null) {
 }
 ```
 
+**Current guidance:** treat this as a **fallback path**, not the primary identity source.
+
+- **Primary sources** are DOM extraction (`/channel/UC...` links) and Main World interception (`ytInitialPlayerResponse` + `/youtubei/v1/player`) which populate `videoChannelMap`.
+- Use watch-page HTML fetching mainly when the video has not yet produced a player payload (no `videoChannelMap` entry) and the DOM does not expose a UC ID.
+
 #### C. YouTube Shorts Page Fetch
 ```javascript
 // Specialized for Shorts cards
@@ -132,6 +157,11 @@ async function fetchChannelFromShortsUrl(videoId, requestedHandle = null) {
     }
 }
 ```
+
+**Current guidance:** this is also increasingly a **fallback**.
+
+- Shorts identity is often learned passively from intercepted JSON renderers (byline `browseEndpoint.browseId`) or from player payloads.
+- Once learned, `videoChannelMap[videoId]` allows subsequent Shorts renders to resolve channel ID without additional fetches.
 
 #### D. YouTube Kids Watch Page Fetch
 ```javascript
@@ -185,17 +215,17 @@ async function performKidsWatchIdentityFetch(videoId) {
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                   Cache Layers                      │
+│                   Cache Layers                              │
 ├─────────────────────────────────────────────────────────────┤
-│  L1: In-Memory (Immediate)                           │
-│  ├── videoChannelMapCache (Background)                │
-│  ├── kidsWatchIdentitySessionCache (Content)             │
-│  └── channelDetailsCache (Background)                 │
+│  L1: In-Memory (Immediate)                                  │
+│  ├── videoChannelMapCache (Background)                      │
+│  ├── kidsWatchIdentitySessionCache (Content)                │
+│  └── channelDetailsCache (Background)                       │
 ├─────────────────────────────────────────────────────────────┤
-│  L2: Browser Storage (Persistent)                       │
-│  ├── videoChannelMap (videoId → channelId)           │
-│  ├── channelMap (handle/customUrl → UC ID)           │
-│  └── ftProfilesV3 (Profile data)                   │
+│  L2: Browser Storage (Persistent)                           │
+│  ├── videoChannelMap (videoId → channelId)                  │
+│  ├── channelMap (handle/customUrl → UC ID)                  │
+│  └── ftProfilesV3 (Profile data)                            │
 └─────────────────────────────────────────────────────────────┘
 ```
 

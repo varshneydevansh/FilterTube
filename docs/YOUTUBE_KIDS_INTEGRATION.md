@@ -163,6 +163,13 @@ sequenceDiagram
 
 ### Kids-Specific Fetch Function
 
+FilterTube uses the same **identity caches** on both YouTube Main and YouTube Kids:
+
+- `videoChannelMap`: `videoId -> UC...` (learned passively from intercepted YouTube JSON such as `ytInitialPlayerResponse` and `/youtubei/v1/player`, then persisted)
+- `channelMap`: `@handle` / `c/<slug>` / `user/<slug>` ↔ `UC...`
+
+On Kids, these caches are especially important because direct network fetches can be **CORS-limited**.
+
 ```javascript
 async function performKidsWatchIdentityFetch(videoId) {
     // Check videoChannelMap first (fast path)
@@ -201,6 +208,8 @@ async function performKidsWatchIdentityFetch(videoId) {
     return await performWatchIdentityFetch(videoId);
 }
 ```
+
+**Note:** this function represents a **fallback path** used when the UC ID is not already known via DOM extraction or `videoChannelMap`. The preferred path for both Main and Kids is to reuse mappings learned from intercepted JSON so blocking can happen immediately.
 
 ## UI Integration
 

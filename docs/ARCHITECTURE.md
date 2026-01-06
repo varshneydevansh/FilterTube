@@ -16,11 +16,17 @@ FilterTube operates on two synchronized layers:
     *   **Benefit:** True zero-flash filtering, high performance, no layout shift.
 
 2.  **Secondary Layer: DOM Fallback (Visual Guard)**
-    *   Monitors the DOM using efficient `MutationObserver`s.
-    *   Catches any content that might bypass the data layer (e.g., client-side hydration updates, complex dynamic loading, watch-playlist panel handling).
-    *   **Hybrid blocking surfaces:** Shorts and some playlist/mix surfaces may require a DOM-first hide combined with async identity enrichment.
-    *   Applies visual hiding (CSS) to blocked elements.
-    *   **Benefit:** Reliability, handles edge cases and dynamic updates.
+    * Monitors the DOM using efficient `MutationObserver`s.
+    * Catches any content that might bypass the data layer (e.g., client-side hydration updates, complex dynamic loading, watch-playlist panel handling).
+    * **Hybrid blocking surfaces:** Shorts and some playlist/mix surfaces may require a DOM-first hide combined with async identity enrichment.
+    * Applies visual hiding (CSS) to blocked elements.
+    * **Benefit:** Reliability, handles edge cases and dynamic updates.
+
+**Channel identity note (current behavior):** identity enrichment is increasingly **passive**.
+
+* The **Main World interception layer** (`seed.js` + `filter_logic.js`) harvests channel ownership from `ytInitialPlayerResponse` and `/youtubei/v1/player` payloads, learning `videoId -> UC...` mappings that get persisted into `videoChannelMap`.
+* The **Isolated World** also frequently extracts `UC...` directly from DOM (e.g., `/channel/UC...` anchors).
+* As a result, explicit HTML fetches of `/watch?v=` and `/shorts/` pages are now best treated as **fallback** paths when neither DOM nor interception has provided a canonical UC ID yet.
 
 ### **Release Notes + What’s New Surface (v3.1.6 addition)**
 
@@ -28,15 +34,15 @@ FilterTube now ships an internal “What’s New” dashboard tab that shares a 
 
 ```mermaid
 graph TD
-    RN[data/release_notes.json] --> BG[background.js]
-    BG -->|buildReleaseNotesPayload| Storage[(releaseNotesPayload)]
-    Storage --> Banner[content/release_notes_prompt.js<br/>(YouTube CTA)]
-    RN --> Dashboard[tab-view.js<br/>loadReleaseNotesIntoDashboard]
+    RN["data/release_notes.json"] --> BG["background.js"]
+    BG -->|"buildReleaseNotesPayload"| Storage["(releaseNotesPayload)"]
+    Storage --> Banner["content/release_notes_prompt.js<br/>YouTube CTA"]
+    RN --> Dashboard["tab-view.js<br/>loadReleaseNotesIntoDashboard"]
 ```
 
-- **Background** hydrates the payload when the extension updates or the banner pings `FilterTube_ReleaseNotesCheck`.
-- **Content script** handles CTA clicks by messaging `FilterTube_OpenWhatsNew`; the background script focuses or spawns `tab-view.html?view=whatsnew`.
-- **Tab view** reads both hash and `?view=` parameters, ensuring deep links land on the What’s New tab and scroll it into view.
+* *Background* hydrates the payload when the extension updates or the banner pings `FilterTube_ReleaseNotesCheck`.
+* *Content script* handles CTA clicks by messaging `FilterTube_OpenWhatsNew`; the background script focuses or spawns `tab-view.html?view=whatsnew`.
+* *Tab view* reads both hash and `?view=` parameters, ensuring deep links land on the What’s New tab and scroll it into view.
 
 This keeps announcements self-contained inside the extension, avoiding blocked `chrome-extension://` navigations or offsite changelog links.
 
@@ -44,10 +50,10 @@ This keeps announcements self-contained inside the extension, avoiding blocked `
 
 `js/io_manager.js` became the canonical normalization/adapter layer. Both UI (Tab View) and future sync tooling call into this module, preventing subtle drift between import/export flows. Key points:
 
-- All inbound identifiers funnel through `normalizeChannelInput`, handling `UC…`, `@handles`, `/c/<slug>`, `/user/<slug>`, and plain names.
-- Merge behavior is deterministic (`UCID > handle > customUrl > originalInput`) with earliest `addedAt` preserved so backups retain ordering.
-- Export flow reads `StateManager` + `chrome.storage.local` (channel/keyword lists, channelMap) and emits a portable v3 schema.
-- Import flow (`importV3`) supports native FilterTube exports, BlockTube JSON, and plaintext lists via adapters.
+* All inbound identifiers funnel through `normalizeChannelInput`, handling `UC…`, `@handles`, `/c/<slug>`, `/user/<slug>`, and plain names.
+* Merge behavior is deterministic (`UCID > handle > customUrl > originalInput`) with earliest `addedAt` preserved so backups retain ordering.
+* Export flow reads `StateManager` + `chrome.storage.local` (channel/keyword lists, channelMap) and emits a portable v3 schema.
+* Import flow (`importV3`) supports native FilterTube exports, BlockTube JSON, and plaintext lists via adapters.
 
 ASCII overview:
 
@@ -136,21 +142,20 @@ The following diagram illustrates the complete interaction between all FilterTub
 +-------------------------------+-----------------------+          |                                                  |
 |                Data Interception Layer                |<---------+                                                  |
 |                                                       |                                                             |
-|   +-------------+            +-------------+          |                                                             |
-|   | 4a: seed.js |            | 3a: seed.js |          |                                                             |
-|   | Fetch Proxy |            |ytInitialData|          |                                                             |
-|   +------+------+            +------+------+          |                                                             |
-|          | intercepts               | intercepts      |                                                             |
-|          v                          v                 |                                                             |
-|   +----------------------------------------+          |                                                             |
-|   |        3b: processWithEngine           |          |                                                             |
-|   |             (Call Filter)              |          |                                                             |
-|   +------------------+---------------------+          |                                                             |
-|                      | calls                          |                                                             |
+|   +----------------------+     +----------------------+     +----------------------+                                   |
+|   | 3a: seed.js Hooks     |     | 3b: seed.js Hooks     |     | 4a: seed.js Fetch/XHR|                                   |
+|   | window.ytInitialData  |     | window.ytInitial      |     | Proxy (/youtubei/v1/*|                                   |
+|   | (Main + Kids pages)   |     | PlayerResponse        |     | incl. /player)       |                                   |
+|   +----------+-----------+     +----------+-----------+     +----------+-----------+                                   |
+|              | intercepts               | intercepts               | intercepts                                            |
+|              v                          v                          v                                                     |
+|   +--------------------------------------------------------------------------------------+                               |
+|   |                         3c: processWithEngine (Call Filter)                         |                               |
+|   +------------------------------+-------------------------------+-----------------------+                               |
+|                                  | calls                          |                                                     |
 +----------------------+--------------------------------+                                                             |
                        |                                                                                              |
                        v                                                                                              |
-+-------------------------------------------------------+          +--------------------------------------------------+
 |                 Filtering Engine Core                 |<---------+               DOM Fallback Layer                 |
 |                                                       |          |                                                  |
 |   +-------------+                                     |          |   +-------------+                                |
@@ -162,6 +167,26 @@ The following diagram illustrates the complete interaction between all FilterTub
 |   | 5b: Identity| <--- | 5e: videoChannel  |          |          |   | 6b: Apply   |                                |
 |   | Resolution  |      |     Map Lookup    |          |          |   |  Fallback   |                                |
 |   +------+------+      +-------------------+          |          |   +------+------+                                |
+|          | harvests owner UC IDs                       |          |                                                  |
+|          v                                             |          |                                                  |
+|   +------------------------+                           |          |                                                  |
+|   | 5f: Harvest + Persist  |                           |          |                                                  |
+|   | videoId -> UC...       |                           |          |                                                  |
+|   | (FilterTube_Update     |                           |          |                                                  |
+|   |  VideoChannelMap)      |                           |          |                                                  |
+|   +-----------+------------+                           |          |                                                  |
+|               | postMessage                             |          |                                                  |
+|               v                                        |          |                                                  |
+|   +------------------------+                           |          |                                                  |
+|   | content_bridge.js      |                           |          |                                                  |
+|   | forwards to background |                           |          |                                                  |
+|   +-----------+------------+                           |          |                                                  |
+|               | chrome.runtime.sendMessage              |          |                                                  |
+|               v                                        |          |                                                  |
+|   +------------------------+                           |          |                                                  |
+|   | background.js          |                           |          |                                                  |
+|   | persists videoChannelMap|                          |          |                                                  |
+|   +------------------------+                           |          |                                                  |
 |          |                                            |          |          | scans                                 |
 |   +------v------+                                     |          |   +------v------+                                |
 |   | 5c: Traverse|                                     |          |   | 6c: Match   |                                |

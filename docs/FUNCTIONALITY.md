@@ -102,7 +102,7 @@ YouTube JSON Data → FilterTubeEngine.processData() → Filtered Data → YouTu
 - **Shorts Detection**: Identifies and blocks YouTube Shorts content
 - **Multiple Layouts**: Handles Shorts in various YouTube layouts
 - **Mobile Compatibility**: Works across desktop and mobile interfaces
-- **Canonical Resolution**: Every Shorts block performs a hidden fetch to resolve the canonical UC ID before persisting, guaranteeing that long-form uploads from the same channel are also filtered.
+- **Canonical Resolution**: Resolves to a canonical `UC...` channel ID whenever possible so blocking a Short also blocks long-form uploads and posts from the same channel. This is typically learned from DOM metadata and intercepted YouTube JSON (then persisted in `videoChannelMap`); a hidden fetch is used only as a fallback when the UC ID is not yet available.
 - **Zero-Gap Removal**: DOM fallback hides the entire parent `ytd-rich-item-renderer`/grid slot so blocked Shorts never leave blank placeholders.
 - **Collaboration Support**: When Shorts include the avatar stack UI, FilterTube requests collaborator metadata from the main world so the same multi-channel 3-dot menu appears on Shorts shelves and the watch page.
 

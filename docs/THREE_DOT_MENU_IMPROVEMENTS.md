@@ -63,6 +63,11 @@ const isProbablyNotChannelName = (value) => {
 const dataHandle = card.getAttribute('data-filtertube-channel-handle');
 const dataId = card.getAttribute('data-filtertube-channel-id');
 
+// Method 1.5: videoChannelMap (preferred when available)
+// Many Shorts/video surfaces can be resolved instantly after FilterTube learns
+// videoId -> UC... from intercepted YouTube JSON (ytInitialPlayerResponse and
+// /youtubei/v1/player) and persists it.
+
 // Method 2: Channel links in metadata
 const shortsChannelLink = card.querySelector(
     'a[href*="/@"]:not([href*="/shorts"]):not([href*="/watch"]), ' +

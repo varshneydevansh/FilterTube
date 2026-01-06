@@ -109,6 +109,13 @@ If you want to contribute or build from source:
 
 FilterTube filters unwanted content **before** it appears on your screen, giving you a clean YouTube experience.
 
+Under the hood, FilterTube also maintains lightweight identity caches:
+
+- `channelMap`: `@handle` / `c/<slug>` / `user/<slug>` ↔ `UC...`
+- `videoChannelMap`: `videoId` → `UC...`
+
+On both **YouTube Main** and **YouTube Kids**, FilterTube can often learn the canonical channel ID **without extra page fetches** by harvesting ownership data from the same JSON payloads YouTube already loads (notably `ytInitialPlayerResponse` and `/youtubei/v1/player`). Once learned, Shorts and Watch surfaces can resolve identity instantly on the next encounter.
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  YouTube loads video data                                   │
@@ -151,34 +158,34 @@ We believe in privacy by design.
 
 ## 🎬 Shorts Blocking Experience
 
-FilterTube v3.0 introduces a robust, hybrid blocking mechanism for YouTube Shorts. We prioritize **Zero Content Leakage** by verifying every channel before blocking.
+FilterTube uses a robust hybrid blocking mechanism for YouTube Shorts.
+
+**Current behavior (v3.1.7):** Shorts blocking is often **near-instant** because FilterTube learns `videoId → UC...` mappings from intercepted YouTube JSON and persists them. This makes Shorts behave much more like regular videos on Home/Search.
 
 ```ascii
 [User Clicks "Block"]
         |
         v
++-------------------------------+
+| 1. Resolve UC ID (fast path)  |
+|    - DOM /channel/UC... OR    |
+|    - videoChannelMap cache OR |
+|    - Main-world JSON harvest  |
++-------------------------------+
+               |
+               v
 +-----------------------+
-|  1. Fetch Channel ID  | (Extra step for Shorts)
-+-----------------------+
-        |
-        v
-+-----------------------+
-|  2. Verify Identity   | (Resolve Canonical ID)
-+-----------------------+
-        |
-        v
-+-----------------------+
-|  3. Block & Hide      |
+| 2. Block & Hide       |
 +-----------------------+
 ```
 
-- **Robust Verification**: We perform a multi-step check (approx. 1s) to ensure we have the correct, unique Channel ID.
+- **Robust Verification**: We resolve to a canonical `UC...` channel ID whenever possible so blocking applies across Shorts + long-form + posts.
 - **Zero Leakage**: By resolving the canonical ID, we ensure that blocking a Short also blocks the channel's long-form videos and posts.
 - **Smart Layouts**: Automatically adjusts the grid to prevent awkward blank spaces.
 
 > [!NOTE]
-> **Why the slight delay?**
-> For Shorts we have an additioanl overhead(1s - 1.5s) of prefetching the channel ID and then resolving the canonical ID. This is to ensure that blocking a channel also blocks all its content, not just the short. Which makes 3 dot UI Blocking for shorts about 2s to 2.5s and rest assured if you have clicked "Block Channel" it will get blocked you can browse freely.
+> **What if the channel ID isn't available yet?**
+> In rare cases where the card does not expose a `UC...` link and the mapping is not yet learned from intercepted JSON, FilterTube falls back to a slower network-based resolution (e.g., fetching a watch/shorts page) to guarantee correctness.
 
 ## Support
 

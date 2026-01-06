@@ -116,11 +116,11 @@ proto.send = function() {
 
 **Key XHR Endpoints Monitored:**
 
-- `/youtubei/v1/search` - Search results and autocomplete
-- `/youtubei/v1/browse` - Home feed, channel pages, recommendations
-- `/youtubei/v1/next` - Infinite scroll pagination (load more)
-- `/youtubei/v1/guide` - Sidebar guide recommendations
-- `/youtubei/v1/player` - Video player metadata and related videos
+* `/youtubei/v1/search` - Search results and autocomplete
+* `/youtubei/v1/browse` - Home feed, channel pages, recommendations
+* `/youtubei/v1/next` - Infinite scroll pagination (load more)
+* `/youtubei/v1/guide` - Sidebar guide recommendations
+* `/youtubei/v1/player` - Video player metadata and related videos
 
 ## 3. Filtering Engine: Recursive Blocking Decision
 
@@ -171,26 +171,25 @@ When user clicks 3-dot menu on any video card, FilterTube injects a "Block Chann
 
 ```mermaid
 sequenceDiagram
-    participant User
-    participant Menu as 3-dot Dropdown
-    participant Card as Video Card
-    participant CB as content_bridge.js
-    participant BG as background.js
-    participant Storage
+    participant UI as UI
+    participant Content as Content
+    participant Background as Background
+    participant Cache as Cache
+    participant API as External API
 
-    User->>Menu: Clicks 3-dot menu
-    Menu->>CB: Detects dropdown opening
-    CB->>Card: extractChannelFromCard(videoCard)
-    Note over Card: Returns initial info (may be incomplete)
-    CB->>CB: injectFilterTubeMenuItem(dropdown, videoCard)
-    Note over CB: Renders menu with initial label
-    User->>Menu: Clicks "Block Channel"
-    CB->>CB: handleBlockChannelClick(channelInfo)
-    CB->>BG: sendMessage(addFilteredChannel, channelInfo)
-    BG->>BG: Resolves identity (if needed)
-    BG->>Storage: Persists channel
-    BG->>CB: Broadcasts settings update
-    CB->>Card: Hides blocked card immediately
+    UI->>Content: User clicks 3-dot menu
+    Content->>Content: extractChannelFromCard()
+    Note over Content: Often returns {id: "UC..."} (DOM), otherwise {needsFetch: true}
+    Content->>Background: Request channel enrichment
+    Background->>Cache: Check videoChannelMap
+    alt Cache has mapping
+        Cache-->>Background: Return cached channelId
+    else No mapping
+        Background->>API: Fetch channel details
+        API-->>Background: Return channel info
+    end
+    Background->>Content: Update menu label
+    Content->>UI: Display updated channel name
 ```
 
 ### 4.2 Channel Identity Resolution
@@ -214,6 +213,15 @@ function extractChannelFromCard(card) {
     };
 }
 ```
+
+#### Layer 2.1: Main World player payload harvesting (no extra fetch)
+
+In many cases, channel ownership is learned before the menu is opened because the Main World interception layer processes:
+
+* `window.ytInitialPlayerResponse`
+* `/youtubei/v1/player` (via `fetch`/`XHR` interception)
+
+This allows `filter_logic.js` to harvest `videoId -> UC...` mappings and persist them into `videoChannelMap`, making Shorts and Watch behave more like regular Home/Search cards (near-instant identity).
 
 #### Layer 2: Main World Lookup (Fast)
 ```javascript
@@ -254,6 +262,15 @@ async function fetchChannelFromWatchUrl(videoId) {
 }
 ```
 
+**Cross-surface behavior:** the overall identity resolution strategy is intended to behave the same on **YouTube Main** and **YouTube Kids**:
+
+* Prefer DOM-extracted `UC...` when present.
+* Prefer `videoChannelMap` when already learned.
+* Prefer Main World interception/harvesting (`ytInitialPlayerResponse`, `/youtubei/v1/player`).
+* Use HTML fetch parsing only as a fallback.
+
+The main difference is that **Kids has stricter CORS limits**, so the fallback network fetch layer may fail more often on `youtubekids.com`, making the interception + caching layers even more important.
+
 ### 4.3 Label Upgrade System
 
 The 3-dot menu intelligently upgrades placeholder labels:
@@ -273,22 +290,22 @@ updateInjectedMenuChannelName(dropdown, {
 ```
 
 **Placeholder Detection Rules:**
-- UC IDs: `/^UC[\w-]{22}$/`
-- Mix titles: `/^mix\s+-/i` or contains `•` separator
-- Metadata strings: Contains `views`, `ago`, `watching`
-- Handles only: Starts with `@` and no actual name
+* UC IDs: `/^UC[\w-]{22}$/`
+* Mix titles: `/^mix\s+-/i` or contains `•` separator
+* Metadata strings: Contains `views`, `ago`, `watching`
+* Handles only: Starts with `@` and no actual name
 
 ### 4.4 Profile-Aware Resolution
 
 **YouTube Main:**
-- Uses standard fetch pipeline
-- Caches in `videoChannelMap` and `channelMap`
-- Full enrichment features available
+* Uses standard fetch pipeline
+* Caches in `videoChannelMap` and `channelMap`
+* Full enrichment features available
 
 **YouTube Kids:**
-- Limited CORS for network requests
-- Falls back to main-world extraction
-- Uses `ftProfilesV3.kids` storage namespace
+* Limited CORS for network requests
+* Falls back to main-world extraction
+* Uses `ftProfilesV3.kids` storage namespace
 
 Collaboration filtering relies on coordinated logic across all three execution worlds. The end-to-end detection pipeline is:
 
@@ -330,26 +347,26 @@ UI Contexts (tab-view.js, popup.js)
 
 ### Data Structures Propagated
 
-- `collaborationGroupId`: deterministic link between channels blocked in the same action.
-- `collaborationWith[]`: per-channel "other members" list used for warnings and tooltips.
-- `allCollaborators[]`: canonical roster (name/handle/id) stored on each channel row so the UI can reason about partial groups even after reordering or searching.
+* `collaborationGroupId`: deterministic link between channels blocked in the same action.
+* `collaborationWith[]`: per-channel "other members" list used for warnings and tooltips.
+* `allCollaborators[]`: canonical roster (name/handle/id) stored on each channel row so the UI can reason about partial groups even after reordering or searching.
 
 ## 10. Collaboration UI & Storage Semantics
 
-- **Storage (`background.js` + `settings_shared.js`)**: `sanitizeChannelEntry` preserves `collaborationGroupId`, `collaborationWith`, and `allCollaborators`, meaning compiled settings always contain the metadata necessary for UI rehydration.
-- **Render Engine**: `buildCollaborationMeta` compares the stored roster with currently filtered entries, computes `presentCount/totalCount`, and emits:
-  - `collaboration-entry` + yellow rail (full groups)
-  - `collaboration-partial` + dashed rail (missing members)
-  - `title` attribute tooltips with “Originally blocked with / Still blocked / Missing now” copy.
-- **Search & Sort Integrity**: Because every collaborator remains an independent row, FCFS ordering, keyword search, and sort toggles behave exactly as non-collab entries, avoiding clipping issues seen with floating group containers.
-- **Home Feed Menu Parity**: `block_channel.js` watcher treats `button-view-model` wrappers as click anchors, so collaboration-aware menu injection (multi-channel + Block All) works on lockup-based home cards, grid shelves, and Shorts shelves alike.
+* **Storage (`background.js` + `settings_shared.js`)**: `sanitizeChannelEntry` preserves `collaborationGroupId`, `collaborationWith`, and `allCollaborators`, meaning compiled settings always contain the metadata necessary for UI rehydration.
+* **Render Engine**: `buildCollaborationMeta` compares the stored roster with currently filtered entries, computes `presentCount/totalCount`, and emits:
+  * `collaboration-entry` + yellow rail (full groups)
+  * `collaboration-partial` + dashed rail (missing members)
+  * `title` attribute tooltips with “Originally blocked with / Still blocked / Missing now” copy.
+* **Search & Sort Integrity**: Because every collaborator remains an independent row, FCFS ordering, keyword search, and sort toggles behave exactly as non-collab entries, avoiding clipping issues seen with floating group containers.
+* **Home Feed Menu Parity**: `block_channel.js` watcher treats `button-view-model` wrappers as click anchors, so collaboration-aware menu injection (multi-channel + Block All) works on lockup-based home cards, grid shelves, and Shorts shelves alike.
 
 ## 11. Handle Normalization & Regex Improvements
 
-- **Extraction + decoding**: handle parsing is percent-decoding + unicode-aware, so unicode handles and encoded links normalize consistently across DOM scraping and URL parsing.
-- **Canonicalization**: normalization strips URLs/querystrings and enforces lowercase so duplicates and mixed input sources converge to the same key.
-- **Storage sync**: once an association is learned (handle ↔ UC ID, and custom URL ↔ UC ID), it is persisted in `channelMap` so future matching avoids network calls.
-- **Regex Compilation**: `compileKeywords` escapes user input but keeps literal dots/underscores intact, ensuring collaboration-derived keywords like `@foo.bar` remain matchable.
+* **Extraction + decoding**: handle parsing is percent-decoding + unicode-aware, so unicode handles and encoded links normalize consistently across DOM scraping and URL parsing.
+* **Canonicalization**: normalization strips URLs/querystrings and enforces lowercase so duplicates and mixed input sources converge to the same key.
+* **Storage sync**: once an association is learned (handle ↔ UC ID, and custom URL ↔ UC ID), it is persisted in `channelMap` so future matching avoids network calls.
+* **Regex Compilation**: `compileKeywords` escapes user input but keeps literal dots/underscores intact, ensuring collaboration-derived keywords like `@foo.bar` remain matchable.
 
 ## 12. Shorts Canonical Resolution (Detailed)
 
@@ -362,9 +379,10 @@ sequenceDiagram
     participant BG as background.js
 
     DOM->>DOM: Detect ytd-reel-item / ytd-shorts-lockup
-    DOM->>FETCH: fetch shorts watch URL (resolve uploader handle)
+    DOM->>DOM: Prefer DOM-extracted /channel/UC... when present
+    DOM->>DOM: Prefer videoChannelMap (learned passively from player payloads)
     DOM->>DOM: try channelMap / ytInitialData replay (no network)
-    DOM->>FETCH: fetch handle/customUrl pages only as a fallback
+    DOM->>FETCH: fetch shorts/watch HTML only as a fallback
     DOM->>BG: handleAddFilteredChannel({ id, handle, isShorts:true })
     BG->>BG: Persist channel, broadcast state update
     DOM->>DOM: hide container (parent rich-item) immediately → zero blank slots
@@ -373,6 +391,11 @@ sequenceDiagram
 - **Grace period**: while identity enrichment runs, DOM fallback can hide immediately so the user does not see blocked content.
 - **Convergence**: once the canonical UC ID is known, subsequent interceptors (data + DOM) recognize the entry on every surface without repeated fetches.
 - **Collaborator Harvesting**: When Shorts expose the avatar stack, `extractCollaboratorsFromAvatarStackElement` seeds collaborator names/handles and the main-world hop fills UC IDs. The same multi-select UI appears regardless of layout.
+
+**Current behavior note:** as of v3.1.7, Shorts identity is increasingly learned *without explicit Shorts-page fetching* because:
+
+- `seed.js` intercepts `ytInitialPlayerResponse` and `/youtubei/v1/player`, and `filter_logic.js` harvests `videoId -> UC...` into `videoChannelMap`.
+- Many cards now expose `/channel/UC...` anchors directly, allowing isolated-world extraction to return `id` immediately.
 
 ## 4. DOM Fallback System (Safety Net)
 
@@ -415,7 +438,6 @@ This is the backup security guard patrolling the building. If a banned video som
                       +-------------+
 
 ```
-
 
 ## 5. Stats Calculation (Time Saved)
 
@@ -500,10 +522,10 @@ The release notes experience is now shared between the banner that appears on Yo
 
 ```mermaid
 graph TD
-    A[release_notes.json] --> B[background.js]
-    B -->|buildReleaseNotesPayload| C[chrome.storage.local releaseNotesPayload]
-    C --> D[content/release_notes_prompt.js]
-    A --> E[tab-view.js loadReleaseNotesIntoDashboard]
+    RN["data/release_notes.json"] --> BG["background.js"]
+    BG -->|"buildReleaseNotesPayload"| Storage["chrome.storage.local releaseNotesPayload"]
+    Storage --> Banner["content/release_notes_prompt.js<br/>YouTube CTA"]
+    RN --> Dashboard["tab-view.js<br/>loadReleaseNotesIntoDashboard"]
 ```
 
 ### 13.2 Banner CTA flow
@@ -525,9 +547,9 @@ sequenceDiagram
 
 ### 13.3 What’s New tab behavior
 
-- `tab-view.js` reads both the hash and `?view=` query param so deep links select the correct nav item and scroll it into view.
-- `data/release_notes.json` entries support `bannerSummary`, `highlights[]`, and `detailsUrl`. Dashboard cards render the highlights list; the banner uses `bannerSummary`.
-- Import/export doc updates reference this shared file so future releases update one source.
+* `tab-view.js` reads both the hash and `?view=` query param so deep links select the correct nav item and scroll it into view.
+* `data/release_notes.json` entries support `bannerSummary`, `highlights[]`, and `detailsUrl`. Dashboard cards render the highlights list; the banner uses `bannerSummary`.
+* Import/export doc updates reference this shared file so future releases update one source.
 
 ## 14. Import/Export Implementation Details (v3.1.6)
 
@@ -574,9 +596,9 @@ FilterTubeSettings.saveSettings()
 
 ### 14.4 Notes on custom channels
 
-- Inputs such as `https://www.youtube.com/c/Filmy_Gyaan` normalize to `c/filmy_gyaan`.
-- Merge priority: `UCID > @handle > customUrl > name/originalInput`.
-- When both a handle and custom URL are present, `sanitizeChannelEntry` retains both to improve lookups across surfaces.
+* Inputs such as `https://www.youtube.com/c/Filmy_Gyaan` normalize to `c/filmy_gyaan`.
+* Merge priority: `UCID > @handle > customUrl > name/originalInput`.
+* When both a handle and custom URL are present, `sanitizeChannelEntry` retains both to improve lookups across surfaces.
 
 ### 14.5 Channel enrichment queue & throttling
 
