@@ -1,6 +1,6 @@
-# FilterTube v3.1.7 Technical Documentation
+# FilterTube v3.1.8 Technical Documentation
 
-This document provides a deep technical dive into implementation of FilterTube's hybrid filtering engine as of v3.1.7.
+This document provides a deep technical dive into implementation of FilterTube's hybrid filtering engine as of v3.1.8.
 
 ## Core Technologies
 
@@ -10,6 +10,17 @@ This document provides a deep technical dive into implementation of FilterTube's
 *   **MutationObserver**: Used for the DOM fallback layer.
 *   **Custom Events / postMessage**: Used for cross-world communication.
 *   **StateManager**: Centralized state management for consistent settings across UI and background.
+
+## Cross-browser Downloads (Export + Auto-backup)
+
+FilterTube writes JSON files using the browser `downloads` API.
+
+*   **Blob URL path**: when `URL.createObjectURL` is available, FilterTube generates a Blob URL so downloads work in Firefox (which blocks `data:` URL downloads).
+*   **Data URL fallback**: in Chrome MV3 service worker contexts, `URL.createObjectURL` may be unavailable; FilterTube falls back to `data:application/json` URLs.
+
+Auto-backups are written as a single rolling file (silent overwrite) to avoid clutter:
+
+*   `Downloads/FilterTube Backup/FilterTube-Backup-Latest.json`
 
 ## 1. Data Interception: `ytInitialData` Hook
 

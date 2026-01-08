@@ -108,10 +108,19 @@
                     </span>
                     <span class="nav-label">Help</span>
                 </li>
+                <li class="nav-item" data-tab="support">
+                    <span class="nav-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"></path>
+                        </svg>
+                    </span>
+                    <span class="nav-label">Support</span>
+                </li>
             </ul>
 
             <div class="sidebar-footer">
-                <div class="version-info">v3.1.7</div>
+                <div class="version-info">v3.1.8</div>
             </div>
         </nav>
 
@@ -581,6 +590,52 @@
                                     <div class="help-item-body">YouTube sometimes reuses DOM nodes during SPA navigation. FilterTube re-scans and clears stale cached metadata, but a hard refresh can help confirm persistence.</div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="supportView" class="view-section">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Support FilterTube</h3>
+                        </div>
+                        <div class="card-body">
+                            <p>
+                                FilterTube is built and maintained independently, with a strong focus on privacy, performance, and long-term usability.
+                                The project has grown significantly thanks to user feedback, and many of you asked for a way to support its continued development.
+                            </p>
+                            <p>
+                                Most of the engineering work, architecture decisions, and ongoing maintenance are handled with the help of LLMs, which acts as a core development assistant helping write code, review changes, debug complex issues, and manage the project structure.
+                                This setup allows FilterTube to move fast while staying robust.
+                            </p>
+                            <p style="margin-bottom:12px;">Support from users directly helps with:</p>
+                            <ul style="margin: 8px 0 14px; padding-left: 20px;">
+                                <li>Covering AI tooling and development subscriptions</li>
+                                <li>Sustaining long-term maintenance and rapid bug fixes</li>
+                                <li>Funding upcoming work on <b>mobile apps (iOS &amp; Android)</b></li>
+                                <li>Paying platform and developer program fees (Apple, Google, etc.)</li>
+                            </ul>
+                            <p>
+                                FilterTube remains <b>fully functional without any payment</b>.
+                                There are <b>no features locked behind a paywall</b>.
+                                Support is completely optional and exists only because users explicitly asked for it.
+                            </p>
+
+                            <div class="support-actions">
+                                <button id="openKofiBtn" class="btn-primary" type="button">Support on Ko-fi</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Ko-fi</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="support-disclaimer">
+                                Payments are processed securely by Ko-fi and PayPal. FilterTube does not receive or store any login or payment information.
+                            </div>
+                            <iframe id="kofiframe" src="https://ko-fi.com/filtertube/?hidefeed=true&amp;widget=true&amp;embed=true&amp;preview=true" class="support-kofi-iframe" height="712" title="filtertube"></iframe>
                         </div>
                     </div>
                 </div>

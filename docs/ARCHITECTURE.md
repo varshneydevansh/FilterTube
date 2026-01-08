@@ -1,8 +1,8 @@
-# FilterTube v3.1.7 Architecture Documentation
+# FilterTube v3.1.8 Architecture Documentation
 
 ## Executive Summary
 
-FilterTube v3.1.7 implements a robust **Hybrid Filtering Architecture** that combines preemptive **Data Interception (Main World)** with a resilient **DOM Fallback (Isolated World)**. This dual-layer approach ensures comprehensive content filtering across all YouTube surfaces (Home, Search, Watch, Shorts) while maintaining high performance and a "Zero Flash" user experience when YouTube routes content through JSON.
+FilterTube v3.1.8 implements a robust **Hybrid Filtering Architecture** that combines preemptive **Data Interception (Main World)** with a resilient **DOM Fallback (Isolated World)**. This dual-layer approach ensures comprehensive content filtering across all YouTube surfaces (Home, Search, Watch, Shorts) while maintaining high performance and a "Zero Flash" user experience when YouTube routes content through JSON.
 
 ## Architecture Overview
 

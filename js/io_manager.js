@@ -9,7 +9,8 @@
      * so they can be reused by the popup, background, and future automation.
      */
 
-    const STORAGE_NAMESPACE = chrome?.storage?.local;
+    const runtimeAPI = (typeof browser !== 'undefined' && browser.runtime) ? browser : (typeof chrome !== 'undefined' ? chrome : null);
+    const STORAGE_NAMESPACE = runtimeAPI?.storage?.local;
 
     const FT_PROFILES_V3_KEY = 'ftProfilesV3';
 
@@ -828,20 +829,26 @@
         // Chrome downloads API can only save to Downloads folder
         // We'll use Downloads/FilterTube Backup/ as our backup location
         try {
-            if (chrome && chrome.downloads) {
+            if (runtimeAPI?.downloads) {
                 // Test if we can write to Downloads/FilterTube Backup
                 const testPath = 'FilterTube Backup/.test';
                 await new Promise((resolve, reject) => {
-                    chrome.downloads.download({
-                        url: 'data:text/plain;charset=utf-8,test',
+                    const blobUrl = URL.createObjectURL(new Blob(['test'], { type: 'text/plain' }));
+                    runtimeAPI.downloads.download({
+                        url: blobUrl,
                         filename: testPath,
                         saveAs: false
                     }, (downloadId) => {
-                        if (chrome.runtime.lastError) {
-                            reject(new Error(chrome.runtime.lastError.message));
+                        try {
+                            URL.revokeObjectURL(blobUrl);
+                        } catch (e) {
+                            // ignore
+                        }
+                        if (runtimeAPI.runtime?.lastError) {
+                            reject(new Error(runtimeAPI.runtime.lastError.message));
                         } else {
                             // Clean up test file
-                            chrome.downloads.erase({ id: downloadId });
+                            runtimeAPI.downloads.erase({ id: downloadId });
                             resolve(downloadId);
                         }
                     });
@@ -866,24 +873,29 @@
      */
     async function saveBackupFile(data, filename, options = {}) {
         return new Promise(async (resolve) => {
-            if (!chrome || !chrome.downloads) {
+            if (!runtimeAPI?.downloads) {
                 resolve({ ok: false, reason: 'Downloads API unavailable' });
                 return;
             }
 
             const jsonData = JSON.stringify(data, null, 2);
-            const dataUrl = `data:application/json;charset=utf-8,${encodeURIComponent(jsonData)}`;
+            const blobUrl = URL.createObjectURL(new Blob([jsonData], { type: 'application/json' }));
 
             // Get backup directory and construct full path
             const backupDir = await getBackupDirectory();
             const fullPath = backupDir === '.' ? filename : `${backupDir}/${filename}`;
 
-            chrome.downloads.download({
-                url: dataUrl,
+            runtimeAPI.downloads.download({
+                url: blobUrl,
                 filename: fullPath,
                 saveAs: false // Silent save
             }, (downloadId) => {
-                const error = chrome.runtime.lastError;
+                const error = runtimeAPI.runtime?.lastError;
+                try {
+                    URL.revokeObjectURL(blobUrl);
+                } catch (e) {
+                    // ignore
+                }
                 if (error) {
                     resolve({ ok: false, reason: error.message, downloadId: null });
                 } else {
@@ -900,11 +912,11 @@
      */
     async function rotateBackups(keepCount = 10) {
         try {
-            if (!chrome || !chrome.downloads) return;
+            if (!runtimeAPI?.downloads) return;
 
             // Get all FilterTube backup files
             const downloads = await new Promise((resolve) => {
-                chrome.downloads.search({
+                runtimeAPI.downloads.search({
                     query: 'FilterTube-Backup-',
                     limit: 100 // Get recent files
                 }, resolve);
@@ -920,7 +932,7 @@
             for (const file of toDelete) {
                 try {
                     await new Promise((resolve) => {
-                        chrome.downloads.erase({ id: file.id }, resolve);
+                        runtimeAPI.downloads.erase({ id: file.id }, resolve);
                     });
                     console.log(`FilterTube: Deleted old backup: ${file.filename}`);
                 } catch (e) {

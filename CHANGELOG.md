@@ -1,5 +1,22 @@
 # Changelog
 
+## Version 3.1.8
+
+### Support + Backups
+
+- Added a new Support page in the dashboard with Ko-fi embed.
+- Auto-backups now overwrite a single rolling file: `Downloads/FilterTube Backup/FilterTube-Backup-Latest.json`.
+- Auto-backup download URL handling is now cross-browser:
+  - Uses Blob URLs when available.
+  - Falls back to `data:` URLs in Chrome MV3 service worker contexts where `URL.createObjectURL` is unavailable.
+
+### Fixes
+
+- Fixed auto-backup failures in Chrome caused by `URL.createObjectURL is not a function`.
+- Fixed download failures in Firefox caused by `data:` URL download restrictions.
+
+---
+
 ## Version 3.1.7
 
 ### YouTube Kids & Backup support

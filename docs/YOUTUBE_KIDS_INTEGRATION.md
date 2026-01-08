@@ -2,7 +2,7 @@
 
 ## Overview
 
-FilterTube v3.1.7 introduces native integration with YouTube Kids, allowing users to block channels directly from Kids UI while maintaining the same filtering power available on YouTube Main.
+FilterTube v3.1.8 introduces native integration with YouTube Kids, allowing users to block channels directly from Kids UI while maintaining the same filtering power available on YouTube Main.
 
 ## Architecture
 

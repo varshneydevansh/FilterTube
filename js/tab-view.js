@@ -384,7 +384,8 @@ function resolveRequestedView() {
         'settings': 'settings',
         'whatsnew': 'whatsnew',
         'whats-new': 'whatsnew',
-        'help': 'help'
+        'help': 'help',
+        'support': 'support'
     };
     return viewMap[normalized] || null;
 }
@@ -558,6 +559,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const ftImportV3Btn = document.getElementById('ftImportV3Btn');
     const ftImportV3File = document.getElementById('ftImportV3File');
 
+    const openKofiBtn = document.getElementById('openKofiBtn');
+
     // State for search/sort
     let keywordSearchValue = '';
     let keywordSortValue = 'newest';
@@ -570,6 +573,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     let channelDateToTs = null;
 
     const searchContentControls = document.getElementById('searchContentControls');
+
+    if (openKofiBtn) {
+        openKofiBtn.addEventListener('click', () => {
+            try {
+                const url = 'https://ko-fi.com/filtertube';
+                if (runtimeAPI?.tabs?.create) {
+                    runtimeAPI.tabs.create({ url });
+                } else {
+                    window.open(url, '_blank', 'noopener,noreferrer');
+                }
+            } catch (error) {
+                console.warn('Tab-View: failed to open Ko-fi link', error);
+            }
+        });
+    }
 
     // ============================================================================
     // STATE MANAGEMENT
@@ -627,22 +645,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     function downloadJsonToDownloadsFolder(folder, filename, obj) {
         return new Promise((resolve, reject) => {
             try {
-                if (!chrome?.downloads?.download) {
+                if (!runtimeAPI?.downloads?.download) {
                     reject(new Error('Downloads API unavailable'));
                     return;
                 }
 
                 const json = JSON.stringify(obj, null, 2);
-                const dataUrl = `data:application/json;charset=utf-8,${encodeURIComponent(json)}`;
+                const blob = new Blob([json], { type: 'application/json' });
+                const blobUrl = URL.createObjectURL(blob);
                 const safeFolder = (typeof folder === 'string' && folder.trim()) ? folder.trim().replace(/\/+$/, '') : '';
                 const fullPath = safeFolder ? `${safeFolder}/${filename}` : filename;
 
-                chrome.downloads.download({
-                    url: dataUrl,
+                runtimeAPI.downloads.download({
+                    url: blobUrl,
                     filename: fullPath,
                     saveAs: false
                 }, (downloadId) => {
-                    const err = chrome.runtime?.lastError;
+                    const err = runtimeAPI.runtime?.lastError;
+                    try {
+                        URL.revokeObjectURL(blobUrl);
+                    } catch (e) {
+                        // ignore
+                    }
                     if (err) {
                         reject(new Error(err.message || 'Download failed'));
                         return;
@@ -1407,7 +1431,8 @@ function setupNavigation() {
             'kids': 'Kids Mode',
             'settings': 'Settings',
             'whatsnew': 'What’s New',
-            'help': 'Help'
+            'help': 'Help',
+            'support': 'Support'
         };
         if (pageTitle && titles[viewId]) {
             pageTitle.textContent = titles[viewId];

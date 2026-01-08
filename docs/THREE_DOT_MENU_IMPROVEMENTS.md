@@ -2,7 +2,7 @@
 
 ## Overview
 
-FilterTube v3.1.7 significantly improves the 3-dot menu experience across YouTube Main and YouTube Kids, ensuring accurate channel names are displayed and blocking actions work reliably for Shorts, Mixes, Playlists, and Watch page videos.
+FilterTube v3.1.8 significantly improves the 3-dot menu experience across YouTube Main and YouTube Kids, ensuring accurate channel names are displayed and blocking actions work reliably for Shorts, Mixes, Playlists, and Watch page videos.
 
 ## Problem Statement
 

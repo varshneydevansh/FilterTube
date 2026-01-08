@@ -2,7 +2,7 @@
 
 ## Overview
 
-FilterTube v3.1.7 implements a sophisticated network request pipeline for channel identity resolution across both YouTube Main and YouTube Kids domains. This pipeline ensures accurate channel information is available for 3-dot menu labels and blocking actions.
+FilterTube v3.1.8 implements a sophisticated network request pipeline for channel identity resolution across both YouTube Main and YouTube Kids domains. This pipeline ensures accurate channel information is available for 3-dot menu labels and blocking actions.
 
 ## Architecture
 

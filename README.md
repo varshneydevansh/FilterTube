@@ -6,6 +6,8 @@
 
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/varshneydevansh/FilterTube)
 
+[![Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/filtertube)
+
 ## Overview
 
 FilterTube is a browser extension that gives you control over your YouTube feed. Filter videos, shorts, channels, and comments using keywords and smart rules—all processing happens privately on your device.
@@ -160,7 +162,7 @@ We believe in privacy by design.
 
 FilterTube uses a robust hybrid blocking mechanism for YouTube Shorts.
 
-**Current behavior (v3.1.7):** Shorts blocking is often **near-instant** because FilterTube learns `videoId → UC...` mappings from intercepted YouTube JSON and persists them. This makes Shorts behave much more like regular videos on Home/Search.
+**Current behavior (v3.1.8):** Shorts blocking is often **near-instant** because FilterTube learns `videoId → UC...` mappings from intercepted YouTube JSON and persists them. This makes Shorts behave much more like regular videos on Home/Search.
 
 ```ascii
 [User Clicks "Block"]
@@ -190,6 +192,8 @@ FilterTube uses a robust hybrid blocking mechanism for YouTube Shorts.
 ## Support
 
 Found a bug or have a feature request? [Open an issue on GitHub](https://github.com/varshneydevansh/FilterTube/issues).
+
+Want to support the project? You can donate on Ko-fi: [ko-fi.com/filtertube](https://ko-fi.com/filtertube)
 
 ## License
 

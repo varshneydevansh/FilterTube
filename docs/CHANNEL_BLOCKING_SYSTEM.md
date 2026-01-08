@@ -1,4 +1,4 @@
-# Channel Blocking System (v3.1.7)
+# Channel Blocking System (v3.1.8)
 
 ## 0. Goal & Non-Goals
 

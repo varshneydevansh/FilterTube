@@ -270,30 +270,35 @@ async function createAutoBackupInBackground(triggerType, options = {}) {
     payload.meta.trigger = triggerType || 'unknown';
     payload.meta.backupLocation = 'FilterTube Backup';
 
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-    const fileName = `FilterTube-Backup-${timestamp}.json`;
+    const fileName = 'FilterTube-Backup-Latest.json';
     const fullPath = `FilterTube Backup/${fileName}`;
 
     const jsonData = JSON.stringify(payload, null, 2);
-    const dataUrl = `data:application/json;charset=utf-8,${encodeURIComponent(jsonData)}`;
+    const hasObjectUrl = typeof URL !== 'undefined' && typeof URL.createObjectURL === 'function';
+    const downloadUrl = hasObjectUrl
+        ? URL.createObjectURL(new Blob([jsonData], { type: 'application/json' }))
+        : `data:application/json;charset=utf-8,${encodeURIComponent(jsonData)}`;
 
     return new Promise(resolve => {
         browserAPI.downloads.download({
-            url: dataUrl,
+            url: downloadUrl,
             filename: fullPath,
-            saveAs: false
+            saveAs: false,
+            conflictAction: 'overwrite'
         }, downloadId => {
+            if (hasObjectUrl) {
+                try {
+                    URL.revokeObjectURL(downloadUrl);
+                } catch (e) {
+                }
+            }
             const err = browserAPI.runtime?.lastError;
             if (err) {
                 resolve({ ok: false, reason: err.message || 'download_failed' });
                 return;
             }
 
-            if (!options?.skipRotation) {
-                rotateAutoBackups(10).finally(() => resolve({ ok: true, filename: fullPath, downloadId }));
-            } else {
-                resolve({ ok: true, filename: fullPath, downloadId });
-            }
+            resolve({ ok: true, filename: fullPath, downloadId });
         });
     });
 }

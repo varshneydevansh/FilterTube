@@ -3,6 +3,19 @@
     "_comment": "Shared release notes source for the dashboard What’s New tab and the YouTube release banner. Keep entries sorted newest-first by version."
   },
   {
+    "version": "3.1.8",
+    "headline": "Support tab + reliable auto-backups",
+    "summary": "New Support page (Ko-fi) and auto-backups now work reliably on both Chrome and Firefox.",
+    "bannerSummary": "Auto-backups are now cross-browser and overwrite a single latest backup file.",
+    "highlights": [
+      "Added a Support page in the dashboard with Ko-fi embed.",
+      "Auto-backups now overwrite a single rolling file: Downloads/FilterTube Backup/FilterTube-Backup-Latest.json.",
+      "Download strategy is cross-browser (Blob URL when available; data: URL fallback for Chrome MV3 service worker).",
+      "Firefox downloads no longer fail due to data: URL restrictions."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.8"
+  },
+  {
     "version": "3.1.7",
     "headline": "YT Kids + Auto-backup support",
     "summary": "Block channel based content on YT Kids & Auto backups can now be toggled on/off",
