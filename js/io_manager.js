@@ -13,6 +13,8 @@
     const STORAGE_NAMESPACE = runtimeAPI?.storage?.local;
 
     const FT_PROFILES_V3_KEY = 'ftProfilesV3';
+    const FT_PROFILES_V4_KEY = 'ftProfilesV4';
+    const DEFAULT_PROFILE_ID = 'default';
 
     /** Returns a timestamp in ms (kept inline so tests can stub). */
     function nowTs() {
@@ -100,6 +102,76 @@
         };
     }
 
+    function resolveProfileScope(scope, activeProfileId) {
+        const requested = (typeof scope === 'string' && scope.trim()) ? scope.trim() : 'auto';
+        const activeId = normalizeString(activeProfileId) || DEFAULT_PROFILE_ID;
+        if (requested === 'active') return 'active';
+        if (requested === 'full') return activeId === DEFAULT_PROFILE_ID ? 'full' : 'active';
+        return activeId === DEFAULT_PROFILE_ID ? 'full' : 'active';
+    }
+
+    function extractMasterPinVerifier(profilesV4) {
+        const root = safeObject(profilesV4);
+        const profiles = safeObject(root.profiles);
+        const master = safeObject(profiles[DEFAULT_PROFILE_ID]);
+        const security = safeObject(master.security);
+        const verifier = security.masterPinVerifier || security.masterPin || null;
+        return verifier && typeof verifier === 'object' ? verifier : null;
+    }
+
+    async function verifyPinAgainstVerifier(pin, verifier) {
+        const Security = global.FilterTubeSecurity || null;
+        if (!Security || typeof Security.verifyPin !== 'function') {
+            throw new Error('Security manager unavailable');
+        }
+        return Security.verifyPin(pin, verifier);
+    }
+
+    async function requirePinOrThrow(pin, verifier, message) {
+        const ok = await verifyPinAgainstVerifier(pin, verifier);
+        if (!ok) {
+            throw new Error(message || 'PIN required');
+        }
+    }
+
+    function deriveProfilesV3FromV4(profilesV4, profileId, { source = 'export' } = {}) {
+        const root = (profilesV4 && typeof profilesV4 === 'object' && !Array.isArray(profilesV4)) ? profilesV4 : null;
+        const profiles = safeObject(root?.profiles);
+        const id = normalizeString(profileId) || DEFAULT_PROFILE_ID;
+        const activeProfile = safeObject(profiles[id]);
+        const main = safeObject(activeProfile.main);
+        const kids = safeObject(activeProfile.kids);
+        const settings = safeObject(activeProfile.settings);
+
+        const sanitizeChannels = (list) => safeArray(list)
+            .map(entry => sanitizeChannelEntry(entry, { source: entry?.source || source }))
+            .filter(Boolean);
+        const sanitizeKeywords = (list) => safeArray(list)
+            .map(entry => sanitizeKeywordEntry(entry, { source: entry?.source || source }))
+            .filter(Boolean);
+
+        return {
+            main: {
+                mode: normalizeString(main.mode) || 'blocklist',
+                applyKidsRulesOnMain: !!settings.syncKidsToMain,
+                whitelistedChannels: sanitizeChannels(main.whitelistedChannels),
+                whitelistedKeywords: sanitizeKeywords(main.whitelistedKeywords),
+                videoIds: mergeStringList([], safeArray(main.videoIds)),
+                subscriptions: safeArray(main.subscriptions)
+            },
+            kids: {
+                mode: 'blocklist',
+                strictMode: kids.strictMode !== false,
+                blockedChannels: sanitizeChannels(kids.blockedChannels),
+                blockedKeywords: sanitizeKeywords(kids.blockedKeywords),
+                whitelistedChannels: sanitizeChannels(kids.whitelistedChannels),
+                whitelistedKeywords: sanitizeKeywords(kids.whitelistedKeywords),
+                videoIds: mergeStringList([], safeArray(kids.videoIds)),
+                subscriptions: safeArray(kids.subscriptions)
+            }
+        };
+    }
+
     /**
      * Returns the best identifier for a channel. Preference order mirrors how
      * we normally resolve handles/IDs/custom URLs in content scripts.
@@ -131,6 +203,37 @@
         if (existing.source && !incoming.source) merged.source = existing.source;
         if (incoming.source && !existing.source) merged.source = incoming.source;
 
+        if (typeof incoming.filterAllComments !== 'boolean' && typeof existing.filterAllComments === 'boolean') {
+            merged.filterAllComments = existing.filterAllComments;
+        }
+
+        const existingGroupId = typeof existing.collaborationGroupId === 'string' ? existing.collaborationGroupId : '';
+        const incomingGroupId = typeof incoming.collaborationGroupId === 'string' ? incoming.collaborationGroupId : '';
+        if (!incomingGroupId && existingGroupId) {
+            merged.collaborationGroupId = existing.collaborationGroupId;
+        }
+
+        if (incomingGroupId) {
+            if (Array.isArray(incoming.collaborationWith) && incoming.collaborationWith.length > 0) {
+                merged.collaborationWith = incoming.collaborationWith;
+            } else if (Array.isArray(existing.collaborationWith) && existing.collaborationWith.length > 0) {
+                merged.collaborationWith = existing.collaborationWith;
+            }
+
+            if (Array.isArray(incoming.allCollaborators) && incoming.allCollaborators.length > 0) {
+                merged.allCollaborators = incoming.allCollaborators;
+            } else if (Array.isArray(existing.allCollaborators) && existing.allCollaborators.length > 0) {
+                merged.allCollaborators = existing.allCollaborators;
+            }
+        } else {
+            if (!Array.isArray(incoming.collaborationWith) && Array.isArray(existing.collaborationWith)) {
+                merged.collaborationWith = existing.collaborationWith;
+            }
+            if (!Array.isArray(incoming.allCollaborators) && Array.isArray(existing.allCollaborators)) {
+                merged.allCollaborators = existing.allCollaborators;
+            }
+        }
+
         return merged;
     }
 
@@ -151,6 +254,7 @@
                 logo: null,
                 customUrl: null,
                 filterAll: false,
+                filterAllComments: true,
                 source: overrides.source || 'import',
                 originalInput: trimmed,
                 addedAt: overrides.addedAt || nowTs()
@@ -165,6 +269,38 @@
         const name = normalizeString(entry.name);
         const originalInput = normalizeString(entry.originalInput) || id || handle || customUrl || name || null;
         const source = overrides.source || (typeof entry.source === 'string' ? entry.source : 'import');
+
+        const filterAllCommentsCandidate = Object.prototype.hasOwnProperty.call(overrides, 'filterAllComments')
+            ? overrides.filterAllComments
+            : entry.filterAllComments;
+        const filterAllComments = (typeof filterAllCommentsCandidate === 'boolean') ? filterAllCommentsCandidate : true;
+
+        const collaborationGroupId = (typeof entry.collaborationGroupId === 'string' && entry.collaborationGroupId.trim())
+            ? entry.collaborationGroupId.trim()
+            : undefined;
+
+        const collaborationWith = Array.isArray(entry.collaborationWith)
+            ? entry.collaborationWith
+                .map(v => typeof v === 'string' ? v.trim() : '')
+                .filter(Boolean)
+            : undefined;
+
+        const allCollaborators = Array.isArray(entry.allCollaborators)
+            ? entry.allCollaborators
+                .map(collab => {
+                    if (!collab || typeof collab !== 'object') return null;
+                    const collabHandle = typeof collab.handle === 'string' ? collab.handle.trim() : '';
+                    const collabId = typeof collab.id === 'string' ? collab.id.trim() : '';
+                    const collabName = normalizeString(collab.name) || collabHandle || collabId || '';
+                    if (!collabHandle && !collabId && !collabName) return null;
+                    return {
+                        handle: collabHandle || null,
+                        name: collabName || null,
+                        id: collabId || null
+                    };
+                })
+                .filter(Boolean)
+            : undefined;
 
         const addedAtCandidate = Object.prototype.hasOwnProperty.call(overrides, 'addedAt')
             ? overrides.addedAt
@@ -182,9 +318,13 @@
             logo: normalizeString(entry.logo) || null,
             customUrl: customUrl || null,
             filterAll: !!entry.filterAll,
+            filterAllComments,
             source,
             originalInput,
-            addedAt
+            addedAt,
+            ...(collaborationGroupId ? { collaborationGroupId } : {}),
+            ...(Array.isArray(collaborationWith) ? { collaborationWith } : {}),
+            ...(Array.isArray(allCollaborators) ? { allCollaborators } : {})
         };
     }
 
@@ -237,7 +377,7 @@
                 subscriptions: safeArray(main.subscriptions || subscriptions.main)
             },
             kids: {
-                mode: normalizeString(kids.mode) || 'whitelist',
+                mode: normalizeString(kids.mode) || 'blocklist',
                 strictMode: normalizeBool(kids.strictMode, true),
                 blockedChannels: safeArray(kids.blockedChannels),
                 blockedKeywords: safeArray(kids.blockedKeywords),
@@ -255,6 +395,220 @@
             [FT_PROFILES_V3_KEY]: nextProfiles
         };
         return writeStorage(payload);
+    }
+
+    function isValidProfilesV4(value) {
+        return !!(
+            value
+            && typeof value === 'object'
+            && !Array.isArray(value)
+            && typeof value.activeProfileId === 'string'
+            && value.activeProfileId.trim()
+            && value.profiles
+            && typeof value.profiles === 'object'
+            && !Array.isArray(value.profiles)
+        );
+    }
+
+    function buildDefaultProfilesV4FromLegacyStorage(storage) {
+        const now = nowTs();
+        const legacyChannelsRaw = storage?.filterChannels;
+        const legacyKeywordsRaw = storage?.uiKeywords;
+        const profilesV3Raw = safeObject(storage?.[FT_PROFILES_V3_KEY]);
+
+        const v3Main = safeObject(profilesV3Raw.main);
+        const v3Kids = safeObject(profilesV3Raw.kids);
+
+        const legacyChannels = Array.isArray(legacyChannelsRaw)
+            ? legacyChannelsRaw
+            : (typeof legacyChannelsRaw === 'string'
+                ? legacyChannelsRaw
+                    .split(',')
+                    .map(s => s.trim())
+                    .filter(Boolean)
+                : []);
+
+        const legacyKeywords = Array.isArray(legacyKeywordsRaw)
+            ? legacyKeywordsRaw
+            : [];
+
+        const mainChannels = legacyChannels
+            .map(entry => sanitizeChannelEntry(entry, { source: 'user', addedAt: entry?.addedAt || now }))
+            .filter(Boolean);
+
+        const mainKeywords = legacyKeywords
+            .map(entry => sanitizeKeywordEntry(entry, { source: entry?.source || 'user', addedAt: entry?.addedAt || now }))
+            .filter(Boolean);
+
+        const kidsChannels = safeArray(v3Kids.blockedChannels)
+            .map(entry => sanitizeChannelEntry(entry, { source: entry?.source || 'user', addedAt: entry?.addedAt || now }))
+            .filter(Boolean);
+
+        const kidsKeywords = safeArray(v3Kids.blockedKeywords)
+            .map(entry => sanitizeKeywordEntry(entry, { source: entry?.source || 'user', addedAt: entry?.addedAt || now }))
+            .filter(Boolean);
+
+        return {
+            schemaVersion: 4,
+            activeProfileId: DEFAULT_PROFILE_ID,
+            profiles: {
+                [DEFAULT_PROFILE_ID]: {
+                    type: 'account',
+                    parentProfileId: null,
+                    name: 'Default',
+                    settings: {
+                        syncKidsToMain: !!v3Main.applyKidsRulesOnMain
+                    },
+                    main: {
+                        channels: mainChannels,
+                        keywords: mainKeywords
+                    },
+                    kids: {
+                        mode: 'blocklist',
+                        strictMode: v3Kids.strictMode !== false,
+                        blockedChannels: kidsChannels,
+                        blockedKeywords: kidsKeywords
+                    }
+                }
+            }
+        };
+    }
+
+    async function loadProfilesV4() {
+        const data = await readStorage([FT_PROFILES_V4_KEY, 'filterChannels', 'uiKeywords', FT_PROFILES_V3_KEY]);
+        const existing = data?.[FT_PROFILES_V4_KEY];
+        if (isValidProfilesV4(existing)) {
+            let needsWrite = false;
+            try {
+                const profiles = safeObject(existing.profiles);
+                for (const [profileId, rawProfile] of Object.entries(profiles)) {
+                    const profile = safeObject(rawProfile);
+                    const rawType = normalizeString(profile.type).toLowerCase();
+                    if (profileId === DEFAULT_PROFILE_ID) {
+                        if (rawType !== 'account') {
+                            needsWrite = true;
+                            break;
+                        }
+                        if (profile.parentProfileId != null) {
+                            needsWrite = true;
+                            break;
+                        }
+                        continue;
+                    }
+                    if (rawType !== 'account' && rawType !== 'child') {
+                        needsWrite = true;
+                        break;
+                    }
+                    if (rawType === 'account') {
+                        if (profile.parentProfileId != null) {
+                            needsWrite = true;
+                            break;
+                        }
+                    }
+                    if (rawType === 'child') {
+                        const parent = normalizeString(profile.parentProfileId);
+                        if (!parent) {
+                            needsWrite = true;
+                            break;
+                        }
+                    }
+                }
+            } catch (e) {
+                needsWrite = true;
+            }
+
+            if (needsWrite) {
+                const sanitized = sanitizeProfilesV4(existing, { source: 'local' });
+                if (sanitized) {
+                    await writeStorage({ [FT_PROFILES_V4_KEY]: sanitized });
+                    return sanitized;
+                }
+            }
+
+            return existing;
+        }
+
+        const migrated = buildDefaultProfilesV4FromLegacyStorage(data);
+        await writeStorage({ [FT_PROFILES_V4_KEY]: migrated });
+        return migrated;
+    }
+
+    async function saveProfilesV4(nextProfiles) {
+        if (!isValidProfilesV4(nextProfiles)) {
+            return writeStorage({});
+        }
+        return writeStorage({ [FT_PROFILES_V4_KEY]: nextProfiles });
+    }
+
+    function sanitizeProfilesV4(profilesV4, { source = 'export' } = {}) {
+        if (!isValidProfilesV4(profilesV4)) return null;
+        const profiles = safeObject(profilesV4.profiles);
+        const outProfiles = {};
+
+        for (const [profileId, rawProfile] of Object.entries(profiles)) {
+            if (!profileId) continue;
+            const profile = safeObject(rawProfile);
+            const main = safeObject(profile.main);
+            const kids = safeObject(profile.kids);
+            const settings = safeObject(profile.settings);
+
+            const rawType = normalizeString(profile.type).toLowerCase();
+            const isDefault = profileId === DEFAULT_PROFILE_ID;
+            const resolvedType = (rawType === 'account' || rawType === 'child')
+                ? rawType
+                : (isDefault ? 'account' : 'child');
+
+            let resolvedParentProfileId = null;
+            if (resolvedType === 'child') {
+                const rawParent = normalizeString(profile.parentProfileId);
+                if (rawParent && Object.prototype.hasOwnProperty.call(profiles, rawParent)) {
+                    resolvedParentProfileId = rawParent;
+                } else {
+                    resolvedParentProfileId = DEFAULT_PROFILE_ID;
+                }
+            }
+
+            outProfiles[profileId] = {
+                ...profile,
+                type: isDefault ? 'account' : resolvedType,
+                parentProfileId: isDefault ? null : resolvedParentProfileId,
+                name: normalizeString(profile.name) || 'Profile',
+                settings: {
+                    ...settings,
+                    syncKidsToMain: !!settings.syncKidsToMain
+                },
+                main: {
+                    ...main,
+                    channels: safeArray(main.channels)
+                        .map(entry => sanitizeChannelEntry(entry, { source: entry?.source || source }))
+                        .filter(Boolean),
+                    keywords: safeArray(main.keywords)
+                        .map(entry => sanitizeKeywordEntry(entry, { source: entry?.source || source }))
+                        .filter(Boolean)
+                },
+                kids: {
+                    ...kids,
+                    mode: 'blocklist',
+                    strictMode: kids.strictMode !== false,
+                    blockedChannels: safeArray(kids.blockedChannels)
+                        .map(entry => sanitizeChannelEntry(entry, { source: entry?.source || source }))
+                        .filter(Boolean),
+                    blockedKeywords: safeArray(kids.blockedKeywords)
+                        .map(entry => sanitizeKeywordEntry(entry, { source: entry?.source || source }))
+                        .filter(Boolean)
+                }
+            };
+        }
+
+        const activeProfileId = normalizeString(profilesV4.activeProfileId) || DEFAULT_PROFILE_ID;
+        const resolvedActiveId = outProfiles[activeProfileId] ? activeProfileId : (outProfiles[DEFAULT_PROFILE_ID] ? DEFAULT_PROFILE_ID : Object.keys(outProfiles)[0] || DEFAULT_PROFILE_ID);
+
+        return {
+            ...profilesV4,
+            schemaVersion: 4,
+            activeProfileId: resolvedActiveId,
+            profiles: outProfiles
+        };
     }
 
     /**
@@ -433,7 +787,7 @@
                     subscriptions: []
                 },
                 kids: {
-                    mode: 'whitelist',
+                    mode: 'blocklist',
                     strictMode: true,
                     blockedChannels: [],
                     blockedKeywords: [],
@@ -450,14 +804,23 @@
      * Serializes the current state into the FilterTube v3 JSON structure that
      * both the UI and CLI tooling share. Keeps feature flags grouped by topic.
      */
-    function buildV3Export({ mainSettings, mainKeywords, mainChannels, channelMap, profilesV3 }) {
+    function buildV3Export({ mainSettings, mainKeywords, mainChannels, channelMap, profilesV3, exportType = 'full', profileId = null, profileName = null }) {
+        let profilesV4 = null;
+        try {
+            profilesV4 = sanitizeProfilesV4(mainSettings?.[FT_PROFILES_V4_KEY] || null, { source: 'export' });
+        } catch (e) {
+            profilesV4 = null;
+        }
         return {
             meta: {
                 version: 3,
                 timestamp: nowTs(),
                 application: 'FilterTube',
-                exportType: 'full'
+                exportType,
+                ...((exportType === 'profile' && typeof profileId === 'string' && profileId.trim()) ? { profileId: profileId.trim() } : {}),
+                ...((exportType === 'profile' && typeof profileName === 'string' && profileName.trim()) ? { profileName: profileName.trim() } : {})
             },
+            ...(profilesV4 ? { profilesV4 } : {}),
             settings: {
                 theme: mainSettings?.theme === 'dark' ? 'dark' : 'light',
                 sync: {
@@ -497,7 +860,7 @@
                     applyKidsRulesOnMain: !!profilesV3?.main?.applyKidsRulesOnMain
                 },
                 kids: {
-                    mode: profilesV3?.kids?.mode || 'whitelist',
+                    mode: 'blocklist',
                     strictMode: profilesV3?.kids?.strictMode !== false,
                     enableSearch: true
                 }
@@ -561,6 +924,14 @@
         const maps = safeObject(root.maps);
         const channelMap = safeObject(maps.channelMap);
 
+        let profilesV4 = null;
+        try {
+            const v4Candidate = root?.profilesV4 || root?.[FT_PROFILES_V4_KEY] || null;
+            profilesV4 = sanitizeProfilesV4(v4Candidate, { source: 'import' });
+        } catch (e) {
+            profilesV4 = null;
+        }
+
         const mainChannels = safeArray(main.channels).map(ch => sanitizeChannelEntry(ch, { source: 'import' })).filter(Boolean);
         const mainKeywords = safeArray(main.keywords).map(kw => sanitizeKeywordEntry(kw, { source: kw?.source || 'import' })).filter(Boolean);
 
@@ -579,7 +950,7 @@
         const kidsSubs = safeArray(kids.subscriptions);
 
         const mainMode = normalizeString(settings?.main?.mode) || normalizeString(main.mode) || 'blocklist';
-        const kidsMode = normalizeString(settings?.kids?.mode) || normalizeString(kids.mode) || 'whitelist';
+        const kidsMode = normalizeString(settings?.kids?.mode) || normalizeString(kids.mode) || 'blocklist';
 
         const applyKidsRulesOnMain = normalizeBool(settings?.main?.applyKidsRulesOnMain, false);
         const kidsStrictMode = normalizeBool(settings?.kids?.strictMode, true);
@@ -596,6 +967,7 @@
             mainChannels,
             mainKeywords,
             channelMap,
+            profilesV4,
             profilesV3: {
                 main: {
                     mode: mainMode,
@@ -619,7 +991,7 @@
         };
     }
 
-    async function exportV3() {
+    async function exportV3({ scope = 'auto', auth = null } = {}) {
         const SettingsAPI = global.FilterTubeSettings || {};
         if (typeof SettingsAPI.loadSettings !== 'function') {
             throw new Error('FilterTubeSettings.loadSettings not available');
@@ -628,19 +1000,93 @@
         const mainSettings = await SettingsAPI.loadSettings();
         const profilesV3 = await loadProfilesV3();
 
-        const mainChannels = safeArray(mainSettings.channels);
-        const mainKeywords = safeArray(mainSettings.keywords);
+        let profilesV4 = null;
+        try {
+            profilesV4 = await loadProfilesV4();
+        } catch (e) {
+            profilesV4 = null;
+        }
+
+        const activeId = normalizeString(profilesV4?.activeProfileId) || DEFAULT_PROFILE_ID;
+        const effectiveScope = resolveProfileScope(scope, activeId);
+
+        const masterVerifier = extractMasterPinVerifier(profilesV4);
+        if (activeId === DEFAULT_PROFILE_ID && masterVerifier) {
+            await requirePinOrThrow(
+                normalizeString(auth?.localMasterPin),
+                masterVerifier,
+                'Master PIN required'
+            );
+        }
+
+        let profilesV4ForExport = profilesV4;
+        let profilesV3ForExport = profilesV3;
+        let mainChannels = safeArray(mainSettings.channels);
+        let mainKeywords = safeArray(mainSettings.keywords);
+        let exportType = 'full';
+        let exportProfileId = null;
+        let exportProfileName = null;
+
+        if (effectiveScope === 'active') {
+            exportType = 'profile';
+            exportProfileId = activeId;
+            exportProfileName = normalizeString(safeObject(safeObject(profilesV4?.profiles)[activeId]).name) || activeId;
+
+            if (profilesV4 && profilesV4.profiles && typeof profilesV4.profiles === 'object' && !Array.isArray(profilesV4.profiles)) {
+                const activeProfile = safeObject(profilesV4.profiles[activeId]);
+                profilesV4ForExport = {
+                    schemaVersion: 4,
+                    activeProfileId: activeId,
+                    profiles: {
+                        [activeId]: activeProfile
+                    }
+                };
+                try {
+                    profilesV4ForExport = sanitizeProfilesV4(profilesV4ForExport, { source: 'export' }) || profilesV4ForExport;
+                } catch (e) {
+                }
+
+                const activeMain = safeObject(activeProfile.main);
+                const activeKids = safeObject(activeProfile.kids);
+                mainChannels = safeArray(activeMain.channels)
+                    .map(entry => sanitizeChannelEntry(entry, { source: entry?.source || 'export' }))
+                    .filter(Boolean);
+                mainKeywords = safeArray(activeMain.keywords)
+                    .map(entry => sanitizeKeywordEntry(entry, { source: entry?.source || 'export' }))
+                    .filter(Boolean);
+
+                profilesV3ForExport = deriveProfilesV3FromV4(profilesV4, activeId, { source: 'export' });
+
+                if (Object.prototype.hasOwnProperty.call(activeKids, 'blockedChannels') || Object.prototype.hasOwnProperty.call(activeKids, 'blockedKeywords')) {
+                    profilesV3ForExport = {
+                        ...profilesV3ForExport,
+                        kids: {
+                            ...profilesV3ForExport.kids,
+                            strictMode: activeKids.strictMode !== false
+                        }
+                    };
+                }
+            }
+        }
+
+        const exportSettings = {
+            ...(mainSettings || {}),
+            ...(profilesV4ForExport ? { [FT_PROFILES_V4_KEY]: profilesV4ForExport } : {})
+        };
 
         return buildV3Export({
-            mainSettings,
+            mainSettings: exportSettings,
             mainKeywords,
             mainChannels,
             channelMap: mainSettings.channelMap || {},
-            profilesV3
+            profilesV3: profilesV3ForExport,
+            exportType,
+            profileId: exportProfileId,
+            profileName: exportProfileName
         });
     }
 
-    async function importV3(json, { strategy = 'merge' } = {}) {
+    async function importV3(json, { strategy = 'merge', scope = 'auto', auth = null } = {}) {
         const parsed = normalizeIncomingV3(json);
         if (!parsed.ok) {
             throw new Error(parsed.error || 'Invalid file');
@@ -653,17 +1099,89 @@
 
         const current = await SettingsAPI.loadSettings();
 
+        let localProfilesV4 = null;
+        try {
+            localProfilesV4 = await loadProfilesV4();
+        } catch (e) {
+            localProfilesV4 = null;
+        }
+        const localActiveId = normalizeString(localProfilesV4?.activeProfileId) || DEFAULT_PROFILE_ID;
+        const effectiveScope = resolveProfileScope(scope, localActiveId);
+        const canTouchLegacyV3 = localActiveId === DEFAULT_PROFILE_ID;
+
+        const localMasterVerifier = extractMasterPinVerifier(localProfilesV4);
+        if (localActiveId === DEFAULT_PROFILE_ID && localMasterVerifier) {
+            await requirePinOrThrow(
+                normalizeString(auth?.localMasterPin),
+                localMasterVerifier,
+                'Master PIN required'
+            );
+        }
+
+        const incomingMasterVerifier = extractMasterPinVerifier(parsed.profilesV4);
+        if (localActiveId === DEFAULT_PROFILE_ID && incomingMasterVerifier) {
+            await requirePinOrThrow(
+                normalizeString(auth?.incomingMasterPin),
+                incomingMasterVerifier,
+                'Backup Master PIN required'
+            );
+        }
+
+        const rawRoot = safeObject(json);
+        const rawMeta = safeObject(rawRoot.meta);
+        const incomingExportType = normalizeString(rawMeta.exportType);
+        const incomingExportProfileId = normalizeString(rawMeta.profileId);
+
+        const incomingV4 = parsed.profilesV4;
+        const incomingProfiles = safeObject(incomingV4?.profiles);
+        let incomingProfileForImport = null;
+        if (incomingV4) {
+            if (effectiveScope === 'active' && localActiveId !== DEFAULT_PROFILE_ID) {
+                const exactMatch = safeObject(incomingProfiles[localActiveId]);
+                if (Object.keys(exactMatch).length > 0) {
+                    incomingProfileForImport = exactMatch;
+                } else if (incomingExportType === 'profile') {
+                    const fallbackId = normalizeString(incomingV4.activeProfileId) || incomingExportProfileId;
+                    incomingProfileForImport = safeObject(incomingProfiles[fallbackId]);
+                } else {
+                    throw new Error('Full backups can only be imported from the Default (Master) profile');
+                }
+            } else {
+                const incomingActiveId = normalizeString(incomingV4.activeProfileId) || DEFAULT_PROFILE_ID;
+                incomingProfileForImport = safeObject(incomingProfiles[incomingActiveId]);
+            }
+        }
+
+        const incomingV4Settings = incomingProfileForImport ? safeObject(incomingProfileForImport.settings) : null;
+
+        const v4MainChannels = incomingProfileForImport
+            ? safeArray(safeObject(incomingProfileForImport.main).channels).map(ch => sanitizeChannelEntry(ch, { source: 'import' })).filter(Boolean)
+            : null;
+        const v4MainKeywords = incomingProfileForImport
+            ? safeArray(safeObject(incomingProfileForImport.main).keywords).map(kw => sanitizeKeywordEntry(kw, { source: kw?.source || 'import' })).filter(Boolean)
+            : null;
+
+        const v4KidsBlockedChannels = incomingProfileForImport
+            ? safeArray(safeObject(incomingProfileForImport.kids).blockedChannels).map(ch => sanitizeChannelEntry(ch, { source: 'import' })).filter(Boolean)
+            : null;
+        const v4KidsBlockedKeywords = incomingProfileForImport
+            ? safeArray(safeObject(incomingProfileForImport.kids).blockedKeywords).map(kw => sanitizeKeywordEntry(kw, { source: kw?.source || 'import' })).filter(Boolean)
+            : null;
+
+        const parsedMainChannels = Array.isArray(v4MainChannels) ? v4MainChannels : parsed.mainChannels;
+        const parsedMainKeywords = Array.isArray(v4MainKeywords) ? v4MainKeywords : parsed.mainKeywords;
+
         const nextChannels = strategy === 'replace'
-            ? parsed.mainChannels
-            : mergeChannelLists(current.channels, parsed.mainChannels);
+            ? parsedMainChannels
+            : mergeChannelLists(current.channels, parsedMainChannels);
 
         const nextKeywords = strategy === 'replace'
-            ? parsed.mainKeywords
-            : mergeKeywordLists(current.keywords, parsed.mainKeywords);
+            ? parsedMainKeywords
+            : mergeKeywordLists(current.keywords, parsedMainKeywords);
 
         const nextChannelMap = { ...safeObject(current.channelMap), ...safeObject(parsed.channelMap) };
 
-        const mainSettingsOverrides = safeObject(parsed.mainSettings);
+        const mainSettingsOverrides = canTouchLegacyV3 ? safeObject(parsed.mainSettings) : {};
 
         const payload = {
             keywords: nextKeywords,
@@ -701,59 +1219,198 @@
 
         const result = await SettingsAPI.saveSettings(payload);
 
-        const storedProfiles = await loadProfilesV3();
-        const nextProfiles = {
-            main: {
-                mode: parsed.profilesV3.main.mode,
-                applyKidsRulesOnMain: parsed.profilesV3.main.applyKidsRulesOnMain,
-                whitelistedChannels: strategy === 'replace'
-                    ? parsed.profilesV3.main.whitelistedChannels
-                    : mergeChannelLists(storedProfiles.main.whitelistedChannels, parsed.profilesV3.main.whitelistedChannels),
-                whitelistedKeywords: strategy === 'replace'
-                    ? parsed.profilesV3.main.whitelistedKeywords
-                    : mergeKeywordLists(storedProfiles.main.whitelistedKeywords, parsed.profilesV3.main.whitelistedKeywords),
-                videoIds: strategy === 'replace'
-                    ? parsed.profilesV3.main.videoIds
-                    : mergeStringList(storedProfiles.main.videoIds, parsed.profilesV3.main.videoIds),
-                subscriptions: strategy === 'replace'
-                    ? safeArray(parsed.profilesV3.main.subscriptions)
-                    : mergeStringList(storedProfiles.main.subscriptions, parsed.profilesV3.main.subscriptions)
-            },
-            kids: {
-                mode: parsed.profilesV3.kids.mode,
-                strictMode: parsed.profilesV3.kids.strictMode,
-                blockedChannels: strategy === 'replace'
-                    ? parsed.profilesV3.kids.blockedChannels
-                    : mergeChannelLists(storedProfiles.kids.blockedChannels, parsed.profilesV3.kids.blockedChannels),
-                blockedKeywords: strategy === 'replace'
-                    ? parsed.profilesV3.kids.blockedKeywords
-                    : mergeKeywordLists(storedProfiles.kids.blockedKeywords, parsed.profilesV3.kids.blockedKeywords),
-                whitelistedChannels: strategy === 'replace'
-                    ? parsed.profilesV3.kids.whitelistedChannels
-                    : mergeChannelLists(storedProfiles.kids.whitelistedChannels, parsed.profilesV3.kids.whitelistedChannels),
-                whitelistedKeywords: strategy === 'replace'
-                    ? parsed.profilesV3.kids.whitelistedKeywords
-                    : mergeKeywordLists(storedProfiles.kids.whitelistedKeywords, parsed.profilesV3.kids.whitelistedKeywords),
-                videoIds: strategy === 'replace'
-                    ? parsed.profilesV3.kids.videoIds
-                    : mergeStringList(storedProfiles.kids.videoIds, parsed.profilesV3.kids.videoIds),
-                subscriptions: strategy === 'replace'
-                    ? safeArray(parsed.profilesV3.kids.subscriptions)
-                    : mergeStringList(storedProfiles.kids.subscriptions, parsed.profilesV3.kids.subscriptions)
-            },
-            subscriptions: {
-                main: strategy === 'replace'
-                    ? safeArray(parsed.profilesV3.main.subscriptions)
-                    : mergeStringList(storedProfiles.main.subscriptions, parsed.profilesV3.main.subscriptions),
-                kids: strategy === 'replace'
-                    ? safeArray(parsed.profilesV3.kids.subscriptions)
-                    : mergeStringList(storedProfiles.kids.subscriptions, parsed.profilesV3.kids.subscriptions)
+        const incomingApplyKidsRulesOnMain = incomingV4Settings
+            ? !!incomingV4Settings.syncKidsToMain
+            : parsed.profilesV3.main.applyKidsRulesOnMain;
+
+        const incomingKidsBlockedChannels = Array.isArray(v4KidsBlockedChannels)
+            ? v4KidsBlockedChannels
+            : parsed.profilesV3.kids.blockedChannels;
+
+        const incomingKidsBlockedKeywords = Array.isArray(v4KidsBlockedKeywords)
+            ? v4KidsBlockedKeywords
+            : parsed.profilesV3.kids.blockedKeywords;
+
+        let nextKidsBlockedChannelsForV4 = null;
+        let nextKidsBlockedKeywordsForV4 = null;
+        let nextKidsStrictModeForV4 = null;
+
+        if (canTouchLegacyV3) {
+            const storedProfiles = await loadProfilesV3();
+
+            const nextProfiles = {
+                main: {
+                    mode: parsed.profilesV3.main.mode,
+                    applyKidsRulesOnMain: incomingApplyKidsRulesOnMain,
+                    whitelistedChannels: strategy === 'replace'
+                        ? parsed.profilesV3.main.whitelistedChannels
+                        : mergeChannelLists(storedProfiles.main.whitelistedChannels, parsed.profilesV3.main.whitelistedChannels),
+                    whitelistedKeywords: strategy === 'replace'
+                        ? parsed.profilesV3.main.whitelistedKeywords
+                        : mergeKeywordLists(storedProfiles.main.whitelistedKeywords, parsed.profilesV3.main.whitelistedKeywords),
+                    videoIds: strategy === 'replace'
+                        ? parsed.profilesV3.main.videoIds
+                        : mergeStringList(storedProfiles.main.videoIds, parsed.profilesV3.main.videoIds),
+                    subscriptions: strategy === 'replace'
+                        ? safeArray(parsed.profilesV3.main.subscriptions)
+                        : mergeStringList(storedProfiles.main.subscriptions, parsed.profilesV3.main.subscriptions)
+                },
+                kids: {
+                    mode: parsed.profilesV3.kids.mode,
+                    strictMode: parsed.profilesV3.kids.strictMode,
+                    blockedChannels: strategy === 'replace'
+                        ? incomingKidsBlockedChannels
+                        : mergeChannelLists(storedProfiles.kids.blockedChannels, incomingKidsBlockedChannels),
+                    blockedKeywords: strategy === 'replace'
+                        ? incomingKidsBlockedKeywords
+                        : mergeKeywordLists(storedProfiles.kids.blockedKeywords, incomingKidsBlockedKeywords),
+                    whitelistedChannels: strategy === 'replace'
+                        ? parsed.profilesV3.kids.whitelistedChannels
+                        : mergeChannelLists(storedProfiles.kids.whitelistedChannels, parsed.profilesV3.kids.whitelistedChannels),
+                    whitelistedKeywords: strategy === 'replace'
+                        ? parsed.profilesV3.kids.whitelistedKeywords
+                        : mergeKeywordLists(storedProfiles.kids.whitelistedKeywords, parsed.profilesV3.kids.whitelistedKeywords),
+                    videoIds: strategy === 'replace'
+                        ? parsed.profilesV3.kids.videoIds
+                        : mergeStringList(storedProfiles.kids.videoIds, parsed.profilesV3.kids.videoIds),
+                    subscriptions: strategy === 'replace'
+                        ? safeArray(parsed.profilesV3.kids.subscriptions)
+                        : mergeStringList(storedProfiles.kids.subscriptions, parsed.profilesV3.kids.subscriptions)
+                },
+                subscriptions: {
+                    main: strategy === 'replace'
+                        ? safeArray(parsed.profilesV3.main.subscriptions)
+                        : mergeStringList(storedProfiles.main.subscriptions, parsed.profilesV3.main.subscriptions),
+                    kids: strategy === 'replace'
+                        ? safeArray(parsed.profilesV3.kids.subscriptions)
+                        : mergeStringList(storedProfiles.kids.subscriptions, parsed.profilesV3.kids.subscriptions)
+                }
+            };
+
+            await saveProfilesV3(nextProfiles);
+
+            nextKidsBlockedChannelsForV4 = safeArray(nextProfiles.kids.blockedChannels);
+            nextKidsBlockedKeywordsForV4 = safeArray(nextProfiles.kids.blockedKeywords);
+            nextKidsStrictModeForV4 = nextProfiles.kids.strictMode !== false;
+        }
+
+        try {
+            let profilesV4 = localProfilesV4 || await loadProfilesV4();
+            let nextV4 = profilesV4;
+
+            const incomingProfilesV4 = incomingV4;
+            if (incomingProfilesV4 && effectiveScope === 'full' && localActiveId === DEFAULT_PROFILE_ID) {
+                const sanitizedIncoming = sanitizeProfilesV4(incomingProfilesV4, { source: 'import' });
+                if (sanitizedIncoming) {
+                    if (strategy === 'replace') {
+                        nextV4 = sanitizedIncoming;
+                    } else {
+                        const baseProfiles = safeObject(nextV4?.profiles);
+                        const incomingProfiles = safeObject(sanitizedIncoming.profiles);
+                        const mergedProfiles = { ...baseProfiles };
+
+                        for (const [profileId, incProfileRaw] of Object.entries(incomingProfiles)) {
+                            const incProfile = safeObject(incProfileRaw);
+                            const existingProfile = safeObject(mergedProfiles[profileId]);
+                            if (!existingProfile || Object.keys(existingProfile).length === 0) {
+                                mergedProfiles[profileId] = incProfile;
+                                continue;
+                            }
+                            const existingMain = safeObject(existingProfile.main);
+                            const existingKids = safeObject(existingProfile.kids);
+                            const incMain = safeObject(incProfile.main);
+                            const incKids = safeObject(incProfile.kids);
+                            mergedProfiles[profileId] = {
+                                ...existingProfile,
+                                ...incProfile,
+                                settings: {
+                                    ...safeObject(existingProfile.settings),
+                                    ...safeObject(incProfile.settings)
+                                },
+                                main: {
+                                    ...existingMain,
+                                    ...incMain,
+                                    channels: mergeChannelLists(existingMain.channels, incMain.channels),
+                                    keywords: mergeKeywordLists(existingMain.keywords, incMain.keywords)
+                                },
+                                kids: {
+                                    ...existingKids,
+                                    ...incKids,
+                                    mode: 'blocklist',
+                                    strictMode: incKids.strictMode !== false,
+                                    blockedChannels: mergeChannelLists(existingKids.blockedChannels, incKids.blockedChannels),
+                                    blockedKeywords: mergeKeywordLists(existingKids.blockedKeywords, incKids.blockedKeywords)
+                                }
+                            };
+                        }
+
+                        nextV4 = {
+                            ...nextV4,
+                            schemaVersion: 4,
+                            profiles: mergedProfiles
+                        };
+                    }
+                }
             }
-        };
 
-        await saveProfilesV3(nextProfiles);
+            const desiredActiveId = (effectiveScope === 'active')
+                ? localActiveId
+                : ((strategy === 'replace' && nextV4 && typeof nextV4.activeProfileId === 'string')
+                    ? nextV4.activeProfileId
+                    : (typeof profilesV4?.activeProfileId === 'string' ? profilesV4.activeProfileId : DEFAULT_PROFILE_ID));
 
-        if (parsed.theme && SettingsAPI.setThemePreference) {
+            const profiles = safeObject(nextV4?.profiles);
+            const activeId = normalizeString(desiredActiveId) || DEFAULT_PROFILE_ID;
+            const activeProfile = profiles[activeId] && typeof profiles[activeId] === 'object' ? profiles[activeId] : {};
+            const activeSettings = safeObject(activeProfile.settings);
+
+            if (!canTouchLegacyV3) {
+                const currentKids = safeObject(activeProfile.kids);
+                nextKidsBlockedChannelsForV4 = strategy === 'replace'
+                    ? incomingKidsBlockedChannels
+                    : mergeChannelLists(safeArray(currentKids.blockedChannels), incomingKidsBlockedChannels);
+                nextKidsBlockedKeywordsForV4 = strategy === 'replace'
+                    ? incomingKidsBlockedKeywords
+                    : mergeKeywordLists(safeArray(currentKids.blockedKeywords), incomingKidsBlockedKeywords);
+
+                const incomingStrict = (incomingProfileForImport && typeof safeObject(incomingProfileForImport.kids).strictMode === 'boolean')
+                    ? safeObject(incomingProfileForImport.kids).strictMode
+                    : parsed.profilesV3.kids.strictMode;
+                nextKidsStrictModeForV4 = incomingStrict !== false;
+            }
+
+            profiles[activeId] = {
+                ...activeProfile,
+                name: typeof activeProfile.name === 'string' ? activeProfile.name : 'Default',
+                settings: {
+                    ...activeSettings,
+                    syncKidsToMain: !!incomingApplyKidsRulesOnMain
+                },
+                main: {
+                    ...(activeProfile.main || {}),
+                    channels: nextChannels,
+                    keywords: nextKeywords
+                },
+                kids: {
+                    ...(activeProfile.kids || {}),
+                    mode: 'blocklist',
+                    strictMode: nextKidsStrictModeForV4 !== false,
+                    blockedChannels: safeArray(nextKidsBlockedChannelsForV4),
+                    blockedKeywords: safeArray(nextKidsBlockedKeywordsForV4)
+                }
+            };
+
+            await saveProfilesV4({
+                ...nextV4,
+                schemaVersion: 4,
+                activeProfileId: activeId,
+                profiles
+            });
+        } catch (e) {
+            console.warn('FilterTube: importV3 failed to sync ftProfilesV4', e);
+        }
+
+        if (canTouchLegacyV3 && parsed.theme && SettingsAPI.setThemePreference) {
             try {
                 await SettingsAPI.setThemePreference(parsed.theme);
             } catch (e) {
@@ -765,6 +1422,36 @@
         }
 
         return { ok: true, result };
+    }
+
+    async function exportV3Encrypted({ scope = 'auto', password = '', auth = null } = {}) {
+        const Security = global.FilterTubeSecurity || null;
+        if (!Security || typeof Security.encryptJson !== 'function') {
+            throw new Error('Security manager unavailable');
+        }
+        const payload = await exportV3({ scope, auth });
+        const encrypted = await Security.encryptJson(payload, password);
+        return {
+            meta: {
+                ...safeObject(payload?.meta),
+                encrypted: true
+            },
+            encrypted
+        };
+    }
+
+    async function importV3Encrypted(container, { password = '', strategy = 'merge', scope = 'auto', auth = null } = {}) {
+        const Security = global.FilterTubeSecurity || null;
+        if (!Security || typeof Security.decryptJson !== 'function') {
+            throw new Error('Security manager unavailable');
+        }
+        const root = safeObject(container);
+        const meta = safeObject(root.meta);
+        if (meta.encrypted !== true || !root.encrypted) {
+            throw new Error('Invalid encrypted backup');
+        }
+        const decrypted = await Security.decryptJson(root.encrypted, password);
+        return importV3(decrypted, { strategy, scope, auth });
     }
 
     // ============================================================================
@@ -785,15 +1472,46 @@
             }
 
             const settings = await SettingsAPI.loadSettings();
+            if (!settings || settings.autoBackupEnabled !== true) {
+                return { ok: true, skipped: true, reason: 'disabled' };
+            }
             const profilesV3 = await loadProfilesV3();
+
+            let profilesV4 = null;
+            try {
+                profilesV4 = await loadProfilesV4();
+            } catch (e) {
+                profilesV4 = null;
+            }
+
+            const activeId = normalizeString(profilesV4?.activeProfileId) || DEFAULT_PROFILE_ID;
+            const effectiveScope = resolveProfileScope('auto', activeId);
+            const profilesV4ForExport = (effectiveScope === 'active' && profilesV4 && profilesV4.profiles && typeof profilesV4.profiles === 'object' && !Array.isArray(profilesV4.profiles))
+                ? {
+                    schemaVersion: 4,
+                    activeProfileId: activeId,
+                    profiles: {
+                        [activeId]: safeObject(profilesV4.profiles[activeId])
+                    }
+                }
+                : profilesV4;
+            const profilesV3ForExport = (effectiveScope === 'active' && profilesV4)
+                ? deriveProfilesV3FromV4(profilesV4, activeId, { source: 'export' })
+                : profilesV3;
 
             // Build backup data (same as export but without transient data)
             const backupData = buildV3Export({
-                mainSettings: settings,
+                mainSettings: {
+                    ...(settings || {}),
+                    ...(profilesV4ForExport ? { [FT_PROFILES_V4_KEY]: profilesV4ForExport } : {})
+                },
                 mainKeywords: settings.keywords || [],
                 mainChannels: settings.channels || [],
                 channelMap: settings.channelMap || {},
-                profilesV3
+                profilesV3: profilesV3ForExport,
+                exportType: effectiveScope === 'active' ? 'profile' : 'full',
+                profileId: effectiveScope === 'active' ? activeId : null,
+                profileName: effectiveScope === 'active' ? (normalizeString(safeObject(safeObject(profilesV4?.profiles)[activeId]).name) || activeId) : null
             });
 
             // Mark as backup with metadata
@@ -802,9 +1520,22 @@
             backupData.meta.backupLocation = await getBackupDirectory();
 
             // Generate filename with timestamp
+            const safePart = (value) => {
+                const raw = normalizeString(value);
+                if (!raw) return '';
+                return raw
+                    .replace(/\s+/g, '-')
+                    .replace(/[^a-zA-Z0-9._-]/g, '')
+                    .replace(/-+/g, '-')
+                    .replace(/^[-_.]+|[-_.]+$/g, '')
+                    .slice(0, 48);
+            };
+
             const now = new Date();
             const timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, 19);
-            const filename = `FilterTube-Backup-${timestamp}.json`;
+            const profileName = normalizeString(safeObject(safeObject(profilesV4?.profiles)[activeId]).name) || activeId;
+            const label = safePart(profileName) || safePart(activeId) || 'Default';
+            const filename = `FilterTube-Backup-${label}-${timestamp}.json`;
 
             // Create backup file
             const result = await saveBackupFile(backupData, filename, options);
@@ -972,9 +1703,13 @@
 
     global.FilterTubeIO = {
         exportV3,
+        exportV3Encrypted,
         importV3,
+        importV3Encrypted,
         loadProfilesV3,
         saveProfilesV3,
+        loadProfilesV4,
+        saveProfilesV4,
         // Auto-backup functions
         createAutoBackup,
         scheduleAutoBackup,

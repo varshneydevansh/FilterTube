@@ -12,6 +12,16 @@ const StateManager = (() => {
     // Import shared settings utilities
     const SettingsAPI = window.FilterTubeSettings || {};
 
+    function isUiLocked() {
+        try {
+            if (typeof window.FilterTubeIsUiLocked === 'function') {
+                return !!window.FilterTubeIsUiLocked();
+            }
+        } catch (e) {
+        }
+        return false;
+    }
+
     function scheduleAutoBackup(triggerType, delay = 1000) {
         try {
             const action = 'FilterTube_ScheduleAutoBackup';
@@ -38,7 +48,8 @@ const StateManager = (() => {
 
     let state = {
         enabled: true,
-        autoBackupEnabled: true,
+        autoBackupEnabled: false,
+        syncKidsToMain: false,
         keywords: [],
         userKeywords: [],
         channels: [],
@@ -79,7 +90,7 @@ const StateManager = (() => {
             blockedChannels: [],
             whitelistedChannels: [],
             whitelistedKeywords: [],
-            mode: 'whitelist',
+            mode: 'blocklist',
             strictMode: true,
             videoIds: [],
             subscriptions: []
@@ -111,6 +122,7 @@ const StateManager = (() => {
         const data = await SettingsAPI.loadSettings();
         const io = window.FilterTubeIO || {};
         let profilesV3 = null;
+        let profilesV4 = null;
         if (io && typeof io.loadProfilesV3 === 'function') {
             try {
                 profilesV3 = await io.loadProfilesV3();
@@ -119,8 +131,16 @@ const StateManager = (() => {
             }
         }
 
+        if (io && typeof io.loadProfilesV4 === 'function') {
+            try {
+                profilesV4 = await io.loadProfilesV4();
+            } catch (e) {
+                console.warn('StateManager: loadProfilesV4 failed', e);
+            }
+        }
+
         state.enabled = data.enabled !== false;
-        state.autoBackupEnabled = data.autoBackupEnabled !== false;
+        state.autoBackupEnabled = data.autoBackupEnabled === true;
         state.keywords = data.keywords || [];
         state.userKeywords = data.userKeywords || [];
         state.channels = data.channels || [];
@@ -155,7 +175,68 @@ const StateManager = (() => {
         state.stats = data.stats || { hiddenCount: 0, savedMinutes: 0 };
         state.channelMap = data.channelMap || {};
         state.theme = data.theme || 'light';
-        if (profilesV3 && profilesV3.kids) {
+        state.syncKidsToMain = false;
+        const pickActiveProfileFromV4 = () => {
+            if (!profilesV4 || typeof profilesV4 !== 'object' || Array.isArray(profilesV4)) return null;
+            const activeId = typeof profilesV4.activeProfileId === 'string' ? profilesV4.activeProfileId.trim() : '';
+            if (!activeId) return null;
+            const profiles = profilesV4.profiles && typeof profilesV4.profiles === 'object' && !Array.isArray(profilesV4.profiles)
+                ? profilesV4.profiles
+                : null;
+            if (!profiles) return null;
+            const activeProfile = profiles[activeId] && typeof profiles[activeId] === 'object' ? profiles[activeId] : null;
+            return activeProfile;
+        };
+        const pickKidsFromV4 = () => {
+            if (!profilesV4 || typeof profilesV4 !== 'object' || Array.isArray(profilesV4)) return null;
+            const activeId = typeof profilesV4.activeProfileId === 'string' ? profilesV4.activeProfileId.trim() : '';
+            if (!activeId) return null;
+            const profiles = profilesV4.profiles && typeof profilesV4.profiles === 'object' && !Array.isArray(profilesV4.profiles)
+                ? profilesV4.profiles
+                : null;
+            if (!profiles) return null;
+            const activeProfile = profiles[activeId] && typeof profiles[activeId] === 'object' ? profiles[activeId] : null;
+            if (!activeProfile) return null;
+            const kids = activeProfile.kids && typeof activeProfile.kids === 'object' ? activeProfile.kids : null;
+            if (!kids) return null;
+            return kids;
+        };
+
+        const activeProfileFromV4 = pickActiveProfileFromV4();
+        if (activeProfileFromV4 && activeProfileFromV4.settings && typeof activeProfileFromV4.settings === 'object') {
+            state.syncKidsToMain = !!activeProfileFromV4.settings.syncKidsToMain;
+        }
+
+        const kidsFromV4 = pickKidsFromV4();
+        if (kidsFromV4) {
+            const cleanBlockedChannels = (kidsFromV4.blockedChannels || []).filter(ch => {
+                const id = (ch.id || '').trim();
+                const handle = (ch.handle || '').trim();
+                const customUrl = (ch.customUrl || '').trim();
+                const name = (ch.name || '').trim();
+
+                if (id.toUpperCase().startsWith('UC') || (handle && handle.startsWith('@')) || customUrl) {
+                    return true;
+                }
+
+                if (name === 'Blocked Video (Kids)' || name === 'Channel') {
+                    return false;
+                }
+
+                return !!name;
+            });
+
+            state.kids = {
+                blockedKeywords: kidsFromV4.blockedKeywords || [],
+                blockedChannels: cleanBlockedChannels,
+                whitelistedChannels: [],
+                whitelistedKeywords: [],
+                mode: 'blocklist',
+                strictMode: kidsFromV4.strictMode !== false,
+                videoIds: kidsFromV4.videoIds || [],
+                subscriptions: kidsFromV4.subscriptions || []
+            };
+        } else if (profilesV3 && profilesV3.kids) {
             // Cleanup legacy "Blocked Video (Kids)" entries that have no valid ID/handle
             const cleanBlockedChannels = (profilesV3.kids.blockedChannels || []).filter(ch => {
                 const id = (ch.id || '').trim();
@@ -182,7 +263,7 @@ const StateManager = (() => {
                 blockedChannels: cleanBlockedChannels,
                 whitelistedChannels: profilesV3.kids.whitelistedChannels || [],
                 whitelistedKeywords: profilesV3.kids.whitelistedKeywords || [],
-                mode: profilesV3.kids.mode || 'whitelist',
+                mode: profilesV3.kids.mode || 'blocklist',
                 strictMode: profilesV3.kids.strictMode !== false,
                 videoIds: profilesV3.kids.videoIds || [],
                 subscriptions: profilesV3.kids.subscriptions || []
@@ -221,7 +302,7 @@ const StateManager = (() => {
                 blockedChannels: [],
                 whitelistedChannels: [],
                 whitelistedKeywords: [],
-                mode: 'whitelist',
+                mode: 'blocklist',
                 strictMode: true,
                 videoIds: [],
                 subscriptions: []
@@ -376,6 +457,11 @@ const StateManager = (() => {
     async function addKidsKeyword(word) {
         await ensureLoaded();
 
+        if (isUiLocked()) {
+            await loadSettings();
+            return false;
+        }
+
         const trimmed = (word || '').trim();
         if (!trimmed) return false;
 
@@ -408,6 +494,11 @@ const StateManager = (() => {
 
     async function removeKidsKeyword(word) {
         await ensureLoaded();
+
+        if (isUiLocked()) {
+            await loadSettings();
+            return false;
+        }
         const kids = getKidsState();
         const before = kids.blockedKeywords.length;
         kids.blockedKeywords = kids.blockedKeywords.filter(entry => (entry.word || '') !== word);
@@ -429,6 +520,11 @@ const StateManager = (() => {
      */
     async function toggleKidsKeywordComments(word) {
         await ensureLoaded();
+
+        if (isUiLocked()) {
+            await loadSettings();
+            return null;
+        }
         const kids = getKidsState();
         const index = kids.blockedKeywords.findIndex(k => (k?.word || '') === word);
         if (index < 0) return null;
@@ -459,6 +555,11 @@ const StateManager = (() => {
      */
     async function toggleKidsKeywordExact(word) {
         await ensureLoaded();
+
+        if (isUiLocked()) {
+            await loadSettings();
+            return null;
+        }
         const kids = getKidsState();
         const index = kids.blockedKeywords.findIndex(k => (k?.word || '') === word);
         if (index < 0) return null;
@@ -506,6 +607,11 @@ const StateManager = (() => {
 
     async function addKidsChannel(input) {
         await ensureLoaded();
+
+        if (isUiLocked()) {
+            await loadSettings();
+            return { success: false, error: 'Profile is locked' };
+        }
         const rawValue = (input || '').trim();
         if (!rawValue) return { success: false, error: 'Empty input' };
 
@@ -576,6 +682,11 @@ const StateManager = (() => {
 
     async function removeKidsChannel(index) {
         await ensureLoaded();
+
+        if (isUiLocked()) {
+            await loadSettings();
+            return false;
+        }
         const kids = getKidsState();
         if (index < 0 || index >= kids.blockedChannels.length) return false;
         const channel = kids.blockedChannels[index];
@@ -597,6 +708,11 @@ const StateManager = (() => {
      */
     async function toggleKidsChannelFilterAll(index) {
         await ensureLoaded();
+
+        if (isUiLocked()) {
+            await loadSettings();
+            return false;
+        }
         const kids = getKidsState();
         if (index < 0 || index >= kids.blockedChannels.length) return false;
 
@@ -695,21 +811,57 @@ const StateManager = (() => {
 
     async function persistKidsProfiles(nextKids) {
         const io = window.FilterTubeIO || {};
-        if (!io || typeof io.saveProfilesV3 !== 'function' || typeof io.loadProfilesV3 !== 'function') {
+        const canV3 = !!(io && typeof io.saveProfilesV3 === 'function' && typeof io.loadProfilesV3 === 'function');
+        const canV4 = !!(io && typeof io.saveProfilesV4 === 'function' && typeof io.loadProfilesV4 === 'function');
+        if (!canV3 && !canV4) {
             console.warn('StateManager: FilterTubeIO not available for kids persistence');
             return;
         }
 
         try {
-            const existing = await io.loadProfilesV3();
-            const merged = {
-                ...existing,
-                kids: {
-                    ...existing?.kids,
-                    ...nextKids
-                }
-            };
-            await io.saveProfilesV3(merged);
+            if (canV3) {
+                const existing = await io.loadProfilesV3();
+                const merged = {
+                    ...existing,
+                    kids: {
+                        ...existing?.kids,
+                        ...nextKids,
+                        mode: 'blocklist'
+                    }
+                };
+                await io.saveProfilesV3(merged);
+            }
+        } catch (e) {
+            console.warn('StateManager: Failed to persist kids profiles', e);
+        }
+
+        try {
+            if (canV4) {
+                const existing = await io.loadProfilesV4();
+                const profiles = (existing && typeof existing === 'object' && !Array.isArray(existing) && existing.profiles && typeof existing.profiles === 'object' && !Array.isArray(existing.profiles))
+                    ? existing.profiles
+                    : {};
+                const activeId = typeof existing?.activeProfileId === 'string' ? existing.activeProfileId : 'default';
+                const activeProfile = profiles[activeId] && typeof profiles[activeId] === 'object' ? profiles[activeId] : {};
+
+                profiles[activeId] = {
+                    ...activeProfile,
+                    kids: {
+                        ...(activeProfile.kids || {}),
+                        ...nextKids,
+                        mode: 'blocklist'
+                    }
+                };
+
+                const nextProfiles = {
+                    ...existing,
+                    schemaVersion: 4,
+                    activeProfileId: activeId,
+                    profiles
+                };
+
+                await io.saveProfilesV4(nextProfiles);
+            }
         } catch (e) {
             console.warn('StateManager: Failed to persist kids profiles', e);
         }
@@ -761,6 +913,11 @@ const StateManager = (() => {
     async function addKeyword(word, options = {}) {
         await ensureLoaded();
 
+        if (isUiLocked()) {
+            await loadSettings();
+            return false;
+        }
+
         const trimmed = word.trim();
         if (!trimmed) return false;
 
@@ -797,6 +954,11 @@ const StateManager = (() => {
     async function toggleKeywordComments(word) {
         await ensureLoaded();
 
+        if (isUiLocked()) {
+            await loadSettings();
+            return false;
+        }
+
         let index = state.userKeywords.findIndex(k => k.word === word);
         if (index === -1) {
             // If the entry isn't in userKeywords (e.g., channel-derived), we don't currently
@@ -826,6 +988,11 @@ const StateManager = (() => {
     async function removeKeyword(word) {
         await ensureLoaded();
 
+        if (isUiLocked()) {
+            await loadSettings();
+            return false;
+        }
+
         const index = state.userKeywords.findIndex(k => k.word === word && k.source !== 'channel');
         if (index === -1) return false;
 
@@ -847,6 +1014,11 @@ const StateManager = (() => {
      */
     async function toggleKeywordExact(word) {
         await ensureLoaded();
+
+        if (isUiLocked()) {
+            await loadSettings();
+            return false;
+        }
 
         const index = state.userKeywords.findIndex(k => k.word === word && k.source !== 'channel');
         if (index === -1) return false;
@@ -885,6 +1057,11 @@ const StateManager = (() => {
      */
     async function addChannel(input) {
         await ensureLoaded();
+
+        if (isUiLocked()) {
+            await loadSettings();
+            return { success: false, error: 'Profile is locked' };
+        }
 
         const rawValue = input.trim();
         if (!rawValue) {
@@ -945,6 +1122,11 @@ const StateManager = (() => {
     async function removeChannel(index) {
         await ensureLoaded();
 
+        if (isUiLocked()) {
+            await loadSettings();
+            return false;
+        }
+
         if (index < 0 || index >= state.channels.length) return false;
 
         const channel = state.channels[index];
@@ -966,6 +1148,11 @@ const StateManager = (() => {
      */
     async function toggleChannelFilterAll(index) {
         await ensureLoaded();
+
+        if (isUiLocked()) {
+            await loadSettings();
+            return false;
+        }
 
         if (index < 0 || index >= state.channels.length) return false;
 
@@ -990,6 +1177,11 @@ const StateManager = (() => {
      */
     async function toggleChannelFilterAllCommentsByRef(channelRef) {
         await ensureLoaded();
+
+        if (isUiLocked()) {
+            await loadSettings();
+            return false;
+        }
 
         if (!channelRef) return false;
         const Settings = SettingsAPI || {};
@@ -1077,9 +1269,15 @@ const StateManager = (() => {
     async function updateSetting(key, value) {
         await ensureLoaded();
 
+        if (isUiLocked()) {
+            await loadSettings();
+            return;
+        }
+
         const validKeys = [
             'enabled',
             'autoBackupEnabled',
+            'syncKidsToMain',
             'hideShorts',
             'hideComments',
             'filterComments',
@@ -1116,6 +1314,60 @@ const StateManager = (() => {
         }
 
         state[key] = !!value;
+
+        if (key === 'syncKidsToMain') {
+            try {
+                const io = window.FilterTubeIO || {};
+                if (typeof io.loadProfilesV4 === 'function' && typeof io.saveProfilesV4 === 'function') {
+                    const profilesV4 = await io.loadProfilesV4();
+                    const activeId = (typeof profilesV4?.activeProfileId === 'string' && profilesV4.activeProfileId.trim())
+                        ? profilesV4.activeProfileId.trim()
+                        : 'default';
+                    const profiles = (profilesV4?.profiles && typeof profilesV4.profiles === 'object' && !Array.isArray(profilesV4.profiles))
+                        ? { ...profilesV4.profiles }
+                        : {};
+                    const activeProfile = (profiles[activeId] && typeof profiles[activeId] === 'object') ? profiles[activeId] : {};
+                    const settings = (activeProfile.settings && typeof activeProfile.settings === 'object' && !Array.isArray(activeProfile.settings))
+                        ? activeProfile.settings
+                        : {};
+
+                    profiles[activeId] = {
+                        ...activeProfile,
+                        settings: {
+                            ...settings,
+                            syncKidsToMain: !!state.syncKidsToMain
+                        }
+                    };
+
+                    await io.saveProfilesV4({
+                        ...profilesV4,
+                        schemaVersion: 4,
+                        activeProfileId: activeId,
+                        profiles
+                    });
+                }
+
+                if (typeof io.loadProfilesV3 === 'function' && typeof io.saveProfilesV3 === 'function') {
+                    const profilesV3 = await io.loadProfilesV3();
+                    if (profilesV3 && typeof profilesV3 === 'object') {
+                        profilesV3.main = profilesV3.main && typeof profilesV3.main === 'object' ? profilesV3.main : {};
+                        profilesV3.main.applyKidsRulesOnMain = !!state.syncKidsToMain;
+                        await io.saveProfilesV3(profilesV3);
+                    }
+                }
+            } catch (e) {
+                console.warn('StateManager: failed to persist syncKidsToMain', e);
+            }
+
+            try {
+                await requestRefresh('main');
+            } catch (e) {
+            }
+
+            notifyListeners('settingUpdated', { key, value: state[key] });
+            scheduleAutoBackup('setting_updated');
+            return;
+        }
 
         // Handle hideComments and filterComments mutual exclusivity
         if (key === 'hideComments' && value === true) {
@@ -1258,7 +1510,8 @@ const StateManager = (() => {
                     'hideSearchShelves',
                     'stats',
                     'channelMap',
-                    'ftProfilesV3'
+                    'ftProfilesV3',
+                    'ftProfilesV4'
                 ];
                 const hasSettingsChange = storageKeys.some(key => changes[key]);
 

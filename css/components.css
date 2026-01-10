@@ -64,6 +64,61 @@
     box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
 }
 
+ .select-input {
+    padding: var(--ft-space-sm) var(--ft-space-md);
+    border: 1px solid var(--ft-color-sem-neutral-border);
+    border-radius: var(--ft-radius-md);
+    background-color: var(--ft-color-bg-surface);
+    color: var(--ft-color-text-primary);
+    font-family: var(--ft-font-family-base);
+    font-size: var(--ft-font-size-body);
+    min-width: 180px;
+ }
+
+ .select-input:focus {
+    outline: none;
+    border-color: var(--ft-color-brand-primary);
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+ }
+
+ .ft-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--ft-color-bg-overlay);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 12000;
+    padding: var(--ft-space-lg);
+ }
+
+ .ft-modal {
+    width: min(560px, 100%);
+ }
+
+ .ft-modal-title {
+    margin: 0;
+    font-family: var(--ft-font-family-serif);
+    font-size: var(--ft-font-size-h3);
+    font-weight: var(--ft-font-weight-semibold);
+    letter-spacing: var(--ft-letter-spacing-tight);
+    line-height: var(--ft-line-height-tight);
+ }
+
+ .ft-modal-body {
+    margin-top: var(--ft-space-sm);
+    display: flex;
+    flex-direction: column;
+    gap: var(--ft-space-sm);
+ }
+
+ .ft-modal-actions {
+    display: flex;
+    gap: var(--ft-space-sm);
+    justify-content: flex-end;
+    margin-top: var(--ft-space-md);
+ }
+
 /* --- Buttons --- */
 .btn-primary {
     background-color: var(--ft-color-brand-primary);
@@ -808,6 +863,12 @@ html[data-theme="dark"] .exact-toggle.toggle-variant-blue.active:hover {
     color: #92400e;
 }
 
+/* Variant: Kids sync source */
+.channel-derived-badge.badge-variant-kids {
+    background: rgba(236, 72, 153, 0.12);
+    color: #9d174d;
+}
+
 html[data-theme="dark"] .channel-derived-badge {
     background: rgba(34, 197, 94, 0.25);
     color: #86efac;
@@ -816,6 +877,11 @@ html[data-theme="dark"] .channel-derived-badge {
 html[data-theme="dark"] .channel-derived-badge.badge-variant-comments {
     background: rgba(251, 191, 36, 0.2);
     color: #fde68a;
+}
+
+html[data-theme="dark"] .channel-derived-badge.badge-variant-kids {
+    background: rgba(236, 72, 153, 0.18);
+    color: #fbcfe8;
 }
 
 /* --- Delete Button --- */

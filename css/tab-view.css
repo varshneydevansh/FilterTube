@@ -101,6 +101,12 @@ body {
     font-weight: var(--ft-font-weight-semibold);
 }
 
+ .nav-item.ft-nav-disabled {
+     opacity: 0.45;
+     cursor: not-allowed;
+     pointer-events: none;
+ }
+
 .nav-icon {
     font-size: 1.2em;
     width: 24px;
@@ -174,7 +180,28 @@ body {
     flex: 1;
     overflow-y: auto;
     padding: var(--ft-space-xl);
-    padding-top: 0;
+}
+
+.ft-lock-gate {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    padding: var(--ft-space-xl);
+}
+
+.ft-lock-gate .card {
+    max-width: 520px;
+    margin: 0 auto;
+}
+
+.help-item.ft-profile-group-header {
+    border-style: dashed;
+    background-color: var(--ft-color-bg-panel);
+}
+
+.help-item.ft-profile-child {
+    margin-left: 14px;
+    border-left: 3px solid var(--ft-color-collab-border, #facc15);
 }
 
 .view-section {
@@ -183,6 +210,20 @@ body {
     margin: 0 auto;
     animation: fadeIn 0.3s ease;
 }
+
+ .ft-app-locked .view-section.active {
+     display: none !important;
+ }
+
+ .ft-app-locked #helpView.active,
+ .ft-app-locked #supportView.active,
+ .ft-app-locked #whatsnewView.active {
+     display: block !important;
+ }
+
+ .ft-child-profile #kidsView.active {
+     display: none !important;
+ }
 
 /* Responsive tweaks */
 @media (max-width: 900px) {
@@ -684,6 +725,16 @@ body {
  :root[data-theme="dark"] .list-item.source-comments {
      border-color: rgba(140, 92, 38, 0.45);
      background: rgba(140, 92, 38, 0.22);
+ }
+
+ .list-item.source-kids {
+     border-color: rgba(236, 72, 153, 0.28);
+     background: rgba(252, 231, 243, 0.7);
+ }
+
+ :root[data-theme="dark"] .list-item.source-kids {
+     border-color: rgba(236, 72, 153, 0.55);
+     background: rgba(190, 24, 93, 0.18);
  }
 
 .list-item.channel-derived .item-left {

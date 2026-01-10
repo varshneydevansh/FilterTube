@@ -35,6 +35,7 @@ const RenderEngine = (() => {
         if (!element) return;
         if (channelDerived) element.classList.add('channel-derived');
         if (sourceKey === 'comments') element.classList.add('source-comments');
+        if (sourceKey === 'kids') element.classList.add('source-kids');
     }
 
     function createSourceBadge({ sourceKey, title }) {
@@ -43,6 +44,14 @@ const RenderEngine = (() => {
             text: isFromComments ? 'From Comments' : 'From Channel',
             title,
             variantClass: isFromComments ? 'badge-variant-comments' : ''
+        });
+    }
+
+    function createKidsSyncBadge() {
+        return createPillBadge({
+            text: 'From Kids',
+            title: 'This entry is synced from your YouTube Kids blocklist',
+            variantClass: 'badge-variant-kids'
         });
     }
 
@@ -374,9 +383,37 @@ const RenderEngine = (() => {
             onDelete = null
         } = options;
 
-        const channelsSource = profile === 'kids'
+        let channelsSource = profile === 'kids'
             ? (state.kids?.blockedChannels || [])
             : state.channels;
+
+        if (profile !== 'kids' && state.syncKidsToMain) {
+            const Settings = getSettings();
+            const kidsChannels = Array.isArray(state.kids?.blockedChannels) ? state.kids.blockedChannels : [];
+            const mainChannels = Array.isArray(state.channels) ? state.channels : [];
+            const getKey = (entry) => {
+                try {
+                    if (Settings?.getChannelDerivedKey) return Settings.getChannelDerivedKey(entry);
+                } catch (e) {
+                }
+                const id = (entry?.id || '').toLowerCase();
+                const handle = (entry?.handle || '').toLowerCase();
+                const customUrl = (entry?.customUrl || '').toLowerCase();
+                const name = (entry?.name || '').toLowerCase();
+                return id || handle || customUrl || name;
+            };
+
+            const seen = new Set(mainChannels.map(getKey).filter(Boolean));
+            const kidsOnly = [];
+            kidsChannels.forEach(ch => {
+                const key = getKey(ch);
+                if (!key || seen.has(key)) return;
+                seen.add(key);
+                kidsOnly.push({ ...ch, __ftFromKids: true });
+            });
+
+            channelsSource = [...mainChannels, ...kidsOnly];
+        }
         const { groups: collaborationGroups } = groupChannelsByCollaboration(state.channels);
 
         // Filter and sort channels
@@ -435,16 +472,38 @@ const RenderEngine = (() => {
         }
 
         const renderChannelRow = (channel) => {
-            const originalIndex = (profile === 'kids')
-                ? channelsSource.indexOf(channel)
-                : state.channels.indexOf(channel);
-            const listIndex = originalIndex;
-            const collaborationMeta = (profile === 'kids') ? null : buildCollaborationMeta(channel, collaborationGroups);
+            const isFromKids = !!channel?.__ftFromKids;
+            const effectiveProfile = isFromKids ? 'kids' : profile;
+
+            let listIndex = -1;
+            if (effectiveProfile === 'kids') {
+                const kidsList = Array.isArray(state.kids?.blockedChannels) ? state.kids.blockedChannels : [];
+                const Settings = getSettings();
+                const getKey = (entry) => {
+                    try {
+                        if (Settings?.getChannelDerivedKey) return Settings.getChannelDerivedKey(entry);
+                    } catch (e) {
+                    }
+                    const id = (entry?.id || '').toLowerCase();
+                    const handle = (entry?.handle || '').toLowerCase();
+                    const customUrl = (entry?.customUrl || '').toLowerCase();
+                    const name = (entry?.name || '').toLowerCase();
+                    return id || handle || customUrl || name;
+                };
+                const targetKey = getKey(channel);
+                listIndex = targetKey
+                    ? kidsList.findIndex(ch => getKey(ch) === targetKey)
+                    : kidsList.indexOf(channel);
+            } else {
+                listIndex = state.channels.indexOf(channel);
+            }
+
+            const collaborationMeta = (effectiveProfile === 'kids') ? null : buildCollaborationMeta(channel, collaborationGroups);
             return createChannelListItem(channel, listIndex, {
                 minimal,
                 showNodeMapping,
                 collaborationMeta,
-                profile,
+                profile: effectiveProfile,
                 onDelete
             });
         };
@@ -601,7 +660,9 @@ const RenderEngine = (() => {
 
         const item = document.createElement('div');
         item.className = 'keyword-item';
-        applySourceClasses(item, { sourceKey: channel?.source === 'comments' ? 'comments' : null });
+        applySourceClasses(item, {
+            sourceKey: channel?.__ftFromKids ? 'kids' : (channel?.source === 'comments' ? 'comments' : null)
+        });
         if (channel.collaborationGroupId) {
             item.classList.add('collaboration-member');
             item.setAttribute('data-collaboration-group-id', channel.collaborationGroupId);
@@ -622,6 +683,11 @@ const RenderEngine = (() => {
 
         const controls = document.createElement('div');
         controls.className = 'keyword-controls';
+
+        if (channel?.__ftFromKids) {
+            const badge = createKidsSyncBadge();
+            if (badge instanceof Node) controls.appendChild(badge);
+        }
 
         const deleteHandler = async () => {
             if (profile === 'kids') {
@@ -652,7 +718,9 @@ const RenderEngine = (() => {
 
         const item = document.createElement('div');
         item.className = 'list-item channel-item';
-        applySourceClasses(item, { sourceKey: channel?.source === 'comments' ? 'comments' : null });
+        applySourceClasses(item, {
+            sourceKey: channel?.__ftFromKids ? 'kids' : (channel?.source === 'comments' ? 'comments' : null)
+        });
         if (collaborationMeta) {
             item.classList.add('collaboration-entry');
             if (collaborationMeta.isPartial) {
@@ -686,6 +754,11 @@ const RenderEngine = (() => {
 
         infoGroup.appendChild(logoImg);
         infoGroup.appendChild(nameSpan);
+
+        if (channel?.__ftFromKids) {
+            const badge = createKidsSyncBadge();
+            if (badge instanceof Node) infoGroup.appendChild(badge);
+        }
 
         if (channel?.source === 'comments') {
             infoGroup.appendChild(createSourceBadge({

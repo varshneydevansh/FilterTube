@@ -518,6 +518,15 @@ async function loadReleaseNotesIntoDashboard() {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        document.body.classList.add('ft-app-locked');
+    } catch (e) {
+    }
+    try {
+        window.FilterTubeIsUiLocked = () => true;
+        window.FilterTubeResolveViewAccess = () => ({ viewId: 'help', reason: 'boot' });
+    } catch (e) {
+    }
     // Initialize UI
     initializeFiltersTabs();
     initializeKidsTabs();
@@ -555,9 +564,22 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const themeToggle = document.getElementById('themeToggle');
 
+    const ftProfileSelector = document.getElementById('ftProfileSelector');
+
     const ftExportV3Btn = document.getElementById('ftExportV3Btn');
+    const ftExportV3EncryptedBtn = document.getElementById('ftExportV3EncryptedBtn');
+    const ftExportActiveOnly = document.getElementById('ftExportActiveOnly');
     const ftImportV3Btn = document.getElementById('ftImportV3Btn');
     const ftImportV3File = document.getElementById('ftImportV3File');
+
+    const ftProfilesManager = document.getElementById('ftProfilesManager');
+    const ftCreateAccountBtn = document.getElementById('ftCreateAccountBtn');
+    const ftCreateChildBtn = document.getElementById('ftCreateChildBtn');
+    const ftSetMasterPinBtn = document.getElementById('ftSetMasterPinBtn');
+    const ftClearMasterPinBtn = document.getElementById('ftClearMasterPinBtn');
+
+    const ftAllowAccountCreation = document.getElementById('ftAllowAccountCreation');
+    const ftMaxAccounts = document.getElementById('ftMaxAccounts');
 
     const openKofiBtn = document.getElementById('openKofiBtn');
 
@@ -605,6 +627,891 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    let activeProfileId = 'default';
+    let profilesV4Cache = null;
+    let isHandlingProfileSwitch = false;
+    let sessionMasterPin = '';
+    const unlockedProfiles = new Set();
+
+    let lockGateEl = null;
+
+    const LOCK_ALLOWED_VIEWS = new Set(['help', 'whatsnew', 'support']);
+
+    async function sendRuntimeMessage(payload) {
+        return new Promise((resolve) => {
+            try {
+                if (!runtimeAPI?.runtime?.sendMessage) {
+                    resolve(null);
+                    return;
+                }
+
+                const maybePromise = runtimeAPI.runtime.sendMessage(payload, (resp) => {
+                    const err = runtimeAPI.runtime?.lastError;
+                    if (err) {
+                        resolve(null);
+                        return;
+                    }
+                    resolve(resp);
+                });
+
+                if (maybePromise && typeof maybePromise.then === 'function') {
+                    maybePromise.then(resolve).catch(() => resolve(null));
+                }
+            } catch (e) {
+                resolve(null);
+            }
+        });
+    }
+
+    async function syncSessionUnlockStateFromBackground() {}
+
+    async function notifyBackgroundUnlocked(profileId, pin = '') {}
+
+    async function notifyBackgroundLocked(profileId) {}
+
+    function safeObject(value) {
+        return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+    }
+
+    function normalizeString(value) {
+        return typeof value === 'string' ? value.trim() : '';
+    }
+
+    function extractMasterPinVerifier(profilesV4) {
+        const root = safeObject(profilesV4);
+        const profiles = safeObject(root.profiles);
+        const master = safeObject(profiles.default);
+        const security = safeObject(master.security);
+        const verifier = security.masterPinVerifier || security.masterPin || null;
+        return verifier && typeof verifier === 'object' ? verifier : null;
+    }
+
+    function extractProfilePinVerifier(profilesV4, profileId) {
+        const root = safeObject(profilesV4);
+        const profiles = safeObject(root.profiles);
+        const profile = safeObject(profiles[profileId]);
+        const security = safeObject(profile.security);
+        const verifier = security.profilePinVerifier || security.pinVerifier || null;
+        return verifier && typeof verifier === 'object' ? verifier : null;
+    }
+
+    function isProfileLocked(profilesV4, profileId) {
+        if (profileId === 'default') {
+            return !!extractMasterPinVerifier(profilesV4);
+        }
+        return !!extractProfilePinVerifier(profilesV4, profileId);
+    }
+
+    function getProfileName(profilesV4, profileId) {
+        const root = safeObject(profilesV4);
+        const profiles = safeObject(root.profiles);
+        const profile = safeObject(profiles[profileId]);
+        const raw = normalizeString(profile.name);
+        if (raw) return raw;
+        return profileId === 'default' ? 'Default' : 'Profile';
+    }
+
+    function getProfileType(profilesV4, profileId) {
+        const root = safeObject(profilesV4);
+        const profiles = safeObject(root.profiles);
+        const profile = safeObject(profiles[profileId]);
+        if (profileId === 'default') return 'account';
+        const rawType = normalizeString(profile.type).toLowerCase();
+        if (rawType === 'account' || rawType === 'child') return rawType;
+        const parent = normalizeString(profile.parentProfileId);
+        if (parent) return 'child';
+        return 'account';
+    }
+
+    function getParentAccountId(profilesV4, profileId) {
+        const type = getProfileType(profilesV4, profileId);
+        if (type === 'account') return profileId;
+        const root = safeObject(profilesV4);
+        const profiles = safeObject(root.profiles);
+        const profile = safeObject(profiles[profileId]);
+        const parent = normalizeString(profile.parentProfileId);
+        return (parent && profiles[parent]) ? parent : 'default';
+    }
+
+    function getAccountPolicy(profilesV4) {
+        const root = safeObject(profilesV4);
+        const profiles = safeObject(root.profiles);
+        const master = safeObject(profiles.default);
+        const settings = safeObject(master.settings);
+        const policy = safeObject(settings.accountPolicy);
+        const allowAccountCreation = policy.allowAccountCreation === true;
+        const maxAccounts = typeof policy.maxAccounts === 'number' && Number.isFinite(policy.maxAccounts)
+            ? Math.max(0, Math.floor(policy.maxAccounts))
+            : 0;
+        return { allowAccountCreation, maxAccounts };
+    }
+
+    function countNonDefaultAccounts(profilesV4) {
+        const root = safeObject(profilesV4);
+        const profiles = safeObject(root.profiles);
+        let count = 0;
+        for (const id of Object.keys(profiles)) {
+            if (id === 'default') continue;
+            if (getProfileType(profilesV4, id) === 'account') count += 1;
+        }
+        return count;
+    }
+
+    function getSortedIdsByName(profilesV4, ids) {
+        const out = [...ids];
+        out.sort((a, b) => {
+            if (a === 'default') return -1;
+            if (b === 'default') return 1;
+            const an = getProfileName(profilesV4, a).toLowerCase();
+            const bn = getProfileName(profilesV4, b).toLowerCase();
+            if (an < bn) return -1;
+            if (an > bn) return 1;
+            return a.localeCompare(b);
+        });
+        return out;
+    }
+
+    function getAccountIds(profilesV4) {
+        const root = safeObject(profilesV4);
+        const profiles = safeObject(root.profiles);
+        const ids = [];
+        for (const id of Object.keys(profiles)) {
+            if (getProfileType(profilesV4, id) === 'account') ids.push(id);
+        }
+        if (!ids.includes('default')) ids.unshift('default');
+        return getSortedIdsByName(profilesV4, ids);
+    }
+
+    function getChildrenForAccount(profilesV4, accountId) {
+        const root = safeObject(profilesV4);
+        const profiles = safeObject(root.profiles);
+        const ids = [];
+        for (const id of Object.keys(profiles)) {
+            if (id === accountId) continue;
+            if (getProfileType(profilesV4, id) !== 'child') continue;
+            if (getParentAccountId(profilesV4, id) !== accountId) continue;
+            ids.push(id);
+        }
+        return getSortedIdsByName(profilesV4, ids);
+    }
+
+    function buildProfileLabel(profilesV4, profileId) {
+        const name = getProfileName(profilesV4, profileId);
+        const locked = isProfileLocked(profilesV4, profileId);
+        const type = getProfileType(profilesV4, profileId);
+        if (profileId === 'default') {
+            return locked ? `${name} (Master, locked)` : `${name} (Master)`;
+        }
+        if (type === 'account') {
+            return locked ? `${name} (Account, locked)` : `${name} (Account)`;
+        }
+        return locked ? `${name} (Child, locked)` : `${name} (Child)`;
+    }
+
+    function updateAdminPolicyControls() {
+        if (!ftAllowAccountCreation || !ftMaxAccounts) return;
+        const profilesV4 = profilesV4Cache;
+        const isAdmin = activeProfileId === 'default';
+        ftAllowAccountCreation.disabled = !isAdmin;
+        ftMaxAccounts.disabled = !isAdmin;
+
+        if (!profilesV4) return;
+        const policy = getAccountPolicy(profilesV4);
+        ftAllowAccountCreation.checked = policy.allowAccountCreation === true;
+        ftMaxAccounts.value = String(policy.maxAccounts || 0);
+    }
+
+    function isUiLocked() {
+        const profilesV4 = profilesV4Cache;
+        if (!profilesV4) {
+            return document.body.classList.contains('ft-app-locked');
+        }
+        return !!(profilesV4 && isProfileLocked(profilesV4, activeProfileId) && !unlockedProfiles.has(activeProfileId));
+    }
+
+    function getActiveProfileType() {
+        const profilesV4 = profilesV4Cache;
+        if (!profilesV4) return 'account';
+        return getProfileType(profilesV4, activeProfileId);
+    }
+
+    function resolveViewAccess(requestedViewId) {
+        const viewId = normalizeString(requestedViewId);
+        if (!viewId) return { viewId: 'help', reason: 'unknown' };
+
+        if (isUiLocked() && !LOCK_ALLOWED_VIEWS.has(viewId)) {
+            return { viewId: 'help', reason: 'locked' };
+        }
+
+        return { viewId, reason: null };
+    }
+
+    function updateNavigationAccessUI() {
+        const locked = isUiLocked();
+        document.body.classList.remove('ft-child-profile');
+
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach((item) => {
+            const tab = normalizeString(item.getAttribute('data-tab'));
+            let disabled = false;
+            if (locked) {
+                disabled = tab && !LOCK_ALLOWED_VIEWS.has(tab);
+            }
+            item.classList.toggle('ft-nav-disabled', disabled);
+            if (disabled) {
+                item.setAttribute('aria-disabled', 'true');
+            } else {
+                item.removeAttribute('aria-disabled');
+            }
+        });
+
+        const currentNav = document.querySelector('.nav-item.active');
+        const currentViewId = normalizeString(currentNav?.getAttribute('data-tab')) || 'dashboard';
+        const resolved = resolveViewAccess(currentViewId);
+        if (resolved.viewId !== currentViewId && typeof window.switchView === 'function') {
+            window.switchView(resolved.viewId);
+        }
+    }
+
+    function applyLockGateIfNeeded() {
+        const profilesV4 = profilesV4Cache;
+        const isLocked = profilesV4 && isProfileLocked(profilesV4, activeProfileId) && !unlockedProfiles.has(activeProfileId);
+        document.body.classList.toggle('ft-app-locked', !!isLocked);
+
+        window.FilterTubeIsUiLocked = () => isUiLocked();
+        window.FilterTubeResolveViewAccess = (viewId) => resolveViewAccess(viewId);
+
+        updateNavigationAccessUI();
+
+        const viewContainer = document.querySelector('.view-container');
+        if (!viewContainer) return;
+
+        if (!isLocked) {
+            if (lockGateEl) {
+                try {
+                    lockGateEl.remove();
+                } catch (e) {
+                }
+                lockGateEl = null;
+            }
+            return;
+        }
+
+        if (lockGateEl && lockGateEl.isConnected) return;
+        const gate = document.createElement('div');
+        gate.className = 'ft-lock-gate';
+
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        const header = document.createElement('div');
+        header.className = 'card-header';
+        const h3 = document.createElement('h3');
+        h3.textContent = 'Profile Locked';
+        header.appendChild(h3);
+
+        const body = document.createElement('div');
+        body.className = 'card-body';
+        const hint = document.createElement('div');
+        hint.className = 'import-export-hint';
+        hint.textContent = `Unlock ${getProfileName(profilesV4, activeProfileId)} to view settings.`;
+
+        const actions = document.createElement('div');
+        actions.style.display = 'flex';
+        actions.style.gap = '8px';
+        actions.style.flexWrap = 'wrap';
+        actions.style.marginTop = '12px';
+
+        const unlockBtn = document.createElement('button');
+        unlockBtn.className = 'btn-primary';
+        unlockBtn.type = 'button';
+        unlockBtn.textContent = 'Unlock';
+        unlockBtn.addEventListener('click', async () => {
+            try {
+                const ok = await ensureProfileUnlocked(profilesV4Cache, activeProfileId);
+                if (!ok) return;
+                await refreshProfilesUI();
+                UIComponents.showToast('Unlocked', 'success');
+            } catch (e) {
+                UIComponents.showToast('Failed to unlock', 'error');
+            }
+        });
+
+        body.appendChild(hint);
+        actions.appendChild(unlockBtn);
+        body.appendChild(actions);
+        card.appendChild(header);
+        card.appendChild(body);
+        gate.appendChild(card);
+        viewContainer.insertBefore(gate, viewContainer.firstChild);
+        lockGateEl = gate;
+    }
+
+    async function showPromptModal({ title, message, placeholder = '', inputType = 'text', confirmText = 'Confirm', cancelText = 'Cancel', initialValue = '' }) {
+        return new Promise((resolve) => {
+            const overlay = document.createElement('div');
+            overlay.className = 'ft-modal-overlay';
+
+            const card = document.createElement('div');
+            card.className = 'card ft-modal';
+
+            const header = document.createElement('div');
+            header.className = 'card-header';
+            const titleEl = document.createElement('h3');
+            titleEl.className = 'ft-modal-title';
+            titleEl.textContent = title;
+            header.appendChild(titleEl);
+
+            const body = document.createElement('div');
+            body.className = 'card-body ft-modal-body';
+
+            if (message) {
+                const msg = document.createElement('div');
+                msg.className = 'import-export-hint';
+                msg.textContent = message;
+                body.appendChild(msg);
+            }
+
+            const input = document.createElement('input');
+            input.className = 'text-input';
+            input.type = inputType;
+            input.placeholder = placeholder;
+            input.value = initialValue;
+            body.appendChild(input);
+
+            const actions = document.createElement('div');
+            actions.className = 'ft-modal-actions';
+
+            const cancelBtn = document.createElement('button');
+            cancelBtn.className = 'btn-secondary';
+            cancelBtn.type = 'button';
+            cancelBtn.textContent = cancelText;
+
+            const okBtn = document.createElement('button');
+            okBtn.className = 'btn-primary';
+            okBtn.type = 'button';
+            okBtn.textContent = confirmText;
+
+            const cleanup = () => {
+                try {
+                    overlay.remove();
+                } catch (e) {
+                }
+            };
+
+            const closeWith = (value) => {
+                cleanup();
+                resolve(value);
+            };
+
+            cancelBtn.addEventListener('click', () => closeWith(null));
+            okBtn.addEventListener('click', () => closeWith(input.value));
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    okBtn.click();
+                } else if (e.key === 'Escape') {
+                    e.preventDefault();
+                    cancelBtn.click();
+                }
+            });
+
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    cancelBtn.click();
+                }
+            });
+
+            actions.appendChild(cancelBtn);
+            actions.appendChild(okBtn);
+            body.appendChild(actions);
+
+            card.appendChild(header);
+            card.appendChild(body);
+            overlay.appendChild(card);
+            document.body.appendChild(overlay);
+
+            setTimeout(() => {
+                try {
+                    input.focus();
+                    input.select();
+                } catch (e) {
+                }
+            }, 0);
+        });
+    }
+
+    async function verifyPin(pin, verifier) {
+        const Security = window.FilterTubeSecurity || {};
+        if (typeof Security.verifyPin !== 'function') {
+            throw new Error('Security manager unavailable');
+        }
+        return Security.verifyPin(pin, verifier);
+    }
+
+    async function ensureProfileUnlocked(profilesV4, profileId) {
+        await syncSessionUnlockStateFromBackground();
+        if (!isProfileLocked(profilesV4, profileId)) return true;
+        if (unlockedProfiles.has(profileId)) return true;
+
+        const verifier = profileId === 'default'
+            ? extractMasterPinVerifier(profilesV4)
+            : extractProfilePinVerifier(profilesV4, profileId);
+        if (!verifier) return true;
+
+        const title = profileId === 'default' ? 'Enter Master PIN' : 'Enter Profile PIN';
+        const name = getProfileName(profilesV4, profileId);
+        const pin = await showPromptModal({
+            title,
+            message: `Unlock ${name} to continue.`,
+            placeholder: 'PIN',
+            inputType: 'password',
+            confirmText: 'Unlock'
+        });
+        const normalized = normalizeString(pin);
+        if (!normalized) return false;
+        const ok = await verifyPin(normalized, verifier);
+        if (!ok) {
+            UIComponents.showToast('Incorrect PIN', 'error');
+            return false;
+        }
+
+        unlockedProfiles.add(profileId);
+        if (profileId === 'default') {
+            sessionMasterPin = normalized;
+        }
+        await notifyBackgroundUnlocked(profileId, profileId === 'default' ? sessionMasterPin : '');
+        return true;
+    }
+
+    async function ensureAdminUnlocked(profilesV4) {
+        const masterVerifier = extractMasterPinVerifier(profilesV4);
+        if (!masterVerifier) return true;
+        if (unlockedProfiles.has('default') && sessionMasterPin) return true;
+        return ensureProfileUnlocked(profilesV4, 'default');
+    }
+
+    function updateExportScopeControls() {
+        if (!ftExportActiveOnly) return;
+        if (activeProfileId !== 'default') {
+            ftExportActiveOnly.checked = true;
+            ftExportActiveOnly.disabled = true;
+            ftExportActiveOnly.title = 'Only the Default (Master) profile can export all profiles.';
+        } else {
+            ftExportActiveOnly.disabled = false;
+            ftExportActiveOnly.title = '';
+        }
+    }
+
+    function renderProfileSelector(profilesV4) {
+        if (!ftProfileSelector) return;
+        const root = safeObject(profilesV4);
+        const profiles = safeObject(root.profiles);
+
+        ftProfileSelector.innerHTML = '';
+
+        const accountIds = getAccountIds(profilesV4);
+        accountIds.forEach((accountId, idx) => {
+            const accountName = getProfileName(profilesV4, accountId);
+
+            const headerOpt = document.createElement('option');
+            headerOpt.disabled = true;
+            headerOpt.value = '';
+            headerOpt.textContent = `${idx === 0 ? '' : ''}${accountName}`;
+            ftProfileSelector.appendChild(headerOpt);
+
+            const accountOpt = document.createElement('option');
+            accountOpt.value = accountId;
+            accountOpt.textContent = buildProfileLabel(profilesV4, accountId);
+            ftProfileSelector.appendChild(accountOpt);
+
+            const children = getChildrenForAccount(profilesV4, accountId);
+            children.forEach(childId => {
+                const opt = document.createElement('option');
+                opt.value = childId;
+                opt.textContent = `  - ${buildProfileLabel(profilesV4, childId)}`;
+                ftProfileSelector.appendChild(opt);
+            });
+
+            if (idx < accountIds.length - 1) {
+                const spacer = document.createElement('option');
+                spacer.disabled = true;
+                spacer.value = '';
+                spacer.textContent = '──────────';
+                ftProfileSelector.appendChild(spacer);
+            }
+        });
+
+        const current = normalizeString(root.activeProfileId) || 'default';
+        ftProfileSelector.value = current;
+    }
+
+    function renderProfilesManager(profilesV4) {
+        if (!ftProfilesManager) return;
+        const root = safeObject(profilesV4);
+        const profiles = safeObject(root.profiles);
+
+        ftProfilesManager.innerHTML = '';
+
+        const accountIds = getAccountIds(profilesV4);
+        const ids = [];
+        accountIds.forEach(accountId => {
+            ids.push(accountId, ...getChildrenForAccount(profilesV4, accountId));
+        });
+
+        let lastAccount = null;
+        ids.forEach((profileId) => {
+            const accountId = getParentAccountId(profilesV4, profileId);
+            const type = getProfileType(profilesV4, profileId);
+            if (accountId !== lastAccount) {
+                lastAccount = accountId;
+                const headerRow = document.createElement('div');
+                headerRow.className = 'help-item ft-profile-group-header';
+                const title = document.createElement('div');
+                title.className = 'help-item-title';
+                title.textContent = `Account: ${getProfileName(profilesV4, accountId)}`;
+                headerRow.appendChild(title);
+                ftProfilesManager.appendChild(headerRow);
+            }
+
+            const row = document.createElement('div');
+            row.className = `help-item${type === 'child' ? ' ft-profile-child' : ''}`;
+
+            const title = document.createElement('div');
+            title.className = 'help-item-title';
+            title.textContent = buildProfileLabel(profilesV4, profileId);
+
+            const body = document.createElement('div');
+            body.className = 'help-item-body';
+
+            const actions = document.createElement('div');
+            actions.style.display = 'flex';
+            actions.style.gap = '8px';
+            actions.style.flexWrap = 'wrap';
+            actions.style.marginTop = '8px';
+
+            const switchBtn = document.createElement('button');
+            switchBtn.className = 'btn-secondary';
+            switchBtn.type = 'button';
+            switchBtn.textContent = profileId === activeProfileId ? 'Active' : 'Switch';
+            switchBtn.disabled = profileId === activeProfileId;
+            switchBtn.addEventListener('click', async () => {
+                if (ftProfileSelector) {
+                    ftProfileSelector.value = profileId;
+                }
+                await switchToProfile(profileId);
+            });
+
+            const renameBtn = document.createElement('button');
+            renameBtn.className = 'btn-secondary';
+            renameBtn.type = 'button';
+            renameBtn.textContent = 'Rename';
+            renameBtn.addEventListener('click', async () => {
+                const io = window.FilterTubeIO || {};
+                if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') return;
+                const fresh = await io.loadProfilesV4();
+                const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
+                if (currentActive !== 'default' && currentActive !== profileId) {
+                    UIComponents.showToast('Switch to this profile (or Default) to rename it', 'error');
+                    return;
+                }
+                if (currentActive === 'default') {
+                    const okAdmin = await ensureAdminUnlocked(fresh);
+                    if (!okAdmin) return;
+                } else {
+                    const okSelf = await ensureProfileUnlocked(fresh, profileId);
+                    if (!okSelf) return;
+                }
+
+                const currentName = getProfileName(fresh, profileId);
+                const nextNameRaw = await showPromptModal({
+                    title: 'Rename Profile',
+                    message: 'Enter a new profile name.',
+                    placeholder: 'Profile name',
+                    inputType: 'text',
+                    confirmText: 'Save',
+                    initialValue: currentName
+                });
+                const nextName = normalizeString(nextNameRaw);
+                if (!nextName) return;
+
+                const profiles = safeObject(fresh.profiles);
+                const profile = safeObject(profiles[profileId]);
+                profiles[profileId] = { ...profile, name: nextName };
+                await io.saveProfilesV4({
+                    ...fresh,
+                    schemaVersion: 4,
+                    profiles
+                });
+                await refreshProfilesUI();
+                UIComponents.showToast('Profile updated', 'success');
+            });
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'btn-secondary';
+            deleteBtn.type = 'button';
+            deleteBtn.textContent = 'Delete';
+            deleteBtn.disabled = profileId === 'default';
+            deleteBtn.addEventListener('click', async () => {
+                if (profileId === 'default') return;
+                const io = window.FilterTubeIO || {};
+                if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') return;
+                const fresh = await io.loadProfilesV4();
+                const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
+                if (currentActive !== 'default' && currentActive !== profileId) {
+                    UIComponents.showToast('Switch to this profile (or Default) to delete it', 'error');
+                    return;
+                }
+                if (currentActive === 'default') {
+                    const okAdmin = await ensureAdminUnlocked(fresh);
+                    if (!okAdmin) return;
+                } else {
+                    const okSelf = await ensureProfileUnlocked(fresh, profileId);
+                    if (!okSelf) return;
+                }
+                const confirmed = window.confirm('Delete this profile? This cannot be undone.');
+                if (!confirmed) return;
+
+                const profiles = safeObject(fresh.profiles);
+                delete profiles[profileId];
+
+                const nextActive = normalizeString(fresh.activeProfileId) || 'default';
+                const resolvedActive = profiles[nextActive] ? nextActive : 'default';
+                await io.saveProfilesV4({
+                    ...fresh,
+                    schemaVersion: 4,
+                    activeProfileId: resolvedActive,
+                    profiles
+                });
+                unlockedProfiles.delete(profileId);
+                await StateManager.loadSettings();
+                await refreshProfilesUI();
+                await applyLockGateIfNeeded();
+                UIComponents.showToast('Profile deleted', 'success');
+            });
+
+            actions.appendChild(switchBtn);
+            actions.appendChild(renameBtn);
+            actions.appendChild(deleteBtn);
+
+            if (profileId !== 'default') {
+                const pinBtn = document.createElement('button');
+                pinBtn.className = 'btn-secondary';
+                pinBtn.type = 'button';
+                pinBtn.textContent = isProfileLocked(profilesV4, profileId) ? 'Change PIN' : 'Set PIN';
+                pinBtn.addEventListener('click', async () => {
+                    const io = window.FilterTubeIO || {};
+                    if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') return;
+                    const fresh = await io.loadProfilesV4();
+
+                    const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
+                    if (currentActive !== 'default' && currentActive !== profileId) {
+                        UIComponents.showToast('Switch to this profile (or Default) to manage its PIN', 'error');
+                        return;
+                    }
+
+                    if (currentActive === 'default') {
+                        const okAdmin = await ensureAdminUnlocked(fresh);
+                        if (!okAdmin) return;
+                    } else {
+                        const okSelf = await ensureProfileUnlocked(fresh, profileId);
+                        if (!okSelf) return;
+                    }
+
+                    const pin1 = await showPromptModal({
+                        title: 'Set Profile PIN',
+                        message: 'Enter a PIN for this profile.',
+                        placeholder: 'PIN',
+                        inputType: 'password',
+                        confirmText: 'Continue'
+                    });
+                    if (pin1 === null) return;
+                    const pin2 = await showPromptModal({
+                        title: 'Confirm Profile PIN',
+                        message: 'Re-enter the PIN to confirm.',
+                        placeholder: 'PIN',
+                        inputType: 'password',
+                        confirmText: 'Save'
+                    });
+                    if (pin2 === null) return;
+                    if (normalizeString(pin1) !== normalizeString(pin2) || !normalizeString(pin1)) {
+                        UIComponents.showToast('PINs do not match', 'error');
+                        return;
+                    }
+
+                    const Security = window.FilterTubeSecurity || {};
+                    if (typeof Security.createPinVerifier !== 'function') {
+                        UIComponents.showToast('Security manager unavailable', 'error');
+                        return;
+                    }
+
+                    const verifier = await Security.createPinVerifier(normalizeString(pin1));
+                    const profiles = safeObject(fresh.profiles);
+                    const profile = safeObject(profiles[profileId]);
+                    const security = safeObject(profile.security);
+                    profiles[profileId] = {
+                        ...profile,
+                        security: {
+                            ...security,
+                            profilePinVerifier: verifier
+                        }
+                    };
+                    await io.saveProfilesV4({
+                        ...fresh,
+                        schemaVersion: 4,
+                        profiles
+                    });
+                    unlockedProfiles.delete(profileId);
+                    await refreshProfilesUI();
+                    UIComponents.showToast('Profile PIN updated', 'success');
+                });
+
+                const clearPinBtn = document.createElement('button');
+                clearPinBtn.className = 'btn-secondary';
+                clearPinBtn.type = 'button';
+                clearPinBtn.textContent = 'Remove PIN';
+                clearPinBtn.disabled = !isProfileLocked(profilesV4, profileId);
+                clearPinBtn.addEventListener('click', async () => {
+                    const io = window.FilterTubeIO || {};
+                    if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') return;
+                    const fresh = await io.loadProfilesV4();
+
+                    const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
+                    if (currentActive !== 'default' && currentActive !== profileId) {
+                        UIComponents.showToast('Switch to this profile (or Default) to manage its PIN', 'error');
+                        return;
+                    }
+
+                    if (currentActive === 'default') {
+                        const okAdmin = await ensureAdminUnlocked(fresh);
+                        if (!okAdmin) return;
+                    } else {
+                        const okSelf = await ensureProfileUnlocked(fresh, profileId);
+                        if (!okSelf) return;
+                    }
+                    const confirmed = window.confirm('Remove the profile PIN?');
+                    if (!confirmed) return;
+
+                    const profiles = safeObject(fresh.profiles);
+                    const profile = safeObject(profiles[profileId]);
+                    const security = safeObject(profile.security);
+                    const nextSecurity = { ...security };
+                    delete nextSecurity.profilePinVerifier;
+                    delete nextSecurity.pinVerifier;
+                    profiles[profileId] = {
+                        ...profile,
+                        security: nextSecurity
+                    };
+                    await io.saveProfilesV4({
+                        ...fresh,
+                        schemaVersion: 4,
+                        profiles
+                    });
+                    unlockedProfiles.delete(profileId);
+                    await refreshProfilesUI();
+                    UIComponents.showToast('Profile PIN removed', 'success');
+                });
+
+                actions.appendChild(pinBtn);
+                actions.appendChild(clearPinBtn);
+            }
+
+            body.appendChild(actions);
+
+            row.appendChild(title);
+            row.appendChild(body);
+            ftProfilesManager.appendChild(row);
+        });
+    }
+
+    async function refreshProfilesUI() {
+        try {
+            const io = window.FilterTubeIO || {};
+            if (typeof io.loadProfilesV4 !== 'function') return;
+            const profilesV4 = await io.loadProfilesV4();
+            profilesV4Cache = profilesV4;
+            const nextActive = normalizeString(profilesV4?.activeProfileId) || 'default';
+            activeProfileId = nextActive;
+            updateExportScopeControls();
+            updateAdminPolicyControls();
+            renderProfileSelector(profilesV4);
+            renderProfilesManager(profilesV4);
+            applyLockGateIfNeeded();
+        } catch (e) {
+        }
+    }
+
+    async function switchToProfile(nextProfileId) {
+        if (isHandlingProfileSwitch) return;
+        const targetId = normalizeString(nextProfileId);
+        if (!targetId) return;
+
+        isHandlingProfileSwitch = true;
+        try {
+            const io = window.FilterTubeIO || {};
+            if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
+                UIComponents.showToast('Profiles unavailable', 'error');
+                return;
+            }
+            const profilesV4 = await io.loadProfilesV4();
+            const profiles = safeObject(profilesV4?.profiles);
+            if (!profiles[targetId]) {
+                UIComponents.showToast('Profile not found', 'error');
+                return;
+            }
+
+            const ok = await ensureProfileUnlocked(profilesV4, targetId);
+            if (!ok) {
+                if (ftProfileSelector) {
+                    ftProfileSelector.value = normalizeString(profilesV4?.activeProfileId) || 'default';
+                }
+                return;
+            }
+
+            await io.saveProfilesV4({
+                ...profilesV4,
+                schemaVersion: 4,
+                activeProfileId: targetId,
+                profiles
+            });
+            await StateManager.loadSettings();
+            await refreshProfilesUI();
+            UIComponents.showToast('Profile switched', 'success');
+        } catch (e) {
+            console.warn('Tab-View: profile switch failed', e);
+            UIComponents.showToast('Failed to switch profile', 'error');
+        } finally {
+            isHandlingProfileSwitch = false;
+        }
+    }
+    try {
+        const io = window.FilterTubeIO || {};
+        if (typeof io.loadProfilesV4 === 'function') {
+            const profilesV4 = await io.loadProfilesV4();
+            profilesV4Cache = profilesV4;
+            if (typeof profilesV4?.activeProfileId === 'string' && profilesV4.activeProfileId.trim()) {
+                activeProfileId = profilesV4.activeProfileId.trim();
+            }
+        }
+    } catch (e) {
+    }
+
+    updateExportScopeControls();
+    if (profilesV4Cache) {
+        renderProfileSelector(profilesV4Cache);
+        renderProfilesManager(profilesV4Cache);
+    }
+
+    applyLockGateIfNeeded();
+
+    if (ftProfileSelector) {
+        ftProfileSelector.addEventListener('change', async (e) => {
+            const targetId = e.target?.value || '';
+            await switchToProfile(targetId);
+        });
+    }
+
     // Subscribe to state changes
     StateManager.subscribe((eventType, data) => {
         console.log('Tab-View: State changed', eventType, data);
@@ -631,6 +1538,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (eventType === 'settingUpdated' || eventType === 'externalUpdate') {
             updateCheckboxes();
+        }
+
+        if (eventType === 'load' || eventType === 'externalUpdate') {
+            refreshProfilesUI();
         }
 
         if (eventType === 'themeChanged') {
@@ -686,15 +1597,115 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         try {
-            const payload = await io.exportV3();
+            let auth = null;
+            try {
+                const profilesV4 = profilesV4Cache || (typeof io.loadProfilesV4 === 'function' ? await io.loadProfilesV4() : null);
+                const activeId = normalizeString(profilesV4?.activeProfileId) || 'default';
+                const requestedScope = ftExportActiveOnly?.checked ? 'active' : 'auto';
+                const effectiveScope = (requestedScope === 'active') ? 'active' : (activeId === 'default' ? 'full' : 'active');
+                const masterVerifier = extractMasterPinVerifier(profilesV4);
+                if (activeId === 'default' && masterVerifier) {
+                    if (!sessionMasterPin) {
+                        const okAdmin = await ensureAdminUnlocked(profilesV4);
+                        if (!okAdmin) return;
+                    }
+                    auth = { localMasterPin: sessionMasterPin };
+                }
+            } catch (e) {
+            }
+
+            const payload = await io.exportV3({ scope: ftExportActiveOnly?.checked ? 'active' : 'auto', auth });
             const date = new Date();
             const stamp = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-            const filename = `filtertube_export_v3_${stamp}.json`;
+            const safePart = (value) => {
+                if (typeof value !== 'string') return '';
+                return value
+                    .trim()
+                    .replace(/\s+/g, '-')
+                    .replace(/[^a-zA-Z0-9._-]/g, '')
+                    .replace(/-+/g, '-')
+                    .replace(/^[-_.]+|[-_.]+$/g, '')
+                    .slice(0, 48);
+            };
+
+            const exportType = payload?.meta?.exportType;
+            const exportProfileName = typeof payload?.meta?.profileName === 'string' ? payload.meta.profileName : '';
+            const exportProfileId = typeof payload?.meta?.profileId === 'string' ? payload.meta.profileId : '';
+            const label = safePart(exportProfileName) || safePart(exportProfileId);
+
+            const filename = (exportType === 'profile' && label)
+                ? `filtertube_export_${label}_${stamp}.json`
+                : `filtertube_export_v3_${stamp}.json`;
             await downloadJsonToDownloadsFolder('FilterTube Export', filename, payload);
             UIComponents.showToast('Exported JSON to Downloads/FilterTube Export/', 'success');
         } catch (e) {
             UIComponents.showToast('Export failed', 'error');
             console.error('Export V3 failed', e);
+        }
+    }
+
+    async function runExportV3Encrypted() {
+        const io = window.FilterTubeIO;
+        if (!io || typeof io.exportV3Encrypted !== 'function') {
+            UIComponents.showToast('Encrypted export unavailable', 'error');
+            return;
+        }
+
+        try {
+            const passwordRaw = await showPromptModal({
+                title: 'Encrypted Export Password',
+                message: 'Enter a password/PIN to encrypt this export.',
+                placeholder: 'Password / PIN',
+                inputType: 'password',
+                confirmText: 'Encrypt'
+            });
+            const password = normalizeString(passwordRaw);
+            if (!password) return;
+
+            let auth = null;
+            try {
+                const profilesV4 = profilesV4Cache || (typeof io.loadProfilesV4 === 'function' ? await io.loadProfilesV4() : null);
+                const activeId = normalizeString(profilesV4?.activeProfileId) || 'default';
+                const requestedScope = ftExportActiveOnly?.checked ? 'active' : 'auto';
+                const effectiveScope = (requestedScope === 'active') ? 'active' : (activeId === 'default' ? 'full' : 'active');
+                const masterVerifier = extractMasterPinVerifier(profilesV4);
+                if (activeId === 'default' && masterVerifier) {
+                    if (!sessionMasterPin) {
+                        const okAdmin = await ensureAdminUnlocked(profilesV4);
+                        if (!okAdmin) return;
+                    }
+                    auth = { localMasterPin: sessionMasterPin };
+                }
+            } catch (e) {
+            }
+
+            const payload = await io.exportV3Encrypted({ scope: ftExportActiveOnly?.checked ? 'active' : 'auto', password, auth });
+
+            const date = new Date();
+            const stamp = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+            const safePart = (value) => {
+                if (typeof value !== 'string') return '';
+                return value
+                    .trim()
+                    .replace(/\s+/g, '-')
+                    .replace(/[^a-zA-Z0-9._-]/g, '')
+                    .replace(/-+/g, '-')
+                    .replace(/^[-_.]+|[-_.]+$/g, '')
+                    .slice(0, 48);
+            };
+            const exportType = payload?.meta?.exportType;
+            const exportProfileName = typeof payload?.meta?.profileName === 'string' ? payload.meta.profileName : '';
+            const exportProfileId = typeof payload?.meta?.profileId === 'string' ? payload.meta.profileId : '';
+            const label = safePart(exportProfileName) || safePart(exportProfileId);
+            const filename = (exportType === 'profile' && label)
+                ? `filtertube_export_${label}_${stamp}_encrypted.json`
+                : `filtertube_export_v3_${stamp}_encrypted.json`;
+
+            await downloadJsonToDownloadsFolder('FilterTube Export', filename, payload);
+            UIComponents.showToast('Exported encrypted JSON to Downloads/FilterTube Export/', 'success');
+        } catch (e) {
+            UIComponents.showToast('Encrypted export failed', 'error');
+            console.error('Export encrypted failed', e);
         }
     }
 
@@ -709,7 +1720,58 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const text = await file.text();
             const parsed = JSON.parse(text);
-            await io.importV3(parsed, { strategy: 'merge' });
+
+            let payload = parsed;
+            if (safeObject(parsed?.meta).encrypted === true && parsed?.encrypted) {
+                const passwordRaw = await showPromptModal({
+                    title: 'Decrypt Backup',
+                    message: 'Enter the password/PIN used to encrypt this backup.',
+                    placeholder: 'Password / PIN',
+                    inputType: 'password',
+                    confirmText: 'Decrypt'
+                });
+                const password = normalizeString(passwordRaw);
+                if (!password) return;
+                const Security = window.FilterTubeSecurity || {};
+                if (typeof Security.decryptJson !== 'function') {
+                    UIComponents.showToast('Security manager unavailable', 'error');
+                    return;
+                }
+                payload = await Security.decryptJson(parsed.encrypted, password);
+            }
+
+            let auth = null;
+            try {
+                const localProfilesV4 = profilesV4Cache || (typeof io.loadProfilesV4 === 'function' ? await io.loadProfilesV4() : null);
+                const localActive = normalizeString(localProfilesV4?.activeProfileId) || 'default';
+                const effectiveScope = localActive === 'default' ? 'full' : 'active';
+                const localVerifier = extractMasterPinVerifier(localProfilesV4);
+                const incomingVerifier = extractMasterPinVerifier(payload?.profilesV4);
+
+                if (localActive === 'default' && effectiveScope === 'full' && localVerifier) {
+                    if (!sessionMasterPin) {
+                        const okAdmin = await ensureAdminUnlocked(localProfilesV4);
+                        if (!okAdmin) return;
+                    }
+                    auth = { ...(auth || {}), localMasterPin: sessionMasterPin };
+                }
+
+                if (localActive === 'default' && effectiveScope === 'full' && incomingVerifier) {
+                    const backupPinRaw = await showPromptModal({
+                        title: 'Backup Master PIN',
+                        message: 'This backup is protected by a Master PIN. Enter it to import.',
+                        placeholder: 'Master PIN',
+                        inputType: 'password',
+                        confirmText: 'Authorize'
+                    });
+                    const backupPin = normalizeString(backupPinRaw);
+                    if (!backupPin) return;
+                    auth = { ...(auth || {}), incomingMasterPin: backupPin };
+                }
+            } catch (e) {
+            }
+
+            await io.importV3(payload, { strategy: 'merge', scope: 'auto', auth });
 
             await StateManager.loadSettings();
             const state = StateManager.getState();
@@ -731,6 +1793,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    if (ftExportV3EncryptedBtn) {
+        ftExportV3EncryptedBtn.addEventListener('click', () => {
+            runExportV3Encrypted();
+        });
+    }
+
     if (ftImportV3Btn && ftImportV3File) {
         ftImportV3Btn.addEventListener('click', () => {
             ftImportV3File.click();
@@ -740,6 +1808,337 @@ document.addEventListener('DOMContentLoaded', async () => {
             const file = e.target?.files?.[0] || null;
             await runImportV3FromFile(file);
             e.target.value = '';
+        });
+    }
+
+    if (ftAllowAccountCreation && ftMaxAccounts) {
+        const persistPolicy = async (nextPolicy) => {
+            const io = window.FilterTubeIO || {};
+            if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') return;
+            const fresh = await io.loadProfilesV4();
+            if (normalizeString(fresh?.activeProfileId) !== 'default') {
+                UIComponents.showToast('Switch to Default to change account policy', 'error');
+                return;
+            }
+            const okAdmin = await ensureAdminUnlocked(fresh);
+            if (!okAdmin) return;
+            const profiles = safeObject(fresh.profiles);
+            const master = safeObject(profiles.default);
+            const settings = safeObject(master.settings);
+            profiles.default = {
+                ...master,
+                settings: {
+                    ...settings,
+                    accountPolicy: {
+                        allowAccountCreation: nextPolicy.allowAccountCreation === true,
+                        maxAccounts: Math.max(0, Math.floor(nextPolicy.maxAccounts || 0))
+                    }
+                }
+            };
+            await io.saveProfilesV4({
+                ...fresh,
+                schemaVersion: 4,
+                profiles
+            });
+            await refreshProfilesUI();
+            UIComponents.showToast('Account policy updated', 'success');
+        };
+
+        ftAllowAccountCreation.addEventListener('change', async () => {
+            if (!profilesV4Cache) return;
+            const policy = getAccountPolicy(profilesV4Cache);
+            await persistPolicy({ ...policy, allowAccountCreation: !!ftAllowAccountCreation.checked });
+        });
+
+        ftMaxAccounts.addEventListener('change', async () => {
+            if (!profilesV4Cache) return;
+            const policy = getAccountPolicy(profilesV4Cache);
+            const nextMax = parseInt(ftMaxAccounts.value || '0', 10);
+            await persistPolicy({ ...policy, maxAccounts: Number.isFinite(nextMax) ? nextMax : 0 });
+        });
+    }
+
+    if (ftCreateAccountBtn) {
+        ftCreateAccountBtn.addEventListener('click', async () => {
+            const io = window.FilterTubeIO || {};
+            if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
+                UIComponents.showToast('Profiles unavailable', 'error');
+                return;
+            }
+
+            const profilesV4 = await io.loadProfilesV4();
+            if (normalizeString(profilesV4?.activeProfileId) !== 'default') {
+                UIComponents.showToast('Switch to Default to create an account', 'error');
+                return;
+            }
+
+            const okAdmin = await ensureAdminUnlocked(profilesV4);
+            if (!okAdmin) return;
+
+            const policy = getAccountPolicy(profilesV4);
+            if (!policy.allowAccountCreation) {
+                UIComponents.showToast('Account creation is disabled in Master policy', 'error');
+                return;
+            }
+
+            if (policy.maxAccounts > 0) {
+                const existingCount = countNonDefaultAccounts(profilesV4);
+                if (existingCount >= policy.maxAccounts) {
+                    UIComponents.showToast('Account limit reached', 'error');
+                    return;
+                }
+            }
+
+            const nameRaw = await showPromptModal({
+                title: 'Create Account',
+                message: 'Enter a name for the new account.',
+                placeholder: 'Profile name',
+                inputType: 'text',
+                confirmText: 'Create'
+            });
+            const name = normalizeString(nameRaw);
+            if (!name) return;
+
+            const makeIdPart = (value) => normalizeString(value)
+                .toLowerCase()
+                .replace(/\s+/g, '-')
+                .replace(/[^a-z0-9_-]/g, '')
+                .replace(/-+/g, '-')
+                .replace(/^[-_]+|[-_]+$/g, '')
+                .slice(0, 28);
+
+            const baseId = makeIdPart(name) || `profile-${Math.random().toString(36).slice(2, 8)}`;
+            const profiles = safeObject(profilesV4.profiles);
+            let candidate = baseId;
+            let counter = 2;
+            while (profiles[candidate] || candidate === 'default') {
+                candidate = `${baseId}-${counter}`;
+                counter += 1;
+            }
+
+            profiles[candidate] = {
+                type: 'account',
+                parentProfileId: null,
+                name,
+                settings: {
+                    syncKidsToMain: false
+                },
+                main: {
+                    channels: [],
+                    keywords: []
+                },
+                kids: {
+                    mode: 'blocklist',
+                    strictMode: true,
+                    blockedChannels: [],
+                    blockedKeywords: []
+                }
+            };
+
+            await io.saveProfilesV4({
+                ...profilesV4,
+                schemaVersion: 4,
+                profiles
+            });
+
+            await refreshProfilesUI();
+            await switchToProfile(candidate);
+        });
+    }
+
+    if (ftCreateChildBtn) {
+        ftCreateChildBtn.addEventListener('click', async () => {
+            const io = window.FilterTubeIO || {};
+            if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
+                UIComponents.showToast('Profiles unavailable', 'error');
+                return;
+            }
+
+            const profilesV4 = await io.loadProfilesV4();
+            const currentActive = normalizeString(profilesV4?.activeProfileId) || 'default';
+            const currentType = getProfileType(profilesV4, currentActive);
+            if (currentType !== 'account') {
+                UIComponents.showToast('Switch to the parent account to create a child profile', 'error');
+                return;
+            }
+
+            const okUnlocked = await ensureProfileUnlocked(profilesV4, currentActive);
+            if (!okUnlocked) return;
+
+            const nameRaw = await showPromptModal({
+                title: 'Create Child Profile',
+                message: 'Enter a name for the new child profile.',
+                placeholder: 'Profile name',
+                inputType: 'text',
+                confirmText: 'Create'
+            });
+            const name = normalizeString(nameRaw);
+            if (!name) return;
+
+            const makeIdPart = (value) => normalizeString(value)
+                .toLowerCase()
+                .replace(/\s+/g, '-')
+                .replace(/[^a-z0-9_-]/g, '')
+                .replace(/-+/g, '-')
+                .replace(/^[-_]+|[-_]+$/g, '')
+                .slice(0, 28);
+
+            const baseId = makeIdPart(name) || `profile-${Math.random().toString(36).slice(2, 8)}`;
+            const profiles = safeObject(profilesV4.profiles);
+            let candidate = baseId;
+            let counter = 2;
+            while (profiles[candidate] || candidate === 'default') {
+                candidate = `${baseId}-${counter}`;
+                counter += 1;
+            }
+
+            profiles[candidate] = {
+                type: 'child',
+                parentProfileId: currentActive,
+                name,
+                settings: {
+                    syncKidsToMain: false
+                },
+                main: {
+                    channels: [],
+                    keywords: []
+                },
+                kids: {
+                    mode: 'blocklist',
+                    strictMode: true,
+                    blockedChannels: [],
+                    blockedKeywords: []
+                }
+            };
+
+            await io.saveProfilesV4({
+                ...profilesV4,
+                schemaVersion: 4,
+                profiles
+            });
+
+            await refreshProfilesUI();
+            await switchToProfile(candidate);
+        });
+    }
+
+    if (ftSetMasterPinBtn) {
+        ftSetMasterPinBtn.addEventListener('click', async () => {
+            const io = window.FilterTubeIO || {};
+            if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
+                UIComponents.showToast('Profiles unavailable', 'error');
+                return;
+            }
+            const profilesV4 = await io.loadProfilesV4();
+            if (normalizeString(profilesV4?.activeProfileId) !== 'default') {
+                UIComponents.showToast('Switch to Default (Master) to manage Master PIN', 'error');
+                return;
+            }
+
+            const hasExisting = !!extractMasterPinVerifier(profilesV4);
+            if (hasExisting) {
+                const okAdmin = await ensureAdminUnlocked(profilesV4);
+                if (!okAdmin) return;
+            }
+
+            const pin1 = await showPromptModal({
+                title: hasExisting ? 'Change Master PIN' : 'Set Master PIN',
+                message: 'Enter a new Master PIN.',
+                placeholder: 'Master PIN',
+                inputType: 'password',
+                confirmText: 'Continue'
+            });
+            if (pin1 === null) return;
+            const pin2 = await showPromptModal({
+                title: 'Confirm Master PIN',
+                message: 'Re-enter the Master PIN to confirm.',
+                placeholder: 'Master PIN',
+                inputType: 'password',
+                confirmText: 'Save'
+            });
+            if (pin2 === null) return;
+            if (normalizeString(pin1) !== normalizeString(pin2) || !normalizeString(pin1)) {
+                UIComponents.showToast('PINs do not match', 'error');
+                return;
+            }
+
+            const Security = window.FilterTubeSecurity || {};
+            if (typeof Security.createPinVerifier !== 'function') {
+                UIComponents.showToast('Security manager unavailable', 'error');
+                return;
+            }
+
+            const verifier = await Security.createPinVerifier(normalizeString(pin1));
+            const profiles = safeObject(profilesV4.profiles);
+            const master = safeObject(profiles.default);
+            const security = safeObject(master.security);
+
+            profiles.default = {
+                ...master,
+                security: {
+                    ...security,
+                    masterPinVerifier: verifier
+                }
+            };
+
+            await io.saveProfilesV4({
+                ...profilesV4,
+                schemaVersion: 4,
+                profiles
+            });
+
+            sessionMasterPin = normalizeString(pin1);
+            unlockedProfiles.add('default');
+            await refreshProfilesUI();
+            UIComponents.showToast('Master PIN updated', 'success');
+        });
+    }
+
+    if (ftClearMasterPinBtn) {
+        ftClearMasterPinBtn.addEventListener('click', async () => {
+            const io = window.FilterTubeIO || {};
+            if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
+                UIComponents.showToast('Profiles unavailable', 'error');
+                return;
+            }
+            const profilesV4 = await io.loadProfilesV4();
+            if (normalizeString(profilesV4?.activeProfileId) !== 'default') {
+                UIComponents.showToast('Switch to Default (Master) to manage Master PIN', 'error');
+                return;
+            }
+
+            const hasExisting = !!extractMasterPinVerifier(profilesV4);
+            if (!hasExisting) {
+                UIComponents.showToast('No Master PIN is set', 'info');
+                return;
+            }
+
+            const okAdmin = await ensureAdminUnlocked(profilesV4);
+            if (!okAdmin) return;
+            const confirmed = window.confirm('Remove the Master PIN?');
+            if (!confirmed) return;
+
+            const profiles = safeObject(profilesV4.profiles);
+            const master = safeObject(profiles.default);
+            const security = safeObject(master.security);
+            const nextSecurity = { ...security };
+            delete nextSecurity.masterPinVerifier;
+            delete nextSecurity.masterPin;
+            profiles.default = {
+                ...master,
+                security: nextSecurity
+            };
+
+            await io.saveProfilesV4({
+                ...profilesV4,
+                schemaVersion: 4,
+                profiles
+            });
+
+            sessionMasterPin = '';
+            unlockedProfiles.delete('default');
+            await refreshProfilesUI();
+            UIComponents.showToast('Master PIN removed', 'success');
         });
     }
 
@@ -982,6 +2381,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (addKeywordBtn) {
         addKeywordBtn.addEventListener('click', async () => {
+            if (isUiLocked()) return;
             const word = (keywordInput?.value || '').trim();
             if (!word) return;
 
@@ -1070,6 +2470,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (addChannelBtn) {
         addChannelBtn.addEventListener('click', async () => {
+            if (isUiLocked()) return;
             const input = (channelInput?.value || '').trim();
             if (!input) return;
 
@@ -1167,6 +2568,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Kids event handlers
     if (kidsAddKeywordBtn) {
         kidsAddKeywordBtn.addEventListener('click', async () => {
+            if (isUiLocked()) return;
             const word = (kidsKeywordInput?.value || '').trim();
             if (!word) return;
             const success = await StateManager.addKidsKeyword(word);
@@ -1244,6 +2646,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (kidsAddChannelBtn) {
         kidsAddChannelBtn.addEventListener('click', async () => {
+            if (isUiLocked()) return;
             const input = (kidsChannelInput?.value || '').trim();
             if (!input) return;
             const result = await StateManager.addKidsChannel(input);
@@ -1327,6 +2730,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     allSettingCheckboxes.forEach(el => {
         el.addEventListener('change', async () => {
+            if (isUiLocked()) {
+                updateCheckboxes();
+                return;
+            }
             const key = el.getAttribute('data-ft-setting');
             if (!key) return;
             await StateManager.updateSetting(key, el.checked);
@@ -1400,21 +2807,34 @@ function setupNavigation() {
 
     navItems.forEach(item => {
         item.addEventListener('click', () => {
+            try {
+                if (item.getAttribute('aria-disabled') === 'true') return;
+            } catch (e) {
+            }
             const targetView = item.getAttribute('data-tab');
             switchView(targetView);
         });
     });
 
     function switchView(viewId) {
+        let effectiveViewId = viewId;
+        try {
+            if (typeof window.FilterTubeResolveViewAccess === 'function') {
+                effectiveViewId = window.FilterTubeResolveViewAccess(viewId)?.viewId || viewId;
+            }
+        } catch (e) {
+            effectiveViewId = viewId;
+        }
+
         // Update nav items
         navItems.forEach(item => {
-            item.classList.toggle('active', item.getAttribute('data-tab') === viewId);
+            item.classList.toggle('active', item.getAttribute('data-tab') === effectiveViewId);
         });
 
         // Update view sections
         viewSections.forEach(section => {
-            section.classList.toggle('active', section.id === `${viewId}View`);
-            if (section.id === `${viewId}View`) {
+            section.classList.toggle('active', section.id === `${effectiveViewId}View`);
+            if (section.id === `${effectiveViewId}View`) {
                 section.scrollTop = 0;
             }
         });
@@ -1434,8 +2854,8 @@ function setupNavigation() {
             'help': 'Help',
             'support': 'Support'
         };
-        if (pageTitle && titles[viewId]) {
-            pageTitle.textContent = titles[viewId];
+        if (pageTitle && titles[effectiveViewId]) {
+            pageTitle.textContent = titles[effectiveViewId];
         }
     }
 

@@ -29,8 +29,25 @@ function safeObject(value) {
     return value && typeof value === 'object' ? value : {};
 }
 
+function normalizeString(value) {
+    return typeof value === 'string' ? value.trim() : '';
+}
+
 function nowTs() {
     return Date.now();
+}
+
+function isValidProfilesV4(value) {
+    return !!(
+        value
+        && typeof value === 'object'
+        && !Array.isArray(value)
+        && typeof value.activeProfileId === 'string'
+        && value.activeProfileId.trim()
+        && value.profiles
+        && typeof value.profiles === 'object'
+        && !Array.isArray(value.profiles)
+    );
 }
 
 function buildAutoBackupPayload({ settings, profilesV3, theme }) {
@@ -39,13 +56,46 @@ function buildAutoBackupPayload({ settings, profilesV3, theme }) {
     const mainProfile = safeObject(p.main);
     const kidsProfile = safeObject(p.kids);
 
+    const profilesV4 = s?.ftProfilesV4;
+    const hasProfilesV4 = isValidProfilesV4(profilesV4);
+    const activeProfileId = hasProfilesV4 && typeof profilesV4.activeProfileId === 'string'
+        ? profilesV4.activeProfileId
+        : 'default';
+    const activeProfile = hasProfilesV4
+        ? safeObject(safeObject(profilesV4.profiles)[activeProfileId])
+        : {};
+    const activeProfileName = normalizeString(activeProfile?.name) || (activeProfileId === 'default' ? 'Default' : activeProfileId);
+
+    const exportType = (activeProfileId === 'default') ? 'full' : 'profile';
+    const effectiveProfilesV4 = hasProfilesV4
+        ? (exportType === 'full'
+            ? profilesV4
+            : {
+                schemaVersion: 4,
+                activeProfileId,
+                profiles: {
+                    [activeProfileId]: activeProfile
+                }
+            })
+        : null;
+
+    const activeMainV4 = safeObject(activeProfile?.main);
+    const activeKidsV4 = safeObject(activeProfile?.kids);
+    const activeSettingsV4 = safeObject(activeProfile?.settings);
+    const applyKidsRulesOnMain = hasProfilesV4
+        ? !!activeSettingsV4.syncKidsToMain
+        : !!mainProfile.applyKidsRulesOnMain;
+
     return {
         meta: {
             version: 3,
             timestamp: nowTs(),
             application: 'FilterTube',
-            exportType: 'full'
+            exportType,
+            profileId: activeProfileId,
+            profileName: activeProfileName
         },
+        ...(effectiveProfilesV4 ? { profilesV4: effectiveProfilesV4 } : {}),
         settings: {
             theme: theme === 'dark' ? 'dark' : 'light',
             sync: {
@@ -82,11 +132,11 @@ function buildAutoBackupPayload({ settings, profilesV3, theme }) {
                 hideMoreFromYouTube: !!s.hideMoreFromYouTube,
                 hideSubscriptions: !!s.hideSubscriptions,
                 hideSearchShelves: !!s.hideSearchShelves,
-                applyKidsRulesOnMain: !!mainProfile.applyKidsRulesOnMain
+                applyKidsRulesOnMain
             },
             kids: {
-                mode: typeof kidsProfile.mode === 'string' ? kidsProfile.mode : 'whitelist',
-                strictMode: kidsProfile.strictMode !== false,
+                mode: 'blocklist',
+                strictMode: hasProfilesV4 ? (activeKidsV4.strictMode !== false) : (kidsProfile.strictMode !== false),
                 enableSearch: true
             }
         },
@@ -100,8 +150,8 @@ function buildAutoBackupPayload({ settings, profilesV3, theme }) {
                 subscriptions: safeArray(mainProfile.subscriptions)
             },
             kids: {
-                blockedChannels: safeArray(kidsProfile.blockedChannels),
-                blockedKeywords: safeArray(kidsProfile.blockedKeywords),
+                blockedChannels: hasProfilesV4 ? safeArray(activeKidsV4.blockedChannels) : safeArray(kidsProfile.blockedChannels),
+                blockedKeywords: hasProfilesV4 ? safeArray(activeKidsV4.blockedKeywords) : safeArray(kidsProfile.blockedKeywords),
                 whitelistedChannels: safeArray(kidsProfile.whitelistedChannels),
                 whitelistedKeywords: safeArray(kidsProfile.whitelistedKeywords),
                 videoIds: safeArray(kidsProfile.videoIds),
@@ -159,43 +209,87 @@ function readAutoBackupState() {
             'hideSubscriptions',
             'hideSearchShelves',
             'channelMap',
+            'ftProfilesV4',
             'ftProfilesV3',
             'ftThemePreference'
         ], items => {
             const theme = items?.ftThemePreference === 'dark' ? 'dark' : 'light';
+
+            const storedProfilesV4 = items?.ftProfilesV4;
+            const hasProfilesV4 = isValidProfilesV4(storedProfilesV4);
+            const activeProfileId = hasProfilesV4 && typeof storedProfilesV4.activeProfileId === 'string'
+                ? storedProfilesV4.activeProfileId
+                : DEFAULT_PROFILE_ID;
+            const activeProfile = hasProfilesV4
+                ? safeObject(safeObject(storedProfilesV4.profiles)?.[activeProfileId])
+                : {};
+            const activeMain = safeObject(activeProfile.main);
+            const activeSettings = safeObject(activeProfile.settings);
+
+            const boolFromV4 = (key, legacyValue) => {
+                try {
+                    if (Object.prototype.hasOwnProperty.call(activeSettings, key)) {
+                        return !!activeSettings[key];
+                    }
+                } catch (e) {
+                }
+                return !!legacyValue;
+            };
+
+            const enabledFromV4 = (() => {
+                try {
+                    if (Object.prototype.hasOwnProperty.call(activeSettings, 'enabled')) {
+                        return activeSettings.enabled !== false;
+                    }
+                } catch (e) {
+                }
+                return items?.enabled !== false;
+            })();
+
+            const hideCommentsFromV4 = boolFromV4('hideComments', !!items?.hideAllComments);
+            const filterCommentsFromV4 = hideCommentsFromV4 ? false : boolFromV4('filterComments', !!items?.filterComments);
+
+            const channelsFromV4 = (hasProfilesV4 && Array.isArray(activeMain.channels))
+                ? activeMain.channels
+                : safeArray(items?.filterChannels);
+            const keywordsFromV4 = (hasProfilesV4 && Array.isArray(activeMain.keywords))
+                ? activeMain.keywords
+                : safeArray(items?.uiKeywords);
+
             const settings = {
-                enabled: items?.enabled !== false,
-                channels: safeArray(items?.filterChannels),
-                keywords: safeArray(items?.uiKeywords),
-                hideShorts: !!items?.hideAllShorts,
-                hideComments: !!items?.hideAllComments,
-                filterComments: !!items?.filterComments,
-                hideHomeFeed: !!items?.hideHomeFeed,
-                hideSponsoredCards: !!items?.hideSponsoredCards,
-                hideWatchPlaylistPanel: !!items?.hideWatchPlaylistPanel,
-                hidePlaylistCards: !!items?.hidePlaylistCards,
-                hideMembersOnly: !!items?.hideMembersOnly,
-                hideMixPlaylists: !!items?.hideMixPlaylists,
-                hideVideoSidebar: !!items?.hideVideoSidebar,
-                hideRecommended: !!items?.hideRecommended,
-                hideLiveChat: !!items?.hideLiveChat,
-                hideVideoInfo: !!items?.hideVideoInfo,
-                hideVideoButtonsBar: !!items?.hideVideoButtonsBar,
-                hideAskButton: !!items?.hideAskButton,
-                hideVideoChannelRow: !!items?.hideVideoChannelRow,
-                hideVideoDescription: !!items?.hideVideoDescription,
-                hideMerchTicketsOffers: !!items?.hideMerchTicketsOffers,
-                hideEndscreenVideowall: !!items?.hideEndscreenVideowall,
-                hideEndscreenCards: !!items?.hideEndscreenCards,
-                disableAutoplay: !!items?.disableAutoplay,
-                disableAnnotations: !!items?.disableAnnotations,
-                hideTopHeader: !!items?.hideTopHeader,
-                hideNotificationBell: !!items?.hideNotificationBell,
-                hideExploreTrending: !!items?.hideExploreTrending,
-                hideMoreFromYouTube: !!items?.hideMoreFromYouTube,
-                hideSubscriptions: !!items?.hideSubscriptions,
-                hideSearchShelves: !!items?.hideSearchShelves,
+                enabled: enabledFromV4,
+                channels: channelsFromV4,
+                keywords: keywordsFromV4,
+                hideShorts: boolFromV4('hideShorts', !!items?.hideAllShorts),
+                hideComments: hideCommentsFromV4,
+                filterComments: filterCommentsFromV4,
+                hideHomeFeed: boolFromV4('hideHomeFeed', !!items?.hideHomeFeed),
+                hideSponsoredCards: boolFromV4('hideSponsoredCards', !!items?.hideSponsoredCards),
+                hideWatchPlaylistPanel: boolFromV4('hideWatchPlaylistPanel', !!items?.hideWatchPlaylistPanel),
+                hidePlaylistCards: boolFromV4('hidePlaylistCards', !!items?.hidePlaylistCards),
+                hideMembersOnly: boolFromV4('hideMembersOnly', !!items?.hideMembersOnly),
+                hideMixPlaylists: boolFromV4('hideMixPlaylists', !!items?.hideMixPlaylists),
+                hideVideoSidebar: boolFromV4('hideVideoSidebar', !!items?.hideVideoSidebar),
+                hideRecommended: boolFromV4('hideRecommended', !!items?.hideRecommended),
+                hideLiveChat: boolFromV4('hideLiveChat', !!items?.hideLiveChat),
+                hideVideoInfo: boolFromV4('hideVideoInfo', !!items?.hideVideoInfo),
+                hideVideoButtonsBar: boolFromV4('hideVideoButtonsBar', !!items?.hideVideoButtonsBar),
+                hideAskButton: boolFromV4('hideAskButton', !!items?.hideAskButton),
+                hideVideoChannelRow: boolFromV4('hideVideoChannelRow', !!items?.hideVideoChannelRow),
+                hideVideoDescription: boolFromV4('hideVideoDescription', !!items?.hideVideoDescription),
+                hideMerchTicketsOffers: boolFromV4('hideMerchTicketsOffers', !!items?.hideMerchTicketsOffers),
+                hideEndscreenVideowall: boolFromV4('hideEndscreenVideowall', !!items?.hideEndscreenVideowall),
+                hideEndscreenCards: boolFromV4('hideEndscreenCards', !!items?.hideEndscreenCards),
+                disableAutoplay: boolFromV4('disableAutoplay', !!items?.disableAutoplay),
+                disableAnnotations: boolFromV4('disableAnnotations', !!items?.disableAnnotations),
+                hideTopHeader: boolFromV4('hideTopHeader', !!items?.hideTopHeader),
+                hideNotificationBell: boolFromV4('hideNotificationBell', !!items?.hideNotificationBell),
+                hideExploreTrending: boolFromV4('hideExploreTrending', !!items?.hideExploreTrending),
+                hideMoreFromYouTube: boolFromV4('hideMoreFromYouTube', !!items?.hideMoreFromYouTube),
+                hideSubscriptions: boolFromV4('hideSubscriptions', !!items?.hideSubscriptions),
+                hideSearchShelves: boolFromV4('hideSearchShelves', !!items?.hideSearchShelves),
                 channelMap: safeObject(items?.channelMap),
+                ftProfilesV4: items?.ftProfilesV4 || null,
                 theme
             };
             const profilesV3 = safeObject(items?.ftProfilesV3);
@@ -204,7 +298,7 @@ function readAutoBackupState() {
     });
 }
 
-function rotateAutoBackups(keepCount = 10) {
+function rotateAutoBackups(keepCount = 10, label = '') {
     return new Promise(resolve => {
         if (!browserAPI.downloads || typeof browserAPI.downloads.search !== 'function') {
             resolve();
@@ -216,8 +310,11 @@ function rotateAutoBackups(keepCount = 10) {
             limit: 100
         }, results => {
             const items = Array.isArray(results) ? results : [];
+            const safeLabel = typeof label === 'string' ? label.trim() : '';
+            const folderNeedle = safeLabel ? `FilterTube Backup/${safeLabel}/` : '';
             const backups = items
                 .filter(d => (d?.filename || '').includes('FilterTube-Backup-'))
+                .filter(d => !folderNeedle || (d?.filename || '').includes(folderNeedle))
                 .sort((a, b) => {
                     const at = (a?.endTime ? new Date(a.endTime).getTime() : 0);
                     const bt = (b?.endTime ? new Date(b.endTime).getTime() : 0);
@@ -254,7 +351,7 @@ async function createAutoBackupInBackground(triggerType, options = {}) {
     try {
         const flag = await new Promise(resolve => {
             browserAPI.storage.local.get(['ftAutoBackupEnabled'], items => {
-                resolve(items?.ftAutoBackupEnabled !== false);
+                resolve(items?.ftAutoBackupEnabled === true);
             });
         });
         if (!flag) {
@@ -270,8 +367,24 @@ async function createAutoBackupInBackground(triggerType, options = {}) {
     payload.meta.trigger = triggerType || 'unknown';
     payload.meta.backupLocation = 'FilterTube Backup';
 
-    const fileName = 'FilterTube-Backup-Latest.json';
-    const fullPath = `FilterTube Backup/${fileName}`;
+    const safePart = (value) => {
+        const raw = typeof value === 'string' ? value.trim() : '';
+        if (!raw) return '';
+        return raw
+            .replace(/\s+/g, '-')
+            .replace(/[^a-zA-Z0-9._-]/g, '')
+            .replace(/-+/g, '-')
+            .replace(/^[-_.]+|[-_.]+$/g, '')
+            .slice(0, 48);
+    };
+
+    const label = safePart(typeof payload?.meta?.profileName === 'string' ? payload.meta.profileName : '')
+        || safePart(typeof payload?.meta?.profileId === 'string' ? payload.meta.profileId : '')
+        || 'Default';
+    const now = new Date();
+    const timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    const fileName = `FilterTube-Backup-${timestamp}.json`;
+    const fullPath = `FilterTube Backup/${label}/${fileName}`;
 
     const jsonData = JSON.stringify(payload, null, 2);
     const hasObjectUrl = typeof URL !== 'undefined' && typeof URL.createObjectURL === 'function';
@@ -284,7 +397,7 @@ async function createAutoBackupInBackground(triggerType, options = {}) {
             url: downloadUrl,
             filename: fullPath,
             saveAs: false,
-            conflictAction: 'overwrite'
+            conflictAction: 'uniquify'
         }, downloadId => {
             if (hasObjectUrl) {
                 try {
@@ -296,6 +409,11 @@ async function createAutoBackupInBackground(triggerType, options = {}) {
             if (err) {
                 resolve({ ok: false, reason: err.message || 'download_failed' });
                 return;
+            }
+
+            try {
+                rotateAutoBackups(10, label);
+            } catch (e) {
             }
 
             resolve({ ok: true, filename: fullPath, downloadId });
@@ -339,6 +457,8 @@ const watchIdentitySessionCache = new Map();
 const pendingKidsWatchIdentityFetches = new Map();
 const kidsWatchIdentitySessionCache = new Map();
 const CURRENT_VERSION = (browserAPI.runtime.getManifest()?.version || '').trim();
+const FT_PROFILES_V4_KEY = 'ftProfilesV4';
+const DEFAULT_PROFILE_ID = 'default';
 // Deep link into the tab-view dashboard; query param avoids hash-only navigation
 // so we can reliably parse intent even when hash stripping occurs.
 const WHATS_NEW_PAGE_URL = browserAPI.runtime.getURL('html/tab-view.html?view=whatsnew');
@@ -363,6 +483,124 @@ let pendingAutoBackupOptions = null;
 
 function isKidsUrl(url) {
     return typeof url === 'string' && url.includes('youtubekids.com');
+}
+
+function buildProfilesV4FromLegacyState(items, storageUpdates = {}) {
+    const profilesV3 = safeObject(items?.ftProfilesV3);
+    const kidsV3 = safeObject(profilesV3.kids);
+    const mainV3 = safeObject(profilesV3.main);
+    const now = nowTs();
+
+    const enabled = items?.enabled !== false;
+    const hideComments = !!items?.hideAllComments;
+
+    const rawChannels = Object.prototype.hasOwnProperty.call(storageUpdates, 'filterChannels')
+        ? storageUpdates.filterChannels
+        : items?.filterChannels;
+
+    let mainChannels = [];
+    if (Array.isArray(rawChannels)) {
+        mainChannels = rawChannels;
+    } else if (typeof rawChannels === 'string') {
+        mainChannels = rawChannels
+            .split(',')
+            .map(c => c.trim())
+            .filter(Boolean)
+            .map(c => ({
+                name: c,
+                id: c,
+                handle: null,
+                handleDisplay: c,
+                canonicalHandle: null,
+                logo: null,
+                filterAll: false,
+                originalInput: c
+            }));
+    }
+
+    const rawKeywords = Object.prototype.hasOwnProperty.call(storageUpdates, 'uiKeywords')
+        ? storageUpdates.uiKeywords
+        : items?.uiKeywords;
+
+    let mainKeywords = [];
+    if (Array.isArray(rawKeywords)) {
+        mainKeywords = rawKeywords;
+    } else if (Array.isArray(items?.filterKeywords)) {
+        mainKeywords = items.filterKeywords
+            .map(keyword => {
+                const pattern = typeof keyword?.pattern === 'string' ? keyword.pattern : '';
+                if (!pattern) return null;
+                const isExact = pattern.startsWith('\\b') && pattern.endsWith('\\b');
+                const raw = pattern
+                    .replace(/^\\b/, '')
+                    .replace(/\\b$/, '')
+                    .replace(/\\(.)/g, '$1');
+                const word = raw.trim();
+                if (!word) return null;
+                return { word, exact: isExact, comments: true, addedAt: now, source: 'user' };
+            })
+            .filter(Boolean);
+    } else if (typeof items?.filterKeywords === 'string') {
+        mainKeywords = items.filterKeywords
+            .split(',')
+            .map(word => word.trim())
+            .filter(Boolean)
+            .map(word => ({ word, exact: false, comments: true, addedAt: now, source: 'user' }));
+    }
+
+    return {
+        schemaVersion: 4,
+        activeProfileId: DEFAULT_PROFILE_ID,
+        profiles: {
+            [DEFAULT_PROFILE_ID]: {
+                type: 'account',
+                parentProfileId: null,
+                name: 'Default',
+                settings: {
+                    syncKidsToMain: !!mainV3.applyKidsRulesOnMain,
+                    enabled,
+                    hideShorts: !!items?.hideAllShorts,
+                    hideComments,
+                    filterComments: hideComments ? false : !!items?.filterComments,
+                    hideHomeFeed: !!items?.hideHomeFeed,
+                    hideSponsoredCards: !!items?.hideSponsoredCards,
+                    hideWatchPlaylistPanel: !!items?.hideWatchPlaylistPanel,
+                    hidePlaylistCards: !!items?.hidePlaylistCards,
+                    hideMembersOnly: !!items?.hideMembersOnly,
+                    hideMixPlaylists: !!items?.hideMixPlaylists,
+                    hideVideoSidebar: !!items?.hideVideoSidebar,
+                    hideRecommended: !!items?.hideRecommended,
+                    hideLiveChat: !!items?.hideLiveChat,
+                    hideVideoInfo: !!items?.hideVideoInfo,
+                    hideVideoButtonsBar: !!items?.hideVideoButtonsBar,
+                    hideAskButton: !!items?.hideAskButton,
+                    hideVideoChannelRow: !!items?.hideVideoChannelRow,
+                    hideVideoDescription: !!items?.hideVideoDescription,
+                    hideMerchTicketsOffers: !!items?.hideMerchTicketsOffers,
+                    hideEndscreenVideowall: !!items?.hideEndscreenVideowall,
+                    hideEndscreenCards: !!items?.hideEndscreenCards,
+                    disableAutoplay: !!items?.disableAutoplay,
+                    disableAnnotations: !!items?.disableAnnotations,
+                    hideTopHeader: !!items?.hideTopHeader,
+                    hideNotificationBell: !!items?.hideNotificationBell,
+                    hideExploreTrending: !!items?.hideExploreTrending,
+                    hideMoreFromYouTube: !!items?.hideMoreFromYouTube,
+                    hideSubscriptions: !!items?.hideSubscriptions,
+                    hideSearchShelves: !!items?.hideSearchShelves
+                },
+                main: {
+                    channels: safeArray(mainChannels),
+                    keywords: safeArray(mainKeywords)
+                },
+                kids: {
+                    mode: 'blocklist',
+                    strictMode: kidsV3.strictMode !== false,
+                    blockedChannels: safeArray(kidsV3.blockedChannels),
+                    blockedKeywords: safeArray(kidsV3.blockedKeywords)
+                }
+            }
+        }
+    };
 }
 
 function ensureVideoChannelMapCache() {
@@ -531,7 +769,8 @@ async function getCompiledSettings(sender = null, profileType = null) {
             'channelMap',
             'videoChannelMap',
             'stats',
-            'ftProfilesV3'
+            'ftProfilesV3',
+            FT_PROFILES_V4_KEY
         ], (items) => {
             const compiledSettings = {};
             const storageUpdates = {};
@@ -542,6 +781,31 @@ async function getCompiledSettings(sender = null, profileType = null) {
             const storedUiKeywords = Array.isArray(items.uiKeywords) ? items.uiKeywords : null;
             const storedUiChannels = Array.isArray(items.uiChannels) ? items.uiChannels : null;
             const useExact = items.useExactWordMatching || false;
+
+            const escapeRegex = (value) => String(value || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const compileKeywordEntries = (entries, predicate = null) => {
+                const list = Array.isArray(entries) ? entries : [];
+                const compiled = [];
+                const seen = new Set();
+
+                for (const entry of list) {
+                    const word = (typeof entry === 'string')
+                        ? entry.trim()
+                        : (typeof entry?.word === 'string' ? entry.word.trim() : '');
+                    if (!word) continue;
+                    if (predicate && !predicate(entry)) continue;
+
+                    const exact = (typeof entry === 'object' && entry) ? entry.exact === true : false;
+                    const escaped = escapeRegex(word);
+                    const pattern = exact ? `\\b${escaped}\\b` : escaped;
+                    const key = `${pattern.toLowerCase()}::i`;
+                    if (seen.has(key)) continue;
+                    seen.add(key);
+                    compiled.push({ pattern, flags: 'i' });
+                }
+
+                return compiled;
+            };
 
             // Helper to validate compiled keyword entries
             const sanitizeCompiledList = (list = []) => list.filter(entry => {
@@ -625,18 +889,116 @@ async function getCompiledSettings(sender = null, profileType = null) {
                 compiledSettings.filterKeywordsComments = compiledSettings.filterKeywords;
             }
 
+            // Compile channels - preserve objects with name, id, handle, filterAll
+            const storedProfilesV4 = items?.[FT_PROFILES_V4_KEY];
+            const hasProfilesV4 = isValidProfilesV4(storedProfilesV4);
+
+            if (!hasProfilesV4) {
+                try {
+                    storageUpdates[FT_PROFILES_V4_KEY] = buildProfilesV4FromLegacyState(items, storageUpdates);
+                } catch (e) {
+                }
+            }
+
+            const effectiveProfilesV4 = hasProfilesV4 ? storedProfilesV4 : storageUpdates?.[FT_PROFILES_V4_KEY];
+            const activeProfileId = typeof effectiveProfilesV4?.activeProfileId === 'string'
+                ? effectiveProfilesV4.activeProfileId
+                : DEFAULT_PROFILE_ID;
+            const activeProfile = safeObject(safeObject(effectiveProfilesV4?.profiles)?.[activeProfileId]);
+            const activeMain = safeObject(activeProfile.main);
+            const activeKids = safeObject(activeProfile.kids);
+
+            const activeSettings = safeObject(activeProfile.settings);
+            const syncKidsToMain = !!activeSettings.syncKidsToMain;
+
+            const boolFromV4 = (key, legacyValue) => {
+                try {
+                    if (Object.prototype.hasOwnProperty.call(activeSettings, key)) {
+                        return !!activeSettings[key];
+                    }
+                } catch (e) {
+                }
+                return !!legacyValue;
+            };
+
+            const enabledFromV4 = (() => {
+                try {
+                    if (Object.prototype.hasOwnProperty.call(activeSettings, 'enabled')) {
+                        return activeSettings.enabled !== false;
+                    }
+                } catch (e) {
+                }
+                return items.enabled !== false;
+            })();
+
+            const hideCommentsFromV4 = boolFromV4('hideComments', items.hideAllComments || false);
+            const filterCommentsFromV4 = hideCommentsFromV4 ? false : boolFromV4('filterComments', items.filterComments || false);
+
+            const v4KeywordEntries = shouldUseKidsProfile
+                ? (Array.isArray(activeKids.blockedKeywords) ? activeKids.blockedKeywords : null)
+                : (() => {
+                    const mainKeywords = Array.isArray(activeMain.keywords) ? activeMain.keywords : null;
+                    if (!syncKidsToMain) return mainKeywords;
+                    const kidsKeywords = Array.isArray(activeKids.blockedKeywords) ? activeKids.blockedKeywords : null;
+                    if (!mainKeywords && kidsKeywords) return kidsKeywords;
+                    if (!kidsKeywords) return mainKeywords;
+                    return [...mainKeywords, ...kidsKeywords];
+                })();
+
+            if (v4KeywordEntries) {
+                compiledSettings.filterKeywords = compileKeywordEntries(v4KeywordEntries);
+                compiledSettings.filterKeywordsComments = compileKeywordEntries(v4KeywordEntries, entry => {
+                    return (typeof entry === 'object' && entry) ? entry.comments !== false : true;
+                });
+            }
+
             // Persist any migrations we calculated
             if (Object.keys(storageUpdates).length > 0) {
                 browserAPI.storage.local.set(storageUpdates);
             }
 
-            // Compile channels - preserve objects with name, id, handle, filterAll
             const storedProfilesV3 = items.ftProfilesV3 && typeof items.ftProfilesV3 === 'object' ? items.ftProfilesV3 : null;
             const kidsProfile = storedProfilesV3?.kids && typeof storedProfilesV3.kids === 'object' ? storedProfilesV3.kids : null;
 
+            const kidsChannelsV3 = Array.isArray(kidsProfile?.blockedChannels) ? kidsProfile.blockedChannels : [];
+            const kidsKeywordsV3 = Array.isArray(kidsProfile?.blockedKeywords) ? kidsProfile.blockedKeywords : [];
+
+            const kidsChannelsV4 = Array.isArray(activeKids.blockedChannels) ? activeKids.blockedChannels : null;
+            const kidsKeywordsV4 = Array.isArray(activeKids.blockedKeywords) ? activeKids.blockedKeywords : null;
+
+            const effectiveKidsChannels = (kidsChannelsV4 && kidsChannelsV4.length > 0)
+                ? kidsChannelsV4
+                : kidsChannelsV3;
+
+            const effectiveKidsKeywords = (kidsKeywordsV4 && kidsKeywordsV4.length > 0)
+                ? kidsKeywordsV4
+                : kidsKeywordsV3;
+
+            const dedupeChannels = (channels = []) => {
+                const out = [];
+                const seen = new Set();
+                for (const ch of Array.isArray(channels) ? channels : []) {
+                    if (!ch || typeof ch !== 'object') continue;
+                    const id = typeof ch.id === 'string' ? ch.id.trim().toLowerCase() : '';
+                    const handle = typeof ch.handle === 'string' ? ch.handle.trim().toLowerCase() : '';
+                    const customUrl = typeof ch.customUrl === 'string' ? ch.customUrl.trim().toLowerCase() : '';
+                    const name = typeof ch.name === 'string' ? ch.name.trim().toLowerCase() : '';
+                    const key = id ? `id:${id}` : (handle ? `handle:${handle}` : (customUrl ? `custom:${customUrl}` : (name ? `name:${name}` : '')));
+                    if (!key) continue;
+                    if (seen.has(key)) continue;
+                    seen.add(key);
+                    out.push(ch);
+                }
+                return out;
+            };
+
             const storedChannels = shouldUseKidsProfile
-                ? (Array.isArray(kidsProfile?.blockedChannels) ? kidsProfile.blockedChannels : [])
-                : items.filterChannels;
+                ? effectiveKidsChannels
+                : (() => {
+                    const mainChannels = Array.isArray(activeMain.channels) ? activeMain.channels : items.filterChannels;
+                    if (!syncKidsToMain) return mainChannels;
+                    return dedupeChannels([...(Array.isArray(mainChannels) ? mainChannels : []), ...effectiveKidsChannels]);
+                })();
             let compiledChannels = [];
             const additionalKeywordsFromChannels = [];
 
@@ -662,6 +1024,10 @@ async function getCompiledSettings(sender = null, profileType = null) {
                         // normalizedHandle must only be set if there's an actual @handle, never from channel name
                         const normalizedHandle = ch.handle ? ch.handle.toLowerCase() : (ch.canonicalHandle ? ch.canonicalHandle.toLowerCase() : null);
                         const displayHandle = ch.handleDisplay || canonicalHandle || ch.name || '';
+                        const filterAllComments = (typeof ch.filterAllComments === 'boolean') ? ch.filterAllComments : true;
+                        const collaborationGroupId = typeof ch.collaborationGroupId === 'string' ? ch.collaborationGroupId : null;
+                        const collaborationWith = Array.isArray(ch.collaborationWith) ? ch.collaborationWith : null;
+                        const allCollaborators = Array.isArray(ch.allCollaborators) ? ch.allCollaborators : null;
                         const channelObj = {
                             name: ch.name,
                             id: ch.id || '', // Preserve case for UC IDs
@@ -670,8 +1036,14 @@ async function getCompiledSettings(sender = null, profileType = null) {
                             canonicalHandle: canonicalHandle || null,
                             logo: ch.logo || null,
                             filterAll: !!ch.filterAll,
+                            filterAllComments,
                             originalInput: ch.originalInput || ch.id || ch.handle || ch.name || null,
-                            customUrl: ch.customUrl || null  // c/Name or user/Name for legacy channels
+                            customUrl: ch.customUrl || null,  // c/Name or user/Name for legacy channels
+                            source: typeof ch.source === 'string' ? ch.source : null,
+                            addedAt: typeof ch.addedAt === 'number' ? ch.addedAt : null,
+                            collaborationGroupId,
+                            collaborationWith,
+                            allCollaborators
                         };
 
                         // If filterAll is enabled, add the channel name to keywords
@@ -747,12 +1119,28 @@ async function getCompiledSettings(sender = null, profileType = null) {
 
             // Kids profile keyword compilation (YouTube Kids domain only)
             if (shouldUseKidsProfile) {
-                const rawKidsKeywords = Array.isArray(kidsProfile?.blockedKeywords) ? kidsProfile.blockedKeywords : [];
+                const rawKidsKeywords = effectiveKidsKeywords;
                 const compiledKidsKeywords = rawKidsKeywords.map(entry => {
                     try {
                         const word = typeof entry?.word === 'string' ? entry.word.trim() : '';
                         if (!word) return null;
-                        const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\\\$&');
+                        const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                        const exact = entry?.exact === true;
+                        return {
+                            pattern: exact ? `\\b${escaped}\\b` : escaped,
+                            flags: 'i'
+                        };
+                    } catch (e) {
+                        return null;
+                    }
+                }).filter(Boolean);
+
+                const compiledKidsKeywordsComments = rawKidsKeywords.map(entry => {
+                    try {
+                        if (entry && typeof entry === 'object' && entry.comments === false) return null;
+                        const word = typeof entry?.word === 'string' ? entry.word.trim() : '';
+                        if (!word) return null;
+                        const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                         const exact = entry?.exact === true;
                         return {
                             pattern: exact ? `\\b${escaped}\\b` : escaped,
@@ -765,54 +1153,56 @@ async function getCompiledSettings(sender = null, profileType = null) {
 
                 // Preserve channel-derived keywords (Filter All) alongside kids keyword list.
                 // We want: (kids keyword entries) + (channel-derived patterns) with de-dup.
-                const mergedPatterns = [];
-                const seen = new Set();
-                const pushUnique = (entry) => {
-                    if (!entry?.pattern) return;
-                    const key = `${String(entry.pattern).toLowerCase()}::${String(entry.flags || '').toLowerCase()}`;
-                    if (seen.has(key)) return;
-                    seen.add(key);
-                    mergedPatterns.push(entry);
+                const mergeWithChannels = (baseList = []) => {
+                    const merged = [];
+                    const seen = new Set();
+                    const pushUnique = (entry) => {
+                        if (!entry?.pattern) return;
+                        const key = `${String(entry.pattern).toLowerCase()}::${String(entry.flags || '').toLowerCase()}`;
+                        if (seen.has(key)) return;
+                        seen.add(key);
+                        merged.push(entry);
+                    };
+                    baseList.forEach(pushUnique);
+                    (additionalKeywordsFromChannels || []).forEach(pushUnique);
+                    return merged;
                 };
 
-                compiledKidsKeywords.forEach(pushUnique);
-                (additionalKeywordsFromChannels || []).forEach(pushUnique);
-
-                compiledSettings.filterKeywords = mergedPatterns;
-                compiledSettings.filterKeywordsComments = mergedPatterns;
+                compiledSettings.filterKeywords = mergeWithChannels(compiledKidsKeywords);
+                compiledSettings.filterKeywordsComments = mergeWithChannels(compiledKidsKeywordsComments);
             }
 
             // Pass through boolean flags
-            compiledSettings.enabled = items.enabled !== false;
-            compiledSettings.hideAllComments = items.hideAllComments || false;
-            compiledSettings.filterComments = items.filterComments || false;
+            compiledSettings.enabled = enabledFromV4;
+            compiledSettings.hideAllComments = hideCommentsFromV4;
+            compiledSettings.filterComments = filterCommentsFromV4;
             compiledSettings.useExactWordMatching = useExact;
-            compiledSettings.hideAllShorts = items.hideAllShorts || false;
-            compiledSettings.hideHomeFeed = items.hideHomeFeed || false;
-            compiledSettings.hideSponsoredCards = items.hideSponsoredCards || false;
-            compiledSettings.hideWatchPlaylistPanel = items.hideWatchPlaylistPanel || false;
-            compiledSettings.hidePlaylistCards = items.hidePlaylistCards || false;
-            compiledSettings.hideMembersOnly = items.hideMembersOnly || false;
-            compiledSettings.hideMixPlaylists = items.hideMixPlaylists || false;
-            compiledSettings.hideVideoSidebar = items.hideVideoSidebar || false;
-            compiledSettings.hideRecommended = items.hideRecommended || false;
-            compiledSettings.hideLiveChat = items.hideLiveChat || false;
-            compiledSettings.hideVideoInfo = items.hideVideoInfo || false;
-            compiledSettings.hideVideoButtonsBar = items.hideVideoButtonsBar || false;
-            compiledSettings.hideAskButton = items.hideAskButton || false;
-            compiledSettings.hideVideoChannelRow = items.hideVideoChannelRow || false;
-            compiledSettings.hideVideoDescription = items.hideVideoDescription || false;
-            compiledSettings.hideMerchTicketsOffers = items.hideMerchTicketsOffers || false;
-            compiledSettings.hideEndscreenVideowall = items.hideEndscreenVideowall || false;
-            compiledSettings.hideEndscreenCards = items.hideEndscreenCards || false;
-            compiledSettings.disableAutoplay = items.disableAutoplay || false;
-            compiledSettings.disableAnnotations = items.disableAnnotations || false;
-            compiledSettings.hideTopHeader = items.hideTopHeader || false;
-            compiledSettings.hideNotificationBell = items.hideNotificationBell || false;
-            compiledSettings.hideExploreTrending = items.hideExploreTrending || false;
-            compiledSettings.hideMoreFromYouTube = items.hideMoreFromYouTube || false;
-            compiledSettings.hideSubscriptions = items.hideSubscriptions || false;
-            compiledSettings.hideSearchShelves = items.hideSearchShelves || false;
+            compiledSettings.hideAllShorts = boolFromV4('hideShorts', items.hideAllShorts || false);
+            compiledSettings.hideHomeFeed = boolFromV4('hideHomeFeed', items.hideHomeFeed || false);
+            compiledSettings.hideSponsoredCards = boolFromV4('hideSponsoredCards', items.hideSponsoredCards || false);
+            compiledSettings.hideWatchPlaylistPanel = boolFromV4('hideWatchPlaylistPanel', items.hideWatchPlaylistPanel || false);
+            compiledSettings.hidePlaylistCards = boolFromV4('hidePlaylistCards', items.hidePlaylistCards || false);
+            compiledSettings.hideMembersOnly = boolFromV4('hideMembersOnly', items.hideMembersOnly || false);
+            compiledSettings.hideMixPlaylists = boolFromV4('hideMixPlaylists', items.hideMixPlaylists || false);
+            compiledSettings.hideVideoSidebar = boolFromV4('hideVideoSidebar', items.hideVideoSidebar || false);
+            compiledSettings.hideRecommended = boolFromV4('hideRecommended', items.hideRecommended || false);
+            compiledSettings.hideLiveChat = boolFromV4('hideLiveChat', items.hideLiveChat || false);
+            compiledSettings.hideVideoInfo = boolFromV4('hideVideoInfo', items.hideVideoInfo || false);
+            compiledSettings.hideVideoButtonsBar = boolFromV4('hideVideoButtonsBar', items.hideVideoButtonsBar || false);
+            compiledSettings.hideAskButton = boolFromV4('hideAskButton', items.hideAskButton || false);
+            compiledSettings.hideVideoChannelRow = boolFromV4('hideVideoChannelRow', items.hideVideoChannelRow || false);
+            compiledSettings.hideVideoDescription = boolFromV4('hideVideoDescription', items.hideVideoDescription || false);
+            compiledSettings.hideMerchTicketsOffers = boolFromV4('hideMerchTicketsOffers', items.hideMerchTicketsOffers || false);
+            compiledSettings.hideEndscreenVideowall = boolFromV4('hideEndscreenVideowall', items.hideEndscreenVideowall || false);
+            compiledSettings.hideEndscreenCards = boolFromV4('hideEndscreenCards', items.hideEndscreenCards || false);
+            compiledSettings.disableAutoplay = boolFromV4('disableAutoplay', items.disableAutoplay || false);
+            compiledSettings.disableAnnotations = boolFromV4('disableAnnotations', items.disableAnnotations || false);
+            compiledSettings.hideTopHeader = boolFromV4('hideTopHeader', items.hideTopHeader || false);
+            compiledSettings.hideNotificationBell = boolFromV4('hideNotificationBell', items.hideNotificationBell || false);
+            compiledSettings.hideExploreTrending = boolFromV4('hideExploreTrending', items.hideExploreTrending || false);
+            compiledSettings.hideMoreFromYouTube = boolFromV4('hideMoreFromYouTube', items.hideMoreFromYouTube || false);
+            compiledSettings.hideSubscriptions = boolFromV4('hideSubscriptions', items.hideSubscriptions || false);
+            compiledSettings.hideSearchShelves = boolFromV4('hideSearchShelves', items.hideSearchShelves || false);
 
             console.log(`FilterTube Background: Compiled ${targetProfile} settings: ${compiledChannels.length} channels, ${compiledSettings.filterKeywords.length} keywords`);
 
@@ -823,7 +1213,6 @@ async function getCompiledSettings(sender = null, profileType = null) {
         });
     });
 }
-
 
 // Extension installed or updated handler
 browserAPI.runtime.onInstalled.addListener(function (details) {
@@ -1277,167 +1666,53 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
     } else if (action === 'fetchWatchIdentity') {
         handleFetchWatchIdentityMessage(request, sendResponse);
         return true;
+    } else if (action === 'FilterTube_KidsBlockChannel') {
+        const rawVideoId = typeof request?.videoId === 'string' ? request.videoId.trim() : '';
+        const channel = request?.channel && typeof request.channel === 'object' ? request.channel : {};
+        const originalInput = typeof channel?.originalInput === 'string' ? channel.originalInput.trim() : '';
+
+        const input = originalInput
+            || (rawVideoId ? `watch:${rawVideoId}` : '')
+            || (typeof channel?.id === 'string' ? channel.id.trim() : '')
+            || (typeof channel?.name === 'string' ? channel.name.trim() : '');
+
+        handleAddFilteredChannel(
+            input,
+            false,
+            null,
+            null,
+            {
+                displayHandle: channel?.handleDisplay || null,
+                canonicalHandle: channel?.canonicalHandle || null,
+                channelName: channel?.name || null,
+                customUrl: channel?.customUrl || null,
+                source: channel?.source || 'kidsNative'
+            },
+            'kids',
+            rawVideoId
+        ).then(result => {
+            try {
+                if (result && result.success) {
+                    scheduleAutoBackupInBackground('kids_channel_added');
+                }
+            } catch (e) {
+            }
+
+            if (result?.success) {
+                sendResponse({ success: true, channel: result.channelData || null, updated: !!result.updated });
+            } else {
+                sendResponse({ success: false, error: result?.error || 'Failed to block Kids channel' });
+            }
+        }).catch(error => {
+            sendResponse({ success: false, error: error?.message || 'Failed to block Kids channel' });
+        });
+
+        return true;
     } else if (request.action === "injectScripts") {
         // Handle script injection via Chrome scripting API
         console.log("FilterTube Background: Received injectScripts request for:", request.scripts);
         sendResponse({ acknowledged: true });
         return;
-    } else if (action === 'FilterTube_KidsBlockChannel') {
-        const channel = request?.channel && typeof request.channel === 'object' ? request.channel : null;
-        if (!channel) {
-            sendResponse?.({ success: false, error: 'missing_channel' });
-            return;
-        }
-
-        const requestVideoId = (typeof request.videoId === 'string' ? request.videoId.trim() : '');
-
-        handleAddFilteredChannel(
-            channel.id || channel.handle || channel.customUrl || channel.originalInput,
-            false, // filterAll
-            null,  // collaborationWith
-            null,  // collaborationGroupId
-            {
-                displayHandle: channel.handleDisplay,
-                canonicalHandle: channel.canonicalHandle,
-                channelName: channel.name,
-                customUrl: channel.customUrl,
-                source: channel.source || 'kidsNative'
-            },
-            'kids',
-            requestVideoId
-        ).then(result => {
-            if (result.success) {
-                try {
-                    scheduleAutoBackupInBackground('kids_channel_added');
-                } catch (e) {
-                }
-                sendResponse?.({ success: true, channel: result.channelData });
-            } else {
-                sendResponse?.({ success: false, error: result.error });
-            }
-        });
-        return true;
-    } else if (action === 'FilterTube_FirstRunCheck') {
-        browserAPI.storage.local.get(['firstRunRefreshNeeded'], (result) => {
-            sendResponse({
-                needed: Boolean(result?.firstRunRefreshNeeded)
-            });
-        });
-        return true;
-    } else if (action === 'FilterTube_FirstRunComplete') {
-        browserAPI.storage.local.set({ firstRunRefreshNeeded: false }, () => {
-            sendResponse({ ok: true });
-        });
-        return true;
-    } else if (action === 'FilterTube_ReleaseNotesCheck') {
-        // Content script ping: “Do I need to show the banner right now?”
-        browserAPI.storage.local.get(['releaseNotesPayload', 'releaseNotesSeenVersion'], async (result) => {
-            let payload = result?.releaseNotesPayload;
-            const seenVersion = result?.releaseNotesSeenVersion;
-            if (!payload?.version && CURRENT_VERSION) {
-                try {
-                    payload = await buildReleaseNotesPayload(CURRENT_VERSION);
-                    await new Promise(resolve => browserAPI.storage.local.set({ releaseNotesPayload: payload }, resolve));
-                } catch (error) {
-                    console.warn('FilterTube Background: Unable to hydrate release notes payload on demand', error);
-                }
-            }
-            const shouldShow = payload && payload.version && payload.version !== seenVersion;
-            sendResponse({
-                needed: Boolean(shouldShow),
-                payload: shouldShow ? payload : null
-            });
-        });
-        return true;
-    } else if (action === 'FilterTube_ReleaseNotesAck') {
-        // Banner dismissed – remember the version so we don’t prompt repeatedly.
-        const version = typeof request?.version === 'string' ? request.version : null;
-        if (!version) {
-            sendResponse({ ok: false, error: 'missing_version' });
-            return;
-        }
-        browserAPI.storage.local.set({ releaseNotesSeenVersion: version, releaseNotesPayload: null }, () => {
-            sendResponse({ ok: true });
-        });
-        return true;
-    } else if (action === 'FilterTube_OpenWhatsNew') {
-        // CTA from the YouTube banner – open or focus the dashboard’s What’s New view.
-        const requestedUrl = typeof request?.url === 'string' && request.url.trim()
-            ? request.url
-            : WHATS_NEW_PAGE_URL;
-        const finalUrl = requestedUrl || WHATS_NEW_PAGE_URL;
-
-        const focusExistingTab = () => {
-            browserAPI.tabs.query({
-                url: browserAPI.runtime.getURL('html/tab-view.html*')
-            }, (tabs) => {
-                if (browserAPI.runtime.lastError) {
-                    console.warn('FilterTube Background: tabs.query failed', browserAPI.runtime.lastError);
-                }
-                const existing = Array.isArray(tabs) ? tabs[0] : null;
-                if (existing?.id) {
-                    browserAPI.tabs.update(existing.id, { active: true, url: finalUrl }, () => {
-                        if (browserAPI.runtime.lastError) {
-                            console.warn('FilterTube Background: tabs.update failed', browserAPI.runtime.lastError);
-                            browserAPI.tabs.create({ url: finalUrl });
-                        }
-                        sendResponse({ ok: true, reused: true });
-                    });
-                } else {
-                    browserAPI.tabs.create({ url: finalUrl }, () => {
-                        if (browserAPI.runtime.lastError) {
-                            console.warn('FilterTube Background: tabs.create failed', browserAPI.runtime.lastError);
-                            sendResponse({ ok: false, error: browserAPI.runtime.lastError.message });
-                        } else {
-                            sendResponse({ ok: true, reused: false });
-                        }
-                    });
-                }
-            });
-        };
-
-        focusExistingTab();
-        return true;
-    } else if (request.action === "injectScripts") {
-        // Handle script injection via Chrome scripting API
-        console.log("FilterTube Background: Received injectScripts request for:", request.scripts);
-
-        if (!browserAPI.scripting?.executeScript) {
-            console.error("FilterTube Background: scripting API not available");
-            sendResponse({ success: false, error: "Scripting API not available" });
-            return false;
-        }
-
-        if (!sender.tab?.id) {
-            console.error("FilterTube Background: No tab ID available from sender");
-            sendResponse({ success: false, error: "No tab ID available" });
-            return false;
-        }
-
-        // Inject scripts sequentially
-        const injectSequentially = async () => {
-            try {
-                for (const scriptName of request.scripts) {
-                    console.log(`FilterTube Background: Injecting ${scriptName}.js into tab ${sender.tab.id}`);
-
-                    await browserAPI.scripting.executeScript({
-                        target: { tabId: sender.tab.id },
-                        files: [`js/${scriptName}.js`],
-                        world: 'MAIN'
-                    });
-
-                    console.log(`FilterTube Background: Successfully injected ${scriptName}.js`);
-                }
-
-                sendResponse({ success: true });
-            } catch (error) {
-                console.error("FilterTube Background: Script injection failed:", error);
-                sendResponse({ success: false, error: error.message });
-            }
-        };
-
-        injectSequentially();
-        return true; // Indicates that the response is sent asynchronously
     } else if (request.action === "processFetchData") {
         // Handle fetch/XHR data processing from content_bridge
         if (request.url && request.data) {
@@ -1545,7 +1820,13 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
         (async () => {
             try {
                 // 1. Get current channels
-                const data = await new Promise(resolve => browserAPI.storage.local.get(['filterChannels'], resolve));
+                const data = await new Promise(resolve => browserAPI.storage.local.get([
+                    'filterChannels',
+                    'uiKeywords',
+                    'filterKeywords',
+                    'ftProfilesV3',
+                    FT_PROFILES_V4_KEY
+                ], resolve));
                 let channels = data.filterChannels || [];
 
                 // Normalize legacy string arrays to objects if necessary
@@ -1670,7 +1951,45 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
                 // 6. Add to list and save
                 channels.unshift(newEntry); // Add to top
 
-                await new Promise(resolve => browserAPI.storage.local.set({ filterChannels: channels }, resolve));
+                let nextProfilesV4 = null;
+                try {
+                    const existingV4 = data?.[FT_PROFILES_V4_KEY];
+                    const profilesV4 = isValidProfilesV4(existingV4)
+                        ? existingV4
+                        : buildProfilesV4FromLegacyState(data, {});
+
+                    const activeId = typeof profilesV4?.activeProfileId === 'string' ? profilesV4.activeProfileId : DEFAULT_PROFILE_ID;
+                    const profiles = safeObject(profilesV4?.profiles);
+                    const activeProfile = safeObject(profiles?.[activeId]);
+                    const main = safeObject(activeProfile.main);
+
+                    profiles[activeId] = {
+                        ...activeProfile,
+                        name: typeof activeProfile.name === 'string' ? activeProfile.name : 'Default',
+                        settings: safeObject(activeProfile.settings),
+                        main: {
+                            ...main,
+                            channels: channels
+                        },
+                        kids: {
+                            ...safeObject(activeProfile.kids),
+                            mode: 'blocklist'
+                        }
+                    };
+
+                    nextProfilesV4 = {
+                        ...profilesV4,
+                        schemaVersion: 4,
+                        profiles
+                    };
+                } catch (e) {
+                }
+
+                const writePayload = { filterChannels: channels };
+                if (nextProfilesV4) {
+                    writePayload[FT_PROFILES_V4_KEY] = nextProfilesV4;
+                }
+                await new Promise(resolve => browserAPI.storage.local.set(writePayload, resolve));
 
                 console.log("FilterTube Background: Persistent add success", newEntry);
                 try {
@@ -1686,7 +2005,7 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
         })();
 
         return true; // Keep message channel open for async response
-    } else if (request.action === 'FilterTube_ApplySettings' && request.settings) {
+    } else if (request.action === "FilterTube_ApplySettings" && request.settings) {
         // Forward compiled settings to all relevant tabs for immediate application.
         // request.profile should be passed from the UI (popup/tab-view) to avoid cross-domain leaks.
         const targetProfile = request.profile === 'kids' ? 'kids' : 'main';
@@ -1792,7 +2111,8 @@ browserAPI.storage.onChanged.addListener((changes, area) => {
             'hideSponsoredCards',
             'channelMap',
             'videoChannelMap',
-            'ftProfilesV3'
+            'ftProfilesV3',
+            FT_PROFILES_V4_KEY
         ];
         let settingsChanged = false;
         for (const key of relevantKeys) {
@@ -2607,17 +2927,45 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
 
         // Get existing channels from the correct profile
         const isKids = profile === 'kids';
-        const storageKeys = isKids ? ['ftProfilesV3'] : ['filterChannels'];
-        const storage = await storageGet(storageKeys);
+        const storage = await storageGet([
+            FT_PROFILES_V4_KEY,
+            'filterChannels',
+            'uiKeywords',
+            'filterKeywords',
+            'ftProfilesV3'
+        ]);
+
+        let profilesV4 = storage?.[FT_PROFILES_V4_KEY];
+        let profilesV3 = storage.ftProfilesV3 || {};
+        let activeProfileId = DEFAULT_PROFILE_ID;
+        let activeProfile = {};
+        let activeMain = {};
+        let activeKids = {};
+
+        if (!isValidProfilesV4(profilesV4)) {
+            try {
+                profilesV4 = buildProfilesV4FromLegacyState(storage, {});
+            } catch (e) {
+                profilesV4 = null;
+            }
+        }
+
+        if (profilesV4 && isValidProfilesV4(profilesV4)) {
+            activeProfileId = typeof profilesV4.activeProfileId === 'string' ? profilesV4.activeProfileId : DEFAULT_PROFILE_ID;
+            activeProfile = safeObject(safeObject(profilesV4.profiles)[activeProfileId]);
+            activeMain = safeObject(activeProfile.main);
+            activeKids = safeObject(activeProfile.kids);
+        }
 
         let channels = [];
-        let profilesV3 = null;
         if (isKids) {
-            profilesV3 = storage.ftProfilesV3 || {};
-            const kidsProfile = profilesV3.kids || {};
-            channels = Array.isArray(kidsProfile.blockedChannels) ? kidsProfile.blockedChannels : [];
+            const kidsFromV4 = Array.isArray(activeKids.blockedChannels) ? activeKids.blockedChannels : null;
+            const kidsProfile = safeObject(profilesV3.kids);
+            const kidsFromV3 = Array.isArray(kidsProfile.blockedChannels) ? kidsProfile.blockedChannels : [];
+            channels = kidsFromV4 || kidsFromV3;
         } else {
-            channels = Array.isArray(storage.filterChannels) ? storage.filterChannels : [];
+            const mainFromV4 = Array.isArray(activeMain.channels) ? activeMain.channels : null;
+            channels = mainFromV4 || (Array.isArray(storage.filterChannels) ? storage.filterChannels : []);
         }
 
         // Build allCollaborators array from collaborationWith for popup grouping
@@ -2739,12 +3087,45 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
         }
 
         // Save back to storage
+        const storageWritePayload = {};
+
+        if (profilesV4 && isValidProfilesV4(profilesV4)) {
+            const profiles = safeObject(profilesV4.profiles);
+            const baseProfile = safeObject(profiles[activeProfileId]);
+            const nextMain = safeObject(baseProfile.main);
+            const nextKids = safeObject(baseProfile.kids);
+
+            profiles[activeProfileId] = {
+                ...baseProfile,
+                name: typeof baseProfile.name === 'string' ? baseProfile.name : 'Default',
+                settings: safeObject(baseProfile.settings),
+                main: {
+                    ...nextMain,
+                    channels: isKids ? safeArray(nextMain.channels) : channels
+                },
+                kids: {
+                    ...nextKids,
+                    mode: 'blocklist',
+                    strictMode: nextKids.strictMode !== false,
+                    blockedChannels: isKids ? channels : safeArray(nextKids.blockedChannels),
+                    blockedKeywords: safeArray(nextKids.blockedKeywords)
+                }
+            };
+
+            storageWritePayload[FT_PROFILES_V4_KEY] = {
+                ...profilesV4,
+                schemaVersion: 4,
+                profiles
+            };
+        }
+
         if (isKids) {
             profilesV3.kids = {
                 ...(profilesV3.kids || {}),
-                blockedChannels: channels
+                blockedChannels: channels,
+                mode: 'blocklist'
             };
-            await browserAPI.storage.local.set({ ftProfilesV3: profilesV3 });
+            storageWritePayload.ftProfilesV3 = profilesV3;
 
             // Broadcast refresh for Kids
             try {
@@ -2755,8 +3136,10 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                 });
             } catch (e) { }
         } else {
-            await browserAPI.storage.local.set({ filterChannels: channels });
+            storageWritePayload.filterChannels = channels;
         }
+
+        await browserAPI.storage.local.set(storageWritePayload);
 
         return {
             success: true,
@@ -2780,7 +3163,13 @@ async function handleToggleChannelFilterAll(channelId, value) {
     try {
         // Get existing channels
         const storage = await new Promise(resolve => {
-            browserAPI.storage.local.get(['filterChannels'], resolve);
+            browserAPI.storage.local.get([
+                'filterChannels',
+                'uiKeywords',
+                'filterKeywords',
+                'ftProfilesV3',
+                FT_PROFILES_V4_KEY
+            ], resolve);
         });
 
         const channels = Array.isArray(storage.filterChannels) ? storage.filterChannels : [];
@@ -2797,9 +3186,47 @@ async function handleToggleChannelFilterAll(channelId, value) {
         // Toggle filterAll
         channels[channelIndex].filterAll = value;
 
+        let nextProfilesV4 = null;
+        try {
+            const existingV4 = storage?.[FT_PROFILES_V4_KEY];
+            const profilesV4 = isValidProfilesV4(existingV4)
+                ? existingV4
+                : buildProfilesV4FromLegacyState(storage, {});
+
+            const activeId = typeof profilesV4?.activeProfileId === 'string' ? profilesV4.activeProfileId : DEFAULT_PROFILE_ID;
+            const profiles = safeObject(profilesV4?.profiles);
+            const activeProfile = safeObject(profiles?.[activeId]);
+            const main = safeObject(activeProfile.main);
+
+            profiles[activeId] = {
+                ...activeProfile,
+                name: typeof activeProfile.name === 'string' ? activeProfile.name : 'Default',
+                settings: safeObject(activeProfile.settings),
+                main: {
+                    ...main,
+                    channels: channels
+                },
+                kids: {
+                    ...safeObject(activeProfile.kids),
+                    mode: 'blocklist'
+                }
+            };
+
+            nextProfilesV4 = {
+                ...profilesV4,
+                schemaVersion: 4,
+                profiles
+            };
+        } catch (e) {
+        }
+
         // Save to storage
         await new Promise(resolve => {
-            browserAPI.storage.local.set({ filterChannels: channels }, resolve);
+            const payload = { filterChannels: channels };
+            if (nextProfilesV4) {
+                payload[FT_PROFILES_V4_KEY] = nextProfilesV4;
+            }
+            browserAPI.storage.local.set(payload, resolve);
         });
 
         console.log('FilterTube Background: Toggled filterAll for channel:', channelId, 'to:', value);

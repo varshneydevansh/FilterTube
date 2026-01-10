@@ -11,6 +11,9 @@
 
     const THEME_KEY = 'ftThemePreference';
     const AUTO_BACKUP_KEY = 'ftAutoBackupEnabled';
+    const FT_PROFILES_V3_KEY = 'ftProfilesV3';
+    const FT_PROFILES_V4_KEY = 'ftProfilesV4';
+    const DEFAULT_PROFILE_ID = 'default';
     const SETTINGS_KEYS = [
         'enabled',
         'filterKeywords',
@@ -49,6 +52,90 @@
     ];
 
     const SETTINGS_CHANGE_KEYS = new Set([...SETTINGS_KEYS, THEME_KEY, AUTO_BACKUP_KEY]);
+
+    function safeObject(value) {
+        return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+    }
+
+    function safeArray(value) {
+        return Array.isArray(value) ? value : [];
+    }
+
+    function isValidProfilesV4(value) {
+        return !!(
+            value
+            && typeof value === 'object'
+            && !Array.isArray(value)
+            && typeof value.activeProfileId === 'string'
+            && value.activeProfileId.trim()
+            && value.profiles
+            && typeof value.profiles === 'object'
+            && !Array.isArray(value.profiles)
+        );
+    }
+
+    function buildProfilesV4FromLegacyState(storage, mainChannels, mainKeywords) {
+        const profilesV3 = safeObject(storage?.[FT_PROFILES_V3_KEY]);
+        const kidsV3 = safeObject(profilesV3.kids);
+        const mainV3 = safeObject(profilesV3.main);
+
+        const enabled = storage?.enabled !== false;
+        const hideComments = !!storage?.hideAllComments;
+
+        return {
+            schemaVersion: 4,
+            activeProfileId: DEFAULT_PROFILE_ID,
+            profiles: {
+                [DEFAULT_PROFILE_ID]: {
+                    type: 'account',
+                    parentProfileId: null,
+                    name: 'Default',
+                    settings: {
+                        syncKidsToMain: !!mainV3.applyKidsRulesOnMain,
+                        enabled,
+                        hideShorts: !!storage?.hideAllShorts,
+                        hideComments,
+                        filterComments: hideComments ? false : !!storage?.filterComments,
+                        hideHomeFeed: !!storage?.hideHomeFeed,
+                        hideSponsoredCards: !!storage?.hideSponsoredCards,
+                        hideWatchPlaylistPanel: !!storage?.hideWatchPlaylistPanel,
+                        hidePlaylistCards: !!storage?.hidePlaylistCards,
+                        hideMembersOnly: !!storage?.hideMembersOnly,
+                        hideMixPlaylists: !!storage?.hideMixPlaylists,
+                        hideVideoSidebar: !!storage?.hideVideoSidebar,
+                        hideRecommended: !!storage?.hideRecommended,
+                        hideLiveChat: !!storage?.hideLiveChat,
+                        hideVideoInfo: !!storage?.hideVideoInfo,
+                        hideVideoButtonsBar: !!storage?.hideVideoButtonsBar,
+                        hideAskButton: !!storage?.hideAskButton,
+                        hideVideoChannelRow: !!storage?.hideVideoChannelRow,
+                        hideVideoDescription: !!storage?.hideVideoDescription,
+                        hideMerchTicketsOffers: !!storage?.hideMerchTicketsOffers,
+                        hideEndscreenVideowall: !!storage?.hideEndscreenVideowall,
+                        hideEndscreenCards: !!storage?.hideEndscreenCards,
+                        disableAutoplay: !!storage?.disableAutoplay,
+                        disableAnnotations: !!storage?.disableAnnotations,
+                        hideTopHeader: !!storage?.hideTopHeader,
+                        hideNotificationBell: !!storage?.hideNotificationBell,
+                        hideExploreTrending: !!storage?.hideExploreTrending,
+                        hideMoreFromYouTube: !!storage?.hideMoreFromYouTube,
+                        hideSubscriptions: !!storage?.hideSubscriptions,
+                        hideSearchShelves: !!storage?.hideSearchShelves
+                    },
+                    main: {
+                        channels: safeArray(mainChannels),
+                        keywords: safeArray(mainKeywords)
+                    },
+                    kids: {
+                        mode: 'blocklist',
+                        strictMode: kidsV3.strictMode !== false,
+                        blockedChannels: safeArray(kidsV3.blockedChannels),
+                        blockedKeywords: safeArray(kidsV3.blockedKeywords)
+                    }
+                }
+            }
+        };
+    }
 
     function sanitizeKeywordEntry(entry, overrides = {}) {
         if (!entry) return null;
@@ -403,10 +490,24 @@
 
     function loadSettings() {
         return new Promise(resolve => {
-            STORAGE_NAMESPACE?.get([...SETTINGS_KEYS, THEME_KEY, AUTO_BACKUP_KEY], result => {
+            STORAGE_NAMESPACE?.get([...SETTINGS_KEYS, THEME_KEY, AUTO_BACKUP_KEY, FT_PROFILES_V3_KEY, FT_PROFILES_V4_KEY], result => {
+                const profilesV4 = result?.[FT_PROFILES_V4_KEY];
+                const hasProfilesV4 = isValidProfilesV4(profilesV4);
+
+                let mainRawKeywords = result.uiKeywords;
+                let mainRawChannels = result.filterChannels;
+
+                if (hasProfilesV4) {
+                    const activeId = profilesV4.activeProfileId;
+                    const activeProfile = safeObject(safeObject(profilesV4.profiles)[activeId]);
+                    const main = safeObject(activeProfile.main);
+                    mainRawKeywords = Array.isArray(main.keywords) ? main.keywords : mainRawKeywords;
+                    mainRawChannels = Array.isArray(main.channels) ? main.channels : mainRawChannels;
+                }
+
                 // Load all keywords (user + channel-derived) from storage
-                const allKeywords = normalizeKeywords(result.uiKeywords, result.filterKeywords);
-                const channels = normalizeChannels(result.filterChannels);
+                const allKeywords = normalizeKeywords(mainRawKeywords, result.filterKeywords);
+                const channels = normalizeChannels(mainRawChannels);
 
                 // Sync keywords with current channel filterAll state (preserves order)
                 const keywords = syncFilterAllKeywords(allKeywords, channels);
@@ -414,44 +515,135 @@
                 // Extract just user keywords for compatibility
                 const userKeywords = extractUserKeywords(keywords);
 
-                const hideAllComments = !!result.hideAllComments;
-                const filterComments = !hideAllComments && !!result.filterComments;
+                const activeId = hasProfilesV4 ? profilesV4.activeProfileId : '';
+                const activeProfile = hasProfilesV4 ? safeObject(safeObject(profilesV4.profiles)[activeId]) : {};
+                const profileSettings = safeObject(activeProfile.settings);
+
+                const readBool = (key, fallback) => {
+                    if (Object.prototype.hasOwnProperty.call(profileSettings, key)) {
+                        return !!profileSettings[key];
+                    }
+                    return !!fallback;
+                };
+
+                const enabled = Object.prototype.hasOwnProperty.call(profileSettings, 'enabled')
+                    ? profileSettings.enabled !== false
+                    : (result.enabled !== false);
+
+                const hideComments = readBool('hideComments', !!result.hideAllComments);
+                const filterComments = hideComments ? false : readBool('filterComments', !!result.filterComments);
                 const theme = result[THEME_KEY] === 'dark' ? 'dark' : 'light';
-                const autoBackupEnabled = result?.[AUTO_BACKUP_KEY] !== false;
+                const autoBackupEnabled = result?.[AUTO_BACKUP_KEY] === true;
+
+                const effectiveSettings = {
+                    enabled,
+                    hideShorts: readBool('hideShorts', !!result.hideAllShorts),
+                    hideComments,
+                    filterComments,
+                    hideHomeFeed: readBool('hideHomeFeed', !!result.hideHomeFeed),
+                    hideSponsoredCards: readBool('hideSponsoredCards', !!result.hideSponsoredCards),
+                    hideWatchPlaylistPanel: readBool('hideWatchPlaylistPanel', !!result.hideWatchPlaylistPanel),
+                    hidePlaylistCards: readBool('hidePlaylistCards', !!result.hidePlaylistCards),
+                    hideMembersOnly: readBool('hideMembersOnly', !!result.hideMembersOnly),
+                    hideMixPlaylists: readBool('hideMixPlaylists', !!result.hideMixPlaylists),
+                    hideVideoSidebar: readBool('hideVideoSidebar', !!result.hideVideoSidebar),
+                    hideRecommended: readBool('hideRecommended', !!result.hideRecommended),
+                    hideLiveChat: readBool('hideLiveChat', !!result.hideLiveChat),
+                    hideVideoInfo: readBool('hideVideoInfo', !!result.hideVideoInfo),
+                    hideVideoButtonsBar: readBool('hideVideoButtonsBar', !!result.hideVideoButtonsBar),
+                    hideAskButton: readBool('hideAskButton', !!result.hideAskButton),
+                    hideVideoChannelRow: readBool('hideVideoChannelRow', !!result.hideVideoChannelRow),
+                    hideVideoDescription: readBool('hideVideoDescription', !!result.hideVideoDescription),
+                    hideMerchTicketsOffers: readBool('hideMerchTicketsOffers', !!result.hideMerchTicketsOffers),
+                    hideEndscreenVideowall: readBool('hideEndscreenVideowall', !!result.hideEndscreenVideowall),
+                    hideEndscreenCards: readBool('hideEndscreenCards', !!result.hideEndscreenCards),
+                    disableAutoplay: readBool('disableAutoplay', !!result.disableAutoplay),
+                    disableAnnotations: readBool('disableAnnotations', !!result.disableAnnotations),
+                    hideTopHeader: readBool('hideTopHeader', !!result.hideTopHeader),
+                    hideNotificationBell: readBool('hideNotificationBell', !!result.hideNotificationBell),
+                    hideExploreTrending: readBool('hideExploreTrending', !!result.hideExploreTrending),
+                    hideMoreFromYouTube: readBool('hideMoreFromYouTube', !!result.hideMoreFromYouTube),
+                    hideSubscriptions: readBool('hideSubscriptions', !!result.hideSubscriptions),
+                    hideSearchShelves: readBool('hideSearchShelves', !!result.hideSearchShelves)
+                };
+
+                if (!hasProfilesV4) {
+                    try {
+                        const nextProfilesV4 = buildProfilesV4FromLegacyState(result, channels, keywords);
+                        STORAGE_NAMESPACE?.set({ [FT_PROFILES_V4_KEY]: nextProfilesV4 }, () => {
+                            // ignore
+                        });
+                    } catch (e) {
+                    }
+                } else {
+                    try {
+                        if (activeId && activeProfile && typeof activeProfile === 'object') {
+                            const missing = {};
+                            let needsWrite = false;
+                            for (const [key, value] of Object.entries(effectiveSettings)) {
+                                if (!Object.prototype.hasOwnProperty.call(profileSettings, key)) {
+                                    missing[key] = value;
+                                    needsWrite = true;
+                                }
+                            }
+
+                            if (needsWrite) {
+                                const profiles = safeObject(profilesV4.profiles);
+                                profiles[activeId] = {
+                                    ...activeProfile,
+                                    settings: {
+                                        ...profileSettings,
+                                        ...missing
+                                    }
+                                };
+                                STORAGE_NAMESPACE?.set({
+                                    [FT_PROFILES_V4_KEY]: {
+                                        ...profilesV4,
+                                        schemaVersion: 4,
+                                        profiles
+                                    }
+                                }, () => {
+                                    // ignore
+                                });
+                            }
+                        }
+                    } catch (e) {
+                    }
+                }
 
                 resolve({
-                    enabled: result.enabled !== false,
+                    enabled,
                     keywords,
                     userKeywords,
                     channels,
-                    hideShorts: !!result.hideAllShorts,
-                    hideComments: hideAllComments,
+                    hideShorts: effectiveSettings.hideShorts,
+                    hideComments,
                     filterComments,
-                    hideHomeFeed: !!result.hideHomeFeed,
-                    hideSponsoredCards: !!result.hideSponsoredCards,
-                    hideWatchPlaylistPanel: !!result.hideWatchPlaylistPanel,
-                    hidePlaylistCards: !!result.hidePlaylistCards,
-                    hideMembersOnly: !!result.hideMembersOnly,
-                    hideMixPlaylists: !!result.hideMixPlaylists,
-                    hideVideoSidebar: !!result.hideVideoSidebar,
-                    hideRecommended: !!result.hideRecommended,
-                    hideLiveChat: !!result.hideLiveChat,
-                    hideVideoInfo: !!result.hideVideoInfo,
-                    hideVideoButtonsBar: !!result.hideVideoButtonsBar,
-                    hideAskButton: !!result.hideAskButton,
-                    hideVideoChannelRow: !!result.hideVideoChannelRow,
-                    hideVideoDescription: !!result.hideVideoDescription,
-                    hideMerchTicketsOffers: !!result.hideMerchTicketsOffers,
-                    hideEndscreenVideowall: !!result.hideEndscreenVideowall,
-                    hideEndscreenCards: !!result.hideEndscreenCards,
-                    disableAutoplay: !!result.disableAutoplay,
-                    disableAnnotations: !!result.disableAnnotations,
-                    hideTopHeader: !!result.hideTopHeader,
-                    hideNotificationBell: !!result.hideNotificationBell,
-                    hideExploreTrending: !!result.hideExploreTrending,
-                    hideMoreFromYouTube: !!result.hideMoreFromYouTube,
-                    hideSubscriptions: !!result.hideSubscriptions,
-                    hideSearchShelves: !!result.hideSearchShelves,
+                    hideHomeFeed: effectiveSettings.hideHomeFeed,
+                    hideSponsoredCards: effectiveSettings.hideSponsoredCards,
+                    hideWatchPlaylistPanel: effectiveSettings.hideWatchPlaylistPanel,
+                    hidePlaylistCards: effectiveSettings.hidePlaylistCards,
+                    hideMembersOnly: effectiveSettings.hideMembersOnly,
+                    hideMixPlaylists: effectiveSettings.hideMixPlaylists,
+                    hideVideoSidebar: effectiveSettings.hideVideoSidebar,
+                    hideRecommended: effectiveSettings.hideRecommended,
+                    hideLiveChat: effectiveSettings.hideLiveChat,
+                    hideVideoInfo: effectiveSettings.hideVideoInfo,
+                    hideVideoButtonsBar: effectiveSettings.hideVideoButtonsBar,
+                    hideAskButton: effectiveSettings.hideAskButton,
+                    hideVideoChannelRow: effectiveSettings.hideVideoChannelRow,
+                    hideVideoDescription: effectiveSettings.hideVideoDescription,
+                    hideMerchTicketsOffers: effectiveSettings.hideMerchTicketsOffers,
+                    hideEndscreenVideowall: effectiveSettings.hideEndscreenVideowall,
+                    hideEndscreenCards: effectiveSettings.hideEndscreenCards,
+                    disableAutoplay: effectiveSettings.disableAutoplay,
+                    disableAnnotations: effectiveSettings.disableAnnotations,
+                    hideTopHeader: effectiveSettings.hideTopHeader,
+                    hideNotificationBell: effectiveSettings.hideNotificationBell,
+                    hideExploreTrending: effectiveSettings.hideExploreTrending,
+                    hideMoreFromYouTube: effectiveSettings.hideMoreFromYouTube,
+                    hideSubscriptions: effectiveSettings.hideSubscriptions,
+                    hideSearchShelves: effectiveSettings.hideSearchShelves,
                     stats: result.stats || { hiddenCount: 0, savedMinutes: 0 },
                     channelMap: result.channelMap || {},
                     theme,
@@ -565,13 +757,91 @@
             hideMoreFromYouTube: compiledSettings.hideMoreFromYouTube,
             hideSubscriptions: compiledSettings.hideSubscriptions,
             hideSearchShelves: compiledSettings.hideSearchShelves,
-            [AUTO_BACKUP_KEY]: autoBackupEnabled !== false
+            [AUTO_BACKUP_KEY]: autoBackupEnabled === true
         };
 
         return new Promise(resolve => {
-            STORAGE_NAMESPACE?.set(payload, () => {
-                const error = chrome.runtime?.lastError || null;
-                resolve({ compiledSettings, error });
+            STORAGE_NAMESPACE?.get([FT_PROFILES_V4_KEY, FT_PROFILES_V3_KEY], (existing) => {
+                let nextProfilesV4 = null;
+                try {
+                    const existingV4 = existing?.[FT_PROFILES_V4_KEY];
+                    if (isValidProfilesV4(existingV4)) {
+                        const profiles = safeObject(existingV4.profiles);
+                        const activeId = existingV4.activeProfileId;
+                        const activeProfile = safeObject(profiles[activeId]);
+                        const existingKids = safeObject(activeProfile.kids);
+
+                        const existingSettings = safeObject(activeProfile.settings);
+                        const nextSettings = {
+                            ...existingSettings,
+                            enabled: compiledSettings.enabled,
+                            hideShorts: compiledSettings.hideAllShorts,
+                            hideComments: compiledSettings.hideAllComments,
+                            filterComments: compiledSettings.filterComments,
+                            hideHomeFeed: compiledSettings.hideHomeFeed,
+                            hideSponsoredCards: compiledSettings.hideSponsoredCards,
+                            hideWatchPlaylistPanel: compiledSettings.hideWatchPlaylistPanel,
+                            hidePlaylistCards: compiledSettings.hidePlaylistCards,
+                            hideMembersOnly: compiledSettings.hideMembersOnly,
+                            hideMixPlaylists: compiledSettings.hideMixPlaylists,
+                            hideVideoSidebar: compiledSettings.hideVideoSidebar,
+                            hideRecommended: compiledSettings.hideRecommended,
+                            hideLiveChat: compiledSettings.hideLiveChat,
+                            hideVideoInfo: compiledSettings.hideVideoInfo,
+                            hideVideoButtonsBar: compiledSettings.hideVideoButtonsBar,
+                            hideAskButton: compiledSettings.hideAskButton,
+                            hideVideoChannelRow: compiledSettings.hideVideoChannelRow,
+                            hideVideoDescription: compiledSettings.hideVideoDescription,
+                            hideMerchTicketsOffers: compiledSettings.hideMerchTicketsOffers,
+                            hideEndscreenVideowall: compiledSettings.hideEndscreenVideowall,
+                            hideEndscreenCards: compiledSettings.hideEndscreenCards,
+                            disableAutoplay: compiledSettings.disableAutoplay,
+                            disableAnnotations: compiledSettings.disableAnnotations,
+                            hideTopHeader: compiledSettings.hideTopHeader,
+                            hideNotificationBell: compiledSettings.hideNotificationBell,
+                            hideExploreTrending: compiledSettings.hideExploreTrending,
+                            hideMoreFromYouTube: compiledSettings.hideMoreFromYouTube,
+                            hideSubscriptions: compiledSettings.hideSubscriptions,
+                            hideSearchShelves: compiledSettings.hideSearchShelves
+                        };
+
+                        profiles[activeId] = {
+                            ...activeProfile,
+                            name: typeof activeProfile.name === 'string' ? activeProfile.name : 'Default',
+                            settings: nextSettings,
+                            main: {
+                                ...safeObject(activeProfile.main),
+                                channels: sanitizedChannels,
+                                keywords: sanitizedKeywords
+                            },
+                            kids: {
+                                ...existingKids,
+                                mode: 'blocklist',
+                                strictMode: existingKids.strictMode !== false,
+                                blockedChannels: safeArray(existingKids.blockedChannels),
+                                blockedKeywords: safeArray(existingKids.blockedKeywords)
+                            }
+                        };
+
+                        nextProfilesV4 = {
+                            ...existingV4,
+                            schemaVersion: 4,
+                            profiles
+                        };
+                    } else {
+                        nextProfilesV4 = buildProfilesV4FromLegacyState(existing, sanitizedChannels, sanitizedKeywords);
+                    }
+                } catch (e) {
+                }
+
+                if (nextProfilesV4) {
+                    payload[FT_PROFILES_V4_KEY] = nextProfilesV4;
+                }
+
+                STORAGE_NAMESPACE?.set(payload, () => {
+                    const error = chrome.runtime?.lastError || null;
+                    resolve({ compiledSettings, error });
+                });
             });
         });
     }

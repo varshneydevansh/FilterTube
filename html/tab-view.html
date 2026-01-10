@@ -140,6 +140,7 @@
                 </button>
                 <h1 id="pageTitle">Dashboard</h1>
                 <div class="actions">
+                    <select id="ftProfileSelector" class="select-input" title="Active profile"></select>
                     <button id="themeToggle" class="icon-btn" title="Toggle Theme">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -285,6 +286,11 @@
                                         </div>
                                         <div class="import-export-actions">
                                             <button id="ftExportV3Btn" class="btn-primary" type="button">Download JSON</button>
+                                            <button id="ftExportV3EncryptedBtn" class="btn-secondary" type="button" title="Download an encrypted backup JSON (requires a password/PIN)">Download Encrypted</button>
+                                            <label class="import-export-hint" style="display:flex;align-items:center;gap:8px;" title="When enabled, only the currently active profile is included in the export.">
+                                                <input id="ftExportActiveOnly" type="checkbox" />
+                                                Export active profile only
+                                            </label>
                                         </div>
                                     </div>
                                 </div>
@@ -316,6 +322,52 @@
 
                     <div class="card">
                         <div class="card-header">
+                            <h3>Profiles</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="import-export-hint" style="margin-bottom:10px;">
+                                Profiles are independent. The <code>Default</code> profile acts as admin for full backups and managing other profiles.
+                            </div>
+                            <div id="ftProfilesManager" class="help-list"></div>
+                            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
+                                <button id="ftCreateAccountBtn" class="btn-secondary" type="button">Create Account</button>
+                                <button id="ftCreateChildBtn" class="btn-secondary" type="button">Create Child</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Security</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="import-export-hint" style="margin-bottom:10px;">
+                                Master PIN locks the Default profile and controls admin actions like full backups and managing other profiles.
+                            </div>
+                            <div class="toggle-row" title="When enabled, the Default (Master) profile can create new independent accounts.">
+                                <div class="toggle-info">
+                                    <div class="toggle-title">Allow independent account creation</div>
+                                </div>
+                                <label class="switch">
+                                    <input id="ftAllowAccountCreation" type="checkbox" />
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                            <div class="toggle-row" title="Limits how many independent accounts can exist (excluding Default).">
+                                <div class="toggle-info">
+                                    <div class="toggle-title">Max independent accounts</div>
+                                </div>
+                                <input id="ftMaxAccounts" class="text-input" type="number" min="0" step="1" style="max-width:120px;" />
+                            </div>
+                            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                                <button id="ftSetMasterPinBtn" class="btn-secondary" type="button">Set / Change Master PIN</button>
+                                <button id="ftClearMasterPinBtn" class="btn-secondary" type="button">Remove Master PIN</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
                             <h3>Backups</h3>
                         </div>
                         <div class="card-body">
@@ -329,7 +381,27 @@
                                 </label>
                             </div>
                             <div class="import-export-hint" style="margin-top:10px;">
-                                Auto backups are saved to <code>Downloads/FilterTube Backup/</code>.
+                                Auto backups are saved to <code>"Downloads/FilterTube Backup/"</code>.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>YT Kids → YT Main Sync</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="toggle-row" title="When enabled, channels and keywords blocked on YouTube Kids are also applied on main YouTube for this profile.">
+                                <div class="toggle-info">
+                                    <div class="toggle-title">Apply YT Kids blocklist on YouTube</div>
+                                </div>
+                                <label class="switch">
+                                    <input id="setting_syncKidsToMain" type="checkbox" data-ft-setting="syncKidsToMain" />
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                            <div class="import-export-hint" style="margin-top:10px;">
+                                Synced items show in your main list with a <code>"From Kids"</code> badge.
                             </div>
                         </div>
                     </div>
@@ -366,8 +438,9 @@
                                             <span class="channel-derived-badge">From Channel</span>
                                             <span class="channel-derived-badge badge-variant-comments">From Comments</span>
                                             <span class="collaboration-badge">Collaboration</span>
+                                            <span class="channel-derived-badge badge-variant-kids">From Kids</span>
                                         </div>
-                                        <div style="margin-top:6px;">Badges match row tinting: green for channel-derived, brown for comment-sourced, yellow for collaborations.</div>
+                                        <div style="margin-top:6px;">Badges match row tinting: green for channel-derived, brown for comment-sourced, yellow for collaborations, Pink for YT Kids Derived.</div>
                                     </div>
                                 </div>
                                 <div class="help-item">
@@ -650,6 +723,7 @@
  
  
     <script src="../js/settings_shared.js"></script>
+    <script src="../js/security_manager.js"></script>
     <script src="../js/io_manager.js"></script>
     <script src="../js/content_controls_catalog.js"></script>
     <script src="../js/ui_components.js"></script>

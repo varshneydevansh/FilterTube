@@ -17,15 +17,15 @@
     <div class="app-container">
         <!-- Header -->
         <header class="app-header">
-            <div class="brand">
+            <div id="toggleEnabledBrandBtn" class="brand" role="button" tabindex="0" aria-pressed="true" title="Toggle Filtering">
                 <img src="../icons/icon-48.png" alt="FilterTube" class="logo-icon">
                 <h1 class="app-title">Filter<span class="title-accent">Tube</span></h1>
             </div>
             <div class="header-actions">
-                <button id="toggleEnabledBtn" class="status-card" type="button" aria-pressed="true">
-                    <div class="status-indicator active"></div>
-                    <span class="status-text">Filtering Active</span>
-                </button>
+                <div id="ftProfileMenuPopup" class="ft-profile-menu">
+                    <button id="ftProfileBadgeBtnPopup" class="ft-profile-badge" type="button" aria-haspopup="listbox" aria-expanded="false" title="Active profile"></button>
+                    <div id="ftProfileDropdownPopup" class="ft-profile-dropdown" role="listbox" hidden></div>
+                </div>
                 <button id="openInTabBtn" class="icon-button" title="Open Full Settings" aria-label="Open Full Settings">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
@@ -53,6 +53,8 @@
     <script src="../js/settings_shared.js"></script>
     <script src="../js/content_controls_catalog.js"></script>
     <script src="../js/ui_components.js"></script>
+    <script src="../js/security_manager.js"></script>
+    <script src="../js/io_manager.js"></script>
     <script src="../js/state_manager.js"></script>
     <script src="../js/render_engine.js"></script>
     <script src="../js/popup.js"></script>
