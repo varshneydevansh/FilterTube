@@ -1376,10 +1376,8 @@ const StateManager = (() => {
 
         await saveSettings();
         notifyListeners('settingUpdated', { key, value: state[key] });
-        
-        // Trigger auto-backup for major settings changes
-        const majorSettings = ['enabled', 'hideShorts', 'hideComments', 'filterComments', 'hideHomeFeed'];
-        if (majorSettings.includes(key) && key !== 'autoBackupEnabled') {
+
+        if (key !== 'autoBackupEnabled' || state.autoBackupEnabled === true) {
             scheduleAutoBackup('setting_updated');
         }
     }

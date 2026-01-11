@@ -25,6 +25,12 @@ The outcome is a versioned schema that can evolve without forcing painful rewrit
 
 The system already stores and depends on the following core concepts:
 
+- **Profiles V4 (multi-profile + PIN)**  
+  - `ftProfilesV4 = { schemaVersion: 4, activeProfileId, profiles: { [id]: { type, parentProfileId, name, settings, main, kids, security } } }`
+  - `security.masterPinVerifier` (Default) / `security.profilePinVerifier` (others) = PBKDF2-SHA256 150k + salt + iterations + keyLen.
+  - Unlock state is **UI-local**; background holds a **session-only PIN cache** after verifying PIN via `FilterTube_SessionPinAuth`.
+  - Import/restore is **gated to Default (Master)** (and only if unlocked when PIN-protected).
+
 - **Keywords**
   - UI-friendly list: `uiKeywords` (objects with `word`, `exact`, `comments`, timestamps)
   - Compiled list: `filterKeywords` + `filterKeywordsComments` (regex `{pattern, flags}`)
@@ -48,7 +54,7 @@ The system already stores and depends on the following core concepts:
   - sanitizing compiled regex entries
   - returning a “compiled settings” object to content scripts / main world.
 
-**Implication:** Import/Export must integrate with `StateManager` + `FilterTubeSettings.saveSettings()` so that the compilation path remains the single path.
+**Implication:** Import/Export must integrate with `StateManager` + `FilterTubeSettings.saveSettings()` so the compilation path remains the single path.
 
 ### 1.3 The “worlds” problem (P2P sync must not fight it)
 
@@ -63,6 +69,7 @@ FilterTube runs across multiple execution contexts:
 
 - Phase 1 Import/Export lives in **Tab View Settings** (UI context).
 - Phase 2 Sync orchestration lives in **background** (so it continues even if UI closes).
+- PIN verification for encryption happens in **background**; UIs must send PIN for the active profile and background caches it temporarily.
 
 ---
 
@@ -189,6 +196,65 @@ This is the **export/import contract**.
 
 **Note:** This schema is intentionally a superset. In Phase 1, most `kids` and `intelligence` sections will export as defaults.
 
+### 3.3 Profiles V4 export surface (what actually ships today)
+
+```
+ftProfilesV4
+├─ schemaVersion: 4
+├─ activeProfileId: "default" | "<other>"
+└─ profiles
+   ├─ default
+   │  ├─ type: "account"
+   │  ├─ parentProfileId: null
+   │  ├─ name: "Default"
+   │  ├─ settings: { enabled, autoBackupEnabled, autoBackupMode, autoBackupFormat, syncKidsToMain, ...toggles }
+   │  ├─ main: { channels, keywords }
+   │  ├─ kids: { mode: "blocklist", strictMode, blockedChannels, blockedKeywords }
+   │  └─ security: { masterPinVerifier? }
+   └─ otherProfileId...
+      ├─ type: "account"|"child"
+      ├─ parentProfileId: "default"|accountId
+      ├─ settings/main/kids (same shape as above)
+      └─ security: { profilePinVerifier? }
+```
+
+### 3.4 Export scopes (per-profile vs full)
+
+- **Full (Default active)**: include entire `ftProfilesV4` (all profiles).
+- **Profile-only (non-default active)**: include only the active profile inside `ftProfilesV4`.
+- UI enforces this: non-default profiles cannot export “full”.
+
+### 3.5 Encrypted export/backup container (current)
+
+```json
+{
+  "meta": {
+    "version": 3,
+    "exportType": "full|profile",
+    "profileId": "default|child1",
+    "profileName": "Default",
+    "encrypted": true
+  },
+  "encrypted": {
+    "salt": "<base64>",
+    "iv": "<base64>",
+    "ciphertext": "<base64>",
+    "iterations": 150000,
+    "algo": "PBKDF2-SHA256 + AES-GCM"
+  }
+}
+```
+
+### 3.6 Auto-backup policy (per profile)
+
+- Keys: `autoBackupEnabled`, `autoBackupMode` (`latest|history`), `autoBackupFormat` (`auto|plain|encrypted`).
+- Destination: `Downloads/FilterTube Backup/<ProfileLabel>/FilterTube-Backup-(Latest|<timestamp>).(json|encrypted.json)`.
+- Encryption decision:
+  - `encrypted`: always encrypt.
+  - `plain`: never encrypt.
+  - `auto`: encrypt if the active profile has a PIN verifier; else plain.
+- **Session PIN cache requirement**: background encrypts only if the PIN was verified via `FilterTube_SessionPinAuth` for the active profile; otherwise encrypted backup is skipped (safe default).
+
 ---
 
 ## 4) Phase 1 (NOW): Import/Export feature (File-based)
@@ -239,6 +305,7 @@ Merge rules:
 - **Keywords:** dedupe by `word + exact + comments` (case-insensitive).
 - **Video IDs:** dedupe by exact videoId.
 - **Identity caches:** merge `channelMap` + `videoChannelMap` (new wins only if existing is missing).
+- **ProfilesV4:** replace or merge per export scope; PIN verifiers are kept as-is (never downgraded to plaintext).
 
 ### 4.4 Where this integrates into code (minimal disruption)
 

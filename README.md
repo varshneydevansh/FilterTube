@@ -24,9 +24,11 @@ FilterTube is a browser extension that gives you control over your YouTube feed.
 
 ### Channel & Data Management
 
-- **Import / Export**: One-click backups keep filters synced across browsers with schema-v3 JSON.
+- **Multi-Profile with PIN Locks**: Account + child profiles, each with independent filters/settings; optional PIN lock gates UI until unlocked.
+- **Profile-Scoped Backups**: Auto-backup and manual export respect the active profile. Default (Master) can export full; non-default exports active-only.
+- **Encrypted Backups**: PBKDF2-SHA256 (150k) + AES-GCM. Encryption auto-enables when the active profile has a PIN (or you pick “Encrypted” format); background verifies PIN before encrypting.
 - **Handle Enrichment Queue**: Newly imported channels are resolved slowly in the background to avoid hammering YouTube.
-- **Kids Mode Profiles**: Maintain a separate, safer rule set for YouTube Kids without mixing it with the main profile.
+- **Kids Mode Profiles**: Maintain a separate, safer rule set for YouTube Kids without mixing it with the main profile; optional “Apply Kids list on main YouTube” sync toggle.
 
 ### Comment Control
 
@@ -51,6 +53,7 @@ FilterTube is a browser extension that gives you control over your YouTube feed.
 ### Help & Documentation
 
 - **Help Page (Dashboard)**: In the new tab UI, a dedicated Help section explains every feature, import/export flow, and troubleshooting tip.
+- **Deep Dive Docs**: See `docs/PROFILES_PIN_MODEL.md` for the lock model and `docs/DATA_PORTABILITY_SYNC_WHITELIST_PLAN.md` for the export/import schema and backup rules.
 
 ## Installation
 

@@ -21,6 +21,14 @@ try {
     console.warn('FilterTube Background: Failed to load shared identity helpers', e);
 }
 
+try {
+    if (typeof importScripts === 'function' && !globalThis.FilterTubeSecurity) {
+        importScripts('security_manager.js');
+    }
+} catch (e) {
+    console.warn('FilterTube Background: Failed to load security helpers', e);
+}
+
 function safeArray(value) {
     return Array.isArray(value) ? value : [];
 }
@@ -177,6 +185,7 @@ function buildAutoBackupPayload({ settings, profilesV3, theme }) {
 function readAutoBackupState() {
     return new Promise(resolve => {
         browserAPI.storage.local.get([
+            'ftAutoBackupEnabled',
             'enabled',
             'uiKeywords',
             'filterChannels',
@@ -260,6 +269,31 @@ function readAutoBackupState() {
                 enabled: enabledFromV4,
                 channels: channelsFromV4,
                 keywords: keywordsFromV4,
+                autoBackupEnabled: (() => {
+                    try {
+                        if (Object.prototype.hasOwnProperty.call(activeSettings, 'autoBackupEnabled')) {
+                            return activeSettings.autoBackupEnabled === true;
+                        }
+                    } catch (e) {
+                    }
+                    return items?.ftAutoBackupEnabled === true;
+                })(),
+                autoBackupMode: (() => {
+                    try {
+                        const raw = typeof activeSettings.autoBackupMode === 'string' ? activeSettings.autoBackupMode.trim().toLowerCase() : '';
+                        if (raw === 'history' || raw === 'latest') return raw;
+                    } catch (e) {
+                    }
+                    return 'latest';
+                })(),
+                autoBackupFormat: (() => {
+                    try {
+                        const raw = typeof activeSettings.autoBackupFormat === 'string' ? activeSettings.autoBackupFormat.trim().toLowerCase() : '';
+                        if (raw === 'plain' || raw === 'encrypted' || raw === 'auto') return raw;
+                    } catch (e) {
+                    }
+                    return 'auto';
+                })(),
                 hideShorts: boolFromV4('hideShorts', !!items?.hideAllShorts),
                 hideComments: hideCommentsFromV4,
                 filterComments: filterCommentsFromV4,
@@ -296,6 +330,59 @@ function readAutoBackupState() {
             resolve({ settings, profilesV3, theme });
         });
     });
+}
+
+function isTrustedUiSender(sender) {
+    try {
+        if (!sender) return false;
+        if (sender.tab) return false;
+        const url = typeof sender.url === 'string' ? sender.url : '';
+        if (!url) return false;
+        const base = typeof browserAPI?.runtime?.getURL === 'function' ? browserAPI.runtime.getURL('') : '';
+        return !!(base && url.startsWith(base));
+    } catch (e) {
+        return false;
+    }
+}
+
+function extractPinVerifierFromProfilesV4(profilesV4, profileId) {
+    const root = safeObject(profilesV4);
+    const profiles = safeObject(root.profiles);
+    const profile = safeObject(profiles[profileId]);
+    const security = safeObject(profile.security);
+    if (profileId === DEFAULT_PROFILE_ID) {
+        const verifier = security.masterPinVerifier || security.masterPin || null;
+        return verifier && typeof verifier === 'object' ? verifier : null;
+    }
+    const verifier = security.profilePinVerifier || security.pinVerifier || null;
+    return verifier && typeof verifier === 'object' ? verifier : null;
+}
+
+const sessionPinCache = new Map();
+
+async function verifyAndCacheSessionPin(profileId, pin) {
+    const Security = globalThis.FilterTubeSecurity || null;
+    if (!Security || typeof Security.verifyPin !== 'function') {
+        throw new Error('Security manager unavailable');
+    }
+
+    const stored = await new Promise(resolve => {
+        browserAPI.storage.local.get([FT_PROFILES_V4_KEY], items => resolve(items?.[FT_PROFILES_V4_KEY] || null));
+    });
+    if (!isValidProfilesV4(stored)) {
+        throw new Error('Profiles unavailable');
+    }
+    const verifier = extractPinVerifierFromProfilesV4(stored, profileId);
+    if (!verifier) {
+        sessionPinCache.delete(profileId);
+        return { ok: true, stored: false, reason: 'no_pin' };
+    }
+    const ok = await Security.verifyPin(pin, verifier);
+    if (!ok) {
+        return { ok: false, error: 'Incorrect PIN' };
+    }
+    sessionPinCache.set(profileId, pin);
+    return { ok: true, stored: true };
 }
 
 function rotateAutoBackups(keepCount = 10, label = '') {
@@ -348,19 +435,10 @@ async function createAutoBackupInBackground(triggerType, options = {}) {
         return { ok: false, reason: 'downloads_unavailable' };
     }
 
-    try {
-        const flag = await new Promise(resolve => {
-            browserAPI.storage.local.get(['ftAutoBackupEnabled'], items => {
-                resolve(items?.ftAutoBackupEnabled === true);
-            });
-        });
-        if (!flag) {
-            return { ok: true, skipped: true, reason: 'disabled' };
-        }
-    } catch (e) {
-    }
-
     const { settings, profilesV3, theme } = await readAutoBackupState();
+    if (!settings || settings.autoBackupEnabled !== true) {
+        return { ok: true, skipped: true, reason: 'disabled' };
+    }
     const payload = buildAutoBackupPayload({ settings, profilesV3, theme });
 
     payload.meta.backupType = 'auto';
@@ -381,12 +459,44 @@ async function createAutoBackupInBackground(triggerType, options = {}) {
     const label = safePart(typeof payload?.meta?.profileName === 'string' ? payload.meta.profileName : '')
         || safePart(typeof payload?.meta?.profileId === 'string' ? payload.meta.profileId : '')
         || 'Default';
+    const profilesV4 = safeObject(settings?.ftProfilesV4);
+    const activeId = normalizeString(profilesV4?.activeProfileId) || DEFAULT_PROFILE_ID;
+    const hasPin = !!extractPinVerifierFromProfilesV4(profilesV4, activeId);
+    const format = typeof settings?.autoBackupFormat === 'string' ? settings.autoBackupFormat : 'auto';
+    const shouldEncrypt = (format === 'encrypted') || (format !== 'plain' && hasPin);
+
+    let exportObject = payload;
+    let ext = 'json';
+    if (shouldEncrypt) {
+        const pin = sessionPinCache.get(activeId) || '';
+        if (!pin) {
+            return { ok: true, skipped: true, reason: 'missing_session_pin' };
+        }
+        const Security = globalThis.FilterTubeSecurity || null;
+        if (!Security || typeof Security.encryptJson !== 'function') {
+            return { ok: false, reason: 'security_unavailable' };
+        }
+        const encrypted = await Security.encryptJson(payload, pin);
+        exportObject = {
+            meta: {
+                ...safeObject(payload?.meta),
+                encrypted: true
+            },
+            encrypted
+        };
+        ext = 'encrypted.json';
+    }
+
+    const mode = typeof settings?.autoBackupMode === 'string' ? settings.autoBackupMode : 'latest';
+    const useHistory = mode === 'history';
     const now = new Date();
     const timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, 19);
-    const fileName = `FilterTube-Backup-${timestamp}.json`;
+    const fileName = useHistory
+        ? `FilterTube-Backup-${timestamp}.${ext}`
+        : `FilterTube-Backup-Latest.${ext}`;
     const fullPath = `FilterTube Backup/${label}/${fileName}`;
 
-    const jsonData = JSON.stringify(payload, null, 2);
+    const jsonData = JSON.stringify(exportObject, null, 2);
     const hasObjectUrl = typeof URL !== 'undefined' && typeof URL.createObjectURL === 'function';
     const downloadUrl = hasObjectUrl
         ? URL.createObjectURL(new Blob([jsonData], { type: 'application/json' }))
@@ -397,7 +507,7 @@ async function createAutoBackupInBackground(triggerType, options = {}) {
             url: downloadUrl,
             filename: fullPath,
             saveAs: false,
-            conflictAction: 'uniquify'
+            conflictAction: useHistory ? 'uniquify' : 'overwrite'
         }, downloadId => {
             if (hasObjectUrl) {
                 try {
@@ -411,9 +521,11 @@ async function createAutoBackupInBackground(triggerType, options = {}) {
                 return;
             }
 
-            try {
-                rotateAutoBackups(10, label);
-            } catch (e) {
+            if (useHistory) {
+                try {
+                    rotateAutoBackups(10, label);
+                } catch (e) {
+                }
             }
 
             resolve({ ok: true, filename: fullPath, downloadId });
@@ -1649,6 +1761,30 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
             sendResponse({ error: error.message || "Unknown error occurred while compiling settings." });
         });
         return true; // Indicates that the response is sent asynchronously.
+    } else if (action === 'FilterTube_SessionPinAuth') {
+        if (!isTrustedUiSender(sender)) {
+            sendResponse?.({ ok: false, error: 'untrusted_sender' });
+            return false;
+        }
+        const profileId = normalizeString(request?.profileId) || DEFAULT_PROFILE_ID;
+        const pin = normalizeString(request?.pin);
+        verifyAndCacheSessionPin(profileId, pin).then((result) => {
+            sendResponse?.(result);
+        }).catch((e) => {
+            sendResponse?.({ ok: false, error: e?.message || 'failed' });
+        });
+        return true;
+    } else if (action === 'FilterTube_ClearSessionPin') {
+        if (!isTrustedUiSender(sender)) {
+            sendResponse?.({ ok: false, error: 'untrusted_sender' });
+            return false;
+        }
+        const profileId = normalizeString(request?.profileId);
+        if (profileId) {
+            sessionPinCache.delete(profileId);
+        }
+        sendResponse?.({ ok: true });
+        return false;
     } else if (action === 'FilterTube_ScheduleAutoBackup') {
         try {
             const triggerType = typeof request?.triggerType === 'string' ? request.triggerType : 'unknown';

@@ -23,6 +23,48 @@ const UIComponents = (() => {
         bgPanel: '#F0EFEA'
     };
 
+    function isDarkTheme() {
+        try {
+            return document.documentElement.getAttribute('data-theme') === 'dark';
+        } catch (e) {
+            return false;
+        }
+    }
+
+    function hashHue(value) {
+        const str = typeof value === 'string' ? value.trim() : '';
+        let hash = 0;
+        for (let i = 0; i < str.length; i += 1) {
+            hash = (hash * 31 + str.charCodeAt(i)) % 360;
+        }
+        return hash;
+    }
+
+    function getProfileColors(seed) {
+        const h = hashHue(seed);
+        const dark = isDarkTheme();
+
+        const accent = dark
+            ? `hsl(${h} 70% 62%)`
+            : `hsl(${h} 70% 42%)`;
+
+        return {
+            bg: dark
+                ? `hsl(${h} 55% 32%)`
+                : `hsl(${h} 65% 85%)`,
+            fg: dark
+                ? `hsl(${h} 80% 92%)`
+                : `hsl(${h} 40% 22%)`,
+            accent,
+            accentBg: dark
+                ? `hsl(${h} 70% 28% / 0.42)`
+                : `hsl(${h} 70% 45% / 0.16)`,
+            accentBorder: dark
+                ? `hsl(${h} 70% 62% / 0.6)`
+                : `hsl(${h} 70% 38% / 0.55)`
+        };
+    }
+
     // ============================================================================
     // BUTTONS
     // ============================================================================
@@ -423,6 +465,253 @@ const UIComponents = (() => {
         return select;
     }
 
+    function createDropdownFromSelect(selectEl, { className = '' } = {}) {
+        const select = selectEl;
+        if (!select || !(select instanceof HTMLSelectElement)) return null;
+
+        try {
+            if (select.dataset.ftSelectEnhanced === 'true') {
+                return null;
+            }
+            if (select.closest('.ft-select-menu')) {
+                return null;
+            }
+        } catch (e) {
+        }
+
+        const wrapper = document.createElement('div');
+        wrapper.className = `ft-select-menu ${className}`.trim();
+
+        const trigger = document.createElement('button');
+        trigger.type = 'button';
+        trigger.className = 'select-input ft-select-trigger';
+        trigger.setAttribute('aria-haspopup', 'listbox');
+        trigger.setAttribute('aria-expanded', 'false');
+
+        const dropdown = document.createElement('div');
+        dropdown.className = 'ft-profile-dropdown ft-select-dropdown';
+        dropdown.setAttribute('role', 'listbox');
+        dropdown.hidden = true;
+
+        const updateTriggerLabel = () => {
+            const selected = select.options[select.selectedIndex];
+            trigger.textContent = selected ? selected.textContent : '';
+        };
+
+        const close = () => {
+            dropdown.hidden = true;
+            trigger.setAttribute('aria-expanded', 'false');
+            dropdown.style.transform = '';
+        };
+
+        const syncDisabled = () => {
+            try {
+                trigger.disabled = !!select.disabled;
+                trigger.setAttribute('aria-disabled', select.disabled ? 'true' : 'false');
+                if (select.disabled) {
+                    close();
+                }
+            } catch (e) {
+            }
+        };
+
+        const position = () => {
+            if (dropdown.hidden) return;
+            try {
+                const rect = dropdown.getBoundingClientRect();
+                const pad = 8;
+                const maxRight = window.innerWidth - pad;
+                let shift = 0;
+                if (rect.left < pad) {
+                    shift = pad - rect.left;
+                } else if (rect.right > maxRight) {
+                    shift = maxRight - rect.right;
+                }
+                dropdown.style.transform = shift ? `translateX(${shift}px)` : '';
+            } catch (e) {
+            }
+        };
+
+        const toggle = () => {
+            if (select.disabled) {
+                syncDisabled();
+                return;
+            }
+            const next = !dropdown.hidden;
+            dropdown.hidden = next;
+            trigger.setAttribute('aria-expanded', next ? 'false' : 'true');
+            if (!next) {
+                applyAccentVars();
+                updateTriggerLabel();
+                rebuildOptions();
+                position();
+            }
+        };
+
+        const resolveContextSubtitle = () => {
+            try {
+                const explicit = (select.getAttribute('data-subtitle') || '').trim();
+                if (explicit) return explicit;
+
+                const container = select.closest('.sort-controls, .date-range-controls, .toggle-row, .import-export-actions, .actions')
+                    || select.parentElement;
+                if (!container) return '';
+
+                const labelEl = container.querySelector('.label, .toggle-title');
+                const raw = (labelEl?.textContent || '').trim();
+                if (!raw) return '';
+                return raw.replace(/\s*:\s*$/, '');
+            } catch (e) {
+                return '';
+            }
+        };
+
+        const contextSubtitle = resolveContextSubtitle();
+
+        const getAccentVars = () => {
+            try {
+                const rootStyles = window.getComputedStyle(document.documentElement);
+                const accent = (rootStyles.getPropertyValue('--ft-select-accent') || '').trim();
+                const accentBg = (rootStyles.getPropertyValue('--ft-select-accent-bg') || '').trim();
+                const accentBorder = (rootStyles.getPropertyValue('--ft-select-border') || '').trim();
+                return { accent, accentBg, accentBorder };
+            } catch (e) {
+                return { accent: '', accentBg: '', accentBorder: '' };
+            }
+        };
+
+        const applyAccentVars = () => {
+            const vars = getAccentVars();
+            if (vars.accent) wrapper.style.setProperty('--ft-profile-accent', vars.accent);
+            if (vars.accentBg) wrapper.style.setProperty('--ft-profile-accent-bg', vars.accentBg);
+            if (vars.accentBorder) wrapper.style.setProperty('--ft-profile-accent-border', vars.accentBorder);
+        };
+
+        const rebuildOptions = () => {
+            dropdown.innerHTML = '';
+            Array.from(select.options).forEach((opt) => {
+                const value = opt.value;
+                const label = opt.textContent;
+
+                if (opt.disabled && !value) {
+                    const header = document.createElement('div');
+                    header.className = 'ft-profile-dropdown-group';
+                    header.setAttribute('role', 'presentation');
+                    header.textContent = label || '';
+                    dropdown.appendChild(header);
+                    return;
+                }
+
+                if (opt.disabled) {
+                    return;
+                }
+
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = `ft-profile-dropdown-item ft-select-option${select.value === value ? ' is-active' : ''}`;
+                btn.setAttribute('role', 'option');
+                btn.setAttribute('aria-selected', select.value === value ? 'true' : 'false');
+
+                applyAccentVars();
+                const vars = getAccentVars();
+                if (vars.accent) btn.style.setProperty('--ft-profile-accent', vars.accent);
+                if (vars.accentBg) btn.style.setProperty('--ft-profile-accent-bg', vars.accentBg);
+                if (vars.accentBorder) btn.style.setProperty('--ft-profile-accent-border', vars.accentBorder);
+
+                const avatar = document.createElement('div');
+                avatar.className = 'ft-profile-dropdown-avatar';
+                const initial = (label || '').trim().slice(0, 1).toUpperCase() || '?';
+                avatar.textContent = initial;
+                avatar.style.backgroundColor = vars.accentBg || 'rgba(74, 157, 127, 0.16)';
+                avatar.style.color = vars.accent || 'rgba(74, 157, 127, 1)';
+                avatar.style.borderColor = vars.accentBorder || '';
+
+                const meta = document.createElement('div');
+                meta.className = 'ft-profile-dropdown-meta';
+
+                const nameEl = document.createElement('div');
+                nameEl.className = 'ft-profile-dropdown-name';
+                nameEl.textContent = label || '';
+
+                const subtitleEl = document.createElement('div');
+                subtitleEl.className = 'ft-profile-dropdown-subtitle';
+                subtitleEl.textContent = ((opt.getAttribute('data-subtitle') || '').trim() || contextSubtitle);
+
+                meta.appendChild(nameEl);
+                meta.appendChild(subtitleEl);
+
+                btn.appendChild(avatar);
+                btn.appendChild(meta);
+
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    select.value = value;
+                    select.dispatchEvent(new Event('change', { bubbles: true }));
+                    updateTriggerLabel();
+                    rebuildOptions();
+                    close();
+                });
+
+                dropdown.appendChild(btn);
+            });
+        };
+
+        trigger.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            toggle();
+        });
+
+        window.addEventListener('resize', () => {
+            position();
+        });
+
+        document.addEventListener('click', (e) => {
+            try {
+                if (wrapper.contains(e.target)) return;
+                close();
+            } catch (err) {
+                close();
+            }
+        });
+
+        select.addEventListener('change', () => {
+            applyAccentVars();
+            syncDisabled();
+            updateTriggerLabel();
+            rebuildOptions();
+        });
+
+        try {
+            const obs = new MutationObserver(() => {
+                syncDisabled();
+            });
+            obs.observe(select, { attributes: true, attributeFilter: ['disabled'] });
+        } catch (e) {
+        }
+
+        select.style.display = 'none';
+
+        try {
+            select.dataset.ftSelectEnhanced = 'true';
+        } catch (e) {
+        }
+
+        applyAccentVars();
+        syncDisabled();
+        updateTriggerLabel();
+        rebuildOptions();
+
+        wrapper.appendChild(trigger);
+        wrapper.appendChild(dropdown);
+        wrapper.appendChild(select);
+
+        select.parentNode?.insertBefore(wrapper, select);
+
+        return { wrapper, trigger, dropdown, select };
+    }
+
     // ============================================================================
     // ICON BUTTONS
     // ============================================================================
@@ -543,6 +832,7 @@ const UIComponents = (() => {
 
     return {
         Colors,
+        getProfileColors,
         createButton,
         flashButtonSuccess,
         createToggleButton,
@@ -551,6 +841,7 @@ const UIComponents = (() => {
         createSearchInput,
         createCheckbox,
         createSelect,
+        createDropdownFromSelect,
         createIconButton,
         createBadge,
         createChannelLogo,

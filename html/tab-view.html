@@ -120,7 +120,7 @@
             </ul>
 
             <div class="sidebar-footer">
-                <div class="version-info">v3.1.8</div>
+                <div class="version-info">v3.1.9</div>
             </div>
         </nav>
 
@@ -140,7 +140,10 @@
                 </button>
                 <h1 id="pageTitle">Dashboard</h1>
                 <div class="actions">
-                    <select id="ftProfileSelector" class="select-input" title="Active profile"></select>
+                    <div id="ftProfileMenuTab" class="ft-profile-menu">
+                        <button id="ftProfileBadgeBtnTab" class="ft-profile-badge" type="button" aria-haspopup="listbox" aria-expanded="false" title="Active profile"></button>
+                        <div id="ftProfileDropdownTab" class="ft-profile-dropdown" role="listbox" hidden></div>
+                    </div>
                     <button id="themeToggle" class="icon-btn" title="Toggle Theme">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -380,6 +383,25 @@
                                     <span class="slider round"></span>
                                 </label>
                             </div>
+                            <div class="toggle-row" title="Controls whether auto backups overwrite a single Latest file or keep a small timestamped history.">
+                                <div class="toggle-info">
+                                    <div class="toggle-title">Auto backup mode</div>
+                                </div>
+                                <select id="ftAutoBackupMode" class="select-input" style="min-width:200px;">
+                                    <option value="latest">Latest (single file)</option>
+                                    <option value="history">History (timestamped)</option>
+                                </select>
+                            </div>
+                            <div class="toggle-row" title="Auto uses encryption automatically when this profile has a PIN.">
+                                <div class="toggle-info">
+                                    <div class="toggle-title">Auto backup format</div>
+                                </div>
+                                <select id="ftAutoBackupFormat" class="select-input" style="min-width:200px;">
+                                    <option value="auto">Auto (encrypt if PIN is set)</option>
+                                    <option value="plain">Plain JSON</option>
+                                    <option value="encrypted">Encrypted</option>
+                                </select>
+                            </div>
                             <div class="import-export-hint" style="margin-top:10px;">
                                 Auto backups are saved to <code>"Downloads/FilterTube Backup/"</code>.
                             </div>
@@ -425,6 +447,11 @@
                 </div>
 
                 <div id="helpView" class="view-section">
+                    <div class="card">
+                        <input type="text" id="helpSearchInput" class="search-input" placeholder="Search help..." style="width:100%;border-radius:0;border-left:none;border-right:none;" />
+                        <div id="helpSearchEmpty" class="import-export-hint" style="display:none;margin:8px 16px 12px;">No help topics match your search.</div>
+                    </div>
+
                     <div class="card">
                         <div class="card-header">
                             <h3>UI Legend (Badges & Pills)</h3>
@@ -586,17 +613,14 @@
                             <h3>Import &amp; Export backups</h3>
                         </div>
                         <div class="card-body">
-                            <p style="margin-bottom:12px;">
-                                Keep a private copy of your FilterTube setup or move it to another browser in seconds. Exports generate a single JSON that bundles every keyword, channel, Kids profile, and design preference. Imports merge the JSON into your current profile—nothing is overwritten unless the same channel or keyword already exists.
-                            </p>
                             <div class="help-list">
                                 <div class="help-item">
                                     <div class="help-item-title">Export</div>
                                     <div class="help-item-body">
                                         <ul>
-                                            <li>Click <strong>Download JSON</strong> to capture the latest channels, keywords, Kids settings, and theme choices.</li>
-                                            <li>Export is saved to <code>Downloads/FilterTube Export/</code> (file name follows <code>filtertube_export_v3_YYYY-MM-DD.json</code>).</li>
-                                            <li>Store it anywhere private (cloud drive, USB) for quick restores.</li>
+                                            <li><strong>Full vs Active-only:</strong> Master (Default) can export all profiles; non-master is forced to “Export active profile only”.</li>
+                                            <li><strong>Formats:</strong> Plain JSON or Encrypted; encrypted exports require a PIN at import.</li>
+                                            <li><strong>Destination:</strong> <code>Downloads/FilterTube Export/</code> with versioned filename.</li>
                                         </ul>
                                     </div>
                                 </div>
@@ -604,9 +628,68 @@
                                     <div class="help-item-title">Import</div>
                                     <div class="help-item-body">
                                         <ul>
-                                            <li>Choose any FilterTube backup or compatible JSON (BlockTube/others work too).</li>
-                                            <li>Channels and keywords are merged; duplicates update in place while new entries append.</li>
-                                            <li>Kids Mode and design preferences are layered on top of your current profile without wiping existing data.</li>
+                                            <li>Merges channels/keywords; matching entries update, new ones append. Profiles in the file are restored as-is.</li>
+                                            <li>Encrypted imports prompt for the PIN. Admin-only actions (full restore) require unlocking Master.</li>
+                                            <li>Auto-backup settings and modes from the backup are applied per profile.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="help-item">
+                                    <div class="help-item-title">Auto-backup</div>
+                                    <div class="help-item-body">
+                                        <ul>
+                                            <li>Per-profile toggle; mode (Latest/History) and format (Plain/Encrypted/Auto) follow the active profile.</li>
+                                            <li>Backups save to <code>Downloads/FilterTube Backup/</code>. Encrypted backups require a verified PIN to create.</li>
+                                            <li>Popup and New Tab both respect lock state: controls disable when locked.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Profiles &amp; PIN behavior</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="help-list">
+                                <div class="help-item">
+                                    <div class="help-item-title">Profile types</div>
+                                    <div class="help-item-body">
+                                        <ul>
+                                            <li><strong>Default (Master):</strong> Admin for full exports, profile management, and account policy.</li>
+                                            <li><strong>Account:</strong> Independent profile; can have child profiles.</li>
+                                            <li><strong>Child:</strong> Follows parent; UI gating uses locks/PINs.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="help-item">
+                                    <div class="help-item-title">Locks &amp; PINs</div>
+                                    <div class="help-item-body">
+                                        <ul>
+                                            <li>Locked profiles disable toggles and auto-backup controls until unlocked.</li>
+                                            <li>Encrypted exports/backups need the profile’s PIN; Master unlock is required for admin actions.</li>
+                                            <li>Unlock is per-session in both Popup and New Tab.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="help-item">
+                                    <div class="help-item-title">Auto-backup &amp; actions</div>
+                                    <div class="help-item-body">
+                                        <ul>
+                                            <li>New profiles inherit the creator’s auto-backup mode/format/enable state.</li>
+                                            <li>Scheduling runs on profile creation and mode/format changes only if auto-backup is enabled for that profile.</li>
+                                            <li>Export scope toggle is disabled/forced to active-only for non-master; enabled for Master.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="help-item">
+                                    <div class="help-item-title">Where to change things</div>
+                                    <div class="help-item-body">
+                                        <ul>
+                                            <li><strong>Popup:</strong> Quick toggle changes; respects locks/PINs; auto-backup controls visible when enabled.</li>
+                                            <li><strong>New Tab:</strong> Full profile management (create/rename/delete, PIN set/remove), export/import, auto-backup mode/format.</li>
                                         </ul>
                                     </div>
                                 </div>

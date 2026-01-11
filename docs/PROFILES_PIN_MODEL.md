@@ -15,12 +15,70 @@
 - **Account profile**: `type: "account"` (or inferred account when no `type` and no `parentProfileId`).
 - **Child profile**: `type: "child"` (or inferred child when `parentProfileId` is present).
 - **Locked profile**: A profile is considered locked if it has a PIN verifier.
-  - Master: `profiles.default.security.masterPinVerifier`
-  - Non-default: `profiles[profileId].security.profilePinVerifier`
+  - Master: `profiles.default.security.masterPinVerifier` 
+  - Non-default: `profiles[profileId].security.profilePinVerifier` 
 - **Unlocked session state (UI-local)**:
   - Stored in-memory in the UI context (`unlockedProfiles` Set).
   - Not persisted to `storage`.
   - Reset on hard refresh / tab close.
+- **PIN crypto artifacts**:
+  - Verifier: PBKDF2-SHA256 with 150k iterations + random salt → stored as `{kdf, hashAlg, iterations, salt, hash}`.
+  - Encryption container: PBKDF2-SHA256 (150k) → AES-GCM (random IV) with `{kdf, cipher, data}` payload.
+
+## ftProfilesV4 JSON model (current)
+
+```json
+{
+  "schemaVersion": 4,
+  "activeProfileId": "default",
+  "profiles": {
+    "default": {
+      "type": "account",
+      "parentProfileId": null,
+      "name": "Default",
+      "settings": {
+        "enabled": true,
+        "syncKidsToMain": false,
+        "autoBackupEnabled": true,
+        "autoBackupMode": "latest",
+        "autoBackupFormat": "auto",
+        "...": "other per-profile settings (hideShorts, hideComments, etc.)"
+      },
+      "main": {
+        "channels": [],
+        "keywords": []
+      },
+      "kids": {
+        "mode": "blocklist",
+        "strictMode": true,
+        "blockedChannels": [],
+        "blockedKeywords": []
+      },
+      "security": {
+        "masterPinVerifier": { "kdf": "pbkdf2-sha256", "iterations": 150000, "salt": "...", "hash": "..." }
+      }
+    },
+    "child1": {
+      "type": "child",
+      "parentProfileId": "default",
+      "name": "Kiddo",
+      "settings": { "...": "same shape as above" },
+      "main": { "...": "profile-specific main settings" },
+      "kids": { "...": "kids profile data" },
+      "security": {
+        "profilePinVerifier": { "kdf": "pbkdf2-sha256", "iterations": 150000, "salt": "...", "hash": "..." }
+      }
+    }
+  }
+}
+```
+
+Key points:
+
+- Settings are **per-profile**; feature flags (e.g., hideShorts) live under the active profile’s `settings`.
+- Auto-backup flags live per profile (`autoBackupEnabled`, `autoBackupMode`, `autoBackupFormat`).
+- PIN verifiers live under `security` (`masterPinVerifier` for Default; `profilePinVerifier` for others).
+- `activeProfileId` controls UI scoping and export scope.
 
 ## Current Implemented Rules
 
@@ -65,6 +123,50 @@
 - Unlock state is currently **local-only** to each UI context.
   - Popup unlock does not unlock New Tab automatically.
   - New Tab unlock does not unlock popup automatically.
+- **Background session PIN cache**:
+  - UIs send `FilterTube_SessionPinAuth` with the PIN; background verifies against stored verifier and keeps a **memory-only** cache per profile.
+  - UIs can clear it with `FilterTube_ClearSessionPin` (on lock/Logout).
+  - Auto-backup encryption depends on this cache (see below); if missing, encrypted auto-backup is skipped.
+
+### 6) Admin-only actions / downgrade safety
+
+- Import/restore is **Master-only** (active profile must be `default`; Master PIN must be unlocked if set).
+- Full export is **Master-only**; non-default exports are forced to “active profile only”.
+- Account policy controls (allow account creation, max accounts) are **Master-only** and disabled elsewhere.
+- When a profile is locked, StateManager and UI both block mutations (defense-in-depth).
+
+## PIN cryptography & flows
+
+- **Create/Update PIN**:
+  - UI collects PIN → `FilterTubeSecurity.createPinVerifier(pin)` → PBKDF2-SHA256 (150k, random salt) → verifier stored in `profiles[*].security`.
+- **Verify PIN**:
+  - UI sends PIN to background via `FilterTube_SessionPinAuth`.
+  - Background loads `ftProfilesV4`, picks the correct verifier (master vs profile), runs `FilterTubeSecurity.verifyPin`, and **only then** caches the PIN in `sessionPinCache` (memory only, per-profile).
+- **Encrypt export/backup**:
+  - If format is `encrypted` or `auto`+profile has PIN, background requires a cached session PIN.
+  - Payload is wrapped as `{ meta: { encrypted: true, ... }, encrypted: { kdf: PBKDF2-SHA256 150k + salt, cipher: AES-GCM + iv, data: b64 } }`.
+- **Decrypt import**:
+  - UI (tab view) prompts for password/PIN, calls `FilterTubeSecurity.decryptJson(encrypted, password)`, then imports the decrypted payload through the normal import path.
+
+```mermaid
+sequenceDiagram
+    participant UI
+    participant BG as Background
+    participant Sec as FilterTubeSecurity
+
+    UI->>Sec: createPinVerifier(pin)
+    Sec-->>UI: verifier (PBKDF2-SHA256 150k)
+    UI->>BG: save verifier in profilesV4.security
+
+    UI->>BG: FilterTube_SessionPinAuth(pin, profileId)
+    BG->>Sec: verifyPin(pin, verifier)
+    Sec-->>BG: ok?
+    BG-->>BG: sessionPinCache[profileId] = pin (mem-only)
+
+    BG->>Sec: encryptJson(payload, pin) (when backup/export encrypts)
+    Sec-->>BG: {kdf, cipher, data}
+    BG-->>UI: encrypted backup file
+```
 
 ## Admin / Master-only actions (Current)
 
@@ -79,6 +181,11 @@ Some actions are intentionally limited to the Default (Master) profile UI contex
 
 Note: This does not affect a parallel account’s ability to access its own Filters/Kids/Settings when it has no PIN or after it is unlocked.
 
+### Import / restore
+
+- Import/restore UI is gated to **Default (Master) context**. If Default has a PIN, it must be unlocked first.
+- Non-default profiles cannot import/restore (prevents overwrite by children).
+
 ## Data portability / backup rules (Current)
 
 ### Auto-backup
@@ -91,11 +198,72 @@ Note: This does not affect a parallel account’s ability to access its own Filt
   - `Downloads/FilterTube Backup/<ProfileName>/FilterTube-Backup-<timestamp>.json`
 - Rotation:
   - Rotates per profile folder.
+- Enablement:
+  - `profilesV4.profiles[activeId].settings.autoBackupEnabled === true`
+- Modes:
+  - `latest`: overwrites `FilterTube-Backup-Latest.json|encrypted.json`
+  - `history`: writes timestamped files and rotates within the profile folder
+- Format:
+  - `auto`: encrypt if profile has a PIN verifier
+  - `plain`: always plaintext JSON
+  - `encrypted`: always encrypted container
+- Encryption gating:
+  - Requires session PIN cached in background; if absent and encryption is needed, backup is **skipped** (safe default).
+
+### Auto-backup safety flow
+
+```mermaid
+flowchart TD
+    UI[UI (Popup/Tab)] -->|PIN| BGAuth[FilterTube_SessionPinAuth\n(verifies PIN, caches in memory)]
+    BGAuth --> Cache[Session PIN cache (mem only)]
+    Auto[Auto-backup scheduler] --> Build[buildAutoBackupPayload\n(scope = active profile)]
+    Build --> DecideFmt{Format?}
+    DecideFmt -->|plain| SavePlain[write JSON]
+    DecideFmt -->|encrypted| NeedPIN{Session PIN?}
+    NeedPIN -->|no| Skip[skip backup (safe default)]
+    NeedPIN -->|yes| Encrypt[PBKDF2-SHA256 150k + AES-GCM]
+    Encrypt --> SaveEnc[write encrypted JSON container]
+    SavePlain --> Rotate[rotate per-profile folder (if history mode)]
+    SaveEnc --> Rotate
+```
+
+### Auto-backup mode & format (New)
+
+- **Per-profile enablement**: `profilesV4.profiles[activeId].settings.autoBackupEnabled`.
+- **Mode** (`profilesV4.profiles[activeId].settings.autoBackupMode`):
+  - `latest`: overwrites a single file per profile (`FilterTube-Backup-Latest.*`).
+  - `history`: keeps timestamped backups (rotates per profile folder).
+- **Format** (`profilesV4.profiles[activeId].settings.autoBackupFormat`):
+  - `auto`: encrypt if the active profile has a PIN, otherwise plain JSON.
+  - `plain`: always write plain JSON.
+  - `encrypted`: always write encrypted backup containers.
+
+### Encrypted auto-backups (New)
+
+- If auto-backups are encrypted, the background uses an **in-memory, session-only PIN cache**.
+- The cache is populated only when an extension UI page sends the PIN and the background **verifies it against the stored verifier**.
+- If the profile is PIN-protected but no session PIN is available, auto-backup is skipped (best-effort).
+
+## Profile creation & robustness rules
+
+- **Creation surfaces**: Tab view “Profiles” card (`ftCreateAccountBtn` / `ftCreateChildBtn`); Default (Master) must allow account creation and stay within `maxAccounts`.
+- **Types**:
+  - `account` (or inferred when no `parentProfileId`).
+  - `child` (explicit type or inferred when `parentProfileId` is set).
+- **Parent linkage**: Children carry `parentProfileId`; policies can later use this to gate cross-account switches.
+- **Lock gate**: Any profile with a PIN stays locked until correct PIN entered; locked state blocks restricted views and all mutations (StateManager defense-in-depth).
+- **Import/export scope**: Default can export/import full; non-default exports/imports active-only; encrypted imports require the correct password/PIN.
+- **Session security**: Unlock is UI-local; background only trusts a PIN once verified; cache is memory-only (cleared on profile lock/clear action).
+- **Tamper resistance**:
+  - PIN verification happens in background (UI cannot “claim” unlock).
+  - No persisted unlock tokens; reload resets lock state.
+  - Encrypted backups require the verified PIN at creation time; imports require the correct password/PIN to decrypt.
 
 ### Manual export
 
 - Default can export full or active-only.
 - Non-default profiles are forced to export active-only (current UI behavior).
+- Manual import is allowed only when the active profile is Default (and unlocked if PIN-protected).
 
 ## Known open decisions / remaining work
 
@@ -117,6 +285,27 @@ Possible future policies (not implemented):
 
 - Align New Tab profile selector UX with popup dropdown.
 - Grey/disable admin-only actions consistently based on lock state and active profile.
+
+## Implementation checklist (Status)
+
+- **[Done]** Strict lock gate in New Tab UI (no restricted views rendered while locked).
+- **[Done]** Profile switching prompts only for the target profile PIN (no Master PIN required just to switch).
+- **[Done]** Mutations blocked while locked (UI + StateManager defense-in-depth).
+- **[Done]** Auto-backup per-profile enable/mode/format + encrypted auto-backup using background-verified session PIN cache.
+- **[Done]** New Tab UI exposes auto-backup mode/format controls.
+- **[Done]** Dashboard keyword/channel counts update on profile switch.
+- **[In progress]** Standardize dropdown styling across all UIs (Sort/Date/Settings/selects).
+- **[In progress]** Standardize profile selector styling/colors across Popup + New Tab (shared accent colors).
+- **[Done]** Gate import/restore behind Default (Master) UI context (best-effort safety).
+
+## Encrypted backup safety notes
+
+- Encrypted backups intentionally keep a small **plaintext `meta`** section (version/app/exportType/profile label + `encrypted: true`).
+- This metadata **does not enable decryption**.
+- Decryption security comes from:
+  - PBKDF2-SHA256 (150k iterations, per-backup random salt)
+  - AES-GCM (random IV)
+- The biggest real-world risk is **weak PINs/passwords** (e.g. 4-digit PINs) because backups can be brute-forced offline.
 
 ## Quick sanity test matrix
 

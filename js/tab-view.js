@@ -538,7 +538,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const keywordListEl = document.getElementById('keywordListEl');
     const searchKeywords = document.getElementById('searchKeywords');
     const keywordSort = document.getElementById('keywordSort');
-
     const keywordDatePreset = document.getElementById('keywordDatePreset');
     const keywordDateFrom = document.getElementById('keywordDateFrom');
     const keywordDateTo = document.getElementById('keywordDateTo');
@@ -564,7 +563,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const themeToggle = document.getElementById('themeToggle');
 
+    const ftAutoBackupMode = document.getElementById('ftAutoBackupMode');
+    const ftAutoBackupFormat = document.getElementById('ftAutoBackupFormat');
     const ftProfileSelector = document.getElementById('ftProfileSelector');
+    const ftProfileMenuTab = document.getElementById('ftProfileMenuTab');
+    const ftProfileBadgeBtnTab = document.getElementById('ftProfileBadgeBtnTab');
+    const ftProfileDropdownTab = document.getElementById('ftProfileDropdownTab');
 
     const ftExportV3Btn = document.getElementById('ftExportV3Btn');
     const ftExportV3EncryptedBtn = document.getElementById('ftExportV3EncryptedBtn');
@@ -595,6 +599,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     let channelDateToTs = null;
 
     const searchContentControls = document.getElementById('searchContentControls');
+    const helpSearchInput = document.getElementById('helpSearchInput');
+    const helpSearchEmpty = document.getElementById('helpSearchEmpty');
+    const helpSearchCard = helpSearchInput ? helpSearchInput.closest('.card') : null;
 
     if (openKofiBtn) {
         openKofiBtn.addEventListener('click', () => {
@@ -609,6 +616,30 @@ document.addEventListener('DOMContentLoaded', async () => {
                 console.warn('Tab-View: failed to open Ko-fi link', error);
             }
         });
+    }
+
+    try {
+        const createDropdownFromSelect = window.UIComponents?.createDropdownFromSelect;
+        if (typeof createDropdownFromSelect === 'function') {
+            [
+                'keywordSort',
+                'keywordDatePreset',
+                'channelSort',
+                'channelDatePreset',
+                'kidsKeywordSort',
+                'kidsKeywordDatePreset',
+                'kidsChannelSort',
+                'kidsChannelDatePreset',
+                'ftAutoBackupMode',
+                'ftAutoBackupFormat'
+            ].forEach((id) => {
+                const el = document.getElementById(id);
+                if (el && el.tagName === 'SELECT') {
+                    createDropdownFromSelect(el);
+                }
+            });
+        }
+    } catch (e) {
     }
 
     // ============================================================================
@@ -663,11 +694,49 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    async function scheduleAutoBackup(triggerType, delay = 1000, options = null) {
+        try {
+            const trigger = typeof triggerType === 'string' ? triggerType : 'unknown';
+            const payload = {
+                action: 'FilterTube_ScheduleAutoBackup',
+                triggerType: trigger,
+                delay: (typeof delay === 'number' && Number.isFinite(delay)) ? delay : 1000
+            };
+            if (options && typeof options === 'object') {
+                payload.options = options;
+            }
+            await sendRuntimeMessage(payload);
+        } catch (e) {
+        }
+    }
+
     async function syncSessionUnlockStateFromBackground() {}
 
-    async function notifyBackgroundUnlocked(profileId, pin = '') {}
+    async function notifyBackgroundUnlocked(profileId, pin = '') {
+        try {
+            const id = normalizeString(profileId);
+            const normalizedPin = normalizeString(pin);
+            if (!id || !normalizedPin) return;
+            await sendRuntimeMessage({
+                action: 'FilterTube_SessionPinAuth',
+                profileId: id,
+                pin: normalizedPin
+            });
+        } catch (e) {
+        }
+    }
 
-    async function notifyBackgroundLocked(profileId) {}
+    async function notifyBackgroundLocked(profileId) {
+        try {
+            const id = normalizeString(profileId);
+            if (!id) return;
+            await sendRuntimeMessage({
+                action: 'FilterTube_ClearSessionPin',
+                profileId: id
+            });
+        } catch (e) {
+        }
+    }
 
     function safeObject(value) {
         return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
@@ -675,6 +744,184 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function normalizeString(value) {
         return typeof value === 'string' ? value.trim() : '';
+    }
+
+    function getProfileColors(seed) {
+        try {
+            const colorsApi = window.UIComponents?.getProfileColors;
+            if (typeof colorsApi === 'function') {
+                return colorsApi(seed);
+            }
+        } catch (e) {
+        }
+        return {
+            bg: 'hsl(0 0% 90%)',
+            fg: 'hsl(0 0% 18%)',
+            accent: 'hsl(160 40% 40%)',
+            accentBg: 'hsla(160, 40%, 40%, 0.14)',
+            accentBorder: 'hsla(160, 40%, 40%, 0.55)'
+        };
+    }
+
+    function getProfileInitial(profilesV4, profileId) {
+        const name = normalizeString(getProfileName(profilesV4, profileId)) || normalizeString(profileId);
+        const char = name ? name.slice(0, 1).toUpperCase() : '?';
+        return char;
+    }
+
+    function closeProfileDropdownTab() {
+        if (!ftProfileDropdownTab || !ftProfileBadgeBtnTab) return;
+        ftProfileDropdownTab.hidden = true;
+        ftProfileDropdownTab.style.transform = '';
+        ftProfileBadgeBtnTab.setAttribute('aria-expanded', 'false');
+    }
+
+    function positionProfileDropdownTab() {
+        if (!ftProfileDropdownTab || ftProfileDropdownTab.hidden) return;
+        try {
+            const rect = ftProfileDropdownTab.getBoundingClientRect();
+            const pad = 8;
+            const maxRight = window.innerWidth - pad;
+            let shift = 0;
+            if (rect.left < pad) {
+                shift = pad - rect.left;
+            } else if (rect.right > maxRight) {
+                shift = maxRight - rect.right;
+            }
+            ftProfileDropdownTab.style.transform = shift ? `translateX(${shift}px)` : '';
+        } catch (e) {
+        }
+    }
+
+    function toggleProfileDropdownTab() {
+        if (!ftProfileDropdownTab || !ftProfileBadgeBtnTab) return;
+        const next = !ftProfileDropdownTab.hidden;
+        ftProfileDropdownTab.hidden = next;
+        ftProfileBadgeBtnTab.setAttribute('aria-expanded', next ? 'false' : 'true');
+        if (!next) {
+            positionProfileDropdownTab();
+        }
+    }
+
+    function renderProfileSelectorTab(profilesV4) {
+        if (!ftProfileDropdownTab || !ftProfileBadgeBtnTab) return;
+        const root = safeObject(profilesV4);
+        const current = normalizeString(root.activeProfileId) || 'default';
+
+        const badgeColors = getProfileColors(current);
+        ftProfileBadgeBtnTab.textContent = getProfileInitial(profilesV4, current);
+        ftProfileBadgeBtnTab.style.backgroundColor = badgeColors.bg;
+        ftProfileBadgeBtnTab.style.color = badgeColors.fg;
+        ftProfileBadgeBtnTab.style.borderColor = badgeColors.accentBorder || '';
+        ftProfileBadgeBtnTab.title = buildProfileLabel(profilesV4, current);
+
+        try {
+            document.documentElement.style.setProperty('--ft-select-border', badgeColors.accentBorder || '');
+            document.documentElement.style.setProperty('--ft-select-accent', badgeColors.accent || '');
+            document.documentElement.style.setProperty('--ft-select-accent-bg', badgeColors.accentBg || '');
+        } catch (e) {
+        }
+
+        ftProfileDropdownTab.innerHTML = '';
+
+        const appendProfileBtn = (id) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            const locked = isProfileLocked(profilesV4, id);
+            const type = getProfileType(profilesV4, id);
+            const isChild = type === 'child';
+            btn.className = `ft-profile-dropdown-item${id === current ? ' is-active' : ''}${locked ? ' is-locked' : ''}${isChild ? ' is-child' : ''}`;
+            btn.setAttribute('role', 'option');
+            btn.setAttribute('aria-selected', id === current ? 'true' : 'false');
+
+            const colors = getProfileColors(id);
+            btn.style.setProperty('--ft-profile-accent', colors.accent || '');
+            btn.style.setProperty('--ft-profile-accent-bg', colors.accentBg || '');
+            btn.style.setProperty('--ft-profile-accent-border', colors.accentBorder || '');
+
+            const avatar = document.createElement('div');
+            avatar.className = 'ft-profile-dropdown-avatar';
+            avatar.style.backgroundColor = colors.bg;
+            avatar.style.color = colors.fg;
+            avatar.textContent = getProfileInitial(profilesV4, id);
+
+            const meta = document.createElement('div');
+            meta.className = 'ft-profile-dropdown-meta';
+
+            const nameEl = document.createElement('div');
+            nameEl.className = 'ft-profile-dropdown-name';
+            nameEl.textContent = getProfileName(profilesV4, id);
+
+            const subtitleEl = document.createElement('div');
+            subtitleEl.className = 'ft-profile-dropdown-subtitle';
+            subtitleEl.textContent = buildProfileSubtitle(profilesV4, id);
+
+            meta.appendChild(nameEl);
+            meta.appendChild(subtitleEl);
+
+            btn.appendChild(avatar);
+            btn.appendChild(meta);
+
+            btn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                closeProfileDropdownTab();
+                await switchToProfile(id);
+            });
+
+            ftProfileDropdownTab.appendChild(btn);
+        };
+
+        const accountIds = getAccountIds(profilesV4);
+        accountIds.forEach((accountId, idx) => {
+            const header = document.createElement('div');
+            header.className = 'ft-profile-dropdown-group';
+            header.setAttribute('role', 'presentation');
+            header.textContent = accountId === 'default'
+                ? `${getProfileName(profilesV4, accountId)} (Master)`
+                : `${getProfileName(profilesV4, accountId)} (Account)`;
+            ftProfileDropdownTab.appendChild(header);
+
+            appendProfileBtn(accountId);
+            const children = getChildrenForAccount(profilesV4, accountId);
+            children.forEach(childId => appendProfileBtn(childId));
+
+            if (idx < accountIds.length - 1) {
+                const sep = document.createElement('div');
+                sep.className = 'ft-profile-dropdown-separator';
+                sep.setAttribute('role', 'presentation');
+                ftProfileDropdownTab.appendChild(sep);
+            }
+        });
+
+        positionProfileDropdownTab();
+    }
+
+    function updateAutoBackupPolicyControls() {
+        try {
+            if (!ftAutoBackupMode || !ftAutoBackupFormat) return;
+            const profilesV4 = profilesV4Cache;
+            const root = safeObject(profilesV4);
+            const profiles = safeObject(root.profiles);
+            const activeProfile = safeObject(profiles[activeProfileId]);
+            const settings = safeObject(activeProfile.settings);
+
+            const mode = normalizeString(settings.autoBackupMode).toLowerCase();
+            ftAutoBackupMode.value = (mode === 'history' || mode === 'latest') ? mode : 'latest';
+
+            const format = normalizeString(settings.autoBackupFormat).toLowerCase();
+            ftAutoBackupFormat.value = (format === 'plain' || format === 'encrypted' || format === 'auto') ? format : 'auto';
+
+            const locked = isUiLocked();
+            const enabled = StateManager.getState()?.autoBackupEnabled === true;
+            const canEdit = !locked && enabled;
+
+            ftAutoBackupMode.disabled = !canEdit;
+            ftAutoBackupFormat.disabled = !canEdit;
+            ftAutoBackupMode.title = canEdit ? '' : (locked ? 'Unlock this profile to change auto-backup preferences.' : 'Enable Auto Backup to change mode.');
+            ftAutoBackupFormat.title = canEdit ? '' : (locked ? 'Unlock this profile to change auto-backup preferences.' : 'Enable Auto Backup to change format.');
+        } catch (e) {
+        }
     }
 
     function extractMasterPinVerifier(profilesV4) {
@@ -808,6 +1055,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         return locked ? `${name} (Child, locked)` : `${name} (Child)`;
     }
 
+    function buildProfileSubtitle(profilesV4, profileId) {
+        const locked = isProfileLocked(profilesV4, profileId);
+        if (profileId === 'default') {
+            return locked ? 'Master • Locked' : 'Master';
+        }
+        const type = getProfileType(profilesV4, profileId);
+        if (type === 'account') {
+            return locked ? 'Account • Locked' : 'Account';
+        }
+        return locked ? 'Child • Locked' : 'Child';
+    }
+
     function updateAdminPolicyControls() {
         if (!ftAllowAccountCreation || !ftMaxAccounts) return;
         const profilesV4 = profilesV4Cache;
@@ -882,6 +1141,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.FilterTubeResolveViewAccess = (viewId) => resolveViewAccess(viewId);
 
         updateNavigationAccessUI();
+        updateAutoBackupPolicyControls();
+        updateCheckboxes();
 
         const viewContainer = document.querySelector('.view-container');
         if (!viewContainer) return;
@@ -1081,7 +1342,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (profileId === 'default') {
             sessionMasterPin = normalized;
         }
-        await notifyBackgroundUnlocked(profileId, profileId === 'default' ? sessionMasterPin : '');
+        await notifyBackgroundUnlocked(profileId, profileId === 'default' ? sessionMasterPin : normalized);
         return true;
     }
 
@@ -1105,7 +1366,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function renderProfileSelector(profilesV4) {
-        if (!ftProfileSelector) return;
+        if (!ftProfileSelector) {
+            renderProfileSelectorTab(profilesV4);
+            return;
+        }
         const root = safeObject(profilesV4);
         const profiles = safeObject(root.profiles);
 
@@ -1145,6 +1409,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const current = normalizeString(root.activeProfileId) || 'default';
         ftProfileSelector.value = current;
+
+        try {
+            const colors = getProfileColors(current);
+            ftProfileSelector.style.setProperty('--ft-profile-accent', colors.accent || '');
+            ftProfileSelector.style.setProperty('--ft-profile-accent-bg', colors.accentBg || '');
+            ftProfileSelector.style.setProperty('--ft-profile-accent-border', colors.accentBorder || '');
+            ftProfileSelector.style.borderColor = colors.accentBorder || '';
+            ftProfileSelector.style.backgroundColor = colors.accentBg || '';
+            ftProfileSelector.style.color = colors.fg || '';
+            // propagate accent to other selects for consistent look
+            document.documentElement.style.setProperty('--ft-select-border', colors.accentBorder || '');
+            document.documentElement.style.setProperty('--ft-select-accent', colors.accent || '');
+        } catch (e) {
+        }
     }
 
     function renderProfilesManager(profilesV4) {
@@ -1176,7 +1454,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             const row = document.createElement('div');
-            row.className = `help-item${type === 'child' ? ' ft-profile-child' : ''}`;
+            const locked = isProfileLocked(profilesV4, profileId);
+            row.className = `help-item ft-profile-row${type === 'child' ? ' ft-profile-child' : ''}${profileId === activeProfileId ? ' is-active' : ''}${locked ? ' is-locked' : ''}`;
+
+            const colors = getProfileColors(profileId);
+            row.style.setProperty('--ft-profile-accent', colors.accent || '');
+            row.style.setProperty('--ft-profile-accent-bg', colors.accentBg || '');
+            row.style.setProperty('--ft-profile-accent-border', colors.accentBorder || '');
 
             const title = document.createElement('div');
             title.className = 'help-item-title';
@@ -1249,7 +1533,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
 
             const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'btn-secondary';
+            deleteBtn.className = 'btn-secondary btn-danger';
             deleteBtn.type = 'button';
             deleteBtn.textContent = 'Delete';
             deleteBtn.disabled = profileId === 'default';
@@ -1409,6 +1693,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         profiles
                     });
                     unlockedProfiles.delete(profileId);
+                    await notifyBackgroundLocked(profileId);
                     await refreshProfilesUI();
                     UIComponents.showToast('Profile PIN removed', 'success');
                 });
@@ -1435,6 +1720,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             activeProfileId = nextActive;
             updateExportScopeControls();
             updateAdminPolicyControls();
+            updateAutoBackupPolicyControls();
             renderProfileSelector(profilesV4);
             renderProfilesManager(profilesV4);
             applyLockGateIfNeeded();
@@ -1477,6 +1763,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
             await StateManager.loadSettings();
             await refreshProfilesUI();
+            updateStats();
             UIComponents.showToast('Profile switched', 'success');
         } catch (e) {
             console.warn('Tab-View: profile switch failed', e);
@@ -1498,6 +1785,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     updateExportScopeControls();
+    updateAdminPolicyControls();
+    updateAutoBackupPolicyControls();
     if (profilesV4Cache) {
         renderProfileSelector(profilesV4Cache);
         renderProfilesManager(profilesV4Cache);
@@ -1507,8 +1796,37 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (ftProfileSelector) {
         ftProfileSelector.addEventListener('change', async (e) => {
-            const targetId = e.target?.value || '';
-            await switchToProfile(targetId);
+            try {
+                const target = normalizeString(e?.target?.value);
+                if (!target) return;
+                await switchToProfile(target);
+            } catch (err) {
+            }
+        });
+    }
+
+    if (ftProfileBadgeBtnTab && ftProfileDropdownTab) {
+        ftProfileBadgeBtnTab.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleProfileDropdownTab();
+        });
+
+        window.addEventListener('resize', () => {
+            positionProfileDropdownTab();
+        });
+
+        document.addEventListener('click', (e) => {
+            try {
+                if (!ftProfileMenuTab) {
+                    closeProfileDropdownTab();
+                    return;
+                }
+                if (ftProfileMenuTab.contains(e.target)) return;
+                closeProfileDropdownTab();
+            } catch (err) {
+                closeProfileDropdownTab();
+            }
         });
     }
 
@@ -1538,6 +1856,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (eventType === 'settingUpdated' || eventType === 'externalUpdate') {
             updateCheckboxes();
+            updateAutoBackupPolicyControls();
         }
 
         if (eventType === 'load' || eventType === 'externalUpdate') {
@@ -1718,6 +2037,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         try {
+            const profilesV4 = profilesV4Cache || (typeof io.loadProfilesV4 === 'function' ? await io.loadProfilesV4() : null);
+            const activeId = normalizeString(profilesV4?.activeProfileId) || 'default';
+            if (activeId !== 'default') {
+                UIComponents.showToast('Switch to Default (Master) to import backups', 'error');
+                return;
+            }
+
+            const masterVerifier = extractMasterPinVerifier(profilesV4);
+            if (masterVerifier && !sessionMasterPin) {
+                const okAdmin = await ensureAdminUnlocked(profilesV4);
+                if (!okAdmin) return;
+            }
+        } catch (e) {
+        }
+
+        try {
             const text = await file.text();
             const parsed = JSON.parse(text);
 
@@ -1818,6 +2153,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const fresh = await io.loadProfilesV4();
             if (normalizeString(fresh?.activeProfileId) !== 'default') {
                 UIComponents.showToast('Switch to Default to change account policy', 'error');
+                updateAdminPolicyControls();
                 return;
             }
             const okAdmin = await ensureAdminUnlocked(fresh);
@@ -1845,12 +2181,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
 
         ftAllowAccountCreation.addEventListener('change', async () => {
+            if (activeProfileId !== 'default') {
+                UIComponents.showToast('Switch to Default to change account policy', 'error');
+                updateAdminPolicyControls();
+                return;
+            }
             if (!profilesV4Cache) return;
             const policy = getAccountPolicy(profilesV4Cache);
             await persistPolicy({ ...policy, allowAccountCreation: !!ftAllowAccountCreation.checked });
         });
 
         ftMaxAccounts.addEventListener('change', async () => {
+            if (activeProfileId !== 'default') {
+                UIComponents.showToast('Switch to Default to change account policy', 'error');
+                updateAdminPolicyControls();
+                return;
+            }
             if (!profilesV4Cache) return;
             const policy = getAccountPolicy(profilesV4Cache);
             const nextMax = parseInt(ftMaxAccounts.value || '0', 10);
@@ -1916,12 +2262,24 @@ document.addEventListener('DOMContentLoaded', async () => {
                 counter += 1;
             }
 
+            const sourceId = normalizeString(profilesV4?.activeProfileId) || 'default';
+            const sourceProfile = safeObject(profiles[sourceId]);
+            const sourceSettings = safeObject(sourceProfile.settings);
+            const autoBackupEnabled = sourceSettings.autoBackupEnabled === true;
+            const modeRaw = normalizeString(sourceSettings.autoBackupMode).toLowerCase();
+            const autoBackupMode = (modeRaw === 'history' || modeRaw === 'latest') ? modeRaw : 'latest';
+            const formatRaw = normalizeString(sourceSettings.autoBackupFormat).toLowerCase();
+            const autoBackupFormat = (formatRaw === 'plain' || formatRaw === 'encrypted' || formatRaw === 'auto') ? formatRaw : 'auto';
+
             profiles[candidate] = {
                 type: 'account',
                 parentProfileId: null,
                 name,
                 settings: {
-                    syncKidsToMain: false
+                    syncKidsToMain: false,
+                    autoBackupEnabled,
+                    autoBackupMode,
+                    autoBackupFormat
                 },
                 main: {
                     channels: [],
@@ -1943,6 +2301,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             await refreshProfilesUI();
             await switchToProfile(candidate);
+            try {
+                const fresh = profilesV4Cache;
+                const root = safeObject(fresh);
+                const profiles = safeObject(root.profiles);
+                const activeProfile = safeObject(profiles[normalizeString(root.activeProfileId) || 'default']);
+                const settings = safeObject(activeProfile.settings);
+                if (settings.autoBackupEnabled === true) {
+                    await scheduleAutoBackup('profile_created', 1500);
+                }
+            } catch (e) {
+            }
         });
     }
 
@@ -1992,12 +2361,23 @@ document.addEventListener('DOMContentLoaded', async () => {
                 counter += 1;
             }
 
+            const sourceProfile = safeObject(profiles[currentActive]);
+            const sourceSettings = safeObject(sourceProfile.settings);
+            const autoBackupEnabled = sourceSettings.autoBackupEnabled === true;
+            const modeRaw = normalizeString(sourceSettings.autoBackupMode).toLowerCase();
+            const autoBackupMode = (modeRaw === 'history' || modeRaw === 'latest') ? modeRaw : 'latest';
+            const formatRaw = normalizeString(sourceSettings.autoBackupFormat).toLowerCase();
+            const autoBackupFormat = (formatRaw === 'plain' || formatRaw === 'encrypted' || formatRaw === 'auto') ? formatRaw : 'auto';
+
             profiles[candidate] = {
                 type: 'child',
                 parentProfileId: currentActive,
                 name,
                 settings: {
-                    syncKidsToMain: false
+                    syncKidsToMain: false,
+                    autoBackupEnabled,
+                    autoBackupMode,
+                    autoBackupFormat
                 },
                 main: {
                     channels: [],
@@ -2019,6 +2399,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             await refreshProfilesUI();
             await switchToProfile(candidate);
+            try {
+                const fresh = profilesV4Cache;
+                const root = safeObject(fresh);
+                const profiles = safeObject(root.profiles);
+                const activeProfile = safeObject(profiles[normalizeString(root.activeProfileId) || 'default']);
+                const settings = safeObject(activeProfile.settings);
+                if (settings.autoBackupEnabled === true) {
+                    await scheduleAutoBackup('profile_created', 1500);
+                }
+            } catch (e) {
+            }
         });
     }
 
@@ -2137,8 +2528,88 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             sessionMasterPin = '';
             unlockedProfiles.delete('default');
+            await notifyBackgroundLocked('default');
             await refreshProfilesUI();
             UIComponents.showToast('Master PIN removed', 'success');
+        });
+    }
+
+    if (ftAutoBackupMode) {
+        ftAutoBackupMode.addEventListener('change', async () => {
+            if (isUiLocked()) {
+                updateAutoBackupPolicyControls();
+                return;
+            }
+            if (StateManager.getState()?.autoBackupEnabled !== true) {
+                updateAutoBackupPolicyControls();
+                return;
+            }
+            try {
+                const io = window.FilterTubeIO || {};
+                if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') return;
+                const fresh = await io.loadProfilesV4();
+                const activeId = normalizeString(fresh?.activeProfileId) || 'default';
+                const profiles = safeObject(fresh?.profiles);
+                const profile = safeObject(profiles[activeId]);
+                const settings = safeObject(profile.settings);
+                const next = ftAutoBackupMode.value === 'history' ? 'history' : 'latest';
+                profiles[activeId] = {
+                    ...profile,
+                    settings: {
+                        ...settings,
+                        autoBackupMode: next
+                    }
+                };
+                await io.saveProfilesV4({
+                    ...fresh,
+                    schemaVersion: 4,
+                    activeProfileId: activeId,
+                    profiles
+                });
+                await refreshProfilesUI();
+                await scheduleAutoBackup('setting_updated');
+            } catch (e) {
+            }
+        });
+    }
+
+    if (ftAutoBackupFormat) {
+        ftAutoBackupFormat.addEventListener('change', async () => {
+            if (isUiLocked()) {
+                updateAutoBackupPolicyControls();
+                return;
+            }
+            if (StateManager.getState()?.autoBackupEnabled !== true) {
+                updateAutoBackupPolicyControls();
+                return;
+            }
+            try {
+                const io = window.FilterTubeIO || {};
+                if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') return;
+                const fresh = await io.loadProfilesV4();
+                const activeId = normalizeString(fresh?.activeProfileId) || 'default';
+                const profiles = safeObject(fresh?.profiles);
+                const profile = safeObject(profiles[activeId]);
+                const settings = safeObject(profile.settings);
+                const raw = normalizeString(ftAutoBackupFormat.value).toLowerCase();
+                const next = (raw === 'plain' || raw === 'encrypted' || raw === 'auto') ? raw : 'auto';
+                profiles[activeId] = {
+                    ...profile,
+                    settings: {
+                        ...settings,
+                        autoBackupFormat: next
+                    }
+                };
+                await io.saveProfilesV4({
+                    ...fresh,
+                    schemaVersion: 4,
+                    activeProfileId: activeId,
+                    profiles
+                });
+                await refreshProfilesUI();
+                await scheduleAutoBackup('setting_updated');
+            } catch (e) {
+            }
         });
     }
 
@@ -2282,17 +2753,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function updateCheckboxes() {
         const state = StateManager.getState();
+        const locked = isUiLocked();
 
         allSettingCheckboxes.forEach(el => {
             const key = el.getAttribute('data-ft-setting');
             if (!key) return;
             el.checked = !!state[key];
+            el.disabled = locked;
         });
 
         const filterCommentsEl = contentControlsContainer?.querySelector('input[data-ft-setting="filterComments"]') || null;
         if (filterCommentsEl) {
             filterCommentsEl.checked = state.hideComments ? false : !!state.filterComments;
-            filterCommentsEl.disabled = !!state.hideComments;
+            filterCommentsEl.disabled = locked || !!state.hideComments;
         }
     }
 
@@ -2315,6 +2788,29 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             groupEl.style.display = (!q || anyVisible) ? '' : 'none';
         });
+    }
+
+    function filterHelpCards() {
+        const helpView = document.getElementById('helpView');
+        if (!helpView) return;
+        if (helpSearchCard) helpSearchCard.style.display = '';
+
+        const q = (helpSearchInput?.value || '').trim().toLowerCase();
+        const cards = helpView.querySelectorAll('.card');
+
+        let visibleCount = 0;
+        cards.forEach(card => {
+            if (helpSearchCard && card === helpSearchCard) return;
+            const text = (card.textContent || '').toLowerCase();
+            const show = !q || text.includes(q);
+            card.style.display = show ? '' : 'none';
+            if (show) visibleCount += 1;
+        });
+
+        if (helpSearchEmpty) {
+            const showEmpty = !!q && visibleCount === 0;
+            helpSearchEmpty.style.display = showEmpty ? '' : 'none';
+        }
     }
 
     function updateStats() {
@@ -2373,6 +2869,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderKidsChannels();
     updateCheckboxes();
     filterContentControls();
+    filterHelpCards();
     updateStats();
 
     // ============================================================================
@@ -2461,6 +2958,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (searchContentControls) {
         searchContentControls.addEventListener('input', () => {
             filterContentControls();
+        });
+    }
+
+    if (helpSearchInput) {
+        helpSearchInput.addEventListener('input', () => {
+            filterHelpCards();
         });
     }
 
@@ -2731,6 +3234,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     allSettingCheckboxes.forEach(el => {
         el.addEventListener('change', async () => {
             if (isUiLocked()) {
+                updateCheckboxes();
+                return;
+            }
+            if (el.disabled) {
                 updateCheckboxes();
                 return;
             }

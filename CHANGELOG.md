@@ -1,5 +1,18 @@
 # Changelog
 
+## Version 3.1.9
+
+### Multi-Profiles, Auto-backup, and PIN Protct
+
+- Auto-backup settings are now profile-aware: mode/format selectors disable when auto-backup is off or the profile is locked, and new profiles inherit auto-backup preferences correctly.
+- Auto-backup scheduling triggers on profile creation and mode/format changes only when the active profile has auto-backup enabled, respecting per-profile PIN locks.
+- Content-control toggles and auto-backup controls revert and stay disabled when a profile is locked, preventing unauthorized changes.
+- Export scope UI enforces “Export active profile only” for non-master profiles; Master can toggle full exports.
+- New Tab profile dropdown sits above the lock gate (z-index fix) so it stays clickable even when locked.
+- Documentation updated to capture profile/PIN model, profile-scoped backups, and UI gating rules.
+
+---
+
 ## Version 3.1.8
 
 ### Support + Backups

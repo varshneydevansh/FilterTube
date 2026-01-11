@@ -3,6 +3,20 @@
     "_comment": "Shared release notes source for the dashboard What’s New tab and the YouTube release banner. Keep entries sorted newest-first by version."
   },
   {
+    "version": "3.1.9",
+    "headline": "Profile-aware backups + lock-gated controls",
+    "summary": "Auto-backup and content controls now respect profile locks/PINs, inherit per-profile settings, and the profile dropdown stays clickable over the lock gate.",
+    "bannerSummary": "Per-profile auto-backup + locked-profile gating; profile selector is always clickable.",
+    "highlights": [
+      "Auto-backup mode/format selectors disable when auto-backup is off or the profile is locked; new profiles inherit auto-backup preferences.",
+      "Auto-backup scheduling now triggers on profile creation and mode/format changes only when auto-backup is enabled for that profile.",
+      "Content-control toggles and backup controls stay disabled/revert when locked; export scope forces active-profile-only for non-master profiles.",
+      "Profile dropdown z-index fix keeps it clickable even when the lock gate banner is visible.",
+      "Docs updated for profile/PIN model, profile-scoped backups, and UI gating rules."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.1.9"
+  },
+  {
     "version": "3.1.8",
     "headline": "Support tab + reliable auto-backups",
     "summary": "New Support page (Ko-fi) and auto-backups now work reliably on both Chrome and Firefox.",

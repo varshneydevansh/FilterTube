@@ -11,16 +11,40 @@ This document provides a deep technical dive into implementation of FilterTube's
 *   **Custom Events / postMessage**: Used for cross-world communication.
 *   **StateManager**: Centralized state management for consistent settings across UI and background.
 
-## Cross-browser Downloads (Export + Auto-backup)
+## Cross-browser Downloads, Export & Auto-backup (Profile-aware)
 
 FilterTube writes JSON files using the browser `downloads` API.
 
-*   **Blob URL path**: when `URL.createObjectURL` is available, FilterTube generates a Blob URL so downloads work in Firefox (which blocks `data:` URL downloads).
-*   **Data URL fallback**: in Chrome MV3 service worker contexts, `URL.createObjectURL` may be unavailable; FilterTube falls back to `data:application/json` URLs.
+* **Blob URL path**: when `URL.createObjectURL` is available, we generate a Blob URL so downloads work in Firefox (which blocks `data:` URL downloads).
+* **Data URL fallback**: if `URL.createObjectURL` is unavailable (e.g., Chrome MV3 service worker), we fall back to `data:application/json` URLs.
 
-Auto-backups are written as a single rolling file (silent overwrite) to avoid clutter:
+Auto-backups are **per-profile** and support history + encryption:
 
-*   `Downloads/FilterTube Backup/FilterTube-Backup-Latest.json`
+* Destination pattern: `Downloads/FilterTube Backup/<ProfileLabel>/`
+* **Mode** (`autoBackupMode`, per-profile):
+  * `latest` (default): `FilterTube-Backup-Latest.json|encrypted.json` (overwritten)
+  * `history`: `FilterTube-Backup-<timestamp>.json|encrypted.json` (rotated per profile folder)
+* **Format** (`autoBackupFormat`, per-profile):
+  * `auto`: encrypt if the active profile has a PIN verifier
+  * `plain`: always plaintext JSON
+  * `encrypted`: always encrypted container
+* **Enablement**: `profilesV4.profiles[activeId].settings.autoBackupEnabled === true`
+* **Encryption**: PBKDF2-SHA256 (150k iterations, random salt) + AES-GCM (random IV). Plaintext `meta` remains for version/profile labeling; payload is inside `encrypted`.
+* **Session PIN cache**: Background keeps a memory-only cache after verifying UI-sent PINs via `FilterTube_SessionPinAuth`; encrypted backups **skip** if cache is missing (safe default).
+
+### Auto-backup payload construction (profile-aware)
+
+* If active profile is `default`: export type `full`, includes `profilesV4`.
+* If active profile is not `default`: export type `profile`, includes only the active profile inside `profilesV4`.
+* Kids/main settings and lists are taken from the active profile’s `settings/main/kids`.
+* File naming: per-profile label folder; `Latest` overwrite vs timestamped history.
+* Rotation: only in history mode, per profile folder.
+
+### Import / Export gating
+
+* **Full export**: only when active profile is `default`; Master PIN must be unlocked if set.
+* **Import/restore**: only when active profile is `default`; Master PIN must be unlocked if set; encrypted imports require the password/PIN to decrypt.
+* **Non-default export**: forced to active-profile-only.
 
 ## 1. Data Interception: `ytInitialData` Hook
 

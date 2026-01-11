@@ -195,7 +195,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     const unlockedProfiles = new Set();
 
     async function sendRuntimeMessage(payload) {
-        return null;
+        return new Promise((resolve) => {
+            try {
+                if (!chrome?.runtime?.sendMessage) {
+                    resolve(null);
+                    return;
+                }
+
+                const maybePromise = chrome.runtime.sendMessage(payload, (resp) => {
+                    const err = chrome.runtime?.lastError;
+                    if (err) {
+                        resolve(null);
+                        return;
+                    }
+                    resolve(resp);
+                });
+
+                if (maybePromise && typeof maybePromise.then === 'function') {
+                    maybePromise.then(resolve).catch(() => resolve(null));
+                }
+            } catch (e) {
+                resolve(null);
+            }
+        });
     }
 
     async function syncSessionUnlockStateFromBackground() {
@@ -203,7 +225,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function notifyBackgroundUnlocked(profileId, pin = '') {
-        return;
+        try {
+            const id = normalizeString(profileId);
+            const normalizedPin = normalizeString(pin);
+            if (!id || !normalizedPin) return;
+            await sendRuntimeMessage({
+                action: 'FilterTube_SessionPinAuth',
+                profileId: id,
+                pin: normalizedPin
+            });
+        } catch (e) {
+        }
     }
 
     let lockGateEl = null;
@@ -330,34 +362,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         return getSortedIdsByName(profilesV4, ids);
     }
 
-    function hashHue(value) {
-        const str = normalizeString(value);
-        let hash = 0;
-        for (let i = 0; i < str.length; i += 1) {
-            hash = (hash * 31 + str.charCodeAt(i)) % 360;
-        }
-        return hash;
-    }
-
-    function isDarkTheme() {
-        try {
-            return document.documentElement.getAttribute('data-theme') === 'dark';
-        } catch (e) {
-            return false;
-        }
-    }
-
     function getProfileColors(seed) {
-        const h = hashHue(seed);
-        if (isDarkTheme()) {
-            return {
-                bg: `hsl(${h} 55% 32%)`,
-                fg: `hsl(${h} 80% 92%)`
-            };
+        try {
+            const colorsApi = window.UIComponents?.getProfileColors;
+            if (typeof colorsApi === 'function') {
+                return colorsApi(seed);
+            }
+        } catch (e) {
         }
         return {
-            bg: `hsl(${h} 65% 85%)`,
-            fg: `hsl(${h} 40% 22%)`
+            bg: 'hsl(0 0% 90%)',
+            fg: 'hsl(0 0% 18%)',
+            accent: 'hsl(160 40% 40%)',
+            accentBg: 'hsla(160, 40%, 40%, 0.14)',
+            accentBorder: 'hsla(160, 40%, 40%, 0.55)'
         };
     }
 
@@ -531,7 +549,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             return false;
         }
         unlockedProfiles.add(profileId);
+        await notifyBackgroundUnlocked(profileId, normalized);
         return true;
+    }
+
+    function isUiLocked() {
+        try {
+            const profilesV4 = profilesV4Cache;
+            const activeProfileId = normalizeString(profilesV4?.activeProfileId) || 'default';
+            return !!(profilesV4 && isProfileLocked(profilesV4, activeProfileId) && !unlockedProfiles.has(activeProfileId));
+        } catch (e) {
+        }
+        return false;
     }
 
     function applyLockGateIfNeeded() {
@@ -540,6 +569,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const isLocked = profilesV4 && isProfileLocked(profilesV4, activeProfileId) && !unlockedProfiles.has(activeProfileId);
 
         document.body.classList.toggle('ft-popup-locked', !!isLocked);
+
+        try {
+            updateCheckboxes();
+        } catch (e) {
+        }
 
         const appContainer = document.querySelector('.app-container');
         const headerEl = document.querySelector('.app-header');
@@ -622,6 +656,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         ftProfileBadgeBtnPopup.textContent = getProfileInitial(profilesV4, current);
         ftProfileBadgeBtnPopup.style.backgroundColor = badgeColors.bg;
         ftProfileBadgeBtnPopup.style.color = badgeColors.fg;
+        ftProfileBadgeBtnPopup.style.borderColor = badgeColors.accentBorder || '';
         ftProfileBadgeBtnPopup.title = buildProfileLabel(profilesV4, current);
 
         ftProfileDropdownPopup.innerHTML = '';
@@ -636,9 +671,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             btn.setAttribute('role', 'option');
             btn.setAttribute('aria-selected', id === current ? 'true' : 'false');
 
+            const colors = getProfileColors(id);
+            btn.style.setProperty('--ft-profile-accent', colors.accent || '');
+            btn.style.setProperty('--ft-profile-accent-bg', colors.accentBg || '');
+            btn.style.setProperty('--ft-profile-accent-border', colors.accentBorder || '');
+
             const avatar = document.createElement('div');
             avatar.className = 'ft-profile-dropdown-avatar';
-            const colors = getProfileColors(id);
             avatar.style.backgroundColor = colors.bg;
             avatar.style.color = colors.fg;
             avatar.textContent = getProfileInitial(profilesV4, id);
@@ -724,19 +763,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!profiles[targetId]) {
                 UIComponents.showToast('Profile not found', 'error');
                 return;
-            }
-
-            const currentId = normalizeString(profilesV4?.activeProfileId) || 'default';
-            const currentType = getProfileType(profilesV4, currentId);
-            const currentAccount = getParentAccountId(profilesV4, currentId);
-            const targetAccount = getParentAccountId(profilesV4, targetId);
-
-            if (currentType === 'child' && currentAccount !== targetAccount) {
-                const okAdmin = await ensureProfileUnlocked(profilesV4, 'default');
-                if (!okAdmin) {
-                    await refreshProfilesUI();
-                    return;
-                }
             }
 
             const ok = await ensureProfileUnlocked(profilesV4, targetId);
@@ -863,17 +889,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function updateCheckboxes() {
         const state = StateManager.getState();
+        const locked = isUiLocked();
 
         contentControlCheckboxes.forEach(el => {
             const key = el.getAttribute('data-ft-setting');
             if (!key) return;
             el.checked = !!state[key];
+            el.disabled = locked;
         });
 
         const filterCommentsEl = contentControlsContainer?.querySelector('input[data-ft-setting="filterComments"]') || null;
         if (filterCommentsEl) {
             filterCommentsEl.checked = state.hideComments ? false : !!state.filterComments;
-            filterCommentsEl.disabled = !!state.hideComments;
+            filterCommentsEl.disabled = locked || !!state.hideComments;
         }
 
         if (toggleEnabledBrandBtn) {
@@ -1006,6 +1034,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Checkbox handlers
     contentControlCheckboxes.forEach(el => {
         el.addEventListener('change', async () => {
+            if (isUiLocked()) {
+                updateCheckboxes();
+                return;
+            }
             const key = el.getAttribute('data-ft-setting');
             if (!key) return;
             await StateManager.updateSetting(key, el.checked);

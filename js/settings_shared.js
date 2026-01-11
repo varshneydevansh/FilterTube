@@ -533,9 +533,12 @@
                 const hideComments = readBool('hideComments', !!result.hideAllComments);
                 const filterComments = hideComments ? false : readBool('filterComments', !!result.filterComments);
                 const theme = result[THEME_KEY] === 'dark' ? 'dark' : 'light';
-                const autoBackupEnabled = result?.[AUTO_BACKUP_KEY] === true;
+                const autoBackupEnabled = Object.prototype.hasOwnProperty.call(profileSettings, 'autoBackupEnabled')
+                    ? (profileSettings.autoBackupEnabled === true)
+                    : (result?.[AUTO_BACKUP_KEY] === true);
 
                 const effectiveSettings = {
+                    autoBackupEnabled,
                     enabled,
                     hideShorts: readBool('hideShorts', !!result.hideAllShorts),
                     hideComments,
@@ -774,6 +777,7 @@
                         const existingSettings = safeObject(activeProfile.settings);
                         const nextSettings = {
                             ...existingSettings,
+                            autoBackupEnabled: autoBackupEnabled === true,
                             enabled: compiledSettings.enabled,
                             hideShorts: compiledSettings.hideAllShorts,
                             hideComments: compiledSettings.hideAllComments,

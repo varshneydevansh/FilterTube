@@ -133,6 +133,7 @@
      Shadows & Depth
      ========================================= */
   --ft-shadow-floating: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --ft-shadow-subtle: 0 1px 2px rgba(0, 0, 0, 0.05);
   --ft-shadow-elevated: 0 8px 24px rgba(0, 0, 0, 0.08);
   --ft-shadow-focus-ring: 0 0 0 3px rgba(46, 134, 171, 0.25);
 
