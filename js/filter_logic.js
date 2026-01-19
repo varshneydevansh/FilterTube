@@ -331,9 +331,17 @@
             title: ['header.shelfHeaderRenderer.title.simpleText']
         },
         lockupViewModel: {
-            videoId: 'contentId',
+            videoId: [
+                'rendererContext.commandContext.onTap.innertubeCommand.watchEndpoint.videoId',
+                'contentId'
+            ],
             title: ['metadata.lockupMetadataViewModel.title.content', 'accessibilityText'],
             channelName: ['metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.0.metadataParts.0.text.content'],
+            channelId: ['metadata.lockupMetadataViewModel.image.decoratedAvatarViewModel.rendererContext.commandContext.onTap.innertubeCommand.browseEndpoint.browseId'],
+            channelHandle: [
+                'metadata.lockupMetadataViewModel.image.decoratedAvatarViewModel.rendererContext.commandContext.onTap.innertubeCommand.browseEndpoint.canonicalBaseUrl',
+                'metadata.lockupMetadataViewModel.image.decoratedAvatarViewModel.rendererContext.commandContext.onTap.innertubeCommand.commandMetadata.webCommandMetadata.url'
+            ],
             metadataRows: ['metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows']
         },
 
@@ -573,6 +581,55 @@
             this.debugEnabled = true;
         }
 
+        _harvestBrowseEndpoint(node) {
+            if (!node || typeof node !== 'object') return;
+
+            const browse =
+                node?.browseEndpoint ||
+                node?.navigationEndpoint?.browseEndpoint ||
+                node?.command?.browseEndpoint ||
+                node?.innertubeCommand?.browseEndpoint ||
+                node?.endpoint?.browseEndpoint ||
+                null;
+
+            const browseId = browse?.browseId;
+            if (!browseId || typeof browseId !== 'string' || !browseId.startsWith('UC')) return;
+
+            let handle = null;
+            let customUrl = null;
+
+            const canonical = browse?.canonicalBaseUrl || browse?.canonicalUrl || browse?.url || '';
+            if (typeof canonical === 'string' && canonical) {
+                const normalized = normalizeChannelHandle(canonical);
+                if (normalized) {
+                    handle = normalized;
+                } else if (canonical.startsWith('/c/')) {
+                    const slug = canonical.split('/')[2];
+                    if (slug) customUrl = `c/${slug.split('?')[0].split('#')[0]}`;
+                } else if (canonical.startsWith('/user/')) {
+                    const slug = canonical.split('/')[2];
+                    if (slug) customUrl = `user/${slug.split('?')[0].split('#')[0]}`;
+                }
+            }
+
+            if (!handle && typeof node?.url === 'string') {
+                const normalized = normalizeChannelHandle(node.url);
+                if (normalized) handle = normalized;
+            }
+
+            if (!handle && typeof node?.webCommandMetadata?.url === 'string') {
+                const normalized = normalizeChannelHandle(node.webCommandMetadata.url);
+                if (normalized) handle = normalized;
+            }
+
+            if (handle) {
+                this._registerMapping(browseId, handle);
+            }
+            if (customUrl) {
+                this._registerCustomUrlMapping(browseId, customUrl);
+            }
+        }
+
         /**
          * Process and validate settings from background script
          */
@@ -782,28 +839,36 @@
          * any UC ID <-> @handle pairs found in their byline navigation endpoints.
          */
         _harvestRendererChannelMappings(root) {
+
             if (!root || typeof root !== 'object') return;
 
             const visited = new WeakSet();
 
             const visit = (node) => {
-                if (!node || typeof node !== 'object' || visited.has(node)) return;
+                if (!node || typeof node !== 'object') return;
+                if (visited.has(node)) return;
                 visited.add(node);
 
-                // Unwrap common renderer containers to normalize shape
+                this._harvestBrowseEndpoint(node);
+
+                // Identify any video renderer nested under known keys.
                 let candidate = node;
                 if (candidate.videoRenderer) {
                     candidate = candidate.videoRenderer;
-                } else if (candidate.gridVideoRenderer) {
-                    candidate = candidate.gridVideoRenderer;
                 } else if (candidate.compactVideoRenderer) {
                     candidate = candidate.compactVideoRenderer;
                 } else if (candidate.playlistVideoRenderer) {
                     candidate = candidate.playlistVideoRenderer;
+                } else if (candidate.lockupViewModel) {
+                    candidate = candidate.lockupViewModel;
                 } else if (candidate.richItemRenderer?.content?.videoRenderer) {
                     candidate = candidate.richItemRenderer.content.videoRenderer;
+                } else if (candidate.richItemRenderer?.content?.lockupViewModel) {
+                    candidate = candidate.richItemRenderer.content.lockupViewModel;
                 } else if (candidate.content?.videoRenderer) {
                     candidate = candidate.content.videoRenderer;
+                } else if (candidate.content?.lockupViewModel) {
+                    candidate = candidate.content.lockupViewModel;
                 }
 
                 this._harvestFromRendererByline(candidate);
@@ -824,7 +889,7 @@
         _harvestVideoOwnerFromRenderer(renderer) {
             if (!renderer || typeof renderer !== 'object') return;
 
-            const videoId = renderer.videoId || renderer.navigationEndpoint?.watchEndpoint?.videoId || '';
+            const videoId = renderer.videoId || renderer.contentId || renderer.navigationEndpoint?.watchEndpoint?.videoId || '';
             if (!videoId || typeof videoId !== 'string' || !/^[a-zA-Z0-9_-]{11}$/.test(videoId)) return;
 
             const ownerId =
@@ -841,6 +906,18 @@
             const browseId = byline?.runs?.[0]?.navigationEndpoint?.browseEndpoint?.browseId || '';
             if (browseId && typeof browseId === 'string' && browseId.startsWith('UC')) {
                 this._registerVideoChannelMapping(videoId, browseId);
+                return;
+            }
+
+            const lockupBrowse = renderer?.metadata?.lockupMetadataViewModel?.image?.decoratedAvatarViewModel?.rendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint;
+            const lockupBrowseId = lockupBrowse?.browseId;
+            if (lockupBrowseId && typeof lockupBrowseId === 'string' && lockupBrowseId.startsWith('UC')) {
+                this._registerVideoChannelMapping(videoId, lockupBrowseId);
+                const canonical = lockupBrowse?.canonicalBaseUrl || '';
+                const normalized = typeof canonical === 'string' ? normalizeChannelHandle(canonical) : '';
+                if (normalized) {
+                    this._registerMapping(lockupBrowseId, normalized);
+                }
             }
         }
 
@@ -1005,7 +1082,17 @@
             const title = this._extractTitle(item, rules);
             const channelInfo = this._extractChannelInfo(item, rules);
             const description = this._extractDescription(item, rules);
-            const videoId = rules.videoId ? getByPath(item, rules.videoId) : '';
+            let videoId = '';
+            if (rules.videoId) {
+                const videoIdPaths = Array.isArray(rules.videoId) ? rules.videoId : [rules.videoId];
+                for (const path of videoIdPaths) {
+                    const candidate = getByPath(item, path);
+                    if (candidate && typeof candidate === 'string') {
+                        videoId = candidate;
+                        break;
+                    }
+                }
+            }
             const skipKeywordFiltering = CHANNEL_ONLY_RENDERERS.has(rendererType);
 
             // Shorts: if no channel identity present, try videoChannelMap (populated when user blocked Shorts)
@@ -1204,7 +1291,108 @@
          * For collaboration videos, returns an array of all collaborating channels
          */
         _extractChannelInfo(item, rules) {
-            const channelInfo = { name: '', id: '', handle: '', customUrl: '' };
+            const channelInfo = { name: '', id: '', handle: '', customUrl: '', logo: '' };
+
+            // PRIORITY: Avatar stack collaborations (e.g., lockupViewModel/watch-next-feed)
+            // Some surfaces represent collaborations via avatarStackViewModel rather than showDialogCommand.
+            // If we can extract multiple browseEndpoints, treat as a collaboration.
+            try {
+                const extractFromAvatarStack = (stack) => {
+                    const avatars = stack?.avatars;
+                    if (!Array.isArray(avatars) || avatars.length === 0) return [];
+                    const collaborators = [];
+                    const seen = new Set();
+
+                    for (const entry of avatars) {
+                        const vm = entry?.avatarViewModel || entry?.avatar || entry;
+                        const endpoint =
+                            vm?.rendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint ||
+                            vm?.onTap?.innertubeCommand?.browseEndpoint ||
+                            entry?.rendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint ||
+                            null;
+
+                        const browseId = endpoint?.browseId;
+                        const canonicalBaseUrl = endpoint?.canonicalBaseUrl || vm?.commandMetadata?.webCommandMetadata?.url || '';
+
+                        const collab = { name: '', id: '', handle: '', customUrl: '', logo: '' };
+                        if (browseId && typeof browseId === 'string' && browseId.startsWith('UC')) {
+                            collab.id = browseId;
+                        }
+
+                        const logoUrl =
+                            vm?.avatarViewModel?.image?.sources?.[0]?.url ||
+                            vm?.image?.sources?.[0]?.url ||
+                            entry?.avatarViewModel?.image?.sources?.[0]?.url ||
+                            entry?.image?.sources?.[0]?.url ||
+                            '';
+                        if (logoUrl && typeof logoUrl === 'string') {
+                            collab.logo = logoUrl;
+                        }
+
+                        if (canonicalBaseUrl && typeof canonicalBaseUrl === 'string') {
+                            if (canonicalBaseUrl.startsWith('/@')) {
+                                const normalized = normalizeChannelHandle(canonicalBaseUrl);
+                                if (normalized) collab.handle = normalized;
+                            } else if (canonicalBaseUrl.startsWith('/c/')) {
+                                const slug = canonicalBaseUrl.split('/')[2];
+                                if (slug) collab.customUrl = 'c/' + slug.split(/[?#]/)[0];
+                            } else if (canonicalBaseUrl.startsWith('/user/')) {
+                                const slug = canonicalBaseUrl.split('/')[2];
+                                if (slug) collab.customUrl = 'user/' + slug.split(/[?#]/)[0];
+                            }
+                        }
+
+                        const a11y = entry?.a11yLabel || vm?.a11yLabel || vm?.accessibilityText || '';
+                        if (typeof a11y === 'string' && a11y.trim()) {
+                            const cleaned = a11y.replace(/\bgo to channel\b/i, '').trim();
+                            if (cleaned && !cleaned.startsWith('@')) {
+                                collab.name = cleaned;
+                            }
+                        }
+
+                        const key = (collab.id || collab.handle || collab.customUrl || '').toLowerCase();
+                        if (!key || seen.has(key)) continue;
+                        seen.add(key);
+                        collaborators.push(collab);
+                    }
+
+                    return collaborators;
+                };
+
+                const visited = new WeakSet();
+                const scanForStack = (node, depth = 0) => {
+                    if (!node || typeof node !== 'object' || visited.has(node) || depth > 10) return null;
+                    visited.add(node);
+
+                    if (node.avatarStackViewModel) {
+                        const extracted = extractFromAvatarStack(node.avatarStackViewModel);
+                        if (extracted.length > 1) return extracted;
+                    }
+
+                    if (Array.isArray(node)) {
+                        for (const child of node.slice(0, 25)) {
+                            const found = scanForStack(child, depth + 1);
+                            if (found) return found;
+                        }
+                        return null;
+                    }
+
+                    for (const key in node) {
+                        if (!Object.prototype.hasOwnProperty.call(node, key)) continue;
+                        const value = node[key];
+                        if (!value || typeof value !== 'object') continue;
+                        const found = scanForStack(value, depth + 1);
+                        if (found) return found;
+                    }
+                    return null;
+                };
+
+                const avatarStackCollaborators = scanForStack(item);
+                if (Array.isArray(avatarStackCollaborators) && avatarStackCollaborators.length > 1) {
+                    return avatarStackCollaborators;
+                }
+            } catch (e) {
+            }
 
             // PRIORITY: Check for collaboration video (showDialogCommand in byline)
             const bylineText = item.shortBylineText || item.longBylineText;
@@ -1248,7 +1436,17 @@
                                         const browseId = browseEndpoint.browseId;
                                         const canonicalBaseUrl = browseEndpoint.canonicalBaseUrl;
 
-                                        let collabChannelInfo = { name: title || '', id: '', handle: '', customUrl: '' };
+                                        let collabChannelInfo = { name: title || '', id: '', handle: '', customUrl: '', logo: '' };
+
+                                        const dialogLogoUrl =
+                                            listItemViewModel.leadingElement?.avatarViewModel?.image?.sources?.[0]?.url ||
+                                            listItemViewModel.leadingElement?.thumbnailViewModel?.image?.sources?.[0]?.url ||
+                                            listItemViewModel.leadingElement?.image?.sources?.[0]?.url ||
+                                            listItemViewModel.leadingElement?.avatar?.avatarViewModel?.image?.sources?.[0]?.url ||
+                                            '';
+                                        if (dialogLogoUrl && typeof dialogLogoUrl === 'string') {
+                                            collabChannelInfo.logo = dialogLogoUrl;
+                                        }
 
                                         // Extract handle or customUrl from canonicalBaseUrl
                                         if (canonicalBaseUrl) {
@@ -1326,6 +1524,17 @@
             if (rules.channelHandle) {
                 const handlePaths = Array.isArray(rules.channelHandle) ? rules.channelHandle : [rules.channelHandle];
                 channelInfo.handle = extractChannelHandleFromPaths(item, handlePaths);
+            }
+
+            // Watch page lockupViewModel: capture channel avatar/logo
+            if (!channelInfo.logo) {
+                const lockupLogoUrl =
+                    getByPath(item, 'metadata.lockupMetadataViewModel.image.decoratedAvatarViewModel.avatar.avatarViewModel.image.sources.0.url') ||
+                    getByPath(item, 'metadata.lockupMetadataViewModel.image.decoratedAvatarViewModel.avatar.image.sources.0.url') ||
+                    '';
+                if (lockupLogoUrl && typeof lockupLogoUrl === 'string') {
+                    channelInfo.logo = lockupLogoUrl;
+                }
             }
 
             // Additional fallback extraction attempts

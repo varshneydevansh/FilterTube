@@ -34,6 +34,14 @@ playlist.json
 playlist.js
 playlist.html
 collab_on_homepage.html
+YT_KIDS.json
+YT_MAIN_NEXT_RESPONSE_COMMENT.json
+YT_MAIN_next?prettyPrint.json
+YT_MAIN_NEXT.json
+YT_MAIN_UPNEXT_FEED_WATCHPAGE.json
+YT_MAIN_UPNEXT_FEED_WATCHPAGE2.json
+YT_MAIN_WATCH.html
+YT_MAIN.json
 
 # Logs
 *.log

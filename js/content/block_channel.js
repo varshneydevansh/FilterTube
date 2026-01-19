@@ -199,6 +199,8 @@ function captureKidsMenuContext(menuButton) {
         ts: now,
         videoId: '',
         channelId: '',
+        channelHandle: '',
+        customUrl: '',
         channelName: '',
         source: 'kidsMenu'
     };
@@ -216,6 +218,30 @@ function captureKidsMenuContext(menuButton) {
             const href = channelAnchor?.getAttribute('href') || channelAnchor?.href || '';
             if (href && window.FilterTubeIdentity?.extractChannelIdFromPath) {
                 context.channelId = window.FilterTubeIdentity.extractChannelIdFromPath(href) || '';
+            }
+
+            if (href) {
+                try {
+                    const extractedHandle = window.FilterTubeIdentity?.extractRawHandle?.(href) || '';
+                    if (extractedHandle && extractedHandle.startsWith('@')) {
+                        context.channelHandle = extractedHandle;
+                    }
+                } catch (e) {
+                }
+
+                try {
+                    const decoded = (() => {
+                        try { return decodeURIComponent(href); } catch (e) { return href; }
+                    })();
+                    if (decoded.startsWith('/c/')) {
+                        const slug = decoded.split('/')[2] || '';
+                        if (slug) context.customUrl = `c/${slug}`;
+                    } else if (decoded.startsWith('/user/')) {
+                        const slug = decoded.split('/')[2] || '';
+                        if (slug) context.customUrl = `user/${slug}`;
+                    }
+                } catch (e) {
+                }
             }
             const channelName = channelAnchor?.textContent?.trim() || '';
             if (channelName) {
@@ -295,15 +321,34 @@ async function handleKidsNativeBlock(blockType = 'video', options = {}) {
         return;
     }
 
-    const ctx = (lastKidsMenuContext && (now - (lastKidsMenuContext.ts || 0) < KIDS_MENU_CONTEXT_TTL_MS))
+    let ctx = (lastKidsMenuContext && (now - (lastKidsMenuContext.ts || 0) < KIDS_MENU_CONTEXT_TTL_MS))
         ? lastKidsMenuContext
         : null;
 
+    try {
+        // Best-effort refresh to reduce stale menu context (Kids toast can fire late).
+        if (!ctx || (!ctx.channelId && !ctx.channelName)) {
+            const fresh = captureKidsMenuContext(lastClickedMenuButton);
+            if (fresh) {
+                lastKidsMenuContext = fresh;
+                ctx = fresh;
+            }
+        }
+    } catch (e) {
+    }
+
     const videoId = ctx?.videoId || '';
     const channelIdHint = ctx?.channelId || '';
+    const channelHandleHint = (ctx?.channelHandle || '').trim();
+    const customUrlHint = (ctx?.customUrl || '').trim();
 
-    const channelName = (ctx?.channelName || '').trim();
+    let channelName = (ctx?.channelName || '').trim();
     const channelId = (channelIdHint || '').trim();
+
+    // Some Kids surfaces can yield an ID-like token in our fallback parsing; avoid persisting that as the channel name.
+    if (/^[a-zA-Z0-9_-]{11}$/.test(channelName) || /^UC[\w-]{22}$/i.test(channelName)) {
+        channelName = '';
+    }
 
     if (!videoId && !channelId && !channelName) return;
 
@@ -332,17 +377,27 @@ async function handleKidsNativeBlock(blockType = 'video', options = {}) {
 
     console.log(`FilterTube: Handling Kids native ${blockType} block for:`, dedupKey);
 
+    const safeHandle = (channelHandleHint && channelHandleHint.startsWith('@')) ? channelHandleHint : '';
+    const safeCustomUrl = (customUrlHint && (customUrlHint.startsWith('c/') || customUrlHint.startsWith('user/'))) ? customUrlHint : '';
+
+    // Important: only set originalInput when it is a canonical identifier.
+    // Otherwise allow background to use watch:<videoId> resolution.
+    const originalInput = (channelId && channelId.startsWith('UC'))
+        ? channelId
+        : (safeHandle || safeCustomUrl || '');
+
     chrome.runtime?.sendMessage({
         action: 'FilterTube_KidsBlockChannel',
         videoId: videoId || null,
         channel: {
-            name: channelName || channelId || 'Channel',
+            name: channelName || null,
             id: channelId || '',
-            handle: '',
-            handleDisplay: null,
-            canonicalHandle: null,
-            customUrl: null,
-            originalInput: videoId ? `watch:${videoId}` : (channelId || channelName),
+            handle: safeHandle || null,
+            handleDisplay: safeHandle || null,
+            canonicalHandle: safeHandle || null,
+            customUrl: safeCustomUrl || null,
+            // Prefer stable identifiers (UC id / channel name). If unavailable, let background fall back to watch:<videoId>.
+            originalInput: originalInput || null,
             source: blockType === 'channel' ? 'kidsNativeChannel' : 'kidsNativeVideo',
             addedAt: Date.now()
         }

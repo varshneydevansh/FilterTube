@@ -326,6 +326,11 @@ const StateManager = (() => {
         if (!name) return true;
         if (id && name === id) return true;
         if (isHandleLike(name)) return true;
+        // Topic channels often only have a stable UC ID and a display name like "Artist - Topic".
+        // Treat these as complete enough to avoid repeated enrichment attempts.
+        if (name && /\s-\sTopic$/i.test(name) && id && id.toUpperCase().startsWith('UC')) {
+            return false;
+        }
         if (!channel.handle || !channel.logo) return true;
         return false;
     }

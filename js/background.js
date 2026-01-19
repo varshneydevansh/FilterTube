@@ -568,9 +568,52 @@ const pendingWatchIdentityFetches = new Map();
 const watchIdentitySessionCache = new Map();
 const pendingKidsWatchIdentityFetches = new Map();
 const kidsWatchIdentitySessionCache = new Map();
+const pendingPostBlockEnrichments = new Map();
+const postBlockEnrichmentAttempted = new Map();
 const CURRENT_VERSION = (browserAPI.runtime.getManifest()?.version || '').trim();
 const FT_PROFILES_V4_KEY = 'ftProfilesV4';
 const DEFAULT_PROFILE_ID = 'default';
+
+function schedulePostBlockEnrichment(channel, profile = 'main', metadata = {}) {
+    const source = typeof metadata?.source === 'string' ? metadata.source : '';
+    if (source === 'postBlockEnrichment') return;
+
+    const id = typeof channel?.id === 'string' ? channel.id.trim() : '';
+    if (!id || !id.toUpperCase().startsWith('UC')) return;
+
+    const key = `${profile === 'kids' ? 'kids' : 'main'}:${id.toLowerCase()}`;
+    const now = Date.now();
+    const lastAttempt = postBlockEnrichmentAttempted.get(key) || 0;
+    if (now - lastAttempt < 6 * 60 * 60 * 1000) return;
+
+    const name = typeof channel?.name === 'string' ? channel.name.trim() : '';
+    const handle = typeof channel?.handle === 'string' ? channel.handle.trim() : '';
+    const customUrl = typeof channel?.customUrl === 'string' ? channel.customUrl.trim() : '';
+    const logo = typeof channel?.logo === 'string' ? channel.logo.trim() : '';
+
+    const needsEnrichment = ((!handle && !customUrl) || !logo || !name);
+    if (!needsEnrichment) return;
+
+    if (pendingPostBlockEnrichments.has(key)) return;
+    postBlockEnrichmentAttempted.set(key, now);
+
+    const promise = (async () => {
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        await handleAddFilteredChannel(
+            id,
+            false,
+            null,
+            null,
+            { source: 'postBlockEnrichment' },
+            profile === 'kids' ? 'kids' : 'main',
+            ''
+        );
+    })().finally(() => {
+        pendingPostBlockEnrichments.delete(key);
+    });
+
+    pendingPostBlockEnrichments.set(key, promise);
+}
 // Deep link into the tab-view dashboard; query param avoids hash-only navigation
 // so we can reliably parse intent even when hash stripping occurs.
 const WHATS_NEW_PAGE_URL = browserAPI.runtime.getURL('html/tab-view.html?view=whatsnew');
@@ -1118,13 +1161,17 @@ async function getCompiledSettings(sender = null, profileType = null) {
                 compiledChannels = storedChannels.map(ch => {
                     if (typeof ch === 'string') {
                         const trimmed = ch.trim();
+                        const looksLikeHandle = trimmed.startsWith('@');
+                        const looksLikeUc = trimmed.toUpperCase().startsWith('UC');
+                        const canonicalHandle = looksLikeHandle ? trimmed : null;
+                        const normalizedHandle = looksLikeHandle ? trimmed.toLowerCase() : null;
                         // Legacy string format - convert to object format
                         return {
                             name: trimmed,
                             id: trimmed, // Preserve case for UC IDs
-                            handle: null,
-                            handleDisplay: trimmed || null,
-                            canonicalHandle: null,
+                            handle: normalizedHandle,
+                            handleDisplay: looksLikeHandle ? trimmed : null,
+                            canonicalHandle: canonicalHandle,
                             logo: null,
                             filterAll: false,
                             originalInput: trimmed
@@ -1132,10 +1179,14 @@ async function getCompiledSettings(sender = null, profileType = null) {
                     } else if (ch && typeof ch === 'object') {
                         // New object format - preserve the original case for IDs and handles
                         // canonicalHandle should only come from actual handle sources, not channel name
-                        const canonicalHandle = ch.canonicalHandle || ch.handle || '';
+                        const candidateCanonical = (ch.canonicalHandle || ch.handle || '').trim();
+                        const canonicalHandle = candidateCanonical.startsWith('@') ? candidateCanonical : '';
                         // normalizedHandle must only be set if there's an actual @handle, never from channel name
-                        const normalizedHandle = ch.handle ? ch.handle.toLowerCase() : (ch.canonicalHandle ? ch.canonicalHandle.toLowerCase() : null);
-                        const displayHandle = ch.handleDisplay || canonicalHandle || ch.name || '';
+                        const normalizedHandle = canonicalHandle ? canonicalHandle.toLowerCase() : null;
+                        const candidateDisplay = (ch.handleDisplay || '').trim();
+                        const displayHandle = candidateDisplay.startsWith('@')
+                            ? candidateDisplay
+                            : (canonicalHandle || '');
                         const filterAllComments = (typeof ch.filterAllComments === 'boolean') ? ch.filterAllComments : true;
                         const collaborationGroupId = typeof ch.collaborationGroupId === 'string' ? ch.collaborationGroupId : null;
                         const collaborationWith = Array.isArray(ch.collaborationWith) ? ch.collaborationWith : null;
@@ -2324,6 +2375,20 @@ async function fetchChannelInfo(channelIdOrHandle) {
             if (extracted) customUrl = extracted;
         };
 
+        let channelName = null;
+        let channelHandle = null;
+        let channelLogo = null;
+
+        const normalizeHandleOutput = (value) => {
+            if (!value || typeof value !== 'string') return null;
+            let v = value.trim();
+            if (!v) return null;
+            if (v.startsWith('/@')) v = v.slice(1);
+            if (!v.startsWith('@')) return null;
+            v = v.split(/[/?#]/)[0].trim();
+            return v || null;
+        };
+
         // If the input itself is a UC ID, use it directly as the resolved ID and construct canonical URL
         if (cleanId.toUpperCase().startsWith('UC') && cleanId.length === 24) { // UC + 22 chars
             resolvedChannelId = cleanId;
@@ -2376,7 +2441,10 @@ async function fetchChannelInfo(channelIdOrHandle) {
         console.log('FilterTube Background: Fetching channel info for:', cleanId);
 
         // Fetch the channel page HTML
-        let response = await fetch(channelUrl);
+        let response = await fetch(channelUrl, {
+            credentials: 'include',
+            headers: { 'Accept': 'text/html' }
+        });
 
         // If /@handle/about 404s, fall back to /@handle
         if (!response.ok && isHandle) {
@@ -2387,7 +2455,10 @@ async function fetchChannelInfo(channelIdOrHandle) {
                     .trim();
                 const encodedHandle = encodeURIComponent(handleWithoutAt);
                 const fallbackUrl = `https://www.youtube.com/@${encodedHandle}`;
-                response = await fetch(fallbackUrl);
+                response = await fetch(fallbackUrl, {
+                    credentials: 'include',
+                    headers: { 'Accept': 'text/html' }
+                });
             } catch (fallbackError) {
                 // Ignore, keep original response for error handling below
             }
@@ -2399,6 +2470,53 @@ async function fetchChannelInfo(channelIdOrHandle) {
         }
 
         const html = await response.text();
+
+        const decodeHtmlEntities = (value) => {
+            if (!value || typeof value !== 'string') return value;
+            return value
+                .replace(/&amp;/g, '&')
+                .replace(/&quot;/g, '"')
+                .replace(/&#39;/g, "'")
+                .replace(/&lt;/g, '<')
+                .replace(/&gt;/g, '>');
+        };
+
+        const extractMeta = (key) => {
+            if (!key) return null;
+            const escapedKey = String(key).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const patterns = [
+                new RegExp(`<meta[^>]+property=["']${escapedKey}["'][^>]+content=["']([^"']+)["'][^>]*>`, 'i'),
+                new RegExp(`<meta[^>]+content=["']([^"']+)["'][^>]+property=["']${escapedKey}["'][^>]*>`, 'i'),
+                new RegExp(`<meta[^>]+name=["']${escapedKey}["'][^>]+content=["']([^"']+)["'][^>]*>`, 'i'),
+                new RegExp(`<meta[^>]+content=["']([^"']+)["'][^>]+name=["']${escapedKey}["'][^>]*>`, 'i')
+            ];
+            for (const re of patterns) {
+                const match = html.match(re);
+                if (match && match[1]) return decodeHtmlEntities(match[1].trim());
+            }
+            return null;
+        };
+
+        const extractCanonicalHref = () => {
+            const match = html.match(/<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)["'][^>]*>/i)
+                || html.match(/<link[^>]+href=["']([^"']+)["'][^>]+rel=["']canonical["'][^>]*>/i);
+            return match && match[1] ? decodeHtmlEntities(match[1].trim()) : null;
+        };
+
+        const ogTitle = extractMeta('og:title') || extractMeta('twitter:title');
+        const ogImage = extractMeta('og:image') || extractMeta('twitter:image');
+        const ogUrl = extractMeta('og:url') || extractCanonicalHref();
+        if (ogUrl) {
+            assignCustomUrl(ogUrl);
+            const handleMatch = ogUrl.match(/\/(@[^/?#]+)/);
+            if (!channelHandle && handleMatch && handleMatch[1]) {
+                channelHandle = normalizeHandleOutput(handleMatch[1]) || channelHandle;
+            }
+            const ucMatch = ogUrl.match(/\/channel\/(UC[\w-]{22})/i);
+            if (!resolvedChannelId && ucMatch && ucMatch[1]) {
+                resolvedChannelId = ucMatch[1];
+            }
+        }
 
         // Extract ytInitialData from the page using a more robust method
         let data = null;
@@ -2468,25 +2586,35 @@ async function fetchChannelInfo(channelIdOrHandle) {
         }
 
         if (!data) {
-            console.error('FilterTube Background: Could not extract ytInitialData from page');
-            return { success: false, error: 'Could not extract channel data' };
+            if (!resolvedChannelId && cleanId.toUpperCase().startsWith('UC') && cleanId.length === 24) {
+                resolvedChannelId = cleanId;
+            }
+
+            if (!resolvedChannelId) {
+                const match = html.match(/\/channel\/(UC[\w-]{22})/);
+                if (match && match[1]) {
+                    resolvedChannelId = match[1];
+                }
+            }
+
+            if (!resolvedChannelId) {
+                console.error('FilterTube Background: Could not extract ytInitialData from page');
+                return { success: false, error: 'Could not extract channel data' };
+            }
+
+            channelName = ogTitle || channelName;
+            channelLogo = ogImage || channelLogo;
+            channelHandle = normalizeHandleOutput(channelHandle) || null;
+
+            return {
+                success: true,
+                name: channelName || resolvedChannelId,
+                id: resolvedChannelId,
+                handle: channelHandle,
+                logo: channelLogo,
+                customUrl: customUrl
+            };
         }
-
-        let channelName = null;
-        let channelHandle = null;
-        let channelLogo = null;
-
-        const normalizeHandleOutput = (value) => {
-            if (!value || typeof value !== 'string') return null;
-            let v = value.trim();
-            if (!v) return null;
-            // Some surfaces provide "/@handle"; normalize to "@handle".
-            if (v.startsWith('/@')) v = v.slice(1);
-            if (!v.startsWith('@')) return null;
-            // Strip path segments.
-            v = v.split(/[/?#]/)[0].trim();
-            return v || null;
-        };
 
         // --- BLOCK 1: Metadata Renderer (Standard & Most Reliable) ---
         const metadata = data?.metadata?.channelMetadataRenderer;
@@ -2680,6 +2808,14 @@ async function fetchChannelInfo(channelIdOrHandle) {
             }
         }
 
+        if (!channelName && ogTitle) {
+            channelName = ogTitle;
+        }
+
+        if (!channelLogo && ogImage) {
+            channelLogo = ogImage;
+        }
+
         if (!customUrl) {
             const canonicalMatch = html.match(/"canonicalBaseUrl":"(\/(?:c|user)\/[^"]+)"/);
             if (canonicalMatch && canonicalMatch[1]) {
@@ -2740,6 +2876,7 @@ browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 displayHandle: message.displayHandle,
                 canonicalHandle: message.canonicalHandle,
                 channelName: message.channelName,
+                channelLogo: message.channelLogo,
                 customUrl: message.customUrl,
                 source: message.source || null
             },
@@ -3002,7 +3139,80 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
 
         // Fetch channel info (by UC ID when possible, otherwise by original input)
         console.log('FilterTube Background: Fetching channel info for:', lookupValue);
-        let channelInfo = await fetchChannelInfo(lookupValue);
+        let channelInfo = null;
+        const isUcIdLike = (value) => {
+            if (!value || typeof value !== 'string') return false;
+            return /^UC[a-zA-Z0-9_-]{22}$/.test(value.trim());
+        };
+
+        const isProbablyNotChannelName = (value) => {
+            if (!value || typeof value !== 'string') return true;
+            const trimmed = value.trim();
+            if (!trimmed) return true;
+            if (isUcIdLike(trimmed)) return true;
+            if (trimmed.startsWith('@')) return true;
+            if (trimmed.toLowerCase() === 'channel') return true;
+            if (trimmed.includes('•')) return true;
+            if (/\bviews?\b/i.test(trimmed)) return true;
+            if (/\bago\b/i.test(trimmed)) return true;
+            if (/\bwatching\b/i.test(trimmed)) return true;
+            return false;
+        };
+
+        const sanitizePersistedChannelName = (value) => {
+            if (!value || typeof value !== 'string') return '';
+            const trimmed = value.trim();
+            if (!trimmed) return '';
+            if (isProbablyNotChannelName(trimmed)) return '';
+            return trimmed;
+        };
+
+        const hasMetadataName = typeof metadata.channelName === 'string' && metadata.channelName.trim();
+        const hasGoodMetadataName = Boolean(hasMetadataName && !isProbablyNotChannelName(metadata.channelName));
+        const hasMetadataHandle = typeof metadata.displayHandle === 'string' && metadata.displayHandle.trim();
+        const hasMetadataLogo = typeof metadata.channelLogo === 'string' && metadata.channelLogo.trim();
+
+        // Important: do NOT skip fetch purely because we have a logo.
+        // That leads to persisting {name: UC...} entries when name/handle were missing.
+        const shouldSkipFetch = lookupValue && String(lookupValue).toUpperCase().startsWith('UC') && (hasGoodMetadataName || hasMetadataHandle);
+        if (shouldSkipFetch) {
+            channelInfo = {
+                success: true,
+                id: String(lookupValue),
+                handle: (isHandle ? normalizedValue : null),
+                name: (metadata.channelName || metadata.displayHandle || (isHandle ? normalizedValue : '') || String(lookupValue)),
+                logo: metadata.channelLogo || null,
+                customUrl: metadata.customUrl || null
+            };
+        } else {
+            channelInfo = await fetchChannelInfo(lookupValue);
+        }
+
+        // If channel page scraping failed (often due to google.com/sorry redirects + CORS),
+        // fall back to watch identity resolution when a videoId is available.
+        // This path is spec-aligned: it uses video payload surfaces and avoids brittle channel page HTML.
+        if (!channelInfo.success && effectiveVideoId) {
+            try {
+                const isKids = profile === 'kids';
+                const identity = isKids
+                    ? (await performKidsWatchIdentityFetch(effectiveVideoId) || await performWatchIdentityFetch(effectiveVideoId))
+                    : await performWatchIdentityFetch(effectiveVideoId);
+
+                if (identity && (identity.id || identity.handle || identity.name)) {
+                    channelInfo = {
+                        success: true,
+                        id: identity.id || mappedId || (lookupValue && String(lookupValue).toUpperCase().startsWith('UC') ? lookupValue : ''),
+                        handle: identity.handle || (isHandle ? normalizedValue : null),
+                        name: identity.name || metadata.channelName || metadata.displayHandle || (isHandle ? normalizedValue : null),
+                        logo: (identity.logo || metadata.channelLogo || null),
+                        customUrl: identity.customUrl || metadata.customUrl || null
+                    };
+                    if (!metadata.channelName && identity.name) metadata.channelName = identity.name;
+                    if (!metadata.displayHandle && identity.handle) metadata.displayHandle = identity.handle;
+                }
+            } catch (e) {
+            }
+        }
 
         // If scraping failed for a handle but we know a UC ID from channelMap, synthesize a minimal entry
         if (!channelInfo.success && isHandle && mappedId) {
@@ -3034,7 +3244,7 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                     id: fallbackId,
                     handle: normalizedHandle || null,
                     name: candidateName || normalizedHandle || fallbackId,
-                    logo: null,
+                    logo: metadata.channelLogo || null,
                     customUrl: metadata.customUrl || null
                 };
                 console.warn('FilterTube Background: fetchChannelInfo failed; persisting minimal channel entry with UC ID', {
@@ -3109,16 +3319,25 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             ? [{ handle: channelInfo.handle, name: channelInfo.name }, ...collaborationWith.map(h => ({ handle: h }))]
             : [];
 
-        const canonicalHandle = (metadata.canonicalHandle || channelInfo.canonicalHandle || channelInfo.handle || (isHandle ? rawValue : '') || '').trim();
-        const normalizedHandle = canonicalHandle ? canonicalHandle.toLowerCase() : (channelInfo.handle ? channelInfo.handle.toLowerCase() : '');
-        const handleDisplay = metadata.displayHandle || channelInfo.handleDisplay || canonicalHandle || (metadata.channelName || channelInfo.name) || '';
-        const finalChannelName = pickBetterName(metadata.channelName, channelInfo.name, handleDisplay, canonicalHandle, normalizedValue);
+        const canonicalCandidate = (metadata.canonicalHandle || channelInfo.canonicalHandle || channelInfo.handle || (isHandle ? rawValue : '') || '').trim();
+        const canonicalHandle = isHandleLike(canonicalCandidate) ? canonicalCandidate : '';
+        const normalizedHandle = canonicalHandle
+            ? canonicalHandle.toLowerCase()
+            : (isHandleLike(channelInfo.handle) ? String(channelInfo.handle).trim().toLowerCase() : '');
+        const displayCandidate = String(metadata.displayHandle || channelInfo.handleDisplay || '').trim();
+        const handleDisplay = isHandleLike(displayCandidate)
+            ? displayCandidate
+            : (canonicalHandle || '');
+
+        const finalChannelName = sanitizePersistedChannelName(
+            pickBetterName(metadata.channelName, channelInfo.name, normalizedValue)
+        );
 
         if (normalizedHandle) {
             channelInfo.handle = normalizedHandle;
         }
-        channelInfo.canonicalHandle = canonicalHandle || channelInfo.canonicalHandle || normalizedHandle || null;
-        channelInfo.handleDisplay = handleDisplay || channelInfo.handleDisplay || channelInfo.canonicalHandle || channelInfo.handle || channelInfo.name || '';
+        channelInfo.canonicalHandle = canonicalHandle || null;
+        channelInfo.handleDisplay = handleDisplay || null;
         channelInfo.name = finalChannelName;
 
         // Check if channel already exists; if so, upgrade instead of rejecting
@@ -3138,15 +3357,19 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                 } catch (e) { /* already decoded or invalid */ }
             }
 
+            const mergedName = (() => {
+                const existingName = sanitizePersistedChannelName(existing.name || '');
+                if (existingName) return existingName;
+                return finalChannelName;
+            })();
+
             const updated = {
                 ...existing,
                 id: existing.id || channelInfo.id,
                 handle: existing.handle || channelInfo.handle,
-                handleDisplay: existing.handleDisplay || channelInfo.handleDisplay,
-                canonicalHandle: existing.canonicalHandle || channelInfo.canonicalHandle,
-                name: (existing.name && !(isHandleLike(existing.name) && !isHandleLike(finalChannelName)))
-                    ? existing.name
-                    : finalChannelName,
+                handleDisplay: (isHandleLike(existing.handleDisplay) ? existing.handleDisplay : '') || channelInfo.handleDisplay || null,
+                canonicalHandle: (isHandleLike(existing.canonicalHandle) ? existing.canonicalHandle : '') || channelInfo.canonicalHandle || null,
+                name: mergedName,
                 logo: existing.logo || channelInfo.logo,
                 customUrl: existing.customUrl || customUrl,
                 source: existing.source || metadata.source || null,
@@ -3184,8 +3407,8 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             const newChannel = {
                 id: channelInfo.id,
                 handle: channelInfo.handle,
-                handleDisplay: channelInfo.handleDisplay || null,
-                canonicalHandle: channelInfo.canonicalHandle || null,
+                handleDisplay: isHandleLike(channelInfo.handleDisplay) ? channelInfo.handleDisplay : null,
+                canonicalHandle: isHandleLike(channelInfo.canonicalHandle) ? channelInfo.canonicalHandle : null,
                 name: finalChannelName,
                 logo: channelInfo.logo,
                 filterAll: filterAll,
@@ -3220,6 +3443,32 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                     console.log('FilterTube Background: Added customUrl mapping:', normalizedCustomUrl, '->', finalChannelData.id);
                 }
             } catch (e) { }
+        }
+
+        if (finalChannelData?.id && typeof finalChannelData.id === 'string' && finalChannelData.id.toUpperCase().startsWith('UC')) {
+            const handleToMap = (finalChannelData.handleDisplay || finalChannelData.canonicalHandle || finalChannelData.handle || '').trim();
+            const normalizedHandleKey = (finalChannelData.handle || '').trim().toLowerCase();
+            if (handleToMap && handleToMap.startsWith('@')) {
+                try {
+                    const mapStorage = await storageGet(['channelMap']);
+                    const channelMap = mapStorage.channelMap || {};
+                    const keyId = finalChannelData.id.toLowerCase();
+                    const keyHandle = normalizedHandleKey || handleToMap.toLowerCase();
+                    let hasChange = false;
+                    if (keyHandle && channelMap[keyHandle] !== finalChannelData.id) {
+                        channelMap[keyHandle] = finalChannelData.id;
+                        hasChange = true;
+                    }
+                    if (channelMap[keyId] !== handleToMap) {
+                        channelMap[keyId] = handleToMap;
+                        hasChange = true;
+                    }
+                    if (hasChange) {
+                        await browserAPI.storage.local.set({ channelMap });
+                    }
+                } catch (e) {
+                }
+            }
         }
 
         // Save back to storage
@@ -3276,6 +3525,11 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
         }
 
         await browserAPI.storage.local.set(storageWritePayload);
+
+        try {
+            schedulePostBlockEnrichment(finalChannelData, profile, metadata);
+        } catch (e) {
+        }
 
         return {
             success: true,

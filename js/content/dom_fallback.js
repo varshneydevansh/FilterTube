@@ -1589,7 +1589,14 @@ function shouldHideContent(title, channel, settings, options = {}) {
 
                     if (!cachedState) {
                         // Not known, not fetching. Start async fetch now.
-                        fetchIdForHandle(filterHandle);
+                        const isKidsHost = (() => {
+                            try {
+                                return typeof location !== 'undefined' && String(location.hostname || '').includes('youtubekids.com');
+                            } catch (e) {
+                                return false;
+                            }
+                        })();
+                        fetchIdForHandle(filterHandle, { skipNetwork: isKidsHost });
                     } else if (cachedState !== 'PENDING') {
                         // We just resolved it in memory! Check if it matches.
                         if (cachedState.toLowerCase() === contentId) {

@@ -370,6 +370,73 @@
         return value.trim().toLowerCase().replace(/\s+/g, ' ');
     }
 
+    function extractCustomUrlFromCanonicalBaseUrl(value) {
+        if (!value || typeof value !== 'string') return '';
+        const trimmed = value.trim();
+        if (!trimmed) return '';
+        const decoded = (() => {
+            try {
+                return decodeURIComponent(trimmed);
+            } catch (e) {
+                return trimmed;
+            }
+        })();
+
+        const path = decoded.startsWith('http') ? (() => {
+            try {
+                return new URL(decoded).pathname;
+            } catch (e) {
+                return decoded;
+            }
+        })() : decoded;
+
+        if (path.startsWith('/c/')) {
+            const slug = path.split('/')[2] || '';
+            return slug ? `c/${slug}` : '';
+        }
+        if (path.startsWith('/user/')) {
+            const slug = path.split('/')[2] || '';
+            return slug ? `user/${slug}` : '';
+        }
+        return '';
+    }
+
+    function extractChannelLogoFromObject(obj) {
+        if (!obj || typeof obj !== 'object') return '';
+
+        const candidates = [
+            obj?.lockupMetadataViewModel?.image?.decoratedAvatarViewModel?.avatar?.avatarViewModel?.image?.sources?.[0]?.url,
+            obj?.image?.decoratedAvatarViewModel?.avatar?.avatarViewModel?.image?.sources?.[0]?.url,
+            obj?.decoratedAvatarViewModel?.avatar?.avatarViewModel?.image?.sources?.[0]?.url,
+            obj?.avatar?.avatarViewModel?.image?.sources?.[0]?.url,
+            obj?.avatarViewModel?.image?.sources?.[0]?.url,
+            obj?.channelAvatar?.sources?.[0]?.url,
+            obj?.thumbnail?.thumbnails?.[0]?.url,
+            obj?.thumbnail?.thumbnails?.[1]?.url,
+            obj?.thumbnails?.[0]?.url,
+            obj?.thumbnails?.[1]?.url
+        ];
+
+        for (const cand of candidates) {
+            if (typeof cand === 'string' && cand.trim()) return cand.trim();
+        }
+        return '';
+    }
+
+    function mergeChannelCandidates(...candidates) {
+        const merged = { id: null, handle: null, name: null, logo: null, customUrl: null };
+        for (const candidate of candidates) {
+            if (!candidate || typeof candidate !== 'object') continue;
+            if (!merged.id && typeof candidate.id === 'string' && candidate.id.trim()) merged.id = candidate.id.trim();
+            if (!merged.handle && typeof candidate.handle === 'string' && candidate.handle.trim()) merged.handle = candidate.handle.trim();
+            if (!merged.name && typeof candidate.name === 'string' && candidate.name.trim()) merged.name = candidate.name.trim();
+            if (!merged.logo && typeof candidate.logo === 'string' && candidate.logo.trim()) merged.logo = candidate.logo.trim();
+            if (!merged.customUrl && typeof candidate.customUrl === 'string' && candidate.customUrl.trim()) merged.customUrl = candidate.customUrl.trim();
+        }
+        const hasAny = Boolean(merged.id || merged.handle || merged.name || merged.logo || merged.customUrl);
+        return hasAny ? merged : null;
+    }
+
     function searchYtInitialDataForVideoChannel(videoId, options = {}) {
         if (!videoId) {
             postLog('log', 'Channel search skipped - missing videoId');
@@ -391,6 +458,104 @@
         const normalizedExpectedName = normalizeChannelName(options.expectedName);
         const hasExpectations = Boolean(normalizedExpectedHandle || normalizedExpectedName);
         let fallbackCandidate = null;
+
+        const isWatchContext = (() => {
+            try {
+                return typeof document !== 'undefined' && (document.location?.pathname || '').startsWith('/watch');
+            } catch (e) {
+                return false;
+            }
+        })();
+        const isCurrentWatchVideo = (() => {
+            if (!isWatchContext) return false;
+            try {
+                const params = new URLSearchParams(document.location?.search || '');
+                return params.get('v') === videoId;
+            } catch (e) {
+                return false;
+            }
+        })();
+
+        const extractOwnerCandidate = (ownerRenderer) => {
+            if (!ownerRenderer || typeof ownerRenderer !== 'object') return null;
+            const endpoint =
+                ownerRenderer?.navigationEndpoint?.browseEndpoint ||
+                ownerRenderer?.title?.runs?.[0]?.navigationEndpoint?.browseEndpoint ||
+                ownerRenderer?.shortBylineText?.runs?.[0]?.navigationEndpoint?.browseEndpoint ||
+                null;
+            const browseId = endpoint?.browseId || '';
+            const canonicalBaseUrl = endpoint?.canonicalBaseUrl || '';
+            const handle = canonicalBaseUrl ? (extractRawHandle(canonicalBaseUrl) || null) : null;
+            const customUrl = canonicalBaseUrl ? (extractCustomUrlFromCanonicalBaseUrl(canonicalBaseUrl) || null) : null;
+            const name = ownerRenderer?.title?.runs?.[0]?.text || ownerRenderer?.title?.simpleText || ownerRenderer?.shortBylineText?.runs?.[0]?.text || '';
+            const logo = extractChannelLogoFromObject(ownerRenderer) || '';
+            const candidate = {
+                id: (browseId && typeof browseId === 'string' && browseId.startsWith('UC')) ? browseId : null,
+                handle: handle || null,
+                name: name || null,
+                logo: logo || null,
+                customUrl: customUrl || null
+            };
+
+            if (!candidate.id && !candidate.handle && !candidate.name && !candidate.logo && !candidate.customUrl) {
+                return null;
+            }
+            if (!hasExpectations || matchesExpectations(candidate)) {
+                return candidate;
+            }
+            if (!fallbackCandidate) {
+                fallbackCandidate = candidate;
+            }
+            return null;
+        };
+
+        const extractFromPlayerResponse = (player) => {
+            if (!player || typeof player !== 'object') return null;
+            const details = player.videoDetails || null;
+            const micro = player.microformat?.playerMicroformatRenderer || null;
+            const playerVideoId = details?.videoId || '';
+            if (playerVideoId && playerVideoId !== videoId) return null;
+            const id = details?.channelId || null;
+            const name = details?.author || micro?.ownerChannelName || null;
+            const profileUrl = micro?.ownerProfileUrl || micro?.ownerProfileUrl?.url || null;
+            const handle = profileUrl ? (extractRawHandle(profileUrl) || null) : null;
+            const customUrl = profileUrl ? (extractCustomUrlFromCanonicalBaseUrl(profileUrl) || null) : null;
+            const candidate = { id, handle, name, customUrl };
+            return mergeChannelCandidates(candidate);
+        };
+
+        const watchOwnerCandidate = (() => {
+            if (!isCurrentWatchVideo || !window.ytInitialData) return null;
+            const visitedOwner = new WeakSet();
+            const scan = (node, depth = 0) => {
+                if (!node || typeof node !== 'object' || visitedOwner.has(node) || depth > 10) return null;
+                visitedOwner.add(node);
+                if (node.videoSecondaryInfoRenderer?.owner?.videoOwnerRenderer) {
+                    const cand = extractOwnerCandidate(node.videoSecondaryInfoRenderer.owner.videoOwnerRenderer);
+                    if (cand) return cand;
+                }
+                if (node.videoOwnerRenderer) {
+                    const cand = extractOwnerCandidate(node.videoOwnerRenderer);
+                    if (cand) return cand;
+                }
+                if (Array.isArray(node)) {
+                    for (const child of node.slice(0, 40)) {
+                        const found = scan(child, depth + 1);
+                        if (found) return found;
+                    }
+                    return null;
+                }
+                for (const key in node) {
+                    if (!Object.prototype.hasOwnProperty.call(node, key)) continue;
+                    const value = node[key];
+                    if (!value || typeof value !== 'object') continue;
+                    const found = scan(value, depth + 1);
+                    if (found) return found;
+                }
+                return null;
+            };
+            return scan(window.ytInitialData);
+        })();
 
         function matchesExpectations(candidate) {
             if (!candidate) return false;
@@ -417,7 +582,13 @@
             visited.add(node);
 
             // Direct hit: object with our videoId
-            if (node.videoId === videoId) {
+            const nodeVideoId = node.videoId ||
+                node?.watchEndpoint?.videoId ||
+                node?.navigationEndpoint?.watchEndpoint?.videoId ||
+                node?.navigationEndpoint?.commandMetadata?.webCommandMetadata?.url?.match(/watch\?v=([a-zA-Z0-9_-]{11})/)?.[1] ||
+                '';
+
+            if (nodeVideoId === videoId) {
                 foundVideoObject = true;
 
                 // Priority 1: navigationEndpoint.browseEndpoint on the video renderer
@@ -476,6 +647,16 @@
                         }
                     }
                 }
+
+                const ownerRenderer =
+                    node?.videoSecondaryInfoRenderer?.owner?.videoOwnerRenderer ||
+                    node?.owner?.videoOwnerRenderer ||
+                    node?.videoOwnerRenderer ||
+                    null;
+                if (ownerRenderer) {
+                    const ownerCandidate = extractOwnerCandidate(ownerRenderer);
+                    if (ownerCandidate) return ownerCandidate;
+                }
             }
 
             // Recurse
@@ -531,6 +712,29 @@
         }
 
         let result = null;
+        const playerCandidate = (() => {
+            const ftPlayer = window.filterTube?.lastYtInitialPlayerResponse || window.filterTube?.rawYtInitialPlayerResponse;
+            const basePlayer = ftPlayer || window.ytInitialPlayerResponse;
+            const extracted = extractFromPlayerResponse(basePlayer);
+            if (extracted) {
+                if (!hasExpectations || matchesExpectations(extracted)) {
+                    return extracted;
+                }
+                if (!fallbackCandidate) fallbackCandidate = extracted;
+            }
+            return null;
+        })();
+
+        if (watchOwnerCandidate) {
+            const mergedWatch = mergeChannelCandidates(watchOwnerCandidate, playerCandidate);
+            if (mergedWatch) {
+                if (!hasExpectations || matchesExpectations(mergedWatch)) {
+                    return mergedWatch;
+                }
+                if (!fallbackCandidate) fallbackCandidate = mergedWatch;
+            }
+        }
+
         for (const target of searchTargets) {
             // Reset per-root flags while preserving global fallback
             const prevFoundFlag = foundVideoObject;

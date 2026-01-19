@@ -678,7 +678,7 @@ const RenderEngine = (() => {
         text.className = 'keyword-text';
         const displayName = (channel.name && channel.name !== channel.id)
             ? channel.name
-            : (channel.handle || channel.id);
+            : (channel.handle || channel.customUrl || channel.id);
         text.textContent = displayName;
 
         const controls = document.createElement('div');
@@ -750,7 +750,7 @@ const RenderEngine = (() => {
         nameSpan.className = 'channel-name';
         nameSpan.textContent = (channel.name && channel.name !== channel.id)
             ? channel.name
-            : channel.id;
+            : (channel.handle || channel.customUrl || channel.id);
 
         infoGroup.appendChild(logoImg);
         infoGroup.appendChild(nameSpan);
@@ -928,7 +928,7 @@ const RenderEngine = (() => {
         // Prefer to show what the user typed (originalInput) → what we resolved (id/handle/customUrl)
         const originalInput = channel.originalInput || channel.customUrl || channel.handle || channel.id;
         const fetchedId = channel.id;
-        const fetchedHandle = channel.handle;
+        const fetchedHandle = channel.handle || channel.canonicalHandle || channel.handleDisplay || null;
         const customUrl = channel.customUrl;
 
         let source = originalInput;
@@ -936,10 +936,19 @@ const RenderEngine = (() => {
         let isResolved = false;
 
         const inputLooksLikeUc = Boolean(originalInput && originalInput.toUpperCase().startsWith('UC'));
+        const inputLooksLikeWatch = Boolean(originalInput && /^watch:[a-zA-Z0-9_-]{11}$/.test(originalInput));
+        const inputLooksLikeVideoId = Boolean(originalInput && /^[a-zA-Z0-9_-]{11}$/.test(originalInput));
         const hasCustomUrl = Boolean(customUrl);
 
-        // Case: input was UC ID, resolved to handle
-        if (inputLooksLikeUc && fetchedHandle) {
+        // Case: input was a watch placeholder / bare videoId, resolved to UC ID
+        if ((inputLooksLikeWatch || inputLooksLikeVideoId) && fetchedId) {
+            source = originalInput;
+            target = fetchedId;
+            isResolved = true;
+        }
+
+        // Case: input was UC ID, resolved to handle (or display handle)
+        else if (inputLooksLikeUc && fetchedHandle) {
             source = originalInput;
             target = fetchedHandle;
             isResolved = true;
@@ -968,11 +977,23 @@ const RenderEngine = (() => {
             target = fetchedId;
             isResolved = true;
         }
-        // Fallback to channelMap if we have a mapping
-        else if (channelMap && originalInput && channelMap[originalInput.toLowerCase()]) {
-            source = originalInput;
-            target = channelMap[originalInput.toLowerCase()];
-            isResolved = true;
+        // Fallback to channelMap if we have a mapping.
+        // NOTE: channelMap stores both directions (UC -> @handle AND @handle -> UC).
+        else if (channelMap && originalInput) {
+            const key = String(originalInput).toLowerCase();
+            const direct = channelMap[key];
+            if (direct) {
+                source = originalInput;
+                target = direct;
+                isResolved = true;
+            } else if (fetchedId) {
+                const byId = channelMap[String(fetchedId).toLowerCase()];
+                if (byId) {
+                    source = originalInput;
+                    target = byId;
+                    isResolved = true;
+                }
+            }
         }
 
         // If source and target are identical (e.g., UC... → UC...), treat as unresolved to avoid noisy arrow

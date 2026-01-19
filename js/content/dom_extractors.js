@@ -348,6 +348,12 @@ function scanDataForChannelIdentifiers(root) {
     // Direct check on the object first (most common case)
     // Check for channelId, browseId (often channel ID), canonicalBaseUrl (often /channel/...)
     if (root.channelId) result.id = root.channelId;
+    else if (root.externalChannelId && typeof root.externalChannelId === 'string' && root.externalChannelId.startsWith('UC')) {
+        result.id = root.externalChannelId;
+    }
+    else if (root.kidsVideoOwnerExtension?.externalChannelId && typeof root.kidsVideoOwnerExtension.externalChannelId === 'string' && root.kidsVideoOwnerExtension.externalChannelId.startsWith('UC')) {
+        result.id = root.kidsVideoOwnerExtension.externalChannelId;
+    }
     else if (root.browseId && root.browseId.startsWith('UC')) result.id = root.browseId;
 
     if (root.canonicalBaseUrl) {
