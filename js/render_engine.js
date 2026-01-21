@@ -670,8 +670,16 @@ const RenderEngine = (() => {
         if (collaborationMeta?.isPartial) {
             item.classList.add('collaboration-partial');
         }
+        const tooltipParts = [];
         if (collaborationMeta?.tooltip) {
-            item.setAttribute('title', collaborationMeta.tooltip);
+            tooltipParts.push(collaborationMeta.tooltip);
+        }
+        const topicTooltip = getTopicChannelTooltip(channel);
+        if (topicTooltip) {
+            tooltipParts.push(topicTooltip);
+        }
+        if (tooltipParts.length > 0) {
+            item.setAttribute('title', tooltipParts.join('\n'));
         }
 
         const text = document.createElement('span');
@@ -726,8 +734,22 @@ const RenderEngine = (() => {
             if (collaborationMeta.isPartial) {
                 item.classList.add('collaboration-partial');
             }
+            const tooltipParts = [];
             if (collaborationMeta.tooltip) {
-                item.setAttribute('title', collaborationMeta.tooltip);
+                tooltipParts.push(collaborationMeta.tooltip);
+            }
+            const topicTooltip = getTopicChannelTooltip(channel);
+            if (topicTooltip) {
+                tooltipParts.push(topicTooltip);
+            }
+            if (tooltipParts.length > 0) {
+                item.setAttribute('title', tooltipParts.join('\n'));
+            }
+        }
+        if (!collaborationMeta) {
+            const topicTooltip = getTopicChannelTooltip(channel);
+            if (topicTooltip) {
+                item.setAttribute('title', topicTooltip);
             }
         }
 
@@ -838,7 +860,11 @@ const RenderEngine = (() => {
         if (mapping.isResolved) {
             targetBadge.className = 'node-badge resolved';
             targetBadge.textContent = mapping.target;
-            targetBadge.title = 'Fetched ID';
+            if (isTopicChannel(channel)) {
+                targetBadge.title = getTopicChannelTooltip(channel);
+            } else {
+                targetBadge.title = 'Fetched ID';
+            }
         } else {
             targetBadge.className = 'node-source-text';
             targetBadge.textContent = mapping.target || 'Not fetched';
@@ -902,6 +928,22 @@ const RenderEngine = (() => {
     // HELPER FUNCTIONS
     // ============================================================================
 
+    function isTopicChannel(channel) {
+        if (channel?.topicChannel === true) return true;
+        const name = typeof channel?.name === 'string' ? channel.name.trim() : '';
+        const id = typeof channel?.id === 'string' ? channel.id.trim() : '';
+        const handle = typeof channel?.handle === 'string' ? channel.handle.trim() : '';
+        const customUrl = typeof channel?.customUrl === 'string' ? channel.customUrl.trim() : '';
+        if (!name || !/\s-\sTopic$/i.test(name)) return false;
+        if (handle || customUrl) return false;
+        return Boolean(id && id.toUpperCase().startsWith('UC'));
+    }
+
+    function getTopicChannelTooltip(channel) {
+        if (!isTopicChannel(channel)) return '';
+        return 'Topic channels do not have @handles or custom URLs. The UC ID is the canonical identifier.';
+    }
+
     /**
      * Find channel by channelRef
      */
@@ -930,6 +972,8 @@ const RenderEngine = (() => {
         const fetchedId = channel.id;
         const fetchedHandle = channel.handle || channel.canonicalHandle || channel.handleDisplay || null;
         const customUrl = channel.customUrl;
+        const topicName = typeof channel?.name === 'string' ? channel.name.trim() : '';
+        const isTopic = isTopicChannel(channel);
 
         let source = originalInput;
         let target = null;
@@ -951,6 +995,12 @@ const RenderEngine = (() => {
         else if (inputLooksLikeUc && fetchedHandle) {
             source = originalInput;
             target = fetchedHandle;
+            isResolved = true;
+        }
+        // Case: Topic channels (UC ID + "- Topic" name) count as resolved
+        else if (inputLooksLikeUc && !fetchedHandle && isTopic) {
+            source = originalInput;
+            target = topicName;
             isResolved = true;
         }
         // Case: input was handle, resolved to UC ID

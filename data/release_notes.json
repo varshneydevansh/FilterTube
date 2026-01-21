@@ -1,6 +1,21 @@
 [
   {
-    "_comment": "Shared release notes source for the dashboard What’s New tab and the YouTube release banner. Keep entries sorted newest-first by version."
+    "_comment": "Shared release notes source for the dashboard What's New tab and the YouTube release banner. Keep entries sorted newest-first by version."
+  },
+  {
+    "version": "3.2.0",
+    "headline": "Instant blocking + zero-network Kids",
+    "summary": "3-dot menus show channel names instantly, network requests drop dramatically, and YouTube Kids works entirely offline.",
+    "bannerSummary": "Zero-delay blocking with proactive XHR interception; Kids mode works without any network fetches.",
+    "highlights": [
+      "3-dot menus now show correct channel names instantly—no more 'Fetching...' delays.",
+      "Channel identity comes from intercepted YouTube JSON responses, reducing network calls.",
+      "YouTube Kids works entirely without network fetches for reliable blocking.",
+      "Missing metadata fills in the background at a controlled rate (6-hour cooldown).",
+      "Topic channels (e.g., 'Music - Topic') handled specially without @handles.",
+      "New comprehensive documentation with ASCII and Mermaid flow diagrams."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.0"
   },
   {
     "version": "3.1.9",

@@ -47,13 +47,31 @@ FilterTube is a browser extension that gives you control over your YouTube feed.
 
 ### Performance & Privacy
 
-- **Zero Flash**: Filters content *before* it renders on screen.
+- **Zero Flash**: Filters content *before* it renders on screen using proactive XHR interception.
+- **Instant Blocking**: 3-dot menus show correct channel names immediately—no "Fetching..." delays.
+- **Network Reduction**: Most channel identity comes from intercepted JSON, not page fetches.
 - **100% Private**: No data leaves your browser. No analytics. No tracking.
+
+### Proactive Channel Identity (v3.2.0)
+
+FilterTube now uses a **proactive, XHR-first** strategy to extract channel identity before rendering:
+
+- **XHR Interception**: Captures YouTube's JSON responses (`/youtubei/v1/next`, `/browse`, `/player`)
+- **Instant Stamping**: Broadcasts channel info across worlds to stamp DOM cards immediately
+- **Zero-Network Kids**: YouTube Kids works entirely without network fetches
+- **Smart Enrichment**: Post-block enrichment fills missing metadata at a controlled rate
+
+Learn more in [Proactive Channel Identity](docs/PROACTIVE_CHANNEL_IDENTITY.md).
 
 ### Help & Documentation
 
 - **Help Page (Dashboard)**: In the new tab UI, a dedicated Help section explains every feature, import/export flow, and troubleshooting tip.
-- **Deep Dive Docs**: See `docs/PROFILES_PIN_MODEL.md` for the lock model and `docs/DATA_PORTABILITY_SYNC_WHITELIST_PLAN.md` for the export/import schema and backup rules.
+- **Technical Docs**:
+  - [Channel Blocking System](docs/CHANNEL_BLOCKING_SYSTEM.md) – Architecture and data flow
+  - [Proactive Channel Identity](docs/PROACTIVE_CHANNEL_IDENTITY.md) – XHR interception and instant stamping
+  - [Developer Guide](docs/DEVELOPER_GUIDE.md) – Extending FilterTube for new YouTube features
+  - [Architecture](docs/ARCHITECTURE.md) – System design and cross-world messaging
+  - [YouTube Kids Integration](docs/YOUTUBE_KIDS_INTEGRATION.md) – Kids-specific optimizations
 
 ## Installation
 

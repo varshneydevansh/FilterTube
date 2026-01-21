@@ -1,5 +1,40 @@
 # Changelog
 
+## Version 3.2.0
+
+### Proactive Channel Identity Architecture
+
+- **Zero-delay blocking**: 3-dot menus now show correct channel names instantly—no more "Fetching..." delays—thanks to proactive XHR interception that extracts channel identity before rendering.
+- **Network reduction**: Most channel identity comes from intercepted YouTube JSON responses (`/youtubei/v1/next`, `/browse`, `/player`), dramatically reducing the need for separate network fetches.
+- **Zero-network Kids mode**: YouTube Kids works entirely without network fetches, relying only on intercepted JSON for reliable blocking.
+- **Instant DOM stamping**: Channel info is broadcast across worlds and stamped on DOM cards immediately, enabling instant hiding and menu updates.
+- **Post-block enrichment**: Missing metadata (handle, logo, name) is filled in the background at a controlled rate (6-hour cooldown per channel) to avoid spamming YouTube.
+- **Topic channel handling**: Special case for auto-generated Topic channels (e.g., "Music - Topic") that don't have @handles or custom URLs.
+
+### Developer Experience
+
+- **New documentation**: Added comprehensive docs for the proactive pipeline, including ASCII and Mermaid flow diagrams, surface-by-surface examples, and extension guides.
+- **Developer guide**: Created detailed guide for extending XHR snapshot stashing and renderer extraction.
+- **Architecture updates**: Documented cross-world messaging protocol and snapshot stashing architecture.
+
+### Fixes
+
+- **Banner regression**: Fixed missing "What's New" and refresh banners after extension updates—both now show correctly on open YouTube/Kids tabs.
+- **Message handlers**: Restored background message handlers for release notes and first-run prompts that were accidentally removed.
+
+### Documentation
+
+- **CHANNEL_BLOCKING_SYSTEM.md**: Updated with proactive XHR interception, data source waterfall, and Topic channel details.
+- **PROACTIVE_CHANNEL_IDENTITY.md**: New comprehensive guide explaining the proactive pipeline with ASCII and Mermaid diagrams.
+- **DEVELOPER_GUIDE.md**: New guide for extending FilterTube to support new YouTube features.
+- **NETWORK_REQUEST_PIPELINE.md**: Refactored to reflect XHR-first proactive strategy.
+- **ARCHITECTURE.md**: Updated with cross-world messaging and snapshot stashing details.
+- **YOUTUBE_KIDS_INTEGRATION.md**: Updated for zero-network operation.
+- **README.md**: Added proactive model overview and links to new documentation.
+- **Website**: Updated website for better rediability and listed new features.
+
+---
+
 ## Version 3.1.9
 
 ### Multi-Profiles, Auto-backup, and PIN Protct

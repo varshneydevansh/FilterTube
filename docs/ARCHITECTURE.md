@@ -1,36 +1,448 @@
-# FilterTube v3.1.8 Architecture Documentation
+# Architecture Documentation (v3.2.0)
 
-## Executive Summary
+## Overview
 
-FilterTube v3.1.8 implements a robust **Hybrid Filtering Architecture** that combines preemptive **Data Interception (Main World)** with a resilient **DOM Fallback (Isolated World)**. This dual-layer approach ensures comprehensive content filtering across all YouTube surfaces (Home, Search, Watch, Shorts) while maintaining high performance and a "Zero Flash" user experience when YouTube routes content through JSON.
+FilterTube v3.2.0 implements a comprehensive proactive channel identity system with advanced network interception, post-block enrichment, and robust fallback strategies. This architecture documentation covers the high-level design and component interactions.
 
-## Architecture Overview
+## Core Architecture (v3.2.0)
 
-### **Hybrid Filtering Strategy**
+### Proactive Network Interception System
 
-FilterTube operates on two synchronized layers:
+```mermaid
+graph TD
+    A[YouTube XHR Requests] --> B[Main World seed.js]
+    B --> C[stashNetworkSnapshot]
+    C --> D[lastYtNextResponse]
+    C --> E[lastYtBrowseResponse]
+    C --> F[lastYtPlayerResponse]
+    
+    D --> G[Isolated World content_bridge.js]
+    E --> G
+    F --> G
+    
+    G --> H[Multi-Source Identity Resolution]
+    H --> I[Instant Channel Names]
+    I --> J[3-dot Menu Blocking]
+    
+    J --> K[Background Post-Block Enrichment]
+    K --> L[Rate-Limited Metadata Filling]
+```
 
-1.  **Primary Layer: Data Interception (Main World engine)**
-    *   Intercepts YouTube's raw JSON data (via `ytInitialData`, `ytInitialPlayerResponse`, and `fetch`/`XHR` overrides) before it reaches the rendering engine.
-    *   Modifies data structure to remove blocked content *before* it is ever created in the DOM.
-    *   **Benefit:** True zero-flash filtering, high performance, no layout shift.
+### Network Snapshot Architecture
 
-2.  **Secondary Layer: DOM Fallback (Visual Guard)**
-    * Monitors the DOM using efficient `MutationObserver`s.
-    * Catches any content that might bypass the data layer (e.g., client-side hydration updates, complex dynamic loading, watch-playlist panel handling).
-    * **Hybrid blocking surfaces:** Shorts and some playlist/mix surfaces may require a DOM-first hide combined with async identity enrichment.
-    * Applies visual hiding (CSS) to blocked elements.
-    * **Benefit:** Reliability, handles edge cases and dynamic updates.
+```javascript
+// In seed.js - comprehensive network interception
+function stashNetworkSnapshot(data, dataName) {
+    if (dataName.includes('/youtubei/v1/next')) {
+        window.filterTube.lastYtNextResponse = data;
+        window.filterTube.lastYtNextResponseTs = Date.now();
+    }
+    if (dataName.includes('/youtubei/v1/browse')) {
+        window.filterTube.lastYtBrowseResponse = data;
+        window.filterTube.lastYtBrowseResponseTs = Date.now();
+    }
+    if (dataName.includes('/youtubei/v1/player')) {
+        window.filterTube.lastYtPlayerResponse = data;
+        window.filterTube.lastYtPlayerResponseTs = Date.now();
+    }
+}
+```
 
-**Channel identity note (current behavior):** identity enrichment is increasingly **passive**.
+**Intercepted endpoints:**
+- `/youtubei/v1/next` – Home feed, watch next, recommendations
+- `/youtubei/v1/browse` – Channel pages, search, Kids content
+- `/youtubei/v1/player` – Video player metadata, Shorts data
 
-* The **Main World interception layer** (`seed.js` + `filter_logic.js`) harvests channel ownership from `ytInitialPlayerResponse` and `/youtubei/v1/player` payloads, learning `videoId -> UC...` mappings that get persisted into `videoChannelMap`.
-* The **Isolated World** also frequently extracts `UC...` directly from DOM (e.g., `/channel/UC...` anchors).
-* As a result, explicit HTML fetches of `/watch?v=` and `/shorts/` pages are now best treated as **fallback** paths when neither DOM nor interception has provided a canonical UC ID yet.
+## Component Architecture
 
-### **Release Notes + What’s New Surface (v3.1.6 addition)**
+### Main World Components
 
-FilterTube now ships an internal “What’s New” dashboard tab that shares a single data source (`data/release_notes.json`) with the release banner injected on YouTube. The flow is lightweight and doesn’t require network access beyond loading the packaged JSON.
+#### `seed.js` - Network Interception Engine
+- **Purpose**: Hook into YouTube's XHR requests and stash responses
+- **Key Functions**: `stashNetworkSnapshot()`, `FilterTubeEngine.process()`
+- **Data Flow**: YouTube XHR → Snapshot Storage → Cross-world Messaging
+
+#### `injector.js` - Identity Resolution Engine
+- **Purpose**: Extract channel identity from multiple data sources
+- **Key Functions**: `searchYtInitialDataForVideoChannel()`, `extractCollaboratorsFromDataObject()`
+- **Data Sources**: Stashed snapshots, page globals, DOM data
+
+### Isolated World Components
+
+#### `content_bridge.js` - UI Bridge
+- **Purpose**: Bridge between main world data and UI components
+- **Key Functions**: `prefetchIdentityForCard()`, `injectFilterTubeMenuItem()`, `handleBlockChannelClick()`
+- **Data Flow**: Main World → UI Updates → Background Messages
+
+#### `dom_fallback.js` - DOM Processing
+- **Purpose**: Process DOM elements when structured data fails
+- **Key Functions**: `applyDOMFallback()`, `shouldHideContent()`
+- **Fallback Strategy**: Last resort when structured data unavailable
+
+### Background Script Components
+
+#### `background.js` - Data Management
+- **Purpose**: Persistent storage, API calls, enrichment scheduling
+- **Key Functions**: `handleAddFilteredChannel()`, `schedulePostBlockEnrichment()`, `fetchChannelInfo()`
+- **Storage**: Chrome storage API, profile management
+
+## Data Flow Architecture
+
+### Proactive Identity Resolution Flow
+
+```mermaid
+sequenceDiagram
+    participant Browser
+    participant XHR as YouTube XHR
+    participant Main as Main World (seed.js)
+    participant Filter as FilterLogic
+    participant Isolated as Isolated World (content_bridge.js)
+    participant DOM as DOM (cards/menus)
+    participant BG as Background Script
+
+    Browser->>XHR: Request YouTube data
+    XHR->>Main: Response data
+    Main->>Main: stashNetworkSnapshot()
+    Main->>Filter: Process & extract channels
+    Filter->>Isolated: Channel identity via postMessage
+    Isolated->>DOM: Stamp channel attributes
+    DOM->>DOM: Instant 3-dot menu names
+    
+    Note over DOM: User clicks "Block channel"
+    DOM->>Isolated: handleBlockChannelClick()
+    Isolated->>BG: FilterTube_BlockChannel
+    BG->>BG: handleAddFilteredChannel()
+    BG->>BG: schedulePostBlockEnrichment()
+    BG->>Isolated: Settings updated
+    Isolated->>DOM: Hide blocked content
+```
+
+### Post-Block Enrichment Flow
+
+```mermaid
+sequenceDiagram
+    participant BG as Background Script
+    participant API as YouTube API
+    participant Storage as Chrome Storage
+    
+    BG->>BG: Check enrichment needed
+    BG->>BG: Rate limit check (6h cooldown)
+    BG->>BG: Schedule random delay (3.5-4s)
+    
+    Note over BG: After delay
+    BG->>API: fetchChannelInfo()
+    API->>BG: Channel metadata
+    BG->>Storage: Update channel entry
+    BG->>BG: Update channelMap mappings
+```
+
+## Storage Architecture
+
+### Profile-Aware Storage Structure
+
+```javascript
+// v3.2.0 Profile Architecture
+const profilesV4 = {
+    activeId: 'default',
+    profiles: {
+        'default': {
+            id: 'default',
+            name: 'Main Profile',
+            settings: {
+                main: {
+                    blockedChannels: [channelData],
+                    blockedKeywords: ['keyword'],
+                    contentControls: { hideShorts: false }
+                },
+                kids: {
+                    blockedChannels: [channelData],
+                    blockedKeywords: ['keyword'],
+                    contentControls: { hideShorts: false }
+                }
+            },
+            security: {
+                masterPin: 'encrypted',
+                sessionPin: 'cached'
+            }
+        },
+        'kids': {
+            id: 'kids',
+            name: 'Kids Profile',
+            settings: {
+                main: { /* empty */ },
+                kids: {
+                    blockedChannels: [channelData],
+                    blockedKeywords: ['keyword']
+                }
+            }
+        }
+    }
+};
+```
+
+### Channel Data Structure (v3.2.0)
+
+```javascript
+const channelData = {
+    id: 'UC...',                    // Primary UC ID
+    handle: '@handle',              // Normalized handle
+    name: 'Channel Name',           // Sanitized display name
+    handleDisplay: '@handle',       // UI display handle
+    canonicalHandle: '@handle',     // Original handle
+    logo: 'https://...',           // Channel avatar URL
+    customUrl: 'c/name',            // Custom URL for legacy channels
+    filterAll: false,               // Filter all content flag
+    filterAllComments: true,       // Filter all comments flag
+    collaborationGroupId: null,      // Collaboration group ID
+    collaborationWith: ['@handle'], // Collaboration partners
+    originalInput: '@handle',       // User's original input
+    source: '3dot',                 // Blocking source
+    addedAt: Date.now()             // Timestamp
+};
+```
+
+## Cross-World Communication
+
+### Message Passing Architecture
+
+```javascript
+// Main World → Isolated World
+window.postMessage({
+    type: 'FilterTube_UpdateVideoChannelMap',
+    payload: { videoId: 'abc123', channelId: 'UC...' }
+}, '*');
+
+// Isolated World → Background Script
+chrome.runtime.sendMessage({
+    action: 'FilterTube_BlockChannel',
+    channel: { id: 'UC...', handle: '@handle', name: 'Channel Name' },
+    profile: 'main'
+});
+
+// Background → Isolated World
+chrome.tabs.sendMessage(tabId, {
+    action: 'FilterTube_SettingsUpdated',
+    settings: updatedSettings
+});
+```
+
+## Performance Architecture
+
+### Caching Strategy
+
+```javascript
+// Multi-level caching architecture
+const cacheHierarchy = {
+    // Level 1: In-memory snapshots (most recent)
+    networkSnapshots: {
+        lastYtNextResponse: { data, timestamp },
+        lastYtBrowseResponse: { data, timestamp },
+        lastYtPlayerResponse: { data, timestamp }
+    },
+    
+    // Level 2: Channel mappings (handle ↔ UC ID)
+    channelMap: {
+        '@handle': 'UC...',
+        'UC...': '@handle',
+        'c/name': 'UC...'
+    },
+    
+    // Level 3: Video mappings (videoId → UC ID)
+    videoChannelMap: {
+        'videoId1': 'UC...',
+        'videoId2': 'UC...'
+    },
+    
+    // Level 4: Persistent storage (Chrome storage)
+    persistentStorage: {
+        profilesV4: { /* profile data */ },
+        channelMap: { /* mappings */ }
+    }
+};
+```
+
+### Rate Limiting Architecture
+
+```javascript
+// Multi-dimensional rate limiting
+const rateLimiting = {
+    // Post-block enrichment: 6-hour cooldown per channel
+    postBlockEnrichment: {
+        key: `${profile}:${channelId.toLowerCase()}`,
+        cooldown: 6 * 60 * 60 * 1000, // 6 hours
+        storage: postBlockEnrichmentAttempted
+    },
+    
+    // API calls: per-request throttling
+    apiCalls: {
+        key: `${endpoint}:${channelId}`,
+        cooldown: 1000, // 1 second
+        storage: pendingApiCalls
+    },
+    
+    // DOM updates: debounced processing
+    domUpdates: {
+        key: 'domFallback',
+        debounce: 100, // 100ms
+        storage: debouncedUpdate
+    }
+};
+```
+
+## Error Handling Architecture
+
+### Fallback Hierarchy
+
+```mermaid
+graph TD
+    A[Primary: Network Snapshots] --> B[Secondary: Page Globals]
+    B --> C[Tertiary: Targeted Fetch]
+    C --> D[Quaternary: OG Meta Tags]
+    D --> E[Ultimate: DOM Extraction]
+    E --> F[Last Resort: Generic Fallback]
+    
+    F --> G[Channel Name: "Channel"]
+    F --> H[Handle: null]
+    F --> I[ID: null]
+```
+
+### Error Recovery Strategies
+
+```javascript
+// Multi-level error recovery
+const errorRecovery = {
+    // Network errors: CORS handling
+    networkErrors: {
+        detection: 'TypeError && message.includes("CORS")',
+        action: 'fetchAlternativeMethod()',
+        fallback: 'ogMetaExtraction()'
+    },
+    
+    // Data parsing errors: graceful degradation
+    parsingErrors: {
+        detection: 'try/catch around JSON.parse',
+        action: 'use alternative data sources',
+        fallback: 'DOM extraction'
+    },
+    
+    // Storage errors: local fallback
+    storageErrors: {
+        detection: 'chrome.storage API failures',
+        action: 'use in-memory cache',
+        fallback: 're-initialize from defaults'
+    }
+};
+```
+
+## Security Architecture
+
+### Data Validation
+
+```javascript
+// Input sanitization and validation
+const validationLayer = {
+    // Channel name validation
+    channelName: {
+        rules: [
+            'reject if starts with "@"',
+            'reject if looks like UC ID',
+            'reject if contains "•"',
+            'reject if contains view/ago/watching'
+        ],
+        sanitizer: 'sanitizePersistedChannelName()'
+    },
+    
+    // Handle validation
+    handle: {
+        rules: [
+            'must start with "@"',
+            'must be valid UTF-8',
+            'must not contain invalid characters'
+        ],
+        normalizer: 'normalizeHandleValue()'
+    },
+    
+    // UC ID validation
+    ucId: {
+        rules: [
+            'must start with "UC"',
+            'must be 24 characters total',
+            'must contain only valid characters'
+        ],
+        validator: '/^UC[\\w-]{22}$/'
+    }
+};
+```
+
+### Cross-World Security
+
+```javascript
+// Secure cross-world communication
+const securityMeasures = {
+    // Message validation
+    messageValidation: {
+        sourceValidation: 'check event.source === window',
+        typeValidation: 'validate message.type',
+        payloadValidation: 'sanitize message.payload'
+    },
+    
+    // Data isolation
+    dataIsolation: {
+        mainWorld: 'no direct DOM access',
+        isolatedWorld: 'no direct network access',
+        background: 'no direct DOM access'
+    },
+    
+    // Storage encryption
+    encryption: {
+        masterPin: 'PBKDF2-SHA256 (150k iterations)',
+        dataEncryption: 'AES-GCM with random IV',
+        sessionCache: 'memory-only, time-limited'
+    }
+};
+```
+
+// Video → channel mapping
+window.postMessage({
+    type: 'FilterTube_UpdateVideoChannelMap',
+    payload: [{ videoId: 'abc123', channelId: 'UC...' }]
+}, '*');
+
+// Collaboration data
+window.postMessage({
+    type: 'FilterTube_CacheCollaboratorInfo',
+    payload: { videoId: 'abc123', collaborators: [...] }
+}, '*');
+```
+
+#### Isolated → Main (Requests)
+```javascript
+// Request channel info
+window.postMessage({
+    type: 'FilterTube_RequestChannelInfo',
+    requestId: 'uuid',
+    payload: { videoId: 'abc123', expectedHandle: '@...' }
+}, '*');
+
+// Request collaborators
+window.postMessage({
+    type: 'FilterTube_RequestCollaborators',
+    requestId: 'uuid',
+    payload: { videoId: 'abc123' }
+}, '*');
+```
+
+### Message Flow
+
+1. **Main World** extracts channel data from XHR snapshots
+2. **Broadcasts** updates to Isolated World via `postMessage`
+3. **Isolated World** receives messages and stamps DOM immediately
+4. **Background** persists mappings for future sessions
+5. **Isolated World** can request additional data if needed
+
+### **Release Notes + What's New Surface (v3.2.0)**
+
+FilterTube ships an internal "What's New" dashboard tab that shares a single data source (`data/release_notes.json`) with the release banner injected on YouTube. The flow is lightweight and doesn't require network access beyond loading the packaged JSON.
 
 ```mermaid
 graph TD
@@ -46,9 +458,9 @@ graph TD
 
 This keeps announcements self-contained inside the extension, avoiding blocked `chrome-extension://` navigations or offsite changelog links.
 
-### Import / Export & Data Portability (v3.1.6 addition)
+### Import / Export & Data Portability (v3.2.0)
 
-`js/io_manager.js` became the canonical normalization/adapter layer. Both UI (Tab View) and future sync tooling call into this module, preventing subtle drift between import/export flows. Key points:
+`js/io_manager.js` is the canonical normalization/adapter layer. Both UI (Tab View) and future sync tooling call into this module, preventing subtle drift between import/export flows. Key points:
 
 * All inbound identifiers funnel through `normalizeChannelInput`, handling `UC…`, `@handles`, `/c/<slug>`, `/user/<slug>`, and plain names.
 * Merge behavior is deterministic (`UCID > handle > customUrl > originalInput`) with earliest `addedAt` preserved so backups retain ordering.
@@ -65,38 +477,38 @@ File Input → io_manager.importV3()
             → StateManager broadcasts + recompiles
 ```
 
-### **Multi-World Extension Architecture**
-
-FilterTube leverages the modern "Isolated World" vs. "Main World" concept to bridge the gap between extension security and page access.
+### **Multi-World Architecture with Proactive Pipeline**
 
 ```mermaid
 graph TD
-    subgraph "Extension Context (Isolated World)"
-        BG[Background Service Worker]
-        CB[Content Bridge]
-        Storage[(Settings Storage)]
+    subgraph "Main World (Page Context)"
+        Seed[seed.js<br/>XHR Interception]
+        Filter[filter_logic.js<br/>Channel Extraction]
+        Snapshots[window.filterTube<br/>lastYt*Response]
     end
 
-    subgraph "Page Context (Main World)"
-        Seed[Seed Script]
-        Engine[Filter Logic Engine]
-        Injector[Injector Coordinator]
-        YT[YouTube App]
+    subgraph "Isolated World (Extension)"
+        Bridge[content_bridge.js<br/>Message Handler]
+        DOM[DOM Stamping<br/>3-dot Menus]
+        Fallback[DOM Fallback<br/>Visual Guard]
     end
 
-    User((User)) -->|Update Settings| Storage
-    Storage -->|Changes| BG
-    BG -->|Compile RegExp| BG
-    BG -->|Serialized Settings| CB
-    CB -->|PostMessage| Injector
-    Injector -->|Apply| Engine
+    subgraph "Background (Service Worker)"
+        Persist[Channel Persistence<br/>channelMap/videoChannelMap]
+        Enrich[schedulePostBlockEnrichment<br/>Rate Limited]
+        Kids[Zero-Network Mode<br/>Kids Safety]
+    end
+
+    YouTube[YouTube XHR] -->|JSON Response| Seed
+    Seed -->|Stash Snapshot| Snapshots
+    Snapshots -->|Extract Channel| Filter
+    Filter -->|postMessage| Bridge
+    Bridge -->|Stamp Cards| DOM
+    Bridge -->|Persist Mappings| Persist
+    Persist -->|Post-Block Fill| Enrich
+    Enrich -.->|Skip Network| Kids
     
-    YT -->|Request Data| Seed
-    Seed -->|Intercept| Engine
-    Engine -->|Filter| Seed
-    Seed -->|Clean Data| YT
-    
-    CB -.->|DOM Fallback| YT
+    DOM -->|Hide Content| Fallback
 ```
 
 ## Unified System Map
@@ -142,17 +554,17 @@ The following diagram illustrates the complete interaction between all FilterTub
 +-------------------------------+-----------------------+          |                                                  |
 |                Data Interception Layer                |<---------+                                                  |
 |                                                       |                                                             |
-|   +----------------------+     +----------------------+     +----------------------+                                   |
-|   | 3a: seed.js Hooks     |     | 3b: seed.js Hooks     |     | 4a: seed.js Fetch/XHR|                                   |
-|   | window.ytInitialData  |     | window.ytInitial      |     | Proxy (/youtubei/v1/*|                                   |
-|   | (Main + Kids pages)   |     | PlayerResponse        |     | incl. /player)       |                                   |
-|   +----------+-----------+     +----------+-----------+     +----------+-----------+                                   |
-|              | intercepts               | intercepts               | intercepts                                            |
-|              v                          v                          v                                                     |
-|   +--------------------------------------------------------------------------------------+                               |
-|   |                         3c: processWithEngine (Call Filter)                         |                               |
-|   +------------------------------+-------------------------------+-----------------------+                               |
-|                                  | calls                          |                                                     |
+|   +-----------------------+     +-----------------------+     +-----------------------+                             |
+|   | 3a: seed.js Hooks     |     | 3b: seed.js Hooks     |     | 4a: seed.js Fetch/XHR |                             |
+|   | window.ytInitialData  |     | window.ytInitial      |     | Proxy (/youtubei/v1/* |                             |
+|   | (Main + Kids pages)   |     | PlayerResponse        |     | incl. /player)        |                             |
+|   +----------+------------+     +-----------+-----------+     +----------+------------+                             |
+|              | intercepts                   | intercepts               | intercepts                                 |
+|              v                              v                          v                                            |
+|   +--------------------------------------------------------------------------------------+                          |
+|   |                          3c: processWithEngine (Call Filter)                         |                          |
+|   +------------------------------+-------------------------------+-----------------------+                          |
+|                                  | calls                          |                                                 |
 +----------------------+--------------------------------+                                                             |
                        |                                                                                              |
                        v                                                                                              |
@@ -167,26 +579,26 @@ The following diagram illustrates the complete interaction between all FilterTub
 |   | 5b: Identity| <--- | 5e: videoChannel  |          |          |   | 6b: Apply   |                                |
 |   | Resolution  |      |     Map Lookup    |          |          |   |  Fallback   |                                |
 |   +------+------+      +-------------------+          |          |   +------+------+                                |
-|          | harvests owner UC IDs                       |          |                                                  |
-|          v                                             |          |                                                  |
-|   +------------------------+                           |          |                                                  |
-|   | 5f: Harvest + Persist  |                           |          |                                                  |
-|   | videoId -> UC...       |                           |          |                                                  |
-|   | (FilterTube_Update     |                           |          |                                                  |
-|   |  VideoChannelMap)      |                           |          |                                                  |
-|   +-----------+------------+                           |          |                                                  |
-|               | postMessage                             |          |                                                  |
-|               v                                        |          |                                                  |
-|   +------------------------+                           |          |                                                  |
-|   | content_bridge.js      |                           |          |                                                  |
-|   | forwards to background |                           |          |                                                  |
-|   +-----------+------------+                           |          |                                                  |
-|               | chrome.runtime.sendMessage              |          |                                                  |
-|               v                                        |          |                                                  |
-|   +------------------------+                           |          |                                                  |
-|   | background.js          |                           |          |                                                  |
-|   | persists videoChannelMap|                          |          |                                                  |
-|   +------------------------+                           |          |                                                  |
+|          | harvests owner UC IDs                      |          |                                                  |
+|          v                                            |          |                                                  |
+|   +------------------------+                          |          |                                                  |
+|   | 5f: Harvest + Persist  |                          |          |                                                  |
+|   | videoId -> UC...       |                          |          |                                                  |
+|   | (FilterTube_Update     |                          |          |                                                  |
+|   |  VideoChannelMap)      |                          |          |                                                  |
+|   +-----------+------------+                          |          |                                                  |
+|               | postMessage                           |          |                                                  |
+|               v                                       |          |                                                  |
+|   +------------------------+                          |          |                                                  |
+|   | content_bridge.js      |                          |          |                                                  |
+|   | forwards to background |                          |          |                                                  |
+|   +-----------+------------+                          |          |                                                  |
+|               | chrome.runtime.sendMessage            |          |                                                  |
+|               v                                       |          |                                                  |
+|   +------------------------+                          |          |                                                  |
+|   | background.js          |                          |          |                                                  |
+|   | persists videoChannelMap|                         |          |                                                  |
+|   +------------------------+                          |          |                                                  |
 |          |                                            |          |          | scans                                 |
 |   +------v------+                                     |          |   +------v------+                                |
 |   | 5c: Traverse|                                     |          |   | 6c: Match   |                                |
@@ -358,7 +770,7 @@ To ensure that a newly learned identity (e.g., resolving a `c/Name` to a UC ID) 
                                                                           | trigger
                                                                           v
 +-----------------------+      +-----------------------+      +-----------+-----------+
-|   6. All Other Tabs   |      |   5. Settings Broadcast|      |   4. recompileSettings|
+|   6. All Other Tabs   |      |  5. Settings Broadcast|      |  4. recompileSettings |
 |   (Instant Update)    | <=== | Background sends      | <=== | storage.onChanged     |
 | DOM Fallback re-runs  |      | FilterTube_Refreshed  |      | detects map update    |
 | with new mappings     |      | to all tabs           |      |                       |

@@ -1,8 +1,8 @@
-# Network Request Pipeline Documentation
+# Network Request Pipeline Documentation (v3.2.0)
 
 ## Overview
 
-FilterTube v3.1.8 implements a sophisticated network request pipeline for channel identity resolution across both YouTube Main and YouTube Kids domains. This pipeline ensures accurate channel information is available for 3-dot menu labels and blocking actions.
+FilterTube v3.2.0 implements a **proactive, XHR-first** network request pipeline that intercepts YouTube's JSON responses to extract channel identity before rendering. This eliminates network latency for most operations and enables instant blocking across all surfaces.
 
 ## Architecture
 
@@ -10,96 +10,285 @@ FilterTube v3.1.8 implements a sophisticated network request pipeline for channe
 ┌─────────────────────────────────────────────────────────────┐
 │                    FilterTube Extension                     │
 ├─────────────────────────────────────────────────────────────┤
+│  Main World (Page Context)                                  │
+│  ├── XHR Interception (/youtubei/v1/*)                      │
+│  ├── Snapshot Stashing (lastYt*Response)                    │
+│  ├── Channel Extraction (filter_logic.js)                   │
+│  └── Cross-world Messaging (postMessage)                    │
+├─────────────────────────────────────────────────────────────┤
 │  Content Scripts (Isolated World)                           │
-│  ├── Initial DOM Extraction                                 │
-│  ├── Background Request Trigger                             │
-│  └── Async Label Update                                     │
+│  ├── Message Handling (content_bridge.js)                   │
+│  ├── Instant DOM Stamping (data-filtertube-*)               │
+│  ├── 3-dot Menu Updates                                     │
+│  └── Fallback Network Requests (rare)                       │
 ├─────────────────────────────────────────────────────────────┤
 │  Background Script (Service Worker)                         │
-│  ├── Request Routing                                        │
-│  ├── Cache Layer                                            │
-│  ├── Fetch Handlers                                         │
-│  └── Response Processing                                    │
-├─────────────────────────────────────────────────────────────┤
-│  External APIs                                              │
-│  ├── YouTube Watch Page                                     │
-│  ├── YouTube Shorts Page                                    │
-│  └── YouTube Kids Watch Page                                │
+│  ├── Channel Persistence                                    │
+│  ├── Post-block Enrichment                                  │
+│  ├── Rate Limiting                                          │
+│  └── Kids Zero-Network Mode                                 │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## Request Flow
+## Proactive Request Flow (v3.2.0)
 
-### 1. Initial Trigger
+### 1. XHR Interception (Primary Path)
 
 ```mermaid
 sequenceDiagram
-    participant UI as UI
-    participant Content as Content
-    participant Background as Background
-    participant Cache as Cache
-    participant API as External API
+    participant Browser as Browser
+    participant XHR as YouTube XHR
+    participant Main as Main World
+    participant Filter as FilterLogic
+    participant Isolated as Isolated World
+    participant DOM as DOM
 
-    UI->>Content: User clicks 3-dot menu
-    Content->>Content: extractChannelFromCard()
-    Note over Content: Often returns {id: "UC..."} (DOM), otherwise {needsFetch: true}
-    Content->>Background: Request channel enrichment
-    Background->>Cache: Check videoChannelMap
-    alt Cache has mapping
-        Cache-->>Background: Return cached channelId
-    else No mapping
-        Background->>API: Fetch channel details
-        API-->>Background: Return channel info
-    end
-    Background->>Content: Update menu label
-    Content->>UI: Display updated channel name
+    Browser->>XHR: GET /youtubei/v1/next
+    XHR-->>Main: JSON response
+    Main->>Main: stashNetworkSnapshot()
+    Main->>Filter: extractChannelInfo()
+    Filter->>Filter: harvest UC ID, handle, name, logo
+    Filter->>Main: postMessage(FilterTube_UpdateVideoChannelMap)
+    Main->>Isolated: postMessage(FilterTube_UpdateVideoChannelMap)
+    Isolated->>DOM: stampChannelIdentity()
+    DOM->>DOM: 3-dot menu shows correct name instantly
 ```
 
-**Important update (current behavior):** the diagram above shows the *menu enrichment* request flow, but in practice **FilterTube often already knows the UC channel ID before the user opens the menu**.
+**Key changes in v3.2.0:**
+- **No network requests** for identity in most cases
+- **Instant UI updates**—no "Fetching..." delays
+- **Zero-network Kids mode**—works entirely from XHR data
 
-- **Main World interception (preferred):** `js/seed.js` intercepts `ytInitialData`, `ytInitialPlayerResponse`, and `/youtubei/v1/*` fetch/XHR payloads. `js/filter_logic.js` harvests `videoId -> UC...` and posts it via `window.postMessage({ type: 'FilterTube_UpdateVideoChannelMap' })`.
-- **Persistence:** `js/content_bridge.js` receives `FilterTube_UpdateVideoChannelMap` and forwards it to `background.js` (`action: 'updateVideoChannelMap'`). This makes Shorts/Watch identity available *on future renders* and across surfaces.
-- **DOM-first shortcut (now common):** many cards (including Shorts surfaces) now expose `/channel/UC...` anchors, so `extractChannelFromCard()` can return a UC ID immediately, meaning `needsFetch` is often false.
+### 2. Request Types (Priority Order)
 
-### 2. Request Types
+#### 1. Network Snapshot Stashing (Primary Path)
 
-#### A. Main World ytInitialData Lookup
 ```javascript
-// Fastest: Extract from page's initial data
-async function searchYtInitialDataForVideoChannel(videoId, options = {}) {
-    const expectedHandle = options.expectedHandle || null;
-    const expectedName = options.expectedName || null;
-
-    // Search through ytInitialData structure
-    const initialData = window.ytInitialData;
-    if (!initialData) return null;
-
-    // Deep search for video-related channel info
-    const searchResult = deepSearchInitialData(initialData, videoId);
-    if (searchResult) {
-        return {
-            id: searchResult.channelId,
-            handle: searchResult.handle,
-            name: searchResult.name,
-            source: 'ytInitialData'
-        };
+// In seed.js - comprehensive network interception
+function stashNetworkSnapshot(data, dataName) {
+    if (!window.filterTube) return;
+    if (dataName.includes('/youtubei/v1/next')) {
+        window.filterTube.lastYtNextResponse = data;
+        window.filterTube.lastYtNextResponseTs = Date.now();
     }
+    if (dataName.includes('/youtubei/v1/browse')) {
+        window.filterTube.lastYtBrowseResponse = data;
+        window.filterTube.lastYtBrowseResponseTs = Date.now();
+    }
+    if (dataName.includes('/youtubei/v1/player')) {
+        window.filterTube.lastYtPlayerResponse = data;
+        window.filterTube.lastYtPlayerResponseTs = Date.now();
+    }
+}
+```
 
+**Endpoints intercepted and stashed:**
+- `/youtubei/v1/next` – Home feed, watch next feed, recommendations
+- `/youtubei/v1/browse` – Channel pages, search results, Kids content
+- `/youtubei/v1/player` – Video player metadata, Shorts data
+
+**Multiple snapshot sources:**
+- `lastYtNextResponse` – Latest next feed data
+- `lastYtBrowseResponse` – Latest browse data  
+- `lastYtPlayerResponse` – Latest player data
+- `rawYtInitialData` – Page initial data
+- `rawYtInitialPlayerResponse` – Page player data
+
+### 2. Multi-Source Identity Extraction
+
+```javascript
+// In injector.js - comprehensive snapshot search
+function searchYtInitialDataForVideoChannel(videoId, expectations = {}) {
+    const roots = [];
+    
+    // Primary: Stashed network responses
+    if (window.filterTube?.lastYtNextResponse) {
+        roots.push({ root: window.filterTube.lastYtNextResponse, label: 'lastYtNextResponse' });
+    }
+    if (window.filterTube?.lastYtBrowseResponse) {
+        roots.push({ root: window.filterTube.lastYtBrowseResponse, label: 'lastYtBrowseResponse' });
+    }
+    if (window.filterTube?.lastYtPlayerResponse) {
+        roots.push({ root: window.filterTube.lastYtPlayerResponse, label: 'lastYtPlayerResponse' });
+    }
+    
+    // Fallback: Page globals
+    if (window.ytInitialData) {
+        roots.push({ root: window.ytInitialData, label: 'ytInitialData' });
+    }
+    if (window.ytInitialPlayerResponse) {
+        roots.push({ root: window.ytInitialPlayerResponse, label: 'ytInitialPlayerResponse' });
+    }
+    
+    // Search each root for video-specific channel data
+    for (const target of roots) {
+        const result = searchObject(target.root, videoId);
+        if (result) return result;
+    }
+    
     return null;
 }
 ```
 
-#### A2. Main World player payload harvesting (Watch + Shorts)
+#### 3. Post-Block Enrichment (Background Processing)
 
-In addition to `ytInitialData`, the **player response** is now a major identity source:
+```javascript
+// In background.js - asynchronous enrichment with rate limiting
+function schedulePostBlockEnrichment(channel, profile = 'main', metadata = {}) {
+    const source = metadata?.source || '';
+    if (source === 'postBlockEnrichment') return;
 
-- `window.ytInitialPlayerResponse` (defineProperty hook in `js/seed.js`)
-- `/youtubei/v1/player` (fetch/XHR interception in `js/seed.js`)
+    const id = channel?.id || '';
+    if (!id || !id.toUpperCase().startsWith('UC')) return;
 
-These commonly include explicit fields such as `videoDetails.videoOwnerChannelId` / `videoDetails.channelId` or `microformat.playerMicroformatRenderer.externalChannelId`, allowing `filter_logic.js` to register:
+    const key = `${profile === 'kids' ? 'kids' : 'main'}:${id.toLowerCase()}`;
+    const now = Date.now();
+    const lastAttempt = postBlockEnrichmentAttempted.get(key) || 0;
+    
+    // Rate limit: 6-hour cooldown between attempts
+    if (now - lastAttempt < 6 * 60 * 60 * 1000) return;
 
-- `channelMap` mappings (UC ID ↔ handle/customUrl)
-- `videoChannelMap` mappings (videoId → UC ID)
+    const needsEnrichment = (
+        (!channel.handle && !channel.customUrl) || 
+        !channel.logo || 
+        !channel.name
+    );
+    if (!needsEnrichment) return;
+
+    // Schedule enrichment with random delay (3.5-4s)
+    const delayMs = 3500 + Math.floor(Math.random() * 750);
+    
+    setTimeout(async () => {
+        await handleAddFilteredChannel(
+            id,
+            false,
+            null,
+            null,
+            { source: 'postBlockEnrichment' },
+            profile,
+            ''
+        );
+    }, delayMs);
+}
+```
+
+**Enrichment features:**
+- **Rate limited** to avoid excessive network requests
+- **Background processing** doesn't block UI
+- **Fills missing metadata**: handle, customUrl, logo, name
+- **Smart scheduling** with random delays to avoid patterns
+
+#### 4. Enhanced CORS Handling
+
+```javascript
+// Improved fetch with CORS fallback strategies
+async function fetchChannelInfo(channelIdOrHandle) {
+    try {
+        const response = await fetch(channelUrl, {
+            credentials: 'include',
+            headers: { 'Accept': 'text/html' }
+        });
+        
+        // Handle 404s for @handle/about by falling back to @handle
+        if (!response.ok && isHandle) {
+            const fallbackUrl = `https://www.youtube.com/@${encodedHandle}`;
+            return await fetch(fallbackUrl, {
+                credentials: 'include',
+                headers: { 'Accept': 'text/html' }
+            });
+        }
+        
+        return response;
+    } catch (error) {
+        // CORS errors trigger alternative fetch methods
+        if (error.name === 'TypeError' && error.message.includes('CORS')) {
+            return await fetchAlternativeMethod(url);
+        }
+        throw error;
+    }
+}
+```
+
+#### 5. OG Meta Tag Extraction (Ultimate Fallback)
+
+```javascript
+// Extract channel info from HTML meta tags when JSON parsing fails
+const extractMeta = (key) => {
+    const patterns = [
+        new RegExp(`<meta[^>]+property=["']${key}["'][^>]+content=["']([^"']+)["']`, 'i'),
+        new RegExp(`<meta[^>]+content=["']([^"']+)["'][^>]+property=["']${key}["']`, 'i')
+    ];
+    
+    for (const re of patterns) {
+        const match = html.match(re);
+        if (match && match[1]) return decodeHtmlEntities(match[1]);
+    }
+    return null;
+};
+
+// Extract channel name, image, and URL from OG tags
+const ogTitle = extractMeta('og:title');
+const ogImage = extractMeta('og:image'); 
+const ogUrl = extractMeta('og:url');
+```
+    
+    #### 6. Kids Zero-Network Prefetch
+
+```javascript
+// Kids: do NOT prefetch via network. Rely on Network JSON interception
+async function prefetchIdentityForCard({ videoId, card }) {
+    if (isKidsHost) {
+        // Extract from XHR-intercepted data only
+        const info = extractChannelFromCard(card);
+        if (info?.id || info?.handle || info?.customUrl) {
+            stampChannelIdentity(card, info);
+            if (info.id) {
+                persistVideoChannelMapping(videoId, info.id);
+            }
+        }
+        return;
+    }
+    
+    // Main site: use ytInitialData search as fallback
+    const ytInfo = await searchYtInitialDataForVideoChannel(videoId, null);
+    if (ytInfo && (ytInfo.id || ytInfo.handle || ytInfo.customUrl)) {
+        stampChannelIdentity(card, ytInfo);
+        if (ytInfo.id) {
+            persistVideoChannelMapping(videoId, ytInfo.id);
+        }
+    }
+}
+```
+
+**Kids-specific features:**
+- **Zero-network operation** - no fetch requests for Kids
+- **XHR-only identity** - relies entirely on intercepted JSON
+- **DOM extraction fallback** - uses stamped attributes when available
+
+### 3. Fallback Cascade (v3.2.0)
+
+```
+Primary Strategy Failure
+├── Network snapshot stashing failed
+├── ytInitialData lookup failed  
+├── Watch page fetch failed
+├── Shorts page fetch failed
+├── Kids page fetch failed
+└── OG meta tag extraction failed
+
+Ultimate Fallback:
+- Use DOM-extracted handle/ID
+- Display "Channel" as last resort
+- Log failure for debugging
+```
+
+**Enhanced fallback hierarchy:**
+1. **Stashed network responses** (lastYtNextResponse, etc.)
+2. **Page globals** (ytInitialData, ytInitialPlayerResponse)  
+3. **Targeted fetch** (watch/shorts pages)
+4. **OG meta tags** (HTML parsing)
+5. **DOM extraction** (data attributes)
+6. **Generic fallback** ("Channel")
 
 #### B. YouTube Watch Page Fetch
 ```javascript

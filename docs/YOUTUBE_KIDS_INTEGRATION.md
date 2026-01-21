@@ -1,27 +1,164 @@
-# YouTube Kids Integration Documentation
+# YouTube Kids Integration Documentation (v3.2.0)
 
 ## Overview
 
-FilterTube v3.1.8 introduces native integration with YouTube Kids, allowing users to block channels directly from Kids UI while maintaining the same filtering power available on YouTube Main.
+FilterTube v3.2.0 provides **zero-network** integration with YouTube Kids, relying entirely on proactive XHR interception to extract channel identity without any network requests. This ensures reliable blocking on YouTube Kids where traditional network fetching often fails.
+
+## Zero-Network Architecture (v3.2.0)
+
+### Proactive Channel Identity on Kids
+
+```javascript
+// In seed.js - network snapshot stashing works on Kids too
+function stashNetworkSnapshot(data, dataName) {
+    if (dataName.includes('/youtubei/v1/browse')) {
+        // Kids browse responses contain channel identity
+        window.filterTube.lastYtBrowseResponse = data;
+        window.filterTube.lastYtBrowseResponseTs = Date.now();
+    }
+}
+
+// In content_bridge.js - Kids zero-network prefetch
+async function prefetchIdentityForCard({ videoId, card }) {
+    const isKidsHost = typeof location !== 'undefined' && 
+                      String(location.hostname || '').includes('youtubekids.com');
+    
+    if (isKidsHost) {
+        // Kids: do NOT prefetch via network. Rely on Network JSON interception
+        const info = extractChannelFromCard(card);
+        if (info?.id || info?.handle || info?.customUrl) {
+            stampChannelIdentity(card, info);
+            if (info.id) {
+                persistVideoChannelMapping(videoId, info.id);
+            }
+        }
+        return;
+    }
+}
+```
+
+**Kids-specific features:**
+- **Zero network requests** - completely relies on XHR interception
+- **Instant blocking** - no "Fetching..." delays on Kids
+- **Reliable operation** - works even when Kids blocks external requests
+- **DOM extraction fallback** - uses stamped attributes when available
+
+### Enhanced Kids Native Blocking (v3.2.0)
+
+```javascript
+// In block_channel.js - improved Kids context capture
+function captureKidsMenuContext(menuButton) {
+    const context = {
+        ts: now,
+        videoId: '',
+        channelId: '',
+        channelHandle: '',
+        customUrl: '',
+        channelName: '',
+        source: 'kidsMenu'
+    };
+    
+    // Extract handle from channel links
+    if (href) {
+        const extractedHandle = window.FilterTubeIdentity?.extractRawHandle?.(href) || '';
+        if (extractedHandle && extractedHandle.startsWith('@')) {
+            context.channelHandle = extractedHandle;
+        }
+        
+        // Extract customUrl from /c/ and /user/ paths
+        const decoded = (() => {
+            try { return decodeURIComponent(href); } catch (e) { return href; }
+        })();
+        if (decoded.startsWith('/c/')) {
+            const slug = decoded.split('/')[2] || '';
+            if (slug) context.customUrl = `c/${slug}`;
+        } else if (decoded.startsWith('/user/')) {
+            const slug = decoded.split('/')[2] || '';
+            if (slug) context.customUrl = `user/${slug}`;
+        }
+    }
+    
+    return context;
+}
+
+// Enhanced Kids blocking with validation
+async function handleKidsNativeBlock(blockType = 'video', options = {}) {
+    let ctx = lastKidsMenuContext;
+    
+    // Refresh stale context to reduce errors
+    if (!ctx || (!ctx.channelId && !ctx.channelName)) {
+        const fresh = captureKidsMenuContext(lastClickedMenuButton);
+        if (fresh) {
+            lastKidsMenuContext = fresh;
+            ctx = fresh;
+        }
+    }
+    
+    // Validate and sanitize channel name
+    let channelName = ctx?.channelName || '';
+    if (/^[a-zA-Z0-9_-]{11}$/.test(channelName) || /^UC[\w-]{22}$/i.test(channelName)) {
+        channelName = '';
+    }
+    
+    const safeHandle = (ctx?.channelHandle || '').trim();
+    const safeCustomUrl = (ctx?.customUrl || '').trim();
+    
+    // Send to background with proper identifiers
+    chrome.runtime?.sendMessage({
+        action: 'FilterTube_KidsBlockChannel',
+        videoId: ctx?.videoId || null,
+        channel: {
+            name: channelName || null,
+            id: ctx?.channelId || '',
+            handle: safeHandle || null,
+            customUrl: safeCustomUrl || null,
+            originalInput: (ctx?.channelId && ctx?.channelId.startsWith('UC'))
+                ? ctx?.channelId
+                : (safeHandle || safeCustomUrl || ''),
+            source: blockType === 'channel' ? 'kidsNativeChannel' : 'kidsNativeVideo'
+        }
+    });
+}
+```
+
+**Kids blocking improvements:**
+- **Handle extraction** from channel links
+- **CustomUrl support** for /c/ and /user/ channels
+- **Context refresh** to reduce stale data
+- **Name validation** to avoid persisting IDs as names
+- **Proper identifier prioritization**
 
 ## Architecture
 
-### Dual-Profile System
+### Zero-Network Design
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────┐
 │                    FilterTube Extension                             │
 ├─────────────────────────────────────────────────────────────────────┤
+│  Main World (Page Context)                                          │
+│  ├── XHR Interception (/youtubei/v1/*)                              │
+│  ├── Snapshot Stashing (lastYt*Response)                            │
+│  └── Channel Extraction (no network)                                │
+├─────────────────────────────────────────────────────────────────────┤
+│  Isolated World (Extension)                                         │
+│  ├── Message Handling (content_bridge.js)                           │
+│  ├── Native UI Integration (block_channel.js)                       │
+│  └── DOM Stamping (instant)                                         │
+├─────────────────────────────────────────────────────────────────────┤
 │  Background Script (Service Worker)                                 │
 │  ├── Profile Detection (URL-based)                                  │
 │  ├── Kids Native Message Handler                                    │
 │  └── Settings Compilation (per-profile)                             │
-├─────────────────────────────────────────────────────────────────────┤
-│  Content Scripts                                                    │
-│  ├── Main: youtube.com (existing logic)                             │
-│  └── Kids: youtubekids.com (new native integration)                 │
 └─────────────────────────────────────────────────────────────────────┘
 ```
+
+### Key Principle: No Network Fetches
+
+All channel identity on YouTube Kids comes from:
+1. **XHR JSON interception** – `/youtubei/v1/next`, `/youtubei/v1/browse`
+2. **DOM extraction** – When available in page markup
+3. **Never from network fetches** – `skipNetwork: true` enforced everywhere
 
 ### Profile Detection
 
@@ -34,11 +171,51 @@ function isKidsUrl(url) {
 const targetProfile = isKidsUrl(senderUrl) ? 'kids' : 'main';
 ```
 
-## Native Blocking Flow
+## Zero-Network Identity Resolution
+
+### Proactive Channel Extraction
+
+```javascript
+// In filter_logic.js - XHR interception works the same as Main
+function extractChannelInfoForKids(item, rules) {
+    // Extract UC ID from browseEndpoint
+    const channelId = item.browseEndpoint?.browseId;
+    
+    // Extract handle/customUrl from canonicalBaseUrl
+    const canonical = item.browseEndpoint?.canonicalBaseUrl;
+    const handle = canonical ? normalizeChannelHandle(canonical) : '';
+    const customUrl = canonical ? extractCustomUrlFromCanonicalBaseUrl(canonical) : '';
+    
+    // Extract name from metadata
+    const name = item.title?.simpleText || item.byline?.simpleText;
+    
+    return { id: channelId, handle, customUrl, name };
+}
+```
+
+### Cross-world Messaging
+
+Same messages as Main YouTube, but with Kids-specific data:
+
+```javascript
+// Main World broadcasts channel info
+window.postMessage({
+    type: 'FilterTube_UpdateChannelMap',
+    payload: { '@handle': 'UC...', 'c/name': 'UC...' }
+}, '*');
+
+// Isolated World receives and stamps instantly
+function handleMainWorldMessages(event) {
+    if (event.data.type === 'FilterTube_UpdateChannelMap') {
+        // Stamp all matching cards immediately
+        stampKidsCardsWithChannelInfo(event.data.payload);
+    }
+}
+```
+
+## Native Blocking Flow (Zero-Network)
 
 ### Event Detection
-
-FilterTube integrates with YouTube Kids' native blocking UI through passive event listeners:
 
 ```javascript
 // Monitor menu clicks and toast notifications
@@ -60,9 +237,9 @@ document.addEventListener('DOMNodeInserted', (e) => {
 }, true);
 ```
 
-### Context Capture
+### Context Capture (Enhanced for Zero-Network)
 
-When a block action is detected, FilterTube captures relevant context:
+When a block action is detected, FilterTube captures context without any network fetches:
 
 ```javascript
 function captureKidsMenuContext(menuButton) {
@@ -71,26 +248,36 @@ function captureKidsMenuContext(menuButton) {
         videoId: '',
         channelId: '',
         channelName: '',
+        handle: '',
+        customUrl: '',
         source: 'kidsMenu'
     };
 
     // Extract from video card
     const card = menuButton?.closest('ytk-compact-video-renderer, ytk-grid-video-renderer, ytk-video-renderer');
     if (card) {
-        // Extract video ID
-        context.videoId = extractVideoIdFromCard(card);
+        // Check for stamped attributes first (from XHR)
+        context.channelId = card.getAttribute('data-filtertube-channel-id') || '';
+        context.handle = card.getAttribute('data-filtertube-channel-handle') || '';
+        context.customUrl = card.getAttribute('data-filtertube-channel-custom') || '';
+        context.channelName = card.getAttribute('data-filtertube-channel-name') || '';
         
-        // Extract channel ID from link
-        const channelLink = card.querySelector('a[href*="/channel/"], a[href*="/channel/"]');
-        if (channelLink && window.FilterTubeIdentity?.extractChannelIdFromPath) {
-            context.channelId = window.FilterTubeIdentity.extractChannelIdFromPath(channelLink.href);
+        // Fallback to DOM extraction
+        if (!context.channelId) {
+            const channelLink = card.querySelector('a[href*="/channel/"], a[href*="/@"]');
+            if (channelLink) {
+                context.channelId = extractChannelIdFromPath(channelLink.href);
+                context.handle = extractRawHandle(channelLink.href);
+                context.channelName = channelLink.textContent?.trim() || '';
+            }
         }
         
-        // Extract channel name
-        context.channelName = channelLink?.textContent?.trim() || '';
+        // Extract video ID
+        context.videoId = card.getAttribute('data-filtertube-video-id') || 
+                         extractVideoIdFromCard(card) || '';
     }
 
-    // Fallback to page context
+    // Fallback to page context (no network fetch)
     const isWatch = location.pathname.startsWith('/watch');
     if (isWatch && !context.videoId) {
         const params = new URLSearchParams(location.search);
@@ -98,6 +285,11 @@ function captureKidsMenuContext(menuButton) {
         if (v && /^[a-zA-Z0-9_-]{11}$/.test(v)) {
             context.videoId = v;
         }
+    }
+    
+    // Never trigger network fetches on Kids
+    return context;
+}
     }
 
     return context;

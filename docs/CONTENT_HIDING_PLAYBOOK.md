@@ -1,20 +1,22 @@
-# Content Hiding + Channel Identity Playbook
+# Content Hiding + Channel Identity Playbook (v3.2.0)
 
 This document is an *operator playbook* for answering:
 
 - Which layer is responsible for hiding content in each YouTube surface?
-- Which data source(s) are used to resolve a channel’s identity (UC ID + @handle)?
+- Which data source(s) are used to resolve a channel's identity (UC ID + @handle)?
 - What to check when blocking fails (especially `/@handle/about` returning 404).
-
+- **NEW in v3.2.0**: How proactive XHR interception changes the game.
 
 ## 1) The Three Layers (Who Does What)
 
 ### 1.1 Engine (Main World): `seed.js` + `filter_logic.js`
 - **Purpose**
   - Remove blocked/matching items from YouTube JSON responses **before** YouTube renders.
-  - Prevent “flash of blocked content” when possible.
+  - **NEW v3.2.0**: Stash network snapshots for proactive identity resolution.
+  - Prevent "flash of blocked content" when possible.
 - **Strengths**
   - Earliest filtering.
+  - **NEW v3.2.0**: Proactive channel identity via XHR interception.
   - Best for feed/search/watch data responses.
 - **Limits**
   - Not every surface routes through a convenient JSON response.
@@ -29,7 +31,7 @@ This document is an *operator playbook* for answering:
   - Can hide immediately after a manual block action.
 - **Limits**
   - Can only hide *after* elements exist.
-  - Channel identity may be incomplete in the DOM (common on Shorts).
+  - **IMPROVED v3.2.0**: Channel identity is now stamped from proactive sources, reducing incomplete data on Shorts.
 
 ### 1.3 Menu-click Blocking (User Action): 3-dot menu injection (`block_channel.js` + `content_bridge.js`)
 - **Purpose**
@@ -37,12 +39,11 @@ This document is an *operator playbook* for answering:
   - Hide the clicked card instantly for UX feedback
 - **Strengths**
   - Direct, explicit user action.
-  - Can use extra context (videoId, expected byline) to recover identity.
+  - **IMPROVED v3.2.0**: Can use extra context (videoId, expected byline) to recover identity.
 - **Limits**
-  - If we don’t have `videoId`, we lose the strongest fallbacks (ytInitialData lookup / shorts fetch).
+  - If we don't have `videoId`, we lose the strongest fallbacks (ytInitialData lookup / shorts fetch).
 
-
-## 2) Canonical Channel Identity Rules
+## 2) Canonical Channel Identity Rules (v3.2.0 Updates)
 
 ### 2.1 Canonical key
 - **Canonical identity is UC ID** (`UCxxxxxxxxxxxxxxxxxxxxxx`).
@@ -51,36 +52,61 @@ This document is an *operator playbook* for answering:
 Additional supported aliases:
 - `customUrl` (`/c/<slug>` and `/user/<slug>`) is treated as a persisted alias that can be resolved to a UC ID via `channelMap`.
 
-### 2.2 `channelMap` (alias cache)
+### 2.2 `channelMap` (alias cache) - **ENHANCED v3.2.0**
 Stored in local extension storage as a bidirectional map:
 - `channelMap[lowercaseHandle] -> UCID`
 - `channelMap[lowercaseUCID] -> handleDisplay`
 
+**NEW v3.2.0**: Automatic mapping updates during blocking operations:
+- Background automatically persists handle↔UC mappings when new channels are added
+- Cross-world messaging ensures UI and background stay in sync
+- Rate-limited enrichment fills missing mappings over time
+
 Use cases:
 - Converting handle-only contexts into UC IDs.
 - Recovering from YouTube handle URL breakage.
+- **NEW v3.2.0**: Proactive mapping from XHR interception data.
 
+## 3) Channel Identity Sources (Priority Order) - **REVISED v3.2.0**
 
-## 3) Channel Identity Sources (Priority Order)
+### 3.1 **NEW: Proactive Network Snapshots (Highest Priority)**
+```javascript
+// In seed.js - stashed during XHR interception
+function stashNetworkSnapshot(data, dataName) {
+    if (dataName.includes('/youtubei/v1/next')) {
+        window.filterTube.lastYtNextResponse = data;
+        window.filterTube.lastYtNextResponseTs = Date.now();
+    }
+    // ... browse and player endpoints too
+}
+```
 
-When trying to resolve `{ id, handle, name }` for a channel:
+**Sources:**
+- `lastYtNextResponse` - Latest next feed data
+- `lastYtBrowseResponse` - Latest browse data  
+- `lastYtPlayerResponse` - Latest player data
+- `rawYtInitialData` - Page initial data
+- `rawYtInitialPlayerResponse` - Page player data
 
-1. **Direct UC ID**
-   - From DOM links (`/channel/UC...`) or already-known metadata.
-2. **Main-world ytInitialData lookup by `videoId`** (best “no network” recovery)
+### 3.2 Direct UC ID
+- From DOM links (`/channel/UC...`) or already-known metadata.
+
+### 3.3 **IMPROVED: Main-world ytInitialData lookup by `videoId`** (best "no network" recovery)
    - `content_bridge.js` → `requestChannelInfoFromMainWorld(videoId)`
-   - `injector.js` searches `window.ytInitialData` and returns `{ id, handle, name }`.
-3. **`channelMap` handle→UC mapping**
-   - Fast, no network.
-4. **`channelMap` customUrl→UC mapping**
-   - Fast, no network.
-5. **Shorts page fetch (`/shorts/<videoId>`)**
+   - **NEW v3.2.0**: Now searches multiple snapshot sources, not just `window.ytInitialData`
    - Parses embedded `ytInitialData` / header renderers / canonical links.
-6. **Handle/customUrl page fetch**
+
+### 3.4 Targeted Fetch (Last Resort)
    - `https://www.youtube.com/@<handle>/about`, then fallback to `https://www.youtube.com/@<handle>`
    - `https://www.youtube.com/c/<slug>` / `https://www.youtube.com/user/<slug>`
+   - **IMPROVED v3.2.0**: Enhanced CORS handling with automatic fallbacks
    - This is the most fragile due to YouTube’s 404 bug for some handles.
 
+### 3.5 Ultimate Fallbacks
+   - **NEW v3.2.0**: OG meta tag extraction when JSON parsing fails
+   - **NEW v3.2.0**: Watch identity resolution when channel page scraping fails
+   - DOM extraction from stamped attributes
+   - Generic fallback ("Channel")
 
 ## 4) Surface-by-Surface: “What hides content” + “Where identity comes from”
 

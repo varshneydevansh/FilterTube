@@ -1,6 +1,13 @@
-# YouTube Renderer Inventory (Nov 2025)
+# YouTube Renderer Inventory (v3.2.0 - Jan 2026)
 
 This document tracks which YouTube renderers/selectors FilterTube currently targets and how the latest DOM samples map to them.
+
+**NEW v3.2.0 Major Updates:**
+- **Proactive Network Interception**: Added comprehensive XHR interception and snapshot stashing
+- **Enhanced Collaboration Detection**: Added `avatarStackViewModel` support for Mix cards and collaboration detection
+- **Topic Channel Support**: Added special handling for auto-generated YouTube topic channels
+- **Post-Block Enrichment**: Added background enrichment system for incomplete channel data
+- **Kids Video Enhancement**: Added `kidsVideoOwnerExtension` and `externalChannelId` support
 
 ## Home Feed
 
@@ -12,6 +19,130 @@ This document tracks which YouTube renderers/selectors FilterTube currently targ
 | `videoRenderer` / `gridVideoRenderer` | Legacy rich-grid video cards | ✅ Covered @js/filter_logic.js#129-133 |
 | `playlistRenderer` / `radioRenderer` | Mix/playlist shelves | ✅ Covered @js/filter_logic.js#206-215 |
 | `shelfRenderer` | Home page shelf headers | ✅ Covered @js/filter_logic.js#145-147 |
+
+### **UPDATED v3.2.0: Renderer Status Changes**
+
+| JSON renderer key | Previous Status | Current Status | Notes |
+| --- | --- | --- | --- |
+| `continuationItemRenderer` | ⚠️ Missing | ✅ **IMPLEMENTED** | Used for comment continuations @js/seed.js#546 |
+| `itemSectionRenderer` | ⚠️ Missing | ✅ **IMPLEMENTED** | Comment section removal @js/seed.js#377 |
+| `twoColumnWatchNextResults` | ❌ Not parsed | ✅ **IMPLEMENTED** | Watch page content structure @js/filter_logic.js#813 |
+| `watchCardRichHeaderRenderer` | ⚠️ Missing | ✅ **IMPLEMENTED** | Universal watch card headers @js/filter_logic.js#361 |
+| `backstagePostRenderer` | ✅ Covered | ✅ **ENHANCED** | Community posts with full content @js/filter_logic.js#465 |
+| `backstagePollRenderer` | ❌ Not parsed | ✅ **IMPLEMENTED** | Poll questions & choices @js/filter_logic.js#472 |
+| `backstageQuizRenderer` | ❌ Not parsed | ✅ **IMPLEMENTED** | Quiz questions & options @js/filter_logic.js#481 |
+| `notificationRenderer` | ✅ Covered | ✅ **ENHANCED** | Full notification parsing @js/filter_logic.js#493 |
+| `menuRenderer` | ℹ️ UI only | ✅ **IMPLEMENTED** | Menu navigation items @js/content_bridge.js#3901 |
+| `commentRenderer` | ✅ Covered | ✅ **ENHANCED** | Comment text & author @js/filter_logic.js#559 |
+| `commentThreadRenderer` | ✅ Covered | ✅ **ENHANCED** | Comment thread containers @js/filter_logic.js#564 |
+
+### **NEW v3.2.0: Additional Renderers Found**
+
+| JSON renderer key | Purpose | Status | Location |
+| --- | --- | --- | --- |
+| `backstagePostThreadRenderer` | Community post threads | ✅ **NEW** | @js/filter_logic.js#458 |
+| `ticketShelfRenderer` | Ticket/metadata shelves | ✅ **NEW** | @js/filter_logic.js#422 |
+| `podcastRenderer` | Podcast content | ✅ **NEW** | @js/filter_logic.js#425 |
+| `richShelfRenderer` | Rich shelf containers | ✅ **NEW** | @js/filter_logic.js#438 |
+| `channelVideoPlayerRenderer` | Channel featured video | ✅ **NEW** | @js/filter_logic.js#444 |
+| `compactRadioRenderer` | Compact radio playlists | ✅ **NEW** | @js/filter_logic.js#419 |
+| `relatedChipCloudRenderer` | Related chip clouds | ✅ **NEW** | @js/filter_logic.js#365 |
+| `chipCloudRenderer` | Chip cloud containers | ✅ **NEW** | @js/filter_logic.js#369 |
+| `chipCloudChipRenderer` | Individual chips | ✅ **NEW** | @js/filter_logic.js#372 |
+| `secondarySearchContainerRenderer` | Search container | ✅ **NEW** | @js/filter_logic.js#388 |
+
+### **NEW v3.2.0: Proactive Network Snapshot System**
+
+| Network Endpoint | Data Source | Purpose | Status |
+| --- | --- | --- | --- |
+| `/youtubei/v1/next` | `lastYtNextResponse` | Watch page playlist & recommendations | ✅ Stashed @js/seed.js#stashNetworkSnapshot |
+| `/youtubei/v1/browse` | `lastYtBrowseResponse` | Channel page & browse data | ✅ Stashed @js/seed.js#stashNetworkSnapshot |
+| `/youtubei/v1/player` | `lastYtPlayerResponse` | Video player metadata | ✅ Stashed @js/seed.js#stashNetworkSnapshot |
+
+**Multi-Source Channel Resolution:**
+```javascript
+// Enhanced search across all proactive sources
+const roots = [
+    window.filterTube?.lastYtNextResponse,      // Playlist data
+    window.filterTube?.lastYtBrowseResponse,    // Channel data  
+    window.filterTube?.lastYtPlayerResponse,    // Player data
+    window.ytInitialData,                       // Page data
+    window.filterTube?.lastYtInitialData        // Backup page data
+];
+```
+
+### **NEW v3.2.0: Enhanced Collaboration Detection**
+
+| Renderer/Component | Collaboration Type | Status | Notes |
+| --- | --- | --- | --- |
+| `avatarStackViewModel` | Multi-channel avatar stacks | ✅ **NEW** | Extracts collaborators from avatar arrays @js/injector.js#extractFromAvatarStackViewModel |
+| `decoratedAvatarViewModel` | Channel avatars with endpoints | ✅ **ENHANCED** | Now extracts logos and channel info @js/filter_logic.js#340 |
+| Mix Cards (`collection-stack`) | **NOT** collaborations | ✅ **FIXED** | Properly excluded from collaboration detection @js/content_bridge.js#isMixCardElement |
+
+**Avatar Stack Structure:**
+```javascript
+// New avatarStackViewModel parsing
+{
+    avatars: [
+        {
+            avatarViewModel: {
+                image: { sources: [{ url: "logo_url" }] },
+                rendererContext: {
+                    commandContext: {
+                        onTap: {
+                            innertubeCommand: {
+                                browseEndpoint: {
+                                    browseId: "UC...",
+                                    canonicalBaseUrl: "/@handle"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}
+```
+
+### **NEW v3.2.0: Topic Channel Support**
+
+| Channel Type | Detection Pattern | Status | Notes |
+| --- | --- | --- | --- |
+| Auto-generated Topic Channels | Name ends with " - Topic" | ✅ **NEW** | Special handling in @js/render_engine.js#isTopicChannel |
+| Topic Channel Tooltip | No @handle/customUrl | ✅ **NEW** | Shows explanatory tooltip in UI |
+
+**Topic Channel Logic:**
+```javascript
+function isTopicChannel(channel) {
+    const name = channel?.name || '';
+    const hasTopicSuffix = /\s-\sTopic$/i.test(name);
+    const hasNoHandle = !channel.handle && !channel.customUrl;
+    const hasUcId = channel.id?.startsWith('UC');
+    return hasTopicSuffix && hasNoHandle && hasUcId;
+}
+```
+
+### **NEW v3.2.0: Post-Block Enrichment System**
+
+| Feature | Purpose | Status | Notes |
+| --- | --- | --- | --- |
+| `schedulePostBlockEnrichment()` | Background enrichment of incomplete channel data | ✅ **NEW** | Runs 3.5s after block with rate limiting @js/background.js#579 |
+| `pendingPostBlockEnrichments` | Tracks active enrichment requests | ✅ **NEW** | Prevents duplicate enrichment attempts |
+| `postBlockEnrichmentAttempted` | Rate limiting cache (6 hours) | ✅ **NEW** | Avoids repeated failed enrichments |
+
+**Enrichment Triggers:**
+- Missing handle or customUrl
+- Missing logo
+- Missing proper channel name
+- Not a topic channel (topic channels are excluded)
+
+### **NEW v3.2.0: Enhanced Kids Video Support**
+
+| Renderer Field | Purpose | Status | Notes |
+| --- | --- | --- | --- |
+| `kidsVideoOwnerExtension.externalChannelId` | Kids video channel ID extraction | ✅ **NEW** | @js/filter_logic.js#896 |
+| `externalChannelId` | General external channel ID | ✅ **ENHANCED** | Multiple fallback locations @js/content/dom_extractors.js#351 |
 
 ### New DOM elements from sample
 | DOM tag / component | Associated data | Coverage | Notes |
@@ -88,7 +219,7 @@ Each collaborator in `listItems[].listItemViewModel`:
 | Block All Collaborators | 2+ collaborators | Blocks ALL channels independently with shared `collaborationGroupId` |
 | Done • Block X Selected | 3-6 collaborators | Appears after selecting rows in multi-step mode; persists only selections |
 
-#### Watch page notes (v3.1.2)
+#### Watch page notes (v3.2.0)
 
 - **Main video + right rail:** Watch-page dropdowns consume the same collaborator cache as Home/Search, so per-channel menu rows (and “Block All”) appear with names/handles even when the DOM only exposed “Channel A and 3 more”.
 - **Embedded Shorts:** Shorts surfaced inside the watch column mark `fetchStrategy: 'shorts'`; we prefetch `/shorts/<videoId>` before falling back to `/watch?v=` so collaborator menus and UC IDs hydrate reliably.
@@ -97,6 +228,8 @@ Each collaborator in `listItems[].listItemViewModel`:
 - **Watch playlist autoplay:** Autoplay uses an `ended`-event safety net to trigger a Next-click only when the immediate next playlist row is blocked, preventing blocked items from briefly playing.
 - **Playlist reprocessing robustness:** Previously hidden playlist rows are kept hidden during identity gaps (sticky-hide) to prevent restored blocked items from becoming playable during async enrichment.
 - **Dropdown close behavior:** The 3-dot dropdown close logic avoids closing `ytd-miniplayer` when a miniplayer is visible.
+- **ENHANCED v3.2.0:** Avatar stack collaboration detection now works on Mix cards and surfaces where `avatarStackViewModel` is used instead of `showDialogCommand`.
+- **ENHANCED v3.2.0:** Collaboration detection now properly excludes Mix cards (collection stacks) from being treated as collaborations.
 
 **Multi-select note (3+ collaborators):**
 When there are 3–6 collaborators, individual rows act as “select” toggles first. The bottom row becomes:
@@ -455,3 +588,67 @@ FilterTube now injects a "Block Channel" option into the 3-dot menu for the foll
 The dropdown observer lives in `js/content/block_channel.js` and uses a `MutationObserver` to detect when a dropdown container (typically `tp-yt-iron-dropdown`) is added or becomes visible. It traces back to the `lastClickedMenuButton` to identify the parent video card from the list above, then calls `content_bridge.js:injectFilterTubeMenuItem(dropdown, card)`.
 
 Inside `injectFilterTubeMenuItem`, FilterTube waits for YouTube to populate either the **new menu list** (`yt-list-view-model`) or the **legacy menu list** (`tp-yt-paper-listbox` / `ytd-menu-popup-renderer`) before inserting the menu entry. For Shorts, an asynchronous background fetch is often required to resolve the channel handle/ID from the video URL.
+
+---
+
+## v3.2.0 Implementation Summary
+
+### ✅ Completed v3.2.0 Enhancements
+
+| Feature | Implementation Status | Key Files |
+| --- | --- | --- |
+| **Proactive Network Interception** | ✅ Complete | `js/seed.js#stashNetworkSnapshot`, `js/injector.js` |
+| **Avatar Stack Collaboration Detection** | ✅ Complete | `js/injector.js#extractFromAvatarStackViewModel`, `js/filter_logic.js` |
+| **Topic Channel Support** | ✅ Complete | `js/render_engine.js#isTopicChannel`, `js/background.js` |
+| **Post-Block Enrichment** | ✅ Complete | `js/background.js#schedulePostBlockEnrichment` |
+| **Enhanced Kids Video Support** | ✅ Complete | `js/filter_logic.js`, `js/content/dom_extractors.js` |
+| **Mix Card Exclusion** | ✅ Complete | `js/content_bridge.js#isMixCardElement` |
+| **Enhanced CORS Handling** | ✅ Complete | `js/background.js#fetchChannelInfo` |
+
+### 🎯 v3.2.0 Architecture Impact
+
+- **Zero-Network Operation**: Most channel identity now resolved from stashed snapshots
+- **Improved Collaboration Detection**: Avatar stacks provide better collaborator extraction
+- **Better Error Recovery**: Multiple fallback strategies for channel resolution
+- **Enhanced Performance**: Reduced network calls through proactive data stashing
+- **Topic Channel Awareness**: Special handling for auto-generated YouTube channels
+
+### 📋 Tags Still Under Investigation
+
+| Renderer/Component | Current Status | Investigation Needed |
+| --- | --- | --- |
+| `compactAutoplayRenderer` | ⚠️ **STILL MISSING** | Add extraction paths for autoplay modules |
+| `expandableMetadataRenderer` | ⚠️ **STILL MISSING** | AI summary text filtering requirements |
+| `channelSubMenuRenderer` | ⚠️ **STILL MISSING** | Playlist menu text filtering needs |
+| `watchCardRHPanelRenderer` | ⚠️ **STILL MISSING** | Right-hand hero layout mapping |
+| `horizontalCardListRenderer` | ⚠️ **STILL MISSING** | Album shelf refinement chips |
+| `watchCardHeroVideoRenderer` | ⚠️ **STILL MISSING** | Hero watch card extraction |
+| `watchCardSectionSequenceRenderer` | ⚠️ **STILL MISSING** | Vertical hero list container |
+
+### ✅ **RECENTLY IMPLEMENTED** (Previously Missing)
+
+| Renderer/Component | Previous Status | Current Status | Notes |
+| --- | --- | --- | --- |
+| `continuationItemRenderer` | ⚠️ Missing | ✅ **IMPLEMENTED v3.2.0** | Comment continuations @js/seed.js#546 |
+| `itemSectionRenderer` | ⚠️ Missing | ✅ **IMPLEMENTED v3.2.0** | Comment section removal @js/seed.js#377 |
+| `twoColumnWatchNextResults` | ❌ Not parsed | ✅ **IMPLEMENTED v3.2.0** | Watch page structure @js/filter_logic.js#813 |
+| `watchCardRichHeaderRenderer` | ⚠️ Missing | ✅ **IMPLEMENTED v3.2.0** | Universal watch cards @js/filter_logic.js#361 |
+| `backstagePollRenderer` | ❌ Not parsed | ✅ **IMPLEMENTED v3.2.0** | Poll questions @js/filter_logic.js#472 |
+| `backstageQuizRenderer` | ❌ Not parsed | ✅ **IMPLEMENTED v3.2.0** | Quiz questions @js/filter_logic.js#481 |
+| `menuRenderer` | ℹ️ UI only | ✅ **IMPLEMENTED v3.2.0** | Menu navigation @js/content_bridge.js#3901 |
+| `ticketShelfRenderer` | ❌ Not documented | ✅ **IMPLEMENTED v3.2.0** | Ticket shelves @js/filter_logic.js#422 |
+| `podcastRenderer` | ❌ Not documented | ✅ **IMPLEMENTED v3.2.0** | Podcast content @js/filter_logic.js#425 |
+| `richShelfRenderer` | ❌ Not documented | ✅ **IMPLEMENTED v3.2.0** | Rich shelves @js/filter_logic.js#438 |
+| `channelVideoPlayerRenderer` | ❌ Not documented | ✅ **IMPLEMENTED v3.2.0** | Channel videos @js/filter_logic.js#444 |
+| `compactRadioRenderer` | ❌ Not documented | ✅ **IMPLEMENTED v3.2.0** | Compact radio @js/filter_logic.js#419 |
+| `relatedChipCloudRenderer` | ❌ Not documented | ✅ **IMPLEMENTED v3.2.0** | Related chips @js/filter_logic.js#365 |
+| `chipCloudRenderer` | ❌ Not documented | ✅ **IMPLEMENTED v3.2.0** | Chip clouds @js/filter_logic.js#369 |
+| `chipCloudChipRenderer` | ❌ Not documented | ✅ **IMPLEMENTED v3.2.0** | Individual chips @js/filter_logic.js#372 |
+| `secondarySearchContainerRenderer` | ❌ Not documented | ✅ **IMPLEMENTED v3.2.0** | Search container @js/filter_logic.js#388 |
+
+### 🔍 Future Monitoring Points
+
+1. **AI & Experimental Features**: Monitor `yt-button-view-model` for "Ask" button and other AI features
+2. **Badge Text Evolution**: Watch for new badge types in `yt-thumbnail-overlay-badge-view-model`
+3. **Chip Cloud Expansion**: Monitor feed filter chips for potential filtering requirements
+4. **Mobile Layout Changes**: Continue validating mobile-specific renderers and DOM structures

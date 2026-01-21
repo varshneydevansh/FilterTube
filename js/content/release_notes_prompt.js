@@ -15,7 +15,7 @@
 
     const PROMPT_ID = 'ft-release-notes-banner';
     const WHATS_NEW_URL = (api.runtime && typeof api.runtime.getURL === 'function')
-        ? api.runtime.getURL('html/tab-view.html#whats-new')
+        ? api.runtime.getURL('html/tab-view.html?view=whatsnew')
         : null;
     let payloadCache = null;
     let dismissed = false;

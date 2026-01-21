@@ -172,10 +172,11 @@ YouTube JSON Data → FilterTubeEngine.processData() → Filtered Data → YouTu
 - **Real-time Preview**: Immediate feedback on filter changes
 - **Status Indicators**: Shows current filtering state
 
-#### UI polish (v3.1.3)
+#### UI polish (v3.2.0)
 - Popup search bars (keywords/channels/content controls) now align to full row width; add buttons sit beside matching-sized inputs.
 - Content control rows in popup hide descriptions for compactness; tab view keeps descriptions as title-only tooltips (hover the title text).
 - Pills/chips: Exact = whole-term matching; Comment defaults **ON** (filters matching comments, can be turned off even if Hide Comments is on); Filter All creates a channel-derived keyword with Exact on the channel name. C/E round chips mirror popup pills.
+- Proactive XHR interception provides instant channel names in 3-dot menus, eliminating "Fetching..." delays.
 - Badges match row tinting: green = From Channel, brown = From Comments, yellow = Collaboration rows.
 
 ### **Tab View (Advanced Dashboard)**

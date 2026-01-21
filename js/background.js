@@ -570,6 +570,8 @@ const pendingKidsWatchIdentityFetches = new Map();
 const kidsWatchIdentitySessionCache = new Map();
 const pendingPostBlockEnrichments = new Map();
 const postBlockEnrichmentAttempted = new Map();
+const queuedPostBlockEnrichmentKeys = new Set();
+let postBlockEnrichmentWorker = Promise.resolve();
 const CURRENT_VERSION = (browserAPI.runtime.getManifest()?.version || '').trim();
 const FT_PROFILES_V4_KEY = 'ftProfilesV4';
 const DEFAULT_PROFILE_ID = 'default';
@@ -577,6 +579,9 @@ const DEFAULT_PROFILE_ID = 'default';
 function schedulePostBlockEnrichment(channel, profile = 'main', metadata = {}) {
     const source = typeof metadata?.source === 'string' ? metadata.source : '';
     if (source === 'postBlockEnrichment') return;
+
+    const topicFlag = channel?.topicChannel === true || metadata?.topicChannel === true;
+    if (topicFlag) return;
 
     const id = typeof channel?.id === 'string' ? channel.id.trim() : '';
     if (!id || !id.toUpperCase().startsWith('UC')) return;
@@ -594,12 +599,15 @@ function schedulePostBlockEnrichment(channel, profile = 'main', metadata = {}) {
     const needsEnrichment = ((!handle && !customUrl) || !logo || !name);
     if (!needsEnrichment) return;
 
-    if (pendingPostBlockEnrichments.has(key)) return;
+    if (pendingPostBlockEnrichments.has(key) || queuedPostBlockEnrichmentKeys.has(key)) return;
     postBlockEnrichmentAttempted.set(key, now);
+    queuedPostBlockEnrichmentKeys.add(key);
 
-    const promise = (async () => {
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        await handleAddFilteredChannel(
+    const delayMs = 3500 + Math.floor(Math.random() * 750);
+
+    const run = postBlockEnrichmentWorker
+        .then(() => new Promise(resolve => setTimeout(resolve, delayMs)))
+        .then(() => handleAddFilteredChannel(
             id,
             false,
             null,
@@ -607,13 +615,19 @@ function schedulePostBlockEnrichment(channel, profile = 'main', metadata = {}) {
             { source: 'postBlockEnrichment' },
             profile === 'kids' ? 'kids' : 'main',
             ''
-        );
-    })().finally(() => {
-        pendingPostBlockEnrichments.delete(key);
-    });
+        ))
+        .catch(() => {
+        })
+        .finally(() => {
+            pendingPostBlockEnrichments.delete(key);
+            queuedPostBlockEnrichmentKeys.delete(key);
+        });
 
-    pendingPostBlockEnrichments.set(key, promise);
+    postBlockEnrichmentWorker = run.catch(() => {
+    });
+    pendingPostBlockEnrichments.set(key, run);
 }
+
 // Deep link into the tab-view dashboard; query param avoids hash-only navigation
 // so we can reliably parse intent even when hash stripping occurs.
 const WHATS_NEW_PAGE_URL = browserAPI.runtime.getURL('html/tab-view.html?view=whatsnew');
@@ -1422,11 +1436,36 @@ browserAPI.runtime.onInstalled.addListener(function (details) {
         console.log('FilterTube extension updated from version ' + details.previousVersion);
         buildReleaseNotesPayload(CURRENT_VERSION).then((payload) => {
             browserAPI.storage.local.set({
-                releaseNotesPayload: payload
+                releaseNotesPayload: payload,
+                firstRunRefreshNeeded: true
             });
         }).catch(error => {
             console.warn('FilterTube Background: unable to prepare release notes payload', error);
         });
+
+        // Show refresh prompt in already-open YouTube tabs after update.
+        try {
+            browserAPI.tabs.query({ url: ['*://*.youtube.com/*', '*://*.youtubekids.com/*'] }, (tabs) => {
+                if (browserAPI.runtime.lastError) {
+                    console.warn('FilterTube: tabs.query failed', browserAPI.runtime.lastError);
+                    return;
+                }
+                tabs?.forEach(tab => {
+                    if (!tab?.id || !browserAPI.scripting?.executeScript) return;
+                    browserAPI.scripting.executeScript({
+                        target: { tabId: tab.id },
+                        world: 'ISOLATED',
+                        files: ['js/content/first_run_prompt.js']
+                    }, () => {
+                        if (browserAPI.runtime.lastError) {
+                            console.warn('FilterTube: failed to inject first_run_prompt', browserAPI.runtime.lastError);
+                        }
+                    });
+                });
+            });
+        } catch (e) {
+            console.warn('FilterTube: failed to inject first-run prompt on update', e);
+        }
         // You could handle migration of settings between versions here if needed
     }
 });
@@ -1788,7 +1827,71 @@ async function performWatchIdentityFetch(videoId) {
 browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     const action = request?.action || request?.type;
 
-    if (action === "getCompiledSettings") {
+    if (action === 'FilterTube_ReleaseNotesCheck') {
+        storageGet(['releaseNotesSeenVersion', 'releaseNotesPayload']).then(async (data) => {
+            const seenVersion = typeof data?.releaseNotesSeenVersion === 'string'
+                ? data.releaseNotesSeenVersion
+                : '';
+            const cachedPayload = data?.releaseNotesPayload && typeof data.releaseNotesPayload === 'object'
+                ? data.releaseNotesPayload
+                : null;
+
+            if (cachedPayload?.version && cachedPayload.version !== seenVersion) {
+                sendResponse({ needed: true, payload: cachedPayload });
+                return;
+            }
+
+            if (seenVersion && seenVersion === CURRENT_VERSION) {
+                sendResponse({ needed: false });
+                return;
+            }
+
+            try {
+                const payload = await buildReleaseNotesPayload(CURRENT_VERSION);
+                await browserAPI.storage.local.set({ releaseNotesPayload: payload });
+                sendResponse({ needed: true, payload });
+            } catch (e) {
+                console.warn('FilterTube Background: release notes check failed', e);
+                sendResponse({ needed: false });
+            }
+        });
+        return true;
+    } else if (action === 'FilterTube_ReleaseNotesAck') {
+        const version = typeof request?.version === 'string' ? request.version.trim() : '';
+        browserAPI.storage.local.set({
+            releaseNotesSeenVersion: version || CURRENT_VERSION,
+            releaseNotesPayload: null
+        }).then(() => sendResponse?.({ ok: true })).catch((e) => {
+            console.warn('FilterTube Background: release notes ack failed', e);
+            sendResponse?.({ ok: false });
+        });
+        return true;
+    } else if (action === 'FilterTube_FirstRunCheck') {
+        storageGet(['firstRunRefreshNeeded']).then((data) => {
+            sendResponse?.({ needed: data?.firstRunRefreshNeeded !== false });
+        }).catch(() => sendResponse?.({ needed: false }));
+        return true;
+    } else if (action === 'FilterTube_FirstRunComplete') {
+        browserAPI.storage.local.set({ firstRunRefreshNeeded: false })
+            .then(() => sendResponse?.({ ok: true }))
+            .catch((e) => {
+                console.warn('FilterTube Background: first-run completion failed', e);
+                sendResponse?.({ ok: false });
+            });
+        return true;
+    } else if (action === 'FilterTube_OpenWhatsNew') {
+        // Open the What's New page in a new tab
+        const url = request?.url || WHATS_NEW_PAGE_URL;
+        browserAPI.tabs.create({ url: url, active: true }, (tab) => {
+            if (browserAPI.runtime.lastError) {
+                console.warn('FilterTube Background: failed to open What\'s New tab', browserAPI.runtime.lastError);
+                sendResponse?.({ ok: false, error: browserAPI.runtime.lastError.message });
+            } else {
+                sendResponse?.({ ok: true, tabId: tab.id });
+            }
+        });
+        return true;
+    } else if (action === "getCompiledSettings") {
         const senderUrl = sender?.tab?.url || sender?.url || '';
         const requestedProfile = request.profileType;
         const profileType = requestedProfile === 'kids' ? 'kids' : (requestedProfile === 'main' ? 'main' : (isKidsUrl(senderUrl) ? 'kids' : 'main'));
@@ -2084,7 +2187,10 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
                 }
 
                 const normalizedResolvedId = details.id.toUpperCase();
-                const existingById = channels.find(ch => (ch.id || '').toUpperCase() === normalizedResolvedId);
+                const existingById = channels.find(ch =>
+                    ch && (ch.id === normalizedResolvedId || ch.handle === normalizedResolvedId)
+                );
+
                 if (existingById) {
                     console.log('FilterTube Background: Channel already exists (matched by UC ID), skipping duplicate add:', normalizedResolvedId);
                     sendResponse({ success: false, error: 'Channel already exists' });
@@ -2471,6 +2577,9 @@ async function fetchChannelInfo(channelIdOrHandle) {
 
         const html = await response.text();
 
+        const topicChannel = /id=["']links-section["'][\s\S]*?Auto-generated by YouTube/i.test(html)
+            || /ytChannelExternalLinkViewModelTitle[\s\S]*?>\s*Auto-generated by YouTube\s*</i.test(html);
+
         const decodeHtmlEntities = (value) => {
             if (!value || typeof value !== 'string') return value;
             return value
@@ -2608,11 +2717,12 @@ async function fetchChannelInfo(channelIdOrHandle) {
 
             return {
                 success: true,
-                name: channelName || resolvedChannelId,
+                name: channelName || resolvedChannelId, // Fallback to ID if name fails
                 id: resolvedChannelId,
                 handle: channelHandle,
                 logo: channelLogo,
-                customUrl: customUrl
+                customUrl: customUrl, // c/Name or user/Name if that was the input
+                topicChannel
             };
         }
 
@@ -2850,7 +2960,8 @@ async function fetchChannelInfo(channelIdOrHandle) {
             id: resolvedChannelId,
             handle: channelHandle,
             logo: channelLogo,
-            customUrl: customUrl // c/Name or user/Name if that was the input
+            customUrl: customUrl, // c/Name or user/Name if that was the input
+            topicChannel
         };
     } catch (error) {
         console.error('FilterTube Background: Failed to fetch channel info:', error);
@@ -3169,12 +3280,16 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
 
         const hasMetadataName = typeof metadata.channelName === 'string' && metadata.channelName.trim();
         const hasGoodMetadataName = Boolean(hasMetadataName && !isProbablyNotChannelName(metadata.channelName));
+        const looksLikeTopicName = hasMetadataName && /\s-\sTopic$/i.test(metadata.channelName.trim());
         const hasMetadataHandle = typeof metadata.displayHandle === 'string' && metadata.displayHandle.trim();
         const hasMetadataLogo = typeof metadata.channelLogo === 'string' && metadata.channelLogo.trim();
 
         // Important: do NOT skip fetch purely because we have a logo.
         // That leads to persisting {name: UC...} entries when name/handle were missing.
-        const shouldSkipFetch = lookupValue && String(lookupValue).toUpperCase().startsWith('UC') && (hasGoodMetadataName || hasMetadataHandle);
+        const shouldSkipFetch = lookupValue
+            && String(lookupValue).toUpperCase().startsWith('UC')
+            && (hasGoodMetadataName || hasMetadataHandle)
+            && !looksLikeTopicName;
         if (shouldSkipFetch) {
             channelInfo = {
                 success: true,
@@ -3182,7 +3297,8 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                 handle: (isHandle ? normalizedValue : null),
                 name: (metadata.channelName || metadata.displayHandle || (isHandle ? normalizedValue : '') || String(lookupValue)),
                 logo: metadata.channelLogo || null,
-                customUrl: metadata.customUrl || null
+                customUrl: metadata.customUrl || null,
+                topicChannel: false
             };
         } else {
             channelInfo = await fetchChannelInfo(lookupValue);
@@ -3339,6 +3455,7 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
         channelInfo.canonicalHandle = canonicalHandle || null;
         channelInfo.handleDisplay = handleDisplay || null;
         channelInfo.name = finalChannelName;
+        channelInfo.topicChannel = channelInfo.topicChannel === true || metadata.topicChannel === true;
 
         // Check if channel already exists; if so, upgrade instead of rejecting
         const existingIndex = channels.findIndex(ch =>
@@ -3372,6 +3489,7 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                 name: mergedName,
                 logo: existing.logo || channelInfo.logo,
                 customUrl: existing.customUrl || customUrl,
+                topicChannel: existing.topicChannel === true || channelInfo.topicChannel === true,
                 source: existing.source || metadata.source || null,
                 originalInput: existing.originalInput || customUrl || channelInfo.handle || channelInfo.id || rawValue,
                 addedAt: existing.addedAt || Date.now()
@@ -3416,6 +3534,7 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                 collaborationGroupId: collaborationGroupId || null,
                 allCollaborators: allCollaborators,
                 customUrl: customUrl || null,
+                topicChannel: channelInfo.topicChannel === true,
                 source: metadata.source || (isKids ? 'user' : null),
                 originalInput: customUrl || channelInfo.handle || channelInfo.id || rawValue,
                 addedAt: Date.now()
@@ -3527,7 +3646,9 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
         await browserAPI.storage.local.set(storageWritePayload);
 
         try {
-            schedulePostBlockEnrichment(finalChannelData, profile, metadata);
+            if (existingIndex === -1) {
+                schedulePostBlockEnrichment(finalChannelData, profile, metadata);
+            }
         } catch (e) {
         }
 

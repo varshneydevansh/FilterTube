@@ -231,6 +231,81 @@
     function extractCollaboratorsFromDataObject(obj) {
         if (!obj || typeof obj !== 'object') return null;
 
+        const extractFromAvatarStackViewModel = (stack) => {
+            const avatars = stack?.avatars;
+            if (!Array.isArray(avatars) || avatars.length === 0) return null;
+            const collaborators = [];
+            const seen = new Set();
+
+            const parseBrowseIdFromUrl = (url) => {
+                if (!url || typeof url !== 'string') return '';
+                const match = url.match(/(?:channel\/)?(UC[\w-]{22})/i);
+                return match?.[1] || '';
+            };
+
+            const pickEndpointUrl = (node) => {
+                if (!node || typeof node !== 'object') return '';
+                return (
+                    node?.commandMetadata?.webCommandMetadata?.url ||
+                    node?.webCommandMetadata?.url ||
+                    node?.url ||
+                    ''
+                );
+            };
+
+            const resolveBrowseEndpoint = (node) => {
+                if (!node || typeof node !== 'object') return null;
+                return (
+                    node?.rendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint ||
+                    node?.rendererContext?.commandContext?.onTap?.innertubeCommand?.command?.browseEndpoint ||
+                    node?.rendererContext?.commandContext?.onTap?.browseEndpoint ||
+                    node?.onTap?.innertubeCommand?.browseEndpoint ||
+                    node?.onTap?.innertubeCommand?.command?.browseEndpoint ||
+                    node?.onTap?.browseEndpoint ||
+                    node?.navigationEndpoint?.browseEndpoint ||
+                    node?.browseEndpoint ||
+                    null
+                );
+            };
+
+            for (const entry of avatars) {
+                const vm = entry?.avatarViewModel || entry?.avatar || entry;
+
+                const endpoint = resolveBrowseEndpoint(vm) || resolveBrowseEndpoint(entry) || null;
+                const browseId = endpoint?.browseId || '';
+                const endpointUrl = pickEndpointUrl(endpoint) || pickEndpointUrl(vm) || pickEndpointUrl(entry) || '';
+                const canonicalBaseUrl = endpoint?.canonicalBaseUrl || endpointUrl || '';
+
+                const collab = { name: '', id: '', handle: '', customUrl: '' };
+                const inferredId = (browseId && typeof browseId === 'string') ? browseId : '';
+                const urlId = parseBrowseIdFromUrl(canonicalBaseUrl);
+                const finalId = (inferredId && inferredId.toUpperCase().startsWith('UC')) ? inferredId : (urlId ? urlId : '');
+                if (finalId) collab.id = finalId;
+
+                if (canonicalBaseUrl && typeof canonicalBaseUrl === 'string') {
+                    const extracted = extractRawHandle(canonicalBaseUrl);
+                    if (extracted) collab.handle = extracted;
+                    const custom = extractCustomUrlFromCanonicalBaseUrl(canonicalBaseUrl);
+                    if (custom) collab.customUrl = custom;
+                }
+
+                const label = entry?.a11yLabel || vm?.a11yLabel || vm?.accessibilityText || '';
+                if (typeof label === 'string' && label.trim()) {
+                    const cleaned = label.replace(/\bgo to channel\b/i, '').trim();
+                    if (cleaned && !cleaned.startsWith('@')) {
+                        collab.name = cleaned;
+                    }
+                }
+
+                const key = (collab.id || collab.handle || collab.customUrl || collab.name || '').toLowerCase();
+                if (!key || seen.has(key)) continue;
+                seen.add(key);
+                collaborators.push(collab);
+            }
+
+            return collaborators.length > 0 ? collaborators : null;
+        };
+
         const extractFromShowDialogCommand = (showDialogCommand) => {
             const listItems = showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems;
             if (!Array.isArray(listItems) || listItems.length === 0) return null;
@@ -265,6 +340,16 @@
             return collaborators.length > 0 ? collaborators : null;
         };
 
+        // Handle raw stack objects passed directly.
+        if (Array.isArray(obj.avatars)) {
+            const extracted = extractFromAvatarStackViewModel(obj);
+            if (Array.isArray(extracted) && extracted.length > 1) return extracted;
+        }
+        if (obj.avatarStackViewModel && Array.isArray(obj.avatarStackViewModel.avatars)) {
+            const extracted = extractFromAvatarStackViewModel(obj.avatarStackViewModel);
+            if (Array.isArray(extracted) && extracted.length > 1) return extracted;
+        }
+
         let renderer = obj;
         if (renderer.content?.videoRenderer) {
             renderer = renderer.content.videoRenderer;
@@ -297,6 +382,48 @@
                 const collaborators = extractFromShowDialogCommand(showDialogCommand);
                 if (collaborators) return collaborators;
             }
+        }
+
+        // Some surfaces expose collaboration via avatarStackViewModel rather than showDialogCommand.
+        // Handle both wrapper objects ({ avatarStackViewModel: {...} }) and a raw stack object ({ avatars: [...] }).
+        try {
+            const visited = new WeakSet();
+            const scan = (node, depth = 0) => {
+                if (!node || typeof node !== 'object' || visited.has(node) || depth > 10) return null;
+                visited.add(node);
+                if (node.avatarStackViewModel) {
+                    const extracted = extractFromAvatarStackViewModel(node.avatarStackViewModel);
+                    if (Array.isArray(extracted) && extracted.length > 1) {
+                        return extracted;
+                    }
+                }
+                if (Array.isArray(node.avatars)) {
+                    const extracted = extractFromAvatarStackViewModel(node);
+                    if (Array.isArray(extracted) && extracted.length > 1) {
+                        return extracted;
+                    }
+                }
+                if (Array.isArray(node)) {
+                    for (const child of node.slice(0, 25)) {
+                        const found = scan(child, depth + 1);
+                        if (found) return found;
+                    }
+                    return null;
+                }
+                for (const key in node) {
+                    if (!Object.prototype.hasOwnProperty.call(node, key)) continue;
+                    const value = node[key];
+                    if (!value || typeof value !== 'object') continue;
+                    const found = scan(value, depth + 1);
+                    if (found) return found;
+                }
+                return null;
+            };
+            const stacked = scan(renderer);
+            if (Array.isArray(stacked) && stacked.length > 1) {
+                return stacked;
+            }
+        } catch (e) {
         }
 
         // Home lockupViewModel often doesn't expose bylineText runs; fall back to a bounded deep scan
@@ -437,14 +564,15 @@
         return hasAny ? merged : null;
     }
 
-    function searchYtInitialDataForVideoChannel(videoId, options = {}) {
+    function searchYtInitialDataForVideoChannel(videoId, expectations = {}) {
         if (!videoId) {
             postLog('log', 'Channel search skipped - missing videoId');
             return null;
         }
 
-        if (!window.ytInitialData) {
-            postLog('log', 'Channel search skipped - ytInitialData not available');
+        const initialDataRoot = window.ytInitialData || window.filterTube?.lastYtInitialData || window.filterTube?.rawYtInitialData || null;
+        if (!initialDataRoot) {
+            postLog('log', 'Channel search skipped - ytInitialData snapshot not available');
             return null;
         }
 
@@ -452,6 +580,7 @@
 
         let foundVideoObject = false;
         const visited = new WeakSet();
+        const options = (expectations && typeof expectations === 'object') ? expectations : {};
         const normalizedExpectedHandle = typeof options.expectedHandle === 'string'
             ? (extractRawHandle(options.expectedHandle) || options.expectedHandle).trim().toLowerCase()
             : '';
@@ -525,7 +654,7 @@
         };
 
         const watchOwnerCandidate = (() => {
-            if (!isCurrentWatchVideo || !window.ytInitialData) return null;
+            if (!isCurrentWatchVideo || !initialDataRoot) return null;
             const visitedOwner = new WeakSet();
             const scan = (node, depth = 0) => {
                 if (!node || typeof node !== 'object' || visitedOwner.has(node) || depth > 10) return null;
@@ -554,7 +683,7 @@
                 }
                 return null;
             };
-            return scan(window.ytInitialData);
+            return scan(initialDataRoot);
         })();
 
         function matchesExpectations(candidate) {
@@ -577,16 +706,38 @@
             return true;
         }
 
+        const extractVideoIdFromNode = (node) => {
+            if (!node || typeof node !== 'object') return '';
+            const direct =
+                node.videoId ||
+                node.contentId ||
+                node?.watchEndpoint?.videoId ||
+                node?.navigationEndpoint?.watchEndpoint?.videoId ||
+                node?.reelWatchEndpoint?.videoId ||
+                node?.navigationEndpoint?.reelWatchEndpoint?.videoId ||
+                '';
+            if (direct && typeof direct === 'string') return direct;
+
+            const urlCandidate =
+                node?.navigationEndpoint?.commandMetadata?.webCommandMetadata?.url ||
+                node?.navigationEndpoint?.watchEndpoint?.commandMetadata?.webCommandMetadata?.url ||
+                node?.commandMetadata?.webCommandMetadata?.url ||
+                '';
+            if (urlCandidate && typeof urlCandidate === 'string') {
+                const match = urlCandidate.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
+                if (match && match[1]) return match[1];
+                const watchMatch = urlCandidate.match(/watch\?v=([a-zA-Z0-9_-]{11})/);
+                if (watchMatch && watchMatch[1]) return watchMatch[1];
+            }
+            return '';
+        };
+
         function searchNode(node, visited) {
             if (!node || typeof node !== 'object' || visited.has(node)) return null;
             visited.add(node);
 
             // Direct hit: object with our videoId
-            const nodeVideoId = node.videoId ||
-                node?.watchEndpoint?.videoId ||
-                node?.navigationEndpoint?.watchEndpoint?.videoId ||
-                node?.navigationEndpoint?.commandMetadata?.webCommandMetadata?.url?.match(/watch\?v=([a-zA-Z0-9_-]{11})/)?.[1] ||
-                '';
+            const nodeVideoId = extractVideoIdFromNode(node);
 
             if (nodeVideoId === videoId) {
                 foundVideoObject = true;
@@ -703,12 +854,29 @@
         if (window.ytInitialData) {
             searchTargets.push({ root: window.ytInitialData, label: 'ytInitialData' });
         }
+        if (window.filterTube?.lastYtInitialData) {
+            searchTargets.push({ root: window.filterTube.lastYtInitialData, label: 'filterTube.lastYtInitialData' });
+        }
+        if (window.filterTube?.rawYtInitialData) {
+            searchTargets.push({ root: window.filterTube.rawYtInitialData, label: 'filterTube.rawYtInitialData' });
+        }
+
+        if (window.filterTube?.lastYtNextResponse) {
+            searchTargets.push({ root: window.filterTube.lastYtNextResponse, label: 'filterTube.lastYtNextResponse' });
+        }
+        if (window.filterTube?.lastYtBrowseResponse) {
+            searchTargets.push({ root: window.filterTube.lastYtBrowseResponse, label: 'filterTube.lastYtBrowseResponse' });
+        }
 
         const ftPlayer = window.filterTube?.lastYtInitialPlayerResponse || window.filterTube?.rawYtInitialPlayerResponse;
         if (ftPlayer) {
             searchTargets.push({ root: ftPlayer, label: 'filterTube.lastYtInitialPlayerResponse' });
         } else if (window.ytInitialPlayerResponse) {
             searchTargets.push({ root: window.ytInitialPlayerResponse, label: 'ytInitialPlayerResponse' });
+        }
+
+        if (window.filterTube?.lastYtPlayerResponse) {
+            searchTargets.push({ root: window.filterTube.lastYtPlayerResponse, label: 'filterTube.lastYtPlayerResponse' });
         }
 
         let result = null;
@@ -767,16 +935,62 @@
         postLog('log', `Searching collaborators for ${videoId}...`);
 
         let result = null;
+
+        const roots = [];
         if (window.ytInitialData) {
+            roots.push({ root: window.ytInitialData, label: 'ytInitialData' });
+        }
+        if (window.filterTube?.lastYtInitialData) {
+            roots.push({ root: window.filterTube.lastYtInitialData, label: 'filterTube.lastYtInitialData' });
+        }
+        if (window.filterTube?.rawYtInitialData) {
+            roots.push({ root: window.filterTube.rawYtInitialData, label: 'filterTube.rawYtInitialData' });
+        }
+
+        if (window.filterTube?.lastYtNextResponse) {
+            roots.push({ root: window.filterTube.lastYtNextResponse, label: 'filterTube.lastYtNextResponse' });
+        }
+        if (window.filterTube?.lastYtBrowseResponse) {
+            roots.push({ root: window.filterTube.lastYtBrowseResponse, label: 'filterTube.lastYtBrowseResponse' });
+        }
+
+        const extractVideoIdFromNode = (node) => {
+            if (!node || typeof node !== 'object') return '';
+            const direct =
+                node.videoId ||
+                node.contentId ||
+                node?.watchEndpoint?.videoId ||
+                node?.navigationEndpoint?.watchEndpoint?.videoId ||
+                node?.reelWatchEndpoint?.videoId ||
+                node?.navigationEndpoint?.reelWatchEndpoint?.videoId ||
+                '';
+            if (direct && typeof direct === 'string') return direct;
+
+            const urlCandidate =
+                node?.navigationEndpoint?.commandMetadata?.webCommandMetadata?.url ||
+                node?.navigationEndpoint?.watchEndpoint?.commandMetadata?.webCommandMetadata?.url ||
+                node?.commandMetadata?.webCommandMetadata?.url ||
+                '';
+            if (urlCandidate && typeof urlCandidate === 'string') {
+                const match = urlCandidate.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
+                if (match && match[1]) return match[1];
+                const watchMatch = urlCandidate.match(/watch\?v=([a-zA-Z0-9_-]{11})/);
+                if (watchMatch && watchMatch[1]) return watchMatch[1];
+            }
+            return '';
+        };
+
+        for (const target of roots) {
             const visited = new WeakSet();
             function searchObject(obj, depth = 0) {
                 if (!obj || typeof obj !== 'object' || visited.has(obj) || depth > 12) return null;
                 visited.add(obj);
 
-                if (obj.videoId === videoId || obj.contentId === videoId) {
+                const nodeVideoId = extractVideoIdFromNode(obj);
+                if (nodeVideoId === videoId) {
                     const extracted = extractCollaboratorsFromDataObject(obj);
                     if (Array.isArray(extracted) && extracted.length > 0) {
-                        postLog('log', '✅ Found collaborators via global ytInitialData');
+                        postLog('log', `✅ Found collaborators via ${target.label}`);
                         return extracted;
                     }
                 }
@@ -799,7 +1013,7 @@
                 return null;
             }
 
-            result = searchObject(window.ytInitialData);
+            result = searchObject(target.root);
             if (result) {
                 return result;
             }
@@ -820,26 +1034,100 @@
             if (wrapper && wrapper !== baseElement) {
                 candidates.push(wrapper);
             }
+
+            // Late-loaded lockup cards often keep the collaborator endpoints on nested avatar-stack elements.
+            try {
+                const avatarStack = baseElement.querySelector('yt-avatar-stack-view-model, .yt-avatar-stack-view-model');
+                if (avatarStack) {
+                    candidates.push(avatarStack);
+                }
+                const nestedAvatarStacks = baseElement.querySelectorAll?.('yt-avatar-stack-view-model, .yt-avatar-stack-view-model');
+                if (nestedAvatarStacks && nestedAvatarStacks.length > 1) {
+                    for (const node of Array.from(nestedAvatarStacks).slice(0, 3)) {
+                        if (node && !candidates.includes(node)) {
+                            candidates.push(node);
+                        }
+                    }
+                }
+            } catch (e) {
+                // ignore
+            }
         } else {
             postLog('warn', `❌ Could not find DOM element for ${videoId}`);
         }
 
+        const hydrateFromStampedAttributes = (element, label) => {
+            if (!element || typeof element.getAttribute !== 'function') return null;
+            const raw = element.getAttribute('data-filtertube-collaborators') || '';
+            if (!raw) return null;
+            try {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    postLog('log', `✅ Hydrated collaborators from ${label} data-filtertube-collaborators`);
+                    return parsed;
+                }
+            } catch (e) {
+                // ignore
+            }
+            return null;
+        };
+
         const attemptExtraction = (element, label) => {
             if (!element) return null;
+
+            let best = null;
+            let bestScore = 0;
+
+            const stamped = hydrateFromStampedAttributes(element, label);
+            if (Array.isArray(stamped) && stamped.length > 0) {
+                best = stamped;
+                bestScore = getCollaboratorListQuality(stamped);
+            }
+
             const dataCandidates = [
                 element.data,
+                element.data?.content,
+                element.data?.content?.videoRenderer,
+                element.data?.content?.lockupViewModel,
                 element.__data?.data,
+                element.__data?.data?.content,
+                element.__data?.data?.content?.videoRenderer,
+                element.__data?.data?.content?.lockupViewModel,
                 element.__data?.item,
                 element.__data
             ];
             for (const candidate of dataCandidates) {
                 const extracted = extractCollaboratorsFromDataObject(candidate);
                 if (Array.isArray(extracted) && extracted.length > 0) {
-                    postLog('log', `✅ Hydrated collaborators from ${label} .data`);
-                    return extracted;
+                    const score = getCollaboratorListQuality(extracted);
+                    if (score > bestScore) {
+                        best = extracted;
+                        bestScore = score;
+                    }
                 }
             }
-            return null;
+
+            // Some lockup view-models store collaborators on nested metadata elements.
+            try {
+                const nestedStamped = element.querySelector?.('[data-filtertube-collaborators]');
+                if (nestedStamped) {
+                    const nested = hydrateFromStampedAttributes(nestedStamped, `${label} descendant`);
+                    if (Array.isArray(nested) && nested.length > 0) {
+                        const score = getCollaboratorListQuality(nested);
+                        if (score > bestScore) {
+                            best = nested;
+                            bestScore = score;
+                        }
+                    }
+                }
+            } catch (e) {
+                // ignore
+            }
+
+            if (best) {
+                postLog('log', `✅ Hydrated collaborators from ${label} (score=${bestScore})`);
+            }
+            return best;
         };
 
         for (const element of candidates) {

@@ -1,4 +1,4 @@
-# Channel Blocking System (v3.1.8)
+# Channel Blocking System (v3.2.0)
 
 ## 0. Goal & Non-Goals
 
@@ -88,118 +88,335 @@ The system maintains two bidirectional lookup maps in local storage:
 
 ## 3. Data Sources for Channel Info (Where IDs/Handles Come From)
 
-FilterTube uses several sources, prioritized differently depending on surface and profile.
+FilterTube uses a **proactive, XHR-first** strategy to extract channel identity before rendering, minimizing network calls and ensuring instant blocking. The waterfall priority is:
 
-### 3.1 DOM extraction (Isolated World)
-- `content_bridge.js` attempts to extract channel metadata from DOM card.
-- On **Search** page, channel name is in `#channel-info ytd-channel-name a`, while thumbnail overlays may contain misleading text.
-- On **Home** page (lockup view-model), channel link may be `href="/@handle"` or `href="/channel/UC..."`.
-- On **Shorts** cards, often only handle/videoId is available initially.
-- On **Kids** pages, extraction follows native UI patterns (`ytk-compact-video-renderer`).
+1. **XHR JSON interception** (Main World)
+2. **`ytInitial*` snapshots** (Main World)
+3. **DOM extraction** (Isolated World)
+4. **Network fetch** (Background, rare fallback)
 
-### 3.2 `ytInitialData` deep search (Main World via `injector.js`)
-- `content_bridge.js` sends `FilterTube_RequestChannelInfo` with `videoId`.
-- `injector.js` searches `window.ytInitialData` for an object matching that `videoId` and extracts:
-  - `browseEndpoint.browseId` (UC ID)
-  - `browseEndpoint.canonicalBaseUrl` (handle)
-  - byline run `text` (channel name)
+### 3.1 XHR JSON interception (Main World) – Primary source
 
-This is most reliable "no-network" source when YouTube supplies browse endpoint.
+`seed.js` now **stashes network snapshots** for proactive identity extraction:
 
-### 3.2.1 Player payload harvesting (Main World, no extra fetch)
+- `/youtubei/v1/next` → `window.filterTube.lastYtNextResponse`
+- `/youtubei/v1/browse` → `window.filterTube.lastYtBrowseResponse`
+- `/youtubei/v1/player` → `window.filterTube.lastYtPlayerResponse`
 
-In addition to `ytInitialData`, FilterTube now passively learns identity from **player payloads** intercepted by `seed.js`:
+`filter_logic.js` harvests from these snapshots:
+- **UC ID** from `browseEndpoint.browseId`
+- **@handle** and **customUrl** from `canonicalBaseUrl`
+- **Channel name** and **logo** from metadata/byline
+- **Collaborators** from `avatarStackViewModel` and `showDialogCommand`
 
-- `window.ytInitialPlayerResponse` (defineProperty setter hook)
-- `/youtubei/v1/player` responses (fetch/XHR interception)
+Cross-world messages broadcast identity:
+- `FilterTube_UpdateChannelMap`
+- `FilterTube_UpdateVideoChannelMap`
+- `FilterTube_CacheCollaboratorInfo`
 
-These frequently expose explicit owner fields (e.g. `videoDetails.videoOwnerChannelId`, `videoDetails.channelId`, `microformat.playerMicroformatRenderer.externalChannelId`).
+### 3.2 `ytInitial*` snapshots (Main World) – Secondary source
 
-When detected, `filter_logic.js` registers:
+When XHR snapshots are unavailable, we fall back to:
+- `window.ytInitialData`
+- `window.ytInitialPlayerResponse`
+- `window.filterTube.lastYtInitialData`
+- `window.filterTube.lastYtInitialPlayerResponse`
 
-- **`videoChannelMap`**: `videoId -> UC...`
-- **`channelMap`**: `UC... <-> @handle` and `c/<slug>/user/<slug> -> UC...` when canonical URLs are present
+`injector.js` searches these for:
+- `videoId` → `browseEndpoint.browseId` (UC ID)
+- `videoId` → `canonicalBaseUrl` (handle/customUrl)
+- Collaboration lists via `avatarStackViewModel`/`showDialogCommand`
 
-This makes **Shorts and Watch surfaces converge to UC IDs without page HTML fetches** in many cases.
+### 3.3 DOM extraction (Isolated World) – Best-effort
 
-### 3.3 Network fetch strategies (profile-aware)
+`content_bridge.js` extracts from DOM when JSON isn't available:
+- **Search**: `#channel-info ytd-channel-name a` for name; `href` for handle/UC
+- **Home**: lockup metadata, avatar alt text, or channel links
+- **Shorts**: `data-filtertube-channel-*` attributes or fallback links
+- **Kids**: native UI patterns (`ytk-compact-video-renderer`)
 
-#### YouTube Main:
-- **Watch page fetch**: `https://www.youtube.com/watch?v=<videoId>` (fallback)
-- **Shorts page fetch**: `https://www.youtube.com/shorts/<videoId>` (fallback)
-- **Channel about fetch**: `https://www.youtube.com/@<handle>/about` (last resort)
+### 3.4 Network fetch (Background) – Last resort
 
-**Important:** these fetches are increasingly used only when:
+Only used when:
+- No identity found in XHR/ytInitial*/DOM
+- Manual channel addition via popup
+- Post-block enrichment for missing fields
 
-- the clicked card does not expose `/channel/UC...` in DOM,
-- and `videoChannelMap` has not yet been learned for that `videoId` via Main World interception.
+Fetch strategies:
+- **Watch page**: `/watch?v=<videoId>` (parse ytInitialData/meta)
+- **Shorts page**: `/shorts/<videoId>` (parse ytInitialData/meta)
+- **Channel about**: `/@handle/about` (404-aware)
+- **Custom URLs**: `/c/<slug>` or `/user/<slug>` (legacy support)
 
-#### YouTube Kids:
-- **Kids watch fetch**: `https://www.youtubekids.com/watch?v=<videoId>` (CORS-limited)
-- Falls back to main-world extraction when Kids fetch fails
+**Kids safety**: All network fetches are skipped on Kids surfaces (`skipNetwork: true`).
 
-### 3.4 Caching layers
-- **`videoChannelMap`**: `videoId -> UC ID` mappings for persistence
+### 3.5 Caching layers & persistence
+- **`videoChannelMap`**: `videoId -> UC ID` mappings for persistence (Shorts/Watch)
 - **`channelMap`**: `(handle | customUrl) <-> UC ID` bidirectional lookups
 - **Session caches**: In-memory caches for active browsing session
 - **Race-safe updates**: Debounced writes to prevent storage conflicts
+- **XHR snapshot stashing**: `window.filterTube.lastYt*Response` for proactive lookups
+
+### 3.6 Post-block enrichment (`schedulePostBlockEnrichment`)
+
+After a channel is blocked, `background.js` may schedule **post-block enrichment** to fill missing fields:
+- **Trigger**: Only from `handleAddFilteredChannel` after successful persist
+- **Rate limiting**: 6 hours per channel (`postBlockEnrichmentAttempted` Map)
+- **Conditions**: Runs only if missing handle/customUrl/logo/name
+- **Debounce**: 1.5s delay + random 750ms to avoid burst traffic
+- **Profile-aware**: Separate keys for `main` vs `kids`
+- **Skip**: If `source === 'postBlockEnrichment'` (prevents loops)
+
+This ensures manual adds and 3-dot blocks eventually get full metadata without spamming the network.
 
 ---
 
-## 4. Blocking Flow (3-dot Menu → Resolve → Persist → Hide)
+## 4. Proactive Identity Pipeline (New Flow)
 
-### 4.1 Menu injection and click detection
+### 4.1 Waterfall diagram
+
+```
+HTML GET → XHR JSON (/youtubei/v1/next, /browse, /player)
+        ↓
+    FilterLogic (main world)
+        - Extract UC IDs, handles, customUrls, names, logos
+        - Harvest collaborators from avatarStack/showDialog
+        - Broadcasts:
+          • FilterTube_UpdateChannelMap
+          • FilterTube_UpdateVideoChannelMap
+          • FilterTube_CacheCollaboratorInfo
+        ↓
+    Content Script (isolated world)
+        - Receives messages
+        - Stamps cards with data-filtertube-*
+        - Updates 3-dot menus instantly
+        ↓
+    DOM (visible UI)
+        - Cards appear pre-stamped
+        - No network calls needed for blocking
+        ↓
+    Network (rare fallback)
+        - Only if JSON lacked identity
+        - Uses Shorts/Watch/About fetches
+        - Kids surfaces avoid this entirely
+```
+
+### 4.2 Cross-world messaging
+
+**Main → Isolated**:
+- `FilterTube_UpdateChannelMap`: `{handle|customUrl: ucId}`
+- `FilterTube_UpdateVideoChannelMap`: `{videoId: ucId}`
+- `FilterTube_CacheCollaboratorInfo`: `{videoId, collaborators[]}`
+
+**Isolated → Main**:
+- `FilterTube_RequestChannelInfo`: `{videoId, expectedHandle?, expectedName?}`
+- `FilterTube_RequestCollaborators`: `{videoId}`
+
+### 4.3 Instant stamping
+
+When `FilterTube_UpdateVideoChannelMap` arrives:
+- `content_bridge.js` stamps all matching cards:
+  ```javascript
+  const cards = document.querySelectorAll(`[data-filtertube-video-id="${videoId}"]`);
+  for (const card of cards) {
+      stampChannelIdentity(card, { id: channelId });
+  }
+  ```
+- 3-dot menus show correct names immediately
+- No "Fetching…" delay (proactive XHR interception provides instant identity)
+
+### 4.4 Collaboration detection
+
+Two paths, both proactive:
+
+**1) XHR JSON (`filter_logic.js`)**:
+- `avatarStackViewModel.avatars[]` → extract UC/handle/customUrl/name
+- `showDialogCommand` → full collaborator list
+- Broadcast via `FilterTube_CacheCollaboratorInfo`
+
+**2) DOM fallback (`content_bridge.js`)**:
+- Detect avatar stack elements
+- Query `data-filtertube-collaborators` attributes
+- Fall back to main-world `searchYtInitialDataForVideoChannel`
+
+Result: Multi-channel menus appear instantly on watch/home/search.
+
+---
+
+## 6. Blocking Flow (3-dot Menu → Resolve → Persist → Hide)
+
+### 6.1 Menu injection and click detection
+
 - `js/content/block_channel.js` detects overflow dropdown opening and resolves associated card.
 - It calls `content_bridge.js:injectFilterTubeMenuItem(dropdown, videoCard)` to render "Block channel" menu entry.
 - On click, `content_bridge.js:handleBlockChannelClick(channelInfo, ...)` runs.
 
-### 4.2 Identity resolution pipeline (v3.1.7 enhanced)
+### 6.2 Post-Block Enrichment System (v3.2.0)
 
-#### Initial extraction (synchronous):
+FilterTube v3.2.0 includes a sophisticated post-block enrichment system that asynchronously fills missing channel metadata after successful blocking operations.
+
+#### Enrichment Pipeline
+
 ```javascript
-// Extract what's available from DOM
-let initialChannelInfo = extractChannelFromCard(videoCard);
-// Returns: { id?, handle?, name?, videoId?, needsFetch? }
+// In background.js - intelligent enrichment scheduling
+function schedulePostBlockEnrichment(channel, profile = 'main', metadata = {}) {
+    // Avoid duplicate enrichment requests
+    const source = metadata?.source || '';
+    if (source === 'postBlockEnrichment') return;
+
+    const id = channel?.id || '';
+    if (!id || !id.toUpperCase().startsWith('UC')) return;
+
+    // Rate limiting: 6-hour cooldown per channel
+    const key = `${profile === 'kids' ? 'kids' : 'main'}:${id.toLowerCase()}`;
+    const now = Date.now();
+    const lastAttempt = postBlockEnrichmentAttempted.get(key) || 0;
+    if (now - lastAttempt < 6 * 60 * 60 * 1000) return;
+
+    // Check if enrichment is needed
+    const needsEnrichment = (
+        (!channel.handle && !channel.customUrl) || 
+        !channel.logo || 
+        !channel.name
+    );
+    if (!needsEnrichment) return;
+
+    // Schedule with random delay (3.5-4s) to avoid patterns
+    const delayMs = 3500 + Math.floor(Math.random() * 750);
+    
+    setTimeout(async () => {
+        await handleAddFilteredChannel(
+            id,
+            false,
+            null,
+            null,
+            { source: 'postBlockEnrichment' },
+            profile,
+            ''
+        );
+    }, delayMs);
+}
 ```
 
-**Important:** `content_bridge.js` also explicitly prefers fresh DOM attributes when present:
+**Enrichment features:**
+- **Smart detection** - only enriches channels missing key metadata
+- **Rate limited** - 6-hour cooldown prevents excessive requests
+- **Background processing** - doesn't block UI operations
+- **Random delays** - avoids detectable request patterns
+- **Profile-aware** - separate tracking for Main and Kids profiles
 
-- `data-filtertube-channel-id` (or `/channel/UC...` anchors)
-- `data-filtertube-channel-handle`
+#### Enhanced Kids Native Blocking
 
-So if the card already exposes `UC...`, the menu can render and block immediately without additional enrichment.
-
-#### Background enrichment (asynchronous):
 ```javascript
-// Kick off enrichment if needed
-const fetchPromise = (async () => {
-    let enrichedInfo = initialChannelInfo;
+// In block_channel.js - improved Kids context capture
+function captureKidsMenuContext(menuButton) {
+    const context = {
+        ts: now,
+        videoId: '',
+        channelId: '',
+        channelHandle: '',
+        customUrl: '',
+        channelName: '',
+        source: 'kidsMenu'
+    };
     
-    // Determine if network fetch is needed
-    const needsEnrichment = !enrichedInfo?.id || isHandleLike(enrichedInfo?.name);
-    
-    if (needsEnrichment && enrichedInfo?.videoId) {
-        // Route to appropriate fetch handler
-        if (isKidsUrl) {
-            enrichedInfo = await performKidsWatchIdentityFetch(videoId);
-        } else if (enrichedInfo.fetchStrategy === 'shorts') {
-            enrichedInfo = await fetchChannelFromShortsUrl(videoId);
-        } else {
-            enrichedInfo = await fetchChannelFromWatchUrl(videoId);
+    // Extract handle from href
+    if (href) {
+        const extractedHandle = window.FilterTubeIdentity?.extractRawHandle?.(href) || '';
+        if (extractedHandle && extractedHandle.startsWith('@')) {
+            context.channelHandle = extractedHandle;
+        }
+        
+        // Extract customUrl from /c/ and /user/ paths
+        const decoded = (() => {
+            try { return decodeURIComponent(href); } catch (e) { return href; }
+        })();
+        if (decoded.startsWith('/c/')) {
+            const slug = decoded.split('/')[2] || '';
+            if (slug) context.customUrl = `c/${slug}`;
+        } else if (decoded.startsWith('/user/')) {
+            const slug = decoded.split('/')[2] || '';
+            if (slug) context.customUrl = `user/${slug}`;
         }
     }
     
-    return enrichedInfo;
-})();
+    return context;
+}
+
+// Enhanced Kids blocking with better validation
+async function handleKidsNativeBlock(blockType = 'video', options = {}) {
+    let ctx = lastKidsMenuContext;
+    
+    // Refresh stale context to reduce errors
+    if (!ctx || (!ctx.channelId && !ctx.channelName)) {
+        const fresh = captureKidsMenuContext(lastClickedMenuButton);
+        if (fresh) {
+            lastKidsMenuContext = fresh;
+            ctx = fresh;
+        }
+    }
+    
+    // Validate and sanitize channel name
+    let channelName = ctx?.channelName || '';
+    if (/^[a-zA-Z0-9_-]{11}$/.test(channelName) || /^UC[\w-]{22}$/i.test(channelName)) {
+        channelName = '';
+    }
+    
+    const safeHandle = (ctx?.channelHandle || '').trim();
+    const safeCustomUrl = (ctx?.customUrl || '').trim();
+    
+    // Send to background with proper identifiers
+    chrome.runtime?.sendMessage({
+        action: 'FilterTube_KidsBlockChannel',
+        videoId: ctx?.videoId || null,
+        channel: {
+            name: channelName || null,
+            id: ctx?.channelId || '',
+            handle: safeHandle || null,
+            customUrl: safeCustomUrl || null,
+            originalInput: (ctx?.channelId && ctx?.channelId.startsWith('UC'))
+                ? ctx.channelId
+                : (safeHandle || safeCustomUrl || ''),
+            source: blockType === 'channel' ? 'kidsNativeChannel' : 'kidsNativeVideo'
+        }
+    });
+}
 ```
 
-**Current behavior note:** enrichment is now **multi-path** and is not always a network fetch.
+**Kids blocking improvements:**
+- **Handle extraction** from channel links
+- **CustomUrl support** for /c/ and /user/ channels
+- **Context refresh** to reduce stale data
+- **Name validation** to avoid persisting IDs as names
+- **Proper identifier prioritization**
 
-- If `fetchStrategy === "mainworld"`, the menu enrichment path prefers a `ytInitialData` lookup (`searchYtInitialDataForVideoChannel(videoId, { expectedHandle, expectedName })`).
-- Shorts/watch HTML fetches are used as fallbacks when the main-world lookup is not applicable or fails.
-- Handle → UC ID resolution uses the persisted `channelMap` first; network is avoided during menu open where possible.
+#### Background Enrichment Logic (Last Resort)
+
+```javascript
+// Background enrichment - rarely needed thanks to proactive XHR
+if (needsEnrichment && enrichedInfo?.videoId) {
+    // Route to appropriate fetch handler (last resort)
+    if (isKidsUrl) {
+        // Kids: skip network, rely on intercepted JSON only
+        enrichedInfo = await performKidsWatchIdentityFetch(videoId);
+    } else if (enrichedInfo.fetchStrategy === 'shorts') {
+        enrichedInfo = await fetchChannelFromShortsUrl(videoId, null, { allowDirectFetch: false });
+    } else {
+        enrichedInfo = await fetchChannelFromWatchUrl(videoId);
+    }
+    
+    return enrichedInfo;
+}
+```
+
+**Current behavior note**: enrichment is now **rare** thanks to proactive XHR interception.
+
+- If `fetchStrategy === "mainworld"`, we search `ytInitialData` snapshots.
+- Network fetches are avoided on Kids (`allowDirectFetch: false`).
+- Handle → UC ID resolution uses the persisted `channelMap` first.
 
 #### Label update (upgrade placeholders):
+
 ```javascript
 // Update menu label when enrichment completes
 fetchPromise.then(finalChannelInfo => {
@@ -210,10 +427,12 @@ fetchPromise.then(finalChannelInfo => {
 });
 ```
 
-### 4.3 Profile-aware persistence
+### 6.3 Profile-aware persistence
+
 - **Main profile**: Stores in `filterChannels` array
 - **Kids profile**: Stores in `ftProfilesV3.kids.blockedChannels`
 - `background.js:handleAddFilteredChannel()` routes based on sender URL:
+
 ```javascript
 const isKids = isKidsUrl(sender.tab?.url);
 const targetProfile = isKids ? 'kids' : 'main';
@@ -226,6 +445,8 @@ if (targetProfile === 'kids') {
     await addToMainProfile(channelData);
 }
 ```
+
+After persisting, `schedulePostBlockEnrichment` may run to fill missing metadata (see Section 3.6).
 
 ---
 
@@ -267,9 +488,9 @@ DOM fallback must be careful about:
 - Separate storage namespace (`ftProfilesV3.kids`)
 - DOM fallback uses videoChannelMap mappings from Kids browse/search
 
-### 5.4 3-Dot Menu Label Resolution (v3.1.7)
+### 5.4 3-Dot Menu Label Resolution (v3.2.0)
 
-The 3-dot menu now intelligently upgrades placeholder labels to real channel names:
+The 3-dot menu now intelligently upgrades placeholder labels to real channel names using proactive XHR data:
 
 #### Placeholder detection:
 ```javascript
@@ -464,9 +685,9 @@ This section answers:
   - Playlist queue rows (`ytd-playlist-panel-video-renderer`)
   - Embedded Shorts tiles rendered inside the watch column
 
-- **3-dot menu / collaboration status (v3.1.0)**
-  - The watch page now reuses the same collaborator roster cache as Home/Search, so any card with ≥2 collaborators immediately renders per-channel menu rows (plus “Block All”) with accurate names/handles.
-  - Shorts tiles opened inside the watch shell may mark `fetchStrategy: 'shorts'`; when identity is not already known via DOM extraction or `videoChannelMap`, we can fall back to `/shorts/<id>` fetch (and then `fetchChannelFromWatchUrl`) to guarantee a canonical UC ID.
+- **3-dot menu / collaboration status (v3.2.0)**
+  - The watch page reuses the same collaborator roster cache as Home/Search, so any card with ≥2 collaborators immediately renders per-channel menu rows (plus "Block All") with accurate names/handles.
+  - Shorts tiles opened inside the watch shell may mark `fetchStrategy: 'shorts'`; when identity is not already known via proactive XHR interception or `videoChannelMap`, we can fall back to `/shorts/<id>` fetch (and then `fetchChannelFromWatchUrl`) to guarantee a canonical UC ID.
   - In many cases, the UC ID is already known by the time the menu opens because FilterTube harvests ownership from `ytInitialPlayerResponse` and `/youtubei/v1/player` payloads and persists `videoId -> UC...` into `videoChannelMap`.
   - Non-collaboration rows still show the generic “Block Channel” label because the synchronous DOM scrape rarely includes the channel name. Follow-up work is tracked to probe `ytd-watch-metadata`/`ytd-video-owner-renderer` synchronously so we can display names everywhere.
 

@@ -26,6 +26,36 @@
     let rawYtInitialData = null;
     let rawYtInitialPlayerResponse = null;
 
+    function stashNetworkSnapshot(data, dataName) {
+        try {
+            if (!window.filterTube) return;
+            if (!data || typeof data !== 'object') return;
+            const name = typeof dataName === 'string' ? dataName : '';
+            if (!name) return;
+
+            const ts = Date.now();
+            if (name.includes('/youtubei/v1/next')) {
+                window.filterTube.lastYtNextResponse = data;
+                window.filterTube.lastYtNextResponseName = name;
+                window.filterTube.lastYtNextResponseTs = ts;
+                return;
+            }
+            if (name.includes('/youtubei/v1/browse')) {
+                window.filterTube.lastYtBrowseResponse = data;
+                window.filterTube.lastYtBrowseResponseName = name;
+                window.filterTube.lastYtBrowseResponseTs = ts;
+                return;
+            }
+            if (name.includes('/youtubei/v1/player')) {
+                window.filterTube.lastYtPlayerResponse = data;
+                window.filterTube.lastYtPlayerResponseName = name;
+                window.filterTube.lastYtPlayerResponseTs = ts;
+                return;
+            }
+        } catch (e) {
+        }
+    }
+
     let replayTimer = null;
     let replayAttempts = 0;
 
@@ -263,6 +293,7 @@
             }
 
             seedDebugLog(`⏭️ Skipping engine filtering for ${dataName} to allow DOM-based restore`);
+            stashNetworkSnapshot(data, dataName);
             return data;
         }
 
@@ -291,12 +322,15 @@
                 } else {
                     seedDebugLog(`⚠️ No changes made to data - check filter rules and data structure`);
                 }
-                
+
+                stashNetworkSnapshot(result, dataName);
                 return result;
             } catch (e) {
                 seedDebugLog(`❌ Engine processing failed for ${dataName}:`, e);
                 // Fall back to basic processing
-                return basicProcessing(data, dataName);
+                const fallback = basicProcessing(data, dataName);
+                stashNetworkSnapshot(fallback, dataName);
+                return fallback;
             }
         } else {
             seedDebugLog(`⚠️ FilterTubeEngine not available yet`);

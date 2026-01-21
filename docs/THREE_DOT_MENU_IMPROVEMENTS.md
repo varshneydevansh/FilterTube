@@ -2,11 +2,11 @@
 
 ## Overview
 
-FilterTube v3.1.8 significantly improves the 3-dot menu experience across YouTube Main and YouTube Kids, ensuring accurate channel names are displayed and blocking actions work reliably for Shorts, Mixes, Playlists, and Watch page videos.
+FilterTube v3.2.0 significantly improves the 3-dot menu experience across YouTube Main and YouTube Kids, ensuring accurate channel names are displayed and blocking actions work reliably for Shorts, Mixes, Playlists, and Watch page videos.
 
 ## Problem Statement
 
-Prior to v3.1.7, users experienced:
+Prior to v3.2.0, users experienced:
 1. **UC IDs displayed**: 3-dot menu showed `UCxxxxxxxx...` instead of human-readable channel names
 2. **Mix titles as channel names**: Mix/playlist cards showed video titles instead of actual channel names
 3. **Metadata strings as names**: Watch right-pane showed strings like "Title • 1.2M views • 2 days ago"
@@ -24,10 +24,101 @@ Prior to v3.1.7, users experienced:
                                 │
                                 ▼
                        ┌──────────────────┐
-                       │  Label Update    │
-                       │  (Upgrade Rule)  │
-                       └──────────────────┘
+                      ### Mix Card Channel Extraction (v3.2.0)
+
+FilterTube v3.2.0 includes sophisticated Mix card handling that extracts channel identity from YouTube's Mix/playlist collection surfaces.
+
+```javascript
+// In content_bridge.js - specialized Mix card extraction
+function extractChannelFromCard(card) {
+    // SPECIAL CASE: Mix cards (collection stacks / "My Mix")
+    const isMixCard = isMixCardElement(card);
+    if (isMixCard) {
+        const deriveMixName = () => {
+            const nameEl = card.querySelector(
+                '#channel-info ytd-channel-name a, ' +
+                '#channel-name #text a, ' +
+                'ytd-channel-name #text a'
+            );
+            const candidate = nameEl?.textContent?.trim() || '';
+            if (!candidate) return '';
+            const lower = candidate.toLowerCase();
+            if (lower.startsWith('mix') || lower.startsWith('my mix')) return '';
+            if (lower.includes('mix') && candidate.includes('–')) return '';
+            return candidate;
+        };
+
+        // Extract from stamped attributes first
+        let id = card.getAttribute('data-filtertube-channel-id') || '';
+        let handle = card.getAttribute('data-filtertube-channel-handle') || '';
+        let customUrl = card.getAttribute('data-filtertube-channel-custom') || '';
+
+        // Fallback to DOM data extraction
+        if ((!id || !handle || !customUrl) && typeof scanDataForChannelIdentifiers === 'function') {
+            const candidates = [
+                card.data,
+                card.data?.content,
+                card.data?.content?.lockupViewModel,
+                card.__data,
+                card.__data?.data,
+                card.__data?.data?.content,
+                card.__data?.data?.content?.lockupViewModel
+            ];
+            for (const candidate of candidates) {
+                if (!candidate) continue;
+                const parsed = scanDataForChannelIdentifiers(candidate);
+                if (parsed?.id && !id) id = parsed.id;
+                if (parsed?.handle && !handle) handle = normalizeHandleValue(parsed.handle);
+                if (parsed?.customUrl && !customUrl) customUrl = parsed.customUrl;
+                if (id || handle || customUrl) break;
+            }
+        }
+
+        // Extract from channel links
+        if (!id || !handle || !customUrl) {
+            const link = card.querySelector('a[href*="/channel/UC"], a[href*="/@"], a[href*="/c/"], a[href*="/user/"]');
+            const href = link?.getAttribute('href') || '';
+            if (href) {
+                if (!handle) {
+                    const extracted = extractRawHandle(href);
+                    if (extracted) handle = normalizeHandleValue(extracted);
+                }
+                if (!id) {
+                    const ucMatch = href.match(/\/(UC[\w-]{22})/);
+                    if (ucMatch) id = ucMatch[1];
+                }
+                if (!customUrl) {
+                    const match = href.match(/\/(c|user)\/([^/?#]+)/);
+                    if (match && match[1] && match[2]) {
+                        try {
+                            customUrl = `${match[1]}/${decodeURIComponent(match[2])}`;
+                        } catch (_) {
+                            customUrl = `${match[1]}/${match[2]}`;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (id || handle || customUrl) {
+            let name = deriveMixName();
+            if (!name) {
+                const stamped = card.getAttribute('data-filtertube-channel-name') || '';
+                if (stamped && !stamped.includes('•')) {
+                    name = stamped;
+                }
+            }
+            return { id: id || '', handle: handle || '', customUrl: customUrl || '', name: name || '', logo: extractAvatarUrl() || '' };
+        }
+    }
+}
 ```
+
+**Mix card features:**
+- **Smart name derivation** - filters out "Mix" and "My Mix" prefixes
+- **Multi-source extraction** - stamped attributes, DOM data, channel links
+- **CustomUrl support** - handles /c/ and /user/ channel types
+- **Fallback hierarchy** - tries multiple extraction methods
 
 ### Placeholder Detection System
 
@@ -384,10 +475,11 @@ Track label resolution performance:
 
 ### From Previous Versions
 
-Users upgrading to v3.1.7 will see:
+Users upgrading to v3.2.0 will see:
 - Immediate improvement in Mix/playlist label accuracy
 - Better Shorts channel name resolution
 - More consistent behavior across all surfaces
+- Zero-delay blocking thanks to proactive XHR interception
 - No breaking changes to existing blocks
 
 ### Data Compatibility

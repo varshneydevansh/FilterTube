@@ -1,50 +1,229 @@
-# FilterTube v3.1.8 Technical Documentation
+# Technical Documentation (v3.2.0)
 
-This document provides a deep technical dive into implementation of FilterTube's hybrid filtering engine as of v3.1.8.
+## Overview
 
-## Core Technologies
+FilterTube v3.2.0 implements a comprehensive proactive channel identity system with advanced network interception, post-block enrichment, and robust fallback strategies. This technical documentation covers the core mechanisms and implementation details.
 
-*   **JavaScript (ES6+)**: Core logic.
-*   **Manifest V3**: The extension standard used.
-*   **Proxy & Object.defineProperty**: Used for hooking global browser APIs.
-*   **MutationObserver**: Used for the DOM fallback layer.
-*   **Custom Events / postMessage**: Used for cross-world communication.
-*   **StateManager**: Centralized state management for consistent settings across UI and background.
+## Network Snapshot Stashing (v3.2.0)
 
-## Cross-browser Downloads, Export & Auto-backup (Profile-aware)
+### Snapshot Architecture
 
-FilterTube writes JSON files using the browser `downloads` API.
+```javascript
+// In seed.js - comprehensive network interception
+function stashNetworkSnapshot(data, dataName) {
+    try {
+        if (!window.filterTube) return;
+        if (!data || typeof data !== 'object') return;
+        
+        const ts = Date.now();
+        
+        if (dataName.includes('/youtubei/v1/next')) {
+            window.filterTube.lastYtNextResponse = data;
+            window.filterTube.lastYtNextResponseName = dataName;
+            window.filterTube.lastYtNextResponseTs = ts;
+        }
+        if (dataName.includes('/youtubei/v1/browse')) {
+            window.filterTube.lastYtBrowseResponse = data;
+            window.filterTube.lastYtBrowseResponseName = dataName;
+            window.filterTube.lastYtBrowseResponseTs = ts;
+        }
+        if (dataName.includes('/youtubei/v1/player')) {
+            window.filterTube.lastYtPlayerResponse = data;
+            window.filterTube.lastYtPlayerResponseName = dataName;
+            window.filterTube.lastYtPlayerResponseTs = ts;
+        }
+    } catch (e) {
+        // Silently fail to avoid breaking YouTube
+    }
+}
+```
 
-* **Blob URL path**: when `URL.createObjectURL` is available, we generate a Blob URL so downloads work in Firefox (which blocks `data:` URL downloads).
-* **Data URL fallback**: if `URL.createObjectURL` is unavailable (e.g., Chrome MV3 service worker), we fall back to `data:application/json` URLs.
+**Snapshot storage:**
+- `lastYtNextResponse` - Latest next feed data with timestamp
+- `lastYtBrowseResponse` - Latest browse data with timestamp
+- `lastYtPlayerResponse` - Latest player data with timestamp
 
-Auto-backups are **per-profile** and support history + encryption:
+## Post-Block Enrichment System (v3.2.0)
 
-* Destination pattern: `Downloads/FilterTube Backup/<ProfileLabel>/`
-* **Mode** (`autoBackupMode`, per-profile):
-  * `latest` (default): `FilterTube-Backup-Latest.json|encrypted.json` (overwritten)
-  * `history`: `FilterTube-Backup-<timestamp>.json|encrypted.json` (rotated per profile folder)
-* **Format** (`autoBackupFormat`, per-profile):
-  * `auto`: encrypt if the active profile has a PIN verifier
-  * `plain`: always plaintext JSON
-  * `encrypted`: always encrypted container
-* **Enablement**: `profilesV4.profiles[activeId].settings.autoBackupEnabled === true`
-* **Encryption**: PBKDF2-SHA256 (150k iterations, random salt) + AES-GCM (random IV). Plaintext `meta` remains for version/profile labeling; payload is inside `encrypted`.
-* **Session PIN cache**: Background keeps a memory-only cache after verifying UI-sent PINs via `FilterTube_SessionPinAuth`; encrypted backups **skip** if cache is missing (safe default).
+### Intelligent Enrichment Pipeline
 
-### Auto-backup payload construction (profile-aware)
+```javascript
+// In background.js - rate-limited enrichment
+function schedulePostBlockEnrichment(channel, profile = 'main', metadata = {}) {
+    const source = metadata?.source || '';
+    if (source === 'postBlockEnrichment') return;
 
-* If active profile is `default`: export type `full`, includes `profilesV4`.
-* If active profile is not `default`: export type `profile`, includes only the active profile inside `profilesV4`.
-* Kids/main settings and lists are taken from the active profile’s `settings/main/kids`.
-* File naming: per-profile label folder; `Latest` overwrite vs timestamped history.
-* Rotation: only in history mode, per profile folder.
+    const id = channel?.id || '';
+    if (!id || !id.toUpperCase().startsWith('UC')) return;
 
-### Import / Export gating
+    // Rate limiting: 6-hour cooldown per channel
+    const key = `${profile === 'kids' ? 'kids' : 'main'}:${id.toLowerCase()}`;
+    const now = Date.now();
+    const lastAttempt = postBlockEnrichmentAttempted.get(key) || 0;
+    if (now - lastAttempt < 6 * 60 * 60 * 1000) return;
 
-* **Full export**: only when active profile is `default`; Master PIN must be unlocked if set.
-* **Import/restore**: only when active profile is `default`; Master PIN must be unlocked if set; encrypted imports require the password/PIN to decrypt.
-* **Non-default export**: forced to active-profile-only.
+    // Check if enrichment is needed
+    const needsEnrichment = (
+        (!channel.handle && !channel.customUrl) || 
+        !channel.logo || 
+        !channel.name
+    );
+    if (!needsEnrichment) return;
+
+    // Schedule with random delay (3.5-4s) to avoid patterns
+    const delayMs = 3500 + Math.floor(Math.random() * 750);
+    
+    setTimeout(async () => {
+        await handleAddFilteredChannel(
+            id,
+            false,
+            null,
+            null,
+            { source: 'postBlockEnrichment' },
+            profile,
+            ''
+        );
+    }, delayMs);
+}
+```
+
+**Enrichment features:**
+- **Smart detection** - only enriches channels missing key metadata
+- **Rate limited** - 6-hour cooldown prevents excessive requests
+- **Background processing** - doesn't block UI operations
+- **Random delays** - avoids detectable request patterns
+- **Profile-aware** - separate tracking for Main and Kids profiles
+
+## Enhanced CORS and Error Handling (v3.2.0)
+
+### Robust Fetch Strategies
+
+```javascript
+// In background.js - improved fetch with fallbacks
+async function fetchChannelInfo(channelIdOrHandle) {
+    try {
+        const response = await fetch(channelUrl, {
+            credentials: 'include',
+            headers: { 'Accept': 'text/html' }
+        });
+        
+        // Handle 404s for @handle/about by falling back to @handle
+        if (!response.ok && isHandle) {
+            const fallbackUrl = `https://www.youtube.com/@${encodedHandle}`;
+            return await fetch(fallbackUrl, {
+                credentials: 'include',
+                headers: { 'Accept': 'text/html' }
+            });
+        }
+        
+        return response;
+    } catch (error) {
+        // CORS errors trigger alternative fetch methods
+        if (error.name === 'TypeError' && error.message.includes('CORS')) {
+            return await fetchAlternativeMethod(url);
+        }
+        throw error;
+    }
+}
+```
+
+### OG Meta Tag Extraction (Ultimate Fallback)
+
+```javascript
+// Extract channel info from HTML meta tags when JSON parsing fails
+const extractMeta = (key) => {
+    const patterns = [
+        new RegExp(`<meta[^>]+property=["']${key}["'][^>]+content=["']([^"']+)["'][^>]*>`, 'i'),
+        new RegExp(`<meta[^>]+content=["']([^"']+)["'][^>]+property=["']${key}["'][^>]*>`, 'i')
+    ];
+    
+    for (const re of patterns) {
+        const match = html.match(re);
+        if (match && match[1]) return decodeHtmlEntities(match[1]);
+    }
+    return null;
+};
+
+// Extract channel name, image, and URL from OG tags
+const ogTitle = extractMeta('og:title');
+const ogImage = extractMeta('og:image'); 
+const ogUrl = extractMeta('og:url');
+```
+
+## Watch Identity Resolution as Fallback (v3.2.0)
+
+### Video Payload Channel Resolution
+
+```javascript
+// When channel page scraping fails, use video payload data
+if (!channelInfo.success && effectiveVideoId) {
+    try {
+        const isKids = profile === 'kids';
+        const identity = isKids
+            ? (await performKidsWatchIdentityFetch(effectiveVideoId) || 
+               await performWatchIdentityFetch(effectiveVideoId))
+            : await performWatchIdentityFetch(effectiveVideoId);
+
+        if (identity && (identity.id || identity.handle || identity.name)) {
+            channelInfo = {
+                success: true,
+                id: identity.id || mappedId || '',
+                handle: identity.handle || '',
+                name: identity.name || '',
+                logo: identity.logo || '',
+                customUrl: identity.customUrl || ''
+            };
+        }
+    } catch (e) {
+        // Silently fail and use minimal fallback
+    }
+}
+```
+
+## Channel Name Sanitization (v3.2.0)
+
+### Smart Name Validation
+
+```javascript
+// In background.js - prevent persisting bad channel names
+const isProbablyNotChannelName = (value) => {
+    if (!value || typeof value !== 'string') return true;
+    const trimmed = value.trim();
+    if (!trimmed) return true;
+    if (trimmed.startsWith('@')) return true;
+    if (trimmed.toLowerCase() === 'channel') return true;
+    if (trimmed.includes('•')) return true;
+    if (/\bviews?\b/i.test(trimmed)) return true;
+    if (/\bago\b/i.test(trimmed)) return true;
+    if (/\bwatching\b/i.test(trimmed)) return true;
+    return false;
+};
+
+const sanitizePersistedChannelName = (value) => {
+    if (!value || typeof value !== 'string') return '';
+    const trimmed = value.trim();
+    if (!trimmed) return '';
+    if (isProbablyNotChannelName(trimmed)) return '';
+    return trimmed;
+};
+```
+
+## Current Behavior Notes (v3.2.0)
+
+### Proactive System Impact
+
+- **Enrichment is now rare** thanks to proactive XHR interception
+- **Kids zero-network mode** works entirely from intercepted JSON
+- **Handle → UC ID resolution** uses persisted `channelMap` first
+- **Network fetches are avoided** on Kids (`allowDirectFetch: false`)
+- **Main world searches** use `ytInitialData` snapshots when needed
+
+### Performance Characteristics
+
+- **Zero-delay blocking** - 3-dot menus show correct names instantly
+- **Reduced API calls** - most identity comes from intercepted JSON
+- **Better cache hit rates** - shared data across all surfaces
+- **Reliable Kids operation** - works even when Kids blocks external requests
 
 ## 1. Data Interception: `ytInitialData` Hook
 
@@ -427,9 +606,10 @@ sequenceDiagram
 - **Convergence**: once the canonical UC ID is known, subsequent interceptors (data + DOM) recognize the entry on every surface without repeated fetches.
 - **Collaborator Harvesting**: When Shorts expose the avatar stack, `extractCollaboratorsFromAvatarStackElement` seeds collaborator names/handles and the main-world hop fills UC IDs. The same multi-select UI appears regardless of layout.
 
-**Current behavior note:** as of v3.1.7, Shorts identity is increasingly learned *without explicit Shorts-page fetching* because:
+**Current behavior note:** as of v3.2.0, Shorts identity is increasingly learned *without explicit Shorts-page fetching* because:
 
 - `seed.js` intercepts `ytInitialPlayerResponse` and `/youtubei/v1/player`, and `filter_logic.js` harvests `videoId -> UC...` into `videoChannelMap`.
+- Proactive XHR interception provides most channel identity before rendering.
 - Many cards now expose `/channel/UC...` anchors directly, allowing isolated-world extraction to return `id` immediately.
 
 ## 4. DOM Fallback System (Safety Net)

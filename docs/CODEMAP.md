@@ -111,8 +111,8 @@ FilterTube/
 **Context:** UI Contexts
 **Purpose:** Entry points for the UI, initializing `StateManager` and `RenderEngine`.
 
-#### Tab view additions (v3.1.6)
-- Adds a “What’s New” navigation tab that loads cards from `data/release_notes.json`.
+#### Tab view additions (v3.2.0)
+- Adds a "What's New" navigation tab that loads cards from `data/release_notes.json`.
 - Reads both hash (`#whatsnew`) and query parameters (`?view=whatsnew`) so banner deep-links auto-select the correct view.
 - Import/Export card calls into `io_manager.js` for all serialization logic.
 

@@ -1,5 +1,5 @@
 /* FilterTube Retro-Futuristic Theme */
-@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
     /* Dark Mode (Default) */
@@ -13,7 +13,9 @@
     --glass-border: rgba(255, 255, 255, 0.1);
     --card-bg: rgba(30, 30, 30, 0.6);
     --scanline-color: rgba(0, 0, 0, 0.5);
-    --font-main: 'Share Tech Mono', 'Courier New', monospace;
+    --font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'Share Tech Mono', 'Courier New', monospace;
+    --font-display: 'Share Tech Mono', 'Courier New', monospace;
     --selection-bg: var(--accent-color);
     --selection-text: #000;
     --footer-bg: #050505;
@@ -93,15 +95,18 @@ body {
     background-color: var(--bg-color);
     color: var(--text-color);
     font-family: var(--font-main);
-    line-height: 1.6;
-    font-size: 18px;
-    /* Increased base font size */
+    line-height: 1.7;
+    /* Increased line height for better readability */
+    font-size: 16px;
+    /* Optimized base font size */
+    font-weight: 400;
+    /* Better weight for readability */
     overflow-x: hidden;
     min-height: 100vh;
     transition: background-color 0.3s, color 0.3s;
 }
 
-/* Retro Effects */
+/* Retro Effects - Limited to hero section for better readability */
 .scanlines {
     position: fixed;
     top: 0;
@@ -116,6 +121,13 @@ body {
     background-size: 100% 4px;
     pointer-events: none;
     z-index: 100;
+    opacity: 0.3;
+    /* Reduced opacity for better readability */
+}
+
+/* Hide scanlines on all pages except hero section */
+body:not(:has(.hero-section)) .scanlines {
+    display: none;
 }
 
 .noise {
@@ -167,9 +179,13 @@ nav {
 }
 
 .brand-name {
-    font-size: 1.5rem;
-    font-weight: bold;
-    letter-spacing: 2px;
+    font-family: var(--font-display);
+    /* Keep mono for brand */
+    font-size: 1.4rem;
+    /* Slightly smaller for readability */
+    font-weight: 700;
+    letter-spacing: 1px;
+    /* Reduced spacing */
     color: var(--accent-color);
     text-shadow: 0 0 10px var(--accent-glow);
 }
@@ -183,10 +199,13 @@ nav {
 .nav-links a {
     color: var(--text-color);
     text-decoration: none;
-    font-size: 1.1rem;
+    font-size: 1rem;
+    /* Smaller for better readability */
     transition: color 0.3s;
     text-transform: uppercase;
     font-weight: 500;
+    letter-spacing: 0.5px;
+    /* Reduced spacing */
 }
 
 .nav-links a:hover,
@@ -204,7 +223,10 @@ nav {
     cursor: pointer;
     transition: all 0.3s;
     text-transform: uppercase;
-    font-weight: bold;
+    font-weight: 600;
+    font-size: 0.85rem;
+    /* Smaller for better readability */
+    letter-spacing: 0.5px;
 }
 
 .theme-toggle:hover {
@@ -216,10 +238,15 @@ nav {
 .cta-button {
     background: var(--accent-color);
     color: #fff !important;
-    padding: 0.5rem 1.5rem;
+    padding: 0.6rem 1.5rem;
+    /* Slightly more padding */
     border-radius: 2px;
     box-shadow: 0 0 15px var(--accent-glow);
-    font-weight: bold;
+    font-weight: 600;
+    font-size: 0.9rem;
+    /* Better size */
+    letter-spacing: 0.5px;
+    /* Better spacing */
 }
 
 .mobile-menu-toggle {
@@ -259,6 +286,8 @@ nav {
 }
 
 .hero-content h1 {
+    font-family: var(--font-display);
+    /* Use mono font only for hero title */
     font-size: clamp(2.5rem, 5vw, 4.5rem);
     /* Responsive font size */
     line-height: 1.1;
@@ -267,6 +296,10 @@ nav {
     position: relative;
     word-wrap: break-word;
     /* Prevent clipping */
+    font-weight: 700;
+    /* Stronger weight for impact */
+    letter-spacing: 2px;
+    /* Better spacing */
 }
 
 .glitch {
@@ -351,15 +384,22 @@ nav {
 }
 
 .hero-subtitle {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
+    /* Slightly smaller for better readability */
     margin-bottom: 2rem;
-    opacity: 0.9;
-    color: var(--text-muted);
+    opacity: 0.95;
+    /* Higher contrast */
+    color: var(--text-color);
+    /* Use main text color instead of muted */
     white-space: normal;
     /* Allow wrapping */
     max-width: 100%;
     position: relative;
     display: inline-block;
+    font-weight: 500;
+    /* Medium weight for better readability */
+    line-height: 1.6;
+    /* Better line height */
 }
 
 .hero-subtitle::after {
@@ -500,12 +540,19 @@ section.fade-in.visible {
 }
 
 .section-title {
-    font-size: 2.5rem;
+    font-size: 2.2rem;
+    /* Slightly smaller for better readability */
     margin-bottom: 3rem;
     text-align: center;
     text-transform: uppercase;
     color: var(--accent-color);
     text-shadow: 0 0 10px var(--accent-glow);
+    font-weight: 600;
+    /* Better weight */
+    letter-spacing: 1px;
+    /* Better spacing */
+    line-height: 1.3;
+    /* Better line height */
 }
 
 .grid-container {
@@ -531,16 +578,27 @@ section.fade-in.visible {
 }
 
 .card h3 {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
+    /* Slightly smaller for readability */
     margin-bottom: 1rem;
     color: var(--accent-color);
+    font-weight: 600;
+    /* Better weight */
+    line-height: 1.3;
+    /* Better line height */
 }
 
 .card p {
-    font-size: 1.1rem;
+    font-size: 1rem;
+    /* Standard size for better readability */
     color: var(--text-color);
-    opacity: 0.9;
+    opacity: 0.95;
+    /* Higher contrast */
     flex-grow: 1;
+    line-height: 1.7;
+    /* Better line height */
+    font-weight: 400;
+    /* Regular weight */
 }
 
 /* How It Works Pipeline */
@@ -615,17 +673,26 @@ section.fade-in.visible {
 }
 
 .story-block h3 {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
+    /* Smaller for readability */
     color: var(--accent-color);
     margin-bottom: 1rem;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
+    /* Reduced spacing */
+    font-weight: 600;
+    line-height: 1.3;
 }
 
 .story-block p {
-    font-size: 1.2rem;
-    line-height: 1.8;
+    font-size: 1.1rem;
+    /* Standard size for readability */
+    line-height: 1.7;
+    /* Better line height */
     color: var(--text-color);
+    opacity: 0.95;
+    /* Better contrast */
+    font-weight: 400;
 }
 
 .story-quote-box {
@@ -637,23 +704,40 @@ section.fade-in.visible {
 }
 
 .story-quote-box p {
-    font-size: 1.15rem;
-    line-height: 1.8;
+    font-size: 1.05rem;
+    /* Slightly smaller for readability */
+    line-height: 1.7;
+    /* Better line height */
+    font-style: italic;
     color: var(--text-color);
+    opacity: 0.9;
     margin-bottom: 1rem;
 }
 
 .story-link {
     display: inline-block;
     color: var(--accent-color);
-    text-decoration: none;
-    font-weight: bold;
+    text-decoration: underline;
+    /* Add underline to make it clearly a link */
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+    font-weight: 600;
+    /* Make it bolder to stand out */
     margin-top: 1rem;
+    margin-bottom: 1rem;
     transition: all 0.3s;
+    padding: 0.25rem 0.5rem;
+    /* Add some padding to make it more clickable */
+    border-radius: 4px;
+    background: rgba(255, 51, 51, 0.1);
+    /* Subtle background to highlight it */
 }
 
 .story-link:hover {
     text-shadow: 0 0 10px var(--accent-glow);
+    background: rgba(255, 51, 51, 0.2);
+    transform: translateY(-1px);
+    /* Add slight lift on hover */
 }
 
 .evidence-box {
@@ -690,11 +774,16 @@ section.fade-in.visible {
 }
 
 .creator-quote p {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
+    /* Smaller for readability */
     font-style: italic;
-    line-height: 1.8;
+    line-height: 1.7;
+    /* Better line height */
     color: var(--text-color);
+    opacity: 0.95;
+    /* Better contrast */
     margin-bottom: 1rem;
+    font-weight: 400;
 }
 
 .creator-quote cite {
@@ -706,10 +795,15 @@ section.fade-in.visible {
 }
 
 .story-content p {
-    font-size: 1.2rem;
-    line-height: 1.8;
+    font-size: 1.1rem;
+    /* Standard size for readability */
+    line-height: 1.7;
+    /* Better line height */
     margin-bottom: 1.5rem;
     color: var(--text-color);
+    opacity: 0.95;
+    /* Better contrast */
+    font-weight: 400;
 }
 
 .story-content cite {
@@ -738,13 +832,22 @@ blockquote {
     padding: 1.5rem;
     border-left: 4px solid var(--accent-color);
     background: rgba(128, 128, 128, 0.05);
+    font-size: 1.05rem;
+    /* Better size for readability */
+    line-height: 1.7;
+    /* Better line height */
+    color: var(--text-color);
+    opacity: 0.95;
+    /* Better contrast */
 }
 
 blockquote footer {
     margin-top: 1rem;
-    font-size: 1rem;
+    font-size: 0.95rem;
+    /* Smaller for better hierarchy */
     color: var(--text-muted);
-    font-weight: bold;
+    font-weight: 600;
+    /* Better weight */
 }
 
 /* Download Section / Browser Grid */
@@ -799,8 +902,11 @@ blockquote footer {
 }
 
 .browser-link span {
-    font-weight: bold;
-    font-size: 1.1rem;
+    font-weight: 600;
+    /* Better weight */
+    font-size: 1rem;
+    /* Standard size for readability */
+    line-height: 1.3;
 }
 
 /* Footer */
@@ -825,11 +931,22 @@ footer {
 .footer-col h4 {
     color: var(--accent-color);
     margin-bottom: 1.5rem;
-    font-size: 1.3rem;
+    font-size: 1.2rem;
+    /* Smaller for readability */
+    font-weight: 600;
+    /* Better weight */
+    letter-spacing: 0.5px;
+    /* Better spacing */
+    line-height: 1.3;
 }
 
 .footer-col p {
     color: var(--footer-text);
+    font-size: 0.95rem;
+    /* Better size */
+    line-height: 1.6;
+    /* Better line height */
+    opacity: 0.9;
 }
 
 .footer-col a {
@@ -839,6 +956,9 @@ footer {
     margin-bottom: 0.8rem;
     transition: color 0.3s;
     font-weight: 500;
+    font-size: 0.95rem;
+    /* Consistent size */
+    line-height: 1.4;
 }
 
 .footer-col a:hover {
@@ -849,8 +969,12 @@ footer {
     text-align: center;
     padding-top: 2rem;
     border-top: 1px solid rgba(128, 128, 128, 0.2);
-    font-size: 1rem;
+    font-size: 0.9rem;
+    /* Smaller for better hierarchy */
     color: var(--footer-text);
+    line-height: 1.5;
+    /* Better line height */
+    opacity: 0.8;
 }
 
 /* Mobile Responsive */

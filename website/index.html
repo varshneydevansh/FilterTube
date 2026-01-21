@@ -29,7 +29,8 @@
         <div class="nav-links">
             <a href="#features">Features</a>
             <a href="#how-it-works">How it Works</a>
-            <a href="kids.html">Kids</a>
+            <a href="#youtube-kids">Kids</a>
+            <a href="#whats-new">What's New</a>
             <a href="ml.html">ML & AI</a>
             <a href="mobile.html">Mobile</a>
             <button id="theme-toggle" class="theme-toggle">LIGHT MODE</button>
@@ -64,6 +65,10 @@
                             <img src="https://cdnjs.cloudflare.com/ajax/libs/browser-logos/74.1.0/edge/edge_24x24.png"
                                 alt="Edge">
                         </a>
+                        <a href="#download" title="Download for Firefox">
+                            <img src="https://cdnjs.cloudflare.com/ajax/libs/browser-logos/74.1.0/firefox/firefox_24x24.png"
+                                alt="Edge">
+                        </a>
                         <a href="#download" title="Download for Brave">
                             <img src="https://cdnjs.cloudflare.com/ajax/libs/browser-logos/74.1.0/brave/brave_24x24.png"
                                 alt="Brave">
@@ -84,8 +89,8 @@
             <h2 class="section-title">Technical Features</h2>
             <div class="grid-container">
                 <div class="card glass-panel">
-                    <h3>Regex Filtering</h3>
-                    <p>Powerful regular expression support for advanced pattern matching in titles and comments.</p>
+                    <h3>Exact Word Matching</h3>
+                    <p>Precise keyword filtering with optional exact word boundaries for accurate matching.</p>
                 </div>
                 <div class="card glass-panel">
                     <h3>Channel Whitelist</h3>
@@ -107,6 +112,30 @@
                     <h3>Performance</h3>
                     <p>Optimized for zero latency. Filters are applied instantly before rendering.</p>
                 </div>
+                <div class="card glass-panel">
+                    <h3>Auto Backup</h3>
+                    <p>Automatic backups saved to Downloads/FilterTube Backup/ with customizable toggle.</p>
+                </div>
+                <div class="card glass-panel">
+                    <h3>Import/Export</h3>
+                    <p>Manual exports to Downloads/FilterTube Export/ with full data portability.</p>
+                </div>
+                <div class="card glass-panel">
+                    <h3>Mobile Responsive</h3>
+                    <p>Mobile-friendly tab view with hamburger navigation and responsive grids.</p>
+                </div>
+                <div class="card glass-panel">
+                    <h3>Members-Only Control</h3>
+                    <p>Hide paid membership content across watch, sidebar, and compact video layouts.</p>
+                </div>
+                <div class="card glass-panel">
+                    <h3>Mix/Radio Detection</h3>
+                    <p>Intelligently excludes Mix and Radio items from playlist hiding.</p>
+                </div>
+                <div class="card glass-panel">
+                    <h3>What's New Dashboard</h3>
+                    <p>Curated release notes tab with detailed changelog and feature highlights.</p>
+                </div>
             </div>
         </section>
 
@@ -116,19 +145,19 @@
                 <div class="pipeline-step">
                     <div class="step-number">01</div>
                     <h3>INTERCEPT</h3>
-                    <p>initialData → FilterTube Hook</p>
+                    <p>ytInitialData → FilterTube Hook</p>
                 </div>
                 <div class="pipeline-arrow">→</div>
                 <div class="pipeline-step">
                     <div class="step-number">02</div>
                     <h3>ANALYZE</h3>
-                    <p>processData(videos, userFilters)</p>
+                    <p>Recursive Renderer Processing</p>
                 </div>
                 <div class="pipeline-arrow">→</div>
                 <div class="pipeline-step">
                     <div class="step-number">03</div>
                     <h3>BLOCK</h3>
-                    <p>blocked.forEach(v → null)</p>
+                    <p>Remove Matching Renderers</p>
                 </div>
                 <div class="pipeline-arrow">→</div>
                 <div class="pipeline-step">
@@ -165,6 +194,36 @@
                 <div class="card glass-panel">
                     <h3>UX Guidelines</h3>
                     <p>Follows strict accessibility and design principles as outlined in our UX Guide.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="youtube-kids" class="features-section">
+            <h2 class="section-title">YouTube Kids Protection</h2>
+            <div class="grid-container">
+                <div class="card glass-panel">
+                    <h3>Complete Channel Blocking</h3>
+                    <p>Full channel and keyword-based blocking on YouTube Kids with passive 3-dot menu integration.</p>
+                </div>
+                <div class="card glass-panel">
+                    <h3>Kids-Mode Profiles</h3>
+                    <p>Separate profile system designed specifically for children with independent restrictions.</p>
+                </div>
+                <div class="card glass-panel">
+                    <h3>Parental Controls</h3>
+                    <p>Advanced parental control features including PIN protection and content filtering.</p>
+                </div>
+                <div class="card glass-panel">
+                    <h3>Educational Focus</h3>
+                    <p>Prioritizes educational content while blocking inappropriate entertainment videos.</p>
+                </div>
+                <div class="card glass-panel">
+                    <h3>Peace of Mind</h3>
+                    <p>Let your children explore YouTube safely with comprehensive protection built for kids.</p>
+                </div>
+                <div class="card glass-panel">
+                    <h3>Dedicated Kids Page</h3>
+                    <p>Visit our dedicated <a href="kids.html" style="color: var(--accent-color);">Kids Mode page</a> for detailed features.</p>
                 </div>
             </div>
         </section>
@@ -226,7 +285,7 @@
                     <p>When YouTube Forum maintainers deleted mine and other parents' comments and locked the thread, I
                         decided to create FilterTube.</p>
                     <a href="https://support.google.com/youtubekids/thread/54509605/how-to-block-videos-by-keyword-or-tag?hl=en"
-                        target="_blank" class="story-link">→ View Original Thread (Locked)</a>
+                        target="_blank" class="story-link">🔗 View Original Thread (Locked)</a>
                 </div>
 
                 <div class="evidence-box">
@@ -247,6 +306,36 @@
             </div>
         </section>
 
+        <section id="whats-new" class="features-section">
+            <h2 class="section-title">What's New</h2>
+            <div class="grid-container">
+                <div class="card glass-panel">
+                    <h3>Release Notes Dashboard</h3>
+                    <p>Curated "What's New" tab in the extension dashboard with detailed changelog and feature highlights.</p>
+                </div>
+                <div class="card glass-panel">
+                    <h3>Auto Backup System</h3>
+                    <p>Automatic backups saved to Downloads/FilterTube Backup/ with customizable toggle settings.</p>
+                </div>
+                <div class="card glass-panel">
+                    <h3>Enhanced Import/Export</h3>
+                    <p>Manual exports to Downloads/FilterTube Export/ with full data portability and merge options.</p>
+                </div>
+                <div class="card glass-panel">
+                    <h3>Mobile Responsive UI</h3>
+                    <p>Mobile-friendly tab view with hamburger navigation and responsive grids for all screen sizes.</p>
+                </div>
+                <div class="card glass-panel">
+                    <h3>Members-Only Control</h3>
+                    <p>Hide paid membership content across watch, sidebar, and compact video layouts.</p>
+                </div>
+                <div class="card glass-panel">
+                    <h3>Mix/Radio Detection</h3>
+                    <p>Intelligently excludes Mix and Radio items from playlist hiding while keeping standard playlists.</p>
+                </div>
+            </div>
+        </section>
+
         <section id="download" class="download-section">
             <h2 class="section-title">Get Started</h2>
             <p>Take back control of your feed today.</p>
@@ -257,24 +346,22 @@
                         alt="Chrome">
                     <span>Chrome</span>
                 </a>
-                <a href="https://chromewebstore.google.com/detail/filtertube/cjmdggnnpmpchholgnkfokibidbbnfgc"
-                    class="browser-link">
+                <a href="https://microsoftedge.microsoft.com/addons/detail/filtertube/lgeflbmplcmljnhffmoghkoccflhlbem" class="browser-link">
                     <img src="https://cdnjs.cloudflare.com/ajax/libs/browser-logos/74.1.0/edge/edge_48x48.png"
                         alt="Edge">
                     <span>Edge</span>
                 </a>
-                <a href="#" class="browser-link">
+                <a href="https://addons.mozilla.org/en-US/firefox/addon/filtertube/" class="browser-link">
                     <img src="https://cdnjs.cloudflare.com/ajax/libs/browser-logos/74.1.0/firefox/firefox_48x48.png"
                         alt="Firefox">
                     <span>Firefox</span>
                 </a>
-                <a href="#" class="browser-link">
+                <a href="https://github.com/varshneydevansh/FilterTube/releases" class="browser-link">
                     <img src="https://cdnjs.cloudflare.com/ajax/libs/browser-logos/74.1.0/opera/opera_48x48.png"
                         alt="Opera">
                     <span>Opera</span>
                 </a>
-                <a href="https://chromewebstore.google.com/detail/filtertube/cjmdggnnpmpchholgnkfokibidbbnfgc"
-                    class="browser-link">
+                <a href="https://chromewebstore.google.com/detail/filtertube/cjmdggnnpmpchholgnkfokibidbbnfgc" class="browser-link">
                     <img src="https://cdnjs.cloudflare.com/ajax/libs/browser-logos/74.1.0/brave/brave_48x48.png"
                         alt="Brave">
                     <span>Brave</span>
