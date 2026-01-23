@@ -13,6 +13,9 @@
     // Debug logging with sequence numbers and bridge relay
     let injectorDebugSequence = 0;
     function postLog(level, ...args) {
+        if (level === 'log' && !window.__filtertubeDebug) {
+            return;
+        }
         injectorDebugSequence++;
         console[level](`[${injectorDebugSequence}] FilterTube (Injector):`, ...args);
 
@@ -1252,7 +1255,13 @@
     // Set up additional data hooks if seed.js didn't handle them
     function setupAdditionalHooks() {
         // Hook ytInitialData if not already hooked
-        if (!Object.getOwnPropertyDescriptor(window, 'ytInitialData')?.get) {
+        const ytInitialDataDesc = Object.getOwnPropertyDescriptor(window, 'ytInitialData');
+        if (ytInitialDataDesc && ytInitialDataDesc.configurable === false) {
+            postLog('warn', 'ytInitialData is non-configurable; skipping injector hook');
+            return;
+        }
+
+        if (!ytInitialDataDesc?.get) {
             postLog('log', 'Setting up ytInitialData hook (seed.js backup)');
 
             let ytInitialDataValue = window.ytInitialData;
@@ -1274,25 +1283,29 @@
                 }
             }
 
-            Object.defineProperty(window, 'ytInitialData', {
-                configurable: true,
-                get: () => ytInitialDataValue,
-                set: (newValue) => {
-                    postLog('log', 'ytInitialData setter called (injector hook)');
+            try {
+                Object.defineProperty(window, 'ytInitialData', {
+                    configurable: true,
+                    get: () => ytInitialDataValue,
+                    set: (newValue) => {
+                        postLog('log', 'ytInitialData setter called (injector hook)');
 
-                    if (settingsReceived && window.FilterTubeEngine) {
-                        ytInitialDataValue = processDataWithFilterLogic(newValue, 'ytInitialData');
-                    } else {
-                        ytInitialDataValue = newValue;
-                        initialDataQueue.push({
-                            name: 'ytInitialData',
-                            process: () => {
-                                ytInitialDataValue = processDataWithFilterLogic(ytInitialDataValue, 'ytInitialData');
-                            }
-                        });
+                        if (settingsReceived && window.FilterTubeEngine) {
+                            ytInitialDataValue = processDataWithFilterLogic(newValue, 'ytInitialData');
+                        } else {
+                            ytInitialDataValue = newValue;
+                            initialDataQueue.push({
+                                name: 'ytInitialData',
+                                process: () => {
+                                    ytInitialDataValue = processDataWithFilterLogic(ytInitialDataValue, 'ytInitialData');
+                                }
+                            });
+                        }
                     }
-                }
-            });
+                });
+            } catch (e) {
+                postLog('warn', 'Failed to install ytInitialData injector hook', e);
+            }
         } else {
             postLog('log', 'ytInitialData hook already exists (seed.js handled it)');
         }

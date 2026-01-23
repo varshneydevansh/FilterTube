@@ -640,6 +640,12 @@ const RELEASE_NOTES_TEMPLATE = {
 let releaseNotesCache = null;
 let compiledSettingsCache = { main: null, kids: null };
 
+let channelMapCache = null;
+let channelMapLoadPromise = null;
+let channelMapFlushPromise = Promise.resolve();
+let channelMapFlushTimer = null;
+const pendingChannelMapUpdates = new Map();
+
 let videoChannelMapCache = null;
 let videoChannelMapLoadPromise = null;
 let videoChannelMapFlushPromise = Promise.resolve();
@@ -772,6 +778,82 @@ function buildProfilesV4FromLegacyState(items, storageUpdates = {}) {
     };
 }
 
+function ensureChannelMapCache() {
+    if (channelMapCache && typeof channelMapCache === 'object') {
+        return Promise.resolve(channelMapCache);
+    }
+    if (channelMapLoadPromise) return channelMapLoadPromise;
+
+    channelMapLoadPromise = storageGet(['channelMap']).then(result => {
+        const stored = result?.channelMap;
+        channelMapCache = stored && typeof stored === 'object' ? { ...stored } : {};
+        channelMapLoadPromise = null;
+        return channelMapCache;
+    }).catch(() => {
+        channelMapCache = {};
+        channelMapLoadPromise = null;
+        return channelMapCache;
+    });
+
+    return channelMapLoadPromise;
+}
+
+function flushChannelMapUpdates() {
+    channelMapFlushPromise = channelMapFlushPromise.then(async () => {
+        if (pendingChannelMapUpdates.size === 0) return;
+        const map = await ensureChannelMapCache();
+        for (const [key, value] of pendingChannelMapUpdates.entries()) {
+            if (!key || !value) continue;
+            map[key] = value;
+        }
+        pendingChannelMapUpdates.clear();
+        await browserAPI.storage.local.set({ channelMap: map });
+    }).catch(() => {
+    });
+    return channelMapFlushPromise;
+}
+
+function scheduleChannelMapFlush() {
+    if (channelMapFlushTimer) return;
+    channelMapFlushTimer = setTimeout(() => {
+        channelMapFlushTimer = null;
+        flushChannelMapUpdates();
+    }, 250);
+}
+
+function enqueueChannelMapUpdate(key, value) {
+    const k = typeof key === 'string' ? key.trim().toLowerCase() : '';
+    const v = typeof value === 'string' ? value.trim() : '';
+    if (!k || !v) return;
+    pendingChannelMapUpdates.set(k, v);
+
+    if (channelMapCache && typeof channelMapCache === 'object') {
+        channelMapCache[k] = v;
+    }
+
+    if (compiledSettingsCache.main) {
+        compiledSettingsCache.main.channelMap = channelMapCache || compiledSettingsCache.main.channelMap;
+    }
+    if (compiledSettingsCache.kids) {
+        compiledSettingsCache.kids.channelMap = channelMapCache || compiledSettingsCache.kids.channelMap;
+    }
+
+    scheduleChannelMapFlush();
+}
+
+function enqueueChannelMapMappings(mappings = []) {
+    const list = Array.isArray(mappings) ? mappings : [];
+    if (list.length === 0) return;
+
+    list.forEach(m => {
+        if (!m || !m.id || !m.handle) return;
+        const keyId = String(m.id).toLowerCase();
+        const keyHandle = String(m.handle).toLowerCase();
+        enqueueChannelMapUpdate(keyId, m.handle);
+        enqueueChannelMapUpdate(keyHandle, m.id);
+    });
+}
+
 function ensureVideoChannelMapCache() {
     if (videoChannelMapCache && typeof videoChannelMapCache === 'object') {
         return Promise.resolve(videoChannelMapCache);
@@ -836,6 +918,13 @@ function enqueueVideoChannelMapUpdate(videoId, channelId) {
 
     if (videoChannelMapCache && typeof videoChannelMapCache === 'object') {
         videoChannelMapCache[v] = c;
+    }
+
+    if (compiledSettingsCache.main) {
+        compiledSettingsCache.main.videoChannelMap = videoChannelMapCache || compiledSettingsCache.main.videoChannelMap;
+    }
+    if (compiledSettingsCache.kids) {
+        compiledSettingsCache.kids.videoChannelMap = videoChannelMapCache || compiledSettingsCache.kids.videoChannelMap;
     }
     scheduleVideoChannelMapFlush();
 }
@@ -2319,34 +2408,7 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
         sendResponse({ acknowledged: true });
         return false;
     } else if (request.action === "updateChannelMap") {
-        // Handle learned ID/Handle mappings from filter_logic
-        browserAPI.storage.local.get(['channelMap'], (result) => {
-            const currentMap = result.channelMap || {};
-            let hasChange = false;
-
-            request.mappings.forEach(m => {
-                if (!m || !m.id || !m.handle) return;
-
-                // Keys are lowercase for case-insensitive lookup
-                // Values preserve ORIGINAL case from YouTube
-                const keyId = m.id.toLowerCase();
-                const keyHandle = m.handle.toLowerCase();
-
-                if (currentMap[keyId] !== m.handle) {
-                    currentMap[keyId] = m.handle;    // UC... -> @HandleDisplay (original case)
-                    hasChange = true;
-                }
-                if (currentMap[keyHandle] !== m.id) {
-                    currentMap[keyHandle] = m.id;    // @handle -> UC... (original case)
-                    hasChange = true;
-                }
-            });
-
-            if (hasChange) {
-                browserAPI.storage.local.set({ channelMap: currentMap });
-                console.log("FilterTube Background: Channel map updated in storage");
-            }
-        });
+        enqueueChannelMapMappings(request.mappings);
         return false; // No response needed
     } else if (request.action === "updateVideoChannelMap") {
         // Store videoId → channelId mappings for Shorts persistence after refresh
@@ -2402,8 +2464,6 @@ browserAPI.storage.onChanged.addListener((changes, area) => {
             'filterComments',
             'hideHomeFeed',
             'hideSponsoredCards',
-            'channelMap',
-            'videoChannelMap',
             'ftProfilesV3',
             FT_PROFILES_V4_KEY
         ];
@@ -2975,7 +3035,8 @@ async function fetchChannelInfo(channelIdOrHandle) {
 // ==========================================
 
 browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    console.log('FilterTube Background: Received message:', message?.type || message?.action);
+    if (!message?.type) return false;
+    console.log('FilterTube Background: Received message:', message.type);
 
     if (message.type === 'addFilteredChannel') {
         handleAddFilteredChannel(

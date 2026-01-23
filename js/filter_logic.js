@@ -14,6 +14,9 @@
     // Debug logging with sequence numbers and bridge relay
     let filterLogicDebugSequence = 0;
     function postLogToBridge(level, ...args) {
+        if (level === 'log' && !window.__filtertubeDebug) {
+            return;
+        }
         filterLogicDebugSequence++;
         console[level](`[${filterLogicDebugSequence}] FilterTube (FilterLogic):`, ...args);
 
@@ -578,7 +581,7 @@
             this.settings = this._processSettings(settings);
             this.channelMap = settings.channelMap || {}; // UC ID <-> @handle mappings
             this.blockedCount = 0;
-            this.debugEnabled = true;
+            this.debugEnabled = !!window.__filtertubeDebug;
         }
 
         _harvestBrowseEndpoint(node) {

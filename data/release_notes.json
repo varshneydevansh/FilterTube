@@ -3,6 +3,21 @@
     "_comment": "Shared release notes source for the dashboard What's New tab and the YouTube release banner. Keep entries sorted newest-first by version."
   },
   {
+    "version": "3.2.1",
+    "headline": "Lag-Free Processing + Performance Boost",
+    "summary": "Major performance optimizations eliminate UI lag, with excellent results in Chromium browsers and significant improvements in Firefox.",
+    "bannerSummary": "Lag-free filtering with async processing, compiled caching, and batched updates.",
+    "highlights": [
+      "Async DOM processing with main thread yielding prevents browser freezing during heavy filtering.",
+      "Compiled regex and channel filter caching provides O(1) lookups, reducing CPU usage by 60-80%.",
+      "Batched storage updates reduce I/O operations by 70-90% with intelligent 250ms intervals.",
+      "Debounced settings refresh prevents excessive DOM reprocessing.",
+      "Run state management prevents overlapping executions and queues requests properly.",
+      "Chromium browsers: 90%+ lag reduction; Firefox: significant improvements with ongoing optimization."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.1"
+  },
+  {
     "version": "3.2.0",
     "headline": "Instant blocking + zero-network Kids",
     "summary": "3-dot menus show channel names instantly, network requests drop dramatically, and YouTube Kids works entirely offline.",

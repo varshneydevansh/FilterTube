@@ -1,4 +1,4 @@
-# Channel Blocking System (v3.2.0)
+# Channel Blocking System (v3.2.1)
 
 ## 0. Goal & Non-Goals
 
@@ -251,9 +251,9 @@ Result: Multi-channel menus appear instantly on watch/home/search.
 - It calls `content_bridge.js:injectFilterTubeMenuItem(dropdown, videoCard)` to render "Block channel" menu entry.
 - On click, `content_bridge.js:handleBlockChannelClick(channelInfo, ...)` runs.
 
-### 6.2 Post-Block Enrichment System (v3.2.0)
+### 6.2 Post-Block Enrichment System (v3.2.1)
 
-FilterTube v3.2.0 includes a sophisticated post-block enrichment system that asynchronously fills missing channel metadata after successful blocking operations.
+FilterTube v3.2.1 includes a sophisticated post-block enrichment system that asynchronously fills missing channel metadata after successful blocking operations.
 
 #### Enrichment Pipeline
 
@@ -488,7 +488,7 @@ DOM fallback must be careful about:
 - Separate storage namespace (`ftProfilesV3.kids`)
 - DOM fallback uses videoChannelMap mappings from Kids browse/search
 
-### 5.4 3-Dot Menu Label Resolution (v3.2.0)
+### 5.4 3-Dot Menu Label Resolution (v3.2.1)
 
 The 3-dot menu now intelligently upgrades placeholder labels to real channel names using proactive XHR data:
 
@@ -685,7 +685,7 @@ This section answers:
   - Playlist queue rows (`ytd-playlist-panel-video-renderer`)
   - Embedded Shorts tiles rendered inside the watch column
 
-- **3-dot menu / collaboration status (v3.2.0)**
+- **3-dot menu / collaboration status (v3.2.1)**
   - The watch page reuses the same collaborator roster cache as Home/Search, so any card with ≥2 collaborators immediately renders per-channel menu rows (plus "Block All") with accurate names/handles.
   - Shorts tiles opened inside the watch shell may mark `fetchStrategy: 'shorts'`; when identity is not already known via proactive XHR interception or `videoChannelMap`, we can fall back to `/shorts/<id>` fetch (and then `fetchChannelFromWatchUrl`) to guarantee a canonical UC ID.
   - In many cases, the UC ID is already known by the time the menu opens because FilterTube harvests ownership from `ytInitialPlayerResponse` and `/youtubei/v1/player` payloads and persists `videoId -> UC...` into `videoChannelMap`.

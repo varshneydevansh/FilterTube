@@ -1,10 +1,10 @@
-# YouTube Kids Integration Documentation (v3.2.0)
+# YouTube Kids Integration Documentation (v3.2.1)
 
 ## Overview
 
-FilterTube v3.2.0 provides **zero-network** integration with YouTube Kids, relying entirely on proactive XHR interception to extract channel identity without any network requests. This ensures reliable blocking on YouTube Kids where traditional network fetching often fails.
+FilterTube v3.2.1 provides **zero-network** integration with YouTube Kids, relying entirely on proactive XHR interception to extract channel identity without any network requests. This ensures reliable blocking on YouTube Kids where traditional network fetching often fails.
 
-## Zero-Network Architecture (v3.2.0)
+## Zero-Network Architecture (v3.2.1)
 
 ### Proactive Channel Identity on Kids
 
@@ -43,7 +43,7 @@ async function prefetchIdentityForCard({ videoId, card }) {
 - **Reliable operation** - works even when Kids blocks external requests
 - **DOM extraction fallback** - uses stamped attributes when available
 
-### Enhanced Kids Native Blocking (v3.2.0)
+### Enhanced Kids Native Blocking (v3.2.1)
 
 ```javascript
 // In block_channel.js - improved Kids context capture

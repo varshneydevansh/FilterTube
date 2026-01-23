@@ -321,8 +321,17 @@ const StateManager = (() => {
         const id = typeof channel.id === 'string' ? channel.id.trim() : '';
         const handle = typeof channel.handle === 'string' ? channel.handle.trim() : '';
         const customUrl = typeof channel.customUrl === 'string' ? channel.customUrl.trim() : '';
+        const source = typeof channel.source === 'string' ? channel.source.trim() : '';
         const hasLookup = !!(id || handle || customUrl);
         if (!hasLookup) return false;
+
+        if (!id || !id.toUpperCase().startsWith('UC')) return true;
+
+        if (source === 'import') {
+            if (name && id && name === id && !handle && !customUrl) {
+                return false;
+            }
+        }
         if (!name) return true;
         if (id && name === id) return true;
         if (isHandleLike(name)) return true;
@@ -331,7 +340,6 @@ const StateManager = (() => {
         if (name && /\s-\sTopic$/i.test(name) && id && id.toUpperCase().startsWith('UC')) {
             return false;
         }
-        if (!channel.handle || !channel.logo) return true;
         return false;
     }
 
@@ -1463,6 +1471,11 @@ const StateManager = (() => {
         if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.onChanged) {
             chrome.storage.onChanged.addListener(async (changes, area) => {
                 if (area !== 'local' || isSaving) return;
+
+                const changedKeys = Object.keys(changes || {});
+                if (changedKeys.length === 1 && changedKeys[0] === 'channelMap') {
+                    return;
+                }
 
                 // Check for theme changes
                 if (changes.ftThemePreference) {

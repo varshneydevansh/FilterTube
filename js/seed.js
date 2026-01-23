@@ -97,8 +97,10 @@
     }
     
     // Debug logging with sequence numbers
+    const seedDebugEnabled = !!window.__filtertubeDebug;
     let seedDebugSequence = 0;
     function seedDebugLog(message, ...args) {
+        if (!seedDebugEnabled) return;
         seedDebugSequence++;
         console.log(`[${seedDebugSequence}] FilterTube (Seed):`, message, ...args);
         
@@ -426,25 +428,34 @@
         }
 
         // Set up defineProperty hook for future data
-        Object.defineProperty(window, 'ytInitialData', {
-            configurable: true,
-            get: function() {
-                return originalYtInitialData;
-            },
-            set: function(newValue) {
-                seedDebugLog('🎯 ytInitialData intercepted via setter');
-                seedDebugLog('Data keys:', newValue ? Object.keys(newValue) : 'null');
-                seedDebugLog('Data size:', newValue ? JSON.stringify(newValue).length : 0, 'chars');
-                
-                const processed = processWithEngine(newValue, 'ytInitialData');
-                originalYtInitialData = processed;
-                
-                // Update global reference
-                if (window.filterTube) {
-                    window.filterTube.lastYtInitialData = processed;
-                }
+        const ytInitialDataDesc = Object.getOwnPropertyDescriptor(window, 'ytInitialData');
+        if (ytInitialDataDesc && ytInitialDataDesc.configurable === false) {
+            seedDebugLog('⚠️ ytInitialData is non-configurable; skipping hook');
+        } else {
+            try {
+                Object.defineProperty(window, 'ytInitialData', {
+                    configurable: true,
+                    get: function() {
+                        return originalYtInitialData;
+                    },
+                    set: function(newValue) {
+                        seedDebugLog('🎯 ytInitialData intercepted via setter');
+                        seedDebugLog('Data keys:', newValue ? Object.keys(newValue) : 'null');
+                        seedDebugLog('Data size:', newValue ? JSON.stringify(newValue).length : 0, 'chars');
+                        
+                        const processed = processWithEngine(newValue, 'ytInitialData');
+                        originalYtInitialData = processed;
+                        
+                        // Update global reference
+                        if (window.filterTube) {
+                            window.filterTube.lastYtInitialData = processed;
+                        }
+                    }
+                });
+            } catch (e) {
+                seedDebugLog('⚠️ Failed to install ytInitialData hook:', e);
             }
-        });
+        }
 
         // Hook ytInitialPlayerResponse
         let originalYtInitialPlayerResponse = window.ytInitialPlayerResponse;
@@ -462,25 +473,34 @@
         }
 
         // Set up defineProperty hook for future data
-        Object.defineProperty(window, 'ytInitialPlayerResponse', {
-            configurable: true,
-            get: function() {
-                return originalYtInitialPlayerResponse;
-            },
-            set: function(newValue) {
-                seedDebugLog('🎯 ytInitialPlayerResponse intercepted via setter');
-                seedDebugLog('Data keys:', newValue ? Object.keys(newValue) : 'null');
-                seedDebugLog('Data size:', newValue ? JSON.stringify(newValue).length : 0, 'chars');
-                
-                const processed = processWithEngine(newValue, 'ytInitialPlayerResponse');
-                originalYtInitialPlayerResponse = processed;
-                
-                // Update global reference
-                if (window.filterTube) {
-                    window.filterTube.lastYtInitialPlayerResponse = processed;
-                }
+        const ytPlayerDesc = Object.getOwnPropertyDescriptor(window, 'ytInitialPlayerResponse');
+        if (ytPlayerDesc && ytPlayerDesc.configurable === false) {
+            seedDebugLog('⚠️ ytInitialPlayerResponse is non-configurable; skipping hook');
+        } else {
+            try {
+                Object.defineProperty(window, 'ytInitialPlayerResponse', {
+                    configurable: true,
+                    get: function() {
+                        return originalYtInitialPlayerResponse;
+                    },
+                    set: function(newValue) {
+                        seedDebugLog('🎯 ytInitialPlayerResponse intercepted via setter');
+                        seedDebugLog('Data keys:', newValue ? Object.keys(newValue) : 'null');
+                        seedDebugLog('Data size:', newValue ? JSON.stringify(newValue).length : 0, 'chars');
+                        
+                        const processed = processWithEngine(newValue, 'ytInitialPlayerResponse');
+                        originalYtInitialPlayerResponse = processed;
+                        
+                        // Update global reference
+                        if (window.filterTube) {
+                            window.filterTube.lastYtInitialPlayerResponse = processed;
+                        }
+                    }
+                });
+            } catch (e) {
+                seedDebugLog('⚠️ Failed to install ytInitialPlayerResponse hook:', e);
             }
-        });
+        }
 
         dataHooksEstablished = true;
         seedDebugLog("✅ Data hooks established successfully");

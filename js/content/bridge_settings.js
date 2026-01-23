@@ -96,8 +96,43 @@ function sendSettingsToMainWorld(settings) {
     }
 }
 
+let pendingStorageRefreshTimer = 0;
+let lastStorageRefreshTs = 0;
+const MIN_STORAGE_REFRESH_INTERVAL_MS = 250;
+
+function scheduleSettingsRefreshFromStorage() {
+    const now = Date.now();
+    const elapsed = now - lastStorageRefreshTs;
+    if (elapsed >= MIN_STORAGE_REFRESH_INTERVAL_MS && !pendingStorageRefreshTimer) {
+        lastStorageRefreshTs = now;
+        requestSettingsFromBackground().then(result => {
+            if (result?.success) {
+                applyDOMFallback(result.settings, { forceReprocess: true });
+            }
+        });
+        return;
+    }
+
+    if (pendingStorageRefreshTimer) return;
+    const delay = Math.max(0, MIN_STORAGE_REFRESH_INTERVAL_MS - elapsed);
+    pendingStorageRefreshTimer = setTimeout(() => {
+        pendingStorageRefreshTimer = 0;
+        lastStorageRefreshTs = Date.now();
+        requestSettingsFromBackground().then(result => {
+            if (result?.success) {
+                applyDOMFallback(result.settings, { forceReprocess: true });
+            }
+        });
+    }, delay);
+}
+
 function handleStorageChanges(changes, area) {
     if (area !== 'local') return;
+
+    const changedKeys = Object.keys(changes || {});
+    if (changedKeys.length === 1 && changedKeys[0] === 'channelMap') {
+        return;
+    }
     const relevantKeys = [
         'enabled',
         'filterKeywords',
@@ -139,12 +174,7 @@ function handleStorageChanges(changes, area) {
     ];
     if (Object.keys(changes).some(key => relevantKeys.includes(key))) {
         // FIX: Apply changes IMMEDIATELY without debounce
-        requestSettingsFromBackground().then(result => {
-            if (result?.success) {
-                // Force immediate reprocess with no scroll preservation for instant feedback
-                applyDOMFallback(result.settings, { forceReprocess: true });
-            }
-        });
+        scheduleSettingsRefreshFromStorage();
     }
 }
 

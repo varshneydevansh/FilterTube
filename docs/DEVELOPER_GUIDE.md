@@ -1,4 +1,4 @@
-# Developer Guide (v3.2.0)
+# Developer Guide (v3.2.1)
 
 ## Overview
 

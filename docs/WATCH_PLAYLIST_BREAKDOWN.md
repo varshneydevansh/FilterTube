@@ -1,30 +1,30 @@
-# Watch Playlist – Current Implementation (v3.2.0)
+# Watch Playlist – Current Implementation (v3.2.1)
 
 ## Goal
 
 - Ensure all videos from blocked channels stay hidden inside the watch-page playlist panel (`/watch?v=...&list=...`) even after hard refresh and SPA navigation.
 - Ensure Next/Prev/autoplay never lands on a blocked playlist item (no visible playback flash).
-- **NEW v3.2.0**: Leverage proactive XHR interception for instant channel identity resolution.
+- **NEW v3.2.1**: Leverage proactive XHR interception for instant channel identity resolution.
 
 
 ## How it works now
 
-### 1) Hiding playlist panel items (DOM fallback) - **ENHANCED v3.2.0**
+### 1) Hiding playlist panel items (DOM fallback) - **ENHANCED v3.2.1**
 
 - Playlist panel rows are scanned by `applyDOMFallback()` in `js/content/dom_fallback.js`.
 - For playlist items, channel extraction prefers `#byline` (not `#text`) to avoid accidentally reading the video title.
-- **NEW v3.2.0**: Channel identity is now stamped from proactive network snapshots, reducing reliance on DOM extraction.
+- **NEW v3.2.1**: Channel identity is now stamped from proactive network snapshots, reducing reliance on DOM extraction.
 - When a playlist row is hidden, FilterTube hides the wrapper container (`ytd-playlist-panel-video-wrapper-renderer`) when present to avoid leaving a “clickable ghost row”.
 
 
-### 2) Deterministic identity for playlist items (prefetch → videoChannelMap) - **IMPROVED v3.2.0**
+### 2) Deterministic identity for playlist items (prefetch → videoChannelMap) - **IMPROVED v3.2.1**
 
 - Many playlist rows only expose channel *name* (no handle/UC id). For deterministic filtering, FilterTube enriches playlist items using the same prefetch/hydration queue used for Shorts.
 - `js/content_bridge.js`:
   - Attaches an `IntersectionObserver` prefetcher.
   - On watch pages with `list=...`, playlist panel rows are prioritized for observation so they get enriched early.
   - Prefetch resolves `videoId -> channelId` and persists it into `videoChannelMap`, enabling reliable "same-channel" hiding (e.g., multiple Pitbull entries).
-- **NEW v3.2.0**: Prefetch now leverages proactive network snapshots first, falling back to targeted fetch only when needed.
+- **NEW v3.2.1**: Prefetch now leverages proactive network snapshots first, falling back to targeted fetch only when needed.
 
 
 ### 3) No-flash skipping for blocked Next/Prev/autoplay
@@ -41,10 +41,10 @@ Sticky-hide: if a playlist row was already hidden but its channel identity is te
 ## Notes on matching when playlist rows have no identity
 
 - If a playlist item does not expose `UC...` or `@handle`, FilterTube uses a strict byline-name fallback match for playlist rows only.
-- **IMPROVED v3.2.0**: With proactive snapshots, fewer playlist items fall back to name-only matching.
+- **IMPROVED v3.2.1**: With proactive snapshots, fewer playlist items fall back to name-only matching.
 - This is intentionally conservative to avoid false positives.
 
-## **NEW v3.2.0: Proactive Identity Resolution for Playlists**
+## **NEW v3.2.1: Proactive Identity Resolution for Playlists**
 
 ### 4.1 Network Snapshot Integration
 
@@ -86,7 +86,7 @@ function searchYtInitialDataForVideoChannel(videoId, expectations = {}) {
 - **Reduced prefetch needs**: Most playlist items now have channel identity without network requests
 - **Better cache hit rates**: Shared playlist data across all watch page interactions
 
-## **NEW v3.2.0: Enhanced Error Handling for Playlists**
+## **NEW v3.2.1: Enhanced Error Handling for Playlists**
 
 ### 5.1 CORS and Network Error Recovery
 
@@ -130,21 +130,21 @@ if (!channelInfo.success && effectiveVideoId) {
 }
 ```
 
-## Performance Improvements (v3.2.0)
+## Performance Improvements (v3.2.1)
 
-### Before v3.2.0 (Reactive)
+### Before v3.2.1 (Reactive)
 - Network fetch for every playlist item without channel identity
 - "Fetching..." delays in playlist panel enrichment
 - Multiple redundant API calls for same channel across playlist items
 - Poor performance on large playlists with many blocked channels
 
-### After v3.2.0 (Proactive)
+### After v3.2.1 (Proactive)
 - **Instant playlist identity** - channel names available immediately from stashed data
 - **Reduced network calls** - most playlist identity from intercepted JSON
 - **Better cache utilization** - shared playlist data across all watch page interactions
 - **Faster playlist loading** - no waiting for enrichment before hiding blocked items
 
-## Debugging Playlist Issues (v3.2.0)
+## Debugging Playlist Issues (v3.2.1)
 
 ### Common Issues and Solutions
 
