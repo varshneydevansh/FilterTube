@@ -43,6 +43,8 @@ const pendingWatchFetches = new Map();
  */
 const pendingDropdownFetches = new WeakMap();
 
+const dropdownVisibilityObservers = new WeakMap();
+
 /**
  * Observe dropdowns and inject FilterTube menu items
  */
@@ -78,11 +80,40 @@ function setupMenuObserver() {
         }
     }, true);
 
+    function ensureDropdownVisibilityObserver(dropdown) {
+        if (!dropdown || dropdownVisibilityObservers.has(dropdown)) return;
+        const obs = new MutationObserver(() => {
+            try {
+                const isVisible = dropdown.style.display !== 'none' && dropdown.getAttribute('aria-hidden') !== 'true';
+                if (isVisible) {
+                    handleDropdownAppeared(dropdown).catch(err => {
+                        console.error('FilterTube: Error in handleDropdownAppeared:', err);
+                    });
+                } else {
+                    if (injectedDropdowns.has(dropdown)) {
+                        injectedDropdowns.delete(dropdown);
+                    }
+                }
+            } catch (e) {
+            }
+        });
+        dropdownVisibilityObservers.set(dropdown, obs);
+        try {
+            obs.observe(dropdown, { attributes: true, attributeFilter: ['style', 'aria-hidden'] });
+        } catch (e) {
+        }
+    }
+
     // Wait for document.body to be ready
     const startObserver = () => {
         if (!document.body) {
             setTimeout(startObserver, 100);
             return;
+        }
+
+        try {
+            document.querySelectorAll('tp-yt-iron-dropdown').forEach(dd => ensureDropdownVisibilityObserver(dd));
+        } catch (e) {
         }
 
         // Observe dropdown menus appearing (childList for new nodes)
@@ -95,6 +126,7 @@ function setupMenuObserver() {
                     const dropdown = node.matches?.('tp-yt-iron-dropdown') ? node : node.querySelector?.('tp-yt-iron-dropdown');
 
                     if (dropdown) {
+                        ensureDropdownVisibilityObserver(dropdown);
                         const isVisible = dropdown.style.display !== 'none' && dropdown.getAttribute('aria-hidden') !== 'true';
 
                         if (isVisible) {
@@ -107,33 +139,12 @@ function setupMenuObserver() {
                     }
                 }
 
-                // Check for attribute changes (dropdown becoming visible)
-                if (mutation.type === 'attributes' && mutation.target.matches?.('tp-yt-iron-dropdown')) {
-                    const dropdown = mutation.target;
-                    const isVisible = dropdown.style.display !== 'none' && dropdown.getAttribute('aria-hidden') !== 'true';
-
-                    if (isVisible) {
-                        console.log('FilterTube: Dropdown became visible (attribute change)');
-                        // Call async function without awaiting (fire and forget)
-                        handleDropdownAppeared(dropdown).catch(err => {
-                            console.error('FilterTube: Error in handleDropdownAppeared:', err);
-                        });
-                    } else {
-                        // Dropdown hidden - clear cached state so next open re-injects fresh
-                        if (injectedDropdowns.has(dropdown)) {
-                            console.log('FilterTube: Dropdown hidden, clearing cached state');
-                            injectedDropdowns.delete(dropdown);
-                        }
-                    }
-                }
             }
         });
 
         observer.observe(document.body, {
             childList: true,
-            subtree: true,
-            attributes: true,
-            attributeFilter: ['style', 'aria-hidden']
+            subtree: true
         });
 
         console.log('FilterTube: Menu observer started');
@@ -470,7 +481,7 @@ async function handleDropdownAppearedInternal(dropdown) {
     );
 
     // Find the associated video/short card from the button (comprehensive selectors)
-    const videoCard = commentThread || lastClickedMenuButton.closest(
+    let videoCard = commentThread || lastClickedMenuButton.closest(
         'ytd-rich-item-renderer, ' +
         'ytd-video-renderer, ' +
         'ytd-grid-video-renderer, ' +
@@ -488,24 +499,80 @@ async function handleDropdownAppearedInternal(dropdown) {
         'ytm-shorts-lockup-view-model-v2, ' +           // Shorts variant
         'ytm-item-section-renderer, ' +                 // Container for shorts
         'yt-lockup-view-model, ' +                      // Modern video lockup (collabs)
-        'ytd-rich-shelf-renderer'                       // Shelf containing shorts
+        'ytd-rich-shelf-renderer, ' +                   // Shelf containing shorts
+        'ytd-watch-metadata, ' +                        // Watch page header
+        'ytd-video-primary-info-renderer, ' +           // Watch page primary info
+        'ytd-video-secondary-info-renderer, ' +         // Watch page secondary info
+        'ytd-video-owner-renderer, ' +                  // Watch page channel row
+        'ytd-watch-flexy'                               // Watch page root
     );
+
+    if (!videoCard) {
+        try {
+            const watchMeta = document.querySelector('ytd-watch-metadata');
+            if (watchMeta) {
+                videoCard = watchMeta;
+            }
+        } catch (e) {
+        }
+    }
 
     if (videoCard) {
         console.log('FilterTube: Found video card:', videoCard.tagName);
 
+        // Watch page: if we are using a watch header/owner renderer (which may not contain a watch link),
+        // stamp the current videoId from URL so the menu enrichment path can use main-world lookups.
+        // IMPORTANT: Do NOT stamp URL videoId onto normal feed cards (e.g., yt-lockup-view-model),
+        // otherwise we can overwrite the card's real identity and block the wrong channel.
+        try {
+            const tag = (videoCard.tagName || '').toLowerCase();
+            const isWatchHeaderCard = (
+                tag === 'ytd-watch-metadata' ||
+                tag === 'ytd-video-primary-info-renderer' ||
+                tag === 'ytd-video-secondary-info-renderer' ||
+                tag === 'ytd-video-owner-renderer' ||
+                tag === 'ytd-watch-flexy'
+            );
+
+            if (isWatchHeaderCard && !videoCard.getAttribute('data-filtertube-video-id')) {
+                const path = (document.location?.pathname || '');
+                let v = '';
+
+                if (path.startsWith('/watch')) {
+                    const params = new URLSearchParams(document.location?.search || '');
+                    v = params.get('v') || '';
+                } else if (path.startsWith('/shorts/')) {
+                    const parts = path.split('/').filter(Boolean);
+                    v = parts.length >= 2 ? (parts[1] || '') : '';
+                } else {
+                    const params = new URLSearchParams(document.location?.search || '');
+                    v = params.get('v') || '';
+                }
+
+                if (v && /^[a-zA-Z0-9_-]{11}$/.test(v)) {
+                    videoCard.setAttribute('data-filtertube-video-id', v);
+                }
+            }
+        } catch (e) {
+        }
+
         // Get unique ID for this video card
         let videoCardId = videoCard.getAttribute('data-filtertube-unique-id');
         if (!videoCardId) {
-            // Try to extract video ID from links
-            const videoLink = videoCard.querySelector('a[href*="/watch?v="], a[href*="/shorts/"]');
-            const videoIdMatch = videoLink?.href.match(/(?:watch\?v=|shorts\/)([a-zA-Z0-9_-]{11})/);
-
-            if (videoIdMatch) {
-                videoCardId = videoIdMatch[1];
+            const stampedVideoId = videoCard.getAttribute('data-filtertube-video-id') || '';
+            if (stampedVideoId && /^[a-zA-Z0-9_-]{11}$/.test(stampedVideoId)) {
+                videoCardId = stampedVideoId;
             } else {
-                // Fallback: generate random ID
-                videoCardId = `card-${Math.random().toString(36).substr(2, 9)}`;
+                // Try to extract video ID from links
+                const videoLink = videoCard.querySelector('a[href*="/watch?v="], a[href*="/shorts/"]');
+                const videoIdMatch = videoLink?.href.match(/(?:watch\?v=|shorts\/)([a-zA-Z0-9_-]{11})/);
+
+                if (videoIdMatch) {
+                    videoCardId = videoIdMatch[1];
+                } else {
+                    // Fallback: generate random ID
+                    videoCardId = `card-${Math.random().toString(36).substr(2, 9)}`;
+                }
             }
             videoCard.setAttribute('data-filtertube-unique-id', videoCardId);
         }

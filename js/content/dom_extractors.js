@@ -36,7 +36,8 @@ const VIDEO_CARD_SELECTORS = [
     'ytk-grid-video-renderer',
     'ytk-video-renderer',
     'ytk-compact-channel-renderer',
-    'ytk-compact-playlist-renderer'
+    'ytk-compact-playlist-renderer',
+    'ytk-kids-slim-owner-renderer'
 ].join(', ');
 
 function ensureVideoIdForCard(card) {
@@ -719,6 +720,11 @@ function extractVideoIdFromCard(card) {
     if (!card) return null;
 
     try {
+        const stamped = card.getAttribute?.('data-filtertube-video-id') || '';
+        if (stamped && /^[a-zA-Z0-9_-]{11}$/.test(stamped)) {
+            return stamped;
+        }
+
         const extractFromHref = (href) => {
             if (!href || typeof href !== 'string') return null;
             const watchMatch = href.match(/[?&]v=([a-zA-Z0-9_-]{11})/);

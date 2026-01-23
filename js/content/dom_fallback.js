@@ -834,7 +834,7 @@ function applyDOMFallback(settings, options = {}) {
         try {
             const elementTag = (element.tagName || '').toLowerCase();
             const alreadyProcessed = element.hasAttribute('data-filtertube-processed');
-            const uniqueId = element.getAttribute('data-filtertube-unique-id') || extractVideoIdFromCard(element) || '';
+            const uniqueId = element.getAttribute('data-filtertube-unique-id') || (elementTag.startsWith('ytk-') ? ensureVideoIdForCard(element) : extractVideoIdFromCard(element)) || '';
             const lastProcessedId = element.getAttribute('data-filtertube-last-processed-id') || '';
             const contentChanged = alreadyProcessed && uniqueId && lastProcessedId && uniqueId !== lastProcessedId;
 
@@ -853,7 +853,7 @@ function applyDOMFallback(settings, options = {}) {
                     element.hasAttribute('data-filtertube-channel-custom');
 
                 if (!hasIdentityAttr && elementTag.startsWith('ytk-') && effectiveSettings.videoChannelMap) {
-                    const videoId = element.getAttribute('data-filtertube-video-id') || extractVideoIdFromCard(element);
+                    const videoId = ensureVideoIdForCard(element);
                     if (videoId && effectiveSettings.videoChannelMap[videoId]) {
                         element.removeAttribute('data-filtertube-processed');
                         element.removeAttribute('data-filtertube-last-processed-id');
@@ -966,7 +966,7 @@ function applyDOMFallback(settings, options = {}) {
             const hasChannelIdentity = Boolean(channelMeta.handle || channelMeta.id || channelMeta.customUrl);
             let mappedChannelId = '';
             if (!hasChannelIdentity && effectiveSettings.videoChannelMap) {
-                const videoId = element.getAttribute('data-filtertube-video-id') || extractVideoIdFromCard(element);
+                const videoId = ensureVideoIdForCard(element);
                 if (videoId && effectiveSettings.videoChannelMap[videoId]) {
                     mappedChannelId = effectiveSettings.videoChannelMap[videoId];
                     channelMeta = { ...channelMeta, id: mappedChannelId };
@@ -1449,8 +1449,6 @@ function applyDOMFallback(settings, options = {}) {
 
 // Helper function to check if content should be hidden
 function shouldHideContent(title, channel, settings, options = {}) {
-    if (!title && !channel) return false;
-
     const {
         skipKeywords = false,
         channelHref = '',
@@ -1460,6 +1458,8 @@ function shouldHideContent(title, channel, settings, options = {}) {
     } = options;
     const channelMeta = providedChannelMeta || buildChannelMetadata(channel, channelHref);
     const hasChannelIdentity = Boolean(channelMeta.handle || channelMeta.id || channelMeta.customUrl);
+
+    if (!title && !channel && !hasChannelIdentity && (!collaborators || collaborators.length === 0)) return false;
 
     // Debug logging (disabled by default - set to true for troubleshooting)
     const debugFiltering = false;

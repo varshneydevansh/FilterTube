@@ -570,13 +570,11 @@
             return null;
         }
 
-        const initialDataRoot = window.ytInitialData || window.filterTube?.lastYtInitialData || window.filterTube?.rawYtInitialData || null;
-        if (!initialDataRoot) {
-            postLog('log', 'Channel search skipped - ytInitialData snapshot not available');
-            return null;
-        }
-
-        postLog('log', `Searching ytInitialData for channel of video: ${videoId}`);
+        // IMPORTANT: Do not require ytInitialData to exist.
+        // On many surfaces (especially YouTube Kids), the most reliable identity comes
+        // from stashed network snapshots (lastYtBrowseResponse/lastYtNextResponse/lastYtPlayerResponse).
+        // This function must continue as long as ANY snapshot root exists.
+        postLog('log', `Searching snapshots for channel of video: ${videoId}`);
 
         let foundVideoObject = false;
         const visited = new WeakSet();
@@ -654,6 +652,7 @@
         };
 
         const watchOwnerCandidate = (() => {
+            const initialDataRoot = window.ytInitialData || window.filterTube?.lastYtInitialData || window.filterTube?.rawYtInitialData || null;
             if (!isCurrentWatchVideo || !initialDataRoot) return null;
             const visitedOwner = new WeakSet();
             const scan = (node, depth = 0) => {
@@ -685,6 +684,42 @@
             };
             return scan(initialDataRoot);
         })();
+
+        // Build the list of roots to search.
+        // We include ytInitialData when present, but DO NOT depend on it.
+        const searchTargets = [];
+        if (window.ytInitialData) {
+            searchTargets.push({ root: window.ytInitialData, label: 'ytInitialData' });
+        }
+        if (window.filterTube?.lastYtInitialData) {
+            searchTargets.push({ root: window.filterTube.lastYtInitialData, label: 'filterTube.lastYtInitialData' });
+        }
+        if (window.filterTube?.rawYtInitialData) {
+            searchTargets.push({ root: window.filterTube.rawYtInitialData, label: 'filterTube.rawYtInitialData' });
+        }
+
+        if (window.filterTube?.lastYtNextResponse) {
+            searchTargets.push({ root: window.filterTube.lastYtNextResponse, label: 'filterTube.lastYtNextResponse' });
+        }
+        if (window.filterTube?.lastYtBrowseResponse) {
+            searchTargets.push({ root: window.filterTube.lastYtBrowseResponse, label: 'filterTube.lastYtBrowseResponse' });
+        }
+
+        const ftPlayer = window.filterTube?.lastYtInitialPlayerResponse || window.filterTube?.rawYtInitialPlayerResponse;
+        if (ftPlayer) {
+            searchTargets.push({ root: ftPlayer, label: 'filterTube.lastYtInitialPlayerResponse' });
+        } else if (window.ytInitialPlayerResponse) {
+            searchTargets.push({ root: window.ytInitialPlayerResponse, label: 'ytInitialPlayerResponse' });
+        }
+
+        if (window.filterTube?.lastYtPlayerResponse) {
+            searchTargets.push({ root: window.filterTube.lastYtPlayerResponse, label: 'filterTube.lastYtPlayerResponse' });
+        }
+
+        if (searchTargets.length === 0) {
+            postLog('log', 'Channel search skipped - no snapshot roots available');
+            return null;
+        }
 
         function matchesExpectations(candidate) {
             if (!candidate) return false;
@@ -848,35 +883,6 @@
                 return result;
             }
             return null;
-        }
-
-        const searchTargets = [];
-        if (window.ytInitialData) {
-            searchTargets.push({ root: window.ytInitialData, label: 'ytInitialData' });
-        }
-        if (window.filterTube?.lastYtInitialData) {
-            searchTargets.push({ root: window.filterTube.lastYtInitialData, label: 'filterTube.lastYtInitialData' });
-        }
-        if (window.filterTube?.rawYtInitialData) {
-            searchTargets.push({ root: window.filterTube.rawYtInitialData, label: 'filterTube.rawYtInitialData' });
-        }
-
-        if (window.filterTube?.lastYtNextResponse) {
-            searchTargets.push({ root: window.filterTube.lastYtNextResponse, label: 'filterTube.lastYtNextResponse' });
-        }
-        if (window.filterTube?.lastYtBrowseResponse) {
-            searchTargets.push({ root: window.filterTube.lastYtBrowseResponse, label: 'filterTube.lastYtBrowseResponse' });
-        }
-
-        const ftPlayer = window.filterTube?.lastYtInitialPlayerResponse || window.filterTube?.rawYtInitialPlayerResponse;
-        if (ftPlayer) {
-            searchTargets.push({ root: ftPlayer, label: 'filterTube.lastYtInitialPlayerResponse' });
-        } else if (window.ytInitialPlayerResponse) {
-            searchTargets.push({ root: window.ytInitialPlayerResponse, label: 'ytInitialPlayerResponse' });
-        }
-
-        if (window.filterTube?.lastYtPlayerResponse) {
-            searchTargets.push({ root: window.filterTube.lastYtPlayerResponse, label: 'filterTube.lastYtPlayerResponse' });
         }
 
         let result = null;

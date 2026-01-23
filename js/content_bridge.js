@@ -648,6 +648,7 @@ const PREFETCH_TIMEOUT_MS = 5000;
 let prefetchQueue = [];
 let prefetchActive = 0;
 const prefetchSeen = new Set();
+const prefetchSeenAt = new Map();
 let prefetchObserver = null;
 let prefetchPaused = false;
 const observedPrefetchCards = new WeakSet();
@@ -801,8 +802,10 @@ function queuePrefetchForCard(card) {
     }
 
     const key = videoId;
-    if (prefetchSeen.has(key)) return;
+    const lastSeen = prefetchSeenAt.get(key) || 0;
+    if (prefetchSeen.has(key) && (Date.now() - lastSeen) < 30 * 1000) return;
     prefetchSeen.add(key);
+    prefetchSeenAt.set(key, Date.now());
 
     prefetchQueue.push({ videoId, card });
     if (prefetchQueue.length > PREFETCH_MAX_QUEUE) {
@@ -851,6 +854,28 @@ async function prefetchIdentityForCard({ videoId, card }) {
                     }
                 }
             } catch (e) {
+            }
+
+            // Kids: if we still don't have a UC ID mapping, try main-world snapshot search (still zero-network).
+            // This is critical for cases where FilterTubeEngine skips harvesting a particular response,
+            // or the DOM does not expose channel anchors.
+            if (!currentSettings?.videoChannelMap?.[videoId]) {
+                try {
+                    const ytInfo = await withTimeout(searchYtInitialDataForVideoChannel(videoId, null), PREFETCH_TIMEOUT_MS);
+                    if (ytInfo && (ytInfo.id || ytInfo.handle || ytInfo.customUrl)) {
+                        if (!ytInfo.id && ytInfo.handle) {
+                            const resolvedId = resolveIdFromHandle(ytInfo.handle);
+                            if (resolvedId) {
+                                ytInfo.id = resolvedId;
+                            }
+                        }
+                        stampChannelIdentity(card, ytInfo);
+                        if (ytInfo.id) {
+                            persistVideoChannelMapping(videoId, ytInfo.id);
+                        }
+                    }
+                } catch (e) {
+                }
             }
             return;
         }
@@ -3185,8 +3210,28 @@ function handleMainWorldMessages(event) {
 
             try {
                 const cards = document.querySelectorAll(`[data-filtertube-video-id="${videoId}"]`);
-                for (const card of cards) {
-                    stampChannelIdentity(card, { id: channelId });
+                if (cards && cards.length > 0) {
+                    for (const card of cards) {
+                        stampChannelIdentity(card, { id: channelId });
+                    }
+                } else {
+                    // If we haven't stamped `data-filtertube-video-id` yet (common on Kids due to DOM timing),
+                    // best-effort find matching anchors and stamp the surrounding card.
+                    const selectors = [
+                        `a[href*="watch?v=${videoId}"]`,
+                        `a[href*="/watch?v=${videoId}"]`,
+                        `a[href*="/shorts/${videoId}"]`,
+                        `a[href*="/watch/${videoId}"]`
+                    ];
+                    const anchors = document.querySelectorAll(selectors.join(','));
+                    anchors.forEach(anchor => {
+                        const card = findVideoCardElement(anchor);
+                        if (!card || !card.getAttribute) return;
+                        if (!card.getAttribute('data-filtertube-video-id')) {
+                            card.setAttribute('data-filtertube-video-id', videoId);
+                        }
+                        stampChannelIdentity(card, { id: channelId });
+                    });
                 }
             } catch (e) {
                 // ignore
@@ -3344,8 +3389,13 @@ async function initializeDOMFallback(settings) {
 
         // Set up a mutation observer to handle dynamic loading
         // We use a debounced version of the fallback to prevent performance issues
+        let lastFallbackRunTs = 0;
+        let pendingImmediateFallbackTimer = 0;
+        const MIN_FALLBACK_INTERVAL_MS = 250;
+
         const debouncedFallback = debounce(() => {
             applyDOMFallback(null);
+            lastFallbackRunTs = Date.now();
         }, 200);
 
         let immediateFallbackScheduled = false;
@@ -3354,6 +3404,24 @@ async function initializeDOMFallback(settings) {
             immediateFallbackScheduled = true;
             requestAnimationFrame(() => {
                 immediateFallbackScheduled = false;
+
+                const now = Date.now();
+                const elapsed = now - (lastFallbackRunTs || 0);
+                if (elapsed < MIN_FALLBACK_INTERVAL_MS) {
+                    if (pendingImmediateFallbackTimer) return;
+                    pendingImmediateFallbackTimer = setTimeout(() => {
+                        pendingImmediateFallbackTimer = 0;
+                        lastFallbackRunTs = Date.now();
+                        applyDOMFallback(null);
+                        try {
+                            schedulePrefetchScan();
+                        } catch (e) {
+                        }
+                    }, MIN_FALLBACK_INTERVAL_MS - elapsed);
+                    return;
+                }
+
+                lastFallbackRunTs = now;
                 applyDOMFallback(null);
                 try {
                     schedulePrefetchScan();
@@ -3470,6 +3538,14 @@ function debounce(func, delay) {
 // 3-DOT MENU - BLOCK CHANNEL FEATURE
 // ==========================================
 
+const ytInitialDataChannelCache = new Map();
+const ytInitialDataChannelCacheExpiry = new Map();
+const ytInitialDataChannelNegativeExpiry = new Map();
+const ytInitialDataChannelInFlight = new Map();
+
+const YT_INITIALDATA_CACHE_TTL_MS = 5 * 60 * 1000;
+const YT_INITIALDATA_NEGATIVE_TTL_MS = 20 * 1000;
+
 /**
  * Recursively search ytInitialData for channel info associated with a video ID
  * NOTE: The actual search runs in MAIN world (injector.js); this function simply
@@ -3485,22 +3561,80 @@ async function searchYtInitialDataForVideoChannel(videoId, options = null) {
     const resolvedOptions = typeof options === 'object' && options !== null
         ? options
         : { expectedHandle: options };
-    const result = await requestChannelInfoFromMainWorld(videoId, resolvedOptions);
-    if (!result) return null;
 
-    if (resolvedOptions.expectedHandle) {
-        const normalizedExpected = normalizeHandleValue(resolvedOptions.expectedHandle);
-        const normalizedFound = normalizeHandleValue(result.handle);
-        if (normalizedExpected && normalizedFound && normalizedExpected !== normalizedFound) {
-            console.warn('FilterTube: ytInitialData handle mismatch, rejecting result', {
-                expected: normalizedExpected,
-                found: normalizedFound,
-                videoId
-            });
+    const expectedHandleKey = resolvedOptions.expectedHandle ? normalizeHandleValue(resolvedOptions.expectedHandle).toLowerCase() : '';
+    const expectedNameKey = (typeof resolvedOptions.expectedName === 'string' ? resolvedOptions.expectedName.trim().toLowerCase().replace(/\s+/g, ' ') : '');
+    const cacheKey = `${videoId}|h:${expectedHandleKey}|n:${expectedNameKey}`;
+
+    const now = Date.now();
+    const negExpiry = ytInitialDataChannelNegativeExpiry.get(cacheKey) || 0;
+    if (negExpiry) {
+        if (now < negExpiry) {
+            return null;
+        }
+        ytInitialDataChannelNegativeExpiry.delete(cacheKey);
+    }
+
+    const expiry = ytInitialDataChannelCacheExpiry.get(cacheKey) || 0;
+    if (expiry) {
+        if (now < expiry) {
+            return ytInitialDataChannelCache.get(cacheKey) || null;
+        }
+        ytInitialDataChannelCacheExpiry.delete(cacheKey);
+        ytInitialDataChannelCache.delete(cacheKey);
+    }
+
+    if (ytInitialDataChannelInFlight.has(cacheKey)) {
+        try {
+            return await ytInitialDataChannelInFlight.get(cacheKey);
+        } catch (e) {
             return null;
         }
     }
-    return result;
+
+    const inFlight = (async () => {
+        const result = await requestChannelInfoFromMainWorld(videoId, resolvedOptions);
+        if (!result) return null;
+
+        if (resolvedOptions.expectedHandle) {
+            const normalizedExpected = normalizeHandleValue(resolvedOptions.expectedHandle);
+            const normalizedFound = normalizeHandleValue(result.handle);
+            if (normalizedExpected && normalizedFound && normalizedExpected !== normalizedFound) {
+                console.warn('FilterTube: ytInitialData handle mismatch, rejecting result', {
+                    expected: normalizedExpected,
+                    found: normalizedFound,
+                    videoId
+                });
+                return null;
+            }
+        }
+        return result;
+    })();
+
+    ytInitialDataChannelInFlight.set(cacheKey, inFlight);
+
+    try {
+        const result = await inFlight;
+        const nextNow = Date.now();
+        if (result) {
+            ytInitialDataChannelCache.set(cacheKey, result);
+            ytInitialDataChannelCacheExpiry.set(cacheKey, nextNow + YT_INITIALDATA_CACHE_TTL_MS);
+            ytInitialDataChannelNegativeExpiry.delete(cacheKey);
+        } else {
+            ytInitialDataChannelNegativeExpiry.set(cacheKey, nextNow + YT_INITIALDATA_NEGATIVE_TTL_MS);
+            ytInitialDataChannelCache.delete(cacheKey);
+            ytInitialDataChannelCacheExpiry.delete(cacheKey);
+        }
+        return result;
+    } catch (e) {
+        try {
+            ytInitialDataChannelNegativeExpiry.set(cacheKey, Date.now() + YT_INITIALDATA_NEGATIVE_TTL_MS);
+        } catch (err) {
+        }
+        return null;
+    } finally {
+        ytInitialDataChannelInFlight.delete(cacheKey);
+    }
 }
 
 /**
@@ -5338,6 +5472,38 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
     if (videoId && videoCard && !videoCard.getAttribute('data-filtertube-video-id')) {
         try {
             videoCard.setAttribute('data-filtertube-video-id', videoId);
+        } catch (e) {
+        }
+    }
+
+    // Stamp the best synchronous identity we have onto the clicked card immediately.
+    // This improves:
+    // - menu label fallback (name/id/handle)
+    // - mismatch-protection for main-world lookups
+    // - watch/shorts surfaces where cards are recycled rapidly
+    if (!isCommentThreadCard && videoCard && initialChannelInfo) {
+        try {
+            const safeId = typeof initialChannelInfo.id === 'string' ? initialChannelInfo.id.trim() : '';
+            if (safeId && safeId.toUpperCase().startsWith('UC') && !videoCard.getAttribute('data-filtertube-channel-id')) {
+                videoCard.setAttribute('data-filtertube-channel-id', safeId);
+            }
+
+            const safeHandle = typeof initialChannelInfo.handle === 'string' ? initialChannelInfo.handle.trim() : '';
+            if (safeHandle && safeHandle.startsWith('@') && !videoCard.getAttribute('data-filtertube-channel-handle')) {
+                videoCard.setAttribute('data-filtertube-channel-handle', safeHandle);
+            }
+
+            const safeCustom = typeof initialChannelInfo.customUrl === 'string' ? initialChannelInfo.customUrl.trim() : '';
+            if (safeCustom && !videoCard.getAttribute('data-filtertube-channel-custom')) {
+                videoCard.setAttribute('data-filtertube-channel-custom', safeCustom);
+            }
+
+            const safeName = typeof initialChannelInfo.name === 'string' ? initialChannelInfo.name.trim() : '';
+            if (safeName && safeName.toLowerCase() !== 'channel' && !safeName.startsWith('@') && !/^UC[a-zA-Z0-9_-]{22}$/.test(safeName) && !safeName.includes('•')) {
+                if (!videoCard.getAttribute('data-filtertube-channel-name')) {
+                    videoCard.setAttribute('data-filtertube-channel-name', safeName);
+                }
+            }
         } catch (e) {
         }
     }
