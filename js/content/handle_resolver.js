@@ -129,6 +129,20 @@ function extractHandleFromString(value) {
 // ==========================================
 const resolvedHandleCache = new Map();
 
+let pendingDomFallbackRerunTimer = 0;
+function scheduleDomFallbackRerun() {
+    if (pendingDomFallbackRerunTimer) return;
+    pendingDomFallbackRerunTimer = setTimeout(() => {
+        pendingDomFallbackRerunTimer = 0;
+        try {
+            if (typeof applyDOMFallback === 'function') {
+                applyDOMFallback(currentSettings, { forceReprocess: true });
+            }
+        } catch (e) {
+        }
+    }, 250);
+}
+
 async function fetchIdForHandle(handle, options = {}) {
     const { skipNetwork = false } = options;
     const normalizedHandle = normalizeHandleValue(handle);
@@ -205,13 +219,11 @@ async function fetchIdForHandle(handle, options = {}) {
                 source: 'content_bridge'
             }, '*');
 
-            console.log(`FilterTube: ✅ Resolved @${cleanHandle} -> ${id}`);
+            if (window.__filtertubeDebug) {
+                console.log(`FilterTube: ✅ Resolved @${cleanHandle} -> ${id}`);
+            }
 
-            setTimeout(() => {
-                if (typeof applyDOMFallback === 'function') {
-                    applyDOMFallback(currentSettings, { forceReprocess: true });
-                }
-            }, 50);
+            scheduleDomFallbackRerun();
             return id;
         }
         resolvedHandleCache.delete(cleanHandle);

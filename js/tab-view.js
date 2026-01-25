@@ -1832,7 +1832,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Subscribe to state changes
     StateManager.subscribe((eventType, data) => {
-        console.log('Tab-View: State changed', eventType, data);
+        if (window.__filtertubeDebug) {
+            console.log('Tab-View: State changed', eventType, data);
+        }
 
         if (['keywordAdded', 'keywordRemoved', 'keywordUpdated', 'load', 'save'].includes(eventType)) {
             renderKeywords();

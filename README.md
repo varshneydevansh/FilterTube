@@ -52,14 +52,17 @@ FilterTube is a browser extension that gives you control over your YouTube feed.
 - **Network Reduction**: Most channel identity comes from intercepted JSON, not page fetches.
 - **100% Private**: No data leaves your browser. No analytics. No tracking.
 
-### Proactive Channel Identity (v3.2.1)
+### Proactive Channel Identity (v3.2.2)
 
-FilterTube now uses a **proactive, XHR-first** strategy to extract channel identity before rendering, enhanced with lag-free performance optimizations:
+FilterTube now uses a **proactive, XHR-first** strategy to extract channel identity before rendering, enhanced with lag-free performance optimizations and improved user experience:
 
 - **XHR Interception**: Captures YouTube's JSON responses (`/youtubei/v1/next`, `/browse`, `/player`)
 - **Instant Stamping**: Broadcasts channel info across worlds to stamp DOM cards immediately
 - **Zero-Network Kids**: YouTube Kids works entirely without network fetches
 - **Smart Enrichment**: Post-block enrichment fills missing metadata at a controlled rate
+- **Optimistic UI**: Content hides instantly when blocked, with automatic restoration if needed
+- **Mobile Support**: Enhanced 3-dot menu injection for YouTube mobile with proper renderer handling
+- **Smooth Rendering**: Large channel lists render efficiently using idle scheduling and batching
 
 Learn more in [Proactive Channel Identity](docs/PROACTIVE_CHANNEL_IDENTITY.md).
 

@@ -4,6 +4,15 @@
 let lastClickedMenuButton = null;
 const isKidsSite = typeof location !== 'undefined' && location.hostname.includes('youtubekids.com');
 
+const blockChannelDebugLog = (...args) => {
+    try {
+        if (window.__filtertubeDebug) {
+            console.log(...args);
+        }
+    } catch (e) {
+    }
+};
+
 let lastKidsMenuContext = null;
 const KIDS_MENU_CONTEXT_TTL_MS = 15000;
 let lastKidsBlockActionTs = 0;
@@ -67,11 +76,12 @@ function setupMenuObserver() {
             '#menu button[aria-label], ' +
             'ytd-reel-item-renderer button[aria-label*="More"], ' +
             'ytd-reel-video-renderer button[aria-label*="More"], ' +
-            'ytm-menu-renderer button'
+            'ytm-menu-renderer button, ' +
+            'ytm-bottom-sheet-renderer button'
         );
         if (menuButton) {
             lastClickedMenuButton = menuButton;
-            console.log('FilterTube: 3-dot button clicked, button:', menuButton.getAttribute('aria-label'));
+            blockChannelDebugLog('FilterTube: 3-dot button clicked, button:', menuButton.getAttribute('aria-label'));
 
             // Also try to find and inject immediately into existing dropdown
             setTimeout(() => {
@@ -84,7 +94,15 @@ function setupMenuObserver() {
         if (!dropdown || dropdownVisibilityObservers.has(dropdown)) return;
         const obs = new MutationObserver(() => {
             try {
-                const isVisible = dropdown.style.display !== 'none' && dropdown.getAttribute('aria-hidden') !== 'true';
+                const hiddenAttr = dropdown.getAttribute('aria-hidden') === 'true' || dropdown.hasAttribute('hidden');
+                let styleVisible = true;
+                try {
+                    const style = window.getComputedStyle(dropdown);
+                    styleVisible = style.display !== 'none' && style.visibility !== 'hidden';
+                } catch (e) {
+                    styleVisible = dropdown.style.display !== 'none';
+                }
+                const isVisible = !hiddenAttr && styleVisible;
                 if (isVisible) {
                     handleDropdownAppeared(dropdown).catch(err => {
                         console.error('FilterTube: Error in handleDropdownAppeared:', err);
@@ -99,7 +117,7 @@ function setupMenuObserver() {
         });
         dropdownVisibilityObservers.set(dropdown, obs);
         try {
-            obs.observe(dropdown, { attributes: true, attributeFilter: ['style', 'aria-hidden'] });
+            obs.observe(dropdown, { attributes: true, attributeFilter: ['style', 'aria-hidden', 'hidden'] });
         } catch (e) {
         }
     }
@@ -112,7 +130,7 @@ function setupMenuObserver() {
         }
 
         try {
-            document.querySelectorAll('tp-yt-iron-dropdown').forEach(dd => ensureDropdownVisibilityObserver(dd));
+            document.querySelectorAll('tp-yt-iron-dropdown, ytm-menu-popup-renderer, bottom-sheet-container').forEach(dd => ensureDropdownVisibilityObserver(dd));
         } catch (e) {
         }
 
@@ -123,14 +141,24 @@ function setupMenuObserver() {
                 for (const node of mutation.addedNodes) {
                     if (node.nodeType !== 1) continue;
 
-                    const dropdown = node.matches?.('tp-yt-iron-dropdown') ? node : node.querySelector?.('tp-yt-iron-dropdown');
+                    const dropdown = node.matches?.('tp-yt-iron-dropdown, ytm-menu-popup-renderer, bottom-sheet-container')
+                        ? node
+                        : node.querySelector?.('tp-yt-iron-dropdown, ytm-menu-popup-renderer, bottom-sheet-container');
 
                     if (dropdown) {
                         ensureDropdownVisibilityObserver(dropdown);
-                        const isVisible = dropdown.style.display !== 'none' && dropdown.getAttribute('aria-hidden') !== 'true';
+                        const hiddenAttr = dropdown.getAttribute('aria-hidden') === 'true' || dropdown.hasAttribute('hidden');
+                        let styleVisible = true;
+                        try {
+                            const style = window.getComputedStyle(dropdown);
+                            styleVisible = style.display !== 'none' && style.visibility !== 'hidden';
+                        } catch (e) {
+                            styleVisible = dropdown.style.display !== 'none';
+                        }
+                        const isVisible = !hiddenAttr && styleVisible;
 
                         if (isVisible) {
-                            console.log('FilterTube: Dropdown added to DOM');
+                            blockChannelDebugLog('FilterTube: Dropdown added to DOM');
                             // Call async function without awaiting (fire and forget)
                             handleDropdownAppeared(dropdown).catch(err => {
                                 console.error('FilterTube: Error in handleDropdownAppeared:', err);
@@ -147,7 +175,7 @@ function setupMenuObserver() {
             subtree: true
         });
 
-        console.log('FilterTube: Menu observer started');
+        blockChannelDebugLog('FilterTube: Menu observer started');
     };
 
     startObserver();
@@ -188,7 +216,7 @@ function setupKidsPassiveBlockListener() {
                     if (toast && /(video|channel)\s+blocked/i.test(text)) {
                         // Suppress toast if click handler recently did it
                         if (Date.now() - lastKidsBlockClickTs < 2000) {
-                            console.log('FilterTube: Kids block toast suppressed (click recently handled)');
+                            blockChannelDebugLog('FilterTube: Kids block toast suppressed (click recently handled)');
                             return;
                         }
                         const blockType = /channel\s+blocked/i.test(text) ? 'channel' : 'video';
@@ -377,7 +405,7 @@ async function handleKidsNativeBlock(blockType = 'video', options = {}) {
     if (!dedupKey) return;
 
     if (handledKidsBlockActions.has(dedupKey)) {
-        console.log(`FilterTube: Kids block for "${dedupKey}" already handled (${options.source || 'event'})`);
+        blockChannelDebugLog(`FilterTube: Kids block for "${dedupKey}" already handled (${options.source || 'event'})`);
         return;
     }
 
@@ -386,7 +414,7 @@ async function handleKidsNativeBlock(blockType = 'video', options = {}) {
     lastKidsBlockActionTs = now;
     setTimeout(() => handledKidsBlockActions.delete(dedupKey), 10000);
 
-    console.log(`FilterTube: Handling Kids native ${blockType} block for:`, dedupKey);
+    blockChannelDebugLog(`FilterTube: Handling Kids native ${blockType} block for:`, dedupKey);
 
     const safeHandle = (channelHandleHint && channelHandleHint.startsWith('@')) ? channelHandleHint : '';
     const safeCustomUrl = (customUrlHint && (customUrlHint.startsWith('c/') || customUrlHint.startsWith('user/'))) ? customUrlHint : '';
@@ -427,13 +455,21 @@ async function handleKidsNativeBlock(blockType = 'video', options = {}) {
  * Try to inject into currently visible dropdown
  */
 function tryInjectIntoVisibleDropdown() {
-    const visibleDropdowns = document.querySelectorAll('tp-yt-iron-dropdown');
+    const visibleDropdowns = document.querySelectorAll('tp-yt-iron-dropdown, ytm-menu-popup-renderer, bottom-sheet-container');
 
     for (const dropdown of visibleDropdowns) {
-        const isVisible = dropdown.style.display !== 'none' && dropdown.getAttribute('aria-hidden') !== 'true';
+        const hiddenAttr = dropdown.getAttribute('aria-hidden') === 'true' || dropdown.hasAttribute('hidden');
+        let styleVisible = true;
+        try {
+            const style = window.getComputedStyle(dropdown);
+            styleVisible = style.display !== 'none' && style.visibility !== 'hidden';
+        } catch (e) {
+            styleVisible = dropdown.style.display !== 'none';
+        }
+        const isVisible = !hiddenAttr && styleVisible;
 
         if (isVisible) {
-            console.log('FilterTube: Found visible dropdown');
+            blockChannelDebugLog('FilterTube: Found visible dropdown');
             // Call async function without awaiting (fire and forget)
             handleDropdownAppeared(dropdown).catch(err => {
                 console.error('FilterTube: Error in handleDropdownAppeared:', err);
@@ -449,7 +485,7 @@ function tryInjectIntoVisibleDropdown() {
 async function handleDropdownAppeared(dropdown) {
     // Synchronous lock to prevent race conditions from multiple mutation events
     if (processingDropdowns.has(dropdown)) {
-        console.debug('FilterTube: Dropdown already being processed (sync lock), skipping');
+        blockChannelDebugLog('FilterTube: Dropdown already being processed (sync lock), skipping');
         return;
     }
     processingDropdowns.add(dropdown);
@@ -467,11 +503,11 @@ async function handleDropdownAppeared(dropdown) {
  */
 async function handleDropdownAppearedInternal(dropdown) {
     if (!lastClickedMenuButton) {
-        console.log('FilterTube: No button reference, skipping injection');
+        blockChannelDebugLog('FilterTube: No button reference, skipping injection');
         return;
     }
 
-    console.log('FilterTube: Dropdown appeared, finding video card...');
+    blockChannelDebugLog('FilterTube: Dropdown appeared, finding video card...');
 
     // Prefer comment-thread context first (YouTube comments 3-dot menu).
     // This lets us reuse the same injection/block pipeline while hiding the whole thread.
@@ -518,7 +554,7 @@ async function handleDropdownAppearedInternal(dropdown) {
     }
 
     if (videoCard) {
-        console.log('FilterTube: Found video card:', videoCard.tagName);
+        blockChannelDebugLog('FilterTube: Found video card:', videoCard.tagName);
 
         // Watch page: if we are using a watch header/owner renderer (which may not contain a watch link),
         // stamp the current videoId from URL so the menu enrichment path can use main-world lookups.
@@ -582,7 +618,7 @@ async function handleDropdownAppearedInternal(dropdown) {
 
         if (dropdownState?.videoCardId === videoCardId) {
             if (dropdownState.isProcessing) {
-                console.debug('FilterTube: Dropdown already processing for this video, skipping');
+                blockChannelDebugLog('FilterTube: Dropdown already processing for this video, skipping');
                 return;
             }
             if (dropdownState.isComplete) {
@@ -594,15 +630,15 @@ async function handleDropdownAppearedInternal(dropdown) {
                     const isStaleState = titleSpan?.textContent?.includes('✓') || titleSpan?.textContent?.includes('Blocking');
 
                     if (isStaleState) {
-                        console.log('FilterTube: Menu item has stale state, re-injecting fresh');
+                        blockChannelDebugLog('FilterTube: Menu item has stale state, re-injecting fresh');
                         injectedDropdowns.delete(dropdown);
                         // Continue to re-inject
                     } else {
-                        console.log('FilterTube: Dropdown already injected for this video, skipping');
+                        blockChannelDebugLog('FilterTube: Dropdown already injected for this video, skipping');
                         return;
                     }
                 } else {
-                    console.log('FilterTube: State says complete but menu item missing, re-injecting');
+                    blockChannelDebugLog('FilterTube: State says complete but menu item missing, re-injecting');
                     // Reset state and continue to re-inject
                     injectedDropdowns.delete(dropdown);
                 }
@@ -610,7 +646,7 @@ async function handleDropdownAppearedInternal(dropdown) {
         }
 
         if (dropdownState && dropdownState.videoCardId !== videoCardId) {
-            console.log('FilterTube: Dropdown reused for different video - will clean and reinject');
+            blockChannelDebugLog('FilterTube: Dropdown reused for different video - will clean and reinject');
             // Old items will be removed by injectFilterTubeMenuItem automatically
         }
 
@@ -622,7 +658,7 @@ async function handleDropdownAppearedInternal(dropdown) {
             for (const mutation of mutations) {
                 for (const node of mutation.removedNodes) {
                     if (node === videoCard || node.contains(videoCard)) {
-                        console.log('FilterTube: Video card removed, closing dropdown');
+                        blockChannelDebugLog('FilterTube: Video card removed, closing dropdown');
                         dropdown.style.display = 'none';
                         dropdown.setAttribute('aria-hidden', 'true');
                         observer.disconnect();
@@ -645,7 +681,7 @@ async function handleDropdownAppearedInternal(dropdown) {
                         const fetchData = pendingDropdownFetches.get(dropdown);
                         if (fetchData) {
                             fetchData.cancelled = true;
-                            console.log('FilterTube: Dropdown closed, marked fetch as cancelled');
+                            blockChannelDebugLog('FilterTube: Dropdown closed, marked fetch as cancelled');
                         }
                         dropdownObserver.disconnect();
                     }
@@ -671,13 +707,13 @@ async function handleDropdownAppearedInternal(dropdown) {
             injectedDropdowns.set(dropdown, { videoCardId, isProcessing: false, isComplete: false });
         }
     } else {
-        console.log('FilterTube: Could not find video card from button');
+        blockChannelDebugLog('FilterTube: Could not find video card from button');
 
         // CRITICAL: Clean up any stale FilterTube items from dropdown
         // (prevents old "✓ Channel Blocked" showing when we can't identify the video)
         const oldItems = dropdown.querySelectorAll('.filtertube-block-channel-item');
         if (oldItems.length > 0) {
-            console.log('FilterTube: Removing stale FilterTube items from dropdown');
+            blockChannelDebugLog('FilterTube: Removing stale FilterTube items from dropdown');
             oldItems.forEach(item => item.remove());
         }
     }

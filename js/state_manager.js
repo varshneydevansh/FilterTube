@@ -102,6 +102,9 @@ const StateManager = (() => {
     let isEnriching = false;
     let lastEnrichmentSignature = '';
 
+    const MAX_CHANNEL_ENRICHMENTS_PER_SESSION = 10;
+    let channelEnrichmentProcessedThisSession = 0;
+
     let isSaving = false;
     let listeners = [];
 
@@ -113,7 +116,11 @@ const StateManager = (() => {
      * Load settings from storage and populate state
      * @returns {Promise<Object>} Loaded state
      */
-    async function loadSettings() {
+    async function loadSettings(options = {}) {
+        const opts = options && typeof options === 'object' ? options : {};
+        const shouldNotify = opts.notify !== false;
+        const shouldResetEnrichment = opts.resetEnrichment !== false;
+        const shouldScheduleEnrichment = opts.scheduleEnrichment !== false;
         if (!SettingsAPI.loadSettings) {
             console.warn('StateManager: SettingsAPI.loadSettings not available');
             return state;
@@ -269,20 +276,30 @@ const StateManager = (() => {
                 subscriptions: profilesV3.kids.subscriptions || []
             };
         }
-        // Reset enrichment state so re-imports can re-run enrichment
-        resetEnrichmentState();
+        if (shouldResetEnrichment) {
+            // Reset enrichment state so re-imports can re-run enrichment
+            resetEnrichmentState();
+        }
         lastEnrichmentSignature = computeChannelSignature();
         state.isLoaded = true;
 
-        notifyListeners('load', state);
+        if (shouldNotify) {
+            notifyListeners('load', state);
+        }
         // Kick off async channel name enrichment after initial load
-        scheduleChannelNameEnrichment();
+        if (shouldScheduleEnrichment) {
+            scheduleChannelNameEnrichment();
+        }
         return state;
     }
 
+    let channelEnrichmentScheduled = false;
     function scheduleChannelNameEnrichment() {
         try {
+            if (channelEnrichmentScheduled) return;
+            channelEnrichmentScheduled = true;
             setTimeout(() => {
+                channelEnrichmentScheduled = false;
                 enqueueChannelEnrichment();
             }, 0);
         } catch (e) {
@@ -386,7 +403,6 @@ const StateManager = (() => {
     }
 
     function triggerChannelEnrichmentRefresh() {
-        resetEnrichmentState();
         enqueueChannelEnrichment();
         lastEnrichmentSignature = computeChannelSignature();
     }
@@ -411,13 +427,19 @@ const StateManager = (() => {
     function maybeRefreshEnrichmentFromChannels() {
         const sig = computeChannelSignature();
         if (sig !== lastEnrichmentSignature) {
-            triggerChannelEnrichmentRefresh();
+            lastEnrichmentSignature = sig;
+            enqueueChannelEnrichment();
         }
     }
 
     function processChannelEnrichmentQueue() {
         if (isEnriching) return;
         if (channelEnrichmentQueue.length === 0) return;
+
+        if (channelEnrichmentProcessedThisSession >= MAX_CHANNEL_ENRICHMENTS_PER_SESSION) {
+            channelEnrichmentQueue.length = 0;
+            return;
+        }
 
         const task = channelEnrichmentQueue.shift();
         if (!task || !task.input) {
@@ -428,11 +450,13 @@ const StateManager = (() => {
         isEnriching = true;
 
         const startedAt = Date.now();
-        console.log('FilterTube StateManager: channel enrichment start', {
-            input: task.input,
-            queueLength: channelEnrichmentQueue.length,
-            startedAt
-        });
+        if (window.__filtertubeDebug) {
+            console.log('FilterTube StateManager: channel enrichment start', {
+                input: task.input,
+                queueLength: channelEnrichmentQueue.length,
+                startedAt
+            });
+        }
 
         chrome.runtime.sendMessage({
             type: 'addFilteredChannel',
@@ -447,15 +471,18 @@ const StateManager = (() => {
             source: task.source || null,
             profile: task.profile || 'main'
         }, () => {
+            channelEnrichmentProcessedThisSession++;
             // throttle to avoid hammering
             const durationMs = Date.now() - startedAt;
             const delayMs = 5000 + Math.floor(Math.random() * 2000); // 5-7s backoff to reduce request burstiness
-            console.log('FilterTube StateManager: channel enrichment complete', {
-                input: task.input,
-                durationMs,
-                nextDelayMs: delayMs,
-                remainingQueue: channelEnrichmentQueue.length
-            });
+            if (window.__filtertubeDebug) {
+                console.log('FilterTube StateManager: channel enrichment complete', {
+                    input: task.input,
+                    durationMs,
+                    nextDelayMs: delayMs,
+                    remainingQueue: channelEnrichmentQueue.length
+                });
+            }
             setTimeout(() => {
                 isEnriching = false;
                 processChannelEnrichmentQueue();
@@ -1469,6 +1496,47 @@ const StateManager = (() => {
      */
     function setupStorageListener() {
         if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.onChanged) {
+            let externalReloadTimer = 0;
+            let externalReloadInFlight = false;
+            let externalReloadPending = false;
+
+            const runExternalReload = async () => {
+                if (externalReloadInFlight) {
+                    externalReloadPending = true;
+                    return;
+                }
+                const beforeSig = computeChannelSignature();
+                externalReloadInFlight = true;
+                try {
+                    // External reload should not trigger a full UI rerender via the 'load' event
+                    // and must not reset/schedule enrichment (it can cascade storage writes).
+                    await loadSettings({ notify: false, resetEnrichment: false, scheduleEnrichment: false });
+                } catch (e) {
+                } finally {
+                    externalReloadInFlight = false;
+                }
+
+                const afterSig = computeChannelSignature();
+                if (afterSig !== beforeSig) {
+                    notifyListeners('load', state);
+                } else {
+                    notifyListeners('externalUpdate', state);
+                }
+
+                if (externalReloadPending) {
+                    externalReloadPending = false;
+                    setTimeout(runExternalReload, 0);
+                }
+            };
+
+            const scheduleExternalReload = () => {
+                if (externalReloadTimer) return;
+                externalReloadTimer = setTimeout(() => {
+                    externalReloadTimer = 0;
+                    runExternalReload();
+                }, 150);
+            };
+
             chrome.storage.onChanged.addListener(async (changes, area) => {
                 if (area !== 'local' || isSaving) return;
 
@@ -1532,12 +1600,11 @@ const StateManager = (() => {
                 const hasSettingsChange = storageKeys.some(key => changes[key]);
 
                 if (hasSettingsChange) {
-                    console.log('StateManager: Detected external settings change, reloading...');
+                    if (window.__filtertubeDebug) {
+                        console.log('StateManager: Detected external settings change, reloading...');
+                    }
 
-                    // Reload all settings from storage to ensure sync
-                    await loadSettings();
-
-                    notifyListeners('externalUpdate', state);
+                    scheduleExternalReload();
                 }
             });
         }

@@ -100,14 +100,14 @@ let pendingStorageRefreshTimer = 0;
 let lastStorageRefreshTs = 0;
 const MIN_STORAGE_REFRESH_INTERVAL_MS = 250;
 
-function scheduleSettingsRefreshFromStorage() {
+function scheduleSettingsRefreshFromStorage({ forceReprocess = true } = {}) {
     const now = Date.now();
     const elapsed = now - lastStorageRefreshTs;
     if (elapsed >= MIN_STORAGE_REFRESH_INTERVAL_MS && !pendingStorageRefreshTimer) {
         lastStorageRefreshTs = now;
         requestSettingsFromBackground().then(result => {
             if (result?.success) {
-                applyDOMFallback(result.settings, { forceReprocess: true });
+                applyDOMFallback(result.settings, { forceReprocess: forceReprocess === true });
             }
         });
         return;
@@ -120,7 +120,7 @@ function scheduleSettingsRefreshFromStorage() {
         lastStorageRefreshTs = Date.now();
         requestSettingsFromBackground().then(result => {
             if (result?.success) {
-                applyDOMFallback(result.settings, { forceReprocess: true });
+                applyDOMFallback(result.settings, { forceReprocess: forceReprocess === true });
             }
         });
     }, delay);
@@ -133,6 +133,8 @@ function handleStorageChanges(changes, area) {
     if (changedKeys.length === 1 && changedKeys[0] === 'channelMap') {
         return;
     }
+
+    const isVideoChannelMapOnly = changedKeys.length === 1 && changedKeys[0] === 'videoChannelMap';
     const relevantKeys = [
         'enabled',
         'filterKeywords',
@@ -174,7 +176,7 @@ function handleStorageChanges(changes, area) {
     ];
     if (Object.keys(changes).some(key => relevantKeys.includes(key))) {
         // FIX: Apply changes IMMEDIATELY without debounce
-        scheduleSettingsRefreshFromStorage();
+        scheduleSettingsRefreshFromStorage({ forceReprocess: !isVideoChannelMapOnly });
     }
 }
 

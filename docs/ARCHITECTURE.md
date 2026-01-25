@@ -1,8 +1,67 @@
-# Architecture Documentation (v3.2.1)
+# Architecture Documentation (v3.2.2)
 
 ## Overview
 
-FilterTube v3.2.1 implements a comprehensive proactive channel identity system with advanced network interception, post-block enrichment, and robust fallback strategies. This architecture documentation covers the high-level design and component interactions.
+FilterTube v3.2.2 builds on the proactive channel identity system of v3.2.1 with significant UI/UX improvements including optimistic updates, enhanced mobile support, debug gating, and smoother rendering. This architecture documentation covers both the high-level design and the new user experience enhancements.
+
+## UI/UX Architecture (v3.2.2)
+
+### Optimistic Update System
+
+The optimistic update system provides immediate visual feedback while maintaining data integrity:
+
+```mermaid
+graph TD
+    A[User Action: Block Channel] --> B[Record Optimistic State]
+    B --> C[Apply Immediate UI Hide]
+    C --> D[Send to Background Script]
+    D --> E{Background Success?}
+    E -->|Yes| F[Keep Hidden - Success State]
+    E -->|No| G[Restore Optimistic State]
+    G --> H[Show Error State]
+    
+    style B fill:#e3f2fd
+    style C fill:#4caf50
+    style F fill:#4caf50
+    style G fill:#ffeb3b
+    style H fill:#f44336
+```
+
+**Components:**
+
+- **State Recording**: Captures DOM state before changes
+- **Immediate Updates**: Applies visual changes instantly
+- **Error Recovery**: Restores original state if operations fail
+- **User Feedback**: Shows success/error states appropriately
+
+### Mobile Menu Architecture
+
+Enhanced mobile menu support with platform-specific rendering:
+
+```mermaid
+graph TD
+    A[Menu Detection] --> B{Mobile Platform?}
+    B -->|Yes| C[ytm-menu-popup-renderer]
+    B -->|No| D[ytd-menu-popup-renderer]
+    C --> E[ytm-service-item-renderer]
+    D --> F[ytd-menu-service-item-renderer]
+    E --> G[Mobile-Optimized Item]
+    F --> H[Desktop-Optimized Item]
+    G --> I[Touch-Friendly Events]
+    H --> J[Mouse-Friendly Events]
+    
+    style C fill:#ff9800
+    style E fill:#ff9800
+    style G fill:#ff9800
+    style I fill:#ff9800
+```
+
+**Mobile Enhancements:**
+
+- **Platform Detection**: Automatically detects mobile vs desktop
+- **Renderer Selection**: Uses appropriate renderer tags and scopes
+- **Touch Optimization**: Maintains proper touch interactions
+- **Bottom Sheet Support**: Handles mobile bottom-sheet containers
 
 ## Core Architecture (v3.2.1)
 
@@ -32,9 +91,9 @@ graph TD
     N --> O[Compiled Caching System]
     O --> P[Responsive UI - No Lag]
     
-    style N fill:#e1f5fe
-    style O fill:#e1f5fe
-    style P fill:#c8e6c9
+    style N fill:#2196f3
+    style O fill:#2196f3
+    style P fill:#4caf50
 ```
 
 ### Network Snapshot Architecture
@@ -268,7 +327,7 @@ graph TD
     B -->|No| C[Build Channel Filter Index]
     B -->|Yes| D[Use Cached Index]
     C --> E[Cache Index in WeakMap]
-    D --> F[Fast O(1) Channel Lookups]
+    D --> F[Fast O1 Channel Lookups]
     E --> F
     
     G[Keyword Filtering] --> H{Cached Regex Exists?}
@@ -339,11 +398,11 @@ graph LR
     I --> L[Needs Tuning]
     J --> K
     
-    style B fill:#c8e6c9
-    style G fill:#c8e6c9
-    style C fill:#fff3e0
-    style K fill:#fff3e0
-    style L fill:#ffebee
+    style B fill:#4caf50
+    style G fill:#2e7d32
+    style C fill:#ff9800
+    style K fill:#f57c00
+    style L fill:#f44336
 ```
 
 ### Caching Strategy (v3.2.1+ Enhanced)
@@ -419,7 +478,7 @@ graph TD
     D --> E[Ultimate: DOM Extraction]
     E --> F[Last Resort: Generic Fallback]
     
-    F --> G[Channel Name: "Channel"]
+    F --> G[Channel Name: Channel]
     F --> H[Handle: null]
     F --> I[ID: null]
 ```

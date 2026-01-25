@@ -746,7 +746,12 @@ function handleCommentsFallback(settings) {
 
         const channelName = authorAnchor?.textContent?.trim() || thread.querySelector('#author-text')?.textContent?.trim() || '';
         const channelHref = authorAnchor?.getAttribute?.('href') || authorAnchor?.href || '';
-        const channelMeta = buildChannelMetadata(channelName, channelHref);
+        const channelMeta = (typeof extractChannelMetadataFromElement === 'function')
+            ? extractChannelMetadataFromElement(thread, channelName, channelHref, {
+                cacheTarget: authorAnchor || thread,
+                relatedElements: [authorAnchor].filter(Boolean)
+            })
+            : buildChannelMetadata(channelName, channelHref);
 
         // Honour pending/confirmed hides from the 3-dot UI, even if keyword filtering is off.
         const blockedChannelId = thread.getAttribute('data-filtertube-blocked-channel-id') || '';
@@ -842,8 +847,25 @@ async function applyDOMFallback(settings, options = {}) {
 
     currentSettings = effectiveSettings;
 
+    const scrollState = window.__filtertubeScrollState || (window.__filtertubeScrollState = {
+        lastScrollTs: 0,
+        listenerAttached: false
+    });
+    if (!scrollState.listenerAttached) {
+        scrollState.listenerAttached = true;
+        try {
+            window.addEventListener('scroll', () => {
+                scrollState.lastScrollTs = Date.now();
+            }, { passive: true, capture: true });
+        } catch (e) {
+        }
+    }
+
     const { forceReprocess = false, preserveScroll = true } = options;
-    const allowPreserveScroll = preserveScroll && !forceReprocess;
+    const now = Date.now();
+    const isUserScrolling = now - (scrollState.lastScrollTs || 0) < 150;
+    const allowPreserveScroll = preserveScroll && !forceReprocess && !isUserScrolling;
+    const runStartedAt = now;
 
     // Start tracking hide/restore operations
     filteringTracker.reset();
@@ -1706,15 +1728,34 @@ async function applyDOMFallback(settings, options = {}) {
     }
 
     if (allowPreserveScroll && scrollingElement) {
-        if (typeof scrollingElement.scrollTo === 'function') {
-            scrollingElement.scrollTo({ top: previousScrollTop, left: previousScrollLeft, behavior: 'instant' });
+        const didScrollDuringRun = (scrollState.lastScrollTs || 0) > runStartedAt;
+        const now2 = Date.now();
+        const isUserScrollingNow = now2 - (scrollState.lastScrollTs || 0) < 150;
+        if (didScrollDuringRun || isUserScrollingNow) {
+            // User scrolled while we were processing; do not fight the scroll position.
         } else {
-            window.scrollTo(previousScrollLeft, previousScrollTop);
+        try {
+            if (typeof scrollingElement.scrollTo === 'function') {
+                scrollingElement.scrollTo({ top: previousScrollTop, left: previousScrollLeft, behavior: 'auto' });
+            } else {
+                window.scrollTo(previousScrollLeft, previousScrollTop);
+            }
+        } catch (e) {
+            try {
+                window.scrollTo(previousScrollLeft, previousScrollTop);
+            } catch (e2) {
+            }
+        }
         }
     }
 
     // Log hide/restore summary
-    filteringTracker.logSummary();
+    try {
+        if (window.__filtertubeDebug) {
+            filteringTracker.logSummary();
+        }
+    } catch (e) {
+    }
 
     try {
         if (!window.__filtertubePlaylistSkipState) {

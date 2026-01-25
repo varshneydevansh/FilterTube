@@ -1,8 +1,129 @@
-# Technical Documentation (v3.2.1+ Performance Optimizations)
+# Technical Documentation (v3.2.2 UI/UX Improvements)
 
 ## Overview
 
-FilterTube v3.2.1+ implements comprehensive performance optimizations that eliminate user-perceived lag through advanced caching, async processing, and batched updates. This technical documentation covers the core performance mechanisms and implementation details.
+FilterTube v3.2.2 builds on the performance optimizations of v3.2.1 with significant UI/UX improvements including optimistic updates, enhanced mobile support, debug gating, and smoother rendering. This technical documentation covers both the core performance mechanisms and the new user experience enhancements.
+
+## UI/UX Improvements (v3.2.2)
+
+### Optimistic UI Updates with Automatic Restoration
+
+The most significant user experience improvement in v3.2.2 is the implementation of optimistic UI updates for channel blocking:
+
+```javascript
+// Optimistic hide state tracking
+const optimisticHideState = [];
+let didOptimisticHide = false;
+
+const recordOptimisticHide = (element, meta) => {
+    optimisticHideState.push({
+        element,
+        prevDisplay: element.style.display,
+        prevHiddenAttr: element.getAttribute('data-filtertube-hidden'),
+        prevHadHiddenClass: element.classList.contains('filtertube-hidden'),
+        prevBlocked: { /* capture all data attributes */ }
+    });
+    markElementAsBlocked(element, meta, 'pending');
+    element.style.display = 'none';
+    element.classList.add('filtertube-hidden');
+};
+
+const restoreOptimisticHide = () => {
+    // Restore all saved state if blocking fails
+    for (const item of optimisticHideState) {
+        // Restore display, classes, and attributes
+        element.style.display = item.prevDisplay || '';
+        // ... restore other properties
+    }
+    optimisticHideState.length = 0;
+};
+```
+
+**Benefits:**
+
+- **Instant Feedback**: Content hides immediately when user clicks "Block Channel"
+- **No Uncertainty**: Users see immediate results without wondering if the action worked
+- **Automatic Recovery**: If blocking fails, content automatically reappears
+- **Error Handling**: Failed operations show proper error states while maintaining UI consistency
+
+### Enhanced Mobile Menu Support
+
+v3.2.2 adds comprehensive support for YouTube mobile menu structures:
+
+```javascript
+// Mobile menu detection and renderer selection
+const isMobileMenu = Boolean(menuList.closest?.('ytm-menu-popup-renderer')) || 
+                    Boolean(menuContainer?.matches?.('ytm-menu-popup-renderer'));
+
+const rendererTag = isMobileMenu ? 'ytm-menu-service-item-renderer' : 'ytd-menu-service-item-renderer';
+const rendererScope = isMobileMenu ? 'ytm-menu-popup-renderer' : 'ytd-menu-popup-renderer';
+
+// Create appropriate menu item for the platform
+const filterTubeItem = document.createElement(rendererTag);
+filterTubeItem.className = `style-scope ${rendererScope} filtertube-block-channel-item`;
+```
+
+**Mobile Enhancements:**
+
+- **Proper Renderer Tags**: Uses `ytm-*` tags for mobile instead of `ytd-*`
+- **Scope Handling**: Correct CSS scoping for mobile vs desktop
+- **Bottom Sheet Support**: Handles mobile bottom-sheet containers
+- **Touch-Friendly**: Maintains proper touch interactions on mobile devices
+
+### Debug Gated Logging System
+
+All console output is now gated behind a debug flag to reduce production noise:
+
+```javascript
+const debugLog = (...args) => {
+    try {
+        if (window.__filtertubeDebug) {
+            console.log(...args);
+        }
+    } catch (e) {
+        // Silent fail if debug flag not available
+    }
+};
+
+// Usage throughout codebase
+if (window.__filtertubeDebug) {
+    console.log('FilterTube: Detailed operation info');
+}
+```
+
+**Debug Benefits:**
+
+- **Clean Production**: No console spam for regular users
+- **Full Debug Info**: Developers can enable with `window.__filtertubeDebug = true`
+- **Performance**: Reduced console overhead in production
+- **Selective Logging**: Only important errors show without debug flag
+
+### Scroll Preservation During Filtering
+
+Enhanced DOM fallback processing respects user scrolling:
+
+```javascript
+const scrollState = window.__filtertubeScrollState || (window.__filtertubeScrollState = {
+    lastScrollTs: 0,
+    listenerAttached: false
+});
+
+// Track user scrolling
+window.addEventListener('scroll', () => {
+    scrollState.lastScrollTs = Date.now();
+}, { passive: true, capture: true });
+
+// Preserve scroll position during filtering
+const isUserScrolling = now - (scrollState.lastScrollTs || 0) < 150;
+const allowPreserveScroll = preserveScroll && !forceReprocess && !isUserScrolling;
+```
+
+**Scroll Benefits:**
+
+- **No Jarring Jumps**: Scroll position stays stable during filtering
+- **User Respect**: Doesn't fight user scrolling operations
+- **Smooth Experience**: Filtering happens invisibly in the background
+- **Intelligent Behavior**: Only preserves scroll when appropriate
 
 ## Performance Optimizations (v3.2.1+)
 

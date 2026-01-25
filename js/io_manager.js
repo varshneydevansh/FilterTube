@@ -1134,6 +1134,18 @@
 
         const incomingV4 = parsed.profilesV4;
         const incomingProfiles = safeObject(incomingV4?.profiles);
+        const incomingActiveId = normalizeString(incomingV4?.activeProfileId) || incomingExportProfileId || DEFAULT_PROFILE_ID;
+        const importingProfileId = incomingExportType === 'profile'
+            ? (incomingExportProfileId || incomingActiveId)
+            : '';
+        const shouldImportIntoSeparateProfile = Boolean(
+            incomingExportType === 'profile'
+            && localActiveId === DEFAULT_PROFILE_ID
+            && importingProfileId
+            && importingProfileId !== DEFAULT_PROFILE_ID
+        );
+        const shouldTouchLegacyV3 = canTouchLegacyV3 && !shouldImportIntoSeparateProfile;
+
         let incomingProfileForImport = null;
         if (incomingV4) {
             if (effectiveScope === 'active' && localActiveId !== DEFAULT_PROFILE_ID) {
@@ -1181,7 +1193,7 @@
 
         const nextChannelMap = { ...safeObject(current.channelMap), ...safeObject(parsed.channelMap) };
 
-        const mainSettingsOverrides = canTouchLegacyV3 ? safeObject(parsed.mainSettings) : {};
+        const mainSettingsOverrides = shouldTouchLegacyV3 ? safeObject(parsed.mainSettings) : {};
 
         const payload = {
             keywords: nextKeywords,
@@ -1217,7 +1229,9 @@
             hideSearchShelves: Object.prototype.hasOwnProperty.call(mainSettingsOverrides, 'hideSearchShelves') ? !!mainSettingsOverrides.hideSearchShelves : current.hideSearchShelves
         };
 
-        const result = await SettingsAPI.saveSettings(payload);
+        const result = shouldImportIntoSeparateProfile
+            ? { compiledSettings: null, error: null, skipped: true }
+            : await SettingsAPI.saveSettings(payload);
 
         const incomingApplyKidsRulesOnMain = incomingV4Settings
             ? !!incomingV4Settings.syncKidsToMain
@@ -1235,7 +1249,7 @@
         let nextKidsBlockedKeywordsForV4 = null;
         let nextKidsStrictModeForV4 = null;
 
-        if (canTouchLegacyV3) {
+        if (shouldTouchLegacyV3) {
             const storedProfiles = await loadProfilesV3();
 
             const nextProfiles = {
@@ -1361,56 +1375,82 @@
 
             const profiles = safeObject(nextV4?.profiles);
             const activeId = normalizeString(desiredActiveId) || DEFAULT_PROFILE_ID;
-            const activeProfile = profiles[activeId] && typeof profiles[activeId] === 'object' ? profiles[activeId] : {};
-            const activeSettings = safeObject(activeProfile.settings);
+            const writeActiveId = activeId;
 
-            if (!canTouchLegacyV3) {
-                const currentKids = safeObject(activeProfile.kids);
-                nextKidsBlockedChannelsForV4 = strategy === 'replace'
-                    ? incomingKidsBlockedChannels
-                    : mergeChannelLists(safeArray(currentKids.blockedChannels), incomingKidsBlockedChannels);
-                nextKidsBlockedKeywordsForV4 = strategy === 'replace'
-                    ? incomingKidsBlockedKeywords
-                    : mergeKeywordLists(safeArray(currentKids.blockedKeywords), incomingKidsBlockedKeywords);
+            const targetProfileId = shouldImportIntoSeparateProfile
+                ? importingProfileId
+                : activeId;
 
-                const incomingStrict = (incomingProfileForImport && typeof safeObject(incomingProfileForImport.kids).strictMode === 'boolean')
-                    ? safeObject(incomingProfileForImport.kids).strictMode
-                    : parsed.profilesV3.kids.strictMode;
-                nextKidsStrictModeForV4 = incomingStrict !== false;
-            }
+            const targetProfile = (profiles[targetProfileId] && typeof profiles[targetProfileId] === 'object')
+                ? profiles[targetProfileId]
+                : {};
+            const targetSettings = safeObject(targetProfile.settings);
+            const targetMain = safeObject(targetProfile.main);
+            const targetKids = safeObject(targetProfile.kids);
 
-            profiles[activeId] = {
-                ...activeProfile,
-                name: typeof activeProfile.name === 'string' ? activeProfile.name : 'Default',
+            const incomingStrict = (incomingProfileForImport && typeof safeObject(incomingProfileForImport.kids).strictMode === 'boolean')
+                ? safeObject(incomingProfileForImport.kids).strictMode
+                : parsed.profilesV3.kids.strictMode;
+            const desiredKidsStrict = incomingStrict !== false;
+
+            const targetNextChannels = shouldImportIntoSeparateProfile
+                ? (strategy === 'replace'
+                    ? parsedMainChannels
+                    : mergeChannelLists(safeArray(targetMain.channels), parsedMainChannels))
+                : nextChannels;
+            const targetNextKeywords = shouldImportIntoSeparateProfile
+                ? (strategy === 'replace'
+                    ? parsedMainKeywords
+                    : mergeKeywordLists(safeArray(targetMain.keywords), parsedMainKeywords))
+                : nextKeywords;
+
+            const desiredKidsBlockedChannels = strategy === 'replace'
+                ? incomingKidsBlockedChannels
+                : mergeChannelLists(safeArray(targetKids.blockedChannels), incomingKidsBlockedChannels);
+            const desiredKidsBlockedKeywords = strategy === 'replace'
+                ? incomingKidsBlockedKeywords
+                : mergeKeywordLists(safeArray(targetKids.blockedKeywords), incomingKidsBlockedKeywords);
+
+            profiles[targetProfileId] = {
+                ...targetProfile,
+                type: typeof targetProfile.type === 'string'
+                    ? targetProfile.type
+                    : (targetProfileId === DEFAULT_PROFILE_ID ? 'account' : 'child'),
+                parentProfileId: (targetProfileId === DEFAULT_PROFILE_ID)
+                    ? null
+                    : (targetProfile.parentProfileId != null ? targetProfile.parentProfileId : DEFAULT_PROFILE_ID),
+                name: typeof targetProfile.name === 'string'
+                    ? targetProfile.name
+                    : (targetProfileId === DEFAULT_PROFILE_ID ? 'Default' : 'Profile'),
                 settings: {
-                    ...activeSettings,
+                    ...targetSettings,
                     syncKidsToMain: !!incomingApplyKidsRulesOnMain
                 },
                 main: {
-                    ...(activeProfile.main || {}),
-                    channels: nextChannels,
-                    keywords: nextKeywords
+                    ...targetMain,
+                    channels: targetNextChannels,
+                    keywords: targetNextKeywords
                 },
                 kids: {
-                    ...(activeProfile.kids || {}),
+                    ...targetKids,
                     mode: 'blocklist',
-                    strictMode: nextKidsStrictModeForV4 !== false,
-                    blockedChannels: safeArray(nextKidsBlockedChannelsForV4),
-                    blockedKeywords: safeArray(nextKidsBlockedKeywordsForV4)
+                    strictMode: desiredKidsStrict,
+                    blockedChannels: safeArray(desiredKidsBlockedChannels),
+                    blockedKeywords: safeArray(desiredKidsBlockedKeywords)
                 }
             };
 
             await saveProfilesV4({
                 ...nextV4,
                 schemaVersion: 4,
-                activeProfileId: activeId,
+                activeProfileId: writeActiveId,
                 profiles
             });
         } catch (e) {
             console.warn('FilterTube: importV3 failed to sync ftProfilesV4', e);
         }
 
-        if (canTouchLegacyV3 && parsed.theme && SettingsAPI.setThemePreference) {
+        if (shouldTouchLegacyV3 && parsed.theme && SettingsAPI.setThemePreference) {
             try {
                 await SettingsAPI.setThemePreference(parsed.theme);
             } catch (e) {

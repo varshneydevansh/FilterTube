@@ -3,6 +3,21 @@
     "_comment": "Shared release notes source for the dashboard What's New tab and the YouTube release banner. Keep entries sorted newest-first by version."
   },
   {
+    "version": "3.2.2",
+    "headline": "UI/UX Improvements + Debug Gating",
+    "summary": "Enhanced user experience with optimistic UI updates, mobile menu support, and debug gating for cleaner console output.",
+    "bannerSummary": "Instant visual feedback, mobile support, and smoother rendering.",
+    "highlights": [
+      "Optimistic UI updates hide content instantly with automatic restoration if blocking fails",
+      "Enhanced mobile menu support with proper YouTube mobile renderer handling",
+      "All console logs now gated behind debug flag to reduce production noise",
+      "Scroll preservation during filtering prevents jarring position changes",
+      "Channel enrichment limits prevent excessive background requests",
+      "Idle-scheduled rendering for smoother large list updates"
+    ],
+    "detailsUrl": "docs/CHANGELOG.md#version-322"
+  },
+  {
     "version": "3.2.1",
     "headline": "Lag-Free Processing + Performance Boost",
     "summary": "Major performance optimizations eliminate UI lag, with excellent results in Chromium browsers and significant improvements in Firefox.",

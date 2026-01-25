@@ -15,6 +15,19 @@ const RenderEngine = (() => {
     const getUIComponents = () => window.UIComponents;
     const getSettings = () => window.FilterTubeSettings || {};
 
+    const scheduleIdle = (cb) => {
+        if (typeof requestIdleCallback === 'function') {
+            return requestIdleCallback(cb, { timeout: 250 });
+        }
+        return setTimeout(() => cb({ didTimeout: true, timeRemaining: () => 0 }), 0);
+    };
+
+    const cancelIdle = (id) => {
+        if (!id) return;
+        if (typeof cancelIdleCallback === 'function') cancelIdleCallback(id);
+        else clearTimeout(id);
+    };
+
     // ============================================================================
     // KEYWORD RENDERING
     // ============================================================================
@@ -367,8 +380,14 @@ const RenderEngine = (() => {
     function renderChannelList(container, options = {}) {
         if (!container) return;
 
+        cancelIdle(container.__ftChannelRenderTaskId);
+        container.__ftChannelRenderTaskId = 0;
+        container.__ftChannelRenderGen = (container.__ftChannelRenderGen || 0) + 1;
+        const renderGen = container.__ftChannelRenderGen;
+
         const StateManager = getStateManager();
         const state = StateManager?.getState() || { channels: [], kids: { blockedChannels: [] } };
+        const Settings = getSettings();
 
         const {
             showSearch = false,
@@ -383,43 +402,40 @@ const RenderEngine = (() => {
             onDelete = null
         } = options;
 
+        const deriveChannelKey = (entry) => {
+            try {
+                if (Settings?.getChannelDerivedKey) return Settings.getChannelDerivedKey(entry);
+            } catch (e) {
+            }
+            const id = (entry?.id || '').toLowerCase();
+            const handle = (entry?.handle || '').toLowerCase();
+            const customUrl = (entry?.customUrl || '').toLowerCase();
+            const name = (entry?.name || '').toLowerCase();
+            return id || handle || customUrl || name;
+        };
+
         let channelsSource = profile === 'kids'
             ? (state.kids?.blockedChannels || [])
             : state.channels;
 
         if (profile !== 'kids' && state.syncKidsToMain) {
-            const Settings = getSettings();
             const kidsChannels = Array.isArray(state.kids?.blockedChannels) ? state.kids.blockedChannels : [];
             const mainChannels = Array.isArray(state.channels) ? state.channels : [];
-            const getKey = (entry) => {
-                try {
-                    if (Settings?.getChannelDerivedKey) return Settings.getChannelDerivedKey(entry);
-                } catch (e) {
-                }
-                const id = (entry?.id || '').toLowerCase();
-                const handle = (entry?.handle || '').toLowerCase();
-                const customUrl = (entry?.customUrl || '').toLowerCase();
-                const name = (entry?.name || '').toLowerCase();
-                return id || handle || customUrl || name;
-            };
-
-            const seen = new Set(mainChannels.map(getKey).filter(Boolean));
+            const seen = new Set(mainChannels.map(deriveChannelKey).filter(Boolean));
             const kidsOnly = [];
             kidsChannels.forEach(ch => {
-                const key = getKey(ch);
+                const key = deriveChannelKey(ch);
                 if (!key || seen.has(key)) return;
                 seen.add(key);
                 kidsOnly.push({ ...ch, __ftFromKids: true });
             });
-
             channelsSource = [...mainChannels, ...kidsOnly];
         }
+
         const { groups: collaborationGroups } = groupChannelsByCollaboration(state.channels);
 
-        // Filter and sort channels
         let displayChannels = [...channelsSource];
 
-        // Apply search filter
         if (showSearch && searchValue) {
             const search = searchValue.toLowerCase();
             displayChannels = displayChannels.filter(ch => {
@@ -430,7 +446,6 @@ const RenderEngine = (() => {
             });
         }
 
-        // Apply date filter
         if ((typeof dateFrom === 'number' && Number.isFinite(dateFrom)) || (typeof dateTo === 'number' && Number.isFinite(dateTo))) {
             const from = (typeof dateFrom === 'number' && Number.isFinite(dateFrom)) ? dateFrom : null;
             const to = (typeof dateTo === 'number' && Number.isFinite(dateTo)) ? dateTo : null;
@@ -442,22 +457,18 @@ const RenderEngine = (() => {
             });
         }
 
-        // Apply sorting
         if (showSort) {
             if (sortValue === 'az') {
                 displayChannels.sort((a, b) => (a.name || a.id).localeCompare(b.name || b.id));
             } else if (sortValue === 'oldest') {
                 displayChannels.sort((a, b) => safeTimestamp(a.addedAt) - safeTimestamp(b.addedAt));
             } else {
-                // newest
                 displayChannels.sort((a, b) => safeTimestamp(b.addedAt) - safeTimestamp(a.addedAt));
             }
         }
 
-        // Clear container
         container.innerHTML = '';
 
-        // Empty state
         if (displayChannels.length === 0) {
             const emptyMsg = showSearch && searchValue
                 ? 'No channels found'
@@ -471,31 +482,39 @@ const RenderEngine = (() => {
             return;
         }
 
+        const mainIndexByRef = new Map();
+        const mainList = Array.isArray(state.channels) ? state.channels : [];
+        mainList.forEach((ch, idx) => mainIndexByRef.set(ch, idx));
+
+        const kidsList = Array.isArray(state.kids?.blockedChannels) ? state.kids.blockedChannels : [];
+        const kidsIndexByRef = new Map();
+        const kidsIndexByKey = new Map();
+        kidsList.forEach((ch, idx) => {
+            kidsIndexByRef.set(ch, idx);
+            const key = deriveChannelKey(ch);
+            if (key && !kidsIndexByKey.has(key)) kidsIndexByKey.set(key, idx);
+        });
+
         const renderChannelRow = (channel) => {
             const isFromKids = !!channel?.__ftFromKids;
             const effectiveProfile = isFromKids ? 'kids' : profile;
 
             let listIndex = -1;
             if (effectiveProfile === 'kids') {
-                const kidsList = Array.isArray(state.kids?.blockedChannels) ? state.kids.blockedChannels : [];
-                const Settings = getSettings();
-                const getKey = (entry) => {
-                    try {
-                        if (Settings?.getChannelDerivedKey) return Settings.getChannelDerivedKey(entry);
-                    } catch (e) {
-                    }
-                    const id = (entry?.id || '').toLowerCase();
-                    const handle = (entry?.handle || '').toLowerCase();
-                    const customUrl = (entry?.customUrl || '').toLowerCase();
-                    const name = (entry?.name || '').toLowerCase();
-                    return id || handle || customUrl || name;
-                };
-                const targetKey = getKey(channel);
-                listIndex = targetKey
-                    ? kidsList.findIndex(ch => getKey(ch) === targetKey)
-                    : kidsList.indexOf(channel);
+                const targetKey = deriveChannelKey(channel);
+                if (targetKey && kidsIndexByKey.has(targetKey)) {
+                    listIndex = kidsIndexByKey.get(targetKey);
+                } else if (kidsIndexByRef.has(channel)) {
+                    listIndex = kidsIndexByRef.get(channel);
+                } else {
+                    listIndex = kidsList.indexOf(channel);
+                }
             } else {
-                listIndex = state.channels.indexOf(channel);
+                if (mainIndexByRef.has(channel)) {
+                    listIndex = mainIndexByRef.get(channel);
+                } else {
+                    listIndex = mainList.indexOf(channel);
+                }
             }
 
             const collaborationMeta = (effectiveProfile === 'kids') ? null : buildCollaborationMeta(channel, collaborationGroups);
@@ -508,20 +527,42 @@ const RenderEngine = (() => {
             });
         };
 
-        // Popup/minimal mode renders a flat list with subtle indicators only
-        if (minimal) {
-            displayChannels.forEach(channel => {
-                const item = renderChannelRow(channel);
-                container.appendChild(item);
-            });
-            return;
-        }
+        let cursor = 0;
+        const total = displayChannels.length;
+        const batchSize = minimal ? 80 : 60;
+        const minBatch = minimal ? 20 : 15;
 
-        // Render channels in the exact order of the filtered/sorted list.
-        displayChannels.forEach(channel => {
-            const item = renderChannelRow(channel);
-            container.appendChild(item);
-        });
+        const processBatch = (deadline) => {
+            if (container.__ftChannelRenderGen !== renderGen) return;
+
+            const fragment = document.createDocumentFragment();
+            let processed = 0;
+
+            while (cursor < total && processed < batchSize) {
+                const shouldYield = deadline
+                    && !deadline.didTimeout
+                    && typeof deadline.timeRemaining === 'function'
+                    && processed >= minBatch
+                    && deadline.timeRemaining() <= 4;
+                if (shouldYield) break;
+
+                const item = renderChannelRow(displayChannels[cursor]);
+                cursor += 1;
+                processed += 1;
+                if (item instanceof Node) fragment.appendChild(item);
+            }
+
+            container.appendChild(fragment);
+
+            if (cursor < total) {
+                container.__ftChannelRenderTaskId = scheduleIdle(processBatch);
+                return;
+            }
+
+            container.__ftChannelRenderTaskId = 0;
+        };
+
+        processBatch({ didTimeout: true, timeRemaining: () => 0 });
     }
 
     /**

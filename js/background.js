@@ -3036,7 +3036,12 @@ async function fetchChannelInfo(channelIdOrHandle) {
 
 browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (!message?.type) return false;
-    console.log('FilterTube Background: Received message:', message.type);
+    try {
+        if (globalThis?.__filtertubeDebug) {
+            console.log('FilterTube Background: Received message:', message.type);
+        }
+    } catch (e) {
+    }
 
     if (message.type === 'addFilteredChannel') {
         handleAddFilteredChannel(
@@ -3702,6 +3707,10 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             } catch (e) { }
         } else {
             storageWritePayload.filterChannels = channels;
+            try {
+                storageWritePayload.uiChannels = safeArray(channels).map(ch => (typeof ch?.name === 'string' ? ch.name : '')).filter(Boolean);
+            } catch (e) {
+            }
         }
 
         await browserAPI.storage.local.set(storageWritePayload);

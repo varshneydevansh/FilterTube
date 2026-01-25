@@ -267,6 +267,14 @@ function forceCloseDropdown(dropdown) {
 
     dropdown.style.display = 'none';
     dropdown.setAttribute('aria-hidden', 'true');
+    try {
+        if (dropdown.matches?.('ytm-menu-popup-renderer')) {
+            dropdown.setAttribute('hidden', '');
+        } else {
+            dropdown.removeAttribute('hidden');
+        }
+    } catch (e) {
+    }
 
     // Click elsewhere to release focus trap
     setTimeout(() => {
@@ -319,7 +327,7 @@ function injectCollaboratorPlaceholderMenu(newMenuList, oldMenuList, message = '
             const item = document.createElement('yt-list-item-view-model');
             item.className = 'yt-list-item-view-model filtertube-block-channel-item filtertube-collab-placeholder';
             item.setAttribute('role', 'menuitem');
-            item.setAttribute('tabindex', '-1');
+            item.setAttribute('tabindex', '0');
             item.style.opacity = '0.6';
             item.style.pointerEvents = 'none';
             item.innerHTML = `
@@ -333,16 +341,20 @@ function injectCollaboratorPlaceholderMenu(newMenuList, oldMenuList, message = '
         newMenuList.insertBefore(makeItem(message, 'Please wait…'), newMenuList.firstChild);
         newMenuList.insertBefore(makeItem(blockAllMessage, 'Awaiting collaborator list'), newMenuList.firstChild.nextSibling);
     } else if (oldMenuList) {
-        const menuList = oldMenuList.querySelector('tp-yt-paper-listbox') || oldMenuList;
+        const menuList = oldMenuList.querySelector('tp-yt-paper-listbox#items') || oldMenuList.querySelector('tp-yt-paper-listbox') || oldMenuList;
+        const isMobileMenu = Boolean(menuList.closest?.('ytm-menu-popup-renderer'));
+        const rendererTag = isMobileMenu ? 'ytm-menu-service-item-renderer' : 'ytd-menu-service-item-renderer';
+        const rendererScope = isMobileMenu ? 'ytm-menu-popup-renderer' : 'ytd-menu-popup-renderer';
+        const itemScope = isMobileMenu ? 'ytm-menu-service-item-renderer' : 'ytd-menu-service-item-renderer';
         const makeItem = (primary, secondary) => {
-            const item = document.createElement('ytd-menu-service-item-renderer');
-            item.className = 'style-scope ytd-menu-popup-renderer filtertube-block-channel-item filtertube-collab-placeholder';
+            const item = document.createElement(rendererTag);
+            item.className = `style-scope ${rendererScope} filtertube-block-channel-item filtertube-collab-placeholder`;
             item.setAttribute('role', 'menuitem');
             item.setAttribute('tabindex', '-1');
             item.style.opacity = '0.6';
             item.style.pointerEvents = 'none';
             item.innerHTML = `
-                <tp-yt-paper-item class="style-scope ytd-menu-service-item-renderer filtertube-menu-item" role="option" tabindex="-1">
+                <tp-yt-paper-item class="style-scope ${itemScope} filtertube-menu-item" role="option" tabindex="-1">
                     ${buildPlaceholderContent(primary, secondary)}
                 </tp-yt-paper-item>
             `;
@@ -360,7 +372,13 @@ function getMenuContainers(dropdown, existingNew, existingOld) {
     }
     const newMenuList = dropdown.querySelector('yt-list-view-model');
     const oldMenuList = dropdown.querySelector(
+        'tp-yt-paper-listbox#items, ' +
         'tp-yt-paper-listbox, ' +
+        'ytm-menu-popup-renderer, ' +
+        'ytm-menu-service-item-renderer, ' +
+        '#items.ytm-menu-popup-renderer, ' +
+        '#items.style-scope.ytm-menu-popup-renderer, ' +
+        'bottom-sheet-container, ' +
         'ytd-menu-popup-renderer, ' +
         'ytd-menu-service-item-renderer, ' +
         '#items.ytd-menu-popup-renderer, ' +
@@ -1007,7 +1025,7 @@ let filteringTracker = {
     },
 
     recordHide(element, reason) {
-        if (!this.isActive) return;
+        if (!this.isActive || !window.__filtertubeDebug) return;
         const title = element.querySelector('#video-title, h3 a, .yt-lockup-metadata-view-model__title')?.textContent?.trim() ||
             element.getAttribute('aria-label')?.substring(0, 50) ||
             'Unknown';
@@ -1019,7 +1037,7 @@ let filteringTracker = {
     },
 
     recordRestore(element) {
-        if (!this.isActive) return;
+        if (!this.isActive || !window.__filtertubeDebug) return;
         const title = element.querySelector('#video-title, h3 a, .yt-lockup-metadata-view-model__title')?.textContent?.trim() ||
             element.getAttribute('aria-label')?.substring(0, 50) ||
             'Unknown';
@@ -1033,6 +1051,12 @@ let filteringTracker = {
     logSummary() {
         if (!this.isActive) return;
         this.isActive = false;
+
+        if (!window.__filtertubeDebug) {
+            this.hiddenItems = [];
+            this.restoredItems = [];
+            return;
+        }
 
         if (this.hiddenItems.length > 0 || this.restoredItems.length > 0) {
             console.log('%c📊 FilterTube Hide/Restore Summary', 'font-weight: bold; font-size: 14px; color: #FF6B6B;');
@@ -1051,6 +1075,9 @@ let filteringTracker = {
             console.log(`%c📈 Net change: ${this.hiddenItems.length - this.restoredItems.length > 0 ? '+' : ''}${this.hiddenItems.length - this.restoredItems.length} hidden`,
                 'color: #6B8AFF; font-weight: bold;');
         }
+
+        this.hiddenItems = [];
+        this.restoredItems = [];
     }
 };
 
@@ -3804,11 +3831,15 @@ async function enrichVisibleShortsWithChannelInfo(blockedChannelId, settings) {
 
     const shortsElements = document.querySelectorAll(shortsSelectors);
     if (shortsElements.length === 0) {
-        console.log('FilterTube: No Shorts found to enrich');
+        if (window.__filtertubeDebug) {
+            console.log('FilterTube: No Shorts found to enrich');
+        }
         return;
     }
 
-    console.log(`FilterTube: Enriching ${shortsElements.length} Shorts with channel info`);
+    if (window.__filtertubeDebug) {
+        console.log(`FilterTube: Enriching ${shortsElements.length} Shorts with channel info`);
+    }
 
     const videoChannelMap = settings?.videoChannelMap || {};
     const videoIdsToFetch = [];
@@ -3868,11 +3899,15 @@ async function enrichVisibleShortsWithChannelInfo(blockedChannelId, settings) {
     }
 
     if (videoIdsToFetch.length === 0) {
-        console.log('FilterTube: All visible Shorts already have channel mappings');
+        if (window.__filtertubeDebug) {
+            console.log('FilterTube: All visible Shorts already have channel mappings');
+        }
         return;
     }
 
-    console.log(`FilterTube: Fetching channel info for ${videoIdsToFetch.length} Shorts`);
+    if (window.__filtertubeDebug) {
+        console.log(`FilterTube: Fetching channel info for ${videoIdsToFetch.length} Shorts`);
+    }
 
     // Limit concurrent fetches to avoid overwhelming the network
     const MAX_CONCURRENT = 3;
@@ -5352,6 +5387,7 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
             const isDropdownOpen = () => {
                 if (!dropdown?.isConnected) return false;
                 if (dropdown.getAttribute('aria-hidden') === 'true') return false;
+                if (dropdown.hasAttribute('hidden')) return false;
 
                 const style = window.getComputedStyle(dropdown);
                 if (style.display === 'none' || style.visibility === 'hidden') return false;
@@ -5374,7 +5410,13 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
                 // Detect menu structure type (new vs old) - COMPREHENSIVE DETECTION
                 const newMenuList = dropdown.querySelector('yt-list-view-model');
                 const oldMenuList = dropdown.querySelector(
+                    'tp-yt-paper-listbox#items, ' +
                     'tp-yt-paper-listbox, ' +
+                    'ytm-menu-popup-renderer, ' +
+                    'ytm-menu-service-item-renderer, ' +
+                    '#items.ytm-menu-popup-renderer, ' +
+                    '#items.style-scope.ytm-menu-popup-renderer, ' +
+                    'bottom-sheet-container, ' +
                     'ytd-menu-popup-renderer, ' +
                     'ytd-menu-service-item-renderer, ' +
                     '#items.ytd-menu-popup-renderer, ' +
@@ -5427,7 +5469,7 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
                 }
             });
 
-            closeObserver.observe(dropdown, { attributes: true, attributeFilter: ['style', 'aria-hidden'] });
+            closeObserver.observe(dropdown, { attributes: true, attributeFilter: ['style', 'aria-hidden', 'hidden'] });
 
             // Also set a timeout as backup
             timeoutId = setTimeout(() => {
@@ -5449,7 +5491,13 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
             await waitForNextFrameDelay(250);
             const retryNew = dropdown.querySelector('yt-list-view-model');
             const retryOld = dropdown.querySelector(
+                'tp-yt-paper-listbox#items, ' +
                 'tp-yt-paper-listbox, ' +
+                'ytm-menu-popup-renderer, ' +
+                'ytm-menu-service-item-renderer, ' +
+                '#items.ytm-menu-popup-renderer, ' +
+                '#items.style-scope.ytm-menu-popup-renderer, ' +
+                'bottom-sheet-container, ' +
                 'ytd-menu-popup-renderer, ' +
                 'ytd-menu-service-item-renderer, ' +
                 '#items.ytd-menu-popup-renderer, ' +
@@ -6025,7 +6073,11 @@ function injectIntoNewMenu(menuList, channelInfo, videoCard, collaborationMetada
  * Inject into OLD menu structure (tp-yt-paper-listbox)
  */
 function injectIntoOldMenu(menuContainer, channelInfo, videoCard, collaborationMetadata = null, injectionOptions = {}) {
-    const menuList = menuContainer.querySelector('tp-yt-paper-listbox') || menuContainer;
+    const menuList = menuContainer.querySelector('tp-yt-paper-listbox#items') || menuContainer.querySelector('tp-yt-paper-listbox') || (menuContainer.matches?.('bottom-sheet-container') ? menuContainer.querySelector('bottom-sheet-layout') : menuContainer);
+    const isMobileMenu = Boolean(menuList.closest?.('ytm-menu-popup-renderer')) || Boolean(menuContainer?.matches?.('ytm-menu-popup-renderer')) || Boolean(menuContainer?.matches?.('bottom-sheet-container'));
+    const rendererTag = isMobileMenu ? 'ytm-menu-service-item-renderer' : 'ytd-menu-service-item-renderer';
+    const rendererScope = isMobileMenu ? 'ytm-menu-popup-renderer' : 'ytd-menu-popup-renderer';
+    const itemScope = isMobileMenu ? 'ytm-menu-service-item-renderer' : 'ytd-menu-service-item-renderer';
 
     // Inline SVG for FilterTube logo (user-provided SVG)
     const filterTubeSvg = `<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 128 128" style="display: block;">
@@ -6041,15 +6093,15 @@ function injectIntoOldMenu(menuContainer, channelInfo, videoCard, collaborationM
     const channelName = escapeHtml(pickMenuChannelDisplayName(channelInfo, injectionOptions));
 
     // Create FilterTube menu item (OLD structure)
-    const filterTubeItem = document.createElement('ytd-menu-service-item-renderer');
-    filterTubeItem.className = 'style-scope ytd-menu-popup-renderer filtertube-block-channel-item';
+    const filterTubeItem = document.createElement(rendererTag);
+    filterTubeItem.className = `style-scope ${rendererScope} filtertube-block-channel-item`;
     filterTubeItem.setAttribute('system-icons', '');
     filterTubeItem.setAttribute('role', 'menuitem');
     filterTubeItem.setAttribute('use-icons', '');
     filterTubeItem.setAttribute('tabindex', '-1');
 
     filterTubeItem.innerHTML = `
-        <tp-yt-paper-item class="style-scope ytd-menu-service-item-renderer filtertube-menu-item" style-target="host" role="option" tabindex="0" aria-disabled="false">
+        <tp-yt-paper-item class="style-scope ${itemScope} filtertube-menu-item" style-target="host" role="option" tabindex="0" aria-disabled="false">
             <div style="width: 24px; height: 24px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; margin-top: 2px;">
                 ${filterTubeSvg}
             </div>
@@ -6268,6 +6320,67 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
     }
     console.log('FilterTube: Block Channel clicked', { channelInfo, filterAll });
 
+    let blockPersisted = false;
+
+    const optimisticHideState = [];
+    let didOptimisticHide = false;
+    const recordOptimisticHide = (element, meta) => {
+        if (!element || optimisticHideState.some(item => item?.element === element)) return;
+        optimisticHideState.push({
+            element,
+            prevDisplay: element.style.display,
+            prevHiddenAttr: element.getAttribute('data-filtertube-hidden'),
+            prevHadHiddenClass: element.classList.contains('filtertube-hidden'),
+            prevBlocked: {
+                id: element.getAttribute('data-filtertube-blocked-channel-id'),
+                handle: element.getAttribute('data-filtertube-blocked-channel-handle'),
+                custom: element.getAttribute('data-filtertube-blocked-channel-custom'),
+                name: element.getAttribute('data-filtertube-blocked-channel-name'),
+                state: element.getAttribute('data-filtertube-blocked-state'),
+                ts: element.getAttribute('data-filtertube-blocked-ts')
+            }
+        });
+        markElementAsBlocked(element, meta, 'pending');
+        element.style.display = 'none';
+        element.classList.add('filtertube-hidden');
+        element.setAttribute('data-filtertube-hidden', 'true');
+    };
+
+    const restoreOptimisticHide = () => {
+        if (optimisticHideState.length === 0) return;
+        for (const item of optimisticHideState) {
+            const element = item?.element;
+            if (!element) continue;
+            try {
+                element.style.display = item.prevDisplay || '';
+                if (!item.prevHadHiddenClass) {
+                    element.classList.remove('filtertube-hidden');
+                }
+                if (item.prevHiddenAttr == null) {
+                    element.removeAttribute('data-filtertube-hidden');
+                } else {
+                    element.setAttribute('data-filtertube-hidden', item.prevHiddenAttr);
+                }
+
+                const prev = item.prevBlocked || {};
+                const restoreAttr = (name, value) => {
+                    if (value == null) element.removeAttribute(name);
+                    else element.setAttribute(name, value);
+                };
+                restoreAttr('data-filtertube-blocked-channel-id', prev.id);
+                restoreAttr('data-filtertube-blocked-channel-handle', prev.handle);
+                restoreAttr('data-filtertube-blocked-channel-custom', prev.custom);
+                restoreAttr('data-filtertube-blocked-channel-name', prev.name);
+                restoreAttr('data-filtertube-blocked-state', prev.state);
+                restoreAttr('data-filtertube-blocked-ts', prev.ts);
+
+                filteringTracker?.recordRestore?.(element);
+            } catch (e) {
+            }
+        }
+        optimisticHideState.length = 0;
+    };
+
     let requestedHandle = '';
     let requestedHandleForNetwork = '';
     if (channelInfo?.handle || channelInfo?.canonicalHandle || channelInfo?.handleDisplay) {
@@ -6483,6 +6596,11 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                 titleSpan.textContent = `✓ Blocked ${successCount} channels`;
                 titleSpan.style.color = '#10b981'; // green
             }
+
+            if (successCount === 0) {
+                menuItem.style.pointerEvents = 'auto';
+                return;
+            }
         }
 
         // Hide ALL instances of this video card immediately
@@ -6563,7 +6681,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
     }
 
     // Get the dropdown to check for pending fetches
-    const dropdown = menuItem.closest('tp-yt-iron-dropdown, ytd-menu-popup-renderer');
+    const dropdown = menuItem.closest('tp-yt-iron-dropdown, ytm-menu-popup-renderer, ytd-menu-popup-renderer');
 
     // Check if there's a background fetch in progress with complete channel info
     const fetchData = dropdown ? pendingDropdownFetches.get(dropdown) : null;
@@ -6756,6 +6874,55 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
         // Get collaboration metadata from menu item attribute
         const collaborationWithAttr = menuItem.getAttribute('data-collaboration-with');
         const collaborationWith = collaborationWithAttr ? JSON.parse(collaborationWithAttr) : null;
+
+        if (videoCard && menuItem.getAttribute('data-multi-step') !== 'true') {
+            try {
+                const videoCardTag = (videoCard?.tagName || '').toLowerCase();
+                if (videoCardTag === 'ytd-comment-thread-renderer' || videoCardTag === 'ytm-comment-thread-renderer') {
+                    recordOptimisticHide(videoCard, channelInfo);
+                    didOptimisticHide = true;
+                } else {
+                    const isShorts = videoCard.tagName.toLowerCase().includes('shorts-lockup-view-model') ||
+                        videoCard.tagName.toLowerCase().includes('reel');
+                    let containerToHide = videoCard;
+                    if (isShorts) {
+                        let parentContainer = videoCard.closest('ytd-rich-item-renderer');
+                        if (!parentContainer) {
+                            parentContainer = videoCard.closest('.ytGridShelfViewModelGridShelfItem');
+                        }
+                        if (parentContainer) {
+                            containerToHide = parentContainer;
+                        }
+                    } else {
+                        const isHomeLockup = videoCard.tagName.toLowerCase().includes('lockup-view-model');
+                        if (isHomeLockup) {
+                            const parentContainer = videoCard.closest('ytd-rich-item-renderer');
+                            if (parentContainer) {
+                                containerToHide = parentContainer;
+                            }
+                        }
+                    }
+
+                    recordOptimisticHide(containerToHide, channelInfo);
+                    didOptimisticHide = true;
+
+                    if (!isShorts) {
+                        const videoId = extractVideoIdFromCard(videoCard);
+                        if (videoId) {
+                            const allVideoCards = document.querySelectorAll('ytd-video-renderer, ytd-grid-video-renderer, ytd-compact-video-renderer, ytd-rich-item-renderer');
+                            allVideoCards.forEach(card => {
+                                if (card === containerToHide) return;
+                                const cardVideoId = extractVideoIdFromCard(card);
+                                if (cardVideoId === videoId) {
+                                    recordOptimisticHide(card, channelInfo);
+                                }
+                            });
+                        }
+                    }
+                }
+            } catch (e) {
+            }
+        }
 
         // Add channel via background script with filterAll preference and collaboration metadata
         const filterAllSelections = new Map();
@@ -6999,6 +7166,9 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
         }
 
         if (!result.success) {
+            if (didOptimisticHide && !blockPersisted) {
+                restoreOptimisticHide();
+            }
             // Error state
             if (titleSpan) {
                 if (handleResolutionFailed404 && requestedHandle) {
@@ -7026,6 +7196,8 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             }, 2000);
             return;
         }
+
+        blockPersisted = true;
 
         if (result && result.channelData) {
             upsertFilterChannel(result.channelData);
@@ -7102,86 +7274,78 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             return;
         }
 
-        // IMMEDIATELY hide comment thread for instant feedback (comment 3-dot menu)
-        const videoCardTag = (videoCard?.tagName || '').toLowerCase();
-        if (videoCard && (videoCardTag === 'ytd-comment-thread-renderer' || videoCardTag === 'ytm-comment-thread-renderer')) {
-            console.log('FilterTube: Hiding comment thread immediately');
-            markElementAsBlocked(videoCard, channelInfo, 'pending');
-            videoCard.style.display = 'none';
-            videoCard.classList.add('filtertube-hidden');
-            videoCard.setAttribute('data-filtertube-hidden', 'true');
+        if (!didOptimisticHide) {
+            try {
+                const videoCardTag = (videoCard?.tagName || '').toLowerCase();
+                if (videoCard && (videoCardTag === 'ytd-comment-thread-renderer' || videoCardTag === 'ytm-comment-thread-renderer')) {
+                    console.log('FilterTube: Hiding comment thread immediately');
+                    markElementAsBlocked(videoCard, channelInfo, 'pending');
+                    videoCard.style.display = 'none';
+                    videoCard.classList.add('filtertube-hidden');
+                    videoCard.setAttribute('data-filtertube-hidden', 'true');
+                }
 
-            // Close the dropdown since the thread is now hidden
-            const dropdown = menuItem.closest('tp-yt-iron-dropdown');
-            if (dropdown) {
-                forceCloseDropdown(dropdown);
+                if (videoCard && !(videoCardTag === 'ytd-comment-thread-renderer' || videoCardTag === 'ytm-comment-thread-renderer')) {
+                    console.log('FilterTube: Hiding video card immediately');
+
+                    const isShorts = videoCard.tagName.toLowerCase().includes('shorts-lockup-view-model') ||
+                        videoCard.tagName.toLowerCase().includes('reel');
+
+                    let containerToHide = videoCard;
+                    if (isShorts) {
+                        let parentContainer = videoCard.closest('ytd-rich-item-renderer');
+                        if (!parentContainer) {
+                            parentContainer = videoCard.closest('.ytGridShelfViewModelGridShelfItem');
+                        }
+                        if (parentContainer) {
+                            containerToHide = parentContainer;
+                        }
+                        console.log('FilterTube: Shorts detected, hiding container:', containerToHide.tagName || containerToHide.className);
+                    } else {
+                        const isHomeLockup = videoCard.tagName.toLowerCase().includes('lockup-view-model');
+                        if (isHomeLockup) {
+                            const parentContainer = videoCard.closest('ytd-rich-item-renderer');
+                            if (parentContainer) {
+                                containerToHide = parentContainer;
+                            }
+                        }
+                    }
+
+                    markElementAsBlocked(containerToHide, channelInfo, 'pending');
+                    containerToHide.style.display = 'none';
+                    containerToHide.classList.add('filtertube-hidden');
+                    containerToHide.setAttribute('data-filtertube-hidden', 'true');
+                    console.log('FilterTube: Applied immediate hiding to:', containerToHide.tagName || containerToHide.className);
+
+                    if (!isShorts) {
+                        const videoId = extractVideoIdFromCard(videoCard);
+                        if (videoId) {
+                            const allVideoCards = document.querySelectorAll('ytd-video-renderer, ytd-grid-video-renderer, ytd-compact-video-renderer, ytd-rich-item-renderer');
+                            allVideoCards.forEach(card => {
+                                if (card === containerToHide) return;
+                                const cardVideoId = extractVideoIdFromCard(card);
+                                if (cardVideoId === videoId) {
+                                    markElementAsBlocked(card, channelInfo, 'pending');
+                                    card.style.display = 'none';
+                                    card.classList.add('filtertube-hidden');
+                                    card.setAttribute('data-filtertube-hidden', 'true');
+                                    console.log('FilterTube: Also hiding duplicate video card');
+                                }
+                            });
+                        }
+                    }
+                }
+            } catch (e) {
+                console.warn('FilterTube: Immediate hide failed', e);
             }
         }
 
-        // IMMEDIATELY hide ALL instances of this video card for instant feedback
-        // (YouTube sometimes shows the same collaboration video multiple times in search results)
-        if (videoCard && !(videoCardTag === 'ytd-comment-thread-renderer' || videoCardTag === 'ytm-comment-thread-renderer')) {
-            console.log('FilterTube: Hiding video card immediately');
-
-            // Check if this is a shorts card
-            const isShorts = videoCard.tagName.toLowerCase().includes('shorts-lockup-view-model') ||
-                videoCard.tagName.toLowerCase().includes('reel');
-
-            // For shorts and home lockups, find the correct parent container to hide
-            let containerToHide = videoCard;
-            if (isShorts) {
-                // Try homepage container (ytd-rich-item-renderer)
-                let parentContainer = videoCard.closest('ytd-rich-item-renderer');
-                // If not found, try search page container (div.ytGridShelfViewModelGridShelfItem)
-                if (!parentContainer) {
-                    parentContainer = videoCard.closest('.ytGridShelfViewModelGridShelfItem');
-                }
-                if (parentContainer) {
-                    containerToHide = parentContainer;
-                }
-                console.log('FilterTube: Shorts detected, hiding container:', containerToHide.tagName || containerToHide.className);
-            } else {
-                const isHomeLockup = videoCard.tagName.toLowerCase().includes('lockup-view-model');
-                if (isHomeLockup) {
-                    const parentContainer = videoCard.closest('ytd-rich-item-renderer');
-                    if (parentContainer) {
-                        containerToHide = parentContainer;
-                    }
-                }
+        try {
+            const menuDropdown = menuItem.closest('tp-yt-iron-dropdown, ytm-menu-popup-renderer');
+            if (menuDropdown) {
+                forceCloseDropdown(menuDropdown);
             }
-
-            // Immediate hiding: Apply direct styles + class to ensure it's hidden right away
-            markElementAsBlocked(containerToHide, channelInfo, 'pending');
-            containerToHide.style.display = 'none';
-            containerToHide.classList.add('filtertube-hidden');
-            containerToHide.setAttribute('data-filtertube-hidden', 'true');
-            console.log('FilterTube: Applied immediate hiding to:', containerToHide.tagName || containerToHide.className);
-
-            // For non-shorts, also try to find other instances of the same video
-            if (!isShorts) {
-                const videoId = extractVideoIdFromCard(videoCard);
-                if (videoId) {
-                    const allVideoCards = document.querySelectorAll('ytd-video-renderer, ytd-grid-video-renderer, ytd-compact-video-renderer, ytd-rich-item-renderer');
-                    allVideoCards.forEach(card => {
-                        if (card === containerToHide) return; // Already hidden
-                        const cardVideoId = extractVideoIdFromCard(card);
-                        if (cardVideoId === videoId) {
-                            markElementAsBlocked(card, channelInfo, 'pending');
-                            card.style.display = 'none';
-                            card.classList.add('filtertube-hidden');
-                            card.setAttribute('data-filtertube-hidden', 'true');
-                            console.log('FilterTube: Also hiding duplicate video card');
-                        }
-                    });
-                }
-            }
-
-
-            // Close the dropdown since the video is now hidden
-            const dropdown = menuItem.closest('tp-yt-iron-dropdown');
-            if (dropdown) {
-                forceCloseDropdown(dropdown);
-            }
+        } catch (e) {
         }
 
         // After storage is updated, pull fresh settings (to include the new channel) and re-run DOM pass
@@ -7209,17 +7373,30 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
 
     } catch (error) {
         console.error('FilterTube: Error blocking channel:', error);
-        if (titleSpan) {
-            titleSpan.textContent = '✗ Error';
-            titleSpan.style.color = '#ef4444';
+        if (!blockPersisted && didOptimisticHide) {
+            restoreOptimisticHide();
         }
-        setTimeout(() => {
+        if (!blockPersisted) {
             if (titleSpan) {
-                titleSpan.textContent = originalText;
+                titleSpan.textContent = '✗ Error';
                 titleSpan.style.color = '#ef4444';
             }
-            menuItem.style.pointerEvents = 'auto';
-        }, 2000);
+            setTimeout(() => {
+                if (titleSpan) {
+                    titleSpan.textContent = originalText;
+                    titleSpan.style.color = '#ef4444';
+                }
+                menuItem.style.pointerEvents = 'auto';
+            }, 2000);
+        } else {
+            try {
+                if (titleSpan) {
+                    titleSpan.textContent = '✓ Channel Blocked';
+                    titleSpan.style.color = '#10b981';
+                }
+            } catch (e) {
+            }
+        }
     }
 }
 

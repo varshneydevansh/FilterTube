@@ -1,5 +1,22 @@
 # Changelog
 
+## Version 3.2.2
+
+### UI/UX Improvements & Debug Gating
+
+- **Optimistic UI Updates**: Added immediate visual feedback when blocking channels - content hides instantly with automatic restoration if blocking fails, eliminating user uncertainty.
+- **Enhanced Mobile Menu Support**: Improved 3-dot menu injection for YouTube mobile (ytm-menu-popup-renderer) with proper renderer tags and scope handling.
+- **Debug Gated Logging**: All console logs now gated behind `window.__filtertubeDebug` flag to reduce noise in production while maintaining full debug capabilities.
+- **Scroll Preservation**: Enhanced DOM fallback processing to respect user scrolling during filtering operations, preventing jarring scroll position changes.
+- **Channel Enrichment Limits**: Added per-session limits (10 enrichments) to prevent excessive background requests and improve performance.
+- **Idle-Scheduled Rendering**: Channel list rendering now uses `requestIdleCallback` with batching for smoother UI updates in large lists.
+
+### State Management Refinements
+
+- **External Reload Debouncing**: Storage changes from other tabs now debounced with intelligent signature comparison to prevent unnecessary UI re-renders.
+- **Selective Notifications**: External updates only trigger full 'load' events when channel signatures actually change, otherwise use lightweight 'externalUpdate' events.
+- **Bridge State Management**: Improved script injection state tracking with globalThis-based shared state for better reliability.
+
 ## Version 3.2.1
 
 ### Performance Optimizations - Lag-Free Processing
