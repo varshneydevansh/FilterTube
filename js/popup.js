@@ -43,7 +43,7 @@ function initializePopupFiltersTabs() {
             </div>
 
             <div id="channelList" class="keyword-list">
-                <div class="empty-state">No channels blocked</div>
+                <div class="empty-state">No channels added</div>
             </div>
         </div>
     `;
@@ -178,6 +178,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const channelListEl = document.getElementById('channelList');
     const searchChannelsPopup = document.getElementById('searchChannelsPopup');
 
+    const ftTopBarListModeControlsPopup = document.getElementById('ftTopBarListModeControlsPopup');
+
     const contentControlsContainer = document.getElementById('popupFiltersTabsContainer');
     const contentControlCheckboxes = contentControlsContainer
         ? contentControlsContainer.querySelectorAll('input[type="checkbox"][data-ft-setting]')
@@ -236,6 +238,58 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         } catch (e) {
         }
+    }
+
+    function renderListModeControls() {
+        const state = StateManager.getState();
+        const locked = isUiLocked();
+        const mode = state?.mode === 'whitelist' ? 'whitelist' : 'blocklist';
+
+        if (!ftTopBarListModeControlsPopup) return;
+        ftTopBarListModeControlsPopup.innerHTML = '';
+
+        const toggle = UIComponents.createToggleButton({
+            text: 'Whitelist',
+            active: mode === 'whitelist',
+            onToggle: async (nextState) => {
+                if (isUiLocked()) {
+                    renderListModeControls();
+                    return;
+                }
+
+                const enablingWhitelist = nextState === true;
+                const whitelistEmpty = (state?.whitelistChannels?.length || 0) === 0 && (state?.whitelistKeywords?.length || 0) === 0;
+                let copyBlocklist = false;
+                if (enablingWhitelist && whitelistEmpty) {
+                    copyBlocklist = window.confirm('Copy your current blocklist into whitelist to get started?');
+                    if (!copyBlocklist) {
+                        UIComponents.showToast('Whitelist is empty — videos will stay hidden until you add allow rules.', 'info');
+                    }
+                }
+
+                const resp = await sendRuntimeMessage({
+                    action: 'FilterTube_SetListMode',
+                    profileType: 'main',
+                    mode: nextState ? 'whitelist' : 'blocklist',
+                    copyBlocklist
+                });
+
+                if (!resp || resp.ok !== true) {
+                    UIComponents.showToast('Failed to update list mode', 'error');
+                    renderListModeControls();
+                    return;
+                }
+
+                await StateManager.loadSettings();
+                renderKeywords();
+                renderChannels();
+                updateCheckboxes();
+                renderListModeControls();
+            },
+            className: ''
+        });
+
+        ftTopBarListModeControlsPopup.appendChild(toggle);
     }
 
     let lockGateEl = null;
@@ -835,6 +889,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (eventType === 'load' || eventType === 'externalUpdate') {
             refreshProfilesUI();
+            renderListModeControls();
         }
     });
 
@@ -917,6 +972,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderKeywords();
     renderChannels();
     updateCheckboxes();
+    renderListModeControls();
     filterContentControlsPopup();
     await refreshProfilesUI();
 

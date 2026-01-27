@@ -439,9 +439,10 @@ function extractChannelMetadataFromElement(element, channelText = '', channelHre
     const hrefId = extractChannelIdFromString(normalizedHref) || extractChannelIdFromString(channelHref);
 
     const normalizedCachedHandle = cachedHandle ? normalizeHandleValue(cachedHandle) : '';
+    const isChannelIdHref = Boolean(hrefId && normalizedHref && normalizedHref.startsWith('/channel/'));
     const shouldTrustCachedHandle = Boolean(
         normalizedCachedHandle &&
-        (!hrefHandle || normalizedCachedHandle === normalizeHandleValue(hrefHandle))
+        (!isChannelIdHref && (!hrefHandle || normalizedCachedHandle === normalizeHandleValue(hrefHandle)))
     );
     const shouldTrustCachedId = Boolean(
         cachedId &&
@@ -468,13 +469,36 @@ function extractChannelMetadataFromElement(element, channelText = '', channelHre
     const meta = buildChannelMetadata(channelText, channelHref);
 
     if (!meta.handle || !meta.id) {
-        const datasetValues = [...new Set([element, cacheTarget, ...relatedElements])]
+        const valueSources = [...new Set([cacheTarget, ...relatedElements].filter(Boolean))];
+        if (!cacheTarget || cacheTarget === element) {
+            valueSources.unshift(element);
+        }
+
+        // Prevent false handle extraction from unrelated text (e.g., video titles mentioning @someone).
+        // When we have explicit channel-related nodes (anchor/byline), only use those for handle discovery.
+        const handleSources = (cacheTarget || relatedElements.length > 0)
+            ? [...new Set([cacheTarget, ...relatedElements].filter(Boolean))]
+            : valueSources;
+
+        const datasetValues = valueSources
             .filter(src => src && src.dataset)
             .map(src => collectDatasetValues(src))
             .filter(Boolean)
             .join(' ');
 
-        const attributeValues = [...new Set([element, cacheTarget, ...relatedElements])]
+        const datasetValuesForHandle = handleSources
+            .filter(src => src && src.dataset)
+            .map(src => collectDatasetValues(src))
+            .filter(Boolean)
+            .join(' ');
+
+        const attributeValues = valueSources
+            .filter(src => src)
+            .map(src => collectAttributeValues(src))
+            .filter(Boolean)
+            .join(' ');
+
+        const attributeValuesForHandle = handleSources
             .filter(src => src)
             .map(src => collectAttributeValues(src))
             .filter(Boolean)
@@ -482,7 +506,7 @@ function extractChannelMetadataFromElement(element, channelText = '', channelHre
 
         if (datasetValues) {
             if (!meta.handle) {
-                const dsHandle = extractHandleFromString(datasetValues);
+                const dsHandle = extractHandleFromString(datasetValuesForHandle);
                 if (dsHandle) meta.handle = dsHandle;
             }
             if (!meta.id) {
@@ -493,7 +517,7 @@ function extractChannelMetadataFromElement(element, channelText = '', channelHre
 
         if (attributeValues) {
             if (!meta.handle) {
-                const attrHandle = extractHandleFromString(attributeValues);
+                const attrHandle = extractHandleFromString(attributeValuesForHandle);
                 if (attrHandle) meta.handle = attrHandle;
             }
             if (!meta.id) {

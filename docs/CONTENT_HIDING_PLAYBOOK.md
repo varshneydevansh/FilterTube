@@ -1,4 +1,4 @@
-# Content Hiding + Channel Identity Playbook (v3.2.1+ Performance Optimizations)
+# Content Hiding + Channel Identity Playbook (v3.2.3 Whitelist Mode + Performance Optimizations)
 
 This document is an *operator playbook* for answering:
 
@@ -6,6 +6,7 @@ This document is an *operator playbook* for answering:
 - Which data source(s) are used to resolve a channel's identity (UC ID + @handle)?
 - What to check when blocking fails (especially `/@handle/about` returning 404).
 - **NEW in v3.2.1+**: How performance optimizations eliminate lag and improve responsiveness.
+- **NEW in v3.2.3**: How whitelist mode inverts filtering logic.
 
 ## 1) The Three Layers (Who Does What)
 
@@ -13,10 +14,12 @@ This document is an *operator playbook* for answering:
 - **Purpose**
   - Remove blocked/matching items from YouTube JSON responses **before** YouTube renders.
   - **NEW v3.2.1**: Stash network snapshots for proactive identity resolution.
+  - **NEW v3.2.3**: Apply whitelist mode filtering (hide all except allowed content).
   - Prevent "flash of blocked content" when possible.
 - **Strengths**
   - Earliest filtering.
   - **NEW v3.2.1**: Proactive channel identity via XHR interception.
+  - **NEW v3.2.3**: Zero-flash whitelist filtering.
   - Best for feed/search/watch data responses.
 - **Limits**
   - Not every surface routes through a convenient JSON response.
@@ -26,9 +29,11 @@ This document is an *operator playbook* for answering:
 - **Purpose**
   - Hide/restore already-rendered elements.
   - Handle SPA navigation, late hydration, and recycled DOM nodes.
+  - **NEW v3.2.3**: Apply whitelist mode visibility logic (hide all except allowed).
 - **Strengths**
   - Works even when engine misses something.
   - Can hide immediately after a manual block action.
+  - **NEW v3.2.3**: Enforces whitelist mode on dynamically loaded content.
 - **Limits**
   - Can only hide *after* elements exist.
   - **MAJOR IMPROVEMENT v3.2.1+**: Converted to async processing with main thread yielding for lag-free operation.
@@ -37,14 +42,19 @@ This document is an *operator playbook* for answering:
   - **Run State Management**: Prevents overlapping executions, queues subsequent calls
   - **Compiled Caching**: Regex and channel filter indexes cached for O(1) lookups
   - **Browser Impact**: Near-zero lag in Chromium, significant improvement in Firefox
+- **Whitelist Mode Behavior (v3.2.3)**
+  - Hides content not matching whitelist channels/keywords
+  - Respects same performance optimizations as blocklist mode
 
-### 1.3 Menu-click Blocking (User Action): 3-dot menu injection (`block_channel.js` + `content_bridge.js`)
+### 1.3 Menu-click Blocking/Allowing (User Action): 3-dot menu injection (`block_channel.js` + `content_bridge.js`)
 - **Purpose**
-  - Persist a new blocked channel entry (via background)
+  - Persist a new blocked/allowed channel entry (via background)
   - Hide the clicked card instantly for UX feedback
+  - **NEW v3.2.3**: Mode-aware action (Block vs Allow depending on list mode)
 - **Strengths**
   - Direct, explicit user action.
   - **IMPROVED v3.2.1**: Can use extra context (videoId, expected byline) to recover identity.
+  - **NEW v3.2.3**: Supports both blocklist and whitelist workflows.
 - **Limits**
   - If we don't have `videoId`, we lose the strongest fallbacks (ytInitialData lookup / shorts fetch).
 
@@ -127,7 +137,90 @@ async function applyDOMFallback(settings, options = {}) {
 4. **Batched Updates**: Storage operations minimized through intelligent batching
 5. **Debounced Refresh**: Settings updates throttled to prevent excessive reprocessing
 
-## 2) Canonical Channel Identity Rules (v3.2.1 Updates)
+## 2) Mode-Aware Processing Flow (v3.2.3)
+
+### 2.1 Dual Mode Processing Pipeline
+
+```text
+┌─────────────────────────────────────────────────────────────┐
+│                    CONTENT APPEARS                          │
+└─────────────────────┬───────────────────────────────────────┘
+                      │
+                      ▼
+┌─────────────────────────────────────────────────────────────┐
+│               CHECK CURRENT FILTER MODE                      │
+│                                                             │
+│  ┌─────────────────┐    ┌─────────────────────────────────┐  │
+│  │   BLOCKLIST     │    │          WHITELIST              │  │
+│  │   MODE          │    │          MODE (v3.2.3)          │  │
+│  └─────────────────┘    └─────────────────────────────────┘  │
+└─────────────────────┬───────────────────────────────────────┘
+                      │
+         ┌────────────┴────────────┐
+         │                         │
+         ▼                         ▼
+┌─────────────────┐    ┌─────────────────────────────────┐
+│ HIDE IF MATCHES  │    │    HIDE IF NO MATCH              │
+│ BLOCKLIST RULES  │    │    WHITELIST RULES               │
+│                 │    │                                 │
+│ • Channel in     │    │ • Channel NOT in whitelist      │
+│   blocklist       │    │ • Keywords NOT in whitelist     │
+│ • Keywords match  │    │                                 │
+│   blocklist       │    │ • SHOW if whitelist match       │
+└─────────────────┘    └─────────────────────────────────┘
+         │                         │
+         └────────────┬────────────┘
+                      │
+                      ▼
+┌─────────────────────────────────────────────────────────────┐
+│                 APPLY VISIBILITY CHANGES                    │
+│                                                             │
+│  • Add CSS classes (filtertube-hidden)                     │
+│  • Set display: none                                         │
+│  • Stamp data attributes (data-filtertube-list-mode)        │
+│  • Update 3-dot menu text (Block vs Allow)                  │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 2.2 Channel Stamping with Mode Context
+
+```text
+┌─────────────────────────────────────────────────────────────┐
+│              CHANNEL IDENTITY RESOLUTION                     │
+└─────────────────────┬───────────────────────────────────────┘
+                      │
+                      ▼
+┌─────────────────────────────────────────────────────────────┐
+│            EXTRACT FROM MULTIPLE SOURCES                     │
+│                                                             │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐   │
+│  │   XHR JSON  │  │ ytInitialData │  │   DOM Elements      │   │
+│  │   Data      │  │   Page Data  │  │   (Shorts/Home)     │   │
+│  └─────────────┘  └─────────────┘  └─────────────────────┘   │
+└─────────────────────┬───────────────────────────────────────┘
+                      │
+                      ▼
+┌─────────────────────────────────────────────────────────────┐
+│              RESOLVE TO CANONICAL UC ID                       │
+│                                                             │
+│  • @handle → channelMap lookup → UC ID                      │
+│  • /c/name → channelMap lookup → UC ID                       │
+│  • /user/name → channelMap lookup → UC ID                    │
+│  • Direct UC ID → use immediately                            │
+└─────────────────────┬───────────────────────────────────────┘
+                      │
+                      ▼
+┌─────────────────────────────────────────────────────────────┐
+│                 STAMP DOM WITH MODE DATA                        │
+│                                                             │
+│  data-filtertube-channel-id="UC..."                        │
+│  data-filtertube-channel-handle="@handle"                   │
+│  data-filtertube-list-mode="whitelist|blocklist"           │
+│  data-filtertube-source="shorts_homepage|watch_page"       │
+└─────────────────────────────────────────────────────────────┘
+```
+
+## 3) Canonical Channel Identity Rules (v3.2.1 Updates)
 
 ### 2.1 Canonical key
 - **Canonical identity is UC ID** (`UCxxxxxxxxxxxxxxxxxxxxxx`).

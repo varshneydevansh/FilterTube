@@ -1,10 +1,12 @@
-# Network Request Pipeline Documentation (v3.2.1)
+# Network Request Pipeline Documentation (v3.2.3)
 
 ## Overview
 
-FilterTube v3.2.1 implements a **proactive, XHR-first** network request pipeline that intercepts YouTube's JSON responses to extract channel identity before rendering. This eliminates network latency for most operations and enables instant blocking across all surfaces.
+FilterTube v3.2.3 implements a **proactive, XHR-first** network request pipeline that intercepts YouTube's JSON responses to extract channel identity before rendering. This eliminates network latency for most operations and enables instant blocking across all surfaces.
 
 **Performance Enhancement (v3.2.1):** The pipeline now includes advanced async processing with main thread yielding, eliminating UI lag during heavy filtering operations. Compiled regex caching and batched storage updates reduce CPU usage by 60-80% and I/O operations by 70-90%.
+
+**Channel Stamping Enhancements (v3.2.3):** Improved DOM stamping with mode-aware data attributes and enhanced channel ID visibility for homepage Shorts and other surfaces.
 
 ## Architecture
 
@@ -267,7 +269,84 @@ async function prefetchIdentityForCard({ videoId, card }) {
 - **XHR-only identity** - relies entirely on intercepted JSON
 - **DOM extraction fallback** - uses stamped attributes when available
 
-### 3. Fallback Cascade (v3.2.1)
+### 3. Enhanced Channel Stamping (v3.2.3)
+
+#### Mode-Aware Data Attributes
+
+FilterTube v3.2.3 enhances DOM stamping with filtering mode context:
+
+```javascript
+// Enhanced stamping with mode awareness (content_bridge.js)
+function stampChannelIdentity(element, channelInfo, mode = 'blocklist') {
+    element.setAttribute('data-filtertube-channel-id', channelInfo.id);
+    element.setAttribute('data-filtertube-channel-handle', channelInfo.handle);
+    element.setAttribute('data-filtertube-channel-name', channelInfo.name);
+    element.setAttribute('data-filtertube-list-mode', mode); // v3.2.3
+    
+    if (channelInfo.customUrl) {
+        element.setAttribute('data-filtertube-custom-url', channelInfo.customUrl);
+    }
+    
+    // Enhanced Shorts homepage visibility
+    if (channelInfo.source === 'shorts_homepage') {
+        element.setAttribute('data-filtertube-source', 'shorts_homepage');
+    }
+}
+```
+
+#### Homepage Shorts Channel Resolution
+
+Improved channel ID extraction for homepage Shorts:
+
+```javascript
+// Enhanced Shorts channel extraction (dom_fallback.js)
+function extractShortsChannelMetadata(shortsCard) {
+    const channelLink = shortsCard.querySelector('a[href*="/@"]') ||
+                       shortsCard.querySelector('a[href*="/channel/"]') ||
+                       shortsCard.querySelector('a[href*="/c/"]');
+    
+    if (channelLink) {
+        const href = channelLink.href;
+        const channelInfo = {
+            handle: extractHandleFromHref(href),
+            customUrl: extractCustomUrlFromHref(href),
+            name: extractChannelNameFromCard(shortsCard),
+            source: 'shorts_homepage'
+        };
+        
+        // Resolve UC ID from network snapshots
+        const ucId = resolveChannelIdFromSnapshots(channelInfo.handle);
+        if (ucId) {
+            channelInfo.id = ucId;
+        }
+        
+        return channelInfo;
+    }
+}
+```
+
+#### Cross-World Mode Synchronization
+
+Channel stamping now includes filtering mode context across worlds:
+
+```javascript
+// Mode synchronization between main world and content scripts
+function syncFilteringMode(mode) {
+    // Broadcast mode change to all content scripts
+    window.postMessage({
+        type: 'FilterTube_ModeChange',
+        mode: mode,
+        timestamp: Date.now()
+    }, '*');
+    
+    // Update existing stamped elements
+    document.querySelectorAll('[data-filtertube-channel-id]').forEach(element => {
+        element.setAttribute('data-filtertube-list-mode', mode);
+    });
+}
+```
+
+### 4. Fallback Cascade (v3.2.1)
 
 ```
 Primary Strategy Failure

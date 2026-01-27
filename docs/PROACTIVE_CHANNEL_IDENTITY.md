@@ -1,10 +1,12 @@
-# Proactive Channel Identity System (v3.2.1)
+# Proactive Channel Identity System (v3.2.3)
 
 ## Overview
 
 FilterTube shifted from a **reactive** (on-demand) to a **proactive** channel identity strategy. Instead of waiting for a 3-dot menu click to fetch channel details, we now intercept YouTube's XHR JSON responses, extract channel identity immediately, and broadcast it across worlds. This enables instant blocking and eliminates network latency for most operations.
 
 **Performance Enhancement (v3.2.1):** The proactive system now leverages compiled caching and async processing, reducing CPU usage by 60-80% and eliminating UI lag during heavy filtering operations. Batched storage updates minimize I/O overhead by 70-90%.
+
+**Channel Stamping Improvements (v3.2.3):** Enhanced DOM stamping with mode-aware data attributes and improved channel ID visibility on homepage Shorts and other surfaces.
 
 ## Why We Changed
 
@@ -360,6 +362,142 @@ function schedulePostBlockEnrichment(channel, profile, metadata) {
             { source: 'postBlockEnrichment' }, profile);
     }, 1500);
 }
+```
+
+## Channel Stamping Improvements (v3.2.3)
+
+### Enhanced DOM Data Attributes
+
+FilterTube v3.2.3 improves channel stamping with mode-aware data attributes and better visibility of channel IDs:
+
+```javascript
+// Enhanced stamping with mode awareness
+function stampChannelData(element, channelInfo, mode) {
+    element.setAttribute('data-filtertube-channel-id', channelInfo.id);
+    element.setAttribute('data-filtertube-channel-handle', channelInfo.handle);
+    element.setAttribute('data-filtertube-channel-name', channelInfo.name);
+    element.setAttribute('data-filtertube-list-mode', mode); // v3.2.3
+    
+    // Enhanced visibility for Shorts and homepage
+    if (channelInfo.customUrl) {
+        element.setAttribute('data-filtertube-custom-url', channelInfo.customUrl);
+    }
+}
+```
+
+### Homepage Shorts Channel ID Visibility
+
+Improved channel ID extraction and stamping for homepage Shorts:
+
+```javascript
+// Enhanced Shorts channel resolution
+function extractShortsChannelInfo(shortsElement) {
+    const channelLink = shortsElement.querySelector('a[href*="/@"]') ||
+                       shortsElement.querySelector('a[href*="/channel/"]');
+    
+    if (channelLink) {
+        const channelHandle = extractHandleFromHref(channelLink.href);
+        const channelId = resolveChannelIdFromSnapshot(channelHandle);
+        
+        return {
+            id: channelId,
+            handle: channelHandle,
+            name: extractChannelName(shortsElement),
+            source: 'shorts_homepage'
+        };
+    }
+}
+```
+
+### Mode-Aware Channel Resolution
+
+Channel resolution now considers the current filtering mode:
+
+```javascript
+// Mode-aware channel resolution
+function resolveChannelForMode(channelInfo, currentMode) {
+    if (currentMode === 'whitelist') {
+        // Prioritize whitelist matching
+        return {
+            ...channelInfo,
+            listType: 'whitelist',
+            action: channelInfo.whitelisted ? 'show' : 'hide'
+        };
+    } else {
+        // Traditional blocklist logic
+        return {
+            ...channelInfo,
+            listType: 'blocklist', 
+            action: channelInfo.blocked ? 'hide' : 'show'
+        };
+    }
+}
+```
+
+## Channel Stamping Flow (v3.2.3)
+
+### Enhanced DOM Stamping Pipeline
+
+```mermaid
+graph TD
+    A[YouTube Content Loads] --> B[Main World XHR Interception]
+    B --> C[Extract Channel Identity]
+    C --> D[Cross-World Messaging]
+    D --> E[Content Script Receives Data]
+    E --> F{Current Filter Mode?}
+    
+    F -->|Blocklist| G[Stamp: data-filtertube-list-mode=blocklist]
+    F -->|Whitelist| H[Stamp: data-filtertube-list-mode=whitelist]
+    
+    G --> I[Add Channel ID/Handle/Name]
+    H --> I
+    I --> J[Add Custom URL if Available]
+    J --> K[Mark Source: shorts_homepage/etc]
+    K --> L[Apply Visibility Rules]
+    
+    L --> M{Content Should Hide?}
+    M -->|Yes| N[Hide Element + Add Class]
+    M -->|No| O[Show Element - No Changes]
+    
+    N --> P[Update 3-dot Menu Text]
+    O --> P
+    P --> Q[Ready for User Interaction]
+    
+    style F fill:#2196f3
+    style H fill:#4caf50
+    style L fill:#ff9800
+    style N fill:#f44336
+    style O fill:#4caf50
+```
+
+### Homepage Shorts Resolution Flow
+
+```mermaid
+graph TD
+    A[Shorts Card Detected] --> B[Extract Channel Link]
+    B --> C{Link Type?}
+    
+    C -->|@handle| D[Extract Handle]
+    C -->|/channel/UC...| E[Extract UC ID]
+    C -->|/c/name| F[Extract Custom URL]
+    C -->|/user/name| F
+    
+    D --> G[Resolve UC ID from Snapshots]
+    E --> H[Use Direct UC ID]
+    F --> I[Resolve UC ID from Custom URL]
+    
+    G --> J[Channel Info Complete]
+    H --> J
+    I --> J
+    
+    J --> K[Stamp DOM Attributes]
+    K --> L[Apply Mode-Aware Filtering]
+    L --> M[Update Menu: Block/Allow]
+    
+    style G fill:#ff9800
+    style I fill:#ff9800
+    style K fill:#4caf50
+    style L fill:#2196f3
 ```
 
 ## Enhanced Fallback Strategies (v3.2.1)

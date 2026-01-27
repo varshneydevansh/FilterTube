@@ -734,6 +734,8 @@ function startCardPrefetchObserver() {
 
 let playlistPanelPrefetchHookInstalled = false;
 
+let rightRailWhitelistObserverInstalled = false;
+
 function installPlaylistPanelPrefetchHook() {
     if (playlistPanelPrefetchHookInstalled) return;
     playlistPanelPrefetchHookInstalled = true;
@@ -776,6 +778,68 @@ function installPlaylistPanelPrefetchHook() {
             attach();
         });
     }
+}
+
+function installRightRailWhitelistObserver() {
+    if (rightRailWhitelistObserverInstalled) return;
+    rightRailWhitelistObserverInstalled = true;
+
+    const scheduleWhitelistRefresh = () => {
+        try {
+            if (currentSettings?.listMode !== 'whitelist') return;
+        } catch (e) {
+            return;
+        }
+
+        if (typeof applyDOMFallback !== 'function') return;
+        // Force reprocess so previously-hidden / previously-pending nodes re-evaluate on SPA swaps.
+        setTimeout(() => {
+            try {
+                applyDOMFallback(null, { preserveScroll: true, forceReprocess: true });
+            } catch (e) {
+                // ignore
+            }
+        }, 0);
+        setTimeout(() => {
+            try {
+                applyDOMFallback(null, { preserveScroll: true, forceReprocess: true });
+            } catch (e) {
+                // ignore
+            }
+        }, 120);
+    };
+
+    const observer = new MutationObserver(() => {
+        scheduleWhitelistRefresh();
+    });
+
+    const attach = () => {
+        const rail = document.querySelector(
+            '#related, #secondary, ytd-watch-next-secondary-results-renderer, ytd-watch-flexy #secondary'
+        );
+        if (!rail) return false;
+        try {
+            observer.observe(rail, { childList: true, subtree: true });
+        } catch (e) {
+            return false;
+        }
+        return true;
+    };
+
+    if (!attach()) {
+        document.addEventListener('yt-navigate-finish', () => {
+            try {
+                observer.disconnect();
+            } catch (e) {
+            }
+            attach();
+            scheduleWhitelistRefresh();
+        });
+    }
+
+    document.addEventListener('yt-navigate-finish', () => {
+        scheduleWhitelistRefresh();
+    });
 }
 
 function queuePrefetchForCard(card) {
@@ -978,10 +1042,21 @@ function resetCardIdentityIfStale(card, videoId) {
     if (cachedId && videoId && cachedId !== videoId) {
         clearBlockedElementAttributes(card);
         card.removeAttribute('data-filtertube-video-id');
-        card.removeAttribute('data-filtertube-channel-id');
-        card.removeAttribute('data-filtertube-channel-handle');
-        card.removeAttribute('data-filtertube-channel-name');
-        card.removeAttribute('data-filtertube-channel-custom');
+        try {
+            if (typeof clearCachedChannelMetadata === 'function') {
+                clearCachedChannelMetadata(card);
+            } else {
+                card.removeAttribute('data-filtertube-channel-id');
+                card.removeAttribute('data-filtertube-channel-handle');
+                card.removeAttribute('data-filtertube-channel-name');
+                card.removeAttribute('data-filtertube-channel-custom');
+            }
+        } catch (e) {
+            card.removeAttribute('data-filtertube-channel-id');
+            card.removeAttribute('data-filtertube-channel-handle');
+            card.removeAttribute('data-filtertube-channel-name');
+            card.removeAttribute('data-filtertube-channel-custom');
+        }
     }
     if ((!cachedId || cachedId !== videoId) && videoId) {
         card.setAttribute('data-filtertube-video-id', videoId);
@@ -3457,6 +3532,106 @@ async function initializeDOMFallback(settings) {
             });
         }
 
+        function applyWhitelistPendingHide(mutations) {
+            try {
+                const listMode = currentSettings?.listMode === 'whitelist' ? 'whitelist' : 'blocklist';
+                if (listMode !== 'whitelist') return;
+            } catch (e) {
+                return;
+            }
+
+            const shouldSkipPendingHide = (element) => {
+                if (!element || typeof element.closest !== 'function') return false;
+                try {
+                    if (element.closest('ytd-watch-flexy, ytd-watch-metadata, ytd-video-primary-info-renderer, ytd-video-secondary-info-renderer, ytd-comments, ytd-comment-simplebox-renderer, #comments, #secondary, #related')) {
+                        const tag = (element.tagName || '').toLowerCase();
+                        const isContentCard = (
+                            tag === 'ytd-video-renderer' ||
+                            tag === 'ytd-compact-video-renderer' ||
+                            tag === 'ytd-watch-card-compact-video-renderer' ||
+                            tag === 'ytd-watch-card-hero-video-renderer' ||
+                            tag === 'ytd-watch-card-rhs-panel-video-renderer' ||
+                            tag === 'ytd-universal-watch-card-renderer' ||
+                            tag === 'ytd-playlist-panel-video-renderer' ||
+                            tag === 'ytd-playlist-panel-video-wrapper-renderer' ||
+                            tag === 'yt-lockup-view-model' ||
+                            tag === 'yt-lockup-metadata-view-model' ||
+                            tag === 'ytd-reel-item-renderer'
+                        );
+                        return !isContentCard;
+                    }
+                } catch (e) {
+                }
+                return false;
+            };
+
+            const resolveTargetToHide = (element) => {
+                try {
+                    const tag = (element?.tagName || '').toLowerCase();
+                    if (tag === 'ytd-rich-grid-media') {
+                        return element.closest('ytd-rich-item-renderer, ytd-item-section-renderer') || element;
+                    }
+                    if (tag === 'yt-lockup-view-model' || tag === 'yt-lockup-metadata-view-model') {
+                        return element.closest('ytd-rich-item-renderer') || element;
+                    }
+                    if (tag === 'ytd-playlist-panel-video-renderer') {
+                        return element.closest('ytd-playlist-panel-video-wrapper-renderer') || element;
+                    }
+                } catch (e) {
+                }
+                return element;
+            };
+
+            const hidePending = (element) => {
+                if (!element) return;
+                try {
+                    if (shouldSkipPendingHide(element)) return;
+                    if (element.hasAttribute('data-filtertube-processed')) return;
+                    if (element.getAttribute('data-filtertube-whitelist-pending') === 'true') return;
+                    if (element.classList.contains('filtertube-hidden') || element.hasAttribute('data-filtertube-hidden')) return;
+
+                    element.classList.add('filtertube-hidden');
+                    element.setAttribute('data-filtertube-hidden', 'true');
+                    element.setAttribute('data-filtertube-whitelist-pending', 'true');
+                    try {
+                        element.style.setProperty('display', 'none', 'important');
+                    } catch (e) {
+                    }
+                } catch (e) {
+                }
+            };
+
+            try {
+                for (const mutation of mutations || []) {
+                    const added = mutation?.addedNodes;
+                    if (!added || !added.length) continue;
+                    for (const node of added) {
+                        if (!(node instanceof Element)) continue;
+
+                        const candidates = [];
+                        try {
+                            if (node.matches && node.matches(VIDEO_CARD_SELECTORS)) {
+                                candidates.push(node);
+                            }
+                        } catch (e) {
+                        }
+
+                        try {
+                            const nested = node.querySelectorAll ? node.querySelectorAll(VIDEO_CARD_SELECTORS) : [];
+                            nested?.forEach?.(el => candidates.push(el));
+                        } catch (e) {
+                        }
+
+                        for (const cand of candidates) {
+                            const target = resolveTargetToHide(cand);
+                            hidePending(target);
+                        }
+                    }
+                }
+            } catch (e) {
+            }
+        }
+
         const observer = new MutationObserver(mutations => {
             let hasNewContent = false;
             for (const mutation of mutations) {
@@ -3467,6 +3642,7 @@ async function initializeDOMFallback(settings) {
             }
 
             if (hasNewContent) {
+                applyWhitelistPendingHide(mutations);
                 scheduleImmediateFallback();
             } else {
                 debouncedFallback();
@@ -3489,6 +3665,7 @@ async function initializeDOMFallback(settings) {
         // Start prefetch observer once DOM fallback is initialized
         startCardPrefetchObserver();
         installPlaylistPanelPrefetchHook();
+        installRightRailWhitelistObserver();
         // Schedule a scan to attach observer to existing cards
         schedulePrefetchScan();
     }
@@ -4763,7 +4940,14 @@ function extractChannelFromCard(card) {
                 'ytd-video-meta-block ytd-channel-name a, ' +
                 '#byline-container ytd-channel-name a, ' +
                 'ytd-channel-name #text a, ' +
-                '.yt-lockup-metadata-view-model__metadata a[href*="/@"]'
+                '.yt-content-metadata-view-model__metadata-row a[href^="/@"], ' +
+                '.yt-content-metadata-view-model__metadata-row a[href^="/channel/"], ' +
+                '.yt-content-metadata-view-model__metadata-row a[href^="/c/"], ' +
+                '.yt-content-metadata-view-model__metadata-row a[href^="/user/"], ' +
+                '.yt-lockup-metadata-view-model__metadata a[href^="/@"], ' +
+                '.yt-lockup-metadata-view-model__metadata a[href^="/channel/"], ' +
+                '.yt-lockup-metadata-view-model__metadata a[href^="/c/"], ' +
+                '.yt-lockup-metadata-view-model__metadata a[href^="/user/"]'
             );
             if (channelNameEl) {
                 name = channelNameEl.textContent?.trim();
@@ -4774,14 +4958,20 @@ function extractChannelFromCard(card) {
                     if (domHandle) {
                         if (handle && handle.toLowerCase() !== domHandle.toLowerCase()) {
                             handle = domHandle;
-                            id = undefined;
                         } else if (!handle) {
                             handle = domHandle;
                         }
                     }
                     const ucMatch = href.match(/\/(UC[\w-]{22})/);
-                    if (ucMatch && !id) {
-                        id = ucMatch[1];
+                    if (ucMatch && ucMatch[1]) {
+                        if (!id || id !== ucMatch[1]) {
+                            id = ucMatch[1];
+                        }
+                    }
+
+                    if (!handle) {
+                        const inferred = extractRawHandle(href);
+                        if (inferred) handle = inferred;
                     }
                 }
             }
@@ -5234,6 +5424,12 @@ function extractChannelFromCard(card) {
  */
 async function injectFilterTubeMenuItem(dropdown, videoCard) {
     if (!dropdown || !videoCard) return;
+
+    try {
+        if (currentSettings?.listMode === 'whitelist') return;
+    } catch (e) {
+        return;
+    }
 
     const videoCardTagName = (videoCard.tagName || '').toLowerCase();
     const isCommentThreadCard = (videoCardTagName === 'ytd-comment-thread-renderer' || videoCardTagName === 'ytm-comment-thread-renderer');

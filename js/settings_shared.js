@@ -123,14 +123,19 @@
                         hideSearchShelves: !!storage?.hideSearchShelves
                     },
                     main: {
+                        mode: 'blocklist',
                         channels: safeArray(mainChannels),
-                        keywords: safeArray(mainKeywords)
+                        keywords: safeArray(mainKeywords),
+                        whitelistChannels: [],
+                        whitelistKeywords: []
                     },
                     kids: {
                         mode: 'blocklist',
                         strictMode: kidsV3.strictMode !== false,
                         blockedChannels: safeArray(kidsV3.blockedChannels),
-                        blockedKeywords: safeArray(kidsV3.blockedKeywords)
+                        blockedKeywords: safeArray(kidsV3.blockedKeywords),
+                        whitelistChannels: [],
+                        whitelistKeywords: []
                     }
                 }
             }
@@ -820,7 +825,7 @@
                             },
                             kids: {
                                 ...existingKids,
-                                mode: 'blocklist',
+                                mode: (typeof existingKids.mode === 'string' && existingKids.mode === 'whitelist') ? 'whitelist' : 'blocklist',
                                 strictMode: existingKids.strictMode !== false,
                                 blockedChannels: safeArray(existingKids.blockedChannels),
                                 blockedKeywords: safeArray(existingKids.blockedKeywords)

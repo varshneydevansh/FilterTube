@@ -43,6 +43,13 @@
         return typeof value === 'number' && Number.isFinite(value) ? value : fallback;
     }
 
+    function normalizeListMode(value, fallback = 'blocklist') {
+        const raw = normalizeString(value).toLowerCase();
+        if (raw === 'whitelist') return 'whitelist';
+        if (raw === 'blocklist') return 'blocklist';
+        return fallback === 'whitelist' ? 'whitelist' : 'blocklist';
+    }
+
     /**
      * Builds a dedupe key for keywords (combines word + switches to avoid
      * storing the same word multiple times with identical flags).
@@ -152,20 +159,20 @@
 
         return {
             main: {
-                mode: normalizeString(main.mode) || 'blocklist',
+                mode: normalizeListMode(main.mode, 'blocklist'),
                 applyKidsRulesOnMain: !!settings.syncKidsToMain,
-                whitelistedChannels: sanitizeChannels(main.whitelistedChannels),
-                whitelistedKeywords: sanitizeKeywords(main.whitelistedKeywords),
+                whitelistedChannels: sanitizeChannels(main.whitelistChannels || main.whitelistedChannels),
+                whitelistedKeywords: sanitizeKeywords(main.whitelistKeywords || main.whitelistedKeywords),
                 videoIds: mergeStringList([], safeArray(main.videoIds)),
                 subscriptions: safeArray(main.subscriptions)
             },
             kids: {
-                mode: 'blocklist',
+                mode: normalizeListMode(kids.mode, 'blocklist'),
                 strictMode: kids.strictMode !== false,
                 blockedChannels: sanitizeChannels(kids.blockedChannels),
                 blockedKeywords: sanitizeKeywords(kids.blockedKeywords),
-                whitelistedChannels: sanitizeChannels(kids.whitelistedChannels),
-                whitelistedKeywords: sanitizeKeywords(kids.whitelistedKeywords),
+                whitelistedChannels: sanitizeChannels(kids.whitelistChannels || kids.whitelistedChannels),
+                whitelistedKeywords: sanitizeKeywords(kids.whitelistKeywords || kids.whitelistedKeywords),
                 videoIds: mergeStringList([], safeArray(kids.videoIds)),
                 subscriptions: safeArray(kids.subscriptions)
             }
@@ -369,7 +376,7 @@
 
         return {
             main: {
-                mode: normalizeString(main.mode) || 'blocklist',
+                mode: normalizeListMode(main.mode, 'blocklist'),
                 applyKidsRulesOnMain: normalizeBool(main.applyKidsRulesOnMain, false),
                 whitelistedChannels: safeArray(main.whitelistedChannels),
                 whitelistedKeywords: safeArray(main.whitelistedKeywords),
@@ -377,7 +384,7 @@
                 subscriptions: safeArray(main.subscriptions || subscriptions.main)
             },
             kids: {
-                mode: normalizeString(kids.mode) || 'blocklist',
+                mode: normalizeListMode(kids.mode, 'blocklist'),
                 strictMode: normalizeBool(kids.strictMode, true),
                 blockedChannels: safeArray(kids.blockedChannels),
                 blockedKeywords: safeArray(kids.blockedKeywords),
@@ -460,14 +467,19 @@
                         syncKidsToMain: !!v3Main.applyKidsRulesOnMain
                     },
                     main: {
+                        mode: 'blocklist',
                         channels: mainChannels,
-                        keywords: mainKeywords
+                        keywords: mainKeywords,
+                        whitelistChannels: [],
+                        whitelistKeywords: []
                     },
                     kids: {
                         mode: 'blocklist',
                         strictMode: v3Kids.strictMode !== false,
                         blockedChannels: kidsChannels,
-                        blockedKeywords: kidsKeywords
+                        blockedKeywords: kidsKeywords,
+                        whitelistChannels: [],
+                        whitelistKeywords: []
                     }
                 }
             }
@@ -579,21 +591,34 @@
                 },
                 main: {
                     ...main,
+                    mode: main.mode === 'whitelist' ? 'whitelist' : 'blocklist',
                     channels: safeArray(main.channels)
                         .map(entry => sanitizeChannelEntry(entry, { source: entry?.source || source }))
                         .filter(Boolean),
                     keywords: safeArray(main.keywords)
                         .map(entry => sanitizeKeywordEntry(entry, { source: entry?.source || source }))
+                        .filter(Boolean),
+                    whitelistChannels: safeArray(main.whitelistChannels)
+                        .map(entry => sanitizeChannelEntry(entry, { source: entry?.source || source }))
+                        .filter(Boolean),
+                    whitelistKeywords: safeArray(main.whitelistKeywords)
+                        .map(entry => sanitizeKeywordEntry(entry, { source: entry?.source || source }))
                         .filter(Boolean)
                 },
                 kids: {
                     ...kids,
-                    mode: 'blocklist',
+                    mode: kids.mode === 'whitelist' ? 'whitelist' : 'blocklist',
                     strictMode: kids.strictMode !== false,
                     blockedChannels: safeArray(kids.blockedChannels)
                         .map(entry => sanitizeChannelEntry(entry, { source: entry?.source || source }))
                         .filter(Boolean),
                     blockedKeywords: safeArray(kids.blockedKeywords)
+                        .map(entry => sanitizeKeywordEntry(entry, { source: entry?.source || source }))
+                        .filter(Boolean),
+                    whitelistChannels: safeArray(kids.whitelistChannels)
+                        .map(entry => sanitizeChannelEntry(entry, { source: entry?.source || source }))
+                        .filter(Boolean),
+                    whitelistKeywords: safeArray(kids.whitelistKeywords)
                         .map(entry => sanitizeKeywordEntry(entry, { source: entry?.source || source }))
                         .filter(Boolean)
                 }
@@ -860,7 +885,7 @@
                     applyKidsRulesOnMain: !!profilesV3?.main?.applyKidsRulesOnMain
                 },
                 kids: {
-                    mode: 'blocklist',
+                    mode: profilesV3?.kids?.mode || 'blocklist',
                     strictMode: profilesV3?.kids?.strictMode !== false,
                     enableSearch: true
                 }
@@ -1173,12 +1198,36 @@
             ? safeArray(safeObject(incomingProfileForImport.main).keywords).map(kw => sanitizeKeywordEntry(kw, { source: kw?.source || 'import' })).filter(Boolean)
             : null;
 
+        const v4MainMode = incomingProfileForImport
+            ? normalizeListMode(safeObject(incomingProfileForImport.main).mode, 'blocklist')
+            : normalizeListMode(parsed.profilesV3?.main?.mode, 'blocklist');
+
+        const v4MainWhitelistChannels = incomingProfileForImport
+            ? safeArray(safeObject(incomingProfileForImport.main).whitelistChannels).map(ch => sanitizeChannelEntry(ch, { source: 'import' })).filter(Boolean)
+            : safeArray(parsed.profilesV3?.main?.whitelistedChannels).map(ch => sanitizeChannelEntry(ch, { source: 'import' })).filter(Boolean);
+
+        const v4MainWhitelistKeywords = incomingProfileForImport
+            ? safeArray(safeObject(incomingProfileForImport.main).whitelistKeywords).map(kw => sanitizeKeywordEntry(kw, { source: kw?.source || 'import' })).filter(Boolean)
+            : safeArray(parsed.profilesV3?.main?.whitelistedKeywords).map(kw => sanitizeKeywordEntry(kw, { source: kw?.source || 'import' })).filter(Boolean);
+
         const v4KidsBlockedChannels = incomingProfileForImport
             ? safeArray(safeObject(incomingProfileForImport.kids).blockedChannels).map(ch => sanitizeChannelEntry(ch, { source: 'import' })).filter(Boolean)
             : null;
         const v4KidsBlockedKeywords = incomingProfileForImport
             ? safeArray(safeObject(incomingProfileForImport.kids).blockedKeywords).map(kw => sanitizeKeywordEntry(kw, { source: kw?.source || 'import' })).filter(Boolean)
             : null;
+
+        const v4KidsMode = incomingProfileForImport
+            ? normalizeListMode(safeObject(incomingProfileForImport.kids).mode, 'blocklist')
+            : normalizeListMode(parsed.profilesV3?.kids?.mode, 'blocklist');
+
+        const v4KidsWhitelistChannels = incomingProfileForImport
+            ? safeArray(safeObject(incomingProfileForImport.kids).whitelistChannels).map(ch => sanitizeChannelEntry(ch, { source: 'import' })).filter(Boolean)
+            : safeArray(parsed.profilesV3?.kids?.whitelistedChannels).map(ch => sanitizeChannelEntry(ch, { source: 'import' })).filter(Boolean);
+
+        const v4KidsWhitelistKeywords = incomingProfileForImport
+            ? safeArray(safeObject(incomingProfileForImport.kids).whitelistKeywords).map(kw => sanitizeKeywordEntry(kw, { source: kw?.source || 'import' })).filter(Boolean)
+            : safeArray(parsed.profilesV3?.kids?.whitelistedKeywords).map(kw => sanitizeKeywordEntry(kw, { source: kw?.source || 'import' })).filter(Boolean);
 
         const parsedMainChannels = Array.isArray(v4MainChannels) ? v4MainChannels : parsed.mainChannels;
         const parsedMainKeywords = Array.isArray(v4MainKeywords) ? v4MainKeywords : parsed.mainKeywords;
@@ -1345,15 +1394,20 @@
                                     ...existingMain,
                                     ...incMain,
                                     channels: mergeChannelLists(existingMain.channels, incMain.channels),
-                                    keywords: mergeKeywordLists(existingMain.keywords, incMain.keywords)
+                                    keywords: mergeKeywordLists(existingMain.keywords, incMain.keywords),
+                                    mode: normalizeListMode(incMain.mode, normalizeListMode(existingMain.mode, 'blocklist')),
+                                    whitelistChannels: mergeChannelLists(existingMain.whitelistChannels, incMain.whitelistChannels),
+                                    whitelistKeywords: mergeKeywordLists(existingMain.whitelistKeywords, incMain.whitelistKeywords)
                                 },
                                 kids: {
                                     ...existingKids,
                                     ...incKids,
-                                    mode: 'blocklist',
+                                    mode: normalizeListMode(incKids.mode, normalizeListMode(existingKids.mode, 'blocklist')),
                                     strictMode: incKids.strictMode !== false,
                                     blockedChannels: mergeChannelLists(existingKids.blockedChannels, incKids.blockedChannels),
-                                    blockedKeywords: mergeKeywordLists(existingKids.blockedKeywords, incKids.blockedKeywords)
+                                    blockedKeywords: mergeKeywordLists(existingKids.blockedKeywords, incKids.blockedKeywords),
+                                    whitelistChannels: mergeChannelLists(existingKids.whitelistChannels, incKids.whitelistChannels),
+                                    whitelistKeywords: mergeKeywordLists(existingKids.whitelistKeywords, incKids.whitelistKeywords)
                                 }
                             };
                         }
@@ -1411,6 +1465,22 @@
                 ? incomingKidsBlockedKeywords
                 : mergeKeywordLists(safeArray(targetKids.blockedKeywords), incomingKidsBlockedKeywords);
 
+            const desiredMainWhitelistChannels = strategy === 'replace'
+                ? v4MainWhitelistChannels
+                : mergeChannelLists(safeArray(targetMain.whitelistChannels), v4MainWhitelistChannels);
+
+            const desiredMainWhitelistKeywords = strategy === 'replace'
+                ? v4MainWhitelistKeywords
+                : mergeKeywordLists(safeArray(targetMain.whitelistKeywords), v4MainWhitelistKeywords);
+
+            const desiredKidsWhitelistChannels = strategy === 'replace'
+                ? v4KidsWhitelistChannels
+                : mergeChannelLists(safeArray(targetKids.whitelistChannels), v4KidsWhitelistChannels);
+
+            const desiredKidsWhitelistKeywords = strategy === 'replace'
+                ? v4KidsWhitelistKeywords
+                : mergeKeywordLists(safeArray(targetKids.whitelistKeywords), v4KidsWhitelistKeywords);
+
             profiles[targetProfileId] = {
                 ...targetProfile,
                 type: typeof targetProfile.type === 'string'
@@ -1428,15 +1498,20 @@
                 },
                 main: {
                     ...targetMain,
+                    mode: normalizeListMode(targetMain.mode, v4MainMode),
                     channels: targetNextChannels,
-                    keywords: targetNextKeywords
+                    keywords: targetNextKeywords,
+                    whitelistChannels: safeArray(desiredMainWhitelistChannels),
+                    whitelistKeywords: safeArray(desiredMainWhitelistKeywords)
                 },
                 kids: {
                     ...targetKids,
-                    mode: 'blocklist',
+                    mode: normalizeListMode(targetKids.mode, v4KidsMode),
                     strictMode: desiredKidsStrict,
                     blockedChannels: safeArray(desiredKidsBlockedChannels),
-                    blockedKeywords: safeArray(desiredKidsBlockedKeywords)
+                    blockedKeywords: safeArray(desiredKidsBlockedKeywords),
+                    whitelistChannels: safeArray(desiredKidsWhitelistChannels),
+                    whitelistKeywords: safeArray(desiredKidsWhitelistKeywords)
                 }
             };
 

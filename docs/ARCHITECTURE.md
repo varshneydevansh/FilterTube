@@ -1,8 +1,82 @@
-# Architecture Documentation (v3.2.2)
+# Architecture Documentation (v3.2.3)
 
 ## Overview
 
-FilterTube v3.2.2 builds on the proactive channel identity system of v3.2.1 with significant UI/UX improvements including optimistic updates, enhanced mobile support, debug gating, and smoother rendering. This architecture documentation covers both the high-level design and the new user experience enhancements.
+FilterTube v3.2.3 builds on the proactive channel identity system of v3.2.1 with significant UI/UX improvements and introduces Whitelist Mode for granular content control. This architecture documentation covers both the high-level design, filtering modes, and user experience enhancements.
+
+## Filtering Modes Architecture (v3.2.3)
+
+FilterTube v3.2.3 introduces dual filtering modes: Blocklist and Whitelist, allowing users to control content visibility through allow/deny lists.
+
+### Blocklist Mode (Default)
+
+Traditional filtering where content matching blocked channels or keywords is hidden:
+
+```mermaid
+graph TD
+    A[Content Appears] --> B{Channel in Blocklist?}
+    B -->|Yes| C[Hide Content]
+    B -->|No| D{Keywords Match?}
+    D -->|Yes| C
+    D -->|No| E[Show Content]
+```
+
+### Whitelist Mode (New)
+
+Content is hidden by default unless it matches whitelisted channels or keywords:
+
+```mermaid
+graph TD
+    A[Content Appears] --> B{Channel in Whitelist?}
+
+    B -->|Yes| C[Show Content]
+    B -->|No| D{Keywords Match Whitelist?}
+    D -->|Yes| C
+    D -->|No| E[Hide Content]
+```
+
+### Mode Switching with Staging Merge
+
+Users can switch modes with automatic list migration:
+
+```mermaid
+graph TD
+    A[User: Switch Mode] --> B{Target Mode?}
+    B -->|Whitelist| C[Copy Blocklist to Whitelist?]
+    B -->|Blocklist| D[Set Mode to Blocklist]
+    
+    C -->|Yes| E[Merge Blocklist → Whitelist]
+    C -->|No| F[Start with Empty Whitelist]
+    
+    E --> G[Clear Blocklist]
+    F --> H[Set Mode to Whitelist]
+    G --> H
+    D --> I[Mode Switch Complete]
+    H --> I
+    
+    I --> J[Refresh All Content]
+    J --> K[Update UI Controls]
+    
+    style E fill:#4caf50
+    style F fill:#ff9800
+    style H fill:#2196f3
+    style I fill:#4caf50
+```
+
+```javascript
+// Switching to Whitelist Mode
+const switchToWhitelist = async (profile, copyBlocklist = true) => {
+    if (copyBlocklist) {
+        // Merge blocklist into whitelist
+        profile.whitelistChannels = [...profile.whitelistChannels, ...profile.blockedChannels];
+        profile.whitelistKeywords = [...profile.whitelistKeywords, ...profile.blockedKeywords];
+        // Clear blocklist
+        profile.blockedChannels = [];
+        profile.blockedKeywords = [];
+    }
+    profile.mode = 'whitelist';
+};
+```
 
 ## UI/UX Architecture (v3.2.2)
 

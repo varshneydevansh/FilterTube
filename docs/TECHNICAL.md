@@ -1,8 +1,167 @@
-# Technical Documentation (v3.2.2 UI/UX Improvements)
+# Technical Documentation (v3.2.3 Whitelist Mode & UI/UX Improvements)
 
 ## Overview
 
-FilterTube v3.2.2 builds on the performance optimizations of v3.2.1 with significant UI/UX improvements including optimistic updates, enhanced mobile support, debug gating, and smoother rendering. This technical documentation covers both the core performance mechanisms and the new user experience enhancements.
+FilterTube v3.2.3 builds on the performance optimizations of v3.2.1 with significant UI/UX improvements and introduces Whitelist Mode for granular content control. This technical documentation covers the filtering logic, mode switching, and user experience enhancements.
+
+## Whitelist Mode Filtering Logic (v3.2.3)
+
+### Dual Mode Filtering Engine
+
+The filtering engine now supports both blocklist and whitelist modes:
+
+```javascript
+// Core filtering decision function
+function shouldHideContent(title, channel, settings) {
+    const listMode = settings.listMode === 'whitelist' ? 'whitelist' : 'blocklist';
+    
+    if (listMode === 'whitelist') {
+        // Whitelist Mode: Hide by default, allow only matches
+        return !matchesWhitelist(title, channel, settings);
+    } else {
+        // Blocklist Mode: Show by default, hide matches
+        return matchesBlocklist(title, channel, settings);
+    }
+}
+
+function matchesWhitelist(title, channel, settings) {
+    // Check channel whitelist
+    if (settings.whitelistChannels && 
+        settings.whitelistChannels.some(ch => matchesChannel(channel, ch))) {
+        return true;
+    }
+    
+    // Check keyword whitelist
+    if (settings.whitelistKeywords && 
+        settings.whitelistKeywords.some(regex => regex.test(title))) {
+        return true;
+    }
+    
+    return false;
+}
+
+function matchesBlocklist(title, channel, settings) {
+    // Check channel blocklist
+    if (settings.filterChannels && 
+        settings.filterChannels.some(ch => matchesChannel(channel, ch))) {
+        return true;
+    }
+    
+    // Check keyword blocklist
+    if (settings.filterKeywords && 
+        settings.filterKeywords.some(regex => regex.test(title))) {
+        return true;
+    }
+    
+    return false;
+}
+```
+
+### Mode-Aware UI Rendering
+
+The UI adapts display text and controls based on the active mode:
+
+```javascript
+// Render engine updates for mode awareness
+function renderKeywords(state, profile = 'main') {
+    const mode = profile === 'kids' ? state.kids?.mode : state.mode;
+    const listType = mode === 'whitelist' ? 'whitelist' : 'blocked';
+    const emptyMessage = mode === 'whitelist' 
+        ? 'No keywords allowed' 
+        : 'No keywords blocked';
+    
+    // Render with appropriate labels
+}
+```
+
+### Background Mode Switching
+
+The background script handles mode switching with list migration:
+
+```javascript
+// Mode switching with staging merge
+async function handleSetListMode(request) {
+    const { profileType, mode, copyBlocklist } = request;
+    
+    // Load current profiles
+    const profilesV4 = await storageGet(FT_PROFILES_V4_KEY);
+    
+    // Apply mode switch with optional merge
+    if (mode === 'whitelist' && copyBlocklist) {
+        mergeBlocklistIntoWhitelist(profilesV4, profileType);
+    }
+    
+    // Update profile mode
+    profilesV4.profiles[activeId][profileType].mode = mode;
+    
+    // Save and trigger refresh
+    await storageSet({ [FT_PROFILES_V4_KEY]: profilesV4 });
+    triggerContentRefresh();
+}
+```
+
+## Data Flow Architecture (v3.2.3)
+
+### Dual Mode Filtering Data Flow
+
+```mermaid
+graph TD
+    A[YouTube Content] --> B[Main World Interception]
+    B --> C[Extract Channel Data]
+    C --> D[Background Processing]
+    
+    D --> E{Profile Mode?}
+    E -->|Blocklist| F[Compile Blocklist Settings]
+    E -->|Whitelist| G[Compile Whitelist Settings]
+    
+    F --> H[Send to Content Scripts]
+    G --> H
+    H --> I[DOM Stamping with Mode]
+    I --> J[Apply Filtering Logic]
+    
+    J --> K{Content Matches Rules?}
+    K -->|Blocklist: Match| L[Hide Content]
+    K -->|Blocklist: No Match| M[Show Content]
+    K -->|Whitelist: Match| M
+    K -->|Whitelist: No Match| L
+    
+    L --> N[Update UI State]
+    M --> N
+    N --> O[User Sees Filtered Results]
+    
+    style E fill:#2196f3
+    style F fill:#f44336
+    style G fill:#4caf50
+    style K fill:#ff9800
+    style L fill:#f44336
+    style M fill:#4caf50
+```
+
+### Mode Switching Data Flow
+
+```mermaid
+graph TD
+    A[User Toggles Mode] --> B[UI Component Event]
+    B --> C[Send to Background]
+    C --> D[Validate Request]
+    D --> E{Target Mode?}
+    
+    E -->|Whitelist| F[Merge Blocklist → Whitelist]
+    E -->|Blocklist| G[Set Mode Directly]
+    
+    F --> H[Update Profiles V4]
+    G --> H
+    H --> I[Clear Compiled Cache]
+    I --> J[Broadcast to All Tabs]
+    J --> K[Refresh Content Scripts]
+    K --> L[Update UI Controls]
+    L --> M[Apply New Filtering]
+    
+    style F fill:#4caf50
+    style G fill:#2196f3
+    style H fill:#ff9800
+    style M fill:#4caf50
+```
 
 ## UI/UX Improvements (v3.2.2)
 

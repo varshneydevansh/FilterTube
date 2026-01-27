@@ -1,8 +1,111 @@
-# YouTube Kids Integration Documentation (v3.2.1)
+# YouTube Kids Integration Documentation (v3.2.3)
 
 ## Overview
 
-FilterTube v3.2.1 provides **zero-network** integration with YouTube Kids, relying entirely on proactive XHR interception to extract channel identity without any network requests. This ensures reliable blocking on YouTube Kids where traditional network fetching often fails.
+FilterTube v3.2.3 provides **zero-network** integration with YouTube Kids, relying entirely on proactive XHR interception to extract channel identity without any network requests. This ensures reliable blocking on YouTube Kids where traditional network fetching often fails.
+
+**Whitelist Mode Support (v3.2.3):** YouTube Kids now supports whitelist mode for granular content control, allowing parents to specify exactly which channels and content are allowed.
+
+## Whitelist Mode for Kids (v3.2.3)
+
+### Kids Profile Whitelist Support
+
+YouTube Kids profiles now support whitelist mode for enhanced parental control:
+
+```javascript
+// In background.js - Kids whitelist mode handling
+async function handleKidsWhitelistChannel(request) {
+    const { channel, videoId } = request;
+    
+    // Add to Kids whitelist instead of blocklist
+    const result = await handleAddFilteredChannel(
+        channel.originalInput || channel.id,
+        false,
+        null,
+        null,
+        {
+            displayHandle: channel.handleDisplay,
+            canonicalHandle: channel.canonicalHandle,
+            channelName: channel.name,
+            customUrl: channel.customUrl,
+            source: 'user'
+        },
+        'kids',
+        videoId,
+        'whitelist' // Use whitelist list type
+    );
+    
+    return result;
+}
+```
+
+### Mode-Aware Kids Filtering
+
+Kids content filtering now respects the profile's filtering mode:
+
+```javascript
+// In content_bridge.js - Kids mode-aware filtering
+function shouldHideKidsContent(title, channel, kidsSettings) {
+    const mode = kidsSettings.mode === 'whitelist' ? 'whitelist' : 'blocklist';
+    
+    if (mode === 'whitelist') {
+        // Hide by default, only show whitelisted content
+        return !matchesKidsWhitelist(title, channel, kidsSettings);
+    } else {
+        // Traditional blocklist mode
+        return matchesKidsBlocklist(title, channel, kidsSettings);
+    }
+}
+
+function matchesKidsWhitelist(title, channel, settings) {
+    // Check against Kids whitelist channels
+    if (settings.whitelistChannels && 
+        settings.whitelistChannels.some(ch => matchesChannel(channel, ch))) {
+        return true;
+    }
+    
+    // Check against Kids whitelist keywords
+    if (settings.whitelistKeywords && 
+        settings.whitelistKeywords.some(regex => regex.test(title))) {
+        return true;
+    }
+    
+    return false;
+}
+```
+
+### Kids UI Controls
+
+The Kids profile interface includes whitelist mode controls:
+
+```javascript
+// In tab-view.js - Kids whitelist toggle
+function renderKidsListModeControls() {
+    const state = StateManager.getState();
+    const kidsMode = state?.kids?.mode === 'whitelist' ? 'whitelist' : 'blocklist';
+    
+    const toggle = UIComponents.createToggleButton({
+        text: 'Whitelist',
+        active: kidsMode === 'whitelist',
+        onToggle: async (nextState) => {
+            const resp = await sendRuntimeMessage({
+                action: 'FilterTube_SetListMode',
+                profileType: 'kids',
+                mode: nextState ? 'whitelist' : 'blocklist',
+                copyBlocklist: false // Kids typically starts with empty whitelist
+            });
+            
+            if (resp.ok) {
+                await StateManager.loadSettings();
+                renderKidsKeywords();
+                renderKidsChannels();
+            }
+        }
+    });
+    
+    return toggle;
+}
+```
 
 ## Zero-Network Architecture (v3.2.1)
 

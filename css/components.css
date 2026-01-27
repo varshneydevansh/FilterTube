@@ -732,6 +732,17 @@ html[data-theme="dark"] input:checked+.slider:before {
     align-items: center;
 }
 
+ .ft-topbar-list-mode {
+     display: inline-flex;
+     align-items: center;
+     gap: var(--ft-space-xs);
+     flex-wrap: nowrap;
+ }
+
+ .ft-topbar-list-mode .exact-toggle {
+     padding: 4px 10px;
+ }
+
 /* --- Exact Toggle Badge --- */
 .exact-toggle {
     display: inline-flex;

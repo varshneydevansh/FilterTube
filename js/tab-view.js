@@ -570,6 +570,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const ftProfileBadgeBtnTab = document.getElementById('ftProfileBadgeBtnTab');
     const ftProfileDropdownTab = document.getElementById('ftProfileDropdownTab');
 
+    const ftTopBarListModeControlsTab = document.getElementById('ftTopBarListModeControlsTab');
+
     const ftExportV3Btn = document.getElementById('ftExportV3Btn');
     const ftExportV3EncryptedBtn = document.getElementById('ftExportV3EncryptedBtn');
     const ftExportActiveOnly = document.getElementById('ftExportActiveOnly');
@@ -1839,21 +1841,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (['keywordAdded', 'keywordRemoved', 'keywordUpdated', 'load', 'save'].includes(eventType)) {
             renderKeywords();
             updateStats();
+            renderListModeControls();
         }
 
         if (['channelAdded', 'channelRemoved', 'channelUpdated', 'load', 'save'].includes(eventType)) {
             renderChannels();
             renderKeywords(); // Re-render keywords in case channel-derived keywords changed
             updateStats();
+            renderListModeControls();
         }
 
         if (['kidsKeywordAdded', 'kidsKeywordRemoved', 'kidsKeywordUpdated', 'load', 'save'].includes(eventType)) {
             renderKidsKeywords();
+            updateStats();
+            renderListModeControls();
         }
 
         if (['kidsChannelAdded', 'kidsChannelRemoved', 'kidsChannelUpdated', 'load', 'save'].includes(eventType)) {
             renderKidsChannels();
             renderKidsKeywords();
+            updateStats();
+            renderListModeControls();
         }
 
         if (eventType === 'settingUpdated' || eventType === 'externalUpdate') {
@@ -1863,6 +1871,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (eventType === 'load' || eventType === 'externalUpdate') {
             refreshProfilesUI();
+            updateCheckboxes();
+            updateStats();
+            renderListModeControls();
         }
 
         if (eventType === 'themeChanged') {
@@ -2284,14 +2295,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                     autoBackupFormat
                 },
                 main: {
+                    mode: 'blocklist',
                     channels: [],
-                    keywords: []
+                    keywords: [],
+                    whitelistChannels: [],
+                    whitelistKeywords: []
                 },
                 kids: {
                     mode: 'blocklist',
                     strictMode: true,
                     blockedChannels: [],
-                    blockedKeywords: []
+                    blockedKeywords: [],
+                    whitelistChannels: [],
+                    whitelistKeywords: []
                 }
             };
 
@@ -2382,14 +2398,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                     autoBackupFormat
                 },
                 main: {
+                    mode: 'blocklist',
                     channels: [],
-                    keywords: []
+                    keywords: [],
+                    whitelistChannels: [],
+                    whitelistKeywords: []
                 },
                 kids: {
                     mode: 'blocklist',
                     strictMode: true,
                     blockedChannels: [],
-                    blockedKeywords: []
+                    blockedKeywords: [],
+                    whitelistChannels: [],
+                    whitelistKeywords: []
                 }
             };
 
@@ -2753,6 +2774,81 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    function renderListModeControls() {
+        const state = StateManager.getState();
+        if (!ftTopBarListModeControlsTab) return;
+
+        const currentNav = document.querySelector('.nav-item.active');
+        const currentViewId = normalizeString(currentNav?.getAttribute('data-tab')) || 'dashboard';
+        const profileType = currentViewId === 'kids' ? 'kids' : 'main';
+
+        const currentMode = (() => {
+            if (profileType === 'kids') {
+                return state?.kids?.mode === 'whitelist' ? 'whitelist' : 'blocklist';
+            }
+            return state?.mode === 'whitelist' ? 'whitelist' : 'blocklist';
+        })();
+
+        ftTopBarListModeControlsTab.innerHTML = '';
+
+        const toggle = UIComponents.createToggleButton({
+            text: 'Whitelist',
+            active: currentMode === 'whitelist',
+            onToggle: async (nextState) => {
+                if (isUiLocked()) {
+                    renderListModeControls();
+                    return;
+                }
+
+                const enablingWhitelist = nextState === true;
+                const whitelistEmpty = (() => {
+                    if (profileType === 'kids') {
+                        return (state?.kids?.whitelistChannels?.length || 0) === 0 && (state?.kids?.whitelistKeywords?.length || 0) === 0;
+                    }
+                    return (state?.whitelistChannels?.length || 0) === 0 && (state?.whitelistKeywords?.length || 0) === 0;
+                })();
+
+                let copyBlocklist = false;
+                if (enablingWhitelist && whitelistEmpty) {
+                    copyBlocklist = window.confirm('Copy your current blocklist into whitelist to get started?');
+                    if (!copyBlocklist) {
+                        UIComponents.showToast('Whitelist is empty — videos will stay hidden until you add allow rules.', 'info');
+                    }
+                }
+
+                const resp = await sendRuntimeMessage({
+                    action: 'FilterTube_SetListMode',
+                    profileType,
+                    mode: nextState ? 'whitelist' : 'blocklist',
+                    copyBlocklist
+                });
+
+                if (!resp || resp.ok !== true) {
+                    UIComponents.showToast('Failed to update list mode', 'error');
+                    renderListModeControls();
+                    return;
+                }
+
+                await StateManager.loadSettings();
+                renderKeywords();
+                renderChannels();
+                renderKidsKeywords();
+                renderKidsChannels();
+                updateCheckboxes();
+                updateStats();
+                renderListModeControls();
+            },
+            className: ''
+        });
+
+        ftTopBarListModeControlsTab.appendChild(toggle);
+    }
+
+    try {
+        window.__filtertubeRenderTopBarListModeControls = renderListModeControls;
+    } catch (e) {
+    }
+
     function updateCheckboxes() {
         const state = StateManager.getState();
         const locked = isUiLocked();
@@ -2870,6 +2966,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderKidsKeywords();
     renderKidsChannels();
     updateCheckboxes();
+    renderListModeControls();
     filterContentControls();
     filterHelpCards();
     updateStats();
@@ -3365,6 +3462,13 @@ function setupNavigation() {
         };
         if (pageTitle && titles[effectiveViewId]) {
             pageTitle.textContent = titles[effectiveViewId];
+        }
+
+        try {
+            if (typeof window.__filtertubeRenderTopBarListModeControls === 'function') {
+                window.__filtertubeRenderTopBarListModeControls();
+            }
+        } catch (e) {
         }
     }
 

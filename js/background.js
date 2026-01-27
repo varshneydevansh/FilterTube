@@ -94,6 +94,27 @@ function buildAutoBackupPayload({ settings, profilesV3, theme }) {
         ? !!activeSettingsV4.syncKidsToMain
         : !!mainProfile.applyKidsRulesOnMain;
 
+    const mainMode = hasProfilesV4
+        ? (activeMainV4.mode === 'whitelist' ? 'whitelist' : 'blocklist')
+        : (typeof mainProfile.mode === 'string' ? mainProfile.mode : 'blocklist');
+    const kidsMode = hasProfilesV4
+        ? (activeKidsV4.mode === 'whitelist' ? 'whitelist' : 'blocklist')
+        : (typeof kidsProfile.mode === 'string' ? kidsProfile.mode : 'blocklist');
+
+    const mainWhitelistChannels = hasProfilesV4
+        ? safeArray(activeMainV4.whitelistChannels)
+        : safeArray(mainProfile.whitelistedChannels);
+    const mainWhitelistKeywords = hasProfilesV4
+        ? safeArray(activeMainV4.whitelistKeywords)
+        : safeArray(mainProfile.whitelistedKeywords);
+
+    const kidsWhitelistChannels = hasProfilesV4
+        ? safeArray(activeKidsV4.whitelistChannels)
+        : safeArray(kidsProfile.whitelistedChannels);
+    const kidsWhitelistKeywords = hasProfilesV4
+        ? safeArray(activeKidsV4.whitelistKeywords)
+        : safeArray(kidsProfile.whitelistedKeywords);
+
     return {
         meta: {
             version: 3,
@@ -111,7 +132,7 @@ function buildAutoBackupPayload({ settings, profilesV3, theme }) {
                 deviceName: null
             },
             main: {
-                mode: typeof mainProfile.mode === 'string' ? mainProfile.mode : 'blocklist',
+                mode: mainMode,
                 hideShorts: !!s.hideShorts,
                 hideComments: !!s.hideComments,
                 filterComments: !!s.filterComments,
@@ -143,7 +164,7 @@ function buildAutoBackupPayload({ settings, profilesV3, theme }) {
                 applyKidsRulesOnMain
             },
             kids: {
-                mode: 'blocklist',
+                mode: kidsMode,
                 strictMode: hasProfilesV4 ? (activeKidsV4.strictMode !== false) : (kidsProfile.strictMode !== false),
                 enableSearch: true
             }
@@ -153,15 +174,19 @@ function buildAutoBackupPayload({ settings, profilesV3, theme }) {
                 channels: safeArray(s.channels),
                 keywords: safeArray(s.keywords),
                 videoIds: safeArray(mainProfile.videoIds),
-                whitelistedChannels: safeArray(mainProfile.whitelistedChannels),
-                whitelistedKeywords: safeArray(mainProfile.whitelistedKeywords),
+                whitelistChannels: mainWhitelistChannels,
+                whitelistKeywords: mainWhitelistKeywords,
+                whitelistedChannels: mainWhitelistChannels,
+                whitelistedKeywords: mainWhitelistKeywords,
                 subscriptions: safeArray(mainProfile.subscriptions)
             },
             kids: {
                 blockedChannels: hasProfilesV4 ? safeArray(activeKidsV4.blockedChannels) : safeArray(kidsProfile.blockedChannels),
                 blockedKeywords: hasProfilesV4 ? safeArray(activeKidsV4.blockedKeywords) : safeArray(kidsProfile.blockedKeywords),
-                whitelistedChannels: safeArray(kidsProfile.whitelistedChannels),
-                whitelistedKeywords: safeArray(kidsProfile.whitelistedKeywords),
+                whitelistChannels: kidsWhitelistChannels,
+                whitelistKeywords: kidsWhitelistKeywords,
+                whitelistedChannels: kidsWhitelistChannels,
+                whitelistedKeywords: kidsWhitelistKeywords,
                 videoIds: safeArray(kidsProfile.videoIds),
                 subscriptions: safeArray(kidsProfile.subscriptions)
             }
@@ -335,7 +360,6 @@ function readAutoBackupState() {
 function isTrustedUiSender(sender) {
     try {
         if (!sender) return false;
-        if (sender.tab) return false;
         const url = typeof sender.url === 'string' ? sender.url : '';
         if (!url) return false;
         const base = typeof browserAPI?.runtime?.getURL === 'function' ? browserAPI.runtime.getURL('') : '';
@@ -764,14 +788,19 @@ function buildProfilesV4FromLegacyState(items, storageUpdates = {}) {
                     hideSearchShelves: !!items?.hideSearchShelves
                 },
                 main: {
+                    mode: 'blocklist',
                     channels: safeArray(mainChannels),
-                    keywords: safeArray(mainKeywords)
+                    keywords: safeArray(mainKeywords),
+                    whitelistChannels: [],
+                    whitelistKeywords: []
                 },
                 kids: {
                     mode: 'blocklist',
                     strictMode: kidsV3.strictMode !== false,
                     blockedChannels: safeArray(kidsV3.blockedChannels),
-                    blockedKeywords: safeArray(kidsV3.blockedKeywords)
+                    blockedKeywords: safeArray(kidsV3.blockedKeywords),
+                    whitelistChannels: [],
+                    whitelistKeywords: []
                 }
             }
         }
@@ -1169,6 +1198,23 @@ async function getCompiledSettings(sender = null, profileType = null) {
             const activeSettings = safeObject(activeProfile.settings);
             const syncKidsToMain = !!activeSettings.syncKidsToMain;
 
+            const mainModeFromV4 = (typeof activeMain.mode === 'string' && activeMain.mode === 'whitelist')
+                ? 'whitelist'
+                : 'blocklist';
+            const kidsModeFromV4 = (typeof activeKids.mode === 'string' && activeKids.mode === 'whitelist')
+                ? 'whitelist'
+                : 'blocklist';
+            compiledSettings.listMode = shouldUseKidsProfile ? kidsModeFromV4 : mainModeFromV4;
+
+            const rawWhitelistKeywords = shouldUseKidsProfile
+                ? (Array.isArray(activeKids.whitelistKeywords) ? activeKids.whitelistKeywords : [])
+                : (Array.isArray(activeMain.whitelistKeywords) ? activeMain.whitelistKeywords : []);
+            compiledSettings.whitelistKeywords = compileKeywordEntries(rawWhitelistKeywords);
+
+            const rawWhitelistChannels = shouldUseKidsProfile
+                ? (Array.isArray(activeKids.whitelistChannels) ? activeKids.whitelistChannels : [])
+                : (Array.isArray(activeMain.whitelistChannels) ? activeMain.whitelistChannels : []);
+
             const boolFromV4 = (key, legacyValue) => {
                 try {
                     if (Object.prototype.hasOwnProperty.call(activeSettings, key)) {
@@ -1224,11 +1270,11 @@ async function getCompiledSettings(sender = null, profileType = null) {
             const kidsChannelsV4 = Array.isArray(activeKids.blockedChannels) ? activeKids.blockedChannels : null;
             const kidsKeywordsV4 = Array.isArray(activeKids.blockedKeywords) ? activeKids.blockedKeywords : null;
 
-            const effectiveKidsChannels = (kidsChannelsV4 && kidsChannelsV4.length > 0)
+            const effectiveKidsChannels = (kidsChannelsV4 != null)
                 ? kidsChannelsV4
                 : kidsChannelsV3;
 
-            const effectiveKidsKeywords = (kidsKeywordsV4 && kidsKeywordsV4.length > 0)
+            const effectiveKidsKeywords = (kidsKeywordsV4 != null)
                 ? kidsKeywordsV4
                 : kidsKeywordsV3;
 
@@ -1236,19 +1282,107 @@ async function getCompiledSettings(sender = null, profileType = null) {
                 const out = [];
                 const seen = new Set();
                 for (const ch of Array.isArray(channels) ? channels : []) {
-                    if (!ch || typeof ch !== 'object') continue;
-                    const id = typeof ch.id === 'string' ? ch.id.trim().toLowerCase() : '';
-                    const handle = typeof ch.handle === 'string' ? ch.handle.trim().toLowerCase() : '';
-                    const customUrl = typeof ch.customUrl === 'string' ? ch.customUrl.trim().toLowerCase() : '';
-                    const name = typeof ch.name === 'string' ? ch.name.trim().toLowerCase() : '';
+                    if (!ch) continue;
+                    const normalized = (() => {
+                        if (typeof ch === 'string') {
+                            const trimmed = ch.trim();
+                            if (!trimmed) return null;
+                            const looksLikeHandle = trimmed.startsWith('@');
+                            return {
+                                name: trimmed,
+                                id: trimmed,
+                                handle: looksLikeHandle ? trimmed.toLowerCase() : null,
+                                handleDisplay: looksLikeHandle ? trimmed : null,
+                                canonicalHandle: looksLikeHandle ? trimmed : null,
+                                customUrl: null,
+                                logo: null,
+                                filterAll: false,
+                                originalInput: trimmed
+                            };
+                        }
+                        if (typeof ch === 'object') {
+                            return ch;
+                        }
+                        return null;
+                    })();
+                    if (!normalized || typeof normalized !== 'object') continue;
+                    const id = typeof normalized.id === 'string' ? normalized.id.trim().toLowerCase() : '';
+                    const handle = typeof normalized.handle === 'string' ? normalized.handle.trim().toLowerCase() : '';
+                    const customUrl = typeof normalized.customUrl === 'string' ? normalized.customUrl.trim().toLowerCase() : '';
+                    const name = typeof normalized.name === 'string' ? normalized.name.trim().toLowerCase() : '';
                     const key = id ? `id:${id}` : (handle ? `handle:${handle}` : (customUrl ? `custom:${customUrl}` : (name ? `name:${name}` : '')));
                     if (!key) continue;
                     if (seen.has(key)) continue;
                     seen.add(key);
-                    out.push(ch);
+                    out.push(normalized);
                 }
                 return out;
             };
+
+            const compileWhitelistChannels = (channels = []) => {
+                const out = [];
+                for (const ch of Array.isArray(channels) ? channels : []) {
+                    if (!ch) continue;
+                    if (typeof ch === 'string') {
+                        const trimmed = ch.trim();
+                        if (!trimmed) continue;
+                        const looksLikeHandle = trimmed.startsWith('@');
+                        const canonicalHandle = looksLikeHandle ? trimmed : null;
+                        const normalizedHandle = looksLikeHandle ? trimmed.toLowerCase() : null;
+                        out.push({
+                            name: trimmed,
+                            id: trimmed,
+                            handle: normalizedHandle,
+                            handleDisplay: looksLikeHandle ? trimmed : null,
+                            canonicalHandle: canonicalHandle,
+                            logo: null,
+                            filterAll: false,
+                            originalInput: trimmed,
+                            customUrl: null,
+                            source: null,
+                            addedAt: null,
+                            collaborationGroupId: null,
+                            collaborationWith: null,
+                            allCollaborators: null
+                        });
+                        continue;
+                    }
+                    if (ch && typeof ch === 'object') {
+                        const candidateCanonical = (ch.canonicalHandle || ch.handle || '').trim();
+                        const canonicalHandle = candidateCanonical.startsWith('@') ? candidateCanonical : '';
+                        const normalizedHandle = canonicalHandle ? canonicalHandle.toLowerCase() : null;
+                        const candidateDisplay = (ch.handleDisplay || '').trim();
+                        const displayHandle = candidateDisplay.startsWith('@')
+                            ? candidateDisplay
+                            : (canonicalHandle || '');
+                        const collaborationGroupId = typeof ch.collaborationGroupId === 'string' ? ch.collaborationGroupId : null;
+                        const collaborationWith = Array.isArray(ch.collaborationWith) ? ch.collaborationWith : null;
+                        const allCollaborators = Array.isArray(ch.allCollaborators) ? ch.allCollaborators : null;
+                        const channelObj = {
+                            name: ch.name,
+                            id: ch.id || ch.originalInput || ch.handle || ch.customUrl || ch.name || '',
+                            handle: normalizedHandle,
+                            handleDisplay: displayHandle || null,
+                            canonicalHandle: canonicalHandle || null,
+                            logo: ch.logo || null,
+                            filterAll: false,
+                            filterAllComments: true,
+                            originalInput: ch.originalInput || ch.id || ch.handle || ch.name || null,
+                            customUrl: ch.customUrl || null,
+                            source: typeof ch.source === 'string' ? ch.source : null,
+                            addedAt: typeof ch.addedAt === 'number' ? ch.addedAt : null,
+                            collaborationGroupId,
+                            collaborationWith,
+                            allCollaborators
+                        };
+                        if (!channelObj.id && !channelObj.handle && !channelObj.customUrl && !channelObj.name) continue;
+                        out.push(channelObj);
+                    }
+                }
+                return dedupeChannels(out);
+            };
+
+            compiledSettings.whitelistChannels = compileWhitelistChannels(rawWhitelistChannels);
 
             const storedChannels = shouldUseKidsProfile
                 ? effectiveKidsChannels
@@ -2028,6 +2162,482 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
         }
         sendResponse?.({ ok: true });
         return false;
+    } else if (action === 'FilterTube_SetListMode') {
+        if (!isTrustedUiSender(sender)) {
+            sendResponse?.({ ok: false, error: 'untrusted_sender' });
+            return false;
+        }
+
+        const requestedMode = (typeof request?.mode === 'string' && request.mode === 'whitelist')
+            ? 'whitelist'
+            : 'blocklist';
+        const requestedProfile = (typeof request?.profileType === 'string' && request.profileType === 'kids')
+            ? 'kids'
+            : 'main';
+        const shouldCopyBlocklist = request?.copyBlocklist === true;
+
+        (async () => {
+            const storage = await storageGet([
+                FT_PROFILES_V4_KEY,
+                'filterChannels',
+                'uiKeywords',
+                'filterKeywords',
+                'ftProfilesV3'
+            ]);
+
+            let profilesV4 = storage?.[FT_PROFILES_V4_KEY];
+            if (!isValidProfilesV4(profilesV4)) {
+                try {
+                    profilesV4 = buildProfilesV4FromLegacyState(storage, {});
+                } catch (e) {
+                    profilesV4 = null;
+                }
+            }
+            if (!profilesV4 || !isValidProfilesV4(profilesV4)) {
+                sendResponse?.({ ok: false, error: 'profiles_unavailable' });
+                return;
+            }
+
+            const activeId = typeof profilesV4.activeProfileId === 'string' ? profilesV4.activeProfileId : DEFAULT_PROFILE_ID;
+            const profiles = safeObject(profilesV4.profiles);
+            const activeProfile = safeObject(profiles[activeId]);
+            const activeMain = safeObject(activeProfile.main);
+            const activeKids = safeObject(activeProfile.kids);
+
+            const nextMain = { ...activeMain };
+            const nextKids = { ...activeKids };
+
+            if (requestedProfile === 'kids') {
+                nextKids.mode = requestedMode;
+            } else {
+                nextMain.mode = requestedMode;
+            }
+
+            const sanitizeKeywordList = (raw) => {
+                return (Array.isArray(raw) ? raw : [])
+                    .map(entry => {
+                        if (!entry) return null;
+                        if (typeof entry === 'string') {
+                            const word = entry.trim();
+                            if (!word) return null;
+                            return { word, exact: false, comments: true, source: 'user', channelRef: null, addedAt: Date.now() };
+                        }
+                        if (typeof entry === 'object') {
+                            const word = typeof entry.word === 'string' ? entry.word.trim() : '';
+                            if (!word) return null;
+                            return {
+                                ...entry,
+                                word,
+                                exact: entry.exact === true,
+                                comments: entry.comments !== false,
+                                source: entry.source === 'channel' ? 'channel' : 'user',
+                                channelRef: entry.source === 'channel' ? (entry.channelRef || null) : null,
+                                addedAt: (typeof entry.addedAt === 'number' && Number.isFinite(entry.addedAt)) ? entry.addedAt : Date.now()
+                            };
+                        }
+                        return null;
+                    })
+                    .filter(Boolean);
+            };
+
+            const dedupeKeywordList = (list) => {
+                const out = [];
+                const seen = new Set();
+                for (const entry of Array.isArray(list) ? list : []) {
+                    const word = typeof entry?.word === 'string' ? entry.word.trim() : '';
+                    if (!word) continue;
+                    const exact = entry.exact === true;
+                    const key = `${word.toLowerCase()}::${exact ? '1' : '0'}`;
+                    if (seen.has(key)) continue;
+                    seen.add(key);
+                    out.push(entry);
+                }
+                return out;
+            };
+
+            const dedupeChannels = (channels = []) => {
+                const out = [];
+                const seen = new Set();
+                for (const ch of Array.isArray(channels) ? channels : []) {
+                    if (!ch || typeof ch !== 'object') continue;
+                    const id = typeof ch.id === 'string' ? ch.id.trim().toLowerCase() : '';
+                    const handle = typeof ch.handle === 'string' ? ch.handle.trim().toLowerCase() : '';
+                    const customUrl = typeof ch.customUrl === 'string' ? ch.customUrl.trim().toLowerCase() : '';
+                    const name = typeof ch.name === 'string' ? ch.name.trim().toLowerCase() : '';
+                    const key = id ? `id:${id}` : (handle ? `handle:${handle}` : (customUrl ? `custom:${customUrl}` : (name ? `name:${name}` : '')));
+                    if (!key) continue;
+                    if (seen.has(key)) continue;
+                    seen.add(key);
+                    out.push(ch);
+                }
+                return out;
+            };
+
+            const mergeAndClearBlocklistIntoWhitelist = (scope) => {
+                if (scope === 'kids') {
+                    const blockedChannels = Array.isArray(nextKids.blockedChannels) ? nextKids.blockedChannels : [];
+                    const blockedKeywords = Array.isArray(nextKids.blockedKeywords) ? nextKids.blockedKeywords : [];
+                    const whitelistChannels = Array.isArray(nextKids.whitelistChannels) ? nextKids.whitelistChannels : [];
+                    const whitelistKeywords = Array.isArray(nextKids.whitelistKeywords) ? nextKids.whitelistKeywords : [];
+
+                    nextKids.whitelistChannels = dedupeChannels([...whitelistChannels, ...blockedChannels]);
+                    nextKids.whitelistKeywords = dedupeKeywordList([
+                        ...sanitizeKeywordList(whitelistKeywords),
+                        ...sanitizeKeywordList(blockedKeywords)
+                    ]);
+
+                    nextKids.blockedChannels = [];
+                    nextKids.blockedKeywords = [];
+                    return;
+                }
+
+                const blockedChannels = Array.isArray(nextMain.channels)
+                    ? nextMain.channels
+                    : (Array.isArray(storage.filterChannels) ? storage.filterChannels : []);
+                const blockedKeywords = Array.isArray(nextMain.keywords)
+                    ? nextMain.keywords
+                    : (Array.isArray(storage.uiKeywords) ? storage.uiKeywords : []);
+                const whitelistChannels = Array.isArray(nextMain.whitelistChannels) ? nextMain.whitelistChannels : [];
+                const whitelistKeywords = Array.isArray(nextMain.whitelistKeywords) ? nextMain.whitelistKeywords : [];
+
+                nextMain.whitelistChannels = dedupeChannels([...whitelistChannels, ...blockedChannels]);
+                nextMain.whitelistKeywords = dedupeKeywordList([
+                    ...sanitizeKeywordList(whitelistKeywords),
+                    ...sanitizeKeywordList(blockedKeywords)
+                ]);
+
+                nextMain.channels = [];
+                nextMain.keywords = [];
+            };
+
+            if (requestedMode === 'whitelist') {
+                mergeAndClearBlocklistIntoWhitelist(requestedProfile);
+            }
+
+            profiles[activeId] = {
+                ...activeProfile,
+                name: typeof activeProfile.name === 'string' ? activeProfile.name : 'Default',
+                settings: safeObject(activeProfile.settings),
+                main: nextMain,
+                kids: nextKids
+            };
+
+            const nextProfilesV4 = {
+                ...profilesV4,
+                schemaVersion: 4,
+                activeProfileId: activeId,
+                profiles
+            };
+
+            const writePayload = { [FT_PROFILES_V4_KEY]: nextProfilesV4 };
+
+            if (requestedMode === 'whitelist' && requestedProfile === 'main') {
+                writePayload.filterChannels = [];
+                writePayload.uiChannels = [];
+                writePayload.uiKeywords = [];
+                writePayload.filterKeywords = [];
+                writePayload.filterKeywordsComments = [];
+            }
+
+            await browserAPI.storage.local.set(writePayload);
+
+            compiledSettingsCache.main = null;
+            compiledSettingsCache.kids = null;
+
+            try {
+                const urlPattern = requestedProfile === 'kids' ? ['*://*.youtubekids.com/*'] : ['*://*.youtube.com/*'];
+                browserAPI.tabs.query({ url: urlPattern }, tabs => {
+                    (tabs || []).forEach(tab => {
+                        if (tab?.id) browserAPI.tabs.sendMessage(tab.id, { action: 'FilterTube_RefreshNow' }, () => { });
+                    });
+                });
+            } catch (e) {
+            }
+
+            sendResponse?.({ ok: true, profileType: requestedProfile, mode: requestedMode });
+        })().catch((e) => {
+            sendResponse?.({ ok: false, error: e?.message || 'failed' });
+        });
+
+        return true;
+    } else if (action === 'addWhitelistChannelPersistent') {
+        if (!isTrustedUiSender(sender)) {
+            sendResponse?.({ success: false, error: 'untrusted_sender' });
+            return false;
+        }
+
+        const input = typeof request?.input === 'string' ? request.input.trim() : '';
+        if (!input) {
+            sendResponse?.({ success: false, error: 'Empty input' });
+            return false;
+        }
+
+        handleAddFilteredChannel(
+            input,
+            false,
+            null,
+            null,
+            { source: 'user' },
+            'main',
+            '',
+            'whitelist'
+        ).then(result => {
+            try {
+                if (result && result.success) {
+                    scheduleAutoBackupInBackground('whitelist_channel_added');
+                }
+            } catch (e) {
+            }
+
+            if (result?.success) {
+                sendResponse?.({ success: true, channel: result.channelData || null, updated: !!result.updated });
+            } else {
+                sendResponse?.({ success: false, error: result?.error || 'Failed to add whitelist channel' });
+            }
+        }).catch((error) => {
+            sendResponse?.({ success: false, error: error?.message || 'Failed to add whitelist channel' });
+        });
+
+        return true;
+    } else if (action === 'FilterTube_KidsWhitelistChannel') {
+        if (!isTrustedUiSender(sender)) {
+            sendResponse?.({ success: false, error: 'untrusted_sender' });
+            return false;
+        }
+
+        const channel = request?.channel && typeof request.channel === 'object' ? request.channel : {};
+        const rawVideoId = typeof request?.videoId === 'string' ? request.videoId.trim() : '';
+        const originalInput = typeof channel?.originalInput === 'string' ? channel.originalInput.trim() : '';
+
+        const input = originalInput
+            || (rawVideoId ? `watch:${rawVideoId}` : '')
+            || (typeof channel?.id === 'string' ? channel.id.trim() : '')
+            || (typeof channel?.name === 'string' ? channel.name.trim() : '');
+
+        if (!input) {
+            sendResponse?.({ success: false, error: 'Empty input' });
+            return false;
+        }
+
+        handleAddFilteredChannel(
+            input,
+            false,
+            null,
+            null,
+            {
+                displayHandle: channel?.handleDisplay || null,
+                canonicalHandle: channel?.canonicalHandle || null,
+                channelName: channel?.name || null,
+                customUrl: channel?.customUrl || null,
+                source: channel?.source || 'user'
+            },
+            'kids',
+            rawVideoId,
+            'whitelist'
+        ).then(result => {
+            try {
+                if (result && result.success) {
+                    scheduleAutoBackupInBackground('kids_whitelist_channel_added');
+                }
+            } catch (e) {
+            }
+
+            if (result?.success) {
+                sendResponse?.({ success: true, channel: result.channelData || null, updated: !!result.updated });
+            } else {
+                sendResponse?.({ success: false, error: result?.error || 'Failed to add Kids whitelist channel' });
+            }
+        }).catch(error => {
+            sendResponse?.({ success: false, error: error?.message || 'Failed to add Kids whitelist channel' });
+        });
+
+        return true;
+    } else if (action === 'FilterTube_TransferWhitelistToBlocklist') {
+        if (!isTrustedUiSender(sender)) {
+            sendResponse?.({ ok: false, error: 'untrusted_sender' });
+            return false;
+        }
+
+        const requestedProfile = (typeof request?.profileType === 'string' && request.profileType === 'kids')
+            ? 'kids'
+            : 'main';
+
+        (async () => {
+            const storage = await storageGet([
+                FT_PROFILES_V4_KEY,
+                'filterChannels',
+                'uiKeywords',
+                'filterKeywords',
+                'filterKeywordsComments',
+                'ftProfilesV3'
+            ]);
+
+            let profilesV4 = storage?.[FT_PROFILES_V4_KEY];
+            if (!isValidProfilesV4(profilesV4)) {
+                try {
+                    profilesV4 = buildProfilesV4FromLegacyState(storage, {});
+                } catch (e) {
+                    profilesV4 = null;
+                }
+            }
+            if (!profilesV4 || !isValidProfilesV4(profilesV4)) {
+                sendResponse?.({ ok: false, error: 'profiles_unavailable' });
+                return;
+            }
+
+            const activeId = typeof profilesV4.activeProfileId === 'string' ? profilesV4.activeProfileId : DEFAULT_PROFILE_ID;
+            const profiles = safeObject(profilesV4.profiles);
+            const activeProfile = safeObject(profiles[activeId]);
+            const activeMain = safeObject(activeProfile.main);
+            const activeKids = safeObject(activeProfile.kids);
+
+            const nextMain = { ...activeMain };
+            const nextKids = { ...activeKids };
+
+            const sanitizeKeywordList = (raw) => {
+                return (Array.isArray(raw) ? raw : [])
+                    .map(entry => {
+                        if (!entry) return null;
+                        if (typeof entry === 'string') {
+                            const word = entry.trim();
+                            if (!word) return null;
+                            return { word, exact: false, comments: true, source: 'user', channelRef: null, addedAt: Date.now() };
+                        }
+                        if (typeof entry === 'object') {
+                            const word = typeof entry.word === 'string' ? entry.word.trim() : '';
+                            if (!word) return null;
+                            return {
+                                ...entry,
+                                word,
+                                exact: entry.exact === true,
+                                comments: entry.comments !== false,
+                                source: entry.source === 'channel' ? 'channel' : 'user',
+                                channelRef: entry.source === 'channel' ? (entry.channelRef || null) : null,
+                                addedAt: (typeof entry.addedAt === 'number' && Number.isFinite(entry.addedAt)) ? entry.addedAt : Date.now()
+                            };
+                        }
+                        return null;
+                    })
+                    .filter(Boolean);
+            };
+
+            const dedupeKeywordList = (list) => {
+                const out = [];
+                const seen = new Set();
+                for (const entry of Array.isArray(list) ? list : []) {
+                    const word = typeof entry?.word === 'string' ? entry.word.trim() : '';
+                    if (!word) continue;
+                    const exact = entry.exact === true;
+                    const key = `${word.toLowerCase()}::${exact ? '1' : '0'}`;
+                    if (seen.has(key)) continue;
+                    seen.add(key);
+                    out.push(entry);
+                }
+                return out;
+            };
+
+            const dedupeChannels = (channels = []) => {
+                const out = [];
+                const seen = new Set();
+                for (const ch of Array.isArray(channels) ? channels : []) {
+                    if (!ch || typeof ch !== 'object') continue;
+                    const id = typeof ch.id === 'string' ? ch.id.trim().toLowerCase() : '';
+                    const handle = typeof ch.handle === 'string' ? ch.handle.trim().toLowerCase() : '';
+                    const customUrl = typeof ch.customUrl === 'string' ? ch.customUrl.trim().toLowerCase() : '';
+                    const name = typeof ch.name === 'string' ? ch.name.trim().toLowerCase() : '';
+                    const key = id ? `id:${id}` : (handle ? `handle:${handle}` : (customUrl ? `custom:${customUrl}` : (name ? `name:${name}` : '')));
+                    if (!key) continue;
+                    if (seen.has(key)) continue;
+                    seen.add(key);
+                    out.push(ch);
+                }
+                return out;
+            };
+
+            if (requestedProfile === 'kids') {
+                const whitelistChannels = Array.isArray(nextKids.whitelistChannels) ? nextKids.whitelistChannels : [];
+                const whitelistKeywords = Array.isArray(nextKids.whitelistKeywords) ? nextKids.whitelistKeywords : [];
+                const blockedChannels = Array.isArray(nextKids.blockedChannels) ? nextKids.blockedChannels : [];
+                const blockedKeywords = Array.isArray(nextKids.blockedKeywords) ? nextKids.blockedKeywords : [];
+
+                nextKids.blockedChannels = dedupeChannels([...blockedChannels, ...whitelistChannels]);
+                nextKids.blockedKeywords = dedupeKeywordList([
+                    ...sanitizeKeywordList(blockedKeywords),
+                    ...sanitizeKeywordList(whitelistKeywords)
+                ]);
+                nextKids.whitelistChannels = [];
+                nextKids.whitelistKeywords = [];
+                nextKids.mode = 'blocklist';
+            } else {
+                const whitelistChannels = Array.isArray(nextMain.whitelistChannels) ? nextMain.whitelistChannels : [];
+                const whitelistKeywords = Array.isArray(nextMain.whitelistKeywords) ? nextMain.whitelistKeywords : [];
+                const blockedChannels = Array.isArray(nextMain.channels) ? nextMain.channels : [];
+                const blockedKeywords = Array.isArray(nextMain.keywords) ? nextMain.keywords : [];
+
+                nextMain.channels = dedupeChannels([...blockedChannels, ...whitelistChannels]);
+                nextMain.keywords = dedupeKeywordList([
+                    ...sanitizeKeywordList(blockedKeywords),
+                    ...sanitizeKeywordList(whitelistKeywords)
+                ]);
+                nextMain.whitelistChannels = [];
+                nextMain.whitelistKeywords = [];
+                nextMain.mode = 'blocklist';
+            }
+
+            profiles[activeId] = {
+                ...activeProfile,
+                name: typeof activeProfile.name === 'string' ? activeProfile.name : 'Default',
+                settings: safeObject(activeProfile.settings),
+                main: nextMain,
+                kids: nextKids
+            };
+
+            const nextProfilesV4 = {
+                ...profilesV4,
+                schemaVersion: 4,
+                activeProfileId: activeId,
+                profiles
+            };
+
+            const writePayload = { [FT_PROFILES_V4_KEY]: nextProfilesV4 };
+
+            if (requestedProfile === 'main') {
+                writePayload.filterChannels = Array.isArray(nextMain.channels) ? nextMain.channels : [];
+                writePayload.uiKeywords = Array.isArray(nextMain.keywords) ? nextMain.keywords : [];
+                try {
+                    writePayload.uiChannels = safeArray(writePayload.filterChannels)
+                        .map(ch => (typeof ch?.name === 'string' ? ch.name : ''))
+                        .filter(Boolean);
+                } catch (e) {
+                }
+            }
+
+            await browserAPI.storage.local.set(writePayload);
+
+            compiledSettingsCache.main = null;
+            compiledSettingsCache.kids = null;
+
+            try {
+                const urlPattern = requestedProfile === 'kids' ? ['*://*.youtubekids.com/*'] : ['*://*.youtube.com/*'];
+                browserAPI.tabs.query({ url: urlPattern }, tabs => {
+                    (tabs || []).forEach(tab => {
+                        if (tab?.id) browserAPI.tabs.sendMessage(tab.id, { action: 'FilterTube_RefreshNow' }, () => { });
+                    });
+                });
+            } catch (e) {
+            }
+
+            try {
+                scheduleAutoBackupInBackground('whitelist_to_blocklist_transfer');
+            } catch (e) {
+            }
+
+            sendResponse?.({ ok: true, profileType: requestedProfile });
+        })().catch((e) => {
+            sendResponse?.({ ok: false, error: e?.message || 'failed' });
+        });
+
+        return true;
     } else if (action === 'FilterTube_ScheduleAutoBackup') {
         try {
             const triggerType = typeof request?.triggerType === 'string' ? request.triggerType : 'unknown';
@@ -2354,8 +2964,7 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
                             channels: channels
                         },
                         kids: {
-                            ...safeObject(activeProfile.kids),
-                            mode: 'blocklist'
+                            ...safeObject(activeProfile.kids)
                         }
                     };
 
@@ -3098,7 +3707,7 @@ browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
  * @param {string} videoId - Optional video ID to help with identity resolution
  * @returns {Promise<Object>} Result with success status
  */
-async function handleAddFilteredChannel(input, filterAll = false, collaborationWith = null, collaborationGroupId = null, metadata = {}, profile = 'main', videoId = '') {
+async function handleAddFilteredChannel(input, filterAll = false, collaborationWith = null, collaborationGroupId = null, metadata = {}, profile = 'main', videoId = '', listType = 'blocklist') {
     try {
         const isHandleLike = (value) => {
             if (!value || typeof value !== 'string') return false;
@@ -3455,6 +4064,7 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
 
         // Get existing channels from the correct profile
         const isKids = profile === 'kids';
+        const targetListType = listType === 'whitelist' ? 'whitelist' : 'blocklist';
         const storage = await storageGet([
             FT_PROFILES_V4_KEY,
             'filterChannels',
@@ -3487,13 +4097,26 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
 
         let channels = [];
         if (isKids) {
-            const kidsFromV4 = Array.isArray(activeKids.blockedChannels) ? activeKids.blockedChannels : null;
+            const kidsFromV4 = targetListType === 'whitelist'
+                ? (Array.isArray(activeKids.whitelistChannels) ? activeKids.whitelistChannels : null)
+                : (Array.isArray(activeKids.blockedChannels) ? activeKids.blockedChannels : null);
             const kidsProfile = safeObject(profilesV3.kids);
-            const kidsFromV3 = Array.isArray(kidsProfile.blockedChannels) ? kidsProfile.blockedChannels : [];
+            const kidsFromV3 = targetListType === 'whitelist'
+                ? (Array.isArray(kidsProfile.whitelistChannels) ? kidsProfile.whitelistChannels : safeArray(kidsProfile.whitelistedChannels))
+                : (Array.isArray(kidsProfile.blockedChannels) ? kidsProfile.blockedChannels : []);
             channels = kidsFromV4 || kidsFromV3;
         } else {
-            const mainFromV4 = Array.isArray(activeMain.channels) ? activeMain.channels : null;
-            channels = mainFromV4 || (Array.isArray(storage.filterChannels) ? storage.filterChannels : []);
+            const mainFromV4 = targetListType === 'whitelist'
+                ? (Array.isArray(activeMain.whitelistChannels) ? activeMain.whitelistChannels : null)
+                : (Array.isArray(activeMain.channels) ? activeMain.channels : null);
+            const mainProfile = safeObject(profilesV3.main);
+            const mainFromV3 = targetListType === 'whitelist'
+                ? (Array.isArray(mainProfile.whitelistChannels) ? mainProfile.whitelistChannels : safeArray(mainProfile.whitelistedChannels))
+                : null;
+            channels = mainFromV4
+                || (targetListType === 'whitelist'
+                    ? mainFromV3
+                    : (Array.isArray(storage.filterChannels) ? storage.filterChannels : []));
         }
 
         // Build allCollaborators array from collaborationWith for popup grouping
@@ -3671,14 +4294,17 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                 settings: safeObject(baseProfile.settings),
                 main: {
                     ...nextMain,
-                    channels: isKids ? safeArray(nextMain.channels) : channels
+                    channels: (!isKids && targetListType === 'blocklist') ? channels : safeArray(nextMain.channels),
+                    whitelistChannels: (!isKids && targetListType === 'whitelist') ? channels : safeArray(nextMain.whitelistChannels)
                 },
                 kids: {
                     ...nextKids,
-                    mode: 'blocklist',
+                    mode: nextKids.mode === 'whitelist' ? 'whitelist' : 'blocklist',
                     strictMode: nextKids.strictMode !== false,
-                    blockedChannels: isKids ? channels : safeArray(nextKids.blockedChannels),
-                    blockedKeywords: safeArray(nextKids.blockedKeywords)
+                    blockedChannels: (isKids && targetListType === 'blocklist') ? channels : safeArray(nextKids.blockedChannels),
+                    blockedKeywords: safeArray(nextKids.blockedKeywords),
+                    whitelistChannels: (isKids && targetListType === 'whitelist') ? channels : safeArray(nextKids.whitelistChannels),
+                    whitelistKeywords: safeArray(nextKids.whitelistKeywords)
                 }
             };
 
@@ -3690,10 +4316,16 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
         }
 
         if (isKids) {
+            const existingKidsV3 = safeObject(profilesV3.kids);
             profilesV3.kids = {
-                ...(profilesV3.kids || {}),
-                blockedChannels: channels,
-                mode: 'blocklist'
+                ...existingKidsV3,
+                blockedChannels: targetListType === 'blocklist'
+                    ? channels
+                    : safeArray(existingKidsV3.blockedChannels),
+                whitelistedChannels: targetListType === 'whitelist'
+                    ? channels
+                    : safeArray(existingKidsV3.whitelistedChannels),
+                mode: existingKidsV3.mode === 'whitelist' ? 'whitelist' : 'blocklist'
             };
             storageWritePayload.ftProfilesV3 = profilesV3;
 
@@ -3706,14 +4338,29 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                 });
             } catch (e) { }
         } else {
-            storageWritePayload.filterChannels = channels;
-            try {
-                storageWritePayload.uiChannels = safeArray(channels).map(ch => (typeof ch?.name === 'string' ? ch.name : '')).filter(Boolean);
-            } catch (e) {
+            if (targetListType === 'blocklist') {
+                storageWritePayload.filterChannels = channels;
+                try {
+                    storageWritePayload.uiChannels = safeArray(channels).map(ch => (typeof ch?.name === 'string' ? ch.name : '')).filter(Boolean);
+                } catch (e) {
+                }
+            }
+
+            if (targetListType === 'whitelist') {
+                const existingMainV3 = safeObject(profilesV3.main);
+                profilesV3.main = {
+                    ...existingMainV3,
+                    whitelistedChannels: channels,
+                    mode: existingMainV3.mode === 'whitelist' ? 'whitelist' : 'blocklist'
+                };
+                storageWritePayload.ftProfilesV3 = profilesV3;
             }
         }
 
         await browserAPI.storage.local.set(storageWritePayload);
+
+        compiledSettingsCache.main = null;
+        compiledSettingsCache.kids = null;
 
         try {
             if (existingIndex === -1) {
@@ -3785,17 +4432,18 @@ async function handleToggleChannelFilterAll(channelId, value) {
                 settings: safeObject(activeProfile.settings),
                 main: {
                     ...main,
-                    channels: channels
+                    channels
                 },
                 kids: {
                     ...safeObject(activeProfile.kids),
-                    mode: 'blocklist'
+                    mode: safeObject(activeProfile.kids).mode === 'whitelist' ? 'whitelist' : 'blocklist'
                 }
             };
 
             nextProfilesV4 = {
                 ...profilesV4,
                 schemaVersion: 4,
+                activeProfileId: activeId,
                 profiles
             };
         } catch (e) {
@@ -3809,6 +4457,9 @@ async function handleToggleChannelFilterAll(channelId, value) {
             }
             browserAPI.storage.local.set(payload, resolve);
         });
+
+        compiledSettingsCache.main = null;
+        compiledSettingsCache.kids = null;
 
         console.log('FilterTube Background: Toggled filterAll for channel:', channelId, 'to:', value);
 

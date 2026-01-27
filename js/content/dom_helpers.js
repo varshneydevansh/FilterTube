@@ -35,6 +35,13 @@ function toggleVisibility(element, shouldHide, reason = '', skipStats = false) {
 
     if (shouldHide) {
         const wasAlreadyHidden = element.classList.contains('filtertube-hidden');
+        const wasWhitelistPending = element.getAttribute('data-filtertube-whitelist-pending') === 'true';
+
+        if (wasAlreadyHidden && wasWhitelistPending && !skipStats) {
+            element.removeAttribute('data-filtertube-whitelist-pending');
+            filteringTracker.recordHide(element, reason);
+            incrementHiddenStats(element);
+        }
 
         if (!wasAlreadyHidden) {
             // IMPORTANT: Extract duration BEFORE hiding the element
@@ -66,9 +73,22 @@ function toggleVisibility(element, shouldHide, reason = '', skipStats = false) {
         handleMediaPlayback(element, true);
     } else {
         const wasHidden = element.classList.contains('filtertube-hidden');
+        const wasShelfHidden = element.classList.contains('filtertube-hidden-shelf');
+        const hadHiddenAttr = element.hasAttribute('data-filtertube-hidden');
+        const hadWhitelistPending = element.getAttribute('data-filtertube-whitelist-pending') === 'true';
 
-        if (wasHidden) {
-            element.classList.remove('filtertube-hidden');
+        if (wasShelfHidden) {
+            element.classList.remove('filtertube-hidden-shelf');
+        }
+
+        if (hadWhitelistPending) {
+            element.removeAttribute('data-filtertube-whitelist-pending');
+        }
+
+        if (wasHidden || hadHiddenAttr) {
+            if (wasHidden) {
+                element.classList.remove('filtertube-hidden');
+            }
             element.removeAttribute('data-filtertube-hidden');
             // CRITICAL: Reset inline style.display that was set during hiding
             try {
@@ -78,14 +98,16 @@ function toggleVisibility(element, shouldHide, reason = '', skipStats = false) {
             }
             // debugLog(`✅ Restoring element`);
 
-            // Record for tracking (only for non-container items)
-            if (!skipStats) {
-                filteringTracker.recordRestore(element);
-            }
+            if (wasHidden) {
+                // Record for tracking (only for non-container items)
+                if (!skipStats) {
+                    filteringTracker.recordRestore(element);
+                }
 
-            // Decrement stats when unhiding content (only if we had counted it)
-            if (!skipStats) {
-                decrementHiddenStats(element);
+                // Decrement stats when unhiding content (only if we had counted it)
+                if (!skipStats) {
+                    decrementHiddenStats(element);
+                }
             }
         }
         handleMediaPlayback(element, false);
@@ -99,16 +121,44 @@ function updateContainerVisibility(container, childSelector) {
     if (!container) return;
     if (container.hasAttribute('data-filtertube-hidden-by-shelf-title')) return;
     if (container.hasAttribute('data-filtertube-hidden-by-hide-all-shorts')) return;
+    const ignoreEmptyHide = container.getAttribute('data-filtertube-ignore-empty-hide') === 'true';
 
     const children = container.querySelectorAll(childSelector);
-    if (children.length === 0) return; // Don't hide empty containers that might be loading
+    const hadChildren = container.getAttribute('data-filtertube-container-had-children') === 'true';
+    if (children.length === 0) {
+        if (ignoreEmptyHide) {
+            container.classList.remove('filtertube-hidden-shelf');
+            if (container.classList.contains('filtertube-hidden')) {
+                container.classList.remove('filtertube-hidden');
+                container.removeAttribute('data-filtertube-hidden');
+            }
+            return;
+        }
+        if (hadChildren) {
+            container.classList.add('filtertube-hidden-shelf');
+        }
+        return;
+    }
+
+    if (!hadChildren) {
+        container.setAttribute('data-filtertube-container-had-children', 'true');
+    }
 
     // Check if all children are hidden
-    const allHidden = Array.from(children).every(child =>
-        child.classList.contains('filtertube-hidden') ||
-        child.hasAttribute('data-filtertube-hidden') ||
-        child.closest('.filtertube-hidden') !== null
-    );
+    const allHidden = Array.from(children).every(child => {
+        if (!child) return true;
+        if (child.classList.contains('filtertube-hidden')) return true;
+        if (child.classList.contains('filtertube-hidden-shelf')) return true;
+        if (child.hasAttribute('data-filtertube-hidden')) return true;
+
+        const hiddenAncestor = child.closest('.filtertube-hidden');
+        if (hiddenAncestor && hiddenAncestor !== container) return true;
+
+        const shelfAncestor = child.closest('.filtertube-hidden-shelf');
+        if (shelfAncestor && shelfAncestor !== container) return true;
+
+        return false;
+    });
 
     if (allHidden) {
         container.classList.add('filtertube-hidden-shelf');

@@ -1,4 +1,4 @@
-# Channel Blocking System (v3.2.1)
+# Channel Blocking System (v3.2.3)
 
 ## 0. Goal & Non-Goals
 
@@ -7,14 +7,16 @@
 FilterTube must be able to:
 
 - Identify **channel identity** for a piece of content (preferably a stable **UC channel ID**, and also capture **@handle** when available).
-- Persist blocked channels in extension storage.
-- Hide (and optionally keyword-filter) all content attributable to those blocked channels.
+- Persist blocked/allowed channels in extension storage with dual filtering modes.
+- Hide (and optionally keyword-filter) all content attributable to those blocked channels in Blocklist mode.
+- Show only content from allowed channels in Whitelist mode (v3.2.3).
 - Work reliably across YouTube surfaces (Home, Search, Shorts, Watch, Kids), including SPA navigation and DOM recycling.
 - Provide accurate channel names in 3-dot menus, upgrading from UC IDs/handles to human-readable names.
+- Support mode switching with list migration (blocklist ↔ whitelist).
 
 ### Non-goals (for this doc)
 
-- This document does **not** implement new behavior.
+- This document does **not** implement new behavior beyond the scope of channel blocking/allowing.
 - Watch-page playlist specifics are documented elsewhere and will be handled as a separate workstream.
 
 ---
@@ -251,7 +253,42 @@ Result: Multi-channel menus appear instantly on watch/home/search.
 - It calls `content_bridge.js:injectFilterTubeMenuItem(dropdown, videoCard)` to render "Block channel" menu entry.
 - On click, `content_bridge.js:handleBlockChannelClick(channelInfo, ...)` runs.
 
-### 6.2 Post-Block Enrichment System (v3.2.1)
+### 6.2 Whitelist Mode Integration (v3.2.3)
+
+FilterTube v3.2.3 extends the channel blocking system to support Whitelist mode, where the filtering logic is inverted:
+
+#### Mode-Aware Channel Operations
+
+```javascript
+// In content_bridge.js - mode-aware menu injection
+function injectFilterTubeMenuItem(menuList, videoCard, channelInfo) {
+    const state = StateManager.getState();
+    const mode = state?.mode === 'whitelist' ? 'whitelist' : 'blocklist';
+    
+    // Update menu text based on mode
+    const menuItemText = mode === 'whitelist' ? 'Allow channel' : 'Block channel';
+    
+    // Send to appropriate list based on mode
+    const action = mode === 'whitelist' ? 'addWhitelistChannelPersistent' : 'addChannelPersistent';
+}
+```
+
+#### Storage Schema Extension
+
+The Profiles V4 schema now includes whitelist-specific fields:
+
+```javascript
+// In background.js - compiled settings with whitelist support
+const compiledSettings = {
+    listMode: 'blocklist' | 'whitelist',
+    filterChannels: [...], // Blocklist channels
+    whitelistChannels: [...], // Whitelist channels (v3.2.3)
+    filterKeywords: [...], // Blocklist keywords  
+    whitelistKeywords: [...] // Whitelist keywords (v3.2.3)
+};
+```
+
+### 6.3 Post-Block Enrichment System (v3.2.1)
 
 FilterTube v3.2.1 includes a sophisticated post-block enrichment system that asynchronously fills missing channel metadata after successful blocking operations.
 
@@ -454,7 +491,9 @@ After persisting, `schedulePostBlockEnrichment` may run to fill missing metadata
 
 ### 5.1 Data interception (Main World) - Zero Flash
 - `seed.js` intercepts YouTube JSON before render via `fetch` and `XMLHttpRequest` hooks.
-- `filter_logic.js` applies blocking rules to remove items from JSON.
+- `filter_logic.js` applies blocking rules based on current mode:
+  - **Blocklist Mode**: Remove items matching blocked channels/keywords
+  - **Whitelist Mode (v3.2.3)**: Remove items NOT matching whitelisted channels/keywords
 - **XHR endpoints monitored**:
   - `/youtubei/v1/search` - Search results
   - `/youtubei/v1/browse` - Home feed, channel pages
@@ -645,6 +684,7 @@ This section answers:
 - **Which element types exist on the page?**
 - **Where do we read `@handle` / UC ID / name from?**
 - **Which file implements that logic?**
+- **How does whitelist mode affect filtering? (v3.2.3)**
 
 ### 10.1 Home feed (Rich Grid)
 
@@ -658,6 +698,10 @@ This section answers:
     - `extractChannelMetadataFromElement(...)` (best-effort id/handle)
     - `extractCollaboratorMetadataFromElement(...)` for collaborations
   - The engine (`seed.js` + `filter_logic.js`) may pre-stamp `data-filtertube-channel-handle/id` onto DOM nodes.
+
+- **Whitelist mode behavior (v3.2.3)**
+  - In whitelist mode, only cards from whitelisted channels remain visible
+  - All other cards are hidden via DOM fallback or data interception
 
 - **Common handle/ID sources**
   - `href` like `"/@Handle"` or `"/channel/UC..."`

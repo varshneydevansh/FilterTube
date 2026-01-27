@@ -640,6 +640,9 @@
             const processed = {
                 filterKeywords: [],
                 filterChannels: [],
+                whitelistKeywords: [],
+                whitelistChannels: [],
+                listMode: 'blocklist',
                 hideAllComments: false,
                 hideAllShorts: false,
                 filterComments: false,
@@ -650,6 +653,20 @@
             // Reconstruct RegExp objects from serialized patterns
             if (settings.filterKeywords && Array.isArray(settings.filterKeywords)) {
                 processed.filterKeywords = settings.filterKeywords.map(item => {
+                    if (item && typeof item === 'object' && item.pattern && item.flags) {
+                        try {
+                            return new RegExp(item.pattern, item.flags);
+                        } catch (e) {
+                            console.error('FilterTube: Failed to reconstruct RegExp:', item, e);
+                            return null;
+                        }
+                    }
+                    return null;
+                }).filter(regex => regex !== null);
+            }
+
+            if (settings.whitelistKeywords && Array.isArray(settings.whitelistKeywords)) {
+                processed.whitelistKeywords = settings.whitelistKeywords.map(item => {
                     if (item && typeof item === 'object' && item.pattern && item.flags) {
                         try {
                             return new RegExp(item.pattern, item.flags);
@@ -675,6 +692,20 @@
                         id: ch.id ? ch.id.toLowerCase() : '',
                         handle: ch.handle ? ch.handle.toLowerCase() : '',
                         name: ch.name ? ch.name.toLowerCase() : '', // Lowercase name for internal matching consistency
+                    };
+                }).filter(ch => ch);
+            }
+
+            if (settings.whitelistChannels && Array.isArray(settings.whitelistChannels)) {
+                processed.whitelistChannels = settings.whitelistChannels.map(ch => {
+                    if (typeof ch === 'string') {
+                        return { name: ch, id: ch, handle: null, logo: null, filterAll: false };
+                    }
+                    return {
+                        ...ch,
+                        id: ch.id ? ch.id.toLowerCase() : '',
+                        handle: ch.handle ? ch.handle.toLowerCase() : '',
+                        name: ch.name ? ch.name.toLowerCase() : '',
                     };
                 }).filter(ch => ch);
             }
@@ -824,6 +855,12 @@
                         entry?.playlistPanelVideoWrapperRenderer?.primaryRenderer;
                     if (!renderer) return;
 
+                    const playlistVideoId =
+                        renderer?.videoId ||
+                        renderer?.navigationEndpoint?.watchEndpoint?.videoId ||
+                        renderer?.navigationEndpoint?.watchEndpoint?.playlistId ||
+                        '';
+
                     const browse = renderer?.shortBylineText?.runs?.[0]?.navigationEndpoint?.browseEndpoint;
                     const browseId = browse?.browseId;
                     const canonical = browse?.canonicalBaseUrl;
@@ -832,6 +869,10 @@
                     );
                     if (browseId && normalizedHandle) {
                         this._registerMapping(browseId, normalizedHandle);
+                    }
+
+                    if (playlistVideoId && typeof playlistVideoId === 'string' && /^[a-zA-Z0-9_-]{11}$/.test(playlistVideoId) && browseId && typeof browseId === 'string' && browseId.startsWith('UC')) {
+                        this._registerVideoChannelMapping(playlistVideoId, browseId);
                     }
                 });
             }
@@ -1097,6 +1138,8 @@
                 }
             }
             const skipKeywordFiltering = CHANNEL_ONLY_RENDERERS.has(rendererType);
+            const listMode = (this.settings.listMode === 'whitelist') ? 'whitelist' : 'blocklist';
+            const isCommentRenderer = rendererType.includes('comment') || rendererType.includes('Comment');
 
             // Shorts: if no channel identity present, try videoChannelMap (populated when user blocked Shorts)
             if (
@@ -1153,6 +1196,41 @@
             // Shorts filtering
             if (this.settings.hideAllShorts && (rendererType === 'reelItemRenderer' || rendererType === 'shortsLockupViewModel' || rendererType === 'shortsLockupViewModelV2')) {
                 this._log(`🚫 Blocking Shorts: ${title || 'Unknown'}`);
+                return true;
+            }
+
+            if (listMode === 'whitelist' && !isCommentRenderer) {
+                const whitelistChannels = Array.isArray(this.settings.whitelistChannels) ? this.settings.whitelistChannels : [];
+                const whitelistKeywords = Array.isArray(this.settings.whitelistKeywords) ? this.settings.whitelistKeywords : [];
+
+                const hasChannelRules = whitelistChannels.length > 0;
+                const hasKeywordRules = !skipKeywordFiltering && whitelistKeywords.length > 0;
+
+                if (!hasChannelRules && !hasKeywordRules) {
+                    return true;
+                }
+
+                if (hasChannelRules) {
+                    for (const collaborator of collaborators) {
+                        if (collaborator && (collaborator.name || collaborator.id || collaborator.handle || collaborator.customUrl)) {
+                            for (const allowChannel of whitelistChannels) {
+                                if (this._matchesChannel(allowChannel, collaborator)) {
+                                    return false;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (hasKeywordRules && (title || description)) {
+                    const textToSearch = `${title} ${description}`.trim();
+                    for (const keywordRegex of whitelistKeywords) {
+                        if (keywordRegex.test(textToSearch)) {
+                            return false;
+                        }
+                    }
+                }
+
                 return true;
             }
 

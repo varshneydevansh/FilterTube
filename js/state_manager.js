@@ -50,6 +50,10 @@ const StateManager = (() => {
         enabled: true,
         autoBackupEnabled: false,
         syncKidsToMain: false,
+        mode: 'blocklist',
+        whitelistChannels: [],
+        whitelistKeywords: [],
+        userWhitelistKeywords: [],
         keywords: [],
         userKeywords: [],
         channels: [],
@@ -88,8 +92,8 @@ const StateManager = (() => {
         kids: {
             blockedKeywords: [],
             blockedChannels: [],
-            whitelistedChannels: [],
-            whitelistedKeywords: [],
+            whitelistChannels: [],
+            whitelistKeywords: [],
             mode: 'blocklist',
             strictMode: true,
             videoIds: [],
@@ -209,10 +213,47 @@ const StateManager = (() => {
             return kids;
         };
 
+        const pickMainFromV4 = () => {
+            if (!profilesV4 || typeof profilesV4 !== 'object' || Array.isArray(profilesV4)) return null;
+            const activeId = typeof profilesV4.activeProfileId === 'string' ? profilesV4.activeProfileId.trim() : '';
+            if (!activeId) return null;
+            const profiles = profilesV4.profiles && typeof profilesV4.profiles === 'object' && !Array.isArray(profilesV4.profiles)
+                ? profilesV4.profiles
+                : null;
+            if (!profiles) return null;
+            const activeProfile = profiles[activeId] && typeof profiles[activeId] === 'object' ? profiles[activeId] : null;
+            if (!activeProfile) return null;
+            const main = activeProfile.main && typeof activeProfile.main === 'object' ? activeProfile.main : null;
+            if (!main) return null;
+            return main;
+        };
+
         const activeProfileFromV4 = pickActiveProfileFromV4();
         if (activeProfileFromV4 && activeProfileFromV4.settings && typeof activeProfileFromV4.settings === 'object') {
             state.syncKidsToMain = !!activeProfileFromV4.settings.syncKidsToMain;
         }
+
+        const mainFromV4 = pickMainFromV4();
+        if (mainFromV4) {
+            state.mode = mainFromV4.mode === 'whitelist' ? 'whitelist' : 'blocklist';
+            state.whitelistChannels = Array.isArray(mainFromV4.whitelistChannels) ? mainFromV4.whitelistChannels : [];
+            state.whitelistKeywords = Array.isArray(mainFromV4.whitelistKeywords) ? mainFromV4.whitelistKeywords : [];
+        } else if (profilesV3 && profilesV3.main) {
+            state.mode = profilesV3.main.mode === 'whitelist' ? 'whitelist' : 'blocklist';
+            state.whitelistChannels = profilesV3.main.whitelistChannels
+                || profilesV3.main.whitelistedChannels
+                || [];
+            state.whitelistKeywords = profilesV3.main.whitelistKeywords
+                || profilesV3.main.whitelistedKeywords
+                || [];
+        } else {
+            state.mode = 'blocklist';
+            state.whitelistChannels = [];
+            state.whitelistKeywords = [];
+        }
+        state.userWhitelistKeywords = Array.isArray(state.whitelistKeywords)
+            ? state.whitelistKeywords.filter(entry => entry && entry.source !== 'channel')
+            : [];
 
         const kidsFromV4 = pickKidsFromV4();
         if (kidsFromV4) {
@@ -236,9 +277,9 @@ const StateManager = (() => {
             state.kids = {
                 blockedKeywords: kidsFromV4.blockedKeywords || [],
                 blockedChannels: cleanBlockedChannels,
-                whitelistedChannels: [],
-                whitelistedKeywords: [],
-                mode: 'blocklist',
+                whitelistChannels: kidsFromV4.whitelistChannels || [],
+                whitelistKeywords: kidsFromV4.whitelistKeywords || [],
+                mode: kidsFromV4.mode === 'whitelist' ? 'whitelist' : 'blocklist',
                 strictMode: kidsFromV4.strictMode !== false,
                 videoIds: kidsFromV4.videoIds || [],
                 subscriptions: kidsFromV4.subscriptions || []
@@ -268,9 +309,9 @@ const StateManager = (() => {
             state.kids = {
                 blockedKeywords: profilesV3.kids.blockedKeywords || [],
                 blockedChannels: cleanBlockedChannels,
-                whitelistedChannels: profilesV3.kids.whitelistedChannels || [],
-                whitelistedKeywords: profilesV3.kids.whitelistedKeywords || [],
-                mode: profilesV3.kids.mode || 'blocklist',
+                whitelistChannels: profilesV3.kids.whitelistChannels || profilesV3.kids.whitelistedChannels || [],
+                whitelistKeywords: profilesV3.kids.whitelistKeywords || profilesV3.kids.whitelistedKeywords || [],
+                mode: profilesV3.kids.mode === 'whitelist' ? 'whitelist' : 'blocklist',
                 strictMode: profilesV3.kids.strictMode !== false,
                 videoIds: profilesV3.kids.videoIds || [],
                 subscriptions: profilesV3.kids.subscriptions || []
@@ -317,8 +358,8 @@ const StateManager = (() => {
             state.kids = {
                 blockedKeywords: [],
                 blockedChannels: [],
-                whitelistedChannels: [],
-                whitelistedKeywords: [],
+                whitelistChannels: [],
+                whitelistKeywords: [],
                 mode: 'blocklist',
                 strictMode: true,
                 videoIds: [],
@@ -507,7 +548,9 @@ const StateManager = (() => {
 
         const lower = trimmed.toLowerCase();
         const kids = getKidsState();
-        if (kids.blockedKeywords.some(entry => (entry.word || '').toLowerCase() === lower)) {
+        const listKey = kids.mode === 'whitelist' ? 'whitelistKeywords' : 'blockedKeywords';
+        const list = Array.isArray(kids[listKey]) ? kids[listKey] : [];
+        if (list.some(entry => (entry.word || '').toLowerCase() === lower)) {
             return false;
         }
 
@@ -520,7 +563,7 @@ const StateManager = (() => {
             addedAt: Date.now()
         };
 
-        kids.blockedKeywords = [entry, ...kids.blockedKeywords];
+        kids[listKey] = [entry, ...list];
         state.kids = { ...kids };
         await persistKidsProfiles(state.kids);
         await requestRefresh('kids');
@@ -540,9 +583,11 @@ const StateManager = (() => {
             return false;
         }
         const kids = getKidsState();
-        const before = kids.blockedKeywords.length;
-        kids.blockedKeywords = kids.blockedKeywords.filter(entry => (entry.word || '') !== word);
-        if (kids.blockedKeywords.length === before) return false;
+        const listKey = kids.mode === 'whitelist' ? 'whitelistKeywords' : 'blockedKeywords';
+        const list = Array.isArray(kids[listKey]) ? kids[listKey] : [];
+        const before = list.length;
+        kids[listKey] = list.filter(entry => (entry.word || '') !== word);
+        if (kids[listKey].length === before) return false;
         state.kids = { ...kids };
         await persistKidsProfiles(state.kids);
         await requestRefresh('kids');
@@ -566,18 +611,21 @@ const StateManager = (() => {
             return null;
         }
         const kids = getKidsState();
-        const index = kids.blockedKeywords.findIndex(k => (k?.word || '') === word);
+        const listKey = kids.mode === 'whitelist' ? 'whitelistKeywords' : 'blockedKeywords';
+        const list = Array.isArray(kids[listKey]) ? kids[listKey] : [];
+        const index = list.findIndex(k => (k?.word || '') === word);
         if (index < 0) return null;
 
-        const entry = kids.blockedKeywords[index] && typeof kids.blockedKeywords[index] === 'object'
-            ? { ...kids.blockedKeywords[index] }
+        const entry = list[index] && typeof list[index] === 'object'
+            ? { ...list[index] }
             : null;
         if (!entry) return null;
 
         // Default is comments enabled (same as main)
         const current = entry.comments !== false;
         entry.comments = !current;
-        kids.blockedKeywords[index] = entry;
+        list[index] = entry;
+        kids[listKey] = list;
         state.kids = { ...kids };
         await persistKidsProfiles(state.kids);
         await requestRefresh('kids');
@@ -601,16 +649,19 @@ const StateManager = (() => {
             return null;
         }
         const kids = getKidsState();
-        const index = kids.blockedKeywords.findIndex(k => (k?.word || '') === word);
+        const listKey = kids.mode === 'whitelist' ? 'whitelistKeywords' : 'blockedKeywords';
+        const list = Array.isArray(kids[listKey]) ? kids[listKey] : [];
+        const index = list.findIndex(k => (k?.word || '') === word);
         if (index < 0) return null;
 
-        const entry = kids.blockedKeywords[index] && typeof kids.blockedKeywords[index] === 'object'
-            ? { ...kids.blockedKeywords[index] }
+        const entry = list[index] && typeof list[index] === 'object'
+            ? { ...list[index] }
             : null;
         if (!entry) return null;
 
         entry.exact = !entry.exact;
-        kids.blockedKeywords[index] = entry;
+        list[index] = entry;
+        kids[listKey] = list;
         state.kids = { ...kids };
         await persistKidsProfiles(state.kids);
         await requestRefresh('kids');
@@ -652,6 +703,8 @@ const StateManager = (() => {
             await loadSettings();
             return { success: false, error: 'Profile is locked' };
         }
+
+        const kids = getKidsState();
         const rawValue = (input || '').trim();
         if (!rawValue) return { success: false, error: 'Empty input' };
 
@@ -670,9 +723,9 @@ const StateManager = (() => {
             };
         }
 
-        const kids = getKidsState();
-
         const channelMap = state.channelMap && typeof state.channelMap === 'object' ? state.channelMap : {};
+        const listKey = kids.mode === 'whitelist' ? 'whitelistChannels' : 'blockedChannels';
+        const list = Array.isArray(kids[listKey]) ? kids[listKey] : [];
 
         // Helper to normalize UC ID
         const normalizeUcId = (v) => {
@@ -687,7 +740,7 @@ const StateManager = (() => {
             const mappedId = channelMap[keySource.toLowerCase()];
             if (mappedId) {
                 const normMappedId = normalizeUcId(mappedId);
-                const alreadyExists = kids.blockedChannels.some(c =>
+                const alreadyExists = list.some(c =>
                     (c.id && normalizeUcId(c.id) === normMappedId)
                 );
                 if (alreadyExists) return { success: false, error: 'Channel already exists' };
@@ -695,8 +748,9 @@ const StateManager = (() => {
         }
 
         try {
+            const action = kids.mode === 'whitelist' ? 'FilterTube_KidsWhitelistChannel' : 'FilterTube_KidsBlockChannel';
             const response = await chrome.runtime.sendMessage({
-                action: 'FilterTube_KidsBlockChannel',
+                action,
                 channel: {
                     originalInput: rawValue,
                     source: 'user'
@@ -728,9 +782,12 @@ const StateManager = (() => {
             return false;
         }
         const kids = getKidsState();
-        if (index < 0 || index >= kids.blockedChannels.length) return false;
-        const channel = kids.blockedChannels[index];
-        kids.blockedChannels.splice(index, 1);
+        const listKey = kids.mode === 'whitelist' ? 'whitelistChannels' : 'blockedChannels';
+        const list = Array.isArray(kids[listKey]) ? kids[listKey] : [];
+        if (index < 0 || index >= list.length) return false;
+        const channel = list[index];
+        list.splice(index, 1);
+        kids[listKey] = list;
         state.kids = { ...kids };
         await persistKidsProfiles(state.kids);
         await requestRefresh('kids');
@@ -754,6 +811,9 @@ const StateManager = (() => {
             return false;
         }
         const kids = getKidsState();
+        if (kids.mode === 'whitelist') {
+            return false;
+        }
         if (index < 0 || index >= kids.blockedChannels.length) return false;
 
         const existing = kids.blockedChannels[index] && typeof kids.blockedChannels[index] === 'object'
@@ -849,6 +909,70 @@ const StateManager = (() => {
         }
     }
 
+    async function persistMainProfiles(nextMain) {
+        const io = window.FilterTubeIO || {};
+        const canV3 = !!(io && typeof io.saveProfilesV3 === 'function' && typeof io.loadProfilesV3 === 'function');
+        const canV4 = !!(io && typeof io.saveProfilesV4 === 'function' && typeof io.loadProfilesV4 === 'function');
+        if (!canV3 && !canV4) {
+            console.warn('StateManager: FilterTubeIO not available for main persistence');
+            return;
+        }
+
+        try {
+            if (canV3) {
+                const existing = await io.loadProfilesV3();
+                const merged = {
+                    ...existing,
+                    main: {
+                        ...existing?.main,
+                        ...nextMain,
+                        mode: (typeof nextMain?.mode === 'string') ? nextMain.mode : existing?.main?.mode,
+                        whitelistedChannels: Array.isArray(nextMain?.whitelistChannels)
+                            ? nextMain.whitelistChannels
+                            : (Array.isArray(existing?.main?.whitelistedChannels) ? existing.main.whitelistedChannels : []),
+                        whitelistedKeywords: Array.isArray(nextMain?.whitelistKeywords)
+                            ? nextMain.whitelistKeywords
+                            : (Array.isArray(existing?.main?.whitelistedKeywords) ? existing.main.whitelistedKeywords : [])
+                    }
+                };
+                await io.saveProfilesV3(merged);
+            }
+        } catch (e) {
+            console.warn('StateManager: Failed to persist main profiles (v3)', e);
+        }
+
+        try {
+            if (canV4) {
+                const existing = await io.loadProfilesV4();
+                const profiles = (existing && typeof existing === 'object' && !Array.isArray(existing) && existing.profiles && typeof existing.profiles === 'object' && !Array.isArray(existing.profiles))
+                    ? existing.profiles
+                    : {};
+                const activeId = typeof existing?.activeProfileId === 'string' ? existing.activeProfileId : 'default';
+                const activeProfile = profiles[activeId] && typeof profiles[activeId] === 'object' ? profiles[activeId] : {};
+
+                profiles[activeId] = {
+                    ...activeProfile,
+                    main: {
+                        ...(activeProfile.main || {}),
+                        ...nextMain,
+                        mode: (typeof nextMain?.mode === 'string') ? nextMain.mode : (activeProfile.main || {}).mode
+                    }
+                };
+
+                const nextProfiles = {
+                    ...existing,
+                    schemaVersion: 4,
+                    activeProfileId: activeId,
+                    profiles
+                };
+
+                await io.saveProfilesV4(nextProfiles);
+            }
+        } catch (e) {
+            console.warn('StateManager: Failed to persist main profiles (v4)', e);
+        }
+    }
+
     async function persistKidsProfiles(nextKids) {
         const io = window.FilterTubeIO || {};
         const canV3 = !!(io && typeof io.saveProfilesV3 === 'function' && typeof io.loadProfilesV3 === 'function');
@@ -866,7 +990,7 @@ const StateManager = (() => {
                     kids: {
                         ...existing?.kids,
                         ...nextKids,
-                        mode: 'blocklist'
+                        mode: (typeof nextKids?.mode === 'string') ? nextKids.mode : existing?.kids?.mode
                     }
                 };
                 await io.saveProfilesV3(merged);
@@ -889,7 +1013,7 @@ const StateManager = (() => {
                     kids: {
                         ...(activeProfile.kids || {}),
                         ...nextKids,
-                        mode: 'blocklist'
+                        mode: (typeof nextKids?.mode === 'string') ? nextKids.mode : (activeProfile.kids || {}).mode
                     }
                 };
 
@@ -958,6 +1082,39 @@ const StateManager = (() => {
             return false;
         }
 
+        if (state.mode === 'whitelist') {
+            const trimmed = (word || '').trim();
+            if (!trimmed) return false;
+            const lowerWord = trimmed.toLowerCase();
+            const exact = options.exact === true;
+            const list = Array.isArray(state.userWhitelistKeywords) ? state.userWhitelistKeywords : [];
+            if (list.some(entry => (entry?.word || '').toLowerCase() === lowerWord && (entry?.exact === true) === exact)) {
+                return false;
+            }
+
+            const entry = {
+                word: trimmed,
+                exact,
+                semantic: options.semantic === true,
+                source: 'user',
+                channelRef: null,
+                comments: Object.prototype.hasOwnProperty.call(options, 'comments') ? !!options.comments : true,
+                addedAt: Date.now()
+            };
+
+            state.userWhitelistKeywords = [entry, ...list];
+            state.whitelistKeywords = [...state.userWhitelistKeywords];
+            await persistMainProfiles({
+                mode: 'whitelist',
+                whitelistChannels: Array.isArray(state.whitelistChannels) ? state.whitelistChannels : [],
+                whitelistKeywords: state.whitelistKeywords
+            });
+            await requestRefresh('main');
+            notifyListeners('keywordAdded', { word: trimmed });
+            scheduleAutoBackup('keyword_added');
+            return true;
+        }
+
         const trimmed = word.trim();
         if (!trimmed) return false;
 
@@ -999,10 +1156,30 @@ const StateManager = (() => {
             return false;
         }
 
+        if (state.mode === 'whitelist') {
+            const list = Array.isArray(state.userWhitelistKeywords) ? state.userWhitelistKeywords : [];
+            const index = list.findIndex(k => (k?.word || '') === word);
+            if (index === -1) return false;
+
+            const current = list[index];
+            const nextValue = (typeof current.comments === 'boolean') ? !current.comments : false;
+            list[index] = { ...current, comments: nextValue };
+            state.userWhitelistKeywords = [...list];
+            state.whitelistKeywords = [...state.userWhitelistKeywords];
+
+            await persistMainProfiles({
+                mode: 'whitelist',
+                whitelistChannels: Array.isArray(state.whitelistChannels) ? state.whitelistChannels : [],
+                whitelistKeywords: state.whitelistKeywords
+            });
+            await requestRefresh('main');
+            notifyListeners('keywordUpdated', { word, comments: nextValue });
+            scheduleAutoBackup('keyword_comments_toggled');
+            return nextValue;
+        }
+
         let index = state.userKeywords.findIndex(k => k.word === word);
         if (index === -1) {
-            // If the entry isn't in userKeywords (e.g., channel-derived), we don't currently
-            // persist keyword-level overrides separately.
             return false;
         }
 
@@ -1033,6 +1210,24 @@ const StateManager = (() => {
             return false;
         }
 
+        if (state.mode === 'whitelist') {
+            const list = Array.isArray(state.userWhitelistKeywords) ? state.userWhitelistKeywords : [];
+            const index = list.findIndex(k => (k?.word || '') === word && k?.source !== 'channel');
+            if (index === -1) return false;
+            list.splice(index, 1);
+            state.userWhitelistKeywords = [...list];
+            state.whitelistKeywords = [...state.userWhitelistKeywords];
+            await persistMainProfiles({
+                mode: 'whitelist',
+                whitelistChannels: Array.isArray(state.whitelistChannels) ? state.whitelistChannels : [],
+                whitelistKeywords: state.whitelistKeywords
+            });
+            await requestRefresh('main');
+            notifyListeners('keywordRemoved', { word });
+            scheduleAutoBackup('keyword_removed');
+            return true;
+        }
+
         const index = state.userKeywords.findIndex(k => k.word === word && k.source !== 'channel');
         if (index === -1) return false;
 
@@ -1058,6 +1253,25 @@ const StateManager = (() => {
         if (isUiLocked()) {
             await loadSettings();
             return false;
+        }
+
+        if (state.mode === 'whitelist') {
+            const list = Array.isArray(state.userWhitelistKeywords) ? state.userWhitelistKeywords : [];
+            const index = list.findIndex(k => (k?.word || '') === word && k?.source !== 'channel');
+            if (index === -1) return false;
+            const next = { ...list[index], exact: !list[index].exact };
+            list[index] = next;
+            state.userWhitelistKeywords = [...list];
+            state.whitelistKeywords = [...state.userWhitelistKeywords];
+            await persistMainProfiles({
+                mode: 'whitelist',
+                whitelistChannels: Array.isArray(state.whitelistChannels) ? state.whitelistChannels : [],
+                whitelistKeywords: state.whitelistKeywords
+            });
+            await requestRefresh('main');
+            notifyListeners('keywordUpdated', { word, exact: !!next.exact });
+            scheduleAutoBackup('keyword_exact_toggled');
+            return !!next.exact;
         }
 
         const index = state.userKeywords.findIndex(k => k.word === word && k.source !== 'channel');
@@ -1103,7 +1317,7 @@ const StateManager = (() => {
             return { success: false, error: 'Profile is locked' };
         }
 
-        const rawValue = input.trim();
+        const rawValue = (input || '').trim();
         if (!rawValue) {
             return { success: false, error: 'Empty input' };
         }
@@ -1126,12 +1340,27 @@ const StateManager = (() => {
         // DELEGATE TO BACKGROUND SCRIPT
         // This ensures the fetch+save completes even if the popup is closed immediately
         try {
+            const action = state.mode === 'whitelist' ? 'addWhitelistChannelPersistent' : 'addChannelPersistent';
             const response = await chrome.runtime.sendMessage({
-                action: 'addChannelPersistent',
+                action,
                 input: rawValue
             });
 
             if (response && response.success) {
+                if (state.mode === 'whitelist') {
+                    const whitelistChannels = Array.isArray(state.whitelistChannels) ? state.whitelistChannels : [];
+                    const incoming = response.channel;
+                    const alreadyExists = whitelistChannels.some(ch => ch?.id && incoming?.id && ch.id === incoming.id);
+
+                    if (!alreadyExists) {
+                        state.whitelistChannels = [incoming, ...whitelistChannels];
+                        notifyListeners('channelAdded', { channel: incoming });
+                    }
+
+                    await requestRefresh('main');
+                    return { success: true, channel: incoming };
+                }
+
                 // FIX: Check if channel was already added via storage sync mechanism
                 // to prevent duplicate entries (Race Condition Fix)
                 const alreadyExists = state.channels.some(ch => ch.id === response.channel.id);
@@ -1167,6 +1396,23 @@ const StateManager = (() => {
             return false;
         }
 
+        if (state.mode === 'whitelist') {
+            const list = Array.isArray(state.whitelistChannels) ? state.whitelistChannels : [];
+            if (index < 0 || index >= list.length) return false;
+            const channel = list[index];
+            list.splice(index, 1);
+            state.whitelistChannels = [...list];
+            await persistMainProfiles({
+                mode: 'whitelist',
+                whitelistChannels: state.whitelistChannels,
+                whitelistKeywords: Array.isArray(state.whitelistKeywords) ? state.whitelistKeywords : []
+            });
+            await requestRefresh('main');
+            notifyListeners('channelRemoved', { channel, index });
+            scheduleAutoBackup('channel_removed');
+            return true;
+        }
+
         if (index < 0 || index >= state.channels.length) return false;
 
         const channel = state.channels[index];
@@ -1191,6 +1437,10 @@ const StateManager = (() => {
 
         if (isUiLocked()) {
             await loadSettings();
+            return false;
+        }
+
+        if (state.mode === 'whitelist') {
             return false;
         }
 
@@ -1220,6 +1470,10 @@ const StateManager = (() => {
 
         if (isUiLocked()) {
             await loadSettings();
+            return false;
+        }
+
+        if (state.mode === 'whitelist') {
             return false;
         }
 

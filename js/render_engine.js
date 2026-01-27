@@ -99,11 +99,23 @@ const RenderEngine = (() => {
         } = options;
 
         // Filter and sort keywords
+        const mainMode = state?.mode === 'whitelist' ? 'whitelist' : 'blocklist';
+        const kidsMode = state?.kids?.mode === 'whitelist' ? 'whitelist' : 'blocklist';
+
         const keywordsSource = profile === 'kids'
-            ? (typeof Settings?.syncFilterAllKeywords === 'function'
-                ? Settings.syncFilterAllKeywords(state.kids?.blockedKeywords || [], state.kids?.blockedChannels || [])
-                : (state.kids?.blockedKeywords || []))
-            : state.keywords;
+            ? (() => {
+                if (kidsMode === 'whitelist') {
+                    return Array.isArray(state.kids?.whitelistKeywords) ? state.kids.whitelistKeywords : [];
+                }
+                const base = Array.isArray(state.kids?.blockedKeywords) ? state.kids.blockedKeywords : [];
+                const channels = Array.isArray(state.kids?.blockedChannels) ? state.kids.blockedChannels : [];
+                return (typeof Settings?.syncFilterAllKeywords === 'function')
+                    ? Settings.syncFilterAllKeywords(base, channels)
+                    : base;
+            })()
+            : (mainMode === 'whitelist'
+                ? (Array.isArray(state.whitelistKeywords) ? state.whitelistKeywords : [])
+                : state.keywords);
         let displayKeywords = [...keywordsSource];
 
         // Apply search filter
@@ -145,7 +157,12 @@ const RenderEngine = (() => {
         if (displayKeywords.length === 0) {
             const emptyMsg = showSearch && searchValue
                 ? 'No keywords found'
-                : 'No keywords added';
+                : (() => {
+                    if (profile === 'kids') {
+                        return kidsMode === 'whitelist' ? 'No keywords allowed' : 'No keywords blocked';
+                    }
+                    return mainMode === 'whitelist' ? 'No keywords allowed' : 'No keywords blocked';
+                })();
 
             if (minimal) {
                 container.innerHTML = `<div class="empty-state">${emptyMsg}</div>`;
@@ -402,6 +419,9 @@ const RenderEngine = (() => {
             onDelete = null
         } = options;
 
+        const mainMode = state?.mode === 'whitelist' ? 'whitelist' : 'blocklist';
+        const kidsMode = state?.kids?.mode === 'whitelist' ? 'whitelist' : 'blocklist';
+
         const deriveChannelKey = (entry) => {
             try {
                 if (Settings?.getChannelDerivedKey) return Settings.getChannelDerivedKey(entry);
@@ -415,10 +435,14 @@ const RenderEngine = (() => {
         };
 
         let channelsSource = profile === 'kids'
-            ? (state.kids?.blockedChannels || [])
-            : state.channels;
+            ? (kidsMode === 'whitelist'
+                ? (Array.isArray(state.kids?.whitelistChannels) ? state.kids.whitelistChannels : [])
+                : (state.kids?.blockedChannels || []))
+            : (mainMode === 'whitelist'
+                ? (Array.isArray(state.whitelistChannels) ? state.whitelistChannels : [])
+                : state.channels);
 
-        if (profile !== 'kids' && state.syncKidsToMain) {
+        if (profile !== 'kids' && state.syncKidsToMain && mainMode !== 'whitelist') {
             const kidsChannels = Array.isArray(state.kids?.blockedChannels) ? state.kids.blockedChannels : [];
             const mainChannels = Array.isArray(state.channels) ? state.channels : [];
             const seen = new Set(mainChannels.map(deriveChannelKey).filter(Boolean));
@@ -472,7 +496,12 @@ const RenderEngine = (() => {
         if (displayChannels.length === 0) {
             const emptyMsg = showSearch && searchValue
                 ? 'No channels found'
-                : 'No channels blocked';
+                : (() => {
+                    if (profile === 'kids') {
+                        return kidsMode === 'whitelist' ? 'No channels allowed' : 'No channels blocked';
+                    }
+                    return mainMode === 'whitelist' ? 'No channels allowed' : 'No channels blocked';
+                })();
 
             if (minimal) {
                 container.innerHTML = `<div class="empty-state">${emptyMsg}</div>`;
@@ -483,10 +512,14 @@ const RenderEngine = (() => {
         }
 
         const mainIndexByRef = new Map();
-        const mainList = Array.isArray(state.channels) ? state.channels : [];
+        const mainList = (mainMode === 'whitelist')
+            ? (Array.isArray(state.whitelistChannels) ? state.whitelistChannels : [])
+            : (Array.isArray(state.channels) ? state.channels : []);
         mainList.forEach((ch, idx) => mainIndexByRef.set(ch, idx));
 
-        const kidsList = Array.isArray(state.kids?.blockedChannels) ? state.kids.blockedChannels : [];
+        const kidsList = (kidsMode === 'whitelist')
+            ? (Array.isArray(state.kids?.whitelistChannels) ? state.kids.whitelistChannels : [])
+            : (Array.isArray(state.kids?.blockedChannels) ? state.kids.blockedChannels : []);
         const kidsIndexByRef = new Map();
         const kidsIndexByKey = new Map();
         kidsList.forEach((ch, idx) => {
@@ -925,6 +958,17 @@ const RenderEngine = (() => {
     function createFilterAllToggle(channel, index, profile = 'main') {
         const StateManager = getStateManager();
         const UIComponents = getUIComponents();
+        const state = StateManager?.getState?.() || {};
+        const mainMode = state?.mode === 'whitelist' ? 'whitelist' : 'blocklist';
+        const kidsMode = state?.kids?.mode === 'whitelist' ? 'whitelist' : 'blocklist';
+
+        if (profile === 'kids' ? (kidsMode === 'whitelist') : (mainMode === 'whitelist')) {
+            const spacer = document.createElement('div');
+            spacer.className = 'filter-all-toggle disabled';
+            spacer.style.visibility = 'hidden';
+            spacer.textContent = 'Filter All';
+            return spacer;
+        }
 
         // Use pill toggle with red variant (no label text)
         const pillToggle = UIComponents?.createToggleButton ?
@@ -951,6 +995,16 @@ const RenderEngine = (() => {
      */
     function createFallbackFilterAllToggle(channel, index, profile = 'main') {
         const StateManager = getStateManager();
+        const state = StateManager?.getState?.() || {};
+        const mainMode = state?.mode === 'whitelist' ? 'whitelist' : 'blocklist';
+        const kidsMode = state?.kids?.mode === 'whitelist' ? 'whitelist' : 'blocklist';
+        if (profile === 'kids' ? (kidsMode === 'whitelist') : (mainMode === 'whitelist')) {
+            const spacer = document.createElement('div');
+            spacer.className = 'exact-toggle toggle-variant-red disabled';
+            spacer.style.visibility = 'hidden';
+            spacer.textContent = 'Filter All';
+            return spacer;
+        }
         const toggle = document.createElement('div');
         toggle.className = `exact-toggle toggle-variant-red ${channel.filterAll ? 'active' : ''}`;
         toggle.textContent = 'Filter All';

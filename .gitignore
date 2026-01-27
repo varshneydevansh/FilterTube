@@ -35,6 +35,9 @@ playlist.js
 playlist.html
 post_opt1_logs.txt
 collab_on_homepage.html
+collab_in_playlist_mix.html
+WHITELIST_background.js
+WHITELIST_content.js
 YT_KIDS.json
 YT_MAIN_NEXT_RESPONSE_COMMENT.json
 YT_MAIN_next?prettyPrint.json

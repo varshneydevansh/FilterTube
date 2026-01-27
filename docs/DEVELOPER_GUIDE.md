@@ -1,22 +1,38 @@
-# Developer Guide (v3.2.1)
+# Developer Guide (v3.2.3)
 
 ## Overview
 
-This guide helps developers understand and extend FilterTube's proactive channel identity system. It covers how to add support for new YouTube endpoints, renderer types, and collaboration patterns.
+This guide helps developers understand and extend FilterTube's proactive channel identity system and whitelist mode functionality. It covers how to add support for new YouTube endpoints, renderer types, collaboration patterns, and dual filtering modes.
 
 ## Core Concepts
 
 ### Execution Worlds
+
 - **Main World** (`js/seed.js`, `js/filter_logic.js`, `js/injector.js`): Page context, can access `window.ytInitialData`
+
 - **Isolated World** (`js/content/*`, `js/content_bridge.js`): Content scripts, can access DOM
+
 - **Background** (`js/background.js`): Extension service worker, handles persistence and network
 
+### Filtering Modes (v3.2.3)
+
+- **Blocklist Mode**: Traditional filtering - hide matching content
+
+- **Whitelist Mode**: Inverted filtering - show only matching content
+
 ### Proactive Pipeline
+
 1. XHR interception → JSON snapshots
+
 2. Channel extraction from snapshots
-3. Cross-world messaging
-4. DOM stamping
-5. Instant UI updates
+
+3. Mode-aware filtering logic
+
+4. Cross-world messaging
+
+5. DOM stamping
+
+6. Instant UI updates
 
 ## Adding Support for New XHR Endpoints
 
