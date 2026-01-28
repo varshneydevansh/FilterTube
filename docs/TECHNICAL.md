@@ -1,10 +1,10 @@
-# Technical Documentation (v3.2.3 Whitelist Mode & UI/UX Improvements)
+# Technical Documentation (v3.2.3 Experimental Whitelist Mode & UI/UX Improvements)
 
 ## Overview
 
-FilterTube v3.2.3 builds on the performance optimizations of v3.2.1 with significant UI/UX improvements and introduces Whitelist Mode for granular content control. This technical documentation covers the filtering logic, mode switching, and user experience enhancements.
+FilterTube v3.2.3 builds on the performance optimizations of v3.2.1 with significant UI/UX improvements and introduces **Experimental Whitelist Mode** for granular content control. This technical documentation covers the filtering logic, mode switching, and user experience enhancements.
 
-## Whitelist Mode Filtering Logic (v3.2.3)
+## Whitelist Mode Filtering Logic (v3.2.3 - Experimental)
 
 ### Dual Mode Filtering Engine
 
@@ -57,6 +57,199 @@ function matchesBlocklist(title, channel, settings) {
 }
 ```
 
+## Whitelist Mode Logic Improvements (v3.2.3 - Experimental)
+
+### Watch Page Protection Logic
+
+Whitelist mode preserves critical watch page functionality to maintain video playback:
+
+```javascript
+// In ensureContentControlStyles() - DOM fallback
+const listMode = (settings && settings.listMode === 'whitelist') ? 'whitelist' : 'blocklist';
+const hideInfoMaster = (listMode !== 'whitelist') && !!settings.hideVideoInfo;
+
+// Only hide watch page elements if NOT in whitelist mode
+if ((listMode !== 'whitelist') && (hideInfoMaster || settings.hideVideoButtonsBar)) {
+    rules.push(`
+        #actions.ytd-watch-metadata,
+        #info > #menu-container {
+            display: none !important;
+        }
+    `);
+}
+```
+
+**Impact**: Ensures video actions, channel row, and description remain visible in whitelist mode for proper playback.
+
+### Search Page Indeterminate State Handling
+
+Prevents page blanking when search results render before channel identity is available:
+
+```javascript
+// In shouldHideContent() - DOM fallback
+try {
+    const path = document.location?.pathname || '';
+    const hasNameSignal = Boolean(normalizeChannelNameForComparison(channelMeta?.name || '') || 
+                              normalizeChannelNameForComparison(channel || ''));
+    
+    // Don't hide indeterminate search results to avoid recursive loading
+    if (path === '/results' && !hasChannelIdentity && !hasNameSignal && collaboratorMetas.length === 0) {
+        return false;
+    }
+} catch (e) {
+    // Fallback to safe behavior
+}
+```
+
+**Impact**: Prevents blank search pages and recursive continuation loads during identity resolution.
+
+### Homepage Duplicate Removal Logic
+
+Automatic cleanup of duplicate content in whitelist mode to improve feed quality:
+
+```javascript
+// In applyDOMFallback() - DOM fallback
+try {
+    const path = document.location?.pathname || '';
+    if (path === '/' && listMode === 'whitelist') {
+        const items = document.querySelectorAll('ytd-rich-grid-renderer ytd-rich-item-renderer');
+        const seen = new Map();
+        
+        for (const item of items) {
+            const videoId = item.getAttribute('data-filtertube-video-id') || extractVideoIdFromCard(item) || '';
+            if (!videoId) continue;
+            
+            const existing = seen.get(videoId);
+            if (!existing) {
+                seen.set(videoId, item);
+                continue;
+            }
+            
+            // Hide duplicates with same video ID
+            toggleVisibility(item, true, 'Duplicate item', true);
+        }
+    }
+} catch (e) {
+    // Graceful fallback
+}
+```
+
+**Impact**: Cleans up mixed content feeds by removing duplicate videos in whitelist mode.
+
+### Whitelist-Pending Processing Optimization
+
+Efficient re-evaluation of content awaiting channel identity to reduce processing overhead:
+
+```javascript
+// In applyDOMFallback() - DOM fallback
+const { onlyWhitelistPending = false } = options;
+
+// Process only pending items in whitelist mode for efficiency
+const videoElements = (onlyWhitelistPending && listMode === 'whitelist')
+    ? document.querySelectorAll(`${VIDEO_CARD_SELECTORS}[data-filtertube-whitelist-pending="true"]`)
+    : document.querySelectorAll(VIDEO_CARD_SELECTORS);
+```
+
+**Impact**: Reduces DOM processing overhead by targeting only relevant elements during whitelist updates.
+
+### Search Thumbnail Channel Extraction
+
+Enhanced channel extraction for search pages to prevent whitelist false-negatives:
+
+```javascript
+// In applyDOMFallback() - DOM fallback
+let searchThumbAnchor = null;
+if (elementTag === 'ytd-video-renderer') {
+    try {
+        searchThumbAnchor = element.querySelector(
+            '#thumbnail a[data-filtertube-channel-handle], ' +
+            '#thumbnail a[data-filtertube-channel-id], ' +
+            'a#thumbnail[data-filtertube-channel-handle], ' +
+            'a#thumbnail[data-filtertube-channel-id], ' +
+            '#thumbnail[data-filtertube-channel-handle], ' +
+            '#thumbnail[data-filtertube-channel-id]'
+        );
+    } catch (e) {
+        // Fallback handling
+    }
+}
+
+const relatedElements = [channelAnchor, channelElement, channelSubtitleElement, searchThumbAnchor];
+```
+
+**Impact**: Prevents first-batch whitelist false-negatives by including thumbnail anchor data in channel extraction.
+
+### Watch Page SPA Swap Cleanup
+
+Prevents stuck hidden elements during YouTube's single-page application navigation:
+
+```javascript
+// In applyDOMFallback() - DOM fallback
+const watchMeta = document.querySelector('ytd-watch-metadata');
+if (watchMeta) {
+    watchMeta.querySelectorAll('[data-filtertube-whitelist-pending="true"], [data-filtertube-hidden], .filtertube-hidden, .filtertube-hidden-shelf').forEach(el => {
+        try {
+            toggleVisibility(el, false, '', true); // Clear stuck flags
+        } catch (e) {
+            // Individual element cleanup failure
+        }
+    });
+}
+```
+
+**Impact**: Ensures watch page elements don't remain stuck hidden after navigation between videos.
+
+### Whitelist-Pending Re-evaluation Timing
+
+Optimized timing for re-evaluating pending content to reduce "recursive hiding" window:
+
+```javascript
+// In initializeDOMFallback() - content bridge
+try {
+    if (typeof applyDOMFallback === 'function') {
+        // Immediate re-evaluation
+        setTimeout(() => {
+            try {
+                applyDOMFallback(null, { preserveScroll: true, onlyWhitelistPending: true });
+            } catch (e) {
+                // Fallback handling
+            }
+        }, 0);
+        
+        // Delayed re-evaluation for late-arriving content
+        setTimeout(() => {
+            try {
+                applyDOMFallback(null, { preserveScroll: true, onlyWhitelistPending: true });
+            } catch (e) {
+                // Fallback handling
+            }
+        }, 90);
+    }
+} catch (e) {
+    // Initialization failure handling
+}
+```
+
+**Impact**: Reduces the window where content might be recursively hidden during search page loading.
+
+### Channel Identity Check Optimization
+
+Removed redundant identity checking for improved performance:
+
+```javascript
+// Before: Redundant check
+if (hasChannelIdentity && channelMetaMatchesIndex(channelMeta, index, channelMap)) {
+    return false;
+}
+
+// After: Streamlined check
+if (channelMetaMatchesIndex(channelMeta, index, channelMap)) {
+    return false;
+}
+```
+
+**Impact**: Minor performance optimization by eliminating redundant boolean checks.
+
 ### Mode-Aware UI Rendering
 
 The UI adapts display text and controls based on the active mode:
@@ -100,7 +293,7 @@ async function handleSetListMode(request) {
 }
 ```
 
-## Data Flow Architecture (v3.2.3)
+## Data Flow Architecture (v3.2.3 - Experimental)
 
 ### Dual Mode Filtering Data Flow
 

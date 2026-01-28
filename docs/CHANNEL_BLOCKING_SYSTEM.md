@@ -9,7 +9,7 @@ FilterTube must be able to:
 - Identify **channel identity** for a piece of content (preferably a stable **UC channel ID**, and also capture **@handle** when available).
 - Persist blocked/allowed channels in extension storage with dual filtering modes.
 - Hide (and optionally keyword-filter) all content attributable to those blocked channels in Blocklist mode.
-- Show only content from allowed channels in Whitelist mode (v3.2.3).
+- Show only content from allowed channels in **Experimental Whitelist mode** (v3.2.3).
 - Work reliably across YouTube surfaces (Home, Search, Shorts, Watch, Kids), including SPA navigation and DOM recycling.
 - Provide accurate channel names in 3-dot menus, upgrading from UC IDs/handles to human-readable names.
 - Support mode switching with list migration (blocklist ↔ whitelist).

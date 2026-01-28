@@ -486,9 +486,10 @@ function ensureContentControlStyles(settings) {
         `);
     }
 
-    const hideInfoMaster = !!settings.hideVideoInfo;
+    const listMode = (settings && settings.listMode === 'whitelist') ? 'whitelist' : 'blocklist';
+    const hideInfoMaster = (listMode !== 'whitelist') && !!settings.hideVideoInfo;
 
-    if (hideInfoMaster || settings.hideVideoButtonsBar) {
+    if ((listMode !== 'whitelist') && (hideInfoMaster || settings.hideVideoButtonsBar)) {
         rules.push(`
             #actions.ytd-watch-metadata,
             #info > #menu-container {
@@ -506,7 +507,7 @@ function ensureContentControlStyles(settings) {
         `);
     }
 
-    if (hideInfoMaster || settings.hideVideoChannelRow) {
+    if ((listMode !== 'whitelist') && (hideInfoMaster || settings.hideVideoChannelRow)) {
         rules.push(`
             #owner.ytd-watch-metadata,
             #top-row.ytd-video-secondary-info-renderer {
@@ -515,7 +516,7 @@ function ensureContentControlStyles(settings) {
         `);
     }
 
-    if (hideInfoMaster || settings.hideVideoDescription) {
+    if ((listMode !== 'whitelist') && (hideInfoMaster || settings.hideVideoDescription)) {
         rules.push(`
             #description.ytd-watch-metadata,
             ytd-expander.ytd-video-secondary-info-renderer {
@@ -935,7 +936,7 @@ async function applyDOMFallback(settings, options = {}) {
         }
     }
 
-    const { forceReprocess = false, preserveScroll = true } = options;
+    const { forceReprocess = false, preserveScroll = true, onlyWhitelistPending = false } = options;
     const now = Date.now();
     const isUserScrolling = now - (scrollState.lastScrollTs || 0) < 150;
     const allowPreserveScroll = preserveScroll && !forceReprocess && !isUserScrolling;
@@ -962,6 +963,19 @@ async function applyDOMFallback(settings, options = {}) {
             document.querySelectorAll('#actions.ytd-watch-metadata, #owner.ytd-watch-metadata, #description.ytd-watch-metadata').forEach(el => {
                 toggleVisibility(el, false, '', true);
             });
+
+            // Some watch-page sub-elements get marked whitelist-pending or hidden during SPA swaps.
+            // Ensure we clear those flags inside the watch metadata container so the description/
+            // channel row/buttons don't get stuck hidden.
+            const watchMeta = document.querySelector('ytd-watch-metadata');
+            if (watchMeta) {
+                watchMeta.querySelectorAll('[data-filtertube-whitelist-pending="true"], [data-filtertube-hidden], .filtertube-hidden, .filtertube-hidden-shelf').forEach(el => {
+                    try {
+                        toggleVisibility(el, false, '', true);
+                    } catch (e) {
+                    }
+                });
+            }
         } catch (e) {
         }
     }
@@ -1116,7 +1130,9 @@ async function applyDOMFallback(settings, options = {}) {
     }
 
     // 1. Video/Content Filtering
-    const videoElements = document.querySelectorAll(VIDEO_CARD_SELECTORS);
+    const videoElements = (onlyWhitelistPending && listMode === 'whitelist')
+        ? document.querySelectorAll(`${VIDEO_CARD_SELECTORS}[data-filtertube-whitelist-pending="true"]`)
+        : document.querySelectorAll(VIDEO_CARD_SELECTORS);
 
     if (!window.__filtertubePlaylistNavGuardInstalled) {
         window.__filtertubePlaylistNavGuardInstalled = true;
@@ -1454,7 +1470,26 @@ async function applyDOMFallback(settings, options = {}) {
             } catch (e) {
             }
             const channelHref = channelAnchor?.getAttribute('href') || channelAnchor?.href || '';
-            const relatedElements = [channelAnchor, channelElement, channelSubtitleElement];
+
+            // Search page: YouTube often places FilterTube-stamped channel attributes on the thumbnail
+            // anchor, while the visible channel name link renders later. Include that node so handle/id
+            // can be extracted immediately (prevents first-batch whitelist false-negatives).
+            let searchThumbAnchor = null;
+            if (elementTag === 'ytd-video-renderer') {
+                try {
+                    searchThumbAnchor = element.querySelector(
+                        '#thumbnail a[data-filtertube-channel-handle], ' +
+                        '#thumbnail a[data-filtertube-channel-id], ' +
+                        'a#thumbnail[data-filtertube-channel-handle], ' +
+                        'a#thumbnail[data-filtertube-channel-id], ' +
+                        '#thumbnail[data-filtertube-channel-handle], ' +
+                        '#thumbnail[data-filtertube-channel-id]'
+                    );
+                } catch (e) {
+                }
+            }
+
+            const relatedElements = [channelAnchor, channelElement, channelSubtitleElement, searchThumbAnchor];
             let channelMeta = extractChannelMetadataFromElement(element, channel, channelHref, {
                 cacheTarget: element,
                 relatedElements
@@ -1949,6 +1984,34 @@ async function applyDOMFallback(settings, options = {}) {
     } catch (e) {
     }
 
+    try {
+        const path = document.location?.pathname || '';
+        if (path === '/' && listMode === 'whitelist') {
+            const items = document.querySelectorAll('ytd-rich-grid-renderer ytd-rich-item-renderer');
+            if (items && items.length > 0) {
+                const seen = new Map();
+                for (const item of items) {
+                    if (!item || typeof item.getAttribute !== 'function') continue;
+                    const videoId = item.getAttribute('data-filtertube-video-id') || extractVideoIdFromCard(item) || '';
+                    if (!videoId) continue;
+
+                    const existing = seen.get(videoId);
+                    if (!existing) {
+                        seen.set(videoId, item);
+                        continue;
+                    }
+
+                    const href = item.querySelector('a[href*="watch?v="], a[href^="/shorts/"]')?.getAttribute('href') || '';
+                    const existingHref = existing.querySelector('a[href*="watch?v="], a[href^="/shorts/"]')?.getAttribute('href') || '';
+                    if (href && existingHref && href !== existingHref) continue;
+
+                    toggleVisibility(item, true, 'Duplicate item', true);
+                }
+            }
+        }
+    } catch (e) {
+    }
+
     if (allowPreserveScroll && scrollingElement) {
         const didScrollDuringRun = (scrollState.lastScrollTs || 0) > runStartedAt;
         const now2 = Date.now();
@@ -2086,7 +2149,7 @@ function shouldHideContent(title, channel, settings, options = {}) {
             const channelMap = settings.channelMap || {};
             const index = getCompiledChannelFilterIndex(settings, whitelistChannels);
             if (index) {
-                if (hasChannelIdentity && channelMetaMatchesIndex(channelMeta, index, channelMap)) {
+                if (channelMetaMatchesIndex(channelMeta, index, channelMap)) {
                     return false;
                 }
                 const collaboratorMetas = Array.isArray(collaborators) ? collaborators : [];
@@ -2096,6 +2159,18 @@ function shouldHideContent(title, channel, settings, options = {}) {
                             return false;
                         }
                     }
+                }
+
+                // Search: the card can render before channel identity exists.
+                // If we have *no* identity and *no* usable name signal, treat as indeterminate
+                // (do not hide) to avoid blanking the page and triggering recursive continuation loads.
+                try {
+                    const path = document.location?.pathname || '';
+                    const hasNameSignal = Boolean(normalizeChannelNameForComparison(channelMeta?.name || '') || normalizeChannelNameForComparison(channel || ''));
+                    if (path === '/results' && !hasChannelIdentity && !hasNameSignal && collaboratorMetas.length === 0) {
+                        return false;
+                    }
+                } catch (e) {
                 }
             }
         }

@@ -5,13 +5,13 @@
 FilterTube v3.2.3 implements a **hybrid filtering system** with dual filtering modes:
 - A primary **data interception layer** removes blocked items from YouTube JSON responses before render when possible.
 - A secondary **DOM fallback layer** hides/restores already-rendered elements for SPA navigation, DOM recycling, and edge cases.
-- **Whitelist Mode**: Hide all content except explicitly allowed channels and keywords (v3.2.3).
+- **Experimental Whitelist Mode**: Hide all content except explicitly allowed channels and keywords (v3.2.3).
 
 ## Core Filtering Capabilities
 
 ### **Content Filtering Modes**
 - **Blocklist Mode (Default)**: Traditional filtering - hide content matching blocked channels/keywords
-- **Whitelist Mode (New v3.2.3)**: Hide all content except content matching whitelisted channels/keywords
+- **Whitelist Mode (Experimental v3.2.3)**: Hide all content except content matching whitelisted channels/keywords
 - **Video Filtering**: Filters videos by title keywords before rendering
 - **Channel Filtering**: Blocks/allows content from specific channels using @handles, channel IDs, or channel names
 - **Comments Filtering**: Removes comment sections entirely when hideAllComments is enabled
@@ -174,7 +174,7 @@ YouTube JSON Data → FilterTubeEngine.processData() → Filtered Data → YouTu
 - **Quick Settings Access**: Easy access to primary filtering options
 - **Real-time Preview**: Immediate feedback on filter changes
 - **Status Indicators**: Shows current filtering state
-- **List Mode Toggle (v3.2.3)**: Switch between Blocklist and Whitelist modes
+- **List Mode Toggle (Experimental v3.2.3)**: Switch between Blocklist and Whitelist modes
 
 #### UI polish (v3.2.1)
 - Popup search bars (keywords/channels/content controls) now align to full row width; add buttons sit beside matching-sized inputs.
@@ -187,7 +187,7 @@ YouTube JSON Data → FilterTubeEngine.processData() → Filtered Data → YouTu
 - **Channel Management**: Dedicated interface for managing blocked/allowed channels.
 - **Keyword Management**: Advanced keyword list editing.
 - **Stats Dashboard**: Detailed view of time saved and videos hidden.
-- **List Mode Controls (v3.2.3)**: Profile-specific whitelist/blocklist mode switching
+- **List Mode Controls (Experimental v3.2.3)**: Profile-specific whitelist/blocklist mode switching
 
 ### **Advanced Settings**
 - **Detailed Configuration**: Access to all filtering options

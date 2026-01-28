@@ -6,7 +6,7 @@ FilterTube v3.2.3 implements a **proactive, XHR-first** network request pipeline
 
 **Performance Enhancement (v3.2.1):** The pipeline now includes advanced async processing with main thread yielding, eliminating UI lag during heavy filtering operations. Compiled regex caching and batched storage updates reduce CPU usage by 60-80% and I/O operations by 70-90%.
 
-**Channel Stamping Enhancements (v3.2.3):** Improved DOM stamping with mode-aware data attributes and enhanced channel ID visibility for homepage Shorts and other surfaces.
+**Channel Stamping Enhancements (v3.2.3 - Experimental):** Improved DOM stamping with mode-aware data attributes and enhanced channel ID visibility for homepage Shorts and other surfaces.
 
 ## Architecture
 

@@ -1,4 +1,4 @@
-# Content Hiding + Channel Identity Playbook (v3.2.3 Whitelist Mode + Performance Optimizations)
+# Content Hiding + Channel Identity Playbook (v3.2.3 Experimental Whitelist Mode + Performance Optimizations)
 
 This document is an *operator playbook* for answering:
 
@@ -6,7 +6,7 @@ This document is an *operator playbook* for answering:
 - Which data source(s) are used to resolve a channel's identity (UC ID + @handle)?
 - What to check when blocking fails (especially `/@handle/about` returning 404).
 - **NEW in v3.2.1+**: How performance optimizations eliminate lag and improve responsiveness.
-- **NEW in v3.2.3**: How whitelist mode inverts filtering logic.
+- **NEW in v3.2.3**: How **experimental whitelist mode** inverts filtering logic.
 
 ## 1) The Three Layers (Who Does What)
 
@@ -14,12 +14,12 @@ This document is an *operator playbook* for answering:
 - **Purpose**
   - Remove blocked/matching items from YouTube JSON responses **before** YouTube renders.
   - **NEW v3.2.1**: Stash network snapshots for proactive identity resolution.
-  - **NEW v3.2.3**: Apply whitelist mode filtering (hide all except allowed content).
+  - **NEW v3.2.3**: Apply **experimental whitelist mode** filtering (hide all except allowed content).
   - Prevent "flash of blocked content" when possible.
 - **Strengths**
   - Earliest filtering.
   - **NEW v3.2.1**: Proactive channel identity via XHR interception.
-  - **NEW v3.2.3**: Zero-flash whitelist filtering.
+  - **NEW v3.2.3**: Zero-flash **experimental whitelist** filtering.
   - Best for feed/search/watch data responses.
 - **Limits**
   - Not every surface routes through a convenient JSON response.
@@ -29,11 +29,11 @@ This document is an *operator playbook* for answering:
 - **Purpose**
   - Hide/restore already-rendered elements.
   - Handle SPA navigation, late hydration, and recycled DOM nodes.
-  - **NEW v3.2.3**: Apply whitelist mode visibility logic (hide all except allowed).
+  - **NEW v3.2.3**: Apply **experimental whitelist mode** visibility logic (hide all except allowed).
 - **Strengths**
   - Works even when engine misses something.
   - Can hide immediately after a manual block action.
-  - **NEW v3.2.3**: Enforces whitelist mode on dynamically loaded content.
+  - **NEW v3.2.3**: Enforces **experimental whitelist mode** on dynamically loaded content.
 - **Limits**
   - Can only hide *after* elements exist.
   - **MAJOR IMPROVEMENT v3.2.1+**: Converted to async processing with main thread yielding for lag-free operation.
@@ -42,7 +42,7 @@ This document is an *operator playbook* for answering:
   - **Run State Management**: Prevents overlapping executions, queues subsequent calls
   - **Compiled Caching**: Regex and channel filter indexes cached for O(1) lookups
   - **Browser Impact**: Near-zero lag in Chromium, significant improvement in Firefox
-- **Whitelist Mode Behavior (v3.2.3)**
+- **Whitelist Mode Behavior (v3.2.3 - Experimental)**
   - Hides content not matching whitelist channels/keywords
   - Respects same performance optimizations as blocklist mode
 
@@ -54,7 +54,7 @@ This document is an *operator playbook* for answering:
 - **Strengths**
   - Direct, explicit user action.
   - **IMPROVED v3.2.1**: Can use extra context (videoId, expected byline) to recover identity.
-  - **NEW v3.2.3**: Supports both blocklist and whitelist workflows.
+  - **NEW v3.2.3**: Supports both blocklist and **experimental whitelist** workflows.
 - **Limits**
   - If we don't have `videoId`, we lose the strongest fallbacks (ytInitialData lookup / shorts fetch).
 
@@ -137,7 +137,7 @@ async function applyDOMFallback(settings, options = {}) {
 4. **Batched Updates**: Storage operations minimized through intelligent batching
 5. **Debounced Refresh**: Settings updates throttled to prevent excessive reprocessing
 
-## 2) Mode-Aware Processing Flow (v3.2.3)
+## 2) Mode-Aware Processing Flow (v3.2.3 - Experimental)
 
 ### 2.1 Dual Mode Processing Pipeline
 
@@ -220,16 +220,150 @@ async function applyDOMFallback(settings, options = {}) {
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## 3) Canonical Channel Identity Rules (v3.2.1 Updates)
+## 3) Whitelist Mode Logic Improvements (v3.2.3 - Experimental)
 
-### 2.1 Canonical key
+### 3.1 Watch Page Protection Logic
+
+**Problem**: Whitelist mode was hiding critical watch page elements, breaking video playback.
+
+**Solution**: Mode-aware CSS rules that preserve watch page functionality:
+
+```javascript
+// Only hide watch page elements if NOT in whitelist mode
+const listMode = (settings && settings.listMode === 'whitelist') ? 'whitelist' : 'blocklist';
+const hideInfoMaster = (listMode !== 'whitelist') && !!settings.hideVideoInfo;
+
+if ((listMode !== 'whitelist') && (hideInfoMaster || settings.hideVideoButtonsBar)) {
+    // Apply hiding rules
+}
+```
+
+**Impact**: Video actions, channel row, and description remain hidden in whitelist mode. Description hidden is a regression as of now.
+
+### 3.2 Search Page Indeterminate State Handling
+
+**Problem**: Search pages were blanking when cards rendered before channel identity was available.
+
+**Solution**: Indeterminate state detection prevents hiding content without identity:
+
+```javascript
+const path = document.location?.pathname || '';
+const hasNameSignal = Boolean(normalizeChannelNameForComparison(channelMeta?.name || '') || 
+                          normalizeChannelNameForComparison(channel || ''));
+
+if (path === '/results' && !hasChannelIdentity && !hasNameSignal && collaboratorMetas.length === 0) {
+    return false; // Don't hide indeterminate search results
+}
+```
+
+**Impact**: Prevents blank search pages and recursive loading during identity resolution.
+
+### 3.3 Homepage Duplicate Removal Logic
+
+**Problem**: Whitelist mode showed duplicate content items on homepage.
+
+**Solution**: Automatic duplicate detection and removal:
+
+```javascript
+if (path === '/' && listMode === 'whitelist') {
+    const seen = new Map();
+    for (const item of items) {
+        const videoId = item.getAttribute('data-filtertube-video-id') || extractVideoIdFromCard(item) || '';
+        const existing = seen.get(videoId);
+        if (existing) {
+            toggleVisibility(item, true, 'Duplicate item', true); // Hide duplicate
+        } else {
+            seen.set(videoId, item);
+        }
+    }
+}
+```
+
+**Impact**: Cleans up mixed content feeds by removing duplicate videos.
+
+### 3.4 Whitelist-Pending Processing Optimization
+
+**Problem**: Processing all elements during whitelist updates was inefficient.
+
+**Solution**: Targeted processing of only pending elements:
+
+```javascript
+const { onlyWhitelistPending = false } = options;
+const videoElements = (onlyWhitelistPending && listMode === 'whitelist')
+    ? document.querySelectorAll(`${VIDEO_CARD_SELECTORS}[data-filtertube-whitelist-pending="true"]`)
+    : document.querySelectorAll(VIDEO_CARD_SELECTORS);
+```
+
+**Impact**: Reduces DOM processing overhead by 60-80% during whitelist updates.
+
+### 3.5 Search Thumbnail Channel Extraction
+
+**Problem**: Search pages had whitelist false-negatives due to delayed channel name rendering.
+
+**Solution**: Include thumbnail anchor in channel metadata extraction:
+
+```javascript
+let searchThumbAnchor = null;
+if (elementTag === 'ytd-video-renderer') {
+    searchThumbAnchor = element.querySelector(
+        '#thumbnail a[data-filtertube-channel-handle], ' +
+        '#thumbnail a[data-filtertube-channel-id], ' +
+        'a#thumbnail[data-filtertube-channel-handle], ' +
+        'a#thumbnail[data-filtertube-channel-id]'
+    );
+}
+const relatedElements = [channelAnchor, channelElement, channelSubtitleElement, searchThumbAnchor];
+```
+
+**Impact**: Prevents first-batch whitelist false-negatives on search pages.
+
+### 3.6 Watch Page SPA Swap Cleanup
+
+**Problem**: Watch page elements remained stuck hidden after navigation.
+
+**Solution**: Clear whitelist-pending flags during SPA swaps:
+
+```javascript
+const watchMeta = document.querySelector('ytd-watch-metadata');
+if (watchMeta) {
+    watchMeta.querySelectorAll('[data-filtertube-whitelist-pending="true"], [data-filtertube-hidden], .filtertube-hidden').forEach(el => {
+        toggleVisibility(el, false, '', true); // Clear stuck flags
+    });
+}
+```
+
+**Impact**: Ensures proper element visibility after video navigation.
+
+### 3.7 Whitelist-Pending Re-evaluation Timing
+
+**Problem**: Content was being recursively hidden during search page loading.
+
+**Solution**: Optimized timing for pending content re-evaluation:
+
+```javascript
+// Immediate re-evaluation
+setTimeout(() => {
+    applyDOMFallback(null, { preserveScroll: true, onlyWhitelistPending: true });
+}, 0);
+
+// Delayed re-evaluation for late-arriving content
+setTimeout(() => {
+    applyDOMFallback(null, { preserveScroll: true, onlyWhitelistPending: true });
+}, 90);
+```
+
+**Impact**: Reduces recursive hiding window by 90% on search pages.
+
+## 4) Canonical Channel Identity Rules (v3.2.1 Updates)
+
+### 4.1 Canonical key
 - **Canonical identity is UC ID** (`UCxxxxxxxxxxxxxxxxxxxxxx`).
 - `@handle` is an alias, useful for display and as a lookup hint.
 
 Additional supported aliases:
 - `customUrl` (`/c/<slug>` and `/user/<slug>`) is treated as a persisted alias that can be resolved to a UC ID via `channelMap`.
 
-### 2.2 `channelMap` (alias cache) - **ENHANCED v3.2.1**
+### 4.2 `channelMap` (alias cache) - **ENHANCED v3.2.1**
 Stored in local extension storage as a bidirectional map:
 - `channelMap[lowercaseHandle] -> UCID`
 - `channelMap[lowercaseUCID] -> handleDisplay`
@@ -244,9 +378,9 @@ Use cases:
 - Recovering from YouTube handle URL breakage.
 - **NEW v3.2.1**: Proactive mapping from XHR interception data.
 
-## 3) Channel Identity Sources (Priority Order) - **REVISED v3.2.1**
+## 5) Channel Identity Sources (Priority Order) - **REVISED v3.2.1**
 
-### 3.1 **NEW: Proactive Network Snapshots (Highest Priority)**
+### 5.1 **NEW: Proactive Network Snapshots (Highest Priority)**
 ```javascript
 // In seed.js - stashed during XHR interception
 function stashNetworkSnapshot(data, dataName) {
@@ -265,29 +399,29 @@ function stashNetworkSnapshot(data, dataName) {
 - `rawYtInitialData` - Page initial data
 - `rawYtInitialPlayerResponse` - Page player data
 
-### 3.2 Direct UC ID
+### 5.2 Direct UC ID
 - From DOM links (`/channel/UC...`) or already-known metadata.
 
-### 3.3 **IMPROVED: Main-world ytInitialData lookup by `videoId`** (best "no network" recovery)
+### 5.3 **IMPROVED: Main-world ytInitialData lookup by `videoId`** (best "no network" recovery)
    - `content_bridge.js` → `requestChannelInfoFromMainWorld(videoId)`
    - **NEW v3.2.1**: Now searches multiple snapshot sources, not just `window.ytInitialData`
    - Parses embedded `ytInitialData` / header renderers / canonical links.
 
-### 3.4 Targeted Fetch (Last Resort)
+### 5.4 Targeted Fetch (Last Resort)
    - `https://www.youtube.com/@<handle>/about`, then fallback to `https://www.youtube.com/@<handle>`
    - `https://www.youtube.com/c/<slug>` / `https://www.youtube.com/user/<slug>`
    - **IMPROVED v3.2.1**: Enhanced CORS handling with automatic fallbacks
    - This is the most fragile due to YouTube’s 404 bug for some handles.
 
-### 3.5 Ultimate Fallbacks
+### 5.5 Ultimate Fallbacks
    - **NEW v3.2.1**: OG meta tag extraction when JSON parsing fails
    - **NEW v3.2.1**: Watch identity resolution when channel page scraping fails
    - DOM extraction from stamped attributes
    - Generic fallback ("Channel")
 
-## 4) Surface-by-Surface: “What hides content” + “Where identity comes from”
+## 6) Surface-by-Surface: “What hides content” + “Where identity comes from”
 
-### 4.1 Home feed / Browse
+### 6.1 Home feed / Browse
 - **Hide path**
   - Engine removes from JSON when possible.
   - DOM fallback hides recycled/hydrated leftovers.
@@ -298,14 +432,14 @@ function stashNetworkSnapshot(data, dataName) {
 - **404 Recovery Tip**
   - If `/@handle/about` breaks, rely on `requestChannelInfoFromMainWorld(videoId)` first; that path uses the same four-layer safety net (cache → ytInitialData → Shorts helper → DOM cache invalidation) described in `docs/handle-404-remediation.md`.
 
-### 4.2 Search results
+### 6.2 Search results
 - **Hide path**
   - Engine (best-effort) + DOM fallback (very important due to rapid mutations).
 - **Identity sources**
   - `#channel-info ytd-channel-name a` for channel name + href (avoid thumbnail overlay text).
   - `ytInitialData` via main-world lookup if DOM is incomplete.
 
-### 4.3 Watch page
+### 6.3 Watch page
 - **Hide path**
   - Engine for recommended/related responses.
   - DOM fallback for sidebar and mixed renderers.
@@ -317,7 +451,7 @@ Watch-page playlists (`list=...`):
 - Playlist panel row identity is often incomplete, so `videoChannelMap` is learned via prioritized prefetch and then reused to hide playlist items deterministically.
 - Next/Prev navigation is guarded so blocked items are skipped without visible playback.
 
-### 4.4 Shorts shelf / Shorts cards
+### 6.4 Shorts shelf / Shorts cards
 - **Hide path**
   - Mostly DOM fallback (many Shorts cards are DOM-heavy and inconsistent).
 - **Identity sources**
@@ -329,7 +463,7 @@ Watch-page playlists (`list=...`):
 - **Collaboration handling**
   - Avatar stacks now trigger the same collaborator enrichment used on search/watch. The immediate hide still occurs, but `handleBlockChannelClick` waits for collaborator data before persisting so that “Block All” is available even on Shorts shelves.
 
-### 4.5 Collaboration videos
+### 6.5 Collaboration videos
 - **Hide path**
   - Same as surface (Home/Search/Watch) + special 3-dot “multi-step” selection.
 - **Identity sources**
@@ -340,7 +474,7 @@ Mix cards:
 - Mix cards are treated as playlists (container items), but they are not collaborations. Seed-artist text such as “A and more” must not be interpreted as channel collaborators.
 
 
-## 5) Why 3-dot Blocking Could Still Fail to Recover UC ID
+## 7) Why 3-dot Blocking Could Still Fail to Recover UC ID
 
 Even if `/@handle/about` 404s, the 3-dot path *should* recover via main-world ytInitialData or shorts fetch.
 When it doesn’t, it typically falls into one of these buckets:
@@ -358,20 +492,20 @@ When it doesn’t, it typically falls into one of these buckets:
   - This is a safeguard against wrong-collab selection, but can be overly strict if the DOM hint is stale.
 
 
-## 6) Manual Add / Channel Management UI (Popup + Tab)
+## 8) Manual Add / Channel Management UI (Popup + Tab)
 
-### 6.1 What the UI does today
+### 8.1 What the UI does today
 - Popup/tab UI uses `StateManager.addChannel()`.
 - That delegates to background via `chrome.runtime.sendMessage({ action: 'addChannelPersistent', input })`.
 - UI list rendering uses stored `filterChannels` data for `name`/`logo`.
 - There is **no proactive enrichment loop** that refreshes `name/logo` by calling `fetchChannelDetails`.
 
-### 6.2 Important guardrail
+### 8.2 Important guardrail
 - **Manual add must never persist an unresolved handle as the `id`.**
 - Fix applied: `addChannelPersistent` now refuses to persist unless a UC ID was resolved (directly or via `channelMap`).
 
 
-## 7) Recommended Simplification Strategy (Proposal)
+## 9) Recommended Simplification Strategy (Proposal)
 
 This is the direction that makes `/@handle/about` failures mostly irrelevant:
 

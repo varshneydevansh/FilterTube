@@ -3,19 +3,20 @@
     "_comment": "Shared release notes source for the dashboard What's New tab and the YouTube release banner. Keep entries sorted newest-first by version."
   },
   {
-    "version": "3.2.2",
-    "headline": "UI/UX Improvements + Debug Gating",
-    "summary": "Enhanced user experience with optimistic UI updates, mobile menu support, and debug gating for cleaner console output.",
-    "bannerSummary": "Instant visual feedback, mobile support, and smoother rendering.",
+    "version": "3.2.3",
+    "headline": "Experimental Whitelist Mode + UI Improvements",
+    "summary": "Alpha release of whitelist mode for 'allow-only' filtering, plus enhanced UI updates and mobile menu support.",
+    "bannerSummary": "Try experimental whitelist mode - hide everything except allowed channels.",
     "highlights": [
+      "EXPERIMENTAL: Whitelist mode hides all content except explicitly allowed channels/keywords",
+      "Dual filtering modes with easy toggle between blocklist and whitelist in popup and tab view",
+      "Staging migration - switch to blocklist to collect channels, then merge back to whitelist",
+      "Watch page protection in whitelist mode maintains video playback functionality",
       "Optimistic UI updates hide content instantly with automatic restoration if blocking fails",
       "Enhanced mobile menu support with proper YouTube mobile renderer handling",
-      "All console logs now gated behind debug flag to reduce production noise",
-      "Scroll preservation during filtering prevents jarring position changes",
-      "Channel enrichment limits prevent excessive background requests",
-      "Idle-scheduled rendering for smoother large list updates"
+      "All console logs now gated behind debug flag to reduce production noise"
     ],
-    "detailsUrl": "docs/CHANGELOG.md#version-322"
+    "detailsUrl": "docs/CHANGELOG.md#version-323"
   },
   {
     "version": "3.2.1",

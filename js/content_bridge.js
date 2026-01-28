@@ -3630,6 +3630,27 @@ async function initializeDOMFallback(settings) {
                 }
             } catch (e) {
             }
+
+            // After marking nodes as whitelist-pending, run a lightweight pass that only
+            // re-evaluates pending nodes. This reduces the "recursive hiding" window on
+            // Search where cards render first and receive identity later.
+            try {
+                if (typeof applyDOMFallback === 'function') {
+                    setTimeout(() => {
+                        try {
+                            applyDOMFallback(null, { preserveScroll: true, onlyWhitelistPending: true });
+                        } catch (e) {
+                        }
+                    }, 0);
+                    setTimeout(() => {
+                        try {
+                            applyDOMFallback(null, { preserveScroll: true, onlyWhitelistPending: true });
+                        } catch (e) {
+                        }
+                    }, 90);
+                }
+            } catch (e) {
+            }
         }
 
         const observer = new MutationObserver(mutations => {

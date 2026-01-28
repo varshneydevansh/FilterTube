@@ -1,5 +1,23 @@
 # Changelog
 
+## Version 3.2.3
+
+### Experimental Whitelist Mode (Alpha)
+
+- **Dual Filtering Modes**: Introduced experimental whitelist mode alongside traditional blocklist mode - whitelist mode hides all content except explicitly allowed channels/keywords.
+- **Mode-Aware UI Controls**: Added list mode toggles in popup and tab view interfaces for switching between blocklist and whitelist modes.
+- **Staging Migration**: Users can temporarily switch to blocklist mode to browse normally and collect channels, then merge blocklist into whitelist when switching back.
+- **Profile Storage Extension**: Extended Profiles V4 schema to support `mode`, `whitelistChannels`, and `whitelistKeywords` fields.
+- **Mode-Aware Filtering Logic**: Updated render engine and DOM fallback to respect current filtering mode in content visibility decisions.
+
+### Whitelist Mode Technical Improvements
+
+- **Watch Page Protection**: Whitelist mode preserves watch page metadata (actions, channel row, description) to maintain video playback functionality.
+- **Search Page Optimization**: Added indeterminate state handling for search results that render before channel identity is available, preventing page blanking.
+- **Homepage Duplicate Removal**: Automatic duplicate content removal on homepage in whitelist mode to clean up mixed content feeds.
+- **Whitelist-Pending Processing**: Optimized DOM fallback with `onlyWhitelistPending` option for efficient re-evaluation of content awaiting channel identity.
+- **Cross-World Mode Sync**: Enhanced channel stamping with `data-filtertube-list-mode` attributes for consistent mode awareness across execution worlds.
+
 ## Version 3.2.2
 
 ### UI/UX Improvements & Debug Gating

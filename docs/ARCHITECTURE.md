@@ -2,11 +2,11 @@
 
 ## Overview
 
-FilterTube v3.2.3 builds on the proactive channel identity system of v3.2.1 with significant UI/UX improvements and introduces Whitelist Mode for granular content control. This architecture documentation covers both the high-level design, filtering modes, and user experience enhancements.
+FilterTube v3.2.3 builds on the proactive channel identity system of v3.2.1 with significant UI/UX improvements and introduces **Experimental Whitelist Mode** for granular content control. This architecture documentation covers both the high-level design, filtering modes, and user experience enhancements.
 
-## Filtering Modes Architecture (v3.2.3)
+## Filtering Modes Architecture (v3.2.3 - Experimental)
 
-FilterTube v3.2.3 introduces dual filtering modes: Blocklist and Whitelist, allowing users to control content visibility through allow/deny lists.
+FilterTube v3.2.3 introduces **experimental** dual filtering modes: Blocklist and Whitelist, allowing users to control content visibility through allow/deny lists.
 
 ### Blocklist Mode (Default)
 
@@ -21,9 +21,9 @@ graph TD
     D -->|No| E[Show Content]
 ```
 
-### Whitelist Mode (New)
+### Whitelist Mode (Experimental)
 
-Content is hidden by default unless it matches whitelisted channels or keywords:
+**EXPERIMENTAL FEATURE** - Content is hidden by default unless it matches whitelisted channels or keywords:
 
 ```mermaid
 graph TD

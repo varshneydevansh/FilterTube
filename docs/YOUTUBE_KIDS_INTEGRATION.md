@@ -4,9 +4,9 @@
 
 FilterTube v3.2.3 provides **zero-network** integration with YouTube Kids, relying entirely on proactive XHR interception to extract channel identity without any network requests. This ensures reliable blocking on YouTube Kids where traditional network fetching often fails.
 
-**Whitelist Mode Support (v3.2.3):** YouTube Kids now supports whitelist mode for granular content control, allowing parents to specify exactly which channels and content are allowed.
+**Whitelist Mode Support (v3.2.3 - Experimental):** YouTube Kids now supports **experimental whitelist mode** for granular content control, allowing parents to specify exactly which channels and content are allowed.
 
-## Whitelist Mode for Kids (v3.2.3)
+## Whitelist Mode for Kids (v3.2.3 - Experimental)
 
 ### Kids Profile Whitelist Support
 
