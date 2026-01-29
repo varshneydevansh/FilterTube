@@ -1,21 +1,32 @@
-# FilterTube v3.2.3 - Current Functionality Documentation
+# FilterTube v3.2.4 - Current Functionality Documentation
 
 ## Overview
 
-FilterTube v3.2.3 implements a **hybrid filtering system** with dual filtering modes:
+FilterTube v3.2.4 implements a **hybrid filtering system** with dual filtering modes:
+
 - A primary **data interception layer** removes blocked items from YouTube JSON responses before render when possible.
 - A secondary **DOM fallback layer** hides/restores already-rendered elements for SPA navigation, DOM recycling, and edge cases.
-- **Experimental Whitelist Mode**: Hide all content except explicitly allowed channels and keywords (v3.2.3).
+- **Experimental Whitelist Mode**: Hide all content except explicitly allowed channels and keywords (v3.2.4).
 
 ## Core Filtering Capabilities
 
 ### **Content Filtering Modes**
+
 - **Blocklist Mode (Default)**: Traditional filtering - hide content matching blocked channels/keywords
-- **Whitelist Mode (Experimental v3.2.3)**: Hide all content except content matching whitelisted channels/keywords
+- **Whitelist Mode (Experimental v3.2.4)**: Hide all content except content matching whitelisted channels/keywords
 - **Video Filtering**: Filters videos by title keywords before rendering
 - **Channel Filtering**: Blocks/allows content from specific channels using @handles, channel IDs, or channel names
 - **Comments Filtering**: Removes comment sections entirely when hideAllComments is enabled
 - **Shorts Filtering**: Blocks YouTube Shorts content when hideAllShorts is enabled
+
+### **Whitelist Mode Features (v3.2.4)**
+
+- **Intelligent Mode Switching**: Confirmation dialogs prevent accidental data loss when switching modes
+- **Enhanced Channel Identity**: Multi-source channel extraction with improved reliability
+- **Search Page Optimizations**: Right-rail watch cards handled intelligently
+- **Performance Improvements**: Selective processing and bridge-level optimizations
+- **UI Enhancements**: Clean interface that hides irrelevant controls in whitelist mode
+- **State Tracking**: Seamless switching between blocklist and whitelist modes
 
 ### **Stats Tracking**
 - **Time Saved**: Calculates and displays the time saved by blocking unwanted videos using actual video durations extracted from YouTube metadata (falls back to 3 minutes for videos, 30 seconds for shorts when duration unavailable).

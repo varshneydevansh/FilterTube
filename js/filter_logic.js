@@ -311,6 +311,12 @@
         'universalWatchCardRenderer'
     ]);
 
+    const CHIP_RENDERERS = new Set([
+        'relatedChipCloudRenderer',
+        'chipCloudRenderer',
+        'chipCloudChipRenderer'
+    ]);
+
     // Comprehensive filter rules for all YouTube renderer types
     const FILTER_RULES = {
         // ------------------------------------------------------------------
@@ -1113,6 +1119,10 @@
         _shouldBlock(item, rendererType) {
             if (!item || typeof item !== 'object') return false;
 
+            if (CHIP_RENDERERS.has(rendererType)) {
+                return false;
+            }
+
             const rules = FILTER_RULES[rendererType];
             if (!rules) {
                 // Log unrecognized renderer types for debugging
@@ -1200,6 +1210,19 @@
             }
 
             if (listMode === 'whitelist' && !isCommentRenderer) {
+                try {
+                    const path = document.location?.pathname || '';
+                    if (path === '/results' && rendererType === 'universalWatchCardRenderer') {
+                        return false;
+                    }
+                } catch (e) {
+                }
+                // Watch page scaffolding: these renderers often lack sufficient channel identity
+                // for whitelist evaluation, but removing them breaks the watch page UI (description,
+                // action buttons, channel row, and comment composer rendering).
+                if (rendererType === 'videoPrimaryInfoRenderer' || rendererType === 'videoSecondaryInfoRenderer') {
+                    return false;
+                }
                 const whitelistChannels = Array.isArray(this.settings.whitelistChannels) ? this.settings.whitelistChannels : [];
                 const whitelistKeywords = Array.isArray(this.settings.whitelistKeywords) ? this.settings.whitelistKeywords : [];
 

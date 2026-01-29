@@ -1,5 +1,25 @@
 # Changelog
 
+## Version 3.2.4
+
+### Enhanced Whitelist Mode (Experimental)
+
+- **3-Dot Menu Cleanup**: Disabled irrelevant "Block Channel" menus in whitelist mode to prevent user confusion and improve interface clarity.
+- **Search Secondary Handling**: Added intelligent processing for right-rail watch cards on search pages, preventing UI clutter in whitelist mode.
+- **Enhanced Channel Extraction**: Improved multi-source channel identity resolution with thumbnail anchors and parent container data extraction.
+- **Mode-Aware State Tracking**: Implemented seamless switching between blocklist/whitelist modes with intelligent reprocessing and state management.
+- **Bridge-Level Optimizations**: Excluded search results from whitelist pending logic for better performance and reduced CPU usage.
+- **UI Confirmation Dialogs**: Added user confirmation when switching modes to prevent accidental data loss, with intelligent transfer options.
+- **Seed.js Intelligence**: Mode-aware search processing that skips unnecessary engine work in whitelist mode for better performance.
+- **Kids Mode Whitelist Support**: Extended whitelist functionality to YouTube Kids profiles with zero-network architecture.
+- **Filter Logic Enhancements**: Added chip renderer exclusion and watch page scaffolding protection for cleaner content filtering.
+
+### Technical Improvements
+
+- **Performance Optimizations**: Selective processing and bridge-level exclusions improve overall extension performance.
+- **Enhanced Error Handling**: Better fallback mechanisms for edge cases in whitelist mode processing.
+- **State Management**: Improved mode switching state tracking prevents unnecessary DOM reprocessing.
+
 ## Version 3.2.3
 
 ### Experimental Whitelist Mode (Alpha)

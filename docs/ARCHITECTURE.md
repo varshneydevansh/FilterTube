@@ -6,7 +6,7 @@ FilterTube v3.2.3 builds on the proactive channel identity system of v3.2.1 with
 
 ## Filtering Modes Architecture (v3.2.3 - Experimental)
 
-FilterTube v3.2.3 introduces **experimental** dual filtering modes: Blocklist and Whitelist, allowing users to control content visibility through allow/deny lists.
+FilterTube v3.2.3 introduces **experimental** dual filtering modes: Blocklist and Whitelist, allowing users to control content visibility through allow/deny lists with significantly improved architecture.
 
 ### Blocklist Mode (Default)
 
@@ -33,35 +33,21 @@ graph TD
     B -->|No| D{Keywords Match Whitelist?}
     D -->|Yes| C
     D -->|No| E[Hide Content]
+    E --> F{Identity Available?}
+    F -->|No| G[Apply Indeterminate Protection]
+    F -->|Yes| H[Hide Immediately]
+    G --> I[Show Temporarily - Re-evaluate Later]
 ```
 
-### Mode Switching with Staging Merge
+### Mode Switching with Enhanced Staging
 
-Users can switch modes with automatic list migration:
+Users can switch modes with intelligent list migration and confirmation dialogs:
 
 ```mermaid
 graph TD
     A[User: Switch Mode] --> B{Target Mode?}
-    B -->|Whitelist| C[Copy Blocklist to Whitelist?]
-    B -->|Blocklist| D[Set Mode to Blocklist]
-    
-    C -->|Yes| E[Merge Blocklist → Whitelist]
-    C -->|No| F[Start with Empty Whitelist]
-    
-    E --> G[Clear Blocklist]
-    F --> H[Set Mode to Whitelist]
-    G --> H
-    D --> I[Mode Switch Complete]
-    H --> I
-    
-    I --> J[Refresh All Content]
-    J --> K[Update UI Controls]
-    
-    style E fill:#4caf50
-    style F fill:#ff9800
-    style H fill:#2196f3
-    style I fill:#4caf50
-```
+    B -->|Whitelist| C{Whitelist Empty?}
+    B -->|Blocklist| D{Blocklist has Content?}
 
 ```javascript
 // Switching to Whitelist Mode

@@ -1,8 +1,8 @@
-# Whitelist Mode Specification (v3.2.3)
+# Whitelist Mode Specification (v3.2.4)
 
 ## Overview
 
-This document specifies the implementation of Whitelist Mode for FilterTube v3.2.3, allowing users to hide all content except explicitly allowed channels and keywords.
+This document specifies the implementation of Whitelist Mode for FilterTube v3.2.4, allowing users to hide all content except explicitly allowed channels and keywords with enhanced performance and UX improvements.
 
 ## Goals
 

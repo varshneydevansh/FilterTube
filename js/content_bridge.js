@@ -3536,124 +3536,130 @@ async function initializeDOMFallback(settings) {
             try {
                 const listMode = currentSettings?.listMode === 'whitelist' ? 'whitelist' : 'blocklist';
                 if (listMode !== 'whitelist') return;
-            } catch (e) {
-                return;
-            }
 
-            const shouldSkipPendingHide = (element) => {
-                if (!element || typeof element.closest !== 'function') return false;
                 try {
-                    if (element.closest('ytd-watch-flexy, ytd-watch-metadata, ytd-video-primary-info-renderer, ytd-video-secondary-info-renderer, ytd-comments, ytd-comment-simplebox-renderer, #comments, #secondary, #related')) {
-                        const tag = (element.tagName || '').toLowerCase();
-                        const isContentCard = (
-                            tag === 'ytd-video-renderer' ||
-                            tag === 'ytd-compact-video-renderer' ||
-                            tag === 'ytd-watch-card-compact-video-renderer' ||
-                            tag === 'ytd-watch-card-hero-video-renderer' ||
-                            tag === 'ytd-watch-card-rhs-panel-video-renderer' ||
-                            tag === 'ytd-universal-watch-card-renderer' ||
-                            tag === 'ytd-playlist-panel-video-renderer' ||
-                            tag === 'ytd-playlist-panel-video-wrapper-renderer' ||
-                            tag === 'yt-lockup-view-model' ||
-                            tag === 'yt-lockup-metadata-view-model' ||
-                            tag === 'ytd-reel-item-renderer'
-                        );
-                        return !isContentCard;
-                    }
+                    const path = document.location?.pathname || '';
+                    if (path === '/results') return;
                 } catch (e) {
                 }
-                return false;
-            };
 
-            const resolveTargetToHide = (element) => {
-                try {
-                    const tag = (element?.tagName || '').toLowerCase();
-                    if (tag === 'ytd-rich-grid-media') {
-                        return element.closest('ytd-rich-item-renderer, ytd-item-section-renderer') || element;
-                    }
-                    if (tag === 'yt-lockup-view-model' || tag === 'yt-lockup-metadata-view-model') {
-                        return element.closest('ytd-rich-item-renderer') || element;
-                    }
-                    if (tag === 'ytd-playlist-panel-video-renderer') {
-                        return element.closest('ytd-playlist-panel-video-wrapper-renderer') || element;
-                    }
-                } catch (e) {
-                }
-                return element;
-            };
-
-            const hidePending = (element) => {
-                if (!element) return;
-                try {
-                    if (shouldSkipPendingHide(element)) return;
-                    if (element.hasAttribute('data-filtertube-processed')) return;
-                    if (element.getAttribute('data-filtertube-whitelist-pending') === 'true') return;
-                    if (element.classList.contains('filtertube-hidden') || element.hasAttribute('data-filtertube-hidden')) return;
-
-                    element.classList.add('filtertube-hidden');
-                    element.setAttribute('data-filtertube-hidden', 'true');
-                    element.setAttribute('data-filtertube-whitelist-pending', 'true');
+                const shouldSkipPendingHide = (element) => {
+                    if (!element || typeof element.closest !== 'function') return false;
                     try {
-                        element.style.setProperty('display', 'none', 'important');
+                        if (element.closest('ytd-watch-flexy, ytd-watch-metadata, ytd-video-primary-info-renderer, ytd-video-secondary-info-renderer, ytd-comments, ytd-comment-simplebox-renderer, #comments, #secondary, #related')) {
+                            const tag = (element.tagName || '').toLowerCase();
+                            const isContentCard = (
+                                tag === 'ytd-video-renderer' ||
+                                tag === 'ytd-compact-video-renderer' ||
+                                tag === 'ytd-watch-card-compact-video-renderer' ||
+                                tag === 'ytd-watch-card-hero-video-renderer' ||
+                                tag === 'ytd-watch-card-rhs-panel-video-renderer' ||
+                                tag === 'ytd-universal-watch-card-renderer' ||
+                                tag === 'ytd-playlist-panel-video-renderer' ||
+                                tag === 'ytd-playlist-panel-video-wrapper-renderer' ||
+                                tag === 'yt-lockup-view-model' ||
+                                tag === 'yt-lockup-metadata-view-model' ||
+                                tag === 'ytd-reel-item-renderer'
+                            );
+                            return !isContentCard;
+                        }
                     } catch (e) {
                     }
-                } catch (e) {
-                }
-            };
+                    return false;
+                };
 
-            try {
-                for (const mutation of mutations || []) {
-                    const added = mutation?.addedNodes;
-                    if (!added || !added.length) continue;
-                    for (const node of added) {
-                        if (!(node instanceof Element)) continue;
+                const resolveTargetToHide = (element) => {
+                    try {
+                        const tag = (element?.tagName || '').toLowerCase();
+                        if (tag === 'ytd-rich-grid-media') {
+                            return element.closest('ytd-rich-item-renderer, ytd-item-section-renderer') || element;
+                        }
+                        if (tag === 'yt-lockup-view-model' || tag === 'yt-lockup-metadata-view-model') {
+                            return element.closest('ytd-rich-item-renderer') || element;
+                        }
+                        if (tag === 'ytd-playlist-panel-video-renderer') {
+                            return element.closest('ytd-playlist-panel-video-wrapper-renderer') || element;
+                        }
+                    } catch (e) {
+                    }
+                    return element;
+                };
 
-                        const candidates = [];
+                const hidePending = (element) => {
+                    if (!element) return;
+                    try {
+                        if (shouldSkipPendingHide(element)) return;
+                        if (element.hasAttribute('data-filtertube-processed')) return;
+                        if (element.getAttribute('data-filtertube-whitelist-pending') === 'true') return;
+                        if (element.classList.contains('filtertube-hidden') || element.hasAttribute('data-filtertube-hidden')) return;
+
                         try {
-                            if (node.matches && node.matches(VIDEO_CARD_SELECTORS)) {
-                                candidates.push(node);
+                            queuePrefetchForCard(element);
+                        } catch (e) {
+                        }
+
+                        element.classList.add('filtertube-hidden');
+                        element.setAttribute('data-filtertube-hidden', 'true');
+                        element.setAttribute('data-filtertube-whitelist-pending', 'true');
+                        try {
+                            element.style.setProperty('display', 'none', 'important');
+                        } catch (e) {
+                        }
+                    } catch (e) {
+                    }
+                };
+
+                try {
+                    for (const mutation of mutations || []) {
+                        const added = mutation?.addedNodes;
+                        if (!added || !added.length) continue;
+                        for (const node of added) {
+                            if (!(node instanceof Element)) continue;
+
+                            const candidates = [];
+                            try {
+                                if (node.matches && node.matches(VIDEO_CARD_SELECTORS)) {
+                                    candidates.push(node);
+                                }
+                            } catch (e) {
                             }
-                        } catch (e) {
-                        }
 
-                        try {
-                            const nested = node.querySelectorAll ? node.querySelectorAll(VIDEO_CARD_SELECTORS) : [];
-                            nested?.forEach?.(el => candidates.push(el));
-                        } catch (e) {
-                        }
+                            try {
+                                const nested = node.querySelectorAll ? node.querySelectorAll(VIDEO_CARD_SELECTORS) : [];
+                                nested?.forEach?.(el => candidates.push(el));
+                            } catch (e) {
+                            }
 
-                        for (const cand of candidates) {
-                            const target = resolveTargetToHide(cand);
-                            hidePending(target);
+                            for (const cand of candidates) {
+                                const target = resolveTargetToHide(cand);
+                                hidePending(target);
+                            }
                         }
                     }
+                } catch (e) {
                 }
-            } catch (e) {
-            }
 
-            // After marking nodes as whitelist-pending, run a lightweight pass that only
-            // re-evaluates pending nodes. This reduces the "recursive hiding" window on
-            // Search where cards render first and receive identity later.
-            try {
-                if (typeof applyDOMFallback === 'function') {
-                    setTimeout(() => {
-                        try {
-                            applyDOMFallback(null, { preserveScroll: true, onlyWhitelistPending: true });
-                        } catch (e) {
-                        }
-                    }, 0);
-                    setTimeout(() => {
-                        try {
-                            applyDOMFallback(null, { preserveScroll: true, onlyWhitelistPending: true });
-                        } catch (e) {
-                        }
-                    }, 90);
+                try {
+                    if (typeof applyDOMFallback === 'function') {
+                        setTimeout(() => {
+                            try {
+                                applyDOMFallback(null, { preserveScroll: true, onlyWhitelistPending: true });
+                            } catch (e) {
+                            }
+                        }, 0);
+                        setTimeout(() => {
+                            try {
+                                applyDOMFallback(null, { preserveScroll: true, onlyWhitelistPending: true });
+                            } catch (e) {
+                            }
+                        }, 90);
+                    }
+                } catch (e) {
                 }
             } catch (e) {
             }
         }
-
-        const observer = new MutationObserver(mutations => {
+ const observer = new MutationObserver(mutations => {
             let hasNewContent = false;
             for (const mutation of mutations) {
                 if (mutation.addedNodes && mutation.addedNodes.length > 0) {

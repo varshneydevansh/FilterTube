@@ -191,8 +191,11 @@
         if (isSearchResultsPath) {
             const isSearchFetch = typeof dataName === 'string' && dataName.startsWith('fetch:/youtubei/v1/search');
             if (isSearchFetch || hasSearchLayout) {
-                seedDebugLog(`⏭️ Skipping engine processing for ${dataName} (search results) to allow DOM-based restore`);
-                return true;
+                const mode = (cachedSettings && cachedSettings.listMode === 'whitelist') ? 'whitelist' : 'blocklist';
+                if (mode !== 'whitelist') {
+                    seedDebugLog(`⏭️ Skipping engine processing for ${dataName} (search results) to allow DOM-based restore`);
+                    return true;
+                }
             }
         }
 

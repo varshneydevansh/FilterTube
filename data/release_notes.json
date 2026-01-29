@@ -3,6 +3,22 @@
     "_comment": "Shared release notes source for the dashboard What's New tab and the YouTube release banner. Keep entries sorted newest-first by version."
   },
   {
+    "version": "3.2.4",
+    "headline": "Enhanced Whitelist Mode + Performance Optimizations",
+    "summary": "Significant improvements to experimental whitelist mode with better UX, performance optimizations, and extended Kids mode support.",
+    "bannerSummary": "Whitelist mode gets smarter with cleaner UI, better performance, and Kids support.",
+    "highlights": [
+      "EXPERIMENTAL: Enhanced whitelist mode with 3-dot menu cleanup, intelligent search processing, and mode-aware state tracking",
+      "Performance boost: Bridge-level optimizations and selective processing reduce CPU usage",
+      "UI improvements: Confirmation dialogs prevent accidental data loss when switching modes",
+      "Kids mode support: Whitelist functionality now works on YouTube Kids with zero-network architecture",
+      "Search optimizations: Right-rail watch cards handled intelligently to prevent UI clutter",
+      "Channel extraction: Multi-source identity resolution with thumbnail anchors and parent containers",
+      "Mode switching: Seamless transitions between blocklist/whitelist with intelligent reprocessing"
+    ],
+    "detailsUrl": "docs/CHANGELOG.md#version-324"
+  },
+  {
     "version": "3.2.3",
     "headline": "Experimental Whitelist Mode + UI Improvements",
     "summary": "Alpha release of whitelist mode for 'allow-only' filtering, plus enhanced UI updates and mobile menu support.",

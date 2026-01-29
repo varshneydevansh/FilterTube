@@ -25,6 +25,30 @@ const handledKidsBlockActions = new Set(); // Set of "videoId" or "channelId" re
  */
 const injectedDropdowns = new WeakMap();
 
+const isWhitelistModeActive = () => {
+    try {
+        return !!currentSettings && typeof currentSettings === 'object' && currentSettings.listMode === 'whitelist';
+    } catch (e) {
+        return false;
+    }
+};
+
+const cleanupInjectedMenuItems = (dropdown) => {
+    try {
+        if (!dropdown || typeof dropdown.querySelectorAll !== 'function') return;
+        dropdown.querySelectorAll('.filtertube-block-channel-item').forEach(item => {
+            try {
+                item.remove();
+            } catch (e) {
+            }
+        });
+        if (injectedDropdowns.has(dropdown)) {
+            injectedDropdowns.delete(dropdown);
+        }
+    } catch (e) {
+    }
+};
+
 // Menu helpers (`escapeHtml`, `ensureFilterTubeMenuStyles`) are defined in
 // `js/content/menu.js` (loaded before this file via manifest ordering).
 
@@ -504,6 +528,11 @@ async function handleDropdownAppeared(dropdown) {
 async function handleDropdownAppearedInternal(dropdown) {
     if (!lastClickedMenuButton) {
         blockChannelDebugLog('FilterTube: No button reference, skipping injection');
+        return;
+    }
+
+    if (isWhitelistModeActive()) {
+        cleanupInjectedMenuItems(dropdown);
         return;
     }
 

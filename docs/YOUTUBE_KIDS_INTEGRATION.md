@@ -1,12 +1,12 @@
-# YouTube Kids Integration Documentation (v3.2.3)
+# YouTube Kids Integration Documentation (v3.2.4)
 
 ## Overview
 
-FilterTube v3.2.3 provides **zero-network** integration with YouTube Kids, relying entirely on proactive XHR interception to extract channel identity without any network requests. This ensures reliable blocking on YouTube Kids where traditional network fetching often fails.
+FilterTube v3.2.4 provides **zero-network** integration with YouTube Kids, relying entirely on proactive XHR interception to extract channel identity without any network requests. This ensures reliable blocking on YouTube Kids where traditional network fetching often fails.
 
-**Whitelist Mode Support (v3.2.3 - Experimental):** YouTube Kids now supports **experimental whitelist mode** for granular content control, allowing parents to specify exactly which channels and content are allowed.
+**Whitelist Mode Support (v3.2.4 - Experimental):** YouTube Kids now supports **experimental whitelist mode** for granular content control, allowing parents to specify exactly which channels and content are allowed.
 
-## Whitelist Mode for Kids (v3.2.3 - Experimental)
+## Whitelist Mode for Kids (v3.2.4 - Experimental)
 
 ### Kids Profile Whitelist Support
 
@@ -141,6 +141,7 @@ async function prefetchIdentityForCard({ videoId, card }) {
 ```
 
 **Kids-specific features:**
+
 - **Zero network requests** - completely relies on XHR interception
 - **Instant blocking** - no "Fetching..." delays on Kids
 - **Reliable operation** - works even when Kids blocks external requests
@@ -225,6 +226,7 @@ async function handleKidsNativeBlock(blockType = 'video', options = {}) {
 ```
 
 **Kids blocking improvements:**
+
 - **Handle extraction** from channel links
 - **CustomUrl support** for /c/ and /user/ channels
 - **Context refresh** to reduce stale data
@@ -259,6 +261,7 @@ async function handleKidsNativeBlock(blockType = 'video', options = {}) {
 ### Key Principle: No Network Fetches
 
 All channel identity on YouTube Kids comes from:
+
 1. **XHR JSON interception** – `/youtubei/v1/next`, `/youtubei/v1/browse`
 2. **DOM extraction** – When available in page markup
 3. **Never from network fetches** – `skipNetwork: true` enforced everywhere
@@ -593,7 +596,7 @@ function enqueueVideoChannelMapUpdate(videoId, channelId) {
 
 ### CORS Limitations
 
-YouTube Kids blocks cross-origin requests from https://www.youtube.com. FilterTube handles this by:
+YouTube Kids blocks cross-origin requests from <https://www.youtube.com>. FilterTube handles this by:
 
 1. **Using Kids watch pages** when possible
 2. **Falling back to main-world extraction** from Kids page HTML

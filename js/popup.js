@@ -258,6 +258,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
 
                 const enablingWhitelist = nextState === true;
+                const disablingWhitelist = nextState !== true && mode === 'whitelist';
                 const whitelistEmpty = (state?.whitelistChannels?.length || 0) === 0 && (state?.whitelistKeywords?.length || 0) === 0;
                 let copyBlocklist = false;
                 if (enablingWhitelist && whitelistEmpty) {
@@ -267,12 +268,25 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }
                 }
 
-                const resp = await sendRuntimeMessage({
-                    action: 'FilterTube_SetListMode',
-                    profileType: 'main',
-                    mode: nextState ? 'whitelist' : 'blocklist',
-                    copyBlocklist
-                });
+                let resp = null;
+                if (disablingWhitelist && !whitelistEmpty) {
+                    const shouldTransfer = window.confirm('Move your whitelist back into blocklist? This will clear whitelist.');
+                    if (shouldTransfer) {
+                        resp = await sendRuntimeMessage({
+                            action: 'FilterTube_TransferWhitelistToBlocklist',
+                            profileType: 'main'
+                        });
+                    }
+                }
+
+                if (!resp) {
+                    resp = await sendRuntimeMessage({
+                        action: 'FilterTube_SetListMode',
+                        profileType: 'main',
+                        mode: nextState ? 'whitelist' : 'blocklist',
+                        copyBlocklist
+                    });
+                }
 
                 if (!resp || resp.ok !== true) {
                     UIComponents.showToast('Failed to update list mode', 'error');

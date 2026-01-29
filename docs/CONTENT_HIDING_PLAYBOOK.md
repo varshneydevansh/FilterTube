@@ -222,12 +222,13 @@ async function applyDOMFallback(settings, options = {}) {
 
 ## 3) Whitelist Mode Logic Improvements (v3.2.3 - Experimental)
 
+**Status**: Whitelist mode is significantly improved but still experimental with known drawbacks.
+
 ### 3.1 Watch Page Protection Logic
 
 **Problem**: Whitelist mode was hiding critical watch page elements, breaking video playback.
 
 **Solution**: Mode-aware CSS rules that preserve watch page functionality:
-
 ```javascript
 // Only hide watch page elements if NOT in whitelist mode
 const listMode = (settings && settings.listMode === 'whitelist') ? 'whitelist' : 'blocklist';
@@ -258,101 +259,175 @@ if (path === '/results' && !hasChannelIdentity && !hasNameSignal && collaborator
 
 **Impact**: Prevents blank search pages and recursive loading during identity resolution.
 
-### 3.3 Homepage Duplicate Removal Logic
+### 3.3 Search Secondary Container Handling
 
-**Problem**: Whitelist mode showed duplicate content items on homepage.
+**NEW v3.2.3**: Enhanced search page processing with right-rail watch card filtering.
 
-**Solution**: Automatic duplicate detection and removal:
+**Problem**: Search right-rail watch cards were being processed inconsistently in whitelist mode.
+
+**Solution**: Skip processing for search secondary containers:
 
 ```javascript
-if (path === '/' && listMode === 'whitelist') {
-    const seen = new Map();
-    for (const item of items) {
-        const videoId = item.getAttribute('data-filtertube-video-id') || extractVideoIdFromCard(item) || '';
-        const existing = seen.get(videoId);
-        if (existing) {
-            toggleVisibility(item, true, 'Duplicate item', true); // Hide duplicate
-        } else {
-            seen.set(videoId, item);
-        }
-    }
+const isSearchSecondary = path === '/results' && !!element.closest('ytd-secondary-search-container-renderer');
+const isSearchRightRailWatchCard = (
+    elementTag === 'ytd-universal-watch-card-renderer' ||
+    elementTag === 'ytd-watch-card-compact-video-renderer' ||
+    elementTag === 'ytd-watch-card-hero-video-renderer' ||
+    elementTag === 'ytd-watch-card-rhs-panel-video-renderer'
+);
+if (isSearchSecondary && isSearchRightRailWatchCard) {
+    toggleVisibility(element, false, '', true);
+    continue; // Skip further processing
 }
 ```
 
-**Impact**: Cleans up mixed content feeds by removing duplicate videos.
+**Impact**: Cleaner search results by properly handling right-rail content in whitelist mode.
 
-### 3.4 Whitelist-Pending Processing Optimization
+### 3.4 Enhanced Channel Metadata Extraction
 
-**Problem**: Processing all elements during whitelist updates was inefficient.
+**NEW v3.2.3**: Improved channel identity resolution with better DOM parsing.
 
-**Solution**: Targeted processing of only pending elements:
+**Problem**: Channel extraction was missing thumbnail anchors and parent container data.
 
-```javascript
-const { onlyWhitelistPending = false } = options;
-const videoElements = (onlyWhitelistPending && listMode === 'whitelist')
-    ? document.querySelectorAll(`${VIDEO_CARD_SELECTORS}[data-filtertube-whitelist-pending="true"]`)
-    : document.querySelectorAll(VIDEO_CARD_SELECTORS);
-```
-
-**Impact**: Reduces DOM processing overhead by 60-80% during whitelist updates.
-
-### 3.5 Search Thumbnail Channel Extraction
-
-**Problem**: Search pages had whitelist false-negatives due to delayed channel name rendering.
-
-**Solution**: Include thumbnail anchor in channel metadata extraction:
+**Solution**: Multi-source channel extraction:
 
 ```javascript
-let searchThumbAnchor = null;
+let channelThumbnailAnchor = null;
 if (elementTag === 'ytd-video-renderer') {
-    searchThumbAnchor = element.querySelector(
-        '#thumbnail a[data-filtertube-channel-handle], ' +
-        '#thumbnail a[data-filtertube-channel-id], ' +
-        'a#thumbnail[data-filtertube-channel-handle], ' +
-        'a#thumbnail[data-filtertube-channel-id]'
+    channelThumbnailAnchor = element.querySelector(
+        '#channel-info a#channel-thumbnail[data-filtertube-channel-id], ' +
+        '#channel-info a#channel-thumbnail[data-filtertube-channel-handle], ' +
+        '#channel-info a[data-filtertube-channel-id], ' +
+        '#channel-info a[data-filtertube-channel-handle]'
     );
 }
-const relatedElements = [channelAnchor, channelElement, channelSubtitleElement, searchThumbAnchor];
+
+const relatedElements = [channelAnchor, channelElement, channelSubtitleElement, 
+                        searchThumbAnchor, channelThumbnailAnchor];
 ```
 
-**Impact**: Prevents first-batch whitelist false-negatives on search pages.
+**Impact**: More reliable channel identity extraction across different card types.
 
-### 3.6 Watch Page SPA Swap Cleanup
+### 3.5 Mode-Aware Processing with State Tracking
 
-**Problem**: Watch page elements remained stuck hidden after navigation.
+**NEW v3.2.3**: Intelligent reprocessing when switching between blocklist/whitelist modes.
 
-**Solution**: Clear whitelist-pending flags during SPA swaps:
+**Problem**: Cards processed in one mode weren't re-evaluated when switching modes.
+
+**Solution**: Track last processed mode and force reprocessing:
 
 ```javascript
-const watchMeta = document.querySelector('ytd-watch-metadata');
-if (watchMeta) {
-    watchMeta.querySelectorAll('[data-filtertube-whitelist-pending="true"], [data-filtertube-hidden], .filtertube-hidden').forEach(el => {
-        toggleVisibility(el, false, '', true); // Clear stuck flags
-    });
+const lastProcessedMode = element.getAttribute('data-filtertube-last-processed-mode') || '';
+const contentChanged = alreadyProcessed && uniqueId && lastProcessedId && uniqueId !== lastProcessedId;
+
+if (alreadyProcessed && !lastProcessedMode) {
+    element.removeAttribute('data-filtertube-processed');
+    clearCachedChannelMetadata(element);
+}
+
+if (alreadyProcessed && lastProcessedMode && lastProcessedMode !== listMode) {
+    element.removeAttribute('data-filtertube-processed');
+    clearCachedChannelMetadata(element);
 }
 ```
 
-**Impact**: Ensures proper element visibility after video navigation.
+**Impact**: Seamless mode switching without requiring page refresh.
 
-### 3.7 Whitelist-Pending Re-evaluation Timing
+### 3.6 Enhanced Shelf and Container Handling
 
-**Problem**: Content was being recursively hidden during search page loading.
+**NEW v3.2.3**: Better container visibility logic for whitelist mode.
 
-**Solution**: Optimized timing for pending content re-evaluation:
+**Problem**: Empty shelves weren't being properly hidden/shown in whitelist mode.
+
+**Solution**: Mode-aware shelf processing:
 
 ```javascript
-// Immediate re-evaluation
-setTimeout(() => {
-    applyDOMFallback(null, { preserveScroll: true, onlyWhitelistPending: true });
-}, 0);
+const shelfTitleMatches = shelfTitle && (
+    (listMode !== 'whitelist' && shouldHideContent(shelfTitle, '', effectiveSettings)) ||
+    (listMode === 'whitelist' && path === '/results' && shelfTitleText.includes('people also search for'))
+);
 
-// Delayed re-evaluation for late-arriving content
-setTimeout(() => {
-    applyDOMFallback(null, { preserveScroll: true, onlyWhitelistPending: true });
-}, 90);
+updateContainerVisibility(shelf, 'ytd-rich-item-renderer, ytd-grid-video-renderer, ytd-video-renderer, ytd-reel-item-renderer, yt-lockup-view-model, ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2, ytd-search-refinement-card-renderer, .ytGridShelfViewModelGridShelfItem');
 ```
 
-**Impact**: Reduces recursive hiding window by 90% on search pages.
+**Impact**: Cleaner content organization in whitelist mode with proper empty shelf handling.
+
+### 3.7 3-Dot Menu Cleanup in Whitelist Mode
+
+**NEW v3.2.3**: Menu injection is disabled in whitelist mode to prevent confusion.
+
+**Problem**: 3-dot "Block Channel" menus were showing in whitelist mode, which doesn't make sense.
+
+**Solution**: Detect whitelist mode and skip menu injection:
+
+```javascript
+const isWhitelistModeActive = () => {
+    try {
+        return !!currentSettings && typeof currentSettings === 'object' && currentSettings.listMode === 'whitelist';
+    } catch (e) {
+        return false;
+    }
+};
+
+async function handleDropdownAppearedInternal(dropdown) {
+    if (isWhitelistModeActive()) {
+        cleanupInjectedMenuItems(dropdown);
+        return; // Skip menu injection entirely
+    }
+    // ... rest of menu logic
+}
+```
+
+**Impact**: Cleaner UI that doesn't show irrelevant blocking options in whitelist mode.
+
+### 3.8 Bridge Optimizations Excluding Search Results
+
+**NEW v3.2.3**: Whitelist pending logic excludes search pages for better performance.
+
+**Problem**: Search pages were getting excessive pending hides due to rapid DOM changes.
+
+**Solution**: Skip search results in whitelist pending observer:
+
+```javascript
+const listMode = currentSettings?.listMode === 'whitelist' ? 'whitelist' : 'blocklist';
+if (listMode !== 'whitelist') return;
+
+const path = document.location?.pathname || '';
+if (path === '/results') return; // Skip search results for pending logic
+```
+
+**Impact**: Reduced CPU usage and better search page stability in whitelist mode.
+
+## Whitelist Mode Current Drawbacks (v3.2.3)
+
+Despite significant improvements, whitelist mode still has several limitations:
+
+### 1. **Description Hiding Regression**
+- **Issue**: Video descriptions are hidden on watch pages in whitelist mode
+- **Workaround**: Manually disable "Hide Video Description" in settings when using whitelist
+- **Impact**: Reduced video information availability
+
+### 2. **Search Page Performance**
+- **Issue**: Search results can show indeterminate states before channel identity resolves
+- **Mitigation**: Implemented indeterminate protection that prevents blank pages
+- **Impact**: Slight delay in content filtering on search pages
+
+### 3. **Kids Mode Compatibility**
+- **Issue**: Whitelist mode on YouTube Kids may show identity-less cards
+- **Mitigation**: Identity-less cards are treated as blocked by default on Kids
+- **Impact**: May hide some legitimate content on Kids profiles
+
+### 4. **Mode Switching Overhead**
+- **Issue**: Switching between blocklist/whitelist requires reprocessing all content
+- **Mitigation**: Intelligent state tracking prevents unnecessary reprocessing
+- **Impact**: Brief UI updates when switching modes
+
+### 5. **Limited Surface Coverage**
+- **Issue**: Some YouTube surfaces (live chat, certain mobile views) have limited whitelist support
+- **Status**: Core surfaces (Home, Search, Watch, Shorts) are fully supported
+- **Impact**: Inconsistent behavior on edge cases
+
+**Recommendation**: Whitelist mode is significantly improved and suitable for primary use, but users should be aware of these limitations. The benefits of granular content control generally outweigh the current drawbacks.
 
 ## 4) Canonical Channel Identity Rules (v3.2.1 Updates)
 
