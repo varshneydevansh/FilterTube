@@ -1,10 +1,10 @@
-# Technical Documentation (v3.2.3 Experimental Whitelist Mode & UI/UX Improvements)
+# Technical Documentation (v3.2.5 Whitelist Mode & UI/UX Improvements)
 
 ## Overview
 
-FilterTube v3.2.3 builds on the performance optimizations of v3.2.1 with significant UI/UX improvements and introduces **Experimental Whitelist Mode** for granular content control. This technical documentation covers the filtering logic, mode switching, and user experience enhancements.
+FilterTube v3.2.5 builds on the performance optimizations of v3.2.1 with significant UI/UX improvements and ships Whitelist Mode for granular content control. This technical documentation covers the filtering logic, mode switching, and user experience enhancements.
 
-## Whitelist Mode Filtering Logic (v3.2.3 - Experimental)
+## Whitelist Mode Filtering Logic (v3.2.5)
 
 ### Dual Mode Filtering Engine
 

@@ -1,4 +1,4 @@
-# Proactive Channel Identity System (v3.2.3)
+# Proactive Channel Identity System (v3.2.5)
 
 ## Overview
 
@@ -6,7 +6,7 @@ FilterTube shifted from a **reactive** (on-demand) to a **proactive** channel id
 
 **Performance Enhancement (v3.2.1):** The proactive system now leverages compiled caching and async processing, reducing CPU usage by 60-80% and eliminating UI lag during heavy filtering operations. Batched storage updates minimize I/O overhead by 70-90%.
 
-**Channel Stamping Improvements (v3.2.3 - Experimental):** Enhanced DOM stamping with mode-aware data attributes and improved channel ID visibility on homepage Shorts and other surfaces.
+**Channel Stamping Improvements (v3.2.5):** Enhanced DOM stamping with mode-aware data attributes and improved channel ID visibility on homepage Shorts and other surfaces.
 
 ## Why We Changed
 

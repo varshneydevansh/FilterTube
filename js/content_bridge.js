@@ -1018,21 +1018,16 @@ function stampChannelIdentity(card, info) {
 
     // Trigger a light refilter so already-rendered cards hide without waiting for next DOM mutation
     if (typeof applyDOMFallback === 'function') {
-        setTimeout(() => {
+        const state = window.__filtertubeStampFallbackState || (window.__filtertubeStampFallbackState = { timer: 0 });
+        if (state.timer) return;
+        state.timer = setTimeout(() => {
+            state.timer = 0;
             try {
                 applyDOMFallback(null);
             } catch (e) {
                 // ignore
             }
-        }, 0);
-        // Second pass a hair later to catch late paints/layout settle
-        setTimeout(() => {
-            try {
-                applyDOMFallback(null);
-            } catch (e) {
-                // ignore
-            }
-        }, 60);
+        }, 120);
     }
 }
 
@@ -3329,8 +3324,16 @@ function handleMainWorldMessages(event) {
                     anchors.forEach(anchor => {
                         const card = findVideoCardElement(anchor);
                         if (!card || !card.getAttribute) return;
-                        if (!card.getAttribute('data-filtertube-video-id')) {
+                        const existingVideoId = card.getAttribute('data-filtertube-video-id') || '';
+                        if (existingVideoId !== videoId) {
                             card.setAttribute('data-filtertube-video-id', videoId);
+                            try {
+                                card.removeAttribute('data-filtertube-channel-id');
+                                card.removeAttribute('data-filtertube-channel-handle');
+                                card.removeAttribute('data-filtertube-channel-name');
+                                card.removeAttribute('data-filtertube-channel-custom');
+                            } catch (e) {
+                            }
                         }
                         stampChannelIdentity(card, { id: channelId });
                     });
@@ -3588,6 +3591,19 @@ async function initializeDOMFallback(settings) {
                 const hidePending = (element) => {
                     if (!element) return;
                     try {
+                        try {
+                            const tag = (element.tagName || '').toLowerCase();
+                            if (tag === 'ytd-playlist-panel-video-renderer' || tag === 'ytd-playlist-panel-video-wrapper-renderer') {
+                                const rowEl = tag === 'ytd-playlist-panel-video-renderer'
+                                    ? element
+                                    : element.querySelector?.('ytd-playlist-panel-video-renderer');
+                                const isSelected = Boolean(
+                                    rowEl && (rowEl.hasAttribute('selected') || rowEl.getAttribute('aria-selected') === 'true')
+                                );
+                                if (isSelected) return;
+                            }
+                        } catch (e) {
+                        }
                         if (shouldSkipPendingHide(element)) return;
                         if (element.hasAttribute('data-filtertube-processed')) return;
                         if (element.getAttribute('data-filtertube-whitelist-pending') === 'true') return;

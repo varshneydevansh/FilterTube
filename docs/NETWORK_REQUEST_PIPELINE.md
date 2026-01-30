@@ -1,12 +1,12 @@
-# Network Request Pipeline Documentation (v3.2.3)
+# Network Request Pipeline Documentation (v3.2.5)
 
 ## Overview
 
-FilterTube v3.2.3 implements a **proactive, XHR-first** network request pipeline that intercepts YouTube's JSON responses to extract channel identity before rendering. This eliminates network latency for most operations and enables instant blocking across all surfaces.
+FilterTube v3.2.5 implements a **proactive, XHR-first** network request pipeline that intercepts YouTube's JSON responses to extract channel identity before rendering. This eliminates network latency for most operations and enables instant blocking across all surfaces.
 
 **Performance Enhancement (v3.2.1):** The pipeline now includes advanced async processing with main thread yielding, eliminating UI lag during heavy filtering operations. Compiled regex caching and batched storage updates reduce CPU usage by 60-80% and I/O operations by 70-90%.
 
-**Channel Stamping Enhancements (v3.2.3 - Experimental):** Improved DOM stamping with mode-aware data attributes and enhanced channel ID visibility for homepage Shorts and other surfaces.
+**Channel Stamping Enhancements (v3.2.5):** Improved DOM stamping with mode-aware data attributes and enhanced channel ID visibility for homepage Shorts and other surfaces.
 
 ## Architecture
 

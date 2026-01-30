@@ -3,6 +3,21 @@
     "_comment": "Shared release notes source for the dashboard What's New tab and the YouTube release banner. Keep entries sorted newest-first by version."
   },
   {
+    "version": "3.2.5",
+    "headline": "Whitelist Mode Promoted + Stability",
+    "summary": "Whitelist mode is now the primary allow-only path with smarter extraction, playlist safeguards, and reduced CPU usage.",
+    "bannerSummary": "Whitelist mode promoted with cleaner UI, better playlist stability, and Kids support.",
+    "highlights": [
+      "Promoted whitelist mode: wording/UI no longer marked experimental",
+      "3-dot menu cleanup and search-secondary handling for whitelist surfaces",
+      "Multi-source channel extraction with thumbnail anchors and parent containers",
+      "Mode-aware state tracking with confirmation dialogs and bridge optimizations",
+      "Playlist stability: selected rows stay visible; pending identities no longer unhide blocked rows",
+      "Kids mode whitelist support with zero-network architecture"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/version-3.2.5"
+  },
+  {
     "version": "3.2.4",
     "headline": "Enhanced Whitelist Mode + Performance Optimizations",
     "summary": "Significant improvements to experimental whitelist mode with better UX, performance optimizations, and extended Kids mode support.",
@@ -16,7 +31,7 @@
       "Channel extraction: Multi-source identity resolution with thumbnail anchors and parent containers",
       "Mode switching: Seamless transitions between blocklist/whitelist with intelligent reprocessing"
     ],
-    "detailsUrl": "docs/CHANGELOG.md#version-324"
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/version-3.2.4"
   },
   {
     "version": "3.2.3",
@@ -32,7 +47,25 @@
       "Enhanced mobile menu support with proper YouTube mobile renderer handling",
       "All console logs now gated behind debug flag to reduce production noise"
     ],
-    "detailsUrl": "docs/CHANGELOG.md#version-323"
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/version-3.2.3"
+  },
+  {
+    "version": "3.2.2",
+    "headline": "UI/UX Improvements & Debug Gating",
+    "summary": "Optimistic updates, mobile menu support, debug-gated logging, scroll preservation, and state management refinements.",
+    "bannerSummary": "Instant UI feedback, mobile menu polish, and debug-gated logs with stable state handling.",
+    "highlights": [
+      "Optimistic UI updates: content hides instantly with auto-restore if blocking fails",
+      "Enhanced mobile menu support for ytm-menu-popup-renderer with correct renderer tags",
+      "Debug-gated logging via window.__filtertubeDebug",
+      "Scroll preservation during DOM fallback to prevent jarring jumps",
+      "Channel enrichment limits (10 per session) to reduce background requests",
+      "Idle-scheduled rendering with requestIdleCallback and batching",
+      "External reload debouncing with signature comparison to avoid redundant renders",
+      "Selective notifications: 'load' only on signature change; otherwise 'externalUpdate'",
+      "Bridge state management via shared global state"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/version-3.2.2"
   },
   {
     "version": "3.2.1",

@@ -9,7 +9,7 @@ FilterTube must be able to:
 - Identify **channel identity** for a piece of content (preferably a stable **UC channel ID**, and also capture **@handle** when available).
 - Persist blocked/allowed channels in extension storage with dual filtering modes.
 - Hide (and optionally keyword-filter) all content attributable to those blocked channels in Blocklist mode.
-- Show only content from allowed channels in **Experimental Whitelist mode** (v3.2.3).
+- Show only content from allowed channels in **Whitelist mode** (v3.2.5).
 - Work reliably across YouTube surfaces (Home, Search, Shorts, Watch, Kids), including SPA navigation and DOM recycling.
 - Provide accurate channel names in 3-dot menus, upgrading from UC IDs/handles to human-readable names.
 - Support mode switching with list migration (blocklist ↔ whitelist).
@@ -253,9 +253,9 @@ Result: Multi-channel menus appear instantly on watch/home/search.
 - It calls `content_bridge.js:injectFilterTubeMenuItem(dropdown, videoCard)` to render "Block channel" menu entry.
 - On click, `content_bridge.js:handleBlockChannelClick(channelInfo, ...)` runs.
 
-### 6.2 Whitelist Mode Integration (v3.2.3)
+### 6.2 Whitelist Mode Integration (v3.2.5)
 
-FilterTube v3.2.3 extends the channel blocking system to support Whitelist mode, where the filtering logic is inverted:
+FilterTube v3.2.5 extends the channel blocking system to support Whitelist mode, where the filtering logic is inverted:
 
 #### Mode-Aware Channel Operations
 
@@ -282,9 +282,9 @@ The Profiles V4 schema now includes whitelist-specific fields:
 const compiledSettings = {
     listMode: 'blocklist' | 'whitelist',
     filterChannels: [...], // Blocklist channels
-    whitelistChannels: [...], // Whitelist channels (v3.2.3)
+    whitelistChannels: [...], // Whitelist channels (v3.2.5)
     filterKeywords: [...], // Blocklist keywords  
-    whitelistKeywords: [...] // Whitelist keywords (v3.2.3)
+    whitelistKeywords: [...] // Whitelist keywords (v3.2.5)
 };
 ```
 
@@ -493,7 +493,7 @@ After persisting, `schedulePostBlockEnrichment` may run to fill missing metadata
 - `seed.js` intercepts YouTube JSON before render via `fetch` and `XMLHttpRequest` hooks.
 - `filter_logic.js` applies blocking rules based on current mode:
   - **Blocklist Mode**: Remove items matching blocked channels/keywords
-  - **Whitelist Mode (v3.2.3)**: Remove items NOT matching whitelisted channels/keywords
+  - **Whitelist Mode (v3.2.5)**: Remove items NOT matching whitelisted channels/keywords
 - **XHR endpoints monitored**:
   - `/youtubei/v1/search` - Search results
   - `/youtubei/v1/browse` - Home feed, channel pages
@@ -684,7 +684,7 @@ This section answers:
 - **Which element types exist on the page?**
 - **Where do we read `@handle` / UC ID / name from?**
 - **Which file implements that logic?**
-- **How does whitelist mode affect filtering? (v3.2.3)**
+- **How does whitelist mode affect filtering? (v3.2.5)**
 
 ### 10.1 Home feed (Rich Grid)
 
@@ -699,7 +699,7 @@ This section answers:
     - `extractCollaboratorMetadataFromElement(...)` for collaborations
   - The engine (`seed.js` + `filter_logic.js`) may pre-stamp `data-filtertube-channel-handle/id` onto DOM nodes.
 
-- **Whitelist mode behavior (v3.2.3)**
+- **Whitelist mode behavior (v3.2.5)**
   - In whitelist mode, only cards from whitelisted channels remain visible
   - All other cards are hidden via DOM fallback or data interception
 

@@ -42,13 +42,48 @@ const VIDEO_CARD_SELECTORS = [
 
 function ensureVideoIdForCard(card) {
     if (!card || typeof card.getAttribute !== 'function') return '';
-    let videoId = card.getAttribute('data-filtertube-video-id');
-    if (videoId) return videoId;
-    videoId = extractVideoIdFromCard(card);
-    if (videoId) {
-        card.setAttribute('data-filtertube-video-id', videoId);
+    const cachedVideoId = card.getAttribute('data-filtertube-video-id') || '';
+    const tag = (card.tagName || '').toLowerCase();
+    const isKidsHost = (() => {
+        try {
+            return tag.startsWith('ytk-') || String(location.hostname || '').includes('youtubekids.com');
+        } catch (e) {
+            return tag.startsWith('ytk-');
+        }
+    })();
+
+    if (!isKidsHost && cachedVideoId && /^[a-zA-Z0-9_-]{11}$/.test(cachedVideoId)) {
+        return cachedVideoId;
     }
-    return videoId;
+
+    let extractedVideoId = '';
+    try {
+        extractedVideoId = extractVideoIdFromCard(card) || '';
+    } catch (e) {
+        extractedVideoId = '';
+    }
+
+    if (extractedVideoId) {
+        if (isKidsHost && cachedVideoId && cachedVideoId !== extractedVideoId) {
+            try {
+                card.removeAttribute('data-filtertube-processed');
+                card.removeAttribute('data-filtertube-last-processed-id');
+                card.removeAttribute('data-filtertube-unique-id');
+                card.removeAttribute('data-filtertube-channel-id');
+                card.removeAttribute('data-filtertube-channel-handle');
+                card.removeAttribute('data-filtertube-channel-name');
+                card.removeAttribute('data-filtertube-channel-custom');
+                card.removeAttribute('data-filtertube-whitelist-pending');
+            } catch (e) {
+            }
+        }
+        if (!cachedVideoId || cachedVideoId !== extractedVideoId) {
+            card.setAttribute('data-filtertube-video-id', extractedVideoId);
+        }
+        return extractedVideoId;
+    }
+
+    return cachedVideoId;
 }
 
 function getCardTitle(card) {
@@ -744,9 +779,20 @@ function extractVideoIdFromCard(card) {
     if (!card) return null;
 
     try {
-        const stamped = card.getAttribute?.('data-filtertube-video-id') || '';
-        if (stamped && /^[a-zA-Z0-9_-]{11}$/.test(stamped)) {
-            return stamped;
+        const tag = (card.tagName || '').toLowerCase();
+        const isKidsHost = (() => {
+            try {
+                return tag.startsWith('ytk-') || String(location.hostname || '').includes('youtubekids.com');
+            } catch (e) {
+                return tag.startsWith('ytk-');
+            }
+        })();
+
+        if (!isKidsHost) {
+            const stamped = card.getAttribute?.('data-filtertube-video-id') || '';
+            if (stamped && /^[a-zA-Z0-9_-]{11}$/.test(stamped)) {
+                return stamped;
+            }
         }
 
         const extractFromHref = (href) => {
@@ -764,8 +810,26 @@ function extractVideoIdFromCard(card) {
             return null;
         };
 
+        // On SPA surfaces (notably YouTube Kids), cards can be recycled and keep stale
+        // data-filtertube-video-id attributes. Always prefer the current /watch?v=... href.
+        if (isKidsHost) {
+            try {
+                const hrefAnchor = card.querySelector('a[href*="/watch?v="], a[href^="/watch?v="]');
+                const href = hrefAnchor?.getAttribute('href') || '';
+                const fromHref = extractFromHref(href);
+                if (fromHref) {
+                    return fromHref;
+                }
+            } catch (e) {
+            }
+
+            const stamped = card.getAttribute?.('data-filtertube-video-id') || '';
+            if (stamped && /^[a-zA-Z0-9_-]{11}$/.test(stamped)) {
+                return stamped;
+            }
+        }
+
         // YouTube Kids: anchor structure differs; scan all links aggressively.
-        const tag = (card.tagName || '').toLowerCase();
         if (tag.startsWith('ytk-')) {
             const anchors = card.querySelectorAll('a[href]');
             for (const anchor of anchors) {

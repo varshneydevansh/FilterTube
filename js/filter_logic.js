@@ -307,8 +307,7 @@
 
     const CHANNEL_ONLY_RENDERERS = new Set([
         'channelRenderer',
-        'gridChannelRenderer',
-        'universalWatchCardRenderer'
+        'gridChannelRenderer'
     ]);
 
     const CHIP_RENDERERS = new Set([
@@ -369,7 +368,21 @@
         universalWatchCardRenderer: {
             videoId: 'watchCardRichHeaderRenderer.navigationEndpoint.videoId',
             title: ['watchCardRichHeaderRenderer.title.simpleText'],
-            channelName: ['watchCardRichHeaderRenderer.subtitle.simpleText']
+            channelName: ['watchCardRichHeaderRenderer.subtitle.simpleText'],
+            channelId: [
+                'watchCardRichHeaderRenderer.subtitle.navigationEndpoint.browseEndpoint.browseId',
+                'watchCardRichHeaderRenderer.subtitle.runs.0.navigationEndpoint.browseEndpoint.browseId',
+                'watchCardRichHeaderRenderer.title.navigationEndpoint.browseEndpoint.browseId',
+                'watchCardRichHeaderRenderer.title.runs.0.navigationEndpoint.browseEndpoint.browseId'
+            ],
+            channelHandle: [
+                'watchCardRichHeaderRenderer.subtitle.navigationEndpoint.browseEndpoint.canonicalBaseUrl',
+                'watchCardRichHeaderRenderer.subtitle.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl',
+                'watchCardRichHeaderRenderer.subtitle.navigationEndpoint.commandMetadata.webCommandMetadata.url',
+                'watchCardRichHeaderRenderer.subtitle.runs.0.navigationEndpoint.commandMetadata.webCommandMetadata.url',
+                'watchCardRichHeaderRenderer.title.navigationEndpoint.browseEndpoint.canonicalBaseUrl',
+                'watchCardRichHeaderRenderer.title.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl'
+            ]
         },
         relatedChipCloudRenderer: {
             title: ['title.simpleText', 'title.runs'],
@@ -1209,14 +1222,19 @@
                 return true;
             }
 
-            if (listMode === 'whitelist' && !isCommentRenderer) {
-                try {
-                    const path = document.location?.pathname || '';
-                    if (path === '/results' && rendererType === 'universalWatchCardRenderer') {
-                        return false;
-                    }
-                } catch (e) {
+            try {
+                const path = document.location?.pathname || '';
+                if (
+                    path === '/results' && (
+                        rendererType === 'secondarySearchContainerRenderer'
+                    )
+                ) {
+                    return false;
                 }
+            } catch (e) {
+            }
+
+            if (listMode === 'whitelist' && !isCommentRenderer) {
                 // Watch page scaffolding: these renderers often lack sufficient channel identity
                 // for whitelist evaluation, but removing them breaks the watch page UI (description,
                 // action buttons, channel row, and comment composer rendering).

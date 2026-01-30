@@ -1,4 +1,4 @@
-# Content Hiding + Channel Identity Playbook (v3.2.3 Experimental Whitelist Mode + Performance Optimizations)
+# Content Hiding + Channel Identity Playbook (v3.2.5 Whitelist Mode + Performance Optimizations)
 
 This document is an *operator playbook* for answering:
 
@@ -6,7 +6,7 @@ This document is an *operator playbook* for answering:
 - Which data source(s) are used to resolve a channel's identity (UC ID + @handle)?
 - What to check when blocking fails (especially `/@handle/about` returning 404).
 - **NEW in v3.2.1+**: How performance optimizations eliminate lag and improve responsiveness.
-- **NEW in v3.2.3**: How **experimental whitelist mode** inverts filtering logic.
+- **NEW in v3.2.5**: How **whitelist mode** inverts filtering logic.
 
 ## 1) The Three Layers (Who Does What)
 
@@ -14,12 +14,12 @@ This document is an *operator playbook* for answering:
 - **Purpose**
   - Remove blocked/matching items from YouTube JSON responses **before** YouTube renders.
   - **NEW v3.2.1**: Stash network snapshots for proactive identity resolution.
-  - **NEW v3.2.3**: Apply **experimental whitelist mode** filtering (hide all except allowed content).
+  - **NEW v3.2.5**: Apply **whitelist mode** filtering (hide all except allowed content).
   - Prevent "flash of blocked content" when possible.
 - **Strengths**
   - Earliest filtering.
   - **NEW v3.2.1**: Proactive channel identity via XHR interception.
-  - **NEW v3.2.3**: Zero-flash **experimental whitelist** filtering.
+  - **NEW v3.2.5**: Zero-flash **whitelist** filtering.
   - Best for feed/search/watch data responses.
 - **Limits**
   - Not every surface routes through a convenient JSON response.
@@ -29,11 +29,11 @@ This document is an *operator playbook* for answering:
 - **Purpose**
   - Hide/restore already-rendered elements.
   - Handle SPA navigation, late hydration, and recycled DOM nodes.
-  - **NEW v3.2.3**: Apply **experimental whitelist mode** visibility logic (hide all except allowed).
+  - **NEW v3.2.5**: Apply **whitelist mode** visibility logic (hide all except allowed).
 - **Strengths**
   - Works even when engine misses something.
   - Can hide immediately after a manual block action.
-  - **NEW v3.2.3**: Enforces **experimental whitelist mode** on dynamically loaded content.
+  - **NEW v3.2.5**: Enforces **whitelist mode** on dynamically loaded content.
 - **Limits**
   - Can only hide *after* elements exist.
   - **MAJOR IMPROVEMENT v3.2.1+**: Converted to async processing with main thread yielding for lag-free operation.
@@ -42,7 +42,7 @@ This document is an *operator playbook* for answering:
   - **Run State Management**: Prevents overlapping executions, queues subsequent calls
   - **Compiled Caching**: Regex and channel filter indexes cached for O(1) lookups
   - **Browser Impact**: Near-zero lag in Chromium, significant improvement in Firefox
-- **Whitelist Mode Behavior (v3.2.3 - Experimental)**
+- **Whitelist Mode Behavior (v3.2.5)**
   - Hides content not matching whitelist channels/keywords
   - Respects same performance optimizations as blocklist mode
 
@@ -220,9 +220,9 @@ async function applyDOMFallback(settings, options = {}) {
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## 3) Whitelist Mode Logic Improvements (v3.2.3 - Experimental)
+## 3) Whitelist Mode Logic Improvements (v3.2.5)
 
-**Status**: Whitelist mode is significantly improved but still experimental with known drawbacks.
+**Status**: Whitelist mode is significantly improved with known limitations.
 
 ### 3.1 Watch Page Protection Logic
 

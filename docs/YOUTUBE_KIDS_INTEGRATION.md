@@ -1,12 +1,12 @@
-# YouTube Kids Integration Documentation (v3.2.4)
+# YouTube Kids Integration Documentation (v3.2.5)
 
 ## Overview
 
-FilterTube v3.2.4 provides **zero-network** integration with YouTube Kids, relying entirely on proactive XHR interception to extract channel identity without any network requests. This ensures reliable blocking on YouTube Kids where traditional network fetching often fails.
+FilterTube v3.2.5 provides **zero-network** integration with YouTube Kids, relying entirely on proactive XHR interception to extract channel identity without any network requests. This ensures reliable blocking on YouTube Kids where traditional network fetching often fails.
 
-**Whitelist Mode Support (v3.2.4 - Experimental):** YouTube Kids now supports **experimental whitelist mode** for granular content control, allowing parents to specify exactly which channels and content are allowed.
+**Whitelist Mode Support:** YouTube Kids now supports whitelist mode for granular content control, allowing parents to specify exactly which channels and content are allowed.
 
-## Whitelist Mode for Kids (v3.2.4 - Experimental)
+## Whitelist Mode for Kids (v3.2.5)
 
 ### Kids Profile Whitelist Support
 

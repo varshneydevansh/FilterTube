@@ -3,14 +3,55 @@
 // DOM fallback filtering pipeline used by `js/content_bridge.js`.
 // Loaded as an Isolated World content script before `content_bridge.js`.
 
-const CHANNEL_ONLY_TAGS = new Set([
-    'ytd-universal-watch-card-renderer',
-    'ytm-universal-watch-card-renderer'
-]);
+const CHANNEL_ONLY_TAGS = new Set([]);
 
 const compiledKeywordRegexCache = new WeakMap();
 const compiledChannelFilterIndexCache = new WeakMap();
 const compiledChannelFilterIndexCacheByList = new WeakMap();
+
+function getListSignatureForRun(list) {
+    try {
+        const active = window.__filtertubeDomFallbackActiveRun;
+        if (active && active.signatures && typeof active.signatures.get === 'function') {
+            const cached = active.signatures.get(list);
+            if (typeof cached === 'string') return cached;
+        }
+    } catch (e) {
+    }
+
+    let signature = '';
+    try {
+        signature = list.map(entry => {
+            if (!entry) return '';
+            if (entry instanceof RegExp) return entry.toString();
+            if (typeof entry === 'string') return entry.trim().toLowerCase();
+            if (typeof entry === 'object') {
+                const pattern = typeof entry.pattern === 'string' ? entry.pattern : '';
+                const flags = typeof entry.flags === 'string' ? entry.flags : 'i';
+                const id = typeof entry.id === 'string' ? entry.id.trim().toLowerCase() : '';
+                const handle = typeof entry.handle === 'string' ? entry.handle.trim().toLowerCase() : '';
+                const customUrl = typeof entry.customUrl === 'string' ? entry.customUrl.trim().toLowerCase() : '';
+                const name = typeof entry.name === 'string' ? entry.name.trim().toLowerCase() : '';
+                const originalInput = typeof entry.originalInput === 'string' ? entry.originalInput.trim().toLowerCase() : '';
+                if (pattern) return `${pattern}::${flags}`.toLowerCase();
+                return [id, handle, customUrl, name, originalInput].filter(Boolean).join('::');
+            }
+            return '';
+        }).filter(Boolean).join('|');
+    } catch (e) {
+        signature = '';
+    }
+
+    try {
+        const active = window.__filtertubeDomFallbackActiveRun;
+        if (active && active.signatures && typeof active.signatures.set === 'function') {
+            active.signatures.set(list, signature);
+        }
+    } catch (e) {
+    }
+
+    return signature;
+}
 
 function normalizeUcIdForComparison(value) {
     if (!value || typeof value !== 'string') return '';
@@ -69,8 +110,12 @@ function normalizeHandleForComparison(value) {
 function getCompiledKeywordRegexes(rawList) {
     if (!Array.isArray(rawList) || rawList.length === 0) return [];
 
+    const signature = getListSignatureForRun(rawList);
+
     const cached = compiledKeywordRegexCache.get(rawList);
-    if (cached) return cached;
+    if (cached && cached.signature === signature && Array.isArray(cached.compiled)) {
+        return cached.compiled;
+    }
 
     const compiled = [];
     for (const keywordData of rawList) {
@@ -92,7 +137,7 @@ function getCompiledKeywordRegexes(rawList) {
         }
     }
 
-    compiledKeywordRegexCache.set(rawList, compiled);
+    compiledKeywordRegexCache.set(rawList, { signature, compiled });
     return compiled;
 }
 
@@ -115,10 +160,12 @@ function getCompiledChannelFilterIndex(settings, listOverride = null) {
     if (!Array.isArray(list) || list.length === 0) return null;
 
     const channelMap = settings.channelMap || {};
+    const signature = getListSignatureForRun(list);
+
     const existing = listOverride
         ? compiledChannelFilterIndexCacheByList.get(list)
         : compiledChannelFilterIndexCache.get(settings);
-    if (existing && existing.sourceList === list && existing.sourceChannelMap === channelMap) {
+    if (existing && existing.sourceList === list && existing.sourceChannelMap === channelMap && existing.sourceSignature === signature) {
         return existing;
     }
 
@@ -206,6 +253,7 @@ function getCompiledChannelFilterIndex(settings, listOverride = null) {
     const index = {
         sourceList: list,
         sourceChannelMap: channelMap,
+        sourceSignature: signature,
         ids,
         handles,
         customUrls,
@@ -907,6 +955,10 @@ async function applyDOMFallback(settings, options = {}) {
 
     try {
 
+    window.__filtertubeDomFallbackActiveRun = {
+        signatures: new WeakMap()
+    };
+
     const supportsHasSelector = (() => {
         try {
             return typeof CSS !== 'undefined' && typeof CSS.supports === 'function' && CSS.supports('selector(:has(*))');
@@ -1252,11 +1304,7 @@ async function applyDOMFallback(settings, options = {}) {
                     elementTag === 'ytd-watch-card-rhs-panel-video-renderer'
                 );
                 if (isSearchSecondary && isSearchRightRailWatchCard) {
-                    toggleVisibility(element, false, '', true);
-                    element.setAttribute('data-filtertube-processed', 'true');
-                    element.setAttribute('data-filtertube-last-processed-mode', listMode);
-                    element.removeAttribute('data-filtertube-last-processed-id');
-                    continue;
+                    // Continue with normal filtering.
                 }
             } catch (e) {
             }
@@ -1724,15 +1772,37 @@ async function applyDOMFallback(settings, options = {}) {
             let hideReason = `Content: ${title}`;
             let shouldHide = matchesFilters;
 
-            // Sticky-hide for watch-playlist panel rows:
-            // If a row was already hidden, and we can't currently resolve identity, do NOT restore it.
-            // This prevents temporarily restored-but-blocked items from becoming playable during enrichment.
+            // Never hide the currently-selected playlist row. Hiding it can trigger
+            // repeated Next/autoplay transitions and visible flicker on SPA updates.
             if (isPlaylistPanelRow) {
-                const wasHidden = targetToHide.classList.contains('filtertube-hidden') || targetToHide.hasAttribute('data-filtertube-hidden');
-                const identityResolvedNow = Boolean(hasChannelIdentity || mappedChannelId);
-                if (wasHidden && !identityResolvedNow && !shouldHide) {
-                    shouldHide = true;
-                    hideReason = hideReason || 'Playlist row (pending identity)';
+                let isSelectedRow = false;
+                try {
+                    const rowEl = element.tagName?.toLowerCase() === 'ytd-playlist-panel-video-renderer'
+                        ? element
+                        : element.querySelector?.('ytd-playlist-panel-video-renderer');
+                    isSelectedRow = Boolean(
+                        rowEl && (rowEl.hasAttribute('selected') || rowEl.getAttribute('aria-selected') === 'true')
+                    );
+                } catch (e) {
+                }
+
+                if (isSelectedRow) {
+                    shouldHide = false;
+                    try {
+                        targetToHide.removeAttribute('data-filtertube-hidden-by-keyword');
+                        targetToHide.removeAttribute('data-filtertube-hidden-by-hide-all-shorts');
+                    } catch (e) {
+                    }
+                } else {
+                    // Sticky-hide for watch-playlist panel rows:
+                    // If a row was already hidden, and we can't currently resolve identity, do NOT restore it.
+                    // This prevents temporarily restored-but-blocked items from becoming playable during enrichment.
+                    const wasHidden = targetToHide.classList.contains('filtertube-hidden') || targetToHide.hasAttribute('data-filtertube-hidden');
+                    const identityResolvedNow = Boolean(hasChannelIdentity || mappedChannelId);
+                    if (wasHidden && !identityResolvedNow && !shouldHide) {
+                        shouldHide = true;
+                        hideReason = hideReason || 'Playlist row (pending identity)';
+                    }
                 }
             }
 
@@ -2140,7 +2210,6 @@ async function applyDOMFallback(settings, options = {}) {
                             if (!item) return false;
                             if (item.classList.contains('filtertube-hidden') || item.classList.contains('filtertube-hidden-shelf')) return false;
                             if (item.hasAttribute('data-filtertube-hidden')) return false;
-                            if (item.offsetParent === null) return false;
                             return true;
                         });
 
@@ -2225,7 +2294,7 @@ async function applyDOMFallback(settings, options = {}) {
         }
         const state = window.__filtertubePlaylistSkipState;
         const now = Date.now();
-        if (now - (state.lastAttemptTs || 0) > 80) {
+        if (now - (state.lastAttemptTs || 0) > 700) {
             const isWatch = (document.location?.pathname || '').startsWith('/watch');
             const params = new URLSearchParams(document.location?.search || '');
             const isPlaylistWatch = params.has('list');
@@ -2280,6 +2349,10 @@ async function applyDOMFallback(settings, options = {}) {
         // ignore
     }
     } finally {
+        try {
+            delete window.__filtertubeDomFallbackActiveRun;
+        } catch (e) {
+        }
         runState.running = false;
         if (runState.pending) {
             runState.pending = false;
@@ -2306,7 +2379,8 @@ function shouldHideContent(title, channel, settings, options = {}) {
         tag === 'ytk-compact-video-renderer' ||
         tag === 'ytk-grid-video-renderer' ||
         tag === 'ytk-video-renderer' ||
-        tag === 'ytk-compact-playlist-renderer'
+        tag === 'ytk-compact-playlist-renderer' ||
+        tag === 'ytk-compact-channel-renderer'
     );
 
     if (!title && !channel && !hasChannelIdentity && (!collaborators || collaborators.length === 0)) {
@@ -2340,13 +2414,24 @@ function shouldHideContent(title, channel, settings, options = {}) {
             const channelMap = settings.channelMap || {};
             const index = getCompiledChannelFilterIndex(settings, whitelistChannels);
             if (index) {
-                if (channelMetaMatchesIndex(channelMeta, index, channelMap)) {
+                const whitelistMeta = { ...(channelMeta || {}) };
+                if (whitelistMeta.id || whitelistMeta.handle || whitelistMeta.customUrl) {
+                    whitelistMeta.name = '';
+                }
+
+                if (channelMetaMatchesIndex(whitelistMeta, index, channelMap)) {
                     return false;
                 }
                 const collaboratorMetas = Array.isArray(collaborators) ? collaborators : [];
                 if (collaboratorMetas.length > 0) {
                     for (const collaborator of collaboratorMetas) {
-                        if (channelMetaMatchesIndex(collaborator, index, channelMap)) {
+                        const whitelistCollab = collaborator && typeof collaborator === 'object'
+                            ? { ...collaborator }
+                            : collaborator;
+                        if (whitelistCollab && typeof whitelistCollab === 'object' && (whitelistCollab.id || whitelistCollab.handle || whitelistCollab.customUrl)) {
+                            whitelistCollab.name = '';
+                        }
+                        if (channelMetaMatchesIndex(whitelistCollab, index, channelMap)) {
                             return false;
                         }
                     }

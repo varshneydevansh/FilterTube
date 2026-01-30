@@ -1,8 +1,8 @@
-# Developer Guide (v3.2.3)
+# Developer Guide (v3.2.5)
 
 ## Overview
 
-This guide helps developers understand and extend FilterTube's proactive channel identity system and **experimental whitelist mode** functionality. It covers how to add support for new YouTube endpoints, renderer types, collaboration patterns, and dual filtering modes.
+This guide helps developers understand and extend FilterTube's proactive channel identity system and whitelist mode functionality. It covers how to add support for new YouTube endpoints, renderer types, collaboration patterns, and dual filtering modes.
 
 ## Core Concepts
 
@@ -14,11 +14,11 @@ This guide helps developers understand and extend FilterTube's proactive channel
 
 - **Background** (`js/background.js`): Extension service worker, handles persistence and network
 
-### Filtering Modes (v3.2.3 - Experimental)
+### Filtering Modes (v3.2.5)
 
 - **Blocklist Mode**: Traditional filtering - hide matching content
 
-- **Whitelist Mode (Experimental)**: Inverted filtering - show only matching content
+- **Whitelist Mode**: Inverted filtering - show only matching content
 
 ### Proactive Pipeline
 
