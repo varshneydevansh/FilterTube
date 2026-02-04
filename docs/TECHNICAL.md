@@ -4,6 +4,110 @@
 
 FilterTube v3.2.5 builds on the performance optimizations of v3.2.1 with significant UI/UX improvements and ships Whitelist Mode for granular content control. This technical documentation covers the filtering logic, mode switching, and user experience enhancements.
 
+## Typography System (v3.2.6)
+
+### Modern Clean Sans-Serif Design
+
+FilterTube v3.2.6 introduces a typography update, replacing the previous serif-based system with a modern, highly readable sans-serif design:
+
+**Font Family Changes:**
+
+```css
+/* Before (v3.2.4 and earlier) */
+--ft-font-family-base: "Inter", sans-serif;
+--ft-font-family-serif: "Crimson Pro", "Playfair Display", "Georgia", serif;
+--ft-font-family-display: "Inter", sans-serif;
+
+/* After (v3.2.6) */
+--ft-font-family-base: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
+--ft-font-family-serif: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;  /* Unified */
+--ft-font-family-display: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+--ft-font-family-mono: "JetBrains Mono", "SF Mono", "Fira Code", "Source Code Pro", monospace;
+```
+
+**Rationale:**
+- **Consistency**: All headings and body text now use Inter for a cohesive, modern look
+- **Readability**: Sans-serif fonts are more readable on screens, especially at smaller sizes
+- **Performance**: Reduced font loading by eliminating separate serif font families
+- **Technical Display**: Added dedicated monospace font for code/channel IDs
+
+### Font Scale Refinement
+
+The font scale has been tightened for better hierarchy and modern aesthetics:
+
+```ascii
+┌─────────────────────────────────────────────────────────┐
+│         FilterTube Typography Scale (v3.2.6)            │
+├─────────────────────────────────────────────────────────┤
+│                                                         │
+│  Token              Size (rem)  Pixels   Use Case       │
+│  ─────────────────  ──────────  ──────   ────────────   │
+│  caption            0.75        12px     Hints, labels  │
+│  body               0.875       14px     Body text      │
+│  base               0.9375      15px     Base size      │
+│  subtitle           1.0625      17px     Subheadings    │
+│  h4                 1.125       18px     Minor heads    │
+│  h3                 1.25        20px     Section heads  │
+│  h2                 1.5         24px     Page heads     │
+│  h1                 1.875       30px     Main titles    │
+│                                                         │
+│  Previous Scale (v3.2.4):                               │
+│  caption: 13px, body: 15px, base: 16px, h3: 22px,       │
+│  h2: 28px, h1: 36px                                     │
+│                                                         │
+│  Change: Tighter, more refined scale with smaller       │
+│  increments for better visual hierarchy                 │
+└─────────────────────────────────────────────────────────┘
+```
+
+### Line Height & Letter Spacing
+
+Optimized for improved readability and modern aesthetics:
+
+```css
+/* Line Heights */
+--ft-line-height-tight: 1.3;      /* Headings (was 1.35) */
+--ft-line-height-base: 1.6;       /* Body text (was 1.65) */
+--ft-line-height-relaxed: 1.75;   /* Unchanged */
+
+/* Letter Spacing */
+--ft-letter-spacing-tight: -0.01em;    /* Headings (was -0.02em) */
+--ft-letter-spacing-normal: -0.003em;  /* Body (was 0em) */
+--ft-letter-spacing-wide: 0.01em;      /* Emphasis (was 0.025em) */
+```
+
+**Impact:**
+- Tighter line heights reduce vertical space, creating a more compact, modern feel
+- Subtle negative letter spacing improves readability at larger sizes
+- Consistent spacing creates visual harmony across all text elements
+
+### Typography Hierarchy Visualization
+
+```ascii
+┌────────────────────────────────────────────────────────────┐
+│                    FilterTube                              │  ← H1 (30px, -0.01em)
+│                                                            │
+│  Dashboard Overview                                        │  ← H2 (24px, -0.01em)
+│                                                            │
+│  Quick Actions                                             │  ← H3 (20px, -0.01em)
+│  ─────────────                                             │
+│                                                            │
+│  Block Channel                                             │  ← H4 (18px, -0.01em)
+│  Manage your blocked channels and keywords                 │  ← Subtitle (17px)
+│                                                            │
+│  FilterTube helps you curate your YouTube experience       │  ← Base (15px)
+│  by blocking unwanted content. All filtering happens       │
+│  locally in your browser for maximum privacy.              │
+│                                                            │
+│  Videos Hidden Today: 42                                   │  ← Body (14px)
+│  Time Saved: 2h 15m                                        │
+│                                                            │
+│  Hint: Click the 3-dot menu to block channels              │  ← Caption (12px)
+│                                                            │
+│  UC1234567890abcdefghijk                                   │  ← Mono (code)
+└────────────────────────────────────────────────────────────┘
+```
+
 ## Whitelist Mode Filtering Logic (v3.2.5)
 
 ### Dual Mode Filtering Engine
@@ -1569,4 +1673,117 @@ The exact latency depends on which fallback path is needed (cache/main-world/net
 +-----------------------------------+
 | 5. Update videoChannelMap (Global)|
 +-----------------------------------+
+```
+
+## UI Component Styling (v3.2.6)
+
+### Enhanced Dropdown & Select Components
+
+FilterTube v3.2.6 introduces refined dropdown and select styling with left accent borders and improved interactivity:
+
+**Visual Design:**
+
+```ascii
+┌─────────────────────────────────────────┐
+│  Select Component Anatomy               │
+├─────────────────────────────────────────┤
+│                                         │
+│  ┃  Sort by: Newest First        ▼      │
+│  ┃  ─────────────────────────────       │
+│  ┃  3px brand accent border             │
+│  ┃                                      │
+│  └─ Floating shadow + hover glow        │
+│                                         │
+│  Dropdown Menu:                         │
+│  ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓      │
+│  ┃ ● Newest First                ┃      │
+│  ┃ ○ Oldest First                ┃      │
+│  ┃ ○ A-Z                         ┃      │
+│  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛      │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+**Extension Status Label:**
+
+```ascii
+┌─────────────────────────────────┐
+│  🎯 FilterTube                  │
+│     ENABLED                     │  ← 7px uppercase status
+└─────────────────────────────────┘
+     Green border + background
+
+┌─────────────────────────────────┐
+│  🎯 FilterTube                  │
+│     DISABLED                    │  ← 7px uppercase status
+└─────────────────────────────────┘
+     Red border + background
+```
+
+## Advance Video Filters Section (v3.2.6)
+
+### Collapsible Popup UI
+
+The popup now includes a collapsible Advance video filters section:
+
+**Visual Layout:**
+
+```ascii
+┌─────────────────────────────────────────┐
+│  Content Controls                       │
+│  ─────────────────────────────────────  │
+│                                         │
+│  ▼ Advance Video Filters                │  ← Collapsible header
+│  ┌───────────────────────────────────┐  │
+│  │ Duration: [5] to [20] minutes     │  │  ← Inline inputs
+│  │ Upload Date: [2024-01-01] to now  │  │
+│  │ Uppercase: Single word (min 2)    │  │
+│  │                                   │  │
+│  │ [Manage in Settings →]            │  │  ← Link button
+│  └───────────────────────────────────┘  │
+└─────────────────────────────────────────┘
+```
+
+**Custom Radio Buttons:**
+
+```css
+.custom-radio {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--ft-color-sem-neutral-border);
+    border-radius: 50%;
+    position: relative;
+}
+
+.custom-radio::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--ft-color-brand-secondary);
+    transition: transform 0.2s ease;
+}
+
+.video-filter-radio-card.selected .custom-radio::after {
+    transform: translate(-50%, -50%) scale(1);
+}
+```
+
+**Visual Layout:**
+
+```ascii
+┌─────────────────────────────────────────────────────────┐
+│ ┃ Duration Filter                                       │
+│ ┃ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐       │
+│ ┃ │ ◉ Longer    │ │ ○ Shorter   │ │ ○ Between   │       │
+│ ┃ │ than [10]   │ │ than [5]    │ │ [5] - [20]  │       │
+│ ┃ │ minutes     │ │ minutes     │ │ minutes     │       │
+│ ┃ └─────────────┘ └─────────────┘ └─────────────┘       │
+│ ┃                                                       │
+│ ┃ ← 3px brand accent border                             │
+└─────────────────────────────────────────────────────────┘
 ```

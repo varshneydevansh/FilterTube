@@ -707,3 +707,47 @@ The Kids integration is designed to be extensible:
 - New fetch strategies can be plugged in
 - Toggle behaviors can be extended
 - Storage format supports new fields
+
+## Kids Mode UI Theming (v3.2.6)
+
+### Pink & Purple Gradient Design System
+
+YouTube Kids UI in FilterTube features a vibrant, child-friendly pink and purple gradient theme to visually distinguish it from the main YouTube interface.
+
+### Complete Visual Layout
+
+```ascii
+┌────────────────────────────────────────────────────────┐
+│  FilterTube - Kids Mode                                │
+│  ═══════════════════════════════════════════════════   │
+│                                                        │
+│  ┌─────────────────────────────────────────────────┐   │
+│  │ ╔═══════════════════════════════════════════╗   │   │
+│  │ ║  [Kids Mode] [Settings] [About]           ║   │   │
+│  │ ╚═══════════════════════════════════════════╝   │   │
+│  └─────────────────────────────────────────────────┘   │
+│     ↑ Pink→Purple gradient tabs                        │
+│                                                        │
+│  ┌─────────────────────────────────────────────────┐   │
+│  │ Blocked Channels                                │   │
+│  ├─────────────────────────────────────────────────┤   │
+│  │ ▌ Peppa Pig Official                            │   │
+│  │ ▌ Baby Shark - Pinkfong                         │   │
+│  │ ▌ Cocomelon - Nursery Rhymes                    │   │
+│  │ ▌ Ryan's World                                  │   │
+│  └─────────────────────────────────────────────────┘   │
+│     ↑ Pink left borders with gradient hover            │
+│                                                        │
+│  ┌─────────────────────────────────────────────────┐   │
+│  │ [Add Channel]  [Import]  [Export]               │   │
+│  └─────────────────────────────────────────────────┘   │
+│     ↑ Gradient primary buttons                         │
+│                                                        │
+│  Color Scheme:                                         │
+│  • Primary: #EC4899 (Hot Pink)                       │
+│  • Secondary: #8B5CF6 (Vibrant Purple)               │
+│  • Gradient: 135deg diagonal                           │
+│  • Shadows: rgba(236, 72, 153, 0.35)                 │
+└────────────────────────────────────────────────────────┘
+```
+

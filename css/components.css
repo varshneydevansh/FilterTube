@@ -26,7 +26,7 @@
 }
 
 .card-header h3 {
-    font-family: var(--ft-font-family-serif);
+    font-family: var(--ft-font-family-display);
     font-size: var(--ft-font-size-h3);
     font-weight: var(--ft-font-weight-semibold);
     letter-spacing: var(--ft-letter-spacing-tight);
@@ -186,7 +186,7 @@ input[type="date"].select-input {
 }
 
 .ft-profile-dropdown-item:hover {
-    background-color: var(--ft-profile-accent-bg, var(--ft-color-bg-panel));
+    background-color: var(--ft-profile-accent-bg, rgba(74, 157, 127, 0.12));
 }
 
 .ft-profile-dropdown-item.is-active {
@@ -270,17 +270,157 @@ button.select-input.ft-select-trigger::after {
     background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="8" viewBox="0 0 12 8"><path fill="%23759d8a" d="M1.41 0L6 4.58 10.59 0 12 1.41l-6 6-6-6z"/></svg>');
 }
 
+.ft-select-menu {
+    position: relative;
+    display: inline-block;
+}
+
 .ft-profile-dropdown.ft-select-dropdown {
+    position: fixed;
     right: auto;
-    left: 0;
-    min-width: 100%;
+    top: auto;
+    left: auto;
+    min-width: 0;
+    max-height: 280px;
+    overflow-y: auto;
+    z-index: 99999;
 }
 
 .ft-profile-dropdown-item.ft-select-option {
     gap: 10px;
+    border-left-width: 3px !important;
+    border-left-color: rgba(74, 157, 127, 1) !important;
 }
 
- .ft-modal-overlay {
+.ft-profile-dropdown-item.ft-select-option .ft-profile-dropdown-avatar {
+    background-color: var(--ft-profile-accent-bg, rgba(74, 157, 127, 0.16)) !important;
+    color: var(--ft-profile-accent, rgba(74, 157, 127, 1)) !important;
+    border-color: var(--ft-profile-accent-border, rgba(74, 157, 127, 0.65)) !important;
+}
+
+.ft-profile-dropdown-item.ft-select-option:hover {
+    background-color: rgba(74, 157, 127, 0.12) !important;
+    border-color: rgba(74, 157, 127, 0.45) !important;
+    border-left-color: rgba(74, 157, 127, 1) !important;
+}
+
+.ft-profile-dropdown-item.ft-select-option.is-active {
+    background-color: rgba(74, 157, 127, 0.16) !important;
+    border-color: rgba(74, 157, 127, 0.65) !important;
+    border-left-color: rgba(74, 157, 127, 1) !important;
+}
+
+/* ============================================================================
+   CUSTOM SELECT DROPDOWNS (Sort/Date) - Enhanced styling with left accent
+   ============================================================================ */
+
+button.select-input.ft-select-trigger {
+    min-width: 160px;
+    padding: var(--ft-space-sm) var(--ft-space-md);
+    padding-right: calc(var(--ft-space-md) + 20px);
+    border: 1px solid var(--ft-color-sem-neutral-border);
+    border-left-width: 3px;
+    border-left-color: var(--ft-color-brand-secondary);
+    border-radius: var(--ft-radius-md);
+    background-color: var(--ft-color-bg-surface);
+    box-shadow: var(--ft-shadow-floating);
+    font-weight: 500;
+    position: relative;
+}
+
+button.select-input.ft-select-trigger:hover {
+    border-color: var(--ft-color-brand-secondary);
+    background-color: rgba(74, 157, 127, 0.08);
+}
+
+button.select-input.ft-select-trigger:focus {
+    outline: none;
+    border-color: var(--ft-color-brand-secondary);
+    box-shadow: 0 0 0 2px rgba(74, 157, 127, 0.2), var(--ft-shadow-floating);
+}
+
+button.select-input.ft-select-trigger::after {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: transform 0.2s ease;
+}
+
+button.select-input.ft-select-trigger[aria-expanded="true"]::after {
+    transform: translateY(-50%) rotate(180deg);
+}
+
+.ft-profile-dropdown.ft-select-dropdown {
+    padding: 6px;
+    z-index: 100;
+}
+
+.custom-date-input,
+input[type="date"].custom-date-input {
+    border: 1px solid var(--ft-color-sem-neutral-border);
+    border-left-width: 3px;
+    border-left-color: var(--ft-color-brand-secondary);
+    border-radius: var(--ft-radius-md);
+    background-color: var(--ft-color-bg-surface);
+    box-shadow: var(--ft-shadow-floating);
+    font-weight: 500;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.custom-date-input:hover,
+input[type="date"].custom-date-input:hover {
+    border-color: var(--ft-color-brand-secondary);
+    background-color: rgba(74, 157, 127, 0.08);
+}
+
+.custom-date-input:focus,
+input[type="date"].custom-date-input:focus {
+    outline: none;
+    border-color: var(--ft-color-brand-secondary);
+    box-shadow: 0 0 0 2px rgba(74, 157, 127, 0.2), var(--ft-shadow-floating);
+}
+
+.custom-date-input::-webkit-calendar-picker-indicator {
+    opacity: 0.6;
+    cursor: pointer;
+    filter: none;
+}
+
+html[data-theme="dark"] .custom-date-input::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    opacity: 0.7;
+}
+
+.custom-date-input::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}
+
+html[data-theme="dark"] .custom-date-input::-webkit-calendar-picker-indicator:hover {
+    opacity: 0.9;
+}
+
+/* Dark mode */
+html[data-theme="dark"] button.select-input.ft-select-trigger,
+html[data-theme="dark"] .custom-date-input {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-left-color: var(--ft-color-brand-secondary);
+}
+
+html[data-theme="dark"] button.select-input.ft-select-trigger:hover,
+html[data-theme="dark"] .custom-date-input:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Disabled state */
+button.select-input.ft-select-trigger:disabled,
+.custom-date-input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.ft-modal-overlay {
     position: fixed;
     inset: 0;
     background: var(--ft-color-bg-overlay);
@@ -297,7 +437,7 @@ button.select-input.ft-select-trigger::after {
 
  .ft-modal-title {
     margin: 0;
-    font-family: var(--ft-font-family-serif);
+    font-family: var(--ft-font-family-display);
     font-size: var(--ft-font-size-h3);
     font-weight: var(--ft-font-weight-semibold);
     letter-spacing: var(--ft-letter-spacing-tight);
@@ -340,6 +480,12 @@ button.select-input.ft-select-trigger::after {
     transform: scale(0.98);
 }
 
+html[data-theme="dark"] .btn-primary,
+html[data-theme="dark"] .btn-primary:hover,
+html[data-theme="dark"] .btn-primary:focus {
+    color: #fff;
+}
+
 .btn-secondary {
     background-color: var(--ft-color-bg-panel);
     color: var(--ft-color-text-primary);
@@ -370,10 +516,29 @@ button.select-input.ft-select-trigger::after {
     box-shadow: 0 0 0 2px rgba(180, 67, 57, 0.18);
 }
 
+.btn-secondary.btn-import {
+    color: #15803d;
+    border-color: rgba(46, 213, 115, 0.6);
+    background-color: rgba(46, 213, 115, 0.08);
+}
+
 .btn-secondary.btn-import:hover {
     background-color: rgba(46, 213, 115, 0.15);
     border-color: rgba(46, 213, 115, 0.8);
     box-shadow: 0 0 0 2px rgba(46, 213, 115, 0.1);
+}
+
+html[data-theme="dark"] .btn-secondary.btn-import {
+    color: #86efac;
+    border-color: rgba(74, 222, 128, 0.55);
+    background-color: rgba(74, 222, 128, 0.12);
+}
+
+html[data-theme="dark"] .btn-secondary.btn-import:hover {
+    color: #fff;
+    background-color: #22c55e;
+    border-color: #22c55e;
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.22);
 }
 
 .import-export-row {
@@ -584,7 +749,7 @@ html[data-theme="dark"] .btn-secondary {
 }
 
 html[data-theme="dark"] .btn-secondary.btn-danger {
-    color: var(--ft-color-status-danger);
+    color: #fca5a5;
     border-color: rgba(180, 67, 57, 0.55);
     background-color: rgba(180, 67, 57, 0.12);
 }
@@ -671,14 +836,14 @@ input:checked+.slider:before {
 
 /* Dark mode support for switches */
 html[data-theme="dark"] .slider {
-    background-color: #0f172a;
-    border-color: rgba(148, 163, 184, 0.4);
+    background-color: #334155;
+    border-color: rgba(148, 163, 184, 0.5);
     box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 
 html[data-theme="dark"] .slider:before {
-    background-color: #111827;
-    border-color: rgba(148, 163, 184, 0.45);
+    background-color: #e2e8f0;
+    border-color: rgba(148, 163, 184, 0.5);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
 }
 
@@ -1072,6 +1237,11 @@ html[data-theme="dark"] .channel-derived-badge.badge-variant-kids {
     background-color: rgba(180, 67, 57, 0.1);
 }
 
+html[data-theme="dark"] .delete-btn:hover {
+    background-color: rgba(180, 67, 57, 0.2);
+    color: var(--ft-color-status-danger);
+}
+
 /* --- Tabs --- */
 .tabs-container {
     width: 100%;
@@ -1196,6 +1366,59 @@ html[data-theme="dark"] .channel-derived-badge.badge-variant-kids {
 ::-webkit-scrollbar-thumb {
     background: var(--ft-color-sem-neutral-border);
     border-radius: 4px;
+}
+
+/* ============================================================================
+   MOBILE RESPONSIVE DROPDOWNS
+   ============================================================================ */
+
+@media (max-width: 768px) {
+    .ft-profile-dropdown.ft-select-dropdown {
+        max-height: 60vh;
+        max-width: 90vw;
+        min-width: 200px;
+        font-size: 16px; /* Prevent zoom on iOS */
+    }
+
+    .ft-profile-dropdown-item.ft-select-option {
+        padding: 12px 14px;
+        min-height: 44px; /* Touch-friendly minimum */
+    }
+
+    button.select-input.ft-select-trigger {
+        min-width: 140px;
+        min-height: 44px; /* Touch-friendly */
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .ft-profile-dropdown.ft-select-dropdown {
+        max-height: 70vh;
+        max-width: 95vw;
+        left: 50% !important;
+        transform: translateX(-50%);
+    }
+
+    .ft-profile-dropdown-item.ft-select-option {
+        padding: 14px 16px;
+    }
+
+    button.select-input.ft-select-trigger {
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .ft-profile-dropdown-item.ft-select-option:hover {
+        background-color: transparent;
+    }
+
+    .ft-profile-dropdown-item.ft-select-option:active {
+        background-color: var(--ft-profile-accent-bg, rgba(74, 157, 127, 0.16));
+    }
 }
 
 ::-webkit-scrollbar-thumb:hover {

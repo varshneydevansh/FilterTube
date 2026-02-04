@@ -151,7 +151,17 @@
 
         const path = document.location?.pathname || '';
         const isSearchResultsPath = path.startsWith('/results');
-        const isChannelPath = /^(\/(@|channel\/|c\/))/i.test(path);
+        const isChannelPath = /^(\/(?:@|channel\/|c\/))/i.test(path);
+
+        const hasEnabledContentFilters = Boolean(
+            cachedSettings
+            && cachedSettings.contentFilters
+            && (
+                cachedSettings.contentFilters.duration?.enabled
+                || cachedSettings.contentFilters.uploadDate?.enabled
+                || cachedSettings.contentFilters.uppercase?.enabled
+            )
+        );
 
         const searchActionCollections = data.onResponseReceivedCommands || data.onResponseReceivedActions || data.onResponseReceivedEndpoints;
         const hasSearchLayout = Boolean(
@@ -193,8 +203,13 @@
             if (isSearchFetch || hasSearchLayout) {
                 const mode = (cachedSettings && cachedSettings.listMode === 'whitelist') ? 'whitelist' : 'blocklist';
                 if (mode !== 'whitelist') {
-                    seedDebugLog(`⏭️ Skipping engine processing for ${dataName} (search results) to allow DOM-based restore`);
-                    return true;
+                    // Historically we skipped search JSON mutation in blocklist mode so DOM fallback
+                    // could "restore" items during identity enrichment. Content filters (duration/date/
+                    // uppercase) are deterministic and should be applied JSON-first to avoid flash.
+                    if (!hasEnabledContentFilters) {
+                        seedDebugLog(`⏭️ Skipping engine processing for ${dataName} (search results) to allow DOM-based restore`);
+                        return true;
+                    }
                 }
             }
         }
@@ -214,8 +229,10 @@
             );
 
             if (channelIndicators && isChannelDataName) {
-                seedDebugLog(`⏭️ Skipping engine processing for ${dataName} (channel page) to allow DOM-based restore`);
-                return true;
+                if (!hasEnabledContentFilters) {
+                    seedDebugLog(`⏭️ Skipping engine processing for ${dataName} (channel page) to allow DOM-based restore`);
+                    return true;
+                }
             }
         }
 
@@ -224,6 +241,9 @@
 
         const isOnHomeFeed = path === '/' && !isMobileInterface;
         if (!isOnHomeFeed) return false;
+
+        // Apply deterministic content filters JSON-first on home feed to prevent flash.
+        if (hasEnabledContentFilters) return false;
 
         const actionCollections = data.onResponseReceivedActions || data.onResponseReceivedEndpoints;
         if (!Array.isArray(actionCollections)) return false;
@@ -620,6 +640,8 @@
 
             const originalOpen = proto.open;
             const originalSend = proto.send;
+            const originalAddEventListener = proto.addEventListener;
+            const originalRemoveEventListener = proto.removeEventListener;
             if (typeof originalOpen !== 'function' || typeof originalSend !== 'function') return;
 
             const getPathname = (rawUrl) => {
@@ -631,9 +653,142 @@
                 }
             };
 
+            const listenerWrapperMap = new WeakMap();
+
+            const getWrappedListener = (xhr, type, listener) => {
+                if (typeof listener !== 'function') return listener;
+                let perXhr = listenerWrapperMap.get(xhr);
+                if (!perXhr) {
+                    perXhr = new Map();
+                    listenerWrapperMap.set(xhr, perXhr);
+                }
+                const key = `${type}::${listener}`;
+                if (perXhr.has(key)) return perXhr.get(key);
+
+                const wrapped = function () {
+                    try {
+                        if ((type === 'readystatechange' || type === 'load') && xhr?.__filtertube_shouldProcessXhr) {
+                            ensureXhrResponseProcessed(xhr);
+                        }
+                    } catch (e) {
+                    }
+                    return listener.apply(this, arguments);
+                };
+                perXhr.set(key, wrapped);
+                return wrapped;
+            };
+
+            const ensureXhrResponseProcessed = (xhr) => {
+                try {
+                    if (!xhr || xhr.__filtertube_responseProcessed) return;
+                    if (!xhr.__filtertube_shouldProcessXhr) return;
+                    if (xhr.readyState !== 4) return;
+                    if (!cachedSettings) return;
+                    if (cachedSettings.enabled === false) return;
+
+                    const status = Number(xhr.status || 0);
+                    if (status && status >= 400) return;
+
+                    const responseType = xhr.responseType || '';
+                    let jsonData = null;
+
+                    if (responseType === 'json') {
+                        jsonData = xhr.response;
+                        if (!jsonData || typeof jsonData !== 'object') return;
+                    } else if (responseType === '' || responseType === 'text') {
+                        const text = xhr.responseText;
+                        if (!text || typeof text !== 'string') return;
+                        const trimmed = text.trim();
+                        if (!trimmed || (trimmed[0] !== '{' && trimmed[0] !== '[')) return;
+                        try {
+                            jsonData = JSON.parse(trimmed);
+                        } catch (e) {
+                            return;
+                        }
+                    } else {
+                        return;
+                    }
+
+                    const urlStr = typeof xhr.__filtertube_url === 'string' ? xhr.__filtertube_url : String(xhr.__filtertube_url || '');
+                    const processed = processWithEngine(jsonData, `xhr:${getPathname(urlStr)}`);
+                    if (!processed || typeof processed !== 'object') return;
+
+                    xhr.__filtertube_modifiedResponse = processed;
+                    xhr.__filtertube_modifiedResponseText = JSON.stringify(processed);
+
+                    if (!xhr.__filtertube_responseInterceptorsInstalled) {
+                        xhr.__filtertube_responseInterceptorsInstalled = true;
+                        try {
+                            const protoResponseDesc = Object.getOwnPropertyDescriptor(proto, 'response');
+                            const protoResponseTextDesc = Object.getOwnPropertyDescriptor(proto, 'responseText');
+
+                            Object.defineProperty(xhr, 'response', {
+                                configurable: true,
+                                get: function () {
+                                    if (this.__filtertube_modifiedResponse !== undefined) {
+                                        const rt = this.responseType || '';
+                                        if (rt === 'json') return this.__filtertube_modifiedResponse;
+                                        if (rt === '' || rt === 'text') return this.__filtertube_modifiedResponseText;
+                                        return this.__filtertube_modifiedResponse;
+                                    }
+                                    return protoResponseDesc && typeof protoResponseDesc.get === 'function'
+                                        ? protoResponseDesc.get.call(this)
+                                        : undefined;
+                                }
+                            });
+
+                            Object.defineProperty(xhr, 'responseText', {
+                                configurable: true,
+                                get: function () {
+                                    if (this.__filtertube_modifiedResponseText !== undefined) {
+                                        return this.__filtertube_modifiedResponseText;
+                                    }
+                                    return protoResponseTextDesc && typeof protoResponseTextDesc.get === 'function'
+                                        ? protoResponseTextDesc.get.call(this)
+                                        : '';
+                                }
+                            });
+                        } catch (e) {
+                        }
+                    }
+
+                    xhr.__filtertube_responseProcessed = true;
+                } catch (e) {
+                }
+            };
+
+            if (typeof originalAddEventListener === 'function') {
+                proto.addEventListener = function (type, listener, options) {
+                    try {
+                        if (this && this.__filtertube_shouldProcessXhr && (type === 'readystatechange' || type === 'load')) {
+                            const wrapped = getWrappedListener(this, type, listener);
+                            return originalAddEventListener.call(this, type, wrapped, options);
+                        }
+                    } catch (e) {
+                    }
+                    return originalAddEventListener.call(this, type, listener, options);
+                };
+            }
+
+            if (typeof originalRemoveEventListener === 'function') {
+                proto.removeEventListener = function (type, listener, options) {
+                    try {
+                        if (this && this.__filtertube_shouldProcessXhr && (type === 'readystatechange' || type === 'load')) {
+                            const wrapped = getWrappedListener(this, type, listener);
+                            return originalRemoveEventListener.call(this, type, wrapped, options);
+                        }
+                    } catch (e) {
+                    }
+                    return originalRemoveEventListener.call(this, type, listener, options);
+                };
+            }
+
             proto.open = function(method, url) {
                 try {
                     this.__filtertube_url = url;
+                    const urlStr = typeof url === 'string' ? url : String(url || '');
+                    this.__filtertube_shouldProcessXhr = Boolean(urlStr && xhrEndpoints.some(endpoint => urlStr.includes(endpoint)));
+                    this.__filtertube_responseProcessed = false;
                 } catch (e) {
                 }
                 return originalOpen.apply(this, arguments);
@@ -644,30 +799,20 @@
                     const rawUrl = this.__filtertube_url;
                     const urlStr = typeof rawUrl === 'string' ? rawUrl : String(rawUrl || '');
                     if (urlStr && xhrEndpoints.some(endpoint => urlStr.includes(endpoint))) {
-                        this.addEventListener('load', () => {
+                        this.__filtertube_shouldProcessXhr = true;
+                        this.__filtertube_responseProcessed = false;
+                        const xhr = this;
+                        const processIfReady = function () {
                             try {
-                                if (!cachedSettings) return;
-                                if (cachedSettings.enabled === false) return;
-
-                                const responseType = this.responseType || '';
-                                if (responseType && responseType !== 'text') return;
-
-                                const text = this.responseText;
-                                if (!text || typeof text !== 'string') return;
-                                const trimmed = text.trim();
-                                if (!trimmed || (trimmed[0] !== '{' && trimmed[0] !== '[')) return;
-
-                                let jsonData = null;
-                                try {
-                                    jsonData = JSON.parse(trimmed);
-                                } catch (e) {
-                                    return;
-                                }
-
-                                processWithEngine(jsonData, `xhr:${getPathname(urlStr)}`);
+                                ensureXhrResponseProcessed(xhr);
                             } catch (e) {
                             }
-                        }, { once: true });
+                        };
+
+                        if (typeof originalAddEventListener === 'function') {
+                            originalAddEventListener.call(this, 'readystatechange', processIfReady);
+                            originalAddEventListener.call(this, 'load', processIfReady);
+                        }
                     }
                 } catch (e) {
                 }

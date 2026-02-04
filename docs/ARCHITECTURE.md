@@ -48,6 +48,28 @@ graph TD
     A[User: Switch Mode] --> B{Target Mode?}
     B -->|Whitelist| C{Whitelist Empty?}
     B -->|Blocklist| D{Blocklist has Content?}
+    
+    C -->|Yes| E[Prompt: Copy Blocklist?]
+    C -->|No| F[Switch to Whitelist]
+    
+    D -->|Yes| G[Confirm Mode Switch]
+    D -->|No| H[Switch to Blocklist]
+    
+    E -->|Yes| I[Merge Blocklist into Whitelist]
+    E -->|No| F
+    
+    I --> J[Clear Blocklist]
+    J --> F
+    
+    G -->|Confirmed| H
+    G -->|Cancelled| K[Keep Current Mode]
+    
+    style F fill:#4caf50
+    style H fill:#2196f3
+    style K fill:#ff9800
+```
+
+**Mode Switching Implementation:**
 
 ```javascript
 // Switching to Whitelist Mode
@@ -262,6 +284,163 @@ sequenceDiagram
     API->>BG: Channel metadata
     BG->>Storage: Update channel entry
     BG->>BG: Update channelMap mappings
+```
+
+### Video Metadata Extraction Flow (Content Filters)
+
+FilterTube extracts and persists video metadata (duration, publish/upload dates) to enable content-based filtering:
+
+```mermaid
+sequenceDiagram
+    participant YT as YouTube XHR
+    participant Main as Main World (filter_logic.js)
+    participant Bridge as Isolated World (content_bridge.js)
+    participant BG as Background Script
+    participant Storage as Chrome Storage
+    
+    YT->>Main: ytInitialPlayerResponse
+    Main->>Main: Extract microformat.playerMicroformatRenderer
+    Main->>Main: Extract videoDetails.lengthSeconds
+    Main->>Main: Extract publishDate/uploadDate
+    
+    Main->>Bridge: postMessage(FilterTube_UpdateVideoMetaMap)
+    Bridge->>Bridge: Queue batched updates (75ms window)
+    Bridge->>BG: runtime.sendMessage(updateVideoMetaMap)
+    
+    BG->>BG: Batch updates (1500 entry cap)
+    BG->>Storage: Persist videoMetaMap
+    BG->>Bridge: Broadcast updated settings
+    
+    Note over Bridge: Content filters can now use metadata
+    Bridge->>Bridge: Apply duration/date filters
+```
+
+**Extraction Sources (Priority Order):**
+
+1. **Player Microformat** (Primary):
+   - `microformat.playerMicroformatRenderer.lengthSeconds` - Video duration (numeric string)
+   - `microformat.playerMicroformatRenderer.publishDate` - ISO date string (e.g., "2024-01-15")
+   - `microformat.playerMicroformatRenderer.uploadDate` - ISO datetime string (e.g., "2024-01-15T10:30:00Z")
+
+2. **Video Details** (Secondary):
+   - `videoDetails.lengthSeconds` - Fallback duration source
+
+3. **DOM Overlays** (Tertiary):
+   - `thumbnailOverlays[].thumbnailOverlayTimeStatusRenderer.text` - Duration badges (e.g., "1:38:14")
+   - `lengthText.simpleText` - Duration text
+   - `publishedTimeText.simpleText` - Relative time (e.g., "5 years ago")
+
+4. **Cached videoMetaMap** (Fallback):
+   - Persistent storage lookup by videoId
+
+**Data Structure:**
+
+```javascript
+videoMetaMap: {
+    'dQw4w9WgXcQ': {
+        lengthSeconds: 212,                    // Numeric or string "212"
+        publishDate: '2009-10-25',             // ISO date
+        uploadDate: '2009-10-25T07:05:00Z'     // ISO datetime
+    }
+}
+```
+
+**Batching System:**
+
+- Updates queued in `pendingVideoMetaUpdates` array
+- Flush timer: 75ms debounce window
+- Deduplication: Signature-based (`videoId|length|publish|upload`)
+- Cache eviction: 6000 entry limit (removes oldest 1500 when exceeded)
+- Storage cap: 1500 entries (enforced on flush)
+
+### Content-Based Filtering Architecture
+
+Three new content filters use `videoMetaMap` data:
+
+```mermaid
+graph TD
+    A[Video Card Detected] --> B[Extract Metadata]
+    
+    B --> C{Duration Filter Enabled?}
+    B --> D{Upload Date Filter Enabled?}
+    B --> E{Uppercase Filter Enabled?}
+    
+    C -->|Yes| F[Get lengthSeconds from videoMetaMap]
+    D -->|Yes| G[Get publishDate from videoMetaMap]
+    E -->|Yes| H[Analyze Title Text]
+    
+    F --> I{Condition: longer/shorter/between}
+    G --> J{Condition: newer/older/between}
+    H --> K{Mode: single_word/all_words/percentage}
+    
+    I -->|Match| L[Hide Video]
+    J -->|Match| L
+    K -->|Match| L
+    
+    I -->|No Match| M[Show Video]
+    J -->|No Match| M
+    K -->|No Match| M
+    
+    style L fill:#f44336
+    style M fill:#4caf50
+```
+
+**Duration Filter:**
+
+```javascript
+contentFilters.duration = {
+    enabled: true,
+    condition: 'between',    // 'longer' | 'shorter' | 'between'
+    minMinutes: 5,
+    maxMinutes: 20
+};
+
+// Logic
+const durationSeconds = videoMetaMap[videoId]?.lengthSeconds || extractFromDOM();
+const durationMinutes = durationSeconds / 60;
+
+if (condition === 'longer') hideIfTrue = durationMinutes > minMinutes;
+if (condition === 'shorter') hideIfTrue = durationMinutes < minMinutes;
+if (condition === 'between') hideIfTrue = durationMinutes < minMinutes || durationMinutes > maxMinutes;
+```
+
+**Upload Date Filter:**
+
+```javascript
+contentFilters.uploadDate = {
+    enabled: true,
+    condition: 'newer',      // 'newer' | 'older' | 'between'
+    fromDate: '2024-01-01',
+    toDate: '2024-12-31'
+};
+
+// Logic
+const publishDate = videoMetaMap[videoId]?.publishDate || parseRelativeTime('5 years ago');
+const timestamp = new Date(publishDate).getTime();
+
+if (condition === 'newer') hideIfTrue = timestamp > fromTimestamp;
+if (condition === 'older') hideIfTrue = timestamp < fromTimestamp;
+if (condition === 'between') hideIfTrue = timestamp < fromTimestamp || timestamp > toTimestamp;
+```
+
+**Uppercase Filter:**
+
+```javascript
+contentFilters.uppercase = {
+    enabled: true,
+    mode: 'single_word',     // 'single_word' | 'all_words' | 'percentage'
+    minWordLength: 2
+};
+
+// Logic (single_word mode)
+const words = title.split(/\s+/);
+for (const word of words) {
+    if (word.length < minWordLength) continue;
+    if (word === word.toUpperCase() && /[A-Z]/.test(word)) {
+        hideIfTrue = true;
+        break;
+    }
+}
 ```
 
 ## Storage Architecture
@@ -490,10 +669,20 @@ const cacheHierarchy = {
         'videoId2': 'UC...'
     },
     
+    // Level 3.5: Video metadata (duration, dates)
+    videoMetaMap: {
+        'videoId1': {
+            lengthSeconds: 317,      // Numeric or string
+            publishDate: '2024-01-15',
+            uploadDate: '2024-01-15T10:30:00Z'
+        }
+    },
+    
     // Level 4: Persistent storage (Chrome storage)
     persistentStorage: {
         profilesV4: { /* profile data */ },
-        channelMap: { /* mappings */ }
+        channelMap: { /* mappings */ },
+        videoMetaMap: { /* video metadata */ }
     }
 };
 ```

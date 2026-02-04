@@ -74,6 +74,63 @@
         }, 50);
     }
 
+    const pendingVideoMetaUpdates = [];
+    const seenVideoMetaUpdates = new Map();
+    let pendingVideoMetaFlush = null;
+    function queueVideoMetaMapping(videoId, meta) {
+        if (!videoId || typeof videoId !== 'string' || !/^[a-zA-Z0-9_-]{11}$/.test(videoId)) return;
+        if (!meta || typeof meta !== 'object') return;
+
+        const lengthSeconds = meta.lengthSeconds;
+        const publishDate = meta.publishDate;
+        const uploadDate = meta.uploadDate;
+        const hasAny = Boolean(
+            (typeof lengthSeconds === 'number' && Number.isFinite(lengthSeconds) && lengthSeconds > 0)
+            || (typeof lengthSeconds === 'string' && /^\d+$/.test(lengthSeconds.trim()))
+            || (typeof publishDate === 'string' && publishDate.trim())
+            || (typeof uploadDate === 'string' && uploadDate.trim())
+        );
+        if (!hasAny) return;
+
+        const signature = [
+            videoId,
+            (typeof lengthSeconds === 'number' ? String(lengthSeconds) : (typeof lengthSeconds === 'string' ? lengthSeconds.trim() : '')),
+            (typeof publishDate === 'string' ? publishDate.trim() : ''),
+            (typeof uploadDate === 'string' ? uploadDate.trim() : '')
+        ].join('|');
+        if (seenVideoMetaUpdates.has(signature)) return;
+        seenVideoMetaUpdates.set(signature, Date.now());
+
+        if (seenVideoMetaUpdates.size > 6000) {
+            const keys = Array.from(seenVideoMetaUpdates.keys());
+            keys.slice(0, 1500).forEach(k => seenVideoMetaUpdates.delete(k));
+        }
+
+        pendingVideoMetaUpdates.push({
+            videoId,
+            lengthSeconds,
+            publishDate,
+            uploadDate
+        });
+
+        if (pendingVideoMetaFlush) return;
+        pendingVideoMetaFlush = setTimeout(() => {
+            pendingVideoMetaFlush = null;
+            if (pendingVideoMetaUpdates.length === 0) return;
+
+            const batch = pendingVideoMetaUpdates.splice(0, pendingVideoMetaUpdates.length);
+            try {
+                window.postMessage({
+                    type: 'FilterTube_UpdateVideoMetaMap',
+                    payload: batch,
+                    source: 'filter_logic'
+                }, '*');
+            } catch (e) {
+                // ignore
+            }
+        }, 75);
+    }
+
     // ============================================================================
     // UTILITY FUNCTIONS
     // ============================================================================
@@ -107,8 +164,24 @@
      * @returns {string} Flattened text
      */
     function flattenText(textObj) {
+        if (typeof textObj === 'number' && Number.isFinite(textObj)) return String(textObj);
         if (typeof textObj === 'string') return textObj;
-        if (!textObj || typeof textObj !== 'object') return '';
+        if (!textObj) return '';
+        if (Array.isArray(textObj)) {
+            return textObj
+                .map(part => {
+                    if (!part) return '';
+                    if (typeof part === 'string') return part;
+                    if (typeof part === 'number' && Number.isFinite(part)) return String(part);
+                    if (typeof part === 'object') return part.text || flattenText(part);
+                    return '';
+                })
+                .join('');
+        }
+        if (typeof textObj !== 'object') return '';
+
+        // Handle new viewModel text shape: { content: "..." }
+        if (typeof textObj.content === 'string' && textObj.content) return textObj.content;
 
         // Handle simpleText
         if (textObj.simpleText) return textObj.simpleText;
@@ -131,6 +204,9 @@
         for (const path of paths) {
             const value = getByPath(obj, path);
             if (value) {
+                if (typeof value === 'number' && !Number.isNaN(value)) {
+                    return String(value);
+                }
                 const text = flattenText(value);
                 if (text) return text;
             }
@@ -301,7 +377,18 @@
             'detailedMetadataSnippets.0.snippetText.runs',
             'detailedMetadataSnippets.0.snippetText.simpleText'
         ],
-        duration: ['thumbnailOverlays.0.thumbnailOverlayTimeStatusRenderer.text.simpleText'],
+        duration: [
+            'thumbnailOverlays.0.thumbnailOverlayTimeStatusRenderer.text.simpleText',
+            'thumbnailOverlays.0.thumbnailOverlayTimeStatusRenderer.text.runs.0.text',
+            'lengthText.simpleText',
+            'lengthText.runs.0.text'
+        ],
+        publishedTime: [
+            'publishedTimeText.simpleText',
+            'publishedTimeText.runs.0.text',
+            'videoInfo.runs.0.text',
+            'videoInfo.runs.2.text'
+        ],
         viewCount: ['viewCountText.simpleText', 'shortViewCountText.simpleText']
     };
 
@@ -324,7 +411,9 @@
         compactVideoRenderer: BASE_VIDEO_RULES,
         gridVideoRenderer: BASE_VIDEO_RULES,
         playlistVideoRenderer: BASE_VIDEO_RULES,
+        playlistPanelVideoRenderer: BASE_VIDEO_RULES,
         watchCardCompactVideoRenderer: BASE_VIDEO_RULES,
+        endScreenVideoRenderer: BASE_VIDEO_RULES,
 
         // ------------------------------------------------------------------
         // Home feed & shelf surfaces
@@ -333,7 +422,17 @@
             videoId: 'content.videoRenderer.videoId',
             title: ['content.videoRenderer.title.runs', 'content.videoRenderer.title.simpleText'],
             channelName: ['content.videoRenderer.shortBylineText.runs', 'content.videoRenderer.longBylineText.runs'],
-            channelId: ['content.videoRenderer.shortBylineText.runs.0.navigationEndpoint.browseEndpoint.browseId']
+            channelId: ['content.videoRenderer.shortBylineText.runs.0.navigationEndpoint.browseEndpoint.browseId'],
+            duration: [
+                'content.videoRenderer.thumbnailOverlays.0.thumbnailOverlayTimeStatusRenderer.text.simpleText',
+                'content.videoRenderer.thumbnailOverlays.0.thumbnailOverlayTimeStatusRenderer.text.runs.0.text',
+                'content.videoRenderer.lengthText.simpleText',
+                'content.videoRenderer.lengthText.runs.0.text'
+            ],
+            publishedTime: [
+                'content.videoRenderer.publishedTimeText.simpleText',
+                'content.videoRenderer.publishedTimeText.runs.0.text'
+            ]
         },
         shelfRenderer: {
             title: ['header.shelfHeaderRenderer.title.simpleText']
@@ -350,7 +449,19 @@
                 'metadata.lockupMetadataViewModel.image.decoratedAvatarViewModel.rendererContext.commandContext.onTap.innertubeCommand.browseEndpoint.canonicalBaseUrl',
                 'metadata.lockupMetadataViewModel.image.decoratedAvatarViewModel.rendererContext.commandContext.onTap.innertubeCommand.commandMetadata.webCommandMetadata.url'
             ],
-            metadataRows: ['metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows']
+            metadataRows: ['metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows'],
+            duration: [
+                'contentImage.thumbnailViewModel.overlays.0.thumbnailOverlayBadgeViewModel.thumbnailBadges.0.thumbnailBadgeViewModel.text',
+                'contentImage.thumbnailViewModel.overlays.0.thumbnailOverlayBadgeViewModel.thumbnailBadgeViewModel.text',
+                'contentImage.thumbnailViewModel.overlays.0.thumbnailBottomOverlayViewModel.badges.0.thumbnailBadgeViewModel.text',
+                'contentImage.collectionThumbnailViewModel.primaryThumbnail.thumbnailViewModel.overlays.0.thumbnailOverlayBadgeViewModel.thumbnailBadges.0.thumbnailBadgeViewModel.text',
+                'contentImage.collectionThumbnailViewModel.primaryThumbnail.thumbnailViewModel.overlays.0.thumbnailBottomOverlayViewModel.badges.0.thumbnailBadgeViewModel.text',
+                'contentImage.primaryThumbnail.thumbnailViewModel.overlays.0.thumbnailOverlayBadgeViewModel.thumbnailBadges.0.thumbnailBadgeViewModel.text'
+            ],
+            publishedTime: [
+                'metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.0.metadataParts.1.text.content',
+                'metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.1.metadataParts.0.text.content'
+            ]
         },
 
         // ------------------------------------------------------------------
@@ -656,6 +767,12 @@
          * Process and validate settings from background script
          */
         _processSettings(settings) {
+            const contentFilterDefaults = {
+                duration: { enabled: false, condition: 'between', minMinutes: 0, maxMinutes: 0, value: '' },
+                uploadDate: { enabled: false, condition: 'newer', fromDate: '', toDate: '', value: '', unit: '', valueMax: 0, unitMax: '' },
+                uppercase: { enabled: false, mode: 'single_word', minWordLength: 2 }
+            };
+
             const processed = {
                 filterKeywords: [],
                 filterChannels: [],
@@ -667,6 +784,25 @@
                 filterComments: false,
                 useExactWordMatching: false,
                 ...settings
+            };
+
+            const incomingContentFilters = (settings && typeof settings === 'object' && settings.contentFilters && typeof settings.contentFilters === 'object' && !Array.isArray(settings.contentFilters))
+                ? settings.contentFilters
+                : {};
+
+            processed.contentFilters = {
+                duration: {
+                    ...contentFilterDefaults.duration,
+                    ...(incomingContentFilters.duration && typeof incomingContentFilters.duration === 'object' ? incomingContentFilters.duration : {})
+                },
+                uploadDate: {
+                    ...contentFilterDefaults.uploadDate,
+                    ...(incomingContentFilters.uploadDate && typeof incomingContentFilters.uploadDate === 'object' ? incomingContentFilters.uploadDate : {})
+                },
+                uppercase: {
+                    ...contentFilterDefaults.uppercase,
+                    ...(incomingContentFilters.uppercase && typeof incomingContentFilters.uppercase === 'object' ? incomingContentFilters.uppercase : {})
+                }
             };
 
             // Reconstruct RegExp objects from serialized patterns
@@ -728,6 +864,10 @@
                     };
                 }).filter(ch => ch);
             }
+
+            processed.videoMetaMap = (settings && typeof settings === 'object' && settings.videoMetaMap && typeof settings.videoMetaMap === 'object' && !Array.isArray(settings.videoMetaMap))
+                ? settings.videoMetaMap
+                : {};
 
             return processed;
         }
@@ -858,6 +998,20 @@
 
             if (videoId && ownerId && ownerId.startsWith('UC')) {
                 this._registerVideoChannelMapping(videoId, ownerId);
+            }
+
+            if (videoId) {
+                const lengthSeconds =
+                    (playerMicroformat && playerMicroformat.lengthSeconds) ||
+                    (videoDetails && videoDetails.lengthSeconds) ||
+                    null;
+
+                const publishDate = (playerMicroformat && playerMicroformat.publishDate) ? String(playerMicroformat.publishDate) : '';
+                const uploadDate = (playerMicroformat && playerMicroformat.uploadDate) ? String(playerMicroformat.uploadDate) : '';
+
+                if (lengthSeconds || publishDate || uploadDate) {
+                    this._registerVideoMetaMapping(videoId, { lengthSeconds, publishDate, uploadDate });
+                }
             }
 
             const playlistContents =
@@ -993,6 +1147,27 @@
             if (current && current[videoId] === channelId) return;
 
             queueVideoChannelMapping(videoId, channelId);
+        }
+
+        _registerVideoMetaMapping(videoId, meta) {
+            if (!videoId || !meta || typeof meta !== 'object') return;
+
+            const current = this.settings?.videoMetaMap && typeof this.settings.videoMetaMap === 'object'
+                ? this.settings.videoMetaMap
+                : null;
+            if (current && current[videoId]) {
+                const existing = current[videoId];
+                const nextLength = meta.lengthSeconds;
+                const nextPublish = meta.publishDate;
+                const nextUpload = meta.uploadDate;
+                const same =
+                    (existing?.lengthSeconds === nextLength)
+                    && (existing?.publishDate === nextPublish)
+                    && (existing?.uploadDate === nextUpload);
+                if (same) return;
+            }
+
+            queueVideoMetaMapping(videoId, meta);
         }
 
         /**
@@ -1195,7 +1370,7 @@
                     const channelNames = collaborators.map(c => c.name || c.handle || c.id).join(' & ');
                     this._log(`📋 Extracted COLLABORATION - Title: "${title}", Channels: "${channelNames}", Type: ${rendererType}`);
                 } else {
-                    this._log(`📋 Extracted - Title: "${channelInfo.name}", ID: "${channelInfo.id}", Desc: "${descPreview}", Type: ${rendererType}`);
+                    this._log(`📋 Extracted - Title: "${title}", ID: "${channelInfo.id}", Desc: "${descPreview}", Type: ${rendererType}`);
                 }
             }
 
@@ -1350,6 +1525,14 @@
                 }
             }
 
+            // Content filters (duration, upload date) - applied after channel/keyword filtering
+            if (!isCommentRenderer) {
+                const shouldBlockByContent = this._checkContentFilters(item, rules, rendererType);
+                if (shouldBlockByContent) {
+                    return true;
+                }
+            }
+
             return false;
         }
 
@@ -1402,10 +1585,594 @@
                 'snippetText.runs',
                 'snippetText.simpleText',
                 'metadataText.simpleText',
-                'expandedDescriptionBodyText.simpleText'
+                'expandedDescriptionBodyText.simpleText',
+                'microformat.playerMicroformatRenderer.description.simpleText',
+                'microformat.playerMicroformatRenderer.description.runs',
+                'videoDetails.shortDescription',
+                'playerResponse.microformat.playerMicroformatRenderer.description.simpleText',
+                'playerResponse.microformat.playerMicroformatRenderer.description.runs',
+                'playerResponse.videoDetails.shortDescription'
             ];
 
             return getTextFromPaths(item, fallbackPaths);
+        }
+
+        /**
+         * Parse duration string (e.g., "1:38:14" or "2:47") to seconds
+         */
+        _parseDurationToSeconds(durationText) {
+            if (durationText === null || durationText === undefined) return null;
+
+            const raw = String(durationText).trim();
+            if (!raw) return null;
+
+            // Support raw seconds like "317"
+            if (/^\d+$/.test(raw)) {
+                const seconds = parseInt(raw, 10);
+                return Number.isFinite(seconds) && seconds > 0 ? seconds : null;
+            }
+
+            // Support "H:MM:SS" or "M:SS" (tolerate 1-2 digit segments)
+            const match = raw.match(/^(\d{1,4}):([0-5]?\d)(?::([0-5]?\d))?$/);
+            if (match) {
+                const first = parseInt(match[1], 10);
+                const second = parseInt(match[2], 10);
+                const third = match[3] !== undefined ? parseInt(match[3], 10) : null;
+                if (!Number.isFinite(first) || !Number.isFinite(second)) return null;
+                if (third !== null && !Number.isFinite(third)) return null;
+                if (second >= 60) return null;
+                if (third !== null && third >= 60) return null;
+                if (third !== null) return first * 3600 + second * 60 + third;
+                return first * 60 + second;
+            }
+
+            // Support accessibility labels like "3 minutes, 55 seconds"
+            const labelSeconds = this._parseAriaLabelDurationSeconds(raw);
+            return labelSeconds > 0 ? labelSeconds : null;
+        }
+
+        _parseAriaLabelDurationSeconds(ariaLabel) {
+            if (!ariaLabel || typeof ariaLabel !== 'string') return 0;
+            let totalSeconds = 0;
+            const hoursMatch = ariaLabel.match(/(\d+)\s*hour/i);
+            if (hoursMatch) totalSeconds += parseInt(hoursMatch[1], 10) * 3600;
+            const minutesMatch = ariaLabel.match(/(\d+)\s*minute/i);
+            if (minutesMatch) totalSeconds += parseInt(minutesMatch[1], 10) * 60;
+            const secondsMatch = ariaLabel.match(/(\d+)\s*second/i);
+            if (secondsMatch) totalSeconds += parseInt(secondsMatch[1], 10);
+            return Number.isFinite(totalSeconds) ? totalSeconds : 0;
+        }
+
+        /**
+         * Parse relative time string (e.g., "5 years ago", "3 months ago") to approximate timestamp
+         */
+        _parseRelativeTimeToTimestamp(timeText) {
+            if (!timeText || typeof timeText !== 'string') return null;
+            const text = timeText.toLowerCase().trim();
+            const now = Date.now();
+            const msPerDay = 24 * 60 * 60 * 1000;
+
+            const patterns = [
+                { regex: /(\d+)\s+year/, multiplier: 365 * msPerDay },
+                { regex: /(\d+)\s+month/, multiplier: 30 * msPerDay },
+                { regex: /(\d+)\s+week/, multiplier: 7 * msPerDay },
+                { regex: /(\d+)\s+day/, multiplier: msPerDay },
+                { regex: /(\d+)\s+hour/, multiplier: 60 * 60 * 1000 },
+                { regex: /(\d+)\s+minute/, multiplier: 60 * 1000 },
+                { regex: /(\d+)\s+second/, multiplier: 1000 }
+            ];
+
+            for (const { regex, multiplier } of patterns) {
+                const match = text.match(regex);
+                if (match) {
+                    const count = parseInt(match[1], 10);
+                    if (!isNaN(count)) {
+                        return now - (count * multiplier);
+                    }
+                }
+            }
+
+            if (text.includes('just now') || text.includes('moments ago')) {
+                return now - (60 * 1000);
+            }
+            if (text.includes('yesterday')) {
+                return now - msPerDay;
+            }
+
+            return null;
+        }
+
+        /**
+         * Extract video duration in seconds from item using rules
+         */
+        _extractDuration(item, rules, rendererType = '', depth = 0) {
+            if (!item || typeof item !== 'object') return null;
+            if (depth > 3) return null;
+
+            const tryResolveVideoId = () => {
+                const videoIdPaths = rules && rules.videoId
+                    ? (Array.isArray(rules.videoId) ? rules.videoId : [rules.videoId])
+                    : [];
+                for (const path of videoIdPaths) {
+                    const candidate = getByPath(item, path);
+                    if (typeof candidate === 'string' && /^[a-zA-Z0-9_-]{11}$/.test(candidate)) return candidate;
+                }
+
+                const directCandidates = [
+                    item.videoId,
+                    item.contentId,
+                    item.encryptedVideoId,
+                    item?.navigationEndpoint?.watchEndpoint?.videoId,
+                    item?.rendererContext?.commandContext?.onTap?.innertubeCommand?.watchEndpoint?.videoId,
+                    item?.onTap?.innertubeCommand?.watchEndpoint?.videoId
+                ];
+                for (const candidate of directCandidates) {
+                    if (typeof candidate === 'string' && /^[a-zA-Z0-9_-]{11}$/.test(candidate)) return candidate;
+                }
+                return '';
+            };
+
+            const readNumericSeconds = (value) => {
+                if (typeof value === 'number' && Number.isFinite(value) && value > 0) return value;
+                if (typeof value === 'string' && /^\d+$/.test(value.trim())) {
+                    const parsed = parseInt(value.trim(), 10);
+                    return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+                }
+                return null;
+            };
+
+            // Numeric duration fields (common across some renderers)
+            const numericCandidates = [
+                item.lengthInSeconds,
+                item.lengthSeconds,
+                item.length_seconds
+            ];
+            for (const candidate of numericCandidates) {
+                const asSeconds = readNumericSeconds(candidate);
+                if (asSeconds) return asSeconds;
+            }
+
+            // videoDetails/microformat fallbacks (watch/player payloads, prefetch blobs)
+            const nestedLengthCandidates = [
+                item?.videoDetails?.lengthSeconds,
+                item?.microformat?.playerMicroformatRenderer?.lengthSeconds,
+                item?.playerResponse?.videoDetails?.lengthSeconds,
+                item?.playerResponse?.microformat?.playerMicroformatRenderer?.lengthSeconds
+            ];
+            for (const candidate of nestedLengthCandidates) {
+                const asSeconds = readNumericSeconds(candidate);
+                if (asSeconds) return asSeconds;
+            }
+
+            // Rules-based lookup (fast path)
+            const durationPaths = rules && rules.duration
+                ? (Array.isArray(rules.duration) ? rules.duration : [rules.duration])
+                : [];
+            for (const path of durationPaths) {
+                const text = getTextFromPaths(item, [path]);
+                if (!text) continue;
+                const seconds = this._parseDurationToSeconds(text);
+                if (seconds !== null) return seconds;
+            }
+
+            // Common renderer shapes: lengthText.{simpleText|runs}
+            const lengthText = flattenText(item.lengthText);
+            if (lengthText) {
+                const seconds = this._parseDurationToSeconds(lengthText);
+                if (seconds !== null) return seconds;
+            }
+
+            // videoRenderer-like: thumbnailOverlays[] => thumbnailOverlayTimeStatusRenderer.text
+            const thumbnailOverlays = item.thumbnailOverlays;
+            if (Array.isArray(thumbnailOverlays)) {
+                for (const overlay of thumbnailOverlays) {
+                    const timeStatus = overlay?.thumbnailOverlayTimeStatusRenderer;
+                    if (timeStatus?.text) {
+                        const text = flattenText(timeStatus.text);
+                        const seconds = this._parseDurationToSeconds(text);
+                        if (seconds !== null) return seconds;
+                    }
+                }
+            }
+
+            const scanThumbnailViewModelOverlays = (thumbnailViewModel) => {
+                const overlays = thumbnailViewModel?.overlays;
+                if (!Array.isArray(overlays)) return null;
+
+                for (const overlay of overlays) {
+                    // Overlay badge view model: thumbnailBadges[]
+                    const overlayBadge = overlay?.thumbnailOverlayBadgeViewModel;
+                    if (overlayBadge) {
+                        const thumbnailBadges = Array.isArray(overlayBadge.thumbnailBadges)
+                            ? overlayBadge.thumbnailBadges
+                            : (overlayBadge.thumbnailBadgeViewModel ? [{ thumbnailBadgeViewModel: overlayBadge.thumbnailBadgeViewModel }] : []);
+
+                        for (const badge of thumbnailBadges) {
+                            const vm = badge?.thumbnailBadgeViewModel;
+                            const text = vm?.text ? flattenText(vm.text) : '';
+                            const seconds = this._parseDurationToSeconds(text);
+                            if (seconds !== null) return seconds;
+
+                            const label = vm?.rendererContext?.accessibilityContext?.label;
+                            const labelSeconds = this._parseDurationToSeconds(label);
+                            if (labelSeconds !== null) return labelSeconds;
+                        }
+                    }
+
+                    // Bottom overlay view model: badges[]
+                    const bottomOverlay = overlay?.thumbnailBottomOverlayViewModel;
+                    if (bottomOverlay && Array.isArray(bottomOverlay.badges)) {
+                        for (const badge of bottomOverlay.badges) {
+                            const vm = badge?.thumbnailBadgeViewModel;
+                            const text = vm?.text ? flattenText(vm.text) : '';
+                            const seconds = this._parseDurationToSeconds(text);
+                            if (seconds !== null) return seconds;
+
+                            const label = vm?.rendererContext?.accessibilityContext?.label;
+                            const labelSeconds = this._parseDurationToSeconds(label);
+                            if (labelSeconds !== null) return labelSeconds;
+                        }
+                    }
+                }
+
+                return null;
+            };
+
+            // lockupViewModel-like: contentImage.*.thumbnailViewModel.overlays[]
+            const contentImage = item.contentImage;
+            if (contentImage && typeof contentImage === 'object') {
+                const direct = scanThumbnailViewModelOverlays(contentImage.thumbnailViewModel);
+                if (direct) return direct;
+
+                const primary = scanThumbnailViewModelOverlays(contentImage.primaryThumbnail?.thumbnailViewModel);
+                if (primary) return primary;
+
+                const collection = scanThumbnailViewModelOverlays(contentImage.collectionThumbnailViewModel?.primaryThumbnail?.thumbnailViewModel);
+                if (collection) return collection;
+            }
+
+            // Wrapper renderers: unwrap and retry (home/search often wrap videoRenderer inside content)
+            const unwrapContainer = item.content && typeof item.content === 'object' ? item.content : null;
+            if (unwrapContainer) {
+                // Prefer known keys first
+                const knownKeys = [
+                    'videoRenderer',
+                    'compactVideoRenderer',
+                    'gridVideoRenderer',
+                    'playlistVideoRenderer',
+                    'playlistPanelVideoRenderer',
+                    'watchCardCompactVideoRenderer',
+                    'endScreenVideoRenderer',
+                    'lockupViewModel',
+                    'richGridMedia'
+                ];
+
+                for (const key of knownKeys) {
+                    if (!unwrapContainer[key]) continue;
+                    const nested = unwrapContainer[key];
+                    const nestedRules = FILTER_RULES[key] || {};
+                    const seconds = this._extractDuration(nested, nestedRules, key, depth + 1);
+                    if (seconds !== null) return seconds;
+                }
+
+                // Generic: any content child that is a known renderer type
+                for (const [key, nested] of Object.entries(unwrapContainer)) {
+                    if (!nested || typeof nested !== 'object') continue;
+                    if (!FILTER_RULES[key]) continue;
+                    const seconds = this._extractDuration(nested, FILTER_RULES[key], key, depth + 1);
+                    if (seconds !== null) return seconds;
+                }
+            }
+
+            // Some renderers may nest lockups directly under item (not under `.content`)
+            const directKnownKeys = [
+                'videoRenderer',
+                'lockupViewModel'
+            ];
+            for (const key of directKnownKeys) {
+                if (!item[key] || typeof item[key] !== 'object') continue;
+                const seconds = this._extractDuration(item[key], FILTER_RULES[key] || {}, key, depth + 1);
+                if (seconds !== null) return seconds;
+            }
+
+            // Last resort: consult learned videoMetaMap (videoId -> lengthSeconds)
+            const resolvedVideoId = tryResolveVideoId();
+            if (resolvedVideoId && this.settings.videoMetaMap && this.settings.videoMetaMap[resolvedVideoId]) {
+                const meta = this.settings.videoMetaMap[resolvedVideoId];
+                const asSeconds = readNumericSeconds(meta?.lengthSeconds);
+                if (asSeconds) return asSeconds;
+            }
+
+            return null;
+        }
+
+        /**
+         * Extract published time timestamp from item using rules
+         */
+        _extractPublishedTime(item, rules, rendererType = '', depth = 0) {
+            if (!item || typeof item !== 'object') return null;
+            if (depth > 3) return null;
+
+            const tryResolveVideoId = () => {
+                const videoIdPaths = rules && rules.videoId
+                    ? (Array.isArray(rules.videoId) ? rules.videoId : [rules.videoId])
+                    : [];
+                for (const path of videoIdPaths) {
+                    const candidate = getByPath(item, path);
+                    if (typeof candidate === 'string' && /^[a-zA-Z0-9_-]{11}$/.test(candidate)) return candidate;
+                }
+
+                const directCandidates = [
+                    item.videoId,
+                    item.contentId,
+                    item.encryptedVideoId,
+                    item?.navigationEndpoint?.watchEndpoint?.videoId,
+                    item?.rendererContext?.commandContext?.onTap?.innertubeCommand?.watchEndpoint?.videoId,
+                    item?.onTap?.innertubeCommand?.watchEndpoint?.videoId
+                ];
+                for (const candidate of directCandidates) {
+                    if (typeof candidate === 'string' && /^[a-zA-Z0-9_-]{11}$/.test(candidate)) return candidate;
+                }
+                return '';
+            };
+
+            const timePaths = rules && rules.publishedTime
+                ? (Array.isArray(rules.publishedTime) ? rules.publishedTime : [rules.publishedTime])
+                : [];
+
+            for (const path of timePaths) {
+                const text = getTextFromPaths(item, [path]);
+                if (!text) continue;
+                const timestamp = this._parseRelativeTimeToTimestamp(text);
+                if (timestamp !== null) return timestamp;
+            }
+
+            // lockupViewModel and podcast-like: scan metadata rows for "... ago"
+            const metadataRoots = [];
+            if (item.metadataRows) metadataRoots.push(item.metadataRows);
+            const metadataFromRules = rules && rules.metadataRows
+                ? getByPath(item, Array.isArray(rules.metadataRows) ? rules.metadataRows[0] : rules.metadataRows)
+                : null;
+            if (metadataFromRules) metadataRoots.push(metadataFromRules);
+
+            for (const root of metadataRoots) {
+                const rows = Array.isArray(root) ? root : (Array.isArray(root?.metadataRows) ? root.metadataRows : null);
+                if (!rows) continue;
+
+                for (const row of rows) {
+                    const parts = Array.isArray(row?.metadataParts) ? row.metadataParts : null;
+                    if (!parts) continue;
+                    for (const part of parts) {
+                        const text = flattenText(part?.text);
+                        if (!text) continue;
+                        const timestamp = this._parseRelativeTimeToTimestamp(text);
+                        if (timestamp !== null) return timestamp;
+                    }
+                }
+            }
+
+            // Wrapper renderers
+            const unwrapContainer = item.content && typeof item.content === 'object' ? item.content : null;
+            if (unwrapContainer) {
+                for (const [key, nested] of Object.entries(unwrapContainer)) {
+                    if (!nested || typeof nested !== 'object') continue;
+                    if (!FILTER_RULES[key]) continue;
+                    const timestamp = this._extractPublishedTime(nested, FILTER_RULES[key], key, depth + 1);
+                    if (timestamp !== null) return timestamp;
+                }
+            }
+
+            if (item.videoRenderer && typeof item.videoRenderer === 'object') {
+                const timestamp = this._extractPublishedTime(item.videoRenderer, FILTER_RULES.videoRenderer || {}, 'videoRenderer', depth + 1);
+                if (timestamp !== null) return timestamp;
+            }
+
+            // Absolute timestamps from player microformat/videoDetails (publishDate/uploadDate)
+            const resolvedVideoId = tryResolveVideoId();
+            if (resolvedVideoId && this.settings.videoMetaMap && this.settings.videoMetaMap[resolvedVideoId]) {
+                const meta = this.settings.videoMetaMap[resolvedVideoId];
+                const candidates = [meta?.uploadDate, meta?.publishDate];
+                for (const raw of candidates) {
+                    if (!raw || typeof raw !== 'string') continue;
+                    const ms = new Date(raw).getTime();
+                    if (Number.isFinite(ms)) return ms;
+                }
+            }
+
+            return null;
+        }
+
+        /**
+         * Check content filters (duration, upload date)
+         */
+        _checkContentFilters(item, rules, rendererType) {
+            const cf = this.settings.contentFilters;
+
+            // DEBUG: Log content filter check
+            this._log('[FilterTube] _checkContentFilters called for ' + rendererType + ', cf.duration:', cf ? cf.duration : null);
+
+            if (!cf) {
+                this._log('[FilterTube] contentFilters is null/undefined, skipping');
+                return false;
+            }
+
+            const isVideoRenderer = [
+                'videoRenderer', 'compactVideoRenderer', 'gridVideoRenderer',
+                'playlistVideoRenderer', 'watchCardCompactVideoRenderer',
+                'endScreenVideoRenderer', 'richItemRenderer', 'lockupViewModel',
+                'shortsLockupViewModel', 'shortsLockupViewModelV2', 'reelItemRenderer',
+                'richGridMedia', 'channelVideoPlayerRenderer', 'playlistPanelVideoRenderer'
+            ].includes(rendererType);
+
+            if (!isVideoRenderer) return false;
+
+            // Duration filter
+            if (cf.duration && cf.duration.enabled) {
+                const durationSeconds = this._extractDuration(item, rules, rendererType);
+                this._log('[FilterTube] Duration filter ENABLED for ' + rendererType + ': condition=' + cf.duration.condition + ', minMinutes=' + cf.duration.minMinutes);
+                this._log('[FilterTube] Extracted duration: ' + durationSeconds + ' seconds (' + (durationSeconds ? (durationSeconds/60).toFixed(1) : 'null') + ' min)');
+                
+                if (durationSeconds !== null) {
+                    const durationMinutes = durationSeconds / 60;
+                    const condition = cf.duration.condition || 'between';
+
+                    const parseRangeValue = (value) => {
+                        if (typeof value !== 'string') return null;
+                        const trimmed = value.trim();
+                        const match = trimmed.match(/^(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)$/);
+                        if (!match) return null;
+                        const a = parseFloat(match[1]);
+                        const b = parseFloat(match[2]);
+                        if (!Number.isFinite(a) || !Number.isFinite(b)) return null;
+                        return { min: a, max: b };
+                    };
+
+                    let min = Number(
+                        cf.duration.minMinutes ??
+                        cf.duration.minutes ??
+                        cf.duration.valueMinutes ??
+                        cf.duration.minutesMin ??
+                        cf.duration.value ??
+                        0
+                    );
+                    let max = Number(
+                        cf.duration.maxMinutes ??
+                        cf.duration.minutesMax ??
+                        cf.duration.valueMinutesMax ??
+                        0
+                    );
+
+                    if (!Number.isFinite(min)) min = 0;
+                    if (!Number.isFinite(max)) max = 0;
+
+                    if ((min <= 0 || max <= 0) && typeof cf.duration.value === 'string') {
+                        const parsed = parseRangeValue(cf.duration.value);
+                        if (parsed) {
+                            if (min <= 0) min = parsed.min;
+                            if (max <= 0) max = parsed.max;
+                        }
+                    }
+
+                    if (max > 0 && min > max) {
+                        const tmp = min;
+                        min = max;
+                        max = tmp;
+                    }
+
+                    let matches = false;
+                    const mode = (cf.duration.mode === 'allow' || cf.duration.mode === 'block') ? cf.duration.mode : 'block';
+                    if (condition === 'longer') {
+                        matches = durationMinutes > min;
+                        this._log('[FilterTube] Checking: ' + durationMinutes.toFixed(1) + ' > ' + min + ' = ' + matches);
+                    } else if (condition === 'shorter') {
+                        matches = durationMinutes < min;
+                        this._log('[FilterTube] Checking: ' + durationMinutes.toFixed(1) + ' < ' + min + ' = ' + matches);
+                    } else {
+                        if (max > 0) {
+                            // "Only between" => block outside range
+                            matches = durationMinutes < min || durationMinutes > max;
+                            this._log('[FilterTube] Checking: outside range ' + min + '-' + max + ' for ' + durationMinutes.toFixed(1) + ' = ' + matches);
+                        }
+                    }
+
+                    const shouldBlock = condition === 'between'
+                        ? matches
+                        : (mode === 'allow' ? !matches : matches);
+
+                    if (shouldBlock) {
+                        this._log('[FilterTube] BLOCKING by duration filter: ' + durationMinutes.toFixed(1) + ' min (' + condition + ')');
+                        return true;
+                    }
+                }
+            }
+
+            // Upload date filter
+            if (cf.uploadDate?.enabled) {
+                const publishTimestamp = this._extractPublishedTime(item, rules, rendererType);
+                if (publishTimestamp !== null) {
+                    const condition = cf.uploadDate.condition || 'newer';
+                    let shouldBlock = false;
+
+                    const parseDateMs = (value) => {
+                        if (!value || typeof value !== 'string') return null;
+                        const ms = new Date(value).getTime();
+                        return Number.isFinite(ms) ? ms : null;
+                    };
+
+                    if (condition === 'newer') {
+                        // "Only past X days" - block videos OLDER than the cutoff
+                        const cutoffMs = parseDateMs(cf.uploadDate.fromDate);
+                        if (cutoffMs !== null) shouldBlock = publishTimestamp < cutoffMs;
+                    } else if (condition === 'older') {
+                        // "Block older than X" - block videos OLDER than the cutoff
+                        const cutoffMs = parseDateMs(cf.uploadDate.toDate);
+                        if (cutoffMs !== null) shouldBlock = publishTimestamp < cutoffMs;
+                    } else if (condition === 'between') {
+                        // "Between X and Y" - block videos OUTSIDE the range
+                        let fromMs = parseDateMs(cf.uploadDate.fromDate);
+                        let toMs = parseDateMs(cf.uploadDate.toDate);
+                        if (fromMs !== null && toMs !== null) {
+                            if (fromMs > toMs) {
+                                const tmp = fromMs;
+                                fromMs = toMs;
+                                toMs = tmp;
+                            }
+                            shouldBlock = publishTimestamp < fromMs || publishTimestamp > toMs;
+                        }
+                    }
+
+                    if (shouldBlock) {
+                        this._log(`🚫 Blocking by upload date filter (${condition})`);
+                        return true;
+                    }
+                }
+            }
+
+            // Uppercase title filter (AI slop detection)
+            if (cf.uppercase?.enabled) {
+                const title = this._extractTitle(item, rules);
+                if (title && this._checkUppercaseTitle(title, cf.uppercase)) {
+                    this._log(`🚫 Blocking by uppercase title filter`);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /**
+         * Check if title contains uppercase words (AI slop detection)
+         */
+        _checkUppercaseTitle(title, settings) {
+            if (!title || typeof title !== 'string') return false;
+            const mode = settings.mode || 'single_word';
+            const minLength = settings.minWordLength || 2;
+
+            // Remove punctuation for word extraction
+            const cleanTitle = title.replace(/[^\w\s]/g, ' ');
+            const words = cleanTitle.split(/\s+/).filter(w => w.length >= minLength);
+
+            if (mode === 'all_caps' || mode === 'both') {
+                // Check if entire title is all caps (ignoring non-letters)
+                const lettersOnly = title.replace(/[^a-zA-Z]/g, '');
+                if (lettersOnly.length > 3 && lettersOnly === lettersOnly.toUpperCase()) {
+                    return true;
+                }
+            }
+
+            if (mode === 'single_word' || mode === 'both') {
+                // Check for single uppercase words
+                for (const word of words) {
+                    const lettersOnly = word.replace(/[^a-zA-Z]/g, '');
+                    if (lettersOnly.length >= minLength &&
+                        lettersOnly === lettersOnly.toUpperCase() &&
+                        lettersOnly.length === word.length) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         /**

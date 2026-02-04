@@ -135,16 +135,19 @@ function handleStorageChanges(changes, area) {
     }
 
     const isVideoChannelMapOnly = changedKeys.length === 1 && changedKeys[0] === 'videoChannelMap';
+    const isVideoMetaMapOnly = changedKeys.length === 1 && changedKeys[0] === 'videoMetaMap';
     const relevantKeys = [
         'enabled',
         'filterKeywords',
         'filterKeywordsComments',
         'filterChannels',
+        'contentFilters',
         'uiChannels',
         'ftProfilesV3',
         'ftProfilesV4',
         'channelMap',
         'videoChannelMap', // Needed so Shorts videoId → channelId updates re-apply settings
+        'videoMetaMap',
         'hideAllComments',
         'filterComments',
         'hideAllShorts',
@@ -176,7 +179,7 @@ function handleStorageChanges(changes, area) {
     ];
     if (Object.keys(changes).some(key => relevantKeys.includes(key))) {
         // FIX: Apply changes IMMEDIATELY without debounce
-        scheduleSettingsRefreshFromStorage({ forceReprocess: !isVideoChannelMapOnly });
+        scheduleSettingsRefreshFromStorage({ forceReprocess: !(isVideoChannelMapOnly || isVideoMetaMapOnly) });
     }
 }
 

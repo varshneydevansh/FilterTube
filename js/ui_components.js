@@ -465,7 +465,7 @@ const UIComponents = (() => {
         return select;
     }
 
-    function createDropdownFromSelect(selectEl, { className = '' } = {}) {
+    function createDropdownFromSelect(selectEl, { className = '', showAvatar = false, showSubtitle = false } = {}) {
         const select = selectEl;
         if (!select || !(select instanceof HTMLSelectElement)) return null;
 
@@ -492,14 +492,34 @@ const UIComponents = (() => {
         dropdown.className = 'ft-profile-dropdown ft-select-dropdown';
         dropdown.setAttribute('role', 'listbox');
         dropdown.hidden = true;
+        // Move dropdown to body to prevent clipping by parent containers
+        document.body.appendChild(dropdown);
+
+        const originalParent = select.parentNode;
+        if (originalParent) {
+            originalParent.insertBefore(wrapper, select);
+        }
 
         const updateTriggerLabel = () => {
-            const selected = select.options[select.selectedIndex];
+            const currentValue = select.value;
+            let selected = null;
+            if (currentValue) {
+                selected = Array.from(select.options).find(opt => opt.value === currentValue) || null;
+            }
+            if (!selected && select.selectedIndex >= 0) {
+                selected = select.options[select.selectedIndex];
+            }
+            if (!selected && select.options.length > 0) {
+                selected = select.options[0];
+            }
             trigger.textContent = selected ? selected.textContent : '';
         };
 
         const close = () => {
             dropdown.hidden = true;
+            dropdown.style.visibility = '';
+            dropdown.style.left = '';
+            dropdown.style.top = '';
             trigger.setAttribute('aria-expanded', 'false');
             dropdown.style.transform = '';
         };
@@ -518,16 +538,61 @@ const UIComponents = (() => {
         const position = () => {
             if (dropdown.hidden) return;
             try {
-                const rect = dropdown.getBoundingClientRect();
+                const triggerRect = trigger.getBoundingClientRect();
+                // Force a layout calculation to get actual dropdown dimensions
+                dropdown.style.visibility = 'hidden';
+                dropdown.style.display = 'block';
+                const dropdownHeight = dropdown.offsetHeight || 280;
+                const dropdownWidth = dropdown.offsetWidth || triggerRect.width;
+                dropdown.style.display = '';
+                dropdown.style.visibility = 'hidden';
+                
                 const pad = 8;
                 const maxRight = window.innerWidth - pad;
-                let shift = 0;
-                if (rect.left < pad) {
-                    shift = pad - rect.left;
-                } else if (rect.right > maxRight) {
-                    shift = maxRight - rect.right;
+                const maxBottom = window.innerHeight - pad;
+
+                // Calculate available space above and below
+                const spaceBelow = maxBottom - triggerRect.bottom;
+                const spaceAbove = triggerRect.top - pad;
+                
+                // Decide whether to show above or below
+                let top;
+                if (spaceBelow >= dropdownHeight || spaceBelow >= spaceAbove) {
+                    // Show below (default)
+                    top = triggerRect.bottom + pad;
+                } else {
+                    // Show above
+                    top = triggerRect.top - dropdownHeight - pad;
                 }
-                dropdown.style.transform = shift ? `translateX(${shift}px)` : '';
+                
+                // Ensure dropdown doesn't go off-screen vertically
+                if (top + dropdownHeight > maxBottom) {
+                    top = maxBottom - dropdownHeight;
+                }
+                if (top < pad) {
+                    top = pad;
+                }
+
+                // Horizontal positioning
+                let left = triggerRect.left;
+                
+                // Ensure dropdown doesn't go off right edge
+                if (left + dropdownWidth > maxRight) {
+                    left = maxRight - dropdownWidth;
+                }
+                // Ensure dropdown doesn't go off left edge
+                if (left < pad) {
+                    left = pad;
+                }
+
+                const scrollX = window.scrollX || window.pageXOffset || 0;
+                const scrollY = window.scrollY || window.pageYOffset || 0;
+
+                dropdown.style.top = `${top + scrollY}px`;
+                dropdown.style.left = `${left + scrollX}px`;
+                dropdown.style.minWidth = `${triggerRect.width}px`;
+                // Reveal only after we have a valid position to avoid a flash at (0,0)
+                dropdown.style.visibility = '';
             } catch (e) {
             }
         };
@@ -538,14 +603,31 @@ const UIComponents = (() => {
                 return;
             }
             const next = !dropdown.hidden;
-            dropdown.hidden = next;
-            trigger.setAttribute('aria-expanded', next ? 'false' : 'true');
-            if (!next) {
-                applyAccentVars();
-                updateTriggerLabel();
-                rebuildOptions();
-                position();
+            if (next) {
+                // Closing
+                dropdown.hidden = true;
+                trigger.setAttribute('aria-expanded', 'false');
+                return;
             }
+            // Opening
+            applyAccentVars();
+            updateTriggerLabel();
+            rebuildOptions();
+            dropdown.hidden = false;
+            trigger.setAttribute('aria-expanded', 'true');
+            // Keep invisible and near trigger until positioned to avoid first-click jump
+            dropdown.style.visibility = 'hidden';
+            const trigRect = trigger.getBoundingClientRect();
+            dropdown.style.left = `${trigRect.left}px`;
+            dropdown.style.top = `${trigRect.bottom}px`;
+            // Position twice (layout + paint) before revealing
+            requestAnimationFrame(() => {
+                position();
+                requestAnimationFrame(() => {
+                    position();
+                    dropdown.style.visibility = '';
+                });
+            });
         };
 
         const resolveContextSubtitle = () => {
@@ -570,13 +652,32 @@ const UIComponents = (() => {
 
         const getAccentVars = () => {
             try {
-                const rootStyles = window.getComputedStyle(document.documentElement);
-                const accent = (rootStyles.getPropertyValue('--ft-select-accent') || '').trim();
-                const accentBg = (rootStyles.getPropertyValue('--ft-select-accent-bg') || '').trim();
-                const accentBorder = (rootStyles.getPropertyValue('--ft-select-border') || '').trim();
-                return { accent, accentBg, accentBorder };
+                const rootEl = document.documentElement;
+                // First check inline styles (set by renderProfileSelectorTab)
+                let accent = (rootEl.style.getPropertyValue('--ft-select-accent') || '').trim();
+                let accentBg = (rootEl.style.getPropertyValue('--ft-select-accent-bg') || '').trim();
+                let accentBorder = (rootEl.style.getPropertyValue('--ft-select-border') || '').trim();
+                
+                // Fallback to computed styles if not found inline
+                if (!accent || !accentBg || !accentBorder) {
+                    const rootStyles = window.getComputedStyle(rootEl);
+                    accent = accent || (rootStyles.getPropertyValue('--ft-select-accent') || '').trim();
+                    accentBg = accentBg || (rootStyles.getPropertyValue('--ft-select-accent-bg') || '').trim();
+                    accentBorder = accentBorder || (rootStyles.getPropertyValue('--ft-select-border') || '').trim();
+                }
+                
+                // Fallback to brand colors if not set
+                return { 
+                    accent: accent || 'rgba(74, 157, 127, 1)', 
+                    accentBg: accentBg || 'rgba(74, 157, 127, 0.16)', 
+                    accentBorder: accentBorder || 'rgba(74, 157, 127, 0.65)' 
+                };
             } catch (e) {
-                return { accent: '', accentBg: '', accentBorder: '' };
+                return { 
+                    accent: 'rgba(74, 157, 127, 1)', 
+                    accentBg: 'rgba(74, 157, 127, 0.16)', 
+                    accentBorder: 'rgba(74, 157, 127, 0.65)' 
+                };
             }
         };
 
@@ -618,13 +719,16 @@ const UIComponents = (() => {
                 if (vars.accentBg) btn.style.setProperty('--ft-profile-accent-bg', vars.accentBg);
                 if (vars.accentBorder) btn.style.setProperty('--ft-profile-accent-border', vars.accentBorder);
 
-                const avatar = document.createElement('div');
-                avatar.className = 'ft-profile-dropdown-avatar';
-                const initial = (label || '').trim().slice(0, 1).toUpperCase() || '?';
-                avatar.textContent = initial;
-                avatar.style.backgroundColor = vars.accentBg || 'rgba(74, 157, 127, 0.16)';
-                avatar.style.color = vars.accent || 'rgba(74, 157, 127, 1)';
-                avatar.style.borderColor = vars.accentBorder || '';
+                if (showAvatar) {
+                    const avatar = document.createElement('div');
+                    avatar.className = 'ft-profile-dropdown-avatar';
+                    const initial = (label || '').trim().slice(0, 1).toUpperCase() || '?';
+                    avatar.textContent = initial;
+                    avatar.style.backgroundColor = vars.accentBg || 'rgba(74, 157, 127, 0.16)';
+                    avatar.style.color = vars.accent || 'rgba(74, 157, 127, 1)';
+                    avatar.style.borderColor = vars.accentBorder || '';
+                    btn.appendChild(avatar);
+                }
 
                 const meta = document.createElement('div');
                 meta.className = 'ft-profile-dropdown-meta';
@@ -632,24 +736,32 @@ const UIComponents = (() => {
                 const nameEl = document.createElement('div');
                 nameEl.className = 'ft-profile-dropdown-name';
                 nameEl.textContent = label || '';
-
-                const subtitleEl = document.createElement('div');
-                subtitleEl.className = 'ft-profile-dropdown-subtitle';
-                subtitleEl.textContent = ((opt.getAttribute('data-subtitle') || '').trim() || contextSubtitle);
-
                 meta.appendChild(nameEl);
-                meta.appendChild(subtitleEl);
 
-                btn.appendChild(avatar);
+                if (showSubtitle) {
+                    const subtitleEl = document.createElement('div');
+                    subtitleEl.className = 'ft-profile-dropdown-subtitle';
+                    subtitleEl.textContent = ((opt.getAttribute('data-subtitle') || '').trim() || contextSubtitle);
+                    meta.appendChild(subtitleEl);
+                }
+
                 btn.appendChild(meta);
 
                 btn.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
+                    // Update select value and dispatch change
                     select.value = value;
-                    select.dispatchEvent(new Event('change', { bubbles: true }));
+                    // Force change event to bubble up properly
+                    const changeEvent = new Event('change', { 
+                        bubbles: true, 
+                        cancelable: true,
+                        composed: true
+                    });
+                    select.dispatchEvent(changeEvent);
+                    // Also trigger input event for completeness
+                    select.dispatchEvent(new Event('input', { bubbles: true }));
                     updateTriggerLabel();
-                    rebuildOptions();
                     close();
                 });
 
@@ -683,6 +795,12 @@ const UIComponents = (() => {
             rebuildOptions();
         });
 
+        // Allow external code to update the select value and refresh the UI without triggering change handlers
+        select.addEventListener('input', () => {
+            updateTriggerLabel();
+            rebuildOptions();
+        });
+
         try {
             const obs = new MutationObserver(() => {
                 syncDisabled();
@@ -704,10 +822,8 @@ const UIComponents = (() => {
         rebuildOptions();
 
         wrapper.appendChild(trigger);
-        wrapper.appendChild(dropdown);
+        // dropdown is already appended to document.body earlier
         wrapper.appendChild(select);
-
-        select.parentNode?.insertBefore(wrapper, select);
 
         return { wrapper, trigger, dropdown, select };
     }
@@ -852,6 +968,13 @@ const UIComponents = (() => {
         showToast
     };
 })();
+
+try {
+    if (typeof window !== 'undefined') {
+        window.UIComponents = UIComponents;
+    }
+} catch (e) {
+}
 
 // Export for use in other scripts
 if (typeof module !== 'undefined' && module.exports) {

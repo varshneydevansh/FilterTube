@@ -48,6 +48,7 @@
         'hideSubscriptions',
         'hideSearchShelves',
         'stats',
+        'statsBySurface',
         'channelMap'
     ];
 
@@ -453,10 +454,12 @@
         hideExploreTrending,
         hideMoreFromYouTube,
         hideSubscriptions,
-        hideSearchShelves
+        hideSearchShelves,
+        contentFilters
     }) {
         const sanitizedChannels = sanitizeChannelsList(channels);
         const sanitizedKeywords = syncFilterAllKeywords(keywords, sanitizedChannels);
+        const sanitizedContentFilters = safeObject(contentFilters);
         return {
             enabled: enabled !== false,
             filterKeywords: compileKeywords(sanitizedKeywords),
@@ -489,7 +492,8 @@
             hideExploreTrending: !!hideExploreTrending,
             hideMoreFromYouTube: !!hideMoreFromYouTube,
             hideSubscriptions: !!hideSubscriptions,
-            hideSearchShelves: !!hideSearchShelves
+            hideSearchShelves: !!hideSearchShelves,
+            contentFilters: sanitizedContentFilters
         };
     }
 
@@ -619,6 +623,8 @@
                     }
                 }
 
+                const contentFilters = safeObject(profileSettings.contentFilters);
+
                 resolve({
                     enabled,
                     keywords,
@@ -653,9 +659,11 @@
                     hideSubscriptions: effectiveSettings.hideSubscriptions,
                     hideSearchShelves: effectiveSettings.hideSearchShelves,
                     stats: result.stats || { hiddenCount: 0, savedMinutes: 0 },
+                    statsBySurface: safeObject(result.statsBySurface),
                     channelMap: result.channelMap || {},
                     theme,
-                    autoBackupEnabled
+                    autoBackupEnabled,
+                    contentFilters
                 });
             });
         });
@@ -693,10 +701,12 @@
         hideMoreFromYouTube,
         hideSubscriptions,
         hideSearchShelves,
-        autoBackupEnabled
+        autoBackupEnabled,
+        contentFilters
     }) {
         const sanitizedChannels = sanitizeChannelsList(channels);
         const sanitizedKeywords = syncFilterAllKeywords(keywords, sanitizedChannels);
+        const sanitizedContentFilters = safeObject(contentFilters);
         const compiledSettings = buildCompiledSettings({
             keywords: sanitizedKeywords,
             channels: sanitizedChannels,
@@ -728,7 +738,8 @@
             hideExploreTrending,
             hideMoreFromYouTube,
             hideSubscriptions,
-            hideSearchShelves
+            hideSearchShelves,
+            contentFilters: sanitizedContentFilters
         });
 
         const payload = {
@@ -811,7 +822,8 @@
                             hideExploreTrending: compiledSettings.hideExploreTrending,
                             hideMoreFromYouTube: compiledSettings.hideMoreFromYouTube,
                             hideSubscriptions: compiledSettings.hideSubscriptions,
-                            hideSearchShelves: compiledSettings.hideSearchShelves
+                            hideSearchShelves: compiledSettings.hideSearchShelves,
+                            contentFilters: sanitizedContentFilters
                         };
 
                         profiles[activeId] = {

@@ -657,6 +657,15 @@ let statsTotalSeconds = 0; // Track total seconds saved instead of using multipl
 let statsLastDate = new Date().toDateString();
 let statsInitialized = false;
 
+function getStatsSurfaceKey() {
+    try {
+        const host = String(location?.hostname || '').toLowerCase();
+        if (host.includes('youtubekids.com')) return 'kids';
+    } catch (e) {
+    }
+    return 'main';
+}
+
 // ==========================
 // PREFETCH / HYDRATION QUEUE
 // ==========================
@@ -1077,6 +1086,45 @@ function persistVideoChannelMapping(videoId, channelId) {
         action: 'updateVideoChannelMap',
         videoId,
         channelId
+    });
+}
+
+function persistVideoMetaMapping(entries = []) {
+    const list = Array.isArray(entries) ? entries : [];
+    if (list.length === 0) return;
+
+    currentSettings = currentSettings || {};
+    currentSettings.videoMetaMap = (currentSettings.videoMetaMap && typeof currentSettings.videoMetaMap === 'object')
+        ? currentSettings.videoMetaMap
+        : {};
+
+    const cleaned = [];
+    for (const entry of list) {
+        const videoId = typeof entry?.videoId === 'string' ? entry.videoId.trim() : '';
+        if (!videoId) continue;
+
+        const lengthSecondsRaw = entry?.lengthSeconds;
+        const publishDateRaw = entry?.publishDate;
+        const uploadDateRaw = entry?.uploadDate;
+
+        const meta = {
+            lengthSeconds: (typeof lengthSecondsRaw === 'number' && Number.isFinite(lengthSecondsRaw))
+                ? lengthSecondsRaw
+                : (typeof lengthSecondsRaw === 'string' ? lengthSecondsRaw.trim() : null),
+            publishDate: (typeof publishDateRaw === 'string' ? publishDateRaw.trim() : ''),
+            uploadDate: (typeof uploadDateRaw === 'string' ? uploadDateRaw.trim() : '')
+        };
+
+        if (!meta.lengthSeconds && !meta.publishDate && !meta.uploadDate) continue;
+        currentSettings.videoMetaMap[videoId] = meta;
+        cleaned.push({ videoId, ...meta });
+    }
+
+    if (cleaned.length === 0) return;
+
+    browserAPI_BRIDGE.runtime.sendMessage({
+        action: 'updateVideoMetaMap',
+        entries: cleaned
     });
 }
 
@@ -2118,13 +2166,23 @@ function initializeStats() {
     if (statsInitialized || !chrome || !chrome.storage) return;
     statsInitialized = true;
 
-    chrome.storage.local.get(['stats'], (result) => {
+    chrome.storage.local.get(['stats', 'statsBySurface'], (result) => {
         const today = new Date().toDateString();
-        if (result.stats && result.stats.lastDate === today) {
+
+        const surface = getStatsSurfaceKey();
+        const bySurface = (result.statsBySurface && typeof result.statsBySurface === 'object' && !Array.isArray(result.statsBySurface))
+            ? result.statsBySurface
+            : {};
+
+        const legacy = (result.stats && typeof result.stats === 'object') ? result.stats : {};
+        const picked = (bySurface[surface] && typeof bySurface[surface] === 'object') ? bySurface[surface] : null;
+        const effective = picked || (surface === 'main' ? legacy : {});
+
+        if (effective && effective.lastDate === today) {
             // Same day, restore count and seconds
-            statsCountToday = result.stats.hiddenCount || 0;
-            statsTotalSeconds = result.stats.savedSeconds || 0;
-            statsLastDate = result.stats.lastDate;
+            statsCountToday = effective.hiddenCount || 0;
+            statsTotalSeconds = effective.savedSeconds || 0;
+            statsLastDate = effective.lastDate;
         } else {
             // New day or no stats, reset
             statsCountToday = 0;
@@ -2320,13 +2378,34 @@ function saveStats() {
     const minutesSaved = Math.floor(statsTotalSeconds / 60);
 
     if (chrome && chrome.storage) {
-        chrome.storage.local.set({
-            stats: {
+        const surface = getStatsSurfaceKey();
+        chrome.storage.local.get(['stats', 'statsBySurface'], (result) => {
+            const nextStats = {
                 hiddenCount: statsCountToday,
                 savedMinutes: minutesSaved,
                 savedSeconds: statsTotalSeconds,
                 lastDate: statsLastDate
+            };
+
+            const existingBySurface = (result.statsBySurface && typeof result.statsBySurface === 'object' && !Array.isArray(result.statsBySurface))
+                ? result.statsBySurface
+                : {};
+
+            const statsBySurface = {
+                ...existingBySurface,
+                [surface]: nextStats
+            };
+
+            const payload = {
+                statsBySurface
+            };
+
+            // Back-compat: keep `stats` in sync for main.
+            if (surface === 'main') {
+                payload.stats = nextStats;
             }
+
+            chrome.storage.local.set(payload);
         });
     }
 }
@@ -3345,6 +3424,43 @@ function handleMainWorldMessages(event) {
         }
 
         if (didPersist && typeof applyDOMFallback === 'function') {
+            requestAnimationFrame(() => {
+                try {
+                    applyDOMFallback(null);
+                } catch (e) {
+                    // ignore
+                }
+            });
+        }
+    } else if (type === 'FilterTube_UpdateVideoMetaMap') {
+        const updates = Array.isArray(payload) ? payload : (payload ? [payload] : []);
+        if (updates.length === 0) return;
+
+        persistVideoMetaMapping(updates);
+
+        // Targeted refresh: clear cached duration + processed flags so duration filters can re-evaluate.
+        let didTouchDom = false;
+        for (const entry of updates) {
+            const videoId = typeof entry?.videoId === 'string' ? entry.videoId.trim() : '';
+            if (!videoId) continue;
+
+            try {
+                const cards = document.querySelectorAll(`[data-filtertube-video-id="${videoId}"]`);
+                for (const card of cards) {
+                    if (!card || !card.getAttribute) continue;
+                    try {
+                        card.removeAttribute('data-filtertube-duration');
+                        card.removeAttribute('data-filtertube-processed');
+                        card.removeAttribute('data-filtertube-last-processed-id');
+                    } catch (e) {
+                    }
+                    didTouchDom = true;
+                }
+            } catch (e) {
+            }
+        }
+
+        if (didTouchDom && typeof applyDOMFallback === 'function') {
             requestAnimationFrame(() => {
                 try {
                     applyDOMFallback(null);

@@ -1,5 +1,48 @@
 # Changelog
 
+## Version 3.2.6
+
+### UI/UX Beautification & Content-Based Filtering
+
+- **Typography Overhaul**: Complete redesign from serif to modern sans-serif system using Inter font family for improved readability and consistency.
+- **Font Scale Refinement**: Tighter increments (12px-30px) with optimized line heights and letter spacing for better visual hierarchy.
+- **Content-Based Filters**: Three new advanced filtering capabilities:
+  - **Duration Filter**: Hide videos by length (longer/shorter/between specific durations)
+  - **Upload Date Filter**: Filter by publish date (newer/older/between specific dates)
+  - **Uppercase Filter**: Detect and filter clickbait ALL CAPS titles (single_word/all_words/percentage modes)
+- **videoMetaMap System**: Persistent storage of video metadata (duration, publish dates) with intelligent batching (75ms window, 1500 entry cap).
+- **Enhanced Dropdowns & Selects**: 3px left accent borders, floating shadows, improved hover effects, and mobile responsiveness.
+- **Custom Date Inputs**: Styled to match select components with consistent visual language.
+- **Button Improvements**:
+  - Import button: Green accent for visual distinction
+  - Primary button: Forced white text in dark mode for readability
+  - Danger button: Improved contrast (#fca5a5)
+- **Toggle Switch Refinements**: Better dark mode contrast with #e2e8f0 knob color.
+- **Brand Toggle Button**: Visual extension status indicator with enabled/disabled states and 7px uppercase labels.
+- **Dark Mode Enhancements**:
+  - Search input: Orange accent highlighting (rgba(217, 119, 6, 0.7))
+  - Card boundaries: Consistent #404040 borders across all cards
+- **Kids Mode Theming**: Vibrant pink (#EC4899) and purple (#8B5CF6) gradient design system:
+  - Tab navigation with gradient backgrounds
+  - Input fields with gradient borders
+  - List items with gradient hover effects
+  - Sidebar navigation styling
+  - Dark mode adaptations with lighter shades
+- **Dashboard Improvements**:
+  - Surface-specific stats tracking (separate for Main and Kids)
+  - Enhanced stat cards with larger values (2.25rem) and better spacing
+  - Donate promo card with gradient styling
+- **Advance Video Filters Section**: Collapsible UI in popup with inline controls and full-width card-style radio options in tab view.
+
+### Documentation Updates
+
+- **ARCHITECTURE.md**: Added videoMetaMap extraction flow, content filters architecture, and fixed broken mermaid diagram.
+- **TECHNICAL.md**: Comprehensive typography system documentation and UI component styling guide (~800 lines).
+- **FUNCTIONALITY.md**: Complete content filters documentation with examples and use cases (~450 lines).
+- **YOUTUBE_KIDS_INTEGRATION.md**: Kids Mode theming documentation with accessibility considerations (~200 lines).
+- **CODEMAP.md**: Updated to v3.2.5 with feature overview.
+- **README.md**: Added content-based filters to features list.
+
 ## Version 3.2.5
 
 ### Whitelist Mode Promoted + Stability

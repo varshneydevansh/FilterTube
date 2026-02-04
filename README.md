@@ -8,6 +8,15 @@
 
 [![Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/filtertube)
 
+![Version](https://img.shields.io/badge/version-3.2.6-blue.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
+![Lines of Code](https://img.shields.io/badge/total%20lines-61.6k-brightgreen.svg)
+![JavaScript LoC](https://img.shields.io/badge/javascript-38.9k%20lines-yellow.svg)
+![Top Language](https://img.shields.io/badge/language-JavaScript-f1e05a.svg)
+![Repo Size](https://img.shields.io/github/repo-size/varshneydevansh/FilterTube?color=orange)
+
+[![Top Languages](https://github-readme-stats.vercel.app/api/top-langs/?username=varshneydevansh&repo=FilterTube&layout=compact&theme=default&hide_border=true)](https://github.com/varshneydevansh/FilterTube)
+
 ## Overview
 
 FilterTube is a browser extension that gives you control over your YouTube feed. Filter videos, shorts, channels, and comments using keywords and smart rules—all processing happens privately on your device.
@@ -21,6 +30,10 @@ FilterTube is a browser extension that gives you control over your YouTube feed.
 - **Hide Shorts**: Optional toggle to remove every Shorts shelf and player hand-off.
 - **Smart Matching**: Choose partial or whole-word matching to stay strict or flexible.
 - **Shelf & Playlist Cleanup**: Refilters shelves and playlists so blocked creators stay gone even after navigation.
+- **Content-Based Filters (v3.2.6)**: 
+  - Filter by video duration (longer/shorter/between specific lengths)
+  - Filter by upload date (newer/older/between specific dates)
+  - Detect and filter clickbait ALL CAPS titles
 
 ### Channel & Data Management
 
@@ -51,6 +64,7 @@ FilterTube is a browser extension that gives you control over your YouTube feed.
 - **Instant Blocking**: 3-dot menus show correct channel names immediately—no "Fetching..." delays.
 - **Network Reduction**: Most channel identity comes from intercepted JSON, not page fetches.
 - **100% Private**: No data leaves your browser. No analytics. No tracking.
+- **Modern UI/UX (v3.2.6)**: Clean typography, refined components, enhanced dark mode, and Kids Mode theming.
 
 ### Proactive Channel Identity (v3.2.2)
 

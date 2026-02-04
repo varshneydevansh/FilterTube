@@ -676,6 +676,12 @@ let videoChannelMapFlushPromise = Promise.resolve();
 let videoChannelMapFlushTimer = null;
 const pendingVideoChannelMapUpdates = new Map();
 
+let videoMetaMapCache = null;
+let videoMetaMapLoadPromise = null;
+let videoMetaMapFlushPromise = Promise.resolve();
+let videoMetaMapFlushTimer = null;
+const pendingVideoMetaMapUpdates = new Map();
+
 let autoBackupTimer = null;
 let pendingAutoBackupTrigger = null;
 let pendingAutoBackupOptions = null;
@@ -903,11 +909,43 @@ function ensureVideoChannelMapCache() {
     return videoChannelMapLoadPromise;
 }
 
+function ensureVideoMetaMapCache() {
+    if (videoMetaMapCache && typeof videoMetaMapCache === 'object') {
+        return Promise.resolve(videoMetaMapCache);
+    }
+    if (videoMetaMapLoadPromise) return videoMetaMapLoadPromise;
+
+    videoMetaMapLoadPromise = storageGet(['videoMetaMap']).then(result => {
+        const stored = result?.videoMetaMap;
+        videoMetaMapCache = stored && typeof stored === 'object' ? { ...stored } : {};
+        videoMetaMapLoadPromise = null;
+        return videoMetaMapCache;
+    }).catch(() => {
+        videoMetaMapCache = {};
+        videoMetaMapLoadPromise = null;
+        return videoMetaMapCache;
+    });
+
+    return videoMetaMapLoadPromise;
+}
+
 function enforceVideoChannelMapCap(map) {
     if (!map || typeof map !== 'object') return;
     const keys = Object.keys(map);
     if (keys.length <= 1000) return;
     keys.slice(0, 100).forEach(k => {
+        try {
+            delete map[k];
+        } catch (e) {
+        }
+    });
+}
+
+function enforceVideoMetaMapCap(map) {
+    if (!map || typeof map !== 'object') return;
+    const keys = Object.keys(map);
+    if (keys.length <= 1500) return;
+    keys.slice(0, 150).forEach(k => {
         try {
             delete map[k];
         } catch (e) {
@@ -931,12 +969,36 @@ function flushVideoChannelMapUpdates() {
     return videoChannelMapFlushPromise;
 }
 
+function flushVideoMetaMapUpdates() {
+    videoMetaMapFlushPromise = videoMetaMapFlushPromise.then(async () => {
+        if (pendingVideoMetaMapUpdates.size === 0) return;
+        const map = await ensureVideoMetaMapCache();
+        for (const [videoId, meta] of pendingVideoMetaMapUpdates.entries()) {
+            if (!videoId || !meta) continue;
+            map[videoId] = meta;
+        }
+        pendingVideoMetaMapUpdates.clear();
+        enforceVideoMetaMapCap(map);
+        await browserAPI.storage.local.set({ videoMetaMap: map });
+    }).catch(() => {
+    });
+    return videoMetaMapFlushPromise;
+}
+
 function scheduleVideoChannelMapFlush() {
     if (videoChannelMapFlushTimer) return;
     videoChannelMapFlushTimer = setTimeout(() => {
         videoChannelMapFlushTimer = null;
         flushVideoChannelMapUpdates();
     }, 50);
+}
+
+function scheduleVideoMetaMapFlush() {
+    if (videoMetaMapFlushTimer) return;
+    videoMetaMapFlushTimer = setTimeout(() => {
+        videoMetaMapFlushTimer = null;
+        flushVideoMetaMapUpdates();
+    }, 75);
 }
 
 function enqueueVideoChannelMapUpdate(videoId, channelId) {
@@ -956,6 +1018,40 @@ function enqueueVideoChannelMapUpdate(videoId, channelId) {
         compiledSettingsCache.kids.videoChannelMap = videoChannelMapCache || compiledSettingsCache.kids.videoChannelMap;
     }
     scheduleVideoChannelMapFlush();
+}
+
+function enqueueVideoMetaMapUpdate(videoId, meta) {
+    const v = typeof videoId === 'string' ? videoId.trim() : '';
+    if (!v) return;
+    if (!meta || typeof meta !== 'object') return;
+
+    const lengthSecondsRaw = meta.lengthSeconds;
+    const publishDateRaw = meta.publishDate;
+    const uploadDateRaw = meta.uploadDate;
+
+    const clean = {
+        lengthSeconds: (typeof lengthSecondsRaw === 'number' && Number.isFinite(lengthSecondsRaw))
+            ? lengthSecondsRaw
+            : (typeof lengthSecondsRaw === 'string' ? lengthSecondsRaw.trim() : null),
+        publishDate: (typeof publishDateRaw === 'string' ? publishDateRaw.trim() : ''),
+        uploadDate: (typeof uploadDateRaw === 'string' ? uploadDateRaw.trim() : '')
+    };
+
+    if (!clean.lengthSeconds && !clean.publishDate && !clean.uploadDate) return;
+    pendingVideoMetaMapUpdates.set(v, clean);
+
+    if (videoMetaMapCache && typeof videoMetaMapCache === 'object') {
+        videoMetaMapCache[v] = clean;
+    }
+
+    if (compiledSettingsCache.main) {
+        compiledSettingsCache.main.videoMetaMap = videoMetaMapCache || compiledSettingsCache.main.videoMetaMap;
+    }
+    if (compiledSettingsCache.kids) {
+        compiledSettingsCache.kids.videoMetaMap = videoMetaMapCache || compiledSettingsCache.kids.videoMetaMap;
+    }
+
+    scheduleVideoMetaMapFlush();
 }
 
 /**
@@ -1006,12 +1102,12 @@ console.log(`FilterTube background script loaded in ${IS_FIREFOX ? 'Firefox' : '
 
 // Function to compile settings from storage
 // Function to compile settings from storage
-async function getCompiledSettings(sender = null, profileType = null) {
+async function getCompiledSettings(sender = null, profileType = null, forceRefresh = false) {
     const senderUrl = sender?.tab?.url || sender?.url || '';
     const targetProfile = profileType === 'kids' || isKidsUrl(senderUrl) ? 'kids' : 'main';
 
     // Return cached settings if available
-    if (compiledSettingsCache[targetProfile]) {
+    if (!forceRefresh && compiledSettingsCache[targetProfile]) {
         return compiledSettingsCache[targetProfile];
     }
 
@@ -1021,6 +1117,7 @@ async function getCompiledSettings(sender = null, profileType = null) {
             'filterKeywords',
             'uiKeywords',
             'filterChannels',
+            'contentFilters',
             'useExactWordMatching',
             'filterKeywordsComments',
             'filterChannelsAdditionalKeywords',
@@ -1055,6 +1152,7 @@ async function getCompiledSettings(sender = null, profileType = null) {
             'hideSearchShelves',
             'channelMap',
             'videoChannelMap',
+            'videoMetaMap',
             'stats',
             'ftProfilesV3',
             FT_PROFILES_V4_KEY
@@ -1208,12 +1306,52 @@ async function getCompiledSettings(sender = null, profileType = null) {
 
             const rawWhitelistKeywords = shouldUseKidsProfile
                 ? (Array.isArray(activeKids.whitelistKeywords) ? activeKids.whitelistKeywords : [])
-                : (Array.isArray(activeMain.whitelistKeywords) ? activeMain.whitelistKeywords : []);
+                : (() => {
+                    const mainKeywords = Array.isArray(activeMain.whitelistKeywords) ? activeMain.whitelistKeywords : [];
+                    // Only merge Kids keywords when sync enabled AND Main is in whitelist mode
+                    if (!syncKidsToMain || mainModeFromV4 !== 'whitelist') return mainKeywords;
+                    const kidsBlockedKeywords = Array.isArray(activeKids.blockedKeywords) ? activeKids.blockedKeywords : [];
+                    const kidsWhitelistKeywords = Array.isArray(activeKids.whitelistKeywords) ? activeKids.whitelistKeywords : [];
+                    const allKidsKeywords = [...kidsBlockedKeywords, ...kidsWhitelistKeywords];
+                    if (!allKidsKeywords.length) return mainKeywords;
+                    const seen = new Set(mainKeywords.map(k => (typeof k === 'object' ? k.word : String(k)).toLowerCase()));
+                    const merged = [...mainKeywords];
+                    allKidsKeywords.forEach(k => {
+                        const word = typeof k === 'object' ? k.word : String(k);
+                        if (!seen.has(word.toLowerCase())) {
+                            seen.add(word.toLowerCase());
+                            merged.push(k);
+                        }
+                    });
+                    return merged;
+                })();
             compiledSettings.whitelistKeywords = compileKeywordEntries(rawWhitelistKeywords);
 
             const rawWhitelistChannels = shouldUseKidsProfile
                 ? (Array.isArray(activeKids.whitelistChannels) ? activeKids.whitelistChannels : [])
-                : (Array.isArray(activeMain.whitelistChannels) ? activeMain.whitelistChannels : []);
+                : (() => {
+                    const mainChannels = Array.isArray(activeMain.whitelistChannels) ? activeMain.whitelistChannels : [];
+                    // Only merge Kids channels when sync enabled AND Main is in whitelist mode
+                    if (!syncKidsToMain || mainModeFromV4 !== 'whitelist') return mainChannels;
+                    const kidsBlockedChannels = Array.isArray(activeKids.blockedChannels) ? activeKids.blockedChannels : [];
+                    const kidsWhitelistChannels = Array.isArray(activeKids.whitelistChannels) ? activeKids.whitelistChannels : [];
+                    const allKidsChannels = [...kidsBlockedChannels, ...kidsWhitelistChannels];
+                    if (!allKidsChannels.length) return mainChannels;
+                    const keyFor = (ch) => {
+                        const id = typeof ch?.id === 'string' ? ch.id.trim().toLowerCase() : '';
+                        const handle = typeof ch?.handle === 'string' ? ch.handle.trim().toLowerCase() : '';
+                        return id || handle || '';
+                    };
+                    const seen = new Set(mainChannels.map(keyFor).filter(Boolean));
+                    const merged = [...mainChannels];
+                    allKidsChannels.forEach(ch => {
+                        const key = keyFor(ch);
+                        if (!key || seen.has(key)) return;
+                        seen.add(key);
+                        merged.push({ ...ch, __ftFromKids: true });
+                    });
+                    return merged;
+                })();
 
             const boolFromV4 = (key, legacyValue) => {
                 try {
@@ -1241,12 +1379,19 @@ async function getCompiledSettings(sender = null, profileType = null) {
             const v4KeywordEntries = shouldUseKidsProfile
                 ? (Array.isArray(activeKids.blockedKeywords) ? activeKids.blockedKeywords : null)
                 : (() => {
-                    const mainKeywords = Array.isArray(activeMain.keywords) ? activeMain.keywords : null;
-                    if (!syncKidsToMain) return mainKeywords;
-                    const kidsKeywords = Array.isArray(activeKids.blockedKeywords) ? activeKids.blockedKeywords : null;
-                    if (!mainKeywords && kidsKeywords) return kidsKeywords;
-                    if (!kidsKeywords) return mainKeywords;
-                    return [...mainKeywords, ...kidsKeywords];
+                    // V4 schema uses 'blockedKeywords' for blocklist mode, fallback to 'keywords' for migration
+                    const mainKeywords = Array.isArray(activeMain.blockedKeywords) 
+                        ? activeMain.blockedKeywords 
+                        : (Array.isArray(activeMain.keywords) ? activeMain.keywords : null);
+                    // Only merge Kids keywords when sync enabled AND Main is in blocklist mode
+                    if (!syncKidsToMain || mainModeFromV4 !== 'blocklist') return mainKeywords;
+                    // Merge ALL kids keywords (blocked + whitelist) into main blocklist when sync enabled
+                    const kidsBlockedKeywords = Array.isArray(activeKids.blockedKeywords) ? activeKids.blockedKeywords : [];
+                    const kidsWhitelistKeywords = Array.isArray(activeKids.whitelistKeywords) ? activeKids.whitelistKeywords : [];
+                    const allKidsKeywords = [...kidsBlockedKeywords, ...kidsWhitelistKeywords];
+                    if (!mainKeywords && allKidsKeywords.length) return allKidsKeywords;
+                    if (!allKidsKeywords.length) return mainKeywords;
+                    return [...mainKeywords, ...allKidsKeywords];
                 })();
 
             if (v4KeywordEntries) {
@@ -1270,9 +1415,17 @@ async function getCompiledSettings(sender = null, profileType = null) {
             const kidsChannelsV4 = Array.isArray(activeKids.blockedChannels) ? activeKids.blockedChannels : null;
             const kidsKeywordsV4 = Array.isArray(activeKids.blockedKeywords) ? activeKids.blockedKeywords : null;
 
+            // For sync, we need ALL kids channels (both blocked and whitelist)
+            const kidsBlockedChannelsV4 = Array.isArray(activeKids.blockedChannels) ? activeKids.blockedChannels : [];
+            const kidsWhitelistChannelsV4 = Array.isArray(activeKids.whitelistChannels) ? activeKids.whitelistChannels : [];
+            const allKidsChannelsV4 = [...kidsBlockedChannelsV4, ...kidsWhitelistChannelsV4];
+
             const effectiveKidsChannels = (kidsChannelsV4 != null)
                 ? kidsChannelsV4
                 : kidsChannelsV3;
+
+            // For sync, use all kids channels when merging
+            const effectiveKidsChannelsForSync = allKidsChannelsV4.length > 0 ? allKidsChannelsV4 : effectiveKidsChannels;
 
             const effectiveKidsKeywords = (kidsKeywordsV4 != null)
                 ? kidsKeywordsV4
@@ -1365,8 +1518,8 @@ async function getCompiledSettings(sender = null, profileType = null) {
                             handleDisplay: displayHandle || null,
                             canonicalHandle: canonicalHandle || null,
                             logo: ch.logo || null,
-                            filterAll: false,
-                            filterAllComments: true,
+                            filterAll: ch.filterAll || false,
+                            filterAllComments: ch.filterAllComments ?? true,
                             originalInput: ch.originalInput || ch.id || ch.handle || ch.name || null,
                             customUrl: ch.customUrl || null,
                             source: typeof ch.source === 'string' ? ch.source : null,
@@ -1387,9 +1540,17 @@ async function getCompiledSettings(sender = null, profileType = null) {
             const storedChannels = shouldUseKidsProfile
                 ? effectiveKidsChannels
                 : (() => {
-                    const mainChannels = Array.isArray(activeMain.channels) ? activeMain.channels : items.filterChannels;
+                    // V4 schema uses 'blockedChannels' for blocklist mode, fallback to 'channels' for migration
+                    const mainChannels = Array.isArray(activeMain.blockedChannels) 
+                        ? activeMain.blockedChannels 
+                        : (Array.isArray(activeMain.channels) ? activeMain.channels : items.filterChannels);
+                    // Only merge Kids channels when sync enabled AND Main is in blocklist mode
                     if (!syncKidsToMain) return mainChannels;
-                    return dedupeChannels([...(Array.isArray(mainChannels) ? mainChannels : []), ...effectiveKidsChannels]);
+                    if (mainModeFromV4 !== 'blocklist') return mainChannels;
+                    // Merge ALL kids channels (blocked + whitelist) into main blocklist when sync enabled
+                    const kidsChannelsWithTag = effectiveKidsChannelsForSync.map(ch => ({ ...ch, __ftFromKids: true }));
+                    const merged = dedupeChannels([...(Array.isArray(mainChannels) ? mainChannels : []), ...kidsChannelsWithTag]);
+                    return merged;
                 })();
             let compiledChannels = [];
             const additionalKeywordsFromChannels = [];
@@ -1506,9 +1667,65 @@ async function getCompiledSettings(sender = null, profileType = null) {
                         ...compiledSettings.filterKeywords,
                         ...uniqueChannelKeywords
                     ];
+
+                    // Persist channel-based keywords to Main's keyword storage
+                    // Only if NOT using Kids profile (Main profile only)
+                    if (!shouldUseKidsProfile) {
+                        const activeProfileId = items.ftActiveProfileId || 'default';
+                        
+                        // Determine which keyword list to update based on Main's mode
+                        // V4 schema uses 'blockedKeywords' for blocklist mode, 'whitelistKeywords' for whitelist mode
+                        const isWhitelistMode = mainModeFromV4 === 'whitelist';
+                        const keywordKey = isWhitelistMode ? 'whitelistKeywords' : 'blockedKeywords';
+                        const currentKeywords = Array.isArray(activeMain[keywordKey]) ? activeMain[keywordKey] : [];
+                        
+                        // Get existing words to avoid duplicates
+                        const existingWords = new Set(
+                            currentKeywords.map(k => (typeof k === 'object' ? k.word : String(k)).toLowerCase())
+                        );
+                        
+                        // Convert compiled keyword format back to storage format
+                        const keywordsToPersist = uniqueChannelKeywords
+                            .map(kw => {
+                                const word = kw.pattern.replace(/\\([.*+?^${}()|[\]\\])/g, '$1');
+                                // Skip if already exists in storage
+                                if (existingWords.has(word.toLowerCase())) return null;
+                                return {
+                                    word: word,
+                                    exact: false,
+                                    comments: true,
+                                    addedAt: Date.now(),
+                                    source: 'filterAll_channel'
+                                };
+                            })
+                            .filter(Boolean);
+                        
+                        if (keywordsToPersist.length > 0 && items.ftProfilesV4?.profiles?.[activeProfileId]) {
+                            const updatedKeywords = [...currentKeywords, ...keywordsToPersist];
+                            // Update the nested structure properly
+                            const updatedProfilesV4 = {
+                                ...items.ftProfilesV4,
+                                profiles: {
+                                    ...items.ftProfilesV4.profiles,
+                                    [activeProfileId]: {
+                                        ...items.ftProfilesV4.profiles[activeProfileId],
+                                        main: {
+                                            ...items.ftProfilesV4.profiles[activeProfileId].main,
+                                            [keywordKey]: updatedKeywords
+                                        }
+                                    }
+                                }
+                            };
+                            // Save to storage immediately
+                            browserAPI.storage.local.set({ ftProfilesV4: updatedProfilesV4 });
+                            console.log(`[FilterTube Sync] Persisted ${keywordsToPersist.length} new channel keywords to Main ${keywordKey}`);
+                        }
+                    }
                 }
 
-                console.log(`FilterTube Background: Added ${uniqueChannelKeywords.length} unique channel-based keywords (${additionalKeywordsFromChannels.length - uniqueChannelKeywords.length} duplicates skipped)`);
+                if (uniqueChannelKeywords.length > 0) {
+                    console.log(`[FilterTube Sync] Added ${uniqueChannelKeywords.length} channel keywords to compiled settings`);
+                }
             }
 
             // Pass through the channel map (UC ID <-> @handle mappings)
@@ -1516,6 +1733,8 @@ async function getCompiledSettings(sender = null, profileType = null) {
 
             // Pass through the video-channel map (videoId -> channelId for Shorts persistence)
             compiledSettings.videoChannelMap = items.videoChannelMap || {};
+
+            compiledSettings.videoMetaMap = items.videoMetaMap || {};
 
             // Kids profile keyword compilation (YouTube Kids domain only)
             if (shouldUseKidsProfile) {
@@ -1603,6 +1822,13 @@ async function getCompiledSettings(sender = null, profileType = null) {
             compiledSettings.hideMoreFromYouTube = boolFromV4('hideMoreFromYouTube', items.hideMoreFromYouTube || false);
             compiledSettings.hideSubscriptions = boolFromV4('hideSubscriptions', items.hideSubscriptions || false);
             compiledSettings.hideSearchShelves = boolFromV4('hideSearchShelves', items.hideSearchShelves || false);
+
+            const profileSettings = activeProfile?.settings || {};
+            compiledSettings.contentFilters = items.contentFilters || profileSettings.contentFilters || {
+                duration: { enabled: false, minMinutes: 0, maxMinutes: 0, condition: 'between' },
+                uploadDate: { enabled: false, fromDate: '', toDate: '', condition: 'newer' },
+                uppercase: { enabled: false, mode: 'single_word', minWordLength: 2 }
+            };
 
             console.log(`FilterTube Background: Compiled ${targetProfile} settings: ${compiledChannels.length} channels, ${compiledSettings.filterKeywords.length} keywords`);
 
@@ -2125,7 +2351,7 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
         }
 
         console.log(`FilterTube Background: Received getCompiledSettings message for profile: ${profileType} (force: ${!!request.forceRefresh})`);
-        getCompiledSettings(sender, profileType).then(compiledSettings => {
+        getCompiledSettings(sender, profileType, !!request.forceRefresh).then(compiledSettings => {
             if (browserAPI.runtime.lastError) {
                 console.error("FilterTube Background: Error retrieving settings from storage:", browserAPI.runtime.lastError);
                 sendResponse({ error: browserAPI.runtime.lastError.message });
@@ -2343,6 +2569,11 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
 
             compiledSettingsCache.main = null;
             compiledSettingsCache.kids = null;
+
+            try {
+                scheduleAutoBackupInBackground('mode_changed');
+            } catch (e) {
+            }
 
             try {
                 const urlPattern = requestedProfile === 'kids' ? ['*://*.youtubekids.com/*'] : ['*://*.youtube.com/*'];
@@ -3026,6 +3257,22 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
             console.log("FilterTube Background: Video-channel mapping stored:", request.videoId, "->", request.channelId);
         }
         return false;
+    } else if (request.action === "updateVideoMetaMap") {
+        const entries = Array.isArray(request.entries)
+            ? request.entries
+            : (request.videoId ? [{
+                videoId: request.videoId,
+                lengthSeconds: request.lengthSeconds,
+                publishDate: request.publishDate,
+                uploadDate: request.uploadDate
+            }] : []);
+
+        for (const entry of entries) {
+            const videoId = entry?.videoId;
+            if (!videoId) continue;
+            enqueueVideoMetaMapUpdate(videoId, entry);
+        }
+        return false;
     } else if (request.action === "recordTimeSaved") {
         // Accumulate saved time
         browserAPI.storage.local.get(['stats'], (result) => {
@@ -3067,6 +3314,7 @@ browserAPI.storage.onChanged.addListener((changes, area) => {
         const relevantKeys = [
             'filterKeywords',
             'filterChannels',
+            'contentFilters',
             'hideMembersOnly',
             'hideAllShorts',
             'hideComments',

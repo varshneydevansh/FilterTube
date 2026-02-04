@@ -1727,6 +1727,53 @@ async function applyDOMFallback(settings, options = {}) {
                 element.removeAttribute('data-filtertube-short');
             }
 
+            let hideByDuration = false;
+            let durationSeconds = null;
+            try {
+                const contentFilters = effectiveSettings && typeof effectiveSettings === 'object' ? effectiveSettings.contentFilters : null;
+                const durationSettings = contentFilters && typeof contentFilters === 'object' ? contentFilters.duration : null;
+                if (durationSettings && durationSettings.enabled && typeof extractVideoDuration === 'function') {
+                    durationSeconds = extractVideoDuration(element);
+
+                    if (!(typeof durationSeconds === 'number' && durationSeconds > 0) && effectiveSettings.videoMetaMap && typeof effectiveSettings.videoMetaMap === 'object') {
+                        const videoId = ensureVideoIdForCard(element);
+                        const meta = (videoId && effectiveSettings.videoMetaMap[videoId]) ? effectiveSettings.videoMetaMap[videoId] : null;
+                        const raw = meta?.lengthSeconds;
+                        let parsed = null;
+                        if (typeof raw === 'number' && Number.isFinite(raw) && raw > 0) {
+                            parsed = raw;
+                        } else if (typeof raw === 'string' && /^\d+$/.test(raw.trim())) {
+                            const num = parseInt(raw.trim(), 10);
+                            parsed = Number.isFinite(num) && num > 0 ? num : null;
+                        }
+
+                        if (parsed && parsed > 0) {
+                            durationSeconds = parsed;
+                            try {
+                                element.setAttribute('data-filtertube-duration', String(parsed));
+                            } catch (e) {
+                            }
+                        }
+                    }
+
+                    if (typeof durationSeconds === 'number' && durationSeconds > 0) {
+                        const durationMinutes = durationSeconds / 60;
+                        const condition = durationSettings.condition || 'between';
+                        const min = Number(durationSettings.minMinutes ?? durationSettings.minutes ?? durationSettings.value ?? durationSettings.minutesMin ?? 0) || 0;
+                        const max = Number(durationSettings.maxMinutes ?? durationSettings.minutesMax ?? 0) || 0;
+
+                        if (condition === 'longer') {
+                            hideByDuration = durationMinutes > min;
+                        } else if (condition === 'shorter') {
+                            hideByDuration = durationMinutes < min;
+                        } else if (max > 0) {
+                            hideByDuration = durationMinutes < min || durationMinutes > max;
+                        }
+                    }
+                }
+            } catch (e) {
+            }
+
             const skipKeywordFiltering = listMode !== 'whitelist' && CHANNEL_ONLY_TAGS.has(elementTag);
             const keywordTarget = (listMode === 'whitelist' && descriptionText)
                 ? `${title} ${descriptionText}`
@@ -1770,7 +1817,10 @@ async function applyDOMFallback(settings, options = {}) {
             }
 
             let hideReason = `Content: ${title}`;
-            let shouldHide = matchesFilters;
+            let shouldHide = matchesFilters || hideByDuration;
+            if (hideByDuration) {
+                hideReason = `Duration filter: ${title}`;
+            }
 
             // Never hide the currently-selected playlist row. Hiding it can trigger
             // repeated Next/autoplay transitions and visible flicker on SPA updates.
@@ -1791,6 +1841,7 @@ async function applyDOMFallback(settings, options = {}) {
                     try {
                         targetToHide.removeAttribute('data-filtertube-hidden-by-keyword');
                         targetToHide.removeAttribute('data-filtertube-hidden-by-hide-all-shorts');
+                        targetToHide.removeAttribute('data-filtertube-hidden-by-duration');
                     } catch (e) {
                     }
                 } else {
@@ -1823,6 +1874,15 @@ async function applyDOMFallback(settings, options = {}) {
                         targetToHide.removeAttribute('data-filtertube-hidden-by-keyword');
                     }
                 }
+            }
+
+            try {
+                if (hideByDuration && shouldHide) {
+                    targetToHide.setAttribute('data-filtertube-hidden-by-duration', 'true');
+                } else {
+                    targetToHide.removeAttribute('data-filtertube-hidden-by-duration');
+                }
+            } catch (e) {
             }
 
             toggleVisibility(targetToHide, shouldHide, hideReason);

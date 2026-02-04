@@ -3,6 +3,19 @@
     "_comment": "Shared release notes source for the dashboard What's New tab and the YouTube release banner. Keep entries sorted newest-first by version."
   },
   {
+    "version": "3.2.6",
+    "headline": "UI/UX Beautification & Content-Based Filtering",
+    "summary": "Complete typography improvements with modern design, three new content filters (duration, date, uppercase).",
+    "bannerSummary": "Beautiful new UI with content filters for duration, upload date, and clickbait detection.",
+    "highlights": [
+      "Typography updates: Modern and refined font scale for better readability",
+      "Content-based filters: Duration (longer/shorter/between), upload date (newer/older/between), and uppercase detection (clickbait titles)",
+      "videoMetaMap system: Persistent video metadata storage with intelligent batching (75ms window, 1500 entry cap)",
+      "Dashboard improvements: Surface-specific stats (Main vs Kids), enhanced stat cards, donate promo card"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.6"
+  },
+  {
     "version": "3.2.5",
     "headline": "Whitelist Mode Promoted + Stability",
     "summary": "Whitelist mode is now the primary allow-only path with smarter extraction, playlist safeguards, and reduced CPU usage.",
@@ -15,7 +28,7 @@
       "Playlist stability: selected rows stay visible; pending identities no longer unhide blocked rows",
       "Kids mode whitelist support with zero-network architecture"
     ],
-    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/version-3.2.5"
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.5"
   },
   {
     "version": "3.2.4",
@@ -31,7 +44,7 @@
       "Channel extraction: Multi-source identity resolution with thumbnail anchors and parent containers",
       "Mode switching: Seamless transitions between blocklist/whitelist with intelligent reprocessing"
     ],
-    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/version-3.2.4"
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.4"
   },
   {
     "version": "3.2.3",
@@ -47,7 +60,7 @@
       "Enhanced mobile menu support with proper YouTube mobile renderer handling",
       "All console logs now gated behind debug flag to reduce production noise"
     ],
-    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/version-3.2.3"
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.3"
   },
   {
     "version": "3.2.2",
@@ -65,7 +78,7 @@
       "Selective notifications: 'load' only on signature change; otherwise 'externalUpdate'",
       "Bridge state management via shared global state"
     ],
-    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/version-3.2.2"
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.2"
   },
   {
     "version": "3.2.1",
