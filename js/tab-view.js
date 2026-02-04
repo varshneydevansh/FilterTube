@@ -17,7 +17,7 @@ function initializeFiltersTabs() {
     const keywordsContent = document.createElement('div');
     keywordsContent.innerHTML = `
         <div class="input-row">
-            <input type="text" id="keywordInput" class="text-input" placeholder="Enter keyword to filter..." />
+            <input type="text" id="keywordInput" class="text-input" placeholder="Keywords (comma-separated)..." />
             <button id="addKeywordBtn" class="btn-primary">Add Keyword</button>
         </div>
 
@@ -59,7 +59,7 @@ function initializeFiltersTabs() {
     const channelsContent = document.createElement('div');
     channelsContent.innerHTML = `
         <div class="input-row">
-            <input type="text" id="channelInput" class="text-input" placeholder="@handle, Channel ID.. or c/ChannelName" />
+            <input type="text" id="channelInput" class="text-input" placeholder="@handle or ID (comma-separated)..." />
             <button id="addChannelBtn" class="btn-primary">Add Channel</button>
         </div>
 
@@ -265,7 +265,7 @@ function initializeKidsTabs() {
     const kidsKeywordsContent = document.createElement('div');
     kidsKeywordsContent.innerHTML = `
         <div class="input-row">
-            <input type="text" id="kidsKeywordInput" class="text-input" placeholder="Enter keyword to block on Kids..." />
+            <input type="text" id="kidsKeywordInput" class="text-input" placeholder="Keywords (comma-separated)..." />
             <button id="kidsAddKeywordBtn" class="btn-primary">Add Keyword</button>
         </div>
 
@@ -307,7 +307,7 @@ function initializeKidsTabs() {
     const kidsChannelsContent = document.createElement('div');
     kidsChannelsContent.innerHTML = `
         <div class="input-row">
-            <input type="text" id="kidsChannelInput" class="text-input" placeholder="@handle, Channel ID, or c/ChannelName" />
+            <input type="text" id="kidsChannelInput" class="text-input" placeholder="@handle or ID (comma-separated)..." />
             <button id="kidsAddChannelBtn" class="btn-primary">Add Channel</button>
         </div>
 
@@ -712,7 +712,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    async function syncSessionUnlockStateFromBackground() {}
+    async function syncSessionUnlockStateFromBackground() { }
 
     async function notifyBackgroundUnlocked(profileId, pin = '') {
         try {
@@ -2992,13 +2992,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (addKeywordBtn) {
         addKeywordBtn.addEventListener('click', async () => {
             if (isUiLocked()) return;
-            const word = (keywordInput?.value || '').trim();
-            if (!word) return;
+            const rawInput = (keywordInput?.value || '').trim();
+            if (!rawInput) return;
 
-            const success = await StateManager.addKeyword(word);
-            if (success) {
+            // Support comma-separated keywords
+            const keywords = rawInput.split(',').map(k => k.trim()).filter(k => k.length > 0);
+            if (keywords.length === 0) return;
+
+            let addedCount = 0;
+            for (const word of keywords) {
+                const success = await StateManager.addKeyword(word);
+                if (success) addedCount++;
+            }
+
+            if (addedCount > 0) {
                 if (keywordInput) keywordInput.value = '';
-                UIComponents.flashButtonSuccess(addKeywordBtn, 'Added!', 1200);
+                const msg = addedCount === 1 ? 'Added!' : `Added ${addedCount}!`;
+                UIComponents.flashButtonSuccess(addKeywordBtn, msg, 1200);
             }
         });
     }
@@ -3087,26 +3097,39 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (addChannelBtn) {
         addChannelBtn.addEventListener('click', async () => {
             if (isUiLocked()) return;
-            const input = (channelInput?.value || '').trim();
-            if (!input) return;
+            const rawInput = (channelInput?.value || '').trim();
+            if (!rawInput) return;
+
+            // Support comma-separated channels
+            const channels = rawInput.split(',').map(c => c.trim()).filter(c => c.length > 0);
+            if (channels.length === 0) return;
 
             const originalText = addChannelBtn.textContent;
             addChannelBtn.textContent = 'Fetching...';
             addChannelBtn.disabled = true;
 
             try {
-                const result = await StateManager.addChannel(input);
+                let addedCount = 0;
+                let lastError = null;
 
-                if (result.success) {
+                for (const input of channels) {
+                    const result = await StateManager.addChannel(input);
+                    if (result.success) {
+                        addedCount++;
+                    } else {
+                        lastError = result.error;
+                    }
+                }
+
+                addChannelBtn.textContent = originalText;
+                addChannelBtn.disabled = false;
+
+                if (addedCount > 0) {
                     if (channelInput) channelInput.value = '';
-                    // Reset button text BEFORE flashing success message
-                    addChannelBtn.textContent = originalText;
-                    addChannelBtn.disabled = false;
-                    UIComponents.flashButtonSuccess(addChannelBtn, 'Added!', 1200);
-                } else {
-                    addChannelBtn.textContent = originalText;
-                    addChannelBtn.disabled = false;
-                    UIComponents.showToast(result.error || 'Failed to add channel', 'error');
+                    const msg = addedCount === 1 ? 'Added!' : `Added ${addedCount}!`;
+                    UIComponents.flashButtonSuccess(addChannelBtn, msg, 1200);
+                } else if (lastError) {
+                    UIComponents.showToast(lastError || 'Failed to add channel', 'error');
                 }
             } catch (error) {
                 addChannelBtn.textContent = originalText;
@@ -3185,12 +3208,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (kidsAddKeywordBtn) {
         kidsAddKeywordBtn.addEventListener('click', async () => {
             if (isUiLocked()) return;
-            const word = (kidsKeywordInput?.value || '').trim();
-            if (!word) return;
-            const success = await StateManager.addKidsKeyword(word);
-            if (success) {
+            const rawInput = (kidsKeywordInput?.value || '').trim();
+            if (!rawInput) return;
+
+            // Support comma-separated keywords
+            const keywords = rawInput.split(',').map(k => k.trim()).filter(k => k.length > 0);
+            if (keywords.length === 0) return;
+
+            let addedCount = 0;
+            for (const word of keywords) {
+                const success = await StateManager.addKidsKeyword(word);
+                if (success) addedCount++;
+            }
+
+            if (addedCount > 0) {
                 if (kidsKeywordInput) kidsKeywordInput.value = '';
-                UIComponents.flashButtonSuccess(kidsAddKeywordBtn, 'Added!', 1200);
+                const msg = addedCount === 1 ? 'Added!' : `Added ${addedCount}!`;
+                UIComponents.flashButtonSuccess(kidsAddKeywordBtn, msg, 1200);
             }
         });
     }
@@ -3263,14 +3297,31 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (kidsAddChannelBtn) {
         kidsAddChannelBtn.addEventListener('click', async () => {
             if (isUiLocked()) return;
-            const input = (kidsChannelInput?.value || '').trim();
-            if (!input) return;
-            const result = await StateManager.addKidsChannel(input);
-            if (result.success) {
+            const rawInput = (kidsChannelInput?.value || '').trim();
+            if (!rawInput) return;
+
+            // Support comma-separated channels
+            const channels = rawInput.split(',').map(c => c.trim()).filter(c => c.length > 0);
+            if (channels.length === 0) return;
+
+            let addedCount = 0;
+            let lastError = null;
+
+            for (const input of channels) {
+                const result = await StateManager.addKidsChannel(input);
+                if (result.success) {
+                    addedCount++;
+                } else {
+                    lastError = result.error;
+                }
+            }
+
+            if (addedCount > 0) {
                 if (kidsChannelInput) kidsChannelInput.value = '';
-                UIComponents.flashButtonSuccess(kidsAddChannelBtn, 'Added!', 1200);
-            } else {
-                UIComponents.showToast(result.error || 'Failed to add channel', 'error');
+                const msg = addedCount === 1 ? 'Added!' : `Added ${addedCount}!`;
+                UIComponents.flashButtonSuccess(kidsAddChannelBtn, msg, 1200);
+            } else if (lastError) {
+                UIComponents.showToast(lastError || 'Failed to add channel', 'error');
             }
         });
     }
