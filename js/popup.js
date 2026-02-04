@@ -145,6 +145,225 @@ function initializePopupFiltersTabs() {
         contentTab.appendChild(groupEl);
     });
 
+    // Advance Video Filters Section (compact version for popup)
+    const videoFiltersSection = document.createElement('div');
+    videoFiltersSection.className = 'content-control-group video-filters-section';
+    videoFiltersSection.style.marginTop = '16px';
+    videoFiltersSection.style.borderTop = '1px solid var(--ft-color-sem-neutral-border)';
+
+    const videoFiltersHeader = document.createElement('button');
+    videoFiltersHeader.className = 'content-control-group__header video-filters-toggle';
+    videoFiltersHeader.type = 'button';
+    videoFiltersHeader.setAttribute('aria-expanded', 'false');
+
+    const videoFiltersTitle = document.createElement('div');
+    videoFiltersTitle.className = 'content-control-group__title';
+    videoFiltersTitle.textContent = 'Advance Video Filters';
+
+    const videoFiltersChevron = document.createElement('span');
+    videoFiltersChevron.className = 'video-filters-chevron';
+    videoFiltersChevron.innerHTML = '▾';
+
+    videoFiltersHeader.appendChild(videoFiltersTitle);
+    videoFiltersHeader.appendChild(videoFiltersChevron);
+    videoFiltersSection.appendChild(videoFiltersHeader);
+
+    const videoFiltersRows = document.createElement('div');
+    videoFiltersRows.className = 'content-control-group__rows video-filters-body';
+
+    // Duration filter row (compact)
+    const durationRow = document.createElement('div');
+    durationRow.className = 'toggle-row';
+    durationRow.setAttribute('data-ft-control-row', 'true');
+
+    const durationInfo = document.createElement('div');
+    durationInfo.className = 'toggle-info';
+
+    const durationTitle = document.createElement('div');
+    durationTitle.className = 'toggle-title';
+    durationTitle.textContent = 'Duration Filter';
+    durationTitle.title = 'Hide long videos (>60m)';
+
+    durationInfo.appendChild(durationTitle);
+
+    const durationToggle = document.createElement('label');
+    durationToggle.className = 'switch';
+
+    const durationCheckbox = document.createElement('input');
+    durationCheckbox.type = 'checkbox';
+    durationCheckbox.id = 'popupVideoFilter_duration_enabled';
+
+    const durationSlider = document.createElement('span');
+    durationSlider.className = 'slider round';
+
+    durationToggle.appendChild(durationCheckbox);
+    durationToggle.appendChild(durationSlider);
+
+    durationRow.appendChild(durationInfo);
+    durationRow.appendChild(durationToggle);
+    videoFiltersRows.appendChild(durationRow);
+
+    // Upload date filter row (compact)
+    const uploadDateRow = document.createElement('div');
+    uploadDateRow.className = 'toggle-row';
+    uploadDateRow.setAttribute('data-ft-control-row', 'true');
+
+    const uploadDateInfo = document.createElement('div');
+    uploadDateInfo.className = 'toggle-info';
+
+    const uploadDateTitle = document.createElement('div');
+    uploadDateTitle.className = 'toggle-title';
+    uploadDateTitle.textContent = 'Upload Date Filter';
+    uploadDateTitle.title = 'Shows videos from the past 30 days';
+
+    uploadDateInfo.appendChild(uploadDateTitle);
+
+    const uploadDateToggle = document.createElement('label');
+    uploadDateToggle.className = 'switch';
+
+    const uploadDateCheckbox = document.createElement('input');
+    uploadDateCheckbox.type = 'checkbox';
+    uploadDateCheckbox.id = 'popupVideoFilter_uploadDate_enabled';
+
+    const uploadDateSlider = document.createElement('span');
+    uploadDateSlider.className = 'slider round';
+
+    uploadDateToggle.appendChild(uploadDateCheckbox);
+    uploadDateToggle.appendChild(uploadDateSlider);
+
+    uploadDateRow.appendChild(uploadDateInfo);
+    uploadDateRow.appendChild(uploadDateToggle);
+    videoFiltersRows.appendChild(uploadDateRow);
+
+    // Uppercase title filter row (compact)
+    const uppercaseRow = document.createElement('div');
+    uppercaseRow.className = 'toggle-row';
+    uppercaseRow.setAttribute('data-ft-control-row', 'true');
+
+    const uppercaseInfo = document.createElement('div');
+    uppercaseInfo.className = 'toggle-info';
+
+    const uppercaseTitle = document.createElement('div');
+    uppercaseTitle.className = 'toggle-title';
+    uppercaseTitle.textContent = 'Uppercase Title Filter';
+    uppercaseTitle.title = 'Block AI slop with ALL CAPS titles';
+
+    uppercaseInfo.appendChild(uppercaseTitle);
+
+    const uppercaseToggle = document.createElement('label');
+    uppercaseToggle.className = 'switch';
+
+    const uppercaseCheckbox = document.createElement('input');
+    uppercaseCheckbox.type = 'checkbox';
+    uppercaseCheckbox.id = 'popupVideoFilter_uppercase_enabled';
+
+    const uppercaseSlider = document.createElement('span');
+    uppercaseSlider.className = 'slider round';
+
+    uppercaseToggle.appendChild(uppercaseCheckbox);
+    uppercaseToggle.appendChild(uppercaseSlider);
+
+    uppercaseRow.appendChild(uppercaseInfo);
+    uppercaseRow.appendChild(uppercaseToggle);
+    videoFiltersRows.appendChild(uppercaseRow);
+
+    const manageInTab = document.createElement('button');
+    manageInTab.className = 'video-filters-manage';
+    manageInTab.type = 'button';
+    manageInTab.textContent = 'Manage in Tab';
+
+    videoFiltersRows.appendChild(manageInTab);
+    videoFiltersSection.appendChild(videoFiltersRows);
+    contentTab.appendChild(videoFiltersSection);
+
+    // Wire up popup video filter event listeners
+    function updatePopupVideoFilterUI() {
+        const isExpanded = videoFiltersHeader.getAttribute('aria-expanded') === 'true';
+        videoFiltersRows.style.display = isExpanded ? 'flex' : 'none';
+    }
+
+    function applyPopupContentFilters(contentFilters = {}) {
+        const durationEnabled = document.getElementById('popupVideoFilter_duration_enabled');
+        const uploadEnabled = document.getElementById('popupVideoFilter_uploadDate_enabled');
+        const uppercaseEnabled = document.getElementById('popupVideoFilter_uppercase_enabled');
+
+        if (durationEnabled) durationEnabled.checked = !!contentFilters.duration?.enabled;
+        if (uploadEnabled) uploadEnabled.checked = !!contentFilters.uploadDate?.enabled;
+        if (uppercaseEnabled) uppercaseEnabled.checked = !!contentFilters.uppercase?.enabled;
+    }
+
+    function savePopupVideoFilters() {
+        const durationEnabled = document.getElementById('popupVideoFilter_duration_enabled')?.checked || false;
+        const uploadEnabled = document.getElementById('popupVideoFilter_uploadDate_enabled')?.checked || false;
+
+        const uppercaseEnabled = document.getElementById('popupVideoFilter_uppercase_enabled')?.checked || false;
+
+        const now = Date.now();
+        const unitMs = { days: 86400000, weeks: 604800000, months: 2592000000, years: 31536000000 };
+        const ageValue = 30;
+        const cutoff = now - ageValue * unitMs.days;
+        const fromDate = new Date(cutoff).toISOString();
+
+        StateManager.updateContentFilters({
+            duration: {
+                enabled: durationEnabled,
+                condition: 'longer',
+                value: '60',
+                minMinutes: 60,
+                maxMinutes: 0
+            },
+            uploadDate: {
+                enabled: uploadEnabled,
+                condition: 'newer',
+                value: String(ageValue),
+                unit: 'days',
+                valueMax: 0,
+                unitMax: '',
+                fromDate,
+                toDate: ''
+            },
+            uppercase: { enabled: uppercaseEnabled, mode: 'all_caps', minWordLength: 2 }
+        });
+    }
+
+    // Attach listeners after delay
+    setTimeout(() => {
+        const durationEnabled = document.getElementById('popupVideoFilter_duration_enabled');
+        const uploadEnabled = document.getElementById('popupVideoFilter_uploadDate_enabled');
+        const uppercaseEnabled = document.getElementById('popupVideoFilter_uppercase_enabled');
+
+        durationEnabled?.addEventListener('change', savePopupVideoFilters);
+        uploadEnabled?.addEventListener('change', savePopupVideoFilters);
+        uppercaseEnabled?.addEventListener('change', () => {
+            savePopupVideoFilters();
+        });
+
+        videoFiltersHeader.addEventListener('click', () => {
+            const expanded = videoFiltersHeader.getAttribute('aria-expanded') === 'true';
+            videoFiltersHeader.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+            updatePopupVideoFilterUI();
+        });
+
+        manageInTab.addEventListener('click', () => {
+            try {
+                if (chrome?.tabs?.create) {
+                    chrome.tabs.create({ url: chrome.runtime.getURL('html/tab-view.html?view=filters') });
+                }
+            } catch (e) {
+            }
+        });
+
+        const state = StateManager.getState();
+        applyPopupContentFilters(state.contentFilters || {});
+        updatePopupVideoFilterUI();
+    }, 100);
+
+    StateManager.subscribe((eventType, data) => {
+        if (eventType === 'contentFiltersUpdated') {
+            applyPopupContentFilters(data?.contentFilters || {});
+        }
+    });
+
     // Create tabs using UIComponents
     const tabs = UIComponents.createTabs({
         tabs: [
@@ -276,6 +495,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                             action: 'FilterTube_TransferWhitelistToBlocklist',
                             profileType: 'main'
                         });
+                    }
+                    // If user clicked Cancel and we're disabling whitelist, don't proceed with mode change
+                    if (!shouldTransfer) {
+                        renderListModeControls();
+                        return;
                     }
                 }
 
@@ -979,6 +1203,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             toggleEnabledBrandBtn.classList.toggle('ft-disabled', !enabled);
             toggleEnabledBrandBtn.setAttribute('aria-pressed', enabled ? 'true' : 'false');
             toggleEnabledBrandBtn.title = enabled ? 'Filtering Active (click to pause)' : 'Filtering Paused (click to enable)';
+            
+            const statusText = document.getElementById('extensionStatusText');
+            if (statusText) {
+                statusText.textContent = enabled ? 'Enabled' : 'Disabled';
+                statusText.classList.toggle('disabled', !enabled);
+            }
         }
     }
 

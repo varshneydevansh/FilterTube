@@ -75,44 +75,48 @@
   --ft-color-collab-warning-text: #92400e;
 
   /* =========================================
-     Typography - "Academic & Modern"
+     Typography - Modern Clean Sans
      ========================================= */
 
-  /* Font Families */
-  --ft-font-family-base: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue", sans-serif;
-  --ft-font-family-serif: "Crimson Pro", "Playfair Display", "Georgia", "Times New Roman", serif;
+  /* Font Families - Modern, clean, highly readable */
+  --ft-font-family-base: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif;
+  --ft-font-family-serif: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
   --ft-font-family-display: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --ft-font-family-mono: "JetBrains Mono", "SF Mono", "Fira Code", "Source Code Pro", monospace;
 
-  /* Scale */
-  --ft-font-size-caption: 0.8125rem;
-  /* 13px - slightly larger for better readability */
-  --ft-font-size-body: 0.9375rem;
-  /* 15px - more comfortable reading size */
-  --ft-font-size-base: 1rem;
-  /* 16px */
-  --ft-font-size-subtitle: 1.125rem;
+  /* Scale - Optimized for readability */
+  --ft-font-size-caption: 0.75rem;
+  /* 12px - small but crisp */
+  --ft-font-size-body: 0.875rem;
+  /* 14px - base comfortable reading */
+  --ft-font-size-base: 0.9375rem;
+  /* 15px - slightly larger base */
+  --ft-font-size-subtitle: 1.0625rem;
+  /* 17px - clearer subheadings */
+  --ft-font-size-h4: 1.125rem;
   /* 18px */
-  --ft-font-size-h3: 1.375rem;
-  /* 22px - better hierarchy */
-  --ft-font-size-h2: 1.75rem;
-  /* 28px - more presence */
-  --ft-font-size-h1: 2.25rem;
-  /* 36px - stronger impact */
+  --ft-font-size-h3: 1.25rem;
+  /* 20px - tighter hierarchy */
+  --ft-font-size-h2: 1.5rem;
+  /* 24px */
+  --ft-font-size-h1: 1.875rem;
+  /* 30px */
 
-  --ft-line-height-base: 1.65;
-  --ft-line-height-tight: 1.35;
+  /* Line heights - More breathing room */
+  --ft-line-height-base: 1.6;
+  --ft-line-height-tight: 1.3;
   --ft-line-height-relaxed: 1.75;
 
-  /* Font Weights */
+  /* Font Weights - Refined scale */
   --ft-font-weight-normal: 400;
   --ft-font-weight-medium: 500;
   --ft-font-weight-semibold: 600;
   --ft-font-weight-bold: 700;
 
-  /* Letter Spacing for elegance */
-  --ft-letter-spacing-tight: -0.02em;
-  --ft-letter-spacing-normal: 0em;
-  --ft-letter-spacing-wide: 0.025em;
+  /* Letter Spacing - Subtle improvements */
+  --ft-letter-spacing-tight: -0.01em;
+  --ft-letter-spacing-normal: -0.003em;
+  --ft-letter-spacing-wide: 0.01em;
 
   /* =========================================
      Spacing & Layout

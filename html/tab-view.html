@@ -108,19 +108,19 @@
                     </span>
                     <span class="nav-label">Help</span>
                 </li>
-                <li class="nav-item" data-tab="support">
+                <li class="nav-item" data-tab="donate">
                     <span class="nav-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"></path>
                         </svg>
                     </span>
-                    <span class="nav-label">Support</span>
+                    <span class="nav-label">Donate</span>
                 </li>
             </ul>
 
             <div class="sidebar-footer">
-                <div class="version-info">v3.2.5</div>
+                <div class="version-info">v3.2.6</div>
             </div>
         </nav>
 
@@ -159,6 +159,13 @@
 
                 <!-- Dashboard View -->
                 <div id="dashboardView" class="view-section active">
+                    <div class="dashboard-stats-source">
+                        <div id="dashboardStatsSourceLabel" class="dashboard-stats-source__label"></div>
+                        <div class="dashboard-stats-source__buttons">
+                            <button id="dashboardStatsMainBtn" class="btn-secondary" type="button">YouTube Main</button>
+                            <button id="dashboardStatsKidsBtn" class="btn-secondary" type="button">YouTube Kids</button>
+                        </div>
+                    </div>
                     <div class="stats-grid">
                         <div class="stat-card">
                             <div class="stat-value" id="statHiddenToday">0</div>
@@ -230,6 +237,26 @@
                             <span class="label">Toggle Kids Mode</span>
                         </button>
                     </div>
+
+                    <!-- Donate Promo Card -->
+                    <div class="card donate-promo-card">
+                        <div class="card-body">
+                            <div class="donate-promo-content">
+                                <div class="donate-promo-icon">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"></path>
+                                    </svg>
+                                </div>
+                                <div class="donate-promo-text">
+                                    <h3>Support FilterTube</h3>
+                                    <p>Help FilterTube by reviews or with funds for development, mobile apps, and new features.</p>
+                                    <p>Currently it's built and maintained by solo independent open-source dev.</p>
+                                </div>
+                                <button id="dashboardDonateBtn" class="btn-primary donate-promo-btn">Donate</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Filters View -->
@@ -259,9 +286,22 @@
 
                 <!-- Kids Mode View -->
                 <div id="kidsView" class="view-section">
-                    <div class="section-header">
-                        <h2>Kids Mode Filters</h2>
-                        <p class="sub-text">Separate blocklists for YouTube Kids. Comments are not supported on YT Kids.</p>
+                    <div class="kids-header">
+                        <div class="kids-header-title">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4.5 9.5V4a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v5.5"></path>
+                                <path d="M2 20v-5h20v5"></path>
+                                <path d="M12 15v5"></path>
+                                <path d="M6 15v5"></path>
+                                <path d="M18 15v5"></path>
+                                <circle cx="12" cy="10" r="2" fill="currentColor" stroke="none"></circle>
+                                <circle cx="6" cy="10" r="2" fill="currentColor" stroke="none"></circle>
+                                <circle cx="18" cy="10" r="2" fill="currentColor" stroke="none"></circle>
+                            </svg>
+                            <span>YouTube Kids Filters</span>
+                        </div>
+                        <p class="kids-header-desc">Block channels and keywords on YouTube Kids. Does not affect comments.</p>
                     </div>
                     <div id="kidsTabsContainer"></div>
                 </div>
@@ -793,7 +833,7 @@
                     </div>
                 </div>
 
-                <div id="supportView" class="view-section">
+                <div id="donateView" class="view-section">
                     <div class="card">
                         <div class="card-header">
                             <h3>Support FilterTube</h3>

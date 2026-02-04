@@ -118,6 +118,29 @@ const RenderEngine = (() => {
                 : state.keywords);
         let displayKeywords = [...keywordsSource];
 
+        // If syncing Kids → Main, include ALL kids keywords (both blocked and whitelist)
+        // Respect Main's mode: only show synced keywords in the active list view
+        // Merge BEFORE sorting so Kids entries are interleaved by time
+        if (profile !== 'kids' && state.syncKidsToMain) {
+            const kidsBlockedKeywords = Array.isArray(state.kids?.blockedKeywords) ? state.kids.blockedKeywords : [];
+            const kidsWhitelistKeywords = Array.isArray(state.kids?.whitelistKeywords) ? state.kids.whitelistKeywords : [];
+            const allKidsKeywords = [...kidsBlockedKeywords, ...kidsWhitelistKeywords];
+            // Use the appropriate main keywords based on mode
+            const mainKeywords = mainMode === 'whitelist'
+                ? (Array.isArray(state.whitelistKeywords) ? state.whitelistKeywords : [])
+                : (Array.isArray(state.keywords) ? state.keywords : []);
+            const seen = new Set(mainKeywords.map(k => (typeof k === 'object' ? k.word : String(k)).toLowerCase()));
+            const kidsOnly = [];
+            allKidsKeywords.forEach(k => {
+                const word = typeof k === 'object' ? k.word : String(k);
+                if (!seen.has(word.toLowerCase())) {
+                    seen.add(word.toLowerCase());
+                    kidsOnly.push(k);
+                }
+            });
+            displayKeywords = [...displayKeywords, ...kidsOnly];
+        }
+
         // Apply search filter
         if (showSearch && searchValue) {
             const search = searchValue.toLowerCase();
@@ -138,16 +161,15 @@ const RenderEngine = (() => {
             });
         }
 
-        // Apply sorting
-        if (showSort) {
-            if (sortValue === 'az') {
-                displayKeywords.sort((a, b) => a.word.localeCompare(b.word));
-            } else if (sortValue === 'oldest') {
-                displayKeywords.sort((a, b) => safeTimestamp(a.addedAt) - safeTimestamp(b.addedAt));
-            } else {
-                // newest
-                displayKeywords.sort((a, b) => safeTimestamp(b.addedAt) - safeTimestamp(a.addedAt));
-            }
+        // Apply sorting - always sort by time for proper Kids/Main interleaving
+        // showSort only controls whether sort UI dropdown is shown
+        if (showSort && sortValue === 'az') {
+            displayKeywords.sort((a, b) => a.word.localeCompare(b.word));
+        } else if (showSort && sortValue === 'oldest') {
+            displayKeywords.sort((a, b) => safeTimestamp(a.addedAt) - safeTimestamp(b.addedAt));
+        } else {
+            // Default: newest first (for proper interleaving of Kids entries)
+            displayKeywords.sort((a, b) => safeTimestamp(b.addedAt) - safeTimestamp(a.addedAt));
         }
 
         // Clear container
@@ -442,18 +464,26 @@ const RenderEngine = (() => {
                 ? (Array.isArray(state.whitelistChannels) ? state.whitelistChannels : [])
                 : state.channels);
 
-        if (profile !== 'kids' && state.syncKidsToMain && mainMode !== 'whitelist') {
-            const kidsChannels = Array.isArray(state.kids?.blockedChannels) ? state.kids.blockedChannels : [];
-            const mainChannels = Array.isArray(state.channels) ? state.channels : [];
+        // If syncing Kids → Main, include ALL kids channels (both blocked and whitelist)
+        // Respect Main's mode: only show synced channels in the active list view
+        // Merge BEFORE sorting so Kids entries are interleaved by time
+        if (profile !== 'kids' && state.syncKidsToMain) {
+            const kidsBlocked = Array.isArray(state.kids?.blockedChannels) ? state.kids.blockedChannels : [];
+            const kidsWhitelist = Array.isArray(state.kids?.whitelistChannels) ? state.kids.whitelistChannels : [];
+            const allKidsChannels = [...kidsBlocked, ...kidsWhitelist];
+            // Use the appropriate main channels based on mode
+            const mainChannels = mainMode === 'whitelist'
+                ? (Array.isArray(state.whitelistChannels) ? state.whitelistChannels : [])
+                : (Array.isArray(state.channels) ? state.channels : []);
             const seen = new Set(mainChannels.map(deriveChannelKey).filter(Boolean));
             const kidsOnly = [];
-            kidsChannels.forEach(ch => {
+            allKidsChannels.forEach(ch => {
                 const key = deriveChannelKey(ch);
                 if (!key || seen.has(key)) return;
                 seen.add(key);
                 kidsOnly.push({ ...ch, __ftFromKids: true });
             });
-            channelsSource = [...mainChannels, ...kidsOnly];
+            channelsSource = [...channelsSource, ...kidsOnly];
         }
 
         const { groups: collaborationGroups } = groupChannelsByCollaboration(state.channels);
@@ -481,14 +511,15 @@ const RenderEngine = (() => {
             });
         }
 
-        if (showSort) {
-            if (sortValue === 'az') {
-                displayChannels.sort((a, b) => (a.name || a.id).localeCompare(b.name || b.id));
-            } else if (sortValue === 'oldest') {
-                displayChannels.sort((a, b) => safeTimestamp(a.addedAt) - safeTimestamp(b.addedAt));
-            } else {
-                displayChannels.sort((a, b) => safeTimestamp(b.addedAt) - safeTimestamp(a.addedAt));
-            }
+        // Apply sorting - always sort by time for proper Kids/Main interleaving
+        // showSort only controls whether sort UI dropdown is shown
+        if (showSort && sortValue === 'az') {
+            displayChannels.sort((a, b) => (a.name || a.id).localeCompare(b.name || b.id));
+        } else if (showSort && sortValue === 'oldest') {
+            displayChannels.sort((a, b) => safeTimestamp(a.addedAt) - safeTimestamp(b.addedAt));
+        } else {
+            // Default: newest first (for proper interleaving of Kids entries)
+            displayChannels.sort((a, b) => safeTimestamp(b.addedAt) - safeTimestamp(a.addedAt));
         }
 
         container.innerHTML = '';
@@ -766,11 +797,6 @@ const RenderEngine = (() => {
         const controls = document.createElement('div');
         controls.className = 'keyword-controls';
 
-        if (channel?.__ftFromKids) {
-            const badge = createKidsSyncBadge();
-            if (badge instanceof Node) controls.appendChild(badge);
-        }
-
         const deleteHandler = async () => {
             if (profile === 'kids') {
                 await StateManager?.removeKidsChannel?.(index);
@@ -962,7 +988,11 @@ const RenderEngine = (() => {
         const mainMode = state?.mode === 'whitelist' ? 'whitelist' : 'blocklist';
         const kidsMode = state?.kids?.mode === 'whitelist' ? 'whitelist' : 'blocklist';
 
-        if (profile === 'kids' ? (kidsMode === 'whitelist') : (mainMode === 'whitelist')) {
+        // For synced channels (__ftFromKids), use Main's mode since they're displayed in Main's list
+        const isFromKids = !!channel?.__ftFromKids;
+        const effectiveMode = isFromKids ? mainMode : (profile === 'kids' ? kidsMode : mainMode);
+
+        if (effectiveMode === 'whitelist') {
             const spacer = document.createElement('div');
             spacer.className = 'filter-all-toggle disabled';
             spacer.style.visibility = 'hidden';
@@ -998,7 +1028,12 @@ const RenderEngine = (() => {
         const state = StateManager?.getState?.() || {};
         const mainMode = state?.mode === 'whitelist' ? 'whitelist' : 'blocklist';
         const kidsMode = state?.kids?.mode === 'whitelist' ? 'whitelist' : 'blocklist';
-        if (profile === 'kids' ? (kidsMode === 'whitelist') : (mainMode === 'whitelist')) {
+
+        // For synced channels (__ftFromKids), use Main's mode since they're displayed in Main's list
+        const isFromKids = !!channel?.__ftFromKids;
+        const effectiveMode = isFromKids ? mainMode : (profile === 'kids' ? kidsMode : mainMode);
+
+        if (effectiveMode === 'whitelist') {
             const spacer = document.createElement('div');
             spacer.className = 'exact-toggle toggle-variant-red disabled';
             spacer.style.visibility = 'hidden';

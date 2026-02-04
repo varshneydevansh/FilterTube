@@ -86,6 +86,7 @@ const StateManager = (() => {
         hideSubscriptions: false,
         hideSearchShelves: false,
         stats: { hiddenCount: 0, savedMinutes: 0 },
+        statsBySurface: {},
         channelMap: {},
         theme: 'light',
         isLoaded: false,
@@ -98,6 +99,27 @@ const StateManager = (() => {
             strictMode: true,
             videoIds: [],
             subscriptions: []
+        },
+        contentFilters: {
+            duration: {
+                enabled: false,
+                condition: 'between', // 'longer', 'shorter', 'between'
+                value: '',
+                minMinutes: 0,
+                maxMinutes: 0
+            },
+            uploadDate: {
+                enabled: false,
+                condition: 'newer', // 'newer', 'older', 'between'
+                value: '',
+                fromDate: '',
+                toDate: ''
+            },
+            uppercase: {
+                enabled: false,
+                mode: 'single_word',
+                minWordLength: 2
+            }
         }
     };
 
@@ -184,9 +206,18 @@ const StateManager = (() => {
         state.hideSubscriptions = data.hideSubscriptions || false;
         state.hideSearchShelves = data.hideSearchShelves || false;
         state.stats = data.stats || { hiddenCount: 0, savedMinutes: 0 };
+        state.statsBySurface = (data.statsBySurface && typeof data.statsBySurface === 'object' && !Array.isArray(data.statsBySurface))
+            ? data.statsBySurface
+            : {};
         state.channelMap = data.channelMap || {};
         state.theme = data.theme || 'light';
         state.syncKidsToMain = false;
+        state.contentFilters = data.contentFilters ? JSON.parse(JSON.stringify(data.contentFilters)) : {
+            duration: { enabled: false, minMinutes: 0, maxMinutes: 0, condition: 'between' },
+            uploadDate: { enabled: false, fromDate: '', toDate: '' },
+            uppercase: { enabled: false, mode: 'single_word', minWordLength: 2 }
+        };
+
         const pickActiveProfileFromV4 = () => {
             if (!profilesV4 || typeof profilesV4 !== 'object' || Array.isArray(profilesV4)) return null;
             const activeId = typeof profilesV4.activeProfileId === 'string' ? profilesV4.activeProfileId.trim() : '';
@@ -238,6 +269,11 @@ const StateManager = (() => {
             state.mode = mainFromV4.mode === 'whitelist' ? 'whitelist' : 'blocklist';
             state.whitelistChannels = Array.isArray(mainFromV4.whitelistChannels) ? mainFromV4.whitelistChannels : [];
             state.whitelistKeywords = Array.isArray(mainFromV4.whitelistKeywords) ? mainFromV4.whitelistKeywords : [];
+            // Also load blocklist channels/keywords from profile
+            state.channels = Array.isArray(mainFromV4.channels) ? mainFromV4.channels : 
+                (Array.isArray(mainFromV4.blockedChannels) ? mainFromV4.blockedChannels : []);
+            state.keywords = Array.isArray(mainFromV4.keywords) ? mainFromV4.keywords : 
+                (Array.isArray(mainFromV4.blockedKeywords) ? mainFromV4.blockedKeywords : []);
         } else if (profilesV3 && profilesV3.main) {
             state.mode = profilesV3.main.mode === 'whitelist' ? 'whitelist' : 'blocklist';
             state.whitelistChannels = profilesV3.main.whitelistChannels
@@ -245,6 +281,13 @@ const StateManager = (() => {
                 || [];
             state.whitelistKeywords = profilesV3.main.whitelistKeywords
                 || profilesV3.main.whitelistedKeywords
+                || [];
+            // Also load blocklist channels/keywords from profile
+            state.channels = profilesV3.main.channels
+                || profilesV3.main.blockedChannels
+                || [];
+            state.keywords = profilesV3.main.keywords
+                || profilesV3.main.blockedKeywords
                 || [];
         } else {
             state.mode = 'blocklist';
@@ -886,7 +929,8 @@ const StateManager = (() => {
                 hideExploreTrending: state.hideExploreTrending,
                 hideMoreFromYouTube: state.hideMoreFromYouTube,
                 hideSubscriptions: state.hideSubscriptions,
-                hideSearchShelves: state.hideSearchShelves
+                hideSearchShelves: state.hideSearchShelves,
+                contentFilters: state.contentFilters
             });
 
             if (broadcast && result.compiledSettings) {
@@ -932,7 +976,14 @@ const StateManager = (() => {
                             : (Array.isArray(existing?.main?.whitelistedChannels) ? existing.main.whitelistedChannels : []),
                         whitelistedKeywords: Array.isArray(nextMain?.whitelistKeywords)
                             ? nextMain.whitelistKeywords
-                            : (Array.isArray(existing?.main?.whitelistedKeywords) ? existing.main.whitelistedKeywords : [])
+                            : (Array.isArray(existing?.main?.whitelistedKeywords) ? existing.main.whitelistedKeywords : []),
+                        // Also persist blocklist channels/keywords
+                        channels: Array.isArray(nextMain?.channels)
+                            ? nextMain.channels
+                            : (Array.isArray(existing?.main?.channels) ? existing.main.channels : []),
+                        keywords: Array.isArray(nextMain?.keywords)
+                            ? nextMain.keywords
+                            : (Array.isArray(existing?.main?.keywords) ? existing.main.keywords : [])
                     }
                 };
                 await io.saveProfilesV3(merged);
@@ -1296,8 +1347,14 @@ const StateManager = (() => {
             state.keywords = state.userKeywords;
             return;
         }
+        let channelsForKeywords = state.channels;
+        if (state.syncKidsToMain) {
+            const kidsBlocked = Array.isArray(state.kids?.blockedChannels) ? state.kids.blockedChannels : [];
+            const kidsWhitelist = Array.isArray(state.kids?.whitelistChannels) ? state.kids.whitelistChannels : [];
+            channelsForKeywords = [...(Array.isArray(state.channels) ? state.channels : []), ...kidsBlocked, ...kidsWhitelist];
+        }
 
-        state.keywords = SettingsAPI.syncFilterAllKeywords(state.userKeywords, state.channels);
+        state.keywords = SettingsAPI.syncFilterAllKeywords(state.userKeywords, channelsForKeywords);
     }
 
     // ============================================================================
@@ -1676,6 +1733,33 @@ const StateManager = (() => {
         }
     }
 
+    /**
+     * Update content filter settings (duration, uploadDate)
+     * @param {Object} nextContentFilters - Partial contentFilters object to merge
+     * @returns {Promise<void>}
+     */
+    async function updateContentFilters(nextContentFilters) {
+        await ensureLoaded();
+
+        if (isUiLocked()) {
+            await loadSettings();
+            return;
+        }
+
+        if (!nextContentFilters || typeof nextContentFilters !== 'object') return;
+
+        state.contentFilters = {
+            duration: { ...state.contentFilters.duration, ...(nextContentFilters.duration || {}) },
+            uploadDate: { ...state.contentFilters.uploadDate, ...(nextContentFilters.uploadDate || {}) },
+            uppercase: { ...state.contentFilters.uppercase, ...(nextContentFilters.uppercase || {}) }
+        };
+
+        await saveSettings();
+        await requestRefresh('main');
+        notifyListeners('contentFiltersUpdated', { contentFilters: state.contentFilters });
+        scheduleAutoBackup('content_filters_updated');
+    }
+
     // ============================================================================
     // THEME MANAGEMENT
     // ============================================================================
@@ -1903,6 +1987,7 @@ const StateManager = (() => {
 
         // Settings
         updateSetting,
+        updateContentFilters,
 
         // Theme
         toggleTheme,

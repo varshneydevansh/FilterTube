@@ -243,3 +243,365 @@ YouTube JSON Data → FilterTubeEngine.processData() → Filtered Data → YouTu
 - **CSP Compliance**: Respects all Content Security Policy restrictions
 
 This data interception approach represents a significant advancement over traditional DOM-based filtering, providing superior performance, user experience, and future-proof operation.
+## Content-Based Filtering (v3.2.6)
+
+### Overview
+
+FilterTube v3.2.6 introduces three new content-based filters that analyze video metadata and titles to provide granular content control beyond channel and keyword blocking:
+
+1. **Duration Filter** - Filter videos by length (longer/shorter/between)
+2. **Upload Date Filter** - Filter videos by publish date (newer/older/between)
+3. **Uppercase Filter** - Detect and filter clickbait-style ALL CAPS titles
+
+### Duration Filter
+
+**Purpose:** Hide videos based on their length to curate content that fits your viewing preferences.
+
+**Conditions:**
+- `longer` - Hide videos longer than specified duration
+- `shorter` - Hide videos shorter than specified duration
+- `between` - Hide videos outside the specified range (too short OR too long)
+
+**Configuration:**
+
+```javascript
+contentFilters: {
+    duration: {
+        enabled: true,
+        condition: 'between',  // 'longer' | 'shorter' | 'between'
+        minMinutes: 5,         // Minimum duration (for 'longer' and 'between')
+        maxMinutes: 20         // Maximum duration (for 'between' only)
+    }
+}
+```
+
+**Data Sources (Priority Order):**
+
+1. **videoMetaMap Cache** - Persistent storage of extracted durations
+   ```javascript
+   videoMetaMap['dQw4w9WgXcQ'].lengthSeconds // 212
+   ```
+
+2. **Player Microformat** - From `ytInitialPlayerResponse`
+   ```javascript
+   microformat.playerMicroformatRenderer.lengthSeconds // "212"
+   ```
+
+3. **Video Details** - Fallback from player response
+   ```javascript
+   videoDetails.lengthSeconds // "212"
+   ```
+
+4. **DOM Overlays** - Thumbnail time badges
+   ```javascript
+   thumbnailOverlays[].thumbnailOverlayTimeStatusRenderer.text // "3:32"
+   lengthText.simpleText // "1:38:14"
+   ```
+
+**Duration Parsing:**
+
+```javascript
+// Supports multiple formats
+"3:32"      → 212 seconds
+"1:38:14"   → 5894 seconds
+"212"       → 212 seconds (numeric string)
+212         → 212 seconds (number)
+```
+
+**Use Cases:**
+
+- Hide long-form content (podcasts, lectures) when browsing casually
+- Filter out short clips when looking for in-depth content
+- Find videos in the "sweet spot" (e.g., 5-20 minutes for tutorials)
+
+**Example Scenarios:**
+
+```ascii
+Condition: "between" (5-20 minutes)
+┌───────────────────────────────────────────┐
+│ Video A: 3 minutes   → HIDDEN (too short) │
+│ Video B: 12 minutes  → SHOWN ✓            │
+│ Video C: 45 minutes  → HIDDEN (too long)  │
+│ Video D: 8 minutes   → SHOWN ✓            │
+└───────────────────────────────────────────┘
+
+Condition: "longer" (10 minutes)
+┌─────────────────────────────────────────┐
+│ Video A: 5 minutes   → SHOWN ✓          │
+│ Video B: 15 minutes  → HIDDEN           │
+│ Video C: 8 minutes   → SHOWN ✓          │
+│ Video D: 30 minutes  → HIDDEN           │
+└─────────────────────────────────────────┘
+```
+
+### Upload Date Filter
+
+**Purpose:** Filter videos based on when they were published to focus on recent or archival content.
+
+**Conditions:**
+- `newer` - Hide videos published after specified date
+- `older` - Hide videos published before specified date
+- `between` - Hide videos outside the specified date range
+
+**Configuration:**
+
+```javascript
+contentFilters: {
+    uploadDate: {
+        enabled: true,
+        condition: 'newer',     // 'newer' | 'older' | 'between'
+        fromDate: '2024-01-01', // ISO date string (YYYY-MM-DD)
+        toDate: '2024-12-31'    // For 'between' only
+    }
+}
+```
+
+**Data Sources (Priority Order):**
+
+1. **videoMetaMap Cache** - Persistent storage
+   ```javascript
+   videoMetaMap['dQw4w9WgXcQ'].publishDate   // "2009-10-25"
+   videoMetaMap['dQw4w9WgXcQ'].uploadDate    // "2009-10-25T07:05:00Z"
+   ```
+
+2. **Player Microformat** - From `ytInitialPlayerResponse`
+   ```javascript
+   microformat.playerMicroformatRenderer.publishDate  // "2024-01-15"
+   microformat.playerMicroformatRenderer.uploadDate   // "2024-01-15T10:30:00Z"
+   ```
+
+3. **DOM Text** - Relative time parsing
+   ```javascript
+   publishedTimeText.simpleText // "5 years ago"
+   ```
+
+**Relative Time Parsing:**
+
+FilterTube parses relative time strings and converts them to approximate timestamps:
+
+```javascript
+"5 years ago"    → ~2019-02-04 (current date - 5 years)
+"3 months ago"   → ~2023-11-04 (current date - 3 months)
+"2 weeks ago"    → ~2024-01-21 (current date - 2 weeks)
+"1 day ago"      → ~2024-02-03 (current date - 1 day)
+```
+
+**Approximation Logic:**
+
+```javascript
+const approximations = {
+    year: 365.25 * 24 * 60 * 60 * 1000,
+    month: 30.44 * 24 * 60 * 60 * 1000,  // Average month
+    week: 7 * 24 * 60 * 60 * 1000,
+    day: 24 * 60 * 60 * 1000
+};
+
+// "5 years ago" → Date.now() - (5 * approximations.year)
+```
+
+**Use Cases:**
+
+- Hide old content when looking for current news/trends
+- Filter out recent uploads when researching historical topics
+- Focus on content from a specific time period (e.g., 2020-2022)
+
+**Example Scenarios:**
+
+```ascii
+Condition: "older" (2023-01-01)
+┌─────────────────────────────────────────┐
+│ Video A: 2022-05-15  → HIDDEN           │
+│ Video B: 2023-06-20  → SHOWN ✓          │
+│ Video C: 2021-12-01  → HIDDEN           │
+│ Video D: 2024-01-10  → SHOWN ✓          │
+└─────────────────────────────────────────┘
+
+Condition: "between" (2023-01-01 to 2023-12-31)
+┌─────────────────────────────────────────┐
+│ Video A: 2022-11-15  → HIDDEN (too old) │
+│ Video B: 2023-06-20  → SHOWN ✓          │
+│ Video C: 2024-02-01  → HIDDEN (too new) │
+│ Video D: 2023-03-15  → SHOWN ✓          │
+└─────────────────────────────────────────┘
+```
+
+### Uppercase Filter
+
+**Purpose:** Detect and filter videos with ALL CAPS titles, commonly used in clickbait content.
+
+**Modes:**
+- `single_word` - Hide if ANY single word is all uppercase (e.g., "SHOCKING reveal")
+- `all_words` - Hide if ALL words are uppercase (e.g., "SHOCKING REVEAL EXPOSED")
+- `percentage` - Hide if percentage of uppercase characters exceeds threshold
+
+**Configuration:**
+
+```javascript
+contentFilters: {
+    uppercase: {
+        enabled: true,
+        mode: 'single_word',    // 'single_word' | 'all_words' | 'percentage'
+        minWordLength: 2,       // Ignore short words (e.g., "A", "I")
+        percentageThreshold: 50 // For 'percentage' mode only
+    }
+}
+```
+
+**Detection Logic:**
+
+**Single Word Mode:**
+```javascript
+const words = title.split(/\s+/);
+for (const word of words) {
+    if (word.length < minWordLength) continue;
+    if (word === word.toUpperCase() && /[A-Z]/.test(word)) {
+        return true; // Hide video
+    }
+}
+```
+
+**All Words Mode:**
+```javascript
+const words = title.split(/\s+/).filter(w => w.length >= minWordLength);
+const allCaps = words.every(w => w === w.toUpperCase() && /[A-Z]/.test(w));
+return allCaps; // Hide if all words are uppercase
+```
+
+**Percentage Mode:**
+```javascript
+const totalChars = title.replace(/[^a-zA-Z]/g, '').length;
+const uppercaseChars = title.replace(/[^A-Z]/g, '').length;
+const percentage = (uppercaseChars / totalChars) * 100;
+return percentage > percentageThreshold; // Hide if exceeds threshold
+```
+
+**Use Cases:**
+
+- Filter clickbait content with sensationalized titles
+- Remove videos with excessive capitalization
+- Curate a feed with professional, well-formatted titles
+
+**Example Scenarios:**
+
+```ascii
+Mode: "single_word" (minWordLength: 2)
+┌─────────────────────────────────────────────────────────┐
+│ "SHOCKING reveal about AI"        → HIDDEN (SHOCKING)   │
+│ "Amazing AI breakthrough"         → SHOWN ✓             │
+│ "I tried this CRAZY experiment"   → HIDDEN (CRAZY)      │
+│ "The future of technology"        → SHOWN ✓             │
+└─────────────────────────────────────────────────────────┘
+
+Mode: "all_words"
+┌─────────────────────────────────────────────────────────┐
+│ "SHOCKING REVEAL ABOUT AI"        → HIDDEN (all caps)   │
+│ "SHOCKING reveal about AI"        → SHOWN ✓ (mixed)     │
+│ "THE ULTIMATE GUIDE"              → HIDDEN (all caps)   │
+│ "The Ultimate Guide"              → SHOWN ✓             │
+└─────────────────────────────────────────────────────────┘
+
+Mode: "percentage" (threshold: 50%)
+┌─────────────────────────────────────────────────────────┐
+│ "SHOCKING AI NEWS"                → HIDDEN (100% caps)  │
+│ "SHOCKING ai news"                → HIDDEN (67% caps)   │
+│ "Shocking AI News"                → SHOWN ✓ (33% caps)  │
+│ "shocking ai news"                → SHOWN ✓ (0% caps)   │
+└─────────────────────────────────────────────────────────┘
+```
+
+### Combined Filtering
+
+All three content filters work in conjunction with channel and keyword filters:
+
+```ascii
+Video Filtering Decision Tree
+┌─────────────────────────────────────────┐
+│ Video Card Detected                     │
+└──────────────┬──────────────────────────┘
+               │
+               ├─→ Channel Filter → HIDE if blocked
+               │
+               ├─→ Keyword Filter → HIDE if matched
+               │
+               ├─→ Duration Filter → HIDE if outside range
+               │
+               ├─→ Upload Date Filter → HIDE if outside range
+               │
+               ├─→ Uppercase Filter → HIDE if detected
+               │
+               └─→ SHOW if all filters pass
+```
+
+**Example Combined Scenario:**
+
+```javascript
+// User Configuration
+{
+    blockedChannels: ['@ClickbaitChannel'],
+    blockedKeywords: ['drama', 'exposed'],
+    contentFilters: {
+        duration: { enabled: true, condition: 'between', minMinutes: 5, maxMinutes: 20 },
+        uploadDate: { enabled: true, condition: 'newer', fromDate: '2024-01-01' },
+        uppercase: { enabled: true, mode: 'single_word', minWordLength: 2 }
+    }
+}
+
+// Video Analysis
+Video A: "@TechChannel" | "SHOCKING AI News" | 12 min | 2024-02-01
+→ HIDDEN (uppercase filter: "SHOCKING")
+
+Video B: "@ClickbaitChannel" | "Amazing discovery" | 10 min | 2024-02-01
+→ HIDDEN (channel filter: blocked)
+
+Video C: "@TechChannel" | "AI tutorial" | 3 min | 2024-02-01
+→ HIDDEN (duration filter: too short)
+
+Video D: "@TechChannel" | "AI tutorial" | 12 min | 2023-12-15
+→ HIDDEN (upload date filter: too old)
+
+Video E: "@TechChannel" | "AI tutorial" | 12 min | 2024-02-01
+→ SHOWN ✓ (passes all filters)
+```
+
+## Dashboard Improvements (v3.2.6)
+
+### Surface-Specific Stats Tracking
+
+FilterTube now tracks statistics separately for YouTube Main and YouTube Kids:
+
+**Data Structure:**
+
+```javascript
+statsBySurface: {
+    main: {
+        videosHiddenToday: 42,
+        timeSavedToday: 7920000,  // milliseconds
+        lastResetDate: '2024-02-04'
+    },
+    kids: {
+        videosHiddenToday: 15,
+        timeSavedToday: 2700000,
+        lastResetDate: '2024-02-04'
+    }
+}
+```
+
+**Dashboard Toggle:**
+
+Users can switch between Main and Kids stats views with toggle buttons:
+
+```ascii
+┌──────────────────────────────────────┐
+│  📊 Statistics                       │
+│  ────────────────────────────────────│
+│                                      │
+│  [ Main ] [ Kids ]  ← Toggle buttons │
+│                                      │
+│  ┌─────────────┐  ┌─────────────┐    │
+│  │   Videos    │  │    Time     │    │
+│  │   Hidden    │  │    Saved    │    │
+│  │             │  │             │    │
+│  │     42      │  │   2h 12m    │    │
+│  └─────────────┘  └─────────────┘    │
+└──────────────────────────────────────┘
+```

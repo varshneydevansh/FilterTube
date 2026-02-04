@@ -1,6 +1,15 @@
-# FilterTube v3.2.1+ Code Map (Performance Optimizations)
+# FilterTube v3.2.6 Code Map (UI/UX Improvements & Content Filters)
 
-This document provides a detailed reference of the key files and functions in the FilterTube v3.2.1+ codebase with performance optimizations.
+This document provides a detailed reference of the key files and functions in the FilterTube v3.2.6 codebase with performance optimizations, UI/UX improvements, and content-based filtering.
+
+## New in v3.2.6
+
+- **Typography Overhaul**: Modern sans-serif design system (Inter font family)
+- **Content Filters**: Duration, upload date, and uppercase detection filters
+- **videoMetaMap**: Persistent video metadata storage for advanced filtering
+- **UI Enhancements**: Refined dropdowns with left accent borders, improved buttons and toggles
+- **Kids Mode Theming**: Pink/purple gradient design system
+- **Dark Mode**: Enhanced contrast and consistent styling
 
 ## Directory Structure
 

@@ -10,6 +10,72 @@
 // ============================================================================
 
 function initializeFiltersTabs() {
+    // Helper function to create compact inline condition rows
+    function createCompactCondition({ name, value, labelText, fields }) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'video-filter-compact-option';
+
+        const mainRow = document.createElement('div');
+        mainRow.className = 'video-filter-compact-main';
+
+        const radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = name;
+        radio.value = value;
+        radio.id = `${name}_${value}`;
+        radio.className = 'video-filter-compact-radio';
+
+        const label = document.createElement('label');
+        label.htmlFor = `${name}_${value}`;
+        label.textContent = labelText;
+        label.className = 'video-filter-compact-label';
+
+        mainRow.appendChild(radio);
+        mainRow.appendChild(label);
+
+        const fieldsWrap = document.createElement('div');
+        fieldsWrap.className = 'video-filter-compact-fields';
+
+        fields.forEach((field) => {
+            if (field.type === 'text') {
+                const span = document.createElement('span');
+                span.textContent = field.text;
+                span.className = 'video-filter-compact-text';
+                fieldsWrap.appendChild(span);
+                return;
+            }
+
+            if (field.type === 'select') {
+                const select = document.createElement('select');
+                select.className = 'video-filter-compact-select';
+                select.id = field.id;
+                if (field.width) select.style.width = field.width;
+                field.options.forEach(opt => {
+                    const option = document.createElement('option');
+                    option.value = opt.value;
+                    option.textContent = opt.label;
+                    select.appendChild(option);
+                });
+                fieldsWrap.appendChild(select);
+                return;
+            }
+
+            const input = document.createElement('input');
+            input.type = field.type || 'number';
+            input.className = 'video-filter-compact-input';
+            input.id = field.id;
+            input.placeholder = field.placeholder || '';
+            if (field.width) input.style.width = field.width;
+            if (field.min !== undefined) input.min = field.min;
+            fieldsWrap.appendChild(input);
+        });
+
+        wrapper.appendChild(mainRow);
+        wrapper.appendChild(fieldsWrap);
+
+        return wrapper;
+    }
+
     const container = document.getElementById('filtersTabsContainer');
     if (!container) return;
 
@@ -45,9 +111,9 @@ function initializeFiltersTabs() {
                 </select>
             </div>
             <div class="date-inputs">
-                <input type="date" id="keywordDateFrom" class="select-input date-input" />
+                <input type="date" id="keywordDateFrom" class="select-input date-input custom-date-input" />
                 <span class="date-sep">to</span>
-                <input type="date" id="keywordDateTo" class="select-input date-input" />
+                <input type="date" id="keywordDateTo" class="select-input date-input custom-date-input" />
                 <button id="keywordDateClear" class="btn-secondary date-clear-btn" type="button">Clear</button>
             </div>
         </div>
@@ -87,9 +153,9 @@ function initializeFiltersTabs() {
                 </select>
             </div>
             <div class="date-inputs">
-                <input type="date" id="channelDateFrom" class="select-input date-input" />
+                <input type="date" id="channelDateFrom" class="select-input date-input custom-date-input" />
                 <span class="date-sep">to</span>
-                <input type="date" id="channelDateTo" class="select-input date-input" />
+                <input type="date" id="channelDateTo" class="select-input date-input custom-date-input" />
                 <button id="channelDateClear" class="btn-secondary date-clear-btn" type="button">Clear</button>
             </div>
         </div>
@@ -207,6 +273,633 @@ function initializeFiltersTabs() {
         contentTab.appendChild(groupEl);
     });
 
+    // Video Filters Section (placed below existing toggles as per spec)
+    const videoFiltersSection = document.createElement('div');
+    videoFiltersSection.className = 'content-control-group video-filters-section';
+    videoFiltersSection.style.marginTop = '20px';
+    videoFiltersSection.style.borderTop = '1px solid var(--ft-color-sem-neutral-border)';
+
+    const videoFiltersHeader = document.createElement('div');
+    videoFiltersHeader.className = 'content-control-group__header';
+
+    const videoFiltersTitle = document.createElement('div');
+    videoFiltersTitle.className = 'content-control-group__title';
+    videoFiltersTitle.textContent = 'Advance Video Filters';
+
+    videoFiltersHeader.appendChild(videoFiltersTitle);
+    videoFiltersSection.appendChild(videoFiltersHeader);
+
+    const videoFiltersRows = document.createElement('div');
+    videoFiltersRows.className = 'content-control-group__rows';
+
+    // Duration filter - single row with toggle, conditions show inline when enabled
+    const durationRow = document.createElement('div');
+    durationRow.className = 'toggle-row';
+    durationRow.setAttribute('data-ft-control-row', 'true');
+
+    const durationInfo = document.createElement('div');
+    durationInfo.className = 'toggle-info';
+
+    const durationTitle = document.createElement('div');
+    durationTitle.className = 'toggle-title';
+    durationTitle.textContent = 'Duration Filter';
+
+    const durationDesc = document.createElement('div');
+    durationDesc.className = 'toggle-description';
+    durationDesc.textContent = '';
+    durationTitle.title = 'Filter videos by length (minutes)';
+
+    durationInfo.appendChild(durationTitle);
+    durationInfo.appendChild(durationDesc);
+
+    const durationToggle = document.createElement('label');
+    durationToggle.className = 'switch';
+
+    const durationCheckbox = document.createElement('input');
+    durationCheckbox.type = 'checkbox';
+    durationCheckbox.id = 'videoFilter_duration_enabled';
+
+    const durationSlider = document.createElement('span');
+    durationSlider.className = 'slider round';
+
+    durationToggle.appendChild(durationCheckbox);
+    durationToggle.appendChild(durationSlider);
+
+    durationRow.appendChild(durationInfo);
+    durationRow.appendChild(durationToggle);
+    videoFiltersRows.appendChild(durationRow);
+
+    // Duration conditions (inline, shown when enabled)
+    const durationConditionsRow = document.createElement('div');
+    durationConditionsRow.className = 'video-filter-conditions-row';
+    durationConditionsRow.id = 'durationConditionsRow';
+
+    const durationConditionsWrap = document.createElement('div');
+    durationConditionsWrap.className = 'video-filter-conditions';
+
+    const longerRadio = createCompactCondition({
+        name: 'videoFilter_duration_condition',
+        value: 'longer',
+        labelText: 'Block longer than',
+        fields: [
+            { id: 'videoFilter_duration_longer_value', type: 'number', placeholder: '60', min: 1, width: '50px' },
+            { type: 'text', text: 'min' }
+        ]
+    });
+    const shorterRadio = createCompactCondition({
+        name: 'videoFilter_duration_condition',
+        value: 'shorter',
+        labelText: 'Block shorter than',
+        fields: [
+            { id: 'videoFilter_duration_shorter_value', type: 'number', placeholder: '5', min: 1, width: '50px' },
+            { type: 'text', text: 'min' }
+        ]
+    });
+    const betweenRadio = createCompactCondition({
+        name: 'videoFilter_duration_condition',
+        value: 'between',
+        labelText: 'Only between',
+        fields: [
+            { id: 'videoFilter_duration_between_min', type: 'number', placeholder: '10', min: 1, width: '50px' },
+            { type: 'text', text: '-' },
+            { id: 'videoFilter_duration_between_max', type: 'number', placeholder: '120', min: 1, width: '50px' },
+            { type: 'text', text: 'min' }
+        ]
+    });
+
+    durationConditionsWrap.appendChild(longerRadio);
+    durationConditionsWrap.appendChild(shorterRadio);
+    durationConditionsWrap.appendChild(betweenRadio);
+    durationConditionsRow.appendChild(durationConditionsWrap);
+    videoFiltersRows.appendChild(durationConditionsRow);
+
+    // Upload Date filter - single row with toggle, conditions show inline when enabled
+    const uploadDateRow = document.createElement('div');
+    uploadDateRow.className = 'toggle-row';
+    uploadDateRow.setAttribute('data-ft-control-row', 'true');
+
+    const uploadDateInfo = document.createElement('div');
+    uploadDateInfo.className = 'toggle-info';
+
+    const uploadDateTitle = document.createElement('div');
+    uploadDateTitle.className = 'toggle-title';
+    uploadDateTitle.textContent = 'Upload Date Filter';
+
+    const uploadDateDesc = document.createElement('div');
+    uploadDateDesc.className = 'toggle-description';
+    uploadDateDesc.textContent = '';
+    uploadDateTitle.title = 'Filter by absolute date range';
+
+    uploadDateInfo.appendChild(uploadDateTitle);
+    uploadDateInfo.appendChild(uploadDateDesc);
+
+    const uploadDateToggle = document.createElement('label');
+    uploadDateToggle.className = 'switch';
+
+    const uploadDateCheckbox = document.createElement('input');
+    uploadDateCheckbox.type = 'checkbox';
+    uploadDateCheckbox.id = 'videoFilter_uploadDate_enabled';
+
+    const uploadDateSlider = document.createElement('span');
+    uploadDateSlider.className = 'slider round';
+
+    uploadDateToggle.appendChild(uploadDateCheckbox);
+    uploadDateToggle.appendChild(uploadDateSlider);
+
+    uploadDateRow.appendChild(uploadDateInfo);
+    uploadDateRow.appendChild(uploadDateToggle);
+    videoFiltersRows.appendChild(uploadDateRow);
+
+    // Upload date conditions (inline, shown when enabled)
+    const uploadDateConditionsRow = document.createElement('div');
+    uploadDateConditionsRow.className = 'video-filter-conditions-row';
+    uploadDateConditionsRow.id = 'uploadDateConditionsRow';
+
+    const uploadDateConditionsWrap = document.createElement('div');
+    uploadDateConditionsWrap.className = 'video-filter-conditions';
+
+    const unitOptions = [
+        { value: 'days', label: 'days' },
+        { value: 'weeks', label: 'weeks' },
+        { value: 'months', label: 'months' },
+        { value: 'years', label: 'years' }
+    ];
+
+    const newerRadio = createCompactCondition({
+        name: 'videoFilter_uploadDate_condition',
+        value: 'newer',
+        labelText: 'Only past',
+        fields: [
+            { id: 'videoFilter_age_newer_value', type: 'number', placeholder: '30', min: 1, width: '45px' },
+            { type: 'select', id: 'videoFilter_age_newer_unit', options: unitOptions, width: '72px' }
+        ]
+    });
+    const olderRadio = createCompactCondition({
+        name: 'videoFilter_uploadDate_condition',
+        value: 'older',
+        labelText: 'Block older than',
+        fields: [
+            { id: 'videoFilter_age_older_value', type: 'number', placeholder: '5', min: 1, width: '45px' },
+            { type: 'select', id: 'videoFilter_age_older_unit', options: unitOptions, width: '72px' }
+        ]
+    });
+    const betweenDateRadio = createCompactCondition({
+        name: 'videoFilter_uploadDate_condition',
+        value: 'between',
+        labelText: 'Between',
+        fields: [
+            { id: 'videoFilter_age_between_min', type: 'number', placeholder: '1', min: 1, width: '45px' },
+            { type: 'select', id: 'videoFilter_age_between_min_unit', options: unitOptions, width: '72px' },
+            { type: 'text', text: '-' },
+            { id: 'videoFilter_age_between_max', type: 'number', placeholder: '6', min: 1, width: '45px' },
+            { type: 'select', id: 'videoFilter_age_between_max_unit', options: unitOptions, width: '72px' }
+        ]
+    });
+
+    uploadDateConditionsWrap.appendChild(newerRadio);
+    uploadDateConditionsWrap.appendChild(olderRadio);
+    uploadDateConditionsWrap.appendChild(betweenDateRadio);
+    uploadDateConditionsRow.appendChild(uploadDateConditionsWrap);
+    videoFiltersRows.appendChild(uploadDateConditionsRow);
+
+    // Uppercase title filter - toggle AND mode dropdown in same row
+    const uppercaseRow = document.createElement('div');
+    uppercaseRow.className = 'toggle-row';
+    uppercaseRow.setAttribute('data-ft-control-row', 'true');
+
+    const uppercaseInfo = document.createElement('div');
+    uppercaseInfo.className = 'toggle-info';
+
+    const uppercaseTitle = document.createElement('div');
+    uppercaseTitle.className = 'toggle-title';
+    uppercaseTitle.textContent = 'UPPERCASE Title Filter';
+
+    const uppercaseDesc = document.createElement('div');
+    uppercaseDesc.className = 'toggle-description';
+    uppercaseDesc.textContent = '';
+    uppercaseTitle.title = 'Block AI slop with ALL CAPS titles';
+
+    uppercaseInfo.appendChild(uppercaseTitle);
+    uppercaseInfo.appendChild(uppercaseDesc);
+
+    const uppercaseControls = document.createElement('div');
+    uppercaseControls.className = 'video-filter-inline-controls';
+
+    const uppercaseModeSelect = document.createElement('select');
+    uppercaseModeSelect.id = 'videoFilter_uppercase_mode';
+    uppercaseModeSelect.className = 'select-input video-filter-mode-select';
+    uppercaseModeSelect.innerHTML = `
+        <option value="single_word">Single uppercase word</option>
+        <option value="all_caps">All caps title</option>
+        <option value="both">Both</option>
+    `;
+
+    const uppercaseToggle = document.createElement('label');
+    uppercaseToggle.className = 'switch';
+
+    const uppercaseCheckbox = document.createElement('input');
+    uppercaseCheckbox.type = 'checkbox';
+    uppercaseCheckbox.id = 'videoFilter_uppercase_enabled';
+
+    const uppercaseSlider = document.createElement('span');
+    uppercaseSlider.className = 'slider round';
+
+    uppercaseToggle.appendChild(uppercaseCheckbox);
+    uppercaseToggle.appendChild(uppercaseSlider);
+
+    uppercaseControls.appendChild(uppercaseModeSelect);
+    uppercaseControls.appendChild(uppercaseToggle);
+
+    uppercaseRow.appendChild(uppercaseInfo);
+    uppercaseRow.appendChild(uppercaseControls);
+    videoFiltersRows.appendChild(uppercaseRow);
+
+    videoFiltersSection.appendChild(videoFiltersRows);
+    contentTab.appendChild(videoFiltersSection);
+
+    function updateVideoFilterUI() {
+        const durationEnabled = document.getElementById('videoFilter_duration_enabled');
+        const durationConditions = document.getElementById('durationConditionsRow');
+        const uploadEnabled = document.getElementById('videoFilter_uploadDate_enabled');
+        const uploadConditions = document.getElementById('uploadDateConditionsRow');
+        const uppercaseEnabled = document.getElementById('videoFilter_uppercase_enabled');
+        const uppercaseModeSelect = document.getElementById('videoFilter_uppercase_mode');
+        const uppercaseModeMenu = uppercaseModeSelect?.closest('.ft-select-menu') || null;
+
+        if (durationConditions) durationConditions.style.display = durationEnabled?.checked ? 'block' : 'none';
+        if (uploadConditions) uploadConditions.style.display = uploadEnabled?.checked ? 'block' : 'none';
+        const showUppercaseMode = !!uppercaseEnabled?.checked;
+        if (uppercaseModeMenu) {
+            uppercaseModeMenu.style.display = showUppercaseMode ? 'inline-flex' : 'none';
+        } else if (uppercaseModeSelect) {
+            uppercaseModeSelect.style.display = showUppercaseMode ? 'inline-block' : 'none';
+        }
+        if (uppercaseModeSelect) {
+            uppercaseModeSelect.disabled = !showUppercaseMode;
+        }
+
+        // Disable inputs for non-selected radio options
+        const durationRadios = document.querySelectorAll('input[name="videoFilter_duration_condition"]');
+        durationRadios.forEach(radio => {
+            const option = radio.closest('.video-filter-compact-option');
+            const inputs = option?.querySelectorAll('input[type="number"], select') || [];
+            inputs.forEach(input => input.disabled = !radio.checked);
+        });
+
+        const uploadRadios = document.querySelectorAll('input[name="videoFilter_uploadDate_condition"]');
+        uploadRadios.forEach(radio => {
+            const option = radio.closest('.video-filter-compact-option');
+            const inputs = option?.querySelectorAll('input[type="number"], select') || [];
+            inputs.forEach(input => input.disabled = !radio.checked);
+        });
+    }
+
+    function applyContentFiltersToUI(contentFilters = {}) {
+        isApplyingContentFiltersUI = true;
+        const durationEnabled = document.getElementById('videoFilter_duration_enabled');
+        const uploadEnabled = document.getElementById('videoFilter_uploadDate_enabled');
+        const uppercaseEnabled = document.getElementById('videoFilter_uppercase_enabled');
+        const uppercaseMode = document.getElementById('videoFilter_uppercase_mode');
+
+        if (durationEnabled) durationEnabled.checked = !!contentFilters.duration?.enabled;
+        if (uploadEnabled) uploadEnabled.checked = !!contentFilters.uploadDate?.enabled;
+        if (uppercaseEnabled) uppercaseEnabled.checked = !!contentFilters.uppercase?.enabled;
+
+        const durationCondition = contentFilters.duration?.condition || 'between';
+        const durationRadio = document.getElementById(`videoFilter_duration_condition_${durationCondition}`);
+        if (durationRadio) durationRadio.checked = true;
+        const longerValue = contentFilters.duration?.condition === 'longer' ? contentFilters.duration?.minMinutes : '';
+        const shorterValue = contentFilters.duration?.condition === 'shorter' ? contentFilters.duration?.minMinutes : '';
+        const betweenMin = durationCondition === 'between' ? (contentFilters.duration?.minMinutes ?? '') : '';
+        const betweenMax = durationCondition === 'between' ? (contentFilters.duration?.maxMinutes ?? '') : '';
+        const longerInput = document.getElementById('videoFilter_duration_longer_value');
+        const shorterInput = document.getElementById('videoFilter_duration_shorter_value');
+        const durationBetweenMinInput = document.getElementById('videoFilter_duration_between_min');
+        const durationBetweenMaxInput = document.getElementById('videoFilter_duration_between_max');
+        if (longerInput) longerInput.value = longerValue || '';
+        if (shorterInput) shorterInput.value = shorterValue || '';
+        if (durationBetweenMinInput) durationBetweenMinInput.value = betweenMin || '';
+        if (durationBetweenMaxInput) durationBetweenMaxInput.value = betweenMax || '';
+
+        const uploadCondition = contentFilters.uploadDate?.condition || 'newer';
+        const uploadRadio = document.getElementById(`videoFilter_uploadDate_condition_${uploadCondition}`);
+        if (uploadRadio) uploadRadio.checked = true;
+        const newerValue = uploadCondition === 'newer' ? contentFilters.uploadDate?.value : '';
+        const olderValue = uploadCondition === 'older' ? contentFilters.uploadDate?.value : '';
+        const newerInput = document.getElementById('videoFilter_age_newer_value');
+        const olderInput = document.getElementById('videoFilter_age_older_value');
+        const uploadBetweenMinInput = document.getElementById('videoFilter_age_between_min');
+        const uploadBetweenMaxInput = document.getElementById('videoFilter_age_between_max');
+        if (newerInput) newerInput.value = newerValue || '';
+        if (olderInput) olderInput.value = olderValue || '';
+        if (uploadBetweenMinInput) uploadBetweenMinInput.value = uploadCondition === 'between' ? (contentFilters.uploadDate?.value || '') : '';
+        if (uploadBetweenMaxInput) uploadBetweenMaxInput.value = uploadCondition === 'between' ? (contentFilters.uploadDate?.valueMax || '') : '';
+
+        const newerUnit = document.getElementById('videoFilter_age_newer_unit');
+        const olderUnit = document.getElementById('videoFilter_age_older_unit');
+        const betweenMinUnit = document.getElementById('videoFilter_age_between_min_unit');
+        const betweenMaxUnit = document.getElementById('videoFilter_age_between_max_unit');
+        if (newerUnit) {
+            newerUnit.value = contentFilters.uploadDate?.unit || 'days';
+            newerUnit.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        if (olderUnit) {
+            olderUnit.value = contentFilters.uploadDate?.unit || 'years';
+            olderUnit.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        if (betweenMinUnit) {
+            betweenMinUnit.value = contentFilters.uploadDate?.unit || 'months';
+            betweenMinUnit.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        if (betweenMaxUnit) {
+            betweenMaxUnit.value = contentFilters.uploadDate?.unitMax || 'months';
+            betweenMaxUnit.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+
+        if (uppercaseMode) {
+            uppercaseMode.value = contentFilters.uppercase?.mode || 'single_word';
+            uppercaseMode.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+
+        updateVideoFilterUI();
+        isApplyingContentFiltersUI = false;
+    }
+
+    let isApplyingContentFiltersUI = false;
+    let pendingVideoFiltersSaveTimer = 0;
+    let lastSavedVideoFiltersSignature = '';
+    let lastVideoFiltersToastTs = 0;
+
+    function scheduleSaveVideoFilters(options = {}) {
+        if (isApplyingContentFiltersUI) return;
+        if (pendingVideoFiltersSaveTimer) {
+            clearTimeout(pendingVideoFiltersSaveTimer);
+        }
+        pendingVideoFiltersSaveTimer = setTimeout(() => {
+            pendingVideoFiltersSaveTimer = 0;
+            saveVideoFilters(options);
+        }, 300);
+    }
+
+    function maybeSelectOptionRadioFromElement(element) {
+        if (isApplyingContentFiltersUI) return false;
+        const option = element?.closest?.('.video-filter-compact-option') || null;
+        if (!option) return false;
+        const radio = option.querySelector('.video-filter-compact-radio');
+        if (!radio || radio.disabled) return false;
+        if (!radio.checked) {
+            radio.checked = true;
+            updateVideoFilterUI();
+            return true;
+        }
+        return false;
+    }
+
+    function computeVideoFiltersSignature(next) {
+        try {
+            return JSON.stringify(next || {});
+        } catch (e) {
+            return '';
+        }
+    }
+
+    function saveVideoFilters(options = {}) {
+        if (isApplyingContentFiltersUI) return;
+
+        const showToast = options?.showToast === true;
+        const state = StateManager.getState();
+        const prior = state?.contentFilters || {};
+
+        const durationCondition = document.querySelector('input[name="videoFilter_duration_condition"]:checked')?.value || (prior.duration?.condition || 'between');
+        const uploadCondition = document.querySelector('input[name="videoFilter_uploadDate_condition"]:checked')?.value || (prior.uploadDate?.condition || 'newer');
+
+        const durationEnabled = document.getElementById('videoFilter_duration_enabled')?.checked || false;
+        const uploadEnabled = document.getElementById('videoFilter_uploadDate_enabled')?.checked || false;
+        const uppercaseEnabled = document.getElementById('videoFilter_uppercase_enabled')?.checked || false;
+        const uppercaseMode = document.getElementById('videoFilter_uppercase_mode')?.value || (prior.uppercase?.mode || 'single_word');
+
+        const durationLongerValueRaw = document.getElementById('videoFilter_duration_longer_value')?.value;
+        const durationShorterValueRaw = document.getElementById('videoFilter_duration_shorter_value')?.value;
+        const durationBetweenMinRaw = document.getElementById('videoFilter_duration_between_min')?.value;
+        const durationBetweenMaxRaw = document.getElementById('videoFilter_duration_between_max')?.value;
+
+        const parsePositiveFloat = (value) => {
+            if (value === null || value === undefined) return null;
+            const num = parseFloat(String(value));
+            return Number.isFinite(num) && num > 0 ? num : null;
+        };
+
+        const nextDuration = {
+            ...(prior.duration || {}),
+            enabled: durationEnabled,
+            condition: durationCondition
+        };
+
+        if (durationCondition === 'longer') {
+            const val = parsePositiveFloat(durationLongerValueRaw);
+            if (val !== null) {
+                nextDuration.minMinutes = val;
+                nextDuration.maxMinutes = 0;
+                nextDuration.value = String(val);
+            }
+        } else if (durationCondition === 'shorter') {
+            const val = parsePositiveFloat(durationShorterValueRaw);
+            if (val !== null) {
+                nextDuration.minMinutes = val;
+                nextDuration.maxMinutes = 0;
+                nextDuration.value = String(val);
+            }
+        } else {
+            const min = parsePositiveFloat(durationBetweenMinRaw);
+            const max = parsePositiveFloat(durationBetweenMaxRaw);
+            if (min !== null && max !== null) {
+                const a = Math.min(min, max);
+                const b = Math.max(min, max);
+                nextDuration.minMinutes = a;
+                nextDuration.maxMinutes = b;
+                nextDuration.value = `${a}-${b}`;
+            }
+        }
+
+        const unitMs = { days: 86400000, weeks: 604800000, months: 2592000000, years: 31536000000 };
+        const now = Date.now();
+        const uploadNewerRaw = document.getElementById('videoFilter_age_newer_value')?.value;
+        const uploadNewerUnit = document.getElementById('videoFilter_age_newer_unit')?.value || (prior.uploadDate?.unit || 'days');
+        const uploadOlderRaw = document.getElementById('videoFilter_age_older_value')?.value;
+        const uploadOlderUnit = document.getElementById('videoFilter_age_older_unit')?.value || (prior.uploadDate?.unit || 'years');
+        const uploadBetweenMinRaw = document.getElementById('videoFilter_age_between_min')?.value;
+        const uploadBetweenMinUnit = document.getElementById('videoFilter_age_between_min_unit')?.value || (prior.uploadDate?.unit || 'months');
+        const uploadBetweenMaxRaw = document.getElementById('videoFilter_age_between_max')?.value;
+        const uploadBetweenMaxUnit = document.getElementById('videoFilter_age_between_max_unit')?.value || (prior.uploadDate?.unitMax || 'months');
+
+        const nextUpload = {
+            ...(prior.uploadDate || {}),
+            enabled: uploadEnabled,
+            condition: uploadCondition
+        };
+
+        if (uploadCondition === 'newer') {
+            const val = parsePositiveFloat(uploadNewerRaw);
+            if (val !== null) {
+                nextUpload.value = String(val);
+                nextUpload.unit = uploadNewerUnit;
+                nextUpload.valueMax = 0;
+                nextUpload.unitMax = '';
+                const cutoff = now - val * (unitMs[uploadNewerUnit] || 0);
+                nextUpload.fromDate = new Date(cutoff).toISOString();
+                nextUpload.toDate = '';
+            }
+        } else if (uploadCondition === 'older') {
+            const val = parsePositiveFloat(uploadOlderRaw);
+            if (val !== null) {
+                nextUpload.value = String(val);
+                nextUpload.unit = uploadOlderUnit;
+                nextUpload.valueMax = 0;
+                nextUpload.unitMax = '';
+                const cutoff = now - val * (unitMs[uploadOlderUnit] || 0);
+                nextUpload.toDate = new Date(cutoff).toISOString();
+                nextUpload.fromDate = '';
+            }
+        } else {
+            const min = parsePositiveFloat(uploadBetweenMinRaw);
+            const max = parsePositiveFloat(uploadBetweenMaxRaw);
+            if (min !== null && max !== null) {
+                nextUpload.value = String(min);
+                nextUpload.unit = uploadBetweenMinUnit;
+                nextUpload.valueMax = max;
+                nextUpload.unitMax = uploadBetweenMaxUnit;
+                const fromCutoff = now - min * (unitMs[uploadBetweenMinUnit] || 0);
+                const toCutoff = now - max * (unitMs[uploadBetweenMaxUnit] || 0);
+                nextUpload.fromDate = new Date(fromCutoff).toISOString();
+                nextUpload.toDate = new Date(toCutoff).toISOString();
+            }
+        }
+
+        const next = {
+            duration: nextDuration,
+            uploadDate: nextUpload,
+            uppercase: { ...(prior.uppercase || {}), enabled: uppercaseEnabled, mode: uppercaseMode, minWordLength: 2 }
+        };
+
+        const nextSig = computeVideoFiltersSignature(next);
+        const priorSig = computeVideoFiltersSignature(prior);
+        if (nextSig === priorSig || (lastSavedVideoFiltersSignature && nextSig === lastSavedVideoFiltersSignature)) {
+            return;
+        }
+
+        lastSavedVideoFiltersSignature = nextSig;
+        StateManager.updateContentFilters(next)
+            .then(() => {
+                if (!showToast) return;
+                const ts = Date.now();
+                if (ts - lastVideoFiltersToastTs < 800) return;
+                lastVideoFiltersToastTs = ts;
+                UIComponents.showToast('Video filters saved', 'success');
+            })
+            .catch((err) => {
+                console.error('Failed to save video filters:', err);
+                UIComponents.showToast('Failed to save video filters', 'error');
+            });
+    }
+
+    // Attach listeners after a short delay to ensure elements are in DOM
+    setTimeout(() => {
+        const durationEnabled = document.getElementById('videoFilter_duration_enabled');
+        const uploadEnabled = document.getElementById('videoFilter_uploadDate_enabled');
+        const uppercaseEnabled = document.getElementById('videoFilter_uppercase_enabled');
+        const uppercaseMode = document.getElementById('videoFilter_uppercase_mode');
+
+        durationEnabled?.addEventListener('change', () => {
+            updateVideoFilterUI();
+            scheduleSaveVideoFilters({ showToast: true });
+        });
+        uploadEnabled?.addEventListener('change', () => {
+            updateVideoFilterUI();
+            scheduleSaveVideoFilters({ showToast: true });
+        });
+        uppercaseEnabled?.addEventListener('change', () => {
+            updateVideoFilterUI();
+            scheduleSaveVideoFilters({ showToast: true });
+        });
+        uppercaseMode?.addEventListener('change', () => scheduleSaveVideoFilters({ showToast: true }));
+
+        // Radio button change listeners for duration and upload date
+        document.querySelectorAll('input[name="videoFilter_duration_condition"]').forEach(radio => {
+            radio?.addEventListener('change', () => {
+                updateVideoFilterUI();
+                scheduleSaveVideoFilters({ showToast: false });
+            });
+        });
+        document.querySelectorAll('input[name="videoFilter_uploadDate_condition"]').forEach(radio => {
+            radio?.addEventListener('change', () => {
+                updateVideoFilterUI();
+                scheduleSaveVideoFilters({ showToast: false });
+            });
+        });
+
+        // Click on option card to select radio button
+        document.querySelectorAll('.video-filter-compact-option').forEach(option => {
+            option.addEventListener('click', (e) => {
+                // Don't trigger if clicking on input/label directly
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'LABEL' || e.target.closest('label')) {
+                    return;
+                }
+                const radio = option.querySelector('.video-filter-compact-radio');
+                if (radio && !radio.disabled) {
+                    radio.checked = true;
+                    updateVideoFilterUI();
+                    scheduleSaveVideoFilters({ showToast: false });
+                }
+            });
+        });
+
+        document.querySelectorAll('.video-filter-compact-option input[type="number"], .video-filter-compact-option select').forEach(el => {
+            el.addEventListener('focus', (e) => {
+                if (maybeSelectOptionRadioFromElement(e.target)) {
+                    scheduleSaveVideoFilters({ showToast: false });
+                }
+            });
+            el.addEventListener('click', (e) => {
+                if (maybeSelectOptionRadioFromElement(e.target)) {
+                    scheduleSaveVideoFilters({ showToast: false });
+                }
+            });
+        });
+        [
+            'videoFilter_duration_longer_value',
+            'videoFilter_duration_shorter_value',
+            'videoFilter_duration_between_min',
+            'videoFilter_duration_between_max',
+            'videoFilter_age_newer_value',
+            'videoFilter_age_newer_unit',
+            'videoFilter_age_older_value',
+            'videoFilter_age_older_unit',
+            'videoFilter_age_between_min',
+            'videoFilter_age_between_min_unit',
+            'videoFilter_age_between_max',
+            'videoFilter_age_between_max_unit'
+        ].forEach(id => {
+            const el = document.getElementById(id);
+            el?.addEventListener('input', (e) => {
+                maybeSelectOptionRadioFromElement(e.target);
+                scheduleSaveVideoFilters({ showToast: false });
+            });
+            el?.addEventListener('change', (e) => {
+                maybeSelectOptionRadioFromElement(e.target);
+                scheduleSaveVideoFilters({ showToast: false });
+            });
+        });
+
+        const state = StateManager.getState();
+        applyContentFiltersToUI(state.contentFilters || {});
+    }, 100);
+
+    StateManager.subscribe((eventType, data) => {
+        if (eventType === 'contentFiltersUpdated') {
+            applyContentFiltersToUI(data?.contentFilters || {});
+        }
+    });
+
     // Create tabs
     const tabs = UIComponents.createTabs({
         tabs: [
@@ -293,9 +986,9 @@ function initializeKidsTabs() {
                 </select>
             </div>
             <div class="date-inputs">
-                <input type="date" id="kidsKeywordDateFrom" class="select-input date-input" />
+                <input type="date" id="kidsKeywordDateFrom" class="select-input date-input custom-date-input" />
                 <span class="date-sep">to</span>
-                <input type="date" id="kidsKeywordDateTo" class="select-input date-input" />
+                <input type="date" id="kidsKeywordDateTo" class="select-input date-input custom-date-input" />
                 <button id="kidsKeywordDateClear" class="btn-secondary date-clear-btn" type="button">Clear</button>
             </div>
         </div>
@@ -335,9 +1028,9 @@ function initializeKidsTabs() {
                 </select>
             </div>
             <div class="date-inputs">
-                <input type="date" id="kidsChannelDateFrom" class="select-input date-input" />
+                <input type="date" id="kidsChannelDateFrom" class="select-input date-input custom-date-input" />
                 <span class="date-sep">to</span>
-                <input type="date" id="kidsChannelDateTo" class="select-input date-input" />
+                <input type="date" id="kidsChannelDateTo" class="select-input date-input custom-date-input" />
                 <button id="kidsChannelDateClear" class="btn-secondary date-clear-btn" type="button">Clear</button>
             </div>
         </div>
@@ -385,7 +1078,8 @@ function resolveRequestedView() {
         'whatsnew': 'whatsnew',
         'whats-new': 'whatsnew',
         'help': 'help',
-        'support': 'support'
+        'donate': 'donate',
+        'support': 'donate'
     };
     return viewMap[normalized] || null;
 }
@@ -588,6 +1282,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const ftMaxAccounts = document.getElementById('ftMaxAccounts');
 
     const openKofiBtn = document.getElementById('openKofiBtn');
+    const dashboardDonateBtn = document.getElementById('dashboardDonateBtn');
 
     // State for search/sort
     let keywordSearchValue = '';
@@ -620,6 +1315,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    if (dashboardDonateBtn) {
+        dashboardDonateBtn.addEventListener('click', () => {
+            try {
+                if (typeof window.switchView === 'function') {
+                    window.switchView('donate');
+                }
+            } catch (error) {
+                console.warn('Tab-View: failed to switch to donate view', error);
+            }
+        });
+    }
+
     try {
         const createDropdownFromSelect = window.UIComponents?.createDropdownFromSelect;
         if (typeof createDropdownFromSelect === 'function') {
@@ -632,6 +1339,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 'kidsKeywordDatePreset',
                 'kidsChannelSort',
                 'kidsChannelDatePreset',
+                'videoFilter_age_newer_unit',
+                'videoFilter_age_older_unit',
+                'videoFilter_age_between_min_unit',
+                'videoFilter_age_between_max_unit',
+                'videoFilter_uppercase_mode',
                 'ftAutoBackupMode',
                 'ftAutoBackupFormat'
             ].forEach((id) => {
@@ -668,7 +1380,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     let lockGateEl = null;
 
-    const LOCK_ALLOWED_VIEWS = new Set(['help', 'whatsnew', 'support']);
+    const LOCK_ALLOWED_VIEWS = new Set(['help', 'whatsnew', 'donate']);
 
     async function sendRuntimeMessage(payload) {
         return new Promise((resolve) => {
@@ -909,10 +1621,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             const settings = safeObject(activeProfile.settings);
 
             const mode = normalizeString(settings.autoBackupMode).toLowerCase();
-            ftAutoBackupMode.value = (mode === 'history' || mode === 'latest') ? mode : 'latest';
+            const modeValue = (mode === 'history' || mode === 'latest') ? mode : 'latest';
+            if (ftAutoBackupMode.value !== modeValue) {
+                ftAutoBackupMode.value = modeValue;
+                ftAutoBackupMode.dispatchEvent(new Event('input', { bubbles: true }));
+            }
 
             const format = normalizeString(settings.autoBackupFormat).toLowerCase();
-            ftAutoBackupFormat.value = (format === 'plain' || format === 'encrypted' || format === 'auto') ? format : 'auto';
+            const formatValue = (format === 'plain' || format === 'encrypted' || format === 'auto') ? format : 'auto';
+            if (ftAutoBackupFormat.value !== formatValue) {
+                ftAutoBackupFormat.value = formatValue;
+                ftAutoBackupFormat.dispatchEvent(new Event('input', { bubbles: true }));
+            }
 
             const locked = isUiLocked();
             const enabled = StateManager.getState()?.autoBackupEnabled === true;
@@ -2191,6 +2911,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
             await refreshProfilesUI();
             UIComponents.showToast('Account policy updated', 'success');
+            await scheduleAutoBackup('setting_updated');
         };
 
         ftAllowAccountCreation.addEventListener('change', async () => {
@@ -2589,7 +3310,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                     activeProfileId: activeId,
                     profiles
                 });
+                profilesV4Cache = {
+                    ...fresh,
+                    profiles,
+                    activeProfileId: activeId
+                };
                 await refreshProfilesUI();
+                UIComponents.showToast('Backup settings updated', 'success');
                 await scheduleAutoBackup('setting_updated');
             } catch (e) {
             }
@@ -2629,6 +3356,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                     activeProfileId: activeId,
                     profiles
                 });
+                profilesV4Cache = {
+                    ...fresh,
+                    profiles,
+                    activeProfileId: activeId
+                };
                 await refreshProfilesUI();
                 await scheduleAutoBackup('setting_updated');
             } catch (e) {
@@ -2792,7 +3524,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         ftTopBarListModeControlsTab.innerHTML = '';
 
         const toggle = UIComponents.createToggleButton({
-            text: 'Whitelist',
+            text: profileType === 'kids' ? 'Whitelist Kids' : 'Whitelist',
             active: currentMode === 'whitelist',
             onToggle: async (nextState) => {
                 if (isUiLocked()) {
@@ -2811,20 +3543,34 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 let copyBlocklist = false;
                 if (enablingWhitelist && whitelistEmpty) {
-                    copyBlocklist = window.confirm('Copy your current blocklist into whitelist to get started?');
+                    const confirmMsg = profileType === 'kids' 
+                        ? 'Copy your current YT Kids blocklist into whitelist to get started?'
+                        : 'Copy your current blocklist into whitelist to get started?';
+                    copyBlocklist = window.confirm(confirmMsg);
                     if (!copyBlocklist) {
-                        UIComponents.showToast('Whitelist is empty — videos will stay hidden until you add allow rules.', 'info');
+                        const infoMsg = profileType === 'kids'
+                            ? 'YT Kids whitelist is empty — videos will stay hidden until you add allow rules.'
+                            : 'Whitelist is empty — videos will stay hidden until you add allow rules.';
+                        UIComponents.showToast(infoMsg, 'info');
                     }
                 }
 
                 let resp = null;
                 if (disablingWhitelist && !whitelistEmpty) {
-                    const shouldTransfer = window.confirm('Move your whitelist back into blocklist? This will clear whitelist.');
+                    const confirmMsg = profileType === 'kids'
+                        ? 'Move your YT Kids whitelist back into blocklist? This will clear the YT Kids whitelist.'
+                        : 'Move your whitelist back into blocklist? This will clear whitelist.';
+                    const shouldTransfer = window.confirm(confirmMsg);
                     if (shouldTransfer) {
                         resp = await sendRuntimeMessage({
                             action: 'FilterTube_TransferWhitelistToBlocklist',
                             profileType
                         });
+                    }
+                    // If user clicked Cancel and we're disabling whitelist, don't proceed with mode change
+                    if (!shouldTransfer) {
+                        renderListModeControls();
+                        return;
                     }
                 }
 
@@ -2925,6 +3671,160 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    let dashboardStatsSurface = 'main';
+    let dashboardStatsRotationTimer = 0;
+    let dashboardStatsUserOverride = false;
+
+    function getDashboardSurfaceStats(surface, state) {
+        const bySurface = (state && state.statsBySurface && typeof state.statsBySurface === 'object' && !Array.isArray(state.statsBySurface))
+            ? state.statsBySurface
+            : {};
+
+        const picked = bySurface[surface] && typeof bySurface[surface] === 'object' ? bySurface[surface] : null;
+        if (picked) return picked;
+        if (surface === 'main') return state?.stats || {};
+        return {};
+    }
+
+    function getDashboardCounts(surface, state) {
+        const mainMode = state?.mode === 'whitelist' ? 'whitelist' : 'blocklist';
+        const kidsMode = state?.kids?.mode === 'whitelist' ? 'whitelist' : 'blocklist';
+        const Settings = window.FilterTubeSettings || {};
+
+        if (surface === 'kids') {
+            const channels = (kidsMode === 'whitelist')
+                ? (Array.isArray(state?.kids?.whitelistChannels) ? state.kids.whitelistChannels : [])
+                : (Array.isArray(state?.kids?.blockedChannels) ? state.kids.blockedChannels : []);
+
+            const keywordBase = (kidsMode === 'whitelist')
+                ? (Array.isArray(state?.kids?.whitelistKeywords) ? state.kids.whitelistKeywords : [])
+                : (Array.isArray(state?.kids?.blockedKeywords) ? state.kids.blockedKeywords : []);
+
+            const keywords = (kidsMode === 'whitelist')
+                ? keywordBase
+                : (typeof Settings.syncFilterAllKeywords === 'function'
+                    ? Settings.syncFilterAllKeywords(keywordBase, channels)
+                    : keywordBase);
+
+            return {
+                keywordCount: keywords.length,
+                channelCount: channels.length
+            };
+        }
+
+        const channels = (mainMode === 'whitelist')
+            ? (Array.isArray(state?.whitelistChannels) ? [...state.whitelistChannels] : [])
+            : (Array.isArray(state?.channels) ? [...state.channels] : []);
+
+        const keywords = (mainMode === 'whitelist')
+            ? (Array.isArray(state?.whitelistKeywords) ? [...state.whitelistKeywords] : [])
+            : (Array.isArray(state?.keywords) ? [...state.keywords] : []);
+
+        // If syncing Kids → Main, include ALL kids channels (both blocked and whitelist)
+        if (state?.syncKidsToMain) {
+            const kidsBlocked = Array.isArray(state?.kids?.blockedChannels) ? state.kids.blockedChannels : [];
+            const kidsWhitelist = Array.isArray(state?.kids?.whitelistChannels) ? state.kids.whitelistChannels : [];
+            const allKidsChannels = [...kidsBlocked, ...kidsWhitelist];
+            const keyFor = (ch) => {
+                const id = typeof ch?.id === 'string' ? ch.id.trim().toLowerCase() : '';
+                const handle = typeof ch?.handle === 'string' ? ch.handle.trim().toLowerCase() : '';
+                return id || handle;
+            };
+            const seen = new Set(channels.map(keyFor).filter(Boolean));
+            allKidsChannels.forEach(ch => {
+                const k = keyFor(ch);
+                if (!k || seen.has(k)) return;
+                seen.add(k);
+                channels.push(ch);
+            });
+
+            // Also include ALL kids keywords (both blocked and whitelist)
+            const kidsBlockedKeywords = Array.isArray(state?.kids?.blockedKeywords) ? state.kids.blockedKeywords : [];
+            const kidsWhitelistKeywords = Array.isArray(state?.kids?.whitelistKeywords) ? state.kids.whitelistKeywords : [];
+            const allKidsKeywords = [...kidsBlockedKeywords, ...kidsWhitelistKeywords];
+            const keywordSeen = new Set(keywords.map(k => {
+                const word = typeof k === 'object' ? k.word : String(k);
+                return word.toLowerCase();
+            }));
+            allKidsKeywords.forEach(k => {
+                const word = typeof k === 'object' ? k.word : String(k);
+                if (!keywordSeen.has(word.toLowerCase())) {
+                    keywordSeen.add(word.toLowerCase());
+                    keywords.push(k);
+                }
+            });
+        }
+
+        return {
+            keywordCount: keywords.length,
+            channelCount: channels.length
+        };
+    }
+
+    function formatSavedTime(totalSeconds) {
+        const safeSeconds = (typeof totalSeconds === 'number' && Number.isFinite(totalSeconds)) ? Math.max(0, totalSeconds) : 0;
+
+        if (safeSeconds < 60) {
+            return `${safeSeconds}s`;
+        }
+        if (safeSeconds < 3600) {
+            const mins = Math.floor(safeSeconds / 60);
+            const secs = safeSeconds % 60;
+            return secs > 0 ? `${mins}m ${secs}s` : `${mins}m`;
+        }
+
+        const hours = Math.floor(safeSeconds / 3600);
+        const mins = Math.floor((safeSeconds % 3600) / 60);
+        const secs = safeSeconds % 60;
+        if (secs > 0) return `${hours}h ${mins}m ${secs}s`;
+        if (mins > 0) return `${hours}h ${mins}m`;
+        return `${hours}h`;
+    }
+
+    function setDashboardStatsSurface(nextSurface, options = {}) {
+        const next = nextSurface === 'kids' ? 'kids' : 'main';
+        dashboardStatsSurface = next;
+        if (options.user) {
+            dashboardStatsUserOverride = true;
+        }
+        updateStats();
+    }
+
+    function scheduleDashboardStatsRotation() {
+        if (dashboardStatsRotationTimer) {
+            clearInterval(dashboardStatsRotationTimer);
+            dashboardStatsRotationTimer = 0;
+        }
+
+        const state = StateManager.getState();
+        const mainCounts = getDashboardCounts('main', state);
+        const kidsCounts = getDashboardCounts('kids', state);
+        const hasMain = (mainCounts.keywordCount + mainCounts.channelCount) > 0;
+        const hasKids = (kidsCounts.keywordCount + kidsCounts.channelCount) > 0;
+
+        if (!hasMain && hasKids) {
+            dashboardStatsSurface = 'kids';
+            return;
+        }
+        if (hasMain && !hasKids) {
+            dashboardStatsSurface = 'main';
+            return;
+        }
+        if (!hasMain && !hasKids) {
+            dashboardStatsSurface = 'main';
+            return;
+        }
+
+        if (dashboardStatsUserOverride) {
+            return;
+        }
+
+        dashboardStatsRotationTimer = setInterval(() => {
+            dashboardStatsSurface = dashboardStatsSurface === 'main' ? 'kids' : 'main';
+            updateStats();
+        }, 2500);
+    }
+
     function updateStats() {
         const state = StateManager.getState();
 
@@ -2934,44 +3834,52 @@ document.addEventListener('DOMContentLoaded', async () => {
         const statHiddenToday = document.getElementById('statHiddenToday');
         const statSavedTime = document.getElementById('statSavedTime');
 
+        const dashboardStatsSourceLabel = document.getElementById('dashboardStatsSourceLabel');
+        const dashboardStatsMainBtn = document.getElementById('dashboardStatsMainBtn');
+        const dashboardStatsKidsBtn = document.getElementById('dashboardStatsKidsBtn');
+
+        if (dashboardStatsMainBtn && !dashboardStatsMainBtn.__filtertubeBound) {
+            dashboardStatsMainBtn.__filtertubeBound = true;
+            dashboardStatsMainBtn.addEventListener('click', () => setDashboardStatsSurface('main', { user: true }));
+        }
+        if (dashboardStatsKidsBtn && !dashboardStatsKidsBtn.__filtertubeBound) {
+            dashboardStatsKidsBtn.__filtertubeBound = true;
+            dashboardStatsKidsBtn.addEventListener('click', () => setDashboardStatsSurface('kids', { user: true }));
+        }
+
+        const surface = dashboardStatsSurface === 'kids' ? 'kids' : 'main';
+        const counts = getDashboardCounts(surface, state);
+        const surfaceStats = getDashboardSurfaceStats(surface, state);
+
+        if (dashboardStatsSourceLabel) {
+            dashboardStatsSourceLabel.textContent = surface === 'kids'
+                ? 'Dashboard stats: YouTube Kids'
+                : 'Dashboard stats: YouTube Main';
+        }
+        if (dashboardStatsMainBtn) {
+            dashboardStatsMainBtn.classList.toggle('active', surface === 'main');
+        }
+        if (dashboardStatsKidsBtn) {
+            dashboardStatsKidsBtn.classList.toggle('active', surface === 'kids');
+        }
+
         if (statActiveKeywords) {
-            statActiveKeywords.textContent = state.userKeywords?.length || 0;
+            statActiveKeywords.textContent = counts.keywordCount || 0;
         }
 
         if (statFilteredChannels) {
-            statFilteredChannels.textContent = state.channels?.length || 0;
+            statFilteredChannels.textContent = counts.channelCount || 0;
         }
 
         if (statHiddenToday) {
-            statHiddenToday.textContent = state.stats?.hiddenCount || 0;
+            statHiddenToday.textContent = surfaceStats?.hiddenCount || 0;
         }
 
         if (statSavedTime) {
-            const totalSeconds = state.stats?.savedSeconds || 0;
-
-            if (totalSeconds < 60) {
-                // Less than 1 minute: show seconds
-                statSavedTime.textContent = `${totalSeconds}s`;
-            } else if (totalSeconds < 3600) {
-                // Less than 1 hour: show minutes and seconds
-                const mins = Math.floor(totalSeconds / 60);
-                const secs = totalSeconds % 60;
-                statSavedTime.textContent = secs > 0 ? `${mins}m ${secs}s` : `${mins}m`;
-            } else {
-                // 1 hour or more: show hours, minutes, and optionally seconds
-                const hours = Math.floor(totalSeconds / 3600);
-                const mins = Math.floor((totalSeconds % 3600) / 60);
-                const secs = totalSeconds % 60;
-
-                if (secs > 0) {
-                    statSavedTime.textContent = `${hours}h ${mins}m ${secs}s`;
-                } else if (mins > 0) {
-                    statSavedTime.textContent = `${hours}h ${mins}m`;
-                } else {
-                    statSavedTime.textContent = `${hours}h`;
-                }
-            }
+            statSavedTime.textContent = formatSavedTime(surfaceStats?.savedSeconds || 0);
         }
+
+        scheduleDashboardStatsRotation();
     }
 
     // Initial render
@@ -3428,6 +4336,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const quickAddKeywordBtn = document.getElementById('quickAddKeywordBtn');
     const quickAddChannelBtn = document.getElementById('quickAddChannelBtn');
     const quickContentControlsBtn = document.getElementById('quickContentControlsBtn');
+    const quickKidsModeBtn = document.getElementById('quickKidsModeBtn');
 
     if (quickAddKeywordBtn) {
         quickAddKeywordBtn.addEventListener('click', () => {
@@ -3457,6 +4366,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             contentTabBtn?.click();
             // slight delay to ensure tab render, then focus search
             setTimeout(() => document.getElementById('searchContentControls')?.focus(), 50);
+        });
+    }
+
+    if (quickKidsModeBtn) {
+        quickKidsModeBtn.addEventListener('click', () => {
+            switchView('kids');
         });
     }
 
@@ -3523,7 +4438,8 @@ function setupNavigation() {
             'settings': 'Settings',
             'whatsnew': 'What’s New',
             'help': 'Help',
-            'support': 'Support'
+            'donate': 'Donate',
+            'support': 'Donate'
         };
         if (pageTitle && titles[effectiveViewId]) {
             pageTitle.textContent = titles[effectiveViewId];
@@ -3539,4 +4455,20 @@ function setupNavigation() {
 
     // Make switchView globally accessible for quick actions
     window.switchView = switchView;
+}
+
+// ============================================================================
+// UI UTILITY FUNCTIONS
+// ============================================================================
+
+function showSuccessToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'ft-success-toast';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    // Remove after animation completes
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
 }

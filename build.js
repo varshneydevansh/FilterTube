@@ -20,6 +20,7 @@ const path = require('path');
 const archiver = require('archiver');
 const https = require('https');
 const readline = require('readline');
+const { execSync } = require('child_process');
 const { version: PACKAGE_VERSION } = require('./package.json');
 
 // Configuration
@@ -191,6 +192,10 @@ async function maybePromptRelease(version, zipPaths) {
         console.log('ℹ️  Release publishing skipped.');
         return;
     }
+
+    // Update README badges with latest LoC stats
+    console.log('\n📊 Updating README badges with latest stats...');
+    await updateReadmeBadges(version);
 
     const token = process.env.GITHUB_TOKEN;
     if (!token) {
@@ -428,4 +433,64 @@ function promptYesNo(question) {
             resolve(answer.trim().toLowerCase() === 'y');
         });
     });
+}
+
+async function updateReadmeBadges(version) {
+    try {
+        // Calculate total lines of code
+        const totalLinesRaw = execSync('git ls-files | xargs wc -l 2>/dev/null | tail -1', { encoding: 'utf8' });
+        const totalLines = parseInt(totalLinesRaw.trim().split(/\s+/)[0], 10);
+
+        // Calculate JavaScript lines
+        const jsLinesRaw = execSync("git ls-files | grep '\\.js$' | xargs wc -l 2>/dev/null | tail -1", { encoding: 'utf8' });
+        const jsLines = parseInt(jsLinesRaw.trim().split(/\s+/)[0], 10);
+
+        if (!totalLines || !jsLines) {
+            console.warn('⚠️  Could not calculate LoC stats; skipping badge update.');
+            return;
+        }
+
+        // Format numbers (e.g., 61617 -> "61.6k")
+        const formatLoC = (num) => {
+            if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'k';
+            }
+            return num.toString();
+        };
+
+        const totalFormatted = formatLoC(totalLines);
+        const jsFormatted = formatLoC(jsLines);
+
+        console.log(`   Total lines: ${totalLines.toLocaleString()} (${totalFormatted})`);
+        console.log(`   JavaScript: ${jsLines.toLocaleString()} (${jsFormatted})`);
+
+        // Read README
+        const readmePath = 'README.md';
+        let readme = fs.readFileSync(readmePath, 'utf8');
+
+        // Update version badge
+        readme = readme.replace(
+            /!\[Version\]\(https:\/\/img\.shields\.io\/badge\/version-[^)]+\)/,
+            `![Version](https://img.shields.io/badge/version-${version}-blue.svg)`
+        );
+
+        // Update total lines badge
+        readme = readme.replace(
+            /!\[Lines of Code\]\(https:\/\/img\.shields\.io\/badge\/total%20lines-[^)]+\)/,
+            `![Lines of Code](https://img.shields.io/badge/total%20lines-${totalFormatted}-brightgreen.svg)`
+        );
+
+        // Update JavaScript LoC badge
+        readme = readme.replace(
+            /!\[JavaScript LoC\]\(https:\/\/img\.shields\.io\/badge\/javascript-[^)]+\)/,
+            `![JavaScript LoC](https://img.shields.io/badge/javascript-${jsFormatted}%20lines-yellow.svg)`
+        );
+
+        // Write updated README
+        fs.writeFileSync(readmePath, readme, 'utf8');
+        console.log('✅ README.md badges updated successfully.');
+
+    } catch (err) {
+        console.warn('⚠️  Failed to update README badges:', err.message);
+    }
 }
