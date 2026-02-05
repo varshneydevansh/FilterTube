@@ -19,7 +19,7 @@ function initializePopupFiltersTabs() {
             </div>
 
             <div class="add-keyword-row">
-                <input type="text" id="newKeywordInput" class="text-input" placeholder="Add keyword..." />
+                <input type="text" id="newKeywordInput" class="text-input" placeholder="Keywords (comma-separated)..." />
                 <button id="addKeywordBtn" class="btn btn-small btn-primary">Add</button>
             </div>
 
@@ -38,7 +38,7 @@ function initializePopupFiltersTabs() {
             </div>
 
             <div class="add-keyword-row">
-                <input type="text" id="channelInput" class="text-input" placeholder="Add @handle, Channel ID.. or c/ChannelName" />
+                <input type="text" id="channelInput" class="text-input" placeholder="@handle or ID (comma-separated)..." />
                 <button id="addChannelBtn" class="btn btn-small btn-primary">Add</button>
             </div>
 
@@ -1272,13 +1272,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Add keyword
     if (addKeywordBtn) {
         addKeywordBtn.addEventListener('click', async () => {
-            const word = (newKeywordInput?.value || '').trim();
-            if (!word) return;
+            const rawInput = (newKeywordInput?.value || '').trim();
+            if (!rawInput) return;
 
-            const success = await StateManager.addKeyword(word);
-            if (success) {
+            // Support comma-separated keywords
+            const keywords = rawInput.split(',').map(k => k.trim()).filter(k => k.length > 0);
+            if (keywords.length === 0) return;
+
+            let addedCount = 0;
+            for (const word of keywords) {
+                const success = await StateManager.addKeyword(word);
+                if (success) addedCount++;
+            }
+
+            if (addedCount > 0) {
                 if (newKeywordInput) newKeywordInput.value = '';
-                UIComponents.flashButtonSuccess(addKeywordBtn, 'Added!', 1200);
+                const msg = addedCount === 1 ? 'Added!' : `Added ${addedCount}!`;
+                UIComponents.flashButtonSuccess(addKeywordBtn, msg, 1200);
             }
         });
     }
@@ -1294,26 +1304,39 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Add channel
     if (addChannelBtn) {
         addChannelBtn.addEventListener('click', async () => {
-            const input = (channelInput?.value || '').trim();
-            if (!input) return;
+            const rawInput = (channelInput?.value || '').trim();
+            if (!rawInput) return;
+
+            // Support comma-separated channels
+            const channels = rawInput.split(',').map(c => c.trim()).filter(c => c.length > 0);
+            if (channels.length === 0) return;
 
             const originalText = addChannelBtn.textContent;
             addChannelBtn.textContent = 'Fetching...';
             addChannelBtn.disabled = true;
 
             try {
-                const result = await StateManager.addChannel(input);
+                let addedCount = 0;
+                let lastError = null;
 
-                if (result.success) {
+                for (const input of channels) {
+                    const result = await StateManager.addChannel(input);
+                    if (result.success) {
+                        addedCount++;
+                    } else {
+                        lastError = result.error;
+                    }
+                }
+
+                addChannelBtn.textContent = originalText;
+                addChannelBtn.disabled = false;
+
+                if (addedCount > 0) {
                     if (channelInput) channelInput.value = '';
-                    // Reset button text BEFORE flashing success message
-                    addChannelBtn.textContent = originalText;
-                    addChannelBtn.disabled = false;
-                    UIComponents.flashButtonSuccess(addChannelBtn, 'Added!', 1200);
-                } else {
-                    addChannelBtn.textContent = originalText;
-                    addChannelBtn.disabled = false;
-                    alert(result.error || 'Failed to add channel');
+                    const msg = addedCount === 1 ? 'Added!' : `Added ${addedCount}!`;
+                    UIComponents.flashButtonSuccess(addChannelBtn, msg, 1200);
+                } else if (lastError) {
+                    alert(lastError || 'Failed to add channel');
                 }
             } catch (error) {
                 addChannelBtn.textContent = originalText;
