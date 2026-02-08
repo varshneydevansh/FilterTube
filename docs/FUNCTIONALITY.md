@@ -1,12 +1,13 @@
-# FilterTube v3.2.5 - Current Functionality Documentation
+# FilterTube v3.2.7 - Current Functionality Documentation
 
 ## Overview
 
-FilterTube v3.2.5 implements a **hybrid filtering system** with dual filtering modes:
+FilterTube v3.2.7 implements a **hybrid filtering system** with dual filtering modes:
 
 - A primary **data interception layer** removes blocked items from YouTube JSON responses before render when possible.
 - A secondary **DOM fallback layer** hides/restores already-rendered elements for SPA navigation, DOM recycling, and edge cases.
-- **Whitelist Mode**: Hide all content except explicitly allowed channels and keywords (v3.2.5).
+- **Whitelist Mode**: Hide all content except explicitly allowed channels and keywords.
+- **Category Filtering**: Filter videos by YouTube category (e.g., Music, Gaming, Education) (v3.2.7).
 
 ## Core Filtering Capabilities
 
@@ -562,6 +563,127 @@ Video D: "@TechChannel" | "AI tutorial" | 12 min | 2023-12-15
 Video E: "@TechChannel" | "AI tutorial" | 12 min | 2024-02-01
 → SHOWN ✓ (passes all filters)
 ```
+
+### Category Filtering (v3.2.7)
+
+**Purpose:** Filter videos based on YouTube's video category metadata to curate your feed by content type.
+
+**Modes:**
+- `blocklist` - Hide videos from specified categories (default: show everything except selected)
+- `whitelist` - Only show videos from specified categories (default: hide everything except selected)
+
+**Configuration:**
+
+```javascript
+contentFilters: {
+    category: {
+        enabled: true,
+        mode: 'blocklist',     // 'blocklist' | 'whitelist'
+        categories: ['Gaming', 'Music']  // Categories to block or allow
+    }
+}
+```
+
+**Supported YouTube Categories:**
+
+| Category | Description |
+|----------|-------------|
+| Music | Music videos, albums, live performances |
+| Gaming | Let's plays, walkthroughs, gaming news |
+| Entertainment | TV clips, talk shows, variety content |
+| Education | Tutorials, lectures, educational content |
+| Science & Technology | Tech reviews, science explainers |
+| News & Politics | Current events, political commentary |
+| Sports | Sports highlights, analysis, fitness |
+| Film & Animation | Short films, animations, trailers |
+| People & Blogs | Vlogs, personal stories, lifestyle |
+| Comedy | Sketches, stand-up, funny compilations |
+| Howto & Style | DIY, fashion, beauty, cooking |
+| Autos & Vehicles | Car reviews, motorsports |
+| Travel & Events | Travel vlogs, event coverage |
+| Pets & Animals | Pet videos, wildlife documentaries |
+| Nonprofits & Activism | Charity, awareness campaigns |
+
+**Data Sources:**
+
+1. **videoMetaMap Cache** - Persistent storage with category field
+   ```javascript
+   videoMetaMap['dQw4w9WgXcQ'].category // "Music"
+   ```
+
+2. **Player Microformat** - From `ytInitialPlayerResponse`
+   ```javascript
+   microformat.playerMicroformatRenderer.category // "Music"
+   ```
+
+3. **Video Details** - Fallback from player response
+   ```javascript
+   videoDetails.category // "Music"
+   ```
+
+**Example Scenarios:**
+
+```ascii
+Mode: "blocklist" (blocking Gaming, Entertainment)
+┌─────────────────────────────────────────────────────┐
+│ Video A: Category "Gaming"        → HIDDEN          │
+│ Video B: Category "Education"     → SHOWN ✓         │
+│ Video C: Category "Entertainment" → HIDDEN          │
+│ Video D: Category "Music"         → SHOWN ✓         │
+└─────────────────────────────────────────────────────┘
+
+Mode: "whitelist" (allowing only Education, Science & Technology)
+┌─────────────────────────────────────────────────────┐
+│ Video A: Category "Gaming"              → HIDDEN    │
+│ Video B: Category "Education"           → SHOWN ✓   │
+│ Video C: Category "Science & Technology"→ SHOWN ✓   │
+│ Video D: Category "Music"               → HIDDEN    │
+└─────────────────────────────────────────────────────┘
+```
+
+**Combined with Other Filters:**
+
+Category filtering works alongside other content filters in the decision tree:
+
+```ascii
+Video Filtering Decision Tree (v3.2.7)
+┌─────────────────────────────────────────┐
+│ Video Card Detected                     │
+└──────────────┬──────────────────────────┘
+               │
+               ├─→ Channel Filter → HIDE if blocked
+               │
+               ├─→ Keyword Filter → HIDE if matched
+               │
+               ├─→ Category Filter → HIDE if blocked/not whitelisted
+               │
+               ├─→ Duration Filter → HIDE if outside range
+               │
+               ├─→ Upload Date Filter → HIDE if outside range
+               │
+               ├─→ Uppercase Filter → HIDE if detected
+               │
+               └─→ SHOW if all filters pass
+```
+
+### Quick-Block Card Action (v3.2.7)
+
+**Purpose:** Add a direct per-card block entry point without opening YouTube's 3-dot menu manually.
+
+**Behavior:**
+- Optional setting: `showQuickBlockButton` (on by default in v3.2.7; users can disable it).
+- Shows a hover/touch button on supported cards.
+- Single-tap direct action (no quick menu).
+- Single-channel cards: blocks that channel immediately.
+- Collaborator cards: blocks all channels associated with that card in one tap.
+- Reuses the same blocking pipeline as injected menu actions, including collaborator handling and optimistic hide.
+- Covers home, search, watch, playlist panel rows, mix/radio cards, and shorts cards.
+- Comment-menu blocks are isolated from playlist/watch card hide logic to prevent unintended autoplay-next transitions.
+- Hover retention is hardened for Search overlays and Home Shorts so the quick-block cross does not disappear mid-hover.
+
+**YouTube Kids behavior:**
+- Uses the same one-tap quick-block entry point.
+- Persists blocked channels into the Kids channel blocklist (profile-aware save path).
 
 ## Dashboard Improvements (v3.2.6)
 

@@ -1,9 +1,10 @@
 {
   "name": "filtertube",
-  "version": "3.2.6",
+  "version": "3.2.7",
   "description": "Restore peace of mind to your digital video experience.",
   "main": "js/background.js",
   "scripts": {
+    "dev": "node build.js",
     "build": "node build.js",
     "build:chrome": "node build.js chrome",
     "build:firefox": "node build.js firefox",

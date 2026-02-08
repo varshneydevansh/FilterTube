@@ -46,6 +46,7 @@
         'hideExploreTrending',
         'hideMoreFromYouTube',
         'hideSubscriptions',
+        'showQuickBlockButton',
         'hideSearchShelves',
         'stats',
         'statsBySurface',
@@ -121,6 +122,7 @@
                         hideExploreTrending: !!storage?.hideExploreTrending,
                         hideMoreFromYouTube: !!storage?.hideMoreFromYouTube,
                         hideSubscriptions: !!storage?.hideSubscriptions,
+                        showQuickBlockButton: storage?.showQuickBlockButton !== false,
                         hideSearchShelves: !!storage?.hideSearchShelves
                     },
                     main: {
@@ -454,12 +456,15 @@
         hideExploreTrending,
         hideMoreFromYouTube,
         hideSubscriptions,
+        showQuickBlockButton,
         hideSearchShelves,
-        contentFilters
+        contentFilters,
+        categoryFilters
     }) {
         const sanitizedChannels = sanitizeChannelsList(channels);
         const sanitizedKeywords = syncFilterAllKeywords(keywords, sanitizedChannels);
         const sanitizedContentFilters = safeObject(contentFilters);
+        const sanitizedCategoryFilters = safeObject(categoryFilters);
         return {
             enabled: enabled !== false,
             filterKeywords: compileKeywords(sanitizedKeywords),
@@ -492,8 +497,10 @@
             hideExploreTrending: !!hideExploreTrending,
             hideMoreFromYouTube: !!hideMoreFromYouTube,
             hideSubscriptions: !!hideSubscriptions,
+            showQuickBlockButton: showQuickBlockButton !== false,
             hideSearchShelves: !!hideSearchShelves,
-            contentFilters: sanitizedContentFilters
+            contentFilters: sanitizedContentFilters,
+            categoryFilters: sanitizedCategoryFilters
         };
     }
 
@@ -576,6 +583,7 @@
                     hideExploreTrending: readBool('hideExploreTrending', !!result.hideExploreTrending),
                     hideMoreFromYouTube: readBool('hideMoreFromYouTube', !!result.hideMoreFromYouTube),
                     hideSubscriptions: readBool('hideSubscriptions', !!result.hideSubscriptions),
+                    showQuickBlockButton: readBool('showQuickBlockButton', result.showQuickBlockButton !== false),
                     hideSearchShelves: readBool('hideSearchShelves', !!result.hideSearchShelves)
                 };
 
@@ -624,6 +632,7 @@
                 }
 
                 const contentFilters = safeObject(profileSettings.contentFilters);
+                const categoryFilters = safeObject(profileSettings.categoryFilters);
 
                 resolve({
                     enabled,
@@ -657,59 +666,27 @@
                     hideExploreTrending: effectiveSettings.hideExploreTrending,
                     hideMoreFromYouTube: effectiveSettings.hideMoreFromYouTube,
                     hideSubscriptions: effectiveSettings.hideSubscriptions,
+                    showQuickBlockButton: effectiveSettings.showQuickBlockButton,
                     hideSearchShelves: effectiveSettings.hideSearchShelves,
                     stats: result.stats || { hiddenCount: 0, savedMinutes: 0 },
                     statsBySurface: safeObject(result.statsBySurface),
                     channelMap: result.channelMap || {},
                     theme,
                     autoBackupEnabled,
-                    contentFilters
+                    contentFilters,
+                    categoryFilters
                 });
             });
         });
     }
 
-    function saveSettings({
-        keywords,
-        channels,
-        enabled,
-        hideShorts,
-        hideComments,
-        filterComments,
-        hideHomeFeed,
-        hideSponsoredCards,
-        hideWatchPlaylistPanel,
-        hidePlaylistCards,
-        hideMembersOnly,
-        hideMixPlaylists,
-        hideVideoSidebar,
-        hideRecommended,
-        hideLiveChat,
-        hideVideoInfo,
-        hideVideoButtonsBar,
-        hideAskButton,
-        hideVideoChannelRow,
-        hideVideoDescription,
-        hideMerchTicketsOffers,
-        hideEndscreenVideowall,
-        hideEndscreenCards,
-        disableAutoplay,
-        disableAnnotations,
-        hideTopHeader,
-        hideNotificationBell,
-        hideExploreTrending,
-        hideMoreFromYouTube,
-        hideSubscriptions,
-        hideSearchShelves,
-        autoBackupEnabled,
-        contentFilters
-    }) {
-        const sanitizedChannels = sanitizeChannelsList(channels);
-        const sanitizedKeywords = syncFilterAllKeywords(keywords, sanitizedChannels);
-        const sanitizedContentFilters = safeObject(contentFilters);
-        const compiledSettings = buildCompiledSettings({
-            keywords: sanitizedKeywords,
-            channels: sanitizedChannels,
+    function saveSettings(options = {}) {
+        const opts = options && typeof options === 'object' ? options : {};
+        const hasCategoryFiltersInput = Object.prototype.hasOwnProperty.call(opts, 'categoryFilters');
+
+        const {
+            keywords,
+            channels,
             enabled,
             hideShorts,
             hideComments,
@@ -738,50 +715,21 @@
             hideExploreTrending,
             hideMoreFromYouTube,
             hideSubscriptions,
+            showQuickBlockButton,
             hideSearchShelves,
-            contentFilters: sanitizedContentFilters
-        });
+            autoBackupEnabled,
+            contentFilters,
+            categoryFilters
+        } = opts;
 
-        const payload = {
-            enabled: compiledSettings.enabled,
-            uiKeywords: sanitizedKeywords, // Save ALL keywords (user + channel-derived) to preserve order
-            filterKeywords: compiledSettings.filterKeywords,
-            filterKeywordsComments: compiledSettings.filterKeywordsComments,
-            filterChannels: compiledSettings.filterChannels,
-            hideAllShorts: compiledSettings.hideAllShorts,
-            hideAllComments: compiledSettings.hideAllComments,
-            filterComments: compiledSettings.filterComments,
-            hideHomeFeed: compiledSettings.hideHomeFeed,
-            hideSponsoredCards: compiledSettings.hideSponsoredCards,
-            hideWatchPlaylistPanel: compiledSettings.hideWatchPlaylistPanel,
-            hidePlaylistCards: compiledSettings.hidePlaylistCards,
-            hideMembersOnly: compiledSettings.hideMembersOnly,
-            hideMixPlaylists: compiledSettings.hideMixPlaylists,
-            hideVideoSidebar: compiledSettings.hideVideoSidebar,
-            hideRecommended: compiledSettings.hideRecommended,
-            hideLiveChat: compiledSettings.hideLiveChat,
-            hideVideoInfo: compiledSettings.hideVideoInfo,
-            hideVideoButtonsBar: compiledSettings.hideVideoButtonsBar,
-            hideAskButton: compiledSettings.hideAskButton,
-            hideVideoChannelRow: compiledSettings.hideVideoChannelRow,
-            hideVideoDescription: compiledSettings.hideVideoDescription,
-            hideMerchTicketsOffers: compiledSettings.hideMerchTicketsOffers,
-            hideEndscreenVideowall: compiledSettings.hideEndscreenVideowall,
-            hideEndscreenCards: compiledSettings.hideEndscreenCards,
-            disableAutoplay: compiledSettings.disableAutoplay,
-            disableAnnotations: compiledSettings.disableAnnotations,
-            hideTopHeader: compiledSettings.hideTopHeader,
-            hideNotificationBell: compiledSettings.hideNotificationBell,
-            hideExploreTrending: compiledSettings.hideExploreTrending,
-            hideMoreFromYouTube: compiledSettings.hideMoreFromYouTube,
-            hideSubscriptions: compiledSettings.hideSubscriptions,
-            hideSearchShelves: compiledSettings.hideSearchShelves,
-            [AUTO_BACKUP_KEY]: autoBackupEnabled === true
-        };
+        const sanitizedChannels = sanitizeChannelsList(channels);
+        const sanitizedKeywords = syncFilterAllKeywords(keywords, sanitizedChannels);
+        const sanitizedContentFilters = safeObject(contentFilters);
 
         return new Promise(resolve => {
             STORAGE_NAMESPACE?.get([FT_PROFILES_V4_KEY, FT_PROFILES_V3_KEY], (existing) => {
                 let nextProfilesV4 = null;
+                let effectiveCategoryFilters = null;
                 try {
                     const existingV4 = existing?.[FT_PROFILES_V4_KEY];
                     if (isValidProfilesV4(existingV4)) {
@@ -791,6 +739,86 @@
                         const existingKids = safeObject(activeProfile.kids);
 
                         const existingSettings = safeObject(activeProfile.settings);
+                        const existingCategoryFilters = safeObject(existingSettings.categoryFilters);
+                        effectiveCategoryFilters = hasCategoryFiltersInput
+                            ? safeObject(categoryFilters)
+                            : existingCategoryFilters;
+
+                        const compiledSettings = buildCompiledSettings({
+                            keywords: sanitizedKeywords,
+                            channels: sanitizedChannels,
+                            enabled,
+                            hideShorts,
+                            hideComments,
+                            filterComments,
+                            hideHomeFeed,
+                            hideSponsoredCards,
+                            hideWatchPlaylistPanel,
+                            hidePlaylistCards,
+                            hideMembersOnly,
+                            hideMixPlaylists,
+                            hideVideoSidebar,
+                            hideRecommended,
+                            hideLiveChat,
+                            hideVideoInfo,
+                            hideVideoButtonsBar,
+                            hideAskButton,
+                            hideVideoChannelRow,
+                            hideVideoDescription,
+                            hideMerchTicketsOffers,
+                            hideEndscreenVideowall,
+                            hideEndscreenCards,
+                            disableAutoplay,
+                            disableAnnotations,
+                            hideTopHeader,
+                            hideNotificationBell,
+                            hideExploreTrending,
+                            hideMoreFromYouTube,
+                            hideSubscriptions,
+                            showQuickBlockButton,
+                            hideSearchShelves,
+                            contentFilters: sanitizedContentFilters,
+                            categoryFilters: effectiveCategoryFilters
+                        });
+
+                        const payload = {
+                            enabled: compiledSettings.enabled,
+                            uiKeywords: sanitizedKeywords,
+                            filterKeywords: compiledSettings.filterKeywords,
+                            filterKeywordsComments: compiledSettings.filterKeywordsComments,
+                            filterChannels: compiledSettings.filterChannels,
+                            hideAllShorts: compiledSettings.hideAllShorts,
+                            hideAllComments: compiledSettings.hideAllComments,
+                            filterComments: compiledSettings.filterComments,
+                            hideHomeFeed: compiledSettings.hideHomeFeed,
+                            hideSponsoredCards: compiledSettings.hideSponsoredCards,
+                            hideWatchPlaylistPanel: compiledSettings.hideWatchPlaylistPanel,
+                            hidePlaylistCards: compiledSettings.hidePlaylistCards,
+                            hideMembersOnly: compiledSettings.hideMembersOnly,
+                            hideMixPlaylists: compiledSettings.hideMixPlaylists,
+                            hideVideoSidebar: compiledSettings.hideVideoSidebar,
+                            hideRecommended: compiledSettings.hideRecommended,
+                            hideLiveChat: compiledSettings.hideLiveChat,
+                            hideVideoInfo: compiledSettings.hideVideoInfo,
+                            hideVideoButtonsBar: compiledSettings.hideVideoButtonsBar,
+                            hideAskButton: compiledSettings.hideAskButton,
+                            hideVideoChannelRow: compiledSettings.hideVideoChannelRow,
+                            hideVideoDescription: compiledSettings.hideVideoDescription,
+                            hideMerchTicketsOffers: compiledSettings.hideMerchTicketsOffers,
+                            hideEndscreenVideowall: compiledSettings.hideEndscreenVideowall,
+                            hideEndscreenCards: compiledSettings.hideEndscreenCards,
+                            disableAutoplay: compiledSettings.disableAutoplay,
+                            disableAnnotations: compiledSettings.disableAnnotations,
+                            hideTopHeader: compiledSettings.hideTopHeader,
+                            hideNotificationBell: compiledSettings.hideNotificationBell,
+                            hideExploreTrending: compiledSettings.hideExploreTrending,
+                            hideMoreFromYouTube: compiledSettings.hideMoreFromYouTube,
+                            hideSubscriptions: compiledSettings.hideSubscriptions,
+                            showQuickBlockButton: compiledSettings.showQuickBlockButton,
+                            hideSearchShelves: compiledSettings.hideSearchShelves,
+                            [AUTO_BACKUP_KEY]: autoBackupEnabled === true
+                        };
+
                         const nextSettings = {
                             ...existingSettings,
                             autoBackupEnabled: autoBackupEnabled === true,
@@ -822,8 +850,10 @@
                             hideExploreTrending: compiledSettings.hideExploreTrending,
                             hideMoreFromYouTube: compiledSettings.hideMoreFromYouTube,
                             hideSubscriptions: compiledSettings.hideSubscriptions,
+                            showQuickBlockButton: compiledSettings.showQuickBlockButton,
                             hideSearchShelves: compiledSettings.hideSearchShelves,
-                            contentFilters: sanitizedContentFilters
+                            contentFilters: sanitizedContentFilters,
+                            categoryFilters: effectiveCategoryFilters
                         };
 
                         profiles[activeId] = {
@@ -849,20 +879,174 @@
                             schemaVersion: 4,
                             profiles
                         };
-                    } else {
-                        nextProfilesV4 = buildProfilesV4FromLegacyState(existing, sanitizedChannels, sanitizedKeywords);
+
+                        payload[FT_PROFILES_V4_KEY] = nextProfilesV4;
+                        STORAGE_NAMESPACE?.set(payload, () => {
+                            const error = chrome.runtime?.lastError || null;
+                            resolve({ compiledSettings, error });
+                        });
+                        return;
                     }
+
+                    // No profiles v4: fall back to legacy migration path.
+                    // In this mode we cannot reliably preserve categoryFilters.
+                    const compiledSettings = buildCompiledSettings({
+                        keywords: sanitizedKeywords,
+                        channels: sanitizedChannels,
+                        enabled,
+                        hideShorts,
+                        hideComments,
+                        filterComments,
+                        hideHomeFeed,
+                        hideSponsoredCards,
+                        hideWatchPlaylistPanel,
+                        hidePlaylistCards,
+                        hideMembersOnly,
+                        hideMixPlaylists,
+                        hideVideoSidebar,
+                        hideRecommended,
+                        hideLiveChat,
+                        hideVideoInfo,
+                        hideVideoButtonsBar,
+                        hideAskButton,
+                        hideVideoChannelRow,
+                        hideVideoDescription,
+                        hideMerchTicketsOffers,
+                        hideEndscreenVideowall,
+                        hideEndscreenCards,
+                        disableAutoplay,
+                        disableAnnotations,
+                        hideTopHeader,
+                        hideNotificationBell,
+                        hideExploreTrending,
+                        hideMoreFromYouTube,
+                        hideSubscriptions,
+                        showQuickBlockButton,
+                        hideSearchShelves,
+                        contentFilters: sanitizedContentFilters,
+                        categoryFilters: safeObject(categoryFilters)
+                    });
+
+                    const payload = {
+                        enabled: compiledSettings.enabled,
+                        uiKeywords: sanitizedKeywords,
+                        filterKeywords: compiledSettings.filterKeywords,
+                        filterKeywordsComments: compiledSettings.filterKeywordsComments,
+                        filterChannels: compiledSettings.filterChannels,
+                        hideAllShorts: compiledSettings.hideAllShorts,
+                        hideAllComments: compiledSettings.hideAllComments,
+                        filterComments: compiledSettings.filterComments,
+                        hideHomeFeed: compiledSettings.hideHomeFeed,
+                        hideSponsoredCards: compiledSettings.hideSponsoredCards,
+                        hideWatchPlaylistPanel: compiledSettings.hideWatchPlaylistPanel,
+                        hidePlaylistCards: compiledSettings.hidePlaylistCards,
+                        hideMembersOnly: compiledSettings.hideMembersOnly,
+                        hideMixPlaylists: compiledSettings.hideMixPlaylists,
+                        hideVideoSidebar: compiledSettings.hideVideoSidebar,
+                        hideRecommended: compiledSettings.hideRecommended,
+                        hideLiveChat: compiledSettings.hideLiveChat,
+                        hideVideoInfo: compiledSettings.hideVideoInfo,
+                        hideVideoButtonsBar: compiledSettings.hideVideoButtonsBar,
+                        hideAskButton: compiledSettings.hideAskButton,
+                        hideVideoChannelRow: compiledSettings.hideVideoChannelRow,
+                        hideVideoDescription: compiledSettings.hideVideoDescription,
+                        hideMerchTicketsOffers: compiledSettings.hideMerchTicketsOffers,
+                        hideEndscreenVideowall: compiledSettings.hideEndscreenVideowall,
+                        hideEndscreenCards: compiledSettings.hideEndscreenCards,
+                        disableAutoplay: compiledSettings.disableAutoplay,
+                        disableAnnotations: compiledSettings.disableAnnotations,
+                        hideTopHeader: compiledSettings.hideTopHeader,
+                        hideNotificationBell: compiledSettings.hideNotificationBell,
+                        hideExploreTrending: compiledSettings.hideExploreTrending,
+                        hideMoreFromYouTube: compiledSettings.hideMoreFromYouTube,
+                        hideSubscriptions: compiledSettings.hideSubscriptions,
+                        showQuickBlockButton: compiledSettings.showQuickBlockButton,
+                        hideSearchShelves: compiledSettings.hideSearchShelves,
+                        [AUTO_BACKUP_KEY]: autoBackupEnabled === true
+                    };
+
+                    try {
+                        const legacyStorage = {
+                            ...safeObject(existing),
+                            enabled: compiledSettings.enabled,
+                            hideAllShorts: compiledSettings.hideAllShorts,
+                            hideAllComments: compiledSettings.hideAllComments,
+                            filterComments: compiledSettings.filterComments,
+                            hideHomeFeed: compiledSettings.hideHomeFeed,
+                            hideSponsoredCards: compiledSettings.hideSponsoredCards,
+                            hideWatchPlaylistPanel: compiledSettings.hideWatchPlaylistPanel,
+                            hidePlaylistCards: compiledSettings.hidePlaylistCards,
+                            hideMembersOnly: compiledSettings.hideMembersOnly,
+                            hideMixPlaylists: compiledSettings.hideMixPlaylists,
+                            hideVideoSidebar: compiledSettings.hideVideoSidebar,
+                            hideRecommended: compiledSettings.hideRecommended,
+                            hideLiveChat: compiledSettings.hideLiveChat,
+                            hideVideoInfo: compiledSettings.hideVideoInfo,
+                            hideVideoButtonsBar: compiledSettings.hideVideoButtonsBar,
+                            hideAskButton: compiledSettings.hideAskButton,
+                            hideVideoChannelRow: compiledSettings.hideVideoChannelRow,
+                            hideVideoDescription: compiledSettings.hideVideoDescription,
+                            hideMerchTicketsOffers: compiledSettings.hideMerchTicketsOffers,
+                            hideEndscreenVideowall: compiledSettings.hideEndscreenVideowall,
+                            hideEndscreenCards: compiledSettings.hideEndscreenCards,
+                            disableAutoplay: compiledSettings.disableAutoplay,
+                            disableAnnotations: compiledSettings.disableAnnotations,
+                            hideTopHeader: compiledSettings.hideTopHeader,
+                            hideNotificationBell: compiledSettings.hideNotificationBell,
+                            hideExploreTrending: compiledSettings.hideExploreTrending,
+                            hideMoreFromYouTube: compiledSettings.hideMoreFromYouTube,
+                            hideSubscriptions: compiledSettings.hideSubscriptions,
+                            showQuickBlockButton: compiledSettings.showQuickBlockButton,
+                            hideSearchShelves: compiledSettings.hideSearchShelves,
+                            [FT_PROFILES_V3_KEY]: existing?.[FT_PROFILES_V3_KEY]
+                        };
+                        payload[FT_PROFILES_V4_KEY] = buildProfilesV4FromLegacyState(legacyStorage, sanitizedChannels, sanitizedKeywords);
+                    } catch (e) {
+                    }
+
+                    STORAGE_NAMESPACE?.set(payload, () => {
+                        const error = chrome.runtime?.lastError || null;
+                        resolve({ compiledSettings, error });
+                    });
                 } catch (e) {
+                    const compiledSettings = buildCompiledSettings({
+                        keywords: sanitizedKeywords,
+                        channels: sanitizedChannels,
+                        enabled,
+                        hideShorts,
+                        hideComments,
+                        filterComments,
+                        hideHomeFeed,
+                        hideSponsoredCards,
+                        hideWatchPlaylistPanel,
+                        hidePlaylistCards,
+                        hideMembersOnly,
+                        hideMixPlaylists,
+                        hideVideoSidebar,
+                        hideRecommended,
+                        hideLiveChat,
+                        hideVideoInfo,
+                        hideVideoButtonsBar,
+                        hideAskButton,
+                        hideVideoChannelRow,
+                        hideVideoDescription,
+                        hideMerchTicketsOffers,
+                        hideEndscreenVideowall,
+                        hideEndscreenCards,
+                        disableAutoplay,
+                        disableAnnotations,
+                        hideTopHeader,
+                        hideNotificationBell,
+                        hideExploreTrending,
+                        hideMoreFromYouTube,
+                        hideSubscriptions,
+                        showQuickBlockButton,
+                        hideSearchShelves,
+                        contentFilters: sanitizedContentFilters,
+                        categoryFilters: safeObject(categoryFilters)
+                    });
+                    resolve({ compiledSettings, error: e });
                 }
-
-                if (nextProfilesV4) {
-                    payload[FT_PROFILES_V4_KEY] = nextProfilesV4;
-                }
-
-                STORAGE_NAMESPACE?.set(payload, () => {
-                    const error = chrome.runtime?.lastError || null;
-                    resolve({ compiledSettings, error });
-                });
             });
         });
     }

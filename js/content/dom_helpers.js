@@ -15,6 +15,40 @@ function ensureStyles() {
         style.textContent = `
             .filtertube-hidden { display: none !important; }
             .filtertube-hidden-shelf { display: none !important; }
+            .filtertube-pending-meta,
+            [data-filtertube-pending-category],
+            [data-filtertube-pending-upload-date] {
+                position: relative !important;
+                pointer-events: none !important;
+                overflow: hidden !important;
+            }
+
+            .filtertube-pending-meta > *,
+            [data-filtertube-pending-category] > *,
+            [data-filtertube-pending-upload-date] > * {
+                visibility: hidden !important;
+            }
+
+            .filtertube-pending-meta::after,
+            [data-filtertube-pending-category]::after,
+            [data-filtertube-pending-upload-date]::after {
+                content: "";
+                position: absolute;
+                inset: 0;
+                border-radius: 12px;
+                background: linear-gradient(90deg,
+                    rgba(148, 163, 184, 0.18) 0%,
+                    rgba(148, 163, 184, 0.28) 40%,
+                    rgba(148, 163, 184, 0.18) 80%
+                );
+                background-size: 220% 100%;
+                animation: filtertube-pending-shimmer 1.1s ease-in-out infinite;
+            }
+
+            @keyframes filtertube-pending-shimmer {
+                0% { background-position: 200% 0; }
+                100% { background-position: -200% 0; }
+            }
             /* Debugging aid (optional, can be toggled) */
             /* .filtertube-hidden { display: block !important; opacity: 0.1 !important; border: 2px solid red !important; } */
         `;

@@ -53,10 +53,13 @@ const RenderEngine = (() => {
 
     function createSourceBadge({ sourceKey, title }) {
         const isFromComments = sourceKey === 'comments';
+        const isKidsSynced = sourceKey === 'kids';
         return createPillBadge({
             text: isFromComments ? 'From Comments' : 'From Channel',
             title,
-            variantClass: isFromComments ? 'badge-variant-comments' : ''
+            variantClass: isFromComments
+                ? 'badge-variant-comments'
+                : (isKidsSynced ? 'badge-variant-kids' : '')
         });
     }
 
@@ -122,7 +125,11 @@ const RenderEngine = (() => {
         // Respect Main's mode: only show synced keywords in the active list view
         // Merge BEFORE sorting so Kids entries are interleaved by time
         if (profile !== 'kids' && state.syncKidsToMain) {
-            const kidsBlockedKeywords = Array.isArray(state.kids?.blockedKeywords) ? state.kids.blockedKeywords : [];
+            const kidsBlockedKeywordsBase = Array.isArray(state.kids?.blockedKeywords) ? state.kids.blockedKeywords : [];
+            const kidsBlockedChannels = Array.isArray(state.kids?.blockedChannels) ? state.kids.blockedChannels : [];
+            const kidsBlockedKeywords = (typeof Settings?.syncFilterAllKeywords === 'function')
+                ? Settings.syncFilterAllKeywords(kidsBlockedKeywordsBase, kidsBlockedChannels)
+                : kidsBlockedKeywordsBase;
             const kidsWhitelistKeywords = Array.isArray(state.kids?.whitelistKeywords) ? state.kids.whitelistKeywords : [];
             const allKidsKeywords = [...kidsBlockedKeywords, ...kidsWhitelistKeywords];
             // Use the appropriate main keywords based on mode
@@ -135,7 +142,11 @@ const RenderEngine = (() => {
                 const word = typeof k === 'object' ? k.word : String(k);
                 if (!seen.has(word.toLowerCase())) {
                     seen.add(word.toLowerCase());
-                    kidsOnly.push(k);
+                    if (k && typeof k === 'object') {
+                        kidsOnly.push({ ...k, __ftFromKids: true });
+                    } else {
+                        kidsOnly.push({ word: String(k), exact: false, comments: true, __ftFromKids: true });
+                    }
                 }
             });
             displayKeywords = [...displayKeywords, ...kidsOnly];
@@ -196,7 +207,8 @@ const RenderEngine = (() => {
 
         // Render each keyword
         displayKeywords.forEach(entry => {
-            const item = createKeywordListItem(entry, { minimal, profile, includeToggles, onDelete });
+            const effectiveProfile = (profile !== 'kids' && entry?.__ftFromKids) ? 'kids' : profile;
+            const item = createKeywordListItem(entry, { minimal, profile: effectiveProfile, includeToggles, onDelete });
             if (item instanceof Node) {
                 container.appendChild(item);
             }
@@ -230,7 +242,7 @@ const RenderEngine = (() => {
         item.className = minimal ? 'keyword-item' : 'list-item';
         applySourceClasses(item, {
             channelDerived: isChannelDerived,
-            sourceKey: null
+            sourceKey: entry?.__ftFromKids ? 'kids' : null
         });
 
         // Left side: word and badges
@@ -245,6 +257,12 @@ const RenderEngine = (() => {
             left.textContent = entry.word;
         } else {
             left.appendChild(word);
+            if (entry?.__ftFromKids) {
+                const kidsBadge = createKidsSyncBadge();
+                if (kidsBadge instanceof Node) {
+                    left.appendChild(kidsBadge);
+                }
+            }
         }
 
         // Right side: controls

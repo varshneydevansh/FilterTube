@@ -895,6 +895,13 @@ html[data-theme="dark"] .stat-card {
     color: var(--ft-color-text-primary);
 }
 
+.ft-topbar-list-mode .exact-toggle {
+    font-size: 11px;
+    line-height: 1;
+    padding: 6px 10px;
+    white-space: nowrap;
+}
+
 .video-filter-range {
     display: flex;
     align-items: center;
@@ -925,7 +932,76 @@ html[data-theme="dark"] .stat-card {
     border-radius: 10px;
     padding: 6px 10px;
     font-size: 12px;
+}
+
+.video-filters-manage:hover {
+    border-color: var(--ft-color-primary);
+    color: var(--ft-color-primary);
+}
+
+.ft-category-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    max-height: 240px;
+    overflow: auto;
+    padding-right: 4px;
+}
+
+.ft-category-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 99px;
+    border: 1px solid var(--ft-category-color-border, var(--ft-color-sem-neutral-border));
+    background: var(--ft-category-color-bg, var(--ft-color-bg-surface));
+    color: var(--ft-color-text-secondary);
     cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.2s;
+    user-select: none;
+    text-align: left;
+    min-height: 32px;
+}
+
+.ft-category-pill:hover {
+    border-color: var(--ft-category-color, var(--ft-color-brand-primary));
+    background: var(--ft-category-color-bg-active, var(--ft-color-bg-surface));
+}
+
+.ft-category-pill.active,
+.ft-category-pill[aria-pressed="true"] {
+    background: var(--ft-category-color-bg-active, rgba(255, 241, 242, 0.9));
+    border-color: var(--ft-category-color, var(--ft-color-brand-primary));
+    color: var(--ft-color-text-primary);
+}
+
+.ft-category-pill:focus-visible {
+    outline: 2px solid var(--ft-category-color, var(--ft-color-brand-primary));
+    outline-offset: 2px;
+}
+
+.ft-category-swatch {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: var(--ft-category-color, var(--ft-color-brand-primary));
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    flex: 0 0 auto;
+}
+
+.ft-category-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--ft-color-text-primary);
+}
+
+html[data-theme="dark"] .ft-category-pill {
+    background: var(--ft-color-bg-elevated);
 }
 
 .video-filters-manage:hover {

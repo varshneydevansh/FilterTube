@@ -855,6 +855,22 @@ html[data-theme="dark"] input:checked+.slider:before {
     background-color: white;
 }
 
+.ft-kids-sub-toggle-row {
+    padding-left: 12px;
+    border-left: 3px solid rgba(168, 85, 247, 0.55);
+    background: rgba(168, 85, 247, 0.06);
+}
+
+html[data-theme="dark"] .ft-kids-sub-toggle-row {
+    border-left-color: rgba(216, 180, 254, 0.55);
+    background: rgba(168, 85, 247, 0.12);
+}
+
+.ft-kids-sub-toggle-row .toggle-title {
+    color: var(--ft-color-text-secondary);
+    font-size: 13px;
+}
+
 
 /* --- Lists (Keywords/Channels) --- */
 .advanced-list {

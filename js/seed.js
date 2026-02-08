@@ -97,10 +97,20 @@
     }
     
     // Debug logging with sequence numbers
-    const seedDebugEnabled = !!window.__filtertubeDebug;
     let seedDebugSequence = 0;
+    function isSeedDebugEnabled() {
+        try {
+            return !!window.__filtertubeDebug || document.documentElement?.getAttribute('data-filtertube-debug') === 'true';
+        } catch (e) {
+            try {
+                return !!window.__filtertubeDebug;
+            } catch (e2) {
+                return false;
+            }
+        }
+    }
     function seedDebugLog(message, ...args) {
-        if (!seedDebugEnabled) return;
+        if (!isSeedDebugEnabled()) return;
         seedDebugSequence++;
         console.log(`[${seedDebugSequence}] FilterTube (Seed):`, message, ...args);
         
@@ -324,6 +334,8 @@
 
         seedDebugLog(`🔧 Starting to process ${dataName}...`);
         seedDebugLog(`Settings available:`, {
+            profileType: cachedSettings.profileType,
+            listMode: cachedSettings.listMode,
             keywords: cachedSettings.filterKeywords?.length || 0,
             channels: cachedSettings.filterChannels?.length || 0,
             hideAllComments: cachedSettings.hideAllComments,
@@ -835,6 +847,8 @@
     function updateSettings(newSettings) {
         seedDebugLog('📥 Settings update received');
         seedDebugLog('Settings details:', {
+            profileType: newSettings.profileType,
+            listMode: newSettings.listMode,
             keywords: newSettings.filterKeywords?.length || 0,
             channels: newSettings.filterChannels?.length || 0,
             hideAllComments: newSettings.hideAllComments,
@@ -842,6 +856,12 @@
         });
         
         cachedSettings = newSettings;
+        try {
+            if (window.filterTube && typeof window.filterTube === 'object') {
+                window.filterTube.settings = newSettings;
+            }
+        } catch (e) {
+        }
         
         // Process any queued data
         if (pendingDataQueue.length > 0) {

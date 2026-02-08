@@ -374,6 +374,54 @@ function clearBlockedElementAttributes(element) {
     element.removeAttribute('data-filtertube-blocked-ts');
 }
 
+function isExplicitlyHiddenByFilterTube(element) {
+    if (!element) return false;
+    const isHidden = element.classList.contains('filtertube-hidden') || element.hasAttribute('data-filtertube-hidden');
+    if (!isHidden) return false;
+
+    const hasExplicitMarker = Boolean(
+        element.getAttribute('data-filtertube-blocked-channel-id')
+        || element.getAttribute('data-filtertube-blocked-channel-handle')
+        || element.getAttribute('data-filtertube-blocked-channel-custom')
+        || element.getAttribute('data-filtertube-hidden-by-channel')
+        || element.getAttribute('data-filtertube-hidden-by-keyword')
+        || element.getAttribute('data-filtertube-hidden-by-duration')
+        || element.getAttribute('data-filtertube-hidden-by-upload-date')
+        || element.getAttribute('data-filtertube-hidden-by-category')
+        || element.getAttribute('data-filtertube-hidden-by-hide-all-shorts')
+    );
+    if (hasExplicitMarker) return true;
+
+    const liveVideoId = extractVideoIdFromCard(element) || '';
+    const stampedVideoId = element.getAttribute('data-filtertube-video-id') || '';
+    const processedVideoId = element.getAttribute('data-filtertube-last-processed-id') || '';
+    const candidateProcessedId = processedVideoId || stampedVideoId;
+
+    if (liveVideoId && candidateProcessedId && liveVideoId !== candidateProcessedId) {
+        // Stale recycled row: clear hidden state immediately so autoplay/nav does not skip past it.
+        clearBlockedElementAttributes(element);
+        element.classList.remove('filtertube-hidden');
+        element.removeAttribute('data-filtertube-hidden');
+        element.removeAttribute('data-filtertube-hidden-by-channel');
+        element.removeAttribute('data-filtertube-hidden-by-keyword');
+        element.removeAttribute('data-filtertube-hidden-by-duration');
+        element.removeAttribute('data-filtertube-hidden-by-upload-date');
+        element.removeAttribute('data-filtertube-hidden-by-category');
+        element.removeAttribute('data-filtertube-hidden-by-hide-all-shorts');
+        try {
+            element.style.removeProperty('display');
+        } catch (e) {
+        }
+        return false;
+    }
+
+    return Boolean(
+        candidateProcessedId &&
+        (!liveVideoId || liveVideoId === candidateProcessedId) &&
+        element.getAttribute('data-filtertube-processed') === 'true'
+    );
+}
+
 function ensureContentControlStyles(settings) {
     if (!settings || typeof settings !== 'object') return;
     if (!document.head) return;
@@ -769,6 +817,8 @@ function handleCommentsFallback(settings) {
         '#comments, ytd-comments, ytd-item-section-renderer[section-identifier="comment-item-section"]'
     );
     const commentThreads = document.querySelectorAll('ytd-comment-thread-renderer, ytm-comment-thread-renderer');
+    const commentRenderers = document.querySelectorAll('ytd-comment-renderer, ytm-comment-renderer');
+    const commentViewModels = document.querySelectorAll('ytd-comment-view-model, ytm-comment-view-model');
 
     try {
         const listMode = (settings && settings.listMode === 'whitelist') ? 'whitelist' : 'blocklist';
@@ -881,6 +931,183 @@ function handleCommentsFallback(settings) {
         }
 
         toggleVisibility(thread, shouldHide, reason);
+    });
+
+    // 4. Reply/comment-renderer filtering (replies are often separate commentRenderer nodes)
+    commentRenderers.forEach(commentEl => {
+        try {
+            if (!commentEl || !(commentEl instanceof Element)) return;
+
+            const parentThread = commentEl.closest('ytd-comment-thread-renderer, ytm-comment-thread-renderer');
+            const isRootOfThread = parentThread && parentThread.querySelector(':scope > ytd-comment-renderer, :scope > ytm-comment-renderer') === commentEl;
+            if (isRootOfThread) return;
+
+            const blockedChannelId = commentEl.getAttribute('data-filtertube-blocked-channel-id') || '';
+            const blockedChannelHandle = commentEl.getAttribute('data-filtertube-blocked-channel-handle') || '';
+            const blockedChannelCustom = commentEl.getAttribute('data-filtertube-blocked-channel-custom') || '';
+            const blockedChannelState = commentEl.getAttribute('data-filtertube-blocked-state') || '';
+            const blockedTimestamp = parseInt(commentEl.getAttribute('data-filtertube-blocked-ts') || '0', 10);
+            const blockAgeMs = blockedTimestamp ? Date.now() - blockedTimestamp : Number.POSITIVE_INFINITY;
+
+            if (blockedChannelId || blockedChannelHandle || blockedChannelCustom) {
+                const isStillBlocked = hasChannelFilters && markedChannelIsStillBlocked(settings, blockedChannelId, blockedChannelHandle, blockedChannelCustom);
+                if (isStillBlocked) {
+                    markElementAsBlocked(commentEl, { id: blockedChannelId, handle: blockedChannelHandle, customUrl: blockedChannelCustom }, 'confirmed');
+                    toggleVisibility(commentEl, true, `Blocked comment author: ${blockedChannelHandle || blockedChannelCustom || blockedChannelId}`);
+                    return;
+                }
+
+                const waitForConfirmation = blockedChannelState === 'pending' && blockAgeMs < 8000;
+                if (waitForConfirmation) {
+                    toggleVisibility(commentEl, true, `Pending channel block: ${blockedChannelHandle || blockedChannelCustom || blockedChannelId}`);
+                    return;
+                }
+
+                clearBlockedElementAttributes(commentEl);
+                toggleVisibility(commentEl, false, '', true);
+            }
+
+            if (!hasChannelFilters && !shouldFilterKeywords) {
+                toggleVisibility(commentEl, false, '', true);
+                return;
+            }
+
+            const authorAnchor = commentEl.querySelector(
+                '#author-text.yt-simple-endpoint, ' +
+                'a#author-text, ' +
+                '#author-text a'
+            );
+            const channelName = authorAnchor?.textContent?.trim() || commentEl.querySelector('#author-text')?.textContent?.trim() || '';
+            const channelHref = authorAnchor?.getAttribute?.('href') || authorAnchor?.href || '';
+            const channelMeta = (typeof extractChannelMetadataFromElement === 'function')
+                ? extractChannelMetadataFromElement(commentEl, channelName, channelHref, {
+                    cacheTarget: authorAnchor || commentEl,
+                    relatedElements: [authorAnchor].filter(Boolean)
+                })
+                : buildChannelMetadata(channelName, channelHref);
+
+            const commentText = commentEl.textContent || '';
+            const shouldHide = shouldHideContent(commentText, channelName, {
+                ...settings,
+                filterKeywords: commentKeywordList
+            }, {
+                skipKeywords: !shouldFilterKeywords,
+                channelHref,
+                channelMeta,
+                contentTag: (commentEl.tagName || '').toLowerCase()
+            });
+
+            let reason = 'Comment Filter';
+            if (shouldHide && hasChannelFilters && (channelMeta.handle || channelMeta.id || channelMeta.customUrl)) {
+                const blockedLabel = channelMeta.handle || channelMeta.customUrl || channelMeta.id;
+                if (blockedLabel) {
+                    reason = `Blocked comment author: ${blockedLabel}`;
+                }
+            }
+
+            toggleVisibility(commentEl, shouldHide, reason);
+        } catch (e) {
+        }
+    });
+
+    // 5. Modern YouTube comments use ytd-comment-view-model for both top-level and reply nodes.
+    commentViewModels.forEach(commentVm => {
+        try {
+            if (!commentVm || !(commentVm instanceof Element)) return;
+            if (commentVm.closest('ytd-comment-simplebox-renderer, ytm-comment-simplebox-renderer, #simple-box')) return;
+
+            const containerToHide = commentVm.closest('ytd-comment-thread-renderer, ytm-comment-thread-renderer') || commentVm;
+
+            const readBlocked = (el) => {
+                if (!el) return { id: '', handle: '', customUrl: '', state: '', ts: 0 };
+                return {
+                    id: el.getAttribute('data-filtertube-blocked-channel-id') || '',
+                    handle: el.getAttribute('data-filtertube-blocked-channel-handle') || '',
+                    customUrl: el.getAttribute('data-filtertube-blocked-channel-custom') || '',
+                    state: el.getAttribute('data-filtertube-blocked-state') || '',
+                    ts: parseInt(el.getAttribute('data-filtertube-blocked-ts') || '0', 10)
+                };
+            };
+
+            const blockedOnVm = readBlocked(commentVm);
+            const blockedOnContainer = containerToHide !== commentVm ? readBlocked(containerToHide) : { id: '', handle: '', customUrl: '', state: '', ts: 0 };
+            const blocked = blockedOnVm.id || blockedOnVm.handle || blockedOnVm.customUrl
+                ? blockedOnVm
+                : blockedOnContainer;
+
+            const blockedTimestamp = blocked.ts || 0;
+            const blockAgeMs = blockedTimestamp ? Date.now() - blockedTimestamp : Number.POSITIVE_INFINITY;
+            const hasStampedBlock = Boolean(blocked.id || blocked.handle || blocked.customUrl);
+
+            if (hasStampedBlock) {
+                const isStillBlocked = hasChannelFilters && markedChannelIsStillBlocked(settings, blocked.id, blocked.handle, blocked.customUrl);
+                if (isStillBlocked) {
+                    markElementAsBlocked(containerToHide, { id: blocked.id, handle: blocked.handle, customUrl: blocked.customUrl }, 'confirmed');
+                    toggleVisibility(containerToHide, true, `Blocked comment author: ${blocked.handle || blocked.customUrl || blocked.id}`);
+                    return;
+                }
+
+                const waitForConfirmation = blocked.state === 'pending' && blockAgeMs < 8000;
+                if (waitForConfirmation) {
+                    toggleVisibility(containerToHide, true, `Pending channel block: ${blocked.handle || blocked.customUrl || blocked.id}`);
+                    return;
+                }
+
+                try {
+                    clearBlockedElementAttributes(containerToHide);
+                    clearBlockedElementAttributes(commentVm);
+                } catch (e) {
+                }
+                toggleVisibility(containerToHide, false, '', true);
+            }
+
+            if (!hasChannelFilters && !shouldFilterKeywords) {
+                toggleVisibility(containerToHide, false, '', true);
+                return;
+            }
+
+            const authorAnchor = commentVm.querySelector(
+                '#header #author-text.yt-simple-endpoint, ' +
+                '#header a#author-text, ' +
+                '#header #author-text a, ' +
+                '#header ytd-author-comment-badge-renderer a[href^="/@"], ' +
+                '#header ytd-author-comment-badge-renderer a[href^="/channel/"], ' +
+                '#header ytd-channel-name a[href^="/@"], ' +
+                '#header ytd-channel-name a[href^="/channel/"]'
+            );
+
+            const thumbnailButton = commentVm.querySelector('#author-thumbnail-button[aria-label]');
+            const channelName = authorAnchor?.textContent?.trim() || commentVm.querySelector('#author-text')?.textContent?.trim() || thumbnailButton?.getAttribute('aria-label') || '';
+            const channelHref = authorAnchor?.getAttribute?.('href') || authorAnchor?.href || '';
+            const channelMeta = (typeof extractChannelMetadataFromElement === 'function')
+                ? extractChannelMetadataFromElement(commentVm, channelName, channelHref, {
+                    cacheTarget: authorAnchor || commentVm,
+                    relatedElements: [authorAnchor].filter(Boolean)
+                })
+                : buildChannelMetadata(channelName, channelHref);
+
+            const commentText = commentVm.textContent || '';
+            const shouldHide = shouldHideContent(commentText, channelName, {
+                ...settings,
+                filterKeywords: commentKeywordList
+            }, {
+                skipKeywords: !shouldFilterKeywords,
+                channelHref,
+                channelMeta,
+                contentTag: (commentVm.tagName || '').toLowerCase()
+            });
+
+            let reason = 'Comment Filter';
+            if (shouldHide && hasChannelFilters && (channelMeta.handle || channelMeta.id || channelMeta.customUrl)) {
+                const blockedLabel = channelMeta.handle || channelMeta.customUrl || channelMeta.id;
+                if (blockedLabel) {
+                    reason = `Blocked comment author: ${blockedLabel}`;
+                }
+            }
+
+            toggleVisibility(containerToHide, shouldHide, reason);
+        } catch (e) {
+        }
     });
 }
 
@@ -1168,8 +1395,15 @@ async function applyDOMFallback(settings, options = {}) {
             if (contentControlStyle) {
                 contentControlStyle.textContent = '';
             }
-            document.querySelectorAll('[data-filtertube-hidden], .filtertube-hidden').forEach(el => {
+            document.querySelectorAll('[data-filtertube-hidden], .filtertube-hidden, [data-filtertube-pending-category], [data-filtertube-pending-upload-date]').forEach(el => {
                 toggleVisibility(el, false, '', true);
+                try {
+                    el.removeAttribute('data-filtertube-pending-category');
+                    el.removeAttribute('data-filtertube-pending-upload-date');
+                    el.removeAttribute('data-filtertube-pending-category-ts');
+                    el.removeAttribute('data-filtertube-pending-upload-date-ts');
+                } catch (e) {
+                }
             });
         } catch (e) {
         }
@@ -1213,7 +1447,7 @@ async function applyDOMFallback(settings, options = {}) {
                     for (let i = start; i >= 0 && i < items.length; i += step) {
                         const cand = items[i];
                         if (!cand) continue;
-                        const candHidden = cand.classList.contains('filtertube-hidden') || cand.hasAttribute('data-filtertube-hidden');
+                        const candHidden = isExplicitlyHiddenByFilterTube(cand);
                         if (candHidden) continue;
                         const link = cand.querySelector('a[href*="watch?v="]');
                         if (link) return link;
@@ -1222,7 +1456,7 @@ async function applyDOMFallback(settings, options = {}) {
                 };
 
                 const immediate = items[idx + direction];
-                const immediateHidden = immediate && (immediate.classList.contains('filtertube-hidden') || immediate.hasAttribute('data-filtertube-hidden'));
+                const immediateHidden = immediate && isExplicitlyHiddenByFilterTube(immediate);
                 if (!immediateHidden) return;
 
                 const targetLink = pickNext(idx + direction, direction);
@@ -1269,7 +1503,7 @@ async function applyDOMFallback(settings, options = {}) {
                     if (idx < 0) return;
 
                     const nextItem = items[idx + 1];
-                    const nextHidden = nextItem && (nextItem.classList.contains('filtertube-hidden') || nextItem.hasAttribute('data-filtertube-hidden'));
+                    const nextHidden = nextItem && isExplicitlyHiddenByFilterTube(nextItem);
                     if (!nextHidden) return;
 
                     const nextBtn = document.querySelector('.ytp-next-button');
@@ -1308,6 +1542,46 @@ async function applyDOMFallback(settings, options = {}) {
                 }
             } catch (e) {
             }
+
+            let hideByCategory = false;
+            let pendingCategoryMeta = false;
+            try {
+                const catFilters = effectiveSettings && typeof effectiveSettings === 'object' ? effectiveSettings.categoryFilters : null;
+                const enabled = !!catFilters?.enabled;
+                const selected = Array.isArray(catFilters?.selected) ? catFilters.selected : [];
+                if (enabled && selected.length > 0) {
+                    const mode = catFilters?.mode === 'allow' ? 'allow' : 'block';
+                    const isHomeOrSearch = (() => {
+                        try {
+                            const path = document.location?.pathname || '';
+                            return path === '/' || path === '/results';
+                        } catch (e) {
+                            return false;
+                        }
+                    })();
+                    const videoId = ensureVideoIdForCard(element);
+                    let categoryRaw = '';
+                    if (videoId && effectiveSettings.videoMetaMap && typeof effectiveSettings.videoMetaMap === 'object') {
+                        categoryRaw = (effectiveSettings.videoMetaMap[videoId]?.category || '').trim();
+                    }
+
+                    if (!categoryRaw && videoId && typeof scheduleVideoMetaFetch === 'function') {
+                        scheduleVideoMetaFetch(videoId, { needDuration: false, needDates: false, needCategory: true });
+                        if (mode === 'allow' || isHomeOrSearch) {
+                            pendingCategoryMeta = true;
+                        }
+                    }
+
+                    if (categoryRaw) {
+                        const selectedSet = new Set(selected.map(v => String(v || '').trim().toLowerCase()).filter(Boolean));
+                        const categoryKey = categoryRaw.toLowerCase();
+                        hideByCategory = (mode === 'allow')
+                            ? !selectedSet.has(categoryKey)
+                            : selectedSet.has(categoryKey);
+                    }
+                }
+            } catch (e) {
+            }
             const alreadyProcessed = element.hasAttribute('data-filtertube-processed');
             const hasWhitelistPending = element.getAttribute('data-filtertube-whitelist-pending') === 'true';
             const uniqueId = element.getAttribute('data-filtertube-unique-id') || (elementTag.startsWith('ytk-') ? ensureVideoIdForCard(element) : extractVideoIdFromCard(element)) || '';
@@ -1340,8 +1614,21 @@ async function applyDOMFallback(settings, options = {}) {
                     if (extractedVideoId && cachedVideoId !== extractedVideoId) {
                         element.removeAttribute('data-filtertube-processed');
                         element.removeAttribute('data-filtertube-last-processed-id');
+                        element.removeAttribute('data-filtertube-duration');
                         element.removeAttribute('data-filtertube-video-id');
+                        element.removeAttribute('data-filtertube-unique-id');
                         clearCachedChannelMetadata(element);
+                        clearBlockedElementAttributes(element);
+                        element.removeAttribute('data-filtertube-hidden-by-channel');
+                        element.removeAttribute('data-filtertube-hidden-by-keyword');
+                        element.removeAttribute('data-filtertube-hidden-by-duration');
+                        element.removeAttribute('data-filtertube-hidden-by-upload-date');
+                        element.removeAttribute('data-filtertube-hidden-by-category');
+                        element.removeAttribute('data-filtertube-hidden-by-hide-all-shorts');
+                        try {
+                            toggleVisibility(element, false, '', true);
+                        } catch (e) {
+                        }
                     }
                 } catch (e) {
                 }
@@ -1407,9 +1694,15 @@ async function applyDOMFallback(settings, options = {}) {
             }
 
             // Extract Metadata
-            const titleElement = element.querySelector('#video-title, .ytd-video-meta-block #video-title, h3 a, .metadata-snippet-container #video-title, #video-title-link, .yt-lockup-metadata-view-model-wiz__title, .yt-lockup-metadata-view-model__title, .yt-lockup-metadata-view-model__heading-reset, yt-formatted-string#title, span#title');
+            const titleElement = element.querySelector(
+                '#video-title, .ytd-video-meta-block #video-title, h3 a, .metadata-snippet-container #video-title, ' +
+                '#video-title-link, .yt-lockup-metadata-view-model-wiz__title, .yt-lockup-metadata-view-model__title, ' +
+                '.yt-lockup-metadata-view-model__heading-reset, yt-formatted-string#title, span#title, ' +
+                'yt-dynamic-text-view-model h1, .yt-page-header-view-model__page-header-title, .dynamicTextViewModelH1'
+            );
+            const isPlaylistPanelRow = (elementTag === 'ytd-playlist-panel-video-renderer' || elementTag === 'ytd-playlist-panel-video-wrapper-renderer');
             let channelElement = null;
-            if (elementTag === 'ytd-playlist-panel-video-renderer' || elementTag === 'ytd-playlist-panel-video-wrapper-renderer') {
+            if (isPlaylistPanelRow) {
                 channelElement = element.querySelector('#byline, #byline-container #byline');
             }
             if (!channelElement && elementTag === 'ytd-video-renderer') {
@@ -1457,8 +1750,24 @@ async function applyDOMFallback(settings, options = {}) {
                     '.watch-card-tertiary-text a'
                 );
             }
+            if (!channelElement && elementTag === 'yt-official-card-view-model') {
+                channelElement = element.querySelector(
+                    '.yt-page-header-view-model__page-header-content-metadata .yt-content-metadata-view-model__metadata-text, ' +
+                    '.yt-page-header-view-model__page-header-content-metadata [role="text"]'
+                );
+            }
             const channelSubtitleElement = element.querySelector('#watch-card-subtitle, #watch-card-subtitle yt-formatted-string');
-            const channelAnchor = (channelElement || channelSubtitleElement)?.closest('a') || element.querySelector('a[href*="/channel"], a[href^="/@"], a[href*="/user/"], a[href*="/c/"]');
+            let channelAnchor = (channelElement || channelSubtitleElement)?.closest('a') || element.querySelector(
+                'a[href*="/channel/UC"], a[href^="/@"], a[href*="/user/"], a[href*="/c/"], ' +
+                '.yt-page-header-view-model__page-header-content-metadata a[href^="/@"], ' +
+                '.ytFlexibleActionsViewModelAction a[href^="/@"], .ytFlexibleActionsViewModelAction a[href*="/channel/UC"]'
+            );
+            if (elementTag === 'yt-official-card-view-model') {
+                const officialCardAnchor = element.querySelector('.ytFlexibleActionsViewModelAction a[href^="/@"]');
+                if (officialCardAnchor) {
+                    channelAnchor = officialCardAnchor;
+                }
+            }
 
             let title = titleElement?.textContent?.trim() || '';
             if (!title) {
@@ -1494,6 +1803,20 @@ async function applyDOMFallback(settings, options = {}) {
             const channelPrimaryText = channelElement?.textContent?.trim() || '';
             const channelSubtitleText = channelSubtitleElement?.textContent?.trim() || '';
             let channel = [channelPrimaryText, channelSubtitleText].filter(Boolean).join(' | ');
+            if (elementTag === 'yt-official-card-view-model') {
+                const officialHandleText = (
+                    element.querySelector('.yt-page-header-view-model__page-header-content-metadata [role="text"]')?.textContent || ''
+                ).trim();
+                const officialHandle = normalizeHandleForComparison(officialHandleText);
+                const officialTitle = (
+                    element.querySelector('.yt-page-header-view-model__page-header-title [role="text"], .dynamicTextViewModelH1 [role="text"]')?.textContent || ''
+                ).trim();
+                if (officialHandle) {
+                    channel = officialHandle;
+                } else if (!channel && officialTitle) {
+                    channel = officialTitle;
+                }
+            }
 
             // YouTube Kids specific extraction from aria-label
             if (!channel && elementTag.startsWith('ytk-')) {
@@ -1522,7 +1845,7 @@ async function applyDOMFallback(settings, options = {}) {
                     }
                 }
             }
-            if (elementTag === 'ytd-playlist-panel-video-renderer' || elementTag === 'ytd-playlist-panel-video-wrapper-renderer') {
+            if (isPlaylistPanelRow) {
                 const compact = channelPrimaryText
                     .split('\n')[0]
                     .split('•')[0]
@@ -1545,6 +1868,33 @@ async function applyDOMFallback(settings, options = {}) {
             } catch (e) {
             }
             const channelHref = channelAnchor?.getAttribute('href') || channelAnchor?.href || '';
+            const playlistVideoId = isPlaylistPanelRow ? ensureVideoIdForCard(element) : '';
+            const playlistMappedChannelId = (() => {
+                if (!playlistVideoId) return '';
+                const mapped = effectiveSettings?.videoChannelMap?.[playlistVideoId] || '';
+                if (typeof mapped === 'string' && /^UC[\w-]{22}$/i.test(mapped.trim())) {
+                    return mapped.trim();
+                }
+                return '';
+            })();
+            const playlistHasExplicitChannelHref = Boolean(channelHref && /\/(@|channel\/|c\/|user\/)/i.test(channelHref));
+            if (isPlaylistPanelRow && !playlistHasExplicitChannelHref) {
+                const stampedId = (element.getAttribute('data-filtertube-channel-id') || '').trim();
+                const stampedHandle = (element.getAttribute('data-filtertube-channel-handle') || '').trim();
+                const hasNestedStampedIdentity = Boolean(
+                    element.querySelector('[data-filtertube-channel-id], [data-filtertube-channel-handle]')
+                );
+                const shouldPurgeStaleIdentity = Boolean(
+                    stampedHandle ||
+                    hasNestedStampedIdentity ||
+                    (stampedId && (!playlistMappedChannelId || stampedId !== playlistMappedChannelId))
+                );
+                if (shouldPurgeStaleIdentity) {
+                    clearCachedChannelMetadata(element);
+                    element.removeAttribute('data-filtertube-channel-custom');
+                    element.removeAttribute('data-filtertube-channel-name');
+                }
+            }
 
             // Search page: YouTube often places FilterTube-stamped channel attributes on the thumbnail
             // anchor, while the visible channel name link renders later. Include that node so handle/id
@@ -1582,6 +1932,36 @@ async function applyDOMFallback(settings, options = {}) {
                 cacheTarget: channelAnchor || element,
                 relatedElements
             });
+            if (elementTag === 'yt-official-card-view-model') {
+                try {
+                    if (!channelMeta.handle) {
+                        const officialHandleHref = element.querySelector('.ytFlexibleActionsViewModelAction a[href^="/@"]')?.getAttribute('href') || '';
+                        const officialHandleText = (
+                            element.querySelector('.yt-page-header-view-model__page-header-content-metadata [role="text"]')?.textContent || ''
+                        ).trim();
+                        const officialHandle = normalizeHandleForComparison(officialHandleText) || normalizeHandleForComparison(officialHandleHref);
+                        if (officialHandle) {
+                            channelMeta = { ...channelMeta, handle: officialHandle };
+                        }
+                    }
+                    if (!channelMeta.id) {
+                        const nestedStampedId = element.querySelector('[data-filtertube-channel-id]')?.getAttribute('data-filtertube-channel-id') || '';
+                        if (nestedStampedId && /^UC[\w-]{22}$/i.test(nestedStampedId)) {
+                            channelMeta = { ...channelMeta, id: nestedStampedId };
+                        }
+                    }
+                    if (!channelMeta.id) {
+                        const nestedChannelHref = element.querySelector('a[href*="/channel/UC"]')?.getAttribute('href') || '';
+                        const nestedChannelId = (typeof extractChannelIdFromString === 'function')
+                            ? extractChannelIdFromString(nestedChannelHref)
+                            : '';
+                        if (nestedChannelId) {
+                            channelMeta = { ...channelMeta, id: nestedChannelId };
+                        }
+                    }
+                } catch (e) {
+                }
+            }
             const collaboratorMetas = extractCollaboratorMetadataFromElement(element);
             try {
                 const stampedName = element.getAttribute('data-filtertube-channel-name') || '';
@@ -1590,6 +1970,16 @@ async function applyDOMFallback(settings, options = {}) {
                     channelMeta = { ...channelMeta, name: inferredName };
                 }
             } catch (e) {
+            }
+
+            if (isPlaylistPanelRow && playlistMappedChannelId) {
+                if (channelMeta.id !== playlistMappedChannelId) {
+                    channelMeta = { ...channelMeta, id: playlistMappedChannelId };
+                }
+                try {
+                    element.setAttribute('data-filtertube-channel-id', playlistMappedChannelId);
+                } catch (e) {
+                }
             }
 
             try {
@@ -1615,6 +2005,183 @@ async function applyDOMFallback(settings, options = {}) {
                         try {
                             element.removeAttribute('data-filtertube-channel-id');
                         } catch (e) {
+                        }
+                    }
+                }
+            } catch (e) {
+            }
+
+            let hideByUploadDate = false;
+            let pendingUploadDateMeta = false;
+            try {
+                const contentFilters = effectiveSettings && typeof effectiveSettings === 'object' ? effectiveSettings.contentFilters : null;
+                const uploadSettings = contentFilters && typeof contentFilters === 'object' ? contentFilters.uploadDate : null;
+                if (uploadSettings && uploadSettings.enabled) {
+                    const parseDateMs = (value) => {
+                        if (!value || typeof value !== 'string') return null;
+                        const ms = new Date(value).getTime();
+                        return Number.isFinite(ms) ? ms : null;
+                    };
+
+                    const parseRelativeTimeToTimestamp = (timeText) => {
+                        if (!timeText || typeof timeText !== 'string') return null;
+                        const text = timeText.toLowerCase().trim();
+                        const now = Date.now();
+                        const msPerDay = 24 * 60 * 60 * 1000;
+                        const patterns = [
+                            { regex: /(\d+)\s*(?:year|years|anno|anni|año|años|jahr|jahre|an|ans)\b/, multiplier: 365 * msPerDay },
+                            { regex: /(\d+)\s*(?:month|months|mese|mesi|mes|meses|monat|monate|mois)\b/, multiplier: 30 * msPerDay },
+                            { regex: /(\d+)\s*(?:week|weeks|settimana|settimane|semana|semanas|woche|wochen|semaine|semaines)\b/, multiplier: 7 * msPerDay },
+                            { regex: /(\d+)\s*(?:day|days|giorno|giorni|día|días|tag|tage|jour|jours)\b/, multiplier: msPerDay },
+                            { regex: /(\d+)\s*(?:hour|hours|ora|ore|hora|horas|stunde|stunden|heure|heures)\b/, multiplier: 60 * 60 * 1000 },
+                            { regex: /(\d+)\s*(?:minute|minutes|minuto|minuti|minuto|minutos|min\.?|minute|minuten)\b/, multiplier: 60 * 1000 },
+                            { regex: /(\d+)\s*(?:second|seconds|secondo|secondi|segundo|segundos|sekunde|sekunden|seconde|secondes)\b/, multiplier: 1000 }
+                        ];
+                        for (const { regex, multiplier } of patterns) {
+                            const match = text.match(regex);
+                            if (match) {
+                                const count = parseInt(match[1], 10);
+                                if (!isNaN(count)) {
+                                    return now - (count * multiplier);
+                                }
+                            }
+                        }
+                        if (
+                            text.includes('just now') ||
+                            text.includes('moments ago') ||
+                            text.includes('proprio ora') ||
+                            text.includes('ahora mismo') ||
+                            text.includes('gerade eben') ||
+                            text.includes("à l'instant")
+                        ) {
+                            return now - (60 * 1000);
+                        }
+                        if (text.includes('yesterday') || text.includes('ieri') || text.includes('ayer') || text.includes('gestern') || text.includes('hier')) {
+                            return now - msPerDay;
+                        }
+                        return null;
+                    };
+
+                    let didScheduleMetaFetch = false;
+                    const resolvePublishTimestamp = () => {
+                        const videoId = ensureVideoIdForCard(element);
+                        if (videoId && effectiveSettings.videoMetaMap && typeof effectiveSettings.videoMetaMap === 'object') {
+                            const meta = effectiveSettings.videoMetaMap[videoId];
+                            const candidates = [meta?.uploadDate, meta?.publishDate];
+                            for (const raw of candidates) {
+                                const ms = parseDateMs(raw);
+                                if (ms !== null) return ms;
+                            }
+                        }
+
+                        const possibleTextNodes = [
+                            element.querySelector('#metadata-line'),
+                            element.querySelector('.ytd-video-meta-block'),
+                            element.querySelector('.yt-lockup-metadata-view-model__metadata'),
+                            element.querySelector('.yt-content-metadata-view-model__metadata-row'),
+                            element.querySelector('#video-info')
+                        ].filter(Boolean);
+
+                        const rawCandidates = [];
+                        for (const node of possibleTextNodes) {
+                            try {
+                                const t = node?.textContent?.trim() || '';
+                                if (t) rawCandidates.push(t);
+                            } catch (e) {
+                            }
+                        }
+                        try {
+                            const aria = element.getAttribute('aria-label') || '';
+                            if (aria) rawCandidates.push(aria);
+                        } catch (e) {
+                        }
+
+                        for (const raw of rawCandidates) {
+                            const parts = String(raw || '')
+                                .split('•')
+                                .map(s => s.trim())
+                                .filter(Boolean);
+                            const likely = parts.find(p => /ago|yesterday|just now|moments ago/i.test(p)) || '';
+                            const relativeCandidate = likely || parts.find(p => /(year|month|week|day|hour|minute|second)/i.test(p)) || '';
+                            const ms = parseRelativeTimeToTimestamp(relativeCandidate) ?? parseDateMs(relativeCandidate);
+                            if (ms !== null) return ms;
+                        }
+
+                        if (videoId && typeof scheduleVideoMetaFetch === 'function') {
+                            try {
+                                didScheduleMetaFetch = true;
+                                scheduleVideoMetaFetch(videoId, { needDuration: false, needDates: true });
+                            } catch (e) {
+                            }
+                        }
+
+                        return null;
+                    };
+
+                    const publishTimestamp = resolvePublishTimestamp();
+                    const isWatchPlaylistRow = (() => {
+                        try {
+                            const path = document.location?.pathname || '';
+                            if (path !== '/watch') return false;
+                            const params = new URLSearchParams(document.location?.search || '');
+                            if (!params.has('list')) return false;
+                            const tag = (element.tagName || '').toLowerCase();
+                            return tag === 'ytd-playlist-panel-video-renderer' || tag === 'ytd-playlist-panel-video-wrapper-renderer';
+                        } catch (e) {
+                            return false;
+                        }
+                    })();
+
+                    const condition = uploadSettings.condition || 'newer';
+                    if (publishTimestamp !== null) {
+                        if (condition === 'newer') {
+                            const cutoffMs = parseDateMs(uploadSettings.fromDate);
+                            if (cutoffMs !== null) hideByUploadDate = publishTimestamp < cutoffMs;
+                        } else if (condition === 'older') {
+                            const cutoffMs = parseDateMs(uploadSettings.toDate);
+                            if (cutoffMs !== null) hideByUploadDate = publishTimestamp < cutoffMs;
+                        } else if (condition === 'between') {
+                            let fromMs = parseDateMs(uploadSettings.fromDate);
+                            let toMs = parseDateMs(uploadSettings.toDate);
+                            if (fromMs !== null && toMs !== null) {
+                                if (fromMs > toMs) {
+                                    const tmp = fromMs;
+                                    fromMs = toMs;
+                                    toMs = tmp;
+                                }
+                                hideByUploadDate = publishTimestamp < fromMs || publishTimestamp > toMs;
+                            }
+                        }
+                    } else if (isWatchPlaylistRow) {
+                        let isSelectedRow = false;
+                        try {
+                            const rowEl = element.tagName?.toLowerCase() === 'ytd-playlist-panel-video-renderer'
+                                ? element
+                                : element.querySelector?.('ytd-playlist-panel-video-renderer');
+                            isSelectedRow = Boolean(
+                                rowEl && (rowEl.hasAttribute('selected') || rowEl.getAttribute('aria-selected') === 'true')
+                            );
+                        } catch (e) {
+                        }
+
+                        if (!isSelectedRow) {
+                            hideByUploadDate = true;
+                        }
+                    } else if (didScheduleMetaFetch) {
+                        const needsTimestamp = (() => {
+                            if (condition === 'newer') {
+                                return parseDateMs(uploadSettings.fromDate) !== null;
+                            }
+                            if (condition === 'older') {
+                                return parseDateMs(uploadSettings.toDate) !== null;
+                            }
+                            if (condition === 'between') {
+                                return parseDateMs(uploadSettings.fromDate) !== null && parseDateMs(uploadSettings.toDate) !== null;
+                            }
+                            return false;
+                        })();
+                        if (needsTimestamp) {
+                            pendingUploadDateMeta = true;
                         }
                     }
                 }
@@ -1693,7 +2260,6 @@ async function applyDOMFallback(settings, options = {}) {
             }
 
             // If channel identity is missing, try videoChannelMap lookup (Shorts + playlist panels + other DOM-heavy cards).
-            const isPlaylistPanelRow = (elementTag === 'ytd-playlist-panel-video-renderer' || elementTag === 'ytd-playlist-panel-video-wrapper-renderer');
             const hasChannelIdentity = Boolean(channelMeta.handle || channelMeta.id || channelMeta.customUrl);
             let mappedChannelId = '';
             if (!hasChannelIdentity && effectiveSettings.videoChannelMap) {
@@ -1753,6 +2319,31 @@ async function applyDOMFallback(settings, options = {}) {
                                 element.setAttribute('data-filtertube-duration', String(parsed));
                             } catch (e) {
                             }
+                        } else {
+                            try {
+                                const isKidsHost = (() => {
+                                    try {
+                                        return typeof location !== 'undefined' && String(location.hostname || '').includes('youtubekids.com');
+                                    } catch (e) {
+                                        return false;
+                                    }
+                                })();
+                                const isKidsCard = elementTag.startsWith('ytk-');
+                                if ((isKidsHost || isKidsCard) && videoId && typeof scheduleVideoMetaFetch === 'function') {
+                                    scheduleVideoMetaFetch(videoId, { needDuration: true, needDates: false, needCategory: false });
+                                }
+                            } catch (e) {
+                            }
+                            try {
+                                const href = element.querySelector('a[href]')?.getAttribute('href') || '';
+                                const isMixLike = href.includes('start_radio=1')
+                                    || !!element.querySelector('a[href*="start_radio=1"]')
+                                    || String(element.querySelector('.yt-badge-shape__text')?.textContent || '').trim().toLowerCase() === 'mix';
+                                if (isMixLike && videoId && typeof scheduleVideoMetaFetch === 'function') {
+                                    scheduleVideoMetaFetch(videoId);
+                                }
+                            } catch (e) {
+                            }
                         }
                     }
 
@@ -1778,6 +2369,50 @@ async function applyDOMFallback(settings, options = {}) {
             const keywordTarget = (listMode === 'whitelist' && descriptionText)
                 ? `${title} ${descriptionText}`
                 : title;
+
+            const isKidsHost = (() => {
+                try {
+                    return typeof location !== 'undefined' && String(location.hostname || '').includes('youtubekids.com');
+                } catch (e) {
+                    return false;
+                }
+            })();
+
+            const debugEnabled = (() => {
+                try {
+                    return !!window.__filtertubeDebug || document.documentElement?.getAttribute('data-filtertube-debug') === 'true';
+                } catch (e) {
+                    return !!window.__filtertubeDebug;
+                }
+            })();
+
+            const hasActiveBlockRules = (() => {
+                try {
+                    const hasChannels = Array.isArray(effectiveSettings.filterChannels) && effectiveSettings.filterChannels.length > 0;
+                    const hasKeywords = Array.isArray(effectiveSettings.filterKeywords) && effectiveSettings.filterKeywords.length > 0;
+                    return hasChannels || hasKeywords;
+                } catch (e) {
+                    return false;
+                }
+            })();
+
+            const hasEnabledContentFilters = (() => {
+                try {
+                    const cf = effectiveSettings && typeof effectiveSettings === 'object' ? effectiveSettings.contentFilters : null;
+                    if (!cf || typeof cf !== 'object') return false;
+                    const hasContent = Boolean(
+                        cf.duration?.enabled ||
+                        cf.uploadDate?.enabled ||
+                        cf.uppercase?.enabled
+                    );
+
+                    const cat = effectiveSettings && typeof effectiveSettings === 'object' ? effectiveSettings.categoryFilters : null;
+                    const hasCategory = Boolean(cat?.enabled && Array.isArray(cat?.selected) && cat.selected.length > 0);
+                    return hasContent || hasCategory;
+                } catch (e) {
+                    return false;
+                }
+            })();
 
             const matchesFilters = shouldHideContent(keywordTarget, channel, effectiveSettings, {
                 skipKeywords: skipKeywordFiltering,
@@ -1817,9 +2452,105 @@ async function applyDOMFallback(settings, options = {}) {
             }
 
             let hideReason = `Content: ${title}`;
-            let shouldHide = matchesFilters || hideByDuration;
+            let shouldHide = matchesFilters || hideByDuration || hideByUploadDate || hideByCategory;
             if (hideByDuration) {
                 hideReason = `Duration filter: ${title}`;
+            }
+            if (hideByUploadDate) {
+                hideReason = `Upload date filter: ${title}`;
+            }
+            if (hideByCategory) {
+                hideReason = `Category filter: ${title}`;
+            }
+
+            const pendingMetaTtlMs = 8000;
+            const nowMetaTs = Date.now();
+            try {
+                if (pendingCategoryMeta) {
+                    const raw = targetToHide.getAttribute('data-filtertube-pending-category-ts') || '';
+                    const prev = raw && /^\d+$/.test(raw) ? parseInt(raw, 10) : 0;
+                    if (prev && (nowMetaTs - prev > pendingMetaTtlMs)) {
+                        pendingCategoryMeta = false;
+                    }
+                }
+            } catch (e) {
+            }
+            try {
+                if (pendingUploadDateMeta) {
+                    const raw = targetToHide.getAttribute('data-filtertube-pending-upload-date-ts') || '';
+                    const prev = raw && /^\d+$/.test(raw) ? parseInt(raw, 10) : 0;
+                    if (prev && (nowMetaTs - prev > pendingMetaTtlMs)) {
+                        pendingUploadDateMeta = false;
+                    }
+                }
+            } catch (e) {
+            }
+
+            const pendingMetaOnly = (pendingCategoryMeta || pendingUploadDateMeta) && !shouldHide;
+            try {
+                if (pendingMetaOnly && pendingCategoryMeta) {
+                    targetToHide.setAttribute('data-filtertube-pending-category', 'true');
+                    const hadTs = targetToHide.hasAttribute('data-filtertube-pending-category-ts');
+                    if (!hadTs) {
+                        targetToHide.setAttribute('data-filtertube-pending-category-ts', String(nowMetaTs));
+                        const pendingTimerState = window.__filtertubePendingMetaRecheck || (window.__filtertubePendingMetaRecheck = { timer: 0 });
+                        if (!pendingTimerState.timer) {
+                            pendingTimerState.timer = setTimeout(() => {
+                                pendingTimerState.timer = 0;
+                                try {
+                                    if (typeof applyDOMFallback === 'function') {
+                                        applyDOMFallback(null, { preserveScroll: true });
+                                    }
+                                } catch (e) {
+                                }
+                            }, pendingMetaTtlMs + 120);
+                        }
+                    }
+                } else {
+                    targetToHide.removeAttribute('data-filtertube-pending-category');
+                    targetToHide.removeAttribute('data-filtertube-pending-category-ts');
+                }
+                if (pendingMetaOnly && pendingUploadDateMeta) {
+                    targetToHide.setAttribute('data-filtertube-pending-upload-date', 'true');
+                    const hadTs = targetToHide.hasAttribute('data-filtertube-pending-upload-date-ts');
+                    if (!hadTs) {
+                        targetToHide.setAttribute('data-filtertube-pending-upload-date-ts', String(nowMetaTs));
+                        const pendingTimerState = window.__filtertubePendingMetaRecheck || (window.__filtertubePendingMetaRecheck = { timer: 0 });
+                        if (!pendingTimerState.timer) {
+                            pendingTimerState.timer = setTimeout(() => {
+                                pendingTimerState.timer = 0;
+                                try {
+                                    if (typeof applyDOMFallback === 'function') {
+                                        applyDOMFallback(null, { preserveScroll: true });
+                                    }
+                                } catch (e) {
+                                }
+                            }, pendingMetaTtlMs + 120);
+                        }
+                    }
+                } else {
+                    targetToHide.removeAttribute('data-filtertube-pending-upload-date');
+                    targetToHide.removeAttribute('data-filtertube-pending-upload-date-ts');
+                }
+            } catch (e) {
+            }
+
+            if (pendingMetaOnly) {
+                hideReason = pendingCategoryMeta ? 'Pending category metadata' : 'Pending upload date metadata';
+            }
+
+            if (isKidsHost && listMode === 'blocklist' && !hasActiveBlockRules && !hasEnabledContentFilters && shouldHide) {
+                if (debugEnabled) {
+                    console.warn('[FilterTube] Fail-open: suppressing hide on Kids blocklist with empty rules', {
+                        title,
+                        channel,
+                        hideByDuration,
+                        hideByUploadDate,
+                        matchesFilters,
+                        hideReason
+                    });
+                }
+                shouldHide = false;
             }
 
             // Never hide the currently-selected playlist row. Hiding it can trigger
@@ -1837,12 +2568,49 @@ async function applyDOMFallback(settings, options = {}) {
                 }
 
                 if (isSelectedRow) {
-                    shouldHide = false;
-                    try {
-                        targetToHide.removeAttribute('data-filtertube-hidden-by-keyword');
-                        targetToHide.removeAttribute('data-filtertube-hidden-by-hide-all-shorts');
-                        targetToHide.removeAttribute('data-filtertube-hidden-by-duration');
-                    } catch (e) {
+                    const hasExplicitBlockMarker = (() => {
+                        try {
+                            return Boolean(
+                                targetToHide.getAttribute('data-filtertube-blocked-channel-id')
+                                || targetToHide.getAttribute('data-filtertube-blocked-channel-handle')
+                                || targetToHide.getAttribute('data-filtertube-blocked-channel-custom')
+                                || targetToHide.getAttribute('data-filtertube-hidden-by-channel')
+                                || targetToHide.getAttribute('data-filtertube-hidden-by-keyword')
+                            );
+                        } catch (e) {
+                            return false;
+                        }
+                    })();
+                    const shouldHideSelectedRow = shouldHide && (hasExplicitBlockMarker || (hasActiveBlockRules && matchesFilters));
+                    if (shouldHideSelectedRow) {
+                        try {
+                            const now = Date.now();
+                            const last = Number(window.__filtertubeLastPlaylistSkipTs || 0);
+                            if (now - last > 1500) {
+                                window.__filtertubeLastPlaylistSkipTs = now;
+                                setTimeout(() => {
+                                    try {
+                                        const nextBtn = document.querySelector('.ytp-next-button:not([disabled])');
+                                        if (nextBtn) nextBtn.click();
+                                    } catch (e) {
+                                    }
+                                }, 80);
+                            }
+                        } catch (e) {
+                        }
+                    } else {
+                        shouldHide = false;
+                        try {
+                            targetToHide.removeAttribute('data-filtertube-hidden-by-keyword');
+                            targetToHide.removeAttribute('data-filtertube-hidden-by-hide-all-shorts');
+                            targetToHide.removeAttribute('data-filtertube-hidden-by-duration');
+                            targetToHide.removeAttribute('data-filtertube-hidden-by-upload-date');
+                            targetToHide.removeAttribute('data-filtertube-pending-category');
+                            targetToHide.removeAttribute('data-filtertube-pending-upload-date');
+                            targetToHide.removeAttribute('data-filtertube-pending-category-ts');
+                            targetToHide.removeAttribute('data-filtertube-pending-upload-date-ts');
+                        } catch (e) {
+                        }
                     }
                 } else {
                     // Sticky-hide for watch-playlist panel rows:
@@ -1850,7 +2618,36 @@ async function applyDOMFallback(settings, options = {}) {
                     // This prevents temporarily restored-but-blocked items from becoming playable during enrichment.
                     const wasHidden = targetToHide.classList.contains('filtertube-hidden') || targetToHide.hasAttribute('data-filtertube-hidden');
                     const identityResolvedNow = Boolean(hasChannelIdentity || mappedChannelId);
-                    if (wasHidden && !identityResolvedNow && !shouldHide) {
+                    const hasActiveListFilters = (() => {
+                        try {
+                            const hasChannels = Array.isArray(effectiveSettings.filterChannels) && effectiveSettings.filterChannels.length > 0;
+                            const hasKeywords = Array.isArray(effectiveSettings.filterKeywords) && effectiveSettings.filterKeywords.length > 0;
+                            const hasWhitelistPending = Array.isArray(effectiveSettings.whitelistChannels) && effectiveSettings.whitelistChannels.length > 0;
+                            return hasChannels || hasKeywords || hasWhitelistPending;
+                        } catch (e) {
+                            return false;
+                        }
+                    })();
+
+                    const hasExplicitHiddenMarker = (() => {
+                        try {
+                            return Boolean(
+                                targetToHide.getAttribute('data-filtertube-blocked-channel-id')
+                                || targetToHide.getAttribute('data-filtertube-blocked-channel-handle')
+                                || targetToHide.getAttribute('data-filtertube-blocked-channel-custom')
+                                || targetToHide.getAttribute('data-filtertube-hidden-by-channel')
+                                || targetToHide.getAttribute('data-filtertube-hidden-by-keyword')
+                                || targetToHide.getAttribute('data-filtertube-hidden-by-duration')
+                                || targetToHide.getAttribute('data-filtertube-hidden-by-upload-date')
+                                || targetToHide.getAttribute('data-filtertube-hidden-by-category')
+                                || targetToHide.getAttribute('data-filtertube-hidden-by-hide-all-shorts')
+                            );
+                        } catch (e) {
+                            return false;
+                        }
+                    })();
+
+                    if (hasActiveListFilters && wasHidden && !identityResolvedNow && !shouldHide && hasExplicitHiddenMarker) {
                         shouldHide = true;
                         hideReason = hideReason || 'Playlist row (pending identity)';
                     }
@@ -1885,7 +2682,25 @@ async function applyDOMFallback(settings, options = {}) {
             } catch (e) {
             }
 
-            toggleVisibility(targetToHide, shouldHide, hideReason);
+            try {
+                if (hideByUploadDate && shouldHide) {
+                    targetToHide.setAttribute('data-filtertube-hidden-by-upload-date', 'true');
+                } else {
+                    targetToHide.removeAttribute('data-filtertube-hidden-by-upload-date');
+                }
+            } catch (e) {
+            }
+
+            try {
+                if (hideByCategory && shouldHide) {
+                    targetToHide.setAttribute('data-filtertube-hidden-by-category', 'true');
+                } else {
+                    targetToHide.removeAttribute('data-filtertube-hidden-by-category');
+                }
+            } catch (e) {
+            }
+
+            toggleVisibility(targetToHide, shouldHide, hideReason, pendingMetaOnly);
             element.setAttribute('data-filtertube-processed', 'true');
             element.setAttribute('data-filtertube-last-processed-mode', listMode);
             if (uniqueId) {
@@ -2363,7 +3178,7 @@ async function applyDOMFallback(settings, options = {}) {
                 const items = Array.from(playlistPanel.querySelectorAll('ytd-playlist-panel-video-renderer'));
                 if (items.length > 0) {
                     const selected = items.find(el => el.hasAttribute('selected') || el.getAttribute('aria-selected') === 'true') || null;
-                    const isHidden = selected && (selected.classList.contains('filtertube-hidden') || selected.hasAttribute('data-filtertube-hidden'));
+                    const isHidden = selected && isExplicitlyHiddenByFilterTube(selected);
                     if (selected && isHidden) {
                         const selectedHref = selected.querySelector('a[href*="watch?v="]')?.getAttribute('href') || '';
                         const selectedVid = (selectedHref.match(/[?&]v=([a-zA-Z0-9_-]{11})/) || [])[1] || '';
@@ -2373,7 +3188,7 @@ async function applyDOMFallback(settings, options = {}) {
                                 for (let i = start; i >= 0 && i < items.length; i += step) {
                                     const cand = items[i];
                                     if (!cand) continue;
-                                    const candHidden = cand.classList.contains('filtertube-hidden') || cand.hasAttribute('data-filtertube-hidden');
+                                    const candHidden = isExplicitlyHiddenByFilterTube(cand);
                                     if (candHidden) continue;
                                     const link = cand.querySelector('a[href*="watch?v="]');
                                     if (link) return link;
@@ -2599,7 +3414,12 @@ function shouldHideContent(title, channel, settings, options = {}) {
                             state.lastTs = now;
                             const key = index.unresolvedHandleKeys[state.idx % index.unresolvedHandleKeys.length];
                             state.idx = (state.idx + 1) % index.unresolvedHandleKeys.length;
-                            const cachedState = hasResolvedCache ? resolvedHandleCache.get(key) : null;
+                            const safeKey = String(key || '').trim().replace(/^@+/, '');
+                            const isBogusUcAsHandle = /^uc[\w-]{22}$/i.test(safeKey);
+                            if (!safeKey || isBogusUcAsHandle) {
+                                return false;
+                            }
+                            const cachedState = hasResolvedCache ? resolvedHandleCache.get(safeKey) : null;
                             if (cachedState && cachedState !== 'PENDING') {
                                 if (String(cachedState).toLowerCase() === contentId) {
                                     return true;
@@ -2612,7 +3432,7 @@ function shouldHideContent(title, channel, settings, options = {}) {
                                         return false;
                                     }
                                 })();
-                                fetchIdForHandle(`@${key}`, { skipNetwork: isKidsHost });
+                                fetchIdForHandle(`@${safeKey}`, { skipNetwork: isKidsHost });
                             }
                         }
                     }

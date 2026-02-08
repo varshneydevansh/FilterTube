@@ -3,6 +3,18 @@
     "_comment": "Shared release notes source for the dashboard What's New tab and the YouTube release banner. Keep entries sorted newest-first by version."
   },
   {
+    "version": "3.2.7",
+    "headline": "Category Filters + Quick Block Hover Cross + Mobile 3 Dot UI & Quick Cross Block Support",
+    "summary": "New category filtering, one-tap quick cross block enabled by default",
+    "bannerSummary": "Use new category filters and quick cross block from card hover; and better support for YT Mobile blocking.",
+    "highlights": [
+      "Category Filtering: Block or allow videos by YouTube category (Music, Gaming, Education, etc.)",
+      "Quick Cross Block Default ON: `Show Quick Cross Block button` is enabled by default in v3.2.7 (users can still disable it)",
+      "Mobile Blocking: Better support for YT Mobile blocking for 3 Dot UI & Quick Cross Block currently working on Home Page"
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.7"
+  },
+  {
     "version": "3.2.6",
     "headline": "UI/UX Beautification & Content-Based Filtering",
     "summary": "Complete typography improvements with modern design, three new content filters (duration, date, uppercase).",

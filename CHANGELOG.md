@@ -1,5 +1,32 @@
 # Changelog
 
+## Version 3.2.7
+
+### Category Filters + Quick Block Hover Cross
+
+- **Quick Block default ON (one-time migration)**: `showQuickBlockButton` now defaults to enabled in v3.2.7, while still allowing users to disable it anytime.
+- **Safe migration behavior**: Added a one-time migration marker (`quickBlockDefaultV327Applied`) so this default is applied once and not re-forced on future updates.
+- **Quick block card action hardening**: Improved card anchoring and hover lifecycle so the quick cross stays visible on complex YouTube surfaces.
+- **Search/Home Shorts hover retention fix**: Pointer tracking now retains hover state while the pointer remains inside host/anchor bounds, reducing cross disappearance under overlay layers.
+
+### Blocking Stability Fixes
+
+- **Comment block isolation**: Comment-origin block actions are now context-isolated from watch/playlist card logic.
+- **Playlist autoplay regression fix**: Blocking from comment menus no longer triggers unintended playlist row hide/next-video transitions.
+- **Context-safe identity path**: Comment-origin actions skip video-card prefetch/identity merge paths that could leak currently-playing card identity.
+
+### Release Notes + What’s New
+
+- **v3.2.7 release note refreshed** in `data/release_notes.json` with short, feature-first highlights.
+
+### Documentation Updates
+
+- Updated quick-block behavior and reliability notes in:
+  - `docs/FUNCTIONALITY.md`
+  - `docs/ARCHITECTURE.md`
+  - `docs/CODEMAP.md`
+- Added README feature note for the quick block cross and updated badge/version metadata.
+
 ## Version 3.2.6
 
 ### UI/UX Beautification & Content-Based Filtering

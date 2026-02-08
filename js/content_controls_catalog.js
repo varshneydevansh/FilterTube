@@ -53,6 +53,11 @@
                     key: 'hideMixPlaylists',
                     title: 'Hide Mix / Radio playlists',
                     description: 'Hide Mix and radio playlist items'
+                },
+                {
+                    key: 'showQuickBlockButton',
+                    title: 'Show Quick Block button',
+                    description: 'Show a hover button on cards for one-tap blocking of all channels on that card'
                 }
             ]
         },

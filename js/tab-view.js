@@ -179,6 +179,7 @@ function initializeFiltersTabs() {
     contentTab.appendChild(contentSearchRow);
 
     const catalog = window.FilterTubeContentControlsCatalog?.getCatalog?.() || [];
+    let feedRowsContainer = null;
 
     function hexToRgba(hex, alpha) {
         if (!hex || typeof hex !== 'string') return '';
@@ -212,6 +213,10 @@ function initializeFiltersTabs() {
         groupEl.className = 'content-control-group';
         applyControlGroupTheme(groupEl, group?.accentColor);
 
+        if (group?.id === 'feed') {
+            groupEl.id = 'feedControlsSection';
+        }
+
         const headerEl = document.createElement('div');
         headerEl.className = 'content-control-group__header';
 
@@ -224,6 +229,9 @@ function initializeFiltersTabs() {
 
         const rowsContainer = document.createElement('div');
         rowsContainer.className = 'content-control-group__rows';
+        if (group?.id === 'feed') {
+            feedRowsContainer = rowsContainer;
+        }
 
         (group.controls || []).forEach(control => {
             const row = document.createElement('div');
@@ -273,29 +281,34 @@ function initializeFiltersTabs() {
         contentTab.appendChild(groupEl);
     });
 
-    // Video Filters Section (placed below existing toggles as per spec)
-    const videoFiltersSection = document.createElement('div');
-    videoFiltersSection.className = 'content-control-group video-filters-section';
-    videoFiltersSection.style.marginTop = '20px';
-    videoFiltersSection.style.borderTop = '1px solid var(--ft-color-sem-neutral-border)';
+    const videoFiltersRows = feedRowsContainer || (() => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'content-control-group video-filters-section';
+        wrapper.style.marginTop = '20px';
+        wrapper.style.borderTop = '1px solid var(--ft-color-sem-neutral-border)';
 
-    const videoFiltersHeader = document.createElement('div');
-    videoFiltersHeader.className = 'content-control-group__header';
+        const header = document.createElement('div');
+        header.className = 'content-control-group__header';
 
-    const videoFiltersTitle = document.createElement('div');
-    videoFiltersTitle.className = 'content-control-group__title';
-    videoFiltersTitle.textContent = 'Advance Video Filters';
+        const title = document.createElement('div');
+        title.className = 'content-control-group__title';
+        title.textContent = 'Feeds';
 
-    videoFiltersHeader.appendChild(videoFiltersTitle);
-    videoFiltersSection.appendChild(videoFiltersHeader);
+        header.appendChild(title);
+        wrapper.appendChild(header);
 
-    const videoFiltersRows = document.createElement('div');
-    videoFiltersRows.className = 'content-control-group__rows';
+        const rows = document.createElement('div');
+        rows.className = 'content-control-group__rows';
+        wrapper.appendChild(rows);
+        contentTab.appendChild(wrapper);
+        return rows;
+    })();
 
     // Duration filter - single row with toggle, conditions show inline when enabled
     const durationRow = document.createElement('div');
     durationRow.className = 'toggle-row';
     durationRow.setAttribute('data-ft-control-row', 'true');
+    durationRow.setAttribute('data-ft-search', 'duration filter');
 
     const durationInfo = document.createElement('div');
     durationInfo.className = 'toggle-info';
@@ -333,6 +346,8 @@ function initializeFiltersTabs() {
     const durationConditionsRow = document.createElement('div');
     durationConditionsRow.className = 'video-filter-conditions-row';
     durationConditionsRow.id = 'durationConditionsRow';
+    durationConditionsRow.setAttribute('data-ft-control-row', 'true');
+    durationConditionsRow.setAttribute('data-ft-search', 'duration filter conditions');
 
     const durationConditionsWrap = document.createElement('div');
     durationConditionsWrap.className = 'video-filter-conditions';
@@ -377,6 +392,7 @@ function initializeFiltersTabs() {
     const uploadDateRow = document.createElement('div');
     uploadDateRow.className = 'toggle-row';
     uploadDateRow.setAttribute('data-ft-control-row', 'true');
+    uploadDateRow.setAttribute('data-ft-search', 'upload date filter');
 
     const uploadDateInfo = document.createElement('div');
     uploadDateInfo.className = 'toggle-info';
@@ -414,6 +430,8 @@ function initializeFiltersTabs() {
     const uploadDateConditionsRow = document.createElement('div');
     uploadDateConditionsRow.className = 'video-filter-conditions-row';
     uploadDateConditionsRow.id = 'uploadDateConditionsRow';
+    uploadDateConditionsRow.setAttribute('data-ft-control-row', 'true');
+    uploadDateConditionsRow.setAttribute('data-ft-search', 'upload date filter conditions');
 
     const uploadDateConditionsWrap = document.createElement('div');
     uploadDateConditionsWrap.className = 'video-filter-conditions';
@@ -466,6 +484,7 @@ function initializeFiltersTabs() {
     const uppercaseRow = document.createElement('div');
     uppercaseRow.className = 'toggle-row';
     uppercaseRow.setAttribute('data-ft-control-row', 'true');
+    uppercaseRow.setAttribute('data-ft-search', 'uppercase title filter');
 
     const uppercaseInfo = document.createElement('div');
     uppercaseInfo.className = 'toggle-info';
@@ -514,8 +533,297 @@ function initializeFiltersTabs() {
     uppercaseRow.appendChild(uppercaseControls);
     videoFiltersRows.appendChild(uppercaseRow);
 
-    videoFiltersSection.appendChild(videoFiltersRows);
-    contentTab.appendChild(videoFiltersSection);
+    const categoryOptions = [
+        { label: 'Film & Animation', color: '#ef4444' },
+        { label: 'Autos & Vehicles', color: '#f97316' },
+        { label: 'Music', color: '#f59e0b' },
+        { label: 'Pets & Animals', color: '#84cc16' },
+        { label: 'Sports', color: '#22c55e' },
+        { label: 'Travel & Events', color: '#14b8a6' },
+        { label: 'Gaming', color: '#0ea5e9' },
+        { label: 'People & Blogs', color: '#3b82f6' },
+        { label: 'Comedy', color: '#6366f1' },
+        { label: 'Entertainment', color: '#8b5cf6' },
+        { label: 'News & Politics', color: '#a855f7' },
+        { label: 'Howto & Style', color: '#ec4899' },
+        { label: 'Education', color: '#f43f5e' },
+        { label: 'Science & Technology', color: '#64748b' },
+        { label: 'Nonprofits & Activism', color: '#10b981' }
+    ];
+
+    const categoryFiltersSection = document.createElement('div');
+    categoryFiltersSection.className = 'content-control-group category-filters-section';
+    categoryFiltersSection.id = 'categoryFiltersSection';
+    categoryFiltersSection.setAttribute('data-ft-control-group', 'true');
+    categoryFiltersSection.setAttribute('data-ft-group-title', 'Category Filters');
+    categoryFiltersSection.style.marginTop = '20px';
+    categoryFiltersSection.style.borderTop = '1px solid var(--ft-color-sem-neutral-border)';
+
+    const categoryFiltersHeader = document.createElement('div');
+    categoryFiltersHeader.className = 'content-control-group__header';
+
+    const categoryFiltersTitle = document.createElement('div');
+    categoryFiltersTitle.className = 'content-control-group__title';
+    categoryFiltersTitle.textContent = 'Category Filters';
+    categoryFiltersHeader.appendChild(categoryFiltersTitle);
+    categoryFiltersSection.appendChild(categoryFiltersHeader);
+
+    const categoryFiltersRows = document.createElement('div');
+    categoryFiltersRows.className = 'content-control-group__rows';
+
+    const categoryModeOptions = [
+        { value: 'block', label: 'Block selected' },
+        { value: 'allow', label: 'Allow only selected' }
+    ];
+
+    const categoryMainRow = document.createElement('div');
+    categoryMainRow.className = 'toggle-row';
+    categoryMainRow.setAttribute('data-ft-control-row', 'true');
+    categoryMainRow.setAttribute('data-ft-search', 'category filter');
+
+    const categoryMainInfo = document.createElement('div');
+    categoryMainInfo.className = 'toggle-info';
+
+    const categoryMainTitle = document.createElement('div');
+    categoryMainTitle.className = 'toggle-title';
+    categoryMainTitle.textContent = 'Category Filter';
+    categoryMainTitle.title = 'Filter videos by their YouTube category';
+
+    const categoryMainDesc = document.createElement('div');
+    categoryMainDesc.className = 'toggle-description';
+    categoryMainDesc.textContent = '';
+
+    categoryMainInfo.appendChild(categoryMainTitle);
+    categoryMainInfo.appendChild(categoryMainDesc);
+
+    const categoryMainControls = document.createElement('div');
+    categoryMainControls.className = 'ft-category-controls';
+
+    const categoryMainMode = UIComponents.createSelect({
+        id: 'categoryFilter_mode',
+        options: categoryModeOptions,
+        value: 'block',
+        onChange: () => scheduleSaveCategoryFilters('main', { showToast: true })
+    });
+
+    const categoryMainToggle = document.createElement('label');
+    categoryMainToggle.className = 'switch';
+
+    const categoryMainEnabled = document.createElement('input');
+    categoryMainEnabled.type = 'checkbox';
+    categoryMainEnabled.id = 'categoryFilter_enabled';
+
+    const categoryMainSlider = document.createElement('span');
+    categoryMainSlider.className = 'slider round';
+
+    categoryMainToggle.appendChild(categoryMainEnabled);
+    categoryMainToggle.appendChild(categoryMainSlider);
+
+    categoryMainControls.appendChild(categoryMainMode);
+    categoryMainControls.appendChild(categoryMainToggle);
+
+    categoryMainRow.appendChild(categoryMainInfo);
+    categoryMainRow.appendChild(categoryMainControls);
+    categoryFiltersRows.appendChild(categoryMainRow);
+
+    const categoryMainPanel = document.createElement('div');
+    categoryMainPanel.className = 'ft-category-panel';
+    categoryMainPanel.id = 'categoryFilter_panel';
+
+    const categoryMainSearch = document.createElement('input');
+    categoryMainSearch.type = 'text';
+    categoryMainSearch.className = 'search-input ft-category-search';
+    categoryMainSearch.id = 'categoryFilter_search';
+    categoryMainSearch.placeholder = 'Search categories...';
+    categoryMainPanel.appendChild(categoryMainSearch);
+
+    const categoryMainList = document.createElement('div');
+    categoryMainList.className = 'ft-category-options';
+    categoryMainList.id = 'categoryFilter_list';
+    categoryMainPanel.appendChild(categoryMainList);
+    categoryFiltersRows.appendChild(categoryMainPanel);
+
+    categoryFiltersSection.appendChild(categoryFiltersRows);
+    contentTab.appendChild(categoryFiltersSection);
+
+    let isApplyingCategoryFiltersUI = false;
+    let pendingCategoryFiltersSaveTimerMain = 0;
+    let lastSavedCategoryFiltersSignatureMain = '';
+    let lastCategoryFiltersToastTs = 0;
+    let categorySelectedMain = [];
+
+    function computeCategoryFiltersSignature(next) {
+        try {
+            return JSON.stringify(next || {});
+        } catch (e) {
+            return '';
+        }
+    }
+
+    function normalizeSelectedArray(arr) {
+        const list = Array.isArray(arr) ? arr : [];
+        const out = [];
+        const seen = new Set();
+        list.forEach((v) => {
+            const label = String(v || '').trim();
+            if (!label) return;
+            const key = label.toLowerCase();
+            if (seen.has(key)) return;
+            seen.add(key);
+            out.push(label);
+        });
+        return out;
+    }
+
+    function updateCategorySelection(profileType, label, isChecked) {
+        const normalized = String(label || '').trim();
+        if (!normalized) return;
+        const type = profileType === 'kids' ? 'kids' : 'main';
+        const arr = categorySelectedMain;
+        const existingKey = normalized.toLowerCase();
+        const next = [];
+        let found = false;
+        arr.forEach((v) => {
+            const vv = String(v || '').trim();
+            if (!vv) return;
+            if (vv.toLowerCase() === existingKey) {
+                found = true;
+                if (isChecked) next.push(vv);
+                return;
+            }
+            next.push(vv);
+        });
+        if (isChecked && !found) {
+            next.push(normalized);
+        }
+        const deduped = normalizeSelectedArray(next);
+        categorySelectedMain = deduped;
+    }
+
+    function renderCategoryList(listEl, selected = [], searchValue = '', profileType = 'main') {
+        if (!listEl) return;
+        const needle = typeof searchValue === 'string' ? searchValue.trim().toLowerCase() : '';
+        const selectedSet = new Set((Array.isArray(selected) ? selected : []).map(v => String(v || '').trim().toLowerCase()).filter(Boolean));
+
+        listEl.innerHTML = '';
+
+        const filtered = categoryOptions.filter(opt => {
+            if (!needle) return true;
+            const label = String(opt?.label || '').toLowerCase();
+            return label.includes(needle);
+        });
+
+        filtered.forEach(opt => {
+            const label = String(opt?.label || '').trim();
+            if (!label) return;
+
+            const key = label.toLowerCase();
+            const isActive = selectedSet.has(key);
+
+            const pill = document.createElement('button');
+            pill.type = 'button';
+            pill.className = 'ft-category-pill';
+            if (isActive) pill.classList.add('active');
+            pill.style.setProperty('--ft-category-color', opt?.color || '');
+            pill.setAttribute('data-ft-category', 'true');
+            pill.setAttribute('data-ft-category-label', label);
+            pill.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+            pill.addEventListener('click', () => {
+                const nextActive = pill.getAttribute('aria-pressed') !== 'true';
+                pill.setAttribute('aria-pressed', nextActive ? 'true' : 'false');
+                pill.classList.toggle('active', nextActive);
+                updateCategorySelection(profileType, label, nextActive);
+                scheduleSaveCategoryFilters(profileType, { showToast: false });
+            });
+
+            const swatch = document.createElement('span');
+            swatch.className = 'ft-category-swatch';
+
+            const text = document.createElement('span');
+            text.className = 'ft-category-label';
+            text.textContent = label;
+
+            pill.appendChild(swatch);
+            pill.appendChild(text);
+            listEl.appendChild(pill);
+        });
+    }
+
+    function updateCategoryFilterUI() {
+        const mainEnabled = document.getElementById('categoryFilter_enabled');
+        const mainPanel = document.getElementById('categoryFilter_panel');
+        const mainMode = document.getElementById('categoryFilter_mode');
+
+        if (mainPanel) mainPanel.style.display = mainEnabled?.checked ? 'block' : 'none';
+
+        if (mainMode) mainMode.disabled = !mainEnabled?.checked;
+    }
+
+    function applyCategoryFiltersToUI(categoryFilters = {}) {
+        isApplyingCategoryFiltersUI = true;
+        const enabled = document.getElementById('categoryFilter_enabled');
+        const mode = document.getElementById('categoryFilter_mode');
+        const list = document.getElementById('categoryFilter_list');
+        const search = document.getElementById('categoryFilter_search');
+
+        if (enabled) enabled.checked = !!categoryFilters.enabled;
+        if (mode) {
+            mode.value = categoryFilters.mode === 'allow' ? 'allow' : 'block';
+            mode.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        categorySelectedMain = normalizeSelectedArray(categoryFilters.selected || []);
+        renderCategoryList(list, categorySelectedMain, search?.value || '', 'main');
+        updateCategoryFilterUI();
+        isApplyingCategoryFiltersUI = false;
+    }
+
+    function saveCategoryFilters(profileType, options = {}) {
+        if (isApplyingCategoryFiltersUI) return;
+        const showToast = options?.showToast === true;
+
+        const type = 'main';
+        const enabledEl = document.getElementById('categoryFilter_enabled');
+        const modeEl = document.getElementById('categoryFilter_mode');
+        const listEl = document.getElementById('categoryFilter_list');
+
+        const next = {
+            enabled: !!enabledEl?.checked,
+            mode: modeEl?.value === 'allow' ? 'allow' : 'block',
+            selected: normalizeSelectedArray(categorySelectedMain)
+        };
+
+        const signature = computeCategoryFiltersSignature(next);
+        const previousSignature = lastSavedCategoryFiltersSignatureMain;
+        if (signature && signature === previousSignature) {
+            if (showToast && Date.now() - lastCategoryFiltersToastTs > 900) {
+                UIComponents.showToast('Category filters saved', 'success');
+                lastCategoryFiltersToastTs = Date.now();
+            }
+            return;
+        }
+
+        lastSavedCategoryFiltersSignatureMain = signature;
+        StateManager.updateCategoryFilters(next);
+
+        if (showToast) {
+            UIComponents.showToast('Category filters saved', 'success');
+            lastCategoryFiltersToastTs = Date.now();
+        }
+    }
+
+    function scheduleSaveCategoryFilters(profileType, options = {}) {
+        if (isApplyingCategoryFiltersUI) return;
+        const type = 'main';
+        const timerRef = pendingCategoryFiltersSaveTimerMain;
+        if (timerRef) {
+            clearTimeout(timerRef);
+        }
+        const timer = setTimeout(() => {
+            pendingCategoryFiltersSaveTimerMain = 0;
+            saveCategoryFilters(type, options);
+        }, 250);
+        pendingCategoryFiltersSaveTimerMain = timer;
+    }
 
     function updateVideoFilterUI() {
         const durationEnabled = document.getElementById('videoFilter_duration_enabled');
@@ -526,9 +834,13 @@ function initializeFiltersTabs() {
         const uppercaseModeSelect = document.getElementById('videoFilter_uppercase_mode');
         const uppercaseModeMenu = uppercaseModeSelect?.closest('.ft-select-menu') || null;
 
-        if (durationConditions) durationConditions.style.display = durationEnabled?.checked ? 'block' : 'none';
-        if (uploadConditions) uploadConditions.style.display = uploadEnabled?.checked ? 'block' : 'none';
-        const showUppercaseMode = !!uppercaseEnabled?.checked;
+        const showDurationControls = !!durationEnabled?.checked;
+        const showUploadControls = !!uploadEnabled?.checked;
+        const showUppercaseControls = !!uppercaseEnabled?.checked;
+
+        if (durationConditions) durationConditions.style.display = showDurationControls ? 'block' : 'none';
+        if (uploadConditions) uploadConditions.style.display = showUploadControls ? 'block' : 'none';
+        const showUppercaseMode = showUppercaseControls;
         if (uppercaseModeMenu) {
             uppercaseModeMenu.style.display = showUppercaseMode ? 'inline-flex' : 'none';
         } else if (uppercaseModeSelect) {
@@ -781,13 +1093,18 @@ function initializeFiltersTabs() {
             uppercase: { ...(prior.uppercase || {}), enabled: uppercaseEnabled, mode: uppercaseMode, minWordLength: 2 }
         };
 
-        const nextSig = computeVideoFiltersSignature(next);
-        const priorSig = computeVideoFiltersSignature(prior);
-        if (nextSig === priorSig || (lastSavedVideoFiltersSignature && nextSig === lastSavedVideoFiltersSignature)) {
+        const mainNextSig = computeVideoFiltersSignature(next);
+        const mainPriorSig = computeVideoFiltersSignature(prior);
+
+        const mainChanged = !(mainNextSig === mainPriorSig || (lastSavedVideoFiltersSignature && mainNextSig === lastSavedVideoFiltersSignature));
+        if (!mainChanged) {
             return;
         }
 
-        lastSavedVideoFiltersSignature = nextSig;
+        if (mainChanged) {
+            lastSavedVideoFiltersSignature = mainNextSig;
+        }
+
         StateManager.updateContentFilters(next)
             .then(() => {
                 if (!showToast) return;
@@ -822,6 +1139,25 @@ function initializeFiltersTabs() {
             scheduleSaveVideoFilters({ showToast: true });
         });
         uppercaseMode?.addEventListener('change', () => scheduleSaveVideoFilters({ showToast: true }));
+
+        const categoryMainEnabled = document.getElementById('categoryFilter_enabled');
+        const categoryMainSearch = document.getElementById('categoryFilter_search');
+        const categoryMainMode = document.getElementById('categoryFilter_mode');
+
+        categoryMainEnabled?.addEventListener('change', () => {
+            updateCategoryFilterUI();
+            scheduleSaveCategoryFilters('main', { showToast: true });
+        });
+        categoryMainMode?.addEventListener('change', () => {
+            updateCategoryFilterUI();
+            scheduleSaveCategoryFilters('main', { showToast: true });
+        });
+        categoryMainSearch?.addEventListener('input', () => {
+            try {
+                renderCategoryList(document.getElementById('categoryFilter_list'), categorySelectedMain, categoryMainSearch.value || '', 'main');
+            } catch (e) {
+            }
+        });
 
         // Radio button change listeners for duration and upload date
         document.querySelectorAll('input[name="videoFilter_duration_condition"]').forEach(radio => {
@@ -892,11 +1228,16 @@ function initializeFiltersTabs() {
 
         const state = StateManager.getState();
         applyContentFiltersToUI(state.contentFilters || {});
+        applyCategoryFiltersToUI(state.categoryFilters || {});
     }, 100);
 
     StateManager.subscribe((eventType, data) => {
         if (eventType === 'contentFiltersUpdated') {
             applyContentFiltersToUI(data?.contentFilters || {});
+            updateVideoFilterUI();
+        }
+        if (eventType === 'categoryFiltersUpdated') {
+            applyCategoryFiltersToUI(data?.categoryFilters || {});
         }
     });
 
@@ -953,6 +1294,71 @@ function initializeFiltersTabs() {
 function initializeKidsTabs() {
     const container = document.getElementById('kidsTabsContainer');
     if (!container) return;
+
+    function createCompactCondition({ name, value, labelText, fields }) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'video-filter-compact-option';
+
+        const mainRow = document.createElement('div');
+        mainRow.className = 'video-filter-compact-main';
+
+        const radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = name;
+        radio.value = value;
+        radio.id = `${name}_${value}`;
+        radio.className = 'video-filter-compact-radio';
+
+        const label = document.createElement('label');
+        label.htmlFor = `${name}_${value}`;
+        label.textContent = labelText;
+        label.className = 'video-filter-compact-label';
+
+        mainRow.appendChild(radio);
+        mainRow.appendChild(label);
+
+        const fieldsWrap = document.createElement('div');
+        fieldsWrap.className = 'video-filter-compact-fields';
+
+        fields.forEach((field) => {
+            if (field.type === 'text') {
+                const span = document.createElement('span');
+                span.textContent = field.text;
+                span.className = 'video-filter-compact-text';
+                fieldsWrap.appendChild(span);
+                return;
+            }
+
+            if (field.type === 'select') {
+                const select = document.createElement('select');
+                select.className = 'video-filter-compact-select';
+                select.id = field.id;
+                if (field.width) select.style.width = field.width;
+                field.options.forEach(opt => {
+                    const option = document.createElement('option');
+                    option.value = opt.value;
+                    option.textContent = opt.label;
+                    select.appendChild(option);
+                });
+                fieldsWrap.appendChild(select);
+                return;
+            }
+
+            const input = document.createElement('input');
+            input.type = field.type || 'number';
+            input.className = 'video-filter-compact-input';
+            input.id = field.id;
+            input.placeholder = field.placeholder || '';
+            if (field.width) input.style.width = field.width;
+            if (field.min !== undefined) input.min = field.min;
+            fieldsWrap.appendChild(input);
+        });
+
+        wrapper.appendChild(mainRow);
+        wrapper.appendChild(fieldsWrap);
+
+        return wrapper;
+    }
 
     // Kids Keywords tab
     const kidsKeywordsContent = document.createElement('div');
@@ -1038,15 +1444,917 @@ function initializeKidsTabs() {
         <div id="kidsChannelListEl" class="advanced-list"></div>
     `;
 
+    const kidsContentTab = document.createElement('div');
+    kidsContentTab.id = 'kidsContentControlsSection';
+
+    const kidsContentSearchRow = document.createElement('div');
+    kidsContentSearchRow.className = 'search-row';
+
+    const kidsContentControlsSearch = document.createElement('input');
+    kidsContentControlsSearch.type = 'text';
+    kidsContentControlsSearch.id = 'searchKidsContentControls';
+    kidsContentControlsSearch.className = 'text-input search-input';
+    kidsContentControlsSearch.placeholder = 'Search kids content controls...';
+
+    kidsContentSearchRow.appendChild(kidsContentControlsSearch);
+    kidsContentTab.appendChild(kidsContentSearchRow);
+
+    const kidsVideoFiltersSection = document.createElement('div');
+    kidsVideoFiltersSection.className = 'content-control-group video-filters-section';
+    kidsVideoFiltersSection.style.marginTop = '10px';
+
+    const kidsVideoFiltersHeader = document.createElement('div');
+    kidsVideoFiltersHeader.className = 'content-control-group__header';
+
+    const kidsVideoFiltersTitle = document.createElement('div');
+    kidsVideoFiltersTitle.className = 'content-control-group__title';
+    kidsVideoFiltersTitle.textContent = 'Content Controls';
+
+    kidsVideoFiltersHeader.appendChild(kidsVideoFiltersTitle);
+    kidsVideoFiltersSection.appendChild(kidsVideoFiltersHeader);
+
+    const kidsVideoFiltersRows = document.createElement('div');
+    kidsVideoFiltersRows.className = 'content-control-group__rows';
+
+    const kidsDurationRow = document.createElement('div');
+    kidsDurationRow.className = 'toggle-row';
+    kidsDurationRow.setAttribute('data-ft-control-row', 'true');
+    kidsDurationRow.setAttribute('data-ft-search', 'duration filter');
+
+    const kidsDurationInfo = document.createElement('div');
+    kidsDurationInfo.className = 'toggle-info';
+
+    const kidsDurationTitle = document.createElement('div');
+    kidsDurationTitle.className = 'toggle-title';
+    kidsDurationTitle.textContent = 'Duration Filter';
+
+    kidsDurationInfo.appendChild(kidsDurationTitle);
+
+    const kidsDurationToggle = document.createElement('label');
+    kidsDurationToggle.className = 'switch';
+
+    const kidsDurationCheckbox = document.createElement('input');
+    kidsDurationCheckbox.type = 'checkbox';
+    kidsDurationCheckbox.id = 'kidsVideoFilter_duration_enabled';
+
+    const kidsDurationSlider = document.createElement('span');
+    kidsDurationSlider.className = 'slider round';
+
+    kidsDurationToggle.appendChild(kidsDurationCheckbox);
+    kidsDurationToggle.appendChild(kidsDurationSlider);
+
+    kidsDurationRow.appendChild(kidsDurationInfo);
+    kidsDurationRow.appendChild(kidsDurationToggle);
+    kidsVideoFiltersRows.appendChild(kidsDurationRow);
+
+    const kidsDurationConditionsRow = document.createElement('div');
+    kidsDurationConditionsRow.className = 'video-filter-conditions-row';
+    kidsDurationConditionsRow.id = 'kidsDurationConditionsRow';
+    kidsDurationConditionsRow.setAttribute('data-ft-control-row', 'true');
+    kidsDurationConditionsRow.setAttribute('data-ft-search', 'duration filter conditions');
+
+    const kidsDurationConditionsWrap = document.createElement('div');
+    kidsDurationConditionsWrap.className = 'video-filter-conditions';
+
+    const kidsLongerRadio = createCompactCondition({
+        name: 'kidsVideoFilter_duration_condition',
+        value: 'longer',
+        labelText: 'Block longer than',
+        fields: [
+            { id: 'kidsVideoFilter_duration_longer_value', type: 'number', placeholder: '60', min: 1, width: '50px' },
+            { type: 'text', text: 'min' }
+        ]
+    });
+    const kidsShorterRadio = createCompactCondition({
+        name: 'kidsVideoFilter_duration_condition',
+        value: 'shorter',
+        labelText: 'Block shorter than',
+        fields: [
+            { id: 'kidsVideoFilter_duration_shorter_value', type: 'number', placeholder: '5', min: 1, width: '50px' },
+            { type: 'text', text: 'min' }
+        ]
+    });
+    const kidsBetweenRadio = createCompactCondition({
+        name: 'kidsVideoFilter_duration_condition',
+        value: 'between',
+        labelText: 'Only between',
+        fields: [
+            { id: 'kidsVideoFilter_duration_between_min', type: 'number', placeholder: '10', min: 1, width: '50px' },
+            { type: 'text', text: '-' },
+            { id: 'kidsVideoFilter_duration_between_max', type: 'number', placeholder: '120', min: 1, width: '50px' },
+            { type: 'text', text: 'min' }
+        ]
+    });
+
+    kidsDurationConditionsWrap.appendChild(kidsLongerRadio);
+    kidsDurationConditionsWrap.appendChild(kidsShorterRadio);
+    kidsDurationConditionsWrap.appendChild(kidsBetweenRadio);
+    kidsDurationConditionsRow.appendChild(kidsDurationConditionsWrap);
+    kidsVideoFiltersRows.appendChild(kidsDurationConditionsRow);
+
+    const kidsUploadDateRow = document.createElement('div');
+    kidsUploadDateRow.className = 'toggle-row';
+    kidsUploadDateRow.setAttribute('data-ft-control-row', 'true');
+    kidsUploadDateRow.setAttribute('data-ft-search', 'upload date filter');
+
+    const kidsUploadDateInfo = document.createElement('div');
+    kidsUploadDateInfo.className = 'toggle-info';
+
+    const kidsUploadDateTitle = document.createElement('div');
+    kidsUploadDateTitle.className = 'toggle-title';
+    kidsUploadDateTitle.textContent = 'Upload Date Filter';
+
+    kidsUploadDateInfo.appendChild(kidsUploadDateTitle);
+
+    const kidsUploadDateToggle = document.createElement('label');
+    kidsUploadDateToggle.className = 'switch';
+
+    const kidsUploadDateCheckbox = document.createElement('input');
+    kidsUploadDateCheckbox.type = 'checkbox';
+    kidsUploadDateCheckbox.id = 'kidsVideoFilter_uploadDate_enabled';
+
+    const kidsUploadDateSlider = document.createElement('span');
+    kidsUploadDateSlider.className = 'slider round';
+
+    kidsUploadDateToggle.appendChild(kidsUploadDateCheckbox);
+    kidsUploadDateToggle.appendChild(kidsUploadDateSlider);
+
+    kidsUploadDateRow.appendChild(kidsUploadDateInfo);
+    kidsUploadDateRow.appendChild(kidsUploadDateToggle);
+    kidsVideoFiltersRows.appendChild(kidsUploadDateRow);
+
+    const kidsUploadDateConditionsRow = document.createElement('div');
+    kidsUploadDateConditionsRow.className = 'video-filter-conditions-row';
+    kidsUploadDateConditionsRow.id = 'kidsUploadDateConditionsRow';
+    kidsUploadDateConditionsRow.setAttribute('data-ft-control-row', 'true');
+    kidsUploadDateConditionsRow.setAttribute('data-ft-search', 'upload date filter conditions');
+
+    const kidsUploadDateConditionsWrap = document.createElement('div');
+    kidsUploadDateConditionsWrap.className = 'video-filter-conditions';
+
+    const unitOptions = [
+        { value: 'days', label: 'days' },
+        { value: 'weeks', label: 'weeks' },
+        { value: 'months', label: 'months' },
+        { value: 'years', label: 'years' }
+    ];
+
+    const kidsNewerRadio = createCompactCondition({
+        name: 'kidsVideoFilter_uploadDate_condition',
+        value: 'newer',
+        labelText: 'Only past',
+        fields: [
+            { id: 'kidsVideoFilter_age_newer_value', type: 'number', placeholder: '30', min: 1, width: '45px' },
+            { type: 'select', id: 'kidsVideoFilter_age_newer_unit', options: unitOptions, width: '72px' }
+        ]
+    });
+    const kidsOlderRadio = createCompactCondition({
+        name: 'kidsVideoFilter_uploadDate_condition',
+        value: 'older',
+        labelText: 'Block older than',
+        fields: [
+            { id: 'kidsVideoFilter_age_older_value', type: 'number', placeholder: '5', min: 1, width: '45px' },
+            { type: 'select', id: 'kidsVideoFilter_age_older_unit', options: unitOptions, width: '72px' }
+        ]
+    });
+    const kidsBetweenDateRadio = createCompactCondition({
+        name: 'kidsVideoFilter_uploadDate_condition',
+        value: 'between',
+        labelText: 'Between',
+        fields: [
+            { id: 'kidsVideoFilter_age_between_min', type: 'number', placeholder: '1', min: 1, width: '45px' },
+            { type: 'select', id: 'kidsVideoFilter_age_between_min_unit', options: unitOptions, width: '72px' },
+            { type: 'text', text: '-' },
+            { id: 'kidsVideoFilter_age_between_max', type: 'number', placeholder: '6', min: 1, width: '45px' },
+            { type: 'select', id: 'kidsVideoFilter_age_between_max_unit', options: unitOptions, width: '72px' }
+        ]
+    });
+
+    kidsUploadDateConditionsWrap.appendChild(kidsNewerRadio);
+    kidsUploadDateConditionsWrap.appendChild(kidsOlderRadio);
+    kidsUploadDateConditionsWrap.appendChild(kidsBetweenDateRadio);
+    kidsUploadDateConditionsRow.appendChild(kidsUploadDateConditionsWrap);
+    kidsVideoFiltersRows.appendChild(kidsUploadDateConditionsRow);
+
+    const kidsUppercaseRow = document.createElement('div');
+    kidsUppercaseRow.className = 'toggle-row';
+    kidsUppercaseRow.setAttribute('data-ft-control-row', 'true');
+    kidsUppercaseRow.setAttribute('data-ft-search', 'uppercase title filter');
+
+    const kidsUppercaseInfo = document.createElement('div');
+    kidsUppercaseInfo.className = 'toggle-info';
+
+    const kidsUppercaseTitle = document.createElement('div');
+    kidsUppercaseTitle.className = 'toggle-title';
+    kidsUppercaseTitle.textContent = 'UPPERCASE Title Filter';
+
+    kidsUppercaseInfo.appendChild(kidsUppercaseTitle);
+
+    const kidsUppercaseControls = document.createElement('div');
+    kidsUppercaseControls.className = 'video-filter-inline-controls';
+
+    const kidsUppercaseModeSelect = document.createElement('select');
+    kidsUppercaseModeSelect.id = 'kidsVideoFilter_uppercase_mode';
+    kidsUppercaseModeSelect.className = 'select-input video-filter-mode-select';
+    kidsUppercaseModeSelect.innerHTML = `
+        <option value="single_word">Single uppercase word</option>
+        <option value="all_caps">All caps title</option>
+        <option value="both">Both</option>
+    `;
+
+    const kidsUppercaseToggle = document.createElement('label');
+    kidsUppercaseToggle.className = 'switch';
+
+    const kidsUppercaseCheckbox = document.createElement('input');
+    kidsUppercaseCheckbox.type = 'checkbox';
+    kidsUppercaseCheckbox.id = 'kidsVideoFilter_uppercase_enabled';
+
+    const kidsUppercaseSlider = document.createElement('span');
+    kidsUppercaseSlider.className = 'slider round';
+
+    kidsUppercaseToggle.appendChild(kidsUppercaseCheckbox);
+    kidsUppercaseToggle.appendChild(kidsUppercaseSlider);
+
+    kidsUppercaseControls.appendChild(kidsUppercaseModeSelect);
+    kidsUppercaseControls.appendChild(kidsUppercaseToggle);
+
+    kidsUppercaseRow.appendChild(kidsUppercaseInfo);
+    kidsUppercaseRow.appendChild(kidsUppercaseControls);
+    kidsVideoFiltersRows.appendChild(kidsUppercaseRow);
+
+    kidsVideoFiltersSection.appendChild(kidsVideoFiltersRows);
+    kidsContentTab.appendChild(kidsVideoFiltersSection);
+
+    const categoryOptions = [
+        { label: 'Film & Animation', color: '#ef4444' },
+        { label: 'Autos & Vehicles', color: '#f97316' },
+        { label: 'Music', color: '#f59e0b' },
+        { label: 'Pets & Animals', color: '#84cc16' },
+        { label: 'Sports', color: '#22c55e' },
+        { label: 'Travel & Events', color: '#14b8a6' },
+        { label: 'Gaming', color: '#0ea5e9' },
+        { label: 'People & Blogs', color: '#3b82f6' },
+        { label: 'Comedy', color: '#6366f1' },
+        { label: 'Entertainment', color: '#8b5cf6' },
+        { label: 'News & Politics', color: '#a855f7' },
+        { label: 'Howto & Style', color: '#ec4899' },
+        { label: 'Education', color: '#f43f5e' },
+        { label: 'Science & Technology', color: '#64748b' },
+        { label: 'Nonprofits & Activism', color: '#10b981' }
+    ];
+
+    function hexToRgba(hex, alpha) {
+        if (!hex || typeof hex !== 'string') return '';
+        const sanitized = hex.replace('#', '');
+        const bigint = parseInt(sanitized.length === 3
+            ? sanitized.split('').map(ch => ch + ch).join('')
+            : sanitized, 16);
+        if (Number.isNaN(bigint)) return '';
+        const r = (bigint >> 16) & 255;
+        const g = (bigint >> 8) & 255;
+        const b = bigint & 255;
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    const kidsCategorySection = document.createElement('div');
+    kidsCategorySection.className = 'content-control-group category-filters-section';
+    kidsCategorySection.style.marginTop = '20px';
+    kidsCategorySection.style.borderTop = '1px solid var(--ft-color-sem-neutral-border)';
+    kidsCategorySection.setAttribute('data-ft-control-group', 'true');
+    kidsCategorySection.setAttribute('data-ft-group-title', 'Kids Category Filters');
+
+    const kidsCategoryHeader = document.createElement('div');
+    kidsCategoryHeader.className = 'content-control-group__header';
+
+    const kidsCategoryTitle = document.createElement('div');
+    kidsCategoryTitle.className = 'content-control-group__title';
+    kidsCategoryTitle.textContent = 'Category Filters';
+
+    kidsCategoryHeader.appendChild(kidsCategoryTitle);
+    kidsCategorySection.appendChild(kidsCategoryHeader);
+
+    const kidsCategoryRows = document.createElement('div');
+    kidsCategoryRows.className = 'content-control-group__rows';
+
+    const kidsCategoryMainRow = document.createElement('div');
+    kidsCategoryMainRow.className = 'toggle-row';
+    kidsCategoryMainRow.setAttribute('data-ft-control-row', 'true');
+    kidsCategoryMainRow.setAttribute('data-ft-search', 'category filter');
+
+    const kidsCategoryInfo = document.createElement('div');
+    kidsCategoryInfo.className = 'toggle-info';
+
+    const kidsCategoryInfoTitle = document.createElement('div');
+    kidsCategoryInfoTitle.className = 'toggle-title';
+    kidsCategoryInfoTitle.textContent = 'Category Filter';
+
+    kidsCategoryInfo.appendChild(kidsCategoryInfoTitle);
+
+    const kidsCategoryControls = document.createElement('div');
+    kidsCategoryControls.className = 'ft-category-controls';
+
+    const kidsCategoryModeOptions = [
+        { value: 'block', label: 'Block selected' },
+        { value: 'allow', label: 'Allow only selected' }
+    ];
+
+    const kidsCategoryMode = UIComponents.createSelect({
+        id: 'kidsCategoryFilter_mode',
+        options: kidsCategoryModeOptions,
+        value: 'block'
+    });
+
+    const kidsCategoryToggle = document.createElement('label');
+    kidsCategoryToggle.className = 'switch';
+
+    const kidsCategoryEnabled = document.createElement('input');
+    kidsCategoryEnabled.type = 'checkbox';
+    kidsCategoryEnabled.id = 'kidsCategoryFilter_enabled';
+
+    const kidsCategorySlider = document.createElement('span');
+    kidsCategorySlider.className = 'slider round';
+
+    kidsCategoryToggle.appendChild(kidsCategoryEnabled);
+    kidsCategoryToggle.appendChild(kidsCategorySlider);
+
+    kidsCategoryControls.appendChild(kidsCategoryMode);
+    kidsCategoryControls.appendChild(kidsCategoryToggle);
+
+    kidsCategoryMainRow.appendChild(kidsCategoryInfo);
+    kidsCategoryMainRow.appendChild(kidsCategoryControls);
+    kidsCategoryRows.appendChild(kidsCategoryMainRow);
+
+    const kidsCategoryPanel = document.createElement('div');
+    kidsCategoryPanel.className = 'ft-category-panel';
+    kidsCategoryPanel.id = 'kidsCategoryFilter_panel';
+
+    const kidsCategorySearch = document.createElement('input');
+    kidsCategorySearch.type = 'text';
+    kidsCategorySearch.className = 'search-input ft-category-search';
+    kidsCategorySearch.id = 'kidsCategoryFilter_search';
+    kidsCategorySearch.placeholder = 'Search categories...';
+    kidsCategoryPanel.appendChild(kidsCategorySearch);
+
+    const kidsCategoryList = document.createElement('div');
+    kidsCategoryList.className = 'ft-category-options';
+    kidsCategoryList.id = 'kidsCategoryFilter_list';
+    kidsCategoryPanel.appendChild(kidsCategoryList);
+    kidsCategoryRows.appendChild(kidsCategoryPanel);
+
+    kidsCategorySection.appendChild(kidsCategoryRows);
+    kidsContentTab.appendChild(kidsCategorySection);
+
+    let kidsCategorySelected = [];
+    let isApplyingKidsUi = false;
+    let pendingKidsSaveTimer = 0;
+    let pendingKidsCategorySaveTimer = 0;
+
+    function normalizeSelectedArray(arr) {
+        const list = Array.isArray(arr) ? arr : [];
+        const out = [];
+        const seen = new Set();
+        list.forEach((v) => {
+            const label = String(v || '').trim();
+            if (!label) return;
+            const key = label.toLowerCase();
+            if (seen.has(key)) return;
+            seen.add(key);
+            out.push(label);
+        });
+        return out;
+    }
+
+    function updateKidsCategorySelection(label, isChecked) {
+        const normalized = String(label || '').trim();
+        if (!normalized) return;
+        const existingKey = normalized.toLowerCase();
+        const next = [];
+        let found = false;
+        kidsCategorySelected.forEach((v) => {
+            const vv = String(v || '').trim();
+            if (!vv) return;
+            if (vv.toLowerCase() === existingKey) {
+                found = true;
+                if (isChecked) next.push(vv);
+                return;
+            }
+            next.push(vv);
+        });
+        if (isChecked && !found) {
+            next.push(normalized);
+        }
+        kidsCategorySelected = normalizeSelectedArray(next);
+    }
+
+    function renderKidsCategoryList(listEl, selected = [], searchValue = '') {
+        if (!listEl) return;
+        const needle = typeof searchValue === 'string' ? searchValue.trim().toLowerCase() : '';
+        const selectedSet = new Set((Array.isArray(selected) ? selected : []).map(v => String(v || '').trim().toLowerCase()).filter(Boolean));
+        listEl.innerHTML = '';
+
+        const filtered = categoryOptions.filter(opt => {
+            if (!needle) return true;
+            const label = String(opt?.label || '').toLowerCase();
+            return label.includes(needle);
+        });
+
+        filtered.forEach(opt => {
+            const label = String(opt?.label || '').trim();
+            if (!label) return;
+
+            const key = label.toLowerCase();
+            const isActive = selectedSet.has(key);
+
+            const pill = document.createElement('button');
+            pill.type = 'button';
+            pill.className = 'ft-category-pill';
+            pill.style.setProperty('--ft-category-color', opt?.color || '');
+            pill.style.setProperty('--ft-category-color-bg', hexToRgba(opt?.color || '', 0.12));
+            pill.style.setProperty('--ft-category-color-border', hexToRgba(opt?.color || '', 0.55));
+            pill.style.setProperty('--ft-category-color-bg-active', hexToRgba(opt?.color || '', 0.16));
+            pill.setAttribute('data-ft-category', 'true');
+            pill.setAttribute('data-ft-category-label', label);
+            pill.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+            pill.classList.toggle('active', isActive);
+
+            pill.addEventListener('click', () => {
+                const nextActive = pill.getAttribute('aria-pressed') !== 'true';
+                pill.setAttribute('aria-pressed', nextActive ? 'true' : 'false');
+                pill.classList.toggle('active', nextActive);
+                updateKidsCategorySelection(label, nextActive);
+                scheduleSaveKidsCategoryFilters({ showToast: false });
+            });
+
+            const swatch = document.createElement('span');
+            swatch.className = 'ft-category-swatch';
+
+            const text = document.createElement('span');
+            text.className = 'ft-category-label';
+            text.textContent = label;
+
+            pill.appendChild(swatch);
+            pill.appendChild(text);
+            listEl.appendChild(pill);
+        });
+    }
+
+    function updateKidsCategoryUi() {
+        if (kidsCategoryPanel) kidsCategoryPanel.style.display = kidsCategoryEnabled?.checked ? 'block' : 'none';
+        if (kidsCategoryMode) kidsCategoryMode.disabled = !kidsCategoryEnabled?.checked;
+    }
+
+    function applyKidsCategoryFiltersToUI(categoryFilters = {}) {
+        isApplyingKidsUi = true;
+        if (kidsCategoryEnabled) kidsCategoryEnabled.checked = !!categoryFilters.enabled;
+        if (kidsCategoryMode) {
+            kidsCategoryMode.value = categoryFilters.mode === 'allow' ? 'allow' : 'block';
+            kidsCategoryMode.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        kidsCategorySelected = normalizeSelectedArray(categoryFilters.selected || []);
+        renderKidsCategoryList(kidsCategoryList, kidsCategorySelected, kidsCategorySearch?.value || '');
+        updateKidsCategoryUi();
+        isApplyingKidsUi = false;
+    }
+
+    function scheduleSaveKidsCategoryFilters(options = {}) {
+        if (isApplyingKidsUi) return;
+        if (pendingKidsCategorySaveTimer) {
+            clearTimeout(pendingKidsCategorySaveTimer);
+        }
+        pendingKidsCategorySaveTimer = setTimeout(() => {
+            pendingKidsCategorySaveTimer = 0;
+            saveKidsCategoryFilters(options);
+        }, 250);
+    }
+
+    function saveKidsCategoryFilters(options = {}) {
+        if (isApplyingKidsUi) return;
+        const showToast = options?.showToast === true;
+        const next = {
+            enabled: !!kidsCategoryEnabled?.checked,
+            mode: kidsCategoryMode?.value === 'allow' ? 'allow' : 'block',
+            selected: normalizeSelectedArray(kidsCategorySelected)
+        };
+
+        StateManager.updateKidsCategoryFilters(next)
+            .then(() => {
+                if (showToast) UIComponents.showToast('Kids category filters saved', 'success');
+            })
+            .catch(() => {
+                if (showToast) UIComponents.showToast('Failed to save kids category filters', 'error');
+            });
+    }
+
+    function updateKidsVideoFilterUI() {
+        const showDurationControls = !!kidsDurationCheckbox?.checked;
+        const showUploadControls = !!kidsUploadDateCheckbox?.checked;
+        const showUppercaseControls = !!kidsUppercaseCheckbox?.checked;
+
+        if (kidsDurationConditionsRow) kidsDurationConditionsRow.style.display = showDurationControls ? 'block' : 'none';
+        if (kidsUploadDateConditionsRow) kidsUploadDateConditionsRow.style.display = showUploadControls ? 'block' : 'none';
+
+        const uppercaseModeMenu = kidsUppercaseModeSelect?.closest('.ft-select-menu') || null;
+        if (uppercaseModeMenu) {
+            uppercaseModeMenu.style.display = showUppercaseControls ? 'inline-flex' : 'none';
+        } else if (kidsUppercaseModeSelect) {
+            kidsUppercaseModeSelect.style.display = showUppercaseControls ? 'inline-block' : 'none';
+        }
+        if (kidsUppercaseModeSelect) {
+            kidsUppercaseModeSelect.disabled = !showUppercaseControls;
+        }
+
+        const durationRadios = document.querySelectorAll('input[name="kidsVideoFilter_duration_condition"]');
+        durationRadios.forEach(radio => {
+            const option = radio.closest('.video-filter-compact-option');
+            const inputs = option?.querySelectorAll('input[type="number"], select') || [];
+            inputs.forEach(input => input.disabled = !radio.checked);
+        });
+
+        const uploadRadios = document.querySelectorAll('input[name="kidsVideoFilter_uploadDate_condition"]');
+        uploadRadios.forEach(radio => {
+            const option = radio.closest('.video-filter-compact-option');
+            const inputs = option?.querySelectorAll('input[type="number"], select') || [];
+            inputs.forEach(input => input.disabled = !radio.checked);
+        });
+    }
+
+    function maybeSelectKidsOptionRadioFromElement(element) {
+        if (isApplyingKidsUi) return false;
+        const option = element?.closest?.('.video-filter-compact-option') || null;
+        if (!option) return false;
+        const radio = option.querySelector('.video-filter-compact-radio');
+        if (!radio || radio.checked) return false;
+        radio.checked = true;
+        updateKidsVideoFilterUI();
+        return true;
+    }
+
+    function computeSignature(next) {
+        try {
+            return JSON.stringify(next || {});
+        } catch (e) {
+            return '';
+        }
+    }
+
+    let lastSavedKidsVideoFiltersSignature = '';
+    let lastKidsVideoFiltersToastTs = 0;
+
+    function scheduleSaveKidsVideoFilters(options = {}) {
+        if (isApplyingKidsUi) return;
+        if (pendingKidsSaveTimer) {
+            clearTimeout(pendingKidsSaveTimer);
+        }
+        pendingKidsSaveTimer = setTimeout(() => {
+            pendingKidsSaveTimer = 0;
+            saveKidsVideoFilters(options);
+        }, 300);
+    }
+
+    function saveKidsVideoFilters(options = {}) {
+        if (isApplyingKidsUi) return;
+        const showToast = options?.showToast === true;
+        const state = StateManager.getState();
+        const prior = state?.kids?.contentFilters || {};
+
+        const durationCondition = document.querySelector('input[name="kidsVideoFilter_duration_condition"]:checked')?.value || (prior.duration?.condition || 'between');
+        const uploadCondition = document.querySelector('input[name="kidsVideoFilter_uploadDate_condition"]:checked')?.value || (prior.uploadDate?.condition || 'newer');
+
+        const durationEnabled = document.getElementById('kidsVideoFilter_duration_enabled')?.checked || false;
+        const uploadEnabled = document.getElementById('kidsVideoFilter_uploadDate_enabled')?.checked || false;
+        const uppercaseEnabled = document.getElementById('kidsVideoFilter_uppercase_enabled')?.checked || false;
+        const uppercaseMode = document.getElementById('kidsVideoFilter_uppercase_mode')?.value || (prior.uppercase?.mode || 'single_word');
+
+        const durationLongerValueRaw = document.getElementById('kidsVideoFilter_duration_longer_value')?.value;
+        const durationShorterValueRaw = document.getElementById('kidsVideoFilter_duration_shorter_value')?.value;
+        const durationBetweenMinRaw = document.getElementById('kidsVideoFilter_duration_between_min')?.value;
+        const durationBetweenMaxRaw = document.getElementById('kidsVideoFilter_duration_between_max')?.value;
+
+        const parsePositiveFloat = (value) => {
+            if (value === null || value === undefined) return null;
+            const num = parseFloat(String(value));
+            return Number.isFinite(num) && num > 0 ? num : null;
+        };
+
+        const nextDuration = {
+            ...(prior.duration || {}),
+            enabled: durationEnabled,
+            condition: durationCondition
+        };
+
+        if (durationCondition === 'longer') {
+            const val = parsePositiveFloat(durationLongerValueRaw);
+            if (val !== null) {
+                nextDuration.minMinutes = val;
+                nextDuration.maxMinutes = 0;
+                nextDuration.value = String(val);
+            }
+        } else if (durationCondition === 'shorter') {
+            const val = parsePositiveFloat(durationShorterValueRaw);
+            if (val !== null) {
+                nextDuration.minMinutes = val;
+                nextDuration.maxMinutes = 0;
+                nextDuration.value = String(val);
+            }
+        } else {
+            const min = parsePositiveFloat(durationBetweenMinRaw);
+            const max = parsePositiveFloat(durationBetweenMaxRaw);
+            if (min !== null && max !== null) {
+                const a = Math.min(min, max);
+                const b = Math.max(min, max);
+                nextDuration.minMinutes = a;
+                nextDuration.maxMinutes = b;
+                nextDuration.value = `${a}-${b}`;
+            }
+        }
+
+        const unitMs = { days: 86400000, weeks: 604800000, months: 2592000000, years: 31536000000 };
+        const now = Date.now();
+        const uploadNewerRaw = document.getElementById('kidsVideoFilter_age_newer_value')?.value;
+        const uploadNewerUnit = document.getElementById('kidsVideoFilter_age_newer_unit')?.value || (prior.uploadDate?.unit || 'days');
+        const uploadOlderRaw = document.getElementById('kidsVideoFilter_age_older_value')?.value;
+        const uploadOlderUnit = document.getElementById('kidsVideoFilter_age_older_unit')?.value || (prior.uploadDate?.unit || 'years');
+        const uploadBetweenMinRaw = document.getElementById('kidsVideoFilter_age_between_min')?.value;
+        const uploadBetweenMinUnit = document.getElementById('kidsVideoFilter_age_between_min_unit')?.value || (prior.uploadDate?.unit || 'months');
+        const uploadBetweenMaxRaw = document.getElementById('kidsVideoFilter_age_between_max')?.value;
+        const uploadBetweenMaxUnit = document.getElementById('kidsVideoFilter_age_between_max_unit')?.value || (prior.uploadDate?.unitMax || 'months');
+
+        const nextUpload = {
+            ...(prior.uploadDate || {}),
+            enabled: uploadEnabled,
+            condition: uploadCondition
+        };
+
+        if (uploadCondition === 'newer') {
+            const val = parsePositiveFloat(uploadNewerRaw);
+            if (val !== null) {
+                nextUpload.value = String(val);
+                nextUpload.unit = uploadNewerUnit;
+                nextUpload.valueMax = 0;
+                nextUpload.unitMax = '';
+                const cutoff = now - val * (unitMs[uploadNewerUnit] || 0);
+                nextUpload.fromDate = new Date(cutoff).toISOString();
+                nextUpload.toDate = '';
+            }
+        } else if (uploadCondition === 'older') {
+            const val = parsePositiveFloat(uploadOlderRaw);
+            if (val !== null) {
+                nextUpload.value = String(val);
+                nextUpload.unit = uploadOlderUnit;
+                nextUpload.valueMax = 0;
+                nextUpload.unitMax = '';
+                const cutoff = now - val * (unitMs[uploadOlderUnit] || 0);
+                nextUpload.toDate = new Date(cutoff).toISOString();
+                nextUpload.fromDate = '';
+            }
+        } else {
+            const min = parsePositiveFloat(uploadBetweenMinRaw);
+            const max = parsePositiveFloat(uploadBetweenMaxRaw);
+            if (min !== null && max !== null) {
+                nextUpload.value = String(min);
+                nextUpload.unit = uploadBetweenMinUnit;
+                nextUpload.valueMax = max;
+                nextUpload.unitMax = uploadBetweenMaxUnit;
+                const fromCutoff = now - min * (unitMs[uploadBetweenMinUnit] || 0);
+                const toCutoff = now - max * (unitMs[uploadBetweenMaxUnit] || 0);
+                nextUpload.fromDate = new Date(fromCutoff).toISOString();
+                nextUpload.toDate = new Date(toCutoff).toISOString();
+            }
+        }
+
+        const next = {
+            duration: nextDuration,
+            uploadDate: nextUpload,
+            uppercase: { ...(prior.uppercase || {}), enabled: uppercaseEnabled, mode: uppercaseMode, minWordLength: 2 }
+        };
+
+        const nextSig = computeSignature(next);
+        const priorSig = computeSignature(prior);
+        if (nextSig === priorSig || (lastSavedKidsVideoFiltersSignature && nextSig === lastSavedKidsVideoFiltersSignature)) {
+            return;
+        }
+        lastSavedKidsVideoFiltersSignature = nextSig;
+
+        StateManager.updateKidsContentFilters(next)
+            .then(() => {
+                if (!showToast) return;
+                const ts = Date.now();
+                if (ts - lastKidsVideoFiltersToastTs < 800) return;
+                lastKidsVideoFiltersToastTs = ts;
+                UIComponents.showToast('Kids video filters saved', 'success');
+            })
+            .catch(() => {
+                if (showToast) UIComponents.showToast('Failed to save kids video filters', 'error');
+            });
+    }
+
+    function applyKidsVideoFiltersToUI(contentFilters = {}) {
+        isApplyingKidsUi = true;
+        const durationEnabled = document.getElementById('kidsVideoFilter_duration_enabled');
+        const uploadEnabled = document.getElementById('kidsVideoFilter_uploadDate_enabled');
+        const uppercaseEnabled = document.getElementById('kidsVideoFilter_uppercase_enabled');
+        const uppercaseMode = document.getElementById('kidsVideoFilter_uppercase_mode');
+
+        if (durationEnabled) durationEnabled.checked = !!contentFilters.duration?.enabled;
+        if (uploadEnabled) uploadEnabled.checked = !!contentFilters.uploadDate?.enabled;
+        if (uppercaseEnabled) uppercaseEnabled.checked = !!contentFilters.uppercase?.enabled;
+
+        const durationCondition = contentFilters.duration?.condition || 'between';
+        const durationRadio = document.getElementById(`kidsVideoFilter_duration_condition_${durationCondition}`);
+        if (durationRadio) durationRadio.checked = true;
+        const longerInput = document.getElementById('kidsVideoFilter_duration_longer_value');
+        const shorterInput = document.getElementById('kidsVideoFilter_duration_shorter_value');
+        const betweenMinInput = document.getElementById('kidsVideoFilter_duration_between_min');
+        const betweenMaxInput = document.getElementById('kidsVideoFilter_duration_between_max');
+        if (longerInput) longerInput.value = durationCondition === 'longer' ? (contentFilters.duration?.minMinutes ?? '') : '';
+        if (shorterInput) shorterInput.value = durationCondition === 'shorter' ? (contentFilters.duration?.minMinutes ?? '') : '';
+        if (betweenMinInput) betweenMinInput.value = durationCondition === 'between' ? (contentFilters.duration?.minMinutes ?? '') : '';
+        if (betweenMaxInput) betweenMaxInput.value = durationCondition === 'between' ? (contentFilters.duration?.maxMinutes ?? '') : '';
+
+        const uploadCondition = contentFilters.uploadDate?.condition || 'newer';
+        const uploadRadio = document.getElementById(`kidsVideoFilter_uploadDate_condition_${uploadCondition}`);
+        if (uploadRadio) uploadRadio.checked = true;
+        const newerInput = document.getElementById('kidsVideoFilter_age_newer_value');
+        const olderInput = document.getElementById('kidsVideoFilter_age_older_value');
+        const betweenMin = document.getElementById('kidsVideoFilter_age_between_min');
+        const betweenMax = document.getElementById('kidsVideoFilter_age_between_max');
+        if (newerInput) newerInput.value = uploadCondition === 'newer' ? (contentFilters.uploadDate?.value || '') : '';
+        if (olderInput) olderInput.value = uploadCondition === 'older' ? (contentFilters.uploadDate?.value || '') : '';
+        if (betweenMin) betweenMin.value = uploadCondition === 'between' ? (contentFilters.uploadDate?.value || '') : '';
+        if (betweenMax) betweenMax.value = uploadCondition === 'between' ? (contentFilters.uploadDate?.valueMax || '') : '';
+
+        const newerUnit = document.getElementById('kidsVideoFilter_age_newer_unit');
+        const olderUnit = document.getElementById('kidsVideoFilter_age_older_unit');
+        const betweenMinUnit = document.getElementById('kidsVideoFilter_age_between_min_unit');
+        const betweenMaxUnit = document.getElementById('kidsVideoFilter_age_between_max_unit');
+        if (newerUnit) {
+            newerUnit.value = contentFilters.uploadDate?.unit || 'days';
+            newerUnit.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        if (olderUnit) {
+            olderUnit.value = contentFilters.uploadDate?.unit || 'years';
+            olderUnit.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        if (betweenMinUnit) {
+            betweenMinUnit.value = contentFilters.uploadDate?.unit || 'months';
+            betweenMinUnit.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        if (betweenMaxUnit) {
+            betweenMaxUnit.value = contentFilters.uploadDate?.unitMax || 'months';
+            betweenMaxUnit.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+
+        if (uppercaseMode) {
+            uppercaseMode.value = contentFilters.uppercase?.mode || 'single_word';
+            uppercaseMode.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+
+        updateKidsVideoFilterUI();
+        isApplyingKidsUi = false;
+    }
+
+    function filterKidsContentControls() {
+        const q = (kidsContentControlsSearch?.value || '').trim().toLowerCase();
+        const groups = kidsContentTab.querySelectorAll('[data-ft-control-group]');
+        groups.forEach(groupEl => {
+            const groupTitle = (groupEl.getAttribute('data-ft-group-title') || '').toLowerCase();
+            const groupMatches = q ? groupTitle.includes(q) : false;
+            const rows = groupEl.querySelectorAll('[data-ft-control-row]');
+            let anyVisible = false;
+            rows.forEach(row => {
+                const text = row.getAttribute('data-ft-search') || '';
+                const show = !q || groupMatches || text.includes(q);
+                row.style.display = show ? '' : 'none';
+                if (show) anyVisible = true;
+            });
+            groupEl.style.display = (!q || anyVisible) ? '' : 'none';
+        });
+    }
+
+    kidsContentControlsSearch.addEventListener('input', () => {
+        filterKidsContentControls();
+    });
+
+    kidsDurationCheckbox.addEventListener('change', () => {
+        updateKidsVideoFilterUI();
+        scheduleSaveKidsVideoFilters({ showToast: true });
+    });
+    kidsUploadDateCheckbox.addEventListener('change', () => {
+        updateKidsVideoFilterUI();
+        scheduleSaveKidsVideoFilters({ showToast: true });
+    });
+    kidsUppercaseCheckbox.addEventListener('change', () => {
+        updateKidsVideoFilterUI();
+        scheduleSaveKidsVideoFilters({ showToast: true });
+    });
+    kidsUppercaseModeSelect.addEventListener('change', () => scheduleSaveKidsVideoFilters({ showToast: true }));
+
+    kidsCategoryEnabled.addEventListener('change', () => {
+        updateKidsCategoryUi();
+        scheduleSaveKidsCategoryFilters({ showToast: true });
+    });
+    kidsCategoryMode.addEventListener('change', () => {
+        updateKidsCategoryUi();
+        scheduleSaveKidsCategoryFilters({ showToast: true });
+    });
+    kidsCategorySearch.addEventListener('input', () => {
+        renderKidsCategoryList(kidsCategoryList, kidsCategorySelected, kidsCategorySearch.value || '');
+    });
+
+    document.querySelectorAll('input[name="kidsVideoFilter_duration_condition"]').forEach(radio => {
+        radio.addEventListener('change', () => {
+            updateKidsVideoFilterUI();
+            scheduleSaveKidsVideoFilters({ showToast: true });
+        });
+    });
+    document.querySelectorAll('input[name="kidsVideoFilter_uploadDate_condition"]').forEach(radio => {
+        radio.addEventListener('change', () => {
+            updateKidsVideoFilterUI();
+            scheduleSaveKidsVideoFilters({ showToast: true });
+        });
+    });
+
+    kidsContentTab.querySelectorAll('.video-filter-compact-option').forEach(option => {
+        option.addEventListener('click', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'LABEL' || e.target.closest('label')) {
+                return;
+            }
+            const radio = option.querySelector('.video-filter-compact-radio');
+            if (radio && !radio.disabled) {
+                radio.checked = true;
+                updateKidsVideoFilterUI();
+                scheduleSaveKidsVideoFilters({ showToast: false });
+            }
+        });
+    });
+
+    kidsContentTab.querySelectorAll('.video-filter-compact-option input[type="number"], .video-filter-compact-option select').forEach(el => {
+        el.addEventListener('focus', (e) => {
+            if (maybeSelectKidsOptionRadioFromElement(e.target)) {
+                scheduleSaveKidsVideoFilters({ showToast: false });
+            }
+        });
+        el.addEventListener('click', (e) => {
+            if (maybeSelectKidsOptionRadioFromElement(e.target)) {
+                scheduleSaveKidsVideoFilters({ showToast: false });
+            }
+        });
+        el.addEventListener('input', (e) => {
+            maybeSelectKidsOptionRadioFromElement(e.target);
+            scheduleSaveKidsVideoFilters({ showToast: false });
+        });
+        el.addEventListener('change', (e) => {
+            maybeSelectKidsOptionRadioFromElement(e.target);
+            scheduleSaveKidsVideoFilters({ showToast: true });
+        });
+    });
+
     const tabs = UIComponents.createTabs({
         tabs: [
             { id: 'kidsKeywords', label: 'Keyword Management', content: kidsKeywordsContent },
-            { id: 'kidsChannels', label: 'Channel Management', content: kidsChannelsContent }
+            { id: 'kidsChannels', label: 'Channel Management', content: kidsChannelsContent },
+            { id: 'kidsContent', label: 'Content Controls', content: kidsContentTab }
         ],
         defaultTab: 'kidsKeywords'
     });
 
     container.appendChild(tabs.container);
+
+    try {
+        const createDropdownFromSelect = window.UIComponents?.createDropdownFromSelect;
+        if (typeof createDropdownFromSelect === 'function') {
+            [
+                'kidsVideoFilter_age_newer_unit',
+                'kidsVideoFilter_age_older_unit',
+                'kidsVideoFilter_age_between_min_unit',
+                'kidsVideoFilter_age_between_max_unit',
+                'kidsVideoFilter_uppercase_mode',
+                'kidsCategoryFilter_mode'
+            ].forEach((id) => {
+                const el = document.getElementById(id);
+                if (el && el.tagName === 'SELECT') {
+                    createDropdownFromSelect(el);
+                }
+            });
+        }
+    } catch (e) {
+    }
+
+    try {
+        const state = StateManager.getState();
+        applyKidsVideoFiltersToUI(state?.kids?.contentFilters || {});
+        applyKidsCategoryFiltersToUI(state?.kids?.categoryFilters || {});
+    } catch (e) {
+    }
+
+    StateManager.subscribe((eventType, data) => {
+        if (eventType === 'kidsContentFiltersUpdated') {
+            applyKidsVideoFiltersToUI(data?.contentFilters || {});
+        }
+        if (eventType === 'kidsCategoryFiltersUpdated') {
+            applyKidsCategoryFiltersToUI(data?.categoryFilters || {});
+        }
+    });
 }
 // Expose for safety in case other modules call it
 window.initializeKidsTabs = initializeKidsTabs;
@@ -1093,6 +2401,49 @@ function handleNavigationIntent() {
     if (!viewId) return;
     if (typeof window.switchView === 'function') {
         window.switchView(viewId);
+    }
+    try {
+        const searchParams = new URLSearchParams(window.location.search || '');
+        const section = (searchParams.get('section') || '').toLowerCase();
+        if (viewId === 'filters' && section) {
+            try {
+                const tabs = document.querySelector('#filtersView .tab-buttons') || document.querySelector('.tab-buttons');
+                const contentTabBtn = tabs?.querySelector('[data-tab-id="content"]');
+                if (contentTabBtn) {
+                    contentTabBtn.click();
+                }
+            } catch (e) {
+            }
+            if (section === 'categories' || section === 'category' || section === 'categoryfilters') {
+                const target = document.getElementById('categoryFiltersSection');
+                if (target) {
+                    requestAnimationFrame(() => target.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+                }
+            }
+            if (section === 'feeds' || section === 'feed') {
+                const target = document.getElementById('feedControlsSection');
+                if (target) {
+                    requestAnimationFrame(() => target.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+                }
+            }
+        }
+        if (viewId === 'kids' && section) {
+            if (section === 'content' || section === 'contentcontrols' || section === 'content-controls') {
+                try {
+                    const tabs = document.querySelector('#kidsView .tab-buttons') || document.querySelector('.tab-buttons');
+                    const kidsContentTabBtn = tabs?.querySelector('[data-tab-id="kidsContent"]');
+                    if (kidsContentTabBtn) {
+                        kidsContentTabBtn.click();
+                    }
+                } catch (e) {
+                }
+                const target = document.getElementById('kidsContentControlsSection');
+                if (target) {
+                    requestAnimationFrame(() => target.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+                }
+            }
+        }
+    } catch (e) {
     }
     if (viewId === 'whatsnew') {
         const view = document.getElementById('whatsnewView');
@@ -1344,6 +2695,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 'videoFilter_age_between_min_unit',
                 'videoFilter_age_between_max_unit',
                 'videoFilter_uppercase_mode',
+                'categoryFilter_mode',
                 'ftAutoBackupMode',
                 'ftAutoBackupFormat'
             ].forEach((id) => {
@@ -1424,7 +2776,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    async function syncSessionUnlockStateFromBackground() {}
+    async function syncSessionUnlockStateFromBackground() { }
 
     async function notifyBackgroundUnlocked(profileId, pin = '') {
         try {
@@ -2605,16 +3957,47 @@ document.addEventListener('DOMContentLoaded', async () => {
     // IMPORT / EXPORT (V3)
     // ============================================================================
 
+    /**
+     * Fallback download via anchor click - works in Firefox when downloads API fails
+     */
+    function downloadViaAnchor(blob, filename) {
+        return new Promise((resolve) => {
+            try {
+                const blobUrl = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = blobUrl;
+                a.download = filename;
+                a.style.display = 'none';
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => {
+                    try {
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(blobUrl);
+                    } catch (e) {
+                        // ignore cleanup errors
+                    }
+                    resolve({ filename, method: 'anchor' });
+                }, 150);
+            } catch (e) {
+                // Even if anchor fails, resolve with error info
+                resolve({ filename, method: 'anchor', error: e.message });
+            }
+        });
+    }
+
     function downloadJsonToDownloadsFolder(folder, filename, obj) {
         return new Promise((resolve, reject) => {
             try {
+                const json = JSON.stringify(obj, null, 2);
+                const blob = new Blob([json], { type: 'application/json' });
+
+                // If downloads API unavailable, use anchor fallback immediately
                 if (!runtimeAPI?.downloads?.download) {
-                    reject(new Error('Downloads API unavailable'));
+                    downloadViaAnchor(blob, filename).then(resolve);
                     return;
                 }
 
-                const json = JSON.stringify(obj, null, 2);
-                const blob = new Blob([json], { type: 'application/json' });
                 const blobUrl = URL.createObjectURL(blob);
                 const safeFolder = (typeof folder === 'string' && folder.trim()) ? folder.trim().replace(/\/+$/, '') : '';
                 const fullPath = safeFolder ? `${safeFolder}/${filename}` : filename;
@@ -2631,16 +4014,21 @@ document.addEventListener('DOMContentLoaded', async () => {
                         // ignore
                     }
                     if (err) {
-                        reject(new Error(err.message || 'Download failed'));
+                        // Firefox 147+ may fail with subfolder paths - fallback to anchor
+                        console.warn('FilterTube: Downloads API failed, using anchor fallback:', err.message);
+                        downloadViaAnchor(blob, filename)
+                            .then(resolve)
+                            .catch(() => reject(new Error(err.message || 'Download failed')));
                         return;
                     }
-                    resolve({ downloadId, filename: fullPath });
+                    resolve({ downloadId, filename: fullPath, method: 'downloads_api' });
                 });
             } catch (e) {
                 reject(e);
             }
         });
     }
+
 
     async function runExportV3() {
         const io = window.FilterTubeIO;
@@ -3543,7 +4931,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 let copyBlocklist = false;
                 if (enablingWhitelist && whitelistEmpty) {
-                    const confirmMsg = profileType === 'kids' 
+                    const confirmMsg = profileType === 'kids'
                         ? 'Copy your current YT Kids blocklist into whitelist to get started?'
                         : 'Copy your current blocklist into whitelist to get started?';
                     copyBlocklist = window.confirm(confirmMsg);
@@ -4415,7 +5803,7 @@ function showSuccessToast(message) {
     toast.className = 'ft-success-toast';
     toast.textContent = message;
     document.body.appendChild(toast);
-    
+
     // Remove after animation completes
     setTimeout(() => {
         toast.remove();

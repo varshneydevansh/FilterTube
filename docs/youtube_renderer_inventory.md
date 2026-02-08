@@ -590,6 +590,16 @@ The dropdown observer lives in `js/content/block_channel.js` and uses a `Mutatio
 
 Inside `injectFilterTubeMenuItem`, FilterTube waits for YouTube to populate either the **new menu list** (`yt-list-view-model`) or the **legacy menu list** (`tp-yt-paper-listbox` / `ytd-menu-popup-renderer`) before inserting the menu entry. For Shorts, an asynchronous background fetch is often required to resolve the channel handle/ID from the video URL.
 
+### Search Artist Top Card (2026 update)
+
+| Renderer / Host | Surface | FilterTube Handling |
+| --- | --- | --- |
+| `yt-official-card-view-model` | YouTube search artist/music top card | Included in DOM fallback card selectors and channel extraction paths (handle + nested channel ID fallback). |
+
+Notes:
+- This renderer can expose the handle in header metadata (`@handle`) while nested lockups carry UC IDs.
+- FilterTube now treats this card as a first-class block target for handle, channel ID, and keyword matching.
+
 ---
 
 ## v3.2.1 Implementation Summary

@@ -51,6 +51,9 @@ main().catch(err => {
 });
 
 async function main() {
+    console.log('\n📊 Updating README badges with latest stats...');
+    await updateReadmeBadges(VERSION);
+
     // Clean and create dist directory
     // Only clean if we are building everything, otherwise we wipe previous specific builds
     if (!targetBrowser && fs.existsSync('dist')) {
@@ -192,10 +195,6 @@ async function maybePromptRelease(version, zipPaths) {
         console.log('ℹ️  Release publishing skipped.');
         return;
     }
-
-    // Update README badges with latest LoC stats
-    console.log('\n📊 Updating README badges with latest stats...');
-    await updateReadmeBadges(version);
 
     const token = process.env.GITHUB_TOKEN;
     if (!token) {

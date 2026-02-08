@@ -20,7 +20,11 @@ const VIDEO_CARD_SELECTORS = [
     'ytd-playlist-panel-video-wrapper-renderer',
     'ytd-reel-item-renderer',
     'ytd-playlist-renderer',
+    'ytd-grid-playlist-renderer',
+    'ytd-compact-playlist-renderer',
+    'ytd-playlist-video-renderer',
     'ytd-radio-renderer',
+    'ytd-compact-radio-renderer',
     'yt-lockup-view-model',
     'yt-lockup-metadata-view-model',
     'ytd-channel-renderer',
@@ -28,6 +32,7 @@ const VIDEO_CARD_SELECTORS = [
     'ytd-universal-watch-card-renderer',
     'ytd-channel-video-player-renderer',
     'ytd-channel-featured-content-renderer',
+    'yt-official-card-view-model',
     'ytm-shorts-lockup-view-model',
     'ytm-shorts-lockup-view-model-v2',
 
@@ -52,7 +57,18 @@ function ensureVideoIdForCard(card) {
         }
     })();
 
-    if (!isKidsHost && cachedVideoId && /^[a-zA-Z0-9_-]{11}$/.test(cachedVideoId)) {
+    const canFastReturnStamp = !isKidsHost && cachedVideoId && /^[a-zA-Z0-9_-]{11}$/.test(cachedVideoId)
+        && !(tag === 'yt-lockup-view-model' ||
+            tag === 'yt-lockup-metadata-view-model' ||
+            tag === 'ytd-rich-item-renderer' ||
+            tag === 'ytd-video-renderer' ||
+            tag === 'ytd-grid-video-renderer' ||
+            tag === 'ytd-compact-video-renderer' ||
+            tag === 'ytm-video-with-context-renderer' ||
+            tag === 'ytm-compact-video-renderer' ||
+            tag === 'ytd-playlist-panel-video-renderer' ||
+            tag === 'ytd-playlist-panel-video-wrapper-renderer');
+    if (canFastReturnStamp) {
         return cachedVideoId;
     }
 
@@ -64,16 +80,108 @@ function ensureVideoIdForCard(card) {
     }
 
     if (extractedVideoId) {
-        if (isKidsHost && cachedVideoId && cachedVideoId !== extractedVideoId) {
+        const shouldClearOnMismatch = (isKidsHost ||
+            tag === 'yt-lockup-view-model' ||
+            tag === 'yt-lockup-metadata-view-model' ||
+            tag === 'ytd-rich-item-renderer' ||
+            tag === 'ytd-video-renderer' ||
+            tag === 'ytd-grid-video-renderer' ||
+            tag === 'ytd-compact-video-renderer' ||
+            tag === 'ytm-video-with-context-renderer' ||
+            tag === 'ytm-compact-video-renderer' ||
+            tag === 'ytd-playlist-panel-video-renderer' ||
+            tag === 'ytd-playlist-panel-video-wrapper-renderer');
+
+        // IMPORTANT: YouTube frequently recycles DOM nodes. If this element did not previously have our
+        // `data-filtertube-video-id` stamp but still has old FilterTube identity/hidden markers from a
+        // prior video, stamping a new videoId without clearing those markers can poison the mapping
+        // (e.g., playlist "next" rows hiding unrelated videos). Clear stale state before stamping.
+        if (shouldClearOnMismatch && !cachedVideoId) {
+            try {
+                const hasAnyIdentity = Boolean(
+                    card.hasAttribute('data-filtertube-channel-id') ||
+                    card.hasAttribute('data-filtertube-channel-handle') ||
+                    card.hasAttribute('data-filtertube-channel-custom') ||
+                    card.hasAttribute('data-filtertube-channel-name') ||
+                    card.querySelector?.('[data-filtertube-channel-id],[data-filtertube-channel-handle],[data-filtertube-channel-custom],[data-filtertube-channel-name]')
+                );
+                const hasAnyState = Boolean(
+                    card.hasAttribute('data-filtertube-processed') ||
+                    card.hasAttribute('data-filtertube-hidden') ||
+                    card.classList?.contains('filtertube-hidden') ||
+                    card.hasAttribute('data-filtertube-collaborators') ||
+                    card.hasAttribute('data-filtertube-blocked-state')
+                );
+
+                if (hasAnyIdentity || hasAnyState) {
+                    // Clear any nested channel metadata too (search surfaces often stamp on inner anchors).
+                    clearCachedChannelMetadata(card);
+                    card.removeAttribute('data-filtertube-channel-name');
+                    card.removeAttribute('data-filtertube-channel-custom');
+
+                    card.removeAttribute('data-filtertube-processed');
+                    card.removeAttribute('data-filtertube-last-processed-id');
+                    card.removeAttribute('data-filtertube-last-processed-mode');
+                    card.removeAttribute('data-filtertube-unique-id');
+                    card.removeAttribute('data-filtertube-duration');
+                    card.removeAttribute('data-filtertube-whitelist-pending');
+
+                    card.removeAttribute('data-filtertube-hidden');
+                    card.removeAttribute('data-filtertube-hidden-by-channel');
+                    card.removeAttribute('data-filtertube-hidden-by-keyword');
+                    card.removeAttribute('data-filtertube-hidden-by-duration');
+                    card.removeAttribute('data-filtertube-hidden-by-upload-date');
+                    card.removeAttribute('data-filtertube-hidden-by-category');
+                    card.removeAttribute('data-filtertube-hidden-by-hide-all-shorts');
+                    card.classList.remove('filtertube-hidden');
+
+                    card.removeAttribute('data-filtertube-blocked-channel-id');
+                    card.removeAttribute('data-filtertube-blocked-channel-handle');
+                    card.removeAttribute('data-filtertube-blocked-channel-custom');
+                    card.removeAttribute('data-filtertube-blocked-channel-name');
+                    card.removeAttribute('data-filtertube-blocked-state');
+                    card.removeAttribute('data-filtertube-blocked-ts');
+
+                    card.removeAttribute('data-filtertube-collaborators');
+                    card.removeAttribute('data-filtertube-collaborators-source');
+                    card.removeAttribute('data-filtertube-collaborators-ts');
+                    card.removeAttribute('data-filtertube-expected-collaborators');
+                    card.removeAttribute('data-filtertube-collab-state');
+                    card.removeAttribute('data-filtertube-collab-awaiting-dialog');
+                    card.removeAttribute('data-filtertube-collab-requested');
+                }
+            } catch (e) {
+            }
+        }
+
+        if (shouldClearOnMismatch && cachedVideoId && cachedVideoId !== extractedVideoId) {
             try {
                 card.removeAttribute('data-filtertube-processed');
                 card.removeAttribute('data-filtertube-last-processed-id');
+                card.removeAttribute('data-filtertube-last-processed-mode');
                 card.removeAttribute('data-filtertube-unique-id');
                 card.removeAttribute('data-filtertube-channel-id');
                 card.removeAttribute('data-filtertube-channel-handle');
                 card.removeAttribute('data-filtertube-channel-name');
                 card.removeAttribute('data-filtertube-channel-custom');
                 card.removeAttribute('data-filtertube-whitelist-pending');
+                card.removeAttribute('data-filtertube-hidden');
+                card.removeAttribute('data-filtertube-hidden-by-channel');
+                card.removeAttribute('data-filtertube-hidden-by-keyword');
+                card.removeAttribute('data-filtertube-hidden-by-duration');
+                card.removeAttribute('data-filtertube-hidden-by-upload-date');
+                card.removeAttribute('data-filtertube-hidden-by-category');
+                card.removeAttribute('data-filtertube-hidden-by-hide-all-shorts');
+                card.removeAttribute('data-filtertube-blocked-channel-id');
+                card.removeAttribute('data-filtertube-blocked-channel-handle');
+                card.removeAttribute('data-filtertube-blocked-channel-custom');
+                card.removeAttribute('data-filtertube-blocked-channel-name');
+                card.removeAttribute('data-filtertube-blocked-state');
+                card.removeAttribute('data-filtertube-blocked-ts');
+                card.classList.remove('filtertube-hidden');
+                if (card.style && card.style.display === 'none') {
+                    card.style.display = '';
+                }
             } catch (e) {
             }
         }
@@ -124,8 +232,34 @@ function extractVideoDuration(element) {
 
     // Check cache first
     const cached = element.getAttribute('data-filtertube-duration');
-    if (cached !== null && cached !== '') {
-        return parseInt(cached, 10);
+    if (cached !== null) {
+        if (cached === '') {
+            // Some surfaces hydrate the duration badge async (notably playlists/mixes).
+            // Only re-scan when we can observe at least one duration indicator in the DOM.
+            const durationCandidates = Array.from(element.querySelectorAll(
+                '.yt-badge-shape__text, badge-shape[aria-label], ytd-thumbnail-overlay-time-status-renderer span#text, span.ytd-thumbnail-overlay-time-status-renderer, #time-status span'
+            ));
+            const hasDurationIndicator = durationCandidates.some(node => {
+                try {
+                    const text = (node?.getAttribute?.('aria-label') || node?.textContent || '').trim();
+                    if (!text) return false;
+                    if (!/\d/.test(text)) return false;
+                    if (text.includes(':')) return true;
+                    if (/hour|minute|second/i.test(text)) return true;
+                    return false;
+                } catch (e) {
+                    return false;
+                }
+            });
+            if (!hasDurationIndicator) return null;
+            try {
+                element.removeAttribute('data-filtertube-duration');
+            } catch (e) {
+            }
+        } else if (cached !== '') {
+            const parsed = parseInt(cached, 10);
+            return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+        }
     }
 
     // 1. NEW: Check for badge-shape text (e.g., "3:54")
@@ -366,6 +500,24 @@ function scanDataForVideoId(root) {
         return watchId;
     }
 
+    const videos = Array.isArray(root.videos) ? root.videos : null;
+    if (videos && videos.length > 0) {
+        const first = videos[0];
+        const nestedCandidates = [
+            first?.childVideoRenderer?.videoId,
+            first?.childVideoRenderer?.navigationEndpoint?.watchEndpoint?.videoId,
+            first?.playlistVideoRenderer?.videoId,
+            first?.playlistVideoRenderer?.navigationEndpoint?.watchEndpoint?.videoId,
+            first?.videoRenderer?.videoId,
+            first?.videoRenderer?.navigationEndpoint?.watchEndpoint?.videoId
+        ];
+        for (const candidate of nestedCandidates) {
+            if (typeof candidate === 'string' && /^[a-zA-Z0-9_-]{11}$/.test(candidate)) {
+                return candidate;
+            }
+        }
+    }
+
     const updateItems = root?.updateKidsBlacklistEndpoint?.items;
     if (Array.isArray(updateItems) && updateItems.length > 0) {
         const candidate = updateItems[0]?.encryptedVideoId;
@@ -481,7 +633,10 @@ function extractChannelMetadataFromElement(element, channelText = '', channelHre
     );
     const shouldTrustCachedId = Boolean(
         cachedId &&
-        (!hrefId || cachedId === hrefId)
+        (
+            (hrefId && cachedId === hrefId) ||
+            (!hrefId && !hrefHandle)
+        )
     );
 
     if (cachedHandle && !shouldTrustCachedHandle) {
@@ -788,13 +943,6 @@ function extractVideoIdFromCard(card) {
             }
         })();
 
-        if (!isKidsHost) {
-            const stamped = card.getAttribute?.('data-filtertube-video-id') || '';
-            if (stamped && /^[a-zA-Z0-9_-]{11}$/.test(stamped)) {
-                return stamped;
-            }
-        }
-
         const extractFromHref = (href) => {
             if (!href || typeof href !== 'string') return null;
             const watchMatch = href.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
@@ -809,6 +957,23 @@ function extractVideoIdFromCard(card) {
             if (embedMatch) return embedMatch[1];
             return null;
         };
+
+        const primaryHrefSelectors = [
+            'a.yt-lockup-view-model__content-image[href*="watch?v="]',
+            'a.yt-lockup-metadata-view-model__title[href*="watch?v="]',
+            'a#thumbnail[href*="watch?v="]',
+            'a#video-title[href*="watch?v="]',
+            'h3 a[href*="watch?v="]'
+        ];
+        for (const selector of primaryHrefSelectors) {
+            try {
+                const a = card.querySelector(selector);
+                const href = a?.getAttribute?.('href') || '';
+                const match = extractFromHref(href);
+                if (match) return match;
+            } catch (e) {
+            }
+        }
 
         // On SPA surfaces (notably YouTube Kids), cards can be recycled and keep stale
         // data-filtertube-video-id attributes. Always prefer the current /watch?v=... href.
@@ -840,7 +1005,7 @@ function extractVideoIdFromCard(card) {
         }
 
         // Method 1: From thumbnail link href
-        const thumbnailLink = card.querySelector('a#thumbnail, a[href*="/watch"]');
+        const thumbnailLink = card.querySelector('a#thumbnail[href*="watch?v="], a[href*="/watch?v="]');
         if (thumbnailLink) {
             const href = thumbnailLink.getAttribute('href');
             if (href) {
@@ -850,7 +1015,7 @@ function extractVideoIdFromCard(card) {
         }
 
         // Method 2: From video-title link
-        const titleLink = card.querySelector('a#video-title, a[href*="/watch"]');
+        const titleLink = card.querySelector('a#video-title[href*="watch?v="], a.yt-lockup-metadata-view-model__title[href*="watch?v="], a[href*="/watch?v="]');
         if (titleLink) {
             const href = titleLink.getAttribute('href');
             if (href) {
@@ -860,7 +1025,7 @@ function extractVideoIdFromCard(card) {
         }
 
         // Method 3: From any watch link in the card
-        const anyWatchLink = card.querySelector('a[href*="/watch?v="]');
+        const anyWatchLink = card.querySelector('a[href*="/watch?v="]:not(.yt-core-attributed-string__link)');
         if (anyWatchLink) {
             const href = anyWatchLink.getAttribute('href');
             if (href) {

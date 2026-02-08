@@ -599,6 +599,83 @@ let postBlockEnrichmentWorker = Promise.resolve();
 const CURRENT_VERSION = (browserAPI.runtime.getManifest()?.version || '').trim();
 const FT_PROFILES_V4_KEY = 'ftProfilesV4';
 const DEFAULT_PROFILE_ID = 'default';
+const QUICK_BLOCK_DEFAULT_MIGRATION_KEY = 'quickBlockDefaultV327Applied';
+const QUICK_BLOCK_DEFAULT_TARGET_VERSION = '3.2.7';
+
+function compareSemver(a = '', b = '') {
+    const toParts = (value) => String(value || '')
+        .trim()
+        .split('.')
+        .map(part => parseInt(part, 10))
+        .map(num => (Number.isFinite(num) ? num : 0));
+    const ap = toParts(a);
+    const bp = toParts(b);
+    const len = Math.max(ap.length, bp.length, 3);
+    for (let i = 0; i < len; i++) {
+        const av = ap[i] || 0;
+        const bv = bp[i] || 0;
+        if (av > bv) return 1;
+        if (av < bv) return -1;
+    }
+    return 0;
+}
+
+function isVersionAtLeast(version, minimum) {
+    return compareSemver(version, minimum) >= 0;
+}
+
+function applyQuickBlockDefaultMigrationOnce({ previousVersion = '', isInstall = false } = {}) {
+    return new Promise((resolve) => {
+        browserAPI.storage.local.get([FT_PROFILES_V4_KEY, QUICK_BLOCK_DEFAULT_MIGRATION_KEY, 'showQuickBlockButton'], (items) => {
+            try {
+                if (items?.[QUICK_BLOCK_DEFAULT_MIGRATION_KEY]) {
+                    resolve(false);
+                    return;
+                }
+
+                // Apply only on install or when moving from pre-v3.2.7 to v3.2.7+.
+                const shouldApplyByVersion = isInstall
+                    || !previousVersion
+                    || compareSemver(previousVersion, QUICK_BLOCK_DEFAULT_TARGET_VERSION) < 0;
+                if (!shouldApplyByVersion || !isVersionAtLeast(CURRENT_VERSION, QUICK_BLOCK_DEFAULT_TARGET_VERSION)) {
+                    resolve(false);
+                    return;
+                }
+
+                const updates = {
+                    [QUICK_BLOCK_DEFAULT_MIGRATION_KEY]: true,
+                    showQuickBlockButton: true
+                };
+
+                const profilesV4 = items?.[FT_PROFILES_V4_KEY];
+                if (profilesV4 && typeof profilesV4 === 'object' && profilesV4.profiles && typeof profilesV4.profiles === 'object') {
+                    const nextProfiles = {};
+                    for (const [profileId, rawProfile] of Object.entries(profilesV4.profiles)) {
+                        const profile = (rawProfile && typeof rawProfile === 'object') ? rawProfile : {};
+                        const settings = (profile.settings && typeof profile.settings === 'object' && !Array.isArray(profile.settings))
+                            ? profile.settings
+                            : {};
+                        nextProfiles[profileId] = {
+                            ...profile,
+                            settings: {
+                                ...settings,
+                                showQuickBlockButton: true
+                            }
+                        };
+                    }
+                    updates[FT_PROFILES_V4_KEY] = {
+                        ...profilesV4,
+                        profiles: nextProfiles
+                    };
+                }
+
+                browserAPI.storage.local.set(updates, () => resolve(true));
+            } catch (e) {
+                browserAPI.storage.local.set({ [QUICK_BLOCK_DEFAULT_MIGRATION_KEY]: true }, () => resolve(false));
+            }
+        });
+    });
+}
 
 function schedulePostBlockEnrichment(channel, profile = 'main', metadata = {}) {
     const source = typeof metadata?.source === 'string' ? metadata.source : '';
@@ -944,8 +1021,10 @@ function enforceVideoChannelMapCap(map) {
 function enforceVideoMetaMapCap(map) {
     if (!map || typeof map !== 'object') return;
     const keys = Object.keys(map);
-    if (keys.length <= 1500) return;
-    keys.slice(0, 150).forEach(k => {
+    const MAX_VIDEO_META_ENTRIES = 2000;
+    const EVICT_COUNT = 500;
+    if (keys.length <= MAX_VIDEO_META_ENTRIES) return;
+    keys.slice(0, EVICT_COUNT).forEach(k => {
         try {
             delete map[k];
         } catch (e) {
@@ -975,6 +1054,12 @@ function flushVideoMetaMapUpdates() {
         const map = await ensureVideoMetaMapCache();
         for (const [videoId, meta] of pendingVideoMetaMapUpdates.entries()) {
             if (!videoId || !meta) continue;
+            try {
+                if (Object.prototype.hasOwnProperty.call(map, videoId)) {
+                    delete map[videoId];
+                }
+            } catch (e) {
+            }
             map[videoId] = meta;
         }
         pendingVideoMetaMapUpdates.clear();
@@ -1028,19 +1113,27 @@ function enqueueVideoMetaMapUpdate(videoId, meta) {
     const lengthSecondsRaw = meta.lengthSeconds;
     const publishDateRaw = meta.publishDate;
     const uploadDateRaw = meta.uploadDate;
+    const categoryRaw = meta.category;
 
     const clean = {
         lengthSeconds: (typeof lengthSecondsRaw === 'number' && Number.isFinite(lengthSecondsRaw))
             ? lengthSecondsRaw
             : (typeof lengthSecondsRaw === 'string' ? lengthSecondsRaw.trim() : null),
         publishDate: (typeof publishDateRaw === 'string' ? publishDateRaw.trim() : ''),
-        uploadDate: (typeof uploadDateRaw === 'string' ? uploadDateRaw.trim() : '')
+        uploadDate: (typeof uploadDateRaw === 'string' ? uploadDateRaw.trim() : ''),
+        category: (typeof categoryRaw === 'string' ? categoryRaw.trim() : '')
     };
 
-    if (!clean.lengthSeconds && !clean.publishDate && !clean.uploadDate) return;
+    if (!clean.lengthSeconds && !clean.publishDate && !clean.uploadDate && !clean.category) return;
     pendingVideoMetaMapUpdates.set(v, clean);
 
     if (videoMetaMapCache && typeof videoMetaMapCache === 'object') {
+        try {
+            if (Object.prototype.hasOwnProperty.call(videoMetaMapCache, v)) {
+                delete videoMetaMapCache[v];
+            }
+        } catch (e) {
+        }
         videoMetaMapCache[v] = clean;
     }
 
@@ -1303,6 +1396,7 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
                 ? 'whitelist'
                 : 'blocklist';
             compiledSettings.listMode = shouldUseKidsProfile ? kidsModeFromV4 : mainModeFromV4;
+            compiledSettings.profileType = targetProfile;
 
             const rawWhitelistKeywords = shouldUseKidsProfile
                 ? (Array.isArray(activeKids.whitelistKeywords) ? activeKids.whitelistKeywords : [])
@@ -1624,9 +1718,18 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
                 const beforeCount = compiledChannels.length;
                 compiledChannels = compiledChannels.filter(ch => {
                     if (!ch || typeof ch !== 'object') return false;
-                    if (typeof ch.id === 'string' && ch.id.toUpperCase().startsWith('UC')) return true;
-                    if (typeof ch.id === 'string' && ch.id.trim() !== '') return true;
-                    console.warn('FilterTube Background: Dropping invalid channel entry missing id', ch);
+                    const id = typeof ch.id === 'string' ? ch.id.trim() : '';
+                    const handle = typeof ch.handle === 'string' ? ch.handle.trim() : '';
+                    const customUrl = typeof ch.customUrl === 'string' ? ch.customUrl.trim() : '';
+                    const originalInput = typeof ch.originalInput === 'string' ? ch.originalInput.trim() : '';
+
+                    if (id && id.toUpperCase().startsWith('UC')) return true;
+                    if (id) return true;
+                    if (handle.startsWith('@')) return true;
+                    if (customUrl.startsWith('c/') || customUrl.startsWith('user/')) return true;
+                    if (originalInput.startsWith('watch:')) return true;
+
+                    console.warn('FilterTube Background: Dropping invalid channel entry missing id/handle/customUrl', ch);
                     return false;
                 });
 
@@ -1821,13 +1924,52 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
             compiledSettings.hideExploreTrending = boolFromV4('hideExploreTrending', items.hideExploreTrending || false);
             compiledSettings.hideMoreFromYouTube = boolFromV4('hideMoreFromYouTube', items.hideMoreFromYouTube || false);
             compiledSettings.hideSubscriptions = boolFromV4('hideSubscriptions', items.hideSubscriptions || false);
+            compiledSettings.showQuickBlockButton = boolFromV4('showQuickBlockButton', items.showQuickBlockButton !== false);
             compiledSettings.hideSearchShelves = boolFromV4('hideSearchShelves', items.hideSearchShelves || false);
 
             const profileSettings = activeProfile?.settings || {};
-            compiledSettings.contentFilters = items.contentFilters || profileSettings.contentFilters || {
+            const profileContentFilters = (() => {
+                try {
+                    if (shouldUseKidsProfile) {
+                        const kidsFilters = activeKids && typeof activeKids === 'object' ? activeKids.contentFilters : null;
+                        if (kidsFilters && typeof kidsFilters === 'object' && !Array.isArray(kidsFilters)) return kidsFilters;
+                        return null;
+                    }
+                    const mainFilters = profileSettings && typeof profileSettings === 'object' ? profileSettings.contentFilters : null;
+                    if (mainFilters && typeof mainFilters === 'object' && !Array.isArray(mainFilters)) return mainFilters;
+                } catch (e) {
+                }
+                return null;
+            })();
+            const legacyContentFilters = (!shouldUseKidsProfile && items.contentFilters && typeof items.contentFilters === 'object' && !Array.isArray(items.contentFilters))
+                ? items.contentFilters
+                : null;
+            compiledSettings.contentFilters = profileContentFilters || legacyContentFilters || {
                 duration: { enabled: false, minMinutes: 0, maxMinutes: 0, condition: 'between' },
                 uploadDate: { enabled: false, fromDate: '', toDate: '', condition: 'newer' },
                 uppercase: { enabled: false, mode: 'single_word', minWordLength: 2 }
+            };
+
+            const profileCategoryFilters = (() => {
+                try {
+                    if (shouldUseKidsProfile) {
+                        const kidsFilters = activeKids && typeof activeKids === 'object' ? activeKids.categoryFilters : null;
+                        if (kidsFilters && typeof kidsFilters === 'object' && !Array.isArray(kidsFilters)) return kidsFilters;
+                        return null;
+                    }
+                    const mainFilters = profileSettings && typeof profileSettings === 'object' ? profileSettings.categoryFilters : null;
+                    if (mainFilters && typeof mainFilters === 'object' && !Array.isArray(mainFilters)) return mainFilters;
+                } catch (e) {
+                }
+                return null;
+            })();
+            const legacyCategoryFilters = (!shouldUseKidsProfile && items.categoryFilters && typeof items.categoryFilters === 'object' && !Array.isArray(items.categoryFilters))
+                ? items.categoryFilters
+                : null;
+            compiledSettings.categoryFilters = profileCategoryFilters || legacyCategoryFilters || {
+                enabled: false,
+                mode: 'block',
+                selected: []
             };
 
             console.log(`FilterTube Background: Compiled ${targetProfile} settings: ${compiledChannels.length} channels, ${compiledSettings.filterKeywords.length} keywords`);
@@ -1853,9 +1995,12 @@ browserAPI.runtime.onInstalled.addListener(function (details) {
             hideAllComments: false,
             filterComments: false,
             hideAllShorts: false,
+            showQuickBlockButton: true,
             firstRunRefreshNeeded: true,
             releaseNotesSeenVersion: CURRENT_VERSION,
             releaseNotesPayload: null
+        });
+        applyQuickBlockDefaultMigrationOnce({ isInstall: true }).catch(() => {
         });
 
         // Proactively inject the first-run prompt into already-open YouTube tabs
@@ -1883,6 +2028,8 @@ browserAPI.runtime.onInstalled.addListener(function (details) {
         }
     } else if (details.reason === 'update') {
         console.log('FilterTube extension updated from version ' + details.previousVersion);
+        applyQuickBlockDefaultMigrationOnce({ previousVersion: details.previousVersion || '' }).catch(() => {
+        });
         buildReleaseNotesPayload(CURRENT_VERSION).then((payload) => {
             browserAPI.storage.local.set({
                 releaseNotesPayload: payload,
@@ -4394,10 +4541,40 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
         channelInfo.name = finalChannelName;
         channelInfo.topicChannel = channelInfo.topicChannel === true || metadata.topicChannel === true;
 
-        // Check if channel already exists; if so, upgrade instead of rejecting
-        const existingIndex = channels.findIndex(ch =>
-            ch && (ch.id === channelInfo.id || ch.handle === channelInfo.handle)
+        // Check if channel already exists; if so, upgrade instead of rejecting.
+        // IMPORTANT: Never match on empty/null handles. That caused unrelated channels
+        // (both with null handle) to collide and overwrite each other.
+        const normalizeHandleForMatch = (value) => {
+            if (!value || typeof value !== 'string') return '';
+            const trimmed = value.trim();
+            if (!trimmed || !trimmed.startsWith('@')) return '';
+            return trimmed.toLowerCase();
+        };
+        const incomingIdForMatch = (typeof channelInfo.id === 'string' ? channelInfo.id.trim() : '');
+        const incomingHandleForMatch = normalizeHandleForMatch(
+            channelInfo.handle || channelInfo.canonicalHandle || channelInfo.handleDisplay || ''
         );
+        const existingIndex = channels.findIndex((ch) => {
+            if (!ch) return false;
+
+            const existingIdForMatch = (typeof ch.id === 'string' ? ch.id.trim() : '');
+            if (incomingIdForMatch && existingIdForMatch && existingIdForMatch === incomingIdForMatch) {
+                return true;
+            }
+
+            const existingHandleForMatch = normalizeHandleForMatch(
+                ch.handle || ch.canonicalHandle || ch.handleDisplay || ''
+            );
+            if (incomingHandleForMatch && existingHandleForMatch && existingHandleForMatch === incomingHandleForMatch) {
+                // Defensive: if both sides also have UC IDs and they differ, do not merge.
+                if (incomingIdForMatch && existingIdForMatch && incomingIdForMatch !== existingIdForMatch) {
+                    return false;
+                }
+                return true;
+            }
+
+            return false;
+        });
 
         let finalChannelData = null;
 
@@ -4720,4 +4897,3 @@ async function handleToggleChannelFilterAll(channelId, value) {
 }
 
 console.log(`FilterTube Background ${IS_FIREFOX ? 'Script' : 'Service Worker'} loaded and ready to serve filtered content.`);
-

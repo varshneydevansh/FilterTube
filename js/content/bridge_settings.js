@@ -25,8 +25,35 @@ browserAPI_BRIDGE.runtime.onMessage.addListener((request, sender, sendResponse) 
         sendResponse?.({ acknowledged: true });
     } else if (request.action === 'FilterTube_ApplySettings' && request.settings) {
         debugLog('⚡ Applying settings pushed from UI');
-        sendSettingsToMainWorld(request.settings);
-        applyDOMFallback(request.settings, { forceReprocess: true });
+        try {
+            const expectedProfile = (() => {
+                try {
+                    const host = String(location?.hostname || '').toLowerCase();
+                    return host.includes('youtubekids.com') ? 'kids' : 'main';
+                } catch (e) {
+                    return 'main';
+                }
+            })();
+
+            const incomingProfile = request.settings?.profileType === 'kids'
+                ? 'kids'
+                : (request.settings?.profileType === 'main' ? 'main' : '');
+
+            if (incomingProfile && incomingProfile !== expectedProfile) {
+                requestSettingsFromBackground().then(result => {
+                    if (result?.success) {
+                        applyDOMFallback(result.settings, { forceReprocess: true });
+                    }
+                });
+                sendResponse?.({ acknowledged: true });
+                return;
+            }
+        } catch (e) {
+        }
+
+        const normalized = normalizeSettingsForHost(request.settings);
+        sendSettingsToMainWorld(normalized);
+        applyDOMFallback(normalized, { forceReprocess: true });
         sendResponse?.({ acknowledged: true });
     }
 });
@@ -34,12 +61,115 @@ browserAPI_BRIDGE.runtime.onMessage.addListener((request, sender, sendResponse) 
 let pendingSeedSettings = null;
 let seedListenerAttached = false;
 
+function normalizeSettingsForHost(settings) {
+    try {
+        if (!settings || typeof settings !== 'object') return settings;
+        const host = String(location?.hostname || '').toLowerCase();
+        if (!host.includes('youtubekids.com')) return settings;
+        const profile = settings.profileType === 'kids' ? 'kids' : (settings.profileType === 'main' ? 'main' : '');
+        if (profile === 'kids') return settings;
+        const listMode = settings.listMode === 'whitelist' ? 'whitelist' : 'blocklist';
+        if (listMode !== 'whitelist') return settings;
+
+        const wlChannels = Array.isArray(settings.whitelistChannels) ? settings.whitelistChannels.length : 0;
+        const wlKeywords = Array.isArray(settings.whitelistKeywords) ? settings.whitelistKeywords.length : 0;
+        if (wlChannels !== 0 || wlKeywords !== 0) return settings;
+
+        const debugEnabled = (() => {
+            try {
+                return !!window.__filtertubeDebug || document.documentElement?.getAttribute('data-filtertube-debug') === 'true';
+            } catch (e) {
+                return !!window.__filtertubeDebug;
+            }
+        })();
+        if (debugEnabled) {
+            console.warn('[FilterTube] Forcing Kids whitelist(empty) -> blocklist for fail-open filtering.');
+        }
+
+        return { ...settings, listMode: 'blocklist' };
+    } catch (e) {
+        return settings;
+    }
+}
+
 function requestSettingsFromBackground() {
     return new Promise((resolve) => {
-        browserAPI_BRIDGE.runtime.sendMessage({ action: "getCompiledSettings" }, (response) => {
+        const profileType = (() => {
+            try {
+                const host = String(location?.hostname || '').toLowerCase();
+                return host.includes('youtubekids.com') ? 'kids' : 'main';
+            } catch (e) {
+                return 'main';
+            }
+        })();
+
+        browserAPI_BRIDGE.runtime.sendMessage({ action: "getCompiledSettings", profileType }, (response) => {
             if (response && !response.error) {
-                sendSettingsToMainWorld(response);
-                resolve({ success: true, settings: response });
+                try {
+                    const resolvedProfile = response.profileType === 'kids'
+                        ? 'kids'
+                        : (response.profileType === 'main' ? 'main' : '');
+                    if (resolvedProfile && resolvedProfile !== profileType) {
+                        browserAPI_BRIDGE.runtime.sendMessage({ action: "getCompiledSettings", profileType, forceRefresh: true }, (retry) => {
+                            if (retry && !retry.error) {
+                                const normalized = normalizeSettingsForHost(retry);
+                                sendSettingsToMainWorld(normalized);
+                                resolve({ success: true, settings: normalized });
+                            } else {
+                                const normalized = normalizeSettingsForHost(response);
+                                sendSettingsToMainWorld(normalized);
+                                resolve({ success: true, settings: normalized });
+                            }
+                        });
+                        return;
+                    }
+                } catch (e) {
+                }
+
+                try {
+                    const debugEnabled = (() => {
+                        try {
+                            return !!window.__filtertubeDebug || document.documentElement?.getAttribute('data-filtertube-debug') === 'true';
+                        } catch (e) {
+                            return !!window.__filtertubeDebug;
+                        }
+                    })();
+
+                    if (debugEnabled) {
+                        const host = (() => {
+                            try {
+                                return String(location?.hostname || '').toLowerCase();
+                            } catch (e) {
+                                return '';
+                            }
+                        })();
+
+                        const isKidsHost = host.includes('youtubekids.com');
+                        const listMode = response.listMode === 'whitelist' ? 'whitelist' : 'blocklist';
+                        const wlChannels = Array.isArray(response.whitelistChannels) ? response.whitelistChannels.length : 0;
+                        const wlKeywords = Array.isArray(response.whitelistKeywords) ? response.whitelistKeywords.length : 0;
+                        const blChannels = Array.isArray(response.filterChannels) ? response.filterChannels.length : 0;
+                        const blKeywords = Array.isArray(response.filterKeywords) ? response.filterKeywords.length : 0;
+
+                        console.log('[FilterTube] Compiled settings received', {
+                            host,
+                            requestedProfileType: profileType,
+                            listMode,
+                            filterChannels: blChannels,
+                            filterKeywords: blKeywords,
+                            whitelistChannels: wlChannels,
+                            whitelistKeywords: wlKeywords
+                        });
+
+                        if (isKidsHost && listMode === 'whitelist' && wlChannels === 0 && wlKeywords === 0) {
+                            console.warn('[FilterTube] Kids host received whitelist mode with empty allow-lists (this hides most content).');
+                        }
+                    }
+                } catch (e) {
+                }
+                const normalized = normalizeSettingsForHost(response);
+                sendSettingsToMainWorld(normalized);
+                resolve({ success: true, settings: normalized });
             } else {
                 resolve({ success: false });
             }
@@ -175,6 +305,7 @@ function handleStorageChanges(changes, area) {
         'hideExploreTrending',
         'hideMoreFromYouTube',
         'hideSubscriptions',
+        'showQuickBlockButton',
         'hideSearchShelves'
     ];
     if (Object.keys(changes).some(key => relevantKeys.includes(key))) {

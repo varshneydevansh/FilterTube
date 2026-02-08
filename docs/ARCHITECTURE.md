@@ -1,8 +1,8 @@
-# Architecture Documentation (v3.2.5)
+# Architecture Documentation (v3.2.7)
 
 ## Overview
 
-FilterTube v3.2.5 builds on the proactive channel identity system of v3.2.1 with significant UI/UX improvements and now ships **Whitelist Mode** as the primary allow-only path for granular content control. This architecture documentation covers both the high-level design, filtering modes, and user experience enhancements.
+FilterTube v3.2.7 builds on the proactive channel identity system with performance optimizations, category filtering, and enhanced cross-browser support. This architecture documentation covers high-level design, filtering modes, memory management, and cross-browser compatibility.
 
 ## Filtering Modes Architecture (v3.2.5)
 
@@ -442,6 +442,170 @@ for (const word of words) {
     }
 }
 ```
+
+### Category Filtering Architecture (v3.2.7)
+
+FilterTube v3.2.7 introduces category-based filtering using YouTube's video category metadata:
+
+```mermaid
+graph TD
+    A[Video Card Detected] --> B{Category Filter Enabled?}
+    B -->|No| C[Continue to Other Filters]
+    B -->|Yes| D[Extract Category from videoMetaMap]
+    D --> E{Category Available?}
+    E -->|No| F[Show Video - No Metadata]
+    E -->|Yes| G{Category in Filter List?}
+    G -->|Yes - Blocklist| H[Hide Video]
+    G -->|Yes - Whitelist| I[Show Video]
+    G -->|No - Blocklist| J[Show Video]
+    G -->|No - Whitelist| K[Hide Video]
+    
+    style H fill:#f44336
+    style K fill:#f44336
+    style I fill:#4caf50
+    style J fill:#4caf50
+```
+
+**Category Data Structure:**
+
+```javascript
+videoMetaMap: {
+    'dQw4w9WgXcQ': {
+        lengthSeconds: 212,
+        publishDate: '2009-10-25',
+        uploadDate: '2009-10-25T07:05:00Z',
+        category: 'Music'  // YouTube category name
+    }
+}
+
+contentFilters.category = {
+    enabled: true,
+    mode: 'blocklist',       // 'blocklist' | 'whitelist'
+    categories: ['Gaming', 'Music']
+};
+```
+
+**Supported YouTube Categories:**
+- Music, Gaming, Entertainment, News & Politics
+- Education, Science & Technology, Sports
+- Film & Animation, People & Blogs
+- Comedy, Howto & Style, Autos & Vehicles
+- Travel & Events, Pets & Animals, Nonprofits & Activism
+
+### Memory Management Architecture (v3.2.7)
+
+#### LRU Eviction for videoMetaMap
+
+FilterTube v3.2.7 implements LRU (Least Recently Used) eviction to prevent unbounded memory growth:
+
+```mermaid
+graph TD
+    A[New Video Metadata] --> B{videoMetaMap Size > 3000?}
+    B -->|No| C[Store Normally]
+    B -->|Yes| D[Collect LRU Entries]
+    D --> E[Sort by lastAccessed Timestamp]
+    E --> F[Remove Oldest 500 Entries]
+    F --> C
+    C --> G[Update lastAccessed on Read]
+    
+    style D fill:#ff9800
+    style F fill:#f44336
+```
+
+**Implementation:**
+
+```javascript
+// LRU eviction in background.js
+const MAX_VIDEO_META_ENTRIES = 3000;
+const EVICT_COUNT = 500;
+
+function evictLRUEntries(videoMetaMap) {
+    const entries = Object.entries(videoMetaMap);
+    if (entries.length <= MAX_VIDEO_META_ENTRIES) return videoMetaMap;
+    
+    // Sort by lastAccessed (oldest first)
+    entries.sort((a, b) => (a[1].lastAccessed || 0) - (b[1].lastAccessed || 0));
+    
+    // Remove oldest entries
+    const toRemove = entries.slice(0, entries.length - MAX_VIDEO_META_ENTRIES + EVICT_COUNT);
+    for (const [videoId] of toRemove) {
+        delete videoMetaMap[videoId];
+    }
+    
+    return videoMetaMap;
+}
+```
+
+#### Pending-Meta Shimmer with TTL
+
+The pending-meta shimmer system prevents stale "fetching metadata" states:
+
+```mermaid
+graph TD
+    A[Request Video Metadata] --> B[Record Request Timestamp]
+    B --> C[Show Shimmer Badge]
+    C --> D{Metadata Received?}
+    D -->|Yes| E[Hide Shimmer - Show Data]
+    D -->|No| F{TTL Expired? - 8 seconds}
+    F -->|Yes| G[Hide Shimmer - Clear Pending]
+    F -->|No| H[Continue Showing Shimmer]
+    H --> D
+    
+    style E fill:#4caf50
+    style G fill:#ff9800
+```
+
+**TTL Cleanup:**
+
+```javascript
+const PENDING_META_TTL_MS = 8000; // 8 seconds
+
+function cleanupStalePendingMeta() {
+    const now = Date.now();
+    const keys = Object.keys(lastWatchMetaFetchAttempt);
+    for (const key of keys) {
+        if (now - lastWatchMetaFetchAttempt[key] > PENDING_META_TTL_MS) {
+            delete lastWatchMetaFetchAttempt[key];
+        }
+    }
+}
+```
+
+**Safe Key-Collection Pattern:**
+```javascript
+// Safe iteration - copy keys before deleting
+const keys = Object.keys(map);
+for (const key of keys) {
+    if (shouldDelete(map[key])) {
+        delete map[key]; // Safe: iterating over copied array
+    }
+}
+```
+
+### Quick-Block Card Action Architecture (v3.2.7)
+
+FilterTube adds an optional direct card-level block action in the Isolated World:
+
+```mermaid
+graph TD
+    A[User clicks quick block button] --> B[Extract channel/collaborator metadata from card]
+    B --> C{Card has 2+ channels?}
+    C -->|No| D[Call handleBlockChannelClick with primary channel]
+    C -->|Yes| E[Build block-all payload from all collaborators on card]
+    E --> F[Reuse existing block pipeline]
+    D --> F
+    F --> G[Persist filter channel entries + apply optimistic hide]
+```
+
+Key implementation points:
+- Controlled by `showQuickBlockButton` setting.
+- Default-on in v3.2.7 via a one-time migration (`quickBlockDefaultV327Applied`) so it is enabled once without being re-forced in future updates.
+- Single tap only (no extra quick menu).
+- Reuses existing channel-block handlers (no parallel logic fork).
+- For collaborator cards, one tap blocks every channel on that card.
+- Applies on YouTube Main and YouTube Kids with profile-aware persistence.
+- Comment-origin block actions are context-isolated to comment nodes; they skip playlist/video prefetch identity merges and videoId fallback lookups.
+- Pointer tracking keeps hover active while inside host/anchor bounds, stabilizing the cross button on Search overlays and Home Shorts.
 
 ## Storage Architecture
 

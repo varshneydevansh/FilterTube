@@ -105,6 +105,62 @@
         }, 0);
     }
 
+    function normalizeLooseText(value) {
+        if (!value || typeof value !== 'string') return '';
+        return value.trim().toLowerCase().replace(/\s+/g, ' ');
+    }
+
+    function normalizeExpectedHandle(value) {
+        const raw = extractRawHandle(value) || (typeof value === 'string' ? value.trim() : '');
+        if (!raw) return '';
+        const norm = raw.startsWith('@') ? raw : `@${raw.replace(/^@+/, '')}`;
+        return norm.toLowerCase();
+    }
+
+    function buildExpectedMatcher(payload) {
+        const expectedNames = Array.isArray(payload?.expectedNames) ? payload.expectedNames : [];
+        const expectedHandles = Array.isArray(payload?.expectedHandles) ? payload.expectedHandles : [];
+
+        const nameSet = new Set(expectedNames.map(normalizeLooseText).filter(Boolean));
+        const handleSet = new Set(expectedHandles.map(normalizeExpectedHandle).filter(Boolean));
+
+        // If caller didn't send expectations, we must not reject results solely on that.
+        const hasAny = nameSet.size > 0 || handleSet.size > 0;
+
+        return {
+            hasAny,
+            matchesAny(collaborator) {
+                if (!hasAny) return true;
+                if (!collaborator || typeof collaborator !== 'object') return false;
+                const name = normalizeLooseText(collaborator.name);
+                const handle = normalizeExpectedHandle(collaborator.handle);
+                return (name && nameSet.has(name)) || (handle && handleSet.has(handle));
+            }
+        };
+    }
+
+    function isValidCollaboratorResponse(list, matcher) {
+        if (!Array.isArray(list) || list.length < 2) return false;
+
+        // Prevent obvious garbage: all entries empty/placeholder-ish.
+        const hasAnyIdentity = list.some(c => {
+            if (!c || typeof c !== 'object') return false;
+            const id = typeof c.id === 'string' ? c.id.trim() : '';
+            const handle = typeof c.handle === 'string' ? c.handle.trim() : '';
+            const name = typeof c.name === 'string' ? c.name.trim() : '';
+            const customUrl = typeof c.customUrl === 'string' ? c.customUrl.trim() : '';
+            return Boolean(id || handle || customUrl || name);
+        });
+        if (!hasAnyIdentity) return false;
+
+        // If expectations were provided, require at least one collaborator to match.
+        if (matcher && matcher.hasAny) {
+            return list.some(c => matcher.matchesAny(c));
+        }
+
+        return true;
+    }
+
     function cacheCollaboratorsIfBetter(videoId, collaborators = []) {
         if (!videoId || !Array.isArray(collaborators) || collaborators.length === 0) {
             return collaboratorCache.get(videoId) || null;
@@ -165,19 +221,28 @@
             const { videoId, requestId } = payload;
             postLog('log', `Received collaborator info request for video: ${videoId}`);
 
+            const matcher = buildExpectedMatcher(payload || {});
+
             // First check cache (for dynamically loaded videos)
             let collaboratorInfo = collaboratorCache.get(videoId);
             let collaboratorScore = getCollaboratorListQuality(collaboratorInfo);
 
             // If not in cache, or ytInitialData has richer data, search ytInitialData
-            const ytInitialDataCollaborators = searchYtInitialDataForCollaborators(videoId);
+            const ytInitialDataCollaborators = searchYtInitialDataForCollaborators(videoId, matcher);
             const ytScore = getCollaboratorListQuality(ytInitialDataCollaborators);
-            if (ytScore > collaboratorScore) {
+
+            const cacheValid = isValidCollaboratorResponse(collaboratorInfo, matcher);
+            const ytValid = isValidCollaboratorResponse(ytInitialDataCollaborators, matcher);
+
+            if (ytValid && (!cacheValid || ytScore > collaboratorScore)) {
                 collaboratorInfo = cacheCollaboratorsIfBetter(videoId, ytInitialDataCollaborators);
                 collaboratorScore = ytScore;
-            } else if (!collaboratorInfo && Array.isArray(ytInitialDataCollaborators)) {
+            } else if (!cacheValid && ytValid) {
                 collaboratorInfo = cacheCollaboratorsIfBetter(videoId, ytInitialDataCollaborators);
                 collaboratorScore = ytScore;
+            } else if (!cacheValid) {
+                // Do not return a single-channel or mismatched collaborator list; it can poison block actions.
+                collaboratorInfo = null;
             }
 
             // Send response back to content_bridge
@@ -580,6 +645,7 @@
         postLog('log', `Searching snapshots for channel of video: ${videoId}`);
 
         let foundVideoObject = false;
+        let matchedTargetVideo = false;
         const visited = new WeakSet();
         const options = (expectations && typeof expectations === 'object') ? expectations : {};
         const normalizedExpectedHandle = typeof options.expectedHandle === 'string'
@@ -643,8 +709,10 @@
             if (!player || typeof player !== 'object') return null;
             const details = player.videoDetails || null;
             const micro = player.microformat?.playerMicroformatRenderer || null;
-            const playerVideoId = details?.videoId || '';
-            if (playerVideoId && playerVideoId !== videoId) return null;
+            const playerVideoId = (typeof details?.videoId === 'string') ? details.videoId : '';
+            if (!playerVideoId) return null;
+            if (playerVideoId !== videoId) return null;
+            matchedTargetVideo = true;
             const id = details?.channelId || null;
             const name = details?.author || micro?.ownerChannelName || null;
             const profileUrl = micro?.ownerProfileUrl || micro?.ownerProfileUrl?.url || null;
@@ -779,6 +847,7 @@
 
             if (nodeVideoId === videoId) {
                 foundVideoObject = true;
+                matchedTargetVideo = true;
 
                 // Priority 1: navigationEndpoint.browseEndpoint on the video renderer
                 const nav = node.navigationEndpoint && node.navigationEndpoint.browseEndpoint;
@@ -903,6 +972,7 @@
         })();
 
         if (watchOwnerCandidate) {
+            matchedTargetVideo = true;
             const mergedWatch = mergeChannelCandidates(watchOwnerCandidate, playerCandidate);
             if (mergedWatch) {
                 if (!hasExpectations || matchesExpectations(mergedWatch)) {
@@ -926,8 +996,12 @@
         if (!result && !fallbackCandidate) {
             postLog('log', `Channel search: no channel info extracted for ${videoId} across ${searchTargets.length} roots`);
         }
-
-        return result || fallbackCandidate;
+        if (result) return result;
+        if (fallbackCandidate && matchedTargetVideo) return fallbackCandidate;
+        if (fallbackCandidate && !matchedTargetVideo) {
+            postLog('warn', `Channel search: ignoring unanchored fallback for ${videoId}`);
+        }
+        return null;
     }
 
     /**
@@ -935,7 +1009,7 @@
      * @param {string} videoId
      * @returns {Array|null}
      */
-    function searchYtInitialDataForCollaborators(videoId) {
+    function searchYtInitialDataForCollaborators(videoId, matcher = null) {
         if (!videoId) {
             postLog('log', 'Collaborator search skipped - missing videoId');
             return null;
@@ -999,6 +1073,11 @@
                 if (nodeVideoId === videoId) {
                     const extracted = extractCollaboratorsFromDataObject(obj);
                     if (Array.isArray(extracted) && extracted.length > 0) {
+                        // Only treat this as a valid collaboration result when it is a true roster (2+ channels)
+                        // and matches expectations from the clicked card (when provided).
+                        if (!isValidCollaboratorResponse(extracted, matcher)) {
+                            return null;
+                        }
                         postLog('log', `✅ Found collaborators via ${target.label}`);
                         return extracted;
                     }

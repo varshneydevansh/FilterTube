@@ -64,6 +64,7 @@ function initializePopupFiltersTabs() {
     contentTab.appendChild(contentSearchRow);
 
     const catalog = window.FilterTubeContentControlsCatalog?.getCatalog?.() || [];
+    let feedRowsContainer = null;
 
     function hexToRgba(hex, alpha) {
         if (!hex || typeof hex !== 'string') return '';
@@ -92,6 +93,7 @@ function initializePopupFiltersTabs() {
         const groupEl = document.createElement('div');
         groupEl.setAttribute('data-ft-control-group', 'true');
         groupEl.setAttribute('data-ft-group-title', group?.title || '');
+        groupEl.setAttribute('data-ft-group-id', group?.id || '');
         groupEl.className = 'content-control-group';
         applyControlGroupTheme(groupEl, group?.accentColor);
 
@@ -107,6 +109,10 @@ function initializePopupFiltersTabs() {
 
         const rowsContainer = document.createElement('div');
         rowsContainer.className = 'content-control-group__rows';
+
+        if (group?.id === 'feed') {
+            feedRowsContainer = rowsContainer;
+        }
 
         (group.controls || []).forEach(control => {
             const row = document.createElement('div');
@@ -145,36 +151,36 @@ function initializePopupFiltersTabs() {
         contentTab.appendChild(groupEl);
     });
 
-    // Advance Video Filters Section (compact version for popup)
-    const videoFiltersSection = document.createElement('div');
-    videoFiltersSection.className = 'content-control-group video-filters-section';
-    videoFiltersSection.style.marginTop = '16px';
-    videoFiltersSection.style.borderTop = '1px solid var(--ft-color-sem-neutral-border)';
+    const videoFiltersRows = feedRowsContainer || (() => {
+        const videoFiltersSection = document.createElement('div');
+        videoFiltersSection.className = 'content-control-group video-filters-section';
+        videoFiltersSection.style.marginTop = '16px';
+        videoFiltersSection.style.borderTop = '1px solid var(--ft-color-sem-neutral-border)';
+        videoFiltersSection.setAttribute('data-ft-control-group', 'true');
+        videoFiltersSection.setAttribute('data-ft-group-title', 'Feeds');
 
-    const videoFiltersHeader = document.createElement('button');
-    videoFiltersHeader.className = 'content-control-group__header video-filters-toggle';
-    videoFiltersHeader.type = 'button';
-    videoFiltersHeader.setAttribute('aria-expanded', 'false');
+        const videoFiltersHeader = document.createElement('div');
+        videoFiltersHeader.className = 'content-control-group__header';
 
-    const videoFiltersTitle = document.createElement('div');
-    videoFiltersTitle.className = 'content-control-group__title';
-    videoFiltersTitle.textContent = 'Advance Video Filters';
+        const videoFiltersTitle = document.createElement('div');
+        videoFiltersTitle.className = 'content-control-group__title';
+        videoFiltersTitle.textContent = 'Feeds';
 
-    const videoFiltersChevron = document.createElement('span');
-    videoFiltersChevron.className = 'video-filters-chevron';
-    videoFiltersChevron.innerHTML = '▾';
+        videoFiltersHeader.appendChild(videoFiltersTitle);
+        videoFiltersSection.appendChild(videoFiltersHeader);
 
-    videoFiltersHeader.appendChild(videoFiltersTitle);
-    videoFiltersHeader.appendChild(videoFiltersChevron);
-    videoFiltersSection.appendChild(videoFiltersHeader);
-
-    const videoFiltersRows = document.createElement('div');
-    videoFiltersRows.className = 'content-control-group__rows video-filters-body';
+        const rows = document.createElement('div');
+        rows.className = 'content-control-group__rows';
+        videoFiltersSection.appendChild(rows);
+        contentTab.appendChild(videoFiltersSection);
+        return rows;
+    })();
 
     // Duration filter row (compact)
     const durationRow = document.createElement('div');
     durationRow.className = 'toggle-row';
     durationRow.setAttribute('data-ft-control-row', 'true');
+    durationRow.setAttribute('data-ft-search', 'duration filter');
 
     const durationInfo = document.createElement('div');
     durationInfo.className = 'toggle-info';
@@ -203,10 +209,41 @@ function initializePopupFiltersTabs() {
     durationRow.appendChild(durationToggle);
     videoFiltersRows.appendChild(durationRow);
 
+    const kidsDurationRow = document.createElement('div');
+    kidsDurationRow.className = 'toggle-row ft-kids-sub-toggle-row';
+    kidsDurationRow.setAttribute('data-ft-control-row', 'true');
+    kidsDurationRow.setAttribute('data-ft-search', 'duration filter');
+
+    const kidsDurationInfo = document.createElement('div');
+    kidsDurationInfo.className = 'toggle-info';
+
+    const kidsDurationTitle = document.createElement('div');
+    kidsDurationTitle.className = 'toggle-title';
+    kidsDurationTitle.textContent = 'Duration Filter';
+
+    kidsDurationInfo.appendChild(kidsDurationTitle);
+
+    const kidsDurationToggle = document.createElement('label');
+    kidsDurationToggle.className = 'switch';
+
+    const kidsDurationCheckbox = document.createElement('input');
+    kidsDurationCheckbox.type = 'checkbox';
+    kidsDurationCheckbox.id = 'popupVideoFilter_duration_enabled_kids';
+
+    const kidsDurationSlider = document.createElement('span');
+    kidsDurationSlider.className = 'slider round';
+
+    kidsDurationToggle.appendChild(kidsDurationCheckbox);
+    kidsDurationToggle.appendChild(kidsDurationSlider);
+
+    kidsDurationRow.appendChild(kidsDurationInfo);
+    kidsDurationRow.appendChild(kidsDurationToggle);
+
     // Upload date filter row (compact)
     const uploadDateRow = document.createElement('div');
     uploadDateRow.className = 'toggle-row';
     uploadDateRow.setAttribute('data-ft-control-row', 'true');
+    uploadDateRow.setAttribute('data-ft-search', 'upload date filter');
 
     const uploadDateInfo = document.createElement('div');
     uploadDateInfo.className = 'toggle-info';
@@ -235,10 +272,41 @@ function initializePopupFiltersTabs() {
     uploadDateRow.appendChild(uploadDateToggle);
     videoFiltersRows.appendChild(uploadDateRow);
 
+    const kidsUploadDateRow = document.createElement('div');
+    kidsUploadDateRow.className = 'toggle-row ft-kids-sub-toggle-row';
+    kidsUploadDateRow.setAttribute('data-ft-control-row', 'true');
+    kidsUploadDateRow.setAttribute('data-ft-search', 'upload date filter');
+
+    const kidsUploadDateInfo = document.createElement('div');
+    kidsUploadDateInfo.className = 'toggle-info';
+
+    const kidsUploadDateTitle = document.createElement('div');
+    kidsUploadDateTitle.className = 'toggle-title';
+    kidsUploadDateTitle.textContent = 'Upload Date Filter';
+
+    kidsUploadDateInfo.appendChild(kidsUploadDateTitle);
+
+    const kidsUploadDateToggle = document.createElement('label');
+    kidsUploadDateToggle.className = 'switch';
+
+    const kidsUploadDateCheckbox = document.createElement('input');
+    kidsUploadDateCheckbox.type = 'checkbox';
+    kidsUploadDateCheckbox.id = 'popupVideoFilter_uploadDate_enabled_kids';
+
+    const kidsUploadDateSlider = document.createElement('span');
+    kidsUploadDateSlider.className = 'slider round';
+
+    kidsUploadDateToggle.appendChild(kidsUploadDateCheckbox);
+    kidsUploadDateToggle.appendChild(kidsUploadDateSlider);
+
+    kidsUploadDateRow.appendChild(kidsUploadDateInfo);
+    kidsUploadDateRow.appendChild(kidsUploadDateToggle);
+
     // Uppercase title filter row (compact)
     const uppercaseRow = document.createElement('div');
     uppercaseRow.className = 'toggle-row';
     uppercaseRow.setAttribute('data-ft-control-row', 'true');
+    uppercaseRow.setAttribute('data-ft-search', 'uppercase title filter');
 
     const uppercaseInfo = document.createElement('div');
     uppercaseInfo.className = 'toggle-info';
@@ -267,19 +335,46 @@ function initializePopupFiltersTabs() {
     uppercaseRow.appendChild(uppercaseToggle);
     videoFiltersRows.appendChild(uppercaseRow);
 
+    const kidsUppercaseRow = document.createElement('div');
+    kidsUppercaseRow.className = 'toggle-row ft-kids-sub-toggle-row';
+    kidsUppercaseRow.setAttribute('data-ft-control-row', 'true');
+    kidsUppercaseRow.setAttribute('data-ft-search', 'uppercase title filter');
+
+    const kidsUppercaseInfo = document.createElement('div');
+    kidsUppercaseInfo.className = 'toggle-info';
+
+    const kidsUppercaseTitle = document.createElement('div');
+    kidsUppercaseTitle.className = 'toggle-title';
+    kidsUppercaseTitle.textContent = 'Uppercase Title Filter';
+
+    kidsUppercaseInfo.appendChild(kidsUppercaseTitle);
+
+    const kidsUppercaseToggle = document.createElement('label');
+    kidsUppercaseToggle.className = 'switch';
+
+    const kidsUppercaseCheckbox = document.createElement('input');
+    kidsUppercaseCheckbox.type = 'checkbox';
+    kidsUppercaseCheckbox.id = 'popupVideoFilter_uppercase_enabled_kids';
+
+    const kidsUppercaseSlider = document.createElement('span');
+    kidsUppercaseSlider.className = 'slider round';
+
+    kidsUppercaseToggle.appendChild(kidsUppercaseCheckbox);
+    kidsUppercaseToggle.appendChild(kidsUppercaseSlider);
+
+    kidsUppercaseRow.appendChild(kidsUppercaseInfo);
+    kidsUppercaseRow.appendChild(kidsUppercaseToggle);
+
     const manageInTab = document.createElement('button');
     manageInTab.className = 'video-filters-manage';
     manageInTab.type = 'button';
-    manageInTab.textContent = 'Manage in Tab';
+    manageInTab.textContent = 'Manage in Tab View';
 
     videoFiltersRows.appendChild(manageInTab);
-    videoFiltersSection.appendChild(videoFiltersRows);
-    contentTab.appendChild(videoFiltersSection);
 
     // Wire up popup video filter event listeners
     function updatePopupVideoFilterUI() {
-        const isExpanded = videoFiltersHeader.getAttribute('aria-expanded') === 'true';
-        videoFiltersRows.style.display = isExpanded ? 'flex' : 'none';
+        if (!videoFiltersRows) return;
     }
 
     function applyPopupContentFilters(contentFilters = {}) {
@@ -287,42 +382,122 @@ function initializePopupFiltersTabs() {
         const uploadEnabled = document.getElementById('popupVideoFilter_uploadDate_enabled');
         const uppercaseEnabled = document.getElementById('popupVideoFilter_uppercase_enabled');
 
+        const kidsDurationEnabled = document.getElementById('popupVideoFilter_duration_enabled_kids');
+        const kidsUploadEnabled = document.getElementById('popupVideoFilter_uploadDate_enabled_kids');
+        const kidsUppercaseEnabled = document.getElementById('popupVideoFilter_uppercase_enabled_kids');
+
         if (durationEnabled) durationEnabled.checked = !!contentFilters.duration?.enabled;
         if (uploadEnabled) uploadEnabled.checked = !!contentFilters.uploadDate?.enabled;
         if (uppercaseEnabled) uppercaseEnabled.checked = !!contentFilters.uppercase?.enabled;
+
     }
 
-    function savePopupVideoFilters() {
+    function applyPopupKidsContentFilters(contentFilters = {}) {
+        const kidsDurationEnabled = document.getElementById('popupVideoFilter_duration_enabled_kids')
+            || document.getElementById('popupVideoFilter_duration_enabled');
+        const kidsUploadEnabled = document.getElementById('popupVideoFilter_uploadDate_enabled_kids')
+            || document.getElementById('popupVideoFilter_uploadDate_enabled');
+        const kidsUppercaseEnabled = document.getElementById('popupVideoFilter_uppercase_enabled_kids')
+            || document.getElementById('popupVideoFilter_uppercase_enabled');
+
+        if (kidsDurationEnabled) kidsDurationEnabled.checked = !!contentFilters.duration?.enabled;
+        if (kidsUploadEnabled) kidsUploadEnabled.checked = !!contentFilters.uploadDate?.enabled;
+        if (kidsUppercaseEnabled) kidsUppercaseEnabled.checked = !!contentFilters.uppercase?.enabled;
+    }
+
+    async function resolveProfileTypeFromTabs() {
+        try {
+            const tabsApi = (typeof chrome !== 'undefined' && chrome.tabs && typeof chrome.tabs.query === 'function')
+                ? chrome.tabs
+                : ((typeof browser !== 'undefined' && browser.tabs && typeof browser.tabs.query === 'function') ? browser.tabs : null);
+            if (!tabsApi) return 'main';
+
+            const tabs = await new Promise(resolve => {
+                try {
+                    const maybePromise = tabsApi.query({ active: true, currentWindow: true }, (result) => resolve(result));
+                    if (maybePromise && typeof maybePromise.then === 'function') {
+                        maybePromise.then(resolve).catch(() => resolve([]));
+                    }
+                } catch (e) {
+                    resolve([]);
+                }
+            });
+
+            const url = String(tabs && tabs[0] && tabs[0].url ? tabs[0].url : '');
+            if (url && /^(https?:\/\/)?([^\/]+\.)?youtubekids\.com\b/i.test(url)) {
+                return 'kids';
+            }
+        } catch (e) {
+        }
+        return 'main';
+    }
+
+    async function updatePopupVideoFiltersVisibility() {
+        const profileType = await resolveProfileTypeFromTabs();
+        const showKids = profileType === 'kids';
+
+        const mainRows = [
+            document.getElementById('popupVideoFilter_duration_enabled')?.closest('.toggle-row'),
+            document.getElementById('popupVideoFilter_uploadDate_enabled')?.closest('.toggle-row'),
+            document.getElementById('popupVideoFilter_uppercase_enabled')?.closest('.toggle-row')
+        ].filter(Boolean);
+
+        const kidsRows = [
+            document.getElementById('popupVideoFilter_duration_enabled_kids')?.closest('.toggle-row'),
+            document.getElementById('popupVideoFilter_uploadDate_enabled_kids')?.closest('.toggle-row'),
+            document.getElementById('popupVideoFilter_uppercase_enabled_kids')?.closest('.toggle-row')
+        ].filter(Boolean);
+
+        if (kidsRows.length === 0) {
+            mainRows.forEach(row => row.style.display = 'flex');
+        } else {
+            mainRows.forEach(row => row.style.display = showKids ? 'none' : 'flex');
+            kidsRows.forEach(row => row.style.display = showKids ? 'flex' : 'none');
+        }
+
+        manageInTab.textContent = showKids ? 'Manage Kids Content Controls in Tab View' : 'Manage Categories in Tab View';
+    }
+
+    async function applyPopupVideoFiltersForActiveProfile() {
+        try {
+            const profileType = await resolveProfileTypeFromTabs();
+            const state = StateManager.getState();
+            if (profileType === 'kids') {
+                applyPopupKidsContentFilters(state?.kids?.contentFilters || {});
+            } else {
+                applyPopupContentFilters(state?.contentFilters || {});
+            }
+        } catch (e) {
+        }
+    }
+
+    function savePopupVideoFilters(profileType) {
+        const state = StateManager.getState();
+        const type = profileType === 'kids' ? 'kids' : 'main';
+
+        if (type === 'kids') {
+            const durationEnabled = (document.getElementById('popupVideoFilter_duration_enabled_kids')
+                || document.getElementById('popupVideoFilter_duration_enabled'))?.checked || false;
+            const uploadEnabled = (document.getElementById('popupVideoFilter_uploadDate_enabled_kids')
+                || document.getElementById('popupVideoFilter_uploadDate_enabled'))?.checked || false;
+            const uppercaseEnabled = (document.getElementById('popupVideoFilter_uppercase_enabled_kids')
+                || document.getElementById('popupVideoFilter_uppercase_enabled'))?.checked || false;
+            const prior = state?.kids?.contentFilters || {};
+            return StateManager.updateKidsContentFilters({
+                duration: { ...(prior.duration || {}), enabled: durationEnabled },
+                uploadDate: { ...(prior.uploadDate || {}), enabled: uploadEnabled },
+                uppercase: { ...(prior.uppercase || {}), enabled: uppercaseEnabled }
+            });
+        }
+
         const durationEnabled = document.getElementById('popupVideoFilter_duration_enabled')?.checked || false;
         const uploadEnabled = document.getElementById('popupVideoFilter_uploadDate_enabled')?.checked || false;
-
         const uppercaseEnabled = document.getElementById('popupVideoFilter_uppercase_enabled')?.checked || false;
-
-        const now = Date.now();
-        const unitMs = { days: 86400000, weeks: 604800000, months: 2592000000, years: 31536000000 };
-        const ageValue = 30;
-        const cutoff = now - ageValue * unitMs.days;
-        const fromDate = new Date(cutoff).toISOString();
-
-        StateManager.updateContentFilters({
-            duration: {
-                enabled: durationEnabled,
-                condition: 'longer',
-                value: '60',
-                minMinutes: 60,
-                maxMinutes: 0
-            },
-            uploadDate: {
-                enabled: uploadEnabled,
-                condition: 'newer',
-                value: String(ageValue),
-                unit: 'days',
-                valueMax: 0,
-                unitMax: '',
-                fromDate,
-                toDate: ''
-            },
-            uppercase: { enabled: uppercaseEnabled, mode: 'all_caps', minWordLength: 2 }
+        const prior = state?.contentFilters || {};
+        return StateManager.updateContentFilters({
+            duration: { ...(prior.duration || {}), enabled: durationEnabled },
+            uploadDate: { ...(prior.uploadDate || {}), enabled: uploadEnabled },
+            uppercase: { ...(prior.uppercase || {}), enabled: uppercaseEnabled }
         });
     }
 
@@ -332,35 +507,67 @@ function initializePopupFiltersTabs() {
         const uploadEnabled = document.getElementById('popupVideoFilter_uploadDate_enabled');
         const uppercaseEnabled = document.getElementById('popupVideoFilter_uppercase_enabled');
 
-        durationEnabled?.addEventListener('change', savePopupVideoFilters);
-        uploadEnabled?.addEventListener('change', savePopupVideoFilters);
-        uppercaseEnabled?.addEventListener('change', () => {
-            savePopupVideoFilters();
-        });
+        const kidsDurationEnabled = document.getElementById('popupVideoFilter_duration_enabled_kids');
+        const kidsUploadEnabled = document.getElementById('popupVideoFilter_uploadDate_enabled_kids');
+        const kidsUppercaseEnabled = document.getElementById('popupVideoFilter_uppercase_enabled_kids');
 
-        videoFiltersHeader.addEventListener('click', () => {
-            const expanded = videoFiltersHeader.getAttribute('aria-expanded') === 'true';
-            videoFiltersHeader.setAttribute('aria-expanded', expanded ? 'false' : 'true');
-            updatePopupVideoFilterUI();
+        durationEnabled?.addEventListener('change', async () => {
+            const profileType = await resolveProfileTypeFromTabs();
+            savePopupVideoFilters(profileType);
+        });
+        uploadEnabled?.addEventListener('change', async () => {
+            const profileType = await resolveProfileTypeFromTabs();
+            savePopupVideoFilters(profileType);
+        });
+        uppercaseEnabled?.addEventListener('change', async () => {
+            const profileType = await resolveProfileTypeFromTabs();
+            savePopupVideoFilters(profileType);
+        });
+        kidsDurationEnabled?.addEventListener('change', async () => {
+            const profileType = await resolveProfileTypeFromTabs();
+            if (profileType === 'kids') {
+                savePopupVideoFilters('kids');
+            }
+        });
+        kidsUploadEnabled?.addEventListener('change', async () => {
+            const profileType = await resolveProfileTypeFromTabs();
+            if (profileType === 'kids') {
+                savePopupVideoFilters('kids');
+            }
+        });
+        kidsUppercaseEnabled?.addEventListener('change', async () => {
+            const profileType = await resolveProfileTypeFromTabs();
+            if (profileType === 'kids') {
+                savePopupVideoFilters('kids');
+            }
         });
 
         manageInTab.addEventListener('click', () => {
             try {
-                if (chrome?.tabs?.create) {
-                    chrome.tabs.create({ url: chrome.runtime.getURL('html/tab-view.html?view=filters') });
-                }
+                resolveProfileTypeFromTabs().then((profileType) => {
+                    const isKids = profileType === 'kids';
+                    const url = isKids
+                        ? chrome.runtime.getURL('html/tab-view.html?view=kids&section=content')
+                        : chrome.runtime.getURL('html/tab-view.html?view=filters&section=categories');
+                    if (chrome?.tabs?.create) {
+                        chrome.tabs.create({ url });
+                    }
+                });
             } catch (e) {
             }
         });
 
-        const state = StateManager.getState();
-        applyPopupContentFilters(state.contentFilters || {});
+        applyPopupVideoFiltersForActiveProfile();
         updatePopupVideoFilterUI();
+        updatePopupVideoFiltersVisibility();
     }, 100);
 
     StateManager.subscribe((eventType, data) => {
         if (eventType === 'contentFiltersUpdated') {
-            applyPopupContentFilters(data?.contentFilters || {});
+            applyPopupVideoFiltersForActiveProfile();
+        }
+        if (eventType === 'kidsContentFiltersUpdated') {
+            applyPopupVideoFiltersForActiveProfile();
         }
     });
 
@@ -404,6 +611,46 @@ document.addEventListener('DOMContentLoaded', async () => {
         ? contentControlsContainer.querySelectorAll('input[type="checkbox"][data-ft-setting]')
         : [];
 
+    function applyPopupContentControlsVisibility(profileType) {
+        if (!contentControlsContainer) return;
+        const type = profileType === 'kids' ? 'kids' : 'main';
+        const groups = contentControlsContainer.querySelectorAll('[data-ft-control-group]');
+        const allowedKidsGroups = new Set(['feed']);
+        groups.forEach(groupEl => {
+            const id = (groupEl.getAttribute('data-ft-group-id') || '').trim();
+            if (type === 'kids') {
+                groupEl.hidden = !allowedKidsGroups.has(id);
+            } else {
+                groupEl.hidden = false;
+            }
+
+            if (type === 'kids' && id === 'feed') {
+                try {
+                    const rows = groupEl.querySelectorAll('.toggle-row');
+                    rows.forEach(row => {
+                        const hasCatalogToggle = !!row.querySelector('input[type="checkbox"][data-ft-setting]');
+                        if (hasCatalogToggle) {
+                            row.hidden = true;
+                        } else {
+                            row.hidden = false;
+                        }
+                    });
+                } catch (e) {
+                }
+            } else {
+                try {
+                    const rows = groupEl.querySelectorAll('.toggle-row');
+                    rows.forEach(row => row.hidden = false);
+                } catch (e) {
+                }
+            }
+        });
+        try {
+            filterContentControlsPopup();
+        } catch (e) {
+        }
+    }
+
     const openInTabBtn = document.getElementById('openInTabBtn');
     const toggleEnabledBrandBtn = document.getElementById('toggleEnabledBrandBtn');
 
@@ -413,6 +660,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     let profilesV4Cache = null;
     let isHandlingProfileSwitch = false;
+    let popupActiveProfileType = 'main';
     const unlockedProfiles = new Set();
 
     async function sendRuntimeMessage(payload) {
@@ -462,38 +710,95 @@ document.addEventListener('DOMContentLoaded', async () => {
     function renderListModeControls() {
         const state = StateManager.getState();
         const locked = isUiLocked();
-        const mode = state?.mode === 'whitelist' ? 'whitelist' : 'blocklist';
+        const resolveProfileTypeFromTabs = async () => {
+            try {
+                const tabsApi = (typeof chrome !== 'undefined' && chrome.tabs && typeof chrome.tabs.query === 'function')
+                    ? chrome.tabs
+                    : ((typeof browser !== 'undefined' && browser.tabs && typeof browser.tabs.query === 'function') ? browser.tabs : null);
+                if (!tabsApi) return 'main';
+
+                const tabs = await new Promise(resolve => {
+                    try {
+                        const maybePromise = tabsApi.query({ active: true, currentWindow: true }, (result) => {
+                            resolve(result);
+                        });
+                        if (maybePromise && typeof maybePromise.then === 'function') {
+                            maybePromise.then(resolve).catch(() => resolve([]));
+                        }
+                    } catch (e) {
+                        try {
+                            const maybePromise = tabsApi.query({ active: true, currentWindow: true });
+                            if (maybePromise && typeof maybePromise.then === 'function') {
+                                maybePromise.then(resolve).catch(() => resolve([]));
+                            } else {
+                                resolve(Array.isArray(maybePromise) ? maybePromise : []);
+                            }
+                        } catch (e2) {
+                            resolve([]);
+                        }
+                    }
+                });
+
+                const url = String(tabs && tabs[0] && tabs[0].url ? tabs[0].url : '');
+                if (url && /^(https?:\/\/)?([^\/]+\.)?youtubekids\.com\b/i.test(url)) {
+                    return 'kids';
+                }
+            } catch (e) {
+            }
+            return 'main';
+        };
+
+        const uiProfileType = popupActiveProfileType === 'kids' ? 'kids' : 'main';
+        const effectiveMode = uiProfileType === 'kids'
+            ? (state?.kids?.mode === 'whitelist' ? 'whitelist' : 'blocklist')
+            : (state?.mode === 'whitelist' ? 'whitelist' : 'blocklist');
 
         if (!ftTopBarListModeControlsPopup) return;
         ftTopBarListModeControlsPopup.innerHTML = '';
 
         const toggle = UIComponents.createToggleButton({
-            text: 'Whitelist',
-            active: mode === 'whitelist',
+            text: uiProfileType === 'kids' ? 'Whitelist Kids' : 'Whitelist',
+            active: effectiveMode === 'whitelist',
             onToggle: async (nextState) => {
                 if (isUiLocked()) {
                     renderListModeControls();
                     return;
                 }
 
+                const profileType = await resolveProfileTypeFromTabs();
+                const currentMode = profileType === 'kids'
+                    ? (state?.kids?.mode === 'whitelist' ? 'whitelist' : 'blocklist')
+                    : (state?.mode === 'whitelist' ? 'whitelist' : 'blocklist');
+
                 const enablingWhitelist = nextState === true;
-                const disablingWhitelist = nextState !== true && mode === 'whitelist';
-                const whitelistEmpty = (state?.whitelistChannels?.length || 0) === 0 && (state?.whitelistKeywords?.length || 0) === 0;
+                const disablingWhitelist = nextState !== true && currentMode === 'whitelist';
+                const whitelistEmpty = profileType === 'kids'
+                    ? ((state?.kids?.whitelistChannels?.length || 0) === 0 && (state?.kids?.whitelistKeywords?.length || 0) === 0)
+                    : ((state?.whitelistChannels?.length || 0) === 0 && (state?.whitelistKeywords?.length || 0) === 0);
                 let copyBlocklist = false;
                 if (enablingWhitelist && whitelistEmpty) {
-                    copyBlocklist = window.confirm('Copy your current blocklist into whitelist to get started?');
+                    const msg = profileType === 'kids'
+                        ? 'Copy your current YT Kids blocklist into whitelist to get started?'
+                        : 'Copy your current blocklist into whitelist to get started?';
+                    copyBlocklist = window.confirm(msg);
                     if (!copyBlocklist) {
-                        UIComponents.showToast('Whitelist is empty — videos will stay hidden until you add allow rules.', 'info');
+                        const toastMsg = profileType === 'kids'
+                            ? 'YT Kids whitelist is empty — videos will stay hidden until you add allow rules.'
+                            : 'Whitelist is empty — videos will stay hidden until you add allow rules.';
+                        UIComponents.showToast(toastMsg, 'info');
                     }
                 }
 
                 let resp = null;
                 if (disablingWhitelist && !whitelistEmpty) {
-                    const shouldTransfer = window.confirm('Move your whitelist back into blocklist? This will clear whitelist.');
+                    const confirmMsg = profileType === 'kids'
+                        ? 'Move your YT Kids whitelist back into blocklist? This will clear the YT Kids whitelist.'
+                        : 'Move your whitelist back into blocklist? This will clear whitelist.';
+                    const shouldTransfer = window.confirm(confirmMsg);
                     if (shouldTransfer) {
                         resp = await sendRuntimeMessage({
                             action: 'FilterTube_TransferWhitelistToBlocklist',
-                            profileType: 'main'
+                            profileType
                         });
                     }
                     // If user clicked Cancel and we're disabling whitelist, don't proceed with mode change
@@ -506,7 +811,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (!resp) {
                     resp = await sendRuntimeMessage({
                         action: 'FilterTube_SetListMode',
-                        profileType: 'main',
+                        profileType,
                         mode: nextState ? 'whitelist' : 'blocklist',
                         copyBlocklist
                     });
@@ -528,6 +833,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         ftTopBarListModeControlsPopup.appendChild(toggle);
+
+        resolveProfileTypeFromTabs().then(profileType => {
+            try {
+                const resolved = profileType === 'kids' ? 'kids' : 'main';
+                if (popupActiveProfileType !== resolved) {
+                    popupActiveProfileType = resolved;
+                    try {
+                        renderKeywords();
+                        renderChannels();
+                    } catch (e) {
+                    }
+                    try {
+                        applyPopupContentControlsVisibility(resolved);
+                    } catch (e) {
+                    }
+                    renderListModeControls();
+                }
+            } catch (e) {
+            }
+        });
     }
 
     let lockGateEl = null;
@@ -1142,7 +1467,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             showSearch: true,
             showSort: false,
             searchValue: keywordSearchValue,
-            sortValue: 'newest'
+            sortValue: 'newest',
+            profile: popupActiveProfileType === 'kids' ? 'kids' : 'main'
         });
     }
 
@@ -1154,7 +1480,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             showSort: false,
             showNodeMapping: false,
             searchValue: channelSearchValue,
-            sortValue: 'newest'
+            sortValue: 'newest',
+            profile: popupActiveProfileType === 'kids' ? 'kids' : 'main'
         });
     }
 
@@ -1203,7 +1530,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             toggleEnabledBrandBtn.classList.toggle('ft-disabled', !enabled);
             toggleEnabledBrandBtn.setAttribute('aria-pressed', enabled ? 'true' : 'false');
             toggleEnabledBrandBtn.title = enabled ? 'Filtering Active (click to pause)' : 'Filtering Paused (click to enable)';
-            
+
             const statusText = document.getElementById('extensionStatusText');
             if (statusText) {
                 statusText.textContent = enabled ? 'Enabled' : 'Disabled';
@@ -1275,7 +1602,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             const word = (newKeywordInput?.value || '').trim();
             if (!word) return;
 
-            const success = await StateManager.addKeyword(word);
+            const success = popupActiveProfileType === 'kids'
+                ? await StateManager.addKidsKeyword(word)
+                : await StateManager.addKeyword(word);
             if (success) {
                 if (newKeywordInput) newKeywordInput.value = '';
                 UIComponents.flashButtonSuccess(addKeywordBtn, 'Added!', 1200);
@@ -1302,7 +1631,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             addChannelBtn.disabled = true;
 
             try {
-                const result = await StateManager.addChannel(input);
+                const result = popupActiveProfileType === 'kids'
+                    ? await StateManager.addKidsChannel(input)
+                    : await StateManager.addChannel(input);
 
                 if (result.success) {
                     if (channelInput) channelInput.value = '';

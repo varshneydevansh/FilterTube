@@ -2,20 +2,10 @@
   <img src="https://github.com/varshneydevansh/FilterTube/blob/master/icons/icon-128.png" alt="FilterTube Icon">
   <h1>FilterTube</h1>
   <p>Peace of Mind for your Digital Space</p>
+  
+  [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/varshneydevansh/FilterTube) ![Version](https://img.shields.io/badge/version-3.2.7-blue.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg) ![Lines of Code](https://img.shields.io/badge/total%20lines-68.0k-brightgreen.svg) ![JavaScript LoC](https://img.shields.io/badge/javascript-44.8k%20lines-yellow.svg) ![Top Language](https://img.shields.io/github/languages/top/varshneydevansh/FilterTube?color=f1e05a) ![Repo Size](https://img.shields.io/github/repo-size/varshneydevansh/FilterTube?color=orange)
+  
 </div>
-
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/varshneydevansh/FilterTube)
-
-[![Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/filtertube)
-
-![Version](https://img.shields.io/badge/version-3.2.6-blue.svg)
-![License](https://img.shields.io/badge/license-MIT-green.svg)
-![Lines of Code](https://img.shields.io/badge/total%20lines-61.6k-brightgreen.svg)
-![JavaScript LoC](https://img.shields.io/badge/javascript-38.9k%20lines-yellow.svg)
-![Top Language](https://img.shields.io/badge/language-JavaScript-f1e05a.svg)
-![Repo Size](https://img.shields.io/github/repo-size/varshneydevansh/FilterTube?color=orange)
-
-[![Top Languages](https://github-readme-stats.vercel.app/api/top-langs/?username=varshneydevansh&repo=FilterTube&layout=compact&theme=default&hide_border=true)](https://github.com/varshneydevansh/FilterTube)
 
 ## Overview
 
@@ -30,6 +20,7 @@ FilterTube is a browser extension that gives you control over your YouTube feed.
 - **Hide Shorts**: Optional toggle to remove every Shorts shelf and player hand-off.
 - **Smart Matching**: Choose partial or whole-word matching to stay strict or flexible.
 - **Shelf & Playlist Cleanup**: Refilters shelves and playlists so blocked creators stay gone even after navigation.
+- **Quick Block Cross (v3.2.7)**: One-tap hover cross on cards to block instantly (enabled by default, can be disabled).
 - **Content-Based Filters (v3.2.6)**: 
   - Filter by video duration (longer/shorter/between specific lengths)
   - Filter by upload date (newer/older/between specific dates)
@@ -231,7 +222,7 @@ FilterTube uses a robust hybrid blocking mechanism for YouTube Shorts.
 
 Found a bug or have a feature request? [Open an issue on GitHub](https://github.com/varshneydevansh/FilterTube/issues).
 
-Want to support the project? You can donate on Ko-fi: [ko-fi.com/filtertube](https://ko-fi.com/filtertube)
+Want to support the project? You can donate on Ko-fi:     [![Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/filtertube)
 
 ## License
 

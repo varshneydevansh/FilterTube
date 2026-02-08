@@ -84,6 +84,7 @@ const StateManager = (() => {
         hideExploreTrending: false,
         hideMoreFromYouTube: false,
         hideSubscriptions: false,
+        showQuickBlockButton: true,
         hideSearchShelves: false,
         stats: { hiddenCount: 0, savedMinutes: 0 },
         statsBySurface: {},
@@ -98,7 +99,33 @@ const StateManager = (() => {
             mode: 'blocklist',
             strictMode: true,
             videoIds: [],
-            subscriptions: []
+            subscriptions: [],
+            contentFilters: {
+                duration: {
+                    enabled: false,
+                    condition: 'between',
+                    value: '',
+                    minMinutes: 0,
+                    maxMinutes: 0
+                },
+                uploadDate: {
+                    enabled: false,
+                    condition: 'newer',
+                    value: '',
+                    fromDate: '',
+                    toDate: ''
+                },
+                uppercase: {
+                    enabled: false,
+                    mode: 'single_word',
+                    minWordLength: 2
+                }
+            },
+            categoryFilters: {
+                enabled: false,
+                mode: 'block',
+                selected: []
+            }
         },
         contentFilters: {
             duration: {
@@ -120,6 +147,11 @@ const StateManager = (() => {
                 mode: 'single_word',
                 minWordLength: 2
             }
+        },
+        categoryFilters: {
+            enabled: false,
+            mode: 'block',
+            selected: []
         }
     };
 
@@ -204,6 +236,7 @@ const StateManager = (() => {
         state.hideExploreTrending = data.hideExploreTrending || false;
         state.hideMoreFromYouTube = data.hideMoreFromYouTube || false;
         state.hideSubscriptions = data.hideSubscriptions || false;
+        state.showQuickBlockButton = data.showQuickBlockButton !== false;
         state.hideSearchShelves = data.hideSearchShelves || false;
         state.stats = data.stats || { hiddenCount: 0, savedMinutes: 0 };
         state.statsBySurface = (data.statsBySurface && typeof data.statsBySurface === 'object' && !Array.isArray(data.statsBySurface))
@@ -217,6 +250,22 @@ const StateManager = (() => {
             uploadDate: { enabled: false, fromDate: '', toDate: '' },
             uppercase: { enabled: false, mode: 'single_word', minWordLength: 2 }
         };
+
+        state.categoryFilters = data.categoryFilters ? JSON.parse(JSON.stringify(data.categoryFilters)) : {
+            enabled: false,
+            mode: 'block',
+            selected: []
+        };
+
+        try {
+            const loaded = state.categoryFilters && typeof state.categoryFilters === 'object' ? state.categoryFilters : {};
+            state.categoryFilters = {
+                enabled: loaded.enabled === true,
+                mode: loaded.mode === 'allow' ? 'allow' : 'block',
+                selected: Array.isArray(loaded.selected) ? [...loaded.selected] : []
+            };
+        } catch (e) {
+        }
 
         const pickActiveProfileFromV4 = () => {
             if (!profilesV4 || typeof profilesV4 !== 'object' || Array.isArray(profilesV4)) return null;
@@ -325,8 +374,40 @@ const StateManager = (() => {
                 mode: kidsFromV4.mode === 'whitelist' ? 'whitelist' : 'blocklist',
                 strictMode: kidsFromV4.strictMode !== false,
                 videoIds: kidsFromV4.videoIds || [],
-                subscriptions: kidsFromV4.subscriptions || []
+                subscriptions: kidsFromV4.subscriptions || [],
+                contentFilters: (kidsFromV4.contentFilters && typeof kidsFromV4.contentFilters === 'object')
+                    ? JSON.parse(JSON.stringify(kidsFromV4.contentFilters))
+                    : {},
+                categoryFilters: (kidsFromV4.categoryFilters && typeof kidsFromV4.categoryFilters === 'object')
+                    ? JSON.parse(JSON.stringify(kidsFromV4.categoryFilters))
+                    : {}
             };
+
+            try {
+                const defaults = {
+                    duration: { enabled: false, condition: 'between', value: '', minMinutes: 0, maxMinutes: 0 },
+                    uploadDate: { enabled: false, condition: 'newer', value: '', fromDate: '', toDate: '' },
+                    uppercase: { enabled: false, mode: 'single_word', minWordLength: 2 }
+                };
+                const loaded = state.kids.contentFilters && typeof state.kids.contentFilters === 'object' ? state.kids.contentFilters : {};
+                state.kids.contentFilters = {
+                    duration: { ...defaults.duration, ...(loaded.duration || {}) },
+                    uploadDate: { ...defaults.uploadDate, ...(loaded.uploadDate || {}) },
+                    uppercase: { ...defaults.uppercase, ...(loaded.uppercase || {}) }
+                };
+            } catch (e) {
+            }
+
+            try {
+                const defaults = { enabled: false, mode: 'block', selected: [] };
+                const loaded = state.kids.categoryFilters && typeof state.kids.categoryFilters === 'object' ? state.kids.categoryFilters : {};
+                state.kids.categoryFilters = {
+                    enabled: loaded.enabled === true,
+                    mode: loaded.mode === 'allow' ? 'allow' : defaults.mode,
+                    selected: Array.isArray(loaded.selected) ? [...loaded.selected] : []
+                };
+            } catch (e) {
+            }
         } else if (profilesV3 && profilesV3.kids) {
             // Cleanup legacy "Blocked Video (Kids)" entries that have no valid ID/handle
             const cleanBlockedChannels = (profilesV3.kids.blockedChannels || []).filter(ch => {
@@ -357,8 +438,40 @@ const StateManager = (() => {
                 mode: profilesV3.kids.mode === 'whitelist' ? 'whitelist' : 'blocklist',
                 strictMode: profilesV3.kids.strictMode !== false,
                 videoIds: profilesV3.kids.videoIds || [],
-                subscriptions: profilesV3.kids.subscriptions || []
+                subscriptions: profilesV3.kids.subscriptions || [],
+                contentFilters: (profilesV3.kids.contentFilters && typeof profilesV3.kids.contentFilters === 'object')
+                    ? JSON.parse(JSON.stringify(profilesV3.kids.contentFilters))
+                    : {},
+                categoryFilters: (profilesV3.kids.categoryFilters && typeof profilesV3.kids.categoryFilters === 'object')
+                    ? JSON.parse(JSON.stringify(profilesV3.kids.categoryFilters))
+                    : {}
             };
+
+            try {
+                const defaults = {
+                    duration: { enabled: false, condition: 'between', value: '', minMinutes: 0, maxMinutes: 0 },
+                    uploadDate: { enabled: false, condition: 'newer', value: '', fromDate: '', toDate: '' },
+                    uppercase: { enabled: false, mode: 'single_word', minWordLength: 2 }
+                };
+                const loaded = state.kids.contentFilters && typeof state.kids.contentFilters === 'object' ? state.kids.contentFilters : {};
+                state.kids.contentFilters = {
+                    duration: { ...defaults.duration, ...(loaded.duration || {}) },
+                    uploadDate: { ...defaults.uploadDate, ...(loaded.uploadDate || {}) },
+                    uppercase: { ...defaults.uppercase, ...(loaded.uppercase || {}) }
+                };
+            } catch (e) {
+            }
+
+            try {
+                const defaults = { enabled: false, mode: 'block', selected: [] };
+                const loaded = state.kids.categoryFilters && typeof state.kids.categoryFilters === 'object' ? state.kids.categoryFilters : {};
+                state.kids.categoryFilters = {
+                    enabled: loaded.enabled === true,
+                    mode: loaded.mode === 'allow' ? 'allow' : defaults.mode,
+                    selected: Array.isArray(loaded.selected) ? [...loaded.selected] : []
+                };
+            } catch (e) {
+            }
         }
         if (shouldResetEnrichment) {
             // Reset enrichment state so re-imports can re-run enrichment
@@ -406,7 +519,12 @@ const StateManager = (() => {
                 mode: 'blocklist',
                 strictMode: true,
                 videoIds: [],
-                subscriptions: []
+                subscriptions: [],
+                contentFilters: {
+                    duration: { enabled: false, condition: 'between', value: '', minMinutes: 0, maxMinutes: 0 },
+                    uploadDate: { enabled: false, condition: 'newer', value: '', fromDate: '', toDate: '' },
+                    uppercase: { enabled: false, mode: 'single_word', minWordLength: 2 }
+                }
             };
         }
         return state.kids;
@@ -929,8 +1047,10 @@ const StateManager = (() => {
                 hideExploreTrending: state.hideExploreTrending,
                 hideMoreFromYouTube: state.hideMoreFromYouTube,
                 hideSubscriptions: state.hideSubscriptions,
+                showQuickBlockButton: state.showQuickBlockButton,
                 hideSearchShelves: state.hideSearchShelves,
-                contentFilters: state.contentFilters
+                contentFilters: state.contentFilters,
+                categoryFilters: state.categoryFilters
             });
 
             if (broadcast && result.compiledSettings) {
@@ -1656,6 +1776,7 @@ const StateManager = (() => {
             'hideExploreTrending',
             'hideMoreFromYouTube',
             'hideSubscriptions',
+            'showQuickBlockButton',
             'hideSearchShelves'
         ];
 
@@ -1758,6 +1879,88 @@ const StateManager = (() => {
         await requestRefresh('main');
         notifyListeners('contentFiltersUpdated', { contentFilters: state.contentFilters });
         scheduleAutoBackup('content_filters_updated');
+    }
+
+    async function updateKidsContentFilters(nextContentFilters) {
+        await ensureLoaded();
+
+        if (isUiLocked()) {
+            await loadSettings();
+            return;
+        }
+
+        if (!nextContentFilters || typeof nextContentFilters !== 'object') return;
+
+        const kids = getKidsState();
+        const current = (kids.contentFilters && typeof kids.contentFilters === 'object') ? kids.contentFilters : {};
+        kids.contentFilters = {
+            duration: { ...(current.duration || {}), ...(nextContentFilters.duration || {}) },
+            uploadDate: { ...(current.uploadDate || {}), ...(nextContentFilters.uploadDate || {}) },
+            uppercase: { ...(current.uppercase || {}), ...(nextContentFilters.uppercase || {}) }
+        };
+        state.kids = { ...kids };
+
+        await persistKidsProfiles(state.kids);
+        await requestRefresh('kids');
+        notifyListeners('kidsContentFiltersUpdated', { contentFilters: kids.contentFilters });
+        scheduleAutoBackup('kids_content_filters_updated');
+    }
+
+    async function updateCategoryFilters(nextCategoryFilters) {
+        await ensureLoaded();
+
+        if (isUiLocked()) {
+            await loadSettings();
+            return;
+        }
+
+        if (!nextCategoryFilters || typeof nextCategoryFilters !== 'object') return;
+
+        const current = state.categoryFilters && typeof state.categoryFilters === 'object' ? state.categoryFilters : {};
+        const next = {
+            enabled: nextCategoryFilters.enabled === true,
+            mode: Object.prototype.hasOwnProperty.call(nextCategoryFilters, 'mode')
+                ? (nextCategoryFilters.mode === 'allow' ? 'allow' : 'block')
+                : (current.mode === 'allow' ? 'allow' : 'block'),
+            selected: Object.prototype.hasOwnProperty.call(nextCategoryFilters, 'selected')
+                ? (Array.isArray(nextCategoryFilters.selected) ? [...nextCategoryFilters.selected] : [])
+                : (Array.isArray(current.selected) ? [...current.selected] : [])
+        };
+        state.categoryFilters = next;
+
+        await saveSettings();
+        await requestRefresh('main');
+        notifyListeners('categoryFiltersUpdated', { categoryFilters: state.categoryFilters });
+        scheduleAutoBackup('category_filters_updated');
+    }
+
+    async function updateKidsCategoryFilters(nextCategoryFilters) {
+        await ensureLoaded();
+
+        if (isUiLocked()) {
+            await loadSettings();
+            return;
+        }
+
+        if (!nextCategoryFilters || typeof nextCategoryFilters !== 'object') return;
+
+        const kids = getKidsState();
+        const current = kids.categoryFilters && typeof kids.categoryFilters === 'object' ? kids.categoryFilters : {};
+        kids.categoryFilters = {
+            enabled: nextCategoryFilters.enabled === true,
+            mode: Object.prototype.hasOwnProperty.call(nextCategoryFilters, 'mode')
+                ? (nextCategoryFilters.mode === 'allow' ? 'allow' : 'block')
+                : (current.mode === 'allow' ? 'allow' : 'block'),
+            selected: Object.prototype.hasOwnProperty.call(nextCategoryFilters, 'selected')
+                ? (Array.isArray(nextCategoryFilters.selected) ? [...nextCategoryFilters.selected] : [])
+                : (Array.isArray(current.selected) ? [...current.selected] : [])
+        };
+        state.kids = { ...kids };
+
+        await persistKidsProfiles(state.kids);
+        await requestRefresh('kids');
+        notifyListeners('kidsCategoryFiltersUpdated', { categoryFilters: kids.categoryFilters });
+        scheduleAutoBackup('kids_category_filters_updated');
     }
 
     // ============================================================================
@@ -1929,6 +2132,7 @@ const StateManager = (() => {
                     'hideExploreTrending',
                     'hideMoreFromYouTube',
                     'hideSubscriptions',
+                    'showQuickBlockButton',
                     'hideSearchShelves',
                     'stats',
                     'channelMap',
@@ -1988,6 +2192,9 @@ const StateManager = (() => {
         // Settings
         updateSetting,
         updateContentFilters,
+        updateKidsContentFilters,
+        updateCategoryFilters,
+        updateKidsCategoryFilters,
 
         // Theme
         toggleTheme,

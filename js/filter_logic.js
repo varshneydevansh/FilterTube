@@ -84,11 +84,13 @@
         const lengthSeconds = meta.lengthSeconds;
         const publishDate = meta.publishDate;
         const uploadDate = meta.uploadDate;
+        const category = meta.category;
         const hasAny = Boolean(
             (typeof lengthSeconds === 'number' && Number.isFinite(lengthSeconds) && lengthSeconds > 0)
             || (typeof lengthSeconds === 'string' && /^\d+$/.test(lengthSeconds.trim()))
             || (typeof publishDate === 'string' && publishDate.trim())
             || (typeof uploadDate === 'string' && uploadDate.trim())
+            || (typeof category === 'string' && category.trim())
         );
         if (!hasAny) return;
 
@@ -96,7 +98,8 @@
             videoId,
             (typeof lengthSeconds === 'number' ? String(lengthSeconds) : (typeof lengthSeconds === 'string' ? lengthSeconds.trim() : '')),
             (typeof publishDate === 'string' ? publishDate.trim() : ''),
-            (typeof uploadDate === 'string' ? uploadDate.trim() : '')
+            (typeof uploadDate === 'string' ? uploadDate.trim() : ''),
+            (typeof category === 'string' ? category.trim() : '')
         ].join('|');
         if (seenVideoMetaUpdates.has(signature)) return;
         seenVideoMetaUpdates.set(signature, Date.now());
@@ -110,7 +113,8 @@
             videoId,
             lengthSeconds,
             publishDate,
-            uploadDate
+            uploadDate,
+            category
         });
 
         if (pendingVideoMetaFlush) return;
@@ -541,15 +545,77 @@
         // ------------------------------------------------------------------
         // Search results & generic lists
         playlistRenderer: {
+            videoId: [
+                'navigationEndpoint.watchEndpoint.videoId',
+                'videos.0.childVideoRenderer.videoId',
+                'videos.0.childVideoRenderer.navigationEndpoint.watchEndpoint.videoId',
+                'videos.0.playlistVideoRenderer.videoId',
+                'videos.0.playlistVideoRenderer.navigationEndpoint.watchEndpoint.videoId'
+            ],
             title: ['title.simpleText'],
             channelName: ['shortBylineText.runs'],
             channelId: ['shortBylineText.runs.0.navigationEndpoint.browseEndpoint.browseId'],
-            channelHandle: ['shortBylineText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl']
+            channelHandle: ['shortBylineText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl'],
+            duration: [
+                'lengthText.simpleText',
+                'lengthText.runs.0.text',
+                'videos.0.childVideoRenderer.lengthText.simpleText',
+                'videos.0.childVideoRenderer.lengthText.runs.0.text',
+                'videos.0.playlistVideoRenderer.lengthText.simpleText',
+                'videos.0.playlistVideoRenderer.lengthText.runs.0.text'
+            ],
+            publishedTime: [
+                'videos.0.childVideoRenderer.publishedTimeText.simpleText',
+                'videos.0.childVideoRenderer.publishedTimeText.runs.0.text',
+                'videos.0.playlistVideoRenderer.publishedTimeText.simpleText',
+                'videos.0.playlistVideoRenderer.publishedTimeText.runs.0.text'
+            ]
+        },
+        gridPlaylistRenderer: {
+            videoId: [
+                'navigationEndpoint.watchEndpoint.videoId',
+                'videos.0.childVideoRenderer.videoId',
+                'videos.0.childVideoRenderer.navigationEndpoint.watchEndpoint.videoId',
+                'videos.0.playlistVideoRenderer.videoId',
+                'videos.0.playlistVideoRenderer.navigationEndpoint.watchEndpoint.videoId'
+            ],
+            title: ['title.simpleText', 'title.runs'],
+            channelName: ['shortBylineText.runs', 'longBylineText.runs'],
+            channelId: [
+                'shortBylineText.runs.0.navigationEndpoint.browseEndpoint.browseId',
+                'longBylineText.runs.0.navigationEndpoint.browseEndpoint.browseId'
+            ],
+            channelHandle: [
+                'shortBylineText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl',
+                'longBylineText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl'
+            ],
+            duration: [
+                'lengthText.simpleText',
+                'lengthText.runs.0.text',
+                'videos.0.childVideoRenderer.lengthText.simpleText',
+                'videos.0.childVideoRenderer.lengthText.runs.0.text',
+                'videos.0.playlistVideoRenderer.lengthText.simpleText',
+                'videos.0.playlistVideoRenderer.lengthText.runs.0.text'
+            ],
+            publishedTime: [
+                'videos.0.childVideoRenderer.publishedTimeText.simpleText',
+                'videos.0.childVideoRenderer.publishedTimeText.runs.0.text',
+                'videos.0.playlistVideoRenderer.publishedTimeText.simpleText',
+                'videos.0.playlistVideoRenderer.publishedTimeText.runs.0.text'
+            ]
         },
         radioRenderer: {
+            videoId: [
+                'navigationEndpoint.watchEndpoint.videoId',
+                'secondaryNavigationEndpoint.watchEndpoint.videoId'
+            ],
             title: ['title.simpleText']
         },
         compactRadioRenderer: {
+            videoId: [
+                'navigationEndpoint.watchEndpoint.videoId',
+                'secondaryNavigationEndpoint.watchEndpoint.videoId'
+            ],
             title: ['title.simpleText']
         },
         ticketShelfRenderer: {
@@ -773,6 +839,12 @@
                 uppercase: { enabled: false, mode: 'single_word', minWordLength: 2 }
             };
 
+            const categoryFilterDefaults = {
+                enabled: false,
+                mode: 'block',
+                selected: []
+            };
+
             const processed = {
                 filterKeywords: [],
                 filterChannels: [],
@@ -803,6 +875,19 @@
                     ...contentFilterDefaults.uppercase,
                     ...(incomingContentFilters.uppercase && typeof incomingContentFilters.uppercase === 'object' ? incomingContentFilters.uppercase : {})
                 }
+            };
+
+            const incomingCategoryFilters = (settings && typeof settings === 'object' && settings.categoryFilters && typeof settings.categoryFilters === 'object' && !Array.isArray(settings.categoryFilters))
+                ? settings.categoryFilters
+                : {};
+            processed.categoryFilters = {
+                ...categoryFilterDefaults,
+                ...incomingCategoryFilters,
+                enabled: incomingCategoryFilters.enabled === true,
+                mode: incomingCategoryFilters.mode === 'allow' ? 'allow' : 'block',
+                selected: Array.isArray(incomingCategoryFilters.selected)
+                    ? incomingCategoryFilters.selected.map(v => (typeof v === 'string' ? v.trim() : '')).filter(Boolean)
+                    : []
             };
 
             // Reconstruct RegExp objects from serialized patterns
@@ -1008,9 +1093,12 @@
 
                 const publishDate = (playerMicroformat && playerMicroformat.publishDate) ? String(playerMicroformat.publishDate) : '';
                 const uploadDate = (playerMicroformat && playerMicroformat.uploadDate) ? String(playerMicroformat.uploadDate) : '';
+                const category = (playerMicroformat && (playerMicroformat.category || playerMicroformat.genre))
+                    ? String(playerMicroformat.category || playerMicroformat.genre)
+                    : '';
 
-                if (lengthSeconds || publishDate || uploadDate) {
-                    this._registerVideoMetaMapping(videoId, { lengthSeconds, publishDate, uploadDate });
+                if (lengthSeconds || publishDate || uploadDate || category) {
+                    this._registerVideoMetaMapping(videoId, { lengthSeconds, publishDate, uploadDate, category });
                 }
             }
 
@@ -1296,7 +1384,14 @@
          * Debug logging function
          */
         _log(message, ...args) {
-            if (this.debugEnabled) {
+            const enabled = (() => {
+                try {
+                    return !!window.__filtertubeDebug || document.documentElement?.getAttribute('data-filtertube-debug') === 'true';
+                } catch (e) {
+                    return !!this.debugEnabled;
+                }
+            })();
+            if (enabled) {
                 console.log(`FilterTube (Filter):`, message, ...args);
             }
         }
@@ -1531,9 +1626,72 @@
                 if (shouldBlockByContent) {
                     return true;
                 }
+
+                const shouldBlockByCategory = this._checkCategoryFilters(item, rules, rendererType);
+                if (shouldBlockByCategory) {
+                    return true;
+                }
             }
 
             return false;
+        }
+
+        _checkCategoryFilters(item, rules, rendererType) {
+            const cf = this.settings.categoryFilters;
+            if (!cf || cf.enabled !== true) return false;
+
+            const selected = Array.isArray(cf.selected)
+                ? cf.selected.map(v => (typeof v === 'string' ? v.trim().toLowerCase() : '')).filter(Boolean)
+                : [];
+            if (selected.length === 0) return false;
+            const selectedSet = new Set(selected);
+
+            const isVideoRenderer = [
+                'videoRenderer', 'compactVideoRenderer', 'gridVideoRenderer',
+                'playlistVideoRenderer', 'watchCardCompactVideoRenderer',
+                'endScreenVideoRenderer', 'richItemRenderer', 'lockupViewModel',
+                'shortsLockupViewModel', 'shortsLockupViewModelV2', 'reelItemRenderer',
+                'richGridMedia', 'channelVideoPlayerRenderer', 'playlistPanelVideoRenderer',
+                'playlistRenderer', 'gridPlaylistRenderer', 'radioRenderer', 'compactRadioRenderer'
+            ].includes(rendererType);
+            if (!isVideoRenderer) return false;
+
+            const tryResolveVideoId = () => {
+                const videoIdPaths = rules && rules.videoId
+                    ? (Array.isArray(rules.videoId) ? rules.videoId : [rules.videoId])
+                    : [];
+                for (const path of videoIdPaths) {
+                    const candidate = getByPath(item, path);
+                    if (candidate && typeof candidate === 'string' && /^[a-zA-Z0-9_-]{11}$/.test(candidate)) {
+                        return candidate;
+                    }
+                }
+                return '';
+            };
+
+            const videoId = tryResolveVideoId();
+            if (!videoId) return false;
+
+            const meta = (this.settings.videoMetaMap && this.settings.videoMetaMap[videoId]) ? this.settings.videoMetaMap[videoId] : null;
+            const categoryRaw = (meta && typeof meta.category === 'string') ? meta.category.trim() : '';
+
+            if (!categoryRaw) {
+                try {
+                    if (typeof scheduleVideoMetaFetch === 'function') {
+                        scheduleVideoMetaFetch(videoId, { needDuration: false, needDates: false, needCategory: true });
+                    }
+                } catch (e) {
+                }
+                return false;
+            }
+
+            const categoryKey = categoryRaw.toLowerCase();
+            const mode = cf.mode === 'allow' ? 'allow' : 'block';
+
+            if (mode === 'allow') {
+                return !selectedSet.has(categoryKey);
+            }
+            return selectedSet.has(categoryKey);
         }
 
         /**
@@ -1709,6 +1867,23 @@
                 for (const candidate of directCandidates) {
                     if (typeof candidate === 'string' && /^[a-zA-Z0-9_-]{11}$/.test(candidate)) return candidate;
                 }
+
+                // playlistRenderer/gridPlaylistRenderer-like: try the first nested video entry
+                const videos = Array.isArray(item.videos) ? item.videos : null;
+                if (videos && videos.length > 0) {
+                    const first = videos[0];
+                    const nestedCandidates = [
+                        first?.childVideoRenderer?.videoId,
+                        first?.childVideoRenderer?.navigationEndpoint?.watchEndpoint?.videoId,
+                        first?.playlistVideoRenderer?.videoId,
+                        first?.playlistVideoRenderer?.navigationEndpoint?.watchEndpoint?.videoId,
+                        first?.videoRenderer?.videoId,
+                        first?.videoRenderer?.navigationEndpoint?.watchEndpoint?.videoId
+                    ];
+                    for (const candidate of nestedCandidates) {
+                        if (typeof candidate === 'string' && /^[a-zA-Z0-9_-]{11}$/.test(candidate)) return candidate;
+                    }
+                }
                 return '';
             };
 
@@ -1831,6 +2006,23 @@
                 if (collection) return collection;
             }
 
+            // playlistRenderer/gridPlaylistRenderer: fall back to the first nested video card's duration
+            const playlistEntries = Array.isArray(item.videos) ? item.videos : null;
+            if (playlistEntries && playlistEntries.length > 0) {
+                const first = playlistEntries[0];
+                const nested =
+                    first?.childVideoRenderer ||
+                    first?.playlistVideoRenderer ||
+                    first?.compactVideoRenderer ||
+                    first?.videoRenderer ||
+                    first?.gridVideoRenderer ||
+                    null;
+                if (nested && typeof nested === 'object') {
+                    const seconds = this._extractDuration(nested, BASE_VIDEO_RULES, 'nestedVideo', depth + 1);
+                    if (seconds !== null) return seconds;
+                }
+            }
+
             // Wrapper renderers: unwrap and retry (home/search often wrap videoRenderer inside content)
             const unwrapContainer = item.content && typeof item.content === 'object' ? item.content : null;
             if (unwrapContainer) {
@@ -1913,6 +2105,23 @@
                 for (const candidate of directCandidates) {
                     if (typeof candidate === 'string' && /^[a-zA-Z0-9_-]{11}$/.test(candidate)) return candidate;
                 }
+
+                // playlistRenderer/gridPlaylistRenderer-like: try the first nested video entry
+                const videos = Array.isArray(item.videos) ? item.videos : null;
+                if (videos && videos.length > 0) {
+                    const first = videos[0];
+                    const nestedCandidates = [
+                        first?.childVideoRenderer?.videoId,
+                        first?.childVideoRenderer?.navigationEndpoint?.watchEndpoint?.videoId,
+                        first?.playlistVideoRenderer?.videoId,
+                        first?.playlistVideoRenderer?.navigationEndpoint?.watchEndpoint?.videoId,
+                        first?.videoRenderer?.videoId,
+                        first?.videoRenderer?.navigationEndpoint?.watchEndpoint?.videoId
+                    ];
+                    for (const candidate of nestedCandidates) {
+                        if (typeof candidate === 'string' && /^[a-zA-Z0-9_-]{11}$/.test(candidate)) return candidate;
+                    }
+                }
                 return '';
             };
 
@@ -1962,6 +2171,23 @@
                 }
             }
 
+            // playlistRenderer/gridPlaylistRenderer: fall back to the first nested video card's published time
+            const playlistEntries = Array.isArray(item.videos) ? item.videos : null;
+            if (playlistEntries && playlistEntries.length > 0) {
+                const first = playlistEntries[0];
+                const nested =
+                    first?.childVideoRenderer ||
+                    first?.playlistVideoRenderer ||
+                    first?.compactVideoRenderer ||
+                    first?.videoRenderer ||
+                    first?.gridVideoRenderer ||
+                    null;
+                if (nested && typeof nested === 'object') {
+                    const timestamp = this._extractPublishedTime(nested, BASE_VIDEO_RULES, 'nestedVideo', depth + 1);
+                    if (timestamp !== null) return timestamp;
+                }
+            }
+
             if (item.videoRenderer && typeof item.videoRenderer === 'object') {
                 const timestamp = this._extractPublishedTime(item.videoRenderer, FILTER_RULES.videoRenderer || {}, 'videoRenderer', depth + 1);
                 if (timestamp !== null) return timestamp;
@@ -2001,7 +2227,8 @@
                 'playlistVideoRenderer', 'watchCardCompactVideoRenderer',
                 'endScreenVideoRenderer', 'richItemRenderer', 'lockupViewModel',
                 'shortsLockupViewModel', 'shortsLockupViewModelV2', 'reelItemRenderer',
-                'richGridMedia', 'channelVideoPlayerRenderer', 'playlistPanelVideoRenderer'
+                'richGridMedia', 'channelVideoPlayerRenderer', 'playlistPanelVideoRenderer',
+                'playlistRenderer', 'gridPlaylistRenderer', 'radioRenderer', 'compactRadioRenderer'
             ].includes(rendererType);
 
             if (!isVideoRenderer) return false;

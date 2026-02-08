@@ -1,8 +1,19 @@
-# FilterTube v3.2.6 Code Map (UI/UX Improvements & Content Filters)
+# FilterTube v3.2.7 Code Map (Performance & Category Filtering)
 
-This document provides a detailed reference of the key files and functions in the FilterTube v3.2.6 codebase with performance optimizations, UI/UX improvements, and content-based filtering.
+This document provides a detailed reference of the key files and functions in the FilterTube v3.2.7 codebase with performance optimizations, category filtering, and enhanced cross-browser support.
 
-## New in v3.2.6
+## New in v3.2.7
+
+- **Category Filtering**: Filter videos by YouTube category (e.g., Music, Gaming, Education)
+- **Quick-Block Default ON**: `showQuickBlockButton` now defaults to enabled (one-time migration in v3.2.7; user can disable)
+- **Quick-Block Card Action**: Hover/touch cross on cards for one-tap direct block (single channel card blocks one channel, collaborator card blocks all associated channels)
+- **Comment Block Isolation**: Comment-origin block actions no longer trigger playlist/watch row hides or autoplay-next side effects
+- **Hover Retention Hardening**: Search overlays and Home Shorts retain quick-block hover state reliably
+- **LRU Eviction**: `videoMetaMap` now uses LRU eviction (3000 entry cap) to prevent unbounded growth
+- **Pending-Meta Shimmer**: 8-second TTL for "fetching metadata" states prevents stale shimmer badges
+- **Firefox Download Fallback**: Anchor-click fallback when `downloads.download()` fails with subfolder paths
+
+## Previous in v3.2.6
 
 - **Typography Overhaul**: Modern sans-serif design system (Inter font family)
 - **Content Filters**: Duration, upload date, and uppercase detection filters

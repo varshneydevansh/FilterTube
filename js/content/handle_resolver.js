@@ -110,12 +110,15 @@ function normalizeHandleValue(handle) {
     const rawHandle = extractRawHandle(normalized);
     if (rawHandle) {
         normalized = rawHandle;
+    } else if (!normalized.startsWith('@')) {
+        return '';
     }
 
     normalized = normalized.replace(/^@+/, '');
     normalized = normalized.split('/')[0];
     normalized = normalized.replace(/\s+/g, '');
     if (!normalized) return '';
+    if (/^UC[\w-]{22}$/i.test(normalized)) return '';
     return `@${normalized.toLowerCase()}`;
 }
 
