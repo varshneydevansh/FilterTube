@@ -56,8 +56,19 @@
     const HANDLE_TERMINATOR_REGEX = /[\/\s?#"'<>\u2022\u00B7]/;
     function extractRawHandle(value) {
         const sharedExtractRawHandle = window.FilterTubeIdentity?.extractRawHandle;
+        const sharedNormalizeHandleValue = window.FilterTubeIdentity?.normalizeHandleValue;
+        if (typeof sharedNormalizeHandleValue === 'function') {
+            const raw = typeof sharedExtractRawHandle === 'function'
+                ? (sharedExtractRawHandle(value) || value || '')
+                : (value || '');
+            return sharedNormalizeHandleValue(raw) || '';
+        }
         if (typeof sharedExtractRawHandle === 'function') {
-            return sharedExtractRawHandle(value);
+            const extracted = sharedExtractRawHandle(value);
+            if (!extracted) return '';
+            const core = extracted.replace(/^@+/, '').trim();
+            if (!/^[A-Za-z0-9._-]{3,60}$/.test(core) || !/[A-Za-z0-9]/.test(core)) return '';
+            return `@${core.toLowerCase()}`;
         }
         if (!value || typeof value !== 'string') return '';
         let working = value.trim();
@@ -90,7 +101,8 @@
         buffer = buffer.replace(/[\u200B-\u200F\u202A-\u202E\u2066-\u2069\uFEFF]/g, '');
         buffer = buffer.trim();
         if (!buffer) return '';
-        return `@${buffer}`;
+        if (!/^[A-Za-z0-9._-]{3,60}$/.test(buffer) || !/[A-Za-z0-9]/.test(buffer)) return '';
+        return `@${buffer.toLowerCase()}`;
     }
 
     function getCollaboratorListQuality(list) {
@@ -374,30 +386,117 @@
             return collaborators.length > 0 ? collaborators : null;
         };
 
-        const extractFromShowDialogCommand = (showDialogCommand) => {
-            const listItems = showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems;
+        const extractListItemsFromSheetLikeCommand = (command) => {
+            if (!command || typeof command !== 'object') return [];
+            const listItems =
+                command?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems ||
+                command?.panelLoadingStrategy?.inlineContent?.sheetViewModel?.content?.listViewModel?.listItems ||
+                [];
+            return Array.isArray(listItems) ? listItems : [];
+        };
+
+        const extractFromSheetLikeCommand = (sheetCommand) => {
+            const listItems = extractListItemsFromSheetLikeCommand(sheetCommand);
             if (!Array.isArray(listItems) || listItems.length === 0) return null;
 
             const collaborators = [];
+            const parseCustomUrl = (value) => {
+                if (!value || typeof value !== 'string') return '';
+                const match = value.match(/\/(c|user)\/([^/?#]+)/);
+                if (!match || !match[1] || !match[2]) return '';
+                try {
+                    return `${match[1]}/${decodeURIComponent(match[2])}`;
+                } catch (e) {
+                    return `${match[1]}/${match[2]}`;
+                }
+            };
+
+            const pickBrowseEndpoint = (viewModel) => {
+                if (!viewModel || typeof viewModel !== 'object') return null;
+                const fromContext = (
+                    viewModel?.rendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint ||
+                    viewModel?.rendererContext?.commandContext?.onTap?.innertubeCommand?.command?.browseEndpoint ||
+                    viewModel?.rendererContext?.commandContext?.onTap?.browseEndpoint ||
+                    null
+                );
+                const commandRuns = Array.isArray(viewModel?.title?.commandRuns) ? viewModel.title.commandRuns : [];
+                let fromTitleRuns = null;
+                for (const run of commandRuns) {
+                    const browse =
+                        run?.onTap?.innertubeCommand?.browseEndpoint ||
+                        run?.onTap?.innertubeCommand?.command?.browseEndpoint ||
+                        run?.onTap?.browseEndpoint ||
+                        null;
+                    if (browse) {
+                        fromTitleRuns = browse;
+                        break;
+                    }
+                }
+                const normalizeUc = (value) => {
+                    const raw = typeof value === 'string' ? value.trim() : '';
+                    return /^UC[\w-]{22}$/i.test(raw) ? raw : '';
+                };
+                const contextId = normalizeUc(fromContext?.browseId || '');
+                const titleId = normalizeUc(fromTitleRuns?.browseId || '');
+                const idsConflict = Boolean(contextId && titleId && contextId !== titleId);
+                const preferred = idsConflict ? fromContext : (fromTitleRuns || fromContext);
+                if (!preferred) return null;
+                return {
+                    ...(fromContext || {}),
+                    ...(fromTitleRuns || {}),
+                    browseId: idsConflict
+                        ? (fromContext?.browseId || '')
+                        : (fromTitleRuns?.browseId || fromContext?.browseId || ''),
+                    canonicalBaseUrl: idsConflict
+                        ? (fromContext?.canonicalBaseUrl || '')
+                        : (fromTitleRuns?.canonicalBaseUrl || fromContext?.canonicalBaseUrl || ''),
+                    __idsConflict: idsConflict
+                };
+            };
+
+            const pickMetadataUrl = (viewModel) => {
+                const direct = viewModel?.rendererContext?.commandContext?.onTap?.innertubeCommand?.commandMetadata?.webCommandMetadata?.url ||
+                    viewModel?.rendererContext?.commandContext?.onTap?.innertubeCommand?.command?.commandMetadata?.webCommandMetadata?.url ||
+                    '';
+                if (direct) return direct;
+                const commandRuns = Array.isArray(viewModel?.title?.commandRuns) ? viewModel.title.commandRuns : [];
+                for (const run of commandRuns) {
+                    const candidate = run?.onTap?.innertubeCommand?.commandMetadata?.webCommandMetadata?.url ||
+                        run?.onTap?.innertubeCommand?.command?.commandMetadata?.webCommandMetadata?.url ||
+                        run?.onTap?.commandMetadata?.webCommandMetadata?.url ||
+                        '';
+                    if (candidate) return candidate;
+                }
+                return '';
+            };
+
             for (const item of listItems) {
                 const viewModel = item?.listItemViewModel;
                 if (!viewModel) continue;
 
                 const title = viewModel.title?.content;
                 const subtitle = viewModel.subtitle?.content;
-                const browseEndpoint = viewModel.rendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint;
+                const browseEndpoint = pickBrowseEndpoint(viewModel);
 
                 const collab = { name: title };
                 if (browseEndpoint?.canonicalBaseUrl) {
                     const extracted = extractRawHandle(browseEndpoint.canonicalBaseUrl);
                     if (extracted) collab.handle = extracted;
                 }
+                if (!collab.customUrl) {
+                    const metadataUrl = pickMetadataUrl(viewModel);
+                    const parsedCustom = parseCustomUrl(metadataUrl);
+                    if (parsedCustom) collab.customUrl = parsedCustom;
+                }
+                if (browseEndpoint?.browseId?.startsWith('UC')) {
+                    collab.id = browseEndpoint.browseId;
+                }
                 if (!collab.handle && subtitle) {
                     const extracted = extractRawHandle(subtitle);
                     if (extracted) collab.handle = extracted;
                 }
-                if (browseEndpoint?.browseId?.startsWith('UC')) {
-                    collab.id = browseEndpoint.browseId;
+                if (browseEndpoint?.__idsConflict && collab.id && collab.handle) {
+                    collab.handle = '';
                 }
 
                 if (collab.handle || collab.id || collab.name) {
@@ -444,10 +543,12 @@
         const bylineText = renderer.shortBylineText || renderer.longBylineText;
         if (bylineText?.runs) {
             for (const run of bylineText.runs) {
+                const showSheetCommand = run.navigationEndpoint?.showSheetCommand;
                 const showDialogCommand = run.navigationEndpoint?.showDialogCommand;
-                if (!showDialogCommand) continue;
+                const sheetLikeCommand = showSheetCommand || showDialogCommand;
+                if (!sheetLikeCommand) continue;
 
-                const collaborators = extractFromShowDialogCommand(showDialogCommand);
+                const collaborators = extractFromSheetLikeCommand(sheetLikeCommand);
                 if (collaborators) return collaborators;
             }
         }
@@ -494,15 +595,16 @@
         } catch (e) {
         }
 
-        // Home lockupViewModel often doesn't expose bylineText runs; fall back to a bounded deep scan
-        // for showDialogCommand anywhere inside the renderer.
+        // Home/watch lockups can expose either showDialogCommand or showSheetCommand.
+        // Fall back to a bounded deep scan for either command anywhere inside the renderer.
         const visited = new WeakSet();
         function deepScanForShowDialog(node, depth = 0) {
             if (!node || typeof node !== 'object' || visited.has(node) || depth > 10) return null;
             visited.add(node);
 
-            if (node.showDialogCommand) {
-                const collaborators = extractFromShowDialogCommand(node.showDialogCommand);
+            const sheetLikeCommand = node.showSheetCommand || node.showDialogCommand;
+            if (sheetLikeCommand) {
+                const collaborators = extractFromSheetLikeCommand(sheetLikeCommand);
                 if (collaborators) return collaborators;
             }
 

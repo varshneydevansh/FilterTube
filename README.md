@@ -3,7 +3,7 @@
   <h1>FilterTube</h1>
   <p>Peace of Mind for your Digital Space</p>
   
-  [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/varshneydevansh/FilterTube) ![Version](https://img.shields.io/badge/version-3.2.7-blue.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg) ![Lines of Code](https://img.shields.io/badge/total%20lines-68.0k-brightgreen.svg) ![JavaScript LoC](https://img.shields.io/badge/javascript-44.8k%20lines-yellow.svg) ![Top Language](https://img.shields.io/github/languages/top/varshneydevansh/FilterTube?color=f1e05a) ![Repo Size](https://img.shields.io/github/repo-size/varshneydevansh/FilterTube?color=orange)
+  [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/varshneydevansh/FilterTube) ![Version](https://img.shields.io/badge/version-3.2.8-blue.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg) ![Lines of Code](https://img.shields.io/badge/total%20lines-73.5k-brightgreen.svg) ![JavaScript LoC](https://img.shields.io/badge/javascript-49.9k%20lines-yellow.svg) ![Top Language](https://img.shields.io/github/languages/top/varshneydevansh/FilterTube?color=f1e05a) ![Repo Size](https://img.shields.io/github/repo-size/varshneydevansh/FilterTube?color=orange)
   
 </div>
 
@@ -21,6 +21,8 @@ FilterTube is a browser extension that gives you control over your YouTube feed.
 - **Smart Matching**: Choose partial or whole-word matching to stay strict or flexible.
 - **Shelf & Playlist Cleanup**: Refilters shelves and playlists so blocked creators stay gone even after navigation.
 - **Quick Block Cross (v3.2.7)**: One-tap hover cross on cards to block instantly (enabled by default, can be disabled).
+- **YouTube Mobile Support (v3.2.8)**: Full blocking capabilities now on `m.youtube.com`, including 3-dot menu injection and native mobile touch support.
+- **Playlist Auto-Skip (v3.2.8)**: Automatically skips blocked videos in Mixes/Playlists on both Desktop and Mobile to prevent audio tracking.
 - **Content-Based Filters (v3.2.6)**: 
   - Filter by video duration (longer/shorter/between specific lengths)
   - Filter by upload date (newer/older/between specific dates)
@@ -56,6 +58,7 @@ FilterTube is a browser extension that gives you control over your YouTube feed.
 - **Network Reduction**: Most channel identity comes from intercepted JSON, not page fetches.
 - **100% Private**: No data leaves your browser. No analytics. No tracking.
 - **Modern UI/UX (v3.2.6)**: Clean typography, refined components, enhanced dark mode, and Kids Mode theming.
+- **Visual Feedback (v3.2.8)**: Clear green/red highlights in menus to indicate Blocked vs Selected states.
 
 ### Proactive Channel Identity (v3.2.2)
 

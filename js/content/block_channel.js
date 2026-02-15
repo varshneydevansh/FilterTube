@@ -81,7 +81,7 @@ let quickBlockStylesInjected = false;
 let quickBlockObserverStarted = false;
 let quickBlockSweepTimer = 0;
 let quickBlockPeriodicTimer = 0;
-const FT_DROPDOWN_SELECTORS = 'tp-yt-iron-dropdown, ytm-menu-popup-renderer, bottom-sheet-container, div.menu-content[role="dialog"]';
+const FT_DROPDOWN_SELECTORS = 'tp-yt-iron-dropdown, ytm-menu-popup-renderer, ytm-bottom-sheet-renderer, bottom-sheet-container, div.menu-content[role="dialog"]';
 const isMobileYouTubeSurface = () => {
     try {
         const host = String(location?.hostname || '').toLowerCase();
@@ -113,6 +113,39 @@ const isHoverCapableDesktopSurface = () => {
     }
 };
 
+const isMainYoutubeDesktopSurface = () => {
+    try {
+        const host = String(location?.hostname || '').toLowerCase();
+        if (host !== 'www.youtube.com' && host !== 'youtube.com') return false;
+        return !isMobileYouTubeSurface();
+    } catch (e) {
+        return false;
+    }
+};
+
+function getComposedParent(node) {
+    if (!node) return null;
+    if (node.parentElement) return node.parentElement;
+    const root = node.getRootNode?.();
+    if (root && root instanceof ShadowRoot) {
+        return root.host || null;
+    }
+    return null;
+}
+
+function closestComposed(startNode, selector) {
+    if (!startNode || !(startNode instanceof Element) || !selector) return null;
+    let cursor = startNode;
+    while (cursor && cursor instanceof Element) {
+        try {
+            if (cursor.matches(selector)) return cursor;
+        } catch (e) {
+        }
+        cursor = getComposedParent(cursor);
+    }
+    return null;
+}
+
 function isPostLikeQuickBlockCard(card) {
     if (!card || !(card instanceof Element)) return false;
     try {
@@ -125,16 +158,85 @@ function isPostLikeQuickBlockCard(card) {
     return false;
 }
 
+function isQuickBlockMixLikeCard(card) {
+    if (!card || !(card instanceof Element)) return false;
+    try {
+        const tag = String(card.tagName || '').toLowerCase();
+        if (
+            tag === 'ytm-compact-radio-renderer' ||
+            tag === 'ytm-radio-renderer' ||
+            tag === 'ytd-radio-renderer' ||
+            tag === 'ytd-compact-radio-renderer'
+        ) {
+            return true;
+        }
+
+        const navHref = card.querySelector?.(
+            'a[href*="start_radio=1"], a[href*="list=RDMM"]'
+        )?.getAttribute?.('href') || '';
+        if (navHref && (navHref.includes('start_radio=1') || navHref.includes('list=RDMM'))) {
+            return true;
+        }
+
+        if (card.querySelector?.('.radioBottomOverlayHost, .radioBottomOverlayText')) {
+            return true;
+        }
+
+        const headline = card.querySelector?.(
+            '.YtmCompactMediaItemHeadline .yt-core-attributed-string, ' +
+            '.YtmCompactMediaItemHeadline, ' +
+            'h3.media-item-headline'
+        )?.textContent?.trim() || '';
+        if (headline && (/^mix\b/i.test(headline) || /^my\s+mix\b/i.test(headline))) {
+            return true;
+        }
+    } catch (e) {
+    }
+    return false;
+}
+
 function resolveQuickBlockHost(node) {
     if (!node || !(node instanceof Element)) return null;
     const tag = String(node.tagName || '').toLowerCase();
+
+    // Prefer the *most specific* identity-carrying child inside wrapper hosts.
+    // This is especially important on YTM where `ytm-rich-item-renderer` often wraps
+    // playlist/mix lockups, and the wrapper can pick up a "seed" videoId from the thumbnail.
+    // If we quick-block from the wrapper, we can block the wrong channel (or fail playlist creator flow).
+    if (tag === 'ytm-rich-item-renderer' || tag === 'ytd-rich-item-renderer') {
+        try {
+            const leaf = node.querySelector(
+                'ytm-compact-playlist-renderer, ' +
+                'ytm-compact-radio-renderer, ' +
+                'ytm-radio-renderer, ' +
+                'ytm-video-with-context-renderer, ' +
+                'ytm-compact-video-renderer, ' +
+                'ytm-playlist-video-renderer, ' +
+                'ytm-compact-show-renderer, ' +
+                'ytd-playlist-renderer, ' +
+                'ytd-grid-playlist-renderer, ' +
+                'ytd-compact-playlist-renderer, ' +
+                'ytd-video-renderer, ' +
+                'ytd-grid-video-renderer, ' +
+                'ytd-compact-video-renderer, ' +
+                'ytd-playlist-video-renderer, ' +
+                'ytd-radio-renderer, ' +
+                'ytd-compact-radio-renderer, ' +
+                'yt-lockup-view-model, ' +
+                'yt-lockup-metadata-view-model'
+            );
+            if (leaf && leaf instanceof Element) return leaf;
+        } catch (e) {
+        }
+    }
+
     if (
         tag === 'yt-lockup-view-model' ||
         tag === 'yt-lockup-metadata-view-model' ||
         tag.startsWith('ytm-shorts-lockup-view-model')
     ) {
         return node.closest(
-            'ytd-rich-item-renderer, ytd-video-renderer, ytd-grid-video-renderer, ytd-compact-video-renderer, ytd-playlist-panel-video-renderer, ytd-playlist-panel-video-wrapper-renderer, ytm-rich-item-renderer, ytm-video-with-context-renderer, .ytGridShelfViewModelGridShelfItem'
+            'ytd-rich-item-renderer, ytd-video-renderer, ytd-grid-video-renderer, ytd-compact-video-renderer, ytd-playlist-panel-video-renderer, ytd-playlist-panel-video-wrapper-renderer, ytm-rich-item-renderer, ytm-video-with-context-renderer, ytm-universal-watch-card-renderer, ytm-watch-card-hero-video-renderer, ytm-watch-card-rich-header-renderer, .ytGridShelfViewModelGridShelfItem'
         ) || node;
     }
     if (tag === 'ytd-rich-grid-media') {
@@ -176,6 +278,10 @@ function resolveQuickBlockAnchor(hostCard) {
         'ytd-compact-video-renderer',
         'ytm-video-with-context-renderer',
         'ytm-compact-video-renderer',
+        'ytm-universal-watch-card-renderer',
+        'ytm-watch-card-hero-video-renderer',
+        'ytm-watch-card-rich-header-renderer',
+        'ytm-playlist-panel-video-renderer',
         'ytd-thumbnail'
     ];
 
@@ -282,8 +388,12 @@ const QUICK_BLOCK_CARD_SELECTORS = [
     'ytm-rich-item-renderer',
     'ytm-compact-video-renderer',
     'ytm-video-with-context-renderer',
+    'ytm-universal-watch-card-renderer',
+    'ytm-watch-card-hero-video-renderer',
+    'ytm-watch-card-rich-header-renderer',
     'ytm-compact-playlist-renderer',
     'ytm-playlist-video-renderer',
+    'ytm-compact-show-renderer',
     'ytm-playlist-panel-video-renderer',
     'ytm-reel-item-renderer',
     'ytm-radio-renderer',
@@ -320,19 +430,30 @@ function ensureQuickBlockStyles() {
     style.textContent = `
 	    .filtertube-quick-block-host {
 	        position: relative !important;
+	        isolation: isolate;
 	    }
 	    .filtertube-quick-block-anchor {
 	        position: relative !important;
+	        overflow: hidden;
 	    }
 	    .filtertube-quick-block-wrap {
 	        position: absolute;
 	        top: 8px;
 	        left: 8px;
-	        z-index: 2147483000;
+	        z-index: 10;
 	        opacity: 0;
 	        pointer-events: none;
 	        transition: opacity 0.15s ease;
 	        will-change: opacity;
+	    }
+	    html:not([data-filtertube-mobile-surface]) .filtertube-quick-block-host {
+	        isolation: auto;
+	    }
+	    html:not([data-filtertube-mobile-surface]) .filtertube-quick-block-anchor {
+	        overflow: visible;
+	    }
+	    html:not([data-filtertube-mobile-surface]) .filtertube-quick-block-wrap {
+	        z-index: 2147483000;
 	    }
 	    .filtertube-quick-block-host:hover .filtertube-quick-block-wrap,
 	    .filtertube-quick-block-anchor:hover .filtertube-quick-block-wrap,
@@ -402,6 +523,7 @@ function createSyntheticQuickBlockMenuItem(label = 'Block') {
 
 function collectQuickBlockCollaborators(base = {}, videoCard = null) {
     const candidates = [];
+    const mixLike = base?.__mixLike === true;
 
     if (Array.isArray(base?.allCollaborators)) {
         candidates.push(...base.allCollaborators.filter(Boolean));
@@ -412,6 +534,16 @@ function collectQuickBlockCollaborators(base = {}, videoCard = null) {
             const fromDom = extractCollaboratorMetadataFromElement(videoCard);
             if (Array.isArray(fromDom) && fromDom.length > 0) {
                 candidates.push(...fromDom.filter(Boolean));
+            }
+        } catch (e) {
+        }
+    }
+
+    if (!mixLike && candidates.length < 2 && base.videoId && typeof resolvedCollaboratorsByVideoId !== 'undefined') {
+        try {
+            const resolved = resolvedCollaboratorsByVideoId.get(base.videoId);
+            if (Array.isArray(resolved) && resolved.length >= 2) {
+                candidates.push(...resolved.filter(Boolean));
             }
         } catch (e) {
         }
@@ -449,7 +581,73 @@ function collectQuickBlockCollaborators(base = {}, videoCard = null) {
 
 function buildQuickBlockContext(videoCard) {
     if (!videoCard || typeof extractChannelFromCard !== 'function') return null;
-    const base = extractChannelFromCard(videoCard) || {};
+    const resolveIdentityCard = (card) => {
+        if (!card || !(card instanceof Element)) return card;
+        const tag = String(card.tagName || '').toLowerCase();
+        // Playlist/mix cards on YTM are frequently wrapped by rich-item containers.
+        // Quick-block must resolve identity from the leaf renderer, not the wrapper.
+        if (tag === 'ytm-rich-item-renderer' || tag === 'ytd-rich-item-renderer') {
+            try {
+                const leaf = card.querySelector(
+                    'ytm-compact-playlist-renderer, ' +
+                    'ytm-compact-radio-renderer, ' +
+                    'ytm-radio-renderer, ' +
+                    'ytm-video-with-context-renderer, ' +
+                    'ytm-compact-video-renderer, ' +
+                    'ytd-playlist-renderer, ' +
+                    'ytd-grid-playlist-renderer, ' +
+                    'ytd-compact-playlist-renderer, ' +
+                    'ytd-radio-renderer, ' +
+                    'ytd-compact-radio-renderer, ' +
+                    'ytd-video-renderer, ' +
+                    'ytd-grid-video-renderer, ' +
+                    'ytd-compact-video-renderer'
+                );
+                if (leaf && leaf instanceof Element) return leaf;
+            } catch (e) {
+            }
+        }
+        return card;
+    };
+
+    const identityCard = resolveIdentityCard(videoCard);
+    const isMixLike = isQuickBlockMixLikeCard(identityCard || videoCard);
+    let base = extractChannelFromCard(identityCard) || extractChannelFromCard(videoCard) || {};
+    // Defensive fallback: if extraction ran on a wrapper and we still have no identity,
+    // recover playlist creator-flow metadata from the visible playlist link/byline.
+    if (!base?.id && !base?.handle && !base?.customUrl && !base?.playlistId) {
+        try {
+            const root = identityCard || videoCard;
+            const playlistHref = root?.querySelector?.('a[href^="/playlist?list="], a[href*="/playlist?list="]')?.getAttribute?.('href') || '';
+            if (playlistHref) {
+                const qs = playlistHref.split('?')[1] || '';
+                const params = new URLSearchParams(qs);
+                const playlistId = params.get('list') || '';
+                if (playlistId) {
+                    const bylineText = root?.querySelector?.(
+                        '.YtmBadgeAndBylineRendererItemByline .yt-core-attributed-string, ' +
+                        '.YtmBadgeAndBylineRendererItemByline, ' +
+                        '.YtmCompactMediaItemByline .yt-core-attributed-string, ' +
+                        '.YtmCompactMediaItemByline'
+                    )?.textContent?.trim() || '';
+                    const creatorName = (() => {
+                        const match = bylineText.match(/^(.+?)\s*[•·]\s*playlist\b/i);
+                        return (match && match[1]) ? match[1].trim() : '';
+                    })();
+                    base = {
+                        ...base,
+                        source: 'ytm_playlist_card',
+                        playlistId,
+                        fetchStrategy: 'playlist',
+                        needsFetch: true,
+                        expectedChannelName: creatorName || null,
+                        name: (base?.name || creatorName || '').trim()
+                    };
+                }
+            }
+        } catch (e) {
+        }
+    }
     const isPostCard = (() => {
         try {
             if (videoCard.getAttribute?.('is-post') === '' || videoCard.getAttribute?.('is-post') === 'true') return true;
@@ -458,13 +656,50 @@ function buildQuickBlockContext(videoCard) {
         }
         return false;
     })();
-    const videoId = isPostCard ? '' : (base.videoId || ensureVideoIdForCard(videoCard) || extractVideoIdFromCard(videoCard) || '');
-    const collaborators = collectQuickBlockCollaborators({ ...base, videoId }, videoCard);
+    const isPlaylistCreatorFlow = Boolean(
+        base?.fetchStrategy === 'playlist' ||
+        base?.source === 'ytm_playlist_card' ||
+        base?.playlistId
+    );
+    const videoId = (isPostCard || isPlaylistCreatorFlow)
+        ? ''
+        : (base.videoId || ensureVideoIdForCard(identityCard) || extractVideoIdFromCard(identityCard) || ensureVideoIdForCard(videoCard) || extractVideoIdFromCard(videoCard) || '');
+    const collaborators = collectQuickBlockCollaborators({ ...base, videoId, __mixLike: isMixLike }, identityCard || videoCard);
+    const collabHint = (() => {
+        const bylineText = (identityCard || videoCard).querySelector?.(
+            '.YtmBadgeAndBylineRendererItemByline .yt-core-attributed-string, ' +
+            '.YtmCompactMediaItemByline .yt-core-attributed-string, ' +
+            '.YtmCompactMediaItemByline, ' +
+            '#attributed-channel-name .yt-core-attributed-string, ' +
+            '#attributed-channel-name'
+        )?.textContent?.trim() || '';
+        const expectedFromStamp = parseInt((identityCard || videoCard).getAttribute?.('data-filtertube-expected-collaborators') || '0', 10) || 0;
+        let names = [];
+        let hasHiddenCollaborators = false;
+        let hiddenCount = 0;
+        if (bylineText && typeof parseCollaboratorNames === 'function') {
+            try {
+                const parsed = parseCollaboratorNames(bylineText);
+                names = Array.isArray(parsed?.names) ? parsed.names.filter(Boolean) : [];
+                hasHiddenCollaborators = Boolean(parsed?.hasHiddenCollaborators);
+                hiddenCount = Number(parsed?.hiddenCount || 0);
+            } catch (e) {
+            }
+        }
+        const expectedCount = Math.max(expectedFromStamp, names.length + hiddenCount);
+        return {
+            active: !isMixLike && Boolean((hasHiddenCollaborators && names.length >= 1) || expectedFromStamp > 1),
+            names,
+            expectedCount
+        };
+    })();
     if (!videoId && collaborators.length === 0) return null;
     return {
         base: { ...base, videoId },
         videoId,
-        collaborators
+        collaborators,
+        collabHint,
+        isMixLikeCard: isMixLike
     };
 }
 
@@ -473,6 +708,18 @@ function getQuickBlockActionInfo(context) {
     const collaborators = Array.isArray(context.collaborators) ? context.collaborators : [];
     const videoId = context.videoId || '';
     const groupId = (typeof generateCollaborationGroupId === 'function') ? generateCollaborationGroupId() : `quick-${Date.now()}`;
+
+    if (context?.isMixLikeCard) {
+        const primaryMix = collaborators[0] || context.base;
+        if (!primaryMix) return null;
+        return {
+            channelInfo: {
+                ...primaryMix,
+                videoId: primaryMix.videoId || videoId
+            },
+            attrs: {}
+        };
+    }
 
     if (collaborators.length >= 2) {
         const targets = collaborators.slice(0, 6);
@@ -489,6 +736,37 @@ function getQuickBlockActionInfo(context) {
                 'data-is-block-all': 'true'
             }
         };
+    }
+
+    if (context?.collabHint?.active && videoId) {
+        const provisional = [...collaborators];
+        const existingNames = new Set(
+            provisional
+                .map(item => (typeof item?.name === 'string' ? item.name.trim().toLowerCase() : ''))
+                .filter(Boolean)
+        );
+        (context.collabHint.names || []).forEach((name) => {
+            const key = (typeof name === 'string' ? name.trim().toLowerCase() : '');
+            if (!key || existingNames.has(key)) return;
+            provisional.push({ name: name.trim(), handle: '', id: '', customUrl: '' });
+            existingNames.add(key);
+        });
+        if (provisional.length >= 2 || context.collabHint.expectedCount > 1) {
+            const collaboratorCount = Math.max(provisional.length, context.collabHint.expectedCount || 2);
+            return {
+                channelInfo: {
+                    name: collaboratorCount === 2 ? 'Both Channels' : `All ${collaboratorCount} Collaborators`,
+                    isBlockAllOption: true,
+                    allCollaborators: provisional.slice(0, 6),
+                    collaborationGroupId: groupId,
+                    videoId
+                },
+                attrs: {
+                    'data-collaboration-group-id': groupId,
+                    'data-is-block-all': 'true'
+                }
+            };
+        }
     }
 
     const primary = collaborators[0] || context.base;
@@ -613,6 +891,76 @@ async function runQuickBlockAction(videoCard, triggerBtn) {
         const info = getQuickBlockActionInfo(context);
         if (!info || !info.channelInfo) return;
 
+        // Defensive playlist fallback: if identity is empty but this card points to a playlist,
+        // force creator-resolution flow in handleBlockChannelClick instead of failing with
+        // "No channel identifier available".
+        try {
+            const current = info.channelInfo || {};
+            const hasIdentity = Boolean(current.id || current.handle || current.customUrl || current.videoId);
+            const hasPlaylistHint = Boolean(current.playlistId || current.fetchStrategy === 'playlist' || current.source === 'ytm_playlist_card');
+            if (!hasIdentity && !hasPlaylistHint) {
+                const playlistHref = videoCard?.querySelector?.('a[href^="/playlist?list="], a[href*="/playlist?list="]')?.getAttribute?.('href') || '';
+                if (playlistHref) {
+                    const qs = playlistHref.split('?')[1] || '';
+                    const params = new URLSearchParams(qs);
+                    const playlistId = params.get('list') || '';
+                    if (playlistId) {
+                        const bylineText = videoCard?.querySelector?.(
+                            '.YtmBadgeAndBylineRendererItemByline .yt-core-attributed-string, ' +
+                            '.YtmBadgeAndBylineRendererItemByline, ' +
+                            '.YtmCompactMediaItemByline .yt-core-attributed-string, ' +
+                            '.YtmCompactMediaItemByline'
+                        )?.textContent?.trim() || '';
+                        const expectedName = (() => {
+                            const match = bylineText.match(/^(.+?)\s*[•·]\s*playlist\b/i);
+                            return (match && match[1]) ? match[1].trim() : '';
+                        })();
+                        info.channelInfo = {
+                            ...current,
+                            source: 'ytm_playlist_card',
+                            fetchStrategy: 'playlist',
+                            needsFetch: true,
+                            playlistId,
+                            expectedChannelName: expectedName || current.name || ''
+                        };
+                    }
+                }
+            }
+        } catch (e) {
+        }
+
+        // Ensure quick-block on collab cards behaves like the top "Block All" row.
+        // Always try main-world collaborator resolution by videoId (when available), then
+        // promote quick-block to Block All if we can resolve 2+ collaborators.
+        if (context?.videoId && typeof requestCollaboratorInfoFromMainWorld === 'function') {
+            const currentList = Array.isArray(info.channelInfo?.allCollaborators) ? info.channelInfo.allCollaborators : [];
+            const hasStrongRoster = currentList.length >= 2 && currentList.every((c) => Boolean(c?.id || c?.handle || c?.customUrl));
+            if (!hasStrongRoster) {
+                try {
+                    const expectedNames = currentList.map(c => c?.name).filter(Boolean);
+                    const enriched = await requestCollaboratorInfoFromMainWorld(context.videoId, { expectedNames });
+                    const sanitized = typeof sanitizeCollaboratorList === 'function'
+                        ? sanitizeCollaboratorList(enriched)
+                        : (Array.isArray(enriched) ? enriched.filter(Boolean) : []);
+                    if (Array.isArray(sanitized) && sanitized.length >= 2) {
+                        const groupId = info.channelInfo?.collaborationGroupId || (typeof generateCollaborationGroupId === 'function'
+                            ? generateCollaborationGroupId()
+                            : `quick-${Date.now()}`);
+                        info.channelInfo.isBlockAllOption = true;
+                        info.channelInfo.allCollaborators = sanitized.slice(0, 6);
+                        info.channelInfo.collaborationGroupId = groupId;
+                        info.channelInfo.name = sanitized.length === 2 ? 'Both Channels' : `All ${sanitized.length} Collaborators`;
+                        info.attrs = {
+                            ...(info.attrs || {}),
+                            'data-collaboration-group-id': groupId,
+                            'data-is-block-all': 'true'
+                        };
+                    }
+                } catch (e) {
+                }
+            }
+        }
+
         if (typeof handleBlockChannelClick === 'function') {
             const synthetic = createSyntheticQuickBlockMenuItem('Blocking...');
             Object.entries(info.attrs || {}).forEach(([k, v]) => synthetic.setAttribute(k, v));
@@ -644,7 +992,30 @@ function ensureQuickBlockButton(card) {
     const hostCard = resolveQuickBlockHost(card);
     if (!hostCard) return;
     const parentCard = hostCard.parentElement?.closest?.(QUICK_BLOCK_CARD_SELECTORS);
-    if (parentCard && parentCard !== hostCard) return;
+    if (parentCard && parentCard !== hostCard) {
+        // Allow nested *playlist/mix lockups* to own the quick-block button even when they
+        // sit inside a rich-item wrapper. Otherwise we attach the button to the wrapper and
+        // block the wrong identity (seed video) for playlists.
+        const hostTag = String(hostCard.tagName || '').toLowerCase();
+        const allowNestedLeaf = (
+            hostTag === 'ytd-video-renderer' ||
+            hostTag === 'ytd-grid-video-renderer' ||
+            hostTag === 'ytd-compact-video-renderer' ||
+            hostTag === 'ytd-playlist-video-renderer' ||
+            hostTag === 'yt-lockup-view-model' ||
+            hostTag === 'yt-lockup-metadata-view-model' ||
+            hostTag === 'ytm-video-with-context-renderer' ||
+            hostTag === 'ytm-compact-video-renderer' ||
+            hostTag === 'ytm-compact-playlist-renderer' ||
+            hostTag === 'ytm-compact-radio-renderer' ||
+            hostTag === 'ytm-radio-renderer' ||
+            hostTag === 'ytm-compact-show-renderer' ||
+            hostTag === 'ytd-playlist-renderer' ||
+            hostTag === 'ytd-grid-playlist-renderer' ||
+            hostTag === 'ytd-compact-playlist-renderer'
+        );
+        if (!allowNestedLeaf) return;
+    }
 
     if (!isQuickBlockEnabled()) {
         const existing = hostCard.querySelector('.filtertube-quick-block-wrap');
@@ -754,8 +1125,11 @@ function ensureQuickBlockButton(card) {
     trigger.addEventListener('click', (event) => {
         event.preventDefault();
         event.stopPropagation();
-        // Use the closest matched card for extraction (more accurate than wrapper hosts).
-        const actionCard = (card && card.isConnected) ? card : hostCard;
+        // Use the resolved host for extraction (wrapper hosts can carry the wrong identity,
+        // especially for playlist cards where the wrapper can inherit a seed thumbnail videoId).
+        const actionCard = (hostCard && hostCard.isConnected)
+            ? hostCard
+            : ((card && card.isConnected) ? card : hostCard);
         runQuickBlockAction(actionCard, trigger);
     });
     trigger.addEventListener('mouseenter', () => {
@@ -800,6 +1174,13 @@ function setupQuickBlockObserver() {
     ensureQuickBlockStyles();
 
     const boot = () => {
+        const isMainDesktopSurface = isMainYoutubeDesktopSurface();
+        if (isMainDesktopSurface) {
+            // Keep main desktop stable/performant: rely on 3-dot menu flow there.
+            // Quick-block hover/button overlay remains enabled on mobile/YTM surfaces.
+            removeQuickBlockButtons();
+            return;
+        }
         scheduleQuickBlockSweep(document);
 
         document.addEventListener('pointerenter', (event) => {
@@ -814,7 +1195,7 @@ function setupQuickBlockObserver() {
         // `mouseenter` from firing on the underlying host. Track the pointer position and
         // force the quick-block hover state on the best card under the pointer.
         // This eliminates the "1st hover bad, 2nd better, 3rd stable" pattern.
-        if (!isMobileYouTubeSurface() && isHoverCapableDesktopSurface()) {
+        if (!isMainDesktopSurface && !isMobileYouTubeSurface() && isHoverCapableDesktopSurface()) {
             let lastHost = null;
             let pending = false;
             let lastX = 0;
@@ -947,7 +1328,18 @@ function setupQuickBlockObserver() {
                     if (node.matches?.(QUICK_BLOCK_CARD_SELECTORS)) {
                         ensureQuickBlockButton(node);
                     } else {
-                        scheduleQuickBlockSweep(node);
+                        if (!isMainDesktopSurface) {
+                            scheduleQuickBlockSweep(node);
+                        } else {
+                            // On main desktop, avoid unconditional subtree sweeps.
+                            // Only sweep wrappers that actually contain quick-block candidates.
+                            try {
+                                if (node.querySelector?.(QUICK_BLOCK_CARD_SELECTORS)) {
+                                    scheduleQuickBlockSweep(node);
+                                }
+                            } catch (e) {
+                            }
+                        }
                     }
                 }
                 for (const node of mutation.removedNodes) {
@@ -967,7 +1359,7 @@ function setupQuickBlockObserver() {
 
         observer.observe(document.body, { childList: true, subtree: true });
 
-        if (!quickBlockPeriodicTimer) {
+        if (!quickBlockPeriodicTimer && !isMainDesktopSurface) {
             quickBlockPeriodicTimer = window.setInterval(() => {
                 sweepQuickBlockButtons(document);
             }, 1800);
@@ -993,20 +1385,37 @@ function setupMenuObserver() {
 
     // Track clicks on 3-dot buttons (comprehensive selectors for all YouTube contexts)
     document.addEventListener('click', (e) => {
-        const menuButton = e.target.closest(
+        const menuSelector =
             'button[aria-label*="More"], ' +
             'button[aria-label*="Action"], ' +
             'button[aria-label*="menu"], ' +
             'yt-icon-button.dropdown-trigger, ' +
             'yt-icon-button#button.dropdown-trigger, ' +
             '.shortsLockupViewModelHostOutsideMetadataMenu button, ' +
+            '.shortsLockupViewModelHostInlineMetadataMenu button, ' +
             'ytd-menu-renderer button, ' +
             '#menu button[aria-label], ' +
             'ytd-reel-item-renderer button[aria-label*="More"], ' +
             'ytd-reel-video-renderer button[aria-label*="More"], ' +
             'ytm-menu-renderer button, ' +
             'ytm-bottom-sheet-renderer button'
-        );
+        ;
+        let menuButton = (e.target instanceof Element) ? e.target.closest(menuSelector) : null;
+        if (!menuButton && typeof e.composedPath === 'function') {
+            const path = e.composedPath();
+            for (const node of path) {
+                if (!(node instanceof Element)) continue;
+                if (node.matches?.(menuSelector)) {
+                    menuButton = node;
+                    break;
+                }
+                const nearby = node.closest?.(menuSelector);
+                if (nearby) {
+                    menuButton = nearby;
+                    break;
+                }
+            }
+        }
         if (menuButton) {
             lastClickedMenuButton = menuButton;
             blockChannelDebugLog('FilterTube: 3-dot button clicked, button:', menuButton.getAttribute('aria-label'));
@@ -1014,7 +1423,7 @@ function setupMenuObserver() {
             // Also try to find and inject immediately into existing dropdown
             setTimeout(() => {
                 tryInjectIntoVisibleDropdown();
-            }, 150);
+            }, isMobileYouTubeSurface() ? 260 : 150);
         }
     }, true);
 
@@ -1045,7 +1454,7 @@ function setupMenuObserver() {
         });
         dropdownVisibilityObservers.set(dropdown, obs);
         try {
-            obs.observe(dropdown, { attributes: true, attributeFilter: ['style', 'aria-hidden', 'hidden'] });
+            obs.observe(dropdown, { attributes: true, attributeFilter: ['style', 'class', 'open', 'opened', 'aria-hidden', 'hidden'] });
         } catch (e) {
         }
     }
@@ -1444,7 +1853,8 @@ async function handleDropdownAppearedInternal(dropdown) {
 
     // Prefer comment context first (thread + modern comment view/renderer nodes).
     // This prevents fallback to watch/playlist wrappers when blocking from comment menus.
-    const commentContextCard = lastClickedMenuButton.closest(
+    const commentContextCard = closestComposed(
+        lastClickedMenuButton,
         'ytd-comment-thread-renderer, ' +
         'ytm-comment-thread-renderer, ' +
         'ytd-comment-view-model, ' +
@@ -1452,12 +1862,14 @@ async function handleDropdownAppearedInternal(dropdown) {
         'ytd-comment-renderer, ' +
         'ytm-comment-renderer'
     );
-    const clickInComments = Boolean(lastClickedMenuButton.closest(
+    const clickInComments = Boolean(closestComposed(
+        lastClickedMenuButton,
         '#comments, ytd-comments, ytd-item-section-renderer[section-identifier="comment-item-section"]'
     ));
 
     // Find the associated video/short card from the button (comprehensive selectors)
-    let videoCard = commentContextCard || lastClickedMenuButton.closest(
+    let videoCard = commentContextCard || closestComposed(
+        lastClickedMenuButton,
         'ytd-rich-item-renderer, ' +
         'ytd-video-renderer, ' +
         'ytd-grid-video-renderer, ' +
@@ -1468,6 +1880,9 @@ async function handleDropdownAppearedInternal(dropdown) {
         'ytd-compact-promoted-video-renderer, ' +
         'ytm-compact-video-renderer, ' +
         'ytm-video-with-context-renderer, ' +
+        'ytm-universal-watch-card-renderer, ' +
+        'ytm-watch-card-hero-video-renderer, ' +
+        'ytm-watch-card-rich-header-renderer, ' +
         'ytm-compact-playlist-renderer, ' +
         'ytm-playlist-video-renderer, ' +
         'ytm-playlist-panel-video-renderer, ' +
@@ -1489,13 +1904,67 @@ async function handleDropdownAppearedInternal(dropdown) {
         'ytd-rich-shelf-renderer'                       // Shelf containing shorts
     );
     if (!videoCard && !clickInComments) {
-        videoCard = lastClickedMenuButton.closest(
+        videoCard = closestComposed(
+            lastClickedMenuButton,
             'ytd-watch-metadata, ' +                    // Watch page header
             'ytd-video-primary-info-renderer, ' +       // Watch page primary info
             'ytd-video-secondary-info-renderer, ' +     // Watch page secondary info
             'ytd-video-owner-renderer, ' +              // Watch page channel row
             'ytd-watch-flexy'                           // Watch page root
         );
+    }
+
+    // YTM community posts: avoid using broad section wrappers as identity source.
+    // If we landed on a rich-section wrapper, refine to the exact post/thread card.
+    try {
+        const tag = String(videoCard?.tagName || '').toLowerCase();
+        if (tag === 'ytm-rich-section-renderer') {
+            const precisePost = closestComposed(
+                lastClickedMenuButton,
+                'ytm-backstage-post-renderer, ytm-backstage-post-thread-renderer, ytm-post-renderer'
+            );
+            if (precisePost) {
+                videoCard = precisePost;
+            } else {
+                const byContainment = Array.from(videoCard.querySelectorAll(
+                    'ytm-backstage-post-renderer, ytm-backstage-post-thread-renderer, ytm-post-renderer'
+                )).find((candidate) => {
+                    try {
+                        return candidate && candidate.contains(lastClickedMenuButton);
+                    } catch (e) {
+                        return false;
+                    }
+                }) || null;
+                if (byContainment) {
+                    videoCard = byContainment;
+                }
+            }
+        }
+    } catch (e) {
+    }
+
+    // Shorts menus can bubble from shelf/section wrappers; refine to the actual shorts tile
+    // so we never hide an entire shelf when blocking one short.
+    try {
+        const tag = String(videoCard?.tagName || '').toLowerCase();
+        const isBroadShortsWrapper = (
+            tag === 'ytd-rich-shelf-renderer' ||
+            tag === 'ytm-item-section-renderer'
+        );
+        if (isBroadShortsWrapper) {
+            const preciseShortsCard = closestComposed(
+                lastClickedMenuButton,
+                'ytm-shorts-lockup-view-model, ' +
+                'ytm-shorts-lockup-view-model-v2, ' +
+                'ytd-reel-item-renderer, ' +
+                'ytd-reel-video-renderer, ' +
+                'reel-item-endpoint'
+            );
+            if (preciseShortsCard) {
+                videoCard = preciseShortsCard;
+            }
+        }
+    } catch (e) {
     }
 
     if (!videoCard && !clickInComments) {
@@ -1602,7 +2071,7 @@ async function handleDropdownAppearedInternal(dropdown) {
 
         if (dropdownState && dropdownState.videoCardId !== videoCardId) {
             blockChannelDebugLog('FilterTube: Dropdown reused for different video - will clean and reinject');
-            // Old items will be removed by injectFilterTubeMenuItem automatically
+            injectedDropdowns.delete(dropdown);
         }
 
         // Mark as being processed IMMEDIATELY (prevents duplicate calls)
@@ -1678,4 +2147,4 @@ async function handleDropdownAppearedInternal(dropdown) {
 setTimeout(() => {
     setupMenuObserver();
     setupQuickBlockObserver();
-}, 1000);
+}, 350);

@@ -5,11 +5,10 @@ console.log("FilterTube: content_bridge.js loaded (Isolated World)");
 function buildChannelMetadataPayload(channelInfo = {}) {
     const canonicalRaw = channelInfo.canonicalHandle || channelInfo.handleDisplay || channelInfo.handle || '';
     const canonicalExtracted = extractRawHandle(canonicalRaw);
-    const canonical = canonicalExtracted || (typeof canonicalRaw === 'string' && canonicalRaw.trim().startsWith('@') ? canonicalRaw.trim() : '');
+    const canonical = normalizeHandleValue(canonicalExtracted || canonicalRaw || '');
 
     const isHandleLike = (value) => {
-        if (!value || typeof value !== 'string') return false;
-        return value.trim().startsWith('@');
+        return Boolean(normalizeHandleValue(value || ''));
     };
 
     const isUcIdLike = (value) => {
@@ -21,13 +20,23 @@ function buildChannelMetadataPayload(channelInfo = {}) {
         if (!value || typeof value !== 'string') return true;
         const trimmed = value.trim();
         if (!trimmed) return true;
+        const currentVideoId = typeof channelInfo?.videoId === 'string' ? channelInfo.videoId.trim().toLowerCase() : '';
+        if (currentVideoId) {
+            const lower = trimmed.toLowerCase();
+            if (lower === currentVideoId || lower === currentVideoId.slice(1) || lower === currentVideoId.slice(0, -1)) return true;
+        }
+        if (/^watch:[a-zA-Z0-9_-]{11}$/i.test(trimmed)) return true;
+        if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) return true;
         if (isHandleLike(trimmed)) return true;
         if (isUcIdLike(trimmed)) return true;
+        if (/^uc[a-z0-9_-]{6,}$/i.test(trimmed)) return true;
         if (trimmed.includes('•')) return true;
         if (/\bviews?\b/i.test(trimmed)) return true;
         if (/\bago\b/i.test(trimmed)) return true;
         if (/\bwatching\b/i.test(trimmed)) return true;
+        if (COLLAB_NON_CHANNEL_LABEL_PATTERN.test(trimmed.toLowerCase())) return true;
         const lower = trimmed.toLowerCase();
+        if (lower === 'youtube') return true;
         if (lower.startsWith('mix')) return true;
         if (lower.includes('mix') && trimmed.includes('–')) return true;
         return false;
@@ -44,6 +53,7 @@ function buildChannelMetadataPayload(channelInfo = {}) {
         const trimmed = value.trim();
         if (!trimmed) return true;
         if (isUcIdLike(trimmed)) return true;
+        if (/^uc[a-z0-9_-]{6,}$/i.test(trimmed)) return true;
         if (trimmed.toLowerCase() === 'channel') return true;
         if (trimmed.includes('•')) return true;
         if (/\bviews?\b/i.test(trimmed)) return true;
@@ -71,19 +81,25 @@ function buildChannelMetadataPayload(channelInfo = {}) {
 }
 
 function pickMenuChannelDisplayName(channelInfo, injectionOptions = {}) {
-    const displayCandidate = typeof injectionOptions.displayName === 'string'
-        ? injectionOptions.displayName.trim()
-        : '';
-    const nameCandidate = typeof channelInfo?.name === 'string'
-        ? channelInfo.name.trim()
-        : '';
-    const expectedNameCandidate = typeof channelInfo?.expectedChannelName === 'string'
-        ? channelInfo.expectedChannelName.trim()
-        : '';
+    const normalizeCandidate = (value) => {
+        const candidate = typeof value === 'string' ? value.trim() : '';
+        if (!candidate) return '';
+        try {
+            const parsed = parseCollaboratorNames(candidate);
+            if (parsed?.hasHiddenCollaborators && Array.isArray(parsed.names) && parsed.names.length > 0) {
+                return String(parsed.names[0] || '').trim();
+            }
+        } catch (e) {
+        }
+        return candidate;
+    };
+
+    const displayCandidate = normalizeCandidate(injectionOptions.displayName);
+    const nameCandidate = normalizeCandidate(channelInfo?.name);
+    const expectedNameCandidate = normalizeCandidate(channelInfo?.expectedChannelName);
 
     const isHandleLike = (value) => {
-        if (!value || typeof value !== 'string') return false;
-        return value.trim().startsWith('@');
+        return Boolean(normalizeHandleValue(value || ''));
     };
 
     const isUcIdLike = (value) => {
@@ -95,18 +111,28 @@ function pickMenuChannelDisplayName(channelInfo, injectionOptions = {}) {
         if (!value || typeof value !== 'string') return true;
         const trimmed = value.trim();
         if (!trimmed) return true;
+        const currentVideoId = typeof channelInfo?.videoId === 'string' ? channelInfo.videoId.trim().toLowerCase() : '';
+        if (currentVideoId) {
+            const lowerVideo = trimmed.toLowerCase();
+            if (lowerVideo === currentVideoId || lowerVideo === currentVideoId.slice(1) || lowerVideo === currentVideoId.slice(0, -1)) return true;
+        }
+        if (/^watch:[a-zA-Z0-9_-]{11}$/i.test(trimmed)) return true;
+        if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) return true;
         if (isUcIdLike(trimmed)) return true;
+        if (/^uc[a-z0-9_-]{6,}$/i.test(trimmed)) return true;
         if (trimmed.includes('•')) return true;
         if (/\bviews?\b/i.test(trimmed)) return true;
         if (/\bago\b/i.test(trimmed)) return true;
         if (/\bwatching\b/i.test(trimmed)) return true;
         const lower = trimmed.toLowerCase();
         if (lower === 'channel') return true;
+        if (lower === 'youtube') return true;
         if (lower.startsWith('mix')) return true;
         if (lower.startsWith('my mix')) return true;
         if (/^my\s*mix/i.test(trimmed)) return true;
         if (/\band more\b/i.test(trimmed) && /mix/i.test(trimmed)) return true;
         if (lower.includes('mix') && trimmed.includes('–')) return true;
+        if (COLLAB_NON_CHANNEL_LABEL_PATTERN.test(lower)) return true;
         return false;
     };
 
@@ -168,6 +194,45 @@ function upsertFilterChannel(channelData) {
     currentSettings.filterChannels = existing;
 }
 
+function isLikelyNonChannelName(value) {
+    if (!value || typeof value !== 'string') return true;
+    const trimmed = value.trim();
+    if (!trimmed) return true;
+    if (/^UC[a-zA-Z0-9_-]{22}$/i.test(trimmed)) return true;
+    if (trimmed.startsWith('@')) return true;
+    if (trimmed.includes('•')) return true;
+    if (/\bviews?\b/i.test(trimmed)) return true;
+    if (/\bago\b/i.test(trimmed)) return true;
+    if (/\bwatching\b/i.test(trimmed)) return true;
+    if (trimmed.toLowerCase() === 'youtube') return true;
+    if (/^\d+:\d+/.test(trimmed)) return true;
+    return false;
+}
+
+function deriveExpectedChannelName(value) {
+    if (!value || typeof value !== 'string') return '';
+    let text = value
+        .replace(/\s+/g, ' ')
+        .replace(/\s*\n\s*/g, ' ')
+        .trim();
+    if (!text) return '';
+
+    // Common YTM aria-label format:
+    // "<title> by <channel> <views/age> <duration>"
+    const byMatch = text.match(/\bby\s+(.+?)(?:\s+\d|$)/i);
+    if (byMatch && byMatch[1]) {
+        text = byMatch[1].trim();
+    }
+
+    text = text
+        .replace(/\s+\d[\d,.]*\s+(?:views?|watching)\b.*$/i, '')
+        .replace(/\s+\d+\s+(?:second|minute|hour|day|week|month|year)s?\s+ago\b.*$/i, '')
+        .trim();
+
+    if (isLikelyNonChannelName(text)) return '';
+    return text;
+}
+
 function registerActiveCollaborationMenu(videoId, dropdown, videoCard, state = {}) {
     if (!videoId || !dropdown) return;
     const context = {
@@ -227,6 +292,32 @@ function cleanupDropdownState(dropdown) {
 function forceCloseDropdown(dropdown) {
     if (!dropdown) return;
     cleanupDropdownState(dropdown);
+    try {
+        dropdown.dispatchEvent(new CustomEvent('filtertube-force-close'));
+    } catch (e) {
+    }
+    const isMobileSurface = (() => {
+        try {
+            const host = String(location?.hostname || '').toLowerCase();
+            return host.startsWith('m.') || host.includes('music.youtube.com');
+        } catch (e) {
+            return false;
+        }
+    })();
+    const isYtmSheetLike = (() => {
+        try {
+            return Boolean(
+                dropdown.matches?.('bottom-sheet-container, ytm-bottom-sheet-renderer, ytm-menu-popup-renderer, div.menu-content[role="dialog"]') ||
+                dropdown.closest?.('bottom-sheet-container, ytm-bottom-sheet-renderer, ytm-menu-popup-renderer')
+            );
+        } catch (e) {
+            return false;
+        }
+    })();
+    if (isMobileSurface && isYtmSheetLike) {
+        closeYTMBottomSheet(dropdown);
+        return;
+    }
 
     const hasVisibleMiniplayer = () => {
         try {
@@ -250,45 +341,127 @@ function forceCloseDropdown(dropdown) {
         bubbles: true,
         cancelable: true
     });
-    dropdown.dispatchEvent(escapeEvent);
-
     const activeElement = document.activeElement;
-    if (activeElement && dropdown.contains(activeElement)) {
-        activeElement.blur();
-    }
-
-    if (typeof dropdown.close === 'function') {
+    if (activeElement && typeof activeElement.blur === 'function') {
         try {
-            dropdown.close();
-        } catch (error) {
-            console.warn('FilterTube: Failed to call dropdown.close()', error);
+            activeElement.blur();
+        } catch (e) {
         }
     }
 
-    dropdown.style.display = 'none';
-    dropdown.setAttribute('aria-hidden', 'true');
-    try {
-        if (dropdown.matches?.('ytm-menu-popup-renderer, div.menu-content[role="dialog"]')) {
-            dropdown.setAttribute('hidden', '');
-        } else {
-            dropdown.removeAttribute('hidden');
+    const hosts = new Set([dropdown]);
+    const hostRoot = dropdown.closest?.('bottom-sheet-container, ytm-bottom-sheet-renderer, ytm-menu-popup-renderer, tp-yt-iron-dropdown');
+    if (hostRoot) hosts.add(hostRoot);
+
+    const closeHost = (host) => {
+        if (!host) return;
+        try {
+            host.dispatchEvent(escapeEvent);
+        } catch (e) {
         }
-    } catch (e) {
+        if (typeof host.close === 'function') {
+            try {
+                host.close();
+            } catch (error) {
+                console.warn('FilterTube: Failed to call dropdown.close()', error);
+            }
+        }
+        try {
+            if ('opened' in host) host.opened = false;
+            if ('open' in host) host.open = false;
+        } catch (e) {
+        }
+    };
+    hosts.forEach(closeHost);
+
+    const scrims = new Set();
+    hosts.forEach((host) => {
+        try {
+            host.querySelectorAll('ytw-scrim, .ytWebScrimHost, .ytWebScrimHostModernOverlay').forEach((el) => scrims.add(el));
+        } catch (e) {
+        }
+    });
+    scrims.forEach((scrim) => {
+        try {
+            const closeBtn = scrim.querySelector?.('button[aria-label="Close"], .ytWebScrimHiddenButton');
+            if (closeBtn && typeof closeBtn.click === 'function') {
+                closeBtn.click();
+            }
+        } catch (e) {
+        }
+    });
+
+    hosts.forEach((host) => {
+        try {
+            host.querySelectorAll('button[aria-label="Close"], button.hidden-button, .ytWebScrimHiddenButton').forEach((btn) => {
+                if (typeof btn.click === 'function') btn.click();
+            });
+        } catch (e) {
+        }
+    });
+
+    if (isMobileSurface) {
+        return;
     }
 
-    // Click elsewhere to release focus trap
     setTimeout(() => {
         if (hasVisibleMiniplayer()) return;
-        const ytdApp = document.querySelector('ytd-app');
-        if (ytdApp) {
+        const clickTarget = document.querySelector('ytd-app') || document.body;
+        if (clickTarget) {
             const clickEvent = new MouseEvent('click', {
                 bubbles: true,
                 cancelable: true,
                 view: window
             });
-            ytdApp.dispatchEvent(clickEvent);
+            clickTarget.dispatchEvent(clickEvent);
         }
     }, 50);
+}
+
+function closeYTMBottomSheet(bottomSheet) {
+    if (!bottomSheet) return;
+    cleanupDropdownState(bottomSheet);
+
+    try {
+        const active = document.activeElement;
+        if (active && typeof active.blur === 'function') {
+            active.blur();
+        }
+    } catch (e) {
+    }
+
+    const hostRoot = (() => {
+        try {
+            if (bottomSheet.matches?.('bottom-sheet-container')) return bottomSheet;
+            return bottomSheet.closest?.('bottom-sheet-container') || bottomSheet;
+        } catch (e) {
+            return bottomSheet;
+        }
+    })();
+
+    try {
+        const scrimBtn = (hostRoot || bottomSheet).querySelector?.('ytw-scrim button, button[aria-label="Close"], .ytWebScrimHiddenButton');
+        if (scrimBtn && typeof scrimBtn.click === 'function') {
+            scrimBtn.click();
+        }
+    } catch (e) {
+    }
+
+    const hosts = new Set([bottomSheet, hostRoot]);
+    hosts.forEach((host) => {
+        if (!host) return;
+        if (typeof host.close === 'function') {
+            try {
+                host.close();
+            } catch (e) {
+            }
+        }
+        try {
+            if ('opened' in host) host.opened = false;
+            if ('open' in host) host.open = false;
+        } catch (e) {
+        }
+    });
 }
 
 function clearFilterTubeMenuItems(dropdown) {
@@ -307,8 +480,116 @@ function waitForNextFrameDelay(delayMs = 0) {
     });
 }
 
+const OLD_MENU_PRIMARY_CONTAINER_SELECTOR = [
+    'tp-yt-paper-listbox#items',
+    'tp-yt-paper-listbox',
+    'div.menu-content[role="dialog"]',
+    'ytm-menu-popup-renderer',
+    'ytm-bottom-sheet-renderer',
+    'ytd-menu-popup-renderer',
+    'ytd-menu-service-item-renderer',
+    '#items.ytd-menu-popup-renderer',
+    '#items.style-scope.ytd-menu-popup-renderer'
+].join(', ');
+
+const OLD_MENU_MARKER_SELECTOR = [
+    'ytm-menu-service-item-renderer',
+    'ytm-menu-navigation-item-renderer',
+    'ytm-menu-item',
+    'ytm-menu-renderer',
+    'ytm-menu'
+].join(', ');
+
+const YTM_MENU_ROOT_SELECTOR = [
+    'div.menu-content[role="dialog"]',
+    'ytm-menu-popup-renderer',
+    'ytm-bottom-sheet-renderer',
+    'bottom-sheet-container',
+    'ytm-menu-renderer',
+    'ytm-menu'
+].join(', ');
+
+function resolveOldMenuContainer(dropdown) {
+    if (!dropdown) return null;
+    try {
+        // ytm-bottom-sheet-renderer is the trigger wrapper; real menu is body-level bottom-sheet-container.
+        if (dropdown.matches?.('ytm-bottom-sheet-renderer')) return null;
+        if (dropdown.matches?.('bottom-sheet-container') && dropdown.querySelector('yt-list-view-model')) {
+            // Shorts/mobile action sheets use list-view model; avoid legacy menu path.
+            return null;
+        }
+        if (dropdown.matches?.('bottom-sheet-container')) {
+            const legacySheetList = dropdown.querySelector('.bottom-sheet-media-menu-item');
+            if (legacySheetList) return legacySheetList;
+        }
+    } catch (e) {
+    }
+
+    try {
+        if (dropdown.matches?.(OLD_MENU_PRIMARY_CONTAINER_SELECTOR)) {
+            if (dropdown.matches?.('ytm-bottom-sheet-renderer')) return null;
+            return dropdown;
+        }
+    } catch (e) {
+    }
+
+    const primary = dropdown.querySelector?.(OLD_MENU_PRIMARY_CONTAINER_SELECTOR);
+    if (primary && !primary.matches?.('ytm-bottom-sheet-renderer')) return primary;
+
+    const marker = dropdown.querySelector?.(OLD_MENU_MARKER_SELECTOR);
+    if (!marker) return null;
+    const markerRoot = marker.closest?.(YTM_MENU_ROOT_SELECTOR);
+    if (markerRoot?.matches?.('ytm-bottom-sheet-renderer')) return null;
+    if (markerRoot?.matches?.('bottom-sheet-container')) {
+        const legacySheetList = marker.closest?.('.bottom-sheet-media-menu-item');
+        if (legacySheetList) return legacySheetList;
+    }
+    return markerRoot || marker.parentElement || marker;
+}
+
+function resolveMenuInsertionTarget(menuContainer) {
+    if (!menuContainer) return null;
+    const listbox = menuContainer.querySelector?.('tp-yt-paper-listbox#items') ||
+        menuContainer.querySelector?.('tp-yt-paper-listbox');
+    if (listbox) return listbox;
+    if (
+        menuContainer.matches?.('ytm-menu-service-item-renderer, ytm-menu-navigation-item-renderer, ytm-menu-item') &&
+        menuContainer.parentElement
+    ) {
+        return menuContainer.parentElement;
+    }
+    if (menuContainer.matches?.('bottom-sheet-container, bottom-sheet-layout')) {
+        const legacySheetList = menuContainer.querySelector?.('.bottom-sheet-media-menu-item');
+        if (legacySheetList) return legacySheetList;
+    }
+    const existingMobileItem = menuContainer.querySelector?.('ytm-menu-service-item-renderer, ytm-menu-navigation-item-renderer');
+    if (existingMobileItem?.parentElement) {
+        return existingMobileItem.parentElement;
+    }
+    return menuContainer;
+}
+
+function isMobileMenuContainer(menuList, menuContainer) {
+    const container = menuContainer || menuList;
+    const target = menuList || container;
+    const hostHint = (() => {
+        try {
+            const host = String(location?.hostname || '').toLowerCase();
+            return host.startsWith('m.youtube.') || host.includes('music.youtube.com');
+        } catch (e) {
+            return false;
+        }
+    })();
+    return Boolean(
+        hostHint ||
+        target?.closest?.('ytm-menu-popup-renderer, ytm-bottom-sheet-renderer, bottom-sheet-container, ytm-menu-renderer, ytm-menu, ytm-app') ||
+        container?.matches?.('div.menu-content[role="dialog"], ytm-menu-popup-renderer, ytm-bottom-sheet-renderer, bottom-sheet-container, ytm-menu-renderer, ytm-menu') ||
+        container?.querySelector?.('ytm-menu-service-item-renderer, ytm-menu-navigation-item-renderer, ytm-menu-item')
+    );
+}
+
 function injectCollaboratorPlaceholderMenu(newMenuList, oldMenuList, message = 'Fetching collaborators…') {
-    const blockAllMessage = 'Block All (pending…)';
+    const blockAllMessage = getAdaptiveMenuCopy().pendingAll;
     const newStructure = Boolean(newMenuList);
 
     const buildPlaceholderContent = (primaryText, secondaryText) => `
@@ -341,13 +622,9 @@ function injectCollaboratorPlaceholderMenu(newMenuList, oldMenuList, message = '
         newMenuList.insertBefore(makeItem(message, 'Please wait…'), newMenuList.firstChild);
         newMenuList.insertBefore(makeItem(blockAllMessage, 'Awaiting collaborator list'), newMenuList.firstChild.nextSibling);
     } else if (oldMenuList) {
-        const menuList = oldMenuList.querySelector('tp-yt-paper-listbox#items') || oldMenuList.querySelector('tp-yt-paper-listbox') || oldMenuList;
-        const isMobileMenu = Boolean(
-            menuList.closest?.('ytm-menu-popup-renderer') ||
-            menuList.closest?.('ytm-app') ||
-            oldMenuList.matches?.('div.menu-content[role="dialog"]') ||
-            oldMenuList.querySelector?.('ytm-menu-service-item-renderer')
-        );
+        const menuList = resolveMenuInsertionTarget(oldMenuList);
+        if (!menuList) return;
+        const isMobileMenu = isMobileMenuContainer(menuList, oldMenuList);
         const rendererTag = isMobileMenu ? 'ytm-menu-service-item-renderer' : 'ytd-menu-service-item-renderer';
         const rendererScope = isMobileMenu ? 'ytm-menu-popup-renderer' : 'ytd-menu-popup-renderer';
         const itemScope = isMobileMenu ? 'ytm-menu-service-item-renderer' : 'ytd-menu-service-item-renderer';
@@ -376,20 +653,7 @@ function getMenuContainers(dropdown, existingNew, existingOld) {
         return { newMenuList: existingNew, oldMenuList: existingOld };
     }
     const newMenuList = dropdown.querySelector('yt-list-view-model');
-    const oldMenuList = dropdown.querySelector(
-        'tp-yt-paper-listbox#items, ' +
-        'tp-yt-paper-listbox, ' +
-        'div.menu-content[role="dialog"], ' +
-        'ytm-menu-popup-renderer, ' +
-        'ytm-menu-service-item-renderer, ' +
-        '#items.ytm-menu-popup-renderer, ' +
-        '#items.style-scope.ytm-menu-popup-renderer, ' +
-        'bottom-sheet-container, ' +
-        'ytd-menu-popup-renderer, ' +
-        'ytd-menu-service-item-renderer, ' +
-        '#items.ytd-menu-popup-renderer, ' +
-        '#items.style-scope.ytd-menu-popup-renderer'
-    );
+    const oldMenuList = resolveOldMenuContainer(dropdown);
     return { newMenuList, oldMenuList };
 }
 
@@ -418,7 +682,11 @@ function renderFilterTubeMenuEntries({ dropdown, newMenuList, oldMenuList, chann
     if (channelInfo.isCollaboration && channelInfo.allCollaborators && channelInfo.allCollaborators.length >= 2) {
         const collaborators = channelInfo.allCollaborators;
         const collaboratorCount = Math.min(collaborators.length, 6);
-        const isMultiStep = collaboratorCount >= 3;
+        const totalCollaboratorCount = Math.max(
+            channelInfo.expectedCollaboratorCount || 0,
+            collaborators.length
+        );
+        const isMultiStep = totalCollaboratorCount >= 3;
         const groupId = generateCollaborationGroupId();
         const hasIdentifier = (c) => Boolean(c?.handle || c?.id || c?.customUrl);
         const anyMissingIdentifiers = collaborators.some(c => !hasIdentifier(c));
@@ -441,7 +709,7 @@ function renderFilterTubeMenuEntries({ dropdown, newMenuList, oldMenuList, chann
             }
 
             const blockAllMenuItem = injectIntoNewMenu(containers.newMenuList, {
-                name: collaboratorCount === 2 ? 'Both Channels' : `All ${collaboratorCount} Collaborators`,
+                name: totalCollaboratorCount === 2 ? 'Both Channels' : `All ${totalCollaboratorCount} Collaborators`,
                 isBlockAllOption: true,
                 allCollaborators: collaborators.slice(0, collaboratorCount),
                 collaborationGroupId: groupId,
@@ -449,9 +717,15 @@ function renderFilterTubeMenuEntries({ dropdown, newMenuList, oldMenuList, chann
             }, videoCard, null, {
                 disabled: anyMissingIdentifiers,
                 displayName: anyMissingIdentifiers ? 'All Collaborators (resolving…)'
-                    : (collaboratorCount === 2 ? 'Both Channels' : `All ${collaboratorCount} Collaborators`)
+                    : (totalCollaboratorCount === 2 ? 'Both Channels' : `All ${totalCollaboratorCount} Collaborators`)
             });
-            setupMultiStepMenu(dropdown, groupId, collaborators.slice(0, collaboratorCount), blockAllMenuItem);
+            setupMultiStepMenu(
+                dropdown,
+                groupId,
+                collaborators.slice(0, collaboratorCount),
+                blockAllMenuItem,
+                totalCollaboratorCount
+            );
         } else if (containers.oldMenuList) {
             for (let i = 0; i < collaboratorCount; i++) {
                 const collaborator = collaborators[i];
@@ -470,7 +744,7 @@ function renderFilterTubeMenuEntries({ dropdown, newMenuList, oldMenuList, chann
             }
 
             const blockAllMenuItem = injectIntoOldMenu(containers.oldMenuList, {
-                name: collaboratorCount === 2 ? 'Both Channels' : `All ${collaboratorCount} Collaborators`,
+                name: totalCollaboratorCount === 2 ? 'Both Channels' : `All ${totalCollaboratorCount} Collaborators`,
                 isBlockAllOption: true,
                 allCollaborators: collaborators.slice(0, collaboratorCount),
                 collaborationGroupId: groupId,
@@ -478,9 +752,15 @@ function renderFilterTubeMenuEntries({ dropdown, newMenuList, oldMenuList, chann
             }, videoCard, null, {
                 disabled: anyMissingIdentifiers,
                 displayName: anyMissingIdentifiers ? 'All Collaborators (resolving…)'
-                    : (collaboratorCount === 2 ? 'Both Channels' : `All ${collaboratorCount} Collaborators`)
+                    : (totalCollaboratorCount === 2 ? 'Both Channels' : `All ${totalCollaboratorCount} Collaborators`)
             });
-            setupMultiStepMenu(dropdown, groupId, collaborators.slice(0, collaboratorCount), blockAllMenuItem);
+            setupMultiStepMenu(
+                dropdown,
+                groupId,
+                collaborators.slice(0, collaboratorCount),
+                blockAllMenuItem,
+                totalCollaboratorCount
+            );
         }
         forceDropdownResize(dropdown);
         return;
@@ -534,6 +814,7 @@ function updateInjectedMenuChannelName(dropdown, channelInfo) {
         if (/\bago\b/i.test(trimmed)) return true;
         if (/\bwatching\b/i.test(trimmed)) return true;
         if (isUcIdLike(trimmed)) return true;
+        if (/^uc[a-z0-9_-]{6,}$/i.test(trimmed)) return true;
         const lower = trimmed.toLowerCase();
         if (lower === 'channel') return true;
         if (lower.startsWith('mix')) return true;
@@ -1618,6 +1899,7 @@ function generateCollaborationGroupId() {
 const COLLAB_MULTI_MORE_PATTERN = /\band\s+\d+\s+more\b/i;
 const COLLAB_MORE_TOKEN_PATTERN = /^\d+\s+more$/i;
 const COLLAB_PLACEHOLDER_NAME_PATTERN = /^(?:and\s+|block\s+)?\d+\s+more(?:\s+(?:collaborators?|channels?))?$/i;
+const COLLAB_NON_CHANNEL_LABEL_PATTERN = /^(?:not interested|send feedback|save(?:\s+to(?:\s+playlist|\s+watch\s+later)?)?|share|report|undo|action menu|channel|block channel|filter all)$/i;
 if (!window.pendingCollabCards) {
     window.pendingCollabCards = new Map(); // key -> entry
 }
@@ -1666,10 +1948,99 @@ function cancelDropdownCleanup(dropdown) {
     }
 }
 
+function normalizeUcIdForCollaborator(value) {
+    const raw = typeof value === 'string' ? value.trim() : '';
+    return /^UC[\w-]{22}$/i.test(raw) ? raw : '';
+}
+
+function normalizeCustomUrlForCollaborator(value) {
+    if (!value || typeof value !== 'string') return '';
+    return value.trim().toLowerCase().replace(/^\/+/, '').replace(/\/+$/, '');
+}
+
+function lookupChannelMapAlias(key) {
+    const normalizedKey = typeof key === 'string' ? key.trim().toLowerCase() : '';
+    if (!normalizedKey) return '';
+    const map = currentSettings?.channelMap || {};
+    const direct = typeof map[normalizedKey] === 'string' ? map[normalizedKey].trim() : '';
+    if (direct) return direct;
+    // Defensive: some entries may be stored as original-cased keys.
+    const original = typeof map[key] === 'string' ? map[key].trim() : '';
+    return original || '';
+}
+
+function resolveMappedIdForHandle(handle) {
+    const normalizedHandle = normalizeHandleValue(handle || '');
+    if (!normalizedHandle) return '';
+    const mappedId = normalizeUcIdForCollaborator(lookupChannelMapAlias(normalizedHandle));
+    if (!mappedId) return '';
+    const mappedHandle = normalizeHandleValue(lookupChannelMapAlias(mappedId));
+    if (mappedHandle && mappedHandle !== normalizedHandle) return '';
+    return mappedId;
+}
+
+function resolveMappedHandleForId(id) {
+    const normalizedId = normalizeUcIdForCollaborator(id || '');
+    if (!normalizedId) return '';
+    const mappedHandle = normalizeHandleValue(lookupChannelMapAlias(normalizedId));
+    if (!mappedHandle) return '';
+    const mappedId = normalizeUcIdForCollaborator(lookupChannelMapAlias(mappedHandle));
+    if (mappedId && mappedId !== normalizedId) return '';
+    return mappedHandle;
+}
+
+function extractPlaylistIdFromHref(href) {
+    const value = typeof href === 'string' ? href.trim() : '';
+    if (!value || !/playlist\?list=/i.test(value)) return '';
+    try {
+        const parsed = new URL(value, location.origin);
+        return parsed.searchParams.get('list') || '';
+    } catch (e) {
+        const qs = value.split('?')[1] || '';
+        const params = new URLSearchParams(qs);
+        return params.get('list') || '';
+    }
+}
+
+function extractPlaylistIdFromElement(root) {
+    if (!root?.querySelector) return '';
+    const anchor = root.querySelector('a[href^="/playlist?list="], a[href*="/playlist?list="]');
+    const href = anchor?.getAttribute?.('href') || anchor?.href || '';
+    return extractPlaylistIdFromHref(href);
+}
+
 function getCollaboratorKey(channelInfo) {
     if (!channelInfo) return '';
-    const value = channelInfo.id || channelInfo.handle || channelInfo.customUrl || channelInfo.name || '';
-    return value.trim().toLowerCase();
+    const id = normalizeUcIdForCollaborator(channelInfo.id || '');
+    const handle = normalizeHandleValue(channelInfo.handle || channelInfo.canonicalHandle || channelInfo.handleDisplay || '');
+    const customUrl = normalizeCustomUrlForCollaborator(channelInfo.customUrl || '');
+    const name = normalizeCollaboratorName(channelInfo.name || '');
+
+    const mappedIdFromHandle = handle ? resolveMappedIdForHandle(handle) : '';
+    const canonicalId = id || mappedIdFromHandle;
+    if (canonicalId) return canonicalId.toLowerCase();
+    if (handle) return handle.toLowerCase();
+    if (customUrl) return customUrl;
+    return name;
+}
+
+function getAdaptiveMenuCopy() {
+    let compact = false;
+    try {
+        const host = String(location?.hostname || '').toLowerCase();
+        const mobileHost = host.startsWith('m.youtube.');
+        const narrowViewport = (window.innerWidth || 0) > 0 && (window.innerWidth || 0) <= 420;
+        compact = Boolean(mobileHost || narrowViewport);
+    } catch (e) {
+        compact = false;
+    }
+    return {
+        block: 'Block',
+        filterAllToggle: compact ? 'All' : 'Filter All',
+        fallbackBlock: compact ? 'Block' : 'Block channel',
+        fallbackBlockAll: compact ? 'Block + All' : 'Block channel (Filter All)',
+        pendingAll: compact ? 'All (pending…)' : 'Block All (pending…)'
+    };
 }
 
 function clearMultiStepStateForDropdown(dropdown) {
@@ -1697,6 +2068,7 @@ function updateMultiStepActionLabel(state) {
     const channelName = state.blockAllItem.querySelector('.filtertube-channel-name');
     const titleSpan = state.blockAllItem.querySelector('.filtertube-menu-title');
     const selectedCount = state.selected?.size || 0;
+    const totalCount = Math.max(state.expectedTotal || 0, state.total || 0);
 
     const setTitleParts = (primary, secondary) => {
         if (label) label.textContent = primary;
@@ -1711,7 +2083,18 @@ function updateMultiStepActionLabel(state) {
         }
     };
 
-    if (selectedCount > 0) {
+    if (totalCount > 0) {
+        const clampedSelected = Math.min(selectedCount, totalCount);
+        const counterLabel = `🤝 ${clampedSelected}/${totalCount}`;
+        setTitleParts(selectedCount > 0 ? 'Done' : (state.defaultLabel || 'Block'), counterLabel);
+        if (selectedCount > 0) {
+            state.blockAllItem.setAttribute('data-is-done-button', 'true');
+            state.blockAllItem.classList.add('filtertube-multistep-ready');
+        } else {
+            state.blockAllItem.removeAttribute('data-is-done-button');
+            state.blockAllItem.classList.remove('filtertube-multistep-ready');
+        }
+    } else if (selectedCount > 0) {
         setTitleParts('Done', `Block ${selectedCount} Selected`);
         state.blockAllItem.setAttribute('data-is-done-button', 'true');
         state.blockAllItem.classList.add('filtertube-multistep-ready');
@@ -1805,10 +2188,31 @@ function refreshMultiStepSelections(groupId) {
             item.classList.remove('filtertube-collab-selected');
         }
     });
+
+    // Keep n in "k/n" synced with the card's currently known collaborator total.
+    // Prefer active dropdown/card context, then fall back to rendered rows.
+    state.total = collaboratorItems.length;
+    try {
+        const videoId = state.dropdown.getAttribute('data-filtertube-collab-video-id') || '';
+        const context = videoId ? activeCollaborationDropdowns.get(videoId) : null;
+        const contextExpected = parseInt(context?.expectedCount || '0', 10) || 0;
+        const cardExpected = parseInt(context?.videoCard?.getAttribute?.('data-filtertube-expected-collaborators') || '0', 10) || 0;
+        const infoExpected = parseInt(context?.channelInfo?.expectedCollaboratorCount || '0', 10) || 0;
+        state.expectedTotal = Math.max(
+            state.total || 0,
+            state.expectedTotal || 0,
+            contextExpected,
+            cardExpected,
+            infoExpected
+        );
+    } catch (e) {
+        state.expectedTotal = Math.max(state.total || 0, state.expectedTotal || 0);
+    }
+
     updateMultiStepActionLabel(state);
 }
 
-function setupMultiStepMenu(dropdown, groupId, collaborators = [], blockAllItemRef = null) {
+function setupMultiStepMenu(dropdown, groupId, collaborators = [], blockAllItemRef = null, expectedTotal = 0) {
     if (!dropdown || !groupId) return;
     clearMultiStepStateForDropdown(dropdown);
 
@@ -1821,6 +2225,7 @@ function setupMultiStepMenu(dropdown, groupId, collaborators = [], blockAllItemR
         groupId,
         dropdown,
         total: collaborators.length,
+        expectedTotal: Math.max(expectedTotal || 0, collaborators.length),
         selected: new Set(),
         // --- FIX: Initialize state properties ---
         filterAllMap: new Map(),
@@ -1829,7 +2234,7 @@ function setupMultiStepMenu(dropdown, groupId, collaborators = [], blockAllItemR
         collaborators,
         defaultLabel: blockAllItem?.querySelector('.filtertube-menu-label')?.textContent || 'Block',
         defaultChannelName: blockAllItem?.querySelector('.filtertube-channel-name')?.textContent ||
-            `All ${collaborators.length} Collaborators`
+            `All ${Math.max(expectedTotal || 0, collaborators.length)} Collaborators`
     };
 
     multiStepSelectionState.set(groupId, state);
@@ -1956,31 +2361,137 @@ function isPlaceholderCollaboratorEntry(collaborator) {
     const label = (collaborator.handle || collaborator.name || '').trim();
     if (!label) return false;
     const normalized = label.replace(/^@+/, '').toLowerCase();
-    return COLLAB_PLACEHOLDER_NAME_PATTERN.test(normalized);
+    return COLLAB_PLACEHOLDER_NAME_PATTERN.test(normalized) || COLLAB_NON_CHANNEL_LABEL_PATTERN.test(normalized);
+}
+
+function buildCollaboratorAliasKeys(collaborator) {
+    if (!collaborator || typeof collaborator !== 'object') return [];
+
+    const keys = [];
+    const addKey = (type, value) => {
+        const normalized = typeof value === 'string' ? value.trim().toLowerCase() : '';
+        if (!normalized) return;
+        const key = `${type}:${normalized}`;
+        if (!keys.includes(key)) keys.push(key);
+    };
+
+    const normalizedId = normalizeUcIdForCollaborator(collaborator.id || '');
+    const normalizedHandle = normalizeHandleValue(collaborator.handle || '');
+    const normalizedCustom = normalizeCustomUrlForCollaborator(collaborator.customUrl || '');
+    const normalizedName = normalizeCollaboratorName(collaborator.name || '');
+
+    if (normalizedId) {
+        addKey('id', normalizedId);
+        const mappedHandle = resolveMappedHandleForId(normalizedId);
+        if (mappedHandle) addKey('handle', mappedHandle);
+    }
+    if (normalizedHandle) {
+        addKey('handle', normalizedHandle);
+        const mappedId = resolveMappedIdForHandle(normalizedHandle);
+        if (mappedId) addKey('id', mappedId);
+    }
+    if (normalizedCustom) addKey('custom', normalizedCustom);
+    if (normalizedName) addKey('name', normalizedName);
+
+    return keys;
+}
+
+function mergeCollaboratorIdentity(target, incoming) {
+    if (!target || !incoming) return target;
+    if (!target.id && incoming.id) target.id = incoming.id;
+    if (!target.handle && incoming.handle) target.handle = incoming.handle;
+    if (!target.customUrl && incoming.customUrl) target.customUrl = incoming.customUrl;
+    if (!target.name && incoming.name) target.name = incoming.name;
+
+    // Prefer keeping a human-readable non-handle name when both exist.
+    const targetLooksHandle = typeof target.name === 'string' && target.name.trim().startsWith('@');
+    const incomingLooksDisplayName = typeof incoming.name === 'string'
+        && incoming.name.trim()
+        && !incoming.name.trim().startsWith('@')
+        && !COLLAB_NON_CHANNEL_LABEL_PATTERN.test(incoming.name.trim().toLowerCase());
+    if (targetLooksHandle && incomingLooksDisplayName) {
+        target.name = incoming.name.trim();
+    }
+    const targetLooksWeakId = typeof target.name === 'string' && (
+        /^UC[\w-]{22}$/i.test(target.name.trim()) ||
+        /^[a-zA-Z0-9_-]{11}$/.test(target.name.trim()) ||
+        /^watch:[a-zA-Z0-9_-]{11}$/i.test(target.name.trim())
+    );
+    if (targetLooksWeakId && incomingLooksDisplayName) {
+        target.name = incoming.name.trim();
+    }
+
+    return target;
 }
 
 function sanitizeCollaboratorList(collaborators = []) {
     if (!Array.isArray(collaborators)) return [];
     const sanitized = [];
-    const seenKeys = new Set();
+    const aliasToIndex = new Map();
 
     collaborators.forEach(collab => {
         if (!collab || typeof collab !== 'object') return;
         const normalized = {
             name: (collab.name || '').trim(),
             handle: normalizeHandleValue(collab.handle),
-            id: typeof collab.id === 'string' ? collab.id.trim() : '',
-            customUrl: typeof collab.customUrl === 'string' ? collab.customUrl.trim() : ''
+            id: normalizeUcIdForCollaborator(collab.id || ''),
+            customUrl: normalizeCustomUrlForCollaborator(collab.customUrl || '')
         };
+
+        if (normalized.handle && !normalized.id) {
+            const mappedId = resolveMappedIdForHandle(normalized.handle);
+            if (mappedId) normalized.id = mappedId;
+        }
+        if (normalized.id && normalized.handle) {
+            const mappedIdFromHandle = resolveMappedIdForHandle(normalized.handle);
+            if (mappedIdFromHandle && mappedIdFromHandle !== normalized.id) {
+                // Handle alias conflicts with explicit UC ID. Keep UC ID as canonical identity.
+                normalized.handle = '';
+            }
+        }
 
         if (!normalized.name && !normalized.handle && !normalized.id && !normalized.customUrl) return;
         if (isPlaceholderCollaboratorEntry(normalized)) return;
 
-        const key = (normalized.id || normalized.handle || normalized.customUrl || normalized.name.toLowerCase());
-        if (!key || seenKeys.has(key)) return;
-        seenKeys.add(key);
+        const aliasKeys = buildCollaboratorAliasKeys(normalized);
+        if (aliasKeys.length === 0) return;
+
+        let existingIndex = -1;
+        for (const key of aliasKeys) {
+            if (!aliasToIndex.has(key)) continue;
+            existingIndex = aliasToIndex.get(key);
+            break;
+        }
+
+        if (existingIndex !== -1) {
+            const merged = mergeCollaboratorIdentity(sanitized[existingIndex], normalized);
+            sanitized[existingIndex] = merged;
+            const mergedKeys = buildCollaboratorAliasKeys(merged);
+            mergedKeys.forEach((key) => aliasToIndex.set(key, existingIndex));
+            return;
+        }
+
+        const nextIndex = sanitized.length;
         sanitized.push(normalized);
+        aliasKeys.forEach((key) => aliasToIndex.set(key, nextIndex));
     });
+
+    // If we already have a strong UC-ID roster, drop handle-only aliases that map to a different UC.
+    // This prevents VEVO/main-handle alias noise from inflating collaborator counts.
+    const ucIdSet = new Set(
+        sanitized
+            .map((entry) => normalizeUcIdForCollaborator(entry?.id || '').toLowerCase())
+            .filter(Boolean)
+    );
+    if (ucIdSet.size >= 2) {
+        return sanitized.filter((entry) => {
+            if (!entry || typeof entry !== 'object') return false;
+            if (entry.id) return true;
+            const mappedId = resolveMappedIdForHandle(entry.handle || '');
+            if (!mappedId) return true;
+            return ucIdSet.has(mappedId.toLowerCase());
+        });
+    }
 
     return sanitized;
 }
@@ -2445,6 +2956,31 @@ function applyResolvedCollaborators(videoId, collaborators, options = {}) {
                 card.setAttribute('data-filtertube-expected-collaborators', String(expected));
             }
         }
+
+        // Stamp primary collaborator identity so menu injection and quick-block labels
+        // stay stable even when DOM avatar stacks are absent.
+        const primary = sanitized[0] || null;
+        if (primary) {
+            const identity = {};
+            if (typeof primary.id === 'string' && /^UC[\w-]{22}$/i.test(primary.id.trim())) {
+                identity.id = primary.id.trim();
+            }
+            if (typeof primary.handle === 'string' && primary.handle.trim()) {
+                identity.handle = normalizeHandleValue(primary.handle);
+            }
+            if (typeof primary.customUrl === 'string' && primary.customUrl.trim()) {
+                identity.customUrl = primary.customUrl.trim();
+            }
+            if (typeof primary.name === 'string' && primary.name.trim() && !isLikelyNonChannelName(primary.name)) {
+                identity.name = primary.name.trim();
+            }
+            if (Object.keys(identity).length > 0) {
+                stampChannelIdentity(card, identity);
+            }
+            if (identity.id) {
+                persistVideoChannelMapping(videoId, identity.id);
+            }
+        }
     };
 
     if (cards.length > 0) {
@@ -2536,6 +3072,28 @@ function applyCollaboratorsByVideoId(videoId, collaborators, options = {}) {
         );
         if (expected > 0) {
             card.setAttribute('data-filtertube-expected-collaborators', String(expected));
+        }
+        const primary = sanitized[0] || null;
+        if (primary) {
+            const identity = {};
+            if (typeof primary.id === 'string' && /^UC[\w-]{22}$/i.test(primary.id.trim())) {
+                identity.id = primary.id.trim();
+            }
+            if (typeof primary.handle === 'string' && primary.handle.trim()) {
+                identity.handle = normalizeHandleValue(primary.handle);
+            }
+            if (typeof primary.customUrl === 'string' && primary.customUrl.trim()) {
+                identity.customUrl = primary.customUrl.trim();
+            }
+            if (typeof primary.name === 'string' && primary.name.trim() && !isLikelyNonChannelName(primary.name)) {
+                identity.name = primary.name.trim();
+            }
+            if (Object.keys(identity).length > 0) {
+                stampChannelIdentity(card, identity);
+            }
+            if (identity.id) {
+                persistVideoChannelMapping(videoId, identity.id);
+            }
         }
         updatedAnyCard = true;
     };
@@ -2862,16 +3420,95 @@ function handleMediaPlayback(element, shouldHide) {
 function extractCollaboratorMetadataFromRenderer(rendererCandidate) {
     if (!rendererCandidate || typeof rendererCandidate !== 'object') return [];
 
-    const extractFromShowDialogCommand = (showDialogCommand) => {
-        const listItems = showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems;
+    const extractListItemsFromSheetLikeCommand = (command) => {
+        if (!command || typeof command !== 'object') return [];
+        const listItems =
+            command?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems ||
+            command?.panelLoadingStrategy?.inlineContent?.sheetViewModel?.content?.listViewModel?.listItems ||
+            [];
+        return Array.isArray(listItems) ? listItems : [];
+    };
+
+    const extractFromSheetLikeCommand = (sheetCommand) => {
+        const listItems = extractListItemsFromSheetLikeCommand(sheetCommand);
         if (!Array.isArray(listItems) || listItems.length === 0) return [];
+
+        const parseCustomUrl = (value) => {
+            if (!value || typeof value !== 'string') return '';
+            const match = value.match(/\/(c|user)\/([^/?#]+)/);
+            if (!match || !match[1] || !match[2]) return '';
+            try {
+                return `${match[1]}/${decodeURIComponent(match[2])}`;
+            } catch (e) {
+                return `${match[1]}/${match[2]}`;
+            }
+        };
+
+        const pickBrowseEndpoint = (viewModel) => {
+            if (!viewModel || typeof viewModel !== 'object') return null;
+            const fromContext = (
+                viewModel?.rendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint ||
+                viewModel?.rendererContext?.commandContext?.onTap?.innertubeCommand?.command?.browseEndpoint ||
+                viewModel?.rendererContext?.commandContext?.onTap?.browseEndpoint ||
+                null
+            );
+            const commandRuns = Array.isArray(viewModel?.title?.commandRuns) ? viewModel.title.commandRuns : [];
+            let fromTitleRuns = null;
+            for (const run of commandRuns) {
+                const browse =
+                    run?.onTap?.innertubeCommand?.browseEndpoint ||
+                    run?.onTap?.innertubeCommand?.command?.browseEndpoint ||
+                    run?.onTap?.browseEndpoint ||
+                    null;
+                if (browse) {
+                    fromTitleRuns = browse;
+                    break;
+                }
+            }
+            const normalizeUc = (value) => {
+                const raw = typeof value === 'string' ? value.trim() : '';
+                return /^UC[\w-]{22}$/i.test(raw) ? raw : '';
+            };
+            const contextId = normalizeUc(fromContext?.browseId || '');
+            const titleId = normalizeUc(fromTitleRuns?.browseId || '');
+            const idsConflict = Boolean(contextId && titleId && contextId !== titleId);
+            const preferred = idsConflict ? fromContext : (fromTitleRuns || fromContext);
+            if (!preferred) return null;
+            return {
+                ...(fromContext || {}),
+                ...(fromTitleRuns || {}),
+                browseId: idsConflict
+                    ? (fromContext?.browseId || '')
+                    : (fromTitleRuns?.browseId || fromContext?.browseId || ''),
+                canonicalBaseUrl: idsConflict
+                    ? (fromContext?.canonicalBaseUrl || '')
+                    : (fromTitleRuns?.canonicalBaseUrl || fromContext?.canonicalBaseUrl || ''),
+                __idsConflict: idsConflict
+            };
+        };
+
+        const pickMetadataUrl = (viewModel) => {
+            const directUrl = viewModel?.rendererContext?.commandContext?.onTap?.innertubeCommand?.commandMetadata?.webCommandMetadata?.url ||
+                viewModel?.rendererContext?.commandContext?.onTap?.innertubeCommand?.command?.commandMetadata?.webCommandMetadata?.url ||
+                '';
+            if (directUrl) return directUrl;
+            const commandRuns = Array.isArray(viewModel?.title?.commandRuns) ? viewModel.title.commandRuns : [];
+            for (const run of commandRuns) {
+                const candidate = run?.onTap?.innertubeCommand?.commandMetadata?.webCommandMetadata?.url ||
+                    run?.onTap?.innertubeCommand?.command?.commandMetadata?.webCommandMetadata?.url ||
+                    run?.onTap?.commandMetadata?.webCommandMetadata?.url ||
+                    '';
+                if (candidate) return candidate;
+            }
+            return '';
+        };
 
         const collaborators = [];
         for (const item of listItems) {
             const viewModel = item?.listItemViewModel;
             if (!viewModel) continue;
 
-            const browseEndpoint = viewModel.rendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint;
+            const browseEndpoint = pickBrowseEndpoint(viewModel);
             const collab = {
                 name: viewModel.title?.content || '',
                 handle: '',
@@ -2897,6 +3534,18 @@ function extractCollaboratorMetadataFromRenderer(rendererCandidate) {
                 }
             }
 
+            if (!collab.customUrl) {
+                const metadataUrl = pickMetadataUrl(viewModel);
+                const parsedCustom = parseCustomUrl(metadataUrl);
+                if (parsedCustom) {
+                    collab.customUrl = parsedCustom;
+                }
+            }
+
+            if (browseEndpoint?.browseId?.startsWith?.('UC')) {
+                collab.id = browseEndpoint.browseId;
+            }
+
             if (!collab.handle && viewModel.subtitle?.content) {
                 const extracted = extractRawHandle(viewModel.subtitle.content);
                 if (extracted) {
@@ -2904,8 +3553,10 @@ function extractCollaboratorMetadataFromRenderer(rendererCandidate) {
                 }
             }
 
-            if (browseEndpoint?.browseId?.startsWith?.('UC')) {
-                collab.id = browseEndpoint.browseId;
+            if (browseEndpoint?.__idsConflict && collab.id && collab.handle) {
+                // Conflicting IDs in the same collaborator row (seen on some VEVO/music cards):
+                // keep UC ID as canonical identity and drop handle alias from the conflicting path.
+                collab.handle = '';
             }
 
             if (collab.name || collab.handle || collab.id) {
@@ -2940,13 +3591,15 @@ function extractCollaboratorMetadataFromRenderer(rendererCandidate) {
     const runs = Array.isArray(byline?.runs) ? byline.runs : [];
 
     for (const run of runs) {
+        const showSheetCommand = run.navigationEndpoint?.showSheetCommand;
         const showDialogCommand = run.navigationEndpoint?.showDialogCommand;
-        if (!showDialogCommand) continue;
+        const sheetLikeCommand = showSheetCommand || showDialogCommand;
+        if (!sheetLikeCommand) continue;
 
-        const listItems = showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems;
+        const listItems = extractListItemsFromSheetLikeCommand(sheetLikeCommand);
         if (!Array.isArray(listItems) || listItems.length === 0) continue;
 
-        const extracted = extractFromShowDialogCommand(showDialogCommand);
+        const extracted = extractFromSheetLikeCommand(sheetLikeCommand);
         if (extracted.length > 0) {
             Array.prototype.push.apply(collaborators, extracted);
         }
@@ -2963,8 +3616,9 @@ function extractCollaboratorMetadataFromRenderer(rendererCandidate) {
             if (!node || typeof node !== 'object' || visited.has(node) || depth > 10) return [];
             visited.add(node);
 
-            if (node.showDialogCommand) {
-                const extracted = extractFromShowDialogCommand(node.showDialogCommand);
+            const sheetLikeCommand = node.showSheetCommand || node.showDialogCommand;
+            if (sheetLikeCommand) {
+                const extracted = extractFromSheetLikeCommand(sheetLikeCommand);
                 if (extracted.length > 0) return extracted;
             }
 
@@ -3158,11 +3812,17 @@ function extractCollaboratorMetadataFromElement(element) {
         if (cacheTarget) {
             const existing = getCachedCollaboratorsFromCard(cacheTarget);
             if (existing.length > 0) {
-                const newScore = getCollaboratorListQuality(sanitized);
-                const existingScore = getCollaboratorListQuality(existing);
-                if (existingScore > newScore) {
-                    bestList = existing;
-                }
+                const merged = mergeCollaboratorLists(existing, sanitized);
+                const candidates = [sanitized, existing, merged];
+                bestList = candidates.reduce((best, candidate) => {
+                    if (!Array.isArray(candidate) || candidate.length === 0) return best;
+                    if (!Array.isArray(best) || best.length === 0) return candidate;
+                    if (candidate.length > best.length) return candidate;
+                    if (candidate.length < best.length) return best;
+                    return getCollaboratorListQuality(candidate) > getCollaboratorListQuality(best)
+                        ? candidate
+                        : best;
+                }, bestList);
             }
 
             if (bestList.length > 0) {
@@ -3356,8 +4016,14 @@ function extractCollaboratorMetadataFromElement(element) {
 
     if (collaborators.length > 0) {
         const missingIdentifiers = collaborators.some(c => !c.handle && !c.id && !c.customUrl);
+        const missingAlternateIdentity = collaborators.some(c =>
+            Boolean(c?.id) &&
+            !c?.handle &&
+            !c?.customUrl &&
+            !/\s-\stopic$/i.test(String(c?.name || '').trim())
+        );
         const needsMoreCollaborators = expectedCollaboratorCount > 0 && collaborators.length < expectedCollaboratorCount;
-        if (missingIdentifiers || needsMoreCollaborators) {
+        if (missingIdentifiers || missingAlternateIdentity || needsMoreCollaborators) {
             requiresDialogExtraction = true;
         }
     } else if (expectedCollaboratorCount > 0) {
@@ -3714,11 +4380,17 @@ function mergeCollaboratorsWithMainWorld(initialChannelInfo, mainWorldCollaborat
         const normalizedName = normalizeCollaboratorName(collaborator.name);
 
         let match = null;
-        if (normalizedHandle) {
-            match = tryMatch(candidate => candidate.handle && candidate.handle.toLowerCase() === normalizedHandle);
-        }
         if (!match && normalizedId) {
             match = tryMatch(candidate => candidate.id && candidate.id.toLowerCase() === normalizedId);
+        }
+        if (!match && normalizedHandle) {
+            match = tryMatch(candidate => {
+                const candidateHandle = candidate.handle && candidate.handle.toLowerCase();
+                if (!candidateHandle || candidateHandle !== normalizedHandle) return false;
+                if (!normalizedId) return true;
+                const candidateId = candidate.id && candidate.id.toLowerCase();
+                return !candidateId || candidateId === normalizedId;
+            });
         }
         if (!match && normalizedName) {
             match = tryMatch(candidate => normalizeCollaboratorName(candidate.name) === normalizedName);
@@ -3937,6 +4609,17 @@ function handleMainWorldMessages(event) {
         // Handle response from Main World with single-channel info
         const { requestId, channel, videoId } = payload || {};
         const pending = window.pendingChannelInfoRequests.get(requestId);
+
+        // Opportunistically persist id<->handle mappings learned from main-world lookups.
+        // This improves later UC->@handle enrichment in background without waiting for manual blocks.
+        try {
+            const cid = typeof channel?.id === 'string' ? channel.id.trim() : '';
+            const chandle = normalizeHandleValue(channel?.handle || '') || '';
+            if (cid && /^UC[\w-]{22}$/i.test(cid) && chandle && chandle.startsWith('@')) {
+                persistChannelMappings([{ id: cid, handle: chandle }]);
+            }
+        } catch (e) {
+        }
 
         if (pending) {
             clearTimeout(pending.timeoutId);
@@ -4184,7 +4867,7 @@ async function initializeDOMFallback(settings) {
             } catch (e) {
             }
         }
- const observer = new MutationObserver(mutations => {
+        const observer = new MutationObserver(mutations => {
             let hasNewContent = false;
             for (const mutation of mutations) {
                 if (mutation.addedNodes && mutation.addedNodes.length > 0) {
@@ -4226,12 +4909,19 @@ async function initializeDOMFallback(settings) {
 let watchPlaylistFallbackMenuInstalled = false;
 function ensureWatchPlaylistFallbackMenu() {
     if (watchPlaylistFallbackMenuInstalled) return;
-    watchPlaylistFallbackMenuInstalled = true;
+
+    const isWatchPage = () => {
+        try {
+            const path = document.location?.pathname || '';
+            return path.startsWith('/watch');
+        } catch (e) {
+            return false;
+        }
+    };
 
     const isWatchPlaylist = () => {
         try {
-            const path = document.location?.pathname || '';
-            if (!path.startsWith('/watch')) return false;
+            if (!isWatchPage()) return false;
             const params = new URLSearchParams(document.location?.search || '');
             return params.has('list');
         } catch (e) {
@@ -4239,10 +4929,24 @@ function ensureWatchPlaylistFallbackMenu() {
         }
     };
 
-    if (!isWatchPlaylist()) {
+    const isMobileWatchPage = () => {
+        try {
+            const host = String(document.location?.hostname || '').toLowerCase();
+            return isWatchPage() && (
+                host === 'm.youtube.com' ||
+                host.startsWith('m.youtube.') ||
+                host === 'music.youtube.com' ||
+                host.endsWith('.music.youtube.com')
+            );
+        } catch (e) {
+            return false;
+        }
+    };
+
+    if (!isWatchPage()) {
         document.addEventListener('yt-navigate-finish', () => {
             try {
-                if (isWatchPlaylist()) {
+                if (isWatchPage()) {
                     ensureWatchPlaylistFallbackMenu();
                 }
             } catch (e) {
@@ -4250,6 +4954,8 @@ function ensureWatchPlaylistFallbackMenu() {
         }, { once: true });
         return;
     }
+
+    watchPlaylistFallbackMenuInstalled = true;
 
     try {
         const styleId = 'filtertube-watch-playlist-fallback-menu-style';
@@ -4272,6 +4978,11 @@ function ensureWatchPlaylistFallbackMenu() {
                     align-items: center;
                     justify-content: center;
                     border-radius: 999px;
+                }
+                .filtertube-playlist-menu-fallback-btn--mobile {
+                    width: 28px;
+                    height: 28px;
+                    margin-left: 6px;
                 }
                 .filtertube-playlist-menu-fallback-btn:hover {
                     background: rgba(255, 255, 255, 0.10);
@@ -4302,6 +5013,34 @@ function ensureWatchPlaylistFallbackMenu() {
                     overflow: hidden;
                     text-overflow: ellipsis;
                     white-space: nowrap;
+                }
+                .filtertube-playlist-menu-fallback-popover .ft-menu-items {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 2px;
+                    max-height: 320px;
+                    overflow-y: auto;
+                    padding: 2px;
+                }
+                .filtertube-playlist-menu-fallback-popover .ft-menu-items ytm-menu-service-item-renderer,
+                .filtertube-playlist-menu-fallback-popover .ft-menu-items ytd-menu-service-item-renderer,
+                .filtertube-playlist-menu-fallback-popover .ft-menu-items yt-list-item-view-model {
+                    display: block;
+                }
+                .filtertube-playlist-menu-fallback-popover .ft-menu-items tp-yt-paper-item.filtertube-menu-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    width: 100%;
+                    padding: 8px 10px;
+                    box-sizing: border-box;
+                    cursor: pointer;
+                }
+                .filtertube-playlist-menu-fallback-popover .ft-menu-items .filtertube-menu-item {
+                    border-radius: 10px;
+                }
+                .filtertube-playlist-menu-fallback-popover .ft-menu-items .filtertube-menu-item:hover {
+                    background: rgba(255, 255, 255, 0.08);
                 }
                 .filtertube-playlist-menu-fallback-popover button.ft-action {
                     width: 100%;
@@ -4346,10 +5085,22 @@ function ensureWatchPlaylistFallbackMenu() {
     const rowHasNativeMenuButton = (row, menuHost) => {
         const root = menuHost || row;
         if (!root) return false;
-        try {
-            if (root.querySelector('ytd-menu-renderer, yt-icon-button.dropdown-trigger, button[aria-label*="Action menu"], button[aria-label*="More"]')) {
-                return true;
+        const isVisible = (el) => {
+            if (!el || !(el instanceof Element)) return false;
+            try {
+                const style = window.getComputedStyle(el);
+                if (!style || style.display === 'none' || style.visibility === 'hidden') return false;
+            } catch (e) {
             }
+            return true;
+        };
+        try {
+            const btn = root.querySelector(
+                'ytd-menu-renderer button[aria-label], ' +
+                'yt-icon-button.dropdown-trigger button, ' +
+                '#menu ytd-menu-renderer button[aria-label]'
+            );
+            if (isVisible(btn)) return true;
         } catch (e) {
         }
         return false;
@@ -4382,15 +5133,140 @@ function ensureWatchPlaylistFallbackMenu() {
                 <path fill="currentColor" d="M12 4a2 2 0 1 0 0 4a2 2 0 0 0 0-4Zm0 6a2 2 0 1 0 0 4a2 2 0 0 0 0-4Zm0 6a2 2 0 1 0 0 4a2 2 0 0 0 0-4Z"/>
             </svg>
         `;
-        btn.addEventListener('click', (e) => {
+        let lastOpenAt = 0;
+        const openFallback = (e) => {
             e.preventDefault();
             e.stopPropagation();
+            const now = Date.now();
+            if (now - lastOpenAt < 220) return;
+            lastOpenAt = now;
             try {
                 openFilterTubePlaylistFallbackPopover(btn, row);
             } catch (err) {
                 console.warn('FilterTube: Failed to open playlist fallback menu', err);
             }
-        }, true);
+        };
+        btn.addEventListener('pointerup', openFallback, true);
+        btn.addEventListener('click', openFallback, true);
+
+        try {
+            menuHost.appendChild(btn);
+        } catch (e) {
+        }
+    };
+
+    const ytmCardHasNativeMenuButton = (card) => {
+        if (!card) return false;
+        try {
+            if (card.getAttribute('data-has-overflow-menu') === 'false') {
+                return false;
+            }
+        } catch (e) {
+        }
+        const isVisible = (el) => {
+            if (!el || !(el instanceof Element)) return false;
+            try {
+                const style = window.getComputedStyle(el);
+                if (!style || style.display === 'none' || style.visibility === 'hidden') return false;
+            } catch (e) {
+            }
+            return true;
+        };
+        try {
+            const btn = card.querySelector(
+                'ytm-menu-renderer button[aria-label], ' +
+                'ytm-menu button[aria-label], ' +
+                '.menu-renderer button[aria-label], ' +
+                '.overflow-menu button[aria-label]'
+            );
+            if (isVisible(btn)) return true;
+        } catch (e) {
+        }
+        return false;
+    };
+
+    const getYtmFallbackMenuHost = (card) => {
+        if (!card) return null;
+        return card.querySelector(
+            '.YtmCompactMediaItemHost, ' +
+            '.ytmPlaylistPanelVideoRendererV2Host .YtmCompactMediaItemMetadata, ' +
+            '.watch-card-rich-header-call-to-actions-container, ' +
+            '.watch-card-rich-header-renderer, ' +
+            '.media-item-info, ' +
+            '.YtmCompactMediaItemMetadata, ' +
+            '.YtmCompactMediaItemMetadataContent, ' +
+            '.details'
+        ) || card;
+    };
+
+    const YTM_FALLBACK_ALLOWED_TAGS = new Set([
+        'ytm-compact-playlist-renderer',
+        'ytm-playlist-video-renderer',
+        'ytm-playlist-panel-video-renderer',
+        'ytm-playlist-panel-video-wrapper-renderer',
+        'ytm-compact-radio-renderer',
+        'ytm-radio-renderer',
+        'ytm-compact-channel-renderer'
+    ]);
+
+    const ensureFallbackButtonForYtmCard = (card) => {
+        if (!card || !(card instanceof Element)) return;
+        const tag = String(card.tagName || '').toLowerCase();
+        if (!YTM_FALLBACK_ALLOWED_TAGS.has(tag)) {
+            const isContextVideoCard = tag === 'ytm-video-with-context-renderer';
+            const hasPlaylistSignals = (() => {
+                try {
+                    if (card.closest('ytm-playlist-panel-video-renderer, ytm-playlist-panel-video-wrapper-renderer, ytm-playlist-video-renderer')) {
+                        return true;
+                    }
+                    const watchLinkWithList = card.querySelector('a[href*="/watch?v="][href*="list="], a[href*="start_radio=1"], a[href*="list=RD"]');
+                    return Boolean(watchLinkWithList);
+                } catch (e) {
+                    return false;
+                }
+            })();
+            if (!(isContextVideoCard && (hasPlaylistSignals || isMixCardElement(card)))) {
+                return;
+            }
+        }
+        const menuHost = getYtmFallbackMenuHost(card);
+        if (!menuHost) return;
+
+        if (ytmCardHasNativeMenuButton(card)) {
+            const existing = menuHost.querySelector('.filtertube-playlist-menu-fallback-btn[data-filtertube-fallback-menu="ytm"]');
+            if (existing) {
+                try { existing.remove(); } catch (e) { }
+            }
+            return;
+        }
+
+        if (menuHost.querySelector('.filtertube-playlist-menu-fallback-btn[data-filtertube-fallback-menu="ytm"]')) return;
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'filtertube-playlist-menu-fallback-btn filtertube-playlist-menu-fallback-btn--mobile';
+        btn.setAttribute('aria-label', 'FilterTube menu');
+        btn.setAttribute('data-filtertube-fallback-menu', 'ytm');
+        btn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path fill="currentColor" d="M12 4a2 2 0 1 0 0 4a2 2 0 0 0 0-4Zm0 6a2 2 0 1 0 0 4a2 2 0 0 0 0-4Zm0 6a2 2 0 1 0 0 4a2 2 0 0 0 0-4Z"/>
+            </svg>
+        `;
+        let lastOpenAt = 0;
+        const openFallback = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const now = Date.now();
+            if (now - lastOpenAt < 220) return;
+            lastOpenAt = now;
+            try {
+                openFilterTubePlaylistFallbackPopover(btn, card);
+            } catch (err) {
+                console.warn('FilterTube: Failed to open YTM fallback menu', err);
+            }
+        };
+        btn.addEventListener('pointerup', openFallback, true);
+        btn.addEventListener('click', openFallback, true);
 
         try {
             menuHost.appendChild(btn);
@@ -4399,12 +5275,33 @@ function ensureWatchPlaylistFallbackMenu() {
     };
 
     const scan = () => {
-        if (!isWatchPlaylist()) return;
-        const panel = document.querySelector('ytd-playlist-panel-renderer');
-        if (!panel) return;
-        const rows = panel.querySelectorAll('ytd-playlist-panel-video-renderer');
-        if (!rows || rows.length === 0) return;
-        rows.forEach(row => ensureFallbackButtonForRow(row));
+        if (!isWatchPage()) return;
+
+        if (isWatchPlaylist()) {
+            const panel = document.querySelector('ytd-playlist-panel-renderer');
+            if (panel) {
+                const rows = panel.querySelectorAll('ytd-playlist-panel-video-renderer');
+                if (rows && rows.length > 0) {
+                    rows.forEach(row => ensureFallbackButtonForRow(row));
+                }
+            }
+        }
+
+        if (isMobileWatchPage()) {
+            const ytmCards = document.querySelectorAll(
+                'ytm-compact-playlist-renderer, ' +
+                'ytm-playlist-video-renderer, ' +
+                'ytm-playlist-panel-video-renderer, ' +
+                'ytm-playlist-panel-video-wrapper-renderer, ' +
+                'ytm-compact-radio-renderer, ' +
+                'ytm-radio-renderer, ' +
+                'ytm-compact-channel-renderer, ' +
+                'ytm-video-with-context-renderer'
+            );
+            ytmCards.forEach(card => {
+                ensureFallbackButtonForYtmCard(card);
+            });
+        }
     };
 
     const observer = new MutationObserver(() => {
@@ -4413,13 +5310,27 @@ function ensureWatchPlaylistFallbackMenu() {
 
     const attach = () => {
         const panel = document.querySelector('ytd-playlist-panel-renderer');
-        if (!panel) return false;
-        try {
-            observer.observe(panel, { childList: true, subtree: true });
-        } catch (e) {
-            return false;
+        if (panel) {
+            try {
+                observer.observe(panel, { childList: true, subtree: true });
+            } catch (e) {
+                return false;
+            }
+            return true;
         }
-        return true;
+
+        if (isMobileWatchPage()) {
+            const root = document.body || document.documentElement;
+            if (!root) return false;
+            try {
+                observer.observe(root, { childList: true, subtree: true });
+            } catch (e) {
+                return false;
+            }
+            return true;
+        }
+
+        return false;
     };
 
     if (!attach()) {
@@ -4465,9 +5376,31 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
     pop.className = 'filtertube-playlist-menu-fallback-popover';
     pop.setAttribute('role', 'dialog');
     pop.setAttribute('aria-label', 'FilterTube menu');
+    pop.addEventListener('filtertube-force-close', () => {
+        try {
+            close();
+        } catch (e) {
+        }
+    });
 
     const ensuredVideoId = (() => {
-        try { return ensureVideoIdForCard(row) || ''; } catch (e) { return ''; }
+        try {
+            const tag = String(row?.tagName || '').toLowerCase();
+            const looksLikePlaylistRow = tag.includes('playlist') && !tag.includes('playlist-panel-video');
+            const playlistLink = row.querySelector?.(
+                'a[href*="list="]:not([href*="watch?v="]):not([href*="/shorts/"])'
+            );
+            if (looksLikePlaylistRow || playlistLink) {
+                const stampedVideoId = (typeof row?.getAttribute === 'function')
+                    ? (row.getAttribute('data-filtertube-video-id') || '')
+                    : '';
+                const extractedVideoId = stampedVideoId || extractVideoIdFromCard(row) || '';
+                return extractedVideoId;
+            }
+            return ensureVideoIdForCard(row) || '';
+        } catch (e) {
+            return '';
+        }
     })();
 
     let extracted = null;
@@ -4477,112 +5410,194 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
         extracted = null;
     }
 
+    const fallbackByline = row.querySelector(
+        '.YtmCompactMediaItemByline .yt-core-attributed-string, ' +
+        '.YtmCompactMediaItemByline, ' +
+        '#byline'
+    )?.textContent?.trim() || '';
+    const fallbackHeadlineAria = row.querySelector(
+        '.YtmCompactMediaItemHeadline [aria-label], ' +
+        '.YtmCompactMediaItemHeadline'
+    )?.getAttribute?.('aria-label') || '';
+    const isMixFallbackRow = isMixCardElement(row);
+    const normalizeFallbackName = (value) => {
+        const trimmed = typeof value === 'string' ? value.trim() : '';
+        if (!trimmed) return '';
+        if (isLikelyNonChannelName(trimmed)) return '';
+        if (isMixFallbackRow && trimmed.toLowerCase() === 'youtube') return '';
+        return trimmed;
+    };
+    const derivedExpectedName = deriveExpectedChannelName(fallbackByline)
+        || deriveExpectedChannelName(fallbackHeadlineAria)
+        || '';
+    const fallbackDisplayName = normalizeFallbackName(derivedExpectedName || fallbackByline || '');
+    const expectedNameForLookup = normalizeFallbackName(derivedExpectedName || '');
+    const hasBylineCollabHint = Boolean(/\b\d+\s+more\b/i.test(fallbackByline || fallbackHeadlineAria || ''));
+
     const title = (() => {
-        const name = extracted?.name || row.querySelector('#byline')?.textContent?.trim() || '';
+        const name = extracted?.name || fallbackDisplayName || '';
         const vid = ensuredVideoId || extracted?.videoId || '';
         const label = name ? `FilterTube: ${name}` : 'FilterTube';
         return vid ? `${label}` : label;
     })();
 
-    const action = document.createElement('button');
-    action.type = 'button';
-    action.className = 'ft-action';
-    action.textContent = 'Block channel';
-
-    const actionAll = document.createElement('button');
-    actionAll.type = 'button';
-    actionAll.className = 'ft-action';
-    actionAll.textContent = 'Block channel (Filter All)';
-
     const hint = document.createElement('div');
     hint.className = 'ft-hint';
-    hint.textContent = 'Fallback menu (YouTube 3-dot unavailable for this item).';
+    hint.textContent = 'Fallback menu (native 3-dot unavailable for this item).';
 
-    const performBlock = async (filterAll) => {
-        try {
-            let info = extracted || (extractChannelFromCard(row) || null);
-            let handle = typeof info?.handle === 'string' ? info.handle.trim() : '';
-            let id = typeof info?.id === 'string' ? info.id.trim() : '';
-            let customUrl = typeof info?.customUrl === 'string' ? info.customUrl.trim() : '';
-            let input = handle || customUrl || id;
+    const menuItemsHost = document.createElement('div');
+    menuItemsHost.className = 'ft-menu-items';
+    menuItemsHost.setAttribute('role', 'menu');
 
-            if (!input) {
-                // Playlist rows sometimes render without any channel link; try main-world lookup via videoId.
-                const expectedName = row.querySelector('#byline')?.textContent?.trim() || '';
-                const videoId = ensuredVideoId || (typeof info?.videoId === 'string' ? info.videoId.trim() : '');
-                if (videoId) {
-                    try {
-                        const resolved = await requestChannelInfoFromMainWorld(videoId, { expectedName });
-                        if (resolved) {
-                            info = { ...(info || {}), ...resolved, videoId };
-                            handle = typeof info.handle === 'string' ? info.handle.trim() : '';
-                            id = typeof info.id === 'string' ? info.id.trim() : '';
-                            customUrl = typeof info.customUrl === 'string' ? info.customUrl.trim() : '';
-                            input = handle || customUrl || id;
-                        }
-                    } catch (e) {
-                    }
-                }
-            }
-
-            if (!input) {
-                console.warn('FilterTube: Fallback menu could not extract channel identity');
-                close();
-                return;
-            }
-
-            const metaPayload = buildChannelMetadataPayload({
-                ...(info || {}),
-                videoId: ensuredVideoId || info?.videoId || null,
-                source: 'playlist_fallback_menu'
-            });
-
-            action.disabled = true;
-            actionAll.disabled = true;
-            const res = await addChannelDirectly(input, !!filterAll, null, null, metaPayload);
-            close();
-
-            if (res && res.success) {
-                try {
-                    const refreshed = await requestSettingsFromBackground();
-                    if (refreshed?.success && refreshed.settings) {
-                        currentSettings = refreshed.settings;
-                    }
-                } catch (e) {
-                }
-                try {
-                    if (typeof applyDOMFallback === 'function') {
-                        applyDOMFallback(null, { forceReprocess: true, preserveScroll: true });
-                    }
-                } catch (e) {
-                }
-            } else {
-                console.warn('FilterTube: Failed to block channel from fallback menu:', res?.error || 'unknown');
-            }
-        } catch (e) {
-            console.warn('FilterTube: Fallback block failed', e);
-            close();
-        }
+    const playlistIdFromRow = extractPlaylistIdFromElement(row);
+    const isPlaylistFallbackCard = Boolean(
+        extracted?.fetchStrategy === 'playlist' ||
+        extracted?.playlistId ||
+        playlistIdFromRow
+    );
+    let channelInfoForMenu = {
+        ...(extracted || {}),
+        source: extracted?.source || (isPlaylistFallbackCard ? 'ytm_playlist_card' : 'playlist_fallback_menu'),
+        fetchStrategy: isPlaylistFallbackCard ? 'playlist' : extracted?.fetchStrategy,
+        playlistId: extracted?.playlistId || playlistIdFromRow || '',
+        // For playlist cards we intentionally avoid using the thumbnail videoId (top video channel).
+        videoId: isPlaylistFallbackCard ? '' : (ensuredVideoId || extracted?.videoId || ''),
+        name: extracted?.name || fallbackDisplayName || ''
     };
 
-    action.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        performBlock(false);
-    }, true);
-    actionAll.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        performBlock(true);
-    }, true);
+    if (channelInfoForMenu.name) {
+        channelInfoForMenu.expectedChannelName = channelInfoForMenu.expectedChannelName || channelInfoForMenu.name;
+    }
+    if (!channelInfoForMenu.expectedChannelName && expectedNameForLookup) {
+        channelInfoForMenu.expectedChannelName = expectedNameForLookup;
+    }
+
+    // If we only have byline text, bootstrap a provisional collaboration roster.
+    // This covers:
+    // - "A and B" (explicit pair)
+    // - "A and 2 more" (partial list with hidden collaborators)
+    if (!isMixFallbackRow && (!Array.isArray(channelInfoForMenu.allCollaborators) || channelInfoForMenu.allCollaborators.length < 2) && fallbackDisplayName) {
+        try {
+            const parsed = parseCollaboratorNames(fallbackDisplayName);
+            const hasExplicitPair = parsed?.names?.length >= 2;
+            const hasHiddenTail = parsed?.names?.length >= 1 && parsed?.hasHiddenCollaborators;
+            if (hasExplicitPair || hasHiddenTail) {
+                const provisionalNames = Array.isArray(parsed.names) ? parsed.names.slice(0, 6) : [];
+                if (parsed.hasHiddenCollaborators && parsed.hiddenCount > 0) {
+                    const maxItems = Math.min(6, provisionalNames.length + parsed.hiddenCount);
+                    for (let i = provisionalNames.length; i < maxItems; i++) {
+                        provisionalNames.push(`Collaborator ${i + 1}`);
+                    }
+                }
+                channelInfoForMenu.isCollaboration = true;
+                channelInfoForMenu.allCollaborators = provisionalNames.map((name) => ({
+                    name,
+                    handle: '',
+                    id: '',
+                    customUrl: ''
+                }));
+                channelInfoForMenu.needsEnrichment = true;
+                channelInfoForMenu.expectedCollaboratorCount = Math.max(
+                    parsed.names.length + (parsed.hiddenCount || 0),
+                    parsed.names.length
+                );
+            }
+        } catch (e) {
+        }
+    }
+
+    // Allow block actions even when identity is weak by routing through watch:<videoId>.
+    if (!isPlaylistFallbackCard && !channelInfoForMenu.id && !channelInfoForMenu.handle && !channelInfoForMenu.customUrl && channelInfoForMenu.videoId) {
+        channelInfoForMenu.needsFetch = true;
+        channelInfoForMenu.fetchStrategy = 'mainworld';
+    }
+
+    const renderFallbackMenu = (info) => {
+        try {
+            renderFilterTubeMenuEntries({
+                dropdown: pop,
+                newMenuList: null,
+                oldMenuList: menuItemsHost,
+                channelInfo: info,
+                videoCard: row,
+                placeholder: Boolean(info?.isCollaboration && info?.needsEnrichment)
+            });
+        } catch (e) {
+            console.warn('FilterTube: Failed to render fallback menu entries', e);
+        }
+    };
 
     const titleEl = document.createElement('div');
     titleEl.className = 'ft-title';
     titleEl.textContent = title;
     pop.appendChild(titleEl);
-    pop.appendChild(action);
-    pop.appendChild(actionAll);
+    pop.appendChild(menuItemsHost);
     pop.appendChild(hint);
+
+    renderFallbackMenu(channelInfoForMenu);
+
+    const refreshFallbackIdentity = async () => {
+        try {
+            let nextInfo = { ...channelInfoForMenu };
+            let changed = false;
+
+            if (nextInfo.isCollaboration || nextInfo.needsEnrichment || hasBylineCollabHint) {
+                try {
+                    const expectedNames = [];
+                    if (fallbackDisplayName) expectedNames.push(fallbackDisplayName);
+                    if (nextInfo?.name) expectedNames.push(nextInfo.name);
+                    if (!nextInfo.videoId) {
+                        // Collaborator enrichment requires a videoId; playlist cards have none here.
+                        throw new Error('missing_video_id_for_collabs');
+                    }
+                    const collabs = await requestCollaboratorInfoFromMainWorld(nextInfo.videoId, { expectedNames });
+                    const sanitized = sanitizeCollaboratorList(collabs);
+                    if (sanitized.length >= 2) {
+                        nextInfo = {
+                            ...nextInfo,
+                            isCollaboration: true,
+                            allCollaborators: sanitized.slice(0, 6),
+                            needsEnrichment: false,
+                            expectedCollaboratorCount: Math.max(
+                                nextInfo.expectedCollaboratorCount || 0,
+                                sanitized.length
+                            )
+                        };
+                        changed = true;
+                    }
+                } catch (e) {
+                }
+            }
+
+            if (((!nextInfo.id && !nextInfo.handle && !nextInfo.customUrl) || nextInfo.needsFetch) && nextInfo.fetchStrategy !== 'playlist') {
+                try {
+                    if (!nextInfo.videoId) throw new Error('missing_video_id');
+                    const resolved = await requestChannelInfoFromMainWorld(nextInfo.videoId, {
+                        expectedName: nextInfo.expectedChannelName || expectedNameForLookup || ''
+                    });
+                    if (resolved) {
+                        nextInfo = {
+                            ...nextInfo,
+                            ...resolved,
+                            videoId: nextInfo.videoId,
+                            expectedChannelName: nextInfo.expectedChannelName || expectedNameForLookup || ''
+                        };
+                        changed = true;
+                    }
+                } catch (e) {
+                }
+            }
+
+            if (changed && playlistFallbackPopoverState?.popover === pop && pop.isConnected) {
+                channelInfoForMenu = nextInfo;
+                const refreshedName = pickMenuChannelDisplayName(channelInfoForMenu, {});
+                titleEl.textContent = refreshedName ? `FilterTube: ${refreshedName}` : 'FilterTube';
+                renderFallbackMenu(channelInfoForMenu);
+            }
+        } catch (e) {
+        }
+    };
+    refreshFallbackIdentity().catch(() => { });
 
     // Position: align right edge with the button, prefer below.
     const padding = 8;
@@ -4609,7 +5624,7 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
 }
 
 function injectCollaboratorPlaceholderMenu(newMenuList, oldMenuList, message = 'Fetching collaborators…') {
-    const blockAllMessage = 'Block All (pending…)';
+    const blockAllMessage = getAdaptiveMenuCopy().pendingAll;
     const newStructure = Boolean(newMenuList);
 
     const buildPlaceholderContent = (primaryText, secondaryText) => `
@@ -4642,16 +5657,21 @@ function injectCollaboratorPlaceholderMenu(newMenuList, oldMenuList, message = '
         newMenuList.insertBefore(makeItem(message, 'Please wait…'), newMenuList.firstChild);
         newMenuList.insertBefore(makeItem(blockAllMessage, 'Awaiting collaborator list'), newMenuList.firstChild?.nextSibling || null);
     } else if (oldMenuList) {
-        const menuList = oldMenuList.querySelector('tp-yt-paper-listbox') || oldMenuList;
+        const menuList = resolveMenuInsertionTarget(oldMenuList);
+        if (!menuList) return;
+        const isMobileMenu = isMobileMenuContainer(menuList, oldMenuList);
+        const rendererTag = isMobileMenu ? 'ytm-menu-service-item-renderer' : 'ytd-menu-service-item-renderer';
+        const rendererScope = isMobileMenu ? 'ytm-menu-popup-renderer' : 'ytd-menu-popup-renderer';
+        const itemScope = isMobileMenu ? 'ytm-menu-service-item-renderer' : 'ytd-menu-service-item-renderer';
         const makeItem = (primary, secondary) => {
-            const item = document.createElement('ytd-menu-service-item-renderer');
-            item.className = 'style-scope ytd-menu-popup-renderer filtertube-block-channel-item filtertube-collab-placeholder';
+            const item = document.createElement(rendererTag);
+            item.className = `style-scope ${rendererScope} filtertube-block-channel-item filtertube-collab-placeholder`;
             item.setAttribute('role', 'menuitem');
             item.setAttribute('tabindex', '-1');
             item.style.opacity = '0.6';
             item.style.pointerEvents = 'none';
             item.innerHTML = `
-                <tp-yt-paper-item class="style-scope ytd-menu-service-item-renderer filtertube-menu-item" role="option" tabindex="-1">
+                <tp-yt-paper-item class="style-scope ${itemScope} filtertube-menu-item" role="option" tabindex="-1">
                     ${buildPlaceholderContent(primary, secondary)}
                 </tp-yt-paper-item>
             `;
@@ -4751,13 +5771,14 @@ async function searchYtInitialDataForVideoChannel(videoId, options = null) {
         }
 
         if (typeof resolvedOptions.expectedName === 'string' && resolvedOptions.expectedName.trim()) {
+            const allowNameMismatch = resolvedOptions.allowNameMismatch === true;
             const normalizeName = (value) => {
                 if (!value || typeof value !== 'string') return '';
                 return value.trim().toLowerCase().replace(/\s+/g, ' ');
             };
             const normalizedExpectedName = normalizeName(resolvedOptions.expectedName);
             const normalizedFoundName = normalizeName(result.name);
-            if (normalizedExpectedName && normalizedFoundName && normalizedExpectedName !== normalizedFoundName) {
+            if (!allowNameMismatch && normalizedExpectedName && normalizedFoundName && normalizedExpectedName !== normalizedFoundName) {
                 console.warn('FilterTube: ytInitialData name mismatch, rejecting result', {
                     expected: normalizedExpectedName,
                     found: normalizedFoundName,
@@ -5481,12 +6502,304 @@ function extractChannelFromCard(card) {
 
     try {
         const cardTag = (card.tagName || '').toLowerCase();
+        const extractPlaylistOwnerFromRendererData = (rendererLike, playlistIdHint = '') => {
+            if (!rendererLike || typeof rendererLike !== 'object') return null;
+
+            const renderer =
+                rendererLike.compactPlaylistRenderer ||
+                rendererLike.content?.compactPlaylistRenderer ||
+                rendererLike.richItemRenderer?.content?.compactPlaylistRenderer ||
+                rendererLike.lockupViewModel ||
+                rendererLike.content?.lockupViewModel ||
+                rendererLike.richItemRenderer?.content?.lockupViewModel ||
+                null;
+            if (!renderer || typeof renderer !== 'object') return null;
+
+            const normalizedPlaylistHint = typeof playlistIdHint === 'string' ? playlistIdHint.trim() : '';
+            const rendererPlaylistId = typeof renderer?.playlistId === 'string' ? renderer.playlistId.trim() : '';
+            if (normalizedPlaylistHint && rendererPlaylistId && normalizedPlaylistHint !== rendererPlaylistId) {
+                return null;
+            }
+
+            const extractCustomUrlFromCanonical = (value) => {
+                if (!value || typeof value !== 'string') return '';
+                const decoded = decodeURIComponentSafe(value);
+                const m = decoded.match(/\/(c|user)\/([^/?#]+)/i);
+                if (!m || !m[1] || !m[2]) return '';
+                return `${m[1].toLowerCase()}/${m[2]}`;
+            };
+
+            const parseRunNavigationEndpoint = (run) => {
+                if (!run || typeof run !== 'object') return null;
+                const nav = run.navigationEndpoint || {};
+                const browse = nav.browseEndpoint || nav.command?.browseEndpoint || nav.innertubeCommand?.browseEndpoint || null;
+                const browseId = typeof browse?.browseId === 'string' ? browse.browseId.trim() : '';
+                const canonical = (
+                    browse?.canonicalBaseUrl ||
+                    nav?.commandMetadata?.webCommandMetadata?.url ||
+                    nav?.webCommandMetadata?.url ||
+                    ''
+                );
+                const handle = normalizeHandleValue(extractRawHandle(canonical) || '');
+                const customUrl = extractCustomUrlFromCanonical(canonical);
+                const text = typeof run.text === 'string' ? run.text.trim() : '';
+                return {
+                    id: browseId && browseId.startsWith('UC') ? browseId : '',
+                    handle,
+                    customUrl,
+                    name: text
+                        && !/^\s*playlist\s*$/i.test(text)
+                        && !/^\s*podcast\s*$/i.test(text)
+                        && !/^[•·]$/.test(text)
+                        ? text
+                        : ''
+                };
+            };
+
+            // compactPlaylistRenderer: shortBylineText/longBylineText carries owner endpoint.
+            const runs = [
+                ...(Array.isArray(renderer.shortBylineText?.runs) ? renderer.shortBylineText.runs : []),
+                ...(Array.isArray(renderer.longBylineText?.runs) ? renderer.longBylineText.runs : [])
+            ];
+            const candidates = runs
+                .map(parseRunNavigationEndpoint)
+                .filter(Boolean)
+                .filter(entry => entry.id || entry.handle || entry.customUrl);
+
+            // lockupViewModel: owner can be in metadataRows[*].metadataParts[*].text.commandRuns[*].onTap
+            if (candidates.length === 0) {
+                const metadataRows = renderer?.metadata?.lockupMetadataViewModel?.metadata?.contentMetadataViewModel?.metadataRows;
+                if (Array.isArray(metadataRows)) {
+                    for (const row of metadataRows) {
+                        const parts = Array.isArray(row?.metadataParts) ? row.metadataParts : [];
+                        for (const part of parts) {
+                            const commandRuns = Array.isArray(part?.text?.commandRuns) ? part.text.commandRuns : [];
+                            for (const cmd of commandRuns) {
+                                const onTap = cmd?.onTap;
+                                if (!onTap) continue;
+                                const pseudoRun = {
+                                    text: part?.text?.content || '',
+                                    navigationEndpoint: {
+                                        browseEndpoint: onTap?.innertubeCommand?.browseEndpoint,
+                                        commandMetadata: onTap?.innertubeCommand?.commandMetadata
+                                    }
+                                };
+                                const parsed = parseRunNavigationEndpoint(pseudoRun);
+                                if (parsed && (parsed.id || parsed.handle || parsed.customUrl)) {
+                                    candidates.push(parsed);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (candidates.length === 0) return null;
+
+            // Prefer entries with UC ID first; otherwise handle/custom.
+            candidates.sort((a, b) => {
+                const score = (x) => (x.id ? 3 : 0) + (x.handle ? 2 : 0) + (x.customUrl ? 1 : 0);
+                return score(b) - score(a);
+            });
+
+            return candidates[0];
+        };
+
+        // YTM compact playlist cards:
+        // Block the PLAYLIST CREATOR (owner), not the thumbnail's top video channel.
+        if (cardTag === 'ytm-compact-playlist-renderer') {
+            const playlistAvatarUrl = (() => {
+                const img = card.querySelector(
+                    'ytm-channel-thumbnail-with-link-renderer img, ' +
+                    'ytm-profile-icon img, ' +
+                    'yt-avatar-shape img, ' +
+                    'yt-img-shadow img'
+                );
+                if (!img) return '';
+                return (img.getAttribute('src') || img.src || '').trim();
+            })();
+
+            const playlistHref = card.querySelector('a[href^="/playlist?list="], a[href*="/playlist?list="]')?.getAttribute?.('href') || '';
+            const playlistId = (() => {
+                if (!playlistHref) return '';
+                const qs = playlistHref.split('?')[1] || '';
+                const params = new URLSearchParams(qs);
+                return params.get('list') || '';
+            })();
+            const inlineOwner = (() => {
+                const candidates = [
+                    card.data,
+                    card.data?.content,
+                    card.__data,
+                    card.__data?.data,
+                    card.__data?.item,
+                    card.__data?.data?.content
+                ];
+                for (const candidate of candidates) {
+                    const parsed = extractPlaylistOwnerFromRendererData(candidate, playlistId);
+                    if (parsed && (parsed.id || parsed.handle || parsed.customUrl)) {
+                        return parsed;
+                    }
+                }
+                return null;
+            })();
+
+            const bylineText = card.querySelector(
+                '.YtmBadgeAndBylineRendererItemByline .yt-core-attributed-string, ' +
+                '.YtmBadgeAndBylineRendererItemByline, ' +
+                '.YtmCompactMediaItemByline .yt-core-attributed-string, ' +
+                '.YtmCompactMediaItemByline'
+            )?.textContent?.trim() || '';
+
+            const creatorName = (() => {
+                const raw = (bylineText || '').trim();
+                if (!raw) return '';
+                const match = raw.match(/^(.+?)\s*[•·]\s*playlist\b/i);
+                if (!match || !match[1]) return '';
+                const candidate = match[1].trim();
+                if (!candidate || isLikelyNonChannelName(candidate)) return '';
+                return candidate;
+            })();
+
+            if (inlineOwner) {
+                return {
+                    handle: inlineOwner.handle || '',
+                    id: inlineOwner.id || '',
+                    customUrl: inlineOwner.customUrl || '',
+                    name: inlineOwner.name || creatorName || '',
+                    logo: playlistAvatarUrl || '',
+                    source: 'ytm_playlist_card',
+                    playlistId,
+                    needsFetch: false,
+                    fetchStrategy: 'playlist',
+                    expectedChannelName: creatorName || inlineOwner.name || null
+                };
+            }
+
+            // Sometimes YTM provides an owner link in the byline; prefer that.
+            const creatorLink = card.querySelector(
+                '.YtmBadgeAndBylineRendererItemByline a[href^="/@"], ' +
+                '.YtmBadgeAndBylineRendererItemByline a[href^="/channel/"], ' +
+                '.YtmBadgeAndBylineRendererItemByline a[href^="/c/"], ' +
+                '.YtmBadgeAndBylineRendererItemByline a[href^="/user/"], ' +
+                '.YtmCompactMediaItemByline a[href^="/@"], ' +
+                '.YtmCompactMediaItemByline a[href^="/channel/"], ' +
+                '.YtmCompactMediaItemByline a[href^="/c/"], ' +
+                '.YtmCompactMediaItemByline a[href^="/user/"]'
+            );
+            const creatorHref = creatorLink?.getAttribute?.('href') || '';
+            const creatorHandle = normalizeHandleValue(extractRawHandle(creatorHref) || '');
+            const creatorId = extractChannelIdFromString(creatorHref) || '';
+            const creatorCustomUrl = (() => {
+                const match = creatorHref.match(/\/(c|user)\/([^/?#]+)/);
+                if (match && match[1] && match[2]) {
+                    try {
+                        return `${match[1]}/${decodeURIComponent(match[2])}`;
+                    } catch (_) {
+                        return `${match[1]}/${match[2]}`;
+                    }
+                }
+                return '';
+            })();
+
+            if (creatorHandle || creatorId || creatorCustomUrl) {
+                const linkedText = creatorLink?.textContent?.trim() || '';
+                const linkedName = (() => {
+                    const raw = linkedText;
+                    if (!raw) return '';
+                    const match = raw.match(/^(.+?)\s*[•·]\s*playlist\b/i);
+                    if (match && match[1]) return match[1].trim();
+                    return raw;
+                })();
+                return {
+                    handle: creatorHandle || '',
+                    id: creatorId || '',
+                    customUrl: creatorCustomUrl || '',
+                    name: linkedName || creatorName || '',
+                    logo: playlistAvatarUrl || '',
+                    source: 'ytm_playlist_card',
+                    playlistId
+                };
+            }
+
+            if (playlistId) {
+                return {
+                    handle: '',
+                    id: '',
+                    customUrl: '',
+                    name: creatorName || '',
+                    logo: playlistAvatarUrl || '',
+                    source: 'ytm_playlist_card',
+                    playlistId,
+                    needsFetch: true,
+                    fetchStrategy: 'playlist',
+                    expectedChannelName: creatorName || null
+                };
+            }
+        }
+
+        // YTM lockup playlist cards can hide owner identity in inline lockupViewModel metadata rows.
+        // Prefer this over seed-video heuristics when the card points to a playlist.
+        if (cardTag === 'ytm-rich-item-renderer' || cardTag === 'yt-lockup-view-model') {
+            const playlistHref = card.querySelector('a[href^="/playlist?list="], a[href*="/playlist?list="]')?.getAttribute?.('href') || '';
+            if (playlistHref) {
+                const qs = playlistHref.split('?')[1] || '';
+                const params = new URLSearchParams(qs);
+                const playlistId = params.get('list') || '';
+
+                const inlineOwner = (() => {
+                    const candidates = [
+                        card.data,
+                        card.data?.content,
+                        card.data?.content?.lockupViewModel,
+                        card.__data,
+                        card.__data?.data,
+                        card.__data?.item,
+                        card.__data?.data?.content,
+                        card.__data?.data?.content?.lockupViewModel
+                    ];
+                    for (const candidate of candidates) {
+                        const parsed = extractPlaylistOwnerFromRendererData(candidate, playlistId);
+                        if (parsed && (parsed.id || parsed.handle || parsed.customUrl)) return parsed;
+                    }
+                    return null;
+                })();
+
+                if (inlineOwner) {
+                    const bylineText = card.querySelector(
+                        '.yt-content-metadata-view-model__metadata-row .yt-core-attributed-string, ' +
+                        '.yt-lockup-metadata-view-model .yt-core-attributed-string'
+                    )?.textContent?.trim() || '';
+                    const expectedChannelName = (() => {
+                        const raw = (bylineText || '').trim();
+                        const match = raw.match(/^(.+?)\s*[•·]\s*playlist\b/i);
+                        if (match && match[1]) return match[1].trim();
+                        return inlineOwner.name || '';
+                    })();
+                    return {
+                        handle: inlineOwner.handle || '',
+                        id: inlineOwner.id || '',
+                        customUrl: inlineOwner.customUrl || '',
+                        name: inlineOwner.name || expectedChannelName || '',
+                        logo: '',
+                        source: 'ytm_playlist_card',
+                        playlistId,
+                        needsFetch: false,
+                        fetchStrategy: 'playlist',
+                        expectedChannelName: expectedChannelName || null
+                    };
+                }
+            }
+        }
 
         const extractAvatarUrl = () => {
             const img = card.querySelector(
                 '#avatar img, ' +
                 'ytd-channel-name img, ' +
                 'ytd-video-owner-renderer img, ' +
+                'ytm-channel-thumbnail-with-link-renderer img, ' +
+                'ytm-slim-owner-renderer img, ' +
+                'ytm-profile-icon img, ' +
                 'yt-avatar-shape img, ' +
                 'yt-img-shadow img'
             );
@@ -5696,10 +7009,54 @@ function extractChannelFromCard(card) {
         // SPECIAL CASE: Mix cards (collection stacks / "My Mix")
         const isMixCard = isMixCardElement(card);
         if (isMixCard) {
+            const normalizeText = (value) => {
+                if (!value || typeof value !== 'string') return '';
+                return value.trim().toLowerCase().replace(/\s+/g, ' ');
+            };
+            const getHeadlineText = () => {
+                return card.querySelector(
+                    '.media-item-headline .yt-core-attributed-string, ' +
+                    '.YtmCompactMediaItemHeadline .yt-core-attributed-string, ' +
+                    '.YtmCompactMediaItemHeadline, ' +
+                    'h3.media-item-headline, h3'
+                )?.textContent?.trim() || '';
+            };
+            const isLikelyVideoTitle = (candidate) => {
+                if (!candidate || typeof candidate !== 'string') return false;
+                const normalizedCandidate = normalizeText(candidate);
+                if (!normalizedCandidate) return false;
+                const headline = normalizeText(getHeadlineText());
+                if (headline && normalizedCandidate === headline) return true;
+                const headlineAria = normalizeText(
+                    card.querySelector(
+                        '.media-item-headline [aria-label], .YtmCompactMediaItemHeadline [aria-label]'
+                    )?.getAttribute?.('aria-label') || ''
+                );
+                if (headlineAria && (headlineAria.startsWith(`${normalizedCandidate} by `) || headlineAria.startsWith(normalizedCandidate))) {
+                    return true;
+                }
+                return false;
+            };
             const deriveMixName = () => {
+                const bylineText = card.querySelector(
+                    '.YtmBadgeAndBylineRendererItemByline .yt-core-attributed-string, ' +
+                    '.YtmCompactMediaItemByline .yt-core-attributed-string, ' +
+                    '.YtmCompactMediaItemByline'
+                )?.textContent?.trim() || '';
+                if (bylineText) {
+                    const parsed = parseCollaboratorNames(bylineText);
+                    if (parsed.hasHiddenCollaborators && parsed.names.length > 0) {
+                        return parsed.names[0];
+                    }
+                    if (!isLikelyNonChannelName(bylineText) && !isLikelyVideoTitle(bylineText)) {
+                        return bylineText;
+                    }
+                }
                 const nameEl = card.querySelector(
                     '#channel-info ytd-channel-name a, ' +
                     '#channel-name #text a, ' +
+                    '.YtmBadgeAndBylineRendererItemByline a[href*="/@"], ' +
+                    '.YtmBadgeAndBylineRendererItemByline a[href*="/channel/"], ' +
                     'ytd-channel-name #text a'
                 );
                 const candidate = nameEl?.textContent?.trim() || '';
@@ -5707,6 +7064,7 @@ function extractChannelFromCard(card) {
                 const lower = candidate.toLowerCase();
                 if (lower.startsWith('mix') || lower.startsWith('my mix')) return '';
                 if (lower.includes('mix') && candidate.includes('–')) return '';
+                if (isLikelyVideoTitle(candidate)) return '';
                 return candidate;
             };
 
@@ -5768,7 +7126,7 @@ function extractChannelFromCard(card) {
                     const stamped = card.getAttribute('data-filtertube-channel-name') ||
                         card.querySelector('[data-filtertube-channel-name]')?.getAttribute('data-filtertube-channel-name') ||
                         '';
-                    if (stamped && !stamped.includes('•')) {
+                    if (stamped && !stamped.includes('•') && !isLikelyVideoTitle(stamped)) {
                         name = stamped;
                     }
                 }
@@ -5782,7 +7140,8 @@ function extractChannelFromCard(card) {
             card.tagName.toLowerCase() === 'ytd-post-renderer' ||
             card.tagName.toLowerCase() === 'ytm-post-renderer' ||
             card.tagName.toLowerCase() === 'ytm-backstage-post-renderer' ||
-            card.tagName.toLowerCase() === 'ytm-backstage-post-thread-renderer'
+            card.tagName.toLowerCase() === 'ytm-backstage-post-thread-renderer' ||
+            card.tagName.toLowerCase() === 'ytm-rich-section-renderer'
         );
 
         if (isPostCard) {
@@ -5863,19 +7222,25 @@ function extractChannelFromCard(card) {
 
         if (hasCollaborationSignal) {
             const hasMissingData = collaborators.some(c => !c.handle && !c.id && !c.customUrl);
+            const hasMissingAlternateIdentity = collaborators.some(c =>
+                Boolean(c?.id) &&
+                !c?.handle &&
+                !c?.customUrl &&
+                !/\s-\stopic$/i.test(String(c?.name || '').trim())
+            );
             const needsMoreCollaborators = expectedCount > 0 && collaborators.length < expectedCount;
 
             console.log('FilterTube: Collaboration detected through unified extraction:', {
                 count: collaborators.length,
                 expected: expectedCount,
-                needsEnrichment: hasMissingData || needsMoreCollaborators
+                needsEnrichment: hasMissingData || hasMissingAlternateIdentity || needsMoreCollaborators
             });
 
             return {
                 ...(collaborators[0] || {}),
                 isCollaboration: true,
                 allCollaborators: collaborators,
-                needsEnrichment: hasMissingData || needsMoreCollaborators,
+                needsEnrichment: hasMissingData || hasMissingAlternateIdentity || needsMoreCollaborators,
                 expectedCollaboratorCount: expectedCount,
                 videoId: videoId
             };
@@ -5886,13 +7251,70 @@ function extractChannelFromCard(card) {
             card.querySelector('[data-filtertube-channel-handle]')?.getAttribute('data-filtertube-channel-handle');
         const dataId = card.getAttribute('data-filtertube-channel-id') ||
             card.querySelector('[data-filtertube-channel-id]')?.getAttribute('data-filtertube-channel-id');
-        const isPlaylistPanelCard = (cardTag === 'ytd-playlist-panel-video-renderer' || cardTag === 'ytd-playlist-panel-video-wrapper-renderer');
+        const dataCustomUrl = card.getAttribute('data-filtertube-channel-custom') ||
+            card.querySelector('[data-filtertube-channel-custom]')?.getAttribute('data-filtertube-channel-custom') ||
+            '';
+        const isPlaylistPanelCard = (
+            cardTag === 'ytd-playlist-panel-video-renderer' ||
+            cardTag === 'ytd-playlist-panel-video-wrapper-renderer' ||
+            cardTag === 'ytm-playlist-panel-video-renderer' ||
+            cardTag === 'ytm-playlist-panel-video-wrapper-renderer'
+        );
+        const isCollectionPlaylistCard = (
+            cardTag === 'ytm-compact-playlist-renderer' ||
+            cardTag === 'ytm-compact-radio-renderer' ||
+            cardTag === 'ytm-radio-renderer'
+        );
+
+        const parseCustomUrlFromHref = (href) => {
+            if (!href || typeof href !== 'string') return '';
+            const match = href.match(/\/(c|user)\/([^/?#]+)/);
+            if (match && match[1] && match[2]) {
+                try {
+                    return `${match[1]}/${decodeURIComponent(match[2])}`;
+                } catch (e) {
+                    return `${match[1]}/${match[2]}`;
+                }
+            }
+            return '';
+        };
 
         if (dataHandle || dataId) {
             let name = null;
             let handle = dataHandle;
             let id = dataId;
+            let customUrl = dataCustomUrl;
             const videoIdHint = extractVideoIdFromCard(card) || '';
+            const playlistIdHint = isCollectionPlaylistCard ? extractPlaylistIdFromElement(card) : '';
+
+            if (isCollectionPlaylistCard) {
+                const explicitAuthorAnchor = card.querySelector(
+                    '.YtmCompactMediaItemByline a[href*="/@"], ' +
+                    '.YtmCompactMediaItemByline a[href*="/channel/UC"], ' +
+                    '.YtmCompactMediaItemByline a[href*="/c/"], ' +
+                    '.YtmCompactMediaItemByline a[href*="/user/"], ' +
+                    '.yt-content-metadata-view-model__metadata-row a[href*="/@"], ' +
+                    '.yt-content-metadata-view-model__metadata-row a[href*="/channel/UC"], ' +
+                    '.yt-content-metadata-view-model__metadata-row a[href*="/c/"], ' +
+                    '.yt-content-metadata-view-model__metadata-row a[href*="/user/"]'
+                );
+                const collectionNav = card.querySelector(
+                    'a[href*="/playlist?list="], a[href*="list=RD"], a[href*="start_radio=1"]'
+                );
+                if (!explicitAuthorAnchor && collectionNav) {
+                    // Recycled collection cards frequently inherit stale stamped IDs/handles.
+                    // When no explicit author link exists, force identity refresh from visible text.
+                    id = '';
+                    handle = '';
+                    customUrl = '';
+                    try {
+                        clearCachedChannelMetadata(card);
+                        card.removeAttribute('data-filtertube-channel-custom');
+                        card.removeAttribute('data-filtertube-channel-name');
+                    } catch (e) {
+                    }
+                }
+            }
 
             if (isPlaylistPanelCard) {
                 const mappedId = (() => {
@@ -5904,18 +7326,25 @@ function extractChannelFromCard(card) {
                     '#byline-container ytd-channel-name a[href*="/channel/"], ' +
                     '#byline-container ytd-channel-name a[href*="/c/"], ' +
                     '#byline-container ytd-channel-name a[href*="/user/"], ' +
-                    '#byline a[href*="/@"], #byline a[href*="/channel/"], #byline a[href*="/c/"], #byline a[href*="/user/"]'
+                    '#byline a[href*="/@"], #byline a[href*="/channel/"], #byline a[href*="/c/"], #byline a[href*="/user/"], ' +
+                    '.YtmCompactMediaItemByline a[href*="/@"], ' +
+                    '.YtmCompactMediaItemByline a[href*="/channel/"], ' +
+                    '.YtmCompactMediaItemByline a[href*="/c/"], ' +
+                    '.YtmCompactMediaItemByline a[href*="/user/"]'
                 );
                 const bylineHref = bylineAnchor?.getAttribute('href') || bylineAnchor?.href || '';
                 const bylineId = extractChannelIdFromString(bylineHref) || '';
                 const bylineHandle = normalizeHandleValue(extractRawHandle(bylineHref) || '');
+                const bylineCustomUrl = parseCustomUrlFromHref(bylineHref);
 
                 if (mappedId) {
                     id = mappedId;
                     handle = bylineHandle || '';
+                    if (!customUrl && bylineCustomUrl) customUrl = bylineCustomUrl;
                 } else if (bylineId || bylineHandle) {
                     id = bylineId || '';
                     handle = bylineHandle || '';
+                    if (!customUrl && bylineCustomUrl) customUrl = bylineCustomUrl;
                 } else {
                     // Playlist rows without explicit author links must not trust recycled stamped IDs/handles.
                     // They are rehydrated aggressively and can inherit channel identity from another row.
@@ -5940,10 +7369,19 @@ function extractChannelFromCard(card) {
             }
 
             // Playlist panel items often render the channel name as plain text (#byline), not a link.
-            if (!name && cardTag === 'ytd-playlist-panel-video-renderer') {
-                const bylineText = card.querySelector('#byline')?.textContent?.trim() || '';
+            if (!name && isPlaylistPanelCard) {
+                const bylineText = card.querySelector(
+                    '.YtmCompactMediaItemByline .yt-core-attributed-string, ' +
+                    '.YtmCompactMediaItemByline, ' +
+                    '#byline'
+                )?.textContent?.trim() || '';
                 if (bylineText && !bylineText.includes('•')) {
                     name = bylineText;
+                }
+                if (!name) {
+                    const ytmHeadlineAria = card.querySelector('.YtmCompactMediaItemHeadline [aria-label]')?.getAttribute('aria-label') || '';
+                    const derived = deriveExpectedChannelName(ytmHeadlineAria);
+                    if (derived) name = derived;
                 }
             }
 
@@ -5958,6 +7396,13 @@ function extractChannelFromCard(card) {
                 'ytd-video-meta-block ytd-channel-name a, ' +
                 '#byline-container ytd-channel-name a, ' +
                 'ytd-channel-name #text a, ' +
+                'ytm-slim-owner-renderer a, ' +
+                'ytm-channel-thumbnail-with-link-renderer a, ' +
+                '.watch-card-rich-header-text a, ' +
+                '.YtmCompactMediaItemByline a[href^="/@"], ' +
+                '.YtmCompactMediaItemByline a[href^="/channel/"], ' +
+                '.YtmCompactMediaItemByline a[href^="/c/"], ' +
+                '.YtmCompactMediaItemByline a[href^="/user/"], ' +
                 '.yt-content-metadata-view-model__metadata-row a[href^="/@"], ' +
                 '.yt-content-metadata-view-model__metadata-row a[href^="/channel/"], ' +
                 '.yt-content-metadata-view-model__metadata-row a[href^="/c/"], ' +
@@ -5986,6 +7431,10 @@ function extractChannelFromCard(card) {
                             id = ucMatch[1];
                         }
                     }
+                    if (!customUrl) {
+                        const hrefCustom = parseCustomUrlFromHref(href);
+                        if (hrefCustom) customUrl = hrefCustom;
+                    }
 
                     if (!handle) {
                         const inferred = extractRawHandle(href);
@@ -6000,6 +7449,15 @@ function extractChannelFromCard(card) {
                 const channelLinkWithAttr = card.querySelector('[data-filtertube-channel-handle], [data-filtertube-channel-id]');
                 if (channelLinkWithAttr) {
                     const candidateName = channelLinkWithAttr.textContent?.trim();
+                    const normalize = (value) => (typeof value === 'string' ? value.trim().toLowerCase().replace(/\s+/g, ' ') : '');
+                    const headlineText = normalize(
+                        card.querySelector(
+                            '.media-item-headline .yt-core-attributed-string, ' +
+                            '.YtmCompactMediaItemHeadline .yt-core-attributed-string, ' +
+                            '.YtmCompactMediaItemHeadline, h3.media-item-headline, h3'
+                        )?.textContent || ''
+                    );
+                    const normalizedCandidate = normalize(candidateName);
                     // Reject if it looks like overlay text (duration or "Now playing")
                     if (candidateName &&
                         !candidateName.includes('Now playing') &&
@@ -6008,7 +7466,8 @@ function extractChannelFromCard(card) {
                         !candidateName.includes('•') &&
                         !/\bviews?\b/i.test(candidateName) &&
                         !/\bago\b/i.test(candidateName) &&
-                        !/\bwatching\b/i.test(candidateName)) {
+                        !/\bwatching\b/i.test(candidateName) &&
+                        !(headlineText && normalizedCandidate === headlineText)) {
                         name = candidateName;
                     }
                 }
@@ -6037,13 +7496,78 @@ function extractChannelFromCard(card) {
                 }
             }
 
+            if (!name) {
+                const ytmBylineText = card.querySelector(
+                    '.YtmBadgeAndBylineRendererItemByline .yt-core-attributed-string, ' +
+                    '.YtmBadgeAndBylineRendererItemByline, ' +
+                    '.YtmCompactMediaItemByline .yt-core-attributed-string, ' +
+                    '.YtmCompactMediaItemByline'
+                )?.textContent?.trim() || '';
+                if (
+                    ytmBylineText &&
+                    !ytmBylineText.includes('•') &&
+                    !/\bviews?\b/i.test(ytmBylineText) &&
+                    !/\bago\b/i.test(ytmBylineText) &&
+                    !/\bwatching\b/i.test(ytmBylineText)
+                ) {
+                    name = ytmBylineText;
+                }
+            }
+
+            const isMixLikeCard = isMixCardElement(card);
+            if (isMixLikeCard) {
+                const mixBylineText = card.querySelector(
+                    '.YtmBadgeAndBylineRendererItemByline .yt-core-attributed-string, ' +
+                    '.YtmBadgeAndBylineRendererItemByline, ' +
+                    '.YtmCompactMediaItemByline .yt-core-attributed-string, ' +
+                    '.YtmCompactMediaItemByline'
+                )?.textContent?.trim() || '';
+                if (mixBylineText) {
+                    const parsedMixByline = parseCollaboratorNames(mixBylineText);
+                    if (parsedMixByline.hasHiddenCollaborators && parsedMixByline.names.length > 0) {
+                        name = parsedMixByline.names[0];
+                    } else if (
+                        !isLikelyNonChannelName(mixBylineText) &&
+                        !/^mix\b/i.test(mixBylineText) &&
+                        mixBylineText.toLowerCase() !== 'youtube'
+                    ) {
+                        name = mixBylineText;
+                    }
+                }
+            }
+
             const parsedCollaboratorsFromName = parseCollaboratorNames(name || '');
             const hasCollabDomSignal = Boolean(
                 card.querySelector('yt-avatar-stack-view-model, #attributed-channel-name')
             );
+            const avatarMatchesFirstOnly = (() => {
+                // Heuristic: for true collaborations the card avatar alt/aria usually matches the FIRST
+                // collaborator only (e.g. "Go to channel A"), while the byline string is "A and B".
+                // For single channels whose literal name includes "and" (e.g. "Salt and Pepper"),
+                // the avatar alt matches the FULL byline string, not just the first token.
+                if (!name || typeof name !== 'string') return false;
+                if (!parsedCollaboratorsFromName?.names || parsedCollaboratorsFromName.names.length < 2) return false;
+                const rawAlt = card.querySelector(
+                    'ytm-channel-thumbnail-with-link-renderer img[alt], ' +
+                    'ytm-profile-icon img[alt], ' +
+                    'yt-avatar-shape img[alt], ' +
+                    'yt-img-shadow img[alt], ' +
+                    '#avatar img[alt]'
+                )?.getAttribute?.('alt') || '';
+                const cleanedAlt = rawAlt.replace(/^Go to channel\s+/i, '').trim();
+                if (!cleanedAlt) return false;
+                const full = name.trim().toLowerCase();
+                const first = String(parsedCollaboratorsFromName.names[0] || '').trim().toLowerCase();
+                const altLower = cleanedAlt.toLowerCase();
+                if (!first) return false;
+                if (altLower !== first) return false;
+                return altLower !== full;
+            })();
             const hasCollabNameHint = Boolean(
-                parsedCollaboratorsFromName.hasHiddenCollaborators ||
-                (parsedCollaboratorsFromName.names.length >= 2 && (hasCollabDomSignal || isPlaylistPanelCard || cardTag.includes('lockup-view-model')))
+                !isMixLikeCard && (
+                    parsedCollaboratorsFromName.hasHiddenCollaborators ||
+                    (parsedCollaboratorsFromName.names.length >= 2 && (hasCollabDomSignal || avatarMatchesFirstOnly))
+                )
             );
 
             if (hasCollabNameHint) {
@@ -6085,8 +7609,23 @@ function extractChannelFromCard(card) {
                 };
             }
 
-            console.log('FilterTube: Extracted from data attribute:', { handle, id, name });
-            return { handle, id, name, logo: extractAvatarUrl() || '', videoId: videoIdHint || undefined };
+            console.log('FilterTube: Extracted from data attribute:', { handle, id, customUrl, name });
+            if (isCollectionPlaylistCard && playlistIdHint) {
+                return {
+                    handle,
+                    id,
+                    customUrl,
+                    name,
+                    logo: extractAvatarUrl() || '',
+                    videoId: '',
+                    source: 'ytm_playlist_card',
+                    playlistId: playlistIdHint,
+                    fetchStrategy: 'playlist',
+                    needsFetch: !id && !handle && !customUrl,
+                    expectedChannelName: name || null
+                };
+            }
+            return { handle, id, customUrl, name, logo: extractAvatarUrl() || '', videoId: videoIdHint || undefined };
         }
 
         // Method 3: Find channel link - PRIORITIZE specific metadata areas over generic selectors
@@ -6291,7 +7830,10 @@ function extractChannelFromCard(card) {
                         ...collaborators[0],
                         isCollaboration: true,
                         allCollaborators: collaborators,
-                        needsEnrichment: collaborators.some(c => !c.handle && !c.id),
+                        needsEnrichment: collaborators.some(c =>
+                            (!c.handle && !c.id)
+                            || (Boolean(c?.id) && !c?.handle && !c?.customUrl && !/\s-\stopic$/i.test(String(c?.name || '').trim()))
+                        ),
                         expectedCollaboratorCount: expectedCount,
                         videoId
                     };
@@ -6474,19 +8016,43 @@ function extractChannelFromCard(card) {
 
         const fallbackVideoId = ensureVideoIdForCard(card);
         if (fallbackVideoId) {
-            const fallbackName = card.querySelector(
+            const fallbackNameRaw = card.querySelector(
                 '#channel-info ytd-channel-name a, ' +
                 '#channel-info #channel-name a, ' +
-                '.yt-lockup-metadata-view-model__metadata a[href*="/@"]'
+                '.yt-lockup-metadata-view-model__metadata a[href*="/@"], ' +
+                '.YtmBadgeAndBylineRendererItemByline .yt-core-attributed-string, ' +
+                '.YtmCompactMediaItemByline .yt-core-attributed-string, ' +
+                '.YtmCompactMediaItemByline, ' +
+                '.YtmCompactMediaItemMetadata a, ' +
+                'ytm-slim-owner-renderer a, ' +
+                '.watch-card-rich-header-text a'
             )?.textContent?.trim() || '';
-            const fallbackHandleHref = card.querySelector('.yt-core-attributed-string__link[href*="/@"]')?.getAttribute('href') || '';
+            const fallbackHeadlineAria = card.querySelector('.YtmCompactMediaItemHeadline [aria-label]')?.getAttribute('aria-label') || '';
+            const fallbackName = deriveExpectedChannelName(fallbackNameRaw)
+                || deriveExpectedChannelName(fallbackHeadlineAria)
+                || '';
+            const playlistOwnerFromByline = (() => {
+                const raw = (fallbackNameRaw || '').trim();
+                if (!raw) return '';
+                const match = raw.match(/^(.+?)\s*[•·]\s*playlist\b/i);
+                if (!match || !match[1]) return '';
+                const candidate = match[1].trim();
+                if (!candidate || isLikelyNonChannelName(candidate)) return '';
+                return candidate;
+            })();
+            const fallbackHandleHref = card.querySelector(
+                'ytm-channel-thumbnail-with-link-renderer a[href*="/@"], ' +
+                'ytm-slim-owner-renderer a[href*="/@"], ' +
+                '.watch-card-rich-header-text a[href*="/@"], ' +
+                '.yt-core-attributed-string__link[href*="/@"]'
+            )?.getAttribute('href') || '';
             const fallbackHandle = extractRawHandle(fallbackHandleHref);
             console.log('FilterTube: Falling back to main-world lookup for video:', fallbackVideoId, 'expectedName:', fallbackName || 'n/a');
             return {
                 videoId: fallbackVideoId,
                 needsFetch: true,
                 fetchStrategy: 'mainworld',
-                expectedChannelName: fallbackName || null,
+                expectedChannelName: fallbackName || playlistOwnerFromByline || null,
                 expectedHandle: fallbackHandle || null
             };
         }
@@ -6505,6 +8071,19 @@ function extractChannelFromCard(card) {
  */
 async function injectFilterTubeMenuItem(dropdown, videoCard) {
     if (!dropdown || !videoCard) return;
+    const isYtmTriggerWrapper = (() => {
+        try {
+            const tag = String(dropdown?.tagName || '').toLowerCase();
+            return tag === 'ytm-bottom-sheet-renderer' || tag === 'ytm-menu-renderer' || tag === 'ytm-menu';
+        } catch (e) {
+            return false;
+        }
+    })();
+    if (isYtmTriggerWrapper) {
+        // On YTM this host wraps the trigger button. The actual menu dialog appears as
+        // body-level `bottom-sheet-container` and is handled when that container appears.
+        return;
+    }
 
     try {
         if (currentSettings?.listMode === 'whitelist') return;
@@ -6539,6 +8118,7 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
     } else if (initialChannelInfo.handleDisplay) {
         applyHandleMetadata(initialChannelInfo, initialChannelInfo.handleDisplay, { force: true });
     }
+
     // If YouTube recycled this card, ensure stale channel attrs are cleared, then re-extract.
     if (initialChannelInfo && videoCard && !isCommentContextCard) {
         const currentVideoId = extractVideoIdFromCard(videoCard);
@@ -6554,35 +8134,61 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
         }
     }
     if (!isCommentContextCard) {
-        // Prefer fresh DOM identifiers over any cached collaborator-derived data
-        const domHandleAttr = videoCard.getAttribute('data-filtertube-channel-handle') ||
-            videoCard.querySelector('[data-filtertube-channel-handle]')?.getAttribute('data-filtertube-channel-handle');
-        const domIdAttr = videoCard.getAttribute('data-filtertube-channel-id') ||
-            videoCard.querySelector('[data-filtertube-channel-id]')?.getAttribute('data-filtertube-channel-id');
+        const isPlaylistCreatorFlow = Boolean(
+            initialChannelInfo?.fetchStrategy === 'playlist' ||
+            initialChannelInfo?.source === 'ytm_playlist_card' ||
+            initialChannelInfo?.playlistId
+        );
+
+        // Prefer fresh DOM identifiers over any cached collaborator-derived data.
+        //
+        // IMPORTANT: Playlist collection cards must block the PLAYLIST CREATOR. Those cards are often
+        // stamped with a thumbnail seed videoId and then later get a seed channel-id via video→channel
+        // stamping. Never allow those stamped IDs/handles to overwrite playlist creator intent.
         const domNameAttr = videoCard.getAttribute('data-filtertube-channel-name') ||
             videoCard.querySelector('[data-filtertube-channel-name]')?.getAttribute('data-filtertube-channel-name');
-        const domHandleCandidate =
-            extractRawHandle(domHandleAttr) ||
-            extractRawHandle(
-                videoCard
-                    .querySelector('#channel-info ytd-channel-name a[href*="/@"], ytd-channel-name #text a[href*="/@"]')
-                    ?.getAttribute('href') || ''
-            ) ||
-            extractRawHandle(
-                videoCard.querySelector('a#thumbnail[data-filtertube-channel-handle]')?.getAttribute('data-filtertube-channel-handle') || ''
-            );
 
-        if (domHandleCandidate) {
-            applyHandleMetadata(initialChannelInfo, domHandleCandidate, { force: true });
-        }
+        if (!isPlaylistCreatorFlow) {
+            const domHandleAttr = videoCard.getAttribute('data-filtertube-channel-handle') ||
+                videoCard.querySelector('[data-filtertube-channel-handle]')?.getAttribute('data-filtertube-channel-handle');
+            const domIdAttr = videoCard.getAttribute('data-filtertube-channel-id') ||
+                videoCard.querySelector('[data-filtertube-channel-id]')?.getAttribute('data-filtertube-channel-id');
 
-        const domId = domIdAttr ||
-            extractChannelIdFromString(
-                videoCard.querySelector('#channel-info ytd-channel-name a[href*="/channel/UC"], a#thumbnail[href*="/channel/UC"]')?.getAttribute('href') || ''
-            );
+            const domHandleCandidate =
+                extractRawHandle(domHandleAttr) ||
+                extractRawHandle(
+                    videoCard
+                        .querySelector(
+                            '#channel-info ytd-channel-name a[href*="/@"], ' +
+                            'ytd-channel-name #text a[href*="/@"], ' +
+                            'ytm-channel-thumbnail-with-link-renderer a[href*="/@"], ' +
+                            'ytm-slim-owner-renderer a[href*="/@"], ' +
+                            '.watch-card-rich-header-text a[href*="/@"]'
+                        )
+                        ?.getAttribute('href') || ''
+                ) ||
+                extractRawHandle(
+                    videoCard.querySelector('a#thumbnail[data-filtertube-channel-handle]')?.getAttribute('data-filtertube-channel-handle') || ''
+                );
 
-        if (domId) {
-            initialChannelInfo.id = domId;
+            if (domHandleCandidate) {
+                applyHandleMetadata(initialChannelInfo, domHandleCandidate, { force: true });
+            }
+
+            const domId = domIdAttr ||
+                extractChannelIdFromString(
+                    videoCard.querySelector(
+                        '#channel-info ytd-channel-name a[href*="/channel/UC"], ' +
+                        'a#thumbnail[href*="/channel/UC"], ' +
+                        'ytm-channel-thumbnail-with-link-renderer a[href*="/channel/UC"], ' +
+                        'ytm-slim-owner-renderer a[href*="/channel/UC"], ' +
+                        '.watch-card-rich-header-text a[href*="/channel/UC"]'
+                    )?.getAttribute('href') || ''
+                );
+
+            if (domId) {
+                initialChannelInfo.id = domId;
+            }
         }
 
         if (domNameAttr && (!initialChannelInfo.name || typeof initialChannelInfo.name !== 'string' || !initialChannelInfo.name.trim())) {
@@ -6597,6 +8203,35 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
     }
 
     console.log('FilterTube: Initial channel info:', initialChannelInfo);
+
+    const isMixCardContext = (() => {
+        try {
+            return !isCommentContextCard && typeof isMixCardElement === 'function' && isMixCardElement(videoCard);
+        } catch (e) {
+            return false;
+        }
+    })();
+
+    if (isMixCardContext) {
+        try {
+            videoCard?.removeAttribute('data-filtertube-collaborators');
+            videoCard?.removeAttribute('data-filtertube-collaborators-source');
+            videoCard?.removeAttribute('data-filtertube-collaborators-ts');
+            videoCard?.removeAttribute('data-filtertube-expected-collaborators');
+            videoCard?.removeAttribute('data-filtertube-collab-state');
+            videoCard?.removeAttribute('data-filtertube-collab-awaiting-dialog');
+        } catch (e) {
+        }
+        if (initialChannelInfo?.isCollaboration) {
+            initialChannelInfo = {
+                ...initialChannelInfo,
+                isCollaboration: false,
+                allCollaborators: [],
+                needsEnrichment: false,
+                expectedCollaboratorCount: 0
+            };
+        }
+    }
 
     if (initialChannelInfo.isCollaboration) {
         // Use validated cache to prevent stale data from DOM element recycling
@@ -6615,11 +8250,26 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
     // Ensure the card is stamped with a videoId before requesting enrichment so
     // the main world can reliably hydrate collaborators via DOM.
     if (!isCommentContextCard) {
-        if (initialChannelInfo.videoId) {
+        // IMPORTANT: For playlist cards we must not backfill a thumbnail videoId and then
+        // resolve the top video's channel. Playlists block the playlist creator.
+        const isPlaylistCreatorFlow = initialChannelInfo?.fetchStrategy === 'playlist' || Boolean(initialChannelInfo?.playlistId);
+        if (isPlaylistCreatorFlow) {
+            // Defensive: playlist cards should never carry a seed thumbnail videoId/channel stamp.
+            // Clear any stale stamps so quick-block and future passes can't accidentally treat this
+            // playlist as a video card.
+            try {
+                videoCard.removeAttribute('data-filtertube-video-id');
+                videoCard.removeAttribute('data-filtertube-channel-id');
+                videoCard.removeAttribute('data-filtertube-channel-handle');
+                videoCard.removeAttribute('data-filtertube-channel-custom');
+            } catch (e) {
+            }
+        }
+        if (!isPlaylistCreatorFlow && initialChannelInfo.videoId) {
             if (!videoCard.getAttribute('data-filtertube-video-id')) {
                 videoCard.setAttribute('data-filtertube-video-id', initialChannelInfo.videoId);
             }
-        } else {
+        } else if (!isPlaylistCreatorFlow) {
             const ensuredVideoId = ensureVideoIdForCard(videoCard);
             if (ensuredVideoId) {
                 initialChannelInfo.videoId = ensuredVideoId;
@@ -6633,8 +8283,7 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
             return /^UC[a-zA-Z0-9_-]{22}$/.test(value.trim());
         };
         const isHandleLike = (value) => {
-            if (!value || typeof value !== 'string') return false;
-            return value.trim().startsWith('@');
+            return Boolean(normalizeHandleValue(value || ''));
         };
 
         const hasVideoId = typeof initialChannelInfo.videoId === 'string' && initialChannelInfo.videoId.trim();
@@ -6647,7 +8296,13 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
         // recycled DOM nodes and cause identity overrides.
         const missingIdentityBits = !initialChannelInfo.id;
 
-        if (!isCommentContextCard && initialChannelInfo.source !== 'comments' && !initialChannelInfo.isCollaboration && hasVideoId && missingIdentityBits) {
+        if (!isCommentContextCard
+            && initialChannelInfo.source !== 'comments'
+            && !initialChannelInfo.isCollaboration
+            && initialChannelInfo.fetchStrategy !== 'playlist'
+            && hasVideoId
+            && missingIdentityBits
+        ) {
             initialChannelInfo.needsFetch = true;
             initialChannelInfo.fetchStrategy = 'mainworld';
             if (!initialChannelInfo.expectedHandle && initialChannelInfo.handle) {
@@ -6699,20 +8354,7 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
             const checkMenu = () => {
                 // Detect menu structure type (new vs old) - COMPREHENSIVE DETECTION
                 const newMenuList = dropdown.querySelector('yt-list-view-model');
-                const oldMenuList = dropdown.querySelector(
-                    'tp-yt-paper-listbox#items, ' +
-                    'tp-yt-paper-listbox, ' +
-                    'div.menu-content[role="dialog"], ' +
-                    'ytm-menu-popup-renderer, ' +
-                    'ytm-menu-service-item-renderer, ' +
-                    '#items.ytm-menu-popup-renderer, ' +
-                    '#items.style-scope.ytm-menu-popup-renderer, ' +
-                    'bottom-sheet-container, ' +
-                    'ytd-menu-popup-renderer, ' +
-                    'ytd-menu-service-item-renderer, ' +
-                    '#items.ytd-menu-popup-renderer, ' +
-                    '#items.style-scope.ytd-menu-popup-renderer'
-                );
+                const oldMenuList = resolveOldMenuContainer(dropdown);
 
                 if (newMenuList || oldMenuList) {
                     console.log('FilterTube: Menu detected - newMenuList:', !!newMenuList, 'oldMenuList:', !!oldMenuList);
@@ -6781,20 +8423,7 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
         if (status !== 'closed') {
             await waitForNextFrameDelay(250);
             const retryNew = dropdown.querySelector('yt-list-view-model');
-            const retryOld = dropdown.querySelector(
-                'tp-yt-paper-listbox#items, ' +
-                'tp-yt-paper-listbox, ' +
-                'div.menu-content[role="dialog"], ' +
-                'ytm-menu-popup-renderer, ' +
-                'ytm-menu-service-item-renderer, ' +
-                '#items.ytm-menu-popup-renderer, ' +
-                '#items.style-scope.ytm-menu-popup-renderer, ' +
-                'bottom-sheet-container, ' +
-                'ytd-menu-popup-renderer, ' +
-                'ytd-menu-service-item-renderer, ' +
-                '#items.ytd-menu-popup-renderer, ' +
-                '#items.style-scope.ytd-menu-popup-renderer'
-            );
+            const retryOld = resolveOldMenuContainer(dropdown);
             if (retryNew || retryOld) {
                 console.log('FilterTube: Menu detected on delayed retry');
                 return await injectFilterTubeMenuItem(dropdown, videoCard);
@@ -6848,7 +8477,7 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
         }
     }
 
-    if (!initialChannelInfo.isCollaboration && videoId) {
+    if (!isMixCardContext && !initialChannelInfo.isCollaboration && videoId) {
         const cachedResolved = resolvedCollaboratorsByVideoId.get(videoId);
         const hasCollabDomSignal = (() => {
             try {
@@ -6897,16 +8526,18 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
         if (cachedResolved && cachedResolved.length > 0) {
             const sanitizedResolved = sanitizeCollaboratorList(cachedResolved);
             const sanitizedCard = sanitizeCollaboratorList(cardCollaborators);
-
-            // Choose the list with MORE collaborators; if equal length, fall back
-            // to the one with higher quality score.
-            if (sanitizedResolved.length > sanitizedCard.length ||
-                (sanitizedResolved.length === sanitizedCard.length &&
-                    getCollaboratorListQuality(sanitizedResolved) > getCollaboratorListQuality(sanitizedCard))) {
-                sanitizedCollaborators = sanitizedResolved;
-            } else {
-                sanitizedCollaborators = sanitizedCard;
-            }
+            const mergedResolvedFirst = mergeCollaboratorLists(sanitizedResolved, sanitizedCard);
+            const mergedCardFirst = mergeCollaboratorLists(sanitizedCard, sanitizedResolved);
+            const candidates = [sanitizedResolved, sanitizedCard, mergedResolvedFirst, mergedCardFirst];
+            sanitizedCollaborators = candidates.reduce((best, candidate) => {
+                if (!Array.isArray(candidate) || candidate.length === 0) return best;
+                if (!Array.isArray(best) || best.length === 0) return candidate;
+                if (candidate.length > best.length) return candidate;
+                if (candidate.length < best.length) return best;
+                return getCollaboratorListQuality(candidate) > getCollaboratorListQuality(best)
+                    ? candidate
+                    : best;
+            }, []);
         } else {
             sanitizedCollaborators = sanitizeCollaboratorList(cardCollaborators);
         }
@@ -7024,8 +8655,9 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
             }
         })();
 
-        // For shorts, fetch channel info from shorts URL
-        if (initialChannelInfo.needsFetch && initialChannelInfo.videoId) {
+        // For cards that need enrichment, resolve identity without causing noisy network fetches.
+        // For shorts / video cards, fetch channel info from main-world ytInitialData
+        if (initialChannelInfo.needsFetch && initialChannelInfo.videoId && initialChannelInfo.fetchStrategy !== 'playlist') {
             // During menu hover/open we must avoid network fetches (these can trigger
             // google.com/sorry throttling). Prefer main-world ytInitialData only.
             const fetchStrategy = initialChannelInfo.fetchStrategy || 'mainworld';
@@ -7108,6 +8740,7 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
                 if (/\bago\b/i.test(trimmed)) return true;
                 if (/\bwatching\b/i.test(trimmed)) return true;
                 if (isUcIdLike(trimmed)) return true;
+                if (/^uc[a-z0-9_-]{6,}$/i.test(trimmed)) return true;
                 const lower = trimmed.toLowerCase();
                 if (lower === 'channel') return true;
                 if (lower.startsWith('mix')) return true;
@@ -7296,6 +8929,7 @@ function injectIntoNewMenu(menuList, channelInfo, videoCard, collaborationMetada
 
     // Build channel display name
     const channelName = escapeHtml(pickMenuChannelDisplayName(channelInfo, injectionOptions));
+    const menuCopy = getAdaptiveMenuCopy();
 
     filterTubeItem.innerHTML = `
         <div class="yt-list-item-view-model__label yt-list-item-view-model__container yt-list-item-view-model__container--compact yt-list-item-view-model__container--tappable yt-list-item-view-model__container--in-popup filtertube-menu-item">
@@ -7310,7 +8944,7 @@ function injectIntoNewMenu(menuList, channelInfo, videoCard, collaborationMetada
                         <span class="filtertube-channel-name">${channelName}</span>
                     </span>
                     <div class="filtertube-filter-all-toggle exact-toggle toggle-variant-red">
-                        Filter All
+                        ${menuCopy.filterAllToggle}
                     </div>
                 </div>
             </div>
@@ -7390,13 +9024,10 @@ function injectIntoNewMenu(menuList, channelInfo, videoCard, collaborationMetada
  * Inject into OLD menu structure (tp-yt-paper-listbox)
  */
 function injectIntoOldMenu(menuContainer, channelInfo, videoCard, collaborationMetadata = null, injectionOptions = {}) {
-    const menuList = menuContainer.querySelector('tp-yt-paper-listbox#items') || menuContainer.querySelector('tp-yt-paper-listbox') || (menuContainer.matches?.('bottom-sheet-container') ? menuContainer.querySelector('bottom-sheet-layout') : menuContainer);
-    const isMobileMenu = Boolean(menuList.closest?.('ytm-menu-popup-renderer')) ||
-        Boolean(menuList.closest?.('ytm-app')) ||
-        Boolean(menuContainer?.matches?.('ytm-menu-popup-renderer')) ||
-        Boolean(menuContainer?.matches?.('bottom-sheet-container')) ||
-        Boolean(menuContainer?.matches?.('div.menu-content[role="dialog"]')) ||
-        Boolean(menuContainer?.querySelector?.('ytm-menu-service-item-renderer'));
+    const menuList = resolveMenuInsertionTarget(menuContainer) ||
+        (menuContainer.matches?.('bottom-sheet-container, ytm-bottom-sheet-renderer') ? menuContainer.querySelector('bottom-sheet-layout') : menuContainer);
+    if (!menuList) return null;
+    const isMobileMenu = isMobileMenuContainer(menuList, menuContainer);
     const rendererTag = isMobileMenu ? 'ytm-menu-service-item-renderer' : 'ytd-menu-service-item-renderer';
     const rendererScope = isMobileMenu ? 'ytm-menu-popup-renderer' : 'ytd-menu-popup-renderer';
     const itemScope = isMobileMenu ? 'ytm-menu-service-item-renderer' : 'ytd-menu-service-item-renderer';
@@ -7413,6 +9044,7 @@ function injectIntoOldMenu(menuContainer, channelInfo, videoCard, collaborationM
 
     // Build channel display name
     const channelName = escapeHtml(pickMenuChannelDisplayName(channelInfo, injectionOptions));
+    const menuCopy = getAdaptiveMenuCopy();
 
     // Create FilterTube menu item (OLD structure)
     const filterTubeItem = document.createElement(rendererTag);
@@ -7433,7 +9065,7 @@ function injectIntoOldMenu(menuContainer, channelInfo, videoCard, collaborationM
                 <span class="filtertube-channel-name">${channelName}</span>
             </span>
             <div class="filtertube-filter-all-toggle exact-toggle toggle-variant-red">
-                Filter All
+                ${menuCopy.filterAllToggle}
             </div>
         </tp-yt-paper-item>
     `;
@@ -7615,7 +9247,27 @@ function resolveCommentHideTarget(node) {
 
 function syncBlockedElementsWithFilters(effectiveSettings) {
     const filterChannels = effectiveSettings?.filterChannels || [];
+    const filterKeywords = effectiveSettings?.filterKeywords || [];
     const channelMap = effectiveSettings?.channelMap || {};
+
+    // Fail-open safety: if there are no active channel/keyword rules, nothing should remain hidden.
+    // This protects against SPA node recycling leaving behind `data-filtertube-hidden` without
+    // a corresponding active filter (e.g., phantom Shakira hides on fresh sessions).
+    if ((Array.isArray(filterChannels) ? filterChannels.length : 0) === 0
+        && (Array.isArray(filterKeywords) ? filterKeywords.length : 0) === 0
+    ) {
+        try {
+            document.querySelectorAll('[data-filtertube-hidden="true"]').forEach((el) => {
+                try {
+                    clearBlockedElementAttributes(el);
+                    toggleVisibility(el, false, '', true);
+                } catch (e) {
+                }
+            });
+        } catch (e) {
+        }
+    }
+
     const blockedElements = document.querySelectorAll('[data-filtertube-blocked-channel-id], [data-filtertube-blocked-channel-handle]');
     if (blockedElements.length === 0) return;
 
@@ -7631,6 +9283,38 @@ function syncBlockedElementsWithFilters(effectiveSettings) {
             handle: element.getAttribute('data-filtertube-blocked-channel-handle') || '',
             name: element.getAttribute('data-filtertube-blocked-channel-name') || ''
         };
+        const currentStamped = {
+            id: element.getAttribute('data-filtertube-channel-id') || '',
+            handle: element.getAttribute('data-filtertube-channel-handle') || '',
+            name: element.getAttribute('data-filtertube-channel-name') || ''
+        };
+        const normalize = (value) => (typeof value === 'string' ? value.trim().toLowerCase() : '');
+        const blockedId = normalize(meta.id);
+        const blockedHandle = normalize(meta.handle);
+        const stampedId = normalize(currentStamped.id);
+        const stampedHandle = normalize(currentStamped.handle);
+        const hasStampedIdentity = Boolean(stampedId || stampedHandle);
+        const hasBlockedIdentity = Boolean(blockedId || blockedHandle);
+        const idMismatch = blockedId && stampedId && blockedId !== stampedId;
+        const handleMismatch = blockedHandle && stampedHandle && blockedHandle !== stampedHandle;
+        const staleBlockedIdentity = hasStampedIdentity && hasBlockedIdentity && (idMismatch || handleMismatch);
+
+        // YTM aggressively recycles DOM nodes. If blocked metadata belongs to a previous channel
+        // but the card is now stamped with a different identity, clear stale blocked state first.
+        if (staleBlockedIdentity) {
+            if (filterChannels.length > 0 && isStillBlocked(currentStamped)) {
+                markElementAsBlocked(element, currentStamped, 'confirmed');
+                if (isCommentContextTag(tag)) {
+                    toggleVisibility(element, true, `Blocked comment author: ${currentStamped.handle || currentStamped.id}`);
+                } else {
+                    toggleVisibility(element, true, `Blocked channel: ${currentStamped.handle || currentStamped.id}`);
+                }
+            } else {
+                clearBlockedElementAttributes(element);
+                toggleVisibility(element, false, '', true);
+            }
+            return;
+        }
 
         if (filterChannels.length > 0 && isStillBlocked(meta)) {
             markElementAsBlocked(element, meta, 'confirmed');
@@ -7693,8 +9377,75 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
         return snapshot;
     })();
 
+    const clickedCollabKey = (menuItem.getAttribute('data-collab-key') || '').trim().toLowerCase();
+    const isSingleCollaboratorSelection = Boolean(
+        clickedCollabKey &&
+        menuItem.getAttribute('data-is-block-all') !== 'true'
+    );
+    const normalizeIdentityName = (value) => {
+        if (!value || typeof value !== 'string') return '';
+        return value.trim().toLowerCase();
+    };
+    const clickedIdentityLock = {
+        id: (typeof channelInfo?.id === 'string' ? channelInfo.id.trim() : ''),
+        handle: normalizeHandleValue(channelInfo?.handle || channelInfo?.canonicalHandle || channelInfo?.handleDisplay || '') || '',
+        customUrl: (typeof channelInfo?.customUrl === 'string' ? channelInfo.customUrl.trim().toLowerCase() : ''),
+        name: normalizeIdentityName(channelInfo?.name || channelInfo?.expectedChannelName || '')
+    };
+    const candidateMatchesClickedIdentity = (candidate) => {
+        if (!isSingleCollaboratorSelection) return true;
+        if (!candidate || typeof candidate !== 'object') return false;
+
+        const candidateKey = (getCollaboratorKey(candidate) || '').trim().toLowerCase();
+        if (clickedCollabKey && candidateKey && clickedCollabKey === candidateKey) return true;
+
+        const candidateId = (typeof candidate.id === 'string' ? candidate.id.trim() : '');
+        const candidateHandle = normalizeHandleValue(candidate.handle || candidate.canonicalHandle || candidate.handleDisplay || '') || '';
+        const candidateCustomUrl = (typeof candidate.customUrl === 'string' ? candidate.customUrl.trim().toLowerCase() : '');
+        const candidateName = normalizeIdentityName(candidate.name || candidate.expectedChannelName || '');
+
+        if (clickedIdentityLock.id && candidateId && clickedIdentityLock.id === candidateId) return true;
+        if (clickedIdentityLock.handle && candidateHandle && clickedIdentityLock.handle === candidateHandle) return true;
+        if (clickedIdentityLock.customUrl && candidateCustomUrl && clickedIdentityLock.customUrl === candidateCustomUrl) return true;
+        if (clickedIdentityLock.name && candidateName && clickedIdentityLock.name === candidateName) return true;
+
+        const clickedHasStrongIdentity = Boolean(
+            clickedIdentityLock.id ||
+            clickedIdentityLock.handle ||
+            clickedIdentityLock.customUrl
+        );
+        // When the clicked row had no strong identity, allow enrichment candidates.
+        return !clickedHasStrongIdentity;
+    };
+
+    // Playlist cards on YTM often have creator name immediately but identifiers only in page/header JSON.
+    // Stamp playlist context early so block flow resolves creator via fetchPlaylistCreator instead of
+    // falling through to generic channel-page fetches.
     try {
-        if (!isCommentContextBlock && clickSnapshot?.videoId && clickSnapshot.videoId !== (channelInfo?.videoId || '')) {
+        if (!isCommentContextBlock) {
+            const playlistIdHint =
+                (typeof channelInfo?.playlistId === 'string' ? channelInfo.playlistId.trim() : '') ||
+                extractPlaylistIdFromElement(videoCard) ||
+                extractPlaylistIdFromElement(menuItem?.closest?.('ytm-compact-playlist-renderer, ytm-rich-item-renderer, yt-lockup-view-model') || null);
+            if (playlistIdHint) {
+                channelInfo = {
+                    ...(channelInfo || {}),
+                    playlistId: playlistIdHint,
+                    fetchStrategy: 'playlist',
+                    source: channelInfo?.source || 'ytm_playlist_card',
+                    expectedChannelName: channelInfo?.expectedChannelName || channelInfo?.name || ''
+                };
+                if (!channelInfo.id && !channelInfo.customUrl) {
+                    channelInfo.videoId = '';
+                }
+            }
+        }
+    } catch (e) {
+    }
+
+    try {
+        const isPlaylistCreatorFlow = Boolean(channelInfo?.fetchStrategy === 'playlist' || channelInfo?.source === 'ytm_playlist_card' || channelInfo?.playlistId);
+        if (!isPlaylistCreatorFlow && !isCommentContextBlock && clickSnapshot?.videoId && clickSnapshot.videoId !== (channelInfo?.videoId || '')) {
             channelInfo = { ...(channelInfo || {}), videoId: clickSnapshot.videoId };
         }
     } catch (e) {
@@ -7705,6 +9456,33 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             channelInfo = { ...(channelInfo || {}), videoId: '' };
         } catch (e) {
         }
+    }
+
+    // Playlist cards: resolve playlist creator BEFORE persisting blocks.
+    try {
+        const needsPlaylistResolve = !isCommentContextBlock
+            && channelInfo
+            && (
+                channelInfo.fetchStrategy === 'playlist'
+                || channelInfo.source === 'ytm_playlist_card'
+                || (typeof channelInfo.playlistId === 'string' && channelInfo.playlistId.trim())
+            )
+            && typeof channelInfo.playlistId === 'string'
+            && channelInfo.playlistId.trim()
+            && !channelInfo.id
+            && !channelInfo.customUrl;
+
+        if (needsPlaylistResolve) {
+            const details = await browserAPI_BRIDGE.runtime.sendMessage({
+                action: 'fetchPlaylistCreator',
+                playlistId: channelInfo.playlistId.trim(),
+                expectedName: channelInfo.expectedChannelName || channelInfo.name || ''
+            });
+            if (details && details.success) {
+                channelInfo = { ...(channelInfo || {}), ...details };
+            }
+        }
+    } catch (e) {
     }
 
     let blockPersisted = false;
@@ -7812,6 +9590,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             const trimmed = value.trim();
             if (!trimmed) return true;
             if (isUcIdLike(trimmed)) return true;
+            if (/^uc[a-z0-9_-]{6,}$/i.test(trimmed)) return true;
             if (isHandleLike(trimmed)) return true;
             if (trimmed.toLowerCase() === 'channel') return true;
             if (trimmed.includes('•')) return true;
@@ -7845,13 +9624,20 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                 expectedName: channelInfo.expectedChannelName || null
             });
             if (ytInfo) {
-                channelInfo = { ...channelInfo, ...ytInfo, videoId: channelInfo.videoId };
-                if (channelInfo?.handle) {
-                    applyHandleMetadata(channelInfo, channelInfo.handle, { force: true });
-                    requestedHandle = normalizeHandleValue(channelInfo.handle) || requestedHandle;
-                    if (!requestedHandleForNetwork) {
-                        requestedHandleForNetwork = extractRawHandle(channelInfo.handle) || '';
+                if (candidateMatchesClickedIdentity(ytInfo)) {
+                    channelInfo = { ...channelInfo, ...ytInfo, videoId: channelInfo.videoId };
+                    if (channelInfo?.handle) {
+                        applyHandleMetadata(channelInfo, channelInfo.handle, { force: true });
+                        requestedHandle = normalizeHandleValue(channelInfo.handle) || requestedHandle;
+                        if (!requestedHandleForNetwork) {
+                            requestedHandleForNetwork = extractRawHandle(channelInfo.handle) || '';
+                        }
                     }
+                } else {
+                    console.warn('FilterTube: Ignoring mismatched structured lookup for clicked collaborator', {
+                        clickedCollabKey,
+                        candidate: ytInfo
+                    });
                 }
             }
         }
@@ -7897,7 +9683,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                 );
 
                 for (const collaborator of selectedCollaborators) {
-                    const identifier = collaborator.handle || collaborator.id || collaborator.customUrl || collaborator.name;
+                    const identifier = collaborator.id || collaborator.handle || collaborator.customUrl || collaborator.name;
                     if (!identifier) {
                         console.error('FilterTube: Cannot block collaborator - no identifier', collaborator);
                         continue;
@@ -7914,7 +9700,11 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                         .map(c => c.handle || c.id || c.customUrl || c.name);
 
                     // Execute block
-                    const collaboratorMetadata = buildChannelMetadataPayload(collaborator);
+                    const collaboratorMetadata = buildChannelMetadataPayload({
+                        ...collaborator,
+                        videoId: collaborator.videoId || channelInfo.videoId || '',
+                        source: collaborator.source || channelInfo.source || 'collab_block_all'
+                    });
                     let result = await addChannelDirectly(identifier, useFilterAll, otherChannels, groupId, collaboratorMetadata);
 
                     // --- FIX: Add retry logic for robustness ---
@@ -7960,13 +9750,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             let successCount = 0;
             for (let i = 0; i < collaboratorCount; i++) {
                 const collaborator = channelInfo.allCollaborators[i];
-                let input = collaborator.handle || collaborator.id || collaborator.customUrl;
-
-                if (!input && collaborator.name) {
-                    const guessedHandle = `@${collaborator.name.toLowerCase().replace(/\s+/g, '')}`;
-                    console.log(`FilterTube: No handle/id for "${collaborator.name}", trying guessed handle: ${guessedHandle}`);
-                    input = guessedHandle;
-                }
+                let input = collaborator.id || collaborator.handle || collaborator.customUrl;
 
                 if (input) {
                     const otherChannels = channelInfo.allCollaborators
@@ -7975,7 +9759,11 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                     const collaboratorFilterAll = resolveFilterAllPreference(collaborator);
 
                     console.log(`FilterTube: Blocking collaborator ${i + 1}/${collaboratorCount}: ${input}`, 'filterAll:', collaboratorFilterAll);
-                    const collaboratorMetadata = buildChannelMetadataPayload(collaborator);
+                    const collaboratorMetadata = buildChannelMetadataPayload({
+                        ...collaborator,
+                        videoId: collaborator.videoId || channelInfo.videoId || '',
+                        source: collaborator.source || channelInfo.source || 'collab_block_all'
+                    });
                     const result = await addChannelDirectly(input, collaboratorFilterAll, otherChannels, groupId, collaboratorMetadata);
                     if (result.success) {
                         successCount++;
@@ -7984,7 +9772,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                         console.error(`FilterTube: Failed to block ${input}:`, result.error);
                     }
                 } else {
-                    console.error(`FilterTube: Cannot block collaborator - no identifier available:`, collaborator);
+                    console.warn('FilterTube: Skipping collaborator without resolvable identifier', collaborator);
                 }
             }
 
@@ -8086,6 +9874,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                     const trimmed = value.trim();
                     if (!trimmed) return true;
                     if (isUcIdLike(trimmed)) return true;
+                    if (/^uc[a-z0-9_-]{6,}$/i.test(trimmed)) return true;
                     if (trimmed.includes('•')) return true;
                     if (/\bviews?\b/i.test(trimmed)) return true;
                     if (/\bago\b/i.test(trimmed)) return true;
@@ -8188,7 +9977,14 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
 
     if (!channelInfo.id && requestedHandle) {
         try {
-            const cacheResolvedId = await fetchIdForHandle(requestedHandle);
+            const skipNetwork = (() => {
+                try {
+                    return String(location?.hostname || '').toLowerCase().startsWith('m.youtube.');
+                } catch (e) {
+                    return false;
+                }
+            })();
+            const cacheResolvedId = await fetchIdForHandle(requestedHandle, { skipNetwork });
             if (cacheResolvedId) {
                 channelInfo.id = cacheResolvedId;
                 console.log('FilterTube: Pre-resolved UC ID via cache', cacheResolvedId, 'for handle', requestedHandle);
@@ -8246,22 +10042,180 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             if (attrCustom) channelInfo.customUrl = attrCustom;
         }
 
-        let input = channelInfo.id || channelInfo.customUrl || requestedHandleForNetwork || channelInfo.handle;
-
-        if (!input && channelInfo?.name) {
-            const collabKey = (menuItem.getAttribute('data-collab-key') || '').trim();
-            const collabGroup = (menuItem.getAttribute('data-collaboration-group-id') || '').trim();
-            if (collabKey || collabGroup) {
-                const guessedHandle = `@${String(channelInfo.name).trim().toLowerCase().replace(/\s+/g, '')}`;
-                const normalizedGuess = normalizeHandleValue(guessedHandle);
-                if (normalizedGuess) {
-                    channelInfo.handle = normalizedGuess;
-                    requestedHandle = requestedHandle || normalizedGuess;
-                    requestedHandleForNetwork = requestedHandleForNetwork || normalizedGuess;
-                    applyHandleMetadata(channelInfo, normalizedGuess, { force: true });
-                    input = normalizedGuess;
+        // Ensure we carry a videoId whenever available on watch surfaces.
+        // This enables background watch-identity enrichment for UC-only blocks.
+        const isPlaylistCreatorFlow = Boolean(
+            channelInfo?.fetchStrategy === 'playlist' ||
+            channelInfo?.source === 'ytm_playlist_card' ||
+            channelInfo?.playlistId
+        );
+        if (!isPlaylistCreatorFlow && !channelInfo.videoId) {
+            try {
+                const currentV = new URLSearchParams(location.search || '').get('v') || '';
+                if (/^[a-zA-Z0-9_-]{11}$/.test(currentV)) {
+                    channelInfo.videoId = currentV;
+                }
+            } catch (e) {
+            }
+            if (!channelInfo.videoId) {
+                try {
+                    const path = String(location?.pathname || '');
+                    const shortsMatch = path.match(/\/shorts\/([a-zA-Z0-9_-]{11})(?:[/?#]|$)/i);
+                    const watchPathMatch = path.match(/\/watch\/([a-zA-Z0-9_-]{11})(?:[/?#]|$)/i);
+                    const recovered = (shortsMatch && shortsMatch[1])
+                        ? shortsMatch[1]
+                        : ((watchPathMatch && watchPathMatch[1]) ? watchPathMatch[1] : '');
+                    if (recovered) {
+                        channelInfo.videoId = recovered;
+                    }
+                } catch (e) {
                 }
             }
+        }
+
+        // Pre-persist identity hydration:
+        // If we already have UC ID but no alternate identity, resolve from main-world by videoId first.
+        // This avoids storing fresh entries as "UC -> Not fetched".
+        if (
+            !isCommentContextBlock &&
+            channelInfo?.videoId &&
+            channelInfo?.id &&
+            String(channelInfo.id).trim().startsWith('UC') &&
+            !normalizeHandleValue(channelInfo.handle || '') &&
+            !String(channelInfo.customUrl || '').trim()
+        ) {
+            try {
+                const ytInfo = await searchYtInitialDataForVideoChannel(channelInfo.videoId, {
+                    expectedHandle: requestedHandle || channelInfo.expectedHandle || '',
+                    expectedName: channelInfo.expectedChannelName || channelInfo.name || '',
+                    // This call is only trying to fill alternate IDs (handle/customUrl) for a UC-known entry.
+                    // Do not hard-reject on name mismatch; instead, require that the UC id stays consistent.
+                    allowNameMismatch: true
+                });
+                const knownId = typeof channelInfo?.id === 'string' ? channelInfo.id.trim() : '';
+                const foundId = typeof ytInfo?.id === 'string' ? ytInfo.id.trim() : '';
+                const idConsistent = !knownId || !foundId || knownId === foundId;
+                if (ytInfo && idConsistent && candidateMatchesClickedIdentity(ytInfo)) {
+                    const hydratedHandle = normalizeHandleValue(ytInfo.handle || '');
+                    if (hydratedHandle) {
+                        channelInfo.handle = hydratedHandle;
+                        applyHandleMetadata(channelInfo, hydratedHandle, { force: true });
+                    }
+                    if (!channelInfo.customUrl && ytInfo.customUrl) {
+                        channelInfo.customUrl = ytInfo.customUrl;
+                    }
+                    if ((!channelInfo.name || isProbablyNotChannelName(channelInfo.name)) && ytInfo.name) {
+                        channelInfo.name = ytInfo.name;
+                    }
+                }
+            } catch (e) {
+            }
+        }
+
+        let input = channelInfo.id || channelInfo.customUrl || requestedHandleForNetwork || channelInfo.handle;
+        const playlistIdFromDomHint = !channelInfo?.playlistId
+            ? extractPlaylistIdFromElement(videoCard)
+            : '';
+        if (!channelInfo?.playlistId && playlistIdFromDomHint) {
+            channelInfo.playlistId = playlistIdFromDomHint;
+        }
+        const isPlaylistOwnerFlow = Boolean(
+            channelInfo?.fetchStrategy === 'playlist' ||
+            channelInfo?.source === 'ytm_playlist_card' ||
+            channelInfo?.playlistId ||
+            playlistIdFromDomHint
+        );
+        const isMobileYtmHost = (() => {
+            try {
+                const host = String(location?.hostname || '').toLowerCase();
+                return host.startsWith('m.youtube.') || host.startsWith('music.youtube.');
+            } catch (e) {
+                return false;
+            }
+        })();
+
+        // YTM-first policy: when we do not have a stable channel identifier yet,
+        // prefer watch-based identity flow over handle-page fetches.
+        if (
+            isMobileYtmHost &&
+            !isPlaylistOwnerFlow &&
+            !channelInfo.id &&
+            !channelInfo.customUrl &&
+            channelInfo.videoId
+        ) {
+            input = `watch:${channelInfo.videoId}`;
+        }
+
+        // Identity lock for single-collaborator row: never drop the clicked row's own identifier.
+        if (!input && isSingleCollaboratorSelection) {
+            input = clickedIdentityLock.id || clickedIdentityLock.customUrl || clickedIdentityLock.handle || '';
+            if (!channelInfo.id && clickedIdentityLock.id) channelInfo.id = clickedIdentityLock.id;
+            if (!channelInfo.customUrl && clickedIdentityLock.customUrl) channelInfo.customUrl = clickedIdentityLock.customUrl;
+            if (!channelInfo.handle && clickedIdentityLock.handle) {
+                channelInfo.handle = clickedIdentityLock.handle;
+                applyHandleMetadata(channelInfo, clickedIdentityLock.handle, { force: true });
+            }
+        }
+
+        // Playlist hardening: some YTM cards arrive with only name/logo and no identifiers.
+        // Recover playlistId from DOM and resolve creator identity before persisting.
+        if (
+            !isCommentContextBlock &&
+            !input &&
+            channelInfo &&
+            !channelInfo.id &&
+            !channelInfo.customUrl
+        ) {
+            try {
+                if (!channelInfo.playlistId) {
+                    const playlistHref = videoCard?.querySelector?.('a[href^="/playlist?list="], a[href*="/playlist?list="]')?.getAttribute?.('href') || '';
+                    if (playlistHref) {
+                        const qs = playlistHref.split('?')[1] || '';
+                        const params = new URLSearchParams(qs);
+                        const pid = params.get('list') || '';
+                        if (pid) channelInfo.playlistId = pid;
+                    }
+                }
+                if (channelInfo.playlistId) {
+                    channelInfo.fetchStrategy = 'playlist';
+                    if (!channelInfo.source) channelInfo.source = 'ytm_playlist_card';
+                    const details = await browserAPI_BRIDGE.runtime.sendMessage({
+                        action: 'fetchPlaylistCreator',
+                        playlistId: channelInfo.playlistId.trim(),
+                        expectedName: channelInfo.expectedChannelName || channelInfo.name || ''
+                    });
+                    if (details?.success) {
+                        channelInfo = { ...(channelInfo || {}), ...details };
+                        if (channelInfo.handle) applyHandleMetadata(channelInfo, channelInfo.handle, { force: true });
+                        input = channelInfo.id || channelInfo.customUrl || requestedHandleForNetwork || channelInfo.handle || '';
+                    }
+                }
+            } catch (e) {
+            }
+        }
+
+        // YTM playlist/mix cards frequently start with weak DOM identity. Prefer background
+        // watch-resolution by videoId over noisy inferred handles/custom strings.
+        if (
+            !isCommentContextBlock &&
+            !channelInfo.id &&
+            channelInfo.videoId &&
+            (channelInfo.needsFetch || channelInfo.fetchStrategy === 'mainworld') &&
+            channelInfo.fetchStrategy !== 'playlist' &&
+            channelInfo.source !== 'ytm_playlist_card' &&
+            !channelInfo.playlistId
+        ) {
+            input = `watch:${channelInfo.videoId}`;
+        }
+
+        if (
+            !input &&
+            !isCommentContextBlock &&
+            channelInfo?.videoId &&
+            channelInfo?.fetchStrategy !== 'playlist' &&
+            !channelInfo?.playlistId
+        ) {
+            input = `watch:${channelInfo.videoId}`;
         }
 
         // Get collaboration metadata from menu item attribute
@@ -8339,10 +10293,109 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
         let handleResolutionFailed404 = false;
 
         const initialWas404 = !result.success && /Failed to fetch channel page: 404/i.test(result.error || '');
+        const playlistIdForFlow = typeof channelInfo?.playlistId === 'string' ? channelInfo.playlistId.trim() : '';
+        const isPlaylistCreatorRetryFlow = Boolean(
+            !isCommentContextBlock &&
+            (
+                channelInfo?.fetchStrategy === 'playlist' ||
+                channelInfo?.source === 'ytm_playlist_card' ||
+                playlistIdForFlow
+            )
+        );
+        const isAlgorithmicPlaylistFlow = Boolean(
+            isPlaylistCreatorRetryFlow &&
+            (
+                /^RD/i.test(playlistIdForFlow) ||
+                String(channelInfo?.source || '').toLowerCase().includes('mix') ||
+                String(channelInfo?.source || '').toLowerCase().includes('radio') ||
+                /(?:^|\b)(?:mix|my mix)\b/i.test(String(channelInfo?.name || channelInfo?.expectedChannelName || ''))
+            )
+        );
+
+        // Playlist creator fallback: when we only had a weak handle and channel page lookup 404s,
+        // retry by resolving owner identity from the playlist page itself.
+        if (!result.success && channelInfo?.playlistId && (
+            /Failed to fetch channel page: 404/i.test(result.error || '') ||
+            /No channel identifier/i.test(result.error || '')
+        )) {
+            try {
+                const details = await browserAPI_BRIDGE.runtime.sendMessage({
+                    action: 'fetchPlaylistCreator',
+                    playlistId: String(channelInfo.playlistId).trim(),
+                    expectedName: channelInfo.expectedChannelName || channelInfo.name || ''
+                });
+                if (details?.success) {
+                    channelInfo = { ...(channelInfo || {}), ...details };
+                    if (channelInfo.handle) applyHandleMetadata(channelInfo, channelInfo.handle, { force: true });
+                    const retryInput = channelInfo.id || channelInfo.customUrl || channelInfo.handle || '';
+                    if (retryInput) {
+                        result = await addChannelDirectly(
+                            retryInput,
+                            filterAll,
+                            collaborationWith,
+                            menuItem.getAttribute('data-collaboration-group-id'),
+                            buildChannelMetadataPayload(channelInfo)
+                        );
+                    }
+                }
+            } catch (e) {
+            }
+
+            // Deterministic fallback: re-read owner identity from card renderer data/DOM.
+            // Do NOT guess handles from display text for playlist cards.
+            if (!result.success) {
+                try {
+                    const parsedFromCard = videoCard ? extractChannelFromCard(videoCard) : null;
+                    if (parsedFromCard && (parsedFromCard.id || parsedFromCard.handle || parsedFromCard.customUrl)) {
+                        channelInfo = { ...(channelInfo || {}), ...parsedFromCard };
+                        if (channelInfo.handle) applyHandleMetadata(channelInfo, channelInfo.handle, { force: true });
+                        const retryInput = channelInfo.id || channelInfo.customUrl || channelInfo.handle || '';
+                        if (retryInput) {
+                            result = await addChannelDirectly(
+                                retryInput,
+                                filterAll,
+                                collaborationWith,
+                                menuItem.getAttribute('data-collaboration-group-id'),
+                                buildChannelMetadataPayload(channelInfo)
+                            );
+                        }
+                    }
+                } catch (e) {
+                }
+            }
+
+            // Final playlist fallback: use seed video identity from playlist thumbnail.
+            if (!result.success && isAlgorithmicPlaylistFlow) {
+                try {
+                    const seedVideoId = (() => {
+                        const direct = typeof extractVideoIdFromCard === 'function' ? (extractVideoIdFromCard(videoCard) || '') : '';
+                        if (/^[a-zA-Z0-9_-]{11}$/.test(direct)) return direct;
+                        const img = videoCard?.querySelector?.('img[src*="/vi/"], img[src*="/vi_webp/"]');
+                        const src = img?.getAttribute?.('src') || img?.src || '';
+                        const m = src.match(/\/vi(?:_webp)?\/([a-zA-Z0-9_-]{11})(?:[/?]|$)/i);
+                        return m?.[1] || '';
+                    })();
+                    if (seedVideoId) {
+                        result = await addChannelDirectly(
+                            `watch:${seedVideoId}`,
+                            filterAll,
+                            collaborationWith,
+                            menuItem.getAttribute('data-collaboration-group-id'),
+                            buildChannelMetadataPayload({
+                                ...channelInfo,
+                                videoId: seedVideoId,
+                                source: channelInfo?.source || 'playlist_seed_video_fallback'
+                            })
+                        );
+                    }
+                } catch (e) {
+                }
+            }
+        }
 
         // If the background could not fetch the channel page (e.g., /@handle/about returns 404),
         // try to recover using ytInitialData for this video, then fall back to the Shorts URL helper.
-        if (!isCommentContextBlock && !result.success && channelInfo.videoId && (
+        if (!isCommentContextBlock && !result.success && channelInfo.videoId && !isPlaylistCreatorRetryFlow && (
             initialWas404 ||
             /No channel identifier/i.test(result.error || '') ||
             !input
@@ -8356,119 +10409,55 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                     expectedName
                 });
                 if (ytChannel && (ytChannel.id || ytChannel.handle)) {
-                    let retryInput = '';
-
-                    // Prefer UC ID when available
-                    if (ytChannel.id && ytChannel.id.startsWith('UC')) {
-                        retryInput = ytChannel.id;
-                        channelInfo.id = ytChannel.id;
-                    }
-
-                    // Fallback to a normalized handle from ytInitialData if no UC ID
-                    if (!retryInput && ytChannel.handle) {
-                        const normalizedFromYt = normalizeHandleValue(ytChannel.handle);
-                        if (normalizedFromYt) {
-                            retryInput = normalizedFromYt;
-                            channelInfo.handle = requestedHandle || normalizedFromYt;
-                        }
-                    }
-
-                    // If we only have a handle, attempt channelMap resolution before retrying.
-                    if (!retryInput && channelInfo.handle) {
-                        const mappedId = await fetchIdForHandle(channelInfo.handle, { skipNetwork: true });
-                        if (mappedId) {
-                            channelInfo.id = mappedId;
-                            retryInput = mappedId;
-                        }
-                    }
-
-                    if (retryInput) {
-                        console.log('FilterTube: Retrying block with ytInitialData identifier:', retryInput);
-
-                        // Cache the resolved handle/ID on a nearby card element to help future passes
-                        const cacheTarget = (() => {
-                            const candidate = videoCard;
-                            if (candidate && clickSnapshot?.videoId) {
-                                try {
-                                    const candidateVideoId = extractVideoIdFromCard(candidate) || '';
-                                    if (candidateVideoId && candidateVideoId !== clickSnapshot.videoId) {
-                                        return null;
-                                    }
-                                } catch (e) {
-                                }
-                            }
-                            return candidate || document.querySelector(`ytd-rich-item-renderer a[href*="${channelInfo.videoId}"]`)?.closest('[data-filtertube-channel-handle],[data-filtertube-channel-id]');
-                        })();
-                        if (cacheTarget) {
-                            if (channelInfo.handle) {
-                                cacheTarget.setAttribute('data-filtertube-channel-handle', channelInfo.handle);
-                            }
-                            if (channelInfo.id) {
-                                cacheTarget.setAttribute('data-filtertube-channel-id', channelInfo.id);
-                            }
-                        }
-                        if (channelInfo.id && (channelInfo.handle || requestedHandle)) {
-                            broadcastChannelMapping(channelInfo.id, channelInfo.handle || requestedHandle);
-                        }
-
-                        result = await addChannelDirectly(
-                            retryInput,
-                            filterAll,
-                            collaborationWith,
-                            menuItem.getAttribute('data-collaboration-group-id'),
-                            buildChannelMetadataPayload(channelInfo)
-                        );
-                    }
-                }
-            } catch (e) {
-                console.warn('FilterTube: ytInitialData channel lookup failed, continuing to Shorts fallback:', e);
-            }
-
-            // 2) Network fallback: fetch the /watch?v=ID page directly (works for all video types including /c/ channels)
-            if (!result.success && channelInfo.videoId) {
-                console.log('FilterTube: Attempting watch page fallback for video:', channelInfo.videoId);
-                try {
-                    const watchInfo = await fetchChannelFromWatchUrl(channelInfo.videoId, expectedHandle);
-                    if (watchInfo && (watchInfo.id || watchInfo.handle || watchInfo.customUrl)) {
-                        let retryInput = null;
+                    if (isSingleCollaboratorSelection && !candidateMatchesClickedIdentity(ytChannel)) {
+                        console.warn('FilterTube: Skipping mismatched ytInitialData fallback for collaborator row', {
+                            clickedCollabKey,
+                            candidate: ytChannel
+                        });
+                    } else {
+                        let retryInput = '';
 
                         // Prefer UC ID when available
-                        if (watchInfo.id && watchInfo.id.startsWith('UC')) {
-                            channelInfo.id = watchInfo.id;
-                            retryInput = watchInfo.id;
+                        if (ytChannel.id && ytChannel.id.startsWith('UC')) {
+                            retryInput = ytChannel.id;
+                            channelInfo.id = ytChannel.id;
                         }
 
-                        // Use customUrl for /c/ or /user/ channels if no UC ID yet
-                        if (!retryInput && watchInfo.customUrl) {
-                            channelInfo.customUrl = watchInfo.customUrl;
-                            retryInput = watchInfo.customUrl;
-                        }
-
-                        // Fallback to handle
-                        if (!retryInput && watchInfo.handle) {
-                            const normalizedHandle = normalizeHandleValue(watchInfo.handle);
-                            if (normalizedHandle) {
-                                channelInfo.handle = normalizedHandle;
-                                retryInput = normalizedHandle;
+                        // Fallback to a normalized handle from ytInitialData if no UC ID
+                        if (!retryInput && ytChannel.handle) {
+                            const normalizedFromYt = normalizeHandleValue(ytChannel.handle);
+                            if (normalizedFromYt) {
+                                retryInput = normalizedFromYt;
+                                channelInfo.handle = requestedHandle || normalizedFromYt;
                             }
                         }
 
-                        // Update name if available
-                        if (watchInfo.name && !channelInfo.name) {
-                            channelInfo.name = watchInfo.name;
-                        }
-
-                        // Broadcast mapping if we have both
-                        if (channelInfo.id && channelInfo.handle) {
-                            broadcastChannelMapping(channelInfo.id, channelInfo.handle);
+                        // If we only have a handle, attempt channelMap resolution before retrying.
+                        if (!retryInput && channelInfo.handle) {
+                            const mappedId = await fetchIdForHandle(channelInfo.handle, { skipNetwork: true });
+                            if (mappedId) {
+                                channelInfo.id = mappedId;
+                                retryInput = mappedId;
+                            }
                         }
 
                         if (retryInput) {
-                            console.log('FilterTube: Retrying block with watch page identifier:', retryInput);
+                            console.log('FilterTube: Retrying block with ytInitialData identifier:', retryInput);
 
-                            // Cache the resolved info
-                            const cacheTarget = videoCard || document
-                                .querySelector(`ytd-rich-item-renderer a[href*="${channelInfo.videoId}"]`)?.closest('[data-filtertube-channel-handle],[data-filtertube-channel-id]');
+                            // Cache the resolved handle/ID on a nearby card element to help future passes
+                            const cacheTarget = (() => {
+                                const candidate = videoCard;
+                                if (candidate && clickSnapshot?.videoId) {
+                                    try {
+                                        const candidateVideoId = extractVideoIdFromCard(candidate) || '';
+                                        if (candidateVideoId && candidateVideoId !== clickSnapshot.videoId) {
+                                            return null;
+                                        }
+                                    } catch (e) {
+                                    }
+                                }
+                                return candidate || document.querySelector(`ytd-rich-item-renderer a[href*="${channelInfo.videoId}"]`)?.closest('[data-filtertube-channel-handle],[data-filtertube-channel-id]');
+                            })();
                             if (cacheTarget) {
                                 if (channelInfo.handle) {
                                     cacheTarget.setAttribute('data-filtertube-channel-handle', channelInfo.handle);
@@ -8476,6 +10465,9 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                                 if (channelInfo.id) {
                                     cacheTarget.setAttribute('data-filtertube-channel-id', channelInfo.id);
                                 }
+                            }
+                            if (channelInfo.id && (channelInfo.handle || requestedHandle)) {
+                                broadcastChannelMapping(channelInfo.id, channelInfo.handle || requestedHandle);
                             }
 
                             result = await addChannelDirectly(
@@ -8487,13 +10479,92 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                             );
                         }
                     }
+                }
+            } catch (e) {
+                console.warn('FilterTube: ytInitialData channel lookup failed, continuing to Shorts fallback:', e);
+            }
+
+            // 2) Background watch-identity fallback (CORS-safe on m.youtube.com).
+            if (!result.success && channelInfo.videoId && !isSingleCollaboratorSelection) {
+                console.log('FilterTube: Attempting background watch fallback for video:', channelInfo.videoId);
+                try {
+                    result = await addChannelDirectly(
+                        `watch:${channelInfo.videoId}`,
+                        filterAll,
+                        collaborationWith,
+                        menuItem.getAttribute('data-collaboration-group-id'),
+                        buildChannelMetadataPayload({
+                            ...channelInfo,
+                            source: channelInfo?.source || 'watch_fallback',
+                            videoId: channelInfo.videoId
+                        })
+                    );
                 } catch (e) {
-                    console.warn('FilterTube: Watch page fallback failed:', e);
+                    console.warn('FilterTube: Background watch fallback failed:', e);
+                }
+            }
+
+            // 2b) Desktop-only direct watch fetch fallback (legacy; skipped on m.youtube.com due CORS).
+            if (!result.success && channelInfo.videoId && !isSingleCollaboratorSelection) {
+                const isMobileOrigin = (() => {
+                    try {
+                        return String(location?.hostname || '').toLowerCase().startsWith('m.youtube.');
+                    } catch (e) {
+                        return false;
+                    }
+                })();
+                if (!isMobileOrigin) {
+                    console.log('FilterTube: Attempting direct watch page fallback for video:', channelInfo.videoId);
+                    try {
+                        const watchInfo = await fetchChannelFromWatchUrl(channelInfo.videoId, expectedHandle);
+                        if (watchInfo && (watchInfo.id || watchInfo.handle || watchInfo.customUrl)) {
+                            let retryInput = null;
+
+                            if (watchInfo.id && watchInfo.id.startsWith('UC')) {
+                                channelInfo.id = watchInfo.id;
+                                retryInput = watchInfo.id;
+                            }
+
+                            if (!retryInput && watchInfo.customUrl) {
+                                channelInfo.customUrl = watchInfo.customUrl;
+                                retryInput = watchInfo.customUrl;
+                            }
+
+                            if (!retryInput && watchInfo.handle) {
+                                const normalizedHandle = normalizeHandleValue(watchInfo.handle);
+                                if (normalizedHandle) {
+                                    channelInfo.handle = normalizedHandle;
+                                    retryInput = normalizedHandle;
+                                }
+                            }
+
+                            if (watchInfo.name && !channelInfo.name) {
+                                channelInfo.name = watchInfo.name;
+                            }
+
+                            if (channelInfo.id && channelInfo.handle) {
+                                broadcastChannelMapping(channelInfo.id, channelInfo.handle);
+                            }
+
+                            if (retryInput) {
+                                console.log('FilterTube: Retrying block with direct watch identifier:', retryInput);
+                                result = await addChannelDirectly(
+                                    retryInput,
+                                    filterAll,
+                                    collaborationWith,
+                                    menuItem.getAttribute('data-collaboration-group-id'),
+                                    buildChannelMetadataPayload(channelInfo)
+                                );
+                            }
+                        }
+                    } catch (e) {
+                        console.warn('FilterTube: Direct watch page fallback failed:', e);
+                    }
                 }
             }
 
             // 3) Final fallback: Shorts-specific helper (only when applicable)
-            if (!result.success && channelInfo.needsFetch && channelInfo.fetchStrategy !== 'mainworld') {
+            if (!result.success && channelInfo.needsFetch && channelInfo.fetchStrategy !== 'mainworld' && !isSingleCollaboratorSelection) {
                 const fallbackInfo = await fetchChannelFromShortsUrl(channelInfo.videoId, expectedHandle, { allowDirectFetch: true });
                 if (fallbackInfo && (fallbackInfo.id || fallbackInfo.handle)) {
                     let retryInput = null;
@@ -8602,6 +10673,28 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             channelInfo = { ...channelInfo, ...result.channelData };
         }
 
+        // If we hid the card optimistically before the block completed, upgrade that hidden node
+        // with the final resolved identity so the later sync/restore pass cannot "unhide" it due
+        // to missing blocked metadata (common on Mix cards where DOM identity is weak at click time).
+        if (didOptimisticHide && optimisticHideState.length > 0) {
+            try {
+                for (const item of optimisticHideState) {
+                    const element = item?.element;
+                    if (!element) continue;
+                    try {
+                        markElementAsBlocked(element, channelInfo, 'confirmed');
+                        element.style.display = 'none';
+                        element.classList.add('filtertube-hidden');
+                        element.setAttribute('data-filtertube-hidden', 'true');
+                    } catch (e) {
+                    }
+                }
+            } catch (e) {
+            } finally {
+                optimisticHideState.length = 0;
+            }
+        }
+
         // At this point we succeeded. If we still don't have a UC ID, warn reach may be limited.
         if (!channelInfo.id && channelInfo.handle) {
             console.warn('FilterTube: Blocked using handle only; no UC ID was resolved. Other videos may remain until a UC ID is learned.', {
@@ -8628,8 +10721,15 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
 
         console.log('FilterTube: Successfully blocked channel:', channelInfo, 'filterAll:', filterAll);
 
-        // Store videoId → channelId mapping for Shorts persistence after refresh
-        if (channelInfo.videoId && channelInfo.id) {
+        // Store videoId → channelId mapping for Shorts persistence after refresh.
+        // Never persist a watch video mapping when blocking a playlist creator; that would poison
+        // the map (current watch video → playlist owner) and cause wrong future resolutions.
+        const isPlaylistCreatorBlock = Boolean(
+            channelInfo?.fetchStrategy === 'playlist' ||
+            channelInfo?.source === 'ytm_playlist_card' ||
+            channelInfo?.playlistId
+        );
+        if (!isPlaylistCreatorBlock && channelInfo.videoId && channelInfo.id) {
             persistVideoChannelMapping(channelInfo.videoId, channelInfo.id);
             try {
                 const cards = document.querySelectorAll(`[data-filtertube-video-id="${channelInfo.videoId}"]`);
@@ -8821,10 +10921,11 @@ async function addChannelDirectly(input, filterAll = false, collaborationWith = 
                 videoId: metadata.videoId || null,
                 profile,
                 customUrl: metadata.customUrl || null,  // c/Name or user/Name for legacy channels
-                source: metadata.source || null
+                source: metadata.source || null,
+                pageHost: (typeof location !== 'undefined' ? String(location.hostname || '') : '')
             }, (response) => {
                 resolve(response || { success: false, error: 'No response from background' });
-                
+
                 // Trigger auto-backup after successful channel addition
                 if (response && response.success) {
                     try {

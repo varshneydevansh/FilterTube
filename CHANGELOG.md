@@ -1,5 +1,35 @@
 # Changelog
 
+## Version 3.2.8
+
+### Robust YouTube Mobile Support
+
+- **Native Mobile Integration**: Full support for `m.youtube.com` with dedicated handling for `ytm-*` renderers and specialized JSON extraction paths.
+- **Mobile Bottom-Sheet Menus**: Hardened injection for mobile menus, supporting both legacy (`.bottom-sheet-media-menu-item`) and modern (`yt-list-view-model`) structures.
+- **Adaptive Quick-Block**: The one-tap hover/touch block cross is now active on mobile video cards and shorts.
+- **Mobile Navigation Guard**: Adapted auto-skip logic for mobile playlist panels to prevent playing blocked content.
+
+### Identity Resolution Hardening
+
+- **Round-Trip Validation**: Introduced `isRoundTripHandleId` validation—mappings between Handles and UC IDs are only trusted if they point back to each other, preventing stale alias poisoning.
+- **Playlist Creator Flow**: Added `fetchPlaylistCreator` to resolve channel owners directly from playlist pages when standard renderers lack identity.
+- **Card Poisoning Protection**: Implemented `isPlaylistCollectionCardElement` checks to prevent playlist cards from inheriting incorrect seed IDs during DOM node recycling.
+- **Escaped Data Decoding**: Improved extraction reliability by decoding escaped sequences (`\xNN`, `\uNNNN`) in intercepted YouTube metadata.
+
+### Background Enrichment Architecture
+
+- **Tiered Retry System**: Overhauled background enrichment with priority-based cadences:
+  - **Identity Gaps**: Retries every 5-12s (max 12 attempts) to resolve missing IDs/Handles.
+  - **Presentation Gaps**: Retries every 2-3m (max 6 attempts) for missing logos or names.
+- **Multi-Origin Rotation**: Background fetches now rotate across `m.youtube.com`, `www.youtube.com`, and `music.youtube.com` to bypass origin-specific rate limits.
+- **Failure Cooldown**: UC-only resolution failures now trigger a 15-minute cooldown before subsequent retry cycles to reduce network overhead.
+
+### Technical & UI Refinements
+
+- **Adaptive Menu Labels**: Added `getAdaptiveMenuCopy` to intelligently toggle between "Block" and "Block Channel" based on viewport width and platform.
+- **Shadow DOM Traversal**: New `closestComposed` helper allows robust metadata extraction across Shadow DOM boundaries.
+- **Quick-Block Restriction**: Temporarily restricted the hover-block cross to YouTube Mobile to ensure zero overhead and maximum stability on the primary desktop site (v3.3.0 roadmap for re-introduction).
+
 ## Version 3.2.7
 
 ### Category Filters + Quick Block Hover Cross

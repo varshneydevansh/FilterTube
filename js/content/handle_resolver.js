@@ -148,6 +148,14 @@ function scheduleDomFallbackRerun() {
 
 async function fetchIdForHandle(handle, options = {}) {
     const { skipNetwork = false } = options;
+    const isMobileLikeHost = (() => {
+        try {
+            const host = String(location?.hostname || '').toLowerCase();
+            return host.startsWith('m.youtube.') || host.startsWith('music.youtube.') || host.includes('youtubekids.com');
+        } catch (e) {
+            return false;
+        }
+    })();
     const normalizedHandle = normalizeHandleValue(handle);
     const cleanHandle = normalizedHandle ? normalizedHandle.replace(/^@/, '') : '';
     if (!cleanHandle) return null;
@@ -182,7 +190,7 @@ async function fetchIdForHandle(handle, options = {}) {
         return null;
     }
 
-    if (skipNetwork) {
+    if (skipNetwork || isMobileLikeHost) {
         // Remove the pending marker so future non-skip calls can attempt network fetch
         resolvedHandleCache.delete(cleanHandle);
         return null;

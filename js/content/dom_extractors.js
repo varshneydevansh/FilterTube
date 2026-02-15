@@ -35,6 +35,23 @@ const VIDEO_CARD_SELECTORS = [
     'yt-official-card-view-model',
     'ytm-shorts-lockup-view-model',
     'ytm-shorts-lockup-view-model-v2',
+    'ytm-rich-item-renderer',
+    'ytm-video-with-context-renderer',
+    'ytm-compact-video-renderer',
+    'ytm-compact-channel-renderer',
+    'ytm-compact-radio-renderer',
+    'ytm-compact-playlist-renderer',
+    'ytm-playlist-video-renderer',
+    'ytm-playlist-panel-video-renderer',
+    'ytm-playlist-panel-video-wrapper-renderer',
+    'ytm-reel-item-renderer',
+    'ytm-reel-shelf-renderer',
+    'ytm-universal-watch-card-renderer',
+    'ytm-watch-card-hero-video-renderer',
+    'ytm-watch-card-rich-header-renderer',
+    'ytm-backstage-post-renderer',
+    'ytm-backstage-post-thread-renderer',
+    'ytm-rich-section-renderer',
 
     // YouTube Kids (DOM-only)
     'ytk-compact-video-renderer',
@@ -44,6 +61,68 @@ const VIDEO_CARD_SELECTORS = [
     'ytk-compact-playlist-renderer',
     'ytk-kids-slim-owner-renderer'
 ].join(', ');
+
+const RECYCLED_VIDEO_ID_GUARD_TAGS = new Set([
+    'yt-lockup-view-model',
+    'yt-lockup-metadata-view-model',
+    'ytd-rich-item-renderer',
+    'ytd-video-renderer',
+    'ytd-grid-video-renderer',
+    'ytd-compact-video-renderer',
+    'ytd-playlist-panel-video-renderer',
+    'ytd-playlist-panel-video-wrapper-renderer',
+    'ytm-rich-item-renderer',
+    'ytm-video-with-context-renderer',
+    'ytm-compact-video-renderer',
+    'ytm-compact-playlist-renderer',
+    'ytm-playlist-video-renderer',
+    'ytm-playlist-panel-video-renderer',
+    'ytm-playlist-panel-video-wrapper-renderer',
+    'ytm-radio-renderer',
+    'ytm-compact-radio-renderer',
+    'ytm-universal-watch-card-renderer',
+    'ytm-watch-card-hero-video-renderer',
+    'ytm-watch-card-rich-header-renderer',
+    'ytm-backstage-post-renderer',
+    'ytm-backstage-post-thread-renderer',
+    'ytm-rich-section-renderer'
+]);
+
+function shouldGuardVideoIdStamp(tag, isKidsHost) {
+    return Boolean(isKidsHost || RECYCLED_VIDEO_ID_GUARD_TAGS.has(tag));
+}
+
+function isPlaylistCollectionCardElement(card) {
+    if (!card || typeof card.querySelector !== 'function') return false;
+    const tag = (card.tagName || '').toLowerCase();
+
+    // These are playlist *collection* cards (not videos). Their thumbnail image often contains a
+    // "seed" videoId that must NOT be treated as the card's identity (or we end up stamping the
+    // seed channel onto the playlist creator card).
+    const explicitTags = new Set([
+        'ytd-playlist-renderer',
+        'ytd-grid-playlist-renderer',
+        'ytd-compact-playlist-renderer',
+        'ytd-radio-renderer',
+        'ytd-compact-radio-renderer',
+        'ytm-compact-playlist-renderer',
+        'ytm-compact-radio-renderer',
+        'ytm-radio-renderer',
+        'ytk-compact-playlist-renderer'
+    ]);
+
+    if (explicitTags.has(tag)) return true;
+
+    // Heuristic fallback: has a playlist endpoint but no watch/shorts endpoint.
+    try {
+        const hasPlaylistLink = Boolean(card.querySelector('a[href^="/playlist?list="], a[href*="/playlist?list="]'));
+        if (!hasPlaylistLink) return false;
+        const hasWatchLikeLink = Boolean(card.querySelector('a[href*="watch?v="], a[href*="/watch?v="], a[href*="/shorts/"], a[href*="/watch/"]'));
+        return !hasWatchLikeLink;
+    } catch (e) {
+        return false;
+    }
+}
 
 function ensureVideoIdForCard(card) {
     if (!card || typeof card.getAttribute !== 'function') return '';
@@ -57,17 +136,22 @@ function ensureVideoIdForCard(card) {
         }
     })();
 
-    const canFastReturnStamp = !isKidsHost && cachedVideoId && /^[a-zA-Z0-9_-]{11}$/.test(cachedVideoId)
-        && !(tag === 'yt-lockup-view-model' ||
-            tag === 'yt-lockup-metadata-view-model' ||
-            tag === 'ytd-rich-item-renderer' ||
-            tag === 'ytd-video-renderer' ||
-            tag === 'ytd-grid-video-renderer' ||
-            tag === 'ytd-compact-video-renderer' ||
-            tag === 'ytm-video-with-context-renderer' ||
-            tag === 'ytm-compact-video-renderer' ||
-            tag === 'ytd-playlist-panel-video-renderer' ||
-            tag === 'ytd-playlist-panel-video-wrapper-renderer');
+    // Playlist collection cards must not carry a derived thumbnail videoId or derived channel stamps.
+    // Clear them aggressively so subsequent videoId→channel stamping cannot poison the playlist card.
+    if (isPlaylistCollectionCardElement(card)) {
+        try {
+            card.removeAttribute('data-filtertube-video-id');
+            card.removeAttribute('data-filtertube-channel-id');
+            card.removeAttribute('data-filtertube-channel-handle');
+            card.removeAttribute('data-filtertube-channel-custom');
+        } catch (e) {
+        }
+        return '';
+    }
+
+    const canFastReturnStamp = !shouldGuardVideoIdStamp(tag, isKidsHost) &&
+        cachedVideoId &&
+        /^[a-zA-Z0-9_-]{11}$/.test(cachedVideoId);
     if (canFastReturnStamp) {
         return cachedVideoId;
     }
@@ -80,17 +164,7 @@ function ensureVideoIdForCard(card) {
     }
 
     if (extractedVideoId) {
-        const shouldClearOnMismatch = (isKidsHost ||
-            tag === 'yt-lockup-view-model' ||
-            tag === 'yt-lockup-metadata-view-model' ||
-            tag === 'ytd-rich-item-renderer' ||
-            tag === 'ytd-video-renderer' ||
-            tag === 'ytd-grid-video-renderer' ||
-            tag === 'ytd-compact-video-renderer' ||
-            tag === 'ytm-video-with-context-renderer' ||
-            tag === 'ytm-compact-video-renderer' ||
-            tag === 'ytd-playlist-panel-video-renderer' ||
-            tag === 'ytd-playlist-panel-video-wrapper-renderer');
+        const shouldClearOnMismatch = shouldGuardVideoIdStamp(tag, isKidsHost);
 
         // IMPORTANT: YouTube frequently recycles DOM nodes. If this element did not previously have our
         // `data-filtertube-video-id` stamp but still has old FilterTube identity/hidden markers from a
@@ -593,9 +667,15 @@ function scanDataForChannelIdentifiers(root) {
                                 if (nav.browseEndpoint.browseId && nav.browseEndpoint.browseId.startsWith('UC') && !result.id) {
                                     result.id = nav.browseEndpoint.browseId;
                                 }
-                                if (nav.browseEndpoint.canonicalBaseUrl && !result.customUrl) {
-                                    const custom = extractCustomUrlFromPath(nav.browseEndpoint.canonicalBaseUrl);
-                                    if (custom) result.customUrl = custom;
+                                if (nav.browseEndpoint.canonicalBaseUrl) {
+                                    if (!result.handle && nav.browseEndpoint.canonicalBaseUrl.includes('/@')) {
+                                        const handle = extractHandleFromString(nav.browseEndpoint.canonicalBaseUrl);
+                                        if (handle) result.handle = handle;
+                                    }
+                                    if (!result.customUrl) {
+                                        const custom = extractCustomUrlFromPath(nav.browseEndpoint.canonicalBaseUrl);
+                                        if (custom) result.customUrl = custom;
+                                    }
                                 }
                             }
                         }
@@ -1041,6 +1121,28 @@ function extractVideoIdFromCard(card) {
             if (href) {
                 const match = extractFromHref(href);
                 if (match) return match;
+            }
+        }
+
+        // IMPORTANT: Playlist collection cards often ONLY expose playlist hrefs. Their thumbnail image
+        // contains a "seed" videoId which must NOT be treated as this card's identity.
+        if (isPlaylistCollectionCardElement(card)) {
+            return null;
+        }
+
+        // Method 5: Thumbnail image URLs (mix/radio cards sometimes only expose playlist href).
+        const imageSources = [];
+        card.querySelectorAll('img[src], img[srcset], source[srcset]').forEach((el) => {
+            const src = el.getAttribute('src') || '';
+            const srcset = el.getAttribute('srcset') || '';
+            if (src) imageSources.push(src);
+            if (srcset) imageSources.push(srcset);
+        });
+        for (const candidate of imageSources) {
+            if (!candidate || typeof candidate !== 'string') continue;
+            const match = candidate.match(/\/vi(?:_webp)?\/([a-zA-Z0-9_-]{11})(?:[\/?]|$)/);
+            if (match && match[1]) {
+                return match[1];
             }
         }
 

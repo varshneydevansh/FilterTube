@@ -221,9 +221,20 @@
     function normalizeChannelHandle(rawHandle) {
         if (typeof rawHandle !== 'string') return '';
 
+        const sharedNormalizeHandle = window.FilterTubeIdentity?.normalizeHandleValue;
         const sharedExtractRawHandle = window.FilterTubeIdentity?.extractRawHandle;
+        if (typeof sharedNormalizeHandle === 'function') {
+            const candidate = typeof sharedExtractRawHandle === 'function'
+                ? (sharedExtractRawHandle(rawHandle) || rawHandle)
+                : rawHandle;
+            return sharedNormalizeHandle(candidate) || '';
+        }
         if (typeof sharedExtractRawHandle === 'function') {
-            return sharedExtractRawHandle(rawHandle) || '';
+            const extracted = sharedExtractRawHandle(rawHandle) || '';
+            if (!extracted) return '';
+            const core = extracted.replace(/^@+/, '').trim();
+            if (!/^[A-Za-z0-9._-]{3,60}$/.test(core) || !/[A-Za-z0-9]/.test(core)) return '';
+            return `@${core.toLowerCase()}`;
         }
         let candidate = rawHandle.trim();
         if (!candidate) return '';
@@ -251,7 +262,8 @@
         }
         decoded = decoded.replace(/[\u200B-\u200F\u202A-\u202E\u2066-\u2069\uFEFF]/g, '').trim();
         if (!decoded) return '';
-        return `@${decoded}`;
+        if (!/^[A-Za-z0-9._-]{3,60}$/.test(decoded) || !/[A-Za-z0-9]/.test(decoded)) return '';
+        return `@${decoded.toLowerCase()}`;
     }
 
     function findHandleInValue(value) {
@@ -416,6 +428,62 @@
         gridVideoRenderer: BASE_VIDEO_RULES,
         playlistVideoRenderer: BASE_VIDEO_RULES,
         playlistPanelVideoRenderer: BASE_VIDEO_RULES,
+        videoWithContextRenderer: {
+            videoId: ['videoId', 'navigationEndpoint.watchEndpoint.videoId'],
+            title: ['headline.runs', 'title.runs', 'headline.simpleText', 'title.simpleText'],
+            channelName: ['shortBylineText.runs', 'longBylineText.runs', 'ownerText.runs'],
+            channelId: [
+                'shortBylineText.runs.0.navigationEndpoint.browseEndpoint.browseId',
+                'longBylineText.runs.0.navigationEndpoint.browseEndpoint.browseId',
+                'ownerText.runs.0.navigationEndpoint.browseEndpoint.browseId',
+                'channelThumbnail.channelThumbnailWithLinkRenderer.navigationEndpoint.browseEndpoint.browseId'
+            ],
+            channelHandle: [
+                'shortBylineText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl',
+                'longBylineText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl',
+                'ownerText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl',
+                'shortBylineText.runs.0.navigationEndpoint.commandMetadata.webCommandMetadata.url',
+                'longBylineText.runs.0.navigationEndpoint.commandMetadata.webCommandMetadata.url',
+                'ownerText.runs.0.navigationEndpoint.commandMetadata.webCommandMetadata.url',
+                'channelThumbnail.channelThumbnailWithLinkRenderer.navigationEndpoint.browseEndpoint.canonicalBaseUrl',
+                'channelThumbnail.channelThumbnailWithLinkRenderer.navigationEndpoint.commandMetadata.webCommandMetadata.url'
+            ],
+            duration: [
+                'thumbnailOverlays.0.thumbnailOverlayTimeStatusRenderer.text.simpleText',
+                'thumbnailOverlays.0.thumbnailOverlayTimeStatusRenderer.text.runs.0.text',
+                'lengthText.simpleText',
+                'lengthText.runs.0.text'
+            ],
+            publishedTime: [
+                'publishedTimeText.simpleText',
+                'publishedTimeText.runs.0.text',
+                'videoInfo.runs.0.text',
+                'videoInfo.runs.2.text'
+            ],
+            viewCount: ['viewCountText.simpleText', 'shortViewCountText.simpleText']
+        },
+        compactPlaylistRenderer: {
+            title: ['title.runs', 'title.simpleText'],
+            channelName: ['shortBylineText.runs', 'longBylineText.runs'],
+            channelId: [
+                'shortBylineText.runs.0.navigationEndpoint.browseEndpoint.browseId',
+                'longBylineText.runs.0.navigationEndpoint.browseEndpoint.browseId'
+            ],
+            channelHandle: [
+                'shortBylineText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl',
+                'longBylineText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl',
+                'shortBylineText.runs.0.navigationEndpoint.commandMetadata.webCommandMetadata.url',
+                'longBylineText.runs.0.navigationEndpoint.commandMetadata.webCommandMetadata.url'
+            ]
+        },
+        channelThumbnailWithLinkRenderer: {
+            channelId: ['navigationEndpoint.browseEndpoint.browseId'],
+            channelHandle: [
+                'navigationEndpoint.browseEndpoint.canonicalBaseUrl',
+                'navigationEndpoint.commandMetadata.webCommandMetadata.url'
+            ],
+            channelName: ['accessibility.accessibilityData.label']
+        },
         watchCardCompactVideoRenderer: BASE_VIDEO_RULES,
         endScreenVideoRenderer: BASE_VIDEO_RULES,
 
@@ -448,10 +516,19 @@
             ],
             title: ['metadata.lockupMetadataViewModel.title.content', 'accessibilityText'],
             channelName: ['metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.0.metadataParts.0.text.content'],
-            channelId: ['metadata.lockupMetadataViewModel.image.decoratedAvatarViewModel.rendererContext.commandContext.onTap.innertubeCommand.browseEndpoint.browseId'],
+            channelId: [
+                'metadata.lockupMetadataViewModel.image.decoratedAvatarViewModel.rendererContext.commandContext.onTap.innertubeCommand.browseEndpoint.browseId',
+                // YTM playlist lockups commonly carry owner browseId in metadataRows.commandRuns
+                'metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.0.metadataParts.0.text.commandRuns.0.onTap.innertubeCommand.browseEndpoint.browseId',
+                'metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.0.metadataParts.1.text.commandRuns.0.onTap.innertubeCommand.browseEndpoint.browseId'
+            ],
             channelHandle: [
                 'metadata.lockupMetadataViewModel.image.decoratedAvatarViewModel.rendererContext.commandContext.onTap.innertubeCommand.browseEndpoint.canonicalBaseUrl',
-                'metadata.lockupMetadataViewModel.image.decoratedAvatarViewModel.rendererContext.commandContext.onTap.innertubeCommand.commandMetadata.webCommandMetadata.url'
+                'metadata.lockupMetadataViewModel.image.decoratedAvatarViewModel.rendererContext.commandContext.onTap.innertubeCommand.commandMetadata.webCommandMetadata.url',
+                'metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.0.metadataParts.0.text.commandRuns.0.onTap.innertubeCommand.browseEndpoint.canonicalBaseUrl',
+                'metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.0.metadataParts.0.text.commandRuns.0.onTap.innertubeCommand.commandMetadata.webCommandMetadata.url',
+                'metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.0.metadataParts.1.text.commandRuns.0.onTap.innertubeCommand.browseEndpoint.canonicalBaseUrl',
+                'metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.0.metadataParts.1.text.commandRuns.0.onTap.innertubeCommand.commandMetadata.webCommandMetadata.url'
             ],
             metadataRows: ['metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows'],
             duration: [
@@ -1164,14 +1241,28 @@
                     candidate = candidate.compactVideoRenderer;
                 } else if (candidate.playlistVideoRenderer) {
                     candidate = candidate.playlistVideoRenderer;
+                } else if (candidate.playlistPanelVideoRenderer) {
+                    candidate = candidate.playlistPanelVideoRenderer;
+                } else if (candidate.videoWithContextRenderer) {
+                    candidate = candidate.videoWithContextRenderer;
+                } else if (candidate.compactPlaylistRenderer) {
+                    candidate = candidate.compactPlaylistRenderer;
                 } else if (candidate.lockupViewModel) {
                     candidate = candidate.lockupViewModel;
                 } else if (candidate.richItemRenderer?.content?.videoRenderer) {
                     candidate = candidate.richItemRenderer.content.videoRenderer;
+                } else if (candidate.richItemRenderer?.content?.videoWithContextRenderer) {
+                    candidate = candidate.richItemRenderer.content.videoWithContextRenderer;
+                } else if (candidate.richItemRenderer?.content?.compactPlaylistRenderer) {
+                    candidate = candidate.richItemRenderer.content.compactPlaylistRenderer;
                 } else if (candidate.richItemRenderer?.content?.lockupViewModel) {
                     candidate = candidate.richItemRenderer.content.lockupViewModel;
                 } else if (candidate.content?.videoRenderer) {
                     candidate = candidate.content.videoRenderer;
+                } else if (candidate.content?.videoWithContextRenderer) {
+                    candidate = candidate.content.videoWithContextRenderer;
+                } else if (candidate.content?.compactPlaylistRenderer) {
+                    candidate = candidate.content.compactPlaylistRenderer;
                 } else if (candidate.content?.lockupViewModel) {
                     candidate = candidate.content.lockupViewModel;
                 }
@@ -1652,7 +1743,8 @@
                 'endScreenVideoRenderer', 'richItemRenderer', 'lockupViewModel',
                 'shortsLockupViewModel', 'shortsLockupViewModelV2', 'reelItemRenderer',
                 'richGridMedia', 'channelVideoPlayerRenderer', 'playlistPanelVideoRenderer',
-                'playlistRenderer', 'gridPlaylistRenderer', 'radioRenderer', 'compactRadioRenderer'
+                'playlistRenderer', 'gridPlaylistRenderer', 'radioRenderer', 'compactRadioRenderer',
+                'videoWithContextRenderer', 'compactPlaylistRenderer'
             ].includes(rendererType);
             if (!isVideoRenderer) return false;
 
@@ -2033,6 +2125,8 @@
                     'gridVideoRenderer',
                     'playlistVideoRenderer',
                     'playlistPanelVideoRenderer',
+                    'videoWithContextRenderer',
+                    'compactPlaylistRenderer',
                     'watchCardCompactVideoRenderer',
                     'endScreenVideoRenderer',
                     'lockupViewModel',
@@ -2059,7 +2153,9 @@
             // Some renderers may nest lockups directly under item (not under `.content`)
             const directKnownKeys = [
                 'videoRenderer',
-                'lockupViewModel'
+                'lockupViewModel',
+                'videoWithContextRenderer',
+                'compactPlaylistRenderer'
             ];
             for (const key of directKnownKeys) {
                 if (!item[key] || typeof item[key] !== 'object') continue;
@@ -2228,7 +2324,8 @@
                 'endScreenVideoRenderer', 'richItemRenderer', 'lockupViewModel',
                 'shortsLockupViewModel', 'shortsLockupViewModelV2', 'reelItemRenderer',
                 'richGridMedia', 'channelVideoPlayerRenderer', 'playlistPanelVideoRenderer',
-                'playlistRenderer', 'gridPlaylistRenderer', 'radioRenderer', 'compactRadioRenderer'
+                'playlistRenderer', 'gridPlaylistRenderer', 'radioRenderer', 'compactRadioRenderer',
+                'videoWithContextRenderer', 'compactPlaylistRenderer'
             ].includes(rendererType);
 
             if (!isVideoRenderer) return false;
@@ -2523,6 +2620,74 @@
             }
 
             if (bylineText?.runs) {
+                const extractListItemsFromSheetLikeCommand = (command) => {
+                    if (!command || typeof command !== 'object') return [];
+                    const listItems =
+                        command?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems ||
+                        command?.panelLoadingStrategy?.inlineContent?.sheetViewModel?.content?.listViewModel?.listItems ||
+                        [];
+                    return Array.isArray(listItems) ? listItems : [];
+                };
+
+                const pickBrowseEndpoint = (viewModel) => {
+                    if (!viewModel || typeof viewModel !== 'object') return null;
+                    const fromContext = (
+                        viewModel?.rendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint ||
+                        viewModel?.rendererContext?.commandContext?.onTap?.innertubeCommand?.command?.browseEndpoint ||
+                        viewModel?.rendererContext?.commandContext?.onTap?.browseEndpoint ||
+                        null
+                    );
+                    const commandRuns = Array.isArray(viewModel?.title?.commandRuns) ? viewModel.title.commandRuns : [];
+                    let fromTitleRuns = null;
+                    for (const run of commandRuns) {
+                        const browse =
+                            run?.onTap?.innertubeCommand?.browseEndpoint ||
+                            run?.onTap?.innertubeCommand?.command?.browseEndpoint ||
+                            run?.onTap?.browseEndpoint ||
+                            null;
+                        if (browse) {
+                            fromTitleRuns = browse;
+                            break;
+                        }
+                    }
+                    const normalizeUc = (value) => {
+                        const raw = typeof value === 'string' ? value.trim() : '';
+                        return /^UC[\w-]{22}$/i.test(raw) ? raw : '';
+                    };
+                    const contextId = normalizeUc(fromContext?.browseId || '');
+                    const titleId = normalizeUc(fromTitleRuns?.browseId || '');
+                    const idsConflict = Boolean(contextId && titleId && contextId !== titleId);
+                    const preferred = idsConflict ? fromContext : (fromTitleRuns || fromContext);
+                    if (!preferred) return null;
+                    return {
+                        ...(fromContext || {}),
+                        ...(fromTitleRuns || {}),
+                        browseId: idsConflict
+                            ? (fromContext?.browseId || '')
+                            : (fromTitleRuns?.browseId || fromContext?.browseId || ''),
+                        canonicalBaseUrl: idsConflict
+                            ? (fromContext?.canonicalBaseUrl || '')
+                            : (fromTitleRuns?.canonicalBaseUrl || fromContext?.canonicalBaseUrl || ''),
+                        __idsConflict: idsConflict
+                    };
+                };
+
+                const pickMetadataUrl = (viewModel) => {
+                    const direct = viewModel?.rendererContext?.commandContext?.onTap?.innertubeCommand?.commandMetadata?.webCommandMetadata?.url ||
+                        viewModel?.rendererContext?.commandContext?.onTap?.innertubeCommand?.command?.commandMetadata?.webCommandMetadata?.url ||
+                        '';
+                    if (direct) return direct;
+                    const commandRuns = Array.isArray(viewModel?.title?.commandRuns) ? viewModel.title.commandRuns : [];
+                    for (const run of commandRuns) {
+                        const candidate = run?.onTap?.innertubeCommand?.commandMetadata?.webCommandMetadata?.url ||
+                            run?.onTap?.innertubeCommand?.command?.commandMetadata?.webCommandMetadata?.url ||
+                            run?.onTap?.commandMetadata?.webCommandMetadata?.url ||
+                            '';
+                        if (candidate) return candidate;
+                    }
+                    return '';
+                };
+
                 for (const run of bylineText.runs) {
                     // DEBUG: Log run structure
                     if (run.text && (run.text.includes(' and ') || run.text.includes(' & '))) {
@@ -2531,13 +2696,15 @@
                         postLogToBridge('log', '[COLLAB DEBUG] Has showDialogCommand?', !!run.navigationEndpoint?.showDialogCommand);
                     }
 
-                    // Look for showDialogCommand which indicates a collaboration video
+                    // Look for showSheet/showDialog command which indicates a collaboration video
+                    const showSheetCommand = run.navigationEndpoint?.showSheetCommand;
                     const showDialogCommand = run.navigationEndpoint?.showDialogCommand;
-                    if (showDialogCommand) {
-                        postLogToBridge('log', '🎯 Detected COLLABORATION video via showDialogCommand in filter_logic');
+                    const sheetLikeCommand = showSheetCommand || showDialogCommand;
+                    if (sheetLikeCommand) {
+                        postLogToBridge('log', '🎯 Detected COLLABORATION video via sheet/dialog command in filter_logic');
 
                         // Extract all collaborating channels from listItems
-                        const listItems = showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems;
+                        const listItems = extractListItemsFromSheetLikeCommand(sheetLikeCommand);
 
                         if (listItems && Array.isArray(listItems)) {
                             const collaborators = [];
@@ -2545,7 +2712,7 @@
                             for (const item of listItems) {
                                 const listItemViewModel = item.listItemViewModel;
                                 if (listItemViewModel) {
-                                    const browseEndpoint = listItemViewModel.rendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint;
+                                    const browseEndpoint = pickBrowseEndpoint(listItemViewModel);
                                     const title = listItemViewModel.title?.content;
 
                                     if (browseEndpoint) {
@@ -2583,10 +2750,25 @@
                                                 }
                                             }
                                         }
+                                        if (!collabChannelInfo.customUrl) {
+                                            const metadataUrl = pickMetadataUrl(listItemViewModel);
+                                            if (typeof metadataUrl === 'string') {
+                                                if (metadataUrl.includes('/c/')) {
+                                                    const cMatch = metadataUrl.match(/\/c\/([^/?#]+)/);
+                                                    if (cMatch && cMatch[1]) collabChannelInfo.customUrl = `c/${cMatch[1]}`;
+                                                } else if (metadataUrl.includes('/user/')) {
+                                                    const uMatch = metadataUrl.match(/\/user\/([^/?#]+)/);
+                                                    if (uMatch && uMatch[1]) collabChannelInfo.customUrl = `user/${uMatch[1]}`;
+                                                }
+                                            }
+                                        }
 
                                         // Extract UC ID
                                         if (browseId?.startsWith('UC')) {
                                             collabChannelInfo.id = browseId;
+                                        }
+                                        if (browseEndpoint?.__idsConflict && collabChannelInfo.id && collabChannelInfo.handle) {
+                                            collabChannelInfo.handle = '';
                                         }
 
                                         if (collabChannelInfo.handle || collabChannelInfo.id || collabChannelInfo.customUrl) {
@@ -2634,7 +2816,14 @@
             }
 
             if (rules.channelId) {
-                channelInfo.id = getByPath(item, rules.channelId);
+                const idPaths = Array.isArray(rules.channelId) ? rules.channelId : [rules.channelId];
+                for (const path of idPaths) {
+                    const candidate = getByPath(item, path);
+                    if (typeof candidate === 'string' && candidate.trim()) {
+                        channelInfo.id = candidate.trim();
+                        break;
+                    }
+                }
             }
 
             if (rules.channelHandle) {
@@ -2669,6 +2858,9 @@
                     'longBylineText.runs.0.navigationEndpoint.browseEndpoint.browseId',
                     'ownerText.runs.0.navigationEndpoint.browseEndpoint.browseId',
                     'authorEndpoint.browseEndpoint.browseId',
+                    'channelThumbnail.channelThumbnailWithLinkRenderer.navigationEndpoint.browseEndpoint.browseId',
+                    'metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.0.metadataParts.0.text.commandRuns.0.onTap.innertubeCommand.browseEndpoint.browseId',
+                    'metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.0.metadataParts.1.text.commandRuns.0.onTap.innertubeCommand.browseEndpoint.browseId',
                     'channelId'
                 ];
 
@@ -2685,7 +2877,16 @@
                         'shortBylineText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl',
                         'longBylineText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl',
                         'ownerText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl',
-                        'navigationEndpoint.browseEndpoint.canonicalBaseUrl'
+                        'shortBylineText.runs.0.navigationEndpoint.commandMetadata.webCommandMetadata.url',
+                        'longBylineText.runs.0.navigationEndpoint.commandMetadata.webCommandMetadata.url',
+                        'ownerText.runs.0.navigationEndpoint.commandMetadata.webCommandMetadata.url',
+                        'channelThumbnail.channelThumbnailWithLinkRenderer.navigationEndpoint.browseEndpoint.canonicalBaseUrl',
+                        'channelThumbnail.channelThumbnailWithLinkRenderer.navigationEndpoint.commandMetadata.webCommandMetadata.url',
+                        'navigationEndpoint.browseEndpoint.canonicalBaseUrl',
+                        'metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.0.metadataParts.0.text.commandRuns.0.onTap.innertubeCommand.browseEndpoint.canonicalBaseUrl',
+                        'metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.0.metadataParts.0.text.commandRuns.0.onTap.innertubeCommand.commandMetadata.webCommandMetadata.url',
+                        'metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.0.metadataParts.1.text.commandRuns.0.onTap.innertubeCommand.browseEndpoint.canonicalBaseUrl',
+                        'metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.0.metadataParts.1.text.commandRuns.0.onTap.innertubeCommand.commandMetadata.webCommandMetadata.url'
                     ];
 
                     // Try to extract handle or customUrl from canonicalBaseUrl
@@ -2712,6 +2913,61 @@
                         // Stop if we have what we need
                         if (channelInfo.handle && channelInfo.customUrl) break;
                     }
+                }
+            }
+
+            // Generic lockup fallback: iterate ALL metadataRows/metadataParts/commandRuns.
+            // YTM frequently shifts owner identity between parts, so fixed [0] paths miss valid IDs/handles.
+            if (!channelInfo.id || !channelInfo.handle || !channelInfo.customUrl) {
+                try {
+                    const metadataRows = getByPath(item, 'metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows');
+                    if (Array.isArray(metadataRows)) {
+                        for (const row of metadataRows) {
+                            const parts = Array.isArray(row?.metadataParts) ? row.metadataParts : [];
+                            for (const part of parts) {
+                                const commandRuns = Array.isArray(part?.text?.commandRuns) ? part.text.commandRuns : [];
+                                for (const cmd of commandRuns) {
+                                    const command = cmd?.onTap?.innertubeCommand || cmd?.onTap?.browseEndpoint || null;
+                                    const browseEndpoint = command?.browseEndpoint || (command?.browseId ? command : null) || null;
+                                    const browseId = browseEndpoint?.browseId;
+                                    if (!channelInfo.id && typeof browseId === 'string' && /^UC[\w-]{22}$/i.test(browseId)) {
+                                        channelInfo.id = browseId.trim();
+                                    }
+
+                                    const canonicalBaseUrl = browseEndpoint?.canonicalBaseUrl ||
+                                        command?.commandMetadata?.webCommandMetadata?.url ||
+                                        cmd?.onTap?.commandMetadata?.webCommandMetadata?.url ||
+                                        '';
+                                    if (typeof canonicalBaseUrl === 'string' && canonicalBaseUrl) {
+                                        if (!channelInfo.handle && canonicalBaseUrl.startsWith('/@')) {
+                                            const normalized = normalizeChannelHandle(canonicalBaseUrl);
+                                            if (normalized) channelInfo.handle = normalized;
+                                        } else if (!channelInfo.customUrl && (canonicalBaseUrl.startsWith('/c/') || canonicalBaseUrl.startsWith('/user/'))) {
+                                            if (typeof window.FilterTubeIdentity?.extractCustomUrlFromPath === 'function') {
+                                                channelInfo.customUrl = window.FilterTubeIdentity.extractCustomUrlFromPath(canonicalBaseUrl);
+                                            } else {
+                                                const partsArr = canonicalBaseUrl.split('/');
+                                                const type = partsArr[1];
+                                                const slug = partsArr[2] ? partsArr[2].split(/[?#]/)[0] : '';
+                                                if (slug) channelInfo.customUrl = `${type}/${slug}`;
+                                            }
+                                        }
+                                    }
+
+                                    if (channelInfo.id && (channelInfo.handle || channelInfo.customUrl)) {
+                                        break;
+                                    }
+                                }
+                                if (channelInfo.id && (channelInfo.handle || channelInfo.customUrl)) {
+                                    break;
+                                }
+                            }
+                            if (channelInfo.id && (channelInfo.handle || channelInfo.customUrl)) {
+                                break;
+                            }
+                        }
+                    }
+                } catch (e) {
                 }
             }
 

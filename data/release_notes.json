@@ -3,6 +3,20 @@
     "_comment": "Shared release notes source for the dashboard What's New tab and the YouTube release banner. Keep entries sorted newest-first by version."
   },
   {
+    "version": "3.2.8",
+    "headline": "YouTube Mobile Support + Identity Hardening",
+    "summary": "Full YouTube Mobile support, hardened identity resolution, and tiered background enrichment.",
+    "bannerSummary": "Now with robust YouTube Mobile support, hardened channel identity, and smarter background updates.",
+    "highlights": [
+      "YouTube Mobile: Native support for m.youtube.com with specialized menu injection and auto-skip.",
+      "Identity Hardening: New Round-Trip validation prevents stale channel alias poisoning.",
+      "Tiered Enrichment: Smarter background retries for missing handles, names, and logos.",
+      "Multi-Origin Rotation: Rotates requests across YouTube origins to improve reliability.",
+      "Playlist Creator: Resolves channel owners directly from playlist pages for better coverage."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.8"
+  },
+  {
     "version": "3.2.7",
     "headline": "Category Filters + Quick Block Hover Cross + Mobile 3 Dot UI & Quick Cross Block Support",
     "summary": "New category filtering, one-tap quick cross block enabled by default",

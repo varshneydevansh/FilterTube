@@ -594,8 +594,10 @@ const pendingKidsWatchIdentityFetches = new Map();
 const kidsWatchIdentitySessionCache = new Map();
 const pendingPostBlockEnrichments = new Map();
 const postBlockEnrichmentAttempted = new Map();
+const postBlockEnrichmentAttemptCounts = new Map();
 const queuedPostBlockEnrichmentKeys = new Set();
 let postBlockEnrichmentWorker = Promise.resolve();
+const POST_BLOCK_ENRICHMENT_MAX_ATTEMPTS = 6;
 const CURRENT_VERSION = (browserAPI.runtime.getManifest()?.version || '').trim();
 const FT_PROFILES_V4_KEY = 'ftProfilesV4';
 const DEFAULT_PROFILE_ID = 'default';
@@ -678,45 +680,116 @@ function applyQuickBlockDefaultMigrationOnce({ previousVersion = '', isInstall =
 }
 
 function schedulePostBlockEnrichment(channel, profile = 'main', metadata = {}) {
-    const source = typeof metadata?.source === 'string' ? metadata.source : '';
-    if (source === 'postBlockEnrichment') return;
-
     const topicFlag = channel?.topicChannel === true || metadata?.topicChannel === true;
     if (topicFlag) return;
 
     const id = typeof channel?.id === 'string' ? channel.id.trim() : '';
     if (!id || !id.toUpperCase().startsWith('UC')) return;
 
-    const key = `${profile === 'kids' ? 'kids' : 'main'}:${id.toLowerCase()}`;
-    const now = Date.now();
-    const lastAttempt = postBlockEnrichmentAttempted.get(key) || 0;
-    if (now - lastAttempt < 6 * 60 * 60 * 1000) return;
-
     const name = typeof channel?.name === 'string' ? channel.name.trim() : '';
     const handle = typeof channel?.handle === 'string' ? channel.handle.trim() : '';
     const customUrl = typeof channel?.customUrl === 'string' ? channel.customUrl.trim() : '';
     const logo = typeof channel?.logo === 'string' ? channel.logo.trim() : '';
+    const sourceTag = String(metadata?.source || channel?.source || '').toLowerCase();
+    const isImportedSource = /\b(import|backup|restore|migration)\b/.test(sourceTag);
+    const isFreshEntry = metadata?.newlyAdded === true || metadata?.isNewEntry === true;
 
-    const needsEnrichment = ((!handle && !customUrl) || !logo || !name);
-    if (!needsEnrichment) return;
+    const isLikelyBadName = (value) => {
+        if (!value || typeof value !== 'string') return true;
+        const trimmed = value.trim();
+        if (!trimmed) return true;
+        if (trimmed.startsWith('@')) return true;
+        if (/^UC[\w-]{22}$/i.test(trimmed)) return true;
+        if (/^uc[a-z0-9_-]{6,}$/i.test(trimmed)) return true;
+        if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) return true;
+        if (/^watch:[a-zA-Z0-9_-]{11}$/i.test(trimmed)) return true;
+        return false;
+    };
+
+    const missingIdentity = (!handle && !customUrl);
+    const missingPresentation = (!logo || !name || isLikelyBadName(name));
+    // Run one low-cost validation fetch for newly added channels (except import/backup flows),
+    // even when identity appears complete, so wrong aliases like @...vevo can be corrected quickly.
+    const forceValidationForNewEntry = isFreshEntry && !isImportedSource;
+    const needsEnrichment = (missingIdentity || missingPresentation || forceValidationForNewEntry);
+    const key = `${profile === 'kids' ? 'kids' : 'main'}:${id.toLowerCase()}`;
+    if (!needsEnrichment) {
+        postBlockEnrichmentAttemptCounts.delete(key);
+        return;
+    }
+
+    let currentAttempts = postBlockEnrichmentAttemptCounts.get(key) || 0;
+    const now = Date.now();
+    const lastAttempt = postBlockEnrichmentAttempted.get(key) || 0;
+    const maxAttempts = missingIdentity
+        ? Math.max(POST_BLOCK_ENRICHMENT_MAX_ATTEMPTS, 12)
+        : POST_BLOCK_ENRICHMENT_MAX_ATTEMPTS;
+    if (currentAttempts >= maxAttempts) {
+        // UC-only rows are the highest-impact failure mode ("Not fetched").
+        // Allow retries again after a cool-down window instead of permanently exhausting attempts.
+        const cooldownMs = missingIdentity ? (15 * 60 * 1000) : (60 * 60 * 1000);
+        if (now - lastAttempt < cooldownMs) return;
+        currentAttempts = 0;
+        postBlockEnrichmentAttemptCounts.set(key, 0);
+    }
+    // New rows should validate quickly so we do not leave "UC -> Not fetched" entries behind.
+    // Identity gaps retry in ~5-12s; presentation-only gaps retry in ~2-3m.
+    const retryGapMs = missingIdentity
+        ? (5 * 1000) + Math.floor(Math.random() * (7 * 1000))
+        : (2 * 60 * 1000) + Math.floor(Math.random() * (60 * 1000));
+    if (!isFreshEntry && now - lastAttempt < retryGapMs) return;
 
     if (pendingPostBlockEnrichments.has(key) || queuedPostBlockEnrichmentKeys.has(key)) return;
     postBlockEnrichmentAttempted.set(key, now);
+    postBlockEnrichmentAttemptCounts.set(key, currentAttempts + 1);
     queuedPostBlockEnrichmentKeys.add(key);
 
-    const delayMs = 3500 + Math.floor(Math.random() * 750);
+    const delayMs = missingIdentity
+        ? (700 + Math.floor(Math.random() * 600))
+        : ((isFreshEntry ? 1800 : 2500) + Math.floor(Math.random() * 700));
+    const preferredEnrichmentVideoId = (typeof metadata?.enrichmentVideoId === 'string' && metadata.enrichmentVideoId.trim())
+        ? metadata.enrichmentVideoId.trim()
+        : ((typeof metadata?.videoId === 'string' && metadata.videoId.trim())
+            ? metadata.videoId.trim()
+            : '');
+
+    const resolveEnrichmentVideoId = async () => {
+        if (preferredEnrichmentVideoId) return preferredEnrichmentVideoId;
+        try {
+            const map = await ensureVideoChannelMapCache();
+            const targetId = id.toLowerCase();
+            const entries = Object.entries(map || {});
+            for (let i = entries.length - 1; i >= 0; i--) {
+                const [candidateVideoId, candidateChannelId] = entries[i];
+                if (!candidateVideoId || !candidateChannelId) continue;
+                if (!/^[a-zA-Z0-9_-]{11}$/.test(String(candidateVideoId))) continue;
+                const normalizedCandidateId = String(candidateChannelId).trim().toLowerCase();
+                if (normalizedCandidateId === targetId) {
+                    return String(candidateVideoId).trim();
+                }
+            }
+        } catch (e) {
+        }
+        return '';
+    };
 
     const run = postBlockEnrichmentWorker
         .then(() => new Promise(resolve => setTimeout(resolve, delayMs)))
-        .then(() => handleAddFilteredChannel(
-            id,
-            false,
-            null,
-            null,
-            { source: 'postBlockEnrichment' },
-            profile === 'kids' ? 'kids' : 'main',
-            ''
-        ))
+        .then(async () => {
+            const enrichmentVideoId = await resolveEnrichmentVideoId();
+            return handleAddFilteredChannel(
+                id,
+                false,
+                null,
+                null,
+                {
+                    source: 'postBlockEnrichment',
+                    enrichmentVideoId
+                },
+                profile === 'kids' ? 'kids' : 'main',
+                enrichmentVideoId
+            );
+        })
         .catch(() => {
         })
         .finally(() => {
@@ -1474,8 +1547,8 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
                 ? (Array.isArray(activeKids.blockedKeywords) ? activeKids.blockedKeywords : null)
                 : (() => {
                     // V4 schema uses 'blockedKeywords' for blocklist mode, fallback to 'keywords' for migration
-                    const mainKeywords = Array.isArray(activeMain.blockedKeywords) 
-                        ? activeMain.blockedKeywords 
+                    const mainKeywords = Array.isArray(activeMain.blockedKeywords)
+                        ? activeMain.blockedKeywords
                         : (Array.isArray(activeMain.keywords) ? activeMain.keywords : null);
                     // Only merge Kids keywords when sync enabled AND Main is in blocklist mode
                     if (!syncKidsToMain || mainModeFromV4 !== 'blocklist') return mainKeywords;
@@ -1635,8 +1708,8 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
                 ? effectiveKidsChannels
                 : (() => {
                     // V4 schema uses 'blockedChannels' for blocklist mode, fallback to 'channels' for migration
-                    const mainChannels = Array.isArray(activeMain.blockedChannels) 
-                        ? activeMain.blockedChannels 
+                    const mainChannels = Array.isArray(activeMain.blockedChannels)
+                        ? activeMain.blockedChannels
                         : (Array.isArray(activeMain.channels) ? activeMain.channels : items.filterChannels);
                     // Only merge Kids channels when sync enabled AND Main is in blocklist mode
                     if (!syncKidsToMain) return mainChannels;
@@ -1775,18 +1848,18 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
                     // Only if NOT using Kids profile (Main profile only)
                     if (!shouldUseKidsProfile) {
                         const activeProfileId = items.ftActiveProfileId || 'default';
-                        
+
                         // Determine which keyword list to update based on Main's mode
                         // V4 schema uses 'blockedKeywords' for blocklist mode, 'whitelistKeywords' for whitelist mode
                         const isWhitelistMode = mainModeFromV4 === 'whitelist';
                         const keywordKey = isWhitelistMode ? 'whitelistKeywords' : 'blockedKeywords';
                         const currentKeywords = Array.isArray(activeMain[keywordKey]) ? activeMain[keywordKey] : [];
-                        
+
                         // Get existing words to avoid duplicates
                         const existingWords = new Set(
                             currentKeywords.map(k => (typeof k === 'object' ? k.word : String(k)).toLowerCase())
                         );
-                        
+
                         // Convert compiled keyword format back to storage format
                         const keywordsToPersist = uniqueChannelKeywords
                             .map(kw => {
@@ -1802,7 +1875,7 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
                                 };
                             })
                             .filter(Boolean);
-                        
+
                         if (keywordsToPersist.length > 0 && items.ftProfilesV4?.profiles?.[activeProfileId]) {
                             const updatedKeywords = [...currentKeywords, ...keywordsToPersist];
                             // Update the nested structure properly
@@ -2143,9 +2216,7 @@ function storageGet(keys) {
 async function performShortsIdentityFetch(videoId, normalizedHandle) {
     const stored = await storageGet(['videoChannelMap']);
     const storedId = stored?.videoChannelMap?.[videoId];
-    if (storedId) {
-        return { id: storedId, videoId, source: 'videoChannelMap' };
-    }
+    let weakIdentity = storedId ? { id: storedId, videoId, source: 'videoChannelMap' } : null;
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort('timeout'), SHORTS_FETCH_TIMEOUT_MS);
@@ -2164,6 +2235,11 @@ async function performShortsIdentityFetch(videoId, normalizedHandle) {
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
         let previewBuffer = '';
+        const hasStrongAlternate = (identity) => Boolean(
+            identity &&
+            ((typeof identity.handle === 'string' && identity.handle.trim().startsWith('@'))
+                || (typeof identity.customUrl === 'string' && identity.customUrl.trim()))
+        );
 
         while (true) {
             const { done, value } = await reader.read();
@@ -2172,10 +2248,18 @@ async function performShortsIdentityFetch(videoId, normalizedHandle) {
             previewBuffer += decoder.decode(value, { stream: true });
             const quickIdentity = extractIdentityFromPreview(previewBuffer, normalizedHandle);
             if (quickIdentity) {
-                controller.abort('identity_found');
                 quickIdentity.partial = true;
                 quickIdentity.videoId = videoId;
-                return quickIdentity;
+                if (hasStrongAlternate(quickIdentity)) {
+                    controller.abort('identity_found');
+                    return quickIdentity;
+                }
+                weakIdentity = {
+                    ...(weakIdentity || {}),
+                    ...quickIdentity,
+                    id: quickIdentity.id || weakIdentity?.id || null,
+                    videoId
+                };
             }
 
             if (previewBuffer.length >= SHORTS_PARTIAL_STREAM_LIMIT) {
@@ -2189,34 +2273,172 @@ async function performShortsIdentityFetch(videoId, normalizedHandle) {
         const fallbackIdentity = extractIdentityFromPreview(previewBuffer, normalizedHandle);
         if (fallbackIdentity) {
             fallbackIdentity.videoId = videoId;
-            return fallbackIdentity;
+            if (hasStrongAlternate(fallbackIdentity)) {
+                return fallbackIdentity;
+            }
+            weakIdentity = {
+                ...(weakIdentity || {}),
+                ...fallbackIdentity,
+                id: fallbackIdentity.id || weakIdentity?.id || null,
+                videoId
+            };
         }
 
-        return null;
+        return weakIdentity || null;
     } catch (error) {
         if (error?.name === 'AbortError') {
             console.debug('FilterTube Background: Shorts fetch aborted', error?.message || '');
         } else {
             console.debug('FilterTube Background: Shorts fetch exception', error);
         }
-        return null;
+        return weakIdentity || null;
     } finally {
         clearTimeout(timeoutId);
     }
 }
 
 function extractIdentityFromPreview(preview, normalizedHandle) {
-    if (!preview || typeof FilterTubeIdentity?.fastExtractIdentityFromHtmlChunk !== 'function') {
+    if (!preview || typeof preview !== 'string') {
         return null;
     }
-    const identity = FilterTubeIdentity.fastExtractIdentityFromHtmlChunk(preview);
-    if (!identity) return null;
 
-    const normalizedFound = typeof FilterTubeIdentity.normalizeHandleValue === 'function'
+    const decodeJsonEscapesForSearch = (value) => {
+        if (!value || typeof value !== 'string') return '';
+        return value
+            .replace(/\\x([0-9a-fA-F]{2})/g, (_, hex) => {
+                try {
+                    return String.fromCharCode(parseInt(hex, 16));
+                } catch (e) {
+                    return _;
+                }
+            })
+            .replace(/\\u([0-9a-fA-F]{4})/g, (_, hex) => {
+                try {
+                    return String.fromCharCode(parseInt(hex, 16));
+                } catch (e) {
+                    return _;
+                }
+            })
+            .replace(/\\\//g, '/')
+            .replace(/\\u002F/gi, '/')
+            .replace(/\\u003A/gi, ':')
+            .replace(/\\u003D/gi, '=')
+            .replace(/\\u0026/gi, '&')
+            .replace(/\\u003F/gi, '?')
+            .replace(/\\u0023/gi, '#')
+            .replace(/\\u0040/gi, '@');
+    };
+
+    const decodedPreview = decodeJsonEscapesForSearch(preview);
+    const unescapedPreview = decodedPreview.replace(/\\\//g, '/');
+    const identity = (() => {
+        if (typeof FilterTubeIdentity?.fastExtractIdentityFromHtmlChunk !== 'function') return {};
+        return (
+            FilterTubeIdentity.fastExtractIdentityFromHtmlChunk(unescapedPreview) ||
+            FilterTubeIdentity.fastExtractIdentityFromHtmlChunk(decodedPreview) ||
+            FilterTubeIdentity.fastExtractIdentityFromHtmlChunk(preview) ||
+            {}
+        );
+    })();
+
+    const safeExtractHandle = (value) => {
+        if (!value || typeof value !== 'string') return '';
+        try {
+            const raw = typeof FilterTubeIdentity?.extractRawHandle === 'function'
+                ? FilterTubeIdentity.extractRawHandle(value)
+                : '';
+            const normalized = typeof FilterTubeIdentity?.normalizeHandleValue === 'function'
+                ? FilterTubeIdentity.normalizeHandleValue(raw || value)
+                : (raw || value);
+            return (typeof normalized === 'string' && normalized.trim().startsWith('@'))
+                ? normalized.trim().toLowerCase()
+                : '';
+        } catch (e) {
+            return '';
+        }
+    };
+
+    const safeExtractCustomUrl = (value) => {
+        if (!value || typeof value !== 'string') return '';
+        try {
+            if (typeof FilterTubeIdentity?.extractCustomUrlFromPath === 'function') {
+                const extracted = FilterTubeIdentity.extractCustomUrlFromPath(value);
+                if (extracted) return extracted;
+            }
+        } catch (e) {
+        }
+        const match = value.match(/\/(c|user)\/([^/?#]+)/i);
+        if (match && match[1] && match[2]) {
+            try {
+                return `${match[1].toLowerCase()}/${decodeURIComponent(match[2])}`;
+            } catch (e) {
+                return `${match[1].toLowerCase()}/${match[2]}`;
+            }
+        }
+        return '';
+    };
+
+    if (!identity.id) {
+        const idMatch = unescapedPreview.match(/"(?:browseId|externalChannelId|channelId|ownerChannelId|ownerDocid|externalId)"\s*:\s*"(UC[\w-]{22})"/i);
+        if (idMatch && idMatch[1]) {
+            identity.id = idMatch[1];
+        }
+    }
+
+    if (!identity.handle) {
+        const handlePatterns = [
+            /"vanityChannelUrl"\s*:\s*"https?:\/\/(?:www|m|music)\.youtube\.com\/(@[^"\/?#\\]+)"/i,
+            /"canonicalBaseUrl"\s*:\s*"(\/@[^"\/?#\\]+)"/i,
+            /"ownerUrls"\s*:\s*\[\s*"https?:\/\/(?:www|m|music)\.youtube\.com\/(@[^"\/?#\\]+)"/i,
+            /"urlCanonical"\s*:\s*"https?:\/\/(?:www|m|music)\.youtube\.com\/(@[^"\/?#\\]+)"/i,
+            /href="(\/@[^"]+)"/i
+        ];
+        for (const pattern of handlePatterns) {
+            const match = unescapedPreview.match(pattern) || decodedPreview.match(pattern);
+            if (!match || !match[1]) continue;
+            const extracted = safeExtractHandle(match[1]);
+            if (extracted) {
+                identity.handle = extracted;
+                break;
+            }
+        }
+    }
+
+    if (!identity.customUrl) {
+        const customPatterns = [
+            /"canonicalBaseUrl"\s*:\s*"(\/(?:c|user)\/[^"?#\\]+)"/i,
+            /"vanityChannelUrl"\s*:\s*"https?:\/\/(?:www|m|music)\.youtube\.com\/((?:c|user)\/[^"?#\\]+)"/i
+        ];
+        for (const pattern of customPatterns) {
+            const match = unescapedPreview.match(pattern) || decodedPreview.match(pattern);
+            if (!match || !match[1]) continue;
+            const extracted = safeExtractCustomUrl(match[1]);
+            if (extracted) {
+                identity.customUrl = extracted;
+                break;
+            }
+        }
+    }
+
+    if (!identity.name) {
+        const nameMatch = unescapedPreview.match(/"ownerChannelName"\s*:\s*"([^"]+)"/i) ||
+            unescapedPreview.match(/"channelTitleText"\s*:\s*\{"runs"\s*:\s*\[\s*\{"text"\s*:\s*"([^"]+)"/i) ||
+            decodedPreview.match(/"ownerChannelName"\s*:\s*"([^"]+)"/i) ||
+            decodedPreview.match(/"channelTitleText"\s*:\s*\{"runs"\s*:\s*\[\s*\{"text"\s*:\s*"([^"]+)"/i);
+        if (nameMatch && nameMatch[1]) {
+            identity.name = nameMatch[1];
+        }
+    }
+
+    const normalizedFound = typeof FilterTubeIdentity?.normalizeHandleValue === 'function'
         ? FilterTubeIdentity.normalizeHandleValue(identity.handle || '')
         : '';
 
     if (normalizedHandle && normalizedFound && normalizedFound !== normalizedHandle) {
+        return null;
+    }
+
+    if (!identity.id && !identity.handle && !identity.customUrl) {
         return null;
     }
 
@@ -2345,66 +2567,122 @@ async function performWatchIdentityFetch(videoId) {
     const fetchPromise = (async () => {
         const stored = await storageGet(['videoChannelMap']);
         const storedId = stored?.videoChannelMap?.[videoId];
-        if (storedId) {
-            return { id: storedId, videoId, source: 'videoChannelMap' };
-        }
+        let weakCandidate = storedId ? { id: storedId, videoId, source: 'videoChannelMap' } : null;
 
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort('timeout'), SHORTS_FETCH_TIMEOUT_MS);
-        try {
-            const response = await fetch(`https://www.youtube.com/watch?v=${videoId}`, {
-                credentials: 'include',
-                headers: { 'Accept': 'text/html' },
-                signal: controller.signal
-            });
+        const fetchFromOrigin = async (origin) => {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort('timeout'), SHORTS_FETCH_TIMEOUT_MS);
+            try {
+                const response = await fetch(`${origin}/watch?v=${videoId}`, {
+                    credentials: 'include',
+                    headers: { 'Accept': 'text/html' },
+                    signal: controller.signal
+                });
 
-            if (!response.ok || !response.body) {
-                console.debug('FilterTube Background: Watch response not usable', response.status);
+                if (!response.ok || !response.body) {
+                    console.debug('FilterTube Background: Watch response not usable', origin, response.status);
+                    return null;
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let previewBuffer = '';
+                let weakIdentity = null;
+                const hasStrongAlternate = (identity) => Boolean(
+                    identity &&
+                    ((typeof identity.handle === 'string' && identity.handle.trim().startsWith('@'))
+                        || (typeof identity.customUrl === 'string' && identity.customUrl.trim()))
+                );
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    previewBuffer += decoder.decode(value, { stream: true });
+                    const quickIdentity = extractIdentityFromPreview(previewBuffer, '');
+                    if (quickIdentity) {
+                        quickIdentity.partial = true;
+                        quickIdentity.videoId = videoId;
+                        quickIdentity.source = origin;
+                        if (hasStrongAlternate(quickIdentity)) {
+                            controller.abort('identity_found');
+                            return quickIdentity;
+                        }
+                        weakIdentity = {
+                            ...(weakIdentity || {}),
+                            ...quickIdentity,
+                            id: quickIdentity.id || weakIdentity?.id || null,
+                            videoId,
+                            source: origin
+                        };
+                    }
+
+                    if (previewBuffer.length >= WATCH_PARTIAL_STREAM_LIMIT) {
+                        await reader.cancel();
+                        controller.abort('preview_limit');
+                        break;
+                    }
+                }
+
+                previewBuffer += decoder.decode();
+                const fallbackIdentity = extractIdentityFromPreview(previewBuffer, '');
+                if (fallbackIdentity) {
+                    fallbackIdentity.videoId = videoId;
+                    fallbackIdentity.source = origin;
+                    if (hasStrongAlternate(fallbackIdentity)) {
+                        return fallbackIdentity;
+                    }
+                    weakIdentity = {
+                        ...(weakIdentity || {}),
+                        ...fallbackIdentity,
+                        id: fallbackIdentity.id || weakIdentity?.id || null,
+                        videoId,
+                        source: origin
+                    };
+                }
+
+                return weakIdentity;
+            } catch (error) {
+                if (error?.name === 'AbortError') {
+                    console.debug('FilterTube Background: Watch fetch aborted', origin, error?.message || '');
+                } else {
+                    console.debug('FilterTube Background: Watch fetch exception', origin, error);
+                }
                 return null;
+            } finally {
+                clearTimeout(timeoutId);
             }
+        };
 
-            const reader = response.body.getReader();
-            const decoder = new TextDecoder();
-            let previewBuffer = '';
+        const origins = [
+            'https://m.youtube.com',
+            'https://www.youtube.com',
+            'https://music.youtube.com'
+        ];
+        const hasStrongAlternate = (identity) => Boolean(
+            identity &&
+            ((typeof identity.handle === 'string' && identity.handle.trim().startsWith('@'))
+                || (typeof identity.customUrl === 'string' && identity.customUrl.trim()))
+        );
 
-            while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
-
-                previewBuffer += decoder.decode(value, { stream: true });
-                const quickIdentity = extractIdentityFromPreview(previewBuffer, '');
-                if (quickIdentity) {
-                    controller.abort('identity_found');
-                    quickIdentity.partial = true;
-                    quickIdentity.videoId = videoId;
-                    return quickIdentity;
+        for (const origin of origins) {
+            const identity = await fetchFromOrigin(origin);
+            if (identity && (identity.id || identity.handle || identity.customUrl)) {
+                const merged = {
+                    ...identity,
+                    id: identity.id || storedId || ''
+                };
+                if (hasStrongAlternate(merged)) {
+                    return merged;
                 }
-
-                if (previewBuffer.length >= WATCH_PARTIAL_STREAM_LIMIT) {
-                    await reader.cancel();
-                    controller.abort('preview_limit');
-                    break;
-                }
+                weakCandidate = {
+                    ...(weakCandidate || {}),
+                    ...merged
+                };
             }
-
-            previewBuffer += decoder.decode();
-            const fallbackIdentity = extractIdentityFromPreview(previewBuffer, '');
-            if (fallbackIdentity) {
-                fallbackIdentity.videoId = videoId;
-                return fallbackIdentity;
-            }
-
-            return null;
-        } catch (error) {
-            if (error?.name === 'AbortError') {
-                console.debug('FilterTube Background: Watch fetch aborted', error?.message || '');
-            } else {
-                console.debug('FilterTube Background: Watch fetch exception', error);
-            }
-            return null;
-        } finally {
-            clearTimeout(timeoutId);
         }
+
+        return weakCandidate || null;
     })();
 
     pendingWatchIdentityFetches.set(videoId, fetchPromise);
@@ -2417,6 +2695,152 @@ async function performWatchIdentityFetch(videoId) {
     } finally {
         pendingWatchIdentityFetches.delete(videoId);
     }
+}
+
+async function resolveAlternateIdentityForChannelId(channelId, {
+    preferredVideoId = '',
+    profile = 'main',
+    expectedName = ''
+} = {}) {
+    const normalizedId = (typeof channelId === 'string' ? channelId.trim() : '');
+    if (!/^UC[\w-]{22}$/i.test(normalizedId)) return null;
+
+    const normalizeHandle = (value) => {
+        const raw = typeof value === 'string' ? value.trim() : '';
+        if (!raw || !raw.startsWith('@')) return '';
+        return raw.toLowerCase();
+    };
+    const normalizeNameToken = (value) => {
+        if (!value || typeof value !== 'string') return '';
+        return value.trim().toLowerCase().replace(/^@+/, '').replace(/\s+/g, '');
+    };
+
+    let handle = '';
+    let customUrl = '';
+    let name = '';
+    let logo = '';
+    const expectedToken = normalizeNameToken(expectedName);
+
+    // 1) Fast path: channelMap direct/reverse handle resolution.
+    try {
+        const mapStorage = await storageGet(['channelMap']);
+        const channelMap = mapStorage?.channelMap || {};
+        const idKey = normalizedId.toLowerCase();
+        const directHandle = normalizeHandle(channelMap[idKey] || '');
+        const directRoundTrip = directHandle
+            ? String(channelMap[directHandle] || '').trim().toLowerCase()
+            : '';
+        if (directHandle && (!directRoundTrip || directRoundTrip === idKey)) {
+            handle = directHandle;
+        }
+
+        if (!handle) {
+            const entries = Object.entries(channelMap || {});
+            const matching = [];
+            for (const [k, v] of entries) {
+                const handleKey = normalizeHandle(k);
+                if (!handleKey) continue;
+                const mappedId = (typeof v === 'string' ? v.trim().toLowerCase() : '');
+                if (mappedId !== idKey) continue;
+                const token = normalizeNameToken(handleKey);
+                const score = expectedToken && token
+                    ? (token === expectedToken ? 3 : (token.includes(expectedToken) || expectedToken.includes(token) ? 2 : 1))
+                    : 1;
+                matching.push({ handle: handleKey, score });
+            }
+            matching.sort((a, b) => b.score - a.score);
+            if (matching.length > 0) {
+                handle = matching[0].handle;
+            }
+        }
+    } catch (e) {
+    }
+
+    // 2) Deterministic UC fetch from background context.
+    // Prefer this before video-origin loops so fresh UC-only entries can resolve quickly.
+    if (!handle && !customUrl) {
+        try {
+            const fetched = await fetchChannelInfo(normalizedId);
+            if (fetched?.success && typeof fetched.id === 'string' && fetched.id.trim().toLowerCase() === normalizedId.toLowerCase()) {
+                const fetchedHandle = normalizeHandle(fetched.handle || '');
+                if (!handle && fetchedHandle) {
+                    handle = fetchedHandle;
+                }
+                if (!customUrl && typeof fetched.customUrl === 'string' && fetched.customUrl.trim()) {
+                    customUrl = fetched.customUrl.trim();
+                }
+                if (!name && typeof fetched.name === 'string' && fetched.name.trim()) {
+                    name = fetched.name.trim();
+                }
+                if (!logo && typeof fetched.logo === 'string' && fetched.logo.trim()) {
+                    logo = fetched.logo.trim();
+                }
+            }
+        } catch (e) {
+        }
+    }
+
+    // 3) Identity fetch from recent videos mapped to this UC.
+    const candidateVideoIds = [];
+    const seenVideoIds = new Set();
+    const addVideo = (candidate) => {
+        const vid = typeof candidate === 'string' ? candidate.trim() : '';
+        if (!/^[a-zA-Z0-9_-]{11}$/.test(vid) || seenVideoIds.has(vid)) return;
+        seenVideoIds.add(vid);
+        candidateVideoIds.push(vid);
+    };
+
+    addVideo(preferredVideoId);
+    try {
+        const map = await ensureVideoChannelMapCache();
+        const entries = Object.entries(map || {});
+        const idKey = normalizedId.toLowerCase();
+        for (let i = entries.length - 1; i >= 0 && candidateVideoIds.length < 10; i--) {
+            const [videoId, mappedChannelId] = entries[i];
+            if (!videoId || !mappedChannelId) continue;
+            const mapped = String(mappedChannelId).trim().toLowerCase();
+            if (mapped !== idKey) continue;
+            addVideo(String(videoId));
+        }
+    } catch (e) {
+    }
+
+    for (const vid of candidateVideoIds) {
+        try {
+            const identity = profile === 'kids'
+                ? (await performKidsWatchIdentityFetch(vid) || await performWatchIdentityFetch(vid))
+                : (await performWatchIdentityFetch(vid) || await performShortsIdentityFetch(vid, ''));
+            if (!identity) continue;
+
+            const identityId = (typeof identity.id === 'string' ? identity.id.trim() : '');
+            if (identityId && identityId.toLowerCase() !== normalizedId.toLowerCase()) {
+                continue;
+            }
+
+            const foundHandle = normalizeHandle(identity.handle || '');
+            if (!handle && foundHandle) handle = foundHandle;
+            if (!customUrl && typeof identity.customUrl === 'string' && identity.customUrl.trim()) {
+                customUrl = identity.customUrl.trim();
+            }
+            if (!name && typeof identity.name === 'string' && identity.name.trim()) {
+                name = identity.name.trim();
+            }
+            if (!logo && typeof identity.logo === 'string' && identity.logo.trim()) {
+                logo = identity.logo.trim();
+            }
+            if (handle || customUrl) break;
+        } catch (e) {
+        }
+    }
+
+    if (!handle && !customUrl && !name && !logo) return null;
+    return {
+        id: normalizedId,
+        handle: handle || null,
+        customUrl: customUrl || null,
+        name: name || null,
+        logo: logo || null
+    };
 }
 
 // Listen for messages sent from other parts of the extension (e.g., content scripts, popup).
@@ -3445,6 +3869,615 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
         return true; // Indicates that the response is sent asynchronously.
     }
 
+    else if (request.action === "fetchPlaylistCreator") {
+        const playlistId = typeof request?.playlistId === 'string' ? request.playlistId.trim() : '';
+        const expectedName = typeof request?.expectedName === 'string' ? request.expectedName.trim() : '';
+        if (!playlistId) {
+            sendResponse?.({ success: false, error: 'missing_playlist_id' });
+            return false;
+        }
+
+        (async () => {
+            try {
+                const fetchHtml = async (origin) => {
+                    const url = `${origin}/playlist?list=${encodeURIComponent(playlistId)}`;
+                    const res = await fetch(url, { credentials: 'include' });
+                    const html = await res.text();
+                    return { url, res, html };
+                };
+                const decodeJsonEscapesForSearch = (value) => {
+                    if (!value || typeof value !== 'string') return '';
+                    return value
+                        .replace(/\\x([0-9a-fA-F]{2})/g, (_, hex) => {
+                            try {
+                                return String.fromCharCode(parseInt(hex, 16));
+                            } catch (e) {
+                                return _;
+                            }
+                        })
+                        .replace(/\\u([0-9a-fA-F]{4})/g, (_, hex) => {
+                            try {
+                                return String.fromCharCode(parseInt(hex, 16));
+                            } catch (e) {
+                                return _;
+                            }
+                        })
+                        .replace(/\\\//g, '/')
+                        .replace(/\\u002F/gi, '/')
+                        .replace(/\\u003A/gi, ':')
+                        .replace(/\\u003D/gi, '=')
+                        .replace(/\\u0026/gi, '&')
+                        .replace(/\\u003F/gi, '?')
+                        .replace(/\\u0023/gi, '#')
+                        .replace(/\\u0040/gi, '@');
+                };
+
+                // Prefer m.youtube.com (CORS-friendly + stable), then fall back to www if needed.
+                const first = await fetchHtml('https://m.youtube.com');
+                let html = first.html;
+                let regexHtml = decodeJsonEscapesForSearch(html);
+                const pickChunk = (rawHtml) => {
+                    const lowerHtml = rawHtml.toLowerCase();
+                    const pivots = ['playlistheaderrenderer', 'compactplaylistrenderer'];
+                    for (const pivotKey of pivots) {
+                        const idx = lowerHtml.indexOf(pivotKey);
+                        if (idx >= 0) {
+                            const start = Math.max(0, idx - 35000);
+                            const end = Math.min(rawHtml.length, idx + 35000);
+                            return rawHtml.slice(start, end);
+                        }
+                    }
+                    return rawHtml.slice(0, Math.min(rawHtml.length, 90000));
+                };
+
+                let chunk = pickChunk(regexHtml);
+
+                let handle = '';
+                let id = '';
+                let customUrl = '';
+                let name = '';
+
+                const isHandleLike = (value) => typeof value === 'string' && value.trim().startsWith('@');
+                const normalizeExpectedToken = (value) => {
+                    if (!value || typeof value !== 'string') return '';
+                    return value
+                        .trim()
+                        .toLowerCase()
+                        .replace(/^@+/, '')
+                        .replace(/\s+/g, '');
+                };
+                const expectedToken = normalizeExpectedToken(expectedName);
+                const matchesExpected = (candidate) => {
+                    if (!expectedToken || expectedToken.length < 2) return true;
+                    if (!candidate || typeof candidate !== 'object') return false;
+                    const candidateName = normalizeExpectedToken(candidate.name || '');
+                    const candidateHandle = normalizeExpectedToken(candidate.handle || candidate.canonicalHandle || candidate.handleDisplay || '');
+                    if (candidateHandle && (candidateHandle === expectedToken || candidateHandle.includes(expectedToken) || expectedToken.includes(candidateHandle))) return true;
+                    if (candidateName && (candidateName === expectedToken || candidateName.includes(expectedToken) || expectedToken.includes(candidateName))) return true;
+                    return false;
+                };
+
+                const normalizeHandle = (value) => {
+                    const raw = typeof value === 'string' ? value.trim() : '';
+                    if (!raw) return '';
+                    if (typeof FilterTubeIdentity?.normalizeHandleValue === 'function') {
+                        return FilterTubeIdentity.normalizeHandleValue(raw) || '';
+                    }
+                    const trimmed = raw.startsWith('@') ? raw : '';
+                    if (!trimmed) return '';
+                    const core = trimmed.replace(/^@+/, '').trim();
+                    if (!/^[A-Za-z0-9._-]{3,60}$/.test(core) || !/[A-Za-z0-9]/.test(core)) return '';
+                    return `@${core.toLowerCase()}`;
+                };
+
+                const decodeForRegex = (value) => {
+                    if (!value || typeof value !== 'string') return '';
+                    try { return decodeURIComponent(value); } catch (e) { return value; }
+                };
+                const escapeRegExp = (value) => String(value || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const findPlaylistWindow = (source) => {
+                    if (!source || typeof source !== 'string') return source || '';
+                    const rx = new RegExp(`"playlistId"\\s*:\\s*"${escapeRegExp(playlistId)}"`, 'i');
+                    const match = rx.exec(source);
+                    if (!match || typeof match.index !== 'number') return source;
+                    const idx = match.index;
+                    return source.slice(Math.max(0, idx - 4000), Math.min(source.length, idx + 12000));
+                };
+                const parseCustomUrlFromPath = (value) => {
+                    if (!value || typeof value !== 'string') return '';
+                    const decoded = decodeForRegex(value);
+                    const match = decoded.match(/\/(c|user)\/([^/?#]+)/i);
+                    if (!match || !match[1] || !match[2]) return '';
+                    return `${match[1].toLowerCase()}/${match[2]}`;
+                };
+                const isLikelyOwnerText = (value) => {
+                    if (!value || typeof value !== 'string') return false;
+                    const text = value.trim();
+                    if (!text) return false;
+                    const lower = text.toLowerCase();
+                    if (lower === 'playlist' || lower === 'podcast') return false;
+                    if (/\b(?:videos?|episodes?)\b/i.test(text)) return false;
+                    if (/^\d+\s*(?:videos?|episodes?)$/i.test(text)) return false;
+                    return true;
+                };
+                const parseRunOwnerCandidate = (run, fallbackText = '') => {
+                    if (!run || typeof run !== 'object') return null;
+                    const nav = run.navigationEndpoint || {};
+                    const browse = nav?.browseEndpoint || nav?.command?.browseEndpoint || nav?.innertubeCommand?.browseEndpoint || null;
+                    const browseId = typeof browse?.browseId === 'string' ? browse.browseId.trim() : '';
+                    const canonicalPath = decodeForRegex(
+                        browse?.canonicalBaseUrl ||
+                        nav?.commandMetadata?.webCommandMetadata?.url ||
+                        nav?.webCommandMetadata?.url ||
+                        ''
+                    );
+                    const extractedHandle = (() => {
+                        if (!canonicalPath) return '';
+                        if (typeof FilterTubeIdentity?.extractRawHandle === 'function') {
+                            return FilterTubeIdentity.extractRawHandle(canonicalPath) || '';
+                        }
+                        const hm = canonicalPath.match(/\/(@[^/?#]+)/);
+                        return hm?.[1] || '';
+                    })();
+                    const normalizedHandle = extractedHandle ? normalizeHandle(extractedHandle) : '';
+                    const parsedCustom = canonicalPath ? parseCustomUrlFromPath(canonicalPath) : '';
+                    const text = (typeof run?.text === 'string' ? run.text : fallbackText || '').trim();
+                    const candidate = {
+                        id: /^UC[\w-]{22}$/i.test(browseId) ? browseId : '',
+                        handle: normalizedHandle || '',
+                        customUrl: parsedCustom || '',
+                        name: isLikelyOwnerText(text) ? text : ''
+                    };
+                    if (!candidate.id && !candidate.handle && !candidate.customUrl) return null;
+                    return candidate;
+                };
+                const pickBestOwnerCandidate = (list) => {
+                    const candidates = Array.isArray(list) ? list.filter(Boolean) : [];
+                    if (candidates.length === 0) return null;
+                    candidates.sort((a, b) => {
+                        const score = (entry) => {
+                            const identityScore = (entry.id ? 4 : 0) + (entry.handle ? 3 : 0) + (entry.customUrl ? 2 : 0) + (entry.name ? 1 : 0);
+                            return identityScore + (matchesExpected(entry) ? 8 : 0);
+                        };
+                        return score(b) - score(a);
+                    });
+                    return candidates[0] || null;
+                };
+                const parseMetadataRowsOwner = (rows) => {
+                    if (!Array.isArray(rows) || rows.length === 0) return null;
+                    const candidates = [];
+                    for (const row of rows) {
+                        const parts = Array.isArray(row?.metadataParts) ? row.metadataParts : [];
+                        for (const part of parts) {
+                            const partText = (part?.text?.content || '').trim();
+
+                            const stackRuns = Array.isArray(part?.avatarStack?.avatarStackViewModel?.text?.commandRuns)
+                                ? part.avatarStack.avatarStackViewModel.text.commandRuns
+                                : [];
+                            for (const cmd of stackRuns) {
+                                const nav = {
+                                    browseEndpoint: cmd?.onTap?.innertubeCommand?.browseEndpoint || cmd?.onTap?.browseEndpoint || null,
+                                    commandMetadata: cmd?.onTap?.innertubeCommand?.commandMetadata || cmd?.onTap?.commandMetadata || null
+                                };
+                                const parsed = parseRunOwnerCandidate({ text: partText, navigationEndpoint: nav }, partText);
+                                if (parsed) candidates.push(parsed);
+                            }
+
+                            const commandRuns = Array.isArray(part?.text?.commandRuns) ? part.text.commandRuns : [];
+                            for (const cmd of commandRuns) {
+                                const nav = {
+                                    browseEndpoint: cmd?.onTap?.innertubeCommand?.browseEndpoint || cmd?.onTap?.browseEndpoint || null,
+                                    commandMetadata: cmd?.onTap?.innertubeCommand?.commandMetadata || cmd?.onTap?.commandMetadata || null
+                                };
+                                const parsed = parseRunOwnerCandidate({ text: partText, navigationEndpoint: nav }, partText);
+                                if (parsed) candidates.push(parsed);
+                            }
+                        }
+                    }
+                    return pickBestOwnerCandidate(candidates);
+                };
+                const extractJSONBlock = (text, startPattern) => {
+                    if (!text || typeof text !== 'string') return null;
+                    const startIndex = text.search(startPattern);
+                    if (startIndex === -1) return null;
+                    const jsonStart = text.indexOf('{', startIndex);
+                    if (jsonStart === -1) return null;
+
+                    let depth = 0;
+                    let inString = false;
+                    let escapeNext = false;
+                    for (let i = jsonStart; i < text.length; i++) {
+                        const char = text[i];
+                        if (escapeNext) {
+                            escapeNext = false;
+                            continue;
+                        }
+                        if (char === '\\') {
+                            escapeNext = true;
+                            continue;
+                        }
+                        if (char === '"') {
+                            inString = !inString;
+                            continue;
+                        }
+                        if (!inString) {
+                            if (char === '{') depth++;
+                            else if (char === '}') {
+                                depth--;
+                                if (depth === 0) {
+                                    return text.substring(jsonStart, i + 1);
+                                }
+                            }
+                        }
+                    }
+                    return null;
+                };
+                const parseInitialDataFromHtml = (sourceHtml) => {
+                    if (!sourceHtml || typeof sourceHtml !== 'string') return null;
+                    const patterns = [
+                        /var ytInitialData\s*=/,
+                        /window\["ytInitialData"\]\s*=/,
+                        /ytInitialData"\s*:/
+                    ];
+                    for (const pattern of patterns) {
+                        const jsonStr = extractJSONBlock(sourceHtml, pattern);
+                        if (!jsonStr) continue;
+                        try {
+                            const trimmed = jsonStr.trimStart();
+                            const afterBrace = trimmed.startsWith('{') ? trimmed.slice(1).trimStart() : '';
+                            const nextNonWs = afterBrace ? afterBrace[0] : '';
+                            const looksLikeJson = trimmed.startsWith('{') && (nextNonWs === '"' || nextNonWs === '}');
+                            if (!looksLikeJson) continue;
+                            const parsed = JSON.parse(jsonStr);
+                            if (parsed && typeof parsed === 'object') return parsed;
+                        } catch (e) {
+                        }
+                    }
+                    return null;
+                };
+                const extractOwnerFromParsedInitialData = (parsedData) => {
+                    if (!parsedData || typeof parsedData !== 'object') return null;
+                    const candidates = [];
+                    const visited = new WeakSet();
+                    const scan = (node, depth = 0) => {
+                        if (!node || typeof node !== 'object' || visited.has(node) || depth > 16) return;
+                        visited.add(node);
+
+                        const compact = node?.compactPlaylistRenderer;
+                        if (compact && typeof compact === 'object') {
+                            const compactPlaylistId = typeof compact?.playlistId === 'string' ? compact.playlistId.trim() : '';
+                            if (!playlistId || !compactPlaylistId || compactPlaylistId === playlistId) {
+                                const runs = [
+                                    ...(Array.isArray(compact?.shortBylineText?.runs) ? compact.shortBylineText.runs : []),
+                                    ...(Array.isArray(compact?.longBylineText?.runs) ? compact.longBylineText.runs : [])
+                                ];
+                                const runCandidates = runs.map((run) => parseRunOwnerCandidate(run)).filter(Boolean);
+                                const picked = pickBestOwnerCandidate(runCandidates);
+                                if (picked) candidates.push(picked);
+                            }
+                        }
+
+                        const headerRows = node?.pageHeaderRenderer?.content?.pageHeaderViewModel?.metadata?.contentMetadataViewModel?.metadataRows;
+                        if (Array.isArray(headerRows)) {
+                            const picked = parseMetadataRowsOwner(headerRows);
+                            if (picked) candidates.push(picked);
+                        }
+                        const metadataRows = node?.metadata?.contentMetadataViewModel?.metadataRows;
+                        if (Array.isArray(metadataRows)) {
+                            const picked = parseMetadataRowsOwner(metadataRows);
+                            if (picked) candidates.push(picked);
+                        }
+                        const lockupRows = node?.metadata?.lockupMetadataViewModel?.metadata?.contentMetadataViewModel?.metadataRows;
+                        if (Array.isArray(lockupRows)) {
+                            const picked = parseMetadataRowsOwner(lockupRows);
+                            if (picked) candidates.push(picked);
+                        }
+
+                        if (Array.isArray(node)) {
+                            for (const child of node) scan(child, depth + 1);
+                            return;
+                        }
+                        for (const key of Object.keys(node)) {
+                            const value = node[key];
+                            if (!value || typeof value !== 'object') continue;
+                            scan(value, depth + 1);
+                        }
+                    };
+                    scan(parsedData, 0);
+                    return pickBestOwnerCandidate(candidates);
+                };
+                const extractOwnerFromCompactPlaylistRenderer = (source) => {
+                    if (!source || typeof source !== 'string') return null;
+                    const windowed = findPlaylistWindow(source);
+                    const scoped = windowed || source;
+                    if (!scoped || typeof scoped !== 'string') return null;
+
+                    // Prefer compactPlaylistRenderer block tied to this playlistId.
+                    const focused = (() => {
+                        const rx = new RegExp(
+                            `"compactPlaylistRenderer"\\s*:\\s*\\{[\\s\\S]{0,24000}?"playlistId"\\s*:\\s*"${escapeRegExp(playlistId)}"[\\s\\S]{0,28000}?\\}`,
+                            'i'
+                        );
+                        const m = scoped.match(rx);
+                        return m?.[0] || scoped;
+                    })();
+
+                    const runRegex = /"text"\s*:\s*"([^"]{1,220})"[\s\S]{0,2600}?"browseId"\s*:\s*"(UC[\w-]{22})"[\s\S]{0,2200}?(?:"canonicalBaseUrl"\s*:\s*"([^"]+)"|"webCommandMetadata"\s*:\s*\{"url"\s*:\s*"([^"]+)")/gi;
+                    let match;
+                    let fallback = null;
+
+                    while ((match = runRegex.exec(focused)) !== null) {
+                        const text = (match[1] || '').trim();
+                        const browseId = (match[2] || '').trim();
+                        const baseOrUrl = (match[3] || match[4] || '').trim();
+                        if (!browseId || !/^UC[\w-]{22}$/i.test(browseId)) continue;
+
+                        const canonicalPath = decodeForRegex(baseOrUrl || '');
+                        const extractedHandle = (() => {
+                            if (!canonicalPath) return '';
+                            if (typeof FilterTubeIdentity?.extractRawHandle === 'function') {
+                                return FilterTubeIdentity.extractRawHandle(canonicalPath) || '';
+                            }
+                            const hm = canonicalPath.match(/\/(@[^/?#]+)/);
+                            return hm?.[1] || '';
+                        })();
+                        const normalizedHandle = extractedHandle ? normalizeHandle(extractedHandle) : '';
+                        const parsedCustom = canonicalPath ? parseCustomUrlFromPath(canonicalPath) : '';
+                        const candidate = {
+                            id: browseId,
+                            handle: normalizedHandle || '',
+                            customUrl: parsedCustom || '',
+                            name: isLikelyOwnerText(text) ? text : ''
+                        };
+
+                        if (!fallback) fallback = candidate;
+                        if (matchesExpected(candidate)) return candidate;
+                    }
+
+                    return fallback;
+                };
+
+                const extractOwnerFromChunk = (rawChunk) => {
+                    if (!rawChunk || typeof rawChunk !== 'string') return null;
+                    const lower = rawChunk.toLowerCase();
+                    const windows = [];
+                    let fallbackCandidate = null;
+
+                    const pushWindow = (idx, radiusBefore = 2500, radiusAfter = 20000) => {
+                        if (idx < 0) return;
+                        windows.push(rawChunk.slice(
+                            Math.max(0, idx - radiusBefore),
+                            Math.min(rawChunk.length, idx + radiusAfter)
+                        ));
+                    };
+
+                    // Strong pivots first: playlist header blocks (owner is here, not in the list items).
+                    pushWindow(lower.indexOf('playlistheaderrenderer'), 1500, 30000);
+                    pushWindow(lower.indexOf('playlistsidebarprimaryinforenderer'), 1500, 30000);
+                    pushWindow(lower.indexOf('"ownertext"'), 500, 15000);
+                    pushWindow(lower.indexOf('"shortbylinetext"'), 500, 15000);
+
+                    if (windows.length === 0) {
+                        windows.push(rawChunk.slice(0, Math.min(rawChunk.length, 60000)));
+                    }
+
+                    for (const win of windows) {
+                        const winLower = win.toLowerCase();
+                        const ownerIdx = winLower.indexOf('"ownertext"') >= 0 ? winLower.indexOf('"ownertext"') : winLower.indexOf('"shortbylinetext"');
+                        const segment = ownerIdx >= 0 ? win.slice(ownerIdx, Math.min(win.length, ownerIdx + 18000)) : win;
+
+                        // Prefer a single "run" that contains both the visible owner text and the browseId.
+                        const runMatch = segment.match(
+                            /"text"\s*:\s*"([^"]{1,160})"[\s\S]{0,2400}?"browseId"\s*:\s*"(UC[\w-]{22})"[\s\S]{0,2400}?(?:"canonicalBaseUrl"\s*:\s*"([^"]+)")?/i
+                        );
+                        const idMatch = runMatch?.[2] ? runMatch[2].trim() : (segment.match(/"browseId"\s*:\s*"(UC[\w-]{22})"/i)?.[1] || '').trim();
+                        const canonicalBaseUrl = runMatch?.[3] ? runMatch[3].trim() : (segment.match(/"canonicalBaseUrl"\s*:\s*"([^"]+)"/i)?.[1] || '').trim();
+                        const text = runMatch?.[1] ? runMatch[1].trim() : '';
+
+                        const extractedHandle = (() => {
+                            const pathCandidate = decodeForRegex(canonicalBaseUrl || '');
+                            if (typeof FilterTubeIdentity?.extractRawHandle === 'function') {
+                                const raw = FilterTubeIdentity.extractRawHandle(pathCandidate) || FilterTubeIdentity.extractRawHandle(segment) || '';
+                                return raw;
+                            }
+                            return '';
+                        })();
+                        const normalizedHandle = extractedHandle ? normalizeHandle(extractedHandle) : '';
+
+                        const parsedCustom = canonicalBaseUrl ? parseCustomUrlFromPath(canonicalBaseUrl) : '';
+
+                        const candidate = {
+                            id: idMatch || '',
+                            handle: normalizedHandle || '',
+                            customUrl: parsedCustom || '',
+                            name: text || ''
+                        };
+
+                        if (candidate.id || candidate.handle || candidate.customUrl) {
+                            if (!fallbackCandidate) {
+                                fallbackCandidate = candidate;
+                            }
+                            if (matchesExpected(candidate)) {
+                                return candidate;
+                            }
+                        }
+                    }
+
+                    // Do not fail hard when expected-name matching is noisy/missing on localized playlist
+                    // surfaces; prefer the strongest owner candidate from ownerText windows.
+                    return fallbackCandidate;
+                };
+
+                // Structured parse first: prefer explicit byline/metadata command runs from ytInitialData.
+                const parsedInitialData = parseInitialDataFromHtml(html);
+                const structuredOwnerIdentity = extractOwnerFromParsedInitialData(parsedInitialData);
+                if (structuredOwnerIdentity) {
+                    id = structuredOwnerIdentity.id || id;
+                    handle = structuredOwnerIdentity.handle || handle;
+                    customUrl = structuredOwnerIdentity.customUrl || customUrl;
+                    if (!name && structuredOwnerIdentity.name && isLikelyOwnerText(structuredOwnerIdentity.name)) {
+                        name = structuredOwnerIdentity.name.trim();
+                    }
+                }
+
+                // Playlist ownership MUST come from playlist owner/byline blocks, not first video uploader.
+                const ownerIdentity = extractOwnerFromChunk(chunk) || extractOwnerFromChunk(regexHtml);
+                if (ownerIdentity) {
+                    id = id || ownerIdentity.id;
+                    handle = handle || ownerIdentity.handle;
+                    customUrl = customUrl || ownerIdentity.customUrl;
+                    if (!name && ownerIdentity.name && isLikelyOwnerText(ownerIdentity.name)) {
+                        name = ownerIdentity.name.trim();
+                    }
+                }
+
+                // Explicit compactPlaylistRenderer fallback:
+                // JSON often carries stable owner browseId/canonicalBaseUrl here even when header parsing is noisy.
+                if (!id && !handle && !customUrl) {
+                    const compactOwner = extractOwnerFromCompactPlaylistRenderer(regexHtml) || extractOwnerFromCompactPlaylistRenderer(chunk);
+                    if (compactOwner) {
+                        id = id || compactOwner.id;
+                        handle = handle || compactOwner.handle;
+                        customUrl = customUrl || compactOwner.customUrl;
+                        if (!name && compactOwner.name && isLikelyOwnerText(compactOwner.name)) {
+                            name = compactOwner.name.trim();
+                        }
+                    }
+                }
+
+                // Try to extract owner handle from explicit hrefs near playlist header.
+                if (!handle && typeof FilterTubeIdentity?.extractRawHandle === 'function') {
+                    const hrefMatch = chunk.match(/href="(\/@[^"]+)"/i);
+                    if (hrefMatch && hrefMatch[1]) {
+                        handle = FilterTubeIdentity.extractRawHandle(hrefMatch[1]) || '';
+                    }
+                }
+
+                // Try to extract visible owner name (often equals handle without @ on YTM).
+                name = name || '';
+                const anchorTextMatch = chunk.match(/href="\/@[^"]+"[^>]*>([^<]{1,120})<\/a>/i);
+                if (anchorTextMatch && anchorTextMatch[1]) {
+                    name = anchorTextMatch[1].trim();
+                }
+                if (!name && expectedName) name = expectedName;
+
+                // Logo (best-effort)
+                let logo = '';
+                const logoMatch = chunk.match(/https:\/\/yt3\.ggpht\.com\/[^"'\s>]+/i);
+                if (logoMatch && logoMatch[0]) logo = logoMatch[0];
+
+                handle = normalizeHandle(handle);
+                if (handle && handle.startsWith('/@')) {
+                    handle = normalizeHandle(handle.replace(/^\//, ''));
+                }
+                // If we still have a path-like handle, coerce to @handle form.
+                if (handle && handle.startsWith('@')) {
+                    // already ok
+                } else if (handle && handle.startsWith('/@')) {
+                    handle = normalizeHandle(handle.slice(1));
+                }
+                if (handle && !isHandleLike(handle)) {
+                    const extracted = typeof FilterTubeIdentity?.extractRawHandle === 'function'
+                        ? FilterTubeIdentity.extractRawHandle(handle)
+                        : '';
+                    if (extracted) handle = normalizeHandle(extracted);
+                }
+
+                // Last resort: fastExtractIdentity can accidentally pick the first video's uploader.
+                // Only accept it if it matches the expected playlist creator name when provided.
+                if ((!id && !handle && !customUrl) && typeof FilterTubeIdentity?.fastExtractIdentityFromHtmlChunk === 'function') {
+                    const fallbackIdentity = FilterTubeIdentity.fastExtractIdentityFromHtmlChunk(chunk)
+                        || FilterTubeIdentity.fastExtractIdentityFromHtmlChunk(regexHtml)
+                        || FilterTubeIdentity.fastExtractIdentityFromHtmlChunk(html)
+                        || {};
+                    const fallbackCandidate = {
+                        id: typeof fallbackIdentity.id === 'string' ? fallbackIdentity.id.trim() : '',
+                        handle: typeof fallbackIdentity.handle === 'string' ? normalizeHandle(fallbackIdentity.handle) : '',
+                        customUrl: typeof fallbackIdentity.customUrl === 'string' ? fallbackIdentity.customUrl.trim() : '',
+                        name: expectedName || ''
+                    };
+                    if ((fallbackCandidate.id || fallbackCandidate.handle || fallbackCandidate.customUrl) && matchesExpected(fallbackCandidate)) {
+                        id = id || fallbackCandidate.id;
+                        handle = handle || fallbackCandidate.handle;
+                        customUrl = customUrl || fallbackCandidate.customUrl;
+                    }
+                }
+
+                // If we couldn't extract any stable identity, report failure so the caller can choose a fallback.
+                // If m.youtube.com didn't contain the owner in the extracted window, retry against www.
+                if (!id && !handle && !customUrl) {
+                    try {
+                        const second = await fetchHtml('https://www.youtube.com');
+                        html = second.html;
+                        regexHtml = decodeJsonEscapesForSearch(html);
+                        chunk = pickChunk(regexHtml);
+
+                        const retryOwner = extractOwnerFromChunk(chunk) || extractOwnerFromChunk(regexHtml);
+                        if (retryOwner) {
+                            if (!id && retryOwner.id) id = retryOwner.id.trim();
+                            if (!handle && retryOwner.handle) handle = retryOwner.handle.trim();
+                            if (!customUrl && retryOwner.customUrl) customUrl = retryOwner.customUrl.trim();
+                            if (!name && retryOwner.name && isLikelyOwnerText(retryOwner.name)) {
+                                name = retryOwner.name.trim();
+                            }
+                        }
+
+                        if (!id && !handle && !customUrl) {
+                            const retryCompactOwner = extractOwnerFromCompactPlaylistRenderer(regexHtml) || extractOwnerFromCompactPlaylistRenderer(chunk);
+                            if (retryCompactOwner) {
+                                if (!id && retryCompactOwner.id) id = retryCompactOwner.id.trim();
+                                if (!handle && retryCompactOwner.handle) handle = retryCompactOwner.handle.trim();
+                                if (!customUrl && retryCompactOwner.customUrl) customUrl = retryCompactOwner.customUrl.trim();
+                                if (!name && retryCompactOwner.name && isLikelyOwnerText(retryCompactOwner.name)) {
+                                    name = retryCompactOwner.name.trim();
+                                }
+                            }
+                        }
+
+                        if (!handle && typeof FilterTubeIdentity?.extractRawHandle === 'function') {
+                            const hrefMatch = chunk.match(/href="(\/@[^"]+)"/i);
+                            if (hrefMatch && hrefMatch[1]) {
+                                handle = FilterTubeIdentity.extractRawHandle(hrefMatch[1]) || '';
+                            }
+                        }
+                        const retryParsedInitialData = parseInitialDataFromHtml(html);
+                        const retryStructuredOwner = extractOwnerFromParsedInitialData(retryParsedInitialData);
+                        if (retryStructuredOwner) {
+                            if (!id && retryStructuredOwner.id) id = retryStructuredOwner.id.trim();
+                            if (!handle && retryStructuredOwner.handle) handle = retryStructuredOwner.handle.trim();
+                            if (!customUrl && retryStructuredOwner.customUrl) customUrl = retryStructuredOwner.customUrl.trim();
+                            if (!name && retryStructuredOwner.name && isLikelyOwnerText(retryStructuredOwner.name)) {
+                                name = retryStructuredOwner.name.trim();
+                            }
+                        }
+
+                        handle = normalizeHandle(handle);
+                    } catch (e) {
+                    }
+                }
+
+                if (!id && !handle && !customUrl) {
+                    sendResponse?.({ success: false, error: 'playlist_owner_not_found', playlistId });
+                    return;
+                }
+
+                sendResponse?.({
+                    success: true,
+                    id: id || null,
+                    handle: handle || null,
+                    customUrl: customUrl || null,
+                    name: name || null,
+                    logo: logo || null,
+                    playlistId
+                });
+            } catch (e) {
+                sendResponse?.({ success: false, error: e?.message || 'playlist_fetch_failed' });
+            }
+        })();
+
+        return true;
+    }
+
     // Handle any browser-specific actions if needed
     if (request.action === "getBrowserInfo") {
         sendResponse({
@@ -3551,12 +4584,19 @@ async function fetchChannelInfo(channelIdOrHandle) {
 
         const normalizeHandleOutput = (value) => {
             if (!value || typeof value !== 'string') return null;
-            let v = value.trim();
-            if (!v) return null;
-            if (v.startsWith('/@')) v = v.slice(1);
-            if (!v.startsWith('@')) return null;
-            v = v.split(/[/?#]/)[0].trim();
-            return v || null;
+            try {
+                const raw = typeof FilterTubeIdentity?.extractRawHandle === 'function'
+                    ? (FilterTubeIdentity.extractRawHandle(value) || '')
+                    : '';
+                const normalized = typeof FilterTubeIdentity?.normalizeHandleValue === 'function'
+                    ? (FilterTubeIdentity.normalizeHandleValue(raw || value) || '')
+                    : (raw || value);
+                return (normalized && typeof normalized === 'string' && normalized.trim().startsWith('@'))
+                    ? normalized.trim()
+                    : null;
+            } catch (e) {
+                return null;
+            }
         };
 
         // If the input itself is a UC ID, use it directly as the resolved ID and construct canonical URL
@@ -3634,6 +4674,22 @@ async function fetchChannelInfo(channelIdOrHandle) {
             }
         }
 
+        // The final response URL often contains the canonical handle/custom path after redirects
+        // (e.g., /channel/UC... -> /@handle or /c/...); use it as a strong alternate identity hint.
+        try {
+            const finalUrl = typeof response?.url === 'string' ? response.url : '';
+            if (finalUrl) {
+                const finalHandleMatch = finalUrl.match(/\/(@[^/?#]+)/);
+                if (!channelHandle && finalHandleMatch && finalHandleMatch[1]) {
+                    channelHandle = normalizeHandleOutput(finalHandleMatch[1]) || channelHandle;
+                }
+                if (!customUrl) {
+                    assignCustomUrl(finalUrl);
+                }
+            }
+        } catch (e) {
+        }
+
         if (!response.ok) {
             console.error('FilterTube Background: Failed to fetch channel page:', response.status, response.statusText);
             return { success: false, error: `Failed to fetch channel page: ${response.status}` };
@@ -3688,6 +4744,68 @@ async function fetchChannelInfo(channelIdOrHandle) {
             const ucMatch = ogUrl.match(/\/channel\/(UC[\w-]{22})/i);
             if (!resolvedChannelId && ucMatch && ucMatch[1]) {
                 resolvedChannelId = ucMatch[1];
+            }
+        }
+
+        // Direct HTML fallbacks (works even when ytInitialData JSON parse fails):
+        // - escaped JSON fields often still contain vanity/canonical handle paths.
+        // - channel pages frequently encode `/` as `\u002F` and `@` as `\u0040`
+        const decodeJsonEscapesForSearch = (value) => {
+            if (!value || typeof value !== 'string') return '';
+            return value
+                .replace(/\\\//g, '/')
+                .replace(/\\u002F/gi, '/')
+                .replace(/\\u003A/gi, ':')
+                .replace(/\\u003D/gi, '=')
+                .replace(/\\u0026/gi, '&')
+                .replace(/\\u003F/gi, '?')
+                .replace(/\\u0023/gi, '#')
+                .replace(/\\u0040/gi, '@');
+        };
+        const htmlForRegex = decodeJsonEscapesForSearch(html);
+        // Prefer the on-page header handle (what users actually see on channel page) over
+        // redirect vanity aliases. This is important for VEVO/music redirect mismatches.
+        {
+            const pageHeaderHandleMatch = htmlForRegex.match(
+                /yt-page-header-view-model__page-header-content-metadata[\s\S]{0,2500}?(@[A-Za-z0-9._-]{3,60})/i
+            );
+            if (pageHeaderHandleMatch && pageHeaderHandleMatch[1]) {
+                const normalized = normalizeHandleOutput(pageHeaderHandleMatch[1]);
+                if (normalized) {
+                    channelHandle = normalized;
+                }
+            }
+        }
+        if (!channelHandle) {
+            const handlePatterns = [
+                /"vanityChannelUrl"\s*:\s*"https?:\/\/(?:www\.|m\.|music\.)?youtube\.com\/(@[^"\/?#\\]+)"/i,
+                /"canonicalBaseUrl"\s*:\s*"(\/@[^"\/?#\\]+)"/i,
+                /"ownerUrls"\s*:\s*\[\s*"https?:\/\/(?:www\.|m\.|music\.)?youtube\.com\/(@[^"\/?#\\]+)"/i,
+                /"urlCanonical"\s*:\s*"https?:\/\/(?:www\.|m\.|music\.)?youtube\.com\/(@[^"\/?#\\]+)"/i,
+                /"browseEndpoint"\s*:\s*\{[\s\S]{0,800}?"canonicalBaseUrl"\s*:\s*"(\/@[^"\/?#\\]+)"/i,
+                /href="(\/@[^"]+)"/i
+            ];
+            for (const pattern of handlePatterns) {
+                const match = htmlForRegex.match(pattern);
+                if (match && match[1]) {
+                    const normalized = normalizeHandleOutput(match[1]);
+                    if (normalized) {
+                        channelHandle = normalized;
+                        break;
+                    }
+                }
+            }
+        }
+        if (!customUrl) {
+            const customMatch = htmlForRegex.match(/"canonicalBaseUrl"\s*:\s*"(\/(?:c|user)\/[^"?#\\]+)"/i);
+            if (customMatch && customMatch[1]) {
+                assignCustomUrl(customMatch[1]);
+            }
+        }
+        if (!resolvedChannelId) {
+            const externalIdMatch = htmlForRegex.match(/"externalId"\s*:\s*"(UC[\w-]{22})"/i);
+            if (externalIdMatch && externalIdMatch[1]) {
+                resolvedChannelId = externalIdMatch[1];
             }
         }
 
@@ -3749,9 +4867,17 @@ async function fetchChannelInfo(channelIdOrHandle) {
             const jsonStr = extractJSON(html, pattern);
             if (jsonStr) {
                 try {
-                    data = JSON.parse(jsonStr);
-                    console.log('FilterTube Background: Successfully extracted ytInitialData using pattern:', pattern);
-                    break;
+                    const trimmed = typeof jsonStr === 'string' ? jsonStr.trimStart() : '';
+                    // Some YouTube surfaces embed JS object literals (single quotes / unquoted keys).
+                    // Avoid JSON.parse noise; rely on regex/meta fallbacks instead.
+                    const afterBrace = trimmed.startsWith('{') ? trimmed.slice(1).trimStart() : '';
+                    const nextNonWs = afterBrace ? afterBrace[0] : '';
+                    const looksLikeJson = trimmed.startsWith('{') && (nextNonWs === '"' || nextNonWs === '}');
+                    if (looksLikeJson) {
+                        data = JSON.parse(jsonStr);
+                        console.log('FilterTube Background: Successfully extracted ytInitialData using pattern:', pattern);
+                        break;
+                    }
                 } catch (e) {
                     console.warn('FilterTube Background: Failed to parse JSON for pattern:', pattern, e.message);
                 }
@@ -3866,20 +4992,19 @@ async function fetchChannelInfo(channelIdOrHandle) {
                     channelName = pageHeader.title.dynamicTextViewModel.text.content;
                 }
 
-                // Handle from metadata rows
-                if (!channelHandle) {
-                    const metadataRows = pageHeader.metadata?.contentMetadataViewModel?.metadataRows;
-                    if (metadataRows && metadataRows.length > 0) {
-                        const handlePart = metadataRows[0]?.metadataParts?.[0]?.text?.content;
-                        if (handlePart && handlePart.startsWith('@')) {
-                            channelHandle = normalizeHandleOutput(handlePart) || channelHandle;
-                        } else {
-                            const canonicalUrl = metadataRows[0]?.metadataParts?.[0]?.navigationEndpoint?.urlEndpoint?.url;
-                            if (canonicalUrl && canonicalUrl.startsWith('/@')) {
-                                channelHandle = normalizeHandleOutput(canonicalUrl) || channelHandle;
-                            }
-                            assignCustomUrl(canonicalUrl);
+                // Handle from metadata rows.
+                // Intentionally override weaker hints (redirect vanity aliases) when this exists.
+                const metadataRows = pageHeader.metadata?.contentMetadataViewModel?.metadataRows;
+                if (metadataRows && metadataRows.length > 0) {
+                    const handlePart = metadataRows[0]?.metadataParts?.[0]?.text?.content;
+                    if (handlePart && handlePart.startsWith('@')) {
+                        channelHandle = normalizeHandleOutput(handlePart) || channelHandle;
+                    } else {
+                        const canonicalUrl = metadataRows[0]?.metadataParts?.[0]?.navigationEndpoint?.urlEndpoint?.url;
+                        if (canonicalUrl && canonicalUrl.startsWith('/@')) {
+                            channelHandle = normalizeHandleOutput(canonicalUrl) || channelHandle;
                         }
+                        assignCustomUrl(canonicalUrl);
                     }
                 }
 
@@ -4059,7 +5184,8 @@ browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 channelName: message.channelName,
                 channelLogo: message.channelLogo,
                 customUrl: message.customUrl,
-                source: message.source || null
+                source: message.source || null,
+                pageHost: message.pageHost || null
             },
             message.profile || 'main',
             message.videoId || ''
@@ -4104,9 +5230,19 @@ browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
  */
 async function handleAddFilteredChannel(input, filterAll = false, collaborationWith = null, collaborationGroupId = null, metadata = {}, profile = 'main', videoId = '', listType = 'blocklist') {
     try {
+        const normalizeHandleStrict = (value) => {
+            if (!value || typeof value !== 'string') return '';
+            if (typeof FilterTubeIdentity?.normalizeHandleValue === 'function') {
+                return FilterTubeIdentity.normalizeHandleValue(value) || '';
+            }
+            const trimmed = value.trim();
+            if (!trimmed.startsWith('@')) return '';
+            const core = trimmed.replace(/^@+/, '').trim();
+            if (!/^[A-Za-z0-9._-]{3,60}$/.test(core) || !/[A-Za-z0-9]/.test(core)) return '';
+            return `@${core.toLowerCase()}`;
+        };
         const isHandleLike = (value) => {
-            if (!value || typeof value !== 'string') return false;
-            return value.trim().startsWith('@');
+            return Boolean(normalizeHandleStrict(value));
         };
 
         const pickBetterName = (...candidates) => {
@@ -4114,7 +5250,13 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                 .map(v => (typeof v === 'string' ? v.trim() : ''))
                 .filter(Boolean);
             if (cleaned.length === 0) return '';
-            const preferred = cleaned.find(v => !isHandleLike(v) && v.toLowerCase() !== 'channel');
+            const preferred = cleaned.find(v =>
+                !isHandleLike(v)
+                && v.toLowerCase() !== 'channel'
+                && !/^watch:[a-zA-Z0-9_-]{11}$/i.test(v)
+                && !/^[a-zA-Z0-9_-]{11}$/.test(v)
+                && !/^PL[\w-]{12,}$/i.test(v)
+            );
             return preferred || cleaned[0];
         };
 
@@ -4160,7 +5302,7 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                     } catch (e) {
                         // ignore
                     }
-                    return '@' + decodedHandle;
+                    return normalizeHandleStrict('@' + decodedHandle);
                 }
 
                 if (path.startsWith('/c/')) {
@@ -4201,12 +5343,13 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                 if (ucMatch && ucMatch[1]) return ucMatch[1];
 
                 const handleMatch = cleanedPath.match(/\/@([^/?#]+)/);
-                if (handleMatch && handleMatch[1]) return '@' + handleMatch[1];
+                if (handleMatch && handleMatch[1]) return normalizeHandleStrict('@' + handleMatch[1]);
             }
 
             if (cleaned.startsWith('channel/')) return cleaned.replace('channel/', '');
             if (cleaned.startsWith('c/')) return cleaned;
             if (cleaned.startsWith('user/')) return cleaned;
+            if (cleaned.startsWith('@')) return normalizeHandleStrict(cleaned);
             if (cleaned.startsWith('/c/')) {
                 const slug = cleaned.split('/')[2];
                 return slug ? `c/${slug}` : '';
@@ -4218,6 +5361,37 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
 
             return cleaned;
         };
+
+        // Guard: post-block enrichment must never re-add a channel the user unblocked.
+        if (metadata?.source === 'postBlockEnrichment') {
+            const normalizedInput = normalizeChannelInput(input);
+            const storage = await storageGet([FT_PROFILES_V4_KEY, 'filterChannels', 'ftProfilesV3']);
+            const idCandidate = (typeof normalizedInput === 'string' && /^UC[\w-]{22}$/i.test(normalizedInput.trim())) ? normalizedInput.trim() : '';
+            if (idCandidate) {
+                const profileType = profile === 'kids' ? 'kids' : 'main';
+                const v4 = safeObject(storage?.[FT_PROFILES_V4_KEY]);
+                const profiles = safeObject(v4?.profiles);
+                const activeProfileId = typeof v4?.activeProfileId === 'string' ? v4.activeProfileId : DEFAULT_PROFILE_ID;
+                const activeProfile = safeObject(profiles?.[activeProfileId]);
+                const fromV4 = profileType === 'kids'
+                    ? safeArray(safeObject(activeProfile?.kids)?.blockedChannels)
+                    : safeArray(safeObject(activeProfile?.main)?.channels);
+                const channels = fromV4.length > 0
+                    ? fromV4
+                    : (Array.isArray(storage?.filterChannels) ? storage.filterChannels : []);
+                const stillBlocked = channels.some((ch) => {
+                    if (typeof ch === 'string') {
+                        const raw = ch.trim();
+                        return raw && raw.toLowerCase() === idCandidate.toLowerCase();
+                    }
+                    const id = (typeof ch?.id === 'string' ? ch.id.trim() : '');
+                    return id && id.toLowerCase() === idCandidate.toLowerCase();
+                });
+                if (!stillBlocked) {
+                    return { success: false, skipped: true, reason: 'no_longer_blocked' };
+                }
+            }
+        }
 
         const rawValue = String(input || '').trim();
         if (!rawValue) {
@@ -4251,7 +5425,33 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
 
         const effectiveVideoId = (typeof videoId === 'string' && videoId.trim())
             ? videoId.trim()
-            : videoIdFromInput;
+            : ((typeof metadata?.videoId === 'string' && metadata.videoId.trim())
+                ? metadata.videoId.trim()
+                : videoIdFromInput);
+        const pageHost = (typeof metadata?.pageHost === 'string' ? metadata.pageHost.trim().toLowerCase() : '');
+        const sourceTag = (typeof metadata?.source === 'string' ? metadata.source.trim().toLowerCase() : '');
+        const isYtmContext = Boolean(
+            pageHost.startsWith('m.youtube.') ||
+            pageHost.startsWith('music.youtube.') ||
+            sourceTag.includes('ytm')
+        );
+        const hasStrongChannelIdentifier = isHandle || isUcId || isCustomUrl || isUserUrl;
+        const isVideoDrivenInput = Boolean(videoIdFromInput);
+        const missingAlternateForInput = !isHandleLike(metadata?.displayHandle || metadata?.canonicalHandle || '')
+            && !String(metadata?.customUrl || '').trim();
+        const allowVideoOwnerResolution = Boolean(
+            effectiveVideoId &&
+            (
+                isVideoDrivenInput ||
+                !hasStrongChannelIdentifier ||
+                missingAlternateForInput ||
+                isYtmContext // YTM often provides UC-only; we still need handle/customUrl
+            )
+        );
+        // Always allow a video-backed identity boost when we have a videoId.
+        // This is critical for YTM collab/playlist flows where the clicked input is UC-only:
+        // we still need handle/customUrl immediately for alternate-ID persistence.
+        const allowVideoIdentityBoost = Boolean(effectiveVideoId);
 
         if (!isHandle && !isUcId && !isCustomUrl && !isUserUrl) {
             if (!effectiveVideoId) {
@@ -4271,9 +5471,20 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                 const candidateId = channelMap[lowerHandle];
 
                 if (candidateId && candidateId.toUpperCase().startsWith('UC')) {
-                    mappedId = candidateId;
-                    lookupValue = candidateId;
-                    console.log('FilterTube Background: Using mapped UC ID for handle', normalizedValue, '->', mappedId);
+                    const reverseHandle = typeof channelMap[String(candidateId).trim().toLowerCase()] === 'string'
+                        ? String(channelMap[String(candidateId).trim().toLowerCase()]).trim().toLowerCase()
+                        : '';
+                    if (!reverseHandle || reverseHandle === lowerHandle) {
+                        mappedId = candidateId;
+                        lookupValue = candidateId;
+                        console.log('FilterTube Background: Using mapped UC ID for handle', normalizedValue, '->', mappedId);
+                    } else {
+                        console.log('FilterTube Background: Ignoring conflicting handle->UC mapping', {
+                            handle: normalizedValue,
+                            mappedId: candidateId,
+                            reverseHandle
+                        });
+                    }
                 }
             } catch (e) {
                 console.warn('FilterTube Background: Failed to read channelMap for handle resolution:', e);
@@ -4281,7 +5492,7 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
         }
 
         // If we have a videoId and NO UC ID yet, try to resolve from the video page (Shorts, Watch, Kids)
-        if (effectiveVideoId && (!lookupValue || !lookupValue.toUpperCase().startsWith('UC'))) {
+        if (allowVideoOwnerResolution && (!lookupValue || !lookupValue.toUpperCase().startsWith('UC'))) {
             try {
                 const isKids = profile === 'kids';
                 const resolution = isKids
@@ -4330,10 +5541,19 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             if (!value || typeof value !== 'string') return true;
             const trimmed = value.trim();
             if (!trimmed) return true;
+            const normalizedVideoId = (typeof effectiveVideoId === 'string' ? effectiveVideoId.trim().toLowerCase() : '');
+            if (normalizedVideoId) {
+                const lower = trimmed.toLowerCase();
+                if (lower === normalizedVideoId || lower === normalizedVideoId.slice(1) || lower === normalizedVideoId.slice(0, -1)) return true;
+            }
             if (isUcIdLike(trimmed)) return true;
+            if (/^uc[a-z0-9_-]{6,}$/i.test(trimmed)) return true;
             if (trimmed.startsWith('@')) return true;
             if (trimmed.toLowerCase() === 'channel') return true;
+            if (trimmed.toLowerCase() === 'youtube') return true;
+            if (/^(?:not interested|send feedback|save(?:\s+to(?:\s+playlist|\s+watch\s+later)?)?|share|report|undo|action menu)$/i.test(trimmed)) return true;
             if (trimmed.includes('•')) return true;
+            if (/\band\s+\d+\s+more\b/i.test(trimmed) || /\band\s+more\b/i.test(trimmed)) return true;
             if (/\bviews?\b/i.test(trimmed)) return true;
             if (/\bago\b/i.test(trimmed)) return true;
             if (/\bwatching\b/i.test(trimmed)) return true;
@@ -4344,9 +5564,42 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             if (!value || typeof value !== 'string') return '';
             const trimmed = value.trim();
             if (!trimmed) return '';
+            const normalizedVideoId = (typeof effectiveVideoId === 'string' ? effectiveVideoId.trim().toLowerCase() : '');
+            if (normalizedVideoId) {
+                const lower = trimmed.toLowerCase();
+                if (lower === normalizedVideoId || lower === normalizedVideoId.slice(1) || lower === normalizedVideoId.slice(0, -1)) return '';
+            }
+            if (/^watch:[a-zA-Z0-9_-]{11}$/i.test(trimmed)) return '';
+            if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) return '';
+            if (/^uc[a-z0-9_-]{6,}$/i.test(trimmed)) return '';
+            if (/^PL[\w-]{12,}$/i.test(trimmed)) return '';
             if (isProbablyNotChannelName(trimmed)) return '';
             return trimmed;
         };
+
+        // Bootstrap missing alternate handle from existing channelMap when possible.
+        // This helps "UC -> Not fetched" entries recover without waiting for network fetches.
+        if (
+            lookupValue &&
+            String(lookupValue).toUpperCase().startsWith('UC') &&
+            !isHandleLike(metadata.displayHandle || '')
+        ) {
+            try {
+                const mapStorage = await storageGet(['channelMap']);
+                const channelMap = mapStorage?.channelMap || {};
+                const ucKey = String(lookupValue).trim().toLowerCase();
+                const mappedHandle = typeof channelMap[ucKey] === 'string' ? channelMap[ucKey].trim() : '';
+                const normalizedMappedHandle = isHandleLike(mappedHandle) ? mappedHandle.toLowerCase() : '';
+                const roundTripId = normalizedMappedHandle && typeof channelMap[normalizedMappedHandle] === 'string'
+                    ? String(channelMap[normalizedMappedHandle]).trim().toLowerCase()
+                    : '';
+                if (normalizedMappedHandle && (!roundTripId || roundTripId === ucKey)) {
+                    metadata.displayHandle = normalizedMappedHandle;
+                    if (!metadata.canonicalHandle) metadata.canonicalHandle = normalizedMappedHandle;
+                }
+            } catch (e) {
+            }
+        }
 
         const hasMetadataName = typeof metadata.channelName === 'string' && metadata.channelName.trim();
         const hasGoodMetadataName = Boolean(hasMetadataName && !isProbablyNotChannelName(metadata.channelName));
@@ -4356,16 +5609,43 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
 
         // Important: do NOT skip fetch purely because we have a logo.
         // That leads to persisting {name: UC...} entries when name/handle were missing.
+        // Only skip the network fetch when we already have a trustworthy NAME.
+        // Having only a handle is not enough; otherwise we persist name="@handle" which breaks UI.
+        // Only skip the heavy channel-page fetch when we already have a reliable alternate identity
+        // (handle/customUrl) or we can round-trip via channelMap. Otherwise we end up persisting
+        // UC-only entries that show "Not fetched" in the dashboard for a long time.
+        const hasAlternateIdentity = Boolean(
+            isHandleLike(metadata.displayHandle || '') ||
+            isHandleLike(metadata.canonicalHandle || '') ||
+            isHandleLike(channelInfo?.handle || '') ||
+            (typeof metadata.customUrl === 'string' && metadata.customUrl.trim()) ||
+            (typeof channelInfo?.customUrl === 'string' && String(channelInfo.customUrl).trim())
+        );
         const shouldSkipFetch = lookupValue
             && String(lookupValue).toUpperCase().startsWith('UC')
-            && (hasGoodMetadataName || hasMetadataHandle)
-            && !looksLikeTopicName;
+            && hasGoodMetadataName
+            && !looksLikeTopicName
+            && hasAlternateIdentity;
+        const shouldAvoidChannelPageFetch = Boolean(
+            isYtmContext &&
+            (effectiveVideoId || String(lookupValue || '').toUpperCase().startsWith('UC'))
+        );
         if (shouldSkipFetch) {
             channelInfo = {
                 success: true,
                 id: String(lookupValue),
                 handle: (isHandle ? normalizedValue : null),
                 name: (metadata.channelName || metadata.displayHandle || (isHandle ? normalizedValue : '') || String(lookupValue)),
+                logo: metadata.channelLogo || null,
+                customUrl: metadata.customUrl || null,
+                topicChannel: false
+            };
+        } else if (shouldAvoidChannelPageFetch) {
+            channelInfo = {
+                success: true,
+                id: String(lookupValue || ''),
+                handle: (isHandle ? normalizedValue : null),
+                name: (metadata.channelName || metadata.displayHandle || (isHandle ? normalizedValue : '') || String(lookupValue || '')),
                 logo: metadata.channelLogo || null,
                 customUrl: metadata.customUrl || null,
                 topicChannel: false
@@ -4377,7 +5657,7 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
         // If channel page scraping failed (often due to google.com/sorry redirects + CORS),
         // fall back to watch identity resolution when a videoId is available.
         // This path is spec-aligned: it uses video payload surfaces and avoids brittle channel page HTML.
-        if (!channelInfo.success && effectiveVideoId) {
+        if (!channelInfo.success && allowVideoOwnerResolution) {
             try {
                 const isKids = profile === 'kids';
                 const identity = isKids
@@ -4397,6 +5677,138 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                     if (!metadata.displayHandle && identity.handle) metadata.displayHandle = identity.handle;
                 }
             } catch (e) {
+            }
+        }
+
+        // If we resolved a UC but still have weak identity (missing handle/custom/name),
+        // do one watch-based identity boost so alternate IDs are persisted quickly.
+        const isYtmUcOnlyNeedingAlternate = Boolean(
+            isYtmContext &&
+            channelInfo?.success &&
+            typeof channelInfo?.id === 'string' &&
+            /^UC[\w-]{22}$/i.test(channelInfo.id.trim()) &&
+            !isHandleLike(channelInfo.handle || '') &&
+            !String(channelInfo.customUrl || '').trim()
+        );
+        if (channelInfo.success && allowVideoIdentityBoost && !isYtmUcOnlyNeedingAlternate) {
+            try {
+                const missingHandle = !isHandleLike(channelInfo.handle || '');
+                const missingCustomUrl = !String(channelInfo.customUrl || '').trim();
+                const weakName = !String(channelInfo.name || '').trim() || isProbablyNotChannelName(channelInfo.name || '');
+                if (missingHandle || missingCustomUrl || weakName) {
+                    const isKids = profile === 'kids';
+                    const identity = isKids
+                        ? (await performKidsWatchIdentityFetch(effectiveVideoId) || await performWatchIdentityFetch(effectiveVideoId))
+                        : await performWatchIdentityFetch(effectiveVideoId);
+                    if (identity && (identity.id || identity.handle || identity.customUrl || identity.name)) {
+                        const currentId = (typeof channelInfo.id === 'string' ? channelInfo.id.trim() : '');
+                        const identityId = (typeof identity.id === 'string' ? identity.id.trim() : '');
+                        const hasCurrentUc = /^UC[\w-]{22}$/i.test(currentId);
+                        const hasIdentityUc = /^UC[\w-]{22}$/i.test(identityId);
+                        const idMatches = hasCurrentUc && hasIdentityUc
+                            ? currentId.toLowerCase() === identityId.toLowerCase()
+                            : true;
+
+                        // Never replace an explicitly resolved collaborator/channel UC ID with
+                        // watch-owner identity from the same video. This caused Block All rows to
+                        // collapse into a single channel entry.
+                        if (hasIdentityUc && (!hasCurrentUc || idMatches)) {
+                            channelInfo.id = identityId;
+                            mappedId = identityId;
+                            lookupValue = identityId;
+                            try {
+                                enqueueVideoChannelMapUpdate(effectiveVideoId, identityId);
+                            } catch (e) {
+                            }
+                        }
+
+                        if (!(hasCurrentUc && hasIdentityUc && !idMatches)) {
+                            if (isHandleLike(identity.handle || '')) {
+                                channelInfo.handle = String(identity.handle).trim().toLowerCase();
+                                if (!metadata.displayHandle) metadata.displayHandle = channelInfo.handle;
+                            }
+                            if (identity.customUrl && !channelInfo.customUrl) {
+                                channelInfo.customUrl = identity.customUrl;
+                                if (!metadata.customUrl) metadata.customUrl = identity.customUrl;
+                            }
+                            if (identity.name && !isProbablyNotChannelName(identity.name)) {
+                                channelInfo.name = identity.name;
+                                if (!metadata.channelName || isProbablyNotChannelName(metadata.channelName)) {
+                                    metadata.channelName = identity.name;
+                                }
+                            }
+                            if (identity.logo && !channelInfo.logo) {
+                                channelInfo.logo = identity.logo;
+                                if (!metadata.channelLogo) metadata.channelLogo = identity.logo;
+                            }
+                        }
+                    }
+                }
+            } catch (e) {
+            }
+        }
+
+        // Final fallback: if we still have only a UC id (no handle/customUrl), do one direct channel-page
+        // fetch attempt now. This avoids leaving entries stuck as "Not fetched" until the enrichment timer.
+        if (shouldSkipFetch && !shouldAvoidChannelPageFetch && channelInfo?.success && lookupValue && String(lookupValue).toUpperCase().startsWith('UC')) {
+            try {
+                const stillMissingHandle = !isHandleLike(channelInfo.handle || '');
+                const stillMissingCustom = !String(channelInfo.customUrl || '').trim();
+                if ((stillMissingHandle && stillMissingCustom) || !channelInfo.name || isProbablyNotChannelName(channelInfo.name || '')) {
+                    const fetched = await fetchChannelInfo(lookupValue);
+                    if (fetched?.success) {
+                        if (!channelInfo.name || isProbablyNotChannelName(channelInfo.name || '')) {
+                            channelInfo.name = fetched.name || channelInfo.name;
+                        }
+                        if (!channelInfo.logo) channelInfo.logo = fetched.logo || channelInfo.logo;
+                        if (stillMissingCustom && fetched.customUrl) channelInfo.customUrl = fetched.customUrl;
+                        if (stillMissingHandle && isHandleLike(fetched.handle || '')) {
+                            channelInfo.handle = String(fetched.handle).trim().toLowerCase();
+                            if (!metadata.displayHandle) metadata.displayHandle = channelInfo.handle;
+                            if (!metadata.canonicalHandle) metadata.canonicalHandle = channelInfo.handle;
+                        }
+                    }
+                }
+            } catch (e) {
+            }
+        }
+
+        // Last-mile alternate identity resolution for UC-only rows.
+        // This prevents persisting entries as "Not fetched" when we already know the channel via
+        // channelMap / recent video->channel mappings.
+        if (channelInfo?.success && channelInfo?.id) {
+            const missingHandle = !isHandleLike(channelInfo.handle || '');
+            const missingCustom = !String(channelInfo.customUrl || '').trim();
+            if (missingHandle && missingCustom) {
+                try {
+                    const resolvedAlt = await resolveAlternateIdentityForChannelId(channelInfo.id, {
+                        preferredVideoId: effectiveVideoId,
+                        profile,
+                        expectedName: metadata.channelName || channelInfo.name || ''
+                    });
+                    if (resolvedAlt) {
+                        if (isHandleLike(resolvedAlt.handle || '') && !isHandleLike(channelInfo.handle || '')) {
+                            channelInfo.handle = String(resolvedAlt.handle).trim().toLowerCase();
+                            if (!metadata.displayHandle) metadata.displayHandle = channelInfo.handle;
+                            if (!metadata.canonicalHandle) metadata.canonicalHandle = channelInfo.handle;
+                        }
+                        if (!channelInfo.customUrl && resolvedAlt.customUrl) {
+                            channelInfo.customUrl = resolvedAlt.customUrl;
+                            if (!metadata.customUrl) metadata.customUrl = resolvedAlt.customUrl;
+                        }
+                        if ((!channelInfo.name || isProbablyNotChannelName(channelInfo.name || '')) && resolvedAlt.name) {
+                            channelInfo.name = resolvedAlt.name;
+                            if (!metadata.channelName || isProbablyNotChannelName(metadata.channelName || '')) {
+                                metadata.channelName = resolvedAlt.name;
+                            }
+                        }
+                        if (!channelInfo.logo && resolvedAlt.logo) {
+                            channelInfo.logo = resolvedAlt.logo;
+                            if (!metadata.channelLogo) metadata.channelLogo = resolvedAlt.logo;
+                        }
+                    }
+                } catch (e) {
+                }
             }
         }
 
@@ -4465,7 +5877,8 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             'filterChannels',
             'uiKeywords',
             'filterKeywords',
-            'ftProfilesV3'
+            'ftProfilesV3',
+            'channelMap'
         ]);
 
         let profilesV4 = storage?.[FT_PROFILES_V4_KEY];
@@ -4514,12 +5927,266 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                     : (Array.isArray(storage.filterChannels) ? storage.filterChannels : []));
         }
 
-        // Build allCollaborators array from collaborationWith for popup grouping
-        const allCollaborators = collaborationWith && collaborationWith.length > 0
-            ? [{ handle: channelInfo.handle, name: channelInfo.name }, ...collaborationWith.map(h => ({ handle: h }))]
+        // Build normalized collaborator roster used by UI badges/grouping.
+        // collaborationWith can contain a mix of @handles, UC IDs, custom URLs, or names.
+        const channelMap = safeObject(storage?.channelMap);
+        const normalizeUcId = (value) => {
+            const raw = typeof value === 'string' ? value.trim() : '';
+            return /^UC[\w-]{22}$/i.test(raw) ? raw : '';
+        };
+        const normalizeCustomUrl = (value) => {
+            if (!value || typeof value !== 'string') return '';
+            return value.trim().toLowerCase().replace(/^\/+/, '').replace(/\/+$/, '');
+        };
+        const lookupChannelMap = (key) => {
+            const normalized = typeof key === 'string' ? key.trim().toLowerCase() : '';
+            if (!normalized) return '';
+            const direct = typeof channelMap[normalized] === 'string' ? channelMap[normalized].trim() : '';
+            if (direct) return direct;
+            const original = typeof channelMap[key] === 'string' ? channelMap[key].trim() : '';
+            return original || '';
+        };
+        const resolveMappedIdFromHandle = (handle) => {
+            const normalizedHandle = isHandleLike(handle || '')
+                ? String(handle).trim().toLowerCase()
+                : '';
+            if (!normalizedHandle) return '';
+            const mappedId = normalizeUcId(lookupChannelMap(normalizedHandle));
+            if (!mappedId) return '';
+            const mappedHandle = isHandleLike(lookupChannelMap(mappedId))
+                ? String(lookupChannelMap(mappedId)).trim().toLowerCase()
+                : '';
+            if (mappedHandle && mappedHandle !== normalizedHandle) return '';
+            return mappedId;
+        };
+        const resolveMappedHandleFromId = (id) => {
+            const normalizedId = normalizeUcId(id || '');
+            if (!normalizedId) return '';
+            const mappedHandle = isHandleLike(lookupChannelMap(normalizedId))
+                ? String(lookupChannelMap(normalizedId)).trim().toLowerCase()
+                : '';
+            if (!mappedHandle) return '';
+            const mappedId = normalizeUcId(lookupChannelMap(mappedHandle));
+            if (mappedId && mappedId !== normalizedId) return '';
+            return mappedHandle;
+        };
+        const canonicalizeCollaborator = (candidate) => {
+            if (!candidate || typeof candidate !== 'object') return null;
+            let normalizedHandle = isHandleLike(candidate.handle || '')
+                ? String(candidate.handle).trim().toLowerCase()
+                : '';
+            const normalizedId = normalizeUcId(candidate.id || '');
+            const normalizedCustomUrl = normalizeCustomUrl(candidate.customUrl || '');
+            const normalizedName = typeof candidate.name === 'string' ? candidate.name.trim() : '';
+
+            const mappedIdFromHandle = normalizedHandle ? resolveMappedIdFromHandle(normalizedHandle) : '';
+            const canonicalId = normalizedId || mappedIdFromHandle;
+            if (canonicalId && normalizedHandle) {
+                const strictMappedId = resolveMappedIdFromHandle(normalizedHandle);
+                if (strictMappedId && strictMappedId !== canonicalId) {
+                    // Keep UC ID as canonical identity on conflict; drop mismatched handle alias.
+                    normalizedHandle = '';
+                }
+            }
+
+            const normalized = {
+                handle: normalizedHandle || '',
+                id: canonicalId || '',
+                customUrl: normalizedCustomUrl || '',
+                name: normalizedName || ''
+            };
+
+            if (!normalized.handle && !normalized.id && !normalized.customUrl && !normalized.name) {
+                return null;
+            }
+            return normalized;
+        };
+        const mergeCollaborator = (base, incoming) => {
+            if (!base || !incoming) return base || incoming || null;
+            if (!base.id && incoming.id) base.id = incoming.id;
+            if (!base.handle && incoming.handle) base.handle = incoming.handle;
+            if (!base.customUrl && incoming.customUrl) base.customUrl = incoming.customUrl;
+            if (!base.name && incoming.name) base.name = incoming.name;
+            return base;
+        };
+        const dedupeCollaborators = (list) => {
+            const deduped = [];
+            const aliasToIndex = new Map();
+
+            const addAlias = (alias, idx) => {
+                if (!alias || aliasToIndex.has(alias)) return;
+                aliasToIndex.set(alias, idx);
+            };
+
+            const getAliases = (entry) => {
+                const aliases = [];
+                const push = (type, value) => {
+                    const normalized = typeof value === 'string' ? value.trim().toLowerCase() : '';
+                    if (!normalized) return;
+                    const key = `${type}:${normalized}`;
+                    if (!aliases.includes(key)) aliases.push(key);
+                };
+                if (entry.id) {
+                    push('id', entry.id);
+                }
+                if (entry.handle) {
+                    push('handle', entry.handle);
+                    const mappedId = resolveMappedIdFromHandle(entry.handle);
+                    if (mappedId) push('id', mappedId);
+                }
+                if (entry.customUrl) push('custom', entry.customUrl);
+                if (entry.name) push('name', entry.name);
+                return aliases;
+            };
+
+            (Array.isArray(list) ? list : []).forEach((candidate) => {
+                const normalized = canonicalizeCollaborator(candidate);
+                if (!normalized) return;
+                const aliases = getAliases(normalized);
+                if (aliases.length === 0) return;
+
+                let existingIndex = -1;
+                for (const alias of aliases) {
+                    if (!aliasToIndex.has(alias)) continue;
+                    existingIndex = aliasToIndex.get(alias);
+                    break;
+                }
+
+                if (existingIndex !== -1) {
+                    deduped[existingIndex] = mergeCollaborator(deduped[existingIndex], normalized);
+                    getAliases(deduped[existingIndex]).forEach((alias) => addAlias(alias, existingIndex));
+                    return;
+                }
+
+                const nextIndex = deduped.length;
+                deduped.push(normalized);
+                aliases.forEach((alias) => addAlias(alias, nextIndex));
+            });
+
+            return deduped;
+        };
+
+        const parseCollaborationRef = (raw) => {
+            const value = typeof raw === 'string' ? raw.trim() : '';
+            if (!value) return null;
+            let parsed = null;
+            try {
+                if (typeof FilterTubeIdentity?.canonicalizeChannelInput === 'function') {
+                    parsed = FilterTubeIdentity.canonicalizeChannelInput(value);
+                }
+            } catch (e) {
+            }
+
+            if (parsed?.type === 'handle' && parsed.value) {
+                return canonicalizeCollaborator({ handle: parsed.value, id: '', customUrl: '', name: '' });
+            }
+            if (parsed?.type === 'ucid' && parsed.value) {
+                return canonicalizeCollaborator({ handle: '', id: parsed.value, customUrl: '', name: '' });
+            }
+
+            if (/^UC[\w-]{22}$/i.test(value)) {
+                return canonicalizeCollaborator({ handle: '', id: value, customUrl: '', name: '' });
+            }
+            if (value.startsWith('@')) {
+                return canonicalizeCollaborator({ handle: value.toLowerCase(), id: '', customUrl: '', name: '' });
+            }
+            if (/^(c|user)\/[^/?#]+$/i.test(value)) {
+                return canonicalizeCollaborator({ handle: '', id: '', customUrl: value, name: '' });
+            }
+            return canonicalizeCollaborator({ handle: '', id: '', customUrl: '', name: value });
+        };
+
+        const primaryCollaborator = canonicalizeCollaborator({
+            handle: isHandleLike(channelInfo.handle || '') ? String(channelInfo.handle).trim().toLowerCase() : '',
+            id: normalizeUcId(channelInfo.id || ''),
+            customUrl: typeof channelInfo.customUrl === 'string' ? channelInfo.customUrl.trim() : '',
+            name: typeof channelInfo.name === 'string' ? channelInfo.name.trim() : ''
+        }) || {
+            handle: '',
+            id: '',
+            customUrl: '',
+            name: ''
+        };
+
+        const parsedCollaborationRefs = Array.isArray(collaborationWith)
+            ? collaborationWith.map(parseCollaborationRef).filter(Boolean)
+            : [];
+        const pruneHandleOnlyAliases = (list) => {
+            const entries = Array.isArray(list) ? list : [];
+            const ucIdSet = new Set(
+                entries
+                    .map((entry) => normalizeUcId(entry?.id || '').toLowerCase())
+                    .filter(Boolean)
+            );
+            if (ucIdSet.size < 2) return entries;
+            return entries.filter((entry) => {
+                if (!entry || typeof entry !== 'object') return false;
+                if (entry.id) return true;
+                const mappedId = resolveMappedIdFromHandle(entry.handle || '');
+                if (!mappedId) return true;
+                return ucIdSet.has(mappedId.toLowerCase());
+            });
+        };
+        const dedupedCollaborationRefs = pruneHandleOnlyAliases(dedupeCollaborators(parsedCollaborationRefs));
+        const normalizedCollaborationWith = dedupedCollaborationRefs
+            .map((entry) => entry.id || entry.handle || entry.customUrl || entry.name || '')
+            .filter(Boolean);
+        const allCollaborators = normalizedCollaborationWith.length > 0
+            ? pruneHandleOnlyAliases(dedupeCollaborators([primaryCollaborator, ...dedupedCollaborationRefs]))
             : [];
 
-        const canonicalCandidate = (metadata.canonicalHandle || channelInfo.canonicalHandle || channelInfo.handle || (isHandle ? rawValue : '') || '').trim();
+        // Late-stage bootstrap: mapping may be learned asynchronously while this request is in flight.
+        // Re-check UC->@handle before persisting to avoid new "Not fetched" rows.
+        if (
+            channelInfo?.id
+            && /^UC[\w-]{22}$/i.test(String(channelInfo.id).trim())
+            && !isHandleLike(channelInfo.handle || '')
+            && !isHandleLike(metadata.displayHandle || '')
+            && !isHandleLike(metadata.canonicalHandle || '')
+        ) {
+            try {
+                const mapStorage = await storageGet(['channelMap']);
+                const channelMap = mapStorage?.channelMap || {};
+                const idKey = String(channelInfo.id).trim().toLowerCase();
+                const mappedHandle = typeof channelMap[idKey] === 'string' ? channelMap[idKey].trim() : '';
+                const normalizedMappedHandle = isHandleLike(mappedHandle) ? mappedHandle.toLowerCase() : '';
+                const roundTripId = normalizedMappedHandle && typeof channelMap[normalizedMappedHandle] === 'string'
+                    ? String(channelMap[normalizedMappedHandle]).trim().toLowerCase()
+                    : '';
+                if (normalizedMappedHandle && (!roundTripId || roundTripId === idKey)) {
+                    channelInfo.handle = normalizedMappedHandle;
+                    if (!metadata.displayHandle) metadata.displayHandle = normalizedMappedHandle;
+                    if (!metadata.canonicalHandle) metadata.canonicalHandle = normalizedMappedHandle;
+                }
+            } catch (e) {
+            }
+        }
+
+        let canonicalCandidate = (metadata.canonicalHandle || channelInfo.canonicalHandle || channelInfo.handle || (isHandle ? rawValue : '') || '').trim();
+        const incomingCanonicalId = normalizeUcId(channelInfo.id || '');
+        if (incomingCanonicalId && isHandleLike(canonicalCandidate)) {
+            const normalizedCandidateHandle = String(canonicalCandidate).trim().toLowerCase();
+            const mappedIdForCandidate = resolveMappedIdFromHandle(normalizedCandidateHandle);
+            if (mappedIdForCandidate && mappedIdForCandidate !== incomingCanonicalId) {
+                // UC ID is primary. Drop conflicting handle aliases.
+                canonicalCandidate = '';
+                if (isHandleLike(channelInfo.handle || '') && String(channelInfo.handle).trim().toLowerCase() === normalizedCandidateHandle) {
+                    channelInfo.handle = '';
+                }
+                if (isHandleLike(channelInfo.canonicalHandle || '') && String(channelInfo.canonicalHandle).trim().toLowerCase() === normalizedCandidateHandle) {
+                    channelInfo.canonicalHandle = '';
+                }
+                if (isHandleLike(channelInfo.handleDisplay || '') && String(channelInfo.handleDisplay).trim().toLowerCase() === normalizedCandidateHandle) {
+                    channelInfo.handleDisplay = '';
+                }
+                if (isHandleLike(metadata.displayHandle || '') && String(metadata.displayHandle).trim().toLowerCase() === normalizedCandidateHandle) {
+                    metadata.displayHandle = '';
+                }
+                if (isHandleLike(metadata.canonicalHandle || '') && String(metadata.canonicalHandle).trim().toLowerCase() === normalizedCandidateHandle) {
+                    metadata.canonicalHandle = '';
+                }
+            }
+        }
         const canonicalHandle = isHandleLike(canonicalCandidate) ? canonicalCandidate : '';
         const normalizedHandle = canonicalHandle
             ? canonicalHandle.toLowerCase()
@@ -4613,9 +6280,9 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                 updated.filterAll = true;
             }
 
-            if (Array.isArray(collaborationWith) && collaborationWith.length > 0) {
+            if (Array.isArray(normalizedCollaborationWith) && normalizedCollaborationWith.length > 0) {
                 const existingWith = Array.isArray(existing.collaborationWith) ? existing.collaborationWith : [];
-                const mergedWith = [...new Set([...existingWith, ...collaborationWith])];
+                const mergedWith = [...new Set([...existingWith, ...normalizedCollaborationWith])];
                 updated.collaborationWith = mergedWith;
                 updated.allCollaborators = allCollaborators;
             }
@@ -4644,7 +6311,7 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                 name: finalChannelName,
                 logo: channelInfo.logo,
                 filterAll: filterAll,
-                collaborationWith: collaborationWith || [],
+                collaborationWith: normalizedCollaborationWith || [],
                 collaborationGroupId: collaborationGroupId || null,
                 allCollaborators: allCollaborators,
                 customUrl: customUrl || null,
@@ -4688,11 +6355,21 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                     const keyId = finalChannelData.id.toLowerCase();
                     const keyHandle = normalizedHandleKey || handleToMap.toLowerCase();
                     let hasChange = false;
-                    if (keyHandle && channelMap[keyHandle] !== finalChannelData.id) {
+                    const normalizeUc = (value) => (typeof value === 'string' && /^UC[\w-]{22}$/i.test(value.trim()) ? value.trim().toLowerCase() : '');
+                    const normalizeHandle = (value) => (typeof value === 'string' && value.trim().startsWith('@') ? value.trim().toLowerCase() : '');
+                    const existingIdForHandle = normalizeUc(channelMap[keyHandle]);
+                    const existingHandleForId = normalizeHandle(channelMap[keyId]);
+
+                    // Never overwrite an existing conflicting UC mapping for a handle unless it already round-trips.
+                    const canWriteHandleMap = !existingIdForHandle || existingIdForHandle === keyId || existingHandleForId === keyHandle;
+                    if (keyHandle && canWriteHandleMap && channelMap[keyHandle] !== finalChannelData.id) {
                         channelMap[keyHandle] = finalChannelData.id;
                         hasChange = true;
                     }
-                    if (channelMap[keyId] !== handleToMap) {
+
+                    // Never overwrite an existing conflicting handle mapping for a UC unless it already round-trips.
+                    const canWriteIdMap = !existingHandleForId || existingHandleForId === keyHandle || existingIdForHandle === keyId;
+                    if (canWriteIdMap && channelMap[keyId] !== handleToMap) {
                         channelMap[keyId] = handleToMap;
                         hasChange = true;
                     }
@@ -4712,6 +6389,50 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             const baseProfile = safeObject(profiles[activeProfileId]);
             const nextMain = safeObject(baseProfile.main);
             const nextKids = safeObject(baseProfile.kids);
+            const mainMode = nextMain.mode === 'whitelist' ? 'whitelist' : 'blocklist';
+            const mainKeywordKey = mainMode === 'whitelist' ? 'whitelistKeywords' : 'blockedKeywords';
+            const mainBlockedKeywords = safeArray(nextMain.blockedKeywords);
+            const mainWhitelistKeywords = safeArray(nextMain.whitelistKeywords);
+            let appendedFilterAllKeyword = null;
+
+            if (!isKids && finalChannelData?.filterAll) {
+                const keywordWord = sanitizePersistedChannelName(
+                    pickBetterName(
+                        finalChannelData?.name,
+                        metadata?.channelName,
+                        metadata?.displayHandle,
+                        finalChannelData?.handleDisplay,
+                        finalChannelData?.handle
+                    )
+                );
+
+                if (keywordWord && keywordWord !== finalChannelData?.id) {
+                    const targetKeywordList = mainKeywordKey === 'whitelist'
+                        ? mainWhitelistKeywords
+                        : mainBlockedKeywords;
+                    const existingWords = new Set(
+                        targetKeywordList
+                            .map(entry => {
+                                if (!entry) return '';
+                                if (typeof entry === 'string') return entry.trim().toLowerCase();
+                                if (typeof entry?.word === 'string') return entry.word.trim().toLowerCase();
+                                return '';
+                            })
+                            .filter(Boolean)
+                    );
+
+                    if (!existingWords.has(keywordWord.toLowerCase())) {
+                        appendedFilterAllKeyword = {
+                            word: keywordWord,
+                            exact: false,
+                            comments: true,
+                            addedAt: Date.now(),
+                            source: 'filterAll_channel'
+                        };
+                        targetKeywordList.push(appendedFilterAllKeyword);
+                    }
+                }
+            }
 
             profiles[activeProfileId] = {
                 ...baseProfile,
@@ -4720,7 +6441,9 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                 main: {
                     ...nextMain,
                     channels: (!isKids && targetListType === 'blocklist') ? channels : safeArray(nextMain.channels),
-                    whitelistChannels: (!isKids && targetListType === 'whitelist') ? channels : safeArray(nextMain.whitelistChannels)
+                    whitelistChannels: (!isKids && targetListType === 'whitelist') ? channels : safeArray(nextMain.whitelistChannels),
+                    blockedKeywords: mainBlockedKeywords,
+                    whitelistKeywords: mainWhitelistKeywords
                 },
                 kids: {
                     ...nextKids,
@@ -4738,6 +6461,22 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                 schemaVersion: 4,
                 profiles
             };
+
+            if (appendedFilterAllKeyword && mainKeywordKey === 'blockedKeywords') {
+                const legacyUiKeywords = safeArray(storage.uiKeywords);
+                const hasWord = legacyUiKeywords.some(entry => {
+                    const word = typeof entry?.word === 'string'
+                        ? entry.word.trim().toLowerCase()
+                        : (typeof entry === 'string' ? entry.trim().toLowerCase() : '');
+                    return word === appendedFilterAllKeyword.word.toLowerCase();
+                });
+                if (!hasWord) {
+                    storageWritePayload.uiKeywords = [
+                        ...legacyUiKeywords,
+                        appendedFilterAllKeyword
+                    ];
+                }
+            }
         }
 
         if (isKids) {
@@ -4788,9 +6527,11 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
         compiledSettingsCache.kids = null;
 
         try {
-            if (existingIndex === -1) {
-                schedulePostBlockEnrichment(finalChannelData, profile, metadata);
-            }
+            schedulePostBlockEnrichment(finalChannelData, profile, {
+                ...metadata,
+                enrichmentVideoId: (typeof effectiveVideoId === 'string' ? effectiveVideoId : '') || '',
+                newlyAdded: existingIndex === -1
+            });
         } catch (e) {
         }
 
@@ -4838,8 +6579,17 @@ async function handleToggleChannelFilterAll(channelId, value) {
 
         // Toggle filterAll
         channels[channelIndex].filterAll = value;
+        const channelForToggle = channels[channelIndex] || {};
+        const keywordWord = (() => {
+            const raw = typeof channelForToggle?.name === 'string' ? channelForToggle.name.trim() : '';
+            if (!raw) return '';
+            if (raw.toUpperCase().startsWith('UC')) return '';
+            if (raw.startsWith('@')) return '';
+            return raw;
+        })();
 
         let nextProfilesV4 = null;
+        let nextUiKeywords = null;
         try {
             const existingV4 = storage?.[FT_PROFILES_V4_KEY];
             const profilesV4 = isValidProfilesV4(existingV4)
@@ -4850,6 +6600,64 @@ async function handleToggleChannelFilterAll(channelId, value) {
             const profiles = safeObject(profilesV4?.profiles);
             const activeProfile = safeObject(profiles?.[activeId]);
             const main = safeObject(activeProfile.main);
+            const mainMode = main.mode === 'whitelist' ? 'whitelist' : 'blocklist';
+            const keywordKey = mainMode === 'whitelist' ? 'whitelistKeywords' : 'blockedKeywords';
+            let mainKeywords = safeArray(main[keywordKey]);
+
+            if (keywordWord) {
+                const normalizedWord = keywordWord.toLowerCase();
+                const entryToWord = (entry) => {
+                    if (typeof entry === 'string') return entry.trim().toLowerCase();
+                    if (typeof entry?.word === 'string') return entry.word.trim().toLowerCase();
+                    return '';
+                };
+                const hasWord = mainKeywords.some(entry => entryToWord(entry) === normalizedWord);
+                if (value) {
+                    if (!hasWord) {
+                        mainKeywords = [
+                            ...mainKeywords,
+                            {
+                                word: keywordWord,
+                                exact: false,
+                                comments: true,
+                                addedAt: Date.now(),
+                                source: 'filterAll_channel'
+                            }
+                        ];
+                    }
+                } else {
+                    mainKeywords = mainKeywords.filter(entry => {
+                        if (entryToWord(entry) !== normalizedWord) return true;
+                        if (typeof entry === 'string') return false;
+                        return entry?.source !== 'filterAll_channel';
+                    });
+                }
+
+                if (keywordKey === 'blockedKeywords') {
+                    const uiKeywords = safeArray(storage.uiKeywords);
+                    const hasUiWord = uiKeywords.some(entry => entryToWord(entry) === normalizedWord);
+                    if (value) {
+                        if (!hasUiWord) {
+                            nextUiKeywords = [
+                                ...uiKeywords,
+                                {
+                                    word: keywordWord,
+                                    exact: false,
+                                    comments: true,
+                                    addedAt: Date.now(),
+                                    source: 'filterAll_channel'
+                                }
+                            ];
+                        }
+                    } else {
+                        nextUiKeywords = uiKeywords.filter(entry => {
+                            if (entryToWord(entry) !== normalizedWord) return true;
+                            if (typeof entry === 'string') return false;
+                            return entry?.source !== 'filterAll_channel';
+                        });
+                    }
+                }
+            }
 
             profiles[activeId] = {
                 ...activeProfile,
@@ -4857,7 +6665,8 @@ async function handleToggleChannelFilterAll(channelId, value) {
                 settings: safeObject(activeProfile.settings),
                 main: {
                     ...main,
-                    channels
+                    channels,
+                    [keywordKey]: mainKeywords
                 },
                 kids: {
                     ...safeObject(activeProfile.kids),
@@ -4879,6 +6688,9 @@ async function handleToggleChannelFilterAll(channelId, value) {
             const payload = { filterChannels: channels };
             if (nextProfilesV4) {
                 payload[FT_PROFILES_V4_KEY] = nextProfilesV4;
+            }
+            if (Array.isArray(nextUiKeywords)) {
+                payload.uiKeywords = nextUiKeywords;
             }
             browserAPI.storage.local.set(payload, resolve);
         });
