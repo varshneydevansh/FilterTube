@@ -273,12 +273,18 @@
 
         // Handle single-channel info request from content_bridge (for UC ID + handle lookup)
         if (type === 'FilterTube_RequestChannelInfo' && source === 'content_bridge') {
-            const { videoId, requestId, expectedHandle, expectedName } = payload || {};
-            postLog('log', `Received channel info request for video: ${videoId}`);
+            const { videoId, channelId, requestId, expectedHandle, expectedName } = payload || {};
+            postLog('log', `Received channel info request for video/channel: ${videoId || 'n/a'} / ${channelId || 'n/a'}`);
 
             let channel = null;
             if (videoId) {
                 channel = searchYtInitialDataForVideoChannel(videoId, {
+                    expectedHandle: extractRawHandle(expectedHandle) || expectedHandle,
+                    expectedName
+                });
+            }
+            if (!channel && channelId) {
+                channel = searchYtInitialDataForChannelId(channelId, {
                     expectedHandle: extractRawHandle(expectedHandle) || expectedHandle,
                     expectedName
                 });
@@ -297,7 +303,7 @@
             if (channel) {
                 postLog('log', 'Sent channel info response:', channel);
             } else {
-                postLog('log', 'No channel info found for video:', videoId);
+                postLog('log', 'No channel info found for video/channel:', videoId || 'n/a', channelId || 'n/a');
             }
         }
     });
@@ -756,6 +762,43 @@
         const normalizedExpectedName = normalizeChannelName(options.expectedName);
         const hasExpectations = Boolean(normalizedExpectedHandle || normalizedExpectedName);
         let fallbackCandidate = null;
+        const isLikelyBadName = (value) => {
+            if (!value || typeof value !== 'string') return true;
+            const trimmed = value.trim();
+            if (!trimmed) return true;
+            const lower = trimmed.toLowerCase();
+            if (lower.startsWith('@')) return true;
+            if (/^uc[\w-]{22}$/i.test(trimmed)) return true;
+            if (trimmed.includes('•')) return true;
+            if (/\bviews?\b/i.test(trimmed)) return true;
+            if (/\bago\b/i.test(trimmed)) return true;
+            if (/^like\s+this\s+video\??$/i.test(trimmed)) return true;
+            if (/\band\s+\d+\s+more\b/i.test(trimmed) || /\band\s+more\b/i.test(trimmed)) return true;
+            if (/^\s*mix\b/i.test(trimmed)) return true;
+            if (trimmed.toLowerCase() === 'channel') return true;
+            return false;
+        };
+        const extractChannelThumbnailA11yName = (node) => {
+            if (!node || typeof node !== 'object') return '';
+            const rawLabel =
+                node?.channelThumbnail?.channelThumbnailWithLinkRenderer?.accessibility?.accessibilityData?.label ||
+                node?.channelThumbnailSupportedRenderers?.channelThumbnailWithLinkRenderer?.accessibility?.accessibilityData?.label ||
+                '';
+            if (typeof rawLabel !== 'string' || !rawLabel.trim()) return '';
+            const cleaned = rawLabel.replace(/^go to channel\s+/i, '').trim();
+            if (!cleaned || isLikelyBadName(cleaned)) return '';
+            return cleaned;
+        };
+        const pickPreferredName = (node, baseName) => {
+            const cleanedBase = (typeof baseName === 'string' && !isLikelyBadName(baseName))
+                ? baseName.trim()
+                : '';
+            const a11yName = extractChannelThumbnailA11yName(node);
+            if (a11yName && /\s-\sTopic$/i.test(a11yName) && !/\s-\sTopic$/i.test(cleanedBase || '')) {
+                return a11yName;
+            }
+            return cleanedBase || a11yName || '';
+        };
 
         const isWatchContext = (() => {
             try {
@@ -785,7 +828,8 @@
             const canonicalBaseUrl = endpoint?.canonicalBaseUrl || '';
             const handle = canonicalBaseUrl ? (extractRawHandle(canonicalBaseUrl) || null) : null;
             const customUrl = canonicalBaseUrl ? (extractCustomUrlFromCanonicalBaseUrl(canonicalBaseUrl) || null) : null;
-            const name = ownerRenderer?.title?.runs?.[0]?.text || ownerRenderer?.title?.simpleText || ownerRenderer?.shortBylineText?.runs?.[0]?.text || '';
+            const rawName = ownerRenderer?.title?.runs?.[0]?.text || ownerRenderer?.title?.simpleText || ownerRenderer?.shortBylineText?.runs?.[0]?.text || '';
+            const name = (typeof rawName === 'string' && !isLikelyBadName(rawName)) ? rawName.trim() : '';
             const logo = extractChannelLogoFromObject(ownerRenderer) || '';
             const candidate = {
                 id: (browseId && typeof browseId === 'string' && browseId.startsWith('UC')) ? browseId : null,
@@ -956,7 +1000,10 @@
                 if (nav) {
                     const browseId = nav.browseId;
                     const canonicalBaseUrl = nav.canonicalBaseUrl;
-                    const name = (node.shortBylineText?.runs?.[0]?.text) || (node.longBylineText?.runs?.[0]?.text) || undefined;
+                    const name = pickPreferredName(
+                        node,
+                        (node.shortBylineText?.runs?.[0]?.text) || (node.longBylineText?.runs?.[0]?.text) || ''
+                    ) || undefined;
 
                     if (canonicalBaseUrl) {
                         const handle = extractRawHandle(canonicalBaseUrl) || null;
@@ -982,7 +1029,7 @@
 
                         const browseId = browse.browseId;
                         const canonicalBaseUrl = browse.canonicalBaseUrl;
-                        const name = run.text;
+                        const name = pickPreferredName(node, run.text);
 
                         if (canonicalBaseUrl) {
                             const handle = extractRawHandle(canonicalBaseUrl) || null;
@@ -1016,6 +1063,44 @@
                 if (ownerRenderer) {
                     const ownerCandidate = extractOwnerCandidate(ownerRenderer);
                     if (ownerCandidate) return ownerCandidate;
+                }
+
+                const channelThumbnailRenderer =
+                    node?.channelThumbnail?.channelThumbnailWithLinkRenderer ||
+                    node?.channelThumbnailSupportedRenderers?.channelThumbnailWithLinkRenderer ||
+                    null;
+                if (channelThumbnailRenderer) {
+                    const nav = channelThumbnailRenderer?.navigationEndpoint || {};
+                    const browse = nav?.browseEndpoint || null;
+                    const browseId = (typeof browse?.browseId === 'string' && browse.browseId.startsWith('UC'))
+                        ? browse.browseId
+                        : '';
+                    const canonicalBaseUrl = browse?.canonicalBaseUrl || nav?.commandMetadata?.webCommandMetadata?.url || '';
+                    const handle = canonicalBaseUrl ? (extractRawHandle(canonicalBaseUrl) || null) : null;
+                    const customUrl = canonicalBaseUrl ? (extractCustomUrlFromCanonicalBaseUrl(canonicalBaseUrl) || null) : null;
+                    const a11yLabel = channelThumbnailRenderer?.accessibility?.accessibilityData?.label || '';
+                    const rawA11yName = (typeof a11yLabel === 'string' && a11yLabel.trim())
+                        ? a11yLabel.replace(/^go to channel\s+/i, '').trim()
+                        : '';
+                    const name = (!rawA11yName || isLikelyBadName(rawA11yName)) ? null : rawA11yName;
+                    const logo = extractChannelLogoFromObject(channelThumbnailRenderer) || null;
+                    if (browseId || handle || customUrl) {
+                        const candidate = mergeChannelCandidates({
+                            id: browseId || null,
+                            handle: handle || null,
+                            customUrl: customUrl || null,
+                            name: name || null,
+                            logo: logo || null
+                        });
+                        if (candidate) {
+                            if (!hasExpectations || matchesExpectations(candidate)) {
+                                return candidate;
+                            }
+                            if (!fallbackCandidate) {
+                                fallbackCandidate = candidate;
+                            }
+                        }
+                    }
                 }
             }
 
@@ -1102,6 +1187,220 @@
         if (fallbackCandidate && matchedTargetVideo) return fallbackCandidate;
         if (fallbackCandidate && !matchedTargetVideo) {
             postLog('warn', `Channel search: ignoring unanchored fallback for ${videoId}`);
+        }
+        return null;
+    }
+
+    function searchYtInitialDataForChannelId(channelId, expectations = {}) {
+        const normalizeUc = (value) => {
+            const raw = typeof value === 'string' ? value.trim() : '';
+            return /^UC[\w-]{22}$/i.test(raw) ? raw : '';
+        };
+        const targetId = normalizeUc(channelId);
+        if (!targetId) return null;
+
+        const options = (expectations && typeof expectations === 'object') ? expectations : {};
+        const normalizedExpectedHandle = typeof options.expectedHandle === 'string'
+            ? (extractRawHandle(options.expectedHandle) || options.expectedHandle).trim().toLowerCase()
+            : '';
+        const normalizedExpectedName = normalizeChannelName(options.expectedName);
+        const hasExpectations = Boolean(normalizedExpectedHandle || normalizedExpectedName);
+
+        const isLikelyBadName = (value) => {
+            if (!value || typeof value !== 'string') return true;
+            const trimmed = value.trim();
+            if (!trimmed) return true;
+            const lower = trimmed.toLowerCase();
+            if (lower.startsWith('@')) return true;
+            if (/^uc[\w-]{22}$/i.test(trimmed)) return true;
+            if (/\band\s+\d+\s+more\b/i.test(trimmed)) return true;
+            if (/^like\s+this\s+video\??$/i.test(trimmed)) return true;
+            if (/^\s*channel\s*$/i.test(trimmed)) return true;
+            if (/\bsubscribers?\b/i.test(trimmed)) return true;
+            if (/\bviews?\b/i.test(trimmed)) return true;
+            if (/\bago\b/i.test(trimmed)) return true;
+            if (/^\s*mix\b/i.test(trimmed)) return true;
+            if (/\s[-–]\s/.test(trimmed) && /\bmix\b/i.test(trimmed)) return true;
+            if (trimmed.includes('•')) return true;
+            return false;
+        };
+
+        const normalizeCandidate = (candidate) => {
+            if (!candidate || typeof candidate !== 'object') return null;
+            const id = normalizeUc(candidate.id || '') || targetId;
+            const handle = typeof candidate.handle === 'string'
+                ? (extractRawHandle(candidate.handle) || '').trim().toLowerCase()
+                : '';
+            const customUrl = typeof candidate.customUrl === 'string' ? candidate.customUrl.trim() : '';
+            const nameRaw = typeof candidate.name === 'string' ? candidate.name.trim() : '';
+            const name = (!nameRaw || isLikelyBadName(nameRaw)) ? '' : nameRaw;
+            const logo = typeof candidate.logo === 'string' ? candidate.logo.trim() : '';
+            if (!id && !handle && !customUrl && !name && !logo) return null;
+            return {
+                id: id || targetId,
+                handle: handle || null,
+                customUrl: customUrl || null,
+                name: name || null,
+                logo: logo || null
+            };
+        };
+
+        const matchesExpectations = (candidate) => {
+            if (!candidate) return false;
+            if (!hasExpectations) return true;
+            if (normalizedExpectedHandle) {
+                const candidateHandle = candidate.handle ? candidate.handle.toLowerCase() : '';
+                if (candidateHandle && candidateHandle !== normalizedExpectedHandle) {
+                    return false;
+                }
+            }
+            if (normalizedExpectedName) {
+                const candidateName = normalizeChannelName(candidate.name);
+                if (candidateName && candidateName !== normalizedExpectedName) {
+                    return false;
+                }
+            }
+            return true;
+        };
+
+        const candidateScore = (candidate, matched) => {
+            if (!candidate) return -1;
+            let score = 0;
+            if (candidate.id) score += 6;
+            if (candidate.handle) score += 4;
+            if (candidate.customUrl) score += 2;
+            if (candidate.name) score += 3;
+            if (candidate.logo) score += 1;
+            if (matched) score += 5;
+            return score;
+        };
+
+        const extractCandidateFromNode = (node) => {
+            if (!node || typeof node !== 'object') return null;
+            const endpointCandidates = [
+                node?.browseEndpoint,
+                node?.navigationEndpoint?.browseEndpoint,
+                node?.rendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint,
+                node?.command?.browseEndpoint,
+                node?.onTap?.innertubeCommand?.browseEndpoint
+            ].filter(Boolean);
+
+            let matchedEndpoint = null;
+            for (const endpoint of endpointCandidates) {
+                const browseId = normalizeUc(endpoint?.browseId || '');
+                if (browseId && browseId.toLowerCase() === targetId.toLowerCase()) {
+                    matchedEndpoint = endpoint;
+                    break;
+                }
+            }
+
+            const directId = normalizeUc(node?.browseId || node?.channelId || node?.externalChannelId || node?.ownerChannelId || node?.ownerDocid || node?.externalId || '');
+            const hasIdMatch = Boolean(
+                (directId && directId.toLowerCase() === targetId.toLowerCase()) ||
+                matchedEndpoint
+            );
+            if (!hasIdMatch) return null;
+
+            const canonicalBaseUrl = (
+                matchedEndpoint?.canonicalBaseUrl ||
+                node?.canonicalBaseUrl ||
+                node?.navigationEndpoint?.commandMetadata?.webCommandMetadata?.url ||
+                node?.commandMetadata?.webCommandMetadata?.url ||
+                node?.webCommandMetadata?.url ||
+                ''
+            );
+
+            const handle = canonicalBaseUrl ? (extractRawHandle(canonicalBaseUrl) || '') : '';
+            const customUrl = canonicalBaseUrl ? (extractCustomUrlFromCanonicalBaseUrl(canonicalBaseUrl) || '') : '';
+            const nameCandidates = [
+                node?.shortBylineText?.runs?.[0]?.text,
+                node?.longBylineText?.runs?.[0]?.text,
+                node?.ownerText?.runs?.[0]?.text,
+                node?.slimOwnerRenderer?.title?.runs?.[0]?.text,
+                node?.videoOwnerRenderer?.title?.runs?.[0]?.text,
+                node?.channelMetadataRenderer?.title,
+                node?.metadata?.channelMetadataRenderer?.title,
+                node?.listItemViewModel?.title?.content,
+                node?.subtitle?.content,
+                (() => {
+                    const raw =
+                        node?.channelThumbnail?.channelThumbnailWithLinkRenderer?.accessibility?.accessibilityData?.label ||
+                        node?.channelThumbnailSupportedRenderers?.channelThumbnailWithLinkRenderer?.accessibility?.accessibilityData?.label ||
+                        '';
+                    if (typeof raw !== 'string' || !raw.trim()) return '';
+                    return raw.replace(/^go to channel\s+/i, '').trim();
+                })()
+            ];
+            const name = nameCandidates.find((value) => {
+                return typeof value === 'string' && value.trim() && !isLikelyBadName(value);
+            }) || '';
+            const logo = extractChannelLogoFromObject(node) || '';
+
+            return normalizeCandidate({
+                id: targetId,
+                handle,
+                customUrl,
+                name,
+                logo
+            });
+        };
+
+        const roots = [];
+        if (window.ytInitialData) roots.push({ root: window.ytInitialData, label: 'ytInitialData' });
+        if (window.filterTube?.lastYtInitialData) roots.push({ root: window.filterTube.lastYtInitialData, label: 'filterTube.lastYtInitialData' });
+        if (window.filterTube?.rawYtInitialData) roots.push({ root: window.filterTube.rawYtInitialData, label: 'filterTube.rawYtInitialData' });
+        if (window.filterTube?.lastYtNextResponse) roots.push({ root: window.filterTube.lastYtNextResponse, label: 'filterTube.lastYtNextResponse' });
+        if (window.filterTube?.lastYtBrowseResponse) roots.push({ root: window.filterTube.lastYtBrowseResponse, label: 'filterTube.lastYtBrowseResponse' });
+        if (window.filterTube?.lastYtPlayerResponse) roots.push({ root: window.filterTube.lastYtPlayerResponse, label: 'filterTube.lastYtPlayerResponse' });
+        const ftPlayer = window.filterTube?.lastYtInitialPlayerResponse || window.filterTube?.rawYtInitialPlayerResponse || window.ytInitialPlayerResponse;
+        if (ftPlayer) roots.push({ root: ftPlayer, label: 'playerResponse' });
+        if (roots.length === 0) return null;
+
+        let bestMatched = null;
+        let bestMatchedScore = -1;
+        let bestFallback = null;
+        let bestFallbackScore = -1;
+
+        for (const target of roots) {
+            const visited = new WeakSet();
+            const scan = (node, depth = 0) => {
+                if (!node || typeof node !== 'object' || visited.has(node) || depth > 14) return;
+                visited.add(node);
+
+                const candidate = extractCandidateFromNode(node);
+                if (candidate) {
+                    const matched = matchesExpectations(candidate);
+                    const score = candidateScore(candidate, matched);
+                    if (matched && score > bestMatchedScore) {
+                        bestMatched = candidate;
+                        bestMatchedScore = score;
+                    } else if (!matched && score > bestFallbackScore) {
+                        bestFallback = candidate;
+                        bestFallbackScore = score;
+                    }
+                }
+
+                if (Array.isArray(node)) {
+                    for (const child of node) scan(child, depth + 1);
+                    return;
+                }
+                for (const key in node) {
+                    if (!Object.prototype.hasOwnProperty.call(node, key)) continue;
+                    const value = node[key];
+                    if (!value || typeof value !== 'object') continue;
+                    scan(value, depth + 1);
+                }
+            };
+            scan(target.root, 0);
+        }
+
+        if (bestMatched) {
+            postLog('log', `Channel-id lookup matched for ${targetId}:`, bestMatched);
+            return bestMatched;
+        }
+        if (bestFallback) {
+            postLog('log', `Channel-id lookup fallback for ${targetId}:`, bestFallback);
+            return bestFallback;
         }
         return null;
     }

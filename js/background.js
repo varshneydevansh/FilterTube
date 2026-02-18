@@ -679,8 +679,32 @@ function applyQuickBlockDefaultMigrationOnce({ previousVersion = '', isInstall =
     });
 }
 
+function isLikelyTopicChannelIdentity({
+    id = '',
+    name = '',
+    handle = '',
+    customUrl = '',
+    topicChannel = false
+} = {}) {
+    if (topicChannel === true) return true;
+    const normalizedId = typeof id === 'string' ? id.trim() : '';
+    const normalizedName = typeof name === 'string' ? name.trim() : '';
+    const normalizedHandle = typeof handle === 'string' ? handle.trim() : '';
+    const normalizedCustom = typeof customUrl === 'string' ? customUrl.trim() : '';
+    if (!normalizedId || !/^UC[\w-]{22}$/i.test(normalizedId)) return false;
+    if (!normalizedName || !/\s-\sTopic$/i.test(normalizedName)) return false;
+    if (normalizedHandle || normalizedCustom) return false;
+    return true;
+}
+
 function schedulePostBlockEnrichment(channel, profile = 'main', metadata = {}) {
-    const topicFlag = channel?.topicChannel === true || metadata?.topicChannel === true;
+    const topicFlag = isLikelyTopicChannelIdentity({
+        id: channel?.id || '',
+        name: channel?.name || metadata?.channelName || '',
+        handle: channel?.handle || metadata?.displayHandle || metadata?.canonicalHandle || '',
+        customUrl: channel?.customUrl || metadata?.customUrl || '',
+        topicChannel: channel?.topicChannel === true || metadata?.topicChannel === true
+    });
     if (topicFlag) return;
 
     const id = typeof channel?.id === 'string' ? channel.id.trim() : '';
@@ -694,15 +718,32 @@ function schedulePostBlockEnrichment(channel, profile = 'main', metadata = {}) {
     const isImportedSource = /\b(import|backup|restore|migration)\b/.test(sourceTag);
     const isFreshEntry = metadata?.newlyAdded === true || metadata?.isNewEntry === true;
 
+    const normalizeComparableName = (input) => {
+        if (!input || typeof input !== 'string') return '';
+        return input
+            .replace(/\s+/g, ' ')
+            .replace(/\s*\n\s*/g, ' ')
+            .trim()
+            .toLowerCase();
+    };
     const isLikelyBadName = (value) => {
         if (!value || typeof value !== 'string') return true;
         const trimmed = value.trim();
         if (!trimmed) return true;
         if (trimmed.startsWith('@')) return true;
         if (/^UC[\w-]{22}$/i.test(trimmed)) return true;
-        if (/^uc[a-z0-9_-]{6,}$/i.test(trimmed)) return true;
-        if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) return true;
         if (/^watch:[a-zA-Z0-9_-]{11}$/i.test(trimmed)) return true;
+        if (trimmed.toLowerCase() === 'channel') return true;
+        if (trimmed.includes('•')) return true;
+        if (/\bviews?\b/i.test(trimmed)) return true;
+        if (/\bago\b/i.test(trimmed)) return true;
+        if (/\band\s+\d+\s+more\b/i.test(trimmed) || /\band\s+more\b/i.test(trimmed)) return true;
+        if (/^like\s+this\s+video\??$/i.test(trimmed)) return true;
+        const videoIdHint = (typeof metadata?.videoId === 'string' ? metadata.videoId.trim().toLowerCase() : '')
+            || (typeof metadata?.enrichmentVideoId === 'string' ? metadata.enrichmentVideoId.trim().toLowerCase() : '');
+        if (videoIdHint && trimmed.toLowerCase() === videoIdHint) return true;
+        const videoTitleHint = normalizeComparableName(metadata?.videoTitleHint || '');
+        if (videoTitleHint && normalizeComparableName(trimmed) === videoTitleHint) return true;
         return false;
     };
 
@@ -2331,6 +2372,20 @@ function extractIdentityFromPreview(preview, normalizedHandle) {
 
     const decodedPreview = decodeJsonEscapesForSearch(preview);
     const unescapedPreview = decodedPreview.replace(/\\\//g, '/');
+    const isLikelyBadPreviewName = (value) => {
+        if (!value || typeof value !== 'string') return true;
+        const trimmed = value.trim();
+        if (!trimmed) return true;
+        if (trimmed.startsWith('@')) return true;
+        if (/^UC[\w-]{22}$/i.test(trimmed)) return true;
+        if (trimmed.includes('•')) return true;
+        if (/\bviews?\b/i.test(trimmed)) return true;
+        if (/\bago\b/i.test(trimmed)) return true;
+        if (/^like\s+this\s+video\??$/i.test(trimmed)) return true;
+        if (/^\s*mix\b/i.test(trimmed)) return true;
+        if (/\band\s+\d+\s+more\b/i.test(trimmed) || /\band\s+more\b/i.test(trimmed)) return true;
+        return false;
+    };
     const identity = (() => {
         if (typeof FilterTubeIdentity?.fastExtractIdentityFromHtmlChunk !== 'function') return {};
         return (
@@ -2340,6 +2395,9 @@ function extractIdentityFromPreview(preview, normalizedHandle) {
             {}
         );
     })();
+    if (identity?.name && isLikelyBadPreviewName(identity.name)) {
+        identity.name = '';
+    }
 
     const safeExtractHandle = (value) => {
         if (!value || typeof value !== 'string') return '';
@@ -2426,7 +2484,10 @@ function extractIdentityFromPreview(preview, normalizedHandle) {
             decodedPreview.match(/"ownerChannelName"\s*:\s*"([^"]+)"/i) ||
             decodedPreview.match(/"channelTitleText"\s*:\s*\{"runs"\s*:\s*\[\s*\{"text"\s*:\s*"([^"]+)"/i);
         if (nameMatch && nameMatch[1]) {
-            identity.name = nameMatch[1];
+            const candidateName = String(nameMatch[1]).trim();
+            if (!isLikelyBadPreviewName(candidateName)) {
+                identity.name = candidateName;
+            }
         }
     }
 
@@ -5183,6 +5244,7 @@ browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 canonicalHandle: message.canonicalHandle,
                 channelName: message.channelName,
                 channelLogo: message.channelLogo,
+                videoTitleHint: message.videoTitleHint,
                 customUrl: message.customUrl,
                 source: message.source || null,
                 pageHost: message.pageHost || null
@@ -5244,6 +5306,15 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
         const isHandleLike = (value) => {
             return Boolean(normalizeHandleStrict(value));
         };
+        const normalizeComparableName = (value) => {
+            if (!value || typeof value !== 'string') return '';
+            return value
+                .replace(/\s+/g, ' ')
+                .replace(/\s*\n\s*/g, ' ')
+                .trim()
+                .toLowerCase();
+        };
+        const normalizedVideoTitleHint = normalizeComparableName(metadata?.videoTitleHint || '');
 
         const pickBetterName = (...candidates) => {
             const cleaned = candidates
@@ -5252,6 +5323,7 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             if (cleaned.length === 0) return '';
             const preferred = cleaned.find(v =>
                 !isHandleLike(v)
+                && !isProbablyNotChannelName(v)
                 && v.toLowerCase() !== 'channel'
                 && !/^watch:[a-zA-Z0-9_-]{11}$/i.test(v)
                 && !/^[a-zA-Z0-9_-]{11}$/.test(v)
@@ -5541,6 +5613,7 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             if (!value || typeof value !== 'string') return true;
             const trimmed = value.trim();
             if (!trimmed) return true;
+            if (normalizedVideoTitleHint && normalizeComparableName(trimmed) === normalizedVideoTitleHint) return true;
             const normalizedVideoId = (typeof effectiveVideoId === 'string' ? effectiveVideoId.trim().toLowerCase() : '');
             if (normalizedVideoId) {
                 const lower = trimmed.toLowerCase();
@@ -5551,6 +5624,7 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             if (trimmed.startsWith('@')) return true;
             if (trimmed.toLowerCase() === 'channel') return true;
             if (trimmed.toLowerCase() === 'youtube') return true;
+            if (/^like\s+this\s+video\??$/i.test(trimmed)) return true;
             if (/^(?:not interested|send feedback|save(?:\s+to(?:\s+playlist|\s+watch\s+later)?)?|share|report|undo|action menu)$/i.test(trimmed)) return true;
             if (trimmed.includes('•')) return true;
             if (/\band\s+\d+\s+more\b/i.test(trimmed) || /\band\s+more\b/i.test(trimmed)) return true;
@@ -5564,6 +5638,7 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             if (!value || typeof value !== 'string') return '';
             const trimmed = value.trim();
             if (!trimmed) return '';
+            if (normalizedVideoTitleHint && normalizeComparableName(trimmed) === normalizedVideoTitleHint) return '';
             const normalizedVideoId = (typeof effectiveVideoId === 'string' ? effectiveVideoId.trim().toLowerCase() : '');
             if (normalizedVideoId) {
                 const lower = trimmed.toLowerCase();
@@ -5611,9 +5686,9 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
         // That leads to persisting {name: UC...} entries when name/handle were missing.
         // Only skip the network fetch when we already have a trustworthy NAME.
         // Having only a handle is not enough; otherwise we persist name="@handle" which breaks UI.
-        // Only skip the heavy channel-page fetch when we already have a reliable alternate identity
-        // (handle/customUrl) or we can round-trip via channelMap. Otherwise we end up persisting
-        // UC-only entries that show "Not fetched" in the dashboard for a long time.
+        // Only skip the heavy channel-page fetch when we already have a reliable channel name and
+        // either alternate identity (handle/customUrl) or a concrete video context to resolve from.
+        // This keeps JSON/watch-driven flows fast while still allowing UC-only rows to recover.
         const hasAlternateIdentity = Boolean(
             isHandleLike(metadata.displayHandle || '') ||
             isHandleLike(metadata.canonicalHandle || '') ||
@@ -5621,11 +5696,18 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             (typeof metadata.customUrl === 'string' && metadata.customUrl.trim()) ||
             (typeof channelInfo?.customUrl === 'string' && String(channelInfo.customUrl).trim())
         );
+        const inferredTopicFromMetadata = isLikelyTopicChannelIdentity({
+            id: String(lookupValue || '').trim(),
+            name: metadata.channelName || '',
+            handle: metadata.displayHandle || metadata.canonicalHandle || channelInfo?.handle || '',
+            customUrl: metadata.customUrl || channelInfo?.customUrl || '',
+            topicChannel: metadata?.topicChannel === true
+        });
         const shouldSkipFetch = lookupValue
             && String(lookupValue).toUpperCase().startsWith('UC')
             && hasGoodMetadataName
             && !looksLikeTopicName
-            && hasAlternateIdentity;
+            && (hasAlternateIdentity || Boolean(effectiveVideoId));
         const shouldAvoidChannelPageFetch = Boolean(
             isYtmContext &&
             (effectiveVideoId || String(lookupValue || '').toUpperCase().startsWith('UC'))
@@ -5638,7 +5720,7 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                 name: (metadata.channelName || metadata.displayHandle || (isHandle ? normalizedValue : '') || String(lookupValue)),
                 logo: metadata.channelLogo || null,
                 customUrl: metadata.customUrl || null,
-                topicChannel: false
+                topicChannel: inferredTopicFromMetadata
             };
         } else if (shouldAvoidChannelPageFetch) {
             channelInfo = {
@@ -5648,7 +5730,7 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                 name: (metadata.channelName || metadata.displayHandle || (isHandle ? normalizedValue : '') || String(lookupValue || '')),
                 logo: metadata.channelLogo || null,
                 customUrl: metadata.customUrl || null,
-                topicChannel: false
+                topicChannel: inferredTopicFromMetadata
             };
         } else {
             channelInfo = await fetchChannelInfo(lookupValue);
@@ -5731,7 +5813,9 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                                 channelInfo.customUrl = identity.customUrl;
                                 if (!metadata.customUrl) metadata.customUrl = identity.customUrl;
                             }
-                            if (identity.name && !isProbablyNotChannelName(identity.name)) {
+                            const currentName = (typeof channelInfo.name === 'string' ? channelInfo.name.trim() : '');
+                            const currentNameWeak = !currentName || isProbablyNotChannelName(currentName);
+                            if (identity.name && !isProbablyNotChannelName(identity.name) && currentNameWeak) {
                                 channelInfo.name = identity.name;
                                 if (!metadata.channelName || isProbablyNotChannelName(metadata.channelName)) {
                                     metadata.channelName = identity.name;
@@ -6197,7 +6281,7 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             : (canonicalHandle || '');
 
         const finalChannelName = sanitizePersistedChannelName(
-            pickBetterName(metadata.channelName, channelInfo.name, normalizedValue)
+            pickBetterName(channelInfo.name, metadata.channelName, normalizedValue)
         );
 
         if (normalizedHandle) {
@@ -6206,7 +6290,13 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
         channelInfo.canonicalHandle = canonicalHandle || null;
         channelInfo.handleDisplay = handleDisplay || null;
         channelInfo.name = finalChannelName;
-        channelInfo.topicChannel = channelInfo.topicChannel === true || metadata.topicChannel === true;
+        channelInfo.topicChannel = isLikelyTopicChannelIdentity({
+            id: channelInfo.id || '',
+            name: finalChannelName || channelInfo.name || metadata.channelName || '',
+            handle: channelInfo.handle || channelInfo.canonicalHandle || channelInfo.handleDisplay || metadata.displayHandle || metadata.canonicalHandle || '',
+            customUrl: channelInfo.customUrl || metadata.customUrl || '',
+            topicChannel: channelInfo.topicChannel === true || metadata.topicChannel === true
+        });
 
         // Check if channel already exists; if so, upgrade instead of rejecting.
         // IMPORTANT: Never match on empty/null handles. That caused unrelated channels
@@ -6257,7 +6347,19 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
 
             const mergedName = (() => {
                 const existingName = sanitizePersistedChannelName(existing.name || '');
+                const incomingName = sanitizePersistedChannelName(finalChannelName || '');
+                const isPostBlockEnrichment = sourceTag === 'postblockenrichment';
+                // Enrichment calls are explicitly meant to repair weak/wrong names.
+                // Only replace an existing name when current value is missing/weak.
+                if (isPostBlockEnrichment) {
+                    const existingWeak = !existingName || isProbablyNotChannelName(existingName);
+                    if (incomingName && existingWeak) return incomingName;
+                    if (existingName) return existingName;
+                    if (incomingName) return incomingName;
+                    return finalChannelName;
+                }
                 if (existingName) return existingName;
+                if (incomingName) return incomingName;
                 return finalChannelName;
             })();
 

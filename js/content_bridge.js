@@ -6,6 +6,15 @@ function buildChannelMetadataPayload(channelInfo = {}) {
     const canonicalRaw = channelInfo.canonicalHandle || channelInfo.handleDisplay || channelInfo.handle || '';
     const canonicalExtracted = extractRawHandle(canonicalRaw);
     const canonical = normalizeHandleValue(canonicalExtracted || canonicalRaw || '');
+    const normalizeComparableText = (value) => {
+        if (!value || typeof value !== 'string') return '';
+        return value
+            .replace(/\s+/g, ' ')
+            .replace(/\s*\n\s*/g, ' ')
+            .trim()
+            .toLowerCase();
+    };
+    const normalizedVideoTitleHint = normalizeComparableText(channelInfo?.videoTitleHint || '');
 
     const isHandleLike = (value) => {
         return Boolean(normalizeHandleValue(value || ''));
@@ -20,6 +29,7 @@ function buildChannelMetadataPayload(channelInfo = {}) {
         if (!value || typeof value !== 'string') return true;
         const trimmed = value.trim();
         if (!trimmed) return true;
+        if (normalizedVideoTitleHint && normalizeComparableText(trimmed) === normalizedVideoTitleHint) return true;
         const currentVideoId = typeof channelInfo?.videoId === 'string' ? channelInfo.videoId.trim().toLowerCase() : '';
         if (currentVideoId) {
             const lower = trimmed.toLowerCase();
@@ -34,6 +44,8 @@ function buildChannelMetadataPayload(channelInfo = {}) {
         if (/\bviews?\b/i.test(trimmed)) return true;
         if (/\bago\b/i.test(trimmed)) return true;
         if (/\bwatching\b/i.test(trimmed)) return true;
+        if (/^like\s+this\s+video\??$/i.test(trimmed)) return true;
+        if (/\band\s+\d+\s+more\b/i.test(trimmed) || /\band\s+more\b/i.test(trimmed)) return true;
         if (COLLAB_NON_CHANNEL_LABEL_PATTERN.test(trimmed.toLowerCase())) return true;
         const lower = trimmed.toLowerCase();
         if (lower === 'youtube') return true;
@@ -75,6 +87,7 @@ function buildChannelMetadataPayload(channelInfo = {}) {
         channelName: safeName || null,
         channelLogo: channelInfo.logo || null,
         videoId: channelInfo.videoId || null,
+        videoTitleHint: normalizedVideoTitleHint || null,
         customUrl: channelInfo.customUrl || null,  // c/Name or user/Name for legacy channels
         source: channelInfo.source || null
     };
@@ -124,6 +137,8 @@ function pickMenuChannelDisplayName(channelInfo, injectionOptions = {}) {
         if (/\bviews?\b/i.test(trimmed)) return true;
         if (/\bago\b/i.test(trimmed)) return true;
         if (/\bwatching\b/i.test(trimmed)) return true;
+        if (/^like\s+this\s+video\??$/i.test(trimmed)) return true;
+        if (/\band\s+\d+\s+more\b/i.test(trimmed) || /\band\s+more\b/i.test(trimmed)) return true;
         const lower = trimmed.toLowerCase();
         if (lower === 'channel') return true;
         if (lower === 'youtube') return true;
@@ -204,8 +219,11 @@ function isLikelyNonChannelName(value) {
     if (/\bviews?\b/i.test(trimmed)) return true;
     if (/\bago\b/i.test(trimmed)) return true;
     if (/\bwatching\b/i.test(trimmed)) return true;
+    if (/^like\s+this\s+video\??$/i.test(trimmed)) return true;
+    if (/\band\s+\d+\s+more\b/i.test(trimmed) || /\band\s+more\b/i.test(trimmed)) return true;
     if (trimmed.toLowerCase() === 'youtube') return true;
     if (/^\d+:\d+/.test(trimmed)) return true;
+    if (/^\s*mix\b/i.test(trimmed)) return true;
     return false;
 }
 
@@ -231,6 +249,84 @@ function deriveExpectedChannelName(value) {
 
     if (isLikelyNonChannelName(text)) return '';
     return text;
+}
+
+function normalizeComparableCardText(value) {
+    if (!value || typeof value !== 'string') return '';
+    return value
+        .replace(/\s+/g, ' ')
+        .replace(/\s*\n\s*/g, ' ')
+        .trim()
+        .toLowerCase();
+}
+
+function collectCardTitleHints(card) {
+    if (!card || !(card instanceof Element)) return [];
+    const values = new Set();
+    const push = (value) => {
+        const normalized = normalizeComparableCardText(value);
+        if (!normalized) return;
+        values.add(normalized);
+    };
+
+    try {
+        const stampedTitle = card.getAttribute('data-filtertube-video-title') || '';
+        if (stampedTitle) push(stampedTitle);
+    } catch (e) {
+    }
+
+    try {
+        const titleNodes = card.querySelectorAll(
+            'a#video-title, ' +
+            '#video-title, ' +
+            '#video-title-link, ' +
+            '.media-item-headline .yt-core-attributed-string, ' +
+            '.YtmCompactMediaItemHeadline .yt-core-attributed-string, ' +
+            '.YtmCompactMediaItemHeadline, ' +
+            '.yt-lockup-metadata-view-model__title, ' +
+            '.yt-lockup-view-model-wiz__title, ' +
+            '.shortsLockupViewModelHostOutsideMetadataTitle, ' +
+            '.shortsLockupViewModelHostInlineMetadataTitle, ' +
+            'h3, h3 a'
+        );
+        titleNodes.forEach((node) => {
+            if (!(node instanceof Element)) return;
+            push(node.textContent || '');
+            push(node.getAttribute('title') || '');
+            push(node.getAttribute('aria-label') || '');
+        });
+    } catch (e) {
+    }
+
+    return Array.from(values);
+}
+
+function isLikelyVideoTitleForCard(card, candidate) {
+    if (!candidate || typeof candidate !== 'string') return false;
+    if (!card || !(card instanceof Element)) return false;
+
+    const normalizedCandidate = normalizeComparableCardText(candidate);
+    if (!normalizedCandidate || normalizedCandidate.length < 3) return false;
+
+    const titleHints = collectCardTitleHints(card);
+    if (!Array.isArray(titleHints) || titleHints.length === 0) return false;
+
+    return titleHints.some((hint) => {
+        if (!hint) return false;
+        if (hint === normalizedCandidate) return true;
+        if (hint.startsWith(`${normalizedCandidate} by `)) return true;
+        if (hint.startsWith(`${normalizedCandidate} | `)) return true;
+        return false;
+    });
+}
+
+function sanitizeChannelNameForCard(value, card = null) {
+    if (!value || typeof value !== 'string') return '';
+    const trimmed = value.trim();
+    if (!trimmed) return '';
+    if (isLikelyNonChannelName(trimmed)) return '';
+    if (card && isLikelyVideoTitleForCard(card, trimmed)) return '';
+    return trimmed;
 }
 
 function registerActiveCollaborationMenu(videoId, dropdown, videoCard, state = {}) {
@@ -813,6 +909,8 @@ function updateInjectedMenuChannelName(dropdown, channelInfo) {
         if (/\bviews?\b/i.test(trimmed)) return true;
         if (/\bago\b/i.test(trimmed)) return true;
         if (/\bwatching\b/i.test(trimmed)) return true;
+        if (/^like\s+this\s+video\??$/i.test(trimmed)) return true;
+        if (/\band\s+\d+\s+more\b/i.test(trimmed) || /\band\s+more\b/i.test(trimmed)) return true;
         if (isUcIdLike(trimmed)) return true;
         if (/^uc[a-z0-9_-]{6,}$/i.test(trimmed)) return true;
         const lower = trimmed.toLowerCase();
@@ -4294,23 +4392,25 @@ function requestChannelInfoFromMainWorld(videoId, options = {}) {
     return new Promise((resolve) => {
         const requestId = ++window.channelInfoRequestId;
         const timeoutMs = 2000; // 2 second timeout
+        const channelId = typeof options?.channelId === 'string' ? options.channelId.trim() : '';
 
         const timeoutId = setTimeout(() => {
             const pending = window.pendingChannelInfoRequests.get(requestId);
             if (pending) {
                 window.pendingChannelInfoRequests.delete(requestId);
-                console.log('FilterTube: Channel info request timed out for video:', videoId);
+                console.log('FilterTube: Channel info request timed out for video/channel:', videoId || 'n/a', channelId || 'n/a');
                 resolve(null);
             }
         }, timeoutMs);
 
-        window.pendingChannelInfoRequests.set(requestId, { resolve, timeoutId, videoId });
+        window.pendingChannelInfoRequests.set(requestId, { resolve, timeoutId, videoId, channelId });
 
         const sendRequest = () => {
             window.postMessage({
                 type: 'FilterTube_RequestChannelInfo',
                 payload: {
                     videoId,
+                    channelId: channelId || null,
                     requestId,
                     expectedHandle: options.expectedHandle || null,
                     expectedName: options.expectedName || null
@@ -4331,7 +4431,7 @@ function requestChannelInfoFromMainWorld(videoId, options = {}) {
             }
         }, 1000);
 
-        console.log('FilterTube: Sent channel info request to Main World for video:', videoId, 'expectedName:', options.expectedName || 'n/a');
+        console.log('FilterTube: Sent channel info request to Main World for video/channel:', videoId || 'n/a', channelId || 'n/a', 'expectedName:', options.expectedName || 'n/a');
     });
 }
 
@@ -4459,18 +4559,79 @@ function handleMainWorldMessages(event) {
         // Persist learned videoId → channelId mappings (Kids browse/search + player payloads)
         const updates = Array.isArray(payload) ? payload : (payload ? [payload] : []);
         let didPersist = false;
+        const normalizeCustomUrlKey = (value) => {
+            if (!value || typeof value !== 'string') return '';
+            const raw = value.trim();
+            if (!raw) return '';
+            const direct = raw.match(/^(c|user)\/([^/?#]+)/i);
+            if (direct && direct[1] && direct[2]) {
+                try {
+                    return `${direct[1].toLowerCase()}/${decodeURIComponent(direct[2]).toLowerCase()}`;
+                } catch (e) {
+                    return `${direct[1].toLowerCase()}/${direct[2].toLowerCase()}`;
+                }
+            }
+            const fromPath = raw.match(/\/(c|user)\/([^/?#]+)/i);
+            if (fromPath && fromPath[1] && fromPath[2]) {
+                try {
+                    return `${fromPath[1].toLowerCase()}/${decodeURIComponent(fromPath[2]).toLowerCase()}`;
+                } catch (e) {
+                    return `${fromPath[1].toLowerCase()}/${fromPath[2].toLowerCase()}`;
+                }
+            }
+            return '';
+        };
+        const persistCustomUrlMapping = (customUrlKey, id) => {
+            if (!customUrlKey || !id) return;
+            try {
+                browserAPI_BRIDGE.storage.local.get(['channelMap'], (result) => {
+                    const channelMap = result?.channelMap || {};
+                    if (!channelMap[customUrlKey] || channelMap[customUrlKey] !== id) {
+                        channelMap[customUrlKey] = id;
+                        browserAPI_BRIDGE.storage.local.set({ channelMap }, () => { });
+                    }
+                });
+            } catch (e) {
+            }
+        };
         for (const entry of updates) {
             const videoId = entry?.videoId;
             const channelId = entry?.channelId;
             if (!videoId || !channelId) continue;
             persistVideoChannelMapping(videoId, channelId);
 
+            const normalizedHandle = normalizeHandleValue(
+                entry?.handle ||
+                entry?.channelHandle ||
+                entry?.canonicalHandle ||
+                ''
+            ) || '';
+            const normalizedCustomUrl = normalizeCustomUrlKey(entry?.customUrl || '');
+            const rawName = (typeof entry?.channelName === 'string' ? entry.channelName.trim() : '')
+                || (typeof entry?.name === 'string' ? entry.name.trim() : '');
+            const rawLogo = (typeof entry?.channelLogo === 'string' ? entry.channelLogo.trim() : '')
+                || (typeof entry?.logo === 'string' ? entry.logo.trim() : '');
+
+            if (normalizedHandle) {
+                persistChannelMappings([{ id: channelId, handle: normalizedHandle }]);
+            }
+            if (normalizedCustomUrl) {
+                persistCustomUrlMapping(normalizedCustomUrl, channelId);
+            }
+
             try {
+                const baseIdentity = { id: channelId };
+                if (normalizedHandle) baseIdentity.handle = normalizedHandle;
+                if (normalizedCustomUrl) baseIdentity.customUrl = normalizedCustomUrl;
+                if (rawLogo) baseIdentity.logo = rawLogo;
                 const cards = document.querySelectorAll(`[data-filtertube-video-id="${videoId}"]`);
                 if (cards && cards.length > 0) {
                     for (const card of cards) {
                         if (!shouldStampCardForVideoId(card, videoId)) continue;
-                        stampChannelIdentity(card, { id: channelId });
+                        const stamped = { ...baseIdentity };
+                        const safeName = sanitizeChannelNameForCard(rawName, card);
+                        if (safeName) stamped.name = safeName;
+                        stampChannelIdentity(card, stamped);
                     }
                 } else {
                     // If we haven't stamped `data-filtertube-video-id` yet (common on Kids due to DOM timing),
@@ -4486,7 +4647,10 @@ function handleMainWorldMessages(event) {
                         const card = findVideoCardElement(anchor);
                         if (!card || !card.getAttribute) return;
                         if (!shouldStampCardForVideoId(card, videoId)) return;
-                        stampChannelIdentity(card, { id: channelId });
+                        const stamped = { ...baseIdentity };
+                        const safeName = sanitizeChannelNameForCard(rawName, card);
+                        if (safeName) stamped.name = safeName;
+                        stampChannelIdentity(card, stamped);
                     });
                 }
             } catch (e) {
@@ -4929,10 +5093,10 @@ function ensureWatchPlaylistFallbackMenu() {
         }
     };
 
-    const isMobileWatchPage = () => {
+    const isMobileYoutubeSurface = () => {
         try {
             const host = String(document.location?.hostname || '').toLowerCase();
-            return isWatchPage() && (
+            return (
                 host === 'm.youtube.com' ||
                 host.startsWith('m.youtube.') ||
                 host === 'music.youtube.com' ||
@@ -4942,18 +5106,6 @@ function ensureWatchPlaylistFallbackMenu() {
             return false;
         }
     };
-
-    if (!isWatchPage()) {
-        document.addEventListener('yt-navigate-finish', () => {
-            try {
-                if (isWatchPage()) {
-                    ensureWatchPlaylistFallbackMenu();
-                }
-            } catch (e) {
-            }
-        }, { once: true });
-        return;
-    }
 
     watchPlaylistFallbackMenuInstalled = true;
 
@@ -5071,12 +5223,12 @@ function ensureWatchPlaylistFallbackMenu() {
         if (!row) return null;
         try {
             const children = row.children ? Array.from(row.children) : [];
-            const direct = children.find(ch => ch && ch.id === 'menu') || null;
+            const direct = children.find(ch => ch && (ch.id === 'menu' || ch.id === 'action-menu')) || null;
             if (direct) return direct;
         } catch (e) {
         }
         try {
-            return row.querySelector('#menu');
+            return row.querySelector('#menu, #action-menu, ytd-comment-action-buttons-renderer, .comment-action-buttons');
         } catch (e) {
             return null;
         }
@@ -5090,6 +5242,9 @@ function ensureWatchPlaylistFallbackMenu() {
             try {
                 const style = window.getComputedStyle(el);
                 if (!style || style.display === 'none' || style.visibility === 'hidden') return false;
+                if (style.opacity === '0') return false;
+                if (!el.getClientRects || el.getClientRects().length === 0) return false;
+                if (el.closest?.('[hidden], [aria-hidden="true"]')) return false;
             } catch (e) {
             }
             return true;
@@ -5097,7 +5252,17 @@ function ensureWatchPlaylistFallbackMenu() {
         try {
             const btn = root.querySelector(
                 'ytd-menu-renderer button[aria-label], ' +
+                'ytd-menu-renderer button[aria-haspopup="menu"], ' +
+                'ytd-menu-renderer button[aria-haspopup="true"], ' +
+                '#menu button[aria-haspopup="menu"], ' +
+                '#menu button[aria-haspopup="true"], ' +
+                '#action-menu button[aria-haspopup="menu"], ' +
+                '#action-menu button[aria-haspopup="true"], ' +
+                '#action-menu button[aria-label], ' +
+                'ytd-comment-action-buttons-renderer button[aria-label], ' +
                 'yt-icon-button.dropdown-trigger button, ' +
+                'yt-button-shape button[aria-haspopup="menu"], ' +
+                'yt-button-shape button[aria-haspopup="true"], ' +
                 '#menu ytd-menu-renderer button[aria-label]'
             );
             if (isVisible(btn)) return true;
@@ -5168,6 +5333,9 @@ function ensureWatchPlaylistFallbackMenu() {
             try {
                 const style = window.getComputedStyle(el);
                 if (!style || style.display === 'none' || style.visibility === 'hidden') return false;
+                if (style.opacity === '0') return false;
+                if (!el.getClientRects || el.getClientRects().length === 0) return false;
+                if (el.closest?.('[hidden], [aria-hidden="true"]')) return false;
             } catch (e) {
             }
             return true;
@@ -5175,9 +5343,15 @@ function ensureWatchPlaylistFallbackMenu() {
         try {
             const btn = card.querySelector(
                 'ytm-menu-renderer button[aria-label], ' +
+                'ytm-menu-renderer button[aria-haspopup="menu"], ' +
+                'ytm-menu-renderer button[aria-haspopup="true"], ' +
                 'ytm-menu button[aria-label], ' +
+                'ytm-menu button[aria-haspopup="menu"], ' +
+                'ytm-menu button[aria-haspopup="true"], ' +
                 '.menu-renderer button[aria-label], ' +
-                '.overflow-menu button[aria-label]'
+                '.overflow-menu button[aria-label], ' +
+                '.overflow-menu button[aria-haspopup="menu"], ' +
+                '.overflow-menu button[aria-haspopup="true"]'
             );
             if (isVisible(btn)) return true;
         } catch (e) {
@@ -5188,6 +5362,8 @@ function ensureWatchPlaylistFallbackMenu() {
     const getYtmFallbackMenuHost = (card) => {
         if (!card) return null;
         return card.querySelector(
+            '#menu, ' +
+            '.comment-action-buttons, ' +
             '.YtmCompactMediaItemHost, ' +
             '.ytmPlaylistPanelVideoRendererV2Host .YtmCompactMediaItemMetadata, ' +
             '.watch-card-rich-header-call-to-actions-container, ' +
@@ -5206,7 +5382,11 @@ function ensureWatchPlaylistFallbackMenu() {
         'ytm-playlist-panel-video-wrapper-renderer',
         'ytm-compact-radio-renderer',
         'ytm-radio-renderer',
-        'ytm-compact-channel-renderer'
+        'ytm-compact-channel-renderer',
+        'ytm-rich-item-renderer',
+        'ytm-comment-thread-renderer',
+        'ytm-comment-renderer',
+        'ytm-comment-view-model'
     ]);
 
     const ensureFallbackButtonForYtmCard = (card) => {
@@ -5214,18 +5394,7 @@ function ensureWatchPlaylistFallbackMenu() {
         const tag = String(card.tagName || '').toLowerCase();
         if (!YTM_FALLBACK_ALLOWED_TAGS.has(tag)) {
             const isContextVideoCard = tag === 'ytm-video-with-context-renderer';
-            const hasPlaylistSignals = (() => {
-                try {
-                    if (card.closest('ytm-playlist-panel-video-renderer, ytm-playlist-panel-video-wrapper-renderer, ytm-playlist-video-renderer')) {
-                        return true;
-                    }
-                    const watchLinkWithList = card.querySelector('a[href*="/watch?v="][href*="list="], a[href*="start_radio=1"], a[href*="list=RD"]');
-                    return Boolean(watchLinkWithList);
-                } catch (e) {
-                    return false;
-                }
-            })();
-            if (!(isContextVideoCard && (hasPlaylistSignals || isMixCardElement(card)))) {
+            if (!isContextVideoCard) {
                 return;
             }
         }
@@ -5265,7 +5434,11 @@ function ensureWatchPlaylistFallbackMenu() {
                 console.warn('FilterTube: Failed to open YTM fallback menu', err);
             }
         };
-        btn.addEventListener('pointerup', openFallback, true);
+        btn.addEventListener('pointerup', (e) => {
+            // On touch surfaces, rely on click to avoid interfering with scroll gestures.
+            if (e?.pointerType === 'touch') return;
+            openFallback(e);
+        }, true);
         btn.addEventListener('click', openFallback, true);
 
         try {
@@ -5275,69 +5448,106 @@ function ensureWatchPlaylistFallbackMenu() {
     };
 
     const scan = () => {
-        if (!isWatchPage()) return;
+        const root = document.body || document.documentElement;
+        if (!root) return;
+        processNode(root);
+    };
 
-        if (isWatchPlaylist()) {
-            const panel = document.querySelector('ytd-playlist-panel-renderer');
-            if (panel) {
-                const rows = panel.querySelectorAll('ytd-playlist-panel-video-renderer');
-                if (rows && rows.length > 0) {
-                    rows.forEach(row => ensureFallbackButtonForRow(row));
-                }
+    const DESKTOP_FALLBACK_SELECTOR =
+        'ytd-rich-item-renderer, ' +
+        'ytd-rich-grid-slim-media, ' +
+        'ytd-rich-grid-media, ' +
+        'ytd-video-renderer, ' +
+        'ytd-grid-video-renderer, ' +
+        'ytd-compact-video-renderer, ' +
+        'ytd-playlist-video-renderer, ' +
+        'ytd-watch-card-compact-video-renderer, ' +
+        'ytd-watch-card-hero-video-renderer, ' +
+        'ytd-watch-card-rhs-panel-video-renderer, ' +
+        'yt-lockup-view-model, ' +
+        'ytd-radio-renderer, ' +
+        'ytd-compact-radio-renderer, ' +
+        'ytd-playlist-renderer, ' +
+        'ytd-grid-playlist-renderer, ' +
+        'ytd-compact-playlist-renderer, ' +
+        'ytd-comment-thread-renderer, ' +
+        'ytd-comment-renderer, ' +
+        'ytd-comment-view-model';
+
+    const YTM_FALLBACK_SELECTOR =
+        'ytm-compact-playlist-renderer, ' +
+        'ytm-playlist-video-renderer, ' +
+        'ytm-playlist-panel-video-renderer, ' +
+        'ytm-playlist-panel-video-wrapper-renderer, ' +
+        'ytm-compact-radio-renderer, ' +
+        'ytm-radio-renderer, ' +
+        'ytm-compact-channel-renderer, ' +
+        'ytm-video-with-context-renderer, ' +
+        'ytm-rich-item-renderer, ' +
+        'ytm-comment-thread-renderer, ' +
+        'ytm-comment-renderer, ' +
+        'ytm-comment-view-model';
+
+    const visitSelector = (node, selector, visitor) => {
+        if (!node || !(node instanceof Element)) return;
+        try {
+            if (node.matches?.(selector)) {
+                visitor(node);
             }
+        } catch (e) {
         }
-
-        if (isMobileWatchPage()) {
-            const ytmCards = document.querySelectorAll(
-                'ytm-compact-playlist-renderer, ' +
-                'ytm-playlist-video-renderer, ' +
-                'ytm-playlist-panel-video-renderer, ' +
-                'ytm-playlist-panel-video-wrapper-renderer, ' +
-                'ytm-compact-radio-renderer, ' +
-                'ytm-radio-renderer, ' +
-                'ytm-compact-channel-renderer, ' +
-                'ytm-video-with-context-renderer'
-            );
-            ytmCards.forEach(card => {
-                ensureFallbackButtonForYtmCard(card);
-            });
+        try {
+            const found = node.querySelectorAll?.(selector);
+            found?.forEach?.(visitor);
+        } catch (e) {
         }
     };
 
-    const observer = new MutationObserver(() => {
-        try { scan(); } catch (e) { }
+    const processNode = (node) => {
+        if (!node || !(node instanceof Element)) return;
+        const isWatchSurface = isWatchPage();
+        const isMobileSurface = isMobileYoutubeSurface();
+
+        if (isWatchSurface && isWatchPlaylist()) {
+            visitSelector(node, 'ytd-playlist-panel-video-renderer', ensureFallbackButtonForRow);
+        }
+
+        if (!isMobileSurface) {
+            visitSelector(node, DESKTOP_FALLBACK_SELECTOR, ensureFallbackButtonForRow);
+        }
+
+        if (isMobileSurface) {
+            visitSelector(node, YTM_FALLBACK_SELECTOR, ensureFallbackButtonForYtmCard);
+        }
+    };
+
+    const observerWithNodes = new MutationObserver((mutations) => {
+        for (const mutation of mutations || []) {
+            const added = mutation?.addedNodes;
+            if (!added || !added.length) continue;
+            for (const node of added) {
+                if (!(node instanceof Element)) continue;
+                processNode(node);
+            }
+        }
     });
 
     const attach = () => {
-        const panel = document.querySelector('ytd-playlist-panel-renderer');
-        if (panel) {
-            try {
-                observer.observe(panel, { childList: true, subtree: true });
-            } catch (e) {
-                return false;
-            }
-            return true;
+        const root = document.body || document.documentElement;
+        if (!root) return false;
+        try {
+            observerWithNodes.observe(root, { childList: true, subtree: true });
+        } catch (e) {
+            return false;
         }
-
-        if (isMobileWatchPage()) {
-            const root = document.body || document.documentElement;
-            if (!root) return false;
-            try {
-                observer.observe(root, { childList: true, subtree: true });
-            } catch (e) {
-                return false;
-            }
-            return true;
-        }
-
-        return false;
+        return true;
     };
 
     if (!attach()) {
         const t = setInterval(() => {
             if (attach()) {
                 clearInterval(t);
-                try { scan(); } catch (e) { }
+                scan();
             }
         }, 700);
         setTimeout(() => clearInterval(t), 12000);
@@ -5346,7 +5556,9 @@ function ensureWatchPlaylistFallbackMenu() {
     }
 
     document.addEventListener('yt-navigate-finish', () => {
-        try { scan(); } catch (e) { }
+        window.setTimeout(() => {
+            try { scan(); } catch (e) { }
+        }, 220);
     });
 }
 
@@ -5573,7 +5785,9 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
                 try {
                     if (!nextInfo.videoId) throw new Error('missing_video_id');
                     const resolved = await requestChannelInfoFromMainWorld(nextInfo.videoId, {
-                        expectedName: nextInfo.expectedChannelName || expectedNameForLookup || ''
+                        expectedHandle: nextInfo.expectedHandle || nextInfo.handle || '',
+                        expectedName: nextInfo.expectedChannelName || expectedNameForLookup || '',
+                        channelId: nextInfo.id || null
                     });
                     if (resolved) {
                         nextInfo = {
@@ -5715,17 +5929,18 @@ const YT_INITIALDATA_NEGATIVE_TTL_MS = 20 * 1000;
  * @returns {Promise<Object|null>} - {handle, name} or {id, name} or null
  */
 async function searchYtInitialDataForVideoChannel(videoId, options = null) {
-    if (!videoId) {
-        console.log('FilterTube: ytInitialData search skipped - no videoId');
-        return null;
-    }
     const resolvedOptions = typeof options === 'object' && options !== null
         ? options
         : { expectedHandle: options };
+    const fallbackChannelId = typeof resolvedOptions.channelId === 'string' ? resolvedOptions.channelId.trim() : '';
+    if (!videoId && !fallbackChannelId) {
+        console.log('FilterTube: ytInitialData search skipped - no videoId/channelId');
+        return null;
+    }
 
     const expectedHandleKey = resolvedOptions.expectedHandle ? normalizeHandleValue(resolvedOptions.expectedHandle).toLowerCase() : '';
     const expectedNameKey = (typeof resolvedOptions.expectedName === 'string' ? resolvedOptions.expectedName.trim().toLowerCase().replace(/\s+/g, ' ') : '');
-    const cacheKey = `${videoId}|h:${expectedHandleKey}|n:${expectedNameKey}`;
+    const cacheKey = `${videoId || 'novid'}|cid:${fallbackChannelId || 'none'}|h:${expectedHandleKey}|n:${expectedNameKey}`;
 
     const now = Date.now();
     const negExpiry = ytInitialDataChannelNegativeExpiry.get(cacheKey) || 0;
@@ -5754,7 +5969,7 @@ async function searchYtInitialDataForVideoChannel(videoId, options = null) {
     }
 
     const inFlight = (async () => {
-        const result = await requestChannelInfoFromMainWorld(videoId, resolvedOptions);
+        const result = await requestChannelInfoFromMainWorld(videoId || '', resolvedOptions);
         if (!result) return null;
 
         if (resolvedOptions.expectedHandle) {
@@ -5764,7 +5979,8 @@ async function searchYtInitialDataForVideoChannel(videoId, options = null) {
                 console.warn('FilterTube: ytInitialData handle mismatch, rejecting result', {
                     expected: normalizedExpected,
                     found: normalizedFound,
-                    videoId
+                    videoId: videoId || null,
+                    channelId: fallbackChannelId || null
                 });
                 return null;
             }
@@ -5782,7 +5998,8 @@ async function searchYtInitialDataForVideoChannel(videoId, options = null) {
                 console.warn('FilterTube: ytInitialData name mismatch, rejecting result', {
                     expected: normalizedExpectedName,
                     found: normalizedFoundName,
-                    videoId
+                    videoId: videoId || null,
+                    channelId: fallbackChannelId || null
                 });
                 return null;
             }
@@ -6917,7 +7134,7 @@ function extractChannelFromCard(card) {
             const channelNameEl = card.querySelector('#channel-info #channel-name a, #channel-name #text a, ytd-channel-name #text a');
             if (channelNameEl) {
                 const href = channelNameEl.getAttribute('href');
-                const name = channelNameEl.textContent?.trim();
+                const name = sanitizeChannelNameForCard(channelNameEl.textContent?.trim() || '', card);
 
                 if (href) {
                     const extracted = extractRawHandle(href);
@@ -6933,7 +7150,10 @@ function extractChannelFromCard(card) {
                 card.querySelector('[data-filtertube-channel-handle]')?.getAttribute('data-filtertube-channel-handle');
             if (dataHandle) {
                 // Get channel name from #channel-name, avoiding overlay text
-                const channelName = card.querySelector('#channel-info #channel-name a, #channel-name #text a, ytd-channel-name #text a')?.textContent?.trim();
+                const channelName = sanitizeChannelNameForCard(
+                    card.querySelector('#channel-info #channel-name a, #channel-name #text a, ytd-channel-name #text a')?.textContent?.trim() || '',
+                    card
+                );
                 console.log('FilterTube: Extracted from SHORTS full card data attr:', { handle: dataHandle, name: channelName });
                 return { handle: dataHandle, name: channelName, logo: extractAvatarUrl() || '' };
             }
@@ -6949,22 +7169,41 @@ function extractChannelFromCard(card) {
                 card.querySelector('[data-filtertube-channel-id]')?.getAttribute('data-filtertube-channel-id');
 
             if (dataHandle || dataId) {
-                // Try to extract channel name from the link with the data attribute
-                const channelLinkWithAttr = card.querySelector('[data-filtertube-channel-handle], [data-filtertube-channel-id]');
-                let name = channelLinkWithAttr?.textContent?.trim();
-                // Clean up name if it contains extra elements (like verified badges)
-                if (name && channelLinkWithAttr?.childNodes) {
-                    // Get only direct text content, not nested spans
-                    name = Array.from(channelLinkWithAttr.childNodes)
-                        .filter(n => n.nodeType === Node.TEXT_NODE)
-                        .map(n => n.textContent.trim())
-                        .join('') || name;
-                }
-                if (!name) {
-                    name = card.getAttribute('data-filtertube-channel-name') ||
-                        card.querySelector('[data-filtertube-channel-name]')?.getAttribute('data-filtertube-channel-name') ||
-                        '';
-                }
+                // Avoid deriving channel names from thumbnail/title anchors on Shorts cards.
+                // Those links frequently carry video title text and can poison persisted channel names.
+                const canonicalNameFromDom = sanitizeChannelNameForCard(
+                    card.querySelector(
+                        '#channel-info #channel-name a, ' +
+                        '#channel-name #text a, ' +
+                        'ytd-channel-name #text a, ' +
+                        '.shortsLockupViewModelHostOutsideMetadataChannelName, ' +
+                        '.shortsLockupViewModelHostInlineMetadataChannelName'
+                    )?.textContent?.trim() || '',
+                    card
+                );
+                const stampedName = sanitizeChannelNameForCard(
+                    card.getAttribute('data-filtertube-channel-name') ||
+                    card.querySelector('[data-filtertube-channel-name]')?.getAttribute('data-filtertube-channel-name') ||
+                    '',
+                    card
+                );
+                const attrTextName = (() => {
+                    const channelLinkWithAttr = card.querySelector('[data-filtertube-channel-handle], [data-filtertube-channel-id]');
+                    if (!channelLinkWithAttr) return '';
+                    let candidate = channelLinkWithAttr.textContent?.trim() || '';
+                    if (candidate && channelLinkWithAttr?.childNodes) {
+                        const directText = Array.from(channelLinkWithAttr.childNodes)
+                            .filter(n => n.nodeType === Node.TEXT_NODE)
+                            .map(n => n.textContent.trim())
+                            .join('')
+                            .trim();
+                        if (directText) {
+                            candidate = directText;
+                        }
+                    }
+                    return sanitizeChannelNameForCard(candidate, card);
+                })();
+                const name = canonicalNameFromDom || stampedName || attrTextName || '';
                 console.log('FilterTube: Found SHORTS channel from data attributes:', { handle: dataHandle, id: dataId, name });
                 return { handle: dataHandle, id: dataId, name, logo: extractAvatarUrl() || '' };
             }
@@ -6981,7 +7220,7 @@ function extractChannelFromCard(card) {
                 const href = shortsChannelLink.getAttribute('href');
                 const extracted = extractRawHandle(href);
                 if (extracted) {
-                    const name = shortsChannelLink.textContent?.trim();
+                    const name = sanitizeChannelNameForCard(shortsChannelLink.textContent?.trim() || '', card);
                     console.log('FilterTube: Extracted from SHORTS DOM link:', { handle: extracted, name });
                     return { handle: extracted, name, logo: extractAvatarUrl() || '' };
                 }
@@ -6996,8 +7235,31 @@ function extractChannelFromCard(card) {
                 if (videoIdMatch) {
                     const videoId = videoIdMatch[1];
                     console.log('FilterTube: Extracted shorts video ID:', videoId);
+                    const expectedNameFromShorts = sanitizeChannelNameForCard(
+                        card.querySelector(
+                            '.shortsLockupViewModelHostOutsideMetadataChannelName, ' +
+                            '.shortsLockupViewModelHostInlineMetadataChannelName, ' +
+                            'ytm-slim-owner-renderer a, ' +
+                            'ytm-channel-thumbnail-with-link-renderer a'
+                        )?.textContent?.trim() || '',
+                        card
+                    );
+                    const expectedHandle = extractRawHandle(
+                        card.querySelector(
+                            '.shortsLockupViewModelHostOutsideMetadataChannelName[href*="/@"], ' +
+                            '.shortsLockupViewModelHostInlineMetadataChannelName[href*="/@"], ' +
+                            'ytm-slim-owner-renderer a[href*="/@"], ' +
+                            'ytm-channel-thumbnail-with-link-renderer a[href*="/@"]'
+                        )?.getAttribute?.('href') || ''
+                    );
                     // Return a promise marker - we'll need to handle this async
-                    return { videoId, needsFetch: true };
+                    return {
+                        videoId,
+                        needsFetch: true,
+                        fetchStrategy: 'mainworld',
+                        expectedChannelName: expectedNameFromShorts || null,
+                        expectedHandle: expectedHandle || null
+                    };
                 }
             }
 
@@ -7363,8 +7625,9 @@ function extractChannelFromCard(card) {
                 const stamped = card.getAttribute('data-filtertube-channel-name') ||
                     card.querySelector('[data-filtertube-channel-name]')?.getAttribute('data-filtertube-channel-name') ||
                     '';
-                if (stamped && !stamped.includes('•')) {
-                    name = stamped;
+                const safeStamped = sanitizeChannelNameForCard(stamped, card);
+                if (safeStamped) {
+                    name = safeStamped;
                 }
             }
 
@@ -7413,7 +7676,10 @@ function extractChannelFromCard(card) {
                 '.yt-lockup-metadata-view-model__metadata a[href^="/user/"]'
             );
             if (channelNameEl) {
-                name = channelNameEl.textContent?.trim();
+                const safeNameFromLink = sanitizeChannelNameForCard(channelNameEl.textContent?.trim() || '', card);
+                if (safeNameFromLink) {
+                    name = safeNameFromLink;
+                }
 
                 const href = channelNameEl.getAttribute('href') || channelNameEl.href || '';
                 if (href) {
@@ -7468,7 +7734,10 @@ function extractChannelFromCard(card) {
                         !/\bago\b/i.test(candidateName) &&
                         !/\bwatching\b/i.test(candidateName) &&
                         !(headlineText && normalizedCandidate === headlineText)) {
-                        name = candidateName;
+                        const safeCandidate = sanitizeChannelNameForCard(candidateName, card);
+                        if (safeCandidate) {
+                            name = safeCandidate;
+                        }
                     }
                 }
             }
@@ -7484,7 +7753,10 @@ function extractChannelFromCard(card) {
                     !/\bwatching\b/i.test(lockupName) &&
                     !lockupName.includes('•')
                 ) {
-                    name = lockupName;
+                    const safeLockupName = sanitizeChannelNameForCard(lockupName, card);
+                    if (safeLockupName) {
+                        name = safeLockupName;
+                    }
                 }
             }
 
@@ -7492,7 +7764,10 @@ function extractChannelFromCard(card) {
                 const avatarImg = card.querySelector('yt-avatar-shape img, img.yt-avatar-shape__image');
                 const avatarAlt = avatarImg?.getAttribute('alt')?.trim() || '';
                 if (avatarAlt && !/go to channel/i.test(avatarAlt) && !avatarAlt.includes('•')) {
-                    name = avatarAlt;
+                    const safeAvatarAlt = sanitizeChannelNameForCard(avatarAlt, card);
+                    if (safeAvatarAlt) {
+                        name = safeAvatarAlt;
+                    }
                 }
             }
 
@@ -7510,7 +7785,10 @@ function extractChannelFromCard(card) {
                     !/\bago\b/i.test(ytmBylineText) &&
                     !/\bwatching\b/i.test(ytmBylineText)
                 ) {
-                    name = ytmBylineText;
+                    const safeYtmByline = sanitizeChannelNameForCard(ytmBylineText, card);
+                    if (safeYtmByline) {
+                        name = safeYtmByline;
+                    }
                 }
             }
 
@@ -7525,13 +7803,19 @@ function extractChannelFromCard(card) {
                 if (mixBylineText) {
                     const parsedMixByline = parseCollaboratorNames(mixBylineText);
                     if (parsedMixByline.hasHiddenCollaborators && parsedMixByline.names.length > 0) {
-                        name = parsedMixByline.names[0];
+                        const safeParsedMix = sanitizeChannelNameForCard(parsedMixByline.names[0], card);
+                        if (safeParsedMix) {
+                            name = safeParsedMix;
+                        }
                     } else if (
                         !isLikelyNonChannelName(mixBylineText) &&
                         !/^mix\b/i.test(mixBylineText) &&
                         mixBylineText.toLowerCase() !== 'youtube'
                     ) {
-                        name = mixBylineText;
+                        const safeMixByline = sanitizeChannelNameForCard(mixBylineText, card);
+                        if (safeMixByline) {
+                            name = safeMixByline;
+                        }
                     }
                 }
             }
@@ -7658,7 +7942,7 @@ function extractChannelFromCard(card) {
 
         if (channelNameLink) {
             const href = channelNameLink.getAttribute('href');
-            const name = channelNameLink.textContent?.trim();
+            const name = sanitizeChannelNameForCard(channelNameLink.textContent?.trim() || '', card);
             if (href) {
                 const extracted = extractRawHandle(href);
                 if (extracted) {
@@ -7720,7 +8004,7 @@ function extractChannelFromCard(card) {
                         'ytd-channel-name #text a, ' +
                         'ytd-video-meta-block ytd-channel-name a'
                     );
-                    const name = nameEl?.textContent?.trim();
+                    const name = sanitizeChannelNameForCard(nameEl?.textContent?.trim() || '', card);
                     console.log('FilterTube: Extracted from avatar link:', { handle: extracted, name });
                     return { handle: extracted, name, logo: extractAvatarUrl() || '' };
                 }
@@ -7744,6 +8028,7 @@ function extractChannelFromCard(card) {
                         const nameEl = card.querySelector('#channel-info ytd-channel-name a, ytd-channel-name #text a');
                         channelName = nameEl?.textContent?.trim() || channelName;
                     }
+                    channelName = sanitizeChannelNameForCard(channelName || '', card);
                     console.log('FilterTube: Extracted from generic link:', { handle: extracted, name: channelName });
                     return { handle: extracted, name: channelName, logo: extractAvatarUrl() || '' };
                 }
@@ -7761,7 +8046,7 @@ function extractChannelFromCard(card) {
 
         if (channelNameEl) {
             const href = channelNameEl.getAttribute('href');
-            let name = channelNameEl.textContent?.trim();
+            let name = sanitizeChannelNameForCard(channelNameEl.textContent?.trim() || '', card);
 
             // Validate name doesn't contain overlay text
             if (name && (name.includes('Now playing') || /^\d+:\d+/.test(name))) {
@@ -7963,7 +8248,7 @@ function extractChannelFromCard(card) {
                 const href = metaIdLink.getAttribute('href') || '';
                 const idMatch = href.match(/\/(UC[\w-]{22})/);
                 if (idMatch && idMatch[1]) {
-                    const name = metaIdLink.textContent?.trim() || '';
+                    const name = sanitizeChannelNameForCard(metaIdLink.textContent?.trim() || '', card);
                     console.log('FilterTube: Extracted from lockup meta (UC):', { id: idMatch[1], name });
                     return { id: idMatch[1], name, logo: extractAvatarUrl() || '' };
                 }
@@ -7972,7 +8257,7 @@ function extractChannelFromCard(card) {
             if (metaHandleLink) {
                 const href = metaHandleLink.getAttribute('href') || '';
                 const handle = extractRawHandle(href);
-                const name = metaHandleLink.textContent?.trim() || '';
+                const name = sanitizeChannelNameForCard(metaHandleLink.textContent?.trim() || '', card);
                 if (handle) {
                     console.log('FilterTube: Extracted from lockup meta (handle):', { handle, name });
                     return { handle, name, logo: extractAvatarUrl() || '' };
@@ -7988,14 +8273,14 @@ function extractChannelFromCard(card) {
                     '.yt-lockup-metadata-view-model__metadata a[href*="/user/"]'
                 );
                 if (channelLink) {
-                    name = channelLink.textContent?.trim() || '';
+                    name = sanitizeChannelNameForCard(channelLink.textContent?.trim() || '', card);
                 }
 
                 if (!name) {
                     const avatarImg = lockup.querySelector('yt-avatar-shape img, img.yt-avatar-shape__image');
                     const avatarAlt = avatarImg?.getAttribute('alt')?.trim() || '';
                     if (avatarAlt && !/go to channel/i.test(avatarAlt)) {
-                        name = avatarAlt;
+                        name = sanitizeChannelNameForCard(avatarAlt, card);
                     }
                 }
 
@@ -8028,9 +8313,12 @@ function extractChannelFromCard(card) {
                 '.watch-card-rich-header-text a'
             )?.textContent?.trim() || '';
             const fallbackHeadlineAria = card.querySelector('.YtmCompactMediaItemHeadline [aria-label]')?.getAttribute('aria-label') || '';
-            const fallbackName = deriveExpectedChannelName(fallbackNameRaw)
+            const fallbackName = sanitizeChannelNameForCard(
+                deriveExpectedChannelName(fallbackNameRaw)
                 || deriveExpectedChannelName(fallbackHeadlineAria)
-                || '';
+                || '',
+                card
+            );
             const playlistOwnerFromByline = (() => {
                 const raw = (fallbackNameRaw || '').trim();
                 if (!raw) return '';
@@ -8192,7 +8480,10 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
         }
 
         if (domNameAttr && (!initialChannelInfo.name || typeof initialChannelInfo.name !== 'string' || !initialChannelInfo.name.trim())) {
-            initialChannelInfo.name = domNameAttr;
+            const safeDomName = sanitizeChannelNameForCard(domNameAttr, videoCard);
+            if (safeDomName) {
+                initialChannelInfo.name = safeDomName;
+            }
         }
     }
 
@@ -8287,7 +8578,17 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
         };
 
         const hasVideoId = typeof initialChannelInfo.videoId === 'string' && initialChannelInfo.videoId.trim();
-        const nameLooksBad = !initialChannelInfo.name || isUcIdLike(initialChannelInfo.name) || isHandleLike(initialChannelInfo.name);
+        const safeCurrentName = sanitizeChannelNameForCard(initialChannelInfo?.name || '', videoCard);
+        const safeExpectedName = sanitizeChannelNameForCard(initialChannelInfo?.expectedChannelName || '', videoCard);
+        if (safeCurrentName) {
+            initialChannelInfo.name = safeCurrentName;
+        }
+        if (safeExpectedName) {
+            initialChannelInfo.expectedChannelName = safeExpectedName;
+        } else if (initialChannelInfo?.expectedChannelName) {
+            initialChannelInfo.expectedChannelName = null;
+        }
+        const nameLooksBad = !safeCurrentName || isUcIdLike(safeCurrentName) || isHandleLike(safeCurrentName);
         // IMPORTANT: Do NOT treat a missing/placeholder name as a reason to do main-world lookup
         // when we already have a stable UC ID. This was causing playlist/Mix items to be overridden
         // by unrelated channels found in ytInitialData deep search.
@@ -8308,8 +8609,8 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
             if (!initialChannelInfo.expectedHandle && initialChannelInfo.handle) {
                 initialChannelInfo.expectedHandle = initialChannelInfo.handle;
             }
-            if (!initialChannelInfo.expectedChannelName && initialChannelInfo.name && !nameLooksBad) {
-                initialChannelInfo.expectedChannelName = initialChannelInfo.name;
+            if (!initialChannelInfo.expectedChannelName && safeCurrentName && !nameLooksBad) {
+                initialChannelInfo.expectedChannelName = safeCurrentName;
             }
         }
     } catch (e) {
@@ -8467,7 +8768,10 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
                 videoCard.setAttribute('data-filtertube-channel-custom', safeCustom);
             }
 
-            const safeName = typeof initialChannelInfo.name === 'string' ? initialChannelInfo.name.trim() : '';
+            const safeName = sanitizeChannelNameForCard(
+                (typeof initialChannelInfo.name === 'string' ? initialChannelInfo.name.trim() : ''),
+                videoCard
+            );
             if (safeName && safeName.toLowerCase() !== 'channel' && !safeName.startsWith('@') && !/^UC[a-zA-Z0-9_-]{22}$/.test(safeName) && !safeName.includes('•')) {
                 if (!videoCard.getAttribute('data-filtertube-channel-name')) {
                     videoCard.setAttribute('data-filtertube-channel-name', safeName);
@@ -8666,7 +8970,8 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
                 console.log('FilterTube: Background fetch - main-world channel info for:', initialChannelInfo.videoId);
                 const fetchedInfo = await searchYtInitialDataForVideoChannel(initialChannelInfo.videoId, {
                     expectedHandle: initialChannelInfo.expectedHandle || null,
-                    expectedName: initialChannelInfo.expectedChannelName || null
+                    expectedName: initialChannelInfo.expectedChannelName || null,
+                    channelId: initialChannelInfo.id || null
                 });
                 if (fetchedInfo) {
                     const fetchedId = (fetchedInfo.id || '').trim();
@@ -8694,6 +8999,12 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
                             ...fetchedInfo,
                             videoId: initialChannelInfo.videoId
                         };
+                        const safeFetchedName = sanitizeChannelNameForCard(finalChannelInfo?.name || '', videoCard);
+                        if (safeFetchedName) {
+                            finalChannelInfo.name = safeFetchedName;
+                        } else if (finalChannelInfo?.name) {
+                            delete finalChannelInfo.name;
+                        }
                         console.log('FilterTube: Background fetch complete - main-world channel:', fetchedInfo);
                     }
                 } else {
@@ -8756,7 +9067,8 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
                 try {
                     const ytInfo = await searchYtInitialDataForVideoChannel(enrichedInfo.videoId, {
                         expectedHandle: enrichedInfo.expectedHandle || null,
-                        expectedName: enrichedInfo.expectedChannelName || null
+                        expectedName: enrichedInfo.expectedChannelName || null,
+                        channelId: enrichedInfo.id || null
                     });
                     if (ytInfo) {
                         enrichedInfo = {
@@ -8764,18 +9076,55 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
                             ...ytInfo,
                             videoId: enrichedInfo.videoId
                         };
+                        const safeEnrichedName = sanitizeChannelNameForCard(enrichedInfo?.name || '', videoCard);
+                        if (safeEnrichedName) {
+                            enrichedInfo.name = safeEnrichedName;
+                        } else if (enrichedInfo?.name) {
+                            delete enrichedInfo.name;
+                        }
                     }
                 } catch (e) {
                 }
             }
 
-            const stillNeedsNameEnrichment = !enrichedInfo?.name || isHandleLike(enrichedInfo.name) || isProbablyNotChannelName(enrichedInfo.name);
+            let stillNeedsNameEnrichment = !enrichedInfo?.name || isHandleLike(enrichedInfo.name) || isProbablyNotChannelName(enrichedInfo.name);
 
-            if (stillNeedsNameEnrichment && lookup && !enrichedInfo?.videoId) {
+            // JSON-first fallback: if videoId is missing but we still have a UC ID, ask main-world
+            // snapshots by channelId before any background network fetch.
+            const ucIdForMainWorldLookup = (typeof enrichedInfo?.id === 'string' && /^UC[\w-]{22}$/i.test(enrichedInfo.id.trim()))
+                ? enrichedInfo.id.trim()
+                : '';
+            if (stillNeedsNameEnrichment && !enrichedInfo?.videoId && ucIdForMainWorldLookup) {
+                try {
+                    const byChannelId = await searchYtInitialDataForVideoChannel('', {
+                        expectedHandle: enrichedInfo.expectedHandle || enrichedInfo.handle || null,
+                        expectedName: enrichedInfo.expectedChannelName || enrichedInfo.name || null,
+                        channelId: ucIdForMainWorldLookup,
+                        allowNameMismatch: true
+                    });
+                    if (byChannelId) {
+                        enrichedInfo = {
+                            ...enrichedInfo,
+                            ...byChannelId
+                        };
+                        const safeByIdName = sanitizeChannelNameForCard(enrichedInfo?.name || '', videoCard);
+                        if (safeByIdName) {
+                            enrichedInfo.name = safeByIdName;
+                        } else if (enrichedInfo?.name) {
+                            delete enrichedInfo.name;
+                        }
+                    }
+                } catch (e) {
+                }
+                stillNeedsNameEnrichment = !enrichedInfo?.name || isHandleLike(enrichedInfo.name) || isProbablyNotChannelName(enrichedInfo.name);
+            }
+
+            const lookupForNetwork = enrichedInfo?.id || enrichedInfo?.handle || lookup || null;
+            if (stillNeedsNameEnrichment && lookupForNetwork && !enrichedInfo?.videoId) {
                 try {
                     const details = await browserAPI_BRIDGE.runtime.sendMessage({
                         action: 'fetchChannelDetails',
-                        channelIdOrHandle: lookup
+                        channelIdOrHandle: lookupForNetwork
                     });
                     if (details && details.success) {
                         enrichedInfo = { ...enrichedInfo, ...details };
@@ -8789,7 +9138,10 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
 
             try {
                 if (videoCard && enrichedInfo) {
-                    const safeName = typeof enrichedInfo.name === 'string' ? enrichedInfo.name.trim() : '';
+                    const safeName = sanitizeChannelNameForCard(
+                        (typeof enrichedInfo.name === 'string' ? enrichedInfo.name.trim() : ''),
+                        videoCard
+                    );
                     if (safeName && !isHandleLike(safeName) && !isProbablyNotChannelName(safeName)) {
                         if (!videoCard.getAttribute('data-filtertube-channel-name')) {
                             videoCard.setAttribute('data-filtertube-channel-name', safeName);
@@ -9359,6 +9711,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             videoId: (typeof channelInfo?.videoId === 'string' ? channelInfo.videoId.trim() : ''),
             cardVideoId: '',
             cardCustomUrl: '',
+            videoTitleHint: '',
             cardRef: videoCard
         };
         try {
@@ -9373,9 +9726,22 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             }
         } catch (e) {
         }
+        try {
+            const hints = collectCardTitleHints(videoCard);
+            if (Array.isArray(hints) && hints.length > 0) {
+                snapshot.videoTitleHint = String(hints[0] || '').trim().toLowerCase();
+            }
+        } catch (e) {
+        }
+        if (!snapshot.videoTitleHint && typeof channelInfo?.videoTitleHint === 'string') {
+            snapshot.videoTitleHint = channelInfo.videoTitleHint.trim().toLowerCase();
+        }
         if (!snapshot.videoId && snapshot.cardVideoId) snapshot.videoId = snapshot.cardVideoId;
         return snapshot;
     })();
+    if (clickSnapshot.videoTitleHint) {
+        channelInfo = { ...(channelInfo || {}), videoTitleHint: clickSnapshot.videoTitleHint };
+    }
 
     const clickedCollabKey = (menuItem.getAttribute('data-collab-key') || '').trim().toLowerCase();
     const isSingleCollaboratorSelection = Boolean(
@@ -9619,9 +9985,14 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
         );
 
         if (needsStructuredLookup) {
+            const lookupExpectedName = sanitizeChannelNameForCard(
+                channelInfo?.expectedChannelName || channelInfo?.name || '',
+                videoCard
+            );
             const ytInfo = await searchYtInitialDataForVideoChannel(channelInfo.videoId, {
                 expectedHandle: requestedHandle || channelInfo.expectedHandle || null,
-                expectedName: channelInfo.expectedChannelName || null
+                expectedName: lookupExpectedName || null,
+                channelId: channelInfo.id || null
             });
             if (ytInfo) {
                 if (candidateMatchesClickedIdentity(ytInfo)) {
@@ -9703,6 +10074,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                     const collaboratorMetadata = buildChannelMetadataPayload({
                         ...collaborator,
                         videoId: collaborator.videoId || channelInfo.videoId || '',
+                        videoTitleHint: clickSnapshot.videoTitleHint || channelInfo.videoTitleHint || '',
                         source: collaborator.source || channelInfo.source || 'collab_block_all'
                     });
                     let result = await addChannelDirectly(identifier, useFilterAll, otherChannels, groupId, collaboratorMetadata);
@@ -9762,6 +10134,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                     const collaboratorMetadata = buildChannelMetadataPayload({
                         ...collaborator,
                         videoId: collaborator.videoId || channelInfo.videoId || '',
+                        videoTitleHint: clickSnapshot.videoTitleHint || channelInfo.videoTitleHint || '',
                         source: collaborator.source || channelInfo.source || 'collab_block_all'
                     });
                     const result = await addChannelDirectly(input, collaboratorFilterAll, otherChannels, groupId, collaboratorMetadata);
@@ -9945,7 +10318,10 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                 }
 
                 if (canApplyFetchedIdentity && (!channelInfo?.name || isProbablyNotChannelName(channelInfo.name)) && fetchedChannelInfo?.name && !isProbablyNotChannelName(fetchedChannelInfo.name)) {
-                    channelInfo.name = fetchedChannelInfo.name;
+                    const safeFetchedName = sanitizeChannelNameForCard(fetchedChannelInfo.name, videoCard);
+                    if (safeFetchedName) {
+                        channelInfo.name = safeFetchedName;
+                    }
                 }
                 if (canApplyFetchedIdentity && (!channelInfo?.handle || !String(channelInfo.handle).trim().startsWith('@')) && fetchedChannelInfo?.handle) {
                     channelInfo.handle = fetchedChannelInfo.handle;
@@ -10013,18 +10389,17 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
         // Single channel blocking (normal case)
         // Prefer canonical UC ID when available, fall back to handle
         const expectedHandle = requestedHandle || channelInfo?.expectedHandle || null;
-        const expectedName = channelInfo?.expectedChannelName || channelInfo?.name || null;
-
-        try {
-            const name = typeof channelInfo?.name === 'string' ? channelInfo.name.trim() : '';
-            const expected = typeof channelInfo?.expectedChannelName === 'string' ? channelInfo.expectedChannelName.trim() : '';
-            const nameLooksBad = (!name) || name.toLowerCase() === 'channel' || name.includes('•') || name.startsWith('@') || /^UC[a-zA-Z0-9_-]{22}$/.test(name);
-            const expectedLooksOk = expected && expected.toLowerCase() !== 'channel' && !expected.includes('•') && !expected.startsWith('@') && !/^UC[a-zA-Z0-9_-]{22}$/.test(expected);
-            if (nameLooksBad && expectedLooksOk) {
-                channelInfo.name = expected;
-            }
-        } catch (e) {
+        const safeExpectedName = sanitizeChannelNameForCard(channelInfo?.expectedChannelName || '', videoCard);
+        const safeCurrentName = sanitizeChannelNameForCard(channelInfo?.name || '', videoCard);
+        if (safeCurrentName) {
+            channelInfo.name = safeCurrentName;
+        } else if (safeExpectedName) {
+            channelInfo.name = safeExpectedName;
         }
+        if (safeExpectedName) {
+            channelInfo.expectedChannelName = safeExpectedName;
+        }
+        const expectedName = safeExpectedName || safeCurrentName || null;
 
         // Identity integrity: ensure canonicalHandle/handleDisplay align with the handle we intend
         // to persist (especially important for collaborator rows, where prefetch data can carry
@@ -10087,7 +10462,11 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             try {
                 const ytInfo = await searchYtInitialDataForVideoChannel(channelInfo.videoId, {
                     expectedHandle: requestedHandle || channelInfo.expectedHandle || '',
-                    expectedName: channelInfo.expectedChannelName || channelInfo.name || '',
+                    expectedName: sanitizeChannelNameForCard(
+                        channelInfo.expectedChannelName || channelInfo.name || '',
+                        videoCard
+                    ) || '',
+                    channelId: channelInfo.id || null,
                     // This call is only trying to fill alternate IDs (handle/customUrl) for a UC-known entry.
                     // Do not hard-reject on name mismatch; instead, require that the UC id stays consistent.
                     allowNameMismatch: true
@@ -10105,7 +10484,10 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                         channelInfo.customUrl = ytInfo.customUrl;
                     }
                     if ((!channelInfo.name || isProbablyNotChannelName(channelInfo.name)) && ytInfo.name) {
-                        channelInfo.name = ytInfo.name;
+                        const safeYtName = sanitizeChannelNameForCard(ytInfo.name, videoCard);
+                        if (safeYtName) {
+                            channelInfo.name = safeYtName;
+                        }
                     }
                 }
             } catch (e) {
@@ -10406,7 +10788,8 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             try {
                 const ytChannel = await searchYtInitialDataForVideoChannel(channelInfo.videoId, {
                     expectedHandle,
-                    expectedName
+                    expectedName,
+                    channelId: channelInfo.id || null
                 });
                 if (ytChannel && (ytChannel.id || ytChannel.handle)) {
                     if (isSingleCollaboratorSelection && !candidateMatchesClickedIdentity(ytChannel)) {
@@ -10539,7 +10922,10 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                             }
 
                             if (watchInfo.name && !channelInfo.name) {
-                                channelInfo.name = watchInfo.name;
+                                const safeWatchName = sanitizeChannelNameForCard(watchInfo.name, videoCard);
+                                if (safeWatchName) {
+                                    channelInfo.name = safeWatchName;
+                                }
                             }
 
                             if (channelInfo.id && channelInfo.handle) {
@@ -10919,6 +11305,7 @@ async function addChannelDirectly(input, filterAll = false, collaborationWith = 
                 channelName: metadata.channelName || null,
                 channelLogo: metadata.channelLogo || null,
                 videoId: metadata.videoId || null,
+                videoTitleHint: metadata.videoTitleHint || null,
                 profile,
                 customUrl: metadata.customUrl || null,  // c/Name or user/Name for legacy channels
                 source: metadata.source || null,

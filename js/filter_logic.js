@@ -41,11 +41,66 @@
     const pendingVideoChannelUpdates = [];
     const seenVideoChannelUpdates = new Map();
     let pendingVideoChannelFlush = null;
-    function queueVideoChannelMapping(videoId, channelId) {
+    function normalizeComparableIdentityText(value) {
+        if (!value || typeof value !== 'string') return '';
+        return value
+            .replace(/\s+/g, ' ')
+            .replace(/\s*\n\s*/g, ' ')
+            .trim()
+            .toLowerCase();
+    }
+
+    function isLikelyBadChannelIdentityName(value, videoTitleHint = '') {
+        if (!value || typeof value !== 'string') return true;
+        const trimmed = value.trim();
+        if (!trimmed) return true;
+        if (trimmed.startsWith('@')) return true;
+        if (/^UC[\w-]{22}$/i.test(trimmed)) return true;
+        if (trimmed.includes('•')) return true;
+        if (/\bviews?\b/i.test(trimmed)) return true;
+        if (/\bago\b/i.test(trimmed)) return true;
+        if (/\bwatching\b/i.test(trimmed)) return true;
+        if (/^like\s+this\s+video\??$/i.test(trimmed)) return true;
+        if (/^\s*mix\b/i.test(trimmed)) return true;
+        if (/\band\s+\d+\s+more\b/i.test(trimmed) || /\band\s+more\b/i.test(trimmed)) return true;
+        const normalizedTitle = normalizeComparableIdentityText(videoTitleHint);
+        if (normalizedTitle && normalizeComparableIdentityText(trimmed) === normalizedTitle) return true;
+        return false;
+    }
+
+    function queueVideoChannelMapping(videoId, channelId, identity = {}) {
         if (!videoId || typeof videoId !== 'string' || !/^[a-zA-Z0-9_-]{11}$/.test(videoId)) return;
         if (!channelId || typeof channelId !== 'string' || !channelId.startsWith('UC')) return;
 
-        const key = `${videoId}:${channelId}`;
+        const normalizedHandle = normalizeChannelHandle(
+            identity?.handle ||
+            identity?.channelHandle ||
+            identity?.canonicalHandle ||
+            ''
+        ) || '';
+        const normalizedCustomUrl = (() => {
+            const raw = typeof identity?.customUrl === 'string' ? identity.customUrl.trim() : '';
+            if (!raw) return '';
+            const direct = raw.match(/^(c|user)\/([^/?#]+)/i);
+            if (direct && direct[1] && direct[2]) {
+                return `${direct[1].toLowerCase()}/${direct[2]}`;
+            }
+            const fromPath = raw.match(/\/(c|user)\/([^/?#]+)/i);
+            if (fromPath && fromPath[1] && fromPath[2]) {
+                return `${fromPath[1].toLowerCase()}/${fromPath[2]}`;
+            }
+            return '';
+        })();
+        const normalizedVideoTitleHint = normalizeComparableIdentityText(identity?.videoTitle || identity?.videoTitleHint || '');
+        const nameCandidate = typeof identity?.name === 'string'
+            ? identity.name.trim()
+            : (typeof identity?.channelName === 'string' ? identity.channelName.trim() : '');
+        const safeName = (!isLikelyBadChannelIdentityName(nameCandidate, normalizedVideoTitleHint) ? nameCandidate : '');
+        const safeLogo = (typeof identity?.logo === 'string' && identity.logo.trim())
+            ? identity.logo.trim()
+            : ((typeof identity?.channelLogo === 'string' && identity.channelLogo.trim()) ? identity.channelLogo.trim() : '');
+
+        const key = `${videoId}:${channelId}|h:${normalizedHandle || ''}|c:${normalizedCustomUrl || ''}|n:${normalizeComparableIdentityText(safeName || '')}|l:${safeLogo ? 1 : 0}`;
         if (seenVideoChannelUpdates.has(key)) return;
         seenVideoChannelUpdates.set(key, Date.now());
 
@@ -54,7 +109,14 @@
             keys.slice(0, 1000).forEach(k => seenVideoChannelUpdates.delete(k));
         }
 
-        pendingVideoChannelUpdates.push({ videoId, channelId });
+        pendingVideoChannelUpdates.push({
+            videoId,
+            channelId,
+            handle: normalizedHandle || null,
+            customUrl: normalizedCustomUrl || null,
+            channelName: safeName || null,
+            channelLogo: safeLogo || null
+        });
 
         if (pendingVideoChannelFlush) return;
         pendingVideoChannelFlush = setTimeout(() => {
@@ -1282,11 +1344,86 @@
             visit(root);
         }
 
+        _extractRendererPrimaryIdentity(renderer) {
+            if (!renderer || typeof renderer !== 'object') return {};
+            const byline = renderer.shortBylineText || renderer.longBylineText || renderer.ownerText || {};
+            const firstRun = Array.isArray(byline?.runs) && byline.runs.length > 0 ? byline.runs[0] : null;
+            const browse = firstRun?.navigationEndpoint?.browseEndpoint || null;
+            const channelThumb =
+                renderer?.channelThumbnail?.channelThumbnailWithLinkRenderer ||
+                renderer?.channelThumbnailSupportedRenderers?.channelThumbnailWithLinkRenderer ||
+                null;
+            const canonical = browse?.canonicalBaseUrl ||
+                firstRun?.navigationEndpoint?.commandMetadata?.webCommandMetadata?.url ||
+                channelThumb?.navigationEndpoint?.browseEndpoint?.canonicalBaseUrl ||
+                channelThumb?.navigationEndpoint?.commandMetadata?.webCommandMetadata?.url ||
+                '';
+            const handle = normalizeChannelHandle(canonical);
+            const customUrl = (() => {
+                if (typeof canonical !== 'string' || !canonical) return '';
+                if (canonical.startsWith('/c/')) {
+                    const slug = canonical.split('/')[2];
+                    return slug ? `c/${slug.split('?')[0].split('#')[0]}` : '';
+                }
+                if (canonical.startsWith('/user/')) {
+                    const slug = canonical.split('/')[2];
+                    return slug ? `user/${slug.split('?')[0].split('#')[0]}` : '';
+                }
+                return '';
+            })();
+            const titleHint = flattenText(
+                renderer?.headline ||
+                renderer?.title ||
+                renderer?.metadata?.lockupMetadataViewModel?.title ||
+                ''
+            );
+            const bylineName = typeof firstRun?.text === 'string' ? firstRun.text.trim() : '';
+            const ownerName =
+                renderer?.owner?.videoOwnerRenderer?.title?.runs?.[0]?.text ||
+                renderer?.owner?.videoOwnerRenderer?.title?.simpleText ||
+                renderer?.slimOwnerRenderer?.title?.runs?.[0]?.text ||
+                '';
+            const a11yLabel =
+                channelThumb?.accessibility?.accessibilityData?.label ||
+                '';
+            const a11yName = (typeof a11yLabel === 'string' && a11yLabel.trim())
+                ? a11yLabel.replace(/^go to channel\s+/i, '').trim()
+                : '';
+            const pickSafeName = (value) => {
+                if (typeof value !== 'string') return '';
+                const trimmed = value.trim();
+                if (!trimmed) return '';
+                if (isLikelyBadChannelIdentityName(trimmed, titleHint)) return '';
+                return trimmed;
+            };
+            const safeByline = pickSafeName(bylineName);
+            const safeOwner = pickSafeName(ownerName);
+            const safeA11y = pickSafeName(a11yName);
+            const a11yLooksTopic = /\s-\sTopic$/i.test(safeA11y || '');
+            const bylineLooksTopic = /\s-\sTopic$/i.test(safeByline || '');
+            const ownerLooksTopic = /\s-\sTopic$/i.test(safeOwner || '');
+            const name = (a11yLooksTopic && !bylineLooksTopic && !ownerLooksTopic)
+                ? safeA11y
+                : (safeByline || safeOwner || safeA11y || '');
+            const logo =
+                channelThumb?.thumbnail?.thumbnails?.[0]?.url ||
+                channelThumb?.thumbnail?.thumbnails?.[1]?.url ||
+                renderer?.owner?.videoOwnerRenderer?.thumbnail?.thumbnails?.[0]?.url ||
+                '';
+            return {
+                handle: handle || '',
+                customUrl: customUrl || '',
+                name: name || '',
+                logo: (typeof logo === 'string' ? logo : '')
+            };
+        }
+
         _harvestVideoOwnerFromRenderer(renderer) {
             if (!renderer || typeof renderer !== 'object') return;
 
             const videoId = renderer.videoId || renderer.contentId || renderer.navigationEndpoint?.watchEndpoint?.videoId || '';
             if (!videoId || typeof videoId !== 'string' || !/^[a-zA-Z0-9_-]{11}$/.test(videoId)) return;
+            const rendererIdentity = this._extractRendererPrimaryIdentity(renderer);
 
             const ownerId =
                 renderer?.kidsVideoOwnerExtension?.externalChannelId ||
@@ -1294,21 +1431,50 @@
                 '';
 
             if (ownerId && typeof ownerId === 'string' && ownerId.startsWith('UC')) {
-                this._registerVideoChannelMapping(videoId, ownerId);
+                this._registerVideoChannelMapping(videoId, ownerId, rendererIdentity);
                 return;
             }
 
             const byline = renderer.shortBylineText || renderer.longBylineText || renderer.ownerText;
             const browseId = byline?.runs?.[0]?.navigationEndpoint?.browseEndpoint?.browseId || '';
             if (browseId && typeof browseId === 'string' && browseId.startsWith('UC')) {
-                this._registerVideoChannelMapping(videoId, browseId);
+                this._registerVideoChannelMapping(videoId, browseId, rendererIdentity);
+                return;
+            }
+
+            const channelThumbBrowse =
+                renderer?.channelThumbnail?.channelThumbnailWithLinkRenderer?.navigationEndpoint?.browseEndpoint ||
+                renderer?.channelThumbnailSupportedRenderers?.channelThumbnailWithLinkRenderer?.navigationEndpoint?.browseEndpoint ||
+                null;
+            const channelThumbBrowseId = channelThumbBrowse?.browseId || '';
+            if (channelThumbBrowseId && typeof channelThumbBrowseId === 'string' && channelThumbBrowseId.startsWith('UC')) {
+                this._registerVideoChannelMapping(videoId, channelThumbBrowseId, rendererIdentity);
+                const thumbCanonical =
+                    channelThumbBrowse?.canonicalBaseUrl ||
+                    renderer?.channelThumbnail?.channelThumbnailWithLinkRenderer?.navigationEndpoint?.commandMetadata?.webCommandMetadata?.url ||
+                    renderer?.channelThumbnailSupportedRenderers?.channelThumbnailWithLinkRenderer?.navigationEndpoint?.commandMetadata?.webCommandMetadata?.url ||
+                    '';
+                const normalized = typeof thumbCanonical === 'string' ? normalizeChannelHandle(thumbCanonical) : '';
+                if (normalized) {
+                    this._registerMapping(channelThumbBrowseId, normalized);
+                } else if (typeof thumbCanonical === 'string' && thumbCanonical) {
+                    let custom = '';
+                    if (thumbCanonical.startsWith('/c/')) {
+                        const slug = thumbCanonical.split('/')[2];
+                        if (slug) custom = `c/${slug.split('?')[0].split('#')[0]}`;
+                    } else if (thumbCanonical.startsWith('/user/')) {
+                        const slug = thumbCanonical.split('/')[2];
+                        if (slug) custom = `user/${slug.split('?')[0].split('#')[0]}`;
+                    }
+                    if (custom) this._registerCustomUrlMapping(channelThumbBrowseId, custom);
+                }
                 return;
             }
 
             const lockupBrowse = renderer?.metadata?.lockupMetadataViewModel?.image?.decoratedAvatarViewModel?.rendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint;
             const lockupBrowseId = lockupBrowse?.browseId;
             if (lockupBrowseId && typeof lockupBrowseId === 'string' && lockupBrowseId.startsWith('UC')) {
-                this._registerVideoChannelMapping(videoId, lockupBrowseId);
+                this._registerVideoChannelMapping(videoId, lockupBrowseId, rendererIdentity);
                 const canonical = lockupBrowse?.canonicalBaseUrl || '';
                 const normalized = typeof canonical === 'string' ? normalizeChannelHandle(canonical) : '';
                 if (normalized) {
@@ -1317,15 +1483,15 @@
             }
         }
 
-        _registerVideoChannelMapping(videoId, channelId) {
+        _registerVideoChannelMapping(videoId, channelId, identity = {}) {
             if (!videoId || !channelId) return;
 
             const current = this.settings?.videoChannelMap && typeof this.settings.videoChannelMap === 'object'
                 ? this.settings.videoChannelMap
                 : null;
-            if (current && current[videoId] === channelId) return;
+            if (current && current[videoId] === channelId && !identity?.name && !identity?.handle && !identity?.customUrl && !identity?.logo) return;
 
-            queueVideoChannelMapping(videoId, channelId);
+            queueVideoChannelMapping(videoId, channelId, identity || {});
         }
 
         _registerVideoMetaMapping(videoId, meta) {
@@ -1547,6 +1713,19 @@
                 if (collaborator.id && collaborator.customUrl) {
                     this._registerCustomUrlMapping(collaborator.id, collaborator.customUrl);
                 }
+            }
+
+            // Emit richer per-video identity (name/handle/custom/logo) so isolated-world cards can be
+            // pre-stamped from XHR/ytInitialData and avoid fallback lookups.
+            const primaryOwner = collaborators[0] || null;
+            if (videoId && primaryOwner?.id && /^UC[\w-]{22}$/i.test(String(primaryOwner.id))) {
+                this._registerVideoChannelMapping(videoId, String(primaryOwner.id), {
+                    handle: primaryOwner.handle || '',
+                    customUrl: primaryOwner.customUrl || '',
+                    name: primaryOwner.name || '',
+                    logo: primaryOwner.logo || '',
+                    videoTitle: title || ''
+                });
             }
 
             // Log extraction results for debugging
@@ -2969,6 +3148,29 @@
                     }
                 } catch (e) {
                 }
+            }
+
+            // Topic channels frequently show a shortened byline ("Artist") while the channel thumbnail
+            // accessibility label has the canonical name ("Artist - Topic"). Prefer the topic label.
+            try {
+                const a11yLabel =
+                    getByPath(item, 'channelThumbnail.channelThumbnailWithLinkRenderer.accessibility.accessibilityData.label') ||
+                    getByPath(item, 'channelThumbnailSupportedRenderers.channelThumbnailWithLinkRenderer.accessibility.accessibilityData.label') ||
+                    '';
+                if (typeof a11yLabel === 'string' && a11yLabel.trim()) {
+                    const cleaned = a11yLabel.replace(/^go to channel\s+/i, '').trim();
+                    const safeA11y = !isLikelyBadChannelIdentityName(cleaned, this._extractTitle(item, rules)) ? cleaned : '';
+                    if (safeA11y) {
+                        const currentName = typeof channelInfo.name === 'string' ? channelInfo.name.trim() : '';
+                        const safeCurrent = !isLikelyBadChannelIdentityName(currentName, this._extractTitle(item, rules)) ? currentName : '';
+                        const a11yLooksTopic = /\s-\sTopic$/i.test(safeA11y);
+                        const currentLooksTopic = /\s-\sTopic$/i.test(safeCurrent);
+                        if (!safeCurrent || (a11yLooksTopic && !currentLooksTopic)) {
+                            channelInfo.name = safeA11y;
+                        }
+                    }
+                }
+            } catch (e) {
             }
 
             return channelInfo;

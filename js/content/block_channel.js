@@ -81,6 +81,9 @@ let quickBlockStylesInjected = false;
 let quickBlockObserverStarted = false;
 let quickBlockSweepTimer = 0;
 let quickBlockPeriodicTimer = 0;
+let quickBlockPointerTrackingStarted = false;
+let quickBlockLastPointerX = Number.NaN;
+let quickBlockLastPointerY = Number.NaN;
 const FT_DROPDOWN_SELECTORS = 'tp-yt-iron-dropdown, ytm-menu-popup-renderer, ytm-bottom-sheet-renderer, bottom-sheet-container, div.menu-content[role="dialog"]';
 const isMobileYouTubeSurface = () => {
     try {
@@ -122,6 +125,23 @@ const isMainYoutubeDesktopSurface = () => {
         return false;
     }
 };
+
+function startQuickBlockPointerTracking() {
+    if (quickBlockPointerTrackingStarted) return;
+    quickBlockPointerTrackingStarted = true;
+    document.addEventListener('pointermove', (event) => {
+        try {
+            if (!event || (event.pointerType && event.pointerType !== 'mouse')) return;
+            quickBlockLastPointerX = event.clientX;
+            quickBlockLastPointerY = event.clientY;
+        } catch (e) {
+        }
+    }, { passive: true, capture: true });
+    document.addEventListener('pointerleave', () => {
+        quickBlockLastPointerX = Number.NaN;
+        quickBlockLastPointerY = Number.NaN;
+    }, { passive: true, capture: true });
+}
 
 function getComposedParent(node) {
     if (!node) return null;
@@ -363,7 +383,78 @@ function setQuickBlockHoverStateForHost(hostCard, active, stickyMs = 0) {
     }
 }
 
-const QUICK_BLOCK_CARD_SELECTORS = [
+function isLikelyQuickBlockOverlayElement(target) {
+    if (!(target instanceof Element)) return false;
+    const tag = String(target.tagName || '').toLowerCase();
+    if (tag.includes('overlay') || tag.includes('preview') || tag.includes('player')) return true;
+    const classStr = String(target.className || '').toLowerCase();
+    if (!classStr) return false;
+    return (
+        classStr.includes('overlay') ||
+        classStr.includes('preview') ||
+        classStr.includes('hover') ||
+        classStr.includes('player')
+    );
+}
+
+function pointInsideQuickBlockHostBounds(hostCard, x, y, pad = 3) {
+    if (!hostCard || !(hostCard instanceof Element)) return false;
+    if (!Number.isFinite(x) || !Number.isFinite(y)) return false;
+    const boundsEl = (hostCard.__filtertubeQuickAnchor instanceof Element)
+        ? hostCard.__filtertubeQuickAnchor
+        : hostCard;
+    try {
+        const rect = boundsEl.getBoundingClientRect();
+        if (!rect || rect.width <= 0 || rect.height <= 0) return false;
+        return (
+            x >= (rect.left - pad) &&
+            x <= (rect.right + pad) &&
+            y >= (rect.top - pad) &&
+            y <= (rect.bottom + pad)
+        );
+    } catch (e) {
+        return false;
+    }
+}
+
+function shouldRetainQuickBlockHoverOnLeave(hostCard, event) {
+    if (!hostCard || !(hostCard instanceof Element)) return false;
+    if (isMobileYouTubeSurface()) return false;
+
+    const related = event?.relatedTarget;
+    if (related instanceof Element) {
+        if (related.closest?.('.filtertube-quick-block-wrap')) return true;
+        if (isLikelyQuickBlockOverlayElement(related)) return true;
+        const relatedCard = related.closest?.(QUICK_BLOCK_CARD_SELECTORS);
+        if (relatedCard) {
+            const relatedHost = resolveQuickBlockHost(relatedCard);
+            if (relatedHost && relatedHost === hostCard) return true;
+        }
+    }
+
+    if (!pointInsideQuickBlockHostBounds(hostCard, quickBlockLastPointerX, quickBlockLastPointerY, 4)) {
+        return false;
+    }
+
+    try {
+        const topEl = document.elementFromPoint(quickBlockLastPointerX, quickBlockLastPointerY);
+        if (!(topEl instanceof Element)) return true;
+        if (topEl === hostCard || hostCard.contains(topEl)) return true;
+        if (topEl.closest?.('.filtertube-quick-block-wrap')) return true;
+        if (isLikelyQuickBlockOverlayElement(topEl)) return true;
+        const topCard = topEl.closest?.(QUICK_BLOCK_CARD_SELECTORS);
+        if (topCard) {
+            const topHost = resolveQuickBlockHost(topCard);
+            if (topHost && topHost === hostCard) return true;
+        }
+    } catch (e) {
+        return true;
+    }
+
+    return false;
+}
+
+const QUICK_BLOCK_DESKTOP_CARD_SELECTORS = [
     'yt-official-card-view-model',
     'ytd-rich-item-renderer',
     'ytd-rich-grid-media',
@@ -384,7 +475,10 @@ const QUICK_BLOCK_CARD_SELECTORS = [
     'ytd-reel-item-renderer',
     'ytd-shorts-lockup-view-model',
     'yt-lockup-view-model',
-    'yt-lockup-metadata-view-model',
+    'yt-lockup-metadata-view-model'
+].join(', ');
+
+const QUICK_BLOCK_MOBILE_CARD_SELECTORS = [
     'ytm-rich-item-renderer',
     'ytm-compact-video-renderer',
     'ytm-video-with-context-renderer',
@@ -400,12 +494,28 @@ const QUICK_BLOCK_CARD_SELECTORS = [
     'ytm-compact-radio-renderer',
     'ytm-lockup-view-model',
     'ytm-shorts-lockup-view-model',
-    'ytm-shorts-lockup-view-model-v2',
+    'ytm-shorts-lockup-view-model-v2'
+].join(', ');
+
+const QUICK_BLOCK_KIDS_CARD_SELECTORS = [
     'ytk-video-renderer',
     'ytk-grid-video-renderer',
     'ytk-compact-video-renderer',
     'ytk-compact-playlist-renderer'
 ].join(', ');
+
+let QUICK_BLOCK_CARD_SELECTORS = QUICK_BLOCK_DESKTOP_CARD_SELECTORS;
+
+function resolveQuickBlockSelectorsForSurface() {
+    if (isKidsSite) return QUICK_BLOCK_KIDS_CARD_SELECTORS;
+    if (isMobileYouTubeSurface()) return QUICK_BLOCK_MOBILE_CARD_SELECTORS;
+    return QUICK_BLOCK_DESKTOP_CARD_SELECTORS;
+}
+
+function refreshQuickBlockCardSelectors() {
+    QUICK_BLOCK_CARD_SELECTORS = resolveQuickBlockSelectorsForSurface();
+    return QUICK_BLOCK_CARD_SELECTORS;
+}
 
 const isQuickBlockEnabled = () => {
     try {
@@ -434,7 +544,7 @@ function ensureQuickBlockStyles() {
 	    }
 	    .filtertube-quick-block-anchor {
 	        position: relative !important;
-	        overflow: hidden;
+	        overflow: visible;
 	    }
 	    .filtertube-quick-block-wrap {
 	        position: absolute;
@@ -450,11 +560,16 @@ function ensureQuickBlockStyles() {
 	        isolation: auto;
 	    }
 	    html:not([data-filtertube-mobile-surface]) .filtertube-quick-block-anchor {
-	        overflow: visible;
+	        overflow: hidden;
 	    }
 	    html:not([data-filtertube-mobile-surface]) .filtertube-quick-block-wrap {
 	        z-index: 2147483000;
 	    }
+    html:not([data-filtertube-mobile-surface]) .filtertube-quick-block-host[data-filtertube-quick-hover="true"],
+    html:not([data-filtertube-mobile-surface]) .filtertube-quick-block-host[data-filtertube-quick-sticky="true"],
+    html:not([data-filtertube-mobile-surface]) .filtertube-quick-block-host[data-filtertube-quick-force="true"] {
+        z-index: 24;
+    }
 	    .filtertube-quick-block-host:hover .filtertube-quick-block-wrap,
 	    .filtertube-quick-block-anchor:hover .filtertube-quick-block-wrap,
 	    .filtertube-quick-block-host[data-filtertube-quick-hover="true"] .filtertube-quick-block-wrap,
@@ -1032,12 +1147,7 @@ function ensureQuickBlockButton(card) {
 
     hostCard.classList.add('filtertube-quick-block-host');
     try {
-        const shouldForceVisible = isMobileYouTubeSurface();
-        if (shouldForceVisible) {
-            hostCard.setAttribute('data-filtertube-quick-force', 'true');
-        } else {
-            hostCard.removeAttribute('data-filtertube-quick-force');
-        }
+        hostCard.removeAttribute('data-filtertube-quick-force');
     } catch (e) {
     }
 
@@ -1058,13 +1168,23 @@ function ensureQuickBlockButton(card) {
         hostCard.addEventListener('mouseenter', () => {
             setQuickBlockHoverStateForHost(hostCard, true, HOVER_STICKY_MS);
         }, { passive: true });
-        hostCard.addEventListener('mouseleave', () => {
+        hostCard.addEventListener('mouseleave', (event) => {
+            const retain = shouldRetainQuickBlockHoverOnLeave(hostCard, event);
+            if (retain) {
+                setQuickBlockHoverStateForHost(hostCard, true, HOVER_STICKY_MS);
+                return;
+            }
             setQuickBlockHoverStateForHost(hostCard, false, LEAVE_STICKY_MS);
         }, { passive: true });
         hostCard.addEventListener('pointerenter', () => {
             setQuickBlockHoverStateForHost(hostCard, true, HOVER_STICKY_MS);
         }, { passive: true });
-        hostCard.addEventListener('pointerleave', () => {
+        hostCard.addEventListener('pointerleave', (event) => {
+            const retain = shouldRetainQuickBlockHoverOnLeave(hostCard, event);
+            if (retain) {
+                setQuickBlockHoverStateForHost(hostCard, true, HOVER_STICKY_MS);
+                return;
+            }
             setQuickBlockHoverStateForHost(hostCard, false, LEAVE_STICKY_MS);
         }, { passive: true });
         hostCard.addEventListener('focusin', () => {
@@ -1079,13 +1199,23 @@ function ensureQuickBlockButton(card) {
         anchor.addEventListener('mouseenter', () => {
             setQuickBlockHoverStateForHost(hostCard, true, HOVER_STICKY_MS);
         }, { passive: true });
-        anchor.addEventListener('mouseleave', () => {
+        anchor.addEventListener('mouseleave', (event) => {
+            const retain = shouldRetainQuickBlockHoverOnLeave(hostCard, event);
+            if (retain) {
+                setQuickBlockHoverStateForHost(hostCard, true, HOVER_STICKY_MS);
+                return;
+            }
             setQuickBlockHoverStateForHost(hostCard, false, LEAVE_STICKY_MS);
         }, { passive: true });
         anchor.addEventListener('pointerenter', () => {
             setQuickBlockHoverStateForHost(hostCard, true, HOVER_STICKY_MS);
         }, { passive: true });
-        anchor.addEventListener('pointerleave', () => {
+        anchor.addEventListener('pointerleave', (event) => {
+            const retain = shouldRetainQuickBlockHoverOnLeave(hostCard, event);
+            if (retain) {
+                setQuickBlockHoverStateForHost(hostCard, true, HOVER_STICKY_MS);
+                return;
+            }
             setQuickBlockHoverStateForHost(hostCard, false, LEAVE_STICKY_MS);
         }, { passive: true });
         anchor.addEventListener('focusin', () => {
@@ -1155,6 +1285,7 @@ function sweepQuickBlockButtons(root = document) {
         removeQuickBlockButtons();
         return;
     }
+    refreshQuickBlockCardSelectors();
     root.querySelectorAll(QUICK_BLOCK_CARD_SELECTORS).forEach((card) => {
         ensureQuickBlockButton(card);
     });
@@ -1172,34 +1303,38 @@ function setupQuickBlockObserver() {
     if (quickBlockObserverStarted) return;
     quickBlockObserverStarted = true;
     ensureQuickBlockStyles();
+    startQuickBlockPointerTracking();
 
     const boot = () => {
         const isMainDesktopSurface = isMainYoutubeDesktopSurface();
-        if (isMainDesktopSurface) {
-            // Keep main desktop stable/performant: rely on 3-dot menu flow there.
-            // Quick-block hover/button overlay remains enabled on mobile/YTM surfaces.
-            removeQuickBlockButtons();
-            return;
+        const isMobileSurface = isMobileYouTubeSurface();
+        refreshQuickBlockCardSelectors();
+        if (!isMainDesktopSurface) {
+            scheduleQuickBlockSweep(document);
         }
-        scheduleQuickBlockSweep(document);
 
-        document.addEventListener('pointerenter', (event) => {
-            if (!isQuickBlockEnabled()) return;
-            const card = event?.target?.closest?.(QUICK_BLOCK_CARD_SELECTORS);
-            if (card) {
-                ensureQuickBlockButton(card);
-            }
-        }, true);
+        if (!isMobileSurface) {
+            document.addEventListener('pointerenter', (event) => {
+                if (!isQuickBlockEnabled()) return;
+                refreshQuickBlockCardSelectors();
+                const card = event?.target?.closest?.(QUICK_BLOCK_CARD_SELECTORS);
+                if (card) {
+                    ensureQuickBlockButton(card);
+                }
+            }, true);
+        }
 
         // Home/Search hover-preview overlays can sit above the card, preventing `:hover` and
         // `mouseenter` from firing on the underlying host. Track the pointer position and
         // force the quick-block hover state on the best card under the pointer.
         // This eliminates the "1st hover bad, 2nd better, 3rd stable" pattern.
-        if (!isMainDesktopSurface && !isMobileYouTubeSurface() && isHoverCapableDesktopSurface()) {
+        if (!isMobileYouTubeSurface() && isHoverCapableDesktopSurface()) {
             let lastHost = null;
             let pending = false;
             let lastX = 0;
             let lastY = 0;
+            let lastTickTs = 0;
+            let sustainTimer = 0;
 
             const clearLast = () => {
                 if (lastHost) {
@@ -1223,6 +1358,33 @@ function setupQuickBlockObserver() {
                 } catch (e) {
                 }
                 return null;
+            };
+
+            const resolveHostFromEventTarget = (target) => {
+                try {
+                    if (!(target instanceof Element)) return null;
+                    if (target.closest?.(FT_DROPDOWN_SELECTORS)) return null;
+                    const candidate = target.closest?.(QUICK_BLOCK_CARD_SELECTORS);
+                    if (!candidate) return null;
+                    if (isPostLikeQuickBlockCard(candidate)) return null;
+                    return resolveQuickBlockHost(candidate);
+                } catch (e) {
+                    return null;
+                }
+            };
+
+            const isLikelyOverlayLayer = (target) => {
+                if (!(target instanceof Element)) return false;
+                const tag = String(target.tagName || '').toLowerCase();
+                if (tag.includes('overlay') || tag.includes('preview') || tag.includes('player')) return true;
+                const classStr = String(target.className || '').toLowerCase();
+                if (!classStr) return false;
+                return (
+                    classStr.includes('overlay') ||
+                    classStr.includes('preview') ||
+                    classStr.includes('hover') ||
+                    classStr.includes('player')
+                );
             };
 
             const resolveHostBoundsElement = (host) => {
@@ -1288,76 +1450,129 @@ function setupQuickBlockObserver() {
                 setQuickBlockHoverStateForHost(host, true, 900);
             };
 
+            const queueTick = () => {
+                if (pending) return;
+                pending = true;
+                requestAnimationFrame(tick);
+            };
+
             document.addEventListener('pointermove', (event) => {
                 try {
                     if (!event || (event.pointerType && event.pointerType !== 'mouse')) return;
                     lastX = event.clientX;
                     lastY = event.clientY;
+
+                    const targetHost = resolveHostFromEventTarget(event.target);
+                    if (targetHost) {
+                        if (targetHost !== lastHost) {
+                            clearLast();
+                            lastHost = targetHost;
+                        }
+                        ensureQuickBlockButton(targetHost);
+                        setQuickBlockHoverStateForHost(targetHost, true, 900);
+                        return;
+                    }
+
+                    const targetEl = event.target instanceof Element ? event.target : null;
+                    if (!lastHost && !isLikelyOverlayLayer(targetEl)) {
+                        return;
+                    }
+
+                    const now = performance.now();
+                    if ((now - lastTickTs) < 120) return;
                     if (pending) return;
-                    pending = true;
-                    requestAnimationFrame(tick);
+                    lastTickTs = now;
+                    queueTick();
                 } catch (e) {
                 }
             }, { passive: true, capture: true });
+
+            sustainTimer = window.setInterval(() => {
+                try {
+                    if (!isQuickBlockEnabled()) {
+                        clearLast();
+                        return;
+                    }
+                    if (!lastHost) return;
+                    if (!Number.isFinite(quickBlockLastPointerX) || !Number.isFinite(quickBlockLastPointerY)) return;
+                    if (!pointInsideQuickBlockHostBounds(lastHost, quickBlockLastPointerX, quickBlockLastPointerY, 4)) return;
+                    const topEl = document.elementFromPoint(quickBlockLastPointerX, quickBlockLastPointerY);
+                    if (topEl instanceof Element && topEl.closest?.(FT_DROPDOWN_SELECTORS)) return;
+                    const now = performance.now();
+                    if ((now - lastTickTs) < 180) return;
+                    lastTickTs = now;
+                    queueTick();
+                } catch (e) {
+                }
+            }, 220);
+            window.addEventListener('pagehide', () => {
+                if (sustainTimer) {
+                    clearInterval(sustainTimer);
+                    sustainTimer = 0;
+                }
+            }, { once: true });
 
             document.addEventListener('mouseleave', () => {
                 clearLast();
             }, { passive: true, capture: true });
+
+            window.addEventListener('scroll', () => {
+                clearLast();
+                document.querySelectorAll('.filtertube-quick-block-host[data-filtertube-quick-hover], .filtertube-quick-block-host[data-filtertube-quick-sticky]').forEach((host) => {
+                    try {
+                        host.removeAttribute('data-filtertube-quick-hover');
+                        host.removeAttribute('data-filtertube-quick-sticky');
+                    } catch (e) {
+                    }
+                });
+            }, { passive: true, capture: true });
         }
 
-        const observer = new MutationObserver((mutations) => {
-            if (!isQuickBlockEnabled()) {
-                removeQuickBlockButtons();
-                return;
-            }
-            for (const mutation of mutations) {
-                try {
-                    const target = mutation.target;
-                    if (target instanceof Element) {
-                        const closestCard = target.matches?.(QUICK_BLOCK_CARD_SELECTORS)
-                            ? target
-                            : target.closest?.(QUICK_BLOCK_CARD_SELECTORS);
-                        if (closestCard) {
-                            ensureQuickBlockButton(closestCard);
-                        }
-                    }
-                } catch (e) {
+        if (!isMainDesktopSurface) {
+            const observer = new MutationObserver((mutations) => {
+                if (!isQuickBlockEnabled()) {
+                    removeQuickBlockButtons();
+                    return;
                 }
-                for (const node of mutation.addedNodes) {
-                    if (!(node instanceof Element)) continue;
-                    if (node.matches?.(QUICK_BLOCK_CARD_SELECTORS)) {
-                        ensureQuickBlockButton(node);
-                    } else {
-                        if (!isMainDesktopSurface) {
-                            scheduleQuickBlockSweep(node);
-                        } else {
-                            // On main desktop, avoid unconditional subtree sweeps.
-                            // Only sweep wrappers that actually contain quick-block candidates.
-                            try {
-                                if (node.querySelector?.(QUICK_BLOCK_CARD_SELECTORS)) {
-                                    scheduleQuickBlockSweep(node);
-                                }
-                            } catch (e) {
+                refreshQuickBlockCardSelectors();
+                for (const mutation of mutations) {
+                    try {
+                        const target = mutation.target;
+                        if (target instanceof Element) {
+                            const closestCard = target.matches?.(QUICK_BLOCK_CARD_SELECTORS)
+                                ? target
+                                : target.closest?.(QUICK_BLOCK_CARD_SELECTORS);
+                            if (closestCard) {
+                                ensureQuickBlockButton(closestCard);
                             }
                         }
+                    } catch (e) {
+                    }
+                    for (const node of mutation.addedNodes) {
+                        if (!(node instanceof Element)) continue;
+                        if (node.matches?.(QUICK_BLOCK_CARD_SELECTORS)) {
+                            ensureQuickBlockButton(node);
+                        } else {
+                            scheduleQuickBlockSweep(node);
+                        }
+                    }
+                    for (const node of mutation.removedNodes) {
+                        if (!(node instanceof Element)) continue;
+                        if (node.classList?.contains('filtertube-quick-block-wrap')) {
+                            const hostFromWrap = node.__filtertubeQuickHost instanceof Element ? node.__filtertubeQuickHost : null;
+                            const host = hostFromWrap || (mutation.target instanceof Element
+                                ? (mutation.target.matches?.(QUICK_BLOCK_CARD_SELECTORS)
+                                    ? mutation.target
+                                    : mutation.target.closest?.(QUICK_BLOCK_CARD_SELECTORS))
+                                : null);
+                            if (host) ensureQuickBlockButton(host);
+                        }
                     }
                 }
-                for (const node of mutation.removedNodes) {
-                    if (!(node instanceof Element)) continue;
-                    if (node.classList?.contains('filtertube-quick-block-wrap')) {
-                        const hostFromWrap = node.__filtertubeQuickHost instanceof Element ? node.__filtertubeQuickHost : null;
-                        const host = hostFromWrap || (mutation.target instanceof Element
-                            ? (mutation.target.matches?.(QUICK_BLOCK_CARD_SELECTORS)
-                                ? mutation.target
-                                : mutation.target.closest?.(QUICK_BLOCK_CARD_SELECTORS))
-                            : null);
-                        if (host) ensureQuickBlockButton(host);
-                    }
-                }
-            }
-        });
+            });
 
-        observer.observe(document.body, { childList: true, subtree: true });
+            observer.observe(document.body, { childList: true, subtree: true });
+        }
 
         if (!quickBlockPeriodicTimer && !isMainDesktopSurface) {
             quickBlockPeriodicTimer = window.setInterval(() => {
@@ -1389,6 +1604,10 @@ function setupMenuObserver() {
             'button[aria-label*="More"], ' +
             'button[aria-label*="Action"], ' +
             'button[aria-label*="menu"], ' +
+            'button[aria-haspopup="menu"], ' +
+            'button[aria-haspopup="true"], ' +
+            'yt-button-shape button, ' +
+            'yt-icon-button-shape button, ' +
             'yt-icon-button.dropdown-trigger, ' +
             'yt-icon-button#button.dropdown-trigger, ' +
             '.shortsLockupViewModelHostOutsideMetadataMenu button, ' +

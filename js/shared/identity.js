@@ -426,6 +426,21 @@
         return match ? match[1] : '';
     }
 
+    function isLikelyBadIdentityName(value) {
+        if (!value || typeof value !== 'string') return true;
+        const trimmed = value.trim();
+        if (!trimmed) return true;
+        if (trimmed.startsWith('@')) return true;
+        if (/^UC[\w-]{22}$/i.test(trimmed)) return true;
+        if (trimmed.includes('•')) return true;
+        if (/\bviews?\b/i.test(trimmed)) return true;
+        if (/\bago\b/i.test(trimmed)) return true;
+        if (/^like\s+this\s+video\??$/i.test(trimmed)) return true;
+        if (/^\s*mix\b/i.test(trimmed)) return true;
+        if (/\band\s+\d+\s+more\b/i.test(trimmed) || /\band\s+more\b/i.test(trimmed)) return true;
+        return false;
+    }
+
     function fastExtractIdentityFromHtmlChunk(htmlChunk) {
         if (!htmlChunk || typeof htmlChunk !== 'string') return null;
 
@@ -467,10 +482,13 @@
 
         if (!result.name) {
             const titleMatch = htmlChunk.match(/"channelTitleText":\{"runs":\[\{"text":"([^"]+)"/i) ||
-                htmlChunk.match(/"title":{"simpleText":"([^"]+)"}/i) ||
-                htmlChunk.match(/"ownerChannelName":"([^"]+)"/i);
+                htmlChunk.match(/"ownerChannelName":"([^"]+)"/i) ||
+                htmlChunk.match(/"channelMetadataRenderer":\{"title":"([^"]+)"/i);
             if (titleMatch && titleMatch[1]) {
-                result.name = titleMatch[1];
+                const candidateName = String(titleMatch[1]).trim();
+                if (!isLikelyBadIdentityName(candidateName)) {
+                    result.name = candidateName;
+                }
             }
         }
 
