@@ -1057,6 +1057,9 @@ function getStatsSurfaceKey() {
 const PREFETCH_MAX_QUEUE = 10;
 const PREFETCH_CONCURRENCY = 2;
 const PREFETCH_TIMEOUT_MS = 5000;
+const VIDEO_IDENTITY_CACHE_MAX_SIZE = 5000;
+const VIDEO_IDENTITY_CACHE_EVICT_BATCH_SIZE = 1000;
+const videoIdentityCache = new Map();
 let prefetchQueue = [];
 let prefetchActive = 0;
 const prefetchSeen = new Set();
@@ -1253,6 +1256,10 @@ function queuePrefetchForCard(card) {
             card.removeAttribute('data-filtertube-channel-handle');
             card.removeAttribute('data-filtertube-channel-name');
             card.removeAttribute('data-filtertube-channel-custom');
+            card.removeAttribute('data-filtertube-channel-logo');
+            card.removeAttribute('data-filtertube-channel-source');
+            card.removeAttribute('data-filtertube-channel-fetch-strategy');
+            card.removeAttribute('data-filtertube-channel-expected-channel-name');
         } catch (e) {
         }
     }
@@ -1309,14 +1316,81 @@ function withTimeout(promise, ms) {
     ]);
 }
 
+function setVideoIdentityCache(videoId, identity = {}) {
+    if (!videoId || !identity || typeof identity !== 'object') return;
+    const existing = videoIdentityCache.get(videoId) || {};
+    const merged = { ...existing };
+
+    if (typeof identity.id === 'string' && identity.id.trim()) {
+        merged.id = identity.id.trim();
+    }
+    if (typeof identity.handle === 'string' && identity.handle.trim()) {
+        merged.handle = identity.handle.trim().toLowerCase();
+    }
+    if (typeof identity.customUrl === 'string' && identity.customUrl.trim()) {
+        merged.customUrl = identity.customUrl.trim();
+    }
+    if (typeof identity.name === 'string' && identity.name.trim()) {
+        merged.name = identity.name.trim();
+    }
+    if (typeof identity.logo === 'string' && identity.logo.trim()) {
+        merged.logo = identity.logo.trim();
+    }
+    if (typeof identity.source === 'string' && identity.source.trim()) {
+        merged.source = identity.source.trim();
+    }
+    if (typeof identity.fetchStrategy === 'string' && identity.fetchStrategy.trim()) {
+        merged.fetchStrategy = identity.fetchStrategy.trim();
+    }
+    if (typeof identity.expectedChannelName === 'string' && identity.expectedChannelName.trim()) {
+        merged.expectedChannelName = identity.expectedChannelName.trim();
+    }
+
+    if (!merged.id && !merged.handle && !merged.customUrl && !merged.name && !merged.logo && !merged.source && !merged.fetchStrategy && !merged.expectedChannelName) {
+        return;
+    }
+
+    if (videoIdentityCache.has(videoId)) {
+        videoIdentityCache.delete(videoId);
+    }
+    videoIdentityCache.set(videoId, merged);
+
+    if (videoIdentityCache.size > VIDEO_IDENTITY_CACHE_MAX_SIZE) {
+        const evictCount = Math.min(
+            VIDEO_IDENTITY_CACHE_EVICT_BATCH_SIZE,
+            videoIdentityCache.size - VIDEO_IDENTITY_CACHE_MAX_SIZE
+        );
+        if (evictCount > 0) {
+            const keys = [...videoIdentityCache.keys()];
+            for (let i = 0; i < evictCount; i++) {
+                videoIdentityCache.delete(keys[i]);
+            }
+        }
+    }
+}
+
+function getSeedIdentityForVideoId(videoId) {
+    if (!videoId) return null;
+    const cached = videoIdentityCache.get(videoId);
+    const mappedId = currentSettings?.videoChannelMap?.[videoId];
+    if (!cached && !mappedId) return null;
+    if (!cached && mappedId) {
+        return { id: mappedId };
+    }
+    return mappedId ? { ...cached, id: mappedId } : { ...cached };
+}
+
 async function prefetchIdentityForCard({ videoId, card }) {
     try {
         if (!card || !card.isConnected) return;
 
         if (typeof location !== 'undefined' && String(location.hostname || '').includes('youtubekids.com')) {
-            if (currentSettings?.videoChannelMap && currentSettings.videoChannelMap[videoId]) {
-                stampChannelIdentity(card, { id: currentSettings.videoChannelMap[videoId] });
-                return;
+            const seededIdentity = getSeedIdentityForVideoId(videoId);
+            if (seededIdentity) {
+                if (seededIdentity.id || seededIdentity.handle || seededIdentity.customUrl || seededIdentity.name || seededIdentity.logo) {
+                    stampChannelIdentity(card, seededIdentity);
+                    return;
+                }
             }
 
             // Kids: do NOT prefetch via network. Rely on Network JSON interception (FilterTube_UpdateVideoChannelMap)
@@ -1357,8 +1431,9 @@ async function prefetchIdentityForCard({ videoId, card }) {
         }
 
         // If settings already know this mapping, bail early
-        if (currentSettings?.videoChannelMap && currentSettings.videoChannelMap[videoId]) {
-            stampChannelIdentity(card, { id: currentSettings.videoChannelMap[videoId] });
+        const seededIdentity = getSeedIdentityForVideoId(videoId);
+        if (seededIdentity && (seededIdentity.id || seededIdentity.handle || seededIdentity.customUrl || seededIdentity.name || seededIdentity.logo)) {
+            stampChannelIdentity(card, seededIdentity);
             return;
         }
 
@@ -1407,8 +1482,11 @@ function stampChannelIdentity(card, info) {
     if (info.id) card.setAttribute('data-filtertube-channel-id', info.id);
     if (info.handle) card.setAttribute('data-filtertube-channel-handle', info.handle);
     if (info.customUrl) card.setAttribute('data-filtertube-channel-custom', info.customUrl);
-
     if (info.name) card.setAttribute('data-filtertube-channel-name', info.name);
+    if (info.logo) card.setAttribute('data-filtertube-channel-logo', info.logo);
+    if (info.source) card.setAttribute('data-filtertube-channel-source', info.source);
+    if (info.fetchStrategy) card.setAttribute('data-filtertube-channel-fetch-strategy', info.fetchStrategy);
+    if (info.expectedChannelName) card.setAttribute('data-filtertube-channel-expected-channel-name', info.expectedChannelName);
 
     // Trigger a light refilter so already-rendered cards hide without waiting for next DOM mutation
     if (typeof applyDOMFallback === 'function') {
@@ -4596,9 +4674,9 @@ function handleMainWorldMessages(event) {
         };
         for (const entry of updates) {
             const videoId = entry?.videoId;
-            const channelId = entry?.channelId;
-            if (!videoId || !channelId) continue;
-            persistVideoChannelMapping(videoId, channelId);
+            const channelId = typeof entry?.channelId === 'string' ? entry.channelId.trim() : '';
+            if (!videoId) continue;
+            if (channelId) persistVideoChannelMapping(videoId, channelId);
 
             const normalizedHandle = normalizeHandleValue(
                 entry?.handle ||
@@ -4611,26 +4689,49 @@ function handleMainWorldMessages(event) {
                 || (typeof entry?.name === 'string' ? entry.name.trim() : '');
             const rawLogo = (typeof entry?.channelLogo === 'string' ? entry.channelLogo.trim() : '')
                 || (typeof entry?.logo === 'string' ? entry.logo.trim() : '');
+            const source = (typeof entry?.source === 'string' && entry.source.trim()) ? entry.source.trim() : 'filter_logic';
+            const fetchStrategy = (typeof entry?.fetchStrategy === 'string' && entry.fetchStrategy.trim()) ? entry.fetchStrategy.trim() : 'rules';
+            const expectedChannelName = (typeof entry?.expectedChannelName === 'string' && entry.expectedChannelName.trim()) ? entry.expectedChannelName.trim() : '';
 
-            if (normalizedHandle) {
+            if (channelId && normalizedHandle) {
                 persistChannelMappings([{ id: channelId, handle: normalizedHandle }]);
             }
-            if (normalizedCustomUrl) {
+            if (channelId && normalizedCustomUrl) {
                 persistCustomUrlMapping(normalizedCustomUrl, channelId);
             }
+            const cachedIdentity = {
+                ...(channelId ? { id: channelId } : {}),
+                ...(normalizedHandle ? { handle: normalizedHandle } : {}),
+                ...(normalizedCustomUrl ? { customUrl: normalizedCustomUrl } : {}),
+                ...(rawName ? { name: rawName } : {}),
+                ...(rawLogo ? { logo: rawLogo } : {}),
+                ...(source ? { source } : {}),
+                ...(fetchStrategy ? { fetchStrategy } : {}),
+                ...(expectedChannelName ? { expectedChannelName } : {})
+            };
+            setVideoIdentityCache(videoId, cachedIdentity);
 
             try {
-                const baseIdentity = { id: channelId };
-                if (normalizedHandle) baseIdentity.handle = normalizedHandle;
-                if (normalizedCustomUrl) baseIdentity.customUrl = normalizedCustomUrl;
-                if (rawLogo) baseIdentity.logo = rawLogo;
+                const cacheForVideo = videoIdentityCache.get(videoId) || {};
+                const baseIdentity = {
+                    ...cacheForVideo,
+                    id: channelId || cacheForVideo.id || '',
+                    handle: normalizedHandle || cacheForVideo.handle || '',
+                    customUrl: normalizedCustomUrl || cacheForVideo.customUrl || '',
+                    logo: rawLogo || cacheForVideo.logo || '',
+                    source: source || cacheForVideo.source || '',
+                    fetchStrategy: fetchStrategy || cacheForVideo.fetchStrategy || '',
+                    expectedChannelName: expectedChannelName || cacheForVideo.expectedChannelName || '',
+                    name: cacheForVideo.name || rawName || ''
+                };
                 const cards = document.querySelectorAll(`[data-filtertube-video-id="${videoId}"]`);
                 if (cards && cards.length > 0) {
                     for (const card of cards) {
                         if (!shouldStampCardForVideoId(card, videoId)) continue;
                         const stamped = { ...baseIdentity };
-                        const safeName = sanitizeChannelNameForCard(rawName, card);
+                        const safeName = sanitizeChannelNameForCard(baseIdentity.name, card);
                         if (safeName) stamped.name = safeName;
+                        else if (!rawName) delete stamped.name;
                         stampChannelIdentity(card, stamped);
                     }
                 } else {
@@ -4648,8 +4749,9 @@ function handleMainWorldMessages(event) {
                         if (!card || !card.getAttribute) return;
                         if (!shouldStampCardForVideoId(card, videoId)) return;
                         const stamped = { ...baseIdentity };
-                        const safeName = sanitizeChannelNameForCard(rawName, card);
+                        const safeName = sanitizeChannelNameForCard(baseIdentity.name, card);
                         if (safeName) stamped.name = safeName;
+                        else if (!rawName) delete stamped.name;
                         stampChannelIdentity(card, stamped);
                     });
                 }
@@ -5120,7 +5222,7 @@ function ensureWatchPlaylistFallbackMenu() {
                     -webkit-appearance: none;
                     border: none;
                     background: transparent;
-                    color: inherit;
+                    color: var(--yt-spec-text-primary, #fff);
                     width: 32px;
                     height: 32px;
                     padding: 0;
@@ -5130,6 +5232,9 @@ function ensureWatchPlaylistFallbackMenu() {
                     align-items: center;
                     justify-content: center;
                     border-radius: 999px;
+                    opacity: 0.7;
+                    transition: opacity 0.15s ease, background 0.15s ease;
+                    flex-shrink: 0;
                 }
                 .filtertube-playlist-menu-fallback-btn--mobile {
                     width: 28px;
@@ -5137,10 +5242,25 @@ function ensureWatchPlaylistFallbackMenu() {
                     margin-left: 6px;
                 }
                 .filtertube-playlist-menu-fallback-btn:hover {
+                    opacity: 1;
                     background: rgba(255, 255, 255, 0.10);
                 }
+                html[dark] .filtertube-playlist-menu-fallback-btn,
+                html[data-theme="dark"] .filtertube-playlist-menu-fallback-btn,
+                ytd-app[dark] .filtertube-playlist-menu-fallback-btn {
+                    color: #fff;
+                }
+                html:not([dark]) .filtertube-playlist-menu-fallback-btn,
+                html[data-theme="light"] .filtertube-playlist-menu-fallback-btn {
+                    color: #030303;
+                }
+                html[dark] .filtertube-playlist-menu-fallback-btn:hover,
                 html[data-theme="dark"] .filtertube-playlist-menu-fallback-btn:hover {
                     background: rgba(255, 255, 255, 0.12);
+                }
+                html:not([dark]) .filtertube-playlist-menu-fallback-btn:hover,
+                html[data-theme="light"] .filtertube-playlist-menu-fallback-btn:hover {
+                    background: rgba(0, 0, 0, 0.08);
                 }
                 .filtertube-playlist-menu-fallback-popover {
                     position: fixed;
@@ -5219,6 +5339,34 @@ function ensureWatchPlaylistFallbackMenu() {
     } catch (e) {
     }
 
+    const isMenuLabel = (label) => {
+        return /(action|more|overflow|menu|options|ellipsis|three|dot)/i.test(label || '');
+    };
+
+    const isMenuControl = (button) => {
+        if (!button || !(button instanceof Element)) return false;
+        const label = String(button.getAttribute?.('aria-label') || '').trim().toLowerCase();
+        if (button.getAttribute?.('aria-haspopup') === 'menu' || button.getAttribute?.('aria-haspopup') === 'true') return true;
+        if (button.classList?.contains('dropdown-trigger') || button.classList?.contains('menu-renderer')) return true;
+        if (button.id === 'button') return true;
+        if (button.matches?.('ytd-menu-renderer') || button.matches?.('ytm-menu-renderer') || button.matches?.('yt-icon-button#button')) return true;
+        if (label && isMenuLabel(label)) return true;
+        return false;
+    };
+
+    const isVisible = (el) => {
+        if (!el || !(el instanceof Element)) return false;
+        try {
+            const style = window.getComputedStyle(el);
+            if (!style || style.display === 'none' || style.visibility === 'hidden') return false;
+            if (style.opacity === '0') return false;
+            if (!el.getClientRects || el.getClientRects().length === 0) return false;
+            if (el.closest?.('[hidden], [aria-hidden="true"]')) return false;
+        } catch (e) {
+        }
+        return true;
+    };
+
     const getMenuHost = (row) => {
         if (!row) return null;
         try {
@@ -5228,29 +5376,33 @@ function ensureWatchPlaylistFallbackMenu() {
         } catch (e) {
         }
         try {
-            return row.querySelector('#menu, #action-menu, ytd-comment-action-buttons-renderer, .comment-action-buttons');
+            // For yt-lockup-view-model (Mix cards etc.), use the menu-button slot
+            const lockupMenuSlot = row.querySelector('.yt-lockup-metadata-view-model__menu-button');
+            if (lockupMenuSlot) return lockupMenuSlot;
+            return row.querySelector(
+                '#menu, #action-menu, #menu-container, ytd-comment-action-buttons-renderer, .comment-action-buttons, ytd-menu-renderer, .menu-renderer'
+            ) || row;
         } catch (e) {
-            return null;
+            return row;
         }
     };
 
     const rowHasNativeMenuButton = (row, menuHost) => {
         const root = menuHost || row;
         if (!root) return false;
-        const isVisible = (el) => {
-            if (!el || !(el instanceof Element)) return false;
-            try {
-                const style = window.getComputedStyle(el);
-                if (!style || style.display === 'none' || style.visibility === 'hidden') return false;
-                if (style.opacity === '0') return false;
-                if (!el.getClientRects || el.getClientRects().length === 0) return false;
-                if (el.closest?.('[hidden], [aria-hidden="true"]')) return false;
-            } catch (e) {
-            }
-            return true;
-        };
         try {
-            const btn = root.querySelector(
+            const menuRenderer = root.querySelector(
+                'ytd-menu-renderer, ytm-menu-renderer, ytm-menu, ytm-bottom-sheet-renderer, tp-yt-paper-listbox, .menu-renderer, .overflow-menu'
+            );
+            if (menuRenderer) return true;
+            // .yt-lockup-metadata-view-model__menu-button only counts if it actually has a button inside
+            // (on Mix cards this div exists but is empty)
+            const lockupMenuBtn = root.querySelector('.yt-lockup-metadata-view-model__menu-button');
+            if (lockupMenuBtn && lockupMenuBtn.querySelector('button')) return true;
+        } catch (e) {
+        }
+        try {
+            const menuButtons = root.querySelectorAll?.(
                 'ytd-menu-renderer button[aria-label], ' +
                 'ytd-menu-renderer button[aria-haspopup="menu"], ' +
                 'ytd-menu-renderer button[aria-haspopup="true"], ' +
@@ -5263,24 +5415,74 @@ function ensureWatchPlaylistFallbackMenu() {
                 'yt-icon-button.dropdown-trigger button, ' +
                 'yt-button-shape button[aria-haspopup="menu"], ' +
                 'yt-button-shape button[aria-haspopup="true"], ' +
-                '#menu ytd-menu-renderer button[aria-label]'
+                '#menu ytd-menu-renderer button[aria-label], ' +
+                '.overflow-menu button, ' +
+                '.comment-action-buttons button, ' +
+                '.yt-lockup-metadata-view-model__menu-button button[aria-label], ' +
+                '.yt-lockup-metadata-view-model__menu-button button[aria-label*="Action menu"], ' +
+                '.yt-lockup-metadata-view-model__menu-button button[aria-label*="More actions"], ' +
+                '.media-item-menu button, ' +
+                'ytm-bottom-sheet-renderer button, ' +
+                'ytm-bottom-sheet-renderer button[aria-label*="Action menu"], ' +
+                'ytm-bottom-sheet-renderer button[aria-label*="More actions"], ' +
+                'button[aria-haspopup="menu"], ' +
+                'button[aria-haspopup="true"]'
             );
-            if (isVisible(btn)) return true;
+            for (const btn of menuButtons || []) {
+                if (!isVisible(btn)) continue;
+                if (isMenuControl(btn)) {
+                    const host = btn.closest?.(
+                        '.yt-lockup-metadata-view-model__menu-button, ytd-menu-renderer, ytm-menu-renderer, ytm-menu, ytm-bottom-sheet-renderer, .menu-renderer, .overflow-menu, #menu, #action-menu, .comment-action-buttons, ytd-comment-action-buttons-renderer'
+                    );
+                    if (host) return true;
+                }
+            }
         } catch (e) {
         }
         return false;
     };
 
+    const isShortsSurface = (el) => {
+        if (!el || !(el instanceof Element)) return false;
+        try {
+            const tag = el.tagName?.toLowerCase() || '';
+            if (tag === 'ytm-shorts-lockup-view-model' || tag === 'ytm-shorts-lockup-view-model-v2') return true;
+            if (el.classList?.contains('shortsLockupViewModelHost')) return true;
+            if (el.closest?.('ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2, ytd-reel-item-renderer')) return true;
+            // Check if the card links to /shorts/
+            const href = el.querySelector?.('a[href*="/shorts/"]');
+            if (href && !el.querySelector?.('a[href*="/watch?"]')) return true;
+        } catch (e) { }
+        return false;
+    };
+
     const ensureFallbackButtonForRow = (row) => {
         if (!row || !(row instanceof Element)) return;
+        // Skip Shorts cards — they always have native 3-dot menus
+        if (isShortsSurface(row)) return;
+        // Skip if this ROW (at any depth) already has a fallback button
+        if (row.querySelector?.('.filtertube-playlist-menu-fallback-btn')) return;
         const menuHost = getMenuHost(row);
         if (!menuHost) return;
+        try {
+            const staleNativeMarker = menuHost.getAttribute?.('data-filtertube-native-menu-seen');
+            if (staleNativeMarker === '1' && !rowHasNativeMenuButton(row, menuHost)) {
+                menuHost.removeAttribute?.('data-filtertube-native-menu-seen');
+                menuHost.removeAttribute?.('data-filtertube-native-menu-seen-at');
+            }
+        } catch (e) {
+        }
 
         // If YouTube menu exists, remove our fallback if present.
         if (rowHasNativeMenuButton(row, menuHost)) {
             const existing = menuHost.querySelector('.filtertube-playlist-menu-fallback-btn');
             if (existing) {
                 try { existing.remove(); } catch (e) { }
+            }
+            try {
+                menuHost.setAttribute('data-filtertube-native-menu-seen', '1');
+                menuHost.setAttribute('data-filtertube-native-menu-seen-at', String(Date.now()));
+            } catch (e) {
             }
             return;
         }
@@ -5341,6 +5543,23 @@ function ensureWatchPlaylistFallbackMenu() {
             return true;
         };
         try {
+            const explicitYtmMenuHost = card.querySelector(
+                '.ytmPlaylistPanelVideoRendererV2Host .media-item-menu, ' +
+                '.details .media-item-menu, ' +
+                '.details ytm-bottom-sheet-renderer, ' +
+                '.ytmPlaylistPanelVideoRendererV2Host ytm-bottom-sheet-renderer, ' +
+                '.media-item-menu, ' +
+                'ytm-bottom-sheet-renderer'
+            );
+            if (explicitYtmMenuHost) {
+                const explicitBtn = explicitYtmMenuHost.querySelector(
+                    'button[aria-label], button[aria-label*="Action menu"], button[aria-label*="More actions"], button[aria-haspopup="menu"], button[aria-haspopup="true"]'
+                );
+                if (isVisible(explicitBtn)) return true;
+            }
+        } catch (e) {
+        }
+        try {
             const btn = card.querySelector(
                 'ytm-menu-renderer button[aria-label], ' +
                 'ytm-menu-renderer button[aria-haspopup="menu"], ' +
@@ -5349,11 +5568,27 @@ function ensureWatchPlaylistFallbackMenu() {
                 'ytm-menu button[aria-haspopup="menu"], ' +
                 'ytm-menu button[aria-haspopup="true"], ' +
                 '.menu-renderer button[aria-label], ' +
+                '.overflow-menu button, ' +
                 '.overflow-menu button[aria-label], ' +
+                '.overflow-menu button[aria-label*="Action menu"], ' +
+                '.overflow-menu button[aria-label*="More actions"], ' +
                 '.overflow-menu button[aria-haspopup="menu"], ' +
-                '.overflow-menu button[aria-haspopup="true"]'
+                '.overflow-menu button[aria-haspopup="true"], ' +
+                '.menu-renderer button[aria-label*="Action menu"], ' +
+                '.menu-renderer button[aria-label*="More actions"], ' +
+                '.media-item-menu button[aria-label], ' +
+                '.media-item-menu button[aria-label*="Action menu"], ' +
+                '.media-item-menu button[aria-label*="More actions"], ' +
+                'ytm-bottom-sheet-renderer button[aria-label], ' +
+                'ytm-bottom-sheet-renderer button[aria-label*="Action menu"], ' +
+                'ytm-bottom-sheet-renderer button[aria-label*="More actions"], ' +
+                '.details button[aria-label*="Action menu"], ' +
+                '.details button[aria-label*="More actions"]'
             );
-            if (isVisible(btn)) return true;
+            if (isVisible(btn)) {
+                const host = btn.closest?.('.media-item-menu, ytm-bottom-sheet-renderer, ytm-menu-renderer, ytm-menu, .menu-renderer, .overflow-menu, .details');
+                if (host) return true;
+            }
         } catch (e) {
         }
         return false;
@@ -5362,6 +5597,11 @@ function ensureWatchPlaylistFallbackMenu() {
     const getYtmFallbackMenuHost = (card) => {
         if (!card) return null;
         return card.querySelector(
+            '.media-item-menu, ' +
+            'ytm-bottom-sheet-renderer.media-item-menu, ' +
+            '.details .media-item-menu, ' +
+            '.details ytm-bottom-sheet-renderer, ' +
+            'ytm-bottom-sheet-renderer, ' +
             '#menu, ' +
             '.comment-action-buttons, ' +
             '.YtmCompactMediaItemHost, ' +
@@ -5400,11 +5640,24 @@ function ensureWatchPlaylistFallbackMenu() {
         }
         const menuHost = getYtmFallbackMenuHost(card);
         if (!menuHost) return;
+        try {
+            const staleNativeMarker = menuHost.getAttribute?.('data-filtertube-native-menu-seen');
+            if (staleNativeMarker === '1' && !ytmCardHasNativeMenuButton(card)) {
+                menuHost.removeAttribute?.('data-filtertube-native-menu-seen');
+                menuHost.removeAttribute?.('data-filtertube-native-menu-seen-at');
+            }
+        } catch (e) {
+        }
 
         if (ytmCardHasNativeMenuButton(card)) {
             const existing = menuHost.querySelector('.filtertube-playlist-menu-fallback-btn[data-filtertube-fallback-menu="ytm"]');
             if (existing) {
                 try { existing.remove(); } catch (e) { }
+            }
+            try {
+                menuHost.setAttribute('data-filtertube-native-menu-seen', '1');
+                menuHost.setAttribute('data-filtertube-native-menu-seen-at', String(Date.now()));
+            } catch (e) {
             }
             return;
         }
@@ -5521,6 +5774,62 @@ function ensureWatchPlaylistFallbackMenu() {
         }
     };
 
+    const MENU_HOST_SELECTOR = [
+        'ytm-bottom-sheet-renderer',
+        '.media-item-menu',
+        'ytm-menu-renderer',
+        'ytm-menu',
+        'ytd-menu-renderer',
+        '.yt-lockup-metadata-view-model__menu-button',
+        '.comment-action-buttons',
+        '.overflow-menu',
+        '#menu',
+        '#action-menu',
+        '[aria-label="Action menu"]',
+        '[aria-label="More actions"]',
+        '[aria-label*="Action menu"]',
+        '[aria-label*="More actions"]',
+        '[aria-haspopup="menu"]',
+        '[aria-haspopup="true"]'
+    ].join(', ');
+
+    const ensureFallbackForMenuMutation = (node) => {
+        if (!node || !(node instanceof Element)) return;
+
+        let menuHost = null;
+        try {
+            if (node.matches?.(MENU_HOST_SELECTOR)) {
+                menuHost = node;
+            } else {
+                menuHost = node.closest?.(MENU_HOST_SELECTOR);
+            }
+        } catch (e) {
+        }
+        if (!menuHost) return;
+
+        const isWatchSurface = isWatchPage();
+        const isMobileSurface = isMobileYoutubeSurface();
+        const hostSelector = isMobileSurface
+            ? `${YTM_FALLBACK_SELECTOR}`
+            : `${DESKTOP_FALLBACK_SELECTOR}, [data-filtertube-video-id]`;
+
+        try {
+            const fallbackHost = menuHost.closest?.(hostSelector);
+            if (!fallbackHost) return;
+
+            if (isWatchSurface && isWatchPlaylist() && fallbackHost.matches?.('ytd-playlist-panel-video-renderer')) {
+                ensureFallbackButtonForRow(fallbackHost);
+                return;
+            }
+            if (isMobileSurface) {
+                ensureFallbackButtonForYtmCard(fallbackHost);
+            } else {
+                ensureFallbackButtonForRow(fallbackHost);
+            }
+        } catch (e) {
+        }
+    };
+
     const observerWithNodes = new MutationObserver((mutations) => {
         for (const mutation of mutations || []) {
             const added = mutation?.addedNodes;
@@ -5528,6 +5837,7 @@ function ensureWatchPlaylistFallbackMenu() {
             for (const node of added) {
                 if (!(node instanceof Element)) continue;
                 processNode(node);
+                ensureFallbackForMenuMutation(node);
             }
         }
     });

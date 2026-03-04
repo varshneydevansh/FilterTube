@@ -36,6 +36,8 @@ playlist.html
 post_opt1_logs.txt
 collab_on_homepage.html
 collab_in_playlist_mix.html
+reel_item_watch?prettyPrint=False.JSON
+strange_ytInitialData.json
 WHITELIST_background.js
 WHITELIST_content.js
 yt_kids_latest.json
