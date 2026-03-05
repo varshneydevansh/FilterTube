@@ -26,6 +26,8 @@ ehthumbs.db
 Thumbs.db
 logs.json
 text.txt
+comments.json
+tmp.json
 playlist.json
 watchpage.json
 collab.json
@@ -55,6 +57,10 @@ YTM-LOGS.txt
 YTM-WATCH PLAYER.html
 YTM-XHR.json
 YTM.json
+extracted_watch_paths.txt
+get_watch?prettyPrint=false.json
+docs/spa-collab-watchlist-handoff.md
+watcher-collab-watchlist-spa-fix-plan.md
 
 # Logs
 *.log

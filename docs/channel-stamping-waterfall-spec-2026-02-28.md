@@ -163,6 +163,17 @@ This section provides the absolute path for every identity attribute across all 
   - **Channel Logo**: `.listItemViewModel.leadingAccessory.avatarViewModel.image.sources[0].url`
   - **Subscriber Count**: `.listItemViewModel.subtitle.content` (Regex for "N subscribers")
 
+### 2.10.1 `get_watch?prettyPrint=false` collaborator path variants
+
+- The same roster is not always under `sheetViewModel`; in many watch responses the effective path is:
+  - `videoSecondaryInfoRenderer.owner.videoOwnerRenderer.navigationEndpoint.showDialogCommand.panelLoadingStrategy.inlineContent.dialogViewModel.customContent.listViewModel.listItems[]`
+  - or `...showSheetCommand.panelLoadingStrategy.inlineContent.dialogViewModel.content.listViewModel.listItems[]`
+  - or `...showDialogCommand.panelLoadingStrategy.inlineContent.dialogViewModel.customContent.listViewModel.listItems[]`
+- Observed shape limits:
+  - Some watch payload variants include names in `attributedTitle` only (`"... and 2 more"`) and do not include per-collaborator ids in the same byline path.
+  - Some responses include handle/ID only for one collaborator entry while the roster remains partial.
+  - Rely on this path only when it is explicitly a collaborator roster context; do not convert aggregate text to blocking target names.
+
 ### 2.11 `commentEntityPayload` (Comment Context)
 *Found in: `YT_MAIN_NEXT_RESPONSE_COMMENT.json`*
 
@@ -203,6 +214,16 @@ type ChannelIdentityRow = {
 ```
 
 Block only when `id` can be finalized to a UC ID or we have a deterministic identity path that can be resolved to one.
+
+For `get_watch` flows with partial payloads:
+
+- Prefer `id` from `videoDetails.channelId` / resolved owner endpoint first.
+- Fall back to deterministic `expectedChannelName` / `source` derived from `videoSecondaryInfoRenderer`/`playerMicroformat`.
+- Then use DOM-confirmed text only if it is not collapsed-byline (`A, B and more`, `and N more`, comma-heavy byline).
+- Only use handle fallback after richer fields are absent.
+- Keep strict safety for label/id stamping:
+  - `data-filtertube-channel-id` only when it matches `^UC[a-zA-Z0-9_-]{22}$`.
+  - `Block Channel` should remain the final fallback when no safe non-empty name exists.
 
 ---
 

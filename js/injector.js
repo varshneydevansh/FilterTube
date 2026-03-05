@@ -135,18 +135,45 @@
 
         const nameSet = new Set(expectedNames.map(normalizeLooseText).filter(Boolean));
         const handleSet = new Set(expectedHandles.map(normalizeExpectedHandle).filter(Boolean));
+        const comparableExpectedNames = Array.from(nameSet)
+            .map((value) => value
+                .replace(/\b(?:vevo|topic)\b/g, ' ')
+                .replace(/[^a-z0-9]+/g, '')
+                .trim()
+            )
+            .filter(Boolean);
 
         // If caller didn't send expectations, we must not reject results solely on that.
         const hasAny = nameSet.size > 0 || handleSet.size > 0;
 
         return {
             hasAny,
+            nameCount: nameSet.size,
+            handleCount: handleSet.size,
             matchesAny(collaborator) {
                 if (!hasAny) return true;
                 if (!collaborator || typeof collaborator !== 'object') return false;
                 const name = normalizeLooseText(collaborator.name);
                 const handle = normalizeExpectedHandle(collaborator.handle);
-                return (name && nameSet.has(name)) || (handle && handleSet.has(handle));
+                const compactName = name
+                    ? name
+                        .replace(/\b(?:vevo|topic)\b/g, ' ')
+                        .replace(/[^a-z0-9]+/g, '')
+                        .trim()
+                    : '';
+                const fuzzyNameMatch = compactName
+                    ? comparableExpectedNames.some((expected) => {
+                        if (!expected) return false;
+                        const minLen = Math.min(expected.length, compactName.length);
+                        if (minLen < 4) return false;
+                        return compactName.startsWith(expected) || expected.startsWith(compactName);
+                    })
+                    : false;
+                return (
+                    (name && nameSet.has(name)) ||
+                    fuzzyNameMatch ||
+                    (handle && handleSet.has(handle))
+                );
             }
         };
     }
@@ -171,6 +198,40 @@
         }
 
         return true;
+    }
+
+    function scoreCollaboratorCandidate(list, matcher, depth = 0) {
+        if (!Array.isArray(list) || list.length < 2) return -1;
+
+        const hasMatch = matcher?.hasAny
+            ? list.some(c => matcher.matchesAny(c))
+            : true;
+        if (!hasMatch) return -1;
+
+        const matchCount = matcher?.hasAny
+            ? list.reduce((count, collaborator) => count + (matcher.matchesAny(collaborator) ? 1 : 0), 0)
+            : list.length;
+        const matchRatio = matcher?.hasAny ? matchCount / list.length : 1;
+
+        const idMatchCount = list.reduce((count, collaborator) => {
+            if (!collaborator || typeof collaborator !== 'object') return count;
+            if (collaborator.id) count += 1;
+            if (collaborator.handle) count += 0.5;
+            if (collaborator.customUrl) count += 0.5;
+            return count;
+        }, 0);
+
+        const quality = getCollaboratorListQuality(list);
+        const depthPenalty = Math.min(10, Math.max(0, depth));
+
+        return (
+            quality * 25 +
+            list.length * 12 +
+            idMatchCount * 8 +
+            matchCount * 6 +
+            matchRatio * 50 -
+            depthPenalty
+        );
     }
 
     function cacheCollaboratorsIfBetter(videoId, collaborators = []) {
@@ -245,11 +306,22 @@
 
             const cacheValid = isValidCollaboratorResponse(collaboratorInfo, matcher);
             const ytValid = isValidCollaboratorResponse(ytInitialDataCollaborators, matcher);
+            const ytLooseValid = isValidCollaboratorResponse(ytInitialDataCollaborators, null);
+            const strictHandleExpectation = Boolean(matcher?.handleCount);
 
             if (ytValid && (!cacheValid || ytScore > collaboratorScore)) {
                 collaboratorInfo = cacheCollaboratorsIfBetter(videoId, ytInitialDataCollaborators);
                 collaboratorScore = ytScore;
             } else if (!cacheValid && ytValid) {
+                collaboratorInfo = cacheCollaboratorsIfBetter(videoId, ytInitialDataCollaborators);
+                collaboratorScore = ytScore;
+            } else if (
+                ytLooseValid &&
+                !strictHandleExpectation &&
+                (!cacheValid || ytScore > collaboratorScore)
+            ) {
+                // VideoId-anchored fallback: return the best roster even when name hints
+                // are slightly mismatched (e.g. "Shakira" vs "shakiraVEVO").
                 collaboratorInfo = cacheCollaboratorsIfBetter(videoId, ytInitialDataCollaborators);
                 collaboratorScore = ytScore;
             } else if (!cacheValid) {
@@ -394,11 +466,51 @@
 
         const extractListItemsFromSheetLikeCommand = (command) => {
             if (!command || typeof command !== 'object') return [];
-            const listItems =
-                command?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems ||
-                command?.panelLoadingStrategy?.inlineContent?.sheetViewModel?.content?.listViewModel?.listItems ||
-                [];
-            return Array.isArray(listItems) ? listItems : [];
+            const candidates = [
+                command?.listViewModel?.listItems,
+                command?.content?.listViewModel?.listItems,
+                command?.customContent?.listViewModel?.listItems,
+                command?.presenterDialogViewModel?.listViewModel?.listItems,
+                command?.presenterDialogViewModel?.content?.listViewModel?.listItems,
+                command?.presenterDialogViewModel?.customContent?.listViewModel?.listItems,
+                command?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.listViewModel?.listItems,
+                command?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems,
+                command?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.listViewModel?.listItems,
+                command?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.sheetViewModel?.content?.listViewModel?.listItems,
+                command?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.listViewModel?.listItems,
+                command?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems,
+                command?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.sheetViewModel?.content?.listViewModel?.listItems,
+                command?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems,
+                command?.panelLoadingStrategy?.inlineContent?.sheetViewModel?.content?.listViewModel?.listItems,
+                command?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.content?.listViewModel?.listItems,
+                command?.panelLoadingStrategy?.inlineContent?.dialog?.presenterDialogViewModel?.customContent?.listViewModel?.listItems,
+                command?.panelLoadingStrategy?.inlineContent?.dialog?.presenterDialogViewModel?.content?.listViewModel?.listItems,
+                command?.panelLoadingStrategy?.inlineContent?.dialog?.presenterDialogViewModel?.listViewModel?.listItems,
+                command?.panelLoadingStrategy?.inlineContent?.dialog?.dialogViewModel?.content?.listViewModel?.listItems,
+                command?.panelLoadingStrategy?.inlineContent?.dialog?.dialogViewModel?.customContent?.listViewModel?.listItems,
+                command?.panelLoadingStrategy?.inlineContent?.dialog?.dialogViewModel?.listViewModel?.listItems,
+                command?.dialog?.presenterDialogViewModel?.content?.listViewModel?.listItems,
+                command?.dialog?.presenterDialogViewModel?.customContent?.listViewModel?.listItems,
+                command?.dialog?.presenterDialogViewModel?.listViewModel?.listItems,
+                command?.dialog?.dialogViewModel?.content?.listViewModel?.listItems,
+                command?.dialog?.dialogViewModel?.customContent?.listViewModel?.listItems,
+                command?.dialog?.dialogViewModel?.listViewModel?.listItems,
+                command?.showDialogCommand?.dialog?.presenterDialogViewModel?.content?.listViewModel?.listItems,
+                command?.showDialogCommand?.dialog?.presenterDialogViewModel?.customContent?.listViewModel?.listItems,
+                command?.showDialogCommand?.dialog?.presenterDialogViewModel?.listViewModel?.listItems,
+                command?.showDialogCommand?.dialog?.dialogViewModel?.content?.listViewModel?.listItems,
+                command?.showDialogCommand?.dialog?.dialogViewModel?.customContent?.listViewModel?.listItems,
+                command?.showDialogCommand?.dialog?.dialogViewModel?.listViewModel?.listItems,
+                command?.showDialogCommand?.dialog?.presenterDialogViewModel?.content?.listViewModel?.listItems,
+                command?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.content?.listViewModel?.listItems,
+                command?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.content?.listViewModel?.listItems,
+                command?.showSheetCommand?.presenterDialogViewModel?.content?.listViewModel?.listItems,
+                command?.showSheetCommand?.presenterDialogViewModel?.customContent?.listViewModel?.listItems,
+            ];
+            for (const candidate of candidates) {
+                if (Array.isArray(candidate) && candidate.length > 0) return candidate;
+            }
+            return [];
         };
 
         const extractFromSheetLikeCommand = (sheetCommand) => {
@@ -557,6 +669,16 @@
                 const collaborators = extractFromSheetLikeCommand(sheetLikeCommand);
                 if (collaborators) return collaborators;
             }
+        }
+
+        // Home/watch lockups can expose collaborator rosters on owner text command runs
+        // even when byline-level deep scans miss the exact command payload path.
+        const ownerRunsForCommands = Array.isArray(renderer.ownerText?.runs) ? renderer.ownerText.runs : [];
+        for (const run of ownerRunsForCommands) {
+            const ownerSheetCommand = run?.navigationEndpoint?.showDialogCommand || run?.navigationEndpoint?.showSheetCommand;
+            if (!ownerSheetCommand) continue;
+            const collaborators = extractFromSheetLikeCommand(ownerSheetCommand);
+            if (collaborators) return collaborators;
         }
 
         // Some surfaces expose collaboration via avatarStackViewModel rather than showDialogCommand.
@@ -726,8 +848,8 @@
         return '';
     }
 
-    function mergeChannelCandidates(...candidates) {
-        const merged = { id: null, handle: null, name: null, logo: null, customUrl: null };
+        function mergeChannelCandidates(...candidates) {
+        const merged = { id: null, handle: null, name: null, logo: null, customUrl: null, allCollaborators: null };
         for (const candidate of candidates) {
             if (!candidate || typeof candidate !== 'object') continue;
             if (!merged.id && typeof candidate.id === 'string' && candidate.id.trim()) merged.id = candidate.id.trim();
@@ -735,6 +857,9 @@
             if (!merged.name && typeof candidate.name === 'string' && candidate.name.trim()) merged.name = candidate.name.trim();
             if (!merged.logo && typeof candidate.logo === 'string' && candidate.logo.trim()) merged.logo = candidate.logo.trim();
             if (!merged.customUrl && typeof candidate.customUrl === 'string' && candidate.customUrl.trim()) merged.customUrl = candidate.customUrl.trim();
+            if (!merged.allCollaborators && Array.isArray(candidate.allCollaborators) && candidate.allCollaborators.length > 0) {
+                merged.allCollaborators = candidate.allCollaborators;
+            }
         }
         const hasAny = Boolean(merged.id || merged.handle || merged.name || merged.logo || merged.customUrl);
         return hasAny ? merged : null;
@@ -819,6 +944,176 @@
 
         const extractOwnerCandidate = (ownerRenderer) => {
             if (!ownerRenderer || typeof ownerRenderer !== 'object') return null;
+
+            const extractOwnerCommandCollaborators = (command) => {
+                if (!command || typeof command !== 'object') return null;
+                const visited = new WeakSet();
+                const collectCommands = (root, depth = 0) => {
+                    if (!root || typeof root !== 'object' || depth > 12 || visited.has(root)) return [];
+                    visited.add(root);
+
+                    const nested = [
+                        root,
+                        root?.showDialogCommand,
+                        root?.showSheetCommand,
+                        root?.command,
+                        root?.command?.showDialogCommand,
+                        root?.command?.showSheetCommand,
+                        root?.command?.dialog?.presenterDialogViewModel,
+                        root?.command?.dialog?.dialogViewModel,
+                        root?.command?.dialog?.listViewModel,
+                        root?.dialog?.presenterDialogViewModel,
+                        root?.dialog?.dialogViewModel,
+                        root?.dialog?.listViewModel,
+                        root?.showDialogCommand?.dialog?.presenterDialogViewModel,
+                        root?.showDialogCommand?.dialog?.dialogViewModel,
+                        root?.showDialogCommand?.dialog?.listViewModel,
+                        root?.showSheetCommand?.dialog?.presenterDialogViewModel,
+                        root?.showDialogCommand?.dialog?.dialogViewModel,
+                        root?.showSheetCommand?.dialog?.dialogViewModel,
+                        root?.showDialogCommand?.dialog?.panelLoadingStrategy?.inlineContent?.dialogViewModel,
+                        root?.showSheetCommand?.dialog?.panelLoadingStrategy?.inlineContent?.dialogViewModel,
+                        root?.showDialogCommand?.dialog?.panelLoadingStrategy?.inlineContent?.dialog?.presenterDialogViewModel,
+                        root?.showDialogCommand?.dialog?.panelLoadingStrategy?.inlineContent?.dialog?.dialogViewModel,
+                        root?.showSheetCommand?.dialog?.panelLoadingStrategy?.inlineContent?.dialog?.presenterDialogViewModel,
+                        root?.showSheetCommand?.dialog?.panelLoadingStrategy?.inlineContent?.dialog?.dialogViewModel,
+                        root?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.dialogViewModel,
+                        root?.showDialogCommand?.showDialogCommand,
+                        root?.showDialogCommand?.showSheetCommand,
+                        root?.showSheetCommand?.showDialogCommand,
+                        root?.showSheetCommand?.showSheetCommand,
+                        root?.panelLoadingStrategy?.inlineContent?.dialogViewModel,
+                        root?.panelLoadingStrategy?.inlineContent?.sheetViewModel,
+                        root?.panelLoadingStrategy?.inlineContent?.dialog?.presenterDialogViewModel,
+                        root?.panelLoadingStrategy?.inlineContent?.sheetViewModel?.presenterDialogViewModel,
+                        root?.presenterDialogViewModel,
+                        root?.content,
+                        root?.customContent
+                    ];
+
+                    const candidates = [];
+                    for (const child of nested) {
+                        if (!child || typeof child !== 'object') continue;
+                        const children = collectCommands(child, depth + 1);
+                        for (const collected of children) {
+                            candidates.push(collected);
+                        }
+                    }
+                    return [root, ...candidates];
+                };
+
+                const commandCandidates = collectCommands(command);
+                for (const candidateCommand of commandCandidates) {
+                    const collaborators = extractFromSheetLikeCommand(candidateCommand);
+                    if (Array.isArray(collaborators) && collaborators.length > 0) return collaborators;
+                }
+                return null;
+            };
+
+            const looksLikeCollapsedByline = (value) => {
+                if (!value || typeof value !== 'string') return false;
+                const trimmed = value.replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
+                if (!trimmed) return false;
+                if (trimmed.includes('•')) return true;
+                if (/,/.test(trimmed)) return true;
+                if (/\band\s+\d+\s+more\b/i.test(trimmed) || /\band\s+more\b/i.test(trimmed)) return true;
+                return false;
+            };
+
+            const ownerNavCommands = [
+                ownerRenderer?.navigationEndpoint,
+                ownerRenderer?.navigationEndpoint?.command,
+                ownerRenderer?.navigationEndpoint?.showDialogCommand,
+                ownerRenderer?.navigationEndpoint?.showSheetCommand,
+                ownerRenderer?.navigationEndpoint?.command?.showDialogCommand,
+                ownerRenderer?.navigationEndpoint?.command?.showSheetCommand,
+                ownerRenderer?.navigationEndpoint?.dialog?.presenterDialogViewModel,
+                ownerRenderer?.navigationEndpoint?.dialog?.dialogViewModel,
+                ownerRenderer?.navigationEndpoint?.dialog?.listViewModel,
+                ownerRenderer?.navigationEndpoint?.showDialogCommand?.dialog?.presenterDialogViewModel,
+                ownerRenderer?.navigationEndpoint?.showDialogCommand?.presenterDialogViewModel,
+                ownerRenderer?.navigationEndpoint?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel,
+                ownerRenderer?.navigationEndpoint?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel,
+                ownerRenderer?.navigationEndpoint?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel,
+                ownerRenderer?.navigationEndpoint?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.sheetViewModel,
+                ownerRenderer?.navigationEndpoint?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.sheetViewModel,
+                ownerRenderer?.navigationEndpoint?.showDialogCommand?.showDialogCommand,
+                ownerRenderer?.navigationEndpoint?.showDialogCommand?.showSheetCommand,
+                ownerRenderer?.navigationEndpoint?.showSheetCommand?.showDialogCommand,
+                ownerRenderer?.navigationEndpoint?.showSheetCommand?.showSheetCommand,
+                ownerRenderer?.navigationEndpoint?.showDialogCommand?.dialog?.presenterDialogViewModel,
+                ownerRenderer?.navigationEndpoint?.showDialogCommand?.dialog?.dialogViewModel,
+                ownerRenderer?.navigationEndpoint?.showDialogCommand?.dialog?.listViewModel,
+                ownerRenderer?.navigationEndpoint?.showDialogCommand?.dialog?.dialogViewModel,
+                ownerRenderer?.navigationEndpoint?.showSheetCommand?.dialog?.presenterDialogViewModel,
+                ownerRenderer?.navigationEndpoint?.showSheetCommand?.dialog?.dialogViewModel,
+                ownerRenderer?.navigationEndpoint?.showSheetCommand?.dialog?.listViewModel,
+                ownerRenderer?.navigationEndpoint?.command?.showDialogCommand?.dialog?.presenterDialogViewModel,
+                ownerRenderer?.navigationEndpoint?.command?.dialog?.presenterDialogViewModel,
+                ownerRenderer?.navigationEndpoint?.command?.dialog?.dialogViewModel,
+                ownerRenderer?.navigationEndpoint?.command?.dialog?.listViewModel,
+                ownerRenderer?.navigationEndpoint?.command?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel,
+                ownerRenderer?.navigationEndpoint?.command?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel,
+                ownerRenderer?.navigationEndpoint?.command?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.sheetViewModel,
+                ownerRenderer?.navigationEndpoint?.command?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.sheetViewModel,
+                ownerRenderer?.navigationEndpoint?.showDialogCommand?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel,
+                ownerRenderer?.navigationEndpoint?.showSheetCommand?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel
+            ];
+
+            let allCollaborators = [];
+            for (const ownerNavCommand of ownerNavCommands) {
+                if (!ownerNavCommand) continue;
+                const directFromOwnerCommand = extractOwnerCommandCollaborators(ownerNavCommand);
+                if (Array.isArray(directFromOwnerCommand) && directFromOwnerCommand.length > 0) {
+                    allCollaborators = directFromOwnerCommand;
+                    break;
+                }
+            }
+
+            if (!allCollaborators.length) {
+                const allRuns = [
+                    ...(Array.isArray(ownerRenderer?.title?.runs) ? ownerRenderer.title.runs : []),
+                    ...(Array.isArray(ownerRenderer?.shortBylineText?.runs) ? ownerRenderer.shortBylineText.runs : [])
+                ];
+                for (const run of allRuns) {
+                    const command = run?.navigationEndpoint?.showDialogCommand
+                        || run?.navigationEndpoint?.showSheetCommand
+                        || run?.navigationEndpoint
+                        || run?.navigationEndpoint?.command?.showDialogCommand
+                        || run?.navigationEndpoint?.command?.showSheetCommand
+                        || run?.navigationEndpoint?.dialog?.presenterDialogViewModel
+                        || run?.navigationEndpoint?.dialog?.dialogViewModel
+                        || run?.navigationEndpoint?.dialog?.listViewModel
+                        || run?.navigationEndpoint?.showDialogCommand?.dialog?.presenterDialogViewModel
+                        || run?.navigationEndpoint?.showDialogCommand?.dialog?.dialogViewModel
+                        || run?.navigationEndpoint?.showDialogCommand?.dialog?.listViewModel
+                        || run?.navigationEndpoint?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel
+                        || run?.navigationEndpoint?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialog?.presenterDialogViewModel
+                        || run?.navigationEndpoint?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialog?.dialogViewModel
+                        || run?.navigationEndpoint?.showDialogCommand?.dialog?.dialogViewModel
+                        || run?.navigationEndpoint?.showDialogCommand?.dialog?.panelLoadingStrategy?.inlineContent?.dialogViewModel
+                        || run?.navigationEndpoint?.showDialogCommand?.showDialogCommand?.dialog?.presenterDialogViewModel
+                        || run?.navigationEndpoint?.showDialogCommand?.showDialogCommand?.dialog?.dialogViewModel
+                        || run?.navigationEndpoint?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel
+                        || run?.navigationEndpoint?.showSheetCommand?.dialog?.presenterDialogViewModel
+                        || run?.navigationEndpoint?.showSheetCommand?.dialog?.dialogViewModel
+                        || run?.navigationEndpoint?.showSheetCommand?.dialog?.listViewModel
+                        || run?.navigationEndpoint?.showSheetCommand?.dialog?.presenterDialogViewModel
+                        || run?.navigationEndpoint?.showSheetCommand?.dialog?.dialogViewModel
+                        || run?.navigationEndpoint?.showSheetCommand?.dialog?.panelLoadingStrategy?.inlineContent?.dialogViewModel
+                        || run?.navigationEndpoint?.showDialogCommand?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel
+                        || run?.navigationEndpoint?.showSheetCommand?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel
+                        || run?.navigationEndpoint?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.sheetViewModel
+                        || run?.navigationEndpoint?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.sheetViewModel;
+                    if (!command) continue;
+                    const fromRunCommand = extractOwnerCommandCollaborators(command);
+                    if (Array.isArray(fromRunCommand) && fromRunCommand.length > 0) {
+                        allCollaborators = fromRunCommand;
+                        break;
+                    }
+                }
+            }
+
             const endpoint =
                 ownerRenderer?.navigationEndpoint?.browseEndpoint ||
                 ownerRenderer?.title?.runs?.[0]?.navigationEndpoint?.browseEndpoint ||
@@ -836,12 +1131,28 @@
                 handle: handle || null,
                 name: name || null,
                 logo: logo || null,
-                customUrl: customUrl || null
+                customUrl: customUrl || null,
+                allCollaborators: Array.isArray(allCollaborators) ? allCollaborators : null
             };
+
+            const candidateNameIsCollapsed = looksLikeCollapsedByline(candidate.name);
+            if ((!candidate.name || candidateNameIsCollapsed) && Array.isArray(candidate.allCollaborators) && candidate.allCollaborators.length > 0) {
+                const firstCollaboratorName = (candidate.allCollaborators[0]?.name || '').trim();
+                if (firstCollaboratorName && !looksLikeCollapsedByline(firstCollaboratorName) && !isLikelyBadName(firstCollaboratorName)) {
+                    candidate.name = firstCollaboratorName;
+                }
+            }
+
+            if (!candidate.id && !candidate.handle && !candidate.name && !candidate.logo && !candidate.customUrl) {
+                if (Array.isArray(candidate.allCollaborators) && candidate.allCollaborators.length > 0 && candidate.allCollaborators[0]?.name) {
+                    candidate.name = candidate.allCollaborators[0].name;
+                }
+            }
 
             if (!candidate.id && !candidate.handle && !candidate.name && !candidate.logo && !candidate.customUrl) {
                 return null;
             }
+
             if (!hasExpectations || matchesExpectations(candidate)) {
                 return candidate;
             }
@@ -869,37 +1180,71 @@
         };
 
         const watchOwnerCandidate = (() => {
-            const initialDataRoot = window.ytInitialData || window.filterTube?.lastYtInitialData || window.filterTube?.rawYtInitialData || null;
-            if (!isCurrentWatchVideo || !initialDataRoot) return null;
-            const visitedOwner = new WeakSet();
-            const scan = (node, depth = 0) => {
-                if (!node || typeof node !== 'object' || visitedOwner.has(node) || depth > 10) return null;
-                visitedOwner.add(node);
-                if (node.videoSecondaryInfoRenderer?.owner?.videoOwnerRenderer) {
-                    const cand = extractOwnerCandidate(node.videoSecondaryInfoRenderer.owner.videoOwnerRenderer);
-                    if (cand) return cand;
-                }
-                if (node.videoOwnerRenderer) {
-                    const cand = extractOwnerCandidate(node.videoOwnerRenderer);
-                    if (cand) return cand;
-                }
-                if (Array.isArray(node)) {
-                    for (const child of node.slice(0, 40)) {
-                        const found = scan(child, depth + 1);
+            if (!isCurrentWatchVideo) return null;
+
+            const watchOwnerRoots = [];
+            if (window.ytInitialData) {
+                watchOwnerRoots.push({ root: window.ytInitialData, label: 'ytInitialData' });
+            }
+            if (window.filterTube?.lastYtInitialData) {
+                watchOwnerRoots.push({ root: window.filterTube.lastYtInitialData, label: 'filterTube.lastYtInitialData' });
+            }
+            if (window.filterTube?.rawYtInitialData) {
+                watchOwnerRoots.push({ root: window.filterTube.rawYtInitialData, label: 'filterTube.rawYtInitialData' });
+            }
+            if (window.filterTube?.lastYtNextResponse) {
+                watchOwnerRoots.push({ root: window.filterTube.lastYtNextResponse, label: 'filterTube.lastYtNextResponse' });
+            }
+            const watchPlayerRoot = window.filterTube?.lastYtPlayerResponse || window.filterTube?.lastYtInitialPlayerResponse || window.filterTube?.rawYtInitialPlayerResponse;
+            if (watchPlayerRoot) {
+                watchOwnerRoots.push({ root: watchPlayerRoot, label: 'filterTube.watchPlayerRoot' });
+            } else if (window.ytInitialPlayerResponse) {
+                watchOwnerRoots.push({ root: window.ytInitialPlayerResponse, label: 'ytInitialPlayerResponse' });
+            }
+
+            const scanWithLog = (root, rootLabel) => {
+                if (!root || typeof root !== 'object') return null;
+                const visitedOwner = new WeakSet();
+                const scan = (node, depth = 0) => {
+                    if (!node || typeof node !== 'object' || visitedOwner.has(node) || depth > 10) return null;
+                    visitedOwner.add(node);
+                    if (node.videoSecondaryInfoRenderer?.owner?.videoOwnerRenderer) {
+                        const cand = extractOwnerCandidate(node.videoSecondaryInfoRenderer.owner.videoOwnerRenderer);
+                        if (cand) return cand;
+                    }
+                    if (node.videoOwnerRenderer) {
+                        const cand = extractOwnerCandidate(node.videoOwnerRenderer);
+                        if (cand) return cand;
+                    }
+                    if (Array.isArray(node)) {
+                        for (const child of node.slice(0, 40)) {
+                            const found = scan(child, depth + 1);
+                            if (found) return found;
+                        }
+                        return null;
+                    }
+                    for (const key in node) {
+                        if (!Object.prototype.hasOwnProperty.call(node, key)) continue;
+                        const value = node[key];
+                        if (!value || typeof value !== 'object') continue;
+                        const found = scan(value, depth + 1);
                         if (found) return found;
                     }
                     return null;
+                };
+                const found = scan(root);
+                if (found) {
+                    postLog('log', `Watch owner candidate found in ${rootLabel}`);
                 }
-                for (const key in node) {
-                    if (!Object.prototype.hasOwnProperty.call(node, key)) continue;
-                    const value = node[key];
-                    if (!value || typeof value !== 'object') continue;
-                    const found = scan(value, depth + 1);
-                    if (found) return found;
-                }
-                return null;
+                return found;
             };
-            return scan(initialDataRoot);
+
+            for (const target of watchOwnerRoots) {
+                const found = scanWithLog(target.root, target.label);
+                if (found) return found;
+            }
+
+            return null;
         })();
 
         // Build the list of roots to search.
@@ -1024,6 +1369,27 @@
                 const byline = node.shortBylineText || node.longBylineText || node.ownerText;
                 if (byline?.runs && Array.isArray(byline.runs)) {
                     for (const run of byline.runs) {
+                        const runOwnerCandidate = run?.navigationEndpoint
+                            ? extractOwnerCandidate({ navigationEndpoint: run.navigationEndpoint })
+                            : null;
+                        if (
+                            runOwnerCandidate &&
+                            (
+                                runOwnerCandidate.id ||
+                                runOwnerCandidate.handle ||
+                                runOwnerCandidate.customUrl ||
+                                runOwnerCandidate.allCollaborators?.length > 0 ||
+                                runOwnerCandidate.name
+                            )
+                        ) {
+                            if (!hasExpectations || matchesExpectations(runOwnerCandidate)) {
+                                return runOwnerCandidate;
+                            }
+                            if (!fallbackCandidate) {
+                                fallbackCandidate = runOwnerCandidate;
+                            }
+                        }
+
                         const browse = run?.navigationEndpoint?.browseEndpoint;
                         if (!browse) continue;
 
@@ -1146,9 +1512,11 @@
 
         let result = null;
         const playerCandidate = (() => {
-            const ftPlayer = window.filterTube?.lastYtInitialPlayerResponse || window.filterTube?.rawYtInitialPlayerResponse;
-            const basePlayer = ftPlayer || window.ytInitialPlayerResponse;
-            const extracted = extractFromPlayerResponse(basePlayer);
+            const ftPlayer = window.filterTube?.lastYtPlayerResponse ||
+                window.filterTube?.lastYtInitialPlayerResponse ||
+                window.filterTube?.rawYtInitialPlayerResponse ||
+                window.ytInitialPlayerResponse;
+            const extracted = extractFromPlayerResponse(ftPlayer);
             if (extracted) {
                 if (!hasExpectations || matchesExpectations(extracted)) {
                     return extracted;
@@ -1410,7 +1778,7 @@
      * @param {string} videoId
      * @returns {Array|null}
      */
-    function searchYtInitialDataForCollaborators(videoId, matcher = null) {
+function searchYtInitialDataForCollaborators(videoId, matcher = null) {
         if (!videoId) {
             postLog('log', 'Collaborator search skipped - missing videoId');
             return null;
@@ -1419,6 +1787,13 @@
         postLog('log', `Searching collaborators for ${videoId}...`);
 
         let result = null;
+
+        let bestMatched = null;
+        let bestMatchedScore = -1;
+        let bestMatchedDepth = Infinity;
+        let bestFallback = null;
+        let bestFallbackScore = -1;
+        let bestFallbackDepth = Infinity;
 
         const roots = [];
         if (window.ytInitialData) {
@@ -1436,6 +1811,13 @@
         }
         if (window.filterTube?.lastYtBrowseResponse) {
             roots.push({ root: window.filterTube.lastYtBrowseResponse, label: 'filterTube.lastYtBrowseResponse' });
+        }
+        if (window.filterTube?.lastYtPlayerResponse) {
+            roots.push({ root: window.filterTube.lastYtPlayerResponse, label: 'filterTube.lastYtPlayerResponse' });
+        }
+        const playerRoot = window.filterTube?.lastYtInitialPlayerResponse || window.filterTube?.rawYtInitialPlayerResponse || window.ytInitialPlayerResponse;
+        if (playerRoot) {
+            roots.push({ root: playerRoot, label: 'filterTube.playerResponse' });
         }
 
         const extractVideoIdFromNode = (node) => {
@@ -1467,20 +1849,34 @@
         for (const target of roots) {
             const visited = new WeakSet();
             function searchObject(obj, depth = 0) {
-                if (!obj || typeof obj !== 'object' || visited.has(obj) || depth > 12) return null;
+                if (!obj || typeof obj !== 'object' || visited.has(obj) || depth > 20) return;
                 visited.add(obj);
 
                 const nodeVideoId = extractVideoIdFromNode(obj);
                 if (nodeVideoId === videoId) {
                     const extracted = extractCollaboratorsFromDataObject(obj);
                     if (Array.isArray(extracted) && extracted.length > 0) {
-                        // Only treat this as a valid collaboration result when it is a true roster (2+ channels)
-                        // and matches expectations from the clicked card (when provided).
-                        if (!isValidCollaboratorResponse(extracted, matcher)) {
-                            return null;
+                        const isMatch = matcher?.hasAny
+                            ? extracted.some(candidate => matcher.matchesAny(candidate))
+                            : false;
+                        const score = scoreCollaboratorCandidate(extracted, matcher, depth);
+
+                        // First-class candidate: matches expected identity signals (when available)
+                        if (isMatch) {
+                            if (score > bestMatchedScore || (score === bestMatchedScore && depth < bestMatchedDepth)) {
+                                bestMatchedScore = score;
+                                bestMatchedDepth = depth;
+                                bestMatched = extracted;
+                            }
+                        } else if (isValidCollaboratorResponse(extracted, null)) {
+                            // Secondary candidate: valid roster that does not match expected signals yet.
+                            const fallbackScore = scoreCollaboratorCandidate(extracted, null, depth);
+                            if (fallbackScore > bestFallbackScore || (fallbackScore === bestFallbackScore && depth < bestFallbackDepth)) {
+                                bestFallbackScore = fallbackScore;
+                                bestFallbackDepth = depth;
+                                bestFallback = extracted;
+                            }
                         }
-                        postLog('log', `✅ Found collaborators via ${target.label}`);
-                        return extracted;
                     }
                 }
 
@@ -1490,22 +1886,25 @@
                     if (!value || typeof value !== 'object') continue;
                     if (Array.isArray(value)) {
                         for (let i = 0; i < value.length; i++) {
-                            const nested = searchObject(value[i], depth + 1);
-                            if (nested) return nested;
+                            searchObject(value[i], depth + 1);
                         }
                     } else {
-                        const nested = searchObject(value, depth + 1);
-                        if (nested) return nested;
+                        searchObject(value, depth + 1);
                     }
                 }
-
-                return null;
             }
 
-            result = searchObject(target.root);
-            if (result) {
-                return result;
-            }
+            searchObject(target.root);
+        }
+
+        if (bestMatched) {
+            postLog('log', `✅ Found collaborators for ${videoId} via matched roster`);
+            return bestMatched;
+        }
+
+        if (bestFallback) {
+            postLog('log', `⚠️ Found collaborators for ${videoId} via fallback roster`);
+            return bestFallback;
         }
 
         postLog('log', '⚠️ Global search failed. Attempting DOM hydration…');
@@ -1519,7 +1918,17 @@
         const baseElement = document.querySelector(selector);
         if (baseElement) {
             candidates.push(baseElement);
-            const wrapper = baseElement.closest('ytd-rich-item-renderer, ytd-grid-video-renderer, ytd-compact-video-renderer, ytd-playlist-video-renderer, ytd-video-renderer');
+            const wrapper = baseElement.closest(
+                'ytd-rich-item-renderer, ' +
+                'ytd-grid-video-renderer, ' +
+                'ytd-compact-video-renderer, ' +
+                'ytd-playlist-video-renderer, ' +
+                'ytd-playlist-panel-video-renderer, ' +
+                'ytd-playlist-panel-video-wrapper-renderer, ' +
+                'ytm-playlist-panel-video-renderer, ' +
+                'ytm-playlist-panel-video-wrapper-renderer, ' +
+                'ytd-video-renderer'
+            );
             if (wrapper && wrapper !== baseElement) {
                 candidates.push(wrapper);
             }
@@ -1543,6 +1952,34 @@
             }
         } else {
             postLog('warn', `❌ Could not find DOM element for ${videoId}`);
+        }
+
+        // Watch-page fallback: selected playlist row and owner metadata often keep the
+        // collaborator dialog command when card-level stamps are incomplete during SPA swaps.
+        try {
+            const currentVideoId = (() => {
+                try {
+                    const params = new URLSearchParams(window.location?.search || '');
+                    return params.get('v') || '';
+                } catch (err) {
+                    return '';
+                }
+            })();
+            if (currentVideoId && currentVideoId === videoId) {
+                const watchCandidates = document.querySelectorAll(
+                    'ytd-watch-metadata, ' +
+                    'ytd-video-owner-renderer, ' +
+                    'ytd-playlist-panel-video-renderer[selected], ' +
+                    'ytd-playlist-panel-video-wrapper-renderer[selected] ytd-playlist-panel-video-renderer'
+                );
+                for (const node of Array.from(watchCandidates).slice(0, 8)) {
+                    if (node && !candidates.includes(node)) {
+                        candidates.push(node);
+                    }
+                }
+            }
+        } catch (e) {
+            // ignore
         }
 
         const hydrateFromStampedAttributes = (element, label) => {

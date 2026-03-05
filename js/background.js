@@ -5243,6 +5243,7 @@ browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 displayHandle: message.displayHandle,
                 canonicalHandle: message.canonicalHandle,
                 channelName: message.channelName,
+                expectedChannelName: message.expectedChannelName,
                 channelLogo: message.channelLogo,
                 videoTitleHint: message.videoTitleHint,
                 customUrl: message.customUrl,
@@ -5921,11 +5922,12 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                     : (isHandle ? normalizedValue.toLowerCase() : '');
 
                 const candidateName = (metadata.channelName || '').trim();
+                const expectedNameFromMetadata = (metadata.expectedChannelName || '').trim();
                 channelInfo = {
                     success: true,
                     id: fallbackId,
                     handle: normalizedHandle || null,
-                    name: candidateName || normalizedHandle || fallbackId,
+                    name: expectedNameFromMetadata || candidateName || normalizedHandle || fallbackId,
                     logo: metadata.channelLogo || null,
                     customUrl: metadata.customUrl || null
                 };
@@ -6281,18 +6283,41 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             : (canonicalHandle || '');
 
         const finalChannelName = sanitizePersistedChannelName(
-            pickBetterName(channelInfo.name, metadata.channelName, normalizedValue)
+            pickBetterName(
+                channelInfo.name,
+                metadata.expectedChannelName,
+                metadata.channelName,
+                channelInfo.handleDisplay,
+                channelInfo.handle,
+                channelInfo.canonicalHandle,
+                metadata.displayHandle,
+                metadata.canonicalHandle,
+                normalizedValue
+            )
         );
+
+        const finalChannelNameFallbackHandle = (() => {
+            const handleCandidate = pickBetterName(
+                metadata.displayHandle,
+                metadata.canonicalHandle,
+                channelInfo.handleDisplay,
+                channelInfo.handle,
+                channelInfo.canonicalHandle,
+                isHandle ? normalizedValue : ''
+            );
+            return isHandleLike(handleCandidate) ? handleCandidate.toLowerCase() : '';
+        })();
+        const resolvedFinalChannelName = finalChannelName || finalChannelNameFallbackHandle || '';
 
         if (normalizedHandle) {
             channelInfo.handle = normalizedHandle;
         }
         channelInfo.canonicalHandle = canonicalHandle || null;
         channelInfo.handleDisplay = handleDisplay || null;
-        channelInfo.name = finalChannelName;
+        channelInfo.name = resolvedFinalChannelName;
         channelInfo.topicChannel = isLikelyTopicChannelIdentity({
             id: channelInfo.id || '',
-            name: finalChannelName || channelInfo.name || metadata.channelName || '',
+            name: resolvedFinalChannelName || channelInfo.name || metadata.channelName || '',
             handle: channelInfo.handle || channelInfo.canonicalHandle || channelInfo.handleDisplay || metadata.displayHandle || metadata.canonicalHandle || '',
             customUrl: channelInfo.customUrl || metadata.customUrl || '',
             topicChannel: channelInfo.topicChannel === true || metadata.topicChannel === true
@@ -6347,7 +6372,7 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
 
             const mergedName = (() => {
                 const existingName = sanitizePersistedChannelName(existing.name || '');
-                const incomingName = sanitizePersistedChannelName(finalChannelName || '');
+                const incomingName = sanitizePersistedChannelName(resolvedFinalChannelName || finalChannelName || '');
                 const isPostBlockEnrichment = sourceTag === 'postblockenrichment';
                 // Enrichment calls are explicitly meant to repair weak/wrong names.
                 // Only replace an existing name when current value is missing/weak.
@@ -6356,11 +6381,11 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                     if (incomingName && existingWeak) return incomingName;
                     if (existingName) return existingName;
                     if (incomingName) return incomingName;
-                    return finalChannelName;
+                    return resolvedFinalChannelName;
                 }
                 if (existingName) return existingName;
                 if (incomingName) return incomingName;
-                return finalChannelName;
+                return resolvedFinalChannelName;
             })();
 
             const updated = {
@@ -6410,7 +6435,7 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                 handle: channelInfo.handle,
                 handleDisplay: isHandleLike(channelInfo.handleDisplay) ? channelInfo.handleDisplay : null,
                 canonicalHandle: isHandleLike(channelInfo.canonicalHandle) ? channelInfo.canonicalHandle : null,
-                name: finalChannelName,
+                name: resolvedFinalChannelName,
                 logo: channelInfo.logo,
                 filterAll: filterAll,
                 collaborationWith: normalizedCollaborationWith || [],
@@ -6498,17 +6523,42 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             let appendedFilterAllKeyword = null;
 
             if (!isKids && finalChannelData?.filterAll) {
-                const keywordWord = sanitizePersistedChannelName(
-                    pickBetterName(
+                const deriveKeywordWord = () => {
+                    const candidate = pickBetterName(
                         finalChannelData?.name,
                         metadata?.channelName,
-                        metadata?.displayHandle,
+                        metadata?.expectedChannelName,
                         finalChannelData?.handleDisplay,
-                        finalChannelData?.handle
-                    )
-                );
+                        finalChannelData?.handle,
+                        finalChannelData?.canonicalHandle,
+                        metadata?.displayHandle,
+                        metadata?.canonicalHandle,
+                        normalizedValue
+                    );
+                    const fromCandidate = sanitizePersistedChannelName(candidate);
+                    if (fromCandidate) return fromCandidate;
 
-                if (keywordWord && keywordWord !== finalChannelData?.id) {
+                    const handleLike = pickBetterName(
+                        finalChannelData?.handle,
+                        finalChannelData?.canonicalHandle,
+                        finalChannelData?.handleDisplay,
+                        metadata?.displayHandle,
+                        metadata?.canonicalHandle
+                    );
+                    if (handleLike && isHandleLike(handleLike)) {
+                        return sanitizePersistedChannelName(handleLike.replace(/^@+/, '').trim());
+                    }
+                    return '';
+                };
+                let keywordWord = deriveKeywordWord();
+                if (!keywordWord && finalChannelData?.id) {
+                    const fallbackKeyword = String(finalChannelData.id).trim();
+                    if (fallbackKeyword) {
+                        keywordWord = fallbackKeyword;
+                    }
+                }
+
+                if (keywordWord) {
                     const targetKeywordList = mainKeywordKey === 'whitelist'
                         ? mainWhitelistKeywords
                         : mainBlockedKeywords;

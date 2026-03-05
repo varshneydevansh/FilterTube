@@ -606,6 +606,99 @@ function scanDataForVideoId(root) {
 function scanDataForChannelIdentifiers(root) {
     const result = { handle: '', id: '', customUrl: '' };
     if (!root || typeof root !== 'object') return result;
+    const normalizeId = (value) => {
+        if (!value || typeof value !== 'string') return '';
+        return value.trim().startsWith('UC') && /^UC[\w-]{22}$/i.test(value.trim()) ? value.trim() : '';
+    };
+    const pickEndpoint = (node) => {
+        if (!node || typeof node !== 'object') return null;
+        return (
+            node?.rendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint ||
+            node?.rendererContext?.commandContext?.onTap?.innertubeCommand?.command?.browseEndpoint ||
+            node?.rendererContext?.commandContext?.onTap?.browseEndpoint ||
+            node?.onTap?.innertubeCommand?.browseEndpoint ||
+            node?.onTap?.innertubeCommand?.command?.browseEndpoint ||
+            node?.onTap?.browseEndpoint ||
+            node?.navigationEndpoint?.browseEndpoint ||
+            node?.browseEndpoint ||
+            null
+        );
+    };
+    const pickListCandidate = (source) => {
+        const listItems = (
+            source?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems ||
+            source?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.listViewModel?.listItems ||
+            source?.showDialogCommand?.dialog?.presenterDialogViewModel?.content?.listViewModel?.listItems ||
+            source?.showDialogCommand?.dialog?.presenterDialogViewModel?.customContent?.listViewModel?.listItems ||
+            source?.showDialogCommand?.dialog?.presenterDialogViewModel?.listViewModel?.listItems ||
+            source?.showDialogCommand?.dialog?.dialogViewModel?.content?.listViewModel?.listItems ||
+            source?.showDialogCommand?.dialog?.dialogViewModel?.customContent?.listViewModel?.listItems ||
+            source?.showDialogCommand?.dialog?.dialogViewModel?.listViewModel?.listItems ||
+            source?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems ||
+            source?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.listViewModel?.listItems ||
+            source?.showSheetCommand?.dialog?.presenterDialogViewModel?.content?.listViewModel?.listItems ||
+            source?.showSheetCommand?.dialog?.presenterDialogViewModel?.customContent?.listViewModel?.listItems ||
+            source?.showSheetCommand?.dialog?.presenterDialogViewModel?.listViewModel?.listItems ||
+            source?.showDialogCommand?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems ||
+            source?.showDialogCommand?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.listViewModel?.listItems ||
+            source?.showDialogCommand?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.sheetViewModel?.content?.listViewModel?.listItems ||
+            source?.showSheetCommand?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.content?.listViewModel?.listItems ||
+            source?.showSheetCommand?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialog?.presenterDialogViewModel?.content?.listViewModel?.listItems ||
+            source?.showDialogCommand?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.dialog?.presenterDialogViewModel?.content?.listViewModel?.listItems ||
+            source?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.dialog?.presenterDialogViewModel?.content?.listViewModel?.listItems ||
+            source?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialog?.presenterDialogViewModel?.content?.listViewModel?.listItems ||
+            source?.panelLoadingStrategy?.inlineContent?.dialog?.presenterDialogViewModel?.content?.listViewModel?.listItems ||
+            source?.panelLoadingStrategy?.inlineContent?.dialog?.dialogViewModel?.customContent?.listViewModel?.listItems ||
+            source?.panelLoadingStrategy?.inlineContent?.dialog?.dialogViewModel?.listViewModel?.listItems ||
+            source?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems ||
+            source?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.content?.listViewModel?.listItems ||
+            source?.dialogViewModel?.customContent?.listViewModel?.listItems ||
+            source?.content?.dialogViewModel?.customContent?.listViewModel?.listItems ||
+            source?.dialogViewModel?.listViewModel?.listItems ||
+            source?.content?.dialogViewModel?.listViewModel?.listItems ||
+            source?.showDialogCommand?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.content?.listViewModel?.listItems ||
+            source?.showSheetCommand?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.content?.listViewModel?.listItems ||
+            source?.panelLoadingStrategy?.inlineContent?.dialog?.presenterDialogViewModel?.customContent?.listViewModel?.listItems ||
+            source?.panelLoadingStrategy?.inlineContent?.dialog?.presenterDialogViewModel?.listViewModel?.listItems ||
+            source?.dialog?.presenterDialogViewModel?.content?.listViewModel?.listItems ||
+            source?.dialog?.presenterDialogViewModel?.customContent?.listViewModel?.listItems ||
+            source?.dialog?.presenterDialogViewModel?.listViewModel?.listItems ||
+            source?.panelLoadingStrategy?.inlineContent?.sheetViewModel?.presenterDialogViewModel?.listViewModel?.listItems ||
+            source?.panelLoadingStrategy?.inlineContent?.sheet?.content?.listViewModel?.listItems ||
+            []
+        );
+        if (!Array.isArray(listItems) || listItems.length === 0) return null;
+        const first = listItems[0]?.listItemViewModel;
+        if (!first || typeof first !== 'object') return null;
+        const endpoint = pickEndpoint(first) || pickEndpoint(first.subtitle) || pickEndpoint(first.title);
+        const candidate = { id: '', handle: '', customUrl: '' };
+        const browseId = normalizeId(endpoint?.browseId);
+        if (browseId) candidate.id = browseId;
+        if (endpoint?.canonicalBaseUrl) {
+            const handle = extractHandleFromString(endpoint.canonicalBaseUrl);
+            if (handle) candidate.handle = handle;
+            const custom = extractCustomUrlFromPath(endpoint.canonicalBaseUrl);
+            if (custom) candidate.customUrl = custom;
+        }
+        if (!candidate.handle && first?.title?.content && typeof first.title.content === 'string') {
+            const handle = extractHandleFromString(first.title.content);
+            if (handle) candidate.handle = handle;
+        }
+        if (!candidate.customUrl && first?.subtitle?.content && typeof first.subtitle.content === 'string') {
+            const custom = extractCustomUrlFromPath(first.subtitle.content);
+            if (custom) candidate.customUrl = custom;
+        }
+        return (candidate.id || candidate.handle || candidate.customUrl) ? candidate : null;
+    };
+    const applyListCandidate = (candidate) => {
+        if (!candidate || typeof candidate !== 'object') return;
+        if (!result.id) result.id = candidate.id || '';
+        if (!result.handle) result.handle = candidate.handle || '';
+        if (!result.customUrl) result.customUrl = candidate.customUrl || '';
+    };
+
+    const seed = pickListCandidate(root);
+    if (seed) applyListCandidate(seed);
 
     // Direct check on the object first (most common case)
     // Check for channelId, browseId (often channel ID), canonicalBaseUrl (often /channel/...)
@@ -632,13 +725,16 @@ function scanDataForChannelIdentifiers(root) {
 
     // Shallow scan of specific known properties to avoid deep recursion into related items
     // We explicitly avoid 'items', 'contents', 'results' which usually contain OTHER videos/channels
-    const safeProperties = ['navigationEndpoint', 'command', 'browseEndpoint', 'urlEndpoint', 'owner', 'channelName', 'shortBylineText', 'longBylineText', 'runs', 'text'];
+    const safeProperties = ['navigationEndpoint', 'command', 'browseEndpoint', 'urlEndpoint', 'owner', 'channelName', 'shortBylineText', 'longBylineText', 'runs', 'text', 'showDialogCommand', 'showSheetCommand', 'panelLoadingStrategy'];
 
     for (const prop of safeProperties) {
         if (root[prop]) {
             const val = root[prop];
             if (typeof val === 'object') {
                 // Check nested navigation endpoint
+                const nestedFromList = pickListCandidate(val);
+                if (nestedFromList) applyListCandidate(nestedFromList);
+
                 if (val.browseId && val.browseId.startsWith('UC')) {
                     if (!result.id) result.id = val.browseId;
                 }
