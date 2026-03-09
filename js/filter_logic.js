@@ -196,6 +196,7 @@
             id: channelId,
             videoId,
             channelId,
+            authority: 'confirmed',
             handle: normalizedHandle || null,
             customUrl: normalizedCustomUrl || null,
             channelName: safeName || null,
@@ -297,6 +298,7 @@
             videoId,
             channelId: null,
             id: null,
+            authority: 'hint',
             handle: normalizedHandle || null,
             customUrl: normalizedCustomUrl || null,
             channelName: identity?.name || safeName || null,
@@ -348,7 +350,7 @@
             const batch = pendingVideoIdentityHints.splice(0, pendingVideoIdentityHints.length);
             try {
                 window.postMessage({
-                    type: 'FilterTube_UpdateVideoChannelMap',
+                    type: 'FilterTube_UpdateVideoIdentityHint',
                     payload: batch,
                     source: 'filter_logic'
                 }, '*');

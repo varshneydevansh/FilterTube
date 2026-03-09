@@ -1346,6 +1346,7 @@ function queuePrefetchForCard(card) {
     if (!priorCachedVideoId) {
         try {
             card.removeAttribute('data-filtertube-channel-id');
+            card.removeAttribute('data-filtertube-channel-authority');
             card.removeAttribute('data-filtertube-channel-handle');
             card.removeAttribute('data-filtertube-channel-name');
             card.removeAttribute('data-filtertube-channel-custom');
@@ -1379,59 +1380,60 @@ function queuePrefetchForCard(card) {
         }
     }
 
-    const existingId = card.getAttribute('data-filtertube-channel-id');
-    const existingHandle = card.getAttribute('data-filtertube-channel-handle');
+    const existingIdentity = readCardChannelIdentity(card);
+    const existingId = existingIdentity.id || '';
+    const existingHandle = existingIdentity.handle || '';
+    const existingAuthority = normalizeIdentityAuthority(existingIdentity.authority, existingIdentity);
 
     const existingRichIdentity = {
         handle: existingHandle || null,
-        customUrl: card.getAttribute('data-filtertube-channel-custom') || null,
-        name: card.getAttribute('data-filtertube-channel-name') || null,
-        logo: card.getAttribute('data-filtertube-channel-logo') || null,
-        source: card.getAttribute('data-filtertube-channel-source') || null,
-        fetchStrategy: card.getAttribute('data-filtertube-channel-fetch-strategy') || null,
-        expectedChannelName: card.getAttribute('data-filtertube-channel-expected-channel-name') || null
+        customUrl: existingIdentity.customUrl || null,
+        name: existingIdentity.name || null,
+        logo: existingIdentity.logo || null,
+        source: existingIdentity.source || null,
+        fetchStrategy: existingIdentity.fetchStrategy || null,
+        expectedChannelName: existingIdentity.expectedChannelName || null
     };
     const existingHasRichIdentity = hasNonIdRichFields(existingRichIdentity);
     const hasValidExistingId = isSeedChannelId(existingId);
+    const hasConfirmedMappedId = hasConfirmedVideoChannelMapping(videoId, existingId);
+    const canTrustExistingIdentity = hasConfirmedMappedId;
 
     // If we already have an ID that was associated with this element's cached video id,
     // persist and skip only when we also have rich details.
     if (priorCachedVideoId && priorCachedVideoId === videoId) {
-        if (hasValidExistingId) {
+        if (hasValidExistingId && canTrustExistingIdentity) {
             persistVideoChannelMapping(videoId, existingId);
         }
 
         // If rich identity already exists, allow a fast-path skip.
         // Map-only/partial states still need enrichment to fill missing fields.
-        if (existingHasRichIdentity && hasValidExistingId) return;
+        if (existingHasRichIdentity && hasValidExistingId && canTrustExistingIdentity) return;
 
         // Ensure stale/legacy IDs do not block enrichment.
         if (existingId && !hasValidExistingId) {
             try {
                 card.removeAttribute('data-filtertube-channel-id');
+                card.removeAttribute('data-filtertube-channel-authority');
             } catch (e) {
             }
         }
     }
 
     // If we only have a handle, try to resolve to UC ID immediately using channelMap.
-    // Keep this as a fast-path, but do not suppress the queue when we have no rich identity.
-    if (!existingHasRichIdentity && !existingId && existingHandle) {
+    // Only trust this path when the stamped identity is already confirmed.
+    if (existingAuthority === 'confirmed' && !existingHasRichIdentity && !existingId && existingHandle) {
         const resolvedId = resolveIdFromHandle(existingHandle);
         if (resolvedId) {
-            stampChannelIdentity(card, { id: resolvedId, handle: existingHandle });
-            persistVideoChannelMapping(videoId, resolvedId);
-            return;
+            stampChannelIdentity(card, { id: resolvedId, handle: existingHandle, authority: 'confirmed' });
         }
     }
 
     // If we only have a raw handle and no cached id, still attempt one quick map resolve.
-    if (!existingHasRichIdentity && !hasValidExistingId && existingHandle) {
+    if (existingAuthority === 'confirmed' && !existingHasRichIdentity && !hasValidExistingId && existingHandle) {
         const resolvedId = resolveIdFromHandle(existingHandle);
         if (resolvedId) {
-            stampChannelIdentity(card, { id: resolvedId, handle: existingHandle });
-            persistVideoChannelMapping(videoId, resolvedId);
-            return;
+            stampChannelIdentity(card, { id: resolvedId, handle: existingHandle, authority: 'confirmed' });
         }
     }
 
@@ -1480,6 +1482,11 @@ function setVideoIdentityCache(videoId, identity = {}) {
     };
 
     const normalizedSeedId = normalizeSeedChannelId(identity?.id);
+    const existingAuthority = normalizeIdentityAuthority(existing?.authority, existing);
+    const incomingAuthority = normalizeIdentityAuthority(identity?.authority, {
+        ...identity,
+        id: normalizedSeedId || identity?.id || ''
+    });
     if (normalizedSeedId) {
         merged.id = normalizedSeedId;
     } else if (Object.prototype.hasOwnProperty.call(identity, 'id') && typeof identity.id === 'string') {
@@ -1516,6 +1523,15 @@ function setVideoIdentityCache(videoId, identity = {}) {
             delete merged.expectedChannelName;
         }
     }
+    if (incomingAuthority === 'confirmed') {
+        merged.authority = 'confirmed';
+    } else if (incomingAuthority === 'hint') {
+        if (existingAuthority !== 'confirmed') {
+            merged.authority = 'hint';
+        }
+    } else if (existingAuthority) {
+        merged.authority = existingAuthority;
+    }
 
     if (!merged.id && !merged.handle && !merged.customUrl && !merged.name && !merged.logo && !merged.source && !merged.fetchStrategy && !merged.expectedChannelName) {
         return;
@@ -1543,7 +1559,7 @@ function setVideoIdentityCache(videoId, identity = {}) {
 function getSeedIdentityForVideoId(videoId, card = null) {
     if (!videoId) return null;
     const cached = videoIdentityCache.get(videoId);
-    const mappedId = normalizeSeedChannelId(currentSettings?.videoChannelMap?.[videoId]);
+    const mappedId = getConfirmedVideoChannelId(videoId);
     const cachedCopy = cached ? { ...cached } : {};
     const extractCandidateVideoId = (value) => {
         if (!value || typeof value !== 'string') return '';
@@ -1572,6 +1588,7 @@ function getSeedIdentityForVideoId(videoId, card = null) {
     const hasMatchingVideoContext = !cardVideoId || cardVideoId === videoId;
     if (mappedId) {
         cachedCopy.id = mappedId;
+        cachedCopy.authority = 'confirmed';
     } else if (cachedCopy.id) {
         const normalized = normalizeSeedChannelId(cachedCopy.id);
         if (normalized) {
@@ -1601,6 +1618,12 @@ function getSeedIdentityForVideoId(videoId, card = null) {
 
     if (cachedCopy.id && !isSeedChannelId(cachedCopy.id)) {
         delete cachedCopy.id;
+    }
+    const normalizedAuthority = normalizeIdentityAuthority(cachedCopy.authority, cachedCopy);
+    if (normalizedAuthority) {
+        cachedCopy.authority = normalizedAuthority;
+    } else {
+        delete cachedCopy.authority;
     }
     if (typeof cachedCopy.name === 'string') {
         const safeName = sanitizeSeedName(cachedCopy.name);
@@ -1642,6 +1665,32 @@ function normalizeSeedChannelId(value) {
     return match ? match[1] : '';
 }
 
+function normalizeIdentityAuthority(value, identity = null) {
+    const raw = typeof value === 'string' ? value.trim().toLowerCase() : '';
+    if (raw === 'confirmed' || raw === 'hint') {
+        return raw;
+    }
+    return '';
+}
+
+function getConfirmedVideoChannelId(videoId) {
+    if (!videoId || typeof videoId !== 'string') return '';
+    const entry = currentSettings?.videoChannelMap?.[videoId];
+    const raw = typeof entry === 'string'
+        ? entry
+        : (entry && typeof entry === 'object'
+            ? (entry.channelId || entry.id || '')
+            : '');
+    return normalizeSeedChannelId(raw);
+}
+
+function hasConfirmedVideoChannelMapping(videoId, channelId = '') {
+    const mappedId = getConfirmedVideoChannelId(videoId);
+    if (!mappedId) return false;
+    if (!channelId) return true;
+    return mappedId === normalizeSeedChannelId(channelId);
+}
+
 function hasRichIdentity(identity) {
     if (!identity || typeof identity !== 'object') return false;
     const isSafeName = (value) => {
@@ -1667,7 +1716,7 @@ function hasRichIdentity(identity) {
 function mergeIdentityObjects(primary, fallback = {}) {
     const merged = { ...fallback };
     if (!primary || typeof primary !== 'object') return merged;
-    for (const key of ['id', 'handle', 'customUrl', 'name', 'logo', 'source', 'fetchStrategy', 'expectedChannelName']) {
+    for (const key of ['id', 'handle', 'customUrl', 'name', 'logo', 'source', 'fetchStrategy', 'expectedChannelName', 'authority']) {
         if (primary[key]) {
             merged[key] = primary[key];
         }
@@ -1710,17 +1759,25 @@ async function prefetchIdentityForCard({ videoId, card }) {
             if (stamped.id && !isSeedChannelId(stamped.id)) {
                 delete stamped.id;
             }
+            const normalizedAuthority = normalizeIdentityAuthority(stamped.authority, stamped);
+            if (normalizedAuthority) {
+                stamped.authority = normalizedAuthority;
+            } else {
+                delete stamped.authority;
+            }
             return stamped;
         };
 
     const seededIdentity = buildIdentityForCard(videoId, card);
     const initial = normalizeStampedIdentity(seededIdentity);
+    const hasConfirmedInitialId = hasConfirmedVideoChannelMapping(videoId, initial?.id || '');
 
     if (initial.id) {
-        stampChannelIdentity(card, initial);
-        if (initial.id && !currentSettings?.videoChannelMap?.[videoId]) {
-            persistVideoChannelMapping(videoId, initial.id);
-        }
+        // Seeded DOM/cache identity is cosmetic until it matches a confirmed video->channel mapping.
+        stampChannelIdentity(card, {
+            ...initial,
+            authority: hasConfirmedInitialId ? 'confirmed' : 'hint'
+        });
     }
     const hasStableSecondaryIdentity = (() => {
         if (!initial || typeof initial !== 'object') return false;
@@ -1731,7 +1788,7 @@ async function prefetchIdentityForCard({ videoId, card }) {
         if (safeExpected && !hasCollapsedByline(safeExpected) && !isLikelyNonChannelName(safeExpected)) return true;
         return false;
     })();
-    if (initial.id && hasStableSecondaryIdentity) return;
+    if (hasConfirmedInitialId && hasStableSecondaryIdentity) return;
 
         // If we are still missing both map identity and rich fields, use a lightweight
         // main-world fallback (ytInitialData snapshot) before giving up.
@@ -1744,7 +1801,10 @@ async function prefetchIdentityForCard({ videoId, card }) {
                         ytInfo.id = resolvedId;
                     }
                 }
-                const merged = mergeIdentityObjects(ytInfo, seededIdentity);
+                const merged = mergeIdentityObjects({
+                    ...ytInfo,
+                    authority: 'confirmed'
+                }, seededIdentity);
                 const finalIdentity = normalizeStampedIdentity(merged);
                 if (finalIdentity.id || hasRichIdentity(finalIdentity)) {
                     stampChannelIdentity(card, finalIdentity);
@@ -1763,13 +1823,27 @@ async function prefetchIdentityForCard({ videoId, card }) {
 
 function stampChannelIdentity(card, info) {
     if (!card || !info) return;
+    const normalizedId = Object.prototype.hasOwnProperty.call(info, 'id')
+        ? normalizeSeedChannelId(info.id)
+        : '';
     if (Object.prototype.hasOwnProperty.call(info, 'id')) {
-        const normalizedId = normalizeSeedChannelId(info.id);
         if (normalizedId) {
             setValidatedChannelId(card, normalizedId);
         } else {
             card.removeAttribute('data-filtertube-channel-id');
+            card.removeAttribute('data-filtertube-channel-authority');
         }
+    }
+    const normalizedAuthority = normalizeIdentityAuthority(info.authority, {
+        ...info,
+        id: normalizedId || info.id || ''
+    });
+    if (normalizedAuthority) {
+        card.setAttribute('data-filtertube-channel-authority', normalizedAuthority);
+    } else if (normalizedId) {
+        card.setAttribute('data-filtertube-channel-authority', 'confirmed');
+    } else if (Object.prototype.hasOwnProperty.call(info, 'authority')) {
+        card.removeAttribute('data-filtertube-channel-authority');
     }
     if (info.handle) card.setAttribute('data-filtertube-channel-handle', info.handle);
     if (info.customUrl) card.setAttribute('data-filtertube-channel-custom', info.customUrl);
@@ -1794,10 +1868,11 @@ function stampChannelIdentity(card, info) {
     }
 }
 
-function clearChannelIdentityDisplayFields(card, { preserveId = false } = {}) {
+function clearChannelIdentityDisplayFields(card, { preserveId = false, preserveExpectedChannelName = false } = {}) {
     if (!card || typeof card.removeAttribute !== 'function') return;
     if (!preserveId) {
         card.removeAttribute('data-filtertube-channel-id');
+        card.removeAttribute('data-filtertube-channel-authority');
     }
     card.removeAttribute('data-filtertube-channel-handle');
     card.removeAttribute('data-filtertube-channel-custom');
@@ -1805,7 +1880,9 @@ function clearChannelIdentityDisplayFields(card, { preserveId = false } = {}) {
     card.removeAttribute('data-filtertube-channel-logo');
     card.removeAttribute('data-filtertube-channel-source');
     card.removeAttribute('data-filtertube-channel-fetch-strategy');
-    card.removeAttribute('data-filtertube-channel-expected-channel-name');
+    if (!preserveExpectedChannelName) {
+        card.removeAttribute('data-filtertube-channel-expected-channel-name');
+    }
 }
 
 function resetCardIdentityIfStale(card, videoId) {
@@ -1819,6 +1896,7 @@ function resetCardIdentityIfStale(card, videoId) {
                 clearCachedChannelMetadata(card);
             } else {
                 card.removeAttribute('data-filtertube-channel-id');
+                card.removeAttribute('data-filtertube-channel-authority');
                 card.removeAttribute('data-filtertube-channel-handle');
                 card.removeAttribute('data-filtertube-channel-name');
                 card.removeAttribute('data-filtertube-channel-custom');
@@ -1829,6 +1907,7 @@ function resetCardIdentityIfStale(card, videoId) {
             }
         } catch (e) {
             card.removeAttribute('data-filtertube-channel-id');
+            card.removeAttribute('data-filtertube-channel-authority');
             card.removeAttribute('data-filtertube-channel-handle');
             card.removeAttribute('data-filtertube-channel-name');
             card.removeAttribute('data-filtertube-channel-custom');
@@ -1947,6 +2026,9 @@ function readCardChannelIdentity(card) {
     const rawFetch = card.getAttribute?.('data-filtertube-channel-fetch-strategy')
         || card.querySelector?.('[data-filtertube-channel-fetch-strategy]')?.getAttribute?.('data-filtertube-channel-fetch-strategy')
         || '';
+    const rawAuthority = card.getAttribute?.('data-filtertube-channel-authority')
+        || card.querySelector?.('[data-filtertube-channel-authority]')?.getAttribute?.('data-filtertube-channel-authority')
+        || '';
 
     return {
         id: normalizeSeedChannelId(rawId) || '',
@@ -1956,6 +2038,7 @@ function readCardChannelIdentity(card) {
         logo: typeof rawLogo === 'string' ? rawLogo.trim() : '',
         source: typeof rawSource === 'string' ? rawSource.trim() : '',
         fetchStrategy: typeof rawFetch === 'string' ? rawFetch.trim() : '',
+        authority: normalizeIdentityAuthority(rawAuthority, { id: rawId }) || '',
         expectedChannelName: typeof rawExpected === 'string' ? rawExpected.trim() : ''
     };
 }
@@ -2053,7 +2136,13 @@ function shouldStampCardForVideoId(card, videoId, options = {}) {
             return false;
         }
         if (shouldPurgeDisplayFields && hasExistingIdentity) {
-            clearChannelIdentityDisplayFields(card, { preserveId: true });
+            clearChannelIdentityDisplayFields(card, {
+                preserveId: true,
+                preserveExpectedChannelName: Boolean(
+                    incomingSeed?.expectedChannelName ||
+                    existingIdentity?.expectedChannelName
+                )
+            });
         }
         return true;
     }
@@ -5272,8 +5361,10 @@ function handleMainWorldMessages(event) {
     } else if (type === 'FilterTube_UpdateChannelMap') {
         // Forward learned channel mappings to background for persistence
         persistChannelMappings(payload);
-    } else if (type === 'FilterTube_UpdateVideoChannelMap') {
+    } else if (type === 'FilterTube_UpdateVideoChannelMap' || type === 'FilterTube_UpdateVideoIdentityHint') {
         // Persist learned videoId → channelId mappings (Kids browse/search + player payloads)
+        // `FilterTube_UpdateVideoIdentityHint` is cosmetic only and must not complete the authoritative pipeline.
+        const isAuthoritativeVideoMap = type === 'FilterTube_UpdateVideoChannelMap';
         const updates = Array.isArray(payload) ? payload : (payload ? [payload] : []);
         let didPersist = false;
         const normalizeCustomUrlKey = (value) => {
@@ -5413,9 +5504,13 @@ function handleMainWorldMessages(event) {
             if (!shouldStampCardForVideoId(card, videoId, { allowLooseMatch: true })) return;
 
             const stamped = getSeedIdentityForVideoId(videoId, card) || {};
+            const hasConfirmedStampedId = hasConfirmedVideoChannelMapping(videoId, stamped?.id || '');
             const shouldStamp = Boolean(stamped && (stamped.id || stamped.handle || stamped.customUrl || stamped.name || stamped.logo || stamped.expectedChannelName));
             if (shouldStamp) {
-                stampChannelIdentity(card, stamped);
+                stampChannelIdentity(card, {
+                    ...stamped,
+                    authority: hasConfirmedStampedId ? 'confirmed' : 'hint'
+                });
             }
             const normalizedStampedName = sanitizeChannelNameForCard(stamped?.name || '', card);
             const normalizedStampedExpected = sanitizeChannelNameForCard(stamped?.expectedChannelName || '', card);
@@ -5429,7 +5524,7 @@ function handleMainWorldMessages(event) {
                 !isLikelyNonChannelName(normalizedStampedExpected) &&
                 !hasCollapsedByline(normalizedStampedExpected)
             );
-            const needsPrefetch = (!isSeedChannelId(stamped?.id) || (!hasUsableSeedName && !hasUsableSeedExpected));
+            const needsPrefetch = (!hasConfirmedStampedId || (!hasUsableSeedName && !hasUsableSeedExpected));
 
             if (needsPrefetch) {
                 prefetchIdentityForCard({
@@ -5441,11 +5536,12 @@ function handleMainWorldMessages(event) {
 
         for (const entry of updates) {
             const videoId = normalizeVideoIdFromPayload(entry?.videoId);
-            const channelId = normalizeSeedChannelId(
+            const rawChannelId = normalizeSeedChannelId(
                 typeof entry?.channelId === 'string' ? entry.channelId.trim() : ''
             );
+            const channelId = isAuthoritativeVideoMap ? rawChannelId : '';
             if (!videoId) continue;
-            if (channelId) persistVideoChannelMapping(videoId, channelId);
+            if (isAuthoritativeVideoMap && channelId) persistVideoChannelMapping(videoId, channelId);
 
             const normalizedHandle = normalizeHandleValue(
                 entry?.handle ||
@@ -5462,10 +5558,10 @@ function handleMainWorldMessages(event) {
             const fetchStrategy = (typeof entry?.fetchStrategy === 'string' && entry.fetchStrategy.trim()) ? entry.fetchStrategy.trim() : 'rules';
             const expectedChannelName = (typeof entry?.expectedChannelName === 'string' && entry.expectedChannelName.trim()) ? entry.expectedChannelName.trim() : '';
 
-            if (channelId && normalizedHandle) {
+            if (isAuthoritativeVideoMap && channelId && normalizedHandle) {
                 persistChannelMappings([{ id: channelId, handle: normalizedHandle }]);
             }
-            if (channelId && normalizedCustomUrl) {
+            if (isAuthoritativeVideoMap && channelId && normalizedCustomUrl) {
                 persistCustomUrlMapping(normalizedCustomUrl, channelId);
             }
             const cachedIdentity = {
@@ -5476,7 +5572,8 @@ function handleMainWorldMessages(event) {
                 ...(rawLogo ? { logo: rawLogo } : {}),
                 ...(source ? { source } : {}),
                 ...(fetchStrategy ? { fetchStrategy } : {}),
-                ...(expectedChannelName ? { expectedChannelName } : {})
+                ...(expectedChannelName ? { expectedChannelName } : {}),
+                authority: (isAuthoritativeVideoMap && channelId) ? 'confirmed' : 'hint'
             };
             setVideoIdentityCache(videoId, cachedIdentity);
 
@@ -5489,7 +5586,9 @@ function handleMainWorldMessages(event) {
             } catch (e) {
                 // ignore
             }
-            didPersist = true;
+            if (isAuthoritativeVideoMap && channelId) {
+                didPersist = true;
+            }
         }
 
         if (didPersist && typeof applyDOMFallback === 'function') {
