@@ -1,21 +1,12 @@
-# FilterTube v3.2.8 Code Map
+# FilterTube v3.2.7 Code Map (Performance & Category Filtering)
 
-This document provides a detailed reference of the key files and functions in the FilterTube codebase.
+This document provides a detailed reference of the key files and functions in the FilterTube v3.2.7 codebase with performance optimizations, category filtering, and enhanced cross-browser support.
 
-## New in v3.2.8
-
-- **YouTube Mobile Support**: Dedicated handling for `m.youtube.com` mobile web interface (`ytm-*` renderers).
-- **Mobile Quick-Block**: One-tap blocking for mobile watch cards, playlist rows, and hero videos via cross-hover/touch.
-- **Mobile 3-Dot Menu**: Expanded detection for `ytm-bottom-sheet-renderer` and modern `yt-list-view-model` menus.
-- **Mobile Optimistic Hiding**: Immediate visual feedback for blocked channel posts and sections on the mobile site.
-- **Playlist Navigation Guard**: Auto-skip logic adapted for mobile playlist panel structure to prevent playing blocked content.
-- **Renderer Isolation**: Strict tag-name checking to prevent cross-contamination between `ytd-` (Desktop), `ytk-` (Kids), and `ytm-` (Mobile) handlers.
-
-## Previous in v3.2.7
+## New in v3.2.7
 
 - **Category Filtering**: Filter videos by YouTube category (e.g., Music, Gaming, Education)
 - **Quick-Block Default ON**: `showQuickBlockButton` now defaults to enabled (one-time migration in v3.2.7; user can disable)
-- **Quick-Block Card Action**: Hover/touch cross on cards for one-tap direct block (**v3.2.8: Restricted to YouTube Mobile only**; Desktop/Kids re-introduction in v3.3.0)
+- **Quick-Block Card Action**: Hover/touch cross on cards for one-tap direct block (single channel card blocks one channel, collaborator card blocks all associated channels)
 - **Comment Block Isolation**: Comment-origin block actions no longer trigger playlist/watch row hides or autoplay-next side effects
 - **Hover Retention Hardening**: Search overlays and Home Shorts retain quick-block hover state reliably
 - **LRU Eviction**: `videoMetaMap` now uses LRU eviction (3000 entry cap) to prevent unbounded growth

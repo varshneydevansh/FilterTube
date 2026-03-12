@@ -41,149 +41,11 @@
     const pendingVideoChannelUpdates = [];
     const seenVideoChannelUpdates = new Map();
     let pendingVideoChannelFlush = null;
-    const pendingVideoIdentityHints = [];
-    const seenVideoIdentityHints = new Map();
-    let pendingVideoIdentityHintFlush = null;
-    function normalizeComparableIdentityText(value) {
-        if (!value || typeof value !== 'string') return '';
-        return value
-            .replace(/\s+/g, ' ')
-            .replace(/\s*\n\s*/g, ' ')
-            .trim()
-            .toLowerCase();
-    }
-
-    function isLikelyBadChannelIdentityName(value, videoTitleHint = '') {
-        if (!value || typeof value !== 'string') return true;
-        const trimmed = value.trim();
-        if (!trimmed) return true;
-        const sharedBadName = typeof window.FilterTubeIdentity?.isLikelyBadIdentityName === 'function'
-            ? window.FilterTubeIdentity.isLikelyBadIdentityName
-            : null;
-        if (typeof sharedBadName === 'function' && sharedBadName(trimmed)) {
-            return true;
-        }
-        const normalizedTitle = normalizeComparableIdentityText(videoTitleHint);
-        if (normalizedTitle && normalizeComparableIdentityText(trimmed) === normalizedTitle) return true;
-        return false;
-    }
-
-    function queueVideoChannelMapping(videoId, channelId, identity = {}) {
+    function queueVideoChannelMapping(videoId, channelId) {
         if (!videoId || typeof videoId !== 'string' || !/^[a-zA-Z0-9_-]{11}$/.test(videoId)) return;
         if (!channelId || typeof channelId !== 'string' || !channelId.startsWith('UC')) return;
 
-        const normalizedHandle = normalizeChannelHandle(
-            identity?.handle ||
-            identity?.channelHandle ||
-            identity?.canonicalHandle ||
-            ''
-        ) || '';
-        const normalizedCustomUrl = (() => {
-            const raw = typeof identity?.customUrl === 'string' ? identity.customUrl.trim() : '';
-            if (!raw) return '';
-            const direct = raw.match(/^(c|user)\/([^/?#]+)/i);
-            if (direct && direct[1] && direct[2]) {
-                return `${direct[1].toLowerCase()}/${direct[2]}`;
-            }
-            const fromPath = raw.match(/\/(c|user)\/([^/?#]+)/i);
-            if (fromPath && fromPath[1] && fromPath[2]) {
-                return `${fromPath[1].toLowerCase()}/${fromPath[2]}`;
-            }
-            return '';
-        })();
-        const normalizedVideoTitleHint = normalizeComparableIdentityText(identity?.videoTitle || identity?.videoTitleHint || '');
-        const nameCandidate = typeof identity?.name === 'string'
-            ? identity.name.trim()
-            : (typeof identity?.channelName === 'string' ? identity.channelName.trim() : '');
-        const expectedChannelNameCandidate = typeof identity?.expectedChannelName === 'string'
-            ? identity.expectedChannelName.trim()
-            : '';
-        const source = typeof identity?.source === 'string' ? identity.source.trim() : '';
-        const fetchStrategy = typeof identity?.fetchStrategy === 'string' ? identity.fetchStrategy.trim() : '';
-        const playlistId = typeof identity?.playlistId === 'string' ? identity.playlistId.trim() : '';
-        const collaboratorsSource = typeof identity?.collaboratorsSource === 'string' ? identity.collaboratorsSource.trim() : '';
-        const cardCategory = typeof identity?.cardCategory === 'string' ? identity.cardCategory.trim() : '';
-        const expectedCollaboratorCount = Number.isInteger(identity?.expectedCollaboratorCount)
-            ? identity.expectedCollaboratorCount
-            : Array.isArray(identity?.allCollaborators)
-                ? identity.allCollaborators.length
-                : 0;
-        const allCollaborators = Array.isArray(identity?.allCollaborators)
-            ? identity.allCollaborators
-                .map((item) => {
-                    if (!item || typeof item !== 'object') return null;
-                    const collabId = (() => {
-                        const raw = typeof item?.id === 'string' ? item.id.trim() : '';
-                        return /^UC[a-zA-Z0-9_-]{22}$/i.test(raw) ? raw : '';
-                    })();
-                    const collabHandle = normalizeChannelHandle(
-                        item?.handle ||
-                        item?.channelHandle ||
-                        item?.canonicalHandle ||
-                        ''
-                    ) || '';
-                    const collabCustomUrl = (() => {
-                        const raw = typeof item?.customUrl === 'string' ? item.customUrl.trim() : '';
-                        if (!raw) return '';
-                        if (raw.startsWith('/c/')) {
-                            return raw.slice(3).toLowerCase();
-                        }
-                        if (raw.startsWith('c/')) {
-                            return raw.toLowerCase();
-                        }
-                        if (raw.startsWith('/user/')) {
-                            return raw.slice(6).toLowerCase();
-                        }
-                        if (raw.startsWith('user/')) {
-                            return raw.toLowerCase();
-                        }
-                        return raw.toLowerCase();
-                    })();
-                    const collabName = typeof item?.name === 'string' ? item.name.trim() : '';
-                    const collabLogo = typeof item?.logo === 'string' ? item.logo.trim() : '';
-                    const hasAny = Boolean(collabId || collabHandle || collabCustomUrl || collabName);
-                    if (!hasAny) return null;
-                    return {
-                        id: collabId || null,
-                        handle: collabHandle || null,
-                        customUrl: collabCustomUrl || null,
-                        name: collabName || null,
-                        logo: collabLogo || null
-                    };
-                })
-                .filter(Boolean)
-                .slice(0, 8)
-            : [];
-        const safeName = (!isLikelyBadChannelIdentityName(nameCandidate, normalizedVideoTitleHint) ? nameCandidate : '');
-        const safeLogo = (typeof identity?.logo === 'string' && identity.logo.trim())
-            ? identity.logo.trim()
-            : ((typeof identity?.channelLogo === 'string' && identity.channelLogo.trim()) ? identity.channelLogo.trim() : '');
-        const safeExpectedName = (!isLikelyBadChannelIdentityName(expectedChannelNameCandidate, normalizedVideoTitleHint) ? expectedChannelNameCandidate : '');
-        const finalIsCollaboration = Boolean(identity?.isCollaboration || (Array.isArray(identity?.allCollaborators) && identity?.allCollaborators.length > 1));
-        const collaboratorKey = Array.isArray(allCollaborators) && allCollaborators.length > 0
-            ? allCollaborators
-                .slice(0, 5)
-                .map((item) => `${item.id || ''}|${item.handle || ''}|${item.customUrl || ''}|${item.name || ''}`)
-                .join(',')
-            : '';
-        const needsFetch = Boolean(identity?.needsFetch);
-
-        const key = [
-            `${videoId}:${channelId}`,
-            `h:${normalizedHandle || ''}`,
-            `cu:${normalizedCustomUrl || ''}`,
-            `n:${normalizeComparableIdentityText(safeName || '')}`,
-            `p:${normalizeComparableIdentityText(safeExpectedName || '')}`,
-            `l:${safeLogo ? 1 : 0}`,
-            `pid:${playlistId || ''}`,
-            `src:${source || 'rules'}`,
-            `fs:${fetchStrategy || 'rules'}`,
-            `cat:${normalizeComparableIdentityText(cardCategory || '')}`,
-            `collab:${finalIsCollaboration ? 1 : 0}`,
-            `exp:${expectedCollaboratorCount || 0}`,
-            `sig:${collaboratorKey}`,
-            `f:${needsFetch ? 1 : 0}`
-        ].join('|');
+        const key = `${videoId}:${channelId}`;
         if (seenVideoChannelUpdates.has(key)) return;
         seenVideoChannelUpdates.set(key, Date.now());
 
@@ -192,29 +54,7 @@
             keys.slice(0, 1000).forEach(k => seenVideoChannelUpdates.delete(k));
         }
 
-        pendingVideoChannelUpdates.push({
-            id: channelId,
-            videoId,
-            channelId,
-            authority: 'confirmed',
-            handle: normalizedHandle || null,
-            customUrl: normalizedCustomUrl || null,
-            channelName: safeName || null,
-            expectedChannelName: safeExpectedName || null,
-            name: safeName || null,
-            logo: safeLogo || null,
-            channelLogo: safeLogo || null,
-            videoTitle: identity?.videoTitle || '',
-            source: source || 'filter_logic',
-            fetchStrategy: fetchStrategy || 'rules',
-            playlistId: playlistId || null,
-            isCollaboration: finalIsCollaboration,
-            needsFetch: needsFetch,
-            allCollaborators: allCollaborators || [],
-            collaboratorsSource: collaboratorsSource || null,
-            expectedCollaboratorCount: expectedCollaboratorCount || allCollaborators.length,
-            cardCategory: cardCategory || null
-        });
+        pendingVideoChannelUpdates.push({ videoId, channelId });
 
         if (pendingVideoChannelFlush) return;
         pendingVideoChannelFlush = setTimeout(() => {
@@ -232,132 +72,6 @@
                 // ignore
             }
         }, 50);
-    }
-
-    function queueVideoIdentityHint(videoId, identity = {}) {
-        if (!videoId || typeof videoId !== 'string' || !/^[a-zA-Z0-9_-]{11}$/.test(videoId)) return;
-
-        const normalizedHandle = normalizeChannelHandle(
-            identity?.handle ||
-            identity?.channelHandle ||
-            identity?.canonicalHandle ||
-            ''
-        ) || '';
-        const normalizedCustomUrl = (() => {
-            const raw = typeof identity?.customUrl === 'string' ? identity.customUrl.trim() : '';
-            if (!raw) return '';
-            const direct = raw.match(/^(c|user)\/(.+)/i);
-            if (direct && direct[1] && direct[2]) {
-                return `${direct[1].toLowerCase()}/${direct[2]}`;
-            }
-            const fromPath = raw.match(/\/(c|user)\/([^/?#]+)/i);
-            if (fromPath && fromPath[1] && fromPath[2]) {
-                return `${fromPath[1].toLowerCase()}/${fromPath[2]}`;
-            }
-            return '';
-        })();
-
-        const normalizedName = normalizeComparableIdentityText(identity?.name || identity?.channelName || '');
-        const normalizedExpectedName = normalizeComparableIdentityText(identity?.expectedChannelName || '');
-        const safeName = normalizedName || '';
-        const safeExpectedName = normalizedExpectedName || '';
-        const safeLogo = (typeof identity?.logo === 'string' && identity?.logo.trim())
-            ? identity.logo.trim()
-            : ((typeof identity?.channelLogo === 'string' && identity.channelLogo.trim()) ? identity.channelLogo.trim() : '');
-        const safeChannelId = '';
-        const source = (typeof identity?.source === 'string' ? identity.source.trim() : 'filter_logic');
-        const fetchStrategy = (typeof identity?.fetchStrategy === 'string' ? identity.fetchStrategy.trim() : 'rules');
-        const cardCategory = (typeof identity?.cardCategory === 'string' ? identity.cardCategory.trim() : '');
-        const expectedCollaboratorCount = Number.isInteger(identity?.expectedCollaboratorCount)
-            ? identity.expectedCollaboratorCount
-            : 0;
-
-        const key = [
-            `v:${videoId}`,
-            `h:${normalizedHandle}`,
-            `cu:${normalizedCustomUrl}`,
-            `n:${safeName}`,
-            `p:${safeExpectedName}`,
-            `l:${safeLogo ? 1 : 0}`,
-            `pid:${identity?.playlistId || ''}`,
-            `src:${source}`,
-            `fs:${fetchStrategy}`,
-            `cat:${normalizeComparableIdentityText(cardCategory || '')}`,
-            `c:${safeChannelId}`,
-            `exp:${expectedCollaboratorCount || 0}`
-        ].join('|');
-
-        if (seenVideoIdentityHints.has(key)) return;
-        seenVideoIdentityHints.set(key, Date.now());
-        if (seenVideoIdentityHints.size > 2000) {
-            const keys = Array.from(seenVideoIdentityHints.keys());
-            keys.slice(0, 500).forEach(k => seenVideoIdentityHints.delete(k));
-        }
-
-        pendingVideoIdentityHints.push({
-            videoId,
-            channelId: null,
-            id: null,
-            authority: 'hint',
-            handle: normalizedHandle || null,
-            customUrl: normalizedCustomUrl || null,
-            channelName: identity?.name || safeName || null,
-            expectedChannelName: identity?.expectedChannelName || safeExpectedName || null,
-            name: identity?.name || safeName || null,
-            logo: safeLogo || null,
-            channelLogo: safeLogo || null,
-            videoTitle: identity?.videoTitle || '',
-            source,
-            fetchStrategy,
-            playlistId: identity?.playlistId || '',
-            playlistSeedVideoId: identity?.playlistSeedVideoId || '',
-            videoSeedVideoId: identity?.playlistSeedVideoId || '',
-            isCollaboration: Boolean(identity?.isCollaboration),
-            needsFetch: Boolean(identity?.needsFetch),
-            allCollaborators: Array.isArray(identity?.allCollaborators)
-                ? identity.allCollaborators.slice(0, 8).map((item) => ({
-                    id: typeof item?.id === 'string' && /^UC[a-zA-Z0-9_-]{22}$/i.test(item.id.trim()) ? item.id.trim() : null,
-                    handle: normalizeChannelHandle(item?.handle || item?.channelHandle || item?.canonicalHandle || '') || null,
-                    customUrl: (() => {
-                        const raw = typeof item?.customUrl === 'string' ? item.customUrl.trim() : '';
-                        if (!raw) return null;
-                        if (raw.startsWith('/c/')) return raw.slice(3).toLowerCase();
-                        if (raw.startsWith('c/')) return raw.toLowerCase();
-                        if (raw.startsWith('/user/')) return raw.slice(6).toLowerCase();
-                        if (raw.startsWith('user/')) return raw.toLowerCase();
-                        return raw.toLowerCase();
-                    })(),
-                    name: typeof item?.name === 'string' ? item.name.trim() : null,
-                    logo: typeof item?.logo === 'string' ? item.logo.trim() : null,
-                    subtitle: typeof item?.subtitle === 'string' ? item.subtitle.trim() : null
-                })).filter((entry) => Boolean(entry.id || entry.handle || entry.customUrl || entry.name))
-                : [],
-            collaboratorsSource: typeof identity?.collaboratorsSource === 'string' ? identity.collaboratorsSource.trim() : '',
-            expectedCollaboratorCount,
-            cardCategory,
-            videoDuration: identity?.videoDuration || '',
-            videoViewsText: identity?.videoViewsText || '',
-            videoPublishedText: identity?.videoPublishedText || '',
-            videoBylineText: identity?.videoBylineText || '',
-            videoCountText: identity?.videoCountText || ''
-        });
-
-        if (pendingVideoIdentityHintFlush) return;
-        pendingVideoIdentityHintFlush = setTimeout(() => {
-            pendingVideoIdentityHintFlush = null;
-            if (pendingVideoIdentityHints.length === 0) return;
-
-            const batch = pendingVideoIdentityHints.splice(0, pendingVideoIdentityHints.length);
-            try {
-                window.postMessage({
-                    type: 'FilterTube_UpdateVideoIdentityHint',
-                    payload: batch,
-                    source: 'filter_logic'
-                }, '*');
-            } catch (e) {
-                // ignore
-            }
-        }, 55);
     }
 
     const pendingVideoMetaUpdates = [];
@@ -507,20 +221,9 @@
     function normalizeChannelHandle(rawHandle) {
         if (typeof rawHandle !== 'string') return '';
 
-        const sharedNormalizeHandle = window.FilterTubeIdentity?.normalizeHandleValue;
         const sharedExtractRawHandle = window.FilterTubeIdentity?.extractRawHandle;
-        if (typeof sharedNormalizeHandle === 'function') {
-            const candidate = typeof sharedExtractRawHandle === 'function'
-                ? (sharedExtractRawHandle(rawHandle) || rawHandle)
-                : rawHandle;
-            return sharedNormalizeHandle(candidate) || '';
-        }
         if (typeof sharedExtractRawHandle === 'function') {
-            const extracted = sharedExtractRawHandle(rawHandle) || '';
-            if (!extracted) return '';
-            const core = extracted.replace(/^@+/, '').trim();
-            if (!/^[A-Za-z0-9._-]{3,60}$/.test(core) || !/[A-Za-z0-9]/.test(core)) return '';
-            return `@${core.toLowerCase()}`;
+            return sharedExtractRawHandle(rawHandle) || '';
         }
         let candidate = rawHandle.trim();
         if (!candidate) return '';
@@ -548,8 +251,7 @@
         }
         decoded = decoded.replace(/[\u200B-\u200F\u202A-\u202E\u2066-\u2069\uFEFF]/g, '').trim();
         if (!decoded) return '';
-        if (!/^[A-Za-z0-9._-]{3,60}$/.test(decoded) || !/[A-Za-z0-9]/.test(decoded)) return '';
-        return `@${decoded.toLowerCase()}`;
+        return `@${decoded}`;
     }
 
     function findHandleInValue(value) {
@@ -696,8 +398,7 @@
 
     const CHANNEL_ONLY_RENDERERS = new Set([
         'channelRenderer',
-        'gridChannelRenderer',
-        'compactChannelRenderer'
+        'gridChannelRenderer'
     ]);
 
     const CHIP_RENDERERS = new Set([
@@ -715,95 +416,6 @@
         gridVideoRenderer: BASE_VIDEO_RULES,
         playlistVideoRenderer: BASE_VIDEO_RULES,
         playlistPanelVideoRenderer: BASE_VIDEO_RULES,
-        videoWithContextRenderer: {
-            videoId: ['videoId', 'navigationEndpoint.watchEndpoint.videoId'],
-            title: ['headline.runs', 'title.runs', 'headline.simpleText', 'title.simpleText'],
-            channelName: ['shortBylineText.runs', 'longBylineText.runs', 'ownerText.runs'],
-            channelId: [
-                'shortBylineText.runs.0.navigationEndpoint.browseEndpoint.browseId',
-                'longBylineText.runs.0.navigationEndpoint.browseEndpoint.browseId',
-                'ownerText.runs.0.navigationEndpoint.browseEndpoint.browseId',
-                'channelThumbnail.channelThumbnailWithLinkRenderer.navigationEndpoint.browseEndpoint.browseId'
-            ],
-            channelHandle: [
-                'shortBylineText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl',
-                'longBylineText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl',
-                'ownerText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl',
-                'shortBylineText.runs.0.navigationEndpoint.commandMetadata.webCommandMetadata.url',
-                'longBylineText.runs.0.navigationEndpoint.commandMetadata.webCommandMetadata.url',
-                'ownerText.runs.0.navigationEndpoint.commandMetadata.webCommandMetadata.url',
-                'channelThumbnail.channelThumbnailWithLinkRenderer.navigationEndpoint.browseEndpoint.canonicalBaseUrl',
-                'channelThumbnail.channelThumbnailWithLinkRenderer.navigationEndpoint.commandMetadata.webCommandMetadata.url'
-            ],
-            duration: [
-                'thumbnailOverlays.0.thumbnailOverlayTimeStatusRenderer.text.simpleText',
-                'thumbnailOverlays.0.thumbnailOverlayTimeStatusRenderer.text.runs.0.text',
-                'lengthText.simpleText',
-                'lengthText.runs.0.text'
-            ],
-            publishedTime: [
-                'publishedTimeText.simpleText',
-                'publishedTimeText.runs.0.text',
-                'videoInfo.runs.0.text',
-                'videoInfo.runs.2.text'
-            ],
-            viewCount: ['viewCountText.simpleText', 'shortViewCountText.simpleText']
-        },
-        compactPlaylistRenderer: {
-            title: ['title.runs', 'title.simpleText'],
-            channelName: ['shortBylineText.runs', 'longBylineText.runs'],
-            channelId: [
-                'shortBylineText.runs.0.navigationEndpoint.browseEndpoint.browseId',
-                'longBylineText.runs.0.navigationEndpoint.browseEndpoint.browseId'
-            ],
-            channelHandle: [
-                'shortBylineText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl',
-                'longBylineText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl',
-                'shortBylineText.runs.0.navigationEndpoint.commandMetadata.webCommandMetadata.url',
-                'longBylineText.runs.0.navigationEndpoint.commandMetadata.webCommandMetadata.url'
-            ]
-        },
-        compactChannelRenderer: {
-            videoId: 'channelId',
-            title: ['displayName.runs', 'displayName.simpleText'],
-            channelName: ['displayName.runs', 'displayName.simpleText'],
-            channelId: [
-                'channelId',
-                'navigationEndpoint.browseEndpoint.browseId'
-            ],
-            channelHandle: [
-                'navigationEndpoint.browseEndpoint.canonicalBaseUrl',
-                'subscriberCountText.runs.0.text',
-                'navigationEndpoint.commandMetadata.webCommandMetadata.url'
-            ],
-            channelThumbnail: [
-                'thumbnail.thumbnails',
-                'avatar.thumbnails'
-            ]
-        },
-        channelThumbnailWithLinkRenderer: {
-            channelId: ['navigationEndpoint.browseEndpoint.browseId'],
-            channelHandle: [
-                'navigationEndpoint.browseEndpoint.canonicalBaseUrl',
-                'navigationEndpoint.commandMetadata.webCommandMetadata.url'
-            ],
-            channelName: ['accessibility.accessibilityData.label']
-        },
-        reelPlayerOverlayRenderer: {
-            title: ['reelChannelBarViewModel.channelTitle.content'],
-            channelName: ['reelChannelBarViewModel.channelTitle.content'],
-            channelId: ['reelChannelBarViewModel.channelTitle.onTap.innertubeCommand.browseEndpoint.browseId'],
-            channelHandle: [
-                'reelChannelBarViewModel.channelTitle.commandRuns.0.onTap.innertubeCommand.browseEndpoint.canonicalBaseUrl',
-                'reelChannelBarViewModel.channelTitle.onTap.innertubeCommand.browseEndpoint.canonicalBaseUrl',
-                'reelChannelBarViewModel.channelTitle.onTap.innertubeCommand.commandMetadata.webCommandMetadata.url',
-                'reelChannelBarViewModel.channelTitle.commandMetadata.webCommandMetadata.url'
-            ],
-            channelLogo: [
-                'reelChannelBarViewModel.avatar.avatarViewModel.image.sources.0.url',
-                'reelChannelBarViewModel.avatar.image.sources.0.url'
-            ]
-        },
         watchCardCompactVideoRenderer: BASE_VIDEO_RULES,
         endScreenVideoRenderer: BASE_VIDEO_RULES,
 
@@ -836,19 +448,10 @@
             ],
             title: ['metadata.lockupMetadataViewModel.title.content', 'accessibilityText'],
             channelName: ['metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.0.metadataParts.0.text.content'],
-            channelId: [
-                'metadata.lockupMetadataViewModel.image.decoratedAvatarViewModel.rendererContext.commandContext.onTap.innertubeCommand.browseEndpoint.browseId',
-                // YTM playlist lockups commonly carry owner browseId in metadataRows.commandRuns
-                'metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.0.metadataParts.0.text.commandRuns.0.onTap.innertubeCommand.browseEndpoint.browseId',
-                'metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.0.metadataParts.1.text.commandRuns.0.onTap.innertubeCommand.browseEndpoint.browseId'
-            ],
+            channelId: ['metadata.lockupMetadataViewModel.image.decoratedAvatarViewModel.rendererContext.commandContext.onTap.innertubeCommand.browseEndpoint.browseId'],
             channelHandle: [
                 'metadata.lockupMetadataViewModel.image.decoratedAvatarViewModel.rendererContext.commandContext.onTap.innertubeCommand.browseEndpoint.canonicalBaseUrl',
-                'metadata.lockupMetadataViewModel.image.decoratedAvatarViewModel.rendererContext.commandContext.onTap.innertubeCommand.commandMetadata.webCommandMetadata.url',
-                'metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.0.metadataParts.0.text.commandRuns.0.onTap.innertubeCommand.browseEndpoint.canonicalBaseUrl',
-                'metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.0.metadataParts.0.text.commandRuns.0.onTap.innertubeCommand.commandMetadata.webCommandMetadata.url',
-                'metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.0.metadataParts.1.text.commandRuns.0.onTap.innertubeCommand.browseEndpoint.canonicalBaseUrl',
-                'metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.0.metadataParts.1.text.commandRuns.0.onTap.innertubeCommand.commandMetadata.webCommandMetadata.url'
+                'metadata.lockupMetadataViewModel.image.decoratedAvatarViewModel.rendererContext.commandContext.onTap.innertubeCommand.commandMetadata.webCommandMetadata.url'
             ],
             metadataRows: ['metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows'],
             duration: [
@@ -1478,29 +1081,8 @@
                 this._registerMapping(ownerId, ownerHandle);
             }
 
-            const normalizedOwnerProfileUrl = (() => {
-                const canonical = playerMicroformat?.canonicalBaseUrl || ownerHandle;
-                if (typeof canonical !== 'string') return '';
-                if (canonical.startsWith('/c/')) {
-                    const slug = canonical.split('/')[2];
-                    return slug ? `c/${slug.split('?')[0].split('#')[0]}` : '';
-                }
-                if (canonical.startsWith('/user/')) {
-                    const slug = canonical.split('/')[2];
-                    return slug ? `user/${slug.split('?')[0].split('#')[0]}` : '';
-                }
-                return '';
-            })();
-            const ownerIdentityFromPlayer = {
-                handle: ownerHandle || '',
-                customUrl: normalizedOwnerProfileUrl || '',
-                name: typeof playerMicroformat?.ownerChannelName === 'string'
-                    ? playerMicroformat.ownerChannelName
-                    : (typeof videoDetails?.author === 'string' ? videoDetails.author : ''),
-                logo: playerMicroformat?.thumbnail?.thumbnails?.[0]?.url || ''
-            };
             if (videoId && ownerId && ownerId.startsWith('UC')) {
-                this._registerVideoChannelMapping(videoId, ownerId, ownerIdentityFromPlayer);
+                this._registerVideoChannelMapping(videoId, ownerId);
             }
 
             if (videoId) {
@@ -1551,8 +1133,7 @@
                     }
 
                     if (playlistVideoId && typeof playlistVideoId === 'string' && /^[a-zA-Z0-9_-]{11}$/.test(playlistVideoId) && browseId && typeof browseId === 'string' && browseId.startsWith('UC')) {
-                        const playlistOwnerIdentity = this._extractRendererPrimaryIdentity(renderer);
-                        this._registerVideoChannelMapping(playlistVideoId, browseId, playlistOwnerIdentity);
+                        this._registerVideoChannelMapping(playlistVideoId, browseId);
                     }
                 });
             }
@@ -1583,52 +1164,14 @@
                     candidate = candidate.compactVideoRenderer;
                 } else if (candidate.playlistVideoRenderer) {
                     candidate = candidate.playlistVideoRenderer;
-                } else if (candidate.reelItemRenderer) {
-                    candidate = candidate.reelItemRenderer;
-                } else if (candidate.shortsLockupViewModel) {
-                    candidate = candidate.shortsLockupViewModel;
-                } else if (candidate.shortsLockupViewModelV2) {
-                    candidate = candidate.shortsLockupViewModelV2;
-                } else if (candidate.playlistPanelVideoRenderer) {
-                    candidate = candidate.playlistPanelVideoRenderer;
-                } else if (candidate.videoWithContextRenderer) {
-                    candidate = candidate.videoWithContextRenderer;
-                } else if (candidate.compactPlaylistRenderer) {
-                    candidate = candidate.compactPlaylistRenderer;
-                } else if (candidate.compactChannelRenderer) {
-                    candidate = candidate.compactChannelRenderer;
                 } else if (candidate.lockupViewModel) {
                     candidate = candidate.lockupViewModel;
                 } else if (candidate.richItemRenderer?.content?.videoRenderer) {
                     candidate = candidate.richItemRenderer.content.videoRenderer;
-                } else if (candidate.richItemRenderer?.content?.videoWithContextRenderer) {
-                    candidate = candidate.richItemRenderer.content.videoWithContextRenderer;
-                } else if (candidate.richItemRenderer?.content?.compactPlaylistRenderer) {
-                    candidate = candidate.richItemRenderer.content.compactPlaylistRenderer;
-                } else if (candidate.richItemRenderer?.content?.compactChannelRenderer) {
-                    candidate = candidate.richItemRenderer.content.compactChannelRenderer;
                 } else if (candidate.richItemRenderer?.content?.lockupViewModel) {
                     candidate = candidate.richItemRenderer.content.lockupViewModel;
-                } else if (candidate.richItemRenderer?.content?.reelItemRenderer) {
-                    candidate = candidate.richItemRenderer.content.reelItemRenderer;
-                } else if (candidate.richItemRenderer?.content?.shortsLockupViewModel) {
-                    candidate = candidate.richItemRenderer.content.shortsLockupViewModel;
-                } else if (candidate.richItemRenderer?.content?.shortsLockupViewModelV2) {
-                    candidate = candidate.richItemRenderer.content.shortsLockupViewModelV2;
                 } else if (candidate.content?.videoRenderer) {
                     candidate = candidate.content.videoRenderer;
-                } else if (candidate.content?.videoWithContextRenderer) {
-                    candidate = candidate.content.videoWithContextRenderer;
-                } else if (candidate.content?.compactPlaylistRenderer) {
-                    candidate = candidate.content.compactPlaylistRenderer;
-                } else if (candidate.content?.compactChannelRenderer) {
-                    candidate = candidate.content.compactChannelRenderer;
-                } else if (candidate.content?.reelItemRenderer) {
-                    candidate = candidate.content.reelItemRenderer;
-                } else if (candidate.content?.shortsLockupViewModel) {
-                    candidate = candidate.content.shortsLockupViewModel;
-                } else if (candidate.content?.shortsLockupViewModelV2) {
-                    candidate = candidate.content.shortsLockupViewModelV2;
                 } else if (candidate.content?.lockupViewModel) {
                     candidate = candidate.content.lockupViewModel;
                 }
@@ -1648,168 +1191,11 @@
             visit(root);
         }
 
-        _extractRendererPrimaryIdentity(renderer) {
-            if (!renderer || typeof renderer !== 'object') return {};
-            const byline = renderer.shortBylineText || renderer.longBylineText || renderer.ownerText || {};
-            const firstRun = Array.isArray(byline?.runs) && byline.runs.length > 0 ? byline.runs[0] : null;
-            const browse = firstRun?.navigationEndpoint?.browseEndpoint || null;
-            const channelThumb =
-                renderer?.channelThumbnail?.channelThumbnailWithLinkRenderer ||
-                renderer?.channelThumbnailSupportedRenderers?.channelThumbnailWithLinkRenderer ||
-                null;
-            const canonical = browse?.canonicalBaseUrl ||
-                firstRun?.navigationEndpoint?.commandMetadata?.webCommandMetadata?.url ||
-                channelThumb?.navigationEndpoint?.browseEndpoint?.canonicalBaseUrl ||
-                channelThumb?.navigationEndpoint?.commandMetadata?.webCommandMetadata?.url ||
-                '';
-            let handle = normalizeChannelHandle(canonical);
-            let customUrl = (() => {
-                if (typeof canonical !== 'string' || !canonical) return '';
-                if (canonical.startsWith('/c/')) {
-                    const slug = canonical.split('/')[2];
-                    return slug ? `c/${slug.split('?')[0].split('#')[0]}` : '';
-                }
-                if (canonical.startsWith('/user/')) {
-                    const slug = canonical.split('/')[2];
-                    return slug ? `user/${slug.split('?')[0].split('#')[0]}` : '';
-                }
-                return '';
-            })();
-            const titleHint = flattenText(
-                renderer?.headline ||
-                renderer?.title ||
-                renderer?.metadata?.lockupMetadataViewModel?.title ||
-                ''
-            );
-            const bylineName = typeof firstRun?.text === 'string' ? firstRun.text.trim() : '';
-            let ownerName =
-                renderer?.owner?.videoOwnerRenderer?.title?.runs?.[0]?.text ||
-                renderer?.owner?.videoOwnerRenderer?.title?.simpleText ||
-                renderer?.slimOwnerRenderer?.title?.runs?.[0]?.text ||
-                '';
-            let metadataName = '';
-            const lockupMetadataRows =
-                getByPath(renderer, 'metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows') ||
-                getByPath(renderer, 'metadata.lockupMetadataViewModel.metadataRows') ||
-                getByPath(renderer, 'metadata.contentMetadataViewModel.metadataRows') ||
-                [];
-            const normalizedLockupMetadataRows = Array.isArray(lockupMetadataRows) ? lockupMetadataRows : [];
-            if (Array.isArray(lockupMetadataRows)) {
-                for (const row of normalizedLockupMetadataRows) {
-                    if (!row || typeof row !== 'object') continue;
-                    const parts = Array.isArray(row.metadataParts) ? row.metadataParts : [];
-                    for (const part of parts) {
-                        if (!metadataName && part?.text) {
-                            const candidate = flattenText(part.text).trim();
-                            if (candidate && !isLikelyBadChannelIdentityName(candidate, titleHint)) {
-                                metadataName = candidate;
-                            }
-                        }
-                        const textObj = part?.text;
-                        const commandRuns = [
-                            ...(Array.isArray(textObj?.commandRuns) ? textObj.commandRuns : []),
-                            ...(Array.isArray(part?.commandRuns) ? part.commandRuns : []),
-                            ...(part?.onTap ? [part.onTap] : [])
-                        ];
-                        for (const run of commandRuns) {
-                            const command = run?.onTap?.innertubeCommand || run?.onTap?.browseEndpoint || run?.innertubeCommand || run?.browseEndpoint || null;
-                            const runBrowse = command?.browseEndpoint || (command?.browseId ? command : null) || null;
-                            const canonicalBaseUrl = runBrowse?.canonicalBaseUrl || run?.commandMetadata?.webCommandMetadata?.url || run?.onTap?.commandMetadata?.webCommandMetadata?.url || '';
-                            if (canonicalBaseUrl && typeof canonicalBaseUrl === 'string') {
-                                const resolvedHandle = normalizeChannelHandle(canonicalBaseUrl);
-                                const resolvedCustom = (() => {
-                                    if (canonicalBaseUrl.startsWith('/c/') || canonicalBaseUrl.startsWith('/user/')) {
-                                        const partsArr = canonicalBaseUrl.split('/');
-                                        const type = partsArr[1];
-                                        const slug = partsArr[2] ? partsArr[2].split(/[?#]/)[0] : '';
-                                        return slug ? `${type}/${slug}` : '';
-                                    }
-                                    return '';
-                                })();
-                                if (!handle && resolvedHandle) handle = resolvedHandle;
-                                if (!customUrl && resolvedCustom) customUrl = resolvedCustom;
-                            }
-                        }
-                    }
-                }
-            }
-
-            ownerName = ownerName || metadataName;
-            const a11yLabel =
-                channelThumb?.accessibility?.accessibilityData?.label ||
-                '';
-            const a11yName = (typeof a11yLabel === 'string' && a11yLabel.trim())
-                ? a11yLabel.replace(/^go to channel\s+/i, '').trim()
-                : '';
-            const pickSafeName = (value) => {
-                if (typeof value !== 'string') return '';
-                const trimmed = value.trim();
-                if (!trimmed) return '';
-                if (isLikelyBadChannelIdentityName(trimmed, titleHint)) return '';
-                return trimmed;
-            };
-            const safeByline = pickSafeName(bylineName);
-            const safeOwner = pickSafeName(ownerName);
-            const safeA11y = pickSafeName(a11yName);
-            const a11yLooksTopic = /\s-\sTopic$/i.test(safeA11y || '');
-            const bylineLooksTopic = /\s-\sTopic$/i.test(safeByline || '');
-            const ownerLooksTopic = /\s-\sTopic$/i.test(safeOwner || '');
-            const lockupName = metadataName && (!safeByline && !safeOwner && !safeA11y
-                ? metadataName
-                : '');
-            const name = (a11yLooksTopic && !bylineLooksTopic && !ownerLooksTopic)
-                ? safeA11y
-                : (safeByline || safeOwner || safeA11y || lockupName || '');
-            const logo =
-                channelThumb?.thumbnail?.thumbnails?.[0]?.url ||
-                channelThumb?.thumbnail?.thumbnails?.[1]?.url ||
-                renderer?.owner?.videoOwnerRenderer?.thumbnail?.thumbnails?.[0]?.url ||
-                '';
-            const lockupLogo =
-                getByPath(renderer, 'metadata.lockupMetadataViewModel.image.decoratedAvatarViewModel.avatar.avatarViewModel.image.sources.0.url') ||
-                getByPath(renderer, 'metadata.lockupMetadataViewModel.image.decoratedAvatarViewModel.avatar.image.sources.0.url') ||
-                getByPath(renderer, 'metadata.lockupMetadataViewModel.image.decoratedAvatarViewModel.image.sources.0.url');
-            return {
-                handle: handle || '',
-                customUrl: customUrl || '',
-                name: name || '',
-                logo: (typeof (lockupLogo || logo) === 'string' ? (lockupLogo || logo) : '')
-            };
-        }
-
         _harvestVideoOwnerFromRenderer(renderer) {
             if (!renderer || typeof renderer !== 'object') return;
 
-            const videoId =
-                renderer.videoId ||
-                renderer.contentId ||
-                renderer.navigationEndpoint?.watchEndpoint?.videoId ||
-                renderer.onTap?.innertubeCommand?.reelWatchEndpoint?.videoId ||
-                renderer.onTap?.innertubeCommand?.watchEndpoint?.videoId ||
-                '';
+            const videoId = renderer.videoId || renderer.contentId || renderer.navigationEndpoint?.watchEndpoint?.videoId || '';
             if (!videoId || typeof videoId !== 'string' || !/^[a-zA-Z0-9_-]{11}$/.test(videoId)) return;
-            if (renderer?.metadata?.lockupMetadataViewModel) {
-                const meta = renderer.metadata.lockupMetadataViewModel;
-                const debugRows =
-                    getByPath(meta, 'metadata.contentMetadataViewModel.metadataRows') ||
-                    getByPath(meta, 'metadataRows') ||
-                    [];
-                const flatParts = Array.isArray(debugRows)
-                    ? debugRows.flatMap(row => Array.isArray(row?.metadataParts) ? row.metadataParts : [])
-                    : [];
-                console.log('FilterTube DEBUG lockup:', videoId, JSON.stringify({
-                    hasAvatar: !!(meta?.image?.decoratedAvatarViewModel || meta?.image?.avatar?.avatarViewModel),
-                    rowCount: Array.isArray(debugRows) ? debugRows.length : 0,
-                    partTexts: flatParts.map((part) => part?.text?.content || '').filter(Boolean).slice(0, 3),
-                    textCommandRuns: flatParts.map((part) => (part?.text?.commandRuns || []).length),
-                    partCommandRuns: flatParts.map((part) => (part?.commandRuns || []).length),
-                    rowCommandRuns: Array.isArray(debugRows)
-                        ? debugRows.map((row) => (Array.isArray(row?.commandRuns) ? row.commandRuns.length : 0))
-                        : [],
-                    partOnTap: flatParts.map((part) => !!part?.onTap || !!part?.text?.onTap)
-                }));
-            }
-            const rendererIdentity = this._extractRendererPrimaryIdentity(renderer);
 
             const ownerId =
                 renderer?.kidsVideoOwnerExtension?.externalChannelId ||
@@ -1817,316 +1203,38 @@
                 '';
 
             if (ownerId && typeof ownerId === 'string' && ownerId.startsWith('UC')) {
-                this._registerVideoChannelMapping(videoId, ownerId, rendererIdentity);
+                this._registerVideoChannelMapping(videoId, ownerId);
                 return;
             }
 
             const byline = renderer.shortBylineText || renderer.longBylineText || renderer.ownerText;
             const browseId = byline?.runs?.[0]?.navigationEndpoint?.browseEndpoint?.browseId || '';
             if (browseId && typeof browseId === 'string' && browseId.startsWith('UC')) {
-                this._registerVideoChannelMapping(videoId, browseId, rendererIdentity);
+                this._registerVideoChannelMapping(videoId, browseId);
                 return;
             }
 
-            const channelThumbBrowse =
-                renderer?.channelThumbnail?.channelThumbnailWithLinkRenderer?.navigationEndpoint?.browseEndpoint ||
-                renderer?.channelThumbnailSupportedRenderers?.channelThumbnailWithLinkRenderer?.navigationEndpoint?.browseEndpoint ||
-                null;
-            const channelThumbBrowseId = channelThumbBrowse?.browseId || '';
-            if (channelThumbBrowseId && typeof channelThumbBrowseId === 'string' && channelThumbBrowseId.startsWith('UC')) {
-                this._registerVideoChannelMapping(videoId, channelThumbBrowseId, rendererIdentity);
-                const thumbCanonical =
-                    channelThumbBrowse?.canonicalBaseUrl ||
-                    renderer?.channelThumbnail?.channelThumbnailWithLinkRenderer?.navigationEndpoint?.commandMetadata?.webCommandMetadata?.url ||
-                    renderer?.channelThumbnailSupportedRenderers?.channelThumbnailWithLinkRenderer?.navigationEndpoint?.commandMetadata?.webCommandMetadata?.url ||
-                    '';
-                const normalized = typeof thumbCanonical === 'string' ? normalizeChannelHandle(thumbCanonical) : '';
-                if (normalized) {
-                    this._registerMapping(channelThumbBrowseId, normalized);
-                } else if (typeof thumbCanonical === 'string' && thumbCanonical) {
-                    let custom = '';
-                    if (thumbCanonical.startsWith('/c/')) {
-                        const slug = thumbCanonical.split('/')[2];
-                        if (slug) custom = `c/${slug.split('?')[0].split('#')[0]}`;
-                    } else if (thumbCanonical.startsWith('/user/')) {
-                        const slug = thumbCanonical.split('/')[2];
-                        if (slug) custom = `user/${slug.split('?')[0].split('#')[0]}`;
-                    }
-                    if (custom) this._registerCustomUrlMapping(channelThumbBrowseId, custom);
-                }
-                return;
-            }
-
-            const lockupBrowse =
-                renderer?.metadata?.lockupMetadataViewModel?.image?.decoratedAvatarViewModel?.rendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint ||
-                renderer?.metadata?.lockupMetadataViewModel?.image?.avatar?.avatarViewModel?.rendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint ||
-                renderer?.metadata?.lockupMetadataViewModel?.image?.decoratedAvatarViewModel?.rendererContext?.onTap?.browseEndpoint ||
-                renderer?.metadata?.lockupMetadataViewModel?.image?.avatar?.rendererContext?.onTap?.browseEndpoint ||
-                null;
+            const lockupBrowse = renderer?.metadata?.lockupMetadataViewModel?.image?.decoratedAvatarViewModel?.rendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint;
             const lockupBrowseId = lockupBrowse?.browseId;
             if (lockupBrowseId && typeof lockupBrowseId === 'string' && lockupBrowseId.startsWith('UC')) {
-                this._registerVideoChannelMapping(videoId, lockupBrowseId, rendererIdentity);
+                this._registerVideoChannelMapping(videoId, lockupBrowseId);
                 const canonical = lockupBrowse?.canonicalBaseUrl || '';
                 const normalized = typeof canonical === 'string' ? normalizeChannelHandle(canonical) : '';
                 if (normalized) {
                     this._registerMapping(lockupBrowseId, normalized);
                 }
-                return;
-            }
-
-            const metadataRows =
-                getByPath(renderer, 'metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows') ||
-                getByPath(renderer, 'metadata.lockupMetadataViewModel.metadataRows') ||
-                getByPath(renderer, 'metadata.contentMetadataViewModel.metadataRows') ||
-                getByPath(renderer, 'metadata.lockupMetadataViewModel.contentMetadataViewModel.metadataRows') ||
-                [];
-            if (Array.isArray(metadataRows)) {
-                for (const row of metadataRows) {
-                    if (!row || typeof row !== 'object') continue;
-                    const parts = Array.isArray(row?.metadataParts) ? row.metadataParts : [];
-                    for (const part of parts) {
-                        const registerFromBrowseSource = (browseSource) => {
-                            const browse = browseSource?.browseEndpoint
-                                || browseSource?.command?.browseEndpoint
-                                || browseSource?.innertubeCommand?.browseEndpoint
-                                || browseSource?.onTap?.innertubeCommand?.browseEndpoint
-                                || browseSource?.onTap?.browseEndpoint
-                                || null;
-                            const browseId = typeof browse?.browseId === 'string' ? browse.browseId.trim() : '';
-                            if (!browseId || !browseId.startsWith('UC')) return null;
-                            const canonicalBaseUrl = browse?.canonicalBaseUrl
-                                || browseSource?.canonicalBaseUrl
-                                || browseSource?.commandMetadata?.webCommandMetadata?.url
-                                || browseSource?.onTap?.commandMetadata?.webCommandMetadata?.url
-                                || '';
-                            this._registerVideoChannelMapping(videoId, browseId, rendererIdentity);
-                            if (typeof canonicalBaseUrl === 'string' && canonicalBaseUrl.startsWith('/')) {
-                                const normalized = normalizeChannelHandle(canonicalBaseUrl);
-                                if (normalized) {
-                                    this._registerMapping(browseId, normalized);
-                                } else if (canonicalBaseUrl.startsWith('/c/') || canonicalBaseUrl.startsWith('/user/')) {
-                                    const m = canonicalBaseUrl.split('?')[0].split('/');
-                                    if (m[2]) {
-                                        this._registerCustomUrlMapping(browseId, `${m[1]}/${m[2]}`);
-                                    }
-                                }
-                            }
-                            return true;
-                        };
-                        const commandRuns = [
-                            ...(Array.isArray(part?.text?.commandRuns) ? part.text.commandRuns : []),
-                            ...(Array.isArray(part?.commandRuns) ? part.commandRuns : []),
-                            ...(part?.onTap ? [part.onTap] : [])
-                        ];
-                        const partRunCandidates = Array.isArray(part?.text?.runs)
-                            ? part.text.runs
-                                .map((run) => {
-                                    return run?.navigationEndpoint || run?.onTap || run?.command || run?.textCommand?.onTap || null;
-                                })
-                                .filter(Boolean)
-                            : [];
-                        const partSourceCandidates = [
-                            ...(Array.isArray(part?.text?.commandRuns) ? part.text.commandRuns : []),
-                            ...(Array.isArray(part?.commandRuns) ? part.commandRuns : []),
-                            ...(Array.isArray(part?.content?.commandRuns) ? part.content.commandRuns : []),
-                            ...partRunCandidates,
-                            ...(Array.isArray(part?.text?.commandRuns)
-                                ? part.text.commandRuns
-                                    .map((cmd) => cmd?.navigationEndpoint || cmd?.command || cmd?.onTap || null)
-                                    .filter(Boolean)
-                                : []),
-                            ...(part?.onTap ? [part.onTap] : []),
-                            ...(part?.text?.onTap ? [part.text.onTap] : []),
-                            ...(part?.content?.onTap ? [part.content.onTap] : []),
-                            ...(part?.command ? [part.command] : []),
-                            ...(part?.navigationEndpoint ? [part.navigationEndpoint] : [])
-                        ];
-                        const rowSourceCandidates = [
-                            ...(Array.isArray(row?.commandRuns) ? row.commandRuns : []),
-                            ...(Array.isArray(row?.content?.commandRuns) ? row.content.commandRuns : []),
-                            ...(Array.isArray(row?.text?.commandRuns) ? row.text.commandRuns : []),
-                            ...(row?.onTap ? [row.onTap] : []),
-                            ...(row?.text?.onTap ? [row.text.onTap] : []),
-                            ...(row?.content?.onTap ? [row.content.onTap] : []),
-                            ...(row?.navigationEndpoint ? [row.navigationEndpoint] : []),
-                            ...(row?.command ? [row.command] : []),
-                            ...(Array.isArray(row?.text?.runs)
-                                ? row.text.runs
-                                    .map((run) => run?.navigationEndpoint || run?.onTap || run?.command || run?.textCommand?.onTap || null)
-                                    .filter(Boolean)
-                                : [])
-                        ];
-                        if (Array.isArray(rowSourceCandidates)) {
-                            for (const source of rowSourceCandidates) {
-                                if (registerFromBrowseSource(source)) return;
-                            }
-                        }
-                        if (partSourceCandidates.length > 0) {
-                            for (const source of partSourceCandidates) {
-                                if (registerFromBrowseSource(source)) return;
-                            }
-                        }
-                        for (const run of commandRuns) {
-                            const command = run?.onTap?.innertubeCommand || run?.onTap?.browseEndpoint || run?.innertubeCommand || run?.browseEndpoint || null;
-                            const browse = command?.browseEndpoint || (command?.browseId ? command : null) || null;
-                            const rowBrowseId = browse?.browseId || '';
-                            if (typeof rowBrowseId === 'string' && rowBrowseId.startsWith('UC')) {
-                                this._registerVideoChannelMapping(videoId, rowBrowseId, rendererIdentity);
-                                const canonicalBaseUrl = browse?.canonicalBaseUrl || run?.commandMetadata?.webCommandMetadata?.url || run?.onTap?.commandMetadata?.webCommandMetadata?.url || '';
-                                const normalized = typeof canonicalBaseUrl === 'string' ? normalizeChannelHandle(canonicalBaseUrl) : '';
-                                if (normalized) {
-                                    this._registerMapping(rowBrowseId, normalized);
-                                } else if (typeof canonicalBaseUrl === 'string' && (canonicalBaseUrl.startsWith('/c/') || canonicalBaseUrl.startsWith('/user/'))) {
-                                    const partsArr = canonicalBaseUrl.split('/');
-                                    const type = partsArr[1];
-                                    const slug = partsArr[2] ? partsArr[2].split(/[?#]/)[0] : '';
-                                    if (type && slug) this._registerCustomUrlMapping(rowBrowseId, `${type}/${slug}`);
-                                }
-                                return;
-                            }
-                        }
-                    }
-                }
-            }
-
-            const reelOverlayRenderer = getByPath(renderer, 'navigationEndpoint.reelWatchEndpoint.overlay.reelPlayerOverlayRenderer')
-                || getByPath(renderer, 'reelWatchEndpoint.overlay.reelPlayerOverlayRenderer')
-                || getByPath(renderer, 'overlay.reelPlayerOverlayRenderer');
-            if (reelOverlayRenderer?.reelChannelBarViewModel?.channelTitle) {
-                const overlayTitle = reelOverlayRenderer.reelChannelBarViewModel.channelTitle || null;
-                const overlayName = flattenText(overlayTitle?.content || '');
-                const overlayLogo =
-                    getByPath(reelOverlayRenderer, 'reelChannelBarViewModel.avatar.avatarViewModel.image.sources.0.url') ||
-                    getByPath(reelOverlayRenderer, 'reelChannelBarViewModel.avatar.image.sources.0.url') ||
-                    '';
-                const overlaySourceCandidates = [];
-                if (overlayTitle?.onTap?.innertubeCommand?.browseEndpoint) {
-                    overlaySourceCandidates.push(overlayTitle.onTap.innertubeCommand.browseEndpoint);
-                }
-                if (Array.isArray(overlayTitle?.commandRuns)) {
-                    for (const run of overlayTitle.commandRuns) {
-                        if (run?.onTap?.innertubeCommand?.browseEndpoint) {
-                            overlaySourceCandidates.push(run.onTap.innertubeCommand.browseEndpoint);
-                        }
-                        if (run?.onTap?.browseEndpoint) {
-                            overlaySourceCandidates.push(run.onTap.browseEndpoint);
-                        }
-                    }
-                }
-                const overlayCanonicalCandidates = [
-                    overlayTitle?.onTap?.commandMetadata?.webCommandMetadata?.url,
-                    ...overlaySourceCandidates.map((source) => source?.canonicalBaseUrl),
-                    ...overlaySourceCandidates.map((source) => source?.commandMetadata?.webCommandMetadata?.url),
-                    overlayTitle?.commandMetadata?.webCommandMetadata?.url
-                ];
-                const normalizedOverlayHandle = (() => {
-                    for (const candidate of overlayCanonicalCandidates) {
-                        if (typeof candidate === 'string') {
-                            const normalized = normalizeChannelHandle(candidate);
-                            if (normalized) return normalized;
-                        }
-                    }
-                    return '';
-                })();
-                const overlayCustomUrl = (() => {
-                    const canonicalCandidate = overlayCanonicalCandidates.find((candidate) => typeof candidate === 'string' && candidate.startsWith('/c/')) ||
-                        overlayCanonicalCandidates.find((candidate) => typeof candidate === 'string' && candidate.startsWith('/user/'));
-                    if (typeof canonicalCandidate !== 'string') return '';
-                    const parts = canonicalCandidate.split('/');
-                    const type = parts[1];
-                    const slug = parts[2] ? parts[2].split(/[?#]/)[0] : '';
-                    return slug && type ? `${type}/${slug}` : '';
-                })();
-                const overlayChannelId = overlaySourceCandidates
-                    .map((source) => source?.browseId)
-                    .find((id) => typeof id === 'string' && /^UC[\w-]{22}$/i.test(id)) || '';
-
-                if (overlayChannelId) {
-                    this._registerVideoChannelMapping(videoId, overlayChannelId, {
-                        ...rendererIdentity,
-                        name: overlayName || rendererIdentity.name || '',
-                        handle: normalizedOverlayHandle || rendererIdentity.handle || '',
-                        customUrl: overlayCustomUrl || rendererIdentity.customUrl || '',
-                        logo: overlayLogo || rendererIdentity.logo || ''
-                    });
-                    const overlayCanonical = overlaySourceCandidates
-                        .map((source) => source?.canonicalBaseUrl || source?.commandMetadata?.webCommandMetadata?.url || '')
-                        .find((value) => typeof value === 'string' && value.startsWith('/')) || '';
-                    if (overlayCanonical) {
-                        const normalized = normalizeChannelHandle(overlayCanonical);
-                        if (normalized) {
-                            this._registerMapping(overlayChannelId, normalized);
-                        } else if (overlayCanonical.startsWith('/c/') || overlayCanonical.startsWith('/user/')) {
-                            const parts = overlayCanonical.split('?')[0].split('/');
-                            if (parts[2]) {
-                                this._registerCustomUrlMapping(overlayChannelId, `${parts[1]}/${parts[2]}`);
-                            }
-                        }
-                    }
-                    return;
-                }
-
-                const fallbackOverlayName = overlayName || rendererIdentity.name || '';
-                const fallbackOverlayHandle = normalizedOverlayHandle || rendererIdentity.handle || '';
-                const fallbackOverlayLogo = overlayLogo || rendererIdentity.logo || '';
-                const fallbackOverlayCustomUrl = overlayCustomUrl || rendererIdentity.customUrl || '';
-                if (fallbackOverlayName || fallbackOverlayHandle || fallbackOverlayLogo || fallbackOverlayCustomUrl) {
-                    queueVideoIdentityHint(videoId, {
-                        name: fallbackOverlayName,
-                        handle: fallbackOverlayHandle,
-                        customUrl: fallbackOverlayCustomUrl,
-                        logo: fallbackOverlayLogo,
-                        source: 'filter_logic',
-                        fetchStrategy: 'rules'
-                    });
-                }
-            }
-
-            // FALLBACK: All browseId paths failed. Emit whatever identity we have
-            // so content_bridge can stamp the card.
-            // Merge rendererIdentity with any direct byline text that may have been missed.
-            const fallbackName = rendererIdentity?.name || (() => {
-                // Direct byline extraction as last resort — often has channel name
-                // even when there's no browse endpoint
-                const byline = renderer.shortBylineText || renderer.longBylineText || renderer.ownerText;
-                if (byline?.simpleText) return byline.simpleText.trim();
-                if (Array.isArray(byline?.runs)) {
-                    return byline.runs.map(r => r?.text || '').join('').trim();
-                }
-                return '';
-            })();
-            const fallbackHandle = rendererIdentity?.handle || '';
-            const fallbackLogo = rendererIdentity?.logo || '';
-            const fallbackCustomUrl = rendererIdentity?.customUrl || '';
-
-            if (fallbackName || fallbackHandle) {
-                queueVideoIdentityHint(videoId, {
-                    name: fallbackName,
-                    handle: fallbackHandle,
-                    customUrl: fallbackCustomUrl,
-                    logo: fallbackLogo,
-                    source: 'filter_logic',
-                    fetchStrategy: 'rules'
-                });
             }
         }
 
-        _registerVideoChannelMapping(videoId, channelId, identity = {}) {
+        _registerVideoChannelMapping(videoId, channelId) {
             if (!videoId || !channelId) return;
 
             const current = this.settings?.videoChannelMap && typeof this.settings.videoChannelMap === 'object'
                 ? this.settings.videoChannelMap
                 : null;
-            const currentVideoEntry = current ? current[videoId] : null;
-            const currentVideoId = typeof currentVideoEntry === 'string'
-                ? currentVideoEntry
-                : (currentVideoEntry && typeof currentVideoEntry === 'object'
-                    ? (currentVideoEntry.channelId || currentVideoEntry.id)
-                    : '');
-            const hasUsefulIdentity = !!(identity?.name || identity?.channelName || identity?.handle || identity?.customUrl || identity?.logo || identity?.channelLogo);
-            if (currentVideoId === channelId && !hasUsefulIdentity) return;
+            if (current && current[videoId] === channelId) return;
 
-            queueVideoChannelMapping(videoId, channelId, identity || {});
+            queueVideoChannelMapping(videoId, channelId);
         }
 
         _registerVideoMetaMapping(videoId, meta) {
@@ -2327,22 +1435,13 @@
             const isCommentRenderer = rendererType.includes('comment') || rendererType.includes('Comment');
 
             // Shorts: if no channel identity present, try videoChannelMap (populated when user blocked Shorts)
-            if (videoId && this.settings.videoChannelMap && !Array.isArray(channelInfo)) {
-                const cached = this.settings.videoChannelMap[videoId];
-                if (typeof cached === 'string') {
-                    if (!channelInfo.id) channelInfo.id = cached;
-                } else if (cached && typeof cached === 'object') {
-                    if (!channelInfo.id) channelInfo.id = cached.channelId || cached.id || '';
-                    if (!channelInfo.name) channelInfo.name = cached.channelName || cached.name || '';
-                    if (!channelInfo.handle) channelInfo.handle = normalizeChannelHandle(
-                        cached.handle ||
-                        cached.channelHandle ||
-                        cached.canonicalHandle ||
-                        ''
-                    ) || '';
-                    if (!channelInfo.customUrl) channelInfo.customUrl = cached.customUrl || '';
-                    if (!channelInfo.logo) channelInfo.logo = cached.logo || cached.channelLogo || '';
-                }
+            if (
+                (!channelInfo.id && !channelInfo.handle && !channelInfo.customUrl) &&
+                videoId &&
+                this.settings.videoChannelMap &&
+                this.settings.videoChannelMap[videoId]
+            ) {
+                channelInfo.id = this.settings.videoChannelMap[videoId];
             }
 
             // Handle collaboration videos (channelInfo is an array)
@@ -2356,190 +1455,6 @@
                 }
                 if (collaborator.id && collaborator.customUrl) {
                     this._registerCustomUrlMapping(collaborator.id, collaborator.customUrl);
-                }
-            }
-
-            const extractText = (value) => {
-                if (!value) return '';
-                if (typeof value === 'string') return value.trim();
-
-                if (typeof value === 'object') {
-                    if (typeof value.simpleText === 'string' && value.simpleText.trim()) {
-                        return value.simpleText.trim();
-                    }
-
-                    if (typeof value.text === 'string' && value.text.trim()) {
-                        return value.text.trim();
-                    }
-
-                    if (Array.isArray(value.runs)) {
-                        const firstRun = value.runs.find((run) => run && typeof run.text === 'string' && run.text.trim());
-                        if (firstRun) return firstRun.text.trim();
-                    }
-                }
-
-                if (Array.isArray(value)) {
-                    const firstRun = value.find((run) => run && typeof run.text === 'string' && run.text.trim());
-                    if (firstRun) return firstRun.text.trim();
-                }
-
-                return '';
-            };
-
-            const pickText = (paths) => {
-                if (!Array.isArray(paths)) return '';
-                for (const path of paths) {
-                    const value = getByPath(item, path);
-                    const text = extractText(value);
-                    if (text) return text;
-                }
-                return '';
-            };
-
-            const playlistId = (() => {
-                const candidates = [
-                    getByPath(item, 'navigationEndpoint.watchEndpoint.playlistId'),
-                    getByPath(item, 'secondaryNavigationEndpoint.watchEndpoint.playlistId'),
-                    getByPath(item, 'onTap.innertubeCommand.watchEndpoint.playlistId'),
-                    getByPath(item, 'navigationEndpoint.secondaryNavigationEndpoint.watchEndpoint.playlistId'),
-                    getByPath(item, 'watchEndpoint.playlistId')
-                ];
-                for (const candidate of candidates) {
-                    if (typeof candidate === 'string' && candidate.trim()) {
-                        return candidate.trim();
-                    }
-                }
-                return '';
-            })();
-
-            const seedVideoId = (() => {
-                const candidates = [
-                    getByPath(item, 'navigationEndpoint.watchEndpoint.videoId'),
-                    getByPath(item, 'secondaryNavigationEndpoint.watchEndpoint.videoId'),
-                    getByPath(item, 'onTap.innertubeCommand.watchEndpoint.videoId'),
-                    getByPath(item, 'navigationEndpoint.secondaryNavigationEndpoint.watchEndpoint.videoId'),
-                    getByPath(item, 'watchEndpoint.videoId'),
-                    getByPath(item, 'compactVideoRenderer.navigationEndpoint.watchEndpoint.videoId')
-                ];
-                for (const candidate of candidates) {
-                    if (typeof candidate === 'string' && /^[a-zA-Z0-9_-]{11}$/.test(candidate.trim())) {
-                        return candidate.trim();
-                    }
-                }
-                return '';
-            })();
-
-            const isMixCandidate = rendererType === 'radioRenderer' || rendererType === 'compactRadioRenderer';
-            const collaboratorPayload = isCollaboration
-                ? collaborators
-                    .map((collaborator) => {
-                        if (!collaborator || typeof collaborator !== 'object') return null;
-                        return {
-                            id: typeof collaborator.id === 'string' ? collaborator.id.trim() : '',
-                            handle: typeof collaborator.handle === 'string' ? collaborator.handle.trim() : '',
-                            customUrl: typeof collaborator.customUrl === 'string' ? collaborator.customUrl.trim() : '',
-                            name: typeof collaborator.name === 'string' ? collaborator.name.trim() : '',
-                            logo: typeof collaborator.logo === 'string' ? collaborator.logo.trim() : '',
-                            subtitle: typeof collaborator.subtitle === 'string' ? collaborator.subtitle.trim() : ''
-                        };
-                    })
-                    .filter(Boolean)
-                : [];
-            const expectedCollaboratorCount = isCollaboration ? collaborators.length : 0;
-
-            // Emit richer per-video identity (name/handle/custom/logo/playlist/collaboration) so isolated-world cards can be
-            // pre-stamped from XHR/ytInitialData and avoid fallback lookups.
-            const primaryOwner = collaborators[0] || null;
-            const videoDurationText = pickText([
-                'lengthText',
-                'richThumbnail.movingThumbnailRenderer.movingThumbnailDetails.parts.0.thumbnail.thumbnail.accessibility.accessibilityData.label',
-                'thumbnailOverlays.1.thumbnailOverlayTimeStatusRenderer.text',
-                'thumbnailOverlays.0.thumbnailOverlayTimeStatusRenderer.text'
-            ]);
-            const videoViewsText = pickText([
-                'shortViewCountText',
-                'videoInfo',
-                'videoInfo.runs',
-                'metadata.rows.0.runs'
-            ]);
-            const videoPublishedText = pickText([
-                'publishedTimeText',
-                'videoInfo.runs',
-                'metadata.rows.1.runs'
-            ]);
-            const videoBylineText = pickText([
-                'shortBylineText',
-                'longBylineText',
-                'metadata.rows.0.title'
-            ]);
-            const videoCountText = pickText([
-                'videoCountText',
-                'videoCountShortText',
-                'videoCountAndViewCountText',
-                'thumbnailOverlayBottomPanelRenderer.text'
-            ]);
-            const resolvedOwnerId = (() => {
-                if (primaryOwner?.id && /^UC[\w-]{22}$/i.test(String(primaryOwner.id))) {
-                    return String(primaryOwner.id);
-                }
-
-                if (!isMixCandidate || !seedVideoId) return '';
-
-                const mapped = this?.settings?.videoChannelMap?.[seedVideoId];
-                if (typeof mapped === 'string' && /^UC[\w-]{22}$/i.test(mapped)) {
-                    return mapped;
-                }
-
-                return '';
-            })();
-
-            const resolvedOwnerName = (() => {
-                const preferred = typeof primaryOwner?.name === 'string' ? primaryOwner.name.trim() : '';
-                if (preferred) return preferred;
-                return (typeof collaborators?.[0]?.name === 'string' && collaborators[0].name.trim())
-                    ? collaborators[0].name.trim()
-                    : '';
-            })();
-            const resolvedOwnerHandle = (() => {
-                if (typeof primaryOwner?.handle === 'string' && primaryOwner.handle.trim()) {
-                    return primaryOwner.handle.trim();
-                }
-                const mappedHandle = typeof resolvedOwnerId === 'string'
-                    ? this.channelMap?.[resolvedOwnerId]
-                    : '';
-                return typeof mappedHandle === 'string' ? normalizeChannelHandle(mappedHandle) : '';
-            })();
-
-            const identityPayload = {
-                handle: resolvedOwnerHandle,
-                customUrl: primaryOwner?.customUrl || '',
-                name: resolvedOwnerName,
-                logo: primaryOwner?.logo || '',
-                videoTitle: title || '',
-                videoDuration: videoDurationText,
-                videoViewsText,
-                videoPublishedText,
-                videoBylineText,
-                videoCountText,
-                playlistSeedVideoId: seedVideoId || '',
-                source: 'filter_logic',
-                fetchStrategy: isMixCandidate ? 'mix' : 'rules',
-                playlistId: playlistId || '',
-                cardCategory: isMixCandidate ? 'mix' : 'video',
-                isCollaboration: isCollaboration && collaborators.length > 1,
-                expectedCollaboratorCount: expectedCollaboratorCount,
-                collaboratorsSource: collaborators.length > 1 ? 'renderer_extraction' : '',
-                allCollaborators: collaboratorPayload,
-                expectedChannelName: resolvedOwnerName,
-                isMixCandidate,
-                needsFetch: !resolvedOwnerId
-            };
-
-            if (videoId) {
-                if (resolvedOwnerId) {
-                    this._registerVideoChannelMapping(videoId, resolvedOwnerId, identityPayload);
-                } else {
-                    queueVideoIdentityHint(videoId, identityPayload);
                 }
             }
 
@@ -2737,8 +1652,7 @@
                 'endScreenVideoRenderer', 'richItemRenderer', 'lockupViewModel',
                 'shortsLockupViewModel', 'shortsLockupViewModelV2', 'reelItemRenderer',
                 'richGridMedia', 'channelVideoPlayerRenderer', 'playlistPanelVideoRenderer',
-                'playlistRenderer', 'gridPlaylistRenderer', 'radioRenderer', 'compactRadioRenderer',
-                'videoWithContextRenderer', 'compactPlaylistRenderer'
+                'playlistRenderer', 'gridPlaylistRenderer', 'radioRenderer', 'compactRadioRenderer'
             ].includes(rendererType);
             if (!isVideoRenderer) return false;
 
@@ -3119,8 +2033,6 @@
                     'gridVideoRenderer',
                     'playlistVideoRenderer',
                     'playlistPanelVideoRenderer',
-                    'videoWithContextRenderer',
-                    'compactPlaylistRenderer',
                     'watchCardCompactVideoRenderer',
                     'endScreenVideoRenderer',
                     'lockupViewModel',
@@ -3147,9 +2059,7 @@
             // Some renderers may nest lockups directly under item (not under `.content`)
             const directKnownKeys = [
                 'videoRenderer',
-                'lockupViewModel',
-                'videoWithContextRenderer',
-                'compactPlaylistRenderer'
+                'lockupViewModel'
             ];
             for (const key of directKnownKeys) {
                 if (!item[key] || typeof item[key] !== 'object') continue;
@@ -3318,8 +2228,7 @@
                 'endScreenVideoRenderer', 'richItemRenderer', 'lockupViewModel',
                 'shortsLockupViewModel', 'shortsLockupViewModelV2', 'reelItemRenderer',
                 'richGridMedia', 'channelVideoPlayerRenderer', 'playlistPanelVideoRenderer',
-                'playlistRenderer', 'gridPlaylistRenderer', 'radioRenderer', 'compactRadioRenderer',
-                'videoWithContextRenderer', 'compactPlaylistRenderer'
+                'playlistRenderer', 'gridPlaylistRenderer', 'radioRenderer', 'compactRadioRenderer'
             ].includes(rendererType);
 
             if (!isVideoRenderer) return false;
@@ -3328,8 +2237,8 @@
             if (cf.duration && cf.duration.enabled) {
                 const durationSeconds = this._extractDuration(item, rules, rendererType);
                 this._log('[FilterTube] Duration filter ENABLED for ' + rendererType + ': condition=' + cf.duration.condition + ', minMinutes=' + cf.duration.minMinutes);
-                this._log('[FilterTube] Extracted duration: ' + durationSeconds + ' seconds (' + (durationSeconds ? (durationSeconds / 60).toFixed(1) : 'null') + ' min)');
-
+                this._log('[FilterTube] Extracted duration: ' + durationSeconds + ' seconds (' + (durationSeconds ? (durationSeconds/60).toFixed(1) : 'null') + ' min)');
+                
                 if (durationSeconds !== null) {
                     const durationMinutes = durationSeconds / 60;
                     const condition = cf.duration.condition || 'between';
@@ -3614,74 +2523,6 @@
             }
 
             if (bylineText?.runs) {
-                const extractListItemsFromSheetLikeCommand = (command) => {
-                    if (!command || typeof command !== 'object') return [];
-                    const listItems =
-                        command?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems ||
-                        command?.panelLoadingStrategy?.inlineContent?.sheetViewModel?.content?.listViewModel?.listItems ||
-                        [];
-                    return Array.isArray(listItems) ? listItems : [];
-                };
-
-                const pickBrowseEndpoint = (viewModel) => {
-                    if (!viewModel || typeof viewModel !== 'object') return null;
-                    const fromContext = (
-                        viewModel?.rendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint ||
-                        viewModel?.rendererContext?.commandContext?.onTap?.innertubeCommand?.command?.browseEndpoint ||
-                        viewModel?.rendererContext?.commandContext?.onTap?.browseEndpoint ||
-                        null
-                    );
-                    const commandRuns = Array.isArray(viewModel?.title?.commandRuns) ? viewModel.title.commandRuns : [];
-                    let fromTitleRuns = null;
-                    for (const run of commandRuns) {
-                        const browse =
-                            run?.onTap?.innertubeCommand?.browseEndpoint ||
-                            run?.onTap?.innertubeCommand?.command?.browseEndpoint ||
-                            run?.onTap?.browseEndpoint ||
-                            null;
-                        if (browse) {
-                            fromTitleRuns = browse;
-                            break;
-                        }
-                    }
-                    const normalizeUc = (value) => {
-                        const raw = typeof value === 'string' ? value.trim() : '';
-                        return /^UC[\w-]{22}$/i.test(raw) ? raw : '';
-                    };
-                    const contextId = normalizeUc(fromContext?.browseId || '');
-                    const titleId = normalizeUc(fromTitleRuns?.browseId || '');
-                    const idsConflict = Boolean(contextId && titleId && contextId !== titleId);
-                    const preferred = idsConflict ? fromContext : (fromTitleRuns || fromContext);
-                    if (!preferred) return null;
-                    return {
-                        ...(fromContext || {}),
-                        ...(fromTitleRuns || {}),
-                        browseId: idsConflict
-                            ? (fromContext?.browseId || '')
-                            : (fromTitleRuns?.browseId || fromContext?.browseId || ''),
-                        canonicalBaseUrl: idsConflict
-                            ? (fromContext?.canonicalBaseUrl || '')
-                            : (fromTitleRuns?.canonicalBaseUrl || fromContext?.canonicalBaseUrl || ''),
-                        __idsConflict: idsConflict
-                    };
-                };
-
-                const pickMetadataUrl = (viewModel) => {
-                    const direct = viewModel?.rendererContext?.commandContext?.onTap?.innertubeCommand?.commandMetadata?.webCommandMetadata?.url ||
-                        viewModel?.rendererContext?.commandContext?.onTap?.innertubeCommand?.command?.commandMetadata?.webCommandMetadata?.url ||
-                        '';
-                    if (direct) return direct;
-                    const commandRuns = Array.isArray(viewModel?.title?.commandRuns) ? viewModel.title.commandRuns : [];
-                    for (const run of commandRuns) {
-                        const candidate = run?.onTap?.innertubeCommand?.commandMetadata?.webCommandMetadata?.url ||
-                            run?.onTap?.innertubeCommand?.command?.commandMetadata?.webCommandMetadata?.url ||
-                            run?.onTap?.commandMetadata?.webCommandMetadata?.url ||
-                            '';
-                        if (candidate) return candidate;
-                    }
-                    return '';
-                };
-
                 for (const run of bylineText.runs) {
                     // DEBUG: Log run structure
                     if (run.text && (run.text.includes(' and ') || run.text.includes(' & '))) {
@@ -3690,15 +2531,13 @@
                         postLogToBridge('log', '[COLLAB DEBUG] Has showDialogCommand?', !!run.navigationEndpoint?.showDialogCommand);
                     }
 
-                    // Look for showSheet/showDialog command which indicates a collaboration video
-                    const showSheetCommand = run.navigationEndpoint?.showSheetCommand;
+                    // Look for showDialogCommand which indicates a collaboration video
                     const showDialogCommand = run.navigationEndpoint?.showDialogCommand;
-                    const sheetLikeCommand = showSheetCommand || showDialogCommand;
-                    if (sheetLikeCommand) {
-                        postLogToBridge('log', '🎯 Detected COLLABORATION video via sheet/dialog command in filter_logic');
+                    if (showDialogCommand) {
+                        postLogToBridge('log', '🎯 Detected COLLABORATION video via showDialogCommand in filter_logic');
 
                         // Extract all collaborating channels from listItems
-                        const listItems = extractListItemsFromSheetLikeCommand(sheetLikeCommand);
+                        const listItems = showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems;
 
                         if (listItems && Array.isArray(listItems)) {
                             const collaborators = [];
@@ -3706,22 +2545,14 @@
                             for (const item of listItems) {
                                 const listItemViewModel = item.listItemViewModel;
                                 if (listItemViewModel) {
-                                    const browseEndpoint = pickBrowseEndpoint(listItemViewModel);
+                                    const browseEndpoint = listItemViewModel.rendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint;
                                     const title = listItemViewModel.title?.content;
 
                                     if (browseEndpoint) {
                                         const browseId = browseEndpoint.browseId;
                                         const canonicalBaseUrl = browseEndpoint.canonicalBaseUrl;
 
-                                        const subtitle = listItemViewModel.subtitle?.content;
-                                        let collabChannelInfo = {
-                                            name: title || '',
-                                            id: '',
-                                            handle: '',
-                                            customUrl: '',
-                                            logo: '',
-                                            subtitle: typeof subtitle === 'string' ? subtitle.trim() : ''
-                                        };
+                                        let collabChannelInfo = { name: title || '', id: '', handle: '', customUrl: '', logo: '' };
 
                                         const dialogLogoUrl =
                                             listItemViewModel.leadingElement?.avatarViewModel?.image?.sources?.[0]?.url ||
@@ -3752,25 +2583,10 @@
                                                 }
                                             }
                                         }
-                                        if (!collabChannelInfo.customUrl) {
-                                            const metadataUrl = pickMetadataUrl(listItemViewModel);
-                                            if (typeof metadataUrl === 'string') {
-                                                if (metadataUrl.includes('/c/')) {
-                                                    const cMatch = metadataUrl.match(/\/c\/([^/?#]+)/);
-                                                    if (cMatch && cMatch[1]) collabChannelInfo.customUrl = `c/${cMatch[1]}`;
-                                                } else if (metadataUrl.includes('/user/')) {
-                                                    const uMatch = metadataUrl.match(/\/user\/([^/?#]+)/);
-                                                    if (uMatch && uMatch[1]) collabChannelInfo.customUrl = `user/${uMatch[1]}`;
-                                                }
-                                            }
-                                        }
 
                                         // Extract UC ID
                                         if (browseId?.startsWith('UC')) {
                                             collabChannelInfo.id = browseId;
-                                        }
-                                        if (browseEndpoint?.__idsConflict && collabChannelInfo.id && collabChannelInfo.handle) {
-                                            collabChannelInfo.handle = '';
                                         }
 
                                         if (collabChannelInfo.handle || collabChannelInfo.id || collabChannelInfo.customUrl) {
@@ -3818,30 +2634,12 @@
             }
 
             if (rules.channelId) {
-                const idPaths = Array.isArray(rules.channelId) ? rules.channelId : [rules.channelId];
-                for (const path of idPaths) {
-                    const candidate = getByPath(item, path);
-                    if (typeof candidate === 'string' && candidate.trim()) {
-                        channelInfo.id = candidate.trim();
-                        break;
-                    }
-                }
+                channelInfo.id = getByPath(item, rules.channelId);
             }
 
             if (rules.channelHandle) {
                 const handlePaths = Array.isArray(rules.channelHandle) ? rules.channelHandle : [rules.channelHandle];
                 channelInfo.handle = extractChannelHandleFromPaths(item, handlePaths);
-            }
-
-            if (rules.channelLogo && !channelInfo.logo) {
-                const logoPaths = Array.isArray(rules.channelLogo) ? rules.channelLogo : [rules.channelLogo];
-                for (const path of logoPaths) {
-                    const logoCandidate = getByPath(item, path);
-                    if (typeof logoCandidate === 'string' && logoCandidate.trim()) {
-                        channelInfo.logo = logoCandidate.trim();
-                        break;
-                    }
-                }
             }
 
             // Watch page lockupViewModel: capture channel avatar/logo
@@ -3871,9 +2669,6 @@
                     'longBylineText.runs.0.navigationEndpoint.browseEndpoint.browseId',
                     'ownerText.runs.0.navigationEndpoint.browseEndpoint.browseId',
                     'authorEndpoint.browseEndpoint.browseId',
-                    'channelThumbnail.channelThumbnailWithLinkRenderer.navigationEndpoint.browseEndpoint.browseId',
-                    'metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.0.metadataParts.0.text.commandRuns.0.onTap.innertubeCommand.browseEndpoint.browseId',
-                    'metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.0.metadataParts.1.text.commandRuns.0.onTap.innertubeCommand.browseEndpoint.browseId',
                     'channelId'
                 ];
 
@@ -3890,16 +2685,7 @@
                         'shortBylineText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl',
                         'longBylineText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl',
                         'ownerText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl',
-                        'shortBylineText.runs.0.navigationEndpoint.commandMetadata.webCommandMetadata.url',
-                        'longBylineText.runs.0.navigationEndpoint.commandMetadata.webCommandMetadata.url',
-                        'ownerText.runs.0.navigationEndpoint.commandMetadata.webCommandMetadata.url',
-                        'channelThumbnail.channelThumbnailWithLinkRenderer.navigationEndpoint.browseEndpoint.canonicalBaseUrl',
-                        'channelThumbnail.channelThumbnailWithLinkRenderer.navigationEndpoint.commandMetadata.webCommandMetadata.url',
-                        'navigationEndpoint.browseEndpoint.canonicalBaseUrl',
-                        'metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.0.metadataParts.0.text.commandRuns.0.onTap.innertubeCommand.browseEndpoint.canonicalBaseUrl',
-                        'metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.0.metadataParts.0.text.commandRuns.0.onTap.innertubeCommand.commandMetadata.webCommandMetadata.url',
-                        'metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.0.metadataParts.1.text.commandRuns.0.onTap.innertubeCommand.browseEndpoint.canonicalBaseUrl',
-                        'metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.0.metadataParts.1.text.commandRuns.0.onTap.innertubeCommand.commandMetadata.webCommandMetadata.url'
+                        'navigationEndpoint.browseEndpoint.canonicalBaseUrl'
                     ];
 
                     // Try to extract handle or customUrl from canonicalBaseUrl
@@ -3927,93 +2713,6 @@
                         if (channelInfo.handle && channelInfo.customUrl) break;
                     }
                 }
-            }
-
-            // Generic lockup fallback: iterate ALL metadataRows/metadataParts/commandRuns.
-            // YTM frequently shifts owner identity between parts, so fixed [0] paths miss valid IDs/handles.
-            if (!channelInfo.id || !channelInfo.handle || !channelInfo.customUrl) {
-                try {
-                    const metadataRows =
-                        getByPath(item, 'metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows') ||
-                        getByPath(item, 'metadata.lockupMetadataViewModel.metadataRows') ||
-                        getByPath(item, 'metadata.contentMetadataViewModel.metadataRows') ||
-                        getByPath(item, 'metadata.lockupMetadataViewModel.contentMetadataViewModel.metadataRows') ||
-                        [];
-                    if (Array.isArray(metadataRows)) {
-                        for (const row of metadataRows) {
-                            const parts = Array.isArray(row?.metadataParts) ? row.metadataParts : [];
-                            for (const part of parts) {
-                                const commandRuns = [
-                                    ...(Array.isArray(part?.text?.commandRuns) ? part.text.commandRuns : []),
-                                    ...(Array.isArray(part?.commandRuns) ? part.commandRuns : []),
-                                    ...(part?.onTap ? [part.onTap] : [])
-                                ];
-                                for (const cmd of commandRuns) {
-                                    const command = cmd?.onTap?.innertubeCommand || cmd?.onTap?.browseEndpoint || cmd?.innertubeCommand || cmd?.browseEndpoint || null;
-                                    const browseEndpoint = command?.browseEndpoint || (command?.browseId ? command : null) || null;
-                                    const browseId = browseEndpoint?.browseId;
-                                    if (!channelInfo.id && typeof browseId === 'string' && /^UC[\w-]{22}$/i.test(browseId)) {
-                                        channelInfo.id = browseId.trim();
-                                    }
-
-                                    const canonicalBaseUrl = browseEndpoint?.canonicalBaseUrl ||
-                                        command?.commandMetadata?.webCommandMetadata?.url ||
-                                        cmd?.onTap?.commandMetadata?.webCommandMetadata?.url ||
-                                        '';
-                                    if (typeof canonicalBaseUrl === 'string' && canonicalBaseUrl) {
-                                        if (!channelInfo.handle && canonicalBaseUrl.startsWith('/@')) {
-                                            const normalized = normalizeChannelHandle(canonicalBaseUrl);
-                                            if (normalized) channelInfo.handle = normalized;
-                                        } else if (!channelInfo.customUrl && (canonicalBaseUrl.startsWith('/c/') || canonicalBaseUrl.startsWith('/user/'))) {
-                                            if (typeof window.FilterTubeIdentity?.extractCustomUrlFromPath === 'function') {
-                                                channelInfo.customUrl = window.FilterTubeIdentity.extractCustomUrlFromPath(canonicalBaseUrl);
-                                            } else {
-                                                const partsArr = canonicalBaseUrl.split('/');
-                                                const type = partsArr[1];
-                                                const slug = partsArr[2] ? partsArr[2].split(/[?#]/)[0] : '';
-                                                if (slug) channelInfo.customUrl = `${type}/${slug}`;
-                                            }
-                                        }
-                                    }
-
-                                    if (channelInfo.id && (channelInfo.handle || channelInfo.customUrl)) {
-                                        break;
-                                    }
-                                }
-                                if (channelInfo.id && (channelInfo.handle || channelInfo.customUrl)) {
-                                    break;
-                                }
-                            }
-                            if (channelInfo.id && (channelInfo.handle || channelInfo.customUrl)) {
-                                break;
-                            }
-                        }
-                    }
-                } catch (e) {
-                }
-            }
-
-            // Topic channels frequently show a shortened byline ("Artist") while the channel thumbnail
-            // accessibility label has the canonical name ("Artist - Topic"). Prefer the topic label.
-            try {
-                const a11yLabel =
-                    getByPath(item, 'channelThumbnail.channelThumbnailWithLinkRenderer.accessibility.accessibilityData.label') ||
-                    getByPath(item, 'channelThumbnailSupportedRenderers.channelThumbnailWithLinkRenderer.accessibility.accessibilityData.label') ||
-                    '';
-                if (typeof a11yLabel === 'string' && a11yLabel.trim()) {
-                    const cleaned = a11yLabel.replace(/^go to channel\s+/i, '').trim();
-                    const safeA11y = !isLikelyBadChannelIdentityName(cleaned, this._extractTitle(item, rules)) ? cleaned : '';
-                    if (safeA11y) {
-                        const currentName = typeof channelInfo.name === 'string' ? channelInfo.name.trim() : '';
-                        const safeCurrent = !isLikelyBadChannelIdentityName(currentName, this._extractTitle(item, rules)) ? currentName : '';
-                        const a11yLooksTopic = /\s-\sTopic$/i.test(safeA11y);
-                        const currentLooksTopic = /\s-\sTopic$/i.test(safeCurrent);
-                        if (!safeCurrent || (a11yLooksTopic && !currentLooksTopic)) {
-                            channelInfo.name = safeA11y;
-                        }
-                    }
-                }
-            } catch (e) {
             }
 
             return channelInfo;

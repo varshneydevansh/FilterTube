@@ -4,88 +4,10 @@
 // Loaded as an Isolated World content script before `content_bridge.js`.
 
 const CHANNEL_ONLY_TAGS = new Set([]);
-const PLAYLIST_PANEL_SELECTOR = 'ytd-playlist-panel-renderer, ytm-playlist-panel-renderer';
-const PLAYLIST_ROW_SELECTOR = 'ytd-playlist-panel-video-renderer, ytm-playlist-panel-video-renderer';
-const PLAYLIST_WRAPPER_SELECTOR = 'ytd-playlist-panel-video-wrapper-renderer, ytm-playlist-panel-video-wrapper-renderer';
 
 const compiledKeywordRegexCache = new WeakMap();
 const compiledChannelFilterIndexCache = new WeakMap();
 const compiledChannelFilterIndexCacheByList = new WeakMap();
-
-function isPlaylistPanelRowTag(tag) {
-    return tag === 'ytd-playlist-panel-video-renderer'
-        || tag === 'ytd-playlist-panel-video-wrapper-renderer'
-        || tag === 'ytm-playlist-panel-video-renderer'
-        || tag === 'ytm-playlist-panel-video-wrapper-renderer';
-}
-
-function getPlaylistPanelRowElement(element) {
-    if (!element || !(element instanceof Element)) return null;
-    const tag = (element.tagName || '').toLowerCase();
-    if (tag === 'ytd-playlist-panel-video-renderer' || tag === 'ytm-playlist-panel-video-renderer') {
-        return element;
-    }
-    return element.querySelector(PLAYLIST_ROW_SELECTOR);
-}
-
-function isPlaylistRowSelected(rowEl) {
-    return Boolean(rowEl && (rowEl.hasAttribute('selected') || rowEl.getAttribute('aria-selected') === 'true'));
-}
-
-function getPlaylistSkipState() {
-    if (!window.__filtertubePlaylistSkipState) {
-        window.__filtertubePlaylistSkipState = { lastAttemptTs: 0, lastSelectedVideoId: '', lastDirection: 1 };
-    }
-    return window.__filtertubePlaylistSkipState;
-}
-
-function getPlaylistRowVideoId(rowEl) {
-    if (!rowEl || !(rowEl instanceof Element)) return '';
-    const stamped = rowEl.getAttribute('data-filtertube-video-id') || '';
-    if (/^[a-zA-Z0-9_-]{11}$/.test(stamped)) return stamped;
-
-    const href = rowEl.querySelector('a[href*="watch?v="], a[href*="/watch?"]')?.getAttribute('href') || '';
-    const hrefMatch = href.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
-    if (hrefMatch && hrefMatch[1]) return hrefMatch[1];
-
-    try {
-        return ensureVideoIdForCard(rowEl) || '';
-    } catch (e) {
-        return '';
-    }
-}
-
-function findNextVisiblePlaylistLink(items, startIndex, step) {
-    for (let i = startIndex; i >= 0 && i < items.length; i += step) {
-        const candidate = items[i];
-        if (!candidate) continue;
-        const row = getPlaylistPanelRowElement(candidate) || candidate;
-        if (isExplicitlyHiddenByFilterTube(candidate) || isExplicitlyHiddenByFilterTube(row)) {
-            continue;
-        }
-        const link = row.querySelector('a[href*="watch?v="], a[href*="/watch?"]');
-        if (link) return link;
-    }
-    return null;
-}
-
-function tryOpenYtmPlaylistPanel() {
-    try {
-        const host = (document.location?.hostname || '').toLowerCase();
-        const isMobile = host === 'm.youtube.com' || document.documentElement.hasAttribute('data-filtertube-mobile-surface');
-        if (!isMobile) return false;
-        const openButton = document.querySelector(
-            'button[aria-label*="queue" i], ' +
-            'button[aria-label*="playlist" i], ' +
-            '.watch-card-rich-header-call-to-actions-container button'
-        );
-        if (!openButton) return false;
-        openButton.click();
-        return true;
-    } catch (e) {
-        return false;
-    }
-}
 
 function getListSignatureForRun(list) {
     try {
@@ -270,13 +192,7 @@ function getCompiledChannelFilterIndex(settings, listOverride = null) {
             names.add(normalizedWithoutAt);
         }
         const mappedId = normalizeUcIdForComparison(lookupChannelMap(h));
-        // Only trust handle->UC mapping when it round-trips back to the same handle.
-        if (mappedId) {
-            const reverseHandle = normalizeHandleForComparison(lookupChannelMap(mappedId));
-            if (reverseHandle && reverseHandle === h) {
-                ids.add(mappedId);
-            }
-        }
+        if (mappedId) ids.add(mappedId);
 
         const key = h.replace(/^@/, '');
         if (key && !lookupChannelMap(h) && !unresolvedHandleKeysSeen.has(key)) {
@@ -311,11 +227,6 @@ function getCompiledChannelFilterIndex(settings, listOverride = null) {
         }
 
         if (typeof entry === 'object') {
-            const entryId = normalizeUcIdForComparison(entry.id || entry.originalInput || '');
-            const entryHandle = normalizeHandleForComparison(entry.handle || entry.canonicalHandle || entry.handleDisplay || entry.originalInput || '');
-            const entryCustom = normalizeCustomUrlForComparison(entry.customUrl || entry.originalInput || '');
-            const hasStructuredIdentity = Boolean(entryId || entryHandle || entryCustom);
-
             addId(entry.id);
             addId(entry.originalInput);
 
@@ -327,14 +238,15 @@ function getCompiledChannelFilterIndex(settings, listOverride = null) {
             addCustomUrl(entry.customUrl);
             addCustomUrl(entry.originalInput);
 
-            if (!hasStructuredIdentity) {
-                addName(entry.name);
-                addName(entry.handle);
-                addName(entry.originalInput);
-            }
+            addName(entry.name);
+            addName(entry.handle);
+            addName(entry.originalInput);
 
-            // Do not auto-expand UC -> handle from channelMap into the compiled index.
-            // A stale map can cause unrelated handle-only cards to be hidden.
+            const idKey = normalizeUcIdForComparison(entry.id || '');
+            if (idKey) {
+                const mappedHandle = normalizeHandleForComparison(lookupChannelMap(idKey));
+                if (mappedHandle) handles.add(mappedHandle);
+            }
         }
     }
 
@@ -378,16 +290,13 @@ function channelMetaMatchesIndex(meta, index, channelMap) {
         if (withoutAt && index.names.has(withoutAt)) return true;
     }
 
+    if (metaId) {
+        const mappedHandle = normalizeHandleForComparison(lookupChannelMap(metaId));
+        if (mappedHandle && index.handles.has(mappedHandle)) return true;
+    }
     if (metaHandle) {
         const mappedId = normalizeUcIdForComparison(lookupChannelMap(metaHandle));
-        if (mappedId && index.ids.has(mappedId)) {
-            const reverseHandle = normalizeHandleForComparison(lookupChannelMap(mappedId));
-            // Require explicit handle presence in current filter index to avoid
-            // hiding by stale UC<->handle aliases alone.
-            if (reverseHandle && reverseHandle === metaHandle && index.handles.has(metaHandle)) {
-                return true;
-            }
-        }
+        if (mappedId && index.ids.has(mappedId)) return true;
     }
     if (metaCustomUrl) {
         const mappedId = normalizeUcIdForComparison(lookupChannelMap(metaCustomUrl));
@@ -1520,29 +1429,37 @@ async function applyDOMFallback(settings, options = {}) {
                 const isPlaylistWatch = params.has('list');
                 if (!isWatch || !isPlaylistWatch) return;
 
-                const playlistPanel = document.querySelector(PLAYLIST_PANEL_SELECTOR);
-                if (!playlistPanel) {
-                    tryOpenYtmPlaylistPanel();
-                    return;
-                }
-                const items = Array.from(playlistPanel.querySelectorAll(PLAYLIST_ROW_SELECTOR));
+                const playlistPanel = document.querySelector('ytd-playlist-panel-renderer');
+                if (!playlistPanel) return;
+                const items = Array.from(playlistPanel.querySelectorAll('ytd-playlist-panel-video-renderer'));
                 if (items.length === 0) return;
 
-                const selected = items.find(el => isPlaylistRowSelected(getPlaylistPanelRowElement(el) || el)) || null;
+                const selected = items.find(el => el.hasAttribute('selected') || el.getAttribute('aria-selected') === 'true') || null;
                 if (!selected) return;
                 const idx = items.indexOf(selected);
                 if (idx < 0) return;
 
-                const state = getPlaylistSkipState();
+                const state = window.__filtertubePlaylistSkipState || (window.__filtertubePlaylistSkipState = { lastAttemptTs: 0, lastSelectedVideoId: '', lastDirection: 1 });
                 const direction = btn.classList.contains('ytp-prev-button') ? -1 : 1;
                 state.lastDirection = direction;
 
+                const pickNext = (start, step) => {
+                    for (let i = start; i >= 0 && i < items.length; i += step) {
+                        const cand = items[i];
+                        if (!cand) continue;
+                        const candHidden = isExplicitlyHiddenByFilterTube(cand);
+                        if (candHidden) continue;
+                        const link = cand.querySelector('a[href*="watch?v="]');
+                        if (link) return link;
+                    }
+                    return null;
+                };
+
                 const immediate = items[idx + direction];
-                const immediateRow = immediate ? (getPlaylistPanelRowElement(immediate) || immediate) : null;
-                const immediateHidden = immediate && (isExplicitlyHiddenByFilterTube(immediate) || isExplicitlyHiddenByFilterTube(immediateRow));
+                const immediateHidden = immediate && isExplicitlyHiddenByFilterTube(immediate);
                 if (!immediateHidden) return;
 
-                const targetLink = findNextVisiblePlaylistLink(items, idx + direction, direction);
+                const targetLink = pickNext(idx + direction, direction);
                 if (!targetLink) return;
 
                 event.preventDefault();
@@ -1557,9 +1474,6 @@ async function applyDOMFallback(settings, options = {}) {
                 } catch (e) {
                 }
 
-                const selectedVideoId = getPlaylistRowVideoId(getPlaylistPanelRowElement(selected) || selected);
-                state.lastAttemptTs = Date.now();
-                state.lastSelectedVideoId = selectedVideoId || state.lastSelectedVideoId || '';
                 targetLink.click();
             } catch (e) {
             }
@@ -1579,18 +1493,17 @@ async function applyDOMFallback(settings, options = {}) {
 
                     // Let YouTube handle normal autoplay, but when the immediate next playlist item
                     // is hidden, force a Next click so our click-guard can skip deterministically.
-                    const playlistPanel = document.querySelector(PLAYLIST_PANEL_SELECTOR);
+                    const playlistPanel = document.querySelector('ytd-playlist-panel-renderer');
                     if (!playlistPanel) return;
-                    const items = Array.from(playlistPanel.querySelectorAll(PLAYLIST_ROW_SELECTOR));
+                    const items = Array.from(playlistPanel.querySelectorAll('ytd-playlist-panel-video-renderer'));
                     if (items.length === 0) return;
-                    const selected = items.find(el => isPlaylistRowSelected(getPlaylistPanelRowElement(el) || el)) || null;
+                    const selected = items.find(el => el.hasAttribute('selected') || el.getAttribute('aria-selected') === 'true') || null;
                     if (!selected) return;
                     const idx = items.indexOf(selected);
                     if (idx < 0) return;
 
                     const nextItem = items[idx + 1];
-                    const nextRow = nextItem ? (getPlaylistPanelRowElement(nextItem) || nextItem) : null;
-                    const nextHidden = nextItem && (isExplicitlyHiddenByFilterTube(nextItem) || isExplicitlyHiddenByFilterTube(nextRow));
+                    const nextHidden = nextItem && isExplicitlyHiddenByFilterTube(nextItem);
                     if (!nextHidden) return;
 
                     const nextBtn = document.querySelector('.ytp-next-button');
@@ -1785,19 +1698,12 @@ async function applyDOMFallback(settings, options = {}) {
                 '#video-title, .ytd-video-meta-block #video-title, h3 a, .metadata-snippet-container #video-title, ' +
                 '#video-title-link, .yt-lockup-metadata-view-model-wiz__title, .yt-lockup-metadata-view-model__title, ' +
                 '.yt-lockup-metadata-view-model__heading-reset, yt-formatted-string#title, span#title, ' +
-                'yt-dynamic-text-view-model h1, .yt-page-header-view-model__page-header-title, .dynamicTextViewModelH1, ' +
-                'h3.media-item-headline a, h3.media-item-headline .yt-core-attributed-string, h3.media-item-headline, ' +
-                '.YtmCompactMediaItemHeadline a, .YtmCompactMediaItemHeadline .yt-core-attributed-string, .YtmCompactMediaItemHeadline, ' +
-                '.watch-card-rich-header-text a, .watch-card-rich-header-text .yt-core-attributed-string, .watch-card-rich-header-text'
+                'yt-dynamic-text-view-model h1, .yt-page-header-view-model__page-header-title, .dynamicTextViewModelH1'
             );
-            const isPlaylistPanelRow = isPlaylistPanelRowTag(elementTag);
+            const isPlaylistPanelRow = (elementTag === 'ytd-playlist-panel-video-renderer' || elementTag === 'ytd-playlist-panel-video-wrapper-renderer');
             let channelElement = null;
             if (isPlaylistPanelRow) {
-                channelElement = element.querySelector(
-                    '#byline, #byline-container #byline, ' +
-                    '.YtmCompactMediaItemByline .yt-core-attributed-string, ' +
-                    '.YtmCompactMediaItemByline a'
-                );
+                channelElement = element.querySelector('#byline, #byline-container #byline');
             }
             if (!channelElement && elementTag === 'ytd-video-renderer') {
                 channelElement = element.querySelector(
@@ -1841,10 +1747,7 @@ async function applyDOMFallback(settings, options = {}) {
                     '.yt-lockup-metadata-view-model-wiz__metadata, ' +
                     '.yt-content-metadata-view-model__metadata-text, ' +
                     'yt-formatted-string[slot="subtitle"], ' +
-                    '.watch-card-tertiary-text a, ' +
-                    'ytm-slim-owner-renderer a, ' +
-                    'ytm-channel-thumbnail-with-link-renderer a, ' +
-                    '.watch-card-rich-header-text a'
+                    '.watch-card-tertiary-text a'
                 );
             }
             if (!channelElement && elementTag === 'yt-official-card-view-model') {
@@ -1857,9 +1760,7 @@ async function applyDOMFallback(settings, options = {}) {
             let channelAnchor = (channelElement || channelSubtitleElement)?.closest('a') || element.querySelector(
                 'a[href*="/channel/UC"], a[href^="/@"], a[href*="/user/"], a[href*="/c/"], ' +
                 '.yt-page-header-view-model__page-header-content-metadata a[href^="/@"], ' +
-                '.ytFlexibleActionsViewModelAction a[href^="/@"], .ytFlexibleActionsViewModelAction a[href*="/channel/UC"], ' +
-                'ytm-slim-owner-renderer a[href^="/@"], ytm-slim-owner-renderer a[href*="/channel/UC"], ' +
-                'ytm-channel-thumbnail-with-link-renderer a[href^="/@"], ytm-channel-thumbnail-with-link-renderer a[href*="/channel/UC"]'
+                '.ytFlexibleActionsViewModelAction a[href^="/@"], .ytFlexibleActionsViewModelAction a[href*="/channel/UC"]'
             );
             if (elementTag === 'yt-official-card-view-model') {
                 const officialCardAnchor = element.querySelector('.ytFlexibleActionsViewModelAction a[href^="/@"]');
@@ -1899,31 +1800,9 @@ async function applyDOMFallback(settings, options = {}) {
                     }
                 }
             }
-            if (!title) {
-                const mobileHeadlineAria = element.querySelector(
-                    '.YtmCompactMediaItemHeadline [aria-label], ' +
-                    'h3.media-item-headline [aria-label], ' +
-                    'a.media-item-headline[aria-label], ' +
-                    '.watch-card-rich-header-text [aria-label]'
-                )?.getAttribute('aria-label') || '';
-                if (mobileHeadlineAria) {
-                    title = mobileHeadlineAria.trim();
-                }
-            }
             const channelPrimaryText = channelElement?.textContent?.trim() || '';
             const channelSubtitleText = channelSubtitleElement?.textContent?.trim() || '';
             let channel = [channelPrimaryText, channelSubtitleText].filter(Boolean).join(' | ');
-            if (!channel) {
-                const mobileBylineText = element.querySelector(
-                    '.YtmCompactMediaItemByline .yt-core-attributed-string, ' +
-                    '.YtmCompactMediaItemByline, ' +
-                    '.watch-card-tertiary-text, ' +
-                    'ytm-slim-owner-renderer .yt-core-attributed-string'
-                )?.textContent?.trim() || '';
-                if (mobileBylineText) {
-                    channel = mobileBylineText.split('\n')[0].split('•')[0].trim();
-                }
-            }
             if (elementTag === 'yt-official-card-view-model') {
                 const officialHandleText = (
                     element.querySelector('.yt-page-header-view-model__page-header-content-metadata [role="text"]')?.textContent || ''
@@ -1989,8 +1868,7 @@ async function applyDOMFallback(settings, options = {}) {
             } catch (e) {
             }
             const channelHref = channelAnchor?.getAttribute('href') || channelAnchor?.href || '';
-            const playlistIdentityTarget = isPlaylistPanelRow ? (getPlaylistPanelRowElement(element) || element) : null;
-            const playlistVideoId = playlistIdentityTarget ? ensureVideoIdForCard(playlistIdentityTarget) : '';
+            const playlistVideoId = isPlaylistPanelRow ? ensureVideoIdForCard(element) : '';
             const playlistMappedChannelId = (() => {
                 if (!playlistVideoId) return '';
                 const mapped = effectiveSettings?.videoChannelMap?.[playlistVideoId] || '';
@@ -2001,10 +1879,10 @@ async function applyDOMFallback(settings, options = {}) {
             })();
             const playlistHasExplicitChannelHref = Boolean(channelHref && /\/(@|channel\/|c\/|user\/)/i.test(channelHref));
             if (isPlaylistPanelRow && !playlistHasExplicitChannelHref) {
-                const stampedId = (playlistIdentityTarget?.getAttribute('data-filtertube-channel-id') || '').trim();
-                const stampedHandle = (playlistIdentityTarget?.getAttribute('data-filtertube-channel-handle') || '').trim();
+                const stampedId = (element.getAttribute('data-filtertube-channel-id') || '').trim();
+                const stampedHandle = (element.getAttribute('data-filtertube-channel-handle') || '').trim();
                 const hasNestedStampedIdentity = Boolean(
-                    playlistIdentityTarget?.querySelector('[data-filtertube-channel-id], [data-filtertube-channel-handle]')
+                    element.querySelector('[data-filtertube-channel-id], [data-filtertube-channel-handle]')
                 );
                 const shouldPurgeStaleIdentity = Boolean(
                     stampedHandle ||
@@ -2012,11 +1890,9 @@ async function applyDOMFallback(settings, options = {}) {
                     (stampedId && (!playlistMappedChannelId || stampedId !== playlistMappedChannelId))
                 );
                 if (shouldPurgeStaleIdentity) {
-                    if (playlistIdentityTarget) {
-                        clearCachedChannelMetadata(playlistIdentityTarget);
-                        playlistIdentityTarget.removeAttribute('data-filtertube-channel-custom');
-                        playlistIdentityTarget.removeAttribute('data-filtertube-channel-name');
-                    }
+                    clearCachedChannelMetadata(element);
+                    element.removeAttribute('data-filtertube-channel-custom');
+                    element.removeAttribute('data-filtertube-channel-name');
                 }
             }
 
@@ -2101,11 +1977,7 @@ async function applyDOMFallback(settings, options = {}) {
                     channelMeta = { ...channelMeta, id: playlistMappedChannelId };
                 }
                 try {
-                    if (playlistIdentityTarget) {
-                        playlistIdentityTarget.setAttribute('data-filtertube-channel-id', playlistMappedChannelId);
-                    } else {
-                        element.setAttribute('data-filtertube-channel-id', playlistMappedChannelId);
-                    }
+                    element.setAttribute('data-filtertube-channel-id', playlistMappedChannelId);
                 } catch (e) {
                 }
             }
@@ -2254,7 +2126,7 @@ async function applyDOMFallback(settings, options = {}) {
                             const params = new URLSearchParams(document.location?.search || '');
                             if (!params.has('list')) return false;
                             const tag = (element.tagName || '').toLowerCase();
-                            return isPlaylistPanelRowTag(tag);
+                            return tag === 'ytd-playlist-panel-video-renderer' || tag === 'ytd-playlist-panel-video-wrapper-renderer';
                         } catch (e) {
                             return false;
                         }
@@ -2283,8 +2155,12 @@ async function applyDOMFallback(settings, options = {}) {
                     } else if (isWatchPlaylistRow) {
                         let isSelectedRow = false;
                         try {
-                            const rowEl = getPlaylistPanelRowElement(element);
-                            isSelectedRow = isPlaylistRowSelected(rowEl);
+                            const rowEl = element.tagName?.toLowerCase() === 'ytd-playlist-panel-video-renderer'
+                                ? element
+                                : element.querySelector?.('ytd-playlist-panel-video-renderer');
+                            isSelectedRow = Boolean(
+                                rowEl && (rowEl.hasAttribute('selected') || rowEl.getAttribute('aria-selected') === 'true')
+                            );
                         } catch (e) {
                         }
 
@@ -2570,8 +2446,8 @@ async function applyDOMFallback(settings, options = {}) {
             } else if (elementTag === 'yt-lockup-view-model' || elementTag === 'yt-lockup-metadata-view-model') {
                 const parent = element.closest('ytd-rich-item-renderer');
                 if (parent) targetToHide = parent;
-            } else if (elementTag === 'ytd-playlist-panel-video-renderer' || elementTag === 'ytm-playlist-panel-video-renderer') {
-                const wrapper = element.closest(PLAYLIST_WRAPPER_SELECTOR);
+            } else if (elementTag === 'ytd-playlist-panel-video-renderer') {
+                const wrapper = element.closest('ytd-playlist-panel-video-wrapper-renderer');
                 if (wrapper) targetToHide = wrapper;
             }
 
@@ -2682,8 +2558,12 @@ async function applyDOMFallback(settings, options = {}) {
             if (isPlaylistPanelRow) {
                 let isSelectedRow = false;
                 try {
-                    const rowEl = getPlaylistPanelRowElement(element);
-                    isSelectedRow = isPlaylistRowSelected(rowEl);
+                    const rowEl = element.tagName?.toLowerCase() === 'ytd-playlist-panel-video-renderer'
+                        ? element
+                        : element.querySelector?.('ytd-playlist-panel-video-renderer');
+                    isSelectedRow = Boolean(
+                        rowEl && (rowEl.hasAttribute('selected') || rowEl.getAttribute('aria-selected') === 'true')
+                    );
                 } catch (e) {
                 }
 
@@ -3284,65 +3164,41 @@ async function applyDOMFallback(settings, options = {}) {
     }
 
     try {
-        const state = getPlaylistSkipState();
+        if (!window.__filtertubePlaylistSkipState) {
+            window.__filtertubePlaylistSkipState = { lastAttemptTs: 0, lastSelectedVideoId: '', lastDirection: 1 };
+        }
+        const state = window.__filtertubePlaylistSkipState;
         const now = Date.now();
         if (now - (state.lastAttemptTs || 0) > 700) {
             const isWatch = (document.location?.pathname || '').startsWith('/watch');
             const params = new URLSearchParams(document.location?.search || '');
             const isPlaylistWatch = params.has('list');
-            const playlistPanel = document.querySelector(PLAYLIST_PANEL_SELECTOR);
-            if (isWatch && isPlaylistWatch) {
-                // Safety net for YTM watch pages when playlist panel is collapsed/not mounted:
-                // if current playing video belongs to a blocked channel, force skip via player Next.
-                try {
-                    const currentVideoId = (params.get('v') || '').trim();
-                    const mappedIdRaw = currentVideoId ? (effectiveSettings?.videoChannelMap?.[currentVideoId] || '') : '';
-                    const mappedId = (typeof mappedIdRaw === 'string' && /^UC[\w-]{22}$/i.test(mappedIdRaw.trim()))
-                        ? mappedIdRaw.trim()
-                        : '';
-                    if (mappedId) {
-                        const index = getCompiledChannelFilterIndex(effectiveSettings);
-                        const isBlockedCurrent = Boolean(
-                            index && channelMetaMatchesIndex(
-                                { id: mappedId, handle: '', customUrl: '', name: '' },
-                                index,
-                                effectiveSettings?.channelMap || {}
-                            )
-                        );
-                        if (isBlockedCurrent) {
-                            const nextBtn = document.querySelector('.ytp-next-button:not([disabled])');
-                            if (nextBtn) {
-                                try {
-                                    const video = document.querySelector('video.html5-main-video');
-                                    if (video && typeof video.pause === 'function') {
-                                        video.pause();
-                                    }
-                                } catch (e) {
-                                }
-                                state.lastAttemptTs = now;
-                                state.lastSelectedVideoId = currentVideoId || state.lastSelectedVideoId || '';
-                                nextBtn.click();
-                                return;
-                            }
-                        }
-                    }
-                } catch (e) {
-                }
-            }
+            const playlistPanel = document.querySelector('ytd-playlist-panel-renderer');
             if (isWatch && isPlaylistWatch && playlistPanel) {
-                const items = Array.from(playlistPanel.querySelectorAll(PLAYLIST_ROW_SELECTOR));
+                const items = Array.from(playlistPanel.querySelectorAll('ytd-playlist-panel-video-renderer'));
                 if (items.length > 0) {
-                    const selected = items.find(el => isPlaylistRowSelected(getPlaylistPanelRowElement(el) || el)) || null;
-                    const selectedRow = selected ? (getPlaylistPanelRowElement(selected) || selected) : null;
-                    const isHidden = selected && (isExplicitlyHiddenByFilterTube(selected) || isExplicitlyHiddenByFilterTube(selectedRow));
+                    const selected = items.find(el => el.hasAttribute('selected') || el.getAttribute('aria-selected') === 'true') || null;
+                    const isHidden = selected && isExplicitlyHiddenByFilterTube(selected);
                     if (selected && isHidden) {
-                        const selectedVid = getPlaylistRowVideoId(selectedRow || selected);
+                        const selectedHref = selected.querySelector('a[href*="watch?v="]')?.getAttribute('href') || '';
+                        const selectedVid = (selectedHref.match(/[?&]v=([a-zA-Z0-9_-]{11})/) || [])[1] || '';
                         if (!selectedVid || state.lastSelectedVideoId !== selectedVid) {
                             const idx = items.indexOf(selected);
+                            const pickNext = (start, step) => {
+                                for (let i = start; i >= 0 && i < items.length; i += step) {
+                                    const cand = items[i];
+                                    if (!cand) continue;
+                                    const candHidden = isExplicitlyHiddenByFilterTube(cand);
+                                    if (candHidden) continue;
+                                    const link = cand.querySelector('a[href*="watch?v="]');
+                                    if (link) return link;
+                                }
+                                return null;
+                            };
 
                             const direction = state.lastDirection === -1 ? -1 : 1;
-                            const preferred = findNextVisiblePlaylistLink(items, idx + direction, direction);
-                            const fallback = preferred ? null : findNextVisiblePlaylistLink(items, idx - direction, -direction);
+                            const preferred = pickNext(idx + direction, direction);
+                            const fallback = preferred ? null : pickNext(idx - direction, -direction);
                             const target = preferred || fallback;
                             if (target) {
                                 try {
@@ -3511,7 +3367,7 @@ function shouldHideContent(title, channel, settings, options = {}) {
 
     if (settings.filterChannels && settings.filterChannels.length > 0 && !hasChannelIdentity && (!collaborators || collaborators.length === 0)) {
         const tag = (contentTag || '').toLowerCase();
-        const isPlaylistPanelItem = isPlaylistPanelRowTag(tag);
+        const isPlaylistPanelItem = tag === 'ytd-playlist-panel-video-renderer' || tag === 'ytd-playlist-panel-video-wrapper-renderer';
         if (isPlaylistPanelItem) {
             const index = getCompiledChannelFilterIndex(settings);
             const candidate = normalizeChannelNameForComparison(channel);
@@ -3540,7 +3396,7 @@ function shouldHideContent(title, channel, settings, options = {}) {
             }
 
             // 2. Active Resolution (Safety net for missing mappings)
-            // This runs when the blocklist has a handle but content currently only exposes UC ID.
+            // This runs when the blocklist has a Handle (e.g. @shakira)
             // but the content on screen only shows a UC ID (UC...)
             if (channelMeta.id && !channelMeta.handle && Array.isArray(index.unresolvedHandleKeys) && index.unresolvedHandleKeys.length > 0) {
                 try {

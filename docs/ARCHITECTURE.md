@@ -1,104 +1,8 @@
-# Architecture Documentation (v3.2.8)
+# Architecture Documentation (v3.2.7)
 
 ## Overview
 
 FilterTube v3.2.7 builds on the proactive channel identity system with performance optimizations, category filtering, and enhanced cross-browser support. This architecture documentation covers high-level design, filtering modes, memory management, and cross-browser compatibility.
-
-## YouTube Mobile Architecture (v3.2.8)
-
-FilterTube v3.2.8 introduces a dedicated architecture for the YouTube Mobile web interface (`m.youtube.com`), which differs significantly from Desktop and Kids.
-
-### Surface Comparison
-
-| Feature | YouTube Desktop (`ytd-*`) | YouTube Kids (`ytk-*`) | YouTube Mobile (`ytm-*`) |
-| :--- | :--- | :--- | :--- |
-| **Renderers** | Polymer desktop components | Simplified Kids components | Mobile-optimized components |
-| **Menus** | `ytd-menu-popup-renderer` | `ytk-menu-popup-renderer` | **Bottom Sheet** (`bottom-sheet-container`) |
-| **Navigation** | Desktop SPA | Kids SPA | Mobile SPA with touch gestures |
-| **Network** | Fetch + XHR | Strict Zero-Network | Hybrid (XHR + DOM fallback) |
-
-### Mobile Menu Injection Flow
-
-YouTube Mobile uses a "Bottom Sheet" pattern for menus, requiring a specialized detection and injection strategy:
-
-```mermaid
-graph TD
-    A[User Clicks 3-Dot] --> B[Observe .bottom-sheet-container]
-    B --> C{Menu Type?}
-    
-    C -->|Legacy| D[Class: .bottom-sheet-media-menu-item]
-    C -->|Modern| E[Tag: yt-list-view-model]
-    
-    D --> F[Inject ytm-menu-service-item-renderer]
-    E --> G[Inject yt-list-item-view-model]
-    
-    F --> H[Bind Touch Events]
-    G --> H
-    
-    H --> I{Identity Known?}
-    I -->|Yes| J[Show 'Block Channel']
-    I -->|No| K[Async Resolve via Video ID]
-    
-    K --> L[Update Menu Text]
-    
-    style D fill:#ff9800
-    style E fill:#2196f3
-    style H fill:#4caf50
-```
-
-### Mobile Specific Components
-
-1.  **Bottom Sheet Detection**: Unlike desktop popups, mobile menus slide up from the bottom. `block_channel.js` now observes `bottom-sheet-container` for child list mutations or attribute changes (`open`).
-2.  **Renderer Isolation**: To prevent cross-contamination, all mobile logic is guarded by checking for `ytm-` prefixed tags.
-3.  **Playlist Navigation**: The mobile playlist panel (`ytm-playlist-panel-video-renderer`) requires specific logic to skip blocked tracks because the DOM structure differs from the desktop `ytd-playlist-panel-video-renderer`.
-
-## YouTube Mobile Architecture (v3.2.8)
-
-FilterTube v3.2.8 introduces a dedicated architecture for the YouTube Mobile web interface (`m.youtube.com`), which differs significantly from Desktop and Kids.
-
-### Surface Comparison
-
-| Feature | YouTube Desktop (`ytd-*`) | YouTube Kids (`ytk-*`) | YouTube Mobile (`ytm-*`) |
-| :--- | :--- | :--- | :--- |
-| **Renderers** | Polymer desktop components | Simplified Kids components | Mobile-optimized components |
-| **Menus** | `ytd-menu-popup-renderer` | `ytk-menu-popup-renderer` | **Bottom Sheet** (`bottom-sheet-container`) |
-| **Navigation** | Desktop SPA | Kids SPA | Mobile SPA with touch gestures |
-| **Network** | Fetch + XHR | Strict Zero-Network | Hybrid (XHR + DOM fallback) |
-
-### Mobile Menu Injection Flow
-
-YouTube Mobile uses a "Bottom Sheet" pattern for menus, requiring a specialized detection and injection strategy:
-
-```mermaid
-graph TD
-    A[User Clicks 3-Dot] --> B[Observe .bottom-sheet-container]
-    B --> C{Menu Type?}
-    
-    C -->|Legacy| D[Class: .bottom-sheet-media-menu-item]
-    C -->|Modern| E[Tag: yt-list-view-model]
-    
-    D --> F[Inject ytm-menu-service-item-renderer]
-    E --> G[Inject yt-list-item-view-model]
-    
-    F --> H[Bind Touch Events]
-    G --> H
-    
-    H --> I{Identity Known?}
-    I -->|Yes| J[Show 'Block Channel']
-    I -->|No| K[Async Resolve via Video ID]
-    
-    K --> L[Update Menu Text]
-    
-    style D fill:#ff9800
-    style E fill:#2196f3
-    style H fill:#4caf50
-```
-
-### Mobile Specific Components
-
-1.  **Bottom Sheet Detection**: Unlike desktop popups, mobile menus slide up from the bottom. `block_channel.js` now observes `bottom-sheet-container` for child list mutations or attribute changes (`open`).
-2.  **Renderer Isolation**: To prevent cross-contamination, all mobile logic is guarded by checking for `ytm-` prefixed tags.
-3.  **Playlist Navigation**: The mobile playlist panel (`ytm-playlist-panel-video-renderer`) requires specific logic to skip blocked tracks because the DOM structure differs from the desktop `ytd-playlist-panel-video-renderer`.
 
 ## Filtering Modes Architecture (v3.2.5)
 
@@ -678,14 +582,9 @@ for (const key of keys) {
 }
 ```
 
-### Quick-Block Card Action Architecture (v3.2.7 - Restricted in v3.2.8)
+### Quick-Block Card Action Architecture (v3.2.7)
 
-FilterTube provides a direct card-level block action via a hover/touch cross button.
-
-**v3.2.8 Implementation Note**: To maintain stability and performance on the primary desktop site, the Quick-Block overlay is **temporarily restricted to YouTube Mobile (m.youtube.com)**.
-- **Mobile Only**: Shows a hover/touch button on supported mobile cards (Home, Search, Watch).
-- **Main Desktop/Kids**: Users must rely on the standard 3-dot menu flow for blocking.
-- **Future Roadmap**: Re-introduction to Desktop and Kids is planned for v3.3.0 following regression testing.
+FilterTube adds an optional direct card-level block action in the Isolated World:
 
 ```mermaid
 graph TD
@@ -704,7 +603,7 @@ Key implementation points:
 - Single tap only (no extra quick menu).
 - Reuses existing channel-block handlers (no parallel logic fork).
 - For collaborator cards, one tap blocks every channel on that card.
-- Mobile Only (v3.2.8): Restriction ensures zero overhead on `www.youtube.com` while maintaining mobile utility.
+- Applies on YouTube Main and YouTube Kids with profile-aware persistence.
 - Comment-origin block actions are context-isolated to comment nodes; they skip playlist/video prefetch identity merges and videoId fallback lookups.
 - Pointer tracking keeps hover active while inside host/anchor bounds, stabilizing the cross button on Search overlays and Home Shorts.
 

@@ -599,9 +599,7 @@ const RenderEngine = (() => {
                 }
             }
 
-            const collaborationMeta = (effectiveProfile === 'kids')
-                ? null
-                : buildCollaborationMeta(channel, collaborationGroups, state?.channelMap || {});
+            const collaborationMeta = (effectiveProfile === 'kids') ? null : buildCollaborationMeta(channel, collaborationGroups);
             return createChannelListItem(channel, listIndex, {
                 minimal,
                 showNodeMapping,
@@ -672,74 +670,14 @@ const RenderEngine = (() => {
         return { groups, individual };
     }
 
-    function buildCollaborationMeta(channel, groups, channelMap = {}) {
+    function buildCollaborationMeta(channel, groups) {
         const groupId = channel?.collaborationGroupId;
         if (!groupId || !groups?.has(groupId)) return null;
 
         const currentMembers = groups.get(groupId) || [];
-        const allCollaborators = (() => {
-            const deduped = [];
-            const seen = new Set();
-
-            const mapLookup = (key) => {
-                const normalized = typeof key === 'string' ? key.trim().toLowerCase() : '';
-                if (!normalized) return '';
-                const direct = typeof channelMap?.[normalized] === 'string' ? channelMap[normalized].trim() : '';
-                if (direct) return direct;
-                const original = typeof channelMap?.[key] === 'string' ? channelMap[key].trim() : '';
-                return original || '';
-            };
-
-            const resolveCanonical = (candidate) => {
-                const id = normalizeIdKey(candidate?.id);
-                const handle = normalizeHandleKey(candidate?.handle || candidate?.canonicalHandle || candidate?.handleDisplay || '');
-                const name = normalizeNameKey(candidate?.name);
-                const mappedFromHandle = handle ? normalizeIdKey(mapLookup(handle)) : '';
-                const canonicalId = id || mappedFromHandle;
-                const mappedFromId = canonicalId ? normalizeHandleKey(mapLookup(canonicalId)) : '';
-                return {
-                    id: canonicalId || '',
-                    handle: handle || mappedFromId || '',
-                    name
-                };
-            };
-
-            const pushIfNew = (candidate) => {
-                if (!candidate) return;
-                const canonical = resolveCanonical(candidate);
-                const handle = canonical.handle;
-                const id = canonical.id;
-                const name = canonical.name;
-                const key = id
-                    ? `id:${id}`
-                    : (handle
-                        ? `handle:${handle}`
-                        : (name ? `name:${name}` : ''));
-                if (!key || seen.has(key)) return;
-                seen.add(key);
-                deduped.push({
-                    handle: canonical.handle || candidate.handle || '',
-                    id: canonical.id || candidate.id || '',
-                    name: candidate.name || ''
-                });
-            };
-
-            // Build roster from every member's persisted collaborator list.
-            currentMembers.forEach((member) => {
-                if (Array.isArray(member?.allCollaborators) && member.allCollaborators.length > 0) {
-                    member.allCollaborators.forEach(pushIfNew);
-                }
-            });
-
-            // Fallback if roster is unavailable on this group.
-            if (deduped.length === 0) {
-                currentMembers.forEach((member) => {
-                    pushIfNew({ handle: member.handle, id: member.id, name: member.name });
-                });
-            }
-
-            return deduped;
-        })();
+        const allCollaborators = Array.isArray(channel.allCollaborators) && channel.allCollaborators.length > 0
+            ? channel.allCollaborators
+            : currentMembers.map(member => ({ handle: member.handle, name: member.name, id: member.id }));
 
         const missingNames = [];
         const presentNames = [];
@@ -779,34 +717,16 @@ const RenderEngine = (() => {
         };
     }
 
-    function normalizeHandleKey(value) {
-        const raw = typeof value === 'string' ? value.trim() : '';
-        return raw && raw.startsWith('@') ? raw.toLowerCase() : '';
-    }
-
-    function normalizeIdKey(value) {
-        const raw = typeof value === 'string' ? value.trim() : '';
-        return /^UC[\w-]{22}$/i.test(raw) ? raw.toLowerCase() : '';
-    }
-
-    function normalizeNameKey(value) {
-        if (!value || typeof value !== 'string') return '';
-        return value.trim().toLowerCase().replace(/\s+/g, ' ');
-    }
-
     function matchesCollaborator(channel, collaborator) {
         if (!channel || !collaborator) return false;
-
-        const channelHandle = normalizeHandleKey(channel.handle || channel.canonicalHandle || channel.handleDisplay || '');
-        const collabHandle = normalizeHandleKey(collaborator.handle || collaborator.canonicalHandle || collaborator.handleDisplay || '');
+        const channelHandle = (channel.handle || '').toLowerCase();
+        const collabHandle = (collaborator.handle || '').toLowerCase();
         if (channelHandle && collabHandle && channelHandle === collabHandle) return true;
 
-        const channelId = normalizeIdKey(channel.id);
-        const collabId = normalizeIdKey(collaborator.id);
-        if (channelId && collabId && channelId === collabId) return true;
+        if (channel.id && collaborator.id && channel.id === collaborator.id) return true;
 
-        const channelName = normalizeNameKey(channel.name || '');
-        const collabName = normalizeNameKey(collaborator.name || '');
+        const channelName = (channel.name || '').toLowerCase();
+        const collabName = (collaborator.name || '').toLowerCase();
         return !!channelName && !!collabName && channelName === collabName;
     }
 
@@ -1224,20 +1144,6 @@ const RenderEngine = (() => {
             source = originalInput;
             target = fetchedHandle;
             isResolved = true;
-        }
-        // Case: input was UC ID, no alternate handle/custom yet, but we still have a human channel name.
-        else if (inputLooksLikeUc && !fetchedHandle && !hasCustomUrl) {
-            const nameCandidate = typeof channel?.name === 'string' ? channel.name.trim() : '';
-            const looksLikeWeakName = !nameCandidate
-                || nameCandidate.startsWith('@')
-                || /^UC[\w-]{22}$/i.test(nameCandidate)
-                || /^[a-zA-Z0-9_-]{11}$/.test(nameCandidate)
-                || /^watch:[a-zA-Z0-9_-]{11}$/i.test(nameCandidate);
-            if (!looksLikeWeakName) {
-                source = originalInput;
-                target = nameCandidate;
-                isResolved = true;
-            }
         }
         // Case: Topic channels (UC ID + "- Topic" name) count as resolved
         else if (inputLooksLikeUc && !fetchedHandle && isTopic) {

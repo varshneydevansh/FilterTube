@@ -80,17 +80,7 @@ The system maintains two bidirectional lookup maps in local storage:
    - Used for Shorts and watch-page playlist panels (and any surface where DOM metadata is incomplete).
    - Since many cards lack identity, we store the mapping after the first successful resolution so it works offline/instantly on next load.
 
-### 2.4 Playlist Creator Resolution (v3.2.8)
-Playlist collection cards (Mixes, Radio, Shelves) often omit creator identifiers.
-*   **Background Fetch**: When a playlist is blocked, FilterTube uses `fetchPlaylistCreator` to resolve the owner from the playlist's landing page.
-*   **Seed Artist Support**: For algorithmic Mixes (RDMM...), the system attempts to resolve the seed artist as the primary owner.
-
-### 2.5 Card Poisoning Protection (SPA Recycling)
-YouTube recycles DOM nodes, which can cause a playlist card to inherit a `videoId` from a previous card's thumbnail.
-*   **Aggressive Clearing**: `isPlaylistCollectionCardElement` (in `dom_extractors.js`) detects these cards and clears all `videoId` and `channelId` stamps derived from "seed" thumbnails.
-*   **Impact**: Prevents blocking the uploader of a video shown in a playlist thumbnail instead of the playlist creator.
-
-### 2.6 Custom URL normalization (`/c/Name`, `/user/Name`)
+### 2.4 Custom URL normalization (`/c/Name`, `/user/Name`)
 - All worlds call into the helpers in `js/shared/identity.js` to normalize canonicalBaseUrl strings into predictable keys (`c/<slug>` or `user/<slug>`, percent-decoding as needed).
 - `background.js:fetchChannelInfo()` now fetches `/c/<slug>` or `/user/<slug>` directly and records the resulting UC ID back into `channelMap`.
 - `content_bridge.js` and `filter_logic.js` both consult `channelMap` before falling back to network, so DOM-only custom URL cards still hide immediately once a mapping is learned.
@@ -536,13 +526,6 @@ DOM fallback must be careful about:
 - Limited CORS handling for network requests
 - Separate storage namespace (`ftProfilesV3.kids`)
 - DOM fallback uses videoChannelMap mappings from Kids browse/search
-
-#### YouTube Mobile (m.youtube.com):
-- Supports `ytm-*` renderers (e.g., `ytm-video-with-context-renderer`, `ytm-shorts-lockup-view-model`).
-- Bottom-sheet menu integration (`ytm-bottom-sheet-renderer`) using specialized injection strategies.
-- One-tap quick block support via cross-hover/touch on mobile cards.
-- Auto-skip functionality for blocked content in mobile playlist panels.
-- Optimistic hiding for community posts and section wrappers.
 
 ### 5.4 3-Dot Menu Label Resolution (v3.2.1)
 

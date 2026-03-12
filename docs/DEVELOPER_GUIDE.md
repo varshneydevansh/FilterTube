@@ -117,34 +117,35 @@ Look for patterns like:
 
 ```javascript
 _extractChannelInfo(item, rules) {
-    const channelInfo = { name: '', id: '', handle: '', customUrl: '', logo: '' };
+    const channelInfo = { name: '', id: '', handle: '', customUrl: '' };
     
-    // Pattern 1: Rule-based extraction (Generic)
-    if (rules.channelId) {
-        channelInfo.id = this._resolvePath(item, rules.channelId);
-    }
-    // ... other rule applications
-    
-    // Pattern 2: Manual renderer-specific overrides
+    // Add new renderer type
     if (item.newRendererType) {
         const renderer = item.newRendererType;
-        // Extract video ID and register mappings
-        if (renderer.videoId && channelInfo.id) {
-            this._registerVideoChannelMapping(renderer.videoId, channelInfo.id);
+        
+        // Extract video ID
+        if (renderer.videoId) {
+            // Extract channel info
+            const endpoint = renderer.channelEndpoint?.browseEndpoint;
+            if (endpoint?.browseId) {
+                channelInfo.id = endpoint.browseId;
+            }
+            if (endpoint?.canonicalBaseUrl) {
+                channelInfo.handle = normalizeChannelHandle(endpoint.canonicalBaseUrl);
+                channelInfo.customUrl = extractCustomUrlFromCanonicalBaseUrl(endpoint.canonicalBaseUrl);
+            }
+            channelInfo.name = renderer.channelTitle?.simpleText || '';
+            
+            // Register mappings
+            if (channelInfo.id && channelInfo.handle) {
+                this._registerMapping(channelInfo.id, channelInfo.handle);
+            }
+            if (channelInfo.id && channelInfo.customUrl) {
+                this._registerCustomUrlMapping(channelInfo.id, channelInfo.customUrl);
+            }
+            
+            return channelInfo;
         }
-        return channelInfo;
-    }
-    
-    // YouTube Mobile Example (v3.2.8)
-    if (item.videoWithContextRenderer) {
-        const renderer = item.videoWithContextRenderer;
-        const thumbnail = renderer.channelThumbnail?.channelThumbnailWithLinkRenderer;
-        const endpoint = thumbnail?.navigationEndpoint?.browseEndpoint;
-        
-        if (endpoint?.browseId) channelInfo.id = endpoint.browseId;
-        if (endpoint?.canonicalBaseUrl) channelInfo.handle = endpoint.canonicalBaseUrl;
-        
-        return channelInfo;
     }
     
     // Continue with existing logic...
@@ -166,25 +167,6 @@ if (item.newRendererType?.videoId && channelInfo.id) {
 2. Open FilterTube dev tools
 3. Look for extraction logs
 4. Verify the channel appears correctly in the 3-dot menu
-
-## Using Background Actions for Identity
-
-Sometimes you need to trigger a background fetch from the content script to resolve deep identity.
-
-### Resolving Playlist Owners
-
-```javascript
-// Example: Resolve playlist creator in v3.2.8
-const details = await browserAPI.runtime.sendMessage({
-    action: 'fetchPlaylistCreator',
-    playlistId: 'PL...',
-    expectedName: 'Creator Name'
-});
-
-if (details?.success) {
-    console.log('Resolved creator:', details.id, details.handle);
-}
-```
 
 ## Extending Collaboration Detection
 

@@ -182,46 +182,38 @@ function schedulePostBlockEnrichment(channel, profile = 'main', metadata = {}) {
 - **Fills missing metadata**: handle, customUrl, logo, name
 - **Smart scheduling** with random delays to avoid patterns
 
-#### 4. Enhanced CORS and Multi-Origin Handling (v3.2.8)
-
-FilterTube v3.2.8 implements multi-origin rotation to bypass CORS restrictions and regional layout differences:
+#### 4. Enhanced CORS Handling
 
 ```javascript
-// Background fetch rotates through multiple origins for robustness
-const origins = [
-    'https://m.youtube.com',
-    'https://www.youtube.com',
-    'https://music.youtube.com'
-];
-
-async function performWatchIdentityFetch(videoId) {
-    for (const origin of origins) {
-        const identity = await fetchFromOrigin(origin, videoId);
-        if (identity && (identity.id || identity.handle)) return identity;
+// Improved fetch with CORS fallback strategies
+async function fetchChannelInfo(channelIdOrHandle) {
+    try {
+        const response = await fetch(channelUrl, {
+            credentials: 'include',
+            headers: { 'Accept': 'text/html' }
+        });
+        
+        // Handle 404s for @handle/about by falling back to @handle
+        if (!response.ok && isHandle) {
+            const fallbackUrl = `https://www.youtube.com/@${encodedHandle}`;
+            return await fetch(fallbackUrl, {
+                credentials: 'include',
+                headers: { 'Accept': 'text/html' }
+            });
+        }
+        
+        return response;
+    } catch (error) {
+        // CORS errors trigger alternative fetch methods
+        if (error.name === 'TypeError' && error.message.includes('CORS')) {
+            return await fetchAlternativeMethod(url);
+        }
+        throw error;
     }
-    return null;
 }
 ```
 
-**Origin Rotation Strategy:**
-*   **m.youtube.com** (Primary): Highly CORS-friendly and stable for mobile identity.
-*   **www.youtube.com** (Fallback): Standard desktop data source.
-*   **music.youtube.com** (Tertiary): Used for VEVO/Topic channel resolution.
-
-#### 5. Tiered Post-Block Enrichment (v3.2.8)
-
-The enrichment system now uses a tiered retry strategy based on the type of missing metadata:
-
-| Gap Type | Description | Retry Cadence | Max Attempts |
-| :--- | :--- | :--- | :--- |
-| **Identity** | Missing Handle or Custom URL | Fast (~5-12s) | 12 |
-| **Presentation** | Missing Logo or Channel Name | Slow (~2-3m) | 6 |
-
-**Cooldown Policy:**
-*   **UC-only rows**: If all attempts fail, a 15-minute cooldown is applied before allowing new retry cycles.
-*   **Validation**: Newly added channels undergo a mandatory one-time validation fetch to correct any incorrect aliases (e.g., VEVO vs. Main handle).
-
-#### 6. OG Meta Tag Extraction (Ultimate Fallback)
+#### 5. OG Meta Tag Extraction (Ultimate Fallback)
 
 ```javascript
 // Extract channel info from HTML meta tags when JSON parsing fails

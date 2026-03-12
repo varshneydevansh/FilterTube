@@ -114,12 +114,6 @@ function searchYtInitialDataForVideoChannel(videoId, expectations = {}) {
 4. **OG meta extraction** (HTML parsing)
 5. **DOM extraction** (data attributes)
 
-### 3. Opportunistic Mapping Persistence (v3.2.8)
-Even if a user does not click "Block", FilterTube now learns from the identity lookups triggered by standard browsing.
-*   **Mechanism**: `content_bridge.js` listens for all `FilterTube_ChannelInfoResponse` messages from the Main World.
-*   **Persistence**: If a lookup resolves a new Handle ↔ UC ID pair, it is persisted to `channelMap` immediately.
-*   **Impact**: Pre-warms the cache so that future encounters with the same channel (even on different surfaces) can be resolved instantly without repeating the main-world lookup or background fetch.
-
 ## Architecture Diagram
 
 ```mermaid
@@ -254,12 +248,6 @@ window.postMessage({
 - **XHR source**: Same endpoints, but Kids-specific payloads
 - **Network policy**: `skipNetwork: true` everywhere
 - **Result**: Zero-network blocking works reliably
-
-### YouTube Mobile (m.youtube.com)
-- **XHR source**: Mobile endpoints with `ytm-*` renderer payloads (e.g., `videoWithContextRenderer`).
-- **Extraction**: `videoWithContextRenderer`, `compactPlaylistRenderer` → UC ID, handle, name.
-- **Menus**: Integration with mobile bottom sheets (`ytm-bottom-sheet-renderer`).
-- **Result**: Proactive identity resolution for the mobile web interface.
 
 ## Implementation Details
 

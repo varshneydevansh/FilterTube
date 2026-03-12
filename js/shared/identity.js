@@ -28,16 +28,6 @@
     ];
     const ZERO_WIDTH_REGEX = /[\u200B-\u200F\u202A-\u202E\u2066-\u2069\uFEFF]/g;
     const UC_ID_REGEX = /^UC[\w-]{22}$/i;
-    const HANDLE_CORE_REGEX = /^[A-Za-z0-9._-]{3,60}$/;
-
-    function isPlausibleHandleCore(value) {
-        if (!value || typeof value !== 'string') return false;
-        const trimmed = value.trim();
-        if (!trimmed) return false;
-        if (!HANDLE_CORE_REGEX.test(trimmed)) return false;
-        if (!/[A-Za-z0-9]/.test(trimmed)) return false;
-        return true;
-    }
 
     function normalizeHandleGlyphs(value) {
         let normalized = value;
@@ -90,7 +80,6 @@
         buffer = normalizeHandleGlyphs(buffer);
         buffer = buffer.trim();
         if (!buffer) return '';
-        if (!isPlausibleHandleCore(buffer)) return '';
 
         return `@${buffer}`;
     }
@@ -118,7 +107,6 @@
         normalized = normalized.replace(/\s+/g, '');
         if (!normalized) return '';
         if (UC_ID_REGEX.test(normalized)) return '';
-        if (!isPlausibleHandleCore(normalized)) return '';
 
         return `@${normalized.toLowerCase()}`;
     }
@@ -247,24 +235,11 @@
             return channelMap[key.toLowerCase()] || '';
         };
 
-        const isRoundTripHandleId = (handleCandidate, idCandidate) => {
-            const handleKey = normalizeHandleForComparison(handleCandidate || '');
-            const idKey = normalizeUcIdForComparison(idCandidate || '');
-            if (!handleKey || !idKey) return false;
-            const mappedId = normalizeUcIdForComparison(lookupChannelMap(handleKey));
-            if (mappedId && mappedId !== idKey) return false;
-            const mappedHandle = normalizeHandleForComparison(lookupChannelMap(idKey));
-            if (mappedHandle && mappedHandle !== handleKey) return false;
-            // If either direction is missing, treat as non-round-trip (avoid false positives).
-            return Boolean(mappedId && mappedHandle);
-        };
-
         if (typeof filterChannel === 'object') {
             const filterId = normalizeUcIdForComparison(filterChannel.id || '');
             const filterName = typeof filterChannel.name === 'string' ? filterChannel.name.toLowerCase().trim() : '';
             const filterHandles = collectHandleVariants(filterChannel);
             const filterCustomUrl = normalizeCustomUrl(filterChannel.customUrl);
-            const hasStructuredIdentity = Boolean(filterId || filterHandles.length > 0 || filterCustomUrl);
 
             if (!filterId && !filterName && filterHandles.length === 0 && !filterCustomUrl) return false;
 
@@ -280,21 +255,31 @@
                 }
             }
 
-            if (!hasStructuredIdentity && filterName && metaName && filterName === metaName) {
+            if (filterName && metaName && filterName === metaName) {
                 return true;
             }
 
-            if (!hasStructuredIdentity && filterName && metaHandles.length > 0) {
+            if (filterName && metaHandles.length > 0) {
                 for (const mh of metaHandles) {
                     const withoutAt = mh.replace(/^@/, '');
                     if (withoutAt && withoutAt === filterName) return true;
                 }
             }
 
-            if (!hasStructuredIdentity && metaName && filterHandles.length > 0) {
+            if (metaName && filterHandles.length > 0) {
                 for (const fh of filterHandles) {
                     const withoutAt = fh.replace(/^@/, '');
                     if (withoutAt && withoutAt === metaName) return true;
+                }
+            }
+
+            if (filterId && metaHandles.length > 0) {
+                const mappedHandle = lookupChannelMap(filterId);
+                const normalizedMappedHandle = normalizeHandleForComparison(mappedHandle);
+                if (normalizedMappedHandle) {
+                    for (const mh of metaHandles) {
+                        if (mh === normalizedMappedHandle) return true;
+                    }
                 }
             }
 
@@ -302,7 +287,7 @@
                 for (const fh of filterHandles) {
                     const mappedId = lookupChannelMap(fh);
                     const normalizedMappedId = normalizeUcIdForComparison(mappedId);
-                    if (normalizedMappedId && normalizedMappedId === metaId && isRoundTripHandleId(fh, normalizedMappedId)) {
+                    if (normalizedMappedId && normalizedMappedId === metaId) {
                         return true;
                     }
                 }
@@ -349,7 +334,7 @@
 
             const mappedId = lookupChannelMap(normalizedFilter);
             const normalizedMappedId = normalizeUcIdForComparison(mappedId);
-            if (normalizedMappedId && metaId && normalizedMappedId === metaId && isRoundTripHandleId(filterHandle, normalizedMappedId)) {
+            if (normalizedMappedId && metaId && normalizedMappedId === metaId) {
                 return true;
             }
 
@@ -380,6 +365,16 @@
         const filterId = normalizeUcIdForComparison(normalizedFilter);
         if (filterId && metaId && filterId === metaId) {
             return true;
+        }
+
+        if (filterId && metaHandles.length > 0) {
+            const mappedHandle = lookupChannelMap(filterId);
+            const normalizedMappedHandle = normalizeHandleForComparison(mappedHandle);
+            if (normalizedMappedHandle) {
+                for (const mh of metaHandles) {
+                    if (mh === normalizedMappedHandle) return true;
+                }
+            }
         }
 
         if (metaId && filterId && metaHandles.length > 0) {
@@ -426,21 +421,6 @@
         return match ? match[1] : '';
     }
 
-    function isLikelyBadIdentityName(value) {
-        if (!value || typeof value !== 'string') return true;
-        const trimmed = value.trim();
-        if (!trimmed) return true;
-        if (trimmed.startsWith('@')) return true;
-        if (/^UC[\w-]{22}$/i.test(trimmed)) return true;
-        if (trimmed.includes('•')) return true;
-        if (/\bviews?\b/i.test(trimmed)) return true;
-        if (/\bago\b/i.test(trimmed)) return true;
-        if (/^like\s+this\s+video\??$/i.test(trimmed)) return true;
-        if (/^\s*mix\b/i.test(trimmed)) return true;
-        if (/\band\s+\d+\s+more\b/i.test(trimmed) || /\band\s+more\b/i.test(trimmed)) return true;
-        return false;
-    }
-
     function fastExtractIdentityFromHtmlChunk(htmlChunk) {
         if (!htmlChunk || typeof htmlChunk !== 'string') return null;
 
@@ -482,13 +462,10 @@
 
         if (!result.name) {
             const titleMatch = htmlChunk.match(/"channelTitleText":\{"runs":\[\{"text":"([^"]+)"/i) ||
-                htmlChunk.match(/"ownerChannelName":"([^"]+)"/i) ||
-                htmlChunk.match(/"channelMetadataRenderer":\{"title":"([^"]+)"/i);
+                htmlChunk.match(/"title":{"simpleText":"([^"]+)"}/i) ||
+                htmlChunk.match(/"ownerChannelName":"([^"]+)"/i);
             if (titleMatch && titleMatch[1]) {
-                const candidateName = String(titleMatch[1]).trim();
-                if (!isLikelyBadIdentityName(candidateName)) {
-                    result.name = candidateName;
-                }
+                result.name = titleMatch[1];
             }
         }
 

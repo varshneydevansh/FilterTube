@@ -56,19 +56,8 @@
     const HANDLE_TERMINATOR_REGEX = /[\/\s?#"'<>\u2022\u00B7]/;
     function extractRawHandle(value) {
         const sharedExtractRawHandle = window.FilterTubeIdentity?.extractRawHandle;
-        const sharedNormalizeHandleValue = window.FilterTubeIdentity?.normalizeHandleValue;
-        if (typeof sharedNormalizeHandleValue === 'function') {
-            const raw = typeof sharedExtractRawHandle === 'function'
-                ? (sharedExtractRawHandle(value) || value || '')
-                : (value || '');
-            return sharedNormalizeHandleValue(raw) || '';
-        }
         if (typeof sharedExtractRawHandle === 'function') {
-            const extracted = sharedExtractRawHandle(value);
-            if (!extracted) return '';
-            const core = extracted.replace(/^@+/, '').trim();
-            if (!/^[A-Za-z0-9._-]{3,60}$/.test(core) || !/[A-Za-z0-9]/.test(core)) return '';
-            return `@${core.toLowerCase()}`;
+            return sharedExtractRawHandle(value);
         }
         if (!value || typeof value !== 'string') return '';
         let working = value.trim();
@@ -101,8 +90,7 @@
         buffer = buffer.replace(/[\u200B-\u200F\u202A-\u202E\u2066-\u2069\uFEFF]/g, '');
         buffer = buffer.trim();
         if (!buffer) return '';
-        if (!/^[A-Za-z0-9._-]{3,60}$/.test(buffer) || !/[A-Za-z0-9]/.test(buffer)) return '';
-        return `@${buffer.toLowerCase()}`;
+        return `@${buffer}`;
     }
 
     function getCollaboratorListQuality(list) {
@@ -135,45 +123,18 @@
 
         const nameSet = new Set(expectedNames.map(normalizeLooseText).filter(Boolean));
         const handleSet = new Set(expectedHandles.map(normalizeExpectedHandle).filter(Boolean));
-        const comparableExpectedNames = Array.from(nameSet)
-            .map((value) => value
-                .replace(/\b(?:vevo|topic)\b/g, ' ')
-                .replace(/[^a-z0-9]+/g, '')
-                .trim()
-            )
-            .filter(Boolean);
 
         // If caller didn't send expectations, we must not reject results solely on that.
         const hasAny = nameSet.size > 0 || handleSet.size > 0;
 
         return {
             hasAny,
-            nameCount: nameSet.size,
-            handleCount: handleSet.size,
             matchesAny(collaborator) {
                 if (!hasAny) return true;
                 if (!collaborator || typeof collaborator !== 'object') return false;
                 const name = normalizeLooseText(collaborator.name);
                 const handle = normalizeExpectedHandle(collaborator.handle);
-                const compactName = name
-                    ? name
-                        .replace(/\b(?:vevo|topic)\b/g, ' ')
-                        .replace(/[^a-z0-9]+/g, '')
-                        .trim()
-                    : '';
-                const fuzzyNameMatch = compactName
-                    ? comparableExpectedNames.some((expected) => {
-                        if (!expected) return false;
-                        const minLen = Math.min(expected.length, compactName.length);
-                        if (minLen < 4) return false;
-                        return compactName.startsWith(expected) || expected.startsWith(compactName);
-                    })
-                    : false;
-                return (
-                    (name && nameSet.has(name)) ||
-                    fuzzyNameMatch ||
-                    (handle && handleSet.has(handle))
-                );
+                return (name && nameSet.has(name)) || (handle && handleSet.has(handle));
             }
         };
     }
@@ -198,40 +159,6 @@
         }
 
         return true;
-    }
-
-    function scoreCollaboratorCandidate(list, matcher, depth = 0) {
-        if (!Array.isArray(list) || list.length < 2) return -1;
-
-        const hasMatch = matcher?.hasAny
-            ? list.some(c => matcher.matchesAny(c))
-            : true;
-        if (!hasMatch) return -1;
-
-        const matchCount = matcher?.hasAny
-            ? list.reduce((count, collaborator) => count + (matcher.matchesAny(collaborator) ? 1 : 0), 0)
-            : list.length;
-        const matchRatio = matcher?.hasAny ? matchCount / list.length : 1;
-
-        const idMatchCount = list.reduce((count, collaborator) => {
-            if (!collaborator || typeof collaborator !== 'object') return count;
-            if (collaborator.id) count += 1;
-            if (collaborator.handle) count += 0.5;
-            if (collaborator.customUrl) count += 0.5;
-            return count;
-        }, 0);
-
-        const quality = getCollaboratorListQuality(list);
-        const depthPenalty = Math.min(10, Math.max(0, depth));
-
-        return (
-            quality * 25 +
-            list.length * 12 +
-            idMatchCount * 8 +
-            matchCount * 6 +
-            matchRatio * 50 -
-            depthPenalty
-        );
     }
 
     function cacheCollaboratorsIfBetter(videoId, collaborators = []) {
@@ -306,22 +233,11 @@
 
             const cacheValid = isValidCollaboratorResponse(collaboratorInfo, matcher);
             const ytValid = isValidCollaboratorResponse(ytInitialDataCollaborators, matcher);
-            const ytLooseValid = isValidCollaboratorResponse(ytInitialDataCollaborators, null);
-            const strictHandleExpectation = Boolean(matcher?.handleCount);
 
             if (ytValid && (!cacheValid || ytScore > collaboratorScore)) {
                 collaboratorInfo = cacheCollaboratorsIfBetter(videoId, ytInitialDataCollaborators);
                 collaboratorScore = ytScore;
             } else if (!cacheValid && ytValid) {
-                collaboratorInfo = cacheCollaboratorsIfBetter(videoId, ytInitialDataCollaborators);
-                collaboratorScore = ytScore;
-            } else if (
-                ytLooseValid &&
-                !strictHandleExpectation &&
-                (!cacheValid || ytScore > collaboratorScore)
-            ) {
-                // VideoId-anchored fallback: return the best roster even when name hints
-                // are slightly mismatched (e.g. "Shakira" vs "shakiraVEVO").
                 collaboratorInfo = cacheCollaboratorsIfBetter(videoId, ytInitialDataCollaborators);
                 collaboratorScore = ytScore;
             } else if (!cacheValid) {
@@ -345,18 +261,12 @@
 
         // Handle single-channel info request from content_bridge (for UC ID + handle lookup)
         if (type === 'FilterTube_RequestChannelInfo' && source === 'content_bridge') {
-            const { videoId, channelId, requestId, expectedHandle, expectedName } = payload || {};
-            postLog('log', `Received channel info request for video/channel: ${videoId || 'n/a'} / ${channelId || 'n/a'}`);
+            const { videoId, requestId, expectedHandle, expectedName } = payload || {};
+            postLog('log', `Received channel info request for video: ${videoId}`);
 
             let channel = null;
             if (videoId) {
                 channel = searchYtInitialDataForVideoChannel(videoId, {
-                    expectedHandle: extractRawHandle(expectedHandle) || expectedHandle,
-                    expectedName
-                });
-            }
-            if (!channel && channelId) {
-                channel = searchYtInitialDataForChannelId(channelId, {
                     expectedHandle: extractRawHandle(expectedHandle) || expectedHandle,
                     expectedName
                 });
@@ -375,7 +285,7 @@
             if (channel) {
                 postLog('log', 'Sent channel info response:', channel);
             } else {
-                postLog('log', 'No channel info found for video/channel:', videoId || 'n/a', channelId || 'n/a');
+                postLog('log', 'No channel info found for video:', videoId);
             }
         }
     });
@@ -464,157 +374,30 @@
             return collaborators.length > 0 ? collaborators : null;
         };
 
-        const extractListItemsFromSheetLikeCommand = (command) => {
-            if (!command || typeof command !== 'object') return [];
-            const candidates = [
-                command?.listViewModel?.listItems,
-                command?.content?.listViewModel?.listItems,
-                command?.customContent?.listViewModel?.listItems,
-                command?.presenterDialogViewModel?.listViewModel?.listItems,
-                command?.presenterDialogViewModel?.content?.listViewModel?.listItems,
-                command?.presenterDialogViewModel?.customContent?.listViewModel?.listItems,
-                command?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.listViewModel?.listItems,
-                command?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems,
-                command?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.listViewModel?.listItems,
-                command?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.sheetViewModel?.content?.listViewModel?.listItems,
-                command?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.listViewModel?.listItems,
-                command?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems,
-                command?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.sheetViewModel?.content?.listViewModel?.listItems,
-                command?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems,
-                command?.panelLoadingStrategy?.inlineContent?.sheetViewModel?.content?.listViewModel?.listItems,
-                command?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.content?.listViewModel?.listItems,
-                command?.panelLoadingStrategy?.inlineContent?.dialog?.presenterDialogViewModel?.customContent?.listViewModel?.listItems,
-                command?.panelLoadingStrategy?.inlineContent?.dialog?.presenterDialogViewModel?.content?.listViewModel?.listItems,
-                command?.panelLoadingStrategy?.inlineContent?.dialog?.presenterDialogViewModel?.listViewModel?.listItems,
-                command?.panelLoadingStrategy?.inlineContent?.dialog?.dialogViewModel?.content?.listViewModel?.listItems,
-                command?.panelLoadingStrategy?.inlineContent?.dialog?.dialogViewModel?.customContent?.listViewModel?.listItems,
-                command?.panelLoadingStrategy?.inlineContent?.dialog?.dialogViewModel?.listViewModel?.listItems,
-                command?.dialog?.presenterDialogViewModel?.content?.listViewModel?.listItems,
-                command?.dialog?.presenterDialogViewModel?.customContent?.listViewModel?.listItems,
-                command?.dialog?.presenterDialogViewModel?.listViewModel?.listItems,
-                command?.dialog?.dialogViewModel?.content?.listViewModel?.listItems,
-                command?.dialog?.dialogViewModel?.customContent?.listViewModel?.listItems,
-                command?.dialog?.dialogViewModel?.listViewModel?.listItems,
-                command?.showDialogCommand?.dialog?.presenterDialogViewModel?.content?.listViewModel?.listItems,
-                command?.showDialogCommand?.dialog?.presenterDialogViewModel?.customContent?.listViewModel?.listItems,
-                command?.showDialogCommand?.dialog?.presenterDialogViewModel?.listViewModel?.listItems,
-                command?.showDialogCommand?.dialog?.dialogViewModel?.content?.listViewModel?.listItems,
-                command?.showDialogCommand?.dialog?.dialogViewModel?.customContent?.listViewModel?.listItems,
-                command?.showDialogCommand?.dialog?.dialogViewModel?.listViewModel?.listItems,
-                command?.showDialogCommand?.dialog?.presenterDialogViewModel?.content?.listViewModel?.listItems,
-                command?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.content?.listViewModel?.listItems,
-                command?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.content?.listViewModel?.listItems,
-                command?.showSheetCommand?.presenterDialogViewModel?.content?.listViewModel?.listItems,
-                command?.showSheetCommand?.presenterDialogViewModel?.customContent?.listViewModel?.listItems,
-            ];
-            for (const candidate of candidates) {
-                if (Array.isArray(candidate) && candidate.length > 0) return candidate;
-            }
-            return [];
-        };
-
-        const extractFromSheetLikeCommand = (sheetCommand) => {
-            const listItems = extractListItemsFromSheetLikeCommand(sheetCommand);
+        const extractFromShowDialogCommand = (showDialogCommand) => {
+            const listItems = showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems;
             if (!Array.isArray(listItems) || listItems.length === 0) return null;
 
             const collaborators = [];
-            const parseCustomUrl = (value) => {
-                if (!value || typeof value !== 'string') return '';
-                const match = value.match(/\/(c|user)\/([^/?#]+)/);
-                if (!match || !match[1] || !match[2]) return '';
-                try {
-                    return `${match[1]}/${decodeURIComponent(match[2])}`;
-                } catch (e) {
-                    return `${match[1]}/${match[2]}`;
-                }
-            };
-
-            const pickBrowseEndpoint = (viewModel) => {
-                if (!viewModel || typeof viewModel !== 'object') return null;
-                const fromContext = (
-                    viewModel?.rendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint ||
-                    viewModel?.rendererContext?.commandContext?.onTap?.innertubeCommand?.command?.browseEndpoint ||
-                    viewModel?.rendererContext?.commandContext?.onTap?.browseEndpoint ||
-                    null
-                );
-                const commandRuns = Array.isArray(viewModel?.title?.commandRuns) ? viewModel.title.commandRuns : [];
-                let fromTitleRuns = null;
-                for (const run of commandRuns) {
-                    const browse =
-                        run?.onTap?.innertubeCommand?.browseEndpoint ||
-                        run?.onTap?.innertubeCommand?.command?.browseEndpoint ||
-                        run?.onTap?.browseEndpoint ||
-                        null;
-                    if (browse) {
-                        fromTitleRuns = browse;
-                        break;
-                    }
-                }
-                const normalizeUc = (value) => {
-                    const raw = typeof value === 'string' ? value.trim() : '';
-                    return /^UC[\w-]{22}$/i.test(raw) ? raw : '';
-                };
-                const contextId = normalizeUc(fromContext?.browseId || '');
-                const titleId = normalizeUc(fromTitleRuns?.browseId || '');
-                const idsConflict = Boolean(contextId && titleId && contextId !== titleId);
-                const preferred = idsConflict ? fromContext : (fromTitleRuns || fromContext);
-                if (!preferred) return null;
-                return {
-                    ...(fromContext || {}),
-                    ...(fromTitleRuns || {}),
-                    browseId: idsConflict
-                        ? (fromContext?.browseId || '')
-                        : (fromTitleRuns?.browseId || fromContext?.browseId || ''),
-                    canonicalBaseUrl: idsConflict
-                        ? (fromContext?.canonicalBaseUrl || '')
-                        : (fromTitleRuns?.canonicalBaseUrl || fromContext?.canonicalBaseUrl || ''),
-                    __idsConflict: idsConflict
-                };
-            };
-
-            const pickMetadataUrl = (viewModel) => {
-                const direct = viewModel?.rendererContext?.commandContext?.onTap?.innertubeCommand?.commandMetadata?.webCommandMetadata?.url ||
-                    viewModel?.rendererContext?.commandContext?.onTap?.innertubeCommand?.command?.commandMetadata?.webCommandMetadata?.url ||
-                    '';
-                if (direct) return direct;
-                const commandRuns = Array.isArray(viewModel?.title?.commandRuns) ? viewModel.title.commandRuns : [];
-                for (const run of commandRuns) {
-                    const candidate = run?.onTap?.innertubeCommand?.commandMetadata?.webCommandMetadata?.url ||
-                        run?.onTap?.innertubeCommand?.command?.commandMetadata?.webCommandMetadata?.url ||
-                        run?.onTap?.commandMetadata?.webCommandMetadata?.url ||
-                        '';
-                    if (candidate) return candidate;
-                }
-                return '';
-            };
-
             for (const item of listItems) {
                 const viewModel = item?.listItemViewModel;
                 if (!viewModel) continue;
 
                 const title = viewModel.title?.content;
                 const subtitle = viewModel.subtitle?.content;
-                const browseEndpoint = pickBrowseEndpoint(viewModel);
+                const browseEndpoint = viewModel.rendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint;
 
                 const collab = { name: title };
                 if (browseEndpoint?.canonicalBaseUrl) {
                     const extracted = extractRawHandle(browseEndpoint.canonicalBaseUrl);
                     if (extracted) collab.handle = extracted;
                 }
-                if (!collab.customUrl) {
-                    const metadataUrl = pickMetadataUrl(viewModel);
-                    const parsedCustom = parseCustomUrl(metadataUrl);
-                    if (parsedCustom) collab.customUrl = parsedCustom;
-                }
-                if (browseEndpoint?.browseId?.startsWith('UC')) {
-                    collab.id = browseEndpoint.browseId;
-                }
                 if (!collab.handle && subtitle) {
                     const extracted = extractRawHandle(subtitle);
                     if (extracted) collab.handle = extracted;
                 }
-                if (browseEndpoint?.__idsConflict && collab.id && collab.handle) {
-                    collab.handle = '';
+                if (browseEndpoint?.browseId?.startsWith('UC')) {
+                    collab.id = browseEndpoint.browseId;
                 }
 
                 if (collab.handle || collab.id || collab.name) {
@@ -661,24 +444,12 @@
         const bylineText = renderer.shortBylineText || renderer.longBylineText;
         if (bylineText?.runs) {
             for (const run of bylineText.runs) {
-                const showSheetCommand = run.navigationEndpoint?.showSheetCommand;
                 const showDialogCommand = run.navigationEndpoint?.showDialogCommand;
-                const sheetLikeCommand = showSheetCommand || showDialogCommand;
-                if (!sheetLikeCommand) continue;
+                if (!showDialogCommand) continue;
 
-                const collaborators = extractFromSheetLikeCommand(sheetLikeCommand);
+                const collaborators = extractFromShowDialogCommand(showDialogCommand);
                 if (collaborators) return collaborators;
             }
-        }
-
-        // Home/watch lockups can expose collaborator rosters on owner text command runs
-        // even when byline-level deep scans miss the exact command payload path.
-        const ownerRunsForCommands = Array.isArray(renderer.ownerText?.runs) ? renderer.ownerText.runs : [];
-        for (const run of ownerRunsForCommands) {
-            const ownerSheetCommand = run?.navigationEndpoint?.showDialogCommand || run?.navigationEndpoint?.showSheetCommand;
-            if (!ownerSheetCommand) continue;
-            const collaborators = extractFromSheetLikeCommand(ownerSheetCommand);
-            if (collaborators) return collaborators;
         }
 
         // Some surfaces expose collaboration via avatarStackViewModel rather than showDialogCommand.
@@ -723,16 +494,15 @@
         } catch (e) {
         }
 
-        // Home/watch lockups can expose either showDialogCommand or showSheetCommand.
-        // Fall back to a bounded deep scan for either command anywhere inside the renderer.
+        // Home lockupViewModel often doesn't expose bylineText runs; fall back to a bounded deep scan
+        // for showDialogCommand anywhere inside the renderer.
         const visited = new WeakSet();
         function deepScanForShowDialog(node, depth = 0) {
             if (!node || typeof node !== 'object' || visited.has(node) || depth > 10) return null;
             visited.add(node);
 
-            const sheetLikeCommand = node.showSheetCommand || node.showDialogCommand;
-            if (sheetLikeCommand) {
-                const collaborators = extractFromSheetLikeCommand(sheetLikeCommand);
+            if (node.showDialogCommand) {
+                const collaborators = extractFromShowDialogCommand(node.showDialogCommand);
                 if (collaborators) return collaborators;
             }
 
@@ -848,8 +618,8 @@
         return '';
     }
 
-        function mergeChannelCandidates(...candidates) {
-        const merged = { id: null, handle: null, name: null, logo: null, customUrl: null, allCollaborators: null };
+    function mergeChannelCandidates(...candidates) {
+        const merged = { id: null, handle: null, name: null, logo: null, customUrl: null };
         for (const candidate of candidates) {
             if (!candidate || typeof candidate !== 'object') continue;
             if (!merged.id && typeof candidate.id === 'string' && candidate.id.trim()) merged.id = candidate.id.trim();
@@ -857,9 +627,6 @@
             if (!merged.name && typeof candidate.name === 'string' && candidate.name.trim()) merged.name = candidate.name.trim();
             if (!merged.logo && typeof candidate.logo === 'string' && candidate.logo.trim()) merged.logo = candidate.logo.trim();
             if (!merged.customUrl && typeof candidate.customUrl === 'string' && candidate.customUrl.trim()) merged.customUrl = candidate.customUrl.trim();
-            if (!merged.allCollaborators && Array.isArray(candidate.allCollaborators) && candidate.allCollaborators.length > 0) {
-                merged.allCollaborators = candidate.allCollaborators;
-            }
         }
         const hasAny = Boolean(merged.id || merged.handle || merged.name || merged.logo || merged.customUrl);
         return hasAny ? merged : null;
@@ -887,43 +654,6 @@
         const normalizedExpectedName = normalizeChannelName(options.expectedName);
         const hasExpectations = Boolean(normalizedExpectedHandle || normalizedExpectedName);
         let fallbackCandidate = null;
-        const isLikelyBadName = (value) => {
-            if (!value || typeof value !== 'string') return true;
-            const trimmed = value.trim();
-            if (!trimmed) return true;
-            const lower = trimmed.toLowerCase();
-            if (lower.startsWith('@')) return true;
-            if (/^uc[\w-]{22}$/i.test(trimmed)) return true;
-            if (trimmed.includes('•')) return true;
-            if (/\bviews?\b/i.test(trimmed)) return true;
-            if (/\bago\b/i.test(trimmed)) return true;
-            if (/^like\s+this\s+video\??$/i.test(trimmed)) return true;
-            if (/\band\s+\d+\s+more\b/i.test(trimmed) || /\band\s+more\b/i.test(trimmed)) return true;
-            if (/^\s*mix\b/i.test(trimmed)) return true;
-            if (trimmed.toLowerCase() === 'channel') return true;
-            return false;
-        };
-        const extractChannelThumbnailA11yName = (node) => {
-            if (!node || typeof node !== 'object') return '';
-            const rawLabel =
-                node?.channelThumbnail?.channelThumbnailWithLinkRenderer?.accessibility?.accessibilityData?.label ||
-                node?.channelThumbnailSupportedRenderers?.channelThumbnailWithLinkRenderer?.accessibility?.accessibilityData?.label ||
-                '';
-            if (typeof rawLabel !== 'string' || !rawLabel.trim()) return '';
-            const cleaned = rawLabel.replace(/^go to channel\s+/i, '').trim();
-            if (!cleaned || isLikelyBadName(cleaned)) return '';
-            return cleaned;
-        };
-        const pickPreferredName = (node, baseName) => {
-            const cleanedBase = (typeof baseName === 'string' && !isLikelyBadName(baseName))
-                ? baseName.trim()
-                : '';
-            const a11yName = extractChannelThumbnailA11yName(node);
-            if (a11yName && /\s-\sTopic$/i.test(a11yName) && !/\s-\sTopic$/i.test(cleanedBase || '')) {
-                return a11yName;
-            }
-            return cleanedBase || a11yName || '';
-        };
 
         const isWatchContext = (() => {
             try {
@@ -944,176 +674,6 @@
 
         const extractOwnerCandidate = (ownerRenderer) => {
             if (!ownerRenderer || typeof ownerRenderer !== 'object') return null;
-
-            const extractOwnerCommandCollaborators = (command) => {
-                if (!command || typeof command !== 'object') return null;
-                const visited = new WeakSet();
-                const collectCommands = (root, depth = 0) => {
-                    if (!root || typeof root !== 'object' || depth > 12 || visited.has(root)) return [];
-                    visited.add(root);
-
-                    const nested = [
-                        root,
-                        root?.showDialogCommand,
-                        root?.showSheetCommand,
-                        root?.command,
-                        root?.command?.showDialogCommand,
-                        root?.command?.showSheetCommand,
-                        root?.command?.dialog?.presenterDialogViewModel,
-                        root?.command?.dialog?.dialogViewModel,
-                        root?.command?.dialog?.listViewModel,
-                        root?.dialog?.presenterDialogViewModel,
-                        root?.dialog?.dialogViewModel,
-                        root?.dialog?.listViewModel,
-                        root?.showDialogCommand?.dialog?.presenterDialogViewModel,
-                        root?.showDialogCommand?.dialog?.dialogViewModel,
-                        root?.showDialogCommand?.dialog?.listViewModel,
-                        root?.showSheetCommand?.dialog?.presenterDialogViewModel,
-                        root?.showDialogCommand?.dialog?.dialogViewModel,
-                        root?.showSheetCommand?.dialog?.dialogViewModel,
-                        root?.showDialogCommand?.dialog?.panelLoadingStrategy?.inlineContent?.dialogViewModel,
-                        root?.showSheetCommand?.dialog?.panelLoadingStrategy?.inlineContent?.dialogViewModel,
-                        root?.showDialogCommand?.dialog?.panelLoadingStrategy?.inlineContent?.dialog?.presenterDialogViewModel,
-                        root?.showDialogCommand?.dialog?.panelLoadingStrategy?.inlineContent?.dialog?.dialogViewModel,
-                        root?.showSheetCommand?.dialog?.panelLoadingStrategy?.inlineContent?.dialog?.presenterDialogViewModel,
-                        root?.showSheetCommand?.dialog?.panelLoadingStrategy?.inlineContent?.dialog?.dialogViewModel,
-                        root?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.dialogViewModel,
-                        root?.showDialogCommand?.showDialogCommand,
-                        root?.showDialogCommand?.showSheetCommand,
-                        root?.showSheetCommand?.showDialogCommand,
-                        root?.showSheetCommand?.showSheetCommand,
-                        root?.panelLoadingStrategy?.inlineContent?.dialogViewModel,
-                        root?.panelLoadingStrategy?.inlineContent?.sheetViewModel,
-                        root?.panelLoadingStrategy?.inlineContent?.dialog?.presenterDialogViewModel,
-                        root?.panelLoadingStrategy?.inlineContent?.sheetViewModel?.presenterDialogViewModel,
-                        root?.presenterDialogViewModel,
-                        root?.content,
-                        root?.customContent
-                    ];
-
-                    const candidates = [];
-                    for (const child of nested) {
-                        if (!child || typeof child !== 'object') continue;
-                        const children = collectCommands(child, depth + 1);
-                        for (const collected of children) {
-                            candidates.push(collected);
-                        }
-                    }
-                    return [root, ...candidates];
-                };
-
-                const commandCandidates = collectCommands(command);
-                for (const candidateCommand of commandCandidates) {
-                    const collaborators = extractFromSheetLikeCommand(candidateCommand);
-                    if (Array.isArray(collaborators) && collaborators.length > 0) return collaborators;
-                }
-                return null;
-            };
-
-            const looksLikeCollapsedByline = (value) => {
-                if (!value || typeof value !== 'string') return false;
-                const trimmed = value.replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
-                if (!trimmed) return false;
-                if (trimmed.includes('•')) return true;
-                if (/,/.test(trimmed)) return true;
-                if (/\band\s+\d+\s+more\b/i.test(trimmed) || /\band\s+more\b/i.test(trimmed)) return true;
-                return false;
-            };
-
-            const ownerNavCommands = [
-                ownerRenderer?.navigationEndpoint,
-                ownerRenderer?.navigationEndpoint?.command,
-                ownerRenderer?.navigationEndpoint?.showDialogCommand,
-                ownerRenderer?.navigationEndpoint?.showSheetCommand,
-                ownerRenderer?.navigationEndpoint?.command?.showDialogCommand,
-                ownerRenderer?.navigationEndpoint?.command?.showSheetCommand,
-                ownerRenderer?.navigationEndpoint?.dialog?.presenterDialogViewModel,
-                ownerRenderer?.navigationEndpoint?.dialog?.dialogViewModel,
-                ownerRenderer?.navigationEndpoint?.dialog?.listViewModel,
-                ownerRenderer?.navigationEndpoint?.showDialogCommand?.dialog?.presenterDialogViewModel,
-                ownerRenderer?.navigationEndpoint?.showDialogCommand?.presenterDialogViewModel,
-                ownerRenderer?.navigationEndpoint?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel,
-                ownerRenderer?.navigationEndpoint?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel,
-                ownerRenderer?.navigationEndpoint?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel,
-                ownerRenderer?.navigationEndpoint?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.sheetViewModel,
-                ownerRenderer?.navigationEndpoint?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.sheetViewModel,
-                ownerRenderer?.navigationEndpoint?.showDialogCommand?.showDialogCommand,
-                ownerRenderer?.navigationEndpoint?.showDialogCommand?.showSheetCommand,
-                ownerRenderer?.navigationEndpoint?.showSheetCommand?.showDialogCommand,
-                ownerRenderer?.navigationEndpoint?.showSheetCommand?.showSheetCommand,
-                ownerRenderer?.navigationEndpoint?.showDialogCommand?.dialog?.presenterDialogViewModel,
-                ownerRenderer?.navigationEndpoint?.showDialogCommand?.dialog?.dialogViewModel,
-                ownerRenderer?.navigationEndpoint?.showDialogCommand?.dialog?.listViewModel,
-                ownerRenderer?.navigationEndpoint?.showDialogCommand?.dialog?.dialogViewModel,
-                ownerRenderer?.navigationEndpoint?.showSheetCommand?.dialog?.presenterDialogViewModel,
-                ownerRenderer?.navigationEndpoint?.showSheetCommand?.dialog?.dialogViewModel,
-                ownerRenderer?.navigationEndpoint?.showSheetCommand?.dialog?.listViewModel,
-                ownerRenderer?.navigationEndpoint?.command?.showDialogCommand?.dialog?.presenterDialogViewModel,
-                ownerRenderer?.navigationEndpoint?.command?.dialog?.presenterDialogViewModel,
-                ownerRenderer?.navigationEndpoint?.command?.dialog?.dialogViewModel,
-                ownerRenderer?.navigationEndpoint?.command?.dialog?.listViewModel,
-                ownerRenderer?.navigationEndpoint?.command?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel,
-                ownerRenderer?.navigationEndpoint?.command?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel,
-                ownerRenderer?.navigationEndpoint?.command?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.sheetViewModel,
-                ownerRenderer?.navigationEndpoint?.command?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.sheetViewModel,
-                ownerRenderer?.navigationEndpoint?.showDialogCommand?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel,
-                ownerRenderer?.navigationEndpoint?.showSheetCommand?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel
-            ];
-
-            let allCollaborators = [];
-            for (const ownerNavCommand of ownerNavCommands) {
-                if (!ownerNavCommand) continue;
-                const directFromOwnerCommand = extractOwnerCommandCollaborators(ownerNavCommand);
-                if (Array.isArray(directFromOwnerCommand) && directFromOwnerCommand.length > 0) {
-                    allCollaborators = directFromOwnerCommand;
-                    break;
-                }
-            }
-
-            if (!allCollaborators.length) {
-                const allRuns = [
-                    ...(Array.isArray(ownerRenderer?.title?.runs) ? ownerRenderer.title.runs : []),
-                    ...(Array.isArray(ownerRenderer?.shortBylineText?.runs) ? ownerRenderer.shortBylineText.runs : [])
-                ];
-                for (const run of allRuns) {
-                    const command = run?.navigationEndpoint?.showDialogCommand
-                        || run?.navigationEndpoint?.showSheetCommand
-                        || run?.navigationEndpoint
-                        || run?.navigationEndpoint?.command?.showDialogCommand
-                        || run?.navigationEndpoint?.command?.showSheetCommand
-                        || run?.navigationEndpoint?.dialog?.presenterDialogViewModel
-                        || run?.navigationEndpoint?.dialog?.dialogViewModel
-                        || run?.navigationEndpoint?.dialog?.listViewModel
-                        || run?.navigationEndpoint?.showDialogCommand?.dialog?.presenterDialogViewModel
-                        || run?.navigationEndpoint?.showDialogCommand?.dialog?.dialogViewModel
-                        || run?.navigationEndpoint?.showDialogCommand?.dialog?.listViewModel
-                        || run?.navigationEndpoint?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel
-                        || run?.navigationEndpoint?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialog?.presenterDialogViewModel
-                        || run?.navigationEndpoint?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialog?.dialogViewModel
-                        || run?.navigationEndpoint?.showDialogCommand?.dialog?.dialogViewModel
-                        || run?.navigationEndpoint?.showDialogCommand?.dialog?.panelLoadingStrategy?.inlineContent?.dialogViewModel
-                        || run?.navigationEndpoint?.showDialogCommand?.showDialogCommand?.dialog?.presenterDialogViewModel
-                        || run?.navigationEndpoint?.showDialogCommand?.showDialogCommand?.dialog?.dialogViewModel
-                        || run?.navigationEndpoint?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel
-                        || run?.navigationEndpoint?.showSheetCommand?.dialog?.presenterDialogViewModel
-                        || run?.navigationEndpoint?.showSheetCommand?.dialog?.dialogViewModel
-                        || run?.navigationEndpoint?.showSheetCommand?.dialog?.listViewModel
-                        || run?.navigationEndpoint?.showSheetCommand?.dialog?.presenterDialogViewModel
-                        || run?.navigationEndpoint?.showSheetCommand?.dialog?.dialogViewModel
-                        || run?.navigationEndpoint?.showSheetCommand?.dialog?.panelLoadingStrategy?.inlineContent?.dialogViewModel
-                        || run?.navigationEndpoint?.showDialogCommand?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel
-                        || run?.navigationEndpoint?.showSheetCommand?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel
-                        || run?.navigationEndpoint?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.sheetViewModel
-                        || run?.navigationEndpoint?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.sheetViewModel;
-                    if (!command) continue;
-                    const fromRunCommand = extractOwnerCommandCollaborators(command);
-                    if (Array.isArray(fromRunCommand) && fromRunCommand.length > 0) {
-                        allCollaborators = fromRunCommand;
-                        break;
-                    }
-                }
-            }
-
             const endpoint =
                 ownerRenderer?.navigationEndpoint?.browseEndpoint ||
                 ownerRenderer?.title?.runs?.[0]?.navigationEndpoint?.browseEndpoint ||
@@ -1123,36 +683,19 @@
             const canonicalBaseUrl = endpoint?.canonicalBaseUrl || '';
             const handle = canonicalBaseUrl ? (extractRawHandle(canonicalBaseUrl) || null) : null;
             const customUrl = canonicalBaseUrl ? (extractCustomUrlFromCanonicalBaseUrl(canonicalBaseUrl) || null) : null;
-            const rawName = ownerRenderer?.title?.runs?.[0]?.text || ownerRenderer?.title?.simpleText || ownerRenderer?.shortBylineText?.runs?.[0]?.text || '';
-            const name = (typeof rawName === 'string' && !isLikelyBadName(rawName)) ? rawName.trim() : '';
+            const name = ownerRenderer?.title?.runs?.[0]?.text || ownerRenderer?.title?.simpleText || ownerRenderer?.shortBylineText?.runs?.[0]?.text || '';
             const logo = extractChannelLogoFromObject(ownerRenderer) || '';
             const candidate = {
                 id: (browseId && typeof browseId === 'string' && browseId.startsWith('UC')) ? browseId : null,
                 handle: handle || null,
                 name: name || null,
                 logo: logo || null,
-                customUrl: customUrl || null,
-                allCollaborators: Array.isArray(allCollaborators) ? allCollaborators : null
+                customUrl: customUrl || null
             };
-
-            const candidateNameIsCollapsed = looksLikeCollapsedByline(candidate.name);
-            if ((!candidate.name || candidateNameIsCollapsed) && Array.isArray(candidate.allCollaborators) && candidate.allCollaborators.length > 0) {
-                const firstCollaboratorName = (candidate.allCollaborators[0]?.name || '').trim();
-                if (firstCollaboratorName && !looksLikeCollapsedByline(firstCollaboratorName) && !isLikelyBadName(firstCollaboratorName)) {
-                    candidate.name = firstCollaboratorName;
-                }
-            }
-
-            if (!candidate.id && !candidate.handle && !candidate.name && !candidate.logo && !candidate.customUrl) {
-                if (Array.isArray(candidate.allCollaborators) && candidate.allCollaborators.length > 0 && candidate.allCollaborators[0]?.name) {
-                    candidate.name = candidate.allCollaborators[0].name;
-                }
-            }
 
             if (!candidate.id && !candidate.handle && !candidate.name && !candidate.logo && !candidate.customUrl) {
                 return null;
             }
-
             if (!hasExpectations || matchesExpectations(candidate)) {
                 return candidate;
             }
@@ -1180,71 +723,37 @@
         };
 
         const watchOwnerCandidate = (() => {
-            if (!isCurrentWatchVideo) return null;
-
-            const watchOwnerRoots = [];
-            if (window.ytInitialData) {
-                watchOwnerRoots.push({ root: window.ytInitialData, label: 'ytInitialData' });
-            }
-            if (window.filterTube?.lastYtInitialData) {
-                watchOwnerRoots.push({ root: window.filterTube.lastYtInitialData, label: 'filterTube.lastYtInitialData' });
-            }
-            if (window.filterTube?.rawYtInitialData) {
-                watchOwnerRoots.push({ root: window.filterTube.rawYtInitialData, label: 'filterTube.rawYtInitialData' });
-            }
-            if (window.filterTube?.lastYtNextResponse) {
-                watchOwnerRoots.push({ root: window.filterTube.lastYtNextResponse, label: 'filterTube.lastYtNextResponse' });
-            }
-            const watchPlayerRoot = window.filterTube?.lastYtPlayerResponse || window.filterTube?.lastYtInitialPlayerResponse || window.filterTube?.rawYtInitialPlayerResponse;
-            if (watchPlayerRoot) {
-                watchOwnerRoots.push({ root: watchPlayerRoot, label: 'filterTube.watchPlayerRoot' });
-            } else if (window.ytInitialPlayerResponse) {
-                watchOwnerRoots.push({ root: window.ytInitialPlayerResponse, label: 'ytInitialPlayerResponse' });
-            }
-
-            const scanWithLog = (root, rootLabel) => {
-                if (!root || typeof root !== 'object') return null;
-                const visitedOwner = new WeakSet();
-                const scan = (node, depth = 0) => {
-                    if (!node || typeof node !== 'object' || visitedOwner.has(node) || depth > 10) return null;
-                    visitedOwner.add(node);
-                    if (node.videoSecondaryInfoRenderer?.owner?.videoOwnerRenderer) {
-                        const cand = extractOwnerCandidate(node.videoSecondaryInfoRenderer.owner.videoOwnerRenderer);
-                        if (cand) return cand;
-                    }
-                    if (node.videoOwnerRenderer) {
-                        const cand = extractOwnerCandidate(node.videoOwnerRenderer);
-                        if (cand) return cand;
-                    }
-                    if (Array.isArray(node)) {
-                        for (const child of node.slice(0, 40)) {
-                            const found = scan(child, depth + 1);
-                            if (found) return found;
-                        }
-                        return null;
-                    }
-                    for (const key in node) {
-                        if (!Object.prototype.hasOwnProperty.call(node, key)) continue;
-                        const value = node[key];
-                        if (!value || typeof value !== 'object') continue;
-                        const found = scan(value, depth + 1);
+            const initialDataRoot = window.ytInitialData || window.filterTube?.lastYtInitialData || window.filterTube?.rawYtInitialData || null;
+            if (!isCurrentWatchVideo || !initialDataRoot) return null;
+            const visitedOwner = new WeakSet();
+            const scan = (node, depth = 0) => {
+                if (!node || typeof node !== 'object' || visitedOwner.has(node) || depth > 10) return null;
+                visitedOwner.add(node);
+                if (node.videoSecondaryInfoRenderer?.owner?.videoOwnerRenderer) {
+                    const cand = extractOwnerCandidate(node.videoSecondaryInfoRenderer.owner.videoOwnerRenderer);
+                    if (cand) return cand;
+                }
+                if (node.videoOwnerRenderer) {
+                    const cand = extractOwnerCandidate(node.videoOwnerRenderer);
+                    if (cand) return cand;
+                }
+                if (Array.isArray(node)) {
+                    for (const child of node.slice(0, 40)) {
+                        const found = scan(child, depth + 1);
                         if (found) return found;
                     }
                     return null;
-                };
-                const found = scan(root);
-                if (found) {
-                    postLog('log', `Watch owner candidate found in ${rootLabel}`);
                 }
-                return found;
+                for (const key in node) {
+                    if (!Object.prototype.hasOwnProperty.call(node, key)) continue;
+                    const value = node[key];
+                    if (!value || typeof value !== 'object') continue;
+                    const found = scan(value, depth + 1);
+                    if (found) return found;
+                }
+                return null;
             };
-
-            for (const target of watchOwnerRoots) {
-                const found = scanWithLog(target.root, target.label);
-                if (found) return found;
-            }
-
-            return null;
+            return scan(initialDataRoot);
         })();
 
         // Build the list of roots to search.
@@ -1345,10 +854,7 @@
                 if (nav) {
                     const browseId = nav.browseId;
                     const canonicalBaseUrl = nav.canonicalBaseUrl;
-                    const name = pickPreferredName(
-                        node,
-                        (node.shortBylineText?.runs?.[0]?.text) || (node.longBylineText?.runs?.[0]?.text) || ''
-                    ) || undefined;
+                    const name = (node.shortBylineText?.runs?.[0]?.text) || (node.longBylineText?.runs?.[0]?.text) || undefined;
 
                     if (canonicalBaseUrl) {
                         const handle = extractRawHandle(canonicalBaseUrl) || null;
@@ -1369,33 +875,12 @@
                 const byline = node.shortBylineText || node.longBylineText || node.ownerText;
                 if (byline?.runs && Array.isArray(byline.runs)) {
                     for (const run of byline.runs) {
-                        const runOwnerCandidate = run?.navigationEndpoint
-                            ? extractOwnerCandidate({ navigationEndpoint: run.navigationEndpoint })
-                            : null;
-                        if (
-                            runOwnerCandidate &&
-                            (
-                                runOwnerCandidate.id ||
-                                runOwnerCandidate.handle ||
-                                runOwnerCandidate.customUrl ||
-                                runOwnerCandidate.allCollaborators?.length > 0 ||
-                                runOwnerCandidate.name
-                            )
-                        ) {
-                            if (!hasExpectations || matchesExpectations(runOwnerCandidate)) {
-                                return runOwnerCandidate;
-                            }
-                            if (!fallbackCandidate) {
-                                fallbackCandidate = runOwnerCandidate;
-                            }
-                        }
-
                         const browse = run?.navigationEndpoint?.browseEndpoint;
                         if (!browse) continue;
 
                         const browseId = browse.browseId;
                         const canonicalBaseUrl = browse.canonicalBaseUrl;
-                        const name = pickPreferredName(node, run.text);
+                        const name = run.text;
 
                         if (canonicalBaseUrl) {
                             const handle = extractRawHandle(canonicalBaseUrl) || null;
@@ -1429,44 +914,6 @@
                 if (ownerRenderer) {
                     const ownerCandidate = extractOwnerCandidate(ownerRenderer);
                     if (ownerCandidate) return ownerCandidate;
-                }
-
-                const channelThumbnailRenderer =
-                    node?.channelThumbnail?.channelThumbnailWithLinkRenderer ||
-                    node?.channelThumbnailSupportedRenderers?.channelThumbnailWithLinkRenderer ||
-                    null;
-                if (channelThumbnailRenderer) {
-                    const nav = channelThumbnailRenderer?.navigationEndpoint || {};
-                    const browse = nav?.browseEndpoint || null;
-                    const browseId = (typeof browse?.browseId === 'string' && browse.browseId.startsWith('UC'))
-                        ? browse.browseId
-                        : '';
-                    const canonicalBaseUrl = browse?.canonicalBaseUrl || nav?.commandMetadata?.webCommandMetadata?.url || '';
-                    const handle = canonicalBaseUrl ? (extractRawHandle(canonicalBaseUrl) || null) : null;
-                    const customUrl = canonicalBaseUrl ? (extractCustomUrlFromCanonicalBaseUrl(canonicalBaseUrl) || null) : null;
-                    const a11yLabel = channelThumbnailRenderer?.accessibility?.accessibilityData?.label || '';
-                    const rawA11yName = (typeof a11yLabel === 'string' && a11yLabel.trim())
-                        ? a11yLabel.replace(/^go to channel\s+/i, '').trim()
-                        : '';
-                    const name = (!rawA11yName || isLikelyBadName(rawA11yName)) ? null : rawA11yName;
-                    const logo = extractChannelLogoFromObject(channelThumbnailRenderer) || null;
-                    if (browseId || handle || customUrl) {
-                        const candidate = mergeChannelCandidates({
-                            id: browseId || null,
-                            handle: handle || null,
-                            customUrl: customUrl || null,
-                            name: name || null,
-                            logo: logo || null
-                        });
-                        if (candidate) {
-                            if (!hasExpectations || matchesExpectations(candidate)) {
-                                return candidate;
-                            }
-                            if (!fallbackCandidate) {
-                                fallbackCandidate = candidate;
-                            }
-                        }
-                    }
                 }
             }
 
@@ -1512,11 +959,9 @@
 
         let result = null;
         const playerCandidate = (() => {
-            const ftPlayer = window.filterTube?.lastYtPlayerResponse ||
-                window.filterTube?.lastYtInitialPlayerResponse ||
-                window.filterTube?.rawYtInitialPlayerResponse ||
-                window.ytInitialPlayerResponse;
-            const extracted = extractFromPlayerResponse(ftPlayer);
+            const ftPlayer = window.filterTube?.lastYtInitialPlayerResponse || window.filterTube?.rawYtInitialPlayerResponse;
+            const basePlayer = ftPlayer || window.ytInitialPlayerResponse;
+            const extracted = extractFromPlayerResponse(basePlayer);
             if (extracted) {
                 if (!hasExpectations || matchesExpectations(extracted)) {
                     return extracted;
@@ -1559,226 +1004,12 @@
         return null;
     }
 
-    function searchYtInitialDataForChannelId(channelId, expectations = {}) {
-        const normalizeUc = (value) => {
-            const raw = typeof value === 'string' ? value.trim() : '';
-            return /^UC[\w-]{22}$/i.test(raw) ? raw : '';
-        };
-        const targetId = normalizeUc(channelId);
-        if (!targetId) return null;
-
-        const options = (expectations && typeof expectations === 'object') ? expectations : {};
-        const normalizedExpectedHandle = typeof options.expectedHandle === 'string'
-            ? (extractRawHandle(options.expectedHandle) || options.expectedHandle).trim().toLowerCase()
-            : '';
-        const normalizedExpectedName = normalizeChannelName(options.expectedName);
-        const hasExpectations = Boolean(normalizedExpectedHandle || normalizedExpectedName);
-
-        const isLikelyBadName = (value) => {
-            if (!value || typeof value !== 'string') return true;
-            const trimmed = value.trim();
-            if (!trimmed) return true;
-            const lower = trimmed.toLowerCase();
-            if (lower.startsWith('@')) return true;
-            if (/^uc[\w-]{22}$/i.test(trimmed)) return true;
-            if (/\band\s+\d+\s+more\b/i.test(trimmed)) return true;
-            if (/^like\s+this\s+video\??$/i.test(trimmed)) return true;
-            if (/^\s*channel\s*$/i.test(trimmed)) return true;
-            if (/\bsubscribers?\b/i.test(trimmed)) return true;
-            if (/\bviews?\b/i.test(trimmed)) return true;
-            if (/\bago\b/i.test(trimmed)) return true;
-            if (/^\s*mix\b/i.test(trimmed)) return true;
-            if (/\s[-–]\s/.test(trimmed) && /\bmix\b/i.test(trimmed)) return true;
-            if (trimmed.includes('•')) return true;
-            return false;
-        };
-
-        const normalizeCandidate = (candidate) => {
-            if (!candidate || typeof candidate !== 'object') return null;
-            const id = normalizeUc(candidate.id || '') || targetId;
-            const handle = typeof candidate.handle === 'string'
-                ? (extractRawHandle(candidate.handle) || '').trim().toLowerCase()
-                : '';
-            const customUrl = typeof candidate.customUrl === 'string' ? candidate.customUrl.trim() : '';
-            const nameRaw = typeof candidate.name === 'string' ? candidate.name.trim() : '';
-            const name = (!nameRaw || isLikelyBadName(nameRaw)) ? '' : nameRaw;
-            const logo = typeof candidate.logo === 'string' ? candidate.logo.trim() : '';
-            if (!id && !handle && !customUrl && !name && !logo) return null;
-            return {
-                id: id || targetId,
-                handle: handle || null,
-                customUrl: customUrl || null,
-                name: name || null,
-                logo: logo || null
-            };
-        };
-
-        const matchesExpectations = (candidate) => {
-            if (!candidate) return false;
-            if (!hasExpectations) return true;
-            if (normalizedExpectedHandle) {
-                const candidateHandle = candidate.handle ? candidate.handle.toLowerCase() : '';
-                if (candidateHandle && candidateHandle !== normalizedExpectedHandle) {
-                    return false;
-                }
-            }
-            if (normalizedExpectedName) {
-                const candidateName = normalizeChannelName(candidate.name);
-                if (candidateName && candidateName !== normalizedExpectedName) {
-                    return false;
-                }
-            }
-            return true;
-        };
-
-        const candidateScore = (candidate, matched) => {
-            if (!candidate) return -1;
-            let score = 0;
-            if (candidate.id) score += 6;
-            if (candidate.handle) score += 4;
-            if (candidate.customUrl) score += 2;
-            if (candidate.name) score += 3;
-            if (candidate.logo) score += 1;
-            if (matched) score += 5;
-            return score;
-        };
-
-        const extractCandidateFromNode = (node) => {
-            if (!node || typeof node !== 'object') return null;
-            const endpointCandidates = [
-                node?.browseEndpoint,
-                node?.navigationEndpoint?.browseEndpoint,
-                node?.rendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint,
-                node?.command?.browseEndpoint,
-                node?.onTap?.innertubeCommand?.browseEndpoint
-            ].filter(Boolean);
-
-            let matchedEndpoint = null;
-            for (const endpoint of endpointCandidates) {
-                const browseId = normalizeUc(endpoint?.browseId || '');
-                if (browseId && browseId.toLowerCase() === targetId.toLowerCase()) {
-                    matchedEndpoint = endpoint;
-                    break;
-                }
-            }
-
-            const directId = normalizeUc(node?.browseId || node?.channelId || node?.externalChannelId || node?.ownerChannelId || node?.ownerDocid || node?.externalId || '');
-            const hasIdMatch = Boolean(
-                (directId && directId.toLowerCase() === targetId.toLowerCase()) ||
-                matchedEndpoint
-            );
-            if (!hasIdMatch) return null;
-
-            const canonicalBaseUrl = (
-                matchedEndpoint?.canonicalBaseUrl ||
-                node?.canonicalBaseUrl ||
-                node?.navigationEndpoint?.commandMetadata?.webCommandMetadata?.url ||
-                node?.commandMetadata?.webCommandMetadata?.url ||
-                node?.webCommandMetadata?.url ||
-                ''
-            );
-
-            const handle = canonicalBaseUrl ? (extractRawHandle(canonicalBaseUrl) || '') : '';
-            const customUrl = canonicalBaseUrl ? (extractCustomUrlFromCanonicalBaseUrl(canonicalBaseUrl) || '') : '';
-            const nameCandidates = [
-                node?.shortBylineText?.runs?.[0]?.text,
-                node?.longBylineText?.runs?.[0]?.text,
-                node?.ownerText?.runs?.[0]?.text,
-                node?.slimOwnerRenderer?.title?.runs?.[0]?.text,
-                node?.videoOwnerRenderer?.title?.runs?.[0]?.text,
-                node?.channelMetadataRenderer?.title,
-                node?.metadata?.channelMetadataRenderer?.title,
-                node?.listItemViewModel?.title?.content,
-                node?.subtitle?.content,
-                (() => {
-                    const raw =
-                        node?.channelThumbnail?.channelThumbnailWithLinkRenderer?.accessibility?.accessibilityData?.label ||
-                        node?.channelThumbnailSupportedRenderers?.channelThumbnailWithLinkRenderer?.accessibility?.accessibilityData?.label ||
-                        '';
-                    if (typeof raw !== 'string' || !raw.trim()) return '';
-                    return raw.replace(/^go to channel\s+/i, '').trim();
-                })()
-            ];
-            const name = nameCandidates.find((value) => {
-                return typeof value === 'string' && value.trim() && !isLikelyBadName(value);
-            }) || '';
-            const logo = extractChannelLogoFromObject(node) || '';
-
-            return normalizeCandidate({
-                id: targetId,
-                handle,
-                customUrl,
-                name,
-                logo
-            });
-        };
-
-        const roots = [];
-        if (window.ytInitialData) roots.push({ root: window.ytInitialData, label: 'ytInitialData' });
-        if (window.filterTube?.lastYtInitialData) roots.push({ root: window.filterTube.lastYtInitialData, label: 'filterTube.lastYtInitialData' });
-        if (window.filterTube?.rawYtInitialData) roots.push({ root: window.filterTube.rawYtInitialData, label: 'filterTube.rawYtInitialData' });
-        if (window.filterTube?.lastYtNextResponse) roots.push({ root: window.filterTube.lastYtNextResponse, label: 'filterTube.lastYtNextResponse' });
-        if (window.filterTube?.lastYtBrowseResponse) roots.push({ root: window.filterTube.lastYtBrowseResponse, label: 'filterTube.lastYtBrowseResponse' });
-        if (window.filterTube?.lastYtPlayerResponse) roots.push({ root: window.filterTube.lastYtPlayerResponse, label: 'filterTube.lastYtPlayerResponse' });
-        const ftPlayer = window.filterTube?.lastYtInitialPlayerResponse || window.filterTube?.rawYtInitialPlayerResponse || window.ytInitialPlayerResponse;
-        if (ftPlayer) roots.push({ root: ftPlayer, label: 'playerResponse' });
-        if (roots.length === 0) return null;
-
-        let bestMatched = null;
-        let bestMatchedScore = -1;
-        let bestFallback = null;
-        let bestFallbackScore = -1;
-
-        for (const target of roots) {
-            const visited = new WeakSet();
-            const scan = (node, depth = 0) => {
-                if (!node || typeof node !== 'object' || visited.has(node) || depth > 14) return;
-                visited.add(node);
-
-                const candidate = extractCandidateFromNode(node);
-                if (candidate) {
-                    const matched = matchesExpectations(candidate);
-                    const score = candidateScore(candidate, matched);
-                    if (matched && score > bestMatchedScore) {
-                        bestMatched = candidate;
-                        bestMatchedScore = score;
-                    } else if (!matched && score > bestFallbackScore) {
-                        bestFallback = candidate;
-                        bestFallbackScore = score;
-                    }
-                }
-
-                if (Array.isArray(node)) {
-                    for (const child of node) scan(child, depth + 1);
-                    return;
-                }
-                for (const key in node) {
-                    if (!Object.prototype.hasOwnProperty.call(node, key)) continue;
-                    const value = node[key];
-                    if (!value || typeof value !== 'object') continue;
-                    scan(value, depth + 1);
-                }
-            };
-            scan(target.root, 0);
-        }
-
-        if (bestMatched) {
-            postLog('log', `Channel-id lookup matched for ${targetId}:`, bestMatched);
-            return bestMatched;
-        }
-        if (bestFallback) {
-            postLog('log', `Channel-id lookup fallback for ${targetId}:`, bestFallback);
-            return bestFallback;
-        }
-        return null;
-    }
-
     /**
      * Hybrid search for collaborator info (global cache + DOM hydration)
      * @param {string} videoId
      * @returns {Array|null}
      */
-function searchYtInitialDataForCollaborators(videoId, matcher = null) {
+    function searchYtInitialDataForCollaborators(videoId, matcher = null) {
         if (!videoId) {
             postLog('log', 'Collaborator search skipped - missing videoId');
             return null;
@@ -1787,13 +1018,6 @@ function searchYtInitialDataForCollaborators(videoId, matcher = null) {
         postLog('log', `Searching collaborators for ${videoId}...`);
 
         let result = null;
-
-        let bestMatched = null;
-        let bestMatchedScore = -1;
-        let bestMatchedDepth = Infinity;
-        let bestFallback = null;
-        let bestFallbackScore = -1;
-        let bestFallbackDepth = Infinity;
 
         const roots = [];
         if (window.ytInitialData) {
@@ -1811,13 +1035,6 @@ function searchYtInitialDataForCollaborators(videoId, matcher = null) {
         }
         if (window.filterTube?.lastYtBrowseResponse) {
             roots.push({ root: window.filterTube.lastYtBrowseResponse, label: 'filterTube.lastYtBrowseResponse' });
-        }
-        if (window.filterTube?.lastYtPlayerResponse) {
-            roots.push({ root: window.filterTube.lastYtPlayerResponse, label: 'filterTube.lastYtPlayerResponse' });
-        }
-        const playerRoot = window.filterTube?.lastYtInitialPlayerResponse || window.filterTube?.rawYtInitialPlayerResponse || window.ytInitialPlayerResponse;
-        if (playerRoot) {
-            roots.push({ root: playerRoot, label: 'filterTube.playerResponse' });
         }
 
         const extractVideoIdFromNode = (node) => {
@@ -1849,34 +1066,20 @@ function searchYtInitialDataForCollaborators(videoId, matcher = null) {
         for (const target of roots) {
             const visited = new WeakSet();
             function searchObject(obj, depth = 0) {
-                if (!obj || typeof obj !== 'object' || visited.has(obj) || depth > 20) return;
+                if (!obj || typeof obj !== 'object' || visited.has(obj) || depth > 12) return null;
                 visited.add(obj);
 
                 const nodeVideoId = extractVideoIdFromNode(obj);
                 if (nodeVideoId === videoId) {
                     const extracted = extractCollaboratorsFromDataObject(obj);
                     if (Array.isArray(extracted) && extracted.length > 0) {
-                        const isMatch = matcher?.hasAny
-                            ? extracted.some(candidate => matcher.matchesAny(candidate))
-                            : false;
-                        const score = scoreCollaboratorCandidate(extracted, matcher, depth);
-
-                        // First-class candidate: matches expected identity signals (when available)
-                        if (isMatch) {
-                            if (score > bestMatchedScore || (score === bestMatchedScore && depth < bestMatchedDepth)) {
-                                bestMatchedScore = score;
-                                bestMatchedDepth = depth;
-                                bestMatched = extracted;
-                            }
-                        } else if (isValidCollaboratorResponse(extracted, null)) {
-                            // Secondary candidate: valid roster that does not match expected signals yet.
-                            const fallbackScore = scoreCollaboratorCandidate(extracted, null, depth);
-                            if (fallbackScore > bestFallbackScore || (fallbackScore === bestFallbackScore && depth < bestFallbackDepth)) {
-                                bestFallbackScore = fallbackScore;
-                                bestFallbackDepth = depth;
-                                bestFallback = extracted;
-                            }
+                        // Only treat this as a valid collaboration result when it is a true roster (2+ channels)
+                        // and matches expectations from the clicked card (when provided).
+                        if (!isValidCollaboratorResponse(extracted, matcher)) {
+                            return null;
                         }
+                        postLog('log', `✅ Found collaborators via ${target.label}`);
+                        return extracted;
                     }
                 }
 
@@ -1886,25 +1089,22 @@ function searchYtInitialDataForCollaborators(videoId, matcher = null) {
                     if (!value || typeof value !== 'object') continue;
                     if (Array.isArray(value)) {
                         for (let i = 0; i < value.length; i++) {
-                            searchObject(value[i], depth + 1);
+                            const nested = searchObject(value[i], depth + 1);
+                            if (nested) return nested;
                         }
                     } else {
-                        searchObject(value, depth + 1);
+                        const nested = searchObject(value, depth + 1);
+                        if (nested) return nested;
                     }
                 }
+
+                return null;
             }
 
-            searchObject(target.root);
-        }
-
-        if (bestMatched) {
-            postLog('log', `✅ Found collaborators for ${videoId} via matched roster`);
-            return bestMatched;
-        }
-
-        if (bestFallback) {
-            postLog('log', `⚠️ Found collaborators for ${videoId} via fallback roster`);
-            return bestFallback;
+            result = searchObject(target.root);
+            if (result) {
+                return result;
+            }
         }
 
         postLog('log', '⚠️ Global search failed. Attempting DOM hydration…');
@@ -1918,17 +1118,7 @@ function searchYtInitialDataForCollaborators(videoId, matcher = null) {
         const baseElement = document.querySelector(selector);
         if (baseElement) {
             candidates.push(baseElement);
-            const wrapper = baseElement.closest(
-                'ytd-rich-item-renderer, ' +
-                'ytd-grid-video-renderer, ' +
-                'ytd-compact-video-renderer, ' +
-                'ytd-playlist-video-renderer, ' +
-                'ytd-playlist-panel-video-renderer, ' +
-                'ytd-playlist-panel-video-wrapper-renderer, ' +
-                'ytm-playlist-panel-video-renderer, ' +
-                'ytm-playlist-panel-video-wrapper-renderer, ' +
-                'ytd-video-renderer'
-            );
+            const wrapper = baseElement.closest('ytd-rich-item-renderer, ytd-grid-video-renderer, ytd-compact-video-renderer, ytd-playlist-video-renderer, ytd-video-renderer');
             if (wrapper && wrapper !== baseElement) {
                 candidates.push(wrapper);
             }
@@ -1952,34 +1142,6 @@ function searchYtInitialDataForCollaborators(videoId, matcher = null) {
             }
         } else {
             postLog('warn', `❌ Could not find DOM element for ${videoId}`);
-        }
-
-        // Watch-page fallback: selected playlist row and owner metadata often keep the
-        // collaborator dialog command when card-level stamps are incomplete during SPA swaps.
-        try {
-            const currentVideoId = (() => {
-                try {
-                    const params = new URLSearchParams(window.location?.search || '');
-                    return params.get('v') || '';
-                } catch (err) {
-                    return '';
-                }
-            })();
-            if (currentVideoId && currentVideoId === videoId) {
-                const watchCandidates = document.querySelectorAll(
-                    'ytd-watch-metadata, ' +
-                    'ytd-video-owner-renderer, ' +
-                    'ytd-playlist-panel-video-renderer[selected], ' +
-                    'ytd-playlist-panel-video-wrapper-renderer[selected] ytd-playlist-panel-video-renderer'
-                );
-                for (const node of Array.from(watchCandidates).slice(0, 8)) {
-                    if (node && !candidates.includes(node)) {
-                        candidates.push(node);
-                    }
-                }
-            }
-        } catch (e) {
-            // ignore
         }
 
         const hydrateFromStampedAttributes = (element, label) => {

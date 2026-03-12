@@ -92,13 +92,6 @@ YouTube JSON Data → FilterTubeEngine.processData() → Filtered Data → YouTu
 - `ticketShelfRenderer` - Promotional content
 - And 10+ additional renderer types
 
-### **YouTube Mobile Support (v3.2.8)**
-FilterTube now extends its filtering capabilities to the YouTube Mobile web interface (`m.youtube.com`):
-- **Mobile Renderers**: Supports `ytm-video-with-context-renderer`, `ytm-compact-radio-renderer` (Mixes), and `ytm-shorts-lockup-view-model`.
-- **Bottom Sheet Menus**: Intelligent injection into mobile bottom-sheet menu system for blocking channels directly from the UI.
-- **Playlist & Watch**: Filters content within mobile playlists and the watch page queue, including auto-skip functionality for blocked tracks.
-- **Quick Block**: One-tap quick block (cross-hover) supported on mobile video cards and shorts.
-
 ## Filtering Features
 
 ### **Keyword Filtering**
@@ -673,26 +666,24 @@ Video Filtering Decision Tree (v3.2.7)
                └─→ SHOW if all filters pass
 ```
 
-### Quick-Block Card Action (v3.2.7 - Restricted in v3.2.8)
+### Quick-Block Card Action (v3.2.7)
 
 **Purpose:** Add a direct per-card block entry point without opening YouTube's 3-dot menu manually.
 
-**v3.2.8 Implementation Note**: To ensure maximum stability and zero performance overhead on the primary desktop site, the Quick-Block hover/touch button is **currently active on YouTube Mobile (m.youtube.com) only**. Support for Main Desktop and YouTube Kids will be reintroduced in v3.3.0.
-
 **Behavior:**
 - Optional setting: `showQuickBlockButton` (on by default in v3.2.7; users can disable it).
-- Shows a hover/touch button on supported mobile cards.
+- Shows a hover/touch button on supported cards.
 - Single-tap direct action (no quick menu).
 - Single-channel cards: blocks that channel immediately.
 - Collaborator cards: blocks all channels associated with that card in one tap.
 - Reuses the same blocking pipeline as injected menu actions, including collaborator handling and optimistic hide.
-- Covers mobile Home, Search, Watch, and Shorts cards.
+- Covers home, search, watch, playlist panel rows, mix/radio cards, and shorts cards.
 - Comment-menu blocks are isolated from playlist/watch card hide logic to prevent unintended autoplay-next transitions.
-- Hover retention is hardened for mobile touch/hover interactions so the quick-block cross remains stable during scrolling.
+- Hover retention is hardened for Search overlays and Home Shorts so the quick-block cross does not disappear mid-hover.
 
-**Standard Desktop/Kids behavior (v3.2.8):**
-- Users should use the injected "Block" or "Block Channel" buttons within the standard 3-dot menu.
-- Quick-block overlay remains inactive to prevent UI layout regressions on these platforms.
+**YouTube Kids behavior:**
+- Uses the same one-tap quick-block entry point.
+- Persists blocked channels into the Kids channel blocklist (profile-aware save path).
 
 ## Dashboard Improvements (v3.2.6)
 

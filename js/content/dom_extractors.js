@@ -35,23 +35,6 @@ const VIDEO_CARD_SELECTORS = [
     'yt-official-card-view-model',
     'ytm-shorts-lockup-view-model',
     'ytm-shorts-lockup-view-model-v2',
-    'ytm-rich-item-renderer',
-    'ytm-video-with-context-renderer',
-    'ytm-compact-video-renderer',
-    'ytm-compact-channel-renderer',
-    'ytm-compact-radio-renderer',
-    'ytm-compact-playlist-renderer',
-    'ytm-playlist-video-renderer',
-    'ytm-playlist-panel-video-renderer',
-    'ytm-playlist-panel-video-wrapper-renderer',
-    'ytm-reel-item-renderer',
-    'ytm-reel-shelf-renderer',
-    'ytm-universal-watch-card-renderer',
-    'ytm-watch-card-hero-video-renderer',
-    'ytm-watch-card-rich-header-renderer',
-    'ytm-backstage-post-renderer',
-    'ytm-backstage-post-thread-renderer',
-    'ytm-rich-section-renderer',
 
     // YouTube Kids (DOM-only)
     'ytk-compact-video-renderer',
@@ -61,68 +44,6 @@ const VIDEO_CARD_SELECTORS = [
     'ytk-compact-playlist-renderer',
     'ytk-kids-slim-owner-renderer'
 ].join(', ');
-
-const RECYCLED_VIDEO_ID_GUARD_TAGS = new Set([
-    'yt-lockup-view-model',
-    'yt-lockup-metadata-view-model',
-    'ytd-rich-item-renderer',
-    'ytd-video-renderer',
-    'ytd-grid-video-renderer',
-    'ytd-compact-video-renderer',
-    'ytd-playlist-panel-video-renderer',
-    'ytd-playlist-panel-video-wrapper-renderer',
-    'ytm-rich-item-renderer',
-    'ytm-video-with-context-renderer',
-    'ytm-compact-video-renderer',
-    'ytm-compact-playlist-renderer',
-    'ytm-playlist-video-renderer',
-    'ytm-playlist-panel-video-renderer',
-    'ytm-playlist-panel-video-wrapper-renderer',
-    'ytm-radio-renderer',
-    'ytm-compact-radio-renderer',
-    'ytm-universal-watch-card-renderer',
-    'ytm-watch-card-hero-video-renderer',
-    'ytm-watch-card-rich-header-renderer',
-    'ytm-backstage-post-renderer',
-    'ytm-backstage-post-thread-renderer',
-    'ytm-rich-section-renderer'
-]);
-
-function shouldGuardVideoIdStamp(tag, isKidsHost) {
-    return Boolean(isKidsHost || RECYCLED_VIDEO_ID_GUARD_TAGS.has(tag));
-}
-
-function isPlaylistCollectionCardElement(card) {
-    if (!card || typeof card.querySelector !== 'function') return false;
-    const tag = (card.tagName || '').toLowerCase();
-
-    // These are playlist *collection* cards (not videos). Their thumbnail image often contains a
-    // "seed" videoId that must NOT be treated as the card's identity (or we end up stamping the
-    // seed channel onto the playlist creator card).
-    const explicitTags = new Set([
-        'ytd-playlist-renderer',
-        'ytd-grid-playlist-renderer',
-        'ytd-compact-playlist-renderer',
-        'ytd-radio-renderer',
-        'ytd-compact-radio-renderer',
-        'ytm-compact-playlist-renderer',
-        'ytm-compact-radio-renderer',
-        'ytm-radio-renderer',
-        'ytk-compact-playlist-renderer'
-    ]);
-
-    if (explicitTags.has(tag)) return true;
-
-    // Heuristic fallback: has a playlist endpoint but no watch/shorts endpoint.
-    try {
-        const hasPlaylistLink = Boolean(card.querySelector('a[href^="/playlist?list="], a[href*="/playlist?list="]'));
-        if (!hasPlaylistLink) return false;
-        const hasWatchLikeLink = Boolean(card.querySelector('a[href*="watch?v="], a[href*="/watch?v="], a[href*="/shorts/"], a[href*="/watch/"]'));
-        return !hasWatchLikeLink;
-    } catch (e) {
-        return false;
-    }
-}
 
 function ensureVideoIdForCard(card) {
     if (!card || typeof card.getAttribute !== 'function') return '';
@@ -136,22 +57,17 @@ function ensureVideoIdForCard(card) {
         }
     })();
 
-    // Playlist collection cards must not carry a derived thumbnail videoId or derived channel stamps.
-    // Clear them aggressively so subsequent videoId→channel stamping cannot poison the playlist card.
-    if (isPlaylistCollectionCardElement(card)) {
-        try {
-            card.removeAttribute('data-filtertube-video-id');
-            card.removeAttribute('data-filtertube-channel-id');
-            card.removeAttribute('data-filtertube-channel-handle');
-            card.removeAttribute('data-filtertube-channel-custom');
-        } catch (e) {
-        }
-        return '';
-    }
-
-    const canFastReturnStamp = !shouldGuardVideoIdStamp(tag, isKidsHost) &&
-        cachedVideoId &&
-        /^[a-zA-Z0-9_-]{11}$/.test(cachedVideoId);
+    const canFastReturnStamp = !isKidsHost && cachedVideoId && /^[a-zA-Z0-9_-]{11}$/.test(cachedVideoId)
+        && !(tag === 'yt-lockup-view-model' ||
+            tag === 'yt-lockup-metadata-view-model' ||
+            tag === 'ytd-rich-item-renderer' ||
+            tag === 'ytd-video-renderer' ||
+            tag === 'ytd-grid-video-renderer' ||
+            tag === 'ytd-compact-video-renderer' ||
+            tag === 'ytm-video-with-context-renderer' ||
+            tag === 'ytm-compact-video-renderer' ||
+            tag === 'ytd-playlist-panel-video-renderer' ||
+            tag === 'ytd-playlist-panel-video-wrapper-renderer');
     if (canFastReturnStamp) {
         return cachedVideoId;
     }
@@ -164,7 +80,17 @@ function ensureVideoIdForCard(card) {
     }
 
     if (extractedVideoId) {
-        const shouldClearOnMismatch = shouldGuardVideoIdStamp(tag, isKidsHost);
+        const shouldClearOnMismatch = (isKidsHost ||
+            tag === 'yt-lockup-view-model' ||
+            tag === 'yt-lockup-metadata-view-model' ||
+            tag === 'ytd-rich-item-renderer' ||
+            tag === 'ytd-video-renderer' ||
+            tag === 'ytd-grid-video-renderer' ||
+            tag === 'ytd-compact-video-renderer' ||
+            tag === 'ytm-video-with-context-renderer' ||
+            tag === 'ytm-compact-video-renderer' ||
+            tag === 'ytd-playlist-panel-video-renderer' ||
+            tag === 'ytd-playlist-panel-video-wrapper-renderer');
 
         // IMPORTANT: YouTube frequently recycles DOM nodes. If this element did not previously have our
         // `data-filtertube-video-id` stamp but still has old FilterTube identity/hidden markers from a
@@ -606,99 +532,6 @@ function scanDataForVideoId(root) {
 function scanDataForChannelIdentifiers(root) {
     const result = { handle: '', id: '', customUrl: '' };
     if (!root || typeof root !== 'object') return result;
-    const normalizeId = (value) => {
-        if (!value || typeof value !== 'string') return '';
-        return value.trim().startsWith('UC') && /^UC[\w-]{22}$/i.test(value.trim()) ? value.trim() : '';
-    };
-    const pickEndpoint = (node) => {
-        if (!node || typeof node !== 'object') return null;
-        return (
-            node?.rendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint ||
-            node?.rendererContext?.commandContext?.onTap?.innertubeCommand?.command?.browseEndpoint ||
-            node?.rendererContext?.commandContext?.onTap?.browseEndpoint ||
-            node?.onTap?.innertubeCommand?.browseEndpoint ||
-            node?.onTap?.innertubeCommand?.command?.browseEndpoint ||
-            node?.onTap?.browseEndpoint ||
-            node?.navigationEndpoint?.browseEndpoint ||
-            node?.browseEndpoint ||
-            null
-        );
-    };
-    const pickListCandidate = (source) => {
-        const listItems = (
-            source?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems ||
-            source?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.listViewModel?.listItems ||
-            source?.showDialogCommand?.dialog?.presenterDialogViewModel?.content?.listViewModel?.listItems ||
-            source?.showDialogCommand?.dialog?.presenterDialogViewModel?.customContent?.listViewModel?.listItems ||
-            source?.showDialogCommand?.dialog?.presenterDialogViewModel?.listViewModel?.listItems ||
-            source?.showDialogCommand?.dialog?.dialogViewModel?.content?.listViewModel?.listItems ||
-            source?.showDialogCommand?.dialog?.dialogViewModel?.customContent?.listViewModel?.listItems ||
-            source?.showDialogCommand?.dialog?.dialogViewModel?.listViewModel?.listItems ||
-            source?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems ||
-            source?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.listViewModel?.listItems ||
-            source?.showSheetCommand?.dialog?.presenterDialogViewModel?.content?.listViewModel?.listItems ||
-            source?.showSheetCommand?.dialog?.presenterDialogViewModel?.customContent?.listViewModel?.listItems ||
-            source?.showSheetCommand?.dialog?.presenterDialogViewModel?.listViewModel?.listItems ||
-            source?.showDialogCommand?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems ||
-            source?.showDialogCommand?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.listViewModel?.listItems ||
-            source?.showDialogCommand?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.sheetViewModel?.content?.listViewModel?.listItems ||
-            source?.showSheetCommand?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.content?.listViewModel?.listItems ||
-            source?.showSheetCommand?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialog?.presenterDialogViewModel?.content?.listViewModel?.listItems ||
-            source?.showDialogCommand?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.dialog?.presenterDialogViewModel?.content?.listViewModel?.listItems ||
-            source?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.dialog?.presenterDialogViewModel?.content?.listViewModel?.listItems ||
-            source?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialog?.presenterDialogViewModel?.content?.listViewModel?.listItems ||
-            source?.panelLoadingStrategy?.inlineContent?.dialog?.presenterDialogViewModel?.content?.listViewModel?.listItems ||
-            source?.panelLoadingStrategy?.inlineContent?.dialog?.dialogViewModel?.customContent?.listViewModel?.listItems ||
-            source?.panelLoadingStrategy?.inlineContent?.dialog?.dialogViewModel?.listViewModel?.listItems ||
-            source?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems ||
-            source?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.content?.listViewModel?.listItems ||
-            source?.dialogViewModel?.customContent?.listViewModel?.listItems ||
-            source?.content?.dialogViewModel?.customContent?.listViewModel?.listItems ||
-            source?.dialogViewModel?.listViewModel?.listItems ||
-            source?.content?.dialogViewModel?.listViewModel?.listItems ||
-            source?.showDialogCommand?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.content?.listViewModel?.listItems ||
-            source?.showSheetCommand?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.content?.listViewModel?.listItems ||
-            source?.panelLoadingStrategy?.inlineContent?.dialog?.presenterDialogViewModel?.customContent?.listViewModel?.listItems ||
-            source?.panelLoadingStrategy?.inlineContent?.dialog?.presenterDialogViewModel?.listViewModel?.listItems ||
-            source?.dialog?.presenterDialogViewModel?.content?.listViewModel?.listItems ||
-            source?.dialog?.presenterDialogViewModel?.customContent?.listViewModel?.listItems ||
-            source?.dialog?.presenterDialogViewModel?.listViewModel?.listItems ||
-            source?.panelLoadingStrategy?.inlineContent?.sheetViewModel?.presenterDialogViewModel?.listViewModel?.listItems ||
-            source?.panelLoadingStrategy?.inlineContent?.sheet?.content?.listViewModel?.listItems ||
-            []
-        );
-        if (!Array.isArray(listItems) || listItems.length === 0) return null;
-        const first = listItems[0]?.listItemViewModel;
-        if (!first || typeof first !== 'object') return null;
-        const endpoint = pickEndpoint(first) || pickEndpoint(first.subtitle) || pickEndpoint(first.title);
-        const candidate = { id: '', handle: '', customUrl: '' };
-        const browseId = normalizeId(endpoint?.browseId);
-        if (browseId) candidate.id = browseId;
-        if (endpoint?.canonicalBaseUrl) {
-            const handle = extractHandleFromString(endpoint.canonicalBaseUrl);
-            if (handle) candidate.handle = handle;
-            const custom = extractCustomUrlFromPath(endpoint.canonicalBaseUrl);
-            if (custom) candidate.customUrl = custom;
-        }
-        if (!candidate.handle && first?.title?.content && typeof first.title.content === 'string') {
-            const handle = extractHandleFromString(first.title.content);
-            if (handle) candidate.handle = handle;
-        }
-        if (!candidate.customUrl && first?.subtitle?.content && typeof first.subtitle.content === 'string') {
-            const custom = extractCustomUrlFromPath(first.subtitle.content);
-            if (custom) candidate.customUrl = custom;
-        }
-        return (candidate.id || candidate.handle || candidate.customUrl) ? candidate : null;
-    };
-    const applyListCandidate = (candidate) => {
-        if (!candidate || typeof candidate !== 'object') return;
-        if (!result.id) result.id = candidate.id || '';
-        if (!result.handle) result.handle = candidate.handle || '';
-        if (!result.customUrl) result.customUrl = candidate.customUrl || '';
-    };
-
-    const seed = pickListCandidate(root);
-    if (seed) applyListCandidate(seed);
 
     // Direct check on the object first (most common case)
     // Check for channelId, browseId (often channel ID), canonicalBaseUrl (often /channel/...)
@@ -725,16 +558,13 @@ function scanDataForChannelIdentifiers(root) {
 
     // Shallow scan of specific known properties to avoid deep recursion into related items
     // We explicitly avoid 'items', 'contents', 'results' which usually contain OTHER videos/channels
-    const safeProperties = ['navigationEndpoint', 'command', 'browseEndpoint', 'urlEndpoint', 'owner', 'channelName', 'shortBylineText', 'longBylineText', 'runs', 'text', 'showDialogCommand', 'showSheetCommand', 'panelLoadingStrategy'];
+    const safeProperties = ['navigationEndpoint', 'command', 'browseEndpoint', 'urlEndpoint', 'owner', 'channelName', 'shortBylineText', 'longBylineText', 'runs', 'text'];
 
     for (const prop of safeProperties) {
         if (root[prop]) {
             const val = root[prop];
             if (typeof val === 'object') {
                 // Check nested navigation endpoint
-                const nestedFromList = pickListCandidate(val);
-                if (nestedFromList) applyListCandidate(nestedFromList);
-
                 if (val.browseId && val.browseId.startsWith('UC')) {
                     if (!result.id) result.id = val.browseId;
                 }
@@ -763,15 +593,9 @@ function scanDataForChannelIdentifiers(root) {
                                 if (nav.browseEndpoint.browseId && nav.browseEndpoint.browseId.startsWith('UC') && !result.id) {
                                     result.id = nav.browseEndpoint.browseId;
                                 }
-                                if (nav.browseEndpoint.canonicalBaseUrl) {
-                                    if (!result.handle && nav.browseEndpoint.canonicalBaseUrl.includes('/@')) {
-                                        const handle = extractHandleFromString(nav.browseEndpoint.canonicalBaseUrl);
-                                        if (handle) result.handle = handle;
-                                    }
-                                    if (!result.customUrl) {
-                                        const custom = extractCustomUrlFromPath(nav.browseEndpoint.canonicalBaseUrl);
-                                        if (custom) result.customUrl = custom;
-                                    }
+                                if (nav.browseEndpoint.canonicalBaseUrl && !result.customUrl) {
+                                    const custom = extractCustomUrlFromPath(nav.browseEndpoint.canonicalBaseUrl);
+                                    if (custom) result.customUrl = custom;
                                 }
                             }
                         }
@@ -1217,28 +1041,6 @@ function extractVideoIdFromCard(card) {
             if (href) {
                 const match = extractFromHref(href);
                 if (match) return match;
-            }
-        }
-
-        // IMPORTANT: Playlist collection cards often ONLY expose playlist hrefs. Their thumbnail image
-        // contains a "seed" videoId which must NOT be treated as this card's identity.
-        if (isPlaylistCollectionCardElement(card)) {
-            return null;
-        }
-
-        // Method 5: Thumbnail image URLs (mix/radio cards sometimes only expose playlist href).
-        const imageSources = [];
-        card.querySelectorAll('img[src], img[srcset], source[srcset]').forEach((el) => {
-            const src = el.getAttribute('src') || '';
-            const srcset = el.getAttribute('srcset') || '';
-            if (src) imageSources.push(src);
-            if (srcset) imageSources.push(srcset);
-        });
-        for (const candidate of imageSources) {
-            if (!candidate || typeof candidate !== 'string') continue;
-            const match = candidate.match(/\/vi(?:_webp)?\/([a-zA-Z0-9_-]{11})(?:[\/?]|$)/);
-            if (match && match[1]) {
-                return match[1];
             }
         }
 
