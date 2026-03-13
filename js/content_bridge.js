@@ -3997,7 +3997,7 @@ async function initializeDOMFallback(settings) {
     if (settings) {
         applyDOMFallback(settings);
         try {
-            ensureWatchPlaylistFallbackMenu();
+            ensureFallbackMenuButtons();
         } catch (e) {
         }
 
@@ -4223,46 +4223,41 @@ async function initializeDOMFallback(settings) {
     }
 }
 
-let watchPlaylistFallbackMenuInstalled = false;
-function ensureWatchPlaylistFallbackMenu() {
-    if (watchPlaylistFallbackMenuInstalled) return;
-    watchPlaylistFallbackMenuInstalled = true;
-
-    const isWatchPlaylist = () => {
-        try {
-            const path = document.location?.pathname || '';
-            if (!path.startsWith('/watch')) return false;
-            const params = new URLSearchParams(document.location?.search || '');
-            return params.has('list');
-        } catch (e) {
-            return false;
-        }
-    };
-
-    if (!isWatchPlaylist()) {
-        document.addEventListener('yt-navigate-finish', () => {
-            try {
-                if (isWatchPlaylist()) {
-                    ensureWatchPlaylistFallbackMenu();
-                }
-            } catch (e) {
-            }
-        }, { once: true });
-        return;
-    }
+let fallbackMenuButtonsInstalled = false;
+function ensureFallbackMenuButtons() {
+    if (fallbackMenuButtonsInstalled) return;
+    fallbackMenuButtonsInstalled = true;
 
     try {
-        const styleId = 'filtertube-watch-playlist-fallback-menu-style';
+        const styleId = 'filtertube-fallback-menu-style';
         if (!document.getElementById(styleId)) {
             const style = document.createElement('style');
             style.id = styleId;
             style.textContent = `
+                .filtertube-fallback-menu-slot[data-filtertube-injected="true"] {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: flex-end;
+                }
+                .yt-lockup-metadata-view-model__menu-button.filtertube-fallback-menu-slot[data-filtertube-injected="true"] {
+                    min-width: 32px;
+                    min-height: 32px;
+                }
+                .filtertube-fallback-menu-slot--ytm[data-filtertube-injected="true"] {
+                    flex: 0 0 auto;
+                    align-self: center;
+                    margin-inline-start: 8px;
+                }
+                .filtertube-fallback-menu-slot--comment[data-filtertube-injected="true"] {
+                    margin-inline-start: 8px;
+                    vertical-align: top;
+                }
                 .filtertube-playlist-menu-fallback-btn {
                     appearance: none;
                     -webkit-appearance: none;
                     border: none;
                     background: transparent;
-                    color: inherit;
+                    color: var(--yt-spec-text-primary, var(--yt-spec-icon-active-other, currentColor));
                     width: 32px;
                     height: 32px;
                     padding: 0;
@@ -4272,9 +4267,15 @@ function ensureWatchPlaylistFallbackMenu() {
                     align-items: center;
                     justify-content: center;
                     border-radius: 999px;
+                    opacity: 0.92;
                 }
                 .filtertube-playlist-menu-fallback-btn:hover {
                     background: rgba(255, 255, 255, 0.10);
+                    opacity: 1;
+                }
+                .filtertube-fallback-menu-slot--ytm .filtertube-playlist-menu-fallback-btn {
+                    width: 36px;
+                    height: 36px;
                 }
                 html[data-theme="dark"] .filtertube-playlist-menu-fallback-btn:hover {
                     background: rgba(255, 255, 255, 0.12);
@@ -4322,61 +4323,183 @@ function ensureWatchPlaylistFallbackMenu() {
                     color: rgba(255, 255, 255, 0.66);
                     padding: 6px 10px 2px 10px;
                 }
+                .filtertube-playlist-menu-fallback-list {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 4px;
+                }
+                .filtertube-playlist-menu-fallback-popover .filtertube-block-channel-item {
+                    display: block;
+                    border-radius: 10px;
+                    overflow: hidden;
+                    cursor: pointer;
+                }
+                .filtertube-playlist-menu-fallback-popover .filtertube-menu-item {
+                    width: 100%;
+                    min-height: 44px;
+                    padding: 10px 10px;
+                    border-radius: 10px;
+                    background: transparent;
+                    color: rgba(255, 255, 255, 0.92);
+                }
+                .filtertube-playlist-menu-fallback-popover .filtertube-menu-item:hover {
+                    background: rgba(255, 255, 255, 0.08);
+                }
+                .filtertube-playlist-menu-fallback-popover .filtertube-menu-title-wrapper {
+                    display: flex;
+                    align-items: flex-start;
+                    gap: 8px;
+                    width: 100%;
+                }
+                .filtertube-playlist-menu-fallback-popover .filtertube-menu-title {
+                    display: inline-flex;
+                    align-items: center;
+                    flex-wrap: wrap;
+                }
+                html[dark="false"] .filtertube-playlist-menu-fallback-btn,
+                html[data-theme="light"] .filtertube-playlist-menu-fallback-btn {
+                    color: var(--yt-spec-text-primary, #111827);
+                }
+                html[dark="false"] .filtertube-playlist-menu-fallback-btn:hover,
+                html[data-theme="light"] .filtertube-playlist-menu-fallback-btn:hover {
+                    background: rgba(15, 23, 42, 0.08);
+                }
             `;
             (document.head || document.documentElement).appendChild(style);
         }
     } catch (e) {
     }
 
-    const getMenuHost = (row) => {
-        if (!row) return null;
+    const nativeMenuSelector = [
+        'ytd-menu-renderer button[aria-label]:not([data-filtertube-fallback-menu])',
+        'ytm-menu-renderer button[aria-label]:not([data-filtertube-fallback-menu])',
+        'ytm-bottom-sheet-renderer button[aria-label]:not([data-filtertube-fallback-menu])',
+        'yt-icon-button.dropdown-trigger:not([data-filtertube-fallback-menu])',
+        'button[aria-label*="Action menu"]:not([data-filtertube-fallback-menu])',
+        'button[aria-label*="More actions"]:not([data-filtertube-fallback-menu])',
+        'button[aria-label*="More"]:not([data-filtertube-fallback-menu])'
+    ].join(', ');
+
+    const cardHasNativeMenuButton = (card) => {
+        if (!card || !(card instanceof Element)) return false;
         try {
-            const children = row.children ? Array.from(row.children) : [];
-            const direct = children.find(ch => ch && ch.id === 'menu') || null;
-            if (direct) return direct;
+            return Boolean(card.querySelector(nativeMenuSelector));
+        } catch (e) {
+            return false;
+        }
+    };
+
+    const cleanupFallbackArtifacts = (card) => {
+        if (!card || !(card instanceof Element)) return;
+        try {
+            card.querySelectorAll('.filtertube-playlist-menu-fallback-btn').forEach(node => {
+                try { node.remove(); } catch (e) { }
+            });
         } catch (e) {
         }
         try {
-            return row.querySelector('#menu');
+            card.querySelectorAll('.filtertube-fallback-menu-slot[data-filtertube-injected="true"]').forEach(node => {
+                try { node.remove(); } catch (e) { }
+            });
+        } catch (e) {
+        }
+    };
+
+    const ensureInjectedSlot = (parent, variantClass) => {
+        if (!parent || !(parent instanceof Element)) return null;
+        let slot = null;
+        try {
+            slot = parent.querySelector(`.${variantClass}[data-filtertube-injected="true"]`);
+        } catch (e) {
+            slot = null;
+        }
+        if (slot) return slot;
+
+        slot = document.createElement('div');
+        slot.className = `filtertube-fallback-menu-slot ${variantClass}`;
+        slot.setAttribute('data-filtertube-injected', 'true');
+        try {
+            parent.appendChild(slot);
+            return slot;
         } catch (e) {
             return null;
         }
     };
 
-    const rowHasNativeMenuButton = (row, menuHost) => {
-        const root = menuHost || row;
-        if (!root) return false;
-        try {
-            if (root.querySelector('ytd-menu-renderer, yt-icon-button.dropdown-trigger, button[aria-label*="Action menu"], button[aria-label*="More"]')) {
-                return true;
+    const getMenuHostForCard = (card) => {
+        if (!card || !(card instanceof Element)) return null;
+        const tagName = (card.tagName || '').toLowerCase();
+
+        if (tagName === 'ytd-playlist-panel-video-renderer') {
+            try {
+                const children = card.children ? Array.from(card.children) : [];
+                const direct = children.find(ch => ch && ch.id === 'menu') || null;
+                if (direct) return direct;
+            } catch (e) {
             }
-        } catch (e) {
+            try {
+                return card.querySelector('#menu');
+            } catch (e) {
+                return null;
+            }
         }
-        return false;
+
+        if (tagName === 'yt-lockup-view-model') {
+            const metadata = card.querySelector('yt-lockup-metadata-view-model');
+            if (!metadata) return null;
+            let menuHost = null;
+            try {
+                menuHost = metadata.querySelector('.yt-lockup-metadata-view-model__menu-button');
+            } catch (e) {
+                menuHost = null;
+            }
+            if (menuHost) return menuHost;
+
+            menuHost = document.createElement('div');
+            menuHost.className = 'yt-lockup-metadata-view-model__menu-button filtertube-fallback-menu-slot';
+            menuHost.setAttribute('data-filtertube-injected', 'true');
+            try {
+                metadata.appendChild(menuHost);
+                return menuHost;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        if (tagName === 'ytm-playlist-panel-video-renderer') {
+            const itemHost =
+                card.querySelector('.YtmCompactMediaItemHost') ||
+                card.querySelector('.YtmCompactMediaItemMetadata')?.parentElement ||
+                card;
+            return ensureInjectedSlot(itemHost, 'filtertube-fallback-menu-slot--ytm');
+        }
+
+        if (isCommentContextTag(tagName)) {
+            const threadHost = card.closest('ytd-comment-thread-renderer, ytm-comment-thread-renderer');
+            const root = threadHost || card;
+            const actionMenuHost =
+                root.querySelector('#action-menu') ||
+                root.querySelector('#action-menu ytd-menu-renderer') ||
+                root.querySelector('#action-menu ytm-menu-renderer');
+            if (actionMenuHost) {
+                return ensureInjectedSlot(actionMenuHost, 'filtertube-fallback-menu-slot--comment');
+            }
+
+            const headerHost = root.querySelector('#header') || root.querySelector('#toolbar') || root.querySelector('#main');
+            if (!headerHost) return null;
+            return ensureInjectedSlot(headerHost, 'filtertube-fallback-menu-slot--comment');
+        }
+
+        return null;
     };
 
-    const ensureFallbackButtonForRow = (row) => {
-        if (!row || !(row instanceof Element)) return;
-        const menuHost = getMenuHost(row);
-        if (!menuHost) return;
-
-        // If YouTube menu exists, remove our fallback if present.
-        if (rowHasNativeMenuButton(row, menuHost)) {
-            const existing = menuHost.querySelector('.filtertube-playlist-menu-fallback-btn');
-            if (existing) {
-                try { existing.remove(); } catch (e) { }
-            }
-            return;
-        }
-
-        // Already injected.
-        if (menuHost.querySelector('.filtertube-playlist-menu-fallback-btn')) return;
-
+    const createFallbackButton = (card, surface) => {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'filtertube-playlist-menu-fallback-btn';
         btn.setAttribute('aria-label', 'FilterTube menu');
         btn.setAttribute('data-filtertube-fallback-menu', 'true');
+        btn.setAttribute('data-filtertube-fallback-surface', surface || 'generic');
         btn.innerHTML = `
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                 <path fill="currentColor" d="M12 4a2 2 0 1 0 0 4a2 2 0 0 0 0-4Zm0 6a2 2 0 1 0 0 4a2 2 0 0 0 0-4Zm0 6a2 2 0 1 0 0 4a2 2 0 0 0 0-4Z"/>
@@ -4386,12 +4509,45 @@ function ensureWatchPlaylistFallbackMenu() {
             e.preventDefault();
             e.stopPropagation();
             try {
-                openFilterTubePlaylistFallbackPopover(btn, row);
+                openFilterTubePlaylistFallbackPopover(btn, card);
             } catch (err) {
                 console.warn('FilterTube: Failed to open playlist fallback menu', err);
             }
         }, true);
+        return btn;
+    };
 
+    const ensureFallbackButtonForCard = (card) => {
+        if (!card || !(card instanceof Element)) return;
+        const tagName = (card.tagName || '').toLowerCase();
+
+        if (isCommentContextTag(tagName)) {
+            const threadHost = card.closest('ytd-comment-thread-renderer, ytm-comment-thread-renderer');
+            if (threadHost && threadHost !== card) return;
+        }
+
+        if (cardHasNativeMenuButton(card)) {
+            cleanupFallbackArtifacts(card);
+            return;
+        }
+
+        const menuHost = getMenuHostForCard(card);
+        if (!menuHost) return;
+
+        if (menuHost.querySelector('.filtertube-playlist-menu-fallback-btn')) return;
+
+        let surface = 'generic';
+        if (tagName === 'ytd-playlist-panel-video-renderer') {
+            surface = 'ytd-playlist';
+        } else if (tagName === 'yt-lockup-view-model') {
+            surface = 'ytd-lockup';
+        } else if (tagName === 'ytm-playlist-panel-video-renderer') {
+            surface = 'ytm-playlist';
+        } else if (isCommentContextTag(tagName)) {
+            surface = 'comment';
+        }
+
+        const btn = createFallbackButton(card, surface);
         try {
             menuHost.appendChild(btn);
         } catch (e) {
@@ -4399,43 +4555,51 @@ function ensureWatchPlaylistFallbackMenu() {
     };
 
     const scan = () => {
-        if (!isWatchPlaylist()) return;
-        const panel = document.querySelector('ytd-playlist-panel-renderer');
-        if (!panel) return;
-        const rows = panel.querySelectorAll('ytd-playlist-panel-video-renderer');
-        if (!rows || rows.length === 0) return;
-        rows.forEach(row => ensureFallbackButtonForRow(row));
+        const cards = document.querySelectorAll(
+            'ytd-playlist-panel-video-renderer, ' +
+            'yt-lockup-view-model, ' +
+            'ytm-playlist-panel-video-renderer, ' +
+            'ytd-comment-thread-renderer, ' +
+            'ytm-comment-thread-renderer, ' +
+            'ytd-comment-view-model, ' +
+            'ytm-comment-view-model'
+        );
+        if (!cards || cards.length === 0) return;
+        cards.forEach(card => ensureFallbackButtonForCard(card));
+    };
+
+    let scanQueued = false;
+    const scheduleScan = () => {
+        if (scanQueued) return;
+        scanQueued = true;
+        requestAnimationFrame(() => {
+            scanQueued = false;
+            try { scan(); } catch (e) { }
+        });
     };
 
     const observer = new MutationObserver(() => {
-        try { scan(); } catch (e) { }
+        scheduleScan();
     });
 
-    const attach = () => {
-        const panel = document.querySelector('ytd-playlist-panel-renderer');
-        if (!panel) return false;
-        try {
-            observer.observe(panel, { childList: true, subtree: true });
-        } catch (e) {
-            return false;
-        }
+    const observeTarget = () => {
+        const target = document.body || document.documentElement;
+        if (!target) return false;
+        observer.observe(target, { childList: true, subtree: true });
         return true;
     };
 
-    if (!attach()) {
-        const t = setInterval(() => {
-            if (attach()) {
-                clearInterval(t);
-                try { scan(); } catch (e) { }
-            }
-        }, 700);
-        setTimeout(() => clearInterval(t), 12000);
+    if (!observeTarget()) {
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!observeTarget()) return;
+            scheduleScan();
+        }, { once: true });
     } else {
-        scan();
+        scheduleScan();
     }
 
     document.addEventListener('yt-navigate-finish', () => {
-        try { scan(); } catch (e) { }
+        scheduleScan();
     });
 }
 
@@ -4466,6 +4630,11 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
     pop.setAttribute('role', 'dialog');
     pop.setAttribute('aria-label', 'FilterTube menu');
 
+    try {
+        ensureFilterTubeMenuStyles();
+    } catch (e) {
+    }
+
     const ensuredVideoId = (() => {
         try { return ensureVideoIdForCard(row) || ''; } catch (e) { return ''; }
     })();
@@ -4477,30 +4646,153 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
         extracted = null;
     }
 
+    const getExpectedName = () => {
+        const selectors = [
+            '#byline',
+            '#channel-name',
+            'ytd-channel-name',
+            '#author-text',
+            '#owner-name',
+            'a[href*="/@"]'
+        ];
+
+        for (const selector of selectors) {
+            try {
+                const value = row.querySelector(selector)?.textContent?.trim() || '';
+                if (value) return value;
+            } catch (e) {
+            }
+        }
+
+        return '';
+    };
+
     const title = (() => {
-        const name = extracted?.name || row.querySelector('#byline')?.textContent?.trim() || '';
+        const name = extracted?.name || getExpectedName() || '';
         const vid = ensuredVideoId || extracted?.videoId || '';
         const label = name ? `FilterTube: ${name}` : 'FilterTube';
         return vid ? `${label}` : label;
     })();
 
-    const action = document.createElement('button');
-    action.type = 'button';
-    action.className = 'ft-action';
-    action.textContent = 'Block channel';
-
-    const actionAll = document.createElement('button');
-    actionAll.type = 'button';
-    actionAll.className = 'ft-action';
-    actionAll.textContent = 'Block channel (Filter All)';
-
     const hint = document.createElement('div');
     hint.className = 'ft-hint';
     hint.textContent = 'Fallback menu (YouTube 3-dot unavailable for this item).';
 
-    const performBlock = async (filterAll) => {
+    const hasIdentifier = (channel) => Boolean(channel?.handle || channel?.id || channel?.customUrl);
+
+    const createFallbackMenuRow = (channelInfo, injectionOptions = {}) => {
+        const item = document.createElement('div');
+        item.className = 'yt-list-item-view-model filtertube-block-channel-item';
+        item.setAttribute('role', 'menuitem');
+        item.setAttribute('tabindex', '0');
+
+        if (channelInfo?.isBlockAllOption) {
+            item.setAttribute('data-is-block-all', 'true');
+        }
+        if (channelInfo?.collaborationGroupId) {
+            item.setAttribute('data-collaboration-group-id', channelInfo.collaborationGroupId);
+        }
+
+        const channelName = escapeHtml(pickMenuChannelDisplayName(channelInfo, injectionOptions));
+        const filterTubeSvg = `<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 128 128" style="display: block;">
+            <path fill="#FF3333" d="M53.004837,77.261787 C55.004650,68.586563 48.961483,63.525127 45.151901,57.831970 C36.636456,45.106262 27.572891,32.747910 18.776752,20.208942 C17.048302,17.745022 18.246574,14.746576 21.199722,14.076863 C22.310389,13.824986 23.520674,14.001245 24.685543,14.001154 C51.482349,13.999036 78.279152,13.997606 105.075958,14.002748 C107.511017,14.003215 110.410080,13.422483 111.785439,15.933891 C113.178085,18.476864 111.026321,20.660681 109.690315,22.593620 C99.594292,37.200588 89.433075,51.763405 79.158081,66.244827 C77.520378,68.552994 76.925735,70.848900 76.965294,73.583061 C77.066391,80.572067 76.851021,87.568138 77.069214,94.551788 C77.160759,97.481934 76.221825,99.467453 74.122963,101.447235 C69.040611,106.241264 64.241066,111.333801 59.229191,116.204849 C58.138329,117.265060 57.330574,119.514366 55.379189,118.670372 C53.447678,117.834984 52.933788,115.906029 52.954082,113.675346 C53.063110,101.692680 53.005142,89.708488 53.004837,77.261787 z"/>
+            <path fill="#FF0000" d="M63.316730,58.295921 C61.783310,59.317360 60.616657,60.253048 59.307014,60.898705 C55.871113,62.592613 54.045387,61.557888 54.023708,57.807045 C53.960236,46.824589 53.943741,35.841064 54.033154,24.858967 C54.064426,21.018126 56.738575,19.503649 60.024136,21.659582 C67.653084,26.665573 75.198029,31.814018 82.579330,37.176819 C86.212624,39.816536 85.950592,42.679234 82.150856,45.360466 C76.029831,49.679680 69.801399,53.846684 63.316730,58.295921 z"/>
+        </svg>`;
+
+        item.innerHTML = `
+            <div class="yt-list-item-view-model__label yt-list-item-view-model__container yt-list-item-view-model__container--compact yt-list-item-view-model__container--tappable yt-list-item-view-model__container--in-popup filtertube-menu-item">
+                <div aria-hidden="true" class="yt-list-item-view-model__image-container yt-list-item-view-model__leading" style="display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; flex-shrink: 0;">
+                    ${filterTubeSvg}
+                </div>
+                <div class="yt-list-item-view-model__text-wrapper" style="flex: 1; min-width: 0;">
+                    <div class="yt-list-item-view-model__title-wrapper filtertube-menu-title-wrapper">
+                        <span class="filtertube-menu-title" role="text">
+                            <span class="filtertube-menu-label">Block</span>
+                            <span class="filtertube-menu-separator">•</span>
+                            <span class="filtertube-channel-name">${channelName}</span>
+                        </span>
+                        <div class="filtertube-filter-all-toggle exact-toggle toggle-variant-red">
+                            Filter All
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const toggle = item.querySelector('.filtertube-filter-all-toggle');
+        if (toggle) {
+            toggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const isActive = !isFilterAllToggleActive(toggle);
+                applyFilterAllStateToToggle(toggle, isActive);
+            }, true);
+        }
+
+        if (injectionOptions.disabled) {
+            item.style.pointerEvents = 'none';
+            item.style.opacity = '0.65';
+        }
+
+        hydrateFilterAllToggle(item, channelInfo);
+        return { item, toggle };
+    };
+
+    const performBlock = async (channelInfo, filterAll) => {
         try {
-            let info = extracted || (extractChannelFromCard(row) || null);
+            if (channelInfo?.isBlockAllOption && Array.isArray(channelInfo.allCollaborators) && channelInfo.allCollaborators.length > 0) {
+                let successCount = 0;
+                const collaborators = channelInfo.allCollaborators.slice(0, 6);
+                for (let i = 0; i < collaborators.length; i++) {
+                    const collaborator = collaborators[i];
+                    const identifier = collaborator?.handle || collaborator?.id || collaborator?.customUrl || '';
+                    if (!identifier) continue;
+
+                    const otherChannels = collaborators
+                        .filter((_, idx) => idx !== i)
+                        .map(c => c.handle || c.id || c.customUrl || c.name);
+
+                    const collaboratorMetadata = buildChannelMetadataPayload({
+                        ...collaborator,
+                        videoId: ensuredVideoId || collaborator?.videoId || null,
+                        source: 'playlist_fallback_menu'
+                    });
+
+                    const result = await addChannelDirectly(
+                        identifier,
+                        !!filterAll,
+                        otherChannels,
+                        channelInfo.collaborationGroupId || null,
+                        collaboratorMetadata
+                    );
+                    if (result?.success) {
+                        successCount++;
+                    }
+                }
+
+                close();
+
+                if (successCount > 0) {
+                    try {
+                        const refreshed = await requestSettingsFromBackground();
+                        if (refreshed?.success && refreshed.settings) {
+                            currentSettings = refreshed.settings;
+                        }
+                    } catch (e) {
+                    }
+                    try {
+                        if (typeof applyDOMFallback === 'function') {
+                            applyDOMFallback(null, { forceReprocess: true, preserveScroll: true });
+                        }
+                    } catch (e) {
+                    }
+                } else {
+                    console.warn('FilterTube: Failed to block collaborators from fallback menu');
+                }
+                return;
+            }
+
+            let info = channelInfo || extracted || (extractChannelFromCard(row) || null);
             let handle = typeof info?.handle === 'string' ? info.handle.trim() : '';
             let id = typeof info?.id === 'string' ? info.id.trim() : '';
             let customUrl = typeof info?.customUrl === 'string' ? info.customUrl.trim() : '';
@@ -4508,7 +4800,7 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
 
             if (!input) {
                 // Playlist rows sometimes render without any channel link; try main-world lookup via videoId.
-                const expectedName = row.querySelector('#byline')?.textContent?.trim() || '';
+                const expectedName = getExpectedName();
                 const videoId = ensuredVideoId || (typeof info?.videoId === 'string' ? info.videoId.trim() : '');
                 if (videoId) {
                     try {
@@ -4537,9 +4829,13 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
                 source: 'playlist_fallback_menu'
             });
 
-            action.disabled = true;
-            actionAll.disabled = true;
-            const res = await addChannelDirectly(input, !!filterAll, null, null, metaPayload);
+            const res = await addChannelDirectly(
+                input,
+                !!filterAll,
+                channelInfo?.collaborationWith || null,
+                channelInfo?.collaborationGroupId || null,
+                metaPayload
+            );
             close();
 
             if (res && res.success) {
@@ -4565,23 +4861,87 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
         }
     };
 
-    action.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        performBlock(false);
-    }, true);
-    actionAll.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        performBlock(true);
-    }, true);
+    const list = document.createElement('div');
+    list.className = 'filtertube-playlist-menu-fallback-list';
+
+    const bindFallbackRow = ({ item, toggle }, channelInfo) => {
+        item.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            performBlock(channelInfo, isFilterAllToggleActive(toggle));
+        }, true);
+        item.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                e.stopPropagation();
+                performBlock(channelInfo, isFilterAllToggleActive(toggle));
+            }
+        }, true);
+        list.appendChild(item);
+    };
+
+    const fallbackVideoId = ensuredVideoId || extracted?.videoId || '';
+    const baseInfo = extracted ? { ...extracted } : {};
+    if (fallbackVideoId && !baseInfo.videoId) {
+        baseInfo.videoId = fallbackVideoId;
+    }
+
+    if (baseInfo.isCollaboration && Array.isArray(baseInfo.allCollaborators) && baseInfo.allCollaborators.length >= 2) {
+        const collaborators = baseInfo.allCollaborators.slice(0, 6);
+        const groupId = baseInfo.collaborationGroupId || generateCollaborationGroupId();
+        const anyMissingIdentifiers = collaborators.some(collaborator => !hasIdentifier(collaborator));
+
+        collaborators.forEach((collaborator, index) => {
+            const otherChannels = collaborators
+                .filter((_, idx) => idx !== index)
+                .map(c => c.handle || c.id || c.customUrl || c.name);
+
+            const channelInfo = {
+                ...collaborator,
+                videoId: fallbackVideoId || collaborator.videoId || '',
+                collaborationWith: otherChannels,
+                collaborationGroupId: groupId
+            };
+            bindFallbackRow(
+                createFallbackMenuRow(channelInfo, {
+                    disabled: !hasIdentifier(collaborator),
+                    displayName: hasIdentifier(collaborator)
+                        ? collaborator.name
+                        : `${collaborator.name || 'Channel'} (resolving…)`
+                }),
+                channelInfo
+            );
+        });
+
+        const blockAllInfo = {
+            name: collaborators.length === 2 ? 'Both Channels' : `All ${collaborators.length} Collaborators`,
+            isBlockAllOption: true,
+            allCollaborators: collaborators,
+            collaborationGroupId: groupId,
+            videoId: fallbackVideoId
+        };
+        bindFallbackRow(
+            createFallbackMenuRow(blockAllInfo, {
+                disabled: anyMissingIdentifiers,
+                displayName: anyMissingIdentifiers
+                    ? 'All Collaborators (resolving…)'
+                    : (collaborators.length === 2 ? 'Both Channels' : `All ${collaborators.length} Collaborators`)
+            }),
+            blockAllInfo
+        );
+    } else {
+        const singleInfo = {
+            ...baseInfo,
+            videoId: fallbackVideoId
+        };
+        bindFallbackRow(createFallbackMenuRow(singleInfo), singleInfo);
+    }
 
     const titleEl = document.createElement('div');
     titleEl.className = 'ft-title';
     titleEl.textContent = title;
     pop.appendChild(titleEl);
-    pop.appendChild(action);
-    pop.appendChild(actionAll);
+    pop.appendChild(list);
     pop.appendChild(hint);
 
     // Position: align right edge with the button, prefer below.
