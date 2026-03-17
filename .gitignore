@@ -5,6 +5,7 @@ node_modules/
 build/
 dist/
 *.zip
+website/.next/
 
 
 # IDE/Editor files
@@ -140,4 +141,3 @@ temp/
 /local/
 /private/
 /scratch/
-

@@ -1,0 +1,13 @@
+Use case: homepage hero background video
+Primary request: recreate the same serene FilterTube homepage landscape as the current day hero clip, but at night
+Scene/background: the same gentle flower-covered hill, reflective lake in the foreground, distant mountains, moonlit sky, and clean center space for website headline text
+Subject: serene landscape only, no people, no animals, no buildings, no text, no logos
+Action: minimal environmental motion only, with subtle water shimmer, very soft flower and grass movement, and slow cloud drift
+Camera: locked-off wide hero shot, same framing family and horizon placement as the current homepage day clip, no orbit, no push-in, no cut
+Lighting/mood: blue-hour into night, moonlit water, deep navy sky, faint stars, safe and contemplative rather than dark or ominous
+Color palette: deep navy, moonlit blue, silver white, muted teal, soft lavender-gray
+Style/format: premium cinematic natural landscape, refined and believable, suitable for a modern product website hero
+Timing/beats: 8-second seamless closed loop, motion must begin and end on the same visual rhythm
+Audio: none
+Constraints: preserve the same scene family as the existing homepage day hero, keep generous clean negative space in the center for white overlay text, under-18 safe, no abrupt motion
+Avoid: flicker, hard parallax, camera drift, visible loop seam, horror tone, heavy contrast crush, fast movement, text, watermark
