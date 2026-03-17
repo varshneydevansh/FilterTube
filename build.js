@@ -369,7 +369,7 @@ function createGitHubRelease(token, { tagName, name, body }) {
         hostname: 'api.github.com',
         path: `/repos/${REPO_OWNER}/${REPO_NAME}/releases`,
         headers: {
-            'Authorization': `token ${token}`,
+            'Authorization': `Bearer ${token}`,
             'User-Agent': `${REPO_NAME}-release-script`,
             'Accept': 'application/vnd.github+json',
             'Content-Type': 'application/json',
@@ -390,7 +390,7 @@ function uploadReleaseAsset(token, uploadUrlTemplate, filePath) {
         const options = {
             method: 'POST',
             headers: {
-                'Authorization': `token ${token}`,
+                'Authorization': `Bearer ${token}`,
                 'User-Agent': `${REPO_NAME}-release-script`,
                 'Content-Type': 'application/zip',
                 'Content-Length': stat.size

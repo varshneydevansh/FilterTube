@@ -1,5 +1,33 @@
 # Changelog
 
+## Version 3.2.8
+
+### Theme Refresh + Scenic UI Shell Tuning
+
+- **Scenic shell refresh**: Popup and dashboard surfaces now share the calmer product shell with the local homepage hero video as ambient background media.
+- **Light + dark theme tuning**: Dark mode now keeps the scenic background visible without the washed center glow, while light mode uses cleaner transparency and softer shell opacity.
+- **Popup UI refinement**: The popup was tightened into a quicker control surface with better spacing, improved header balance, clearer enabled/disabled branding, and a more compact profile selector.
+- **Dashboard shell polish**: Top bar, sidebar, cards, and view container were rebalanced to feel more app-like and closer to the website hero direction.
+
+### Responsive + Interaction Improvements
+
+- **Mobile/tab-view fit fixes**: Filter surfaces, date/sort rows, stacked controls, and short-height sidebar layouts were adjusted for smaller screens and compressed-height devices.
+- **Profile dropdown behavior**: The tab-view profile selector now opens as a viewport-positioned dropdown on mobile instead of clipping inside the header layout.
+- **View switching cleanup**: Switching between Dashboard, Filters, Settings, Help, and other pages now resets scroll position instead of inheriting the previous page scroll.
+- **Help/Support layout pass**: Desktop card placement was tightened so Help and Support sections read more evenly.
+
+### Visual State + Control Updates
+
+- **Tint fixes**: Enabled/disabled states, pill accents, and search/control surfaces were corrected to read properly across both themes.
+- **Import/export button polish**: `Download JSON`, `Download Encrypted`, and `Choose JSON` were rebalanced for clearer tinting and more consistent sizing.
+- **Dropdown + field consistency**: Custom selects, date inputs, and profile dropdown sizing were normalized to better match the refreshed shell.
+
+### Tooling + Release Metadata
+
+- **Badge logic fix**: README total line count now excludes binaries like local video assets and only counts tracked text/code files.
+- **Version sync**: Package and browser manifests updated to `3.2.8`.
+- **Release metadata refresh**: Added the `3.2.8` entry in `data/release_notes.json` and UI/UX refresh docs under `docs/`.
+
 ## Version 3.2.7
 
 ### Category Filters + Quick Block Hover Cross
