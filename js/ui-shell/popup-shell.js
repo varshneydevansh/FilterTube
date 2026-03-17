@@ -357,7 +357,7 @@
           strokeLinejoin: "round"
         }
       ))
-    ))), /* @__PURE__ */ _("main", { className: "app-content ft-popup-content" }, /* @__PURE__ */ _("section", { className: "card filter-card ft-popup-filter-card" }, /* @__PURE__ */ _("div", { className: "ft-popup-filter-card__header" }, /* @__PURE__ */ _("div", null, /* @__PURE__ */ _("p", { className: "ft-popup-filter-card__eyebrow" }, "Quick control"), /* @__PURE__ */ _("h3", { className: "ft-popup-filter-card__title" }, "Update this profile fast")), /* @__PURE__ */ _("span", { className: "ft-popup-filter-card__badge" }, "Local-first")), /* @__PURE__ */ _("div", { id: "popupFiltersTabsContainer" })))));
+    ))), /* @__PURE__ */ _("main", { className: "app-content ft-popup-content" }, /* @__PURE__ */ _("section", { className: "ft-popup-filter-card" }, /* @__PURE__ */ _("div", { className: "ft-popup-filter-card__header" }, /* @__PURE__ */ _("div", null, /* @__PURE__ */ _("p", { className: "ft-popup-filter-card__eyebrow" }, "Quick control"), /* @__PURE__ */ _("h3", { className: "ft-popup-filter-card__title" }, "Update this profile fast")), /* @__PURE__ */ _("span", { className: "ft-popup-filter-card__badge" }, "Local-first")), /* @__PURE__ */ _("div", { id: "popupFiltersTabsContainer" })))));
   }
   applyExtensionEnvironment("popup");
   var mountNode = document.getElementById("popupRoot");

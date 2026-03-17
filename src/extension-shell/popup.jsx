@@ -88,7 +88,7 @@ function PopupShell() {
         </header>
 
         <main className="app-content ft-popup-content">
-          <section className="card filter-card ft-popup-filter-card">
+          <section className="ft-popup-filter-card">
             <div className="ft-popup-filter-card__header">
               <div>
                 <p className="ft-popup-filter-card__eyebrow">Quick control</p>

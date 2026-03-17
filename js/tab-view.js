@@ -2659,6 +2659,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     let channelDateFromTs = null;
     let channelDateToTs = null;
 
+    if (ftProfileDropdownTab && ftProfileDropdownTab.parentNode !== document.body) {
+        document.body.appendChild(ftProfileDropdownTab);
+        ftProfileDropdownTab.style.position = 'fixed';
+        ftProfileDropdownTab.style.top = '0';
+        ftProfileDropdownTab.style.left = '0';
+        ftProfileDropdownTab.style.right = 'auto';
+        ftProfileDropdownTab.style.zIndex = '2200';
+    }
+
     const searchContentControls = document.getElementById('searchContentControls');
     const helpSearchInput = document.getElementById('helpSearchInput');
     const helpSearchEmpty = document.getElementById('helpSearchEmpty');
@@ -2851,35 +2860,135 @@ document.addEventListener('DOMContentLoaded', async () => {
     function closeProfileDropdownTab() {
         if (!ftProfileDropdownTab || !ftProfileBadgeBtnTab) return;
         ftProfileDropdownTab.hidden = true;
+        ftProfileDropdownTab.style.visibility = '';
+        ftProfileDropdownTab.style.left = '';
+        ftProfileDropdownTab.style.top = '';
+        ftProfileDropdownTab.style.minWidth = '';
         ftProfileDropdownTab.style.transform = '';
         ftProfileBadgeBtnTab.setAttribute('aria-expanded', 'false');
     }
 
     function positionProfileDropdownTab() {
-        if (!ftProfileDropdownTab || ftProfileDropdownTab.hidden) return;
+        if (!ftProfileDropdownTab || !ftProfileBadgeBtnTab || ftProfileDropdownTab.hidden) return;
         try {
-            const rect = ftProfileDropdownTab.getBoundingClientRect();
+            const triggerRect = ftProfileBadgeBtnTab.getBoundingClientRect();
             const pad = 8;
             const maxRight = window.innerWidth - pad;
-            let shift = 0;
-            if (rect.left < pad) {
-                shift = pad - rect.left;
-            } else if (rect.right > maxRight) {
-                shift = maxRight - rect.right;
+            const maxBottom = window.innerHeight - pad;
+
+            ftProfileDropdownTab.style.position = 'fixed';
+            ftProfileDropdownTab.style.visibility = 'hidden';
+            ftProfileDropdownTab.style.display = 'block';
+
+            const dropdownHeight = ftProfileDropdownTab.offsetHeight || 280;
+            const dropdownWidth = ftProfileDropdownTab.offsetWidth || Math.max(triggerRect.width, 220);
+
+            ftProfileDropdownTab.style.display = '';
+
+            const spaceBelow = maxBottom - triggerRect.bottom;
+            const spaceAbove = triggerRect.top - pad;
+
+            let top;
+            if (spaceBelow >= dropdownHeight || spaceBelow >= spaceAbove) {
+                top = triggerRect.bottom + pad;
+            } else {
+                top = triggerRect.top - dropdownHeight - pad;
             }
-            ftProfileDropdownTab.style.transform = shift ? `translateX(${shift}px)` : '';
+
+            if (top + dropdownHeight > maxBottom) {
+                top = maxBottom - dropdownHeight;
+            }
+            if (top < pad) {
+                top = pad;
+            }
+
+            let left = triggerRect.right - dropdownWidth;
+            if (left + dropdownWidth > maxRight) {
+                left = maxRight - dropdownWidth;
+            }
+            if (left < pad) {
+                left = pad;
+            }
+
+            ftProfileDropdownTab.style.top = `${Math.round(top)}px`;
+            ftProfileDropdownTab.style.left = `${Math.round(left)}px`;
+            ftProfileDropdownTab.style.minWidth = `${Math.max(triggerRect.width, 220)}px`;
+            ftProfileDropdownTab.style.transform = 'none';
+            ftProfileDropdownTab.style.visibility = '';
         } catch (e) {
+            ftProfileDropdownTab.style.visibility = '';
         }
+    }
+
+    let profileDropdownPositionRaf = 0;
+
+    function scheduleProfileDropdownPositionTab() {
+        if (!ftProfileDropdownTab || ftProfileDropdownTab.hidden) return;
+        if (profileDropdownPositionRaf) return;
+        profileDropdownPositionRaf = requestAnimationFrame(() => {
+            profileDropdownPositionRaf = 0;
+            positionProfileDropdownTab();
+        });
+    }
+
+    function resetTabViewScroll(activeSection = null) {
+        const mainContent = document.querySelector('.main-content');
+        const reset = () => {
+            const pad = 8;
+            try {
+                activeSection?.scrollTo?.({ top: 0, left: 0, behavior: 'auto' });
+            } catch (e) {
+                if (activeSection) activeSection.scrollTop = 0;
+            }
+            if (activeSection) {
+                activeSection.scrollTop = 0;
+                activeSection.scrollLeft = 0;
+            }
+            if (viewContainer) {
+                try {
+                    viewContainer.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+                } catch (e) {
+                    viewContainer.scrollTop = 0;
+                    viewContainer.scrollLeft = 0;
+                }
+            }
+            if (mainContent) {
+                mainContent.scrollTop = 0;
+                mainContent.scrollLeft = 0;
+            }
+            document.documentElement.scrollTop = 0;
+            document.documentElement.scrollLeft = 0;
+            document.body.scrollTop = 0;
+            document.body.scrollLeft = 0;
+            try {
+                window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+            } catch (e) {
+                window.scrollTo(0, 0);
+            }
+        };
+
+        reset();
+        requestAnimationFrame(reset);
     }
 
     function toggleProfileDropdownTab() {
         if (!ftProfileDropdownTab || !ftProfileBadgeBtnTab) return;
         const next = !ftProfileDropdownTab.hidden;
-        ftProfileDropdownTab.hidden = next;
-        ftProfileBadgeBtnTab.setAttribute('aria-expanded', next ? 'false' : 'true');
-        if (!next) {
-            positionProfileDropdownTab();
+        if (next) {
+            if (profileDropdownPositionRaf) {
+                cancelAnimationFrame(profileDropdownPositionRaf);
+                profileDropdownPositionRaf = 0;
+            }
+            closeProfileDropdownTab();
+            return;
         }
+        ftProfileDropdownTab.hidden = false;
+        ftProfileBadgeBtnTab.setAttribute('aria-expanded', 'true');
+        ftProfileDropdownTab.style.visibility = 'hidden';
+        scheduleProfileDropdownPositionTab();
+        requestAnimationFrame(() => {
+            scheduleProfileDropdownPositionTab();
+        });
     }
 
     function renderProfileSelectorTab(profilesV4) {
@@ -3900,8 +4009,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         window.addEventListener('resize', () => {
-            positionProfileDropdownTab();
+            scheduleProfileDropdownPositionTab();
         });
+
+        window.addEventListener('scroll', () => {
+            scheduleProfileDropdownPositionTab();
+        }, true);
 
         document.addEventListener('click', (e) => {
             try {
@@ -3909,7 +4022,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     closeProfileDropdownTab();
                     return;
                 }
-                if (ftProfileMenuTab.contains(e.target)) return;
+                if (ftProfileMenuTab.contains(e.target) || ftProfileDropdownTab.contains(e.target)) return;
                 closeProfileDropdownTab();
             } catch (err) {
                 closeProfileDropdownTab();
@@ -5773,16 +5886,16 @@ function setupNavigation() {
         });
 
         // Update view sections
+        let activeSection = null;
         viewSections.forEach(section => {
             section.classList.toggle('active', section.id === `${effectiveViewId}View`);
             if (section.id === `${effectiveViewId}View`) {
-                section.scrollTop = 0;
+                activeSection = section;
             }
         });
 
-        if (viewContainer) {
-            viewContainer.scrollTop = 0;
-        }
+        closeProfileDropdownTab();
+        resetTabViewScroll(activeSection);
 
         try {
             document.body.dataset.activeView = effectiveViewId;

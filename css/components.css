@@ -457,13 +457,18 @@ button.select-input.ft-select-trigger[aria-expanded="true"]::after {
 
 .custom-date-input,
 input[type="date"].custom-date-input {
+    min-height: 44px;
+    padding: 0.82rem 0.95rem;
     border: 1px solid var(--ft-color-sem-neutral-border);
-    border-left-width: 3px;
+    border-left-width: 2px;
     border-left-color: var(--ft-color-brand-secondary);
     border-radius: var(--ft-radius-md);
     background-color: var(--ft-color-bg-surface);
-    box-shadow: var(--ft-shadow-floating);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55), inset 0 -1px 0 rgba(15, 23, 42, 0.06);
     font-weight: 500;
+    font-size: 0.95rem;
+    line-height: 1.2;
+    box-sizing: border-box;
     appearance: none;
     -webkit-appearance: none;
 }
@@ -478,7 +483,7 @@ input[type="date"].custom-date-input:hover {
 input[type="date"].custom-date-input:focus {
     outline: none;
     border-color: var(--ft-color-brand-secondary);
-    box-shadow: 0 0 0 2px rgba(74, 157, 127, 0.2), var(--ft-shadow-floating);
+    box-shadow: 0 0 0 2px rgba(74, 157, 127, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
 .custom-date-input::-webkit-calendar-picker-indicator {
@@ -503,13 +508,14 @@ html[data-theme="dark"] .custom-date-input::-webkit-calendar-picker-indicator:ho
 /* Dark mode */
 html[data-theme="dark"] button.select-input.ft-select-trigger,
 html[data-theme="dark"] .custom-date-input {
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: rgba(15, 21, 29, 0.92);
     border-left-color: var(--ft-color-brand-secondary);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03), inset 0 -1px 0 rgba(0, 0, 0, 0.28);
 }
 
 html[data-theme="dark"] button.select-input.ft-select-trigger:hover,
 html[data-theme="dark"] .custom-date-input:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(18, 25, 34, 0.96);
 }
 
 /* Disabled state */
@@ -734,7 +740,13 @@ html[data-theme="dark"] .btn-secondary.btn-import:hover {
 
 .import-export-actions button {
     min-width: 168px;
+    width: 12.5rem;
+    max-width: 100%;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
     text-align: center;
+    white-space: nowrap;
 }
 
 .import-export-summary {

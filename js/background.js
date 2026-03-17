@@ -600,7 +600,7 @@ const CURRENT_VERSION = (browserAPI.runtime.getManifest()?.version || '').trim()
 const FT_PROFILES_V4_KEY = 'ftProfilesV4';
 const DEFAULT_PROFILE_ID = 'default';
 const QUICK_BLOCK_DEFAULT_MIGRATION_KEY = 'quickBlockDefaultV327Applied';
-const QUICK_BLOCK_DEFAULT_TARGET_VERSION = '3.2.7';
+const QUICK_BLOCK_DEFAULT_TARGET_VERSION = '3.2.8';
 
 function compareSemver(a = '', b = '') {
     const toParts = (value) => String(value || '')

@@ -122,7 +122,7 @@
             </ul>
 
             <div class="sidebar-footer">
-                <div class="version-info">v3.2.6</div>
+                <div class="version-info">v3.2.8</div>
             </div>
         </nav>
 
@@ -166,7 +166,7 @@
                             <div class="view-hero__copy">
                                 <p class="view-hero__eyebrow">FilterTube control center</p>
                                 <h2 class="view-hero__title">Keep every YouTube surface calmer before it turns noisy.</h2>
-                                <p class="view-hero__body">Check what FilterTube is already catching, switch between desktop and Kids surfaces, and jump straight into the rules that matter most for your household.</p>
+                                <p class="view-hero__body">Switch between desktop and Kids surfaces, and jump straight into the rules that matter most for your household.</p>
                             </div>
                             <div class="dashboard-stats-source dashboard-hero__surface">
                                 <div id="dashboardStatsSourceLabel" class="dashboard-stats-source__label"></div>
@@ -264,8 +264,8 @@
                                         </div>
                                         <div class="donate-promo-text">
                                             <h3>Support FilterTube</h3>
-                                            <p>Keep the product moving across desktop, mobile, tablet, and TV without turning privacy into a tradeoff.</p>
-                                            <p>Support helps fund maintenance, new surfaces, and the next calm control tools.</p>
+                                            <p>Keep FilterTube moving across desktop, mobile, tablet, and TV without turning privacy into a tradeoff.<br>
+                                            Support helps fund maintenance, new surfaces, and the next calm control tools.</p>
                                         </div>
                                         <button id="dashboardDonateBtn" class="btn-primary donate-promo-btn">Support the build</button>
                                     </div>
@@ -546,7 +546,7 @@
                                 <p class="view-hero__body">New controls, UI improvements, and behavior changes land here first so you can see what is already live today.</p>
                             </div>
                             <div class="view-hero__meta">
-                                <span class="view-meta-pill">Current version: v3.2.7</span>
+                                <span class="view-meta-pill">Current version: v3.2.8</span>
                                 <span class="view-meta-pill">Desktop release cadence</span>
                             </div>
                         </section>
@@ -698,48 +698,6 @@
 
                             <div class="card">
                                 <div class="card-header">
-                                    <h3>Whitelist Mode</h3>
-                                </div>
-                                <div class="card-body">
-                                    <div class="help-list">
-                                        <div class="help-item">
-                                            <div class="help-item-title">What is Whitelist Mode?</div>
-                                            <div class="help-item-body">Whitelist Mode flips traditional filtering: instead of hiding blocked content, it hides <strong>everything except</strong> content from whitelisted channels and keywords. Perfect for creating an "allow-only" feed.</div>
-                                        </div>
-                                        <div class="help-item">
-                                            <div class="help-item-title">How to Build Your Whitelist</div>
-                                            <div class="help-item-body">
-                                                <p>FilterTube reuses the same workflow as blocklist building:</p>
-                                                <ol style="margin: 8px 0; padding-left: 20px;">
-                                                    <li><strong>Switch to Blocklist Mode:</strong> Start in blocklist mode to browse freely</li>
-                                                    <li><strong>Add Channels via 3-dot Menu:</strong> Use YouTube's "Block Channel" menu on videos you <em>want</em> to allow</li>
-                                                    <li><strong>Switch to Whitelist Mode:</strong> Toggle the mode switch - your blocked channels become your allowed channels</li>
-                                                    <li><strong>Enjoy Clean Feed:</strong> Only whitelisted channels and keywords will appear</li>
-                                                </ol>
-                                            </div>
-                                        </div>
-                                        <div class="help-item">
-                                            <div class="help-item-title">Whitelist Mode Logic</div>
-                                            <div class="help-item-body">
-                                                <p>When in whitelist mode, FilterTube:</p>
-                                                <ul style="margin: 8px 0; padding-left: 20px;">
-                                                    <li><strong>Hides by default:</strong> All content is hidden unless it matches whitelist rules</li>
-                                                    <li><strong>Checks channels:</strong> Shows content from channels in <code>whitelistChannels</code> list</li>
-                                                    <li><strong>Checks keywords:</strong> Shows content with titles matching <code>whitelistKeywords</code> patterns</li>
-                                                    <li><strong>Preserves functionality:</strong> Watch pages and playlists work normally for allowed content</li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                        <div class="help-item">
-                                            <div class="help-item-title">Mode Switching</div>
-                                            <div class="help-item-body">Toggle between Blocklist and Whitelist modes using the top bar controls. FilterTube provides confirmation dialogs when switching to prevent accidental data loss, and automatically migrates your current blocklist to become your whitelist.</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="card">
-                                <div class="card-header">
                                     <h3>Content Controls</h3>
                                 </div>
                                 <div class="card-body">
@@ -873,6 +831,48 @@
                         <div class="help-cluster help-cluster--kids">
                             <div class="card">
                                 <div class="card-header">
+                                    <h3>Whitelist Mode</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="help-list">
+                                        <div class="help-item">
+                                            <div class="help-item-title">What is Whitelist Mode?</div>
+                                            <div class="help-item-body">Whitelist Mode flips traditional filtering: instead of hiding blocked content, it hides <strong>everything except</strong> content from whitelisted channels and keywords. Perfect for creating an "allow-only" feed.</div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">How to Build Your Whitelist</div>
+                                            <div class="help-item-body">
+                                                <p>FilterTube reuses the same workflow as blocklist building:</p>
+                                                <ol style="margin: 8px 0; padding-left: 20px;">
+                                                    <li><strong>Switch to Blocklist Mode:</strong> Start in blocklist mode to browse freely</li>
+                                                    <li><strong>Add Channels via 3-dot Menu:</strong> Use YouTube's "Block Channel" menu on videos you <em>want</em> to allow</li>
+                                                    <li><strong>Switch to Whitelist Mode:</strong> Toggle the mode switch - your blocked channels become your allowed channels</li>
+                                                    <li><strong>Enjoy Clean Feed:</strong> Only whitelisted channels and keywords will appear</li>
+                                                </ol>
+                                            </div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Whitelist Mode Logic</div>
+                                            <div class="help-item-body">
+                                                <p>When in whitelist mode, FilterTube:</p>
+                                                <ul style="margin: 8px 0; padding-left: 20px;">
+                                                    <li><strong>Hides by default:</strong> All content is hidden unless it matches whitelist rules</li>
+                                                    <li><strong>Checks channels:</strong> Shows content from channels in <code>whitelistChannels</code> list</li>
+                                                    <li><strong>Checks keywords:</strong> Shows content with titles matching <code>whitelistKeywords</code> patterns</li>
+                                                    <li><strong>Preserves functionality:</strong> Watch pages and playlists work normally for allowed content</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Mode Switching</div>
+                                            <div class="help-item-body">Toggle between Blocklist and Whitelist modes using the top bar controls. FilterTube provides confirmation dialogs when switching to prevent accidental data loss, and automatically migrates your current blocklist to become your whitelist.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header">
                                     <h3>YouTube Kids Integration</h3>
                                 </div>
                                 <div class="card-body">
@@ -904,9 +904,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="help-cluster help-cluster--support">
                             <div class="card">
                                 <div class="card-header">
                                     <h3>Troubleshooting</h3>

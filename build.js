@@ -30,6 +30,23 @@ const COMMON_DIRS = ['js', 'css', 'html', 'icons', 'data', 'assets'];
 const COMMON_FILES = ['README.md', 'CHANGELOG.md', 'LICENSE'];
 const REPO_OWNER = 'varshneydevansh';
 const REPO_NAME = 'FilterTube';
+const TEXT_LOC_EXTENSIONS = new Set([
+    '.js',
+    '.jsx',
+    '.mjs',
+    '.cjs',
+    '.css',
+    '.html',
+    '.json',
+    '.md',
+    '.txt',
+    '.swift',
+    '.yml',
+    '.yaml'
+]);
+const TEXT_LOC_BASENAMES = new Set([
+    'LICENSE'
+]);
 
 const targetBrowser = process.argv[2];
 const BROWSER_TARGETS = targetBrowser && ALL_BROWSER_TARGETS.includes(targetBrowser)
@@ -439,13 +456,16 @@ function promptYesNo(question) {
 
 async function updateReadmeBadges(version) {
     try {
-        // Calculate total lines of code
-        const totalLinesRaw = execSync('git ls-files | xargs wc -l 2>/dev/null | tail -1', { encoding: 'utf8' });
-        const totalLines = parseInt(totalLinesRaw.trim().split(/\s+/)[0], 10);
+        const trackedFiles = execSync('git ls-files', { encoding: 'utf8' })
+            .split('\n')
+            .map(file => file.trim())
+            .filter(Boolean);
 
-        // Calculate JavaScript lines
-        const jsLinesRaw = execSync("git ls-files | grep '\\.js$' | xargs wc -l 2>/dev/null | tail -1", { encoding: 'utf8' });
-        const jsLines = parseInt(jsLinesRaw.trim().split(/\s+/)[0], 10);
+        const totalFiles = trackedFiles.filter(shouldCountInTotalLoC);
+        const jsFiles = trackedFiles.filter(file => path.extname(file).toLowerCase() === '.js');
+
+        const totalLines = sumFileLines(totalFiles);
+        const jsLines = sumFileLines(jsFiles);
 
         if (!totalLines || !jsLines) {
             console.warn('⚠️  Could not calculate LoC stats; skipping badge update.');
@@ -495,4 +515,24 @@ async function updateReadmeBadges(version) {
     } catch (err) {
         console.warn('⚠️  Failed to update README badges:', err.message);
     }
+}
+
+function shouldCountInTotalLoC(filePath) {
+    const ext = path.extname(filePath).toLowerCase();
+    const basename = path.basename(filePath);
+    return TEXT_LOC_EXTENSIONS.has(ext) || TEXT_LOC_BASENAMES.has(basename);
+}
+
+function sumFileLines(files) {
+    return files.reduce((total, filePath) => {
+        try {
+            const content = fs.readFileSync(filePath, 'utf8');
+            const newlineCount = (content.match(/\n/g) || []).length;
+            const lineCount = content.length === 0 ? 0 : newlineCount + 1;
+            return total + lineCount;
+        } catch (err) {
+            console.warn(`⚠️  Skipping ${filePath} during LoC count: ${err.message}`);
+            return total;
+        }
+    }, 0);
 }

@@ -3,6 +3,19 @@
     "_comment": "Shared release notes source for the dashboard What's New tab and the YouTube release banner. Keep entries sorted newest-first by version."
   },
   {
+    "version": "3.2.8",
+    "headline": "Theme Refresh + Scenic UI Shell Tuning",
+    "summary": "Popup and dashboard surfaces now use the calmer scenic theme system with tighter layout, stronger tint states, and better light/dark balance.",
+    "bannerSummary": "Refined popup + dashboard theme with calmer transparency, stronger pills, and better responsive layout behavior.",
+    "highlights": [
+      "Scenic UI refresh: popup and dashboard now share the calmer product shell with the local hero video as ambient background media.",
+      "Light and dark theme tuning: darker mode keeps the scenic background visible without the washed center glow, while light mode uses cleaner transparency.",
+      "Responsive cleanup: tighter popup spacing, smaller profile dropdown, better Help/Support card layout, and improved mobile fit across filter surfaces.",
+      "Control tint fixes: enabled/disabled states, pill colors, search fields, and import/export actions now read more clearly across both themes."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.8"
+  },
+  {
     "version": "3.2.7",
     "headline": "Category Filters + Quick Block Hover Cross + Mobile 3 Dot UI & Quick Cross Block Support",
     "summary": "New category filtering, one-tap quick cross block enabled by default",
