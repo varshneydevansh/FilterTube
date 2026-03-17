@@ -585,16 +585,24 @@ const UIComponents = (() => {
                     left = pad;
                 }
 
-                const scrollX = window.scrollX || window.pageXOffset || 0;
-                const scrollY = window.scrollY || window.pageYOffset || 0;
-
-                dropdown.style.top = `${top + scrollY}px`;
-                dropdown.style.left = `${left + scrollX}px`;
+                dropdown.style.top = `${top}px`;
+                dropdown.style.left = `${left}px`;
                 dropdown.style.minWidth = `${triggerRect.width}px`;
                 // Reveal only after we have a valid position to avoid a flash at (0,0)
                 dropdown.style.visibility = '';
             } catch (e) {
             }
+        };
+
+        let positionRaf = 0;
+
+        const schedulePosition = () => {
+            if (dropdown.hidden) return;
+            if (positionRaf) return;
+            positionRaf = requestAnimationFrame(() => {
+                positionRaf = 0;
+                position();
+            });
         };
 
         const toggle = () => {
@@ -605,6 +613,10 @@ const UIComponents = (() => {
             const next = !dropdown.hidden;
             if (next) {
                 // Closing
+                if (positionRaf) {
+                    cancelAnimationFrame(positionRaf);
+                    positionRaf = 0;
+                }
                 dropdown.hidden = true;
                 trigger.setAttribute('aria-expanded', 'false');
                 return;
@@ -776,12 +788,16 @@ const UIComponents = (() => {
         });
 
         window.addEventListener('resize', () => {
-            position();
+            schedulePosition();
         });
+
+        window.addEventListener('scroll', () => {
+            schedulePosition();
+        }, true);
 
         document.addEventListener('click', (e) => {
             try {
-                if (wrapper.contains(e.target)) return;
+                if (wrapper.contains(e.target) || dropdown.contains(e.target)) return;
                 close();
             } catch (err) {
                 close();

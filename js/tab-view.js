@@ -9,6 +9,38 @@
 // FILTERS TAB INITIALIZATION
 // ============================================================================
 
+function initializeResponsiveNav() {
+    const navToggle = document.getElementById('navToggle');
+    const sidebar = document.getElementById('sidebarNav');
+    const overlay = document.getElementById('sidebarOverlay');
+
+    if (!navToggle || !sidebar || !overlay || navToggle.dataset.ftNavBound === 'true') return;
+
+    function closeSidebar() {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('visible');
+    }
+
+    function closeOnWide() {
+        if (window.innerWidth > 768) {
+            closeSidebar();
+        }
+    }
+
+    navToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('visible');
+    });
+
+    overlay.addEventListener('click', () => {
+        closeSidebar();
+    });
+
+    window.addEventListener('resize', closeOnWide);
+    closeOnWide();
+    navToggle.dataset.ftNavBound = 'true';
+}
+
 function initializeFiltersTabs() {
     // Helper function to create compact inline condition rows
     function createCompactCondition({ name, value, labelText, fields }) {
@@ -1253,8 +1285,6 @@ function initializeFiltersTabs() {
 
     container.appendChild(tabs.container);
 
-    // Responsive nav toggle for mobile
-    const navToggle = document.getElementById('navToggle');
     const sidebar = document.getElementById('sidebarNav');
     const overlay = document.getElementById('sidebarOverlay');
 
@@ -1262,24 +1292,6 @@ function initializeFiltersTabs() {
         sidebar?.classList.remove('open');
         overlay?.classList.remove('visible');
     }
-
-    function closeOnWide() {
-        if (window.innerWidth > 900) {
-            closeSidebar();
-        }
-    }
-
-    navToggle?.addEventListener('click', () => {
-        sidebar?.classList.toggle('open');
-        overlay?.classList.toggle('visible');
-    });
-
-    overlay?.addEventListener('click', () => {
-        closeSidebar();
-    });
-
-    window.addEventListener('resize', closeOnWide);
-    closeOnWide();
 
     // Close sidebar on tab switch (for mobile)
     const navItems = document.querySelectorAll('.nav-item');
@@ -2573,6 +2585,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) {
     }
     // Initialize UI
+    initializeResponsiveNav();
     initializeFiltersTabs();
     initializeKidsTabs();
     setupNavigation();
@@ -5736,6 +5749,11 @@ function setupNavigation() {
             }
             const targetView = item.getAttribute('data-tab');
             switchView(targetView);
+            try {
+                document.getElementById('sidebarNav')?.classList.remove('open');
+                document.getElementById('sidebarOverlay')?.classList.remove('visible');
+            } catch (e) {
+            }
         });
     });
 
@@ -5764,6 +5782,12 @@ function setupNavigation() {
 
         if (viewContainer) {
             viewContainer.scrollTop = 0;
+        }
+
+        try {
+            document.body.dataset.activeView = effectiveViewId;
+            document.documentElement.dataset.activeView = effectiveViewId;
+        } catch (e) {
         }
 
         // Update page title

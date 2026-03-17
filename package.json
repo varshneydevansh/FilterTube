@@ -4,6 +4,7 @@
   "description": "Restore peace of mind to your digital video experience.",
   "main": "js/background.js",
   "scripts": {
+    "build:ui": "node scripts/build-extension-ui.mjs",
     "dev": "node build.js",
     "build": "node build.js",
     "build:chrome": "node build.js chrome",
@@ -32,6 +33,10 @@
   "homepage": "https://github.com/varshneydevansh/FilterTube",
   "devDependencies": {
     "archiver": "^5.3.1",
+    "esbuild": "^0.27.4",
     "fs-extra": "^11.1.1"
+  },
+  "dependencies": {
+    "preact": "^10.29.0"
   }
 }

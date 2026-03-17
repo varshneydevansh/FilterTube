@@ -8,12 +8,14 @@
     <link rel="stylesheet" href="../css/design_tokens.css">
     <link rel="stylesheet" href="../css/components.css">
     <link rel="stylesheet" href="../css/tab-view.css">
+    <link rel="stylesheet" href="../css/serene-shell.css">
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Crimson+Pro:wght@400;500;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,500;1,600&family=JetBrains+Mono:wght@500;700&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
 </head>
 
 <body>
+    <div id="tabViewShellDecor"></div>
     <div class="app-container">
         <!-- Sidebar Navigation -->
         <nav class="sidebar" id="sidebarNav">
@@ -159,674 +161,767 @@
 
                 <!-- Dashboard View -->
                 <div id="dashboardView" class="view-section active">
-                    <div class="dashboard-stats-source">
-                        <div id="dashboardStatsSourceLabel" class="dashboard-stats-source__label"></div>
-                        <div class="dashboard-stats-source__buttons">
-                            <button id="dashboardStatsMainBtn" class="btn-secondary" type="button">YouTube Main</button>
-                            <button id="dashboardStatsKidsBtn" class="btn-secondary" type="button">YouTube Kids</button>
-                        </div>
-                    </div>
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-value" id="statHiddenToday">0</div>
-                            <div class="stat-label">Content Hidden Today</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="statActiveKeywords">0</div>
-                            <div class="stat-label">Active Keywords</div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-value" id="statFilteredChannels">0</div>
-                            <div class="stat-label">Filtered Channels</div>
-                        </div>
-                        <div class="stat-card" title="Total duration of all videos hidden by your filters">
-                            <div class="stat-value" id="statSavedTime">0m</div>
-                            <div class="stat-label">Est. Time Saved</div>
-                        </div>
-                    </div>
-
-                    <div class="section-header">
-                        <h2>Quick Actions</h2>
-                    </div>
-                    <div class="quick-actions-grid">
-                        <button class="action-card" id="quickAddKeywordBtn">
-                            <span class="icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                    <polyline points="17 8 12 3 7 8"></polyline>
-                                    <line x1="12" y1="3" x2="12" y2="15"></line>
-                                </svg>
-                            </span>
-                            <span class="label">Add Keyword</span>
-                        </button>
-
-                        <button class="action-card" id="quickAddChannelBtn">
-                            <span class="icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                    <circle cx="12" cy="7" r="4"></circle>
-                                </svg>
-                            </span>
-                            <span class="label">Add Channel</span>
-                        </button>
-                        <button class="action-card" id="quickContentControlsBtn">
-                            <span class="icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <rect x="3" y="4" width="18" height="16" rx="2" ry="2"></rect>
-                                    <path d="M7 8h10"></path>
-                                    <path d="M7 12h6"></path>
-                                    <path d="M7 16h8"></path>
-                                </svg>
-                            </span>
-                            <span class="label">Content Controls</span>
-                        </button>
-                        <button class="action-card" id="quickKidsModeBtn">
-                            <span class="icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M4.5 9.5V4a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v5.5"></path>
-                                    <path d="M2 20v-5h20v5"></path>
-                                    <path d="M12 15v5"></path>
-                                    <path d="M6 15v5"></path>
-                                    <path d="M18 15v5"></path>
-                                </svg>
-                            </span>
-                            <span class="label">Toggle Kids Mode</span>
-                        </button>
-                    </div>
-
-                    <!-- Donate Promo Card -->
-                    <div class="card donate-promo-card">
-                        <div class="card-body">
-                            <div class="donate-promo-content">
-                                <div class="donate-promo-icon">
-                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"></path>
-                                    </svg>
-                                </div>
-                                <div class="donate-promo-text">
-                                    <h3>Support FilterTube</h3>
-                                    <p>Help FilterTube by reviews or with funds for development, mobile apps, and new features.</p>
-                                    <p>Currently it's built and maintained by solo independent open-source dev.</p>
-                                </div>
-                                <button id="dashboardDonateBtn" class="btn-primary donate-promo-btn">Donate</button>
+                    <div class="view-shell view-shell--dashboard dashboard-shell">
+                        <section class="view-hero dashboard-hero">
+                            <div class="view-hero__copy">
+                                <p class="view-hero__eyebrow">FilterTube control center</p>
+                                <h2 class="view-hero__title">Keep every YouTube surface calmer before it turns noisy.</h2>
+                                <p class="view-hero__body">Check what FilterTube is already catching, switch between desktop and Kids surfaces, and jump straight into the rules that matter most for your household.</p>
                             </div>
-                        </div>
+                            <div class="dashboard-stats-source dashboard-hero__surface">
+                                <div id="dashboardStatsSourceLabel" class="dashboard-stats-source__label"></div>
+                                <div class="dashboard-stats-source__buttons">
+                                    <button id="dashboardStatsMainBtn" class="btn-secondary" type="button">YouTube Main</button>
+                                    <button id="dashboardStatsKidsBtn" class="btn-secondary" type="button">YouTube Kids</button>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="dashboard-metrics">
+                            <div class="stats-grid">
+                                <div class="stat-card">
+                                    <div class="stat-value" id="statHiddenToday">0</div>
+                                    <div class="stat-label">Content Hidden Today</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value" id="statActiveKeywords">0</div>
+                                    <div class="stat-label">Active Keywords</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-value" id="statFilteredChannels">0</div>
+                                    <div class="stat-label">Filtered Channels</div>
+                                </div>
+                                <div class="stat-card" title="Total duration of all videos hidden by your filters">
+                                    <div class="stat-value" id="statSavedTime">0m</div>
+                                    <div class="stat-label">Est. Time Saved</div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="dashboard-actions">
+                            <div class="section-header">
+                                <h2>Quick Actions</h2>
+                                <p class="section-header__body">Jump into the changes people make most often when a feed starts drifting.</p>
+                            </div>
+                            <div class="quick-actions-grid">
+                                <button class="action-card" id="quickAddKeywordBtn">
+                                    <span class="icon">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                            <polyline points="17 8 12 3 7 8"></polyline>
+                                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                                        </svg>
+                                    </span>
+                                    <span class="label">Add Keyword</span>
+                                </button>
+
+                                <button class="action-card" id="quickAddChannelBtn">
+                                    <span class="icon">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                            <circle cx="12" cy="7" r="4"></circle>
+                                        </svg>
+                                    </span>
+                                    <span class="label">Add Channel</span>
+                                </button>
+                                <button class="action-card" id="quickContentControlsBtn">
+                                    <span class="icon">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <rect x="3" y="4" width="18" height="16" rx="2" ry="2"></rect>
+                                            <path d="M7 8h10"></path>
+                                            <path d="M7 12h6"></path>
+                                            <path d="M7 16h8"></path>
+                                        </svg>
+                                    </span>
+                                    <span class="label">Content Controls</span>
+                                </button>
+                                <button class="action-card" id="quickKidsModeBtn">
+                                    <span class="icon">
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M4.5 9.5V4a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v5.5"></path>
+                                            <path d="M2 20v-5h20v5"></path>
+                                            <path d="M12 15v5"></path>
+                                            <path d="M6 15v5"></path>
+                                            <path d="M18 15v5"></path>
+                                        </svg>
+                                    </span>
+                                    <span class="label">Toggle Kids Mode</span>
+                                </button>
+                            </div>
+
+                            <div class="card donate-promo-card">
+                                <div class="card-body">
+                                    <div class="donate-promo-content">
+                                        <div class="donate-promo-icon">
+                                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"></path>
+                                            </svg>
+                                        </div>
+                                        <div class="donate-promo-text">
+                                            <h3>Support FilterTube</h3>
+                                            <p>Keep the product moving across desktop, mobile, tablet, and TV without turning privacy into a tradeoff.</p>
+                                            <p>Support helps fund maintenance, new surfaces, and the next calm control tools.</p>
+                                        </div>
+                                        <button id="dashboardDonateBtn" class="btn-primary donate-promo-btn">Support the build</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
                     </div>
                 </div>
 
                 <!-- Filters View -->
                 <div id="filtersView" class="view-section">
-                    <!-- Tabs will be injected here by JavaScript -->
-                    <div id="filtersTabsContainer"></div>
+                    <div class="view-shell view-shell--filters">
+                        <section class="view-hero filters-hero">
+                            <div class="view-hero__copy">
+                                <p class="view-hero__eyebrow">Rules that already work today</p>
+                                <h2 class="view-hero__title">Build the exact feed boundaries you want FilterTube to keep.</h2>
+                                <p class="view-hero__body">Channels, keywords, Shorts, comments, and profile-specific rules all stay local and stay explicit.</p>
+                            </div>
+                        </section>
+                        <div id="filtersTabsContainer"></div>
+                    </div>
                 </div>
 
                 <!-- Semantic View (Placeholder) -->
                 <div id="semanticView" class="view-section">
-                    <div class="empty-state-large">
-                        <div class="icon">
-                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <line x1="2" y1="12" x2="22" y2="12"></line>
-                                <path
-                                    d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
-                                </path>
-                            </svg>
+                    <div class="view-shell view-shell--semantic semantic-shell">
+                        <section class="view-hero semantic-hero">
+                            <div class="view-hero__copy">
+                                <p class="view-hero__eyebrow">Local semantic direction</p>
+                                <h2 class="view-hero__title">The next layer is smarter matching, not cloud profiling.</h2>
+                                <p class="view-hero__body">Today FilterTube already runs with explicit rules. The future semantic layer is about helping those rules catch more of what you meant, while keeping your browsing behavior on-device.</p>
+                            </div>
+                            <div class="view-hero__meta">
+                                <span class="view-meta-pill">Current: explicit rules</span>
+                                <span class="view-meta-pill">Research: local semantic help</span>
+                                <span class="view-meta-pill">Later: thumbnail analysis</span>
+                            </div>
+                        </section>
+                        <div class="card semantic-card">
+                            <div class="card-body">
+                                <div class="empty-state-large">
+                                    <div class="icon">
+                                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <line x1="2" y1="12" x2="22" y2="12"></line>
+                                            <path
+                                                d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
+                                            </path>
+                                        </svg>
+                                    </div>
+                                    <h2>Local semantic filtering</h2>
+                                    <p>This surface will explain how smarter matching can extend current FilterTube rules without turning the product into surveillance software.</p>
+                                    <p class="sub-text">Planned areas include title and description understanding first, with thumbnail analysis staying clearly in roadmap territory until it is local and explainable.</p>
+                                </div>
+                            </div>
                         </div>
-                        <h2>Semantic ML Filtering</h2>
-                        <p>Coming Soon. Advanced AI-powered filtering running locally on your device.</p>
-                        <p class="sub-text">Privacy-first analysis of video titles, descriptions, and thumbnails.</p>
                     </div>
                 </div>
 
                 <!-- Kids Mode View -->
                 <div id="kidsView" class="view-section">
-                    <div class="kids-header">
-                        <div class="kids-header-title">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M4.5 9.5V4a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v5.5"></path>
-                                <path d="M2 20v-5h20v5"></path>
-                                <path d="M12 15v5"></path>
-                                <path d="M6 15v5"></path>
-                                <path d="M18 15v5"></path>
-                                <circle cx="12" cy="10" r="2" fill="currentColor" stroke="none"></circle>
-                                <circle cx="6" cy="10" r="2" fill="currentColor" stroke="none"></circle>
-                                <circle cx="18" cy="10" r="2" fill="currentColor" stroke="none"></circle>
-                            </svg>
-                            <span>YouTube Kids Filters</span>
-                        </div>
-                        <p class="kids-header-desc">Block channels and keywords on YouTube Kids. Does not affect comments.</p>
+                    <div class="view-shell view-shell--kids kids-shell">
+                        <section class="view-hero kids-hero">
+                            <div class="kids-header">
+                                <div class="kids-header-title">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M4.5 9.5V4a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v5.5"></path>
+                                        <path d="M2 20v-5h20v5"></path>
+                                        <path d="M12 15v5"></path>
+                                        <path d="M6 15v5"></path>
+                                        <path d="M18 15v5"></path>
+                                        <circle cx="12" cy="10" r="2" fill="currentColor" stroke="none"></circle>
+                                        <circle cx="6" cy="10" r="2" fill="currentColor" stroke="none"></circle>
+                                        <circle cx="18" cy="10" r="2" fill="currentColor" stroke="none"></circle>
+                                    </svg>
+                                    <span>YouTube Kids Filters</span>
+                                </div>
+                                <p class="kids-header-desc">Keep the youngest surface calmer with the same profile-aware control system, tuned for family-safe viewing.</p>
+                            </div>
+                        </section>
+                        <div id="kidsTabsContainer"></div>
                     </div>
-                    <div id="kidsTabsContainer"></div>
                 </div>
 
                 <!-- Settings View -->
                 <div id="settingsView" class="view-section">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>Import / Export</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="help-list">
-                                <div class="help-item">
-                                    <div class="help-item-title">Export backup</div>
-                                    <div class="help-item-body import-export-row">
-                                        <div class="import-export-text">
-                                            <span class="import-export-summary">
-                                                Snapshot of channels, keywords, kids profiles, and themes.</br>
-                                            </span>
-                                            <span class="import-export-hint">
-                                                Saved to <code>Downloads/FilterTube Export/</code>
-                                            </span>
-                                            <span class="info-hint" title="Download a portable JSON that includes every FilterTube list (channels, keywords, kids settings, design preferences, kids profiles, and more).">
-                                                Details
-                                            </span>
+                    <div class="view-shell view-shell--settings settings-shell">
+                        <section class="view-hero settings-hero">
+                            <div class="view-hero__copy">
+                                <p class="view-hero__eyebrow">Profiles, backup, and trust</p>
+                                <h2 class="view-hero__title">Keep every FilterTube setup portable, locked when needed, and ready for the next screen.</h2>
+                                <p class="view-hero__body">Profiles stay separate, backups stay on-device, and Kids sync stays explicit. This is where the current desktop control system turns into the base for mobile, tablet, and TV later.</p>
+                            </div>
+                            <div class="view-hero__meta">
+                                <span class="view-meta-pill">Local backups</span>
+                                <span class="view-meta-pill">PIN-protected profiles</span>
+                                <span class="view-meta-pill">Kids sync</span>
+                            </div>
+                        </section>
+
+                        <div class="settings-grid">
+                            <div class="settings-core">
+                                <div class="card settings-card">
+                                    <div class="card-header">
+                                        <h3>Import / Export</h3>
+                                    </div>
+                                    <div class="card-body settings-card__body">
+                                        <div class="help-list">
+                                            <div class="help-item">
+                                                <div class="help-item-title">Export backup</div>
+                                                <div class="help-item-body import-export-row">
+                                                    <div class="import-export-text">
+                                                        <span class="import-export-summary">
+                                                            Snapshot of channels, keywords, kids profiles, and themes.</br>
+                                                        </span>
+                                                        <span class="import-export-hint">
+                                                            Saved to <code>Downloads/FilterTube Export/</code>
+                                                        </span>
+                                                        <span class="info-hint" title="Download a portable JSON that includes every FilterTube list (channels, keywords, kids settings, design preferences, kids profiles, and more).">
+                                                            Details
+                                                        </span>
+                                                    </div>
+                                                    <div class="import-export-actions">
+                                                        <button id="ftExportV3Btn" class="btn-primary" type="button">Download JSON</button>
+                                                        <button id="ftExportV3EncryptedBtn" class="btn-secondary" type="button" title="Download an encrypted backup JSON (requires a password/PIN)">Download Encrypted</button>
+                                                        <label class="import-export-hint" style="display:flex;align-items:center;gap:8px;" title="When enabled, only the currently active profile is included in the export.">
+                                                            <input id="ftExportActiveOnly" type="checkbox" />
+                                                            Export active profile only
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="help-item">
+                                                <div class="help-item-title">Import backup</div>
+                                                <div class="help-item-body import-export-row">
+                                                    <div class="import-export-text">
+                                                        <span class="import-export-summary">
+                                                            Merge a saved FilterTube export or compatible JSON.</br>
+                                                        </span>
+                                                        <span class="import-export-hint">
+                                                            Existing entries stay put; matching channels/keywords are merged
+                                                        </span>
+                                                        <span class="info-hint" title="Bring in data from FilterTube backups, BlockTube exports, or other structured JSON tools. Matching channels/keywords are merged; everything else is appended.">
+                                                            Details
+                                                        </span>
+                                                    </div>
+                                                    <div class="import-export-actions">
+                                                        <input id="ftImportV3File" type="file" accept="application/json,.json" style="display:none;" />
+                                                        <button id="ftImportV3Btn" class="btn-secondary btn-import" type="button" title="Import a FilterTube export or any compatible JSON (BlockTube, other tools, etc.)">
+                                                            Choose JSON
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="import-export-actions">
-                                            <button id="ftExportV3Btn" class="btn-primary" type="button">Download JSON</button>
-                                            <button id="ftExportV3EncryptedBtn" class="btn-secondary" type="button" title="Download an encrypted backup JSON (requires a password/PIN)">Download Encrypted</button>
-                                            <label class="import-export-hint" style="display:flex;align-items:center;gap:8px;" title="When enabled, only the currently active profile is included in the export.">
-                                                <input id="ftExportActiveOnly" type="checkbox" />
-                                                Export active profile only
+                                    </div>
+                                </div>
+
+                                <div class="card settings-card">
+                                    <div class="card-header">
+                                        <h3>Profiles</h3>
+                                    </div>
+                                    <div class="card-body settings-card__body settings-card__body--profiles">
+                                        <div class="import-export-hint" style="margin-bottom:10px;">
+                                            Profiles are independent. The <code>Default</code> profile acts as admin for full backups and managing other profiles.
+                                        </div>
+                                        <div id="ftProfilesManager" class="help-list"></div>
+                                        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
+                                            <button id="ftCreateAccountBtn" class="btn-secondary" type="button">Create Account</button>
+                                            <button id="ftCreateChildBtn" class="btn-secondary" type="button">Create Child</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card settings-card">
+                                    <div class="card-header">
+                                        <h3>Security</h3>
+                                    </div>
+                                    <div class="card-body settings-card__body">
+                                        <div class="import-export-hint" style="margin-bottom:10px;">
+                                            Master PIN locks the Default profile and controls admin actions like full backups and managing other profiles.
+                                        </div>
+                                        <div class="toggle-row" title="When enabled, the Default (Master) profile can create new independent accounts.">
+                                            <div class="toggle-info">
+                                                <div class="toggle-title">Allow independent account creation</div>
+                                            </div>
+                                            <label class="switch">
+                                                <input id="ftAllowAccountCreation" type="checkbox" />
+                                                <span class="slider round"></span>
                                             </label>
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="help-item">
-                                    <div class="help-item-title">Import backup</div>
-                                    <div class="help-item-body import-export-row">
-                                        <div class="import-export-text">
-                                            <span class="import-export-summary">
-                                                Merge a saved FilterTube export or compatible JSON.</br>
-                                            </span>
-                                            <span class="import-export-hint">
-                                                Existing entries stay put; matching channels/keywords are merged
-                                            </span>
-                                            <span class="info-hint" title="Bring in data from FilterTube backups, BlockTube exports, or other structured JSON tools. Matching channels/keywords are merged; everything else is appended.">
-                                                Details
-                                            </span>
+                                        <div class="toggle-row" title="Limits how many independent accounts can exist (excluding Default).">
+                                            <div class="toggle-info">
+                                                <div class="toggle-title">Max independent accounts</div>
+                                            </div>
+                                            <input id="ftMaxAccounts" class="text-input" type="number" min="0" step="1" style="max-width:120px;" />
                                         </div>
-                                        <div class="import-export-actions">
-                                            <input id="ftImportV3File" type="file" accept="application/json,.json" style="display:none;" />
-                                            <button id="ftImportV3Btn" class="btn-secondary btn-import" type="button" title="Import a FilterTube export or any compatible JSON (BlockTube, other tools, etc.)">
-                                                Choose JSON
-                                            </button>
+                                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                                            <button id="ftSetMasterPinBtn" class="btn-secondary" type="button">Set / Change Master PIN</button>
+                                            <button id="ftClearMasterPinBtn" class="btn-secondary" type="button">Remove Master PIN</button>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
 
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>Profiles</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="import-export-hint" style="margin-bottom:10px;">
-                                Profiles are independent. The <code>Default</code> profile acts as admin for full backups and managing other profiles.
-                            </div>
-                            <div id="ftProfilesManager" class="help-list"></div>
-                            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
-                                <button id="ftCreateAccountBtn" class="btn-secondary" type="button">Create Account</button>
-                                <button id="ftCreateChildBtn" class="btn-secondary" type="button">Create Child</button>
-                            </div>
-                        </div>
-                    </div>
+                            <div class="settings-system">
+                                <div class="card settings-card">
+                                    <div class="card-header">
+                                        <h3>Backups</h3>
+                                    </div>
+                                    <div class="card-body settings-card__body">
+                                        <div class="toggle-row" title="When enabled, FilterTube will automatically save timestamped backups after you add/remove channels or keywords and after major settings changes.">
+                                            <div class="toggle-info">
+                                                <div class="toggle-title">Enable Auto Backup</div>
+                                            </div>
+                                            <label class="switch">
+                                                <input id="setting_autoBackupEnabled" type="checkbox" data-ft-setting="autoBackupEnabled" />
+                                                <span class="slider round"></span>
+                                            </label>
+                                        </div>
+                                        <div class="toggle-row" title="Controls whether auto backups overwrite a single Latest file or keep a small timestamped history.">
+                                            <div class="toggle-info">
+                                                <div class="toggle-title">Auto backup mode</div>
+                                            </div>
+                                            <select id="ftAutoBackupMode" class="select-input" style="min-width:200px;">
+                                                <option value="latest">Latest (single file)</option>
+                                                <option value="history">History (timestamped)</option>
+                                            </select>
+                                        </div>
+                                        <div class="toggle-row" title="Auto uses encryption automatically when this profile has a PIN.">
+                                            <div class="toggle-info">
+                                                <div class="toggle-title">Auto backup format</div>
+                                            </div>
+                                            <select id="ftAutoBackupFormat" class="select-input" style="min-width:200px;">
+                                                <option value="auto">Auto (encrypt if PIN is set)</option>
+                                                <option value="plain">Plain JSON</option>
+                                                <option value="encrypted">Encrypted</option>
+                                            </select>
+                                        </div>
+                                        <div class="import-export-hint" style="margin-top:10px;">
+                                            Auto backups are saved to <code>"Downloads/FilterTube Backup/"</code>.
+                                        </div>
+                                    </div>
+                                </div>
 
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>Security</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="import-export-hint" style="margin-bottom:10px;">
-                                Master PIN locks the Default profile and controls admin actions like full backups and managing other profiles.
-                            </div>
-                            <div class="toggle-row" title="When enabled, the Default (Master) profile can create new independent accounts.">
-                                <div class="toggle-info">
-                                    <div class="toggle-title">Allow independent account creation</div>
+                                <div class="card settings-card">
+                                    <div class="card-header">
+                                        <h3>YT Kids → YT Main Sync</h3>
+                                    </div>
+                                    <div class="card-body settings-card__body">
+                                        <div class="toggle-row" title="When enabled, channels and keywords blocked on YouTube Kids are also applied on main YouTube for this profile.">
+                                            <div class="toggle-info">
+                                                <div class="toggle-title">Apply YT Kids blocklist on YouTube</div>
+                                            </div>
+                                            <label class="switch">
+                                                <input id="setting_syncKidsToMain" type="checkbox" data-ft-setting="syncKidsToMain" />
+                                                <span class="slider round"></span>
+                                            </label>
+                                        </div>
+                                        <div class="import-export-hint" style="margin-top:10px;">
+                                            Synced items show in your main list with a <code>"From Kids"</code> badge.
+                                        </div>
+                                    </div>
                                 </div>
-                                <label class="switch">
-                                    <input id="ftAllowAccountCreation" type="checkbox" />
-                                    <span class="slider round"></span>
-                                </label>
-                            </div>
-                            <div class="toggle-row" title="Limits how many independent accounts can exist (excluding Default).">
-                                <div class="toggle-info">
-                                    <div class="toggle-title">Max independent accounts</div>
-                                </div>
-                                <input id="ftMaxAccounts" class="text-input" type="number" min="0" step="1" style="max-width:120px;" />
-                            </div>
-                            <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                                <button id="ftSetMasterPinBtn" class="btn-secondary" type="button">Set / Change Master PIN</button>
-                                <button id="ftClearMasterPinBtn" class="btn-secondary" type="button">Remove Master PIN</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>Backups</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="toggle-row" title="When enabled, FilterTube will automatically save timestamped backups after you add/remove channels or keywords and after major settings changes.">
-                                <div class="toggle-info">
-                                    <div class="toggle-title">Enable Auto Backup</div>
-                                </div>
-                                <label class="switch">
-                                    <input id="setting_autoBackupEnabled" type="checkbox" data-ft-setting="autoBackupEnabled" />
-                                    <span class="slider round"></span>
-                                </label>
-                            </div>
-                            <div class="toggle-row" title="Controls whether auto backups overwrite a single Latest file or keep a small timestamped history.">
-                                <div class="toggle-info">
-                                    <div class="toggle-title">Auto backup mode</div>
-                                </div>
-                                <select id="ftAutoBackupMode" class="select-input" style="min-width:200px;">
-                                    <option value="latest">Latest (single file)</option>
-                                    <option value="history">History (timestamped)</option>
-                                </select>
-                            </div>
-                            <div class="toggle-row" title="Auto uses encryption automatically when this profile has a PIN.">
-                                <div class="toggle-info">
-                                    <div class="toggle-title">Auto backup format</div>
-                                </div>
-                                <select id="ftAutoBackupFormat" class="select-input" style="min-width:200px;">
-                                    <option value="auto">Auto (encrypt if PIN is set)</option>
-                                    <option value="plain">Plain JSON</option>
-                                    <option value="encrypted">Encrypted</option>
-                                </select>
-                            </div>
-                            <div class="import-export-hint" style="margin-top:10px;">
-                                Auto backups are saved to <code>"Downloads/FilterTube Backup/"</code>.
                             </div>
                         </div>
                     </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>YT Kids → YT Main Sync</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="toggle-row" title="When enabled, channels and keywords blocked on YouTube Kids are also applied on main YouTube for this profile.">
-                                <div class="toggle-info">
-                                    <div class="toggle-title">Apply YT Kids blocklist on YouTube</div>
-                                </div>
-                                <label class="switch">
-                                    <input id="setting_syncKidsToMain" type="checkbox" data-ft-setting="syncKidsToMain" />
-                                    <span class="slider round"></span>
-                                </label>
-                            </div>
-                            <div class="import-export-hint" style="margin-top:10px;">
-                                Synced items show in your main list with a <code>"From Kids"</code> badge.
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
 
                 <div id="whatsnewView" class="view-section">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>What’s New</h3>
-                        </div>
-                        <div class="card-body">
-                            <p class="whats-new-intro">
-                                FilterTube evolves constantly. Here are the highlights from recent releases so you can discover new tools without digging through the full changelog.
-                            </p>
-                            <div id="releaseNotesList" class="release-notes-list">
-                                <div class="release-notes-empty">Loading release notes…</div>
+                    <div class="view-shell view-shell--whatsnew whatsnew-shell">
+                        <section class="view-hero whatsnew-hero">
+                            <div class="view-hero__copy">
+                                <p class="view-hero__eyebrow">Release track</p>
+                                <h2 class="view-hero__title">Follow what FilterTube shipped without digging through the whole project history.</h2>
+                                <p class="view-hero__body">New controls, UI improvements, and behavior changes land here first so you can see what is already live today.</p>
                             </div>
-                        </div>
+                            <div class="view-hero__meta">
+                                <span class="view-meta-pill">Current version: v3.2.7</span>
+                                <span class="view-meta-pill">Desktop release cadence</span>
+                            </div>
+                        </section>
+                        <section class="card whatsnew-feed">
+                            <div class="card-body">
+                                <div id="releaseNotesList" class="release-notes-list">
+                                    <div class="release-notes-empty">Loading release notes…</div>
+                                </div>
+                            </div>
+                        </section>
                     </div>
                 </div>
 
                 <div id="helpView" class="view-section">
-                    <div class="card">
-                        <input type="text" id="helpSearchInput" class="search-input" placeholder="Search help..." style="width:100%;border-radius:0;border-left:none;border-right:none;" />
-                        <div id="helpSearchEmpty" class="import-export-hint" style="display:none;margin:8px 16px 12px;">No help topics match your search.</div>
-                    </div>
+                    <div class="view-shell view-shell--help help-shell">
+                        <section class="view-hero help-hero">
+                            <div class="view-hero__copy">
+                                <p class="view-hero__eyebrow">Help and reference</p>
+                                <h2 class="view-hero__title">Learn the product quickly without losing the thread of what already ships.</h2>
+                                <p class="view-hero__body">Search the basics, understand how rules behave, and check profile or Kids behavior without leaving the app-style flow.</p>
+                            </div>
+                        </section>
 
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>UI Legend (Badges & Pills)</h3>
+                        <div class="help-toolbar">
+                            <div class="card help-toolbar-card">
+                                <input type="text" id="helpSearchInput" class="search-input" placeholder="Search help..." style="width:100%;border-radius:0;border-left:none;border-right:none;" />
+                                <div id="helpSearchEmpty" class="import-export-hint" style="display:none;margin:8px 16px 12px;">No help topics match your search.</div>
+                            </div>
                         </div>
-                        <div class="card-body">
-                            <div class="help-list">
-                                <div class="help-item">
-                                    <div class="help-item-title">Source badges on rows</div>
-                                    <div class="help-item-body">
-                                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                                            <span class="channel-derived-badge">From Channel</span>
-                                            <span class="channel-derived-badge badge-variant-comments">From Comments</span>
-                                            <span class="collaboration-badge">Collaboration</span>
-                                            <span class="channel-derived-badge badge-variant-kids">From Kids</span>
+
+                        <div class="help-cluster help-cluster--basics">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>UI Legend (Badges & Pills)</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="help-list">
+                                        <div class="help-item">
+                                            <div class="help-item-title">Source badges on rows</div>
+                                            <div class="help-item-body">
+                                                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                                                    <span class="channel-derived-badge">From Channel</span>
+                                                    <span class="channel-derived-badge badge-variant-comments">From Comments</span>
+                                                    <span class="collaboration-badge">Collaboration</span>
+                                                    <span class="channel-derived-badge badge-variant-kids">From Kids</span>
+                                                </div>
+                                                <div style="margin-top:6px;">Badges match row tinting: green for channel-derived, brown for comment-sourced, yellow for collaborations, Pink for YT Kids Derived.</div>
+                                            </div>
                                         </div>
-                                        <div style="margin-top:6px;">Badges match row tinting: green for channel-derived, brown for comment-sourced, yellow for collaborations, Pink for YT Kids Derived.</div>
-                                    </div>
-                                </div>
-                                <div class="help-item">
-                                    <div class="help-item-title">Pills & row chips</div>
-                                    <div class="help-item-body">
-                                        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-                                            <span class="exact-toggle">Exact</span>
-                                            <span class="exact-toggle active">Exact</span>
-                                            <span class="exact-toggle active" aria-hidden="true" style="border-radius:999px;width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;padding:0;">E</span>
-                                            <span style="font-size:13px;color:var(--ft-color-text-secondary);margin-left:6px;">Exact is whole-term matching.</span>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Pills & row chips</div>
+                                            <div class="help-item-body">
+                                                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                                                    <span class="exact-toggle">Exact</span>
+                                                    <span class="exact-toggle active">Exact</span>
+                                                    <span class="exact-toggle active" aria-hidden="true" style="border-radius:999px;width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;padding:0;">E</span>
+                                                    <span style="font-size:13px;color:var(--ft-color-text-secondary);margin-left:6px;">Exact is whole-term matching.</span>
+                                                </div>
+                                                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px;">
+                                                    <span class="exact-toggle toggle-variant-blue">Comment</span>
+                                                    <span class="exact-toggle toggle-variant-blue active">Comment</span>
+                                                    <span class="exact-toggle toggle-variant-blue active" aria-hidden="true" style="border-radius:999px;width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;padding:0;">C</span>
+                                                    <span style="font-size:13px;color:var(--ft-color-text-secondary);margin-left:6px;">Comment defaults ON; turn off to let matching comments through (even if Hide Comments is on).</span>
+                                                </div>
+                                                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px;">
+                                                    <span class="exact-toggle toggle-variant-red active">Filter All</span>
+                                                    <span style="font-size:13px;color:var(--ft-color-text-secondary);margin-left:6px;">Creates a channel-derived keyword with Exact on the channel name.</span>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px;">
-                                            <span class="exact-toggle toggle-variant-blue">Comment</span>
-                                            <span class="exact-toggle toggle-variant-blue active">Comment</span>
-                                            <span class="exact-toggle toggle-variant-blue active" aria-hidden="true" style="border-radius:999px;width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;padding:0;">C</span>
-                                            <span style="font-size:13px;color:var(--ft-color-text-secondary);margin-left:6px;">Comment defaults ON; turn off to let matching comments through (even if Hide Comments is on).</span>
-                                        </div>
-                                        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px;">
-                                            <span class="exact-toggle toggle-variant-red active">Filter All</span>
-                                            <span style="font-size:13px;color:var(--ft-color-text-secondary);margin-left:6px;">Creates a channel-derived keyword with Exact on the channel name.</span>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Content control tooltips</div>
+                                            <div class="help-item-body">
+                                                Hover the toggle title to see its description (tab view only). Popups keep the concise title-only view. Tooltip is bound to the title text, not the whole row.
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="help-item">
-                                    <div class="help-item-title">Content control tooltips</div>
-                                    <div class="help-item-body">
-                                        Hover the toggle title to see its description (tab view only). Popups keep the concise title-only view. Tooltip is bound to the title text, not the whole row.
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>How FilterTube Works</h3>
+                                </div>
+                                <div class="card-body">
+                                    <p>FilterTube uses a hybrid approach to hide content across YouTube:</p>
+                                    <div class="help-list">
+                                        <div class="help-item">
+                                            <div class="help-item-title">Data interception (Zero-flash when possible)</div>
+                                            <div class="help-item-body">When YouTube loads content via JSON, FilterTube removes blocked items before they render.</div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">DOM fallback (Safety net)</div>
+                                            <div class="help-item-body">For SPA navigation, hydration, and recycled DOM nodes, FilterTube scans the page and hides blocked elements.</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>How FilterTube Works</h3>
-                        </div>
-                        <div class="card-body">
-                            <p>FilterTube uses a hybrid approach to hide content across YouTube:</p>
-                            <div class="help-list">
-                                <div class="help-item">
-                                    <div class="help-item-title">Data interception (Zero-flash when possible)</div>
-                                    <div class="help-item-body">When YouTube loads content via JSON, FilterTube removes blocked items before they render.</div>
+                        <div class="help-cluster help-cluster--filters">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>Channel Identifiers</h3>
                                 </div>
-                                <div class="help-item">
-                                    <div class="help-item-title">DOM fallback (Safety net)</div>
-                                    <div class="help-item-body">For SPA navigation, hydration, and recycled DOM nodes, FilterTube scans the page and hides blocked elements.</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>Channel Identifiers</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="help-list">
-                                <div class="help-item">
-                                    <div class="help-item-title">UC Channel ID (recommended)</div>
-                                    <div class="help-item-body">A stable identifier like <b><code>UCxjr9iAaC5QaIbp5hlERHDQ</code></b>. This is the most reliable way to block a channel.</div>
-                                </div>
-                                <div class="help-item">
-                                    <div class="help-item-title">@handle (supports unicode)</div>
-                                    <div class="help-item-body">Handles like <b><code>@감동메모리</code></b> or <b><code>@BTS</code></b>. FilterTube normalizes percent-encoding and unicode so handles match everywhere.</div>
-                                </div>
-                                <div class="help-item">
-                                    <div class="help-item-title">Legacy channel URLs</div>
-                                    <div class="help-item-body">Some channels appear as <b><code>/c/Name</code></b> or <b><code>/user/Name</code></b>. FilterTube stores them as normalized <b><code>c/name</code></b> or <b><code>user/name</code></b> and maps them to a <b>UC ID</b> when possible.</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>Filters</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="help-list">
-                                <div class="help-item">
-                                    <div class="help-item-title">Keywords</div>
-                                    <div class="help-item-body">Add keywords to hide videos (and optionally comments) whose title/text matches your list.</div>
-                                </div>
-                                <div class="help-item">
-                                    <div class="help-item-title">Exact</div>
-                                    <div class="help-item-body">When enabled, keyword matching is stricter (useful for short words that cause false matches).</div>
-                                </div>
-                                <div class="help-item">
-                                    <div class="help-item-title">Channels</div>
-                                    <div class="help-item-body">Add a channel by <b><code>UC...</code></b> or <b><code>@handle</code></b> or <b><code>/c/Name</code></b> or <b><code>/user/Name</code></b>. <br/>Channels blocked from the YouTube 3-dot menu will appear here automatically.</div>
-                                </div>
-                                <div class="help-item">
-                                    <div class="help-item-title">Filter All Content (per-channel)</div>
-                                    <div class="help-item-body">Adds the channel name as a keyword source so content mentioning that channel is also hidden (useful for Mixes, reposts, and recommendations).</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>Whitelist Mode</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="help-list">
-                                <div class="help-item">
-                                    <div class="help-item-title">What is Whitelist Mode?</div>
-                                    <div class="help-item-body">Whitelist Mode flips traditional filtering: instead of hiding blocked content, it hides <strong>everything except</strong> content from whitelisted channels and keywords. Perfect for creating an "allow-only" feed.</div>
-                                </div>
-                                <div class="help-item">
-                                    <div class="help-item-title">How to Build Your Whitelist</div>
-                                    <div class="help-item-body">
-                                        <p>FilterTube reuses the same workflow as blocklist building:</p>
-                                        <ol style="margin: 8px 0; padding-left: 20px;">
-                                            <li><strong>Switch to Blocklist Mode:</strong> Start in blocklist mode to browse freely</li>
-                                            <li><strong>Add Channels via 3-dot Menu:</strong> Use YouTube's "Block Channel" menu on videos you <em>want</em> to allow</li>
-                                            <li><strong>Switch to Whitelist Mode:</strong> Toggle the mode switch - your blocked channels become your allowed channels</li>
-                                            <li><strong>Enjoy Clean Feed:</strong> Only whitelisted channels and keywords will appear</li>
-                                        </ol>
+                                <div class="card-body">
+                                    <div class="help-list">
+                                        <div class="help-item">
+                                            <div class="help-item-title">UC Channel ID (recommended)</div>
+                                            <div class="help-item-body">A stable identifier like <b><code>UCxjr9iAaC5QaIbp5hlERHDQ</code></b>. This is the most reliable way to block a channel.</div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">@handle (supports unicode)</div>
+                                            <div class="help-item-body">Handles like <b><code>@감동메모리</code></b> or <b><code>@BTS</code></b>. FilterTube normalizes percent-encoding and unicode so handles match everywhere.</div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Legacy channel URLs</div>
+                                            <div class="help-item-body">Some channels appear as <b><code>/c/Name</code></b> or <b><code>/user/Name</code></b>. FilterTube stores them as normalized <b><code>c/name</code></b> or <b><code>user/name</code></b> and maps them to a <b>UC ID</b> when possible.</div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="help-item">
-                                    <div class="help-item-title">Whitelist Mode Logic</div>
-                                    <div class="help-item-body">
-                                        <p>When in whitelist mode, FilterTube:</p>
-                                        <ul style="margin: 8px 0; padding-left: 20px;">
-                                            <li><strong>Hides by default:</strong> All content is hidden unless it matches whitelist rules</li>
-                                            <li><strong>Checks channels:</strong> Shows content from channels in <code>whitelistChannels</code> list</li>
-                                            <li><strong>Checks keywords:</strong> Shows content with titles matching <code>whitelistKeywords</code> patterns</li>
-                                            <li><strong>Preserves functionality:</strong> Watch pages and playlists work normally for allowed content</li>
-                                        </ul>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>Filters</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="help-list">
+                                        <div class="help-item">
+                                            <div class="help-item-title">Keywords</div>
+                                            <div class="help-item-body">Add keywords to hide videos (and optionally comments) whose title/text matches your list.</div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Exact</div>
+                                            <div class="help-item-body">When enabled, keyword matching is stricter (useful for short words that cause false matches).</div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Channels</div>
+                                            <div class="help-item-body">Add a channel by <b><code>UC...</code></b> or <b><code>@handle</code></b> or <b><code>/c/Name</code></b> or <b><code>/user/Name</code></b>. <br/>Channels blocked from the YouTube 3-dot menu will appear here automatically.</div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Filter All Content (per-channel)</div>
+                                            <div class="help-item-body">Adds the channel name as a keyword source so content mentioning that channel is also hidden (useful for Mixes, reposts, and recommendations).</div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="help-item">
-                                    <div class="help-item-title">Mode Switching</div>
-                                    <div class="help-item-body">Toggle between Blocklist and Whitelist modes using the top bar controls. FilterTube provides confirmation dialogs when switching to prevent accidental data loss, and automatically migrates your current blocklist to become your whitelist.</div>
-                                </div>
                             </div>
-                        </div>
-                    </div>
 
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>Content Controls</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="help-list">
-                                <div class="help-item">
-                                    <div class="help-item-title">Hide Shorts</div>
-                                    <div class="help-item-body">Hides Shorts cards across YouTube surfaces.</div>
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>Whitelist Mode</h3>
                                 </div>
-                                <div class="help-item">
-                                    <div class="help-item-title">Hide All Comments</div>
-                                    <div class="help-item-body">Removes comment sections entirely.</div>
-                                </div>
-                                <div class="help-item">
-                                    <div class="help-item-title">Filter Comments</div>
-                                    <div class="help-item-body">Hides only comments that match your keywords (disabled if Hide All Comments is enabled).</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>Watch Page Playlists</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="help-list">
-                                <div class="help-item">
-                                    <div class="help-item-title">Playlist panel hiding</div>
-                                    <div class="help-item-body">FilterTube hides blocked-channel rows inside the watch-page playlist panel, including after refresh and scroll/load-more.</div>
-                                </div>
-                                <div class="help-item">
-                                    <div class="help-item-title">No-flash Next/Prev skipping</div>
-                                    <div class="help-item-body">When Next/Prev would land on a blocked item, FilterTube redirects to the next visible item before playback is visible.</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>Import &amp; Export backups</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="help-list">
-                                <div class="help-item">
-                                    <div class="help-item-title">Export</div>
-                                    <div class="help-item-body">
-                                        <ul>
-                                            <li><strong>Full vs Active-only:</strong> Master (Default) can export all profiles; non-master is forced to “Export active profile only”.</li>
-                                            <li><strong>Formats:</strong> Plain JSON or Encrypted; encrypted exports require a PIN at import.</li>
-                                            <li><strong>Destination:</strong> <code>Downloads/FilterTube Export/</code> with versioned filename.</li>
-                                        </ul>
+                                <div class="card-body">
+                                    <div class="help-list">
+                                        <div class="help-item">
+                                            <div class="help-item-title">What is Whitelist Mode?</div>
+                                            <div class="help-item-body">Whitelist Mode flips traditional filtering: instead of hiding blocked content, it hides <strong>everything except</strong> content from whitelisted channels and keywords. Perfect for creating an "allow-only" feed.</div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">How to Build Your Whitelist</div>
+                                            <div class="help-item-body">
+                                                <p>FilterTube reuses the same workflow as blocklist building:</p>
+                                                <ol style="margin: 8px 0; padding-left: 20px;">
+                                                    <li><strong>Switch to Blocklist Mode:</strong> Start in blocklist mode to browse freely</li>
+                                                    <li><strong>Add Channels via 3-dot Menu:</strong> Use YouTube's "Block Channel" menu on videos you <em>want</em> to allow</li>
+                                                    <li><strong>Switch to Whitelist Mode:</strong> Toggle the mode switch - your blocked channels become your allowed channels</li>
+                                                    <li><strong>Enjoy Clean Feed:</strong> Only whitelisted channels and keywords will appear</li>
+                                                </ol>
+                                            </div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Whitelist Mode Logic</div>
+                                            <div class="help-item-body">
+                                                <p>When in whitelist mode, FilterTube:</p>
+                                                <ul style="margin: 8px 0; padding-left: 20px;">
+                                                    <li><strong>Hides by default:</strong> All content is hidden unless it matches whitelist rules</li>
+                                                    <li><strong>Checks channels:</strong> Shows content from channels in <code>whitelistChannels</code> list</li>
+                                                    <li><strong>Checks keywords:</strong> Shows content with titles matching <code>whitelistKeywords</code> patterns</li>
+                                                    <li><strong>Preserves functionality:</strong> Watch pages and playlists work normally for allowed content</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Mode Switching</div>
+                                            <div class="help-item-body">Toggle between Blocklist and Whitelist modes using the top bar controls. FilterTube provides confirmation dialogs when switching to prevent accidental data loss, and automatically migrates your current blocklist to become your whitelist.</div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="help-item">
-                                    <div class="help-item-title">Import</div>
-                                    <div class="help-item-body">
-                                        <ul>
-                                            <li>Merges channels/keywords; matching entries update, new ones append. Profiles in the file are restored as-is.</li>
-                                            <li>Encrypted imports prompt for the PIN. Admin-only actions (full restore) require unlocking Master.</li>
-                                            <li>Auto-backup settings and modes from the backup are applied per profile.</li>
-                                        </ul>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>Content Controls</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="help-list">
+                                        <div class="help-item">
+                                            <div class="help-item-title">Hide Shorts</div>
+                                            <div class="help-item-body">Hides Shorts cards across YouTube surfaces.</div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Hide All Comments</div>
+                                            <div class="help-item-body">Removes comment sections entirely.</div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Filter Comments</div>
+                                            <div class="help-item-body">Hides only comments that match your keywords (disabled if Hide All Comments is enabled).</div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="help-item">
-                                    <div class="help-item-title">Auto-backup</div>
-                                    <div class="help-item-body">
-                                        <ul>
-                                            <li>Per-profile toggle; mode (Latest/History) and format (Plain/Encrypted/Auto) follow the active profile.</li>
-                                            <li>Backups save to <code>Downloads/FilterTube Backup/</code>. Encrypted backups require a verified PIN to create.</li>
-                                            <li>Popup and New Tab both respect lock state: controls disable when locked.</li>
-                                        </ul>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>Watch Page Playlists</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="help-list">
+                                        <div class="help-item">
+                                            <div class="help-item-title">Playlist panel hiding</div>
+                                            <div class="help-item-body">FilterTube hides blocked-channel rows inside the watch-page playlist panel, including after refresh and scroll/load-more.</div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">No-flash Next/Prev skipping</div>
+                                            <div class="help-item-body">When Next/Prev would land on a blocked item, FilterTube redirects to the next visible item before playback is visible.</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>Profiles &amp; PIN behavior</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="help-list">
-                                <div class="help-item">
-                                    <div class="help-item-title">Profile types</div>
-                                    <div class="help-item-body">
-                                        <ul>
-                                            <li><strong>Default (Master):</strong> Admin for full exports, profile management, and account policy.</li>
-                                            <li><strong>Account:</strong> Independent profile; can have child profiles.</li>
-                                            <li><strong>Child:</strong> Follows parent; UI gating uses locks/PINs.</li>
-                                        </ul>
+                        <div class="help-cluster help-cluster--accounts">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>Import &amp; Export backups</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="help-list">
+                                        <div class="help-item">
+                                            <div class="help-item-title">Export</div>
+                                            <div class="help-item-body">
+                                                <ul>
+                                                    <li><strong>Full vs Active-only:</strong> Master (Default) can export all profiles; non-master is forced to “Export active profile only”.</li>
+                                                    <li><strong>Formats:</strong> Plain JSON or Encrypted; encrypted exports require a PIN at import.</li>
+                                                    <li><strong>Destination:</strong> <code>Downloads/FilterTube Export/</code> with versioned filename.</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Import</div>
+                                            <div class="help-item-body">
+                                                <ul>
+                                                    <li>Merges channels/keywords; matching entries update, new ones append. Profiles in the file are restored as-is.</li>
+                                                    <li>Encrypted imports prompt for the PIN. Admin-only actions (full restore) require unlocking Master.</li>
+                                                    <li>Auto-backup settings and modes from the backup are applied per profile.</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Auto-backup</div>
+                                            <div class="help-item-body">
+                                                <ul>
+                                                    <li>Per-profile toggle; mode (Latest/History) and format (Plain/Encrypted/Auto) follow the active profile.</li>
+                                                    <li>Backups save to <code>Downloads/FilterTube Backup/</code>. Encrypted backups require a verified PIN to create.</li>
+                                                    <li>Popup and New Tab both respect lock state: controls disable when locked.</li>
+                                                </ul>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="help-item">
-                                    <div class="help-item-title">Locks &amp; PINs</div>
-                                    <div class="help-item-body">
-                                        <ul>
-                                            <li>Locked profiles disable toggles and auto-backup controls until unlocked.</li>
-                                            <li>Encrypted exports/backups need the profile’s PIN; Master unlock is required for admin actions.</li>
-                                            <li>Unlock is per-session in both Popup and New Tab.</li>
-                                        </ul>
-                                    </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>Profiles &amp; PIN behavior</h3>
                                 </div>
-                                <div class="help-item">
-                                    <div class="help-item-title">Auto-backup &amp; actions</div>
-                                    <div class="help-item-body">
-                                        <ul>
-                                            <li>New profiles inherit the creator’s auto-backup mode/format/enable state.</li>
-                                            <li>Scheduling runs on profile creation and mode/format changes only if auto-backup is enabled for that profile.</li>
-                                            <li>Export scope toggle is disabled/forced to active-only for non-master; enabled for Master.</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="help-item">
-                                    <div class="help-item-title">Where to change things</div>
-                                    <div class="help-item-body">
-                                        <ul>
-                                            <li><strong>Popup:</strong> Quick toggle changes; respects locks/PINs; auto-backup controls visible when enabled.</li>
-                                            <li><strong>New Tab:</strong> Full profile management (create/rename/delete, PIN set/remove), export/import, auto-backup mode/format.</li>
-                                        </ul>
+                                <div class="card-body">
+                                    <div class="help-list">
+                                        <div class="help-item">
+                                            <div class="help-item-title">Profile types</div>
+                                            <div class="help-item-body">
+                                                <ul>
+                                                    <li><strong>Default (Master):</strong> Admin for full exports, profile management, and account policy.</li>
+                                                    <li><strong>Account:</strong> Independent profile; can have child profiles.</li>
+                                                    <li><strong>Child:</strong> Follows parent; UI gating uses locks/PINs.</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Locks &amp; PINs</div>
+                                            <div class="help-item-body">
+                                                <ul>
+                                                    <li>Locked profiles disable toggles and auto-backup controls until unlocked.</li>
+                                                    <li>Encrypted exports/backups need the profile’s PIN; Master unlock is required for admin actions.</li>
+                                                    <li>Unlock is per-session in both Popup and New Tab.</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Auto-backup &amp; actions</div>
+                                            <div class="help-item-body">
+                                                <ul>
+                                                    <li>New profiles inherit the creator’s auto-backup mode/format/enable state.</li>
+                                                    <li>Scheduling runs on profile creation and mode/format changes only if auto-backup is enabled for that profile.</li>
+                                                    <li>Export scope toggle is disabled/forced to active-only for non-master; enabled for Master.</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Where to change things</div>
+                                            <div class="help-item-body">
+                                                <ul>
+                                                    <li><strong>Popup:</strong> Quick toggle changes; respects locks/PINs; auto-backup controls visible when enabled.</li>
+                                                    <li><strong>New Tab:</strong> Full profile management (create/rename/delete, PIN set/remove), export/import, auto-backup mode/format.</li>
+                                                </ul>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>YouTube Kids Integration</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="help-list">
-                                <div class="help-item">
-                                    <div class="help-item-title">Passive Listening on YouTube Kids</div>
-                                    <div class="help-item-body">FilterTube provides complete Channel & Keyword based blocking on YouTube Kids by passively listening to the 3-dot menu UI in YT Kids content cards ("Block this video" and "Block this channel").</div>
+                        <div class="help-cluster help-cluster--kids">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>YouTube Kids Integration</h3>
                                 </div>
-                                <div class="help-item">
-                                    <div class="help-item-title">YouTube's Native Blocking vs FilterTube</div>
-                                    <div class="help-item-body">When parents block channels using YouTube Kids' native 3-dot menu, those blocks are managed by YouTube's system. FilterTube maintains its own separate blocklist for Kids Mode, giving you additional control and backup options.</div>
-                                </div>
-                                <div class="help-item">
-                                    <div class="help-item-title">Understanding Channel Blocking Behavior</div>
-                                    <div class="help-item-body">
-                                        <p>Parents should understand YouTube's complex channel blocking system:</p>
-                                        <ul style="margin: 8px 0; padding-left: 20px;">
-                                            <li>Channels blocked via YouTube Kids' native UI are managed by YouTube's system</li>
-                                            <li>FilterTube's passive listener creates entries in its own Kids Mode blocklist</li>
-                                            <li>If a channel doesn't appear after removing from FilterTube's list, it may still be blocked by YouTube's native system</li>
-                                            <li>Use YouTube's official unblocking process for native blocks: <a href="https://support.google.com/youtubekids/answer/7178746?hl=en#zippy=%2Cunblock-individual-channels-from-youtube-using-your-linked-parent-account" target="_blank" rel="noopener noreferrer">Unblock channels from YouTube using your linked parent account</a></li>
-                                        </ul>
+                                <div class="card-body">
+                                    <div class="help-list">
+                                        <div class="help-item">
+                                            <div class="help-item-title">Passive Listening on YouTube Kids</div>
+                                            <div class="help-item-body">FilterTube provides complete Channel & Keyword based blocking on YouTube Kids by passively listening to the 3-dot menu UI in YT Kids content cards ("Block this video" and "Block this channel").</div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">YouTube's Native Blocking vs FilterTube</div>
+                                            <div class="help-item-body">When parents block channels using YouTube Kids' native 3-dot menu, those blocks are managed by YouTube's system. FilterTube maintains its own separate blocklist for Kids Mode, giving you additional control and backup options.</div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Understanding Channel Blocking Behavior</div>
+                                            <div class="help-item-body">
+                                                <p>Parents should understand YouTube's complex channel blocking system:</p>
+                                                <ul style="margin: 8px 0; padding-left: 20px;">
+                                                    <li>Channels blocked via YouTube Kids' native UI are managed by YouTube's system</li>
+                                                    <li>FilterTube's passive listener creates entries in its own Kids Mode blocklist</li>
+                                                    <li>If a channel doesn't appear after removing from FilterTube's list, it may still be blocked by YouTube's native system</li>
+                                                    <li>Use YouTube's official unblocking process for native blocks: <a href="https://support.google.com/youtubekids/answer/7178746?hl=en#zippy=%2Cunblock-individual-channels-from-youtube-using-your-linked-parent-account" target="_blank" rel="noopener noreferrer">Unblock channels from YouTube using your linked parent account</a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Parent Account Integration</div>
+                                            <div class="help-item-body">YouTube Kids blocking requires a verified parent account. Parents can block content from their child's YouTube Kids profile and share content from YouTube to their child's profile. See <a href="https://support.google.com/youtubekids/answer/7178746?hl=en" target="_blank" rel="noopener noreferrer">YouTube Kids Help Center</a> for complete details.</div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="help-item">
-                                    <div class="help-item-title">Parent Account Integration</div>
-                                    <div class="help-item-body">YouTube Kids blocking requires a verified parent account. Parents can block content from their child's YouTube Kids profile and share content from YouTube to their child's profile. See <a href="https://support.google.com/youtubekids/answer/7178746?hl=en" target="_blank" rel="noopener noreferrer">YouTube Kids Help Center</a> for complete details.</div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>Troubleshooting</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="help-list">
-                                <div class="help-item">
-                                    <div class="help-item-title">"Failed to fetch" while blocking</div>
-                                    <div class="help-item-body">If FilterTube already knows the channel UC ID, it can still persist the block even if fetching the logo/name fails. Try reloading if the UI doesn't update immediately.</div>
+                        <div class="help-cluster help-cluster--support">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>Troubleshooting</h3>
                                 </div>
-                                <div class="help-item">
-                                    <div class="help-item-title">Blocked channel still appears</div>
-                                    <div class="help-item-body">YouTube sometimes reuses DOM nodes during SPA navigation. FilterTube re-scans and clears stale cached metadata, but a hard refresh can help confirm persistence.</div>
+                                <div class="card-body">
+                                    <div class="help-list">
+                                        <div class="help-item">
+                                            <div class="help-item-title">"Failed to fetch" while blocking</div>
+                                            <div class="help-item-body">If FilterTube already knows the channel UC ID, it can still persist the block even if fetching the logo/name fails. Try reloading if the UI doesn't update immediately.</div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Blocked channel still appears</div>
+                                            <div class="help-item-body">YouTube sometimes reuses DOM nodes during SPA navigation. FilterTube re-scans and clears stale cached metadata, but a hard refresh can help confirm persistence.</div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -834,60 +929,51 @@
                 </div>
 
                 <div id="donateView" class="view-section">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>Support FilterTube</h3>
-                        </div>
-                        <div class="card-body">
-                            <p>
-                                FilterTube is built and maintained independently, with a strong focus on privacy, performance, and long-term usability.
-                                The project has grown significantly thanks to user feedback, and many of you asked for a way to support its continued development.
-                            </p>
-                            <p>
-                                Most of the engineering work, architecture decisions, and ongoing maintenance are handled with the help of LLMs, which acts as a core development assistant helping write code, review changes, debug complex issues, and manage the project structure.
-                                This setup allows FilterTube to move fast while staying robust.
-                            </p>
-                            <p style="margin-bottom:12px;">Support from users directly helps with:</p>
-                            <ul style="margin: 8px 0 14px; padding-left: 20px;">
-                                <li>Covering AI tooling and development subscriptions</li>
-                                <li>Sustaining long-term maintenance and rapid bug fixes</li>
-                                <li>Funding upcoming work on <b>mobile apps (iOS &amp; Android)</b></li>
-                                <li>Paying platform and developer program fees (Apple, Google, etc.)</li>
-                            </ul>
-                            <p>
-                                FilterTube remains <b>fully functional without any payment</b>.
-                                There are <b>no features locked behind a paywall</b>.
-                                Support is completely optional and exists only because users explicitly asked for it.
-                            </p>
-
-                            <div class="support-actions">
-                                <button id="openKofiBtn" class="btn-primary" type="button">Support on Ko-fi</button>
+                    <div class="view-shell view-shell--donate donate-shell">
+                        <section class="view-hero donate-hero">
+                            <div class="view-hero__copy">
+                                <p class="view-hero__eyebrow">Support the product</p>
+                                <h2 class="view-hero__title">Help FilterTube keep growing across desktop, mobile, tablet, and TV without compromising trust.</h2>
+                                <p class="view-hero__body">Support is optional, the product stays fully usable, and contributions go toward maintenance, faster fixes, new surfaces, and the developer costs behind shipping them well.</p>
                             </div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <h3>Ko-fi</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="support-disclaimer">
-                                Payments are processed securely by Ko-fi and PayPal. FilterTube does not receive or store any login or payment information.
+                            <div class="donate-hero__details">
+                                <ul class="donate-hero__list">
+                                    <li>Long-term maintenance and faster bug fixes</li>
+                                    <li>Mobile, tablet, and TV product work</li>
+                                    <li>Platform fees, tooling, and release overhead</li>
+                                </ul>
+                                <div class="support-actions">
+                                    <button id="openKofiBtn" class="btn-primary" type="button">Support on Ko-fi</button>
+                                </div>
                             </div>
-                            <iframe id="kofiframe" src="https://ko-fi.com/filtertube/?hidefeed=true&amp;widget=true&amp;embed=true&amp;preview=true" class="support-kofi-iframe" height="712" title="filtertube"></iframe>
+                        </section>
+
+                        <div class="donate-grid">
+                            <div class="card donate-trust">
+                                <div class="card-header">
+                                    <h3>Trust and payment handling</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="support-disclaimer">
+                                        Payments are processed securely by Ko-fi and PayPal. FilterTube does not receive or store any login or payment information.
+                                    </div>
+                                    <p>Support is optional and there are no features locked behind a paywall. The goal is to keep the product sustainable while continuing to ship calm, privacy-first control surfaces.</p>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>
 
             </div>
-        </main> 
- 
- 
- 
- 
- 
- 
- 
+        </main>
+
+
+
+
+
+
+
     <script src="../js/settings_shared.js"></script>
     <script src="../js/security_manager.js"></script>
     <script src="../js/io_manager.js"></script>
@@ -895,6 +981,7 @@
     <script src="../js/ui_components.js"></script>
     <script src="../js/state_manager.js"></script>
     <script src="../js/render_engine.js"></script>
+    <script src="../js/ui-shell/tab-view-decor.js"></script>
     <script src="../js/tab-view.js"></script>
 </body>
 

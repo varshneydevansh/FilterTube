@@ -8,51 +8,14 @@
     <link rel="stylesheet" href="../css/design_tokens.css">
     <link rel="stylesheet" href="../css/components.css">
     <link rel="stylesheet" href="../css/popup.css">
+    <link rel="stylesheet" href="../css/serene-shell.css">
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Crimson+Pro:wght@400;500;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,500;1,600&family=JetBrains+Mono:wght@500;700&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
 </head>
 
 <body>
-    <div class="app-container">
-        <!-- Header -->
-        <header class="app-header">
-            <div id="toggleEnabledBrandBtn" class="brand" role="button" tabindex="0" aria-pressed="true" title="Toggle Filtering">
-                <img src="../icons/icon-48.png" alt="FilterTube" class="logo-icon">
-                <div class="brand-text">
-                    <h1 class="app-title">Filter<span class="title-accent">Tube</span></h1>
-                    <span id="extensionStatusText" class="extension-status">Enabled</span>
-                </div>
-            </div>
-            <div class="header-actions">
-                <div id="ftProfileMenuPopup" class="ft-profile-menu">
-                    <button id="ftProfileBadgeBtnPopup" class="ft-profile-badge" type="button" aria-haspopup="listbox" aria-expanded="false" title="Active profile"></button>
-                    <div id="ftProfileDropdownPopup" class="ft-profile-dropdown" role="listbox" hidden></div>
-                </div>
-                <div id="ftTopBarListModeControlsPopup" class="ft-topbar-list-mode"></div>
-                <button id="openInTabBtn" class="icon-button" title="Open Full Settings" aria-label="Open Full Settings">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                        <polyline points="15 3 21 3 21 9"></polyline>
-                        <line x1="10" y1="14" x2="21" y2="3"></line>
-                    </svg>
-                </button>
-            </div>
-        </header>
-
-        <!-- Main Content -->
-        <main class="app-content">
-            <!-- Quick Filters Card -->
-            <section class="card filter-card">
-                <!-- Tabs will be injected here by JavaScript -->
-                <div id="popupFiltersTabsContainer"></div>
-            </section>
-
-
-
-
-        </main>
-    </div>
+    <div id="popupRoot"></div>
 
     <script src="../js/settings_shared.js"></script>
     <script src="../js/content_controls_catalog.js"></script>
@@ -61,6 +24,7 @@
     <script src="../js/io_manager.js"></script>
     <script src="../js/state_manager.js"></script>
     <script src="../js/render_engine.js"></script>
+    <script src="../js/ui-shell/popup-shell.js"></script>
     <script src="../js/popup.js"></script>
 </body>
 
