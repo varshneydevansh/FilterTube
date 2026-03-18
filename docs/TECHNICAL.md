@@ -1,8 +1,8 @@
-# Technical Documentation (v3.2.5 Whitelist Mode & UI/UX Improvements)
+# Technical Documentation (v3.2.8 Filtering, Recovery & UI Shell Notes)
 
 ## Overview
 
-FilterTube v3.2.5 builds on the performance optimizations of v3.2.1 with significant UI/UX improvements and ships Whitelist Mode for granular content control. This technical documentation covers the filtering logic, mode switching, and user experience enhancements.
+FilterTube v3.2.8 builds on the earlier performance and whitelist-mode work with watch-page SPA recovery hardening, Mix/watch fallback-menu fixes, and a newer extension shell/UI layer. This technical documentation covers the filtering logic, identity recovery behavior, mode switching, and user experience enhancements.
 
 ## Typography System (v3.2.6)
 
@@ -302,6 +302,8 @@ if (watchMeta) {
 ```
 
 **Impact**: Ensures watch page elements don't remain stuck hidden after navigation between videos.
+
+**Follow-up note:** this cleanup now matters for collaborator state too. During watch-to-watch SPA swaps, FilterTube re-validates stamped collaborator metadata/menu assumptions against stronger watch roots so a stale `A and 2 more` placeholder does not survive after the selected playlist row or watch metadata changes.
 
 ### Whitelist-Pending Re-evaluation Timing
 
@@ -1181,6 +1183,11 @@ sequenceDiagram
     Content->>UI: Display updated channel name
 ```
 
+`Filter All` is selection state inside the custom fallback popover, not the action itself. The actual block is committed only when the user activates the real `Block • Channel` row, after which background can persist both:
+
+- the channel entry
+- the linked channel-derived keyword state
+
 ### 4.2 Channel Identity Resolution
 
 FilterTube uses a multi-layer approach to resolve channel identities:
@@ -1231,6 +1238,17 @@ function requestChannelInfo(videoId) {
     });
 }
 ```
+
+#### Watch-Page Mix / Playlist Recovery Order
+
+When a watch-page playlist / Mix row does not expose stable owner identity directly, the current fallback order is:
+
+1. `UC ID`
+2. `customUrl`
+3. `@handle`
+4. `watch:VIDEO_ID`
+
+`watch:VIDEO_ID` is recovery-only. It is not treated as canonical channel identity; it is a bridge that lets background recover the real owner from watch-page payloads.
 
 #### Layer 3: Network Fetch (Fallback)
 ```javascript
@@ -1283,6 +1301,9 @@ updateInjectedMenuChannelName(dropdown, {
 * Mix titles: `/^mix\s+-/i` or contains `•` separator
 * Metadata strings: Contains `views`, `ago`, `watching`
 * Handles only: Starts with `@` and no actual name
+* Collapsed collaboration labels: values like `A and 2 more` are display hints, not final channel identity
+
+If later recovery returns a stronger canonical name for the same UC ID, the stored label can now be repaired instead of permanently keeping a title-like placeholder.
 
 ### 4.4 Profile-Aware Resolution
 
@@ -1349,6 +1370,7 @@ UI Contexts (tab-view.js, popup.js)
   * `title` attribute tooltips with “Originally blocked with / Still blocked / Missing now” copy.
 * **Search & Sort Integrity**: Because every collaborator remains an independent row, FCFS ordering, keyword search, and sort toggles behave exactly as non-collab entries, avoiding clipping issues seen with floating group containers.
 * **Home Feed Menu Parity**: `block_channel.js` watcher treats `button-view-model` wrappers as click anchors, so collaboration-aware menu injection (multi-channel + Block All) works on lockup-based home cards, grid shelves, and Shorts shelves alike.
+* **Watch SPA Rehydration**: recovered watch-page collaborator rosters reconnect to stored `collaborationGroupId` / `allCollaborators` after navigation, so the tab UI and subsequent menus can reflect the full group rather than the first visible name only.
 
 ## 11. Handle Normalization & Regex Improvements
 
@@ -1464,6 +1486,12 @@ With multiple UIs (Popup, Tab View) and background processes, keeping settings i
 *   **Single Source**: All components read/write settings via `StateManager`.
 *   **Broadcasting**: When settings change in one place, `StateManager` notifies all other parts of the extension.
 *   **Consistency**: Ensures that if you add a filter in the Tab View, the Popup updates instantly.
+
+This now includes shell follow-up behavior too:
+
+* popup and tab shells both refresh from the same confirmed background state
+* route changes reset the page-scroll position in tab view
+* profile/dropdown fixes and row-shell behavior are driven by shared state updates rather than local one-off assumptions
 
 ## 7. Channel Matching Algorithm
 
@@ -1675,7 +1703,27 @@ The exact latency depends on which fallback path is needed (cache/main-world/net
 +-----------------------------------+
 ```
 
-## UI Component Styling (v3.2.6)
+## UI Component Styling (v3.2.6 + v3.2.8 follow-up)
+
+### Serene Shell Follow-Up
+
+The current extension UI is no longer just a set of styled legacy controls. The popup and tab view now sit inside a shared shell layer with:
+
+- a compact popup tray rather than a mini full page
+- a persistent app-like desktop shell in tab view
+- ambient local hero video behind popup and tab surfaces
+- stronger semantic pill colors for `Exact`, `Comments`, and `Filter All`
+- separate compact popup-row behavior vs shared full tab-view row shells
+- internal scroll containers and mobile drawer/sidebar handling tuned independently
+
+Relevant runtime/build pieces:
+
+- `/Users/devanshvarshney/FilterTube/src/extension-shell/popup.jsx`
+- `/Users/devanshvarshney/FilterTube/src/extension-shell/tab-view-decor.jsx`
+- `/Users/devanshvarshney/FilterTube/js/ui-shell/popup-shell.js`
+- `/Users/devanshvarshney/FilterTube/js/ui-shell/tab-view-decor.js`
+- `/Users/devanshvarshney/FilterTube/css/serene-shell.css`
+- `/Users/devanshvarshney/FilterTube/css/design_tokens.css`
 
 ### Enhanced Dropdown & Select Components
 
@@ -1720,6 +1768,15 @@ FilterTube v3.2.6 introduces refined dropdown and select styling with left accen
      Red border + background
 ```
 
+Follow-up shell/UI behavior now also includes:
+
+- popup profile dropdown sizing tuned to popup scale
+- detached dropdown anchoring fixes in tab view
+- short-height sidebar internal scrolling
+- route/page scroll reset between tab-view sections
+- corrected list-row shells so long channel/keyword lists do not overlap or clip metadata
+- custom fallback 3-dot feedback states: pressed, focus-visible, and open
+
 ## Advance Video Filters Section (v3.2.6)
 
 ### Collapsible Popup UI
@@ -1743,6 +1800,12 @@ The popup now includes a collapsible Advance video filters section:
 │  └───────────────────────────────────┘  │
 └─────────────────────────────────────────┘
 ```
+
+Current note:
+
+- the newer popup direction is a compact quick-control tray
+- advanced controls still exist, but the shell is optimized around fast actions first
+- `Filter All` in the custom fallback 3-dot popover is selection-only; only the actual block row commits the action
 
 **Custom Radio Buttons:**
 

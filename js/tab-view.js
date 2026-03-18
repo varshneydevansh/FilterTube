@@ -2867,6 +2867,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         ftProfileDropdownTab.style.transform = '';
         ftProfileBadgeBtnTab.setAttribute('aria-expanded', 'false');
     }
+    window.closeProfileDropdownTab = closeProfileDropdownTab;
 
     function positionProfileDropdownTab() {
         if (!ftProfileDropdownTab || !ftProfileBadgeBtnTab || ftProfileDropdownTab.hidden) return;
@@ -5894,7 +5895,11 @@ function setupNavigation() {
             }
         });
 
-        closeProfileDropdownTab();
+        if (typeof closeProfileDropdownTab === 'function') {
+            closeProfileDropdownTab();
+        } else if (typeof window.closeProfileDropdownTab === 'function') {
+            window.closeProfileDropdownTab();
+        }
         resetTabViewScroll(activeSection);
 
         try {

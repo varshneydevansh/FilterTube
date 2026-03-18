@@ -1,8 +1,8 @@
-# YouTube Renderer Inventory (v3.2.1 - Jan 2026)
+# YouTube Renderer Inventory (v3.2.8 follow-up)
 
 This document tracks which YouTube renderers/selectors FilterTube currently targets and how the latest DOM samples map to them.
 
-**NEW v3.2.1 Major Updates:**
+**Major updates tracked here:**
 - **Proactive Network Interception**: Added comprehensive XHR interception and snapshot stashing
 - **Enhanced Collaboration Detection**: Added `avatarStackViewModel` support for Mix cards and collaboration detection
 - **Topic Channel Support**: Added special handling for auto-generated YouTube topic channels
@@ -187,10 +187,21 @@ YouTube collaboration videos can feature up to **5 collaborating channels + 1 up
 
 | Source | Location | Data Available | Status |
 | --- | --- | --- | --- |
-| **ytInitialData (Primary)** | `videoRenderer.longBylineText.runs[].navigationEndpoint.showDialogCommand.panelLoadingStrategy.inlineContent.dialogViewModel.customContent.listViewModel.listItems[]` | Full channel info for ALL collaborators | ✅ Covered |
+| **ytInitialData / watch roots (Primary)** | `showSheetCommand -> panelLoadingStrategy -> inlineContent -> sheetViewModel -> content -> listViewModel -> listItems` plus `showDialogCommand` / direct `listViewModel` variants | Full channel info for ALL collaborators | ✅ Covered |
 | **DOM Fallback** | `#attributed-channel-name > yt-text-view-model` | Channel names, partial handles (first channel only has direct link) | ✅ Covered |
 
-#### ytInitialData Structure for Collaborators
+#### Watch-Page Collaborator Recovery Matrix
+
+Authoritative collaborator data can now come from several watch-page paths. The important rule is that collapsed byline text like `Shakira and 2 more` is not the roster.
+
+Supported recovery paths include:
+
+| Path family | Purpose |
+| --- | --- |
+| `showSheetCommand -> panelLoadingStrategy -> inlineContent -> sheetViewModel -> content -> listViewModel -> listItems` | Preferred watch-page collaborator sheet |
+| `showDialogCommand -> panelLoadingStrategy -> inlineContent -> dialogViewModel -> customContent -> listViewModel -> listItems` | Older dialog-based collaborator list |
+| direct nested `listViewModel.listItems` variants | Layout drift / fallback variants |
+| selected playlist row + watch metadata + owner metadata | Strong watch-page fallback roots during SPA swaps |
 
 Each collaborator in `listItems[].listItemViewModel`:
 | Field Path | Data | Example |
@@ -223,14 +234,15 @@ Each collaborator in `listItems[].listItemViewModel`:
 #### Watch page notes (v3.2.1)
 
 - **Main video + right rail:** Watch-page dropdowns consume the same collaborator cache as Home/Search, so per-channel menu rows (and “Block All”) appear with names/handles even when the DOM only exposed “Channel A and 3 more”.
+- **SPA re-check behavior:** During watch-to-watch swaps, collaborator recovery can re-check watch metadata, owner metadata, and the selected playlist row, then refresh an open collaboration menu when fuller roster data arrives.
 - **Embedded Shorts:** Shorts surfaced inside the watch column mark `fetchStrategy: 'shorts'`; we prefetch `/shorts/<videoId>` before falling back to `/watch?v=` so collaborator menus and UC IDs hydrate reliably.
-- **Single-channel rows:** Still display “Block Channel” in some cases when the DOM scrape does not include the channel name.
+- **Weak-identity rows:** watch/playlist rows can recover through `watch:VIDEO_ID` when stable owner identity is incomplete, and later enrichment can repair provisional names.
 - **Watch playlist panel:** Playlist panel rows now hide deterministically for blocked channels (prefetch enriches `videoChannelMap` for playlist items), and Next/Prev navigation skips blocked items without visible playback flash.
 - **Watch playlist autoplay:** Autoplay uses an `ended`-event safety net to trigger a Next-click only when the immediate next playlist row is blocked, preventing blocked items from briefly playing.
 - **Playlist reprocessing robustness:** Previously hidden playlist rows are kept hidden during identity gaps (sticky-hide) to prevent restored blocked items from becoming playable during async enrichment.
 - **Dropdown close behavior:** The 3-dot dropdown close logic avoids closing `ytd-miniplayer` when a miniplayer is visible.
-- **ENHANCED v3.2.1:** Avatar stack collaboration detection now works on Mix cards and surfaces where `avatarStackViewModel` is used instead of `showDialogCommand`.
-- **ENHANCED v3.2.1:** Collaboration detection now properly excludes Mix cards (collection stacks) from being treated as collaborations.
+- **ENHANCED:** Avatar stack collaboration detection works on surfaces where `avatarStackViewModel` is used instead of explicit dialog commands.
+- **Mix guardrail:** Mix / collection-stack cards are excluded from collaborator grouping, but still participate in owner recovery and fallback 3-dot blocking.
 
 **Multi-select note (3+ collaborators):**
 When there are 3–6 collaborators, individual rows act as “select” toggles first. The bottom row becomes:
@@ -246,7 +258,9 @@ When there are 3–6 collaborators, individual rows act as “select” toggles 
   name: "Channel Name",     // Display name
   filterAll: true/false,    // Filter All toggle state
   collaborationWith: ["@other1", "@other2"],  // Other collaborators (for UI display)
-  collaborationGroupId: "uuid-xxx"            // Links related entries (for group operations)
+  collaborationGroupId: "uuid-xxx",           // Links related entries (for group operations)
+  allCollaborators: [{ name, handle, id }],   // Canonical roster carried for rehydration
+  expectedCollaboratorCount: 3                // Supports "and N more" semantics while enrichment is pending
 }
 ```
 
@@ -331,6 +345,8 @@ On **search page** (`ytd-video-renderer`):
 - Channel name is in a **separate location**: `#channel-info > ytd-channel-name > a`
 
 **Solution**: When extracting channel name with data attributes present, ALWAYS query `#channel-info ytd-channel-name a` first, never rely on the data-attribute element's textContent.
+
+**General guardrail**: owner names must come from real channel selectors such as `#channel-info ytd-channel-name a`, `#owner-name a`, or authoritative recovered payloads. Row titles, thumbnail links, generic data-attribute hosts, and fallback-popover titles are provisional only and may contain overlay/title text.
 
 | DOM tag / component | Underlying renderer / data source | Status | Notes |
 | --- | --- | --- | --- |
@@ -462,6 +478,30 @@ On **search page** (`ytd-video-renderer`):
 | `<ytd-playlist-panel-video-renderer>` | `playlistPanelVideoRenderer` | ✅ Covered — **NEW** | Titles/bylines map to existing renderer rules; ensure resume-progress DOM doesn’t hide filtered items |
 | Playlist action controls (`ytd-playlist-loop-button-renderer`, shuffle toggle) | DOM-only | ℹ️ **NEW** | UI buttons only; no filtering required |
 
+### Custom fallback 3-dot support on weak watch rows
+
+When YouTube does not expose a usable native overflow path or row identity is too weak, FilterTube can render its own fallback controls on watch-page rows such as:
+
+- `ytd-playlist-panel-video-renderer`
+- `yt-lockup-view-model`
+- mobile playlist / compact watch rows
+
+Fallback UI elements:
+
+| Element | Purpose |
+| --- | --- |
+| `.filtertube-fallback-menu-slot` | Anchor slot for the fallback controls |
+| `.filtertube-playlist-menu-fallback-btn` | Custom launcher button |
+| `.filtertube-playlist-menu-fallback-popover` | Popover containing block rows and toggles |
+
+Fallback contract:
+
+- `Filter All` is toggle-only
+- the real action is the `Block • Channel` row
+- the row shows pressed/focus/open feedback before the popover closes
+- weak watch-row identity can escalate to `watch:VIDEO_ID`
+- post-block enrichment may repair provisional title-like names for the same canonical UC ID
+
 ### Lockup / Shelf Playlists (Related section)
 | JSON renderer key | Purpose | Status |
 | --- | --- | --- |
@@ -584,6 +624,7 @@ FilterTube now injects a "Block Channel" option into the 3-dot menu for the foll
 | **Menu List (New)** | `yt-list-view-model` | Newer YouTube menu structure; FilterTube injects a `yt-list-item-view-model`. |
 | **Menu List (Legacy)** | `tp-yt-paper-listbox` | Older menu structure inside `ytd-menu-popup-renderer`. |
 | **Injected Menu Item** | `yt-list-item-view-model`, `ytd-menu-service-item-renderer` | FilterTube inserts whichever matches the detected menu structure. |
+| **Fallback Popover** | `.filtertube-fallback-menu-slot`, `.filtertube-playlist-menu-fallback-btn`, `.filtertube-playlist-menu-fallback-popover` | Used when native watch-row menu identity is weak or unavailable; follows the custom fallback contract above. |
 
 **Technical Note:**
 The dropdown observer lives in `js/content/block_channel.js` and uses a `MutationObserver` to detect when a dropdown container (typically `tp-yt-iron-dropdown`) is added or becomes visible. It traces back to the `lastClickedMenuButton` to identify the parent video card from the list above, then calls `content_bridge.js:injectFilterTubeMenuItem(dropdown, card)`.

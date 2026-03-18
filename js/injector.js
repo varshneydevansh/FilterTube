@@ -117,11 +117,62 @@
         return norm.toLowerCase();
     }
 
+    function tokenizeExpectedCollaboratorNames(values = []) {
+        const normalizedTokens = new Set();
+        const compactTokens = new Set();
+
+        const pushToken = (value) => {
+            const normalized = normalizeLooseText(value);
+            if (!normalized) return;
+            normalizedTokens.add(normalized);
+
+            const compact = normalized.replace(/[^a-z0-9]/g, '');
+            if (compact) {
+                compactTokens.add(compact);
+            }
+        };
+
+        values.forEach((value) => {
+            if (typeof value !== 'string') return;
+            const trimmed = value.trim();
+            if (!trimmed) return;
+
+            pushToken(trimmed);
+
+            const withoutMore = trimmed
+                .replace(/\band\s+\d+\s+more\b/ig, '')
+                .replace(/\band\s+more\b/ig, '')
+                .trim();
+
+            if (!withoutMore) return;
+
+            const splitTokens = withoutMore
+                .split(/\s*(?:,|&|\band\b)\s*/i)
+                .map((token) => token.trim())
+                .filter(Boolean);
+
+            splitTokens.forEach(pushToken);
+        });
+
+        return {
+            normalized: normalizedTokens,
+            compact: compactTokens
+        };
+    }
+
     function buildExpectedMatcher(payload) {
         const expectedNames = Array.isArray(payload?.expectedNames) ? payload.expectedNames : [];
         const expectedHandles = Array.isArray(payload?.expectedHandles) ? payload.expectedHandles : [];
+        const expectedCollaboratorCount = parseInt(payload?.expectedCollaboratorCount || '0', 10) || 0;
+        const allowRosterFallbackForCollabMarkup = Boolean(
+            payload?.allowRosterFallbackForCollabMarkup ||
+            expectedCollaboratorCount > 2 ||
+            expectedNames.some((value) => /\band\s+(?:\d+\s+)?more\b/i.test(value || ''))
+        );
 
-        const nameSet = new Set(expectedNames.map(normalizeLooseText).filter(Boolean));
+        const tokenizedNames = tokenizeExpectedCollaboratorNames(expectedNames);
+        const nameSet = tokenizedNames.normalized;
+        const compactExpectedNames = Array.from(tokenizedNames.compact);
         const handleSet = new Set(expectedHandles.map(normalizeExpectedHandle).filter(Boolean));
 
         // If caller didn't send expectations, we must not reject results solely on that.
@@ -129,12 +180,28 @@
 
         return {
             hasAny,
+            allowRosterFallbackForCollabMarkup,
+            expectedCollaboratorCount,
+            handleCount: handleSet.size,
             matchesAny(collaborator) {
                 if (!hasAny) return true;
                 if (!collaborator || typeof collaborator !== 'object') return false;
                 const name = normalizeLooseText(collaborator.name);
+                const compactName = name.replace(/[^a-z0-9]/g, '');
                 const handle = normalizeExpectedHandle(collaborator.handle);
-                return (name && nameSet.has(name)) || (handle && handleSet.has(handle));
+                const fuzzyNameMatch = compactName
+                    ? compactExpectedNames.some((expected) => {
+                        if (!expected) return false;
+                        const minLen = Math.min(expected.length, compactName.length);
+                        if (minLen < 4) return false;
+                        return compactName.startsWith(expected) || expected.startsWith(compactName);
+                    })
+                    : false;
+                return (
+                    (name && nameSet.has(name)) ||
+                    fuzzyNameMatch ||
+                    (handle && handleSet.has(handle))
+                );
             }
         };
     }
@@ -155,10 +222,59 @@
 
         // If expectations were provided, require at least one collaborator to match.
         if (matcher && matcher.hasAny) {
-            return list.some(c => matcher.matchesAny(c));
+            if (list.some(c => matcher.matchesAny(c))) {
+                return true;
+            }
+
+            if (matcher.allowRosterFallbackForCollabMarkup) {
+                const strongIdentityCount = list.reduce((count, collaborator) => {
+                    if (!collaborator || typeof collaborator !== 'object') return count;
+                    const hasStrongIdentity = Boolean(
+                        (typeof collaborator.id === 'string' && /^UC[\w-]{22}$/i.test(collaborator.id.trim())) ||
+                        (typeof collaborator.handle === 'string' && collaborator.handle.trim()) ||
+                        (typeof collaborator.customUrl === 'string' && collaborator.customUrl.trim())
+                    );
+                    return count + (hasStrongIdentity ? 1 : 0);
+                }, 0);
+
+                if (strongIdentityCount >= Math.min(2, list.length)) {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         return true;
+    }
+
+    function scoreCollaboratorCandidate(list, matcher, depth = 0) {
+        if (!Array.isArray(list) || list.length < 2) return -1;
+        if (!isValidCollaboratorResponse(list, matcher)) return -1;
+
+        const matchCount = matcher?.hasAny
+            ? list.reduce((count, collaborator) => count + (matcher.matchesAny(collaborator) ? 1 : 0), 0)
+            : list.length;
+        const matchRatio = matcher?.hasAny ? matchCount / list.length : 1;
+
+        const strongIdentityCount = list.reduce((count, collaborator) => {
+            if (!collaborator || typeof collaborator !== 'object') return count;
+            if (collaborator.id) return count + 1;
+            if (collaborator.handle || collaborator.customUrl) return count + 0.5;
+            return count;
+        }, 0);
+
+        const quality = getCollaboratorListQuality(list);
+        const depthPenalty = Math.min(10, Math.max(0, depth));
+
+        return (
+            quality * 25 +
+            list.length * 12 +
+            strongIdentityCount * 8 +
+            matchCount * 6 +
+            matchRatio * 50 -
+            depthPenalty
+        );
     }
 
     function cacheCollaboratorsIfBetter(videoId, collaborators = []) {
@@ -221,28 +337,35 @@
             const { videoId, requestId } = payload;
             postLog('log', `Received collaborator info request for video: ${videoId}`);
 
-            const matcher = buildExpectedMatcher(payload || {});
+            let collaboratorInfo = null;
 
-            // First check cache (for dynamically loaded videos)
-            let collaboratorInfo = collaboratorCache.get(videoId);
-            let collaboratorScore = getCollaboratorListQuality(collaboratorInfo);
+            try {
+                const matcher = buildExpectedMatcher(payload || {});
 
-            // If not in cache, or ytInitialData has richer data, search ytInitialData
-            const ytInitialDataCollaborators = searchYtInitialDataForCollaborators(videoId, matcher);
-            const ytScore = getCollaboratorListQuality(ytInitialDataCollaborators);
+                // First check cache (for dynamically loaded videos)
+                collaboratorInfo = collaboratorCache.get(videoId);
+                let collaboratorScore = getCollaboratorListQuality(collaboratorInfo);
 
-            const cacheValid = isValidCollaboratorResponse(collaboratorInfo, matcher);
-            const ytValid = isValidCollaboratorResponse(ytInitialDataCollaborators, matcher);
+                // If not in cache, or ytInitialData has richer data, search ytInitialData
+                const ytInitialDataCollaborators = searchYtInitialDataForCollaborators(videoId, matcher);
+                const ytScore = getCollaboratorListQuality(ytInitialDataCollaborators);
 
-            if (ytValid && (!cacheValid || ytScore > collaboratorScore)) {
-                collaboratorInfo = cacheCollaboratorsIfBetter(videoId, ytInitialDataCollaborators);
-                collaboratorScore = ytScore;
-            } else if (!cacheValid && ytValid) {
-                collaboratorInfo = cacheCollaboratorsIfBetter(videoId, ytInitialDataCollaborators);
-                collaboratorScore = ytScore;
-            } else if (!cacheValid) {
-                // Do not return a single-channel or mismatched collaborator list; it can poison block actions.
+                const cacheValid = isValidCollaboratorResponse(collaboratorInfo, matcher);
+                const ytValid = isValidCollaboratorResponse(ytInitialDataCollaborators, matcher);
+
+                if (ytValid && (!cacheValid || ytScore > collaboratorScore)) {
+                    collaboratorInfo = cacheCollaboratorsIfBetter(videoId, ytInitialDataCollaborators);
+                    collaboratorScore = ytScore;
+                } else if (!cacheValid && ytValid) {
+                    collaboratorInfo = cacheCollaboratorsIfBetter(videoId, ytInitialDataCollaborators);
+                    collaboratorScore = ytScore;
+                } else if (!cacheValid) {
+                    // Do not return a single-channel or mismatched collaborator list; it can poison block actions.
+                    collaboratorInfo = null;
+                }
+            } catch (error) {
                 collaboratorInfo = null;
+                postLog('error', `Collaborator lookup failed for ${videoId}: ${error?.message || error}`);
             }
 
             // Send response back to content_bridge
@@ -374,38 +497,193 @@
             return collaborators.length > 0 ? collaborators : null;
         };
 
-        const extractFromShowDialogCommand = (showDialogCommand) => {
-            const listItems = showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems;
-            if (!Array.isArray(listItems) || listItems.length === 0) return null;
+        const extractFromSheetLikeCommand = (command) => {
+            if (!command || typeof command !== 'object') return null;
 
-            const collaborators = [];
-            for (const item of listItems) {
-                const viewModel = item?.listItemViewModel;
-                if (!viewModel) continue;
+            const normalizeUcId = (value) => {
+                const raw = typeof value === 'string' ? value.trim() : '';
+                return /^UC[\w-]{22}$/i.test(raw) ? raw : '';
+            };
 
-                const title = viewModel.title?.content;
-                const subtitle = viewModel.subtitle?.content;
-                const browseEndpoint = viewModel.rendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint;
-
-                const collab = { name: title };
-                if (browseEndpoint?.canonicalBaseUrl) {
-                    const extracted = extractRawHandle(browseEndpoint.canonicalBaseUrl);
-                    if (extracted) collab.handle = extracted;
+            const pickTextContent = (value) => {
+                if (!value) return '';
+                if (typeof value === 'string' && value.trim()) return value.trim();
+                if (typeof value?.content === 'string' && value.content.trim()) return value.content.trim();
+                if (typeof value?.simpleText === 'string' && value.simpleText.trim()) return value.simpleText.trim();
+                if (Array.isArray(value?.runs)) {
+                    const text = value.runs.map((run) => run?.text || '').join('').trim();
+                    if (text) return text;
                 }
-                if (!collab.handle && subtitle) {
-                    const extracted = extractRawHandle(subtitle);
-                    if (extracted) collab.handle = extracted;
-                }
-                if (browseEndpoint?.browseId?.startsWith('UC')) {
-                    collab.id = browseEndpoint.browseId;
-                }
+                return '';
+            };
 
-                if (collab.handle || collab.id || collab.name) {
+            const pickTitleText = (viewModel) => {
+                const title = viewModel?.title;
+                return pickTextContent(title);
+            };
+
+            const pickSubtitleText = (viewModel) => {
+                const subtitle = viewModel?.subtitle;
+                return pickTextContent(subtitle);
+            };
+
+            const resolveCommandContext = (viewModel) => {
+                const titleRunCommand = Array.isArray(viewModel?.title?.commandRuns)
+                    ? (viewModel.title.commandRuns[0]?.onTap?.innertubeCommand || viewModel.title.commandRuns[0]?.onTap?.command || null)
+                    : null;
+                const contextCommand =
+                    viewModel?.rendererContext?.commandContext?.onTap?.innertubeCommand ||
+                    viewModel?.rendererContext?.commandContext?.onTap?.command ||
+                    viewModel?.rendererContext?.commandContext?.onTap ||
+                    null;
+                const browseEndpoint =
+                    titleRunCommand?.browseEndpoint ||
+                    contextCommand?.browseEndpoint ||
+                    viewModel?.navigationEndpoint?.browseEndpoint ||
+                    null;
+                const commandUrl =
+                    titleRunCommand?.commandMetadata?.webCommandMetadata?.url ||
+                    contextCommand?.commandMetadata?.webCommandMetadata?.url ||
+                    browseEndpoint?.canonicalBaseUrl ||
+                    '';
+                return {
+                    browseEndpoint,
+                    commandUrl: typeof commandUrl === 'string' ? commandUrl : ''
+                };
+            };
+
+            const candidateSources = [
+                {
+                    items: command?.panelLoadingStrategy?.inlineContent?.sheetViewModel?.content?.listViewModel?.listItems,
+                    header: pickTextContent(command?.panelLoadingStrategy?.inlineContent?.sheetViewModel?.header?.panelHeaderViewModel?.title),
+                    label: 'sheetViewModel'
+                },
+                {
+                    items: command?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.sheetViewModel?.content?.listViewModel?.listItems,
+                    header: pickTextContent(command?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.sheetViewModel?.header?.panelHeaderViewModel?.title),
+                    label: 'nested showSheetCommand sheetViewModel'
+                },
+                {
+                    items: command?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.sheetViewModel?.content?.listViewModel?.listItems,
+                    header: pickTextContent(command?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.sheetViewModel?.header?.panelHeaderViewModel?.title),
+                    label: 'nested showDialogCommand sheetViewModel'
+                },
+                {
+                    items: command?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems,
+                    header: pickTextContent(command?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.header?.panelHeaderViewModel?.title),
+                    label: 'dialogViewModel customContent'
+                },
+                {
+                    items: command?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.listViewModel?.listItems,
+                    header: pickTextContent(command?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.header?.panelHeaderViewModel?.title),
+                    label: 'dialogViewModel'
+                },
+                {
+                    items: command?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems,
+                    header: pickTextContent(command?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.header?.panelHeaderViewModel?.title),
+                    label: 'nested showDialogCommand dialogViewModel customContent'
+                },
+                {
+                    items: command?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.listViewModel?.listItems,
+                    header: pickTextContent(command?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.header?.panelHeaderViewModel?.title),
+                    label: 'nested showDialogCommand dialogViewModel'
+                },
+                {
+                    items: command?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems,
+                    header: pickTextContent(command?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.header?.panelHeaderViewModel?.title),
+                    label: 'nested showSheetCommand dialogViewModel customContent'
+                },
+                {
+                    items: command?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.listViewModel?.listItems,
+                    header: pickTextContent(command?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.header?.panelHeaderViewModel?.title),
+                    label: 'nested showSheetCommand dialogViewModel'
+                },
+                {
+                    items: command?.listViewModel?.listItems,
+                    header: '',
+                    label: 'direct listViewModel'
+                },
+                {
+                    items: command?.content?.listViewModel?.listItems,
+                    header: '',
+                    label: 'direct content.listViewModel'
+                },
+                {
+                    items: command?.customContent?.listViewModel?.listItems,
+                    header: '',
+                    label: 'direct customContent.listViewModel'
+                }
+            ];
+
+            const extractCollaboratorsFromListItems = (listItems) => {
+                if (!Array.isArray(listItems) || listItems.length === 0) return null;
+                const collaborators = [];
+                const seen = new Set();
+
+                for (const item of listItems) {
+                    const viewModel = item?.listItemViewModel || item?.compactLinkViewModel || item?.content?.listItemViewModel || null;
+                    if (!viewModel || typeof viewModel !== 'object') continue;
+
+                    const title = pickTitleText(viewModel);
+                    const subtitle = pickSubtitleText(viewModel);
+                    const { browseEndpoint, commandUrl } = resolveCommandContext(viewModel);
+
+                    const collab = {
+                        name: title || '',
+                        id: normalizeUcId(browseEndpoint?.browseId || ''),
+                        handle: '',
+                        customUrl: ''
+                    };
+
+                    if (commandUrl) {
+                        const extractedHandle = extractRawHandle(commandUrl);
+                        if (extractedHandle) collab.handle = extractedHandle;
+                        const extractedCustomUrl = extractCustomUrlFromCanonicalBaseUrl(commandUrl);
+                        if (extractedCustomUrl) collab.customUrl = extractedCustomUrl;
+                    }
+
+                    if (!collab.handle && subtitle) {
+                        const subtitleHandle = extractRawHandle(subtitle);
+                        if (subtitleHandle) collab.handle = subtitleHandle;
+                    }
+
+                    const key = (collab.id || collab.handle || collab.customUrl || collab.name || '').toLowerCase();
+                    if (!key || seen.has(key)) continue;
+                    seen.add(key);
                     collaborators.push(collab);
+                }
+
+                return collaborators.length > 0 ? collaborators : null;
+            };
+
+            let bestCandidate = null;
+            let bestScore = -1;
+
+            for (const candidate of candidateSources) {
+                if (!Array.isArray(candidate.items) || candidate.items.length === 0) continue;
+                const collaborators = extractCollaboratorsFromListItems(candidate.items);
+                if (!Array.isArray(collaborators) || collaborators.length === 0) continue;
+
+                const strongIdentityCount = collaborators.reduce((count, collaborator) => {
+                    const hasStrongIdentity = Boolean(collaborator?.id || collaborator?.handle || collaborator?.customUrl);
+                    return count + (hasStrongIdentity ? 1 : 0);
+                }, 0);
+                const headerLooksCollaborative = /collaborators?/i.test(candidate.header || '');
+                const score =
+                    (headerLooksCollaborative ? 1000 : 0) +
+                    strongIdentityCount * 100 +
+                    collaborators.length * 10 +
+                    getCollaboratorListQuality(collaborators);
+
+                if (headerLooksCollaborative || strongIdentityCount >= Math.min(2, collaborators.length)) {
+                    if (score > bestScore) {
+                        bestCandidate = collaborators;
+                        bestScore = score;
+                    }
                 }
             }
 
-            return collaborators.length > 0 ? collaborators : null;
+            return bestCandidate;
         };
 
         // Handle raw stack objects passed directly.
@@ -444,10 +722,15 @@
         const bylineText = renderer.shortBylineText || renderer.longBylineText;
         if (bylineText?.runs) {
             for (const run of bylineText.runs) {
-                const showDialogCommand = run.navigationEndpoint?.showDialogCommand;
-                if (!showDialogCommand) continue;
+                const command =
+                    run.navigationEndpoint?.showDialogCommand ||
+                    run.navigationEndpoint?.showSheetCommand ||
+                    run.navigationEndpoint?.innertubeCommand?.showDialogCommand ||
+                    run.navigationEndpoint?.innertubeCommand?.showSheetCommand ||
+                    null;
+                if (!command) continue;
 
-                const collaborators = extractFromShowDialogCommand(showDialogCommand);
+                const collaborators = extractFromSheetLikeCommand(command);
                 if (collaborators) return collaborators;
             }
         }
@@ -495,14 +778,15 @@
         }
 
         // Home lockupViewModel often doesn't expose bylineText runs; fall back to a bounded deep scan
-        // for showDialogCommand anywhere inside the renderer.
+        // for showDialog/showSheet command payloads anywhere inside the renderer.
         const visited = new WeakSet();
         function deepScanForShowDialog(node, depth = 0) {
             if (!node || typeof node !== 'object' || visited.has(node) || depth > 10) return null;
             visited.add(node);
 
-            if (node.showDialogCommand) {
-                const collaborators = extractFromShowDialogCommand(node.showDialogCommand);
+            const command = node.showDialogCommand || node.showSheetCommand || null;
+            if (command) {
+                const collaborators = extractFromSheetLikeCommand(command);
                 if (collaborators) return collaborators;
             }
 
@@ -531,6 +815,16 @@
         const ownerRuns = renderer.ownerText?.runs || bylineText?.runs;
         if (ownerRuns) {
             for (const run of ownerRuns) {
+                const ownerCommand =
+                    run.navigationEndpoint?.showDialogCommand ||
+                    run.navigationEndpoint?.showSheetCommand ||
+                    run.navigationEndpoint?.innertubeCommand?.showDialogCommand ||
+                    run.navigationEndpoint?.innertubeCommand?.showSheetCommand ||
+                    null;
+                if (ownerCommand) {
+                    const collaborators = extractFromSheetLikeCommand(ownerCommand);
+                    if (collaborators) return collaborators;
+                }
                 const browseEndpoint = run.navigationEndpoint?.browseEndpoint;
                 if (!browseEndpoint) continue;
 
@@ -1017,7 +1311,7 @@
 
         postLog('log', `Searching collaborators for ${videoId}...`);
 
-        let result = null;
+        let bestCandidate = null;
 
         const roots = [];
         if (window.ytInitialData) {
@@ -1073,13 +1367,10 @@
                 if (nodeVideoId === videoId) {
                     const extracted = extractCollaboratorsFromDataObject(obj);
                     if (Array.isArray(extracted) && extracted.length > 0) {
-                        // Only treat this as a valid collaboration result when it is a true roster (2+ channels)
-                        // and matches expectations from the clicked card (when provided).
-                        if (!isValidCollaboratorResponse(extracted, matcher)) {
-                            return null;
+                        const score = scoreCollaboratorCandidate(extracted, matcher, depth);
+                        if (score >= 0 && (!bestCandidate || score > bestCandidate.score)) {
+                            bestCandidate = { list: extracted, score, source: target.label };
                         }
-                        postLog('log', `✅ Found collaborators via ${target.label}`);
-                        return extracted;
                     }
                 }
 
@@ -1089,22 +1380,22 @@
                     if (!value || typeof value !== 'object') continue;
                     if (Array.isArray(value)) {
                         for (let i = 0; i < value.length; i++) {
-                            const nested = searchObject(value[i], depth + 1);
-                            if (nested) return nested;
+                            searchObject(value[i], depth + 1);
                         }
                     } else {
-                        const nested = searchObject(value, depth + 1);
-                        if (nested) return nested;
+                        searchObject(value, depth + 1);
                     }
                 }
 
                 return null;
             }
 
-            result = searchObject(target.root);
-            if (result) {
-                return result;
-            }
+            searchObject(target.root);
+        }
+
+        if (bestCandidate?.list) {
+            postLog('log', `✅ Found collaborators via ${bestCandidate.source} (best-ranked candidate)`);
+            return bestCandidate.list;
         }
 
         postLog('log', '⚠️ Global search failed. Attempting DOM hydration…');
@@ -1113,12 +1404,24 @@
             return null;
         }
 
+        let bestDomCandidate = null;
+        let bestDomScore = -1;
         const candidates = [];
         const selector = `[data-filtertube-video-id="${videoId}"]`;
         const baseElement = document.querySelector(selector);
         if (baseElement) {
             candidates.push(baseElement);
-            const wrapper = baseElement.closest('ytd-rich-item-renderer, ytd-grid-video-renderer, ytd-compact-video-renderer, ytd-playlist-video-renderer, ytd-video-renderer');
+            const wrapper = baseElement.closest(
+                'ytd-rich-item-renderer, ' +
+                'ytd-grid-video-renderer, ' +
+                'ytd-compact-video-renderer, ' +
+                'ytd-playlist-video-renderer, ' +
+                'ytd-playlist-panel-video-renderer, ' +
+                'ytd-playlist-panel-video-wrapper-renderer, ' +
+                'ytm-playlist-panel-video-renderer, ' +
+                'ytm-playlist-panel-video-wrapper-renderer, ' +
+                'ytd-video-renderer'
+            );
             if (wrapper && wrapper !== baseElement) {
                 candidates.push(wrapper);
             }
@@ -1144,6 +1447,34 @@
             postLog('warn', `❌ Could not find DOM element for ${videoId}`);
         }
 
+        // Watch-page fallback: selected playlist row and owner metadata often keep the
+        // collaborator command during SPA swaps even when the clicked row only has partial stamps.
+        try {
+            const currentVideoId = (() => {
+                try {
+                    const params = new URLSearchParams(window.location?.search || '');
+                    return params.get('v') || '';
+                } catch (err) {
+                    return '';
+                }
+            })();
+            if (currentVideoId && currentVideoId === videoId) {
+                const watchCandidates = document.querySelectorAll(
+                    'ytd-watch-metadata, ' +
+                    'ytd-video-owner-renderer, ' +
+                    'ytd-playlist-panel-video-renderer[selected], ' +
+                    'ytd-playlist-panel-video-wrapper-renderer[selected] ytd-playlist-panel-video-renderer'
+                );
+                for (const node of Array.from(watchCandidates).slice(0, 8)) {
+                    if (node && !candidates.includes(node)) {
+                        candidates.push(node);
+                    }
+                }
+            }
+        } catch (e) {
+            // ignore
+        }
+
         const hydrateFromStampedAttributes = (element, label) => {
             if (!element || typeof element.getAttribute !== 'function') return null;
             const raw = element.getAttribute('data-filtertube-collaborators') || '';
@@ -1163,8 +1494,8 @@
         const attemptExtraction = (element, label) => {
             if (!element) return null;
 
-            let best = null;
-            let bestScore = 0;
+        let best = null;
+        let bestScore = 0;
 
             const stamped = hydrateFromStampedAttributes(element, label);
             if (Array.isArray(stamped) && stamped.length > 0) {
@@ -1197,9 +1528,9 @@
 
             // Some lockup view-models store collaborators on nested metadata elements.
             try {
-                const nestedStamped = element.querySelector?.('[data-filtertube-collaborators]');
-                if (nestedStamped) {
-                    const nested = hydrateFromStampedAttributes(nestedStamped, `${label} descendant`);
+                const nestedStampedNodes = element.querySelectorAll?.('[data-filtertube-collaborators]') || [];
+                Array.from(nestedStampedNodes).slice(0, 4).forEach((nestedStamped, index) => {
+                    const nested = hydrateFromStampedAttributes(nestedStamped, `${label} descendant ${index + 1}`);
                     if (Array.isArray(nested) && nested.length > 0) {
                         const score = getCollaboratorListQuality(nested);
                         if (score > bestScore) {
@@ -1207,7 +1538,7 @@
                             bestScore = score;
                         }
                     }
-                }
+                });
             } catch (e) {
                 // ignore
             }
@@ -1218,9 +1549,20 @@
             return best;
         };
 
-        for (const element of candidates) {
-            result = attemptExtraction(element, element === baseElement ? 'element' : 'ancestor');
-            if (result) return result;
+        for (let index = 0; index < candidates.length; index++) {
+            const element = candidates[index];
+            const label = element === baseElement ? 'element' : `candidate-${index + 1}`;
+            const result = attemptExtraction(element, label);
+            const score = scoreCollaboratorCandidate(result, matcher, index);
+            if (score >= 0 && score > bestDomScore) {
+                bestDomCandidate = result;
+                bestDomScore = score;
+            }
+        }
+
+        if (bestDomCandidate) {
+            postLog('log', `✅ Hydrated collaborators from DOM (best-ranked candidate, score=${bestDomScore})`);
+            return bestDomCandidate;
         }
 
         return null;

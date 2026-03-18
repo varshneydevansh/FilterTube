@@ -2,7 +2,7 @@
 
 ## Overview
 
-FilterTube v3.2.1 significantly improves the 3-dot menu experience across YouTube Main and YouTube Kids, ensuring accurate channel names are displayed and blocking actions work reliably for Shorts, Mixes, Playlists, and Watch page videos.
+FilterTube v3.2.1 introduced the main 3-dot menu improvement pass across YouTube Main and YouTube Kids. Later follow-up work in the v3.2.8 cycle extended that behavior on watch-page SPA rows, Mix-like playlist rows, and the custom fallback 3-dot popover so channel names and block actions stay reliable even when row identity is weak.
 
 ## Problem Statement
 
@@ -11,6 +11,16 @@ Prior to v3.2.1, users experienced:
 2. **Mix titles as channel names**: Mix/playlist cards showed video titles instead of actual channel names
 3. **Metadata strings as names**: Watch right-pane showed strings like "Title • 1.2M views • 2 days ago"
 4. **Inconsistent behavior**: Different surfaces (Shorts, Mix, Watch) had varying levels of name resolution
+
+## March 18-19 Follow-Up Additions
+
+The newer watch-page SPA and custom fallback work tightened a few behaviors that were not part of the original v3.2.1 pass:
+
+1. **Watch-page collaborator recovery**: Collaboration rows like `Shakira and 2 more` now upgrade from the authoritative watch-page collaborator sheet instead of getting stuck on one visible name.
+2. **Fallback 3-dot watch recovery**: When a watch-page Mix / playlist row does not expose a stable owner directly, the custom fallback popover now falls back to `watch:VIDEO_ID` recovery the same way quick-cross does.
+3. **Title-like names can be repaired**: If the fallback 3-dot path initially stores a weak title-like label for a UC ID, post-block enrichment can now replace it with the fetched channel-page name.
+4. **`Filter All` is selection, not action**: Inside the custom fallback popover, toggling `Filter All` no longer triggers the block immediately. Only the actual `Block • Channel` row is the action.
+5. **Pressed/open feedback exists on the fallback path**: The custom fallback launcher and row now have focus/open/pressed states so the UI acknowledges the click before the menu closes.
 
 ## Solution Architecture
 
@@ -263,6 +273,12 @@ fetchPromise.then(finalChannelInfo => {
 });
 ```
 
+The same enrichment model now also covers:
+
+- watch-page collaborator rosters that need main-world sheet/dialog recovery
+- weak watch-page Mix / playlist rows that escalate to `watch:VIDEO_ID`
+- post-block repair of title-like provisional names when the same UC ID later resolves to a stronger fetched channel-page name
+
 ### 3. Label Update Logic
 
 ```javascript
@@ -302,11 +318,29 @@ function updateInjectedMenuChannelName(dropdown, channelInfo) {
 - **Detection**: Identify Mix cards by URL/badge patterns
 - **Extraction**: Never use video title; extract from channel links
 - **Fallback**: Use avatar alt text or data attributes
+- **Watch-page recovery**: If a watch-page Mix / playlist row still lacks stable owner identity, allow `watch:VIDEO_ID` recovery instead of giving up
+- **Repair path**: If the row was blocked through fallback metadata first, later enrichment may upgrade the stored label from title-like text to the fetched channel-page name
 
 ### Watch Page Sidebar
 - **Playlist Items**: Extract from channel links, ignore metadata
 - **Autoplay Queue**: Same extraction logic as playlist
 - **Persistence**: Use videoChannelMap for navigation resilience
+- **Collaborations**: If the row signals a hidden collaborator roster, the menu can escalate to the main-world collaborator sheet instead of finalizing a partial single-channel result
+
+### Fallback Strategy
+
+Current fallback order on weak watch-page rows:
+
+1. stable `UC ID`
+2. `customUrl`
+3. `@handle`
+4. `watch:VIDEO_ID`
+
+Guardrails:
+
+- Mix title/byline text is not canonical owner identity
+- collapsed labels like `A and 2 more` are not canonical collaborator rosters
+- `Filter All` in the custom fallback popover is selection-only until the real block row is activated
 
 ### Channel Pages
 - **Header**: Extract from channel name in header
@@ -415,6 +449,14 @@ Test with various channel name formats:
 - **Long names**: > 50 characters
 - **Similar handles**: @channel123 vs @channel124
 
+### 5. Watch-Page Mix / Fallback Popover
+1. Open a watch page with playlist / Mix-like rows.
+2. Trigger the custom fallback 3-dot popover on a row with weak owner identity.
+3. **Expected**: `Filter All` can be toggled without triggering the block immediately.
+4. **Expected**: Clicking the real `Block • Channel` row shows visible pressed feedback before the menu closes.
+5. **Expected**: If the row only exposes video-level metadata at first, owner recovery can still succeed through `watch:VIDEO_ID`.
+6. **Expected**: A weak title-like stored name can later be repaired by post-block enrichment for the same UC ID.
+
 ## Debugging Tools
 
 ### Console Logging
@@ -481,6 +523,14 @@ Users upgrading to v3.2.1 will see:
 - More consistent behavior across all surfaces
 - Zero-delay blocking thanks to proactive XHR interception
 - No breaking changes to existing blocks
+
+Users on the later v3.2.8-era follow-up path also get:
+
+- watch-page SPA collaborator recovery for hidden-roster rows
+- fallback 3-dot recovery aligned with quick-cross on weak watch-page Mix rows
+- non-destructive `Filter All` selection in the custom fallback popover
+- better fallback-row interaction feedback
+- post-block repair of weak title-like names for the same UC ID
 
 ### Data Compatibility
 

@@ -4,7 +4,7 @@ Date: 2026-03-17
 Primary commit: `ece3c3e8d8b506cdf9e989b73752a9c617311ced`  
 Commit title: `feat: Extension UI UX makeover`
 
-This document covers the extension UI/UX overhaul completed on March 17, plus the same-day follow-up tuning that remained in the workspace after the main commit.
+This document covers the extension UI/UX overhaul completed on March 17, plus the March 18-19 follow-up tuning that remained in the workspace after the main commit.
 
 ## Scope
 
@@ -135,6 +135,7 @@ What changed:
 - The `FilterTube / Enabled` brand control was kept prominent but made more app-like.
 - Popup scroll behavior was shifted toward internal content scrolling instead of awkward outer scrolling.
 - The popup profile dropdown was reduced in width and density to match popup scale better.
+- Popup controls were kept on a separate compact row contract so the quick-control tray does not inherit the taller full-list card behavior from tab view.
 
 What this represents:
 
@@ -159,6 +160,7 @@ What changed:
 - Top bar was made slimmer and pinned more like a real website/app header.
 - Dashboard and route-like sections gained ambient video behind the main shell.
 - Main content and view container spacing were tightened to use width more efficiently.
+- Browser-width drawer behavior and desktop sidebar behavior were repeatedly re-aligned so the sidebar and content pane stop visually colliding.
 
 What this represents:
 
@@ -185,6 +187,8 @@ What changed:
 - Main and Kids filters were pushed toward true single-column phone behavior.
 - Dropdown anchoring was fixed so menus open from the trigger instead of detached below it.
 - Mobile fallback scrolling remains available, but the target is better fit rather than horizontal dependency.
+- Short-height devices now let the mobile drawer/sidebar scroll internally instead of clipping the lower navigation items.
+- Tab-view page switches now reset scroll state so one page does not inherit the previous page’s scroll position.
 
 What this represents:
 
@@ -216,9 +220,57 @@ What this represents:
 
 - Theme is no longer just “invert some colors”; it now tries to preserve the same design intent across both modes.
 
+## Interaction And List-Shell Follow-Up
+
+### 8. Shared List Rows Were Stabilized Across Main And Kids Surfaces
+
+After the major shell refresh, the long scrolling keyword/channel lists needed a separate pass because rows started either overlapping or clipping their inner metadata lines.
+
+Key files:
+
+- `/Users/devanshvarshney/FilterTube/css/tab-view.css`
+- `/Users/devanshvarshney/FilterTube/js/render_engine.js`
+
+What changed:
+
+- The shared full-list row shell was corrected for tab-view lists so rows keep their natural height instead of collapsing into each other.
+- Channel rows stopped inheriting the wrong alignment behavior from the generic list shell.
+- Overflow was relaxed so the lower metadata / identity line can remain visible inside the row instead of being cut off.
+- The fix applies to the shared tab-view list surfaces:
+  - main keywords
+  - main channels
+  - Kids keywords
+  - Kids channels
+- Popup minimal rows were intentionally left separate because they use a different compact row contract.
+
+What this represents:
+
+- FilterTube’s dashboard lists are now treated as reusable application surfaces rather than one-off DOM stacks.
+- Shared row behavior is clearer, which lowers the risk of future UI polish work accidentally breaking only one list mode.
+
+### 9. Custom Fallback 3-Dot Menu Received Real Interaction Feedback
+
+The custom fallback 3-dot menu path had become functionally correct but visually dead. A follow-up polish pass fixed that.
+
+Key files:
+
+- `/Users/devanshvarshney/FilterTube/js/content_bridge.js`
+
+What changed:
+
+- The fallback 3-dot launcher now has clearer pressed/open/focus feedback.
+- The fallback menu row now shows an actual pressed pulse before the menu closes.
+- `Filter All` inside the custom fallback popover is now selection-only, not an immediate block action.
+- Only activating the actual `Block • Channel` row counts as the blocking action.
+
+What this represents:
+
+- The custom fallback path now behaves more like a real product surface and less like a brittle emergency path.
+- Interaction semantics are clearer: selection state and destructive action are no longer conflated.
+
 ## Performance Tuning
 
-### 8. Dark-Mode Slowness Was Reduced By Cutting Paint Cost
+### 10. Dark-Mode Slowness Was Reduced By Cutting Paint Cost
 
 Once ambient video and glass layers were added, dark mode started to feel heavier. Follow-up tuning reduced compositing overhead.
 
@@ -240,7 +292,7 @@ What this represents:
 
 ## Help And Support Layout Changes
 
-### 9. Help And Support Were Rebalanced As Product Reference Surfaces
+### 11. Help And Support Were Rebalanced As Product Reference Surfaces
 
 The Help and Support pages were reworked so they are less like a dump of equal cards.
 
@@ -266,6 +318,9 @@ The main extension UI refresh is represented by commit `ece3c3e8d8b506cdf9e989b7
 
 Same-day follow-up tuning after that commit is currently reflected in:
 
+- `/Users/devanshvarshney/FilterTube/js/background.js`
+- `/Users/devanshvarshney/FilterTube/js/content_bridge.js`
+- `/Users/devanshvarshney/FilterTube/js/tab-view.js`
 - `/Users/devanshvarshney/FilterTube/css/components.css`
 - `/Users/devanshvarshney/FilterTube/css/popup.css`
 - `/Users/devanshvarshney/FilterTube/css/serene-shell.css`
@@ -277,6 +332,9 @@ Those follow-up changes cover:
 
 - popup shell cleanup
 - popup dropdown sizing
+- shared list-row stability across long keyword/channel lists
+- fallback 3-dot pressed/open feedback
+- selection-only `Filter All` behavior in the custom fallback popover
 - help/support layout tuning
 - export button alignment/color tuning
 - dark-mode performance cuts
@@ -305,4 +363,4 @@ This refresh established a direction, but there are still likely future passes:
 - more route-by-route desktop/mobile QA in the tab view
 - final popup density tuning after real-user flow review
 - additional performance trimming if more scenic motion is added later
-
+- more targeted QA on short-height / narrow-height device classes where the shell and drawer rules are most sensitive

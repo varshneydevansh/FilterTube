@@ -408,6 +408,25 @@ function renderFilterTubeMenuEntries({ dropdown, newMenuList, oldMenuList, chann
         if (channelInfo.allCollaborators && Array.isArray(channelInfo.allCollaborators) && channelInfo.allCollaborators.length >= 2) {
             console.log('FilterTube: Rendering available collaborator names immediately (enrichment pending)');
             // Continue below to render the collaboration entries
+        } else if (channelInfo.allCollaborators && Array.isArray(channelInfo.allCollaborators) && channelInfo.allCollaborators.length === 1) {
+            const knownCollaborator = channelInfo.allCollaborators[0] || null;
+            const expectedCount = Math.max(
+                channelInfo.expectedCollaboratorCount || 0,
+                parseInt(videoCard?.getAttribute?.('data-filtertube-expected-collaborators') || '0', 10) || 0
+            );
+            const shouldHoldForFullRoster = Boolean(channelInfo.isCollaboration && expectedCount > 1);
+            if (knownCollaborator && !shouldHoldForFullRoster) {
+                channelInfo = {
+                    ...channelInfo,
+                    ...knownCollaborator,
+                    isCollaboration: false
+                };
+                placeholder = false;
+            } else {
+                injectCollaboratorPlaceholderMenu(containers.newMenuList, containers.oldMenuList);
+                forceDropdownResize(dropdown);
+                return;
+            }
         } else {
             injectCollaboratorPlaceholderMenu(containers.newMenuList, containers.oldMenuList);
             forceDropdownResize(dropdown);
@@ -2336,10 +2355,69 @@ function scheduleCollaboratorRetry(element, videoId, options = {}) {
     }, delayMs);
 }
 
+function buildCollaboratorLookupRequestOptions({ card = null, element = null, partialCollaborators = [], channelInfo = null } = {}) {
+    const targetCard = card || findVideoCardElement(element);
+    const cachedCollabs = getCachedCollaboratorsFromCard(targetCard);
+    const expectedNames = [];
+    const expectedHandles = [];
+    let expectedCollaboratorCount = parseInt(targetCard?.getAttribute('data-filtertube-expected-collaborators') || '0', 10) ||
+        parseInt(element?.getAttribute?.('data-filtertube-expected-collaborators') || '0', 10) ||
+        parseInt(channelInfo?.expectedCollaboratorCount || '0', 10) ||
+        0;
+    let allowRosterFallbackForCollabMarkup = false;
+
+    const pushExpectedNameHints = (value) => {
+        if (!value || typeof value !== 'string') return;
+        const trimmed = value.trim();
+        if (!trimmed) return;
+        expectedNames.push(trimmed);
+
+        const parsed = parseCollaboratorNames(trimmed);
+        if (parsed.names.length > 0) {
+            expectedNames.push(...parsed.names);
+            if (parsed.hasHiddenCollaborators) {
+                allowRosterFallbackForCollabMarkup = true;
+                expectedCollaboratorCount = Math.max(
+                    expectedCollaboratorCount,
+                    parsed.names.length + Math.max(parsed.hiddenCount, 1)
+                );
+            }
+        }
+    };
+
+    const pushCollaboratorHints = (collaborators = []) => {
+        (Array.isArray(collaborators) ? collaborators : []).forEach(collab => {
+            if (collab?.name) pushExpectedNameHints(collab.name);
+            if (collab?.handle) expectedHandles.push(collab.handle);
+        });
+    };
+
+    pushCollaboratorHints(partialCollaborators);
+    pushCollaboratorHints(cachedCollabs);
+    pushCollaboratorHints(channelInfo?.allCollaborators);
+
+    if (channelInfo?.name) pushExpectedNameHints(channelInfo.name);
+    if (channelInfo?.expectedChannelName) pushExpectedNameHints(channelInfo.expectedChannelName);
+    if (channelInfo?.handle) expectedHandles.push(channelInfo.handle);
+
+    return {
+        expectedNames: Array.from(new Set(expectedNames.filter(Boolean))),
+        expectedHandles: Array.from(new Set(expectedHandles.filter(Boolean))),
+        expectedCollaboratorCount,
+        allowRosterFallbackForCollabMarkup,
+        cachedCollaborators: cachedCollabs
+    };
+}
+
 function requestCollaboratorEnrichment(element, videoId, partialCollaborators = []) {
     if (!element) return;
     const card = findVideoCardElement(element);
-    const cachedCollabs = getCachedCollaboratorsFromCard(card);
+    const lookupOptions = buildCollaboratorLookupRequestOptions({
+        card,
+        element,
+        partialCollaborators
+    });
+    const cachedCollabs = lookupOptions.cachedCollaborators;
     const enrichmentSeed = (partialCollaborators && partialCollaborators.length > 0)
         ? partialCollaborators
         : (cachedCollabs && cachedCollabs.length > 0
@@ -2356,22 +2434,7 @@ function requestCollaboratorEnrichment(element, videoId, partialCollaborators = 
         element.setAttribute('data-filtertube-collab-retries', '0');
     }
 
-    const expectedNames = [];
-    const expectedHandles = [];
-    (enrichmentSeed || []).forEach(collab => {
-        if (collab?.name) expectedNames.push(collab.name);
-        if (collab?.handle) expectedHandles.push(collab.handle);
-    });
-
-    (cachedCollabs || []).forEach(collab => {
-        if (collab?.name) expectedNames.push(collab.name);
-        if (collab?.handle) expectedHandles.push(collab.handle);
-    });
-
-    requestCollaboratorInfoFromMainWorld(videoId, {
-        expectedNames,
-        expectedHandles
-    })
+    requestCollaboratorInfoFromMainWorld(videoId, lookupOptions)
         .then(collaborators => {
             if (Array.isArray(collaborators) && collaborators.length > 0) {
                 const videoCard = findVideoCardElement(element);
@@ -3580,6 +3643,8 @@ function requestCollaboratorInfoFromMainWorld(videoId, options = {}) {
     return new Promise((resolve) => {
         const expectedNames = Array.isArray(options.expectedNames) ? options.expectedNames : [];
         const expectedHandles = Array.isArray(options.expectedHandles) ? options.expectedHandles : [];
+        const expectedCollaboratorCount = parseInt(options.expectedCollaboratorCount || '0', 10) || 0;
+        const allowRosterFallbackForCollabMarkup = Boolean(options.allowRosterFallbackForCollabMarkup);
         const requestId = ++window.collaboratorRequestId;
         const timeoutMs = 2000; // 2 second timeout
 
@@ -3602,7 +3667,9 @@ function requestCollaboratorInfoFromMainWorld(videoId, options = {}) {
                     videoId,
                     requestId,
                     expectedNames,
-                    expectedHandles
+                    expectedHandles,
+                    expectedCollaboratorCount,
+                    allowRosterFallbackForCollabMarkup
                 },
                 source: 'content_bridge'
             }, '*');
@@ -3706,31 +3773,98 @@ function mergeCollaboratorsWithMainWorld(initialChannelInfo, mainWorldCollaborat
         return null;
     };
 
+    const normalizeUcIdForCollaborator = (value) => {
+        if (!value || typeof value !== 'string') return '';
+        const trimmed = value.trim();
+        return /^UC[\w-]{22}$/i.test(trimmed) ? trimmed.toLowerCase() : '';
+    };
+
+    const isHandleLikeForCollaborator = (value) => {
+        if (!value || typeof value !== 'string') return false;
+        return value.trim().startsWith('@');
+    };
+
+    const isUcIdLikeForCollaborator = (value) => {
+        if (!value || typeof value !== 'string') return false;
+        return /^UC[a-zA-Z0-9_-]{22}$/.test(value.trim());
+    };
+
+    const isProbablyNotChannelNameForCollaborator = (value) => {
+        if (!value || typeof value !== 'string') return true;
+        const trimmed = value.trim();
+        if (!trimmed) return true;
+        if (isHandleLikeForCollaborator(trimmed)) return true;
+        if (isUcIdLikeForCollaborator(trimmed)) return true;
+        if (trimmed.includes('•')) return true;
+        if (/\bviews?\b/i.test(trimmed)) return true;
+        if (/\bago\b/i.test(trimmed)) return true;
+        if (/\bwatching\b/i.test(trimmed)) return true;
+        const lower = trimmed.toLowerCase();
+        if (lower === 'channel') return true;
+        if (lower.startsWith('mix')) return true;
+        if (lower.startsWith('my mix')) return true;
+        if (/^my\s*mix/i.test(trimmed)) return true;
+        if (/\band more\b/i.test(trimmed) && /mix/i.test(trimmed)) return true;
+        if (lower.includes('mix') && trimmed.includes('–')) return true;
+        return false;
+    };
+
+    const isWeakCollaboratorName = (value) => {
+        if (!value || typeof value !== 'string') return true;
+        const trimmed = value.trim();
+        if (!trimmed) return true;
+        if (isHandleLikeForCollaborator(trimmed)) return true;
+        if (isUcIdLikeForCollaborator(trimmed)) return true;
+        if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) return true;
+        if (/^watch:[a-zA-Z0-9_-]{11}$/i.test(trimmed)) return true;
+        if (/\band\s+\d+\s+more\b/i.test(trimmed) || /\band\s+more\b/i.test(trimmed)) return true;
+        if (isProbablyNotChannelNameForCollaborator(trimmed)) return true;
+        return false;
+    };
+
     initialChannelInfo.allCollaborators.forEach(collaborator => {
         if (!collaborator) return;
 
-        const normalizedHandle = collaborator.handle?.toLowerCase();
-        const normalizedId = collaborator.id?.toLowerCase();
+        const normalizedHandle = normalizeHandleValue(collaborator.handle || '').toLowerCase();
+        const normalizedId = normalizeUcIdForCollaborator(collaborator.id || '');
         const normalizedName = normalizeCollaboratorName(collaborator.name);
 
         let match = null;
         if (normalizedHandle) {
-            match = tryMatch(candidate => candidate.handle && candidate.handle.toLowerCase() === normalizedHandle);
+            match = tryMatch(candidate => normalizeHandleValue(candidate.handle || '').toLowerCase() === normalizedHandle);
         }
         if (!match && normalizedId) {
-            match = tryMatch(candidate => candidate.id && candidate.id.toLowerCase() === normalizedId);
+            match = tryMatch(candidate => normalizeUcIdForCollaborator(candidate.id || '') === normalizedId);
         }
         if (!match && normalizedName) {
             match = tryMatch(candidate => normalizeCollaboratorName(candidate.name) === normalizedName);
         }
-        if (!match) {
-            match = tryMatch(() => true);
-        }
 
         if (match) {
-            if (match.handle) collaborator.handle = match.handle;
-            if (match.id) collaborator.id = match.id;
-            if (match.name) collaborator.name = match.name;
+            const existingHandle = normalizeHandleValue(collaborator.handle || '');
+            const matchedHandle = normalizeHandleValue(match.handle || '');
+            if (matchedHandle && (!existingHandle || existingHandle === matchedHandle)) {
+                collaborator.handle = matchedHandle;
+            }
+
+            const existingId = normalizeUcIdForCollaborator(collaborator.id || '');
+            const matchedId = normalizeUcIdForCollaborator(match.id || '');
+            if (matchedId && (!existingId || existingId === matchedId)) {
+                collaborator.id = match.id;
+            }
+
+            const existingName = typeof collaborator.name === 'string' ? collaborator.name.trim() : '';
+            const matchedName = typeof match.name === 'string' ? match.name.trim() : '';
+            if (matchedName) {
+                const sameName = normalizeCollaboratorName(existingName) === normalizeCollaboratorName(matchedName);
+                if (isWeakCollaboratorName(existingName) || sameName) {
+                    collaborator.name = matchedName;
+                }
+            }
+
+            if (!collaborator.customUrl && typeof match.customUrl === 'string' && match.customUrl.trim()) {
+                collaborator.customUrl = match.customUrl.trim();
+            }
         }
     });
 
@@ -3738,10 +3872,20 @@ function mergeCollaboratorsWithMainWorld(initialChannelInfo, mainWorldCollaborat
     if (primary) {
         initialChannelInfo.handle = primary.handle || initialChannelInfo.handle;
         initialChannelInfo.id = primary.id || initialChannelInfo.id;
-        initialChannelInfo.name = primary.name || initialChannelInfo.name;
+        if (!isWeakCollaboratorName(primary.name)) {
+            initialChannelInfo.name = primary.name;
+        }
+        if (!initialChannelInfo.customUrl && primary.customUrl) {
+            initialChannelInfo.customUrl = primary.customUrl;
+        }
     }
 
-    initialChannelInfo.needsEnrichment = false;
+    initialChannelInfo.needsEnrichment = initialChannelInfo.allCollaborators.some(collaborator =>
+        collaborator &&
+        !collaborator.id &&
+        !collaborator.handle &&
+        !collaborator.customUrl
+    );
 }
 
 /**
@@ -3755,7 +3899,13 @@ async function enrichCollaboratorsWithMainWorld(initialChannelInfo) {
     }
 
     try {
-        const mainWorldCollaborators = await requestCollaboratorInfoFromMainWorld(initialChannelInfo.videoId);
+        const sourceCard = document.querySelector?.(`[data-filtertube-video-id="${initialChannelInfo.videoId}"]`) || null;
+        const lookupOptions = buildCollaboratorLookupRequestOptions({
+            card: sourceCard,
+            partialCollaborators: initialChannelInfo.allCollaborators,
+            channelInfo: initialChannelInfo
+        });
+        const mainWorldCollaborators = await requestCollaboratorInfoFromMainWorld(initialChannelInfo.videoId, lookupOptions);
         if (mainWorldCollaborators && mainWorldCollaborators.length > 0) {
             console.log('FilterTube: Received collaborator info from Main World:', mainWorldCollaborators);
             mergeCollaboratorsWithMainWorld(initialChannelInfo, mainWorldCollaborators);
@@ -4268,10 +4418,23 @@ function ensureFallbackMenuButtons() {
                     justify-content: center;
                     border-radius: 999px;
                     opacity: 0.92;
+                    transition: background-color 140ms ease, transform 140ms ease, opacity 140ms ease, box-shadow 140ms ease;
                 }
                 .filtertube-playlist-menu-fallback-btn:hover {
                     background: rgba(255, 255, 255, 0.10);
                     opacity: 1;
+                }
+                .filtertube-playlist-menu-fallback-btn:focus-visible {
+                    outline: none;
+                    opacity: 1;
+                    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.22);
+                    background: rgba(255, 255, 255, 0.12);
+                }
+                .filtertube-playlist-menu-fallback-btn:active,
+                .filtertube-playlist-menu-fallback-btn[aria-expanded="true"] {
+                    opacity: 1;
+                    transform: scale(0.96);
+                    background: rgba(255, 255, 255, 0.16);
                 }
                 .filtertube-fallback-menu-slot--ytm .filtertube-playlist-menu-fallback-btn {
                     width: 36px;
@@ -4279,6 +4442,14 @@ function ensureFallbackMenuButtons() {
                 }
                 html[data-theme="dark"] .filtertube-playlist-menu-fallback-btn:hover {
                     background: rgba(255, 255, 255, 0.12);
+                }
+                html[data-theme="dark"] .filtertube-playlist-menu-fallback-btn:focus-visible {
+                    box-shadow: 0 0 0 2px rgba(148, 163, 184, 0.28);
+                    background: rgba(255, 255, 255, 0.14);
+                }
+                html[data-theme="dark"] .filtertube-playlist-menu-fallback-btn:active,
+                html[data-theme="dark"] .filtertube-playlist-menu-fallback-btn[aria-expanded="true"] {
+                    background: rgba(255, 255, 255, 0.18);
                 }
                 .filtertube-playlist-menu-fallback-popover {
                     position: fixed;
@@ -4345,6 +4516,16 @@ function ensureFallbackMenuButtons() {
                 .filtertube-playlist-menu-fallback-popover .filtertube-menu-item:hover {
                     background: rgba(255, 255, 255, 0.08);
                 }
+                .filtertube-playlist-menu-fallback-popover .filtertube-block-channel-item.is-pressed .filtertube-menu-item,
+                .filtertube-playlist-menu-fallback-popover .filtertube-menu-item:active {
+                    background: rgba(255, 255, 255, 0.16);
+                    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+                    transform: scale(0.985);
+                }
+                .filtertube-playlist-menu-fallback-popover .filtertube-block-channel-item:focus-within .filtertube-menu-item {
+                    background: rgba(255, 255, 255, 0.1);
+                    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+                }
                 .filtertube-playlist-menu-fallback-popover .filtertube-menu-title-wrapper {
                     display: flex;
                     align-items: flex-start;
@@ -4363,6 +4544,17 @@ function ensureFallbackMenuButtons() {
                 html[dark="false"] .filtertube-playlist-menu-fallback-btn:hover,
                 html[data-theme="light"] .filtertube-playlist-menu-fallback-btn:hover {
                     background: rgba(15, 23, 42, 0.08);
+                }
+                html[dark="false"] .filtertube-playlist-menu-fallback-btn:focus-visible,
+                html[data-theme="light"] .filtertube-playlist-menu-fallback-btn:focus-visible {
+                    box-shadow: 0 0 0 2px rgba(148, 163, 184, 0.3);
+                    background: rgba(15, 23, 42, 0.10);
+                }
+                html[dark="false"] .filtertube-playlist-menu-fallback-btn:active,
+                html[dark="false"] .filtertube-playlist-menu-fallback-btn[aria-expanded="true"],
+                html[data-theme="light"] .filtertube-playlist-menu-fallback-btn:active,
+                html[data-theme="light"] .filtertube-playlist-menu-fallback-btn[aria-expanded="true"] {
+                    background: rgba(15, 23, 42, 0.14);
                 }
             `;
             (document.head || document.documentElement).appendChild(style);
@@ -4498,6 +4690,8 @@ function ensureFallbackMenuButtons() {
         btn.type = 'button';
         btn.className = 'filtertube-playlist-menu-fallback-btn';
         btn.setAttribute('aria-label', 'FilterTube menu');
+        btn.setAttribute('aria-haspopup', 'dialog');
+        btn.setAttribute('aria-expanded', 'false');
         btn.setAttribute('data-filtertube-fallback-menu', 'true');
         btn.setAttribute('data-filtertube-fallback-surface', surface || 'generic');
         btn.innerHTML = `
@@ -4607,7 +4801,7 @@ let playlistFallbackPopoverState = null;
 function openFilterTubePlaylistFallbackPopover(button, row) {
     if (!button || !row) return;
     if (!playlistFallbackPopoverState) {
-        playlistFallbackPopoverState = { popover: null, onDocClick: null };
+        playlistFallbackPopoverState = { popover: null, onDocClick: null, openerButton: null };
     }
 
     const close = () => {
@@ -4615,7 +4809,15 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
         if (pop) {
             try { pop.remove(); } catch (e) { }
         }
+        const opener = playlistFallbackPopoverState?.openerButton;
+        if (opener instanceof Element) {
+            try {
+                opener.setAttribute('aria-expanded', 'false');
+            } catch (e) {
+            }
+        }
         playlistFallbackPopoverState.popover = null;
+        playlistFallbackPopoverState.openerButton = null;
         if (playlistFallbackPopoverState?.onDocClick) {
             document.removeEventListener('click', playlistFallbackPopoverState.onDocClick, true);
             playlistFallbackPopoverState.onDocClick = null;
@@ -4723,6 +4925,7 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
         if (toggle) {
             toggle.addEventListener('click', (e) => {
                 e.preventDefault();
+                e.stopImmediatePropagation();
                 e.stopPropagation();
                 const isActive = !isFilterAllToggleActive(toggle);
                 applyFilterAllStateToToggle(toggle, isActive);
@@ -4745,7 +4948,7 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
                 const collaborators = channelInfo.allCollaborators.slice(0, 6);
                 for (let i = 0; i < collaborators.length; i++) {
                     const collaborator = collaborators[i];
-                    const identifier = collaborator?.handle || collaborator?.id || collaborator?.customUrl || '';
+                    const identifier = collaborator?.id || collaborator?.customUrl || collaborator?.handle || '';
                     if (!identifier) continue;
 
                     const otherChannels = collaborators
@@ -4796,7 +4999,7 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
             let handle = typeof info?.handle === 'string' ? info.handle.trim() : '';
             let id = typeof info?.id === 'string' ? info.id.trim() : '';
             let customUrl = typeof info?.customUrl === 'string' ? info.customUrl.trim() : '';
-            let input = handle || customUrl || id;
+            let input = id || customUrl || handle;
 
             if (!input) {
                 // Playlist rows sometimes render without any channel link; try main-world lookup via videoId.
@@ -4810,10 +5013,21 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
                             handle = typeof info.handle === 'string' ? info.handle.trim() : '';
                             id = typeof info.id === 'string' ? info.id.trim() : '';
                             customUrl = typeof info.customUrl === 'string' ? info.customUrl.trim() : '';
-                            input = handle || customUrl || id;
+                            input = id || customUrl || handle;
                         }
                     } catch (e) {
                     }
+                }
+            }
+
+            if (!input) {
+                const videoId = ensuredVideoId || (typeof info?.videoId === 'string' ? info.videoId.trim() : '');
+                if (/^[a-zA-Z0-9_-]{11}$/.test(videoId)) {
+                    // Match quick-block behavior: let background resolve the authoritative owner
+                    // from the watch page when the row itself exposes no stable channel identity.
+                    input = `watch:${videoId}`;
+                    info = { ...(info || {}), videoId };
+                    console.log('FilterTube: Fallback menu using watch:videoId recovery for', videoId);
                 }
             }
 
@@ -4865,16 +5079,38 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
     list.className = 'filtertube-playlist-menu-fallback-list';
 
     const bindFallbackRow = ({ item, toggle }, channelInfo) => {
+        const pulsePressedState = async () => {
+            item.classList.add('is-pressed');
+            await new Promise(resolve => setTimeout(resolve, 85));
+            item.classList.remove('is-pressed');
+        };
+
         item.addEventListener('click', (e) => {
+            const isToggleTarget = toggle && (toggle === e.target || toggle.contains(e.target));
+            if (isToggleTarget) {
+                return;
+            }
             e.preventDefault();
             e.stopPropagation();
-            performBlock(channelInfo, isFilterAllToggleActive(toggle));
+            pulsePressedState()
+                .catch(() => {})
+                .finally(() => {
+                    performBlock(channelInfo, isFilterAllToggleActive(toggle));
+                });
         }, true);
         item.addEventListener('keydown', (e) => {
+            const isToggleTarget = toggle && (toggle === e.target || toggle.contains(e.target));
+            if (isToggleTarget) {
+                return;
+            }
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
                 e.stopPropagation();
-                performBlock(channelInfo, isFilterAllToggleActive(toggle));
+                pulsePressedState()
+                    .catch(() => {})
+                    .finally(() => {
+                        performBlock(channelInfo, isFilterAllToggleActive(toggle));
+                    });
             }
         }, true);
         list.appendChild(item);
@@ -4954,6 +5190,11 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
 
     (document.body || document.documentElement).appendChild(pop);
     playlistFallbackPopoverState.popover = pop;
+    playlistFallbackPopoverState.openerButton = button;
+    try {
+        button.setAttribute('aria-expanded', 'true');
+    } catch (e) {
+    }
 
     playlistFallbackPopoverState.onDocClick = (evt) => {
         try {
@@ -6055,7 +6296,20 @@ function extractChannelFromCard(card) {
 
         // SPECIAL CASE: Mix cards (collection stacks / "My Mix")
         const isMixCard = isMixCardElement(card);
-        if (isMixCard) {
+        const mixBylineHint = (
+            card.getAttribute('data-filtertube-channel-name') ||
+            card.querySelector('#byline')?.textContent?.trim() ||
+            card.querySelector('#byline-container')?.textContent?.trim() ||
+            ''
+        );
+        const parsedMixBylineHint = parseCollaboratorNames(mixBylineHint);
+        const expectedMixCollaboratorCount = Number(card.getAttribute('data-filtertube-expected-collaborators')) || 0;
+        const shouldSkipMixShortcut = Boolean(
+            expectedMixCollaboratorCount > 1 ||
+            parsedMixBylineHint.hasHiddenCollaborators ||
+            parsedMixBylineHint.names.length >= 2
+        );
+        if (isMixCard && !shouldSkipMixShortcut) {
             const deriveMixName = () => {
                 const nameEl = card.querySelector(
                     '#channel-info ytd-channel-name a, ' +

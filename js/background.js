@@ -729,6 +729,94 @@ function schedulePostBlockEnrichment(channel, profile = 'main', metadata = {}) {
     pendingPostBlockEnrichments.set(key, run);
 }
 
+function getChannelDerivedKeywordRef(channel) {
+    if (!channel || typeof channel !== 'object') return '';
+    const keySource = channel.id || channel.handle || channel.originalInput || channel.name || '';
+    return typeof keySource === 'string' ? keySource.toLowerCase() : '';
+}
+
+function getChannelDerivedKeywordWord(channel) {
+    if (!channel || typeof channel !== 'object') return '';
+    if (channel.name && channel.name !== channel.id) {
+        return channel.name;
+    }
+    if (channel.handle) {
+        return channel.handle;
+    }
+    return channel.id || channel.originalInput || '';
+}
+
+function syncStoredMainKeywordsWithChannels(existingKeywords, channels) {
+    const currentKeywords = Array.isArray(existingKeywords) ? existingKeywords : [];
+    const currentChannels = Array.isArray(channels) ? channels : [];
+
+    const activeChannelKeys = new Set();
+    const channelKeywordMap = new Map();
+
+    currentChannels.forEach(channel => {
+        if (!channel || channel.filterAll !== true) return;
+        const channelRef = getChannelDerivedKeywordRef(channel);
+        const word = getChannelDerivedKeywordWord(channel);
+        if (!channelRef || !word) return;
+
+        activeChannelKeys.add(channelRef);
+        channelKeywordMap.set(channelRef, {
+            word,
+            exact: false,
+            semantic: false,
+            source: 'channel',
+            channelRef,
+            comments: (typeof channel.filterAllComments === 'boolean') ? channel.filterAllComments : true,
+            addedAt: channel.addedAt || Date.now()
+        });
+    });
+
+    const synced = [];
+    currentKeywords.forEach(entry => {
+        if (!entry) return;
+
+        if (typeof entry !== 'object' || Array.isArray(entry)) {
+            synced.push(entry);
+            return;
+        }
+
+        if (entry.source !== 'channel') {
+            synced.push(entry);
+            return;
+        }
+
+        const channelRef = typeof entry.channelRef === 'string' ? entry.channelRef : '';
+        if (!channelRef || !activeChannelKeys.has(channelRef)) {
+            return;
+        }
+
+        const nextKeyword = channelKeywordMap.get(channelRef);
+        if (nextKeyword) {
+            synced.push({
+                ...entry,
+                word: nextKeyword.word,
+                source: 'channel',
+                channelRef,
+                comments: nextKeyword.comments,
+                addedAt: entry.addedAt || nextKeyword.addedAt
+            });
+            activeChannelKeys.delete(channelRef);
+            return;
+        }
+
+        synced.push(entry);
+    });
+
+    activeChannelKeys.forEach(channelRef => {
+        const nextKeyword = channelKeywordMap.get(channelRef);
+        if (nextKeyword) {
+            synced.push(nextKeyword);
+        }
+    });
+
+    return synced;
+}
+
 // Deep link into the tab-view dashboard; query param avoids hash-only navigation
 // so we can reliably parse intent even when hash stripping occurs.
 const WHATS_NEW_PAGE_URL = browserAPI.runtime.getURL('html/tab-view.html?view=whatsnew');
@@ -4529,8 +4617,14 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             ? displayCandidate
             : (canonicalHandle || '');
 
+        const incomingSource = typeof metadata?.source === 'string' ? metadata.source.trim() : '';
+        // The custom fallback 3-dot menu can seed metadata.channelName from the row title,
+        // so fetched channel info is more authoritative for that recovery path.
+        const preferFetchedNameFirst = incomingSource === 'playlist_fallback_menu' || incomingSource === 'postBlockEnrichment';
         const finalChannelName = sanitizePersistedChannelName(
-            pickBetterName(metadata.channelName, channelInfo.name, normalizedValue)
+            preferFetchedNameFirst
+                ? pickBetterName(channelInfo.name, metadata.channelName, normalizedValue)
+                : pickBetterName(metadata.channelName, channelInfo.name, normalizedValue)
         );
 
         if (normalizedHandle) {
@@ -4590,8 +4684,23 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
 
             const mergedName = (() => {
                 const existingName = sanitizePersistedChannelName(existing.name || '');
-                if (existingName) return existingName;
-                return finalChannelName;
+                if (!existingName) return finalChannelName;
+
+                const existingSource = typeof existing?.source === 'string' ? existing.source.trim() : '';
+                const sameChannelId = existing.id && channelInfo.id && existing.id === channelInfo.id;
+                const canRepairFallbackMenuName = (
+                    finalChannelName
+                    && finalChannelName !== existingName
+                    && sameChannelId
+                    && existingSource === 'playlist_fallback_menu'
+                    && (incomingSource === 'playlist_fallback_menu' || incomingSource === 'postBlockEnrichment')
+                );
+
+                if (canRepairFallbackMenuName) {
+                    return finalChannelName;
+                }
+
+                return existingName;
             })();
 
             const updated = {
@@ -4712,6 +4821,11 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             const baseProfile = safeObject(profiles[activeProfileId]);
             const nextMain = safeObject(baseProfile.main);
             const nextKids = safeObject(baseProfile.kids);
+            const nextMainChannels = (!isKids && targetListType === 'blocklist') ? channels : safeArray(nextMain.channels);
+            const syncedMainKeywords = syncStoredMainKeywordsWithChannels(
+                Array.isArray(nextMain.keywords) ? nextMain.keywords : safeArray(nextMain.blockedKeywords),
+                nextMainChannels
+            );
 
             profiles[activeProfileId] = {
                 ...baseProfile,
@@ -4719,7 +4833,9 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                 settings: safeObject(baseProfile.settings),
                 main: {
                     ...nextMain,
-                    channels: (!isKids && targetListType === 'blocklist') ? channels : safeArray(nextMain.channels),
+                    channels: nextMainChannels,
+                    keywords: syncedMainKeywords,
+                    blockedKeywords: syncedMainKeywords,
                     whitelistChannels: (!isKids && targetListType === 'whitelist') ? channels : safeArray(nextMain.whitelistChannels)
                 },
                 kids: {
@@ -4850,6 +4966,15 @@ async function handleToggleChannelFilterAll(channelId, value) {
             const profiles = safeObject(profilesV4?.profiles);
             const activeProfile = safeObject(profiles?.[activeId]);
             const main = safeObject(activeProfile.main);
+            const nextChannels = channels.map((channel, index) => (
+                index === channelIndex
+                    ? { ...channel, filterAll: value }
+                    : channel
+            ));
+            const syncedKeywords = syncStoredMainKeywordsWithChannels(
+                Array.isArray(main.keywords) ? main.keywords : safeArray(main.blockedKeywords),
+                nextChannels
+            );
 
             profiles[activeId] = {
                 ...activeProfile,
@@ -4857,7 +4982,9 @@ async function handleToggleChannelFilterAll(channelId, value) {
                 settings: safeObject(activeProfile.settings),
                 main: {
                     ...main,
-                    channels
+                    channels: nextChannels,
+                    keywords: syncedKeywords,
+                    blockedKeywords: syncedKeywords
                 },
                 kids: {
                     ...safeObject(activeProfile.kids),

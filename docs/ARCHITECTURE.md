@@ -1,8 +1,8 @@
-# Architecture Documentation (v3.2.7)
+# Architecture Documentation (v3.2.8)
 
 ## Overview
 
-FilterTube v3.2.7 builds on the proactive channel identity system with performance optimizations, category filtering, and enhanced cross-browser support. This architecture documentation covers high-level design, filtering modes, memory management, and cross-browser compatibility.
+FilterTube v3.2.9 builds on the proactive channel identity system with performance optimizations, watch-page SPA recovery hardening, category filtering, a newer extension shell layer, and enhanced cross-browser support. This architecture documentation covers high-level design, filtering modes, recovery behavior, memory management, and cross-browser compatibility.
 
 ## Filtering Modes Architecture (v3.2.5)
 
@@ -87,6 +87,29 @@ const switchToWhitelist = async (profile, copyBlocklist = true) => {
 ```
 
 ## UI/UX Architecture (v3.2.2)
+
+### Extension Shell Layer (v3.2.8 follow-up)
+
+The extension UI now uses a split shell architecture:
+
+- `Preact` composes popup and tab-view shell/decor surfaces
+- existing vanilla JS still owns filtering logic, state management, and most operational behavior
+- popup and tab view share scenic shell tokens, ambient media, and responsive shell rules without rewriting the filtering engine
+
+Key pieces:
+
+- `/Users/devanshvarshney/FilterTube/src/extension-shell/popup.jsx`
+- `/Users/devanshvarshney/FilterTube/src/extension-shell/tab-view-decor.jsx`
+- `/Users/devanshvarshney/FilterTube/js/ui-shell/popup-shell.js`
+- `/Users/devanshvarshney/FilterTube/js/ui-shell/tab-view-decor.js`
+- `/Users/devanshvarshney/FilterTube/css/serene-shell.css`
+- `/Users/devanshvarshney/FilterTube/css/design_tokens.css`
+
+This means the current architecture should be read as:
+
+- shell/UI composition in `Preact`
+- filtering and persistence in vanilla extension modules
+- shared runtime contracts between shell surfaces and legacy filtering flows
 
 ### Optimistic Update System
 
@@ -606,6 +629,7 @@ Key implementation points:
 - Applies on YouTube Main and YouTube Kids with profile-aware persistence.
 - Comment-origin block actions are context-isolated to comment nodes; they skip playlist/video prefetch identity merges and videoId fallback lookups.
 - Pointer tracking keeps hover active while inside host/anchor bounds, stabilizing the cross button on Search overlays and Home Shorts.
+- Fallback 3-dot recovery is kept behaviorally aligned with quick-block on weak watch-page Mix / playlist rows so one path does not silently degrade while the other still succeeds.
 
 ## Storage Architecture
 
@@ -671,6 +695,8 @@ const channelData = {
     addedAt: Date.now()             // Timestamp
 };
 ```
+
+`filterAll` is the source state for channel-derived keyword sync. The linked keyword list is regenerated from channel state, which is why dashboard toggles and 3-dot menu blocks now stay aligned.
 
 ## Cross-World Communication
 
@@ -1222,7 +1248,7 @@ sequenceDiagram
 
     DOM->>DOM: Detect #attributed-channel-name<br/>parse collaborators
     DOM->>MW: postMessage FilterTube_RequestCollaboratorInfo
-    MW->>MW: searchYtInitialDataForVideoChannel<br/>enrich handles + UC IDs
+    MW->>MW: search watch-page roots + collaborator sheets<br/>enrich handles + UC IDs
     MW-->>DOM: FilterTube_CollaboratorInfoResponse<br/>allCollaborators[] payload
     DOM->>BG: chrome.runtime.sendMessage handleAddFilteredChannel<br/>collaborationGroupId + collaborationWith
     BG->>BG: sanitizeChannelEntry → persist allCollaborators
@@ -1233,7 +1259,7 @@ sequenceDiagram
 ### Architectural Guarantees
 1. **Deterministic grouping** – `content_bridge.js` creates a `collaborationGroupId` before storage, so every UI can reassemble the exact roster after reloads and across browsers.
 2. **Lossless collaborator roster** – `allCollaborators` travels with each saved channel entry, allowing tooltips to show present vs. missing members without re-querying YouTube.
-3. **Cross-world enrichment** – When the DOM only exposes the first collaborator link, the Request/Response hop to the Main World fills remaining handles/IDs directly from `ytInitialData`.
+3. **Cross-world enrichment** – When the DOM only exposes the first collaborator link, the Request/Response hop to the Main World fills remaining handles/IDs from stronger watch-page roots such as collaborator sheets, selected playlist rows, and watch metadata instead of trusting collapsed byline text.
 4. **FCFS rendering with inline metadata** – `render_engine.js` drops floating group containers and instead decorates each row in-place (badge, yellow rail, tooltip), preserving the filtered/sorted order defined by the user.
 
 The collaboration lifecycle reuses the existing Hybrid Filtering channels (`window.postMessage`, `chrome.runtime` messaging, StateManager broadcasts), ensuring the new metadata behaves like any other persisted filter entry.
@@ -1265,6 +1291,17 @@ The collaboration lifecycle reuses the existing Hybrid Filtering channels (`wind
 ```
 
 *Every hop carries the `collaborationGroupId`, `collaborationWith[]`, and `allCollaborators[]`, so downstream consumers never have to re-parse the DOM or `ytInitialData` for that upload.*
+
+### Watch-Page Weak-Identity Recovery
+
+For watch-page playlist / Mix rows, the architecture intentionally allows a recovery-only identity bridge:
+
+1. try stable row identity first (`UC ID`, then `customUrl`, then `@handle`)
+2. if the row is still weak, allow `watch:VIDEO_ID`
+3. background resolves the authoritative owner from watch payloads
+4. post-block enrichment can repair title-like labels for the same canonical UC ID
+
+This keeps Mix/watch rows blockable without treating byline/title text as canonical channel identity.
 
 ## Channel Identity Resolution & 404 Recovery (2025 Hardening)
 
@@ -1344,6 +1381,8 @@ Watch pages with `list=...` require additional guarantees beyond feed/search fil
 
 1. **Playlist panel deterministic hiding**: playlist panel row elements are prioritized for prefetch observers, allowing the extension to learn `videoChannelMap[videoId] -> UC ID` for playlist items even when the DOM lacks full channel identity.
 2. **Navigation guard**: when Next/Prev selects a blocked channel, the watch page auto-skips to the next allowed item without a visible playback flash.
+3. **Collaborator recovery branch**: rows with collapsed labels like `A and 2 more` remain enrichment candidates until stronger watch-page roots provide the real collaborator roster.
+4. **Fallback-menu parity**: if the custom 3-dot popover cannot recover stable owner identity from the row, it can escalate to `watch:VIDEO_ID` recovery instead of failing while quick-block still works.
 
 ### Bidirectional Mapping Synchronization
 
@@ -1470,6 +1509,14 @@ When you change a setting, it's like sending a letter. You drop it in the mailbo
 
 
 ## Component Breakdown
+
+The settings pipeline now also covers `Filter All` fan-out. A single confirmed block action can update:
+
+- the canonical channel entry
+- the linked channel-derived keyword state
+- the compiled settings broadcast consumed by popup, tab view, and content scripts
+
+Background remains the authority for this sync so dashboard toggles and 3-dot menu actions converge on the same compiled result.
 
 ### **1. Background Service (`background.js`)**
 *   **Context:** Background Service Worker.

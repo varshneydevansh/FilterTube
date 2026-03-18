@@ -1424,9 +1424,10 @@ padding: var(--ft-space-xs) var(--ft-space-sm);
 .advanced-list {
     display: flex;
     flex-direction: column;
-    gap: var(--ft-space-xs);
+    gap: var(--ft-space-md);
     max-height: min(75vh, 860px);
     overflow-y: auto;
+    padding-bottom: var(--ft-space-xs);
 }
 
 .list-item {
@@ -1438,6 +1439,9 @@ padding: var(--ft-space-xs) var(--ft-space-sm);
     border-radius: var(--ft-radius-md);
     background-color: var(--ft-color-bg-surface);
     border: 1px solid transparent;
+    position: relative;
+    isolation: isolate;
+    box-sizing: border-box;
 }
 
 .list-item:hover {
@@ -1571,6 +1575,7 @@ padding: var(--ft-space-xs) var(--ft-space-sm);
     display: flex;
     gap: var(--ft-space-sm);
     align-items: center;
+    flex-wrap: wrap;
 }
 
 /* Exact toggle styles now in components.css */
@@ -1645,11 +1650,14 @@ padding: var(--ft-space-xs) var(--ft-space-sm);
 .channel-item {
     display: flex;
     flex-direction: column;
-    padding: 16px !important;
-    gap: 12px;
+    justify-content: flex-start;
+    padding: 18px !important;
+    gap: 14px;
     background: var(--ft-color-bg-base, #ffffff);
     border-bottom: 1px solid var(--ft-color-sem-neutral-border, #e5e7eb);
     align-items: stretch;
+    min-height: auto;
+    overflow: visible;
 }
 
 .channel-item:hover {
@@ -1660,13 +1668,16 @@ padding: var(--ft-space-xs) var(--ft-space-sm);
 .channel-header-row {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
+    gap: 12px;
 }
 
 .channel-info-group {
     display: flex;
     align-items: center;
     gap: 12px;
+    min-width: 0;
+    flex: 1 1 auto;
 }
 
 .channel-logo {
@@ -1683,6 +1694,9 @@ padding: var(--ft-space-xs) var(--ft-space-sm);
     font-size: 16px;
     font-weight: 600;
     color: var(--ft-color-text-primary, #1f2937);
+    line-height: 1.2;
+    min-width: 0;
+    overflow-wrap: anywhere;
 }
 
 :root[data-theme="dark"] .channel-logo {
@@ -1718,18 +1732,23 @@ padding: var(--ft-space-xs) var(--ft-space-sm);
 /* --- ROW 2: BODY (Node + Controls) --- */
 .channel-body-row {
     display: flex;
-    align-items: center;
-    gap: 16px;
+    align-items: flex-start;
+    gap: 10px 16px;
     flex-wrap: wrap;
-    padding-left: 44px;
+    padding-left: 52px;
+    padding-top: 4px;
     /* Indent to align with name (32px logo + 12px gap) */
+    min-width: 0;
 }
 
 /* 1. The Node Map Container */
 .channel-node-container {
     display: inline-flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 10px;
+    min-width: 0;
+    flex: 1 1 360px;
 }
 
 /* Source Text (NO BOX - just plain text, bold) */
@@ -1739,6 +1758,8 @@ padding: var(--ft-space-xs) var(--ft-space-sm);
     font-weight: 600;
     color: var(--ft-color-text-secondary);
     letter-spacing: -0.01em;
+    min-width: 0;
+    overflow-wrap: anywhere;
 }
 
 /* Connector Arrow */
@@ -1792,6 +1813,7 @@ padding: var(--ft-space-xs) var(--ft-space-sm);
     text-overflow: ellipsis;
     white-space: nowrap;
     letter-spacing: -0.01em;
+    flex: 0 1 auto;
 }
 
 :root[data-theme="dark"] .node-badge.resolved {

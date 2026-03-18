@@ -1,8 +1,8 @@
-# FilterTube v3.2.7 - Current Functionality Documentation
+# FilterTube v3.2.8 - Current Functionality Documentation
 
 ## Overview
 
-FilterTube v3.2.7 implements a **hybrid filtering system** with dual filtering modes:
+FilterTube v3.2.9 implements a **hybrid filtering system** with dual filtering modes:
 
 - A primary **data interception layer** removes blocked items from YouTube JSON responses before render when possible.
 - A secondary **DOM fallback layer** hides/restores already-rendered elements for SPA navigation, DOM recycling, and edge cases.
@@ -108,6 +108,17 @@ YouTube JSON Data → FilterTubeEngine.processData() → Filtered Data → YouTu
 - **Collaboration Awareness**: Adds a shared `collaborationGroupId` when the user blocks multi-author videos; the UI reflects missing collaborators via dashed rails + tooltips without altering sort order.
 - **Handle Normalization**: Handle parsing is unicode-safe and percent-decoding aware (`js/shared/identity.js`), so handles like `@감동메모리` and percent-encoded variants remain matchable across surfaces.
 - **404 Recovery Pipeline**: Every block request runs through a cache-first lookup, ytInitialData replay, Shorts helpers, and DOM cache invalidation so handles never persist without a canonical UC ID—even when `/@handle/about` returns 404.
+- **Watch-Page Mix Recovery**: When a watch-page playlist / Mix row lacks strong owner identity, the fallback 3-dot path can recover through `watch:VIDEO_ID` instead of failing silently.
+- **Watch-Page Collaborator Recovery**: Collaboration rows with hidden rosters can upgrade through the watch-page collaborator sheet (`showSheetCommand -> sheetViewModel -> listItems`) instead of remaining stuck on one visible name.
+- **Post-Block Name Repair**: If a fallback menu add stores a weak title-like label for a valid UC ID, later enrichment can repair the entry to the fetched channel-page name.
+- **Filter All Sync Across Entry Points**: `Filter All` now creates and maintains the same channel-derived keyword state whether it is toggled from the dashboard or applied from the 3-dot menu block flow.
+
+### **Channel-Derived Keyword Sync (Filter All)**
+
+- **Linked Keyword Model**: `Filter All` creates a channel-derived fuzzy keyword linked to the blocked channel rather than a standalone hand-authored keyword.
+- **Shared Behavior Across Entry Points**: The same linked keyword state is now produced whether the user toggles `Filter All` in Channel Management or blocks through the 3-dot menu flow.
+- **Stored As Channel State**: The source of truth remains the channel record (`filterAll: true`); keyword storage is regenerated from channel state instead of drifting independently.
+- **UI Meaning**: In dashboard lists, these rows should be read as linked system entries such as `Linked to ...` / `Auto-added by "Filter All Content"` rather than user-authored keywords.
 
 ### **Comment Filtering**
 - **Complete Removal**: Removes entire comment sections
@@ -192,15 +203,21 @@ YouTube JSON Data → FilterTubeEngine.processData() → Filtered Data → YouTu
 #### UI polish (v3.2.1)
 - Popup search bars (keywords/channels/content controls) now align to full row width; add buttons sit beside matching-sized inputs.
 - Content control rows in popup hide descriptions for compactness; tab view keeps descriptions as title-only tooltips (hover the title text).
-- Pills/chips: Exact = whole-term matching; Comment defaults **ON** (filters matching comments, can be turned off even if Hide Comments is on); Filter All creates a channel-derived keyword with Exact on the channel name. C/E round chips mirror popup pills.
+- Pills/chips: Exact = whole-term matching; Comment defaults **ON** (filters matching comments, can be turned off even if Hide Comments is on); Filter All creates a linked channel-derived fuzzy keyword from channel state rather than a standalone exact keyword. C/E round chips mirror popup pills.
 - Proactive XHR interception provides instant channel names in 3-dot menus, eliminating "Fetching..." delays.
 - Badges match row tinting: green = From Channel, brown = From Comments, yellow = Collaboration rows.
+
+#### Watch / fallback 3-dot behavior (v3.2.9 follow-up)
+- Custom fallback 3-dot menus on weak watch-page rows now behave closer to quick-cross by allowing `watch:VIDEO_ID` recovery when row identity is incomplete.
+- In the fallback popover, `Filter All` is selection-only; the actual block action is activating the `Block • Channel` row.
+- The fallback block row now provides visible pressed/open/focus feedback so the click is acknowledged before the menu closes.
 
 ### **Tab View (Advanced Dashboard)**
 - **Channel Management**: Dedicated interface for managing blocked/allowed channels.
 - **Keyword Management**: Advanced keyword list editing.
 - **Stats Dashboard**: Detailed view of time saved and videos hidden.
 - **List Mode Controls (Experimental v3.2.3)**: Profile-specific whitelist/blocklist mode switching
+- **Shared Full-Row Layout Stabilization**: Main/Kids channel and keyword lists share a corrected row shell so long scrolling lists keep natural row height without overlap or metadata clipping.
 
 ### **Advanced Settings**
 - **Detailed Configuration**: Access to all filtering options
