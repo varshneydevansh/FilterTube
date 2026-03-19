@@ -206,6 +206,7 @@ YouTube JSON Data → FilterTubeEngine.processData() → Filtered Data → YouTu
 - Pills/chips: Exact = whole-term matching; Comment defaults **ON** (filters matching comments, can be turned off even if Hide Comments is on); Filter All creates a linked channel-derived fuzzy keyword from channel state rather than a standalone exact keyword. C/E round chips mirror popup pills.
 - Proactive XHR interception provides instant channel names in 3-dot menus, eliminating "Fetching..." delays.
 - Badges match row tinting: green = From Channel, brown = From Comments, yellow = Collaboration rows.
+- If the active profile is PIN-protected and still locked, the popup header `Enabled / Disabled` control is read-only and cannot pause filtering until the profile is unlocked.
 
 #### Watch / fallback 3-dot behavior (v3.2.9 follow-up)
 - Custom fallback 3-dot menus on weak watch-page rows now behave closer to quick-cross by allowing `watch:VIDEO_ID` recovery when row identity is incomplete.
@@ -218,6 +219,7 @@ YouTube JSON Data → FilterTubeEngine.processData() → Filtered Data → YouTu
 - **Stats Dashboard**: Detailed view of time saved and videos hidden.
 - **List Mode Controls (Experimental v3.2.3)**: Profile-specific whitelist/blocklist mode switching
 - **Shared Full-Row Layout Stabilization**: Main/Kids channel and keyword lists share a corrected row shell so long scrolling lists keep natural row height without overlap or metadata clipping.
+- **Locked Profile Switching**: Even while the active profile is locked, the top-bar profile selector remains available so the user can switch to another profile; denied/cancelled PIN prompts refresh the tab UI back to the real active profile state instead of leaving the selector/badge stale.
 
 ### **Advanced Settings**
 - **Detailed Configuration**: Access to all filtering options

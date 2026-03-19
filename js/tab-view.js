@@ -2859,8 +2859,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function closeProfileDropdownTab() {
         if (!ftProfileDropdownTab || !ftProfileBadgeBtnTab) return;
+        if (profileDropdownPositionRaf) {
+            cancelAnimationFrame(profileDropdownPositionRaf);
+            profileDropdownPositionRaf = 0;
+        }
         ftProfileDropdownTab.hidden = true;
-        ftProfileDropdownTab.style.visibility = '';
+        ftProfileDropdownTab.setAttribute('hidden', '');
+        ftProfileDropdownTab.style.display = 'none';
         ftProfileDropdownTab.style.left = '';
         ftProfileDropdownTab.style.top = '';
         ftProfileDropdownTab.style.minWidth = '';
@@ -2878,13 +2883,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             const maxBottom = window.innerHeight - pad;
 
             ftProfileDropdownTab.style.position = 'fixed';
-            ftProfileDropdownTab.style.visibility = 'hidden';
-            ftProfileDropdownTab.style.display = 'block';
-
             const dropdownHeight = ftProfileDropdownTab.offsetHeight || 280;
             const dropdownWidth = ftProfileDropdownTab.offsetWidth || Math.max(triggerRect.width, 220);
-
-            ftProfileDropdownTab.style.display = '';
 
             const spaceBelow = maxBottom - triggerRect.bottom;
             const spaceAbove = triggerRect.top - pad;
@@ -2915,9 +2915,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ftProfileDropdownTab.style.left = `${Math.round(left)}px`;
             ftProfileDropdownTab.style.minWidth = `${Math.max(triggerRect.width, 220)}px`;
             ftProfileDropdownTab.style.transform = 'none';
-            ftProfileDropdownTab.style.visibility = '';
         } catch (e) {
-            ftProfileDropdownTab.style.visibility = '';
         }
     }
 
@@ -2971,6 +2969,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         reset();
         requestAnimationFrame(reset);
     }
+    window.resetTabViewScroll = resetTabViewScroll;
 
     function toggleProfileDropdownTab() {
         if (!ftProfileDropdownTab || !ftProfileBadgeBtnTab) return;
@@ -2984,8 +2983,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         ftProfileDropdownTab.hidden = false;
+        ftProfileDropdownTab.removeAttribute('hidden');
+        ftProfileDropdownTab.style.display = 'block';
         ftProfileBadgeBtnTab.setAttribute('aria-expanded', 'true');
-        ftProfileDropdownTab.style.visibility = 'hidden';
+        positionProfileDropdownTab();
         scheduleProfileDropdownPositionTab();
         requestAnimationFrame(() => {
             scheduleProfileDropdownPositionTab();
@@ -3946,9 +3947,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const ok = await ensureProfileUnlocked(profilesV4, targetId);
             if (!ok) {
-                if (ftProfileSelector) {
-                    ftProfileSelector.value = normalizeString(profilesV4?.activeProfileId) || 'default';
-                }
+                await refreshProfilesUI();
                 return;
             }
 
@@ -5900,7 +5899,11 @@ function setupNavigation() {
         } else if (typeof window.closeProfileDropdownTab === 'function') {
             window.closeProfileDropdownTab();
         }
-        resetTabViewScroll(activeSection);
+        if (typeof resetTabViewScroll === 'function') {
+            resetTabViewScroll(activeSection);
+        } else if (typeof window.resetTabViewScroll === 'function') {
+            window.resetTabViewScroll(activeSection);
+        }
 
         try {
             document.body.dataset.activeView = effectiveViewId;

@@ -1776,6 +1776,10 @@ Follow-up shell/UI behavior now also includes:
 - route/page scroll reset between tab-view sections
 - corrected list-row shells so long channel/keyword lists do not overlap or clip metadata
 - custom fallback 3-dot feedback states: pressed, focus-visible, and open
+- popup now registers the shared `window.FilterTubeIsUiLocked` hook so `StateManager.updateSetting()` cannot be bypassed from the header brand toggle on locked profiles
+- popup header enabled/disabled state is visually disabled and hard-stopped while the active profile is PIN-locked
+- tab-view profile switching mirrors popup on denied/cancelled PIN prompts by refreshing profile/badge/lock UI instead of leaving stale selection state behind
+- tab-view exposes `resetTabViewScroll` the same way it exposes `closeProfileDropdownTab`, so lock-gate redirects and profile-driven view changes do not crash on scope boundaries
 
 ## Advance Video Filters Section (v3.2.6)
 

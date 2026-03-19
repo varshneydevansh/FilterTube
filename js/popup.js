@@ -590,6 +590,11 @@ function initializePopupFiltersTabs() {
 
 // Main initialization
 document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        window.FilterTubeIsUiLocked = () => true;
+    } catch (e) {
+    }
+
     // Initialize tabs first
     initializePopupFiltersTabs();
 
@@ -1186,6 +1191,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const isLocked = profilesV4 && isProfileLocked(profilesV4, activeProfileId) && !unlockedProfiles.has(activeProfileId);
 
         document.body.classList.toggle('ft-popup-locked', !!isLocked);
+        try {
+            window.FilterTubeIsUiLocked = () => isUiLocked();
+        } catch (e) {
+        }
 
         try {
             updateCheckboxes();
@@ -1526,10 +1535,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (toggleEnabledBrandBtn) {
             const enabled = state.enabled !== false;
+            const activeProfileName = getProfileName(profilesV4Cache, normalizeString(profilesV4Cache?.activeProfileId) || 'default');
             toggleEnabledBrandBtn.classList.toggle('ft-enabled', enabled);
             toggleEnabledBrandBtn.classList.toggle('ft-disabled', !enabled);
+            toggleEnabledBrandBtn.classList.toggle('is-locked', locked);
             toggleEnabledBrandBtn.setAttribute('aria-pressed', enabled ? 'true' : 'false');
-            toggleEnabledBrandBtn.title = enabled ? 'Filtering Active (click to pause)' : 'Filtering Paused (click to enable)';
+            toggleEnabledBrandBtn.setAttribute('aria-disabled', locked ? 'true' : 'false');
+            toggleEnabledBrandBtn.tabIndex = locked ? -1 : 0;
+            toggleEnabledBrandBtn.title = locked
+                ? `Unlock ${activeProfileName} to change filtering state.`
+                : (enabled ? 'Filtering Active (click to pause)' : 'Filtering Paused (click to enable)');
 
             const statusText = document.getElementById('extensionStatusText');
             if (statusText) {
@@ -1684,6 +1699,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (toggleEnabledBrandBtn) {
         const handleToggle = async () => {
+            if (isUiLocked()) {
+                updateCheckboxes();
+                UIComponents.showToast('Unlock profile to change filtering state', 'error');
+                return;
+            }
             const state = StateManager.getState();
             const enabled = state.enabled !== false;
             await StateManager.updateSetting('enabled', !enabled);

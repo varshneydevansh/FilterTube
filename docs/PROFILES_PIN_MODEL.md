@@ -117,12 +117,15 @@ Key points:
 - When the UI is locked:
   - Mutating actions (adding/removing channels/keywords, toggling settings) are blocked.
   - StateManager also no-ops mutating operations while locked (defense-in-depth).
+  - This includes the popup header `Enabled / Disabled` brand toggle; it must not be able to pause filtering while a PIN-protected profile is still locked.
 
 ### 5) Popup vs New Tab unlock
 
 - Unlock state is currently **local-only** to each UI context.
   - Popup unlock does not unlock New Tab automatically.
   - New Tab unlock does not unlock popup automatically.
+- The top-bar profile selector in New Tab stays available while locked so the user can switch to a different profile, but the switch still requires the **target profile PIN only** when that target is protected.
+- If a PIN prompt is denied/cancelled during profile switching, the surface must refresh its selector/badge/lock UI back to the true active profile state instead of leaving stale selection UI behind.
 - **Background session PIN cache**:
   - UIs send `FilterTube_SessionPinAuth` with the PIN; background verifies against stored verifier and keeps a **memory-only** cache per profile.
   - UIs can clear it with `FilterTube_ClearSessionPin` (on lock/Logout).
@@ -294,6 +297,8 @@ Possible future policies (not implemented):
 - **[Done]** Auto-backup per-profile enable/mode/format + encrypted auto-backup using background-verified session PIN cache.
 - **[Done]** New Tab UI exposes auto-backup mode/format controls.
 - **[Done]** Dashboard keyword/channel counts update on profile switch.
+- **[Done]** Popup enabled/disabled header toggle now respects the locked-profile mutation gate.
+- **[Done]** New Tab profile badge/dropdown now stays aligned with popup’s guarded switch contract, including denied/cancelled PIN refresh behavior.
 - **[In progress]** Standardize dropdown styling across all UIs (Sort/Date/Settings/selects).
 - **[In progress]** Standardize profile selector styling/colors across Popup + New Tab (shared accent colors).
 - **[Done]** Gate import/restore behind Default (Master) UI context (best-effort safety).

@@ -139,6 +139,18 @@ body {
      box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.35);
  }
 
+ .brand[role="button"].is-locked,
+ .brand[role="button"][aria-disabled="true"] {
+     cursor: not-allowed;
+     opacity: 0.8;
+ }
+
+ .brand[role="button"].is-locked:hover,
+ .brand[role="button"][aria-disabled="true"]:hover {
+     transform: none;
+     box-shadow: none;
+ }
+
  html[data-theme="dark"] .brand[role="button"] {
      border-color: rgba(255, 255, 255, 0.18);
      background: rgba(255, 255, 255, 0.05);

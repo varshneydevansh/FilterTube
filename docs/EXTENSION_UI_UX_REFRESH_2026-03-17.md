@@ -248,6 +248,28 @@ What this represents:
 - FilterTube’s dashboard lists are now treated as reusable application surfaces rather than one-off DOM stacks.
 - Shared row behavior is clearer, which lowers the risk of future UI polish work accidentally breaking only one list mode.
 
+### 9.5 Profile Lock Behavior Was Re-synced Across Popup And Tab View
+
+The profile/PIN follow-up work was not just visual. It corrected a real cross-surface behavior split.
+
+Key files:
+
+- `/Users/devanshvarshney/FilterTube/js/popup.js`
+- `/Users/devanshvarshney/FilterTube/js/tab-view.js`
+- `/Users/devanshvarshney/FilterTube/css/popup.css`
+
+What changed:
+
+- Popup now exports the same lock-state contract to shared state code that tab view already relied on.
+- The popup header `Enabled / Disabled` brand control is visually locked and cannot mutate profile state while the active profile is still PIN-protected.
+- Tab-view profile switching now refreshes its selector/badge/lock UI after denied or cancelled PIN prompts, matching popup behavior.
+- The tab-view profile badge/dropdown and navigation scroll-reset helpers were hardened so locked-profile flows do not get stuck on stale UI state or scope errors.
+
+What this represents:
+
+- Popup and tab view now agree more closely on what “locked profile” means.
+- Security-sensitive profile actions are less dependent on which extension surface the user happened to open.
+
 ### 9. Custom Fallback 3-Dot Menu Received Real Interaction Feedback
 
 The custom fallback 3-dot menu path had become functionally correct but visually dead. A follow-up polish pass fixed that.
