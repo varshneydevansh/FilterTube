@@ -117,6 +117,754 @@
         return norm.toLowerCase();
     }
 
+    function safeStructuredClone(value) {
+        if (value == null) return value;
+        try {
+            if (typeof structuredClone === 'function') {
+                return structuredClone(value);
+            }
+        } catch (e) {
+        }
+        try {
+            return JSON.parse(JSON.stringify(value));
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function sleep(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
+    function getYtcfgValue(key) {
+        if (!key || typeof key !== 'string') return null;
+        try {
+            if (window.ytcfg && typeof window.ytcfg.get === 'function') {
+                const value = window.ytcfg.get(key);
+                if (typeof value !== 'undefined') {
+                    return value;
+                }
+            }
+        } catch (e) {
+        }
+        try {
+            if (window.ytcfg && window.ytcfg.data_ && typeof window.ytcfg.data_ === 'object') {
+                const value = window.ytcfg.data_[key];
+                if (typeof value !== 'undefined') {
+                    return value;
+                }
+            }
+        } catch (e) {
+        }
+        return null;
+    }
+
+    function extractTextFromRenderer(value) {
+        if (!value) return '';
+        if (typeof value === 'string') return value.trim();
+        if (typeof value.simpleText === 'string') return value.simpleText.trim();
+        if (Array.isArray(value.runs)) {
+            return value.runs
+                .map((run) => (typeof run?.text === 'string' ? run.text : ''))
+                .join('')
+                .trim();
+        }
+        return '';
+    }
+
+    function normalizeThumbnailUrl(url) {
+        if (!url || typeof url !== 'string') return '';
+        if (url.startsWith('//')) {
+            return `https:${url}`;
+        }
+        return url;
+    }
+
+    function buildSubscriptionImportHeaders(profile = {}) {
+        const headers = {
+            'content-type': 'application/json'
+        };
+
+        const headerClientName = String(profile.headerClientName || '').trim();
+        const clientVersion = String(profile.headerClientVersion || '').trim();
+        const visitorData = String(profile.visitorData || '').trim();
+        const sessionIndex = String(profile.sessionIndex || '').trim();
+        const delegatedSessionId = String(profile.delegatedSessionId || '').trim();
+
+        if (headerClientName) headers['x-youtube-client-name'] = headerClientName;
+        if (clientVersion) headers['x-youtube-client-version'] = clientVersion;
+        if (visitorData) headers['x-goog-visitor-id'] = visitorData;
+        if (sessionIndex) headers['x-goog-authuser'] = sessionIndex;
+        if (delegatedSessionId) headers['x-goog-pageid'] = delegatedSessionId;
+        if (location?.origin) headers['x-origin'] = location.origin;
+        headers['x-youtube-bootstrap-logged-in'] = 'true';
+
+        return headers;
+    }
+
+    function buildSubscriptionImportRequestProfiles() {
+        const context = safeStructuredClone(getYtcfgValue('INNERTUBE_CONTEXT')) || {};
+        const contextClient = context?.client && typeof context.client === 'object' ? context.client : {};
+        const currentClientVersion = String(
+            contextClient.clientVersion
+            || getYtcfgValue('INNERTUBE_CLIENT_VERSION')
+            || getYtcfgValue('INNERTUBE_CONTEXT_CLIENT_VERSION')
+            || ''
+        ).trim();
+        const visitorData = String(
+            contextClient.visitorData
+            || getYtcfgValue('VISITOR_DATA')
+            || ''
+        ).trim();
+        const sessionIndex = String(
+            getYtcfgValue('SESSION_INDEX')
+            || contextClient.sessionIndex
+            || ''
+        ).trim();
+        const delegatedSessionId = String(
+            getYtcfgValue('DELEGATED_SESSION_ID')
+            || ''
+        ).trim();
+        const webClientHeaderName = String(
+            getYtcfgValue('INNERTUBE_CONTEXT_CLIENT_NAME')
+            || getYtcfgValue('INNERTUBE_CLIENT_NAME')
+            || '1'
+        ).trim();
+        const mwebClientVersion = String(
+            getYtcfgValue('MWEB_INNERTUBE_CLIENT_VERSION')
+            || currentClientVersion
+            || '2.20260318.01.00'
+        ).trim();
+
+        const baseContext = {
+            ...context,
+            client: {
+                ...contextClient,
+                originalUrl: contextClient.originalUrl || location.href
+            }
+        };
+
+        const profileMap = {
+            mweb_fechannels: {
+                source: 'mweb_fechannels',
+                browseId: 'FEchannels',
+                context: {
+                    ...context,
+                    client: {
+                        ...contextClient,
+                        clientName: 'MWEB',
+                        clientVersion: mwebClientVersion,
+                        clientScreen: 'MOBILE_WEB',
+                        platform: 'MOBILE',
+                        originalUrl: 'https://m.youtube.com/feed/channels',
+                        ...(visitorData ? { visitorData } : {})
+                    }
+                },
+                headerClientName: '2',
+                headerClientVersion: mwebClientVersion,
+                visitorData,
+                sessionIndex,
+                delegatedSessionId
+            },
+            web_fechannels: {
+                source: 'web_fechannels',
+                browseId: 'FEchannels',
+                context: baseContext,
+                headerClientName: webClientHeaderName || '1',
+                headerClientVersion: currentClientVersion,
+                visitorData,
+                sessionIndex,
+                delegatedSessionId
+            }
+        };
+
+        const isMobileHost = (() => {
+            try {
+                return String(location?.hostname || '').toLowerCase().startsWith('m.');
+            } catch (e) {
+                return false;
+            }
+        })();
+
+        const profiles = (isMobileHost
+            ? ['mweb_fechannels', 'web_fechannels']
+            : ['web_fechannels', 'mweb_fechannels'])
+            .map((key) => profileMap[key])
+            .filter((profile) => profile?.context);
+
+        return {
+            apiKey: String(getYtcfgValue('INNERTUBE_API_KEY') || '').trim(),
+            profiles
+        };
+    }
+
+    function isYoutubeChannelsFeedPath() {
+        try {
+            return String(location?.pathname || '') === '/feed/channels';
+        } catch (e) {
+            return false;
+        }
+    }
+
+    function detectLoggedOutBrowseResponse(data) {
+        try {
+            if (data?.responseContext?.mainAppWebResponseContext?.loggedOut === true) {
+                return true;
+            }
+        } catch (e) {
+        }
+
+        try {
+            const services = Array.isArray(data?.responseContext?.serviceTrackingParams)
+                ? data.responseContext.serviceTrackingParams
+                : [];
+            for (let i = 0; i < services.length; i += 1) {
+                const service = services[i];
+                const params = Array.isArray(service?.params) ? service.params : [];
+                for (let j = 0; j < params.length; j += 1) {
+                    const param = params[j];
+                    if (param?.key === 'logged_in' && String(param.value || '').trim() === '0') {
+                        return true;
+                    }
+                }
+            }
+        } catch (e) {
+        }
+
+        return false;
+    }
+
+    function collectSubscriptionImportArtifacts(root) {
+        const renderers = [];
+        const tokens = [];
+        const visited = new Set();
+
+        const visit = (node) => {
+            if (!node || typeof node !== 'object') return;
+            if (visited.has(node)) return;
+            visited.add(node);
+
+            if (node.channelListItemRenderer && typeof node.channelListItemRenderer === 'object') {
+                renderers.push(node.channelListItemRenderer);
+            }
+
+            if (node.channelRenderer && typeof node.channelRenderer === 'object') {
+                renderers.push(node.channelRenderer);
+            }
+
+            const token = node?.continuationCommand?.token;
+            if (typeof token === 'string' && token.trim()) {
+                tokens.push(token.trim());
+            }
+
+            if (Array.isArray(node)) {
+                for (let i = 0; i < node.length; i += 1) {
+                    visit(node[i]);
+                }
+                return;
+            }
+
+            Object.keys(node).forEach((key) => {
+                visit(node[key]);
+            });
+        };
+
+        visit(root);
+
+        return {
+            renderers,
+            tokens: Array.from(new Set(tokens))
+        };
+    }
+
+    function collectSubscriptionImportDomSeed(maxChannels) {
+        if (!isYoutubeChannelsFeedPath()) {
+            return {
+                channels: [],
+                tokens: []
+            };
+        }
+
+        const possibleSources = new Set();
+        const addSource = (source) => {
+            if (!source || typeof source !== 'object') return;
+            if (source instanceof Element || source instanceof Node || source === window) return;
+            possibleSources.add(source);
+        };
+
+        const elements = document.querySelectorAll('ytd-channel-renderer, ytm-channel-list-item-renderer');
+        elements.forEach((element) => {
+            addSource(element?.data);
+            addSource(element?.data?.data);
+            addSource(element?.data?.content);
+            addSource(element?.data?.renderer);
+            addSource(element?.__data);
+            addSource(element?.__data?.data);
+            addSource(element?.__data?.content);
+            addSource(element?.__data?.renderer);
+            addSource(element?.__dataHost);
+            addSource(element?.__dataHost?.data);
+        });
+
+        const collected = new Map();
+        const tokens = new Set();
+
+        for (const source of possibleSources) {
+            const { renderers, tokens: candidateTokens } = collectSubscriptionImportArtifacts(source);
+            for (let i = 0; i < renderers.length; i += 1) {
+                const normalized = normalizeSubscriptionImportEntry(renderers[i]);
+                if (!normalized) continue;
+                const key = getSubscriptionImportEntryKey(normalized);
+                if (!key) continue;
+                const existing = collected.get(key);
+                collected.set(key, mergeSubscriptionImportEntries(existing, normalized));
+                if (collected.size >= maxChannels) {
+                    break;
+                }
+            }
+
+            candidateTokens.forEach((token) => {
+                if (token) tokens.add(token);
+            });
+
+            if (collected.size >= maxChannels) {
+                break;
+            }
+        }
+
+        return {
+            channels: Array.from(collected.values()).slice(0, maxChannels),
+            tokens: Array.from(tokens)
+        };
+    }
+
+    function collectSubscriptionImportPageSeed(maxChannels) {
+        if (!isYoutubeChannelsFeedPath()) {
+            return {
+                channels: [],
+                tokens: []
+            };
+        }
+
+        const seedCandidates = [
+            window.ytInitialData,
+            window.__INITIAL_DATA__,
+            window.filterTube?.lastYtInitialData,
+            window.filterTube?.rawYtInitialData,
+            window.filterTube?.lastYtBrowseResponse
+        ].filter((candidate, index, array) => candidate && array.indexOf(candidate) === index);
+
+        const collected = new Map();
+        const tokens = new Set();
+
+        for (let i = 0; i < seedCandidates.length; i += 1) {
+            const { renderers, tokens: candidateTokens } = collectSubscriptionImportArtifacts(seedCandidates[i]);
+            for (let j = 0; j < renderers.length; j += 1) {
+                const normalized = normalizeSubscriptionImportEntry(renderers[j]);
+                if (!normalized) continue;
+                const key = getSubscriptionImportEntryKey(normalized);
+                if (!key) continue;
+                const existing = collected.get(key);
+                collected.set(key, mergeSubscriptionImportEntries(existing, normalized));
+                if (collected.size >= maxChannels) {
+                    break;
+                }
+            }
+            candidateTokens.forEach((token) => {
+                if (token) tokens.add(token);
+            });
+            if (collected.size >= maxChannels) {
+                break;
+            }
+        }
+
+        if (collected.size < maxChannels) {
+            const domSeed = collectSubscriptionImportDomSeed(maxChannels);
+            for (let i = 0; i < domSeed.channels.length; i += 1) {
+                const normalized = domSeed.channels[i];
+                const key = getSubscriptionImportEntryKey(normalized);
+                if (!key) continue;
+                const existing = collected.get(key);
+                collected.set(key, mergeSubscriptionImportEntries(existing, normalized));
+                if (collected.size >= maxChannels) {
+                    break;
+                }
+            }
+            domSeed.tokens.forEach((token) => {
+                if (token) tokens.add(token);
+            });
+        }
+
+        return {
+            channels: Array.from(collected.values()).slice(0, maxChannels),
+            tokens: Array.from(tokens)
+        };
+    }
+
+    async function waitForSubscriptionImportSeed(maxChannels, timeoutMs = 5000) {
+        const deadline = Date.now() + Math.max(250, timeoutMs);
+        let bestSeed = collectSubscriptionImportPageSeed(maxChannels);
+
+        while (Date.now() < deadline) {
+            if ((bestSeed.channels && bestSeed.channels.length > 0) || (bestSeed.tokens && bestSeed.tokens.length > 0)) {
+                return bestSeed;
+            }
+            await sleep(250);
+            bestSeed = collectSubscriptionImportPageSeed(maxChannels);
+        }
+
+        return bestSeed;
+    }
+
+    function getSubscriptionImportEntryKey(entry) {
+        const id = typeof entry?.id === 'string' ? entry.id.trim().toLowerCase() : '';
+        if (id) return `id:${id}`;
+        const handle = typeof entry?.handle === 'string' ? entry.handle.trim().toLowerCase() : '';
+        if (handle) return `handle:${handle}`;
+        const customUrl = typeof entry?.customUrl === 'string' ? entry.customUrl.trim().toLowerCase() : '';
+        if (customUrl) return `custom:${customUrl}`;
+        return '';
+    }
+
+    function normalizeSubscriptionImportEntry(renderer) {
+        if (!renderer || typeof renderer !== 'object') return null;
+
+        const endpoint = renderer.navigationEndpoint || {};
+        const browseEndpoint = endpoint.browseEndpoint || {};
+        const webMetadata = endpoint?.commandMetadata?.webCommandMetadata || {};
+        const canonicalBaseUrl = String(
+            browseEndpoint.canonicalBaseUrl
+            || webMetadata.url
+            || ''
+        ).trim();
+
+        const extractedHandle = extractRawHandle(canonicalBaseUrl);
+        const extractedCustomUrl = typeof window.FilterTubeIdentity?.extractCustomUrlFromPath === 'function'
+            ? window.FilterTubeIdentity.extractCustomUrlFromPath(canonicalBaseUrl)
+            : '';
+        const extractedIdFromPath = typeof window.FilterTubeIdentity?.extractChannelIdFromPath === 'function'
+            ? window.FilterTubeIdentity.extractChannelIdFromPath(canonicalBaseUrl)
+            : '';
+
+        const rawChannelId = String(
+            renderer.channelId
+            || browseEndpoint.browseId
+            || extractedIdFromPath
+            || ''
+        ).trim();
+
+        const channelId = /^UC[\w-]{22}$/i.test(rawChannelId) ? rawChannelId : '';
+        const handle = extractedHandle || '';
+        const customUrl = extractedCustomUrl || '';
+        const name = extractTextFromRenderer(renderer.title) || handle || channelId || customUrl || '';
+        const thumbnails = Array.isArray(renderer?.thumbnail?.thumbnails) ? renderer.thumbnail.thumbnails : [];
+        const bestThumb = thumbnails.length > 0 ? thumbnails[thumbnails.length - 1] : null;
+        const timestampRaw = parseInt(renderer.timestampMs, 10);
+
+        if (!channelId && !handle && !customUrl) {
+            return null;
+        }
+
+        return {
+            id: channelId || '',
+            handle: handle ? handle.toLowerCase() : null,
+            handleDisplay: handle || null,
+            canonicalHandle: handle || null,
+            logo: normalizeThumbnailUrl(bestThumb?.url || '') || null,
+            customUrl: customUrl || null,
+            name,
+            filterAll: false,
+            filterAllComments: true,
+            source: 'subscriptions_import',
+            originalInput: channelId || handle || customUrl || name || null,
+            addedAt: Number.isFinite(timestampRaw) ? timestampRaw : Date.now()
+        };
+    }
+
+    function mergeSubscriptionImportEntries(existing, incoming) {
+        if (!existing) return incoming;
+        if (!incoming) return existing;
+
+        const existingName = typeof existing.name === 'string' ? existing.name.trim() : '';
+        const incomingName = typeof incoming.name === 'string' ? incoming.name.trim() : '';
+        const existingLooksWeak = !existingName
+            || existingName === existing.id
+            || existingName === existing.handle
+            || existingName === existing.customUrl;
+
+        return {
+            ...existing,
+            id: existing.id || incoming.id || '',
+            handle: existing.handle || incoming.handle || null,
+            handleDisplay: existing.handleDisplay || incoming.handleDisplay || incoming.handle || null,
+            canonicalHandle: existing.canonicalHandle || incoming.canonicalHandle || incoming.handle || null,
+            logo: existing.logo || incoming.logo || null,
+            customUrl: existing.customUrl || incoming.customUrl || null,
+            name: (existingLooksWeak && incomingName) ? incomingName : (existingName || incomingName || ''),
+            filterAll: existing.filterAll === true || incoming.filterAll === true,
+            filterAllComments: typeof existing.filterAllComments === 'boolean'
+                ? existing.filterAllComments
+                : (typeof incoming.filterAllComments === 'boolean' ? incoming.filterAllComments : true),
+            source: existing.source || incoming.source || 'subscriptions_import',
+            originalInput: existing.originalInput || incoming.originalInput || incoming.id || incoming.handle || incoming.customUrl || incoming.name || null,
+            addedAt: Math.min(
+                Number.isFinite(existing.addedAt) ? existing.addedAt : Date.now(),
+                Number.isFinite(incoming.addedAt) ? incoming.addedAt : Date.now()
+            )
+        };
+    }
+
+    async function fetchSubscribedChannelsFromYoutubei(requestId, options = {}) {
+        const maxChannels = Math.max(1, Math.min(parseInt(options.maxChannels, 10) || 5000, 5000));
+        const pageDelayMs = Math.max(50, Math.min(parseInt(options.pageDelayMs, 10) || 140, 500));
+        const timeoutMs = Math.max(5000, Math.min(parseInt(options.timeoutMs, 10) || 60000, 120000));
+        const startTs = Date.now();
+        const requestContext = buildSubscriptionImportRequestProfiles();
+        const collected = new Map();
+        const seenTokens = new Set();
+        const seed = await waitForSubscriptionImportSeed(maxChannels, Math.min(timeoutMs, 5000));
+        let continuation = '';
+        let pagesFetched = 0;
+        let lastLoggedOut = false;
+        let requestProfileIndex = 0;
+        let activeSource = seed.channels.length > 0 ? 'page_seed' : '';
+        let partialReason = '';
+
+        const postProgress = (phase, extra = {}) => {
+            window.postMessage({
+                type: 'FilterTube_SubscriptionsImportProgress',
+                payload: {
+                    requestId,
+                    phase,
+                    pagesFetched,
+                    foundCount: collected.size,
+                    maxChannels,
+                    ...extra
+                },
+                source: 'injector'
+            }, '*');
+        };
+
+        if ((!Array.isArray(requestContext?.profiles) || requestContext.profiles.length === 0) && seed.channels.length === 0) {
+            throw new Error('YouTube context unavailable');
+        }
+
+        postProgress('starting');
+
+        if (seed.channels.length > 0) {
+            for (let i = 0; i < seed.channels.length; i += 1) {
+                const entry = seed.channels[i];
+                const key = getSubscriptionImportEntryKey(entry);
+                if (!key) continue;
+                const existing = collected.get(key);
+                collected.set(key, mergeSubscriptionImportEntries(existing, entry));
+                if (collected.size >= maxChannels) {
+                    break;
+                }
+            }
+
+            pagesFetched = 1;
+            continuation = seed.tokens.find((token) => token && !seenTokens.has(token)) || '';
+            if (continuation) {
+                seenTokens.add(continuation);
+            }
+            if (collected.size >= maxChannels) {
+                continuation = '';
+            }
+
+            postProgress('page_seed', {
+                pageRows: seed.channels.length,
+                hasContinuation: !!continuation,
+                source: activeSource
+            });
+        }
+
+        while (continuation || collected.size === 0) {
+            if ((Date.now() - startTs) > timeoutMs) {
+                throw new Error('Subscription import timed out');
+            }
+
+            const requestProfile = requestContext.profiles[requestProfileIndex];
+            if (!requestProfile?.context) {
+                break;
+            }
+
+            const endpointUrl = requestContext.apiKey
+                ? `/youtubei/v1/browse?prettyPrint=false&key=${encodeURIComponent(requestContext.apiKey)}`
+                : '/youtubei/v1/browse?prettyPrint=false';
+            const requestBody = continuation
+                ? { context: requestProfile.context, continuation }
+                : { context: requestProfile.context, browseId: requestProfile.browseId || 'FEchannels' };
+
+            const remainingBudgetMs = Math.max(1500, timeoutMs - (Date.now() - startTs));
+            const fetchTimeoutMs = Math.max(4000, Math.min(25000, remainingBudgetMs));
+            const abortController = typeof AbortController === 'function' ? new AbortController() : null;
+            const abortTimer = abortController
+                ? setTimeout(() => {
+                    try {
+                        abortController.abort();
+                    } catch (e) {
+                    }
+                }, fetchTimeoutMs)
+                : null;
+
+            let response = null;
+            try {
+                response = await fetch(endpointUrl, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: buildSubscriptionImportHeaders(requestProfile),
+                    body: JSON.stringify(requestBody),
+                    ...(abortController ? { signal: abortController.signal } : {})
+                });
+            } catch (error) {
+                if (abortTimer) {
+                    clearTimeout(abortTimer);
+                }
+
+                const timeoutLikeError = error?.name === 'AbortError'
+                    ? `Subscriptions request timed out (${fetchTimeoutMs}ms)`
+                    : (error?.message || 'Subscriptions request failed');
+                const canSwitchProfile = requestProfileIndex < (requestContext.profiles.length - 1);
+                if (canSwitchProfile) {
+                    requestProfileIndex += 1;
+                    activeSource = requestContext.profiles[requestProfileIndex]?.source || activeSource;
+                    postProgress('retrying_source', {
+                        hasContinuation: !!continuation,
+                        source: activeSource,
+                        error: timeoutLikeError
+                    });
+                    continue;
+                }
+
+                if (collected.size > 0) {
+                    partialReason = timeoutLikeError;
+                    break;
+                }
+
+                throw new Error(timeoutLikeError);
+            } finally {
+                if (abortTimer) {
+                    clearTimeout(abortTimer);
+                }
+            }
+
+            let rawText = '';
+            let data = null;
+            try {
+                rawText = await response.text();
+            } catch (e) {
+            }
+
+            if (!response.ok) {
+                try {
+                    data = rawText ? JSON.parse(rawText) : null;
+                } catch (e) {
+                }
+
+                const fallbackMessage = (typeof data?.error?.message === 'string' ? data.error.message.trim() : '')
+                    || (typeof data?.message === 'string' ? data.message.trim() : '')
+                    || `Subscriptions request failed (${response.status})`;
+                const canSwitchProfile = requestProfileIndex < (requestContext.profiles.length - 1);
+                const canRetryWithAlternateProfile = canSwitchProfile;
+                if (canRetryWithAlternateProfile) {
+                    requestProfileIndex += 1;
+                    activeSource = requestContext.profiles[requestProfileIndex]?.source || activeSource;
+                    postProgress('retrying_source', {
+                        hasContinuation: !!continuation,
+                        status: response.status,
+                        source: activeSource
+                    });
+                    continue;
+                }
+
+                if (collected.size > 0) {
+                    partialReason = fallbackMessage;
+                    break;
+                }
+
+                throw new Error(fallbackMessage);
+            }
+
+            try {
+                data = rawText ? JSON.parse(rawText) : null;
+            } catch (e) {
+                if (collected.size > 0) {
+                    partialReason = 'Stopped after a partial subscriptions response.';
+                    break;
+                }
+                throw new Error('Failed to parse subscriptions response');
+            }
+
+            lastLoggedOut = detectLoggedOutBrowseResponse(data);
+            pagesFetched += 1;
+            activeSource = requestProfile.source || activeSource || 'subscriptions_import';
+
+            const { renderers, tokens } = collectSubscriptionImportArtifacts(data);
+            for (let i = 0; i < renderers.length; i += 1) {
+                const normalized = normalizeSubscriptionImportEntry(renderers[i]);
+                if (!normalized) continue;
+                const key = getSubscriptionImportEntryKey(normalized);
+                if (!key) continue;
+                const existing = collected.get(key);
+                collected.set(key, mergeSubscriptionImportEntries(existing, normalized));
+                if (collected.size >= maxChannels) {
+                    break;
+                }
+            }
+
+            const nextToken = tokens.find((token) => token && !seenTokens.has(token)) || '';
+            if (nextToken) {
+                seenTokens.add(nextToken);
+            }
+
+            postProgress('page', {
+                pageRows: renderers.length,
+                hasContinuation: !!nextToken,
+                source: activeSource
+            });
+
+            if (collected.size >= maxChannels) {
+                break;
+            }
+
+            if (!nextToken) {
+                break;
+            }
+
+            continuation = nextToken;
+            await sleep(pageDelayMs);
+        }
+
+        const channels = Array.from(collected.values()).slice(0, maxChannels);
+        if (channels.length === 0 && lastLoggedOut) {
+            return {
+                success: false,
+                error: 'Sign in to YouTube first',
+                errorCode: 'signed_out',
+                channels: [],
+                stats: {
+                    pagesFetched,
+                    totalFound: 0,
+                    source: 'mweb_fechannels'
+                }
+            };
+        }
+
+        return {
+            success: true,
+            channels,
+            stats: {
+                pagesFetched,
+                totalFound: channels.length,
+                truncated: collected.size > maxChannels,
+                partial: !!partialReason,
+                partialReason: partialReason || null,
+                source: activeSource || 'subscriptions_import'
+            }
+        };
+    }
+
     function tokenizeExpectedCollaboratorNames(values = []) {
         const normalizedTokens = new Set();
         const compactTokens = new Set();
@@ -411,7 +1159,53 @@
                 postLog('log', 'No channel info found for video:', videoId);
             }
         }
+
+        if (type === 'FilterTube_RequestSubscriptionImport' && source === 'content_bridge') {
+            const { requestId } = payload || {};
+            postLog('log', `Received subscriptions import request: ${requestId || 'n/a'}`);
+
+            (async () => {
+                let responsePayload = null;
+                try {
+                    responsePayload = await fetchSubscribedChannelsFromYoutubei(requestId, payload || {});
+                } catch (error) {
+                    responsePayload = {
+                        success: false,
+                        error: error?.message || 'Subscription import failed',
+                        errorCode: 'fetch_failed',
+                        channels: [],
+                        stats: {
+                            pagesFetched: 0,
+                            totalFound: 0,
+                            source: 'mweb_fechannels'
+                        }
+                    };
+                    postLog('error', `Subscriptions import failed: ${responsePayload.error}`);
+                }
+
+                window.postMessage({
+                    type: 'FilterTube_SubscriptionsImportResponse',
+                    payload: {
+                        requestId,
+                        ...responsePayload
+                    },
+                    source: 'injector'
+                }, '*');
+
+                postLog('log', 'Sent subscriptions import response:', {
+                    requestId,
+                    success: !!responsePayload?.success,
+                    count: Array.isArray(responsePayload?.channels) ? responsePayload.channels.length : 0
+                });
+            })();
+        }
     });
+
+    window.postMessage({
+        type: 'FilterTube_InjectorBridgeReady',
+        source: 'injector'
+    }, '*');
+    postLog('log', 'Injector bridge is ready for requests');
 
     /**
      * Extract collaborators from a raw renderer/data object

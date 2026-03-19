@@ -189,7 +189,13 @@ function initializeFiltersTabs() {
                 <span class="date-sep">to</span>
                 <input type="date" id="channelDateTo" class="select-input date-input custom-date-input" />
                 <button id="channelDateClear" class="btn-secondary date-clear-btn" type="button">Clear</button>
+                <button id="importSubscriptionsBtn" class="btn-secondary date-clear-btn subscriptions-import-trigger" type="button">Import Subscribed Channels</button>
             </div>
+        </div>
+
+        <div id="importSubscriptionsNotice" class="subscriptions-import-inline subscriptions-import-inline--idle" hidden>
+            <div id="importSubscriptionsStatus" class="subscriptions-import-status" aria-live="polite"></div>
+            <div id="importSubscriptionsActions" class="subscriptions-import-actions" hidden></div>
         </div>
 
         <div id="channelListEl" class="advanced-list"></div>
@@ -2417,14 +2423,29 @@ function handleNavigationIntent() {
     try {
         const searchParams = new URLSearchParams(window.location.search || '');
         const section = (searchParams.get('section') || '').toLowerCase();
+        const flow = (searchParams.get('flow') || '').toLowerCase();
         if (viewId === 'filters' && section) {
             try {
                 const tabs = document.querySelector('#filtersView .tab-buttons') || document.querySelector('.tab-buttons');
+                const keywordsTabBtn = tabs?.querySelector('[data-tab-id="keywords"]');
+                const channelsTabBtn = tabs?.querySelector('[data-tab-id="channels"]');
                 const contentTabBtn = tabs?.querySelector('[data-tab-id="content"]');
-                if (contentTabBtn) {
+                if (section === 'channels' || section === 'channel' || section === 'channelmanagement') {
+                    channelsTabBtn?.click();
+                } else if (section === 'keywords' || section === 'keyword' || section === 'keywordmanagement') {
+                    keywordsTabBtn?.click();
+                } else if (contentTabBtn) {
                     contentTabBtn.click();
                 }
             } catch (e) {
+            }
+            if ((section === 'channels' || section === 'channel' || section === 'channelmanagement') && flow === 'import-subscriptions') {
+                const target = document.getElementById('importSubscriptionsBtn')
+                    || document.getElementById('importSubscriptionsNotice')
+                    || document.getElementById('channelInput');
+                if (target) {
+                    requestAnimationFrame(() => target.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+                }
             }
             if (section === 'categories' || section === 'category' || section === 'categoryfilters') {
                 const target = document.getElementById('categoryFiltersSection');
@@ -2603,6 +2624,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const channelInput = document.getElementById('channelInput');
     const addChannelBtn = document.getElementById('addChannelBtn');
+    const importSubscriptionsNotice = document.getElementById('importSubscriptionsNotice');
+    const importSubscriptionsBtn = document.getElementById('importSubscriptionsBtn');
+    const importSubscriptionsStatus = document.getElementById('importSubscriptionsStatus');
+    const importSubscriptionsActions = document.getElementById('importSubscriptionsActions');
     const channelListEl = document.getElementById('channelListEl');
     const searchChannels = document.getElementById('searchChannels');
     const channelSort = document.getElementById('channelSort');
@@ -2658,6 +2683,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     let keywordDateToTs = null;
     let channelDateFromTs = null;
     let channelDateToTs = null;
+    let preferredSubscriptionsImportTabId = Number.parseInt(new URLSearchParams(window.location.search || '').get('sourceTabId') || '', 10);
+    let subscriptionsImportFlowConsumed = false;
+    let subscriptionsImportState = {
+        phase: 'idle',
+        tone: 'idle',
+        title: '',
+        message: '',
+        meta: '',
+        requestId: '',
+        sourceTabId: null,
+        inProgress: false,
+        canEnableWhitelist: false
+    };
 
     if (ftProfileDropdownTab && ftProfileDropdownTab.parentNode !== document.body) {
         document.body.appendChild(ftProfileDropdownTab);
@@ -2832,6 +2870,374 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function normalizeString(value) {
         return typeof value === 'string' ? value.trim() : '';
+    }
+
+    function pluralize(count, singular, plural = `${singular}s`) {
+        return count === 1 ? singular : plural;
+    }
+
+    function sleep(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
+    async function queryBrowserTabs(queryInfo = {}) {
+        return new Promise((resolve) => {
+            try {
+                if (!runtimeAPI?.tabs?.query) {
+                    resolve([]);
+                    return;
+                }
+
+                const maybePromise = runtimeAPI.tabs.query(queryInfo, (tabs) => {
+                    const err = runtimeAPI.runtime?.lastError;
+                    if (err) {
+                        resolve([]);
+                        return;
+                    }
+                    resolve(Array.isArray(tabs) ? tabs : []);
+                });
+
+                if (maybePromise && typeof maybePromise.then === 'function') {
+                    maybePromise.then((tabs) => resolve(Array.isArray(tabs) ? tabs : [])).catch(() => resolve([]));
+                }
+            } catch (e) {
+                resolve([]);
+            }
+        });
+    }
+
+    async function createBrowserTab(createProperties) {
+        return new Promise((resolve) => {
+            try {
+                if (!runtimeAPI?.tabs?.create) {
+                    resolve(null);
+                    return;
+                }
+
+                const maybePromise = runtimeAPI.tabs.create(createProperties, (tab) => {
+                    const err = runtimeAPI.runtime?.lastError;
+                    if (err) {
+                        resolve(null);
+                        return;
+                    }
+                    resolve(tab || null);
+                });
+
+                if (maybePromise && typeof maybePromise.then === 'function') {
+                    maybePromise.then((tab) => resolve(tab || null)).catch(() => resolve(null));
+                }
+            } catch (e) {
+                resolve(null);
+            }
+        });
+    }
+
+    async function updateBrowserTab(tabId, updateProperties) {
+        return new Promise((resolve) => {
+            try {
+                if (!runtimeAPI?.tabs?.update || !Number.isFinite(tabId)) {
+                    resolve(null);
+                    return;
+                }
+
+                const maybePromise = runtimeAPI.tabs.update(tabId, updateProperties, (tab) => {
+                    const err = runtimeAPI.runtime?.lastError;
+                    if (err) {
+                        resolve(null);
+                        return;
+                    }
+                    resolve(tab || null);
+                });
+
+                if (maybePromise && typeof maybePromise.then === 'function') {
+                    maybePromise.then((tab) => resolve(tab || null)).catch(() => resolve(null));
+                }
+            } catch (e) {
+                resolve(null);
+            }
+        });
+    }
+
+    async function sendMessageToBrowserTab(tabId, payload) {
+        return new Promise((resolve) => {
+            try {
+                if (!runtimeAPI?.tabs?.sendMessage || !Number.isFinite(tabId)) {
+                    resolve({
+                        response: null,
+                        errorCode: 'tab_api_unavailable',
+                        errorMessage: 'Tab messaging unavailable'
+                    });
+                    return;
+                }
+
+                let settled = false;
+                const finish = (value) => {
+                    if (settled) return;
+                    settled = true;
+                    resolve(value);
+                };
+                const handleRuntimeError = (error) => {
+                    const message = typeof error?.message === 'string' ? error.message.trim() : '';
+                    let errorCode = 'tab_send_failed';
+                    if (/Receiving end does not exist/i.test(message)) {
+                        errorCode = 'receiver_unavailable';
+                    } else if (/No tab with id/i.test(message)) {
+                        errorCode = 'tab_missing';
+                    }
+                    finish({
+                        response: null,
+                        errorCode,
+                        errorMessage: message || 'Failed to reach YouTube tab'
+                    });
+                };
+
+                const maybePromise = runtimeAPI.tabs.sendMessage(tabId, payload, (response) => {
+                    const err = runtimeAPI.runtime?.lastError;
+                    if (err) {
+                        handleRuntimeError(err);
+                        return;
+                    }
+                    finish({ response: response || null, errorCode: '', errorMessage: '' });
+                });
+
+                if (maybePromise && typeof maybePromise.then === 'function') {
+                    maybePromise
+                        .then((response) => finish({ response: response || null, errorCode: '', errorMessage: '' }))
+                        .catch((error) => handleRuntimeError(error));
+                }
+            } catch (e) {
+                resolve({
+                    response: null,
+                    errorCode: 'tab_send_failed',
+                    errorMessage: e?.message || 'Failed to reach YouTube tab'
+                });
+            }
+        });
+    }
+
+    function isMainYoutubeUrl(url) {
+        if (!url || typeof url !== 'string') return false;
+        try {
+            const parsed = new URL(url);
+            const host = (parsed.hostname || '').toLowerCase();
+            if (host === 'youtubekids.com' || host.endsWith('.youtubekids.com')) {
+                return false;
+            }
+            return host === 'www.youtube.com'
+                || host === 'youtube.com'
+                || host === 'm.youtube.com';
+        } catch (e) {
+            return false;
+        }
+    }
+
+    function isYoutubeChannelsFeedUrl(url) {
+        if (!isMainYoutubeUrl(url)) return false;
+        try {
+            const parsed = new URL(url);
+            return parsed.pathname === '/feed/channels';
+        } catch (e) {
+            return false;
+        }
+    }
+
+    function isYoutubeSignInUrl(url) {
+        if (!url || typeof url !== 'string') return false;
+        try {
+            const parsed = new URL(url);
+            const host = (parsed.hostname || '').toLowerCase();
+            const path = parsed.pathname || '';
+            if (host === 'accounts.google.com' || host.endsWith('.accounts.google.com')) {
+                return true;
+            }
+            if ((host === 'www.youtube.com' || host === 'youtube.com') && path === '/signin') {
+                return true;
+            }
+        } catch (e) {
+        }
+        return false;
+    }
+
+    function renderSubscriptionsImportState() {
+        if (!importSubscriptionsNotice || !importSubscriptionsStatus || !importSubscriptionsActions) return;
+
+        const nextTone = normalizeString(subscriptionsImportState.tone) || 'idle';
+        importSubscriptionsNotice.classList.remove(
+            'subscriptions-import-inline--idle',
+            'subscriptions-import-inline--info',
+            'subscriptions-import-inline--success',
+            'subscriptions-import-inline--warning',
+            'subscriptions-import-inline--error'
+        );
+        importSubscriptionsNotice.classList.add(`subscriptions-import-inline--${nextTone}`);
+
+        const message = normalizeString(subscriptionsImportState.message);
+        const meta = normalizeString(subscriptionsImportState.meta);
+        const statusText = meta ? `${message} ${meta}`.trim() : message;
+        importSubscriptionsStatus.textContent = statusText;
+
+        importSubscriptionsActions.innerHTML = '';
+        importSubscriptionsActions.hidden = true;
+
+        if (!subscriptionsImportState.inProgress && subscriptionsImportState.canEnableWhitelist) {
+            const enableBtn = document.createElement('button');
+            enableBtn.type = 'button';
+            enableBtn.className = 'btn-primary';
+            enableBtn.dataset.importAction = 'enable-whitelist';
+            enableBtn.textContent = 'Turn On Whitelist';
+            importSubscriptionsActions.appendChild(enableBtn);
+            importSubscriptionsActions.hidden = false;
+        }
+
+        if (!subscriptionsImportState.inProgress && (nextTone === 'error' || subscriptionsImportState.phase === 'error' || subscriptionsImportState.phase === 'empty')) {
+            const retryBtn = document.createElement('button');
+            retryBtn.type = 'button';
+            retryBtn.className = 'btn-secondary';
+            retryBtn.dataset.importAction = 'retry-import';
+            retryBtn.textContent = 'Retry Import';
+            importSubscriptionsActions.appendChild(retryBtn);
+            importSubscriptionsActions.hidden = false;
+        }
+
+        const showNotice = nextTone !== 'idle'
+            || subscriptionsImportState.inProgress
+            || !!statusText
+            || !importSubscriptionsActions.hidden;
+        importSubscriptionsNotice.hidden = !showNotice;
+        importSubscriptionsStatus.hidden = !statusText;
+    }
+
+    function syncSubscriptionsImportControls() {
+        if (!importSubscriptionsBtn) return;
+        const locked = isUiLocked();
+        const busy = subscriptionsImportState.inProgress === true;
+        importSubscriptionsBtn.disabled = locked || busy;
+        importSubscriptionsBtn.setAttribute('aria-disabled', (locked || busy) ? 'true' : 'false');
+        importSubscriptionsBtn.textContent = busy ? 'Importing…' : 'Import Subscribed Channels';
+        importSubscriptionsBtn.title = locked
+            ? 'Unlock this profile to import subscribed channels.'
+            : 'Import subscribed channels into whitelist only. You will choose separately whether to turn whitelist mode on.';
+    }
+
+    function setSubscriptionsImportState(patch = {}) {
+        subscriptionsImportState = {
+            ...subscriptionsImportState,
+            ...patch
+        };
+        renderSubscriptionsImportState();
+        syncSubscriptionsImportControls();
+    }
+
+    function pickBestYoutubeTab(tabs, preferredTabId = null) {
+        const candidates = Array.isArray(tabs) ? tabs.filter((tab) => isMainYoutubeUrl(tab?.url)) : [];
+        if (!candidates.length) return null;
+
+        if (Number.isFinite(preferredTabId)) {
+            const preferred = candidates.find((tab) => tab?.id === preferredTabId);
+            if (preferred && isYoutubeChannelsFeedUrl(preferred?.url)) return preferred;
+        }
+
+        const completeChannelsTab = candidates.find((tab) => isYoutubeChannelsFeedUrl(tab?.url) && tab?.status === 'complete');
+        if (completeChannelsTab) return completeChannelsTab;
+
+        return candidates.find((tab) => isYoutubeChannelsFeedUrl(tab?.url)) || null;
+    }
+
+    async function pingSubscriptionsImportReceiver(tabId) {
+        const pingResult = await sendMessageToBrowserTab(tabId, {
+            action: 'FilterTube_Ping',
+            feature: 'subscriptions_import'
+        });
+        return {
+            ok: pingResult?.response?.ok === true,
+            errorCode: pingResult?.errorCode || '',
+            errorMessage: pingResult?.errorMessage || ''
+        };
+    }
+
+    async function waitForYoutubeTabReady(tabId, timeoutMs = 20000) {
+        const deadline = Date.now() + timeoutMs;
+        let lastChannelsTab = null;
+        let lastTab = null;
+        let lastReceiverStatus = { ok: false, errorCode: '', errorMessage: '' };
+        let lastPingAt = 0;
+        while (Date.now() < deadline) {
+            const tabs = await queryBrowserTabs({});
+            const match = tabs.find((tab) => tab?.id === tabId);
+            if (match) {
+                lastTab = match;
+            }
+            if (match && isYoutubeSignInUrl(match?.url)) {
+                return {
+                    state: 'signed_out',
+                    tab: match
+                };
+            }
+            if (match && isYoutubeChannelsFeedUrl(match?.url)) {
+                lastChannelsTab = match;
+                if (match.status === 'complete') {
+                    const now = Date.now();
+                    if ((now - lastPingAt) >= 700) {
+                        await sleep(250);
+                        lastReceiverStatus = await pingSubscriptionsImportReceiver(tabId);
+                        lastPingAt = Date.now();
+                        if (lastReceiverStatus.ok) {
+                            return {
+                                state: 'ready',
+                                tab: match
+                            };
+                        }
+                    }
+                }
+            }
+            await sleep(350);
+        }
+        if (lastChannelsTab) {
+            if (lastChannelsTab.status === 'complete') {
+                lastReceiverStatus = await pingSubscriptionsImportReceiver(tabId);
+                if (lastReceiverStatus.ok) {
+                    return {
+                        state: 'ready',
+                        tab: lastChannelsTab
+                    };
+                }
+            }
+            return {
+                state: lastChannelsTab.status === 'complete' ? 'receiver_unavailable' : 'loading',
+                tab: lastChannelsTab,
+                receiver: lastReceiverStatus
+            };
+        }
+        if (lastTab && isYoutubeSignInUrl(lastTab?.url)) {
+            return {
+                state: 'signed_out',
+                tab: lastTab
+            };
+        }
+        return {
+            state: 'unready',
+            tab: lastTab
+        };
+    }
+
+    function describeSubscriptionsImportError(result = {}) {
+        const code = normalizeString(result?.errorCode);
+        if (code === 'signed_out') {
+            return 'Sign in to YouTube in the selected tab, then retry the import.';
+        }
+        if (code === 'receiver_unavailable' || code === 'subscriptions_import_unavailable') {
+            return 'The YouTube channels tab is still starting FilterTube. Keep it open for a moment, then retry.';
+        }
+        if (code === 'profile_locked') {
+            return 'Unlock this profile before importing subscribed channels.';
+        }
+        if (code === 'profile_changed') {
+            return 'The active profile changed during import. Retry once the intended profile is active again.';
+        }
+        if (code === 'tab_import_failed') {
+            return 'The selected YouTube tab was not ready for import. Retry after the page finishes loading.';
+        }
+        return normalizeString(result?.error) || 'Unable to import subscribed channels right now.';
     }
 
     function getProfileColors(seed) {
@@ -3292,6 +3698,311 @@ document.addEventListener('DOMContentLoaded', async () => {
         return getProfileType(profilesV4, activeProfileId);
     }
 
+    async function enableWhitelistModeAfterImport(context = {}) {
+        if (isUiLocked()) {
+            updateCheckboxes();
+            renderListModeControls();
+            return;
+        }
+
+        const resp = await sendRuntimeMessage({
+            action: 'FilterTube_SetListMode',
+            profileType: 'main',
+            mode: 'whitelist',
+            copyBlocklist: false
+        });
+
+        if (!resp || resp.ok !== true) {
+            UIComponents.showToast('Failed to enable whitelist mode', 'error');
+            return;
+        }
+
+        await StateManager.loadSettings();
+        renderKeywords();
+        renderChannels();
+        updateCheckboxes();
+        updateStats();
+        renderListModeControls();
+
+        const totalApplied = Number(context.totalApplied) || 0;
+        const meta = normalizeString(context.meta);
+        const message = totalApplied > 0
+            ? `Imported ${totalApplied} subscribed ${pluralize(totalApplied, 'channel')} and turned on whitelist mode.`
+            : 'Whitelist mode is now active for the imported subscribed channels.';
+
+        setSubscriptionsImportState({
+            phase: 'success',
+            tone: 'success',
+            title: 'Whitelist Enabled',
+            message,
+            meta,
+            requestId: '',
+            sourceTabId: null,
+            inProgress: false,
+            canEnableWhitelist: false
+        });
+        UIComponents.showToast('Whitelist mode enabled', 'success');
+    }
+
+    function handleSubscriptionsImportProgress(progress = {}) {
+        if (!subscriptionsImportState.inProgress) return;
+
+        const pagesFetched = Number(progress?.pagesFetched) || 0;
+        const foundCount = Number(progress?.foundCount) || 0;
+        const hasContinuation = progress?.hasContinuation === true;
+        const phase = normalizeString(progress?.phase) || 'page';
+        const metaParts = [];
+
+        if (pagesFetched > 0) {
+            metaParts.push(`${pagesFetched} ${pluralize(pagesFetched, 'page')} checked`);
+        }
+        if (foundCount > 0) {
+            metaParts.push(`${foundCount} ${pluralize(foundCount, 'channel')} found`);
+        }
+        if (hasContinuation) {
+            metaParts.push('Loading more…');
+        }
+
+        setSubscriptionsImportState({
+            phase: 'fetching',
+            tone: 'info',
+            title: phase === 'starting' ? 'Connecting To YouTube' : 'Importing Subscribed Channels',
+            message: phase === 'starting'
+                ? 'Reading the subscribed channel list for the active YouTube account.'
+                : `Collected ${foundCount} subscribed ${pluralize(foundCount, 'channel')} so far.`,
+            meta: metaParts.join(' • '),
+            inProgress: true,
+            canEnableWhitelist: false
+        });
+    }
+
+    async function resolveSubscriptionsImportTab() {
+        const existingTabs = await queryBrowserTabs({});
+        let candidate = pickBestYoutubeTab(existingTabs, preferredSubscriptionsImportTabId);
+        if (candidate?.id) {
+            const readyCandidate = await waitForYoutubeTabReady(candidate.id, 20000);
+            if (readyCandidate?.state === 'ready' || readyCandidate?.state === 'signed_out') {
+                return readyCandidate;
+            }
+        }
+
+        setSubscriptionsImportState({
+            phase: 'opening',
+            tone: 'info',
+            title: 'Opening YouTube',
+            message: 'Opening a background YouTube channels tab for the active account.',
+            meta: 'Waiting for the subscriptions list and FilterTube bridge to finish loading…',
+            inProgress: true,
+            canEnableWhitelist: false
+        });
+
+        const createdTab = await createBrowserTab({
+            url: 'https://www.youtube.com/feed/channels',
+            active: false
+        });
+
+        if (!createdTab?.id) {
+            return {
+                state: 'unready',
+                tab: null
+            };
+        }
+
+        preferredSubscriptionsImportTabId = createdTab.id;
+        const readyCandidate = await waitForYoutubeTabReady(createdTab.id, 20000);
+        if (readyCandidate?.state === 'signed_out' && readyCandidate?.tab?.id) {
+            await updateBrowserTab(readyCandidate.tab.id, { active: true });
+        }
+        return readyCandidate || {
+            state: 'unready',
+            tab: createdTab
+        };
+    }
+
+    async function startSubscribedChannelsImport(trigger = 'manual') {
+        if (isUiLocked()) {
+            updateCheckboxes();
+            UIComponents.showToast('Unlock this profile to import subscribed channels', 'error');
+            return;
+        }
+
+        if (subscriptionsImportState.inProgress) {
+            return;
+        }
+
+        const importChoice = trigger === 'manual'
+            ? await confirmSubscriptionsImportModeChoice()
+            : 'import-only';
+        if (!importChoice) {
+            setSubscriptionsImportState({
+                phase: 'idle',
+                tone: 'idle',
+                title: '',
+                message: '',
+                meta: '',
+                requestId: '',
+                sourceTabId: null,
+                inProgress: false,
+                canEnableWhitelist: false
+            });
+            return;
+        }
+        const enableWhitelistAfterImport = importChoice === 'import-and-enable';
+
+        setSubscriptionsImportState({
+            phase: 'preparing',
+            tone: 'info',
+            title: 'Preparing Import',
+            message: 'Preparing the subscribed channels import for this whitelist.',
+            meta: '',
+            requestId: '',
+            sourceTabId: null,
+            inProgress: true,
+            canEnableWhitelist: false
+        });
+
+        const sourceOutcome = await resolveSubscriptionsImportTab();
+        const sourceTab = sourceOutcome?.tab || null;
+        if (sourceOutcome?.state === 'signed_out') {
+            setSubscriptionsImportState({
+                phase: 'error',
+                tone: 'warning',
+                title: 'Sign In Required',
+                message: 'Sign in to YouTube in the opened tab, then retry the subscriptions import.',
+                meta: 'FilterTube opened the YouTube sign-in flow because this browser session is not logged in.',
+                requestId: '',
+                sourceTabId: sourceTab?.id || null,
+                inProgress: false,
+                canEnableWhitelist: false
+            });
+            UIComponents.showToast('Sign in to YouTube, then retry the import', 'info');
+            return;
+        }
+
+        if (!sourceTab?.id || sourceOutcome?.state !== 'ready' || !isYoutubeChannelsFeedUrl(sourceTab?.url)) {
+            setSubscriptionsImportState({
+                phase: 'error',
+                tone: 'error',
+                title: 'YouTube Tab Not Ready',
+                message: 'The YouTube channels tab is still loading or has not finished starting FilterTube.',
+                meta: 'Keep the /feed/channels tab open for a moment, then retry.',
+                requestId: '',
+                sourceTabId: null,
+                inProgress: false,
+                canEnableWhitelist: false
+            });
+            UIComponents.showToast('YouTube channels tab is still loading', 'error');
+            return;
+        }
+
+        preferredSubscriptionsImportTabId = sourceTab.id;
+        const requestId = `subs-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+        setSubscriptionsImportState({
+            phase: 'fetching',
+            tone: 'info',
+            title: 'Importing Subscribed Channels',
+            message: `Reading subscribed channels from ${sourceTab.title || 'YouTube'}…`,
+            meta: '',
+            requestId,
+            sourceTabId: sourceTab.id,
+            inProgress: true,
+            canEnableWhitelist: false
+        });
+
+        const result = await StateManager.importSubscribedChannelsToWhitelist({
+            requestId,
+            tabId: sourceTab.id,
+            targetProfileId: activeProfileId,
+            timeoutMs: 90000,
+            maxChannels: 5000,
+            pageDelayMs: 140
+        });
+
+        if (!result?.success) {
+            setSubscriptionsImportState({
+                phase: 'error',
+                tone: 'error',
+                title: 'Import Failed',
+                message: describeSubscriptionsImportError(result || {}),
+                meta: '',
+                requestId: '',
+                sourceTabId: null,
+                inProgress: false,
+                canEnableWhitelist: false
+            });
+            if (trigger !== 'auto') {
+                UIComponents.showToast('Subscribed channel import failed', 'error');
+            }
+            return;
+        }
+
+        const counts = result.counts || {};
+        const importedCount = Number(counts.imported) || 0;
+        const updatedCount = Number(counts.updated) || 0;
+        const duplicateCount = Number(counts.duplicates) || 0;
+        const skippedCount = Number(counts.skipped) || 0;
+        const totalApplied = importedCount + updatedCount;
+        const pagesFetched = Number(result?.stats?.pagesFetched) || 0;
+        const metaParts = [];
+
+        if (importedCount > 0) metaParts.push(`${importedCount} new`);
+        if (updatedCount > 0) metaParts.push(`${updatedCount} repaired`);
+        if (duplicateCount > 0) metaParts.push(`${duplicateCount} already present`);
+        if (skippedCount > 0) metaParts.push(`${skippedCount} skipped`);
+        if (pagesFetched > 0) metaParts.push(`${pagesFetched} ${pluralize(pagesFetched, 'page')} read`);
+        if (result?.stats?.partial) metaParts.push('import stopped early');
+
+        if (result.empty) {
+            setSubscriptionsImportState({
+                phase: 'empty',
+                tone: 'warning',
+                title: 'No Subscriptions Imported',
+                message: 'No subscribed channels were found for the selected YouTube account.',
+                meta: metaParts.join(' • '),
+                requestId: '',
+                sourceTabId: null,
+                inProgress: false,
+                canEnableWhitelist: false
+            });
+            UIComponents.showToast('No subscribed channels found', 'info');
+            return;
+        }
+
+        const whitelistOff = (result.currentMode || 'blocklist') !== 'whitelist';
+        if (enableWhitelistAfterImport && whitelistOff) {
+            await enableWhitelistModeAfterImport({
+                totalApplied,
+                meta: metaParts.join(' • ')
+            });
+            UIComponents.showToast('Subscribed channels imported and whitelist mode enabled', 'success');
+            return;
+        }
+
+        const successMessage = totalApplied > 0
+            ? (
+                whitelistOff
+                    ? `Added ${totalApplied} subscribed ${pluralize(totalApplied, 'channel')} to whitelist. Your blocklist channels and keywords were left unchanged.`
+                    : `Added ${totalApplied} subscribed ${pluralize(totalApplied, 'channel')} to the active whitelist.`
+            )
+            : (
+                whitelistOff
+                    ? 'All subscribed channels were already present in whitelist. Your blocklist channels and keywords were left unchanged.'
+                    : 'All subscribed channels were already present in whitelist.'
+            );
+        setSubscriptionsImportState({
+            phase: 'success',
+            tone: (whitelistOff || result?.stats?.partial) ? 'warning' : 'success',
+            title: whitelistOff ? 'Imported To Whitelist' : 'Whitelist Updated',
+            message: successMessage,
+            meta: metaParts.join(' • '),
+            requestId: '',
+            sourceTabId: null,
+            inProgress: false,
+            canEnableWhitelist: whitelistOff
+        });
+        UIComponents.showToast('Subscribed channels imported', 'success');
+    }
+
     function resolveViewAccess(requestedViewId) {
         const viewId = normalizeString(requestedViewId);
         if (!viewId) return { viewId: 'help', reason: 'unknown' };
@@ -3498,6 +4209,138 @@ document.addEventListener('DOMContentLoaded', async () => {
                 } catch (e) {
                 }
             }, 0);
+        });
+    }
+
+    async function showChoiceModal({ title, message = '', details = [], choices = [], cancelText = 'Cancel' }) {
+        return new Promise((resolve) => {
+            const overlay = document.createElement('div');
+            overlay.className = 'ft-modal-overlay';
+
+            const card = document.createElement('div');
+            card.className = 'card ft-modal';
+
+            const header = document.createElement('div');
+            header.className = 'card-header';
+            const titleEl = document.createElement('h3');
+            titleEl.className = 'ft-modal-title';
+            titleEl.textContent = title;
+            header.appendChild(titleEl);
+
+            const body = document.createElement('div');
+            body.className = 'card-body ft-modal-body';
+
+            if (message) {
+                const msg = document.createElement('div');
+                msg.className = 'import-export-hint';
+                msg.textContent = message;
+                body.appendChild(msg);
+            }
+
+            if (Array.isArray(details) && details.length) {
+                const notes = document.createElement('div');
+                notes.className = 'subscriptions-import-modal__notes';
+                details.forEach((detail) => {
+                    const row = document.createElement('div');
+                    row.className = 'subscriptions-import-modal__note';
+                    row.textContent = detail;
+                    notes.appendChild(row);
+                });
+                body.appendChild(notes);
+            }
+
+            const actions = document.createElement('div');
+            actions.className = 'ft-modal-actions subscriptions-import-modal__actions';
+
+            const cancelBtn = document.createElement('button');
+            cancelBtn.className = 'btn-secondary';
+            cancelBtn.type = 'button';
+            cancelBtn.textContent = cancelText;
+
+            const cleanup = () => {
+                try {
+                    overlay.remove();
+                } catch (e) {
+                }
+            };
+
+            const closeWith = (value) => {
+                cleanup();
+                resolve(value);
+            };
+
+            cancelBtn.addEventListener('click', () => closeWith(null));
+
+            actions.appendChild(cancelBtn);
+
+            choices.forEach((choice, index) => {
+                if (!choice || !choice.value || !choice.label) return;
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = choice.className || (choice.recommended ? 'btn-primary' : 'btn-secondary');
+                btn.textContent = choice.label;
+                btn.addEventListener('click', () => closeWith(choice.value));
+                actions.appendChild(btn);
+
+                if (index === 0) {
+                    requestAnimationFrame(() => {
+                        try {
+                            btn.focus();
+                        } catch (e) {
+                        }
+                    });
+                }
+            });
+
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    cancelBtn.click();
+                }
+            });
+
+            const handleEscape = (e) => {
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    cancelBtn.click();
+                }
+            };
+            overlay.addEventListener('keydown', handleEscape);
+
+            body.appendChild(actions);
+            card.appendChild(header);
+            card.appendChild(body);
+            overlay.appendChild(card);
+            document.body.appendChild(overlay);
+        });
+    }
+
+    async function confirmSubscriptionsImportModeChoice() {
+        const currentMode = StateManager.getState()?.mode === 'whitelist' ? 'whitelist' : 'blocklist';
+        if (currentMode === 'whitelist') {
+            return 'import-only';
+        }
+
+        return showChoiceModal({
+            title: 'Import Subscribed Channels',
+            message: 'This feature appends channels from your active YouTube account into this profile\'s whitelist.',
+            details: [
+                'Your current blocklist channels and keywords will stay exactly as they are.',
+                'FilterTube will not copy or flip your blocklist into whitelist during this import.',
+                'Choose whether to store the whitelist only, or store it and turn on whitelist mode when the import finishes.'
+            ],
+            choices: [
+                {
+                    value: 'import-only',
+                    label: 'Import Only',
+                    recommended: true
+                },
+                {
+                    value: 'import-and-enable',
+                    label: 'Import + Turn On Whitelist',
+                    className: 'btn-secondary btn-import'
+                }
+            ],
+            cancelText: 'Cancel'
         });
     }
 
@@ -4047,6 +4890,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             renderKeywords(); // Re-render keywords in case channel-derived keywords changed
             updateStats();
             renderListModeControls();
+            syncSubscriptionsImportControls();
         }
 
         if (['kidsKeywordAdded', 'kidsKeywordRemoved', 'kidsKeywordUpdated', 'load', 'save'].includes(eventType)) {
@@ -4072,6 +4916,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             updateCheckboxes();
             updateStats();
             renderListModeControls();
+            renderSubscriptionsImportState();
         }
 
         if (eventType === 'themeChanged') {
@@ -5116,6 +5961,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         ftTopBarListModeControlsTab.appendChild(toggle);
+
+        if (profileType === 'main' && currentMode === 'whitelist' && subscriptionsImportState.canEnableWhitelist) {
+            setSubscriptionsImportState({
+                tone: 'success',
+                message: 'Imported subscribed channels are now active in whitelist mode.',
+                canEnableWhitelist: false
+            });
+        } else {
+            syncSubscriptionsImportControls();
+        }
     }
 
     try {
@@ -5139,6 +5994,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             filterCommentsEl.checked = state.hideComments ? false : !!state.filterComments;
             filterCommentsEl.disabled = locked || !!state.hideComments;
         }
+
+        syncSubscriptionsImportControls();
     }
 
     function filterContentControls() {
@@ -5406,6 +6263,67 @@ document.addEventListener('DOMContentLoaded', async () => {
     filterContentControls();
     filterHelpCards();
     updateStats();
+    renderSubscriptionsImportState();
+    syncSubscriptionsImportControls();
+
+    if (runtimeAPI?.runtime?.onMessage?.addListener) {
+        runtimeAPI.runtime.onMessage.addListener((message) => {
+            if (message?.action !== 'FilterTube_SubscriptionsImportProgress') {
+                return false;
+            }
+
+            if (!subscriptionsImportState.inProgress) {
+                return false;
+            }
+
+            if (normalizeString(message?.requestId) !== normalizeString(subscriptionsImportState.requestId)) {
+                return false;
+            }
+
+            const sourceTabId = Number(message?.sourceTabId);
+            if (Number.isFinite(subscriptionsImportState.sourceTabId) && Number.isFinite(sourceTabId) && subscriptionsImportState.sourceTabId !== sourceTabId) {
+                return false;
+            }
+
+            handleSubscriptionsImportProgress(message?.progress || {});
+            return false;
+        });
+    }
+
+    if (importSubscriptionsActions) {
+        importSubscriptionsActions.addEventListener('click', async (event) => {
+            const target = event.target;
+            if (!(target instanceof HTMLElement)) return;
+            const action = normalizeString(target.getAttribute('data-import-action'));
+            if (!action) return;
+
+            if (action === 'enable-whitelist') {
+                await enableWhitelistModeAfterImport();
+                return;
+            }
+            if (action === 'retry-import') {
+                await startSubscribedChannelsImport('manual');
+            }
+        });
+    }
+
+    if (importSubscriptionsBtn) {
+        importSubscriptionsBtn.addEventListener('click', async () => {
+            await startSubscribedChannelsImport('manual');
+        });
+    }
+
+    if (!subscriptionsImportFlowConsumed) {
+        const flow = normalizeString(new URLSearchParams(window.location.search || '').get('flow')).toLowerCase();
+        const section = normalizeString(new URLSearchParams(window.location.search || '').get('section')).toLowerCase();
+        if (flow === 'import-subscriptions' && (section === 'channels' || section === 'channel' || section === 'channelmanagement')) {
+            subscriptionsImportFlowConsumed = true;
+            requestAnimationFrame(() => {
+                importSubscriptionsBtn?.scrollIntoView?.({ behavior: 'smooth', block: 'center' });
+                importSubscriptionsBtn?.focus?.();
+            });
+        }
+    }
 
     // ============================================================================
     // EVENT HANDLERS - Keywords

@@ -12,7 +12,8 @@
     const bridgeState = globalThis.__filtertubeBridgeState || (globalThis.__filtertubeBridgeState = {
         debugSequence: 0,
         scriptsInjected: false,
-        injectionInProgress: false
+        injectionInProgress: false,
+        injectionPromise: null
     });
 
     const isFirefox = typeof browser !== 'undefined' && !!browser.runtime;
@@ -48,7 +49,7 @@
     }
 
     async function injectViaFallback(scripts) {
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             let currentIndex = 0;
             function injectNext() {
                 if (currentIndex >= scripts.length) {
@@ -62,6 +63,9 @@
                     currentIndex++;
                     setTimeout(injectNext, 50);
                 };
+                script.onerror = () => {
+                    reject(new Error(`Failed to inject ${scriptName}`));
+                };
                 (document.head || document.documentElement).appendChild(script);
             }
             injectNext();
@@ -69,36 +73,50 @@
     }
 
     globalThis.injectMainWorldScripts = async function injectMainWorldScripts() {
-        if (bridgeState.scriptsInjected || bridgeState.injectionInProgress) return;
+        if (bridgeState.scriptsInjected) {
+            return bridgeState.injectionPromise || Promise.resolve();
+        }
+        if (bridgeState.injectionPromise) {
+            return bridgeState.injectionPromise;
+        }
+
         bridgeState.injectionInProgress = true;
+        bridgeState.injectionPromise = (async () => {
+            const scriptsToInject = ['shared/identity', 'filter_logic'];
+            if (isFirefox) scriptsToInject.push('seed');
+            scriptsToInject.push('injector');
 
-        const scriptsToInject = ['shared/identity', 'filter_logic'];
-        if (isFirefox) scriptsToInject.push('seed');
-        scriptsToInject.push('injector');
-
-        try {
-            if (!isFirefox && api.scripting?.executeScript) {
-                await injectViaScriptingAPI(scriptsToInject);
-            } else {
-                await injectViaFallback(scriptsToInject);
-            }
-            bridgeState.scriptsInjected = true;
-            setTimeout(() => {
-                try {
-                    if (typeof requestSettingsFromBackground === 'function') {
-                        requestSettingsFromBackground();
+            try {
+                if (!isFirefox && api.scripting?.executeScript) {
+                    await injectViaScriptingAPI(scriptsToInject);
+                } else {
+                    await injectViaFallback(scriptsToInject);
+                }
+                bridgeState.scriptsInjected = true;
+                setTimeout(() => {
+                    try {
+                        if (typeof requestSettingsFromBackground === 'function') {
+                            requestSettingsFromBackground();
+                        }
+                    } catch (e) {
                     }
+                }, 100);
+            } catch (error) {
+                bridgeState.scriptsInjected = false;
+                try {
+                    globalThis.debugLog("❌ Script injection failed:", error);
                 } catch (e) {
                 }
-            }, 100);
-        } catch (error) {
-            try {
-                globalThis.debugLog("❌ Script injection failed:", error);
-            } catch (e) {
+                throw error;
+            } finally {
+                bridgeState.injectionInProgress = false;
+                if (!bridgeState.scriptsInjected) {
+                    bridgeState.injectionPromise = null;
+                }
             }
-        } finally {
-            bridgeState.injectionInProgress = false;
-        }
+        })();
+
+        return bridgeState.injectionPromise;
     };
 })();
 

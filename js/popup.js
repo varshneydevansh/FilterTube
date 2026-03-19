@@ -546,11 +546,28 @@ function initializePopupFiltersTabs() {
             try {
                 resolveProfileTypeFromTabs().then((profileType) => {
                     const isKids = profileType === 'kids';
-                    const url = isKids
-                        ? chrome.runtime.getURL('html/tab-view.html?view=kids&section=content')
-                        : chrome.runtime.getURL('html/tab-view.html?view=filters&section=categories');
-                    if (chrome?.tabs?.create) {
-                        chrome.tabs.create({ url });
+                    const runtimeApi = (typeof chrome !== 'undefined' && chrome.runtime)
+                        ? chrome
+                        : ((typeof browser !== 'undefined' && browser.runtime) ? browser : null);
+                    const tabsApi = (typeof chrome !== 'undefined' && chrome.tabs && typeof chrome.tabs.create === 'function')
+                        ? chrome.tabs
+                        : ((typeof browser !== 'undefined' && browser.tabs && typeof browser.tabs.create === 'function') ? browser.tabs : null);
+                    const url = runtimeApi?.runtime?.getURL
+                        ? (isKids
+                            ? runtimeApi.runtime.getURL('html/tab-view.html?view=kids&section=content')
+                            : runtimeApi.runtime.getURL('html/tab-view.html?view=filters&section=categories'))
+                        : (isKids
+                            ? 'html/tab-view.html?view=kids&section=content'
+                            : 'html/tab-view.html?view=filters&section=categories');
+                    if (tabsApi?.create) {
+                        const maybePromise = tabsApi.create({ url });
+                        if (maybePromise && typeof maybePromise.catch === 'function') {
+                            maybePromise.catch(() => {
+                                window.open(url, '_blank', 'noopener,noreferrer');
+                            });
+                        }
+                    } else {
+                        window.open(url, '_blank', 'noopener,noreferrer');
                     }
                 });
             } catch (e) {
@@ -671,13 +688,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function sendRuntimeMessage(payload) {
         return new Promise((resolve) => {
             try {
-                if (!chrome?.runtime?.sendMessage) {
+                const runtimeApi = (typeof chrome !== 'undefined' && chrome.runtime && typeof chrome.runtime.sendMessage === 'function')
+                    ? chrome
+                    : ((typeof browser !== 'undefined' && browser.runtime && typeof browser.runtime.sendMessage === 'function') ? browser : null);
+                if (!runtimeApi?.runtime?.sendMessage) {
                     resolve(null);
                     return;
                 }
 
-                const maybePromise = chrome.runtime.sendMessage(payload, (resp) => {
-                    const err = chrome.runtime?.lastError;
+                const maybePromise = runtimeApi.runtime.sendMessage(payload, (resp) => {
+                    const err = runtimeApi.runtime?.lastError;
                     if (err) {
                         resolve(null);
                         return;
@@ -855,6 +875,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }
                     renderListModeControls();
                 }
+                updateSubscriptionsShortcut();
             } catch (e) {
             }
         });
@@ -868,6 +889,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function normalizeString(value) {
         return typeof value === 'string' ? value.trim() : '';
+    }
+
+    function updateSubscriptionsShortcut() {
+        return;
     }
 
     function extractMasterPinVerifier(profilesV4) {
@@ -1368,6 +1393,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             profilesV4Cache = profilesV4;
             renderProfileSelector(profilesV4);
             applyLockGateIfNeeded();
+            updateSubscriptionsShortcut();
         } catch (e) {
         }
     }
@@ -1552,6 +1578,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 statusText.classList.toggle('disabled', !enabled);
             }
         }
+
+        updateSubscriptionsShortcut();
     }
 
     // Initial render
@@ -1561,6 +1589,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderListModeControls();
     filterContentControlsPopup();
     await refreshProfilesUI();
+    updateSubscriptionsShortcut();
 
     if (ftProfileBadgeBtnPopup && ftProfileDropdownPopup) {
         closeProfileDropdown();
@@ -1693,7 +1722,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Open in tab
     if (openInTabBtn) {
         openInTabBtn.addEventListener('click', () => {
-            chrome.tabs.create({ url: chrome.runtime.getURL('html/tab-view.html') });
+            const runtimeApi = (typeof chrome !== 'undefined' && chrome.runtime)
+                ? chrome
+                : ((typeof browser !== 'undefined' && browser.runtime) ? browser : null);
+            const tabsApi = (typeof chrome !== 'undefined' && chrome.tabs && typeof chrome.tabs.create === 'function')
+                ? chrome.tabs
+                : ((typeof browser !== 'undefined' && browser.tabs && typeof browser.tabs.create === 'function') ? browser.tabs : null);
+            const url = runtimeApi?.runtime?.getURL ? runtimeApi.runtime.getURL('html/tab-view.html') : 'html/tab-view.html';
+            if (tabsApi && typeof tabsApi.create === 'function') {
+                try {
+                    const maybePromise = tabsApi.create({ url });
+                    if (maybePromise && typeof maybePromise.catch === 'function') {
+                        maybePromise.catch(() => {
+                            window.open(url, '_blank', 'noopener,noreferrer');
+                        });
+                    }
+                } catch (e) {
+                    window.open(url, '_blank', 'noopener,noreferrer');
+                }
+            } else {
+                window.open(url, '_blank', 'noopener,noreferrer');
+            }
         });
     }
 

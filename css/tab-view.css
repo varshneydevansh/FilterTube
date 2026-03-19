@@ -1272,6 +1272,121 @@ html[data-theme="dark"] .card::after {
     flex-wrap: wrap;
 }
 
+.subscriptions-import-trigger {
+    min-height: 44px;
+    white-space: nowrap;
+    justify-content: center;
+    flex: 0 0 auto;
+    border-radius: 999px;
+}
+
+.subscriptions-import-inline {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.75rem;
+    margin: -0.15rem 0 var(--ft-space-md);
+    padding: 0.62rem 0.88rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(214, 169, 88, 0.28);
+    background: linear-gradient(180deg, rgba(255, 251, 244, 0.9), rgba(255, 248, 239, 0.82));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.58);
+}
+
+.subscriptions-import-status {
+    min-width: 0;
+    color: var(--ft-color-text-primary);
+    font-size: 0.92rem;
+    line-height: 1.4;
+}
+
+.subscriptions-import-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.subscriptions-import-actions .btn-secondary,
+.subscriptions-import-actions .btn-primary {
+    min-height: 40px;
+    border-radius: 999px;
+    padding-inline: 1rem;
+    white-space: nowrap;
+}
+
+.subscriptions-import-inline--info {
+    border-color: rgba(196, 150, 70, 0.32);
+    background: linear-gradient(180deg, rgba(255, 251, 243, 0.94), rgba(255, 247, 235, 0.9));
+}
+
+.subscriptions-import-inline--success {
+    border-color: rgba(74, 157, 127, 0.34);
+    background: linear-gradient(180deg, rgba(243, 255, 249, 0.96), rgba(234, 250, 242, 0.92));
+}
+
+.subscriptions-import-inline--warning {
+    border-color: rgba(214, 169, 88, 0.4);
+    background: linear-gradient(180deg, rgba(255, 251, 240, 0.96), rgba(255, 246, 228, 0.9));
+}
+
+.subscriptions-import-inline--error {
+    border-color: rgba(180, 67, 57, 0.34);
+    background: linear-gradient(180deg, rgba(255, 247, 246, 0.96), rgba(255, 240, 238, 0.92));
+}
+
+.subscriptions-import-modal__notes {
+    display: grid;
+    gap: 0.58rem;
+    margin-top: 0.15rem;
+}
+
+.subscriptions-import-modal__note {
+    padding: 0.72rem 0.82rem;
+    border-radius: 0.95rem;
+    border: 1px solid rgba(214, 169, 88, 0.2);
+    background: rgba(255, 249, 239, 0.82);
+    color: var(--ft-color-text-secondary);
+    font-size: 0.94rem;
+    line-height: 1.45;
+}
+
+.subscriptions-import-modal__actions {
+    flex-wrap: wrap;
+}
+
+:root[data-theme="dark"] .subscriptions-import-inline {
+    border-color: rgba(176, 135, 70, 0.32);
+    background: linear-gradient(180deg, rgba(46, 38, 29, 0.94), rgba(33, 28, 23, 0.92));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+:root[data-theme="dark"] .subscriptions-import-status {
+    color: var(--ft-color-text-primary);
+}
+
+:root[data-theme="dark"] .subscriptions-import-inline--success {
+    border-color: rgba(74, 222, 128, 0.28);
+    background: linear-gradient(180deg, rgba(22, 51, 38, 0.9), rgba(18, 38, 30, 0.88));
+}
+
+:root[data-theme="dark"] .subscriptions-import-inline--warning {
+    border-color: rgba(214, 169, 88, 0.34);
+    background: linear-gradient(180deg, rgba(58, 44, 21, 0.92), rgba(48, 36, 18, 0.88));
+}
+
+:root[data-theme="dark"] .subscriptions-import-inline--error {
+    border-color: rgba(248, 113, 113, 0.28);
+    background: linear-gradient(180deg, rgba(62, 28, 28, 0.9), rgba(47, 23, 23, 0.88));
+}
+
+:root[data-theme="dark"] .subscriptions-import-modal__note {
+    border-color: rgba(176, 135, 70, 0.22);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--ft-color-text-secondary-dark);
+}
+
 .text-input {
     flex: 1;
     padding: var(--ft-space-sm) var(--ft-space-md);
@@ -2295,7 +2410,8 @@ html[data-theme="dark"] .video-filter-compact-option:has(.video-filter-compact-r
     .date-filter-controls .select-input,
     .date-inputs .select-input,
     .date-inputs .custom-date-input,
-    .date-inputs .date-clear-btn {
+    .date-inputs .date-clear-btn,
+    .date-inputs .subscriptions-import-trigger {
         width: 100%;
         min-width: 0 !important;
         max-width: none;
@@ -2375,6 +2491,9 @@ html[data-theme="dark"] .video-filter-compact-option:has(.video-filter-compact-r
 
     .input-row .text-input,
     .input-row .btn-primary,
+    .subscriptions-import-trigger,
+    .subscriptions-import-actions .btn-secondary,
+    .subscriptions-import-actions .btn-primary,
     .sort-controls .select-input,
     .date-range-controls .select-input,
     .date-inputs .custom-date-input,
@@ -2397,6 +2516,13 @@ html[data-theme="dark"] .video-filter-compact-option:has(.video-filter-compact-r
         padding: 0.62rem 0.82rem;
         font-size: 0.95rem;
         border-radius: 0.9rem;
+    }
+
+    .subscriptions-import-inline,
+    .subscriptions-import-actions,
+    .subscriptions-import-modal__actions {
+        display: grid;
+        grid-template-columns: 1fr;
     }
 
     .content-control-group {

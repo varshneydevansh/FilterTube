@@ -12,10 +12,166 @@
 // - `browserAPI_BRIDGE`, `debugLog`, `currentSettings` (bridge_injection.js)
 // - `applyDOMFallback` (dom_fallback.js)
 
+if (!(window.pendingSubscriptionImportRequests instanceof Map)) {
+    window.pendingSubscriptionImportRequests = new Map();
+}
+if (typeof window.subscriptionImportRequestId !== 'number' || !isFinite(window.subscriptionImportRequestId)) {
+    window.subscriptionImportRequestId = 0;
+}
+if (typeof window.__filtertubeMainWorldImportBridgeReady !== 'boolean') {
+    window.__filtertubeMainWorldImportBridgeReady = false;
+}
+if (!(window.__filtertubeMainWorldBridgeWaiters instanceof Set)) {
+    window.__filtertubeMainWorldBridgeWaiters = new Set();
+}
+
+function markMainWorldImportBridgeReady() {
+    window.__filtertubeMainWorldImportBridgeReady = true;
+    if (!(window.__filtertubeMainWorldBridgeWaiters instanceof Set)) return;
+    window.__filtertubeMainWorldBridgeWaiters.forEach((resolve) => {
+        try {
+            resolve(true);
+        } catch (e) {
+        }
+    });
+    window.__filtertubeMainWorldBridgeWaiters.clear();
+}
+
+function waitForMainWorldImportBridgeReady(timeoutMs = 4000) {
+    if (window.__filtertubeMainWorldImportBridgeReady === true) {
+        return Promise.resolve(true);
+    }
+
+    return new Promise((resolve) => {
+        const waiters = window.__filtertubeMainWorldBridgeWaiters instanceof Set
+            ? window.__filtertubeMainWorldBridgeWaiters
+            : (window.__filtertubeMainWorldBridgeWaiters = new Set());
+
+        let settled = false;
+        const finish = (value) => {
+            if (settled) return;
+            settled = true;
+            waiters.delete(finish);
+            resolve(value === true);
+        };
+
+        waiters.add(finish);
+        setTimeout(() => finish(false), Math.max(250, timeoutMs));
+    });
+}
+
+if (typeof globalThis.FilterTubeRequestSubscribedChannelsFromMainWorld !== 'function') {
+    globalThis.FilterTubeRequestSubscribedChannelsFromMainWorld = function requestSubscribedChannelsFromMainWorld(options = {}, onProgress = null) {
+        return new Promise((resolve) => {
+            const requestId = ++window.subscriptionImportRequestId;
+            const timeoutMs = Math.max(5000, Math.min(parseInt(options.timeoutMs, 10) || 60000, 120000));
+            const maxChannels = Math.max(1, Math.min(parseInt(options.maxChannels, 10) || 5000, 5000));
+            const pageDelayMs = Math.max(50, Math.min(parseInt(options.pageDelayMs, 10) || 140, 500));
+
+            const armTimeout = () => setTimeout(() => {
+                const pending = window.pendingSubscriptionImportRequests.get(requestId);
+                if (pending) {
+                    window.pendingSubscriptionImportRequests.delete(requestId);
+                    console.log('FilterTube: Subscription import request timed out');
+                    resolve({ success: false, error: 'Subscription import timed out', errorCode: 'timeout', channels: [], stats: null });
+                }
+            }, timeoutMs);
+
+            const pendingRequest = {
+                resolve,
+                timeoutId: armTimeout(),
+                timeoutMs,
+                onProgress: typeof onProgress === 'function' ? onProgress : null
+            };
+
+            window.pendingSubscriptionImportRequests.set(requestId, pendingRequest);
+
+            window.postMessage({
+                type: 'FilterTube_RequestSubscriptionImport',
+                payload: {
+                    requestId,
+                    timeoutMs,
+                    maxChannels,
+                    pageDelayMs
+                },
+                source: 'content_bridge'
+            }, '*');
+
+            console.log('FilterTube: Sent subscriptions import request to Main World');
+        });
+    };
+}
+
+if (!window.__filtertubeSubscriptionImportMessageListenerAttached) {
+    window.__filtertubeSubscriptionImportMessageListenerAttached = true;
+    window.addEventListener('message', (event) => {
+        if (event.source !== window) return;
+        const data = event.data || {};
+        if (data.source !== 'injector') return;
+
+        const type = data.type;
+        const payload = data.payload || {};
+        if (type === 'FilterTube_InjectorBridgeReady' || type === 'FilterTube_InjectorToBridge_Ready') {
+            markMainWorldImportBridgeReady();
+            return;
+        }
+
+        if (type === 'FilterTube_SubscriptionsImportProgress') {
+            const { requestId } = payload || {};
+            const pending = window.pendingSubscriptionImportRequests.get(requestId);
+            if (pending) {
+                clearTimeout(pending.timeoutId);
+                pending.timeoutId = setTimeout(() => {
+                    const latestPending = window.pendingSubscriptionImportRequests.get(requestId);
+                    if (latestPending) {
+                        window.pendingSubscriptionImportRequests.delete(requestId);
+                        latestPending.resolve({ success: false, error: 'Subscription import timed out', errorCode: 'timeout', channels: [], stats: null });
+                    }
+                }, Math.max(5000, Math.min(parseInt(pending.timeoutMs, 10) || 60000, 120000)));
+            }
+            if (pending?.onProgress) {
+                try {
+                    pending.onProgress(payload || {});
+                } catch (e) {
+                }
+            }
+            return;
+        }
+
+        if (type === 'FilterTube_SubscriptionsImportResponse') {
+            const { requestId } = payload || {};
+            const pending = window.pendingSubscriptionImportRequests.get(requestId);
+            if (pending) {
+                clearTimeout(pending.timeoutId);
+                window.pendingSubscriptionImportRequests.delete(requestId);
+                pending.resolve(payload || { success: false, error: 'Unknown subscriptions import response', channels: [] });
+            }
+        }
+    });
+}
+
 browserAPI_BRIDGE.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (!request) return;
 
-    if (request.action === 'FilterTube_RefreshNow') {
+    if (request.action === 'FilterTube_Ping') {
+        (async () => {
+            try {
+                if (request?.feature === 'subscriptions_import' && typeof injectMainWorldScripts === 'function') {
+                    await injectMainWorldScripts();
+                    await waitForMainWorldImportBridgeReady(4000);
+                }
+            } catch (e) {
+            }
+
+            sendResponse?.({
+                ok: window.__filtertubeMainWorldImportBridgeReady === true,
+                pathname: String(location?.pathname || ''),
+                href: String(location?.href || ''),
+                readyState: String(document?.readyState || '')
+            });
+        })();
+        return true;
+    } else if (request.action === 'FilterTube_RefreshNow') {
         debugLog('🔄 Refresh requested via runtime messaging');
         requestSettingsFromBackground().then(result => {
             if (result?.success) {
@@ -23,6 +179,52 @@ browserAPI_BRIDGE.runtime.onMessage.addListener((request, sender, sendResponse) 
             }
         });
         sendResponse?.({ acknowledged: true });
+    } else if (request.action === 'FilterTube_ImportSubscribedChannels') {
+        (async () => {
+            let injectionFailed = false;
+            try {
+                if (typeof injectMainWorldScripts === 'function') {
+                    await injectMainWorldScripts();
+                }
+            } catch (e) {
+                injectionFailed = true;
+            }
+
+            const bridgeReady = await waitForMainWorldImportBridgeReady(4000);
+
+            const importer = globalThis.FilterTubeRequestSubscribedChannelsFromMainWorld;
+            if (typeof importer !== 'function' || injectionFailed || !bridgeReady) {
+                sendResponse?.({
+                    success: false,
+                    error: 'subscriptions_import_unavailable',
+                    errorCode: 'subscriptions_import_unavailable'
+                });
+                return;
+            }
+
+            importer(request || {}, (progress) => {
+                try {
+                    browserAPI_BRIDGE.runtime.sendMessage({
+                        action: 'FilterTube_SubscriptionsImportProgress',
+                        requestId: request?.requestId || '',
+                        sourceTabId: request?.sourceTabId || null,
+                        progress: progress || {}
+                    }, () => {
+                        const err = browserAPI_BRIDGE.runtime?.lastError;
+                        if (err && !/Receiving end does not exist/i.test(err.message || '')) {
+                            console.warn('FilterTube: Failed to relay subscriptions import progress', err.message || err);
+                        }
+                    });
+                } catch (e) {
+                }
+            }).then((result) => {
+                sendResponse?.(result || { success: false, error: 'subscriptions_import_failed', channels: [] });
+            }).catch((error) => {
+                sendResponse?.({ success: false, error: error?.message || 'subscriptions_import_failed', channels: [] });
+            });
+        })();
+
+        return true;
     } else if (request.action === 'FilterTube_ApplySettings' && request.settings) {
         debugLog('⚡ Applying settings pushed from UI');
         try {

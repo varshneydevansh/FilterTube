@@ -41,6 +41,19 @@ function normalizeString(value) {
     return typeof value === 'string' ? value.trim() : '';
 }
 
+function sendMessageToTabQuietly(tabId, payload) {
+    try {
+        if (!tabId || !browserAPI?.tabs?.sendMessage) return;
+        browserAPI.tabs.sendMessage(tabId, payload, () => {
+            const err = browserAPI.runtime?.lastError;
+            if (err && !/Receiving end does not exist/i.test(err.message || '')) {
+                console.warn('FilterTube Background: sendMessage error', err.message || err);
+            }
+        });
+    } catch (e) {
+    }
+}
+
 function nowTs() {
     return Date.now();
 }
@@ -369,6 +382,209 @@ function isTrustedUiSender(sender) {
     }
 }
 
+function isHandleLike(value) {
+    return typeof value === 'string' && value.trim().startsWith('@');
+}
+
+function normalizeHandleForStorage(value) {
+    const normalized = typeof FilterTubeIdentity?.normalizeHandleValue === 'function'
+        ? FilterTubeIdentity.normalizeHandleValue(value)
+        : normalizeString(value);
+    return isHandleLike(normalized) ? normalized : '';
+}
+
+function isProbablyNotChannelName(value) {
+    if (!value || typeof value !== 'string') return true;
+    const trimmed = value.trim();
+    if (!trimmed) return true;
+    if (isHandleLike(trimmed)) return true;
+    if (/^UC[\w-]{22}$/i.test(trimmed)) return true;
+    if (trimmed.includes('•')) return true;
+    if (/\bviews?\b/i.test(trimmed)) return true;
+    if (/\bago\b/i.test(trimmed)) return true;
+    if (/\bwatching\b/i.test(trimmed)) return true;
+    const lower = trimmed.toLowerCase();
+    if (lower === 'channel') return true;
+    if (lower.startsWith('mix')) return true;
+    if (lower.startsWith('my mix')) return true;
+    return false;
+}
+
+function sanitizeImportedWhitelistChannelName(value) {
+    if (!value || typeof value !== 'string') return '';
+    const trimmed = value.trim();
+    if (!trimmed) return '';
+    if (isProbablyNotChannelName(trimmed)) return '';
+    return trimmed;
+}
+
+function normalizeImportedWhitelistChannelEntry(entry, source = 'subscriptions_import') {
+    if (typeof entry === 'string') {
+        entry = { originalInput: entry };
+    }
+    if (!entry || typeof entry !== 'object') return null;
+
+    let id = normalizeString(entry.id);
+    let handle = normalizeHandleForStorage(entry.handle || entry.canonicalHandle || entry.handleDisplay || '');
+    let customUrl = normalizeString(entry.customUrl);
+    const originalInput = normalizeString(entry.originalInput) || id || handle || customUrl || normalizeString(entry.name);
+
+    if (typeof FilterTubeIdentity?.canonicalizeChannelInput === 'function') {
+        const canonical = FilterTubeIdentity.canonicalizeChannelInput(originalInput);
+        if (!id && canonical?.type === 'ucid') {
+            id = normalizeString(canonical.value);
+        }
+        if (!handle && canonical?.type === 'handle') {
+            handle = normalizeHandleForStorage(canonical.value);
+        }
+    }
+
+    if (!id && typeof FilterTubeIdentity?.extractChannelIdFromPath === 'function') {
+        id = normalizeString(FilterTubeIdentity.extractChannelIdFromPath(originalInput));
+    }
+    if (!customUrl && typeof FilterTubeIdentity?.extractCustomUrlFromPath === 'function') {
+        customUrl = normalizeString(FilterTubeIdentity.extractCustomUrlFromPath(originalInput));
+    }
+
+    if (!id && !handle && !customUrl) {
+        return null;
+    }
+
+    const name = sanitizeImportedWhitelistChannelName(entry.name)
+        || handle
+        || id
+        || customUrl
+        || '';
+    const handleDisplay = normalizeHandleForStorage(entry.handleDisplay) || handle;
+    const canonicalHandle = normalizeHandleForStorage(entry.canonicalHandle) || handle;
+    const addedAt = Number.isFinite(entry.addedAt) ? entry.addedAt : nowTs();
+    const logo = normalizeString(entry.logo) || null;
+
+    return {
+        id: id || '',
+        handle: handle ? handle.toLowerCase() : null,
+        handleDisplay: handleDisplay || null,
+        canonicalHandle: canonicalHandle || null,
+        customUrl: customUrl || null,
+        name,
+        logo,
+        filterAll: entry.filterAll === true,
+        filterAllComments: typeof entry.filterAllComments === 'boolean' ? entry.filterAllComments : true,
+        source: normalizeString(entry.source) || source,
+        originalInput: originalInput || id || handle || customUrl || name || null,
+        addedAt
+    };
+}
+
+function importedWhitelistEntriesMatch(existing, incoming) {
+    if (!existing || !incoming) return false;
+
+    const existingId = normalizeString(existing.id).toLowerCase();
+    const incomingId = normalizeString(incoming.id).toLowerCase();
+    if (existingId && incomingId && existingId === incomingId) {
+        return true;
+    }
+
+    const existingHandle = normalizeHandleForStorage(existing.handle || existing.canonicalHandle || existing.handleDisplay || '').toLowerCase();
+    const incomingHandle = normalizeHandleForStorage(incoming.handle || incoming.canonicalHandle || incoming.handleDisplay || '').toLowerCase();
+    if (existingHandle && incomingHandle && existingHandle === incomingHandle) {
+        if (existingId && incomingId && existingId !== incomingId) {
+            return false;
+        }
+        return true;
+    }
+
+    const existingCustom = normalizeString(existing.customUrl).toLowerCase();
+    const incomingCustom = normalizeString(incoming.customUrl).toLowerCase();
+    if (existingCustom && incomingCustom && existingCustom === incomingCustom) {
+        if (existingId && incomingId && existingId !== incomingId) {
+            return false;
+        }
+        return true;
+    }
+
+    return false;
+}
+
+function mergeImportedWhitelistChannelEntry(existing, incoming) {
+    if (!existing) return incoming;
+    if (!incoming) return existing;
+
+    const existingName = sanitizeImportedWhitelistChannelName(existing.name);
+    const incomingName = sanitizeImportedWhitelistChannelName(incoming.name);
+    const existingNameWeak = !existingName
+        || existingName === existing.id
+        || existingName === existing.handle
+        || existingName === existing.customUrl;
+
+    return {
+        ...existing,
+        id: normalizeString(existing.id) || normalizeString(incoming.id) || '',
+        handle: normalizeHandleForStorage(existing.handle || existing.canonicalHandle || existing.handleDisplay || '').toLowerCase()
+            || (normalizeHandleForStorage(incoming.handle || incoming.canonicalHandle || incoming.handleDisplay || '').toLowerCase() || null),
+        handleDisplay: normalizeHandleForStorage(existing.handleDisplay) || normalizeHandleForStorage(existing.handle) || normalizeHandleForStorage(incoming.handleDisplay) || normalizeHandleForStorage(incoming.handle) || null,
+        canonicalHandle: normalizeHandleForStorage(existing.canonicalHandle) || normalizeHandleForStorage(existing.handle) || normalizeHandleForStorage(incoming.canonicalHandle) || normalizeHandleForStorage(incoming.handle) || null,
+        customUrl: normalizeString(existing.customUrl) || normalizeString(incoming.customUrl) || null,
+        name: (existingNameWeak && incomingName) ? incomingName : (existingName || incomingName || normalizeString(existing.name) || normalizeString(incoming.name) || ''),
+        logo: normalizeString(existing.logo) || normalizeString(incoming.logo) || null,
+        filterAll: existing.filterAll === true || incoming.filterAll === true,
+        filterAllComments: typeof existing.filterAllComments === 'boolean'
+            ? existing.filterAllComments
+            : (typeof incoming.filterAllComments === 'boolean' ? incoming.filterAllComments : true),
+        source: normalizeString(existing.source) || normalizeString(incoming.source) || 'subscriptions_import',
+        originalInput: normalizeString(existing.originalInput) || normalizeString(incoming.originalInput) || normalizeString(incoming.id) || normalizeString(incoming.handle) || normalizeString(incoming.customUrl) || normalizeString(incoming.name) || null,
+        addedAt: Math.min(
+            Number.isFinite(existing.addedAt) ? existing.addedAt : nowTs(),
+            Number.isFinite(incoming.addedAt) ? incoming.addedAt : nowTs()
+        )
+    };
+}
+
+function mergeImportedWhitelistChannels(existingList, incomingList) {
+    const merged = safeArray(existingList).map((entry) => ({ ...entry }));
+    const counts = {
+        imported: 0,
+        updated: 0,
+        duplicates: 0,
+        skipped: 0
+    };
+
+    const didEntryChange = (before, after) => {
+        if (!before) return true;
+        const keys = ['id', 'handle', 'handleDisplay', 'canonicalHandle', 'customUrl', 'name', 'logo', 'filterAll', 'filterAllComments', 'source', 'originalInput'];
+        return keys.some((key) => (before?.[key] || null) !== (after?.[key] || null));
+    };
+
+    safeArray(incomingList).forEach((entry) => {
+        const normalized = normalizeImportedWhitelistChannelEntry(entry, 'subscriptions_import');
+        if (!normalized) {
+            counts.skipped += 1;
+            return;
+        }
+
+        const matchIndex = merged.findIndex((existing) => importedWhitelistEntriesMatch(existing, normalized));
+        if (matchIndex === -1) {
+            merged.unshift(normalized);
+            counts.imported += 1;
+            return;
+        }
+
+        const existing = merged[matchIndex];
+        const next = mergeImportedWhitelistChannelEntry(existing, normalized);
+        if (didEntryChange(existing, next)) {
+            merged[matchIndex] = next;
+            counts.updated += 1;
+        } else {
+            counts.duplicates += 1;
+        }
+    });
+
+    return {
+        channels: merged,
+        counts
+    };
+}
+
 function extractPinVerifierFromProfilesV4(profilesV4, profileId) {
     const root = safeObject(profilesV4);
     const profiles = safeObject(root.profiles);
@@ -383,6 +599,12 @@ function extractPinVerifierFromProfilesV4(profilesV4, profileId) {
 }
 
 const sessionPinCache = new Map();
+
+function isProfileSessionAuthorized(profilesV4, profileId) {
+    const verifier = extractPinVerifierFromProfilesV4(profilesV4, profileId);
+    if (!verifier) return true;
+    return sessionPinCache.has(profileId);
+}
 
 async function verifyAndCacheSessionPin(profileId, pin) {
     const Security = globalThis.FilterTubeSecurity || null;
@@ -2814,7 +3036,7 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
                 const urlPattern = requestedProfile === 'kids' ? ['*://*.youtubekids.com/*'] : ['*://*.youtube.com/*'];
                 browserAPI.tabs.query({ url: urlPattern }, tabs => {
                     (tabs || []).forEach(tab => {
-                        if (tab?.id) browserAPI.tabs.sendMessage(tab.id, { action: 'FilterTube_RefreshNow' }, () => { });
+                        if (tab?.id) sendMessageToTabQuietly(tab.id, { action: 'FilterTube_RefreshNow' });
                     });
                 });
             } catch (e) {
@@ -2862,6 +3084,152 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
             }
         }).catch((error) => {
             sendResponse?.({ success: false, error: error?.message || 'Failed to add whitelist channel' });
+        });
+
+        return true;
+    } else if (action === 'FilterTube_BatchImportWhitelistChannels') {
+        if (!isTrustedUiSender(sender)) {
+            sendResponse?.({ success: false, error: 'untrusted_sender' });
+            return false;
+        }
+
+        (async () => {
+            const targetProfileId = normalizeString(request?.targetProfileId) || DEFAULT_PROFILE_ID;
+            const requestId = normalizeString(request?.requestId) || '';
+            const incomingChannels = safeArray(request?.channels);
+
+            const storage = await storageGet([FT_PROFILES_V4_KEY, 'ftProfilesV3', 'channelMap']);
+            let profilesV4 = storage?.[FT_PROFILES_V4_KEY];
+            if (!isValidProfilesV4(profilesV4)) {
+                try {
+                    profilesV4 = buildProfilesV4FromLegacyState(storage, {});
+                } catch (e) {
+                    profilesV4 = null;
+                }
+            }
+
+            if (!profilesV4 || !isValidProfilesV4(profilesV4)) {
+                sendResponse?.({ success: false, error: 'profiles_unavailable', errorCode: 'profiles_unavailable' });
+                return;
+            }
+
+            const activeId = normalizeString(profilesV4.activeProfileId) || DEFAULT_PROFILE_ID;
+            if (activeId !== targetProfileId) {
+                sendResponse?.({ success: false, error: 'Profile changed during import', errorCode: 'profile_changed' });
+                return;
+            }
+
+            if (!isProfileSessionAuthorized(profilesV4, targetProfileId)) {
+                sendResponse?.({ success: false, error: 'Profile is locked', errorCode: 'profile_locked' });
+                return;
+            }
+
+            const profiles = safeObject(profilesV4.profiles);
+            const targetProfile = safeObject(profiles[targetProfileId]);
+            const targetMain = safeObject(targetProfile.main);
+            const existingWhitelist = Array.isArray(targetMain.whitelistChannels) ? targetMain.whitelistChannels : [];
+            const mergeResult = mergeImportedWhitelistChannels(existingWhitelist, incomingChannels);
+            const mergedChannels = mergeResult.channels;
+            const counts = mergeResult.counts;
+            const targetMode = targetMain.mode === 'whitelist' ? 'whitelist' : 'blocklist';
+
+            if (incomingChannels.length === 0) {
+                sendResponse?.({
+                    success: true,
+                    requestId,
+                    channels: existingWhitelist,
+                    counts,
+                    currentMode: targetMode,
+                    importedIntoProfileId: targetProfileId
+                });
+                return;
+            }
+
+            profiles[targetProfileId] = {
+                ...targetProfile,
+                main: {
+                    ...targetMain,
+                    whitelistChannels: mergedChannels
+                }
+            };
+
+            const profilesV3 = safeObject(storage.ftProfilesV3);
+            const mainV3 = safeObject(profilesV3.main);
+            profilesV3.main = {
+                ...mainV3,
+                mode: mainV3.mode === 'whitelist' ? 'whitelist' : 'blocklist',
+                whitelistChannels: mergedChannels,
+                whitelistedChannels: mergedChannels
+            };
+
+            const writePayload = {
+                [FT_PROFILES_V4_KEY]: {
+                    ...profilesV4,
+                    schemaVersion: 4,
+                    activeProfileId: activeId,
+                    profiles
+                },
+                ftProfilesV3: profilesV3
+            };
+
+            const nextChannelMap = safeObject(storage.channelMap);
+            let didUpdateChannelMap = false;
+            mergedChannels.forEach((entry) => {
+                const id = normalizeString(entry?.id);
+                const handle = normalizeHandleForStorage(entry?.handle || entry?.canonicalHandle || entry?.handleDisplay || '').toLowerCase();
+                const customUrl = normalizeString(entry?.customUrl).toLowerCase();
+                if (id && handle && nextChannelMap[handle] !== id) {
+                    nextChannelMap[handle] = id;
+                    didUpdateChannelMap = true;
+                }
+                if (id && customUrl && nextChannelMap[customUrl] !== id) {
+                    nextChannelMap[customUrl] = id;
+                    didUpdateChannelMap = true;
+                }
+                if (id && handle && nextChannelMap[id.toLowerCase()] !== handle) {
+                    nextChannelMap[id.toLowerCase()] = handle;
+                    didUpdateChannelMap = true;
+                }
+            });
+            if (didUpdateChannelMap) {
+                writePayload.channelMap = nextChannelMap;
+            }
+
+            await browserAPI.storage.local.set(writePayload);
+
+            compiledSettingsCache.main = null;
+            compiledSettingsCache.kids = null;
+
+            try {
+                scheduleAutoBackupInBackground('whitelist_subscriptions_imported');
+            } catch (e) {
+            }
+
+            try {
+                browserAPI.tabs.query({ url: ['*://*.youtube.com/*'] }, tabs => {
+                    (tabs || []).forEach(tab => {
+                        if (tab?.id) {
+                            sendMessageToTabQuietly(tab.id, { action: 'FilterTube_RefreshNow' });
+                        }
+                    });
+                });
+            } catch (e) {
+            }
+
+            sendResponse?.({
+                success: true,
+                requestId,
+                channels: mergedChannels,
+                counts,
+                currentMode: targetMode,
+                importedIntoProfileId: targetProfileId
+            });
+        })().catch((error) => {
+            sendResponse?.({
+                success: false,
+                error: error?.message || 'Failed to import subscriptions into whitelist',
+                errorCode: 'batch_import_failed'
+            });
         });
 
         return true;
@@ -3087,7 +3455,7 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
                 const urlPattern = requestedProfile === 'kids' ? ['*://*.youtubekids.com/*'] : ['*://*.youtube.com/*'];
                 browserAPI.tabs.query({ url: urlPattern }, tabs => {
                     (tabs || []).forEach(tab => {
-                        if (tab?.id) browserAPI.tabs.sendMessage(tab.id, { action: 'FilterTube_RefreshNow' }, () => { });
+                        if (tab?.id) sendMessageToTabQuietly(tab.id, { action: 'FilterTube_RefreshNow' });
                     });
                 });
             } catch (e) {
@@ -3164,10 +3532,51 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
 
         return true;
     } else if (request.action === "injectScripts") {
-        // Handle script injection via Chrome scripting API
-        console.log("FilterTube Background: Received injectScripts request for:", request.scripts);
-        sendResponse({ acknowledged: true });
-        return;
+        const tabId = Number(sender?.tab?.id);
+        const frameId = Number(sender?.frameId);
+        const scripts = Array.isArray(request?.scripts)
+            ? request.scripts
+                .map((entry) => String(entry || '').trim())
+                .filter(Boolean)
+            : [];
+
+        console.log("FilterTube Background: Received injectScripts request for:", scripts);
+
+        if (!Number.isFinite(tabId)) {
+            sendResponse({ success: false, error: 'No sender tab available for script injection' });
+            return false;
+        }
+
+        if (!browserAPI?.scripting?.executeScript) {
+            sendResponse({ success: false, error: 'Scripting API unavailable' });
+            return false;
+        }
+
+        const files = scripts
+            .map((scriptName) => scriptName.startsWith('js/') ? scriptName : `js/${scriptName}.js`)
+            .filter(Boolean);
+
+        if (!files.length) {
+            sendResponse({ success: true });
+            return false;
+        }
+
+        const target = Number.isFinite(frameId)
+            ? { tabId, frameIds: [frameId] }
+            : { tabId };
+
+        browserAPI.scripting.executeScript({
+            target,
+            files,
+            world: 'MAIN'
+        }).then(() => {
+            sendResponse({ success: true });
+        }).catch((error) => {
+            console.warn('FilterTube Background: injectScripts failed', error);
+            sendResponse({ success: false, error: error?.message || 'Failed to inject requested scripts' });
+        });
+
+        return true;
     } else if (request.action === "processFetchData") {
         // Handle fetch/XHR data processing from content_bridge
         if (request.url && request.data) {
@@ -3473,11 +3882,7 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
 
         browserAPI.tabs.query({ url: urlPattern }, tabs => {
             tabs.forEach(tab => {
-                browserAPI.tabs.sendMessage(tab.id, { action: 'FilterTube_ApplySettings', settings: request.settings }, () => {
-                    if (browserAPI.runtime.lastError && !/Receiving end does not exist/i.test(browserAPI.runtime.lastError.message)) {
-                        console.warn('FilterTube Background: sendMessage error', browserAPI.runtime.lastError.message);
-                    }
-                });
+                sendMessageToTabQuietly(tab.id, { action: 'FilterTube_ApplySettings', settings: request.settings });
             });
         });
         sendResponse({ acknowledged: true });
@@ -4874,7 +5279,7 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             try {
                 browserAPI.tabs.query({ url: ['*://*.youtubekids.com/*'] }, tabs => {
                     (tabs || []).forEach(tab => {
-                        if (tab?.id) browserAPI.tabs.sendMessage(tab.id, { action: 'FilterTube_RefreshNow' }, () => { });
+                        if (tab?.id) sendMessageToTabQuietly(tab.id, { action: 'FilterTube_RefreshNow' });
                     });
                 });
             } catch (e) { }

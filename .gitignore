@@ -62,10 +62,15 @@ YTM-LOGS.txt
 YTM-WATCH PLAYER.html
 YTM-XHR.json
 YTM.json
+guide?prettyPrint=false.json
+import_channels.txt
+ytkids_browse?alt=json.json
+ytm_browse?prettyPrint=false.json
 extracted_watch_paths.txt
 get_watch?prettyPrint=false.json
 docs/spa-collab-watchlist-handoff.md
 watcher-collab-watchlist-spa-fix-plan.md
+docs/subscribed-channels-whitelist-import-plan.md
 
 # Logs
 *.log

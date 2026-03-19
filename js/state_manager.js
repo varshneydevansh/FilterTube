@@ -1235,6 +1235,95 @@ const StateManager = (() => {
         });
     }
 
+    function delay(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
+    async function sendMessageToTab(tabId, payload) {
+        return new Promise((resolve) => {
+            try {
+                const tabsApi = (typeof chrome !== 'undefined' && chrome.tabs && typeof chrome.tabs.sendMessage === 'function')
+                    ? chrome.tabs
+                    : ((typeof browser !== 'undefined' && browser.tabs && typeof browser.tabs.sendMessage === 'function') ? browser.tabs : null);
+                if (!tabsApi || !Number.isFinite(tabId)) {
+                    resolve({ response: null, errorCode: 'tab_api_unavailable', errorMessage: 'Tab messaging unavailable' });
+                    return;
+                }
+
+                let settled = false;
+                const finish = (value) => {
+                    if (settled) return;
+                    settled = true;
+                    resolve(value);
+                };
+                const handleRuntimeError = (error) => {
+                    const message = typeof error?.message === 'string' ? error.message.trim() : '';
+                    let errorCode = 'tab_send_failed';
+                    if (/Receiving end does not exist/i.test(message)) {
+                        errorCode = 'receiver_unavailable';
+                    } else if (/No tab with id/i.test(message)) {
+                        errorCode = 'tab_missing';
+                    }
+                    finish({
+                        response: null,
+                        errorCode,
+                        errorMessage: message || 'Failed to reach YouTube tab'
+                    });
+                };
+
+                const maybePromise = tabsApi.sendMessage(tabId, payload, (response) => {
+                    const err = (typeof chrome !== 'undefined' && chrome.runtime)
+                        ? chrome.runtime.lastError
+                        : ((typeof browser !== 'undefined' && browser.runtime) ? browser.runtime.lastError : null);
+                    if (err) {
+                        handleRuntimeError(err);
+                        return;
+                    }
+                    finish({ response: response || null, errorCode: '', errorMessage: '' });
+                });
+
+                if (maybePromise && typeof maybePromise.then === 'function') {
+                    maybePromise
+                        .then((response) => finish({ response: response || null, errorCode: '', errorMessage: '' }))
+                        .catch((error) => handleRuntimeError(error));
+                }
+            } catch (e) {
+                resolve({
+                    response: null,
+                    errorCode: 'tab_send_failed',
+                    errorMessage: e?.message || 'Failed to reach YouTube tab'
+                });
+            }
+        });
+    }
+
+    async function getActiveProfileContext() {
+        const io = window.FilterTubeIO || {};
+        if (typeof io.loadProfilesV4 !== 'function') {
+            return null;
+        }
+
+        try {
+            const profilesV4 = await io.loadProfilesV4();
+            const activeId = typeof profilesV4?.activeProfileId === 'string' && profilesV4.activeProfileId.trim()
+                ? profilesV4.activeProfileId.trim()
+                : 'default';
+            const profiles = profilesV4?.profiles && typeof profilesV4.profiles === 'object' && !Array.isArray(profilesV4.profiles)
+                ? profilesV4.profiles
+                : {};
+            const activeProfile = profiles[activeId] && typeof profiles[activeId] === 'object'
+                ? profiles[activeId]
+                : {};
+            return {
+                profilesV4,
+                activeId,
+                activeProfile
+            };
+        } catch (e) {
+            return null;
+        }
+    }
+
     // ============================================================================
     // KEYWORD MANAGEMENT
     // ============================================================================
@@ -1557,6 +1646,150 @@ const StateManager = (() => {
         } catch (error) {
             console.error('StateManager: Background delegation failed', error);
             return { success: false, error: 'Connection to background failed' };
+        }
+    }
+
+    async function importSubscribedChannelsToWhitelist(options = {}) {
+        await ensureLoaded();
+
+        if (isUiLocked()) {
+            await loadSettings();
+            return { success: false, error: 'Profile is locked', errorCode: 'profile_locked' };
+        }
+
+        const tabId = Number(options.tabId);
+        if (!Number.isFinite(tabId)) {
+            return { success: false, error: 'No YouTube tab selected', errorCode: 'no_tab' };
+        }
+
+        const requestId = typeof options.requestId === 'string' && options.requestId.trim()
+            ? options.requestId.trim()
+            : `subs-${Date.now()}`;
+        const targetProfileId = typeof options.targetProfileId === 'string' && options.targetProfileId.trim()
+            ? options.targetProfileId.trim()
+            : '';
+        if (!targetProfileId) {
+            return { success: false, error: 'No target profile selected', errorCode: 'no_profile' };
+        }
+
+        const initialProfileContext = await getActiveProfileContext();
+        if (!initialProfileContext) {
+            return { success: false, error: 'Profiles unavailable', errorCode: 'profiles_unavailable' };
+        }
+        if (initialProfileContext.activeId !== targetProfileId) {
+            return { success: false, error: 'Profile changed before import started', errorCode: 'profile_changed' };
+        }
+
+        let tabResult = null;
+        let lastTabError = { errorCode: 'tab_import_failed', errorMessage: 'Failed to reach YouTube tab' };
+        for (let attempt = 0; attempt < 12; attempt += 1) {
+            const sendResult = await sendMessageToTab(tabId, {
+                action: 'FilterTube_ImportSubscribedChannels',
+                requestId,
+                sourceTabId: tabId,
+                maxChannels: options.maxChannels || 5000,
+                timeoutMs: options.timeoutMs || 60000,
+                pageDelayMs: options.pageDelayMs || 140
+            });
+
+            tabResult = sendResult?.response || null;
+            if (tabResult?.success === true) {
+                break;
+            }
+
+            const retryableUnavailable = tabResult?.success !== true
+                && (typeof tabResult?.error === 'string' ? tabResult.error.trim() : '') === 'subscriptions_import_unavailable';
+
+            if (tabResult && !retryableUnavailable) {
+                break;
+            }
+
+            lastTabError = {
+                errorCode: sendResult?.errorCode || (retryableUnavailable ? 'subscriptions_import_unavailable' : 'tab_import_failed'),
+                errorMessage: sendResult?.errorMessage || tabResult?.error || 'Failed to reach YouTube tab'
+            };
+
+            if (attempt < 11) {
+                await delay(Math.min(1800, 300 + (attempt * 180)));
+            }
+        }
+
+        if (!tabResult || tabResult.success !== true) {
+            return {
+                success: false,
+                error: tabResult?.error || lastTabError.errorMessage || 'Failed to fetch subscribed channels from YouTube',
+                errorCode: tabResult?.errorCode || lastTabError.errorCode || 'tab_import_failed'
+            };
+        }
+
+        const channels = Array.isArray(tabResult.channels) ? tabResult.channels : [];
+        if (channels.length === 0) {
+            return {
+                success: true,
+                empty: true,
+                requestId,
+                counts: { imported: 0, updated: 0, duplicates: 0, skipped: 0 },
+                stats: tabResult.stats || null,
+                currentMode: state.mode === 'whitelist' ? 'whitelist' : 'blocklist'
+            };
+        }
+
+        const latestProfileContext = await getActiveProfileContext();
+        if (!latestProfileContext) {
+            return { success: false, error: 'Profiles unavailable', errorCode: 'profiles_unavailable' };
+        }
+        if (latestProfileContext.activeId !== targetProfileId) {
+            return { success: false, error: 'Profile changed during import', errorCode: 'profile_changed' };
+        }
+        if (isUiLocked()) {
+            await loadSettings();
+            return { success: false, error: 'Profile was locked during import', errorCode: 'profile_locked' };
+        }
+
+        try {
+            const runtimeApi = (typeof chrome !== 'undefined' && chrome.runtime && typeof chrome.runtime.sendMessage === 'function')
+                ? chrome
+                : ((typeof browser !== 'undefined' && browser.runtime && typeof browser.runtime.sendMessage === 'function') ? browser : null);
+            if (!runtimeApi) {
+                return {
+                    success: false,
+                    error: 'Background runtime unavailable',
+                    errorCode: 'background_unavailable'
+                };
+            }
+
+            const response = await runtimeApi.runtime.sendMessage({
+                action: 'FilterTube_BatchImportWhitelistChannels',
+                requestId,
+                targetProfileId,
+                channels
+            });
+
+            if (!response || response.success !== true) {
+                return {
+                    success: false,
+                    error: response?.error || 'Failed to save imported subscriptions',
+                    errorCode: response?.errorCode || 'persist_failed'
+                };
+            }
+
+            await loadSettings({ notify: true });
+            await requestRefresh('main');
+
+            return {
+                success: true,
+                requestId,
+                counts: response.counts || { imported: 0, updated: 0, duplicates: 0, skipped: 0 },
+                stats: tabResult.stats || null,
+                currentMode: response.currentMode || (state.mode === 'whitelist' ? 'whitelist' : 'blocklist'),
+                importedIntoProfileId: response.importedIntoProfileId || targetProfileId
+            };
+        } catch (error) {
+            return {
+                success: false,
+                error: error?.message || 'Connection to background failed',
+                errorCode: 'background_unavailable'
+            };
         }
     }
 
@@ -2182,6 +2415,7 @@ const StateManager = (() => {
 
         // Channels
         addChannel,
+        importSubscribedChannelsToWhitelist,
         removeChannel,
         toggleChannelFilterAll,
         toggleChannelFilterAllCommentsByRef,

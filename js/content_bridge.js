@@ -3633,6 +3633,14 @@ if (typeof window.channelInfoRequestId !== 'number' || !isFinite(window.channelI
     window.channelInfoRequestId = 0;
 }
 
+// Pending subscription import requests (for FEchannels lookup in MAIN world)
+if (!(window.pendingSubscriptionImportRequests instanceof Map)) {
+    window.pendingSubscriptionImportRequests = new Map();
+}
+if (typeof window.subscriptionImportRequestId !== 'number' || !isFinite(window.subscriptionImportRequestId)) {
+    window.subscriptionImportRequestId = 0;
+}
+
 /**
  * Request collaborator info from Main World (injector.js) via message passing
  * This is needed because content_bridge.js runs in Isolated World and cannot access window.ytInitialData
@@ -3735,6 +3743,48 @@ function requestChannelInfoFromMainWorld(videoId, options = {}) {
         console.log('FilterTube: Sent channel info request to Main World for video:', videoId, 'expectedName:', options.expectedName || 'n/a');
     });
 }
+
+function requestSubscribedChannelsFromMainWorld(options = {}, onProgress = null) {
+    return new Promise((resolve) => {
+        const requestId = ++window.subscriptionImportRequestId;
+        const timeoutMs = Math.max(5000, Math.min(parseInt(options.timeoutMs, 10) || 60000, 120000));
+        const maxChannels = Math.max(1, Math.min(parseInt(options.maxChannels, 10) || 5000, 5000));
+        const pageDelayMs = Math.max(50, Math.min(parseInt(options.pageDelayMs, 10) || 140, 500));
+
+        const armTimeout = () => setTimeout(() => {
+            const pending = window.pendingSubscriptionImportRequests.get(requestId);
+            if (pending) {
+                window.pendingSubscriptionImportRequests.delete(requestId);
+                console.log('FilterTube: Subscription import request timed out');
+                resolve({ success: false, error: 'Subscription import timed out', errorCode: 'timeout', channels: [], stats: null });
+            }
+        }, timeoutMs);
+
+        const pendingRequest = {
+            resolve,
+            timeoutId: armTimeout(),
+            timeoutMs,
+            onProgress: typeof onProgress === 'function' ? onProgress : null
+        };
+
+        window.pendingSubscriptionImportRequests.set(requestId, pendingRequest);
+
+        window.postMessage({
+            type: 'FilterTube_RequestSubscriptionImport',
+            payload: {
+                requestId,
+                timeoutMs,
+                maxChannels,
+                pageDelayMs
+            },
+            source: 'content_bridge'
+        }, '*');
+
+        console.log('FilterTube: Sent subscriptions import request to Main World');
+    });
+}
+
+window.FilterTubeRequestSubscribedChannelsFromMainWorld = requestSubscribedChannelsFromMainWorld;
 
 /**
  * Normalize collaborator names for comparison
@@ -4043,6 +4093,33 @@ function handleMainWorldMessages(event) {
                 expectedCount,
                 force: true
             });
+        }
+    } else if (type === 'FilterTube_SubscriptionsImportProgress') {
+        const { requestId } = payload || {};
+        const pending = window.pendingSubscriptionImportRequests.get(requestId);
+        if (pending) {
+            clearTimeout(pending.timeoutId);
+            pending.timeoutId = setTimeout(() => {
+                const latestPending = window.pendingSubscriptionImportRequests.get(requestId);
+                if (latestPending) {
+                    window.pendingSubscriptionImportRequests.delete(requestId);
+                    latestPending.resolve({ success: false, error: 'Subscription import timed out', errorCode: 'timeout', channels: [], stats: null });
+                }
+            }, Math.max(5000, Math.min(parseInt(pending.timeoutMs, 10) || 60000, 120000)));
+        }
+        if (pending?.onProgress) {
+            try {
+                pending.onProgress(payload || {});
+            } catch (e) {
+            }
+        }
+    } else if (type === 'FilterTube_SubscriptionsImportResponse') {
+        const { requestId } = payload || {};
+        const pending = window.pendingSubscriptionImportRequests.get(requestId);
+        if (pending) {
+            clearTimeout(pending.timeoutId);
+            window.pendingSubscriptionImportRequests.delete(requestId);
+            pending.resolve(payload || { success: false, error: 'Unknown subscriptions import response', channels: [] });
         }
     } else if (type === 'FilterTube_CacheCollaboratorInfo') {
         const videoId = payload?.videoId;
