@@ -5,6 +5,19 @@
 
     // Idempotency guard - prevent multiple executions
     if (window.filterTubeInjectorHasRun) {
+        try {
+            if (window.filterTubeInjectorBridgeReady === true || window.ftInitialized === true || window.FilterTubeEngine?.processData) {
+                window.postMessage({
+                    type: 'FilterTube_InjectorBridgeReady',
+                    source: 'injector'
+                }, '*');
+                window.postMessage({
+                    type: 'FilterTube_InjectorToBridge_Ready',
+                    source: 'injector'
+                }, '*');
+            }
+        } catch (e) {
+        }
         console.warn('FilterTube (Injector): Already initialized, skipping');
         return; // Now legal because it's inside a function
     }
@@ -244,21 +257,23 @@
             }
         };
 
+        const mwebClientContext = {
+            ...contextClient,
+            clientName: 'MWEB',
+            clientVersion: mwebClientVersion,
+            originalUrl: 'https://m.youtube.com/feed/channels',
+            ...(visitorData ? { visitorData } : {})
+        };
+        delete mwebClientContext.clientScreen;
+        delete mwebClientContext.platform;
+
         const profileMap = {
             mweb_fechannels: {
                 source: 'mweb_fechannels',
                 browseId: 'FEchannels',
                 context: {
                     ...context,
-                    client: {
-                        ...contextClient,
-                        clientName: 'MWEB',
-                        clientVersion: mwebClientVersion,
-                        clientScreen: 'MOBILE_WEB',
-                        platform: 'MOBILE',
-                        originalUrl: 'https://m.youtube.com/feed/channels',
-                        ...(visitorData ? { visitorData } : {})
-                    }
+                    client: mwebClientContext
                 },
                 headerClientName: '2',
                 headerClientVersion: mwebClientVersion,
@@ -796,11 +811,30 @@
                 throw new Error('Failed to parse subscriptions response');
             }
 
-            lastLoggedOut = detectLoggedOutBrowseResponse(data);
+            const { renderers, tokens } = collectSubscriptionImportArtifacts(data);
+            const responseLoggedOut = detectLoggedOutBrowseResponse(data);
+            const shouldRetryLoggedOutProfile = responseLoggedOut
+                && collected.size === 0
+                && renderers.length === 0
+                && tokens.length === 0
+                && requestProfileIndex < (requestContext.profiles.length - 1);
+
+            if (shouldRetryLoggedOutProfile) {
+                requestProfileIndex += 1;
+                activeSource = requestContext.profiles[requestProfileIndex]?.source || activeSource;
+                postProgress('retrying_source', {
+                    hasContinuation: !!continuation,
+                    source: activeSource,
+                    loggedOut: true
+                });
+                await sleep(Math.min(pageDelayMs, 120));
+                continue;
+            }
+
+            lastLoggedOut = responseLoggedOut;
             pagesFetched += 1;
             activeSource = requestProfile.source || activeSource || 'subscriptions_import';
 
-            const { renderers, tokens } = collectSubscriptionImportArtifacts(data);
             for (let i = 0; i < renderers.length; i += 1) {
                 const normalized = normalizeSubscriptionImportEntry(renderers[i]);
                 if (!normalized) continue;
@@ -1201,6 +1235,7 @@
         }
     });
 
+    window.filterTubeInjectorBridgeReady = true;
     window.postMessage({
         type: 'FilterTube_InjectorBridgeReady',
         source: 'injector'

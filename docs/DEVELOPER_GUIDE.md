@@ -258,6 +258,85 @@ if (card.matches('.special-surface')) {
 
 ## Debugging Tools
 
+## Maintaining Subscribed Channels Import
+
+The subscribed-channels importer is a separate pipeline from normal filtering. Maintain it as a bulk acquisition flow, not as another quick-add entry point.
+
+### Files to read first
+
+- `/Users/devanshvarshney/FilterTube/js/tab-view.js`
+- `/Users/devanshvarshney/FilterTube/js/state_manager.js`
+- `/Users/devanshvarshney/FilterTube/js/content/bridge_settings.js`
+- `/Users/devanshvarshney/FilterTube/js/injector.js`
+- `/Users/devanshvarshney/FilterTube/js/background.js`
+
+### Startup model
+
+1. Tab View finds or opens a main YouTube tab.
+2. That tab is routed to `/feed/channels`.
+3. `waitForYoutubeTabReady()` waits for:
+   - page load
+   - subscriptions-import receiver
+   - MAIN-world injector bridge
+4. Only after that does `FilterTube_ImportSubscribedChannels` run.
+
+This means most early failures are startup/bridge issues, not subscription-data issues.
+
+### Import model
+
+`injector.js` currently does:
+
+1. page-seed collection from `/feed/channels`
+2. `FEchannels` browse requests
+3. normalization + dedupe
+4. progress events back to the isolated bridge
+
+Do not move this into popup-only logic. It depends on a live signed-in YouTube page context.
+
+### Testing checklist
+
+#### Signed-in happy path
+
+1. Keep a normal signed-in YouTube tab open.
+2. Start import from Tab View.
+3. Confirm the selected tab moves to `/feed/channels`.
+4. Confirm progress appears inline.
+5. Confirm whitelist rows were persisted.
+
+#### Signed-out path
+
+1. Use a browser profile with no YouTube sign-in.
+2. Start import.
+3. Confirm the sign-in page is surfaced and the UI shows a retryable sign-in warning.
+
+#### Existing-tab-after-install path
+
+1. Keep a YouTube tab open.
+2. install or reload the extension
+3. retry import before refreshing the old tab
+4. verify whether a one-time hard refresh is still required for bridge startup
+
+### Troubleshooting signals
+
+- `signed_out`
+  - the selected tab really is in sign-in/account-routing flow, or the request profile looked logged out
+- `subscriptions_import_unavailable`
+  - isolated bridge or MAIN-world bridge never came up
+- `timeout`
+  - page or `youtubei` request stalled too long
+- `persist_failed`
+  - page import succeeded, background merge/persist did not
+
+### Extension points
+
+Safe places to extend later:
+
+- add stronger `FEchannels` parsing in `injector.js`
+- improve progress metadata returned from `injector.js`
+- refine count fidelity separately from startup reliability
+
+Do not mix startup fixes and source-fidelity changes in the same patch unless the regression surface is tiny and fully validated.
+
 ### Console Commands
 
 ```javascript

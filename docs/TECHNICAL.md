@@ -1,8 +1,8 @@
-# Technical Documentation (v3.2.8 Filtering, Recovery & UI Shell Notes)
+# Technical Documentation (v3.2.9 Filtering, Recovery & UI Shell Notes)
 
 ## Overview
 
-FilterTube v3.2.8 builds on the earlier performance and whitelist-mode work with watch-page SPA recovery hardening, Mix/watch fallback-menu fixes, and a newer extension shell/UI layer. This technical documentation covers the filtering logic, identity recovery behavior, mode switching, and user experience enhancements.
+FilterTube v3.2.9 builds on the earlier performance and whitelist-mode work with watch-page SPA recovery hardening, Mix/watch fallback-menu fixes, the newer extension shell/UI layer, and the new subscribed-channels whitelist import flow. This technical documentation covers the filtering logic, identity recovery behavior, mode switching, and user experience enhancements.
 
 ## Typography System (v3.2.6)
 
@@ -160,6 +160,129 @@ function matchesBlocklist(title, channel, settings) {
     return false;
 }
 ```
+
+## Subscribed Channels Import Pipeline (v3.2.9 follow-up)
+
+This feature does not reuse the normal manual `addChannel()` path. It has a dedicated acquisition pipeline because it needs a live signed-in YouTube page context plus bulk merge semantics.
+
+Detailed reference: `docs/SUBSCRIBED_CHANNELS_IMPORT.md`
+
+### Runtime contract
+
+```ascii
+tab-view.js
+  -> resolveSubscriptionsImportTab()
+  -> waitForYoutubeTabReady()
+  -> StateManager.importSubscribedChannelsToWhitelist()
+
+state_manager.js
+  -> send message to selected YouTube tab
+  -> validate profile/lock state before and after fetch
+  -> send merged list to background
+
+content/bridge_settings.js
+  -> inject MAIN-world scripts when needed
+  -> wait for FilterTube_InjectorBridgeReady
+  -> forward progress + response
+
+injector.js
+  -> collect /feed/channels seed
+  -> fetch FEchannels browse pages
+  -> normalize entries
+
+background.js
+  -> mergeImportedWhitelistChannels()
+  -> persist whitelistChannels + legacy mirrors
+  -> refresh YouTube tabs
+```
+
+### Sequence
+
+```mermaid
+sequenceDiagram
+    participant UI as "tab-view.js"
+    participant Tab as "YouTube /feed/channels tab"
+    participant Bridge as "bridge_settings.js"
+    participant Main as "injector.js"
+    participant BG as "background.js"
+
+    UI->>Tab: ping + wait for import bridge
+    UI->>Tab: FilterTube_ImportSubscribedChannels
+    Tab->>Bridge: runtime listener
+    Bridge->>Main: FilterTube_RequestSubscriptionImport
+    Main-->>Bridge: FilterTube_SubscriptionsImportProgress
+    Main-->>Bridge: FilterTube_SubscriptionsImportResponse
+    Bridge-->>UI: tab response
+    UI->>BG: FilterTube_BatchImportWhitelistChannels
+    BG-->>UI: counts + current mode
+```
+
+### Data source behavior
+
+The current importer is not purely API-first yet. It does:
+
+1. `/feed/channels` page seed lookup
+2. `FEchannels` browse requests
+3. dedupe/merge of normalized entries
+
+That is why the UI's `pages read` counter is an importer metric, not a strict continuation-page count.
+
+### Request profile behavior
+
+`injector.js` builds request profiles from page `ytcfg` context instead of hardcoding a minimal body:
+
+- `web_fechannels`
+- `mweb_fechannels`
+
+The request can retry with the alternate profile when:
+
+- the first profile fails
+- the first profile times out
+- the first profile looks logged out and produced no rows
+
+### Stored result shape
+
+Imported rows are normalized into whitelist channel objects with:
+
+- `id`
+- `handle`
+- `handleDisplay`
+- `canonicalHandle`
+- `customUrl`
+- `name`
+- `logo`
+- `source: 'subscriptions_import'`
+
+### Merge semantics
+
+`background.js` performs the canonical merge via `mergeImportedWhitelistChannels(...)`.
+
+Results are counted as:
+
+- `imported`
+- `updated`
+- `duplicates`
+- `skipped`
+
+The merge writes to:
+
+- `ftProfilesV4.profiles[activeId].main.whitelistChannels`
+- `ftProfilesV3.main.whitelistChannels`
+- `ftProfilesV3.main.whitelistedChannels`
+
+and can also update `channelMap` from imported handle/custom URL identity.
+
+### Mode-switch follow-up
+
+After a successful import:
+
+- `Import Only` leaves the current blocklist untouched
+- `Import + Turn On Whitelist` triggers `FilterTube_SetListMode`
+
+Current implementation note:
+
+- the existing whitelist activation path merges current blocklist channels and keywords into whitelist and clears the blocklist
+- the subscriptions import modal documents this explicitly so the behavior is not surprising
 
 ## Whitelist Mode Logic Improvements (v3.2.3 - Experimental)
 

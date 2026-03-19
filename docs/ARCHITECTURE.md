@@ -1,4 +1,4 @@
-# Architecture Documentation (v3.2.8)
+# Architecture Documentation (v3.2.9)
 
 ## Overview
 
@@ -85,6 +85,71 @@ const switchToWhitelist = async (profile, copyBlocklist = true) => {
     profile.mode = 'whitelist';
 };
 ```
+
+## Subscribed Channels Import Architecture (v3.2.9 follow-up)
+
+The subscriptions importer adds a second whitelist acquisition path alongside manual whitelist entry. It is intentionally an on-demand architecture, separate from passive feed filtering.
+
+Detailed reference: `docs/SUBSCRIBED_CHANNELS_IMPORT.md`
+
+### High-level flow
+
+```mermaid
+graph TD
+    A["Tab View: Import Subscribed Channels"] --> B["Resolve signed-in YouTube tab"]
+    B --> C["Route tab to /feed/channels"]
+    C --> D["Wait for page + FilterTube bridge"]
+    D --> E["Isolated bridge forwards import request"]
+    E --> F["MAIN world injector reads page seed"]
+    F --> G["MAIN world injector requests FEchannels browse pages"]
+    G --> H["Normalized subscription channel list"]
+    H --> I["StateManager validates profile + lock state"]
+    I --> J["Background merges into main.whitelistChannels"]
+    J --> K{"Turn On Whitelist?"}
+    K -->|No| L["Whitelist stored only"]
+    K -->|Yes| M["Existing mode-switch path merges blocklist into whitelist"]
+```
+
+### Why this architecture exists
+
+- The importer must run from a real signed-in YouTube page context.
+- Popup/background-only state is not enough because the request depends on the authenticated YouTube tab plus the FilterTube bridge in that tab.
+- `/feed/channels` gives a predictable subscription page shell and lets the importer use both page-local data and active `youtubei` browse requests.
+
+### Two whitelist-construction paths
+
+Architecturally, FilterTube now needs to document two ways the whitelist can be built:
+
+- **Direct whitelist population**
+  - writes rows straight into `whitelistChannels` / `whitelistKeywords`
+  - includes subscriptions import and normal whitelist-specific additions
+- **Mode-switch migration**
+  - activates when `FilterTube_SetListMode('whitelist')` runs
+  - merges current blocklist channels/keywords into whitelist and clears the blocklist
+
+The subscriptions importer can stop after the first path or continue into the second one.
+
+### Startup contract
+
+```ascii
+UI (tab-view)
+  -> choose a YouTube tab
+  -> move it to /feed/channels if needed
+  -> ping the subscriptions-import receiver
+  -> inject isolated bridge if missing
+  -> wait for MAIN-world injector ready signal
+  -> start import
+```
+
+### Persistence boundary
+
+The page never writes storage directly. The trust boundary is:
+
+- page / bridge world: collect and normalize subscription rows
+- `state_manager.js`: validate active profile + session lock state
+- `background.js`: merge, dedupe, persist, refresh tabs
+
+This keeps whitelist imports aligned with the rest of profile-aware storage rules.
 
 ## UI/UX Architecture (v3.2.2)
 
@@ -239,6 +304,7 @@ function stashNetworkSnapshot(data, dataName) {
 - **Purpose**: Extract channel identity from multiple data sources
 - **Key Functions**: `searchYtInitialDataForVideoChannel()`, `extractCollaboratorsFromDataObject()`
 - **Data Sources**: Stashed snapshots, page globals, DOM data
+- **Subscriptions Import Role**: Handles `FilterTube_RequestSubscriptionImport`, collects `/feed/channels` page seed, then follows `FEchannels` browse pages and posts progress/results back to the isolated bridge.
 
 ### Isolated World Components
 
@@ -246,6 +312,11 @@ function stashNetworkSnapshot(data, dataName) {
 - **Purpose**: Bridge between main world data and UI components
 - **Key Functions**: `prefetchIdentityForCard()`, `injectFilterTubeMenuItem()`, `handleBlockChannelClick()`
 - **Data Flow**: Main World → UI Updates → Background Messages
+
+#### `content/bridge_settings.js` - Import Bridge Gateway
+- **Purpose**: Keeps the subscriptions-import bridge alive in isolated world, forwards requests to MAIN world, relays progress to the UI/runtime, and waits for injector-ready signals.
+- **Key Functions**: `waitForMainWorldImportBridgeReady()`, `FilterTubeRequestSubscribedChannelsFromMainWorld()`
+- **Data Flow**: Tab View/StateManager → runtime message → postMessage to MAIN world → progress/response relay
 
 #### `dom_fallback.js` - DOM Processing
 - **Purpose**: Process DOM elements when structured data fails
@@ -258,6 +329,7 @@ function stashNetworkSnapshot(data, dataName) {
 - **Purpose**: Persistent storage, API calls, enrichment scheduling
 - **Key Functions**: `handleAddFilteredChannel()`, `schedulePostBlockEnrichment()`, `fetchChannelInfo()`
 - **Storage**: Chrome storage API, profile management
+- **Subscriptions Import Role**: `FilterTube_BatchImportWhitelistChannels` merges imported rows into `ftProfilesV4.main.whitelistChannels` and backfills legacy whitelist mirrors plus `channelMap`.
 
 ## Data Flow Architecture
 

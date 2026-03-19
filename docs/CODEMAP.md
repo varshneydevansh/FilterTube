@@ -91,6 +91,7 @@ FilterTube/
 **New Features:**
 - **Debounced Refresh**: `scheduleSettingsRefreshFromStorage()` with 250ms minimum intervals
 - **Storage Filtering**: Ignores channelMap-only changes to prevent excessive reprocessing
+- **Subscriptions Import Bridge**: Keeps a dedicated MAIN-world import bridge alive, forwards `FilterTube_ImportSubscribedChannels`, and relays progress/errors safely back to the UI.
 
 ### `js/filter_logic.js` - **OPTIMIZED v3.2.1+**
 **Context:** Main World (YouTube pages)
@@ -104,6 +105,7 @@ FilterTube/
 **Improvements:**
 - **Non-configurable Property Safety**: Checks for `configurable: false` before attempting to define properties
 - **Error Handling**: Try-catch blocks around `ytInitialData` hook installation
+- **Subscriptions Import Coordinator**: Handles `FilterTube_RequestSubscriptionImport`, builds `FEchannels` request profiles from `ytcfg`, normalizes channel rows, emits progress, and returns the final channel list.
 
 ### `js/seed.js` - **SAFETY ENHANCED v3.2.1+**
 **Context:** Main World (YouTube pages)
@@ -119,6 +121,7 @@ FilterTube/
 **Enhancements:**
 - **Source-based Enrichment Logic**: Import channels skip unnecessary enrichment
 - **Storage Change Filtering**: Ignores channelMap-only changes to reduce listeners
+- **Subscribed Channels Import**: `importSubscribedChannelsToWhitelist()` validates tab/profile/lock state, requests the channel roster from the selected YouTube tab, then persists it through background batch import.
 
 ### `js/io_manager.js`
 **Context:** UI contexts (Tab View) + future sync modules
@@ -186,6 +189,20 @@ FilterTube/
 - Adds a "What's New" navigation tab that loads cards from `data/release_notes.json`.
 - Reads both hash (`#whatsnew`) and query parameters (`?view=whatsnew`) so banner deep-links auto-select the correct view.
 - Import/Export card calls into `io_manager.js` for all serialization logic.
+
+#### Tab view additions (v3.2.9 follow-up)
+- `resolveSubscriptionsImportTab()` reuses a main YouTube tab, moves it to `/feed/channels`, and waits for the page + bridge to be ready.
+- `waitForYoutubeTabReady()` distinguishes page-loading, bridge-startup, sign-in, and receiver-unavailable states.
+- `renderSubscriptionsImportState()` and `syncSubscriptionsImportControls()` drive the inline import status shell and loading animation.
+- `confirmSubscriptionsImportModeChoice()` explains the difference between plain whitelist import and whitelist activation.
+
+### `js/background.js` - subscriptions import additions
+| Function / Action | Description |
+| :--- | :--- |
+| `mergeImportedWhitelistChannels()` | Normalizes/dedupes imported whitelist rows and returns merge counts. |
+| `FilterTube_BatchImportWhitelistChannels` | Persists imported rows into `ftProfilesV4` plus legacy whitelist mirrors and `channelMap`. |
+| `FilterTube_EnsureSubscriptionsImportBridge` | Injects the isolated import bridge into a YouTube tab when the receiver is missing. |
+| `FilterTube_SetListMode` | Existing mode-switch handler that the import flow can call after persistence. |
 
 ### `js/render_engine.js`
 **Context:** UI Contexts

@@ -1,5 +1,110 @@
 # Root Response Wrappers (XHR vs Initial Data)
 
+---
+
+# Absolute JSON Trace: Subscribed Channels Import (`FEchannels`)
+*Files: `ytm_browse?prettyPrint=false.json`, desktop `/feed/channels` page data, live `youtubei/v1/browse?prettyPrint=false` responses*
+
+For subscribed-channels import, the important payload family is `browseId: "FEchannels"`.
+
+**Primary renderer path**:
+- recursively discovered `...channelListItemRenderer`
+- desktop fallback `...channelRenderer`
+
+**Fields FilterTube currently normalizes**:
+- **Channel ID (Primary)**: `...channelListItemRenderer.channelId`
+- **Channel ID (Endpoint Fallback)**: `...channelListItemRenderer.navigationEndpoint.browseEndpoint.browseId`
+- **Canonical URL / Handle Path**: `...channelListItemRenderer.navigationEndpoint.browseEndpoint.canonicalBaseUrl`
+- **Navigation URL Fallback**: `...channelListItemRenderer.navigationEndpoint.commandMetadata.webCommandMetadata.url`
+- **Display Name**: `...channelListItemRenderer.title.runs[0].text`
+- **Thumbnail**: `...channelListItemRenderer.thumbnail.thumbnails[n].url`
+- **Timestamp**: `...channelListItemRenderer.timestampMs`
+
+**Continuation token**:
+- recursive `...continuationCommand.token`
+
+**Equivalent desktop DOM shell**:
+- `ytd-channel-renderer`
+
+**Equivalent mobile DOM shell**:
+- `ytm-channel-list-item-renderer`
+
+These paths are used for whitelist import normalization, not for normal feed filtering.
+
+
+SUBSCRIBER list JSON
+
+"collapsedItemCount": 983,
+                          "collapsedStateButtonText": {
+                            "runs": [
+                              {
+                                "text": "More"
+                              }
+                            ],
+                            "accessibility": {
+                              "accessibilityData": {
+                                "label": "More"
+                              }
+                            }
+                          },
+                          "trackingParams": "CAoQuj4iEwiav--jg6yTAxUkLbcAHcDiD9w="
+                        }
+                      },
+                      "trackingParams": "CAkQ3BwYACITCJq_76ODrJMDFSQttwAdwOIP3A=="
+                    }
+                  },
+                  {
+                    "continuationItemRenderer": {
+                      "trigger": "CONTINUATION_TRIGGER_ON_ITEM_SHOWN",
+                      "continuationEndpoint": {
+                        "clickTrackingParams": "CAcQui8iEwiav--jg6yTAxUkLbcAHcDiD9zKAQS7jUeA",
+                        "commandMetadata": {
+                          "webCommandMetadata": {
+                            "sendPost": true,
+                            "apiUrl": "/youtubei/v1/browse"
+                          }
+                        },
+                        "continuationCommand": {
+                          "token": "4qmFsgKIARIKRkVjaGFubmVscxpiQ0FGNlEwTkJRVkZCYVVselEyaG9WbEV3TVRSVGJFSnFZVVZrVFZKV09VUlRha1pPVTIxS1MyVlRNVFJTUmtWVFJVZHNkVmt6U214YVIyeHBZa2RWWjJGWE5XdGhWMFUlM0SaAhVicm93c2UtZmVlZEZFY2hhbm5lbHM%3D",
+                          "request": "CONTINUATION_REQUEST_TYPE_BROWSE"
+                        }
+                      }
+                    }
+                  }
+                ],
+                "continuations": [
+                  {
+                    "reloadContinuationData": {
+                      "continuation": "4qmFsgIMEgpGRWNoYW5uZWxz",
+                      "clickTrackingParams": "CAgQxqYCIhMImr_vo4OskwMVJC23AB3A4g_cygEEu41HgA=="
+                    }
+                  }
+                ],
+                "trackingParams": "CAcQui8iEwiav--jg6yTAxUkLbcAHcDiD9w=",
+                "targetId": "browse-feedFEchannels"
+              }
+            },
+            "tabIdentifier": "FEchannels",
+            "accessibility": {
+              "accessibilityData": {
+                "label": "channels"
+              }
+            },
+            "trackingParams": "CAYQ8JMBGAEiEwiav--jg6yTAxUkLbcAHcDiD9w="
+          }
+        }
+      ]
+    }
+  },
+
+
+
+
+
+
+
+----
+
 Before diving into specific components, it's crucial to understand how YouTube delivers JSON payloads. They generally arrive in two structural wrappers depending on the context:
 
 ### 1. Main Feed / Initial Page Load (`ytInitialData` or Browse XHR)

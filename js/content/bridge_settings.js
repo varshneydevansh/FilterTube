@@ -150,115 +150,123 @@ if (!window.__filtertubeSubscriptionImportMessageListenerAttached) {
     });
 }
 
-browserAPI_BRIDGE.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (!request) return;
+if (window.__filtertubeRuntimeBridgeListenerAttached !== true) {
+    window.__filtertubeRuntimeBridgeListenerAttached = true;
+    browserAPI_BRIDGE.runtime.onMessage.addListener((request, sender, sendResponse) => {
+        if (!request) return;
 
-    if (request.action === 'FilterTube_Ping') {
-        (async () => {
-            try {
-                if (request?.feature === 'subscriptions_import' && typeof injectMainWorldScripts === 'function') {
-                    await injectMainWorldScripts();
-                    await waitForMainWorldImportBridgeReady(4000);
+        if (request.action === 'FilterTube_Ping') {
+            (async () => {
+                try {
+                    if (request?.feature === 'subscriptions_import' && typeof injectMainWorldScripts === 'function') {
+                        await injectMainWorldScripts();
+                        await waitForMainWorldImportBridgeReady(4000);
+                    }
+                } catch (e) {
                 }
-            } catch (e) {
-            }
 
-            sendResponse?.({
-                ok: window.__filtertubeMainWorldImportBridgeReady === true,
-                pathname: String(location?.pathname || ''),
-                href: String(location?.href || ''),
-                readyState: String(document?.readyState || '')
-            });
-        })();
-        return true;
-    } else if (request.action === 'FilterTube_RefreshNow') {
-        debugLog('🔄 Refresh requested via runtime messaging');
-        requestSettingsFromBackground().then(result => {
-            if (result?.success) {
-                applyDOMFallback(result.settings, { forceReprocess: true });
-            }
-        });
-        sendResponse?.({ acknowledged: true });
-    } else if (request.action === 'FilterTube_ImportSubscribedChannels') {
-        (async () => {
-            let injectionFailed = false;
-            try {
-                if (typeof injectMainWorldScripts === 'function') {
-                    await injectMainWorldScripts();
-                }
-            } catch (e) {
-                injectionFailed = true;
-            }
-
-            const bridgeReady = await waitForMainWorldImportBridgeReady(4000);
-
-            const importer = globalThis.FilterTubeRequestSubscribedChannelsFromMainWorld;
-            if (typeof importer !== 'function' || injectionFailed || !bridgeReady) {
                 sendResponse?.({
-                    success: false,
-                    error: 'subscriptions_import_unavailable',
-                    errorCode: 'subscriptions_import_unavailable'
+                    ok: window.__filtertubeMainWorldImportBridgeReady === true,
+                    pathname: String(location?.pathname || ''),
+                    href: String(location?.href || ''),
+                    readyState: String(document?.readyState || '')
                 });
-                return;
-            }
-
-            importer(request || {}, (progress) => {
-                try {
-                    browserAPI_BRIDGE.runtime.sendMessage({
-                        action: 'FilterTube_SubscriptionsImportProgress',
-                        requestId: request?.requestId || '',
-                        sourceTabId: request?.sourceTabId || null,
-                        progress: progress || {}
-                    }, () => {
-                        const err = browserAPI_BRIDGE.runtime?.lastError;
-                        if (err && !/Receiving end does not exist/i.test(err.message || '')) {
-                            console.warn('FilterTube: Failed to relay subscriptions import progress', err.message || err);
-                        }
-                    });
-                } catch (e) {
+            })();
+            return true;
+        } else if (request.action === 'FilterTube_RefreshNow') {
+            debugLog('🔄 Refresh requested via runtime messaging');
+            requestSettingsFromBackground().then(result => {
+                if (result?.success) {
+                    applyDOMFallback(result.settings, { forceReprocess: true });
                 }
-            }).then((result) => {
-                sendResponse?.(result || { success: false, error: 'subscriptions_import_failed', channels: [] });
-            }).catch((error) => {
-                sendResponse?.({ success: false, error: error?.message || 'subscriptions_import_failed', channels: [] });
             });
-        })();
-
-        return true;
-    } else if (request.action === 'FilterTube_ApplySettings' && request.settings) {
-        debugLog('⚡ Applying settings pushed from UI');
-        try {
-            const expectedProfile = (() => {
+            sendResponse?.({ acknowledged: true });
+        } else if (request.action === 'FilterTube_ImportSubscribedChannels') {
+            (async () => {
+                let injectionFailed = false;
                 try {
-                    const host = String(location?.hostname || '').toLowerCase();
-                    return host.includes('youtubekids.com') ? 'kids' : 'main';
+                    if (typeof injectMainWorldScripts === 'function') {
+                        await injectMainWorldScripts();
+                    }
                 } catch (e) {
-                    return 'main';
+                    injectionFailed = true;
                 }
+
+                const bridgeReady = await waitForMainWorldImportBridgeReady(4000);
+
+                const importer = globalThis.FilterTubeRequestSubscribedChannelsFromMainWorld;
+                if (typeof importer !== 'function' || injectionFailed || !bridgeReady) {
+                    sendResponse?.({
+                        success: false,
+                        error: 'subscriptions_import_unavailable',
+                        errorCode: 'subscriptions_import_unavailable'
+                    });
+                    return;
+                }
+
+                importer(request || {}, (progress) => {
+                    try {
+                        browserAPI_BRIDGE.runtime.sendMessage({
+                            action: 'FilterTube_SubscriptionsImportProgress',
+                            requestId: request?.requestId || '',
+                            sourceTabId: request?.sourceTabId || null,
+                            progress: progress || {}
+                        }, () => {
+                            const err = browserAPI_BRIDGE.runtime?.lastError;
+                            const errMessage = String(err?.message || '');
+                            if (
+                                err
+                                && !/Receiving end does not exist/i.test(errMessage)
+                                && !/The message port closed before a response was received/i.test(errMessage)
+                            ) {
+                                console.warn('FilterTube: Failed to relay subscriptions import progress', err.message || err);
+                            }
+                        });
+                    } catch (e) {
+                    }
+                }).then((result) => {
+                    sendResponse?.(result || { success: false, error: 'subscriptions_import_failed', channels: [] });
+                }).catch((error) => {
+                    sendResponse?.({ success: false, error: error?.message || 'subscriptions_import_failed', channels: [] });
+                });
             })();
 
-            const incomingProfile = request.settings?.profileType === 'kids'
-                ? 'kids'
-                : (request.settings?.profileType === 'main' ? 'main' : '');
-
-            if (incomingProfile && incomingProfile !== expectedProfile) {
-                requestSettingsFromBackground().then(result => {
-                    if (result?.success) {
-                        applyDOMFallback(result.settings, { forceReprocess: true });
+            return true;
+        } else if (request.action === 'FilterTube_ApplySettings' && request.settings) {
+            debugLog('⚡ Applying settings pushed from UI');
+            try {
+                const expectedProfile = (() => {
+                    try {
+                        const host = String(location?.hostname || '').toLowerCase();
+                        return host.includes('youtubekids.com') ? 'kids' : 'main';
+                    } catch (e) {
+                        return 'main';
                     }
-                });
-                sendResponse?.({ acknowledged: true });
-                return;
-            }
-        } catch (e) {
-        }
+                })();
 
-        const normalized = normalizeSettingsForHost(request.settings);
-        sendSettingsToMainWorld(normalized);
-        applyDOMFallback(normalized, { forceReprocess: true });
-        sendResponse?.({ acknowledged: true });
-    }
-});
+                const incomingProfile = request.settings?.profileType === 'kids'
+                    ? 'kids'
+                    : (request.settings?.profileType === 'main' ? 'main' : '');
+
+                if (incomingProfile && incomingProfile !== expectedProfile) {
+                    requestSettingsFromBackground().then(result => {
+                        if (result?.success) {
+                            applyDOMFallback(result.settings, { forceReprocess: true });
+                        }
+                    });
+                    sendResponse?.({ acknowledged: true });
+                    return;
+                }
+            } catch (e) {
+            }
+
+            const normalized = normalizeSettingsForHost(request.settings);
+            sendSettingsToMainWorld(normalized);
+            applyDOMFallback(normalized, { forceReprocess: true });
+            sendResponse?.({ acknowledged: true });
+        }
+    });
+}
 
 let pendingSeedSettings = null;
 let seedListenerAttached = false;

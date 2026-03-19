@@ -3015,6 +3015,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    async function ensureSubscriptionsImportBridge(tabId) {
+        if (!Number.isFinite(tabId)) return false;
+        const response = await sendRuntimeMessage({
+            action: 'FilterTube_EnsureSubscriptionsImportBridge',
+            tabId
+        });
+        return response?.success === true;
+    }
+
     function isMainYoutubeUrl(url) {
         if (!url || typeof url !== 'string') return false;
         try {
@@ -3058,6 +3067,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         return false;
     }
 
+    function buildYoutubeChannelsFeedUrl(url) {
+        try {
+            const parsed = new URL(url);
+            const host = (parsed.hostname || '').toLowerCase();
+            if (host === 'm.youtube.com') {
+                return 'https://m.youtube.com/feed/channels';
+            }
+        } catch (e) {
+        }
+        return 'https://www.youtube.com/feed/channels';
+    }
+
     function renderSubscriptionsImportState() {
         if (!importSubscriptionsNotice || !importSubscriptionsStatus || !importSubscriptionsActions) return;
 
@@ -3070,6 +3091,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             'subscriptions-import-inline--error'
         );
         importSubscriptionsNotice.classList.add(`subscriptions-import-inline--${nextTone}`);
+        importSubscriptionsNotice.classList.toggle('is-loading', subscriptionsImportState.inProgress === true);
+        importSubscriptionsNotice.setAttribute('aria-busy', subscriptionsImportState.inProgress === true ? 'true' : 'false');
 
         const message = normalizeString(subscriptionsImportState.message);
         const meta = normalizeString(subscriptionsImportState.meta);
@@ -3113,6 +3136,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const busy = subscriptionsImportState.inProgress === true;
         importSubscriptionsBtn.disabled = locked || busy;
         importSubscriptionsBtn.setAttribute('aria-disabled', (locked || busy) ? 'true' : 'false');
+        importSubscriptionsBtn.setAttribute('aria-busy', busy ? 'true' : 'false');
+        importSubscriptionsBtn.classList.toggle('is-loading', busy);
         importSubscriptionsBtn.textContent = busy ? 'Importing…' : 'Import Subscribed Channels';
         importSubscriptionsBtn.title = locked
             ? 'Unlock this profile to import subscribed channels.'
@@ -3128,19 +3153,35 @@ document.addEventListener('DOMContentLoaded', async () => {
         syncSubscriptionsImportControls();
     }
 
-    function pickBestYoutubeTab(tabs, preferredTabId = null) {
+    function getOrderedYoutubeTabs(tabs, preferredTabId = null) {
         const candidates = Array.isArray(tabs) ? tabs.filter((tab) => isMainYoutubeUrl(tab?.url)) : [];
-        if (!candidates.length) return null;
+        if (!candidates.length) return [];
 
-        if (Number.isFinite(preferredTabId)) {
-            const preferred = candidates.find((tab) => tab?.id === preferredTabId);
-            if (preferred && isYoutubeChannelsFeedUrl(preferred?.url)) return preferred;
-        }
+        const ordered = [];
+        const seen = new Set();
+        const pushTab = (tab) => {
+            const tabId = Number(tab?.id);
+            if (!Number.isFinite(tabId) || seen.has(tabId)) return;
+            seen.add(tabId);
+            ordered.push(tab);
+        };
 
-        const completeChannelsTab = candidates.find((tab) => isYoutubeChannelsFeedUrl(tab?.url) && tab?.status === 'complete');
-        if (completeChannelsTab) return completeChannelsTab;
+        const preferred = Number.isFinite(preferredTabId)
+            ? candidates.find((tab) => tab?.id === preferredTabId)
+            : null;
 
-        return candidates.find((tab) => isYoutubeChannelsFeedUrl(tab?.url)) || null;
+        pushTab(candidates.find((tab) => tab?.active === true && tab?.status === 'complete'));
+        pushTab(preferred?.status === 'complete' ? preferred : null);
+        candidates.filter((tab) => tab?.status === 'complete').forEach(pushTab);
+        pushTab(candidates.find((tab) => tab?.active === true));
+        pushTab(preferred);
+        candidates.forEach(pushTab);
+
+        return ordered;
+    }
+
+    function pickBestYoutubeTab(tabs, preferredTabId = null) {
+        return getOrderedYoutubeTabs(tabs, preferredTabId)[0] || null;
     }
 
     async function pingSubscriptionsImportReceiver(tabId) {
@@ -3155,12 +3196,68 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
     }
 
-    async function waitForYoutubeTabReady(tabId, timeoutMs = 20000) {
+    function updateSubscriptionsImportWaitState(phase, options = {}) {
+        const tabTitle = normalizeString(options.tabTitle);
+        const tabLabel = tabTitle || 'the selected YouTube tab';
+        let title = '';
+        let message = '';
+        let meta = normalizeString(options.meta);
+
+        if (phase === 'searching') {
+            title = 'Looking For YouTube';
+            message = 'Checking open YouTube tabs for the active account.';
+        } else if (phase === 'waiting_page') {
+            title = 'Waiting For YouTube';
+            message = `Waiting for ${tabLabel} to finish loading.`;
+            meta = meta || 'Keep the tab open for a moment.';
+        } else if (phase === 'waiting_bridge') {
+            title = 'Starting FilterTube';
+            message = `Waiting for FilterTube to finish starting in ${tabLabel}.`;
+            meta = meta || 'The import will begin automatically once the bridge is ready.';
+        } else if (phase === 'bootstrapping_bridge') {
+            title = 'Connecting To YouTube';
+            message = `Connecting FilterTube to ${tabLabel}.`;
+            meta = meta || 'This can happen when the YouTube tab was already open before FilterTube reloaded.';
+        } else if (phase === 'opening_fallback') {
+            title = 'Opening YouTube';
+            message = 'Opening a background YouTube tab for the active account.';
+            meta = meta || 'Waiting for YouTube and FilterTube to finish loading…';
+        } else {
+            return;
+        }
+
+        setSubscriptionsImportState({
+            phase,
+            tone: 'info',
+            title,
+            message,
+            meta,
+            inProgress: true,
+            canEnableWhitelist: false
+        });
+    }
+
+    async function waitForYoutubeTabReady(tabId, timeoutMs = 20000, onStatus = null) {
         const deadline = Date.now() + timeoutMs;
-        let lastChannelsTab = null;
+        let lastYoutubeTab = null;
         let lastTab = null;
         let lastReceiverStatus = { ok: false, errorCode: '', errorMessage: '' };
         let lastPingAt = 0;
+        let signInSeenAt = 0;
+        let bridgeBootstrapAttempted = false;
+        let lastStatusKey = '';
+        const reportStatus = (phase, tab = null, meta = '') => {
+            if (typeof onStatus !== 'function') return;
+            const currentTab = tab || lastYoutubeTab || lastTab || null;
+            const tabTitle = normalizeString(currentTab?.title || '');
+            const nextKey = `${phase}|${currentTab?.id || ''}|${currentTab?.status || ''}|${tabTitle}|${meta}`;
+            if (nextKey === lastStatusKey) return;
+            lastStatusKey = nextKey;
+            try {
+                onStatus({ phase, tab: currentTab, tabTitle, meta });
+            } catch (e) {
+            }
+        };
         while (Date.now() < deadline) {
             const tabs = await queryBrowserTabs({});
             const match = tabs.find((tab) => tab?.id === tabId);
@@ -3168,19 +3265,38 @@ document.addEventListener('DOMContentLoaded', async () => {
                 lastTab = match;
             }
             if (match && isYoutubeSignInUrl(match?.url)) {
-                return {
-                    state: 'signed_out',
-                    tab: match
-                };
+                if (!signInSeenAt) {
+                    signInSeenAt = Date.now();
+                }
+                reportStatus('waiting_page', match);
+                if (match.status === 'complete' && (Date.now() - signInSeenAt) >= 1500) {
+                    return {
+                        state: 'signed_out',
+                        tab: match
+                    };
+                }
+            } else {
+                signInSeenAt = 0;
             }
-            if (match && isYoutubeChannelsFeedUrl(match?.url)) {
-                lastChannelsTab = match;
+            if (match && isMainYoutubeUrl(match?.url)) {
+                lastYoutubeTab = match;
                 if (match.status === 'complete') {
+                    reportStatus('waiting_bridge', match);
                     const now = Date.now();
                     if ((now - lastPingAt) >= 700) {
                         await sleep(250);
                         lastReceiverStatus = await pingSubscriptionsImportReceiver(tabId);
                         lastPingAt = Date.now();
+                        if (!lastReceiverStatus.ok && lastReceiverStatus.errorCode === 'receiver_unavailable' && !bridgeBootstrapAttempted) {
+                            bridgeBootstrapAttempted = true;
+                            reportStatus('bootstrapping_bridge', match);
+                            const injected = await ensureSubscriptionsImportBridge(tabId);
+                            if (injected) {
+                                await sleep(350);
+                                lastReceiverStatus = await pingSubscriptionsImportReceiver(tabId);
+                                lastPingAt = Date.now();
+                            }
+                        }
                         if (lastReceiverStatus.ok) {
                             return {
                                 state: 'ready',
@@ -3188,27 +3304,29 @@ document.addEventListener('DOMContentLoaded', async () => {
                             };
                         }
                     }
+                } else {
+                    reportStatus('waiting_page', match);
                 }
             }
             await sleep(350);
         }
-        if (lastChannelsTab) {
-            if (lastChannelsTab.status === 'complete') {
+        if (lastYoutubeTab) {
+            if (lastYoutubeTab.status === 'complete') {
                 lastReceiverStatus = await pingSubscriptionsImportReceiver(tabId);
                 if (lastReceiverStatus.ok) {
                     return {
                         state: 'ready',
-                        tab: lastChannelsTab
+                        tab: lastYoutubeTab
                     };
                 }
             }
             return {
-                state: lastChannelsTab.status === 'complete' ? 'receiver_unavailable' : 'loading',
-                tab: lastChannelsTab,
+                state: lastYoutubeTab.status === 'complete' ? 'receiver_unavailable' : 'loading',
+                tab: lastYoutubeTab,
                 receiver: lastReceiverStatus
             };
         }
-        if (lastTab && isYoutubeSignInUrl(lastTab?.url)) {
+        if (lastTab && isYoutubeSignInUrl(lastTab?.url) && signInSeenAt) {
             return {
                 state: 'signed_out',
                 tab: lastTab
@@ -3226,7 +3344,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return 'Sign in to YouTube in the selected tab, then retry the import.';
         }
         if (code === 'receiver_unavailable' || code === 'subscriptions_import_unavailable') {
-            return 'The YouTube channels tab is still starting FilterTube. Keep it open for a moment, then retry.';
+            return 'The YouTube tab is still starting FilterTube. Keep it open for a moment, then retry.';
         }
         if (code === 'profile_locked') {
             return 'Unlock this profile before importing subscribed channels.';
@@ -3727,8 +3845,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const totalApplied = Number(context.totalApplied) || 0;
         const meta = normalizeString(context.meta);
         const message = totalApplied > 0
-            ? `Imported ${totalApplied} subscribed ${pluralize(totalApplied, 'channel')} and turned on whitelist mode.`
-            : 'Whitelist mode is now active for the imported subscribed channels.';
+            ? `Imported ${totalApplied} subscribed ${pluralize(totalApplied, 'channel')}, turned on whitelist mode, and merged your current blocklist into whitelist.`
+            : 'Whitelist mode is now active, and your current blocklist has been merged into whitelist.';
 
         setSubscriptionsImportState({
             phase: 'success',
@@ -3777,24 +3895,50 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function resolveSubscriptionsImportTab() {
+        updateSubscriptionsImportWaitState('searching');
         const existingTabs = await queryBrowserTabs({});
-        let candidate = pickBestYoutubeTab(existingTabs, preferredSubscriptionsImportTabId);
-        if (candidate?.id) {
-            const readyCandidate = await waitForYoutubeTabReady(candidate.id, 20000);
+        const candidates = getOrderedYoutubeTabs(existingTabs, preferredSubscriptionsImportTabId);
+        let bestExistingResult = null;
+
+        for (let i = 0; i < candidates.length; i += 1) {
+            let candidate = candidates[i];
+            if (!candidate?.id) continue;
+
+            if (!isYoutubeChannelsFeedUrl(candidate.url) && isMainYoutubeUrl(candidate.url)) {
+                const targetUrl = buildYoutubeChannelsFeedUrl(candidate.url);
+                const updatedTab = await updateBrowserTab(candidate.id, { url: targetUrl, active: false });
+                if (updatedTab?.id) {
+                    candidate = updatedTab;
+                }
+            }
+
+            const readyCandidate = await waitForYoutubeTabReady(candidate.id, 30000, (status) => {
+                updateSubscriptionsImportWaitState(status?.phase, {
+                    tabTitle: status?.tabTitle || status?.tab?.title || '',
+                    meta: status?.meta || ''
+                });
+            });
+
             if (readyCandidate?.state === 'ready' || readyCandidate?.state === 'signed_out') {
-                return readyCandidate;
+                return {
+                    ...readyCandidate,
+                    opened: false
+                };
+            }
+
+            if (!bestExistingResult && readyCandidate) {
+                bestExistingResult = {
+                    ...readyCandidate,
+                    opened: false
+                };
             }
         }
 
-        setSubscriptionsImportState({
-            phase: 'opening',
-            tone: 'info',
-            title: 'Opening YouTube',
-            message: 'Opening a background YouTube channels tab for the active account.',
-            meta: 'Waiting for the subscriptions list and FilterTube bridge to finish loading…',
-            inProgress: true,
-            canEnableWhitelist: false
-        });
+        if (bestExistingResult) {
+            return bestExistingResult;
+        }
+
+        updateSubscriptionsImportWaitState('opening_fallback');
 
         const createdTab = await createBrowserTab({
             url: 'https://www.youtube.com/feed/channels',
@@ -3804,19 +3948,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!createdTab?.id) {
             return {
                 state: 'unready',
+                opened: false,
                 tab: null
             };
         }
 
         preferredSubscriptionsImportTabId = createdTab.id;
-        const readyCandidate = await waitForYoutubeTabReady(createdTab.id, 20000);
+        const readyCandidate = await waitForYoutubeTabReady(createdTab.id, 30000, (status) => {
+            updateSubscriptionsImportWaitState(status?.phase, {
+                tabTitle: status?.tabTitle || status?.tab?.title || '',
+                meta: status?.meta || ''
+            });
+        });
         if (readyCandidate?.state === 'signed_out' && readyCandidate?.tab?.id) {
             await updateBrowserTab(readyCandidate.tab.id, { active: true });
         }
-        return readyCandidate || {
-            state: 'unready',
-            tab: createdTab
-        };
+        return readyCandidate
+            ? { ...readyCandidate, opened: true }
+            : {
+                state: 'unready',
+                opened: true,
+                tab: createdTab
+            };
     }
 
     async function startSubscribedChannelsImport(trigger = 'manual') {
@@ -3868,8 +4021,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 phase: 'error',
                 tone: 'warning',
                 title: 'Sign In Required',
-                message: 'Sign in to YouTube in the opened tab, then retry the subscriptions import.',
-                meta: 'FilterTube opened the YouTube sign-in flow because this browser session is not logged in.',
+                message: 'Sign in to YouTube in the selected tab, then retry the subscriptions import.',
+                meta: sourceOutcome?.opened
+                    ? 'FilterTube opened a YouTube tab because no usable signed-in session was ready.'
+                    : 'The selected YouTube tab is still on a sign-in or account-routing page.',
                 requestId: '',
                 sourceTabId: sourceTab?.id || null,
                 inProgress: false,
@@ -3879,19 +4034,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        if (!sourceTab?.id || sourceOutcome?.state !== 'ready' || !isYoutubeChannelsFeedUrl(sourceTab?.url)) {
+        if (!sourceTab?.id || sourceOutcome?.state !== 'ready' || !isMainYoutubeUrl(sourceTab?.url)) {
             setSubscriptionsImportState({
                 phase: 'error',
                 tone: 'error',
                 title: 'YouTube Tab Not Ready',
-                message: 'The YouTube channels tab is still loading or has not finished starting FilterTube.',
-                meta: 'Keep the /feed/channels tab open for a moment, then retry.',
+                message: 'The selected YouTube tab is still loading or has not finished starting FilterTube.',
+                meta: 'Keep a signed-in YouTube tab open for a moment, then retry.',
                 requestId: '',
                 sourceTabId: null,
                 inProgress: false,
                 canEnableWhitelist: false
             });
-            UIComponents.showToast('YouTube channels tab is still loading', 'error');
+            UIComponents.showToast('YouTube tab is still loading', 'error');
             return;
         }
 
@@ -4324,8 +4479,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             title: 'Import Subscribed Channels',
             message: 'This feature appends channels from your active YouTube account into this profile\'s whitelist.',
             details: [
-                'Your current blocklist channels and keywords will stay exactly as they are.',
-                'FilterTube will not copy or flip your blocklist into whitelist during this import.',
+                'Import Only keeps the imported subscriptions stored in whitelist and leaves your current blocklist exactly as it is.',
+                'Import + Turn On Whitelist will also flip your current blocklist channels and keywords into whitelist and merge them with the imported subscribed channels.',
                 'Choose whether to store the whitelist only, or store it and turn on whitelist mode when the import finishes.'
             ],
             choices: [

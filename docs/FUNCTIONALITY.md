@@ -1,4 +1,4 @@
-# FilterTube v3.2.8 - Current Functionality Documentation
+# FilterTube v3.2.9 - Current Functionality Documentation
 
 ## Overview
 
@@ -22,12 +22,15 @@ FilterTube v3.2.9 implements a **hybrid filtering system** with dual filtering m
 
 ### **Whitelist Mode Features (v3.2.5)**
 
+- **Two Ways To Build Whitelist**: FilterTube can populate whitelist directly through whitelist-specific adds/imports, or indirectly by flipping the current blocklist into whitelist when whitelist mode is activated.
 - **Intelligent Mode Switching**: Confirmation dialogs prevent accidental data loss when switching modes
 - **Enhanced Channel Identity**: Multi-source channel extraction with improved reliability
 - **Search Page Optimizations**: Right-rail watch cards handled intelligently
 - **Performance Improvements**: Selective processing and bridge-level optimizations
 - **UI Enhancements**: Clean interface that hides irrelevant controls in whitelist mode
 - **State Tracking**: Seamless switching between blocklist and whitelist modes
+- **Subscribed Channels Import (v3.2.9 follow-up)**: Tab-view can import the active YouTube account's subscriptions straight into whitelist with inline progress, retry states, and profile-aware persistence
+- **Explicit Import Semantics**: `Import Only` keeps the current blocklist untouched; `Import + Turn On Whitelist` uses the existing mode-switch pipeline, which merges the current blocklist into whitelist
 
 ### **Stats Tracking**
 
@@ -104,6 +107,7 @@ YouTube JSON Data → FilterTubeEngine.processData() → Filtered Data → YouTu
 - **UC ID Support**: Blocks channels by canonical channel IDs (`UC...`).
 - **@Handle Support**: Blocks channels by `@handle` aliases, including unicode/percent-encoded handles.
 - **Legacy URL Support**: Blocks channels by `/c/<name>` and `/user/<name>` via normalized `customUrl` keys.
+- **Subscriptions Import Normalization**: Imported subscription rows are normalized into the same channel shape used by manual whitelist adds, including UC ID, handle, legacy custom URL, logo, and channel name when available.
 - **Name Matching (conservative)**: Some surfaces (notably watch-page playlist panels) expose only byline names; FilterTube uses strict name matching only as a fallback.
 - **Collaboration Awareness**: Adds a shared `collaborationGroupId` when the user blocks multi-author videos; the UI reflects missing collaborators via dashed rails + tooltips without altering sort order.
 - **Handle Normalization**: Handle parsing is unicode-safe and percent-decoding aware (`js/shared/identity.js`), so handles like `@감동메모리` and percent-encoded variants remain matchable across surfaces.
@@ -199,6 +203,7 @@ YouTube JSON Data → FilterTubeEngine.processData() → Filtered Data → YouTu
 - **Real-time Preview**: Immediate feedback on filter changes
 - **Status Indicators**: Shows current filtering state
 - **List Mode Toggle (Experimental v3.2.3)**: Switch between Blocklist and Whitelist modes
+- **No Bulk Subscriptions Import**: The popup intentionally does not run the subscribed-channels import. That flow stays in Tab View because it needs a live YouTube tab, bridge startup states, and clearer whitelist-mode confirmation copy.
 
 #### UI polish (v3.2.1)
 - Popup search bars (keywords/channels/content controls) now align to full row width; add buttons sit beside matching-sized inputs.
@@ -218,8 +223,36 @@ YouTube JSON Data → FilterTubeEngine.processData() → Filtered Data → YouTu
 - **Keyword Management**: Advanced keyword list editing.
 - **Stats Dashboard**: Detailed view of time saved and videos hidden.
 - **List Mode Controls (Experimental v3.2.3)**: Profile-specific whitelist/blocklist mode switching
+- **Subscribed Channels Import**: `Filters -> Channel Management` includes `Import Subscribed Channels`, which reuses an open signed-in YouTube tab, routes it to `/feed/channels`, waits for the FilterTube bridge, then imports subscribed channels into whitelist.
+- **Inline Import Feedback**: The dashboard shows loading, page-wait, bridge-wait, importing, empty, success, and retryable error states inline rather than burying the flow in toasts.
+- **Mode-Aware Completion**: After an import, Tab View can either leave the imported whitelist stored but inactive, or immediately activate whitelist mode and merge the current blocklist into that whitelist.
 - **Shared Full-Row Layout Stabilization**: Main/Kids channel and keyword lists share a corrected row shell so long scrolling lists keep natural row height without overlap or metadata clipping.
 - **Locked Profile Switching**: Even while the active profile is locked, the top-bar profile selector remains available so the user can switch to another profile; denied/cancelled PIN prompts refresh the tab UI back to the real active profile state instead of leaving the selector/badge stale.
+
+### **Subscribed Channels Import (v3.2.9 follow-up)**
+
+Detailed reference: `docs/SUBSCRIBED_CHANNELS_IMPORT.md`
+
+```ascii
+Tab View button
+    -> choose import mode
+    -> reuse signed-in YouTube tab
+    -> move tab to /feed/channels
+    -> wait for FilterTube bridge in that tab
+    -> request subscribed channels from MAIN world
+    -> merge into whitelistChannels
+    -> optionally turn on whitelist mode
+```
+
+Current behavior notes:
+
+- FilterTube currently has two whitelist-construction paths:
+  - direct whitelist population such as subscribed-channels import
+  - blocklist-to-whitelist migration when whitelist mode is activated
+- source account is the active YouTube account in the selected tab
+- import is limited to the main YouTube profile path, not Kids
+- if the browser session is signed out, Tab View brings the sign-in tab forward and shows a retryable warning
+- on a fresh extension install/update, an already-open YouTube tab may need a one-time refresh before the bridge is available
 
 ### **Advanced Settings**
 - **Detailed Configuration**: Access to all filtering options

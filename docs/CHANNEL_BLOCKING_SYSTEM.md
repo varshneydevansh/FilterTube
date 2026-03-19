@@ -245,6 +245,61 @@ Result: Multi-channel menus appear instantly on watch/home/search.
 
 ---
 
+## 5. Subscribed Channels -> Whitelist Import (v3.2.9 follow-up)
+
+This feature gives whitelist mode a second acquisition path besides manual add/import files.
+
+### Scope
+
+- main YouTube only
+- main profile whitelist only
+- driven from Tab View channel management
+- sourced from the active YouTube account in the selected tab
+
+### Flow
+
+```mermaid
+graph TD
+    A["Tab View: Import Subscribed Channels"] --> B["Move selected YouTube tab to /feed/channels"]
+    B --> C["Wait for bridge + MAIN-world injector"]
+    C --> D["Collect subscription rows"]
+    D --> E["Normalize channel identity"]
+    E --> F["Background batch merge into whitelistChannels"]
+    F --> G{"Turn on whitelist?"}
+    G -->|No| H["Whitelist stored only"]
+    G -->|Yes| I["Existing blocklist merged into whitelist and cleared"]
+```
+
+### Important semantics
+
+- FilterTube currently has **two ways to build whitelist**:
+  - direct whitelist population, such as subscribed-channels import or other whitelist-specific adds
+  - blocklist-to-whitelist migration when whitelist mode is activated
+- `Import Only` appends subscriptions to `main.whitelistChannels`
+- it does **not** change the current blocklist
+- `Import + Turn On Whitelist` calls the existing mode-switch path
+- that current path merges the profile's blocklist channels and keywords into whitelist and clears the blocklist
+
+### Identity quality
+
+Imported subscription rows are normalized like other channel entries:
+
+- prefer stable `UC...` IDs
+- keep `@handle` when present
+- keep `customUrl` when present
+- keep best available name/logo
+
+### Persistence behavior
+
+The background batch import:
+
+- dedupes against existing whitelist entries
+- updates weak existing rows with stronger imported metadata
+- mirrors the result into legacy whitelist storage where needed
+- updates `channelMap` when new handle/custom URL mappings are learned
+
+This keeps subscriptions import compatible with the rest of the blocking/allowing system instead of creating a second storage model.
+
 ## 6. Blocking Flow (3-dot Menu → Resolve → Persist → Hide)
 
 ### 6.1 Menu injection and click detection
@@ -920,4 +975,3 @@ The menu injection background enrichment should not do network fetches.
 
 Now:
 - Menu “background fetch” uses `fetchIdForHandle(handle, { skipNetwork: true })`.
-

@@ -1,5 +1,14 @@
 # Changelog
 
+## Version 3.2.9
+
+### Subscribed Channels Import + Whitelist Flow
+
+- **Subscribed channels import**: Added a Tab View flow that imports the active YouTube account's subscriptions into whitelist.
+- **YouTube tab startup hardening**: The import now reuses or opens a YouTube tab, routes it to `/feed/channels`, and waits for the FilterTube bridge before starting.
+- **Whitelist semantics clarified**: `Import Only` keeps the current blocklist untouched, while `Import + Turn On Whitelist` follows the existing blocklist-to-whitelist migration behavior.
+- **Documentation refresh**: Added dedicated import docs plus updated architecture, technical, pipeline, renderer, and developer docs for the new flow.
+
 ## Version 3.2.8
 
 ### Theme Refresh + Scenic UI Shell Tuning

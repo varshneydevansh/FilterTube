@@ -34,6 +34,36 @@ FilterTube v3.2.5 implements a **proactive, XHR-first** network request pipeline
 └─────────────────────────────────────────────────────────────┘
 ```
 
+## On-Demand Subscriptions Import (v3.2.9 follow-up)
+
+The subscriptions importer uses the same cross-world plumbing as the rest of FilterTube, but it is an active request path rather than passive snapshot interception.
+
+```mermaid
+sequenceDiagram
+    participant UI as "Tab View"
+    participant ISO as "bridge_settings.js"
+    participant MAIN as "injector.js"
+    participant YTI as "/youtubei/v1/browse"
+    participant BG as "background.js"
+
+    UI->>ISO: FilterTube_ImportSubscribedChannels
+    ISO->>MAIN: FilterTube_RequestSubscriptionImport
+    MAIN->>MAIN: collect /feed/channels page seed
+    MAIN->>YTI: POST browse (FEchannels)
+    YTI-->>MAIN: channel renderers + continuation
+    MAIN-->>ISO: progress + final channel list
+    UI->>BG: FilterTube_BatchImportWhitelistChannels
+```
+
+Important differences from the normal pipeline:
+
+- starts from a live signed-in YouTube tab that is routed to `/feed/channels`
+- may use page-local seed data before `youtubei` continuation pages
+- persists only after returning to background batch merge
+- is profile-aware and can be followed by a separate list-mode switch
+
+Detailed reference: `docs/SUBSCRIBED_CHANNELS_IMPORT.md`
+
 ## Proactive Request Flow (v3.2.1)
 
 ### 1. XHR Interception (Primary Path)

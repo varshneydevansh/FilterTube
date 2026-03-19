@@ -1273,11 +1273,26 @@ html[data-theme="dark"] .card::after {
 }
 
 .subscriptions-import-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.58rem;
     min-height: 44px;
     white-space: nowrap;
     justify-content: center;
     flex: 0 0 auto;
     border-radius: 999px;
+}
+
+.subscriptions-import-trigger.is-loading::before {
+    content: '';
+    width: 0.92rem;
+    height: 0.92rem;
+    border-radius: 50%;
+    border: 2px solid currentColor;
+    border-right-color: transparent;
+    flex: 0 0 auto;
+    opacity: 0.82;
+    animation: ft-subscriptions-import-spin 0.78s linear infinite;
 }
 
 .subscriptions-import-inline {
@@ -1298,6 +1313,24 @@ html[data-theme="dark"] .card::after {
     color: var(--ft-color-text-primary);
     font-size: 0.92rem;
     line-height: 1.4;
+}
+
+.subscriptions-import-inline.is-loading .subscriptions-import-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.62rem;
+}
+
+.subscriptions-import-inline.is-loading .subscriptions-import-status::before {
+    content: '';
+    width: 0.88rem;
+    height: 0.88rem;
+    border-radius: 50%;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    flex: 0 0 auto;
+    opacity: 0.7;
+    animation: ft-subscriptions-import-spin 0.78s linear infinite;
 }
 
 .subscriptions-import-actions {
@@ -1356,6 +1389,12 @@ html[data-theme="dark"] .card::after {
     flex-wrap: wrap;
 }
 
+@keyframes ft-subscriptions-import-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 :root[data-theme="dark"] .subscriptions-import-inline {
     border-color: rgba(176, 135, 70, 0.32);
     background: linear-gradient(180deg, rgba(46, 38, 29, 0.94), rgba(33, 28, 23, 0.92));
@@ -1385,6 +1424,13 @@ html[data-theme="dark"] .card::after {
     border-color: rgba(176, 135, 70, 0.22);
     background: rgba(255, 255, 255, 0.04);
     color: var(--ft-color-text-secondary-dark);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .subscriptions-import-trigger.is-loading::before,
+    .subscriptions-import-inline.is-loading .subscriptions-import-status::before {
+        animation: none;
+    }
 }
 
 .text-input {

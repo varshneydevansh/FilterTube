@@ -3,6 +3,19 @@
     "_comment": "Shared release notes source for the dashboard What's New tab and the YouTube release banner. Keep entries sorted newest-first by version."
   },
   {
+    "version": "3.2.9",
+    "headline": "Subscribed Channels Import + Whitelist + PIN protection bug fix",
+    "summary": "Import the active YouTube account's subscriptions into whitelist with clearer mode-switch semantics and a more reliable /feed/channels startup flow.",
+    "bannerSummary": "Build whitelist from your current YouTube subscriptions with inline progress and clearer whitelist activation behavior.",
+    "highlights": [
+      "New Tab View import: subscribed channels can be imported from the active signed-in YouTube account into whitelist.",
+      "Import startup now reuses a live YouTube tab, routes it to /feed/channels, and waits for the FilterTube bridge before starting.",
+      "Whitelist copy is clearer: Import Only leaves the blocklist untouched, while Import + Turn On Whitelist follows the existing blocklist-to-whitelist migration path.",
+      "Documentation now covers the import architecture, FEchannels request flow, renderer sources, and whitelist semantics in much more detail."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.2.9"
+  },
+  {
     "version": "3.2.8",
     "headline": "Theme Refresh + Scenic UI Shell Tuning",
     "summary": "Popup and dashboard surfaces now use the calmer scenic theme system with tighter layout, stronger tint states, and better light/dark balance.",

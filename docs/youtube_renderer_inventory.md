@@ -1,4 +1,4 @@
-# YouTube Renderer Inventory (v3.2.8 follow-up)
+# YouTube Renderer Inventory (v3.2.9 follow-up)
 
 This document tracks which YouTube renderers/selectors FilterTube currently targets and how the latest DOM samples map to them.
 
@@ -178,6 +178,25 @@ function isTopicChannel(channel) {
 | `<button-view-model>` | `buttonViewModel` | ℹ️ **NEW** | Drives overflow menus per card; UI text only today |
 | `<ytd-subscription-notification-toggle-button-renderer-next>` | `subscriptionNotificationToggleButtonRenderer` | ℹ️ **NEW** | Notification bell states; strings limited to UI ("Subscribed"); track in case filters target notification text |
 | `<ytd-badge-supported-renderer>` (verified badge) | `metadataBadgeRenderer` | ℹ️ **NEW** | Badge exposes "Official Artist Channel"; low priority unless badges become filter inputs |
+
+### Subscribed-channels import renderers (2026-03 follow-up)
+
+This inventory section is separate from the normal subscriptions feed card filtering above. It tracks the renderer family used by the whitelist-import flow.
+
+| Renderer / DOM shell | Surface | Import role | Status |
+| --- | --- | --- | --- |
+| `channelListItemRenderer` | `FEchannels` browse responses | Primary mobile/web-style subscription roster row | ✅ Used by importer |
+| `channelRenderer` | Desktop page seed / recursive browse artifacts | Desktop subscription row fallback | ✅ Used by importer |
+| `<ytd-channel-renderer>` | `/feed/channels` desktop DOM | Page-seed / DOM fallback source | ✅ Read when present |
+| `<ytm-channel-list-item-renderer>` | `/feed/channels` mobile DOM | Page-seed / DOM fallback source | ✅ Read when present |
+| `continuationCommand.token` | `FEchannels` browse responses | Continuation paging for larger rosters | ✅ Used by importer |
+
+Import notes:
+
+- the importer starts from `/feed/channels`
+- it may seed from page-local data first
+- it then continues through `FEchannels` browse requests
+- the resulting rows are normalized into whitelist channel entries
 
 ### Collaboration Videos + Watch Page (2025-12-21 snapshot, NEW)
 

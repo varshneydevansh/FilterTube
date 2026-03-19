@@ -822,7 +822,7 @@ const CURRENT_VERSION = (browserAPI.runtime.getManifest()?.version || '').trim()
 const FT_PROFILES_V4_KEY = 'ftProfilesV4';
 const DEFAULT_PROFILE_ID = 'default';
 const QUICK_BLOCK_DEFAULT_MIGRATION_KEY = 'quickBlockDefaultV327Applied';
-const QUICK_BLOCK_DEFAULT_TARGET_VERSION = '3.2.8';
+const QUICK_BLOCK_DEFAULT_TARGET_VERSION = '3.2.9';
 
 function compareSemver(a = '', b = '') {
     const toParts = (value) => String(value || '')
@@ -2292,6 +2292,13 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
     });
 }
 
+function shouldSuppressFirstRunPromptInjectionError(error) {
+    const message = String(error?.message || error || '');
+    return /Cannot access contents of the page/i.test(message)
+        || /Frame with ID 0 was removed/i.test(message)
+        || /No tab with id/i.test(message);
+}
+
 // Extension installed or updated handler
 browserAPI.runtime.onInstalled.addListener(function (details) {
     if (details.reason === 'install') {
@@ -2328,7 +2335,10 @@ browserAPI.runtime.onInstalled.addListener(function (details) {
                         files: ['js/content/first_run_prompt.js']
                     }, () => {
                         if (browserAPI.runtime.lastError) {
-                            console.warn('FilterTube: failed to inject first_run_prompt', browserAPI.runtime.lastError);
+                            const error = browserAPI.runtime.lastError;
+                            if (!shouldSuppressFirstRunPromptInjectionError(error)) {
+                                console.warn('FilterTube: failed to inject first_run_prompt', error);
+                            }
                         }
                     });
                 });
@@ -2364,7 +2374,10 @@ browserAPI.runtime.onInstalled.addListener(function (details) {
                         files: ['js/content/first_run_prompt.js']
                     }, () => {
                         if (browserAPI.runtime.lastError) {
-                            console.warn('FilterTube: failed to inject first_run_prompt', browserAPI.runtime.lastError);
+                            const error = browserAPI.runtime.lastError;
+                            if (!shouldSuppressFirstRunPromptInjectionError(error)) {
+                                console.warn('FilterTube: failed to inject first_run_prompt', error);
+                            }
                         }
                     });
                 });
@@ -3574,6 +3587,38 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
         }).catch((error) => {
             console.warn('FilterTube Background: injectScripts failed', error);
             sendResponse({ success: false, error: error?.message || 'Failed to inject requested scripts' });
+        });
+
+        return true;
+    } else if (request.action === 'FilterTube_EnsureSubscriptionsImportBridge') {
+        const tabId = Number(request?.tabId);
+
+        if (!Number.isFinite(tabId)) {
+            sendResponse({ success: false, error: 'Invalid tab id' });
+            return false;
+        }
+
+        if (!browserAPI?.scripting?.executeScript) {
+            sendResponse({ success: false, error: 'Scripting API unavailable' });
+            return false;
+        }
+
+        browserAPI.scripting.executeScript({
+            target: { tabId },
+            world: 'ISOLATED',
+            files: [
+                'js/shared/identity.js',
+                'js/content/dom_helpers.js',
+                'js/content/dom_extractors.js',
+                'js/content/dom_fallback.js',
+                'js/content/bridge_injection.js',
+                'js/content/bridge_settings.js'
+            ]
+        }).then(() => {
+            sendResponse({ success: true });
+        }).catch((error) => {
+            console.warn('FilterTube Background: ensure subscriptions bridge failed', error);
+            sendResponse({ success: false, error: error?.message || 'Failed to inject subscriptions bridge' });
         });
 
         return true;
