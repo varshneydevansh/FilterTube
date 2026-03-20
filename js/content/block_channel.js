@@ -334,6 +334,16 @@ function ensureQuickBlockStyles() {
 	        transition: opacity 0.15s ease;
 	        will-change: opacity;
 	    }
+        html:not([data-filtertube-mobile-surface]) ytd-rich-item-renderer > .filtertube-quick-block-wrap,
+        html:not([data-filtertube-mobile-surface]) ytd-video-renderer > .filtertube-quick-block-wrap,
+        html:not([data-filtertube-mobile-surface]) ytd-grid-video-renderer > .filtertube-quick-block-wrap,
+        html:not([data-filtertube-mobile-surface]) ytd-compact-video-renderer > .filtertube-quick-block-wrap,
+        html:not([data-filtertube-mobile-surface]) ytd-radio-renderer > .filtertube-quick-block-wrap,
+        html:not([data-filtertube-mobile-surface]) ytd-compact-radio-renderer > .filtertube-quick-block-wrap,
+        html:not([data-filtertube-mobile-surface]) ytd-reel-item-renderer > .filtertube-quick-block-wrap,
+        html:not([data-filtertube-mobile-surface]) .ytGridShelfViewModelGridShelfItem > .filtertube-quick-block-wrap {
+            z-index: 2147483000;
+        }
 	    .filtertube-quick-block-host:hover .filtertube-quick-block-wrap,
 	    .filtertube-quick-block-anchor:hover .filtertube-quick-block-wrap,
 	    .filtertube-quick-block-host[data-filtertube-quick-hover="true"] .filtertube-quick-block-wrap,
