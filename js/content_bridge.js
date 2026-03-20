@@ -2925,8 +2925,31 @@ function handleMediaPlayback(element, shouldHide) {
 function extractCollaboratorMetadataFromRenderer(rendererCandidate) {
     if (!rendererCandidate || typeof rendererCandidate !== 'object') return [];
 
-    const extractFromShowDialogCommand = (showDialogCommand) => {
-        const listItems = showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems;
+    const extractListItemsFromSheetLikeCommand = (command) => {
+        const listItems =
+            command?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems ||
+            command?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.content?.listViewModel?.listItems ||
+            command?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.listViewModel?.listItems ||
+            command?.panelLoadingStrategy?.inlineContent?.sheetViewModel?.content?.listViewModel?.listItems ||
+            command?.dialog?.presenterDialogViewModel?.content?.listViewModel?.listItems ||
+            command?.dialog?.presenterDialogViewModel?.customContent?.listViewModel?.listItems ||
+            command?.dialog?.dialogViewModel?.content?.listViewModel?.listItems ||
+            command?.dialog?.dialogViewModel?.customContent?.listViewModel?.listItems ||
+            command?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems ||
+            command?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.content?.listViewModel?.listItems ||
+            command?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.sheetViewModel?.content?.listViewModel?.listItems ||
+            command?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems ||
+            command?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.content?.listViewModel?.listItems ||
+            command?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.sheetViewModel?.content?.listViewModel?.listItems ||
+            command?.showSheetCommand?.dialog?.presenterDialogViewModel?.content?.listViewModel?.listItems ||
+            command?.showSheetCommand?.dialog?.presenterDialogViewModel?.customContent?.listViewModel?.listItems ||
+            command?.showDialogCommand?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.sheetViewModel?.content?.listViewModel?.listItems ||
+            command?.showSheetCommand?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.sheetViewModel?.content?.listViewModel?.listItems;
+        return Array.isArray(listItems) ? listItems : [];
+    };
+
+    const extractFromSheetLikeCommand = (command) => {
+        const listItems = extractListItemsFromSheetLikeCommand(command);
         if (!Array.isArray(listItems) || listItems.length === 0) return [];
 
         const collaborators = [];
@@ -2934,7 +2957,13 @@ function extractCollaboratorMetadataFromRenderer(rendererCandidate) {
             const viewModel = item?.listItemViewModel;
             if (!viewModel) continue;
 
-            const browseEndpoint = viewModel.rendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint;
+            const browseEndpoint =
+                viewModel.rendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint ||
+                viewModel.title?.commandRuns?.[0]?.onTap?.innertubeCommand?.browseEndpoint ||
+                viewModel.onTap?.innertubeCommand?.browseEndpoint ||
+                null;
+            if (!browseEndpoint || typeof browseEndpoint !== 'object') continue;
+
             const collab = {
                 name: viewModel.title?.content || '',
                 handle: '',
@@ -2982,18 +3011,46 @@ function extractCollaboratorMetadataFromRenderer(rendererCandidate) {
     let renderer = rendererCandidate;
     if (renderer.content?.videoRenderer) {
         renderer = renderer.content.videoRenderer;
+    } else if (renderer.content?.videoWithContextRenderer) {
+        renderer = renderer.content.videoWithContextRenderer;
     } else if (renderer.content?.lockupViewModel) {
         renderer = renderer.content.lockupViewModel;
+    } else if (renderer.content?.playlistPanelVideoRenderer) {
+        renderer = renderer.content.playlistPanelVideoRenderer;
+    } else if (renderer.content?.playlistVideoRenderer) {
+        renderer = renderer.content.playlistVideoRenderer;
+    } else if (renderer.content?.compactVideoRenderer) {
+        renderer = renderer.content.compactVideoRenderer;
     } else if (renderer.richItemRenderer?.content?.videoRenderer) {
         renderer = renderer.richItemRenderer.content.videoRenderer;
+    } else if (renderer.richItemRenderer?.content?.videoWithContextRenderer) {
+        renderer = renderer.richItemRenderer.content.videoWithContextRenderer;
     } else if (renderer.richItemRenderer?.content?.lockupViewModel) {
         renderer = renderer.richItemRenderer.content.lockupViewModel;
+    } else if (renderer.richItemRenderer?.content?.playlistPanelVideoRenderer) {
+        renderer = renderer.richItemRenderer.content.playlistPanelVideoRenderer;
+    } else if (renderer.richItemRenderer?.content?.playlistVideoRenderer) {
+        renderer = renderer.richItemRenderer.content.playlistVideoRenderer;
     } else if (renderer.videoRenderer) {
         renderer = renderer.videoRenderer;
+    } else if (renderer.videoWithContextRenderer) {
+        renderer = renderer.videoWithContextRenderer;
     } else if (renderer.lockupViewModel) {
         renderer = renderer.lockupViewModel;
+    } else if (renderer.playlistPanelVideoRenderer) {
+        renderer = renderer.playlistPanelVideoRenderer;
+    } else if (renderer.playlistVideoRenderer) {
+        renderer = renderer.playlistVideoRenderer;
+    } else if (renderer.compactVideoRenderer) {
+        renderer = renderer.compactVideoRenderer;
     } else if (renderer.data?.content) {
-        renderer = renderer.data.content.videoRenderer || renderer.data.content.lockupViewModel || renderer;
+        renderer = renderer.data.content.videoRenderer ||
+            renderer.data.content.videoWithContextRenderer ||
+            renderer.data.content.lockupViewModel ||
+            renderer.data.content.playlistPanelVideoRenderer ||
+            renderer.data.content.playlistVideoRenderer ||
+            renderer.data.content.compactVideoRenderer ||
+            renderer;
     }
 
     if (!renderer || typeof renderer !== 'object') return [];
@@ -3003,13 +3060,17 @@ function extractCollaboratorMetadataFromRenderer(rendererCandidate) {
     const runs = Array.isArray(byline?.runs) ? byline.runs : [];
 
     for (const run of runs) {
-        const showDialogCommand = run.navigationEndpoint?.showDialogCommand;
-        if (!showDialogCommand) continue;
+        const sheetLikeCommand =
+            run.navigationEndpoint?.showSheetCommand ||
+            run.navigationEndpoint?.showDialogCommand ||
+            run.navigationEndpoint?.command?.showSheetCommand ||
+            run.navigationEndpoint?.command?.showDialogCommand;
+        if (!sheetLikeCommand) continue;
 
-        const listItems = showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.customContent?.listViewModel?.listItems;
+        const listItems = extractListItemsFromSheetLikeCommand(sheetLikeCommand);
         if (!Array.isArray(listItems) || listItems.length === 0) continue;
 
-        const extracted = extractFromShowDialogCommand(showDialogCommand);
+        const extracted = extractFromSheetLikeCommand(sheetLikeCommand);
         if (extracted.length > 0) {
             Array.prototype.push.apply(collaborators, extracted);
         }
@@ -3020,14 +3081,15 @@ function extractCollaboratorMetadataFromRenderer(rendererCandidate) {
     }
 
     if (collaborators.length === 0) {
-        // Home lockupViewModel often omits byline.runs; attempt bounded deep scan for showDialogCommand.
+        // Home/mobile lockups can omit byline runs; attempt bounded deep scan for sheet-like commands.
         const visited = new WeakSet();
         const scan = (node, depth = 0) => {
             if (!node || typeof node !== 'object' || visited.has(node) || depth > 10) return [];
             visited.add(node);
 
-            if (node.showDialogCommand) {
-                const extracted = extractFromShowDialogCommand(node.showDialogCommand);
+            const sheetLikeCommand = node.showSheetCommand || node.showDialogCommand;
+            if (sheetLikeCommand) {
+                const extracted = extractFromSheetLikeCommand(sheetLikeCommand);
                 if (extracted.length > 0) return extracted;
             }
 
@@ -3064,13 +3126,31 @@ function hydrateCollaboratorsFromRendererData(card) {
         card.data,
         card.data?.content,
         card.data?.content?.videoRenderer,
+        card.data?.content?.videoWithContextRenderer,
         card.data?.content?.lockupViewModel,
+        card.data?.content?.playlistPanelVideoRenderer,
+        card.data?.content?.playlistVideoRenderer,
+        card.data?.content?.compactVideoRenderer,
+        card.data?.richItemRenderer?.content?.videoRenderer,
+        card.data?.richItemRenderer?.content?.videoWithContextRenderer,
+        card.data?.richItemRenderer?.content?.lockupViewModel,
+        card.data?.richItemRenderer?.content?.playlistPanelVideoRenderer,
+        card.data?.richItemRenderer?.content?.playlistVideoRenderer,
         card.__data,
         card.__data?.data,
         card.__data?.item,
         card.__data?.data?.content,
         card.__data?.data?.content?.videoRenderer,
-        card.__data?.data?.content?.lockupViewModel
+        card.__data?.data?.content?.videoWithContextRenderer,
+        card.__data?.data?.content?.lockupViewModel,
+        card.__data?.data?.content?.playlistPanelVideoRenderer,
+        card.__data?.data?.content?.playlistVideoRenderer,
+        card.__data?.data?.content?.compactVideoRenderer,
+        card.__data?.data?.richItemRenderer?.content?.videoRenderer,
+        card.__data?.data?.richItemRenderer?.content?.videoWithContextRenderer,
+        card.__data?.data?.richItemRenderer?.content?.lockupViewModel,
+        card.__data?.data?.richItemRenderer?.content?.playlistPanelVideoRenderer,
+        card.__data?.data?.richItemRenderer?.content?.playlistVideoRenderer
     ];
 
     for (const candidate of candidates) {
@@ -3397,6 +3477,28 @@ function extractCollaboratorMetadataFromElement(element) {
                     requiresDialogExtraction = true;
                     expectedCollaboratorCount = Math.max(expectedCollaboratorCount, parsed.names.length + parsed.hiddenCount);
                 }
+            }
+        }
+    }
+
+    // Method 3b: YTM watch queue / compact rows often only expose a collapsed byline like
+    // "Shakira and 2 more" in DOM, while the authoritative collaborator roster lives in
+    // showSheetCommand JSON. Treat the byline as a collaboration signal so enrichment runs.
+    if (collaborators.length === 0) {
+        const ytmBylineEl = (card || element).querySelector(
+            '.YtmCompactMediaItemByline .yt-core-attributed-string, ' +
+            '.YtmBadgeAndBylineRendererItemByline .yt-core-attributed-string, ' +
+            'a.media-item-subtitle, ' +
+            '.media-item-subtitle'
+        );
+        const rawText = ytmBylineEl?.textContent?.trim() || '';
+        if (rawText && /\band\s+\d+\s+more\b/i.test(rawText)) {
+            const parsed = parseCollaboratorNames(rawText);
+            if (parsed.names.length > 0 || parsed.hasHiddenCollaborators) {
+                parsed.names.forEach(name => collaborators.push({ name, handle: '', id: '', customUrl: '' }));
+                hydrateCollaboratorsFromLinks(collaborators);
+                requiresDialogExtraction = true;
+                expectedCollaboratorCount = Math.max(expectedCollaboratorCount, parsed.names.length + parsed.hiddenCount);
             }
         }
     }
@@ -5019,6 +5121,19 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
     };
 
     const performBlock = async (channelInfo, filterAll) => {
+        const hideRowImmediately = (meta) => {
+            try {
+                if (!row || !(row instanceof Element)) return;
+                if (typeof markElementAsBlocked === 'function') {
+                    markElementAsBlocked(row, meta || {}, 'pending');
+                }
+                row.style.display = 'none';
+                row.classList.add('filtertube-hidden');
+                row.setAttribute('data-filtertube-hidden', 'true');
+            } catch (e) {
+            }
+        };
+
         try {
             if (channelInfo?.isBlockAllOption && Array.isArray(channelInfo.allCollaborators) && channelInfo.allCollaborators.length > 0) {
                 let successCount = 0;
@@ -5053,6 +5168,7 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
                 close();
 
                 if (successCount > 0) {
+                    hideRowImmediately(channelInfo.allCollaborators[0] || channelInfo);
                     try {
                         const refreshed = await requestSettingsFromBackground();
                         if (refreshed?.success && refreshed.settings) {
@@ -5130,6 +5246,7 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
             close();
 
             if (res && res.success) {
+                hideRowImmediately((res && res.channelData) || info || channelInfo);
                 try {
                     const refreshed = await requestSettingsFromBackground();
                     if (refreshed?.success && refreshed.settings) {
@@ -5523,6 +5640,52 @@ function extractChannelFromInitialData(initialData, options = {}) {
         return true;
     }
 
+    function mergeCandidates(...candidates) {
+        const merged = {
+            id: '',
+            handle: '',
+            name: '',
+            customUrl: ''
+        };
+
+        for (const candidate of candidates) {
+            if (!candidate || typeof candidate !== 'object') continue;
+            if (!merged.id && typeof candidate.id === 'string' && candidate.id.trim()) merged.id = candidate.id.trim();
+            if (!merged.handle && typeof candidate.handle === 'string' && candidate.handle.trim()) merged.handle = candidate.handle.trim();
+            if (!merged.name && typeof candidate.name === 'string' && candidate.name.trim()) merged.name = candidate.name.trim();
+            if (!merged.customUrl && typeof candidate.customUrl === 'string' && candidate.customUrl.trim()) merged.customUrl = candidate.customUrl.trim();
+        }
+
+        return (merged.id || merged.handle || merged.name || merged.customUrl) ? merged : null;
+    }
+
+    function pickSingleSheetCandidate(candidates) {
+        if (!Array.isArray(candidates) || candidates.length === 0) return null;
+
+        const normalizedCandidates = [];
+        const seen = new Set();
+        for (const candidate of candidates) {
+            if (!candidate || typeof candidate !== 'object') continue;
+            const normalizedCandidate = {
+                id: (typeof candidate.id === 'string' && candidate.id.trim()) ? candidate.id.trim() : '',
+                handle: (typeof candidate.handle === 'string' && candidate.handle.trim()) ? candidate.handle.trim() : '',
+                name: (typeof candidate.name === 'string' && candidate.name.trim()) ? candidate.name.trim() : '',
+                customUrl: (typeof candidate.customUrl === 'string' && candidate.customUrl.trim()) ? candidate.customUrl.trim() : ''
+            };
+            const key = (normalizedCandidate.id || normalizedCandidate.handle || normalizedCandidate.customUrl || normalizedCandidate.name || '').toLowerCase();
+            if (!key || seen.has(key)) continue;
+            seen.add(key);
+            normalizedCandidates.push(normalizedCandidate);
+        }
+
+        if (normalizedCandidates.length === 0) return null;
+        if (hasExpectations) {
+            const exactMatch = normalizedCandidates.find(matchesExpectations);
+            if (exactMatch) return exactMatch;
+        }
+        return normalizedCandidates.length === 1 ? normalizedCandidates[0] : null;
+    }
+
     const visited = new WeakSet();
 
     function searchNode(node) {
@@ -5537,8 +5700,14 @@ function extractChannelFromInitialData(initialData, options = {}) {
             candidate = candidate.gridVideoRenderer;
         } else if (candidate.compactVideoRenderer) {
             candidate = candidate.compactVideoRenderer;
+        } else if (candidate.videoWithContextRenderer) {
+            candidate = candidate.videoWithContextRenderer;
+        } else if (candidate.playlistPanelVideoRenderer) {
+            candidate = candidate.playlistPanelVideoRenderer;
         } else if (candidate.playlistVideoRenderer) {
             candidate = candidate.playlistVideoRenderer;
+        } else if (candidate.compactRadioRenderer) {
+            candidate = candidate.compactRadioRenderer;
         } else if (candidate.reelItemRenderer) {
             candidate = candidate.reelItemRenderer;
         } else if (candidate.shortsLockupViewModel) {
@@ -5549,8 +5718,16 @@ function extractChannelFromInitialData(initialData, options = {}) {
             candidate = candidate.lockupViewModel;
         } else if (candidate.richItemRenderer?.content?.videoRenderer) {
             candidate = candidate.richItemRenderer.content.videoRenderer;
+        } else if (candidate.richItemRenderer?.content?.videoWithContextRenderer) {
+            candidate = candidate.richItemRenderer.content.videoWithContextRenderer;
+        } else if (candidate.richItemRenderer?.content?.playlistPanelVideoRenderer) {
+            candidate = candidate.richItemRenderer.content.playlistPanelVideoRenderer;
         } else if (candidate.content?.videoRenderer) {
             candidate = candidate.content.videoRenderer;
+        } else if (candidate.content?.videoWithContextRenderer) {
+            candidate = candidate.content.videoWithContextRenderer;
+        } else if (candidate.content?.playlistPanelVideoRenderer) {
+            candidate = candidate.content.playlistPanelVideoRenderer;
         }
 
         const nodeVideoId = typeof node.videoId === 'string' ? node.videoId : '';
@@ -5558,6 +5735,11 @@ function extractChannelFromInitialData(initialData, options = {}) {
         const effectiveVideoId = candidateVideoId || nodeVideoId;
 
         if (!targetVideoId || (effectiveVideoId && effectiveVideoId === targetVideoId)) {
+            const collaboratorCandidates = extractCollaboratorMetadataFromRenderer(candidate);
+            const sheetCandidate = pickSingleSheetCandidate(
+                collaboratorCandidates.length > 0 ? collaboratorCandidates : extractCollaboratorMetadataFromRenderer(node)
+            );
+
             // Try byline/owner-style fields similar to filter_logic.js
             const byline = candidate.shortBylineText || candidate.longBylineText || candidate.ownerText;
             if (byline?.runs && Array.isArray(byline.runs)) {
@@ -5586,13 +5768,18 @@ function extractChannelFromInitialData(initialData, options = {}) {
                         candidateResult.handle = handle;
                     }
 
-                    if (matchesExpectations(candidateResult)) {
+                    const mergedCandidate = mergeCandidates(candidateResult, sheetCandidate);
+                    if (matchesExpectations(mergedCandidate)) {
                         if (handle) {
                             console.log('FilterTube: Found channel in ytInitialData (deep search):', { handle, id: browseId });
                         }
-                        return candidateResult;
+                        return mergedCandidate;
                     }
                 }
+            }
+
+            if (sheetCandidate && matchesExpectations(sheetCandidate)) {
+                return sheetCandidate;
             }
         }
 
@@ -5851,7 +6038,7 @@ async function fetchChannelFromShortsUrl(videoId, requestedHandle = null) {
 async function fetchChannelFromShortsUrlDirect(videoId, requestedHandle = null, normalizedExpected = null) {
     try {
         console.log('FilterTube: Fetching shorts page directly for video:', videoId);
-        const response = await fetch(`https://www.youtube.com/shorts/${videoId}`, {
+        const response = await fetch(`/shorts/${encodeURIComponent(videoId)}`, {
             credentials: 'same-origin',
             headers: {
                 'Accept': 'text/html'
@@ -5880,11 +6067,13 @@ async function fetchChannelFromShortsUrlDirect(videoId, requestedHandle = null, 
                             for (const item of header.menu.menuRenderer.items) {
                                 const endpoint = item?.menuNavigationItemRenderer?.navigationEndpoint?.browseEndpoint;
                                 if (endpoint?.browseId && endpoint?.canonicalBaseUrl) {
-                                    const handle = endpoint.canonicalBaseUrl.replace('/user/', '@').replace(/^\//, '');
+                                    const canonicalBaseUrl = endpoint.canonicalBaseUrl || '';
+                                    const handle = extractRawHandle(canonicalBaseUrl) || '';
                                     const id = endpoint.browseId && endpoint.browseId.startsWith('UC') ? endpoint.browseId : null;
+                                    const customUrl = extractCustomUrlFromHref(canonicalBaseUrl) || '';
                                     const normalizedFound = normalizeHandleValue(handle);
                                     if (!normalizedHandleExpectation || normalizedFound === normalizedHandleExpectation) {
-                                        return { handle, id, name: '' };
+                                        return { handle, id, customUrl, name: '' };
                                     }
                                 }
                             }
@@ -5896,29 +6085,30 @@ async function fetchChannelFromShortsUrlDirect(videoId, requestedHandle = null, 
                     const headerRenderer = overlay.reelPlayerHeaderSupportedRenderers.reelPlayerHeaderRenderer;
                     const channelNavEndpoint = headerRenderer?.channelNavigationEndpoint?.browseEndpoint;
                     if (channelNavEndpoint?.browseId && channelNavEndpoint?.canonicalBaseUrl) {
-                        const handle = channelNavEndpoint.canonicalBaseUrl.replace('/user/', '@').replace(/^\//, '');
+                        const canonicalBaseUrl = channelNavEndpoint.canonicalBaseUrl || '';
+                        const handle = extractRawHandle(canonicalBaseUrl) || '';
                         const id = channelNavEndpoint.browseId && channelNavEndpoint.browseId.startsWith('UC')
                             ? channelNavEndpoint.browseId
                             : null;
+                        const customUrl = extractCustomUrlFromHref(canonicalBaseUrl) || '';
                         const normalizedFound = normalizeHandleValue(handle);
                         if (!normalizedHandleExpectation || normalizedFound === normalizedHandleExpectation) {
                             return {
                                 handle,
                                 id,
+                                customUrl,
                                 name: headerRenderer.channelTitleText?.runs?.[0]?.text || ''
                             };
                         }
                     }
                 }
 
-                if (!normalizedHandleExpectation) {
-                    const deepResult = extractChannelFromInitialData(ytInitialData, {
-                        videoId,
-                        expectedHandle: requestedHandle
-                    });
-                    if (deepResult) {
-                        return deepResult;
-                    }
+                const deepResult = extractChannelFromInitialData(ytInitialData, {
+                    videoId,
+                    expectedHandle: requestedHandle
+                });
+                if (deepResult) {
+                    return deepResult;
                 }
             } catch (e) {
                 console.debug('FilterTube: Failed to parse ytInitialData from shorts page:', e);
@@ -5997,7 +6187,7 @@ async function fetchChannelFromWatchUrl(videoId, requestedHandle = null) {
     const fetchPromise = (async () => {
         try {
             console.log('FilterTube: Fetching watch page for video:', videoId);
-            const response = await fetch(`https://www.youtube.com/watch?v=${videoId}`, {
+            const response = await fetch(`/watch?v=${encodeURIComponent(videoId)}`, {
                 credentials: 'same-origin',
                 headers: {
                     'Accept': 'text/html'
@@ -6165,11 +6355,42 @@ function extractChannelFromCard(card) {
                 '#avatar img, ' +
                 'ytd-channel-name img, ' +
                 'ytd-video-owner-renderer img, ' +
+                'ytm-channel-thumbnail-with-link-renderer img, ' +
+                'ytm-slim-owner-renderer img, ' +
+                'ytm-profile-icon img, ' +
+                '.ytProfileIconImage, ' +
                 'yt-avatar-shape img, ' +
                 'yt-img-shadow img'
             );
             if (!img) return '';
             return (img.getAttribute('src') || img.src || '').trim();
+        };
+
+        const normalizeYtmChannelName = (value) => {
+            if (!value || typeof value !== 'string') return '';
+            let normalized = value
+                .replace(/\s+/g, ' ')
+                .replace(/^Go to channel\s+/i, '')
+                .trim();
+            if (!normalized) return '';
+            if (normalized.startsWith('@')) return '';
+            if (/^UC[\w-]{22}$/i.test(normalized)) return '';
+            if (normalized.includes('•')) return '';
+            if (/\bviews?\b/i.test(normalized)) return '';
+            if (/\bwatching\b/i.test(normalized)) return '';
+            if (/\bago\b/i.test(normalized)) return '';
+            return normalized;
+        };
+
+        const extractCustomUrlFromHref = (href) => {
+            if (!href || typeof href !== 'string') return '';
+            const match = href.match(/\/(c|user)\/([^/?#]+)/);
+            if (!match || !match[1] || !match[2]) return '';
+            try {
+                return `${match[1]}/${decodeURIComponent(match[2])}`;
+            } catch (_) {
+                return `${match[1]}/${match[2]}`;
+            }
         };
 
         // SPECIAL CASE: Comment context (thread + modern comment view/renderer nodes)
@@ -6360,9 +6581,28 @@ function extractChannelFromCard(card) {
                 const videoIdMatch = href?.match(/\/shorts\/([a-zA-Z0-9_-]{11})/);
                 if (videoIdMatch) {
                     const videoId = videoIdMatch[1];
+                    const expectedShortsNameRaw = normalizeYtmChannelName(
+                        card.querySelector('.shortsLockupViewModelHostOutsideMetadata a[href*="/@"], .shortsLockupViewModelHostOutsideMetadata a[href*="/channel/UC"], .shortsLockupViewModelHostOutsideMetadata a[href*="/c/"], .shortsLockupViewModelHostOutsideMetadata a[href*="/user/"]')?.textContent?.trim() ||
+                        card.querySelector('.shortsLockupViewModelHostOutsideMetadata .yt-core-attributed-string')?.textContent?.trim() ||
+                        card.querySelector('ytm-channel-thumbnail-with-link-renderer img[alt], ytm-profile-icon img[alt], .ytProfileIconImage[alt]')?.getAttribute('alt') ||
+                        ''
+                    );
+                    const expectedShortsName = expectedShortsNameRaw && expectedShortsNameRaw.toLowerCase() !== 'youtube'
+                        ? expectedShortsNameRaw
+                        : '';
+                    const expectedShortsHandle = normalizeHandleValue(
+                        extractRawHandle(
+                            card.querySelector('.shortsLockupViewModelHostOutsideMetadata a[href*="/@"], a[href*="/@"]:not([href*="/shorts"]):not([href*="/watch"])')?.getAttribute('href') || ''
+                        ) || ''
+                    );
                     console.log('FilterTube: Extracted shorts video ID:', videoId);
                     // Return a promise marker - we'll need to handle this async
-                    return { videoId, needsFetch: true };
+                    return {
+                        videoId,
+                        needsFetch: true,
+                        expectedChannelName: expectedShortsName || null,
+                        expectedHandle: expectedShortsHandle || null
+                    };
                 }
             }
 
@@ -6468,6 +6708,96 @@ function extractChannelFromCard(card) {
             }
         }
 
+        const isYtmVideoLikeCard = (
+            cardTag === 'ytm-video-with-context-renderer' ||
+            cardTag === 'ytm-compact-video-renderer' ||
+            cardTag === 'ytm-playlist-video-renderer' ||
+            cardTag === 'ytm-playlist-panel-video-renderer' ||
+            (cardTag === 'ytm-rich-item-renderer' && Boolean(card.querySelector(
+                'ytm-video-with-context-renderer, ' +
+                'ytm-compact-video-renderer, ' +
+                'ytm-playlist-video-renderer, ' +
+                'ytm-playlist-panel-video-renderer'
+            )))
+        );
+
+        if (isYtmVideoLikeCard) {
+            const ytmIdentityRoot = (
+                card.matches('ytm-video-with-context-renderer, ytm-compact-video-renderer, ytm-playlist-video-renderer, ytm-playlist-panel-video-renderer')
+                    ? card
+                    : card.querySelector('ytm-video-with-context-renderer, ytm-compact-video-renderer, ytm-playlist-video-renderer, ytm-playlist-panel-video-renderer')
+            ) || card;
+
+            const ytmBylineHint = (
+                ytmIdentityRoot.querySelector('a.media-item-subtitle')?.textContent?.trim() ||
+                ytmIdentityRoot.querySelector('.YtmBadgeAndBylineRendererItemByline .yt-core-attributed-string')?.textContent?.trim() ||
+                ytmIdentityRoot.querySelector('.YtmCompactMediaItemByline .yt-core-attributed-string')?.textContent?.trim() ||
+                ''
+            );
+            const parsedYtmBylineHint = parseCollaboratorNames(ytmBylineHint);
+            const hasYtmCollaborationSignal = Boolean(
+                ytmIdentityRoot.querySelector('yt-avatar-stack-view-model, #attributed-channel-name') ||
+                parsedYtmBylineHint.hasHiddenCollaborators ||
+                parsedYtmBylineHint.names.length >= 2
+            );
+
+            const ytmChannelLink = ytmIdentityRoot.querySelector(
+                'ytm-channel-thumbnail-with-link-renderer a[href*="/@"], ' +
+                'ytm-channel-thumbnail-with-link-renderer a[href*="/channel/UC"], ' +
+                'ytm-channel-thumbnail-with-link-renderer a[href*="/c/"], ' +
+                'ytm-channel-thumbnail-with-link-renderer a[href*="/user/"], ' +
+                '.media-channel a[href*="/@"], ' +
+                '.media-channel a[href*="/channel/UC"], ' +
+                '.media-channel a[href*="/c/"], ' +
+                '.media-channel a[href*="/user/"], ' +
+                'a.media-item-subtitle[href*="/@"], ' +
+                'a.media-item-subtitle[href*="/channel/UC"], ' +
+                'a.media-item-subtitle[href*="/c/"], ' +
+                'a.media-item-subtitle[href*="/user/"], ' +
+                '.YtmCompactMediaItemMetadataContent a[href*="/@"], ' +
+                '.YtmCompactMediaItemMetadataContent a[href*="/channel/UC"], ' +
+                '.YtmCompactMediaItemMetadataContent a[href*="/c/"], ' +
+                '.YtmCompactMediaItemMetadataContent a[href*="/user/"], ' +
+                '.YtmCompactMediaItemByline a[href*="/@"], ' +
+                '.YtmCompactMediaItemByline a[href*="/channel/UC"], ' +
+                '.YtmCompactMediaItemByline a[href*="/c/"], ' +
+                '.YtmCompactMediaItemByline a[href*="/user/"]'
+            );
+
+            if (ytmChannelLink) {
+                const href = ytmChannelLink.getAttribute('href') || ytmChannelLink.href || '';
+                const handle = normalizeHandleValue(extractRawHandle(href) || '');
+                const id = extractChannelIdFromString(href) || '';
+                const customUrl = extractCustomUrlFromHref(href);
+
+                const ytmNameCandidates = [
+                    ytmChannelLink.textContent?.trim() || '',
+                    ytmIdentityRoot.querySelector('a.media-item-subtitle')?.textContent?.trim() || '',
+                    ytmIdentityRoot.querySelector('.YtmBadgeAndBylineRendererItemByline .yt-core-attributed-string')?.textContent?.trim() || '',
+                    ytmIdentityRoot.querySelector('.YtmCompactMediaItemByline .yt-core-attributed-string')?.textContent?.trim() || '',
+                    ytmIdentityRoot.querySelector('ytm-channel-thumbnail-with-link-renderer img[alt]')?.getAttribute('alt') || '',
+                    ytmIdentityRoot.querySelector('ytm-profile-icon img[alt], .ytProfileIconImage[alt]')?.getAttribute('alt') || ''
+                ];
+
+                const name = ytmNameCandidates
+                    .map(normalizeYtmChannelName)
+                    .find(Boolean) || '';
+
+                if ((handle || id || customUrl) && !hasYtmCollaborationSignal) {
+                    const videoIdHint = extractVideoIdFromCard(card) || ensureVideoIdForCard(card) || '';
+                    console.log('FilterTube: Extracted from YTM video card:', { handle, id, customUrl, name });
+                    return {
+                        handle: handle || '',
+                        id: id || '',
+                        customUrl: customUrl || '',
+                        name,
+                        logo: extractAvatarUrl() || '',
+                        videoId: videoIdHint || undefined
+                    };
+                }
+            }
+        }
+
         // SPECIAL CASE: Detect if this is a Post card (desktop + mobile YTM variants)
         const isPostCard = (
             card.tagName.toLowerCase() === 'ytd-post-renderer' ||
@@ -6549,6 +6879,7 @@ function extractChannelFromCard(card) {
 
         const hasCollaborationSignal = Boolean(
             collaborators && collaborators.length > 1 ||
+            (expectedCount > 1 && collaborators && collaborators.length > 0) ||
             (avatarStackSignal && expectedCount > 1 && collaborators && collaborators.length > 0)
         );
 
@@ -7165,12 +7496,36 @@ function extractChannelFromCard(card) {
 
         const fallbackVideoId = ensureVideoIdForCard(card);
         if (fallbackVideoId) {
-            const fallbackName = card.querySelector(
+            const fallbackNameRaw = card.querySelector(
                 '#channel-info ytd-channel-name a, ' +
                 '#channel-info #channel-name a, ' +
-                '.yt-lockup-metadata-view-model__metadata a[href*="/@"]'
+                '.yt-lockup-metadata-view-model__metadata a[href*="/@"], ' +
+                'ytm-channel-thumbnail-with-link-renderer a[href*="/@"], ' +
+                'ytm-channel-thumbnail-with-link-renderer a[href*="/channel/UC"], ' +
+                'ytm-channel-thumbnail-with-link-renderer a[href*="/c/"], ' +
+                'ytm-channel-thumbnail-with-link-renderer a[href*="/user/"], ' +
+                '.media-channel a[href*="/@"], ' +
+                '.media-channel a[href*="/channel/UC"], ' +
+                '.media-channel a[href*="/c/"], ' +
+                '.media-channel a[href*="/user/"], ' +
+                'a.media-item-subtitle[href*="/@"], ' +
+                'a.media-item-subtitle[href*="/channel/UC"], ' +
+                'a.media-item-subtitle[href*="/c/"], ' +
+                'a.media-item-subtitle[href*="/user/"], ' +
+                '.YtmBadgeAndBylineRendererItemByline .yt-core-attributed-string, ' +
+                '.YtmCompactMediaItemByline .yt-core-attributed-string'
             )?.textContent?.trim() || '';
-            const fallbackHandleHref = card.querySelector('.yt-core-attributed-string__link[href*="/@"]')?.getAttribute('href') || '';
+            const fallbackNameNormalized = normalizeYtmChannelName(fallbackNameRaw);
+            const fallbackName = fallbackNameNormalized
+                ? fallbackNameNormalized
+                : (String(fallbackNameRaw || '').trim().toLowerCase() === 'youtube' ? '' : fallbackNameRaw);
+            const fallbackHandleHref = card.querySelector(
+                '.yt-core-attributed-string__link[href*="/@"], ' +
+                'ytm-channel-thumbnail-with-link-renderer a[href*="/@"], ' +
+                '.media-channel a[href*="/@"], ' +
+                'a.media-item-subtitle[href*="/@"], ' +
+                '.YtmCompactMediaItemByline a[href*="/@"]'
+            )?.getAttribute('href') || '';
             const fallbackHandle = extractRawHandle(fallbackHandleHref);
             console.log('FilterTube: Falling back to main-world lookup for video:', fallbackVideoId, 'expectedName:', fallbackName || 'n/a');
             return {
@@ -7256,7 +7611,14 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
             extractRawHandle(domHandleAttr) ||
             extractRawHandle(
                 videoCard
-                    .querySelector('#channel-info ytd-channel-name a[href*="/@"], ytd-channel-name #text a[href*="/@"]')
+                    .querySelector(
+                        '#channel-info ytd-channel-name a[href*="/@"], ' +
+                        'ytd-channel-name #text a[href*="/@"], ' +
+                        'ytm-channel-thumbnail-with-link-renderer a[href*="/@"], ' +
+                        'ytm-slim-owner-renderer a[href*="/@"], ' +
+                        '.media-channel a[href*="/@"], ' +
+                        'a.media-item-subtitle[href*="/@"]'
+                    )
                     ?.getAttribute('href') || ''
             ) ||
             extractRawHandle(
@@ -7269,7 +7631,14 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
 
         const domId = domIdAttr ||
             extractChannelIdFromString(
-                videoCard.querySelector('#channel-info ytd-channel-name a[href*="/channel/UC"], a#thumbnail[href*="/channel/UC"]')?.getAttribute('href') || ''
+                videoCard.querySelector(
+                    '#channel-info ytd-channel-name a[href*="/channel/UC"], ' +
+                    'a#thumbnail[href*="/channel/UC"], ' +
+                    'ytm-channel-thumbnail-with-link-renderer a[href*="/channel/UC"], ' +
+                    'ytm-slim-owner-renderer a[href*="/channel/UC"], ' +
+                    '.media-channel a[href*="/channel/UC"], ' +
+                    'a.media-item-subtitle[href*="/channel/UC"]'
+                )?.getAttribute('href') || ''
             );
 
         if (domId) {
@@ -7329,14 +7698,29 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
         };
 
         const hasVideoId = typeof initialChannelInfo.videoId === 'string' && initialChannelInfo.videoId.trim();
-        const nameLooksBad = !initialChannelInfo.name || isUcIdLike(initialChannelInfo.name) || isHandleLike(initialChannelInfo.name);
+        const isMobileYtmCard = Boolean(
+            /^ytm-/.test(videoCardTagName) ||
+            videoCard?.querySelector?.('ytm-video-with-context-renderer, ytm-compact-video-renderer, ytm-playlist-video-renderer, ytm-playlist-panel-video-renderer, ytm-compact-radio-renderer, ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2')
+        );
+        const nameLooksBad = !initialChannelInfo.name ||
+            isUcIdLike(initialChannelInfo.name) ||
+            isHandleLike(initialChannelInfo.name) ||
+            (isMobileYtmCard && String(initialChannelInfo.name || '').trim().toLowerCase() === 'youtube');
         // IMPORTANT: Do NOT treat a missing/placeholder name as a reason to do main-world lookup
         // when we already have a stable UC ID. This was causing playlist/Mix items to be overridden
         // by unrelated channels found in ytInitialData deep search.
         // Only require main-world lookup when UC ID is missing.
         // If UC ID is already present, avoid extra lookup churn that can race with
         // recycled DOM nodes and cause identity overrides.
-        const missingIdentityBits = !initialChannelInfo.id;
+        const missingIdentityBits = Boolean(
+            !initialChannelInfo.id ||
+            (
+                isMobileYtmCard &&
+                initialChannelInfo.id &&
+                !initialChannelInfo.handle &&
+                !initialChannelInfo.customUrl
+            )
+        );
 
         if (!isCommentContextCard && initialChannelInfo.source !== 'comments' && !initialChannelInfo.isCollaboration && hasVideoId && missingIdentityBits) {
             initialChannelInfo.needsFetch = true;
@@ -9184,7 +9568,17 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             }
 
             // 3) Final fallback: Shorts-specific helper (only when applicable)
-            if (!result.success && channelInfo.needsFetch && channelInfo.fetchStrategy !== 'mainworld') {
+            const isLikelyShortsBlockContext = Boolean(
+                videoCard?.getAttribute?.('data-filtertube-short') === 'true' ||
+                String(videoCard?.tagName || '').toLowerCase().includes('shorts') ||
+                String(videoCard?.tagName || '').toLowerCase().includes('reel') ||
+                videoCard?.querySelector?.('ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2, .reel-item-endpoint') ||
+                ((typeof location !== 'undefined') && /^\/shorts\//.test(String(location.pathname || '')))
+            );
+
+            if (!result.success && channelInfo.videoId && channelInfo.needsFetch && (
+                channelInfo.fetchStrategy !== 'mainworld' || isLikelyShortsBlockContext
+            )) {
                 const fallbackInfo = await fetchChannelFromShortsUrl(channelInfo.videoId, expectedHandle, { allowDirectFetch: true });
                 if (fallbackInfo && (fallbackInfo.id || fallbackInfo.handle)) {
                     let retryInput = null;

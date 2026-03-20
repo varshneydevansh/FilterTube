@@ -197,13 +197,25 @@ async function fetchIdForHandle(handle, options = {}) {
             ? rawCandidate.replace(/^@+/, '').split(/[/?#]/)[0].trim()
             : cleanHandle;
         const encodedHandle = encodeURIComponent(networkHandleCore);
-        let response = await fetch(`https://www.youtube.com/@${encodedHandle}/about`);
+        const handlePaths = [
+            `/@${encodedHandle}/about`,
+            `/@${encodedHandle}`
+        ];
 
-        if (!response.ok) {
-            response = await fetch(`https://www.youtube.com/@${encodedHandle}`);
+        let response = null;
+        for (const path of handlePaths) {
+            response = await fetch(path, {
+                credentials: 'same-origin',
+                headers: {
+                    'Accept': 'text/html'
+                }
+            });
+            if (response.ok) {
+                break;
+            }
         }
 
-        if (!response.ok) {
+        if (!response || !response.ok) {
             resolvedHandleCache.delete(cleanHandle);
             return null;
         }

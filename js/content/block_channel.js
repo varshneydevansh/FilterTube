@@ -113,6 +113,41 @@ const isHoverCapableDesktopSurface = () => {
     }
 };
 
+const isMobileWatchNextQuickBlockHost = (hostCard) => {
+    if (!hostCard || !(hostCard instanceof Element)) return false;
+
+    try {
+        const host = String(location?.hostname || '').toLowerCase();
+        const path = String(location?.pathname || '');
+        if (!host.includes('m.youtube.com') || !path.startsWith('/watch')) return false;
+
+        if (hostCard.closest?.(`${FT_DROPDOWN_SELECTORS}, ytm-bottom-sheet-renderer`)) return false;
+
+        if (
+            hostCard.matches?.(
+                'ytm-video-with-context-renderer, ' +
+                'ytm-compact-video-renderer, ' +
+                'ytm-playlist-panel-video-renderer, ' +
+                'ytm-playlist-video-renderer, ' +
+                'ytm-radio-renderer, ' +
+                'ytm-compact-radio-renderer, ' +
+                'ytm-shorts-lockup-view-model, ' +
+                'ytm-shorts-lockup-view-model-v2'
+            )
+        ) {
+            return true;
+        }
+
+        return !!hostCard.closest?.(
+            'ytm-item-section-renderer[section-identifier="related-items"], ' +
+            '.single-column-watch-next-modern-panels, ' +
+            'ytm-reel-shelf-renderer'
+        );
+    } catch (e) {
+        return false;
+    }
+};
+
 function isPostLikeQuickBlockCard(card) {
     if (!card || !(card instanceof Element)) return false;
     try {
@@ -376,6 +411,12 @@ function ensureQuickBlockStyles() {
     .filtertube-quick-block-btn[data-busy="true"] {
         opacity: 0.55;
         cursor: progress;
+    }
+    html[data-filtertube-mobile-surface] .filtertube-quick-block-host[data-filtertube-mobile-watch-next="true"] {
+        z-index: 0 !important;
+    }
+    html[data-filtertube-mobile-surface] .filtertube-quick-block-host[data-filtertube-mobile-watch-next="true"] .filtertube-quick-block-wrap {
+        z-index: 2;
     }
     html[data-filtertube-mobile-surface] .filtertube-quick-block-wrap {
         opacity: 1;
@@ -676,6 +717,11 @@ function ensureQuickBlockButton(card) {
             hostCard.setAttribute('data-filtertube-quick-force', 'true');
         } else {
             hostCard.removeAttribute('data-filtertube-quick-force');
+        }
+        if (isMobileWatchNextQuickBlockHost(hostCard)) {
+            hostCard.setAttribute('data-filtertube-mobile-watch-next', 'true');
+        } else {
+            hostCard.removeAttribute('data-filtertube-mobile-watch-next');
         }
     } catch (e) {
     }
