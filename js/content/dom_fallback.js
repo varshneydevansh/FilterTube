@@ -705,6 +705,7 @@ function ensureContentControlStyles(settings) {
     if (settings.hideSubscriptions) {
         rules.push(`
             .yt-simple-endpoint[href^="/feed/subscriptions"],
+            ${supportsHasSelector ? '#sections > ytd-guide-section-renderer:has(ytd-guide-collapsible-section-entry-renderer):has(a[href^="/@"]):not(:has(a[href="/feed/history"])),' : ''}
             ytd-browse[page-subtype="subscriptions"] {
                 display: none !important;
             }
@@ -2753,6 +2754,11 @@ async function applyDOMFallback(settings, options = {}) {
         for (let i = 0; i < chips.length; i++) {
             const chip = chips[i];
             const label = chip.textContent?.trim() || '';
+            const normalizedLabel = label.replace(/\s+/g, ' ').trim().toLowerCase();
+            if (effectiveSettings.hideMixPlaylists && normalizedLabel === 'mixes') {
+                toggleVisibility(chip, true, 'Chip: Mixes', true);
+                continue;
+            }
             if (listMode === 'whitelist') {
                 toggleVisibility(chip, false, '', true);
                 continue;

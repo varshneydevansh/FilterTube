@@ -29,10 +29,10 @@ let collabTriggerListenersAttached = false;
 function scheduleCollaboratorRefresh() {
     if (pendingCollaboratorRefresh) return;
     pendingCollaboratorRefresh = true;
-    requestAnimationFrame(() => {
+    setTimeout(() => {
         pendingCollaboratorRefresh = false;
-        applyDOMFallback(null, { preserveScroll: true, forceReprocess: true });
-    });
+        applyDOMFallback(null, { preserveScroll: true, forceReprocess: false });
+    }, 200);
 }
 
 function isCollabDialogTriggerTarget(target) {
