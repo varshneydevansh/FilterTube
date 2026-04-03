@@ -4214,20 +4214,59 @@ async function fetchChannelInfo(channelIdOrHandle) {
             return match && match[1] ? decodeHtmlEntities(match[1].trim()) : null;
         };
 
+        const decodeEmbeddedUrlValue = (value) => {
+            if (!value || typeof value !== 'string') return '';
+            return decodeHtmlEntities(value)
+                .replace(/\\u002F/g, '/')
+                .replace(/\\\//g, '/')
+                .trim();
+        };
+
+        const learnIdentityFromCanonicalLikeValue = (value) => {
+            const decoded = decodeEmbeddedUrlValue(value);
+            if (!decoded) return;
+            if (!channelHandle) {
+                const normalized = normalizeHandleOutput(decoded);
+                if (normalized) {
+                    channelHandle = normalized;
+                } else {
+                    const handleMatch = decoded.match(/\/(@[^/?#"]+)/);
+                    if (handleMatch && handleMatch[1]) {
+                        channelHandle = normalizeHandleOutput(handleMatch[1]) || channelHandle;
+                    }
+                }
+            }
+            assignCustomUrl(decoded);
+            if (!resolvedChannelId) {
+                const ucMatch = decoded.match(/\/channel\/(UC[\w-]{22})/i);
+                if (ucMatch && ucMatch[1]) {
+                    resolvedChannelId = ucMatch[1];
+                }
+            }
+        };
+
+        const learnIdentityFromHtml = () => {
+            const patterns = [
+                /"canonicalBaseUrl":"([^"]+)"/,
+                /"vanityChannelUrl":"([^"]+)"/,
+                /"channelUrl":"([^"]+)"/
+            ];
+            patterns.forEach((pattern) => {
+                const match = html.match(pattern);
+                if (match && match[1]) {
+                    learnIdentityFromCanonicalLikeValue(match[1]);
+                }
+            });
+        };
+
         const ogTitle = extractMeta('og:title') || extractMeta('twitter:title');
         const ogImage = extractMeta('og:image') || extractMeta('twitter:image');
+        learnIdentityFromCanonicalLikeValue(response?.url || '');
         const ogUrl = extractMeta('og:url') || extractCanonicalHref();
         if (ogUrl) {
-            assignCustomUrl(ogUrl);
-            const handleMatch = ogUrl.match(/\/(@[^/?#]+)/);
-            if (!channelHandle && handleMatch && handleMatch[1]) {
-                channelHandle = normalizeHandleOutput(handleMatch[1]) || channelHandle;
-            }
-            const ucMatch = ogUrl.match(/\/channel\/(UC[\w-]{22})/i);
-            if (!resolvedChannelId && ucMatch && ucMatch[1]) {
-                resolvedChannelId = ucMatch[1];
-            }
+            learnIdentityFromCanonicalLikeValue(ogUrl);
         }
+        learnIdentityFromHtml();
 
         // Extract ytInitialData from the page using a more robust method
         let data = null;
@@ -4647,15 +4686,6 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             return value.trim().startsWith('@');
         };
 
-        const pickBetterName = (...candidates) => {
-            const cleaned = candidates
-                .map(v => (typeof v === 'string' ? v.trim() : ''))
-                .filter(Boolean);
-            if (cleaned.length === 0) return '';
-            const preferred = cleaned.find(v => !isHandleLike(v) && v.toLowerCase() !== 'channel');
-            return preferred || cleaned[0];
-        };
-
         const normalizeChannelInput = (rawInput) => {
             if (!rawInput) return '';
             let cleaned = String(rawInput).trim();
@@ -4864,6 +4894,11 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             return /^UC[a-zA-Z0-9_-]{22}$/.test(value.trim());
         };
 
+        const normalizeComparableName = (value) => {
+            if (!value || typeof value !== 'string') return '';
+            return value.replace(/\s+/g, ' ').trim().toLowerCase();
+        };
+
         const isProbablyNotChannelName = (value) => {
             if (!value || typeof value !== 'string') return true;
             const trimmed = value.trim();
@@ -4878,12 +4913,23 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             return false;
         };
 
+        const normalizedVideoTitleHint = normalizeComparableName(metadata?.videoTitleHint || '');
+
         const sanitizePersistedChannelName = (value) => {
             if (!value || typeof value !== 'string') return '';
             const trimmed = value.trim();
             if (!trimmed) return '';
+            if (normalizedVideoTitleHint && normalizeComparableName(trimmed) === normalizedVideoTitleHint) return '';
             if (isProbablyNotChannelName(trimmed)) return '';
             return trimmed;
+        };
+
+        const pickPersistedChannelName = (...candidates) => {
+            for (const candidate of candidates) {
+                const sanitized = sanitizePersistedChannelName(candidate);
+                if (sanitized) return sanitized;
+            }
+            return '';
         };
 
         const hasMetadataName = typeof metadata.channelName === 'string' && metadata.channelName.trim();
@@ -4891,13 +4937,18 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
         const looksLikeTopicName = hasMetadataName && /\s-\sTopic$/i.test(metadata.channelName.trim());
         const hasMetadataHandle = typeof metadata.displayHandle === 'string' && metadata.displayHandle.trim();
         const hasMetadataLogo = typeof metadata.channelLogo === 'string' && metadata.channelLogo.trim();
+        const hasMetadataCustomUrl = typeof metadata.customUrl === 'string' && metadata.customUrl.trim();
+        const hasAlternateMetadataIdentity = Boolean(hasMetadataHandle || hasMetadataCustomUrl);
 
         // Important: do NOT skip fetch purely because we have a logo.
         // That leads to persisting {name: UC...} entries when name/handle were missing.
+        // Also do not skip the authoritative fetch for video-derived UC IDs when we still
+        // lack a handle/custom URL; that is exactly how content titles leaked into channel rows.
         const shouldSkipFetch = lookupValue
             && String(lookupValue).toUpperCase().startsWith('UC')
             && (hasGoodMetadataName || hasMetadataHandle)
-            && !looksLikeTopicName;
+            && !looksLikeTopicName
+            && (!effectiveVideoId || hasAlternateMetadataIdentity);
         if (shouldSkipFetch) {
             channelInfo = {
                 success: true,
@@ -4941,11 +4992,14 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
         // If scraping failed for a handle but we know a UC ID from channelMap, synthesize a minimal entry
         if (!channelInfo.success && isHandle && mappedId) {
             console.warn('FilterTube Background: fetchChannelInfo failed, falling back to mapped UC ID for handle', normalizedValue);
+            const fallbackNameFromMetadata = sanitizePersistedChannelName(
+                metadata.channelName || metadata.expectedChannelName || ''
+            );
             channelInfo = {
                 success: true,
                 id: mappedId,
                 handle: normalizedValue,
-                name: normalizedValue,
+                name: fallbackNameFromMetadata || '',
                 logo: null
             };
         }
@@ -4962,12 +5016,13 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                 const normalizedHandle = candidateHandle && candidateHandle.startsWith('@') ? candidateHandle.toLowerCase()
                     : (isHandle ? normalizedValue.toLowerCase() : '');
 
-                const candidateName = (metadata.channelName || '').trim();
+                const candidateName = sanitizePersistedChannelName(metadata.channelName || '');
+                const expectedNameFromMetadata = sanitizePersistedChannelName(metadata.expectedChannelName || '');
                 channelInfo = {
                     success: true,
                     id: fallbackId,
                     handle: normalizedHandle || null,
-                    name: candidateName || normalizedHandle || fallbackId,
+                    name: expectedNameFromMetadata || candidateName || normalizedHandle || fallbackId,
                     logo: metadata.channelLogo || null,
                     customUrl: metadata.customUrl || null
                 };
@@ -5071,11 +5126,9 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
         // The custom fallback 3-dot menu can seed metadata.channelName from the row title,
         // so fetched channel info is more authoritative for that recovery path.
         const preferFetchedNameFirst = incomingSource === 'playlist_fallback_menu' || incomingSource === 'postBlockEnrichment';
-        const finalChannelName = sanitizePersistedChannelName(
-            preferFetchedNameFirst
-                ? pickBetterName(channelInfo.name, metadata.channelName, normalizedValue)
-                : pickBetterName(metadata.channelName, channelInfo.name, normalizedValue)
-        );
+        const finalChannelName = preferFetchedNameFirst
+            ? pickPersistedChannelName(channelInfo.name, metadata.expectedChannelName, metadata.channelName, normalizedValue)
+            : pickPersistedChannelName(metadata.channelName, metadata.expectedChannelName, channelInfo.name, normalizedValue);
 
         if (normalizedHandle) {
             channelInfo.handle = normalizedHandle;
@@ -5133,21 +5186,39 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             }
 
             const mergedName = (() => {
-                const existingName = sanitizePersistedChannelName(existing.name || '');
-                if (!existingName) return finalChannelName;
+                const rawExistingName = typeof existing?.name === 'string' ? existing.name.trim() : '';
+                const existingName = sanitizePersistedChannelName(rawExistingName);
+                const incomingName = sanitizePersistedChannelName(finalChannelName || '');
+                if (!existingName) return incomingName;
+                if (!incomingName) return existingName;
 
                 const existingSource = typeof existing?.source === 'string' ? existing.source.trim() : '';
                 const sameChannelId = existing.id && channelInfo.id && existing.id === channelInfo.id;
                 const canRepairFallbackMenuName = (
-                    finalChannelName
-                    && finalChannelName !== existingName
+                    incomingName
+                    && incomingName !== existingName
                     && sameChannelId
                     && existingSource === 'playlist_fallback_menu'
                     && (incomingSource === 'playlist_fallback_menu' || incomingSource === 'postBlockEnrichment')
                 );
 
+                const existingAltIdentity = Boolean(
+                    normalizeHandleForMatch(existing.handle || existing.canonicalHandle || existing.handleDisplay || '') ||
+                    (typeof existing.customUrl === 'string' && existing.customUrl.trim())
+                );
+                const canRepairWeakExistingName = (
+                    incomingName !== existingName
+                    && sameChannelId
+                    && incomingSource === 'postBlockEnrichment'
+                    && !existingAltIdentity
+                );
+
                 if (canRepairFallbackMenuName) {
-                    return finalChannelName;
+                    return incomingName;
+                }
+
+                if (canRepairWeakExistingName) {
+                    return incomingName;
                 }
 
                 return existingName;

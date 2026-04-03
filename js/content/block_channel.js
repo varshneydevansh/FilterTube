@@ -500,7 +500,22 @@ function collectQuickBlockCollaborators(base = {}, videoCard = null) {
 
 function buildQuickBlockContext(videoCard) {
     if (!videoCard || typeof extractChannelFromCard !== 'function') return null;
-    const base = extractChannelFromCard(videoCard) || {};
+    const extractedBase = extractChannelFromCard(videoCard) || {};
+    let base = (typeof promoteChannelInfoFromCollaboratorSignals === 'function')
+        ? (promoteChannelInfoFromCollaboratorSignals(extractedBase, videoCard) || extractedBase)
+        : extractedBase;
+    const isYtmSurface = /^ytm-/i.test(String(videoCard.tagName || ''));
+    if (isYtmSurface && typeof normalizeCollaboratorChannelInfoForCard === 'function') {
+        try {
+            const normalized = normalizeCollaboratorChannelInfoForCard(base, videoCard, {
+                videoId: base.videoId || ensureVideoIdForCard(videoCard) || extractVideoIdFromCard(videoCard) || ''
+            });
+            if (normalized?.channelInfo) {
+                base = normalized.channelInfo;
+            }
+        } catch (e) {
+        }
+    }
     const isPostCard = (() => {
         try {
             if (videoCard.getAttribute?.('is-post') === '' || videoCard.getAttribute?.('is-post') === 'true') return true;

@@ -1828,6 +1828,45 @@
             return null;
         };
 
+        const extractThumbnailOwnerCandidate = (renderer) => {
+            const ownerRenderer =
+                renderer?.channelThumbnail?.channelThumbnailWithLinkRenderer ||
+                renderer?.channelThumbnailWithLinkRenderer ||
+                renderer?.channelThumbnailSupportedRenderers?.channelThumbnailWithLinkRenderer ||
+                renderer?.owner?.channelThumbnailWithLinkRenderer ||
+                null;
+            if (!ownerRenderer || typeof ownerRenderer !== 'object') return null;
+
+            const endpoint =
+                ownerRenderer?.navigationEndpoint?.browseEndpoint ||
+                ownerRenderer?.navigationEndpoint?.command?.browseEndpoint ||
+                null;
+            const browseId = typeof endpoint?.browseId === 'string' ? endpoint.browseId.trim() : '';
+            const canonicalBaseUrl =
+                endpoint?.canonicalBaseUrl ||
+                ownerRenderer?.navigationEndpoint?.commandMetadata?.webCommandMetadata?.url ||
+                ownerRenderer?.navigationEndpoint?.urlEndpoint?.url ||
+                '';
+            const handle = canonicalBaseUrl ? (extractRawHandle(canonicalBaseUrl) || null) : null;
+            const customUrl = canonicalBaseUrl ? (extractCustomUrlFromCanonicalBaseUrl(canonicalBaseUrl) || null) : null;
+            let name =
+                ownerRenderer?.accessibility?.accessibilityData?.label ||
+                ownerRenderer?.title?.simpleText ||
+                ownerRenderer?.title?.runs?.[0]?.text ||
+                '';
+            if (typeof name === 'string') {
+                name = name.replace(/^go to channel\s+/i, '').replace(/\.\s*go to channel\.?$/i, '').trim();
+            }
+
+            const candidate = {
+                id: (browseId && typeof browseId === 'string' && browseId.startsWith('UC')) ? browseId : null,
+                handle: handle || null,
+                name: name || null,
+                customUrl: customUrl || null
+            };
+            return mergeChannelCandidates(candidate);
+        };
+
         const extractFromPlayerResponse = (player) => {
             if (!player || typeof player !== 'object') return null;
             const details = player.videoDetails || null;
@@ -2062,6 +2101,9 @@
                 const sheetCandidate = extractSingleChannelFromSheetLikeData(candidateNode) || (
                     candidateNode !== node ? extractSingleChannelFromSheetLikeData(node) : null
                 );
+                const thumbnailOwnerCandidate = extractThumbnailOwnerCandidate(candidateNode) || (
+                    candidateNode !== node ? extractThumbnailOwnerCandidate(node) : null
+                );
 
                 // Priority 1: navigationEndpoint.browseEndpoint on the video renderer
                 const nav = candidateNode.navigationEndpoint && candidateNode.navigationEndpoint.browseEndpoint;
@@ -2128,6 +2170,16 @@
                 if (ownerRenderer) {
                     const ownerCandidate = mergeChannelCandidates(extractOwnerCandidate(ownerRenderer), sheetCandidate);
                     if (ownerCandidate) return ownerCandidate;
+                }
+
+                const mergedThumbnailOwner = mergeChannelCandidates(thumbnailOwnerCandidate, sheetCandidate);
+                if (mergedThumbnailOwner) {
+                    if (!hasExpectations || matchesExpectations(mergedThumbnailOwner)) {
+                        return mergedThumbnailOwner;
+                    }
+                    if (!fallbackCandidate) {
+                        fallbackCandidate = mergedThumbnailOwner;
+                    }
                 }
 
                 if (sheetCandidate) {
