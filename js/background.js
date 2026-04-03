@@ -4916,6 +4916,7 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             return false;
         };
 
+        const incomingSource = typeof metadata?.source === 'string' ? metadata.source.trim() : '';
         const normalizedVideoTitleHint = normalizeComparableName(metadata?.videoTitleHint || '');
         const normalizedExpectedChannelName = normalizeComparableName(metadata?.expectedChannelName || '');
         const hasLowConfidenceExpectedName = metadata?.lowConfidenceExpectedName === true;
@@ -4987,6 +4988,42 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                         name: identity.name || metadata.channelName || metadata.displayHandle || (isHandle ? normalizedValue : null),
                         logo: (identity.logo || metadata.channelLogo || null),
                         customUrl: identity.customUrl || metadata.customUrl || null
+                    };
+                    if (!metadata.channelName && identity.name) metadata.channelName = identity.name;
+                    if (!metadata.displayHandle && identity.handle) metadata.displayHandle = identity.handle;
+                }
+            } catch (e) {
+            }
+        }
+
+        // YTM/watch fallback rows can initially persist a bare UC ID from the playlist rail.
+        // If channel-page scraping "succeeds" without any alternate identity, still give the
+        // watch payload a chance to recover the canonical handle/custom URL before we save it.
+        const shouldRepairPlaylistFallbackIdentity = Boolean(
+            channelInfo?.success
+            && effectiveVideoId
+            && incomingSource === 'playlist_fallback_menu'
+            && lookupValue
+            && String(lookupValue).toUpperCase().startsWith('UC')
+            && !channelInfo?.handle
+            && !channelInfo?.customUrl
+        );
+        if (shouldRepairPlaylistFallbackIdentity) {
+            try {
+                const isKids = profile === 'kids';
+                const identity = isKids
+                    ? (await performKidsWatchIdentityFetch(effectiveVideoId) || await performWatchIdentityFetch(effectiveVideoId))
+                    : await performWatchIdentityFetch(effectiveVideoId);
+
+                if (identity && (identity.handle || identity.customUrl || identity.name)) {
+                    channelInfo = {
+                        ...channelInfo,
+                        success: true,
+                        id: channelInfo.id || identity.id || lookupValue,
+                        handle: identity.handle || channelInfo.handle || null,
+                        name: identity.name || channelInfo.name || metadata.channelName || null,
+                        logo: identity.logo || channelInfo.logo || metadata.channelLogo || null,
+                        customUrl: identity.customUrl || channelInfo.customUrl || metadata.customUrl || null
                     };
                     if (!metadata.channelName && identity.name) metadata.channelName = identity.name;
                     if (!metadata.displayHandle && identity.handle) metadata.displayHandle = identity.handle;
@@ -5128,7 +5165,6 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
             ? displayCandidate
             : (canonicalHandle || '');
 
-        const incomingSource = typeof metadata?.source === 'string' ? metadata.source.trim() : '';
         // The custom fallback 3-dot menu can seed metadata.channelName from the row title,
         // so fetched channel info is more authoritative for that recovery path.
         const preferFetchedNameFirst = incomingSource === 'playlist_fallback_menu' || incomingSource === 'postBlockEnrichment';

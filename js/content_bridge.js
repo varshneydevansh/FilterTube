@@ -5670,11 +5670,31 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
             let id = typeof info?.id === 'string' ? info.id.trim() : '';
             let customUrl = typeof info?.customUrl === 'string' ? info.customUrl.trim() : '';
             let input = id || customUrl || handle;
+            const videoId = ensuredVideoId || (typeof info?.videoId === 'string' ? info.videoId.trim() : '');
+            const isYtmWatchFallbackRow = Boolean(row && isYtmWatchLikeCollaboratorCard(row));
+
+            if (
+                !channelInfo?.isBlockAllOption
+                && isYtmWatchFallbackRow
+                && typeof handleBlockChannelClick === 'function'
+            ) {
+                // Align the fallback 3-dot popover with the quick-cross path on YTM watch rows.
+                // Quick-cross already routes through handleBlockChannelClick(), which performs
+                // ytInitialData/watch/shorts recovery before persisting. Reuse that same path here
+                // instead of saving directly from a weaker row snapshot.
+                const synthetic = createFilterTubeMenuItem(channelInfo, false);
+                try {
+                    await handleBlockChannelClick(info, synthetic, !!filterAll, row);
+                    close();
+                    return;
+                } catch (e) {
+                    console.warn('FilterTube: YTM watch-row fallback handoff to handleBlockChannelClick failed', e);
+                }
+            }
 
             if (!input) {
                 // Playlist rows sometimes render without any channel link; try main-world lookup via videoId.
                 const expectedName = getExpectedName();
-                const videoId = ensuredVideoId || (typeof info?.videoId === 'string' ? info.videoId.trim() : '');
                 if (videoId) {
                     try {
                         const resolved = await requestChannelInfoFromMainWorld(videoId, { expectedName });
@@ -5690,8 +5710,23 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
                 }
             }
 
+            if (
+                input
+                && isYtmWatchFallbackRow
+                && videoId
+                && /^UC[a-zA-Z0-9_-]{22}$/.test(input)
+                && !handle
+                && !customUrl
+            ) {
+                // YTM watch playlist rows often expose only a UC ID in-row, while quick-cross and
+                // watch-page identity recovery can resolve the canonical handle/custom URL.
+                // Prefer that authoritative watch-based lookup instead of persisting a UC-only entry.
+                input = `watch:${videoId}`;
+                info = { ...(info || {}), videoId };
+                console.log('FilterTube: Fallback menu preferring watch:videoId recovery over bare UC ID for', videoId);
+            }
+
             if (!input) {
-                const videoId = ensuredVideoId || (typeof info?.videoId === 'string' ? info.videoId.trim() : '');
                 if (/^[a-zA-Z0-9_-]{11}$/.test(videoId)) {
                     // Match quick-block behavior: let background resolve the authoritative owner
                     // from the watch page when the row itself exposes no stable channel identity.
