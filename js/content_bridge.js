@@ -53,6 +53,43 @@ function extractJsonObjectFromHtml(html, marker) {
     }
 }
 
+function extractCustomUrlFromHref(href) {
+    if (!href || typeof href !== 'string') return '';
+    const match = href.match(/\/(c|user)\/([^/?#]+)/);
+    if (!match || !match[1] || !match[2]) return '';
+    try {
+        return `${match[1]}/${decodeURIComponent(match[2])}`;
+    } catch (_) {
+        return `${match[1]}/${match[2]}`;
+    }
+}
+
+function isLowConfidenceExpectedChannelLabel(channelInfo = {}) {
+    try {
+        const expectedName = typeof channelInfo?.expectedChannelName === 'string'
+            ? channelInfo.expectedChannelName.trim()
+            : '';
+        if (!expectedName) return false;
+        if (!channelInfo?.needsFetch || !channelInfo?.videoId) return false;
+        if ((channelInfo?.fetchStrategy || 'mainworld') !== 'mainworld') return false;
+
+        const hasAlternateIdentity = Boolean(
+            channelInfo?.handle ||
+            channelInfo?.handleDisplay ||
+            channelInfo?.canonicalHandle ||
+            channelInfo?.customUrl
+        );
+        if (hasAlternateIdentity) return false;
+
+        const currentName = typeof channelInfo?.name === 'string'
+            ? channelInfo.name.trim()
+            : '';
+        return !currentName || currentName === expectedName;
+    } catch (e) {
+        return false;
+    }
+}
+
 function buildChannelMetadataPayload(channelInfo = {}) {
     const canonicalRaw = channelInfo.canonicalHandle || channelInfo.handleDisplay || channelInfo.handle || '';
     const canonicalExtracted = extractRawHandle(canonicalRaw);
@@ -86,9 +123,14 @@ function buildChannelMetadataPayload(channelInfo = {}) {
 
     const primaryNameCandidate = typeof channelInfo?.name === 'string' ? channelInfo.name : '';
     const expectedNameCandidate = typeof channelInfo?.expectedChannelName === 'string' ? channelInfo.expectedChannelName : '';
+    const allowExpectedNameFallback = !isLowConfidenceExpectedChannelLabel(channelInfo);
     const safeName = !isProbablyNotChannelName(primaryNameCandidate)
         ? String(primaryNameCandidate).trim()
-        : (!isProbablyNotChannelName(expectedNameCandidate) ? String(expectedNameCandidate).trim() : '');
+        : (
+            allowExpectedNameFallback && !isProbablyNotChannelName(expectedNameCandidate)
+                ? String(expectedNameCandidate).trim()
+                : ''
+        );
 
     const isProbablyNotDisplayHandle = (value) => {
         if (!value || typeof value !== 'string') return true;
@@ -117,6 +159,8 @@ function buildChannelMetadataPayload(channelInfo = {}) {
         channelLogo: channelInfo.logo || null,
         videoId: channelInfo.videoId || null,
         videoTitleHint: typeof channelInfo.videoTitleHint === 'string' ? channelInfo.videoTitleHint.trim() || null : null,
+        expectedChannelName: typeof channelInfo.expectedChannelName === 'string' ? channelInfo.expectedChannelName.trim() || null : null,
+        lowConfidenceExpectedName: isLowConfidenceExpectedChannelLabel(channelInfo) === true,
         customUrl: channelInfo.customUrl || null,  // c/Name or user/Name for legacy channels
         source: channelInfo.source || null
     };
@@ -168,7 +212,12 @@ function pickMenuChannelDisplayName(channelInfo, injectionOptions = {}) {
     const safeName = (!isHandleLike(nameCandidate) && nameCandidate && !isProbablyNotChannelName(nameCandidate))
         ? nameCandidate
         : '';
-    const safeExpectedName = (!isHandleLike(expectedNameCandidate) && expectedNameCandidate && !isProbablyNotChannelName(expectedNameCandidate))
+    const safeExpectedName = (
+        !isLowConfidenceExpectedChannelLabel(channelInfo) &&
+        !isHandleLike(expectedNameCandidate) &&
+        expectedNameCandidate &&
+        !isProbablyNotChannelName(expectedNameCandidate)
+    )
         ? expectedNameCandidate
         : '';
 
@@ -187,28 +236,7 @@ function pickMenuChannelDisplayName(channelInfo, injectionOptions = {}) {
         }
     })();
 
-    const isLowConfidenceVideoLabel = (() => {
-        try {
-            const hasIdentity = Boolean(
-                channelInfo?.id ||
-                channelInfo?.handle ||
-                channelInfo?.handleDisplay ||
-                channelInfo?.canonicalHandle ||
-                channelInfo?.customUrl
-            );
-            if (hasIdentity) return false;
-            if (!channelInfo?.needsFetch || !channelInfo?.videoId) return false;
-            if ((channelInfo?.fetchStrategy || 'mainworld') !== 'mainworld') return false;
-            const currentName = typeof channelInfo?.name === 'string' ? channelInfo.name.trim() : '';
-            const expectedName = typeof channelInfo?.expectedChannelName === 'string' ? channelInfo.expectedChannelName.trim() : '';
-            const expectedOnlyLabel = Boolean(expectedName && !safeDisplay && !safeName);
-            return Boolean(expectedOnlyLabel || (currentName && expectedName && currentName === expectedName));
-        } catch (e) {
-            return false;
-        }
-    })();
-
-    if (isLowConfidenceVideoLabel) {
+    if (isLowConfidenceExpectedChannelLabel(channelInfo)) {
         return mappedHandle || channelInfo?.id || 'Channel';
     }
 
@@ -6721,16 +6749,33 @@ async function fetchChannelFromWatchUrl(videoId, requestedHandle = null) {
 
                 return enriched;
             };
+            const parseEmbeddedObject = (...markers) => {
+                for (const marker of markers) {
+                    if (!marker) continue;
+                    let searchIndex = 0;
+                    while (searchIndex < html.length) {
+                        const markerIndex = html.indexOf(marker, searchIndex);
+                        if (markerIndex === -1) break;
+
+                        const candidateHtml = html.slice(markerIndex);
+                        const raw = extractJsonObjectFromHtml(candidateHtml, marker);
+                        if (raw) {
+                            try {
+                                return JSON.parse(raw);
+                            } catch (e) {
+                            }
+                        }
+
+                        searchIndex = markerIndex + marker.length;
+                    }
+                }
+                return null;
+            };
 
             // Extract ytInitialData from the page
-            const ytInitialDataRaw =
-                extractJsonObjectFromHtml(html, 'var ytInitialData =') ||
-                extractJsonObjectFromHtml(html, 'ytInitialData =') ||
-                '';
-            if (ytInitialDataRaw) {
+            const ytInitialData = parseEmbeddedObject('var ytInitialData =', 'ytInitialData =');
+            if (ytInitialData) {
                 try {
-                    const ytInitialData = JSON.parse(ytInitialDataRaw);
-
                     // Primary path: videoOwnerRenderer in two-column watch next results
                     const contents = ytInitialData?.contents?.twoColumnWatchNextResults?.results?.results?.contents;
                     if (Array.isArray(contents)) {
@@ -6819,13 +6864,9 @@ async function fetchChannelFromWatchUrl(videoId, requestedHandle = null) {
             }
 
             // Fallback: Extract from ytInitialPlayerResponse
-            const playerResponseRaw =
-                extractJsonObjectFromHtml(html, 'var ytInitialPlayerResponse =') ||
-                extractJsonObjectFromHtml(html, 'ytInitialPlayerResponse =') ||
-                '';
-            if (playerResponseRaw) {
+            const playerResponse = parseEmbeddedObject('var ytInitialPlayerResponse =', 'ytInitialPlayerResponse =');
+            if (playerResponse) {
                 try {
-                    const playerResponse = JSON.parse(playerResponseRaw);
                     const videoDetails = playerResponse?.videoDetails;
                     const micro = playerResponse?.microformat?.playerMicroformatRenderer || null;
 
@@ -6919,17 +6960,6 @@ function extractChannelFromCard(card) {
             if (/\bwatching\b/i.test(normalized)) return '';
             if (/\bago\b/i.test(normalized)) return '';
             return normalized;
-        };
-
-        const extractCustomUrlFromHref = (href) => {
-            if (!href || typeof href !== 'string') return '';
-            const match = href.match(/\/(c|user)\/([^/?#]+)/);
-            if (!match || !match[1] || !match[2]) return '';
-            try {
-                return `${match[1]}/${decodeURIComponent(match[2])}`;
-            } catch (_) {
-                return `${match[1]}/${match[2]}`;
-            }
         };
 
         // SPECIAL CASE: Comment context (thread + modern comment view/renderer nodes)
@@ -8066,6 +8096,30 @@ function extractChannelFromCard(card) {
                 '.YtmCompactMediaItemByline a[href*="/@"]'
             )?.getAttribute('href') || '';
             const fallbackHandle = extractRawHandle(fallbackHandleHref);
+            const mappedFallbackId = (() => {
+                const raw = currentSettings?.videoChannelMap?.[fallbackVideoId] || '';
+                return (typeof raw === 'string' && /^UC[\w-]{22}$/i.test(raw.trim())) ? raw.trim() : '';
+            })();
+
+            if (String(cardTag || '').startsWith('ytm-') && mappedFallbackId) {
+                console.log('FilterTube: Using mapped UC ID for YTM fallback card:', {
+                    videoId: fallbackVideoId,
+                    id: mappedFallbackId,
+                    expectedName: fallbackName || 'n/a'
+                });
+                return {
+                    id: mappedFallbackId,
+                    handle: '',
+                    customUrl: '',
+                    name: '',
+                    videoId: fallbackVideoId,
+                    needsFetch: true,
+                    fetchStrategy: 'mainworld',
+                    expectedChannelName: fallbackName || null,
+                    expectedHandle: fallbackHandle || null
+                };
+            }
+
             console.log('FilterTube: Falling back to main-world lookup for video:', fallbackVideoId, 'expectedName:', fallbackName || 'n/a');
             return {
                 videoId: fallbackVideoId,
@@ -9970,27 +10024,36 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                 try {
                     const watchInfo = await fetchChannelFromWatchUrl(channelInfo.videoId, expectedHandle);
                     if (watchInfo && (watchInfo.id || watchInfo.handle || watchInfo.customUrl)) {
+                        if (watchInfo.id && watchInfo.id.startsWith('UC')) {
+                            channelInfo.id = watchInfo.id;
+                        }
+
+                        if (watchInfo.customUrl) {
+                            channelInfo.customUrl = watchInfo.customUrl;
+                        }
+
+                        if (watchInfo.handle) {
+                            const normalizedWatchHandle = normalizeHandleValue(watchInfo.handle);
+                            if (normalizedWatchHandle) {
+                                applyHandleMetadata(channelInfo, normalizedWatchHandle, { force: true });
+                            }
+                        }
+
                         let retryInput = null;
 
                         // Prefer UC ID when available
-                        if (watchInfo.id && watchInfo.id.startsWith('UC')) {
-                            channelInfo.id = watchInfo.id;
-                            retryInput = watchInfo.id;
+                        if (channelInfo.id && channelInfo.id.startsWith('UC')) {
+                            retryInput = channelInfo.id;
                         }
 
                         // Use customUrl for /c/ or /user/ channels if no UC ID yet
-                        if (!retryInput && watchInfo.customUrl) {
-                            channelInfo.customUrl = watchInfo.customUrl;
-                            retryInput = watchInfo.customUrl;
+                        if (!retryInput && channelInfo.customUrl) {
+                            retryInput = channelInfo.customUrl;
                         }
 
                         // Fallback to handle
-                        if (!retryInput && watchInfo.handle) {
-                            const normalizedHandle = normalizeHandleValue(watchInfo.handle);
-                            if (normalizedHandle) {
-                                channelInfo.handle = normalizedHandle;
-                                retryInput = normalizedHandle;
-                            }
+                        if (!retryInput && channelInfo.handle) {
+                            retryInput = channelInfo.handle;
                         }
 
                         // Prefer the authoritative watch-page owner name when the current
@@ -10374,6 +10437,9 @@ async function addChannelDirectly(input, filterAll = false, collaborationWith = 
                 channelName: metadata.channelName || null,
                 channelLogo: metadata.channelLogo || null,
                 videoId: metadata.videoId || null,
+                videoTitleHint: metadata.videoTitleHint || null,
+                expectedChannelName: metadata.expectedChannelName || null,
+                lowConfidenceExpectedName: metadata.lowConfidenceExpectedName === true,
                 profile,
                 customUrl: metadata.customUrl || null,  // c/Name or user/Name for legacy channels
                 source: metadata.source || null

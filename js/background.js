@@ -4635,6 +4635,9 @@ browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 canonicalHandle: message.canonicalHandle,
                 channelName: message.channelName,
                 channelLogo: message.channelLogo,
+                videoTitleHint: message.videoTitleHint,
+                expectedChannelName: message.expectedChannelName,
+                lowConfidenceExpectedName: message.lowConfidenceExpectedName === true,
                 customUrl: message.customUrl,
                 source: message.source || null
             },
@@ -4914,12 +4917,15 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
         };
 
         const normalizedVideoTitleHint = normalizeComparableName(metadata?.videoTitleHint || '');
+        const normalizedExpectedChannelName = normalizeComparableName(metadata?.expectedChannelName || '');
+        const hasLowConfidenceExpectedName = metadata?.lowConfidenceExpectedName === true;
 
         const sanitizePersistedChannelName = (value) => {
             if (!value || typeof value !== 'string') return '';
             const trimmed = value.trim();
             if (!trimmed) return '';
             if (normalizedVideoTitleHint && normalizeComparableName(trimmed) === normalizedVideoTitleHint) return '';
+            if (hasLowConfidenceExpectedName && normalizedExpectedChannelName && normalizeComparableName(trimmed) === normalizedExpectedChannelName) return '';
             if (isProbablyNotChannelName(trimmed)) return '';
             return trimmed;
         };
