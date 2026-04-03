@@ -3713,6 +3713,90 @@ function isYtmWatchLikeCollaboratorCard(videoCard) {
     }
 }
 
+function promoteYtmWatchRowIdentityFromCollaboratorMetadata(channelInfo, videoCard) {
+    const baseInfo = (channelInfo && typeof channelInfo === 'object') ? { ...channelInfo } : {};
+    if (!videoCard || !isYtmWatchLikeCollaboratorCard(videoCard)) {
+        return baseInfo;
+    }
+
+    let videoId = '';
+    try {
+        videoId = (typeof baseInfo.videoId === 'string' && baseInfo.videoId.trim())
+            ? baseInfo.videoId.trim()
+            : (extractVideoIdFromCard(videoCard) || ensureVideoIdForCard(videoCard) || '');
+    } catch (e) {
+        videoId = typeof baseInfo.videoId === 'string' ? baseInfo.videoId.trim() : '';
+    }
+
+    let collaborators = [];
+    try {
+        collaborators = sanitizeCollaboratorList(extractCollaboratorMetadataFromElement(videoCard) || []);
+    } catch (e) {
+        collaborators = [];
+    }
+
+    if (collaborators.length === 0 && videoId) {
+        try {
+            collaborators = sanitizeCollaboratorList(resolvedCollaboratorsByVideoId.get(videoId) || []);
+        } catch (e) {
+            collaborators = [];
+        }
+    }
+
+    if (collaborators.length === 0) {
+        return videoId && !baseInfo.videoId ? { ...baseInfo, videoId } : baseInfo;
+    }
+
+    const expectedCount = Math.max(
+        parseInt(baseInfo.expectedCollaboratorCount || '0', 10) || 0,
+        parseInt(videoCard.getAttribute?.('data-filtertube-expected-collaborators') || '0', 10) || 0,
+        collaborators.length
+    );
+    const primary = collaborators[0] || {};
+
+    const nameLooksWeak = (value) => {
+        if (!value || typeof value !== 'string') return true;
+        const trimmed = value.trim();
+        if (!trimmed) return true;
+        if (trimmed.startsWith('@')) return true;
+        if (/^UC[a-zA-Z0-9_-]{22}$/.test(trimmed)) return true;
+        if (trimmed.includes('•')) return true;
+        if (/\bviews?\b/i.test(trimmed)) return true;
+        if (/\bago\b/i.test(trimmed)) return true;
+        if (/\bwatching\b/i.test(trimmed)) return true;
+        return false;
+    };
+
+    const merged = {
+        ...baseInfo,
+        videoId: videoId || baseInfo.videoId || '',
+        expectedCollaboratorCount: expectedCount
+    };
+
+    if (collaborators.length >= 2) {
+        return {
+            ...merged,
+            ...primary,
+            isCollaboration: true,
+            allCollaborators: collaborators,
+            needsEnrichment: collaborators.some(c => !c.handle && !c.id && !c.customUrl) || collaborators.length < expectedCount
+        };
+    }
+
+    const single = collaborators[0] || {};
+    if (single.id && !merged.id) merged.id = single.id;
+    if (single.handle && !merged.handle) merged.handle = single.handle;
+    if (single.customUrl && !merged.customUrl) merged.customUrl = single.customUrl;
+    if ((!merged.name || nameLooksWeak(merged.name)) && single.name && !nameLooksWeak(single.name)) {
+        merged.name = single.name;
+    }
+    if (!merged.logo && single.logo) {
+        merged.logo = single.logo;
+    }
+
+    return merged;
+}
+
 function cardHasCollaborationDomSignal(videoCard) {
     try {
         if (!videoCard) return false;
@@ -8244,6 +8328,7 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
         }
     }
     initialChannelInfo = promoteChannelInfoFromCollaboratorSignals(initialChannelInfo, videoCard);
+    initialChannelInfo = promoteYtmWatchRowIdentityFromCollaboratorMetadata(initialChannelInfo, videoCard);
 
     if (!initialChannelInfo || (!initialChannelInfo.handle && !initialChannelInfo.id && !initialChannelInfo.customUrl && !initialChannelInfo.isCollaboration && !initialChannelInfo.needsFetch)) {
         console.log('FilterTube: Could not extract channel info from card');
