@@ -5682,7 +5682,12 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
                 // Quick-cross already routes through handleBlockChannelClick(), which performs
                 // ytInitialData/watch/shorts recovery before persisting. Reuse that same path here
                 // instead of saving directly from a weaker row snapshot.
-                const synthetic = createFilterTubeMenuItem(channelInfo, false);
+                const synthetic = document.createElement('div');
+                synthetic.className = 'filtertube-block-channel-item filtertube-fallback-handoff';
+                const syntheticTitle = document.createElement('span');
+                syntheticTitle.className = 'filtertube-menu-title';
+                syntheticTitle.textContent = 'Block Channel';
+                synthetic.appendChild(syntheticTitle);
                 try {
                     await handleBlockChannelClick(info, synthetic, !!filterAll, row);
                     close();
