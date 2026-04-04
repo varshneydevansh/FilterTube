@@ -113,6 +113,67 @@ const isHoverCapableDesktopSurface = () => {
     }
 };
 
+const isElementVisibleForQuickBlock = (element) => {
+    if (!element || !(element instanceof Element)) return false;
+    try {
+        const style = window.getComputedStyle(element);
+        if (!style) return true;
+        if (style.display === 'none' || style.visibility === 'hidden') return false;
+    } catch (e) {
+    }
+    try {
+        const rect = element.getBoundingClientRect();
+        return !!rect && rect.width > 0 && rect.height > 0;
+    } catch (e) {
+        return true;
+    }
+};
+
+const isMobileSearchSurfaceOpen = () => {
+    if (!isMobileYouTubeSurface()) return false;
+
+    try {
+        const active = document.activeElement;
+        if (active instanceof Element) {
+            if (active.closest('ytm-searchbox, yt-searchbox, form[role="search"], .searchbox-input, .searchbox-input-container')) {
+                return true;
+            }
+            if (
+                active.matches?.('input[type="search"], input[aria-label*="Search" i], input[placeholder*="Search" i]') ||
+                active.getAttribute?.('role') === 'searchbox'
+            ) {
+                return true;
+            }
+        }
+    } catch (e) {
+    }
+
+    const suggestionSelectors = [
+        'ytm-searchbox-suggestions-container',
+        'ytm-searchbox-dropdown',
+        'ytm-search-suggestions-section-renderer',
+        'ytm-search-suggestion-renderer',
+        'searchbox-dropdown',
+        '.searchbox-dropdown',
+        '.searchbox-dropdown-content'
+    ];
+
+    try {
+        return suggestionSelectors.some((selector) => {
+            return Array.from(document.querySelectorAll(selector)).some((el) => isElementVisibleForQuickBlock(el));
+        });
+    } catch (e) {
+        return false;
+    }
+};
+
+const syncQuickBlockSurfaceState = () => {
+    try {
+        document.documentElement.toggleAttribute('data-filtertube-search-surface-open', isMobileSearchSurfaceOpen());
+    } catch (e) {
+    }
+};
+
 const isMobileWatchNextQuickBlockHost = (hostCard) => {
     if (!hostCard || !(hostCard instanceof Element)) return false;
 
@@ -241,6 +302,16 @@ function resolveQuickBlockAnchor(hostCard) {
 function setQuickBlockHoverStateForHost(hostCard, active, stickyMs = 0) {
     if (!hostCard || !(hostCard instanceof Element)) return;
 
+    if (isMobileSearchSurfaceOpen()) {
+        try {
+            hostCard.removeAttribute('data-filtertube-quick-hover');
+            hostCard.removeAttribute('data-filtertube-quick-sticky');
+        } catch (e) {
+        }
+        syncQuickBlockSurfaceState();
+        return;
+    }
+
     try {
         if (hostCard.__filtertubeQuickHoverTimer) {
             clearTimeout(hostCard.__filtertubeQuickHoverTimer);
@@ -348,6 +419,7 @@ function ensureQuickBlockStyles() {
     const mobileSurface = isMobileYouTubeSurface();
     try {
         document.documentElement.toggleAttribute('data-filtertube-mobile-surface', mobileSurface);
+        syncQuickBlockSurfaceState();
     } catch (e) {
     }
     const style = document.createElement('style');
@@ -414,13 +486,24 @@ function ensureQuickBlockStyles() {
     }
     html[data-filtertube-mobile-surface] .filtertube-quick-block-host[data-filtertube-mobile-watch-next="true"] {
         z-index: 0 !important;
+        isolation: isolate;
+    }
+    html[data-filtertube-mobile-surface] .filtertube-quick-block-host[data-filtertube-mobile-watch-next="true"] .filtertube-quick-block-anchor {
+        isolation: isolate;
+        overflow: hidden;
     }
     html[data-filtertube-mobile-surface] .filtertube-quick-block-host[data-filtertube-mobile-watch-next="true"] .filtertube-quick-block-wrap {
-        z-index: 2;
+        top: 6px;
+        left: 6px;
+        z-index: 1;
     }
     html[data-filtertube-mobile-surface] .filtertube-quick-block-wrap {
         opacity: 1;
         pointer-events: auto;
+    }
+    html[data-filtertube-search-surface-open] .filtertube-quick-block-wrap {
+        opacity: 0 !important;
+        pointer-events: none !important;
     }
     @media (hover: none) and (pointer: coarse) {
         .filtertube-quick-block-wrap {
@@ -871,7 +954,21 @@ function setupQuickBlockObserver() {
     ensureQuickBlockStyles();
 
     const boot = () => {
+        syncQuickBlockSurfaceState();
         scheduleQuickBlockSweep(document);
+
+        document.addEventListener('focusin', () => {
+            syncQuickBlockSurfaceState();
+        }, true);
+        document.addEventListener('focusout', () => {
+            setTimeout(() => syncQuickBlockSurfaceState(), 0);
+        }, true);
+        document.addEventListener('input', () => {
+            syncQuickBlockSurfaceState();
+        }, true);
+        document.addEventListener('click', () => {
+            setTimeout(() => syncQuickBlockSurfaceState(), 0);
+        }, true);
 
         document.addEventListener('pointerenter', (event) => {
             if (!isQuickBlockEnabled()) return;
@@ -1001,6 +1098,7 @@ function setupQuickBlockObserver() {
                 return;
             }
             for (const mutation of mutations) {
+                syncQuickBlockSurfaceState();
                 try {
                     const target = mutation.target;
                     if (target instanceof Element) {
