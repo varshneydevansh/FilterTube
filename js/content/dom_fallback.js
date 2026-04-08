@@ -310,6 +310,16 @@ function channelMetaMatchesIndex(meta, index, channelMap) {
     return false;
 }
 
+function isCreatorChannelPagePath(path = '') {
+    try {
+        const normalizedPath = String(path || '').trim();
+        if (!normalizedPath) return false;
+        return /^\/(@[^/]+|channel\/UC[\w-]{22}|c\/[^/]+|user\/[^/]+)(?:\/|$)/i.test(normalizedPath);
+    } catch (e) {
+        return false;
+    }
+}
+
 function getCurrentPageChannelMeta() {
     let path = '';
     try {
@@ -319,7 +329,9 @@ function getCurrentPageChannelMeta() {
     }
 
     if (!path) return null;
-    const baseMatch = path.match(/^\/(@[^/]+|channel\/UC[\w-]{22}|c\/[^/]+|user\/[^/]+)(?:\/|$)/i);
+    const baseMatch = isCreatorChannelPagePath(path)
+        ? path.match(/^\/(@[^/]+|channel\/UC[\w-]{22}|c\/[^/]+|user\/[^/]+)(?:\/|$)/i)
+        : null;
     if (!baseMatch || !baseMatch[1]) return null;
 
     const basePath = `/${baseMatch[1]}`;
@@ -1871,6 +1883,32 @@ async function applyDOMFallback(settings, options = {}) {
                     'a[href^="/user/"]'
                 );
             }
+            if (!channelElement && (
+                elementTag === 'ytm-rich-item-renderer' ||
+                elementTag === 'ytm-video-with-context-renderer' ||
+                elementTag === 'ytm-compact-video-renderer' ||
+                elementTag === 'ytm-playlist-panel-video-renderer' ||
+                elementTag === 'ytm-playlist-video-renderer' ||
+                elementTag === 'ytm-radio-renderer' ||
+                elementTag === 'ytm-compact-radio-renderer' ||
+                elementTag === 'ytm-compact-playlist-renderer'
+            )) {
+                channelElement = element.querySelector(
+                    '.media-channel a[href^="/@"], ' +
+                    '.media-channel a[href^="/channel/"], ' +
+                    '.media-channel a[href^="/c/"], ' +
+                    '.media-channel a[href^="/user/"], ' +
+                    '.subhead a[href^="/@"], ' +
+                    '.subhead a[href^="/channel/"], ' +
+                    '.subhead a[href^="/c/"], ' +
+                    '.subhead a[href^="/user/"], ' +
+                    'ytm-badge-and-byline-renderer a[href^="/@"], ' +
+                    'ytm-badge-and-byline-renderer a[href^="/channel/"], ' +
+                    'ytm-badge-and-byline-renderer a[href^="/c/"], ' +
+                    'ytm-badge-and-byline-renderer a[href^="/user/"], ' +
+                    '.YtmBadgeAndBylineRendererItemByline'
+                );
+            }
             if (!channelElement) {
                 channelElement = element.querySelector(
                     '.yt-content-metadata-view-model__metadata-row a[href^="/@"], ' +
@@ -1906,6 +1944,9 @@ async function applyDOMFallback(settings, options = {}) {
             const channelSubtitleElement = element.querySelector('#watch-card-subtitle, #watch-card-subtitle yt-formatted-string');
             let channelAnchor = (channelElement || channelSubtitleElement)?.closest('a') || element.querySelector(
                 'a[href*="/channel/UC"], a[href^="/@"], a[href*="/user/"], a[href*="/c/"], ' +
+                '.media-channel a[href^="/@"], .media-channel a[href^="/channel/"], .media-channel a[href^="/c/"], .media-channel a[href^="/user/"], ' +
+                '.subhead a[href^="/@"], .subhead a[href^="/channel/"], .subhead a[href^="/c/"], .subhead a[href^="/user/"], ' +
+                'ytm-badge-and-byline-renderer a[href^="/@"], ytm-badge-and-byline-renderer a[href^="/channel/"], ytm-badge-and-byline-renderer a[href^="/c/"], ytm-badge-and-byline-renderer a[href^="/user/"], ' +
                 '.yt-page-header-view-model__page-header-content-metadata a[href^="/@"], ' +
                 '.ytFlexibleActionsViewModelAction a[href^="/@"], .ytFlexibleActionsViewModelAction a[href*="/channel/UC"]'
             );
@@ -3423,6 +3464,29 @@ function shouldHideContent(title, channel, settings, options = {}) {
     const hasChannelIdentity = Boolean(channelMeta.handle || channelMeta.id || channelMeta.customUrl);
 
     const listMode = (settings && settings.listMode === 'whitelist') ? 'whitelist' : 'blocklist';
+    const logWhitelistDecision = (reason, extra = {}) => {
+        try {
+            if (listMode !== 'whitelist') return;
+            const debugEnabled = (() => {
+                try {
+                    return !!window.__filtertubeDebug || document.documentElement?.getAttribute('data-filtertube-debug') === 'true';
+                } catch (e) {
+                    return !!window.__filtertubeDebug;
+                }
+            })();
+            if (!debugEnabled) return;
+            console.log('FilterTube Whitelist (DOM):', {
+                reason,
+                title: (title || '').slice(0, 120),
+                channel: (channel || '').slice(0, 120),
+                contentTag,
+                channelMeta,
+                collaborators,
+                ...extra
+            });
+        } catch (e) {
+        }
+    };
     const tag = (contentTag || '').toLowerCase();
     const isKidsVideoCard = (
         tag === 'ytk-compact-video-renderer' ||
@@ -3461,6 +3525,7 @@ function shouldHideContent(title, channel, settings, options = {}) {
             const compiled = getCompiledKeywordRegexes(whitelistKeywords);
             for (const regex of compiled) {
                 if (matchesKeyword(regex, title)) {
+                    logWhitelistDecision('allow:matched_keyword', { keyword: regex.source });
                     return false;
                 }
             }
@@ -3476,6 +3541,7 @@ function shouldHideContent(title, channel, settings, options = {}) {
                 }
 
                 if (channelMetaMatchesIndex(whitelistMeta, index, channelMap)) {
+                    logWhitelistDecision('allow:matched_channel', { matched: whitelistMeta.handle || whitelistMeta.customUrl || whitelistMeta.id || whitelistMeta.name || '' });
                     return false;
                 }
                 const collaboratorMetas = Array.isArray(collaborators) ? collaborators : [];
@@ -3488,13 +3554,16 @@ function shouldHideContent(title, channel, settings, options = {}) {
                             whitelistCollab.name = '';
                         }
                         if (channelMetaMatchesIndex(whitelistCollab, index, channelMap)) {
+                            logWhitelistDecision('allow:matched_collaborator', { matched: whitelistCollab.handle || whitelistCollab.customUrl || whitelistCollab.id || whitelistCollab.name || '' });
                             return false;
                         }
                     }
                 }
 
-                // Some cards render before channel identity exists. In whitelist mode, treat
-                // those as indeterminate (fail open) on the main site until identity arrives.
+                // Some cards render before channel identity exists. Only fail open on actual
+                // creator/channel pages, where the page identity can vouch for the shelf items.
+                // On homepage/feed/mobile surfaces, unresolved cards should remain blocked until
+                // identity arrives so non-whitelisted channels do not leak through.
                 try {
                     const hasNameSignal = Boolean(normalizeChannelNameForComparison(channelMeta?.name || '') || normalizeChannelNameForComparison(channel || ''));
                     const hasCollaboratorIdentity = collaboratorMetas.some(collaborator => Boolean(
@@ -3513,13 +3582,22 @@ function shouldHideContent(title, channel, settings, options = {}) {
                             return true;
                         }
 
-                        return false;
+                        const path = document.location?.pathname || '';
+                        const pageMeta = isCreatorChannelPagePath(path) ? getCurrentPageChannelMeta() : null;
+                        if (pageMeta && channelMetaMatchesIndex(pageMeta, index, channelMap)) {
+                            logWhitelistDecision('allow:creator_page_whitelisted', { pageMeta });
+                            return false;
+                        }
+
+                        logWhitelistDecision('block:unresolved_identity');
+                        return true;
                     }
                 } catch (e) {
                 }
             }
         }
 
+        logWhitelistDecision('block:no_whitelist_match');
         return true;
     }
 

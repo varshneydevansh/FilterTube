@@ -1,6 +1,21 @@
 // js/content_bridge.js - Isolated world script
 
-console.log("FilterTube: content_bridge.js loaded (Isolated World)");
+function isFilterTubeDebugEnabled() {
+    try {
+        return !!window.__filtertubeDebug || document.documentElement?.getAttribute('data-filtertube-debug') === 'true';
+    } catch (e) {
+        return !!window.__filtertubeDebug;
+    }
+}
+
+function filterTubeDebugLog(...args) {
+    if (!isFilterTubeDebugEnabled()) return;
+    console.log('FilterTube:', ...args);
+}
+
+if (isFilterTubeDebugEnabled()) {
+    console.log("FilterTube: content_bridge.js loaded (Isolated World)");
+}
 
 function extractJsonObjectFromHtml(html, marker) {
     try {
@@ -9588,7 +9603,7 @@ async function checkIfChannelBlocked(channelInfo, menuItem) {
                 applyFilterAllStateToToggle(menuItem.querySelector('.filtertube-filter-all-toggle'), storedEntry.filterAll);
                 addFilterAllContentCheckbox(menuItem, storedEntry);
             }
-            console.log('FilterTube: Channel already blocked:', channelInfo);
+            filterTubeDebugLog('Channel already blocked:', channelInfo);
         }
     } catch (error) {
         console.error('FilterTube: Error checking if channel is blocked:', error);
@@ -9691,7 +9706,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
     if (domToggle) {
         filterAll = isFilterAllToggleActive(domToggle);
     }
-    console.log('FilterTube: Block Channel clicked', { channelInfo, filterAll });
+    filterTubeDebugLog('Block Channel clicked', { channelInfo, filterAll });
 
     const explicitMenuContext = String(menuItem?.getAttribute?.('data-filtertube-context') || '').toLowerCase();
     const videoCardTag = String(videoCard?.tagName || '').toLowerCase();
@@ -10044,7 +10059,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
 
         // Hide ALL instances of this video card immediately
         if (videoCard) {
-            console.log('FilterTube: Hiding video card immediately (Block All Collaborators)');
+            filterTubeDebugLog('Hiding video card immediately (Block All Collaborators)');
 
             // Immediate UX hide should only target the clicked card container.
             // Hiding all same-video instances here can over-hide recycled playlist/home/search cards.
@@ -10058,7 +10073,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                 }
             }
             cardsToHide = [fallbackTarget];
-            console.log('FilterTube: Immediate hide target count:', cardsToHide.length);
+            filterTubeDebugLog('Immediate hide target count:', cardsToHide.length);
 
             const blockedMetadata = channelInfo.allCollaborators?.[0] || channelInfo;
 
@@ -10112,12 +10127,12 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
         }
     }
     if (!isCommentContextBlock && fetchData && !fetchData.cancelled && fetchData.channelInfoPromise) {
-        console.log('FilterTube: Waiting for background fetch to complete...');
+        filterTubeDebugLog('Waiting for background fetch to complete...');
         try {
             // Wait for the background fetch to complete (likely already done by now)
             const fetchedChannelInfo = await fetchData.channelInfoPromise;
             if (fetchedChannelInfo && (fetchedChannelInfo.id || fetchedChannelInfo.handle)) {
-                console.log('FilterTube: Using pre-fetched channel info:', fetchedChannelInfo);
+                filterTubeDebugLog('Using pre-fetched channel info:', fetchedChannelInfo);
 
                 const isUcIdLike = (value) => {
                     if (!value || typeof value !== 'string') return false;
@@ -10305,7 +10320,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             // Prefer watch-page recovery so we persist the authoritative alternate identity.
             input = `watch:${clickSnapshot.videoId}`;
             channelInfo = { ...(channelInfo || {}), videoId: clickSnapshot.videoId };
-            console.log('FilterTube: YTM watch-row block preferring watch:videoId recovery over bare UC ID for', clickSnapshot.videoId);
+            filterTubeDebugLog('YTM watch-row block preferring watch:videoId recovery over bare UC ID for', clickSnapshot.videoId);
         }
 
         if (!input && channelInfo?.name) {
@@ -10443,7 +10458,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                     }
 
                     if (retryInput) {
-                        console.log('FilterTube: Retrying block with ytInitialData identifier:', retryInput);
+                        filterTubeDebugLog('Retrying block with ytInitialData identifier:', retryInput);
 
                         // Cache the resolved handle/ID on a nearby card element to help future passes
                         const cacheTarget = (() => {
@@ -10486,7 +10501,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
 
             // 2) Network fallback: fetch the /watch?v=ID page directly (works for all video types including /c/ channels)
             if (!result.success && channelInfo.videoId) {
-                console.log('FilterTube: Attempting watch page fallback for video:', channelInfo.videoId);
+                filterTubeDebugLog('Attempting watch page fallback for video:', channelInfo.videoId);
                 try {
                     const watchInfo = await fetchChannelFromWatchUrl(channelInfo.videoId, expectedHandle);
                     if (watchInfo && (watchInfo.id || watchInfo.handle || watchInfo.customUrl)) {
@@ -10538,7 +10553,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                         }
 
                         if (retryInput) {
-                            console.log('FilterTube: Retrying block with watch page identifier:', retryInput);
+                            filterTubeDebugLog('Retrying block with watch page identifier:', retryInput);
 
                             // Cache the resolved info
                             const cacheTarget = videoCard || document
@@ -10617,7 +10632,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                     }
 
                     if (retryInput) {
-                        console.log('FilterTube: Retrying block with Shorts identifier:', retryInput);
+                        filterTubeDebugLog('Retrying block with Shorts identifier:', retryInput);
 
                         // Cache the resolved handle/ID on a nearby card element to help future passes
                         const cacheTarget = videoCard || document
@@ -10710,7 +10725,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
         // Add blocked styling class to the menu item
         menuItem.classList.add('filtertube-blocked');
 
-        console.log('FilterTube: Successfully blocked channel:', channelInfo, 'filterAll:', filterAll);
+        filterTubeDebugLog('Successfully blocked channel:', channelInfo, 'filterAll:', filterAll);
 
         // Store videoId → channelId mapping for Shorts persistence after refresh
         if (channelInfo.videoId && channelInfo.id) {
@@ -10762,7 +10777,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                 if (videoCard && isCommentContextBlock) {
                     const commentTarget = resolveCommentHideTarget(videoCard);
                     if (commentTarget) {
-                        console.log('FilterTube: Hiding comment context immediately');
+                        filterTubeDebugLog('Hiding comment context immediately');
                         markElementAsBlocked(commentTarget, channelInfo, 'pending');
                         commentTarget.style.display = 'none';
                         commentTarget.classList.add('filtertube-hidden');
@@ -10771,7 +10786,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                 }
 
                 if (videoCard && !isCommentContextBlock) {
-                    console.log('FilterTube: Hiding video card immediately');
+                    filterTubeDebugLog('Hiding video card immediately');
 
                     const isShorts = videoCard.tagName.toLowerCase().includes('shorts-lockup-view-model') ||
                         videoCard.tagName.toLowerCase().includes('reel');
@@ -10785,7 +10800,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                         if (parentContainer) {
                             containerToHide = parentContainer;
                         }
-                        console.log('FilterTube: Shorts detected, hiding container:', containerToHide.tagName || containerToHide.className);
+                        filterTubeDebugLog('Shorts detected, hiding container:', containerToHide.tagName || containerToHide.className);
                     } else {
                         const isHomeLockup = videoCard.tagName.toLowerCase().includes('lockup-view-model');
                         if (isHomeLockup) {
@@ -10800,7 +10815,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                     containerToHide.style.display = 'none';
                     containerToHide.classList.add('filtertube-hidden');
                     containerToHide.setAttribute('data-filtertube-hidden', 'true');
-                    console.log('FilterTube: Applied immediate hiding to:', containerToHide.tagName || containerToHide.className);
+                    filterTubeDebugLog('Applied immediate hiding to:', containerToHide.tagName || containerToHide.className);
 
                     if (!isShorts) {
                         // Keep immediate hide scoped to the clicked card only.

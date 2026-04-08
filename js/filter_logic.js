@@ -407,6 +407,16 @@
         'chipCloudChipRenderer'
     ]);
 
+    const WHITELIST_CONTAINER_RENDERERS = new Set([
+        'shelfRenderer',
+        'richShelfRenderer',
+        'horizontalListRenderer',
+        'itemSectionRenderer',
+        'sectionListRenderer',
+        'guideSectionRenderer',
+        'guideRenderer'
+    ]);
+
     // Comprehensive filter rules for all YouTube renderer types
     const FILTER_RULES = {
         // ------------------------------------------------------------------
@@ -418,6 +428,36 @@
         playlistPanelVideoRenderer: BASE_VIDEO_RULES,
         watchCardCompactVideoRenderer: BASE_VIDEO_RULES,
         endScreenVideoRenderer: BASE_VIDEO_RULES,
+        videoWithContextRenderer: {
+            videoId: ['videoId', 'inlinePlaybackEndpoint.watchEndpoint.videoId'],
+            title: ['headline.runs', 'headline.simpleText'],
+            channelName: ['shortBylineText.runs', 'longBylineText.runs', 'ownerText.runs'],
+            channelId: [
+                'shortBylineText.runs.0.navigationEndpoint.browseEndpoint.browseId',
+                'channelThumbnail.channelThumbnailWithLinkRenderer.navigationEndpoint.browseEndpoint.browseId',
+                'longBylineText.runs.0.navigationEndpoint.browseEndpoint.browseId',
+                'ownerText.runs.0.navigationEndpoint.browseEndpoint.browseId'
+            ],
+            channelHandle: [
+                'shortBylineText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl',
+                'channelThumbnail.channelThumbnailWithLinkRenderer.navigationEndpoint.browseEndpoint.canonicalBaseUrl',
+                'longBylineText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl',
+                'ownerText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl'
+            ],
+            description: [
+                'descriptionSnippet.runs',
+                'descriptionSnippet.simpleText'
+            ],
+            duration: [
+                'lengthText.simpleText',
+                'lengthText.runs.0.text'
+            ],
+            publishedTime: [
+                'publishedTimeText.simpleText',
+                'publishedTimeText.runs.0.text'
+            ],
+            viewCount: ['shortViewCountText.simpleText', 'shortViewCountText.runs.0.text']
+        },
 
         // ------------------------------------------------------------------
         // Home feed & shelf surfaces
@@ -776,6 +816,7 @@
         constructor(settings) {
             this.settings = this._processSettings(settings);
             this.channelMap = settings.channelMap || {}; // UC ID <-> @handle mappings
+            this.pageChannelMeta = null;
             this.blockedCount = 0;
             this.debugEnabled = !!window.__filtertubeDebug;
         }
@@ -972,26 +1013,58 @@
             if (meta?.externalId) {
                 const id = meta.externalId;
                 let handle = null;
+                let customUrl = null;
+                const pageName = typeof meta.title === 'string' ? meta.title : (typeof meta.name === 'string' ? meta.name : '');
+
+                const tryExtractCustomUrl = (url) => {
+                    if (!url || typeof url !== 'string') return '';
+                    if (url.startsWith('/c/')) {
+                        const slug = url.split('/')[2];
+                        return slug ? `c/${slug.split('?')[0].split('#')[0]}` : '';
+                    }
+                    if (url.startsWith('/user/')) {
+                        const slug = url.split('/')[2];
+                        return slug ? `user/${slug.split('?')[0].split('#')[0]}` : '';
+                    }
+                    return '';
+                };
 
                 // Method A: Check vanityChannelUrl (Standard)
                 if (meta.vanityChannelUrl) {
                     const normalized = normalizeChannelHandle(meta.vanityChannelUrl);
                     if (normalized) handle = normalized;
+                    if (!customUrl) customUrl = tryExtractCustomUrl(meta.vanityChannelUrl);
                 }
 
                 // Method B: Check ownerUrls (Alternative location, used by Shakira's channel)
-                if (!handle && meta.ownerUrls && Array.isArray(meta.ownerUrls)) {
+                if (meta.ownerUrls && Array.isArray(meta.ownerUrls)) {
                     for (const url of meta.ownerUrls) {
-                        const normalized = normalizeChannelHandle(url);
-                        if (!normalized) continue;
-                        handle = normalized;
-                        break;
+                        if (!handle) {
+                            const normalized = normalizeChannelHandle(url);
+                            if (normalized) {
+                                handle = normalized;
+                            }
+                        }
+                        if (!customUrl) {
+                            customUrl = tryExtractCustomUrl(url);
+                        }
+                        if (handle && customUrl) break;
                     }
                 }
 
                 if (id && handle) {
                     this._registerMapping(id, handle);
                 }
+                if (id && customUrl) {
+                    this._registerCustomUrlMapping(id, customUrl);
+                }
+
+                this.pageChannelMeta = {
+                    id: id || '',
+                    handle: handle || '',
+                    customUrl: customUrl || '',
+                    name: pageName || ''
+                };
             }
 
             // 2. Check Microformat (appears in video/channel responses)
@@ -1166,12 +1239,18 @@
                     candidate = candidate.playlistVideoRenderer;
                 } else if (candidate.lockupViewModel) {
                     candidate = candidate.lockupViewModel;
+                } else if (candidate.videoWithContextRenderer) {
+                    candidate = candidate.videoWithContextRenderer;
                 } else if (candidate.richItemRenderer?.content?.videoRenderer) {
                     candidate = candidate.richItemRenderer.content.videoRenderer;
+                } else if (candidate.richItemRenderer?.content?.videoWithContextRenderer) {
+                    candidate = candidate.richItemRenderer.content.videoWithContextRenderer;
                 } else if (candidate.richItemRenderer?.content?.lockupViewModel) {
                     candidate = candidate.richItemRenderer.content.lockupViewModel;
                 } else if (candidate.content?.videoRenderer) {
                     candidate = candidate.content.videoRenderer;
+                } else if (candidate.content?.videoWithContextRenderer) {
+                    candidate = candidate.content.videoWithContextRenderer;
                 } else if (candidate.content?.lockupViewModel) {
                     candidate = candidate.content.lockupViewModel;
                 }
@@ -1229,20 +1308,29 @@
         _registerVideoChannelMapping(videoId, channelId) {
             if (!videoId || !channelId) return;
 
-            const current = this.settings?.videoChannelMap && typeof this.settings.videoChannelMap === 'object'
-                ? this.settings.videoChannelMap
-                : null;
+            if (!this.settings || typeof this.settings !== 'object') {
+                this.settings = {};
+            }
+            if (!this.settings.videoChannelMap || typeof this.settings.videoChannelMap !== 'object') {
+                this.settings.videoChannelMap = {};
+            }
+            const current = this.settings.videoChannelMap;
             if (current && current[videoId] === channelId) return;
 
+            current[videoId] = channelId;
             queueVideoChannelMapping(videoId, channelId);
         }
 
         _registerVideoMetaMapping(videoId, meta) {
             if (!videoId || !meta || typeof meta !== 'object') return;
 
-            const current = this.settings?.videoMetaMap && typeof this.settings.videoMetaMap === 'object'
-                ? this.settings.videoMetaMap
-                : null;
+            if (!this.settings || typeof this.settings !== 'object') {
+                this.settings = {};
+            }
+            if (!this.settings.videoMetaMap || typeof this.settings.videoMetaMap !== 'object') {
+                this.settings.videoMetaMap = {};
+            }
+            const current = this.settings.videoMetaMap;
             if (current && current[videoId]) {
                 const existing = current[videoId];
                 const nextLength = meta.lengthSeconds;
@@ -1255,6 +1343,10 @@
                 if (same) return;
             }
 
+            current[videoId] = {
+                ...(current[videoId] && typeof current[videoId] === 'object' ? current[videoId] : {}),
+                ...meta
+            };
             queueVideoMetaMapping(videoId, meta);
         }
 
@@ -1322,6 +1414,13 @@
         _registerMapping(id, handle) {
             if (!id || !handle) return;
 
+            if (!this.settings || typeof this.settings !== 'object') {
+                this.settings = {};
+            }
+            if (!this.settings.channelMap || typeof this.settings.channelMap !== 'object') {
+                this.settings.channelMap = {};
+            }
+
             // Keys are lowercase for case-insensitive lookup
             // Values preserve ORIGINAL case from YouTube
             const keyId = id.toLowerCase();
@@ -1331,6 +1430,8 @@
             if (this.channelMap[keyId] !== handle) {
                 this.channelMap[keyId] = handle;      // UC... -> @BTS (original case)
                 this.channelMap[keyHandle] = id;      // @bts -> UCLkAepWjdylmXSltofFvsYQ (original case)
+                this.settings.channelMap[keyId] = handle;
+                this.settings.channelMap[keyHandle] = id;
 
                 postLogToBridge('log', `🧠 LEARNED MAPPING: ${id} <-> ${handle}`);
 
@@ -1353,6 +1454,13 @@
         _registerCustomUrlMapping(id, customUrl) {
             if (!id || !customUrl) return;
 
+            if (!this.settings || typeof this.settings !== 'object') {
+                this.settings = {};
+            }
+            if (!this.settings.channelMap || typeof this.settings.channelMap !== 'object') {
+                this.settings.channelMap = {};
+            }
+
             // Normalize customUrl: decode and lowercase for key
             let normalizedCustomUrl = customUrl.toLowerCase();
             try {
@@ -1364,6 +1472,7 @@
             // Only save if this is a new mapping
             if (this.channelMap[normalizedCustomUrl] !== id) {
                 this.channelMap[normalizedCustomUrl] = id;  // c/name -> UC... (original case)
+                this.settings.channelMap[normalizedCustomUrl] = id;
 
                 postLogToBridge('log', `🧠 LEARNED CUSTOM URL MAPPING: ${customUrl} -> ${id}`);
 
@@ -1396,11 +1505,79 @@
             }
         }
 
+        _logWhitelistDecision(reason, details = {}) {
+            try {
+                if (this.settings?.listMode !== 'whitelist') return;
+                const debugEnabled = (() => {
+                    try {
+                        return !!window.__filtertubeDebug || document.documentElement?.getAttribute('data-filtertube-debug') === 'true';
+                    } catch (e) {
+                        return !!window.__filtertubeDebug;
+                    }
+                })();
+                if (!debugEnabled) return;
+                console.log('FilterTube Whitelist (JSON):', {
+                    reason,
+                    ...details
+                });
+            } catch (e) {
+            }
+        }
+
+        _unwrapRendererForFiltering(item, rendererType) {
+            if (!item || typeof item !== 'object') {
+                return { item, rendererType, wrapperRendererType: null };
+            }
+
+            if (rendererType === 'richItemRenderer') {
+                const content = item.content;
+                if (content && typeof content === 'object') {
+                    const preferredNestedRenderers = [
+                        'videoRenderer',
+                        'videoWithContextRenderer',
+                        'compactVideoRenderer',
+                        'gridVideoRenderer',
+                        'playlistVideoRenderer',
+                        'playlistPanelVideoRenderer',
+                        'lockupViewModel',
+                        'shortsLockupViewModel',
+                        'shortsLockupViewModelV2',
+                        'reelItemRenderer',
+                        'backstagePostThreadRenderer',
+                        'backstagePostRenderer',
+                        'channelRenderer',
+                        'gridChannelRenderer',
+                        'radioRenderer',
+                        'compactRadioRenderer',
+                        'playlistRenderer',
+                        'compactPlaylistRenderer'
+                    ];
+
+                    for (const nestedRendererType of preferredNestedRenderers) {
+                        if (content[nestedRendererType] && typeof content[nestedRendererType] === 'object') {
+                            return {
+                                item: content[nestedRendererType],
+                                rendererType: nestedRendererType,
+                                wrapperRendererType: rendererType
+                            };
+                        }
+                    }
+                }
+            }
+
+            return { item, rendererType, wrapperRendererType: null };
+        }
+
         /**
          * Check if an item should be blocked based on filter rules
          */
         _shouldBlock(item, rendererType) {
             if (!item || typeof item !== 'object') return false;
+
+            const originalRendererType = rendererType;
+            const unwrappedRenderer = this._unwrapRendererForFiltering(item, rendererType);
+            item = unwrappedRenderer.item;
+            rendererType = unwrappedRenderer.rendererType;
 
             if (CHIP_RENDERERS.has(rendererType)) {
                 return false;
@@ -1508,6 +1685,9 @@
             }
 
             if (listMode === 'whitelist' && !isCommentRenderer) {
+                if (WHITELIST_CONTAINER_RENDERERS.has(rendererType)) {
+                    return false;
+                }
                 // Watch page scaffolding: these renderers often lack sufficient channel identity
                 // for whitelist evaluation, but removing them breaks the watch page UI (description,
                 // action buttons, channel row, and comment composer rendering).
@@ -1532,6 +1712,11 @@
                 );
 
                 if (!hasChannelRules && !hasKeywordRules) {
+                    this._logWhitelistDecision('block:no_whitelist_rules', {
+                        rendererType,
+                        originalRendererType,
+                        title
+                    });
                     return true;
                 }
 
@@ -1540,6 +1725,13 @@
                         if (collaborator && (collaborator.name || collaborator.id || collaborator.handle || collaborator.customUrl)) {
                             for (const allowChannel of whitelistChannels) {
                                 if (this._matchesChannel(allowChannel, collaborator)) {
+                                    this._logWhitelistDecision('allow:matched_channel', {
+                                        rendererType,
+                                        originalRendererType,
+                                        title,
+                                        matched: collaborator.handle || collaborator.customUrl || collaborator.id || collaborator.name || '',
+                                        collaborator
+                                    });
                                     return false;
                                 }
                             }
@@ -1551,15 +1743,53 @@
                     const textToSearch = `${title} ${description}`.trim();
                     for (const keywordRegex of whitelistKeywords) {
                         if (keywordRegex.test(textToSearch)) {
+                            this._logWhitelistDecision('allow:matched_keyword', {
+                                rendererType,
+                                originalRendererType,
+                                title,
+                                keyword: keywordRegex.source
+                            });
                             return false;
                         }
                     }
                 }
 
                 if (hasChannelRules && !hasStableChannelIdentity && !hasNameSignal && !isShortsLikeRenderer) {
-                    return false;
+                    try {
+                        const path = document.location?.pathname || '';
+                        const isCreatorPage = /^\/(@[^/]+|channel\/UC[\w-]{22}|c\/[^/]+|user\/[^/]+)(?:\/|$)/i.test(path);
+                        if (isCreatorPage && this.pageChannelMeta) {
+                            for (const allowChannel of whitelistChannels) {
+                                if (this._matchesChannel(allowChannel, this.pageChannelMeta)) {
+                                    this._logWhitelistDecision('allow:creator_page_whitelisted', {
+                                        rendererType,
+                                        originalRendererType,
+                                        title,
+                                        pageChannel: this.pageChannelMeta
+                                    });
+                                    return false;
+                                }
+                            }
+                        }
+                    } catch (e) {
+                    }
+                    this._logWhitelistDecision('block:unresolved_identity', {
+                        rendererType,
+                        originalRendererType,
+                        title,
+                        videoId,
+                        collaborators
+                    });
+                    return true;
                 }
 
+                this._logWhitelistDecision('block:no_whitelist_match', {
+                    rendererType,
+                    originalRendererType,
+                    title,
+                    videoId,
+                    collaborators
+                });
                 return true;
             }
 
@@ -1666,7 +1896,7 @@
 
             const isVideoRenderer = [
                 'videoRenderer', 'compactVideoRenderer', 'gridVideoRenderer',
-                'playlistVideoRenderer', 'watchCardCompactVideoRenderer',
+                'playlistVideoRenderer', 'watchCardCompactVideoRenderer', 'videoWithContextRenderer',
                 'endScreenVideoRenderer', 'richItemRenderer', 'lockupViewModel',
                 'shortsLockupViewModel', 'shortsLockupViewModelV2', 'reelItemRenderer',
                 'richGridMedia', 'channelVideoPlayerRenderer', 'playlistPanelVideoRenderer',
@@ -2242,7 +2472,7 @@
 
             const isVideoRenderer = [
                 'videoRenderer', 'compactVideoRenderer', 'gridVideoRenderer',
-                'playlistVideoRenderer', 'watchCardCompactVideoRenderer',
+                'playlistVideoRenderer', 'watchCardCompactVideoRenderer', 'videoWithContextRenderer',
                 'endScreenVideoRenderer', 'richItemRenderer', 'lockupViewModel',
                 'shortsLockupViewModel', 'shortsLockupViewModelV2', 'reelItemRenderer',
                 'richGridMedia', 'channelVideoPlayerRenderer', 'playlistPanelVideoRenderer',

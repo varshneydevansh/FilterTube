@@ -17,7 +17,16 @@
     const IS_FIREFOX = typeof browser !== 'undefined' && !!browser.runtime;
     const isMobileInterface = document.location.hostname.startsWith('m.');
 
-    console.log('FilterTube: seed.js initializing (MAIN world)');
+    const filterTubeSeedDebugEnabled = (() => {
+        try {
+            return !!window.__filtertubeDebug || document.documentElement?.getAttribute('data-filtertube-debug') === 'true';
+        } catch (e) {
+            return !!window.__filtertubeDebug;
+        }
+    })();
+    if (filterTubeSeedDebugEnabled) {
+        console.log('FilterTube: seed.js initializing (MAIN world)');
+    }
     
     // Settings and data management
     let cachedSettings = null;
@@ -162,6 +171,7 @@
         const path = document.location?.pathname || '';
         const isSearchResultsPath = path.startsWith('/results');
         const isChannelPath = /^(\/(?:@|channel\/|c\/))/i.test(path);
+        const mode = (cachedSettings && cachedSettings.listMode === 'whitelist') ? 'whitelist' : 'blocklist';
 
         const hasEnabledContentFilters = Boolean(
             cachedSettings
@@ -211,7 +221,6 @@
         if (isSearchResultsPath) {
             const isSearchFetch = typeof dataName === 'string' && dataName.startsWith('fetch:/youtubei/v1/search');
             if (isSearchFetch || hasSearchLayout) {
-                const mode = (cachedSettings && cachedSettings.listMode === 'whitelist') ? 'whitelist' : 'blocklist';
                 if (mode !== 'whitelist') {
                     // Historically we skipped search JSON mutation in blocklist mode so DOM fallback
                     // could "restore" items during identity enrichment. Content filters (duration/date/
@@ -239,7 +248,7 @@
             );
 
             if (channelIndicators && isChannelDataName) {
-                if (!hasEnabledContentFilters) {
+                if (mode !== 'whitelist' && !hasEnabledContentFilters) {
                     seedDebugLog(`⏭️ Skipping engine processing for ${dataName} (channel page) to allow DOM-based restore`);
                     return true;
                 }
@@ -254,6 +263,7 @@
 
         // Apply deterministic content filters JSON-first on home feed to prevent flash.
         if (hasEnabledContentFilters) return false;
+        if (mode === 'whitelist') return false;
 
         const actionCollections = data.onResponseReceivedActions || data.onResponseReceivedEndpoints;
         if (!Array.isArray(actionCollections)) return false;
