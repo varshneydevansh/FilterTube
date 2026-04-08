@@ -5009,7 +5009,7 @@ async function initializeDOMFallback(settings) {
 
                 try {
                     const path = document.location?.pathname || '';
-                    if (path === '/results') return;
+                    if (path === '/results' || path === '/feed/channels') return;
                 } catch (e) {
                 }
 

@@ -1494,6 +1494,9 @@
 
             try {
                 const path = document.location?.pathname || '';
+                if (path === '/feed/channels') {
+                    return false;
+                }
                 if (
                     path === '/results' && (
                         rendererType === 'secondarySearchContainerRenderer'
@@ -1516,6 +1519,17 @@
 
                 const hasChannelRules = whitelistChannels.length > 0;
                 const hasKeywordRules = !skipKeywordFiltering && whitelistKeywords.length > 0;
+                const hasStableChannelIdentity = collaborators.some(collaborator => Boolean(
+                    collaborator && (collaborator.id || collaborator.handle || collaborator.customUrl)
+                ));
+                const hasNameSignal = collaborators.some(collaborator => Boolean(
+                    collaborator && typeof collaborator.name === 'string' && collaborator.name.trim()
+                ));
+                const isShortsLikeRenderer = (
+                    rendererType === 'reelItemRenderer' ||
+                    rendererType === 'shortsLockupViewModel' ||
+                    rendererType === 'shortsLockupViewModelV2'
+                );
 
                 if (!hasChannelRules && !hasKeywordRules) {
                     return true;
@@ -1540,6 +1554,10 @@
                             return false;
                         }
                     }
+                }
+
+                if (hasChannelRules && !hasStableChannelIdentity && !hasNameSignal && !isShortsLikeRenderer) {
+                    return false;
                 }
 
                 return true;

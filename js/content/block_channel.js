@@ -1067,12 +1067,21 @@ function setupQuickBlockObserver() {
                     clearLast();
                     return;
                 }
-                if (host !== lastHost) {
+                const hostChanged = host !== lastHost;
+                if (hostChanged) {
                     clearLast();
                     lastHost = host;
                 }
-                ensureQuickBlockButton(host);
-                setQuickBlockHoverStateForHost(host, true, 900);
+                const needsEnsure = hostChanged || !host.querySelector?.('.filtertube-quick-block-wrap');
+                const needsHoverActivation = hostChanged
+                    || host.getAttribute?.('data-filtertube-quick-hover') !== 'true';
+
+                if (needsEnsure) {
+                    ensureQuickBlockButton(host);
+                }
+                if (needsHoverActivation) {
+                    setQuickBlockHoverStateForHost(host, true, 900);
+                }
             };
 
             document.addEventListener('pointermove', (event) => {
