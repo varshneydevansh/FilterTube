@@ -382,6 +382,56 @@ function isTrustedUiSender(sender) {
     }
 }
 
+function buildSubscriptionsImportLogSample(entries = [], limit = 8) {
+    return (Array.isArray(entries) ? entries : [])
+        .slice(0, Math.max(0, limit))
+        .map((entry) => ({
+            name: entry?.name || '',
+            id: entry?.id || '',
+            handle: entry?.handle || entry?.canonicalHandle || entry?.handleDisplay || '',
+            customUrl: entry?.customUrl || ''
+        }));
+}
+
+function getSubscriptionsImportTrackedMatches(entries = []) {
+    const trackedGroups = [
+        { key: 'demi', terms: ['demi lovato', '@demilovato', 'uczkurf9tdolfoeuw_4rd7xq'] },
+        { key: 'pitbull', terms: ['pitbull', '@pitbull'] },
+        { key: 'nyusha', terms: ['nyusha', '@nyushamusic', 'ucm9vwkafz0axpuehphmae7w'] }
+    ];
+
+    const normalizedEntries = Array.isArray(entries) ? entries : [];
+    const matches = {};
+
+    trackedGroups.forEach((group) => {
+        matches[group.key] = normalizedEntries
+            .filter((entry) => {
+                const haystack = [
+                    entry?.name,
+                    entry?.handle,
+                    entry?.canonicalHandle,
+                    entry?.handleDisplay,
+                    entry?.customUrl,
+                    entry?.id,
+                    entry?.originalInput
+                ]
+                    .filter(Boolean)
+                    .join(' | ')
+                    .toLowerCase();
+                return group.terms.some((term) => haystack.includes(term));
+            })
+            .slice(0, 5)
+            .map((entry) => ({
+                name: entry?.name || '',
+                id: entry?.id || '',
+                handle: entry?.handle || entry?.canonicalHandle || entry?.handleDisplay || '',
+                customUrl: entry?.customUrl || ''
+            }));
+    });
+
+    return matches;
+}
+
 function isHandleLike(value) {
     return typeof value === 'string' && value.trim().startsWith('@');
 }
@@ -2810,6 +2860,15 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
             }
         });
         return true;
+    } else if (action === 'FilterTube_SubscriptionsImportProgress') {
+        console.log('FilterTube Subscriptions Import:', {
+            stage: 'background-progress',
+            requestId: normalizeString(request?.requestId) || '',
+            sourceTabId: Number(request?.sourceTabId) || null,
+            progress: request?.progress || {}
+        });
+        sendResponse?.({ acknowledged: true });
+        return false;
     } else if (action === "getCompiledSettings") {
         const senderUrl = sender?.tab?.url || sender?.url || '';
         const requestedProfile = request.profileType;
@@ -3146,6 +3205,17 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
             const counts = mergeResult.counts;
             const targetMode = targetMain.mode === 'whitelist' ? 'whitelist' : 'blocklist';
 
+            console.log('FilterTube Subscriptions Import:', {
+                stage: 'background-merge-start',
+                requestId,
+                targetProfileId,
+                currentMode: targetMode,
+                existingWhitelistCount: existingWhitelist.length,
+                incomingCount: incomingChannels.length,
+                incomingSample: buildSubscriptionsImportLogSample(incomingChannels),
+                trackedMatches: getSubscriptionsImportTrackedMatches(incomingChannels)
+            });
+
             if (incomingChannels.length === 0) {
                 sendResponse?.({
                     success: true,
@@ -3236,6 +3306,18 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
                 counts,
                 currentMode: targetMode,
                 importedIntoProfileId: targetProfileId
+            });
+
+            console.log('FilterTube Subscriptions Import:', {
+                stage: 'background-merge-complete',
+                requestId,
+                targetProfileId,
+                currentMode: targetMode,
+                counts,
+                mergedCount: mergedChannels.length,
+                channelMapUpdated: didUpdateChannelMap,
+                mergedSample: buildSubscriptionsImportLogSample(mergedChannels),
+                trackedMatches: getSubscriptionsImportTrackedMatches(mergedChannels)
             });
         })().catch((error) => {
             sendResponse?.({

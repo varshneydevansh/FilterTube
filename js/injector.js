@@ -426,8 +426,24 @@
     function collectSubscriptionImportArtifacts(root) {
         const renderers = [];
         const tokens = [];
+        const continuationRequests = [];
         let expectedTotal = 0;
         const visited = new Set();
+
+        const pushContinuationRequest = (tokenValue, clickTrackingParamsValue = '', sourceValue = '') => {
+            const token = typeof tokenValue === 'string' ? tokenValue.trim() : '';
+            if (!token) return;
+            const clickTrackingParams = typeof clickTrackingParamsValue === 'string'
+                ? clickTrackingParamsValue.trim()
+                : '';
+            const source = typeof sourceValue === 'string' ? sourceValue.trim() : '';
+            continuationRequests.push({
+                token,
+                clickTrackingParams,
+                source
+            });
+            tokens.push(token);
+        };
 
         const visit = (node) => {
             if (!node || typeof node !== 'object') return;
@@ -444,7 +460,11 @@
 
             const token = node?.continuationCommand?.token;
             if (typeof token === 'string' && token.trim()) {
-                tokens.push(token.trim());
+                pushContinuationRequest(
+                    token,
+                    node?.continuationEndpoint?.clickTrackingParams || node?.clickTrackingParams || '',
+                    node?.continuationCommand?.request || ''
+                );
             }
             [
                 node?.reloadContinuationData?.continuation,
@@ -452,7 +472,11 @@
                 node?.timedContinuationData?.continuation
             ].forEach((candidateToken) => {
                 if (typeof candidateToken === 'string' && candidateToken.trim()) {
-                    tokens.push(candidateToken.trim());
+                    pushContinuationRequest(
+                        candidateToken,
+                        node?.clickTrackingParams || node?.continuationEndpoint?.clickTrackingParams || '',
+                        ''
+                    );
                 }
             });
 
@@ -478,6 +502,14 @@
         return {
             renderers,
             tokens: Array.from(new Set(tokens)),
+            continuationRequests: Array.from(
+                new Map(
+                    continuationRequests.map((request) => [
+                        `${request.token}::${request.clickTrackingParams || ''}`,
+                        request
+                    ])
+                ).values()
+            ),
             expectedTotal: expectedTotal > 0 ? expectedTotal : 0
         };
     }
@@ -486,7 +518,8 @@
         if (!isYoutubeChannelsFeedPath()) {
             return {
                 channels: [],
-                tokens: []
+                tokens: [],
+                continuationRequests: []
             };
         }
 
@@ -513,10 +546,16 @@
 
         const collected = new Map();
         const tokens = new Set();
+        const continuationRequests = new Map();
         let expectedTotal = 0;
 
         for (const source of possibleSources) {
-            const { renderers, tokens: candidateTokens, expectedTotal: candidateExpectedTotal } = collectSubscriptionImportArtifacts(source);
+            const {
+                renderers,
+                tokens: candidateTokens,
+                continuationRequests: candidateContinuationRequests,
+                expectedTotal: candidateExpectedTotal
+            } = collectSubscriptionImportArtifacts(source);
             for (let i = 0; i < renderers.length; i += 1) {
                 const normalized = normalizeSubscriptionImportEntry(renderers[i]);
                 if (!normalized) continue;
@@ -532,6 +571,11 @@
             candidateTokens.forEach((token) => {
                 if (token) tokens.add(token);
             });
+            candidateContinuationRequests.forEach((request) => {
+                if (!request?.token) return;
+                const key = `${request.token}::${request.clickTrackingParams || ''}`;
+                continuationRequests.set(key, request);
+            });
             if (candidateExpectedTotal > expectedTotal) {
                 expectedTotal = candidateExpectedTotal;
             }
@@ -544,6 +588,7 @@
         return {
             channels: Array.from(collected.values()).slice(0, maxChannels),
             tokens: Array.from(tokens),
+            continuationRequests: Array.from(continuationRequests.values()),
             expectedTotal: expectedTotal > 0 ? expectedTotal : 0
         };
     }
@@ -552,24 +597,38 @@
         if (!isYoutubeChannelsFeedPath()) {
             return {
                 channels: [],
-                tokens: []
+                tokens: [],
+                continuationRequests: []
             };
         }
+
+        const recentBrowseResponses = Array.isArray(window.filterTube?.recentYtBrowseResponses)
+            ? window.filterTube.recentYtBrowseResponses
+                .map((entry) => entry?.data)
+                .filter((entry) => entry && typeof entry === 'object')
+            : [];
 
         const seedCandidates = [
             window.ytInitialData,
             window.__INITIAL_DATA__,
             window.filterTube?.lastYtInitialData,
             window.filterTube?.rawYtInitialData,
-            window.filterTube?.lastYtBrowseResponse
+            window.filterTube?.lastYtBrowseResponse,
+            ...recentBrowseResponses
         ].filter((candidate, index, array) => candidate && array.indexOf(candidate) === index);
 
         const collected = new Map();
         const tokens = new Set();
+        const continuationRequests = new Map();
         let expectedTotal = 0;
 
         for (let i = 0; i < seedCandidates.length; i += 1) {
-            const { renderers, tokens: candidateTokens, expectedTotal: candidateExpectedTotal } = collectSubscriptionImportArtifacts(seedCandidates[i]);
+            const {
+                renderers,
+                tokens: candidateTokens,
+                continuationRequests: candidateContinuationRequests,
+                expectedTotal: candidateExpectedTotal
+            } = collectSubscriptionImportArtifacts(seedCandidates[i]);
             for (let j = 0; j < renderers.length; j += 1) {
                 const normalized = normalizeSubscriptionImportEntry(renderers[j]);
                 if (!normalized) continue;
@@ -583,6 +642,11 @@
             }
             candidateTokens.forEach((token) => {
                 if (token) tokens.add(token);
+            });
+            candidateContinuationRequests.forEach((request) => {
+                if (!request?.token) return;
+                const key = `${request.token}::${request.clickTrackingParams || ''}`;
+                continuationRequests.set(key, request);
             });
             if (candidateExpectedTotal > expectedTotal) {
                 expectedTotal = candidateExpectedTotal;
@@ -607,6 +671,11 @@
             domSeed.tokens.forEach((token) => {
                 if (token) tokens.add(token);
             });
+            (Array.isArray(domSeed.continuationRequests) ? domSeed.continuationRequests : []).forEach((request) => {
+                if (!request?.token) return;
+                const key = `${request.token}::${request.clickTrackingParams || ''}`;
+                continuationRequests.set(key, request);
+            });
             if ((domSeed.expectedTotal || 0) > expectedTotal) {
                 expectedTotal = domSeed.expectedTotal || 0;
             }
@@ -615,20 +684,198 @@
         return {
             channels: Array.from(collected.values()).slice(0, maxChannels),
             tokens: Array.from(tokens),
+            continuationRequests: Array.from(continuationRequests.values()),
             expectedTotal: expectedTotal > 0 ? expectedTotal : 0
         };
     }
 
-    async function waitForSubscriptionImportSeed(maxChannels, timeoutMs = 5000) {
-        const deadline = Date.now() + Math.max(250, timeoutMs);
+    function buildSubscriptionImportContext(baseContext, clickTrackingParams = '') {
+        const context = safeStructuredClone(baseContext) || {};
+        const tracking = typeof clickTrackingParams === 'string' ? clickTrackingParams.trim() : '';
+        if (!tracking) {
+            return context;
+        }
+        context.clickTracking = {
+            ...(context.clickTracking && typeof context.clickTracking === 'object' ? context.clickTracking : {}),
+            clickTrackingParams: tracking
+        };
+        return context;
+    }
+
+    function isElementVisibleForSubscriptionsImport(element) {
+        if (!(element instanceof Element)) return false;
+        const style = window.getComputedStyle(element);
+        if (!style || style.display === 'none' || style.visibility === 'hidden') return false;
+        const rect = element.getBoundingClientRect();
+        return rect.width > 0 && rect.height > 0;
+    }
+
+    function getSubscriptionImportMoreButtons() {
+        const candidates = Array.from(document.querySelectorAll('button, a[role="button"], yt-button-shape button, ytm-button-renderer button'));
+        return candidates.filter((element) => {
+            if (!isElementVisibleForSubscriptionsImport(element)) return false;
+            const text = [
+                element.textContent || '',
+                element.getAttribute('aria-label') || '',
+                element.getAttribute('title') || ''
+            ].join(' ').trim().toLowerCase();
+            if (!text) return false;
+            return /\bmore\b/.test(text) && !/\bmore actions\b/.test(text);
+        });
+    }
+
+    async function expandSubscriptionsImportPageSeed(maxChannels, timeoutMs = 8000) {
+        if (!isYoutubeChannelsFeedPath()) {
+            return collectSubscriptionImportPageSeed(maxChannels);
+        }
+
+        const deadline = Date.now() + Math.max(1800, timeoutMs);
         let bestSeed = collectSubscriptionImportPageSeed(maxChannels);
+        let stablePasses = 0;
+        let expansionActions = 0;
+        const clickedButtons = new WeakSet();
+
+        const performScrollStep = async () => {
+            const scrollingElement = document.scrollingElement || document.documentElement || document.body;
+            const currentTop = Number(scrollingElement?.scrollTop) || 0;
+            const viewportHeight = window.innerHeight || 900;
+            const currentHeight = Number(scrollingElement?.scrollHeight) || 0;
+            let nextTop = currentTop + Math.max(720, Math.floor(viewportHeight * 1.1));
+            if (currentHeight > 0 && nextTop >= currentHeight - viewportHeight - 32) {
+                nextTop = currentHeight;
+            }
+            try {
+                window.scrollTo({ top: nextTop, behavior: 'instant' });
+            } catch (e) {
+                window.scrollTo(0, nextTop);
+            }
+            try {
+                window.dispatchEvent(new Event('scroll'));
+            } catch (e) {
+            }
+            await sleep(850);
+        };
+
+        while (Date.now() < deadline && bestSeed.channels.length < maxChannels) {
+            let didAction = false;
+            const moreButtons = getSubscriptionImportMoreButtons();
+            for (let i = 0; i < moreButtons.length; i += 1) {
+                const button = moreButtons[i];
+                if (clickedButtons.has(button)) continue;
+                clickedButtons.add(button);
+                didAction = true;
+                expansionActions += 1;
+                try {
+                    button.click();
+                } catch (e) {
+                }
+                await sleep(900);
+                break;
+            }
+
+            if (!didAction) {
+                await performScrollStep();
+                didAction = true;
+                expansionActions += 1;
+            }
+
+            const nextSeed = collectSubscriptionImportPageSeed(maxChannels);
+            const grew = nextSeed.channels.length > bestSeed.channels.length
+                || (nextSeed.expectedTotal || 0) > (bestSeed.expectedTotal || 0)
+                || (Array.isArray(nextSeed.tokens) ? nextSeed.tokens.length : 0) > (Array.isArray(bestSeed.tokens) ? bestSeed.tokens.length : 0);
+
+            if (grew) {
+                bestSeed = nextSeed;
+                stablePasses = 0;
+            } else {
+                stablePasses += 1;
+            }
+
+            if (stablePasses >= 5 || expansionActions >= 18) {
+                break;
+            }
+        }
+
+        return {
+            ...bestSeed,
+            expansionActions
+        };
+    }
+
+    function getLatestSubscriptionImportBrowseSnapshotTs() {
+        try {
+            const recent = Array.isArray(window.filterTube?.recentYtBrowseResponses)
+                ? window.filterTube.recentYtBrowseResponses
+                : [];
+            if (recent.length > 0) {
+                const latest = recent[recent.length - 1];
+                const latestTs = Number(latest?.ts) || 0;
+                if (latestTs > 0) return latestTs;
+            }
+            const fallbackTs = Number(window.filterTube?.lastYtBrowseResponseTs) || 0;
+            return fallbackTs > 0 ? fallbackTs : 0;
+        } catch (e) {
+            return 0;
+        }
+    }
+
+    async function waitForSubscriptionImportSeed(maxChannels, timeoutMs = 5000) {
+        const startedAt = Date.now();
+        const deadline = startedAt + Math.max(1000, timeoutMs);
+        let bestSeed = await expandSubscriptionsImportPageSeed(maxChannels, Math.min(timeoutMs, 12000));
+        let stablePasses = 0;
+        let latestBrowseSnapshotTs = getLatestSubscriptionImportBrowseSnapshotTs();
+
+        const shouldKeepWaitingForGrowth = (seed) => {
+            const channelCount = Array.isArray(seed?.channels) ? seed.channels.length : 0;
+            const tokenCount = Array.isArray(seed?.tokens) ? seed.tokens.length : 0;
+            const expectedTotal = Number(seed?.expectedTotal) || 0;
+            if (channelCount <= 0 && tokenCount <= 0) {
+                return true;
+            }
+            if (channelCount >= maxChannels) {
+                return false;
+            }
+            if (expectedTotal > channelCount) {
+                return true;
+            }
+            return tokenCount > 0;
+        };
 
         while (Date.now() < deadline) {
-            if ((bestSeed.channels && bestSeed.channels.length > 0) || (bestSeed.tokens && bestSeed.tokens.length > 0)) {
-                return bestSeed;
+            if (!shouldKeepWaitingForGrowth(bestSeed)) {
+                break;
             }
-            await sleep(250);
-            bestSeed = collectSubscriptionImportPageSeed(maxChannels);
+
+            const remainingMs = deadline - Date.now();
+            if (remainingMs <= 0) {
+                break;
+            }
+
+            await sleep(600);
+            const nextSeed = await expandSubscriptionsImportPageSeed(maxChannels, Math.min(remainingMs, 10000));
+            const nextBrowseSnapshotTs = getLatestSubscriptionImportBrowseSnapshotTs();
+
+            const grew = (Array.isArray(nextSeed?.channels) ? nextSeed.channels.length : 0) > (Array.isArray(bestSeed?.channels) ? bestSeed.channels.length : 0)
+                || (Number(nextSeed?.expectedTotal) || 0) > (Number(bestSeed?.expectedTotal) || 0)
+                || (Array.isArray(nextSeed?.tokens) ? nextSeed.tokens.length : 0) > (Array.isArray(bestSeed?.tokens) ? bestSeed.tokens.length : 0)
+                || nextBrowseSnapshotTs > latestBrowseSnapshotTs;
+
+            if (grew) {
+                bestSeed = nextSeed;
+                latestBrowseSnapshotTs = nextBrowseSnapshotTs;
+                stablePasses = 0;
+                continue;
+            }
+
+            stablePasses += 1;
+            const elapsedMs = Date.now() - startedAt;
+            if (elapsedMs >= 45000) {
+                break;
+            }
+            if (stablePasses >= 3 && elapsedMs >= 12000) {
+                break;
+            }
         }
 
         return bestSeed;
@@ -735,22 +982,153 @@
         };
     }
 
+    function getSubscriptionsImportTrackedMatches(entries = []) {
+        const trackedGroups = [
+            { key: 'demi', terms: ['demi lovato', '@demilovato', 'uczkurf9tdolfoeuw_4rd7xq'] },
+            { key: 'pitbull', terms: ['pitbull', '@pitbull'] },
+            { key: 'nyusha', terms: ['nyusha', '@nyushamusic', 'ucm9vwkafz0axpuehphmae7w'] }
+        ];
+
+        const normalizedEntries = Array.isArray(entries) ? entries : [];
+        const matches = {};
+
+        trackedGroups.forEach((group) => {
+            matches[group.key] = normalizedEntries
+                .filter((entry) => {
+                    const haystack = [
+                        entry?.name,
+                        entry?.handle,
+                        entry?.canonicalHandle,
+                        entry?.handleDisplay,
+                        entry?.customUrl,
+                        entry?.id,
+                        entry?.originalInput
+                    ]
+                        .filter(Boolean)
+                        .join(' | ')
+                        .toLowerCase();
+                    return group.terms.some((term) => haystack.includes(term));
+                })
+                .slice(0, 5)
+                .map((entry) => ({
+                    name: entry?.name || '',
+                    id: entry?.id || '',
+                    handle: entry?.handle || entry?.canonicalHandle || entry?.handleDisplay || '',
+                    customUrl: entry?.customUrl || ''
+                }));
+        });
+
+        return matches;
+    }
+
+    function buildSubscriptionsImportSample(entries = [], limit = 8) {
+        return (Array.isArray(entries) ? entries : [])
+            .slice(0, Math.max(0, limit))
+            .map((entry) => ({
+                name: entry?.name || '',
+                id: entry?.id || '',
+                handle: entry?.handle || entry?.canonicalHandle || entry?.handleDisplay || '',
+                customUrl: entry?.customUrl || ''
+            }));
+    }
+
+    function summarizeSubscriptionImportResponse(root) {
+        const summary = {
+            topLevelKeys: [],
+            rendererKeys: [],
+            continuationLikeKeys: [],
+            targetIds: []
+        };
+
+        if (!root || typeof root !== 'object') {
+            return summary;
+        }
+
+        try {
+            summary.topLevelKeys = Object.keys(root).slice(0, 12);
+        } catch (e) {
+        }
+
+        const rendererKeys = new Set();
+        const continuationLikeKeys = new Set();
+        const targetIds = new Set();
+        const visited = new Set();
+
+        const visit = (node, depth = 0) => {
+            if (!node || typeof node !== 'object') return;
+            if (visited.has(node) || depth > 6) return;
+            visited.add(node);
+
+            if (Array.isArray(node)) {
+                for (let i = 0; i < node.length; i += 1) {
+                    visit(node[i], depth + 1);
+                    if (rendererKeys.size >= 12 && continuationLikeKeys.size >= 8 && targetIds.size >= 8) {
+                        break;
+                    }
+                }
+                return;
+            }
+
+            Object.keys(node).forEach((key) => {
+                if (/Renderer$|ViewModel$/i.test(key) && rendererKeys.size < 12) {
+                    rendererKeys.add(key);
+                }
+                if (/continuation/i.test(key) && continuationLikeKeys.size < 8) {
+                    continuationLikeKeys.add(key);
+                }
+                if (key === 'targetId' && typeof node[key] === 'string' && targetIds.size < 8) {
+                    targetIds.add(node[key]);
+                }
+            });
+
+            const keys = Object.keys(node);
+            for (let i = 0; i < keys.length; i += 1) {
+                visit(node[keys[i]], depth + 1);
+                if (rendererKeys.size >= 12 && continuationLikeKeys.size >= 8 && targetIds.size >= 8) {
+                    break;
+                }
+            }
+        };
+
+        visit(root);
+
+        summary.rendererKeys = Array.from(rendererKeys);
+        summary.continuationLikeKeys = Array.from(continuationLikeKeys);
+        summary.targetIds = Array.from(targetIds);
+        return summary;
+    }
+
+    function logSubscriptionsImport(stage, payload = {}) {
+        try {
+            console.log('FilterTube Subscriptions Import:', {
+                stage,
+                ...payload
+            });
+        } catch (e) {
+        }
+    }
+
     async function fetchSubscribedChannelsFromYoutubei(requestId, options = {}) {
         const maxChannels = Math.max(1, Math.min(parseInt(options.maxChannels, 10) || 5000, 5000));
         const pageDelayMs = Math.max(50, Math.min(parseInt(options.pageDelayMs, 10) || 140, 500));
-        const timeoutMs = Math.max(5000, Math.min(parseInt(options.timeoutMs, 10) || 60000, 120000));
+        const timeoutMs = Math.max(5000, Math.min(parseInt(options.timeoutMs, 10) || 60000, 150000));
         const startTs = Date.now();
         const requestContext = buildSubscriptionImportRequestProfiles();
         const collected = new Map();
         const seenTokens = new Set();
-        const seed = await waitForSubscriptionImportSeed(maxChannels, Math.min(timeoutMs, 5000));
+        const seedWaitBudgetMs = Math.max(12000, Math.min(timeoutMs - 20000, 60000));
+        const seed = await waitForSubscriptionImportSeed(maxChannels, seedWaitBudgetMs);
+        const seedTokens = Array.isArray(seed?.tokens) ? seed.tokens.filter((token) => typeof token === 'string' && token.trim()) : [];
+        const seedContinuationRequests = Array.isArray(seed?.continuationRequests)
+            ? seed.continuationRequests.filter((request) => typeof request?.token === 'string' && request.token.trim())
+            : [];
         let expectedTotal = Math.max(0, Number(seed?.expectedTotal) || 0);
-        let continuation = '';
         let pagesFetched = 0;
         let lastLoggedOut = false;
-        let requestProfileIndex = 0;
         let activeSource = seed.channels.length > 0 ? 'page_seed' : '';
         let partialReason = '';
+        let lastRequestError = '';
+        let hadSuccessfulResponse = false;
 
         const postProgress = (phase, extra = {}) => {
             window.postMessage({
@@ -771,6 +1149,20 @@
             throw new Error('YouTube context unavailable');
         }
 
+        logSubscriptionsImport('starting', {
+            requestId,
+            host: String(location?.host || ''),
+            path: String(location?.pathname || ''),
+            requestProfiles: Array.isArray(requestContext?.profiles)
+                ? requestContext.profiles.map((profile) => profile?.source || '')
+                : [],
+            seedChannels: seed.channels.length,
+            seedTokens: Array.isArray(seed?.tokens) ? seed.tokens.length : 0,
+            seedContinuationRequests: seedContinuationRequests.length,
+            seedExpansionActions: Number(seed?.expansionActions) || 0,
+            expectedTotal
+        });
+
         postProgress('starting');
 
         if (seed.channels.length > 0) {
@@ -786,38 +1178,110 @@
             }
 
             pagesFetched = 1;
-            continuation = seed.tokens.find((token) => token && !seenTokens.has(token)) || '';
-            if (continuation) {
-                seenTokens.add(continuation);
-            }
-            if (collected.size >= maxChannels) {
-                continuation = '';
-            }
-
             postProgress('page_seed', {
                 pageRows: seed.channels.length,
-                hasContinuation: !!continuation,
+                hasContinuation: (Array.isArray(requestContext?.profiles) ? requestContext.profiles.length > 0 : false) || seedTokens.length > 0,
                 source: activeSource,
-                expectedTotal
+                expectedTotal,
+                seedExpansionActions: Number(seed?.expansionActions) || 0
+            });
+
+            logSubscriptionsImport('page_seed', {
+                requestId,
+                source: activeSource,
+                pageRows: seed.channels.length,
+                foundCount: collected.size,
+                hasContinuation: (Array.isArray(requestContext?.profiles) ? requestContext.profiles.length > 0 : false) || seedTokens.length > 0,
+                seedExpansionActions: Number(seed?.expansionActions) || 0,
+                expectedTotal,
+                sample: buildSubscriptionsImportSample(seed.channels),
+                trackedMatches: getSubscriptionsImportTrackedMatches(seed.channels)
             });
         }
 
-        while (continuation || collected.size === 0) {
+        const requestQueue = [];
+        const queuedInitialProfiles = new Set();
+
+        const queueInitialProfile = (profileIndex) => {
+            if (!Number.isFinite(profileIndex) || profileIndex < 0) return false;
+            if (queuedInitialProfiles.has(profileIndex)) return false;
+            const profile = requestContext?.profiles?.[profileIndex];
+            if (!profile?.context) return false;
+            queuedInitialProfiles.add(profileIndex);
+            requestQueue.push({
+                profileIndex,
+                source: profile.source || '',
+                initialBrowse: true,
+                continuation: '',
+                clickTrackingParams: ''
+            });
+            return true;
+        };
+
+        queueInitialProfile(0);
+
+        const queueContinuation = (profileIndex, source, continuationRequest) => {
+            const trimmedToken = typeof continuationRequest === 'string'
+                ? continuationRequest.trim()
+                : String(continuationRequest?.token || '').trim();
+            if (!trimmedToken) return false;
+            const clickTrackingParams = typeof continuationRequest === 'string'
+                ? ''
+                : String(continuationRequest?.clickTrackingParams || '').trim();
+            const tokenKey = `${trimmedToken}::${clickTrackingParams}`;
+            if (seenTokens.has(tokenKey)) return false;
+            seenTokens.add(tokenKey);
+            requestQueue.push({
+                profileIndex,
+                source: source || '',
+                initialBrowse: false,
+                continuation: trimmedToken,
+                clickTrackingParams
+            });
+            return true;
+        };
+
+        while (requestQueue.length > 0 || collected.size === 0) {
             if ((Date.now() - startTs) > timeoutMs) {
                 throw new Error('Subscription import timed out');
             }
 
-            const requestProfile = requestContext.profiles[requestProfileIndex];
-            if (!requestProfile?.context) {
+            const requestTask = requestQueue.shift();
+            if (!requestTask) {
                 break;
+            }
+
+            const requestProfile = requestContext.profiles[requestTask.profileIndex];
+            if (!requestProfile?.context) {
+                continue;
             }
 
             const endpointUrl = requestContext.apiKey
                 ? `/youtubei/v1/browse?prettyPrint=false&key=${encodeURIComponent(requestContext.apiKey)}`
                 : '/youtubei/v1/browse?prettyPrint=false';
-            const requestBody = continuation
-                ? { context: requestProfile.context, continuation }
-                : { context: requestProfile.context, browseId: requestProfile.browseId || 'FEchannels' };
+            const requestUsesInitialBrowse = requestTask.initialBrowse === true;
+            const requestBody = requestUsesInitialBrowse
+                ? { context: requestProfile.context, browseId: requestProfile.browseId || 'FEchannels' }
+                : (requestTask.continuation
+                    ? {
+                        context: buildSubscriptionImportContext(requestProfile.context, requestTask.clickTrackingParams),
+                        continuation: requestTask.continuation
+                    }
+                    : null);
+            if (!requestBody) {
+                continue;
+            }
+
+            logSubscriptionsImport('request', {
+                requestId,
+                source: requestProfile.source || requestTask.source || activeSource || '',
+                initialBrowse: requestUsesInitialBrowse,
+                continuationPreview: requestTask.continuation ? requestTask.continuation.slice(0, 24) : '',
+                clickTrackingPreview: requestTask.clickTrackingParams ? requestTask.clickTrackingParams.slice(0, 18) : '',
+                channelsCollected: collected.size,
+                expectedTotal,
+                hasContinuation: !!requestTask.continuation
+            });
 
             const remainingBudgetMs = Math.max(1500, timeoutMs - (Date.now() - startTs));
             const fetchTimeoutMs = Math.max(4000, Math.min(25000, remainingBudgetMs));
@@ -848,24 +1312,36 @@
                 const timeoutLikeError = error?.name === 'AbortError'
                     ? `Subscriptions request timed out (${fetchTimeoutMs}ms)`
                     : (error?.message || 'Subscriptions request failed');
-                const canSwitchProfile = requestProfileIndex < (requestContext.profiles.length - 1);
-                if (canSwitchProfile) {
-                    requestProfileIndex += 1;
-                    activeSource = requestContext.profiles[requestProfileIndex]?.source || activeSource;
-                    postProgress('retrying_source', {
-                        hasContinuation: !!continuation,
-                        source: activeSource,
-                        error: timeoutLikeError
-                    });
+                lastRequestError = timeoutLikeError;
+                const queuedAlternate = requestTask.initialBrowse
+                    ? queueInitialProfile(requestTask.profileIndex + 1)
+                    : false;
+                logSubscriptionsImport('retrying_source', {
+                    requestId,
+                    source: queuedAlternate
+                        ? (requestContext?.profiles?.[requestTask.profileIndex + 1]?.source || '')
+                        : (requestProfile.source || requestTask.source || ''),
+                    error: timeoutLikeError,
+                    hasContinuation: !!requestTask.continuation,
+                    channelsCollected: collected.size
+                });
+                postProgress('retrying_source', {
+                    hasContinuation: !!requestTask.continuation,
+                    source: queuedAlternate
+                        ? (requestContext?.profiles?.[requestTask.profileIndex + 1]?.source || '')
+                        : (requestProfile.source || requestTask.source || ''),
+                    error: timeoutLikeError
+                });
+
+                if (collected.size > 0) {
+                    partialReason = partialReason || timeoutLikeError;
                     continue;
                 }
 
-                if (collected.size > 0) {
-                    partialReason = timeoutLikeError;
-                    break;
+                if (requestQueue.length === 0) {
+                    throw new Error(timeoutLikeError);
                 }
-
-                throw new Error(timeoutLikeError);
+                continue;
             } finally {
                 if (abortTimer) {
                     clearTimeout(abortTimer);
@@ -888,25 +1364,36 @@
                 const fallbackMessage = (typeof data?.error?.message === 'string' ? data.error.message.trim() : '')
                     || (typeof data?.message === 'string' ? data.message.trim() : '')
                     || `Subscriptions request failed (${response.status})`;
-                const canSwitchProfile = requestProfileIndex < (requestContext.profiles.length - 1);
-                const canRetryWithAlternateProfile = canSwitchProfile;
-                if (canRetryWithAlternateProfile) {
-                    requestProfileIndex += 1;
-                    activeSource = requestContext.profiles[requestProfileIndex]?.source || activeSource;
-                    postProgress('retrying_source', {
-                        hasContinuation: !!continuation,
-                        status: response.status,
-                        source: activeSource
-                    });
+                lastRequestError = fallbackMessage;
+                const queuedAlternate = requestTask.initialBrowse
+                    ? queueInitialProfile(requestTask.profileIndex + 1)
+                    : false;
+                logSubscriptionsImport('retrying_source', {
+                    requestId,
+                    source: queuedAlternate
+                        ? (requestContext?.profiles?.[requestTask.profileIndex + 1]?.source || '')
+                        : (requestProfile.source || requestTask.source || ''),
+                    status: response.status,
+                    hasContinuation: !!requestTask.continuation,
+                    channelsCollected: collected.size
+                });
+                postProgress('retrying_source', {
+                    hasContinuation: !!requestTask.continuation,
+                    status: response.status,
+                    source: queuedAlternate
+                        ? (requestContext?.profiles?.[requestTask.profileIndex + 1]?.source || '')
+                        : (requestProfile.source || requestTask.source || '')
+                });
+
+                if (collected.size > 0) {
+                    partialReason = partialReason || fallbackMessage;
                     continue;
                 }
 
-                if (collected.size > 0) {
-                    partialReason = fallbackMessage;
-                    break;
+                if (requestQueue.length === 0) {
+                    throw new Error(fallbackMessage);
                 }
-
-                throw new Error(fallbackMessage);
+                continue;
             }
 
             try {
@@ -919,22 +1406,35 @@
                 throw new Error('Failed to parse subscriptions response');
             }
 
-            const { renderers, tokens, expectedTotal: responseExpectedTotal } = collectSubscriptionImportArtifacts(data);
+            const {
+                renderers,
+                tokens,
+                continuationRequests,
+                expectedTotal: responseExpectedTotal
+            } = collectSubscriptionImportArtifacts(data);
+            const responseSummary = renderers.length === 0 ? summarizeSubscriptionImportResponse(data) : null;
             if (responseExpectedTotal > expectedTotal) {
                 expectedTotal = responseExpectedTotal;
             }
+            hadSuccessfulResponse = true;
             const responseLoggedOut = detectLoggedOutBrowseResponse(data);
             const shouldRetryLoggedOutProfile = responseLoggedOut
                 && collected.size === 0
                 && renderers.length === 0
                 && tokens.length === 0
-                && requestProfileIndex < (requestContext.profiles.length - 1);
+                && queueInitialProfile(requestTask.profileIndex + 1);
 
             if (shouldRetryLoggedOutProfile) {
-                requestProfileIndex += 1;
-                activeSource = requestContext.profiles[requestProfileIndex]?.source || activeSource;
+                activeSource = requestProfile.source || requestTask.source || activeSource;
+                logSubscriptionsImport('retrying_source', {
+                    requestId,
+                    source: activeSource,
+                    loggedOut: true,
+                    hasContinuation: !!requestTask.continuation,
+                    channelsCollected: collected.size
+                });
                 postProgress('retrying_source', {
-                    hasContinuation: !!continuation,
+                    hasContinuation: !!requestTask.continuation,
                     source: activeSource,
                     loggedOut: true
                 });
@@ -944,7 +1444,11 @@
 
             lastLoggedOut = responseLoggedOut;
             pagesFetched += 1;
-            activeSource = requestProfile.source || activeSource || 'subscriptions_import';
+            activeSource = requestProfile.source || requestTask.source || activeSource || 'subscriptions_import';
+
+            if (requestTask.initialBrowse && renderers.length === 0 && tokens.length === 0) {
+                queueInitialProfile(requestTask.profileIndex + 1);
+            }
 
             for (let i = 0; i < renderers.length; i += 1) {
                 const normalized = normalizeSubscriptionImportEntry(renderers[i]);
@@ -958,27 +1462,53 @@
                 }
             }
 
-            const nextToken = tokens.find((token) => token && !seenTokens.has(token)) || '';
-            if (nextToken) {
-                seenTokens.add(nextToken);
+            const queuedTokens = [];
+            continuationRequests.forEach((continuationRequest) => {
+                if (queueContinuation(requestTask.profileIndex, activeSource, continuationRequest)) {
+                    queuedTokens.push(continuationRequest.token);
+                }
+            });
+            if (requestUsesInitialBrowse && queuedTokens.length === 0) {
+                seedContinuationRequests.forEach((continuationRequest) => {
+                    if (queueContinuation(requestTask.profileIndex, activeSource, continuationRequest)) {
+                        queuedTokens.push(continuationRequest.token);
+                    }
+                });
             }
+            if (requestUsesInitialBrowse && queuedTokens.length === 0) {
+                seedTokens.forEach((token) => {
+                    if (queueContinuation(requestTask.profileIndex, activeSource, token)) {
+                        queuedTokens.push(token);
+                    }
+                });
+            }
+            const nextToken = queuedTokens[0] || '';
 
             postProgress('page', {
                 pageRows: renderers.length,
-                hasContinuation: !!nextToken,
+                hasContinuation: queuedTokens.length > 0,
                 source: activeSource,
-                expectedTotal
+                expectedTotal,
+                ...(responseSummary ? { responseSummary } : {})
+            });
+
+            logSubscriptionsImport('page', {
+                requestId,
+                source: activeSource,
+                initialBrowse: requestUsesInitialBrowse,
+                pageRows: renderers.length,
+                continuationTokensFound: tokens.length,
+                nextTokenPreview: nextToken ? nextToken.slice(0, 24) : '',
+                foundCount: collected.size,
+                expectedTotal,
+                ...(responseSummary ? { responseSummary } : {}),
+                sample: buildSubscriptionsImportSample(Array.from(collected.values())),
+                trackedMatches: getSubscriptionsImportTrackedMatches(Array.from(collected.values()))
             });
 
             if (collected.size >= maxChannels) {
                 break;
             }
-
-            if (!nextToken) {
-                break;
-            }
-
-            continuation = nextToken;
             await sleep(pageDelayMs);
         }
 
@@ -986,6 +1516,19 @@
         if (!partialReason && expectedTotal > 0 && channels.length < expectedTotal && channels.length < maxChannels) {
             partialReason = `Imported ${channels.length} of ${expectedTotal} subscribed channels`;
         }
+        if (!partialReason && channels.length === 0 && lastRequestError && !hadSuccessfulResponse) {
+            partialReason = lastRequestError;
+        }
+        logSubscriptionsImport('complete', {
+            requestId,
+            source: activeSource || 'subscriptions_import',
+            pagesFetched,
+            totalFound: channels.length,
+            expectedTotal,
+            partialReason: partialReason || '',
+            sample: buildSubscriptionsImportSample(channels),
+            trackedMatches: getSubscriptionsImportTrackedMatches(channels)
+        });
         if (channels.length === 0 && lastLoggedOut) {
             return {
                 success: false,

@@ -1841,6 +1841,7 @@ let filteringTracker = {
         this.restoredItems = [];
     }
 };
+window.filteringTracker = filteringTracker;
 
 /**
  * Generate a unique collaboration group ID (UUID v4 style)
@@ -4493,7 +4494,7 @@ function requestChannelInfoFromMainWorld(videoId, options = {}) {
 function requestSubscribedChannelsFromMainWorld(options = {}, onProgress = null) {
     return new Promise((resolve) => {
         const requestId = ++window.subscriptionImportRequestId;
-        const timeoutMs = Math.max(5000, Math.min(parseInt(options.timeoutMs, 10) || 60000, 120000));
+        const timeoutMs = Math.max(5000, Math.min(parseInt(options.timeoutMs, 10) || 60000, 150000));
         const maxChannels = Math.max(1, Math.min(parseInt(options.maxChannels, 10) || 5000, 5000));
         const pageDelayMs = Math.max(50, Math.min(parseInt(options.pageDelayMs, 10) || 140, 500));
 
@@ -4851,7 +4852,7 @@ function handleMainWorldMessages(event) {
                     window.pendingSubscriptionImportRequests.delete(requestId);
                     latestPending.resolve({ success: false, error: 'Subscription import timed out', errorCode: 'timeout', channels: [], stats: null });
                 }
-            }, Math.max(5000, Math.min(parseInt(pending.timeoutMs, 10) || 60000, 120000)));
+            }, Math.max(5000, Math.min(parseInt(pending.timeoutMs, 10) || 60000, 150000)));
         }
         if (pending?.onProgress) {
             try {

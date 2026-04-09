@@ -13,6 +13,19 @@ const currentPageChannelMetaCache = {
     meta: null
 };
 
+function getFilteringTracker() {
+    const tracker = window.filteringTracker;
+    if (tracker && typeof tracker.reset === 'function' && typeof tracker.logSummary === 'function') {
+        return tracker;
+    }
+    return {
+        reset() {},
+        logSummary() {},
+        recordHide() {},
+        recordRestore() {}
+    };
+}
+
 function getListSignatureForRun(list) {
     try {
         const active = window.__filtertubeDomFallbackActiveRun;
@@ -1321,7 +1334,7 @@ async function applyDOMFallback(settings, options = {}) {
     const runStartedAt = now;
 
     // Start tracking hide/restore operations
-    filteringTracker.reset();
+    getFilteringTracker().reset();
 
     // Removed diagnostic logging - issue identified and fixed
     const scrollingElement = document.scrollingElement || document.documentElement || document.body;
@@ -3373,7 +3386,7 @@ async function applyDOMFallback(settings, options = {}) {
     // Log hide/restore summary
     try {
         if (window.__filtertubeDebug) {
-            filteringTracker.logSummary();
+            getFilteringTracker().logSummary();
         }
     } catch (e) {
     }

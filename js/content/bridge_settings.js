@@ -352,6 +352,30 @@ function normalizeSettingsForHost(settings) {
 
 function requestSettingsFromBackground() {
     return new Promise((resolve) => {
+        const safeResolveFailure = () => {
+            resolve({ success: false, settings: null, error: 'extension_context_invalidated' });
+        };
+        const sendRuntimeMessage = (payload, callback) => {
+            try {
+                if (!browserAPI_BRIDGE?.runtime?.sendMessage || !browserAPI_BRIDGE?.runtime?.id) {
+                    safeResolveFailure();
+                    return false;
+                }
+                browserAPI_BRIDGE.runtime.sendMessage(payload, (response) => {
+                    const err = browserAPI_BRIDGE.runtime?.lastError;
+                    if (err) {
+                        safeResolveFailure();
+                        return;
+                    }
+                    callback(response);
+                });
+                return true;
+            } catch (e) {
+                safeResolveFailure();
+                return false;
+            }
+        };
+
         const profileType = (() => {
             try {
                 const host = String(location?.hostname || '').toLowerCase();
@@ -361,14 +385,14 @@ function requestSettingsFromBackground() {
             }
         })();
 
-        browserAPI_BRIDGE.runtime.sendMessage({ action: "getCompiledSettings", profileType }, (response) => {
+        if (!sendRuntimeMessage({ action: "getCompiledSettings", profileType }, (response) => {
             if (response && !response.error) {
                 try {
                     const resolvedProfile = response.profileType === 'kids'
                         ? 'kids'
                         : (response.profileType === 'main' ? 'main' : '');
                     if (resolvedProfile && resolvedProfile !== profileType) {
-                        browserAPI_BRIDGE.runtime.sendMessage({ action: "getCompiledSettings", profileType, forceRefresh: true }, (retry) => {
+                        if (!sendRuntimeMessage({ action: "getCompiledSettings", profileType, forceRefresh: true }, (retry) => {
                             if (retry && !retry.error) {
                                 const normalized = normalizeSettingsForHost(retry);
                                 sendSettingsToMainWorld(normalized);
@@ -378,7 +402,9 @@ function requestSettingsFromBackground() {
                                 sendSettingsToMainWorld(normalized);
                                 resolve({ success: true, settings: normalized });
                             }
-                        });
+                        })) {
+                            return;
+                        }
                         return;
                     }
                 } catch (e) {
@@ -431,7 +457,9 @@ function requestSettingsFromBackground() {
             } else {
                 resolve({ success: false });
             }
-        });
+        })) {
+            return;
+        }
     });
 }
 

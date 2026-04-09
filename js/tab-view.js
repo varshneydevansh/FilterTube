@@ -2958,6 +2958,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    async function getActiveBrowserTab() {
+        const activeTabs = await queryBrowserTabs({
+            active: true,
+            lastFocusedWindow: true
+        });
+        return Array.isArray(activeTabs) && activeTabs.length > 0
+            ? activeTabs[0]
+            : null;
+    }
+
     async function sendMessageToBrowserTab(tabId, payload) {
         return new Promise((resolve) => {
             try {
@@ -4072,14 +4082,28 @@ document.addEventListener('DOMContentLoaded', async () => {
             canEnableWhitelist: false
         });
 
-        const result = await StateManager.importSubscribedChannelsToWhitelist({
-            requestId,
-            tabId: sourceTab.id,
-            targetProfileId: activeProfileId,
-            timeoutMs: 90000,
-            maxChannels: 5000,
-            pageDelayMs: 140
-        });
+        const previouslyActiveTab = await getActiveBrowserTab();
+        const shouldRestorePreviousTab = Number(previouslyActiveTab?.id) !== Number(sourceTab.id);
+        if (shouldRestorePreviousTab) {
+            await updateBrowserTab(sourceTab.id, { active: true });
+        }
+        await sleep(1200);
+
+        let result = null;
+        try {
+            result = await StateManager.importSubscribedChannelsToWhitelist({
+                requestId,
+                tabId: sourceTab.id,
+                targetProfileId: activeProfileId,
+                timeoutMs: 150000,
+                maxChannels: 5000,
+                pageDelayMs: 140
+            });
+        } finally {
+            if (shouldRestorePreviousTab && Number.isFinite(Number(previouslyActiveTab?.id))) {
+                await updateBrowserTab(Number(previouslyActiveTab.id), { active: true });
+            }
+        }
 
         if (!result?.success) {
             setSubscriptionsImportState({

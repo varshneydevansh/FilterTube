@@ -1649,48 +1649,23 @@ const StateManager = (() => {
         }
     }
 
-    async function importSubscribedChannelsToWhitelist(options = {}) {
-        await ensureLoaded();
-
-        if (isUiLocked()) {
-            await loadSettings();
-            return { success: false, error: 'Profile is locked', errorCode: 'profile_locked' };
-        }
-
-        const tabId = Number(options.tabId);
-        if (!Number.isFinite(tabId)) {
-            return { success: false, error: 'No YouTube tab selected', errorCode: 'no_tab' };
-        }
-
+    async function fetchSubscribedChannelsFromImportTab(tabId, options = {}) {
         const requestId = typeof options.requestId === 'string' && options.requestId.trim()
             ? options.requestId.trim()
             : `subs-${Date.now()}`;
-        const targetProfileId = typeof options.targetProfileId === 'string' && options.targetProfileId.trim()
-            ? options.targetProfileId.trim()
-            : '';
-        if (!targetProfileId) {
-            return { success: false, error: 'No target profile selected', errorCode: 'no_profile' };
-        }
-
-        const initialProfileContext = await getActiveProfileContext();
-        if (!initialProfileContext) {
-            return { success: false, error: 'Profiles unavailable', errorCode: 'profiles_unavailable' };
-        }
-        if (initialProfileContext.activeId !== targetProfileId) {
-            return { success: false, error: 'Profile changed before import started', errorCode: 'profile_changed' };
-        }
+        const sendPayload = {
+            action: 'FilterTube_ImportSubscribedChannels',
+            requestId,
+            sourceTabId: tabId,
+            maxChannels: options.maxChannels || 5000,
+            timeoutMs: options.timeoutMs || 60000,
+            pageDelayMs: options.pageDelayMs || 140
+        };
 
         let tabResult = null;
         let lastTabError = { errorCode: 'tab_import_failed', errorMessage: 'Failed to reach YouTube tab' };
         for (let attempt = 0; attempt < 12; attempt += 1) {
-            const sendResult = await sendMessageToTab(tabId, {
-                action: 'FilterTube_ImportSubscribedChannels',
-                requestId,
-                sourceTabId: tabId,
-                maxChannels: options.maxChannels || 5000,
-                timeoutMs: options.timeoutMs || 60000,
-                pageDelayMs: options.pageDelayMs || 140
-            });
+            const sendResult = await sendMessageToTab(tabId, sendPayload);
 
             tabResult = sendResult?.response || null;
             if (tabResult?.success === true) {
@@ -1722,14 +1697,60 @@ const StateManager = (() => {
             };
         }
 
-        const channels = Array.isArray(tabResult.channels) ? tabResult.channels : [];
+        return {
+            success: true,
+            channels: Array.isArray(tabResult.channels) ? tabResult.channels : [],
+            stats: tabResult.stats || null
+        };
+    }
+
+    async function importSubscribedChannelsToWhitelist(options = {}) {
+        await ensureLoaded();
+
+        if (isUiLocked()) {
+            await loadSettings();
+            return { success: false, error: 'Profile is locked', errorCode: 'profile_locked' };
+        }
+
+        const tabId = Number(options.tabId);
+        if (!Number.isFinite(tabId)) {
+            return { success: false, error: 'No YouTube tab selected', errorCode: 'no_tab' };
+        }
+
+        const requestId = typeof options.requestId === 'string' && options.requestId.trim()
+            ? options.requestId.trim()
+            : `subs-${Date.now()}`;
+        const targetProfileId = typeof options.targetProfileId === 'string' && options.targetProfileId.trim()
+            ? options.targetProfileId.trim()
+            : '';
+        if (!targetProfileId) {
+            return { success: false, error: 'No target profile selected', errorCode: 'no_profile' };
+        }
+
+        const initialProfileContext = await getActiveProfileContext();
+        if (!initialProfileContext) {
+            return { success: false, error: 'Profiles unavailable', errorCode: 'profiles_unavailable' };
+        }
+        if (initialProfileContext.activeId !== targetProfileId) {
+            return { success: false, error: 'Profile changed before import started', errorCode: 'profile_changed' };
+        }
+
+        const primaryFetch = await fetchSubscribedChannelsFromImportTab(tabId, {
+            ...options,
+            requestId
+        });
+        if (!primaryFetch?.success) {
+            return primaryFetch;
+        }
+
+        const channels = Array.isArray(primaryFetch.channels) ? primaryFetch.channels : [];
         if (channels.length === 0) {
             return {
                 success: true,
                 empty: true,
                 requestId,
                 counts: { imported: 0, updated: 0, duplicates: 0, skipped: 0 },
-                stats: tabResult.stats || null,
+                stats: primaryFetch.stats || null,
                 currentMode: state.mode === 'whitelist' ? 'whitelist' : 'blocklist'
             };
         }
@@ -1780,7 +1801,7 @@ const StateManager = (() => {
                 success: true,
                 requestId,
                 counts: response.counts || { imported: 0, updated: 0, duplicates: 0, skipped: 0 },
-                stats: tabResult.stats || null,
+                stats: primaryFetch.stats || null,
                 currentMode: response.currentMode || (state.mode === 'whitelist' ? 'whitelist' : 'blocklist'),
                 importedIntoProfileId: response.importedIntoProfileId || targetProfileId
             };

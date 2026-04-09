@@ -53,6 +53,15 @@
                 window.filterTube.lastYtBrowseResponse = data;
                 window.filterTube.lastYtBrowseResponseName = name;
                 window.filterTube.lastYtBrowseResponseTs = ts;
+                const recentBrowseResponses = Array.isArray(window.filterTube.recentYtBrowseResponses)
+                    ? window.filterTube.recentYtBrowseResponses
+                    : [];
+                recentBrowseResponses.push({
+                    data,
+                    name,
+                    ts
+                });
+                window.filterTube.recentYtBrowseResponses = recentBrowseResponses.slice(-12);
                 return;
             }
             if (name.includes('/youtubei/v1/player')) {
