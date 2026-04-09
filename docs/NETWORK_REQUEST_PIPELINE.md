@@ -1,4 +1,4 @@
-# Network Request Pipeline Documentation (v3.2.5)
+# Network Request Pipeline Documentation (v3.3.0)
 
 ## Overview
 
@@ -34,7 +34,7 @@ FilterTube v3.2.5 implements a **proactive, XHR-first** network request pipeline
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## On-Demand Subscriptions Import (v3.2.9 follow-up)
+## On-Demand Subscriptions Import (v3.3.0 state)
 
 The subscriptions importer uses the same cross-world plumbing as the rest of FilterTube, but it is an active request path rather than passive snapshot interception.
 

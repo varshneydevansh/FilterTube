@@ -3,13 +3,22 @@
   <h1>FilterTube</h1>
   <p>Peace of Mind for your Digital Space</p>
   
-  [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/varshneydevansh/FilterTube) ![Version](https://img.shields.io/badge/version-3.2.9-blue.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg) ![Lines of Code](https://img.shields.io/badge/total%20lines-91.6k-brightgreen.svg) ![JavaScript LoC](https://img.shields.io/badge/javascript-56.7k%20lines-yellow.svg) ![Top Language](https://img.shields.io/github/languages/top/varshneydevansh/FilterTube?color=f1e05a) ![Repo Size](https://img.shields.io/github/repo-size/varshneydevansh/FilterTube?color=orange)
+  [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/varshneydevansh/FilterTube) ![Version](https://img.shields.io/badge/version-3.3.0-blue.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg) ![Lines of Code](https://img.shields.io/badge/total%20lines-91.8k-brightgreen.svg) ![JavaScript LoC](https://img.shields.io/badge/javascript-56.7k%20lines-yellow.svg) ![Top Language](https://img.shields.io/github/languages/top/varshneydevansh/FilterTube?color=f1e05a) ![Repo Size](https://img.shields.io/github/repo-size/varshneydevansh/FilterTube?color=orange)
   
 </div>
 
 ## Overview
 
 FilterTube is a browser extension that gives you control over your YouTube feed. Filter videos, shorts, channels, and comments using keywords and smart rules—all processing happens privately on your device.
+
+## What's New in v3.3.0
+
+- **Collaboration blocking is now much more complete on watch surfaces**: watch right rail, playlist rows, and watch-like lockups can recover full collaborator rosters and refresh the active 3-dot menu.
+- **Mix cards and real collaborations are separated more safely**: plain names containing `&` or `and` no longer become fake collaboration menus without explicit collaborator signals.
+- **Subscribed-channel import is more resilient across browsers**: the importer now relies more on real `/feed/channels` page growth and recent page browse responses.
+- **Channel Management rows can link directly to channel pages** using the best available identifier.
+- **The injected 3-dot block menu item can now be disabled** independently of Quick Block.
+- **Encrypted Firefox export is more dependable** thanks to a safer manual-download fallback path.
 
 ## Features
 
@@ -21,6 +30,7 @@ FilterTube is a browser extension that gives you control over your YouTube feed.
 - **Smart Matching**: Choose partial or whole-word matching to stay strict or flexible.
 - **Shelf & Playlist Cleanup**: Refilters shelves and playlists so blocked creators stay gone even after navigation.
 - **Quick Block Cross (v3.2.7)**: One-tap hover cross on cards to block instantly (enabled by default, can be disabled).
+- **3-Dot Menu Toggle (v3.3.0)**: The FilterTube item inside YouTube's native 3-dot menu can be disabled independently of Quick Block.
 - **Content-Based Filters (v3.2.6)**: 
   - Filter by video duration (longer/shorter/between specific lengths)
   - Filter by upload date (newer/older/between specific dates)
@@ -31,8 +41,10 @@ FilterTube is a browser extension that gives you control over your YouTube feed.
 - **Multi-Profile with PIN Locks**: Account + child profiles, each with independent filters/settings; optional PIN lock gates UI until unlocked.
 - **Profile-Scoped Backups**: Auto-backup and manual export respect the active profile. Default (Master) can export full; non-default exports active-only.
 - **Encrypted Backups**: PBKDF2-SHA256 (150k) + AES-GCM. Encryption auto-enables when the active profile has a PIN (or you pick “Encrypted” format); background verifies PIN before encrypting.
+- **Firefox-Safe Encrypted Export (v3.3.0)**: Manual encrypted export now uses a Firefox-safe fallback instead of relying solely on the downloads API path.
 - **Handle Enrichment Queue**: Newly imported channels are resolved slowly in the background to avoid hammering YouTube.
 - **Kids Mode Profiles**: Maintain a separate, safer rule set for YouTube Kids without mixing it with the main profile; optional “Apply Kids list on main YouTube” sync toggle.
+- **Channel Management Links (v3.3.0)**: Channel rows can open the real YouTube channel page via handle, UCID, or legacy custom URL.
 
 ### Comment Control
 
@@ -53,6 +65,7 @@ FilterTube is a browser extension that gives you control over your YouTube feed.
 
 - **Zero Flash**: Filters content *before* it renders on screen using proactive XHR interception.
 - **Instant Blocking**: 3-dot menus show correct channel names immediately—no "Fetching..." delays.
+- **Collaboration-Aware Menus (v3.3.0)**: Watch-page collaboration rows, Mix/watch recovery paths, and watch-side lockups can now upgrade to the full collaborator roster in the 3-dot UI.
 - **Network Reduction**: Most channel identity comes from intercepted JSON, not page fetches.
 - **100% Private**: No data leaves your browser. No analytics. No tracking.
 - **Modern UI/UX (v3.2.6)**: Clean typography, refined components, enhanced dark mode, and Kids Mode theming.
@@ -80,6 +93,8 @@ Learn more in [Proactive Channel Identity](docs/PROACTIVE_CHANNEL_IDENTITY.md).
   - [Developer Guide](docs/DEVELOPER_GUIDE.md) – Extending FilterTube for new YouTube features
   - [Architecture](docs/ARCHITECTURE.md) – System design and cross-world messaging
   - [YouTube Kids Integration](docs/YOUTUBE_KIDS_INTEGRATION.md) – Kids-specific optimizations
+  - [3-Dot Menu Improvements](docs/THREE_DOT_MENU_IMPROVEMENTS.md) – collaborator-aware menu recovery and Mix/watch handling
+  - [Subscribed Channels Import](docs/SUBSCRIBED_CHANNELS_IMPORT.md) – whitelist import flow and cross-browser page capture details
 
 ## Installation
 

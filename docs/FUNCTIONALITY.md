@@ -1,13 +1,22 @@
-# FilterTube v3.2.9 - Current Functionality Documentation
+# FilterTube v3.3.0 - Current Functionality Documentation
 
 ## Overview
 
-FilterTube v3.2.9 implements a **hybrid filtering system** with dual filtering modes:
+FilterTube v3.3.0 implements a **hybrid filtering system** with dual filtering modes:
 
 - A primary **data interception layer** removes blocked items from YouTube JSON responses before render when possible.
 - A secondary **DOM fallback layer** hides/restores already-rendered elements for SPA navigation, DOM recycling, and edge cases.
 - **Whitelist Mode**: Hide all content except explicitly allowed channels and keywords.
 - **Category Filtering**: Filter videos by YouTube category (e.g., Music, Gaming, Education) (v3.2.7).
+
+## v3.3.0 Release Highlights
+
+- **Watch-page collaboration menus now recover more often on first open** by upgrading from dialog/sheet collaborator rosters and refreshing the active menu in place.
+- **Desktop watch-right-rail and watch-like lockups** can warm up collaborator context from byline hints and then resolve the full roster from Main World data.
+- **False-positive collaboration splitting was tightened** so plain channel names containing `&` or `and` are no longer treated as multi-author videos without explicit collaboration evidence.
+- **Subscribed-channel whitelist import is more resilient across browsers** because it now keeps recent page browse responses and leans on real page-driven `/feed/channels` growth.
+- **Channel Management now supports direct channel links**, and the injected 3-dot block item has its own user-facing toggle.
+- **Firefox encrypted export now uses a safer fallback path** for manual encrypted downloads.
 
 ## Core Filtering Capabilities
 
@@ -26,10 +35,14 @@ FilterTube v3.2.9 implements a **hybrid filtering system** with dual filtering m
 - **Intelligent Mode Switching**: Confirmation dialogs prevent accidental data loss when switching modes
 - **Enhanced Channel Identity**: Multi-source channel extraction with improved reliability
 - **Search Page Optimizations**: Right-rail watch cards handled intelligently
+- **Creator Channel-Page Whitelist Fixes (v3.3.0)**: Creator/channel pages now use page identity more safely in whitelist mode so unresolved cards do not leak incorrectly, while legitimate creator-page content still stays visible.
+- **Restored YTM Renderer Coverage (v3.3.0)**: More YTM renderer types now participate in identity extraction and DOM fallback, improving whitelist correctness on mobile surfaces.
+- **Subscriptions Feed Exemption (v3.3.0)**: `/feed/channels` is no longer treated like a normal filtered feed, so blocked channels still appear on `All subscriptions`.
 - **Performance Improvements**: Selective processing and bridge-level optimizations
 - **UI Enhancements**: Clean interface that hides irrelevant controls in whitelist mode
 - **State Tracking**: Seamless switching between blocklist and whitelist modes
-- **Subscribed Channels Import (v3.2.9 follow-up)**: Tab-view can import the active YouTube account's subscriptions straight into whitelist with inline progress, retry states, and profile-aware persistence
+- **Subscribed Channels Import (v3.3.0 state)**: Tab-view can import the active YouTube account's subscriptions straight into whitelist with inline progress, retry states, and profile-aware persistence
+- **Cross-Browser `/feed/channels` Capture (v3.3.0)**: Import now retains recent page browse responses and waits for active page growth before finalizing, improving Edge/Chrome behavior even when synthetic continuation replay is incomplete.
 - **Explicit Import Semantics**: `Import Only` keeps the current blocklist untouched; `Import + Turn On Whitelist` uses the existing mode-switch pipeline, which merges the current blocklist into whitelist
 
 ### **Stats Tracking**
@@ -114,6 +127,8 @@ YouTube JSON Data → FilterTubeEngine.processData() → Filtered Data → YouTu
 - **404 Recovery Pipeline**: Every block request runs through a cache-first lookup, ytInitialData replay, Shorts helpers, and DOM cache invalidation so handles never persist without a canonical UC ID—even when `/@handle/about` returns 404.
 - **Watch-Page Mix Recovery**: When a watch-page playlist / Mix row lacks strong owner identity, the fallback 3-dot path can recover through `watch:VIDEO_ID` instead of failing silently.
 - **Watch-Page Collaborator Recovery**: Collaboration rows with hidden rosters can upgrade through the watch-page collaborator sheet (`showSheetCommand -> sheetViewModel -> listItems`) instead of remaining stuck on one visible name.
+- **Watch-Rail / Lockup Collaboration Warm-Up**: Desktop watch-side `yt-lockup-view-model` cards can start from byline hints, request the real collaborator roster from Main World, and upgrade the menu to per-collaborator actions.
+- **Mix-As-Collab Guardrails**: Mix cards and generic names like `A & B` or `A and B` no longer become collaborations unless avatar stacks, roster dialogs/sheets, `and N more`, or multiple channel links confirm that interpretation.
 - **Post-Block Name Repair**: If a fallback menu add stores a weak title-like label for a valid UC ID, later enrichment can repair the entry to the fetched channel-page name.
 - **Filter All Sync Across Entry Points**: `Filter All` now creates and maintains the same channel-derived keyword state whether it is toggled from the dashboard or applied from the 3-dot menu block flow.
 
@@ -161,6 +176,7 @@ YouTube JSON Data → FilterTubeEngine.processData() → Filtered Data → YouTu
 - **Fallback Injection**: Uses script tag injection for MAIN world access
 - **MV3 Compatibility**: Works with Firefox's MV3 implementation
 - **CSP Handling**: Robust Content Security Policy compatibility
+- **Encrypted Export Fallback (v3.3.0)**: Manual encrypted export can bypass the downloads API path and use a direct attachment save path when Firefox is flaky with extension-driven downloads.
 
 ### **Unified Experience**
 - **Identical Functionality**: Same filtering capabilities across browsers
@@ -191,6 +207,7 @@ YouTube JSON Data → FilterTubeEngine.processData() → Filtered Data → YouTu
 ### **Configuration Options**
 - **Filter Keywords**: List of keywords to filter from video titles
 - **Filter Channels**: List of channels to block (supports @handles, IDs, names)
+- **Show Block Menu Item**: Toggle that hides FilterTube's injected 3-dot menu entry while leaving Quick Block available.
 - **Hide All Comments**: Toggle to remove all comment sections
 - **Hide All Shorts**: Toggle to remove all YouTube Shorts content
 - **Exact Word Matching**: Option for precise keyword matching
@@ -213,23 +230,25 @@ YouTube JSON Data → FilterTubeEngine.processData() → Filtered Data → YouTu
 - Badges match row tinting: green = From Channel, brown = From Comments, yellow = Collaboration rows.
 - If the active profile is PIN-protected and still locked, the popup header `Enabled / Disabled` control is read-only and cannot pause filtering until the profile is unlocked.
 
-#### Watch / fallback 3-dot behavior (v3.2.9 follow-up)
+#### Watch / fallback 3-dot behavior (v3.3.0 state)
 - Custom fallback 3-dot menus on weak watch-page rows now behave closer to quick-cross by allowing `watch:VIDEO_ID` recovery when row identity is incomplete.
 - In the fallback popover, `Filter All` is selection-only; the actual block action is activating the `Block • Channel` row.
 - The fallback block row now provides visible pressed/open/focus feedback so the click is acknowledged before the menu closes.
 
 ### **Tab View (Advanced Dashboard)**
 - **Channel Management**: Dedicated interface for managing blocked/allowed channels.
+- **Linked Channel Rows (v3.3.0)**: Channel names in Channel Management can open the underlying YouTube channel page using the best available identifier.
 - **Keyword Management**: Advanced keyword list editing.
 - **Stats Dashboard**: Detailed view of time saved and videos hidden.
 - **List Mode Controls (Experimental v3.2.3)**: Profile-specific whitelist/blocklist mode switching
 - **Subscribed Channels Import**: `Filters -> Channel Management` includes `Import Subscribed Channels`, which reuses an open signed-in YouTube tab, routes it to `/feed/channels`, waits for the FilterTube bridge, then imports subscribed channels into whitelist.
+- **Subscriptions Feed Exemption**: `/feed/channels` is treated as a management surface rather than a filter target, so blocked channels can still appear in `All subscriptions`.
 - **Inline Import Feedback**: The dashboard shows loading, page-wait, bridge-wait, importing, empty, success, and retryable error states inline rather than burying the flow in toasts.
 - **Mode-Aware Completion**: After an import, Tab View can either leave the imported whitelist stored but inactive, or immediately activate whitelist mode and merge the current blocklist into that whitelist.
 - **Shared Full-Row Layout Stabilization**: Main/Kids channel and keyword lists share a corrected row shell so long scrolling lists keep natural row height without overlap or metadata clipping.
 - **Locked Profile Switching**: Even while the active profile is locked, the top-bar profile selector remains available so the user can switch to another profile; denied/cancelled PIN prompts refresh the tab UI back to the real active profile state instead of leaving the selector/badge stale.
 
-### **Subscribed Channels Import (v3.2.9 follow-up)**
+### **Subscribed Channels Import (v3.3.0 state)**
 
 Detailed reference: `docs/SUBSCRIBED_CHANNELS_IMPORT.md`
 

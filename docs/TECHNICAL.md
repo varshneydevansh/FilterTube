@@ -1,8 +1,8 @@
-# Technical Documentation (v3.2.9 Filtering, Recovery & UI Shell Notes)
+# Technical Documentation (v3.3.0 Filtering, Recovery & UI Shell Notes)
 
 ## Overview
 
-FilterTube v3.2.9 builds on the earlier performance and whitelist-mode work with watch-page SPA recovery hardening, Mix/watch fallback-menu fixes, the newer extension shell/UI layer, and the new subscribed-channels whitelist import flow. This technical documentation covers the filtering logic, identity recovery behavior, mode switching, and user experience enhancements.
+FilterTube v3.3.0 builds on the earlier performance and whitelist-mode work with watch-page SPA recovery hardening, Mix/watch fallback-menu fixes, stronger collaboration roster recovery, cross-browser subscribed-channels import hardening, and smaller UX controls around backups and menu injection. This technical documentation covers the filtering logic, identity recovery behavior, mode switching, and user experience enhancements.
 
 ## Typography System (v3.2.6)
 
@@ -161,7 +161,7 @@ function matchesBlocklist(title, channel, settings) {
 }
 ```
 
-## Subscribed Channels Import Pipeline (v3.2.9 follow-up)
+## Subscribed Channels Import Pipeline (v3.3.0 state)
 
 This feature does not reuse the normal manual `addChannel()` path. It has a dedicated acquisition pipeline because it needs a live signed-in YouTube page context plus bulk merge semantics.
 
@@ -187,6 +187,8 @@ content/bridge_settings.js
 
 injector.js
   -> collect /feed/channels seed
+  -> keep recent browse-response history
+  -> prefer page-driven expansion when available
   -> fetch FEchannels browse pages
   -> normalize entries
 
@@ -222,10 +224,19 @@ sequenceDiagram
 The current importer is not purely API-first yet. It does:
 
 1. `/feed/channels` page seed lookup
-2. `FEchannels` browse requests
-3. dedupe/merge of normalized entries
+2. recent real-page browse-response harvesting
+3. `FEchannels` browse requests
+4. dedupe/merge of normalized entries
 
 That is why the UI's `pages read` counter is an importer metric, not a strict continuation-page count.
+
+### Cross-browser note
+
+The importer now leans more heavily on real page-driven `/feed/channels` growth because browser/session behavior is not identical:
+
+- Edge often materializes more rows through active page expansion.
+- Chrome may expose the same continuation chain later or less eagerly.
+- Synthetic continuation replay is still useful, but it is no longer treated as the only source of truth.
 
 ### Request profile behavior
 
@@ -239,6 +250,25 @@ The request can retry with the alternate profile when:
 - the first profile fails
 - the first profile times out
 - the first profile looks logged out and produced no rows
+
+### Why `/feed/channels` is exempt from normal hiding
+
+The subscriptions-management page itself is treated as a control surface rather than a normal feed:
+
+- blocked channels still remain visible there
+- whitelist building still works after import
+- users can inspect and audit their subscribed-channel roster even if those channels are hidden elsewhere
+
+## Menu Injection Controls (v3.3.0)
+
+FilterTube now has two separate direct-action controls:
+
+- `showQuickBlockButton`
+- `showBlockMenuItem`
+
+The first controls the hover quick-block affordance on cards. The second controls whether FilterTube injects its own entry inside YouTube's native 3-dot menu.
+
+This separation matters because some users want the fast hover action but do not want an extra menu item competing with YouTube's native actions.
 
 ### Stored result shape
 
@@ -284,7 +314,14 @@ Current implementation note:
 - the existing whitelist activation path merges current blocklist channels and keywords into whitelist and clears the blocklist
 - the subscriptions import modal documents this explicitly so the behavior is not surprising
 
-## Whitelist Mode Logic Improvements (v3.2.3 - Experimental)
+## Whitelist Mode Logic Improvements (v3.3.0 state)
+
+The original whitelist-mode architecture landed earlier, but the current `3.3.0` behavior includes several additional correctness fixes:
+
+- `/feed/channels` is exempt from normal whitelist hiding so the subscriptions-management surface stays usable
+- creator/channel pages can use page identity to avoid false hiding while still blocking unresolved feed cards elsewhere
+- YTM renderer coverage is broader, so more mobile cards now participate in whitelist identity extraction and DOM fallback
+- unresolved cards no longer fail open by default on normal feeds just because identity has not arrived yet
 
 ### Watch Page Protection Logic
 

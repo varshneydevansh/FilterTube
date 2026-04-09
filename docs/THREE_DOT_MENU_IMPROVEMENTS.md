@@ -1,8 +1,8 @@
-# 3-Dot Menu Improvements Documentation
+# 3-Dot Menu Improvements Documentation (v3.3.0)
 
 ## Overview
 
-FilterTube v3.2.1 introduced the main 3-dot menu improvement pass across YouTube Main and YouTube Kids. Later follow-up work in the v3.2.8 cycle extended that behavior on watch-page SPA rows, Mix-like playlist rows, and the custom fallback 3-dot popover so channel names and block actions stay reliable even when row identity is weak.
+FilterTube v3.2.1 introduced the main 3-dot menu improvement pass across YouTube Main and YouTube Kids. The current v3.3.0 state extends that behavior across watch-page SPA rows, YTM and YTD watch-like lockups, Mix-like playlist rows, and the custom fallback 3-dot popover so channel names and block actions stay reliable even when row identity starts weak.
 
 ## Problem Statement
 
@@ -12,7 +12,7 @@ Prior to v3.2.1, users experienced:
 3. **Metadata strings as names**: Watch right-pane showed strings like "Title • 1.2M views • 2 days ago"
 4. **Inconsistent behavior**: Different surfaces (Shorts, Mix, Watch) had varying levels of name resolution
 
-## March 18-19 Follow-Up Additions
+## v3.3.0 Follow-Up Additions
 
 The newer watch-page SPA and custom fallback work tightened a few behaviors that were not part of the original v3.2.1 pass:
 
@@ -21,6 +21,18 @@ The newer watch-page SPA and custom fallback work tightened a few behaviors that
 3. **Title-like names can be repaired**: If the fallback 3-dot path initially stores a weak title-like label for a UC ID, post-block enrichment can now replace it with the fetched channel-page name.
 4. **`Filter All` is selection, not action**: Inside the custom fallback popover, toggling `Filter All` no longer triggers the block immediately. Only the actual `Block • Channel` row is the action.
 5. **Pressed/open feedback exists on the fallback path**: The custom fallback launcher and row now have focus/open/pressed states so the UI acknowledges the click before the menu closes.
+6. **Active-menu collaboration refresh**: If the menu opens before the full collaborator roster is available, the active menu can now refresh in place when the authoritative roster arrives.
+7. **Desktop watch-right-rail collaboration warm-up**: `yt-lockup-view-model` watch cards can start from byline hints and upgrade into a full collaborator menu once Main World returns the roster.
+8. **False-positive collab guards**: Plain names like `Paura & Profitto` are no longer treated as collaborations just because the text contains `&` or `and`.
+9. **Optional menu injection**: Users can now disable FilterTube's injected 3-dot menu entry while keeping Quick Block available.
+
+## Current Surface Guarantees
+
+- **Watch right rail**: collaboration lockups can recover full collaborator rosters from watch-page dialog/sheet data and show all channels in the 3-dot UI.
+- **Watch playlist and Mix rows**: weak owner identity can still be upgraded from `watch:VIDEO_ID` recovery and roster enrichment.
+- **YTM watch-like rows**: mobile watch-list rows use the same collaborator warm-up path instead of waiting for a perfect initial DOM snapshot.
+- **Mix cards with collaboration seed videos**: when the underlying video is a real collaboration, the 3-dot menu can now recover the collaborators from watch/main-world data instead of stopping at the visible uploader.
+- **Single-channel names with separators**: plain names containing `&` or `and` do not become fake collaboration menus unless explicit collaborator evidence exists.
 
 ## Solution Architecture
 

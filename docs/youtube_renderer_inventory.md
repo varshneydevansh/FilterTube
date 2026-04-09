@@ -1,4 +1,4 @@
-# YouTube Renderer Inventory (v3.2.9 follow-up)
+# YouTube Renderer Inventory (v3.3.0 follow-up)
 
 This document tracks which YouTube renderers/selectors FilterTube currently targets and how the latest DOM samples map to them.
 

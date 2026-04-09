@@ -1,8 +1,8 @@
-# Architecture Documentation (v3.2.9)
+# Architecture Documentation (v3.3.0)
 
 ## Overview
 
-FilterTube v3.2.9 builds on the proactive channel identity system with performance optimizations, watch-page SPA recovery hardening, category filtering, a newer extension shell layer, and enhanced cross-browser support. This architecture documentation covers high-level design, filtering modes, recovery behavior, memory management, and cross-browser compatibility.
+FilterTube v3.3.0 builds on the proactive channel identity system with performance optimizations, watch-page SPA recovery hardening, stronger collaboration recovery, category filtering, a newer extension shell layer, and enhanced cross-browser support. This architecture documentation covers high-level design, filtering modes, recovery behavior, memory management, and cross-browser compatibility.
 
 ## Filtering Modes Architecture (v3.2.5)
 
@@ -86,7 +86,7 @@ const switchToWhitelist = async (profile, copyBlocklist = true) => {
 };
 ```
 
-## Subscribed Channels Import Architecture (v3.2.9 follow-up)
+## Subscribed Channels Import Architecture (v3.3.0 state)
 
 The subscriptions importer adds a second whitelist acquisition path alongside manual whitelist entry. It is intentionally an on-demand architecture, separate from passive feed filtering.
 

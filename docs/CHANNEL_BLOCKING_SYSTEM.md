@@ -1,4 +1,4 @@
-# Channel Blocking System (v3.2.3)
+# Channel Blocking System (v3.3.0)
 
 ## 0. Goal & Non-Goals
 
@@ -12,6 +12,7 @@ FilterTube must be able to:
 - Show only content from allowed channels in **Whitelist mode** (v3.2.5).
 - Work reliably across YouTube surfaces (Home, Search, Shorts, Watch, Kids), including SPA navigation and DOM recycling.
 - Provide accurate channel names in 3-dot menus, upgrading from UC IDs/handles to human-readable names.
+- Recover full collaborator rosters on watch-like surfaces when YouTube hides them behind a dialog/sheet instead of exposing them directly in the byline.
 - Support mode switching with list migration (blocklist ↔ whitelist).
 
 ### Non-goals (for this doc)
@@ -233,7 +234,7 @@ Two paths, both proactive:
 
 **1) XHR JSON (`filter_logic.js`)**:
 - `avatarStackViewModel.avatars[]` → extract UC/handle/customUrl/name
-- `showDialogCommand` → full collaborator list
+- `showDialogCommand` / `showSheetCommand` → full collaborator list
 - Broadcast via `FilterTube_CacheCollaboratorInfo`
 
 **2) DOM fallback (`content_bridge.js`)**:
@@ -243,9 +244,28 @@ Two paths, both proactive:
 
 Result: Multi-channel menus appear instantly on watch/home/search.
 
+### 4.5 Collaboration guardrails and menu refresh (v3.3.0)
+
+The current collaboration path intentionally avoids treating plain separator text as proof of multiple channels.
+
+Evidence now needs to come from one or more of:
+
+- avatar-stack metadata
+- `showDialogCommand` / `showSheetCommand` collaborator rosters
+- collapsed `and N more` style markup
+- multiple distinct channel links on the same card
+
+This prevents false positives such as single channel names containing `&` / `and`.
+
+On watch-like surfaces, the 3-dot menu can now also:
+
+- open with provisional single-channel context
+- request the authoritative roster from Main World
+- refresh the active menu in place once the collaborator list arrives
+
 ---
 
-## 5. Subscribed Channels -> Whitelist Import (v3.2.9 follow-up)
+## 5. Subscribed Channels -> Whitelist Import (v3.3.0 state)
 
 This feature gives whitelist mode a second acquisition path besides manual add/import files.
 

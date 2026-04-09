@@ -190,7 +190,7 @@ FilterTube/
 - Reads both hash (`#whatsnew`) and query parameters (`?view=whatsnew`) so banner deep-links auto-select the correct view.
 - Import/Export card calls into `io_manager.js` for all serialization logic.
 
-#### Tab view additions (v3.2.9 follow-up)
+#### Tab view additions (v3.3.0 follow-up)
 - `resolveSubscriptionsImportTab()` reuses a main YouTube tab, moves it to `/feed/channels`, and waits for the page + bridge to be ready.
 - `waitForYoutubeTabReady()` distinguishes page-loading, bridge-startup, sign-in, and receiver-unavailable states.
 - `renderSubscriptionsImportState()` and `syncSubscriptionsImportControls()` drive the inline import status shell and loading animation.

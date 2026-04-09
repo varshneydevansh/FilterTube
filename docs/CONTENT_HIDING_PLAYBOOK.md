@@ -1,4 +1,4 @@
-# Content Hiding + Channel Identity Playbook (v3.2.5 Whitelist Mode + Performance Optimizations)
+# Content Hiding + Channel Identity Playbook (v3.3.0 filtering, whitelist, and menu behavior)
 
 This document is an *operator playbook* for answering:
 
@@ -51,12 +51,20 @@ This document is an *operator playbook* for answering:
   - Persist a new blocked/allowed channel entry (via background)
   - Hide the clicked card instantly for UX feedback
   - **NEW v3.2.3**: Mode-aware action (Block vs Allow depending on list mode)
+  - **NEW v3.3.0**: optionally hide FilterTube's injected 3-dot entry entirely via a dedicated toggle
 - **Strengths**
   - Direct, explicit user action.
   - **IMPROVED v3.2.1**: Can use extra context (videoId, expected byline) to recover identity.
   - **NEW v3.2.3**: Supports both blocklist and **experimental whitelist** workflows.
 - **Limits**
   - If we don't have `videoId`, we lose the strongest fallbacks (ytInitialData lookup / shorts fetch).
+  - If the user disables the 3-dot menu item, Quick Block remains the primary direct-action affordance.
+
+### 1.4 `/feed/channels` management exemption (v3.3.0)
+
+- `/feed/channels` is treated as a management surface, not a normal filtered feed.
+- This prevents blocked channels from disappearing on the `All subscriptions` page.
+- The exemption exists so whitelist building and subscriptions management still work even after a large import or aggressive blocking session.
 
 ## Performance Characteristics by Browser
 
@@ -224,6 +232,15 @@ async function applyDOMFallback(settings, options = {}) {
 
 **Status**: Whitelist mode is significantly improved with known limitations.
 
+### 3.0 Current v3.3.0 whitelist fixes
+
+The older whitelist-mode documentation was focused on the original v3.2.3-v3.2.5 rollout. The current `3.3.0` state adds several important fixes on top of that:
+
+- **`/feed/channels` is exempt** so users can still inspect subscribed channels even when those channels are blocked elsewhere.
+- **Creator/channel pages are safer in whitelist mode**: unresolved cards no longer fail open generically, but actual creator-page context can still keep the correct content visible.
+- **YTM renderer coverage was restored/expanded** so whitelist filtering and identity extraction now apply to more mobile renderers instead of silently missing them.
+- **Search and watch-side unresolved states are stricter where needed**: unresolved cards no longer leak through simply because identity is late, except on explicitly trusted management/creator contexts.
+
 ### 3.1 Watch Page Protection Logic
 
 **Problem**: Whitelist mode was hiding critical watch page elements, breaking video playback.
@@ -240,6 +257,22 @@ if ((listMode !== 'whitelist') && (hideInfoMaster || settings.hideVideoButtonsBa
 ```
 
 **Impact**: Video actions, channel row, and description remain hidden in whitelist mode. Description hidden is a regression as of now.
+
+### 3.1.1 `/feed/channels` management exemption
+
+Whitelist mode now hard-skips `/feed/channels` visibility filtering:
+
+```javascript
+try {
+    const path = document.location?.pathname || '';
+    if (path === '/feed/channels') {
+        return false;
+    }
+} catch (e) {
+}
+```
+
+**Impact**: `All subscriptions` remains a usable audit/import surface even after the user switches to whitelist mode or bulk-imports subscriptions.
 
 ### 3.2 Search Page Indeterminate State Handling
 
@@ -258,6 +291,17 @@ if (path === '/results' && !hasChannelIdentity && !hasNameSignal && collaborator
 ```
 
 **Impact**: Prevents blank search pages and recursive loading during identity resolution.
+
+### 3.2.1 Creator channel-page whitelist handling
+
+Whitelist mode now distinguishes creator/channel pages from generic unresolved feed cards.
+
+Practical behavior:
+
+- on normal feeds, unresolved identity is blocked by default in whitelist mode
+- on an actual creator/channel page, the page's own channel identity can vouch for the content
+
+**Impact**: fewer whitelist leaks on mixed feeds, while creator pages still behave naturally for allowed channels.
 
 ### 3.3 Search Secondary Container Handling
 
@@ -602,4 +646,3 @@ This is the direction that makes `/@handle/about` failures mostly irrelevant:
 
 - **Unify handle parsing/normalization semantics**
   - Ensure identical unicode + percent-decoding behavior across `filter_logic.js`, `content_bridge.js`, and `injector.js`.
-

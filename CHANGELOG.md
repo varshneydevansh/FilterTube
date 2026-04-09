@@ -1,5 +1,36 @@
 # Changelog
 
+## Version 3.3.0
+
+### Collaboration + 3-Dot Menu Recovery
+
+- **YTM 3-dot/Quick Block rollout**: Mobile YouTube home, watch-next, playlist, radio, and Mix-like cards now participate in the same menu/quick-block identity flow instead of falling back to incomplete single-channel handling.
+- **Watch-page collaboration recovery**: Right-rail lockups, watch playlist rows, and watch-like menu surfaces can now recover the full collaborator roster from YouTube's dialog/sheet data instead of stopping at one visible uploader.
+- **Active menu refresh**: If the 3-dot menu opens before collaborator enrichment finishes, the menu can now refresh in place once the full collaborator roster arrives.
+- **Mix/watch recovery hardening**: Mix-like watch rows and fallback popovers now recover owner/collaborator context more consistently through watch-page data.
+- **False-positive collab guardrails**: Plain single-channel names containing `&` or `and` no longer become fake collaboration menus unless explicit collaborator evidence exists.
+- **Optional 3-dot menu item**: Added a new content-control toggle so users can hide FilterTube's injected 3-dot menu entry while keeping Quick Block enabled.
+
+### Quick Block + Surface Stability
+
+- **Quick Block visibility fixes**: Hover quick-block now stays above more desktop card overlays and no longer disappears behind complex YouTube surfaces.
+- **YTM mobile search safety**: Quick Block now suppresses itself while mobile search suggestions are open, so it does not interfere with typing/search dropdown interaction.
+- **Mobile watch-next anchoring**: Quick Block now positions more reliably on mobile watch-next cards instead of colliding with compact watch-side layouts.
+- **Watch/YTM renderer recovery**: Restored and expanded YTM renderer handling across DOM extraction and fallback filtering so more mobile cards resolve identity and hide correctly.
+
+### Whitelist + Subscriptions Import
+
+- **Cross-browser import hardening**: Subscribed-channel import now keeps recent real browse responses, prefers active page-driven `/feed/channels` growth, and handles Chrome/Edge differences more safely.
+- **`/feed/channels` exemption**: The All subscriptions page is treated as a management surface, so blocked channels remain visible there for audit/import purposes.
+- **Creator-page whitelist improvements**: Whitelist mode handles unresolved cards more safely on creator/channel pages while still respecting page identity.
+- **YTM whitelist correctness**: Additional mobile renderers are now evaluated consistently in whitelist mode, reducing cases where unresolved cards leaked through on YTD/YTM feeds.
+- **Navigation/filter polish**: The subscriptions guide section and the `Mixes` chip now respect the related hide controls more consistently.
+
+### Channel Management + Backups
+
+- **Channel Management links**: Channel rows can now open the live YouTube channel page using the best available identifier (`@handle`, UCID, or custom URL).
+- **Firefox encrypted export fix**: Manual encrypted export now uses a safer Firefox fallback path instead of relying only on the downloads API route.
+
 ## Version 3.2.9
 
 ### Subscribed Channels Import + Whitelist Flow

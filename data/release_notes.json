@@ -3,6 +3,22 @@
     "_comment": "Shared release notes source for the dashboard What's New tab and the YouTube release banner. Keep entries sorted newest-first by version."
   },
   {
+    "version": "3.3.0",
+    "headline": "Collaboration recovery + cross-browser import hardening",
+    "summary": "Watch/YTM collaboration menus recover full rosters more reliably, subscriptions import is stronger across browsers, and several surface-specific whitelist and Quick Block fixes are now bundled into 3.3.0.",
+    "bannerSummary": "Better collab menus, stronger whitelist import, safer Quick Block surfaces, direct channel links, and a new toggle for the 3-dot block item.",
+    "highlights": [
+      "Mobile YouTube home/watch-next/Mix-style cards now participate in the same 3-dot and collaborator recovery flow instead of falling back to incomplete single-channel menus.",
+      "Watch-page right rail, playlist rows, and watch-like lockups can now recover the full collaborator roster and refresh the active 3-dot menu in place.",
+      "Mix/watch recovery is safer: real collaboration cards upgrade properly, while plain names containing '&' or 'and' no longer become false collaboration menus.",
+      "Quick Block is more stable across complex surfaces: it stays above more desktop cards, avoids mobile search-suggestion dropdowns, and anchors better on mobile watch-next layouts.",
+      "Subscribed-channel whitelist import now keeps recent page browse responses, prefers real /feed/channels growth, and preserves /feed/channels as a visible management surface.",
+      "Whitelist filtering is stricter and safer across YouTube desktop/mobile renderers, including better creator-page handling and improved Mixes/subscriptions hide controls.",
+      "New controls and polish: Channel Management rows link to real channel pages, the 3-dot block item can be disabled, and encrypted Firefox export uses a safer fallback path."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.0"
+  },
+  {
     "version": "3.2.9",
     "headline": "Subscribed Channels Import + Whitelist + PIN protection bug fix",
     "summary": "Import the active YouTube account's subscriptions into whitelist with clearer mode-switch semantics and a more reliable /feed/channels startup flow.",

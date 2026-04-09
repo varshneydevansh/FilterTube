@@ -13,6 +13,7 @@ Key properties:
 - selected tab is moved to `/feed/channels`
 - import runs through the existing cross-world bridge instead of popup-only state
 - imported channels are normalized and merged into whitelist
+- `/feed/channels` itself is treated as a management surface and is not hidden by normal filtering rules
 - the user can either:
   - **Import Only**
   - **Import + Turn On Whitelist**
@@ -150,7 +151,7 @@ The current implementation uses a layered source strategy after the tab reaches 
 
 This gives FilterTube a fast first batch without waiting for continuation requests.
 
-### 2. Active `youtubei` browse requests
+### 2. Active `youtubei` browse requests and page-driven growth
 
 After the seed, `injector.js` continues through `POST /youtubei/v1/browse?prettyPrint=false` with `browseId: FEchannels`.
 
@@ -165,6 +166,16 @@ Host preference today:
 - `m.youtube.com` prefers `mweb_fechannels` first
 
 The importer can retry the alternate profile if the first one fails or looks logged out.
+
+### 3. Recent browse-response history
+
+The importer now keeps a short history of real page-issued browse responses instead of only the last snapshot. This matters because some browsers and YouTube experiments delay continuation growth until the `/feed/channels` tab is active and the page itself decides to expand.
+
+Operationally, the importer now prefers:
+
+1. initial seed
+2. real page-driven expansion captured from the active tab
+3. synthetic continuation replay only as a follow-up attempt
 
 ## Normalized Channel Shape
 
@@ -233,6 +244,7 @@ Important note:
 
 - `pages read` is currently an importer statistic, not a strict "API continuation pages only" count
 - if page seed contributes entries first, it can count as the first page in the displayed total
+- page-driven seed expansion may contribute more rows without a later successful synthetic continuation replay
 
 ## Failure Modes
 
@@ -245,6 +257,12 @@ Common failure codes:
 - `profile_changed`
 - `timeout`
 - `persist_failed`
+
+Known cross-browser reality:
+
+- Edge currently tends to materialize more `/feed/channels` rows through active page expansion.
+- Chrome can lag behind if the live MWEB page does not expand within the import window, even when synthetic continuations exist.
+- Because of that, exact imported totals can still vary by browser/session, but the importer now reflects the real page state more accurately than the earlier continuation-only path.
 
 Operational note:
 
