@@ -2382,6 +2382,7 @@ window.initializeKidsTabs = initializeKidsTabs;
 // ============================================================================
 
 const runtimeAPI = (typeof browser !== 'undefined' && browser.runtime) ? browser : (typeof chrome !== 'undefined' ? chrome : null);
+const IS_FIREFOX_TAB_VIEW = typeof browser !== 'undefined' && !!browser.runtime;
 const manifestVersion = runtimeAPI?.runtime?.getManifest()?.version || '';
 
 /**
@@ -5146,14 +5147,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    function downloadJsonToDownloadsFolder(folder, filename, obj) {
+    function downloadJsonToDownloadsFolder(folder, filename, obj, options = {}) {
         return new Promise((resolve, reject) => {
             try {
                 const json = JSON.stringify(obj, null, 2);
                 const blob = new Blob([json], { type: 'application/json' });
+                const preferAnchor = options && options.preferAnchor === true;
 
-                // If downloads API unavailable, use anchor fallback immediately
-                if (!runtimeAPI?.downloads?.download) {
+                // Firefox has been flaky here for encrypted exports; bypass the downloads API
+                // when explicitly requested and let the browser handle a direct attachment save.
+                if (preferAnchor || !runtimeAPI?.downloads?.download) {
                     downloadViaAnchor(blob, filename).then(resolve);
                     return;
                 }
@@ -5301,7 +5304,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ? `filtertube_export_${label}_${stamp}_encrypted.json`
                 : `filtertube_export_v3_${stamp}_encrypted.json`;
 
-            await downloadJsonToDownloadsFolder('FilterTube Export', filename, payload);
+            await downloadJsonToDownloadsFolder('FilterTube Export', filename, payload, {
+                preferAnchor: IS_FIREFOX_TAB_VIEW
+            });
             UIComponents.showToast('Exported encrypted JSON to Downloads/FilterTube Export/', 'success');
         } catch (e) {
             UIComponents.showToast('Encrypted export failed', 'error');
