@@ -592,6 +592,7 @@ function handleStorageChanges(changes, area) {
         'hideMoreFromYouTube',
         'hideSubscriptions',
         'showQuickBlockButton',
+        'showBlockMenuItem',
         'hideSearchShelves'
     ];
     if (Object.keys(changes).some(key => relevantKeys.includes(key))) {

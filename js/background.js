@@ -2285,6 +2285,7 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
             compiledSettings.hideMoreFromYouTube = boolFromV4('hideMoreFromYouTube', items.hideMoreFromYouTube || false);
             compiledSettings.hideSubscriptions = boolFromV4('hideSubscriptions', items.hideSubscriptions || false);
             compiledSettings.showQuickBlockButton = boolFromV4('showQuickBlockButton', items.showQuickBlockButton !== false);
+            compiledSettings.showBlockMenuItem = boolFromV4('showBlockMenuItem', items.showBlockMenuItem !== false);
             compiledSettings.hideSearchShelves = boolFromV4('hideSearchShelves', items.hideSearchShelves || false);
 
             const profileSettings = activeProfile?.settings || {};
@@ -2363,6 +2364,7 @@ browserAPI.runtime.onInstalled.addListener(function (details) {
             filterComments: false,
             hideAllShorts: false,
             showQuickBlockButton: true,
+            showBlockMenuItem: true,
             firstRunRefreshNeeded: true,
             releaseNotesSeenVersion: CURRENT_VERSION,
             releaseNotesPayload: null

@@ -47,6 +47,7 @@
         'hideMoreFromYouTube',
         'hideSubscriptions',
         'showQuickBlockButton',
+        'showBlockMenuItem',
         'hideSearchShelves',
         'stats',
         'statsBySurface',
@@ -123,6 +124,7 @@
                         hideMoreFromYouTube: !!storage?.hideMoreFromYouTube,
                         hideSubscriptions: !!storage?.hideSubscriptions,
                         showQuickBlockButton: storage?.showQuickBlockButton !== false,
+                        showBlockMenuItem: storage?.showBlockMenuItem !== false,
                         hideSearchShelves: !!storage?.hideSearchShelves
                     },
                     main: {
@@ -457,6 +459,7 @@
         hideMoreFromYouTube,
         hideSubscriptions,
         showQuickBlockButton,
+        showBlockMenuItem,
         hideSearchShelves,
         contentFilters,
         categoryFilters
@@ -498,6 +501,7 @@
             hideMoreFromYouTube: !!hideMoreFromYouTube,
             hideSubscriptions: !!hideSubscriptions,
             showQuickBlockButton: showQuickBlockButton !== false,
+            showBlockMenuItem: showBlockMenuItem !== false,
             hideSearchShelves: !!hideSearchShelves,
             contentFilters: sanitizedContentFilters,
             categoryFilters: sanitizedCategoryFilters
@@ -584,6 +588,7 @@
                     hideMoreFromYouTube: readBool('hideMoreFromYouTube', !!result.hideMoreFromYouTube),
                     hideSubscriptions: readBool('hideSubscriptions', !!result.hideSubscriptions),
                     showQuickBlockButton: readBool('showQuickBlockButton', result.showQuickBlockButton !== false),
+                    showBlockMenuItem: readBool('showBlockMenuItem', result.showBlockMenuItem !== false),
                     hideSearchShelves: readBool('hideSearchShelves', !!result.hideSearchShelves)
                 };
 
@@ -667,6 +672,7 @@
                     hideMoreFromYouTube: effectiveSettings.hideMoreFromYouTube,
                     hideSubscriptions: effectiveSettings.hideSubscriptions,
                     showQuickBlockButton: effectiveSettings.showQuickBlockButton,
+                    showBlockMenuItem: effectiveSettings.showBlockMenuItem,
                     hideSearchShelves: effectiveSettings.hideSearchShelves,
                     stats: result.stats || { hiddenCount: 0, savedMinutes: 0 },
                     statsBySurface: safeObject(result.statsBySurface),
@@ -716,6 +722,7 @@
             hideMoreFromYouTube,
             hideSubscriptions,
             showQuickBlockButton,
+            showBlockMenuItem,
             hideSearchShelves,
             autoBackupEnabled,
             contentFilters,
@@ -776,6 +783,7 @@
                             hideMoreFromYouTube,
                             hideSubscriptions,
                             showQuickBlockButton,
+                            showBlockMenuItem,
                             hideSearchShelves,
                             contentFilters: sanitizedContentFilters,
                             categoryFilters: effectiveCategoryFilters
@@ -815,6 +823,7 @@
                             hideMoreFromYouTube: compiledSettings.hideMoreFromYouTube,
                             hideSubscriptions: compiledSettings.hideSubscriptions,
                             showQuickBlockButton: compiledSettings.showQuickBlockButton,
+                            showBlockMenuItem: compiledSettings.showBlockMenuItem,
                             hideSearchShelves: compiledSettings.hideSearchShelves,
                             [AUTO_BACKUP_KEY]: autoBackupEnabled === true
                         };
@@ -851,6 +860,7 @@
                             hideMoreFromYouTube: compiledSettings.hideMoreFromYouTube,
                             hideSubscriptions: compiledSettings.hideSubscriptions,
                             showQuickBlockButton: compiledSettings.showQuickBlockButton,
+                            showBlockMenuItem: compiledSettings.showBlockMenuItem,
                             hideSearchShelves: compiledSettings.hideSearchShelves,
                             contentFilters: sanitizedContentFilters,
                             categoryFilters: effectiveCategoryFilters
@@ -922,6 +932,7 @@
                         hideMoreFromYouTube,
                         hideSubscriptions,
                         showQuickBlockButton,
+                        showBlockMenuItem,
                         hideSearchShelves,
                         contentFilters: sanitizedContentFilters,
                         categoryFilters: safeObject(categoryFilters)
@@ -961,6 +972,7 @@
                         hideMoreFromYouTube: compiledSettings.hideMoreFromYouTube,
                         hideSubscriptions: compiledSettings.hideSubscriptions,
                         showQuickBlockButton: compiledSettings.showQuickBlockButton,
+                        showBlockMenuItem: compiledSettings.showBlockMenuItem,
                         hideSearchShelves: compiledSettings.hideSearchShelves,
                         [AUTO_BACKUP_KEY]: autoBackupEnabled === true
                     };
@@ -997,6 +1009,7 @@
                             hideMoreFromYouTube: compiledSettings.hideMoreFromYouTube,
                             hideSubscriptions: compiledSettings.hideSubscriptions,
                             showQuickBlockButton: compiledSettings.showQuickBlockButton,
+                            showBlockMenuItem: compiledSettings.showBlockMenuItem,
                             hideSearchShelves: compiledSettings.hideSearchShelves,
                             [FT_PROFILES_V3_KEY]: existing?.[FT_PROFILES_V3_KEY]
                         };
@@ -1041,6 +1054,7 @@
                         hideMoreFromYouTube,
                         hideSubscriptions,
                         showQuickBlockButton,
+                        showBlockMenuItem,
                         hideSearchShelves,
                         contentFilters: sanitizedContentFilters,
                         categoryFilters: safeObject(categoryFilters)

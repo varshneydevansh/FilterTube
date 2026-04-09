@@ -56,8 +56,13 @@
                 },
                 {
                     key: 'showQuickBlockButton',
-                    title: 'Show Quick Block button',
+                    title: 'Quick Block button',
                     description: 'Show a hover button on cards for one-tap blocking of all channels on that card'
+                },
+                {
+                    key: 'showBlockMenuItem',
+                    title: '3 Dot Block menu item',
+                    description: 'Show FilterTube’s Block/Filter All entry in YouTube’s 3-dot menus'
                 }
             ]
         },

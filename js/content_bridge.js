@@ -8645,6 +8645,11 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
 
     try {
         if (currentSettings?.listMode === 'whitelist') return;
+        if (currentSettings?.showBlockMenuItem === false) {
+            clearFilterTubeMenuItems(dropdown);
+            clearMultiStepStateForDropdown(dropdown);
+            return;
+        }
     } catch (e) {
         return;
     }

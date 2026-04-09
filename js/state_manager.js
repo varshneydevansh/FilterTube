@@ -85,6 +85,7 @@ const StateManager = (() => {
         hideMoreFromYouTube: false,
         hideSubscriptions: false,
         showQuickBlockButton: true,
+        showBlockMenuItem: true,
         hideSearchShelves: false,
         stats: { hiddenCount: 0, savedMinutes: 0 },
         statsBySurface: {},
@@ -237,6 +238,7 @@ const StateManager = (() => {
         state.hideMoreFromYouTube = data.hideMoreFromYouTube || false;
         state.hideSubscriptions = data.hideSubscriptions || false;
         state.showQuickBlockButton = data.showQuickBlockButton !== false;
+        state.showBlockMenuItem = data.showBlockMenuItem !== false;
         state.hideSearchShelves = data.hideSearchShelves || false;
         state.stats = data.stats || { hiddenCount: 0, savedMinutes: 0 };
         state.statsBySurface = (data.statsBySurface && typeof data.statsBySurface === 'object' && !Array.isArray(data.statsBySurface))
@@ -1048,6 +1050,7 @@ const StateManager = (() => {
                 hideMoreFromYouTube: state.hideMoreFromYouTube,
                 hideSubscriptions: state.hideSubscriptions,
                 showQuickBlockButton: state.showQuickBlockButton,
+                showBlockMenuItem: state.showBlockMenuItem,
                 hideSearchShelves: state.hideSearchShelves,
                 contentFilters: state.contentFilters,
                 categoryFilters: state.categoryFilters
@@ -2031,6 +2034,7 @@ const StateManager = (() => {
             'hideMoreFromYouTube',
             'hideSubscriptions',
             'showQuickBlockButton',
+            'showBlockMenuItem',
             'hideSearchShelves'
         ];
 
@@ -2387,6 +2391,7 @@ const StateManager = (() => {
                     'hideMoreFromYouTube',
                     'hideSubscriptions',
                     'showQuickBlockButton',
+                    'showBlockMenuItem',
                     'hideSearchShelves',
                     'stats',
                     'channelMap',
