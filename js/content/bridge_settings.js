@@ -21,8 +21,14 @@ if (typeof window.subscriptionImportRequestId !== 'number' || !isFinite(window.s
 if (typeof window.__filtertubeMainWorldImportBridgeReady !== 'boolean') {
     window.__filtertubeMainWorldImportBridgeReady = false;
 }
+if (typeof window.__filtertubeMainWorldSubscriptionsImportReady !== 'boolean') {
+    window.__filtertubeMainWorldSubscriptionsImportReady = false;
+}
 if (!(window.__filtertubeMainWorldBridgeWaiters instanceof Set)) {
     window.__filtertubeMainWorldBridgeWaiters = new Set();
+}
+if (!(window.__filtertubeMainWorldImportCapabilityWaiters instanceof Set)) {
+    window.__filtertubeMainWorldImportCapabilityWaiters = new Set();
 }
 
 function markMainWorldImportBridgeReady() {
@@ -37,6 +43,18 @@ function markMainWorldImportBridgeReady() {
     window.__filtertubeMainWorldBridgeWaiters.clear();
 }
 
+function markMainWorldSubscriptionsImportReady() {
+    window.__filtertubeMainWorldSubscriptionsImportReady = true;
+    if (!(window.__filtertubeMainWorldImportCapabilityWaiters instanceof Set)) return;
+    window.__filtertubeMainWorldImportCapabilityWaiters.forEach((resolve) => {
+        try {
+            resolve(true);
+        } catch (e) {
+        }
+    });
+    window.__filtertubeMainWorldImportCapabilityWaiters.clear();
+}
+
 function waitForMainWorldImportBridgeReady(timeoutMs = 4000) {
     if (window.__filtertubeMainWorldImportBridgeReady === true) {
         return Promise.resolve(true);
@@ -46,6 +64,29 @@ function waitForMainWorldImportBridgeReady(timeoutMs = 4000) {
         const waiters = window.__filtertubeMainWorldBridgeWaiters instanceof Set
             ? window.__filtertubeMainWorldBridgeWaiters
             : (window.__filtertubeMainWorldBridgeWaiters = new Set());
+
+        let settled = false;
+        const finish = (value) => {
+            if (settled) return;
+            settled = true;
+            waiters.delete(finish);
+            resolve(value === true);
+        };
+
+        waiters.add(finish);
+        setTimeout(() => finish(false), Math.max(250, timeoutMs));
+    });
+}
+
+function waitForMainWorldSubscriptionsImportReady(timeoutMs = 4000) {
+    if (window.__filtertubeMainWorldSubscriptionsImportReady === true) {
+        return Promise.resolve(true);
+    }
+
+    return new Promise((resolve) => {
+        const waiters = window.__filtertubeMainWorldImportCapabilityWaiters instanceof Set
+            ? window.__filtertubeMainWorldImportCapabilityWaiters
+            : (window.__filtertubeMainWorldImportCapabilityWaiters = new Set());
 
         let settled = false;
         const finish = (value) => {
@@ -115,6 +156,10 @@ if (!window.__filtertubeSubscriptionImportMessageListenerAttached) {
             markMainWorldImportBridgeReady();
             return;
         }
+        if (type === 'FilterTube_SubscriptionsImportBridgeReady') {
+            markMainWorldSubscriptionsImportReady();
+            return;
+        }
 
         if (type === 'FilterTube_SubscriptionsImportProgress') {
             const { requestId } = payload || {};
@@ -161,12 +206,14 @@ if (window.__filtertubeRuntimeBridgeListenerAttached !== true) {
                     if (request?.feature === 'subscriptions_import' && typeof injectMainWorldScripts === 'function') {
                         await injectMainWorldScripts();
                         await waitForMainWorldImportBridgeReady(4000);
+                        await waitForMainWorldSubscriptionsImportReady(4000);
                     }
                 } catch (e) {
                 }
 
                 sendResponse?.({
-                    ok: window.__filtertubeMainWorldImportBridgeReady === true,
+                    ok: window.__filtertubeMainWorldImportBridgeReady === true
+                        && window.__filtertubeMainWorldSubscriptionsImportReady === true,
                     pathname: String(location?.pathname || ''),
                     href: String(location?.href || ''),
                     readyState: String(document?.readyState || '')
@@ -193,9 +240,10 @@ if (window.__filtertubeRuntimeBridgeListenerAttached !== true) {
                 }
 
                 const bridgeReady = await waitForMainWorldImportBridgeReady(4000);
+                const subscriptionsImportReady = await waitForMainWorldSubscriptionsImportReady(4000);
 
                 const importer = globalThis.FilterTubeRequestSubscribedChannelsFromMainWorld;
-                if (typeof importer !== 'function' || injectionFailed || !bridgeReady) {
+                if (typeof importer !== 'function' || injectionFailed || !bridgeReady || !subscriptionsImportReady) {
                     sendResponse?.({
                         success: false,
                         error: 'subscriptions_import_unavailable',

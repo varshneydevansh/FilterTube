@@ -3068,15 +3068,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function buildYoutubeChannelsFeedUrl(url) {
-        try {
-            const parsed = new URL(url);
-            const host = (parsed.hostname || '').toLowerCase();
-            if (host === 'm.youtube.com') {
-                return 'https://m.youtube.com/feed/channels';
-            }
-        } catch (e) {
-        }
-        return 'https://www.youtube.com/feed/channels';
+        return 'https://m.youtube.com/feed/channels';
     }
 
     function renderSubscriptionsImportState() {
@@ -3169,10 +3161,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         const preferred = Number.isFinite(preferredTabId)
             ? candidates.find((tab) => tab?.id === preferredTabId)
             : null;
+        const isMobileYoutubeTab = (tab) => {
+            try {
+                return String(new URL(tab?.url || '').hostname || '').toLowerCase() === 'm.youtube.com';
+            } catch (e) {
+                return false;
+            }
+        };
 
+        pushTab(candidates.find((tab) => isMobileYoutubeTab(tab) && tab?.active === true && tab?.status === 'complete'));
+        pushTab(preferred?.status === 'complete' && isMobileYoutubeTab(preferred) ? preferred : null);
+        candidates.filter((tab) => isMobileYoutubeTab(tab) && tab?.status === 'complete').forEach(pushTab);
         pushTab(candidates.find((tab) => tab?.active === true && tab?.status === 'complete'));
         pushTab(preferred?.status === 'complete' ? preferred : null);
         candidates.filter((tab) => tab?.status === 'complete').forEach(pushTab);
+        pushTab(candidates.find((tab) => isMobileYoutubeTab(tab) && tab?.active === true));
+        pushTab(isMobileYoutubeTab(preferred) ? preferred : null);
+        candidates.filter(isMobileYoutubeTab).forEach(pushTab);
         pushTab(candidates.find((tab) => tab?.active === true));
         pushTab(preferred);
         candidates.forEach(pushTab);
@@ -3867,6 +3872,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const pagesFetched = Number(progress?.pagesFetched) || 0;
         const foundCount = Number(progress?.foundCount) || 0;
+        const expectedTotal = Number(progress?.expectedTotal) || 0;
         const hasContinuation = progress?.hasContinuation === true;
         const phase = normalizeString(progress?.phase) || 'page';
         const metaParts = [];
@@ -3874,7 +3880,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (pagesFetched > 0) {
             metaParts.push(`${pagesFetched} ${pluralize(pagesFetched, 'page')} checked`);
         }
-        if (foundCount > 0) {
+        if (expectedTotal > 0) {
+            metaParts.push(`${Math.min(foundCount, expectedTotal)} / ${expectedTotal} found`);
+        } else if (foundCount > 0) {
             metaParts.push(`${foundCount} ${pluralize(foundCount, 'channel')} found`);
         }
         if (hasContinuation) {
@@ -3941,7 +3949,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateSubscriptionsImportWaitState('opening_fallback');
 
         const createdTab = await createBrowserTab({
-            url: 'https://www.youtube.com/feed/channels',
+            url: 'https://m.youtube.com/feed/channels',
             active: false
         });
 
@@ -4098,12 +4106,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         const skippedCount = Number(counts.skipped) || 0;
         const totalApplied = importedCount + updatedCount;
         const pagesFetched = Number(result?.stats?.pagesFetched) || 0;
+        const expectedTotal = Number(result?.stats?.expectedTotal) || 0;
         const metaParts = [];
 
         if (importedCount > 0) metaParts.push(`${importedCount} new`);
         if (updatedCount > 0) metaParts.push(`${updatedCount} repaired`);
         if (duplicateCount > 0) metaParts.push(`${duplicateCount} already present`);
         if (skippedCount > 0) metaParts.push(`${skippedCount} skipped`);
+        if (expectedTotal > 0) metaParts.push(`${Math.min(totalApplied, expectedTotal)} / ${expectedTotal} found`);
         if (pagesFetched > 0) metaParts.push(`${pagesFetched} ${pluralize(pagesFetched, 'page')} read`);
         if (result?.stats?.partial) metaParts.push('import stopped early');
 

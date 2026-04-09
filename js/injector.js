@@ -3,6 +3,80 @@
 (function () {
     'use strict';
 
+    const SUBSCRIPTIONS_IMPORT_BRIDGE_VERSION = '2026-04-09-1';
+
+    function announceSubscriptionsImportBridgeReady() {
+        try {
+            window.filterTubeSubscriptionsImportBridgeReady = true;
+            window.filterTubeSubscriptionsImportBridgeVersion = SUBSCRIPTIONS_IMPORT_BRIDGE_VERSION;
+            window.postMessage({
+                type: 'FilterTube_SubscriptionsImportBridgeReady',
+                payload: {
+                    version: SUBSCRIPTIONS_IMPORT_BRIDGE_VERSION
+                },
+                source: 'injector'
+            }, '*');
+        } catch (e) {
+        }
+    }
+
+    function handleSubscriptionsImportBridgeMessage(event) {
+        if (event.source !== window || !event.data) return;
+
+        const { type, payload, source } = event.data;
+        if (source === 'injector') return;
+        if (type !== 'FilterTube_RequestSubscriptionImport' || source !== 'content_bridge') return;
+
+        const { requestId } = payload || {};
+        postLog('log', `Received subscriptions import request: ${requestId || 'n/a'}`);
+
+        (async () => {
+            let responsePayload = null;
+            try {
+                responsePayload = await fetchSubscribedChannelsFromYoutubei(requestId, payload || {});
+            } catch (error) {
+                responsePayload = {
+                    success: false,
+                    error: error?.message || 'Subscription import failed',
+                    errorCode: 'fetch_failed',
+                    channels: [],
+                    stats: {
+                        pagesFetched: 0,
+                        totalFound: 0,
+                        expectedTotal: 0,
+                        source: 'mweb_fechannels'
+                    }
+                };
+                postLog('error', `Subscriptions import failed: ${responsePayload.error}`);
+            }
+
+            window.postMessage({
+                type: 'FilterTube_SubscriptionsImportResponse',
+                payload: {
+                    requestId,
+                    ...responsePayload
+                },
+                source: 'injector'
+            }, '*');
+
+            postLog('log', 'Sent subscriptions import response:', {
+                requestId,
+                success: !!responsePayload?.success,
+                count: Array.isArray(responsePayload?.channels) ? responsePayload.channels.length : 0
+            });
+        })();
+    }
+
+    function installSubscriptionsImportBridge() {
+        if (window.__filtertubeSubscriptionsImportListenerInstalled !== true) {
+            window.addEventListener('message', handleSubscriptionsImportBridgeMessage);
+            window.__filtertubeSubscriptionsImportListenerInstalled = true;
+        }
+        announceSubscriptionsImportBridgeReady();
+    }
+
+    installSubscriptionsImportBridge();
+
     // Idempotency guard - prevent multiple executions
     if (window.filterTubeInjectorHasRun) {
         try {
@@ -352,6 +426,7 @@
     function collectSubscriptionImportArtifacts(root) {
         const renderers = [];
         const tokens = [];
+        let expectedTotal = 0;
         const visited = new Set();
 
         const visit = (node) => {
@@ -371,6 +446,20 @@
             if (typeof token === 'string' && token.trim()) {
                 tokens.push(token.trim());
             }
+            [
+                node?.reloadContinuationData?.continuation,
+                node?.nextContinuationData?.continuation,
+                node?.timedContinuationData?.continuation
+            ].forEach((candidateToken) => {
+                if (typeof candidateToken === 'string' && candidateToken.trim()) {
+                    tokens.push(candidateToken.trim());
+                }
+            });
+
+            const collapsedItemCount = Number(node?.collapsedItemCount);
+            if (Number.isFinite(collapsedItemCount) && collapsedItemCount > expectedTotal) {
+                expectedTotal = collapsedItemCount;
+            }
 
             if (Array.isArray(node)) {
                 for (let i = 0; i < node.length; i += 1) {
@@ -388,7 +477,8 @@
 
         return {
             renderers,
-            tokens: Array.from(new Set(tokens))
+            tokens: Array.from(new Set(tokens)),
+            expectedTotal: expectedTotal > 0 ? expectedTotal : 0
         };
     }
 
@@ -423,9 +513,10 @@
 
         const collected = new Map();
         const tokens = new Set();
+        let expectedTotal = 0;
 
         for (const source of possibleSources) {
-            const { renderers, tokens: candidateTokens } = collectSubscriptionImportArtifacts(source);
+            const { renderers, tokens: candidateTokens, expectedTotal: candidateExpectedTotal } = collectSubscriptionImportArtifacts(source);
             for (let i = 0; i < renderers.length; i += 1) {
                 const normalized = normalizeSubscriptionImportEntry(renderers[i]);
                 if (!normalized) continue;
@@ -441,6 +532,9 @@
             candidateTokens.forEach((token) => {
                 if (token) tokens.add(token);
             });
+            if (candidateExpectedTotal > expectedTotal) {
+                expectedTotal = candidateExpectedTotal;
+            }
 
             if (collected.size >= maxChannels) {
                 break;
@@ -449,7 +543,8 @@
 
         return {
             channels: Array.from(collected.values()).slice(0, maxChannels),
-            tokens: Array.from(tokens)
+            tokens: Array.from(tokens),
+            expectedTotal: expectedTotal > 0 ? expectedTotal : 0
         };
     }
 
@@ -471,9 +566,10 @@
 
         const collected = new Map();
         const tokens = new Set();
+        let expectedTotal = 0;
 
         for (let i = 0; i < seedCandidates.length; i += 1) {
-            const { renderers, tokens: candidateTokens } = collectSubscriptionImportArtifacts(seedCandidates[i]);
+            const { renderers, tokens: candidateTokens, expectedTotal: candidateExpectedTotal } = collectSubscriptionImportArtifacts(seedCandidates[i]);
             for (let j = 0; j < renderers.length; j += 1) {
                 const normalized = normalizeSubscriptionImportEntry(renderers[j]);
                 if (!normalized) continue;
@@ -488,6 +584,9 @@
             candidateTokens.forEach((token) => {
                 if (token) tokens.add(token);
             });
+            if (candidateExpectedTotal > expectedTotal) {
+                expectedTotal = candidateExpectedTotal;
+            }
             if (collected.size >= maxChannels) {
                 break;
             }
@@ -508,11 +607,15 @@
             domSeed.tokens.forEach((token) => {
                 if (token) tokens.add(token);
             });
+            if ((domSeed.expectedTotal || 0) > expectedTotal) {
+                expectedTotal = domSeed.expectedTotal || 0;
+            }
         }
 
         return {
             channels: Array.from(collected.values()).slice(0, maxChannels),
-            tokens: Array.from(tokens)
+            tokens: Array.from(tokens),
+            expectedTotal: expectedTotal > 0 ? expectedTotal : 0
         };
     }
 
@@ -544,7 +647,10 @@
     function normalizeSubscriptionImportEntry(renderer) {
         if (!renderer || typeof renderer !== 'object') return null;
 
-        const endpoint = renderer.navigationEndpoint || {};
+        const endpoint = renderer.navigationEndpoint
+            || renderer?.title?.runs?.[0]?.navigationEndpoint
+            || renderer?.thumbnailRenderer?.showCustomThumbnailRenderer?.rendererContext?.commandContext?.onTap?.innertubeCommand
+            || {};
         const browseEndpoint = endpoint.browseEndpoint || {};
         const webMetadata = endpoint?.commandMetadata?.webCommandMetadata || {};
         const canonicalBaseUrl = String(
@@ -638,6 +744,7 @@
         const collected = new Map();
         const seenTokens = new Set();
         const seed = await waitForSubscriptionImportSeed(maxChannels, Math.min(timeoutMs, 5000));
+        let expectedTotal = Math.max(0, Number(seed?.expectedTotal) || 0);
         let continuation = '';
         let pagesFetched = 0;
         let lastLoggedOut = false;
@@ -690,7 +797,8 @@
             postProgress('page_seed', {
                 pageRows: seed.channels.length,
                 hasContinuation: !!continuation,
-                source: activeSource
+                source: activeSource,
+                expectedTotal
             });
         }
 
@@ -811,7 +919,10 @@
                 throw new Error('Failed to parse subscriptions response');
             }
 
-            const { renderers, tokens } = collectSubscriptionImportArtifacts(data);
+            const { renderers, tokens, expectedTotal: responseExpectedTotal } = collectSubscriptionImportArtifacts(data);
+            if (responseExpectedTotal > expectedTotal) {
+                expectedTotal = responseExpectedTotal;
+            }
             const responseLoggedOut = detectLoggedOutBrowseResponse(data);
             const shouldRetryLoggedOutProfile = responseLoggedOut
                 && collected.size === 0
@@ -855,7 +966,8 @@
             postProgress('page', {
                 pageRows: renderers.length,
                 hasContinuation: !!nextToken,
-                source: activeSource
+                source: activeSource,
+                expectedTotal
             });
 
             if (collected.size >= maxChannels) {
@@ -871,6 +983,9 @@
         }
 
         const channels = Array.from(collected.values()).slice(0, maxChannels);
+        if (!partialReason && expectedTotal > 0 && channels.length < expectedTotal && channels.length < maxChannels) {
+            partialReason = `Imported ${channels.length} of ${expectedTotal} subscribed channels`;
+        }
         if (channels.length === 0 && lastLoggedOut) {
             return {
                 success: false,
@@ -880,6 +995,7 @@
                 stats: {
                     pagesFetched,
                     totalFound: 0,
+                    expectedTotal,
                     source: 'mweb_fechannels'
                 }
             };
@@ -891,6 +1007,7 @@
             stats: {
                 pagesFetched,
                 totalFound: channels.length,
+                expectedTotal,
                 truncated: collected.size > maxChannels,
                 partial: !!partialReason,
                 partialReason: partialReason || null,
@@ -1194,45 +1311,6 @@
             }
         }
 
-        if (type === 'FilterTube_RequestSubscriptionImport' && source === 'content_bridge') {
-            const { requestId } = payload || {};
-            postLog('log', `Received subscriptions import request: ${requestId || 'n/a'}`);
-
-            (async () => {
-                let responsePayload = null;
-                try {
-                    responsePayload = await fetchSubscribedChannelsFromYoutubei(requestId, payload || {});
-                } catch (error) {
-                    responsePayload = {
-                        success: false,
-                        error: error?.message || 'Subscription import failed',
-                        errorCode: 'fetch_failed',
-                        channels: [],
-                        stats: {
-                            pagesFetched: 0,
-                            totalFound: 0,
-                            source: 'mweb_fechannels'
-                        }
-                    };
-                    postLog('error', `Subscriptions import failed: ${responsePayload.error}`);
-                }
-
-                window.postMessage({
-                    type: 'FilterTube_SubscriptionsImportResponse',
-                    payload: {
-                        requestId,
-                        ...responsePayload
-                    },
-                    source: 'injector'
-                }, '*');
-
-                postLog('log', 'Sent subscriptions import response:', {
-                    requestId,
-                    success: !!responsePayload?.success,
-                    count: Array.isArray(responsePayload?.channels) ? responsePayload.channels.length : 0
-                });
-            })();
-        }
     });
 
     window.filterTubeInjectorBridgeReady = true;
