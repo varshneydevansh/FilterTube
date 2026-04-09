@@ -71,6 +71,76 @@ const RenderEngine = (() => {
         });
     }
 
+    function normalizeChannelHandle(handle) {
+        const raw = typeof handle === 'string' ? handle.trim() : '';
+        if (!raw) return '';
+        const stripped = raw.replace(/^@+/, '');
+        return stripped ? `@${stripped}` : '';
+    }
+
+    function normalizeChannelCustomPath(customUrl) {
+        const raw = typeof customUrl === 'string' ? customUrl.trim() : '';
+        if (!raw) return '';
+
+        const urlMatch = raw.match(/^https?:\/\/(?:www\.)?youtube\.com\/(.+)$/i);
+        const path = (urlMatch ? urlMatch[1] : raw).replace(/^\/+/, '');
+        if (!path) return '';
+
+        if (path.startsWith('@')) {
+            return normalizeChannelHandle(path);
+        }
+
+        return path;
+    }
+
+    function getChannelPageUrl(channel) {
+        const handle = normalizeChannelHandle(channel?.canonicalHandle || channel?.handleDisplay || channel?.handle || '');
+        if (handle) {
+            return `https://www.youtube.com/${handle}`;
+        }
+
+        const channelId = typeof channel?.id === 'string' ? channel.id.trim() : '';
+        if (channelId && /^UC[\w-]+$/i.test(channelId)) {
+            return `https://www.youtube.com/channel/${channelId}`;
+        }
+
+        const customPath = normalizeChannelCustomPath(channel?.customUrl || '');
+        if (customPath) {
+            if (customPath.startsWith('@')) {
+                return `https://www.youtube.com/${customPath}`;
+            }
+            return `https://www.youtube.com/${customPath}`;
+        }
+
+        return '';
+    }
+
+    function getChannelDisplayName(channel) {
+        return (channel?.name && channel.name !== channel.id)
+            ? channel.name
+            : (channel?.handle || channel?.customUrl || channel?.id || '');
+    }
+
+    function createChannelNameNode(channel) {
+        const displayName = getChannelDisplayName(channel);
+        const channelUrl = getChannelPageUrl(channel);
+        if (!channelUrl) {
+            const nameNode = document.createElement('div');
+            nameNode.className = 'channel-name';
+            nameNode.textContent = displayName;
+            return nameNode;
+        }
+
+        const link = document.createElement('a');
+        link.className = 'channel-name channel-name-link';
+        link.textContent = displayName;
+        link.href = channelUrl;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        link.title = `Open channel on YouTube: ${channelUrl}`;
+        return link;
+    }
+
     /**
      * Render keyword list with adaptive UI
      * @param {HTMLElement} container - Container element
@@ -807,9 +877,7 @@ const RenderEngine = (() => {
 
         const text = document.createElement('span');
         text.className = 'keyword-text';
-        const displayName = (channel.name && channel.name !== channel.id)
-            ? channel.name
-            : (channel.handle || channel.customUrl || channel.id);
+        const displayName = getChannelDisplayName(channel);
         text.textContent = displayName;
 
         const controls = document.createElement('div');
@@ -886,11 +954,7 @@ const RenderEngine = (() => {
         logoImg.onerror = () => { logoImg.src = defaultAvatar; };
 
         // Name
-        const nameSpan = document.createElement('div');
-        nameSpan.className = 'channel-name';
-        nameSpan.textContent = (channel.name && channel.name !== channel.id)
-            ? channel.name
-            : (channel.handle || channel.customUrl || channel.id);
+        const nameSpan = createChannelNameNode(channel);
 
         infoGroup.appendChild(logoImg);
         infoGroup.appendChild(nameSpan);

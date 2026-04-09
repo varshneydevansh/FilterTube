@@ -1860,6 +1860,16 @@ padding: var(--ft-space-xs) var(--ft-space-sm);
     overflow-wrap: anywhere;
 }
 
+.channel-name-link {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+}
+
+.channel-name-link:hover {
+    opacity: 0.85;
+}
+
 :root[data-theme="dark"] .channel-logo {
     background: rgba(148, 163, 184, 0.15);
     border-color: rgba(148, 163, 184, 0.35);
