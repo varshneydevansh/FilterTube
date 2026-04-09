@@ -2427,43 +2427,72 @@ function hasCompleteCollaboratorRoster(collaborators = [], expectedCount = 0) {
     return identifiersReady && meetsExpected;
 }
 
-function parseCollaboratorNames(rawText = '') {
+function parseCollaboratorNames(rawText = '', options = {}) {
     if (!rawText || typeof rawText !== 'string') {
         return { names: [], hasHiddenCollaborators: false, hiddenCount: 0 };
     }
 
-    const tokens = rawText.split(/\s+(?:and|&)\s+/i);
+    const {
+        allowSeparatorSplit = false
+    } = options || {};
+
+    const normalizedText = rawText.replace(/\s+/g, ' ').trim();
     const names = [];
-    let hasHidden = COLLAB_MULTI_MORE_PATTERN.test(rawText);
+    let hasHidden = COLLAB_MULTI_MORE_PATTERN.test(normalizedText);
     let hiddenCount = 0;
 
-    tokens.forEach(token => {
-        if (!token) return;
-        const subTokens = token.split(',');
-        subTokens.forEach(part => {
-            if (!part) return;
-            const cleaned = part.replace(/^[\s,]+|[\s,]+$/g, '').trim();
-            if (!cleaned) return;
-            const lower = cleaned.toLowerCase();
-            if (lower === 'and') return;
-            if (lower === 'more' || COLLAB_MORE_TOKEN_PATTERN.test(lower) || lower.endsWith(' more') || lower.startsWith('more ')) {
-                hasHidden = true;
-                const countMatch = lower.match(/(\d+)\s+more/);
-                if (countMatch) {
-                    const parsedCount = parseInt(countMatch[1], 10);
-                    if (!isNaN(parsedCount)) {
-                        hiddenCount += parsedCount;
-                    }
-                } else {
-                    hiddenCount += 1;
-                }
+    const hiddenCountMatches = normalizedText.match(/\b(\d+)\s+more\b/gi) || [];
+    hiddenCountMatches.forEach(match => {
+        const countMatch = match.match(/(\d+)\s+more/i);
+        if (countMatch) {
+            const parsedCount = parseInt(countMatch[1], 10);
+            if (!isNaN(parsedCount)) {
+                hiddenCount += parsedCount;
                 return;
             }
-            names.push(cleaned);
-        });
+        }
+        hiddenCount += 1;
     });
 
+    const pushName = (value) => {
+        const cleaned = String(value || '').replace(/^[\s,]+|[\s,]+$/g, '').trim();
+        if (!cleaned) return;
+        const lower = cleaned.toLowerCase();
+        if (lower === 'and') return;
+        if (lower === 'more' || COLLAB_MORE_TOKEN_PATTERN.test(lower) || lower.endsWith(' more') || lower.startsWith('more ')) {
+            hasHidden = true;
+            return;
+        }
+        names.push(cleaned);
+    };
+
+    if (!allowSeparatorSplit) {
+        if (hasHidden) {
+            const baseText = normalizedText
+                .replace(/\s*(?:,|&|\band\b)\s+\d+\s+more\b.*$/i, '')
+                .trim();
+            if (baseText) pushName(baseText);
+        } else {
+            pushName(normalizedText);
+        }
+        return { names, hasHiddenCollaborators: hasHidden, hiddenCount };
+    }
+
+    const tokens = normalizedText.split(/\s*(?:,|&|\band\b)\s*/i);
+    tokens.forEach(token => pushName(token));
+
     return { names, hasHiddenCollaborators: hasHidden, hiddenCount };
+}
+
+function hasAttributedCollaboratorSignal(attributedContainer) {
+    if (!attributedContainer) return false;
+    try {
+        const rawText = (attributedContainer.textContent || '').replace(/\s+/g, ' ').trim();
+        if (/\b\d+\s+more\b/i.test(rawText)) return true;
+        return countDistinctChannelLinks(attributedContainer) >= 2;
+    } catch (e) {
+        return false;
+    }
 }
 
 function normalizeLooseChannelLabel(value = '') {
@@ -3630,17 +3659,20 @@ function extractCollaboratorMetadataFromElement(element) {
         }
     }
 
-    // Method 1: Check for #attributed-channel-name (collaboration indicator)
+    // Method 1: Check for #attributed-channel-name only when it carries explicit
+    // collaboration markup (multiple channel links or "N more"). A single channel
+    // like "Paura & Profitto" also uses this container, so presence alone is not enough.
     const attributedContainer = element.querySelector('#attributed-channel-name, [id="attributed-channel-name"]');
+    const attributedCollabSignal = hasAttributedCollaboratorSignal(attributedContainer);
 
-    if (attributedContainer) {
+    if (attributedContainer && attributedCollabSignal) {
         // First try to extract from the attributed string (contains multiple channels)
         const ytTextViewModel = attributedContainer.querySelector('yt-text-view-model');
         const attributedString = ytTextViewModel?.querySelector('.yt-core-attributed-string');
         const rawText = attributedString ? (attributedString.textContent || '') : (attributedContainer.textContent || '');
 
         if (rawText) {
-            const parsed = parseCollaboratorNames(rawText);
+            const parsed = parseCollaboratorNames(rawText, { allowSeparatorSplit: true });
             if (parsed.names.length > 0) {
                 parsed.names.forEach(name => collaborators.push({ name, handle: '', id: '' }));
                 hydrateCollaboratorsFromLinks(collaborators);
@@ -3717,7 +3749,7 @@ function extractCollaboratorMetadataFromElement(element) {
         }
 
         if (channelRowText) {
-            const parsed = parseCollaboratorNames(channelRowText);
+            const parsed = parseCollaboratorNames(channelRowText, { allowSeparatorSplit: true });
             if (parsed.names.length > 1 || parsed.hasHiddenCollaborators) {
                 parsed.names.forEach(name => collaborators.push({ name, handle: '', id: '' }));
                 hydrateCollaboratorsFromLinks(collaborators);
@@ -3740,7 +3772,7 @@ function extractCollaboratorMetadataFromElement(element) {
             // If avatar stack is present, trust the text even if links are missing.
             const distinctLinks = avatarStackSignal ? 2 : countDistinctChannelLinks(channelNameEl);
             if (distinctLinks >= 2 || /\d+\s+more/i.test(rawText)) {
-                const parsed = parseCollaboratorNames(rawText);
+                const parsed = parseCollaboratorNames(rawText, { allowSeparatorSplit: true });
                 if (parsed.names.length > 1 || parsed.hasHiddenCollaborators) {
                     parsed.names.forEach(name => collaborators.push({ name, handle: '', id: '' }));
                     hydrateCollaboratorsFromLinks(collaborators);
@@ -3756,7 +3788,7 @@ function extractCollaboratorMetadataFromElement(element) {
     // showSheetCommand JSON. Treat the byline as a collaboration signal so enrichment runs.
     if (collaborators.length === 0) {
         const rawText = extractYtmBylineText(card || element);
-        const parsed = parseCollaboratorNames(rawText);
+        const parsed = parseCollaboratorNames(rawText, { allowSeparatorSplit: true });
         const hasCollapsedYtmCollabSignal = /\band\s+\d+\s+more\b/i.test(rawText);
         let hasExplicitYtmCollabSignal = false;
 
@@ -3893,6 +3925,47 @@ function isYtmWatchLikeCollaboratorCard(videoCard) {
     }
 }
 
+function isDesktopWatchLikeCollaboratorCard(videoCard) {
+    try {
+        if (!videoCard) return false;
+        const tag = String(videoCard.tagName || '').toLowerCase();
+        if (tag !== 'yt-lockup-view-model' && !tag.includes('lockup')) return false;
+        return Boolean(
+            videoCard.closest?.(
+                'ytd-watch-next-secondary-results-renderer, ' +
+                '#secondary, ' +
+                'ytd-item-section-renderer[section-identifier="related-items"]'
+            )
+        );
+    } catch (e) {
+        return false;
+    }
+}
+
+function getWatchLikeCollaborationWarmup(videoCard) {
+    if (!videoCard) {
+        return { collaborators: [], expectedCount: 0 };
+    }
+
+    const candidateTexts = [
+        videoCard.querySelector('.ytLockupMetadataViewModelMetadata .ytContentMetadataViewModelMetadataRow .yt-core-attributed-string')?.textContent?.trim() || '',
+        videoCard.querySelector('.yt-lockup-metadata-view-model__metadata .yt-content-metadata-view-model__metadata-row')?.textContent?.trim() || '',
+        extractYtmBylineText(videoCard) || ''
+    ].filter(Boolean);
+
+    for (const rawText of candidateTexts) {
+        const parsed = parseCollaboratorNames(rawText, { allowSeparatorSplit: true });
+        if (parsed.names.length >= 2 || parsed.hasHiddenCollaborators) {
+            return {
+                collaborators: parsed.names.map(name => ({ name, handle: '', id: '', customUrl: '' })),
+                expectedCount: Math.max(parsed.names.length + parsed.hiddenCount, parsed.names.length, 2)
+            };
+        }
+    }
+
+    return { collaborators: [], expectedCount: 0 };
+}
+
 function promoteYtmWatchRowIdentityFromCollaboratorMetadata(channelInfo, videoCard) {
     const baseInfo = (channelInfo && typeof channelInfo === 'object') ? { ...channelInfo } : {};
     if (!videoCard || !isYtmWatchLikeCollaboratorCard(videoCard)) {
@@ -3980,14 +4053,17 @@ function promoteYtmWatchRowIdentityFromCollaboratorMetadata(channelInfo, videoCa
 function cardHasCollaborationDomSignal(videoCard) {
     try {
         if (!videoCard) return false;
-        if (videoCard.querySelector('yt-avatar-stack-view-model, #attributed-channel-name')) return true;
+        if (videoCard.querySelector('yt-avatar-stack-view-model')) return true;
+        if (hasAttributedCollaboratorSignal(videoCard.querySelector('#attributed-channel-name, [id="attributed-channel-name"]'))) {
+            return true;
+        }
         const rowText = (
             videoCard.querySelector('.yt-lockup-metadata-view-model__metadata .yt-content-metadata-view-model__metadata-row')?.textContent ||
             extractYtmBylineText(videoCard) ||
             videoCard.querySelector('.YtmBadgeAndBylineRendererItemByline .yt-core-attributed-string')?.textContent ||
             ''
         ).toLowerCase();
-        return /\d+\s+more/.test(rowText) || /\s(and|&)\s/.test(rowText);
+        return /\d+\s+more/.test(rowText) || countDistinctChannelLinks(videoCard) >= 2;
     } catch (e) {
         return false;
     }
@@ -4156,7 +4232,9 @@ function promoteChannelInfoFromCollaboratorSignals(channelInfo, videoCard) {
             return '';
         }
     })();
-    const parsedByline = parseCollaboratorNames(bylineText);
+    const parsedByline = parseCollaboratorNames(bylineText, {
+        allowSeparatorSplit: Boolean(videoCard?.querySelector?.('yt-avatar-stack-view-model, #attributed-channel-name'))
+    });
     const expectedCount = Math.max(
         parseInt(baseInfo.expectedCollaboratorCount || '0', 10) || 0,
         parseInt(videoCard.getAttribute?.('data-filtertube-expected-collaborators') || '0', 10) || 0,
@@ -7593,7 +7671,9 @@ function extractChannelFromCard(card) {
             card.querySelector('#byline-container')?.textContent?.trim() ||
             ''
         );
-        const parsedMixBylineHint = parseCollaboratorNames(mixBylineHint);
+        const parsedMixBylineHint = parseCollaboratorNames(mixBylineHint, {
+            allowSeparatorSplit: Boolean(card?.querySelector?.('yt-avatar-stack-view-model, #attributed-channel-name'))
+        });
         const expectedMixCollaboratorCount = Number(card.getAttribute('data-filtertube-expected-collaborators')) || 0;
         const shouldSkipMixShortcut = Boolean(
             expectedMixCollaboratorCount > 1 ||
@@ -7703,7 +7783,9 @@ function extractChannelFromCard(card) {
             ) || card;
 
             const ytmBylineHint = extractYtmBylineText(ytmIdentityRoot);
-            const parsedYtmBylineHint = parseCollaboratorNames(ytmBylineHint);
+            const parsedYtmBylineHint = parseCollaboratorNames(ytmBylineHint, {
+                allowSeparatorSplit: Boolean(ytmIdentityRoot?.querySelector?.('yt-avatar-stack-view-model, #attributed-channel-name'))
+            });
             const hasYtmCollaborationSignal = Boolean(
                 ytmIdentityRoot.querySelector('yt-avatar-stack-view-model, #attributed-channel-name') ||
                 parsedYtmBylineHint.hasHiddenCollaborators ||
@@ -8026,13 +8108,18 @@ function extractChannelFromCard(card) {
                 }
             }
 
-            const parsedCollaboratorsFromName = parseCollaboratorNames(name || '');
+            const attributedContainer = card.querySelector('#attributed-channel-name, [id="attributed-channel-name"]');
             const hasCollabDomSignal = Boolean(
-                card.querySelector('yt-avatar-stack-view-model, #attributed-channel-name')
+                card.querySelector('yt-avatar-stack-view-model') ||
+                hasAttributedCollaboratorSignal(attributedContainer)
             );
+            const distinctChannelLinkCount = countDistinctChannelLinks(card);
+            const parsedCollaboratorsFromName = parseCollaboratorNames(name || '', {
+                allowSeparatorSplit: hasCollabDomSignal || distinctChannelLinkCount >= 2
+            });
             const hasCollabNameHint = Boolean(
                 parsedCollaboratorsFromName.hasHiddenCollaborators ||
-                (parsedCollaboratorsFromName.names.length >= 2 && (hasCollabDomSignal || isPlaylistPanelCard || cardTag.includes('lockup-view-model')))
+                (parsedCollaboratorsFromName.names.length >= 2 && (hasCollabDomSignal || distinctChannelLinkCount >= 2))
             );
 
             if (hasCollabNameHint) {
@@ -8943,20 +9030,29 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
     // For YTM watch rows, also warm this path when DOM signals imply a collaboration but the initial
     // menu snapshot is still incomplete.
     let collaboratorEnrichmentPromise = null;
-    const shouldWarmYtmWatchCollaboration = Boolean(
+    const isWarmableWatchLikeCard = Boolean(
         videoId &&
-        isYtmWatchLikeCollaboratorCard(videoCard) &&
         !initialChannelInfo.isCollaboration &&
-        cardHasCollaborationDomSignal(videoCard)
+        (
+            isYtmWatchLikeCollaboratorCard(videoCard) ||
+            isDesktopWatchLikeCollaboratorCard(videoCard)
+        )
     );
+    const warmupCollaborationInfo = isWarmableWatchLikeCard
+        ? getWatchLikeCollaborationWarmup(videoCard)
+        : { collaborators: [], expectedCount: 0 };
     if (initialChannelInfo.isCollaboration && initialChannelInfo.videoId) {
         collaboratorEnrichmentPromise = enrichCollaboratorsWithMainWorld(initialChannelInfo);
-    } else if (shouldWarmYtmWatchCollaboration) {
-        const provisionalCollaborators = sanitizeCollaboratorList(extractCollaboratorMetadataFromElement(videoCard) || []);
+    } else if (isWarmableWatchLikeCard) {
+        let provisionalCollaborators = sanitizeCollaboratorList(extractCollaboratorMetadataFromElement(videoCard) || []);
+        if (provisionalCollaborators.length === 0 && warmupCollaborationInfo.collaborators.length > 0) {
+            provisionalCollaborators = sanitizeCollaboratorList(warmupCollaborationInfo.collaborators);
+        }
         const provisionalExpectedCount = Math.max(
             parseInt(initialChannelInfo.expectedCollaboratorCount || '0', 10) || 0,
             expectedFromCard,
-            provisionalCollaborators.length
+            provisionalCollaborators.length,
+            warmupCollaborationInfo.expectedCount || 0
         );
         if (provisionalCollaborators.length > 0 && provisionalExpectedCount > 1) {
             const provisionalInfo = hydrateChannelInfoFromCurrentMappings({
@@ -9219,7 +9315,7 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
                     sanitized.length >= 2 &&
                     dropdown?.isConnected &&
                     !activeFetch?.cancelled &&
-                    !activeCollaborationMenus.has(videoId)
+                    !activeCollaborationDropdowns.has(videoId)
                 ) {
                     const enrichedMenuInfo = hydrateChannelInfoFromCurrentMappings({
                         ...initialChannelInfo,
