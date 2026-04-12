@@ -191,14 +191,16 @@ Note: This does not affect a parallel account’s ability to access its own Filt
 
 ## Nanah / Accounts & Sync rules (Current)
 
-- If the active profile is a **child** profile, Nanah behaves as a **replica-only** surface for that UI session.
-- Child profiles cannot send settings to other devices and cannot save arbitrary peer/source trust.
-- Child profiles can only save managed `source -> replica` links.
+- If the active profile is a **locked child** profile, Nanah behaves as a **replica-only** surface for that UI session.
+- If the active profile is an **unlocked child** profile, it may send that child profile's own scoped settings (`active`, `main`, `kids`) to another device, but it still cannot send a `full` account backup from that surface.
+- Locked child profiles cannot save arbitrary peer/source trust.
+- Locked child profiles can only save managed `source -> replica` links.
 - Core backup/import/export/account-admin controls are disabled for child profiles in the desktop UI.
 - Unlocked child surfaces also block profile rename/delete/PIN mutation and trusted parent-link edit/remove from Accounts & Sync.
 - Saved Nanah trust is still **per device link**, not per entire machine.
 - Managed reconnect can require **local approval per session** on the child/replica side through the link's `reconnectMode`.
-- Non-`full` Nanah sync still applies to the receiver's **current active profile only**; it does not yet target an inactive remote profile by name.
+- Live sessions now exchange the receiver's profile inventory, and the sender can choose a specific **Remote target profile** during the session.
+- Managed links can also pin the receiver-side target to one fixed local profile for later sessions.
 
 ## Data portability / backup rules (Current)
 
@@ -296,10 +298,11 @@ MASTER-CENTERED EXAMPLE
 ```text
 LOCAL RULE
 
-The active profile in the current UI session decides what Nanah is allowed to do.
+The active profile and its lock state in the current UI session decide what Nanah is allowed to do.
 
-[Active = account] -> peer or source or replica allowed
-[Active = child]   -> replica-only for Nanah
+[Active = account]        -> peer or source or replica allowed
+[Active = locked child]   -> replica-only for Nanah
+[Active = unlocked child] -> may send that child profile's own scoped snapshot
 ```
 
 ### Default / Master
@@ -326,30 +329,32 @@ The active profile in the current UI session decides what Nanah is allowed to do
 
 ### Replica-first rule for child profiles
 
-For Nanah, child profiles should default to replica behavior:
+For Nanah, child profiles should default to replica behavior while locked:
 
 - a child profile may receive managed updates from a trusted parent/source
-- a child profile should not behave like a normal `source`
+- a locked child profile should not behave like a normal `source`
 - a child profile should not be used as an equal `peer` authority surface for persistent trust
 
 That keeps the child device useful for parent control without turning it into its own admin endpoint.
 
 Important scope note:
 
-- this rule is currently based on the **active profile in the Nanah UI session**
-- if the active profile is a child profile, Nanah behaves replica-only for that session
+- this rule is currently based on the **active profile and local lock state** in the Accounts & Sync UI session
+- if the active profile is a locked child profile, Nanah behaves replica-only for that session
+- if the active profile is an unlocked child profile, Nanah may send that child profile's own scoped snapshot
 - this is not yet a broader device-wide “child mode” outside explicit profile context
 
 ### Permission matrix
 
 ```text
-+----------------------+----------------------+-------------------------------+
-| Active profile type  | Nanah send           | Nanah trust                   |
-+----------------------+----------------------+-------------------------------+
-| Default / Master     | yes                  | peer or managed               |
-| Independent account  | yes                  | peer or managed               |
-| Child                | no                   | managed replica only          |
-+----------------------+----------------------+-------------------------------+
++----------------------+---------------------------+-------------------------------+
+| Active profile type  | Nanah send                | Nanah trust                   |
++----------------------+---------------------------+-------------------------------+
+| Default / Master     | yes                       | peer or managed               |
+| Independent account  | yes                       | peer or managed               |
+| Locked child         | no                        | managed replica only          |
+| Unlocked child       | scoped send only          | managed replica only          |
++----------------------+---------------------------+-------------------------------+
 ```
 
 ```text

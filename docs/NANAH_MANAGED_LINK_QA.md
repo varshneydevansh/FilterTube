@@ -15,7 +15,7 @@ Use it before shipping changes to:
 ## Preconditions
 
 - reload the unpacked extension in every browser under test
-- open the `Nanah Sync` page on both devices
+- open the `Accounts & Sync` page on both devices
 - verify both devices are on the same current build
 - clear stale trusted links only if the scenario explicitly needs a first-time run
 

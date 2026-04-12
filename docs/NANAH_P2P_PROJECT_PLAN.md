@@ -15,6 +15,24 @@ Nanah should be:
 - **Browser-first** (works inside extensions / websites)
 - **Small + composable** (usable by other projects)
 
+## Current desktop checkpoint
+
+FilterTube already ships a working desktop integration for:
+
+- short-code and QR pairing
+- SAS verification
+- peer links and managed source/replica links
+- trusted-link persistence
+- sender-side remote target profile selection during a live session
+- receiver-side fixed target profile binding for later managed updates
+- encrypted recovery of trusted-link state for same-device restore
+
+The major remaining work is no longer the transport core. It is product simplification:
+
+- fewer visible controls for ordinary users
+- a clearer `Parent controls child device` guided flow
+- advanced policy knobs hidden until needed
+
 ---
 
 ## 1) Reality check: “No server at all” options
@@ -313,7 +331,7 @@ class NanahClient {
 - No install
 - No “upload” to your servers
 - Just:
-  - open FilterTube → Settings → Sync
+  - open FilterTube → Accounts & Sync → Device Trust & Sync
   - show code/QR
   - other device enters code
   - done
