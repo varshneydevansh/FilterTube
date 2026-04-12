@@ -583,10 +583,10 @@
                                         <div class="nanah-sync-intro__copy">
                                             <span class="nanah-sync-intro__eyebrow">Private device-to-device sync</span>
                                             <p class="nanah-sync-intro__title">Move FilterTube settings between your own devices without creating a central account.</p>
-                                            <p class="nanah-sync-intro__body">Pair with a 4-character code or QR, confirm the shared safety phrase, then send only the scope you want: <code>active</code>, <code>main</code>, <code>kids</code>, or <code>full</code>. Nanah is private by design: FilterTube does not need a central account to read these settings.</p>
+                                            <p class="nanah-sync-intro__body">Pair with a 4-character code or QR, confirm the same safety phrase, then send only what you want: <code>active</code>, <code>main</code>, <code>kids</code>, or <code>full</code>. FilterTube only uses a small meeting place so your devices can find each other. After that, your settings are meant to move directly from one device to the other.</p>
                                         </div>
                                         <div class="nanah-sync-flow" aria-label="Nanah Sync steps">
-                                            <article class="nanah-sync-flow__step">
+                                            <article class="nanah-sync-flow__step nanah-sync-flow__step--trust">
                                                 <div class="nanah-sync-flow__step-head">
                                                     <span class="nanah-sync-flow__index">Step 1</span>
                                                     <strong>Pair</strong>
@@ -608,33 +608,39 @@
                                                 <span class="nanah-sync-flow__body">Send one update now, or save a managed source link for future replica updates.</span>
                                             </article>
                                         </div>
-                                        <div class="nanah-sync-principles" aria-label="Nanah Sync privacy and trust notes">
-                                            <article class="nanah-sync-principles__item">
-                                                <strong>What the relay sees</strong>
-                                                <span>The relay is only there to help both devices connect and exchange WebRTC setup.</span>
-                                            </article>
-                                            <article class="nanah-sync-principles__item">
-                                                <strong>What trust means</strong>
-                                                <span>Trust saves relationship and policy for a future live session. It does not create silent background sync.</span>
-                                            </article>
-                                            <article class="nanah-sync-principles__item">
-                                                <strong>Best default mental model</strong>
-                                                <span>Think of Nanah as private “pair, verify, send” between your own devices, with optional managed parent rules.</span>
-                                            </article>
+                                        <div class="nanah-sync-principles-block">
+                                            <div class="nanah-sync-principles-label">Privacy and trust notes</div>
+                                            <div class="nanah-sync-principles" aria-label="Nanah Sync privacy and trust notes">
+                                                <article class="nanah-sync-principles__item nanah-sync-principles__item--trust">
+                                                    <strong>What the relay sees</strong>
+                                                    <span>Only the connection setup. It is just the meeting place that helps both devices find each other.</span>
+                                                </article>
+                                                <article class="nanah-sync-principles__item nanah-sync-principles__item--trust">
+                                                    <strong>What trust means</strong>
+                                                    <span>It remembers your choice for the next session. It does not turn on hidden background syncing.</span>
+                                                </article>
+                                                <article class="nanah-sync-principles__item">
+                                                    <strong>Best default mental model</strong>
+                                                    <span>Think of Nanah as private “pair, verify, send” between your own devices, with optional managed parent rules.</span>
+                                                </article>
+                                            </div>
                                         </div>
-                                        <div class="nanah-sync-principles nanah-sync-principles--guide" aria-label="Nanah Sync quick start">
-                                            <article class="nanah-sync-principles__item">
-                                                <strong>One-time send</strong>
-                                                <span>Use this when you only want to copy settings once. Pair, verify, send, and the other device reviews the update.</span>
-                                            </article>
-                                            <article class="nanah-sync-principles__item">
-                                                <strong>Parent controls child</strong>
-                                                <span>Use <code>Source / Parent</code> on the sender, <code>Replica / Kids device</code> on the receiver, pick the remote child profile, then save the managed link once.</span>
-                                            </article>
-                                            <article class="nanah-sync-principles__item">
-                                                <strong>What trust actually does</strong>
-                                                <span>Trust remembers the relationship, allowed scopes, and target profile for the next live session. It is not hidden background sync.</span>
-                                            </article>
+                                        <div class="nanah-sync-principles-block">
+                                            <div class="nanah-sync-principles-label">Good default uses</div>
+                                            <div class="nanah-sync-principles nanah-sync-principles--guide" aria-label="Nanah Sync quick start">
+                                                <article class="nanah-sync-principles__item">
+                                                    <strong>One-time send</strong>
+                                                    <span>Use this when you only want to copy settings once. Pair, verify, send, and the other device reviews the update.</span>
+                                                </article>
+                                                <article class="nanah-sync-principles__item">
+                                                    <strong>Parent controls child</strong>
+                                                    <span>Use <code>Source / Parent</code> on the sender, <code>Replica / Kids device</code> on the receiver, pick the remote child profile, then save the managed link once.</span>
+                                                </article>
+                                                <article class="nanah-sync-principles__item">
+                                                    <strong>What trust actually does</strong>
+                                                    <span>Trust remembers the relationship, allowed scopes, and target profile for the next live session. It is not hidden background sync.</span>
+                                                </article>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -651,56 +657,43 @@
 
                                             <div class="nanah-sync-panel__content nanah-sync-panel__content--setup">
                                                 <div class="nanah-sync-panel__stack nanah-sync-panel__stack--setup">
-                                                    <div class="nanah-sync-guide">
-                                                        <div class="nanah-sync-guide__title">Quick path</div>
-                                                        <ol class="nanah-sync-guide__list">
-                                                            <li>Pick the relationship for this device.</li>
-                                                            <li>Start pairing here or join the code from the other device.</li>
-                                                            <li>Confirm the same safety phrase on both devices.</li>
-                                                            <li>Send once, or save trust if you want future sessions to reuse the policy.</li>
+                                                    <div class="nanah-sync-mode-switch" role="tablist" aria-label="Choose Nanah sync mode">
+                                                        <button id="ftNanahModeSendOnce" class="nanah-sync-mode" type="button" data-mode="send_once" aria-pressed="true">
+                                                            <span class="nanah-sync-mode__eyebrow">Simplest</span>
+                                                            <strong class="nanah-sync-mode__title">Send this profile once</strong>
+                                                            <span class="nanah-sync-mode__body">Pair, verify, send, and let the other device review the update.</span>
+                                                        </button>
+                                                        <button id="ftNanahModeParent" class="nanah-sync-mode" type="button" data-mode="parent_control" aria-pressed="false">
+                                                            <span class="nanah-sync-mode__eyebrow">Parent path</span>
+                                                            <strong class="nanah-sync-mode__title">Parent controls child</strong>
+                                                            <span class="nanah-sync-mode__body">Send parent-managed updates into a child profile and save that trust once.</span>
+                                                        </button>
+                                                        <button id="ftNanahModeFull" class="nanah-sync-mode" type="button" data-mode="full_account" aria-pressed="false">
+                                                            <span class="nanah-sync-mode__eyebrow">Migration</span>
+                                                            <strong class="nanah-sync-mode__title">Move full account</strong>
+                                                            <span class="nanah-sync-mode__body">Use the wider account snapshot when you need full restore or migration.</span>
+                                                        </button>
+                                                    </div>
+
+                                                    <div class="nanah-sync-mode-spotlight" id="ftNanahModeSpotlight">
+                                                        <div class="nanah-sync-mode-spotlight__head">
+                                                            <span id="ftNanahModeEyebrow" class="nanah-sync-guide__title">Simplest path</span>
+                                                            <strong id="ftNanahModeTitle" class="nanah-sync-mode-spotlight__title">Send this profile once</strong>
+                                                        </div>
+                                                        <p id="ftNanahModeBody" class="nanah-sync-mode-spotlight__body">Use this for one-off copies between your own devices. Pair, verify the phrase, send, and the other device reviews it.</p>
+                                                        <ol id="ftNanahModeSteps" class="nanah-sync-guide__list">
+                                                            <li>Leave this in the simple peer flow.</li>
+                                                            <li>Start pairing here or join a code from the other device.</li>
+                                                            <li>Confirm the same safety phrase and send once.</li>
                                                         </ol>
                                                     </div>
-                                                    <div class="nanah-sync-guide">
-                                                        <div class="nanah-sync-guide__title">Parent control quick start</div>
-                                                        <ol class="nanah-sync-guide__list">
-                                                            <li>On the parent device, stay on the parent profile or the child profile you want to send from.</li>
-                                                            <li>Set this side to <code>Source / Parent</code>.</li>
-                                                            <li>On the other device, set <code>Replica / Kids device</code>, then connect and confirm the phrase.</li>
-                                                            <li>Choose the child profile in <code>Remote target profile</code>, send once, then use <code>Save Managed Link</code> for later sessions.</li>
-                                                        </ol>
-                                                    </div>
-                                                    <div class="nanah-sync-form nanah-sync-form--grid">
+
+                                                    <div class="nanah-sync-form nanah-sync-form--primary">
                                                         <label class="nanah-sync-field">
                                                             <span>Device label</span>
                                                             <input id="ftNanahDeviceLabel" class="text-input" type="text" placeholder="My laptop" />
                                                         </label>
-                                                        <label class="nanah-sync-field">
-                                                            <span>Relationship</span>
-                                                            <select id="ftNanahRole" class="select-input">
-                                                                <option value="peer">Peer</option>
-                                                                <option value="source">Source / Parent</option>
-                                                                <option value="replica">Replica / Kids device</option>
-                                                            </select>
-                                                            <small class="nanah-sync-field__hint">Source devices can repeat trusted updates to replicas.</small>
-                                                        </label>
-                                                        <label class="nanah-sync-field">
-                                                            <span>Scope to send</span>
-                                                            <select id="ftNanahScope" class="select-input">
-                                                                <option value="active">Active profile</option>
-                                                                <option value="main">YouTube Main only</option>
-                                                                <option value="kids">YouTube Kids only</option>
-                                                                <option value="full">Full backup</option>
-                                                            </select>
-                                                        </label>
-                                                        <label class="nanah-sync-field">
-                                                            <span id="ftNanahStrategyLabel">Apply mode</span>
-                                                            <select id="ftNanahStrategy" class="select-input">
-                                                                <option value="merge">Merge into remote</option>
-                                                                <option value="replace">Replace remote scope</option>
-                                                            </select>
-                                                            <small id="ftNanahStrategyHint" class="nanah-sync-field__hint">Use <code>replace</code> for managed replicas and <code>merge</code> for peer sync.</small>
-                                                        </label>
-                                                        <label class="nanah-sync-field">
+                                                        <label class="nanah-sync-field" id="ftNanahRemoteTargetField">
                                                             <span>Remote target profile</span>
                                                             <select id="ftNanahRemoteTarget" class="select-input">
                                                                 <option value="">Use remote active profile</option>
@@ -708,6 +701,43 @@
                                                             <small id="ftNanahRemoteTargetHint" class="nanah-sync-field__hint">After the secure handshake, choose a specific remote profile here if you want this update to land somewhere other than the receiver’s currently active profile.</small>
                                                         </label>
                                                     </div>
+
+                                                    <details class="nanah-sync-advanced" id="ftNanahAdvancedDetails">
+                                                        <summary class="nanah-sync-advanced__summary">
+                                                            <span class="nanah-sync-advanced__title">Advanced</span>
+                                                            <span id="ftNanahAdvancedSummary" class="nanah-sync-advanced__value">Peer · Active profile · Merge</span>
+                                                        </summary>
+                                                        <div class="nanah-sync-advanced__body">
+                                                            <div class="nanah-sync-form nanah-sync-form--grid">
+                                                                <label class="nanah-sync-field">
+                                                                    <span>Relationship</span>
+                                                                    <select id="ftNanahRole" class="select-input">
+                                                                        <option value="peer">Peer</option>
+                                                                        <option value="source">Source / Parent</option>
+                                                                        <option value="replica">Replica / Kids device</option>
+                                                                    </select>
+                                                                    <small class="nanah-sync-field__hint">Source devices can repeat trusted updates to replicas.</small>
+                                                                </label>
+                                                                <label class="nanah-sync-field">
+                                                                    <span>Scope to send</span>
+                                                                    <select id="ftNanahScope" class="select-input">
+                                                                        <option value="active">Active profile</option>
+                                                                        <option value="main">YouTube Main only</option>
+                                                                        <option value="kids">YouTube Kids only</option>
+                                                                        <option value="full">Full backup</option>
+                                                                    </select>
+                                                                </label>
+                                                                <label class="nanah-sync-field">
+                                                                    <span id="ftNanahStrategyLabel">Apply mode</span>
+                                                                    <select id="ftNanahStrategy" class="select-input">
+                                                                        <option value="merge">Merge into remote</option>
+                                                                        <option value="replace">Replace remote scope</option>
+                                                                    </select>
+                                                                    <small id="ftNanahStrategyHint" class="nanah-sync-field__hint">Use <code>replace</code> for managed replicas and <code>merge</code> for peer sync.</small>
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    </details>
 
                                                     <div class="nanah-sync-actions">
                                                         <button id="ftNanahHostBtn" class="btn-primary" type="button">Start Pairing</button>
@@ -773,7 +803,7 @@
                                             <div class="nanah-sync-stack">
                                                 <div class="nanah-sync-privacy-banner">
                                                     <strong>Completely P2P after handshake</strong>
-                                                    <span>The real settings payload is intended to move directly between your devices after the secure handshake. FilterTube does not need a central sync account to read it.</span>
+                                                    <span>FilterTube only helps both devices meet. After the secure handshake, your settings are meant to go straight from one device to the other, with no middle sync server reading them.</span>
                                                 </div>
                                                 <label class="nanah-sync-field">
                                                     <span>Enter pairing code</span>
@@ -1111,6 +1141,17 @@
                                 <div class="card-body">
                                     <div class="help-list">
                                         <div class="help-item">
+                                            <div class="help-item-title">Three simple ways to use Nanah</div>
+                                            <div class="help-item-body">
+                                                <ul>
+                                                    <li><strong>Send this profile once:</strong> Best default. Pair, verify, send, and let the other device review the update.</li>
+                                                    <li><strong>Parent controls child:</strong> Best for source → replica trust. Pick the remote child profile once, then save the managed link.</li>
+                                                    <li><strong>Move full account:</strong> Use only for migration, reinstall recovery, or the wider account tree.</li>
+                                                    <li>The <strong>Advanced</strong> section is still there if you need to tune role, scope, or merge/replace manually.</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="help-item">
                                             <div class="help-item-title">How the pairing flow works</div>
                                             <div class="help-item-body">
                                                 <ul>
@@ -1125,9 +1166,9 @@
                                             <div class="help-item-title">Quick start for parents</div>
                                             <div class="help-item-body">
                                                 <ul>
-                                                    <li>On the sender, use <strong>Source / Parent</strong>.</li>
-                                                    <li>On the child device, use <strong>Replica / Kids device</strong>.</li>
-                                                    <li>Connect once, confirm the same safety phrase, and choose the child profile in <strong>Remote target profile</strong>.</li>
+                                                    <li>Choose <strong>Parent controls child</strong> on the sender.</li>
+                                                    <li>Connect once and confirm the same safety phrase.</li>
+                                                    <li>Pick the child profile in <strong>Remote target profile</strong> on the sender side.</li>
                                                     <li>On the first managed connection, the child device may still need one local parent PIN/unlock step to authorize that locked child profile.</li>
                                                     <li>After you choose <strong>Apply + Save Managed Link</strong>, later sessions can reuse that target and policy instead of asking the child to reconfigure everything again.</li>
                                                 </ul>
@@ -1137,9 +1178,10 @@
                                             <div class="help-item-title">What is private and what is not</div>
                                             <div class="help-item-body">
                                                 <ul>
-                                                    <li>The relay only handles pairing and WebRTC setup traffic.</li>
-                                                    <li>The real FilterTube settings payload is intended to move directly device-to-device after the secure handshake.</li>
+                                                    <li>The relay only helps both devices find each other. Think of it as a meeting place, not a place where your settings live.</li>
+                                                    <li>After the secure handshake, your settings are meant to move directly from one device to the other.</li>
                                                     <li>FilterTube does not need a central sync account to read or store your Nanah settings traffic.</li>
+                                                    <li>There is no product goal here around reading your synced rules or chasing user-count analytics from your private settings.</li>
                                                     <li>You should still trust only your own devices and confirm the same safety phrase before applying anything.</li>
                                                 </ul>
                                             </div>
@@ -1241,7 +1283,7 @@
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">What the relay does</div>
-                                            <div class="help-item-body">Nanah’s signaling relay is only there to help both devices find each other and exchange WebRTC setup data. It is not meant to be a place where FilterTube reads your synced rules as account data. The real settings payload is intended to move directly device-to-device after the secure handshake.</div>
+                                            <div class="help-item-body">Nanah’s relay is only there to help both devices meet and exchange connection setup data. It is not meant to be a place where FilterTube reads your synced rules. After the secure handshake, your settings are meant to move directly device-to-device. The underlying project is open here: <a href="https://github.com/varshneydevansh/nanah" target="_blank" rel="noopener noreferrer">github.com/varshneydevansh/nanah</a>.</div>
                                         </div>
                                     </div>
                                 </div>

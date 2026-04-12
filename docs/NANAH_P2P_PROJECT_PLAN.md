@@ -33,6 +33,12 @@ The major remaining work is no longer the transport core. It is product simplifi
 - a clearer `Parent controls child device` guided flow
 - advanced policy knobs hidden until needed
 
+Related docs in this repo:
+
+- `docs/NANAH_USER_GUIDE.md`
+- `docs/NANAH_POST_IMPLEMENTATION_CONCERNS_TRACKER.md`
+- `docs/PROFILES_PIN_MODEL.md`
+
 ---
 
 ## 1) Reality check: “No server at all” options

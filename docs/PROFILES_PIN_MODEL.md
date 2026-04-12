@@ -202,6 +202,18 @@ Note: This does not affect a parallel account’s ability to access its own Filt
 - Live sessions now exchange the receiver's profile inventory, and the sender can choose a specific **Remote target profile** during the session.
 - Managed links can also pin the receiver-side target to one fixed local profile for later sessions.
 
+### Plain-language child approval rule
+
+- First managed parent -> child connection may require one local parent approval on the child device.
+- After that, the child does **not** always need to press allow.
+- If the saved link uses easier parent-control settings, later matching updates can apply more directly.
+- If the saved link uses stricter child protection, the child device must stop for approval more often.
+
+Short version:
+
+- `standard parent control` = easier later updates
+- `strict child protection` = more approval steps on the child device
+
 ## Data portability / backup rules (Current)
 
 ### Auto-backup

@@ -19,6 +19,12 @@ Status keys used below:
 - `Open decision`
 - `Future`
 
+These are not just "Nanah v1 leftovers."
+
+- `Partial` means the behavior exists, but UX/polish/enforcement still needs work.
+- `Open decision` means we still need to choose the product rule deliberately.
+- `Future` means intentionally deferred work, usually beyond the current desktop checkpoint.
+
 ## 1. Nanah page layout and readability
 
 | Concern | Current status | Current state | Next action |
@@ -106,6 +112,25 @@ Status keys used below:
 | Locked profiles should remain protected | `Done` | Locked profiles still gate views and mutations by default. Managed child links now also support a `Strict child protection` preset that forces approval-needed reconnect, no auto-apply, fixed local target, and local unlock required. | Keep this as the highest-safety preset for parent-managed child links. |
 | Need to prevent kids from modifying parent-decided rules | `Done` | Current lock gate blocks restricted views and mutations while locked; child Nanah role is replica-only; unlocked child surfaces now also block profile rename/delete/PIN mutation, account-policy changes, backup import/export, and trusted parent-link edit/remove from Accounts & Sync. | Preserve the defense-in-depth model; future additions should default closed for child surfaces. |
 
+### Plain-language child approval rule
+
+Current intended rule:
+
+- First managed parent -> child connection may require one local parent approval on the child device.
+- After that, the child does **not** always need to press allow.
+- If the saved managed link uses:
+  - `auto-apply` + `fast reconnect` + an allowed locked-child rule,
+  then later matching parent updates can apply without the kid pressing allow.
+- If the saved managed link uses:
+  - `approval-needed reconnect`, or
+  - stricter child protection,
+  then the child device must stop for approval before that session continues.
+
+Short version:
+
+- `standard parent control` = easier later updates
+- `strict child protection` = more approval steps on the child device
+
 ## 9. Backup, uninstall, and trusted-link persistence
 
 | Concern | Current status | Current state | Next action |
@@ -130,6 +155,15 @@ These are the remaining product decisions that still need deliberate design, not
 1. Are there any remaining child-visible admin surfaces that should still be reduced even when the child profile is unlocked?
 2. How much further should reconnect go beyond the current fast / approval-needed fresh-session flow without becoming hidden background sync?
 3. How aggressively should the current Nanah controls be collapsed into a simpler guided parent/peer UX so normal users do not have to understand every advanced policy option?
+
+### What is actually still partial right now
+
+This is the short practical list:
+
+- some child/admin surfaces may still need one more hardening pass
+- reconnect wording and cross-device handoff can still be simpler
+- Help/Accounts & Sync visual polish can still improve
+- the parent-oriented model is implemented in core flows, but not yet reduced to the simplest possible surface everywhere
 
 ## 12. Recommended next implementation order
 
