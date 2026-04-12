@@ -2402,6 +2402,9 @@ function resolveRequestedView() {
         'semantic': 'semantic',
         'kids': 'kids',
         'settings': 'settings',
+        'sync': 'sync',
+        'nanah': 'sync',
+        'nanahsync': 'sync',
         'whatsnew': 'whatsnew',
         'whats-new': 'whatsnew',
         'help': 'help',
@@ -2649,6 +2652,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const ftAutoBackupMode = document.getElementById('ftAutoBackupMode');
     const ftAutoBackupFormat = document.getElementById('ftAutoBackupFormat');
+    const settingAutoBackupEnabled = document.getElementById('setting_autoBackupEnabled');
     const ftProfileSelector = document.getElementById('ftProfileSelector');
     const ftProfileMenuTab = document.getElementById('ftProfileMenuTab');
     const ftProfileBadgeBtnTab = document.getElementById('ftProfileBadgeBtnTab');
@@ -2670,6 +2674,37 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const ftAllowAccountCreation = document.getElementById('ftAllowAccountCreation');
     const ftMaxAccounts = document.getElementById('ftMaxAccounts');
+
+    const ftNanahDeviceLabel = document.getElementById('ftNanahDeviceLabel');
+    const ftNanahRole = document.getElementById('ftNanahRole');
+    const ftNanahScope = document.getElementById('ftNanahScope');
+    const ftNanahStrategy = document.getElementById('ftNanahStrategy');
+    const ftNanahRemoteTarget = document.getElementById('ftNanahRemoteTarget');
+    const ftNanahStrategyLabel = document.getElementById('ftNanahStrategyLabel');
+    const ftNanahStrategyHint = document.getElementById('ftNanahStrategyHint');
+    const ftNanahRemoteTargetHint = document.getElementById('ftNanahRemoteTargetHint');
+    const ftNanahHostBtn = document.getElementById('ftNanahHostBtn');
+    const ftNanahSendBtn = document.getElementById('ftNanahSendBtn');
+    const ftNanahTrustBtn = document.getElementById('ftNanahTrustBtn');
+    const ftNanahEndSessionBtn = document.getElementById('ftNanahEndSessionBtn');
+    const ftNanahStatusCard = document.getElementById('ftNanahStatusCard');
+    const ftNanahStage = document.getElementById('ftNanahStage');
+    const ftNanahLocalProfile = document.getElementById('ftNanahLocalProfile');
+    const ftNanahRemoteLabel = document.getElementById('ftNanahRemoteLabel');
+    const ftNanahRemoteProfile = document.getElementById('ftNanahRemoteProfile');
+    const ftNanahPairCodeRow = document.getElementById('ftNanahPairCodeRow');
+    const ftNanahPairCode = document.getElementById('ftNanahPairCode');
+    const ftNanahSasPhrase = document.getElementById('ftNanahSasPhrase');
+    const ftNanahStatusHint = document.getElementById('ftNanahStatusHint');
+    const ftNanahTargetHint = document.getElementById('ftNanahTargetHint');
+    const ftNanahConfirmSasBtn = document.getElementById('ftNanahConfirmSasBtn');
+    const ftNanahJoinCode = document.getElementById('ftNanahJoinCode');
+    const ftNanahJoinBtn = document.getElementById('ftNanahJoinBtn');
+    const ftNanahPairUri = document.getElementById('ftNanahPairUri');
+    const ftNanahCopyPairUriBtn = document.getElementById('ftNanahCopyPairUriBtn');
+    const ftNanahQrCanvas = document.getElementById('ftNanahQrCanvas');
+    const ftNanahQrCaption = document.getElementById('ftNanahQrCaption');
+    const ftNanahTrustedLinks = document.getElementById('ftNanahTrustedLinks');
 
     const openKofiBtn = document.getElementById('openKofiBtn');
     const dashboardDonateBtn = document.getElementById('dashboardDonateBtn');
@@ -2758,11 +2793,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                 'videoFilter_uppercase_mode',
                 'categoryFilter_mode',
                 'ftAutoBackupMode',
-                'ftAutoBackupFormat'
+                'ftAutoBackupFormat',
+                'ftNanahRole',
+                'ftNanahScope',
+                'ftNanahStrategy',
+                'ftNanahRemoteTarget'
             ].forEach((id) => {
                 const el = document.getElementById(id);
                 if (el && el.tagName === 'SELECT') {
-                    createDropdownFromSelect(el);
+                    createDropdownFromSelect(el, {
+                        className: id.startsWith('ftNanah') ? 'nanah-select-menu' : ''
+                    });
                 }
             });
         }
@@ -2790,6 +2831,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     let isHandlingProfileSwitch = false;
     let sessionMasterPin = '';
     const unlockedProfiles = new Set();
+    const NANAH_TRUSTED_LINKS_KEY = 'ftNanahTrustedLinks';
+    const NANAH_DEVICE_ID_KEY = 'ftNanahDeviceId';
+    const NANAH_DEVICE_LABEL_KEY = 'ftNanahDeviceLabel';
+    let nanahClient = null;
+    let nanahTrustedLinks = [];
+    let nanahStableDeviceId = '';
+    let nanahTrustedReconnectApprovalPromise = null;
+    let nanahSessionState = {
+        stage: 'idle',
+        code: '',
+        pairUri: '',
+        sasPhrase: '',
+        sasConfirmed: false,
+        connected: false,
+        remoteDevice: null,
+        remoteProfile: null,
+        remoteProfileInventory: [],
+        remoteTargetProfile: null,
+        remoteRole: 'peer',
+        helloSent: false,
+        trustedReconnectApproved: false,
+        trustedReconnectDeviceId: ''
+    };
 
     let lockGateEl = null;
 
@@ -2867,6 +2931,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function safeObject(value) {
         return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+    }
+
+    function safeArray(value) {
+        return Array.isArray(value) ? value : [];
     }
 
     function normalizeString(value) {
@@ -3818,6 +3886,65 @@ document.addEventListener('DOMContentLoaded', async () => {
         ftMaxAccounts.value = String(policy.maxAccounts || 0);
     }
 
+    function updateChildProfileCapabilityControls() {
+        const isChild = getActiveProfileType() === 'child';
+        const childTitle = 'Child profiles cannot manage backup, import/export, or account-admin actions here.';
+
+        if (ftExportV3Btn) {
+            ftExportV3Btn.disabled = isChild;
+            ftExportV3Btn.title = isChild ? childTitle : '';
+        }
+        if (ftExportV3EncryptedBtn) {
+            ftExportV3EncryptedBtn.disabled = isChild;
+            ftExportV3EncryptedBtn.title = isChild ? childTitle : 'Download an encrypted backup JSON (requires a password/PIN)';
+        }
+        if (ftImportV3Btn) {
+            ftImportV3Btn.disabled = isChild;
+            ftImportV3Btn.title = isChild ? childTitle : 'Import a FilterTube export or any compatible JSON (BlockTube, other tools, etc.)';
+        }
+        if (ftImportV3File) {
+            ftImportV3File.disabled = isChild;
+        }
+        if (settingAutoBackupEnabled) {
+            settingAutoBackupEnabled.disabled = isChild || isUiLocked();
+            settingAutoBackupEnabled.title = isChild ? childTitle : '';
+        }
+        if (ftAutoBackupMode) {
+            ftAutoBackupMode.disabled = isChild || ftAutoBackupMode.disabled;
+            if (isChild) ftAutoBackupMode.title = childTitle;
+        }
+        if (ftAutoBackupFormat) {
+            ftAutoBackupFormat.disabled = isChild || ftAutoBackupFormat.disabled;
+            if (isChild) ftAutoBackupFormat.title = childTitle;
+        }
+        if (ftCreateAccountBtn) {
+            ftCreateAccountBtn.disabled = isChild;
+            ftCreateAccountBtn.title = isChild ? childTitle : '';
+        }
+        if (ftCreateChildBtn) {
+            ftCreateChildBtn.disabled = isChild;
+            ftCreateChildBtn.title = isChild ? childTitle : '';
+        }
+        if (ftSetMasterPinBtn) {
+            ftSetMasterPinBtn.disabled = isChild;
+            ftSetMasterPinBtn.title = isChild ? childTitle : '';
+        }
+        if (ftClearMasterPinBtn) {
+            ftClearMasterPinBtn.disabled = isChild;
+            ftClearMasterPinBtn.title = isChild ? childTitle : '';
+        }
+    }
+
+    function isChildProfileAdminSurface() {
+        return getActiveProfileType() === 'child';
+    }
+
+    function ensureNonChildAdminAction(message = 'Child profiles cannot manage this action here.') {
+        if (!isChildProfileAdminSurface()) return true;
+        UIComponents.showToast(message, 'error');
+        return false;
+    }
+
     function isUiLocked() {
         const profilesV4 = profilesV4Cache;
         if (!profilesV4) {
@@ -3830,6 +3957,54 @@ document.addEventListener('DOMContentLoaded', async () => {
         const profilesV4 = profilesV4Cache;
         if (!profilesV4) return 'account';
         return getProfileType(profilesV4, activeProfileId);
+    }
+
+    function getNanahProfileTypeLabel(profileType, profileId = '') {
+        if (normalizeString(profileId) === 'default') return 'master account';
+        return normalizeString(profileType).toLowerCase() === 'child' ? 'child profile' : 'account profile';
+    }
+
+    function getNanahLocalProfileContext() {
+        const profilesV4 = profilesV4Cache;
+        const profileId = normalizeString(activeProfileId) || 'default';
+        const profileType = getActiveProfileType();
+        return {
+            profileId,
+            profileName: getProfileName(profilesV4, profileId),
+            profileType,
+            locked: isProfileLocked(profilesV4, profileId) && !unlockedProfiles.has(profileId)
+        };
+    }
+
+    function getNanahProfileInventory(profilesV4 = profilesV4Cache) {
+        const root = safeObject(profilesV4);
+        const profiles = safeObject(root.profiles);
+        return Object.keys(profiles)
+            .map((profileId) => {
+                const profile = safeObject(profiles[profileId]);
+                return {
+                    profileId,
+                    profileName: normalizeString(profile.name) || (profileId === 'default' ? 'Default' : profileId),
+                    profileType: getProfileType(root, profileId),
+                    locked: isProfileLocked(root, profileId) && !unlockedProfiles.has(profileId)
+                };
+            })
+            .sort((a, b) => {
+                if (a.profileId === 'default') return -1;
+                if (b.profileId === 'default') return 1;
+                return a.profileName.localeCompare(b.profileName);
+            });
+    }
+
+    function normalizeNanahProfileInventory(value) {
+        return safeArray(value)
+            .map((entry) => normalizeNanahProfileContext(entry))
+            .filter((entry) => normalizeString(entry.profileId));
+    }
+
+    function isNanahChildReplicaOnly() {
+        const context = getNanahLocalProfileContext();
+        return context.profileType === 'child' && context.locked === true;
     }
 
     async function enableWhitelistModeAfterImport(context = {}) {
@@ -4504,6 +4679,2625 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    function isNanahAvailable() {
+        return !!(window.FilterTubeNanah && window.FilterTubeNanahAdapter);
+    }
+
+    function normalizeNanahCode(input) {
+        return normalizeString(input)
+            .toUpperCase()
+            .replace(/[^A-Z0-9]/g, '')
+            .slice(0, 8);
+    }
+
+    function extractNanahCodeFromInput(input) {
+        const raw = normalizeString(input);
+        if (/^nanah:\/\//i.test(raw)) {
+            try {
+                const parsed = new URL(raw);
+                const uriCode = parsed.searchParams.get('code');
+                const normalizedFromUri = normalizeNanahCode(uriCode);
+                if (normalizedFromUri) return normalizedFromUri;
+            } catch (error) {
+            }
+        }
+        return normalizeNanahCode(raw);
+    }
+
+    function formatNanahStage(stage) {
+        const raw = normalizeString(stage).toLowerCase();
+        if (!raw) return 'Idle';
+        return raw
+            .split('_')
+            .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+            .join(' ');
+    }
+
+    function getNanahRole() {
+        const raw = normalizeString(ftNanahRole?.value).toLowerCase();
+        if (raw === 'source' || raw === 'replica' || raw === 'peer') return raw;
+        return 'peer';
+    }
+
+    function getNanahScope() {
+        const raw = normalizeString(ftNanahScope?.value).toLowerCase();
+        if (getActiveProfileType() === 'child' && raw === 'full') return 'active';
+        if (raw === 'main' || raw === 'kids' || raw === 'full' || raw === 'active') return raw;
+        return 'active';
+    }
+
+    function getNanahStrategy() {
+        const raw = normalizeString(ftNanahStrategy?.value).toLowerCase();
+        return raw === 'replace' ? 'replace' : 'merge';
+    }
+
+    function getNanahScopeList(value) {
+        const list = Array.isArray(value) ? value : [value];
+        const normalized = list
+            .map((item) => normalizeString(item).toLowerCase())
+            .filter((item) => item === 'main' || item === 'kids' || item === 'active' || item === 'full');
+        return normalized.length > 0 ? Array.from(new Set(normalized)) : ['active'];
+    }
+
+    function classifyNanahTrustedLink(localRole, remoteRole) {
+        if (localRole === 'peer' && remoteRole === 'peer') return 'peer_link';
+        if ((localRole === 'source' && remoteRole === 'replica') || (localRole === 'replica' && remoteRole === 'source')) {
+            return 'managed_link';
+        }
+        return '';
+    }
+
+    function getNanahScopeLabel(scope) {
+        const normalized = normalizeString(scope).toLowerCase();
+        if (normalized === 'main') return 'Main';
+        if (normalized === 'kids') return 'Kids';
+        if (normalized === 'full') return 'Full backup';
+        return 'Active profile';
+    }
+
+    function getNanahStrategyLabel(strategy) {
+        return normalizeString(strategy).toLowerCase() === 'replace' ? 'Replace' : 'Merge';
+    }
+
+    function getNanahReconnectMode(mode, fallback = 'fast') {
+        const normalized = normalizeString(mode).toLowerCase();
+        if (normalized === 'approval_needed' || normalized === 'approval') return 'approval_needed';
+        if (normalized === 'fast') return 'fast';
+        return fallback;
+    }
+
+    function getNanahReconnectModeLabel(mode) {
+        return getNanahReconnectMode(mode) === 'approval_needed' ? 'Approval needed' : 'Fast reconnect';
+    }
+
+    function getNanahLockedChildMode(mode, fallback = 'require_unlock') {
+        const normalized = normalizeString(mode).toLowerCase();
+        if (normalized === 'allow_trusted_updates' || normalized === 'allow_locked_updates') return 'allow_trusted_updates';
+        if (normalized === 'require_unlock') return 'require_unlock';
+        return fallback;
+    }
+
+    function getNanahLockedChildModeLabel(mode) {
+        return getNanahLockedChildMode(mode) === 'allow_trusted_updates'
+            ? 'Allow trusted updates while locked'
+            : 'Require local unlock';
+    }
+
+    function getNanahChildProtectionLevel(value, fallback = 'standard') {
+        const normalized = normalizeString(value).toLowerCase();
+        if (normalized === 'strict') return 'strict';
+        if (normalized === 'standard') return 'standard';
+        return fallback;
+    }
+
+    function getNanahChildProtectionLevelLabel(value) {
+        return getNanahChildProtectionLevel(value, 'standard') === 'strict'
+            ? 'Strict child protection'
+            : 'Standard child protection';
+    }
+
+    function getNanahTargetProfileBehavior(value, fallback = 'current_active') {
+        const normalized = normalizeString(value).toLowerCase();
+        if (normalized === 'fixed_profile' || normalized === 'fixed') return 'fixed_profile';
+        if (normalized === 'current_active' || normalized === 'current') return 'current_active';
+        return fallback;
+    }
+
+    function getNanahTargetProfileBehaviorLabel(value) {
+        return getNanahTargetProfileBehavior(value) === 'fixed_profile'
+            ? 'Always this local profile'
+            : 'Current active profile';
+    }
+
+    function getNanahLinkTypeLabel(linkType) {
+        return normalizeString(linkType) === 'managed_link' ? 'managed link' : 'peer link';
+    }
+
+    function getNanahRoleLabel(role) {
+        const normalized = normalizeString(role).toLowerCase();
+        if (normalized === 'source') return 'Source / Parent';
+        if (normalized === 'replica') return 'Replica / Kids device';
+        return 'Peer';
+    }
+
+    function isActiveChildNanahProfile() {
+        return getActiveProfileType() === 'child';
+    }
+
+    function getNanahScopeDescription(scope) {
+        const normalized = normalizeString(scope).toLowerCase();
+        if (normalized === 'main') return 'Only the main YouTube rules and lists.';
+        if (normalized === 'kids') return 'Only the Kids profile rules and lists.';
+        if (normalized === 'full') return 'The wider account snapshot, best for full migration.';
+        return 'The currently active FilterTube profile snapshot.';
+    }
+
+    function describeNanahScopeList(scopes) {
+        return getNanahScopeList(scopes).map(getNanahScopeLabel).join(', ');
+    }
+
+    async function showNanahManagedLinkModal({
+        title,
+        message = '',
+        intro = '',
+        initialPolicy = {},
+        requiredScopes = [],
+        allowApplyOnce = false,
+        allowSave = true,
+        applyOnceLabel = 'Apply once',
+        saveLabel = 'Save managed link',
+        cancelLabel = 'Cancel',
+        showAutoApply = false,
+        showReconnectMode = false,
+        showLockedChildMode = false,
+        showTargetProfileMapping = false,
+        forceFixedTargetProfile = false
+    }) {
+        const scopeOptions = showLockedChildMode
+            ? ['active', 'main', 'kids']
+            : ['active', 'main', 'kids', 'full'];
+        const localProfileContext = getNanahLocalProfileContext();
+
+        return new Promise((resolve) => {
+            const overlay = document.createElement('div');
+            overlay.className = 'ft-modal-overlay';
+
+            const card = document.createElement('div');
+            card.className = 'card ft-modal nanah-managed-modal';
+
+            const header = document.createElement('div');
+            header.className = 'card-header';
+            const titleEl = document.createElement('h3');
+            titleEl.className = 'ft-modal-title';
+            titleEl.textContent = title;
+            header.appendChild(titleEl);
+
+            const body = document.createElement('div');
+            body.className = 'card-body ft-modal-body';
+
+            if (message) {
+                const messageEl = document.createElement('div');
+                messageEl.className = 'import-export-hint nanah-managed-modal__intro';
+                messageEl.textContent = message;
+                body.appendChild(messageEl);
+            }
+
+            if (intro) {
+                const introEl = document.createElement('div');
+                introEl.className = 'nanah-managed-modal__section-copy';
+                introEl.textContent = intro;
+                body.appendChild(introEl);
+            }
+
+            const initialScopes = getNanahScopeList(initialPolicy.allowedScopes || initialPolicy.defaultScope || 'active');
+            const lockedScopes = getNanahScopeList(requiredScopes);
+            let initialDefaultScope = normalizeString(initialPolicy.defaultScope).toLowerCase();
+            if (!initialScopes.includes(initialDefaultScope)) {
+                initialDefaultScope = initialScopes[0];
+            }
+            const initialApplyMode = normalizeString(initialPolicy.applyMode).toLowerCase() === 'replace' ? 'replace' : 'merge';
+            const initialTargetProfileBehavior = forceFixedTargetProfile
+                ? 'fixed_profile'
+                : getNanahTargetProfileBehavior(initialPolicy.targetProfileBehavior, 'current_active');
+
+            const scopeSection = document.createElement('section');
+            scopeSection.className = 'nanah-managed-modal__section';
+            const scopeTitle = document.createElement('div');
+            scopeTitle.className = 'nanah-managed-modal__section-title';
+            scopeTitle.textContent = 'Allowed scopes';
+            const scopeCopy = document.createElement('div');
+            scopeCopy.className = 'nanah-managed-modal__section-copy';
+            scopeCopy.textContent = lockedScopes.length > 0
+                ? `Choose which scopes this trusted link is allowed to sync in future sessions. ${describeNanahScopeList(lockedScopes)} must stay enabled for the current approval.`
+                : 'Choose which scopes this trusted link is allowed to sync in future sessions.';
+            const scopeGrid = document.createElement('div');
+            scopeGrid.className = 'nanah-managed-modal__scope-grid';
+            const scopeInputs = new Map();
+            scopeOptions.forEach((scope) => {
+                const label = document.createElement('label');
+                label.className = 'nanah-managed-modal__scope';
+                const input = document.createElement('input');
+                input.type = 'checkbox';
+                input.value = scope;
+                input.checked = initialScopes.includes(scope) || lockedScopes.includes(scope);
+                if (lockedScopes.includes(scope)) {
+                    input.disabled = true;
+                }
+                const cardEl = document.createElement('span');
+                cardEl.className = 'nanah-managed-modal__scope-card';
+                const strong = document.createElement('strong');
+                strong.textContent = getNanahScopeLabel(scope);
+                const desc = document.createElement('span');
+                desc.textContent = getNanahScopeDescription(scope);
+                cardEl.appendChild(strong);
+                cardEl.appendChild(desc);
+                label.appendChild(input);
+                label.appendChild(cardEl);
+                scopeGrid.appendChild(label);
+                scopeInputs.set(scope, input);
+            });
+            scopeSection.appendChild(scopeTitle);
+            scopeSection.appendChild(scopeCopy);
+            scopeSection.appendChild(scopeGrid);
+            body.appendChild(scopeSection);
+
+            const defaultSection = document.createElement('section');
+            defaultSection.className = 'nanah-managed-modal__section';
+            const defaultTitle = document.createElement('div');
+            defaultTitle.className = 'nanah-managed-modal__section-title';
+            defaultTitle.textContent = 'Default scope';
+            const defaultCopy = document.createElement('div');
+            defaultCopy.className = 'nanah-managed-modal__section-copy';
+            defaultCopy.textContent = 'Choose which scope this link should treat as the main managed target.';
+            const defaultGrid = document.createElement('div');
+            defaultGrid.className = 'nanah-managed-modal__scope-grid';
+            const defaultInputs = new Map();
+            scopeOptions.forEach((scope) => {
+                const label = document.createElement('label');
+                label.className = 'nanah-managed-modal__scope';
+                const input = document.createElement('input');
+                input.type = 'radio';
+                input.name = `nanah-managed-default-${Date.now()}`;
+                input.value = scope;
+                input.checked = scope === initialDefaultScope;
+                const cardEl = document.createElement('span');
+                cardEl.className = 'nanah-managed-modal__scope-card';
+                const strong = document.createElement('strong');
+                strong.textContent = getNanahScopeLabel(scope);
+                const desc = document.createElement('span');
+                desc.textContent = 'Used as the primary managed scope.';
+                cardEl.appendChild(strong);
+                cardEl.appendChild(desc);
+                label.appendChild(input);
+                label.appendChild(cardEl);
+                defaultGrid.appendChild(label);
+                defaultInputs.set(scope, input);
+            });
+            defaultSection.appendChild(defaultTitle);
+            defaultSection.appendChild(defaultCopy);
+            defaultSection.appendChild(defaultGrid);
+            body.appendChild(defaultSection);
+
+            const modeSection = document.createElement('section');
+            modeSection.className = 'nanah-managed-modal__section';
+            const modeTitle = document.createElement('div');
+            modeTitle.className = 'nanah-managed-modal__section-title';
+            modeTitle.textContent = 'Apply mode';
+            const modeGrid = document.createElement('div');
+            modeGrid.className = 'nanah-managed-modal__mode-grid';
+            const mergeLabel = document.createElement('label');
+            mergeLabel.className = 'nanah-managed-modal__mode';
+            const mergeInput = document.createElement('input');
+            mergeInput.type = 'radio';
+            mergeInput.name = `nanah-managed-mode-${Date.now()}`;
+            mergeInput.value = 'merge';
+            mergeInput.checked = initialApplyMode !== 'replace';
+            const mergeCard = document.createElement('span');
+            mergeCard.className = 'nanah-managed-modal__mode-card';
+            mergeCard.innerHTML = '<strong>Merge</strong><span>Keep existing items and add the incoming snapshot into the same scope.</span>';
+            mergeLabel.appendChild(mergeInput);
+            mergeLabel.appendChild(mergeCard);
+            const replaceLabel = document.createElement('label');
+            replaceLabel.className = 'nanah-managed-modal__mode';
+            const replaceInput = document.createElement('input');
+            replaceInput.type = 'radio';
+            replaceInput.name = mergeInput.name;
+            replaceInput.value = 'replace';
+            replaceInput.checked = initialApplyMode === 'replace';
+            const replaceCard = document.createElement('span');
+            replaceCard.className = 'nanah-managed-modal__mode-card';
+            replaceCard.innerHTML = '<strong>Replace</strong><span>Overwrite the target scope with the incoming snapshot for stricter managed control.</span>';
+            replaceLabel.appendChild(replaceInput);
+            replaceLabel.appendChild(replaceCard);
+            modeGrid.appendChild(mergeLabel);
+            modeGrid.appendChild(replaceLabel);
+            modeSection.appendChild(modeTitle);
+            modeSection.appendChild(modeGrid);
+            body.appendChild(modeSection);
+
+            let autoApplyInput = null;
+            if (showAutoApply) {
+                const autoSection = document.createElement('section');
+                autoSection.className = 'nanah-managed-modal__section';
+                const toggle = document.createElement('label');
+                toggle.className = 'nanah-managed-modal__toggle';
+                autoApplyInput = document.createElement('input');
+                autoApplyInput.type = 'checkbox';
+                autoApplyInput.checked = safeObject(initialPolicy).autoApplyControlProposals === true;
+                const toggleCopy = document.createElement('div');
+                const toggleTitle = document.createElement('strong');
+                toggleTitle.textContent = 'Auto-apply future matching updates';
+                const toggleBody = document.createElement('span');
+                toggleBody.textContent = 'Only future proposals that match this saved scope and policy will skip the approval step.';
+                toggleCopy.appendChild(toggleTitle);
+                toggleCopy.appendChild(toggleBody);
+                toggle.appendChild(autoApplyInput);
+                toggle.appendChild(toggleCopy);
+                autoSection.appendChild(toggle);
+                body.appendChild(autoSection);
+            }
+
+            let reconnectFastInput = null;
+            let reconnectApprovalInput = null;
+            if (showReconnectMode) {
+                const reconnectSection = document.createElement('section');
+                reconnectSection.className = 'nanah-managed-modal__section';
+                const reconnectTitle = document.createElement('div');
+                reconnectTitle.className = 'nanah-managed-modal__section-title';
+                reconnectTitle.textContent = 'Reconnect behavior';
+                const reconnectCopy = document.createElement('div');
+                reconnectCopy.className = 'nanah-managed-modal__section-copy';
+                reconnectCopy.textContent = 'Choose whether future trusted reconnects should be as direct as possible or still require a fresh approval on this device.';
+                const reconnectGrid = document.createElement('div');
+                reconnectGrid.className = 'nanah-managed-modal__mode-grid';
+
+                const fastLabel = document.createElement('label');
+                fastLabel.className = 'nanah-managed-modal__mode';
+                reconnectFastInput = document.createElement('input');
+                reconnectFastInput.type = 'radio';
+                reconnectFastInput.name = `nanah-managed-reconnect-${Date.now()}`;
+                reconnectFastInput.value = 'fast';
+                reconnectFastInput.checked = getNanahReconnectMode(initialPolicy.reconnectMode, 'fast') === 'fast';
+                const fastCard = document.createElement('span');
+                fastCard.className = 'nanah-managed-modal__mode-card';
+                fastCard.innerHTML = '<strong>Fast reconnect</strong><span>Trust is already saved. Future sessions should reopen quickly, then follow the saved policy.</span>';
+                fastLabel.appendChild(reconnectFastInput);
+                fastLabel.appendChild(fastCard);
+
+                const approvalLabel = document.createElement('label');
+                approvalLabel.className = 'nanah-managed-modal__mode';
+                reconnectApprovalInput = document.createElement('input');
+                reconnectApprovalInput.type = 'radio';
+                reconnectApprovalInput.name = reconnectFastInput.name;
+                reconnectApprovalInput.value = 'approval_needed';
+                reconnectApprovalInput.checked = getNanahReconnectMode(initialPolicy.reconnectMode, 'fast') === 'approval_needed';
+                const approvalCard = document.createElement('span');
+                approvalCard.className = 'nanah-managed-modal__mode-card';
+                approvalCard.innerHTML = '<strong>Approval needed</strong><span>Future reconnects should still stop for a fresh approval on this device before the session continues.</span>';
+                approvalLabel.appendChild(reconnectApprovalInput);
+                approvalLabel.appendChild(approvalCard);
+
+                reconnectGrid.appendChild(fastLabel);
+                reconnectGrid.appendChild(approvalLabel);
+                reconnectSection.appendChild(reconnectTitle);
+                reconnectSection.appendChild(reconnectCopy);
+                reconnectSection.appendChild(reconnectGrid);
+                body.appendChild(reconnectSection);
+            }
+
+            let targetCurrentInput = null;
+            let targetFixedInput = null;
+            if (showTargetProfileMapping) {
+                const targetSection = document.createElement('section');
+                targetSection.className = 'nanah-managed-modal__section';
+                const targetTitle = document.createElement('div');
+                targetTitle.className = 'nanah-managed-modal__section-title';
+                targetTitle.textContent = 'Target profile on this device';
+                const targetCopy = document.createElement('div');
+                targetCopy.className = 'nanah-managed-modal__section-copy';
+                targetCopy.textContent = forceFixedTargetProfile
+                    ? `This managed link will always write into ${localProfileContext.profileName} on this device. This keeps parent -> child sync predictable even if a different profile is active later.`
+                    : 'Choose whether future managed updates should follow whatever profile is active here at receive time, or always land in this current local profile.';
+                const targetGrid = document.createElement('div');
+                targetGrid.className = 'nanah-managed-modal__mode-grid';
+
+                const currentLabel = document.createElement('label');
+                currentLabel.className = 'nanah-managed-modal__mode';
+                targetCurrentInput = document.createElement('input');
+                targetCurrentInput.type = 'radio';
+                targetCurrentInput.name = `nanah-managed-target-${Date.now()}`;
+                targetCurrentInput.value = 'current_active';
+                targetCurrentInput.checked = !forceFixedTargetProfile && initialTargetProfileBehavior === 'current_active';
+                targetCurrentInput.disabled = forceFixedTargetProfile;
+                const currentCard = document.createElement('span');
+                currentCard.className = 'nanah-managed-modal__mode-card';
+                currentCard.innerHTML = '<strong>Current active profile</strong><span>Future managed updates follow whichever profile is active on this device at receive time.</span>';
+                currentLabel.appendChild(targetCurrentInput);
+                currentLabel.appendChild(currentCard);
+
+                const fixedLabel = document.createElement('label');
+                fixedLabel.className = 'nanah-managed-modal__mode';
+                targetFixedInput = document.createElement('input');
+                targetFixedInput.type = 'radio';
+                targetFixedInput.name = targetCurrentInput.name;
+                targetFixedInput.value = 'fixed_profile';
+                targetFixedInput.checked = forceFixedTargetProfile || initialTargetProfileBehavior === 'fixed_profile';
+                const fixedCard = document.createElement('span');
+                fixedCard.className = 'nanah-managed-modal__mode-card';
+                fixedCard.innerHTML = `<strong>Always this local profile</strong><span>Managed updates always land in ${localProfileContext.profileName} on this device, even if another profile is active later.</span>`;
+                fixedLabel.appendChild(targetFixedInput);
+                fixedLabel.appendChild(fixedCard);
+
+                targetGrid.appendChild(currentLabel);
+                targetGrid.appendChild(fixedLabel);
+                targetSection.appendChild(targetTitle);
+                targetSection.appendChild(targetCopy);
+                targetSection.appendChild(targetGrid);
+                body.appendChild(targetSection);
+            }
+
+            let childLockRequireInput = null;
+            let childLockAllowInput = null;
+            let childProtectionStandardInput = null;
+            let childProtectionStrictInput = null;
+            if (showLockedChildMode) {
+                const childProtectionSection = document.createElement('section');
+                childProtectionSection.className = 'nanah-managed-modal__section';
+                const childProtectionTitle = document.createElement('div');
+                childProtectionTitle.className = 'nanah-managed-modal__section-title';
+                childProtectionTitle.textContent = 'Child protection level';
+                const childProtectionCopy = document.createElement('div');
+                childProtectionCopy.className = 'nanah-managed-modal__section-copy';
+                childProtectionCopy.textContent = 'Choose whether this child link should follow the custom managed settings below, or force the safest managed behavior automatically.';
+                const childProtectionGrid = document.createElement('div');
+                childProtectionGrid.className = 'nanah-managed-modal__mode-grid';
+
+                const childProtectionName = `nanah-managed-child-protection-${Date.now()}`;
+                const standardLabel = document.createElement('label');
+                standardLabel.className = 'nanah-managed-modal__mode';
+                childProtectionStandardInput = document.createElement('input');
+                childProtectionStandardInput.type = 'radio';
+                childProtectionStandardInput.name = childProtectionName;
+                childProtectionStandardInput.value = 'standard';
+                childProtectionStandardInput.checked = getNanahChildProtectionLevel(initialPolicy.childProtectionLevel, 'standard') !== 'strict';
+                const standardCard = document.createElement('span');
+                standardCard.className = 'nanah-managed-modal__mode-card';
+                standardCard.innerHTML = '<strong>Standard</strong><span>Use the managed settings below for reconnect, lock handling, and future matching updates.</span>';
+                standardLabel.appendChild(childProtectionStandardInput);
+                standardLabel.appendChild(standardCard);
+
+                const strictLabel = document.createElement('label');
+                strictLabel.className = 'nanah-managed-modal__mode';
+                childProtectionStrictInput = document.createElement('input');
+                childProtectionStrictInput.type = 'radio';
+                childProtectionStrictInput.name = childProtectionName;
+                childProtectionStrictInput.value = 'strict';
+                childProtectionStrictInput.checked = getNanahChildProtectionLevel(initialPolicy.childProtectionLevel, 'standard') === 'strict';
+                const strictCard = document.createElement('span');
+                strictCard.className = 'nanah-managed-modal__mode-card';
+                strictCard.innerHTML = '<strong>Strict</strong><span>Force approval-needed reconnect, local unlock required, and no auto-apply for this child link.</span>';
+                strictLabel.appendChild(childProtectionStrictInput);
+                strictLabel.appendChild(strictCard);
+
+                childProtectionGrid.appendChild(standardLabel);
+                childProtectionGrid.appendChild(strictLabel);
+                childProtectionSection.appendChild(childProtectionTitle);
+                childProtectionSection.appendChild(childProtectionCopy);
+                childProtectionSection.appendChild(childProtectionGrid);
+                body.appendChild(childProtectionSection);
+
+                const childLockSection = document.createElement('section');
+                childLockSection.className = 'nanah-managed-modal__section';
+                const childLockTitle = document.createElement('div');
+                childLockTitle.className = 'nanah-managed-modal__section-title';
+                childLockTitle.textContent = 'Locked child profile behavior';
+                const childLockCopy = document.createElement('div');
+                childLockCopy.className = 'nanah-managed-modal__section-copy';
+                childLockCopy.textContent = 'Choose whether this trusted parent/source must wait for a local unlock on the child profile, or may apply matching managed updates while the child profile stays locked. This permission is saved only on this device.';
+                const childLockGrid = document.createElement('div');
+                childLockGrid.className = 'nanah-managed-modal__mode-grid';
+
+                const requireLabel = document.createElement('label');
+                requireLabel.className = 'nanah-managed-modal__mode';
+                childLockRequireInput = document.createElement('input');
+                childLockRequireInput.type = 'radio';
+                childLockRequireInput.name = `nanah-managed-child-lock-${Date.now()}`;
+                childLockRequireInput.value = 'require_unlock';
+                childLockRequireInput.checked = getNanahLockedChildMode(initialPolicy.lockedChildMode, 'require_unlock') === 'require_unlock';
+                const requireCard = document.createElement('span');
+                requireCard.className = 'nanah-managed-modal__mode-card';
+                requireCard.innerHTML = '<strong>Require local unlock</strong><span>The child profile must be locally unlocked before managed updates can apply.</span>';
+                requireLabel.appendChild(childLockRequireInput);
+                requireLabel.appendChild(requireCard);
+
+                const allowLabel = document.createElement('label');
+                allowLabel.className = 'nanah-managed-modal__mode';
+                childLockAllowInput = document.createElement('input');
+                childLockAllowInput.type = 'radio';
+                childLockAllowInput.name = childLockRequireInput.name;
+                childLockAllowInput.value = 'allow_trusted_updates';
+                childLockAllowInput.checked = getNanahLockedChildMode(initialPolicy.lockedChildMode, 'require_unlock') === 'allow_trusted_updates';
+                const allowCard = document.createElement('span');
+                allowCard.className = 'nanah-managed-modal__mode-card';
+                allowCard.innerHTML = '<strong>Allow trusted updates while locked</strong><span>Matching managed updates from this trusted parent/source may apply without unlocking the child profile each time.</span>';
+                allowLabel.appendChild(childLockAllowInput);
+                allowLabel.appendChild(allowCard);
+
+                childLockGrid.appendChild(requireLabel);
+                childLockGrid.appendChild(allowLabel);
+                childLockSection.appendChild(childLockTitle);
+                childLockSection.appendChild(childLockCopy);
+                childLockSection.appendChild(childLockGrid);
+                body.appendChild(childLockSection);
+            }
+
+            const errorEl = document.createElement('div');
+            errorEl.className = 'nanah-managed-modal__error';
+            errorEl.dataset.visible = 'false';
+            body.appendChild(errorEl);
+
+            const actions = document.createElement('div');
+            actions.className = 'ft-modal-actions nanah-managed-modal__actions';
+
+            const cancelBtn = document.createElement('button');
+            cancelBtn.type = 'button';
+            cancelBtn.className = 'btn-secondary';
+            cancelBtn.textContent = cancelLabel;
+            actions.appendChild(cancelBtn);
+
+            const readPolicy = () => {
+                const allowedScopes = scopeOptions.filter((scope) => scopeInputs.get(scope)?.checked || lockedScopes.includes(scope));
+                if (allowedScopes.length === 0) {
+                    errorEl.textContent = 'Pick at least one allowed scope before saving this managed link.';
+                    errorEl.dataset.visible = 'true';
+                    return null;
+                }
+                if (lockedScopes.some((scope) => !allowedScopes.includes(scope))) {
+                    errorEl.textContent = `${describeNanahScopeList(lockedScopes)} must stay enabled for this approval.`;
+                    errorEl.dataset.visible = 'true';
+                    return null;
+                }
+                let defaultScope = scopeOptions.find((scope) => defaultInputs.get(scope)?.checked);
+                if (!allowedScopes.includes(defaultScope)) {
+                    defaultScope = allowedScopes[0];
+                }
+                errorEl.dataset.visible = 'false';
+                const childProtectionLevel = childProtectionStrictInput?.checked === true ? 'strict' : 'standard';
+                const targetProfileBehavior = showTargetProfileMapping
+                    ? ((forceFixedTargetProfile || childProtectionLevel === 'strict' || targetFixedInput?.checked === true) ? 'fixed_profile' : 'current_active')
+                    : 'current_active';
+                return {
+                    allowedScopes,
+                    defaultScope,
+                    applyMode: replaceInput.checked ? 'replace' : 'merge',
+                    autoApplyControlProposals: childProtectionLevel === 'strict' ? false : (autoApplyInput?.checked === true),
+                    reconnectMode: childProtectionLevel === 'strict' ? 'approval_needed' : (reconnectApprovalInput?.checked === true ? 'approval_needed' : 'fast'),
+                    lockedChildMode: childProtectionLevel === 'strict' ? 'require_unlock' : (childLockAllowInput?.checked === true ? 'allow_trusted_updates' : 'require_unlock'),
+                    childProtectionLevel,
+                    targetProfileBehavior,
+                    targetProfileId: targetProfileBehavior === 'fixed_profile' ? localProfileContext.profileId : '',
+                    targetProfileName: targetProfileBehavior === 'fixed_profile' ? localProfileContext.profileName : ''
+                };
+            };
+
+            const syncDefaultScopeState = () => {
+                const allowedScopes = scopeOptions.filter((scope) => scopeInputs.get(scope)?.checked || lockedScopes.includes(scope));
+                let activeDefault = scopeOptions.find((scope) => defaultInputs.get(scope)?.checked);
+                scopeOptions.forEach((scope) => {
+                    const enabled = allowedScopes.includes(scope);
+                    const radio = defaultInputs.get(scope);
+                    if (!radio) return;
+                    radio.disabled = !enabled;
+                    if (!enabled) {
+                        radio.checked = false;
+                    }
+                });
+                if (!allowedScopes.includes(activeDefault)) {
+                    const fallback = allowedScopes[0];
+                    if (fallback && defaultInputs.get(fallback)) {
+                        defaultInputs.get(fallback).checked = true;
+                    }
+                }
+            };
+
+            scopeInputs.forEach((input) => {
+                input.addEventListener('change', syncDefaultScopeState);
+            });
+            syncDefaultScopeState();
+
+            const cleanup = () => {
+                try {
+                    overlay.remove();
+                } catch (e) {
+                }
+            };
+
+            const closeWith = (value) => {
+                cleanup();
+                resolve(value);
+            };
+
+            cancelBtn.addEventListener('click', () => closeWith(null));
+            overlay.addEventListener('click', (event) => {
+                if (event.target === overlay) {
+                    closeWith(null);
+                }
+            });
+
+            if (allowApplyOnce) {
+                const applyBtn = document.createElement('button');
+                applyBtn.type = 'button';
+                applyBtn.className = 'btn-secondary';
+                applyBtn.textContent = applyOnceLabel;
+                applyBtn.addEventListener('click', () => {
+                    const policy = readPolicy();
+                    if (!policy) return;
+                    closeWith({ action: 'apply_once', policy });
+                });
+                actions.appendChild(applyBtn);
+            }
+
+            if (allowSave) {
+                const saveBtn = document.createElement('button');
+                saveBtn.type = 'button';
+                saveBtn.className = 'btn-primary';
+                saveBtn.textContent = saveLabel;
+                saveBtn.addEventListener('click', () => {
+                    const policy = readPolicy();
+                    if (!policy) return;
+                    closeWith({ action: 'save', policy });
+                });
+                actions.appendChild(saveBtn);
+                requestAnimationFrame(() => {
+                    try {
+                        saveBtn.focus();
+                    } catch (e) {
+                    }
+                });
+            }
+
+            card.appendChild(header);
+            card.appendChild(body);
+            card.appendChild(actions);
+            overlay.appendChild(card);
+            document.body.appendChild(overlay);
+        });
+    }
+
+    function normalizeNanahTrustedLink(entry) {
+        const raw = safeObject(entry);
+        const remoteDeviceId = normalizeString(raw.remoteDeviceId);
+        if (!remoteDeviceId) return null;
+
+        const localRole = (() => {
+            const value = normalizeString(raw.localRole).toLowerCase();
+            return value === 'source' || value === 'replica' || value === 'peer' ? value : 'peer';
+        })();
+        const remoteRole = (() => {
+            const value = normalizeString(raw.remoteRole || raw.role).toLowerCase();
+            return value === 'source' || value === 'replica' || value === 'peer' ? value : 'peer';
+        })();
+        const derivedLinkType = classifyNanahTrustedLink(localRole, remoteRole);
+        const requestedLinkType = normalizeString(raw.linkType || safeObject(raw.policy).linkType);
+        const linkType = requestedLinkType === 'managed_link' || requestedLinkType === 'peer_link'
+            ? requestedLinkType
+            : (derivedLinkType || 'peer_link');
+        const normalizedScopes = getNanahScopeList(safeObject(raw.policy).allowedScopes || raw.allowedScopes || safeObject(raw.policy).defaultScope || raw.defaultScope);
+        const applyMode = normalizeString(safeObject(raw.policy).applyMode || raw.applyMode).toLowerCase() === 'replace' ? 'replace' : 'merge';
+        const autoApply = safeObject(raw.policy).autoApplyControlProposals === true;
+        const reconnectMode = getNanahReconnectMode(safeObject(raw.policy).reconnectMode || raw.reconnectMode, linkType === 'managed_link' ? 'approval_needed' : 'fast');
+        const lockedChildMode = getNanahLockedChildMode(safeObject(raw.policy).lockedChildMode || raw.lockedChildMode, 'require_unlock');
+        const childProtectionLevel = getNanahChildProtectionLevel(safeObject(raw.policy).childProtectionLevel || raw.childProtectionLevel, 'standard');
+        const targetProfileBehavior = getNanahTargetProfileBehavior(
+            safeObject(raw.policy).targetProfileBehavior || raw.targetProfileBehavior,
+            'current_active'
+        );
+        const targetProfileId = normalizeString(safeObject(raw.policy).targetProfileId || raw.targetProfileId);
+        const targetProfileName = normalizeString(safeObject(raw.policy).targetProfileName || raw.targetProfileName);
+
+        return {
+            ...raw,
+            linkId: normalizeString(raw.linkId) || `nanah-${remoteDeviceId}`,
+            remoteDeviceId,
+            deviceLabel: normalizeString(raw.deviceLabel) || remoteDeviceId,
+            app: 'filtertube',
+            localRole,
+            remoteRole,
+            linkType,
+            createdAt: normalizeString(raw.createdAt) || new Date().toISOString(),
+            lastUsedAt: normalizeString(raw.lastUsedAt) || new Date().toISOString(),
+            policy: {
+                ...safeObject(raw.policy),
+                linkType,
+                decisionMode: linkType === 'managed_link' ? 'source' : 'receiver',
+                allowedScopes: normalizedScopes,
+                defaultScope: normalizeString(safeObject(raw.policy).defaultScope) || normalizedScopes[0],
+                applyMode,
+                autoApplyControlProposals: linkType === 'managed_link' && autoApply,
+                reconnectMode,
+                lockedChildMode,
+                childProtectionLevel,
+                targetProfileBehavior,
+                targetProfileId: targetProfileBehavior === 'fixed_profile' ? targetProfileId : '',
+                targetProfileName: targetProfileBehavior === 'fixed_profile' ? targetProfileName : ''
+            }
+        };
+    }
+
+    function getManagedNanahLinkPolicy(link) {
+        const trusted = normalizeNanahTrustedLink(link);
+        if (!trusted || trusted.linkType !== 'managed_link') return null;
+        return safeObject(trusted.policy);
+    }
+
+    function getNanahCurrentTrustedLink() {
+        const remoteId = normalizeString(safeObject(nanahSessionState.remoteDevice).deviceId);
+        return remoteId ? findNanahTrustedLink(remoteId) : null;
+    }
+
+    function resolveNanahLocalTargetProfile(trustedLink, profilesV4 = profilesV4Cache) {
+        const localProfiles = safeObject(profilesV4);
+        const profiles = safeObject(localProfiles.profiles);
+        const currentActiveId = normalizeString(localProfiles.activeProfileId) || normalizeString(activeProfileId) || 'default';
+        const trusted = normalizeNanahTrustedLink(trustedLink);
+
+        if (!trusted || trusted.linkType !== 'managed_link' || trusted.localRole !== 'replica' || trusted.remoteRole !== 'source') {
+            return {
+                behavior: 'current_active',
+                profileId: currentActiveId,
+                profileName: getProfileName(localProfiles, currentActiveId),
+                profileType: getProfileType(localProfiles, currentActiveId),
+                locked: isProfileLocked(localProfiles, currentActiveId) && !unlockedProfiles.has(currentActiveId)
+            };
+        }
+
+        const behavior = getNanahTargetProfileBehavior(safeObject(trusted.policy).targetProfileBehavior, 'current_active');
+        if (behavior !== 'fixed_profile') {
+            return {
+                behavior: 'current_active',
+                profileId: currentActiveId,
+                profileName: getProfileName(localProfiles, currentActiveId),
+                profileType: getProfileType(localProfiles, currentActiveId),
+                locked: isProfileLocked(localProfiles, currentActiveId) && !unlockedProfiles.has(currentActiveId)
+            };
+        }
+
+        const targetProfileId = normalizeString(safeObject(trusted.policy).targetProfileId);
+        if (!targetProfileId || !profiles[targetProfileId]) {
+            throw new Error('This managed link targets a profile that no longer exists on this device. Edit the link before receiving more updates.');
+        }
+
+        return {
+            behavior: 'fixed_profile',
+            profileId: targetProfileId,
+            profileName: normalizeString(safeObject(trusted.policy).targetProfileName) || getProfileName(localProfiles, targetProfileId),
+            profileType: getProfileType(localProfiles, targetProfileId),
+            locked: isProfileLocked(localProfiles, targetProfileId) && !unlockedProfiles.has(targetProfileId)
+        };
+    }
+
+    function resolveNanahTargetProfileFromPolicy(policy, profilesV4 = profilesV4Cache) {
+        const localProfiles = safeObject(profilesV4);
+        const profiles = safeObject(localProfiles.profiles);
+        const currentActiveId = normalizeString(localProfiles.activeProfileId) || normalizeString(activeProfileId) || 'default';
+        const behavior = getNanahTargetProfileBehavior(safeObject(policy).targetProfileBehavior, 'current_active');
+
+        if (behavior !== 'fixed_profile') {
+            return {
+                behavior: 'current_active',
+                profileId: currentActiveId,
+                profileName: getProfileName(localProfiles, currentActiveId),
+                profileType: getProfileType(localProfiles, currentActiveId),
+                locked: isProfileLocked(localProfiles, currentActiveId) && !unlockedProfiles.has(currentActiveId)
+            };
+        }
+
+        const targetProfileId = normalizeString(safeObject(policy).targetProfileId) || currentActiveId;
+        if (!profiles[targetProfileId]) {
+            throw new Error('The selected target profile is no longer available on this device.');
+        }
+
+        return {
+            behavior: 'fixed_profile',
+            profileId: targetProfileId,
+            profileName: normalizeString(safeObject(policy).targetProfileName) || getProfileName(localProfiles, targetProfileId),
+            profileType: getProfileType(localProfiles, targetProfileId),
+            locked: isProfileLocked(localProfiles, targetProfileId) && !unlockedProfiles.has(targetProfileId)
+        };
+    }
+
+    function resolveNanahExplicitTargetProfile(profileContext, profilesV4 = profilesV4Cache) {
+        const profile = normalizeNanahProfileContext(profileContext);
+        if (!normalizeString(profile.profileId)) return null;
+        return resolveNanahTargetProfileFromPolicy({
+            targetProfileBehavior: 'fixed_profile',
+            targetProfileId: profile.profileId,
+            targetProfileName: profile.profileName
+        }, profilesV4);
+    }
+
+    function buildNanahHelloTargetProfileContext() {
+        const localRole = getNanahRole();
+        const remoteRole = normalizeString(nanahSessionState.remoteRole) || 'peer';
+        if (localRole !== 'replica' || remoteRole !== 'source') return null;
+        const trustedLink = getNanahCurrentTrustedLink();
+        if (!trustedLink || normalizeString(safeObject(trustedLink).linkType) !== 'managed_link') return null;
+        const targetProfile = resolveNanahLocalTargetProfile(trustedLink);
+        return {
+            behavior: targetProfile.behavior,
+            profileId: targetProfile.behavior === 'fixed_profile' ? targetProfile.profileId : '',
+            profileName: targetProfile.behavior === 'fixed_profile' ? targetProfile.profileName : '',
+            profileType: targetProfile.behavior === 'fixed_profile' ? targetProfile.profileType : '',
+            locked: targetProfile.behavior === 'fixed_profile' ? targetProfile.locked === true : false
+        };
+    }
+
+    function getNanahSelectedRemoteTargetProfileId() {
+        return normalizeString(ftNanahRemoteTarget?.value);
+    }
+
+    function getNanahSelectedRemoteTargetProfile() {
+        const selectedId = getNanahSelectedRemoteTargetProfileId();
+        if (!selectedId) return null;
+        const inventory = normalizeNanahProfileInventory(nanahSessionState.remoteProfileInventory);
+        return inventory.find((entry) => normalizeString(entry.profileId) === selectedId) || null;
+    }
+
+    function syncNanahRemoteTargetOptions() {
+        if (!ftNanahRemoteTarget) return;
+        const inventory = normalizeNanahProfileInventory(nanahSessionState.remoteProfileInventory);
+        const previous = normalizeString(ftNanahRemoteTarget.value);
+        ftNanahRemoteTarget.innerHTML = '';
+
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'Use remote active profile';
+        ftNanahRemoteTarget.appendChild(defaultOption);
+
+        inventory.forEach((entry) => {
+            const option = document.createElement('option');
+            option.value = entry.profileId;
+            option.textContent = `${entry.profileName} (${getNanahProfileTypeLabel(entry.profileType, entry.profileId)})${entry.locked ? ' · locked' : ''}`;
+            ftNanahRemoteTarget.appendChild(option);
+        });
+
+        const activeRemoteId = normalizeString(safeObject(nanahSessionState.remoteProfile).profileId);
+        if (previous && inventory.some((entry) => normalizeString(entry.profileId) === previous)) {
+            ftNanahRemoteTarget.value = previous;
+        } else if (activeRemoteId && inventory.some((entry) => normalizeString(entry.profileId) === activeRemoteId)) {
+            ftNanahRemoteTarget.value = activeRemoteId;
+        } else {
+            ftNanahRemoteTarget.value = '';
+        }
+    }
+
+    async function ensureNanahManagedChildLinkPermission(policy) {
+        if (!isActiveChildNanahProfile()) return true;
+        if (getNanahLockedChildMode(safeObject(policy).lockedChildMode, 'require_unlock') !== 'allow_trusted_updates') {
+            return true;
+        }
+        const io = window.FilterTubeIO || {};
+        const profilesV4 = profilesV4Cache || (typeof io.loadProfilesV4 === 'function' ? await io.loadProfilesV4() : null);
+        const activeId = normalizeString(profilesV4?.activeProfileId) || activeProfileId || 'default';
+        const unlocked = await ensureProfileUnlocked(profilesV4, activeId);
+        if (!unlocked) {
+            UIComponents.showToast('Unlock this child profile to allow trusted parent updates while it is locked later.', 'error');
+            return false;
+        }
+        return true;
+    }
+
+    function isCurrentNanahManagedLink() {
+        const trusted = getNanahCurrentTrustedLink();
+        return safeObject(trusted).linkType === 'managed_link';
+    }
+
+    function getNanahCapabilitiesForRole(role) {
+        if (role === 'source') {
+            return ['sync.send', 'control.propose', 'device.link'];
+        }
+        if (role === 'replica') {
+            return ['sync.receive', 'control.apply', 'device.link'];
+        }
+        return ['sync.send', 'sync.receive', 'control.propose', 'control.apply', 'device.link'];
+    }
+
+    function buildNanahPairUri(code) {
+        const normalizedCode = normalizeNanahCode(code);
+        if (!normalizedCode) return '';
+        const relay = normalizeString(window.FilterTubeNanah?.DEFAULT_NANAH_SIGNALING_URL);
+        const params = new URLSearchParams();
+        params.set('app', 'filtertube');
+        params.set('code', normalizedCode);
+        if (relay) params.set('relay', relay);
+        return `nanah://pair?${params.toString()}`;
+    }
+
+    function getNanahRemoteLabel() {
+        const remote = safeObject(nanahSessionState.remoteDevice);
+        return normalizeString(remote.deviceLabel) || normalizeString(remote.deviceId) || 'Unknown device';
+    }
+
+    function normalizeNanahProfileContext(value) {
+        const raw = safeObject(value);
+        const profileId = normalizeString(raw.profileId);
+        const profileType = normalizeString(raw.profileType).toLowerCase() === 'child' ? 'child' : 'account';
+        return {
+            profileId,
+            profileName: normalizeString(raw.profileName) || (profileId === 'default' ? 'Default' : (profileId || 'Unknown profile')),
+            profileType,
+            locked: raw.locked === true
+        };
+    }
+
+    function normalizeNanahTargetProfileContext(value) {
+        const raw = safeObject(value);
+        const behavior = getNanahTargetProfileBehavior(raw.behavior || raw.targetProfileBehavior, 'current_active');
+        return {
+            behavior,
+            profileId: behavior === 'fixed_profile' ? normalizeString(raw.profileId) : '',
+            profileName: behavior === 'fixed_profile' ? normalizeString(raw.profileName) : '',
+            profileType: behavior === 'fixed_profile' ? normalizeString(raw.profileType).toLowerCase() : '',
+            locked: raw.locked === true
+        };
+    }
+
+    function formatNanahProfileContext(value) {
+        const profile = normalizeNanahProfileContext(value);
+        const parts = [`${profile.profileName} (${getNanahProfileTypeLabel(profile.profileType, profile.profileId)})`];
+        if (profile.locked) {
+            parts.push('locked');
+        }
+        return parts.join(', ');
+    }
+
+    function buildNanahTargetHint(scope = getNanahScope()) {
+        const normalizedScope = normalizeString(scope).toLowerCase() || 'active';
+        if (normalizedScope === 'full') {
+            return 'Full backup is the only scope that targets the wider account tree. Saved links still remember trust and policy only, not a live background connection.';
+        }
+        const remoteTargetProfile = normalizeNanahTargetProfileContext(nanahSessionState.remoteTargetProfile);
+        const explicitRemoteTarget = getNanahSelectedRemoteTargetProfile();
+        if (explicitRemoteTarget && normalizeString(explicitRemoteTarget.profileName)) {
+            return `This live session is set to write into ${explicitRemoteTarget.profileName} on ${getNanahRemoteLabel()}, even if another remote profile is active right now.`;
+        }
+        if (remoteTargetProfile.behavior === 'fixed_profile' && normalizeString(remoteTargetProfile.profileName)) {
+            return `${getNanahRemoteLabel()} saved this managed link to write into ${remoteTargetProfile.profileName}, even if another profile is active there later.`;
+        }
+        const remoteProfile = normalizeNanahProfileContext(nanahSessionState.remoteProfile);
+        const localProfile = getNanahLocalProfileContext();
+        const trusted = normalizeNanahTrustedLink(getNanahCurrentTrustedLink());
+        if (trusted && trusted.localRole === 'replica' && trusted.remoteRole === 'source' && trusted.linkType === 'managed_link') {
+            try {
+                const targetProfile = resolveNanahLocalTargetProfile(trusted);
+                if (targetProfile.behavior === 'fixed_profile') {
+                    return `Managed updates from ${getNanahRemoteLabel()} will write into ${targetProfile.profileName} on this device, even if another local profile is active later.`;
+                }
+            } catch (error) {
+                return error?.message || 'This managed link points to a profile that is no longer available on this device.';
+            }
+        }
+        if (localProfile.profileType === 'child' && normalizeString(remoteProfile.profileName)) {
+            return `This child profile will not safely target ${remoteProfile.profileName} on ${getNanahRemoteLabel()} unless that device saves a fixed managed target for this child first.`;
+        }
+        if (normalizeString(remoteProfile.profileName)) {
+            return `${getNanahScopeLabel(normalizedScope)} will write into ${remoteProfile.profileName} on ${getNanahRemoteLabel()}. Nanah v1 does not target inactive remote profiles yet.`;
+        }
+        return 'Non-full sync writes into the receiver\'s current active profile only. Saved links remember trust and policy, not a live background connection.';
+    }
+
+    async function ensureNanahStableDeviceId() {
+        if (normalizeString(nanahStableDeviceId)) return nanahStableDeviceId;
+        const stored = normalizeString(await readNanahStorage(NANAH_DEVICE_ID_KEY));
+        if (stored) {
+            nanahStableDeviceId = stored;
+            return nanahStableDeviceId;
+        }
+        const generated = (() => {
+            try {
+                if (globalThis.crypto && typeof globalThis.crypto.randomUUID === 'function') {
+                    return `ftnanah-${globalThis.crypto.randomUUID()}`;
+                }
+            } catch (error) {
+            }
+            return `ftnanah-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+        })();
+        nanahStableDeviceId = generated;
+        await writeNanahStorage(NANAH_DEVICE_ID_KEY, generated);
+        return nanahStableDeviceId;
+    }
+
+    async function loadNanahPreferredDeviceLabel() {
+        const stored = normalizeString(await readNanahStorage(NANAH_DEVICE_LABEL_KEY));
+        if (stored) return stored;
+        try {
+            const adapter = window.FilterTubeNanahAdapter || {};
+            const descriptor = typeof adapter.getDeviceDescriptor === 'function'
+                ? adapter.getDeviceDescriptor({ appVersion: manifestVersion })
+                : null;
+            return normalizeString(descriptor?.deviceLabel)
+                || normalizeString(navigator?.platform)
+                || 'Browser device';
+        } catch (error) {
+            return normalizeString(navigator?.platform) || 'Browser device';
+        }
+    }
+
+    async function persistNanahPreferredDeviceLabel() {
+        const nextLabel = normalizeString(ftNanahDeviceLabel?.value);
+        if (!nextLabel) return false;
+        return writeNanahStorage(NANAH_DEVICE_LABEL_KEY, nextLabel);
+    }
+
+    async function confirmNanahRemoteTarget(scope) {
+        const normalizedScope = normalizeString(scope).toLowerCase() || 'active';
+        if (normalizedScope === 'full') return true;
+        const localProfile = getNanahLocalProfileContext();
+        const explicitRemoteTarget = getNanahSelectedRemoteTargetProfile();
+        if (explicitRemoteTarget && normalizeString(explicitRemoteTarget.profileId)) {
+            return true;
+        }
+        const remoteTargetProfile = normalizeNanahTargetProfileContext(nanahSessionState.remoteTargetProfile);
+        if (localProfile.profileType === 'child' && remoteTargetProfile.behavior === 'fixed_profile') {
+            return true;
+        }
+        const remoteProfile = normalizeNanahProfileContext(nanahSessionState.remoteProfile);
+        if (!normalizeString(remoteProfile.profileId)) return true;
+        if (normalizeString(localProfile.profileId) === normalizeString(remoteProfile.profileId)) return true;
+
+        if (localProfile.profileType === 'child') {
+            await showChoiceModal({
+                title: 'Managed child target required',
+                message: `You are sending ${getNanahScopeLabel(normalizedScope).toLowerCase()} from ${formatNanahProfileContext(localProfile)}, but ${getNanahRemoteLabel()} currently has ${formatNanahProfileContext(remoteProfile)} active.`,
+                details: [
+                    'For child profiles, FilterTube now blocks "send anyway" in this situation so the update does not land in the wrong remote profile.',
+                    'To manage that child profile reliably, save a Source -> Replica managed link on the other device while its child profile is active once.',
+                    'After that, choose "Always this local profile" on the receiving device so future parent updates can land there without switching profiles each time.'
+                ],
+                choices: [
+                    {
+                        value: 'ok',
+                        label: 'Got It',
+                        recommended: true
+                    }
+                ],
+                cancelText: 'Cancel'
+            });
+            return false;
+        }
+
+        const response = await showChoiceModal({
+            title: 'Remote active profile differs',
+            message: `You are sending ${getNanahScopeLabel(normalizedScope).toLowerCase()} from ${formatNanahProfileContext(localProfile)}, but ${getNanahRemoteLabel()} currently has ${formatNanahProfileContext(remoteProfile)} active.`,
+            details: [
+                'Nanah v1 does not target inactive remote profiles by name yet.',
+                `${getNanahScopeLabel(normalizedScope)} will apply to the remote device\'s current active profile, not to an inactive matching profile.`,
+                'Switch the other device to the intended profile first, or use Full backup only if you really want the wider account tree.'
+            ],
+            choices: [
+                {
+                    value: 'continue',
+                    label: 'Send Anyway'
+                },
+                {
+                    value: 'cancel',
+                    label: 'Cancel',
+                    className: 'btn-secondary',
+                    recommended: true
+                }
+            ],
+            cancelText: 'Cancel'
+        });
+
+        return response === 'continue';
+    }
+
+    function findNanahTrustedLink(remoteDeviceId) {
+        const deviceId = normalizeString(remoteDeviceId);
+        if (!deviceId) return null;
+        return nanahTrustedLinks.find((entry) => normalizeString(entry?.remoteDeviceId) === deviceId) || null;
+    }
+
+    async function readNanahStorage(key) {
+        return new Promise((resolve) => {
+            try {
+                if (!runtimeAPI?.storage?.local?.get) {
+                    resolve(null);
+                    return;
+                }
+                const maybePromise = runtimeAPI.storage.local.get([key], (result) => {
+                    const err = runtimeAPI.runtime?.lastError;
+                    if (err) {
+                        resolve(null);
+                        return;
+                    }
+                    resolve(result ? result[key] : null);
+                });
+                if (maybePromise && typeof maybePromise.then === 'function') {
+                    maybePromise.then((result) => resolve(result ? result[key] : null)).catch(() => resolve(null));
+                }
+            } catch (error) {
+                resolve(null);
+            }
+        });
+    }
+
+    async function writeNanahStorage(key, value) {
+        return new Promise((resolve) => {
+            try {
+                if (!runtimeAPI?.storage?.local?.set) {
+                    resolve(false);
+                    return;
+                }
+                const maybePromise = runtimeAPI.storage.local.set({ [key]: value }, () => {
+                    const err = runtimeAPI.runtime?.lastError;
+                    resolve(!err);
+                });
+                if (maybePromise && typeof maybePromise.then === 'function') {
+                    maybePromise.then(() => resolve(true)).catch(() => resolve(false));
+                }
+            } catch (error) {
+                resolve(false);
+            }
+        });
+    }
+
+    async function loadNanahTrustedLinks() {
+        const stored = await readNanahStorage(NANAH_TRUSTED_LINKS_KEY);
+        nanahTrustedLinks = Array.isArray(stored)
+            ? stored
+                .map((entry) => normalizeNanahTrustedLink(entry))
+                .filter(Boolean)
+            : [];
+    }
+
+    async function persistNanahTrustedLinks() {
+        await writeNanahStorage(NANAH_TRUSTED_LINKS_KEY, nanahTrustedLinks);
+    }
+
+    async function saveNanahTrustedLink(entry) {
+        const deviceId = normalizeString(entry?.remoteDeviceId);
+        if (!deviceId) return;
+        const nextEntry = {
+            ...normalizeNanahTrustedLink({
+                ...safeObject(entry),
+                linkId: normalizeString(entry?.linkId) || `nanah-${deviceId}`,
+                remoteDeviceId: deviceId,
+                deviceLabel: normalizeString(entry?.deviceLabel) || deviceId,
+                app: 'filtertube',
+                createdAt: normalizeString(entry?.createdAt) || new Date().toISOString(),
+                lastUsedAt: new Date().toISOString()
+            })
+        };
+        const existingIndex = nanahTrustedLinks.findIndex((item) => normalizeString(item?.remoteDeviceId) === deviceId);
+        if (existingIndex >= 0) {
+            nanahTrustedLinks.splice(existingIndex, 1, {
+                ...nanahTrustedLinks[existingIndex],
+                ...nextEntry
+            });
+        } else {
+            nanahTrustedLinks.unshift(nextEntry);
+        }
+        await persistNanahTrustedLinks();
+        renderNanahTrustedLinks();
+    }
+
+    async function removeNanahTrustedLink(linkId) {
+        const normalized = normalizeString(linkId);
+        if (!normalized) return;
+        nanahTrustedLinks = nanahTrustedLinks.filter((entry) => normalizeString(entry?.linkId) !== normalized);
+        await persistNanahTrustedLinks();
+        renderNanahTrustedLinks();
+    }
+
+    async function updateNanahTrustedLinkPolicy(linkId, updates = {}) {
+        const normalized = normalizeString(linkId);
+        if (!normalized) return false;
+        const index = nanahTrustedLinks.findIndex((entry) => normalizeString(entry?.linkId) === normalized);
+        if (index < 0) return false;
+        const current = normalizeNanahTrustedLink(nanahTrustedLinks[index]);
+        if (!current) return false;
+        const next = normalizeNanahTrustedLink({
+            ...current,
+            ...safeObject(updates),
+            policy: {
+                ...safeObject(current.policy),
+                ...safeObject(updates.policy)
+            },
+            lastUsedAt: current.lastUsedAt
+        });
+        if (!next) return false;
+        nanahTrustedLinks.splice(index, 1, next);
+        await persistNanahTrustedLinks();
+        renderNanahTrustedLinks();
+        return true;
+    }
+
+    async function markNanahTrustedLinkUsed(remoteDeviceId) {
+        const link = findNanahTrustedLink(remoteDeviceId);
+        if (!link) return;
+        link.lastUsedAt = new Date().toISOString();
+        await persistNanahTrustedLinks();
+        renderNanahTrustedLinks();
+    }
+
+    async function configureNanahTrustedLink(link) {
+        const trusted = normalizeNanahTrustedLink(link);
+        if (!trusted) return;
+
+        if (trusted.linkType !== 'managed_link') {
+            UIComponents.showToast('Peer links do not have managed policy settings yet', 'info');
+            return;
+        }
+
+        const currentPolicy = safeObject(trusted.policy);
+        const nextPolicyDecision = await showNanahManagedLinkModal({
+            title: 'Edit Managed Link',
+            message: `Adjust what ${normalizeString(trusted.deviceLabel) || 'this device'} may receive through this managed link.`,
+            intro: `Current link: ${getNanahStrategyLabel(currentPolicy.applyMode || 'merge')} on ${describeNanahScopeList(currentPolicy.allowedScopes || currentPolicy.defaultScope || 'active')}.`,
+            initialPolicy: currentPolicy,
+            allowApplyOnce: false,
+            allowSave: true,
+            saveLabel: 'Save Policy',
+            cancelLabel: 'Cancel',
+            showAutoApply: trusted.localRole === 'replica' && trusted.remoteRole === 'source',
+            showReconnectMode: trusted.localRole === 'replica' && trusted.remoteRole === 'source',
+            showLockedChildMode: trusted.localRole === 'replica' && trusted.remoteRole === 'source' && isActiveChildNanahProfile(),
+            showTargetProfileMapping: trusted.localRole === 'replica' && trusted.remoteRole === 'source',
+            forceFixedTargetProfile: trusted.localRole === 'replica' && trusted.remoteRole === 'source' && isActiveChildNanahProfile()
+        });
+        if (!nextPolicyDecision?.policy) return;
+        if (!(await ensureNanahManagedChildLinkPermission(nextPolicyDecision.policy))) return;
+
+        await updateNanahTrustedLinkPolicy(trusted.linkId, {
+            policy: {
+                allowedScopes: nextPolicyDecision.policy.allowedScopes,
+                defaultScope: nextPolicyDecision.policy.defaultScope,
+                applyMode: nextPolicyDecision.policy.applyMode,
+                autoApplyControlProposals: nextPolicyDecision.policy.autoApplyControlProposals,
+                reconnectMode: nextPolicyDecision.policy.reconnectMode,
+                lockedChildMode: nextPolicyDecision.policy.lockedChildMode,
+                childProtectionLevel: nextPolicyDecision.policy.childProtectionLevel,
+                targetProfileBehavior: nextPolicyDecision.policy.targetProfileBehavior,
+                targetProfileId: nextPolicyDecision.policy.targetProfileId,
+                targetProfileName: nextPolicyDecision.policy.targetProfileName
+            }
+        });
+        UIComponents.showToast('Managed link updated', 'success');
+    }
+
+    async function startNanahTrustedReconnect(link) {
+        const trusted = normalizeNanahTrustedLink(link);
+        if (!trusted) return;
+
+        if (isNanahChildReplicaOnly() && trusted.localRole !== 'replica') {
+            UIComponents.showToast('Locked child profiles can only reconnect as managed replicas. Unlock the child profile first to reconnect as a sender.', 'error');
+            return;
+        }
+
+        if (ftNanahRole && !ftNanahRole.disabled) {
+            ftNanahRole.value = trusted.localRole || 'peer';
+            ftNanahRole.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+        if (ftNanahScope && safeObject(trusted.policy).defaultScope) {
+            ftNanahScope.value = safeObject(trusted.policy).defaultScope;
+            ftNanahScope.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+        if (ftNanahStrategy && safeObject(trusted.policy).applyMode) {
+            ftNanahStrategy.value = safeObject(trusted.policy).applyMode === 'replace' ? 'replace' : 'merge';
+            ftNanahStrategy.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+
+        const client = await createNanahClient();
+        nanahSessionState.stage = 'hosting';
+        nanahSessionState.code = '';
+        nanahSessionState.pairUri = '';
+        nanahSessionState.sasPhrase = '';
+        nanahSessionState.sasConfirmed = false;
+        nanahSessionState.remoteDevice = null;
+        nanahSessionState.remoteProfile = null;
+        nanahSessionState.remoteTargetProfile = null;
+        nanahSessionState.remoteRole = normalizeString(trusted.remoteRole) || 'peer';
+        nanahSessionState.helloSent = false;
+        nanahSessionState.trustedReconnectApproved = false;
+        nanahSessionState.trustedReconnectDeviceId = '';
+        updateNanahUi();
+
+        const result = await client.host();
+        nanahSessionState.code = normalizeNanahCode(result?.code);
+        nanahSessionState.pairUri = buildNanahPairUri(nanahSessionState.code);
+        updateNanahUi();
+
+        const reconnectMode = getNanahReconnectMode(safeObject(trusted.policy).reconnectMode, trusted.linkType === 'managed_link' ? 'approval_needed' : 'fast');
+        UIComponents.showToast(
+            reconnectMode === 'approval_needed'
+                ? `Reconnect code ${nanahSessionState.code} is ready. Open Accounts & Sync on the other device and approve the reconnect there.`
+                : `Reconnect code ${nanahSessionState.code} is ready. Open Accounts & Sync on ${normalizeString(trusted.deviceLabel) || 'the trusted device'} and join this fresh session.`,
+            'success'
+        );
+    }
+
+    function renderNanahTrustedLinks() {
+        if (!ftNanahTrustedLinks) return;
+        ftNanahTrustedLinks.innerHTML = '';
+
+        if (!Array.isArray(nanahTrustedLinks) || nanahTrustedLinks.length === 0) {
+            const empty = document.createElement('div');
+            empty.className = 'nanah-trusted-links__empty';
+            empty.textContent = 'No trusted devices yet.';
+            ftNanahTrustedLinks.appendChild(empty);
+            return;
+        }
+
+        nanahTrustedLinks.forEach((entry) => {
+            const childAdminRestricted = isChildProfileAdminSurface();
+            const childManagedReplicaLink = childAdminRestricted
+                && normalizeString(entry?.localRole) === 'replica'
+                && normalizeString(entry?.remoteRole) === 'source'
+                && normalizeString(entry?.linkType) === 'managed_link';
+            const card = document.createElement('div');
+            card.className = 'nanah-trusted-link';
+
+            const header = document.createElement('div');
+            header.className = 'nanah-trusted-link__header';
+
+            const titleWrap = document.createElement('div');
+            const title = document.createElement('h4');
+            title.className = 'nanah-trusted-link__title';
+            title.textContent = normalizeString(entry?.deviceLabel) || 'Trusted device';
+            titleWrap.appendChild(title);
+
+            const meta = document.createElement('div');
+            meta.className = 'nanah-trusted-link__meta';
+
+            const rolePill = document.createElement('span');
+            rolePill.className = 'nanah-trusted-link__pill';
+            rolePill.textContent = getNanahLinkTypeLabel(entry?.linkType);
+            meta.appendChild(rolePill);
+
+            const remoteRolePill = document.createElement('span');
+            remoteRolePill.className = 'nanah-trusted-link__pill';
+            remoteRolePill.textContent = normalizeString(entry?.remoteRole) || 'peer';
+            meta.appendChild(remoteRolePill);
+
+            if (safeObject(entry?.policy).linkType === 'managed_link') {
+                const policyPill = document.createElement('span');
+                policyPill.className = 'nanah-trusted-link__pill';
+                policyPill.textContent = `${getNanahStrategyLabel(safeObject(entry?.policy).applyMode)} policy`;
+                meta.appendChild(policyPill);
+            }
+
+            if (safeObject(entry?.policy).autoApplyControlProposals === true) {
+                const autoPill = document.createElement('span');
+                autoPill.className = 'nanah-trusted-link__pill';
+                autoPill.textContent = 'auto-apply';
+                meta.appendChild(autoPill);
+            }
+
+            const lastUsed = normalizeString(entry?.lastUsedAt);
+            if (lastUsed) {
+                const usedPill = document.createElement('span');
+                usedPill.className = 'nanah-trusted-link__pill';
+                usedPill.textContent = `used ${new Date(lastUsed).toLocaleDateString()}`;
+                meta.appendChild(usedPill);
+            }
+
+            titleWrap.appendChild(meta);
+            header.appendChild(titleWrap);
+
+            const actions = document.createElement('div');
+            actions.className = 'nanah-trusted-link__actions';
+
+            const reconnectBtn = document.createElement('button');
+            reconnectBtn.type = 'button';
+            reconnectBtn.className = 'btn-secondary';
+            reconnectBtn.textContent = 'Reconnect';
+            reconnectBtn.addEventListener('click', async () => {
+                try {
+                    await startNanahTrustedReconnect(entry);
+                } catch (error) {
+                    console.error('FilterTube: failed to start trusted reconnect', error);
+                    UIComponents.showToast(error?.message || 'Failed to start trusted reconnect', 'error');
+                }
+            });
+            actions.appendChild(reconnectBtn);
+
+            if (safeObject(entry?.policy).linkType === 'managed_link') {
+                const editBtn = document.createElement('button');
+                editBtn.type = 'button';
+                editBtn.className = 'btn-secondary';
+                editBtn.textContent = 'Edit Policy';
+                editBtn.disabled = childManagedReplicaLink;
+                editBtn.title = childManagedReplicaLink
+                    ? 'Child profiles cannot edit a trusted parent/source policy from this surface.'
+                    : '';
+                editBtn.addEventListener('click', async () => {
+                    if (childManagedReplicaLink) {
+                        UIComponents.showToast('Child profiles cannot edit trusted parent link policy here', 'error');
+                        return;
+                    }
+                    await configureNanahTrustedLink(entry);
+                });
+                actions.appendChild(editBtn);
+            }
+
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'btn-secondary';
+            removeBtn.textContent = 'Remove';
+            removeBtn.disabled = childManagedReplicaLink;
+            removeBtn.title = childManagedReplicaLink
+                ? 'Child profiles cannot remove a trusted parent/source link from this surface.'
+                : '';
+            removeBtn.addEventListener('click', async () => {
+                if (childManagedReplicaLink) {
+                    UIComponents.showToast('Child profiles cannot remove trusted parent links here', 'error');
+                    return;
+                }
+                await removeNanahTrustedLink(entry?.linkId);
+                UIComponents.showToast('Trusted device removed', 'success');
+            });
+            actions.appendChild(removeBtn);
+
+            card.appendChild(header);
+
+            if (safeObject(entry?.policy).linkType === 'managed_link') {
+                const scopes = document.createElement('div');
+                scopes.className = 'nanah-trusted-link__scopes';
+                getNanahScopeList(safeObject(entry?.policy).allowedScopes).forEach((scope) => {
+                    const scopePill = document.createElement('span');
+                    scopePill.className = 'nanah-trusted-link__pill';
+                    scopePill.textContent = getNanahScopeLabel(scope);
+                    scopes.appendChild(scopePill);
+                });
+                card.appendChild(scopes);
+
+                const policyRows = document.createElement('div');
+                policyRows.className = 'nanah-trusted-link__policy';
+
+                const roleRow = document.createElement('div');
+                roleRow.className = 'nanah-trusted-link__policy-row';
+                roleRow.innerHTML = `<span>Direction</span><strong>${getNanahRoleLabel(entry?.localRole)} -> ${getNanahRoleLabel(entry?.remoteRole)}</strong>`;
+                policyRows.appendChild(roleRow);
+
+                const allowedRow = document.createElement('div');
+                allowedRow.className = 'nanah-trusted-link__policy-row';
+                allowedRow.innerHTML = `<span>Allowed scopes</span><strong>${describeNanahScopeList(safeObject(entry?.policy).allowedScopes)}</strong>`;
+                policyRows.appendChild(allowedRow);
+
+                const defaultRow = document.createElement('div');
+                defaultRow.className = 'nanah-trusted-link__policy-row';
+                defaultRow.innerHTML = `<span>Default scope</span><strong>${getNanahScopeLabel(safeObject(entry?.policy).defaultScope)}</strong>`;
+                policyRows.appendChild(defaultRow);
+
+                const applyRow = document.createElement('div');
+                applyRow.className = 'nanah-trusted-link__policy-row';
+                applyRow.innerHTML = `<span>Apply mode</span><strong>${getNanahStrategyLabel(safeObject(entry?.policy).applyMode)}</strong>`;
+                policyRows.appendChild(applyRow);
+
+                const autoRow = document.createElement('div');
+                autoRow.className = 'nanah-trusted-link__policy-row';
+                autoRow.innerHTML = `<span>Auto-apply</span><strong>${safeObject(entry?.policy).autoApplyControlProposals === true ? 'On' : 'Off'}</strong>`;
+                policyRows.appendChild(autoRow);
+
+                const reconnectRow = document.createElement('div');
+                reconnectRow.className = 'nanah-trusted-link__policy-row';
+                reconnectRow.innerHTML = `<span>Reconnect</span><strong>${getNanahReconnectModeLabel(safeObject(entry?.policy).reconnectMode)}</strong>`;
+                policyRows.appendChild(reconnectRow);
+
+                if (entry?.localRole === 'replica' && entry?.remoteRole === 'source') {
+                    const childProtectionRow = document.createElement('div');
+                    childProtectionRow.className = 'nanah-trusted-link__policy-row';
+                    childProtectionRow.innerHTML = `<span>Child protection</span><strong>${getNanahChildProtectionLevelLabel(safeObject(entry?.policy).childProtectionLevel)}</strong>`;
+                    policyRows.appendChild(childProtectionRow);
+
+                    const targetProfileBehavior = getNanahTargetProfileBehavior(safeObject(entry?.policy).targetProfileBehavior, 'current_active');
+                    const targetProfileLabel = targetProfileBehavior === 'fixed_profile'
+                        ? `Fixed: ${normalizeString(safeObject(entry?.policy).targetProfileName) || normalizeString(safeObject(entry?.policy).targetProfileId) || 'Saved profile'}`
+                        : 'Current active profile';
+                    const targetRow = document.createElement('div');
+                    targetRow.className = 'nanah-trusted-link__policy-row';
+                    targetRow.innerHTML = `<span>Target profile</span><strong>${targetProfileLabel}</strong>`;
+                    policyRows.appendChild(targetRow);
+
+                    const lockedChildRow = document.createElement('div');
+                    lockedChildRow.className = 'nanah-trusted-link__policy-row';
+                    lockedChildRow.innerHTML = `<span>Locked child profile</span><strong>${getNanahLockedChildModeLabel(safeObject(entry?.policy).lockedChildMode)}</strong>`;
+                    policyRows.appendChild(lockedChildRow);
+                }
+
+                card.appendChild(policyRows);
+
+                const note = document.createElement('div');
+                note.className = 'nanah-trusted-link__note';
+                note.textContent = `This managed link defaults to ${getNanahScopeLabel(safeObject(entry?.policy).defaultScope)} and uses ${getNanahStrategyLabel(safeObject(entry?.policy).applyMode).toLowerCase()} for allowed scopes. ${entry?.localRole === 'replica' && entry?.remoteRole === 'source'
+                    ? `Targeting is ${getNanahTargetProfileBehaviorLabel(safeObject(entry?.policy).targetProfileBehavior).toLowerCase()}, reconnects are ${getNanahReconnectModeLabel(safeObject(entry?.policy).reconnectMode).toLowerCase()}, and locked child handling is ${getNanahLockedChildModeLabel(safeObject(entry?.policy).lockedChildMode).toLowerCase()}.`
+                    : `Reconnects are ${getNanahReconnectModeLabel(safeObject(entry?.policy).reconnectMode).toLowerCase()}.`}`;
+                card.appendChild(note);
+            }
+
+            card.appendChild(actions);
+            ftNanahTrustedLinks.appendChild(card);
+        });
+    }
+
+    async function renderNanahQr() {
+        if (!ftNanahQrCanvas) return;
+        const canvas = ftNanahQrCanvas;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        const pairUri = normalizeString(nanahSessionState.pairUri);
+        if (!pairUri || !window.FilterTubeQrCode?.toCanvas) {
+            if (ftNanahQrCaption) {
+                ftNanahQrCaption.textContent = pairUri
+                    ? 'QR renderer unavailable in this build'
+                    : 'No active pairing session';
+            }
+            return;
+        }
+
+        await new Promise((resolve) => {
+            window.FilterTubeQrCode.toCanvas(canvas, pairUri, {
+                width: 180,
+                margin: 1,
+                errorCorrectionLevel: 'M',
+                color: {
+                    dark: '#111111',
+                    light: '#ffffff'
+                }
+            }, () => resolve());
+        });
+
+        if (ftNanahQrCaption) {
+            ftNanahQrCaption.textContent = 'Scan in a Nanah-enabled app, or type the same code on the other device.';
+        }
+    }
+
+    function updateNanahPolicyControls() {
+        const childReplicaOnly = isNanahChildReplicaOnly();
+        if (childReplicaOnly && ftNanahRole && ftNanahRole.value !== 'replica') {
+            ftNanahRole.value = 'replica';
+        }
+        if (getActiveProfileType() === 'child' && ftNanahScope && ftNanahScope.value === 'full') {
+            ftNanahScope.value = 'active';
+        }
+        const localRole = getNanahRole();
+        const remoteRole = normalizeString(nanahSessionState.remoteRole) || 'peer';
+        const linkType = classifyNanahTrustedLink(localRole, remoteRole);
+        const trustedManaged = isCurrentNanahManagedLink();
+
+        if (ftNanahStrategyLabel) {
+            ftNanahStrategyLabel.textContent = (trustedManaged && linkType === 'managed_link' && localRole === 'source' && !childReplicaOnly)
+                ? 'Managed sync policy'
+                : 'Suggested action';
+        }
+        if (ftNanahStrategyHint) {
+            if (childReplicaOnly) {
+                ftNanahStrategyHint.textContent = 'This child profile is still locked, so it stays replica-only here. Unlock it locally if you need to send this child profile to another device.';
+            } else if (trustedManaged && linkType === 'managed_link' && localRole === 'source') {
+                ftNanahStrategyHint.textContent = 'Trusted replicas follow this saved merge or replace policy for allowed scopes.';
+            } else if (linkType === 'managed_link') {
+                ftNanahStrategyHint.textContent = 'Until this managed link is trusted, the receiving device still chooses merge or replace.';
+            } else {
+                ftNanahStrategyHint.textContent = 'Peer and first-time sessions let the receiver choose merge or replace.';
+            }
+        }
+        if (ftNanahTrustBtn) {
+            ftNanahTrustBtn.textContent = (childReplicaOnly || linkType === 'managed_link') ? 'Save Managed Link' : 'Trust Connected Device';
+        }
+        if (ftNanahScope) {
+            ftNanahScope.disabled = childReplicaOnly || !!nanahClient;
+            ftNanahScope.title = childReplicaOnly
+                ? 'This child profile is locked, so scope sending is unavailable until you unlock it locally.'
+                : (nanahClient ? 'Scope is locked for the current Nanah session.' : '');
+        }
+        if (ftNanahStrategy) {
+            ftNanahStrategy.disabled = childReplicaOnly || !!nanahClient;
+            ftNanahStrategy.title = childReplicaOnly
+                ? 'This child profile is locked, so outgoing merge/replace behavior stays unavailable until you unlock it locally.'
+                : (nanahClient ? 'Suggested action is locked for the current Nanah session.' : '');
+        }
+        if (ftNanahRemoteTarget) {
+            const canTargetRemoteProfiles = !childReplicaOnly
+                && !!nanahClient
+                && nanahSessionState.connected
+                && getNanahRole() === 'source'
+                && normalizeString(nanahSessionState.remoteRole) === 'replica'
+                && normalizeNanahProfileInventory(nanahSessionState.remoteProfileInventory).length > 0;
+            ftNanahRemoteTarget.disabled = !canTargetRemoteProfiles;
+            ftNanahRemoteTarget.title = canTargetRemoteProfiles
+                ? ''
+                : 'Connect to a replica device first to choose a specific remote profile.';
+        }
+        if (ftNanahRemoteTargetHint) {
+            const selectedTarget = getNanahSelectedRemoteTargetProfile();
+            if (selectedTarget) {
+                ftNanahRemoteTargetHint.textContent = `This session will target ${selectedTarget.profileName} on ${getNanahRemoteLabel()} instead of following the remote active profile.`;
+            } else if (getNanahRole() === 'source' && normalizeString(nanahSessionState.remoteRole) === 'replica') {
+                ftNanahRemoteTargetHint.textContent = 'No fixed remote target is selected for this live session yet, so updates will follow the receiver’s current active profile unless you choose one here.';
+            } else {
+                ftNanahRemoteTargetHint.textContent = 'After the secure handshake, choose a specific remote profile here if you want this update to land somewhere other than the receiver’s currently active profile.';
+            }
+        }
+    }
+
+    function updateNanahUi() {
+        let nanahTone = 'idle';
+        if (!nanahClient) {
+            nanahTone = 'idle';
+        } else if (!nanahSessionState.sasConfirmed && normalizeString(nanahSessionState.sasPhrase)) {
+            nanahTone = 'verify';
+        } else if (nanahSessionState.connected) {
+            const trusted = findNanahTrustedLink(safeObject(nanahSessionState.remoteDevice).deviceId);
+            nanahTone = trusted ? 'trusted' : 'connected';
+        } else if (normalizeString(nanahSessionState.code)) {
+            nanahTone = 'pairing';
+        }
+
+        if (ftNanahStatusCard) {
+            ftNanahStatusCard.dataset.tone = nanahTone;
+        }
+        if (ftNanahStage) {
+            ftNanahStage.textContent = formatNanahStage(nanahSessionState.stage || 'idle');
+        }
+        if (ftNanahLocalProfile) {
+            ftNanahLocalProfile.textContent = formatNanahProfileContext(getNanahLocalProfileContext());
+        }
+        if (ftNanahRemoteLabel) {
+            ftNanahRemoteLabel.textContent = nanahSessionState.connected
+                ? getNanahRemoteLabel()
+                : 'Not connected';
+        }
+        if (ftNanahRemoteProfile) {
+            ftNanahRemoteProfile.textContent = nanahSessionState.connected && nanahSessionState.remoteProfile
+                ? formatNanahProfileContext(nanahSessionState.remoteProfile)
+                : 'Unknown';
+        }
+        if (ftNanahPairCodeRow) {
+            ftNanahPairCodeRow.hidden = !normalizeString(nanahSessionState.code);
+        }
+        if (ftNanahPairCode) {
+            ftNanahPairCode.textContent = normalizeNanahCode(nanahSessionState.code) || '----';
+        }
+        if (ftNanahSasPhrase) {
+            ftNanahSasPhrase.textContent = normalizeString(nanahSessionState.sasPhrase) || 'Waiting';
+        }
+        if (ftNanahPairUri) {
+            ftNanahPairUri.value = normalizeString(nanahSessionState.pairUri);
+        }
+        if (ftNanahCopyPairUriBtn) {
+            ftNanahCopyPairUriBtn.disabled = !normalizeString(nanahSessionState.pairUri);
+        }
+        if (ftNanahConfirmSasBtn) {
+            ftNanahConfirmSasBtn.disabled = !normalizeString(nanahSessionState.sasPhrase) || nanahSessionState.sasConfirmed === true;
+        }
+        if (ftNanahDeviceLabel) {
+            ftNanahDeviceLabel.disabled = !!nanahClient;
+            ftNanahDeviceLabel.title = nanahClient
+                ? 'Device label is locked for the current Nanah session. End the session to change it.'
+                : '';
+        }
+        if (ftNanahRole) {
+            const childReplicaOnly = isNanahChildReplicaOnly();
+            if (childReplicaOnly && ftNanahRole.value !== 'replica') {
+                ftNanahRole.value = 'replica';
+            }
+            ftNanahRole.disabled = !!nanahClient || childReplicaOnly;
+            ftNanahRole.title = childReplicaOnly
+                ? 'This child profile is locked, so it is replica-only in Nanah until you unlock it locally.'
+                : (nanahClient
+                    ? 'Relationship is locked for the current Nanah session. End the session to change it.'
+                    : '');
+        }
+        if (ftNanahSendBtn) {
+            ftNanahSendBtn.disabled = !(nanahSessionState.connected && nanahSessionState.sasConfirmed && nanahClient);
+        }
+        if (ftNanahTrustBtn) {
+            ftNanahTrustBtn.disabled = !(nanahSessionState.connected && safeObject(nanahSessionState.remoteDevice).deviceId);
+        }
+        if (ftNanahEndSessionBtn) {
+            ftNanahEndSessionBtn.disabled = !nanahClient;
+        }
+        if (ftNanahStatusHint) {
+            if (!nanahClient) {
+                ftNanahStatusHint.textContent = 'Create a pairing code on one device, then join from the other device using the same 4-character code.';
+            } else if (!nanahSessionState.sasConfirmed && normalizeString(nanahSessionState.sasPhrase)) {
+                ftNanahStatusHint.textContent = 'Compare the safety phrase on both devices and confirm only if they match exactly.';
+            } else if (nanahSessionState.connected) {
+                const trusted = findNanahTrustedLink(safeObject(nanahSessionState.remoteDevice).deviceId);
+                const trustedPolicy = safeObject(trusted?.policy);
+                ftNanahStatusHint.textContent = isNanahChildReplicaOnly()
+                    ? (trusted
+                        ? 'Child profile connected as a managed replica. Saved parent/source links can keep this device aligned without turning the child into a sender.'
+                        : 'Locked child profile connected. This device stays replica-only until the local child profile is unlocked.')
+                    : trusted
+                    ? (trustedPolicy.linkType === 'managed_link'
+                        ? 'Managed link connected. Replica updates now follow the saved trusted policy for allowed scopes.'
+                        : 'Trusted peer connected. New proposals still stay reviewable on the receiving device.')
+                    : (classifyNanahTrustedLink(getNanahRole(), normalizeString(nanahSessionState.remoteRole) || 'peer') === 'managed_link'
+                        ? 'Connected as a source/replica pair. Until you save a managed link, the receiving device still reviews and chooses merge or replace.'
+                        : 'Connected. You can now send settings or save this device as a trusted peer or managed link.');
+            } else {
+                ftNanahStatusHint.textContent = 'Waiting for the second device to join and complete the secure handshake.';
+            }
+        }
+        if (ftNanahTargetHint) {
+            ftNanahTargetHint.textContent = buildNanahTargetHint(getNanahScope());
+        }
+        updateNanahPolicyControls();
+        renderNanahQr().catch(() => { });
+    }
+
+    function buildNanahDeviceDescriptor() {
+        const adapter = window.FilterTubeNanahAdapter || {};
+        const role = getNanahRole();
+        const deviceLabel = normalizeString(ftNanahDeviceLabel?.value);
+        return adapter.getDeviceDescriptor({
+            deviceId: normalizeString(nanahStableDeviceId) || undefined,
+            deviceLabel: deviceLabel || undefined,
+            appVersion: manifestVersion,
+            capabilities: getNanahCapabilitiesForRole(role)
+        });
+    }
+
+    async function resetNanahSession(closeClient = false) {
+        if (closeClient && nanahClient) {
+            try {
+                await nanahClient.close();
+            } catch (error) {
+            }
+        }
+        nanahClient = null;
+        nanahTrustedReconnectApprovalPromise = null;
+        nanahSessionState = {
+            stage: 'idle',
+            code: '',
+            pairUri: '',
+            sasPhrase: '',
+            sasConfirmed: false,
+            connected: false,
+            remoteDevice: null,
+            remoteProfile: null,
+            remoteProfileInventory: [],
+            remoteTargetProfile: null,
+            remoteRole: 'peer',
+            helloSent: false,
+            trustedReconnectApproved: false,
+            trustedReconnectDeviceId: ''
+        };
+        updateNanahUi();
+        syncNanahRemoteTargetOptions();
+    }
+
+    async function sendNanahHelloEnvelope(force = false) {
+        if (!nanahClient || !nanahSessionState.connected || (nanahSessionState.helloSent && !force)) return;
+        const device = buildNanahDeviceDescriptor();
+        const role = getNanahRole();
+        await nanahClient.send({
+            t: 'hello',
+            id: `hello-${Date.now()}`,
+            app: 'filtertube',
+            role,
+            device,
+            profileContext: getNanahLocalProfileContext(),
+            profileInventory: getNanahProfileInventory(),
+            targetProfileContext: buildNanahHelloTargetProfileContext(),
+            capabilities: safeArray(device.capabilities)
+        });
+        nanahSessionState.helloSent = true;
+    }
+
+    async function ensureNanahOutgoingAuth(scope) {
+        const normalizedScope = normalizeString(scope).toLowerCase();
+        const io = window.FilterTubeIO || {};
+        const profilesV4 = profilesV4Cache || (typeof io.loadProfilesV4 === 'function' ? await io.loadProfilesV4() : null);
+        const activeId = normalizeString(profilesV4?.activeProfileId) || 'default';
+        const masterVerifier = extractMasterPinVerifier(profilesV4);
+        const requiresWholeAccount = normalizedScope === 'full';
+
+        if (requiresWholeAccount && activeId !== 'default') {
+            throw new Error('Switch to Default (Master) to send a full backup');
+        }
+
+        if (profilesV4) {
+            const okUnlocked = await ensureProfileUnlocked(profilesV4, activeId);
+            if (!okUnlocked) {
+                throw new Error(requiresWholeAccount ? 'Master unlock cancelled' : 'Profile unlock cancelled');
+            }
+        }
+
+        if (activeId === 'default' && masterVerifier) {
+            if (!sessionMasterPin) {
+                const okAdmin = await ensureAdminUnlocked(profilesV4);
+                if (!okAdmin) {
+                    throw new Error('Master unlock cancelled');
+                }
+            }
+            return { localMasterPin: sessionMasterPin };
+        }
+        return null;
+    }
+
+    async function ensureNanahIncomingAuth(portable, scope, { trustedLink = null, details = null, targetProfile = null } = {}) {
+        const normalizedScope = normalizeString(scope).toLowerCase();
+        const io = window.FilterTubeIO || {};
+        const localProfilesV4 = profilesV4Cache || (typeof io.loadProfilesV4 === 'function' ? await io.loadProfilesV4() : null);
+        const localActiveId = normalizeString(localProfilesV4?.activeProfileId) || 'default';
+        const resolvedTarget = safeObject(targetProfile);
+        const localTargetId = normalizeString(resolvedTarget.profileId) || localActiveId;
+        const localTargetType = normalizeString(resolvedTarget.profileType) || getProfileType(localProfilesV4, localTargetId);
+        const localVerifier = extractMasterPinVerifier(localProfilesV4);
+        const incomingVerifier = extractMasterPinVerifier(portable?.profilesV4);
+        let auth = null;
+        const requiresWholeAccount = normalizedScope === 'full';
+        const trusted = normalizeNanahTrustedLink(trustedLink);
+        const bypassLockedChildUnlock = Boolean(
+            !requiresWholeAccount
+            && localTargetType === 'child'
+            && isProfileLocked(localProfilesV4, localTargetId)
+            && trusted
+            && trusted.linkType === 'managed_link'
+            && normalizeString(trusted.localRole) === 'replica'
+            && (normalizeString(nanahSessionState.remoteRole) || normalizeString(trusted.remoteRole)) === 'source'
+            && normalizeString(safeObject(details).authorityMode || safeObject(trusted.policy).decisionMode) !== 'peer'
+            && getNanahLockedChildMode(safeObject(trusted.policy).lockedChildMode, 'require_unlock') === 'allow_trusted_updates'
+        );
+
+        if (requiresWholeAccount && localActiveId !== 'default') {
+            throw new Error('Switch to Default (Master) to apply a full backup');
+        }
+
+        if (localProfilesV4 && !bypassLockedChildUnlock) {
+            const okUnlocked = await ensureProfileUnlocked(localProfilesV4, localTargetId);
+            if (!okUnlocked) {
+                throw new Error(requiresWholeAccount ? 'Master unlock cancelled' : 'Profile unlock cancelled');
+            }
+        }
+
+        if (localTargetId === 'default' && localVerifier) {
+            if (!sessionMasterPin) {
+                const okAdmin = await ensureAdminUnlocked(localProfilesV4);
+                if (!okAdmin) {
+                    throw new Error('Master unlock cancelled');
+                }
+            }
+            auth = { ...(auth || {}), localMasterPin: sessionMasterPin };
+        }
+
+        if (localTargetId === 'default' && incomingVerifier) {
+            const incomingPin = await showPromptModal({
+                title: 'Incoming Backup PIN',
+                message: 'This incoming FilterTube payload comes from a Master-protected profile. Enter that PIN to continue.',
+                placeholder: 'Master PIN',
+                inputType: 'password',
+                confirmText: 'Authorize'
+            });
+            const normalizedPin = normalizeString(incomingPin);
+            if (!normalizedPin) {
+                throw new Error('Incoming backup PIN is required');
+            }
+            auth = { ...(auth || {}), incomingMasterPin: normalizedPin };
+        }
+
+        return auth;
+    }
+
+    function parseNanahEnvelopeDetails(envelope) {
+        const root = safeObject(envelope);
+        if (root.t === 'control_proposal') {
+            const parsed = safeObject(JSON.parse(root.payload));
+            return {
+                type: 'control_proposal',
+                scope: normalizeString(parsed.targetScope || root.scope || 'active').toLowerCase() || 'active',
+                strategy: normalizeString(parsed.strategy).toLowerCase() === 'replace' ? 'replace' : 'merge',
+                portable: parsed.portable,
+                summary: normalizeString(root.summary) || normalizeString(parsed.summary) || 'FilterTube settings',
+                targetProfile: normalizeNanahProfileContext(parsed.targetProfile || root.targetProfile),
+                authorityMode: normalizeString(parsed.authorityMode || root.authorityMode) === 'managed' ? 'managed' : 'peer',
+                linkType: normalizeString(parsed.linkType || root.linkType) === 'managed_link' ? 'managed_link' : 'peer_link',
+                allowedScopes: getNanahScopeList(parsed.allowedScopes || root.allowedScopes || parsed.targetScope || root.scope || 'active'),
+                senderStrategySuggested: normalizeString(parsed.authorityMode || root.authorityMode) === 'managed' ? false : true
+            };
+        }
+        if (root.t === 'app_sync') {
+            const adapter = window.FilterTubeNanahAdapter || {};
+            const extracted = typeof adapter.extractPortableFromEnvelope === 'function'
+                ? adapter.extractPortableFromEnvelope(root)
+                : { scope: root.scope || 'active', portable: JSON.parse(root.payload) };
+            return {
+                type: 'app_sync',
+                scope: normalizeString(extracted.scope || 'active').toLowerCase() || 'active',
+                strategy: 'merge',
+                portable: extracted.portable,
+                summary: 'FilterTube settings',
+                targetProfile: normalizeNanahProfileContext(root.targetProfile),
+                authorityMode: 'peer',
+                linkType: 'peer_link',
+                allowedScopes: [normalizeString(extracted.scope || 'active').toLowerCase() || 'active'],
+                senderStrategySuggested: true
+            };
+        }
+        return {
+            type: normalizeString(root.t),
+            scope: 'active',
+            strategy: 'merge',
+            portable: null,
+            summary: '',
+            targetProfile: null,
+            authorityMode: 'peer',
+            linkType: 'peer_link',
+            allowedScopes: ['active'],
+            senderStrategySuggested: true
+        };
+    }
+
+    function shouldAutoApplyNanahProposal(remoteDeviceId) {
+        const localRole = getNanahRole();
+        if (localRole !== 'replica') return false;
+        if (normalizeString(nanahSessionState.remoteRole) !== 'source') return false;
+        const trusted = findNanahTrustedLink(remoteDeviceId);
+        const policy = getManagedNanahLinkPolicy(trusted);
+        return policy?.autoApplyControlProposals === true;
+    }
+
+    async function refreshFilterTubeUiAfterNanahImport() {
+        await StateManager.loadSettings();
+        const state = StateManager.getState();
+        const SettingsAPI = window.FilterTubeSettings || {};
+        if (SettingsAPI.applyThemePreference) {
+            SettingsAPI.applyThemePreference(state.theme);
+        }
+        if (typeof refreshProfilesUI === 'function') {
+            await refreshProfilesUI();
+        }
+        if (typeof renderKeywords === 'function') renderKeywords();
+        if (typeof renderChannels === 'function') renderChannels();
+        if (typeof renderKidsKeywords === 'function') renderKidsKeywords();
+        if (typeof renderKidsChannels === 'function') renderKidsChannels();
+        if (typeof updateCheckboxes === 'function') updateCheckboxes();
+        if (typeof updateStats === 'function') updateStats();
+        if (typeof renderListModeControls === 'function') renderListModeControls();
+    }
+
+    async function applyNanahEnvelope(envelope, strategyOverride = null, targetPolicyOverride = null) {
+        const adapter = window.FilterTubeNanahAdapter || {};
+        if (typeof adapter.applyIncomingEnvelope !== 'function' || typeof adapter.extractPortableFromEnvelope !== 'function') {
+            throw new Error('FilterTube Nanah adapter is unavailable');
+        }
+        const details = parseNanahEnvelopeDetails(envelope);
+        const io = window.FilterTubeIO || {};
+        const localProfilesV4 = profilesV4Cache || (typeof io.loadProfilesV4 === 'function' ? await io.loadProfilesV4() : null);
+        const trustedLink = getNanahCurrentTrustedLink();
+        const explicitTargetProfile = details.scope === 'full' ? null : resolveNanahExplicitTargetProfile(details.targetProfile, localProfilesV4);
+        const targetProfile = explicitTargetProfile
+            || (targetPolicyOverride
+                ? resolveNanahTargetProfileFromPolicy(targetPolicyOverride, localProfilesV4)
+                : resolveNanahLocalTargetProfile(trustedLink, localProfilesV4));
+        const auth = await ensureNanahIncomingAuth(details.portable, details.scope, {
+            trustedLink,
+            details,
+            targetProfile
+        });
+        const result = await adapter.applyIncomingEnvelope(envelope, {
+            strategy: strategyOverride || details.strategy,
+            scope: details.scope,
+            auth,
+            targetProfileId: details.scope === 'full' ? null : normalizeString(targetProfile.profileId) || null
+        });
+        await refreshFilterTubeUiAfterNanahImport();
+        return result;
+    }
+
+    function buildNanahOutgoingProposalPolicy(scope, strategy) {
+        if (isNanahChildReplicaOnly()) {
+            throw new Error('Unlock this child profile first if you want to send its settings to another device.');
+        }
+        const localRole = getNanahRole();
+        const remoteRole = normalizeString(nanahSessionState.remoteRole) || 'peer';
+        const trustedLink = getNanahCurrentTrustedLink();
+        const managedPolicy = getManagedNanahLinkPolicy(trustedLink);
+        const selectedScope = normalizeString(scope).toLowerCase() || 'active';
+        const selectedStrategy = normalizeString(strategy).toLowerCase() === 'replace' ? 'replace' : 'merge';
+        const isTrustedManagedSender = localRole === 'source'
+            && remoteRole === 'replica'
+            && safeObject(trustedLink).linkType === 'managed_link'
+            && managedPolicy;
+
+        if (isTrustedManagedSender) {
+            const allowedScopes = getNanahScopeList(managedPolicy.allowedScopes);
+            if (!allowedScopes.includes(selectedScope)) {
+                throw new Error(`This managed link only allows ${allowedScopes.map(getNanahScopeLabel).join(', ')} syncs`);
+            }
+            return {
+                linkType: 'managed_link',
+                authorityMode: 'managed',
+                scope: selectedScope,
+                strategy: normalizeString(managedPolicy.applyMode).toLowerCase() === 'replace' ? 'replace' : 'merge',
+                allowedScopes
+            };
+        }
+
+        return {
+            linkType: classifyNanahTrustedLink(localRole, remoteRole) || 'peer_link',
+            authorityMode: 'peer',
+            scope: selectedScope,
+            strategy: selectedStrategy,
+            allowedScopes: [selectedScope]
+        };
+    }
+
+    function attachNanahProposalPolicy(envelope, policy) {
+        const root = safeObject(envelope);
+        const parsed = safeObject(JSON.parse(root.payload));
+        parsed.authorityMode = policy.authorityMode;
+        parsed.linkType = policy.linkType;
+        parsed.allowedScopes = getNanahScopeList(policy.allowedScopes);
+        parsed.strategy = policy.strategy;
+        const explicitRemoteTarget = getNanahSelectedRemoteTargetProfile();
+        if (explicitRemoteTarget) {
+            parsed.targetProfile = explicitRemoteTarget;
+            root.targetProfile = explicitRemoteTarget;
+        }
+        root.authorityMode = policy.authorityMode;
+        root.linkType = policy.linkType;
+        root.allowedScopes = getNanahScopeList(policy.allowedScopes);
+        root.payload = JSON.stringify(parsed);
+        if (policy.authorityMode === 'managed') {
+            root.summary = `${root.summary || 'FilterTube settings'} · managed ${getNanahStrategyLabel(policy.strategy).toLowerCase()} policy`;
+        }
+        return root;
+    }
+
+    function resolveTrustedNanahManagedApply(details, trustedLink) {
+        const policy = getManagedNanahLinkPolicy(trustedLink);
+        if (!policy) return null;
+        const allowedScopes = getNanahScopeList(policy.allowedScopes);
+        if (!allowedScopes.includes(details.scope)) {
+            return {
+                ok: false,
+                reason: `This trusted link allows only ${allowedScopes.map(getNanahScopeLabel).join(', ')} syncs`
+            };
+        }
+        return {
+            ok: true,
+            strategy: normalizeString(policy.applyMode).toLowerCase() === 'replace' ? 'replace' : 'merge',
+            autoApply: policy.autoApplyControlProposals === true
+        };
+    }
+
+    function requiresNanahTrustedReconnectApproval(trustedLink) {
+        const trusted = normalizeNanahTrustedLink(trustedLink);
+        if (!trusted || trusted.linkType !== 'managed_link') return false;
+        if (getNanahRole() !== 'replica') return false;
+        const remoteRole = normalizeString(nanahSessionState.remoteRole) || normalizeString(trusted.remoteRole) || 'peer';
+        if (remoteRole !== 'source') return false;
+        return getNanahReconnectMode(safeObject(trusted.policy).reconnectMode, 'approval_needed') === 'approval_needed';
+    }
+
+    async function ensureNanahTrustedReconnectApproved(trustedLink, { closeOnDecline = false } = {}) {
+        const trusted = normalizeNanahTrustedLink(trustedLink);
+        if (!requiresNanahTrustedReconnectApproval(trusted)) {
+            return true;
+        }
+
+        const remoteDeviceId = normalizeString(trusted?.remoteDeviceId) || normalizeString(safeObject(nanahSessionState.remoteDevice).deviceId);
+        if (
+            nanahSessionState.trustedReconnectApproved
+            && normalizeString(nanahSessionState.trustedReconnectDeviceId) === remoteDeviceId
+        ) {
+            return true;
+        }
+
+        if (nanahTrustedReconnectApprovalPromise) {
+            return nanahTrustedReconnectApprovalPromise;
+        }
+
+        nanahTrustedReconnectApprovalPromise = (async () => {
+            const policy = safeObject(trusted.policy);
+            const response = await showChoiceModal({
+                title: 'Approve Managed Reconnect',
+                message: `${getNanahRemoteLabel()} is reconnecting as a saved managed source for ${formatNanahProfileContext(getNanahLocalProfileContext())}.`,
+                details: [
+                    `Allowed scopes: ${describeNanahScopeList(policy.allowedScopes || policy.defaultScope || 'active')}`,
+                    `Saved apply policy: ${getNanahStrategyLabel(policy.applyMode || 'merge')}`,
+                    'No updates from this source will be accepted in this session until you approve this reconnect.'
+                ],
+                choices: [
+                    {
+                        value: 'approve',
+                        label: 'Approve Reconnect',
+                        recommended: true
+                    },
+                    {
+                        value: 'decline',
+                        label: 'Decline',
+                        className: 'btn-secondary'
+                    }
+                ],
+                cancelText: 'Decline'
+            });
+
+            if (response === 'approve') {
+                nanahSessionState.trustedReconnectApproved = true;
+                nanahSessionState.trustedReconnectDeviceId = remoteDeviceId;
+                updateNanahUi();
+                UIComponents.showToast('Trusted reconnect approved for this session', 'success');
+                return true;
+            }
+
+            nanahSessionState.trustedReconnectApproved = false;
+            nanahSessionState.trustedReconnectDeviceId = '';
+            updateNanahUi();
+            UIComponents.showToast('Trusted reconnect declined', 'info');
+            if (closeOnDecline && nanahClient) {
+                try {
+                    await nanahClient.close();
+                } catch (error) {
+                }
+            }
+            return false;
+        })();
+
+        try {
+            return await nanahTrustedReconnectApprovalPromise;
+        } finally {
+            nanahTrustedReconnectApprovalPromise = null;
+        }
+    }
+
+    async function sendNanahDecision(proposalId, accepted, reason = '', extra = {}) {
+        if (!nanahClient || !proposalId) return;
+        try {
+            await nanahClient.send({
+                t: 'control_decision',
+                id: `decision-${Date.now()}`,
+                proposalId,
+                accepted: accepted === true,
+                ...(reason ? { reason } : {}),
+                ...safeObject(extra)
+            });
+        } catch (error) {
+        }
+    }
+
+    async function handleNanahIncomingProposal(envelope) {
+        const details = parseNanahEnvelopeDetails(envelope);
+        const remoteId = normalizeString(safeObject(nanahSessionState.remoteDevice).deviceId);
+        const trustedLink = remoteId ? findNanahTrustedLink(remoteId) : null;
+        const localRole = getNanahRole();
+        const remoteRole = normalizeString(nanahSessionState.remoteRole) || 'peer';
+        const isManagedReceiver = localRole === 'replica'
+            && remoteRole === 'source'
+            && safeObject(trustedLink).linkType === 'managed_link';
+        const isFirstManagedReplicaSession = localRole === 'replica'
+            && remoteRole === 'source'
+            && !isManagedReceiver;
+
+        if (isManagedReceiver) {
+            const reconnectApproved = await ensureNanahTrustedReconnectApproved(trustedLink);
+            if (!reconnectApproved) {
+                await sendNanahDecision(envelope.id, false, 'trusted reconnect not approved');
+                if (nanahClient) {
+                    try {
+                        await nanahClient.close();
+                    } catch (error) {
+                    }
+                }
+                return;
+            }
+        }
+
+        if (remoteId && shouldAutoApplyNanahProposal(remoteId) && isManagedReceiver) {
+            const trustedDecision = resolveTrustedNanahManagedApply(details, trustedLink);
+            if (trustedDecision?.ok) {
+                await applyNanahEnvelope(envelope, trustedDecision.strategy);
+                await sendNanahDecision(envelope.id, true, 'auto-applied');
+                UIComponents.showToast(`Applied ${details.scope} settings from trusted source`, 'success');
+                return;
+            }
+        }
+
+        if (isManagedReceiver) {
+            const trustedDecision = resolveTrustedNanahManagedApply(details, trustedLink);
+            if (!trustedDecision?.ok) {
+                await sendNanahDecision(envelope.id, false, trustedDecision?.reason || 'blocked by trusted link policy');
+                UIComponents.showToast(trustedDecision?.reason || 'Managed update does not match this trusted link policy', 'error');
+                return;
+            }
+
+            const response = await showChoiceModal({
+                title: 'Managed FilterTube Update',
+                message: `${getNanahRemoteLabel()} wants to apply ${details.scope} settings into ${formatNanahProfileContext(getNanahLocalProfileContext())} using the saved managed policy for this device.`,
+                details: [
+                    `Saved policy: ${getNanahStrategyLabel(trustedDecision.strategy)} ${getNanahScopeLabel(details.scope)}`,
+                    `Remote role: ${remoteRole}`,
+                    details.summary || 'FilterTube settings'
+                ],
+                choices: [
+                    {
+                        value: 'approve',
+                        label: `Approve ${getNanahStrategyLabel(trustedDecision.strategy)}`,
+                        recommended: true
+                    },
+                    {
+                        value: 'decline',
+                        label: 'Decline',
+                        className: 'btn-secondary'
+                    }
+                ],
+                cancelText: 'Cancel'
+            });
+
+            if (response !== 'approve') {
+                await sendNanahDecision(envelope.id, false, 'declined');
+                UIComponents.showToast('Incoming managed sync declined', 'info');
+                return;
+            }
+
+            await applyNanahEnvelope(envelope, trustedDecision.strategy);
+            await sendNanahDecision(envelope.id, true, trustedDecision.strategy);
+            UIComponents.showToast(`Applied ${details.scope} settings`, 'success');
+            return;
+        }
+
+        if (isFirstManagedReplicaSession) {
+            const managedApproval = await showNanahManagedLinkModal({
+                title: 'First Managed Source Connection',
+                message: `${getNanahRemoteLabel()} wants to send ${getNanahScopeLabel(details.scope).toLowerCase()} settings into ${formatNanahProfileContext(getNanahLocalProfileContext())}.`,
+                intro: 'You can review this update once without saving trust, or apply it and store a managed link so later source updates follow the policy you set here. Non-full sync applies only to this currently active profile.',
+                initialPolicy: {
+                    allowedScopes: details.allowedScopes || [details.scope],
+                    defaultScope: details.scope,
+                    applyMode: details.strategy,
+                    autoApplyControlProposals: false,
+                    reconnectMode: 'approval_needed',
+                    lockedChildMode: 'require_unlock',
+                    childProtectionLevel: isActiveChildNanahProfile() ? 'strict' : 'standard',
+                    targetProfileBehavior: (normalizeString(safeObject(details.targetProfile).profileId) || isActiveChildNanahProfile())
+                        ? 'fixed_profile'
+                        : 'current_active',
+                    targetProfileId: normalizeString(safeObject(details.targetProfile).profileId) || getNanahLocalProfileContext().profileId,
+                    targetProfileName: normalizeString(safeObject(details.targetProfile).profileName) || getNanahLocalProfileContext().profileName
+                },
+                requiredScopes: [details.scope],
+                allowApplyOnce: true,
+                allowSave: true,
+                applyOnceLabel: 'Apply Once',
+                saveLabel: 'Apply + Save Managed Link',
+                cancelLabel: 'Decline',
+                showAutoApply: true,
+                showReconnectMode: true,
+                showLockedChildMode: isActiveChildNanahProfile(),
+                showTargetProfileMapping: true,
+                forceFixedTargetProfile: isActiveChildNanahProfile()
+            });
+
+            if (!managedApproval?.policy) {
+                await sendNanahDecision(envelope.id, false, 'declined');
+                UIComponents.showToast('Incoming managed sync declined', 'info');
+                return;
+            }
+
+            if (managedApproval.action === 'save' && remoteId) {
+                if (!(await ensureNanahManagedChildLinkPermission(managedApproval.policy))) {
+                    await sendNanahDecision(envelope.id, false, 'local child authorization required');
+                    return;
+                }
+                await saveNanahTrustedLink({
+                    linkId: `nanah-${remoteId}`,
+                    remoteDeviceId: remoteId,
+                    deviceLabel: getNanahRemoteLabel(),
+                    capabilities: safeArray(safeObject(nanahSessionState.remoteDevice).capabilities),
+                    localRole,
+                    remoteRole,
+                    linkType: 'managed_link',
+                    policy: {
+                        linkType: 'managed_link',
+                        capabilities: safeArray(safeObject(nanahSessionState.remoteDevice).capabilities),
+                        allowedScopes: managedApproval.policy.allowedScopes,
+                        defaultScope: managedApproval.policy.defaultScope,
+                        applyMode: managedApproval.policy.applyMode,
+                        autoApplyControlProposals: managedApproval.policy.autoApplyControlProposals,
+                        reconnectMode: managedApproval.policy.reconnectMode,
+                        lockedChildMode: managedApproval.policy.lockedChildMode,
+                        childProtectionLevel: managedApproval.policy.childProtectionLevel,
+                        targetProfileBehavior: managedApproval.policy.targetProfileBehavior,
+                        targetProfileId: managedApproval.policy.targetProfileId,
+                        targetProfileName: managedApproval.policy.targetProfileName
+                    }
+                });
+            }
+
+            await applyNanahEnvelope(envelope, managedApproval.policy.applyMode, managedApproval.policy);
+            await sendNanahDecision(
+                envelope.id,
+                true,
+                managedApproval.policy.applyMode,
+                managedApproval.action === 'save'
+                    ? {
+                        savedManagedLink: {
+                            linkType: 'managed_link',
+                            allowedScopes: managedApproval.policy.allowedScopes,
+                            defaultScope: managedApproval.policy.defaultScope,
+                            applyMode: managedApproval.policy.applyMode,
+                            autoApplyControlProposals: managedApproval.policy.autoApplyControlProposals,
+                            reconnectMode: managedApproval.policy.reconnectMode,
+                            lockedChildMode: managedApproval.policy.lockedChildMode,
+                            childProtectionLevel: managedApproval.policy.childProtectionLevel,
+                            targetProfileBehavior: managedApproval.policy.targetProfileBehavior,
+                            targetProfileId: managedApproval.policy.targetProfileId,
+                            targetProfileName: managedApproval.policy.targetProfileName
+                        }
+                    }
+                    : {}
+            );
+            UIComponents.showToast(
+                managedApproval.action === 'save'
+                    ? `Applied ${details.scope} settings and saved a managed link`
+                    : `Applied ${details.scope} settings once`,
+                'success'
+            );
+            updateNanahUi();
+            return;
+        }
+
+        const response = await showChoiceModal({
+            title: 'Incoming FilterTube Sync',
+            message: `${getNanahRemoteLabel()} wants to apply ${details.scope} settings into ${formatNanahProfileContext(details.targetProfile || getNanahLocalProfileContext())}.`,
+            details: [
+                `${details.senderStrategySuggested ? 'Suggested action' : 'Managed policy'}: ${details.strategy === 'replace' ? 'Replace this scope' : 'Merge into this scope'}`,
+                `Remote role: ${normalizeString(nanahSessionState.remoteRole) || 'peer'}`,
+                ...(classifyNanahTrustedLink(getNanahRole(), normalizeString(nanahSessionState.remoteRole) || 'peer') === 'managed_link'
+                    ? ['This source/replica pairing is not trusted yet, so this device still decides how to apply the update.']
+                    : []),
+                details.summary || 'FilterTube settings'
+            ],
+            choices: [
+                {
+                    value: 'merge',
+                    label: 'Apply as Merge',
+                    recommended: details.strategy !== 'replace'
+                },
+                {
+                    value: 'replace',
+                    label: 'Apply as Replace',
+                    recommended: details.strategy === 'replace'
+                },
+                {
+                    value: 'decline',
+                    label: 'Decline',
+                    className: 'btn-secondary'
+                }
+            ],
+            cancelText: 'Cancel'
+        });
+
+        if (!response || response === 'decline') {
+            await sendNanahDecision(envelope.id, false, 'declined');
+            UIComponents.showToast('Incoming sync declined', 'info');
+            return;
+        }
+
+        await applyNanahEnvelope(envelope, response);
+        await sendNanahDecision(envelope.id, true, response);
+        UIComponents.showToast(`Applied ${details.scope} settings`, 'success');
+    }
+
+    async function handleNanahIncomingEnvelope(envelope) {
+        const root = safeObject(envelope);
+        if (root.t === 'hello') {
+            nanahSessionState.remoteDevice = safeObject(root.device);
+            nanahSessionState.remoteProfile = normalizeNanahProfileContext(root.profileContext || root.profile);
+            nanahSessionState.remoteProfileInventory = normalizeNanahProfileInventory(root.profileInventory || root.profiles);
+            nanahSessionState.remoteTargetProfile = normalizeNanahTargetProfileContext(root.targetProfileContext || root.targetProfile);
+            nanahSessionState.remoteRole = normalizeString(root.role) || 'peer';
+            if (normalizeString(nanahSessionState.trustedReconnectDeviceId) !== normalizeString(safeObject(root.device).deviceId)) {
+                nanahSessionState.trustedReconnectApproved = false;
+                nanahSessionState.trustedReconnectDeviceId = '';
+            }
+            syncNanahRemoteTargetOptions();
+            updateNanahUi();
+            const trustedLink = findNanahTrustedLink(safeObject(root.device).deviceId);
+            const approved = await ensureNanahTrustedReconnectApproved(trustedLink, { closeOnDecline: true });
+            if (approved) {
+                await markNanahTrustedLinkUsed(safeObject(root.device).deviceId);
+            }
+            return;
+        }
+        if (root.t === 'control_decision') {
+            const accepted = root.accepted === true;
+            if (accepted && safeObject(root.savedManagedLink).linkType === 'managed_link') {
+                const remote = safeObject(nanahSessionState.remoteDevice);
+                const remoteDeviceId = normalizeString(remote.deviceId);
+                if (remoteDeviceId) {
+                    await saveNanahTrustedLink({
+                        linkId: `nanah-${remoteDeviceId}`,
+                        remoteDeviceId,
+                        deviceLabel: getNanahRemoteLabel(),
+                        capabilities: safeArray(remote.capabilities),
+                        localRole: getNanahRole(),
+                        remoteRole: normalizeString(nanahSessionState.remoteRole) || 'peer',
+                        linkType: 'managed_link',
+                        policy: {
+                            ...safeObject(root.savedManagedLink)
+                        }
+                    });
+                }
+            }
+            UIComponents.showToast(
+                accepted
+                    ? `${getNanahRemoteLabel()} accepted the sync`
+                    : `${getNanahRemoteLabel()} declined the sync`,
+                accepted ? 'success' : 'info'
+            );
+            return;
+        }
+        if (root.t === 'control_proposal' || root.t === 'app_sync') {
+            await handleNanahIncomingProposal(root);
+        }
+    }
+
+    async function createNanahClient() {
+        if (!isNanahAvailable()) {
+            throw new Error('Nanah runtime is not available');
+        }
+        if (nanahClient) {
+            await resetNanahSession(true);
+        }
+        await ensureNanahStableDeviceId();
+
+        const device = buildNanahDeviceDescriptor();
+        const NanahApi = window.FilterTubeNanah;
+        const client = new NanahApi.NanahClient({
+            app: 'filtertube',
+            device,
+            transport: new NanahApi.WebRtcDataChannelTransport({
+                signalingUrl: NanahApi.DEFAULT_NANAH_SIGNALING_URL
+            })
+        });
+        const currentClient = client;
+
+        client.on('code', (payload) => {
+            if (nanahClient !== currentClient) return;
+            nanahSessionState.code = normalizeNanahCode(payload?.code);
+            nanahSessionState.pairUri = buildNanahPairUri(nanahSessionState.code);
+            updateNanahUi();
+        });
+        client.on('stage', (stage) => {
+            if (nanahClient !== currentClient) return;
+            nanahSessionState.stage = stage;
+            if (stage === 'closed') {
+                Promise.resolve(resetNanahSession(false)).catch(() => { });
+                return;
+            }
+            updateNanahUi();
+        });
+        client.on('sas', (payload) => {
+            if (nanahClient !== currentClient) return;
+            nanahSessionState.sasPhrase = normalizeString(payload?.phrase);
+            updateNanahUi();
+            UIComponents.showToast('Compare the safety phrase on both devices', 'info');
+        });
+        client.on('connected', async () => {
+            if (nanahClient !== currentClient) return;
+            nanahSessionState.connected = true;
+            updateNanahUi();
+            try {
+                await sendNanahHelloEnvelope();
+            } catch (error) {
+                console.warn('FilterTube: failed to send Nanah hello', error);
+            }
+        });
+        client.on('data', (envelope) => {
+            if (nanahClient !== currentClient) return;
+            Promise.resolve(handleNanahIncomingEnvelope(envelope)).catch((error) => {
+                console.error('FilterTube: failed to handle Nanah envelope', error);
+                UIComponents.showToast('Failed to process incoming Nanah sync', 'error');
+            });
+        });
+        client.on('error', (error) => {
+            if (nanahClient !== currentClient) return;
+            console.error('FilterTube: Nanah session error', error);
+            UIComponents.showToast(error?.message || 'Nanah session failed', 'error');
+            Promise.resolve(resetNanahSession(false)).catch(() => { });
+        });
+        client.on('closed', () => {
+            if (nanahClient !== currentClient) return;
+            Promise.resolve(resetNanahSession(false)).catch(() => { });
+        });
+
+        nanahClient = client;
+        updateNanahUi();
+        return client;
+    }
+
+    async function trustConnectedNanahDevice() {
+        const remote = safeObject(nanahSessionState.remoteDevice);
+        const remoteDeviceId = normalizeString(remote.deviceId);
+        if (!remoteDeviceId) {
+            UIComponents.showToast('No connected device to trust yet', 'error');
+            return;
+        }
+
+        const localRole = getNanahRole();
+        const remoteRole = normalizeString(nanahSessionState.remoteRole) || 'peer';
+        const linkType = classifyNanahTrustedLink(localRole, remoteRole);
+        if (!linkType) {
+            UIComponents.showToast(
+                `${getNanahRoleLabel(localRole)} + ${getNanahRoleLabel(remoteRole)} can pair temporarily, but only Peer + Peer or Source + Replica can be saved as a trusted link.`,
+                'error'
+            );
+            return;
+        }
+        if (isNanahChildReplicaOnly() && (localRole !== 'replica' || remoteRole !== 'source' || linkType !== 'managed_link')) {
+            UIComponents.showToast('Locked child profiles can only save managed Source -> Replica links. Unlock the child profile first to send from it.', 'error');
+            return;
+        }
+
+        const scope = getNanahScope();
+        const strategy = getNanahStrategy();
+        let policy = {
+            linkType,
+            capabilities: safeArray(remote.capabilities),
+            allowedScopes: [scope],
+            defaultScope: scope,
+            applyMode: strategy,
+            autoApplyControlProposals: false,
+            reconnectMode: linkType === 'managed_link' ? 'approval_needed' : 'fast',
+            lockedChildMode: 'require_unlock',
+            childProtectionLevel: isActiveChildNanahProfile() ? 'strict' : 'standard',
+            targetProfileBehavior: isActiveChildNanahProfile() ? 'fixed_profile' : 'current_active',
+            targetProfileId: getNanahLocalProfileContext().profileId,
+            targetProfileName: getNanahLocalProfileContext().profileName
+        };
+
+        if (linkType === 'managed_link') {
+            const trustPolicy = await showNanahManagedLinkModal({
+                title: localRole === 'replica' ? 'Trust Managed Source' : 'Save Managed Link',
+                message: localRole === 'replica'
+                    ? `${getNanahRemoteLabel()} is connected as a source device.`
+                    : `${getNanahRemoteLabel()} is connected as a replica device.`,
+                intro: localRole === 'replica'
+                    ? 'Save the scopes and policy this source may use later. Auto-apply is optional and only affects future matching updates.'
+                    : 'Save the source-side managed policy now. The replica still chooses locally whether to trust and auto-apply on its own side.',
+                initialPolicy: policy,
+                allowApplyOnce: false,
+                allowSave: true,
+                saveLabel: 'Save Managed Link',
+                cancelLabel: 'Cancel',
+                showAutoApply: localRole === 'replica' && remoteRole === 'source',
+                showReconnectMode: localRole === 'replica' && remoteRole === 'source',
+                showLockedChildMode: localRole === 'replica' && remoteRole === 'source' && isActiveChildNanahProfile(),
+                showTargetProfileMapping: localRole === 'replica' && remoteRole === 'source',
+                forceFixedTargetProfile: localRole === 'replica' && remoteRole === 'source' && isActiveChildNanahProfile()
+            });
+            if (!trustPolicy?.policy) return;
+            if (!(await ensureNanahManagedChildLinkPermission(trustPolicy.policy))) return;
+            policy = {
+                ...policy,
+                ...trustPolicy.policy
+            };
+        }
+
+        await saveNanahTrustedLink({
+            linkId: `nanah-${remoteDeviceId}`,
+            remoteDeviceId,
+            deviceLabel: normalizeString(remote.deviceLabel) || remoteDeviceId,
+            capabilities: safeArray(remote.capabilities),
+            localRole,
+            remoteRole,
+            linkType,
+            policy
+        });
+        UIComponents.showToast(linkType === 'managed_link' ? 'Managed link saved' : 'Trusted peer saved', 'success');
+        updateNanahUi();
+    }
+
     async function confirmSubscriptionsImportModeChoice() {
         const currentMode = StateManager.getState()?.mode === 'whitelist' ? 'whitelist' : 'blocklist';
         if (currentMode === 'whitelist') {
@@ -4660,6 +7454,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!ftProfilesManager) return;
         const root = safeObject(profilesV4);
         const profiles = safeObject(root.profiles);
+        const childAdminRestricted = isChildProfileAdminSurface();
+        const childAdminTitle = 'Child profiles cannot manage profile names, deletion, or PIN rules from this surface.';
 
         ftProfilesManager.innerHTML = '';
 
@@ -4722,7 +7518,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             renameBtn.className = 'btn-secondary';
             renameBtn.type = 'button';
             renameBtn.textContent = 'Rename';
+            renameBtn.disabled = childAdminRestricted;
+            renameBtn.title = childAdminRestricted ? childAdminTitle : '';
             renameBtn.addEventListener('click', async () => {
+                if (childAdminRestricted) {
+                    UIComponents.showToast('Child profiles cannot rename profiles here', 'error');
+                    return;
+                }
                 const io = window.FilterTubeIO || {};
                 if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') return;
                 const fresh = await io.loadProfilesV4();
@@ -4767,8 +7569,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             deleteBtn.className = 'btn-secondary btn-danger';
             deleteBtn.type = 'button';
             deleteBtn.textContent = 'Delete';
-            deleteBtn.disabled = profileId === 'default';
+            deleteBtn.disabled = profileId === 'default' || childAdminRestricted;
+            deleteBtn.title = childAdminRestricted ? childAdminTitle : '';
             deleteBtn.addEventListener('click', async () => {
+                if (childAdminRestricted) {
+                    UIComponents.showToast('Child profiles cannot delete profiles here', 'error');
+                    return;
+                }
                 if (profileId === 'default') return;
                 const io = window.FilterTubeIO || {};
                 if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') return;
@@ -4815,7 +7622,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 pinBtn.className = 'btn-secondary';
                 pinBtn.type = 'button';
                 pinBtn.textContent = isProfileLocked(profilesV4, profileId) ? 'Change PIN' : 'Set PIN';
+                pinBtn.disabled = childAdminRestricted;
+                pinBtn.title = childAdminRestricted ? childAdminTitle : '';
                 pinBtn.addEventListener('click', async () => {
+                    if (childAdminRestricted) {
+                        UIComponents.showToast('Child profiles cannot manage profile PIN rules here', 'error');
+                        return;
+                    }
                     const io = window.FilterTubeIO || {};
                     if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') return;
                     const fresh = await io.loadProfilesV4();
@@ -4886,8 +7699,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 clearPinBtn.className = 'btn-secondary';
                 clearPinBtn.type = 'button';
                 clearPinBtn.textContent = 'Remove PIN';
-                clearPinBtn.disabled = !isProfileLocked(profilesV4, profileId);
+                clearPinBtn.disabled = !isProfileLocked(profilesV4, profileId) || childAdminRestricted;
+                clearPinBtn.title = childAdminRestricted ? childAdminTitle : '';
                 clearPinBtn.addEventListener('click', async () => {
+                    if (childAdminRestricted) {
+                        UIComponents.showToast('Child profiles cannot manage profile PIN rules here', 'error');
+                        return;
+                    }
                     const io = window.FilterTubeIO || {};
                     if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') return;
                     const fresh = await io.loadProfilesV4();
@@ -4952,9 +7770,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             updateExportScopeControls();
             updateAdminPolicyControls();
             updateAutoBackupPolicyControls();
+            updateChildProfileCapabilityControls();
             renderProfileSelector(profilesV4);
             renderProfilesManager(profilesV4);
             applyLockGateIfNeeded();
+            updateNanahUi();
+            if (nanahClient && nanahSessionState.connected && nanahSessionState.sasConfirmed) {
+                sendNanahHelloEnvelope(true).catch(() => { });
+            }
         } catch (e) {
         }
     }
@@ -5016,6 +7839,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateExportScopeControls();
     updateAdminPolicyControls();
     updateAutoBackupPolicyControls();
+    updateChildProfileCapabilityControls();
     if (profilesV4Cache) {
         renderProfileSelector(profilesV4Cache);
         renderProfilesManager(profilesV4Cache);
@@ -5194,6 +8018,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
     async function runExportV3() {
+        if (!ensureNonChildAdminAction('Child profiles cannot export backups from this surface.')) {
+            return;
+        }
         const io = window.FilterTubeIO;
         if (!io || typeof io.exportV3 !== 'function') {
             UIComponents.showToast('Export unavailable (FilterTubeIO not loaded)', 'error');
@@ -5248,6 +8075,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function runExportV3Encrypted() {
+        if (!ensureNonChildAdminAction('Child profiles cannot export encrypted backups from this surface.')) {
+            return;
+        }
         const io = window.FilterTubeIO;
         if (!io || typeof io.exportV3Encrypted !== 'function') {
             UIComponents.showToast('Encrypted export unavailable', 'error');
@@ -5282,7 +8112,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             } catch (e) {
             }
 
-            const payload = await io.exportV3Encrypted({ scope: ftExportActiveOnly?.checked ? 'active' : 'auto', password, auth });
+            const includeTrustedNanahState = !ftExportActiveOnly?.checked;
+            const payload = await io.exportV3Encrypted({
+                scope: ftExportActiveOnly?.checked ? 'active' : 'auto',
+                password,
+                auth,
+                includeTrustedNanahState
+            });
 
             const date = new Date();
             const stamp = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
@@ -5307,7 +8143,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             await downloadJsonToDownloadsFolder('FilterTube Export', filename, payload, {
                 preferAnchor: IS_FIREFOX_TAB_VIEW
             });
-            UIComponents.showToast('Exported encrypted JSON to Downloads/FilterTube Export/', 'success');
+            UIComponents.showToast(
+                payload?.meta?.containsNanahTrustedState === true
+                    ? 'Exported encrypted backup with trusted-device recovery data'
+                    : 'Exported encrypted JSON to Downloads/FilterTube Export/',
+                'success'
+            );
         } catch (e) {
             UIComponents.showToast('Encrypted export failed', 'error');
             console.error('Export encrypted failed', e);
@@ -5316,6 +8157,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function runImportV3FromFile(file) {
         if (!file) return;
+        if (!ensureNonChildAdminAction('Child profiles cannot import backups from this surface.')) {
+            return;
+        }
         const io = window.FilterTubeIO;
         if (!io || typeof io.importV3 !== 'function') {
             UIComponents.showToast('Import unavailable (FilterTubeIO not loaded)', 'error');
@@ -5362,6 +8206,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             let auth = null;
+            let restoreTrustedNanahState = false;
             try {
                 const localProfilesV4 = profilesV4Cache || (typeof io.loadProfilesV4 === 'function' ? await io.loadProfilesV4() : null);
                 const localActive = normalizeString(localProfilesV4?.activeProfileId) || 'default';
@@ -5389,10 +8234,52 @@ document.addEventListener('DOMContentLoaded', async () => {
                     if (!backupPin) return;
                     auth = { ...(auth || {}), incomingMasterPin: backupPin };
                 }
+
+                const nanahBackupState = safeObject(payload.nanahState);
+                const hasNanahRecoveryData = normalizeString(nanahBackupState.deviceId)
+                    || safeArray(nanahBackupState.trustedLinks).length > 0;
+                if (
+                    safeObject(parsed?.meta).encrypted === true
+                    && hasNanahRecoveryData
+                    && localActive === 'default'
+                    && effectiveScope === 'full'
+                ) {
+                    const restoreChoice = await showChoiceModal({
+                        title: 'Restore Trusted Devices Too?',
+                        message: 'This encrypted full backup also contains Nanah trusted-device recovery data.',
+                        details: [
+                            'Use this only when restoring the same device after reinstall or local data loss.',
+                            'Restoring it on a different device can clone the saved Nanah device identity.',
+                            'Choose Settings Only to restore profiles, filters, and rules without restoring trusted-device identity.'
+                        ],
+                        choices: [
+                            {
+                                value: 'settings_only',
+                                label: 'Settings Only',
+                                recommended: true
+                            },
+                            {
+                                value: 'restore_trust',
+                                label: 'Restore Trusted Devices',
+                                className: 'btn-secondary'
+                            }
+                        ],
+                        cancelText: 'Cancel'
+                    });
+                    if (!restoreChoice) return;
+                    restoreTrustedNanahState = restoreChoice === 'restore_trust';
+                }
             } catch (e) {
             }
 
-            await io.importV3(payload, { strategy: 'merge', scope: 'auto', auth });
+            const importResult = await io.importV3(payload, {
+                strategy: 'merge',
+                scope: 'auto',
+                auth: {
+                    ...(auth || {}),
+                    restoreTrustedNanahState
+                }
+            });
 
             await StateManager.loadSettings();
             const state = StateManager.getState();
@@ -5400,8 +8287,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (SettingsAPI.applyThemePreference) {
                 SettingsAPI.applyThemePreference(state.theme);
             }
+            if (importResult?.restoredNanahState) {
+                nanahStableDeviceId = '';
+                await ensureNanahStableDeviceId();
+                await loadNanahTrustedLinks();
+                updateNanahUi();
+            }
 
-            UIComponents.showToast('Import complete', 'success');
+            UIComponents.showToast(
+                importResult?.restoredNanahState
+                    ? 'Import complete and trusted-device recovery data restored'
+                    : 'Import complete',
+                'success'
+            );
         } catch (e) {
             UIComponents.showToast('Import failed (invalid file?)', 'error');
             console.error('Import V3 failed', e);
@@ -5410,18 +8308,30 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (ftExportV3Btn) {
         ftExportV3Btn.addEventListener('click', () => {
+            if (getActiveProfileType() === 'child') {
+                UIComponents.showToast('Child profiles cannot export backups here', 'error');
+                return;
+            }
             runExportV3();
         });
     }
 
     if (ftExportV3EncryptedBtn) {
         ftExportV3EncryptedBtn.addEventListener('click', () => {
+            if (getActiveProfileType() === 'child') {
+                UIComponents.showToast('Child profiles cannot export encrypted backups here', 'error');
+                return;
+            }
             runExportV3Encrypted();
         });
     }
 
     if (ftImportV3Btn && ftImportV3File) {
         ftImportV3Btn.addEventListener('click', () => {
+            if (getActiveProfileType() === 'child') {
+                UIComponents.showToast('Child profiles cannot import backups here', 'error');
+                return;
+            }
             ftImportV3File.click();
         });
 
@@ -5430,6 +8340,221 @@ document.addEventListener('DOMContentLoaded', async () => {
             await runImportV3FromFile(file);
             e.target.value = '';
         });
+    }
+
+    if (ftNanahJoinCode) {
+        ftNanahJoinCode.addEventListener('input', () => {
+            const normalized = extractNanahCodeFromInput(ftNanahJoinCode.value);
+            if (ftNanahJoinCode.value !== normalized) {
+                ftNanahJoinCode.value = normalized;
+            }
+        });
+    }
+
+    if (ftNanahDeviceLabel && !normalizeString(ftNanahDeviceLabel.value)) {
+        ftNanahDeviceLabel.value = await loadNanahPreferredDeviceLabel();
+    }
+
+    await ensureNanahStableDeviceId();
+    await loadNanahTrustedLinks();
+    renderNanahTrustedLinks();
+    updateNanahUi();
+
+    [ftNanahRole, ftNanahScope, ftNanahStrategy, ftNanahRemoteTarget].forEach((element) => {
+        if (!element) return;
+        element.addEventListener('change', () => {
+            updateNanahUi();
+        });
+    });
+
+    if (ftNanahDeviceLabel) {
+        ftNanahDeviceLabel.addEventListener('input', () => {
+            if (!nanahClient) {
+                void persistNanahPreferredDeviceLabel();
+            }
+        });
+        ftNanahDeviceLabel.addEventListener('blur', () => {
+            void persistNanahPreferredDeviceLabel();
+        });
+        ftNanahDeviceLabel.addEventListener('change', () => {
+            void persistNanahPreferredDeviceLabel();
+            updateNanahUi();
+        });
+    }
+
+    if (!isNanahAvailable()) {
+        [
+            ftNanahHostBtn,
+            ftNanahJoinBtn,
+            ftNanahSendBtn,
+            ftNanahTrustBtn,
+            ftNanahEndSessionBtn,
+            ftNanahConfirmSasBtn,
+            ftNanahCopyPairUriBtn
+        ].forEach((button) => {
+            if (button) button.disabled = true;
+        });
+        if (ftNanahStatusHint) {
+            ftNanahStatusHint.textContent = 'Nanah runtime is not available in this build yet.';
+        }
+    } else {
+        if (ftNanahHostBtn) {
+            ftNanahHostBtn.addEventListener('click', async () => {
+                try {
+                    const client = await createNanahClient();
+                    nanahSessionState.stage = 'hosting';
+                    nanahSessionState.code = '';
+                    nanahSessionState.pairUri = '';
+                    nanahSessionState.sasPhrase = '';
+                    nanahSessionState.sasConfirmed = false;
+                    nanahSessionState.remoteDevice = null;
+                    nanahSessionState.remoteProfile = null;
+                    nanahSessionState.remoteProfileInventory = [];
+                    nanahSessionState.remoteTargetProfile = null;
+                    nanahSessionState.remoteRole = 'peer';
+                    nanahSessionState.helloSent = false;
+                    updateNanahUi();
+                    const result = await client.host();
+                    nanahSessionState.code = normalizeNanahCode(result?.code);
+                    nanahSessionState.pairUri = buildNanahPairUri(nanahSessionState.code);
+                    updateNanahUi();
+                    UIComponents.showToast(`Pairing code ${nanahSessionState.code} is ready`, 'success');
+                } catch (error) {
+                    console.error('FilterTube: failed to host Nanah session', error);
+                    UIComponents.showToast(error?.message || 'Failed to create pairing code', 'error');
+                }
+            });
+        }
+
+        if (ftNanahJoinBtn && ftNanahJoinCode) {
+            ftNanahJoinBtn.addEventListener('click', async () => {
+                const code = extractNanahCodeFromInput(ftNanahJoinCode.value);
+                if (code.length < 4) {
+                    UIComponents.showToast('Enter the 4-character pairing code first', 'error');
+                    return;
+                }
+                const existingCode = normalizeNanahCode(nanahSessionState.code);
+                if (nanahClient && existingCode && existingCode === code) {
+                    UIComponents.showToast('This device is already using that pairing code. End the current session or join from another browser/device.', 'error');
+                    return;
+                }
+                try {
+                    const client = await createNanahClient();
+                    nanahSessionState.code = code;
+                    nanahSessionState.pairUri = buildNanahPairUri(code);
+                    nanahSessionState.stage = 'joining';
+                    nanahSessionState.sasPhrase = '';
+                    nanahSessionState.sasConfirmed = false;
+                    nanahSessionState.remoteDevice = null;
+                    nanahSessionState.remoteProfile = null;
+                    nanahSessionState.remoteProfileInventory = [];
+                    nanahSessionState.remoteTargetProfile = null;
+                    nanahSessionState.remoteRole = 'peer';
+                    nanahSessionState.helloSent = false;
+                    updateNanahUi();
+                    await client.join(code);
+                    UIComponents.showToast(`Joining code ${code}`, 'info');
+                } catch (error) {
+                    console.error('FilterTube: failed to join Nanah session', error);
+                    UIComponents.showToast(error?.message || 'Failed to join pairing code', 'error');
+                }
+            });
+        }
+
+        if (ftNanahConfirmSasBtn) {
+            ftNanahConfirmSasBtn.addEventListener('click', async () => {
+                if (!nanahClient || !normalizeString(nanahSessionState.sasPhrase)) return;
+                try {
+                    const confirmed = await showChoiceModal({
+                        title: 'Confirm Safety Phrase',
+                        message: 'Only continue if both devices show the exact same phrase.',
+                        details: [
+                            `Phrase: ${nanahSessionState.sasPhrase}`,
+                            'This prevents the signaling relay from silently impersonating one side of the session.'
+                        ],
+                        choices: [
+                            {
+                                value: 'confirm',
+                                label: 'Phrase Matches',
+                                recommended: true
+                            }
+                        ],
+                        cancelText: 'Not Yet'
+                    });
+                    if (confirmed !== 'confirm') return;
+                    await nanahClient.confirmSas();
+                    nanahSessionState.sasConfirmed = true;
+                    updateNanahUi();
+                    await sendNanahHelloEnvelope();
+                    UIComponents.showToast('Secure session confirmed', 'success');
+                } catch (error) {
+                    console.error('FilterTube: failed to confirm SAS', error);
+                    UIComponents.showToast('Failed to confirm safety phrase', 'error');
+                }
+            });
+        }
+
+        if (ftNanahCopyPairUriBtn) {
+            ftNanahCopyPairUriBtn.addEventListener('click', async () => {
+                const pairUri = normalizeString(nanahSessionState.pairUri);
+                if (!pairUri) return;
+                try {
+                    await navigator.clipboard.writeText(pairUri);
+                    UIComponents.showToast('Pairing link copied', 'success');
+                } catch (error) {
+                    console.error('FilterTube: failed to copy Nanah pair URI', error);
+                    UIComponents.showToast('Could not copy pairing link', 'error');
+                }
+            });
+        }
+
+        if (ftNanahSendBtn) {
+            ftNanahSendBtn.addEventListener('click', async () => {
+                if (!nanahClient || !nanahSessionState.connected || !nanahSessionState.sasConfirmed) {
+                    UIComponents.showToast('Finish pairing and confirm the safety phrase first', 'error');
+                    return;
+                }
+                try {
+                    const adapter = window.FilterTubeNanahAdapter || {};
+                    if (typeof adapter.buildControlProposal !== 'function') {
+                        throw new Error('FilterTube Nanah adapter is unavailable');
+                    }
+                    const selectionScope = getNanahScope();
+                    const okTarget = await confirmNanahRemoteTarget(selectionScope);
+                    if (!okTarget) {
+                        return;
+                    }
+                    const selectionStrategy = getNanahStrategy();
+                    const policy = buildNanahOutgoingProposalPolicy(selectionScope, selectionStrategy);
+                    const auth = await ensureNanahOutgoingAuth(policy.scope);
+                    let envelope = await adapter.buildControlProposal({ scope: policy.scope, strategy: policy.strategy, auth });
+                    envelope = attachNanahProposalPolicy(envelope, policy);
+                    await nanahClient.send(envelope);
+                    UIComponents.showToast(`Sent ${policy.scope} settings to ${getNanahRemoteLabel()}`, 'success');
+                } catch (error) {
+                    console.error('FilterTube: failed to send Nanah settings', error);
+                    UIComponents.showToast(error?.message || 'Failed to send settings', 'error');
+                }
+            });
+        }
+
+        if (ftNanahTrustBtn) {
+            ftNanahTrustBtn.addEventListener('click', async () => {
+                try {
+                    await trustConnectedNanahDevice();
+                } catch (error) {
+                    console.error('FilterTube: failed to trust Nanah device', error);
+                    UIComponents.showToast(error?.message || 'Failed to trust device', 'error');
+                }
+            });
+        }
+
+        if (ftNanahEndSessionBtn) {
+            ftNanahEndSessionBtn.addEventListener('click', async () => {
+                await resetNanahSession(true);
+                UIComponents.showToast('Nanah session ended', 'success');
+            });
+        }
     }
 
     if (ftAllowAccountCreation && ftMaxAccounts) {
@@ -5468,6 +8593,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
 
         ftAllowAccountCreation.addEventListener('change', async () => {
+            if (!ensureNonChildAdminAction('Child profiles cannot change account policy here.')) {
+                updateAdminPolicyControls();
+                return;
+            }
             if (activeProfileId !== 'default') {
                 UIComponents.showToast('Switch to Default to change account policy', 'error');
                 updateAdminPolicyControls();
@@ -5479,6 +8608,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         ftMaxAccounts.addEventListener('change', async () => {
+            if (!ensureNonChildAdminAction('Child profiles cannot change account policy here.')) {
+                updateAdminPolicyControls();
+                return;
+            }
             if (activeProfileId !== 'default') {
                 UIComponents.showToast('Switch to Default to change account policy', 'error');
                 updateAdminPolicyControls();
@@ -5493,6 +8626,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (ftCreateAccountBtn) {
         ftCreateAccountBtn.addEventListener('click', async () => {
+            if (!ensureNonChildAdminAction('Child profiles cannot manage accounts here.')) {
+                return;
+            }
             const io = window.FilterTubeIO || {};
             if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
                 UIComponents.showToast('Profiles unavailable', 'error');
@@ -5609,6 +8745,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (ftCreateChildBtn) {
         ftCreateChildBtn.addEventListener('click', async () => {
+            if (!ensureNonChildAdminAction('Child profiles cannot create child profiles here.')) {
+                return;
+            }
             const io = window.FilterTubeIO || {};
             if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
                 UIComponents.showToast('Profiles unavailable', 'error');
@@ -5712,6 +8851,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (ftSetMasterPinBtn) {
         ftSetMasterPinBtn.addEventListener('click', async () => {
+            if (!ensureNonChildAdminAction('Child profiles cannot manage the Master PIN here.')) {
+                return;
+            }
             const io = window.FilterTubeIO || {};
             if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
                 UIComponents.showToast('Profiles unavailable', 'error');
@@ -5784,6 +8926,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (ftClearMasterPinBtn) {
         ftClearMasterPinBtn.addEventListener('click', async () => {
+            if (!ensureNonChildAdminAction('Child profiles cannot manage the Master PIN here.')) {
+                return;
+            }
             const io = window.FilterTubeIO || {};
             if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
                 UIComponents.showToast('Profiles unavailable', 'error');
@@ -6190,6 +9335,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         syncSubscriptionsImportControls();
+        updateChildProfileCapabilityControls();
     }
 
     function filterContentControls() {
@@ -7030,6 +10176,7 @@ function setupNavigation() {
             'semantic': 'Semantic ML',
             'kids': 'Kids Mode',
             'settings': 'Settings',
+            'sync': 'Accounts & Sync',
             'whatsnew': 'What’s New',
             'help': 'Help',
             'donate': 'Donate',

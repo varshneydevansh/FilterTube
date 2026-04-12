@@ -84,6 +84,18 @@
                     </span>
                     <span class="nav-label">Settings</span>
                 </li>
+                <li class="nav-item" data-tab="sync">
+                    <span class="nav-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M8 7a5 5 0 0 1 8 0"></path>
+                            <path d="M16 17a5 5 0 0 1-8 0"></path>
+                            <path d="M8 7H4v4"></path>
+                            <path d="M16 17h4v-4"></path>
+                        </svg>
+                    </span>
+                    <span class="nav-label">Accounts &amp; Sync</span>
+                </li>
                 <li class="nav-item" data-tab="whatsnew">
                     <span class="nav-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -357,13 +369,13 @@
                     <div class="view-shell view-shell--settings settings-shell">
                         <section class="view-hero settings-hero">
                             <div class="view-hero__copy">
-                                <p class="view-hero__eyebrow">Profiles, backup, and trust</p>
-                                <h2 class="view-hero__title">Keep every FilterTube setup portable, locked when needed, and ready for the next screen.</h2>
-                                <p class="view-hero__body">Profiles stay separate, backups stay on-device, and Kids sync stays explicit. This is where the current desktop control system turns into the base for mobile, tablet, and TV later.</p>
+                                <p class="view-hero__eyebrow">Backup, restore, and local controls</p>
+                                <h2 class="view-hero__title">Keep every FilterTube setup recoverable, explicit, and easy to manage without losing local control.</h2>
+                                <p class="view-hero__body">Use this page for import/export, automatic backups, and the bridge between YouTube Kids and main YouTube. Profiles, security, and cross-device trust now live together in Accounts &amp; Sync.</p>
                             </div>
                             <div class="view-hero__meta">
                                 <span class="view-meta-pill">Local backups</span>
-                                <span class="view-meta-pill">PIN-protected profiles</span>
+                                <span class="view-meta-pill">Import and restore</span>
                                 <span class="view-meta-pill">Kids sync</span>
                             </div>
                         </section>
@@ -426,51 +438,6 @@
                                     </div>
                                 </div>
 
-                                <div class="card settings-card">
-                                    <div class="card-header">
-                                        <h3>Profiles</h3>
-                                    </div>
-                                    <div class="card-body settings-card__body settings-card__body--profiles">
-                                        <div class="import-export-hint" style="margin-bottom:10px;">
-                                            Profiles are independent. The <code>Default</code> profile acts as admin for full backups and managing other profiles.
-                                        </div>
-                                        <div id="ftProfilesManager" class="help-list"></div>
-                                        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
-                                            <button id="ftCreateAccountBtn" class="btn-secondary" type="button">Create Account</button>
-                                            <button id="ftCreateChildBtn" class="btn-secondary" type="button">Create Child</button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="card settings-card">
-                                    <div class="card-header">
-                                        <h3>Security</h3>
-                                    </div>
-                                    <div class="card-body settings-card__body">
-                                        <div class="import-export-hint" style="margin-bottom:10px;">
-                                            Master PIN locks the Default profile and controls admin actions like full backups and managing other profiles.
-                                        </div>
-                                        <div class="toggle-row" title="When enabled, the Default (Master) profile can create new independent accounts.">
-                                            <div class="toggle-info">
-                                                <div class="toggle-title">Allow independent account creation</div>
-                                            </div>
-                                            <label class="switch">
-                                                <input id="ftAllowAccountCreation" type="checkbox" />
-                                                <span class="slider round"></span>
-                                            </label>
-                                        </div>
-                                        <div class="toggle-row" title="Limits how many independent accounts can exist (excluding Default).">
-                                            <div class="toggle-info">
-                                                <div class="toggle-title">Max independent accounts</div>
-                                            </div>
-                                            <input id="ftMaxAccounts" class="text-input" type="number" min="0" step="1" style="max-width:120px;" />
-                                        </div>
-                                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                                            <button id="ftSetMasterPinBtn" class="btn-secondary" type="button">Set / Change Master PIN</button>
-                                            <button id="ftClearMasterPinBtn" class="btn-secondary" type="button">Remove Master PIN</button>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
 
                             <div class="settings-system">
@@ -529,6 +496,313 @@
                                         </div>
                                         <div class="import-export-hint" style="margin-top:10px;">
                                             Synced items show in your main list with a <code>"From Kids"</code> badge.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div id="syncView" class="view-section">
+                    <div class="view-shell view-shell--settings sync-shell">
+                        <section class="view-hero settings-hero sync-hero">
+                            <div class="view-hero__copy">
+                                <p class="view-hero__eyebrow">Accounts, security, and device trust</p>
+                                <h2 class="view-hero__title">Manage profiles, protect them with PIN rules, and connect trusted devices without making the control model harder to understand.</h2>
+                                <p class="view-hero__body">This page combines account structure and Nanah pairing so users can manage who controls what from one place. Nanah is private by design: the relay only helps devices connect, and the real FilterTube settings payload is intended to move device-to-device after the secure handshake.</p>
+                            </div>
+                            <div class="view-hero__meta">
+                                <span class="view-meta-pill">Profiles</span>
+                                <span class="view-meta-pill">PIN policy</span>
+                                <span class="view-meta-pill">4-character code</span>
+                                <span class="view-meta-pill">Trusted source devices</span>
+                            </div>
+                        </section>
+
+                        <div class="settings-grid">
+                            <div class="settings-core">
+                                <div class="card settings-card">
+                                    <div class="card-header">
+                                        <h3>Profiles</h3>
+                                    </div>
+                                    <div class="card-body settings-card__body settings-card__body--profiles">
+                                        <div class="import-export-hint" style="margin-bottom:10px;">
+                                            Profiles are independent. The <code>Default</code> profile acts as admin for full backups, account policy, and trusted device governance.
+                                        </div>
+                                        <div id="ftProfilesManager" class="help-list"></div>
+                                        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
+                                            <button id="ftCreateAccountBtn" class="btn-secondary" type="button">Create Account</button>
+                                            <button id="ftCreateChildBtn" class="btn-secondary" type="button">Create Child</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="settings-system">
+                                <div class="card settings-card">
+                                    <div class="card-header">
+                                        <h3>Security</h3>
+                                    </div>
+                                    <div class="card-body settings-card__body">
+                                        <div class="import-export-hint" style="margin-bottom:10px;">
+                                            Master PIN locks the Default profile and controls admin actions like account policy, full backups, and trusted-link management rules.
+                                        </div>
+                                        <div class="toggle-row" title="When enabled, the Default (Master) profile can create new independent accounts.">
+                                            <div class="toggle-info">
+                                                <div class="toggle-title">Allow independent account creation</div>
+                                            </div>
+                                            <label class="switch">
+                                                <input id="ftAllowAccountCreation" type="checkbox" />
+                                                <span class="slider round"></span>
+                                            </label>
+                                        </div>
+                                        <div class="toggle-row" title="Limits how many independent accounts can exist (excluding Default).">
+                                            <div class="toggle-info">
+                                                <div class="toggle-title">Max independent accounts</div>
+                                            </div>
+                                            <input id="ftMaxAccounts" class="text-input" type="number" min="0" step="1" style="max-width:120px;" />
+                                        </div>
+                                        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                                            <button id="ftSetMasterPinBtn" class="btn-secondary" type="button">Set / Change Master PIN</button>
+                                            <button id="ftClearMasterPinBtn" class="btn-secondary" type="button">Remove Master PIN</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card settings-card settings-card--featured nanah-sync-card">
+                            <div class="card-header">
+                                <h3>Device Trust &amp; Sync</h3>
+                            </div>
+                            <div class="card-body settings-card__body">
+                                <div class="nanah-sync-shell">
+                                    <div class="nanah-sync-intro">
+                                        <div class="nanah-sync-intro__copy">
+                                            <span class="nanah-sync-intro__eyebrow">Private device-to-device sync</span>
+                                            <p class="nanah-sync-intro__title">Move FilterTube settings between your own devices without creating a central account.</p>
+                                            <p class="nanah-sync-intro__body">Pair with a 4-character code or QR, confirm the shared safety phrase, then send only the scope you want: <code>active</code>, <code>main</code>, <code>kids</code>, or <code>full</code>. Nanah is private by design: FilterTube does not need a central account to read these settings.</p>
+                                        </div>
+                                        <div class="nanah-sync-flow" aria-label="Nanah Sync steps">
+                                            <article class="nanah-sync-flow__step">
+                                                <div class="nanah-sync-flow__step-head">
+                                                    <span class="nanah-sync-flow__index">Step 1</span>
+                                                    <strong>Pair</strong>
+                                                </div>
+                                                <span class="nanah-sync-flow__body">Create a short code on one device and join from the other device.</span>
+                                            </article>
+                                            <article class="nanah-sync-flow__step">
+                                                <div class="nanah-sync-flow__step-head">
+                                                    <span class="nanah-sync-flow__index">Step 2</span>
+                                                    <strong>Verify</strong>
+                                                </div>
+                                                <span class="nanah-sync-flow__body">Confirm the exact same safety phrase on both devices before anything applies.</span>
+                                            </article>
+                                            <article class="nanah-sync-flow__step">
+                                                <div class="nanah-sync-flow__step-head">
+                                                    <span class="nanah-sync-flow__index">Step 3</span>
+                                                    <strong>Send or trust</strong>
+                                                </div>
+                                                <span class="nanah-sync-flow__body">Send one update now, or save a managed source link for future replica updates.</span>
+                                            </article>
+                                        </div>
+                                        <div class="nanah-sync-principles" aria-label="Nanah Sync privacy and trust notes">
+                                            <article class="nanah-sync-principles__item">
+                                                <strong>What the relay sees</strong>
+                                                <span>The relay is only there to help both devices connect and exchange WebRTC setup.</span>
+                                            </article>
+                                            <article class="nanah-sync-principles__item">
+                                                <strong>What trust means</strong>
+                                                <span>Trust saves relationship and policy for a future live session. It does not create silent background sync.</span>
+                                            </article>
+                                            <article class="nanah-sync-principles__item">
+                                                <strong>Best default mental model</strong>
+                                                <span>Think of Nanah as private “pair, verify, send” between your own devices, with optional managed parent rules.</span>
+                                            </article>
+                                        </div>
+                                        <div class="nanah-sync-principles nanah-sync-principles--guide" aria-label="Nanah Sync quick start">
+                                            <article class="nanah-sync-principles__item">
+                                                <strong>One-time send</strong>
+                                                <span>Use this when you only want to copy settings once. Pair, verify, send, and the other device reviews the update.</span>
+                                            </article>
+                                            <article class="nanah-sync-principles__item">
+                                                <strong>Parent controls child</strong>
+                                                <span>Use <code>Source / Parent</code> on the sender, <code>Replica / Kids device</code> on the receiver, pick the remote child profile, then save the managed link once.</span>
+                                            </article>
+                                            <article class="nanah-sync-principles__item">
+                                                <strong>What trust actually does</strong>
+                                                <span>Trust remembers the relationship, allowed scopes, and target profile for the next live session. It is not hidden background sync.</span>
+                                            </article>
+                                        </div>
+                                    </div>
+
+                                    <div class="nanah-sync-grid nanah-sync-grid--featured">
+                                        <div class="nanah-sync-panel nanah-sync-panel--setup">
+                                            <div class="nanah-sync-panel__header">
+                                                <div>
+                                                    <span class="nanah-sync-panel__eyebrow">Local device</span>
+                                                    <h4 class="nanah-sync-panel__title">Choose what this device can send</h4>
+                                                    <p class="nanah-sync-panel__body">Set the device role and sync scope first. Parent/source devices can later keep replica devices aligned, but saved links still need a live session before any new update is sent.</p>
+                                                </div>
+                                                <span class="nanah-sync-panel__badge">Send setup</span>
+                                            </div>
+
+                                            <div class="nanah-sync-panel__content nanah-sync-panel__content--setup">
+                                                <div class="nanah-sync-panel__stack nanah-sync-panel__stack--setup">
+                                                    <div class="nanah-sync-guide">
+                                                        <div class="nanah-sync-guide__title">Quick path</div>
+                                                        <ol class="nanah-sync-guide__list">
+                                                            <li>Pick the relationship for this device.</li>
+                                                            <li>Start pairing here or join the code from the other device.</li>
+                                                            <li>Confirm the same safety phrase on both devices.</li>
+                                                            <li>Send once, or save trust if you want future sessions to reuse the policy.</li>
+                                                        </ol>
+                                                    </div>
+                                                    <div class="nanah-sync-guide">
+                                                        <div class="nanah-sync-guide__title">Parent control quick start</div>
+                                                        <ol class="nanah-sync-guide__list">
+                                                            <li>On the parent device, stay on the parent profile or the child profile you want to send from.</li>
+                                                            <li>Set this side to <code>Source / Parent</code>.</li>
+                                                            <li>On the other device, set <code>Replica / Kids device</code>, then connect and confirm the phrase.</li>
+                                                            <li>Choose the child profile in <code>Remote target profile</code>, send once, then use <code>Save Managed Link</code> for later sessions.</li>
+                                                        </ol>
+                                                    </div>
+                                                    <div class="nanah-sync-form nanah-sync-form--grid">
+                                                        <label class="nanah-sync-field">
+                                                            <span>Device label</span>
+                                                            <input id="ftNanahDeviceLabel" class="text-input" type="text" placeholder="My laptop" />
+                                                        </label>
+                                                        <label class="nanah-sync-field">
+                                                            <span>Relationship</span>
+                                                            <select id="ftNanahRole" class="select-input">
+                                                                <option value="peer">Peer</option>
+                                                                <option value="source">Source / Parent</option>
+                                                                <option value="replica">Replica / Kids device</option>
+                                                            </select>
+                                                            <small class="nanah-sync-field__hint">Source devices can repeat trusted updates to replicas.</small>
+                                                        </label>
+                                                        <label class="nanah-sync-field">
+                                                            <span>Scope to send</span>
+                                                            <select id="ftNanahScope" class="select-input">
+                                                                <option value="active">Active profile</option>
+                                                                <option value="main">YouTube Main only</option>
+                                                                <option value="kids">YouTube Kids only</option>
+                                                                <option value="full">Full backup</option>
+                                                            </select>
+                                                        </label>
+                                                        <label class="nanah-sync-field">
+                                                            <span id="ftNanahStrategyLabel">Apply mode</span>
+                                                            <select id="ftNanahStrategy" class="select-input">
+                                                                <option value="merge">Merge into remote</option>
+                                                                <option value="replace">Replace remote scope</option>
+                                                            </select>
+                                                            <small id="ftNanahStrategyHint" class="nanah-sync-field__hint">Use <code>replace</code> for managed replicas and <code>merge</code> for peer sync.</small>
+                                                        </label>
+                                                        <label class="nanah-sync-field">
+                                                            <span>Remote target profile</span>
+                                                            <select id="ftNanahRemoteTarget" class="select-input">
+                                                                <option value="">Use remote active profile</option>
+                                                            </select>
+                                                            <small id="ftNanahRemoteTargetHint" class="nanah-sync-field__hint">After the secure handshake, choose a specific remote profile here if you want this update to land somewhere other than the receiver’s currently active profile.</small>
+                                                        </label>
+                                                    </div>
+
+                                                    <div class="nanah-sync-actions">
+                                                        <button id="ftNanahHostBtn" class="btn-primary" type="button">Start Pairing</button>
+                                                        <button id="ftNanahSendBtn" class="btn-secondary" type="button" disabled>Send Selected Scope</button>
+                                                        <button id="ftNanahTrustBtn" class="btn-secondary" type="button" disabled>Trust Connected Device</button>
+                                                        <button id="ftNanahEndSessionBtn" class="btn-secondary" type="button" disabled>End Session</button>
+                                                    </div>
+                                                </div>
+
+                                                <div class="nanah-sync-panel__stack nanah-sync-panel__stack--status">
+                                                    <div class="nanah-sync-status" id="ftNanahStatusCard">
+                                                        <div class="nanah-sync-status__headline">
+                                                            <div>
+                                                                <span class="nanah-sync-status__eyebrow">Session state</span>
+                                                                <strong class="nanah-sync-status__stage" id="ftNanahStage">Idle</strong>
+                                                            </div>
+                                                            <div class="nanah-sync-status__signal">Secure handshake</div>
+                                                        </div>
+                                                        <div class="nanah-sync-status__row">
+                                                            <span class="nanah-sync-status__label">This profile</span>
+                                                            <strong id="ftNanahLocalProfile">Default (master account)</strong>
+                                                        </div>
+                                                        <div class="nanah-sync-status__row">
+                                                            <span class="nanah-sync-status__label">Remote device</span>
+                                                            <strong id="ftNanahRemoteLabel">Not connected</strong>
+                                                        </div>
+                                                        <div class="nanah-sync-status__row">
+                                                            <span class="nanah-sync-status__label">Remote active profile</span>
+                                                            <strong id="ftNanahRemoteProfile">Unknown</strong>
+                                                        </div>
+                                                        <div class="nanah-sync-status__row" id="ftNanahPairCodeRow" hidden>
+                                                            <span class="nanah-sync-status__label">Pairing code</span>
+                                                            <strong id="ftNanahPairCode" class="nanah-sync-status__pair-code">----</strong>
+                                                        </div>
+                                                        <div class="nanah-sync-status__row">
+                                                            <span class="nanah-sync-status__label">Safety phrase</span>
+                                                            <strong id="ftNanahSasPhrase">Waiting</strong>
+                                                        </div>
+                                                        <div class="nanah-sync-status__hint" id="ftNanahStatusHint">
+                                                            Create a pairing code on one device, then join from the other device using the same 4-character code.
+                                                        </div>
+                                                        <div class="nanah-sync-status__hint" id="ftNanahTargetHint">
+                                                            Non-full sync writes into the receiver's current active profile only. Saved links remember trust and policy, not a live background connection.
+                                                        </div>
+                                                        <div class="nanah-sync-sas-actions">
+                                                            <button id="ftNanahConfirmSasBtn" class="btn-primary" type="button" disabled>Confirm Matching Phrase</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="nanah-sync-panel nanah-sync-panel--join">
+                                            <div class="nanah-sync-panel__header">
+                                                <div>
+                                                    <span class="nanah-sync-panel__eyebrow">Join and review</span>
+                                                    <h4 class="nanah-sync-panel__title">Bring another device into the session</h4>
+                                                    <p class="nanah-sync-panel__body">Desktop uses the short code now. The pair link and QR are ready for Nanah-enabled mobile and app surfaces next.</p>
+                                                </div>
+                                                <span class="nanah-sync-panel__badge">Receive setup</span>
+                                            </div>
+
+                                            <div class="nanah-sync-stack">
+                                                <div class="nanah-sync-privacy-banner">
+                                                    <strong>Completely P2P after handshake</strong>
+                                                    <span>The real settings payload is intended to move directly between your devices after the secure handshake. FilterTube does not need a central sync account to read it.</span>
+                                                </div>
+                                                <label class="nanah-sync-field">
+                                                    <span>Enter pairing code</span>
+                                                    <div class="nanah-sync-join-row">
+                                                        <input id="ftNanahJoinCode" class="text-input nanah-sync-code-input" type="text" maxlength="8" placeholder="ABCD" />
+                                                        <button id="ftNanahJoinBtn" class="btn-secondary" type="button">Join Session</button>
+                                                    </div>
+                                                </label>
+
+                                                <div class="nanah-sync-link-row">
+                                                    <input id="ftNanahPairUri" class="text-input" type="text" readonly placeholder="Pairing URI will appear here" />
+                                                    <button id="ftNanahCopyPairUriBtn" class="btn-secondary" type="button" disabled>Copy Link</button>
+                                                </div>
+
+                                                <div class="nanah-sync-qr-wrap">
+                                                    <canvas id="ftNanahQrCanvas" width="180" height="180" aria-label="Nanah pairing QR"></canvas>
+                                                    <div class="nanah-sync-qr-caption" id="ftNanahQrCaption">No active pairing session</div>
+                                                </div>
+                                            </div>
+
+                                            <div class="nanah-sync-trusted">
+                                                <div class="nanah-sync-trusted__header">
+                                                    <div class="help-item-title">Trusted devices</div>
+                                                    <div class="nanah-sync-note">Saved links remember trust and policy for later live sessions. They do not keep a background connection open or stream changes continuously.</div>
+                                                </div>
+                                                <div id="ftNanahTrustedLinks" class="nanah-trusted-links">
+                                                    <div class="nanah-trusted-links__empty">No trusted devices yet.</div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -770,6 +1044,7 @@
                                                 <ul>
                                                     <li>Per-profile toggle; mode (Latest/History) and format (Plain/Encrypted/Auto) follow the active profile.</li>
                                                     <li>Backups save to <code>Downloads/FilterTube Backup/</code>. Encrypted backups require a verified PIN to create.</li>
+                                                    <li>On Firefox, encrypted downloads use a fallback save flow so backup export does not fail when the downloads API refuses the file.</li>
                                                     <li>Popup and New Tab both respect lock state: controls disable when locked.</li>
                                                 </ul>
                                             </div>
@@ -828,6 +1103,183 @@
                             </div>
                         </div>
 
+                        <div class="help-cluster help-cluster--support">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>Nanah Sync</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="help-list">
+                                        <div class="help-item">
+                                            <div class="help-item-title">How the pairing flow works</div>
+                                            <div class="help-item-body">
+                                                <ul>
+                                                    <li><strong>Pair:</strong> Create a 4-character code or QR on one device and join from the other.</li>
+                                                    <li><strong>Verify:</strong> Confirm the same safety phrase on both devices before sending anything.</li>
+                                                    <li><strong>Send:</strong> Share only the scope you want: <code>active</code>, <code>main</code>, <code>kids</code>, or <code>full</code>.</li>
+                                                    <li><strong>Simplest mental model:</strong> Pair, verify, send once, then save trust only if you want later sessions to reuse relationship and policy.</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Quick start for parents</div>
+                                            <div class="help-item-body">
+                                                <ul>
+                                                    <li>On the sender, use <strong>Source / Parent</strong>.</li>
+                                                    <li>On the child device, use <strong>Replica / Kids device</strong>.</li>
+                                                    <li>Connect once, confirm the same safety phrase, and choose the child profile in <strong>Remote target profile</strong>.</li>
+                                                    <li>On the first managed connection, the child device may still need one local parent PIN/unlock step to authorize that locked child profile.</li>
+                                                    <li>After you choose <strong>Apply + Save Managed Link</strong>, later sessions can reuse that target and policy instead of asking the child to reconfigure everything again.</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">What is private and what is not</div>
+                                            <div class="help-item-body">
+                                                <ul>
+                                                    <li>The relay only handles pairing and WebRTC setup traffic.</li>
+                                                    <li>The real FilterTube settings payload is intended to move directly device-to-device after the secure handshake.</li>
+                                                    <li>FilterTube does not need a central sync account to read or store your Nanah settings traffic.</li>
+                                                    <li>You should still trust only your own devices and confirm the same safety phrase before applying anything.</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Device roles and trust</div>
+                                            <div class="help-item-body">
+                                                <ul>
+                                                    <li><strong>Peer:</strong> Best for one-off syncing between your own equal devices.</li>
+                                                    <li><strong>Source / Parent:</strong> Can become the trusted sender for future replica updates.</li>
+                                                    <li><strong>Replica / Kids device:</strong> Receives proposals and can optionally auto-apply from trusted source devices.</li>
+                                                    <li><strong>Saved trust:</strong> A trusted link does not create always-on background sync. It remembers the relationship and policy for the next live session.</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Managed links on the first connection</div>
+                                            <div class="help-item-body">
+                                                <ul>
+                                                    <li>An untrusted <strong>Source → Replica</strong> session still asks the receiving device what to do with the first incoming update.</li>
+                                                    <li>The replica can <strong>apply once</strong> without saving trust, or <strong>apply and save</strong> a managed link for future updates.</li>
+                                                    <li>Saving a managed link is what turns future source-side policy into something precise and repeatable.</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Allowed scopes inside a managed link</div>
+                                            <div class="help-item-body">
+                                                <ul>
+                                                    <li>Each trusted managed link can allow one or more scopes: <code>active</code>, <code>main</code>, <code>kids</code>, or <code>full</code>.</li>
+                                                    <li>The default scope and the merge/replace policy live on the trusted link itself, not only in the live session.</li>
+                                                    <li>If an incoming managed update does not match the saved allowed scopes, FilterTube blocks it instead of applying the wrong scope.</li>
+                                                    <li>Managed replica links can now choose a target mode on the receiving device: <strong>Current active profile</strong> or <strong>Always this local profile</strong>.</li>
+                                                    <li>The fixed target mode is the safe way to make <code>B -&gt; B</code> work across devices without guessing by profile name.</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">PINs and encrypted backups</div>
+                                            <div class="help-item-body">
+                                                <ul>
+                                                    <li>PIN checks stay local. Nanah can require the sender or receiver to unlock locally, but the PIN itself is not sent.</li>
+                                                    <li><strong>Encrypted backup</strong> is still the archive path. Nanah is the live device-to-device sync path.</li>
+                                                    <li>Encrypted <strong>full-account</strong> backup can also carry trusted-device recovery data for same-device reinstall recovery, but normal/plain export does not.</li>
+                                                    <li>Restoring trusted-device recovery data is explicit during encrypted import. It is not silently restored from ordinary backup files.</li>
+                                                    <li>Parents can still keep stricter control by using PIN-locked profiles plus trusted managed links for replica devices.</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Refresh, reconnect, and trusted links</div>
+                                            <div class="help-item-body">
+                                                <ul>
+                                                    <li>A live Nanah session is not meant to survive a page refresh, browser restart, or tab close. Refresh ends the live pairing session.</li>
+                                                    <li>Trusted links are saved locally so you do not lose the remembered relationship, but today you still start a fresh live session when reconnecting.</li>
+                                                    <li>The trusted-device card now has a <strong>Reconnect</strong> shortcut that starts the next fresh session with the saved role/policy defaults.</li>
+                                                    <li>Saved trust means a faster next session, not automatic background syncing with no live connection.</li>
+                                                    <li>If you try to reuse the same pairing code on the same active device session, FilterTube now blocks that locally instead of silently burning the code.</li>
+                                                    <li>If no fixed target is saved on the managed replica link, non-<code>full</code> sync still writes into the receiver's current active profile at receive time.</li>
+                                                    <li>If a managed replica link is saved with <strong>Always this local profile</strong>, future managed updates land in that pinned local profile even when some other profile is active on the receiving device.</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">What backups include today</div>
+                                            <div class="help-item-body">
+                                                <ul>
+                                                    <li>Current Nanah trusted-link records are stored in local extension storage, not inside the normal FilterTube export/import payload.</li>
+                                                    <li>Normal/plain backup restores your profiles and filters, but not the saved Nanah trust graph.</li>
+                                                    <li>Encrypted full-account backup can include trusted-device recovery data, and import asks whether to restore it for same-device recovery.</li>
+                                                    <li>That recovery path is intentionally explicit and should not be used to clone one device identity onto another device.</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Master, account, and child behavior</div>
+                                            <div class="help-item-body">
+                                                <ul>
+                                                    <li><strong>Default / Master:</strong> Owns full import/export, master policy, and the broadest account controls.</li>
+                                                    <li><strong>Independent account:</strong> Owns its own settings and can manage its own child profiles, but does not gain authority over parallel accounts.</li>
+                                                    <li><strong>Child profile:</strong> Should be treated as a managed surface. In Nanah it is replica-only, so it should receive parent/source updates rather than act as its own source device.</li>
+                                                    <li><strong>Locked vs unlocked child:</strong> A locked child profile stays replica-only. If the parent unlocks that child profile locally, FilterTube can send that child profile’s own snapshot to another device without turning it into a full admin surface.</li>
+                                                    <li><strong>Targeting today:</strong> Child restrictions still depend on the profile currently active in the Nanah UI session, and child managed links should usually save a fixed local target so parent updates stay tied to that child profile.</li>
+                                                    <li><strong>Parent-safe child targeting:</strong> FilterTube now blocks “send anyway” from a child profile when the other device has some different profile active. The intended parent flow is to save one managed <strong>Source → Replica</strong> link on the receiving child profile and choose <strong>Always this local profile</strong>.</li>
+                                                    <li><strong>Strict child protection:</strong> Managed child links can now force approval-needed reconnect, no auto-apply, fixed local target, and local unlock required as one higher-safety preset.</li>
+                                                    <li>Child profiles also stop exposing broad backup/import/export/account-admin actions in Settings, and the unlocked child surface no longer allows profile rename/delete/PIN mutation or trusted parent-link editing from Accounts &amp; Sync.</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Parent control without giving kids the PIN</div>
+                                            <div class="help-item-body">
+                                                <ul>
+                                                    <li>Kids should not learn or type the parent PIN for normal managed updates.</li>
+                                                    <li>The right model is local authorization on the child device: trust the parent/source link once, then allow only the saved managed scopes and policies.</li>
+                                                    <li>FilterTube already keeps PIN values local. Trusted child links can now choose either <strong>Require local unlock</strong> or <strong>Allow trusted updates while locked</strong>, and that permission is saved only on the child device.</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">What the relay does</div>
+                                            <div class="help-item-body">Nanah’s signaling relay is only there to help both devices find each other and exchange WebRTC setup data. It is not meant to be a place where FilterTube reads your synced rules as account data. The real settings payload is intended to move directly device-to-device after the secure handshake.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>Collaboration &amp; 3-dot Tools</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="help-list">
+                                        <div class="help-item">
+                                            <div class="help-item-title">Collaboration-aware blocking</div>
+                                            <div class="help-item-body">FilterTube can resolve collaborator rosters from YouTube’s watch-page and menu data so the 3-dot UI can show all channels involved in a collab instead of only the visible uploader.</div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Where collab recovery works</div>
+                                            <div class="help-item-body">
+                                                <ul>
+                                                    <li>Watch right rail and watch-like recommendation lockups</li>
+                                                    <li>Watch-page playlist rows</li>
+                                                    <li>YouTube Music surfaces, including Mix cards seeded by collaboration videos</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">If the menu only shows “Block Channel”</div>
+                                            <div class="help-item-body">That usually means YouTube supplied incomplete or stale card metadata. Reopen the menu or refresh the page to let FilterTube rebuild the collaboration roster from fresh watch-page data.</div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Quick Block vs 3-dot Block item</div>
+                                            <div class="help-item-body">These are separate toggles in Content Controls. You can keep the hover Quick Block button, the 3-dot Block entry, both, or neither depending on how much inline UI you want.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="help-cluster help-cluster--kids">
                             <div class="card">
                                 <div class="card-header">
@@ -862,6 +1314,14 @@
                                                     <li><strong>Preserves functionality:</strong> Watch pages and playlists work normally for allowed content</li>
                                                 </ul>
                                             </div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">All subscriptions management page</div>
+                                            <div class="help-item-body"><code>/feed/channels</code> stays visible even in whitelist mode so you can still see and manage all subscribed channels instead of locking yourself out of that management surface.</div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Creator and channel pages</div>
+                                            <div class="help-item-body">Whitelist mode is stricter on creator/channel pages now. FilterTube avoids generic “fail open” behavior there and makes a safer decision when YouTube recycles or delays card identity data.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Mode Switching</div>
@@ -919,6 +1379,10 @@
                                             <div class="help-item-title">Blocked channel still appears</div>
                                             <div class="help-item-body">YouTube sometimes reuses DOM nodes during SPA navigation. FilterTube re-scans and clears stale cached metadata, but a hard refresh can help confirm persistence.</div>
                                         </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Subscribed-channel import</div>
+                                            <div class="help-item-body">Imported subscriptions are now captured more defensively across browsers. If the first pass looks incomplete, reopen the subscribed channels surface and let FilterTube re-capture the page data before trying again.</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -975,6 +1439,9 @@
     <script src="../js/settings_shared.js"></script>
     <script src="../js/security_manager.js"></script>
     <script src="../js/io_manager.js"></script>
+    <script src="../js/vendor/qrcode.bundle.js"></script>
+    <script src="../js/vendor/nanah.bundle.js"></script>
+    <script src="../js/nanah_sync_adapter.js"></script>
     <script src="../js/content_controls_catalog.js"></script>
     <script src="../js/ui_components.js"></script>
     <script src="../js/state_manager.js"></script>

@@ -14,6 +14,8 @@
 
     const FT_PROFILES_V3_KEY = 'ftProfilesV3';
     const FT_PROFILES_V4_KEY = 'ftProfilesV4';
+    const NANAH_TRUSTED_LINKS_KEY = 'ftNanahTrustedLinks';
+    const NANAH_DEVICE_ID_KEY = 'ftNanahDeviceId';
     const DEFAULT_PROFILE_ID = 'default';
 
     /** Returns a timestamp in ms (kept inline so tests can stub). */
@@ -924,6 +926,21 @@
         };
     }
 
+    function normalizeNanahBackupState(value) {
+        const root = safeObject(value);
+        const deviceId = normalizeString(root.deviceId);
+        const trustedLinks = safeArray(root.trustedLinks)
+            .map((entry) => safeObject(entry))
+            .filter((entry) => normalizeString(entry.remoteDeviceId));
+        if (!deviceId && trustedLinks.length === 0) {
+            return null;
+        }
+        return {
+            deviceId,
+            trustedLinks
+        };
+    }
+
     /**
      * Entry point for imports: auto-detect format and convert to canonical v3
      * structure so downstream merging logic doesn’t care about origin.
@@ -1111,7 +1128,7 @@
         });
     }
 
-    async function importV3(json, { strategy = 'merge', scope = 'auto', auth = null } = {}) {
+    async function importV3(json, { strategy = 'merge', scope = 'auto', auth = null, targetProfileId = null } = {}) {
         const parsed = normalizeIncomingV3(json);
         if (!parsed.ok) {
             throw new Error(parsed.error || 'Invalid file');
@@ -1132,10 +1149,19 @@
         }
         const localActiveId = normalizeString(localProfilesV4?.activeProfileId) || DEFAULT_PROFILE_ID;
         const effectiveScope = resolveProfileScope(scope, localActiveId);
-        const canTouchLegacyV3 = localActiveId === DEFAULT_PROFILE_ID;
+        const requestedTargetProfileId = normalizeString(targetProfileId);
+        const explicitTargetProfileId = effectiveScope === 'full' ? '' : requestedTargetProfileId;
+        const explicitTargetProfileExists = explicitTargetProfileId
+            ? Boolean(safeObject(localProfilesV4?.profiles)[explicitTargetProfileId])
+            : false;
+        if (explicitTargetProfileId && !explicitTargetProfileExists) {
+            throw new Error('The selected target profile is no longer available on this device');
+        }
+        const effectiveLocalTargetId = explicitTargetProfileId || localActiveId;
+        const canTouchLegacyV3 = effectiveLocalTargetId === DEFAULT_PROFILE_ID;
 
         const localMasterVerifier = extractMasterPinVerifier(localProfilesV4);
-        if (localActiveId === DEFAULT_PROFILE_ID && localMasterVerifier) {
+        if (effectiveLocalTargetId === DEFAULT_PROFILE_ID && localMasterVerifier) {
             await requirePinOrThrow(
                 normalizeString(auth?.localMasterPin),
                 localMasterVerifier,
@@ -1144,7 +1170,7 @@
         }
 
         const incomingMasterVerifier = extractMasterPinVerifier(parsed.profilesV4);
-        if (localActiveId === DEFAULT_PROFILE_ID && incomingMasterVerifier) {
+        if (effectiveLocalTargetId === DEFAULT_PROFILE_ID && incomingMasterVerifier) {
             await requirePinOrThrow(
                 normalizeString(auth?.incomingMasterPin),
                 incomingMasterVerifier,
@@ -1154,6 +1180,7 @@
 
         const rawRoot = safeObject(json);
         const rawMeta = safeObject(rawRoot.meta);
+        const incomingNanahState = normalizeNanahBackupState(rawRoot.nanahState);
         const incomingExportType = normalizeString(rawMeta.exportType);
         const incomingExportProfileId = normalizeString(rawMeta.profileId);
 
@@ -1164,7 +1191,8 @@
             ? (incomingExportProfileId || incomingActiveId)
             : '';
         const shouldImportIntoSeparateProfile = Boolean(
-            incomingExportType === 'profile'
+            !explicitTargetProfileId
+            && incomingExportType === 'profile'
             && localActiveId === DEFAULT_PROFILE_ID
             && importingProfileId
             && importingProfileId !== DEFAULT_PROFILE_ID
@@ -1173,15 +1201,24 @@
 
         let incomingProfileForImport = null;
         if (incomingV4) {
-            if (effectiveScope === 'active' && localActiveId !== DEFAULT_PROFILE_ID) {
-                const exactMatch = safeObject(incomingProfiles[localActiveId]);
-                if (Object.keys(exactMatch).length > 0) {
-                    incomingProfileForImport = exactMatch;
+            if (effectiveScope === 'active' && !shouldImportIntoSeparateProfile) {
+                const incomingSourceId = normalizeString(incomingV4.activeProfileId) || incomingExportProfileId || DEFAULT_PROFILE_ID;
+                const activeSnapshot = safeObject(incomingProfiles[incomingSourceId]);
+                if (Object.keys(activeSnapshot).length > 0) {
+                    incomingProfileForImport = activeSnapshot;
+                } else if (!explicitTargetProfileId && localActiveId !== DEFAULT_PROFILE_ID) {
+                    const exactMatch = safeObject(incomingProfiles[localActiveId]);
+                    if (Object.keys(exactMatch).length > 0) {
+                        incomingProfileForImport = exactMatch;
+                    } else if (incomingExportType === 'profile') {
+                        incomingProfileForImport = safeObject(incomingProfiles[incomingSourceId]);
+                    } else {
+                        throw new Error('Full backups can only be imported from the Default (Master) profile');
+                    }
                 } else if (incomingExportType === 'profile') {
-                    const fallbackId = normalizeString(incomingV4.activeProfileId) || incomingExportProfileId;
-                    incomingProfileForImport = safeObject(incomingProfiles[fallbackId]);
+                    incomingProfileForImport = safeObject(incomingProfiles[incomingSourceId]);
                 } else {
-                    throw new Error('Full backups can only be imported from the Default (Master) profile');
+                    throw new Error('Incoming active profile snapshot is unavailable');
                 }
             } else {
                 const incomingActiveId = normalizeString(incomingV4.activeProfileId) || DEFAULT_PROFILE_ID;
@@ -1431,9 +1468,10 @@
             const activeId = normalizeString(desiredActiveId) || DEFAULT_PROFILE_ID;
             const writeActiveId = activeId;
 
-            const targetProfileId = shouldImportIntoSeparateProfile
+            const targetProfileId = explicitTargetProfileId
+                || (shouldImportIntoSeparateProfile
                 ? importingProfileId
-                : activeId;
+                : activeId);
 
             const targetProfile = (profiles[targetProfileId] && typeof profiles[targetProfileId] === 'object')
                 ? profiles[targetProfileId]
@@ -1493,12 +1531,13 @@
                     ? targetProfile.name
                     : (targetProfileId === DEFAULT_PROFILE_ID ? 'Default' : 'Profile'),
                 settings: {
-                    ...targetSettings,
+                    ...(strategy === 'replace' ? {} : targetSettings),
+                    ...safeObject(incomingV4Settings),
                     syncKidsToMain: !!incomingApplyKidsRulesOnMain
                 },
                 main: {
                     ...targetMain,
-                    mode: normalizeListMode(targetMain.mode, v4MainMode),
+                    mode: normalizeListMode(v4MainMode, normalizeListMode(targetMain.mode, 'blocklist')),
                     channels: targetNextChannels,
                     keywords: targetNextKeywords,
                     whitelistChannels: safeArray(desiredMainWhitelistChannels),
@@ -1506,7 +1545,7 @@
                 },
                 kids: {
                     ...targetKids,
-                    mode: normalizeListMode(targetKids.mode, v4KidsMode),
+                    mode: normalizeListMode(v4KidsMode, normalizeListMode(targetKids.mode, 'blocklist')),
                     strictMode: desiredKidsStrict,
                     blockedChannels: safeArray(desiredKidsBlockedChannels),
                     blockedKeywords: safeArray(desiredKidsBlockedKeywords),
@@ -1536,20 +1575,69 @@
             await writeStorage({ channelMap: nextChannelMap });
         }
 
-        return { ok: true, result };
+        let restoredNanahState = false;
+        if (
+            incomingNanahState
+            && auth?.restoreTrustedNanahState === true
+            && effectiveScope === 'full'
+            && effectiveLocalTargetId === DEFAULT_PROFILE_ID
+        ) {
+            const existingNanah = await readStorage([NANAH_TRUSTED_LINKS_KEY, NANAH_DEVICE_ID_KEY]);
+            const existingTrustedLinks = safeArray(existingNanah?.[NANAH_TRUSTED_LINKS_KEY]);
+            const incomingTrustedLinks = safeArray(incomingNanahState.trustedLinks);
+            const mergedTrustedLinks = strategy === 'replace'
+                ? incomingTrustedLinks
+                : (() => {
+                    const merged = new Map();
+                    existingTrustedLinks.forEach((entry) => {
+                        const key = normalizeString(safeObject(entry).remoteDeviceId) || normalizeString(safeObject(entry).linkId);
+                        if (key) merged.set(key, entry);
+                    });
+                    incomingTrustedLinks.forEach((entry) => {
+                        const key = normalizeString(safeObject(entry).remoteDeviceId) || normalizeString(safeObject(entry).linkId);
+                        if (key) merged.set(key, entry);
+                    });
+                    return Array.from(merged.values());
+                })();
+
+            const nanahPayload = {
+                [NANAH_TRUSTED_LINKS_KEY]: mergedTrustedLinks
+            };
+            if (incomingNanahState.deviceId) {
+                nanahPayload[NANAH_DEVICE_ID_KEY] = incomingNanahState.deviceId;
+            }
+            await writeStorage(nanahPayload);
+            restoredNanahState = true;
+        }
+
+        return { ok: true, result, restoredNanahState };
     }
 
-    async function exportV3Encrypted({ scope = 'auto', password = '', auth = null } = {}) {
+    async function exportV3Encrypted({ scope = 'auto', password = '', auth = null, includeTrustedNanahState = false } = {}) {
         const Security = global.FilterTubeSecurity || null;
         if (!Security || typeof Security.encryptJson !== 'function') {
             throw new Error('Security manager unavailable');
         }
         const payload = await exportV3({ scope, auth });
+        const exportType = normalizeString(safeObject(payload?.meta).exportType);
+        if (includeTrustedNanahState === true && exportType === 'full') {
+            const storedNanah = await readStorage([NANAH_TRUSTED_LINKS_KEY, NANAH_DEVICE_ID_KEY]);
+            const trustedLinks = safeArray(storedNanah?.[NANAH_TRUSTED_LINKS_KEY]);
+            const deviceId = normalizeString(storedNanah?.[NANAH_DEVICE_ID_KEY]);
+            const normalizedNanahState = normalizeNanahBackupState({
+                deviceId,
+                trustedLinks
+            });
+            if (normalizedNanahState) {
+                payload.nanahState = normalizedNanahState;
+            }
+        }
         const encrypted = await Security.encryptJson(payload, password);
         return {
             meta: {
                 ...safeObject(payload?.meta),
-                encrypted: true
+                encrypted: true,
+                containsNanahTrustedState: safeObject(payload.nanahState).trustedLinks ? true : false
             },
             encrypted
         };

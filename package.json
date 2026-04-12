@@ -4,6 +4,7 @@
   "description": "Restore peace of mind to your digital video experience.",
   "main": "js/background.js",
   "scripts": {
+    "build:nanah-vendor": "node scripts/build-nanah-vendor.mjs",
     "build:ui": "node scripts/build-extension-ui.mjs",
     "dev": "node build.js",
     "build": "node build.js",
@@ -37,6 +38,7 @@
     "fs-extra": "^11.1.1"
   },
   "dependencies": {
-    "preact": "^10.29.0"
+    "preact": "^10.29.0",
+    "qrcode": "^1.5.4"
   }
 }

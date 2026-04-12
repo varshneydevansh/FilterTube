@@ -360,3 +360,73 @@ This is educational, but not the default UX.
 
 - Create a dedicated **Nanah repo** (separate from FilterTube) once you approve the above.
 - For FilterTube itself, implement Phase 1 Import/Export first (so Nanah has a stable portable payload).
+
+---
+
+## 12) Current implementation decision
+
+Nanah is now being incubated inside the FilterTube repo as a **repo-ready subtree**:
+
+```text
+nanah/
+  package.json
+  docs/
+  packages/
+    core/
+    client/
+    signaling/
+```
+
+This is intentional.
+
+It gives us:
+
+- fast integration work while FilterTube is the first consumer
+- clean package boundaries
+- low-friction extraction into a future standalone GitHub repo
+
+### 12.1 Where the signaling server lives
+
+The signaling server code lives here during incubation:
+
+- `/nanah/packages/signaling/src/server.ts`
+
+But in production it should run as a **separate deployed service**, not inside the extension.
+
+That means:
+
+- FilterTube bundles `@nanah/client`
+- the deployed relay runs `@nanah/signaling`
+- actual settings payloads move over the WebRTC data channel
+
+### 12.2 Recommended future GitHub layout
+
+Create a new repo later:
+
+- `varshneydevansh/nanah`
+
+Then move the whole `nanah/` subtree into it with minimal restructuring.
+
+### 12.3 FilterTube integration boundary
+
+FilterTube should integrate through its existing import/export pipeline:
+
+- sender:
+  - `IOManager.exportV3(...)`
+- receiver:
+  - `IOManager.importV3(...)`
+
+Nanah should transport those payloads, not replace FilterTube’s storage semantics.
+
+### 12.4 Parent-managed kids-device sync
+
+Yes, this is a valid Nanah use case.
+
+Recommended first model:
+
+- parent device = `source`
+- kids device = `replica`
+
+This is safer than full two-way mutation at first.
+
+Later we can add trusted peer mode for symmetric device sync.
