@@ -11,7 +11,7 @@
 
 FilterTube is a browser extension that gives you control over your YouTube feed. Filter videos, shorts, channels, and comments using keywords and smart rules—all processing happens privately on your device.
 
-## What's New in v3.3.0
+## What's New in v3.3.1
 
 - **Collaboration blocking is now much more complete on watch surfaces**: watch right rail, playlist rows, and watch-like lockups can recover full collaborator rosters and refresh the active 3-dot menu.
 - **Mix cards and real collaborations are separated more safely**: plain names containing `&` or `and` no longer become fake collaboration menus without explicit collaborator signals.
@@ -19,6 +19,64 @@ FilterTube is a browser extension that gives you control over your YouTube feed.
 - **Channel Management rows can link directly to channel pages** using the best available identifier.
 - **The injected 3-dot block menu item can now be disabled** independently of Quick Block.
 - **Encrypted Firefox export is more dependable** thanks to a safer manual-download fallback path.
+
+## Nanah Device Trust & Sync
+
+FilterTube now includes a device-to-device sync system powered by Nanah.
+
+What it is:
+
+- private device-to-device settings transfer
+- no central sync account required
+- supports one-time send, parent-controls-child, and full-account migration
+
+Plain-language model:
+
+1. both devices meet through a small relay
+2. both devices confirm the same safety phrase
+3. the real settings payload is meant to move directly from one device to the other
+
+That means:
+
+- the relay is only the meeting place
+- FilterTube does not need a cloud copy of your settings
+- trust saves relationship and policy for later live sessions
+- trust does **not** mean hidden always-on background sync
+
+Simple Nanah flows:
+
+```text
+SEND THIS PROFILE ONCE
+
+[Device A] -> pair -> [Device B]
+    |                    |
+    +-- verify phrase ---+
+    |
+    +-- send once ------> [Device B reviews and applies]
+```
+
+```text
+PARENT CONTROLS CHILD
+
+[Parent / Source] == managed link == [Child / Replica]
+        |
+        +-- choose remote child profile
+        +-- send once
+        +-- save managed link for later sessions
+```
+
+Important child rule:
+
+- the first managed parent -> child connection may still need one local parent approval on the child device
+- after that, the child does **not** always need to press allow
+- that depends on the saved managed-link policy
+
+Docs:
+
+- [Nanah User Guide](docs/NANAH_USER_GUIDE.md)
+- [Nanah Concerns Tracker](docs/NANAH_POST_IMPLEMENTATION_CONCERNS_TRACKER.md)
+- [Profiles & PIN Model](docs/PROFILES_PIN_MODEL.md)
+- [Nanah P2P Project Plan](docs/NANAH_P2P_PROJECT_PLAN.md)
 
 ## Features
 

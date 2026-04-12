@@ -9,6 +9,52 @@ FilterTube v3.3.0 implements a **hybrid filtering system** with dual filtering m
 - **Whitelist Mode**: Hide all content except explicitly allowed channels and keywords.
 - **Category Filtering**: Filter videos by YouTube category (e.g., Music, Gaming, Education) (v3.2.7).
 
+It also now includes `Accounts & Sync`, powered by Nanah, for device-to-device settings transfer.
+
+## Nanah / Accounts & Sync functionality
+
+### Three simple sync paths
+
+- **Send this profile once**
+  - pair
+  - verify
+  - send once
+  - receiver reviews
+- **Parent controls child**
+  - connect parent/source to child/replica
+  - choose remote child profile
+  - save managed link once
+- **Move full account**
+  - use broader account snapshot for migration or reinstall recovery
+
+### Plain-language privacy model
+
+```text
+1. both devices meet through a relay
+2. both devices confirm the same safety phrase
+3. the real settings payload is meant to move directly from one device to the other
+```
+
+That means:
+
+- the relay is the meeting place
+- FilterTube does not need a central sync account to read your settings
+- saved trust is not hidden background sync
+
+### Parent / child behavior
+
+- first managed parent -> child connection may require one local parent approval on the child device
+- after that, the child does **not** always need to press allow
+- later behavior depends on the saved managed-link policy
+- locked child profiles stay replica-only unless unlocked locally
+- unlocked child profiles may send only their own scoped snapshot, not a full account backup
+
+### Remote target profile
+
+- live sessions can now show the receiver's profile inventory
+- the sender can choose `Remote target profile`
+- managed links can save a fixed receiver-side target so later updates land in the right profile
+
 ## v3.3.0 Release Highlights
 
 - **Watch-page collaboration menus now recover more often on first open** by upgrading from dialog/sheet collaborator rosters and refreshing the active menu in place.

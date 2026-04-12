@@ -1,8 +1,79 @@
-# Architecture Documentation (v3.3.0)
+# Architecture Documentation (v3.3.1)
 
 ## Overview
 
-FilterTube v3.3.0 builds on the proactive channel identity system with performance optimizations, watch-page SPA recovery hardening, stronger collaboration recovery, category filtering, a newer extension shell layer, and enhanced cross-browser support. This architecture documentation covers high-level design, filtering modes, recovery behavior, memory management, and cross-browser compatibility.
+FilterTube v3.3.1 builds on the proactive channel identity system with performance optimizations, watch-page SPA recovery hardening, stronger collaboration recovery, category filtering, a newer extension shell layer, and enhanced cross-browser support. This architecture documentation covers high-level design, filtering modes, recovery behavior, memory management, and cross-browser compatibility.
+
+## Nanah / Accounts & Sync architecture (desktop checkpoint)
+
+FilterTube now has a second major user-facing system besides filtering: `Accounts & Sync`, powered by [Nanah](https://github.com/varshneydevansh/nanah)
+
+This architecture should be read as:
+
+- profile ownership stays local to each device
+- PIN policy stays local to each device
+- Nanah provides live device-to-device transfer plus saved trust policy
+- the signaling relay is only used so devices can find each other and exchange setup data
+
+### High-level sync architecture
+
+```mermaid
+graph TD
+    A["Accounts & Sync UI"] --> B["tab-view.js"]
+    B --> C["Nanah client"]
+    C --> D["Signaling relay (meeting place only)"]
+    C --> E["WebRTC data channel"]
+    E --> F["Remote device"]
+
+    B --> G["nanah_sync_adapter.js"]
+    G --> H["io_manager.js"]
+    H --> I["ftProfilesV4 / profile storage"]
+
+    F --> J["Remote local profile store"]
+```
+
+### Trust model
+
+```text
+UNTRUSTED LIVE SESSION
+    pair -> verify -> receiver reviews
+
+TRUSTED PEER
+    reconnect faster -> receiver still reviews
+
+MANAGED PARENT LINK
+    reconnect faster -> saved managed policy can decide later matching updates
+```
+
+### Remote profile targeting model
+
+```text
+LIVE SESSION
+
+[Sender]
+  -> sees remote profile inventory
+  -> may choose "Remote target profile"
+  -> proposal carries explicit target
+
+[Receiver]
+  -> applies into chosen local profile
+  -> does not need to switch active profile just to receive
+```
+
+### Child safety boundary
+
+```text
+LOCKED CHILD PROFILE
+  -> replica-only surface
+
+UNLOCKED CHILD PROFILE
+  -> may send its own scoped snapshot
+  -> still not a full admin surface
+
+TRUSTED PARENT LINK
+  -> may update child profile under saved local child-side policy
+  -> PIN stays local
+```
 
 ## Filtering Modes Architecture (v3.2.5)
 

@@ -4,6 +4,69 @@
 
 FilterTube v3.3.0 builds on the earlier performance and whitelist-mode work with watch-page SPA recovery hardening, Mix/watch fallback-menu fixes, stronger collaboration roster recovery, cross-browser subscribed-channels import hardening, and smaller UX controls around backups and menu injection. This technical documentation covers the filtering logic, identity recovery behavior, mode switching, and user experience enhancements.
 
+## Nanah technical checkpoint
+
+FilterTube now also includes a profile-aware device sync surface in `Accounts & Sync`.
+
+Core modules:
+
+```text
+tab-view.js
+  -> Accounts & Sync UI
+  -> live session state
+  -> trusted-link UI
+
+nanah_sync_adapter.js
+  -> converts Nanah payloads into FilterTube apply/import requests
+
+io_manager.js
+  -> canonical merge/replace/import logic for active/main/kids/full scopes
+
+Nanah client
+  -> pairing
+  -> SAS verification
+  -> signaling
+  -> WebRTC data channel
+```
+
+### Transport model
+
+```mermaid
+sequenceDiagram
+    participant A as "Device A"
+    participant Relay as "Signaling relay"
+    participant B as "Device B"
+
+    A->>Relay: create / host pairing session
+    B->>Relay: join pairing session
+    A->>B: verify same safety phrase
+    B->>A: verify same safety phrase
+    A->>B: settings payload over direct data channel
+```
+
+### Technical rules
+
+- the relay is only for connection setup
+- trusted links live in local extension storage
+- PINs stay local and are never transmitted through Nanah
+- explicit remote target profile can be chosen during a live session
+- managed links can pin one fixed receiver-side local profile for later sessions
+- refresh ends the live session but not the saved trust state
+
+### Child approval rule
+
+```text
+FIRST MANAGED PARENT -> CHILD CONNECTION
+    may require one local parent approval on child device
+
+LATER MATCHING UPDATES
+    depends on saved managed-link policy:
+      autoApply
+      reconnectMode
+      lockedChildMode
+      strict child protection preset
+```
+
 ## Typography System (v3.2.6)
 
 ### Modern Clean Sans-Serif Design

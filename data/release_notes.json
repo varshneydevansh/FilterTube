@@ -3,6 +3,21 @@
     "_comment": "Shared release notes source for the dashboard What's New tab and the YouTube release banner. Keep entries sorted newest-first by version."
   },
   {
+    "version": "3.3.1",
+    "headline": "Nanah Accounts & Sync + parent-control simplification",
+    "summary": "Accounts & Sync now presents Nanah as three simpler paths, with stronger parent/child targeting, clearer reconnect rules, and much broader documentation for real-world use.",
+    "bannerSummary": "Simpler Nanah sync, better parent/child control, safer reconnect rules, and full docs for the new Accounts & Sync flow.",
+    "highlights": [
+      "Accounts & Sync now starts with three clearer paths: Send this profile once, Parent controls child, and Move full account.",
+      "Advanced Nanah controls are still available, but they are hidden behind an Advanced section instead of leading the whole flow.",
+      "Parent/source sessions can choose a remote target profile more clearly, and managed-link saves now mirror to the sender so both devices keep the same trust record.",
+      "Trusted links remain saved across refresh, but reconnect is still a fresh live session rather than hidden background sync.",
+      "Locked child updates, reconnect rules, device-label persistence, and self-join/session-burn protection were tightened for safer parent control.",
+      "README, Architecture, Technical, Functionality, Profiles & PIN, project plan, user guide, and the concern tracker now document the current Nanah desktop checkpoint in much more detail."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.1"
+  },
+  {
     "version": "3.3.0",
     "headline": "Collaboration recovery + cross-browser import hardening",
     "summary": "Watch/YTM collaboration menus recover full rosters more reliably, subscriptions import is stronger across browsers, and several surface-specific whitelist and Quick Block fixes are now bundled into 3.3.0.",

@@ -1,5 +1,29 @@
 # Changelog
 
+## Version 3.3.1
+
+### Nanah Device Trust & Sync
+
+- **Accounts & Sync simplification**: `Device Trust & Sync` now starts from three simpler paths: `Send this profile once`, `Parent controls child`, and `Move full account`.
+- **Advanced controls moved behind disclosure**: low-level relationship/scope/policy controls are still available, but they are no longer the first thing ordinary users see.
+- **Remote target profile flow**: live sessions can target a specific remote profile more clearly, especially for parent -> child updates.
+- **Saved managed-link symmetry**: when the receiving device saves a managed link on first approval, the sender now stores the matching trusted relationship too.
+- **Refresh/reconnect clarity**: trusted links remain saved, but refresh still ends the live session; reconnect is a fresh live session, not hidden background sync.
+- **Same-device join protection**: self-join/session-burn behavior is blocked more clearly in signaling and the desktop UI.
+- **Device label persistence**: the preferred Nanah device label now survives page refresh.
+
+### Parent / Child Safety
+
+- **Locked-child parent update path**: trusted parent/source links can update child replicas under a saved local child-side rule without sending the PIN.
+- **Unlocked child rule**: unlocked child profiles may send their own scoped snapshot, but not full-account migration.
+- **Child-surface restriction hardening**: child profiles now block more admin/account/import/export/trusted-link mutation paths in desktop UI surfaces.
+
+### Documentation
+
+- **Nanah user guide added**: a plain-language guide now lives in `docs/NANAH_USER_GUIDE.md`.
+- **Docs refreshed**: README, Architecture, Technical, Functionality, Profiles & PIN, project plan, and the post-implementation concerns tracker now reflect the current Nanah desktop checkpoint.
+- **Help copy refreshed**: the in-product Help page and Accounts & Sync wording now explain the relay as a meeting place and the real payload as device-to-device.
+
 ## Version 3.3.0
 
 ### Collaboration + 3-Dot Menu Recovery
