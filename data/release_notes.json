@@ -4,7 +4,7 @@
   },
   {
     "version": "3.3.1",
-    "headline": "Nanah Accounts & Sync + parent-control simplification",
+    "headline": "Sync Across devices securely via p2p with no 3rd part server",
     "summary": "Accounts & Sync now presents Nanah as three simpler paths, with stronger parent/child targeting, clearer reconnect rules, and much broader documentation for real-world use.",
     "bannerSummary": "Nanah sync, better parent/child control, safer reconnect rules, and full docs for the new Accounts & Sync flow.",
     "highlights": [
