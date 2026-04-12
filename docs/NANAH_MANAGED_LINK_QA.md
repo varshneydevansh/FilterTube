@@ -35,7 +35,7 @@ Use it before shipping changes to:
 - first send on A opens the dedicated first-time managed approval sheet on B
 - B can choose:
   - `Apply Once`
-  - `Apply + Save Managed Link`
+  - `Apply + Save Parent Control`
   - `Decline`
 - if B saves the link:
   - `kids` remains included in `allowedScopes`
@@ -56,7 +56,7 @@ Use it before shipping changes to:
 
 - first-time managed approval on B shows `active` as the currently required scope
 - if B chooses `Apply Once`, no trusted link is saved
-- if B chooses `Apply + Save Managed Link`, the saved managed link shows:
+- if B chooses `Apply + Save Parent Control`, the saved managed link shows:
   - allowed scopes
   - default scope
   - apply mode

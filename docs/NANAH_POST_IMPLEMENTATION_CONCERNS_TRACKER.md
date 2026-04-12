@@ -32,8 +32,8 @@ These are not just "Nanah v1 leftovers."
 | Sync page too cramped | `Partial` | Shell width, Nanah card spacing, intro flow, and panel stacking were improved. | Keep refining with live screenshots after reloads; remaining issues are visual tuning, not missing structure. |
 | Step numbering / overlap / bad alignment | `Done` | Step strip was rebuilt into proper step cards with cleaner numbering and spacing. | Only revisit if a new responsive break appears. |
 | Setup form overlapping session-state card | `Done` | Left setup panel now stacks status below the setup/actions block instead of beside it. | Verify across medium laptop widths in manual QA. |
-| Sync controls not using custom dropdown feel | `Partial` | Nanah controls were routed into the existing selection system styling, but still need ongoing polish parity with the rest of the extension. | Keep harmonizing hover/focus/disabled states during future UI passes. |
-| Buttons/hover feedback felt weak | `Partial` | Button states were improved, but this is still a taste/consistency pass, not a completed product decision. | Continue as part of global extension design cleanup. |
+| Sync controls not using custom dropdown feel | `Done` | Nanah controls now use the extension's selection/input styling with matching hover, focus, and disabled behavior. | Revisit only if a later design-system pass changes the global control look. |
+| Buttons/hover feedback felt weak | `Done` | Mode cards and session actions now have clearer hover, active, and focus feedback. | Keep aligned with any future global button-system changes. |
 | Help page spacing / alignment weak | `Partial` | Help copy and clusters were improved, but page-wide rhythm may still need design refinement. | Continue with broader help-page visual QA. |
 
 ## 2. Managed-link trust behavior
@@ -52,12 +52,12 @@ These are not just "Nanah v1 leftovers."
 | --- | --- | --- | --- |
 | Refresh breaks the live connection | `Done` | This is the current expected behavior. Refresh ends the live WebRTC session. | Documented; future reconnection UX can improve but should remain explicit. |
 | Trusted devices should persist even if the live session ends | `Done` | Trusted links persist in local extension storage. | Consider future reconnect shortcuts; do not imply live-session persistence. |
-| Reconnect after refresh feels unclear | `Partial` | Docs now explain that refresh ends live pairing while trust remains saved, and trusted-device cards expose `Reconnect` to start the next fresh session with saved defaults. | Keep tightening the cross-device handoff copy so users do not mistake reconnect for background sync. |
+| Reconnect after refresh feels unclear | `Done` | Docs now explain that refresh ends live pairing while trust remains saved, and trusted-device cards expose `Start New Session` with an explicit “uses saved trust and policy” hint. | Preserve the explicit fresh-session wording in future clients. |
 | Need clarity on whether relay compute stays active forever | `Done` | Docs now state the relay is intended for short-lived signaling and low-duty coordination only. | Later optimize immediate signaling shutdown if needed. |
 | Saved trust looked like it might mean always-on parent -> child sync | `Done` | UI/docs now explicitly state trusted links remember policy for later live sessions only; they do not keep a background connection alive. | Keep this wording explicit in future mobile/native clients too. |
-| Need a practical reconnect shortcut after trust | `Partial` | Trusted-device cards now expose `Reconnect`, which starts a fresh live session with the saved role/policy defaults. Managed links also persist `fast` vs `approval-needed` reconnect policy. | Future work: make reconnect smoother across devices without implying hidden background sync. |
+| Need a practical reconnect shortcut after trust | `Done` | Trusted-device cards now expose `Start New Session`, which starts a fresh live session with the saved role/policy defaults. Managed links also persist `fast` vs `approval-needed` reconnect policy. | Keep future reconnect work explicit instead of drifting into hidden background sync. |
 | Approval-needed reconnect needed to be enforced on the replica side | `Done` | Managed source -> replica links with `approval-needed` now block incoming managed updates until the replica approves that reconnect for the current session. | Preserve this as the child-safe reconnect path. |
-| Sender needed to see the same saved managed link after the receiver approved it | `Done` | First managed `Apply + Save Managed Link` now mirrors the managed-link record back to the sender side as well, so both devices keep the same saved relationship. | Keep source/replica trust records symmetric for later reconnect UX. |
+| Sender needed to see the same saved managed link after the receiver approved it | `Done` | First managed `Apply + Save Parent Control` now mirrors the managed-link record back to the sender side as well, so both devices keep the same saved relationship. | Keep source/replica trust records symmetric for later fresh-session UX. |
 
 ## 4. Pairing code / self-join behavior
 
@@ -87,12 +87,12 @@ These are not just "Nanah v1 leftovers."
 
 | Concern | Current status | Current state | Next action |
 | --- | --- | --- | --- |
-| Need clearer distinction between Master, independent account, and child profile | `Partial` | Model is now documented in FilterTube docs and Nanah spec. | Turn documentation into stricter enforcement where appropriate. |
-| Independent accounts may have their own children | `Partial` | Current profile system already supports accounts owning children via `parentProfileId`. | Decide whether more child-specific restrictions should apply equally under Master-owned and account-owned children. |
-| Child profiles should not behave like normal admin surfaces | `Partial` | Locked child profiles are replica-only for Nanah sending/trust behavior, unlocked child profiles may send only their own scoped snapshot, core account-management actions are disabled in Accounts & Sync / Settings, and unlocked child surfaces cannot rename/delete profiles or mutate trusted parent-link policy from the Accounts & Sync view. | Extend this into any remaining profile-management or restore surfaces where policy requires it. |
-| Child profiles should not expose broad backup/import/export/admin actions | `Partial` | Child profiles now disable core backup/import/export/account-admin actions in Settings. | Continue reducing child surfaces where policy requires it. |
-| Need a parent-oriented model, not only a single-user sync model | `Partial` | Product/docs now treat child as managed surface and parent/source as authority path. | Continue converting this into enforcement rules across the wider UI. |
-| Need clarity on whether child-device behavior is child-profile-based or device-wide | `Partial` | Current rule is profile-based: if the active profile is a locked child profile, Nanah becomes replica-only for that UI session; if it is an unlocked child profile, it may send only that child profile's scoped snapshot. | Decide whether future device-wide child mode should exist beyond the active-profile rule. |
+| Need clearer distinction between Master, independent account, and child profile | `Done` | Master/account/child behavior is now documented and enforced across the current Accounts & Sync desktop surface. | Keep future surfaces aligned with the same authority model. |
+| Independent accounts may have their own children | `Done` | Current profile system already supports accounts owning children via `parentProfileId`, and the same child restrictions apply there too. | Preserve the same child restrictions regardless of which account owns the child. |
+| Child profiles should not behave like normal admin surfaces | `Done` | Locked child profiles are replica-only, unlocked child profiles can only send a one-time scoped snapshot, and child surfaces now hide or disable parent/full modes, backup/admin actions, and trusted parent-link edits. | Preserve the reduced child surface as the default rule. |
+| Child profiles should not expose broad backup/import/export/admin actions | `Done` | Child profiles now disable backup/import/export/account-admin actions and related sensitive controls in Settings and Accounts & Sync. | Keep new child-surface actions default-closed unless explicitly intended. |
+| Need a parent-oriented model, not only a single-user sync model | `Done` | The guided mode switcher and managed source -> replica flow now center the parent path instead of exposing only a generic sync console. | Continue simplifying future surfaces rather than adding raw policy controls first. |
+| Need clarity on whether child-device behavior is child-profile-based or device-wide | `Future` | Current rule is intentionally profile-based: the active profile controls the restriction model for the current UI session. | Device-wide child mode remains a separate post-checkpoint feature, not a hidden rule change. |
 
 ## 7B. Remote profile targeting and mapping
 
@@ -152,21 +152,18 @@ Short version:
 
 These are the remaining product decisions that still need deliberate design, not just UI cleanup:
 
-1. Are there any remaining child-visible admin surfaces that should still be reduced even when the child profile is unlocked?
-2. How much further should reconnect go beyond the current fast / approval-needed fresh-session flow without becoming hidden background sync?
-3. How aggressively should the current Nanah controls be collapsed into a simpler guided parent/peer UX so normal users do not have to understand every advanced policy option?
+1. How much further should reconnect go beyond the current fast / approval-needed fresh-session flow without becoming hidden background sync?
+2. How aggressively should the current Nanah controls be collapsed into a simpler guided parent/peer UX so normal users do not have to understand every advanced policy option?
+3. Whether device-wide child mode should exist beyond the current profile-based restriction model.
 
 ### What is actually still partial right now
 
 This is the short practical list:
 
-- some child/admin surfaces may still need one more hardening pass
-- reconnect wording and cross-device handoff can still be simpler
+- reconnect can still evolve later, but the current desktop wording is now explicit and non-background
 - Help/Accounts & Sync visual polish can still improve
-- the parent-oriented model is implemented in core flows, but not yet reduced to the simplest possible surface everywhere
+- the parent-oriented model is implemented in current desktop flows, but can still be simplified further over time
 
 ## 12. Recommended next implementation order
 
-1. Simplify the visible Nanah UX into guided parent/peer paths with advanced controls hidden by default.
-2. Add any remaining child-profile UI restrictions for sensitive settings/Nanah actions.
-3. Keep reconnect copy and onboarding simple so saved trust is not mistaken for background sync.
+Current desktop checkpoint complete. No remaining desktop v1 blockers remain for the guided parent/peer flows. Post-checkpoint work is now intentional future refinement, not missing core behavior.

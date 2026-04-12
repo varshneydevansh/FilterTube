@@ -2679,6 +2679,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const ftNanahModeSendOnce = document.getElementById('ftNanahModeSendOnce');
     const ftNanahModeParent = document.getElementById('ftNanahModeParent');
     const ftNanahModeFull = document.getElementById('ftNanahModeFull');
+    const ftNanahChildBanner = document.getElementById('ftNanahChildBanner');
+    const ftNanahChildBannerTitle = document.getElementById('ftNanahChildBannerTitle');
+    const ftNanahChildBannerBody = document.getElementById('ftNanahChildBannerBody');
     const ftNanahModeSpotlight = document.getElementById('ftNanahModeSpotlight');
     const ftNanahModeEyebrow = document.getElementById('ftNanahModeEyebrow');
     const ftNanahModeTitle = document.getElementById('ftNanahModeTitle');
@@ -3904,6 +3907,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function updateChildProfileCapabilityControls() {
         const isChild = getActiveProfileType() === 'child';
         const childTitle = 'Child profiles cannot manage backup, import/export, or account-admin actions here.';
+        const syncKidsToMainToggle = document.getElementById('setting_syncKidsToMain');
 
         if (ftExportV3Btn) {
             ftExportV3Btn.disabled = isChild;
@@ -3947,6 +3951,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (ftClearMasterPinBtn) {
             ftClearMasterPinBtn.disabled = isChild;
             ftClearMasterPinBtn.title = isChild ? childTitle : '';
+        }
+        if (syncKidsToMainToggle) {
+            syncKidsToMainToggle.disabled = isChild;
+            syncKidsToMainToggle.title = isChild ? childTitle : '';
         }
     }
 
@@ -5682,6 +5690,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
     }
 
+    function resolveNanahDisplayTargetProfile(details, trustedLink) {
+        const envelopeTarget = normalizeNanahProfileContext(details?.targetProfile);
+        if (normalizeString(envelopeTarget.profileId)) {
+            return envelopeTarget;
+        }
+        const policy = safeObject(safeObject(trustedLink)?.policy);
+        if (getNanahTargetProfileBehavior(policy.targetProfileBehavior, 'current_active') === 'fixed_profile'
+            && normalizeString(policy.targetProfileId)) {
+            return {
+                profileId: policy.targetProfileId,
+                profileName: normalizeString(policy.targetProfileName) || policy.targetProfileId,
+                profileType: normalizeString(policy.targetProfileType) || 'account',
+                locked: false
+            };
+        }
+        return getNanahLocalProfileContext();
+    }
+
     function formatNanahProfileContext(value) {
         const profile = normalizeNanahProfileContext(value);
         const parts = [`${profile.profileName} (${getNanahProfileTypeLabel(profile.profileType, profile.profileId)})`];
@@ -5723,7 +5749,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (normalizeString(remoteProfile.profileName)) {
             return `${getNanahScopeLabel(normalizedScope)} will write into ${remoteProfile.profileName} on ${getNanahRemoteLabel()}. Inactive remote profiles are only targeted when you choose an explicit remote target or save a fixed managed target there.`;
         }
-        return 'Non-full sync writes into the receiver\'s current active profile only. Saved links remember trust and policy, not a live background connection.';
+        return 'Updates write into the receiver\'s active profile by default, or a fixed profile if one was chosen. Saved links remember trust and policy, not a live background connection.';
     }
 
     async function ensureNanahStableDeviceId() {
@@ -5795,17 +5821,69 @@ document.addEventListener('DOMContentLoaded', async () => {
         ftNanahAdvancedSummary.textContent = `${roleLabel} · ${scopeLabel} · ${strategyLabel}`;
     }
 
+    function enforceChildSyncSurfaceRestrictions() {
+        if (!ftNanahChildBanner || !ftNanahChildBannerTitle || !ftNanahChildBannerBody) return;
+        const isChild = isActiveChildNanahProfile();
+        
+        if (isChild) {
+            if (ftNanahModeParent) ftNanahModeParent.hidden = true;
+            if (ftNanahModeFull) ftNanahModeFull.hidden = true;
+            ftNanahChildBanner.hidden = false;
+
+            if (isNanahChildReplicaOnly()) {
+                if (ftNanahModeSendOnce) {
+                    ftNanahModeSendOnce.hidden = false;
+                    ftNanahModeSendOnce.disabled = true;
+                }
+                ftNanahChildBannerTitle.textContent = "This child profile is restricted";
+                ftNanahChildBannerBody.textContent = "Saved parent links can keep this profile aligned. To start new pairings or send settings, unlock the profile first.";
+                if (ftNanahHostBtn) ftNanahHostBtn.disabled = true;
+            } else {
+                if (ftNanahModeSendOnce) {
+                    ftNanahModeSendOnce.hidden = false;
+                    ftNanahModeSendOnce.disabled = !!nanahClient;
+                }
+                ftNanahChildBannerTitle.textContent = "This is a child profile";
+                ftNanahChildBannerBody.textContent = "You can send a one-time copy of your settings. Parent controls and full migration are available from a parent or account profile.";
+                if (ftNanahHostBtn) ftNanahHostBtn.disabled = !!nanahClient || !!normalizeString(nanahSessionState.code);
+            }
+            
+            if (nanahUiMode === 'parent_control' || nanahUiMode === 'full_account') {
+                setNanahMode('send_once', { persist: false, applyPreset: true });
+            }
+        } else {
+            if (ftNanahModeParent) ftNanahModeParent.hidden = false;
+            if (ftNanahModeFull) ftNanahModeFull.hidden = false;
+            if (ftNanahModeSendOnce) ftNanahModeSendOnce.hidden = false;
+            ftNanahChildBanner.hidden = true;
+            if (ftNanahModeSendOnce) ftNanahModeSendOnce.disabled = !!nanahClient;
+        }
+        refreshNanahAdvancedSummary();
+    }
+
     function setNanahModeButtons(mode = getNanahUiMode()) {
         const normalized = normalizeNanahUiMode(mode);
+        const childSurface = isChildProfileAdminSurface();
+        const childReplicaOnly = childSurface && isNanahChildReplicaOnly();
         [
             ftNanahModeSendOnce,
             ftNanahModeParent,
             ftNanahModeFull
         ].forEach((button) => {
             if (!button) return;
-            const active = normalizeNanahUiMode(button.dataset.mode) === normalized;
+            const buttonMode = normalizeNanahUiMode(button.dataset.mode);
+            const active = buttonMode === normalized;
             button.setAttribute('aria-pressed', active ? 'true' : 'false');
-            button.disabled = !!nanahClient;
+            if (childSurface && (buttonMode === 'parent_control' || buttonMode === 'full_account')) {
+                button.hidden = true;
+            } else {
+                button.hidden = false;
+            }
+            if (button === ftNanahModeSendOnce && childReplicaOnly) {
+                button.disabled = true;
+            } else {
+                button.disabled = !!nanahClient;
+            }
         });
     }
 
@@ -6132,8 +6210,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const reconnectMode = getNanahReconnectMode(safeObject(trusted.policy).reconnectMode, trusted.linkType === 'managed_link' ? 'approval_needed' : 'fast');
         UIComponents.showToast(
             reconnectMode === 'approval_needed'
-                ? `Reconnect code ${nanahSessionState.code} is ready. Open Accounts & Sync on the other device and approve the reconnect there.`
-                : `Reconnect code ${nanahSessionState.code} is ready. Open Accounts & Sync on ${normalizeString(trusted.deviceLabel) || 'the trusted device'} and join this fresh session.`,
+                ? `Session code ${nanahSessionState.code} is ready. Open Accounts & Sync on the other device and approve the reconnect there.`
+                : `Session code ${nanahSessionState.code} is ready. Open Accounts & Sync on ${normalizeString(trusted.deviceLabel) || 'the trusted device'} and join this fresh session.`,
             'success'
         );
     }
@@ -6212,16 +6290,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             const reconnectBtn = document.createElement('button');
             reconnectBtn.type = 'button';
             reconnectBtn.className = 'btn-secondary';
-            reconnectBtn.textContent = 'Reconnect';
+            reconnectBtn.textContent = 'Start New Session';
             reconnectBtn.addEventListener('click', async () => {
                 try {
                     await startNanahTrustedReconnect(entry);
                 } catch (error) {
                     console.error('FilterTube: failed to start trusted reconnect', error);
-                    UIComponents.showToast(error?.message || 'Failed to start trusted reconnect', 'error');
+                    UIComponents.showToast(error?.message || 'Failed to start a new session', 'error');
                 }
             });
             actions.appendChild(reconnectBtn);
+
+            const reconnectHint = document.createElement('small');
+            reconnectHint.className = 'nanah-trusted-link__reconnect-hint';
+            reconnectHint.textContent = 'Uses saved trust and policy';
+            actions.appendChild(reconnectHint);
 
             if (safeObject(entry?.policy).linkType === 'managed_link') {
                 const editBtn = document.createElement('button');
@@ -6303,7 +6386,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 const reconnectRow = document.createElement('div');
                 reconnectRow.className = 'nanah-trusted-link__policy-row';
-                reconnectRow.innerHTML = `<span>Reconnect</span><strong>${getNanahReconnectModeLabel(safeObject(entry?.policy).reconnectMode)}</strong>`;
+                reconnectRow.innerHTML = `<span>New session</span><strong>${getNanahReconnectModeLabel(safeObject(entry?.policy).reconnectMode)}</strong>`;
                 policyRows.appendChild(reconnectRow);
 
                 if (entry?.localRole === 'replica' && entry?.remoteRole === 'source') {
@@ -6332,8 +6415,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const note = document.createElement('div');
                 note.className = 'nanah-trusted-link__note';
                 note.textContent = `This managed link defaults to ${getNanahScopeLabel(safeObject(entry?.policy).defaultScope)} and uses ${getNanahStrategyLabel(safeObject(entry?.policy).applyMode).toLowerCase()} for allowed scopes. ${entry?.localRole === 'replica' && entry?.remoteRole === 'source'
-                    ? `Targeting is ${getNanahTargetProfileBehaviorLabel(safeObject(entry?.policy).targetProfileBehavior).toLowerCase()}, reconnects are ${getNanahReconnectModeLabel(safeObject(entry?.policy).reconnectMode).toLowerCase()}, and locked child handling is ${getNanahLockedChildModeLabel(safeObject(entry?.policy).lockedChildMode).toLowerCase()}.`
-                    : `Reconnects are ${getNanahReconnectModeLabel(safeObject(entry?.policy).reconnectMode).toLowerCase()}.`}`;
+                    ? `Targeting is ${getNanahTargetProfileBehaviorLabel(safeObject(entry?.policy).targetProfileBehavior).toLowerCase()}, new sessions are ${getNanahReconnectModeLabel(safeObject(entry?.policy).reconnectMode).toLowerCase()}, and locked child handling is ${getNanahLockedChildModeLabel(safeObject(entry?.policy).lockedChildMode).toLowerCase()}.`
+                    : `New sessions are ${getNanahReconnectModeLabel(safeObject(entry?.policy).reconnectMode).toLowerCase()}.`}`;
                 card.appendChild(note);
             }
 
@@ -6547,6 +6630,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function updateNanahUi() {
+        enforceChildSyncSurfaceRestrictions();
         let nanahTone = 'idle';
         if (!nanahClient) {
             nanahTone = 'idle';
@@ -6650,6 +6734,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ftNanahTargetHint.textContent = buildNanahTargetHint(getNanahScope());
         }
         updateNanahPolicyControls();
+        refreshNanahAdvancedSummary();
         updateNanahModeUi();
         renderNanahQr().catch(() => { });
     }
@@ -7133,7 +7218,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const response = await showChoiceModal({
                 title: 'Managed FilterTube Update',
-                message: `${getNanahRemoteLabel()} wants to apply ${details.scope} settings into ${formatNanahProfileContext(getNanahLocalProfileContext())} using the saved managed policy for this device.`,
+                message: `${getNanahRemoteLabel()} wants to apply ${details.scope} settings into ${formatNanahProfileContext(resolveNanahDisplayTargetProfile(details, trustedLink))} using the saved managed policy for this device.`,
                 details: [
                     `Saved policy: ${getNanahStrategyLabel(trustedDecision.strategy)} ${getNanahScopeLabel(details.scope)}`,
                     `Remote role: ${remoteRole}`,
@@ -7169,8 +7254,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (isFirstManagedReplicaSession) {
             const managedApproval = await showNanahManagedLinkModal({
                 title: 'First Managed Source Connection',
-                message: `${getNanahRemoteLabel()} wants to send ${getNanahScopeLabel(details.scope).toLowerCase()} settings into ${formatNanahProfileContext(getNanahLocalProfileContext())}.`,
-                intro: 'You can review this update once without saving trust, or apply it and store a managed link so later source updates follow the policy you set here. Non-full sync applies only to this currently active profile.',
+                message: `${getNanahRemoteLabel()} wants to send ${getNanahScopeLabel(details.scope).toLowerCase()} settings into ${formatNanahProfileContext(resolveNanahDisplayTargetProfile(details, null))}.`,
+                intro: 'Review this update once, or save a parent control link so future updates follow the policy below.',
                 initialPolicy: {
                     allowedScopes: details.allowedScopes || [details.scope],
                     defaultScope: details.scope,
@@ -7189,7 +7274,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 allowApplyOnce: true,
                 allowSave: true,
                 applyOnceLabel: 'Apply Once',
-                saveLabel: 'Apply + Save Managed Link',
+                saveLabel: 'Apply + Save Parent Control',
                 cancelLabel: 'Decline',
                 showAutoApply: true,
                 showReconnectMode: true,
@@ -7269,7 +7354,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const response = await showChoiceModal({
             title: 'Incoming FilterTube Sync',
-            message: `${getNanahRemoteLabel()} wants to apply ${details.scope} settings into ${formatNanahProfileContext(details.targetProfile || getNanahLocalProfileContext())}.`,
+            message: `${getNanahRemoteLabel()} wants to apply ${details.scope} settings into ${formatNanahProfileContext(resolveNanahDisplayTargetProfile(details, trustedLink))}.`,
             details: [
                 `${details.senderStrategySuggested ? 'Suggested action' : 'Managed policy'}: ${details.strategy === 'replace' ? 'Replace this scope' : 'Merge into this scope'}`,
                 `Remote role: ${normalizeString(nanahSessionState.remoteRole) || 'peer'}`,

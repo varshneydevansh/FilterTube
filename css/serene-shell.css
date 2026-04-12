@@ -1368,6 +1368,10 @@ html[data-theme="dark"] .btn-secondary:hover {
         0 24px 36px -28px rgba(47, 104, 71, 0.22);
 }
 
+.nanah-sync-mode:active:not(:disabled) {
+    transform: scale(0.985);
+}
+
 .nanah-sync-mode__eyebrow {
     font-size: 0.7rem;
     font-weight: 800;
@@ -1608,6 +1612,35 @@ html[data-theme="dark"] .btn-secondary:hover {
     background:
         radial-gradient(circle at top left, rgba(196, 95, 79, 0.12), transparent 46%),
         linear-gradient(180deg, rgba(255, 250, 247, 0.94), rgba(251, 247, 242, 0.88));
+}
+
+.nanah-sync-child-banner {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 14px 18px;
+    margin-bottom: 16px;
+    border-radius: 10px;
+    border: 1px solid var(--border-info, #b6d4fe);
+    background: var(--surface-info, #eef6ff);
+    animation: nanahChildBannerIn 300ms ease-out both;
+}
+
+@keyframes nanahChildBannerIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.nanah-sync-child-banner strong {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: #1e40af;
+}
+
+.nanah-sync-child-banner span {
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: #3b82f6;
 }
 
 .nanah-sync-privacy-banner strong {
@@ -1914,6 +1947,13 @@ html[data-theme="dark"] .btn-secondary:hover {
     display: flex;
     flex-wrap: wrap;
     gap: 0.65rem;
+}
+
+.nanah-trusted-link__reconnect-hint {
+    font-size: 0.6875rem;
+    color: var(--text-muted, #8e8e93);
+    margin-top: 2px;
+    font-weight: normal;
 }
 
 .nanah-trusted-link__scopes {

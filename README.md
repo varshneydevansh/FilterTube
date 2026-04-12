@@ -43,6 +43,10 @@ That means:
 - trust saves relationship and policy for later live sessions
 - trust does **not** mean hidden always-on background sync
 
+Public relay page:
+
+- [nanah-signaling.varshney-devansh614.workers.dev](https://nanah-signaling.varshney-devansh614.workers.dev/)
+
 Simple Nanah flows:
 
 ```text

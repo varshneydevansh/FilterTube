@@ -44,7 +44,7 @@ Flow:
 3. Confirm the same safety phrase.
 4. Pick the child profile in `Remote target profile`.
 5. Send once.
-6. Save the managed link so later sessions stay simpler.
+6. Save the parent control link so later sessions stay simpler.
 
 Important:
 
@@ -75,6 +75,11 @@ It helps both devices:
 It is **not** meant to be where your FilterTube settings live.
 
 After the secure handshake, the real settings payload is meant to move directly between your devices.
+
+If you want to inspect the public relay endpoint yourself, open:
+
+- [https://nanah-signaling.varshney-devansh614.workers.dev/](https://nanah-signaling.varshney-devansh614.workers.dev/)
+- [https://nanah-signaling.varshney-devansh614.workers.dev/privacy](https://nanah-signaling.varshney-devansh614.workers.dev/privacy)
 
 ## What FilterTube does not need
 
@@ -119,7 +124,7 @@ What does not stay alive:
 
 So after refresh:
 
-- you reconnect
+- you start a new session
 - you do not rebuild trust from zero
 
 ## Do kids always need to press Allow?
