@@ -156,25 +156,25 @@ async function applyDOMFallback(settings, options = {}) {
                       │
                       ▼
 ┌─────────────────────────────────────────────────────────────┐
-│               CHECK CURRENT FILTER MODE                      │
+│               CHECK CURRENT FILTER MODE                     │
 │                                                             │
-│  ┌─────────────────┐    ┌─────────────────────────────────┐  │
-│  │   BLOCKLIST     │    │          WHITELIST              │  │
-│  │   MODE          │    │          MODE (v3.2.3)          │  │
-│  └─────────────────┘    └─────────────────────────────────┘  │
+│  ┌─────────────────┐    ┌─────────────────────────────────┐ │
+│  │   BLOCKLIST     │    │          WHITELIST              │ │
+│  │   MODE          │    │          MODE (v3.2.3)          │ │
+│  └─────────────────┘    └─────────────────────────────────┘ │
 └─────────────────────┬───────────────────────────────────────┘
                       │
          ┌────────────┴────────────┐
          │                         │
          ▼                         ▼
 ┌─────────────────┐    ┌─────────────────────────────────┐
-│ HIDE IF MATCHES  │    │    HIDE IF NO MATCH              │
-│ BLOCKLIST RULES  │    │    WHITELIST RULES               │
+│ HIDE IF MATCHES  │    │    HIDE IF NO MATCH            │
+│ BLOCKLIST RULES  │    │    WHITELIST RULES             │
 │                 │    │                                 │
-│ • Channel in     │    │ • Channel NOT in whitelist      │
-│   blocklist       │    │ • Keywords NOT in whitelist     │
-│ • Keywords match  │    │                                 │
-│   blocklist       │    │ • SHOW if whitelist match       │
+│ • Channel in     │    │ • Channel NOT in whitelist     │
+│   blocklist       │    │ • Keywords NOT in whitelist   │
+│ • Keywords match  │    │                               │
+│   blocklist       │    │ • SHOW if whitelist match     │
 └─────────────────┘    └─────────────────────────────────┘
          │                         │
          └────────────┬────────────┘
@@ -183,8 +183,8 @@ async function applyDOMFallback(settings, options = {}) {
 ┌─────────────────────────────────────────────────────────────┐
 │                 APPLY VISIBILITY CHANGES                    │
 │                                                             │
-│  • Add CSS classes (filtertube-hidden)                     │
-│  • Set display: none                                         │
+│  • Add CSS classes (filtertube-hidden)                      │
+│  • Set display: none                                        │
 │  • Stamp data attributes (data-filtertube-list-mode)        │
 │  • Update 3-dot menu text (Block vs Allow)                  │
 └─────────────────────────────────────────────────────────────┘
@@ -194,37 +194,37 @@ async function applyDOMFallback(settings, options = {}) {
 
 ```text
 ┌─────────────────────────────────────────────────────────────┐
-│              CHANNEL IDENTITY RESOLUTION                     │
+│              CHANNEL IDENTITY RESOLUTION                    │
 └─────────────────────┬───────────────────────────────────────┘
                       │
                       ▼
 ┌─────────────────────────────────────────────────────────────┐
-│            EXTRACT FROM MULTIPLE SOURCES                     │
+│            EXTRACT FROM MULTIPLE SOURCES                    │
 │                                                             │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐   │
-│  │   XHR JSON  │  │ ytInitialData │  │   DOM Elements      │   │
-│  │   Data      │  │   Page Data  │  │   (Shorts/Home)     │   │
-│  └─────────────┘  └─────────────┘  └─────────────────────┘   │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐  │
+│  │   XHR JSON  │  │ ytInitialData │  │   DOM Elements    │  │
+│  │   Data      │  │   Page Data  │  │   (Shorts/Home)    │  │
+│  └─────────────┘  └─────────────┘  └─────────────────────┘  │
 └─────────────────────┬───────────────────────────────────────┘
                       │
                       ▼
 ┌─────────────────────────────────────────────────────────────┐
-│              RESOLVE TO CANONICAL UC ID                       │
+│              RESOLVE TO CANONICAL UC ID                     │
 │                                                             │
 │  • @handle → channelMap lookup → UC ID                      │
-│  • /c/name → channelMap lookup → UC ID                       │
-│  • /user/name → channelMap lookup → UC ID                    │
-│  • Direct UC ID → use immediately                            │
+│  • /c/name → channelMap lookup → UC ID                      │
+│  • /user/name → channelMap lookup → UC ID                   │
+│  • Direct UC ID → use immediately                           │
 └─────────────────────┬───────────────────────────────────────┘
                       │
                       ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                 STAMP DOM WITH MODE DATA                        │
+│                 STAMP DOM WITH MODE DATA                    │
 │                                                             │
-│  data-filtertube-channel-id="UC..."                        │
+│  data-filtertube-channel-id="UC..."                         │
 │  data-filtertube-channel-handle="@handle"                   │
-│  data-filtertube-list-mode="whitelist|blocklist"           │
-│  data-filtertube-source="shorts_homepage|watch_page"       │
+│  data-filtertube-list-mode="whitelist|blocklist"            │
+│  data-filtertube-source="shorts_homepage|watch_page"        │
 └─────────────────────────────────────────────────────────────┘
 ```
 
