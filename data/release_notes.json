@@ -6,7 +6,7 @@
     "version": "3.3.1",
     "headline": "Nanah Accounts & Sync + parent-control simplification",
     "summary": "Accounts & Sync now presents Nanah as three simpler paths, with stronger parent/child targeting, clearer reconnect rules, and much broader documentation for real-world use.",
-    "bannerSummary": "Simpler Nanah sync, better parent/child control, safer reconnect rules, and full docs for the new Accounts & Sync flow.",
+    "bannerSummary": "Nanah sync, better parent/child control, safer reconnect rules, and full docs for the new Accounts & Sync flow.",
     "highlights": [
       "Accounts & Sync now starts with three clearer paths: Send this profile once, Parent controls child, and Move full account.",
       "Advanced Nanah controls are still available, but they are hidden behind an Advanced section instead of leading the whole flow.",
