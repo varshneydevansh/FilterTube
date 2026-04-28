@@ -128,6 +128,7 @@ That checkpoint records the runtime and UI/UX behavior that was upstreamed for t
 - mobile 3-dot menu insertion and fallback menu state
 - watch playlist/Mix row recovery
 - authoritative collaborator rosters and Mix false-positive guards
+- desktop watch `yt-lockup-view-model` collaborator warm-up and background `watch:VIDEO_ID` resolver fallback for weak watch/Mix/Shorts menu rows
 - Unicode handle and UC ID normalization expectations
 - `Exact` whole-term matching
 - channel-owned `Filter All` derived keyword behavior

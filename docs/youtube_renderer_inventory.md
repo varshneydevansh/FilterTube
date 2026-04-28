@@ -288,9 +288,11 @@ Guardrails:
 #### Watch page notes (v3.2.1)
 
 - **Main video + right rail:** Watch-page dropdowns consume the same collaborator cache as Home/Search, so per-channel menu rows (and “Block All”) appear with names/handles even when the DOM only exposed “Channel A and 3 more”.
+- **Desktop lockup metadata rows:** Some watch-page `yt-lockup-view-model` related rows expose collaborator bylines through `yt-lockup-metadata-view-model` / `yt-content-metadata-view-model` rows without an avatar stack. These rows are valid warm-up signals only on watch-like lockups, and Mix guardrails still win.
 - **SPA re-check behavior:** During watch-to-watch swaps, collaborator recovery can re-check watch metadata, owner metadata, and the selected playlist row, then refresh an open collaboration menu when fuller roster data arrives.
 - **Embedded Shorts:** Shorts surfaced inside the watch column mark `fetchStrategy: 'shorts'`; we prefetch `/shorts/<videoId>` before falling back to `/watch?v=` so collaborator menus and UC IDs hydrate reliably.
 - **Weak-identity rows:** watch/playlist rows can recover through `watch:VIDEO_ID` when stable owner identity is incomplete, and later enrichment can repair provisional names.
+- **Background resolver fallback:** When the open menu has a stable 11-character `videoId` but no channel identifier, `content_bridge.js` sends `watch:VIDEO_ID` through the background resolver before any legacy direct fetch. This avoids content-script CORS failures on `/watch` and `/shorts`.
 - **Watch playlist panel:** Playlist panel rows now hide deterministically for blocked channels (prefetch enriches `videoChannelMap` for playlist items), and Next/Prev navigation skips blocked items without visible playback flash.
 - **Watch playlist autoplay:** Autoplay uses an `ended`-event safety net to trigger a Next-click only when the immediate next playlist row is blocked, preventing blocked items from briefly playing.
 - **Playlist reprocessing robustness:** Previously hidden playlist rows are kept hidden during identity gaps (sticky-hide) to prevent restored blocked items from becoming playable during async enrichment.

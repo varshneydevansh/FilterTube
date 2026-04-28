@@ -2674,6 +2674,56 @@ function extractYtmBylineText(root) {
     return extractYtmBylineFromAriaLabel(ariaLabel);
 }
 
+function getDesktopLockupMetadataRows(root) {
+    if (!root || typeof root.querySelectorAll !== 'function') return [];
+    const selectors = [
+        '.yt-lockup-metadata-view-model__metadata .yt-content-metadata-view-model__metadata-row',
+        'yt-lockup-metadata-view-model .yt-content-metadata-view-model__metadata-row',
+        '.ytLockupMetadataViewModelMetadata .ytContentMetadataViewModelMetadataRow',
+        '.ytLockupMetadataViewModelMetadata [class*="MetadataRow"]',
+        'yt-lockup-metadata-view-model [class*="MetadataRow"]',
+        'yt-content-metadata-view-model [class*="MetadataRow"]'
+    ];
+    const rows = [];
+    const seen = new Set();
+    selectors.forEach(selector => {
+        try {
+            root.querySelectorAll(selector).forEach(row => {
+                if (!row || seen.has(row)) return;
+                seen.add(row);
+                rows.push(row);
+            });
+        } catch (e) {
+        }
+    });
+    return rows;
+}
+
+function normalizeMetadataRowText(value = '') {
+    return String(value || '').replace(/\s+/g, ' ').trim();
+}
+
+function isStatsMetadataRowText(value = '') {
+    const normalized = normalizeMetadataRowText(value).toLowerCase();
+    if (!normalized) return true;
+    return Boolean(
+        normalized.includes('view') ||
+        normalized.includes('watching') ||
+        normalized.includes('ago') ||
+        /^\d[\d,.\s]*\s*(?:views?|watching)\b/i.test(normalized)
+    );
+}
+
+function extractDesktopLockupBylineText(root) {
+    const rows = getDesktopLockupMetadataRows(root);
+    for (const row of rows) {
+        const text = normalizeMetadataRowText(row?.textContent || '');
+        if (!text || isStatsMetadataRowText(text)) continue;
+        return text;
+    }
+    return '';
+}
+
 function countDistinctChannelLinks(root) {
     if (!root || typeof root.querySelectorAll !== 'function') return 0;
     const linkSelectors = 'a[href*="/@"]:not([href*="/shorts"]):not([href*="/watch"]), a[href*="/channel/UC"], a[href*="/c/"], a[href*="/user/"]';
@@ -4132,35 +4182,39 @@ function extractCollaboratorMetadataFromElement(element) {
 
     // Method 2: Home lockup metadata rows (yt-lockup-metadata-view-model)
     if (collaborators.length === 0) {
-        const lockupMetadataRows = (card || element).querySelectorAll(
-            '.yt-lockup-metadata-view-model__metadata .yt-content-metadata-view-model__metadata-row, ' +
-            'yt-lockup-metadata-view-model .yt-content-metadata-view-model__metadata-row'
-        );
+        const lockupMetadataRows = getDesktopLockupMetadataRows(card || element);
         let channelRowText = '';
         for (const row of lockupMetadataRows) {
-            const text = row.textContent?.trim();
+            const text = normalizeMetadataRowText(row.textContent || '');
             if (!text) continue;
             const normalized = text.toLowerCase();
             // Skip view-count/age rows
-            if (normalized.includes('view') || normalized.includes('watching') || normalized.includes('ago')) {
+            if (isStatsMetadataRowText(text)) {
                 continue;
             }
             // Check if it contains collaboration keywords
             if (normalized.includes(' and ') || normalized.includes(' & ') || /\d+\s+more/i.test(normalized)) {
+                const parsedLockupRow = parseCollaboratorNames(text, { allowSeparatorSplit: true });
+                const desktopWatchLockupSignal = Boolean(
+                    isDesktopWatchLikeCollaboratorCard(card || element) &&
+                    parsedLockupRow.names.length >= 2
+                );
                 // Golden rule: only treat "and" as collaborator separator if YouTube is rendering the avatar stack.
                 // Otherwise a single channel like "The Institute of Art and Ideas" would be misdetected.
-                if (!avatarStackSignal && !/\d+\s+more/i.test(normalized)) {
+                // Desktop watch related lockups can omit avatar/link DOM but still expose the collaborator
+                // byline text; allow that surface to warm collaborator enrichment, while Mix is guarded above.
+                if (!avatarStackSignal && !desktopWatchLockupSignal && !/\d+\s+more/i.test(normalized)) {
                     continue;
                 }
                 // If avatar stack is present, trust collaboration text even if links are missing (watch/home lockups).
                 // Otherwise, require 2+ distinct channel identities linked to avoid false positives.
-                if (!avatarStackSignal) {
+                if (!avatarStackSignal && !desktopWatchLockupSignal) {
                     const distinctLinks = countDistinctChannelLinks(row);
                     if (distinctLinks < 2 && !/\d+\s+more/i.test(normalized)) {
                         continue;
                     }
                 }
-                channelRowText = text.replace(/\s+/g, ' ').trim();
+                channelRowText = text;
                 break;
             }
         }
@@ -4369,6 +4423,7 @@ function getWatchLikeCollaborationWarmup(videoCard) {
     }
 
     const candidateTexts = [
+        extractDesktopLockupBylineText(videoCard),
         videoCard.querySelector('.ytLockupMetadataViewModelMetadata .ytContentMetadataViewModelMetadataRow .yt-core-attributed-string')?.textContent?.trim() || '',
         videoCard.querySelector('.yt-lockup-metadata-view-model__metadata .yt-content-metadata-view-model__metadata-row')?.textContent?.trim() || '',
         extractYtmBylineText(videoCard) || ''
@@ -4484,12 +4539,18 @@ function cardHasCollaborationDomSignal(videoCard) {
             return true;
         }
         const rowText = (
+            extractDesktopLockupBylineText(videoCard) ||
             videoCard.querySelector('.yt-lockup-metadata-view-model__metadata .yt-content-metadata-view-model__metadata-row')?.textContent ||
             extractYtmBylineText(videoCard) ||
             videoCard.querySelector('.YtmBadgeAndBylineRendererItemByline .yt-core-attributed-string')?.textContent ||
             ''
         ).toLowerCase();
-        return /\d+\s+more/.test(rowText) || countDistinctChannelLinks(videoCard) >= 2;
+        const parsed = parseCollaboratorNames(rowText, { allowSeparatorSplit: true });
+        const desktopWatchLockupSignal = Boolean(
+            isDesktopWatchLikeCollaboratorCard(videoCard) &&
+            parsed.names.length >= 2
+        );
+        return /\d+\s+more/.test(rowText) || desktopWatchLockupSignal || countDistinctChannelLinks(videoCard) >= 2;
     } catch (e) {
         return false;
     }
@@ -9884,7 +9945,7 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
         videoCard
     };
 
-    const normalizedMenuInfo = normalizeCollaboratorChannelInfoForCard(initialChannelInfo, videoCard, {
+    let normalizedMenuInfo = normalizeCollaboratorChannelInfoForCard(initialChannelInfo, videoCard, {
         videoId,
         expectedCount: expectedFromCard
     });
@@ -9929,6 +9990,12 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
                 expectedCollaboratorCount: provisionalExpectedCount,
                 videoId
             }, videoCard);
+            initialChannelInfo = provisionalInfo;
+            normalizedMenuInfo = normalizeCollaboratorChannelInfoForCard(initialChannelInfo, videoCard, {
+                videoId,
+                expectedCount: provisionalExpectedCount
+            });
+            initialChannelInfo = hydrateChannelInfoFromCurrentMappings(normalizedMenuInfo.channelInfo || initialChannelInfo, videoCard);
             collaboratorEnrichmentPromise = enrichCollaboratorsWithMainWorld(provisionalInfo);
         }
     }
@@ -10950,7 +11017,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
     }
 
     try {
-        if (!isCommentContextBlock && clickSnapshot?.videoId && clickSnapshot.videoId !== (channelInfo?.videoId || '')) {
+        if (!isCommentContextBlock && clickSnapshot?.videoId && !(channelInfo?.videoId || '').trim()) {
             channelInfo = { ...(channelInfo || {}), videoId: clickSnapshot.videoId };
         }
     } catch (e) {
@@ -11485,6 +11552,17 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
         }
 
         let input = channelInfo.id || channelInfo.customUrl || requestedHandleForNetwork || channelInfo.handle;
+        let usedBackgroundWatchResolver = false;
+        if (
+            !input &&
+            !isCommentContextBlock &&
+            channelInfo?.videoId &&
+            /^[a-zA-Z0-9_-]{11}$/.test(String(channelInfo.videoId).trim())
+        ) {
+            input = `watch:${String(channelInfo.videoId).trim()}`;
+            usedBackgroundWatchResolver = true;
+            filterTubeDebugLog('Using background watch:videoId resolution for no-identifier menu click:', channelInfo.videoId);
+        }
 
         const mappedWatchChannelId = (() => {
             try {
@@ -11680,8 +11758,28 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                 console.warn('FilterTube: ytInitialData channel lookup failed, continuing to Shorts fallback:', e);
             }
 
-            // 2) Network fallback: fetch the /watch?v=ID page directly (works for all video types including /c/ channels)
-            if (!result.success && channelInfo.videoId) {
+            // 2) Background watch resolver fallback. This runs in the extension/background context,
+            // avoiding YouTube CORS failures from content-script fetch().
+            if (!result.success && channelInfo.videoId && !usedBackgroundWatchResolver && /^[a-zA-Z0-9_-]{11}$/.test(String(channelInfo.videoId).trim())) {
+                try {
+                    const retryInput = `watch:${String(channelInfo.videoId).trim()}`;
+                    filterTubeDebugLog('Retrying block with background watch resolver:', retryInput);
+                    result = await addChannelDirectly(
+                        retryInput,
+                        filterAll,
+                        collaborationWith,
+                        menuItem.getAttribute('data-collaboration-group-id'),
+                        buildChannelMetadataPayload(channelInfo)
+                    );
+                    usedBackgroundWatchResolver = true;
+                } catch (e) {
+                    console.warn('FilterTube: Background watch resolver retry failed:', e);
+                }
+            }
+
+            // 3) Legacy content-script network fallback. This is intentionally skipped after
+            // background watch resolution because direct YouTube fetches can be CORS-blocked.
+            if (!result.success && channelInfo.videoId && !usedBackgroundWatchResolver) {
                 filterTubeDebugLog('Attempting watch page fallback for video:', channelInfo.videoId);
                 try {
                     const watchInfo = await fetchChannelFromWatchUrl(channelInfo.videoId, expectedHandle);
@@ -11762,7 +11860,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                 }
             }
 
-            // 3) Final fallback: Shorts-specific helper (only when applicable)
+            // 4) Final fallback: Shorts-specific helper (only when applicable)
             const isLikelyShortsBlockContext = Boolean(
                 videoCard?.getAttribute?.('data-filtertube-short') === 'true' ||
                 String(videoCard?.tagName || '').toLowerCase().includes('shorts') ||
@@ -11772,7 +11870,8 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             );
 
             if (!result.success && channelInfo.videoId && channelInfo.needsFetch && (
-                channelInfo.fetchStrategy !== 'mainworld' || isLikelyShortsBlockContext
+                !usedBackgroundWatchResolver &&
+                (channelInfo.fetchStrategy !== 'mainworld' || isLikelyShortsBlockContext)
             )) {
                 const fallbackInfo = await fetchChannelFromShortsUrl(channelInfo.videoId, expectedHandle, { allowDirectFetch: true });
                 if (fallbackInfo && (fallbackInfo.id || fallbackInfo.handle)) {

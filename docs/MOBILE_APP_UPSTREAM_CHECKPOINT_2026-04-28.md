@@ -126,6 +126,13 @@ row identity weak, no stable videoId
     -> fail clearly
 ```
 
+The follow-up fix for watch/Mix/Shorts menu clicks is:
+
+- if a menu row has a stable 11-character `videoId` but no channel identifier yet, send `watch:VIDEO_ID` to the background resolver before trying any content-script page fetch;
+- do not let a recycled live card overwrite the menu-captured `videoId` once the menu is open;
+- skip content-script `/watch` or `/shorts` fetch fallbacks after the background resolver has been tried, because YouTube can CORS-block those fetches from the content script;
+- keep unresolved rows in a clear failure state instead of persisting `watch:*` as a fake channel.
+
 Mix containers are not collaborations. A Mix card may contain a collaboration seed video, but the Mix container title or byline is not a collaborator roster.
 
 Mix guardrails include:
@@ -171,6 +178,8 @@ Sanitized roster:
 ```
 
 Expected collaborator counts must be corrected after pruning so the UI does not keep showing unresolved "All Collaborators" states for rows that were only fallback artifacts.
+
+Desktop watch related lockups need one extra warm-up rule. Some `yt-lockup-view-model` rows expose only a lockup metadata byline such as `Channel A and Channel B` without an avatar-stack DOM signal. On watch-like lockup rows, that byline can warm collaborator enrichment and render a provisional collaboration menu, but it must not override an authoritative `Collaborators` sheet and must still be blocked by Mix guardrails.
 
 ## Exact Matching
 
@@ -316,6 +325,8 @@ Pinned/locked profile behavior:
 Before claiming app parity, verify these as live behavior, not just UI presence:
 
 - 3-dot menu entry appears and blocks correctly on Home, Search, Shorts, comments, watch rows, and Mix rows.
+- Desktop watch related `yt-lockup-view-model` collaboration rows open collaborator menus instead of generic `Block Channel` rows.
+- Watch/Mix/Shorts rows with only a stable video ID resolve through the background `watch:VIDEO_ID` path without CORS-blocked content-script fetch failures.
 - Mix cards do not become fake collaborations.
 - Real collaboration cards show the correct roster and preserve `k/n` collaboration state in list UI.
 - `Filter All` persists through reload/profile switch and creates/removes derived keywords only through channel state.

@@ -159,8 +159,8 @@ FilterTube/
 | :--- | :--- |
 | `incrementHiddenStats()` | Increments the blocked counter and calculates "time saved". |
 | `fetchChannelFromShortsUrl(videoId)` | Fetches Shorts page in background to extract channel info (handles canonical UC resolution fallback). |
-| `handleBlockChannelClick()` | Orchestrates the blocking flow: immediate hide + background block + multi-layer 404 recovery (ytInitialData replay, Shorts helpers, channelMap broadcast). |
-| `injectFilterTubeMenuItem()` | Injects the "Block Channel" option into YouTube's 3-dot menu (new selectors cover `button-view-model` home cards). |
+| `handleBlockChannelClick()` | Orchestrates the blocking flow: immediate hide + background block + multi-layer identity recovery. Weak watch/Mix/Shorts rows with a stable video ID now retry through the background `watch:VIDEO_ID` resolver before any legacy content-script network fallback, avoiding YouTube CORS failures. |
+| `injectFilterTubeMenuItem()` | Injects the "Block Channel" option into YouTube's 3-dot menu (new selectors cover `button-view-model` home cards). Desktop watch `yt-lockup-view-model` bylines can warm a provisional collaborator menu while Main World enrichment runs. |
 | `enrichCollaboratorsWithMainWorld()` | Bridges collaborator requests between DOM and Main world, ensuring `allCollaborators` is populated for every surface. |
 | `generateCollaborationGroupId()` | Creates deterministic IDs so grouped channels remain linked across storage/UI. |
 | `sanitizeCollaboratorListWithMeta()` | Normalizes collaborator rosters, drops placeholders/composite fallback rows, and reports pruning metadata for expected-count correction. |
