@@ -2665,6 +2665,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const ftExportActiveOnly = document.getElementById('ftExportActiveOnly');
     const ftImportV3Btn = document.getElementById('ftImportV3Btn');
     const ftImportV3File = document.getElementById('ftImportV3File');
+    const ftImportSyncDeviceBtn = document.getElementById('ftImportSyncDeviceBtn');
 
     const ftProfilesManager = document.getElementById('ftProfilesManager');
     const ftCreateAccountBtn = document.getElementById('ftCreateAccountBtn');
@@ -8648,6 +8649,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    if (ftImportSyncDeviceBtn) {
+        ftImportSyncDeviceBtn.addEventListener('click', () => {
+            if (typeof window.switchView === 'function') {
+                window.switchView('sync');
+            } else {
+                document.querySelector('.nav-item[data-tab="sync"]')?.click();
+            }
+        });
+    }
+
     if (ftNanahJoinCode) {
         ftNanahJoinCode.addEventListener('input', () => {
             const normalized = extractNanahCodeFromInput(ftNanahJoinCode.value);
@@ -9766,33 +9777,31 @@ document.addEventListener('DOMContentLoaded', async () => {
             ? (Array.isArray(state?.whitelistKeywords) ? [...state.whitelistKeywords] : [])
             : (Array.isArray(state?.keywords) ? [...state.keywords] : []);
 
-        // If syncing Kids → Main, include ALL kids channels (both blocked and whitelist)
-        if (state?.syncKidsToMain) {
-            const kidsBlocked = Array.isArray(state?.kids?.blockedChannels) ? state.kids.blockedChannels : [];
-            const kidsWhitelist = Array.isArray(state?.kids?.whitelistChannels) ? state.kids.whitelistChannels : [];
-            const allKidsChannels = [...kidsBlocked, ...kidsWhitelist];
+        if (state?.syncKidsToMain && kidsMode === mainMode) {
+            const kidsChannels = mainMode === 'whitelist'
+                ? (Array.isArray(state?.kids?.whitelistChannels) ? state.kids.whitelistChannels : [])
+                : (Array.isArray(state?.kids?.blockedChannels) ? state.kids.blockedChannels : []);
             const keyFor = (ch) => {
                 const id = typeof ch?.id === 'string' ? ch.id.trim().toLowerCase() : '';
                 const handle = typeof ch?.handle === 'string' ? ch.handle.trim().toLowerCase() : '';
                 return id || handle;
             };
             const seen = new Set(channels.map(keyFor).filter(Boolean));
-            allKidsChannels.forEach(ch => {
+            kidsChannels.forEach(ch => {
                 const k = keyFor(ch);
                 if (!k || seen.has(k)) return;
                 seen.add(k);
                 channels.push(ch);
             });
 
-            // Also include ALL kids keywords (both blocked and whitelist)
-            const kidsBlockedKeywords = Array.isArray(state?.kids?.blockedKeywords) ? state.kids.blockedKeywords : [];
-            const kidsWhitelistKeywords = Array.isArray(state?.kids?.whitelistKeywords) ? state.kids.whitelistKeywords : [];
-            const allKidsKeywords = [...kidsBlockedKeywords, ...kidsWhitelistKeywords];
+            const kidsKeywords = mainMode === 'whitelist'
+                ? (Array.isArray(state?.kids?.whitelistKeywords) ? state.kids.whitelistKeywords : [])
+                : (Array.isArray(state?.kids?.blockedKeywords) ? state.kids.blockedKeywords : []);
             const keywordSeen = new Set(keywords.map(k => {
                 const word = typeof k === 'object' ? k.word : String(k);
                 return word.toLowerCase();
             }));
-            allKidsKeywords.forEach(k => {
+            kidsKeywords.forEach(k => {
                 const word = typeof k === 'object' ? k.word : String(k);
                 if (!keywordSeen.has(word.toLowerCase())) {
                     keywordSeen.add(word.toLowerCase());

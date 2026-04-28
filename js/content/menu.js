@@ -61,7 +61,7 @@ function ensureFilterTubeMenuStyles() {
 
     .filtertube-collab-placeholder .filtertube-channel-name {
         font-style: italic !important;
-        color: rgba(226, 232, 240, 0.7) !important;
+        color: #475569 !important;
     }
 
     tp-yt-paper-item.filtertube-menu-item::before,
@@ -85,6 +85,7 @@ function ensureFilterTubeMenuStyles() {
         font-size: 14px !important;
         line-height: 1.4 !important;
         padding-right: 12px !important;
+        color: #111827 !important;
     }
 
     .filtertube-menu-label {
@@ -100,7 +101,7 @@ function ensureFilterTubeMenuStyles() {
 
     .filtertube-channel-name {
         font-weight: 500 !important;
-        color: #fef3c7 !important;
+        color: #b45309 !important;
     }
 
     .filtertube-filter-all-toggle {
@@ -118,9 +119,9 @@ function ensureFilterTubeMenuStyles() {
         gap: 4px !important;
         padding: 4px 12px !important;
         border-radius: 999px !important;
-        border: 1px solid rgba(148, 163, 184, 0.7) !important;
-        background: rgba(15, 23, 42, 0.02) !important;
-        color: rgba(226, 232, 240, 0.85) !important;
+        border: 1px solid #dc2626 !important;
+        background: #ffffff !important;
+        color: #dc2626 !important;
         font-size: 11px !important;
         font-weight: 600 !important;
         text-transform: uppercase !important;
@@ -133,17 +134,17 @@ function ensureFilterTubeMenuStyles() {
     .filtertube-filter-all-toggle.exact-toggle:hover {
         border-color: #dc2626 !important;
         color: #dc2626 !important;
-        background: rgba(255, 255, 255, 0.04) !important;
+        background: rgba(252, 165, 165, 0.16) !important;
     }
 
     .filtertube-filter-all-toggle.exact-toggle.active {
-        background-color: rgba(180, 67, 57, 0.2) !important;
-        color: #dc2626 !important;
-        border-color: #dc2626 !important;
+        background-color: #b44339 !important;
+        color: #ffffff !important;
+        border-color: #b44339 !important;
     }
 
     .filtertube-filter-all-toggle.exact-toggle.active:hover {
-        background-color: rgba(180, 67, 57, 0.25) !important;
+        background-color: #9f362d !important;
     }
 
     .filtertube-block-channel-item.filtertube-blocked {
@@ -172,10 +173,38 @@ function ensureFilterTubeMenuStyles() {
         font-weight: 600 !important;
     }
 
+    html[dark="true"] .filtertube-menu-title,
+    html[dark]:not([dark="false"]) .filtertube-menu-title,
+    html[data-theme="dark"] .filtertube-menu-title {
+        color: #f8fafc !important;
+    }
+
+    html[dark="true"] .filtertube-channel-name,
+    html[dark]:not([dark="false"]) .filtertube-channel-name,
+    html[data-theme="dark"] .filtertube-channel-name {
+        color: #fef3c7 !important;
+    }
+
+    html[dark="true"] .filtertube-filter-all-toggle.exact-toggle,
+    html[dark]:not([dark="false"]) .filtertube-filter-all-toggle.exact-toggle,
+    html[data-theme="dark"] .filtertube-filter-all-toggle.exact-toggle {
+        background: rgba(15, 23, 42, 0.55) !important;
+        color: #fca5a5 !important;
+        border-color: rgba(248, 113, 113, 0.85) !important;
+    }
+
+    html[dark="true"] .filtertube-filter-all-toggle.exact-toggle.active,
+    html[dark]:not([dark="false"]) .filtertube-filter-all-toggle.exact-toggle.active,
+    html[data-theme="dark"] .filtertube-filter-all-toggle.exact-toggle.active {
+        background-color: #b44339 !important;
+        color: #ffffff !important;
+        border-color: #b44339 !important;
+    }
+
     html[dark="false"] .filtertube-filter-all-toggle.exact-toggle {
         background: rgba(255, 255, 255, 0.9) !important;
-        border: 1px solid rgba(148, 163, 184, 0.8) !important;
-        color: #1f2937 !important;
+        border: 1px solid #dc2626 !important;
+        color: #dc2626 !important;
     }
 
     html[dark="false"] .filtertube-filter-all-toggle.exact-toggle:hover {
@@ -185,9 +214,9 @@ function ensureFilterTubeMenuStyles() {
     }
 
     html[dark="false"] .filtertube-filter-all-toggle.exact-toggle.active {
-        background-color: rgba(248, 113, 113, 0.25) !important;
-        color: #b91c1c !important;
-        border-color: #b91c1c !important;
+        background-color: #b44339 !important;
+        color: #ffffff !important;
+        border-color: #b44339 !important;
     }
 
     html[dark="false"] .filtertube-collab-placeholder .filtertube-channel-name {

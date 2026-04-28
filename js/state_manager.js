@@ -1560,10 +1560,13 @@ const StateManager = (() => {
             return;
         }
         let channelsForKeywords = state.channels;
-        if (state.syncKidsToMain) {
-            const kidsBlocked = Array.isArray(state.kids?.blockedChannels) ? state.kids.blockedChannels : [];
-            const kidsWhitelist = Array.isArray(state.kids?.whitelistChannels) ? state.kids.whitelistChannels : [];
-            channelsForKeywords = [...(Array.isArray(state.channels) ? state.channels : []), ...kidsBlocked, ...kidsWhitelist];
+        const mainMode = state.mode === 'whitelist' ? 'whitelist' : 'blocklist';
+        const kidsMode = state.kids?.mode === 'whitelist' ? 'whitelist' : 'blocklist';
+        if (state.syncKidsToMain && kidsMode === mainMode) {
+            const kidsChannels = mainMode === 'whitelist'
+                ? (Array.isArray(state.kids?.whitelistChannels) ? state.kids.whitelistChannels : [])
+                : (Array.isArray(state.kids?.blockedChannels) ? state.kids.blockedChannels : []);
+            channelsForKeywords = [...(Array.isArray(state.channels) ? state.channels : []), ...kidsChannels];
         }
 
         state.keywords = SettingsAPI.syncFilterAllKeywords(state.userKeywords, channelsForKeywords);

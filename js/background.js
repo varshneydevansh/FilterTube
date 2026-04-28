@@ -1762,15 +1762,12 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
                 ? (Array.isArray(activeKids.whitelistKeywords) ? activeKids.whitelistKeywords : [])
                 : (() => {
                     const mainKeywords = Array.isArray(activeMain.whitelistKeywords) ? activeMain.whitelistKeywords : [];
-                    // Only merge Kids keywords when sync enabled AND Main is in whitelist mode
-                    if (!syncKidsToMain || mainModeFromV4 !== 'whitelist') return mainKeywords;
-                    const kidsBlockedKeywords = Array.isArray(activeKids.blockedKeywords) ? activeKids.blockedKeywords : [];
+                    if (!syncKidsToMain || mainModeFromV4 !== 'whitelist' || kidsModeFromV4 !== 'whitelist') return mainKeywords;
                     const kidsWhitelistKeywords = Array.isArray(activeKids.whitelistKeywords) ? activeKids.whitelistKeywords : [];
-                    const allKidsKeywords = [...kidsBlockedKeywords, ...kidsWhitelistKeywords];
-                    if (!allKidsKeywords.length) return mainKeywords;
+                    if (!kidsWhitelistKeywords.length) return mainKeywords;
                     const seen = new Set(mainKeywords.map(k => (typeof k === 'object' ? k.word : String(k)).toLowerCase()));
                     const merged = [...mainKeywords];
-                    allKidsKeywords.forEach(k => {
+                    kidsWhitelistKeywords.forEach(k => {
                         const word = typeof k === 'object' ? k.word : String(k);
                         if (!seen.has(word.toLowerCase())) {
                             seen.add(word.toLowerCase());
@@ -1785,12 +1782,9 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
                 ? (Array.isArray(activeKids.whitelistChannels) ? activeKids.whitelistChannels : [])
                 : (() => {
                     const mainChannels = Array.isArray(activeMain.whitelistChannels) ? activeMain.whitelistChannels : [];
-                    // Only merge Kids channels when sync enabled AND Main is in whitelist mode
-                    if (!syncKidsToMain || mainModeFromV4 !== 'whitelist') return mainChannels;
-                    const kidsBlockedChannels = Array.isArray(activeKids.blockedChannels) ? activeKids.blockedChannels : [];
+                    if (!syncKidsToMain || mainModeFromV4 !== 'whitelist' || kidsModeFromV4 !== 'whitelist') return mainChannels;
                     const kidsWhitelistChannels = Array.isArray(activeKids.whitelistChannels) ? activeKids.whitelistChannels : [];
-                    const allKidsChannels = [...kidsBlockedChannels, ...kidsWhitelistChannels];
-                    if (!allKidsChannels.length) return mainChannels;
+                    if (!kidsWhitelistChannels.length) return mainChannels;
                     const keyFor = (ch) => {
                         const id = typeof ch?.id === 'string' ? ch.id.trim().toLowerCase() : '';
                         const handle = typeof ch?.handle === 'string' ? ch.handle.trim().toLowerCase() : '';
@@ -1798,7 +1792,7 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
                     };
                     const seen = new Set(mainChannels.map(keyFor).filter(Boolean));
                     const merged = [...mainChannels];
-                    allKidsChannels.forEach(ch => {
+                    kidsWhitelistChannels.forEach(ch => {
                         const key = keyFor(ch);
                         if (!key || seen.has(key)) return;
                         seen.add(key);
@@ -1837,15 +1831,11 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
                     const mainKeywords = Array.isArray(activeMain.blockedKeywords) 
                         ? activeMain.blockedKeywords 
                         : (Array.isArray(activeMain.keywords) ? activeMain.keywords : null);
-                    // Only merge Kids keywords when sync enabled AND Main is in blocklist mode
-                    if (!syncKidsToMain || mainModeFromV4 !== 'blocklist') return mainKeywords;
-                    // Merge ALL kids keywords (blocked + whitelist) into main blocklist when sync enabled
+                    if (!syncKidsToMain || mainModeFromV4 !== 'blocklist' || kidsModeFromV4 !== 'blocklist') return mainKeywords;
                     const kidsBlockedKeywords = Array.isArray(activeKids.blockedKeywords) ? activeKids.blockedKeywords : [];
-                    const kidsWhitelistKeywords = Array.isArray(activeKids.whitelistKeywords) ? activeKids.whitelistKeywords : [];
-                    const allKidsKeywords = [...kidsBlockedKeywords, ...kidsWhitelistKeywords];
-                    if (!mainKeywords && allKidsKeywords.length) return allKidsKeywords;
-                    if (!allKidsKeywords.length) return mainKeywords;
-                    return [...mainKeywords, ...allKidsKeywords];
+                    if (!mainKeywords && kidsBlockedKeywords.length) return kidsBlockedKeywords;
+                    if (!kidsBlockedKeywords.length) return mainKeywords;
+                    return [...mainKeywords, ...kidsBlockedKeywords];
                 })();
 
             if (v4KeywordEntries) {
@@ -1869,17 +1859,16 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
             const kidsChannelsV4 = Array.isArray(activeKids.blockedChannels) ? activeKids.blockedChannels : null;
             const kidsKeywordsV4 = Array.isArray(activeKids.blockedKeywords) ? activeKids.blockedKeywords : null;
 
-            // For sync, we need ALL kids channels (both blocked and whitelist)
             const kidsBlockedChannelsV4 = Array.isArray(activeKids.blockedChannels) ? activeKids.blockedChannels : [];
             const kidsWhitelistChannelsV4 = Array.isArray(activeKids.whitelistChannels) ? activeKids.whitelistChannels : [];
-            const allKidsChannelsV4 = [...kidsBlockedChannelsV4, ...kidsWhitelistChannelsV4];
 
             const effectiveKidsChannels = (kidsChannelsV4 != null)
                 ? kidsChannelsV4
                 : kidsChannelsV3;
 
-            // For sync, use all kids channels when merging
-            const effectiveKidsChannelsForSync = allKidsChannelsV4.length > 0 ? allKidsChannelsV4 : effectiveKidsChannels;
+            const effectiveKidsChannelsForSync = kidsModeFromV4 === 'whitelist'
+                ? kidsWhitelistChannelsV4
+                : (kidsBlockedChannelsV4.length > 0 ? kidsBlockedChannelsV4 : effectiveKidsChannels);
 
             const effectiveKidsKeywords = (kidsKeywordsV4 != null)
                 ? kidsKeywordsV4
@@ -1998,10 +1987,9 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
                     const mainChannels = Array.isArray(activeMain.blockedChannels) 
                         ? activeMain.blockedChannels 
                         : (Array.isArray(activeMain.channels) ? activeMain.channels : items.filterChannels);
-                    // Only merge Kids channels when sync enabled AND Main is in blocklist mode
                     if (!syncKidsToMain) return mainChannels;
                     if (mainModeFromV4 !== 'blocklist') return mainChannels;
-                    // Merge ALL kids channels (blocked + whitelist) into main blocklist when sync enabled
+                    if (kidsModeFromV4 !== 'blocklist') return mainChannels;
                     const kidsChannelsWithTag = effectiveKidsChannelsForSync.map(ch => ({ ...ch, __ftFromKids: true }));
                     const merged = dedupeChannels([...(Array.isArray(mainChannels) ? mainChannels : []), ...kidsChannelsWithTag]);
                     return merged;

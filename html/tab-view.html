@@ -431,6 +431,9 @@
                                                         <button id="ftImportV3Btn" class="btn-secondary btn-import" type="button" title="Import a FilterTube export or any compatible JSON (BlockTube, other tools, etc.)">
                                                             Choose JSON
                                                         </button>
+                                                        <button id="ftImportSyncDeviceBtn" class="btn-secondary" type="button" title="Open Accounts &amp; Sync for QR/code device-to-device setup">
+                                                            Sync from other device
+                                                        </button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -485,9 +488,9 @@
                                         <h3>YT Kids → YT Main Sync</h3>
                                     </div>
                                     <div class="card-body settings-card__body">
-                                        <div class="toggle-row" title="When enabled, channels and keywords blocked on YouTube Kids are also applied on main YouTube for this profile.">
+                                        <div class="toggle-row" title="When enabled, matching-mode YouTube Kids rules are also applied on main YouTube for this profile. Kids blocklist syncs only into Main blocklist; Kids whitelist syncs only into Main whitelist.">
                                             <div class="toggle-info">
-                                                <div class="toggle-title">Apply YT Kids blocklist on YouTube</div>
+                                                <div class="toggle-title">Apply matching YT Kids rules on YouTube</div>
                                             </div>
                                             <label class="switch">
                                                 <input id="setting_syncKidsToMain" type="checkbox" data-ft-setting="syncKidsToMain" />
@@ -495,7 +498,7 @@
                                             </label>
                                         </div>
                                         <div class="import-export-hint" style="margin-top:10px;">
-                                            Synced items show in your main list with a <code>"From Kids"</code> badge.
+                                            Synced items show in your main list with a <code>"From Kids"</code> badge. Mismatched modes do not invert rules.
                                         </div>
                                     </div>
                                 </div>
@@ -1407,6 +1410,17 @@
                                         <div class="help-item">
                                             <div class="help-item-title">Parent Account Integration</div>
                                             <div class="help-item-body">YouTube Kids blocking requires a verified parent account. Parents can block content from their child's YouTube Kids profile and share content from YouTube to their child's profile. See <a href="https://support.google.com/youtubekids/answer/7178746?hl=en" target="_blank" rel="noopener noreferrer">YouTube Kids Help Center</a> for complete details.</div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Kids to Main sync is mode-aware</div>
+                                            <div class="help-item-body">
+                                                <ul style="margin: 8px 0; padding-left: 20px;">
+                                                    <li>Kids blocklist rules apply on main YouTube only when Main is also in blocklist mode.</li>
+                                                    <li>Kids whitelist rules apply on main YouTube only when Main is also in whitelist mode.</li>
+                                                    <li>Mismatched modes do not invert rules: Kids whitelist never becomes a Main blocklist, and Kids blocklist never becomes a Main whitelist.</li>
+                                                    <li>Kids <strong>Filter All</strong> derived keywords stay green in Kids Mode and appear as channel-derived plus <code>From Kids</code> rows in Main when the modes match.</li>
+                                                </ul>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

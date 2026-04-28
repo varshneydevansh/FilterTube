@@ -224,10 +224,17 @@ function isPostLikeQuickBlockCard(card) {
 function resolveQuickBlockHost(node) {
     if (!node || !(node instanceof Element)) return null;
     const tag = String(node.tagName || '').toLowerCase();
+    if (tag.startsWith('ytm-shorts-lockup-view-model')) {
+        return node.closest(
+            'ytd-rich-item-renderer, ytm-rich-item-renderer, .ytGridShelfViewModelGridShelfItem'
+        ) || node;
+    }
     if (
         tag === 'yt-lockup-view-model' ||
         tag === 'yt-lockup-metadata-view-model' ||
-        tag.startsWith('ytm-shorts-lockup-view-model')
+        tag === 'ytm-channel-renderer' ||
+        tag === 'ytm-compact-channel-renderer' ||
+        tag === 'ytm-universal-watch-card-renderer'
     ) {
         return node.closest(
             'ytd-rich-item-renderer, ytd-video-renderer, ytd-grid-video-renderer, ytd-compact-video-renderer, ytd-playlist-panel-video-renderer, ytd-playlist-panel-video-wrapper-renderer, ytm-rich-item-renderer, ytm-video-with-context-renderer, .ytGridShelfViewModelGridShelfItem'
@@ -237,6 +244,28 @@ function resolveQuickBlockHost(node) {
         return node.closest('ytd-rich-item-renderer') || node;
     }
     return node;
+}
+
+function resolveQuickBlockHideTarget(videoCard) {
+    if (!videoCard || !(videoCard instanceof Element)) return videoCard;
+    const tag = String(videoCard.tagName || '').toLowerCase();
+    const isShorts = tag.includes('shorts-lockup-view-model') || tag.includes('reel');
+
+    if (isShorts) {
+        const shortsNode = tag.includes('shorts-lockup-view-model')
+            ? videoCard
+            : videoCard.querySelector?.('ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2');
+        if (shortsNode instanceof Element) {
+            return shortsNode.closest('ytd-rich-item-renderer, ytm-rich-item-renderer, .ytGridShelfViewModelGridShelfItem') || shortsNode;
+        }
+        return videoCard;
+    }
+
+    if (tag.includes('lockup-view-model')) {
+        return videoCard.closest('ytd-rich-item-renderer, ytm-rich-item-renderer, .ytGridShelfViewModelGridShelfItem') || videoCard;
+    }
+
+    return videoCard;
 }
 
 function isRenderableQuickBlockAnchor(node) {
@@ -265,6 +294,10 @@ function resolveQuickBlockAnchor(hostCard) {
         'ytd-rich-grid-media',
         'yt-lockup-view-model',
         'yt-lockup-metadata-view-model',
+        'ytm-channel-renderer',
+        'ytm-compact-channel-renderer',
+        'ytm-universal-watch-card-renderer',
+        'ytm-channel-thumbnail-with-link-renderer',
         'ytd-playlist-panel-video-wrapper-renderer',
         'ytd-playlist-panel-video-renderer',
         'ytd-video-renderer',
@@ -391,6 +424,9 @@ const QUICK_BLOCK_CARD_SELECTORS = [
     'ytm-compact-playlist-renderer',
     'ytm-playlist-video-renderer',
     'ytm-playlist-panel-video-renderer',
+    'ytm-channel-renderer',
+    'ytm-compact-channel-renderer',
+    'ytm-universal-watch-card-renderer',
     'ytm-reel-item-renderer',
     'ytm-radio-renderer',
     'ytm-compact-radio-renderer',
@@ -541,6 +577,10 @@ function collectQuickBlockCollaborators(base = {}, videoCard = null) {
         candidates.push(...base.allCollaborators.filter(Boolean));
     }
 
+    if (base?.id && /^UC[\w-]{22}$/i.test(String(base.id).trim())) {
+        candidates.push({ ...base, id: String(base.id).trim() });
+    }
+
     if (typeof extractCollaboratorMetadataFromElement === 'function' && videoCard) {
         try {
             const fromDom = extractCollaboratorMetadataFromElement(videoCard);
@@ -563,6 +603,27 @@ function collectQuickBlockCollaborators(base = {}, videoCard = null) {
         }
     }
 
+    normalized = normalized.map((entry) => {
+        if (!entry || typeof entry !== 'object') return entry;
+        const match = candidates.find((candidate) => {
+            if (!candidate || typeof candidate !== 'object') return false;
+            const sameId = entry.id && candidate.id && String(entry.id).toLowerCase() === String(candidate.id).toLowerCase();
+            const sameHandle = entry.handle && candidate.handle && String(entry.handle).toLowerCase() === String(candidate.handle).toLowerCase();
+            const sameCustom = entry.customUrl && candidate.customUrl && String(entry.customUrl).toLowerCase() === String(candidate.customUrl).toLowerCase();
+            const sameName = entry.name && candidate.name && String(entry.name).toLowerCase() === String(candidate.name).toLowerCase();
+            return sameId || sameHandle || sameCustom || sameName;
+        });
+        if (!match) return entry;
+        return {
+            ...entry,
+            logo: entry.logo || match.logo || match.channelLogo || '',
+            channelLogo: entry.channelLogo || match.channelLogo || match.logo || '',
+            videoId: entry.videoId || match.videoId || '',
+            videoTitleHint: entry.videoTitleHint || match.videoTitleHint || '',
+            source: entry.source || match.source || ''
+        };
+    });
+
     const seen = new Set();
     const deduped = [];
     normalized.forEach((entry) => {
@@ -578,6 +639,25 @@ function collectQuickBlockCollaborators(base = {}, videoCard = null) {
         seen.add(key);
         deduped.push(entry);
     });
+
+    if (deduped.length === 0 && (base.handle || base.id || base.customUrl || base.name || base.needsFetch || base.videoId)) {
+        const fallback = typeof sanitizeCollaboratorList === 'function'
+            ? sanitizeCollaboratorList([{ ...base }])
+            : [{ ...base }];
+        fallback.forEach((entry) => {
+            if (!entry || typeof entry !== 'object') return;
+            const key = [
+                (entry.id || '').toLowerCase(),
+                (entry.handle || '').toLowerCase(),
+                (entry.customUrl || '').toLowerCase(),
+                (entry.name || '').toLowerCase()
+            ].join('|');
+            if (!key.replace(/\|/g, '').trim()) return;
+            if (seen.has(key)) return;
+            seen.add(key);
+            deduped.push(entry);
+        });
+    }
     return deduped;
 }
 
@@ -608,6 +688,16 @@ function buildQuickBlockContext(videoCard) {
         return false;
     })();
     const videoId = isPostCard ? '' : (base.videoId || ensureVideoIdForCard(videoCard) || extractVideoIdFromCard(videoCard) || '');
+    if (videoId && (!base.id || !/^UC[\w-]{22}$/i.test(String(base.id).trim()))) {
+        try {
+            const mappedId = currentSettings?.videoChannelMap?.[videoId] || '';
+            if (typeof mappedId === 'string' && /^UC[\w-]{22}$/i.test(mappedId.trim())) {
+                base = { ...base, id: mappedId.trim() };
+                blockChannelDebugLog('FilterTube: Quick block using mapped UC ID for video:', videoId, mappedId.trim());
+            }
+        } catch (e) {
+        }
+    }
     const collaborators = collectQuickBlockCollaborators({ ...base, videoId }, videoCard);
     if (!videoId && collaborators.length === 0) return null;
     return {
@@ -732,15 +822,7 @@ async function runQuickBlockFallback(context, info, source = 'quickBlock') {
 function applyQuickBlockImmediateHide(videoCard, channelInfo) {
     if (!videoCard || !(videoCard instanceof Element)) return;
     try {
-        let targetToHide = videoCard;
-        const tag = (videoCard.tagName || '').toLowerCase();
-        if (tag.includes('lockup-view-model')) {
-            const parentContainer = videoCard.closest('ytd-rich-item-renderer, .ytGridShelfViewModelGridShelfItem');
-            if (parentContainer) targetToHide = parentContainer;
-        } else if (tag === 'ytd-shorts-lockup-view-model' || tag.includes('shorts-lockup-view-model')) {
-            const parentContainer = videoCard.closest('ytd-rich-item-renderer, .ytGridShelfViewModelGridShelfItem');
-            if (parentContainer) targetToHide = parentContainer;
-        }
+        const targetToHide = resolveQuickBlockHideTarget(videoCard);
 
         if (typeof markElementAsBlocked === 'function') {
             markElementAsBlocked(targetToHide, channelInfo || {}, 'pending');
@@ -1649,6 +1731,9 @@ async function handleDropdownAppearedInternal(dropdown) {
         'ytm-compact-playlist-renderer, ' +
         'ytm-playlist-video-renderer, ' +
         'ytm-playlist-panel-video-renderer, ' +
+        'ytm-channel-renderer, ' +
+        'ytm-compact-channel-renderer, ' +
+        'ytm-universal-watch-card-renderer, ' +
         'ytm-reel-item-renderer, ' +
         'ytm-radio-renderer, ' +
         'ytm-compact-radio-renderer, ' +
@@ -1657,14 +1742,11 @@ async function handleDropdownAppearedInternal(dropdown) {
         'ytm-post-renderer, ' +                          // Mobile posts
         'ytm-backstage-post-renderer, ' +                // Mobile community post
         'ytm-backstage-post-thread-renderer, ' +         // Mobile community post thread
-        'ytm-rich-section-renderer, ' +                  // Mobile section wrapper
         'ytd-playlist-panel-video-renderer, ' +         // Playlist videos
         'ytd-playlist-video-renderer, ' +               // Playlist videos (alternate)
         'ytm-shorts-lockup-view-model, ' +              // Shorts in mobile/search
         'ytm-shorts-lockup-view-model-v2, ' +           // Shorts variant
-        'ytm-item-section-renderer, ' +                 // Container for shorts
-        'yt-lockup-view-model, ' +                      // Modern video lockup (collabs)
-        'ytd-rich-shelf-renderer'                       // Shelf containing shorts
+        'yt-lockup-view-model'                          // Modern video lockup (collabs)
     );
     if (!videoCard && !clickInComments) {
         videoCard = lastClickedMenuButton.closest(

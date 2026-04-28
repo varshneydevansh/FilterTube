@@ -107,6 +107,132 @@ function normalizeCustomUrlForComparison(value) {
     return '';
 }
 
+function isFilterTubeMixOrRadioElement(element) {
+    if (!element || !(element instanceof Element)) return false;
+    try {
+        const tag = (element.tagName || '').toLowerCase();
+        if (
+            tag === 'ytd-radio-renderer' ||
+            tag === 'ytd-compact-radio-renderer' ||
+            tag === 'ytm-radio-renderer' ||
+            tag === 'ytm-compact-radio-renderer'
+        ) {
+            return true;
+        }
+
+        const badgeText = Array.from(element.querySelectorAll(
+            'yt-thumbnail-overlay-badge-view-model badge-shape .yt-badge-shape__text, ' +
+            '.ytm-badge-and-byline-item, ' +
+            '.badge-style-type-simple'
+        ))
+            .map(node => (node.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase())
+            .find(Boolean) || '';
+        if (badgeText === 'mix') return true;
+
+        const titleText = (
+            element.querySelector(
+                '#video-title, a#video-title, yt-formatted-string#video-title, h3, h3 a, ' +
+                '.compact-media-item-headline, .media-item-headline, ' +
+                '.yt-lockup-metadata-view-model__title, .yt-lockup-view-model__title, ' +
+                '.yt-lockup-metadata-view-model-wiz__title, .yt-core-attributed-string[role="text"]'
+            )?.textContent ||
+            element.querySelector('a[aria-label*="Mix" i], [aria-label*="Mix -" i], [aria-label*="My Mix" i]')?.getAttribute('aria-label') ||
+            element.getAttribute('aria-label') ||
+            ''
+        ).replace(/\s+/g, ' ').trim();
+        if (/^(mix\s*[-:]|my mix\b)/i.test(titleText)) return true;
+
+        const textPrefix = (element.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 180);
+        return /^(?:\d+\+?\s*)?(mix\s*[-:]|my mix\b)/i.test(textPrefix);
+    } catch (e) {
+        return false;
+    }
+}
+
+function isPlaylistPanelRowElement(elementOrTag) {
+    const tag = (typeof elementOrTag === 'string'
+        ? elementOrTag
+        : (elementOrTag?.tagName || '')
+    ).toLowerCase();
+    return tag === 'ytd-playlist-panel-video-renderer' ||
+        tag === 'ytd-playlist-panel-video-wrapper-renderer' ||
+        tag === 'ytm-playlist-panel-video-renderer' ||
+        tag === 'ytm-playlist-panel-video-wrapper-renderer';
+}
+
+function getPlaylistPanelRow(element) {
+    if (!element || !(element instanceof Element)) return null;
+    if (isPlaylistPanelRowElement(element)) return element;
+    try {
+        return element.querySelector(
+            'ytd-playlist-panel-video-renderer, ' +
+            'ytd-playlist-panel-video-wrapper-renderer, ' +
+            'ytm-playlist-panel-video-renderer, ' +
+            'ytm-playlist-panel-video-wrapper-renderer'
+        );
+    } catch (e) {
+        return null;
+    }
+}
+
+function getPlaylistPanelRows(root = document) {
+    try {
+        return Array.from(root.querySelectorAll(
+            'ytd-playlist-panel-video-renderer, ' +
+            'ytm-playlist-panel-video-renderer'
+        ));
+    } catch (e) {
+        return [];
+    }
+}
+
+function getPlaylistPanelContainer() {
+    try {
+        return document.querySelector(
+            'ytd-playlist-panel-renderer, ' +
+            'ytm-playlist-panel-renderer, ' +
+            'ytm-playlist-panel-renderer-v2'
+        );
+    } catch (e) {
+        return null;
+    }
+}
+
+function isSelectedPlaylistPanelRow(element) {
+    const row = getPlaylistPanelRow(element);
+    if (!row) return false;
+    try {
+        return Boolean(
+            row.hasAttribute('selected') ||
+            row.getAttribute('aria-selected') === 'true' ||
+            row.getAttribute('aria-current') === 'true' ||
+            row.getAttribute('data-selected') === 'true' ||
+            row.classList?.contains('selected') ||
+            row.classList?.contains('is-selected') ||
+            row.classList?.contains('ytm-playlist-panel-video-renderer-selected')
+        );
+    } catch (e) {
+        return false;
+    }
+}
+
+function extractPlaylistPanelBylineChannelName(value) {
+    if (!value || typeof value !== 'string') return '';
+    let text = value
+        .replace(/\u00a0/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    if (!text) return '';
+
+    text = text.split('•')[0].trim();
+    text = text.replace(/^by\s+/i, '').trim();
+    text = text.replace(/\s+(?:no\s+views?|[\d,.]+\s*[kmb]?\s+views?|[\d,.]+\s*[kmb]?\s+watching|streamed|premiered|live|shorts)\b.*$/i, '').trim();
+    text = text.replace(/\s+(?:\d+\s+(?:second|minute|hour|day|week|month|year)s?\s+ago)\b.*$/i, '').trim();
+
+    if (!text || text.includes('http://') || text.includes('https://')) return '';
+    return text;
+}
+
 function normalizeHandleForComparison(value) {
     try {
         const fn = window.FilterTubeIdentity?.normalizeHandleForComparison;
@@ -407,6 +533,356 @@ function getCurrentPageChannelMeta() {
     return normalized ? { ...normalized } : null;
 }
 
+function getCurrentWatchVideoId() {
+    try {
+        const path = String(document.location?.pathname || '');
+        if (path.startsWith('/watch')) {
+            const params = new URLSearchParams(document.location?.search || '');
+            const v = params.get('v') || '';
+            return /^[a-zA-Z0-9_-]{11}$/.test(v) ? v : '';
+        }
+    } catch (e) {
+    }
+    return '';
+}
+
+function getCurrentWatchOwnerMeta(settings) {
+    const videoId = getCurrentWatchVideoId();
+    if (!videoId) return null;
+
+    let ownerRoot = null;
+    let ownerAnchor = null;
+    try {
+        ownerRoot = document.querySelector(
+            'ytm-slim-owner-renderer, ' +
+            'ytd-video-owner-renderer, ' +
+            '#owner.ytd-watch-metadata, ' +
+            'ytd-video-secondary-info-renderer #owner'
+        );
+        ownerAnchor = ownerRoot?.querySelector?.(
+            'a[href*="/channel/UC"], ' +
+            'a[href*="/@"], ' +
+            'a[href*="/c/"], ' +
+            'a[href*="/user/"]'
+        ) || null;
+    } catch (e) {
+    }
+
+    const mappedId = (() => {
+        try {
+            const raw = settings?.videoChannelMap?.[videoId];
+            return typeof raw === 'string' && /^UC[\w-]{22}$/i.test(raw.trim()) ? raw.trim() : '';
+        } catch (e) {
+            return '';
+        }
+    })();
+
+    const ownerHref = ownerAnchor?.getAttribute?.('href') || ownerAnchor?.href || '';
+    const ownerName = (() => {
+        try {
+            const direct = ownerAnchor?.textContent?.trim() || '';
+            const cleaned = direct
+                .replace(/\s+/g, ' ')
+                .replace(/\b\d+(?:[.,]\d+)?\s*[kmb]?\s*(?:subscribers?|views?)\b.*$/i, '')
+                .trim();
+            if (cleaned) return cleaned;
+
+            const rootText = ownerRoot?.textContent?.trim() || '';
+            return rootText
+                .replace(/\{[\s\S]*$/, '')
+                .replace(/\s+/g, ' ')
+                .replace(/\b\d+(?:[.,]\d+)?\s*[kmb]?\s*(?:subscribers?|views?)\b.*$/i, '')
+                .replace(/\bSubscribe\b.*$/i, '')
+                .trim();
+        } catch (e) {
+            return '';
+        }
+    })();
+
+    let meta = null;
+    try {
+        meta = (typeof extractChannelMetadataFromElement === 'function')
+            ? extractChannelMetadataFromElement(ownerRoot || document.body, ownerName, ownerHref, {
+                cacheTarget: ownerAnchor || ownerRoot || document.body,
+                relatedElements: [ownerAnchor, ownerRoot].filter(Boolean)
+            })
+            : buildChannelMetadata(ownerName, ownerHref);
+    } catch (e) {
+        meta = buildChannelMetadata(ownerName, ownerHref);
+    }
+
+    meta = meta || {};
+    if (mappedId) {
+        // During mobile YouTube SPA transitions the owner row can briefly retain the
+        // previous video's @handle/name. The current video's videoChannelMap entry is
+        // more reliable, so do not let stale owner text keep skipping allowed videos.
+        meta = {
+            id: mappedId,
+            name: '',
+            mappedIdAuthoritative: true
+        };
+    } else if (ownerName && !meta.name) {
+        meta.name = ownerName;
+    }
+
+    if (!meta.id && !meta.handle && !meta.customUrl && !meta.name) return null;
+    return {
+        ...meta,
+        videoId,
+        ownerRoot,
+        ownerAnchor
+    };
+}
+
+function getPlaylistRowVideoId(row) {
+    if (!row || typeof row.querySelector !== 'function') return '';
+    try {
+        const cached = row.getAttribute?.('data-filtertube-video-id') || '';
+        if (/^[a-zA-Z0-9_-]{11}$/.test(cached)) return cached;
+    } catch (e) {
+    }
+    try {
+        const href = row.querySelector('a[href*="watch?v="], a[href^="/watch?v="]')?.getAttribute?.('href') || '';
+        const match = href.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
+        return match ? match[1] : '';
+    } catch (e) {
+        return '';
+    }
+}
+
+function getPlaylistRowChannelName(row) {
+    if (!row) return '';
+    try {
+        const byline = row.querySelector?.(
+            '#byline, #byline-container #byline, ' +
+            '.ytmPlaylistPanelVideoRendererByline, ' +
+            '.ytmPlaylistPanelVideoRendererV2Byline, ' +
+            '.subhead .YtmCompactMediaItemByline:first-child, ' +
+            '.YtmCompactMediaItemByline:first-child, ' +
+            '.compact-media-item-byline, .metadata-row, ' +
+            'ytm-badge-and-byline-renderer'
+        );
+        return extractPlaylistPanelBylineChannelName(byline?.textContent || row.textContent || '');
+    } catch (e) {
+        return '';
+    }
+}
+
+function findNextAllowedWatchPlaylistLink(settings, currentVideoId = '') {
+    try {
+        const playlistPanel = getPlaylistPanelContainer() || document;
+        const rows = getPlaylistPanelRows(playlistPanel);
+        if (!rows.length) return null;
+
+        const selected = rows.find(row => {
+            try {
+                return isSelectedPlaylistPanelRow(row);
+            } catch (e) {
+                return false;
+            }
+        }) || null;
+        const selectedIndex = selected ? rows.indexOf(selected) : -1;
+        const start = selectedIndex >= 0 ? selectedIndex + 1 : 0;
+
+        const candidates = rows.slice(start).concat(rows.slice(0, Math.max(0, start)));
+        for (const row of candidates) {
+            if (!row) continue;
+            const videoId = getPlaylistRowVideoId(row);
+            if (currentVideoId && videoId === currentVideoId) continue;
+            if (isExplicitlyHiddenByFilterTube(row)) continue;
+
+            const channelMeta = {};
+            const mappedId = videoId ? settings?.videoChannelMap?.[videoId] : '';
+            if (typeof mappedId === 'string' && /^UC[\w-]{22}$/i.test(mappedId.trim())) {
+                channelMeta.id = mappedId.trim();
+            }
+            const channelName = getPlaylistRowChannelName(row);
+            if (channelName) {
+                channelMeta.name = channelName;
+            }
+            if ((channelMeta.id || channelMeta.name) && shouldHideContent('', channelName, settings, {
+                channelMeta,
+                contentTag: (row.tagName || '').toLowerCase()
+            })) {
+                continue;
+            }
+
+            const link = row.querySelector('a[href*="watch?v="], a[href^="/watch?v="]');
+            if (link) return link;
+        }
+    } catch (e) {
+    }
+    return null;
+}
+
+function openWatchPlaylistPanelIfCollapsed() {
+    try {
+        const existingRows = getPlaylistPanelRows(getPlaylistPanelContainer() || document);
+        if (existingRows.length > 0) return false;
+
+        const entry = document.querySelector(
+            'ytm-playlist-panel-entry-point, ' +
+            'ytm-playlist-engagement-panel-entry-point, ' +
+            'ytm-engagement-panel-title-header-renderer'
+        );
+        if (!entry) return false;
+
+        const clickable = entry.querySelector?.('button, [role="button"], a') || entry;
+        if (!clickable || typeof clickable.click !== 'function') return false;
+        clickable.click();
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
+
+function enforceCurrentWatchOwnerBlock(settings) {
+    try {
+        const path = String(document.location?.pathname || '');
+        if (!path.startsWith('/watch')) return;
+
+        const ownerMeta = getCurrentWatchOwnerMeta(settings);
+        if (!ownerMeta || !ownerMeta.videoId) return;
+
+        const title = document.querySelector('ytm-watch h1, ytd-watch-metadata h1, h1.title')?.textContent?.trim() || '';
+        const ownerName = ownerMeta.name || ownerMeta.handle || ownerMeta.id || '';
+        const shouldBlock = shouldHideContent(title, ownerName, settings, {
+            skipKeywords: false,
+            channelHref: ownerMeta.mappedIdAuthoritative
+                ? ''
+                : (ownerMeta.ownerAnchor?.getAttribute?.('href') || ownerMeta.ownerAnchor?.href || ''),
+            channelMeta: ownerMeta,
+            contentTag: 'watch-current-video'
+        });
+        if (!shouldBlock) {
+            try {
+                ownerMeta.ownerRoot?.removeAttribute?.('data-filtertube-current-watch-blocked');
+                const shell = document.querySelector('ytm-watch, ytd-watch-flexy');
+                shell?.removeAttribute?.('data-filtertube-current-watch-blocked');
+            } catch (e) {
+            }
+            return;
+        }
+
+        try {
+            ownerMeta.ownerRoot?.setAttribute?.('data-filtertube-current-watch-blocked', 'true');
+            ownerMeta.ownerRoot?.setAttribute?.('data-filtertube-channel-id', ownerMeta.id || '');
+        } catch (e) {
+        }
+        try {
+            const video = document.querySelector('video.html5-main-video');
+            if (video && typeof video.pause === 'function') {
+                video.pause();
+            }
+        } catch (e) {
+        }
+
+        const state = window.__filtertubeCurrentWatchBlockState || (window.__filtertubeCurrentWatchBlockState = {
+            lastVideoId: '',
+            lastAttemptTs: 0
+        });
+        const now = Date.now();
+        const hasPlaylistRowsNow = (() => {
+            try {
+                return getPlaylistPanelRows(getPlaylistPanelContainer() || document).length > 0;
+            } catch (e) {
+                return false;
+            }
+        })();
+        if (state.lastVideoId === ownerMeta.videoId && now - (state.lastAttemptTs || 0) < 1200 && !hasPlaylistRowsNow) {
+            return;
+        }
+        state.lastVideoId = ownerMeta.videoId;
+        state.lastAttemptTs = now;
+
+        try {
+            ownerMeta.ownerRoot?.setAttribute?.('data-filtertube-current-watch-blocked', 'true');
+            ownerMeta.ownerRoot?.setAttribute?.('data-filtertube-channel-id', ownerMeta.id || '');
+        } catch (e) {
+        }
+
+        try {
+            const selected = getPlaylistPanelRows(getPlaylistPanelContainer() || document)
+                .find(row => isSelectedPlaylistPanelRow(row));
+            if (selected) {
+                selected.setAttribute('data-filtertube-hidden-by-channel', 'true');
+                selected.setAttribute('data-filtertube-current-watch-blocked', 'true');
+                if (ownerMeta.id) selected.setAttribute('data-filtertube-channel-id', ownerMeta.id);
+                toggleVisibility(selected, true, `Current watch blocked: ${ownerName}`, true);
+            }
+        } catch (e) {
+        }
+
+        try {
+            const video = document.querySelector('video.html5-main-video');
+            if (video && typeof video.pause === 'function') {
+                video.pause();
+            }
+        } catch (e) {
+        }
+
+        const targetLink = findNextAllowedWatchPlaylistLink(settings, ownerMeta.videoId);
+        if (targetLink) {
+            setTimeout(() => {
+                try {
+                    targetLink.click();
+                } catch (e) {
+                }
+            }, 60);
+            return;
+        }
+
+        if (openWatchPlaylistPanelIfCollapsed()) {
+            setTimeout(() => {
+                try {
+                    if (typeof applyDOMFallback === 'function') {
+                        applyDOMFallback(settings, { preserveScroll: true, forceReprocess: true });
+                    }
+                } catch (e) {
+                }
+            }, 260);
+            return;
+        }
+
+        state.retryVideoId = state.retryVideoId || '';
+        state.retryCount = Number.isFinite(Number(state.retryCount)) ? Number(state.retryCount) : 0;
+        if (state.retryVideoId !== ownerMeta.videoId) {
+            state.retryVideoId = ownerMeta.videoId;
+            state.retryCount = 0;
+        }
+        if (state.retryCount < 3) {
+            state.retryCount += 1;
+            setTimeout(() => {
+                try {
+                    if (typeof applyDOMFallback === 'function') {
+                        applyDOMFallback(settings, { preserveScroll: true, forceReprocess: true });
+                    }
+                } catch (e) {
+                }
+            }, 1300);
+            return;
+        }
+
+        const nextButton = document.querySelector('.ytp-next-button:not([disabled])');
+        if (nextButton) {
+            setTimeout(() => {
+                try {
+                    nextButton.click();
+                } catch (e) {
+                }
+            }, 80);
+            return;
+        }
+
+        const shell = document.querySelector('ytm-watch, ytd-watch-flexy');
+        if (shell) {
+            shell.setAttribute('data-filtertube-current-watch-blocked', 'true');
+            toggleVisibility(shell, true, `Current watch blocked: ${ownerName}`, true);
+        }
+    } catch (e) {
+    }
+}
+
 function markedChannelIsStillBlocked(settings, blockedChannelId, blockedChannelHandle, blockedChannelCustom) {
     if (!settings || typeof settings !== 'object') return false;
     if (!Array.isArray(settings.filterChannels) || settings.filterChannels.length === 0) return false;
@@ -560,6 +1036,16 @@ function ensureContentControlStyles(settings) {
 
     const rules = [];
 
+    rules.push(`
+        ytm-button-renderer a[href^="intent://"],
+        ytm-button-renderer a[href*="youtube://"],
+        ytm-button-renderer a[href*="open_app"],
+        ytm-button-renderer a[href*="play.google.com/store/apps/details"],
+        a[href^="intent://"] {
+            display: none !important;
+        }
+    `);
+
     if (settings.hideHomeFeed) {
         rules.push(`
             ytd-browse[page-subtype="home"] .ytd-rich-grid-renderer,
@@ -587,7 +1073,9 @@ function ensureContentControlStyles(settings) {
 
     if (settings.hideWatchPlaylistPanel) {
         rules.push(`
-            ytd-playlist-panel-renderer {
+            ytd-playlist-panel-renderer,
+            ytm-playlist-panel-renderer,
+            ytm-playlist-panel-renderer-v2 {
                 display: none !important;
             }
         `);
@@ -614,9 +1102,12 @@ function ensureContentControlStyles(settings) {
         rules.push(`
             ytd-radio-renderer,
             ytd-compact-radio-renderer,
+            ytm-radio-renderer,
+            ytm-compact-radio-renderer,
+            ytm-rich-item-renderer:has(ytm-radio-renderer),
+            ytm-rich-item-renderer:has(ytm-compact-radio-renderer),
             ytd-rich-item-renderer:has(a[href*="start_radio=1"]),
             yt-lockup-view-model:has(a[href*="start_radio=1"]),
-            a[href*="start_radio=1"],
             .ytp-videowall-still[data-is-mix="true"] {
                 display: none !important;
             }
@@ -838,6 +1329,29 @@ function ensureContentControlStyles(settings) {
     }
 
     style.textContent = rules.join('\n');
+    hideYouTubeOpenAppButtons();
+}
+
+function hideYouTubeOpenAppButtons() {
+    try {
+        document.querySelectorAll('ytm-button-renderer a, a[href^="intent://"]').forEach(anchor => {
+            const label = (anchor.getAttribute('aria-label') || anchor.textContent || '').toLowerCase();
+            const href = (anchor.getAttribute('href') || '').toLowerCase();
+            const isOpenAppAction =
+                label.includes('open app') ||
+                href.startsWith('intent://') ||
+                href.includes('youtube://') ||
+                href.includes('open_app') ||
+                href.includes('play.google.com/store/apps/details');
+            if (!isOpenAppAction) return;
+
+            const button = anchor.closest('ytm-button-renderer');
+            const target = button || anchor;
+            target.style.setProperty('display', 'none', 'important');
+            target.setAttribute('data-filtertube-hidden-open-app', 'true');
+        });
+    } catch (e) {
+    }
 }
 
 function normalizeTextForMatching(value) {
@@ -1560,12 +2074,11 @@ async function applyDOMFallback(settings, options = {}) {
                 const isPlaylistWatch = params.has('list');
                 if (!isWatch || !isPlaylistWatch) return;
 
-                const playlistPanel = document.querySelector('ytd-playlist-panel-renderer');
-                if (!playlistPanel) return;
-                const items = Array.from(playlistPanel.querySelectorAll('ytd-playlist-panel-video-renderer'));
+                const playlistPanel = getPlaylistPanelContainer() || document;
+                const items = getPlaylistPanelRows(playlistPanel);
                 if (items.length === 0) return;
 
-                const selected = items.find(el => el.hasAttribute('selected') || el.getAttribute('aria-selected') === 'true') || null;
+                const selected = items.find(el => isSelectedPlaylistPanelRow(el)) || null;
                 if (!selected) return;
                 const idx = items.indexOf(selected);
                 if (idx < 0) return;
@@ -1624,11 +2137,10 @@ async function applyDOMFallback(settings, options = {}) {
 
                     // Let YouTube handle normal autoplay, but when the immediate next playlist item
                     // is hidden, force a Next click so our click-guard can skip deterministically.
-                    const playlistPanel = document.querySelector('ytd-playlist-panel-renderer');
-                    if (!playlistPanel) return;
-                    const items = Array.from(playlistPanel.querySelectorAll('ytd-playlist-panel-video-renderer'));
+                    const playlistPanel = getPlaylistPanelContainer() || document;
+                    const items = getPlaylistPanelRows(playlistPanel);
                     if (items.length === 0) return;
-                    const selected = items.find(el => el.hasAttribute('selected') || el.getAttribute('aria-selected') === 'true') || null;
+                    const selected = items.find(el => isSelectedPlaylistPanelRow(el)) || null;
                     if (!selected) return;
                     const idx = items.indexOf(selected);
                     if (idx < 0) return;
@@ -1872,10 +2384,18 @@ async function applyDOMFallback(settings, options = {}) {
                 '.yt-lockup-metadata-view-model__heading-reset, yt-formatted-string#title, span#title, ' +
                 'yt-dynamic-text-view-model h1, .yt-page-header-view-model__page-header-title, .dynamicTextViewModelH1'
             );
-            const isPlaylistPanelRow = (elementTag === 'ytd-playlist-panel-video-renderer' || elementTag === 'ytd-playlist-panel-video-wrapper-renderer');
+            const isPlaylistPanelRow = isPlaylistPanelRowElement(element);
             let channelElement = null;
             if (isPlaylistPanelRow) {
-                channelElement = element.querySelector('#byline, #byline-container #byline');
+                channelElement = element.querySelector(
+                    '#byline, #byline-container #byline, ' +
+                    '.ytmPlaylistPanelVideoRendererByline, ' +
+                    '.ytmPlaylistPanelVideoRendererV2Byline, ' +
+                    '.subhead .YtmCompactMediaItemByline:first-child, ' +
+                    '.YtmCompactMediaItemByline:first-child, ' +
+                    '.compact-media-item-byline, .metadata-row, ' +
+                    'ytm-badge-and-byline-renderer'
+                );
             }
             if (!channelElement && elementTag === 'ytd-video-renderer') {
                 channelElement = element.querySelector(
@@ -1904,9 +2424,16 @@ async function applyDOMFallback(settings, options = {}) {
                 elementTag === 'ytm-playlist-video-renderer' ||
                 elementTag === 'ytm-radio-renderer' ||
                 elementTag === 'ytm-compact-radio-renderer' ||
-                elementTag === 'ytm-compact-playlist-renderer'
+                elementTag === 'ytm-compact-playlist-renderer' ||
+                elementTag === 'ytm-channel-renderer' ||
+                elementTag === 'ytm-compact-channel-renderer' ||
+                elementTag === 'ytm-universal-watch-card-renderer'
             )) {
                 channelElement = element.querySelector(
+                    'ytm-channel-thumbnail-with-link-renderer a[href^="/@"], ' +
+                    'ytm-channel-thumbnail-with-link-renderer a[href^="/channel/"], ' +
+                    'ytm-channel-thumbnail-with-link-renderer a[href^="/c/"], ' +
+                    'ytm-channel-thumbnail-with-link-renderer a[href^="/user/"], ' +
                     '.media-channel a[href^="/@"], ' +
                     '.media-channel a[href^="/channel/"], ' +
                     '.media-channel a[href^="/c/"], ' +
@@ -1919,6 +2446,10 @@ async function applyDOMFallback(settings, options = {}) {
                     'ytm-badge-and-byline-renderer a[href^="/channel/"], ' +
                     'ytm-badge-and-byline-renderer a[href^="/c/"], ' +
                     'ytm-badge-and-byline-renderer a[href^="/user/"], ' +
+                    '.ytm-channel-name a[href^="/@"], ' +
+                    '.ytm-channel-name a[href^="/channel/"], ' +
+                    '.ytm-channel-name a[href^="/c/"], ' +
+                    '.ytm-channel-name a[href^="/user/"], ' +
                     '.YtmBadgeAndBylineRendererItemByline'
                 );
             }
@@ -2001,9 +2532,32 @@ async function applyDOMFallback(settings, options = {}) {
                     }
                 }
             }
+            if (!title && (
+                elementTag === 'ytm-channel-renderer' ||
+                elementTag === 'ytm-compact-channel-renderer' ||
+                elementTag === 'ytm-universal-watch-card-renderer'
+            )) {
+                const mobileChannelTitle = element.querySelector(
+                    'h3, h2, .channel-title, .ytm-channel-name, .yt-core-attributed-string, [role="heading"]'
+                )?.textContent?.trim() || '';
+                if (mobileChannelTitle && !mobileChannelTitle.includes('•')) {
+                    title = mobileChannelTitle;
+                }
+            }
             const channelPrimaryText = channelElement?.textContent?.trim() || '';
             const channelSubtitleText = channelSubtitleElement?.textContent?.trim() || '';
             let channel = [channelPrimaryText, channelSubtitleText].filter(Boolean).join(' | ');
+            if (!channel && (
+                elementTag === 'ytm-channel-renderer' ||
+                elementTag === 'ytm-compact-channel-renderer' ||
+                elementTag === 'ytm-universal-watch-card-renderer'
+            )) {
+                const mobileHandleText = element.querySelector(
+                    'a[href^="/@"], a[href^="/channel/"], a[href^="/c/"], a[href^="/user/"], ' +
+                    '.subhead, .secondary-text, .ytm-channel-name, ytm-badge-and-byline-renderer'
+                )?.textContent?.trim() || '';
+                channel = mobileHandleText || title;
+            }
             if (elementTag === 'yt-official-card-view-model') {
                 const officialHandleText = (
                     element.querySelector('.yt-page-header-view-model__page-header-content-metadata [role="text"]')?.textContent || ''
@@ -2047,10 +2601,11 @@ async function applyDOMFallback(settings, options = {}) {
                 }
             }
             if (isPlaylistPanelRow) {
-                const compact = channelPrimaryText
-                    .split('\n')[0]
-                    .split('•')[0]
-                    .trim();
+                const compact = extractPlaylistPanelBylineChannelName(
+                    channelPrimaryText
+                        .split('\n')[0]
+                        .trim()
+                ) || extractPlaylistPanelBylineChannelName(channelPrimaryText);
                 channel = compact;
             }
 
@@ -2348,8 +2903,7 @@ async function applyDOMFallback(settings, options = {}) {
                             if (path !== '/watch') return false;
                             const params = new URLSearchParams(document.location?.search || '');
                             if (!params.has('list')) return false;
-                            const tag = (element.tagName || '').toLowerCase();
-                            return tag === 'ytd-playlist-panel-video-renderer' || tag === 'ytd-playlist-panel-video-wrapper-renderer';
+                            return isPlaylistPanelRowElement(element);
                         } catch (e) {
                             return false;
                         }
@@ -2378,12 +2932,7 @@ async function applyDOMFallback(settings, options = {}) {
                     } else if (isWatchPlaylistRow) {
                         let isSelectedRow = false;
                         try {
-                            const rowEl = element.tagName?.toLowerCase() === 'ytd-playlist-panel-video-renderer'
-                                ? element
-                                : element.querySelector?.('ytd-playlist-panel-video-renderer');
-                            isSelectedRow = Boolean(
-                                rowEl && (rowEl.hasAttribute('selected') || rowEl.getAttribute('aria-selected') === 'true')
-                            );
+                            isSelectedRow = isSelectedPlaylistPanelRow(element);
                         } catch (e) {
                         }
 
@@ -2669,8 +3218,11 @@ async function applyDOMFallback(settings, options = {}) {
             } else if (elementTag === 'yt-lockup-view-model' || elementTag === 'yt-lockup-metadata-view-model') {
                 const parent = element.closest('ytd-rich-item-renderer');
                 if (parent) targetToHide = parent;
-            } else if (elementTag === 'ytd-playlist-panel-video-renderer') {
+            } else if (isPlaylistPanelRow) {
                 const wrapper = element.closest('ytd-playlist-panel-video-wrapper-renderer');
+                if (wrapper) targetToHide = wrapper;
+            } else if (elementTag === 'ytm-radio-renderer' || elementTag === 'ytm-compact-radio-renderer') {
+                const wrapper = element.closest('ytm-rich-item-renderer');
                 if (wrapper) targetToHide = wrapper;
             }
 
@@ -2684,6 +3236,20 @@ async function applyDOMFallback(settings, options = {}) {
             }
             if (hideByCategory) {
                 hideReason = `Category filter: ${title}`;
+            }
+
+            if (effectiveSettings.hideMixPlaylists && isFilterTubeMixOrRadioElement(element)) {
+                shouldHide = true;
+                hideReason = `Mix/radio hidden: ${title || 'Mix / Radio'}`;
+                try {
+                    targetToHide.setAttribute('data-filtertube-hidden-by-mix-radio', 'true');
+                } catch (e) {
+                }
+            } else {
+                try {
+                    targetToHide.removeAttribute('data-filtertube-hidden-by-mix-radio');
+                } catch (e) {
+                }
             }
 
             const pendingMetaTtlMs = 8000;
@@ -2781,12 +3347,7 @@ async function applyDOMFallback(settings, options = {}) {
             if (isPlaylistPanelRow) {
                 let isSelectedRow = false;
                 try {
-                    const rowEl = element.tagName?.toLowerCase() === 'ytd-playlist-panel-video-renderer'
-                        ? element
-                        : element.querySelector?.('ytd-playlist-panel-video-renderer');
-                    isSelectedRow = Boolean(
-                        rowEl && (rowEl.hasAttribute('selected') || rowEl.getAttribute('aria-selected') === 'true')
-                    );
+                    isSelectedRow = isSelectedPlaylistPanelRow(element);
                 } catch (e) {
                 }
 
@@ -2863,6 +3424,7 @@ async function applyDOMFallback(settings, options = {}) {
                                 || targetToHide.getAttribute('data-filtertube-hidden-by-duration')
                                 || targetToHide.getAttribute('data-filtertube-hidden-by-upload-date')
                                 || targetToHide.getAttribute('data-filtertube-hidden-by-category')
+                                || targetToHide.getAttribute('data-filtertube-hidden-by-mix-radio')
                                 || targetToHide.getAttribute('data-filtertube-hidden-by-hide-all-shorts')
                             );
                         } catch (e) {
@@ -3392,6 +3954,11 @@ async function applyDOMFallback(settings, options = {}) {
     }
 
     try {
+        enforceCurrentWatchOwnerBlock(effectiveSettings);
+    } catch (e) {
+    }
+
+    try {
         if (!window.__filtertubePlaylistSkipState) {
             window.__filtertubePlaylistSkipState = { lastAttemptTs: 0, lastSelectedVideoId: '', lastDirection: 1 };
         }
@@ -3401,11 +3968,11 @@ async function applyDOMFallback(settings, options = {}) {
             const isWatch = (document.location?.pathname || '').startsWith('/watch');
             const params = new URLSearchParams(document.location?.search || '');
             const isPlaylistWatch = params.has('list');
-            const playlistPanel = document.querySelector('ytd-playlist-panel-renderer');
+            const playlistPanel = getPlaylistPanelContainer() || document;
             if (isWatch && isPlaylistWatch && playlistPanel) {
-                const items = Array.from(playlistPanel.querySelectorAll('ytd-playlist-panel-video-renderer'));
+                const items = getPlaylistPanelRows(playlistPanel);
                 if (items.length > 0) {
-                    const selected = items.find(el => el.hasAttribute('selected') || el.getAttribute('aria-selected') === 'true') || null;
+                    const selected = items.find(el => isSelectedPlaylistPanelRow(el)) || null;
                     const isHidden = selected && isExplicitlyHiddenByFilterTube(selected);
                     if (selected && isHidden) {
                         const selectedHref = selected.querySelector('a[href*="watch?v="]')?.getAttribute('href') || '';
@@ -3638,7 +4205,7 @@ function shouldHideContent(title, channel, settings, options = {}) {
 
     if (settings.filterChannels && settings.filterChannels.length > 0 && !hasChannelIdentity && (!collaborators || collaborators.length === 0)) {
         const tag = (contentTag || '').toLowerCase();
-        const isPlaylistPanelItem = tag === 'ytd-playlist-panel-video-renderer' || tag === 'ytd-playlist-panel-video-wrapper-renderer';
+        const isPlaylistPanelItem = isPlaylistPanelRowElement(tag);
         if (isPlaylistPanelItem) {
             const index = getCompiledChannelFilterIndex(settings);
             const candidate = normalizeChannelNameForComparison(channel);

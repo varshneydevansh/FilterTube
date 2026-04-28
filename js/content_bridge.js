@@ -250,7 +250,7 @@ function pickMenuChannelDisplayName(channelInfo, injectionOptions = {}) {
     })();
 
     if (isLowConfidenceExpectedChannelLabel(channelInfo)) {
-        return mappedHandle || channelInfo?.id || 'Channel';
+        return mappedHandle || safeDisplay || safeName || channelInfo?.id || 'Channel';
     }
 
     return (
@@ -338,9 +338,14 @@ function collectCardTitleHints(card) {
         if (!value || typeof value !== 'string') return false;
         const trimmed = value.trim();
         if (!trimmed) return false;
+        if (/^(more actions|action menu|filtertube menu|send feedback)$/i.test(trimmed)) return false;
+        if (/^go to channel\b/i.test(trimmed)) return false;
+        if (/^subscribe to\b/i.test(trimmed)) return false;
+        if (/^quick block\b/i.test(trimmed)) return false;
         if (/^\d+:\d+/.test(trimmed)) return false;
         if (trimmed.includes('•')) return false;
         if (/\bviews?\b/i.test(trimmed)) return false;
+        if (/\bsubscribers?\b/i.test(trimmed)) return false;
         if (/\bago\b/i.test(trimmed)) return false;
         if (trimmed.startsWith('@')) return false;
         if (/^UC[a-zA-Z0-9_-]{22}$/.test(trimmed)) return false;
@@ -349,6 +354,20 @@ function collectCardTitleHints(card) {
 
     const hints = [];
     const seen = new Set();
+    const addHint = (raw) => {
+        const value = String(raw || '').replace(/\s+/g, ' ').trim();
+        if (!isProbablyTitleHint(value)) return;
+        const key = value.toLowerCase();
+        if (seen.has(key)) return;
+        seen.add(key);
+        hints.push(value);
+    };
+
+    try {
+        addHint(card.data?.overlayMetadata?.primaryText?.content);
+        addHint(card.__data?.data?.overlayMetadata?.primaryText?.content);
+    } catch (e) {
+    }
 
     selectors.forEach((selector) => {
         try {
@@ -357,12 +376,7 @@ function collectCardTitleHints(card) {
                 const raw = selector === '[aria-label]'
                     ? (node.getAttribute('aria-label') || '')
                     : (node.textContent || '');
-                const value = raw.replace(/\s+/g, ' ').trim();
-                if (!isProbablyTitleHint(value)) return;
-                const key = value.toLowerCase();
-                if (seen.has(key)) return;
-                seen.add(key);
-                hints.push(value);
+                addHint(raw);
             });
         } catch (e) {
         }
@@ -538,11 +552,11 @@ function injectCollaboratorPlaceholderMenu(newMenuList, oldMenuList, message = '
 
     const buildPlaceholderContent = (primaryText, secondaryText) => `
         <div class="filtertube-menu-title-wrapper filtertube-menu-title-wrapper--placeholder">
-            <span class="filtertube-menu-title" role="text" style="color: rgba(226, 232, 240, 0.7);">
+            <span class="filtertube-menu-title" role="text" style="color:#475569;">
                 <span class="filtertube-menu-label">Block</span>
                 <span class="filtertube-menu-separator">•</span>
                 <span class="filtertube-channel-name">${escapeHtml(primaryText)}</span>
-                ${secondaryText ? `<div style="font-size:12px;color:rgba(148,163,184,0.9);margin-top:4px;">${escapeHtml(secondaryText)}</div>` : ''}
+                ${secondaryText ? `<div style="font-size:12px;color:#64748b;margin-top:4px;">${escapeHtml(secondaryText)}</div>` : ''}
             </span>
         </div>
     `;
@@ -555,11 +569,11 @@ function injectCollaboratorPlaceholderMenu(newMenuList, oldMenuList, message = '
             item.setAttribute('tabindex', '0');
             item.style.opacity = '0.6';
             item.style.pointerEvents = 'none';
-            item.innerHTML = `
-                <div class="yt-list-item-view-model__label filtertube-menu-item" style="padding:8px 12px;">
-                    ${buildPlaceholderContent(primary, secondary)}
-                </div>
-            `;
+            const label = document.createElement('div');
+            label.className = 'yt-list-item-view-model__label filtertube-menu-item';
+            label.style.padding = '8px 12px';
+            label.appendChild(createFilterTubePlaceholderContent(primary, secondary));
+            item.appendChild(label);
             return item;
         };
 
@@ -583,11 +597,12 @@ function injectCollaboratorPlaceholderMenu(newMenuList, oldMenuList, message = '
             item.setAttribute('tabindex', '-1');
             item.style.opacity = '0.6';
             item.style.pointerEvents = 'none';
-            item.innerHTML = `
-                <tp-yt-paper-item class="style-scope ${itemScope} filtertube-menu-item" role="option" tabindex="-1">
-                    ${buildPlaceholderContent(primary, secondary)}
-                </tp-yt-paper-item>
-            `;
+            const paperItem = document.createElement('tp-yt-paper-item');
+            paperItem.className = `style-scope ${itemScope} filtertube-menu-item`;
+            paperItem.setAttribute('role', 'option');
+            paperItem.setAttribute('tabindex', '-1');
+            paperItem.appendChild(createFilterTubePlaceholderContent(primary, secondary));
+            item.appendChild(paperItem);
             return item;
         };
 
@@ -605,7 +620,10 @@ function getMenuContainers(dropdown, existingNew, existingOld) {
         'tp-yt-paper-listbox#items, ' +
         'tp-yt-paper-listbox, ' +
         'div.menu-content[role="dialog"], ' +
+        '.bottom-sheet-media-menu-item, ' +
+        'bottom-sheet-layout, ' +
         'ytm-menu-popup-renderer, ' +
+        'ytm-menu-navigation-item-renderer, ' +
         'ytm-menu-service-item-renderer, ' +
         '#items.ytm-menu-popup-renderer, ' +
         '#items.style-scope.ytm-menu-popup-renderer, ' +
@@ -2214,7 +2232,7 @@ function sanitizeCollaboratorList(collaborators = []) {
         const normalized = {
             name: (collab.name || '').trim(),
             handle: normalizeHandleValue(collab.handle),
-            id: typeof collab.id === 'string' ? collab.id.trim() : '',
+            id: (typeof collab.id === 'string' && /^UC[\w-]{22}$/i.test(collab.id.trim())) ? collab.id.trim() : '',
             customUrl: typeof collab.customUrl === 'string' ? collab.customUrl.trim() : ''
         };
 
@@ -2412,6 +2430,20 @@ function getValidatedCachedCollaborators(card) {
     return getCachedCollaboratorsFromCard(card);
 }
 
+function clearCollaboratorMetadataFromCard(card) {
+    if (!card || typeof card.removeAttribute !== 'function') return;
+    try {
+        card.removeAttribute('data-filtertube-collaborators');
+        card.removeAttribute('data-filtertube-collaborators-source');
+        card.removeAttribute('data-filtertube-collaborators-ts');
+        card.removeAttribute('data-filtertube-expected-collaborators');
+        card.removeAttribute('data-filtertube-collab-state');
+        card.removeAttribute('data-filtertube-collab-awaiting-dialog');
+        card.removeAttribute('data-filtertube-collab-requested');
+    } catch (e) {
+    }
+}
+
 function buildCollaboratorSignature(collaborators = []) {
     if (!Array.isArray(collaborators) || collaborators.length === 0) return '';
     return collaborators
@@ -2564,14 +2596,64 @@ function countDistinctChannelLinks(root) {
 function isMixCardElement(element) {
     if (!element || typeof element.querySelector !== 'function') return false;
     const root = findVideoCardElement(element) || element;
-    const href = root.querySelector('a[href*="list=RDMM"], a[href*="start_radio=1"]')?.getAttribute('href') || '';
-    if (href && (href.includes('list=RDMM') || href.includes('start_radio=1'))) {
+
+    const tagName = (root.tagName || '').toLowerCase();
+    if (
+        tagName === 'ytm-compact-radio-renderer' ||
+        tagName === 'ytm-radio-renderer' ||
+        tagName === 'ytd-radio-renderer' ||
+        tagName === 'ytd-compact-radio-renderer'
+    ) {
         return true;
     }
-    const badgeText = root.querySelector('yt-thumbnail-overlay-badge-view-model badge-shape .yt-badge-shape__text')?.textContent?.trim() || '';
+
+    const href = root.querySelector('a[href*="list=RDMM"], a[href*="list=RD"], a[href*="start_radio=1"]')?.getAttribute('href') || '';
+    if (href && href.includes('list=RDMM')) {
+        return true;
+    }
+
+    const titleText = (
+        root.querySelector(
+            '#video-title, ' +
+            'a#video-title, ' +
+            'yt-formatted-string#video-title, ' +
+            'h3, ' +
+            'h3 a, ' +
+            '.compact-media-item-headline, ' +
+            '.media-item-headline, ' +
+            '.yt-lockup-metadata-view-model__title, ' +
+            '.yt-lockup-view-model__title, ' +
+            '.yt-lockup-metadata-view-model-wiz__title, ' +
+            '.yt-core-attributed-string[role="text"], ' +
+            '.ShortsLockupViewModelHostMetadataTitle'
+        )?.textContent ||
+        root.querySelector('a[aria-label*="Mix" i], [aria-label*="Mix -" i], [aria-label*="My Mix" i]')?.getAttribute('aria-label') ||
+        root.getAttribute('aria-label') ||
+        ''
+    ).replace(/\s+/g, ' ').trim();
+    if (/^(mix\s*[-:]|my mix\b)/i.test(titleText)) {
+        return true;
+    }
+
+    const textPrefix = (root.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 160);
+    if (/^(mix\s*[-:]|my mix\b)/i.test(textPrefix)) {
+        return true;
+    }
+
+    const badgeText = Array.from(root.querySelectorAll(
+        'yt-thumbnail-overlay-badge-view-model badge-shape .yt-badge-shape__text, ' +
+        '.ytm-badge-and-byline-item, ' +
+        '.badge-style-type-simple'
+    ))
+        .map(node => node?.textContent?.trim() || '')
+        .find(Boolean) || '';
     if (badgeText.toLowerCase() === 'mix') {
         return true;
     }
+
+    // Mobile search video results commonly include start_radio=1 on the normal
+    // watch link. That does not make the video card a Mix card, and treating it
+    // as one suppresses collaborator extraction from "and N more" bylines.
     return false;
 }
 
@@ -3968,6 +4050,10 @@ function getWatchLikeCollaborationWarmup(videoCard) {
 
 function promoteYtmWatchRowIdentityFromCollaboratorMetadata(channelInfo, videoCard) {
     const baseInfo = (channelInfo && typeof channelInfo === 'object') ? { ...channelInfo } : {};
+    if (videoCard && isMixCardElement(videoCard)) {
+        clearCollaboratorMetadataFromCard(videoCard);
+        return baseInfo;
+    }
     if (!videoCard || !isYtmWatchLikeCollaboratorCard(videoCard)) {
         return baseInfo;
     }
@@ -4071,6 +4157,16 @@ function cardHasCollaborationDomSignal(videoCard) {
 
 function normalizeCollaboratorChannelInfoForCard(initialChannelInfo, videoCard, options = {}) {
     const baseInfo = (initialChannelInfo && typeof initialChannelInfo === 'object') ? { ...initialChannelInfo } : {};
+    if (videoCard && isMixCardElement(videoCard)) {
+        clearCollaboratorMetadataFromCard(videoCard);
+        return {
+            channelInfo: baseInfo,
+            collaborators: [],
+            expectedCollaboratorCount: 0,
+            rosterComplete: false,
+            signature: ''
+        };
+    }
     const fallbackVideoId = typeof options.videoId === 'string' ? options.videoId.trim() : '';
     const videoId = fallbackVideoId || (
         (typeof baseInfo.videoId === 'string' && baseInfo.videoId.trim())
@@ -4191,6 +4287,10 @@ function normalizeCollaboratorChannelInfoForCard(initialChannelInfo, videoCard, 
 
 function promoteChannelInfoFromCollaboratorSignals(channelInfo, videoCard) {
     const baseInfo = (channelInfo && typeof channelInfo === 'object') ? { ...channelInfo } : {};
+    if (videoCard && isMixCardElement(videoCard)) {
+        clearCollaboratorMetadataFromCard(videoCard);
+        return baseInfo;
+    }
     if (!videoCard || baseInfo.isCollaboration) return baseInfo;
 
     let videoId = '';
@@ -5276,8 +5376,14 @@ async function initializeDOMFallback(settings) {
 }
 
 let fallbackMenuButtonsInstalled = false;
+let fallbackMenuButtonsRescan = null;
 function ensureFallbackMenuButtons() {
-    if (fallbackMenuButtonsInstalled) return;
+    if (fallbackMenuButtonsInstalled) {
+        if (typeof fallbackMenuButtonsRescan === 'function') {
+            try { fallbackMenuButtonsRescan(); } catch (e) { }
+        }
+        return;
+    }
     fallbackMenuButtonsInstalled = true;
 
     try {
@@ -5565,9 +5671,14 @@ function ensureFallbackMenuButtons() {
             tagName === 'ytm-video-with-context-renderer' ||
             tagName === 'ytm-compact-video-renderer' ||
             tagName === 'ytm-playlist-video-renderer' ||
-            tagName === 'ytm-compact-playlist-renderer'
+            tagName === 'ytm-compact-playlist-renderer' ||
+            tagName === 'ytm-shorts-lockup-view-model' ||
+            tagName === 'ytm-shorts-lockup-view-model-v2'
         ) {
             const itemHost =
+                card.querySelector('.ShortsLockupViewModelHost') ||
+                card.querySelector('.shortsLockupViewModelHostOutsideMetadata') ||
+                card.querySelector('.ShortsLockupViewModelHostMetadata') ||
                 card.querySelector('.YtmCompactMediaItemHost') ||
                 card.querySelector('ytm-media-item') ||
                 card.querySelector('.details.stacked')?.parentElement ||
@@ -5579,12 +5690,24 @@ function ensureFallbackMenuButtons() {
         if (isCommentContextTag(tagName)) {
             const threadHost = card.closest('ytd-comment-thread-renderer, ytm-comment-thread-renderer');
             const root = threadHost || card;
+            const mobileCommentMenuButton =
+                root.querySelector('button.YtmCommentRendererMenu') ||
+                root.querySelector('.YtmCommentRendererMenu');
+            if (mobileCommentMenuButton?.parentElement) {
+                return mobileCommentMenuButton.parentElement;
+            }
+
             const actionMenuHost =
                 root.querySelector('#action-menu') ||
                 root.querySelector('#action-menu ytd-menu-renderer') ||
                 root.querySelector('#action-menu ytm-menu-renderer');
             if (actionMenuHost) {
                 return ensureInjectedSlot(actionMenuHost, 'filtertube-fallback-menu-slot--comment');
+            }
+
+            const mobileDetailsHost = root.querySelector('.YtmCommentRendererDetails') || root.querySelector('.YtmCommentRendererHeader');
+            if (mobileDetailsHost) {
+                return mobileDetailsHost;
             }
 
             const headerHost = root.querySelector('#header') || root.querySelector('#toolbar') || root.querySelector('#main');
@@ -5604,11 +5727,17 @@ function ensureFallbackMenuButtons() {
         btn.setAttribute('aria-expanded', 'false');
         btn.setAttribute('data-filtertube-fallback-menu', 'true');
         btn.setAttribute('data-filtertube-fallback-surface', surface || 'generic');
-        btn.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <path fill="currentColor" d="M12 4a2 2 0 1 0 0 4a2 2 0 0 0 0-4Zm0 6a2 2 0 1 0 0 4a2 2 0 0 0 0-4Zm0 6a2 2 0 1 0 0 4a2 2 0 0 0 0-4Z"/>
-            </svg>
-        `;
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('width', '20');
+        svg.setAttribute('height', '20');
+        svg.setAttribute('viewBox', '0 0 24 24');
+        svg.setAttribute('aria-hidden', 'true');
+        svg.setAttribute('focusable', 'false');
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('fill', 'currentColor');
+        path.setAttribute('d', 'M12 4a2 2 0 1 0 0 4a2 2 0 0 0 0-4Zm0 6a2 2 0 1 0 0 4a2 2 0 0 0 0-4Zm0 6a2 2 0 1 0 0 4a2 2 0 0 0 0-4Z');
+        svg.appendChild(path);
+        btn.appendChild(svg);
         btn.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -5621,24 +5750,40 @@ function ensureFallbackMenuButtons() {
         return btn;
     };
 
-    const ensureFallbackButtonForCard = (card) => {
+    const ensureFallbackButtonForCard = (card, debug = null) => {
         if (!card || !(card instanceof Element)) return;
         const tagName = (card.tagName || '').toLowerCase();
+        const isComment = isCommentContextTag(tagName);
+        const isShortsFallbackSurface =
+            tagName === 'ytm-shorts-lockup-view-model' ||
+            tagName === 'ytm-shorts-lockup-view-model-v2';
+        if (debug && isComment) debug.comments += 1;
 
-        if (isCommentContextTag(tagName)) {
+        if (isComment) {
             const threadHost = card.closest('ytd-comment-thread-renderer, ytm-comment-thread-renderer');
-            if (threadHost && threadHost !== card) return;
+            if (threadHost && threadHost !== card) {
+                if (debug) debug.skippedNestedComment += 1;
+                return;
+            }
         }
 
-        if (cardHasNativeMenuButton(card)) {
+        if (!isComment && !isShortsFallbackSurface && cardHasNativeMenuButton(card)) {
+            if (debug) debug.skippedNative += 1;
             cleanupFallbackArtifacts(card);
             return;
         }
 
         const menuHost = getMenuHostForCard(card);
-        if (!menuHost) return;
+        if (!menuHost) {
+            if (debug) debug.missingHost += 1;
+            return;
+        }
+        if (debug) debug.hosts += 1;
 
-        if (menuHost.querySelector('.filtertube-playlist-menu-fallback-btn')) return;
+        if (menuHost.querySelector('.filtertube-playlist-menu-fallback-btn')) {
+            if (debug) debug.existing += 1;
+            return;
+        }
 
         let surface = 'generic';
         if (tagName === 'ytd-playlist-panel-video-renderer') {
@@ -5653,6 +5798,8 @@ function ensureFallbackMenuButtons() {
             tagName === 'ytm-compact-playlist-renderer'
         ) {
             surface = 'ytm-playlist';
+        } else if (isShortsFallbackSurface) {
+            surface = 'ytm-shorts';
         } else if (isCommentContextTag(tagName)) {
             surface = 'comment';
         }
@@ -5660,7 +5807,9 @@ function ensureFallbackMenuButtons() {
         const btn = createFallbackButton(card, surface);
         try {
             menuHost.appendChild(btn);
+            if (debug) debug.appended += 1;
         } catch (e) {
+            if (debug) debug.errors.push(String(e && e.message ? e.message : e));
         }
     };
 
@@ -5673,24 +5822,57 @@ function ensureFallbackMenuButtons() {
             'ytm-compact-video-renderer, ' +
             'ytm-playlist-video-renderer, ' +
             'ytm-compact-playlist-renderer, ' +
+            'ytm-shorts-lockup-view-model, ' +
+            'ytm-shorts-lockup-view-model-v2, ' +
             'ytd-comment-thread-renderer, ' +
             'ytm-comment-thread-renderer, ' +
             'ytd-comment-view-model, ' +
             'ytm-comment-view-model'
         );
         if (!cards || cards.length === 0) return;
-        cards.forEach(card => ensureFallbackButtonForCard(card));
+        const debug = {
+            cards: cards.length,
+            comments: 0,
+            hosts: 0,
+            existing: 0,
+            appended: 0,
+            skippedNative: 0,
+            skippedNestedComment: 0,
+            missingHost: 0,
+            errors: []
+        };
+        cards.forEach(card => {
+            try {
+                ensureFallbackButtonForCard(card, debug);
+            } catch (e) {
+                debug.errors.push(String(e && e.message ? e.message : e));
+            }
+        });
+        try {
+            window.FilterTube_lastFallbackScan = debug;
+        } catch (e) {
+        }
     };
 
     let scanQueued = false;
     const scheduleScan = () => {
         if (scanQueued) return;
         scanQueued = true;
-        requestAnimationFrame(() => {
+        const runScan = () => {
+            if (!scanQueued) return;
             scanQueued = false;
             try { scan(); } catch (e) { }
-        });
+        };
+        requestAnimationFrame(runScan);
+        setTimeout(runScan, 120);
     };
+    fallbackMenuButtonsRescan = () => {
+        try { scan(); } catch (e) { }
+    };
+    try {
+        window.FilterTube_rescanFallbackMenus = fallbackMenuButtonsRescan;
+    } catch (e) {
+    }
 
     const observer = new MutationObserver(() => {
         scheduleScan();
@@ -5715,6 +5897,30 @@ function ensureFallbackMenuButtons() {
     document.addEventListener('yt-navigate-finish', () => {
         scheduleScan();
     });
+    document.addEventListener('click', () => {
+        scheduleScan();
+        setTimeout(() => {
+            if (typeof fallbackMenuButtonsRescan === 'function') {
+                fallbackMenuButtonsRescan();
+            }
+        }, 700);
+    }, true);
+    window.addEventListener('scroll', () => {
+        scheduleScan();
+    }, true);
+
+    let warmupScans = 0;
+    const warmupTimer = setInterval(() => {
+        warmupScans += 1;
+        if (typeof fallbackMenuButtonsRescan === 'function') {
+            fallbackMenuButtonsRescan();
+        } else {
+            scheduleScan();
+        }
+        if (warmupScans >= 20) {
+            clearInterval(warmupTimer);
+        }
+    }, 1500);
 }
 
 let playlistFallbackPopoverState = null;
@@ -5815,6 +6021,8 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
             'ytd-channel-name',
             '#author-text',
             '#owner-name',
+            '.subhead .YtmCompactMediaItemByline:first-child',
+            '.YtmCompactMediaItemByline:first-child',
             'a[href*="/@"]'
         ];
 
@@ -5855,31 +6063,64 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
             item.setAttribute('data-collaboration-group-id', channelInfo.collaborationGroupId);
         }
 
-        const channelName = escapeHtml(pickMenuChannelDisplayName(channelInfo, injectionOptions));
-        const filterTubeSvg = `<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 128 128" style="display: block;">
-            <path fill="#FF3333" d="M53.004837,77.261787 C55.004650,68.586563 48.961483,63.525127 45.151901,57.831970 C36.636456,45.106262 27.572891,32.747910 18.776752,20.208942 C17.048302,17.745022 18.246574,14.746576 21.199722,14.076863 C22.310389,13.824986 23.520674,14.001245 24.685543,14.001154 C51.482349,13.999036 78.279152,13.997606 105.075958,14.002748 C107.511017,14.003215 110.410080,13.422483 111.785439,15.933891 C113.178085,18.476864 111.026321,20.660681 109.690315,22.593620 C99.594292,37.200588 89.433075,51.763405 79.158081,66.244827 C77.520378,68.552994 76.925735,70.848900 76.965294,73.583061 C77.066391,80.572067 76.851021,87.568138 77.069214,94.551788 C77.160759,97.481934 76.221825,99.467453 74.122963,101.447235 C69.040611,106.241264 64.241066,111.333801 59.229191,116.204849 C58.138329,117.265060 57.330574,119.514366 55.379189,118.670372 C53.447678,117.834984 52.933788,115.906029 52.954082,113.675346 C53.063110,101.692680 53.005142,89.708488 53.004837,77.261787 z"/>
-            <path fill="#FF0000" d="M63.316730,58.295921 C61.783310,59.317360 60.616657,60.253048 59.307014,60.898705 C55.871113,62.592613 54.045387,61.557888 54.023708,57.807045 C53.960236,46.824589 53.943741,35.841064 54.033154,24.858967 C54.064426,21.018126 56.738575,19.503649 60.024136,21.659582 C67.653084,26.665573 75.198029,31.814018 82.579330,37.176819 C86.212624,39.816536 85.950592,42.679234 82.150856,45.360466 C76.029831,49.679680 69.801399,53.846684 63.316730,58.295921 z"/>
-        </svg>`;
+        const channelName = pickMenuChannelDisplayName(channelInfo, injectionOptions);
+        const container = document.createElement('div');
+        container.className = 'yt-list-item-view-model__label yt-list-item-view-model__container yt-list-item-view-model__container--compact yt-list-item-view-model__container--tappable yt-list-item-view-model__container--in-popup filtertube-menu-item';
 
-        item.innerHTML = `
-            <div class="yt-list-item-view-model__label yt-list-item-view-model__container yt-list-item-view-model__container--compact yt-list-item-view-model__container--tappable yt-list-item-view-model__container--in-popup filtertube-menu-item">
-                <div aria-hidden="true" class="yt-list-item-view-model__image-container yt-list-item-view-model__leading" style="display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; flex-shrink: 0;">
-                    ${filterTubeSvg}
-                </div>
-                <div class="yt-list-item-view-model__text-wrapper" style="flex: 1; min-width: 0;">
-                    <div class="yt-list-item-view-model__title-wrapper filtertube-menu-title-wrapper">
-                        <span class="filtertube-menu-title" role="text">
-                            <span class="filtertube-menu-label">Block</span>
-                            <span class="filtertube-menu-separator">•</span>
-                            <span class="filtertube-channel-name">${channelName}</span>
-                        </span>
-                        <div class="filtertube-filter-all-toggle exact-toggle toggle-variant-red">
-                            Filter All
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
+        const iconContainer = document.createElement('div');
+        iconContainer.setAttribute('aria-hidden', 'true');
+        iconContainer.className = 'yt-list-item-view-model__image-container yt-list-item-view-model__leading';
+        iconContainer.style.display = 'flex';
+        iconContainer.style.alignItems = 'center';
+        iconContainer.style.justifyContent = 'center';
+        iconContainer.style.width = '24px';
+        iconContainer.style.height = '24px';
+        iconContainer.style.flexShrink = '0';
+
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('version', '1.1');
+        svg.setAttribute('width', '24');
+        svg.setAttribute('height', '24');
+        svg.setAttribute('viewBox', '0 0 128 128');
+        svg.style.display = 'block';
+        const filterPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        filterPath.setAttribute('fill', '#FF3333');
+        filterPath.setAttribute('d', 'M53.004837,77.261787 C55.004650,68.586563 48.961483,63.525127 45.151901,57.831970 C36.636456,45.106262 27.572891,32.747910 18.776752,20.208942 C17.048302,17.745022 18.246574,14.746576 21.199722,14.076863 C22.310389,13.824986 23.520674,14.001245 24.685543,14.001154 C51.482349,13.999036 78.279152,13.997606 105.075958,14.002748 C107.511017,14.003215 110.410080,13.422483 111.785439,15.933891 C113.178085,18.476864 111.026321,20.660681 109.690315,22.593620 C99.594292,37.200588 89.433075,51.763405 79.158081,66.244827 C77.520378,68.552994 76.925735,70.848900 76.965294,73.583061 C77.066391,80.572067 76.851021,87.568138 77.069214,94.551788 C77.160759,97.481934 76.221825,99.467453 74.122963,101.447235 C69.040611,106.241264 64.241066,111.333801 59.229191,116.204849 C58.138329,117.265060 57.330574,119.514366 55.379189,118.670372 C53.447678,117.834984 52.933788,115.906029 52.954082,113.675346 C53.063110,101.692680 53.005142,89.708488 53.004837,77.261787 z');
+        const playPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        playPath.setAttribute('fill', '#FF0000');
+        playPath.setAttribute('d', 'M63.316730,58.295921 C61.783310,59.317360 60.616657,60.253048 59.307014,60.898705 C55.871113,62.592613 54.045387,61.557888 54.023708,57.807045 C53.960236,46.824589 53.943741,35.841064 54.033154,24.858967 C54.064426,21.018126 56.738575,19.503649 60.024136,21.659582 C67.653084,26.665573 75.198029,31.814018 82.579330,37.176819 C86.212624,39.816536 85.950592,42.679234 82.150856,45.360466 C76.029831,49.679680 69.801399,53.846684 63.316730,58.295921 z');
+        svg.append(filterPath, playPath);
+        iconContainer.appendChild(svg);
+
+        const textWrapper = document.createElement('div');
+        textWrapper.className = 'yt-list-item-view-model__text-wrapper';
+        textWrapper.style.flex = '1';
+        textWrapper.style.minWidth = '0';
+
+        const titleWrapper = document.createElement('div');
+        titleWrapper.className = 'yt-list-item-view-model__title-wrapper filtertube-menu-title-wrapper';
+        const title = document.createElement('span');
+        title.className = 'filtertube-menu-title';
+        title.setAttribute('role', 'text');
+        const label = document.createElement('span');
+        label.className = 'filtertube-menu-label';
+        label.textContent = 'Block';
+        const separator = document.createElement('span');
+        separator.className = 'filtertube-menu-separator';
+        separator.textContent = '•';
+        const name = document.createElement('span');
+        name.className = 'filtertube-channel-name';
+        name.textContent = channelName;
+        title.append(label, separator, name);
+
+        const toggleEl = document.createElement('div');
+        toggleEl.className = 'filtertube-filter-all-toggle exact-toggle toggle-variant-red';
+        toggleEl.textContent = 'Filter All';
+
+        titleWrapper.append(title, toggleEl);
+        textWrapper.appendChild(titleWrapper);
+        container.append(iconContainer, textWrapper);
+        item.appendChild(container);
 
         const toggle = item.querySelector('.filtertube-filter-all-toggle');
         if (toggle) {
@@ -6059,13 +6300,34 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
                 source: 'playlist_fallback_menu'
             });
 
-            const res = await addChannelDirectly(
+            let res = await addChannelDirectly(
                 input,
                 !!filterAll,
                 channelInfo?.collaborationWith || null,
                 channelInfo?.collaborationGroupId || null,
                 metaPayload
             );
+
+            if (
+                (!res || !res.success) &&
+                /No stable channel identifier|No channel identifier/i.test(res?.error || '') &&
+                videoId &&
+                typeof handleBlockChannelClick === 'function'
+            ) {
+                const synthetic = document.createElement('div');
+                synthetic.className = 'filtertube-block-channel-item filtertube-fallback-retry';
+                const syntheticTitle = document.createElement('span');
+                syntheticTitle.className = 'filtertube-menu-title';
+                syntheticTitle.textContent = 'Block Channel';
+                synthetic.appendChild(syntheticTitle);
+                try {
+                    await handleBlockChannelClick({ ...(info || {}), videoId }, synthetic, !!filterAll, row);
+                    close();
+                    return;
+                } catch (e) {
+                    console.warn('FilterTube: Fallback menu retry through handleBlockChannelClick failed', e);
+                }
+            }
             close();
 
             if (res && res.success) {
@@ -6205,11 +6467,19 @@ function openFilterTubePlaylistFallbackPopover(button, row) {
                 blockAllInfo
             );
         } else {
+            const visiblePlaylistName = getExpectedName();
             const singleInfo = {
                 ...baseInfo,
+                name: baseInfo.name || visiblePlaylistName || '',
+                expectedChannelName: baseInfo.expectedChannelName || visiblePlaylistName || null,
                 videoId: fallbackVideoId
             };
-            bindFallbackRow(createFallbackMenuRow(singleInfo), singleInfo);
+            bindFallbackRow(
+                createFallbackMenuRow(singleInfo, {
+                    displayName: singleInfo.name || visiblePlaylistName || undefined
+                }),
+                singleInfo
+            );
         }
     };
 
@@ -6294,11 +6564,11 @@ function injectCollaboratorPlaceholderMenu(newMenuList, oldMenuList, message = '
 
     const buildPlaceholderContent = (primaryText, secondaryText) => `
         <div class="filtertube-menu-title-wrapper filtertube-menu-title-wrapper--placeholder">
-            <span class="filtertube-menu-title" role="text" style="color: rgba(226, 232, 240, 0.7);">
+            <span class="filtertube-menu-title" role="text" style="color:#475569;">
                 <span class="filtertube-menu-label">Block</span>
                 <span class="filtertube-menu-separator">•</span>
                 <span class="filtertube-channel-name">${escapeHtml(primaryText)}</span>
-                ${secondaryText ? `<div style="font-size:12px;color:rgba(148,163,184,0.9);margin-top:4px;">${escapeHtml(secondaryText)}</div>` : ''}
+                ${secondaryText ? `<div style="font-size:12px;color:#64748b;margin-top:4px;">${escapeHtml(secondaryText)}</div>` : ''}
             </span>
         </div>
     `;
@@ -6311,11 +6581,11 @@ function injectCollaboratorPlaceholderMenu(newMenuList, oldMenuList, message = '
             item.setAttribute('tabindex', '-1');
             item.style.opacity = '0.6';
             item.style.pointerEvents = 'none';
-            item.innerHTML = `
-                <div class="yt-list-item-view-model__label filtertube-menu-item" style="padding:8px 12px;">
-                    ${buildPlaceholderContent(primary, secondary)}
-                </div>
-            `;
+            const label = document.createElement('div');
+            label.className = 'yt-list-item-view-model__label filtertube-menu-item';
+            label.style.padding = '8px 12px';
+            label.appendChild(createFilterTubePlaceholderContent(primary, secondary));
+            item.appendChild(label);
             return item;
         };
 
@@ -6330,11 +6600,12 @@ function injectCollaboratorPlaceholderMenu(newMenuList, oldMenuList, message = '
             item.setAttribute('tabindex', '-1');
             item.style.opacity = '0.6';
             item.style.pointerEvents = 'none';
-            item.innerHTML = `
-                <tp-yt-paper-item class="style-scope ytd-menu-service-item-renderer filtertube-menu-item" role="option" tabindex="-1">
-                    ${buildPlaceholderContent(primary, secondary)}
-                </tp-yt-paper-item>
-            `;
+            const paperItem = document.createElement('tp-yt-paper-item');
+            paperItem.className = 'style-scope ytd-menu-service-item-renderer filtertube-menu-item';
+            paperItem.setAttribute('role', 'option');
+            paperItem.setAttribute('tabindex', '-1');
+            paperItem.appendChild(createFilterTubePlaceholderContent(primary, secondary));
+            item.appendChild(paperItem);
             return item;
         };
 
@@ -7434,15 +7705,92 @@ function extractChannelFromCard(card) {
             let normalized = value
                 .replace(/\s+/g, ' ')
                 .replace(/^Go to channel\s+/i, '')
+                .replace(/\s+@[A-Za-z0-9._-]+.*$/i, '')
                 .trim();
             if (!normalized) return '';
             if (normalized.startsWith('@')) return '';
             if (/^UC[\w-]{22}$/i.test(normalized)) return '';
             if (normalized.includes('•')) return '';
             if (/\bviews?\b/i.test(normalized)) return '';
+            if (/\bsubscribers?\b/i.test(normalized)) return '';
+            if (/^\d+(\.\d+)?[KMB]?\s+subscribers?$/i.test(normalized)) return '';
             if (/\bwatching\b/i.test(normalized)) return '';
             if (/\bago\b/i.test(normalized)) return '';
             return normalized;
+        };
+
+        const extractMobileChannelSurfaceInfo = () => {
+            const textFromRuns = (obj) => {
+                const runs = Array.isArray(obj?.runs) ? obj.runs : [];
+                return runs.map(run => run?.text || '').join('').trim();
+            };
+            const renderer = card.data || card.__data?.data || null;
+            const rendererEndpoint =
+                renderer?.navigationEndpoint?.browseEndpoint ||
+                renderer?.endpoint?.innertubeCommand?.browseEndpoint ||
+                renderer?.avatar?.avatarViewModel?.endpoint?.innertubeCommand?.browseEndpoint ||
+                null;
+            const rendererCanonicalUrl = typeof rendererEndpoint?.canonicalBaseUrl === 'string'
+                ? rendererEndpoint.canonicalBaseUrl
+                : '';
+            const rendererHandle = normalizeHandleValue(
+                extractRawHandle(rendererCanonicalUrl) ||
+                extractRawHandle(textFromRuns(renderer?.subscriberCountText)) ||
+                ''
+            );
+            const rendererId = renderer?.channelId ||
+                rendererEndpoint?.browseId ||
+                renderer?.subscribeButton?.subscribeButtonRenderer?.channelId ||
+                '';
+            const rendererName = [
+                textFromRuns(renderer?.displayName),
+                textFromRuns(renderer?.title),
+                renderer?.title?.accessibility?.accessibilityData?.label || '',
+                renderer?.subscribeButton?.subscribeButtonRenderer?.subscribeAccessibility?.accessibilityData?.label || ''
+            ].map(normalizeYtmChannelName).find(Boolean) || '';
+            const rendererLogo =
+                renderer?.thumbnail?.thumbnails?.find?.(thumb => thumb?.url)?.url ||
+                renderer?.avatar?.avatarViewModel?.image?.sources?.find?.(source => source?.url)?.url ||
+                '';
+            if (rendererHandle || /^UC[\w-]{22}$/i.test(rendererId) || rendererName) {
+                return {
+                    handle: rendererHandle || '',
+                    id: /^UC[\w-]{22}$/i.test(rendererId) ? rendererId : '',
+                    customUrl: extractCustomUrlFromHref(rendererCanonicalUrl),
+                    name: rendererName,
+                    logo: rendererLogo || extractAvatarUrl() || ''
+                };
+            }
+
+            const link = card.querySelector(
+                'ytm-channel-thumbnail-with-link-renderer a[href*="/@"], ' +
+                'ytm-channel-thumbnail-with-link-renderer a[href*="/channel/UC"], ' +
+                'ytm-channel-thumbnail-with-link-renderer a[href*="/c/"], ' +
+                'ytm-channel-thumbnail-with-link-renderer a[href*="/user/"], ' +
+                'a[href*="/@"]:not([href*="/watch"]):not([href*="/shorts"]), ' +
+                'a[href*="/channel/UC"], ' +
+                'a[href*="/c/"], ' +
+                'a[href*="/user/"]'
+            );
+            const href = link?.getAttribute?.('href') || link?.href || '';
+            const handle = normalizeHandleValue(extractRawHandle(href) || '');
+            const id = extractChannelIdFromString(href) || '';
+            const customUrl = extractCustomUrlFromHref(href);
+            const name = [
+                card.querySelector('h3, h2, [role="heading"]')?.textContent?.trim() || '',
+                link?.textContent?.trim() || '',
+                card.querySelector('ytm-channel-thumbnail-with-link-renderer img[alt]')?.getAttribute('alt') || '',
+                card.querySelector('ytm-profile-icon img[alt], .ytProfileIconImage[alt], yt-avatar-shape img[alt]')?.getAttribute('alt') || ''
+            ].map(normalizeYtmChannelName).find(Boolean) || '';
+
+            if (!handle && !id && !customUrl && !name) return null;
+            return {
+                handle: handle || '',
+                id: id || '',
+                customUrl: customUrl || '',
+                name,
+                logo: extractAvatarUrl() || ''
+            };
         };
 
         // SPECIAL CASE: Comment context (thread + modern comment view/renderer nodes)
@@ -7455,7 +7803,19 @@ function extractChannelFromCard(card) {
                 'a[href*="/@"]#author-text, ' +
                 'a[href*="/channel/UC"]#author-text, ' +
                 'a[href*="/c/"]#author-text, ' +
-                'a[href*="/user/"]#author-text'
+                'a[href*="/user/"]#author-text, ' +
+                'ytm-comment-thread-renderer a[href*="/@"], ' +
+                'ytm-comment-thread-renderer a[href*="/channel/UC"], ' +
+                'ytm-comment-thread-renderer a[href*="/c/"], ' +
+                'ytm-comment-thread-renderer a[href*="/user/"], ' +
+                'ytm-comment-view-model a[href*="/@"], ' +
+                'ytm-comment-view-model a[href*="/channel/UC"], ' +
+                'ytm-comment-view-model a[href*="/c/"], ' +
+                'ytm-comment-view-model a[href*="/user/"], ' +
+                'a[href*="/@"]:not([href*="/watch"]):not([href*="/shorts"]), ' +
+                'a[href*="/channel/UC"]:not([href*="/watch"]):not([href*="/shorts"]), ' +
+                'a[href*="/c/"]:not([href*="/watch"]):not([href*="/shorts"]), ' +
+                'a[href*="/user/"]:not([href*="/watch"]):not([href*="/shorts"])'
             );
 
             const href = authorAnchor?.getAttribute?.('href') || authorAnchor?.href || '';
@@ -7464,8 +7824,13 @@ function extractChannelFromCard(card) {
             const rawTextFromContainerSpan = card.querySelector('#author-text span')?.textContent?.trim() || '';
             const rawTextFromContainer = card.querySelector('#author-text')?.textContent?.trim() || '';
             const rawTextFromAria = authorAnchor?.getAttribute?.('aria-label')?.trim?.() || '';
+            const authorThumbnailAria =
+                card.querySelector('#author-thumbnail-button[aria-label]')?.getAttribute('aria-label')?.trim() ||
+                card.querySelector('button[aria-label*="Go to channel" i]')?.getAttribute('aria-label')?.trim() ||
+                card.querySelector('a[aria-label*="Go to channel" i]')?.getAttribute('aria-label')?.trim() ||
+                '';
 
-            const rawHandle = extractRawHandle(href) || extractRawHandle(rawTextFromAnchor) || extractRawHandle(rawTextFromContainer);
+            const rawHandle = extractRawHandle(href) || extractRawHandle(rawTextFromAnchor) || extractRawHandle(rawTextFromContainer) || extractRawHandle(authorThumbnailAria);
             const handle = rawHandle ? normalizeHandleValue(rawHandle) : '';
 
             const normalizeNameCandidate = (value) => {
@@ -7502,6 +7867,7 @@ function extractChannelFromCard(card) {
                 rawTextFromAnchorSpan,
                 rawTextFromContainerSpan,
                 rawTextFromAria,
+                authorThumbnailAria,
                 rawTextFromAnchor,
                 rawTextFromContainer
             ].map(normalizeNameCandidate).filter(Boolean);
@@ -7535,6 +7901,18 @@ function extractChannelFromCard(card) {
                     name: name || '',
                     logo: extractAvatarUrl() || ''
                 };
+            }
+        }
+
+        if (
+            cardTag === 'ytm-channel-renderer' ||
+            cardTag === 'ytm-compact-channel-renderer' ||
+            cardTag === 'ytm-universal-watch-card-renderer'
+        ) {
+            const mobileChannelInfo = extractMobileChannelSurfaceInfo();
+            if (mobileChannelInfo) {
+                console.log('FilterTube: Extracted from YTM channel/artist card:', mobileChannelInfo);
+                return mobileChannelInfo;
             }
         }
 
@@ -7607,7 +7985,98 @@ function extractChannelFromCard(card) {
                 return { handle: dataHandle, id: dataId, name, logo: extractAvatarUrl() || '' };
             }
 
-            // Method 2: Try to find channel link in DOM
+            // Method 2: Mobile search Shorts renderer data exposes channel identity
+            // through belowThumbnailMetadata instead of normal channel anchors.
+            const shortsRenderer = card.data || card.__data?.data || null;
+            const shortsAvatarViewModel =
+                shortsRenderer?.belowThumbnailMetadata?.avatar?.avatarViewModel ||
+                shortsRenderer?.metadata?.avatar?.avatarViewModel ||
+                null;
+            const shortsBrowseEndpoint =
+                shortsAvatarViewModel?.endpoint?.innertubeCommand?.browseEndpoint ||
+                shortsAvatarViewModel?.rendererContext?.commandContext?.onTap?.innertubeCommand?.browseEndpoint ||
+                null;
+            const shortsCanonicalBaseUrl = typeof shortsBrowseEndpoint?.canonicalBaseUrl === 'string'
+                ? shortsBrowseEndpoint.canonicalBaseUrl
+                : '';
+            const shortsRendererHandle = normalizeHandleValue(extractRawHandle(shortsCanonicalBaseUrl) || '');
+            const shortsRendererId = shortsBrowseEndpoint?.browseId?.startsWith?.('UC')
+                ? shortsBrowseEndpoint.browseId
+                : '';
+            let shortsRendererCustomUrl = '';
+            const shortsCustomUrlMatch = shortsCanonicalBaseUrl.match(/\/(c|user)\/([^/?#]+)/);
+            if (shortsCustomUrlMatch && shortsCustomUrlMatch[1] && shortsCustomUrlMatch[2]) {
+                try {
+                    shortsRendererCustomUrl = `${shortsCustomUrlMatch[1]}/${decodeURIComponent(shortsCustomUrlMatch[2])}`;
+                } catch (_) {
+                    shortsRendererCustomUrl = `${shortsCustomUrlMatch[1]}/${shortsCustomUrlMatch[2]}`;
+                }
+            }
+            const shortsRendererName = normalizeYtmChannelName(
+                shortsRenderer?.belowThumbnailMetadata?.primaryText?.content ||
+                shortsAvatarViewModel?.accessibilityText ||
+                ''
+            );
+            const shortsRendererLogo =
+                shortsAvatarViewModel?.image?.sources?.find?.(source => source?.url)?.url ||
+                extractAvatarUrl() ||
+                '';
+            const shortsRendererVideoId =
+                shortsRenderer?.onTap?.innertubeCommand?.reelWatchEndpoint?.videoId ||
+                shortsRenderer?.inlinePlayerData?.onVisible?.innertubeCommand?.watchEndpoint?.videoId ||
+                card.getAttribute('data-filtertube-video-id') ||
+                '';
+            if (shortsRendererHandle || shortsRendererId || shortsRendererCustomUrl) {
+                console.log('FilterTube: Extracted SHORTS channel from renderer data:', {
+                    handle: shortsRendererHandle,
+                    id: shortsRendererId,
+                    customUrl: shortsRendererCustomUrl,
+                    name: shortsRendererName,
+                    videoId: shortsRendererVideoId
+                });
+                return {
+                    handle: shortsRendererHandle,
+                    id: shortsRendererId,
+                    customUrl: shortsRendererCustomUrl,
+                    name: shortsRendererName,
+                    logo: shortsRendererLogo,
+                    videoId: shortsRendererVideoId || undefined
+                };
+            }
+
+            // Method 3: Try to recover a UC ID from the Shorts watch params.
+            const shortsEndpointParams = typeof shortsRenderer?.onTap?.innertubeCommand?.reelWatchEndpoint?.params === 'string'
+                ? shortsRenderer.onTap.innertubeCommand.reelWatchEndpoint.params
+                : '';
+            if (shortsEndpointParams) {
+                let decodedShortsParams = shortsEndpointParams;
+                try {
+                    decodedShortsParams = decodeURIComponent(shortsEndpointParams);
+                } catch (_) {
+                }
+                const idFromParams = extractChannelIdFromString(decodedShortsParams);
+                if (idFromParams) {
+                    const videoIdFromParams =
+                        shortsRenderer?.onTap?.innertubeCommand?.reelWatchEndpoint?.videoId ||
+                        card.getAttribute('data-filtertube-video-id') ||
+                        '';
+                    console.log('FilterTube: Extracted SHORTS channel from renderer params:', {
+                        id: idFromParams,
+                        name: shortsRendererName,
+                        videoId: videoIdFromParams
+                    });
+                    return {
+                        id: idFromParams,
+                        handle: shortsRendererHandle || '',
+                        customUrl: shortsRendererCustomUrl || '',
+                        name: shortsRendererName || '',
+                        logo: shortsRendererLogo || '',
+                        videoId: videoIdFromParams || undefined
+                    };
+                }
+            }
+
+            // Method 4: Try to find channel link in DOM
             const shortsChannelLink = card.querySelector(
                 'a[href*="/@"]:not([href*="/shorts"]):not([href*="/watch"]), ' +
                 'ytm-shorts-lockup-view-model a[href*="/@"], ' +
@@ -7625,7 +8094,7 @@ function extractChannelFromCard(card) {
                 }
             }
 
-            // Method 3: Extract from shorts URL (fetch the page)
+            // Method 5: Extract from shorts URL (fetch the page)
             console.log('FilterTube: Attempting to extract channel from shorts URL');
             const shortsLink = card.querySelector('a[href*="/shorts/"]');
             if (shortsLink) {
@@ -7665,33 +8134,23 @@ function extractChannelFromCard(card) {
 
         // SPECIAL CASE: Mix cards (collection stacks / "My Mix")
         const isMixCard = isMixCardElement(card);
-        const mixBylineHint = (
-            card.getAttribute('data-filtertube-channel-name') ||
-            card.querySelector('#byline')?.textContent?.trim() ||
-            card.querySelector('#byline-container')?.textContent?.trim() ||
-            ''
-        );
-        const parsedMixBylineHint = parseCollaboratorNames(mixBylineHint, {
-            allowSeparatorSplit: Boolean(card?.querySelector?.('yt-avatar-stack-view-model, #attributed-channel-name'))
-        });
-        const expectedMixCollaboratorCount = Number(card.getAttribute('data-filtertube-expected-collaborators')) || 0;
-        const shouldSkipMixShortcut = Boolean(
-            expectedMixCollaboratorCount > 1 ||
-            parsedMixBylineHint.hasHiddenCollaborators ||
-            parsedMixBylineHint.names.length >= 2
-        );
-        if (isMixCard && !shouldSkipMixShortcut) {
+        if (isMixCard) {
+            clearCollaboratorMetadataFromCard(card);
             const deriveMixName = () => {
                 const nameEl = card.querySelector(
                     '#channel-info ytd-channel-name a, ' +
                     '#channel-name #text a, ' +
-                    'ytd-channel-name #text a'
+                    'ytd-channel-name #text a, ' +
+                    'ytm-channel-thumbnail-with-link-renderer img[alt], ' +
+                    'ytm-profile-icon img[alt], ' +
+                    '.ytProfileIconImage[alt]'
                 );
-                const candidate = nameEl?.textContent?.trim() || '';
+                const candidate = (nameEl?.getAttribute?.('alt') || nameEl?.textContent || '').trim();
                 if (!candidate) return '';
                 const lower = candidate.toLowerCase();
                 if (lower.startsWith('mix') || lower.startsWith('my mix')) return '';
                 if (lower.includes('mix') && candidate.includes('–')) return '';
+                if (lower.includes('mix') && candidate.includes('-')) return '';
                 return candidate;
             };
 
@@ -7701,6 +8160,14 @@ function extractChannelFromCard(card) {
                 card.querySelector('[data-filtertube-channel-handle]')?.getAttribute('data-filtertube-channel-handle') || '';
             let customUrl = card.getAttribute('data-filtertube-channel-custom') ||
                 card.querySelector('[data-filtertube-channel-custom]')?.getAttribute('data-filtertube-channel-custom') || '';
+            const videoIdHint = extractVideoIdFromCard(card) || ensureVideoIdForCard(card) || '';
+
+            if (!id && videoIdHint) {
+                const mappedId = currentSettings?.videoChannelMap?.[videoIdHint] || '';
+                if (typeof mappedId === 'string' && /^UC[\w-]{22}$/i.test(mappedId.trim())) {
+                    id = mappedId.trim();
+                }
+            }
 
             if ((!id || !handle || !customUrl) && typeof scanDataForChannelIdentifiers === 'function') {
                 const candidates = [
@@ -7758,8 +8225,23 @@ function extractChannelFromCard(card) {
                     }
                 }
                 console.log('FilterTube: Extracted from Mix card:', { id, handle, customUrl, name });
-                return { id: id || '', handle: handle || '', customUrl: customUrl || '', name: name || '', logo: extractAvatarUrl() || '' };
+                return { id: id || '', handle: handle || '', customUrl: customUrl || '', name: name || '', logo: extractAvatarUrl() || '', videoId: videoIdHint || undefined };
             }
+
+            if (videoIdHint) {
+                const fallbackName = deriveMixName();
+                console.log('FilterTube: Mix card needs seed-channel fetch:', { videoId: videoIdHint, name: fallbackName });
+                return {
+                    videoId: videoIdHint,
+                    needsFetch: true,
+                    fetchStrategy: 'mainworld',
+                    expectedChannelName: fallbackName || null,
+                    name: fallbackName || ''
+                };
+            }
+
+            console.log('FilterTube: Mix card detected without seed identity; skipping collaborator mode');
+            return null;
         }
 
         const isYtmVideoLikeCard = (
@@ -7957,12 +8439,20 @@ function extractChannelFromCard(card) {
             card.querySelector('[data-filtertube-channel-handle]')?.getAttribute('data-filtertube-channel-handle');
         const dataId = card.getAttribute('data-filtertube-channel-id') ||
             card.querySelector('[data-filtertube-channel-id]')?.getAttribute('data-filtertube-channel-id');
-        const isPlaylistPanelCard = (cardTag === 'ytd-playlist-panel-video-renderer' || cardTag === 'ytd-playlist-panel-video-wrapper-renderer');
+        const isPlaylistPanelCard = (
+            cardTag === 'ytd-playlist-panel-video-renderer' ||
+            cardTag === 'ytd-playlist-panel-video-wrapper-renderer' ||
+            cardTag === 'ytm-playlist-panel-video-renderer' ||
+            cardTag === 'ytm-playlist-video-renderer'
+        );
 
         if (dataHandle || dataId) {
             let name = null;
             let handle = dataHandle;
             let id = dataId;
+            if (id && !/^UC[\w-]{22}$/i.test(String(id).trim())) {
+                id = '';
+            }
             const videoIdHint = extractVideoIdFromCard(card) || '';
 
             if (isPlaylistPanelCard) {
@@ -8011,8 +8501,12 @@ function extractChannelFromCard(card) {
             }
 
             // Playlist panel items often render the channel name as plain text (#byline), not a link.
-            if (!name && cardTag === 'ytd-playlist-panel-video-renderer') {
-                const bylineText = card.querySelector('#byline')?.textContent?.trim() || '';
+            if (!name && isPlaylistPanelCard) {
+                const bylineText = card.querySelector(
+                    '#byline, .ytmPlaylistPanelVideoRendererByline, .ytmPlaylistPanelVideoRendererV2Byline, ' +
+                    '.subhead .YtmCompactMediaItemByline:first-child, .YtmCompactMediaItemByline:first-child, ' +
+                    '.compact-media-item-byline, .metadata-row'
+                )?.textContent?.trim() || '';
                 if (bylineText && !bylineText.includes('•')) {
                     name = bylineText;
                 }
@@ -8656,6 +9150,10 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
 
     const videoCardTagName = (videoCard.tagName || '').toLowerCase();
     const isCommentContextCard = isCommentContextTag(videoCardTagName);
+    const isMixContextCard = !isCommentContextCard && isMixCardElement(videoCard);
+    if (isMixContextCard) {
+        clearCollaboratorMetadataFromCard(videoCard);
+    }
 
     if (isCommentContextCard) {
         try {
@@ -8695,7 +9193,9 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
             }
         }
     }
-    initialChannelInfo = promoteChannelInfoFromCollaboratorSignals(initialChannelInfo, videoCard);
+    initialChannelInfo = isMixContextCard
+        ? initialChannelInfo
+        : promoteChannelInfoFromCollaboratorSignals(initialChannelInfo, videoCard);
     if (!isCommentContextCard) {
         // Prefer fresh DOM identifiers over any cached collaborator-derived data
         const domHandleAttr = videoCard.getAttribute('data-filtertube-channel-handle') ||
@@ -8746,8 +9246,12 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
             initialChannelInfo.name = domNameAttr;
         }
     }
-    initialChannelInfo = promoteChannelInfoFromCollaboratorSignals(initialChannelInfo, videoCard);
-    initialChannelInfo = promoteYtmWatchRowIdentityFromCollaboratorMetadata(initialChannelInfo, videoCard);
+    initialChannelInfo = isMixContextCard
+        ? initialChannelInfo
+        : promoteChannelInfoFromCollaboratorSignals(initialChannelInfo, videoCard);
+    initialChannelInfo = isMixContextCard
+        ? initialChannelInfo
+        : promoteYtmWatchRowIdentityFromCollaboratorMetadata(initialChannelInfo, videoCard);
     initialChannelInfo = hydrateChannelInfoFromCurrentMappings(initialChannelInfo, videoCard);
 
     if (!initialChannelInfo || (!initialChannelInfo.handle && !initialChannelInfo.id && !initialChannelInfo.customUrl && !initialChannelInfo.isCollaboration && !initialChannelInfo.needsFetch)) {
@@ -8872,7 +9376,10 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
                     'tp-yt-paper-listbox#items, ' +
                     'tp-yt-paper-listbox, ' +
                     'div.menu-content[role="dialog"], ' +
+                    '.bottom-sheet-media-menu-item, ' +
+                    'bottom-sheet-layout, ' +
                     'ytm-menu-popup-renderer, ' +
+                    'ytm-menu-navigation-item-renderer, ' +
                     'ytm-menu-service-item-renderer, ' +
                     '#items.ytm-menu-popup-renderer, ' +
                     '#items.style-scope.ytm-menu-popup-renderer, ' +
@@ -8954,7 +9461,10 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
                 'tp-yt-paper-listbox#items, ' +
                 'tp-yt-paper-listbox, ' +
                 'div.menu-content[role="dialog"], ' +
+                '.bottom-sheet-media-menu-item, ' +
+                'bottom-sheet-layout, ' +
                 'ytm-menu-popup-renderer, ' +
+                'ytm-menu-navigation-item-renderer, ' +
                 'ytm-menu-service-item-renderer, ' +
                 '#items.ytm-menu-popup-renderer, ' +
                 '#items.style-scope.ytm-menu-popup-renderer, ' +
@@ -9038,6 +9548,7 @@ async function injectFilterTubeMenuItem(dropdown, videoCard) {
     const isWarmableWatchLikeCard = Boolean(
         videoId &&
         !initialChannelInfo.isCollaboration &&
+        !isMixContextCard &&
         (
             isYtmWatchLikeCollaboratorCard(videoCard) ||
             isDesktopWatchLikeCollaboratorCard(videoCard)
@@ -9390,6 +9901,7 @@ function attachFilterTubeMenuHandlers({ menuItem, toggle, channelInfo, videoCard
         if (isToggleTarget) {
             // Do NOT intercept toggle clicks. This handler is registered in capture phase,
             // so calling stopPropagation here would prevent the toggle's own click handler.
+            event.preventDefault();
             return;
         }
 
@@ -9425,6 +9937,83 @@ function attachFilterTubeMenuHandlers({ menuItem, toggle, channelInfo, videoCard
     });
 }
 
+function createFilterTubeIconElement() {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('version', '1.1');
+    svg.setAttribute('width', '24');
+    svg.setAttribute('height', '24');
+    svg.setAttribute('viewBox', '0 0 128 128');
+    svg.style.display = 'block';
+
+    const filterPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    filterPath.setAttribute('fill', '#FF3333');
+    filterPath.setAttribute('d', 'M53.004837,77.261787 C55.004650,68.586563 48.961483,63.525127 45.151901,57.831970 C36.636456,45.106262 27.572891,32.747910 18.776752,20.208942 C17.048302,17.745022 18.246574,14.746576 21.199722,14.076863 C22.310389,13.824986 23.520674,14.001245 24.685543,14.001154 C51.482349,13.999036 78.279152,13.997606 105.075958,14.002748 C107.511017,14.003215 110.410080,13.422483 111.785439,15.933891 C113.178085,18.476864 111.026321,20.660681 109.690315,22.593620 C99.594292,37.200588 89.433075,51.763405 79.158081,66.244827 C77.520378,68.552994 76.925735,70.848900 76.965294,73.583061 C77.066391,80.572067 76.851021,87.568138 77.069214,94.551788 C77.160759,97.481934 76.221825,99.467453 74.122963,101.447235 C69.040611,106.241264 64.241066,111.333801 59.229191,116.204849 C58.138329,117.265060 57.330574,119.514366 55.379189,118.670372 C53.447678,117.834984 52.933788,115.906029 52.954082,113.675346 C53.063110,101.692680 53.005142,89.708488 53.004837,77.261787 z');
+
+    const playPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    playPath.setAttribute('fill', '#FF0000');
+    playPath.setAttribute('d', 'M63.316730,58.295921 C61.783310,59.317360 60.616657,60.253048 59.307014,60.898705 C55.871113,62.592613 54.045387,61.557888 54.023708,57.807045 C53.960236,46.824589 53.943741,35.841064 54.033154,24.858967 C54.064426,21.018126 56.738575,19.503649 60.024136,21.659582 C67.653084,26.665573 75.198029,31.814018 82.579330,37.176819 C86.212624,39.816536 85.950592,42.679234 82.150856,45.360466 C76.029831,49.679680 69.801399,53.846684 63.316730,58.295921 z');
+
+    svg.append(filterPath, playPath);
+    return svg;
+}
+
+function createFilterTubeTitleElement(channelName) {
+    const title = document.createElement('span');
+    title.className = 'filtertube-menu-title';
+    title.setAttribute('role', 'text');
+
+    const label = document.createElement('span');
+    label.className = 'filtertube-menu-label';
+    label.textContent = 'Block';
+
+    const separator = document.createElement('span');
+    separator.className = 'filtertube-menu-separator';
+    separator.textContent = '•';
+
+    const name = document.createElement('span');
+    name.className = 'filtertube-channel-name';
+    name.textContent = channelName;
+
+    title.append(label, separator, name);
+    return title;
+}
+
+function createFilterTubePlaceholderContent(primaryText, secondaryText) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'filtertube-menu-title-wrapper filtertube-menu-title-wrapper--placeholder';
+
+    const title = document.createElement('span');
+    title.className = 'filtertube-menu-title';
+    title.setAttribute('role', 'text');
+    title.style.color = '#475569';
+
+    const label = document.createElement('span');
+    label.className = 'filtertube-menu-label';
+    label.textContent = 'Block';
+
+    const separator = document.createElement('span');
+    separator.className = 'filtertube-menu-separator';
+    separator.textContent = '•';
+
+    const name = document.createElement('span');
+    name.className = 'filtertube-channel-name';
+    name.textContent = primaryText;
+
+    title.append(label, separator, name);
+
+    if (secondaryText) {
+        const secondary = document.createElement('div');
+        secondary.style.fontSize = '12px';
+        secondary.style.color = '#64748b';
+        secondary.style.marginTop = '4px';
+        secondary.textContent = secondaryText;
+        title.appendChild(secondary);
+    }
+
+    wrapper.appendChild(title);
+    return wrapper;
+}
+
 function injectIntoNewMenu(menuList, channelInfo, videoCard, collaborationMetadata = null, injectionOptions = {}) {
     // Create FilterTube menu item (NEW structure)
     const filterTubeItem = document.createElement('yt-list-item-view-model');
@@ -9432,38 +10021,45 @@ function injectIntoNewMenu(menuList, channelInfo, videoCard, collaborationMetada
     filterTubeItem.setAttribute('role', 'menuitem');
     filterTubeItem.setAttribute('tabindex', '0');
 
-    // Inline SVG for FilterTube logo (user-provided SVG)
-    const filterTubeSvg = `<svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 128 128" style="display: block;">
-        <path fill="#FF3333" d="M53.004837,77.261787 C55.004650,68.586563 48.961483,63.525127 45.151901,57.831970 C36.636456,45.106262 27.572891,32.747910 18.776752,20.208942 C17.048302,17.745022 18.246574,14.746576 21.199722,14.076863 C22.310389,13.824986 23.520674,14.001245 24.685543,14.001154 C51.482349,13.999036 78.279152,13.997606 105.075958,14.002748 C107.511017,14.003215 110.410080,13.422483 111.785439,15.933891 C113.178085,18.476864 111.026321,20.660681 109.690315,22.593620 C99.594292,37.200588 89.433075,51.763405 79.158081,66.244827 C77.520378,68.552994 76.925735,70.848900 76.965294,73.583061 C77.066391,80.572067 76.851021,87.568138 77.069214,94.551788 C77.160759,97.481934 76.221825,99.467453 74.122963,101.447235 C69.040611,106.241264 64.241066,111.333801 59.229191,116.204849 C58.138329,117.265060 57.330574,119.514366 55.379189,118.670372 C53.447678,117.834984 52.933788,115.906029 52.954082,113.675346 C53.063110,101.692680 53.005142,89.708488 53.004837,77.261787 z"/>
-        <path fill="#FF0000" d="M63.316730,58.295921 C61.783310,59.317360 60.616657,60.253048 59.307014,60.898705 C55.871113,62.592613 54.045387,61.557888 54.023708,57.807045 C53.960236,46.824589 53.943741,35.841064 54.033154,24.858967 C54.064426,21.018126 56.738575,19.503649 60.024136,21.659582 C67.653084,26.665573 75.198029,31.814018 82.579330,37.176819 C86.212624,39.816536 85.950592,42.679234 82.150856,45.360466 C76.029831,49.679680 69.801399,53.846684 63.316730,58.295921 z"/>
-    </svg>`;
-
 
     // Ensure styles are injected
     ensureFilterTubeMenuStyles();
 
     // Build channel display name
-    const channelName = escapeHtml(pickMenuChannelDisplayName(channelInfo, injectionOptions));
+    const channelName = pickMenuChannelDisplayName(channelInfo, injectionOptions);
 
-    filterTubeItem.innerHTML = `
-        <div class="yt-list-item-view-model__label yt-list-item-view-model__container yt-list-item-view-model__container--compact yt-list-item-view-model__container--tappable yt-list-item-view-model__container--in-popup filtertube-menu-item">
-            <div aria-hidden="true" class="yt-list-item-view-model__image-container yt-list-item-view-model__leading" style="display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; flex-shrink: 0;">
-                ${filterTubeSvg}
-            </div>
-            <div class="yt-list-item-view-model__text-wrapper" style="flex: 1; min-width: 0;">
-                <div class="yt-list-item-view-model__title-wrapper filtertube-menu-title-wrapper">
-                    <span class="filtertube-menu-title" role="text">
-                        <span class="filtertube-menu-label">Block</span>
-                        <span class="filtertube-menu-separator">•</span>
-                        <span class="filtertube-channel-name">${channelName}</span>
-                    </span>
-                    <div class="filtertube-filter-all-toggle exact-toggle toggle-variant-red">
-                        Filter All
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
+    const row = document.createElement('div');
+    row.className = 'yt-list-item-view-model__label yt-list-item-view-model__container yt-list-item-view-model__container--compact yt-list-item-view-model__container--tappable yt-list-item-view-model__container--in-popup filtertube-menu-item';
+
+    const iconWrapper = document.createElement('div');
+    iconWrapper.setAttribute('aria-hidden', 'true');
+    iconWrapper.className = 'yt-list-item-view-model__image-container yt-list-item-view-model__leading';
+    iconWrapper.style.display = 'flex';
+    iconWrapper.style.alignItems = 'center';
+    iconWrapper.style.justifyContent = 'center';
+    iconWrapper.style.width = '24px';
+    iconWrapper.style.height = '24px';
+    iconWrapper.style.flexShrink = '0';
+    iconWrapper.appendChild(createFilterTubeIconElement());
+
+    const textWrapper = document.createElement('div');
+    textWrapper.className = 'yt-list-item-view-model__text-wrapper';
+    textWrapper.style.flex = '1';
+    textWrapper.style.minWidth = '0';
+
+    const titleWrapper = document.createElement('div');
+    titleWrapper.className = 'yt-list-item-view-model__title-wrapper filtertube-menu-title-wrapper';
+
+    const title = createFilterTubeTitleElement(channelName);
+
+    const toggle = document.createElement('div');
+    toggle.className = 'filtertube-filter-all-toggle exact-toggle toggle-variant-red';
+    toggle.textContent = 'Filter All';
+
+    titleWrapper.append(title, toggle);
+    textWrapper.appendChild(titleWrapper);
+    row.append(iconWrapper, textWrapper);
+    filterTubeItem.appendChild(row);
 
     // Get title span reference for later updates
     const titleSpan = filterTubeItem.querySelector('.filtertube-menu-title');
@@ -9497,10 +10093,10 @@ function injectIntoNewMenu(menuList, channelInfo, videoCard, collaborationMetada
         filterTubeItem.setAttribute('data-collab-key', collaboratorKeyNew);
     }
 
-    // Get toggle button
-    const toggle = filterTubeItem.querySelector('.filtertube-filter-all-toggle');
     if (toggle) {
         toggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopImmediatePropagation();
             e.stopPropagation();
 
             // Update visual state and get new active state
@@ -9538,7 +10134,10 @@ function injectIntoNewMenu(menuList, channelInfo, videoCard, collaborationMetada
  * Inject into OLD menu structure (tp-yt-paper-listbox)
  */
 function injectIntoOldMenu(menuContainer, channelInfo, videoCard, collaborationMetadata = null, injectionOptions = {}) {
-    const menuList = menuContainer.querySelector('tp-yt-paper-listbox#items') || menuContainer.querySelector('tp-yt-paper-listbox') || (menuContainer.matches?.('bottom-sheet-container') ? menuContainer.querySelector('bottom-sheet-layout') : menuContainer);
+    const modernMobileMenuList = menuContainer.matches?.('.bottom-sheet-media-menu-item')
+        ? menuContainer
+        : menuContainer.querySelector?.('.bottom-sheet-media-menu-item');
+    const menuList = menuContainer.querySelector('tp-yt-paper-listbox#items') || menuContainer.querySelector('tp-yt-paper-listbox') || modernMobileMenuList || (menuContainer.matches?.('bottom-sheet-container') ? menuContainer.querySelector('bottom-sheet-layout') : menuContainer);
     const isMobileMenu = Boolean(menuList.closest?.('ytm-menu-popup-renderer')) ||
         Boolean(menuList.closest?.('ytm-app')) ||
         Boolean(menuContainer?.matches?.('ytm-menu-popup-renderer')) ||
@@ -9560,7 +10159,123 @@ function injectIntoOldMenu(menuContainer, channelInfo, videoCard, collaborationM
     ensureFilterTubeMenuStyles();
 
     // Build channel display name
-    const channelName = escapeHtml(pickMenuChannelDisplayName(channelInfo, injectionOptions));
+    const rawChannelName = pickMenuChannelDisplayName(channelInfo, injectionOptions);
+    const channelName = rawChannelName;
+
+    if (modernMobileMenuList) {
+        const filterTubeItem = document.createElement('ytm-menu-navigation-item-renderer');
+        filterTubeItem.className = 'filtertube-block-channel-item filtertube-modern-bottom-sheet-item';
+        filterTubeItem.setAttribute('role', 'menuitem');
+        filterTubeItem.setAttribute('tabindex', '0');
+
+        const menuItem = document.createElement('ytm-menu-item');
+        const button = document.createElement('button');
+        button.className = 'menu-item-button filtertube-menu-item';
+        button.type = 'button';
+        button.style.display = 'flex';
+        button.style.alignItems = 'center';
+        button.style.gap = '24px';
+        button.style.width = '100%';
+
+        const iconWrapper = document.createElement('span');
+        iconWrapper.setAttribute('aria-hidden', 'true');
+        iconWrapper.style.width = '24px';
+        iconWrapper.style.height = '24px';
+        iconWrapper.style.flexShrink = '0';
+        iconWrapper.style.display = 'inline-flex';
+        iconWrapper.style.alignItems = 'center';
+        iconWrapper.style.justifyContent = 'center';
+
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('version', '1.1');
+        svg.setAttribute('width', '24');
+        svg.setAttribute('height', '24');
+        svg.setAttribute('viewBox', '0 0 128 128');
+        svg.style.display = 'block';
+        const filterPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        filterPath.setAttribute('fill', '#FF3333');
+        filterPath.setAttribute('d', 'M53.004837,77.261787 C55.004650,68.586563 48.961483,63.525127 45.151901,57.831970 C36.636456,45.106262 27.572891,32.747910 18.776752,20.208942 C17.048302,17.745022 18.246574,14.746576 21.199722,14.076863 C22.310389,13.824986 23.520674,14.001245 24.685543,14.001154 C51.482349,13.999036 78.279152,13.997606 105.075958,14.002748 C107.511017,14.003215 110.410080,13.422483 111.785439,15.933891 C113.178085,18.476864 111.026321,20.660681 109.690315,22.593620 C99.594292,37.200588 89.433075,51.763405 79.158081,66.244827 C77.520378,68.552994 76.925735,70.848900 76.965294,73.583061 C77.066391,80.572067 76.851021,87.568138 77.069214,94.551788 C77.160759,97.481934 76.221825,99.467453 74.122963,101.447235 C69.040611,106.241264 64.241066,111.333801 59.229191,116.204849 C58.138329,117.265060 57.330574,119.514366 55.379189,118.670372 C53.447678,117.834984 52.933788,115.906029 52.954082,113.675346 C53.063110,101.692680 53.005142,89.708488 53.004837,77.261787 z');
+        const playPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        playPath.setAttribute('fill', '#FF0000');
+        playPath.setAttribute('d', 'M63.316730,58.295921 C61.783310,59.317360 60.616657,60.253048 59.307014,60.898705 C55.871113,62.592613 54.045387,61.557888 54.023708,57.807045 C53.960236,46.824589 53.943741,35.841064 54.033154,24.858967 C54.064426,21.018126 56.738575,19.503649 60.024136,21.659582 C67.653084,26.665573 75.198029,31.814018 82.579330,37.176819 C86.212624,39.816536 85.950592,42.679234 82.150856,45.360466 C76.029831,49.679680 69.801399,53.846684 63.316730,58.295921 z');
+        svg.append(filterPath, playPath);
+        iconWrapper.appendChild(svg);
+
+        const title = document.createElement('span');
+        title.className = 'filtertube-menu-title';
+        title.setAttribute('role', 'text');
+        title.style.flex = '1';
+        title.style.minWidth = '0';
+        title.style.textAlign = 'left';
+
+        const label = document.createElement('span');
+        label.className = 'filtertube-menu-label';
+        label.textContent = 'Block';
+        const separator = document.createElement('span');
+        separator.className = 'filtertube-menu-separator';
+        separator.textContent = '•';
+        const name = document.createElement('span');
+        name.className = 'filtertube-channel-name';
+        name.textContent = rawChannelName;
+        title.append(label, separator, name);
+
+        const toggle = document.createElement('span');
+        toggle.className = 'filtertube-filter-all-toggle exact-toggle toggle-variant-red';
+        toggle.textContent = 'Filter All';
+
+        button.append(iconWrapper, title, toggle);
+        menuItem.appendChild(button);
+        filterTubeItem.appendChild(menuItem);
+
+        if (collaborationMetadata) {
+            if (collaborationMetadata.collaborationWith) {
+                filterTubeItem.setAttribute('data-collaboration-with', JSON.stringify(collaborationMetadata.collaborationWith));
+            }
+            if (collaborationMetadata.collaborationGroupId) {
+                filterTubeItem.setAttribute('data-collaboration-group-id', collaborationMetadata.collaborationGroupId);
+            }
+            if (collaborationMetadata.isMultiStep) {
+                filterTubeItem.setAttribute('data-multi-step', 'true');
+            }
+        }
+        if (channelInfo.isBlockAllOption) {
+            filterTubeItem.setAttribute('data-is-block-all', 'true');
+        }
+        if (channelInfo.isMultiStep) {
+            filterTubeItem.setAttribute('data-multi-step', 'true');
+        }
+        const collaboratorKeyModern = getCollaboratorKey(channelInfo);
+        if (collaboratorKeyModern && !channelInfo.isBlockAllOption) {
+            filterTubeItem.setAttribute('data-collab-key', collaboratorKeyModern);
+        }
+
+        if (toggle) {
+            toggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                e.stopPropagation();
+                const isActive = !isFilterAllToggleActive(toggle);
+                applyFilterAllStateToToggle(toggle, isActive);
+                persistFilterAllStateForMenuItem(filterTubeItem, isActive);
+                console.log('FilterTube: Filter All toggled:', isActive);
+            });
+        }
+
+        attachFilterTubeMenuHandlers({
+            menuItem: filterTubeItem,
+            toggle,
+            channelInfo,
+            videoCard,
+            injectionOptions
+        });
+
+        modernMobileMenuList.insertBefore(filterTubeItem, modernMobileMenuList.firstChild);
+        checkIfChannelBlocked(channelInfo, filterTubeItem);
+        hydrateFilterAllToggle(filterTubeItem, channelInfo);
+        console.log('FilterTube: Injected modern mobile bottom-sheet menu item at TOP');
+
+        return filterTubeItem;
+    }
 
     // Create FilterTube menu item (OLD structure)
     const filterTubeItem = document.createElement(rendererTag);
@@ -9570,21 +10285,31 @@ function injectIntoOldMenu(menuContainer, channelInfo, videoCard, collaborationM
     filterTubeItem.setAttribute('use-icons', '');
     filterTubeItem.setAttribute('tabindex', '-1');
 
-    filterTubeItem.innerHTML = `
-        <tp-yt-paper-item class="style-scope ${itemScope} filtertube-menu-item" style-target="host" role="option" tabindex="0" aria-disabled="false">
-            <div style="width: 24px; height: 24px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; margin-top: 2px;">
-                ${filterTubeSvg}
-            </div>
-            <span class="filtertube-menu-title" role="text">
-                <span class="filtertube-menu-label">Block</span>
-                <span class="filtertube-menu-separator">•</span>
-                <span class="filtertube-channel-name">${channelName}</span>
-            </span>
-            <div class="filtertube-filter-all-toggle exact-toggle toggle-variant-red">
-                Filter All
-            </div>
-        </tp-yt-paper-item>
-    `;
+    const paperItem = document.createElement('tp-yt-paper-item');
+    paperItem.className = `style-scope ${itemScope} filtertube-menu-item`;
+    paperItem.setAttribute('style-target', 'host');
+    paperItem.setAttribute('role', 'option');
+    paperItem.setAttribute('tabindex', '0');
+    paperItem.setAttribute('aria-disabled', 'false');
+
+    const iconWrapper = document.createElement('div');
+    iconWrapper.style.width = '24px';
+    iconWrapper.style.height = '24px';
+    iconWrapper.style.flexShrink = '0';
+    iconWrapper.style.display = 'flex';
+    iconWrapper.style.alignItems = 'center';
+    iconWrapper.style.justifyContent = 'center';
+    iconWrapper.style.marginTop = '2px';
+    iconWrapper.appendChild(createFilterTubeIconElement());
+
+    const title = createFilterTubeTitleElement(channelName);
+
+    const toggle = document.createElement('div');
+    toggle.className = 'filtertube-filter-all-toggle exact-toggle toggle-variant-red';
+    toggle.textContent = 'Filter All';
+
+    paperItem.append(iconWrapper, title, toggle);
+    filterTubeItem.appendChild(paperItem);
 
     // Get title span reference for later updates
     const titleSpan = filterTubeItem.querySelector('.filtertube-menu-title');
@@ -9616,9 +10341,9 @@ function injectIntoOldMenu(menuContainer, channelInfo, videoCard, collaborationM
         filterTubeItem.setAttribute('data-collab-key', collaboratorKeyOld);
     }
 
-    // Get toggle button
-    const toggle = filterTubeItem.querySelector('.filtertube-filter-all-toggle');
     toggle.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopImmediatePropagation();
         e.stopPropagation();
 
         // Update visual state and get new active state
@@ -9759,6 +10484,28 @@ function resolveCommentHideTarget(node) {
     return node.closest('ytd-comment-thread-renderer, ytm-comment-thread-renderer')
         || node.closest('ytd-comment-view-model, ytm-comment-view-model, ytd-comment-renderer, ytm-comment-renderer')
         || node;
+}
+
+function resolveClickedContentHideTarget(node) {
+    if (!node || !(node instanceof Element)) return node;
+    const tag = String(node.tagName || '').toLowerCase();
+    const isShorts = tag.includes('shorts-lockup-view-model') || tag.includes('reel');
+
+    if (isShorts) {
+        const shortsNode = tag.includes('shorts-lockup-view-model')
+            ? node
+            : node.querySelector?.('ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2');
+        if (shortsNode instanceof Element) {
+            return shortsNode.closest('ytd-rich-item-renderer, ytm-rich-item-renderer, .ytGridShelfViewModelGridShelfItem') || shortsNode;
+        }
+        return node;
+    }
+
+    if (tag.includes('lockup-view-model')) {
+        return node.closest('ytd-rich-item-renderer, ytm-rich-item-renderer, .ytGridShelfViewModelGridShelfItem') || node;
+    }
+
+    return node;
 }
 
 function syncBlockedElementsWithFilters(effectiveSettings) {
@@ -10165,32 +10912,14 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
 
             // Immediate UX hide should only target the clicked card container.
             // Hiding all same-video instances here can over-hide recycled playlist/home/search cards.
-            let cardsToHide = [];
-            let fallbackTarget = videoCard;
-            const tagName = (videoCard.tagName || '').toLowerCase();
-            if (tagName.includes('lockup-view-model')) {
-                const parentContainer = videoCard.closest('ytd-rich-item-renderer');
-                if (parentContainer) {
-                    fallbackTarget = parentContainer;
-                }
-            }
-            cardsToHide = [fallbackTarget];
+            const cardsToHide = [resolveClickedContentHideTarget(videoCard)];
             filterTubeDebugLog('Immediate hide target count:', cardsToHide.length);
 
             const blockedMetadata = channelInfo.allCollaborators?.[0] || channelInfo;
 
             // Hide all instances
             cardsToHide.forEach((card, index) => {
-                let containerToHide = card;
-                if (card.tagName.toLowerCase().includes('shorts-lockup-view-model')) {
-                    let parentContainer = card.closest('ytd-rich-item-renderer');
-                    if (!parentContainer) {
-                        parentContainer = card.closest('.ytGridShelfViewModelGridShelfItem');
-                    }
-                    if (parentContainer) {
-                        containerToHide = parentContainer;
-                    }
-                }
+                const containerToHide = resolveClickedContentHideTarget(card);
                 markElementAsBlocked(containerToHide, blockedMetadata, 'pending');
                 containerToHide.style.display = 'none';
                 containerToHide.classList.add('filtertube-hidden');
@@ -10408,6 +11137,26 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
 
         let input = channelInfo.id || channelInfo.customUrl || requestedHandleForNetwork || channelInfo.handle;
 
+        const mappedWatchChannelId = (() => {
+            try {
+                const mapped = clickSnapshot?.videoId ? currentSettings?.videoChannelMap?.[clickSnapshot.videoId] : '';
+                return (typeof mapped === 'string' && /^UC[a-zA-Z0-9_-]{22}$/.test(mapped.trim())) ? mapped.trim() : '';
+            } catch (e) {
+                return '';
+            }
+        })();
+        if (
+            mappedWatchChannelId &&
+            !isCommentContextBlock &&
+            videoCard &&
+            isYtmWatchLikeCollaboratorCard(videoCard) &&
+            !channelInfo?.handle &&
+            !channelInfo?.customUrl
+        ) {
+            input = mappedWatchChannelId;
+            channelInfo = { ...(channelInfo || {}), id: mappedWatchChannelId, videoId: clickSnapshot.videoId };
+        }
+
         if (
             !isCommentContextBlock &&
             clickSnapshot?.videoId &&
@@ -10416,7 +11165,8 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             typeof input === 'string' &&
             /^UC[a-zA-Z0-9_-]{22}$/.test(input.trim()) &&
             !channelInfo?.handle &&
-            !channelInfo?.customUrl
+            !channelInfo?.customUrl &&
+            !mappedWatchChannelId
         ) {
             // YTM watch/playlist rows often only expose a recycled or uploader-only UC ID.
             // Prefer watch-page recovery so we persist the authoritative alternate identity.
@@ -10454,34 +11204,13 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                     }
                     didOptimisticHide = true;
                 } else {
-                    const isShorts = videoCard.tagName.toLowerCase().includes('shorts-lockup-view-model') ||
-                        videoCard.tagName.toLowerCase().includes('reel');
-                    let containerToHide = videoCard;
-                    if (isShorts) {
-                        let parentContainer = videoCard.closest('ytd-rich-item-renderer');
-                        if (!parentContainer) {
-                            parentContainer = videoCard.closest('.ytGridShelfViewModelGridShelfItem');
-                        }
-                        if (parentContainer) {
-                            containerToHide = parentContainer;
-                        }
-                    } else {
-                        const isHomeLockup = videoCard.tagName.toLowerCase().includes('lockup-view-model');
-                        if (isHomeLockup) {
-                            const parentContainer = videoCard.closest('ytd-rich-item-renderer');
-                            if (parentContainer) {
-                                containerToHide = parentContainer;
-                            }
-                        }
-                    }
+                    const containerToHide = resolveClickedContentHideTarget(videoCard);
 
                     recordOptimisticHide(containerToHide, channelInfo);
                     didOptimisticHide = true;
 
-                    if (!isShorts) {
-                        // Intentionally do not hide duplicate same-video cards in optimistic phase.
-                        // Filter pass will hide true matches without causing transient over-hide/flicker.
-                    }
+                    // Intentionally do not hide duplicate same-video cards in optimistic phase.
+                    // Filter pass will hide true matches without causing transient over-hide/flicker.
                 }
             } catch (e) {
             }
@@ -10521,6 +11250,7 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
         // try to recover using ytInitialData for this video, then fall back to the Shorts URL helper.
         if (!isCommentContextBlock && !result.success && channelInfo.videoId && (
             initialWas404 ||
+            /No stable channel identifier/i.test(result.error || '') ||
             /No channel identifier/i.test(result.error || '') ||
             !input
         )) {
@@ -10890,30 +11620,14 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                 if (videoCard && !isCommentContextBlock) {
                     filterTubeDebugLog('Hiding video card immediately');
 
-                    const isShorts = videoCard.tagName.toLowerCase().includes('shorts-lockup-view-model') ||
-                        videoCard.tagName.toLowerCase().includes('reel');
+	                    const isShorts = videoCard.tagName.toLowerCase().includes('shorts-lockup-view-model') ||
+	                        videoCard.tagName.toLowerCase().includes('reel');
+	                    const containerToHide = resolveClickedContentHideTarget(videoCard);
+	                    if (isShorts) {
+	                        filterTubeDebugLog('Shorts detected, hiding clicked content target:', containerToHide.tagName || containerToHide.className);
+	                    }
 
-                    let containerToHide = videoCard;
-                    if (isShorts) {
-                        let parentContainer = videoCard.closest('ytd-rich-item-renderer');
-                        if (!parentContainer) {
-                            parentContainer = videoCard.closest('.ytGridShelfViewModelGridShelfItem');
-                        }
-                        if (parentContainer) {
-                            containerToHide = parentContainer;
-                        }
-                        filterTubeDebugLog('Shorts detected, hiding container:', containerToHide.tagName || containerToHide.className);
-                    } else {
-                        const isHomeLockup = videoCard.tagName.toLowerCase().includes('lockup-view-model');
-                        if (isHomeLockup) {
-                            const parentContainer = videoCard.closest('ytd-rich-item-renderer');
-                            if (parentContainer) {
-                                containerToHide = parentContainer;
-                            }
-                        }
-                    }
-
-                    markElementAsBlocked(containerToHide, channelInfo, 'pending');
+	                    markElementAsBlocked(containerToHide, channelInfo, 'pending');
                     containerToHide.style.display = 'none';
                     containerToHide.classList.add('filtertube-hidden');
                     containerToHide.setAttribute('data-filtertube-hidden', 'true');
@@ -10928,13 +11642,8 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             }
         }
 
-        try {
-            const menuDropdown = menuItem.closest('tp-yt-iron-dropdown, ytm-menu-popup-renderer, div.menu-content[role="dialog"]');
-            if (menuDropdown) {
-                forceCloseDropdown(menuDropdown);
-            }
-        } catch (e) {
-        }
+        // Keep the menu/sheet open after a successful block so the user can see the
+        // persisted state and optionally turn on Filter All or block another entry.
 
         // After storage is updated, pull fresh settings (to include the new channel) and re-run DOM pass
         let refreshedSettings = null;

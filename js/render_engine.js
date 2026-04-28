@@ -49,15 +49,19 @@ const RenderEngine = (() => {
         if (channelDerived) element.classList.add('channel-derived');
         if (sourceKey === 'comments') element.classList.add('source-comments');
         if (sourceKey === 'kids') element.classList.add('source-kids');
+        if (sourceKey === 'collab') element.classList.add('source-collab');
     }
 
     function createSourceBadge({ sourceKey, title }) {
         const isFromComments = sourceKey === 'comments';
         const isKidsSynced = sourceKey === 'kids';
+        const isCollaboration = sourceKey === 'collab';
         return createPillBadge({
-            text: isFromComments ? 'From Comments' : 'From Channel',
+            text: isCollaboration ? 'Collaboration' : (isFromComments ? 'From Comments' : (isKidsSynced ? 'From Kids' : 'From Channel')),
             title,
-            variantClass: isFromComments
+            variantClass: isCollaboration
+                ? 'badge-variant-collab'
+                : isFromComments
                 ? 'badge-variant-comments'
                 : (isKidsSynced ? 'badge-variant-kids' : '')
         });
@@ -72,14 +76,24 @@ const RenderEngine = (() => {
     }
 
     function normalizeChannelHandle(handle) {
-        const raw = typeof handle === 'string' ? handle.trim() : '';
+        const raw = decodeChannelDisplayValue(typeof handle === 'string' ? handle.trim() : '');
         if (!raw) return '';
         const stripped = raw.replace(/^@+/, '');
         return stripped ? `@${stripped}` : '';
     }
 
+    function decodeChannelDisplayValue(value) {
+        const raw = typeof value === 'string' ? value.trim() : '';
+        if (!raw || !raw.includes('%')) return raw;
+        try {
+            return decodeURIComponent(raw);
+        } catch (e) {
+            return raw;
+        }
+    }
+
     function normalizeChannelCustomPath(customUrl) {
-        const raw = typeof customUrl === 'string' ? customUrl.trim() : '';
+        const raw = decodeChannelDisplayValue(typeof customUrl === 'string' ? customUrl.trim() : '');
         if (!raw) return '';
 
         const urlMatch = raw.match(/^https?:\/\/(?:www\.)?youtube\.com\/(.+)$/i);
@@ -116,9 +130,10 @@ const RenderEngine = (() => {
     }
 
     function getChannelDisplayName(channel) {
-        return (channel?.name && channel.name !== channel.id)
-            ? channel.name
-            : (channel?.handle || channel?.customUrl || channel?.id || '');
+        const name = decodeChannelDisplayValue(channel?.name || '');
+        return (name && name !== channel.id)
+            ? name
+            : (decodeChannelDisplayValue(channel?.handle || channel?.handleDisplay || channel?.canonicalHandle || channel?.customUrl || '') || channel?.id || '');
     }
 
     function createChannelNameNode(channel) {
@@ -191,24 +206,23 @@ const RenderEngine = (() => {
                 : state.keywords);
         let displayKeywords = [...keywordsSource];
 
-        // If syncing Kids → Main, include ALL kids keywords (both blocked and whitelist)
-        // Respect Main's mode: only show synced keywords in the active list view
-        // Merge BEFORE sorting so Kids entries are interleaved by time
-        if (profile !== 'kids' && state.syncKidsToMain) {
-            const kidsBlockedKeywordsBase = Array.isArray(state.kids?.blockedKeywords) ? state.kids.blockedKeywords : [];
-            const kidsBlockedChannels = Array.isArray(state.kids?.blockedChannels) ? state.kids.blockedChannels : [];
-            const kidsBlockedKeywords = (typeof Settings?.syncFilterAllKeywords === 'function')
-                ? Settings.syncFilterAllKeywords(kidsBlockedKeywordsBase, kidsBlockedChannels)
-                : kidsBlockedKeywordsBase;
-            const kidsWhitelistKeywords = Array.isArray(state.kids?.whitelistKeywords) ? state.kids.whitelistKeywords : [];
-            const allKidsKeywords = [...kidsBlockedKeywords, ...kidsWhitelistKeywords];
+        if (profile !== 'kids' && state.syncKidsToMain && kidsMode === mainMode) {
+            const kidsChannels = mainMode === 'whitelist'
+                ? (Array.isArray(state.kids?.whitelistChannels) ? state.kids.whitelistChannels : [])
+                : (Array.isArray(state.kids?.blockedChannels) ? state.kids.blockedChannels : []);
+            const kidsKeywordBase = mainMode === 'whitelist'
+                ? (Array.isArray(state.kids?.whitelistKeywords) ? state.kids.whitelistKeywords : [])
+                : (Array.isArray(state.kids?.blockedKeywords) ? state.kids.blockedKeywords : []);
+            const kidsKeywords = (typeof Settings?.syncFilterAllKeywords === 'function')
+                ? Settings.syncFilterAllKeywords(kidsKeywordBase, kidsChannels)
+                : kidsKeywordBase;
             // Use the appropriate main keywords based on mode
             const mainKeywords = mainMode === 'whitelist'
                 ? (Array.isArray(state.whitelistKeywords) ? state.whitelistKeywords : [])
                 : (Array.isArray(state.keywords) ? state.keywords : []);
             const seen = new Set(mainKeywords.map(k => (typeof k === 'object' ? k.word : String(k)).toLowerCase()));
             const kidsOnly = [];
-            allKidsKeywords.forEach(k => {
+            kidsKeywords.forEach(k => {
                 const word = typeof k === 'object' ? k.word : String(k);
                 if (!seen.has(word.toLowerCase())) {
                     seen.add(word.toLowerCase());
@@ -305,14 +319,23 @@ const RenderEngine = (() => {
 
         const isChannelDerived = entry.source === 'channel';
         const linkedChannel = isChannelDerived ? findChannelByRef(entry.channelRef) : null;
-        const channelDerivedSourceKey = 'channel';
+        const linkedSource = typeof linkedChannel?.source === 'string' ? linkedChannel.source.toLowerCase() : '';
+        const channelDerivedSourceKey = entry?.__ftFromKids
+            ? 'kids'
+            : (linkedChannel?.collaborationGroupId || (Array.isArray(linkedChannel?.collaborationWith) && linkedChannel.collaborationWith.length > 0) || linkedSource.includes('collab'))
+                ? 'collab'
+                : linkedSource.includes('comment')
+                    ? 'comments'
+                    : linkedSource.includes('kids')
+                        ? 'kids'
+                        : 'channel';
 
         // Create item container
         const item = document.createElement('div');
         item.className = minimal ? 'keyword-item' : 'list-item';
         applySourceClasses(item, {
             channelDerived: isChannelDerived,
-            sourceKey: entry?.__ftFromKids ? 'kids' : null
+            sourceKey: isChannelDerived ? channelDerivedSourceKey : (entry?.__ftFromKids ? 'kids' : null)
         });
 
         // Left side: word and badges
@@ -406,7 +429,7 @@ const RenderEngine = (() => {
                 if (channel) {
                     const originLabel = document.createElement('span');
                     originLabel.className = 'channel-derived-origin';
-                    originLabel.textContent = `Linked to ${channel.name || channel.handle || channel.id}`;
+                    originLabel.textContent = `Linked to ${decodeChannelDisplayValue(channel.name || channel.handleDisplay || channel.handle || channel.customUrl || channel.id)}`;
                     originLabel.title = `This keyword is automatically synced with channel's "Filter All" setting`;
                     left.appendChild(originLabel);
                 }
@@ -428,7 +451,7 @@ const RenderEngine = (() => {
                 if (channel) {
                     const originLabel = document.createElement('span');
                     originLabel.className = 'channel-derived-origin';
-                    originLabel.textContent = `Linked to ${channel.name || channel.handle || channel.id}`;
+                    originLabel.textContent = `Linked to ${decodeChannelDisplayValue(channel.name || channel.handleDisplay || channel.handle || channel.customUrl || channel.id)}`;
                     originLabel.title = `This keyword filters content mentioning "${entry.word}" - automatically synced with channel's "Filter All Content" setting`;
                     left.appendChild(originLabel);
                 }
@@ -552,20 +575,17 @@ const RenderEngine = (() => {
                 ? (Array.isArray(state.whitelistChannels) ? state.whitelistChannels : [])
                 : state.channels);
 
-        // If syncing Kids → Main, include ALL kids channels (both blocked and whitelist)
-        // Respect Main's mode: only show synced channels in the active list view
-        // Merge BEFORE sorting so Kids entries are interleaved by time
-        if (profile !== 'kids' && state.syncKidsToMain) {
-            const kidsBlocked = Array.isArray(state.kids?.blockedChannels) ? state.kids.blockedChannels : [];
-            const kidsWhitelist = Array.isArray(state.kids?.whitelistChannels) ? state.kids.whitelistChannels : [];
-            const allKidsChannels = [...kidsBlocked, ...kidsWhitelist];
+        if (profile !== 'kids' && state.syncKidsToMain && kidsMode === mainMode) {
+            const kidsChannels = mainMode === 'whitelist'
+                ? (Array.isArray(state.kids?.whitelistChannels) ? state.kids.whitelistChannels : [])
+                : (Array.isArray(state.kids?.blockedChannels) ? state.kids.blockedChannels : []);
             // Use the appropriate main channels based on mode
             const mainChannels = mainMode === 'whitelist'
                 ? (Array.isArray(state.whitelistChannels) ? state.whitelistChannels : [])
                 : (Array.isArray(state.channels) ? state.channels : []);
             const seen = new Set(mainChannels.map(deriveChannelKey).filter(Boolean));
             const kidsOnly = [];
-            allKidsChannels.forEach(ch => {
+            kidsChannels.forEach(ch => {
                 const key = deriveChannelKey(ch);
                 if (!key || seen.has(key)) return;
                 seen.add(key);
@@ -1182,12 +1202,12 @@ const RenderEngine = (() => {
         // Prefer to show what the user typed (originalInput) → what we resolved (id/handle/customUrl)
         const originalInput = channel.originalInput || channel.customUrl || channel.handle || channel.id;
         const fetchedId = channel.id;
-        const fetchedHandle = channel.handle || channel.canonicalHandle || channel.handleDisplay || null;
-        const customUrl = channel.customUrl;
+        const fetchedHandle = decodeChannelDisplayValue(channel.handle || channel.canonicalHandle || channel.handleDisplay || '') || null;
+        const customUrl = decodeChannelDisplayValue(channel.customUrl || '');
         const topicName = typeof channel?.name === 'string' ? channel.name.trim() : '';
         const isTopic = isTopicChannel(channel);
 
-        let source = originalInput;
+        let source = decodeChannelDisplayValue(originalInput);
         let target = null;
         let isResolved = false;
 
@@ -1198,38 +1218,38 @@ const RenderEngine = (() => {
 
         // Case: input was a watch placeholder / bare videoId, resolved to UC ID
         if ((inputLooksLikeWatch || inputLooksLikeVideoId) && fetchedId) {
-            source = originalInput;
+            source = decodeChannelDisplayValue(originalInput);
             target = fetchedId;
             isResolved = true;
         }
 
         // Case: input was UC ID, resolved to handle (or display handle)
         else if (inputLooksLikeUc && fetchedHandle) {
-            source = originalInput;
+            source = decodeChannelDisplayValue(originalInput);
             target = fetchedHandle;
             isResolved = true;
         }
         // Case: Topic channels (UC ID + "- Topic" name) count as resolved
         else if (inputLooksLikeUc && !fetchedHandle && isTopic) {
-            source = originalInput;
+            source = decodeChannelDisplayValue(originalInput);
             target = topicName;
             isResolved = true;
         }
         // Case: input was handle, resolved to UC ID
         else if (originalInput && originalInput.startsWith('@') && fetchedId && fetchedId !== originalInput) {
-            source = originalInput;
+            source = decodeChannelDisplayValue(originalInput);
             target = fetchedId;
             isResolved = true;
         }
         // Case: input was UC ID, no handle but we learned customUrl
         else if (inputLooksLikeUc && hasCustomUrl) {
-            source = originalInput;
+            source = decodeChannelDisplayValue(originalInput);
             target = customUrl;
             isResolved = true;
         }
         // Case: input was customUrl c/ or user/, resolved to UC ID
         else if (originalInput && (originalInput.startsWith('c/') || originalInput.startsWith('user/')) && fetchedId) {
-            source = originalInput;
+            source = decodeChannelDisplayValue(originalInput);
             target = fetchedId;
             isResolved = true;
         }
@@ -1245,14 +1265,14 @@ const RenderEngine = (() => {
             const key = String(originalInput).toLowerCase();
             const direct = channelMap[key];
             if (direct) {
-                source = originalInput;
-                target = direct;
+                source = decodeChannelDisplayValue(originalInput);
+                target = decodeChannelDisplayValue(direct);
                 isResolved = true;
             } else if (fetchedId) {
                 const byId = channelMap[String(fetchedId).toLowerCase()];
                 if (byId) {
-                    source = originalInput;
-                    target = byId;
+                    source = decodeChannelDisplayValue(originalInput);
+                    target = decodeChannelDisplayValue(byId);
                     isResolved = true;
                 }
             }

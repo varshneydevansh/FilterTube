@@ -30,9 +30,14 @@
     }
 
     function keywordKey(entry) {
+        if (typeof entry === 'string') {
+            return normalizeString(entry).toLowerCase();
+        }
         const item = safeObject(entry);
+        const word = normalizeString(item.word).toLowerCase();
+        if (!word) return '';
         return [
-            normalizeString(item.word).toLowerCase(),
+            word,
             item.exact === true ? '1' : '0',
             item.comments === false ? '0' : '1',
             item.semantic === true ? '1' : '0'
@@ -51,14 +56,12 @@
     function mergeKeywordLists(base, incoming) {
         const seen = new Map();
         safeArray(base).forEach((entry) => {
-            const item = safeObject(entry);
-            const key = keywordKey(item);
-            if (key) seen.set(key, item);
+            const key = keywordKey(entry);
+            if (key) seen.set(key, entry);
         });
         safeArray(incoming).forEach((entry) => {
-            const item = safeObject(entry);
-            const key = keywordKey(item);
-            if (key) seen.set(key, item);
+            const key = keywordKey(entry);
+            if (key) seen.set(key, entry);
         });
         return Array.from(seen.values());
     }
