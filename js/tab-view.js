@@ -5,6 +5,8 @@
  * Full UI with advanced features: search, sort, node mapping, filter-all toggles
  */
 
+const FILTERTUBE_SEMANTIC_ML_ENABLED = false;
+
 // ============================================================================
 // FILTERS TAB INITIALIZATION
 // ============================================================================
@@ -2411,7 +2413,11 @@ function resolveRequestedView() {
         'donate': 'donate',
         'support': 'donate'
     };
-    return viewMap[normalized] || null;
+    const resolved = viewMap[normalized] || null;
+    if (resolved === 'semantic' && !FILTERTUBE_SEMANTIC_ML_ENABLED) {
+        return 'filters';
+    }
+    return resolved;
 }
 
 /**
@@ -4393,8 +4399,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function resolveViewAccess(requestedViewId) {
-        const viewId = normalizeString(requestedViewId);
+        let viewId = normalizeString(requestedViewId);
         if (!viewId) return { viewId: 'help', reason: 'unknown' };
+        if (viewId === 'semantic' && !FILTERTUBE_SEMANTIC_ML_ENABLED) {
+            viewId = 'filters';
+        }
 
         if (isUiLocked() && !LOCK_ALLOWED_VIEWS.has(viewId)) {
             return { viewId: 'help', reason: 'locked' };
@@ -10475,11 +10484,14 @@ function setupNavigation() {
     function switchView(viewId) {
         let effectiveViewId = viewId;
         try {
+            if (effectiveViewId === 'semantic' && !FILTERTUBE_SEMANTIC_ML_ENABLED) {
+                effectiveViewId = 'filters';
+            }
             if (typeof window.FilterTubeResolveViewAccess === 'function') {
-                effectiveViewId = window.FilterTubeResolveViewAccess(viewId)?.viewId || viewId;
+                effectiveViewId = window.FilterTubeResolveViewAccess(effectiveViewId)?.viewId || effectiveViewId;
             }
         } catch (e) {
-            effectiveViewId = viewId;
+            effectiveViewId = (viewId === 'semantic' && !FILTERTUBE_SEMANTIC_ML_ENABLED) ? 'filters' : viewId;
         }
 
         // Update nav items

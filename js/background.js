@@ -1034,7 +1034,7 @@ function syncStoredMainKeywordsWithChannels(existingKeywords, channels) {
         activeChannelKeys.add(channelRef);
         channelKeywordMap.set(channelRef, {
             word,
-            exact: false,
+            exact: true,
             semantic: false,
             source: 'channel',
             channelRef,
@@ -1067,6 +1067,8 @@ function syncStoredMainKeywordsWithChannels(existingKeywords, channels) {
             synced.push({
                 ...entry,
                 word: nextKeyword.word,
+                exact: true,
+                semantic: false,
                 source: 'channel',
                 channelRef,
                 comments: nextKeyword.comments,
@@ -1168,18 +1170,32 @@ function buildProfilesV4FromLegacyState(items, storageUpdates = {}) {
     if (Array.isArray(rawKeywords)) {
         mainKeywords = rawKeywords;
     } else if (Array.isArray(items?.filterKeywords)) {
+        const parseCompiledKeywordPattern = (pattern) => {
+            const unicodeExactPrefix = '(^|[^\\p{L}\\p{N}_])';
+            const unicodeExactSuffix = '(?=$|[^\\p{L}\\p{N}_])';
+            if (pattern.startsWith(unicodeExactPrefix) && pattern.endsWith(unicodeExactSuffix)) {
+                return {
+                    exact: true,
+                    raw: pattern.slice(unicodeExactPrefix.length, pattern.length - unicodeExactSuffix.length)
+                };
+            }
+            if (pattern.startsWith('\\b') && pattern.endsWith('\\b')) {
+                return {
+                    exact: true,
+                    raw: pattern.replace(/^\\b/, '').replace(/\\b$/, '')
+                };
+            }
+            return { exact: false, raw: pattern };
+        };
         mainKeywords = items.filterKeywords
             .map(keyword => {
                 const pattern = typeof keyword?.pattern === 'string' ? keyword.pattern : '';
                 if (!pattern) return null;
-                const isExact = pattern.startsWith('\\b') && pattern.endsWith('\\b');
-                const raw = pattern
-                    .replace(/^\\b/, '')
-                    .replace(/\\b$/, '')
-                    .replace(/\\(.)/g, '$1');
+                const parsed = parseCompiledKeywordPattern(pattern);
+                const raw = parsed.raw.replace(/\\(.)/g, '$1');
                 const word = raw.trim();
                 if (!word) return null;
-                return { word, exact: isExact, comments: true, addedAt: now, source: 'user' };
+                return { word, exact: parsed.exact, comments: true, addedAt: now, source: 'user' };
             })
             .filter(Boolean);
     } else if (typeof items?.filterKeywords === 'string') {
@@ -1621,6 +1637,31 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
             const useExact = items.useExactWordMatching || false;
 
             const escapeRegex = (value) => String(value || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const exactKeywordPattern = (escaped) => `(^|[^\\p{L}\\p{N}_])${escaped}(?=$|[^\\p{L}\\p{N}_])`;
+            const compileKeywordPattern = (word, exact = false) => {
+                const escaped = escapeRegex(word);
+                return {
+                    pattern: exact ? exactKeywordPattern(escaped) : escaped,
+                    flags: exact ? 'iu' : 'i'
+                };
+            };
+            const parseCompiledKeywordPattern = (pattern) => {
+                const unicodeExactPrefix = '(^|[^\\p{L}\\p{N}_])';
+                const unicodeExactSuffix = '(?=$|[^\\p{L}\\p{N}_])';
+                if (pattern.startsWith(unicodeExactPrefix) && pattern.endsWith(unicodeExactSuffix)) {
+                    return {
+                        exact: true,
+                        raw: pattern.slice(unicodeExactPrefix.length, pattern.length - unicodeExactSuffix.length)
+                    };
+                }
+                if (pattern.startsWith('\\b') && pattern.endsWith('\\b')) {
+                    return {
+                        exact: true,
+                        raw: pattern.replace(/^\\b/, '').replace(/\\b$/, '')
+                    };
+                }
+                return { exact: false, raw: pattern };
+            };
             const compileKeywordEntries = (entries, predicate = null) => {
                 const list = Array.isArray(entries) ? entries : [];
                 const compiled = [];
@@ -1634,12 +1675,11 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
                     if (predicate && !predicate(entry)) continue;
 
                     const exact = (typeof entry === 'object' && entry) ? entry.exact === true : false;
-                    const escaped = escapeRegex(word);
-                    const pattern = exact ? `\\b${escaped}\\b` : escaped;
-                    const key = `${pattern.toLowerCase()}::i`;
+                    const compiledEntry = compileKeywordPattern(word, exact);
+                    const key = `${compiledEntry.pattern.toLowerCase()}::${compiledEntry.flags}`;
                     if (seen.has(key)) continue;
                     seen.add(key);
-                    compiled.push({ pattern, flags: 'i' });
+                    compiled.push(compiledEntry);
                 }
 
                 return compiled;
@@ -1656,12 +1696,9 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
                 // If we don't yet have uiKeywords, attempt to reconstruct them from the compiled list
                 if (!storedUiKeywords && compiledSettings.filterKeywords.length) {
                     storageUpdates.uiKeywords = compiledSettings.filterKeywords.map(keyword => {
-                        const isExact = keyword.pattern.startsWith('\\b') && keyword.pattern.endsWith('\\b');
-                        const raw = keyword.pattern
-                            .replace(/^\\b/, '')
-                            .replace(/\\b$/, '')
-                            .replace(/\\(.)/g, '$1');
-                        return { word: raw, exact: isExact };
+                        const parsed = parseCompiledKeywordPattern(keyword.pattern || '');
+                        const raw = parsed.raw.replace(/\\(.)/g, '$1');
+                        return { word: raw, exact: parsed.exact };
                     });
                 }
             } else if (typeof storedCompiled === 'string') {
@@ -1674,11 +1711,7 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
 
                 compiledSettings.filterKeywords = parsedKeywords.map(keyword => {
                     try {
-                        const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                        return {
-                            pattern: useExact ? `\\b${escaped}\\b` : escaped,
-                            flags: 'i'
-                        };
+                        return compileKeywordPattern(keyword, useExact);
                     } catch (error) {
                         console.error(`FilterTube: Invalid regex from legacy keyword: ${keyword}`, error);
                         return null;
@@ -1709,9 +1742,8 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
                     compiledSettings.filterKeywordsComments = compiledSettings.filterKeywords.filter(kw => {
                         try {
                             const raw = typeof kw.pattern === 'string' ? kw.pattern : '';
-                            const unwrapped = raw
-                                .replace(/^\\b/, '')
-                                .replace(/\\b$/, '')
+                            const parsed = parseCompiledKeywordPattern(raw);
+                            const unwrapped = parsed.raw
                                 .replace(/\\(.)/g, '$1')
                                 .trim()
                                 .toLowerCase();
@@ -2051,11 +2083,7 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
 
                         // If filterAll is enabled, add the channel name to keywords
                         if (channelObj.filterAll && channelObj.name && channelObj.name !== channelObj.id) {
-                            const escaped = channelObj.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                            additionalKeywordsFromChannels.push({
-                                pattern: escaped,
-                                flags: 'i'
-                            });
+                            additionalKeywordsFromChannels.push(compileKeywordPattern(channelObj.name, true));
                         }
 
                         return channelObj;
@@ -2194,12 +2222,8 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
                     try {
                         const word = typeof entry?.word === 'string' ? entry.word.trim() : '';
                         if (!word) return null;
-                        const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                         const exact = entry?.exact === true;
-                        return {
-                            pattern: exact ? `\\b${escaped}\\b` : escaped,
-                            flags: 'i'
-                        };
+                        return compileKeywordPattern(word, exact);
                     } catch (e) {
                         return null;
                     }
@@ -2210,12 +2234,8 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
                         if (entry && typeof entry === 'object' && entry.comments === false) return null;
                         const word = typeof entry?.word === 'string' ? entry.word.trim() : '';
                         if (!word) return null;
-                        const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                         const exact = entry?.exact === true;
-                        return {
-                            pattern: exact ? `\\b${escaped}\\b` : escaped,
-                            flags: 'i'
-                        };
+                        return compileKeywordPattern(word, exact);
                     } catch (e) {
                         return null;
                     }

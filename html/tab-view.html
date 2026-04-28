@@ -46,7 +46,7 @@
                     </span>
                     <span class="nav-label">Filters</span>
                 </li>
-                <li class="nav-item" data-tab="semantic">
+                <li class="nav-item" data-tab="semantic" hidden aria-hidden="true" data-feature-state="future">
                     <span class="nav-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -301,18 +301,18 @@
                     </div>
                 </div>
 
-                <!-- Semantic View (Placeholder) -->
+                <!-- Semantic View (feature-gated placeholder) -->
                 <div id="semanticView" class="view-section">
                     <div class="view-shell view-shell--semantic semantic-shell">
                         <section class="view-hero semantic-hero">
                             <div class="view-hero__copy">
-                                <p class="view-hero__eyebrow">Local semantic direction</p>
-                                <h2 class="view-hero__title">The next layer is smarter matching, not cloud profiling.</h2>
-                                <p class="view-hero__body">Today FilterTube already runs with explicit rules. The future semantic layer is about helping those rules catch more of what you meant, while keeping your browsing behavior on-device.</p>
+                                <p class="view-hero__eyebrow">Future layer</p>
+                                <h2 class="view-hero__title">Semantic ML is disabled until runtime matching is implemented.</h2>
+                                <p class="view-hero__body">Today FilterTube enforces explicit keywords, channels, whitelist rules, and content controls. Semantic state stays compatible with profiles, but it is not presented as an active filter.</p>
                             </div>
                             <div class="view-hero__meta">
                                 <span class="view-meta-pill">Current: explicit rules</span>
-                                <span class="view-meta-pill">Research: local semantic help</span>
+                                <span class="view-meta-pill">Feature-gated: future matching</span>
                                 <span class="view-meta-pill">Later: thumbnail analysis</span>
                             </div>
                         </section>
@@ -329,9 +329,9 @@
                                             </path>
                                         </svg>
                                     </div>
-                                    <h2>Local semantic filtering</h2>
-                                    <p>This surface will explain how smarter matching can extend current FilterTube rules without turning the product into surveillance software.</p>
-                                    <p class="sub-text">Planned areas include title and description understanding first, with thumbnail analysis staying clearly in roadmap territory until it is local and explainable.</p>
+                                    <h2>Semantic release gate</h2>
+                                    <p>Semantic ML is intentionally hidden from normal navigation because matching behavior is not implemented in the runtime yet.</p>
+                                    <p class="sub-text">Explicit filters remain the enforceable product. Future semantic review should return only after the extension runtime defines local, explainable matching.</p>
                                 </div>
                             </div>
                         </div>
@@ -926,6 +926,10 @@
                                                 <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px;">
                                                     <span class="exact-toggle toggle-variant-red active">Filter All</span>
                                                     <span style="font-size:13px;color:var(--ft-color-text-secondary);margin-left:6px;">Creates a channel-derived keyword with Exact on the channel name.</span>
+                                                </div>
+                                                <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px;">
+                                                    <span class="exact-toggle toggle-variant-purple is-disabled" aria-disabled="true">Semantic ML (Future)</span>
+                                                    <span style="font-size:13px;color:var(--ft-color-text-secondary);margin-left:6px;">Disabled until local runtime matching is implemented and verified.</span>
                                                 </div>
                                             </div>
                                         </div>

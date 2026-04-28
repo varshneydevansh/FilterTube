@@ -253,7 +253,7 @@ On both **YouTube Main** and **YouTube Kids**, FilterTube can often learn the ca
 
 ### Future Features (Coming Soon)
 
-- **Semantic ML Filtering**: AI-powered filtering that understands video context, not just keywords
+- **Semantic ML Filtering (future)**: Reserved for local, explainable matching after runtime support is implemented; current releases enforce explicit keywords, channels, whitelist rules, and content controls
 - **Kids Mode**: PIN-protected safe environment with whitelisted channels only
 - **Smart Sync**: Automatic linking of channel @handles and IDs for better blocking
 

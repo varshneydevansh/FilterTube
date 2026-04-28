@@ -839,7 +839,7 @@ const channelData = {
 };
 ```
 
-`filterAll` is the source state for channel-derived keyword sync. The linked keyword list is regenerated from channel state, which is why dashboard toggles and 3-dot menu blocks now stay aligned.
+`filterAll` is the source state for channel-derived keyword sync. The linked keyword list is regenerated from channel state with Exact matching, which is why dashboard toggles and 3-dot menu blocks now stay aligned and derived keywords are removed only by clearing the owning channel row.
 
 ## Cross-World Communication
 

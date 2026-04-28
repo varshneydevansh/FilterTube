@@ -175,6 +175,24 @@
     }
 
     function normalizeKeywords(rawKeywords, compiledKeywords) {
+        const parseCompiledKeyword = (pattern) => {
+            const unicodeExactPrefix = '(^|[^\\p{L}\\p{N}_])';
+            const unicodeExactSuffix = '(?=$|[^\\p{L}\\p{N}_])';
+            if (pattern.startsWith(unicodeExactPrefix) && pattern.endsWith(unicodeExactSuffix)) {
+                return {
+                    exact: true,
+                    raw: pattern.slice(unicodeExactPrefix.length, pattern.length - unicodeExactSuffix.length)
+                };
+            }
+            if (pattern.startsWith('\\b') && pattern.endsWith('\\b')) {
+                return {
+                    exact: true,
+                    raw: pattern.replace(/^\\b/, '').replace(/\\b$/, '')
+                };
+            }
+            return { exact: false, raw: pattern };
+        };
+
         if (Array.isArray(rawKeywords)) {
             // For existing keywords without timestamps, assign them based on array position
             // This ensures older entries get older timestamps
@@ -195,12 +213,9 @@
             return compiledKeywords
                 .map(entry => {
                     if (!entry || typeof entry.pattern !== 'string') return null;
-                    const isExact = entry.pattern.startsWith('\\b') && entry.pattern.endsWith('\\b');
-                    const raw = entry.pattern
-                        .replace(/^\\b/, '')
-                        .replace(/\\b$/, '')
-                        .replace(/\\(.)/g, '$1');
-                    return sanitizeKeywordEntry({ word: raw, exact: isExact }, { source: 'user', channelRef: null });
+                    const parsed = parseCompiledKeyword(entry.pattern);
+                    const raw = parsed.raw.replace(/\\(.)/g, '$1');
+                    return sanitizeKeywordEntry({ word: raw, exact: parsed.exact }, { source: 'user', channelRef: null });
                 })
                 .filter(Boolean);
         }
@@ -341,9 +356,10 @@
             .filter(entry => (typeof predicate === 'function' ? predicate(entry) : true))
             .map(entry => {
                 const escaped = entry.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const exactPattern = `(^|[^\\p{L}\\p{N}_])${escaped}(?=$|[^\\p{L}\\p{N}_])`;
                 return {
-                    pattern: entry.exact ? `\\b${escaped}\\b` : escaped,
-                    flags: 'i'
+                    pattern: entry.exact ? exactPattern : escaped,
+                    flags: entry.exact ? 'iu' : 'i'
                 };
             });
     }
@@ -382,7 +398,7 @@
             activeChannelKeys.add(key);
             channelKeywordMap.set(key, {
                 word: getChannelKeywordWord(channel),
-                exact: false,
+                exact: true,
                 semantic: false,
                 source: 'channel',
                 channelRef: key,
@@ -407,7 +423,17 @@
 
                 // If it's a channel-derived keyword, only keep if channel still has filterAll
                 if (entry.channelRef && activeChannelKeys.has(entry.channelRef)) {
-                    result.push(entry);
+                    const nextKeyword = channelKeywordMap.get(entry.channelRef);
+                    result.push({
+                        ...entry,
+                        word: nextKeyword?.word || entry.word,
+                        exact: true,
+                        semantic: false,
+                        source: 'channel',
+                        channelRef: entry.channelRef,
+                        comments: (typeof nextKeyword?.comments === 'boolean') ? nextKeyword.comments : entry.comments,
+                        addedAt: entry.addedAt || nextKeyword?.addedAt || Date.now()
+                    });
                     activeChannelKeys.delete(entry.channelRef); // Mark as already added
                 }
             });

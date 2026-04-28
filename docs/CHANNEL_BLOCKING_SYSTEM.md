@@ -966,8 +966,9 @@ Previously:
 - Background refused to store the channel if `fetchChannelInfo()` failed.
 
 Now:
-- Background allows storing a **handle-only** blocked channel when the error looks like 404.
-  - This makes “block + hide now” work even without UC ID.
+- Background refuses to persist unresolved handle-only rows.
+  - A block can recover through `channelMap`, `watch:<videoId>`, watch-page identity fetch, or a known UC ID.
+  - If none of those produce a stable `UC...` ID, the menu shows a failure state instead of writing a weak handle-only channel row.
 
 ### 13.2 Why we still “resolved” the wrong handle sometimes
 

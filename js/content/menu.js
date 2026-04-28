@@ -147,25 +147,66 @@ function ensureFilterTubeMenuStyles() {
         background-color: #9f362d !important;
     }
 
-    .filtertube-block-channel-item.filtertube-blocked {
-        background: rgba(16, 185, 129, 0.12) !important;
+    .filtertube-block-channel-item.filtertube-blocked,
+    .filtertube-block-channel-item.filtertube-blocked .filtertube-menu-item {
+        background: linear-gradient(90deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.08)) !important;
+        border-left: 4px solid #10b981 !important;
+        box-shadow: inset 0 0 0 1px rgba(16, 185, 129, 0.16) !important;
     }
 
-    .filtertube-block-channel-item.filtertube-blocked .filtertube-menu-title {
+    .filtertube-modern-bottom-sheet-item.filtertube-blocked .menu-item-button {
+        background: linear-gradient(90deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.08)) !important;
+        border-left: 4px solid #10b981 !important;
+        border-radius: 8px !important;
+        box-shadow: inset 0 0 0 1px rgba(16, 185, 129, 0.16) !important;
+    }
+
+    .filtertube-block-channel-item.filtertube-blocked .filtertube-menu-title,
+    .filtertube-block-channel-item.filtertube-blocked .yt-core-attributed-string {
         color: #10b981 !important;
+        font-weight: 700 !important;
     }
 
-    .filtertube-block-channel-item.filtertube-collab-selected:not(.filtertube-blocked) {
-        background: rgba(248, 113, 113, 0.18) !important;
-        border-left: 3px solid #dc2626 !important;
+    .filtertube-block-channel-item.filtertube-blocked .filtertube-menu-label,
+    .filtertube-block-channel-item.filtertube-blocked .filtertube-menu-separator,
+    .filtertube-block-channel-item.filtertube-blocked .filtertube-channel-name {
+        color: #059669 !important;
     }
 
-    .filtertube-block-channel-item.filtertube-collab-selected:not(.filtertube-blocked) .filtertube-menu-title {
-        color: #dc2626 !important;
+    .filtertube-block-channel-item.filtertube-collab-selected:not(.filtertube-blocked),
+    .filtertube-block-channel-item.filtertube-collab-selected:not(.filtertube-blocked) .filtertube-menu-item {
+        background: linear-gradient(90deg, rgba(16, 185, 129, 0.18), rgba(236, 253, 245, 0.82)) !important;
+        border-left: 4px solid #10b981 !important;
+        box-shadow: inset 0 0 0 1px rgba(16, 185, 129, 0.14) !important;
     }
 
-    .filtertube-block-channel-item.filtertube-multistep-ready {
+    .filtertube-modern-bottom-sheet-item.filtertube-collab-selected:not(.filtertube-blocked) .menu-item-button {
+        background: linear-gradient(90deg, rgba(16, 185, 129, 0.18), rgba(236, 253, 245, 0.82)) !important;
+        border-left: 4px solid #10b981 !important;
+        border-radius: 8px !important;
+        box-shadow: inset 0 0 0 1px rgba(16, 185, 129, 0.14) !important;
+    }
+
+    .filtertube-block-channel-item.filtertube-collab-selected:not(.filtertube-blocked) .filtertube-menu-title,
+    .filtertube-block-channel-item.filtertube-collab-selected:not(.filtertube-blocked) .yt-core-attributed-string {
+        color: #047857 !important;
+        font-weight: 700 !important;
+    }
+
+    .filtertube-block-channel-item.filtertube-collab-selected:not(.filtertube-blocked) .filtertube-menu-label,
+    .filtertube-block-channel-item.filtertube-collab-selected:not(.filtertube-blocked) .filtertube-menu-separator,
+    .filtertube-block-channel-item.filtertube-collab-selected:not(.filtertube-blocked) .filtertube-channel-name {
+        color: #047857 !important;
+    }
+
+    .filtertube-block-channel-item.filtertube-multistep-ready,
+    .filtertube-block-channel-item.filtertube-multistep-ready .filtertube-menu-item {
         background: rgba(16, 185, 129, 0.12) !important;
+    }
+
+    .filtertube-modern-bottom-sheet-item.filtertube-multistep-ready .menu-item-button {
+        background: rgba(16, 185, 129, 0.12) !important;
+        border-radius: 8px !important;
     }
 
     .filtertube-block-channel-item.filtertube-multistep-ready .filtertube-menu-title {
@@ -199,6 +240,34 @@ function ensureFilterTubeMenuStyles() {
         background-color: #b44339 !important;
         color: #ffffff !important;
         border-color: #b44339 !important;
+    }
+
+    html[dark="true"] .filtertube-block-channel-item.filtertube-blocked,
+    html[dark="true"] .filtertube-block-channel-item.filtertube-blocked .filtertube-menu-item,
+    html[dark="true"] .filtertube-modern-bottom-sheet-item.filtertube-blocked .menu-item-button,
+    html[dark]:not([dark="false"]) .filtertube-block-channel-item.filtertube-blocked,
+    html[dark]:not([dark="false"]) .filtertube-block-channel-item.filtertube-blocked .filtertube-menu-item,
+    html[dark]:not([dark="false"]) .filtertube-modern-bottom-sheet-item.filtertube-blocked .menu-item-button,
+    html[data-theme="dark"] .filtertube-block-channel-item.filtertube-blocked,
+    html[data-theme="dark"] .filtertube-block-channel-item.filtertube-blocked .filtertube-menu-item,
+    html[data-theme="dark"] .filtertube-modern-bottom-sheet-item.filtertube-blocked .menu-item-button {
+        background: linear-gradient(90deg, rgba(16, 185, 129, 0.24), rgba(6, 95, 70, 0.16)) !important;
+        border-left-color: #34d399 !important;
+        box-shadow: inset 0 0 0 1px rgba(52, 211, 153, 0.2) !important;
+    }
+
+    html[dark="true"] .filtertube-block-channel-item.filtertube-collab-selected:not(.filtertube-blocked),
+    html[dark="true"] .filtertube-block-channel-item.filtertube-collab-selected:not(.filtertube-blocked) .filtertube-menu-item,
+    html[dark="true"] .filtertube-modern-bottom-sheet-item.filtertube-collab-selected:not(.filtertube-blocked) .menu-item-button,
+    html[dark]:not([dark="false"]) .filtertube-block-channel-item.filtertube-collab-selected:not(.filtertube-blocked),
+    html[dark]:not([dark="false"]) .filtertube-block-channel-item.filtertube-collab-selected:not(.filtertube-blocked) .filtertube-menu-item,
+    html[dark]:not([dark="false"]) .filtertube-modern-bottom-sheet-item.filtertube-collab-selected:not(.filtertube-blocked) .menu-item-button,
+    html[data-theme="dark"] .filtertube-block-channel-item.filtertube-collab-selected:not(.filtertube-blocked),
+    html[data-theme="dark"] .filtertube-block-channel-item.filtertube-collab-selected:not(.filtertube-blocked) .filtertube-menu-item,
+    html[data-theme="dark"] .filtertube-modern-bottom-sheet-item.filtertube-collab-selected:not(.filtertube-blocked) .menu-item-button {
+        background: linear-gradient(90deg, rgba(16, 185, 129, 0.22), rgba(6, 95, 70, 0.14)) !important;
+        border-left-color: #34d399 !important;
+        box-shadow: inset 0 0 0 1px rgba(52, 211, 153, 0.18) !important;
     }
 
     html[dark="false"] .filtertube-filter-all-toggle.exact-toggle {

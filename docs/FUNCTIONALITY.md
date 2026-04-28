@@ -180,7 +180,7 @@ YouTube JSON Data → FilterTubeEngine.processData() → Filtered Data → YouTu
 
 ### **Channel-Derived Keyword Sync (Filter All)**
 
-- **Linked Keyword Model**: `Filter All` creates a channel-derived fuzzy keyword linked to the blocked channel rather than a standalone hand-authored keyword.
+- **Linked Keyword Model**: `Filter All` creates a channel-derived Exact keyword linked to the blocked channel rather than a standalone hand-authored keyword.
 - **Shared Behavior Across Entry Points**: The same linked keyword state is now produced whether the user toggles `Filter All` in Channel Management or blocks through the 3-dot menu flow.
 - **Stored As Channel State**: The source of truth remains the channel record (`filterAll: true`); keyword storage is regenerated from channel state instead of drifting independently.
 - **UI Meaning**: In dashboard lists, these rows should be read as linked system entries such as `Linked to ...` / `Auto-added by "Filter All Content"` rather than user-authored keywords.
@@ -271,9 +271,9 @@ YouTube JSON Data → FilterTubeEngine.processData() → Filtered Data → YouTu
 #### UI polish (v3.2.1)
 - Popup search bars (keywords/channels/content controls) now align to full row width; add buttons sit beside matching-sized inputs.
 - Content control rows in popup hide descriptions for compactness; tab view keeps descriptions as title-only tooltips (hover the title text).
-- Pills/chips: Exact = whole-term matching; Comment defaults **ON** (filters matching comments, can be turned off even if Hide Comments is on); Filter All creates a linked channel-derived fuzzy keyword from channel state rather than a standalone exact keyword. C/E round chips mirror popup pills.
+- Pills/chips: Exact = whole-term matching; Comment defaults **ON** (filters matching comments, can be turned off even if Hide Comments is on); Filter All creates a linked channel-derived Exact keyword from channel state. C/E round chips mirror popup pills.
 - Proactive XHR interception provides instant channel names in 3-dot menus, eliminating "Fetching..." delays.
-- Badges match row tinting: green = From Channel, brown = From Comments, yellow = Collaboration rows.
+- Badges match row tinting: green = From Channel, brown = From Comments, yellow = Collaboration rows, pink = From Kids.
 - If the active profile is PIN-protected and still locked, the popup header `Enabled / Disabled` control is read-only and cannot pause filtering until the profile is unlocked.
 
 #### Watch / fallback 3-dot behavior (v3.3.0 state)

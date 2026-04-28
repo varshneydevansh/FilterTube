@@ -498,14 +498,13 @@ const RenderEngine = (() => {
             if (commentsToggle) controls.appendChild(commentsToggle);
             if (exactToggle instanceof Node) controls.appendChild(exactToggle);
 
-            // In full UI, add semantic toggle (disabled for now)
+            // In full UI, show semantic release-gate state without presenting it as active filtering.
             if (!minimal && profile !== 'kids') {
                 const semanticToggle = document.createElement('div');
-                semanticToggle.className = 'exact-toggle toggle-variant-purple';
-                semanticToggle.textContent = 'Semantic';
-                semanticToggle.title = 'Enable semantic matching (Coming Soon)';
-                semanticToggle.style.opacity = '0.5';
-                semanticToggle.style.cursor = 'not-allowed';
+                semanticToggle.className = 'exact-toggle toggle-variant-purple is-disabled';
+                semanticToggle.textContent = 'Semantic ML (Future)';
+                semanticToggle.title = 'Semantic ML is disabled until runtime matching is implemented';
+                semanticToggle.setAttribute('aria-disabled', 'true');
                 controls.appendChild(semanticToggle);
             }
 
@@ -1115,7 +1114,7 @@ const RenderEngine = (() => {
                     await StateManager?.toggleChannelFilterAll(index);
                 },
                 className: 'toggle-variant-red',
-                title: `Automatically adds "${channel.name || channel.handle || channel.id}" as a fuzzy keyword filter - hides any content mentioning this channel name`
+                title: `Automatically adds "${channel.name || channel.handle || channel.id}" as a channel-derived Exact keyword`
             }) :
             createFallbackFilterAllToggle(channel, index, profile);
 
@@ -1145,7 +1144,7 @@ const RenderEngine = (() => {
         const toggle = document.createElement('div');
         toggle.className = `exact-toggle toggle-variant-red ${channel.filterAll ? 'active' : ''}`;
         toggle.textContent = 'Filter All';
-        toggle.title = `Automatically adds "${channel.name || channel.handle || channel.id}" as a fuzzy keyword filter - hides any content mentioning this channel name`;
+        toggle.title = `Automatically adds "${channel.name || channel.handle || channel.id}" as a channel-derived Exact keyword`;
         toggle.addEventListener('click', async () => {
             if (profile === 'kids') {
                 await StateManager?.toggleKidsChannelFilterAll?.(index);

@@ -1136,6 +1136,14 @@ html[data-theme="dark"] .list-item {
     border-color: rgba(15, 118, 86, 0.92);
 }
 
+.exact-toggle.is-disabled,
+.exact-toggle[aria-disabled="true"] {
+    opacity: 0.56;
+    cursor: not-allowed;
+    pointer-events: none;
+    filter: saturate(0.82);
+}
+
 /* Dark mode support */
 html[data-theme="dark"] .exact-toggle {
     background: rgba(20, 28, 38, 0.94);
