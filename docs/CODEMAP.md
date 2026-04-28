@@ -106,6 +106,8 @@ FilterTube/
 - **Non-configurable Property Safety**: Checks for `configurable: false` before attempting to define properties
 - **Error Handling**: Try-catch blocks around `ytInitialData` hook installation
 - **Subscriptions Import Coordinator**: Handles `FilterTube_RequestSubscriptionImport`, builds `FEchannels` request profiles from `ytcfg`, normalizes channel rows, emits progress, and returns the final channel list.
+- **Authoritative Collaborator Roster Scoring**: Header-backed `Collaborators` sheets are tagged as `collaborators-sheet` and score above avatar-stack/direct-list fallbacks for the same video.
+- **Composite Collaborator Pruning**: `sanitizeCollaboratorList()` removes fallback-only composite name rows before caching, e.g. `Daddy Yankee Bizarrap` beside `Daddy Yankee` + `Bizarrap`.
 
 ### `js/seed.js` - **SAFETY ENHANCED v3.2.1+**
 **Context:** Main World (YouTube pages)
@@ -155,6 +157,8 @@ FilterTube/
 | `injectFilterTubeMenuItem()` | Injects the "Block Channel" option into YouTube's 3-dot menu (new selectors cover `button-view-model` home cards). |
 | `enrichCollaboratorsWithMainWorld()` | Bridges collaborator requests between DOM and Main world, ensuring `allCollaborators` is populated for every surface. |
 | `generateCollaborationGroupId()` | Creates deterministic IDs so grouped channels remain linked across storage/UI. |
+| `sanitizeCollaboratorListWithMeta()` | Normalizes collaborator rosters, drops placeholders/composite fallback rows, and reports pruning metadata for expected-count correction. |
+| `resolveExpectedCollaboratorCount()` | Keeps menu expected counts aligned with sanitized rosters when fallback extraction inflated a collaborator count. |
 
 ### `js/content/dom_fallback.js`
 **Context:** Isolated World

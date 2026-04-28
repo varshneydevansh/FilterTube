@@ -235,6 +235,7 @@ Two paths, both proactive:
 **1) XHR JSON (`filter_logic.js`)**:
 - `avatarStackViewModel.avatars[]` → extract UC/handle/customUrl/name
 - `showDialogCommand` / `showSheetCommand` → full collaborator list
+- `showSheetCommand.panelLoadingStrategy.inlineContent.sheetViewModel.header.panelHeaderViewModel.title.content == "Collaborators"` is the authoritative roster discriminator
 - Broadcast via `FilterTube_CacheCollaboratorInfo`
 
 **2) DOM fallback (`content_bridge.js`)**:
@@ -243,6 +244,17 @@ Two paths, both proactive:
 - Fall back to main-world `searchYtInitialDataForVideoChannel`
 
 Result: Multi-channel menus appear instantly on watch/home/search.
+
+Authoritative roster precedence:
+
+```text
+Collaborators sheet JSON
+  > dialog/sheet roster variants with collaborator header
+  > avatar-stack / direct-list fallback with stable identities
+  > DOM byline and collapsed text warm-up
+```
+
+The fallback paths are still important for early UI warm-up, but they must not override a header-backed `Collaborators` sheet for the same `videoId`.
 
 ### 4.5 Collaboration guardrails and menu refresh (v3.3.0)
 
@@ -256,6 +268,14 @@ Evidence now needs to come from one or more of:
 - multiple distinct channel links on the same card
 
 This prevents false positives such as single channel names containing `&` / `and`.
+
+Additional roster guards added on 2026-04-28:
+
+- fallback collaborator candidates are sanitized before scoring, caching, and menu rendering
+- placeholder rows such as `and 2 more` are dropped
+- weak name-only composite rows are dropped when their normalized label is fully covered by two other collaborator labels
+- example: `Daddy Yankee Bizarrap` is removed when `Daddy Yankee` and `Bizarrap` are already in the roster
+- if a pruned composite row inflated `expectedCollaboratorCount`, the expected count is collapsed to the pruned roster length
 
 On watch-like surfaces, the 3-dot menu can now also:
 

@@ -4,7 +4,8 @@ This document tracks which YouTube renderers/selectors FilterTube currently targ
 
 **Major updates tracked here:**
 - **Proactive Network Interception**: Added comprehensive XHR interception and snapshot stashing
-- **Enhanced Collaboration Detection**: Added `avatarStackViewModel` support for Mix cards and collaboration detection
+- **Enhanced Collaboration Detection**: Added `avatarStackViewModel` support for collaboration detection while keeping Mix/Radio renderers explicitly excluded
+- **Authoritative Collaborator Rosters**: Header-backed `Collaborators` sheets now outrank avatar/direct-list fallbacks, and weak composite name-only rows are pruned before cache/menu use
 - **Topic Channel Support**: Added special handling for auto-generated YouTube topic channels
 - **Post-Block Enrichment**: Added background enrichment system for incomplete channel data
 - **Kids Video Enhancement**: Added `kidsVideoOwnerExtension` and `externalChannelId` support
@@ -77,6 +78,9 @@ const roots = [
 | Renderer/Component | Collaboration Type | Status | Notes |
 | --- | --- | --- | --- |
 | `avatarStackViewModel` | Multi-channel avatar stacks | ✅ **NEW** | Extracts collaborators from avatar arrays @js/injector.js#extractFromAvatarStackViewModel |
+| `showSheetCommand.panelLoadingStrategy.inlineContent.sheetViewModel.header.panelHeaderViewModel.title.content == "Collaborators"` | Authoritative collaborator roster | ✅ **PRIMARY** | Wins over avatar stack/direct-list fallback candidates for the same `videoId` |
+| direct / nested `listViewModel.listItems` without `Collaborators` header | Fallback candidate only | ⚠️ **GUARDED** | Can seed recovery, but cannot outrank a header-backed `Collaborators` roster |
+| weak composite name-only rows | Fallback pollution | ✅ **PRUNED** | Rows such as `Daddy Yankee Bizarrap` are removed when fully covered by `Daddy Yankee` + `Bizarrap` |
 | `decoratedAvatarViewModel` | Channel avatars with endpoints | ✅ **ENHANCED** | Now extracts logos and channel info @js/filter_logic.js#340 |
 | Mix Cards (`collection-stack`) | **NOT** collaborations | ✅ **FIXED** | Properly excluded from collaboration detection @js/content_bridge.js#isMixCardElement |
 
@@ -105,6 +109,17 @@ const roots = [
     ]
 }
 ```
+
+**Candidate precedence rule (2026-04-28):**
+
+```text
+1. Header-backed "Collaborators" sheet roster
+2. Dialog/sheet roster variants with explicit collaborator header
+3. Avatar-stack or direct-list fallback with stable identities
+4. DOM byline/collapsed text warm-up only
+```
+
+Fallback candidates are sanitized before scoring and caching. A longer fallback list is not automatically richer if one row is a composite of two real channel labels.
 
 ### **NEW v3.2.1: Topic Channel Support**
 
@@ -241,6 +256,26 @@ Each collaborator in `listItems[].listItemViewModel`:
 | `<yt-avatar-stack-view-model>` | DOM-only (avatar stack) | ✅ Covered | Used to seed collaborator lists and detect collaboration dialog triggers when present |
 | `<a href="/@handle">` | Direct channel link | ⚠️ Partial | Only FIRST channel has direct link in DOM; others require ytInitialData lookup |
 | `badge-shape[title*="•"]` | DOM-only badges | ✅ Covered | Regex `@([A-Za-z0-9._-]+)` extracts handles even when encoded as `@foo.bar` |
+
+#### Roster Precedence and Fallback Sanitizing (2026-04-28)
+
+The full collaborator sheet is authoritative when present:
+
+```text
+shortBylineText.runs[0]
+  .navigationEndpoint.showSheetCommand
+  .panelLoadingStrategy.inlineContent.sheetViewModel
+  .header.panelHeaderViewModel.title.content == "Collaborators"
+```
+
+`injector.js` marks this source as `collaborators-sheet` and gives it a candidate-score bonus. `content_bridge.js` and `injector.js` both sanitize rosters before expected-count stamping or menu rendering.
+
+Guardrails:
+
+- Do not let avatar-stack/direct-list fallback beat a `Collaborators` sheet for the same `videoId`.
+- Drop placeholder rows such as `and 2 more`.
+- Drop weak composite name-only rows that are fully covered by two other labels, such as `Daddy Yankee Bizarrap` when `Daddy Yankee` and `Bizarrap` are already present.
+- If a composite row inflated the expected count, collapse the count to the pruned roster length.
 
 #### 3-Dot Menu UI for Collaborations
 

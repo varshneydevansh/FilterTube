@@ -4,6 +4,31 @@
 
 FilterTube v3.3.0 builds on the earlier performance and whitelist-mode work with watch-page SPA recovery hardening, Mix/watch fallback-menu fixes, stronger collaboration roster recovery, cross-browser subscribed-channels import hardening, and smaller UX controls around backups and menu injection. This technical documentation covers the filtering logic, identity recovery behavior, mode switching, and user experience enhancements.
 
+## Collaboration roster checkpoint (2026-04-28)
+
+The collaboration pipeline now treats YouTube's explicit `Collaborators` sheet as authoritative:
+
+```text
+shortBylineText.runs[0]
+  .navigationEndpoint.showSheetCommand
+  .panelLoadingStrategy.inlineContent.sheetViewModel
+  .header.panelHeaderViewModel.title.content == "Collaborators"
+```
+
+Why this matters:
+
+- prefetch/global search can see several candidates for the same `videoId`
+- avatar stacks and direct list models are useful warm-up fallbacks, but they can contain weak composite labels
+- a longer fallback list is not necessarily richer than the actual `Collaborators` sheet
+
+Runtime rules:
+
+- `injector.js` tags header-backed rosters as `collaborators-sheet` and scores them above fallback candidates
+- `content_bridge.js` and `injector.js` sanitize collaborator lists before caching, menu rendering, and expected-count stamping
+- placeholder rows such as `and 2 more` are removed
+- weak name-only composite rows are removed when fully covered by two other collaborator labels, for example `Daddy Yankee Bizarrap` beside `Daddy Yankee` and `Bizarrap`
+- Mix/Radio containers remain excluded from collaborator promotion through renderer, overlay, RD playlist, and `Mix -/–/—` title guards
+
 ## Nanah technical checkpoint
 
 FilterTube now also includes a profile-aware device sync surface in `Accounts & Sync`.

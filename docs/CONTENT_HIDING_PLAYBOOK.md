@@ -587,10 +587,17 @@ Watch-page playlists (`list=...`):
   - Same as surface (Home/Search/Watch) + special 3-dot “multi-step” selection.
 - **Identity sources**
   - `injector.js` collaborator extraction from ytInitialData.
+  - Header-backed `Collaborators` sheets are authoritative when present.
   - Expected handle/name hints are used to avoid picking the wrong collaborator.
+- **Roster precedence**
+  - `showSheetCommand.panelLoadingStrategy.inlineContent.sheetViewModel.header.panelHeaderViewModel.title.content == "Collaborators"` wins over avatar-stack, direct-list, and DOM byline fallbacks for the same `videoId`.
+  - Avatar stacks and direct list models are warm-up/fallback sources only unless there is no authoritative sheet.
+  - Weak composite name-only rows are pruned before cache, menu render, and expected-count stamping. Example: `Daddy Yankee Bizarrap` is removed when the roster already has `Daddy Yankee` and `Bizarrap`.
 
 Mix cards:
 - Mix cards are treated as playlists (container items), but they are not collaborations. Seed-artist text such as “A and more” must not be interpreted as channel collaborators.
+- Current Mix guards include `radioRenderer`, `compactRadioRenderer`, RD playlist IDs, overlay icon/text `MIX`/`Mix`, video-count signals, and titles beginning with `Mix -`, `Mix –`, or `Mix —`.
+- If a Mix seed video is itself a collaboration, collaborator recovery must come from the seed video's watch/search JSON, not the Mix card title/byline.
 
 
 ## 7) Why 3-dot Blocking Could Still Fail to Recover UC ID

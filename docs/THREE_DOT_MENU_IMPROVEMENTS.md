@@ -25,6 +25,9 @@ The newer watch-page SPA and custom fallback work tightened a few behaviors that
 7. **Desktop watch-right-rail collaboration warm-up**: `yt-lockup-view-model` watch cards can start from byline hints and upgrade into a full collaborator menu once Main World returns the roster.
 8. **False-positive collab guards**: Plain names like `Paura & Profitto` are no longer treated as collaborations just because the text contains `&` or `and`.
 9. **Optional menu injection**: Users can now disable FilterTube's injected 3-dot menu entry while keeping Quick Block available.
+10. **Authoritative collaborator sheets**: A YouTube JSON sheet whose header is `Collaborators` now outranks avatar-stack/direct-list fallback candidates for the same video.
+11. **Composite fallback pruning**: Weak name-only rows such as `Daddy Yankee Bizarrap` are removed when they are only a composite of two real collaborator labels.
+12. **Mix container hardening**: `radioRenderer` / `compactRadioRenderer`, RD playlist IDs, Mix overlay badges, and `Mix -` / `Mix –` / `Mix —` titles block collaboration promotion for the Mix container itself.
 
 ## Current Surface Guarantees
 
@@ -33,6 +36,8 @@ The newer watch-page SPA and custom fallback work tightened a few behaviors that
 - **YTM watch-like rows**: mobile watch-list rows use the same collaborator warm-up path instead of waiting for a perfect initial DOM snapshot.
 - **Mix cards with collaboration seed videos**: when the underlying video is a real collaboration, the 3-dot menu can now recover the collaborators from watch/main-world data instead of stopping at the visible uploader.
 - **Single-channel names with separators**: plain names containing `&` or `and` do not become fake collaboration menus unless explicit collaborator evidence exists.
+- **Authoritative roster precedence**: when `shortBylineText.runs[0].navigationEndpoint.showSheetCommand...sheetViewModel.header...title.content` is `Collaborators`, that list is the source of truth; fallback sources can fill missing fields but cannot invent extra collaborator rows.
+- **Composite row guard**: a fallback-only entry with no UC ID, handle, or custom URL is dropped if its normalized name is fully covered by two other collaborator labels.
 
 ## Solution Architecture
 
@@ -224,6 +229,34 @@ if (isMixCardElement(card)) {
         return extractChannelInfoFromLink(href, name);
     }
 }
+```
+
+#### Collaboration Roster Precedence
+```javascript
+// Simplified current rule
+const header = sheetViewModel?.header?.panelHeaderViewModel?.title?.content;
+if (/^Collaborators$/i.test(header || '')) {
+    // Authoritative roster: outranks avatar/direct-list fallback candidates.
+    return markCollaboratorListSource(listItems, 'collaborators-sheet');
+}
+
+// Fallback lists are sanitized before use:
+// - remove "and N more" placeholders
+// - remove composite name-only rows covered by two real labels
+// - collapse expected count when a pruned composite inflated the count
+```
+
+Example:
+
+```text
+Raw fallback:
+  Bizarrap
+  Daddy Yankee Bizarrap
+  Daddy Yankee
+
+Sanitized roster:
+  Bizarrap
+  Daddy Yankee
 ```
 
 #### Watch Page Right Pane
