@@ -2593,6 +2593,144 @@ function countDistinctChannelLinks(root) {
     return seen.size;
 }
 
+function textFromRendererTextLike(value) {
+    if (!value) return '';
+    if (typeof value === 'string') return value;
+    if (typeof value.content === 'string') return value.content;
+    if (typeof value.simpleText === 'string') return value.simpleText;
+    if (Array.isArray(value.runs)) {
+        return value.runs.map(run => run?.text || '').join('').trim();
+    }
+    return '';
+}
+
+function isMixTitleText(text) {
+    return /^(mix\s*[-–—:]|my mix\b)/i.test(String(text || '').trim());
+}
+
+function hasMixRendererDataSignal(candidate, depth = 0, visited = new WeakSet()) {
+    if (!candidate || typeof candidate !== 'object' || depth > 9) return false;
+    if (visited.has(candidate)) return false;
+    visited.add(candidate);
+
+    if (candidate.radioRenderer || candidate.compactRadioRenderer) return true;
+
+    const renderer = candidate.radioRenderer ||
+        candidate.compactRadioRenderer ||
+        candidate.content?.radioRenderer ||
+        candidate.content?.compactRadioRenderer ||
+        candidate.richItemRenderer?.content?.radioRenderer ||
+        candidate.richItemRenderer?.content?.compactRadioRenderer ||
+        candidate.data?.radioRenderer ||
+        candidate.data?.compactRadioRenderer ||
+        candidate.data?.content?.radioRenderer ||
+        candidate.data?.content?.compactRadioRenderer ||
+        candidate.__data?.data?.radioRenderer ||
+        candidate.__data?.data?.compactRadioRenderer ||
+        candidate.__data?.data?.content?.radioRenderer ||
+        candidate.__data?.data?.content?.compactRadioRenderer ||
+        null;
+
+    if (renderer && renderer !== candidate) {
+        return true;
+    }
+
+    const overlay = candidate.thumbnailOverlayBottomPanelRenderer || null;
+    const overlayIcon = String(overlay?.icon?.iconType || candidate.icon?.iconType || '').toUpperCase();
+    const overlayText = textFromRendererTextLike(overlay?.text).trim().toLowerCase();
+    if (overlayIcon === 'MIX' || overlayText === 'mix') return true;
+
+    const overlays = Array.isArray(candidate.thumbnailOverlays) ? candidate.thumbnailOverlays : [];
+    if (overlays.some(item => hasMixRendererDataSignal(item, depth + 1, visited))) {
+        return true;
+    }
+
+    const playlistId = String(
+        candidate.playlistId ||
+        candidate.navigationEndpoint?.watchEndpoint?.playlistId ||
+        candidate.secondaryNavigationEndpoint?.watchEndpoint?.playlistId ||
+        candidate.watchEndpoint?.playlistId ||
+        ''
+    );
+    if (/^RD/i.test(playlistId)) {
+        const titleText = textFromRendererTextLike(candidate.title).trim();
+        const badgeText = (
+            textFromRendererTextLike(candidate.thumbnailText) ||
+            textFromRendererTextLike(candidate.videoCountText) ||
+            textFromRendererTextLike(candidate.videoCountShortText)
+        ).trim().toLowerCase();
+        if (isMixTitleText(titleText) || badgeText.includes('videos')) {
+            return true;
+        }
+    }
+
+    const keys = [
+        'content',
+        'richItemRenderer',
+        'data',
+        '__data',
+        'renderer',
+        'videoWithContextRenderer',
+        'compactVideoRenderer',
+        'lockupViewModel',
+        'playlistPanelVideoRenderer',
+        'playlistVideoRenderer'
+    ];
+    for (const key of keys) {
+        if (hasMixRendererDataSignal(candidate[key], depth + 1, visited)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function getRendererDataCandidatesForElement(element) {
+    const candidates = [];
+    const seen = new Set();
+    const add = (source) => {
+        if (!source || typeof source !== 'object') return;
+        if (source instanceof Element || source instanceof Node || source === window) return;
+        if (seen.has(source)) return;
+        seen.add(source);
+        candidates.push(source);
+    };
+
+    const addElementSources = (el) => {
+        if (!el || typeof el !== 'object') return;
+        add(el.data);
+        add(el.data?.data);
+        add(el.data?.content);
+        add(el.data?.metadata);
+        add(el.data?.renderer);
+        add(el.__data);
+        add(el.__data?.data);
+        add(el.__data?.item);
+        add(el.__data?.content);
+        add(el.__data?.metadata);
+    };
+
+    try {
+        const root = findVideoCardElement(element) || element;
+        addElementSources(root);
+
+        const parents = [
+            root?.parentElement,
+            root?.closest?.('ytm-rich-item-renderer'),
+            root?.closest?.('ytm-radio-renderer'),
+            root?.closest?.('ytm-compact-radio-renderer'),
+            root?.closest?.('ytd-radio-renderer'),
+            root?.closest?.('ytd-compact-radio-renderer'),
+            root?.closest?.('yt-lockup-view-model'),
+            root?.closest?.('yt-lockup-metadata-view-model')
+        ];
+        parents.forEach(addElementSources);
+    } catch (e) {
+    }
+
+    return candidates;
+}
+
 function isMixCardElement(element) {
     if (!element || typeof element.querySelector !== 'function') return false;
     const root = findVideoCardElement(element) || element;
@@ -2604,6 +2742,10 @@ function isMixCardElement(element) {
         tagName === 'ytd-radio-renderer' ||
         tagName === 'ytd-compact-radio-renderer'
     ) {
+        return true;
+    }
+
+    if (getRendererDataCandidatesForElement(root).some(candidate => hasMixRendererDataSignal(candidate))) {
         return true;
     }
 
@@ -2631,17 +2773,24 @@ function isMixCardElement(element) {
         root.getAttribute('aria-label') ||
         ''
     ).replace(/\s+/g, ' ').trim();
-    if (/^(mix\s*[-:]|my mix\b)/i.test(titleText)) {
+    if (isMixTitleText(titleText)) {
         return true;
     }
 
     const textPrefix = (root.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 160);
-    if (/^(mix\s*[-:]|my mix\b)/i.test(textPrefix)) {
+    if (isMixTitleText(textPrefix)) {
         return true;
     }
 
     const badgeText = Array.from(root.querySelectorAll(
         'yt-thumbnail-overlay-badge-view-model badge-shape .yt-badge-shape__text, ' +
+        'yt-thumbnail-overlay-bottom-panel-view-model, ' +
+        'ytd-thumbnail-overlay-bottom-panel-renderer, ' +
+        'ytm-thumbnail-overlay-bottom-panel-renderer, ' +
+        'ytd-thumbnail-overlay-radio-renderer, ' +
+        '[overlay-style="MIX"], ' +
+        '[aria-label="Mix" i], ' +
+        '[title="Mix" i], ' +
         '.ytm-badge-and-byline-item, ' +
         '.badge-style-type-simple'
     ))
@@ -3305,6 +3454,7 @@ function handleMediaPlayback(element, shouldHide) {
 
 function extractCollaboratorMetadataFromRenderer(rendererCandidate) {
     if (!rendererCandidate || typeof rendererCandidate !== 'object') return [];
+    if (hasMixRendererDataSignal(rendererCandidate)) return [];
 
     const extractListItemsFromSheetLikeCommand = (command) => {
         const listItems =
@@ -3329,7 +3479,39 @@ function extractCollaboratorMetadataFromRenderer(rendererCandidate) {
         return Array.isArray(listItems) ? listItems : [];
     };
 
+    const getSheetLikeCommandTitle = (command) => {
+        const titleCandidates = [
+            command?.panelLoadingStrategy?.inlineContent?.sheetViewModel?.header?.panelHeaderViewModel?.title,
+            command?.panelLoadingStrategy?.inlineContent?.sheetViewModel?.header?.title,
+            command?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.header?.panelHeaderViewModel?.title,
+            command?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.title,
+            command?.dialog?.presenterDialogViewModel?.header?.panelHeaderViewModel?.title,
+            command?.dialog?.presenterDialogViewModel?.title,
+            command?.dialog?.dialogViewModel?.header?.panelHeaderViewModel?.title,
+            command?.dialog?.dialogViewModel?.title,
+            command?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.sheetViewModel?.header?.panelHeaderViewModel?.title,
+            command?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.sheetViewModel?.header?.title,
+            command?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.header?.panelHeaderViewModel?.title,
+            command?.showSheetCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.title,
+            command?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.sheetViewModel?.header?.panelHeaderViewModel?.title,
+            command?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.sheetViewModel?.header?.title,
+            command?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.header?.panelHeaderViewModel?.title,
+            command?.showDialogCommand?.panelLoadingStrategy?.inlineContent?.dialogViewModel?.title
+        ];
+        for (const candidate of titleCandidates) {
+            const title = textFromRendererTextLike(candidate).trim();
+            if (title) return title;
+        }
+        return '';
+    };
+
+    const isCollaboratorsSheetLikeCommand = (command) => {
+        const title = getSheetLikeCommandTitle(command);
+        return /^collaborators$/i.test(title.trim());
+    };
+
     const extractFromSheetLikeCommand = (command) => {
+        if (!isCollaboratorsSheetLikeCommand(command)) return [];
         const listItems = extractListItemsFromSheetLikeCommand(command);
         if (!Array.isArray(listItems) || listItems.length === 0) return [];
 
@@ -3402,6 +3584,8 @@ function extractCollaboratorMetadataFromRenderer(rendererCandidate) {
         renderer = renderer.content.playlistVideoRenderer;
     } else if (renderer.content?.compactVideoRenderer) {
         renderer = renderer.content.compactVideoRenderer;
+    } else if (renderer.content?.radioRenderer || renderer.content?.compactRadioRenderer) {
+        return [];
     } else if (renderer.richItemRenderer?.content?.videoRenderer) {
         renderer = renderer.richItemRenderer.content.videoRenderer;
     } else if (renderer.richItemRenderer?.content?.videoWithContextRenderer) {
@@ -3412,6 +3596,8 @@ function extractCollaboratorMetadataFromRenderer(rendererCandidate) {
         renderer = renderer.richItemRenderer.content.playlistPanelVideoRenderer;
     } else if (renderer.richItemRenderer?.content?.playlistVideoRenderer) {
         renderer = renderer.richItemRenderer.content.playlistVideoRenderer;
+    } else if (renderer.richItemRenderer?.content?.radioRenderer || renderer.richItemRenderer?.content?.compactRadioRenderer) {
+        return [];
     } else if (renderer.videoRenderer) {
         renderer = renderer.videoRenderer;
     } else if (renderer.videoWithContextRenderer) {
@@ -3424,7 +3610,12 @@ function extractCollaboratorMetadataFromRenderer(rendererCandidate) {
         renderer = renderer.playlistVideoRenderer;
     } else if (renderer.compactVideoRenderer) {
         renderer = renderer.compactVideoRenderer;
+    } else if (renderer.radioRenderer || renderer.compactRadioRenderer) {
+        return [];
     } else if (renderer.data?.content) {
+        if (renderer.data.content.radioRenderer || renderer.data.content.compactRadioRenderer) {
+            return [];
+        }
         renderer = renderer.data.content.videoRenderer ||
             renderer.data.content.videoWithContextRenderer ||
             renderer.data.content.lockupViewModel ||
@@ -3435,6 +3626,7 @@ function extractCollaboratorMetadataFromRenderer(rendererCandidate) {
     }
 
     if (!renderer || typeof renderer !== 'object') return [];
+    if (hasMixRendererDataSignal(renderer)) return [];
 
     const collaborators = [];
     const byline = renderer.shortBylineText || renderer.longBylineText;
@@ -3467,6 +3659,7 @@ function extractCollaboratorMetadataFromRenderer(rendererCandidate) {
         const scan = (node, depth = 0) => {
             if (!node || typeof node !== 'object' || visited.has(node) || depth > 10) return [];
             visited.add(node);
+            if (hasMixRendererDataSignal(node)) return [];
 
             const sheetLikeCommand = node.showSheetCommand || node.showDialogCommand;
             if (sheetLikeCommand) {
@@ -3535,6 +3728,7 @@ function hydrateCollaboratorsFromRendererData(card) {
     ];
 
     for (const candidate of candidates) {
+        if (hasMixRendererDataSignal(candidate)) continue;
         const extracted = extractCollaboratorMetadataFromRenderer(candidate);
         if (Array.isArray(extracted) && extracted.length > 0) {
             return extracted;
@@ -3998,8 +4192,9 @@ function isYtmWatchLikeCollaboratorCard(videoCard) {
     try {
         const tag = String(videoCard?.tagName || '').toLowerCase();
         if (!tag.startsWith('ytm-')) return false;
+        if (isMixCardElement(videoCard)) return false;
         return (
-            videoCard.matches?.('ytm-playlist-panel-video-renderer, ytm-video-with-context-renderer, ytm-compact-video-renderer, ytm-playlist-video-renderer, ytm-compact-radio-renderer') ||
+            videoCard.matches?.('ytm-playlist-panel-video-renderer, ytm-video-with-context-renderer, ytm-compact-video-renderer, ytm-playlist-video-renderer') ||
             Boolean(videoCard.closest?.('ytm-single-column-watch-next-results-renderer, ytm-playlist-panel-renderer, ytm-item-section-renderer'))
         );
     } catch (e) {
@@ -4026,6 +4221,9 @@ function isDesktopWatchLikeCollaboratorCard(videoCard) {
 
 function getWatchLikeCollaborationWarmup(videoCard) {
     if (!videoCard) {
+        return { collaborators: [], expectedCount: 0 };
+    }
+    if (isMixCardElement(videoCard)) {
         return { collaborators: [], expectedCount: 0 };
     }
 
@@ -4139,6 +4337,7 @@ function promoteYtmWatchRowIdentityFromCollaboratorMetadata(channelInfo, videoCa
 function cardHasCollaborationDomSignal(videoCard) {
     try {
         if (!videoCard) return false;
+        if (isMixCardElement(videoCard)) return false;
         if (videoCard.querySelector('yt-avatar-stack-view-model')) return true;
         if (hasAttributedCollaboratorSignal(videoCard.querySelector('#attributed-channel-name, [id="attributed-channel-name"]'))) {
             return true;

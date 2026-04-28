@@ -122,6 +122,13 @@ function isFilterTubeMixOrRadioElement(element) {
 
         const badgeText = Array.from(element.querySelectorAll(
             'yt-thumbnail-overlay-badge-view-model badge-shape .yt-badge-shape__text, ' +
+            'yt-thumbnail-overlay-bottom-panel-view-model, ' +
+            'ytd-thumbnail-overlay-bottom-panel-renderer, ' +
+            'ytm-thumbnail-overlay-bottom-panel-renderer, ' +
+            'ytd-thumbnail-overlay-radio-renderer, ' +
+            '[overlay-style="MIX"], ' +
+            '[aria-label="Mix" i], ' +
+            '[title="Mix" i], ' +
             '.ytm-badge-and-byline-item, ' +
             '.badge-style-type-simple'
         ))
@@ -140,10 +147,10 @@ function isFilterTubeMixOrRadioElement(element) {
             element.getAttribute('aria-label') ||
             ''
         ).replace(/\s+/g, ' ').trim();
-        if (/^(mix\s*[-:]|my mix\b)/i.test(titleText)) return true;
+        if (/^(mix\s*[-–—:]|my mix\b)/i.test(titleText)) return true;
 
         const textPrefix = (element.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 180);
-        return /^(?:\d+\+?\s*)?(mix\s*[-:]|my mix\b)/i.test(textPrefix);
+        return /^(?:\d+\+?\s*)?(mix\s*[-–—:]|my mix\b)/i.test(textPrefix);
     } catch (e) {
         return false;
     }
