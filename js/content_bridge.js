@@ -2222,10 +2222,85 @@ function isPlaceholderCollaboratorEntry(collaborator) {
     return COLLAB_PLACEHOLDER_NAME_PATTERN.test(normalized);
 }
 
-function sanitizeCollaboratorList(collaborators = []) {
-    if (!Array.isArray(collaborators)) return [];
+function hasStrongCollaboratorIdentity(collaborator) {
+    if (!collaborator || typeof collaborator !== 'object') return false;
+    return Boolean(
+        (typeof collaborator.id === 'string' && /^UC[\w-]{22}$/i.test(collaborator.id.trim())) ||
+        (typeof collaborator.handle === 'string' && collaborator.handle.trim()) ||
+        (typeof collaborator.customUrl === 'string' && collaborator.customUrl.trim())
+    );
+}
+
+function normalizeCompositeCollaboratorLabel(value) {
+    if (!value || typeof value !== 'string') return '';
+    let normalized = value.trim().replace(/^@+/, '');
+    try {
+        normalized = normalized.normalize('NFKD').replace(/[\u0300-\u036f]/g, '');
+    } catch (_) {
+        // ignore
+    }
+    try {
+        return normalized.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').replace(/\s+/g, ' ').trim();
+    } catch (_) {
+        return normalized.toLowerCase().replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ').trim();
+    }
+}
+
+function collaboratorCompositeLabelVariants(collaborator) {
+    if (!collaborator || typeof collaborator !== 'object') return [];
+    return [
+        collaborator.name,
+        collaborator.handle,
+        collaborator.customUrl
+    ]
+        .map(normalizeCompositeCollaboratorLabel)
+        .filter(Boolean);
+}
+
+function isCompositeNameOnlyCollaborator(candidate, collaborators) {
+    if (!candidate || hasStrongCollaboratorIdentity(candidate) || !candidate.name) return false;
+
+    const candidateLabel = normalizeCompositeCollaboratorLabel(candidate.name);
+    if (!candidateLabel) return false;
+    const candidateTokens = new Set(candidateLabel.split(' ').filter(Boolean));
+    if (candidateTokens.size < 2) return false;
+
+    let coveredTokens = 0;
+    let matchedLabels = 0;
+
+    (Array.isArray(collaborators) ? collaborators : []).forEach(other => {
+        if (!other || other === candidate) return;
+        const variants = collaboratorCompositeLabelVariants(other);
+        if (variants.length === 0) return;
+
+        const matchedVariant = variants.find(label => {
+            if (!label || label === candidateLabel) return false;
+            const tokens = label.split(' ').filter(Boolean);
+            if (tokens.length === 0 || tokens.length > candidateTokens.size) return false;
+            return tokens.every(token => candidateTokens.has(token));
+        });
+
+        if (!matchedVariant) return;
+        matchedLabels += 1;
+        coveredTokens += matchedVariant.split(' ').filter(Boolean).length;
+    });
+
+    return matchedLabels >= 2 && coveredTokens >= candidateTokens.size;
+}
+
+function sanitizeCollaboratorListWithMeta(collaborators = []) {
+    if (!Array.isArray(collaborators)) {
+        return {
+            collaborators: [],
+            rawCount: 0,
+            beforeCompositeCount: 0,
+            droppedPlaceholderCount: 0,
+            droppedCompositeCount: 0
+        };
+    }
     const sanitized = [];
     const seenKeys = new Set();
+    let droppedPlaceholderCount = 0;
 
     collaborators.forEach(collab => {
         if (!collab || typeof collab !== 'object') return;
@@ -2237,7 +2312,10 @@ function sanitizeCollaboratorList(collaborators = []) {
         };
 
         if (!normalized.name && !normalized.handle && !normalized.id && !normalized.customUrl) return;
-        if (isPlaceholderCollaboratorEntry(normalized)) return;
+        if (isPlaceholderCollaboratorEntry(normalized)) {
+            droppedPlaceholderCount += 1;
+            return;
+        }
 
         const key = (normalized.id || normalized.handle || normalized.customUrl || normalized.name.toLowerCase());
         if (!key || seenKeys.has(key)) return;
@@ -2245,12 +2323,41 @@ function sanitizeCollaboratorList(collaborators = []) {
         sanitized.push(normalized);
     });
 
-    return sanitized;
+    const beforeCompositeCount = sanitized.length;
+    const pruned = sanitized.filter(collaborator => !isCompositeNameOnlyCollaborator(collaborator, sanitized));
+
+    return {
+        collaborators: pruned,
+        rawCount: collaborators.length,
+        beforeCompositeCount,
+        droppedPlaceholderCount,
+        droppedCompositeCount: beforeCompositeCount - pruned.length
+    };
+}
+
+function sanitizeCollaboratorList(collaborators = []) {
+    return sanitizeCollaboratorListWithMeta(collaborators).collaborators;
+}
+
+function resolveExpectedCollaboratorCount(rawCollaborators, sanitizedCollaborators, ...countHints) {
+    const sanitizedCount = Array.isArray(sanitizedCollaborators) ? sanitizedCollaborators.length : 0;
+    const meta = sanitizeCollaboratorListWithMeta(rawCollaborators);
+    const numericHints = countHints
+        .map(value => parseInt(value || '0', 10) || 0)
+        .filter(value => value > 0);
+    let expected = Math.max(sanitizedCount, ...numericHints);
+
+    if (meta.droppedCompositeCount > 0 && expected <= meta.beforeCompositeCount) {
+        expected = sanitizedCount;
+    }
+
+    return expected;
 }
 
 function getCollaboratorListQuality(list = []) {
-    if (!Array.isArray(list) || list.length === 0) return 0;
-    return list.reduce((score, collaborator) => {
+    const sanitized = sanitizeCollaboratorList(list);
+    if (!Array.isArray(sanitized) || sanitized.length === 0) return 0;
+    return sanitized.reduce((score, collaborator) => {
         if (!collaborator) return score;
         let entryScore = 10; // prioritize length first
         if (collaborator.name) entryScore += 1;
@@ -2962,11 +3069,16 @@ function requestCollaboratorEnrichment(element, videoId, partialCollaborators = 
 
     requestCollaboratorInfoFromMainWorld(videoId, lookupOptions)
         .then(collaborators => {
-            if (Array.isArray(collaborators) && collaborators.length > 0) {
+            const sanitizedResponse = sanitizeCollaboratorList(collaborators);
+            if (sanitizedResponse.length > 0) {
                 const videoCard = findVideoCardElement(element);
-                const expectedCount = parseInt(videoCard?.getAttribute('data-filtertube-expected-collaborators') || '0', 10) ||
-                    parseInt(element.getAttribute?.('data-filtertube-expected-collaborators') || '0', 10) ||
-                    collaborators.length;
+                const expectedCount = resolveExpectedCollaboratorCount(
+                    collaborators,
+                    sanitizedResponse,
+                    parseInt(videoCard?.getAttribute('data-filtertube-expected-collaborators') || '0', 10) || 0,
+                    parseInt(element.getAttribute?.('data-filtertube-expected-collaborators') || '0', 10) || 0,
+                    sanitizedResponse.length
+                );
                 applyResolvedCollaborators(videoId, collaborators, {
                     expectedCount,
                     sourceCard: videoCard
@@ -2993,7 +3105,11 @@ function applyResolvedCollaborators(videoId, collaborators, options = {}) {
 
     const incomingScore = getCollaboratorListQuality(sanitized);
     const cachedScore = getCollaboratorListQuality(resolvedCollaboratorsByVideoId.get(videoId));
-    const expectedCountHint = options.expectedCount || 0;
+    const expectedCountHint = resolveExpectedCollaboratorCount(
+        collaborators,
+        sanitized,
+        options.expectedCount || 0
+    );
     const forceUpdate = Boolean(options.force);
     const sourceCard = options.sourceCard || null;
     const sourceLabel = options.sourceLabel || '';
@@ -3025,9 +3141,10 @@ function applyResolvedCollaborators(videoId, collaborators, options = {}) {
         card.removeAttribute('data-filtertube-collab-awaiting-dialog');
         card.removeAttribute('data-filtertube-collab-requested');
         if (expectedCountHint || sanitized.length) {
-            const expected = Math.max(
+            const expected = resolveExpectedCollaboratorCount(
+                collaborators,
+                sanitized,
                 expectedCountHint,
-                sanitized.length,
                 parseInt(card.getAttribute('data-filtertube-expected-collaborators') || '0', 10) || 0
             );
             if (expected > 0) {
@@ -3051,7 +3168,9 @@ function applyResolvedCollaborators(videoId, collaborators, options = {}) {
     const expectedAttr = cards[0]?.getAttribute('data-filtertube-expected-collaborators') ||
         sourceCard?.getAttribute?.('data-filtertube-expected-collaborators') ||
         '';
-    const expectedCount = Math.max(
+    const expectedCount = resolveExpectedCollaboratorCount(
+        collaborators,
+        sanitized,
         expectedCountHint,
         parseInt(expectedAttr || '0', 10) || 0,
         sanitized.length
@@ -3081,6 +3200,11 @@ function applyCollaboratorsByVideoId(videoId, collaborators, options = {}) {
     const sanitized = sanitizeCollaboratorList(collaborators);
     if (sanitized.length === 0) return false;
     const incomingScore = getCollaboratorListQuality(sanitized);
+    const expectedCountHint = resolveExpectedCollaboratorCount(
+        collaborators,
+        sanitized,
+        options.expectedCount || 0
+    );
 
     const key = `vid:${videoId}`;
     let entry = window.pendingCollabCards.get(key);
@@ -3121,8 +3245,10 @@ function applyCollaboratorsByVideoId(videoId, collaborators, options = {}) {
         card.setAttribute('data-filtertube-collab-state', 'resolved');
         card.removeAttribute('data-filtertube-collab-awaiting-dialog');
         card.removeAttribute('data-filtertube-collab-requested');
-        const expected = Math.max(
-            options.expectedCount || sanitized.length,
+        const expected = resolveExpectedCollaboratorCount(
+            collaborators,
+            sanitized,
+            expectedCountHint || sanitized.length,
             parseInt(card.getAttribute('data-filtertube-expected-collaborators') || '0', 10) || 0
         );
         if (expected > 0) {
@@ -3144,7 +3270,7 @@ function applyCollaboratorsByVideoId(videoId, collaborators, options = {}) {
     }
 
     refreshActiveCollaborationMenu(videoId, sanitized, {
-        expectedCount: options.expectedCount || sanitized.length,
+        expectedCount: expectedCountHint || sanitized.length,
         force: options.force
     });
 
@@ -3784,7 +3910,12 @@ function extractCollaboratorMetadataFromElement(element) {
         if (sanitizedRenderer.length > 0) {
             Array.prototype.push.apply(collaborators, sanitizedRenderer);
             partialCollaboratorsForEnrichment = sanitizedRenderer.slice(0, Math.min(sanitizedRenderer.length, 2));
-            expectedCollaboratorCount = Math.max(expectedCollaboratorCount, sanitizedRenderer.length);
+            expectedCollaboratorCount = resolveExpectedCollaboratorCount(
+                rendererCollaborators,
+                sanitizedRenderer,
+                expectedCollaboratorCount,
+                sanitizedRenderer.length
+            );
             if (card) {
                 const timestamp = Date.now();
                 try {
@@ -3795,13 +3926,19 @@ function extractCollaboratorMetadataFromElement(element) {
                 card.setAttribute('data-filtertube-collaborators-source', 'lockup');
                 card.setAttribute('data-filtertube-collaborators-ts', String(timestamp));
                 const existingExpected = parseInt(card.getAttribute('data-filtertube-expected-collaborators') || '0', 10) || 0;
-                if (existingExpected < sanitizedRenderer.length) {
-                    card.setAttribute('data-filtertube-expected-collaborators', String(sanitizedRenderer.length));
+                const resolvedExpected = resolveExpectedCollaboratorCount(
+                    rendererCollaborators,
+                    sanitizedRenderer,
+                    existingExpected,
+                    sanitizedRenderer.length
+                );
+                if (resolvedExpected > 0) {
+                    card.setAttribute('data-filtertube-expected-collaborators', String(resolvedExpected));
                 }
                 const resolvedVideoId = ensureVideoIdForCard(card);
                 if (resolvedVideoId) {
-                    applyResolvedCollaborators(resolvedVideoId, sanitizedRenderer, {
-                        expectedCount: Math.max(existingExpected, sanitizedRenderer.length),
+                    applyResolvedCollaborators(resolvedVideoId, rendererCollaborators, {
+                        expectedCount: resolvedExpected,
                         sourceCard: card,
                         sourceLabel: 'lockup'
                     });
@@ -3891,7 +4028,9 @@ function extractCollaboratorMetadataFromElement(element) {
                 }
             }
 
-            const resolvedExpected = Math.max(
+            const resolvedExpected = resolveExpectedCollaboratorCount(
+                collaborators,
+                bestList,
                 expectedCountHint || 0,
                 parseInt(cacheTarget.getAttribute('data-filtertube-expected-collaborators') || '0', 10) || 0,
                 bestList.length
@@ -3905,7 +4044,9 @@ function extractCollaboratorMetadataFromElement(element) {
         collaborators.length = 0;
         Array.prototype.push.apply(collaborators, bestList);
 
-        const resolvedExpected = Math.max(
+        const resolvedExpected = resolveExpectedCollaboratorCount(
+            collaborators,
+            bestList,
             expectedCountHint || 0,
             parseInt(cacheTarget?.getAttribute?.('data-filtertube-expected-collaborators') || '0', 10) || 0,
             bestList.length
@@ -4453,7 +4594,13 @@ function normalizeCollaboratorChannelInfoForCard(initialChannelInfo, videoCard, 
         }
     }
 
-    const expectedCollaboratorCount = Math.max(
+    const expectedCollaboratorCount = resolveExpectedCollaboratorCount(
+        [
+            ...cardCollaborators,
+            ...(Array.isArray(cachedResolved) ? cachedResolved : []),
+            ...avatarStackCollaborators
+        ],
+        sanitizedCollaborators,
         channelInfo.expectedCollaboratorCount || 0,
         options.expectedCount || 0,
         expectedFromCard,
@@ -5208,10 +5355,13 @@ function handleMainWorldMessages(event) {
         }
 
         if (videoId && Array.isArray(collaborators) && collaborators.length > 0) {
+            const sanitizedResponse = sanitizeCollaboratorList(collaborators);
             const expectedAttr = document.querySelector(`[data-filtertube-video-id="${videoId}"]`)?.getAttribute('data-filtertube-expected-collaborators') || '';
-            const expectedCount = Math.max(
+            const expectedCount = resolveExpectedCollaboratorCount(
+                collaborators,
+                sanitizedResponse,
                 parseInt(expectedAttr || '0', 10) || 0,
-                collaborators.length
+                sanitizedResponse.length
             );
             applyResolvedCollaborators(videoId, collaborators, {
                 expectedCount,

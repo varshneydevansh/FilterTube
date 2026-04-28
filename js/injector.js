@@ -180,9 +180,132 @@
         return `@${buffer}`;
     }
 
+    const COLLAB_PLACEHOLDER_NAME_PATTERN = /^(?:and\s+|block\s+)?\d+\s+more(?:\s+(?:collaborators?|channels?))?$/i;
+
+    function hasStrongCollaboratorIdentity(collaborator) {
+        if (!collaborator || typeof collaborator !== 'object') return false;
+        return Boolean(
+            (typeof collaborator.id === 'string' && /^UC[\w-]{22}$/i.test(collaborator.id.trim())) ||
+            (typeof collaborator.handle === 'string' && collaborator.handle.trim()) ||
+            (typeof collaborator.customUrl === 'string' && collaborator.customUrl.trim())
+        );
+    }
+
+    function normalizeCompositeCollaboratorLabel(value) {
+        if (!value || typeof value !== 'string') return '';
+        let normalized = value.trim().replace(/^@+/, '');
+        try {
+            normalized = normalized.normalize('NFKD').replace(/[\u0300-\u036f]/g, '');
+        } catch (_) {
+            // ignore
+        }
+        try {
+            return normalized.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').replace(/\s+/g, ' ').trim();
+        } catch (_) {
+            return normalized.toLowerCase().replace(/[^a-z0-9]+/g, ' ').replace(/\s+/g, ' ').trim();
+        }
+    }
+
+    function collaboratorCompositeLabelVariants(collaborator) {
+        if (!collaborator || typeof collaborator !== 'object') return [];
+        return [
+            collaborator.name,
+            collaborator.handle,
+            collaborator.customUrl
+        ]
+            .map(normalizeCompositeCollaboratorLabel)
+            .filter(Boolean);
+    }
+
+    function isPlaceholderCollaboratorEntry(collaborator) {
+        if (!collaborator || typeof collaborator !== 'object') return true;
+        if (collaborator.id && /^UC[\w-]{22}$/i.test(collaborator.id)) return false;
+        if (collaborator.customUrl) return false;
+        const label = (collaborator.handle || collaborator.name || '').trim();
+        if (!label) return false;
+        return COLLAB_PLACEHOLDER_NAME_PATTERN.test(label.replace(/^@+/, '').toLowerCase());
+    }
+
+    function isCompositeNameOnlyCollaborator(candidate, collaborators) {
+        if (!candidate || hasStrongCollaboratorIdentity(candidate) || !candidate.name) return false;
+
+        const candidateLabel = normalizeCompositeCollaboratorLabel(candidate.name);
+        if (!candidateLabel) return false;
+        const candidateTokens = new Set(candidateLabel.split(' ').filter(Boolean));
+        if (candidateTokens.size < 2) return false;
+
+        let coveredTokens = 0;
+        let matchedLabels = 0;
+
+        (Array.isArray(collaborators) ? collaborators : []).forEach(other => {
+            if (!other || other === candidate) return;
+            const variants = collaboratorCompositeLabelVariants(other);
+            if (variants.length === 0) return;
+
+            const matchedVariant = variants.find(label => {
+                if (!label || label === candidateLabel) return false;
+                const tokens = label.split(' ').filter(Boolean);
+                if (tokens.length === 0 || tokens.length > candidateTokens.size) return false;
+                return tokens.every(token => candidateTokens.has(token));
+            });
+
+            if (!matchedVariant) return;
+            matchedLabels += 1;
+            coveredTokens += matchedVariant.split(' ').filter(Boolean).length;
+        });
+
+        return matchedLabels >= 2 && coveredTokens >= candidateTokens.size;
+    }
+
+    function sanitizeCollaboratorList(collaborators = []) {
+        if (!Array.isArray(collaborators)) return [];
+        const sanitized = [];
+        const seen = new Set();
+
+        for (const collab of collaborators) {
+            if (!collab || typeof collab !== 'object') continue;
+            const normalized = {
+                name: typeof collab.name === 'string' ? collab.name.trim() : '',
+                id: (typeof collab.id === 'string' && /^UC[\w-]{22}$/i.test(collab.id.trim())) ? collab.id.trim() : '',
+                handle: typeof collab.handle === 'string' ? (extractRawHandle(collab.handle) || collab.handle.trim()) : '',
+                customUrl: typeof collab.customUrl === 'string' ? collab.customUrl.trim() : ''
+            };
+            if (!normalized.name && !normalized.id && !normalized.handle && !normalized.customUrl) continue;
+            if (isPlaceholderCollaboratorEntry(normalized)) continue;
+            const key = (normalized.id || normalized.handle || normalized.customUrl || normalized.name).toLowerCase();
+            if (!key || seen.has(key)) continue;
+            seen.add(key);
+            sanitized.push(normalized);
+        }
+
+        return sanitized.filter(collaborator => !isCompositeNameOnlyCollaborator(collaborator, sanitized));
+    }
+
+    function markCollaboratorListSource(list, source) {
+        if (!Array.isArray(list) || !source) return list;
+        try {
+            Object.defineProperty(list, '__filterTubeCollaboratorSource', {
+                value: source,
+                configurable: true
+            });
+        } catch (_) {
+            try {
+                list.__filterTubeCollaboratorSource = source;
+            } catch (e) {
+                // ignore
+            }
+        }
+        return list;
+    }
+
+    function getCollaboratorListSource(list) {
+        return Array.isArray(list) ? (list.__filterTubeCollaboratorSource || '') : '';
+    }
+
     function getCollaboratorListQuality(list) {
-        if (!Array.isArray(list) || list.length === 0) return 0;
-        return list.reduce((score, collaborator) => {
+        const sanitized = sanitizeCollaboratorList(list);
+        if (!Array.isArray(sanitized) || sanitized.length === 0) return 0;
+        return sanitized.reduce((score, collaborator) => {
             if (!collaborator) return score;
             let entryScore = 10;
             if (collaborator.name) entryScore += 1;
@@ -1649,10 +1772,11 @@
     }
 
     function isValidCollaboratorResponse(list, matcher) {
-        if (!Array.isArray(list) || list.length < 2) return false;
+        const sanitized = sanitizeCollaboratorList(list);
+        if (!Array.isArray(sanitized) || sanitized.length < 2) return false;
 
         // Prevent obvious garbage: all entries empty/placeholder-ish.
-        const hasAnyIdentity = list.some(c => {
+        const hasAnyIdentity = sanitized.some(c => {
             if (!c || typeof c !== 'object') return false;
             const id = typeof c.id === 'string' ? c.id.trim() : '';
             const handle = typeof c.handle === 'string' ? c.handle.trim() : '';
@@ -1664,12 +1788,12 @@
 
         // If expectations were provided, require at least one collaborator to match.
         if (matcher && matcher.hasAny) {
-            if (list.some(c => matcher.matchesAny(c))) {
+            if (sanitized.some(c => matcher.matchesAny(c))) {
                 return true;
             }
 
             if (matcher.allowRosterFallbackForCollabMarkup) {
-                const strongIdentityCount = list.reduce((count, collaborator) => {
+                const strongIdentityCount = sanitized.reduce((count, collaborator) => {
                     if (!collaborator || typeof collaborator !== 'object') return count;
                     const hasStrongIdentity = Boolean(
                         (typeof collaborator.id === 'string' && /^UC[\w-]{22}$/i.test(collaborator.id.trim())) ||
@@ -1679,7 +1803,7 @@
                     return count + (hasStrongIdentity ? 1 : 0);
                 }, 0);
 
-                if (strongIdentityCount >= Math.min(2, list.length)) {
+                if (strongIdentityCount >= Math.min(2, sanitized.length)) {
                     return true;
                 }
             }
@@ -1691,27 +1815,30 @@
     }
 
     function scoreCollaboratorCandidate(list, matcher, depth = 0) {
-        if (!Array.isArray(list) || list.length < 2) return -1;
-        if (!isValidCollaboratorResponse(list, matcher)) return -1;
+        const sanitized = sanitizeCollaboratorList(list);
+        if (!Array.isArray(sanitized) || sanitized.length < 2) return -1;
+        if (!isValidCollaboratorResponse(sanitized, matcher)) return -1;
+        const source = getCollaboratorListSource(list);
 
         const matchCount = matcher?.hasAny
-            ? list.reduce((count, collaborator) => count + (matcher.matchesAny(collaborator) ? 1 : 0), 0)
-            : list.length;
-        const matchRatio = matcher?.hasAny ? matchCount / list.length : 1;
+            ? sanitized.reduce((count, collaborator) => count + (matcher.matchesAny(collaborator) ? 1 : 0), 0)
+            : sanitized.length;
+        const matchRatio = matcher?.hasAny ? matchCount / sanitized.length : 1;
 
-        const strongIdentityCount = list.reduce((count, collaborator) => {
+        const strongIdentityCount = sanitized.reduce((count, collaborator) => {
             if (!collaborator || typeof collaborator !== 'object') return count;
             if (collaborator.id) return count + 1;
             if (collaborator.handle || collaborator.customUrl) return count + 0.5;
             return count;
         }, 0);
 
-        const quality = getCollaboratorListQuality(list);
+        const quality = getCollaboratorListQuality(sanitized);
         const depthPenalty = Math.min(10, Math.max(0, depth));
 
         return (
+            (source === 'collaborators-sheet' ? 10000 : 0) +
             quality * 25 +
-            list.length * 12 +
+            sanitized.length * 12 +
             strongIdentityCount * 8 +
             matchCount * 6 +
             matchRatio * 50 -
@@ -1723,12 +1850,16 @@
         if (!videoId || !Array.isArray(collaborators) || collaborators.length === 0) {
             return collaboratorCache.get(videoId) || null;
         }
-        const incomingScore = getCollaboratorListQuality(collaborators);
+        const sanitized = sanitizeCollaboratorList(collaborators);
+        if (sanitized.length === 0) {
+            return collaboratorCache.get(videoId) || null;
+        }
+        const incomingScore = getCollaboratorListQuality(sanitized);
         const existing = collaboratorCache.get(videoId);
         const existingScore = getCollaboratorListQuality(existing);
         if (!existing || incomingScore >= existingScore) {
-            collaboratorCache.set(videoId, collaborators);
-            return collaborators;
+            collaboratorCache.set(videoId, sanitized);
+            return sanitized;
         }
         return existing;
     }
@@ -1944,7 +2075,8 @@
                 collaborators.push(collab);
             }
 
-            return collaborators.length > 0 ? collaborators : null;
+            const sanitized = sanitizeCollaboratorList(collaborators);
+            return sanitized.length > 0 ? sanitized : null;
         };
 
         const extractFromSheetLikeCommand = (command) => {
@@ -2103,11 +2235,13 @@
                     collaborators.push(collab);
                 }
 
-                return collaborators.length > 0 ? collaborators : null;
+                const sanitized = sanitizeCollaboratorList(collaborators);
+                return sanitized.length > 0 ? sanitized : null;
             };
 
             let bestCandidate = null;
             let bestScore = -1;
+            let bestSource = '';
 
             for (const candidate of candidateSources) {
                 if (!Array.isArray(candidate.items) || candidate.items.length === 0) continue;
@@ -2129,11 +2263,13 @@
                     if (score > bestScore) {
                         bestCandidate = collaborators;
                         bestScore = score;
+                        bestSource = headerLooksCollaborative ? 'collaborators-sheet' : 'collaborator-fallback-list';
                     }
                 }
             }
 
-            return bestCandidate;
+            const sanitizedBest = sanitizeCollaboratorList(bestCandidate);
+            return sanitizedBest.length > 0 ? markCollaboratorListSource(sanitizedBest, bestSource) : null;
         };
 
         // Handle raw stack objects passed directly.
@@ -2992,7 +3128,8 @@
 
         if (bestCandidate?.list) {
             postLog('log', `✅ Found collaborators via ${bestCandidate.source} (best-ranked candidate)`);
-            return bestCandidate.list;
+            const sanitizedBest = sanitizeCollaboratorList(bestCandidate.list);
+            return sanitizedBest.length > 0 ? sanitizedBest : null;
         }
 
         postLog('log', '⚠️ Global search failed. Attempting DOM hydration…');
@@ -3079,8 +3216,10 @@
             try {
                 const parsed = JSON.parse(raw);
                 if (Array.isArray(parsed) && parsed.length > 0) {
+                    const sanitized = sanitizeCollaboratorList(parsed);
+                    if (sanitized.length === 0) return null;
                     postLog('log', `✅ Hydrated collaborators from ${label} data-filtertube-collaborators`);
-                    return parsed;
+                    return sanitized;
                 }
             } catch (e) {
                 // ignore
@@ -3159,7 +3298,8 @@
 
         if (bestDomCandidate) {
             postLog('log', `✅ Hydrated collaborators from DOM (best-ranked candidate, score=${bestDomScore})`);
-            return bestDomCandidate;
+            const sanitizedBest = sanitizeCollaboratorList(bestDomCandidate);
+            return sanitizedBest.length > 0 ? sanitizedBest : null;
         }
 
         return null;
