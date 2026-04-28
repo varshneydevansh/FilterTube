@@ -13,6 +13,12 @@ This document provides a detailed reference of the key files and functions in th
 - **Pending-Meta Shimmer**: 8-second TTL for "fetching metadata" states prevents stale shimmer badges
 - **Firefox Download Fallback**: Anchor-click fallback when `downloads.download()` fails with subfolder paths
 
+## 2026-04-28 Mobile/App Upstream Checkpoint
+
+See [MOBILE_APP_UPSTREAM_CHECKPOINT_2026-04-28.md](/Users/devanshvarshney/FilterTube/docs/MOBILE_APP_UPSTREAM_CHECKPOINT_2026-04-28.md) for the current extension-side source of truth that the native app should consume through runtime sync.
+
+That checkpoint covers mobile 3-dot parity, watch playlist/Mix recovery, collaborator roster precedence, exact matching, `Filter All` linked keywords, source badge colors, Kids/Main sync semantics, and UI parity expectations.
+
 ## Previous in v3.2.6
 
 - **Typography Overhaul**: Modern sans-serif design system (Inter font family)

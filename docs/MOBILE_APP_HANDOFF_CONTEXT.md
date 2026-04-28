@@ -119,6 +119,24 @@ Preferred update model:
 2. app repo syncs shared runtime at build time
 3. bundled runtime ships inside app releases
 
+## 2026-04-28 upstream checkpoint
+
+Before continuing app-specific work, use [MOBILE_APP_UPSTREAM_CHECKPOINT_2026-04-28.md](/Users/devanshvarshney/FilterTube/docs/MOBILE_APP_UPSTREAM_CHECKPOINT_2026-04-28.md) as the current extension-side parity checkpoint.
+
+That checkpoint records the runtime and UI/UX behavior that was upstreamed for the mobile app today:
+
+- mobile 3-dot menu insertion and fallback menu state
+- watch playlist/Mix row recovery
+- authoritative collaborator rosters and Mix false-positive guards
+- Unicode handle and UC ID normalization expectations
+- `Exact` whole-term matching
+- channel-owned `Filter All` derived keyword behavior
+- source badge/tint semantics for From Channel, From Comments, Collaboration, and From Kids
+- mode-aware Kids -> Main sync
+- Help, What's New, Accounts & Sync, Filters, and Kids Mode parity expectations
+
+The mobile app should consume these through synced runtime and native UI parity work, not through hand-edited generated runtime copies.
+
 ## Shared vs non-shared code
 
 Good shared candidates:

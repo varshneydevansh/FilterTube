@@ -11,6 +11,23 @@ The target model is:
 - a narrow message bridge connects both sides
 - watch-next, continuation, and restore state are modeled explicitly instead of being treated as incidental DOM state
 
+## 2026-04-28 upstream checkpoint
+
+Current extension-side mobile/runtime parity is summarized in [MOBILE_APP_UPSTREAM_CHECKPOINT_2026-04-28.md](/Users/devanshvarshney/FilterTube/docs/MOBILE_APP_UPSTREAM_CHECKPOINT_2026-04-28.md).
+
+The app runtime adapter should treat these as source-of-truth behaviors:
+
+- 3-dot menu entry works independently of Quick Block visibility.
+- Home, Search, Shorts, comments, watch playlist rows, YTM watch-like rows, and Mix rows all use the same identity recovery principles.
+- Comment-origin blocks target the comment author only.
+- Watch playlist and Mix rows may recover through `watch:VIDEO_ID`, `videoChannelMap`, and intercepted player/next data, but must not fake success without stable identity.
+- Mix containers are not collaboration rosters. Real collaboration recovery must come from video/watch/search JSON.
+- Header-backed `Collaborators` sheets outrank avatar/direct-list/DOM fallback candidates.
+- Composite fallback collaborator names are pruned when covered by real roster names.
+- `Filter All` is channel-owned state that regenerates exact channel-derived keywords.
+- Kids and Main remain independent rule spaces; Kids -> Main sync applies only when list modes match.
+- Semantic ML remains disabled/future until runtime matching exists.
+
 ## 1. Runtime Split
 
 ### Native Kotlin / Swift responsibilities

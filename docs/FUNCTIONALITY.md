@@ -184,6 +184,15 @@ YouTube JSON Data → FilterTubeEngine.processData() → Filtered Data → YouTu
 - **Shared Behavior Across Entry Points**: The same linked keyword state is now produced whether the user toggles `Filter All` in Channel Management or blocks through the 3-dot menu flow.
 - **Stored As Channel State**: The source of truth remains the channel record (`filterAll: true`); keyword storage is regenerated from channel state instead of drifting independently.
 - **UI Meaning**: In dashboard lists, these rows should be read as linked system entries such as `Linked to ...` / `Auto-added by "Filter All Content"` rather than user-authored keywords.
+- **Deletion Rule**: A channel-derived keyword is removed by turning off `Filter All` or deleting the owning channel row, not by treating the derived keyword as a standalone user keyword.
+- **Kids Parallel Behavior**: Kids Mode has its own `Filter All` derived keywords. When mode-aware Kids -> Main sync is enabled, those rows appear in Main as both channel-derived and `From Kids`.
+- **Color Meaning**: Channel-derived rows use green. If the derived row also comes from collaboration, comments, or Kids sync, the row may blend green with yellow, brown, or pink respectively.
+
+### **Exact Keyword Matching**
+
+- **Whole-Term Matching**: `Exact` means a keyword matches as its own term, not as a substring.
+- **Unicode-Aware Boundary**: Exact matching uses Unicode letter/number boundaries so non-English titles, channel names, and handles do not fall back to ASCII-only behavior.
+- **Example**: Exact `Man` matches `Man`, but does not match `Mans`, `Human`, or `Manchester`.
 
 ### **Comment Filtering**
 - **Complete Removal**: Removes entire comment sections
@@ -275,11 +284,14 @@ YouTube JSON Data → FilterTubeEngine.processData() → Filtered Data → YouTu
 - Proactive XHR interception provides instant channel names in 3-dot menus, eliminating "Fetching..." delays.
 - Badges match row tinting: green = From Channel, brown = From Comments, yellow = Collaboration rows, pink = From Kids.
 - If the active profile is PIN-protected and still locked, the popup header `Enabled / Disabled` control is read-only and cannot pause filtering until the profile is unlocked.
+- Semantic ML is a disabled/future surface until runtime matching is implemented; it should not be presented as an active filter.
+- Help/What's New/Accounts & Sync are structured product-reference surfaces. Native apps should mirror their information architecture and state language, not embed their HTML.
 
 #### Watch / fallback 3-dot behavior (v3.3.0 state)
 - Custom fallback 3-dot menus on weak watch-page rows now behave closer to quick-cross by allowing `watch:VIDEO_ID` recovery when row identity is incomplete.
 - In the fallback popover, `Filter All` is selection-only; the actual block action is activating the `Block • Channel` row.
 - The fallback block row now provides visible pressed/open/focus feedback so the click is acknowledged before the menu closes.
+- Selected/blocked collaborator rows should keep readable text. Success can turn text/checkmarks green, but background tint should remain soft and should not hide handles, names, or `Filter All` state.
 
 ### **Tab View (Advanced Dashboard)**
 - **Channel Management**: Dedicated interface for managing blocked/allowed channels.

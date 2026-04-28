@@ -290,6 +290,28 @@ What this represents:
 - The custom fallback path now behaves more like a real product surface and less like a brittle emergency path.
 - Interaction semantics are clearer: selection state and destructive action are no longer conflated.
 
+### 9.6 Mobile/App Parity UI Checkpoint Was Backported Upstream
+
+The app parity work created several UI/UX clarifications that now belong to the extension source of truth, because the app mirrors the extension's product language.
+
+Reference:
+
+- `/Users/devanshvarshney/FilterTube/docs/MOBILE_APP_UPSTREAM_CHECKPOINT_2026-04-28.md`
+
+What changed:
+
+- `Exact`, `Comment`, and `Filter All` pills now have documented active/inactive semantics that must apply wherever the controls are used.
+- Source badge colors are explicit product semantics: green `From Channel`, brown `From Comments`, yellow `Collaboration`, pink `From Kids`.
+- Channel-derived keyword rows are green; multi-source derived rows should blend green with the relevant source color.
+- Kids Mode is documented as a parallel rule surface, not a child of Main filters.
+- Kids `Filter All` creates Kids-derived keywords; Kids -> Main sync shows derived Kids rules in Main only when modes match.
+- Fallback 3-dot selected/blocked states should stay readable: green success text is allowed, but the background tint should remain soft.
+- Semantic ML is documented as disabled/future unless runtime matching is implemented.
+
+What this represents:
+
+- Mobile UI improvements are not app-only inventions. They are now treated as extension product-language refinements that downstream app UI should mirror natively.
+
 ## Performance Tuning
 
 ### 10. Dark-Mode Slowness Was Reduced By Cutting Paint Cost
