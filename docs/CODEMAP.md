@@ -17,7 +17,7 @@ This document provides a detailed reference of the key files and functions in th
 
 See [MOBILE_APP_UPSTREAM_CHECKPOINT_2026-04-28.md](/Users/devanshvarshney/FilterTube/docs/MOBILE_APP_UPSTREAM_CHECKPOINT_2026-04-28.md) for the current extension-side source of truth that the native app should consume through runtime sync.
 
-That checkpoint covers mobile 3-dot parity, watch playlist/Mix recovery, collaborator roster precedence, exact matching, `Filter All` linked keywords, source badge colors, Kids/Main sync semantics, and UI parity expectations.
+That checkpoint covers mobile 3-dot parity, watch playlist/Mix recovery, desktop watch playlist-panel byline recovery, playlist quick-cross post-block mapping refresh, watch/player playlist alternate-ID repair, collaborator roster precedence, exact matching, `Filter All` linked keywords, source badge colors, Kids/Main sync semantics, and UI parity expectations. See [WATCH_PLAYLIST_IDENTITY_REGRESSION_2026-04-29.md](/Users/devanshvarshney/FilterTube/docs/WATCH_PLAYLIST_IDENTITY_REGRESSION_2026-04-29.md) for the specific regression where UC blocking worked but alternate IDs could remain `Not fetched`, and [CHANGELOG_2026-04-29.md](/Users/devanshvarshney/FilterTube/docs/CHANGELOG_2026-04-29.md) for the final 2026-04-29 runtime/UI/app-sync checkpoint.
 
 ## Previous in v3.2.6
 
@@ -159,7 +159,9 @@ FilterTube/
 | :--- | :--- |
 | `incrementHiddenStats()` | Increments the blocked counter and calculates "time saved". |
 | `fetchChannelFromShortsUrl(videoId)` | Fetches Shorts page in background to extract channel info (handles canonical UC resolution fallback). |
-| `handleBlockChannelClick()` | Orchestrates the blocking flow: immediate hide + background block + multi-layer identity recovery. Weak watch/Mix/Shorts rows with a stable video ID now retry through the background `watch:VIDEO_ID` resolver before any legacy content-script network fallback, avoiding YouTube CORS failures. |
+| `handleBlockChannelClick()` | Orchestrates the blocking flow: immediate hide + background block + multi-layer identity recovery. Weak watch/Mix/Shorts rows with a stable video ID now retry through the background `watch:VIDEO_ID` resolver before any legacy content-script network fallback, avoiding YouTube CORS failures. After a successful UC-ID block it also kicks Shorts and playlist-row post-block enrichment so visible watch playlist/Mix rows can hide once their `videoChannelMap` entry is learned; the background path keeps the stored video mapping authoritative while enriching alternate IDs. |
+| `fetchWatchIdentityFromBackground()` | Deduplicates content-script requests to the background `fetchWatchIdentity` resolver for weak watch/Mix/playlist rows, keeping identity lookup out of CORS-prone content-script page fetches. |
+| `enrichVisiblePlaylistRowsWithChannelInfo()` | After a block, scans visible YTD/YTM playlist-panel rows, uses existing `videoChannelMap` entries first, then asks the background watch resolver for missing row owners, persists learned mappings, stamps row identity, and hides rows from the newly blocked UC ID. |
 | `injectFilterTubeMenuItem()` | Injects the "Block Channel" option into YouTube's 3-dot menu (new selectors cover `button-view-model` home cards). Desktop watch `yt-lockup-view-model` bylines can warm a provisional collaborator menu while Main World enrichment runs. |
 | `enrichCollaboratorsWithMainWorld()` | Bridges collaborator requests between DOM and Main world, ensuring `allCollaborators` is populated for every surface. |
 | `generateCollaborationGroupId()` | Creates deterministic IDs so grouped channels remain linked across storage/UI. |

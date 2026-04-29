@@ -147,7 +147,7 @@ function scheduleDomFallbackRerun() {
 }
 
 async function fetchIdForHandle(handle, options = {}) {
-    const { skipNetwork = false } = options;
+    const { skipNetwork = false, backgroundOnly = false } = options;
     const normalizedHandle = normalizeHandleValue(handle);
     const cleanHandle = normalizedHandle ? normalizedHandle.replace(/^@/, '') : '';
     if (!cleanHandle) return null;
@@ -182,7 +182,7 @@ async function fetchIdForHandle(handle, options = {}) {
         return null;
     }
 
-    if (skipNetwork) {
+    if (skipNetwork && !backgroundOnly) {
         // Remove the pending marker so future non-skip calls can attempt network fetch
         resolvedHandleCache.delete(cleanHandle);
         return null;
@@ -196,6 +196,38 @@ async function fetchIdForHandle(handle, options = {}) {
         const networkHandleCore = rawCandidate
             ? rawCandidate.replace(/^@+/, '').split(/[/?#]/)[0].trim()
             : cleanHandle;
+
+        if (backgroundOnly) {
+            const backgroundResult = await new Promise((resolve) => {
+                try {
+                    browserAPI_BRIDGE.runtime.sendMessage({
+                        action: 'fetchChannelDetails',
+                        channelIdOrHandle: `@${networkHandleCore}`
+                    }, (response) => resolve(response || null));
+                } catch (e) {
+                    resolve(null);
+                }
+            });
+
+            const id = typeof backgroundResult?.id === 'string' && backgroundResult.id.toUpperCase().startsWith('UC')
+                ? backgroundResult.id
+                : '';
+            if (id) {
+                const displayHandle = backgroundResult.handle || `@${cleanHandle}`;
+                resolvedHandleCache.set(cleanHandle, id);
+                window.postMessage({
+                    type: 'FilterTube_UpdateChannelMap',
+                    payload: [{ id, handle: displayHandle }],
+                    source: 'content_bridge'
+                }, '*');
+                scheduleDomFallbackRerun();
+                return id;
+            }
+
+            resolvedHandleCache.delete(cleanHandle);
+            return null;
+        }
+
         const encodedHandle = encodeURIComponent(networkHandleCore);
         const handlePaths = [
             `/@${encodedHandle}/about`,

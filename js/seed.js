@@ -43,6 +43,21 @@
             if (!name) return;
 
             const ts = Date.now();
+            if (name.includes('/youtubei/v1/search')) {
+                window.filterTube.lastYtSearchResponse = data;
+                window.filterTube.lastYtSearchResponseName = name;
+                window.filterTube.lastYtSearchResponseTs = ts;
+                const recentSearchResponses = Array.isArray(window.filterTube.recentYtSearchResponses)
+                    ? window.filterTube.recentYtSearchResponses
+                    : [];
+                recentSearchResponses.push({
+                    data,
+                    name,
+                    ts
+                });
+                window.filterTube.recentYtSearchResponses = recentSearchResponses.slice(-12);
+                return;
+            }
             if (name.includes('/youtubei/v1/next')) {
                 window.filterTube.lastYtNextResponse = data;
                 window.filterTube.lastYtNextResponseName = name;

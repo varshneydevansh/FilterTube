@@ -132,6 +132,16 @@ The follow-up fix for watch/Mix/Shorts menu clicks is:
 - do not let a recycled live card overwrite the menu-captured `videoId` once the menu is open;
 - skip content-script `/watch` or `/shorts` fetch fallbacks after the background resolver has been tried, because YouTube can CORS-block those fetches from the content script;
 - keep unresolved rows in a clear failure state instead of persisting `watch:*` as a fake channel.
+- desktop `ytd-playlist-panel-video-renderer` / wrapper rows are now treated as watch-like rows too, not only mobile `ytm-*` rows; their `#byline` is read before generic single-channel extraction so a playlist row such as `GUTSERIEV MEDIA and NYUSHA MUSIC` can warm the collaborator menu instead of degrading to only the first channel.
+
+The quick-cross path has the same convergence requirement. After a successful block with a stable UC ID:
+
+- the content script persists the clicked row's `videoId -> UC...` mapping immediately;
+- the background compiled settings merge pending `videoChannelMap` updates before the debounced storage write finishes, so the next bootstrap/refilter sees the just-learned mapping;
+- post-block enrichment keeps `videoId` and title context, allowing UC-only playlist rows to repair handle/custom URL/name metadata later;
+- visible playlist rows now run the same post-block enrichment sweep that Shorts already used, fetching watch identity through the background resolver and hiding matching rows without waiting for a page reload.
+- optimistically hidden playlist rows are restamped after persistence with the confirmed UC ID and any recovered alternate identity, so the clicked row is not restored by the next DOM fallback pass.
+- a stored `videoChannelMap` hit is no longer enough to stop watch identity enrichment when the alternate ID is missing; the stored UC ID remains a fallback while the background resolver attempts to recover an `@handle` or custom URL.
 
 Mix containers are not collaborations. A Mix card may contain a collaboration seed video, but the Mix container title or byline is not a collaborator roster.
 
@@ -180,6 +190,8 @@ Sanitized roster:
 Expected collaborator counts must be corrected after pruning so the UI does not keep showing unresolved "All Collaborators" states for rows that were only fallback artifacts.
 
 Desktop watch related lockups need one extra warm-up rule. Some `yt-lockup-view-model` rows expose only a lockup metadata byline such as `Channel A and Channel B` without an avatar-stack DOM signal. On watch-like lockup rows, that byline can warm collaborator enrichment and render a provisional collaboration menu, but it must not override an authoritative `Collaborators` sheet and must still be blocked by Mix guardrails.
+
+Desktop watch playlist-panel rows use the same principle. Their `#byline` is a stronger surface-specific signal than the first channel link, so it is parsed before the generic fallback and only used as provisional collaborator state until Main World data confirms or corrects the roster.
 
 ## Exact Matching
 
@@ -327,6 +339,7 @@ Before claiming app parity, verify these as live behavior, not just UI presence:
 - 3-dot menu entry appears and blocks correctly on Home, Search, Shorts, comments, watch rows, and Mix rows.
 - Desktop watch related `yt-lockup-view-model` collaboration rows open collaborator menus instead of generic `Block Channel` rows.
 - Watch/Mix/Shorts rows with only a stable video ID resolve through the background `watch:VIDEO_ID` path without CORS-blocked content-script fetch failures.
+- Player playlist quick-cross blocks hide on the first action, not after repeated back/forth navigation, and Channel Management shows the best recovered alternate identity instead of a stale `Not fetched` target when YouTube exposes an `@handle` or custom URL.
 - Mix cards do not become fake collaborations.
 - Real collaboration cards show the correct roster and preserve `k/n` collaboration state in list UI.
 - `Filter All` persists through reload/profile switch and creates/removes derived keywords only through channel state.

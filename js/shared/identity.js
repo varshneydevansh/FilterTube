@@ -421,19 +421,87 @@
         return match ? match[1] : '';
     }
 
+    function decodeJsonStringFragment(value) {
+        if (!value || typeof value !== 'string') return '';
+        try {
+            return JSON.parse(`"${value.replace(/\n/g, '\\n').replace(/\r/g, '\\r')}"`);
+        } catch (e) {
+            return value
+                .replace(/\\u002F/g, '/')
+                .replace(/\\u0026/g, '&')
+                .replace(/\\\//g, '/')
+                .replace(/\\"/g, '"');
+        }
+    }
+
+    function readJsonStringField(source, fieldName) {
+        if (!source || typeof source !== 'string' || !fieldName) return '';
+        const escaped = String(fieldName).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const match = source.match(new RegExp(`"${escaped}"\\s*:\\s*"((?:\\\\.|[^"\\\\])*)"`, 'i'));
+        return match && match[1] ? decodeJsonStringFragment(match[1]) : '';
+    }
+
+    function assignOwnerBlockIdentity(block, result) {
+        if (!block || typeof block !== 'string' || !result) return;
+
+        const ownerId =
+            readJsonStringField(block, 'browseId') ||
+            readJsonStringField(block, 'externalChannelId') ||
+            readJsonStringField(block, 'channelId') ||
+            readJsonStringField(block, 'ownerChannelId') ||
+            readJsonStringField(block, 'ownerDocid') ||
+            readJsonStringField(block, 'externalId');
+        if (ownerId && UC_ID_REGEX.test(ownerId)) {
+            result.id = ownerId;
+        }
+
+        [
+            readJsonStringField(block, 'canonicalBaseUrl'),
+            readJsonStringField(block, 'url'),
+            readJsonStringField(block, 'ownerProfileUrl')
+        ].forEach(path => assignCanonicalPathIdentity(path, result));
+
+        if (!result.name) {
+            const ownerName =
+                readJsonStringField(block, 'ownerChannelName') ||
+                readJsonStringField(block, 'title') ||
+                readJsonStringField(block, 'text');
+            if (ownerName && !ownerName.startsWith('@')) {
+                result.name = ownerName;
+            }
+        }
+    }
+
     function fastExtractIdentityFromHtmlChunk(htmlChunk) {
         if (!htmlChunk || typeof htmlChunk !== 'string') return null;
 
         const result = {};
 
-        const idMatch = htmlChunk.match(/"(?:browseId|externalChannelId|channelId|ownerChannelId|ownerDocid|externalId)":"(UC[\w-]{22})"/i);
-        if (idMatch && idMatch[1]) {
-            result.id = idMatch[1];
+        const ownerBlocks = [
+            htmlChunk.match(/"(?:shortBylineText|ownerText|longBylineText)"\s*:\s*\{"runs"\s*:\s*\[\{([\s\S]{0,3000}?)\}\]/i),
+            htmlChunk.match(/"videoOwnerRenderer"\s*:\s*\{([\s\S]{0,5000}?)\}/i),
+            htmlChunk.match(/"owner"\s*:\s*\{([\s\S]{0,2500}?)\}/i)
+        ];
+        for (const match of ownerBlocks) {
+            if (match && match[1]) {
+                assignOwnerBlockIdentity(match[1], result);
+                if (result.id || result.handle || result.customUrl) break;
+            }
         }
 
-        const canonicalBaseMatch = htmlChunk.match(/"canonicalBaseUrl":"(\/[^"]+)"/i);
+        const ownerProfileMatch = htmlChunk.match(/"ownerProfileUrl"\s*:\s*"((?:\\.|[^"\\])+)"/i);
+        if (ownerProfileMatch && ownerProfileMatch[1]) {
+            assignCanonicalPathIdentity(decodeJsonStringFragment(ownerProfileMatch[1]), result);
+        }
+
+        const idMatch = htmlChunk.match(/"(?:browseId|externalChannelId|channelId|ownerChannelId|ownerDocid|externalId)"\s*:\s*"(UC[\w-]{22})"/i);
+        if (idMatch && idMatch[1]) {
+            result.id = result.id || idMatch[1];
+        }
+
+        const canonicalBaseMatch = htmlChunk.match(/"canonicalBaseUrl"\s*:\s*"((?:\\.|[^"\\])+)"/i);
         if (canonicalBaseMatch && canonicalBaseMatch[1]) {
-            assignCanonicalPathIdentity(canonicalBaseMatch[1], result);
+            assignCanonicalPathIdentity(decodeJsonStringFragment(canonicalBaseMatch[1]), result);
         }
 
         const canonicalLinkMatch = htmlChunk.match(/<link rel="canonical" href="https:\/\/www\.youtube\.com\/([^"]+)"/i);
@@ -478,8 +546,16 @@
 
     function assignCanonicalPathIdentity(rawPath, result) {
         if (!rawPath || typeof rawPath !== 'string') return;
-        const cleaned = rawPath.trim();
+        let cleaned = decodeJsonStringFragment(rawPath).trim();
         if (!cleaned) return;
+
+        try {
+            if (/^https?:\/\//i.test(cleaned)) {
+                cleaned = new URL(cleaned).pathname || cleaned;
+            }
+        } catch (e) {
+            // ignore
+        }
 
         if (cleaned.startsWith('/@')) {
             const handle = extractRawHandle(cleaned);

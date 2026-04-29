@@ -8215,8 +8215,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             renderListModeControls();
         }
 
-        if (['channelAdded', 'channelRemoved', 'channelUpdated', 'load', 'save'].includes(eventType)) {
+        if (['channelAdded', 'channelRemoved', 'load'].includes(eventType)) {
             renderChannels();
+            renderKeywords(); // Re-render keywords in case channel-derived keywords changed
+            updateStats();
+            renderListModeControls();
+            syncSubscriptionsImportControls();
+        }
+
+        if (eventType === 'channelUpdated') {
+            const channelOnlyToggleUpdate = !!(data && (
+                Object.prototype.hasOwnProperty.call(data, 'filterAll') ||
+                Object.prototype.hasOwnProperty.call(data, 'filterAllComments')
+            ));
+            if (!channelOnlyToggleUpdate) {
+                renderChannels();
+            }
             renderKeywords(); // Re-render keywords in case channel-derived keywords changed
             updateStats();
             renderListModeControls();
@@ -8229,8 +8243,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             renderListModeControls();
         }
 
-        if (['kidsChannelAdded', 'kidsChannelRemoved', 'kidsChannelUpdated', 'load', 'save'].includes(eventType)) {
+        if (['kidsChannelAdded', 'kidsChannelRemoved', 'load'].includes(eventType)) {
             renderKidsChannels();
+            renderKidsKeywords();
+            updateStats();
+            renderListModeControls();
+        }
+
+        if (eventType === 'kidsChannelUpdated') {
+            const kidsChannelOnlyToggleUpdate = !!(data && (
+                Object.prototype.hasOwnProperty.call(data, 'filterAll') ||
+                Object.prototype.hasOwnProperty.call(data, 'filterAllComments')
+            ));
+            if (!kidsChannelOnlyToggleUpdate) {
+                renderKidsChannels();
+            }
             renderKidsKeywords();
             updateStats();
             renderListModeControls();

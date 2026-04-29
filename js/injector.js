@@ -2688,6 +2688,17 @@
             searchTargets.push({ root: window.filterTube.rawYtInitialData, label: 'filterTube.rawYtInitialData' });
         }
 
+        if (window.filterTube?.lastYtSearchResponse) {
+            searchTargets.push({ root: window.filterTube.lastYtSearchResponse, label: 'filterTube.lastYtSearchResponse' });
+        }
+        if (Array.isArray(window.filterTube?.recentYtSearchResponses)) {
+            window.filterTube.recentYtSearchResponses.slice(-6).forEach((entry, index) => {
+                if (entry?.data) {
+                    searchTargets.push({ root: entry.data, label: `filterTube.recentYtSearchResponses[${index}]` });
+                }
+            });
+        }
+
         if (window.filterTube?.lastYtNextResponse) {
             searchTargets.push({ root: window.filterTube.lastYtNextResponse, label: 'filterTube.lastYtNextResponse' });
         }
@@ -3055,6 +3066,17 @@
         }
         if (window.filterTube?.rawYtInitialData) {
             roots.push({ root: window.filterTube.rawYtInitialData, label: 'filterTube.rawYtInitialData' });
+        }
+
+        if (window.filterTube?.lastYtSearchResponse) {
+            roots.push({ root: window.filterTube.lastYtSearchResponse, label: 'filterTube.lastYtSearchResponse' });
+        }
+        if (Array.isArray(window.filterTube?.recentYtSearchResponses)) {
+            window.filterTube.recentYtSearchResponses.slice(-6).forEach((entry, index) => {
+                if (entry?.data) {
+                    roots.push({ root: entry.data, label: `filterTube.recentYtSearchResponses[${index}]` });
+                }
+            });
         }
 
         if (window.filterTube?.lastYtNextResponse) {

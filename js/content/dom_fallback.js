@@ -164,7 +164,8 @@ function isPlaylistPanelRowElement(elementOrTag) {
     return tag === 'ytd-playlist-panel-video-renderer' ||
         tag === 'ytd-playlist-panel-video-wrapper-renderer' ||
         tag === 'ytm-playlist-panel-video-renderer' ||
-        tag === 'ytm-playlist-panel-video-wrapper-renderer';
+        tag === 'ytm-playlist-panel-video-wrapper-renderer' ||
+        tag === 'ytm-playlist-video-renderer';
 }
 
 function getPlaylistPanelRow(element) {
@@ -175,7 +176,8 @@ function getPlaylistPanelRow(element) {
             'ytd-playlist-panel-video-renderer, ' +
             'ytd-playlist-panel-video-wrapper-renderer, ' +
             'ytm-playlist-panel-video-renderer, ' +
-            'ytm-playlist-panel-video-wrapper-renderer'
+            'ytm-playlist-panel-video-wrapper-renderer, ' +
+            'ytm-playlist-video-renderer'
         );
     } catch (e) {
         return null;
@@ -186,7 +188,8 @@ function getPlaylistPanelRows(root = document) {
     try {
         return Array.from(root.querySelectorAll(
             'ytd-playlist-panel-video-renderer, ' +
-            'ytm-playlist-panel-video-renderer'
+            'ytm-playlist-panel-video-renderer, ' +
+            'ytm-playlist-video-renderer'
         ));
     } catch (e) {
         return [];
@@ -4270,14 +4273,11 @@ function shouldHideContent(title, channel, settings, options = {}) {
                                     return true;
                                 }
                             } else if (!cachedState && hasFetchId) {
-                                const isKidsHost = (() => {
-                                    try {
-                                        return typeof location !== 'undefined' && String(location.hostname || '').includes('youtubekids.com');
-                                    } catch (e) {
-                                        return false;
-                                    }
-                                })();
-                                fetchIdForHandle(`@${safeKey}`, { skipNetwork: isKidsHost });
+                                // DOM fallback runs often and should not trigger page-context
+                                // /@handle/about fetches; YouTube can redirect those through
+                                // CORS-blocked pages. Use the background resolver so UC-only
+                                // block rows can still hide handle-only DOM cards.
+                                fetchIdForHandle(`@${safeKey}`, { skipNetwork: true, backgroundOnly: true });
                             }
                         }
                     }
