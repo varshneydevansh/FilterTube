@@ -726,6 +726,63 @@ function rotateAutoBackups(keepCount = 10, label = '') {
     });
 }
 
+function revokeBackgroundBlobUrlLater(blobUrl, delayMs = 60000) {
+    if (!blobUrl || typeof URL === 'undefined' || typeof URL.revokeObjectURL !== 'function') return;
+    setTimeout(() => {
+        try {
+            URL.revokeObjectURL(blobUrl);
+        } catch (e) {
+        }
+    }, delayMs);
+}
+
+function downloadWithBrowserApi(downloadOptions) {
+    return new Promise(resolve => {
+        if (!browserAPI.downloads || typeof browserAPI.downloads.download !== 'function') {
+            resolve({ ok: false, reason: 'downloads_unavailable' });
+            return;
+        }
+
+        let settled = false;
+        const finish = (result) => {
+            if (settled) return;
+            settled = true;
+            resolve(result);
+        };
+
+        try {
+            if (IS_FIREFOX) {
+                const promise = browserAPI.downloads.download(downloadOptions);
+                if (promise && typeof promise.then === 'function') {
+                    promise
+                        .then(downloadId => finish({ ok: true, downloadId }))
+                        .catch(error => finish({ ok: false, reason: error?.message || 'download_failed' }));
+                } else {
+                    finish({ ok: true, downloadId: promise });
+                }
+                return;
+            }
+
+            const maybePromise = browserAPI.downloads.download(downloadOptions, downloadId => {
+                const err = browserAPI.runtime?.lastError;
+                if (err) {
+                    finish({ ok: false, reason: err.message || 'download_failed' });
+                    return;
+                }
+                finish({ ok: true, downloadId });
+            });
+
+            if (maybePromise && typeof maybePromise.then === 'function') {
+                maybePromise
+                    .then(downloadId => finish({ ok: true, downloadId }))
+                    .catch(error => finish({ ok: false, reason: error?.message || 'download_failed' }));
+            }
+        } catch (error) {
+            finish({ ok: false, reason: error?.message || 'download_failed' });
+        }
+    });
+}
+
 async function createAutoBackupInBackground(triggerType, options = {}) {
     if (!browserAPI.downloads || typeof browserAPI.downloads.download !== 'function') {
         return { ok: false, reason: 'downloads_unavailable' };
@@ -798,35 +855,29 @@ async function createAutoBackupInBackground(triggerType, options = {}) {
         ? URL.createObjectURL(new Blob([jsonData], { type: 'application/json' }))
         : `data:application/json;charset=utf-8,${encodeURIComponent(jsonData)}`;
 
-    return new Promise(resolve => {
-        browserAPI.downloads.download({
-            url: downloadUrl,
-            filename: fullPath,
-            saveAs: false,
-            conflictAction: useHistory ? 'uniquify' : 'overwrite'
-        }, downloadId => {
-            if (hasObjectUrl) {
-                try {
-                    URL.revokeObjectURL(downloadUrl);
-                } catch (e) {
-                }
-            }
-            const err = browserAPI.runtime?.lastError;
-            if (err) {
-                resolve({ ok: false, reason: err.message || 'download_failed' });
-                return;
-            }
-
-            if (useHistory) {
-                try {
-                    rotateAutoBackups(10, label);
-                } catch (e) {
-                }
-            }
-
-            resolve({ ok: true, filename: fullPath, downloadId });
-        });
+    const result = await downloadWithBrowserApi({
+        url: downloadUrl,
+        filename: fullPath,
+        saveAs: false,
+        conflictAction: useHistory ? 'uniquify' : 'overwrite'
     });
+
+    if (hasObjectUrl) {
+        revokeBackgroundBlobUrlLater(downloadUrl);
+    }
+
+    if (!result.ok) {
+        return { ok: false, reason: result.reason || 'download_failed' };
+    }
+
+    if (useHistory) {
+        try {
+            rotateAutoBackups(10, label);
+        } catch (e) {
+        }
+    }
+
+    return { ok: true, filename: fullPath, downloadId: result.downloadId };
 }
 
 function scheduleAutoBackupInBackground(triggerType, options = {}, delay = 1000) {

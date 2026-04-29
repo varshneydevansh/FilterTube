@@ -18,6 +18,7 @@ This checkpoint documents the runtime, UI, and documentation work completed on 2
 - Search quick-block hover state is retained across YouTube hover/preview overlays by using longer sticky timing, wrapper-level pointer handling, and a bounds fallback when `elementsFromPoint()` lands on an overlay instead of the card.
 - Mobile search no longer treats a merely focused search input as an open search overlay; quick-block controls are suppressed only when suggestions/dropdowns are actually visible or explicitly expanded.
 - Expected duplicate MAIN-world script loads now log only in debug mode. First-install reloads can legitimately hit the idempotency guards for `seed.js`, `filter_logic.js`, or `injector.js`, but they no longer surface as Chrome extension warnings.
+- Firefox/Waterfox manual export now bypasses extension-driven subfolder downloads for both plain and encrypted JSON, keeps blob URLs alive longer, and supports Promise-style download APIs in backup helpers. See [ISSUE_51_FIREFOX_EXPORT_2026-04-29.md](/Users/devanshvarshney/FilterTube/docs/ISSUE_51_FIREFOX_EXPORT_2026-04-29.md).
 
 ## Mix And Collaboration Safety
 

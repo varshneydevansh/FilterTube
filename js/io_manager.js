@@ -9,7 +9,8 @@
      * so they can be reused by the popup, background, and future automation.
      */
 
-    const runtimeAPI = (typeof browser !== 'undefined' && browser.runtime) ? browser : (typeof chrome !== 'undefined' ? chrome : null);
+    const IS_FIREFOX_IO_MANAGER = typeof browser !== 'undefined' && !!browser.runtime;
+    const runtimeAPI = IS_FIREFOX_IO_MANAGER ? browser : (typeof chrome !== 'undefined' ? chrome : null);
     const STORAGE_NAMESPACE = runtimeAPI?.storage?.local;
 
     const FT_PROFILES_V3_KEY = 'ftProfilesV3';
@@ -35,6 +36,63 @@
 
     function normalizeString(value) {
         return typeof value === 'string' ? value.trim() : '';
+    }
+
+    function revokeDownloadBlobUrlLater(blobUrl, delayMs = 60000) {
+        if (!blobUrl || typeof URL === 'undefined' || typeof URL.revokeObjectURL !== 'function') return;
+        setTimeout(() => {
+            try {
+                URL.revokeObjectURL(blobUrl);
+            } catch (e) {
+            }
+        }, delayMs);
+    }
+
+    function downloadWithRuntimeApi(downloadOptions) {
+        return new Promise(resolve => {
+            if (!runtimeAPI?.downloads || typeof runtimeAPI.downloads.download !== 'function') {
+                resolve({ ok: false, reason: 'Downloads API unavailable' });
+                return;
+            }
+
+            let settled = false;
+            const finish = (result) => {
+                if (settled) return;
+                settled = true;
+                resolve(result);
+            };
+
+            try {
+                if (IS_FIREFOX_IO_MANAGER) {
+                    const promise = runtimeAPI.downloads.download(downloadOptions);
+                    if (promise && typeof promise.then === 'function') {
+                        promise
+                            .then(downloadId => finish({ ok: true, downloadId }))
+                            .catch(error => finish({ ok: false, reason: error?.message || 'Download failed' }));
+                    } else {
+                        finish({ ok: true, downloadId: promise });
+                    }
+                    return;
+                }
+
+                const maybePromise = runtimeAPI.downloads.download(downloadOptions, (downloadId) => {
+                    const err = runtimeAPI.runtime?.lastError;
+                    if (err) {
+                        finish({ ok: false, reason: err.message || 'Download failed' });
+                        return;
+                    }
+                    finish({ ok: true, downloadId });
+                });
+
+                if (maybePromise && typeof maybePromise.then === 'function') {
+                    maybePromise
+                        .then(downloadId => finish({ ok: true, downloadId }))
+                        .catch(error => finish({ ok: false, reason: error?.message || 'Download failed' }));
+                }
+            } catch (error) {
+                finish({ ok: false, reason: error?.message || 'Download failed' });
+            }
+        });
     }
 
     function normalizeBool(value, fallback = false) {
@@ -1768,22 +1826,23 @@
                 const testPath = 'FilterTube Backup/.test';
                 await new Promise((resolve, reject) => {
                     const blobUrl = URL.createObjectURL(new Blob(['test'], { type: 'text/plain' }));
-                    runtimeAPI.downloads.download({
+                    downloadWithRuntimeApi({
                         url: blobUrl,
                         filename: testPath,
                         saveAs: false
-                    }, (downloadId) => {
-                        try {
-                            URL.revokeObjectURL(blobUrl);
-                        } catch (e) {
-                            // ignore
-                        }
-                        if (runtimeAPI.runtime?.lastError) {
-                            reject(new Error(runtimeAPI.runtime.lastError.message));
+                    }).then((result) => {
+                        revokeDownloadBlobUrlLater(blobUrl);
+                        if (!result?.ok) {
+                            reject(new Error(result?.reason || 'Download failed'));
                         } else {
                             // Clean up test file
-                            runtimeAPI.downloads.erase({ id: downloadId });
-                            resolve(downloadId);
+                            try {
+                                if (Number.isFinite(Number(result.downloadId))) {
+                                    runtimeAPI.downloads.erase({ id: result.downloadId });
+                                }
+                            } catch (e) {
+                            }
+                            resolve(result.downloadId);
                         }
                     });
                 });
@@ -1819,22 +1878,17 @@
             const backupDir = await getBackupDirectory();
             const fullPath = backupDir === '.' ? filename : `${backupDir}/${filename}`;
 
-            runtimeAPI.downloads.download({
+            downloadWithRuntimeApi({
                 url: blobUrl,
                 filename: fullPath,
                 saveAs: false // Silent save
-            }, (downloadId) => {
-                const error = runtimeAPI.runtime?.lastError;
-                try {
-                    URL.revokeObjectURL(blobUrl);
-                } catch (e) {
-                    // ignore
-                }
-                if (error) {
-                    resolve({ ok: false, reason: error.message, downloadId: null });
+            }).then((result) => {
+                revokeDownloadBlobUrlLater(blobUrl);
+                if (!result?.ok) {
+                    resolve({ ok: false, reason: result?.reason || 'Download failed', downloadId: null });
                 } else {
                     console.log(`FilterTube: Auto-backup created: ${fullPath}`);
-                    resolve({ ok: true, filename: fullPath, downloadId });
+                    resolve({ ok: true, filename: fullPath, downloadId: result.downloadId });
                 }
             });
         });

@@ -8285,11 +8285,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     // IMPORT / EXPORT (V3)
     // ============================================================================
 
+    function revokeBlobUrlLater(blobUrl, delayMs = 60000) {
+        if (!blobUrl || typeof URL === 'undefined' || typeof URL.revokeObjectURL !== 'function') return;
+        setTimeout(() => {
+            try {
+                URL.revokeObjectURL(blobUrl);
+            } catch (e) {
+                // ignore cleanup errors
+            }
+        }, delayMs);
+    }
+
     /**
-     * Fallback download via anchor click - works in Firefox when downloads API fails
+     * Fallback download via anchor click - works in Firefox when downloads API fails.
+     * Keep the blob URL alive long enough for Firefox/Waterfox on Windows to read it.
      */
     function downloadViaAnchor(blob, filename) {
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             try {
                 const blobUrl = URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -8301,15 +8313,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                 setTimeout(() => {
                     try {
                         document.body.removeChild(a);
-                        URL.revokeObjectURL(blobUrl);
                     } catch (e) {
                         // ignore cleanup errors
                     }
+                }, 2000);
+                revokeBlobUrlLater(blobUrl);
+                setTimeout(() => {
                     resolve({ filename, method: 'anchor' });
-                }, 150);
+                }, 250);
             } catch (e) {
-                // Even if anchor fails, resolve with error info
-                resolve({ filename, method: 'anchor', error: e.message });
+                reject(new Error(e?.message || 'Download failed'));
             }
         });
     }
@@ -8319,12 +8332,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             try {
                 const json = JSON.stringify(obj, null, 2);
                 const blob = new Blob([json], { type: 'application/json' });
-                const preferAnchor = options && options.preferAnchor === true;
+                const preferAnchor = (options && options.preferAnchor === true) || IS_FIREFOX_TAB_VIEW;
 
-                // Firefox has been flaky here for encrypted exports; bypass the downloads API
-                // when explicitly requested and let the browser handle a direct attachment save.
+                // Firefox/Waterfox on Windows can fail extension-initiated blob downloads,
+                // especially with subfolder filenames. Use a direct attachment path there.
                 if (preferAnchor || !runtimeAPI?.downloads?.download) {
-                    downloadViaAnchor(blob, filename).then(resolve);
+                    downloadViaAnchor(blob, filename).then(resolve).catch(reject);
                     return;
                 }
 
@@ -8338,11 +8351,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     saveAs: false
                 }, (downloadId) => {
                     const err = runtimeAPI.runtime?.lastError;
-                    try {
-                        URL.revokeObjectURL(blobUrl);
-                    } catch (e) {
-                        // ignore
-                    }
+                    revokeBlobUrlLater(blobUrl);
                     if (err) {
                         // Firefox 147+ may fail with subfolder paths - fallback to anchor
                         console.warn('FilterTube: Downloads API failed, using anchor fallback:', err.message);
@@ -8409,8 +8418,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             const filename = (exportType === 'profile' && label)
                 ? `filtertube_export_${label}_${stamp}.json`
                 : `filtertube_export_v3_${stamp}.json`;
-            await downloadJsonToDownloadsFolder('FilterTube Export', filename, payload);
-            UIComponents.showToast('Exported JSON to Downloads/FilterTube Export/', 'success');
+            const downloadResult = await downloadJsonToDownloadsFolder('FilterTube Export', filename, payload, {
+                preferAnchor: IS_FIREFOX_TAB_VIEW
+            });
+            UIComponents.showToast(
+                downloadResult?.method === 'anchor'
+                    ? 'Exported JSON to Downloads'
+                    : 'Exported JSON to Downloads/FilterTube Export/',
+                'success'
+            );
         } catch (e) {
             UIComponents.showToast('Export failed', 'error');
             console.error('Export V3 failed', e);
@@ -8483,13 +8499,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ? `filtertube_export_${label}_${stamp}_encrypted.json`
                 : `filtertube_export_v3_${stamp}_encrypted.json`;
 
-            await downloadJsonToDownloadsFolder('FilterTube Export', filename, payload, {
+            const downloadResult = await downloadJsonToDownloadsFolder('FilterTube Export', filename, payload, {
                 preferAnchor: IS_FIREFOX_TAB_VIEW
             });
             UIComponents.showToast(
                 payload?.meta?.containsNanahTrustedState === true
                     ? 'Exported encrypted backup with trusted-device recovery data'
-                    : 'Exported encrypted JSON to Downloads/FilterTube Export/',
+                    : (downloadResult?.method === 'anchor' ? 'Exported encrypted JSON to Downloads' : 'Exported encrypted JSON to Downloads/FilterTube Export/'),
                 'success'
             );
         } catch (e) {

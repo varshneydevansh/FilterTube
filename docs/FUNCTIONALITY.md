@@ -62,7 +62,7 @@ That means:
 - **False-positive collaboration splitting was tightened** so plain channel names containing `&` or `and` are no longer treated as multi-author videos without explicit collaboration evidence.
 - **Subscribed-channel whitelist import is more resilient across browsers** because it now keeps recent page browse responses and leans on real page-driven `/feed/channels` growth.
 - **Channel Management now supports direct channel links**, and the injected 3-dot block item has its own user-facing toggle.
-- **Firefox encrypted export now uses a safer fallback path** for manual encrypted downloads.
+- **Firefox export now uses a safer fallback path** for manual plain and encrypted downloads on Firefox/Waterfox, avoiding subfolder/blob URL failures reported on Windows.
 
 ## Core Filtering Capabilities
 
@@ -231,7 +231,7 @@ YouTube JSON Data → FilterTubeEngine.processData() → Filtered Data → YouTu
 - **Fallback Injection**: Uses script tag injection for MAIN world access
 - **MV3 Compatibility**: Works with Firefox's MV3 implementation
 - **CSP Handling**: Robust Content Security Policy compatibility
-- **Encrypted Export Fallback (v3.3.0)**: Manual encrypted export can bypass the downloads API path and use a direct attachment save path when Firefox is flaky with extension-driven downloads.
+- **Firefox Export Fallback (v3.3.1)**: Manual plain and encrypted export bypass the downloads API path on Firefox/Waterfox and use a direct attachment save path when extension-driven blob downloads are flaky. Blob URL cleanup is delayed so Windows Firefox has time to finish reading the file.
 
 ### **Unified Experience**
 - **Identical Functionality**: Same filtering capabilities across browsers

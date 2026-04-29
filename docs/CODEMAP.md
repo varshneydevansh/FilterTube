@@ -11,7 +11,7 @@ This document provides a detailed reference of the key files and functions in th
 - **Hover Retention Hardening**: Search overlays and Home Shorts retain quick-block hover state reliably
 - **LRU Eviction**: `videoMetaMap` now uses LRU eviction (3000 entry cap) to prevent unbounded growth
 - **Pending-Meta Shimmer**: 8-second TTL for "fetching metadata" states prevents stale shimmer badges
-- **Firefox Download Fallback**: Anchor-click fallback when `downloads.download()` fails with subfolder paths
+- **Firefox Download Fallback**: Firefox/Waterfox manual exports use an anchor-download path with delayed blob URL cleanup; background backups support both Promise-style and callback-style downloads APIs.
 
 ## 2026-04-28 Mobile/App Upstream Checkpoint
 
