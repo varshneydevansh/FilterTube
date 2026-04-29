@@ -12,6 +12,7 @@ This document provides a detailed reference of the key files and functions in th
 - **LRU Eviction**: `videoMetaMap` now uses LRU eviction (3000 entry cap) to prevent unbounded growth
 - **Pending-Meta Shimmer**: 8-second TTL for "fetching metadata" states prevents stale shimmer badges
 - **Firefox Download Fallback**: Firefox/Waterfox manual exports use an anchor-download path with delayed blob URL cleanup; background backups support both Promise-style and callback-style downloads APIs.
+- **System Theme Default**: Missing `ftThemePreference` resolves through `prefers-color-scheme`, while explicit user toggles still persist `light` or `dark`.
 
 ## 2026-04-28 Mobile/App Upstream Checkpoint
 

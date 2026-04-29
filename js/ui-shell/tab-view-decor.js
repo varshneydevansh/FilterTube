@@ -260,13 +260,20 @@
     if (hour >= 10) return "day";
     return "dawn";
   }
+  function getSystemTheme() {
+    try {
+      return window.matchMedia?.("(prefers-color-scheme: dark)")?.matches ? "dark" : "light";
+    } catch (error) {
+      return "light";
+    }
+  }
   function applyExtensionEnvironment(surface) {
     const root = document.documentElement;
     const body = document.body;
     if (!root) return;
     root.dataset.scene = getSceneForHour();
     if (!root.dataset.theme) {
-      root.dataset.theme = "light";
+      root.dataset.theme = getSystemTheme();
     }
     root.dataset.surface = surface;
     root.style.colorScheme = root.dataset.theme === "dark" ? "dark" : "light";

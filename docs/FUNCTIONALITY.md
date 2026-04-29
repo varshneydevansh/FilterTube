@@ -63,6 +63,7 @@ That means:
 - **Subscribed-channel whitelist import is more resilient across browsers** because it now keeps recent page browse responses and leans on real page-driven `/feed/channels` growth.
 - **Channel Management now supports direct channel links**, and the injected 3-dot block item has its own user-facing toggle.
 - **Firefox export now uses a safer fallback path** for manual plain and encrypted downloads on Firefox/Waterfox, avoiding subfolder/blob URL failures reported on Windows.
+- **Fresh installs now follow the browser/OS theme** until the user explicitly toggles light or dark.
 
 ## Core Filtering Capabilities
 
@@ -232,6 +233,7 @@ YouTube JSON Data → FilterTubeEngine.processData() → Filtered Data → YouTu
 - **MV3 Compatibility**: Works with Firefox's MV3 implementation
 - **CSP Handling**: Robust Content Security Policy compatibility
 - **Firefox Export Fallback (v3.3.1)**: Manual plain and encrypted export bypass the downloads API path on Firefox/Waterfox and use a direct attachment save path when extension-driven blob downloads are flaky. Blob URL cleanup is delayed so Windows Firefox has time to finish reading the file.
+- **System Theme Detection (v3.3.1)**: When no theme preference has been saved, popup and dashboard surfaces resolve their first paint from `prefers-color-scheme`; explicit user toggles continue to override the browser/OS theme.
 
 ### **Unified Experience**
 - **Identical Functionality**: Same filtering capabilities across browsers

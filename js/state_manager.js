@@ -91,6 +91,7 @@ const StateManager = (() => {
         statsBySurface: {},
         channelMap: {},
         theme: 'light',
+        themeSource: 'system',
         isLoaded: false,
         kids: {
             blockedKeywords: [],
@@ -246,6 +247,7 @@ const StateManager = (() => {
             : {};
         state.channelMap = data.channelMap || {};
         state.theme = data.theme || 'light';
+        state.themeSource = data.themeSource === 'user' ? 'user' : 'system';
         state.syncKidsToMain = false;
         state.contentFilters = data.contentFilters ? JSON.parse(JSON.stringify(data.contentFilters)) : {
             duration: { enabled: false, minMinutes: 0, maxMinutes: 0, condition: 'between' },
@@ -2349,9 +2351,12 @@ const StateManager = (() => {
 
                 // Check for theme changes
                 if (changes.ftThemePreference) {
-                    const newTheme = changes.ftThemePreference.newValue || 'light';
+                    const newTheme = SettingsAPI.resolveThemePreference
+                        ? SettingsAPI.resolveThemePreference(changes.ftThemePreference.newValue)
+                        : (changes.ftThemePreference.newValue === 'dark' ? 'dark' : 'light');
                     if (state.theme !== newTheme) {
                         state.theme = newTheme;
+                        state.themeSource = (changes.ftThemePreference.newValue === 'dark' || changes.ftThemePreference.newValue === 'light') ? 'user' : 'system';
                         if (SettingsAPI.applyThemePreference) {
                             SettingsAPI.applyThemePreference(newTheme);
                         }

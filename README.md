@@ -3,7 +3,7 @@
   <h1>FilterTube</h1>
   <p>Peace of Mind for your Digital Space</p>
   
-  [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/varshneydevansh/FilterTube) ![Version](https://img.shields.io/badge/version-3.3.1-blue.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg) ![Lines of Code](https://img.shields.io/badge/total%20lines-107.5k-brightgreen.svg) ![JavaScript LoC](https://img.shields.io/badge/javascript-67.0k%20lines-yellow.svg) ![Top Language](https://img.shields.io/github/languages/top/varshneydevansh/FilterTube?color=f1e05a) ![Repo Size](https://img.shields.io/github/repo-size/varshneydevansh/FilterTube?color=orange)
+  [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/varshneydevansh/FilterTube) ![Version](https://img.shields.io/badge/version-3.3.1-blue.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg) ![Lines of Code](https://img.shields.io/badge/total%20lines-107.6k-brightgreen.svg) ![JavaScript LoC](https://img.shields.io/badge/javascript-67.0k%20lines-yellow.svg) ![Top Language](https://img.shields.io/github/languages/top/varshneydevansh/FilterTube?color=f1e05a) ![Repo Size](https://img.shields.io/github/repo-size/varshneydevansh/FilterTube?color=orange)
   
 </div>
 
@@ -19,6 +19,7 @@ FilterTube is a browser extension that gives you control over your YouTube feed.
 - **Channel Management rows can link directly to channel pages** using the best available identifier.
 - **The injected 3-dot block menu item can now be disabled** independently of Quick Block.
 - **Firefox/Waterfox export is more dependable** for both plain and encrypted JSON thanks to a safer manual-download fallback path.
+- **Fresh installs follow your browser/OS theme** until you manually pick light or dark.
 
 ## Nanah Device Trust & Sync
 
@@ -104,6 +105,7 @@ Docs:
 - **Profile-Scoped Backups**: Auto-backup and manual export respect the active profile. Default (Master) can export full; non-default exports active-only.
 - **Encrypted Backups**: PBKDF2-SHA256 (150k) + AES-GCM. Encryption auto-enables when the active profile has a PIN (or you pick “Encrypted” format); background verifies PIN before encrypting.
 - **Firefox-Safe Export (v3.3.1)**: Manual plain and encrypted JSON export now use a Firefox-safe fallback instead of relying on the extension downloads API subfolder path.
+- **System Theme Default (v3.3.1)**: New installs resolve the initial UI theme from `prefers-color-scheme`; explicit light/dark toggles remain sticky.
 - **Handle Enrichment Queue**: Newly imported channels are resolved slowly in the background to avoid hammering YouTube.
 - **Kids Mode Profiles**: Maintain a separate, safer rule set for YouTube Kids without mixing it with the main profile; optional “Apply Kids list on main YouTube” sync toggle.
 - **Channel Management Links (v3.3.0)**: Channel rows can open the real YouTube channel page via handle, UCID, or legacy custom URL.

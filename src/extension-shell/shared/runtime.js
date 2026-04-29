@@ -5,6 +5,14 @@ export function getSceneForHour(hour = new Date().getHours()) {
   return "dawn";
 }
 
+export function getSystemTheme() {
+  try {
+    return window.matchMedia?.("(prefers-color-scheme: dark)")?.matches ? "dark" : "light";
+  } catch (error) {
+    return "light";
+  }
+}
+
 export function applyExtensionEnvironment(surface) {
   const root = document.documentElement;
   const body = document.body;
@@ -13,7 +21,7 @@ export function applyExtensionEnvironment(surface) {
 
   root.dataset.scene = getSceneForHour();
   if (!root.dataset.theme) {
-    root.dataset.theme = "light";
+    root.dataset.theme = getSystemTheme();
   }
   root.dataset.surface = surface;
   root.style.colorScheme = root.dataset.theme === "dark" ? "dark" : "light";

@@ -64,6 +64,22 @@
         return Array.isArray(value) ? value : [];
     }
 
+    function getSystemThemePreference() {
+        try {
+            return global?.matchMedia?.('(prefers-color-scheme: dark)')?.matches ? 'dark' : 'light';
+        } catch (e) {
+            return 'light';
+        }
+    }
+
+    function isStoredThemePreference(value) {
+        return value === 'dark' || value === 'light';
+    }
+
+    function resolveThemePreference(value) {
+        return isStoredThemePreference(value) ? value : getSystemThemePreference();
+    }
+
     function isValidProfilesV4(value) {
         return !!(
             value
@@ -578,7 +594,8 @@
 
                 const hideComments = readBool('hideComments', !!result.hideAllComments);
                 const filterComments = hideComments ? false : readBool('filterComments', !!result.filterComments);
-                const theme = result[THEME_KEY] === 'dark' ? 'dark' : 'light';
+                const hasExplicitTheme = isStoredThemePreference(result?.[THEME_KEY]);
+                const theme = resolveThemePreference(result?.[THEME_KEY]);
                 const autoBackupEnabled = Object.prototype.hasOwnProperty.call(profileSettings, 'autoBackupEnabled')
                     ? (profileSettings.autoBackupEnabled === true)
                     : (result?.[AUTO_BACKUP_KEY] === true);
@@ -704,6 +721,7 @@
                     statsBySurface: safeObject(result.statsBySurface),
                     channelMap: result.channelMap || {},
                     theme,
+                    themeSource: hasExplicitTheme ? 'user' : 'system',
                     autoBackupEnabled,
                     contentFilters,
                     categoryFilters
@@ -1092,7 +1110,7 @@
     }
 
     function applyThemePreference(theme) {
-        const normalized = theme === 'dark' ? 'dark' : 'light';
+        const normalized = resolveThemePreference(theme);
         if (typeof document !== 'undefined') {
             document.documentElement.setAttribute('data-theme', normalized);
         }
@@ -1102,13 +1120,13 @@
     function getThemePreference() {
         return new Promise(resolve => {
             STORAGE_NAMESPACE?.get([THEME_KEY], result => {
-                resolve(result?.[THEME_KEY] === 'dark' ? 'dark' : 'light');
+                resolve(resolveThemePreference(result?.[THEME_KEY]));
             });
         });
     }
 
     function setThemePreference(theme) {
-        const normalized = theme === 'dark' ? 'dark' : 'light';
+        const normalized = resolveThemePreference(theme);
         return new Promise(resolve => {
             STORAGE_NAMESPACE?.set({ [THEME_KEY]: normalized }, () => resolve(normalized));
         });
@@ -1125,7 +1143,7 @@
     function getThemeFromChange(changes) {
         if (!isThemeChange(changes)) return null;
         const newValue = changes[THEME_KEY]?.newValue;
-        return newValue === 'dark' ? 'dark' : 'light';
+        return resolveThemePreference(newValue);
     }
 
     global.FilterTubeSettings = {
@@ -1143,6 +1161,8 @@
         loadSettings,
         saveSettings,
         applyThemePreference,
+        getSystemThemePreference,
+        resolveThemePreference,
         getThemePreference,
         setThemePreference,
         isSettingsChange,
