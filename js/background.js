@@ -1102,6 +1102,13 @@ function getChannelDerivedKeywordWord(channel) {
     return channel.id || channel.originalInput || '';
 }
 
+function parsePackedChannelKeywordSource(sourceValue) {
+    const raw = typeof sourceValue === 'string' ? sourceValue.trim() : '';
+    if (!raw.toLowerCase().startsWith('channel:')) return null;
+    const ref = raw.slice(raw.indexOf(':') + 1).split('|')[0].trim().toLowerCase();
+    return ref ? { source: 'channel', channelRef: ref } : null;
+}
+
 function syncStoredMainKeywordsWithChannels(existingKeywords, channels) {
     const currentKeywords = Array.isArray(existingKeywords) ? existingKeywords : [];
     const currentChannels = Array.isArray(channels) ? channels : [];
@@ -1134,6 +1141,15 @@ function syncStoredMainKeywordsWithChannels(existingKeywords, channels) {
         if (typeof entry !== 'object' || Array.isArray(entry)) {
             synced.push(entry);
             return;
+        }
+
+        const packedSource = parsePackedChannelKeywordSource(entry.source);
+        if (packedSource) {
+            entry = {
+                ...entry,
+                source: 'channel',
+                channelRef: entry.channelRef || packedSource.channelRef
+            };
         }
 
         if (entry.source !== 'channel') {
@@ -3250,13 +3266,18 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
                         if (typeof entry === 'object') {
                             const word = typeof entry.word === 'string' ? entry.word.trim() : '';
                             if (!word) return null;
+                            const packedSource = parsePackedChannelKeywordSource(entry.source);
+                            const channelRef = entry.source === 'channel'
+                                ? (entry.channelRef || null)
+                                : (packedSource?.channelRef || null);
+                            const source = (entry.source === 'channel' || packedSource || channelRef) ? 'channel' : 'user';
                             return {
                                 ...entry,
                                 word,
                                 exact: entry.exact === true,
                                 comments: entry.comments !== false,
-                                source: entry.source === 'channel' ? 'channel' : 'user',
-                                channelRef: entry.source === 'channel' ? (entry.channelRef || null) : null,
+                                source,
+                                channelRef: source === 'channel' ? channelRef : null,
                                 addedAt: (typeof entry.addedAt === 'number' && Number.isFinite(entry.addedAt)) ? entry.addedAt : Date.now()
                             };
                         }
@@ -3705,13 +3726,18 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
                         if (typeof entry === 'object') {
                             const word = typeof entry.word === 'string' ? entry.word.trim() : '';
                             if (!word) return null;
+                            const packedSource = parsePackedChannelKeywordSource(entry.source);
+                            const channelRef = entry.source === 'channel'
+                                ? (entry.channelRef || null)
+                                : (packedSource?.channelRef || null);
+                            const source = (entry.source === 'channel' || packedSource || channelRef) ? 'channel' : 'user';
                             return {
                                 ...entry,
                                 word,
                                 exact: entry.exact === true,
                                 comments: entry.comments !== false,
-                                source: entry.source === 'channel' ? 'channel' : 'user',
-                                channelRef: entry.source === 'channel' ? (entry.channelRef || null) : null,
+                                source,
+                                channelRef: source === 'channel' ? channelRef : null,
                                 addedAt: (typeof entry.addedAt === 'number' && Number.isFinite(entry.addedAt)) ? entry.addedAt : Date.now()
                             };
                         }

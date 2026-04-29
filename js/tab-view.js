@@ -4719,7 +4719,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function normalizeNanahCode(input) {
         return normalizeString(input)
             .toUpperCase()
-            .replace(/[^A-Z0-9]/g, '')
+            .replace(/[^ABCDEFGHJKMNPQRSTUVWXYZ23456789]/g, '')
             .slice(0, 8);
     }
 

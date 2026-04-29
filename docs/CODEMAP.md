@@ -22,6 +22,12 @@ See [MOBILE_APP_UPSTREAM_CHECKPOINT_2026-04-28.md](/Users/devanshvarshney/Filter
 
 That checkpoint covers mobile 3-dot parity, watch playlist/Mix recovery, desktop watch playlist-panel byline recovery, playlist quick-cross post-block mapping refresh, watch/player playlist alternate-ID repair, collaborator roster precedence, exact matching, `Filter All` linked keywords, source badge colors, Kids/Main sync semantics, and UI parity expectations. See [WATCH_PLAYLIST_IDENTITY_REGRESSION_2026-04-29.md](/Users/devanshvarshney/FilterTube/docs/WATCH_PLAYLIST_IDENTITY_REGRESSION_2026-04-29.md) for the specific regression where UC blocking worked but alternate IDs could remain `Not fetched`, and [CHANGELOG_2026-04-29.md](/Users/devanshvarshney/FilterTube/docs/CHANGELOG_2026-04-29.md) for the final 2026-04-29 runtime/UI/app-sync checkpoint.
 
+## 2026-04-30 Nanah App-Sync Metadata Checkpoint
+
+See [CHANGELOG_2026-04-30.md](/Users/devanshvarshney/FilterTube/docs/CHANGELOG_2026-04-30.md) for the Nanah/app sync checkpoint. The key source files are `js/io_manager.js`, `js/settings_shared.js`, `js/background.js`, `js/nanah_sync_adapter.js`, `js/tab-view.js`, and `js/vendor/nanah.bundle.js`.
+
+The important contract is that Android/app-packed keyword sources like `channel:<ref>|label=...|comment` are converted back into canonical extension entries with `source:"channel"` and `channelRef`. This keeps app-imported `Filter All` keyword rows visually and behaviorally equivalent to extension-created channel-derived rows.
+
 ## Previous in v3.2.6
 
 - **Typography Overhaul**: Modern sans-serif design system (Inter font family)
@@ -137,7 +143,7 @@ FilterTube/
 
 ### `js/io_manager.js`
 **Context:** UI contexts (Tab View) + future sync modules
-**Purpose:** Canonical import/export engine. Normalizes channel/keyword entries, merges imports (UC IDs, @handles, `c/slug`), adapts BlockTube/plaintext formats, and emits the versioned portable schema consumed by future sync tooling.
+**Purpose:** Canonical import/export engine. Normalizes channel/keyword entries, merges imports (UC IDs, @handles, `c/slug`), adapts BlockTube/plaintext formats, canonicalizes Android/app packed channel keyword source strings, and emits the versioned portable schema consumed by future sync tooling.
 
 **Context:** UI Contexts (Popup, Tab View)
 **Purpose:** The Single Source of Truth for application state.
@@ -155,6 +161,10 @@ FilterTube/
 | :--- | :--- |
 | `syncFilterAllKeywords` | Merges user keywords with channel-derived keywords. |
 | `compileKeywords` | Converts keywords into RegExp patterns. |
+
+### `js/nanah_sync_adapter.js`
+**Context:** Accounts & Sync / Nanah payload application
+**Purpose:** Converts Nanah payloads into profile-scoped FilterTube mutations. Current adapter normalization preserves app-packed channel keyword ownership before merge/replace so synced `Filter All` keyword rows remain channel-derived instead of plain user keywords.
 
 ### `js/content_bridge.js`
 **Context:** Isolated World

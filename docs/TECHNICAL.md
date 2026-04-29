@@ -77,6 +77,8 @@ sequenceDiagram
 - explicit remote target profile can be chosen during a live session
 - managed links can pin one fixed receiver-side local profile for later sessions
 - refresh ends the live session but not the saved trust state
+- pairing codes are alphanumeric but limited to the Nanah safe alphabet `ABCDEFGHJKMNPQRSTUVWXYZ23456789`
+- Android/app packed channel keyword source strings are normalized back into canonical `source:"channel"` plus `channelRef` before import or Nanah apply
 
 ### Child approval rule
 
@@ -1823,7 +1825,7 @@ sequenceDiagram
 
 | Module | Responsibility |
 | --- | --- |
-| `js/io_manager.js` | Normalizes keywords/channels, adapters, merge logic, and v3 schema builder. |
+| `js/io_manager.js` | Normalizes keywords/channels, adapters, merge logic, app-packed channel keyword sources, and v3 schema builder. |
 | `state_manager.js` + `FilterTubeSettings` | Entry points that read/write storage so compilation remains centralized. |
 | `html/tab-view.html` + `tab-view.js` | Provide UI controls (file picker, merge/replace). |
 

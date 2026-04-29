@@ -29,6 +29,13 @@
         return Array.isArray(value) ? value : [];
     }
 
+    function parsePackedChannelKeywordSource(sourceValue) {
+        const raw = normalizeString(sourceValue);
+        if (!raw.toLowerCase().startsWith('channel:')) return null;
+        const ref = raw.slice(raw.indexOf(':') + 1).split('|')[0].trim().toLowerCase();
+        return ref ? { source: 'channel', channelRef: ref } : null;
+    }
+
     /** Filters out primitives, nulls, and arrays so we only pass plain objects. */
     function safeObject(value) {
         return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
@@ -147,16 +154,19 @@
         const sourceCandidate = Object.prototype.hasOwnProperty.call(overrides, 'source')
             ? overrides.source
             : entry?.source;
+        const packedSource = parsePackedChannelKeywordSource(sourceCandidate) || parsePackedChannelKeywordSource(entry?.source);
 
-        const source = (sourceCandidate === 'channel' || sourceCandidate === 'user' || sourceCandidate === 'import')
+        const source = packedSource
+            ? 'channel'
+            : (sourceCandidate === 'channel' || sourceCandidate === 'user' || sourceCandidate === 'import')
             ? sourceCandidate
-            : (entry?.source === 'channel' ? 'channel' : 'user');
+            : ((entry?.source === 'channel' || normalizeString(entry?.channelRef)) ? 'channel' : 'user');
 
         const channelRefCandidate = Object.prototype.hasOwnProperty.call(overrides, 'channelRef')
             ? overrides.channelRef
             : entry?.channelRef;
 
-        const channelRef = normalizeString(channelRefCandidate) || null;
+        const channelRef = normalizeString(channelRefCandidate) || packedSource?.channelRef || null;
 
         return {
             word,

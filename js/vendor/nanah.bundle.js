@@ -22,7 +22,8 @@
   });
 
   // ../nanah/packages/core/src/codes.ts
-  var PAIRING_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  var PAIRING_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+  var PAIRING_ALPHABET_PATTERN = /[^ABCDEFGHJKMNPQRSTUVWXYZ23456789]/g;
   function getSecureRandomInt(maxExclusive) {
     if (!Number.isInteger(maxExclusive) || maxExclusive <= 0) {
       throw new Error("maxExclusive must be a positive integer");
@@ -46,7 +47,7 @@
     return result;
   }
   function normalizePairingCode(input) {
-    return String(input || "").toUpperCase().replace(/[^A-Z0-9]/g, "").replace(/[O0]/g, "0").replace(/[I1L]/g, "1");
+    return String(input || "").toUpperCase().replace(PAIRING_ALPHABET_PATTERN, "");
   }
   function formatPairingCode(input) {
     const normalized = normalizePairingCode(input);
@@ -216,7 +217,7 @@
   });
 
   // ../nanah/packages/core/dist/codes.js
-  var PAIRING_ALPHABET2 = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  var PAIRING_ALPHABET2 = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
   function getSecureRandomInt2(maxExclusive) {
     if (!Number.isInteger(maxExclusive) || maxExclusive <= 0) {
       throw new Error("maxExclusive must be a positive integer");

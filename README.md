@@ -3,7 +3,7 @@
   <h1>FilterTube</h1>
   <p>Peace of Mind for your Digital Space</p>
   
-  [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/varshneydevansh/FilterTube) ![Version](https://img.shields.io/badge/version-3.3.1-blue.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg) ![Lines of Code](https://img.shields.io/badge/total%20lines-107.9k-brightgreen.svg) ![JavaScript LoC](https://img.shields.io/badge/javascript-67.2k%20lines-yellow.svg) ![Top Language](https://img.shields.io/github/languages/top/varshneydevansh/FilterTube?color=f1e05a) ![Repo Size](https://img.shields.io/github/repo-size/varshneydevansh/FilterTube?color=orange)
+  [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/varshneydevansh/FilterTube) ![Version](https://img.shields.io/badge/version-3.3.1-blue.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg) ![Lines of Code](https://img.shields.io/badge/total%20lines-108.0k-brightgreen.svg) ![JavaScript LoC](https://img.shields.io/badge/javascript-67.3k%20lines-yellow.svg) ![Top Language](https://img.shields.io/github/languages/top/varshneydevansh/FilterTube?color=f1e05a) ![Repo Size](https://img.shields.io/github/repo-size/varshneydevansh/FilterTube?color=orange)
   
 </div>
 
@@ -22,6 +22,8 @@ FilterTube is a browser extension that gives you control over your YouTube feed.
 - **Fresh installs follow your browser/OS theme** until you manually pick light or dark.
 - **The dashboard sidebar stays usable on short desktop windows** with a scrollable navigation list.
 - **Large blocked-channel lists filter faster** because YouTube JSON payloads now use indexed channel matching instead of scanning every saved channel per renderer.
+- **Nanah app/extension sync preserves channel-derived keywords** so rows imported from Android/other Nanah clients keep their `Filter All` source metadata, row tint, and source badges instead of degrading into plain user keywords.
+- **Nanah pairing codes use the human-safe alphabet** `ABCDEFGHJKMNPQRSTUVWXYZ23456789`, matching the upstream Nanah runtime and avoiding ambiguous `I/L/O/0/1` entry drift.
 
 ## Nanah Device Trust & Sync
 
@@ -45,6 +47,8 @@ That means:
 - FilterTube does not need a cloud copy of your settings
 - trust saves relationship and policy for later live sessions
 - trust does **not** mean hidden always-on background sync
+- app/extension sync keeps channel-derived keyword ownership intact across Nanah payloads
+- pairing codes are alphanumeric but intentionally restricted to the Nanah safe alphabet
 
 Public relay page:
 
@@ -159,6 +163,7 @@ Learn more in [Proactive Channel Identity](docs/PROACTIVE_CHANNEL_IDENTITY.md).
   - [Proactive Channel Identity](docs/PROACTIVE_CHANNEL_IDENTITY.md) – XHR interception and instant stamping
   - [Developer Guide](docs/DEVELOPER_GUIDE.md) – Extending FilterTube for new YouTube features
   - [Architecture](docs/ARCHITECTURE.md) – System design and cross-world messaging
+  - [2026-04-30 Changelog](docs/CHANGELOG_2026-04-30.md) – Nanah app-sync metadata and pairing-code alignment checkpoint
   - [YouTube Kids Integration](docs/YOUTUBE_KIDS_INTEGRATION.md) – Kids-specific optimizations
   - [3-Dot Menu Improvements](docs/THREE_DOT_MENU_IMPROVEMENTS.md) – collaborator-aware menu recovery and Mix/watch handling
   - [Subscribed Channels Import](docs/SUBSCRIBED_CHANNELS_IMPORT.md) – whitelist import flow and cross-browser page capture details

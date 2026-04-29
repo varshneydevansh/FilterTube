@@ -29,6 +29,35 @@
         return Array.isArray(value) ? value : [];
     }
 
+    function parsePackedChannelKeywordSource(sourceValue) {
+        const raw = normalizeString(sourceValue);
+        if (!raw.toLowerCase().startsWith('channel:')) return null;
+        const ref = raw.slice(raw.indexOf(':') + 1).split('|')[0].trim().toLowerCase();
+        return ref ? { source: 'channel', channelRef: ref } : null;
+    }
+
+    function normalizeKeywordEntry(entry) {
+        if (typeof entry === 'string') return entry;
+        const item = safeObject(entry);
+        const word = normalizeString(item.word);
+        if (!word) return null;
+        const packedSource = parsePackedChannelKeywordSource(item.source);
+        const channelRef = normalizeString(item.channelRef) || packedSource?.channelRef || '';
+        const source = (item.source === 'channel' || packedSource || channelRef) ? 'channel' : item.source;
+        return {
+            ...item,
+            word,
+            source: source === 'channel' ? 'channel' : (normalizeString(source) || 'user'),
+            channelRef: source === 'channel' ? (channelRef || null) : null
+        };
+    }
+
+    function normalizeKeywordList(list) {
+        return safeArray(list)
+            .map(normalizeKeywordEntry)
+            .filter(Boolean);
+    }
+
     function keywordKey(entry) {
         if (typeof entry === 'string') {
             return normalizeString(entry).toLowerCase();
@@ -56,12 +85,14 @@
     function mergeKeywordLists(base, incoming) {
         const seen = new Map();
         safeArray(base).forEach((entry) => {
-            const key = keywordKey(entry);
-            if (key) seen.set(key, entry);
+            const normalized = normalizeKeywordEntry(entry);
+            const key = keywordKey(normalized);
+            if (key) seen.set(key, normalized);
         });
         safeArray(incoming).forEach((entry) => {
-            const key = keywordKey(entry);
-            if (key) seen.set(key, entry);
+            const normalized = normalizeKeywordEntry(entry);
+            const key = keywordKey(normalized);
+            if (key) seen.set(key, normalized);
         });
         return Array.from(seen.values());
     }
@@ -169,13 +200,13 @@
                     ? safeArray(data.channels)
                     : mergeChannelLists(currentMain.channels, data.channels),
                 keywords: replace
-                    ? safeArray(data.keywords)
+                    ? normalizeKeywordList(data.keywords)
                     : mergeKeywordLists(currentMain.keywords, data.keywords),
                 whitelistChannels: replace
                     ? safeArray(data.whitelistChannels)
                     : mergeChannelLists(currentMain.whitelistChannels, data.whitelistChannels),
                 whitelistKeywords: replace
-                    ? safeArray(data.whitelistKeywords)
+                    ? normalizeKeywordList(data.whitelistKeywords)
                     : mergeKeywordLists(currentMain.whitelistKeywords, data.whitelistKeywords)
             };
 

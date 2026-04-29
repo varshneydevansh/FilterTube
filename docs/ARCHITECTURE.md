@@ -14,6 +14,7 @@ This architecture should be read as:
 - PIN policy stays local to each device
 - Nanah provides live device-to-device transfer plus saved trust policy
 - the signaling relay is only used so devices can find each other and exchange setup data
+- shared app/extension payloads preserve channel-derived keyword ownership so `Filter All` rows do not lose source badges or row tint when synced
 
 ### High-level sync architecture
 
@@ -1223,6 +1224,7 @@ This keeps announcements self-contained inside the extension, avoiding blocked `
 `js/io_manager.js` is the canonical normalization/adapter layer. Both UI (Tab View) and future sync tooling call into this module, preventing subtle drift between import/export flows. Key points:
 
 * All inbound identifiers funnel through `normalizeChannelInput`, handling `UC…`, `@handles`, `/c/<slug>`, `/user/<slug>`, and plain names.
+* App-packed channel keyword sources are normalized to the extension canonical `source:"channel"` plus `channelRef` model before merge/replace.
 * Merge behavior is deterministic (`UCID > handle > customUrl > originalInput`) with earliest `addedAt` preserved so backups retain ordering.
 * Export flow reads `StateManager` + `chrome.storage.local` (channel/keyword lists, channelMap) and emits a portable v3 schema.
 * Import flow (`importV3`) supports native FilterTube exports, BlockTube JSON, and plaintext lists via adapters.

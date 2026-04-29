@@ -64,6 +64,13 @@
         return Array.isArray(value) ? value : [];
     }
 
+    function parsePackedChannelKeywordSource(sourceValue) {
+        const raw = typeof sourceValue === 'string' ? sourceValue.trim() : '';
+        if (!raw.toLowerCase().startsWith('channel:')) return null;
+        const ref = raw.slice(raw.indexOf(':') + 1).split('|')[0].trim().toLowerCase();
+        return ref ? { source: 'channel', channelRef: ref } : null;
+    }
+
     function getSystemThemePreference() {
         try {
             return global?.matchMedia?.('(prefers-color-scheme: dark)')?.matches ? 'dark' : 'light';
@@ -179,12 +186,18 @@
             ? overrides.comments
             : entry.comments;
         const comments = (typeof commentsCandidate === 'boolean') ? commentsCandidate : true;
+        const packedSource = parsePackedChannelKeywordSource(overrides.source) || parsePackedChannelKeywordSource(entry.source);
+        const explicitChannelRef = overrides.channelRef || entry.channelRef || packedSource?.channelRef || null;
+        const source = packedSource || explicitChannelRef || overrides.source === 'channel' || entry.source === 'channel'
+            ? 'channel'
+            : (overrides.source || 'user');
+
         return {
             word,
             exact: !!entry.exact,
             semantic: !!entry.semantic,
-            source: overrides.source || (entry.source === 'channel' ? 'channel' : 'user'),
-            channelRef: overrides.channelRef || entry.channelRef || null,
+            source,
+            channelRef: explicitChannelRef,
             comments,
             addedAt // Track insertion time
         };
@@ -216,8 +229,9 @@
             return rawKeywords
                 .map((entry, index) => {
                     // Preserve source and channelRef if they exist (for channel-derived keywords)
-                    const source = entry.source === 'channel' ? 'channel' : 'user';
-                    const channelRef = entry.source === 'channel' ? entry.channelRef : null;
+                    const packedSource = parsePackedChannelKeywordSource(entry.source);
+                    const source = (entry.source === 'channel' || packedSource) ? 'channel' : 'user';
+                    const channelRef = entry.source === 'channel' ? entry.channelRef : packedSource?.channelRef || null;
                     // If no timestamp exists, assign based on position (newer items have higher timestamps)
                     const addedAt = entry.addedAt || (now - index * 1000);
                     return sanitizeKeywordEntry(entry, { source, channelRef, addedAt });
