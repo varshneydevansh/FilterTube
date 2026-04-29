@@ -64,6 +64,7 @@ That means:
 - **Channel Management now supports direct channel links**, and the injected 3-dot block item has its own user-facing toggle.
 - **Firefox export now uses a safer fallback path** for manual plain and encrypted downloads on Firefox/Waterfox, avoiding subfolder/blob URL failures reported on Windows.
 - **Fresh installs now follow the browser/OS theme** until the user explicitly toggles light or dark.
+- **Dashboard sidebar navigation no longer clips on short desktop windows** because the nav list can scroll independently.
 
 ## Core Filtering Capabilities
 

@@ -540,6 +540,26 @@ body[data-surface="popup"] .input-group {
     border-radius: 1rem;
 }
 
+@media (min-width: 769px) and (max-height: 760px) {
+    .sidebar {
+        gap: 0.85rem;
+        padding: 1rem;
+    }
+
+    .sidebar .brand {
+        margin-bottom: 0.75rem;
+    }
+
+    .nav-item {
+        min-height: 2.55rem;
+        padding-block: 0.68rem;
+    }
+
+    .sidebar-footer {
+        padding-top: 0.7rem;
+    }
+}
+
 .nav-item:hover,
 .nav-item.active {
     border-color: var(--ft-color-sem-neutral-border);

@@ -20,6 +20,7 @@ This checkpoint documents the runtime, UI, and documentation work completed on 2
 - Expected duplicate MAIN-world script loads now log only in debug mode. First-install reloads can legitimately hit the idempotency guards for `seed.js`, `filter_logic.js`, or `injector.js`, but they no longer surface as Chrome extension warnings.
 - Firefox/Waterfox manual export now bypasses extension-driven subfolder downloads for both plain and encrypted JSON, keeps blob URLs alive longer, and supports Promise-style download APIs in backup helpers. See [ISSUE_51_FIREFOX_EXPORT_2026-04-29.md](/Users/devanshvarshney/FilterTube/docs/ISSUE_51_FIREFOX_EXPORT_2026-04-29.md).
 - Fresh installs now follow the browser/OS light or dark theme until the user manually toggles a preference. See [ISSUE_42_SYSTEM_THEME_2026-04-29.md](/Users/devanshvarshney/FilterTube/docs/ISSUE_42_SYSTEM_THEME_2026-04-29.md).
+- Dashboard sidebar navigation now remains reachable on short desktop windows by scrolling the nav list instead of clipping it. See [ISSUE_54_DASHBOARD_SIDEBAR_HEIGHT_2026-04-29.md](/Users/devanshvarshney/FilterTube/docs/ISSUE_54_DASHBOARD_SIDEBAR_HEIGHT_2026-04-29.md).
 
 ## Mix And Collaboration Safety
 

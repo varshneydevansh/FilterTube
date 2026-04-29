@@ -164,6 +164,7 @@ html[data-theme="dark"] body::after {
     gap: var(--ft-space-sm);
     margin-bottom: var(--ft-space-lg);
     padding-left: var(--ft-space-xs);
+    flex-shrink: 0;
 }
 
 .logo-icon {
@@ -193,7 +194,25 @@ html[data-theme="dark"] body::after {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    flex: 1 1 auto;
     min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-gutter: stable;
+    -webkit-overflow-scrolling: touch;
+}
+
+.nav-list::-webkit-scrollbar {
+    width: 0.4rem;
+}
+
+.nav-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.nav-list::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: rgba(100, 116, 139, 0.32);
 }
 
 .nav-item {
@@ -261,6 +280,7 @@ html[data-theme="dark"] body::after {
     color: var(--ft-color-text-muted);
     font-size: var(--ft-font-size-caption);
     text-align: center;
+    flex-shrink: 0;
 }
 
 .sidebar-overlay {

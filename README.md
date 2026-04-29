@@ -20,6 +20,7 @@ FilterTube is a browser extension that gives you control over your YouTube feed.
 - **The injected 3-dot block menu item can now be disabled** independently of Quick Block.
 - **Firefox/Waterfox export is more dependable** for both plain and encrypted JSON thanks to a safer manual-download fallback path.
 - **Fresh installs follow your browser/OS theme** until you manually pick light or dark.
+- **The dashboard sidebar stays usable on short desktop windows** with a scrollable navigation list.
 
 ## Nanah Device Trust & Sync
 
