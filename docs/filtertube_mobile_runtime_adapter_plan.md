@@ -13,7 +13,7 @@ The target model is:
 
 ## 2026-04-28 upstream checkpoint
 
-Current extension-side mobile/runtime parity is summarized in [MOBILE_APP_UPSTREAM_CHECKPOINT_2026-04-28.md](/Users/devanshvarshney/FilterTube/docs/MOBILE_APP_UPSTREAM_CHECKPOINT_2026-04-28.md).
+Current extension-side mobile/runtime parity is summarized in [CODEMAP.md](/Users/devanshvarshney/FilterTube/docs/CODEMAP.md), [TECHNICAL.md](/Users/devanshvarshney/FilterTube/docs/TECHNICAL.md), and [FUNCTIONALITY.md](/Users/devanshvarshney/FilterTube/docs/FUNCTIONALITY.md).
 
 The app runtime adapter should treat these as source-of-truth behaviors:
 

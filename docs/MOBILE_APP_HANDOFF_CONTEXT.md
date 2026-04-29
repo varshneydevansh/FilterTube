@@ -121,7 +121,7 @@ Preferred update model:
 
 ## 2026-04-28 upstream checkpoint
 
-Before continuing app-specific work, use [MOBILE_APP_UPSTREAM_CHECKPOINT_2026-04-28.md](/Users/devanshvarshney/FilterTube/docs/MOBILE_APP_UPSTREAM_CHECKPOINT_2026-04-28.md) as the current extension-side parity checkpoint.
+Before continuing app-specific work, use [CODEMAP.md](/Users/devanshvarshney/FilterTube/docs/CODEMAP.md), [TECHNICAL.md](/Users/devanshvarshney/FilterTube/docs/TECHNICAL.md), and [FUNCTIONALITY.md](/Users/devanshvarshney/FilterTube/docs/FUNCTIONALITY.md) as the current extension-side parity checkpoint.
 
 That checkpoint records the runtime and UI/UX behavior that was upstreamed for the mobile app today:
 

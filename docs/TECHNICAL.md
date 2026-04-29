@@ -80,6 +80,22 @@ sequenceDiagram
 - pairing codes are alphanumeric but limited to the Nanah safe alphabet `ABCDEFGHJKMNPQRSTUVWXYZ23456789`
 - Android/app packed channel keyword source strings are normalized back into canonical `source:"channel"` plus `channelRef` before import or Nanah apply
 
+## Runtime stabilization checkpoint
+
+The latest runtime notes that were previously tracked in dated checkpoint files now live here and in `data/release_notes.json`.
+
+- Watch/player playlist blocking keeps stored `videoId -> UC...` mappings authoritative when later watch identity fetches are weak or conflicting.
+- UC-first enrichment can retry public/no-credentials channel HTML before accepting a row without `@handle` or custom URL metadata.
+- First-save block rows require a real channel name before using the skip-fetch path; a known handle alone is kept as identity, not as the display name.
+- Auto-backup waits briefly for post-block enrichment on channel-added writes so backup snapshots are less likely to capture incomplete first-save rows.
+- DOM fallback handle misses resolve through the background channel-details path instead of page-context `/@handle/about` fetches, avoiding YouTube CORS failures.
+- Search-page SPA collaborator recovery keeps recent `/youtubei/v1/search` snapshots and includes them in main-world channel/collaborator lookup roots.
+- Comment 3-dot menus display the comment author identity instead of borrowing the current playing video's channel row.
+- Post-block enrichment skips identical channel-list writes, and Channel Management avoids full row/avatar rebuilds for simple `Filter All` or comments-toggle changes.
+- Quick Block hover controls retain state across YouTube preview overlays and clip against sticky top chrome on mobile/search surfaces.
+- Expected duplicate Main World init exits are debug-only, so first-install idempotency guards do not surface as warnings.
+- Firefox/Waterfox manual export, system-theme first paint, short-height dashboard sidebar scrolling, and large-blocklist indexed matching are release-note items, not separate dated docs.
+
 ### Child approval rule
 
 ```text

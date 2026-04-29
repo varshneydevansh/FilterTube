@@ -67,6 +67,10 @@ That means:
 - **Dashboard sidebar navigation no longer clips on short desktop windows** because the nav list can scroll independently.
 - **Large blocked-channel lists are cheaper to process** because JSON/XHR filtering now uses indexed channel identity matching instead of scanning every saved channel for every renderer.
 
+## Upcoming Release-Note Checkpoint
+
+The next release-facing checkpoint is staged in `data/release_notes.json` instead of date-stamped changelog files. It consolidates the watch/player playlist identity repair, handle/name first-save cleanup, SPA search collaborator recovery, quick-block hover clipping, Firefox export fallback, system-theme default, sidebar-height fix, large-blocklist indexed matching, duplicate-init debug gating, and Nanah app-sync metadata preservation.
+
 ## Core Filtering Capabilities
 
 ### **Content Filtering Modes**

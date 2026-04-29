@@ -18,13 +18,13 @@ This document provides a detailed reference of the key files and functions in th
 
 ## 2026-04-28 Mobile/App Upstream Checkpoint
 
-See [MOBILE_APP_UPSTREAM_CHECKPOINT_2026-04-28.md](/Users/devanshvarshney/FilterTube/docs/MOBILE_APP_UPSTREAM_CHECKPOINT_2026-04-28.md) for the current extension-side source of truth that the native app should consume through runtime sync.
+The current extension-side source of truth for native-app runtime sync is split across [TECHNICAL.md](/Users/devanshvarshney/FilterTube/docs/TECHNICAL.md), [FUNCTIONALITY.md](/Users/devanshvarshney/FilterTube/docs/FUNCTIONALITY.md), [CHANNEL_BLOCKING_SYSTEM.md](/Users/devanshvarshney/FilterTube/docs/CHANNEL_BLOCKING_SYSTEM.md), and [data/release_notes.json](/Users/devanshvarshney/FilterTube/data/release_notes.json). Date-stamped checkpoint notes are intentionally not kept as permanent docs.
 
-That checkpoint covers mobile 3-dot parity, watch playlist/Mix recovery, desktop watch playlist-panel byline recovery, playlist quick-cross post-block mapping refresh, watch/player playlist alternate-ID repair, collaborator roster precedence, exact matching, `Filter All` linked keywords, source badge colors, Kids/Main sync semantics, and UI parity expectations. See [WATCH_PLAYLIST_IDENTITY_REGRESSION_2026-04-29.md](/Users/devanshvarshney/FilterTube/docs/WATCH_PLAYLIST_IDENTITY_REGRESSION_2026-04-29.md) for the specific regression where UC blocking worked but alternate IDs could remain `Not fetched`, and [CHANGELOG_2026-04-29.md](/Users/devanshvarshney/FilterTube/docs/CHANGELOG_2026-04-29.md) for the final 2026-04-29 runtime/UI/app-sync checkpoint.
+Those stable docs now cover mobile 3-dot parity, watch playlist/Mix recovery, desktop watch playlist-panel byline recovery, playlist quick-cross post-block mapping refresh, watch/player playlist alternate-ID repair, collaborator roster precedence, exact matching, `Filter All` linked keywords, source badge colors, Kids/Main sync semantics, and UI parity expectations.
 
 ## 2026-04-30 Nanah App-Sync Metadata Checkpoint
 
-See [CHANGELOG_2026-04-30.md](/Users/devanshvarshney/FilterTube/docs/CHANGELOG_2026-04-30.md) for the Nanah/app sync checkpoint. The key source files are `js/io_manager.js`, `js/settings_shared.js`, `js/background.js`, `js/nanah_sync_adapter.js`, `js/tab-view.js`, and `js/vendor/nanah.bundle.js`.
+The Nanah/app sync checkpoint is documented in [TECHNICAL.md](/Users/devanshvarshney/FilterTube/docs/TECHNICAL.md), [ARCHITECTURE.md](/Users/devanshvarshney/FilterTube/docs/ARCHITECTURE.md), and [NANAH_USER_GUIDE.md](/Users/devanshvarshney/FilterTube/docs/NANAH_USER_GUIDE.md). The key source files are `js/io_manager.js`, `js/settings_shared.js`, `js/background.js`, `js/nanah_sync_adapter.js`, `js/tab-view.js`, and `js/vendor/nanah.bundle.js`.
 
 The important contract is that Android/app-packed keyword sources like `channel:<ref>|label=...|comment` are converted back into canonical extension entries with `source:"channel"` and `channelRef`. This keeps app-imported `Filter All` keyword rows visually and behaviorally equivalent to extension-created channel-derived rows.
 

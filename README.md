@@ -3,7 +3,7 @@
   <h1>FilterTube</h1>
   <p>Peace of Mind for your Digital Space</p>
   
-  [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/varshneydevansh/FilterTube) ![Version](https://img.shields.io/badge/version-3.3.1-blue.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg) ![Lines of Code](https://img.shields.io/badge/total%20lines-108.0k-brightgreen.svg) ![JavaScript LoC](https://img.shields.io/badge/javascript-67.3k%20lines-yellow.svg) ![Top Language](https://img.shields.io/github/languages/top/varshneydevansh/FilterTube?color=f1e05a) ![Repo Size](https://img.shields.io/github/repo-size/varshneydevansh/FilterTube?color=orange)
+  [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/varshneydevansh/FilterTube) ![Version](https://img.shields.io/badge/version-3.3.1-blue.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg) ![Lines of Code](https://img.shields.io/badge/total%20lines-106.4k-brightgreen.svg) ![JavaScript LoC](https://img.shields.io/badge/javascript-67.3k%20lines-yellow.svg) ![Top Language](https://img.shields.io/github/languages/top/varshneydevansh/FilterTube?color=f1e05a) ![Repo Size](https://img.shields.io/github/repo-size/varshneydevansh/FilterTube?color=orange)
   
 </div>
 
@@ -24,6 +24,7 @@ FilterTube is a browser extension that gives you control over your YouTube feed.
 - **Large blocked-channel lists filter faster** because YouTube JSON payloads now use indexed channel matching instead of scanning every saved channel per renderer.
 - **Nanah app/extension sync preserves channel-derived keywords** so rows imported from Android/other Nanah clients keep their `Filter All` source metadata, row tint, and source badges instead of degrading into plain user keywords.
 - **Nanah pairing codes use the human-safe alphabet** `ABCDEFGHJKMNPQRSTUVWXYZ23456789`, matching the upstream Nanah runtime and avoiding ambiguous `I/L/O/0/1` entry drift.
+- **Next release notes are staged in `data/release_notes.json`** rather than date-stamped docs, so the dashboard What's New feed remains the release-facing source.
 
 ## Nanah Device Trust & Sync
 
@@ -163,7 +164,7 @@ Learn more in [Proactive Channel Identity](docs/PROACTIVE_CHANNEL_IDENTITY.md).
   - [Proactive Channel Identity](docs/PROACTIVE_CHANNEL_IDENTITY.md) – XHR interception and instant stamping
   - [Developer Guide](docs/DEVELOPER_GUIDE.md) – Extending FilterTube for new YouTube features
   - [Architecture](docs/ARCHITECTURE.md) – System design and cross-world messaging
-  - [2026-04-30 Changelog](docs/CHANGELOG_2026-04-30.md) – Nanah app-sync metadata and pairing-code alignment checkpoint
+  - [Release Notes Data](data/release_notes.json) – packaged What's New entries for release-facing changes
   - [YouTube Kids Integration](docs/YOUTUBE_KIDS_INTEGRATION.md) – Kids-specific optimizations
   - [3-Dot Menu Improvements](docs/THREE_DOT_MENU_IMPROVEMENTS.md) – collaborator-aware menu recovery and Mix/watch handling
   - [Subscribed Channels Import](docs/SUBSCRIBED_CHANNELS_IMPORT.md) – whitelist import flow and cross-browser page capture details

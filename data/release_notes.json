@@ -3,6 +3,20 @@
     "_comment": "Shared release notes source for the dashboard What's New tab and the YouTube release banner. Keep entries sorted newest-first by version."
   },
   {
+    "version": "3.3.2",
+    "headline": "Upcoming: watch identity, Nanah sync, and app parity cleanup",
+    "summary": "Prepared release notes for the next checkpoint without bumping the packaged extension version yet: watch/player playlist identity is more reliable, first-save channel rows preserve real names and alternate IDs, Nanah app sync keeps channel-derived keyword ownership, and several UI/performance regressions are guarded.",
+    "bannerSummary": "Watch identity repairs, safer first-save channel rows, Nanah app-sync metadata preservation, and UI/performance regression guards are staged for the next release.",
+    "highlights": [
+      "Watch/player playlist blocks keep stored video-to-channel mappings authoritative while still recovering handles, custom URLs, names, and logos when YouTube exposes them later.",
+      "First-save channel rows no longer treat a bare @handle as a complete display name, reducing backup snapshots with temporary handle-as-name rows.",
+      "Search SPA collaborator recovery keeps recent YouTube search response snapshots so collaborator menus can still upgrade after watch-to-search navigation.",
+      "Nanah/import paths preserve channel-derived Filter All keyword ownership between extension and native app payloads, including row color and source-badge metadata.",
+      "Quick Block hover controls clip against sticky YouTube chrome and keep their hover state across preview overlays without punching into top UI.",
+      "Firefox/Waterfox manual export, system-theme first paint, short-height sidebar scrolling, large-blocklist indexed matching, duplicate init debug gating, and channel-row no-redraw behavior are part of this checkpoint."
+    ]
+  },
+  {
     "version": "3.3.1",
     "headline": "Sync Across devices securely via p2p with no 3rd part server",
     "summary": "Accounts & Sync now presents Nanah as three simpler paths, with stronger parent/child targeting, clearer reconnect rules, and much broader documentation for real-world use.",

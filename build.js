@@ -525,6 +525,9 @@ function shouldCountInTotalLoC(filePath) {
 
 function sumFileLines(files) {
     return files.reduce((total, filePath) => {
+        if (!fs.existsSync(filePath)) {
+            return total;
+        }
         try {
             const content = fs.readFileSync(filePath, 'utf8');
             const newlineCount = (content.match(/\n/g) || []).length;
