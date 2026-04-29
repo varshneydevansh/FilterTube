@@ -6,7 +6,12 @@
 
     // Idempotency guard for seed.js itself
     if (window.filterTubeSeedHasRun) {
-        console.warn('FilterTube (Seed): Already initialized, skipping');
+        try {
+            if (window.__filtertubeDebug || document.documentElement?.getAttribute('data-filtertube-debug') === 'true') {
+                console.debug('FilterTube (Seed): Already initialized, skipping');
+            }
+        } catch (e) {
+        }
         return; // Now legal because it's inside a function
     }
     window.filterTubeSeedHasRun = true;

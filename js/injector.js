@@ -92,7 +92,12 @@
             }
         } catch (e) {
         }
-        console.warn('FilterTube (Injector): Already initialized, skipping');
+        try {
+            if (window.__filtertubeDebug || document.documentElement?.getAttribute('data-filtertube-debug') === 'true') {
+                console.debug('FilterTube (Injector): Already initialized, skipping');
+            }
+        } catch (e) {
+        }
         return; // Now legal because it's inside a function
     }
     window.filterTubeInjectorHasRun = true;

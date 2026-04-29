@@ -81,6 +81,9 @@ let quickBlockStylesInjected = false;
 let quickBlockObserverStarted = false;
 let quickBlockSweepTimer = 0;
 let quickBlockPeriodicTimer = 0;
+let quickBlockViewportUpdateScheduled = false;
+const QUICK_BLOCK_HOVER_STICKY_MS = 1200;
+const QUICK_BLOCK_LEAVE_STICKY_MS = 700;
 const FT_DROPDOWN_SELECTORS = 'tp-yt-iron-dropdown, ytm-menu-popup-renderer, bottom-sheet-container, div.menu-content[role="dialog"]';
 const isMobileYouTubeSurface = () => {
     try {
@@ -132,22 +135,6 @@ const isElementVisibleForQuickBlock = (element) => {
 const isMobileSearchSurfaceOpen = () => {
     if (!isMobileYouTubeSurface()) return false;
 
-    try {
-        const active = document.activeElement;
-        if (active instanceof Element) {
-            if (active.closest('ytm-searchbox, yt-searchbox, form[role="search"], .searchbox-input, .searchbox-input-container')) {
-                return true;
-            }
-            if (
-                active.matches?.('input[type="search"], input[aria-label*="Search" i], input[placeholder*="Search" i]') ||
-                active.getAttribute?.('role') === 'searchbox'
-            ) {
-                return true;
-            }
-        }
-    } catch (e) {
-    }
-
     const suggestionSelectors = [
         'ytm-searchbox-suggestions-container',
         'ytm-searchbox-dropdown',
@@ -159,12 +146,28 @@ const isMobileSearchSurfaceOpen = () => {
     ];
 
     try {
-        return suggestionSelectors.some((selector) => {
+        const hasVisibleSuggestions = suggestionSelectors.some((selector) => {
             return Array.from(document.querySelectorAll(selector)).some((el) => isElementVisibleForQuickBlock(el));
         });
+        if (hasVisibleSuggestions) return true;
+    } catch (e) {
+    }
+
+    try {
+        const active = document.activeElement;
+        if (active instanceof Element) {
+            const searchRoot = active.closest('ytm-searchbox, yt-searchbox, form[role="search"], .searchbox-input, .searchbox-input-container');
+            if (searchRoot) {
+                const expanded = searchRoot.getAttribute?.('aria-expanded') === 'true'
+                    || active.getAttribute?.('aria-expanded') === 'true';
+                const explicitlyOpen = searchRoot.matches?.('[open], [opened], [data-open="true"], [data-opened="true"]');
+                return !!expanded || !!explicitlyOpen;
+            }
+        }
     } catch (e) {
         return false;
     }
+    return false;
 };
 
 const syncQuickBlockSurfaceState = () => {
@@ -332,10 +335,127 @@ function resolveQuickBlockAnchor(hostCard) {
     return hostCard;
 }
 
+function getQuickBlockBoundsElement(hostCard) {
+    if (!hostCard || !(hostCard instanceof Element)) return null;
+    try {
+        const anchor = hostCard.__filtertubeQuickAnchor;
+        if (anchor instanceof Element) {
+            const anchorRect = anchor.getBoundingClientRect();
+            if (anchorRect && anchorRect.width >= 12 && anchorRect.height >= 12) {
+                return anchor;
+            }
+        }
+    } catch (e) {
+    }
+    try {
+        const hostRect = hostCard.getBoundingClientRect();
+        if (hostRect && hostRect.width >= 12 && hostRect.height >= 12) {
+            return hostCard;
+        }
+    } catch (e) {
+    }
+    return hostCard;
+}
+
+function getQuickBlockTopOcclusionPx() {
+    let top = 0;
+    const selectors = [
+        'ytd-masthead',
+        '#masthead',
+        '#masthead-container',
+        'ytm-mobile-topbar-renderer',
+        'ytm-app-header',
+        'ytm-pivot-bar-renderer',
+        'tp-yt-app-header',
+        'app-header',
+        'header[role="banner"]'
+    ];
+    try {
+        selectors.forEach((selector) => {
+            document.querySelectorAll(selector).forEach((el) => {
+                if (!(el instanceof Element) || !isElementVisibleForQuickBlock(el)) return;
+                const rect = el.getBoundingClientRect();
+                if (!rect || rect.height <= 0 || rect.bottom <= 0) return;
+                if (rect.top > 24) return;
+                let pinned = true;
+                try {
+                    const position = window.getComputedStyle(el).position;
+                    pinned = position === 'fixed' || position === 'sticky' || rect.top <= 2;
+                } catch (e) {
+                }
+                if (!pinned) return;
+                top = Math.max(top, Math.min(rect.bottom, Math.max(0, window.innerHeight || 0) * 0.45 || rect.bottom));
+            });
+        });
+    } catch (e) {
+    }
+    return Math.max(0, top);
+}
+
+function pointInsideQuickBlockElementRect(el, x, y, pad = 2) {
+    if (!el || !(el instanceof Element)) return false;
+    try {
+        const rect = el.getBoundingClientRect();
+        if (!rect || rect.width <= 0 || rect.height <= 0) return false;
+        return (
+            x >= (rect.left - pad) &&
+            x <= (rect.right + pad) &&
+            y >= (rect.top - pad) &&
+            y <= (rect.bottom + pad)
+        );
+    } catch (e) {
+        return false;
+    }
+}
+
+function pointInsideQuickBlockHost(hostCard, x, y, pad = 2) {
+    const boundsEl = getQuickBlockBoundsElement(hostCard);
+    return pointInsideQuickBlockElementRect(boundsEl, x, y, pad);
+}
+
+function updateQuickBlockViewportStateForHost(hostCard) {
+    if (!hostCard || !(hostCard instanceof Element)) return false;
+    let hidden = false;
+    try {
+        const boundsEl = getQuickBlockBoundsElement(hostCard);
+        const rect = boundsEl?.getBoundingClientRect?.();
+        const viewportHeight = window.innerHeight || document.documentElement?.clientHeight || 0;
+        const topOcclusion = getQuickBlockTopOcclusionPx();
+        hidden = !rect
+            || rect.width <= 0
+            || rect.height <= 0
+            || rect.bottom <= topOcclusion + 8
+            || rect.top < topOcclusion + 4
+            || (viewportHeight > 0 && rect.top >= viewportHeight - 1);
+    } catch (e) {
+        hidden = false;
+    }
+    try {
+        hostCard.toggleAttribute('data-filtertube-quick-viewport-hidden', hidden);
+    } catch (e) {
+    }
+    return !hidden;
+}
+
+function scheduleQuickBlockViewportRefresh() {
+    if (quickBlockViewportUpdateScheduled) return;
+    quickBlockViewportUpdateScheduled = true;
+    requestAnimationFrame(() => {
+        quickBlockViewportUpdateScheduled = false;
+        syncQuickBlockSurfaceState();
+        try {
+            document.querySelectorAll('.filtertube-quick-block-host').forEach((host) => {
+                updateQuickBlockViewportStateForHost(host);
+            });
+        } catch (e) {
+        }
+    });
+}
+
 function setQuickBlockHoverStateForHost(hostCard, active, stickyMs = 0) {
     if (!hostCard || !(hostCard instanceof Element)) return;
 
-    if (isMobileSearchSurfaceOpen()) {
+    if (isMobileSearchSurfaceOpen() || !updateQuickBlockViewportStateForHost(hostCard)) {
         try {
             hostCard.removeAttribute('data-filtertube-quick-hover');
             hostCard.removeAttribute('data-filtertube-quick-sticky');
@@ -471,7 +591,7 @@ function ensureQuickBlockStyles() {
 	        position: absolute;
 	        top: 8px;
 	        left: 8px;
-	        z-index: 10;
+	        z-index: 30;
 	        opacity: 0;
 	        pointer-events: none;
 	        transition: opacity 0.15s ease;
@@ -485,7 +605,7 @@ function ensureQuickBlockStyles() {
         html:not([data-filtertube-mobile-surface]) ytd-compact-radio-renderer > .filtertube-quick-block-wrap,
         html:not([data-filtertube-mobile-surface]) ytd-reel-item-renderer > .filtertube-quick-block-wrap,
         html:not([data-filtertube-mobile-surface]) .ytGridShelfViewModelGridShelfItem > .filtertube-quick-block-wrap {
-            z-index: 2147483000;
+            z-index: 1000;
         }
 	    .filtertube-quick-block-host:hover .filtertube-quick-block-wrap,
 	    .filtertube-quick-block-anchor:hover .filtertube-quick-block-wrap,
@@ -495,6 +615,10 @@ function ensureQuickBlockStyles() {
 	    .filtertube-quick-block-wrap[data-open="true"] {
 	        opacity: 1;
 	        pointer-events: auto;
+	    }
+	    .filtertube-quick-block-host[data-filtertube-quick-viewport-hidden="true"] .filtertube-quick-block-wrap {
+	        opacity: 0 !important;
+	        pointer-events: none !important;
 	    }
 	    .filtertube-quick-block-btn {
         width: 28px;
@@ -868,6 +992,20 @@ async function runQuickBlockAction(videoCard, triggerBtn) {
     }
 }
 
+function attachQuickBlockWrapHoverEvents(wrap, hostCard) {
+    if (!wrap || !(wrap instanceof Element) || !hostCard || !(hostCard instanceof Element)) return;
+    if (wrap.hasAttribute('data-filtertube-quick-wrap-events')) return;
+    wrap.setAttribute('data-filtertube-quick-wrap-events', 'true');
+    const activate = () => setQuickBlockHoverStateForHost(hostCard, true, QUICK_BLOCK_HOVER_STICKY_MS);
+    const release = () => setQuickBlockHoverStateForHost(hostCard, false, QUICK_BLOCK_LEAVE_STICKY_MS);
+    wrap.addEventListener('mouseenter', activate, { passive: true });
+    wrap.addEventListener('mouseleave', release, { passive: true });
+    wrap.addEventListener('pointerenter', activate, { passive: true });
+    wrap.addEventListener('pointerleave', release, { passive: true });
+    wrap.addEventListener('focusin', activate);
+    wrap.addEventListener('focusout', release);
+}
+
 function ensureQuickBlockButton(card) {
     if (!card || !(card instanceof Element)) return;
     if (isPostLikeQuickBlockCard(card)) return;
@@ -914,50 +1052,46 @@ function ensureQuickBlockButton(card) {
         hostCard.__filtertubeQuickAnchor = anchor;
     } catch (e) {
     }
-
-    const HOVER_STICKY_MS = 900;
-    const LEAVE_STICKY_MS = 320;
-
     if (!hostCard.hasAttribute('data-filtertube-quick-events')) {
         hostCard.setAttribute('data-filtertube-quick-events', 'true');
         hostCard.addEventListener('mouseenter', () => {
-            setQuickBlockHoverStateForHost(hostCard, true, HOVER_STICKY_MS);
+            setQuickBlockHoverStateForHost(hostCard, true, QUICK_BLOCK_HOVER_STICKY_MS);
         }, { passive: true });
         hostCard.addEventListener('mouseleave', () => {
-            setQuickBlockHoverStateForHost(hostCard, false, LEAVE_STICKY_MS);
+            setQuickBlockHoverStateForHost(hostCard, false, QUICK_BLOCK_LEAVE_STICKY_MS);
         }, { passive: true });
         hostCard.addEventListener('pointerenter', () => {
-            setQuickBlockHoverStateForHost(hostCard, true, HOVER_STICKY_MS);
+            setQuickBlockHoverStateForHost(hostCard, true, QUICK_BLOCK_HOVER_STICKY_MS);
         }, { passive: true });
         hostCard.addEventListener('pointerleave', () => {
-            setQuickBlockHoverStateForHost(hostCard, false, LEAVE_STICKY_MS);
+            setQuickBlockHoverStateForHost(hostCard, false, QUICK_BLOCK_LEAVE_STICKY_MS);
         }, { passive: true });
         hostCard.addEventListener('focusin', () => {
-            setQuickBlockHoverStateForHost(hostCard, true, HOVER_STICKY_MS);
+            setQuickBlockHoverStateForHost(hostCard, true, QUICK_BLOCK_HOVER_STICKY_MS);
         });
         hostCard.addEventListener('focusout', () => {
-            setQuickBlockHoverStateForHost(hostCard, false, LEAVE_STICKY_MS);
+            setQuickBlockHoverStateForHost(hostCard, false, QUICK_BLOCK_LEAVE_STICKY_MS);
         });
     }
     if (anchor !== hostCard && !anchor.hasAttribute('data-filtertube-quick-anchor-events')) {
         anchor.setAttribute('data-filtertube-quick-anchor-events', 'true');
         anchor.addEventListener('mouseenter', () => {
-            setQuickBlockHoverStateForHost(hostCard, true, HOVER_STICKY_MS);
+            setQuickBlockHoverStateForHost(hostCard, true, QUICK_BLOCK_HOVER_STICKY_MS);
         }, { passive: true });
         anchor.addEventListener('mouseleave', () => {
-            setQuickBlockHoverStateForHost(hostCard, false, LEAVE_STICKY_MS);
+            setQuickBlockHoverStateForHost(hostCard, false, QUICK_BLOCK_LEAVE_STICKY_MS);
         }, { passive: true });
         anchor.addEventListener('pointerenter', () => {
-            setQuickBlockHoverStateForHost(hostCard, true, HOVER_STICKY_MS);
+            setQuickBlockHoverStateForHost(hostCard, true, QUICK_BLOCK_HOVER_STICKY_MS);
         }, { passive: true });
         anchor.addEventListener('pointerleave', () => {
-            setQuickBlockHoverStateForHost(hostCard, false, LEAVE_STICKY_MS);
+            setQuickBlockHoverStateForHost(hostCard, false, QUICK_BLOCK_LEAVE_STICKY_MS);
         }, { passive: true });
         anchor.addEventListener('focusin', () => {
-            setQuickBlockHoverStateForHost(hostCard, true, HOVER_STICKY_MS);
+            setQuickBlockHoverStateForHost(hostCard, true, QUICK_BLOCK_HOVER_STICKY_MS);
         });
         anchor.addEventListener('focusout', () => {
-            setQuickBlockHoverStateForHost(hostCard, false, LEAVE_STICKY_MS);
+            setQuickBlockHoverStateForHost(hostCard, false, QUICK_BLOCK_LEAVE_STICKY_MS);
         });
     }
 
@@ -971,6 +1105,10 @@ function ensureQuickBlockButton(card) {
             } catch (e) {
             }
         }
+        wrap.__filtertubeQuickHost = hostCard;
+        wrap.__filtertubeQuickAnchor = anchor;
+        attachQuickBlockWrapHoverEvents(wrap, hostCard);
+        updateQuickBlockViewportStateForHost(hostCard);
         return;
     }
 
@@ -995,17 +1133,19 @@ function ensureQuickBlockButton(card) {
         runQuickBlockAction(actionCard, trigger);
     });
     trigger.addEventListener('mouseenter', () => {
-        setQuickBlockHoverStateForHost(hostCard, true, HOVER_STICKY_MS);
+        setQuickBlockHoverStateForHost(hostCard, true, QUICK_BLOCK_HOVER_STICKY_MS);
     }, { passive: true });
     trigger.addEventListener('mouseleave', () => {
-        setQuickBlockHoverStateForHost(hostCard, false, LEAVE_STICKY_MS);
+        setQuickBlockHoverStateForHost(hostCard, false, QUICK_BLOCK_LEAVE_STICKY_MS);
     }, { passive: true });
 
     wrap.appendChild(trigger);
     anchor.appendChild(wrap);
+    attachQuickBlockWrapHoverEvents(wrap, hostCard);
+    updateQuickBlockViewportStateForHost(hostCard);
     try {
         if (!isMobileYouTubeSurface() && (hostCard.matches(':hover') || anchor.matches(':hover') || hostCard.contains(document.activeElement))) {
-            setQuickBlockHoverStateForHost(hostCard, true, HOVER_STICKY_MS);
+            setQuickBlockHoverStateForHost(hostCard, true, QUICK_BLOCK_HOVER_STICKY_MS);
         }
     } catch (e) {
     }
@@ -1041,16 +1181,33 @@ function setupQuickBlockObserver() {
 
         document.addEventListener('focusin', () => {
             syncQuickBlockSurfaceState();
+            scheduleQuickBlockViewportRefresh();
         }, true);
         document.addEventListener('focusout', () => {
-            setTimeout(() => syncQuickBlockSurfaceState(), 0);
+            setTimeout(() => {
+                syncQuickBlockSurfaceState();
+                scheduleQuickBlockViewportRefresh();
+            }, 0);
         }, true);
         document.addEventListener('input', () => {
             syncQuickBlockSurfaceState();
+            scheduleQuickBlockViewportRefresh();
         }, true);
         document.addEventListener('click', () => {
-            setTimeout(() => syncQuickBlockSurfaceState(), 0);
+            setTimeout(() => {
+                syncQuickBlockSurfaceState();
+                scheduleQuickBlockViewportRefresh();
+            }, 0);
         }, true);
+        document.addEventListener('scroll', () => {
+            scheduleQuickBlockViewportRefresh();
+        }, { passive: true, capture: true });
+        window.addEventListener('resize', () => {
+            scheduleQuickBlockViewportRefresh();
+        }, { passive: true });
+        window.addEventListener('orientationchange', () => {
+            scheduleQuickBlockViewportRefresh();
+        }, { passive: true });
 
         document.addEventListener('pointerenter', (event) => {
             if (!isQuickBlockEnabled()) return;
@@ -1072,7 +1229,7 @@ function setupQuickBlockObserver() {
 
             const clearLast = () => {
                 if (lastHost) {
-                    setQuickBlockHoverStateForHost(lastHost, false, 160);
+                    setQuickBlockHoverStateForHost(lastHost, false, QUICK_BLOCK_LEAVE_STICKY_MS);
                     lastHost = null;
                 }
             };
@@ -1091,45 +1248,16 @@ function setupQuickBlockObserver() {
                     }
                 } catch (e) {
                 }
-                return null;
-            };
-
-            const resolveHostBoundsElement = (host) => {
-                if (!host || !(host instanceof Element)) return null;
                 try {
-                    const hostRect = host.getBoundingClientRect();
-                    if (hostRect && hostRect.width >= 12 && hostRect.height >= 12) {
-                        return host;
-                    }
-                } catch (e) {
-                }
-                try {
-                    const anchor = host.__filtertubeQuickAnchor;
-                    if (anchor instanceof Element) {
-                        const anchorRect = anchor.getBoundingClientRect();
-                        if (anchorRect && anchorRect.width >= 12 && anchorRect.height >= 12) {
-                            return anchor;
-                        }
+                    const hosts = document.querySelectorAll('.filtertube-quick-block-host');
+                    for (const host of hosts) {
+                        if (!(host instanceof Element)) continue;
+                        if (isPostLikeQuickBlockCard(host)) continue;
+                        if (pointInsideQuickBlockHost(host, x, y, 3)) return host;
                     }
                 } catch (e) {
                 }
                 return null;
-            };
-
-            const pointInsideElementRect = (el, x, y, pad = 2) => {
-                if (!el || !(el instanceof Element)) return false;
-                try {
-                    const rect = el.getBoundingClientRect();
-                    if (!rect || rect.width <= 0 || rect.height <= 0) return false;
-                    return (
-                        x >= (rect.left - pad) &&
-                        x <= (rect.right + pad) &&
-                        y >= (rect.top - pad) &&
-                        y <= (rect.bottom + pad)
-                    );
-                } catch (e) {
-                    return false;
-                }
             };
 
             const tick = () => {
@@ -1140,8 +1268,7 @@ function setupQuickBlockObserver() {
                 }
                 let host = pickHostFromPoint(lastX, lastY);
                 if (!host && lastHost) {
-                    const boundsEl = resolveHostBoundsElement(lastHost);
-                    if (boundsEl && pointInsideElementRect(boundsEl, lastX, lastY, 3)) {
+                    if (pointInsideQuickBlockHost(lastHost, lastX, lastY, 3)) {
                         host = lastHost;
                     }
                 }
@@ -1161,8 +1288,12 @@ function setupQuickBlockObserver() {
                 if (needsEnsure) {
                     ensureQuickBlockButton(host);
                 }
+                if (!updateQuickBlockViewportStateForHost(host)) {
+                    clearLast();
+                    return;
+                }
                 if (needsHoverActivation) {
-                    setQuickBlockHoverStateForHost(host, true, 900);
+                    setQuickBlockHoverStateForHost(host, true, QUICK_BLOCK_HOVER_STICKY_MS);
                 }
             };
 

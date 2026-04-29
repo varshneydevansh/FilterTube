@@ -772,6 +772,7 @@ Key implementation points:
 - Applies on YouTube Main and YouTube Kids with profile-aware persistence.
 - Comment-origin block actions are context-isolated to comment nodes; they skip playlist/video prefetch identity merges and videoId fallback lookups.
 - Pointer tracking keeps hover active while inside host/anchor bounds, stabilizing the cross button on Search overlays and Home Shorts.
+- A viewport/header guard marks quick-block hosts hidden when the host bounds move under sticky YouTube chrome; this keeps forced-visible mobile controls from overlaying top search/header UI during scroll.
 - Fallback 3-dot recovery is kept behaviorally aligned with quick-block on weak watch-page Mix / playlist rows so one path does not silently degrade while the other still succeeds.
 
 ## Storage Architecture

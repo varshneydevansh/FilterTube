@@ -6,7 +6,12 @@
 
     // Idempotency guard
     if (window.filterTubeLogicHasRun) {
-        console.warn('FilterTube (FilterLogic): Already initialized, skipping');
+        try {
+            if (window.__filtertubeDebug || document.documentElement?.getAttribute('data-filtertube-debug') === 'true') {
+                console.debug('FilterTube (FilterLogic): Already initialized, skipping');
+            }
+        } catch (e) {
+        }
         return; // Now legal because it's inside a function
     }
     window.filterTubeLogicHasRun = true;

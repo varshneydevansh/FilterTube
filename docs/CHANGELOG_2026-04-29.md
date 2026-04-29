@@ -14,6 +14,10 @@ This checkpoint documents the runtime, UI, and documentation work completed on 2
 - Search-page SPA collaborator recovery now keeps latest/recent `/youtubei/v1/search` response snapshots and includes them in main-world channel and collaborator lookup roots.
 - Comment 3-dot menus no longer display the current playing video's channel identity when the click target is a comment author; the block still targets the comment channel.
 - Post-block enrichment skips identical channel-list writes, and Channel Management avoids full row/avatar rebuilds for simple `Filter All` and comments-toggle updates.
+- Quick-block controls now track sticky top bars and viewport bounds so mobile/search crosses hide before a card slides under YouTube's header instead of overlaying top UI while scrolling.
+- Search quick-block hover state is retained across YouTube hover/preview overlays by using longer sticky timing, wrapper-level pointer handling, and a bounds fallback when `elementsFromPoint()` lands on an overlay instead of the card.
+- Mobile search no longer treats a merely focused search input as an open search overlay; quick-block controls are suppressed only when suggestions/dropdowns are actually visible or explicitly expanded.
+- Expected duplicate MAIN-world script loads now log only in debug mode. First-install reloads can legitimately hit the idempotency guards for `seed.js`, `filter_logic.js`, or `injector.js`, but they no longer surface as Chrome extension warnings.
 
 ## Mix And Collaboration Safety
 
@@ -27,6 +31,7 @@ This checkpoint documents the runtime, UI, and documentation work completed on 2
 - Collaborator selected/blocked row tint was softened so text remains readable.
 - Channel Management row interactions no longer trigger broad avatar refresh behavior.
 - Handle-first rows are acceptable as input/original identity, but channel display names must come from fetched or renderer metadata rather than the handle fallback.
+- Quick-block z-index was reduced from page-global overlay levels and paired with viewport clipping, preventing the cross button from punching through sticky chrome while preserving card-level access.
 
 ## App Backport
 

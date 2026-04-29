@@ -809,6 +809,7 @@ Video Filtering Decision Tree (v3.2.7)
 - Covers home, search, watch, playlist panel rows, mix/radio cards, and shorts cards.
 - Comment-menu blocks are isolated from playlist/watch card hide logic to prevent unintended autoplay-next transitions.
 - Hover retention is hardened for Search overlays and Home Shorts so the quick-block cross does not disappear mid-hover.
+- Quick-block controls hide when their host card is clipped by sticky YouTube top bars, preventing the cross from floating over search/header UI during mobile or narrow-viewport scrolling.
 
 **YouTube Kids behavior:**
 - Uses the same one-tap quick-block entry point.
