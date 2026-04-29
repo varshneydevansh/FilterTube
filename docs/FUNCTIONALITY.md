@@ -65,6 +65,7 @@ That means:
 - **Firefox export now uses a safer fallback path** for manual plain and encrypted downloads on Firefox/Waterfox, avoiding subfolder/blob URL failures reported on Windows.
 - **Fresh installs now follow the browser/OS theme** until the user explicitly toggles light or dark.
 - **Dashboard sidebar navigation no longer clips on short desktop windows** because the nav list can scroll independently.
+- **Large blocked-channel lists are cheaper to process** because JSON/XHR filtering now uses indexed channel identity matching instead of scanning every saved channel for every renderer.
 
 ## Core Filtering Capabilities
 
@@ -179,6 +180,7 @@ YouTube JSON Data → FilterTubeEngine.processData() → Filtered Data → YouTu
 - **Mix-As-Collab Guardrails**: Mix cards and generic names like `A & B` or `A and B` no longer become collaborations unless avatar stacks, roster dialogs/sheets, `and N more`, or multiple channel links confirm that interpretation.
 - **Post-Block Name Repair**: If a fallback menu add stores a weak title-like label for a valid UC ID, later enrichment can repair the entry to the fetched channel-page name.
 - **Filter All Sync Across Entry Points**: `Filter All` now creates and maintains the same channel-derived keyword state whether it is toggled from the dashboard or applied from the 3-dot menu block flow.
+- **Large Blocklist Performance**: The shared identity layer builds set-backed indexes for saved channels, so UC IDs, `@handle`s, legacy custom URLs, and strict fallback names are checked without repeatedly walking the entire saved list.
 
 ### **Channel-Derived Keyword Sync (Filter All)**
 

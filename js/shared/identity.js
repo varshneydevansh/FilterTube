@@ -206,6 +206,182 @@
         return handles;
     }
 
+    function normalizeChannelNameForComparison(value) {
+        if (!value || typeof value !== 'string') return '';
+        return value.trim().toLowerCase().replace(/\s+/g, ' ');
+    }
+
+    function normalizeCustomUrlForComparison(url) {
+        if (!url || typeof url !== 'string') return '';
+        let cleaned = url.trim();
+        if (!cleaned) return '';
+        try {
+            cleaned = decodeURIComponent(cleaned);
+        } catch (e) {
+            // ignore
+        }
+        cleaned = cleaned.split(/[?#]/)[0];
+        cleaned = cleaned.replace(/^https?:\/\/[^/]+/i, '');
+        cleaned = cleaned.replace(/^\//, '');
+        cleaned = cleaned.replace(/\/$/, '');
+        cleaned = cleaned.toLowerCase();
+        if (cleaned.startsWith('c/')) return cleaned;
+        if (cleaned.startsWith('user/')) return cleaned;
+        if (cleaned.includes('/c/')) {
+            const parts = cleaned.split('/c/');
+            if (parts[1]) return `c/${parts[1].split('/')[0]}`;
+        }
+        if (cleaned.includes('/user/')) {
+            const parts = cleaned.split('/user/');
+            if (parts[1]) return `user/${parts[1].split('/')[0]}`;
+        }
+        return '';
+    }
+
+    function getChannelMapLookup(channelMap) {
+        return (key) => {
+            try {
+                if (!channelMap || typeof channelMap !== 'object') return '';
+                if (!key || typeof key !== 'string') return '';
+                const normalized = key.toLowerCase();
+                return channelMap[normalized] || channelMap[normalized.replace(/^@/, '')] || '';
+            } catch (e) {
+                return '';
+            }
+        };
+    }
+
+    function buildChannelFilterIndex(filterChannels = [], channelMap = {}) {
+        if (!Array.isArray(filterChannels) || filterChannels.length === 0) return null;
+
+        const lookupChannelMap = getChannelMapLookup(channelMap);
+        const ids = new Set();
+        const handles = new Set();
+        const customUrls = new Set();
+        const names = new Set();
+        const unresolvedHandleKeys = [];
+        const unresolvedHandleKeysSeen = new Set();
+
+        const addId = (candidate) => {
+            const id = normalizeUcIdForComparison(typeof candidate === 'string' ? candidate : '');
+            if (!id) return;
+            ids.add(id);
+            const mappedHandle = normalizeHandleForComparison(lookupChannelMap(id));
+            if (mappedHandle) handles.add(mappedHandle);
+        };
+
+        const addHandle = (candidate) => {
+            const handle = normalizeHandleForComparison(typeof candidate === 'string' ? candidate : '');
+            if (!handle) return;
+            handles.add(handle);
+
+            const withoutAt = handle.replace(/^@/, '');
+            const normalizedWithoutAt = normalizeChannelNameForComparison(withoutAt);
+            if (normalizedWithoutAt) names.add(normalizedWithoutAt);
+
+            const mappedId = normalizeUcIdForComparison(lookupChannelMap(handle));
+            if (mappedId) {
+                ids.add(mappedId);
+                return;
+            }
+
+            if (withoutAt && !unresolvedHandleKeysSeen.has(withoutAt)) {
+                unresolvedHandleKeysSeen.add(withoutAt);
+                unresolvedHandleKeys.push(withoutAt);
+            }
+        };
+
+        const addCustomUrl = (candidate) => {
+            const customUrl = normalizeCustomUrlForComparison(typeof candidate === 'string' ? candidate : '');
+            if (!customUrl) return;
+            customUrls.add(customUrl);
+            const mappedId = normalizeUcIdForComparison(lookupChannelMap(customUrl));
+            if (mappedId) ids.add(mappedId);
+        };
+
+        const addName = (candidate) => {
+            const name = normalizeChannelNameForComparison(typeof candidate === 'string' ? candidate : '');
+            if (name) names.add(name);
+        };
+
+        for (const entry of filterChannels) {
+            if (!entry) continue;
+
+            if (typeof entry === 'string') {
+                const value = entry.trim();
+                if (!value) continue;
+                addId(value);
+                addHandle(value);
+                addCustomUrl(value);
+                addName(value);
+                continue;
+            }
+
+            if (typeof entry === 'object') {
+                addId(entry.id);
+                addId(entry.originalInput);
+
+                addHandle(entry.handle);
+                addHandle(entry.canonicalHandle);
+                addHandle(entry.handleDisplay);
+                addHandle(entry.originalInput);
+
+                addCustomUrl(entry.customUrl);
+                addCustomUrl(entry.originalInput);
+
+                addName(entry.name);
+                addName(entry.handle);
+                addName(entry.originalInput);
+            }
+        }
+
+        return {
+            ids,
+            handles,
+            customUrls,
+            names,
+            unresolvedHandleKeys
+        };
+    }
+
+    function channelMetaMatchesIndex(meta, index, channelMap = {}) {
+        if (!meta || !index) return false;
+        const lookupChannelMap = getChannelMapLookup(channelMap);
+
+        const metaId = normalizeUcIdForComparison(meta.id || '');
+        if (metaId && index.ids?.has(metaId)) return true;
+
+        const metaHandles = collectHandleVariants(meta);
+        for (const metaHandle of metaHandles) {
+            if (index.handles?.has(metaHandle)) return true;
+            const withoutAt = metaHandle.replace(/^@/, '');
+            if (withoutAt && index.names?.has(withoutAt)) return true;
+        }
+
+        const metaCustomUrl = normalizeCustomUrlForComparison(meta.customUrl || '');
+        if (metaCustomUrl && index.customUrls?.has(metaCustomUrl)) return true;
+
+        const metaName = normalizeChannelNameForComparison(meta.name || '');
+        if (metaName && index.names?.has(metaName)) return true;
+
+        if (metaId) {
+            const mappedHandle = normalizeHandleForComparison(lookupChannelMap(metaId));
+            if (mappedHandle && index.handles?.has(mappedHandle)) return true;
+        }
+
+        for (const metaHandle of metaHandles) {
+            const mappedId = normalizeUcIdForComparison(lookupChannelMap(metaHandle));
+            if (mappedId && index.ids?.has(mappedId)) return true;
+        }
+
+        if (metaCustomUrl) {
+            const mappedId = normalizeUcIdForComparison(lookupChannelMap(metaCustomUrl));
+            if (mappedId && index.ids?.has(mappedId)) return true;
+        }
+
+        return false;
+    }
+
     /**
      * Core matching primitive used by UI/menu checks and DOM fallback.
      * Supports legacy string filters and object filters.
@@ -214,32 +390,16 @@
         if (!filterChannel) return false;
 
         const metaId = normalizeUcIdForComparison(meta?.id);
-        const metaName = typeof meta?.name === 'string' ? meta.name.toLowerCase().trim() : '';
+        const metaName = normalizeChannelNameForComparison(meta?.name);
         const metaHandles = collectHandleVariants(meta);
-
-        // Helper to normalize customUrl for comparison (decode percent-encoding, lowercase)
-        const normalizeCustomUrl = (url) => {
-            if (!url || typeof url !== 'string') return '';
-            try {
-                return decodeURIComponent(url).toLowerCase().trim();
-            } catch (e) {
-                return url.toLowerCase().trim();
-            }
-        };
-
-        const metaCustomUrl = normalizeCustomUrl(meta?.customUrl);
-
-        const lookupChannelMap = (key) => {
-            if (!channelMap || typeof channelMap !== 'object') return '';
-            if (!key || typeof key !== 'string') return '';
-            return channelMap[key.toLowerCase()] || '';
-        };
+        const metaCustomUrl = normalizeCustomUrlForComparison(meta?.customUrl);
+        const lookupChannelMap = getChannelMapLookup(channelMap);
 
         if (typeof filterChannel === 'object') {
             const filterId = normalizeUcIdForComparison(filterChannel.id || '');
-            const filterName = typeof filterChannel.name === 'string' ? filterChannel.name.toLowerCase().trim() : '';
+            const filterName = normalizeChannelNameForComparison(filterChannel.name || '');
             const filterHandles = collectHandleVariants(filterChannel);
-            const filterCustomUrl = normalizeCustomUrl(filterChannel.customUrl);
+            const filterCustomUrl = normalizeCustomUrlForComparison(filterChannel.customUrl);
 
             if (!filterId && !filterName && filterHandles.length === 0 && !filterCustomUrl) return false;
 
@@ -350,7 +510,7 @@
 
         // Handle c/ChannelName and user/Name strings
         if (normalizedFilter.includes('/c/') || normalizedFilter.includes('/user/') || normalizedFilter.startsWith('c/') || normalizedFilter.startsWith('user/')) {
-            const filterCustom = normalizeCustomUrl(normalizedFilter);
+            const filterCustom = normalizeCustomUrlForComparison(normalizedFilter);
             if (filterCustom && metaCustomUrl && filterCustom === metaCustomUrl) return true;
 
             // Cross-match: if filter is customUrl, check if channelMap maps it to metaId
@@ -577,6 +737,10 @@
      */
     function isChannelBlocked(filterChannels, channelInfo, channelMap = {}) {
         if (!Array.isArray(filterChannels) || filterChannels.length === 0) return false;
+        const index = buildChannelFilterIndex(filterChannels, channelMap);
+        if (index) {
+            return channelMetaMatchesIndex(channelInfo, index, channelMap);
+        }
         return filterChannels.some(filterChannel => channelMatchesFilter(channelInfo, filterChannel, channelMap));
     }
 
@@ -584,8 +748,12 @@
         extractRawHandle,
         normalizeHandleValue,
         normalizeHandleForComparison,
+        normalizeChannelNameForComparison,
+        normalizeCustomUrlForComparison,
         isUcId,
         canonicalizeChannelInput,
+        buildChannelFilterIndex,
+        channelMetaMatchesIndex,
         channelMatchesFilter,
         isChannelBlocked,
         extractCustomUrlFromPath,

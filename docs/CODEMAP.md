@@ -14,6 +14,7 @@ This document provides a detailed reference of the key files and functions in th
 - **Firefox Download Fallback**: Firefox/Waterfox manual exports use an anchor-download path with delayed blob URL cleanup; background backups support both Promise-style and callback-style downloads APIs.
 - **System Theme Default**: Missing `ftThemePreference` resolves through `prefers-color-scheme`, while explicit user toggles still persist `light` or `dark`.
 - **Short-Height Dashboard Nav**: Sidebar brand/footer stay fixed while `.nav-list` scrolls, keeping every tab reachable on small desktop heights.
+- **Large Blocklist Matching**: Shared channel-filter indexes let the JSON filter and DOM fallback match UC IDs, handles, custom URLs, and strict names with set lookups instead of scanning every saved channel.
 
 ## 2026-04-28 Mobile/App Upstream Checkpoint
 
@@ -106,6 +107,7 @@ FilterTube/
 **Purpose:** Primary filtering engine for JSON responses
 **Changes:**
 - **Debug Optimization**: `this.debugEnabled = !!window.__filtertubeDebug` (conditional logging)
+- **Indexed Channel Matching**: `filterChannelIndex` and `whitelistChannelIndex` use `FilterTubeIdentity.buildChannelFilterIndex()` so large blocklists do not multiply renderer filtering cost by the number of saved channels.
 
 ### `js/injector.js` - **SAFETY ENHANCED v3.2.1+**
 **Context:** Main World (YouTube pages)

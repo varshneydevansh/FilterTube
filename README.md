@@ -3,7 +3,7 @@
   <h1>FilterTube</h1>
   <p>Peace of Mind for your Digital Space</p>
   
-  [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/varshneydevansh/FilterTube) ![Version](https://img.shields.io/badge/version-3.3.1-blue.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg) ![Lines of Code](https://img.shields.io/badge/total%20lines-107.6k-brightgreen.svg) ![JavaScript LoC](https://img.shields.io/badge/javascript-67.0k%20lines-yellow.svg) ![Top Language](https://img.shields.io/github/languages/top/varshneydevansh/FilterTube?color=f1e05a) ![Repo Size](https://img.shields.io/github/repo-size/varshneydevansh/FilterTube?color=orange)
+  [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/varshneydevansh/FilterTube) ![Version](https://img.shields.io/badge/version-3.3.1-blue.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg) ![Lines of Code](https://img.shields.io/badge/total%20lines-107.9k-brightgreen.svg) ![JavaScript LoC](https://img.shields.io/badge/javascript-67.2k%20lines-yellow.svg) ![Top Language](https://img.shields.io/github/languages/top/varshneydevansh/FilterTube?color=f1e05a) ![Repo Size](https://img.shields.io/github/repo-size/varshneydevansh/FilterTube?color=orange)
   
 </div>
 
@@ -21,6 +21,7 @@ FilterTube is a browser extension that gives you control over your YouTube feed.
 - **Firefox/Waterfox export is more dependable** for both plain and encrypted JSON thanks to a safer manual-download fallback path.
 - **Fresh installs follow your browser/OS theme** until you manually pick light or dark.
 - **The dashboard sidebar stays usable on short desktop windows** with a scrollable navigation list.
+- **Large blocked-channel lists filter faster** because YouTube JSON payloads now use indexed channel matching instead of scanning every saved channel per renderer.
 
 ## Nanah Device Trust & Sync
 
@@ -131,6 +132,7 @@ Docs:
 - **Zero Flash**: Filters content *before* it renders on screen using proactive XHR interception.
 - **Instant Blocking**: 3-dot menus show correct channel names immediately—no "Fetching..." delays.
 - **Collaboration-Aware Menus (v3.3.0)**: Watch-page collaboration rows, Mix/watch recovery paths, and watch-side lockups can now upgrade to the full collaborator roster in the 3-dot UI.
+- **Large Blocklist Matching (v3.3.1)**: Channel checks use shared set-backed indexes for UC IDs, handles, custom URLs, and strict fallback names so 200+ saved channels do not create renderer-by-renderer scan costs.
 - **Network Reduction**: Most channel identity comes from intercepted JSON, not page fetches.
 - **100% Private**: No data leaves your browser. No analytics. No tracking.
 - **Modern UI/UX (v3.2.6)**: Clean typography, refined components, enhanced dark mode, and Kids Mode theming.

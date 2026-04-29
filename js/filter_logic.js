@@ -819,11 +819,44 @@
      */
     class YouTubeDataFilter {
         constructor(settings) {
-            this.settings = this._processSettings(settings);
-            this.channelMap = settings.channelMap || {}; // UC ID <-> @handle mappings
+            const rawSettings = settings && typeof settings === 'object' ? settings : {};
+            this.settings = this._processSettings(rawSettings);
+            this.channelMap = rawSettings.channelMap || this.settings.channelMap || {}; // UC ID <-> @handle mappings
+            this.filterChannelIndex = this._buildChannelFilterIndex(this.settings.filterChannels);
+            this.whitelistChannelIndex = this._buildChannelFilterIndex(this.settings.whitelistChannels);
             this.pageChannelMeta = null;
             this.blockedCount = 0;
             this.debugEnabled = !!window.__filtertubeDebug;
+        }
+
+        _buildChannelFilterIndex(filterChannels) {
+            try {
+                const buildIndex = window.FilterTubeIdentity?.buildChannelFilterIndex;
+                if (typeof buildIndex === 'function') {
+                    return buildIndex(filterChannels, this.channelMap);
+                }
+            } catch (e) {
+            }
+            return null;
+        }
+
+        _matchesAnyChannel(channelInfo, filterChannels, index = null) {
+            if (!channelInfo) return false;
+            try {
+                const matchesIndex = window.FilterTubeIdentity?.channelMetaMatchesIndex;
+                if (index && typeof matchesIndex === 'function') {
+                    return matchesIndex(channelInfo, index, this.channelMap);
+                }
+            } catch (e) {
+            }
+
+            const list = Array.isArray(filterChannels) ? filterChannels : [];
+            for (const filterChannel of list) {
+                if (this._matchesChannel(filterChannel, channelInfo)) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         _harvestBrowseEndpoint(node) {
@@ -1728,17 +1761,15 @@
                 if (hasChannelRules) {
                     for (const collaborator of collaborators) {
                         if (collaborator && (collaborator.name || collaborator.id || collaborator.handle || collaborator.customUrl)) {
-                            for (const allowChannel of whitelistChannels) {
-                                if (this._matchesChannel(allowChannel, collaborator)) {
-                                    this._logWhitelistDecision('allow:matched_channel', {
-                                        rendererType,
-                                        originalRendererType,
-                                        title,
-                                        matched: collaborator.handle || collaborator.customUrl || collaborator.id || collaborator.name || '',
-                                        collaborator
-                                    });
-                                    return false;
-                                }
+                            if (this._matchesAnyChannel(collaborator, whitelistChannels, this.whitelistChannelIndex)) {
+                                this._logWhitelistDecision('allow:matched_channel', {
+                                    rendererType,
+                                    originalRendererType,
+                                    title,
+                                    matched: collaborator.handle || collaborator.customUrl || collaborator.id || collaborator.name || '',
+                                    collaborator
+                                });
+                                return false;
                             }
                         }
                     }
@@ -1764,16 +1795,14 @@
                         const path = document.location?.pathname || '';
                         const isCreatorPage = /^\/(@[^/]+|channel\/UC[\w-]{22}|c\/[^/]+|user\/[^/]+)(?:\/|$)/i.test(path);
                         if (isCreatorPage && this.pageChannelMeta) {
-                            for (const allowChannel of whitelistChannels) {
-                                if (this._matchesChannel(allowChannel, this.pageChannelMeta)) {
-                                    this._logWhitelistDecision('allow:creator_page_whitelisted', {
-                                        rendererType,
-                                        originalRendererType,
-                                        title,
-                                        pageChannel: this.pageChannelMeta
-                                    });
-                                    return false;
-                                }
+                            if (this._matchesAnyChannel(this.pageChannelMeta, whitelistChannels, this.whitelistChannelIndex)) {
+                                this._logWhitelistDecision('allow:creator_page_whitelisted', {
+                                    rendererType,
+                                    originalRendererType,
+                                    title,
+                                    pageChannel: this.pageChannelMeta
+                                });
+                                return false;
                             }
                         }
                     } catch (e) {
@@ -1802,16 +1831,14 @@
             // For collaboration videos, block if ANY of the collaborators match a filter
             if (this.settings.filterChannels.length > 0) {
                 for (const collaborator of collaborators) {
-                    if (collaborator.name || collaborator.id || collaborator.handle) {
-                        for (const filterChannel of this.settings.filterChannels) {
-                            if (this._matchesChannel(filterChannel, collaborator)) {
-                                if (isCollaboration) {
-                                    this._log(`🚫 Blocking COLLABORATION video: "${title}" (collaborator "${collaborator.name || collaborator.handle || collaborator.id}" matched filter)`);
-                                } else {
-                                    this._log(`🚫 Blocking channel: ${collaborator.name || collaborator.id || collaborator.handle} (matched filter: ${filterChannel})`);
-                                }
-                                return true;
+                    if (collaborator.name || collaborator.id || collaborator.handle || collaborator.customUrl) {
+                        if (this._matchesAnyChannel(collaborator, this.settings.filterChannels, this.filterChannelIndex)) {
+                            if (isCollaboration) {
+                                this._log(`🚫 Blocking COLLABORATION video: "${title}" (collaborator "${collaborator.name || collaborator.handle || collaborator.id}" matched filter)`);
+                            } else {
+                                this._log(`🚫 Blocking channel: ${collaborator.name || collaborator.id || collaborator.handle} (matched channel index)`);
                             }
+                            return true;
                         }
                     }
                 }
@@ -1862,12 +1889,10 @@
                     // Apply channel filters to comment authors
                     // For comments, channelInfo should always be a single object, not an array
                     const commentChannelInfo = isCollaboration ? collaborators[0] : channelInfo;
-                    if ((commentChannelInfo.name || commentChannelInfo.id || commentChannelInfo.handle) && this.settings.filterChannels.length > 0) {
-                        for (const filterChannel of this.settings.filterChannels) {
-                            if (this._matchesChannel(filterChannel, commentChannelInfo)) {
-                                this._log(`🚫 Blocking comment by author: ${commentChannelInfo.name || commentChannelInfo.id || commentChannelInfo.handle}`);
-                                return true;
-                            }
+                    if ((commentChannelInfo.name || commentChannelInfo.id || commentChannelInfo.handle || commentChannelInfo.customUrl) && this.settings.filterChannels.length > 0) {
+                        if (this._matchesAnyChannel(commentChannelInfo, this.settings.filterChannels, this.filterChannelIndex)) {
+                            this._log(`🚫 Blocking comment by author: ${commentChannelInfo.name || commentChannelInfo.id || commentChannelInfo.handle}`);
+                            return true;
                         }
                     }
                 }

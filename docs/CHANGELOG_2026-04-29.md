@@ -21,6 +21,7 @@ This checkpoint documents the runtime, UI, and documentation work completed on 2
 - Firefox/Waterfox manual export now bypasses extension-driven subfolder downloads for both plain and encrypted JSON, keeps blob URLs alive longer, and supports Promise-style download APIs in backup helpers. See [ISSUE_51_FIREFOX_EXPORT_2026-04-29.md](/Users/devanshvarshney/FilterTube/docs/ISSUE_51_FIREFOX_EXPORT_2026-04-29.md).
 - Fresh installs now follow the browser/OS light or dark theme until the user manually toggles a preference. See [ISSUE_42_SYSTEM_THEME_2026-04-29.md](/Users/devanshvarshney/FilterTube/docs/ISSUE_42_SYSTEM_THEME_2026-04-29.md).
 - Dashboard sidebar navigation now remains reachable on short desktop windows by scrolling the nav list instead of clipping it. See [ISSUE_54_DASHBOARD_SIDEBAR_HEIGHT_2026-04-29.md](/Users/devanshvarshney/FilterTube/docs/ISSUE_54_DASHBOARD_SIDEBAR_HEIGHT_2026-04-29.md).
+- Large blocklists now use shared indexed channel matching in the Main World JSON filter, avoiding renderer-by-renderer scans across every saved channel. DOM fallback handle resolver retries are throttled per handle. See [ISSUE_52_LARGE_BLOCKLIST_PERFORMANCE_2026-04-29.md](/Users/devanshvarshney/FilterTube/docs/ISSUE_52_LARGE_BLOCKLIST_PERFORMANCE_2026-04-29.md).
 
 ## Mix And Collaboration Safety
 

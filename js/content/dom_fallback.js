@@ -4273,6 +4273,21 @@ function shouldHideContent(title, channel, settings, options = {}) {
                                     return true;
                                 }
                             } else if (!cachedState && hasFetchId) {
+                                const attempts = window.__filtertubeActiveHandleResolveAttempts || (window.__filtertubeActiveHandleResolveAttempts = new Map());
+                                const lastAttemptTs = attempts.get(safeKey) || 0;
+                                if (now - lastAttemptTs < 10 * 60 * 1000) {
+                                    return false;
+                                }
+                                attempts.set(safeKey, now);
+                                if (attempts.size > 500) {
+                                    const staleBefore = now - 10 * 60 * 1000;
+                                    for (const [attemptKey, attemptTs] of attempts) {
+                                        if (attemptTs < staleBefore || attempts.size > 500) {
+                                            attempts.delete(attemptKey);
+                                        }
+                                        if (attempts.size <= 400) break;
+                                    }
+                                }
                                 // DOM fallback runs often and should not trigger page-context
                                 // /@handle/about fetches; YouTube can redirect those through
                                 // CORS-blocked pages. Use the background resolver so UC-only
