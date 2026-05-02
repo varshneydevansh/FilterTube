@@ -1027,6 +1027,12 @@ function hasExplicitHideReasonMarker(element) {
 function ensureContentControlStyles(settings) {
     if (!settings || typeof settings !== 'object') return;
     if (!document.head) return;
+    const routePath = document.location?.pathname || '';
+    try {
+        document.documentElement.setAttribute('data-filtertube-route-home', routePath === '/' ? 'true' : 'false');
+        document.documentElement.setAttribute('data-filtertube-route-watch', routePath === '/watch' ? 'true' : 'false');
+    } catch (e) {
+    }
 
     const supportsHasSelector = (() => {
         try {
@@ -1058,6 +1064,10 @@ function ensureContentControlStyles(settings) {
 
     if (settings.hideHomeFeed) {
         rules.push(`
+            html[data-filtertube-route-home="true"] ytm-browse ytm-rich-grid-renderer,
+            html[data-filtertube-route-home="true"] ytm-browse ytm-rich-section-renderer,
+            html[data-filtertube-route-home="true"] ytm-browse ytm-item-section-renderer,
+            html[data-filtertube-route-home="true"] ytm-browse ytm-section-list-renderer,
             ytd-browse[page-subtype="home"] .ytd-rich-grid-renderer,
             ytd-browse[page-subtype="home"] ytd-rich-grid-renderer {
                 display: none !important;
@@ -1194,6 +1204,23 @@ function ensureContentControlStyles(settings) {
         rules.push(`
             ytd-live-chat-frame#chat,
             #chat-container {
+                display: none !important;
+            }
+        `);
+    }
+
+    if (settings.hideAllComments) {
+        rules.push(`
+            #comments,
+            ytd-comments,
+            ytd-item-section-renderer[section-identifier="comment-item-section"],
+            ytm-comment-section-renderer,
+            ytm-comments-entry-point-header-renderer,
+            ytm-comments-entry-point-renderer,
+            ytm-comments-entry-point-teaser-renderer,
+            ytm-comments-header-renderer,
+            ytm-item-section-renderer[section-identifier*="comment"],
+            html[data-filtertube-route-watch="true"] [data-filtertube-mobile-comments-card="true"] {
                 display: none !important;
             }
         `);
@@ -1453,13 +1480,72 @@ function matchesKeyword(regex, rawText, keywordData) {
 // FALLBACK FILTERING LOGIC
 // ============================================================================
 
+function collectMobileCommentEntryCards() {
+    const path = document.location?.pathname || '';
+    if (path !== '/watch') return [];
+    const candidates = document.querySelectorAll([
+        'ytm-comment-section-renderer',
+        'ytm-comments-entry-point-header-renderer',
+        'ytm-comments-entry-point-renderer',
+        'ytm-comments-entry-point-teaser-renderer',
+        'ytm-comments-header-renderer',
+        'ytm-item-section-renderer',
+        '[data-filtertube-mobile-comments-card="true"]'
+    ].join(','));
+    const results = new Set();
+    candidates.forEach(candidate => {
+        if (!candidate) return;
+        const text = (candidate.textContent || '').replace(/\s+/g, ' ').trim();
+        const label = [
+            candidate.getAttribute?.('aria-label') || '',
+            candidate.getAttribute?.('title') || ''
+        ].join(' ');
+        const combined = `${label} ${text}`.toLowerCase();
+        const looksLikeComments = /\bcomments?\b/.test(combined) || /^comments\s*\d*/i.test(text);
+        if (!looksLikeComments) return;
+        const target = candidate.closest?.(
+            'ytm-comment-section-renderer, ytm-item-section-renderer, ytm-comments-entry-point-renderer, ytm-comments-entry-point-header-renderer, ytm-comments-entry-point-teaser-renderer'
+        ) || candidate;
+        results.add(target);
+    });
+    return Array.from(results);
+}
+
+function handleHomeFeedFallback(settings) {
+    const path = document.location?.pathname || '';
+    const isHomeRoute = path === '/';
+    const homeFeedSelectors = [
+        'ytd-browse[page-subtype="home"] ytd-rich-grid-renderer',
+        'ytd-browse[page-subtype="home"] .ytd-rich-grid-renderer',
+        'html[data-filtertube-route-home="true"] ytm-browse ytm-rich-grid-renderer',
+        'html[data-filtertube-route-home="true"] ytm-browse ytm-rich-section-renderer',
+        'html[data-filtertube-route-home="true"] ytm-browse ytm-item-section-renderer',
+        'html[data-filtertube-route-home="true"] ytm-browse ytm-section-list-renderer',
+        '[data-filtertube-hidden-by-hide-home-feed="true"]'
+    ].join(',');
+    document.querySelectorAll(homeFeedSelectors).forEach(element => {
+        if (!element) return;
+        if (settings.hideHomeFeed && isHomeRoute) {
+            element.setAttribute('data-filtertube-hidden-by-hide-home-feed', 'true');
+            toggleVisibility(element, true, 'Hide Home Feed', true);
+        } else if (element.getAttribute('data-filtertube-hidden-by-hide-home-feed') === 'true') {
+            element.removeAttribute('data-filtertube-hidden-by-hide-home-feed');
+            toggleVisibility(element, false, '', true);
+        }
+    });
+}
+
 function handleCommentsFallback(settings) {
     const commentContainers = document.querySelectorAll(
-        '#comments, ytd-comments, ytd-item-section-renderer[section-identifier="comment-item-section"]'
+        '#comments, ytd-comments, ytd-item-section-renderer[section-identifier="comment-item-section"], ' +
+        'ytm-comment-section-renderer, ytm-comments-entry-point-header-renderer, ' +
+        'ytm-comments-entry-point-renderer, ytm-comments-entry-point-teaser-renderer, ' +
+        'ytm-comments-header-renderer, ytm-item-section-renderer[section-identifier*="comment"]'
     );
     const commentThreads = document.querySelectorAll('ytd-comment-thread-renderer, ytm-comment-thread-renderer');
     const commentRenderers = document.querySelectorAll('ytd-comment-renderer, ytm-comment-renderer');
     const commentViewModels = document.querySelectorAll('ytd-comment-view-model, ytm-comment-view-model');
+    const mobileCommentCards = collectMobileCommentEntryCards();
 
     try {
         const listMode = (settings && settings.listMode === 'whitelist') ? 'whitelist' : 'blocklist';
@@ -1484,12 +1570,22 @@ function handleCommentsFallback(settings) {
         commentThreads.forEach(thread => {
             toggleVisibility(thread, true, 'Hide All Comments');
         });
+        mobileCommentCards.forEach(card => {
+            card.setAttribute('data-filtertube-mobile-comments-card', 'true');
+            toggleVisibility(card, true, 'Hide All Comments', true);
+        });
         return;
     }
 
     // 2. Ensure containers are visible when not globally hidden
     commentContainers.forEach(container => {
         toggleVisibility(container, false, '', true);
+    });
+    mobileCommentCards.forEach(card => {
+        if (card.getAttribute('data-filtertube-mobile-comments-card') === 'true') {
+            card.removeAttribute('data-filtertube-mobile-comments-card');
+            toggleVisibility(card, false, '', true);
+        }
     });
 
     const hasChannelFilters = Array.isArray(settings.filterChannels) && settings.filterChannels.length > 0;
@@ -3586,6 +3682,8 @@ async function applyDOMFallback(settings, options = {}) {
     } catch (e) {
     }
 
+    handleHomeFeedFallback(effectiveSettings);
+
     // 3. Shorts Filtering
     const shortsContainerSelectors = 'grid-shelf-view-model, ytd-rich-shelf-renderer[is-shorts], ytd-reel-shelf-renderer';
     const shortContainers = document.querySelectorAll(shortsContainerSelectors);
@@ -3593,8 +3691,27 @@ async function applyDOMFallback(settings, options = {}) {
     // Also target the Shorts guide entry in the sidebar
     const shortsGuideEntries = document.querySelectorAll('ytd-guide-entry-renderer a[title="Shorts"]');
     const shortsGuideRenderers = Array.from(shortsGuideEntries).map(a => a.closest('ytd-guide-entry-renderer')).filter(Boolean);
+    const mobileShortsNavEntries = Array.from(document.querySelectorAll([
+        'ytm-pivot-bar-renderer a[href*="/shorts"]',
+        'ytm-pivot-bar-item-renderer a[href*="/shorts"]',
+        'ytm-pivot-bar-item-renderer',
+        'ytm-pivot-bar-renderer [role="tab"]',
+        'ytm-pivot-bar-renderer [aria-label*="Shorts"]'
+    ].join(','))).map(node => {
+        const navItem = node.closest?.('ytm-pivot-bar-item-renderer, [role="tab"], a') || node;
+        const href = node.getAttribute?.('href') || node.querySelector?.('a[href]')?.getAttribute?.('href') || '';
+        const label = [
+            node.getAttribute?.('aria-label') || '',
+            node.getAttribute?.('title') || '',
+            navItem.getAttribute?.('aria-label') || '',
+            navItem.getAttribute?.('title') || '',
+            node.textContent || '',
+            navItem.textContent || ''
+        ].join(' ').toLowerCase();
+        return (href.includes('/shorts') || /\bshorts\b/.test(label)) ? navItem : null;
+    }).filter(Boolean);
 
-    const allShortsElements = [...shortContainers, ...shortsGuideRenderers];
+    const allShortsElements = [...shortContainers, ...shortsGuideRenderers, ...mobileShortsNavEntries];
 
     if (effectiveSettings.hideAllShorts) {
         allShortsElements.forEach(container => {
