@@ -85,6 +85,24 @@ let quickBlockViewportUpdateScheduled = false;
 const QUICK_BLOCK_HOVER_STICKY_MS = 1200;
 const QUICK_BLOCK_LEAVE_STICKY_MS = 700;
 const FT_DROPDOWN_SELECTORS = 'tp-yt-iron-dropdown, ytm-menu-popup-renderer, bottom-sheet-container, div.menu-content[role="dialog"]';
+const FT_YOUTUBE_OVERLAY_SELECTORS = [
+    FT_DROPDOWN_SELECTORS,
+    'ytd-menu-popup-renderer',
+    'ytd-popup-container tp-yt-paper-dialog',
+    'tp-yt-paper-dialog[role="dialog"]',
+    'tp-yt-paper-dialog[aria-modal="true"]',
+    'ytd-multi-page-menu-renderer',
+    'ytm-bottom-sheet-renderer',
+    'ytm-dialog',
+    'ytm-app-dialog',
+    'ytm-account-menu-renderer',
+    'ytm-account-menu-item-renderer',
+    'ytm-account-section-list-renderer',
+    'ytm-profile-card-renderer',
+    'ytm-sign-in-promo-renderer',
+    '[role="dialog"][aria-modal="true"]',
+    '[aria-modal="true"]'
+].join(', ');
 const isMobileYouTubeSurface = () => {
     try {
         const host = String(location?.hostname || '').toLowerCase();
@@ -170,9 +188,41 @@ const isMobileSearchSurfaceOpen = () => {
     return false;
 };
 
+const isYouTubeOverlaySurfaceOpen = () => {
+    try {
+        const path = String(location?.pathname || '').toLowerCase();
+        if (
+            path.startsWith('/account') ||
+            path.startsWith('/signin') ||
+            path.startsWith('/logout') ||
+            path.includes('/account_switcher')
+        ) {
+            return true;
+        }
+    } catch (e) {
+    }
+
+    try {
+        return Array.from(document.querySelectorAll(FT_YOUTUBE_OVERLAY_SELECTORS)).some((el) => {
+            if (!(el instanceof Element) || !isElementVisibleForQuickBlock(el)) return false;
+            if (el.closest?.('.filtertube-quick-block-wrap')) return false;
+            const rect = el.getBoundingClientRect();
+            const viewportWidth = window.innerWidth || document.documentElement?.clientWidth || 0;
+            const viewportHeight = window.innerHeight || document.documentElement?.clientHeight || 0;
+            if (!rect || rect.width <= 0 || rect.height <= 0) return false;
+            if (viewportWidth > 0 && (rect.right <= 0 || rect.left >= viewportWidth)) return false;
+            if (viewportHeight > 0 && (rect.bottom <= 0 || rect.top >= viewportHeight)) return false;
+            return true;
+        });
+    } catch (e) {
+        return false;
+    }
+};
+
 const syncQuickBlockSurfaceState = () => {
     try {
         document.documentElement.toggleAttribute('data-filtertube-search-surface-open', isMobileSearchSurfaceOpen());
+        document.documentElement.toggleAttribute('data-filtertube-youtube-overlay-open', isYouTubeOverlaySurfaceOpen());
     } catch (e) {
     }
 };
@@ -222,6 +272,21 @@ function isPostLikeQuickBlockCard(card) {
     } catch (e) {
     }
     return false;
+}
+
+function isShortsQuickBlockCard(card) {
+    if (!card || !(card instanceof Element)) return false;
+    try {
+        const tag = String(card.tagName || '').toLowerCase();
+        if (tag.includes('shorts-lockup-view-model') || tag.includes('reel')) return true;
+        return !!card.querySelector?.(
+            'ytd-shorts-lockup-view-model, ytd-reel-item-renderer, ytd-reel-video-renderer, ' +
+            'ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2, ' +
+            '.shortsLockupViewModelHost, .reel-item-endpoint, a[href*="/shorts/"]'
+        );
+    } catch (e) {
+        return false;
+    }
 }
 
 function resolveQuickBlockHost(node) {
@@ -305,9 +370,33 @@ function resolveQuickBlockAnchor(hostCard) {
     if (!hostCard || !(hostCard instanceof Element)) return hostCard;
 
     const candidates = [hostCard];
+    if (isShortsQuickBlockCard(hostCard)) {
+        try {
+            const stableShortsHost = hostCard.matches?.(
+                'ytd-shorts-lockup-view-model, ytd-reel-item-renderer, ytd-reel-video-renderer, ' +
+                'ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2, ' +
+                '.shortsLockupViewModelHost, .ytGridShelfViewModelGridShelfItem'
+            )
+                ? hostCard
+                : hostCard.querySelector?.(
+                    '.shortsLockupViewModelHost, .ytGridShelfViewModelGridShelfItem, ' +
+                    'ytd-shorts-lockup-view-model, ytd-reel-item-renderer, ytd-reel-video-renderer, ' +
+                    'ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2'
+                );
+            if (stableShortsHost && !candidates.includes(stableShortsHost)) {
+                candidates.push(stableShortsHost);
+            }
+        } catch (e) {
+        }
+    }
     const preferred = [
         '#dismissible',
         'ytd-rich-grid-media',
+        '.shortsLockupViewModelHost',
+        '.ytGridShelfViewModelGridShelfItem',
+        'ytd-shorts-lockup-view-model',
+        'ytm-shorts-lockup-view-model',
+        'ytm-shorts-lockup-view-model-v2',
         'yt-lockup-view-model',
         'yt-lockup-metadata-view-model',
         'ytm-channel-renderer',
@@ -381,12 +470,16 @@ function getQuickBlockTopOcclusionPx() {
         'ytm-chip-cloud-renderer',
         'ytm-feed-filter-chip-bar-renderer',
         'yt-chip-cloud-renderer',
+        'yt-chip-cloud-chip-renderer',
+        'ytm-chip-cloud-chip-renderer',
         'ytd-feed-filter-chip-bar-renderer',
+        'ytd-feed-filter-chip-bar-renderer tp-yt-paper-tabs',
         '#chips',
         '#chips-wrapper',
-        'ytm-pivot-bar-renderer',
         'tp-yt-app-header',
         'app-header',
+        '#header-bar',
+        '.mobile-topbar-header',
         'header[role="banner"]'
     ];
     try {
@@ -450,6 +543,94 @@ function getQuickBlockSampledTopOcclusionPx() {
     return Math.max(0, top);
 }
 
+function getQuickBlockBottomOcclusionTopPx() {
+    const viewportHeight = window.innerHeight || document.documentElement?.clientHeight || 0;
+    if (!viewportHeight) return Number.POSITIVE_INFINITY;
+
+    let bottomTop = viewportHeight;
+    const selectors = [
+        'ytm-pivot-bar-renderer',
+        'ytm-tab-bar-renderer',
+        'ytm-bottom-tab-bar-renderer',
+        'ytm-bottom-navigation-renderer',
+        'ytm-app [slot="bottom"]',
+        'nav[aria-label*="bottom" i]',
+        'nav[aria-label*="primary" i]',
+        '#footer',
+        '.pivot-bar',
+        '.mobile-pivot-bar'
+    ];
+
+    try {
+        selectors.forEach((selector) => {
+            document.querySelectorAll(selector).forEach((el) => {
+                if (!(el instanceof Element) || !isElementVisibleForQuickBlock(el)) return;
+                const rect = el.getBoundingClientRect();
+                if (!rect || rect.width <= 0 || rect.height <= 0) return;
+                if (rect.bottom < viewportHeight * 0.55) return;
+                let pinned = rect.bottom >= viewportHeight - 4;
+                try {
+                    const position = window.getComputedStyle(el).position;
+                    pinned = pinned || position === 'fixed' || position === 'sticky';
+                } catch (e) {
+                }
+                if (!pinned) return;
+                bottomTop = Math.min(bottomTop, Math.max(0, rect.top));
+            });
+        });
+    } catch (e) {
+    }
+
+    return Math.min(bottomTop, getQuickBlockSampledBottomOcclusionTopPx());
+}
+
+function getQuickBlockSampledBottomOcclusionTopPx() {
+    const viewportHeight = window.innerHeight || document.documentElement?.clientHeight || 0;
+    if (!viewportHeight) return Number.POSITIVE_INFINITY;
+    let bottomTop = viewportHeight;
+    try {
+        const viewportWidth = window.innerWidth || document.documentElement?.clientWidth || 0;
+        if (!viewportWidth) return bottomTop;
+        const sampleXs = [
+            16,
+            Math.round(viewportWidth * 0.18),
+            Math.round(viewportWidth * 0.34),
+            Math.round(viewportWidth * 0.5),
+            Math.round(viewportWidth * 0.66),
+            Math.round(viewportWidth * 0.82),
+            Math.max(0, viewportWidth - 16)
+        ];
+        const sampleYs = [
+            Math.max(0, viewportHeight - 12),
+            Math.max(0, viewportHeight - 36),
+            Math.max(0, viewportHeight - 60),
+            Math.max(0, viewportHeight - 84),
+            Math.max(0, viewportHeight - 108)
+        ];
+        const cardSelector = QUICK_BLOCK_CARD_SELECTORS.join(',');
+        for (const y of sampleYs) {
+            for (const x of sampleXs) {
+                const stack = document.elementsFromPoint(x, y) || [];
+                for (const el of stack) {
+                    if (!(el instanceof Element)) continue;
+                    if (el === document.body || el === document.documentElement) continue;
+                    if (el.closest?.('.filtertube-quick-block-wrap')) continue;
+                    if (el.closest?.(cardSelector)) continue;
+                    if (!isElementVisibleForQuickBlock(el)) continue;
+                    const rect = el.getBoundingClientRect();
+                    if (!rect || rect.width <= 0 || rect.height <= 0) continue;
+                    if (rect.top < viewportHeight * 0.55 || rect.bottom < viewportHeight - 140) continue;
+                    if (rect.height > 180 && rect.width < viewportWidth * 0.75) continue;
+                    if (rect.width < 18 && rect.height < 18) continue;
+                    bottomTop = Math.min(bottomTop, Math.max(0, rect.top));
+                }
+            }
+        }
+    } catch (e) {
+    }
+    return bottomTop;
+}
+
 function pointInsideQuickBlockElementRect(el, x, y, pad = 2) {
     if (!el || !(el instanceof Element)) return false;
     try {
@@ -480,12 +661,14 @@ function updateQuickBlockViewportStateForHost(hostCard) {
         const wrapRect = hostCard.querySelector?.('.filtertube-quick-block-wrap')?.getBoundingClientRect?.();
         const viewportHeight = window.innerHeight || document.documentElement?.clientHeight || 0;
         const topOcclusion = getQuickBlockTopOcclusionPx();
+        const bottomOcclusionTop = getQuickBlockBottomOcclusionTopPx();
         hidden = !rect
             || rect.width <= 0
             || rect.height <= 0
             || rect.bottom <= topOcclusion + 8
             || rect.top < topOcclusion + 4
             || (wrapRect && wrapRect.width > 0 && wrapRect.height > 0 && wrapRect.top < topOcclusion + 4)
+            || (wrapRect && wrapRect.width > 0 && wrapRect.height > 0 && wrapRect.bottom > bottomOcclusionTop - 4)
             || (viewportHeight > 0 && rect.top >= viewportHeight - 1);
     } catch (e) {
         hidden = false;
@@ -515,7 +698,7 @@ function scheduleQuickBlockViewportRefresh() {
 function setQuickBlockHoverStateForHost(hostCard, active, stickyMs = 0) {
     if (!hostCard || !(hostCard instanceof Element)) return;
 
-    if (isMobileSearchSurfaceOpen() || !updateQuickBlockViewportStateForHost(hostCard)) {
+    if (isMobileSearchSurfaceOpen() || isYouTubeOverlaySurfaceOpen() || !updateQuickBlockViewportStateForHost(hostCard)) {
         try {
             hostCard.removeAttribute('data-filtertube-quick-hover');
             hostCard.removeAttribute('data-filtertube-quick-sticky');
@@ -729,6 +912,10 @@ function ensureQuickBlockStyles() {
         pointer-events: none !important;
     }
     html[data-filtertube-native-controls-open] .filtertube-quick-block-wrap {
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
+    html[data-filtertube-youtube-overlay-open] .filtertube-quick-block-wrap {
         opacity: 0 !important;
         pointer-events: none !important;
     }
@@ -1331,6 +1518,11 @@ function setupQuickBlockObserver() {
                     const list = document.elementsFromPoint(x, y) || [];
                     for (const el of list) {
                         if (!(el instanceof Element)) continue;
+                        const quickWrap = el.closest?.('.filtertube-quick-block-wrap');
+                        const hostFromWrap = quickWrap?.__filtertubeQuickHost instanceof Element
+                            ? quickWrap.__filtertubeQuickHost
+                            : null;
+                        if (hostFromWrap) return hostFromWrap;
                         if (el.closest?.(FT_DROPDOWN_SELECTORS)) continue;
                         const candidate = el.closest?.(QUICK_BLOCK_CARD_SELECTORS);
                         if (!candidate) continue;
@@ -1355,6 +1547,10 @@ function setupQuickBlockObserver() {
             const tick = () => {
                 pending = false;
                 if (!isQuickBlockEnabled()) {
+                    clearLast();
+                    return;
+                }
+                if (isMobileSearchSurfaceOpen() || isYouTubeOverlaySurfaceOpen()) {
                     clearLast();
                     return;
                 }
