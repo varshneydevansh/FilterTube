@@ -728,6 +728,10 @@ function ensureQuickBlockStyles() {
         opacity: 0 !important;
         pointer-events: none !important;
     }
+    html[data-filtertube-native-controls-open] .filtertube-quick-block-wrap {
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
     @media (hover: none) and (pointer: coarse) {
         .filtertube-quick-block-wrap {
             opacity: 1;
