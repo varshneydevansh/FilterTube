@@ -378,6 +378,12 @@ function getQuickBlockTopOcclusionPx() {
         '#masthead-container',
         'ytm-mobile-topbar-renderer',
         'ytm-app-header',
+        'ytm-chip-cloud-renderer',
+        'ytm-feed-filter-chip-bar-renderer',
+        'yt-chip-cloud-renderer',
+        'ytd-feed-filter-chip-bar-renderer',
+        '#chips',
+        '#chips-wrapper',
         'ytm-pivot-bar-renderer',
         'tp-yt-app-header',
         'app-header',
@@ -389,17 +395,56 @@ function getQuickBlockTopOcclusionPx() {
                 if (!(el instanceof Element) || !isElementVisibleForQuickBlock(el)) return;
                 const rect = el.getBoundingClientRect();
                 if (!rect || rect.height <= 0 || rect.bottom <= 0) return;
-                if (rect.top > 24) return;
+                if (rect.top > 180) return;
                 let pinned = true;
                 try {
                     const position = window.getComputedStyle(el).position;
-                    pinned = position === 'fixed' || position === 'sticky' || rect.top <= 2;
+                    pinned = position === 'fixed' || position === 'sticky' || rect.top <= 180;
                 } catch (e) {
                 }
                 if (!pinned) return;
                 top = Math.max(top, Math.min(rect.bottom, Math.max(0, window.innerHeight || 0) * 0.45 || rect.bottom));
             });
         });
+    } catch (e) {
+    }
+    return Math.max(0, top, getQuickBlockSampledTopOcclusionPx());
+}
+
+function getQuickBlockSampledTopOcclusionPx() {
+    let top = 0;
+    try {
+        const viewportWidth = window.innerWidth || document.documentElement?.clientWidth || 0;
+        if (!viewportWidth) return 0;
+        const sampleXs = [
+            16,
+            Math.round(viewportWidth * 0.18),
+            Math.round(viewportWidth * 0.34),
+            Math.round(viewportWidth * 0.5),
+            Math.round(viewportWidth * 0.66),
+            Math.round(viewportWidth * 0.82),
+            Math.max(0, viewportWidth - 16)
+        ];
+        const sampleYs = [12, 36, 60, 84, 108, 132];
+        const cardSelector = QUICK_BLOCK_CARD_SELECTORS.join(',');
+        for (const y of sampleYs) {
+            for (const x of sampleXs) {
+                const stack = document.elementsFromPoint(x, y) || [];
+                for (const el of stack) {
+                    if (!(el instanceof Element)) continue;
+                    if (el === document.body || el === document.documentElement) continue;
+                    if (el.closest?.('.filtertube-quick-block-wrap')) continue;
+                    if (el.closest?.(cardSelector)) continue;
+                    if (!isElementVisibleForQuickBlock(el)) continue;
+                    const rect = el.getBoundingClientRect();
+                    if (!rect || rect.width <= 0 || rect.height <= 0) continue;
+                    if (rect.bottom <= 0 || rect.top < -4 || rect.top > 150 || rect.bottom > 180) continue;
+                    if (rect.height > 120 && rect.width < viewportWidth * 0.75) continue;
+                    if (rect.width < 18 && rect.height < 18) continue;
+                    top = Math.max(top, rect.bottom);
+                }
+            }
+        }
     } catch (e) {
     }
     return Math.max(0, top);
@@ -432,6 +477,7 @@ function updateQuickBlockViewportStateForHost(hostCard) {
     try {
         const boundsEl = getQuickBlockBoundsElement(hostCard);
         const rect = boundsEl?.getBoundingClientRect?.();
+        const wrapRect = hostCard.querySelector?.('.filtertube-quick-block-wrap')?.getBoundingClientRect?.();
         const viewportHeight = window.innerHeight || document.documentElement?.clientHeight || 0;
         const topOcclusion = getQuickBlockTopOcclusionPx();
         hidden = !rect
@@ -439,6 +485,7 @@ function updateQuickBlockViewportStateForHost(hostCard) {
             || rect.height <= 0
             || rect.bottom <= topOcclusion + 8
             || rect.top < topOcclusion + 4
+            || (wrapRect && wrapRect.width > 0 && wrapRect.height > 0 && wrapRect.top < topOcclusion + 4)
             || (viewportHeight > 0 && rect.top >= viewportHeight - 1);
     } catch (e) {
         hidden = false;
@@ -1181,6 +1228,9 @@ function ensureQuickBlockButton(card) {
     anchor.appendChild(wrap);
     attachQuickBlockWrapHoverEvents(wrap, hostCard);
     updateQuickBlockViewportStateForHost(hostCard);
+    requestAnimationFrame(() => {
+        updateQuickBlockViewportStateForHost(hostCard);
+    });
     try {
         if (!isMobileYouTubeSurface() && (hostCard.matches(':hover') || anchor.matches(':hover') || hostCard.contains(document.activeElement))) {
             setQuickBlockHoverStateForHost(hostCard, true, QUICK_BLOCK_HOVER_STICKY_MS);
