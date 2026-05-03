@@ -369,6 +369,24 @@ Since content_bridge.js runs in **Isolated World** (no `ytInitialData` access), 
 
 **Flow Recap:** detect Short → hide container → resolve handle → resolve UC ID → persist → broadcast so interceptors catch future cards.
 
+### Quick Block Surface Matrix (2026-05-03)
+
+This section records the DOM behavior difference found while stabilizing the quick-cross block affordance across the desktop extension and the Android native app WebView.
+
+| Surface | Page / area | Dominant DOM family | Quick-cross behavior | Notes |
+| --- | --- | --- | --- | --- |
+| Desktop extension | Home normal videos | `ytd-rich-item-renderer` + `yt-lockup-view-model` / `ytd-rich-grid-media` | Hover-driven and stable | Fine pointer surfaces can rely on `:hover` plus pointer tracking. |
+| Desktop extension | Home Shorts | `ytd-shorts-lockup-view-model`, `.shortsLockupViewModelHost`, `reelItemRenderer` | Needs stable outer-host anchoring | Hover preview/autoplay can swap thumbnail/player layers; quick-cross must anchor to the outer Shorts host, not a volatile preview child. |
+| Desktop extension | Search normal videos | `ytd-video-renderer`, `yt-lockup-view-model` | Hover-driven and stable | Search cards differ from home lockups but still keep stable card hosts. |
+| Desktop extension | Search Shorts | `shortsLockupViewModel`, `reelItemRenderer`, `.shortsLockupViewModelHost` | Needs stable outer-host anchoring | Same preview-layer issue as Home Shorts. |
+| Desktop extension | Watch page Shorts shelf | `ytd-reel-item-renderer`, `ytd-shorts-lockup-view-model`, watch-next shelf wrappers | Stable after current host fix | Watch shelves recycle less aggressively than Home/Search preview cards, so retention is more reliable. |
+| Android phone WebView | Home/Search/Watch cards | Mobile/touch WebView with desktop or mobile YouTube DOM depending viewport/UA | Touch-visible, not hover-driven | No fine pointer. The app runtime keeps quick-cross visible for discoverability, then must hide it near top chrome, bottom pivot bar, and overlays. |
+| Android tablet WebView | Home/Search grid + chips | Desktop-like YouTube DOM inside coarse-pointer WebView | Touch-visible with app-only occlusion guard | Tablet can look like desktop YouTube but still reports coarse/touch pointer, so extension hover rules are not enough. |
+| Android app overlays | Account/profile/settings sheets | YouTube modal/account/menu renderers over the feed | Quick-cross must be globally hidden | Underlying feed buttons can otherwise poke through account settings, profile switching, dialogs, and bottom sheets. |
+| Posts / Community | Home post shelf, channel Posts tab | `backstagePostRenderer`, `backstagePostThreadRenderer`, `ytd-post-renderer`, `ytm-post-renderer` | Menu path covered; quick-cross intentionally skipped today | `block_channel.js` currently skips post-like cards for quick-cross. Adding post quick-cross should be a separate implementation so it does not destabilize video/Shorts blocking. |
+
+Current rule: extension code owns the general stable host and top/bottom chrome model. Android app runtime adds an app-only WebView occlusion adaptation during sync because touch WebViews force visible quick-cross controls instead of hover-only controls.
+
 ### Podcasts shelf (Podcasts tab, 2025-11-18 sample)
 | DOM tag / component | Underlying renderer / data source | Status | Notes |
 | --- | --- | --- | --- |
