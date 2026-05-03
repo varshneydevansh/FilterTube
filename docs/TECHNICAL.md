@@ -1659,7 +1659,9 @@ sequenceDiagram
     DOM->>DOM: Prefer DOM-extracted /channel/UC... when present
     DOM->>DOM: Prefer videoChannelMap (learned passively from player payloads)
     DOM->>DOM: try channelMap / ytInitialData replay (no network)
-    DOM->>FETCH: fetch shorts/watch HTML only as a fallback
+    DOM->>BG: handleAddFilteredChannel(shorts:videoId) when identity is still missing
+    BG->>FETCH: fetch /shorts/videoId before /watch fallback
+    DOM->>FETCH: fetch shorts/watch HTML only as a final content-script fallback
     DOM->>BG: handleAddFilteredChannel({ id, handle, isShorts:true })
     BG->>BG: Persist channel, broadcast state update
     DOM->>DOM: hide container (parent rich-item) immediately → zero blank slots
@@ -1674,6 +1676,18 @@ sequenceDiagram
 - `seed.js` intercepts `ytInitialPlayerResponse` and `/youtubei/v1/player`, and `filter_logic.js` harvests `videoId -> UC...` into `videoChannelMap`.
 - Proactive XHR interception provides most channel identity before rendering.
 - Many cards now expose `/channel/UC...` anchors directly, allowing isolated-world extraction to return `id` immediately.
+
+### 12.1 2026-05-03 Shorts block resolver checkpoint
+
+Tablet YouTube and mobile watch pages can render Shorts as `ytd-reel-*`, `ytd-shorts-lockup-view-model`, `ytm-shorts-lockup-view-model*`, or anonymous grid shelf hosts. Those cards often expose the Shorts URL before they expose stable channel identity.
+
+Current rules:
+
+- `content_bridge.js:isShortsContentElement()` and `extractShortsVideoIdFromElement()` classify these cards before generic watch extraction.
+- 3-dot blocks and Quick Cross blocks use `shorts:<videoId>` when no UC/handle/custom URL is available.
+- `background.js:handleAddFilteredChannel()` treats `shorts:<videoId>` as a resolver hint and runs `performShortsIdentityFetch(videoId, "")` before falling back to the watch resolver.
+- `shorts:<videoId>` and `watch:<videoId>` are never stored as channel IDs; they must resolve to a UC ID, handle, or custom URL before persistence.
+- Injected block rows get a pending visual state while the resolver runs and close after success to avoid leaving the custom menu floating after its card is hidden.
 
 ## 4. DOM Fallback System (Safety Net)
 

@@ -227,9 +227,18 @@ function isPostLikeQuickBlockCard(card) {
 function resolveQuickBlockHost(node) {
     if (!node || !(node instanceof Element)) return null;
     const tag = String(node.tagName || '').toLowerCase();
-    if (tag.startsWith('ytm-shorts-lockup-view-model')) {
+    const shortsNode = tag.includes('shorts-lockup-view-model') || tag.includes('reel')
+        ? node
+        : node.querySelector?.(
+            'ytd-shorts-lockup-view-model, ytd-reel-item-renderer, ytd-reel-video-renderer, ' +
+            'ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2, ' +
+            '.shortsLockupViewModelHost, .reel-item-endpoint, a[href*="/shorts/"]'
+        );
+    if (shortsNode instanceof Element) {
         return node.closest(
-            'ytd-rich-item-renderer, ytm-rich-item-renderer, .ytGridShelfViewModelGridShelfItem'
+            'ytd-rich-item-renderer, ytd-reel-item-renderer, ytd-video-renderer, ytd-grid-video-renderer, ' +
+            'yt-lockup-view-model, ytm-rich-item-renderer, ytm-reel-item-renderer, ' +
+            '.ytGridShelfViewModelGridShelfItem, .shortsLockupViewModelHost'
         ) || node;
     }
     if (
@@ -252,16 +261,20 @@ function resolveQuickBlockHost(node) {
 function resolveQuickBlockHideTarget(videoCard) {
     if (!videoCard || !(videoCard instanceof Element)) return videoCard;
     const tag = String(videoCard.tagName || '').toLowerCase();
-    const isShorts = tag.includes('shorts-lockup-view-model') || tag.includes('reel');
+    const shortsNode = tag.includes('shorts-lockup-view-model') || tag.includes('reel')
+        ? videoCard
+        : videoCard.querySelector?.(
+            'ytd-shorts-lockup-view-model, ytd-reel-item-renderer, ytd-reel-video-renderer, ' +
+            'ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2, ' +
+            '.shortsLockupViewModelHost, .reel-item-endpoint, a[href*="/shorts/"]'
+        );
 
-    if (isShorts) {
-        const shortsNode = tag.includes('shorts-lockup-view-model')
-            ? videoCard
-            : videoCard.querySelector?.('ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2');
-        if (shortsNode instanceof Element) {
-            return shortsNode.closest('ytd-rich-item-renderer, ytm-rich-item-renderer, .ytGridShelfViewModelGridShelfItem') || shortsNode;
-        }
-        return videoCard;
+    if (shortsNode instanceof Element) {
+        return shortsNode.closest(
+            'ytd-rich-item-renderer, ytd-reel-item-renderer, ytd-video-renderer, ytd-grid-video-renderer, ' +
+            'yt-lockup-view-model, ytm-rich-item-renderer, ytm-reel-item-renderer, ' +
+            '.ytGridShelfViewModelGridShelfItem, .shortsLockupViewModelHost'
+        ) || shortsNode;
     }
 
     if (tag.includes('lockup-view-model')) {
@@ -535,7 +548,10 @@ const QUICK_BLOCK_CARD_SELECTORS = [
     'ytd-radio-renderer',
     'ytd-compact-radio-renderer',
     'ytd-reel-item-renderer',
+    'ytd-reel-video-renderer',
     'ytd-shorts-lockup-view-model',
+    '.shortsLockupViewModelHost',
+    '.ytGridShelfViewModelGridShelfItem',
     'yt-lockup-view-model',
     'yt-lockup-metadata-view-model',
     'ytm-rich-item-renderer',
@@ -791,6 +807,9 @@ function buildQuickBlockContext(videoCard) {
     let base = (typeof promoteChannelInfoFromCollaboratorSignals === 'function')
         ? (promoteChannelInfoFromCollaboratorSignals(extractedBase, videoCard) || extractedBase)
         : extractedBase;
+    const isShortsCard = typeof isShortsContentElement === 'function'
+        ? isShortsContentElement(videoCard)
+        : Boolean(videoCard.querySelector?.('a[href*="/shorts/"]'));
     const isYtmSurface = /^ytm-/i.test(String(videoCard.tagName || ''));
     if (isYtmSurface && typeof normalizeCollaboratorChannelInfoForCard === 'function') {
         try {
@@ -811,7 +830,22 @@ function buildQuickBlockContext(videoCard) {
         }
         return false;
     })();
-    const videoId = isPostCard ? '' : (base.videoId || ensureVideoIdForCard(videoCard) || extractVideoIdFromCard(videoCard) || '');
+    const videoId = isPostCard ? '' : (
+        base.videoId ||
+        (isShortsCard && typeof extractShortsVideoIdFromElement === 'function' ? extractShortsVideoIdFromElement(videoCard) : '') ||
+        ensureVideoIdForCard(videoCard) ||
+        extractVideoIdFromCard(videoCard) ||
+        ''
+    );
+    if (isShortsCard && videoId && (!base.id || !/^UC[\w-]{22}$/i.test(String(base.id).trim()))) {
+        base = {
+            ...base,
+            videoId,
+            needsFetch: true,
+            fetchStrategy: 'shorts',
+            source: base.source || 'quickBlockShorts'
+        };
+    }
     if (videoId && (!base.id || !/^UC[\w-]{22}$/i.test(String(base.id).trim()))) {
         try {
             const mappedId = currentSettings?.videoChannelMap?.[videoId] || '';
@@ -885,7 +919,11 @@ function getQuickBlockInput(collaborator, context) {
     if (handle) return handle;
     const videoId = (collaborator?.videoId || context?.videoId || context?.base?.videoId || '').trim();
     if (videoId && /^[a-zA-Z0-9_-]{11}$/.test(videoId)) {
-        return `watch:${videoId}`;
+        const isShorts = collaborator?.fetchStrategy === 'shorts' ||
+            context?.base?.fetchStrategy === 'shorts' ||
+            collaborator?.source === 'quickBlockShorts' ||
+            context?.base?.source === 'quickBlockShorts';
+        return `${isShorts ? 'shorts' : 'watch'}:${videoId}`;
     }
     return '';
 }

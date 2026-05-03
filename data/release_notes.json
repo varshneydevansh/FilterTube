@@ -11,6 +11,7 @@
       "Watch/player playlist blocks keep stored video-to-channel mappings authoritative while still recovering handles, custom URLs, names, and logos when YouTube exposes them later.",
       "First-save channel rows no longer treat a bare @handle as a complete display name, reducing backup snapshots with temporary handle-as-name rows.",
       "Search SPA collaborator recovery keeps recent YouTube search response snapshots so collaborator menus can still upgrade after watch-to-search navigation.",
+      "Tablet Shorts cards and mobile watch-page Shorts tiles now use a Shorts-specific `shorts:<videoId>` resolver path, so 3-dot blocks and Quick Cross blocks recover the correct channel instead of failing through the watch resolver.",
       "Nanah/import paths preserve channel-derived Filter All keyword ownership between extension and native app payloads, including row color and source-badge metadata.",
       "Quick Block hover controls clip against sticky YouTube chrome and keep their hover state across preview overlays without punching into top UI.",
       "Firefox/Waterfox manual export, system-theme first paint, short-height sidebar scrolling, large-blocklist indexed matching, duplicate init debug gating, and channel-row no-redraw behavior are part of this checkpoint."

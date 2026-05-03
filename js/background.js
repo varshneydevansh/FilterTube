@@ -5302,14 +5302,23 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
         // Support Kids/native flows that send `watch:<videoId>` as a placeholder identifier
         // when channel identity isn't available on the client.
         let videoIdFromInput = '';
+        let videoIdResolverMode = '';
         if (rawValue.startsWith('watch:')) {
             const candidate = rawValue.slice('watch:'.length).trim();
             if (/^[a-zA-Z0-9_-]{11}$/.test(candidate)) {
                 videoIdFromInput = candidate;
+                videoIdResolverMode = 'watch';
+            }
+        } else if (rawValue.startsWith('shorts:')) {
+            const candidate = rawValue.slice('shorts:'.length).trim();
+            if (/^[a-zA-Z0-9_-]{11}$/.test(candidate)) {
+                videoIdFromInput = candidate;
+                videoIdResolverMode = 'shorts';
             }
         } else if (/^[a-zA-Z0-9_-]{11}$/.test(rawValue)) {
             // Allow callers to pass a bare videoId as input.
             videoIdFromInput = rawValue;
+            videoIdResolverMode = 'watch';
         }
 
         const normalizedValue = normalizeChannelInput(rawValue);
@@ -5361,7 +5370,11 @@ async function handleAddFilteredChannel(input, filterAll = false, collaborationW
                 const isKids = profile === 'kids';
                 const resolution = isKids
                     ? (await performKidsWatchIdentityFetch(effectiveVideoId) || await performWatchIdentityFetch(effectiveVideoId))
-                    : await performWatchIdentityFetch(effectiveVideoId);
+                    : (
+                        videoIdResolverMode === 'shorts'
+                            ? (await performShortsIdentityFetch(effectiveVideoId, '') || await performWatchIdentityFetch(effectiveVideoId))
+                            : (await performWatchIdentityFetch(effectiveVideoId) || await performShortsIdentityFetch(effectiveVideoId, ''))
+                    );
 
                 if (resolution?.id && resolution.id.toUpperCase().startsWith('UC')) {
                     mappedId = resolution.id;

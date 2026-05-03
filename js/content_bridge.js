@@ -8659,7 +8659,7 @@ function extractChannelFromCard(card) {
 
         let expectedCollaboratorCount = 0;
         // SPECIAL CASE: Detect if this is a Shorts card (compact format only)
-        const isShortsCard = card.querySelector('ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2, .reel-item-endpoint');
+        const isShortsCard = isShortsContentElement(card);
 
         // Only detect as "Shorts in full card" if explicitly marked by FilterTube
         // Do NOT use href detection as regular videos may have /shorts/ links in related content
@@ -8837,12 +8837,8 @@ function extractChannelFromCard(card) {
 
             // Method 5: Extract from shorts URL (fetch the page)
             console.log('FilterTube: Attempting to extract channel from shorts URL');
-            const shortsLink = card.querySelector('a[href*="/shorts/"]');
-            if (shortsLink) {
-                const href = shortsLink.getAttribute('href');
-                const videoIdMatch = href?.match(/\/shorts\/([a-zA-Z0-9_-]{11})/);
-                if (videoIdMatch) {
-                    const videoId = videoIdMatch[1];
+            const videoId = extractShortsVideoIdFromElement(card);
+            if (videoId) {
                     const expectedShortsNameRaw = normalizeYtmChannelName(
                         card.querySelector('.shortsLockupViewModelHostOutsideMetadata a[href*="/@"], .shortsLockupViewModelHostOutsideMetadata a[href*="/channel/UC"], .shortsLockupViewModelHostOutsideMetadata a[href*="/c/"], .shortsLockupViewModelHostOutsideMetadata a[href*="/user/"]')?.textContent?.trim() ||
                         card.querySelector('.shortsLockupViewModelHostOutsideMetadata .yt-core-attributed-string')?.textContent?.trim() ||
@@ -8862,10 +8858,11 @@ function extractChannelFromCard(card) {
                     return {
                         videoId,
                         needsFetch: true,
+                        fetchStrategy: 'shorts',
+                        source: 'shortsCard',
                         expectedChannelName: expectedShortsName || null,
                         expectedHandle: expectedShortsHandle || null
                     };
-                }
             }
 
             console.warn('FilterTube: SHORTS card detected but no channel info found in card - skipping menu injection');
@@ -11260,19 +11257,66 @@ function resolveCommentHideTarget(node) {
         || node;
 }
 
+function isShortsContentElement(node) {
+    if (!node || !(node instanceof Element)) return false;
+    const tag = String(node.tagName || '').toLowerCase();
+    if (tag.includes('shorts-lockup-view-model') || tag.includes('reel')) return true;
+
+    const structuralShorts = node.matches?.(
+        'ytd-shorts-lockup-view-model, ytd-reel-item-renderer, ytd-reel-video-renderer, ' +
+        'ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2, ' +
+        '.shortsLockupViewModelHost, .reel-item-endpoint'
+    ) || node.querySelector?.(
+        'ytd-shorts-lockup-view-model, ytd-reel-item-renderer, ytd-reel-video-renderer, ' +
+        'ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2, ' +
+        '.shortsLockupViewModelHost, .reel-item-endpoint'
+    );
+    if (structuralShorts) return true;
+
+    const primaryShortsLink = node.matches?.('a[href*="/shorts/"]')
+        ? node
+        : node.querySelector?.(
+            'a#thumbnail[href*="/shorts/"], #thumbnail[href*="/shorts/"], ' +
+            'a[href^="/shorts/"], a[href*="youtube.com/shorts/"]'
+        );
+    if (!primaryShortsLink) return false;
+
+    const primaryWatchLink = node.querySelector?.('a#thumbnail[href*="/watch?v="], #thumbnail[href*="/watch?v="]');
+    return !primaryWatchLink;
+}
+
+function extractShortsVideoIdFromElement(node) {
+    if (!node || !(node instanceof Element)) return '';
+    const attrVideoId = node.getAttribute?.('data-filtertube-video-id') ||
+        node.querySelector?.('[data-filtertube-video-id]')?.getAttribute('data-filtertube-video-id') ||
+        '';
+    if (/^[a-zA-Z0-9_-]{11}$/.test(attrVideoId)) return attrVideoId;
+
+    const shortsLink = node.matches?.('a[href*="/shorts/"]')
+        ? node
+        : node.querySelector?.('a[href*="/shorts/"]');
+    const href = shortsLink?.getAttribute?.('href') || shortsLink?.href || '';
+    const match = href.match(/\/shorts\/([a-zA-Z0-9_-]{11})/);
+    return match?.[1] || '';
+}
+
 function resolveClickedContentHideTarget(node) {
     if (!node || !(node instanceof Element)) return node;
     const tag = String(node.tagName || '').toLowerCase();
-    const isShorts = tag.includes('shorts-lockup-view-model') || tag.includes('reel');
+    const shortsNode = tag.includes('shorts-lockup-view-model') || tag.includes('reel')
+        ? node
+        : node.querySelector?.(
+            'ytd-shorts-lockup-view-model, ytd-reel-item-renderer, ytd-reel-video-renderer, ' +
+            'ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2, ' +
+            '.shortsLockupViewModelHost, .reel-item-endpoint, a[href*="/shorts/"]'
+        );
 
-    if (isShorts) {
-        const shortsNode = tag.includes('shorts-lockup-view-model')
-            ? node
-            : node.querySelector?.('ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2');
-        if (shortsNode instanceof Element) {
-            return shortsNode.closest('ytd-rich-item-renderer, ytm-rich-item-renderer, .ytGridShelfViewModelGridShelfItem') || shortsNode;
-        }
-        return node;
+    if (shortsNode instanceof Element) {
+        return shortsNode.closest(
+            'ytd-rich-item-renderer, ytd-reel-item-renderer, ytd-video-renderer, ytd-grid-video-renderer, ' +
+            'yt-lockup-view-model, ytm-rich-item-renderer, ytm-reel-item-renderer, ' +
+            '.ytGridShelfViewModelGridShelfItem, .shortsLockupViewModelHost'
+        ) || shortsNode;
     }
 
     if (tag.includes('lockup-view-model')) {
@@ -11495,6 +11539,8 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
         titleSpan.textContent = 'Fetching...';
         titleSpan.style.color = '#9ca3af'; // gray
     }
+    menuItem.classList.add('filtertube-pending');
+    menuItem.setAttribute('aria-busy', 'true');
     menuItem.style.pointerEvents = 'none';
 
     try {
@@ -11937,9 +11983,12 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             channelInfo?.videoId &&
             /^[a-zA-Z0-9_-]{11}$/.test(String(channelInfo.videoId).trim())
         ) {
-            input = `watch:${String(channelInfo.videoId).trim()}`;
-            usedBackgroundWatchResolver = true;
-            filterTubeDebugLog('Using background watch:videoId resolution for no-identifier menu click:', channelInfo.videoId);
+            const useShortsResolver = channelInfo.fetchStrategy === 'shorts' ||
+                channelInfo.source === 'shortsCard' ||
+                isShortsContentElement(videoCard);
+            input = `${useShortsResolver ? 'shorts' : 'watch'}:${String(channelInfo.videoId).trim()}`;
+            usedBackgroundWatchResolver = !useShortsResolver;
+            filterTubeDebugLog(`Using background ${useShortsResolver ? 'shorts' : 'watch'}:videoId resolution for no-identifier menu click:`, channelInfo.videoId);
         }
 
         const mappedWatchChannelId = (() => {
@@ -12246,16 +12295,18 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
 
             // 4) Final fallback: Shorts-specific helper (only when applicable)
             const isLikelyShortsBlockContext = Boolean(
+                channelInfo?.fetchStrategy === 'shorts' ||
+                channelInfo?.source === 'shortsCard' ||
                 videoCard?.getAttribute?.('data-filtertube-short') === 'true' ||
                 String(videoCard?.tagName || '').toLowerCase().includes('shorts') ||
                 String(videoCard?.tagName || '').toLowerCase().includes('reel') ||
-                videoCard?.querySelector?.('ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2, .reel-item-endpoint') ||
+                isShortsContentElement(videoCard) ||
                 ((typeof location !== 'undefined') && /^\/shorts\//.test(String(location.pathname || '')))
             );
 
             if (!result.success && channelInfo.videoId && channelInfo.needsFetch && (
-                !usedBackgroundWatchResolver &&
-                (channelInfo.fetchStrategy !== 'mainworld' || isLikelyShortsBlockContext)
+                isLikelyShortsBlockContext ||
+                (!usedBackgroundWatchResolver && channelInfo.fetchStrategy !== 'mainworld')
             )) {
                 const fallbackInfo = await fetchChannelFromShortsUrl(channelInfo.videoId, expectedHandle, { allowDirectFetch: true });
                 if (fallbackInfo && (fallbackInfo.id || fallbackInfo.handle)) {
@@ -12389,6 +12440,8 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
 
         // Add blocked styling class to the menu item
         menuItem.classList.add('filtertube-blocked');
+        menuItem.classList.remove('filtertube-pending');
+        menuItem.removeAttribute('aria-busy');
 
         filterTubeDebugLog('Successfully blocked channel:', channelInfo, 'filterAll:', filterAll);
 
@@ -12475,8 +12528,12 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             }
         }
 
-        // Keep the menu/sheet open after a successful block so the user can see the
-        // persisted state and optionally turn on Filter All or block another entry.
+        const successDropdown = dropdown || menuItem.closest('tp-yt-iron-dropdown, ytm-menu-popup-renderer, ytd-menu-popup-renderer, div.menu-content[role="dialog"], .filtertube-playlist-menu-fallback-popover');
+        if (successDropdown) {
+            setTimeout(() => {
+                forceCloseDropdown(successDropdown);
+            }, 90);
+        }
 
         // After storage is updated, pull fresh settings (to include the new channel) and re-run DOM pass
         let refreshedSettings = null;
@@ -12517,6 +12574,8 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                     titleSpan.textContent = originalText;
                     titleSpan.style.color = '#ef4444';
                 }
+                menuItem.classList.remove('filtertube-pending');
+                menuItem.removeAttribute('aria-busy');
                 menuItem.style.pointerEvents = 'auto';
             }, 2000);
         } else {
@@ -12525,6 +12584,8 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
                     titleSpan.textContent = '✓ Channel Blocked';
                     titleSpan.style.color = '#10b981';
                 }
+                menuItem.classList.remove('filtertube-pending');
+                menuItem.removeAttribute('aria-busy');
             } catch (e) {
             }
         }

@@ -154,6 +154,14 @@ function ensureFilterTubeMenuStyles() {
         box-shadow: inset 0 0 0 1px rgba(16, 185, 129, 0.08) !important;
     }
 
+    .filtertube-block-channel-item.filtertube-pending,
+    .filtertube-block-channel-item.filtertube-pending .filtertube-menu-item {
+        background: linear-gradient(90deg, rgba(148, 163, 184, 0.12), rgba(255, 255, 255, 0.9)) !important;
+        border-left: 4px solid #94a3b8 !important;
+        box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.12) !important;
+        opacity: 0.88 !important;
+    }
+
     .filtertube-modern-bottom-sheet-item.filtertube-blocked .menu-item-button {
         background: linear-gradient(90deg, rgba(16, 185, 129, 0.045), rgba(255, 255, 255, 0.92)) !important;
         border-left: 4px solid #10b981 !important;

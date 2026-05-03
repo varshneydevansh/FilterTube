@@ -837,7 +837,11 @@ This section answers:
 ### 10.4 Shorts shelf / Shorts cards
 
 - **Containers**
+  - `ytd-shorts-lockup-view-model`
+  - `ytd-reel-item-renderer`
+  - `ytd-reel-video-renderer`
   - `ytm-shorts-lockup-view-model` / `ytm-shorts-lockup-view-model-v2`
+  - `.shortsLockupViewModelHost` / `.ytGridShelfViewModelGridShelfItem`
   - Sometimes Shorts appear as a full `ytd-video-renderer` marked by FilterTube using `data-filtertube-short="true"`.
 
 - **Why Shorts are special**
@@ -849,8 +853,34 @@ This section answers:
 
 - **Key functions**
   - `content_bridge.js:extractChannelFromCard()` → may return `{id: 'UC...', videoId}` immediately when the DOM exposes `/channel/UC...`.
-  - If the card only exposes `{videoId, needsFetch: true}`, `content_bridge.js` first consults `videoChannelMap` (persisted `videoId -> UC...`).
+  - If the card only exposes `{videoId, needsFetch: true}`, `content_bridge.js` marks the card as `fetchStrategy: 'shorts'` / `source: 'shortsCard'` so the block flow uses `shorts:<videoId>` instead of the watch resolver.
+  - Quick Cross does the same through `block_channel.js:buildQuickBlockContext()` and `getQuickBlockInput()`, so tablet Shorts and mobile watch-page Shorts do not fall back to weak `watch:<videoId>` placeholders.
   - `content_bridge.js:fetchChannelFromShortsUrl(videoId, requestedHandle)` parses Shorts HTML as a last resort.
+
+#### 2026-05-03 Shorts block resolver checkpoint
+
+The current regression target was tablet Shorts cards failing on most pages and mobile watch-page Shorts failing via 3-dot / Quick Cross. The fix keeps Shorts on a Shorts-specific identity path:
+
+```mermaid
+flowchart TB
+    A["Shorts card or watch-page Shorts tile"] --> B["isShortsContentElement()"]
+    B --> C["extractShortsVideoIdFromElement()"]
+    C --> D{"Stable UC / handle already known?"}
+    D -- yes --> E["Block with UC / handle"]
+    D -- no --> F["Use shorts:VIDEO_ID placeholder"]
+    F --> G["background performShortsIdentityFetch() first"]
+    G --> H{"Resolved UC / handle?"}
+    H -- yes --> I["Persist channel + videoChannelMap"]
+    H -- no --> J["Fallback watch identity fetch / visible failure"]
+    I --> K["Hide Shorts card container"]
+```
+
+Rules:
+
+- `shorts:<videoId>` is only a resolver hint. It is never stored as a channel identity.
+- The background resolver tries `/shorts/<videoId>` before `/watch?v=<videoId>` for this path.
+- The Android runtime bridge recognizes both `watch:<videoId>` and `shorts:<videoId>` as resolver placeholders, matching the extension source.
+- 3-dot rows now show a pending style while the resolver runs, then close the injected menu after a successful block so orphaned menu rows do not remain after the target card disappears.
 
 ### 10.5 Community posts (ytd-post-renderer)
 

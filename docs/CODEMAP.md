@@ -28,6 +28,27 @@ The Nanah/app sync checkpoint is documented in [TECHNICAL.md](/Users/devanshvars
 
 The important contract is that Android/app-packed keyword sources like `channel:<ref>|label=...|comment` are converted back into canonical extension entries with `source:"channel"` and `channelRef`. This keeps app-imported `Filter All` keyword rows visually and behaviorally equivalent to extension-created channel-derived rows.
 
+## 2026-05-03 Shorts Resolver Checkpoint
+
+Tablet Shorts cards and mobile watch-page Shorts tiles now use a Shorts-specific resolver path instead of falling through to the watch resolver:
+
+```text
+Shorts card/tile
+  -> content_bridge.js:isShortsContentElement()
+  -> content_bridge.js:extractShortsVideoIdFromElement()
+  -> block_channel.js quick-cross context OR content_bridge.js 3-dot menu
+  -> shorts:<videoId> resolver placeholder
+  -> background.js performShortsIdentityFetch()
+  -> persisted UC/handle + videoChannelMap
+```
+
+Key files:
+
+- `js/content_bridge.js`: detects Shorts structures across YTD/YTM/tablet renderers, emits `fetchStrategy:"shorts"`, and retries Shorts HTML identity when needed.
+- `js/content/block_channel.js`: keeps Quick Cross aligned with the same `shorts:<videoId>` resolver path and hides the correct Shorts container.
+- `js/background.js`: accepts `shorts:<videoId>` and tries the Shorts identity fetch before watch fallback.
+- `js/content/menu.js`: adds pending visual feedback for injected block rows while resolution runs.
+
 ## Previous in v3.2.6
 
 - **Typography Overhaul**: Modern sans-serif design system (Inter font family)
