@@ -5,6 +5,6 @@ const routes = ["", "/privacy", "/terms", ...platformOrder.map((slug) => `/${slu
 export default function sitemap() {
   return routes.map((route) => ({
     url: `https://filtertube.in${route}`,
-    lastModified: "2026-03-16",
+    lastModified: "2026-05-04",
   }));
 }

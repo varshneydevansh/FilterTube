@@ -7,9 +7,13 @@
     "build": "next build",
     "start": "next start"
   },
+  "engines": {
+    "node": "22.x"
+  },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",
     "@tailwindcss/postcss": "^4.2.1",
+    "@vercel/analytics": "^2.0.1",
     "next": "^16.1.6",
     "postcss": "^8.5.8",
     "react": "^19.2.4",

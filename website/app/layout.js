@@ -4,6 +4,7 @@ import {
   Outfit,
   Plus_Jakarta_Sans,
 } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import Script from "next/script";
 
 import { SceneController } from "@/components/scene-controller";
@@ -121,6 +122,7 @@ try {
           </main>
           <SiteFooter />
         </div>
+        <Analytics />
       </body>
     </html>
   );
