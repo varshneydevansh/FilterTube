@@ -113,11 +113,13 @@ Key points:
 ### 1b) Parent-managed child editing
 
 - A parent/account profile can edit a child profile without switching the active profile to the child.
-- Parent-managed edit routes target the child profile explicitly:
-  - Main rules -> the child profile's Main YouTube list
-  - Kids rules -> the child profile's YouTube Kids list
-- Keyword, channel, and content-control tabs must show the parent-managed child banner while this route is active.
-- The banner's done action exits the virtual child editor and returns to the parent/account surface.
+- Parent-managed edit mode targets the child profile explicitly:
+  - Dashboard stats read from the child profile
+  - Filters edit the child profile's Main YouTube rules
+  - Kids Mode edits the child profile's YouTube Kids rules
+  - Settings/Semantic ML stay visually marked as child-editing surfaces and only child-scoped controls should mutate the child profile
+- Dashboard, Filters, Kids Mode, Settings, and Semantic ML must show the parent-managed child banner while this mode is active.
+- The banner's done action exits the virtual child editor and returns to Accounts & Sync.
 - This is the intended path for parents managing younger kids or teenagers:
   - the child keeps private viewing state and profile identity
   - the parent keeps authority over rule changes and policy

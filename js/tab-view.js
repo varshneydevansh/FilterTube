@@ -4204,12 +4204,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
     }
 
-    function managedChildEditSurface() {
-        return managedChildEdit?.surface === 'kids' ? 'kids' : 'main';
-    }
-
     function isManagedChildEditFor(surface) {
-        return !!managedChildEdit && managedChildEditSurface() === (surface === 'kids' ? 'kids' : 'main');
+        const targetSurface = surface === 'kids' ? 'kids' : 'main';
+        return !!managedChildEdit && (managedChildEdit.surface ? managedChildEdit.surface === targetSurface : true);
     }
 
     function getManagedChildProfile() {
@@ -4308,61 +4305,88 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.__filtertubeIsManagedChildEditFor = isManagedChildEditFor;
         window.__filtertubeBuildManagedChildState = buildManagedChildState;
         window.__filtertubeSaveManagedChildSurface = saveManagedChildSurface;
+        window.__filtertubeRenderManagedChildEditorBanner = renderManagedChildEditorBanner;
     } catch (e) {
     }
 
+    function isManagedChildEditorView(viewId) {
+        return ['dashboard', 'filters', 'semantic', 'kids', 'settings'].includes(normalizeString(viewId));
+    }
+
+    function endManagedChildEdit() {
+        managedChildEdit = null;
+        renderManagedChildEditorBanner();
+        renderKeywords();
+        renderChannels();
+        renderKidsKeywords();
+        renderKidsChannels();
+        renderListModeControls();
+        updateCheckboxes();
+        try {
+            const state = StateManager.getState() || {};
+            const applyMain = window.__filtertubeApplyMainContentControls;
+            const applyKids = window.__filtertubeApplyKidsContentControls;
+            if (typeof applyMain === 'function') applyMain(state.contentFilters || {}, state.categoryFilters || {});
+            if (typeof applyKids === 'function') applyKids(state?.kids?.contentFilters || {}, state?.kids?.categoryFilters || {});
+        } catch (e) {
+        }
+        if (typeof window.switchView === 'function') {
+            window.switchView('sync');
+        }
+    }
+
+    function renderManagedChildGlobalBanner() {
+        const banner = document.getElementById('managedChildGlobalBanner');
+        const currentNav = document.querySelector('.nav-item.active');
+        const currentViewId = normalizeString(currentNav?.getAttribute('data-tab')) || 'dashboard';
+        const active = !!managedChildEdit;
+        const editorView = active && isManagedChildEditorView(currentViewId);
+        const profile = active ? getManagedChildProfile() : null;
+        document.body.classList.toggle('ft-managed-child-active', active && !!profile);
+        document.body.classList.toggle('ft-managed-child-editor-view', editorView && !!profile);
+
+        if (!banner) return;
+        banner.innerHTML = '';
+        banner.hidden = !editorView || !profile;
+        if (!editorView || !profile) return;
+
+        const colors = getProfileColors(normalizeString(managedChildEdit?.profileId));
+        banner.style.setProperty('--ft-profile-accent', colors.accent || '');
+        banner.style.setProperty('--ft-profile-accent-bg', colors.accentBg || '');
+        banner.style.setProperty('--ft-profile-accent-border', colors.accentBorder || '');
+        document.body.style.setProperty('--ft-profile-accent-border', colors.accentBorder || '');
+
+        const copy = document.createElement('div');
+        copy.className = 'ft-managed-child-global__copy';
+        const title = document.createElement('strong');
+        title.textContent = `Editing child: ${normalizeString(profile.name) || 'Child'}`;
+        const body = document.createElement('span');
+        body.textContent = 'Parent-managed child edit mode. Dashboard, Filters, Kids Mode, Settings, and Semantic ML stay scoped to this child where editing is supported.';
+        copy.appendChild(title);
+        copy.appendChild(body);
+
+        const doneBtn = document.createElement('button');
+        doneBtn.type = 'button';
+        doneBtn.className = 'btn-primary';
+        doneBtn.textContent = `Done editing ${normalizeString(profile.name) || 'child'}`;
+        doneBtn.addEventListener('click', endManagedChildEdit);
+
+        banner.appendChild(copy);
+        banner.appendChild(doneBtn);
+    }
+
     function renderManagedChildEditorBanner() {
+        renderManagedChildGlobalBanner();
         const ids = {
             main: ['managedChildFiltersBanner', 'managedChildFiltersChannelBanner', 'managedChildFiltersContentBanner'],
             kids: ['managedChildKidsBanner', 'managedChildKidsChannelBanner', 'managedChildKidsContentBanner']
         };
         const renderFor = (surface) => {
-            const active = isManagedChildEditFor(surface);
-            const profile = active ? getManagedChildProfile() : null;
             ids[surface].forEach(id => {
                 const el = document.getElementById(id);
                 if (!el) return;
                 el.innerHTML = '';
-                el.hidden = !active || !profile;
-                if (!active || !profile) return;
-
-                const copy = document.createElement('div');
-                copy.className = 'ft-managed-child-editor__copy';
-                const title = document.createElement('strong');
-                title.textContent = `Editing child profile: ${normalizeString(profile.name) || 'Child'}`;
-                const body = document.createElement('span');
-                body.textContent = surface === 'kids'
-                    ? 'You are editing this child’s YouTube Kids rules without switching profiles.'
-                    : 'You are editing this child’s Main YouTube rules without switching profiles.';
-                copy.appendChild(title);
-                copy.appendChild(body);
-
-                const closeBtn = document.createElement('button');
-                closeBtn.type = 'button';
-                closeBtn.className = 'btn-secondary';
-                closeBtn.textContent = 'Done editing child';
-                closeBtn.addEventListener('click', () => {
-                    managedChildEdit = null;
-                    renderManagedChildEditorBanner();
-                    renderKeywords();
-                    renderChannels();
-                    renderKidsKeywords();
-                    renderKidsChannels();
-                    renderListModeControls();
-                    updateCheckboxes();
-                    try {
-                        const state = StateManager.getState() || {};
-                        const applyMain = window.__filtertubeApplyMainContentControls;
-                        const applyKids = window.__filtertubeApplyKidsContentControls;
-                        if (typeof applyMain === 'function') applyMain(state.contentFilters || {}, state.categoryFilters || {});
-                        if (typeof applyKids === 'function') applyKids(state?.kids?.contentFilters || {}, state?.kids?.categoryFilters || {});
-                    } catch (e) {
-                    }
-                    switchView('sync');
-                });
-
-                el.appendChild(copy);
-                el.appendChild(closeBtn);
+                el.hidden = true;
             });
         };
         renderFor('main');
@@ -4371,7 +4395,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function startManagedChildEdit(profileId, surface) {
         const targetId = normalizeString(profileId);
-        const targetSurface = surface === 'kids' ? 'kids' : 'main';
+        const targetSurface = surface === 'kids' || surface === 'main' ? surface : '';
         const io = window.FilterTubeIO || {};
         if (!targetId || typeof io.loadProfilesV4 !== 'function') return;
         const fresh = await io.loadProfilesV4();
@@ -4387,7 +4411,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const ok = await ensureProfileUnlocked(fresh, currentActive);
         if (!ok) return;
         profilesV4Cache = fresh;
-        managedChildEdit = { profileId: targetId, surface: targetSurface };
+        managedChildEdit = targetSurface ? { profileId: targetId, surface: targetSurface } : { profileId: targetId };
         renderManagedChildEditorBanner();
         renderKeywords();
         renderChannels();
@@ -4406,7 +4430,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         } catch (e) {
         }
-        switchView(targetSurface === 'kids' ? 'kids' : 'filters');
+        if (typeof window.switchView === 'function') {
+            window.switchView(targetSurface === 'kids' ? 'kids' : 'dashboard');
+        }
     }
 
     function updateAdminPolicyControls() {
@@ -8640,34 +8666,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const canManageTarget = canActiveProfileManageProfile(profilesV4, profileId);
             if (type === 'child' && canManageTarget && !childAdminRestricted) {
-                const editMainBtn = document.createElement('button');
-                editMainBtn.className = access.main ? 'btn-secondary btn-profile-main' : 'btn-secondary';
-                editMainBtn.type = 'button';
-                editMainBtn.textContent = 'Edit Main Rules';
-                editMainBtn.disabled = !access.main;
-                editMainBtn.title = access.main
-                    ? 'Edit this child profile’s Main YouTube rules without switching profiles.'
-                    : 'Main YouTube is blocked for this child profile.';
-                editMainBtn.addEventListener('click', async () => {
-                    if (!access.main) return;
-                    await startManagedChildEdit(profileId, 'main');
+                const editRulesBtn = document.createElement('button');
+                editRulesBtn.className = 'btn-secondary btn-profile-main';
+                editRulesBtn.type = 'button';
+                editRulesBtn.textContent = 'Edit Rules';
+                editRulesBtn.title = 'Enter parent-managed child edit mode without switching into this child profile.';
+                editRulesBtn.addEventListener('click', async () => {
+                    await startManagedChildEdit(profileId);
                 });
 
-                const editKidsBtn = document.createElement('button');
-                editKidsBtn.className = access.kids ? 'btn-secondary btn-profile-kids' : 'btn-secondary';
-                editKidsBtn.type = 'button';
-                editKidsBtn.textContent = 'Edit Kids Rules';
-                editKidsBtn.disabled = !access.kids;
-                editKidsBtn.title = access.kids
-                    ? 'Edit this child profile’s YouTube Kids rules without switching profiles.'
-                    : 'YouTube Kids is blocked for this child profile.';
-                editKidsBtn.addEventListener('click', async () => {
-                    if (!access.kids) return;
-                    await startManagedChildEdit(profileId, 'kids');
-                });
-
-                actions.appendChild(editMainBtn);
-                actions.appendChild(editKidsBtn);
+                actions.appendChild(editRulesBtn);
             }
 
             if (profileId !== 'default') {
@@ -10856,8 +10864,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const state = StateManager.getState();
-        const mainCounts = getDashboardCounts('main', state);
-        const kidsCounts = getDashboardCounts('kids', state);
+        const mainState = window.__filtertubeIsManagedChildEditFor?.('main') === true
+            ? (window.__filtertubeBuildManagedChildState?.('main') || state)
+            : state;
+        const kidsState = window.__filtertubeIsManagedChildEditFor?.('kids') === true
+            ? (window.__filtertubeBuildManagedChildState?.('kids') || state)
+            : state;
+        const mainCounts = getDashboardCounts('main', mainState);
+        const kidsCounts = getDashboardCounts('kids', kidsState);
         const hasMain = (mainCounts.keywordCount + mainCounts.channelCount) > 0;
         const hasKids = (kidsCounts.keywordCount + kidsCounts.channelCount) > 0;
 
@@ -10885,7 +10899,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function updateStats() {
-        const state = StateManager.getState();
+        const baseState = StateManager.getState();
 
         // Update stat cards
         const statActiveKeywords = document.getElementById('statActiveKeywords');
@@ -10907,6 +10921,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const surface = dashboardStatsSurface === 'kids' ? 'kids' : 'main';
+        const state = window.__filtertubeIsManagedChildEditFor?.(surface) === true
+            ? (window.__filtertubeBuildManagedChildState?.(surface) || baseState)
+            : baseState;
         const counts = getDashboardCounts(surface, state);
         const surfaceStats = getDashboardSurfaceStats(surface, state);
 
@@ -11546,6 +11563,9 @@ function setupNavigation() {
         try {
             document.body.dataset.activeView = effectiveViewId;
             document.documentElement.dataset.activeView = effectiveViewId;
+            if (typeof window.__filtertubeRenderManagedChildEditorBanner === 'function') {
+                window.__filtertubeRenderManagedChildEditorBanner();
+            }
         } catch (e) {
         }
 
