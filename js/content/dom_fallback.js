@@ -2489,6 +2489,11 @@ async function applyDOMFallback(settings, options = {}) {
                 '#video-title, .ytd-video-meta-block #video-title, h3 a, .metadata-snippet-container #video-title, ' +
                 '#video-title-link, .yt-lockup-metadata-view-model-wiz__title, .yt-lockup-metadata-view-model__title, ' +
                 '.yt-lockup-metadata-view-model__heading-reset, yt-formatted-string#title, span#title, ' +
+                '.media-item-headline, .compact-media-item-headline, .large-media-item-headline, ' +
+                '.YtmCompactMediaItemHeadline, .YtmVideoWithContextRendererHeadline, ' +
+                '.media-item-headline .yt-core-attributed-string, .compact-media-item-headline .yt-core-attributed-string, ' +
+                '.large-media-item-headline .yt-core-attributed-string, .YtmCompactMediaItemHeadline .yt-core-attributed-string, ' +
+                'ytm-media-item h3, ytm-compact-video-renderer h3, ytm-video-with-context-renderer h3, ' +
                 'yt-dynamic-text-view-model h1, .yt-page-header-view-model__page-header-title, .dynamicTextViewModelH1'
             );
             const isPlaylistPanelRow = isPlaylistPanelRowElement(element);
@@ -2637,6 +2642,23 @@ async function applyDOMFallback(settings, options = {}) {
                     if (anchorTitle) {
                         title = anchorTitle.trim();
                     }
+                }
+            }
+            if (!title && (
+                elementTag === 'ytm-rich-item-renderer' ||
+                elementTag === 'ytm-video-with-context-renderer' ||
+                elementTag === 'ytm-compact-video-renderer'
+            )) {
+                const mobileTitleAria = element.querySelector(
+                    '.YtmCompactMediaItemHeadline .yt-core-attributed-string[aria-label], ' +
+                    '.YtmVideoWithContextRendererHeadline .yt-core-attributed-string[aria-label], ' +
+                    '.media-item-headline .yt-core-attributed-string[aria-label], ' +
+                    '.compact-media-item-headline .yt-core-attributed-string[aria-label], ' +
+                    '.large-media-item-headline .yt-core-attributed-string[aria-label], ' +
+                    '.yt-core-attributed-string[aria-label]'
+                )?.getAttribute?.('aria-label') || '';
+                if (mobileTitleAria) {
+                    title = mobileTitleAria.trim();
                 }
             }
             if (!title && (

@@ -797,6 +797,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (isUiLocked()) {
             toggle.classList.add('is-disabled');
             toggle.setAttribute('aria-disabled', 'true');
+        } else {
+            toggle.classList.remove('is-disabled');
+            toggle.setAttribute('aria-disabled', 'false');
         }
         const handleModeToggle = async () => {
                 if (isUiLocked()) {
@@ -1464,6 +1467,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             profilesV4Cache = profilesV4;
             renderProfileSelector(profilesV4);
             applyLockGateIfNeeded();
+            renderListModeControls();
             updateSubscriptionsShortcut();
         } catch (e) {
         }
