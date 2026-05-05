@@ -566,19 +566,6 @@ html[data-theme="dark"] body::after {
     color: var(--ft-color-text-secondary);
 }
 
-.kids-main-sync-row {
-    margin-top: var(--ft-space-md);
-}
-
-.kids-main-sync-row .toggle-row {
-    padding: var(--ft-space-sm) 0 0;
-    border-bottom: none;
-}
-
-.kids-main-sync-row .import-export-hint {
-    margin-top: 4px;
-}
-
 /* Dark mode */
 :root[data-theme="dark"] .kids-header-title svg {
     color: #F472B8;

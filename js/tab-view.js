@@ -1496,6 +1496,44 @@ function initializeKidsTabs() {
     const kidsVideoFiltersRows = document.createElement('div');
     kidsVideoFiltersRows.className = 'content-control-group__rows';
 
+    const kidsMainSyncRow = document.createElement('div');
+    kidsMainSyncRow.className = 'toggle-row';
+    kidsMainSyncRow.setAttribute('data-ft-control-row', 'true');
+    kidsMainSyncRow.setAttribute('data-ft-search', 'apply matching yt kids rules on youtube sync kids to main from kids badge');
+    kidsMainSyncRow.title = 'When enabled, matching-mode YouTube Kids rules are also applied on main YouTube for this profile. Kids blocklist syncs only into Main blocklist; Kids whitelist syncs only into Main whitelist.';
+
+    const kidsMainSyncInfo = document.createElement('div');
+    kidsMainSyncInfo.className = 'toggle-info';
+
+    const kidsMainSyncTitle = document.createElement('div');
+    kidsMainSyncTitle.className = 'toggle-title';
+    kidsMainSyncTitle.textContent = 'Apply matching YT Kids rules on YouTube';
+
+    const kidsMainSyncHint = document.createElement('div');
+    kidsMainSyncHint.className = 'import-export-hint';
+    kidsMainSyncHint.textContent = 'Synced items show in your main list with a "From Kids" badge. Mismatched modes do not invert rules.';
+
+    kidsMainSyncInfo.appendChild(kidsMainSyncTitle);
+    kidsMainSyncInfo.appendChild(kidsMainSyncHint);
+
+    const kidsMainSyncToggle = document.createElement('label');
+    kidsMainSyncToggle.className = 'switch';
+
+    const kidsMainSyncCheckbox = document.createElement('input');
+    kidsMainSyncCheckbox.type = 'checkbox';
+    kidsMainSyncCheckbox.id = 'setting_syncKidsToMain';
+    kidsMainSyncCheckbox.setAttribute('data-ft-setting', 'syncKidsToMain');
+
+    const kidsMainSyncSlider = document.createElement('span');
+    kidsMainSyncSlider.className = 'slider round';
+
+    kidsMainSyncToggle.appendChild(kidsMainSyncCheckbox);
+    kidsMainSyncToggle.appendChild(kidsMainSyncSlider);
+
+    kidsMainSyncRow.appendChild(kidsMainSyncInfo);
+    kidsMainSyncRow.appendChild(kidsMainSyncToggle);
+    kidsVideoFiltersRows.appendChild(kidsMainSyncRow);
+
     const kidsDurationRow = document.createElement('div');
     kidsDurationRow.className = 'toggle-row';
     kidsDurationRow.setAttribute('data-ft-control-row', 'true');
