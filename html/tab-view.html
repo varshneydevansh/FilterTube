@@ -1088,6 +1088,7 @@
                                                     <li><strong>Default (Master):</strong> Admin for full exports, profile management, and account policy.</li>
                                                     <li><strong>Account:</strong> Independent profile; can have child profiles.</li>
                                                     <li><strong>Child:</strong> Private viewing profile with its own Main/Kids rules; rule editing and settings stay parent-managed.</li>
+                                                    <li><strong>Parent-managed child editing:</strong> A parent/account profile can use a child row’s <strong>Edit Main Rules</strong> or <strong>Edit Kids Rules</strong> actions without switching into that child profile.</li>
                                                 </ul>
                                             </div>
                                         </div>
@@ -1098,6 +1099,7 @@
                                                     <li>Locked profiles disable toggles and auto-backup controls until unlocked.</li>
                                                     <li>Encrypted exports/backups need the profile’s PIN; Master unlock is required for admin actions.</li>
                                                     <li>Child PINs protect profile switching and can open receive-only Accounts &amp; Sync; parent/admin PIN still controls rules, backups, trusted-link policy, and settings.</li>
+                                                    <li>Opening receive-only Accounts &amp; Sync with a child PIN does not unlock Dashboard, Filters, Kids Mode, Settings, or parent controls after you return to the viewing surface.</li>
                                                     <li>Unlock is per-session in both Popup and New Tab.</li>
                                                 </ul>
                                             </div>
@@ -1140,7 +1142,7 @@
                                                     <li><strong>Send this profile once:</strong> Best default. Pair, verify, send, and let the other device review the update.</li>
                                                     <li><strong>Parent controls child:</strong> Best for source → replica trust. Pick the remote child profile once, then save the managed link.</li>
                                                     <li><strong>Move full account:</strong> Use only for migration, reinstall recovery, or the wider account tree.</li>
-                                                    <li><strong>Child receive-only:</strong> Child profiles can join a parent/source code and receive updates, but cannot send, save trust policy, or move backups from that page.</li>
+                                                    <li><strong>Child receive-only:</strong> Child profiles can join a parent/source code and receive updates, but cannot send, save trust policy, move backups, or unlock parent controls from that page.</li>
                                                     <li>The <strong>Advanced</strong> section is still there if you need to tune role, scope, or merge/replace manually.</li>
                                                 </ul>
                                             </div>
@@ -1218,6 +1220,7 @@
                                             <div class="help-item-body">
                                                 <ul>
                                                     <li>PIN checks stay local. Nanah can require the sender or receiver to unlock locally, but the PIN itself is not sent.</li>
+                                                    <li>Child PIN and parent authority are separate. A child PIN can open receive-only sync for that child, while parent/account PIN controls rule edits, backups, sync policy, and trusted links.</li>
                                                     <li><strong>Encrypted backup</strong> is still the archive path. Nanah is the live device-to-device sync path.</li>
                                                     <li>Encrypted <strong>full-account</strong> backup can also carry trusted-device recovery data for same-device reinstall recovery, but normal/plain export does not.</li>
                                                     <li>Restoring trusted-device recovery data is explicit during encrypted import. It is not silently restored from ordinary backup files.</li>
@@ -1258,6 +1261,7 @@
                                                     <li><strong>Independent account:</strong> Owns its own settings and can manage its own child profiles, but does not gain authority over parallel accounts.</li>
                                                     <li><strong>Child profile:</strong> A private viewing surface with its own Main/Kids rules. The child PIN protects switching into it, but parent/account PIN controls policy and rule edits.</li>
                                                     <li><strong>Viewing spaces:</strong> A parent can set each child to Kids only, Main only, or Main + Kids. New child profiles start as Kids only.</li>
+                                                    <li><strong>Parent editing:</strong> Parent/account surfaces can edit a child’s Main or Kids rule list directly from the child row, so parents do not need to hand children the parent PIN.</li>
                                                     <li><strong>Targeting today:</strong> Child managed links should usually save a fixed local target so parent updates stay tied to that child profile.</li>
                                                     <li><strong>Parent-safe child targeting:</strong> FilterTube blocks send-anyway paths from child profiles when the other device has a different profile active. The intended parent flow is to save one managed <strong>Source -> Replica</strong> link on the receiving child profile and choose <strong>Always this local profile</strong>.</li>
                                                     <li><strong>Strict child protection:</strong> Managed child links can now force approval-needed reconnect, no auto-apply, fixed local target, and local unlock required as one higher-safety preset.</li>
@@ -1375,11 +1379,15 @@
                                     <div class="help-list">
                                         <div class="help-item">
                                             <div class="help-item-title">Child profile authority</div>
-                                            <div class="help-item-body">Child profiles are private viewing spaces with their own Main and Kids rules. They cannot change FilterTube settings, sync, backups, profile policy, or rule lists from the child surface.</div>
+                                            <div class="help-item-body">Child profiles are private viewing spaces with their own Main and Kids rules. They cannot change FilterTube settings, backups, profile policy, trusted-link policy, or rule lists from the child surface. Their Accounts &amp; Sync path is receive-only.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Child PIN vs parent PIN</div>
-                                            <div class="help-item-body">A child profile PIN protects switching into that child profile. Parent or account PIN controls rule editing, allowed viewing spaces, profile management, sync, and backups.</div>
+                                            <div class="help-item-body">A child profile PIN protects switching into that child profile and can open receive-only Accounts &amp; Sync. Parent or account PIN controls rule editing, allowed viewing spaces, profile management, sync policy, trusted links, and backups.</div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Where parents edit child rules</div>
+                                            <div class="help-item-body">Open Accounts &amp; Sync from the parent/account profile and use the child row’s Edit Main Rules or Edit Kids Rules buttons. This keeps the child’s profile private while the parent owns policy.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Allowed viewing spaces</div>

@@ -46,8 +46,9 @@ That means:
 - first managed parent -> child connection may require one local parent approval on the child device
 - after that, the child does **not** always need to press allow
 - later behavior depends on the saved managed-link policy
-- locked child profiles stay replica-only unless unlocked locally
-- unlocked child profiles may send only their own scoped snapshot, not a full account backup
+- child profiles are receive-only in Accounts & Sync from the child surface
+- a child PIN can open receive-only sync but does not unlock parent controls, rule editing, backups, or trusted-link policy
+- parent/account profiles edit child Main/Kids rules from the child row without switching into that child profile
 
 ### Remote target profile
 

@@ -99,6 +99,28 @@ Key points:
 - If **active profile has no PIN**:
   - All views are accessible.
 
+### 1a) Child profile authority rules
+
+- A child profile is a private viewing profile, not an admin profile.
+- A child profile can have its own Main and Kids rules, viewing-space policy, and optional child PIN.
+- A child PIN is for switching into that child profile and, when allowed, opening receive-only Accounts & Sync for that child profile.
+- A child PIN does **not** unlock Dashboard, Filters, Kids Mode editing, Settings, backups, account policy, trusted-link policy, or profile management.
+- Parent/account authority is separate from child-profile unlock state:
+  - the parent/account PIN unlocks rule editing, settings, sync policy, backups, and profile policy
+  - the child PIN only proves access to that child profile
+- When a FilterTube settings surface is closed or the app/extension returns to the viewing surface, protected controls must be treated as locked again.
+
+### 1b) Parent-managed child editing
+
+- A parent/account profile can edit a child profile without switching the active profile to the child.
+- Parent-managed edit routes target the child profile explicitly:
+  - Main rules -> the child profile's Main YouTube list
+  - Kids rules -> the child profile's YouTube Kids list
+- This is the intended path for parents managing younger kids or teenagers:
+  - the child keeps private viewing state and profile identity
+  - the parent keeps authority over rule changes and policy
+  - sibling profiles cannot mutate one another unless their parent/account profile has authority
+
 ### 2) Profile switching rules (New Tab UI)
 
 - Switching to a profile requires:
@@ -191,16 +213,18 @@ Note: This does not affect a parallel account’s ability to access its own Filt
 
 ## Nanah / Accounts & Sync rules (Current)
 
-- If the active profile is a **locked child** profile, Nanah behaves as a **replica-only** surface for that UI session.
-- If the active profile is an **unlocked child** profile, it may send that child profile's own scoped settings (`active`, `main`, `kids`) to another device, but it still cannot send a `full` account backup from that surface.
-- Locked child profiles cannot save arbitrary peer/source trust.
-- Locked child profiles can only save managed `source -> replica` links.
+- If the active profile is a **child** profile, Accounts & Sync behaves as a **receive-only replica** surface.
+- If the child profile has its own PIN, that child PIN can open receive-only Accounts & Sync for that child profile only.
+- A child PIN unlock does **not** unlock broader FilterTube settings or parent controls after returning from Accounts & Sync.
+- Child profiles cannot send settings, save arbitrary peer/source trust, move backups, or manage trusted-link policy from the child surface.
+- Child profiles can join a parent/source pairing code and receive allowed updates for their own profile.
 - Core backup/import/export/account-admin controls are disabled for child profiles in the desktop UI.
-- Unlocked child surfaces also block profile rename/delete/PIN mutation and trusted parent-link edit/remove from Accounts & Sync.
+- Child surfaces also block profile rename/delete/PIN mutation and trusted parent-link edit/remove from Accounts & Sync.
 - Saved Nanah trust is still **per device link**, not per entire machine.
 - Managed reconnect can require **local approval per session** on the child/replica side through the link's `reconnectMode`.
 - Live sessions now exchange the receiver's profile inventory, and the sender can choose a specific **Remote target profile** during the session.
 - Managed links can also pin the receiver-side target to one fixed local profile for later sessions.
+- Sync status labels should identify both ends as `profile + device` so users can see which profile on which device is active before sending or applying settings.
 
 ### Plain-language child approval rule
 
@@ -312,9 +336,8 @@ LOCAL RULE
 
 The active profile and its lock state in the current UI session decide what Nanah is allowed to do.
 
-[Active = account]        -> peer or source or replica allowed
-[Active = locked child]   -> replica-only for Nanah
-[Active = unlocked child] -> may send that child profile's own scoped snapshot
+[Active = account] -> peer or source or replica allowed
+[Active = child]   -> receive-only replica for Nanah
 ```
 
 ### Default / Master
@@ -335,25 +358,25 @@ The active profile and its lock state in the current UI session decide what Nana
 ### Child profile
 
 - Should be treated as a managed surface, not a free admin surface
-- Should not be a broad Nanah sender
+- Should not be a Nanah sender from the child surface
 - Should not own full import/export or account-management actions
 - Should be the profile type most likely to receive parent/source updates through trusted managed links
 
-### Replica-first rule for child profiles
+### Replica-only rule for child profiles
 
-For Nanah, child profiles should default to replica behavior while locked:
+For Nanah, child profiles use replica behavior from the child surface:
 
 - a child profile may receive managed updates from a trusted parent/source
-- a locked child profile should not behave like a normal `source`
+- a child profile should not behave like a normal `source`
 - a child profile should not be used as an equal `peer` authority surface for persistent trust
+- child PIN access may open receive-only sync, but parent/account PIN is still needed for rule edits, backups, and trusted-link policy
 
 That keeps the child device useful for parent control without turning it into its own admin endpoint.
 
 Important scope note:
 
-- this rule is currently based on the **active profile and local lock state** in the Accounts & Sync UI session
-- if the active profile is a locked child profile, Nanah behaves replica-only for that session
-- if the active profile is an unlocked child profile, Nanah may send that child profile's own scoped snapshot
+- this rule is based on the **active profile type** in the Accounts & Sync UI session
+- if the active profile is a child profile, Nanah behaves receive-only for that session
 - this is not yet a broader device-wide “child mode” outside explicit profile context
 
 ### Permission matrix
@@ -364,8 +387,7 @@ Important scope note:
 +----------------------+---------------------------+-------------------------------+
 | Default / Master     | yes                       | peer or managed               |
 | Independent account  | yes                       | peer or managed               |
-| Locked child         | no                        | managed replica only          |
-| Unlocked child       | scoped send only          | managed replica only          |
+| Child                | no                        | receive-only managed replica  |
 +----------------------+---------------------------+-------------------------------+
 ```
 

@@ -157,9 +157,11 @@ Current rule is profile-based, not whole-device based.
 
 That means:
 
-- if the active profile in the Nanah UI is a locked child profile, that surface is replica-only
-- if the child profile is unlocked locally, it may send its own scoped snapshot
-- child profiles are still not full admin surfaces
+- if the active profile in the Nanah UI is a child profile, that surface is receive-only
+- the child PIN can open receive-only Accounts & Sync for that child profile
+- the child PIN does not unlock Dashboard, Filters, Kids Mode editing, Settings, backups, trusted-link policy, or profile management
+- parent/account PIN controls rule edits, sync policy, backups, and viewing-space policy
+- child profiles are not full admin surfaces
 
 ## Remote target profile
 
@@ -168,6 +170,28 @@ If you are doing parent control, use `Remote target profile`.
 This lets the sender choose exactly which profile on the other device should receive the update.
 
 That is the safe way to avoid sending to the wrong active profile.
+
+## Profile + device labels
+
+During a live session, FilterTube shows each side as profile plus device.
+
+Example:
+
+- `pushkal (account profile, locked) • Pixel Tablet`
+- `pussy (child profile) • Family iPad`
+
+This is only display context. The editable device label remains just the device name, but the status area shows the active profile too so you can verify the target before sending or applying settings.
+
+## Parent-managed child rules
+
+Parents should edit child rules from the parent/account surface.
+
+Use the child profile row in Accounts & Sync:
+
+- `Edit Main Rules` changes that child profile's Main YouTube rules
+- `Edit Kids Rules` changes that child profile's YouTube Kids rules
+
+This lets teenagers or younger kids keep their own profile identity while the parent keeps control over the rule list and policy.
 
 ## Backups and trusted links
 

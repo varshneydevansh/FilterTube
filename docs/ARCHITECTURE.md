@@ -65,15 +65,19 @@ LIVE SESSION
 
 ```text
 LOCKED CHILD PROFILE
-  -> replica-only surface
+  -> receive-only sync surface
 
 UNLOCKED CHILD PROFILE
-  -> may send its own scoped snapshot
-  -> still not a full admin surface
+  -> child PIN proves profile access only
+  -> still not an admin or sender surface
 
 TRUSTED PARENT LINK
   -> may update child profile under saved local child-side policy
   -> PIN stays local
+
+PARENT / ACCOUNT PROFILE
+  -> edits child Main/Kids rules by explicit child profile ID
+  -> owns policy, backups, trusted links, and viewing-space access
 ```
 
 ## Filtering Modes Architecture (v3.2.5)
