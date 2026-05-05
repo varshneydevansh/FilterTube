@@ -750,6 +750,7 @@ function enforceCurrentWatchOwnerBlock(settings) {
     try {
         const path = String(document.location?.pathname || '');
         if (!path.startsWith('/watch')) return;
+        if (String(document.location?.hostname || '').includes('youtubekids.com')) return;
 
         const ownerMeta = getCurrentWatchOwnerMeta(settings);
         if (!ownerMeta || !ownerMeta.videoId) return;
