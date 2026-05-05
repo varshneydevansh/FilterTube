@@ -500,6 +500,39 @@ html[data-theme="dark"] body::after {
     border-color: var(--ft-color-status-danger);
 }
 
+.help-item.ft-profile-row button:disabled,
+.help-item.ft-profile-row button[disabled] {
+    opacity: 0.48;
+    filter: saturate(0.45);
+    cursor: not-allowed;
+    border-style: dashed;
+    box-shadow: none;
+}
+
+.help-item.ft-profile-row .btn-primary:disabled,
+.help-item.ft-profile-row .btn-primary[disabled] {
+    color: rgba(255, 255, 255, 0.72);
+    background-image: repeating-linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.16) 0,
+        rgba(255, 255, 255, 0.16) 6px,
+        transparent 6px,
+        transparent 12px
+    );
+}
+
+.help-item.ft-profile-row .btn-secondary:disabled,
+.help-item.ft-profile-row .btn-secondary[disabled] {
+    color: var(--ft-color-text-muted);
+    background-image: repeating-linear-gradient(
+        135deg,
+        rgba(107, 114, 128, 0.12) 0,
+        rgba(107, 114, 128, 0.12) 6px,
+        transparent 6px,
+        transparent 12px
+    );
+}
+
 .help-item.ft-profile-row.ft-profile-child,
 .help-item.ft-profile-row.ft-profile-child.is-active {
     border-left-color: var(--ft-color-collab-border, #fbbf24);
