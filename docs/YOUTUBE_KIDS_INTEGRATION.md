@@ -657,10 +657,12 @@ if (action === 'FilterTube_KidsBlockChannel') {
 ### 1. Native Block from Video Card
 
 1. Navigate to YouTube Kids
-2. Find a video from channel to block
-3. Click 3-dot menu → "Block this channel"
+2. Find a video from a channel to block
+3. Use YouTube Kids' native parent-owned menu/action when it exposes "Block this channel"
 4. Verify: Channel appears in Kids tab view
 5. Verify: Videos from channel are hidden
+
+FilterTube intentionally does not add always-on quick-cross buttons or custom rule-changing 3-dot entries inside YouTube Kids. Those controls would be reachable by children, so Kids rule changes stay passive or protected in the FilterTube Kids Mode UI.
 
 ### 2. Native Block from Channel Page
 
@@ -750,4 +752,3 @@ YouTube Kids UI in FilterTube features a vibrant, child-friendly pink and purple
 │  • Shadows: rgba(236, 72, 153, 0.35)                 │
 └────────────────────────────────────────────────────────┘
 ```
-

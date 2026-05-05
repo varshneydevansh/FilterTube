@@ -1933,7 +1933,8 @@ FilterTube maintains a second profile that mirrors the main blocklists but targe
 
 - **Separate storage:** `state_manager.js` exposes `getKidsState`, `addKidsKeyword`, `addKidsChannel`, etc., which persist to `FilterTubeIO.saveProfilesV3()` under the `kids` key so main filters never leak into kids browsing.
 - **Dashboard tabs:** `tab-view.js` renders `initializeKidsTabs()` with keyword/channel managers, search & sort controls, and the same calendar presets used in the main Filters view—users can curate Kids lists without touching the main ones.
-- **Passive capture on youtubekids.com:** `content/block_channel.js` detects the native “Block this video” toast. When a parent blocks content directly inside YouTube Kids, FilterTube synthesizes a minimal channel entry and sends it to `FilterTube_KidsBlockChannel`, keeping the Kids profile in sync even if the extension UI is never opened.
+- **Passive capture on youtubekids.com:** `content/block_channel.js` detects the native “Block this video” / “Block this channel” flow. When a parent blocks content directly inside YouTube Kids, FilterTube synthesizes a minimal channel entry and sends it to `FilterTube_KidsBlockChannel`, keeping the Kids profile in sync even if the extension UI is never opened.
+- **No child-accessible quick controls:** unlike main YouTube, FilterTube does not inject always-on quick-cross or custom rule-changing 3-dot entries into YouTube Kids. Kids rule changes stay parent-owned through YouTube Kids native parent actions or the protected FilterTube Kids Mode UI.
 - **Shared enrichment safety:** the regular enrichment queue runs for Kids entries too, but because Kids browsing happens on a distinct domain, the throttle + logging described above prevent the passive capture flow from overwhelming background requests.
 
 
