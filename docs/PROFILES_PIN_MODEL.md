@@ -116,6 +116,8 @@ Key points:
 - Parent-managed edit routes target the child profile explicitly:
   - Main rules -> the child profile's Main YouTube list
   - Kids rules -> the child profile's YouTube Kids list
+- Keyword, channel, and content-control tabs must show the parent-managed child banner while this route is active.
+- The banner's done action exits the virtual child editor and returns to the parent/account surface.
 - This is the intended path for parents managing younger kids or teenagers:
   - the child keeps private viewing state and profile identity
   - the parent keeps authority over rule changes and policy

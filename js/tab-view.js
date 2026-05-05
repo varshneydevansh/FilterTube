@@ -220,6 +220,12 @@ function initializeFiltersTabs() {
     contentSearchRow.appendChild(contentControlsSearch);
     contentTab.appendChild(contentSearchRow);
 
+    const managedChildFiltersContentBanner = document.createElement('div');
+    managedChildFiltersContentBanner.id = 'managedChildFiltersContentBanner';
+    managedChildFiltersContentBanner.className = 'ft-managed-child-editor';
+    managedChildFiltersContentBanner.hidden = true;
+    contentTab.appendChild(managedChildFiltersContentBanner);
+
     const catalog = window.FilterTubeContentControlsCatalog?.getCatalog?.() || [];
     let feedRowsContainer = null;
 
@@ -822,6 +828,9 @@ function initializeFiltersTabs() {
     function saveCategoryFilters(profileType, options = {}) {
         if (isApplyingCategoryFiltersUI) return;
         const showToast = options?.showToast === true;
+        const managedState = window.__filtertubeIsManagedChildEditFor?.('main') === true
+            ? (window.__filtertubeBuildManagedChildState?.('main') || null)
+            : null;
 
         const type = 'main';
         const enabledEl = document.getElementById('categoryFilter_enabled');
@@ -835,20 +844,34 @@ function initializeFiltersTabs() {
         };
 
         const signature = computeCategoryFiltersSignature(next);
+        const priorSignature = computeCategoryFiltersSignature(managedState?.categoryFilters || StateManager.getState()?.categoryFilters || {});
         const previousSignature = lastSavedCategoryFiltersSignatureMain;
-        if (signature && signature === previousSignature) {
+        if (signature && (signature === priorSignature || (!managedState && signature === previousSignature))) {
             if (showToast && Date.now() - lastCategoryFiltersToastTs > 900) {
-                UIComponents.showToast('Category filters saved', 'success');
+                UIComponents.showToast(managedState ? 'Child category filters saved' : 'Category filters saved', 'success');
                 lastCategoryFiltersToastTs = Date.now();
             }
             return;
         }
 
         lastSavedCategoryFiltersSignatureMain = signature;
-        StateManager.updateCategoryFilters(next);
+        if (managedState) {
+            window.__filtertubeSaveManagedChildSurface?.('main', async (target, profile) => {
+                const settings = profile.settings && typeof profile.settings === 'object' && !Array.isArray(profile.settings)
+                    ? profile.settings
+                    : {};
+                profile.settings = {
+                    ...settings,
+                    categoryFilters: next
+                };
+                return true;
+            });
+        } else {
+            StateManager.updateCategoryFilters(next);
+        }
 
         if (showToast) {
-            UIComponents.showToast('Category filters saved', 'success');
+            UIComponents.showToast(managedState ? 'Child category filters saved' : 'Category filters saved', 'success');
             lastCategoryFiltersToastTs = Date.now();
         }
     }
@@ -1021,7 +1044,10 @@ function initializeFiltersTabs() {
         if (isApplyingContentFiltersUI) return;
 
         const showToast = options?.showToast === true;
-        const state = StateManager.getState();
+        const managedState = window.__filtertubeIsManagedChildEditFor?.('main') === true
+            ? (window.__filtertubeBuildManagedChildState?.('main') || null)
+            : null;
+        const state = managedState || StateManager.getState();
         const prior = state?.contentFilters || {};
 
         const durationCondition = document.querySelector('input[name="videoFilter_duration_condition"]:checked')?.value || (prior.duration?.condition || 'between');
@@ -1138,7 +1164,7 @@ function initializeFiltersTabs() {
         const mainNextSig = computeVideoFiltersSignature(next);
         const mainPriorSig = computeVideoFiltersSignature(prior);
 
-        const mainChanged = !(mainNextSig === mainPriorSig || (lastSavedVideoFiltersSignature && mainNextSig === lastSavedVideoFiltersSignature));
+        const mainChanged = !(mainNextSig === mainPriorSig || (!managedState && lastSavedVideoFiltersSignature && mainNextSig === lastSavedVideoFiltersSignature));
         if (!mainChanged) {
             return;
         }
@@ -1147,13 +1173,26 @@ function initializeFiltersTabs() {
             lastSavedVideoFiltersSignature = mainNextSig;
         }
 
-        StateManager.updateContentFilters(next)
+        const savePromise = managedState
+            ? window.__filtertubeSaveManagedChildSurface?.('main', async (target, profile) => {
+                const settings = profile.settings && typeof profile.settings === 'object' && !Array.isArray(profile.settings)
+                    ? profile.settings
+                    : {};
+                profile.settings = {
+                    ...settings,
+                    contentFilters: next
+                };
+                return true;
+            })
+            : StateManager.updateContentFilters(next);
+
+        Promise.resolve(savePromise)
             .then(() => {
                 if (!showToast) return;
                 const ts = Date.now();
                 if (ts - lastVideoFiltersToastTs < 800) return;
                 lastVideoFiltersToastTs = ts;
-                UIComponents.showToast('Video filters saved', 'success');
+                UIComponents.showToast(managedState ? 'Child video filters saved' : 'Video filters saved', 'success');
             })
             .catch((err) => {
                 console.error('Failed to save video filters:', err);
@@ -1268,20 +1307,41 @@ function initializeFiltersTabs() {
             });
         });
 
-        const state = StateManager.getState();
+        const managedState = window.__filtertubeIsManagedChildEditFor?.('main') === true
+            ? (window.__filtertubeBuildManagedChildState?.('main') || null)
+            : null;
+        const state = managedState || StateManager.getState();
         applyContentFiltersToUI(state.contentFilters || {});
         applyCategoryFiltersToUI(state.categoryFilters || {});
     }, 100);
 
     StateManager.subscribe((eventType, data) => {
         if (eventType === 'contentFiltersUpdated') {
-            applyContentFiltersToUI(data?.contentFilters || {});
+            if (window.__filtertubeIsManagedChildEditFor?.('main') === true) {
+                const managedState = window.__filtertubeBuildManagedChildState?.('main');
+                applyContentFiltersToUI(managedState?.contentFilters || {});
+            } else {
+                applyContentFiltersToUI(data?.contentFilters || {});
+            }
             updateVideoFilterUI();
         }
         if (eventType === 'categoryFiltersUpdated') {
-            applyCategoryFiltersToUI(data?.categoryFilters || {});
+            if (window.__filtertubeIsManagedChildEditFor?.('main') === true) {
+                const managedState = window.__filtertubeBuildManagedChildState?.('main');
+                applyCategoryFiltersToUI(managedState?.categoryFilters || {});
+            } else {
+                applyCategoryFiltersToUI(data?.categoryFilters || {});
+            }
         }
     });
+
+    try {
+        window.__filtertubeApplyMainContentControls = (contentFilters = {}, categoryFilters = {}) => {
+            applyContentFiltersToUI(contentFilters || {});
+            applyCategoryFiltersToUI(categoryFilters || {});
+        };
+    } catch (e) {
+    }
 
     // Create tabs
     const tabs = UIComponents.createTabs({
@@ -1482,6 +1542,12 @@ function initializeKidsTabs() {
 
     kidsContentSearchRow.appendChild(kidsContentControlsSearch);
     kidsContentTab.appendChild(kidsContentSearchRow);
+
+    const managedChildKidsContentBanner = document.createElement('div');
+    managedChildKidsContentBanner.id = 'managedChildKidsContentBanner';
+    managedChildKidsContentBanner.className = 'ft-managed-child-editor';
+    managedChildKidsContentBanner.hidden = true;
+    kidsContentTab.appendChild(managedChildKidsContentBanner);
 
     const kidsVideoFiltersSection = document.createElement('div');
     kidsVideoFiltersSection.className = 'content-control-group video-filters-section';
@@ -1992,15 +2058,25 @@ function initializeKidsTabs() {
     function saveKidsCategoryFilters(options = {}) {
         if (isApplyingKidsUi) return;
         const showToast = options?.showToast === true;
+        const managedState = window.__filtertubeIsManagedChildEditFor?.('kids') === true
+            ? (window.__filtertubeBuildManagedChildState?.('kids') || null)
+            : null;
         const next = {
             enabled: !!kidsCategoryEnabled?.checked,
             mode: kidsCategoryMode?.value === 'allow' ? 'allow' : 'block',
             selected: normalizeSelectedArray(kidsCategorySelected)
         };
 
-        StateManager.updateKidsCategoryFilters(next)
+        const savePromise = managedState
+            ? window.__filtertubeSaveManagedChildSurface?.('kids', async (target) => {
+                target.categoryFilters = next;
+                return true;
+            })
+            : StateManager.updateKidsCategoryFilters(next);
+
+        Promise.resolve(savePromise)
             .then(() => {
-                if (showToast) UIComponents.showToast('Kids category filters saved', 'success');
+                if (showToast) UIComponents.showToast(managedState ? 'Child Kids category filters saved' : 'Kids category filters saved', 'success');
             })
             .catch(() => {
                 if (showToast) UIComponents.showToast('Failed to save kids category filters', 'error');
@@ -2076,7 +2152,10 @@ function initializeKidsTabs() {
     function saveKidsVideoFilters(options = {}) {
         if (isApplyingKidsUi) return;
         const showToast = options?.showToast === true;
-        const state = StateManager.getState();
+        const managedState = window.__filtertubeIsManagedChildEditFor?.('kids') === true
+            ? (window.__filtertubeBuildManagedChildState?.('kids') || null)
+            : null;
+        const state = managedState || StateManager.getState();
         const prior = state?.kids?.contentFilters || {};
 
         const durationCondition = document.querySelector('input[name="kidsVideoFilter_duration_condition"]:checked')?.value || (prior.duration?.condition || 'between');
@@ -2192,18 +2271,25 @@ function initializeKidsTabs() {
 
         const nextSig = computeSignature(next);
         const priorSig = computeSignature(prior);
-        if (nextSig === priorSig || (lastSavedKidsVideoFiltersSignature && nextSig === lastSavedKidsVideoFiltersSignature)) {
+        if (nextSig === priorSig || (!managedState && lastSavedKidsVideoFiltersSignature && nextSig === lastSavedKidsVideoFiltersSignature)) {
             return;
         }
         lastSavedKidsVideoFiltersSignature = nextSig;
 
-        StateManager.updateKidsContentFilters(next)
+        const savePromise = managedState
+            ? window.__filtertubeSaveManagedChildSurface?.('kids', async (target) => {
+                target.contentFilters = next;
+                return true;
+            })
+            : StateManager.updateKidsContentFilters(next);
+
+        Promise.resolve(savePromise)
             .then(() => {
                 if (!showToast) return;
                 const ts = Date.now();
                 if (ts - lastKidsVideoFiltersToastTs < 800) return;
                 lastKidsVideoFiltersToastTs = ts;
-                UIComponents.showToast('Kids video filters saved', 'success');
+                UIComponents.showToast(managedState ? 'Child Kids video filters saved' : 'Kids video filters saved', 'success');
             })
             .catch(() => {
                 if (showToast) UIComponents.showToast('Failed to save kids video filters', 'error');
@@ -2403,7 +2489,10 @@ function initializeKidsTabs() {
     }
 
     try {
-        const state = StateManager.getState();
+        const managedState = window.__filtertubeIsManagedChildEditFor?.('kids') === true
+            ? (window.__filtertubeBuildManagedChildState?.('kids') || null)
+            : null;
+        const state = managedState || StateManager.getState();
         applyKidsVideoFiltersToUI(state?.kids?.contentFilters || {});
         applyKidsCategoryFiltersToUI(state?.kids?.categoryFilters || {});
     } catch (e) {
@@ -2411,12 +2500,30 @@ function initializeKidsTabs() {
 
     StateManager.subscribe((eventType, data) => {
         if (eventType === 'kidsContentFiltersUpdated') {
-            applyKidsVideoFiltersToUI(data?.contentFilters || {});
+            if (window.__filtertubeIsManagedChildEditFor?.('kids') === true) {
+                const managedState = window.__filtertubeBuildManagedChildState?.('kids');
+                applyKidsVideoFiltersToUI(managedState?.kids?.contentFilters || {});
+            } else {
+                applyKidsVideoFiltersToUI(data?.contentFilters || {});
+            }
         }
         if (eventType === 'kidsCategoryFiltersUpdated') {
-            applyKidsCategoryFiltersToUI(data?.categoryFilters || {});
+            if (window.__filtertubeIsManagedChildEditFor?.('kids') === true) {
+                const managedState = window.__filtertubeBuildManagedChildState?.('kids');
+                applyKidsCategoryFiltersToUI(managedState?.kids?.categoryFilters || {});
+            } else {
+                applyKidsCategoryFiltersToUI(data?.categoryFilters || {});
+            }
         }
     });
+
+    try {
+        window.__filtertubeApplyKidsContentControls = (contentFilters = {}, categoryFilters = {}) => {
+            applyKidsVideoFiltersToUI(contentFilters || {});
+            applyKidsCategoryFiltersToUI(categoryFilters || {});
+        };
+    } catch (e) {
+    }
 }
 // Expose for safety in case other modules call it
 window.initializeKidsTabs = initializeKidsTabs;
@@ -4111,20 +4218,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         return profileId ? profiles[profileId] : null;
     }
 
+    function getManagedChildSettings(profile) {
+        return clonePlain(safeObject(profile?.settings), {});
+    }
+
     function buildManagedChildState(surface) {
         const profile = getManagedChildProfile();
         if (!profile) return null;
         const current = StateManager.getState() || {};
+        const settings = getManagedChildSettings(profile);
         if (surface === 'kids') {
             return {
                 ...current,
+                ...settings,
                 kids: getProfileSurface(profile, 'kids'),
-                syncKidsToMain: false
+                syncKidsToMain: settings.syncKidsToMain === true
             };
         }
         const main = getProfileSurface(profile, 'main');
         return {
             ...current,
+            ...settings,
             mode: main.mode,
             keywords: main.keywords,
             userKeywords: main.keywords.filter(entry => entry?.source !== 'channel'),
@@ -4132,7 +4246,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             whitelistKeywords: main.whitelistKeywords,
             userWhitelistKeywords: main.whitelistKeywords.filter(entry => entry?.source !== 'channel'),
             whitelistChannels: main.whitelistChannels,
-            syncKidsToMain: false
+            contentFilters: clonePlain(settings.contentFilters, {}),
+            categoryFilters: clonePlain(settings.categoryFilters, {}),
+            syncKidsToMain: settings.syncKidsToMain === true
         };
     }
 
@@ -4172,14 +4288,33 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderKidsKeywords();
         renderKidsChannels();
         renderListModeControls();
+        updateCheckboxes();
+        try {
+            const settings = safeObject(profile.settings);
+            const applyMain = window.__filtertubeApplyMainContentControls;
+            const applyKids = window.__filtertubeApplyKidsContentControls;
+            if (surface === 'kids' && typeof applyKids === 'function') {
+                applyKids(nextSurface.contentFilters || {}, nextSurface.categoryFilters || {});
+            } else if (surface !== 'kids' && typeof applyMain === 'function') {
+                applyMain(settings.contentFilters || {}, settings.categoryFilters || {});
+            }
+        } catch (e) {
+        }
         updateStats();
         return true;
     }
 
+    try {
+        window.__filtertubeIsManagedChildEditFor = isManagedChildEditFor;
+        window.__filtertubeBuildManagedChildState = buildManagedChildState;
+        window.__filtertubeSaveManagedChildSurface = saveManagedChildSurface;
+    } catch (e) {
+    }
+
     function renderManagedChildEditorBanner() {
         const ids = {
-            main: ['managedChildFiltersBanner', 'managedChildFiltersChannelBanner'],
-            kids: ['managedChildKidsBanner', 'managedChildKidsChannelBanner']
+            main: ['managedChildFiltersBanner', 'managedChildFiltersChannelBanner', 'managedChildFiltersContentBanner'],
+            kids: ['managedChildKidsBanner', 'managedChildKidsChannelBanner', 'managedChildKidsContentBanner']
         };
         const renderFor = (surface) => {
             const active = isManagedChildEditFor(surface);
@@ -4205,7 +4340,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const closeBtn = document.createElement('button');
                 closeBtn.type = 'button';
                 closeBtn.className = 'btn-secondary';
-                closeBtn.textContent = 'Done';
+                closeBtn.textContent = 'Done editing child';
                 closeBtn.addEventListener('click', () => {
                     managedChildEdit = null;
                     renderManagedChildEditorBanner();
@@ -4214,6 +4349,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                     renderKidsKeywords();
                     renderKidsChannels();
                     renderListModeControls();
+                    updateCheckboxes();
+                    try {
+                        const state = StateManager.getState() || {};
+                        const applyMain = window.__filtertubeApplyMainContentControls;
+                        const applyKids = window.__filtertubeApplyKidsContentControls;
+                        if (typeof applyMain === 'function') applyMain(state.contentFilters || {}, state.categoryFilters || {});
+                        if (typeof applyKids === 'function') applyKids(state?.kids?.contentFilters || {}, state?.kids?.categoryFilters || {});
+                    } catch (e) {
+                    }
                     switchView('sync');
                 });
 
@@ -4250,6 +4394,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderKidsKeywords();
         renderKidsChannels();
         renderListModeControls();
+        updateCheckboxes();
+        try {
+            const managedState = buildManagedChildState(targetSurface) || {};
+            const applyMain = window.__filtertubeApplyMainContentControls;
+            const applyKids = window.__filtertubeApplyKidsContentControls;
+            if (targetSurface === 'kids' && typeof applyKids === 'function') {
+                applyKids(managedState?.kids?.contentFilters || {}, managedState?.kids?.categoryFilters || {});
+            } else if (typeof applyMain === 'function') {
+                applyMain(managedState.contentFilters || {}, managedState.categoryFilters || {});
+            }
+        } catch (e) {
+        }
         switchView(targetSurface === 'kids' ? 'kids' : 'filters');
     }
 
@@ -10504,18 +10660,26 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function updateCheckboxes() {
-        const state = StateManager.getState();
+        const baseState = StateManager.getState();
+        const mainManagedState = window.__filtertubeIsManagedChildEditFor?.('main') === true
+            ? (window.__filtertubeBuildManagedChildState?.('main') || null)
+            : null;
+        const kidsManagedState = window.__filtertubeIsManagedChildEditFor?.('kids') === true
+            ? (window.__filtertubeBuildManagedChildState?.('kids') || null)
+            : null;
         const locked = isUiLocked();
 
         allSettingCheckboxes.forEach(el => {
             const key = el.getAttribute('data-ft-setting');
             if (!key) return;
-            el.checked = !!state[key];
+            const surfaceState = el.closest('#kidsView') ? (kidsManagedState || baseState) : (mainManagedState || baseState);
+            el.checked = !!surfaceState[key];
             el.disabled = locked;
         });
 
         const filterCommentsEl = contentControlsContainer?.querySelector('input[data-ft-setting="filterComments"]') || null;
         if (filterCommentsEl) {
+            const state = mainManagedState || baseState;
             filterCommentsEl.checked = state.hideComments ? false : !!state.filterComments;
             filterCommentsEl.disabled = locked || !!state.hideComments;
         }
@@ -11228,6 +11392,27 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             const key = el.getAttribute('data-ft-setting');
             if (!key) return;
+            const surface = el.closest('#kidsView') ? 'kids' : 'main';
+            if (window.__filtertubeIsManagedChildEditFor?.(surface) === true) {
+                const saved = await window.__filtertubeSaveManagedChildSurface?.(surface, async (target, profile) => {
+                    const settings = profile.settings && typeof profile.settings === 'object' && !Array.isArray(profile.settings)
+                        ? profile.settings
+                        : {};
+                    profile.settings = {
+                        ...settings,
+                        [key]: !!el.checked
+                    };
+                    if (key === 'hideComments' && el.checked === true) {
+                        profile.settings.filterComments = false;
+                    }
+                    return true;
+                });
+                if (saved) {
+                    UIComponents.showToast(surface === 'kids' ? 'Child Kids setting saved' : 'Child Main setting saved', 'success');
+                }
+                updateCheckboxes();
+                return;
+            }
             await StateManager.updateSetting(key, el.checked);
         });
     });
