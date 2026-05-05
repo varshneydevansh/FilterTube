@@ -120,6 +120,7 @@ function initializeFiltersTabs() {
             <input type="text" id="keywordInput" class="text-input" placeholder="Enter keyword to filter..." />
             <button id="addKeywordBtn" class="btn-primary">Add Keyword</button>
         </div>
+        <div id="managedChildFiltersBanner" class="ft-managed-child-editor" hidden></div>
 
         <div class="filter-controls">
             <input type="text" id="searchKeywords" class="search-input" placeholder="Search keywords..." />
@@ -162,6 +163,7 @@ function initializeFiltersTabs() {
             <input type="text" id="channelInput" class="text-input" placeholder="@handle, Channel ID.. or c/ChannelName" />
             <button id="addChannelBtn" class="btn-primary">Add Channel</button>
         </div>
+        <div id="managedChildFiltersChannelBanner" class="ft-managed-child-editor" hidden></div>
 
         <div class="filter-controls">
             <input type="text" id="searchChannels" class="search-input" placeholder="Search channels..." />
@@ -1387,6 +1389,7 @@ function initializeKidsTabs() {
             <input type="text" id="kidsKeywordInput" class="text-input" placeholder="Enter keyword to block on Kids..." />
             <button id="kidsAddKeywordBtn" class="btn-primary">Add Keyword</button>
         </div>
+        <div id="managedChildKidsBanner" class="ft-managed-child-editor" hidden></div>
 
         <div class="filter-controls">
             <input type="text" id="kidsSearchKeywords" class="search-input" placeholder="Search keywords..." />
@@ -1429,6 +1432,7 @@ function initializeKidsTabs() {
             <input type="text" id="kidsChannelInput" class="text-input" placeholder="@handle, Channel ID, or c/ChannelName" />
             <button id="kidsAddChannelBtn" class="btn-primary">Add Channel</button>
         </div>
+        <div id="managedChildKidsChannelBanner" class="ft-managed-child-editor" hidden></div>
 
         <div class="filter-controls">
             <input type="text" id="kidsSearchChannels" class="search-input" placeholder="Search channels..." />
@@ -2889,6 +2893,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let activeProfileId = 'default';
     let profilesV4Cache = null;
     let isHandlingProfileSwitch = false;
+    let managedChildEdit = null;
     let sessionMasterPin = '';
     const unlockedProfiles = new Set();
     const NANAH_TRUSTED_LINKS_KEY = 'ftNanahTrustedLinks';
@@ -3984,6 +3989,268 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (access.main) return 'Main only';
         if (access.kids) return 'Kids only';
         return 'No viewing spaces';
+    }
+
+    function canActiveProfileManageProfile(profilesV4, targetProfileId) {
+        const targetId = normalizeString(targetProfileId);
+        const currentActive = normalizeString(profilesV4?.activeProfileId) || activeProfileId || 'default';
+        if (!targetId || getProfileType(profilesV4, currentActive) === 'child') return false;
+        return currentActive === 'default' ||
+            currentActive === targetId ||
+            getParentAccountId(profilesV4, targetId) === currentActive;
+    }
+
+    function clonePlain(value, fallback) {
+        if (Array.isArray(value)) return value.map(item => safeObject(item) === item ? { ...item } : item);
+        if (value && typeof value === 'object') return { ...value };
+        return fallback;
+    }
+
+    function normalizeProfileKeyword(word, options = {}) {
+        const trimmed = normalizeString(word);
+        if (!trimmed) return null;
+        return {
+            word: trimmed,
+            exact: options.exact === true,
+            semantic: options.semantic === true,
+            source: options.source || 'user',
+            channelRef: options.channelRef || null,
+            comments: Object.prototype.hasOwnProperty.call(options, 'comments') ? options.comments !== false : true,
+            addedAt: Date.now()
+        };
+    }
+
+    function normalizeProfileChannel(input) {
+        const raw = normalizeString(input);
+        if (!raw) return null;
+        const lower = raw.toLowerCase();
+        const isUrl = lower.includes('youtube.com') || lower.includes('youtu.be');
+        const isHandle = raw.startsWith('@');
+        const isUc = lower.startsWith('uc') || lower.startsWith('channel/uc');
+        const customUrl = lower.startsWith('c/') || lower.startsWith('/c/')
+            ? raw.replace(/^\/?c\//i, 'c/')
+            : (lower.startsWith('user/') || lower.startsWith('/user/')
+                ? raw.replace(/^\/?user\//i, 'user/')
+                : null);
+        if (!isHandle && !isUc && !isUrl && !customUrl) return null;
+
+        return {
+            name: raw,
+            id: isUc ? raw.replace(/^channel\//i, '') : (customUrl || raw),
+            handle: isHandle ? raw : null,
+            customUrl,
+            originalInput: raw,
+            source: 'user',
+            filterAll: false,
+            addedAt: Date.now()
+        };
+    }
+
+    function getProfileSurface(profile, surface) {
+        const key = surface === 'kids' ? 'kids' : 'main';
+        const source = safeObject(profile?.[key]);
+        if (key === 'kids') {
+            return {
+                mode: source.mode === 'whitelist' ? 'whitelist' : 'blocklist',
+                blockedKeywords: Array.isArray(source.blockedKeywords) ? clonePlain(source.blockedKeywords, []) : [],
+                blockedChannels: Array.isArray(source.blockedChannels) ? clonePlain(source.blockedChannels, []) : [],
+                whitelistKeywords: Array.isArray(source.whitelistKeywords) ? clonePlain(source.whitelistKeywords, []) : [],
+                whitelistChannels: Array.isArray(source.whitelistChannels) ? clonePlain(source.whitelistChannels, []) : [],
+                strictMode: source.strictMode !== false,
+                videoIds: Array.isArray(source.videoIds) ? clonePlain(source.videoIds, []) : [],
+                subscriptions: Array.isArray(source.subscriptions) ? clonePlain(source.subscriptions, []) : [],
+                contentFilters: clonePlain(source.contentFilters, {}),
+                categoryFilters: clonePlain(source.categoryFilters, {})
+            };
+        }
+        return {
+            mode: source.mode === 'whitelist' ? 'whitelist' : 'blocklist',
+            keywords: Array.isArray(source.keywords) ? clonePlain(source.keywords, []) : (Array.isArray(source.blockedKeywords) ? clonePlain(source.blockedKeywords, []) : []),
+            channels: Array.isArray(source.channels) ? clonePlain(source.channels, []) : (Array.isArray(source.blockedChannels) ? clonePlain(source.blockedChannels, []) : []),
+            whitelistKeywords: Array.isArray(source.whitelistKeywords) ? clonePlain(source.whitelistKeywords, []) : [],
+            whitelistChannels: Array.isArray(source.whitelistChannels) ? clonePlain(source.whitelistChannels, []) : []
+        };
+    }
+
+    function setProfileSurface(profile, surface, nextSurface) {
+        const key = surface === 'kids' ? 'kids' : 'main';
+        const existing = safeObject(profile?.[key]);
+        if (key === 'kids') {
+            return {
+                ...profile,
+                kids: {
+                    ...existing,
+                    ...nextSurface,
+                    mode: nextSurface.mode === 'whitelist' ? 'whitelist' : 'blocklist'
+                }
+            };
+        }
+        return {
+            ...profile,
+            main: {
+                ...existing,
+                ...nextSurface,
+                blockedKeywords: Array.isArray(nextSurface.keywords) ? nextSurface.keywords : (Array.isArray(nextSurface.blockedKeywords) ? nextSurface.blockedKeywords : []),
+                blockedChannels: Array.isArray(nextSurface.channels) ? nextSurface.channels : (Array.isArray(nextSurface.blockedChannels) ? nextSurface.blockedChannels : []),
+                mode: nextSurface.mode === 'whitelist' ? 'whitelist' : 'blocklist'
+            }
+        };
+    }
+
+    function managedChildEditSurface() {
+        return managedChildEdit?.surface === 'kids' ? 'kids' : 'main';
+    }
+
+    function isManagedChildEditFor(surface) {
+        return !!managedChildEdit && managedChildEditSurface() === (surface === 'kids' ? 'kids' : 'main');
+    }
+
+    function getManagedChildProfile() {
+        const profiles = safeObject(profilesV4Cache?.profiles);
+        const profileId = normalizeString(managedChildEdit?.profileId);
+        return profileId ? profiles[profileId] : null;
+    }
+
+    function buildManagedChildState(surface) {
+        const profile = getManagedChildProfile();
+        if (!profile) return null;
+        const current = StateManager.getState() || {};
+        if (surface === 'kids') {
+            return {
+                ...current,
+                kids: getProfileSurface(profile, 'kids'),
+                syncKidsToMain: false
+            };
+        }
+        const main = getProfileSurface(profile, 'main');
+        return {
+            ...current,
+            mode: main.mode,
+            keywords: main.keywords,
+            userKeywords: main.keywords.filter(entry => entry?.source !== 'channel'),
+            channels: main.channels,
+            whitelistKeywords: main.whitelistKeywords,
+            userWhitelistKeywords: main.whitelistKeywords.filter(entry => entry?.source !== 'channel'),
+            whitelistChannels: main.whitelistChannels,
+            syncKidsToMain: false
+        };
+    }
+
+    async function saveManagedChildSurface(surface, mutator) {
+        const profileId = normalizeString(managedChildEdit?.profileId);
+        if (!profileId) return false;
+        const io = window.FilterTubeIO || {};
+        if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
+            UIComponents.showToast('Profiles unavailable', 'error');
+            return false;
+        }
+        const fresh = await io.loadProfilesV4();
+        if (!canActiveProfileManageProfile(fresh, profileId)) {
+            managedChildEdit = null;
+            UIComponents.showToast('Switch to the parent account to edit this child profile', 'error');
+            return false;
+        }
+        const profiles = safeObject(fresh.profiles);
+        const profile = safeObject(profiles[profileId]);
+        if (!profiles[profileId]) return false;
+        const nextSurface = getProfileSurface(profile, surface);
+        const result = await mutator(nextSurface, profile);
+        if (result === false) return false;
+
+        profiles[profileId] = setProfileSurface(profile, surface, nextSurface);
+        await io.saveProfilesV4({
+            ...fresh,
+            schemaVersion: 4,
+            profiles
+        });
+        profilesV4Cache = { ...fresh, schemaVersion: 4, profiles };
+        await StateManager.loadSettings({ notify: false, resetEnrichment: false, scheduleEnrichment: false });
+        renderProfilesManager(profilesV4Cache);
+        renderManagedChildEditorBanner();
+        renderKeywords();
+        renderChannels();
+        renderKidsKeywords();
+        renderKidsChannels();
+        renderListModeControls();
+        updateStats();
+        return true;
+    }
+
+    function renderManagedChildEditorBanner() {
+        const ids = {
+            main: ['managedChildFiltersBanner', 'managedChildFiltersChannelBanner'],
+            kids: ['managedChildKidsBanner', 'managedChildKidsChannelBanner']
+        };
+        const renderFor = (surface) => {
+            const active = isManagedChildEditFor(surface);
+            const profile = active ? getManagedChildProfile() : null;
+            ids[surface].forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.innerHTML = '';
+                el.hidden = !active || !profile;
+                if (!active || !profile) return;
+
+                const copy = document.createElement('div');
+                copy.className = 'ft-managed-child-editor__copy';
+                const title = document.createElement('strong');
+                title.textContent = `Editing child profile: ${normalizeString(profile.name) || 'Child'}`;
+                const body = document.createElement('span');
+                body.textContent = surface === 'kids'
+                    ? 'You are editing this child’s YouTube Kids rules without switching profiles.'
+                    : 'You are editing this child’s Main YouTube rules without switching profiles.';
+                copy.appendChild(title);
+                copy.appendChild(body);
+
+                const closeBtn = document.createElement('button');
+                closeBtn.type = 'button';
+                closeBtn.className = 'btn-secondary';
+                closeBtn.textContent = 'Done';
+                closeBtn.addEventListener('click', () => {
+                    managedChildEdit = null;
+                    renderManagedChildEditorBanner();
+                    renderKeywords();
+                    renderChannels();
+                    renderKidsKeywords();
+                    renderKidsChannels();
+                    renderListModeControls();
+                    switchView('sync');
+                });
+
+                el.appendChild(copy);
+                el.appendChild(closeBtn);
+            });
+        };
+        renderFor('main');
+        renderFor('kids');
+    }
+
+    async function startManagedChildEdit(profileId, surface) {
+        const targetId = normalizeString(profileId);
+        const targetSurface = surface === 'kids' ? 'kids' : 'main';
+        const io = window.FilterTubeIO || {};
+        if (!targetId || typeof io.loadProfilesV4 !== 'function') return;
+        const fresh = await io.loadProfilesV4();
+        if (getProfileType(fresh, targetId) !== 'child') {
+            UIComponents.showToast('Managed editing is for child profiles', 'error');
+            return;
+        }
+        if (!canActiveProfileManageProfile(fresh, targetId)) {
+            UIComponents.showToast('Switch to the parent account to edit this child profile', 'error');
+            return;
+        }
+        const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
+        const ok = await ensureProfileUnlocked(fresh, currentActive);
+        if (!ok) return;
+        profilesV4Cache = fresh;
+        managedChildEdit = { profileId: targetId, surface: targetSurface };
+        renderManagedChildEditorBanner();
+        renderKeywords();
+        renderChannels();
+        renderKidsKeywords();
+        renderKidsChannels();
+        renderListModeControls();
+        switchView(targetSurface === 'kids' ? 'kids' : 'filters');
     }
 
     function updateAdminPolicyControls() {
@@ -8193,6 +8460,38 @@ document.addEventListener('DOMContentLoaded', async () => {
             actions.appendChild(mainAccessBtn);
             actions.appendChild(kidsAccessBtn);
 
+            const canManageTarget = canActiveProfileManageProfile(profilesV4, profileId);
+            if (type === 'child' && canManageTarget && !childAdminRestricted) {
+                const editMainBtn = document.createElement('button');
+                editMainBtn.className = access.main ? 'btn-secondary btn-profile-main' : 'btn-secondary';
+                editMainBtn.type = 'button';
+                editMainBtn.textContent = 'Edit Main Rules';
+                editMainBtn.disabled = !access.main;
+                editMainBtn.title = access.main
+                    ? 'Edit this child profile’s Main YouTube rules without switching profiles.'
+                    : 'Main YouTube is blocked for this child profile.';
+                editMainBtn.addEventListener('click', async () => {
+                    if (!access.main) return;
+                    await startManagedChildEdit(profileId, 'main');
+                });
+
+                const editKidsBtn = document.createElement('button');
+                editKidsBtn.className = access.kids ? 'btn-secondary btn-profile-kids' : 'btn-secondary';
+                editKidsBtn.type = 'button';
+                editKidsBtn.textContent = 'Edit Kids Rules';
+                editKidsBtn.disabled = !access.kids;
+                editKidsBtn.title = access.kids
+                    ? 'Edit this child profile’s YouTube Kids rules without switching profiles.'
+                    : 'YouTube Kids is blocked for this child profile.';
+                editKidsBtn.addEventListener('click', async () => {
+                    if (!access.kids) return;
+                    await startManagedChildEdit(profileId, 'kids');
+                });
+
+                actions.appendChild(editMainBtn);
+                actions.appendChild(editKidsBtn);
+            }
+
             if (profileId !== 'default') {
                 const pinBtn = document.createElement('button');
                 pinBtn.className = 'btn-secondary';
@@ -8389,6 +8688,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 activeProfileId: targetId,
                 profiles
             });
+            managedChildEdit = null;
             await StateManager.loadSettings();
             await refreshProfilesUI();
             updateStats();
@@ -9400,7 +9700,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
 
             await refreshProfilesUI();
-            UIComponents.showToast('Child profile created. Parent profile remains active so you can finish setup.', 'success');
+            UIComponents.showToast('Account created. Current profile remains active.', 'success');
             try {
                 const fresh = profilesV4Cache;
                 const root = safeObject(fresh);
@@ -9508,7 +9808,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
 
             await refreshProfilesUI();
-            await switchToProfile(candidate);
+            UIComponents.showToast('Child profile created. Parent profile remains active so you can finish setup.', 'success');
             try {
                 const fresh = profilesV4Cache;
                 const root = safeObject(fresh);
@@ -9821,6 +10121,114 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    async function addManagedKeyword(surface, word) {
+        return saveManagedChildSurface(surface, async (target) => {
+            const listKey = surface === 'kids'
+                ? (target.mode === 'whitelist' ? 'whitelistKeywords' : 'blockedKeywords')
+                : (target.mode === 'whitelist' ? 'whitelistKeywords' : 'keywords');
+            const list = Array.isArray(target[listKey]) ? target[listKey] : [];
+            const entry = normalizeProfileKeyword(word, { comments: surface !== 'kids' });
+            if (!entry) return false;
+            const lower = entry.word.toLowerCase();
+            if (list.some(item => normalizeString(item?.word).toLowerCase() === lower)) return false;
+            target[listKey] = [entry, ...list];
+            return true;
+        });
+    }
+
+    async function removeManagedKeyword(surface, entry) {
+        return saveManagedChildSurface(surface, async (target) => {
+            const listKey = surface === 'kids'
+                ? (target.mode === 'whitelist' ? 'whitelistKeywords' : 'blockedKeywords')
+                : (target.mode === 'whitelist' ? 'whitelistKeywords' : 'keywords');
+            const list = Array.isArray(target[listKey]) ? target[listKey] : [];
+            const word = normalizeString(entry?.word);
+            const before = list.length;
+            target[listKey] = list.filter(item => normalizeString(item?.word) !== word || item?.source === 'channel');
+            return target[listKey].length !== before;
+        });
+    }
+
+    async function toggleManagedKeywordExact(surface, entry) {
+        return saveManagedChildSurface(surface, async (target) => {
+            const listKey = surface === 'kids'
+                ? (target.mode === 'whitelist' ? 'whitelistKeywords' : 'blockedKeywords')
+                : (target.mode === 'whitelist' ? 'whitelistKeywords' : 'keywords');
+            const list = Array.isArray(target[listKey]) ? target[listKey] : [];
+            const word = normalizeString(entry?.word);
+            const index = list.findIndex(item => normalizeString(item?.word) === word && item?.source !== 'channel');
+            if (index < 0) return false;
+            list[index] = { ...safeObject(list[index]), word, exact: !list[index]?.exact };
+            target[listKey] = list;
+            return true;
+        });
+    }
+
+    async function toggleManagedKeywordComments(surface, entry) {
+        if (surface === 'kids') return false;
+        return saveManagedChildSurface(surface, async (target) => {
+            const listKey = target.mode === 'whitelist' ? 'whitelistKeywords' : 'keywords';
+            const list = Array.isArray(target[listKey]) ? target[listKey] : [];
+            const word = normalizeString(entry?.word);
+            const index = list.findIndex(item => normalizeString(item?.word) === word);
+            if (index < 0) return false;
+            const current = safeObject(list[index]);
+            list[index] = { ...current, word, comments: current.comments === false };
+            target[listKey] = list;
+            return true;
+        });
+    }
+
+    async function addManagedChannel(surface, input) {
+        const ok = await saveManagedChildSurface(surface, async (target) => {
+            const listKey = surface === 'kids'
+                ? (target.mode === 'whitelist' ? 'whitelistChannels' : 'blockedChannels')
+                : (target.mode === 'whitelist' ? 'whitelistChannels' : 'channels');
+            const list = Array.isArray(target[listKey]) ? target[listKey] : [];
+            const channel = normalizeProfileChannel(input);
+            if (!channel) {
+                UIComponents.showToast('Invalid format. Use @handle, Channel ID, c/ChannelName, or YouTube URL', 'error');
+                return false;
+            }
+            const key = normalizeString(channel.id || channel.handle || channel.customUrl || channel.name).toLowerCase();
+            const exists = list.some(item => normalizeString(item?.id || item?.handle || item?.customUrl || item?.name).toLowerCase() === key);
+            if (exists) return false;
+            target[listKey] = [channel, ...list];
+            return true;
+        });
+        return ok ? { success: true } : { success: false, error: 'Channel already exists or could not be added' };
+    }
+
+    async function removeManagedChannel(surface, channel, index) {
+        return saveManagedChildSurface(surface, async (target) => {
+            const listKey = surface === 'kids'
+                ? (target.mode === 'whitelist' ? 'whitelistChannels' : 'blockedChannels')
+                : (target.mode === 'whitelist' ? 'whitelistChannels' : 'channels');
+            const list = Array.isArray(target[listKey]) ? target[listKey] : [];
+            if (index < 0 || index >= list.length) return false;
+            list.splice(index, 1);
+            target[listKey] = list;
+            return true;
+        });
+    }
+
+    async function toggleManagedChannelFilterAll(surface, channel, index) {
+        const state = buildManagedChildState(surface);
+        const mode = surface === 'kids'
+            ? (state?.kids?.mode === 'whitelist' ? 'whitelist' : 'blocklist')
+            : (state?.mode === 'whitelist' ? 'whitelist' : 'blocklist');
+        if (mode === 'whitelist') return false;
+
+        return saveManagedChildSurface(surface, async (target) => {
+            const listKey = surface === 'kids' ? 'blockedChannels' : 'channels';
+            const list = Array.isArray(target[listKey]) ? target[listKey] : [];
+            if (index < 0 || index >= list.length) return false;
+            list[index] = { ...safeObject(list[index]), filterAll: !list[index]?.filterAll };
+            target[listKey] = list;
+            return true;
+        });
+    }
+
     function renderKeywords() {
         if (!keywordListEl) return;
         RenderEngine.renderKeywordList(keywordListEl, {
@@ -9830,8 +10238,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             searchValue: keywordSearchValue,
             sortValue: keywordSortValue,
             dateFrom: keywordDateFromTs,
-            dateTo: keywordDateToTs
+            dateTo: keywordDateToTs,
+            stateOverride: isManagedChildEditFor('main') ? buildManagedChildState('main') : null,
+            onDelete: isManagedChildEditFor('main') ? (entry) => removeManagedKeyword('main', entry) : null,
+            onToggleExact: isManagedChildEditFor('main') ? (entry) => toggleManagedKeywordExact('main', entry) : null,
+            onToggleComments: isManagedChildEditFor('main') ? (entry) => toggleManagedKeywordComments('main', entry) : null
         });
+        renderManagedChildEditorBanner();
     }
 
     function renderChannels() {
@@ -9844,8 +10257,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             searchValue: channelSearchValue,
             sortValue: channelSortValue,
             dateFrom: channelDateFromTs,
-            dateTo: channelDateToTs
+            dateTo: channelDateToTs,
+            stateOverride: isManagedChildEditFor('main') ? buildManagedChildState('main') : null,
+            onDelete: isManagedChildEditFor('main') ? (channel, index) => removeManagedChannel('main', channel, index) : null,
+            onToggleFilterAll: isManagedChildEditFor('main') ? (channel, index) => toggleManagedChannelFilterAll('main', channel, index) : null
         });
+        renderManagedChildEditorBanner();
     }
 
     function renderKidsKeywords() {
@@ -9859,8 +10276,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             dateFrom: kidsKeywordDateFromTs,
             dateTo: kidsKeywordDateToTs,
             profile: 'kids',
-            includeToggles: true
+            includeToggles: true,
+            stateOverride: isManagedChildEditFor('kids') ? buildManagedChildState('kids') : null,
+            onDelete: isManagedChildEditFor('kids') ? (entry) => removeManagedKeyword('kids', entry) : null,
+            onToggleExact: isManagedChildEditFor('kids') ? (entry) => toggleManagedKeywordExact('kids', entry) : null
         });
+        renderManagedChildEditorBanner();
     }
 
     function renderKidsChannels() {
@@ -9874,8 +10295,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             sortValue: kidsChannelSortValue,
             dateFrom: kidsChannelDateFromTs,
             dateTo: kidsChannelDateToTs,
-            profile: 'kids'
+            profile: 'kids',
+            stateOverride: isManagedChildEditFor('kids') ? buildManagedChildState('kids') : null,
+            onDelete: isManagedChildEditFor('kids') ? (channel, index) => removeManagedChannel('kids', channel, index) : null,
+            onToggleFilterAll: isManagedChildEditFor('kids') ? (channel, index) => toggleManagedChannelFilterAll('kids', channel, index) : null
         });
+        renderManagedChildEditorBanner();
     }
 
     function renderListModeControls() {
@@ -9885,12 +10310,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         const currentNav = document.querySelector('.nav-item.active');
         const currentViewId = normalizeString(currentNav?.getAttribute('data-tab')) || 'dashboard';
         const profileType = currentViewId === 'kids' ? 'kids' : 'main';
+        const managedState = isManagedChildEditFor(profileType) ? buildManagedChildState(profileType) : null;
+        const modeState = managedState || state;
 
         const currentMode = (() => {
             if (profileType === 'kids') {
-                return state?.kids?.mode === 'whitelist' ? 'whitelist' : 'blocklist';
+                return modeState?.kids?.mode === 'whitelist' ? 'whitelist' : 'blocklist';
             }
-            return state?.mode === 'whitelist' ? 'whitelist' : 'blocklist';
+            return modeState?.mode === 'whitelist' ? 'whitelist' : 'blocklist';
         })();
 
         ftTopBarListModeControlsTab.innerHTML = '';
@@ -9923,9 +10350,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const disablingWhitelist = nextState !== true && currentMode === 'whitelist';
                 const whitelistEmpty = (() => {
                     if (profileType === 'kids') {
-                        return (state?.kids?.whitelistChannels?.length || 0) === 0 && (state?.kids?.whitelistKeywords?.length || 0) === 0;
+                        return (modeState?.kids?.whitelistChannels?.length || 0) === 0 && (modeState?.kids?.whitelistKeywords?.length || 0) === 0;
                     }
-                    return (state?.whitelistChannels?.length || 0) === 0 && (state?.whitelistKeywords?.length || 0) === 0;
+                    return (modeState?.whitelistChannels?.length || 0) === 0 && (modeState?.whitelistKeywords?.length || 0) === 0;
                 })();
 
                 let copyBlocklist = false;
@@ -9943,6 +10370,49 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
 
                 let resp = null;
+                if (managedState) {
+                    if (disablingWhitelist && !whitelistEmpty) {
+                        const confirmMsg = profileType === 'kids'
+                            ? 'Move your YT Kids whitelist back into blocklist? This will clear the YT Kids whitelist.'
+                            : 'Move your whitelist back into blocklist? This will clear whitelist.';
+                        const shouldTransfer = window.confirm(confirmMsg);
+                        if (!shouldTransfer) {
+                            renderListModeControls();
+                            return;
+                        }
+                    }
+                    const saved = await saveManagedChildSurface(profileType, async (target) => {
+                        if (enablingWhitelist && copyBlocklist) {
+                            if (profileType === 'kids') {
+                                target.whitelistChannels = [...(Array.isArray(target.whitelistChannels) ? target.whitelistChannels : []), ...(Array.isArray(target.blockedChannels) ? target.blockedChannels : [])];
+                                target.whitelistKeywords = [...(Array.isArray(target.whitelistKeywords) ? target.whitelistKeywords : []), ...(Array.isArray(target.blockedKeywords) ? target.blockedKeywords : [])];
+                            } else {
+                                target.whitelistChannels = [...(Array.isArray(target.whitelistChannels) ? target.whitelistChannels : []), ...(Array.isArray(target.channels) ? target.channels : [])];
+                                target.whitelistKeywords = [...(Array.isArray(target.whitelistKeywords) ? target.whitelistKeywords : []), ...(Array.isArray(target.keywords) ? target.keywords : [])];
+                            }
+                        }
+                        if (disablingWhitelist) {
+                            if (profileType === 'kids') {
+                                target.blockedChannels = [...(Array.isArray(target.blockedChannels) ? target.blockedChannels : []), ...(Array.isArray(target.whitelistChannels) ? target.whitelistChannels : [])];
+                                target.blockedKeywords = [...(Array.isArray(target.blockedKeywords) ? target.blockedKeywords : []), ...(Array.isArray(target.whitelistKeywords) ? target.whitelistKeywords : [])];
+                                target.whitelistChannels = [];
+                                target.whitelistKeywords = [];
+                            } else {
+                                target.channels = [...(Array.isArray(target.channels) ? target.channels : []), ...(Array.isArray(target.whitelistChannels) ? target.whitelistChannels : [])];
+                                target.keywords = [...(Array.isArray(target.keywords) ? target.keywords : []), ...(Array.isArray(target.whitelistKeywords) ? target.whitelistKeywords : [])];
+                                target.whitelistChannels = [];
+                                target.whitelistKeywords = [];
+                            }
+                        }
+                        target.mode = nextState ? 'whitelist' : 'blocklist';
+                        return true;
+                    });
+                    if (!saved) {
+                        UIComponents.showToast('Failed to update list mode', 'error');
+                    }
+                    renderListModeControls();
+                    return;
+                }
                 if (disablingWhitelist && !whitelistEmpty) {
                     const confirmMsg = profileType === 'kids'
                         ? 'Move your YT Kids whitelist back into blocklist? This will clear the YT Kids whitelist.'
@@ -10367,7 +10837,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             const word = (keywordInput?.value || '').trim();
             if (!word) return;
 
-            const success = await StateManager.addKeyword(word);
+            const success = isManagedChildEditFor('main')
+                ? await addManagedKeyword('main', word)
+                : await StateManager.addKeyword(word);
             if (success) {
                 if (keywordInput) keywordInput.value = '';
                 UIComponents.flashButtonSuccess(addKeywordBtn, 'Added!', 1200);
@@ -10467,7 +10939,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             addChannelBtn.disabled = true;
 
             try {
-                const result = await StateManager.addChannel(input);
+                const result = isManagedChildEditFor('main')
+                    ? await addManagedChannel('main', input)
+                    : await StateManager.addChannel(input);
 
                 if (result.success) {
                     if (channelInput) channelInput.value = '';
@@ -10559,7 +11033,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (isUiLocked()) return;
             const word = (kidsKeywordInput?.value || '').trim();
             if (!word) return;
-            const success = await StateManager.addKidsKeyword(word);
+            const success = isManagedChildEditFor('kids')
+                ? await addManagedKeyword('kids', word)
+                : await StateManager.addKidsKeyword(word);
             if (success) {
                 if (kidsKeywordInput) kidsKeywordInput.value = '';
                 UIComponents.flashButtonSuccess(kidsAddKeywordBtn, 'Added!', 1200);
@@ -10637,7 +11113,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (isUiLocked()) return;
             const input = (kidsChannelInput?.value || '').trim();
             if (!input) return;
-            const result = await StateManager.addKidsChannel(input);
+            const result = isManagedChildEditFor('kids')
+                ? await addManagedChannel('kids', input)
+                : await StateManager.addKidsChannel(input);
             if (result.success) {
                 if (kidsChannelInput) kidsChannelInput.value = '';
                 UIComponents.flashButtonSuccess(kidsAddChannelBtn, 'Added!', 1200);

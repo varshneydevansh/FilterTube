@@ -169,10 +169,6 @@ const RenderEngine = (() => {
     function renderKeywordList(container, options = {}) {
         if (!container) return;
 
-        const StateManager = getStateManager();
-        const state = StateManager?.getState() || { keywords: [], kids: { blockedKeywords: [], blockedChannels: [] } };
-        const Settings = getSettings();
-
         const {
             showSearch = false,
             showSort = false,
@@ -183,8 +179,15 @@ const RenderEngine = (() => {
             dateTo = null,
             profile = 'main',
             includeToggles = true,
-            onDelete = null
+            stateOverride = null,
+            onDelete = null,
+            onToggleExact = null,
+            onToggleComments = null
         } = options;
+
+        const StateManager = getStateManager();
+        const state = stateOverride || StateManager?.getState() || { keywords: [], kids: { blockedKeywords: [], blockedChannels: [] } };
+        const Settings = getSettings();
 
         // Filter and sort keywords
         const mainMode = state?.mode === 'whitelist' ? 'whitelist' : 'blocklist';
@@ -292,7 +295,7 @@ const RenderEngine = (() => {
         // Render each keyword
         displayKeywords.forEach(entry => {
             const effectiveProfile = (profile !== 'kids' && entry?.__ftFromKids) ? 'kids' : profile;
-            const item = createKeywordListItem(entry, { minimal, profile: effectiveProfile, includeToggles, onDelete });
+            const item = createKeywordListItem(entry, { minimal, profile: effectiveProfile, includeToggles, onDelete, onToggleExact, onToggleComments });
             if (item instanceof Node) {
                 container.appendChild(item);
             }
@@ -311,7 +314,9 @@ const RenderEngine = (() => {
             minimal = false,
             profile = 'main',
             includeToggles = true,
-            onDelete = null
+            onDelete = null,
+            onToggleExact = null,
+            onToggleComments = null
         } = config;
         const StateManager = getStateManager();
         const UIComponents = getUIComponents();
@@ -374,6 +379,10 @@ const RenderEngine = (() => {
                     text: commentsToggleText,
                     active: commentsEnabled,
                     onToggle: async () => {
+                        if (typeof onToggleComments === 'function') {
+                            await onToggleComments(entry);
+                            return;
+                        }
                         if (isChannelDerived) {
                             await StateManager?.toggleChannelFilterAllCommentsByRef?.(entry.channelRef);
                             return;
@@ -390,6 +399,10 @@ const RenderEngine = (() => {
                     toggle.setAttribute('aria-pressed', commentsEnabled);
                     toggle.setAttribute('tabindex', '0');
                     toggle.addEventListener('click', async () => {
+                        if (typeof onToggleComments === 'function') {
+                            await onToggleComments(entry);
+                            return;
+                        }
                         if (isChannelDerived) {
                             await StateManager?.toggleChannelFilterAllCommentsByRef?.(entry.channelRef);
                             return;
@@ -399,6 +412,10 @@ const RenderEngine = (() => {
                     toggle.addEventListener('keydown', async (e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
                             e.preventDefault();
+                            if (typeof onToggleComments === 'function') {
+                                await onToggleComments(entry);
+                                return;
+                            }
                             if (isChannelDerived) {
                                 await StateManager?.toggleChannelFilterAllCommentsByRef?.(entry.channelRef);
                                 return;
@@ -466,6 +483,10 @@ const RenderEngine = (() => {
                     text: exactToggleText,
                     active: entry.exact,
                     onToggle: async () => {
+                        if (typeof onToggleExact === 'function') {
+                            await onToggleExact(entry);
+                            return;
+                        }
                         if (profile === 'kids') {
                             await StateManager?.toggleKidsKeywordExact?.(entry.word);
                             return;
@@ -478,22 +499,20 @@ const RenderEngine = (() => {
                 createFallbackExactToggle(entry, minimal, profile);
 
             // Delete button
+            const deleteHandler = async () => {
+                if (typeof onDelete === 'function') {
+                    await onDelete(entry);
+                    return;
+                }
+                if (profile === 'kids') {
+                    await StateManager?.removeKidsKeyword?.(entry.word);
+                    return;
+                }
+                await StateManager?.removeKeyword(entry.word);
+            };
             const deleteBtn = UIComponents?.createDeleteButton ?
-                UIComponents.createDeleteButton(async () => {
-                    if (profile === 'kids') {
-                        await StateManager?.removeKidsKeyword?.(entry.word);
-                        return;
-                    }
-                    await StateManager?.removeKeyword(entry.word);
-                    // Re-render will be triggered by state change listener
-                }) :
-                createFallbackDeleteButton(async () => {
-                    if (profile === 'kids') {
-                        await StateManager?.removeKidsKeyword?.(entry.word);
-                        return;
-                    }
-                    await StateManager?.removeKeyword(entry.word);
-                });
+                UIComponents.createDeleteButton(deleteHandler) :
+                createFallbackDeleteButton(deleteHandler);
 
             if (commentsToggle) controls.appendChild(commentsToggle);
             if (exactToggle instanceof Node) controls.appendChild(exactToggle);
@@ -534,10 +553,6 @@ const RenderEngine = (() => {
         container.__ftChannelRenderGen = (container.__ftChannelRenderGen || 0) + 1;
         const renderGen = container.__ftChannelRenderGen;
 
-        const StateManager = getStateManager();
-        const state = StateManager?.getState() || { channels: [], kids: { blockedChannels: [] } };
-        const Settings = getSettings();
-
         const {
             showSearch = false,
             showSort = false,
@@ -548,8 +563,14 @@ const RenderEngine = (() => {
             dateFrom = null,
             dateTo = null,
             profile = 'main',
-            onDelete = null
+            stateOverride = null,
+            onDelete = null,
+            onToggleFilterAll = null
         } = options;
+
+        const StateManager = getStateManager();
+        const state = stateOverride || StateManager?.getState() || { channels: [], kids: { blockedChannels: [] } };
+        const Settings = getSettings();
 
         const mainMode = state?.mode === 'whitelist' ? 'whitelist' : 'blocklist';
         const kidsMode = state?.kids?.mode === 'whitelist' ? 'whitelist' : 'blocklist';
@@ -694,7 +715,9 @@ const RenderEngine = (() => {
                 showNodeMapping,
                 collaborationMeta,
                 profile: effectiveProfile,
-                onDelete
+                onDelete,
+                onToggleFilterAll,
+                modeOverride: effectiveProfile === 'kids' ? kidsMode : mainMode
             });
         };
 
@@ -851,24 +874,28 @@ const RenderEngine = (() => {
             minimal = false,
             showNodeMapping = false,
             collaborationMeta = null,
-            profile = 'main'
+            profile = 'main',
+            onDelete = null,
+            onToggleFilterAll = null,
+            modeOverride = null
         } = config;
         const StateManager = getStateManager();
         const UIComponents = getUIComponents();
 
         if (minimal) {
-            return createMinimalChannelItem(channel, index, collaborationMeta, profile);
+            return createMinimalChannelItem(channel, index, collaborationMeta, profile, { onDelete });
         } else {
-            return createFullChannelItem(channel, index, showNodeMapping, collaborationMeta, profile);
+            return createFullChannelItem(channel, index, showNodeMapping, collaborationMeta, profile, { onDelete, onToggleFilterAll, modeOverride });
         }
     }
 
     /**
      * Create minimal channel item (for popup)
      */
-    function createMinimalChannelItem(channel, index, collaborationMeta, profile) {
+    function createMinimalChannelItem(channel, index, collaborationMeta, profile, handlers = {}) {
         const StateManager = getStateManager();
         const UIComponents = getUIComponents();
+        const { onDelete = null } = handlers;
 
         const item = document.createElement('div');
         item.className = 'keyword-item';
@@ -903,6 +930,10 @@ const RenderEngine = (() => {
         controls.className = 'keyword-controls';
 
         const deleteHandler = async () => {
+            if (typeof onDelete === 'function') {
+                await onDelete(channel, index);
+                return;
+            }
             if (profile === 'kids') {
                 await StateManager?.removeKidsChannel?.(index);
                 return;
@@ -925,9 +956,10 @@ const RenderEngine = (() => {
     /**
      * Create full channel item (for tab-view)
      */
-    function createFullChannelItem(channel, index, showNodeMapping, collaborationMeta, profile) {
+    function createFullChannelItem(channel, index, showNodeMapping, collaborationMeta, profile, handlers = {}) {
         const StateManager = getStateManager();
         const Settings = getSettings();
+        const { onDelete = null, onToggleFilterAll = null, modeOverride = null } = handlers;
 
         const item = document.createElement('div');
         item.className = 'list-item channel-item';
@@ -1002,6 +1034,10 @@ const RenderEngine = (() => {
         deleteBtn.className = 'delete-btn';
         deleteBtn.innerHTML = '×';
         deleteBtn.addEventListener('click', async () => {
+            if (typeof onDelete === 'function') {
+                await onDelete(channel, index);
+                return;
+            }
             if (profile === 'kids') {
                 await StateManager?.removeKidsChannel?.(index);
                 return;
@@ -1024,7 +1060,7 @@ const RenderEngine = (() => {
         }
 
         // Filter All toggle
-        const filterAllToggle = createFilterAllToggle(channel, index, profile);
+        const filterAllToggle = createFilterAllToggle(channel, index, profile, { onToggleFilterAll, modeOverride });
         bodyRow.appendChild(filterAllToggle);
 
         item.appendChild(bodyRow);
@@ -1082,16 +1118,17 @@ const RenderEngine = (() => {
     /**
      * Create Filter All Content toggle
      */
-    function createFilterAllToggle(channel, index, profile = 'main') {
+    function createFilterAllToggle(channel, index, profile = 'main', handlers = {}) {
         const StateManager = getStateManager();
         const UIComponents = getUIComponents();
         const state = StateManager?.getState?.() || {};
+        const { onToggleFilterAll = null, modeOverride = null } = handlers;
         const mainMode = state?.mode === 'whitelist' ? 'whitelist' : 'blocklist';
         const kidsMode = state?.kids?.mode === 'whitelist' ? 'whitelist' : 'blocklist';
 
         // For synced channels (__ftFromKids), use Main's mode since they're displayed in Main's list
         const isFromKids = !!channel?.__ftFromKids;
-        const effectiveMode = isFromKids ? mainMode : (profile === 'kids' ? kidsMode : mainMode);
+        const effectiveMode = modeOverride || (isFromKids ? mainMode : (profile === 'kids' ? kidsMode : mainMode));
 
         if (effectiveMode === 'whitelist') {
             const spacer = document.createElement('div');
@@ -1107,6 +1144,10 @@ const RenderEngine = (() => {
                 text: 'Filter All',
                 active: channel.filterAll || false,
                 onToggle: async () => {
+                    if (typeof onToggleFilterAll === 'function') {
+                        await onToggleFilterAll(channel, index);
+                        return;
+                    }
                     if (profile === 'kids') {
                         await StateManager?.toggleKidsChannelFilterAll?.(index);
                         return;
