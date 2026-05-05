@@ -4291,12 +4291,20 @@ document.addEventListener('DOMContentLoaded', async () => {
             settingAutoBackupEnabled.title = isChild ? childTitle : '';
         }
         if (ftAutoBackupMode) {
-            ftAutoBackupMode.disabled = isChild || ftAutoBackupMode.disabled;
-            if (isChild) ftAutoBackupMode.title = childTitle;
+            const autoBackupEnabled = StateManager.getState()?.autoBackupEnabled === true;
+            const locked = isUiLocked();
+            ftAutoBackupMode.disabled = isChild || locked || !autoBackupEnabled;
+            ftAutoBackupMode.title = isChild
+                ? childTitle
+                : (locked ? 'Unlock this profile to change auto-backup preferences.' : (autoBackupEnabled ? '' : 'Enable Auto Backup to change mode.'));
         }
         if (ftAutoBackupFormat) {
-            ftAutoBackupFormat.disabled = isChild || ftAutoBackupFormat.disabled;
-            if (isChild) ftAutoBackupFormat.title = childTitle;
+            const autoBackupEnabled = StateManager.getState()?.autoBackupEnabled === true;
+            const locked = isUiLocked();
+            ftAutoBackupFormat.disabled = isChild || locked || !autoBackupEnabled;
+            ftAutoBackupFormat.title = isChild
+                ? childTitle
+                : (locked ? 'Unlock this profile to change auto-backup preferences.' : (autoBackupEnabled ? '' : 'Enable Auto Backup to change format.'));
         }
         if (ftCreateAccountBtn) {
             ftCreateAccountBtn.disabled = isChild;
@@ -6311,6 +6319,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (ftNanahModeSendOnce) ftNanahModeSendOnce.hidden = false;
             ftNanahChildBanner.hidden = true;
             if (ftNanahModeSendOnce) ftNanahModeSendOnce.disabled = !!nanahClient;
+            if (ftNanahHostBtn) ftNanahHostBtn.disabled = !!nanahClient;
         }
         refreshNanahAdvancedSummary();
     }
