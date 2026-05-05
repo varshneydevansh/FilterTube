@@ -9312,7 +9312,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
 
             await refreshProfilesUI();
-            await switchToProfile(candidate);
+            UIComponents.showToast('Child profile created. Parent profile remains active so you can finish setup.', 'success');
             try {
                 const fresh = profilesV4Cache;
                 const root = safeObject(fresh);
