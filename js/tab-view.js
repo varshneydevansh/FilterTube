@@ -2921,6 +2921,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let lockGateEl = null;
 
     const LOCK_ALLOWED_VIEWS = new Set(['help', 'whatsnew', 'donate']);
+    const CHILD_ALLOWED_VIEWS = new Set([...LOCK_ALLOWED_VIEWS, 'sync']);
 
     async function sendRuntimeMessage(payload) {
         return new Promise((resolve) => {
@@ -4056,6 +4057,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         return getActiveProfileType() === 'child';
     }
 
+    function isViewAllowedForCurrentAccess(viewId) {
+        const normalized = normalizeString(viewId);
+        if (getActiveProfileType() === 'child') {
+            return CHILD_ALLOWED_VIEWS.has(normalized);
+        }
+        if (isUiLocked()) {
+            return LOCK_ALLOWED_VIEWS.has(normalized);
+        }
+        return true;
+    }
+
     function ensureNonChildAdminAction(message = 'Child profiles cannot manage this action here.') {
         if (!isChildProfileAdminSurface()) return true;
         UIComponents.showToast(message, 'error');
@@ -4544,11 +4556,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             viewId = 'filters';
         }
 
-        if (getActiveProfileType() === 'child' && !LOCK_ALLOWED_VIEWS.has(viewId)) {
+        if (getActiveProfileType() === 'child' && !CHILD_ALLOWED_VIEWS.has(viewId)) {
             return { viewId: 'help', reason: 'child_profile' };
         }
 
-        if (isUiLocked() && !LOCK_ALLOWED_VIEWS.has(viewId)) {
+        if (getActiveProfileType() !== 'child' && isUiLocked() && !LOCK_ALLOWED_VIEWS.has(viewId)) {
             return { viewId: 'help', reason: 'locked' };
         }
 
@@ -4565,7 +4577,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const tab = normalizeString(item.getAttribute('data-tab'));
             let disabled = false;
             if (locked || childProfile) {
-                disabled = tab && !LOCK_ALLOWED_VIEWS.has(tab);
+                disabled = tab && !isViewAllowedForCurrentAccess(tab);
             }
             item.classList.toggle('ft-nav-disabled', disabled);
             if (disabled) {
@@ -5031,6 +5043,25 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function isActiveChildNanahProfile() {
         return getActiveProfileType() === 'child';
+    }
+
+    function isNanahChildReceiveOnly() {
+        return isActiveChildNanahProfile();
+    }
+
+    async function ensureChildNanahParentAuthorityUnlocked() {
+        if (!isNanahChildReceiveOnly()) return true;
+        const io = window.FilterTubeIO || {};
+        const profilesV4 = profilesV4Cache || (typeof io.loadProfilesV4 === 'function' ? await io.loadProfilesV4() : null);
+        if (!profilesV4) return true;
+        const childId = normalizeString(profilesV4.activeProfileId) || activeProfileId || 'default';
+        const parentId = getParentAccountId(profilesV4, childId) || 'default';
+        const ok = await ensureProfileUnlocked(profilesV4, parentId);
+        if (!ok) {
+            UIComponents.showToast('Parent approval is required before this child profile can trust or apply a new sync source.', 'error');
+            return false;
+        }
+        return true;
     }
 
     function getNanahScopeDescription(scope) {
@@ -5987,27 +6018,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         const isChild = isActiveChildNanahProfile();
         
         if (isChild) {
+            if (ftNanahRole) ftNanahRole.value = 'replica';
+            if (ftNanahScope && ftNanahScope.value === 'full') ftNanahScope.value = 'active';
+            if (ftNanahStrategy) ftNanahStrategy.value = 'merge';
             if (ftNanahModeParent) ftNanahModeParent.hidden = true;
             if (ftNanahModeFull) ftNanahModeFull.hidden = true;
             ftNanahChildBanner.hidden = false;
 
-            if (isNanahChildReplicaOnly()) {
-                if (ftNanahModeSendOnce) {
-                    ftNanahModeSendOnce.hidden = false;
-                    ftNanahModeSendOnce.disabled = true;
-                }
-                ftNanahChildBannerTitle.textContent = "This child profile is restricted";
-                ftNanahChildBannerBody.textContent = "Saved parent links can keep this profile aligned. To start new pairings or send settings, unlock the profile first.";
-                if (ftNanahHostBtn) ftNanahHostBtn.disabled = true;
-            } else {
-                if (ftNanahModeSendOnce) {
-                    ftNanahModeSendOnce.hidden = false;
-                    ftNanahModeSendOnce.disabled = !!nanahClient;
-                }
-                ftNanahChildBannerTitle.textContent = "This is a child profile";
-                ftNanahChildBannerBody.textContent = "You can send a one-time copy of your settings. Parent controls and full migration are available from a parent or account profile.";
-                if (ftNanahHostBtn) ftNanahHostBtn.disabled = !!nanahClient || !!normalizeString(nanahSessionState.code);
+            if (ftNanahModeSendOnce) {
+                ftNanahModeSendOnce.hidden = false;
+                ftNanahModeSendOnce.disabled = true;
             }
+            ftNanahChildBannerTitle.textContent = "Child receive-only sync";
+            ftNanahChildBannerBody.textContent = "This child profile can join a parent/source pairing code and receive updates for its own rules. Sending, backups, trusted-link policy, and profile management stay parent-controlled.";
+            if (ftNanahHostBtn) ftNanahHostBtn.disabled = true;
+            if (ftNanahSendBtn) ftNanahSendBtn.disabled = true;
+            if (ftNanahTrustBtn) ftNanahTrustBtn.disabled = true;
             
             if (nanahUiMode === 'parent_control' || nanahUiMode === 'full_account') {
                 setNanahMode('send_once', { persist: false, applyPreset: true });
@@ -6025,7 +6051,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     function setNanahModeButtons(mode = getNanahUiMode()) {
         const normalized = normalizeNanahUiMode(mode);
         const childSurface = isChildProfileAdminSurface();
-        const childReplicaOnly = childSurface && isNanahChildReplicaOnly();
         [
             ftNanahModeSendOnce,
             ftNanahModeParent,
@@ -6040,7 +6065,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             } else {
                 button.hidden = false;
             }
-            if (button === ftNanahModeSendOnce && childReplicaOnly) {
+            if (childSurface) {
                 button.disabled = true;
             } else {
                 button.disabled = !!nanahClient;
@@ -6061,7 +6086,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        const childReplicaOnly = isNanahChildReplicaOnly();
+        const childReceiveOnly = isNanahChildReceiveOnly();
+        const childReplicaOnly = childReceiveOnly || isNanahChildReplicaOnly();
         isApplyingNanahModePreset = true;
         try {
             if (normalized === 'parent_control') {
@@ -6077,6 +6103,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (ftNanahRole && !childReplicaOnly) ftNanahRole.value = 'peer';
                 if (ftNanahScope) ftNanahScope.value = 'active';
                 if (ftNanahStrategy) ftNanahStrategy.value = 'merge';
+            }
+            if (childReceiveOnly) {
+                if (ftNanahRole) ftNanahRole.value = 'replica';
+                if (ftNanahScope && ftNanahScope.value === 'full') ftNanahScope.value = 'active';
+                if (ftNanahStrategy) ftNanahStrategy.value = 'merge';
+                if (ftNanahRemoteTarget) ftNanahRemoteTarget.value = '';
             }
 
             [ftNanahRole, ftNanahScope, ftNanahStrategy, ftNanahRemoteTarget].forEach((element) => {
@@ -6625,9 +6657,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function updateNanahModeUi() {
         const mode = getNanahUiMode();
+        const childReceiveOnly = isNanahChildReceiveOnly();
         const childReplicaOnly = isNanahChildReplicaOnly();
         const isManagedPair = getNanahRole() === 'source' && normalizeString(nanahSessionState.remoteRole) === 'replica';
         const canShowRemoteTarget = mode !== 'full_account'
+            && !childReceiveOnly
             && !childReplicaOnly
             && (
                 mode === 'parent_control'
@@ -6687,7 +6721,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         };
 
-        const config = configs[mode] || configs.send_once;
+        const config = childReceiveOnly
+            ? {
+                eyebrow: 'Receive-only',
+                title: 'Join parent update',
+                body: 'Use the code from a parent/source device to receive updates for this child profile. This child profile cannot send settings, save trust policy, or move backups from here.',
+                steps: [
+                    'Ask the parent/source device to start pairing.',
+                    'Join the 4-character code here and confirm the same safety phrase.',
+                    'Trusted parent/source links can then send allowed updates into this child profile.'
+                ],
+                hostLabel: 'Parent Starts Pairing',
+                sendLabel: 'Receive Only',
+                trustLabel: 'Parent Managed'
+            }
+            : (configs[mode] || configs.send_once);
 
         if (ftNanahModeEyebrow) ftNanahModeEyebrow.textContent = config.eyebrow;
         if (ftNanahModeTitle) ftNanahModeTitle.textContent = config.title;
@@ -6723,8 +6771,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function updateNanahPolicyControls() {
+        const childReceiveOnly = isNanahChildReceiveOnly();
         const childReplicaOnly = isNanahChildReplicaOnly();
-        if (childReplicaOnly && ftNanahRole && ftNanahRole.value !== 'replica') {
+        if ((childReceiveOnly || childReplicaOnly) && ftNanahRole && ftNanahRole.value !== 'replica') {
             ftNanahRole.value = 'replica';
         }
         if (getActiveProfileType() === 'child' && ftNanahScope && ftNanahScope.value === 'full') {
@@ -6738,10 +6787,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (ftNanahStrategyLabel) {
             ftNanahStrategyLabel.textContent = (trustedManaged && linkType === 'managed_link' && localRole === 'source' && !childReplicaOnly)
                 ? 'Managed sync policy'
-                : 'Suggested action';
+                : (childReceiveOnly ? 'Receive policy' : 'Suggested action');
         }
         if (ftNanahStrategyHint) {
-            if (childReplicaOnly) {
+            if (childReceiveOnly) {
+                ftNanahStrategyHint.textContent = 'Child profiles stay receive-only here. Parent/source devices choose what to send, and this profile reviews or receives the allowed update.';
+            } else if (childReplicaOnly) {
                 ftNanahStrategyHint.textContent = 'This child profile is still locked, so it stays replica-only here. Unlock it locally if you need to send this child profile to another device.';
             } else if (trustedManaged && linkType === 'managed_link' && localRole === 'source') {
                 ftNanahStrategyHint.textContent = 'Trusted replicas follow this saved merge or replace policy for allowed scopes.';
@@ -6752,22 +6803,29 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
         if (ftNanahTrustBtn) {
-            ftNanahTrustBtn.textContent = (childReplicaOnly || linkType === 'managed_link') ? 'Save Managed Link' : 'Trust Connected Device';
+            ftNanahTrustBtn.textContent = childReceiveOnly
+                ? 'Parent Managed'
+                : ((childReplicaOnly || linkType === 'managed_link') ? 'Save Managed Link' : 'Trust Connected Device');
         }
         if (ftNanahScope) {
-            ftNanahScope.disabled = childReplicaOnly || !!nanahClient;
-            ftNanahScope.title = childReplicaOnly
-                ? 'This child profile is locked, so scope sending is unavailable until you unlock it locally.'
-                : (nanahClient ? 'Scope is locked for the current Nanah session.' : '');
+            ftNanahScope.disabled = childReceiveOnly || childReplicaOnly || !!nanahClient;
+            ftNanahScope.title = childReceiveOnly
+                ? 'Child profiles receive updates here; they do not choose an outgoing send scope.'
+                : (childReplicaOnly
+                    ? 'This child profile is locked, so scope sending is unavailable until you unlock it locally.'
+                    : (nanahClient ? 'Scope is locked for the current Nanah session.' : ''));
         }
         if (ftNanahStrategy) {
-            ftNanahStrategy.disabled = childReplicaOnly || !!nanahClient;
-            ftNanahStrategy.title = childReplicaOnly
-                ? 'This child profile is locked, so outgoing merge/replace behavior stays unavailable until you unlock it locally.'
-                : (nanahClient ? 'Suggested action is locked for the current Nanah session.' : '');
+            ftNanahStrategy.disabled = childReceiveOnly || childReplicaOnly || !!nanahClient;
+            ftNanahStrategy.title = childReceiveOnly
+                ? 'Child profiles receive parent/source updates here; trust policy stays parent-managed.'
+                : (childReplicaOnly
+                    ? 'This child profile is locked, so outgoing merge/replace behavior stays unavailable until you unlock it locally.'
+                    : (nanahClient ? 'Suggested action is locked for the current Nanah session.' : ''));
         }
         if (ftNanahRemoteTarget) {
-            const canTargetRemoteProfiles = !childReplicaOnly
+            const canTargetRemoteProfiles = !childReceiveOnly
+                && !childReplicaOnly
                 && !!nanahClient
                 && nanahSessionState.connected
                 && getNanahRole() === 'source'
@@ -6848,22 +6906,25 @@ document.addEventListener('DOMContentLoaded', async () => {
                 : '';
         }
         if (ftNanahRole) {
+            const childReceiveOnly = isNanahChildReceiveOnly();
             const childReplicaOnly = isNanahChildReplicaOnly();
-            if (childReplicaOnly && ftNanahRole.value !== 'replica') {
+            if ((childReceiveOnly || childReplicaOnly) && ftNanahRole.value !== 'replica') {
                 ftNanahRole.value = 'replica';
             }
-            ftNanahRole.disabled = !!nanahClient || childReplicaOnly;
-            ftNanahRole.title = childReplicaOnly
-                ? 'This child profile is locked, so it is replica-only in Nanah until you unlock it locally.'
-                : (nanahClient
-                    ? 'Relationship is locked for the current Nanah session. End the session to change it.'
-                    : '');
+            ftNanahRole.disabled = !!nanahClient || childReceiveOnly || childReplicaOnly;
+            ftNanahRole.title = childReceiveOnly
+                ? 'Child profiles stay replica/receive-only in Nanah.'
+                : (childReplicaOnly
+                    ? 'This child profile is locked, so it is replica-only in Nanah until you unlock it locally.'
+                    : (nanahClient
+                        ? 'Relationship is locked for the current Nanah session. End the session to change it.'
+                        : ''));
         }
         if (ftNanahSendBtn) {
-            ftNanahSendBtn.disabled = !(nanahSessionState.connected && nanahSessionState.sasConfirmed && nanahClient);
+            ftNanahSendBtn.disabled = isNanahChildReceiveOnly() || !(nanahSessionState.connected && nanahSessionState.sasConfirmed && nanahClient);
         }
         if (ftNanahTrustBtn) {
-            ftNanahTrustBtn.disabled = !(nanahSessionState.connected && safeObject(nanahSessionState.remoteDevice).deviceId);
+            ftNanahTrustBtn.disabled = isNanahChildReceiveOnly() || !(nanahSessionState.connected && safeObject(nanahSessionState.remoteDevice).deviceId);
         }
         if (ftNanahEndSessionBtn) {
             ftNanahEndSessionBtn.disabled = !nanahClient;
@@ -7161,6 +7222,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function buildNanahOutgoingProposalPolicy(scope, strategy) {
+        if (isNanahChildReceiveOnly()) {
+            throw new Error('Child profiles are receive-only in Accounts & Sync. Use a parent/source profile to send updates.');
+        }
         if (isNanahChildReplicaOnly()) {
             throw new Error('Unlock this child profile first if you want to send its settings to another device.');
         }
@@ -7344,6 +7408,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         const isFirstManagedReplicaSession = localRole === 'replica'
             && remoteRole === 'source'
             && !isManagedReceiver;
+
+        if (isNanahChildReceiveOnly() && !isManagedReceiver) {
+            const okParent = await ensureChildNanahParentAuthorityUnlocked();
+            if (!okParent) {
+                await sendNanahDecision(envelope.id, false, 'parent authorization required');
+                return;
+            }
+        }
 
         if (isManagedReceiver) {
             const reconnectApproved = await ensureNanahTrustedReconnectApproved(trustedLink);
@@ -7684,6 +7756,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function trustConnectedNanahDevice() {
+        if (isNanahChildReceiveOnly()) {
+            UIComponents.showToast('Child profiles can receive parent/source updates, but trusted-link policy is parent-controlled.', 'error');
+            return;
+        }
         const remote = safeObject(nanahSessionState.remoteDevice);
         const remoteDeviceId = normalizeString(remote.deviceId);
         if (!remoteDeviceId) {
@@ -8982,6 +9058,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     } else {
         if (ftNanahHostBtn) {
             ftNanahHostBtn.addEventListener('click', async () => {
+                if (isNanahChildReceiveOnly()) {
+                    UIComponents.showToast('Start pairing from a parent/source profile, then join the code here.', 'info');
+                    return;
+                }
                 try {
                     const client = await createNanahClient();
                     nanahSessionState.stage = 'hosting';
@@ -9092,6 +9172,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (ftNanahSendBtn) {
             ftNanahSendBtn.addEventListener('click', async () => {
+                if (isNanahChildReceiveOnly()) {
+                    UIComponents.showToast('Child profiles are receive-only in Accounts & Sync.', 'error');
+                    return;
+                }
                 if (!nanahClient || !nanahSessionState.connected || !nanahSessionState.sasConfirmed) {
                     UIComponents.showToast('Finish pairing and confirm the safety phrase first', 'error');
                     return;
@@ -9122,6 +9206,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (ftNanahTrustBtn) {
             ftNanahTrustBtn.addEventListener('click', async () => {
+                if (isNanahChildReceiveOnly()) {
+                    UIComponents.showToast('Trusted-link policy is parent-controlled for child profiles.', 'error');
+                    return;
+                }
                 try {
                     await trustConnectedNanahDevice();
                 } catch (error) {

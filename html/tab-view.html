@@ -1087,7 +1087,7 @@
                                                 <ul>
                                                     <li><strong>Default (Master):</strong> Admin for full exports, profile management, and account policy.</li>
                                                     <li><strong>Account:</strong> Independent profile; can have child profiles.</li>
-                                                    <li><strong>Child:</strong> Follows parent; UI gating uses locks/PINs.</li>
+                                                    <li><strong>Child:</strong> Private viewing profile with its own Main/Kids rules; rule editing and settings stay parent-managed.</li>
                                                 </ul>
                                             </div>
                                         </div>
@@ -1097,6 +1097,7 @@
                                                 <ul>
                                                     <li>Locked profiles disable toggles and auto-backup controls until unlocked.</li>
                                                     <li>Encrypted exports/backups need the profile’s PIN; Master unlock is required for admin actions.</li>
+                                                    <li>Child PINs protect profile switching and can open receive-only Accounts &amp; Sync; parent/admin PIN still controls rules, backups, trusted-link policy, and settings.</li>
                                                     <li>Unlock is per-session in both Popup and New Tab.</li>
                                                 </ul>
                                             </div>
@@ -1139,6 +1140,7 @@
                                                     <li><strong>Send this profile once:</strong> Best default. Pair, verify, send, and let the other device review the update.</li>
                                                     <li><strong>Parent controls child:</strong> Best for source → replica trust. Pick the remote child profile once, then save the managed link.</li>
                                                     <li><strong>Move full account:</strong> Use only for migration, reinstall recovery, or the wider account tree.</li>
+                                                    <li><strong>Child receive-only:</strong> Child profiles can join a parent/source code and receive updates, but cannot send, save trust policy, or move backups from that page.</li>
                                                     <li>The <strong>Advanced</strong> section is still there if you need to tune role, scope, or merge/replace manually.</li>
                                                 </ul>
                                             </div>
