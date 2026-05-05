@@ -1254,12 +1254,12 @@
                                                 <ul>
                                                     <li><strong>Default / Master:</strong> Owns full import/export, master policy, and the broadest account controls.</li>
                                                     <li><strong>Independent account:</strong> Owns its own settings and can manage its own child profiles, but does not gain authority over parallel accounts.</li>
-                                                    <li><strong>Child profile:</strong> Should be treated as a managed surface. A locked child stays replica-only, while an unlocked child can still send a one-time copy of its own settings without becoming a full admin surface.</li>
-                                                    <li><strong>Locked vs unlocked child:</strong> A locked child profile stays replica-only. If the parent unlocks that child profile locally, FilterTube can send that child profile’s own snapshot to another device without turning it into a full admin surface.</li>
-                                                    <li><strong>Targeting today:</strong> Child restrictions still depend on the profile currently active in the Nanah UI session, and child managed links should usually save a fixed local target so parent updates stay tied to that child profile.</li>
-                                                    <li><strong>Parent-safe child targeting:</strong> FilterTube now blocks “send anyway” from a child profile when the other device has some different profile active. The intended parent flow is to save one managed <strong>Source → Replica</strong> link on the receiving child profile and choose <strong>Always this local profile</strong>.</li>
+                                                    <li><strong>Child profile:</strong> A private viewing surface with its own Main/Kids rules. The child PIN protects switching into it, but parent/account PIN controls policy and rule edits.</li>
+                                                    <li><strong>Viewing spaces:</strong> A parent can set each child to Kids only, Main only, or Main + Kids. New child profiles start as Kids only.</li>
+                                                    <li><strong>Targeting today:</strong> Child managed links should usually save a fixed local target so parent updates stay tied to that child profile.</li>
+                                                    <li><strong>Parent-safe child targeting:</strong> FilterTube blocks send-anyway paths from child profiles when the other device has a different profile active. The intended parent flow is to save one managed <strong>Source -> Replica</strong> link on the receiving child profile and choose <strong>Always this local profile</strong>.</li>
                                                     <li><strong>Strict child protection:</strong> Managed child links can now force approval-needed reconnect, no auto-apply, fixed local target, and local unlock required as one higher-safety preset.</li>
-                                                    <li>Child profiles also stop exposing broad backup/import/export/account-admin actions in Settings, and the unlocked child surface no longer allows profile rename/delete/PIN mutation or trusted parent-link editing from Accounts &amp; Sync.</li>
+                                                    <li>Child profiles do not expose broad backup/import/export/account-admin actions in Settings and cannot rename/delete profiles, mutate PIN policy, or edit trusted parent links from the child surface.</li>
                                                 </ul>
                                             </div>
                                         </div>
@@ -1360,6 +1360,28 @@
                                         <div class="help-item">
                                             <div class="help-item-title">Mode Switching</div>
                                             <div class="help-item-body">Toggle between Blocklist and Whitelist modes using the top bar controls. FilterTube provides confirmation dialogs when switching to prevent accidental data loss, and automatically migrates your current blocklist to become your whitelist.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>Profiles, PINs, and Child Profiles</h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="help-list">
+                                        <div class="help-item">
+                                            <div class="help-item-title">Child profile authority</div>
+                                            <div class="help-item-body">Child profiles are private viewing spaces with their own Main and Kids rules. They cannot change FilterTube settings, sync, backups, profile policy, or rule lists from the child surface.</div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Child PIN vs parent PIN</div>
+                                            <div class="help-item-body">A child profile PIN protects switching into that child profile. Parent or account PIN controls rule editing, allowed viewing spaces, profile management, sync, and backups.</div>
+                                        </div>
+                                        <div class="help-item">
+                                            <div class="help-item-title">Allowed viewing spaces</div>
+                                            <div class="help-item-body">Each profile can be set to Kids only, Main only, or Main + Kids. This supports younger kids on YouTube Kids and teenagers on supervised Main YouTube without letting either edit policy.</div>
                                         </div>
                                     </div>
                                 </div>

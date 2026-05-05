@@ -1263,7 +1263,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const profilesV4 = profilesV4Cache;
             const activeProfileId = normalizeString(profilesV4?.activeProfileId) || 'default';
-            return !!(profilesV4 && isProfileLocked(profilesV4, activeProfileId) && !unlockedProfiles.has(activeProfileId));
+            return getProfileType(profilesV4, activeProfileId) === 'child' ||
+                !!(profilesV4 && isProfileLocked(profilesV4, activeProfileId) && !unlockedProfiles.has(activeProfileId));
         } catch (e) {
         }
         return false;
@@ -1272,7 +1273,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     function applyLockGateIfNeeded() {
         const profilesV4 = profilesV4Cache;
         const activeProfileId = normalizeString(profilesV4?.activeProfileId) || 'default';
-        const isLocked = profilesV4 && isProfileLocked(profilesV4, activeProfileId) && !unlockedProfiles.has(activeProfileId);
+        const isLocked = profilesV4 && (
+            getProfileType(profilesV4, activeProfileId) === 'child' ||
+            (isProfileLocked(profilesV4, activeProfileId) && !unlockedProfiles.has(activeProfileId))
+        );
 
         document.body.classList.toggle('ft-popup-locked', !!isLocked);
         try {
@@ -1314,15 +1318,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         const cardHeader = document.createElement('div');
         cardHeader.className = 'card-header';
         const copy = getProfileAccessCopy(profilesV4, activeProfileId);
+        const activeIsChild = getProfileType(profilesV4, activeProfileId) === 'child';
         const h3 = document.createElement('h3');
-        h3.textContent = copy.gateTitle;
+        h3.textContent = activeIsChild ? 'Managed Child Profile' : copy.gateTitle;
         cardHeader.appendChild(h3);
 
         const body = document.createElement('div');
         body.className = 'card-body';
         const hint = document.createElement('div');
         hint.className = 'import-export-hint';
-        hint.textContent = copy.gateMessage;
+        hint.textContent = activeIsChild
+            ? 'This child profile can use its own viewing rules, but FilterTube settings and rule editing stay parent-managed. Switch to the parent profile to make changes.'
+            : copy.gateMessage;
 
         const actions = document.createElement('div');
         actions.style.display = 'flex';
@@ -1333,8 +1340,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         const unlockBtn = document.createElement('button');
         unlockBtn.className = 'btn-primary';
         unlockBtn.type = 'button';
-        unlockBtn.textContent = 'Unlock';
+        unlockBtn.textContent = activeIsChild ? 'Switch Profile' : 'Unlock';
         unlockBtn.addEventListener('click', async () => {
+            if (activeIsChild) {
+                toggleProfileDropdown();
+                return;
+            }
             try {
                 const ok = await ensureProfileUnlocked(profilesV4Cache, activeProfileId);
                 if (!ok) return;

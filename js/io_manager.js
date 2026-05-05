@@ -534,6 +534,8 @@
                     parentProfileId: null,
                     name: 'Default',
                     settings: {
+                        allowMainViewing: true,
+                        allowKidsViewing: true,
                         syncKidsToMain: !!v3Main.applyKidsRulesOnMain
                     },
                     main: {
@@ -657,6 +659,8 @@
                 name: normalizeString(profile.name) || 'Profile',
                 settings: {
                     ...settings,
+                    allowMainViewing: settings.allowMainViewing !== false,
+                    allowKidsViewing: settings.allowKidsViewing !== false,
                     syncKidsToMain: !!settings.syncKidsToMain
                 },
                 main: {

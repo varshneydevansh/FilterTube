@@ -3969,6 +3969,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         return locked ? 'Child • Locked' : 'Child';
     }
 
+    function getProfileViewingAccess(profile) {
+        const settings = safeObject(profile?.settings);
+        return {
+            main: settings.allowMainViewing !== false,
+            kids: settings.allowKidsViewing !== false
+        };
+    }
+
+    function viewingAccessLabel(profile) {
+        const access = getProfileViewingAccess(profile);
+        if (access.main && access.kids) return 'Main + Kids';
+        if (access.main) return 'Main only';
+        if (access.kids) return 'Kids only';
+        return 'No viewing spaces';
+    }
+
     function updateAdminPolicyControls() {
         if (!ftAllowAccountCreation || !ftMaxAccounts) return;
         const profilesV4 = profilesV4Cache;
@@ -4046,12 +4062,64 @@ document.addEventListener('DOMContentLoaded', async () => {
         return false;
     }
 
+    async function updateProfileViewingAccess(profileId, patch) {
+        const targetId = normalizeString(profileId);
+        if (!targetId) return;
+        const io = window.FilterTubeIO || {};
+        if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
+            UIComponents.showToast('Profiles unavailable', 'error');
+            return;
+        }
+        const fresh = await io.loadProfilesV4();
+        const currentActive = normalizeString(fresh?.activeProfileId) || 'default';
+        if (getProfileType(fresh, currentActive) === 'child') {
+            UIComponents.showToast('Child profiles cannot change viewing access', 'error');
+            return;
+        }
+        const allowedManager = currentActive === 'default' ||
+            currentActive === targetId ||
+            getParentAccountId(fresh, targetId) === currentActive;
+        if (!allowedManager) {
+            UIComponents.showToast('Switch to the parent account to change this profile', 'error');
+            return;
+        }
+        const okAdmin = await ensureProfileUnlocked(fresh, currentActive);
+        if (!okAdmin) return;
+        const profiles = safeObject(fresh.profiles);
+        const profile = safeObject(profiles[targetId]);
+        if (!profile || !profiles[targetId]) return;
+        const settings = safeObject(profile.settings);
+        const currentAccess = getProfileViewingAccess(profile);
+        const nextMain = Object.prototype.hasOwnProperty.call(patch, 'main') ? patch.main === true : currentAccess.main;
+        const nextKids = Object.prototype.hasOwnProperty.call(patch, 'kids') ? patch.kids === true : currentAccess.kids;
+        if (!nextMain && !nextKids) {
+            UIComponents.showToast('A profile needs at least one viewing space', 'error');
+            return;
+        }
+        profiles[targetId] = {
+            ...profile,
+            settings: {
+                ...settings,
+                allowMainViewing: nextMain,
+                allowKidsViewing: nextKids
+            }
+        };
+        await io.saveProfilesV4({
+            ...fresh,
+            schemaVersion: 4,
+            profiles
+        });
+        await refreshProfilesUI();
+        UIComponents.showToast('Viewing access updated', 'success');
+    }
+
     function isUiLocked() {
         const profilesV4 = profilesV4Cache;
         if (!profilesV4) {
             return document.body.classList.contains('ft-app-locked');
         }
-        return !!(profilesV4 && isProfileLocked(profilesV4, activeProfileId) && !unlockedProfiles.has(activeProfileId));
+        return getProfileType(profilesV4, activeProfileId) === 'child' ||
+            !!(profilesV4 && isProfileLocked(profilesV4, activeProfileId) && !unlockedProfiles.has(activeProfileId));
     }
 
     function getActiveProfileType() {
@@ -4476,6 +4544,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             viewId = 'filters';
         }
 
+        if (getActiveProfileType() === 'child' && !LOCK_ALLOWED_VIEWS.has(viewId)) {
+            return { viewId: 'help', reason: 'child_profile' };
+        }
+
         if (isUiLocked() && !LOCK_ALLOWED_VIEWS.has(viewId)) {
             return { viewId: 'help', reason: 'locked' };
         }
@@ -4485,13 +4557,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function updateNavigationAccessUI() {
         const locked = isUiLocked();
-        document.body.classList.remove('ft-child-profile');
+        const childProfile = getActiveProfileType() === 'child';
+        document.body.classList.toggle('ft-child-profile', childProfile);
 
         const navItems = document.querySelectorAll('.nav-item');
         navItems.forEach((item) => {
             const tab = normalizeString(item.getAttribute('data-tab'));
             let disabled = false;
-            if (locked) {
+            if (locked || childProfile) {
                 disabled = tab && !LOCK_ALLOWED_VIEWS.has(tab);
             }
             item.classList.toggle('ft-nav-disabled', disabled);
@@ -7889,6 +7962,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const body = document.createElement('div');
             body.className = 'help-item-body';
+            body.textContent = `Viewing access: ${viewingAccessLabel(profiles[profileId])}`;
 
             const actions = document.createElement('div');
             actions.style.display = 'flex';
@@ -8010,6 +8084,38 @@ document.addEventListener('DOMContentLoaded', async () => {
             actions.appendChild(switchBtn);
             actions.appendChild(renameBtn);
             actions.appendChild(deleteBtn);
+
+            const access = getProfileViewingAccess(profiles[profileId]);
+            const mainAccessBtn = document.createElement('button');
+            mainAccessBtn.className = access.main ? 'btn-primary' : 'btn-secondary';
+            mainAccessBtn.type = 'button';
+            mainAccessBtn.textContent = access.main ? 'Main allowed' : 'Main blocked';
+            mainAccessBtn.disabled = childAdminRestricted;
+            mainAccessBtn.title = childAdminRestricted ? childAdminTitle : 'Toggle whether this profile can open Main YouTube.';
+            mainAccessBtn.addEventListener('click', async () => {
+                if (childAdminRestricted) {
+                    UIComponents.showToast('Child profiles cannot change viewing access here', 'error');
+                    return;
+                }
+                await updateProfileViewingAccess(profileId, { main: !access.main });
+            });
+
+            const kidsAccessBtn = document.createElement('button');
+            kidsAccessBtn.className = access.kids ? 'btn-primary' : 'btn-secondary';
+            kidsAccessBtn.type = 'button';
+            kidsAccessBtn.textContent = access.kids ? 'Kids allowed' : 'Kids blocked';
+            kidsAccessBtn.disabled = childAdminRestricted;
+            kidsAccessBtn.title = childAdminRestricted ? childAdminTitle : 'Toggle whether this profile can open YouTube Kids.';
+            kidsAccessBtn.addEventListener('click', async () => {
+                if (childAdminRestricted) {
+                    UIComponents.showToast('Child profiles cannot change viewing access here', 'error');
+                    return;
+                }
+                await updateProfileViewingAccess(profileId, { kids: !access.kids });
+            });
+
+            actions.appendChild(mainAccessBtn);
+            actions.appendChild(kidsAccessBtn);
 
             if (profileId !== 'default') {
                 const pinBtn = document.createElement('button');
@@ -9175,6 +9281,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 parentProfileId: null,
                 name,
                 settings: {
+                    allowMainViewing: true,
+                    allowKidsViewing: true,
                     syncKidsToMain: false,
                     autoBackupEnabled,
                     autoBackupMode,
@@ -9281,6 +9389,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 parentProfileId: currentActive,
                 name,
                 settings: {
+                    allowMainViewing: false,
+                    allowKidsViewing: true,
                     syncKidsToMain: false,
                     autoBackupEnabled,
                     autoBackupMode,
