@@ -362,7 +362,7 @@ body[data-surface="popup"] .ft-popup-open {
     min-height: 2.22rem;
 }
 
-body[data-surface="popup"] .ft-topbar-list-mode .exact-toggle {
+body[data-surface="popup"] .ft-topbar-list-mode .exact-toggle:not(.ft-list-mode-pill) {
     min-height: 2.08rem;
     padding: 0.32rem 0.68rem;
     font-size: 0.62rem;
@@ -2559,7 +2559,7 @@ html[data-theme="dark"] body[data-surface="popup"] .ft-popup-shell__video-tint {
 html[data-theme="dark"] body[data-surface="popup"] .ft-popup-brand,
 html[data-theme="dark"] body[data-surface="popup"] .ft-popup-filter-card,
 html[data-theme="dark"] body[data-surface="popup"] .tab-buttons,
-html[data-theme="dark"] body[data-surface="popup"] .ft-topbar-list-mode .exact-toggle {
+html[data-theme="dark"] body[data-surface="popup"] .ft-topbar-list-mode .exact-toggle:not(.ft-list-mode-pill) {
     background: rgba(10, 16, 24, 0.78) !important;
     border-color: rgba(255, 255, 255, 0.12) !important;
     box-shadow:

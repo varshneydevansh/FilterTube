@@ -781,10 +781,24 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!ftTopBarListModeControlsPopup) return;
         ftTopBarListModeControlsPopup.innerHTML = '';
 
-        const toggle = UIComponents.createToggleButton({
-            text: uiProfileType === 'kids' ? 'Whitelist Kids' : 'Whitelist',
-            active: effectiveMode === 'whitelist',
-            onToggle: async (nextState) => {
+        const toggle = document.createElement('div');
+        toggle.className = [
+            'exact-toggle',
+            'active',
+            'ft-list-mode-pill',
+            effectiveMode === 'blocklist' ? 'toggle-variant-red' : ''
+        ].filter(Boolean).join(' ');
+        toggle.textContent = effectiveMode === 'whitelist'
+            ? (uiProfileType === 'kids' ? 'Whitelist Kids' : 'Whitelist')
+            : 'Blocklist';
+        toggle.setAttribute('role', 'button');
+        toggle.setAttribute('aria-pressed', 'true');
+        toggle.setAttribute('tabindex', isUiLocked() ? '-1' : '0');
+        if (isUiLocked()) {
+            toggle.classList.add('is-disabled');
+            toggle.setAttribute('aria-disabled', 'true');
+        }
+        const handleModeToggle = async () => {
                 if (isUiLocked()) {
                     renderListModeControls();
                     return;
@@ -794,6 +808,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const currentMode = profileType === 'kids'
                     ? (state?.kids?.mode === 'whitelist' ? 'whitelist' : 'blocklist')
                     : (state?.mode === 'whitelist' ? 'whitelist' : 'blocklist');
+                const nextState = currentMode !== 'whitelist';
 
                 const enablingWhitelist = nextState === true;
                 const disablingWhitelist = nextState !== true && currentMode === 'whitelist';
@@ -853,8 +868,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 renderChannels();
                 updateCheckboxes();
                 renderListModeControls();
-            },
-            className: ''
+        };
+        toggle.addEventListener('click', handleModeToggle);
+        toggle.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                handleModeToggle();
+            }
         });
 
         ftTopBarListModeControlsPopup.appendChild(toggle);

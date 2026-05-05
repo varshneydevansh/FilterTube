@@ -9697,15 +9697,30 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         ftTopBarListModeControlsTab.innerHTML = '';
 
-        const toggle = UIComponents.createToggleButton({
-            text: profileType === 'kids' ? 'Whitelist Kids' : 'Whitelist',
-            active: currentMode === 'whitelist',
-            onToggle: async (nextState) => {
+        const toggle = document.createElement('div');
+        toggle.className = [
+            'exact-toggle',
+            'active',
+            'ft-list-mode-pill',
+            currentMode === 'blocklist' ? 'toggle-variant-red' : ''
+        ].filter(Boolean).join(' ');
+        toggle.textContent = currentMode === 'whitelist'
+            ? (profileType === 'kids' ? 'Whitelist Kids' : 'Whitelist')
+            : 'Blocklist';
+        toggle.setAttribute('role', 'button');
+        toggle.setAttribute('aria-pressed', 'true');
+        toggle.setAttribute('tabindex', isUiLocked() ? '-1' : '0');
+        if (isUiLocked()) {
+            toggle.classList.add('is-disabled');
+            toggle.setAttribute('aria-disabled', 'true');
+        }
+        const handleModeToggle = async () => {
                 if (isUiLocked()) {
                     renderListModeControls();
                     return;
                 }
 
+                const nextState = currentMode !== 'whitelist';
                 const enablingWhitelist = nextState === true;
                 const disablingWhitelist = nextState !== true && currentMode === 'whitelist';
                 const whitelistEmpty = (() => {
@@ -9771,8 +9786,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 updateCheckboxes();
                 updateStats();
                 renderListModeControls();
-            },
-            className: ''
+        };
+        toggle.addEventListener('click', handleModeToggle);
+        toggle.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                handleModeToggle();
+            }
         });
 
         ftTopBarListModeControlsTab.appendChild(toggle);
