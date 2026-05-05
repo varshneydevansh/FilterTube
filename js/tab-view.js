@@ -3849,6 +3849,39 @@ document.addEventListener('DOMContentLoaded', async () => {
         return (parent && profiles[parent]) ? parent : 'default';
     }
 
+    function getProfileAccessCopy(profilesV4, profileId) {
+        const name = getProfileName(profilesV4, profileId);
+        if (profileId === 'default') {
+            return {
+                eyebrow: 'Master access',
+                title: 'Enter Master PIN',
+                message: 'Default is protected. Enter the Master PIN to continue.',
+                placeholder: 'Master PIN',
+                gateTitle: 'Master Profile Locked',
+                gateMessage: `Unlock ${name} with the Master PIN to view management controls.`
+            };
+        }
+        const type = getProfileType(profilesV4, profileId);
+        if (type === 'account') {
+            return {
+                eyebrow: 'Protected account',
+                title: `Unlock ${name}`,
+                message: `${name} is a locked independent account. Enter its profile PIN to continue.`,
+                placeholder: 'Profile PIN',
+                gateTitle: 'Protected Account',
+                gateMessage: `Unlock ${name} to view management controls.`
+            };
+        }
+        return {
+            eyebrow: 'Protected child profile',
+            title: `Unlock ${name}`,
+            message: `${name} is a locked child profile. Enter its profile PIN to continue.`,
+            placeholder: 'Profile PIN',
+            gateTitle: 'Protected Child Profile',
+            gateMessage: `Unlock ${name} to view management controls.`
+        };
+    }
+
     function getAccountPolicy(profilesV4) {
         const root = safeObject(profilesV4);
         const profiles = safeObject(root.profiles);
@@ -4512,15 +4545,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const header = document.createElement('div');
         header.className = 'card-header';
+        const copy = getProfileAccessCopy(profilesV4, activeProfileId);
         const h3 = document.createElement('h3');
-        h3.textContent = 'Profile Locked';
+        h3.textContent = copy.gateTitle;
         header.appendChild(h3);
 
         const body = document.createElement('div');
         body.className = 'card-body';
         const hint = document.createElement('div');
         hint.className = 'import-export-hint';
-        hint.textContent = `Unlock ${getProfileName(profilesV4, activeProfileId)} to view settings.`;
+        hint.textContent = copy.gateMessage;
 
         const actions = document.createElement('div');
         actions.style.display = 'flex';
@@ -4553,7 +4587,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         lockGateEl = gate;
     }
 
-    async function showPromptModal({ title, message, placeholder = '', inputType = 'text', confirmText = 'Confirm', cancelText = 'Cancel', initialValue = '' }) {
+    async function showPromptModal({ eyebrow = '', title, message, placeholder = '', inputType = 'text', confirmText = 'Confirm', cancelText = 'Cancel', initialValue = '' }) {
         return new Promise((resolve) => {
             const overlay = document.createElement('div');
             overlay.className = 'ft-modal-overlay';
@@ -4563,6 +4597,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const header = document.createElement('div');
             header.className = 'card-header';
+            if (eyebrow) {
+                const eyebrowEl = document.createElement('div');
+                eyebrowEl.className = 'ft-modal-eyebrow';
+                eyebrowEl.textContent = eyebrow;
+                header.appendChild(eyebrowEl);
+            }
             const titleEl = document.createElement('h3');
             titleEl.className = 'ft-modal-title';
             titleEl.textContent = title;
@@ -7700,12 +7740,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             : extractProfilePinVerifier(profilesV4, profileId);
         if (!verifier) return true;
 
-        const title = profileId === 'default' ? 'Enter Master PIN' : 'Enter Profile PIN';
-        const name = getProfileName(profilesV4, profileId);
+        const copy = getProfileAccessCopy(profilesV4, profileId);
         const pin = await showPromptModal({
-            title,
-            message: `Unlock ${name} to continue.`,
-            placeholder: 'PIN',
+            eyebrow: copy.eyebrow,
+            title: copy.title,
+            message: copy.message,
+            placeholder: copy.placeholder,
             inputType: 'password',
             confirmText: 'Unlock'
         });

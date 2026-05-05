@@ -549,6 +549,17 @@ button.select-input.ft-select-trigger:disabled,
     line-height: var(--ft-line-height-tight);
  }
 
+ .ft-modal-eyebrow {
+    margin: 0 0 var(--ft-space-xs);
+    color: var(--ft-color-primary);
+    font-family: var(--ft-font-family-body);
+    font-size: var(--ft-font-size-xs);
+    font-weight: var(--ft-font-weight-bold);
+    letter-spacing: var(--ft-letter-spacing-wide);
+    line-height: var(--ft-line-height-tight);
+    text-transform: uppercase;
+ }
+
  .ft-modal-body {
     margin-top: var(--ft-space-sm);
     display: flex;
