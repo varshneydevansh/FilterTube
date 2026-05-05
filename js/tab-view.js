@@ -6133,6 +6133,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         return normalizeString(remote.deviceLabel) || normalizeString(remote.deviceId) || 'Unknown device';
     }
 
+    function getNanahLocalDeviceLabel() {
+        return normalizeString(ftNanahDeviceLabel?.value) || normalizeString(nanahStableDeviceId) || 'This device';
+    }
+
     function normalizeNanahProfileContext(value) {
         const raw = safeObject(value);
         const profileId = normalizeString(raw.profileId);
@@ -6182,6 +6186,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             parts.push('locked');
         }
         return parts.join(', ');
+    }
+
+    function formatNanahEndpointContext(profileContext, deviceLabel) {
+        const profileLabel = formatNanahProfileContext(profileContext);
+        const normalizedDeviceLabel = normalizeString(deviceLabel);
+        return normalizedDeviceLabel ? `${profileLabel} • ${normalizedDeviceLabel}` : profileLabel;
     }
 
     function buildNanahTargetHint(scope = getNanahScope()) {
@@ -7145,11 +7155,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             ftNanahStage.textContent = formatNanahStage(nanahSessionState.stage || 'idle');
         }
         if (ftNanahLocalProfile) {
-            ftNanahLocalProfile.textContent = formatNanahProfileContext(getNanahLocalProfileContext());
+            ftNanahLocalProfile.textContent = formatNanahEndpointContext(
+                getNanahLocalProfileContext(),
+                getNanahLocalDeviceLabel()
+            );
         }
         if (ftNanahRemoteLabel) {
             ftNanahRemoteLabel.textContent = nanahSessionState.connected
-                ? getNanahRemoteLabel()
+                ? formatNanahEndpointContext(nanahSessionState.remoteProfile, getNanahRemoteLabel())
                 : 'Not connected';
         }
         if (ftNanahRemoteProfile) {
