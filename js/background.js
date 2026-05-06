@@ -4459,7 +4459,10 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
 browserAPI.storage.onChanged.addListener((changes, area) => {
     if (area === 'local') {
         const relevantKeys = [
+            'uiKeywords',
             'filterKeywords',
+            'filterKeywordsComments',
+            'uiChannels',
             'filterChannels',
             'contentFilters',
             'hideMembersOnly',

@@ -350,7 +350,7 @@ function normalizeSettingsForHost(settings) {
     }
 }
 
-function requestSettingsFromBackground() {
+function requestSettingsFromBackground(options = {}) {
     return new Promise((resolve) => {
         const safeResolveFailure = () => {
             resolve({ success: false, settings: null, error: 'extension_context_invalidated' });
@@ -385,7 +385,9 @@ function requestSettingsFromBackground() {
             }
         })();
 
-        if (!sendRuntimeMessage({ action: "getCompiledSettings", profileType }, (response) => {
+        const forceRefresh = options && typeof options === 'object' && options.forceRefresh === true;
+
+        if (!sendRuntimeMessage({ action: "getCompiledSettings", profileType, forceRefresh }, (response) => {
             if (response && !response.error) {
                 try {
                     const resolvedProfile = response.profileType === 'kids'
@@ -521,7 +523,7 @@ function scheduleSettingsRefreshFromStorage({ forceReprocess = true } = {}) {
     const elapsed = now - lastStorageRefreshTs;
     if (elapsed >= MIN_STORAGE_REFRESH_INTERVAL_MS && !pendingStorageRefreshTimer) {
         lastStorageRefreshTs = now;
-        requestSettingsFromBackground().then(result => {
+        requestSettingsFromBackground({ forceRefresh: true }).then(result => {
             if (result?.success) {
                 applyDOMFallback(result.settings, { forceReprocess: forceReprocess === true });
             }
@@ -534,7 +536,7 @@ function scheduleSettingsRefreshFromStorage({ forceReprocess = true } = {}) {
     pendingStorageRefreshTimer = setTimeout(() => {
         pendingStorageRefreshTimer = 0;
         lastStorageRefreshTs = Date.now();
-        requestSettingsFromBackground().then(result => {
+        requestSettingsFromBackground({ forceRefresh: true }).then(result => {
             if (result?.success) {
                 applyDOMFallback(result.settings, { forceReprocess: forceReprocess === true });
             }
@@ -554,6 +556,7 @@ function handleStorageChanges(changes, area) {
     const isVideoMetaMapOnly = changedKeys.length === 1 && changedKeys[0] === 'videoMetaMap';
     const relevantKeys = [
         'enabled',
+        'uiKeywords',
         'filterKeywords',
         'filterKeywordsComments',
         'filterChannels',
