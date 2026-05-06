@@ -211,6 +211,17 @@
                 || cachedSettings.contentFilters.uppercase?.enabled
             )
         );
+        const hasActiveJsonFilterRules = Boolean(
+            cachedSettings
+            && (
+                (Array.isArray(cachedSettings.filterKeywords) && cachedSettings.filterKeywords.length > 0)
+                || (Array.isArray(cachedSettings.filterChannels) && cachedSettings.filterChannels.length > 0)
+                || (Array.isArray(cachedSettings.filterKeywordsComments) && cachedSettings.filterKeywordsComments.length > 0)
+                || cachedSettings.hideAllComments === true
+                || cachedSettings.hideAllShorts === true
+                || cachedSettings.categoryFilters?.enabled === true
+            )
+        );
 
         const searchActionCollections = data.onResponseReceivedCommands || data.onResponseReceivedActions || data.onResponseReceivedEndpoints;
         const hasSearchLayout = Boolean(
@@ -251,10 +262,9 @@
             const isSearchFetch = typeof dataName === 'string' && dataName.startsWith('fetch:/youtubei/v1/search');
             if (isSearchFetch || hasSearchLayout) {
                 if (mode !== 'whitelist') {
-                    // Historically we skipped search JSON mutation in blocklist mode so DOM fallback
-                    // could "restore" items during identity enrichment. Content filters (duration/date/
-                    // uppercase) are deterministic and should be applied JSON-first to avoid flash.
-                    if (!hasEnabledContentFilters) {
+                    // Keep the old fast path only when there are no active rules. Once a
+                    // blocklist rule exists, JSON filtering must run before YouTube paints.
+                    if (!hasEnabledContentFilters && !hasActiveJsonFilterRules) {
                         seedDebugLog(`⏭️ Skipping engine processing for ${dataName} (search results) to allow DOM-based restore`);
                         return true;
                     }
@@ -277,7 +287,7 @@
             );
 
             if (channelIndicators && isChannelDataName) {
-                if (mode !== 'whitelist' && !hasEnabledContentFilters) {
+                if (mode !== 'whitelist' && !hasEnabledContentFilters && !hasActiveJsonFilterRules) {
                     seedDebugLog(`⏭️ Skipping engine processing for ${dataName} (channel page) to allow DOM-based restore`);
                     return true;
                 }
@@ -293,6 +303,7 @@
         // Apply deterministic content filters JSON-first on home feed to prevent flash.
         if (hasEnabledContentFilters) return false;
         if (mode === 'whitelist') return false;
+        if (hasActiveJsonFilterRules) return false;
 
         const actionCollections = data.onResponseReceivedActions || data.onResponseReceivedEndpoints;
         if (!Array.isArray(actionCollections)) return false;

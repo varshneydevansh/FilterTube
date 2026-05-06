@@ -332,6 +332,33 @@ Avoid direct removal of:
 
 ## Rollout Steps
 
+## Implemented Baseline
+
+### 2026-05-06: active blocklist JSON-first pass
+
+Files changed:
+
+- `js/filter_logic.js`
+- `js/seed.js`
+
+What changed:
+
+- Added a `FilterTubeCandidate` extraction path inside `YouTubeDataFilter`.
+- Keyword decisions now search normalized JSON text from title, description, tags, metadata rows, accessibility labels, and channel identity text.
+- `radioRenderer` and `compactRadioRenderer` now read `title.runs`, byline text, video count text, and inline/secondary watch IDs, so Mix cards can be filtered before DOM paint.
+- `universalWatchCardRenderer` now reads header/call-to-action paths used by search and music hero cards.
+- Channel ID extraction now correctly iterates an array of candidate JSON paths instead of treating the array as one path.
+- `seed.js` no longer skips JSON mutation on home/search/channel feeds when blocklist mode has active rules. The old skip remains only for blocklist mode with no active rules, preserving the fast no-filter path.
+
+Observed result:
+
+- Blocklist keyword filtering on home/search is materially faster and avoids most visible card flash.
+- DOM fallback still remains as the safety net for renderers or late surfaces not yet covered by JSON.
+
+Known remaining work:
+
+- Watch page navigation/video start still has some delay. Treat this as a separate watch-page performance pass, likely around `/youtubei/v1/next` processing scope, right-rail hydration, and avoiding unnecessary full-response scans during player startup.
+
 ### Step 1: Prove settings freshness
 
 Files:

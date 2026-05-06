@@ -526,16 +526,37 @@
         // ------------------------------------------------------------------
         // Watch page related modules & secondary surfaces
         universalWatchCardRenderer: {
-            videoId: 'watchCardRichHeaderRenderer.navigationEndpoint.videoId',
-            title: ['watchCardRichHeaderRenderer.title.simpleText'],
-            channelName: ['watchCardRichHeaderRenderer.subtitle.simpleText'],
+            videoId: [
+                'watchCardRichHeaderRenderer.navigationEndpoint.videoId',
+                'callToAction.watchCardHeroVideoRenderer.watchEndpoint.videoId'
+            ],
+            title: [
+                'header.watchCardRichHeaderRenderer.title.runs',
+                'header.watchCardRichHeaderRenderer.title.simpleText',
+                'watchCardRichHeaderRenderer.title.runs',
+                'watchCardRichHeaderRenderer.title.simpleText',
+                'callToAction.watchCardHeroVideoRenderer.callToActionButton.callToActionButtonRenderer.label.runs',
+                'callToAction.watchCardHeroVideoRenderer.callToActionButton.callToActionButtonRenderer.label.simpleText'
+            ],
+            channelName: [
+                'header.watchCardRichHeaderRenderer.subtitle.runs',
+                'header.watchCardRichHeaderRenderer.subtitle.simpleText',
+                'watchCardRichHeaderRenderer.subtitle.runs',
+                'watchCardRichHeaderRenderer.subtitle.simpleText'
+            ],
             channelId: [
+                'header.watchCardRichHeaderRenderer.titleNavigationEndpoint.browseEndpoint.browseId',
+                'header.watchCardRichHeaderRenderer.subtitle.navigationEndpoint.browseEndpoint.browseId',
+                'header.watchCardRichHeaderRenderer.subtitle.runs.0.navigationEndpoint.browseEndpoint.browseId',
                 'watchCardRichHeaderRenderer.subtitle.navigationEndpoint.browseEndpoint.browseId',
                 'watchCardRichHeaderRenderer.subtitle.runs.0.navigationEndpoint.browseEndpoint.browseId',
                 'watchCardRichHeaderRenderer.title.navigationEndpoint.browseEndpoint.browseId',
                 'watchCardRichHeaderRenderer.title.runs.0.navigationEndpoint.browseEndpoint.browseId'
             ],
             channelHandle: [
+                'header.watchCardRichHeaderRenderer.subtitle.runs.0.text',
+                'header.watchCardRichHeaderRenderer.subtitle.navigationEndpoint.browseEndpoint.canonicalBaseUrl',
+                'header.watchCardRichHeaderRenderer.subtitle.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl',
                 'watchCardRichHeaderRenderer.subtitle.navigationEndpoint.browseEndpoint.canonicalBaseUrl',
                 'watchCardRichHeaderRenderer.subtitle.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl',
                 'watchCardRichHeaderRenderer.subtitle.navigationEndpoint.commandMetadata.webCommandMetadata.url',
@@ -652,16 +673,19 @@
         radioRenderer: {
             videoId: [
                 'navigationEndpoint.watchEndpoint.videoId',
+                'inlinePlaybackEndpoint.watchEndpoint.videoId',
                 'secondaryNavigationEndpoint.watchEndpoint.videoId'
             ],
-            title: ['title.simpleText']
+            title: ['title.simpleText', 'title.runs'],
+            description: ['longBylineText.runs', 'shortBylineText.runs', 'videoCountText.runs', 'videoCountShortText.runs']
         },
         compactRadioRenderer: {
             videoId: [
                 'navigationEndpoint.watchEndpoint.videoId',
                 'secondaryNavigationEndpoint.watchEndpoint.videoId'
             ],
-            title: ['title.simpleText']
+            title: ['title.simpleText', 'title.runs'],
+            description: ['longBylineText.runs', 'shortBylineText.runs', 'videoCountText.runs', 'videoCountShortText.runs']
         },
         ticketShelfRenderer: {
             title: ['header.ticketShelfHeaderRenderer.title.simpleText']
@@ -1606,6 +1630,182 @@
             return { item, rendererType, wrapperRendererType: null };
         }
 
+        _paths(value) {
+            if (!value) return [];
+            return Array.isArray(value) ? value : [value];
+        }
+
+        _collectTextFromPaths(item, paths) {
+            const collected = [];
+            const seen = new Set();
+            for (const path of this._paths(paths)) {
+                let text = '';
+                if (path === 'metadataRows') {
+                    text = flattenMetadataRowsContainer(item?.metadataRows);
+                } else {
+                    const value = getByPath(item, path);
+                    const looksLikeMetadataRows = Array.isArray(value) && value.some(row => row && typeof row === 'object' && (row.metadataParts || row.text || row.title || row.subtitle));
+                    text = looksLikeMetadataRows || (value && typeof value === 'object' && !Array.isArray(value) && (value.metadataRows || value.rows))
+                        ? flattenMetadataRowsContainer(value)
+                        : flattenText(value);
+                }
+                if (!text || typeof text !== 'string') continue;
+                const normalized = text.trim();
+                if (!normalized) continue;
+                const key = normalized.toLowerCase();
+                if (seen.has(key)) continue;
+                seen.add(key);
+                collected.push(normalized);
+            }
+            return collected;
+        }
+
+        _extractVideoId(item, rules) {
+            const paths = rules && rules.videoId ? this._paths(rules.videoId) : [];
+            const directCandidates = [
+                item?.videoId,
+                item?.contentId,
+                item?.encryptedVideoId,
+                item?.navigationEndpoint?.watchEndpoint?.videoId,
+                item?.secondaryNavigationEndpoint?.watchEndpoint?.videoId,
+                item?.rendererContext?.commandContext?.onTap?.innertubeCommand?.watchEndpoint?.videoId,
+                item?.onTap?.innertubeCommand?.watchEndpoint?.videoId,
+                item?.onTap?.innertubeCommand?.reelWatchEndpoint?.videoId
+            ];
+            for (const path of paths) {
+                directCandidates.push(getByPath(item, path));
+            }
+            for (const candidate of directCandidates) {
+                if (typeof candidate === 'string' && /^[a-zA-Z0-9_-]{11}$/.test(candidate)) {
+                    return candidate;
+                }
+            }
+            return '';
+        }
+
+        _extractPlaylistId(item) {
+            const candidates = [
+                item?.playlistId,
+                item?.navigationEndpoint?.watchEndpoint?.playlistId,
+                item?.secondaryNavigationEndpoint?.watchEndpoint?.playlistId,
+                item?.rendererContext?.commandContext?.onTap?.innertubeCommand?.watchEndpoint?.playlistId,
+                item?.onTap?.innertubeCommand?.watchEndpoint?.playlistId
+            ];
+            for (const candidate of candidates) {
+                if (typeof candidate === 'string' && candidate.trim()) {
+                    return candidate.trim();
+                }
+            }
+            return '';
+        }
+
+        _buildCandidate(item, rendererType, wrapperRendererType = null) {
+            const rules = FILTER_RULES[rendererType] || {};
+            const title = this._extractTitle(item, rules);
+            const description = this._extractDescription(item, rules);
+            const channelInfo = this._extractChannelInfo(item, rules);
+            const collaborators = Array.isArray(channelInfo) ? channelInfo : [channelInfo].filter(Boolean);
+            const videoId = this._extractVideoId(item, rules);
+            const playlistId = this._extractPlaylistId(item);
+            const metadataParts = [
+                ...this._collectTextFromPaths(item, rules.channelName),
+                ...this._collectTextFromPaths(item, rules.duration),
+                ...this._collectTextFromPaths(item, rules.publishedTime),
+                ...this._collectTextFromPaths(item, rules.viewCount),
+                ...this._collectTextFromPaths(item, rules.metadataRows),
+                ...this._collectTextFromPaths(item, rules.commentText),
+                ...this._collectTextFromPaths(item, [
+                    'metadataText.simpleText',
+                    'metadataText.runs',
+                    'detailedMetadataSnippets.0.snippetText.simpleText',
+                    'detailedMetadataSnippets.0.snippetText.runs',
+                    'videoDetails.shortDescription',
+                    'videoDetails.keywords',
+                    'microformat.playerMicroformatRenderer.description.simpleText',
+                    'microformat.playerMicroformatRenderer.description.runs',
+                    'playerResponse.videoDetails.shortDescription',
+                    'playerResponse.videoDetails.keywords',
+                    'playerResponse.microformat.playerMicroformatRenderer.description.simpleText',
+                    'playerResponse.microformat.playerMicroformatRenderer.description.runs',
+                    'accessibility.accessibilityData.label',
+                    'accessibilityText'
+                ])
+            ];
+            const channel = collaborators[0] || { name: '', id: '', handle: '', customUrl: '', logo: '' };
+            const lowerTitle = title.toLowerCase();
+            const isMix = (
+                rendererType === 'radioRenderer' ||
+                rendererType === 'compactRadioRenderer' ||
+                (playlistId && playlistId.startsWith('RD')) ||
+                /^mix\s*[-:]/i.test(title) ||
+                lowerTitle.includes('youtube mix')
+            );
+            const isShort = (
+                rendererType === 'reelItemRenderer' ||
+                rendererType === 'shortsLockupViewModel' ||
+                rendererType === 'shortsLockupViewModelV2'
+            );
+            const isComment = rendererType.includes('comment') || rendererType.includes('Comment');
+            const isPlaylist = (
+                rendererType.includes('Playlist') ||
+                rendererType === 'playlistRenderer' ||
+                rendererType === 'gridPlaylistRenderer' ||
+                Boolean(playlistId)
+            );
+
+            return {
+                rendererType,
+                wrapperRendererType,
+                surface: '',
+                videoId,
+                playlistId,
+                title,
+                description,
+                tags: this._collectTextFromPaths(item, ['videoDetails.keywords', 'playerResponse.videoDetails.keywords']),
+                metadataText: metadataParts.join(' ').trim(),
+                durationText: this._collectTextFromPaths(item, rules.duration).join(' '),
+                publishedTimeText: this._collectTextFromPaths(item, rules.publishedTime).join(' '),
+                viewCountText: this._collectTextFromPaths(item, rules.viewCount).join(' '),
+                channel,
+                collaborators,
+                isMix,
+                isShort,
+                isPlaylist,
+                isComment,
+                isStructural: WHITELIST_CONTAINER_RENDERERS.has(rendererType) || CHIP_RENDERERS.has(rendererType)
+            };
+        }
+
+        _candidateSearchText(candidate) {
+            if (!candidate || typeof candidate !== 'object') return '';
+            const channelText = (candidate.collaborators || [])
+                .map(channel => [channel?.name, channel?.handle, channel?.customUrl, channel?.id].filter(Boolean).join(' '))
+                .filter(Boolean)
+                .join(' ');
+            return [
+                candidate.title,
+                candidate.description,
+                Array.isArray(candidate.tags) ? candidate.tags.join(' ') : '',
+                candidate.metadataText,
+                channelText
+            ].filter(Boolean).join(' ').trim();
+        }
+
+        _regexMatches(regex, text) {
+            if (!regex || !text) return false;
+            try {
+                regex.lastIndex = 0;
+                return regex.test(text);
+            } catch (e) {
+                return false;
+            } finally {
+                try {
+                    regex.lastIndex = 0;
+                } catch (e) {
+                }
+            }
+        }
+
         /**
          * Check if an item should be blocked based on filter rules
          */
@@ -1630,24 +1830,14 @@
                 return false;
             }
 
-            // Extract data using filter rules with multiple fallback attempts
-            const title = this._extractTitle(item, rules);
-            const channelInfo = this._extractChannelInfo(item, rules);
-            const description = this._extractDescription(item, rules);
-            let videoId = '';
-            if (rules.videoId) {
-                const videoIdPaths = Array.isArray(rules.videoId) ? rules.videoId : [rules.videoId];
-                for (const path of videoIdPaths) {
-                    const candidate = getByPath(item, path);
-                    if (candidate && typeof candidate === 'string') {
-                        videoId = candidate;
-                        break;
-                    }
-                }
-            }
+            const candidate = this._buildCandidate(item, rendererType, unwrappedRenderer.wrapperRendererType);
+            const title = candidate.title;
+            let channelInfo = candidate.collaborators.length > 1 ? candidate.collaborators : candidate.channel;
+            const description = candidate.description;
+            const videoId = candidate.videoId;
             const skipKeywordFiltering = CHANNEL_ONLY_RENDERERS.has(rendererType);
             const listMode = (this.settings.listMode === 'whitelist') ? 'whitelist' : 'blocklist';
-            const isCommentRenderer = rendererType.includes('comment') || rendererType.includes('Comment');
+            const isCommentRenderer = candidate.isComment;
 
             // Shorts: if no channel identity present, try videoChannelMap (populated when user blocked Shorts)
             if (
@@ -1657,6 +1847,8 @@
                 this.settings.videoChannelMap[videoId]
             ) {
                 channelInfo.id = this.settings.videoChannelMap[videoId];
+                candidate.channel = channelInfo;
+                candidate.collaborators = [channelInfo];
             }
 
             // Handle collaboration videos (channelInfo is an array)
@@ -1775,10 +1967,10 @@
                     }
                 }
 
-                if (hasKeywordRules && (title || description)) {
-                    const textToSearch = `${title} ${description}`.trim();
+                if (hasKeywordRules) {
+                    const textToSearch = this._candidateSearchText(candidate);
                     for (const keywordRegex of whitelistKeywords) {
-                        if (keywordRegex.test(textToSearch)) {
+                        if (this._regexMatches(keywordRegex, textToSearch)) {
                             this._logWhitelistDecision('allow:matched_keyword', {
                                 rendererType,
                                 originalRendererType,
@@ -1845,15 +2037,18 @@
             }
 
             // Keyword filtering (check title AND description)
-            if (!skipKeywordFiltering && this.settings.filterKeywords.length > 0 && (title || description)) {
-                const textToSearch = `${title} ${description}`.trim();
+            if (!skipKeywordFiltering && this.settings.filterKeywords.length > 0) {
+                const textToSearch = this._candidateSearchText(candidate);
 
                 for (const keywordRegex of this.settings.filterKeywords) {
-                    if (keywordRegex.test(textToSearch)) {
+                    if (this._regexMatches(keywordRegex, textToSearch)) {
                         let matchLocation = '';
-                        if (keywordRegex.test(title)) matchLocation += 'title';
-                        if (keywordRegex.test(description)) {
+                        if (this._regexMatches(keywordRegex, title)) matchLocation += 'title';
+                        if (this._regexMatches(keywordRegex, description)) {
                             matchLocation += matchLocation ? '+desc' : 'desc';
+                        }
+                        if (!matchLocation && this._regexMatches(keywordRegex, candidate.metadataText)) {
+                            matchLocation = 'json';
                         }
 
                         this._log(`🚫 Blocking by keyword in ${matchLocation}: "${title.substring(0, 30)}..." (matched: ${keywordRegex.source})`);
@@ -1878,7 +2073,7 @@
                 // Apply keyword filters to comments
                 if (commentText && commentKeywords.length > 0) {
                     for (const keywordRegex of commentKeywords) {
-                        if (keywordRegex.test(commentText)) {
+                        if (this._regexMatches(keywordRegex, commentText)) {
                             this._log(`🚫 Blocking comment by keyword: ${commentText.substring(0, 50)}...`);
                             return true;
                         }
@@ -2910,7 +3105,13 @@
             }
 
             if (rules.channelId) {
-                channelInfo.id = getByPath(item, rules.channelId);
+                for (const path of this._paths(rules.channelId)) {
+                    const value = getByPath(item, path);
+                    if (typeof value === 'string' && value.trim()) {
+                        channelInfo.id = value.trim();
+                        break;
+                    }
+                }
             }
 
             if (rules.channelHandle) {
