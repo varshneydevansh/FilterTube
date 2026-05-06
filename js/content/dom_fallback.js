@@ -751,6 +751,8 @@ function enforceCurrentWatchOwnerBlock(settings) {
         const path = String(document.location?.pathname || '');
         if (!path.startsWith('/watch')) return;
         if (String(document.location?.hostname || '').includes('youtubekids.com')) return;
+        const listMode = (settings && settings.listMode === 'whitelist') ? 'whitelist' : 'blocklist';
+        if (listMode === 'whitelist') return;
 
         const ownerMeta = getCurrentWatchOwnerMeta(settings);
         if (!ownerMeta || !ownerMeta.videoId) return;
@@ -2180,6 +2182,7 @@ async function applyDOMFallback(settings, options = {}) {
                 const params = new URLSearchParams(document.location?.search || '');
                 const isPlaylistWatch = params.has('list');
                 if (!isWatch || !isPlaylistWatch) return;
+                if (currentSettings?.listMode === 'whitelist') return;
 
                 const playlistPanel = getPlaylistPanelContainer() || document;
                 const items = getPlaylistPanelRows(playlistPanel);
@@ -2241,6 +2244,7 @@ async function applyDOMFallback(settings, options = {}) {
                     const params = new URLSearchParams(document.location?.search || '');
                     const isPlaylistWatch = params.has('list');
                     if (!isWatch || !isPlaylistWatch) return;
+                    if (currentSettings?.listMode === 'whitelist') return;
 
                     // Let YouTube handle normal autoplay, but when the immediate next playlist item
                     // is hidden, force a Next click so our click-guard can skip deterministically.
@@ -3495,7 +3499,7 @@ async function applyDOMFallback(settings, options = {}) {
                         }
                     })();
                     const shouldHideSelectedRow = shouldHide && (hasExplicitBlockMarker || (hasActiveBlockRules && matchesFilters));
-                    if (shouldHideSelectedRow) {
+                    if (shouldHideSelectedRow && listMode !== 'whitelist') {
                         try {
                             const now = Date.now();
                             const last = Number(window.__filtertubeLastPlaylistSkipTs || 0);
@@ -4017,7 +4021,33 @@ async function applyDOMFallback(settings, options = {}) {
             updateContainerVisibility(shelf, 'ytd-rich-item-renderer, ytd-grid-video-renderer, ytd-video-renderer, ytd-reel-item-renderer, yt-lockup-view-model, ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2, ytd-search-refinement-card-renderer, .ytGridShelfViewModelGridShelfItem');
 
             try {
-                if (path === '/results' && (shelf.tagName || '').toLowerCase() === 'grid-shelf-view-model') {
+                const shelfTag = (shelf.tagName || '').toLowerCase();
+                if (path === '/' && shelfTag === 'ytd-rich-shelf-renderer') {
+                    const isShortsShelf = shelfTitleText.includes('short') || shelf.hasAttribute('is-shorts');
+                    if (isShortsShelf && !effectiveSettings.hideAllShorts && !shelf.hasAttribute('data-filtertube-hidden-by-hide-all-shorts')) {
+                        const section = shelf.closest('ytd-rich-section-renderer') || shelf;
+                        const items = shelf.querySelectorAll('ytd-rich-item-renderer, ytd-reel-item-renderer, yt-lockup-view-model, ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2');
+                        const hasVisibleItem = Array.from(items).some(item => {
+                            if (!item) return false;
+                            if (item.classList.contains('filtertube-hidden') || item.classList.contains('filtertube-hidden-shelf')) return false;
+                            if (item.hasAttribute('data-filtertube-hidden')) return false;
+                            try {
+                                const style = window.getComputedStyle(item);
+                                if (style && style.display === 'none') return false;
+                            } catch (e) {
+                            }
+                            return true;
+                        });
+
+                        if (!hasVisibleItem) {
+                            toggleVisibility(section, true, 'Empty Shorts shelf', true);
+                        } else {
+                            toggleVisibility(section, false, '', true);
+                        }
+                    }
+                }
+
+                if (path === '/results' && shelfTag === 'grid-shelf-view-model') {
                     const isShortsShelf = shelfTitleText.includes('short');
                     if (isShortsShelf && !effectiveSettings.hideAllShorts && !shelf.hasAttribute('data-filtertube-hidden-by-hide-all-shorts')) {
                         const items = shelf.querySelectorAll('.ytGridShelfViewModelGridShelfItem, ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2, ytd-reel-item-renderer');
@@ -4119,7 +4149,7 @@ async function applyDOMFallback(settings, options = {}) {
             const params = new URLSearchParams(document.location?.search || '');
             const isPlaylistWatch = params.has('list');
             const playlistPanel = getPlaylistPanelContainer() || document;
-            if (isWatch && isPlaylistWatch && playlistPanel) {
+            if (listMode !== 'whitelist' && isWatch && isPlaylistWatch && playlistPanel) {
                 const items = getPlaylistPanelRows(playlistPanel);
                 if (items.length > 0) {
                     const selected = items.find(el => isSelectedPlaylistPanelRow(el)) || null;

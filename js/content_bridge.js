@@ -1075,6 +1075,7 @@ function installRightRailWhitelistObserver() {
     const scheduleWhitelistRefresh = () => {
         try {
             if (currentSettings?.listMode !== 'whitelist') return;
+            if ((document.location?.pathname || '').startsWith('/watch')) return;
         } catch (e) {
             return;
         }
@@ -5765,7 +5766,7 @@ async function initializeDOMFallback(settings) {
 
                 try {
                     const path = document.location?.pathname || '';
-                    if (path === '/results' || path === '/feed/channels') return;
+                    if (path === '/' || path === '/results' || path === '/feed/channels' || path.startsWith('/watch')) return;
                 } catch (e) {
                 }
 

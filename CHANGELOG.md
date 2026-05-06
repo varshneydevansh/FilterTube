@@ -2,6 +2,12 @@
 
 ## Version 3.3.1
 
+### Whitelist Home & Watch Stability
+
+- **Whitelist playback guard**: Watch pages no longer run current-watch owner blocking or playlist skip/redirect logic while in whitelist mode, so YouTube keeps ownership of video startup and navigation.
+- **Home/watch loading guard**: Whitelist pending pre-hide is skipped on Home and Watch surfaces to avoid blank pages while YouTube is still resolving card identity.
+- **Empty Shorts shelf cleanup**: Home Shorts shelves with no visible allowed items are collapsed so whitelist feeds do not leave empty section headers behind.
+
 ### Nanah Device Trust & Sync
 
 - **Accounts & Sync simplification**: `Device Trust & Sync` now starts from three simpler paths: `Send this profile once`, `Parent controls child`, and `Move full account`.

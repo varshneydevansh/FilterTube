@@ -571,6 +571,17 @@ if (watchMeta) {
 
 **Follow-up note:** this cleanup now matters for collaborator state too. During watch-to-watch SPA swaps, FilterTube re-validates stamped collaborator metadata/menu assumptions against stronger watch roots so a stale `A and 2 more` placeholder does not survive after the selected playlist row or watch metadata changes.
 
+### Whitelist Home and Watch Loading Guards
+
+Whitelist mode must hide non-matching content, but it cannot take over YouTube's watch-player lifecycle or blank broad surfaces before identity arrives:
+
+- Home (`/`) and Watch (`/watch`) skip bridge-level whitelist pending pre-hide. Cards are still filtered by the DOM fallback, but YouTube gets to render the surface first.
+- Watch pages skip the right-rail whitelist force-refresh loop. This avoids reprocessing the watch page while the player and metadata are still starting.
+- Current-watch owner blocking, playlist selected-row redirects, and playlist next/previous click guards are blocklist-only. In whitelist mode, FilterTube filters cards/rows but does not drive the currently playing video to the next item.
+- Home Shorts shelves are collapsed when their items are all hidden, preventing empty Shorts headers from remaining in an otherwise valid whitelist feed.
+
+**Impact**: Whitelist feeds remain restrictive without causing blank Home pages, blank Watch pages, or delayed player startup.
+
 ### Whitelist-Pending Re-evaluation Timing
 
 Optimized timing for re-evaluating pending content to reduce "recursive hiding" window:
