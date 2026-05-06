@@ -3540,10 +3540,8 @@ async function applyDOMFallback(settings, options = {}) {
                 );
                 const hasCardText = Boolean((keywordTarget || '').trim() || (channel || '').trim());
                 if (!hasCardIdentity && !hasCardText) {
-                    shouldHide = false;
+                    hideReason = 'Pending whitelist identity';
                     targetToHide.setAttribute('data-filtertube-whitelist-pending', 'true');
-                    targetToHide.removeAttribute('data-filtertube-hidden');
-                    targetToHide.classList.remove('filtertube-hidden');
                     targetToHide.classList.remove('filtertube-hidden-shelf');
                 }
             }
