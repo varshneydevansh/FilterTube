@@ -1699,11 +1699,24 @@
             return '';
         }
 
-        _buildCandidate(item, rendererType, wrapperRendererType = null) {
+        _emptyChannelInfo() {
+            return { name: '', id: '', handle: '', customUrl: '', logo: '' };
+        }
+
+        _hasChannelPolicyRules(listMode = '') {
+            const hasBlockChannels = Array.isArray(this.settings.filterChannels) && this.settings.filterChannels.length > 0;
+            const hasWhitelistChannels = listMode === 'whitelist' && Array.isArray(this.settings.whitelistChannels) && this.settings.whitelistChannels.length > 0;
+            return hasBlockChannels || hasWhitelistChannels;
+        }
+
+        _buildCandidate(item, rendererType, wrapperRendererType = null, options = {}) {
             const rules = FILTER_RULES[rendererType] || {};
             const title = this._extractTitle(item, rules);
             const description = this._extractDescription(item, rules);
-            const channelInfo = this._extractChannelInfo(item, rules);
+            const shouldExtractChannelIdentity = options && options.extractChannelIdentity === true;
+            const channelInfo = shouldExtractChannelIdentity
+                ? this._extractChannelInfo(item, rules)
+                : this._emptyChannelInfo();
             const collaborators = Array.isArray(channelInfo) ? channelInfo : [channelInfo].filter(Boolean);
             const videoId = this._extractVideoId(item, rules);
             const playlistId = this._extractPlaylistId(item);
@@ -1830,13 +1843,16 @@
                 return false;
             }
 
-            const candidate = this._buildCandidate(item, rendererType, unwrappedRenderer.wrapperRendererType);
+            const listMode = (this.settings.listMode === 'whitelist') ? 'whitelist' : 'blocklist';
+            const needsChannelIdentity = this._hasChannelPolicyRules(listMode);
+            const candidate = this._buildCandidate(item, rendererType, unwrappedRenderer.wrapperRendererType, {
+                extractChannelIdentity: needsChannelIdentity
+            });
             const title = candidate.title;
             let channelInfo = candidate.collaborators.length > 1 ? candidate.collaborators : candidate.channel;
             const description = candidate.description;
             const videoId = candidate.videoId;
             const skipKeywordFiltering = CHANNEL_ONLY_RENDERERS.has(rendererType);
-            const listMode = (this.settings.listMode === 'whitelist') ? 'whitelist' : 'blocklist';
             const isCommentRenderer = candidate.isComment;
 
             // Shorts: if no channel identity present, try videoChannelMap (populated when user blocked Shorts)

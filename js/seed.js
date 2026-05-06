@@ -396,18 +396,23 @@
         if (window.FilterTubeEngine && window.FilterTubeEngine.processData) {
             seedDebugLog(`🔧 Processing ${dataName} with comprehensive engine`);
             try {
-                const originalSize = JSON.stringify(data).length;
+                const debugStatsEnabled = isSeedDebugEnabled();
+                const startedAt = debugStatsEnabled ? Date.now() : 0;
+                const originalSize = debugStatsEnabled ? JSON.stringify(data).length : 0;
                 const result = window.FilterTubeEngine.processData(data, cachedSettings, dataName);
-                const newSize = JSON.stringify(result).length;
+                const newSize = debugStatsEnabled ? JSON.stringify(result).length : 0;
                 
                 seedDebugLog(`✅ Successfully processed ${dataName} with engine`);
-                seedDebugLog(`📊 Size change: ${originalSize} → ${newSize} chars (${originalSize - newSize} removed)`);
-                
-                // Check if anything was actually filtered
-                if (originalSize !== newSize) {
-                    seedDebugLog(`🎯 Data was modified! Filtering is working.`);
-                } else {
-                    seedDebugLog(`⚠️ No changes made to data - check filter rules and data structure`);
+                if (debugStatsEnabled) {
+                    seedDebugLog(`📊 Size change: ${originalSize} → ${newSize} chars (${originalSize - newSize} removed)`);
+                    seedDebugLog(`⏱️ Engine processing time: ${Date.now() - startedAt}ms`);
+
+                    // Check if anything was actually filtered
+                    if (originalSize !== newSize) {
+                        seedDebugLog(`🎯 Data was modified! Filtering is working.`);
+                    } else {
+                        seedDebugLog(`⚠️ No changes made to data - check filter rules and data structure`);
+                    }
                 }
 
                 stashNetworkSnapshot(result, dataName);

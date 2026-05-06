@@ -359,6 +359,27 @@ Known remaining work:
 
 - Watch page navigation/video start still has some delay. Treat this as a separate watch-page performance pass, likely around `/youtubei/v1/next` processing scope, right-rail hydration, and avoiding unnecessary full-response scans during player startup.
 
+### 2026-05-06: watch-page cost reduction pass
+
+Files changed:
+
+- `js/filter_logic.js`
+- `js/seed.js`
+
+What changed:
+
+- `seed.js` now gates response size diffing behind debug mode. Normal filtering no longer serializes the original and filtered JSON response just to log byte deltas.
+- `filter_logic.js` now skips deep channel/collaboration extraction unless channel policy needs it. Pure keyword filtering keeps using JSON title, description, tags, metadata, and lightweight text fields, but avoids scanning avatar stacks and collaborator dialogs.
+
+Observed result:
+
+- Watch page navigation and video startup feel lighter after the active blocklist JSON-first pass.
+- Keyword-only filtering keeps the faster pre-paint behavior without paying the full collaborator extraction cost.
+
+Reliability note:
+
+- Channel blocklist/whitelist still keeps the deep channel and collaborator path enabled. Collaboration videos are still blocked when any extracted collaborator matches a channel rule.
+
 ### Step 1: Prove settings freshness
 
 Files:
