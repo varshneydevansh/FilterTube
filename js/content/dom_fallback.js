@@ -2202,6 +2202,13 @@ async function applyDOMFallback(settings, options = {}) {
     const videoElements = (onlyWhitelistPending && listMode === 'whitelist')
         ? document.querySelectorAll(`${VIDEO_CARD_SELECTORS}[data-filtertube-whitelist-pending="true"]`)
         : document.querySelectorAll(VIDEO_CARD_SELECTORS);
+    const isWatchPage = (() => {
+        try {
+            return (document.location?.pathname || '').startsWith('/watch');
+        } catch (e) {
+            return false;
+        }
+    })();
 
     if (!window.__filtertubePlaylistNavGuardInstalled) {
         window.__filtertubePlaylistNavGuardInstalled = true;
@@ -2386,6 +2393,7 @@ async function applyDOMFallback(settings, options = {}) {
                 element.hasAttribute('data-filtertube-channel-handle') ||
                 element.hasAttribute('data-filtertube-channel-custom')
             );
+            const isWatchRightRailCard = Boolean(isWatchPage && element.closest('#secondary, ytd-watch-next-secondary-results-renderer'));
             const hasStaleGenericHiddenState = (
                 listMode === 'whitelist' &&
                 hasCurrentPageIdentity &&
@@ -2486,7 +2494,7 @@ async function applyDOMFallback(settings, options = {}) {
 
                     if (
                         element.hasAttribute('data-filtertube-processed') &&
-                        canUseCurrentPageIdentity &&
+                        (canUseCurrentPageIdentity || isWatchRightRailCard) &&
                         !hasExplicitHideReasonMarker(element)
                     ) {
                         element.removeAttribute('data-filtertube-processed');
@@ -3523,6 +3531,22 @@ async function applyDOMFallback(settings, options = {}) {
 
             let hideReason = `Content: ${title}`;
             let shouldHide = matchesFilters || hideByDuration || hideByUploadDate || hideByCategory;
+            if (listMode === 'whitelist' && isWatchRightRailCard && matchesFilters) {
+                const hasCardIdentity = Boolean(
+                    channelMeta?.id ||
+                    channelMeta?.handle ||
+                    channelMeta?.customUrl ||
+                    collaboratorMetas.some(meta => Boolean(meta?.id || meta?.handle || meta?.customUrl))
+                );
+                const hasCardText = Boolean((keywordTarget || '').trim() || (channel || '').trim());
+                if (!hasCardIdentity && !hasCardText) {
+                    shouldHide = false;
+                    targetToHide.setAttribute('data-filtertube-whitelist-pending', 'true');
+                    targetToHide.removeAttribute('data-filtertube-hidden');
+                    targetToHide.classList.remove('filtertube-hidden');
+                    targetToHide.classList.remove('filtertube-hidden-shelf');
+                }
+            }
             if (hideByDuration) {
                 hideReason = `Duration filter: ${title}`;
             }
@@ -4163,6 +4187,7 @@ async function applyDOMFallback(settings, options = {}) {
             const shelf = shelves[i];
             const shelfTitle = extractShelfTitle(shelf);
             const path = document.location?.pathname || '';
+            const isWatchRailShelf = Boolean(path.startsWith('/watch') && shelf.closest('#secondary, ytd-watch-next-secondary-results-renderer'));
             const shelfTitleText = (shelfTitle || '').toLowerCase();
             const shelfTitleMatches = shelfTitle && (
                 (listMode !== 'whitelist' && shouldHideContent(shelfTitle, '', effectiveSettings)) ||
@@ -4180,7 +4205,15 @@ async function applyDOMFallback(settings, options = {}) {
                 toggleVisibility(shelf, false);
             }
 
-            updateContainerVisibility(shelf, 'ytd-rich-item-renderer, ytd-grid-video-renderer, ytd-video-renderer, ytd-reel-item-renderer, ytd-channel-renderer, ytd-grid-channel-renderer, ytd-universal-watch-card-renderer, ytd-secondary-search-container-renderer, yt-lockup-view-model, ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2, ytd-search-refinement-card-renderer, .ytGridShelfViewModelGridShelfItem');
+            if (listMode === 'whitelist' && isWatchRailShelf) {
+                shelf.classList.remove('filtertube-hidden-shelf');
+                if (shelf.classList.contains('filtertube-hidden')) {
+                    shelf.classList.remove('filtertube-hidden');
+                    shelf.removeAttribute('data-filtertube-hidden');
+                }
+            } else {
+                updateContainerVisibility(shelf, 'ytd-rich-item-renderer, ytd-grid-video-renderer, ytd-video-renderer, ytd-reel-item-renderer, ytd-channel-renderer, ytd-grid-channel-renderer, ytd-universal-watch-card-renderer, ytd-secondary-search-container-renderer, yt-lockup-view-model, ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2, ytd-search-refinement-card-renderer, .ytGridShelfViewModelGridShelfItem');
+            }
 
             try {
                 const shelfTag = (shelf.tagName || '').toLowerCase();
