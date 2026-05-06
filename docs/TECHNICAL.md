@@ -582,6 +582,15 @@ Whitelist mode must hide non-matching content, but it cannot take over YouTube's
 
 **Impact**: Whitelist feeds remain restrictive without causing blank Home pages, blank Watch pages, or delayed player startup.
 
+### Keyword Comment Scope
+
+The old global `filterComments` content-control toggle is now legacy data only. Runtime comment-text filtering is controlled by each keyword row's `comments` flag:
+
+- `comments: true` means the keyword also matches comment text.
+- `comments: false` or missing means the keyword only applies to video titles and available video metadata.
+- `Hide All Comments` remains the global control for removing comment sections entirely.
+- Existing local settings and imported backups that still contain `filterComments: false` are migrated to `comments: false` on keyword rows so users do not suddenly start filtering comments after the global toggle disappears.
+
 ### Whitelist-Pending Re-evaluation Timing
 
 Optimized timing for re-evaluating pending content to reduce "recursive hiding" window:

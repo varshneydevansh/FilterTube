@@ -148,7 +148,6 @@ function buildAutoBackupPayload({ settings, profilesV3, theme }) {
                 mode: mainMode,
                 hideShorts: !!s.hideShorts,
                 hideComments: !!s.hideComments,
-                filterComments: !!s.filterComments,
                 hideHomeFeed: !!s.hideHomeFeed,
                 hideSponsoredCards: !!s.hideSponsoredCards,
                 hideWatchPlaylistPanel: !!s.hideWatchPlaylistPanel,
@@ -294,8 +293,6 @@ function readAutoBackupState() {
             })();
 
             const hideCommentsFromV4 = boolFromV4('hideComments', !!items?.hideAllComments);
-            const filterCommentsFromV4 = hideCommentsFromV4 ? false : boolFromV4('filterComments', !!items?.filterComments);
-
             const channelsFromV4 = (hasProfilesV4 && Array.isArray(activeMain.channels))
                 ? activeMain.channels
                 : safeArray(items?.filterChannels);
@@ -334,7 +331,6 @@ function readAutoBackupState() {
                 })(),
                 hideShorts: boolFromV4('hideShorts', !!items?.hideAllShorts),
                 hideComments: hideCommentsFromV4,
-                filterComments: filterCommentsFromV4,
                 hideHomeFeed: boolFromV4('hideHomeFeed', !!items?.hideHomeFeed),
                 hideSponsoredCards: boolFromV4('hideSponsoredCards', !!items?.hideSponsoredCards),
                 hideWatchPlaylistPanel: boolFromV4('hideWatchPlaylistPanel', !!items?.hideWatchPlaylistPanel),
@@ -945,6 +941,7 @@ const FT_PROFILES_V4_KEY = 'ftProfilesV4';
 const DEFAULT_PROFILE_ID = 'default';
 const QUICK_BLOCK_DEFAULT_MIGRATION_KEY = 'quickBlockDefaultV327Applied';
 const QUICK_BLOCK_DEFAULT_TARGET_VERSION = '3.2.9';
+const KEYWORD_COMMENTS_SCOPE_MIGRATION_KEY = 'keywordCommentsScopeMigrationV332Applied';
 
 function compareSemver(a = '', b = '') {
     const toParts = (value) => String(value || '')
@@ -1016,6 +1013,93 @@ function applyQuickBlockDefaultMigrationOnce({ previousVersion = '', isInstall =
                 browserAPI.storage.local.set(updates, () => resolve(true));
             } catch (e) {
                 browserAPI.storage.local.set({ [QUICK_BLOCK_DEFAULT_MIGRATION_KEY]: true }, () => resolve(false));
+            }
+        });
+    });
+}
+
+function applyKeywordCommentsScopeMigrationOnce() {
+    return new Promise((resolve) => {
+        browserAPI.storage.local.get([
+            KEYWORD_COMMENTS_SCOPE_MIGRATION_KEY,
+            FT_PROFILES_V4_KEY,
+            'uiKeywords',
+            'filterChannels',
+            'filterComments',
+            'hideAllComments'
+        ], (items) => {
+            try {
+                if (items?.[KEYWORD_COMMENTS_SCOPE_MIGRATION_KEY]) {
+                    resolve(false);
+                    return;
+                }
+
+                const updates = { [KEYWORD_COMMENTS_SCOPE_MIGRATION_KEY]: true };
+                const migrateKeywordList = (list, commentsEnabled) => {
+                    if (!Array.isArray(list)) return list;
+                    if (commentsEnabled) return list;
+                    return list.map(entry => {
+                        if (!entry || typeof entry !== 'object' || Array.isArray(entry)) return entry;
+                        return { ...entry, comments: false };
+                    });
+                };
+                const migrateChannelList = (list, commentsEnabled) => {
+                    if (!Array.isArray(list)) return list;
+                    if (commentsEnabled) return list;
+                    return list.map(entry => {
+                        if (!entry || typeof entry !== 'object' || Array.isArray(entry)) return entry;
+                        return { ...entry, filterAllComments: false };
+                    });
+                };
+                const sanitizeSettings = (settings = {}) => {
+                    const next = { ...settings };
+                    delete next.filterComments;
+                    return next;
+                };
+
+                const legacyRootCommentsEnabled = items?.hideAllComments ? false : items?.filterComments === true;
+                if (Array.isArray(items?.uiKeywords)) {
+                    updates.uiKeywords = migrateKeywordList(items.uiKeywords, legacyRootCommentsEnabled);
+                }
+                if (Array.isArray(items?.filterChannels)) {
+                    updates.filterChannels = migrateChannelList(items.filterChannels, legacyRootCommentsEnabled);
+                }
+                updates.filterComments = false;
+
+                const profilesV4 = items?.[FT_PROFILES_V4_KEY];
+                if (profilesV4 && typeof profilesV4 === 'object' && profilesV4.profiles && typeof profilesV4.profiles === 'object') {
+                    const nextProfiles = {};
+                    for (const [profileId, rawProfile] of Object.entries(profilesV4.profiles)) {
+                        const profile = rawProfile && typeof rawProfile === 'object' ? rawProfile : {};
+                        const settings = profile.settings && typeof profile.settings === 'object' && !Array.isArray(profile.settings)
+                            ? profile.settings
+                            : {};
+                        const main = profile.main && typeof profile.main === 'object' && !Array.isArray(profile.main)
+                            ? profile.main
+                            : {};
+                        const commentsEnabled = settings.hideComments ? false : settings.filterComments === true;
+
+                        nextProfiles[profileId] = {
+                            ...profile,
+                            settings: sanitizeSettings(settings),
+                            main: {
+                                ...main,
+                                channels: migrateChannelList(main.channels, commentsEnabled),
+                                keywords: migrateKeywordList(main.keywords, commentsEnabled),
+                                whitelistChannels: migrateChannelList(main.whitelistChannels, commentsEnabled),
+                                whitelistKeywords: migrateKeywordList(main.whitelistKeywords, commentsEnabled)
+                            }
+                        };
+                    }
+                    updates[FT_PROFILES_V4_KEY] = {
+                        ...profilesV4,
+                        profiles: nextProfiles
+                    };
+                }
+
+                browserAPI.storage.local.set(updates, () => resolve(true));
+            } catch (e) {
+                browserAPI.storage.local.set({ [KEYWORD_COMMENTS_SCOPE_MIGRATION_KEY]: true, filterComments: false }, () => resolve(false));
             }
         });
     });
@@ -1295,7 +1379,7 @@ function buildProfilesV4FromLegacyState(items, storageUpdates = {}) {
                 const raw = parsed.raw.replace(/\\(.)/g, '$1');
                 const word = raw.trim();
                 if (!word) return null;
-                return { word, exact: parsed.exact, comments: true, addedAt: now, source: 'user' };
+                return { word, exact: parsed.exact, comments: items?.filterComments === true && !hideComments, addedAt: now, source: 'user' };
             })
             .filter(Boolean);
     } else if (typeof items?.filterKeywords === 'string') {
@@ -1303,7 +1387,7 @@ function buildProfilesV4FromLegacyState(items, storageUpdates = {}) {
             .split(',')
             .map(word => word.trim())
             .filter(Boolean)
-            .map(word => ({ word, exact: false, comments: true, addedAt: now, source: 'user' }));
+            .map(word => ({ word, exact: false, comments: items?.filterComments === true && !hideComments, addedAt: now, source: 'user' }));
     }
 
     return {
@@ -1319,7 +1403,6 @@ function buildProfilesV4FromLegacyState(items, storageUpdates = {}) {
                     enabled,
                     hideShorts: !!items?.hideAllShorts,
                     hideComments,
-                    filterComments: hideComments ? false : !!items?.filterComments,
                     hideHomeFeed: !!items?.hideHomeFeed,
                     hideSponsoredCards: !!items?.hideSponsoredCards,
                     hideWatchPlaylistPanel: !!items?.hideWatchPlaylistPanel,
@@ -1851,7 +1934,7 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
                 const uiKeywords = storedUiKeywords;
                 const includeWords = new Set(
                     uiKeywords
-                        .filter(k => k && typeof k.word === 'string' && (k.comments !== false))
+                        .filter(k => k && typeof k.word === 'string' && k.comments === true)
                         .map(k => k.word.trim().toLowerCase())
                         .filter(Boolean)
                 );
@@ -1971,8 +2054,6 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
             })();
 
             const hideCommentsFromV4 = boolFromV4('hideComments', items.hideAllComments || false);
-            const filterCommentsFromV4 = hideCommentsFromV4 ? false : boolFromV4('filterComments', items.filterComments || false);
-
             const v4KeywordEntries = shouldUseKidsProfile
                 ? (Array.isArray(activeKids.blockedKeywords) ? activeKids.blockedKeywords : null)
                 : (() => {
@@ -1990,7 +2071,7 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
             if (v4KeywordEntries) {
                 compiledSettings.filterKeywords = compileKeywordEntries(v4KeywordEntries);
                 compiledSettings.filterKeywordsComments = compileKeywordEntries(v4KeywordEntries, entry => {
-                    return (typeof entry === 'object' && entry) ? entry.comments !== false : true;
+                    return (typeof entry === 'object' && entry) ? entry.comments === true : false;
                 });
             }
 
@@ -2289,7 +2370,7 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
                                 return {
                                     word: word,
                                     exact: false,
-                                    comments: true,
+                                    comments: false,
                                     addedAt: Date.now(),
                                     source: 'filterAll_channel'
                                 };
@@ -2359,7 +2440,7 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
 
                 const compiledKidsKeywordsComments = rawKidsKeywords.map(entry => {
                     try {
-                        if (entry && typeof entry === 'object' && entry.comments === false) return null;
+                        if (!entry || typeof entry !== 'object' || entry.comments !== true) return null;
                         const word = typeof entry?.word === 'string' ? entry.word.trim() : '';
                         if (!word) return null;
                         const exact = entry?.exact === true;
@@ -2393,7 +2474,7 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
             // Pass through boolean flags
             compiledSettings.enabled = enabledFromV4;
             compiledSettings.hideAllComments = hideCommentsFromV4;
-            compiledSettings.filterComments = filterCommentsFromV4;
+            compiledSettings.filterComments = false;
             compiledSettings.useExactWordMatching = useExact;
             compiledSettings.hideAllShorts = boolFromV4('hideShorts', items.hideAllShorts || false);
             compiledSettings.hideHomeFeed = boolFromV4('hideHomeFeed', items.hideHomeFeed || false);
@@ -2497,7 +2578,6 @@ browserAPI.runtime.onInstalled.addListener(function (details) {
             filterChannels: '',
             useExactWordMatching: false,
             hideAllComments: false,
-            filterComments: false,
             hideAllShorts: false,
             showQuickBlockButton: true,
             showBlockMenuItem: true,
@@ -2506,6 +2586,8 @@ browserAPI.runtime.onInstalled.addListener(function (details) {
             releaseNotesPayload: null
         });
         applyQuickBlockDefaultMigrationOnce({ isInstall: true }).catch(() => {
+        });
+        applyKeywordCommentsScopeMigrationOnce().catch(() => {
         });
 
         // Proactively inject the first-run prompt into already-open YouTube tabs
@@ -2537,6 +2619,8 @@ browserAPI.runtime.onInstalled.addListener(function (details) {
     } else if (details.reason === 'update') {
         console.log('FilterTube extension updated from version ' + details.previousVersion);
         applyQuickBlockDefaultMigrationOnce({ previousVersion: details.previousVersion || '' }).catch(() => {
+        });
+        applyKeywordCommentsScopeMigrationOnce().catch(() => {
         });
         buildReleaseNotesPayload(CURRENT_VERSION).then((payload) => {
             browserAPI.storage.local.set({
@@ -3261,7 +3345,7 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
                         if (typeof entry === 'string') {
                             const word = entry.trim();
                             if (!word) return null;
-                            return { word, exact: false, comments: true, source: 'user', channelRef: null, addedAt: Date.now() };
+                            return { word, exact: false, comments: false, source: 'user', channelRef: null, addedAt: Date.now() };
                         }
                         if (typeof entry === 'object') {
                             const word = typeof entry.word === 'string' ? entry.word.trim() : '';
@@ -3275,7 +3359,7 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
                                 ...entry,
                                 word,
                                 exact: entry.exact === true,
-                                comments: entry.comments !== false,
+                                comments: entry.comments === true,
                                 source,
                                 channelRef: source === 'channel' ? channelRef : null,
                                 addedAt: (typeof entry.addedAt === 'number' && Number.isFinite(entry.addedAt)) ? entry.addedAt : Date.now()
@@ -3721,7 +3805,7 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
                         if (typeof entry === 'string') {
                             const word = entry.trim();
                             if (!word) return null;
-                            return { word, exact: false, comments: true, source: 'user', channelRef: null, addedAt: Date.now() };
+                            return { word, exact: false, comments: false, source: 'user', channelRef: null, addedAt: Date.now() };
                         }
                         if (typeof entry === 'object') {
                             const word = typeof entry.word === 'string' ? entry.word.trim() : '';
@@ -3735,7 +3819,7 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
                                 ...entry,
                                 word,
                                 exact: entry.exact === true,
-                                comments: entry.comments !== false,
+                                comments: entry.comments === true,
                                 source,
                                 channelRef: source === 'channel' ? channelRef : null,
                                 addedAt: (typeof entry.addedAt === 'number' && Number.isFinite(entry.addedAt)) ? entry.addedAt : Date.now()

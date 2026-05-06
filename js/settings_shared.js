@@ -21,7 +21,6 @@
         'filterChannels',
         'hideAllShorts',
         'hideAllComments',
-        'filterComments',
         'hideHomeFeed',
         'hideSponsoredCards',
         'hideWatchPlaylistPanel',
@@ -121,7 +120,6 @@
                         enabled,
                         hideShorts: !!storage?.hideAllShorts,
                         hideComments,
-                        filterComments: hideComments ? false : !!storage?.filterComments,
                         hideHomeFeed: !!storage?.hideHomeFeed,
                         hideSponsoredCards: !!storage?.hideSponsoredCards,
                         hideWatchPlaylistPanel: !!storage?.hideWatchPlaylistPanel,
@@ -185,7 +183,7 @@
         const commentsCandidate = Object.prototype.hasOwnProperty.call(overrides, 'comments')
             ? overrides.comments
             : entry.comments;
-        const comments = (typeof commentsCandidate === 'boolean') ? commentsCandidate : true;
+        const comments = (typeof commentsCandidate === 'boolean') ? commentsCandidate : false;
         const packedSource = parsePackedChannelKeywordSource(overrides.source) || parsePackedChannelKeywordSource(entry.source);
         const explicitChannelRef = overrides.channelRef || entry.channelRef || packedSource?.channelRef || null;
         const source = packedSource || explicitChannelRef || overrides.source === 'channel' || entry.source === 'channel'
@@ -489,7 +487,6 @@
         enabled,
         hideShorts,
         hideComments,
-        filterComments,
         hideHomeFeed,
         hideSponsoredCards,
         hideWatchPlaylistPanel,
@@ -527,11 +524,11 @@
         return {
             enabled: enabled !== false,
             filterKeywords: compileKeywords(sanitizedKeywords),
-            filterKeywordsComments: compileKeywords(sanitizedKeywords, entry => entry.comments !== false),
+            filterKeywordsComments: compileKeywords(sanitizedKeywords, entry => entry.comments === true),
             filterChannels: sanitizedChannels,
             hideAllShorts: !!hideShorts,
             hideAllComments: !!hideComments,
-            filterComments: hideComments ? false : !!filterComments,
+            filterComments: false,
             hideHomeFeed: !!hideHomeFeed,
             hideSponsoredCards: !!hideSponsoredCards,
             hideWatchPlaylistPanel: !!hideWatchPlaylistPanel,
@@ -607,7 +604,6 @@
                     : (result.enabled !== false);
 
                 const hideComments = readBool('hideComments', !!result.hideAllComments);
-                const filterComments = hideComments ? false : readBool('filterComments', !!result.filterComments);
                 const hasExplicitTheme = isStoredThemePreference(result?.[THEME_KEY]);
                 const theme = resolveThemePreference(result?.[THEME_KEY]);
                 const autoBackupEnabled = Object.prototype.hasOwnProperty.call(profileSettings, 'autoBackupEnabled')
@@ -619,7 +615,6 @@
                     enabled,
                     hideShorts: readBool('hideShorts', !!result.hideAllShorts),
                     hideComments,
-                    filterComments,
                     hideHomeFeed: readBool('hideHomeFeed', !!result.hideHomeFeed),
                     hideSponsoredCards: readBool('hideSponsoredCards', !!result.hideSponsoredCards),
                     hideWatchPlaylistPanel: readBool('hideWatchPlaylistPanel', !!result.hideWatchPlaylistPanel),
@@ -703,7 +698,7 @@
                     channels,
                     hideShorts: effectiveSettings.hideShorts,
                     hideComments,
-                    filterComments,
+                    filterComments: false,
                     hideHomeFeed: effectiveSettings.hideHomeFeed,
                     hideSponsoredCards: effectiveSettings.hideSponsoredCards,
                     hideWatchPlaylistPanel: effectiveSettings.hideWatchPlaylistPanel,
@@ -754,7 +749,6 @@
             enabled,
             hideShorts,
             hideComments,
-            filterComments,
             hideHomeFeed,
             hideSponsoredCards,
             hideWatchPlaylistPanel,
@@ -815,7 +809,6 @@
                             enabled,
                             hideShorts,
                             hideComments,
-                            filterComments,
                             hideHomeFeed,
                             hideSponsoredCards,
                             hideWatchPlaylistPanel,
@@ -855,7 +848,6 @@
                             filterChannels: compiledSettings.filterChannels,
                             hideAllShorts: compiledSettings.hideAllShorts,
                             hideAllComments: compiledSettings.hideAllComments,
-                            filterComments: compiledSettings.filterComments,
                             hideHomeFeed: compiledSettings.hideHomeFeed,
                             hideSponsoredCards: compiledSettings.hideSponsoredCards,
                             hideWatchPlaylistPanel: compiledSettings.hideWatchPlaylistPanel,
@@ -892,7 +884,6 @@
                             enabled: compiledSettings.enabled,
                             hideShorts: compiledSettings.hideAllShorts,
                             hideComments: compiledSettings.hideAllComments,
-                            filterComments: compiledSettings.filterComments,
                             hideHomeFeed: compiledSettings.hideHomeFeed,
                             hideSponsoredCards: compiledSettings.hideSponsoredCards,
                             hideWatchPlaylistPanel: compiledSettings.hideWatchPlaylistPanel,
@@ -964,7 +955,6 @@
                         enabled,
                         hideShorts,
                         hideComments,
-                        filterComments,
                         hideHomeFeed,
                         hideSponsoredCards,
                         hideWatchPlaylistPanel,
@@ -1004,7 +994,6 @@
                         filterChannels: compiledSettings.filterChannels,
                         hideAllShorts: compiledSettings.hideAllShorts,
                         hideAllComments: compiledSettings.hideAllComments,
-                        filterComments: compiledSettings.filterComments,
                         hideHomeFeed: compiledSettings.hideHomeFeed,
                         hideSponsoredCards: compiledSettings.hideSponsoredCards,
                         hideWatchPlaylistPanel: compiledSettings.hideWatchPlaylistPanel,
@@ -1041,7 +1030,6 @@
                             enabled: compiledSettings.enabled,
                             hideAllShorts: compiledSettings.hideAllShorts,
                             hideAllComments: compiledSettings.hideAllComments,
-                            filterComments: compiledSettings.filterComments,
                             hideHomeFeed: compiledSettings.hideHomeFeed,
                             hideSponsoredCards: compiledSettings.hideSponsoredCards,
                             hideWatchPlaylistPanel: compiledSettings.hideWatchPlaylistPanel,
@@ -1086,7 +1074,6 @@
                         enabled,
                         hideShorts,
                         hideComments,
-                        filterComments,
                         hideHomeFeed,
                         hideSponsoredCards,
                         hideWatchPlaylistPanel,

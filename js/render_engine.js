@@ -370,7 +370,7 @@ const RenderEngine = (() => {
         const shouldShowToggles = includeToggles;
         const shouldShowCommentsToggle = shouldShowToggles && profile !== 'kids';
 
-        const commentsEnabled = entry.comments !== false;
+        const commentsEnabled = entry.comments === true;
         let commentsToggle = null;
         if (shouldShowCommentsToggle) {
             const commentsToggleText = minimal ? 'C' : 'Comment';
@@ -427,8 +427,8 @@ const RenderEngine = (() => {
                 })();
 
             commentsToggle.title = commentsEnabled
-                ? 'Keyword applies to comment filtering'
-                : 'Keyword does not apply to comment filtering';
+                ? 'Keyword also applies to comment text'
+                : 'Keyword only applies to video title and metadata';
         }
 
         if (isChannelDerived && shouldShowToggles && profile === 'kids') {

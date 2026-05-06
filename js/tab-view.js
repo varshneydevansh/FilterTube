@@ -4122,7 +4122,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             semantic: options.semantic === true,
             source: options.source || 'user',
             channelRef: options.channelRef || null,
-            comments: Object.prototype.hasOwnProperty.call(options, 'comments') ? options.comments !== false : true,
+            comments: Object.prototype.hasOwnProperty.call(options, 'comments') ? options.comments === true : false,
             addedAt: Date.now()
         };
     }
@@ -10359,7 +10359,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const index = list.findIndex(item => normalizeString(item?.word) === word);
             if (index < 0) return false;
             const current = safeObject(list[index]);
-            list[index] = { ...current, word, comments: current.comments === false };
+            list[index] = { ...current, word, comments: current.comments !== true };
             target[listKey] = list;
             return true;
         });
@@ -10684,13 +10684,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             el.checked = !!surfaceState[key];
             el.disabled = locked;
         });
-
-        const filterCommentsEl = contentControlsContainer?.querySelector('input[data-ft-setting="filterComments"]') || null;
-        if (filterCommentsEl) {
-            const state = mainManagedState || baseState;
-            filterCommentsEl.checked = state.hideComments ? false : !!state.filterComments;
-            filterCommentsEl.disabled = locked || !!state.hideComments;
-        }
 
         syncSubscriptionsImportControls();
         updateChildProfileCapabilityControls();
@@ -11419,9 +11412,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                         ...settings,
                         [key]: !!el.checked
                     };
-                    if (key === 'hideComments' && el.checked === true) {
-                        profile.settings.filterComments = false;
-                    }
                     return true;
                 });
                 if (saved) {

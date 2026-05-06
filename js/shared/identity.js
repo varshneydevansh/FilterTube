@@ -259,6 +259,8 @@
         const handles = new Set();
         const customUrls = new Set();
         const names = new Set();
+        const stableNames = new Set();
+        const nameOnlyNames = new Set();
         const unresolvedHandleKeys = [];
         const unresolvedHandleKeysSeen = new Set();
 
@@ -299,9 +301,15 @@
             if (mappedId) ids.add(mappedId);
         };
 
-        const addName = (candidate) => {
+        const addName = (candidate, hasStableIdentity = false) => {
             const name = normalizeChannelNameForComparison(typeof candidate === 'string' ? candidate : '');
-            if (name) names.add(name);
+            if (!name) return;
+            names.add(name);
+            if (hasStableIdentity) {
+                stableNames.add(name);
+            } else {
+                nameOnlyNames.add(name);
+            }
         };
 
         for (const entry of filterChannels) {
@@ -310,14 +318,29 @@
             if (typeof entry === 'string') {
                 const value = entry.trim();
                 if (!value) continue;
+                const hasStableIdentity = Boolean(
+                    normalizeUcIdForComparison(value) ||
+                    normalizeHandleForComparison(value) ||
+                    normalizeCustomUrlForComparison(value)
+                );
                 addId(value);
                 addHandle(value);
                 addCustomUrl(value);
-                addName(value);
+                addName(value, hasStableIdentity);
                 continue;
             }
 
             if (typeof entry === 'object') {
+                const hasStableIdentity = Boolean(
+                    normalizeUcIdForComparison(entry.id || '') ||
+                    normalizeUcIdForComparison(entry.originalInput || '') ||
+                    normalizeHandleForComparison(entry.handle || '') ||
+                    normalizeHandleForComparison(entry.canonicalHandle || '') ||
+                    normalizeHandleForComparison(entry.handleDisplay || '') ||
+                    normalizeHandleForComparison(entry.originalInput || '') ||
+                    normalizeCustomUrlForComparison(entry.customUrl || '') ||
+                    normalizeCustomUrlForComparison(entry.originalInput || '')
+                );
                 addId(entry.id);
                 addId(entry.originalInput);
 
@@ -329,9 +352,9 @@
                 addCustomUrl(entry.customUrl);
                 addCustomUrl(entry.originalInput);
 
-                addName(entry.name);
-                addName(entry.handle);
-                addName(entry.originalInput);
+                addName(entry.name, hasStableIdentity);
+                addName(entry.handle, hasStableIdentity);
+                addName(entry.originalInput, hasStableIdentity);
             }
         }
 
@@ -340,6 +363,8 @@
             handles,
             customUrls,
             names,
+            stableNames,
+            nameOnlyNames,
             unresolvedHandleKeys
         };
     }
@@ -355,14 +380,24 @@
         for (const metaHandle of metaHandles) {
             if (index.handles?.has(metaHandle)) return true;
             const withoutAt = metaHandle.replace(/^@/, '');
-            if (withoutAt && index.names?.has(withoutAt)) return true;
+            if (withoutAt && index.nameOnlyNames?.has(withoutAt)) return true;
+            if (withoutAt && !metaId && index.stableNames?.has(withoutAt)) return true;
         }
 
         const metaCustomUrl = normalizeCustomUrlForComparison(meta.customUrl || '');
         if (metaCustomUrl && index.customUrls?.has(metaCustomUrl)) return true;
 
         const metaName = normalizeChannelNameForComparison(meta.name || '');
-        if (metaName && index.names?.has(metaName)) return true;
+        if (metaName && index.nameOnlyNames?.has(metaName)) return true;
+        if (metaName && !metaId && index.stableNames?.has(metaName)) return true;
+        if (
+            metaName &&
+            !index.nameOnlyNames &&
+            !index.stableNames &&
+            index.names?.has(metaName)
+        ) {
+            return true;
+        }
 
         if (metaId) {
             const mappedHandle = normalizeHandleForComparison(lookupChannelMap(metaId));

@@ -149,7 +149,7 @@
             ? overrides.comments
             : entry?.comments;
 
-        const comments = (typeof commentsCandidate === 'boolean') ? commentsCandidate : true;
+        const comments = (typeof commentsCandidate === 'boolean') ? commentsCandidate : false;
 
         const sourceCandidate = Object.prototype.hasOwnProperty.call(overrides, 'source')
             ? overrides.source
@@ -635,6 +635,22 @@
             const main = safeObject(profile.main);
             const kids = safeObject(profile.kids);
             const settings = safeObject(profile.settings);
+            const hasLegacyFilterComments = Object.prototype.hasOwnProperty.call(settings, 'filterComments');
+            const legacyKeywordCommentsEnabled = hasLegacyFilterComments && settings.hideComments !== true && settings.filterComments === true;
+            const sanitizeMainKeywords = (list) => safeArray(list)
+                .map(entry => sanitizeKeywordEntry(entry, {
+                    source: entry?.source || source,
+                    comments: hasLegacyFilterComments ? legacyKeywordCommentsEnabled : entry?.comments
+                }))
+                .filter(Boolean);
+            const sanitizeMainChannels = (list) => safeArray(list)
+                .map(entry => sanitizeChannelEntry(entry, {
+                    source: entry?.source || source,
+                    filterAllComments: hasLegacyFilterComments ? legacyKeywordCommentsEnabled : entry?.filterAllComments
+                }))
+                .filter(Boolean);
+            const sanitizedSettings = { ...settings };
+            delete sanitizedSettings.filterComments;
 
             const rawType = normalizeString(profile.type).toLowerCase();
             const isDefault = profileId === DEFAULT_PROFILE_ID;
@@ -658,7 +674,7 @@
                 parentProfileId: isDefault ? null : resolvedParentProfileId,
                 name: normalizeString(profile.name) || 'Profile',
                 settings: {
-                    ...settings,
+                    ...sanitizedSettings,
                     allowMainViewing: settings.allowMainViewing !== false,
                     allowKidsViewing: settings.allowKidsViewing !== false,
                     syncKidsToMain: !!settings.syncKidsToMain
@@ -666,18 +682,10 @@
                 main: {
                     ...main,
                     mode: main.mode === 'whitelist' ? 'whitelist' : 'blocklist',
-                    channels: safeArray(main.channels)
-                        .map(entry => sanitizeChannelEntry(entry, { source: entry?.source || source }))
-                        .filter(Boolean),
-                    keywords: safeArray(main.keywords)
-                        .map(entry => sanitizeKeywordEntry(entry, { source: entry?.source || source }))
-                        .filter(Boolean),
-                    whitelistChannels: safeArray(main.whitelistChannels)
-                        .map(entry => sanitizeChannelEntry(entry, { source: entry?.source || source }))
-                        .filter(Boolean),
-                    whitelistKeywords: safeArray(main.whitelistKeywords)
-                        .map(entry => sanitizeKeywordEntry(entry, { source: entry?.source || source }))
-                        .filter(Boolean)
+                    channels: sanitizeMainChannels(main.channels),
+                    keywords: sanitizeMainKeywords(main.keywords),
+                    whitelistChannels: sanitizeMainChannels(main.whitelistChannels),
+                    whitelistKeywords: sanitizeMainKeywords(main.whitelistKeywords)
                 },
                 kids: {
                     ...kids,
@@ -854,7 +862,7 @@
             keywords.push({
                 word,
                 exact: false,
-                comments: true,
+                comments: false,
                 semantic: false,
                 source: 'import',
                 addedAt: now
@@ -930,7 +938,6 @@
                     mode: profilesV3?.main?.mode || 'blocklist',
                     hideShorts: !!mainSettings?.hideShorts,
                     hideComments: !!mainSettings?.hideComments,
-                    filterComments: !!mainSettings?.filterComments,
                     hideHomeFeed: !!mainSettings?.hideHomeFeed,
                     hideSponsoredCards: !!mainSettings?.hideSponsoredCards,
                     hideWatchPlaylistPanel: !!mainSettings?.hideWatchPlaylistPanel,
@@ -1046,13 +1053,28 @@
             profilesV4 = null;
         }
 
-        const mainChannels = safeArray(main.channels).map(ch => sanitizeChannelEntry(ch, { source: 'import' })).filter(Boolean);
-        const mainKeywords = safeArray(main.keywords).map(kw => sanitizeKeywordEntry(kw, { source: kw?.source || 'import' })).filter(Boolean);
+        const mainSettings = safeObject(settings.main);
+        const hasLegacyFilterComments = Object.prototype.hasOwnProperty.call(mainSettings, 'filterComments');
+        const legacyKeywordCommentsEnabled = hasLegacyFilterComments && mainSettings.hideComments !== true && mainSettings.filterComments === true;
+        const mainChannels = safeArray(main.channels).map(ch => sanitizeChannelEntry(ch, {
+            source: 'import',
+            filterAllComments: hasLegacyFilterComments ? legacyKeywordCommentsEnabled : ch?.filterAllComments
+        })).filter(Boolean);
+        const mainKeywords = safeArray(main.keywords).map(kw => sanitizeKeywordEntry(kw, {
+            source: kw?.source || 'import',
+            comments: hasLegacyFilterComments ? legacyKeywordCommentsEnabled : kw?.comments
+        })).filter(Boolean);
 
         const mainVideoIds = mergeStringList([], safeArray(main.videoIds));
 
-        const mainWhitelistedChannels = safeArray(main.whitelistedChannels).map(ch => sanitizeChannelEntry(ch, { source: 'import' })).filter(Boolean);
-        const mainWhitelistedKeywords = safeArray(main.whitelistedKeywords).map(kw => sanitizeKeywordEntry(kw, { source: 'import' })).filter(Boolean);
+        const mainWhitelistedChannels = safeArray(main.whitelistedChannels).map(ch => sanitizeChannelEntry(ch, {
+            source: 'import',
+            filterAllComments: hasLegacyFilterComments ? legacyKeywordCommentsEnabled : ch?.filterAllComments
+        })).filter(Boolean);
+        const mainWhitelistedKeywords = safeArray(main.whitelistedKeywords).map(kw => sanitizeKeywordEntry(kw, {
+            source: 'import',
+            comments: hasLegacyFilterComments ? legacyKeywordCommentsEnabled : kw?.comments
+        })).filter(Boolean);
 
         const kidsBlockedChannels = safeArray(kids.blockedChannels).map(ch => sanitizeChannelEntry(ch, { source: 'import' })).filter(Boolean);
         const kidsBlockedKeywords = safeArray(kids.blockedKeywords).map(kw => sanitizeKeywordEntry(kw, { source: 'import' })).filter(Boolean);
@@ -1070,8 +1092,6 @@
         const kidsStrictMode = normalizeBool(settings?.kids?.strictMode, true);
 
         const theme = settings.theme === 'dark' ? 'dark' : 'light';
-
-        const mainSettings = safeObject(settings.main);
 
         return {
             ok: true,
@@ -1359,7 +1379,6 @@
             enabled: current.enabled,
             hideShorts: Object.prototype.hasOwnProperty.call(mainSettingsOverrides, 'hideShorts') ? !!mainSettingsOverrides.hideShorts : current.hideShorts,
             hideComments: Object.prototype.hasOwnProperty.call(mainSettingsOverrides, 'hideComments') ? !!mainSettingsOverrides.hideComments : current.hideComments,
-            filterComments: Object.prototype.hasOwnProperty.call(mainSettingsOverrides, 'filterComments') ? !!mainSettingsOverrides.filterComments : current.filterComments,
             hideHomeFeed: Object.prototype.hasOwnProperty.call(mainSettingsOverrides, 'hideHomeFeed') ? !!mainSettingsOverrides.hideHomeFeed : current.hideHomeFeed,
             hideSponsoredCards: Object.prototype.hasOwnProperty.call(mainSettingsOverrides, 'hideSponsoredCards') ? !!mainSettingsOverrides.hideSponsoredCards : current.hideSponsoredCards,
             hideWatchPlaylistPanel: Object.prototype.hasOwnProperty.call(mainSettingsOverrides, 'hideWatchPlaylistPanel') ? !!mainSettingsOverrides.hideWatchPlaylistPanel : current.hideWatchPlaylistPanel,

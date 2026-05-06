@@ -1628,12 +1628,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             el.disabled = locked;
         });
 
-        const filterCommentsEl = contentControlsContainer?.querySelector('input[data-ft-setting="filterComments"]') || null;
-        if (filterCommentsEl) {
-            filterCommentsEl.checked = state.hideComments ? false : !!state.filterComments;
-            filterCommentsEl.disabled = locked || !!state.hideComments;
-        }
-
         if (toggleEnabledBrandBtn) {
             const enabled = state.enabled !== false;
             const activeProfileName = getProfileName(profilesV4Cache, normalizeString(profilesV4Cache?.activeProfileId) || 'default');

@@ -120,7 +120,6 @@ This is the **export/import contract**.
         "contentControls": {
           "hideAllShorts": false,
           "hideAllComments": false,
-          "filterComments": false,
           "hideHomeFeed": false,
           "hideSponsoredCards": false
         }

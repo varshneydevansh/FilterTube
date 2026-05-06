@@ -328,6 +328,8 @@ function getCompiledChannelFilterIndex(settings, listOverride = null) {
     const handles = new Set();
     const customUrls = new Set();
     const names = new Set();
+    const stableNames = new Set();
+    const nameOnlyNames = new Set();
     const unresolvedHandleKeys = [];
     const unresolvedHandleKeysSeen = new Set();
 
@@ -360,10 +362,15 @@ function getCompiledChannelFilterIndex(settings, listOverride = null) {
         const mappedId = normalizeUcIdForComparison(lookupChannelMap(custom));
         if (mappedId) ids.add(mappedId);
     };
-    const addName = (candidate) => {
+    const addName = (candidate, hasStableIdentity = false) => {
         const name = normalizeChannelNameForComparison(typeof candidate === 'string' ? candidate : '');
         if (!name) return;
         names.add(name);
+        if (hasStableIdentity) {
+            stableNames.add(name);
+        } else {
+            nameOnlyNames.add(name);
+        }
     };
 
     for (const entry of list) {
@@ -372,14 +379,29 @@ function getCompiledChannelFilterIndex(settings, listOverride = null) {
         if (typeof entry === 'string') {
             const s = entry.trim();
             if (!s) continue;
+            const hasStableIdentity = Boolean(
+                normalizeUcIdForComparison(s) ||
+                normalizeHandleForComparison(s) ||
+                normalizeCustomUrlForComparison(s)
+            );
             addId(s);
             addHandle(s);
             addCustomUrl(s);
-            addName(s);
+            addName(s, hasStableIdentity);
             continue;
         }
 
         if (typeof entry === 'object') {
+            const hasStableIdentity = Boolean(
+                normalizeUcIdForComparison(entry.id || '') ||
+                normalizeUcIdForComparison(entry.originalInput || '') ||
+                normalizeHandleForComparison(entry.handle || '') ||
+                normalizeHandleForComparison(entry.canonicalHandle || '') ||
+                normalizeHandleForComparison(entry.handleDisplay || '') ||
+                normalizeHandleForComparison(entry.originalInput || '') ||
+                normalizeCustomUrlForComparison(entry.customUrl || '') ||
+                normalizeCustomUrlForComparison(entry.originalInput || '')
+            );
             addId(entry.id);
             addId(entry.originalInput);
 
@@ -391,9 +413,9 @@ function getCompiledChannelFilterIndex(settings, listOverride = null) {
             addCustomUrl(entry.customUrl);
             addCustomUrl(entry.originalInput);
 
-            addName(entry.name);
-            addName(entry.handle);
-            addName(entry.originalInput);
+            addName(entry.name, hasStableIdentity);
+            addName(entry.handle, hasStableIdentity);
+            addName(entry.originalInput, hasStableIdentity);
 
             const idKey = normalizeUcIdForComparison(entry.id || '');
             if (idKey) {
@@ -411,6 +433,8 @@ function getCompiledChannelFilterIndex(settings, listOverride = null) {
         handles,
         customUrls,
         names,
+        stableNames,
+        nameOnlyNames,
         unresolvedHandleKeys
     };
 
@@ -436,11 +460,21 @@ function channelMetaMatchesIndex(meta, index, channelMap) {
     if (metaCustomUrl && index.customUrls.has(metaCustomUrl)) return true;
 
     const metaName = normalizeChannelNameForComparison(meta.name || '');
-    if (metaName && index.names.has(metaName)) return true;
+    if (metaName && index.nameOnlyNames?.has(metaName)) return true;
+    if (metaName && !metaId && index.stableNames?.has(metaName)) return true;
+    if (
+        metaName &&
+        !index.nameOnlyNames &&
+        !index.stableNames &&
+        index.names.has(metaName)
+    ) {
+        return true;
+    }
 
     if (metaHandle) {
         const withoutAt = metaHandle.replace(/^@/, '');
-        if (withoutAt && index.names.has(withoutAt)) return true;
+        if (withoutAt && index.nameOnlyNames?.has(withoutAt)) return true;
+        if (withoutAt && !metaId && index.stableNames?.has(withoutAt)) return true;
     }
 
     if (metaId) {
@@ -1595,7 +1629,7 @@ function handleCommentsFallback(settings) {
     const commentKeywordList = Array.isArray(settings.filterKeywordsComments)
         ? settings.filterKeywordsComments
         : settings.filterKeywords;
-    const shouldFilterKeywords = Boolean(settings.filterComments && commentKeywordList?.length > 0);
+    const shouldFilterKeywords = Boolean(commentKeywordList?.length > 0);
 
     // 3. Per-thread filtering
     commentThreads.forEach(thread => {
@@ -2533,6 +2567,36 @@ async function applyDOMFallback(settings, options = {}) {
                 );
             }
             if (!channelElement && (
+                elementTag === 'ytd-channel-renderer' ||
+                elementTag === 'ytd-grid-channel-renderer' ||
+                elementTag === 'ytd-universal-watch-card-renderer' ||
+                elementTag === 'ytd-watch-card-rich-header-renderer' ||
+                elementTag === 'ytd-secondary-search-container-renderer'
+            )) {
+                channelElement = element.querySelector(
+                    '#main-link[href^="/@"], ' +
+                    '#main-link[href^="/channel/"], ' +
+                    '#main-link[href^="/c/"], ' +
+                    '#main-link[href^="/user/"], ' +
+                    '#channel-title a[href^="/@"], ' +
+                    '#channel-title a[href^="/channel/"], ' +
+                    '#channel-title a[href^="/c/"], ' +
+                    '#channel-title a[href^="/user/"], ' +
+                    '#watch-card-subtitle a[href^="/@"], ' +
+                    '#watch-card-subtitle a[href^="/channel/"], ' +
+                    '#watch-card-subtitle a[href^="/c/"], ' +
+                    '#watch-card-subtitle a[href^="/user/"], ' +
+                    'ytd-channel-name a[href^="/@"], ' +
+                    'ytd-channel-name a[href^="/channel/"], ' +
+                    'ytd-channel-name a[href^="/c/"], ' +
+                    'ytd-channel-name a[href^="/user/"], ' +
+                    'a[href^="/@"]:not([href*="/watch"]):not([href*="/shorts"]), ' +
+                    'a[href^="/channel/UC"], ' +
+                    'a[href^="/c/"], ' +
+                    'a[href^="/user/"]'
+                );
+            }
+            if (!channelElement && (
                 elementTag === 'ytm-rich-item-renderer' ||
                 elementTag === 'ytm-video-with-context-renderer' ||
                 elementTag === 'ytm-compact-video-renderer' ||
@@ -2873,7 +2937,102 @@ async function applyDOMFallback(settings, options = {}) {
                 } catch (e) {
                 }
             }
-            const collaboratorMetas = extractCollaboratorMetadataFromElement(element);
+            const collaboratorMetas = Array.isArray(extractCollaboratorMetadataFromElement(element))
+                ? extractCollaboratorMetadataFromElement(element)
+                : [];
+            if (
+                elementTag === 'ytd-secondary-search-container-renderer' ||
+                elementTag === 'ytd-universal-watch-card-renderer' ||
+                elementTag === 'ytd-watch-card-rich-header-renderer'
+            ) {
+                try {
+                    const richRoots = [
+                        element,
+                        element.closest?.('ytd-universal-watch-card-renderer'),
+                        element.closest?.('ytd-secondary-search-container-renderer'),
+                        element.querySelector?.('ytd-universal-watch-card-renderer'),
+                        element.querySelector?.('ytd-watch-card-rich-header-renderer')
+                    ].filter(Boolean);
+                    const seenRichRoots = new Set();
+                    const addRichMeta = (meta) => {
+                        if (!meta || typeof meta !== 'object') return;
+                        if (!meta.id && !meta.handle && !meta.customUrl && !meta.name) return;
+                        const key = [
+                            meta.id || '',
+                            meta.handle || '',
+                            meta.customUrl || '',
+                            meta.name || ''
+                        ].join('|').toLowerCase();
+                        if (!key || seenRichRoots.has(key)) return;
+                        seenRichRoots.add(key);
+                        collaboratorMetas.push(meta);
+                    };
+                    richRoots.forEach(root => {
+                        if (!root || typeof root.querySelectorAll !== 'function') return;
+                        const header = root.matches?.('ytd-watch-card-rich-header-renderer')
+                            ? root
+                            : root.querySelector('ytd-watch-card-rich-header-renderer');
+                        const headerTitle = (
+                            header?.querySelector?.('#title, #channel-title, h2, h3, yt-formatted-string[role="text"], [role="heading"]')?.textContent ||
+                            ''
+                        ).trim();
+                        const headerSubtitle = (
+                            header?.querySelector?.('#subtitle, #watch-card-subtitle, .subtitle, yt-formatted-string#subtitle')?.textContent ||
+                            ''
+                        ).trim();
+
+                        const anchors = root.querySelectorAll(
+                            'ytd-watch-card-rich-header-renderer a[href^="/@"], ' +
+                            'ytd-watch-card-rich-header-renderer a[href^="/channel/"], ' +
+                            'ytd-watch-card-rich-header-renderer a[href^="/c/"], ' +
+                            'ytd-watch-card-rich-header-renderer a[href^="/user/"], ' +
+                            '#watch-card-subtitle a[href^="/@"], ' +
+                            '#watch-card-subtitle a[href^="/channel/"], ' +
+                            '#watch-card-subtitle a[href^="/c/"], ' +
+                            '#watch-card-subtitle a[href^="/user/"], ' +
+                            '#header a[href^="/@"], ' +
+                            '#header a[href^="/channel/"], ' +
+                            '#header a[href^="/c/"], ' +
+                            '#header a[href^="/user/"], ' +
+                            'a[href^="/channel/UC"], ' +
+                            'a[href^="/@"]:not([href*="/watch"]):not([href*="/shorts"]), ' +
+                            'a[href^="/c/"], ' +
+                            'a[href^="/user/"]'
+                        );
+                        anchors.forEach(anchor => {
+                            const text = (anchor.textContent || headerTitle || headerSubtitle || '').trim();
+                            const href = anchor.getAttribute('href') || anchor.href || '';
+                            const meta = extractChannelMetadataFromElement(root, text, href, {
+                                cacheTarget: anchor,
+                                relatedElements: [anchor, header].filter(Boolean)
+                            });
+                            if (headerTitle && !meta.name) {
+                                meta.name = headerTitle;
+                            }
+                            addRichMeta(meta);
+                        });
+
+                        if (headerTitle) {
+                            addRichMeta(buildChannelMetadata(headerTitle, ''));
+                        }
+                        if (headerSubtitle) {
+                            addRichMeta(buildChannelMetadata(headerSubtitle, ''));
+                        }
+                        if (headerTitle || headerSubtitle) {
+                            const handle = normalizeHandleForComparison(headerSubtitle) || normalizeHandleForComparison(headerTitle);
+                            if (handle) {
+                                addRichMeta({
+                                    handle,
+                                    name: headerTitle || headerSubtitle,
+                                    id: '',
+                                    customUrl: null
+                                });
+                            }
+                        }
+                    });
+                } catch (e) {
+                }
+            }
             try {
                 const stampedName = element.getAttribute('data-filtertube-channel-name') || '';
                 const inferredName = stampedName || (channelPrimaryText || '').trim() || (channel || '').trim();
@@ -3351,6 +3510,9 @@ async function applyDOMFallback(settings, options = {}) {
             } else if (elementTag === 'yt-lockup-view-model' || elementTag === 'yt-lockup-metadata-view-model') {
                 const parent = element.closest('ytd-rich-item-renderer');
                 if (parent) targetToHide = parent;
+            } else if (elementTag === 'ytd-watch-card-rich-header-renderer') {
+                const wrapper = element.closest('ytd-secondary-search-container-renderer, ytd-universal-watch-card-renderer');
+                if (wrapper) targetToHide = wrapper;
             } else if (isPlaylistPanelRow) {
                 const wrapper = element.closest('ytd-playlist-panel-video-wrapper-renderer');
                 if (wrapper) targetToHide = wrapper;
@@ -4018,7 +4180,7 @@ async function applyDOMFallback(settings, options = {}) {
                 toggleVisibility(shelf, false);
             }
 
-            updateContainerVisibility(shelf, 'ytd-rich-item-renderer, ytd-grid-video-renderer, ytd-video-renderer, ytd-reel-item-renderer, yt-lockup-view-model, ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2, ytd-search-refinement-card-renderer, .ytGridShelfViewModelGridShelfItem');
+            updateContainerVisibility(shelf, 'ytd-rich-item-renderer, ytd-grid-video-renderer, ytd-video-renderer, ytd-reel-item-renderer, ytd-channel-renderer, ytd-grid-channel-renderer, ytd-universal-watch-card-renderer, ytd-secondary-search-container-renderer, yt-lockup-view-model, ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2, ytd-search-refinement-card-renderer, .ytGridShelfViewModelGridShelfItem');
 
             try {
                 const shelfTag = (shelf.tagName || '').toLowerCase();
@@ -4296,12 +4458,17 @@ function shouldHideContent(title, channel, settings, options = {}) {
             const index = getCompiledChannelFilterIndex(settings, whitelistChannels);
             if (index) {
                 const whitelistMeta = { ...(channelMeta || {}) };
-                if (whitelistMeta.id || whitelistMeta.handle || whitelistMeta.customUrl) {
-                    whitelistMeta.name = '';
+                const identityOnlyMeta = { ...whitelistMeta };
+                if (identityOnlyMeta.id || identityOnlyMeta.handle || identityOnlyMeta.customUrl) {
+                    identityOnlyMeta.name = '';
                 }
 
-                if (channelMetaMatchesIndex(whitelistMeta, index, channelMap)) {
-                    logWhitelistDecision('allow:matched_channel', { matched: whitelistMeta.handle || whitelistMeta.customUrl || whitelistMeta.id || whitelistMeta.name || '' });
+                if (channelMetaMatchesIndex(identityOnlyMeta, index, channelMap)) {
+                    logWhitelistDecision('allow:matched_channel', { matched: identityOnlyMeta.handle || identityOnlyMeta.customUrl || identityOnlyMeta.id || identityOnlyMeta.name || '' });
+                    return false;
+                }
+                if (!identityOnlyMeta.id && whitelistMeta.name && channelMetaMatchesIndex(whitelistMeta, index, channelMap)) {
+                    logWhitelistDecision('allow:matched_channel_name_fallback', { matched: whitelistMeta.name || '' });
                     return false;
                 }
                 const collaboratorMetas = Array.isArray(collaborators) ? collaborators : [];
@@ -4310,11 +4477,24 @@ function shouldHideContent(title, channel, settings, options = {}) {
                         const whitelistCollab = collaborator && typeof collaborator === 'object'
                             ? { ...collaborator }
                             : collaborator;
-                        if (whitelistCollab && typeof whitelistCollab === 'object' && (whitelistCollab.id || whitelistCollab.handle || whitelistCollab.customUrl)) {
-                            whitelistCollab.name = '';
+                        const identityOnlyCollab = whitelistCollab && typeof whitelistCollab === 'object'
+                            ? { ...whitelistCollab }
+                            : whitelistCollab;
+                        if (identityOnlyCollab && typeof identityOnlyCollab === 'object' && (identityOnlyCollab.id || identityOnlyCollab.handle || identityOnlyCollab.customUrl)) {
+                            identityOnlyCollab.name = '';
                         }
-                        if (channelMetaMatchesIndex(whitelistCollab, index, channelMap)) {
-                            logWhitelistDecision('allow:matched_collaborator', { matched: whitelistCollab.handle || whitelistCollab.customUrl || whitelistCollab.id || whitelistCollab.name || '' });
+                        if (channelMetaMatchesIndex(identityOnlyCollab, index, channelMap)) {
+                            logWhitelistDecision('allow:matched_collaborator', { matched: identityOnlyCollab.handle || identityOnlyCollab.customUrl || identityOnlyCollab.id || identityOnlyCollab.name || '' });
+                            return false;
+                        }
+                        if (
+                            whitelistCollab &&
+                            typeof whitelistCollab === 'object' &&
+                            !identityOnlyCollab?.id &&
+                            whitelistCollab.name &&
+                            channelMetaMatchesIndex(whitelistCollab, index, channelMap)
+                        ) {
+                            logWhitelistDecision('allow:matched_collaborator_name_fallback', { matched: whitelistCollab.name || '' });
                             return false;
                         }
                     }

@@ -276,7 +276,7 @@ YouTube JSON Data → FilterTubeEngine.processData() → Filtered Data → YouTu
 - **Hide All Comments**: Toggle to remove all comment sections
 - **Hide All Shorts**: Toggle to remove all YouTube Shorts content
 - **Exact Word Matching**: Option for precise keyword matching
-- **Filter Comments Content**: Advanced comment content filtering
+- **Comment Keyword Pills**: Per-keyword opt-in for matching comment text
 
 ## User Interface Integration
 
@@ -290,7 +290,7 @@ YouTube JSON Data → FilterTubeEngine.processData() → Filtered Data → YouTu
 #### UI polish (v3.2.1)
 - Popup search bars (keywords/channels/content controls) now align to full row width; add buttons sit beside matching-sized inputs.
 - Content control rows in popup hide descriptions for compactness; tab view keeps descriptions as title-only tooltips (hover the title text).
-- Pills/chips: Exact = whole-term matching; Comment defaults **ON** (filters matching comments, can be turned off even if Hide Comments is on); Filter All creates a linked channel-derived Exact keyword from channel state. C/E round chips mirror popup pills.
+- Pills/chips: Exact = whole-term matching; Comment is opt-in per keyword and makes that keyword also match comment text; Filter All creates a linked channel-derived Exact keyword from channel state. C/E round chips mirror popup pills.
 - Proactive XHR interception provides instant channel names in 3-dot menus, eliminating "Fetching..." delays.
 - Badges match row tinting: green = From Channel, brown = From Comments, yellow = Collaboration rows, pink = From Kids.
 - If the active profile is PIN-protected and still locked, the popup header `Enabled / Disabled` control is read-only and cannot pause filtering until the profile is unlocked.

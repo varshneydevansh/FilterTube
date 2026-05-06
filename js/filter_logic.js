@@ -1869,31 +1869,29 @@
                     return true;
                 }
 
-                if (this.settings.filterComments) {
-                    const commentText = rules.commentText ? getTextFromPaths(item, Array.isArray(rules.commentText) ? rules.commentText : [rules.commentText]) : '';
+                const commentText = rules.commentText ? getTextFromPaths(item, Array.isArray(rules.commentText) ? rules.commentText : [rules.commentText]) : '';
 
-                    const commentKeywords = Array.isArray(this.settings.filterKeywordsComments)
-                        ? this.settings.filterKeywordsComments
-                        : this.settings.filterKeywords;
+                const commentKeywords = Array.isArray(this.settings.filterKeywordsComments)
+                    ? this.settings.filterKeywordsComments
+                    : this.settings.filterKeywords;
 
-                    // Apply keyword filters to comments
-                    if (commentText && commentKeywords.length > 0) {
-                        for (const keywordRegex of commentKeywords) {
-                            if (keywordRegex.test(commentText)) {
-                                this._log(`🚫 Blocking comment by keyword: ${commentText.substring(0, 50)}...`);
-                                return true;
-                            }
-                        }
-                    }
-
-                    // Apply channel filters to comment authors
-                    // For comments, channelInfo should always be a single object, not an array
-                    const commentChannelInfo = isCollaboration ? collaborators[0] : channelInfo;
-                    if ((commentChannelInfo.name || commentChannelInfo.id || commentChannelInfo.handle || commentChannelInfo.customUrl) && this.settings.filterChannels.length > 0) {
-                        if (this._matchesAnyChannel(commentChannelInfo, this.settings.filterChannels, this.filterChannelIndex)) {
-                            this._log(`🚫 Blocking comment by author: ${commentChannelInfo.name || commentChannelInfo.id || commentChannelInfo.handle}`);
+                // Apply keyword filters to comments
+                if (commentText && commentKeywords.length > 0) {
+                    for (const keywordRegex of commentKeywords) {
+                        if (keywordRegex.test(commentText)) {
+                            this._log(`🚫 Blocking comment by keyword: ${commentText.substring(0, 50)}...`);
                             return true;
                         }
+                    }
+                }
+
+                // Apply channel filters to comment authors
+                // For comments, channelInfo should always be a single object, not an array
+                const commentChannelInfo = isCollaboration ? collaborators[0] : channelInfo;
+                if ((commentChannelInfo.name || commentChannelInfo.id || commentChannelInfo.handle || commentChannelInfo.customUrl) && this.settings.filterChannels.length > 0) {
+                    if (this._matchesAnyChannel(commentChannelInfo, this.settings.filterChannels, this.filterChannelIndex)) {
+                        this._log(`🚫 Blocking comment by author: ${commentChannelInfo.name || commentChannelInfo.id || commentChannelInfo.handle}`);
+                        return true;
                     }
                 }
             }

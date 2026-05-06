@@ -59,7 +59,6 @@ const StateManager = (() => {
         channels: [],
         hideShorts: false,
         hideComments: false,
-        filterComments: false,
         hideHomeFeed: false,
         hideSponsoredCards: false,
         hideWatchPlaylistPanel: false,
@@ -213,7 +212,6 @@ const StateManager = (() => {
         state.channels = data.channels || [];
         state.hideShorts = data.hideShorts || false;
         state.hideComments = data.hideComments || false;
-        state.filterComments = data.filterComments || false;
         state.hideHomeFeed = data.hideHomeFeed || false;
         state.hideSponsoredCards = data.hideSponsoredCards || false;
         state.hideWatchPlaylistPanel = data.hideWatchPlaylistPanel || false;
@@ -786,20 +784,19 @@ const StateManager = (() => {
             : null;
         if (!entry) return null;
 
-        // Default is comments enabled (same as main)
-        const current = entry.comments !== false;
+        const current = entry.comments === true;
         entry.comments = !current;
         list[index] = entry;
         kids[listKey] = list;
         state.kids = { ...kids };
         await persistKidsProfiles(state.kids);
         await requestRefresh('kids');
-        notifyListeners('kidsKeywordUpdated', { word, comments: entry.comments !== false });
+        notifyListeners('kidsKeywordUpdated', { word, comments: entry.comments === true });
         
         // Trigger auto-backup after Kids keyword comments toggle
         scheduleAutoBackup('kids_keyword_comments_toggled');
         
-        return entry.comments !== false;
+        return entry.comments === true;
     }
 
     /**
@@ -1026,7 +1023,6 @@ const StateManager = (() => {
                 autoBackupEnabled: state.autoBackupEnabled,
                 hideShorts: state.hideShorts,
                 hideComments: state.hideComments,
-                filterComments: state.filterComments,
                 hideHomeFeed: state.hideHomeFeed,
                 hideSponsoredCards: state.hideSponsoredCards,
                 hideWatchPlaylistPanel: state.hideWatchPlaylistPanel,
@@ -1363,7 +1359,7 @@ const StateManager = (() => {
                 semantic: options.semantic === true,
                 source: 'user',
                 channelRef: null,
-                comments: Object.prototype.hasOwnProperty.call(options, 'comments') ? !!options.comments : true,
+                comments: Object.prototype.hasOwnProperty.call(options, 'comments') ? !!options.comments : false,
                 addedAt: Date.now()
             };
 
@@ -1394,7 +1390,7 @@ const StateManager = (() => {
             semantic: options.semantic || false,
             source: 'user',
             channelRef: null,
-            comments: Object.prototype.hasOwnProperty.call(options, 'comments') ? !!options.comments : true,
+            comments: Object.prototype.hasOwnProperty.call(options, 'comments') ? !!options.comments : false,
             addedAt: Date.now() // Timestamp for proper ordering
         });
 
@@ -1427,7 +1423,7 @@ const StateManager = (() => {
             if (index === -1) return false;
 
             const current = list[index];
-            const nextValue = (typeof current.comments === 'boolean') ? !current.comments : false;
+            const nextValue = current.comments !== true;
             list[index] = { ...current, comments: nextValue };
             state.userWhitelistKeywords = [...list];
             state.whitelistKeywords = [...state.userWhitelistKeywords];
@@ -1449,7 +1445,7 @@ const StateManager = (() => {
         }
 
         const current = state.userKeywords[index];
-        const nextValue = (typeof current.comments === 'boolean') ? !current.comments : false;
+        const nextValue = current.comments !== true;
         state.userKeywords[index].comments = nextValue;
 
         recomputeKeywords();
@@ -1995,7 +1991,7 @@ const StateManager = (() => {
 
     /**
      * Update a checkbox/toggle setting
-     * @param {string} key - Setting key (hideShorts, hideComments, filterComments)
+     * @param {string} key - Setting key (hideShorts, hideComments, etc.)
      * @param {boolean} value - New value
      * @returns {Promise<void>}
      */
@@ -2013,7 +2009,6 @@ const StateManager = (() => {
             'syncKidsToMain',
             'hideShorts',
             'hideComments',
-            'filterComments',
             'hideHomeFeed',
             'hideSponsoredCards',
             'hideWatchPlaylistPanel',
@@ -2102,11 +2097,6 @@ const StateManager = (() => {
             notifyListeners('settingUpdated', { key, value: state[key] });
             scheduleAutoBackup('setting_updated');
             return;
-        }
-
-        // Handle hideComments and filterComments mutual exclusivity
-        if (key === 'hideComments' && value === true) {
-            state.filterComments = false;
         }
 
         await saveSettings();

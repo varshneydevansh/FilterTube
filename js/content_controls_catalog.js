@@ -21,11 +21,6 @@
                     key: 'hideComments',
                     title: 'Hide All Comments',
                     description: 'Remove comment sections entirely'
-                },
-                {
-                    key: 'filterComments',
-                    title: 'Filter Comments',
-                    description: 'Hide only comments with keywords'
                 }
             ]
         },
