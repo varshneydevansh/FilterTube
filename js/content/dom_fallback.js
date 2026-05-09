@@ -3820,6 +3820,10 @@ async function applyDOMFallback(settings, options = {}) {
     } catch (e) {
     }
 
+    if (onlyWhitelistPending && listMode === 'whitelist') {
+        return;
+    }
+
     // Inline survey containers embed filtered videos; hide shell when everything inside is hidden
     try {
         const surveys = document.querySelectorAll('ytd-inline-survey-renderer');
