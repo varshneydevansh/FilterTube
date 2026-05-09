@@ -94,6 +94,7 @@ The latest runtime notes that were previously tracked in dated checkpoint files 
 - Post-block enrichment skips identical channel-list writes, and Channel Management avoids full row/avatar rebuilds for simple `Filter All` or comments-toggle changes.
 - Quick Block hover controls retain state across YouTube preview overlays and clip against sticky top chrome on mobile/search surfaces.
 - Expected duplicate Main World init exits are debug-only, so first-install idempotency guards do not surface as warnings.
+- Whitelist pending-card hiding coalesces the follow-up pending-only DOM fallback pass and schedules it only after a mutation batch actually hides new pending cards. This preserves fail-closed whitelist behavior while avoiding repeated no-op scans during heavy YouTube DOM churn.
 - Firefox/Waterfox manual export, system-theme first paint, short-height dashboard sidebar scrolling, and large-blocklist indexed matching are release-note items, not separate dated docs.
 
 ### Child approval rule

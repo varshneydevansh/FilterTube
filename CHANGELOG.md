@@ -6,6 +6,7 @@
 
 - **Whitelist playback guard**: Watch pages no longer run current-watch owner blocking or playlist skip/redirect logic while in whitelist mode, so YouTube keeps ownership of video startup and navigation.
 - **Home/watch loading guard**: Whitelist pending pre-hide is skipped on Home and Watch surfaces to avoid blank pages while YouTube is still resolving card identity.
+- **Whitelist pending-pass throttle**: pending-card rechecks are now coalesced and only scheduled after new pending cards were actually hidden, reducing redundant DOM fallback scans on heavy YouTube pages.
 - **Empty Shorts shelf cleanup**: Home Shorts shelves with no visible allowed items are collapsed so whitelist feeds do not leave empty section headers behind.
 - **Comment keyword scope cleanup**: Removed the global `Filter Comments` content-control toggle. Keyword rows now own comment-text filtering through their `Comment` pill, while `Hide All Comments` remains the global comments-section control.
 

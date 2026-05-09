@@ -5759,6 +5759,23 @@ async function initializeDOMFallback(settings) {
             });
         }
 
+        const whitelistPendingRefreshState = {
+            timer: 0
+        };
+
+        function scheduleWhitelistPendingRecheck(delayMs = 120) {
+            if (whitelistPendingRefreshState.timer) return;
+            whitelistPendingRefreshState.timer = setTimeout(() => {
+                whitelistPendingRefreshState.timer = 0;
+                try {
+                    if (typeof applyDOMFallback === 'function') {
+                        applyDOMFallback(null, { preserveScroll: true, onlyWhitelistPending: true });
+                    }
+                } catch (e) {
+                }
+            }, delayMs);
+        }
+
         function applyWhitelistPendingHide(mutations) {
             try {
                 const listMode = currentSettings?.listMode === 'whitelist' ? 'whitelist' : 'blocklist';
@@ -5812,8 +5829,9 @@ async function initializeDOMFallback(settings) {
                     return element;
                 };
 
+                let hidPendingCard = false;
                 const hidePending = (element) => {
-                    if (!element) return;
+                    if (!element) return false;
                     try {
                         try {
                             const tag = (element.tagName || '').toLowerCase();
@@ -5824,14 +5842,14 @@ async function initializeDOMFallback(settings) {
                                 const isSelected = Boolean(
                                     rowEl && (rowEl.hasAttribute('selected') || rowEl.getAttribute('aria-selected') === 'true')
                                 );
-                                if (isSelected) return;
+                                if (isSelected) return false;
                             }
                         } catch (e) {
                         }
-                        if (shouldSkipPendingHide(element)) return;
-                        if (element.hasAttribute('data-filtertube-processed')) return;
-                        if (element.getAttribute('data-filtertube-whitelist-pending') === 'true') return;
-                        if (element.classList.contains('filtertube-hidden') || element.hasAttribute('data-filtertube-hidden')) return;
+                        if (shouldSkipPendingHide(element)) return false;
+                        if (element.hasAttribute('data-filtertube-processed')) return false;
+                        if (element.getAttribute('data-filtertube-whitelist-pending') === 'true') return false;
+                        if (element.classList.contains('filtertube-hidden') || element.hasAttribute('data-filtertube-hidden')) return false;
 
                         try {
                             queuePrefetchForCard(element);
@@ -5845,7 +5863,9 @@ async function initializeDOMFallback(settings) {
                             element.style.setProperty('display', 'none', 'important');
                         } catch (e) {
                         }
+                        return true;
                     } catch (e) {
+                        return false;
                     }
                 };
 
@@ -5872,29 +5892,17 @@ async function initializeDOMFallback(settings) {
 
                             for (const cand of candidates) {
                                 const target = resolveTargetToHide(cand);
-                                hidePending(target);
+                                if (hidePending(target)) {
+                                    hidPendingCard = true;
+                                }
                             }
                         }
                     }
                 } catch (e) {
                 }
 
-                try {
-                    if (typeof applyDOMFallback === 'function') {
-                        setTimeout(() => {
-                            try {
-                                applyDOMFallback(null, { preserveScroll: true, onlyWhitelistPending: true });
-                            } catch (e) {
-                            }
-                        }, 0);
-                        setTimeout(() => {
-                            try {
-                                applyDOMFallback(null, { preserveScroll: true, onlyWhitelistPending: true });
-                            } catch (e) {
-                            }
-                        }, 90);
-                    }
-                } catch (e) {
+                if (hidPendingCard) {
+                    scheduleWhitelistPendingRecheck();
                 }
             } catch (e) {
             }
