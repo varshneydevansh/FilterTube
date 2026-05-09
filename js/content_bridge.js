@@ -5760,7 +5760,9 @@ async function initializeDOMFallback(settings) {
         }
 
         const whitelistPendingRefreshState = {
-            timer: 0
+            timer: 0,
+            pendingHideTimer: 0,
+            pendingHideMutations: []
         };
 
         function scheduleWhitelistPendingRecheck(delayMs = 120) {
@@ -5774,6 +5776,25 @@ async function initializeDOMFallback(settings) {
                 } catch (e) {
                 }
             }, delayMs);
+        }
+
+        function queueWhitelistPendingHide(mutations, delayMs = 40) {
+            try {
+                if (!mutations || !mutations.length) return;
+                for (const mutation of mutations) {
+                    if (mutation?.addedNodes && mutation.addedNodes.length > 0) {
+                        whitelistPendingRefreshState.pendingHideMutations.push(mutation);
+                    }
+                }
+                if (whitelistPendingRefreshState.pendingHideMutations.length === 0) return;
+                if (whitelistPendingRefreshState.pendingHideTimer) return;
+                whitelistPendingRefreshState.pendingHideTimer = setTimeout(() => {
+                    whitelistPendingRefreshState.pendingHideTimer = 0;
+                    const queuedMutations = whitelistPendingRefreshState.pendingHideMutations.splice(0);
+                    applyWhitelistPendingHide(queuedMutations);
+                }, delayMs);
+            } catch (e) {
+            }
         }
 
         function applyWhitelistPendingHide(mutations) {
@@ -5917,7 +5938,7 @@ async function initializeDOMFallback(settings) {
             }
 
             if (hasNewContent) {
-                applyWhitelistPendingHide(mutations);
+                queueWhitelistPendingHide(mutations);
                 scheduleImmediateFallback();
             } else {
                 debouncedFallback();

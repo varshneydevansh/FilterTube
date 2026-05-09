@@ -224,6 +224,7 @@
 - **Search Page Optimization**: Added indeterminate state handling for search results that render before channel identity is available, preventing page blanking.
 - **Homepage Duplicate Removal**: Automatic duplicate content removal on homepage in whitelist mode to clean up mixed content feeds.
 - **Whitelist-Pending Processing**: Optimized DOM fallback with `onlyWhitelistPending` option for efficient re-evaluation of content awaiting channel identity.
+- **Whitelist-Pending Observer Batching**: Batched newly-added pending-card scans out of the MutationObserver callback to reduce synchronous DOM work while YouTube is loading large feeds.
 - **Cross-World Mode Sync**: Enhanced channel stamping with `data-filtertube-list-mode` attributes for consistent mode awareness across execution worlds.
 
 ## Version 3.2.2

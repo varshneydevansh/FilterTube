@@ -598,32 +598,25 @@ Optimized timing for re-evaluating pending content to reduce "recursive hiding" 
 
 ```javascript
 // In initializeDOMFallback() - content bridge
-try {
-    if (typeof applyDOMFallback === 'function') {
-        // Immediate re-evaluation
-        setTimeout(() => {
-            try {
-                applyDOMFallback(null, { preserveScroll: true, onlyWhitelistPending: true });
-            } catch (e) {
-                // Fallback handling
-            }
-        }, 0);
-        
-        // Delayed re-evaluation for late-arriving content
-        setTimeout(() => {
-            try {
-                applyDOMFallback(null, { preserveScroll: true, onlyWhitelistPending: true });
-            } catch (e) {
-                // Fallback handling
-            }
-        }, 90);
-    }
-} catch (e) {
-    // Initialization failure handling
+function queueWhitelistPendingHide(mutations, delayMs = 40) {
+    // Collect newly-added card mutations and scan them outside the
+    // MutationObserver callback so YouTube feed rendering is not blocked.
+    whitelistPendingRefreshState.pendingHideTimer = setTimeout(() => {
+        const queuedMutations = whitelistPendingRefreshState.pendingHideMutations.splice(0);
+        applyWhitelistPendingHide(queuedMutations);
+    }, delayMs);
+}
+
+function scheduleWhitelistPendingRecheck(delayMs = 120) {
+    if (whitelistPendingRefreshState.timer) return;
+    whitelistPendingRefreshState.timer = setTimeout(() => {
+        whitelistPendingRefreshState.timer = 0;
+        applyDOMFallback(null, { preserveScroll: true, onlyWhitelistPending: true });
+    }, delayMs);
 }
 ```
 
-**Impact**: Reduces the window where content might be recursively hidden during search page loading.
+**Impact**: Reduces the window where content might be recursively hidden during search page loading, and keeps pending-card scans out of the synchronous `MutationObserver` callback during heavy feed loads.
 
 ### Channel Identity Check Optimization
 
