@@ -1930,6 +1930,107 @@ function handleGuideSubscriptionsFallback(settings) {
     }
 }
 
+function hasActiveDOMFallbackWork(settings) {
+    try {
+        if (!settings || typeof settings !== 'object') return false;
+        if (settings.enabled === false) return false;
+        const listMode = settings.listMode === 'whitelist' ? 'whitelist' : 'blocklist';
+        if (listMode === 'whitelist') return true;
+
+        const hasList = (value) => Array.isArray(value) && value.length > 0;
+        if (
+            hasList(settings.filterKeywords) ||
+            hasList(settings.filterChannels) ||
+            hasList(settings.filterKeywordsComments)
+        ) {
+            return true;
+        }
+
+        const booleanFilterKeys = [
+            'hideAllComments',
+            'hideAllShorts',
+            'hideShorts',
+            'hideComments',
+            'filterComments',
+            'hideHomeFeed',
+            'hideSponsoredCards',
+            'hideWatchPlaylistPanel',
+            'hidePlaylistCards',
+            'hideMembersOnly',
+            'hideMixPlaylists',
+            'hideVideoSidebar',
+            'hideRecommended',
+            'hideLiveChat',
+            'hideVideoInfo',
+            'hideVideoButtonsBar',
+            'hideAskButton',
+            'hideVideoChannelRow',
+            'hideVideoDescription',
+            'hideMerchTicketsOffers',
+            'hideEndscreenVideowall',
+            'hideEndscreenCards',
+            'hideTopHeader',
+            'hideNotificationBell',
+            'hideExploreTrending',
+            'hideMoreFromYouTube',
+            'hideSubscriptions',
+            'hideSearchShelves'
+        ];
+        if (booleanFilterKeys.some(key => settings[key] === true)) return true;
+
+        const contentFilters = settings.contentFilters && typeof settings.contentFilters === 'object'
+            ? settings.contentFilters
+            : null;
+        if (
+            contentFilters?.duration?.enabled === true ||
+            contentFilters?.uploadDate?.enabled === true ||
+            contentFilters?.uppercase?.enabled === true
+        ) {
+            return true;
+        }
+
+        const categoryFilters = settings.categoryFilters && typeof settings.categoryFilters === 'object'
+            ? settings.categoryFilters
+            : null;
+        return categoryFilters?.enabled === true;
+    } catch (e) {
+        return true;
+    }
+}
+
+function clearStaleDOMFallbackVisibility() {
+    try {
+        const hiddenSelector = [
+            '[data-filtertube-hidden]',
+            '.filtertube-hidden',
+            '.filtertube-hidden-shelf',
+            '[data-filtertube-whitelist-pending="true"]',
+            '[data-filtertube-pending-category]',
+            '[data-filtertube-pending-upload-date]',
+            '[data-filtertube-hidden-by-hide-all-shorts]'
+        ].join(', ');
+        const hidden = document.querySelectorAll(hiddenSelector);
+        hidden.forEach(el => {
+            try {
+                toggleVisibility(el, false, '', true);
+                el.removeAttribute('data-filtertube-whitelist-pending');
+                el.removeAttribute('data-filtertube-pending-category');
+                el.removeAttribute('data-filtertube-pending-upload-date');
+                el.removeAttribute('data-filtertube-pending-category-ts');
+                el.removeAttribute('data-filtertube-pending-upload-date-ts');
+                el.removeAttribute('data-filtertube-hidden-by-hide-all-shorts');
+                el.removeAttribute('data-filtertube-ignore-empty-hide');
+            } catch (e) {
+            }
+        });
+        const contentControlStyle = document.getElementById('filtertube-content-controls-style');
+        if (contentControlStyle) {
+            contentControlStyle.textContent = '';
+        }
+    } catch (e) {
+    }
+}
+
 // DOM fallback function that processes already-rendered content
 async function applyDOMFallback(settings, options = {}) {
     const effectiveSettings = settings || currentSettings;
@@ -1969,6 +2070,30 @@ async function applyDOMFallback(settings, options = {}) {
     })();
 
     currentSettings = effectiveSettings;
+    const { forceReprocess = false, preserveScroll = true, onlyWhitelistPending = false } = options;
+
+    const hasActiveFallbackWork = hasActiveDOMFallbackWork(effectiveSettings);
+    if (!hasActiveFallbackWork && !onlyWhitelistPending) {
+        const state = window.__filtertubeDomFallbackPerfState || (window.__filtertubeDomFallbackPerfState = {
+            hadActiveWork: false,
+            lastCleanupTs: 0
+        });
+        const cleanupDue = state.hadActiveWork || forceReprocess || (Date.now() - (state.lastCleanupTs || 0) > 5000);
+        if (cleanupDue) {
+            clearStaleDOMFallbackVisibility();
+            state.lastCleanupTs = Date.now();
+        }
+        state.hadActiveWork = false;
+        return;
+    }
+    try {
+        const state = window.__filtertubeDomFallbackPerfState || (window.__filtertubeDomFallbackPerfState = {
+            hadActiveWork: false,
+            lastCleanupTs: 0
+        });
+        state.hadActiveWork = true;
+    } catch (e) {
+    }
 
     const scrollState = window.__filtertubeScrollState || (window.__filtertubeScrollState = {
         lastScrollTs: 0,
@@ -1984,7 +2109,6 @@ async function applyDOMFallback(settings, options = {}) {
         }
     }
 
-    const { forceReprocess = false, preserveScroll = true, onlyWhitelistPending = false } = options;
     const now = Date.now();
     const isUserScrolling = now - (scrollState.lastScrollTs || 0) < 150;
     const allowPreserveScroll = preserveScroll && !forceReprocess && !isUserScrolling;
