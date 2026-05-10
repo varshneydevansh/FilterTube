@@ -6511,12 +6511,8 @@ function ensureFallbackMenuButtons() {
     let warmupScans = 0;
     const warmupTimer = setInterval(() => {
         warmupScans += 1;
-        if (typeof fallbackMenuButtonsRescan === 'function') {
-            fallbackMenuButtonsRescan();
-        } else {
-            scheduleScan();
-        }
-        if (warmupScans >= 20) {
+        scheduleScan();
+        if (warmupScans >= 8) {
             clearInterval(warmupTimer);
         }
     }, 1500);
