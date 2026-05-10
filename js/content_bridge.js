@@ -5989,6 +5989,7 @@ let fallbackMenuButtonsInstalled = false;
 let fallbackMenuButtonsRescan = null;
 function ensureFallbackMenuButtons() {
     if (fallbackMenuButtonsInstalled) {
+        if (isFilterTubeNativeOverlayQuietMode()) return;
         if (typeof fallbackMenuButtonsRescan === 'function') {
             try { fallbackMenuButtonsRescan(); } catch (e) { }
         }
@@ -6424,6 +6425,7 @@ function ensureFallbackMenuButtons() {
     };
 
     const scan = () => {
+        if (isFilterTubeNativeOverlayQuietMode()) return;
         const cards = document.querySelectorAll(
             'ytd-playlist-panel-video-renderer, ' +
             'yt-lockup-view-model, ' +
@@ -6466,17 +6468,20 @@ function ensureFallbackMenuButtons() {
 
     let scanQueued = false;
     const scheduleScan = () => {
+        if (isFilterTubeNativeOverlayQuietMode()) return;
         if (scanQueued) return;
         scanQueued = true;
         const runScan = () => {
             if (!scanQueued) return;
             scanQueued = false;
+            if (isFilterTubeNativeOverlayQuietMode()) return;
             try { scan(); } catch (e) { }
         };
         requestAnimationFrame(runScan);
         setTimeout(runScan, 120);
     };
     fallbackMenuButtonsRescan = () => {
+        if (isFilterTubeNativeOverlayQuietMode()) return;
         try { scan(); } catch (e) { }
     };
     try {
@@ -6485,6 +6490,7 @@ function ensureFallbackMenuButtons() {
     }
 
     const observer = new MutationObserver(() => {
+        if (isFilterTubeNativeOverlayQuietMode()) return;
         scheduleScan();
     });
 
@@ -6508,8 +6514,10 @@ function ensureFallbackMenuButtons() {
         scheduleScan();
     });
     document.addEventListener('click', () => {
+        if (isFilterTubeNativeOverlayQuietMode()) return;
         scheduleScan();
         setTimeout(() => {
+            if (isFilterTubeNativeOverlayQuietMode()) return;
             if (typeof fallbackMenuButtonsRescan === 'function') {
                 fallbackMenuButtonsRescan();
             }
@@ -6517,6 +6525,13 @@ function ensureFallbackMenuButtons() {
     }, true);
     let pendingScrollRescanTimer = 0;
     window.addEventListener('scroll', () => {
+        if (isFilterTubeNativeOverlayQuietMode()) {
+            if (pendingScrollRescanTimer) {
+                clearTimeout(pendingScrollRescanTimer);
+                pendingScrollRescanTimer = 0;
+            }
+            return;
+        }
         if (pendingScrollRescanTimer) {
             clearTimeout(pendingScrollRescanTimer);
         }
@@ -6529,7 +6544,9 @@ function ensureFallbackMenuButtons() {
     let warmupScans = 0;
     const warmupTimer = setInterval(() => {
         warmupScans += 1;
-        scheduleScan();
+        if (!isFilterTubeNativeOverlayQuietMode()) {
+            scheduleScan();
+        }
         if (warmupScans >= 8) {
             clearInterval(warmupTimer);
         }
