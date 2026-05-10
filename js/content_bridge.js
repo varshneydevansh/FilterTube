@@ -6005,35 +6005,31 @@ async function initializeDOMFallback(settings) {
             return false;
         }
 
-        function mutationsLookFallbackRelevant(mutations) {
+        function fallbackMutationSummary(mutations) {
+            const summary = { hasAddedNodes: false, hasFallbackRelevantContent: false };
             try {
                 for (const mutation of mutations || []) {
                     if (!mutation?.addedNodes || mutation.addedNodes.length === 0) continue;
+                    summary.hasAddedNodes = true;
                     for (const node of mutation.addedNodes) {
-                        if (nodeLooksFallbackRelevant(node)) return true;
+                        if (nodeLooksFallbackRelevant(node)) {
+                            summary.hasFallbackRelevantContent = true;
+                            return summary;
+                        }
                     }
                 }
             } catch (e) {
             }
-            return false;
+            return summary;
         }
         const observer = new MutationObserver(mutations => {
-            let hasNewContent = false;
-            for (const mutation of mutations) {
-                if (mutation.addedNodes && mutation.addedNodes.length > 0) {
-                    hasNewContent = true;
-                    break;
-                }
-            }
+            const mutationSummary = fallbackMutationSummary(mutations);
 
-            if (hasNewContent) {
+            if (mutationSummary.hasAddedNodes) {
                 queueWhitelistPendingHide(mutations);
-                const hasFallbackRelevantContent = mutationsLookFallbackRelevant(mutations);
-                if (hasFallbackRelevantContent) {
+                if (mutationSummary.hasFallbackRelevantContent) {
                     scheduleImmediateFallback();
                 }
-            } else {
-                debouncedFallback();
             }
         });
         const observeTarget = () => {
