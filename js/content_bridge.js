@@ -8455,20 +8455,70 @@ function extractChannelFromCard(card) {
     try {
         const cardTag = (card.tagName || '').toLowerCase();
 
-        const extractAvatarUrl = () => {
-            const img = card.querySelector(
-                '#avatar img, ' +
-                'ytd-channel-name img, ' +
-                'ytd-video-owner-renderer img, ' +
-                'ytm-channel-thumbnail-with-link-renderer img, ' +
-                'ytm-slim-owner-renderer img, ' +
-                'ytm-profile-icon img, ' +
-                '.ytProfileIconImage, ' +
-                'yt-avatar-shape img, ' +
-                'yt-img-shadow img'
-            );
+        const normalizeAvatarUrl = (value) => {
+            if (!value || typeof value !== 'string') return '';
+            const trimmed = value.trim();
+            if (!trimmed || /^data:/i.test(trimmed) || /^blob:/i.test(trimmed)) return '';
+            if (trimmed.startsWith('//')) return `https:${trimmed}`;
+            return trimmed;
+        };
+
+        const extractImageUrl = (img) => {
             if (!img) return '';
-            return (img.getAttribute('src') || img.src || '').trim();
+            const directUrl = normalizeAvatarUrl(
+                img.getAttribute('src') ||
+                img.getAttribute('data-thumb') ||
+                img.getAttribute('data-src') ||
+                img.src ||
+                ''
+            );
+            if (directUrl) return directUrl;
+
+            const srcset = img.getAttribute('srcset') || img.getAttribute('data-srcset') || '';
+            if (!srcset) return '';
+            const candidates = srcset
+                .split(',')
+                .map(part => normalizeAvatarUrl(part.trim().split(/\s+/)[0] || ''))
+                .filter(Boolean);
+            return candidates[candidates.length - 1] || '';
+        };
+
+        const extractAvatarUrl = () => {
+            const avatarSelectors = [
+                '#avatar img',
+                '#avatar-link img',
+                '#channel-thumbnail img',
+                'yt-decorated-avatar-view-model img',
+                'yt-avatar-view-model img',
+                'yt-avatar-shape img',
+                'img.yt-spec-avatar-shape__image',
+                'ytm-channel-thumbnail-with-link-renderer img',
+                'ytm-slim-owner-renderer img',
+                'ytm-profile-icon img',
+                '.ytProfileIconImage',
+                'ytd-video-owner-renderer img',
+                'ytd-channel-name img'
+            ];
+
+            for (const selector of avatarSelectors) {
+                const url = extractImageUrl(card.querySelector(selector));
+                if (url) return url;
+            }
+
+            const ownerScopedSelectors = [
+                '#owner yt-img-shadow img',
+                '#channel-info yt-img-shadow img',
+                '#owner-sub-count yt-img-shadow img',
+                'ytd-video-owner-renderer yt-img-shadow img',
+                'ytd-channel-name yt-img-shadow img',
+                'ytm-slim-owner-renderer yt-img-shadow img'
+            ];
+            for (const selector of ownerScopedSelectors) {
+                const url = extractImageUrl(card.querySelector(selector));
+                if (url) return url;
+            }
+
+            return '';
         };
 
         const normalizeYtmChannelName = (value) => {
