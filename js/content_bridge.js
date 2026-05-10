@@ -5777,8 +5777,9 @@ async function initializeDOMFallback(settings) {
         const whitelistPendingRefreshState = {
             timer: 0,
             pendingHideTimer: 0,
-            pendingHideMutations: []
+            pendingHideCandidates: []
         };
+        const WHITELIST_PENDING_HIDE_CANDIDATE_LIMIT = 160;
 
         function scheduleWhitelistPendingRecheck(delayMs = 120) {
             if (isFilterTubeNativeOverlayQuietMode()) return;
@@ -5799,23 +5800,50 @@ async function initializeDOMFallback(settings) {
             try {
                 if (isFilterTubeNativeOverlayQuietMode()) return;
                 if (!mutations || !mutations.length) return;
+                const queueCandidate = (candidate) => {
+                    if (!(candidate instanceof Element)) return;
+                    if (whitelistPendingRefreshState.pendingHideCandidates.includes(candidate)) return;
+                    if (whitelistPendingRefreshState.pendingHideCandidates.length >= WHITELIST_PENDING_HIDE_CANDIDATE_LIMIT) return;
+                    whitelistPendingRefreshState.pendingHideCandidates.push(candidate);
+                };
+                const collectCandidates = (node) => {
+                    if (!(node instanceof Element)) return;
+                    try {
+                        const tagName = (node.tagName || '').toLowerCase();
+                        if (tagName === 'script' || tagName === 'style' || tagName === 'link' || tagName === 'svg' || tagName === 'path') return;
+                        if (node.matches?.(VIDEO_CARD_SELECTORS)) {
+                            queueCandidate(node);
+                            return;
+                        }
+                        if (!node.querySelector?.(VIDEO_CARD_SELECTORS)) return;
+                        const nested = node.querySelectorAll?.(VIDEO_CARD_SELECTORS) || [];
+                        for (const candidate of nested) {
+                            queueCandidate(candidate);
+                            if (whitelistPendingRefreshState.pendingHideCandidates.length >= WHITELIST_PENDING_HIDE_CANDIDATE_LIMIT) break;
+                        }
+                    } catch (e) {
+                    }
+                };
                 for (const mutation of mutations) {
                     if (mutation?.addedNodes && mutation.addedNodes.length > 0) {
-                        whitelistPendingRefreshState.pendingHideMutations.push(mutation);
+                        for (const node of mutation.addedNodes) {
+                            collectCandidates(node);
+                            if (whitelistPendingRefreshState.pendingHideCandidates.length >= WHITELIST_PENDING_HIDE_CANDIDATE_LIMIT) break;
+                        }
                     }
                 }
-                if (whitelistPendingRefreshState.pendingHideMutations.length === 0) return;
+                if (whitelistPendingRefreshState.pendingHideCandidates.length === 0) return;
                 if (whitelistPendingRefreshState.pendingHideTimer) return;
                 whitelistPendingRefreshState.pendingHideTimer = setTimeout(() => {
                     whitelistPendingRefreshState.pendingHideTimer = 0;
-                    const queuedMutations = whitelistPendingRefreshState.pendingHideMutations.splice(0);
-                    applyWhitelistPendingHide(queuedMutations);
+                    const queuedCandidates = whitelistPendingRefreshState.pendingHideCandidates.splice(0);
+                    applyWhitelistPendingHide(queuedCandidates);
                 }, delayMs);
             } catch (e) {
             }
         }
 
-        function applyWhitelistPendingHide(mutations) {
+        function applyWhitelistPendingHide(candidates) {
             try {
                 const listMode = currentSettings?.listMode === 'whitelist' ? 'whitelist' : 'blocklist';
                 if (listMode !== 'whitelist') return;
@@ -5909,32 +5937,11 @@ async function initializeDOMFallback(settings) {
                 };
 
                 try {
-                    for (const mutation of mutations || []) {
-                        const added = mutation?.addedNodes;
-                        if (!added || !added.length) continue;
-                        for (const node of added) {
-                            if (!(node instanceof Element)) continue;
-
-                            const candidates = [];
-                            try {
-                                if (node.matches && node.matches(VIDEO_CARD_SELECTORS)) {
-                                    candidates.push(node);
-                                }
-                            } catch (e) {
-                            }
-
-                            try {
-                                const nested = node.querySelectorAll ? node.querySelectorAll(VIDEO_CARD_SELECTORS) : [];
-                                nested?.forEach?.(el => candidates.push(el));
-                            } catch (e) {
-                            }
-
-                            for (const cand of candidates) {
-                                const target = resolveTargetToHide(cand);
-                                if (hidePending(target)) {
-                                    hidPendingCard = true;
-                                }
-                            }
+                    for (const candidate of candidates || []) {
+                        if (!(candidate instanceof Element)) continue;
+                        const target = resolveTargetToHide(candidate);
+                        if (hidePending(target)) {
+                            hidPendingCard = true;
                         }
                     }
                 } catch (e) {
