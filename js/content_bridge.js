@@ -13,6 +13,17 @@ function filterTubeDebugLog(...args) {
     console.log('FilterTube:', ...args);
 }
 
+function isFilterTubeNativeOverlayQuietMode() {
+    try {
+        if (window.__filterTubeNativeOverlayCovered === true) return true;
+        if (document.documentElement?.hasAttribute?.('data-filtertube-native-overlay-covered')) return true;
+        if (window.__filterTubeNativeFullscreenActive === true) return true;
+        if (document.documentElement?.hasAttribute?.('data-filtertube-native-fullscreen')) return true;
+    } catch (e) {
+    }
+    return false;
+}
+
 if (isFilterTubeDebugEnabled()) {
     console.log("FilterTube: content_bridge.js loaded (Isolated World)");
 }
@@ -5723,16 +5734,19 @@ async function initializeDOMFallback(settings) {
         const MIN_FALLBACK_INTERVAL_MS = 250;
 
         const debouncedFallback = debounce(() => {
+            if (isFilterTubeNativeOverlayQuietMode()) return;
             applyDOMFallback(null);
             lastFallbackRunTs = Date.now();
         }, 200);
 
         let immediateFallbackScheduled = false;
         function scheduleImmediateFallback() {
+            if (isFilterTubeNativeOverlayQuietMode()) return;
             if (immediateFallbackScheduled) return;
             immediateFallbackScheduled = true;
             requestAnimationFrame(() => {
                 immediateFallbackScheduled = false;
+                if (isFilterTubeNativeOverlayQuietMode()) return;
 
                 const now = Date.now();
                 const elapsed = now - (lastFallbackRunTs || 0);
@@ -5740,6 +5754,7 @@ async function initializeDOMFallback(settings) {
                     if (pendingImmediateFallbackTimer) return;
                     pendingImmediateFallbackTimer = setTimeout(() => {
                         pendingImmediateFallbackTimer = 0;
+                        if (isFilterTubeNativeOverlayQuietMode()) return;
                         lastFallbackRunTs = Date.now();
                         applyDOMFallback(null);
                         try {
@@ -5766,9 +5781,11 @@ async function initializeDOMFallback(settings) {
         };
 
         function scheduleWhitelistPendingRecheck(delayMs = 120) {
+            if (isFilterTubeNativeOverlayQuietMode()) return;
             if (whitelistPendingRefreshState.timer) return;
             whitelistPendingRefreshState.timer = setTimeout(() => {
                 whitelistPendingRefreshState.timer = 0;
+                if (isFilterTubeNativeOverlayQuietMode()) return;
                 try {
                     if (typeof applyDOMFallback === 'function') {
                         applyDOMFallback(null, { preserveScroll: true, onlyWhitelistPending: true });
@@ -5780,6 +5797,7 @@ async function initializeDOMFallback(settings) {
 
         function queueWhitelistPendingHide(mutations, delayMs = 40) {
             try {
+                if (isFilterTubeNativeOverlayQuietMode()) return;
                 if (!mutations || !mutations.length) return;
                 for (const mutation of mutations) {
                     if (mutation?.addedNodes && mutation.addedNodes.length > 0) {
