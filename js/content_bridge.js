@@ -5946,7 +5946,71 @@ async function initializeDOMFallback(settings) {
             } catch (e) {
             }
         }
- const observer = new MutationObserver(mutations => {
+
+        function fallbackRelevantSelector() {
+            try {
+                const videoSelectors = typeof VIDEO_CARD_SELECTORS === 'string'
+                    ? VIDEO_CARD_SELECTORS
+                    : [
+                        'ytd-rich-item-renderer',
+                        'ytd-video-renderer',
+                        'ytd-grid-video-renderer',
+                        'ytd-compact-video-renderer',
+                        'ytd-playlist-panel-video-renderer',
+                        'yt-lockup-view-model',
+                        'yt-lockup-metadata-view-model'
+                    ].join(',');
+                return [
+                    videoSelectors,
+                    'ytd-rich-section-renderer',
+                    'ytd-shelf-renderer',
+                    'ytd-item-section-renderer',
+                    'ytd-guide-entry-renderer',
+                    'ytd-comment-thread-renderer',
+                    'yt-chip-cloud-chip-renderer'
+                ].join(',');
+            } catch (e) {
+                return 'ytd-rich-item-renderer,ytd-video-renderer,ytd-compact-video-renderer,yt-lockup-view-model';
+            }
+        }
+        const fallbackRelevantContentSelector = fallbackRelevantSelector();
+
+        function nodeLooksFallbackRelevant(node) {
+            if (!(node instanceof Element)) return false;
+            try {
+                const tagName = (node.tagName || '').toLowerCase();
+                if (tagName === 'script' || tagName === 'style' || tagName === 'link' || tagName === 'svg' || tagName === 'path') {
+                    return false;
+                }
+                if (node.matches?.(fallbackRelevantContentSelector)) return true;
+                if (node.querySelector?.(fallbackRelevantContentSelector)) return true;
+                if (
+                    node.hasAttribute?.('data-filtertube-hidden') ||
+                    node.hasAttribute?.('data-filtertube-whitelist-pending') ||
+                    node.hasAttribute?.('data-filtertube-processing-pending') ||
+                    node.classList?.contains('filtertube-hidden') ||
+                    node.classList?.contains('filtertube-hidden-shelf')
+                ) {
+                    return true;
+                }
+            } catch (e) {
+            }
+            return false;
+        }
+
+        function mutationsLookFallbackRelevant(mutations) {
+            try {
+                for (const mutation of mutations || []) {
+                    if (!mutation?.addedNodes || mutation.addedNodes.length === 0) continue;
+                    for (const node of mutation.addedNodes) {
+                        if (nodeLooksFallbackRelevant(node)) return true;
+                    }
+                }
+            } catch (e) {
+            }
+            return false;
+        }
+        const observer = new MutationObserver(mutations => {
             let hasNewContent = false;
             for (const mutation of mutations) {
                 if (mutation.addedNodes && mutation.addedNodes.length > 0) {
@@ -5957,7 +6021,10 @@ async function initializeDOMFallback(settings) {
 
             if (hasNewContent) {
                 queueWhitelistPendingHide(mutations);
-                scheduleImmediateFallback();
+                const hasFallbackRelevantContent = mutationsLookFallbackRelevant(mutations);
+                if (hasFallbackRelevantContent) {
+                    scheduleImmediateFallback();
+                }
             } else {
                 debouncedFallback();
             }
