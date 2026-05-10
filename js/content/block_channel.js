@@ -1142,6 +1142,7 @@ function buildQuickBlockFallbackMetadata(source, context, collaborator) {
         handleDisplay: collaborator?.handleDisplay || collaborator?.handle || null,
         canonicalHandle: collaborator?.canonicalHandle || collaborator?.handle || null,
         channelName: collaborator?.name || context?.base?.name || null,
+        channelLogo: collaborator?.channelLogo || collaborator?.logo || context?.base?.channelLogo || context?.base?.logo || null,
         customUrl: collaborator?.customUrl || null,
         videoId: collaborator?.videoId || context?.videoId || context?.base?.videoId || null,
         source: source || 'quickBlock'
@@ -1203,6 +1204,7 @@ async function runQuickBlockFallback(context, info, source = 'quickBlock') {
                         displayHandle: metadata.handleDisplay,
                         canonicalHandle: metadata.canonicalHandle,
                         channelName: metadata.channelName,
+                        channelLogo: metadata.channelLogo,
                         customUrl: metadata.customUrl,
                         videoId: metadata.videoId,
                         source: metadata.source,
