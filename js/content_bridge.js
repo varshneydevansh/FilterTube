@@ -6497,9 +6497,16 @@ function ensureFallbackMenuButtons() {
             }
         }, 700);
     }, true);
+    let pendingScrollRescanTimer = 0;
     window.addEventListener('scroll', () => {
-        scheduleScan();
-    }, true);
+        if (pendingScrollRescanTimer) {
+            clearTimeout(pendingScrollRescanTimer);
+        }
+        pendingScrollRescanTimer = setTimeout(() => {
+            pendingScrollRescanTimer = 0;
+            scheduleScan();
+        }, 180);
+    }, { capture: true, passive: true });
 
     let warmupScans = 0;
     const warmupTimer = setInterval(() => {
