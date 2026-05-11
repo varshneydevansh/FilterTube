@@ -6023,6 +6023,7 @@ async function initializeDOMFallback(settings) {
             return summary;
         }
         const observer = new MutationObserver(mutations => {
+            if (isFilterTubeNativeOverlayQuietMode()) return;
             const mutationSummary = fallbackMutationSummary(mutations);
 
             if (mutationSummary.hasAddedNodes) {
