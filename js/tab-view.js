@@ -6307,6 +6307,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         params.set('app', 'filtertube');
         params.set('code', normalizedCode);
         if (relay) params.set('relay', relay);
+        params.set('path', getNanahUiMode());
+        params.set('role', getNanahRole());
+        params.set('scope', getNanahScope());
+        params.set('apply', getNanahStrategy());
         return `nanah://pair?${params.toString()}`;
     }
 
