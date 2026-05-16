@@ -3,13 +3,17 @@
   <h1>FilterTube</h1>
   <p>Peace of Mind for your Digital Space</p>
   
-  [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/varshneydevansh/FilterTube) ![Version](https://img.shields.io/badge/version-3.3.1-blue.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg) ![Lines of Code](https://img.shields.io/badge/total%20lines-106.4k-brightgreen.svg) ![JavaScript LoC](https://img.shields.io/badge/javascript-67.3k%20lines-yellow.svg) ![Top Language](https://img.shields.io/github/languages/top/varshneydevansh/FilterTube?color=f1e05a) ![Repo Size](https://img.shields.io/github/repo-size/varshneydevansh/FilterTube?color=orange)
+  [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/varshneydevansh/FilterTube) ![Version](https://img.shields.io/badge/version-3.3.1-blue.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg) ![Lines of Code](https://img.shields.io/badge/total%20lines-110.8k-brightgreen.svg) ![JavaScript LoC](https://img.shields.io/badge/javascript-70.4k%20lines-yellow.svg) ![Top Language](https://img.shields.io/github/languages/top/varshneydevansh/FilterTube?color=f1e05a) ![Repo Size](https://img.shields.io/github/repo-size/varshneydevansh/FilterTube?color=orange)
   
 </div>
 
 ## Overview
 
 FilterTube is a browser extension that gives you control over your YouTube feed. Filter videos, shorts, channels, and comments using keywords and smart rules—all processing happens privately on your device.
+
+The public website now also acts as the download hub for browser releases, Android phone/tablet builds, and future store links:
+
+👉 **[filtertube.in/downloads](https://filtertube.in/downloads)**
 
 ## What's New in v3.3.1
 
@@ -168,12 +172,14 @@ Learn more in [Proactive Channel Identity](docs/PROACTIVE_CHANNEL_IDENTITY.md).
   - [YouTube Kids Integration](docs/YOUTUBE_KIDS_INTEGRATION.md) – Kids-specific optimizations
   - [3-Dot Menu Improvements](docs/THREE_DOT_MENU_IMPROVEMENTS.md) – collaborator-aware menu recovery and Mix/watch handling
   - [Subscribed Channels Import](docs/SUBSCRIBED_CHANNELS_IMPORT.md) – whitelist import flow and cross-browser page capture details
+  - [Android Public Distribution](docs/ANDROID_PUBLIC_DISTRIBUTION.md) – APK/AAB, GrapheneOS, F-Droid, and release-channel plan
+  - [App Release and Runtime Sync Workflow](docs/APP_RELEASE_AND_RUNTIME_SYNC_WORKFLOW.md) – extension-to-native runtime sync and cross-platform release order
 
 ## Installation
 
 ### For Users
 The easiest way to install FilterTube is via our official website:
-👉 **[Install FilterTube.in](https://filtertube.in)** (Available for Chrome, Firefox, Edge, Brave, Opera)
+👉 **[Install FilterTube.in](https://filtertube.in/downloads)** (browser builds today, Android phone/tablet release links as they become public)
 
 Prefer a direct store link? Pick your browser:
 

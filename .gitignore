@@ -4,7 +4,11 @@ node_modules/
 # Build output
 build/
 dist/
+release-artifacts/
+mobile-artifacts/
 *.zip
+*.apk
+*.aab
 website/.next/
 
 

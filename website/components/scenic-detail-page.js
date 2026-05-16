@@ -7,7 +7,6 @@ import {
 
 import { ActionLink, SectionHeading } from "@/components/marketing-ui";
 import { Reveal } from "@/components/reveal";
-import { ScenicIllustration } from "@/components/scenic-illustration";
 import { getTonePreset } from "@/components/scenic-tones";
 
 function formatRelatedTitles(relatedPages) {
@@ -109,12 +108,32 @@ export function ScenicDetailPage({ page, relatedPages }) {
     ? "border-white/16 bg-[rgba(16,22,30,0.82)] text-[#fffaf4] hover:border-white/28 hover:bg-[rgba(24,31,41,0.96)]"
     : "";
   const relatedSummary = formatRelatedTitles(relatedPages);
+  const hasHeroVideo = Boolean(page.heroVideo?.src);
 
   return (
     <>
       <section className="relative isolate min-h-[100dvh] overflow-hidden px-4 pb-20 pt-28 md:px-6 md:pb-24 md:pt-36">
-        <div className={`absolute inset-0 ${tone.heroBackdrop}`} />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.18),transparent_26%,rgba(255,255,255,0.08)_100%)]" />
+        {hasHeroVideo ? (
+          <video
+            aria-hidden="true"
+            autoPlay
+            className="absolute inset-0 h-full w-full object-cover"
+            loop
+            muted
+            playsInline
+            preload="metadata"
+            src={page.heroVideo.src}
+          />
+        ) : (
+          <div className={`absolute inset-0 ${tone.heroBackdrop}`} />
+        )}
+        <div
+          className={
+            hasHeroVideo
+              ? "absolute inset-0 bg-[radial-gradient(circle_at_34%_34%,rgba(255,255,255,0.78),rgba(255,255,255,0.48)_34%,rgba(255,255,255,0.18)_58%,rgba(255,255,255,0.08)_100%),linear-gradient(90deg,rgba(255,255,255,0.86),rgba(255,255,255,0.48)_48%,rgba(255,255,255,0.18)_100%)]"
+              : "absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.18),transparent_26%,rgba(255,255,255,0.08)_100%)]"
+          }
+        />
         <div
           className={`absolute -left-20 top-16 h-56 w-56 rounded-full blur-[100px] ${tone.primaryOrb}`}
         />
@@ -124,9 +143,9 @@ export function ScenicDetailPage({ page, relatedPages }) {
         <div className="absolute inset-x-0 bottom-0 h-[34vh] bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.82),transparent_72%)]" />
 
         <div className="relative z-10 mx-auto max-w-[1400px]">
-          <div className="grid gap-10 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] lg:items-end">
+          <div>
             <Reveal>
-              <div className="max-w-[42rem]">
+              <div className="max-w-[58rem]">
                 <Link
                   className={`inline-flex min-h-11 items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 active:translate-y-px active:scale-[0.98] ${
                     isDark
@@ -158,7 +177,7 @@ export function ScenicDetailPage({ page, relatedPages }) {
                 >
                   {page.titleDisplay}
                 </h1>
-                <p className={`mt-6 max-w-[40rem] text-base leading-8 md:text-lg ${mutedText}`}>
+                <p className={`mt-6 max-w-[44rem] text-base leading-8 md:text-lg ${mutedText}`}>
                   {page.description}
                 </p>
                 <div className="mt-8 flex flex-wrap gap-3">
@@ -186,66 +205,6 @@ export function ScenicDetailPage({ page, relatedPages }) {
                   >
                     {page.secondaryCta.label}
                   </ActionLink>
-                </div>
-              </div>
-            </Reveal>
-
-            <Reveal delay={120}>
-              <div className={`rounded-[2.3rem] p-2 ${shellClass}`}>
-                <div
-                  className={`ft-inset relative overflow-hidden rounded-[calc(2.3rem-0.5rem)] p-5 md:p-6 ${tone.surface}`}
-                >
-                  <div className="relative z-10">
-                    <div className="flex flex-wrap items-center justify-between gap-4">
-                      <div className="flex items-center gap-4">
-                        <div
-                          className={`flex h-14 w-14 items-center justify-center rounded-[1.2rem] ${tone.iconShell}`}
-                        >
-                          <Icon aria-hidden="true" size={26} weight="light" />
-                        </div>
-                        <div>
-                          <p className={`text-[0.72rem] uppercase tracking-[0.22em] ${eyebrowText}`}>
-                            {page.previewLabel}
-                          </p>
-                          <p className={`mt-2 text-sm font-medium ${headingText}`}>
-                            {page.navTitle}
-                          </p>
-                        </div>
-                      </div>
-                      <span
-                        className={`inline-flex min-h-10 items-center rounded-full px-4 py-2 text-[0.7rem] uppercase tracking-[0.22em] ${tone.accentBadge}`}
-                      >
-                        {page.status}
-                      </span>
-                    </div>
-
-                    <div className="mt-5">
-                      <ScenicIllustration
-                        className="min-h-[22rem] md:min-h-[24rem]"
-                        label={page.previewLabel}
-                        subtitle={page.routeSummary}
-                        title={page.previewTitle}
-                        variant={page.slug}
-                      />
-                    </div>
-
-                    <div className="mt-5 grid auto-rows-fr gap-4 md:grid-cols-3">
-                      {page.previewRows.map((row) => (
-                        <div
-                          className={`grid h-full gap-3 rounded-[1.5rem] border p-4 ${cardLineClass} ${scenicTileClass}`}
-                          key={row.label}
-                        >
-                          <p className={`text-[0.72rem] uppercase tracking-[0.22em] ${eyebrowText}`}>
-                            {row.label}
-                          </p>
-                          <p className={`text-sm font-semibold uppercase tracking-[0.12em] ${headingText}`}>
-                            {row.value}
-                          </p>
-                          <p className={`text-sm leading-7 ${mutedText}`}>{row.detail}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
                 </div>
               </div>
             </Reveal>

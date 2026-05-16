@@ -18,6 +18,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const archiver = require('archiver');
+const crypto = require('crypto');
 const https = require('https');
 const readline = require('readline');
 const { execSync } = require('child_process');
@@ -30,6 +31,7 @@ const COMMON_DIRS = ['js', 'css', 'html', 'icons', 'data', 'assets'];
 const COMMON_FILES = ['README.md', 'CHANGELOG.md', 'LICENSE'];
 const REPO_OWNER = 'varshneydevansh';
 const REPO_NAME = 'FilterTube';
+const MOBILE_ARTIFACT_FILE_RE = /^FilterTube-mobile-tablet-v[0-9][A-Za-z0-9._-]*-code[0-9]+-(?:release|debug)\.(?:apk|aab)$/;
 const TEXT_LOC_EXTENSIONS = new Set([
     '.js',
     '.jsx',
@@ -48,7 +50,15 @@ const TEXT_LOC_BASENAMES = new Set([
     'LICENSE'
 ]);
 
-const targetBrowser = process.argv[2];
+const cliArgs = process.argv.slice(2);
+const targetBrowser = cliArgs.find(arg => ALL_BROWSER_TARGETS.includes(arg));
+const mobileArtifactsArg = cliArgs.find(arg => arg.startsWith('--mobile-artifacts='));
+const mobileArtifactsDirFromArg = mobileArtifactsArg
+    ? mobileArtifactsArg.slice('--mobile-artifacts='.length).trim()
+    : '';
+const mobileArtifactsDirFromEnv = (process.env.FILTERTUBE_MOBILE_ARTIFACTS_DIR || '').trim();
+const mobileArtifactsRequested = cliArgs.includes('--mobile-artifacts') || Boolean(mobileArtifactsDirFromArg || mobileArtifactsDirFromEnv);
+const includeAllMobileArtifacts = cliArgs.includes('--all-mobile-artifacts');
 const BROWSER_TARGETS = targetBrowser && ALL_BROWSER_TARGETS.includes(targetBrowser)
     ? [targetBrowser]
     : ALL_BROWSER_TARGETS;
@@ -142,7 +152,8 @@ async function main() {
         }
     }
 
-    await maybePromptRelease(VERSION, zipPaths);
+    const mobileArtifactPaths = await maybeCollectMobileArtifacts(VERSION);
+    await maybePromptRelease(VERSION, zipPaths, mobileArtifactPaths);
 }
 
 function ensureCollabDialogScriptOrder(manifestJSON) {
@@ -200,13 +211,92 @@ function createZip(browser, sourceDir, version) {
     });
 }
 
-async function maybePromptRelease(version, zipPaths) {
+async function maybeCollectMobileArtifacts(version) {
+    const defaultDir = path.join('release-artifacts', 'mobile');
+    let sourceDir = mobileArtifactsDirFromArg || mobileArtifactsDirFromEnv;
+
+    if (!sourceDir && mobileArtifactsRequested) {
+        sourceDir = defaultDir;
+    }
+
+    if (!sourceDir && process.stdout.isTTY) {
+        const include = await promptYesNo(`📱 Attach Android mobile/tablet APK/AAB artifacts to release v${version}? (y/N): `);
+        if (!include) return [];
+        sourceDir = await promptText(`   Artifact directory [${defaultDir}]: `);
+        sourceDir = sourceDir.trim() || defaultDir;
+    }
+
+    if (!sourceDir) return [];
+
+    const resolvedSourceDir = path.resolve(sourceDir);
+    if (!fs.existsSync(resolvedSourceDir) || !fs.statSync(resolvedSourceDir).isDirectory()) {
+        console.warn(`⚠️  Mobile artifact directory not found: ${resolvedSourceDir}`);
+        return [];
+    }
+
+    const matchedSourceFiles = fs.readdirSync(resolvedSourceDir)
+        .filter(name => MOBILE_ARTIFACT_FILE_RE.test(name))
+        .sort();
+
+    if (!matchedSourceFiles.length) {
+        console.warn(`⚠️  No mobile artifacts matched ${MOBILE_ARTIFACT_FILE_RE} in ${resolvedSourceDir}`);
+        return [];
+    }
+
+    const sourceFiles = includeAllMobileArtifacts
+        ? matchedSourceFiles
+        : selectLatestMobileArtifacts(matchedSourceFiles);
+
+    if (sourceFiles.length !== matchedSourceFiles.length) {
+        const latestCode = extractAndroidVersionCode(sourceFiles[0]);
+        console.log(`ℹ️  Mobile artifacts: selected latest versionCode ${latestCode}. Use --all-mobile-artifacts to attach every matching file.`);
+    }
+
+    const targetDir = path.join('dist', 'mobile');
+    fs.ensureDirSync(targetDir);
+
+    const copiedPaths = [];
+    for (const fileName of sourceFiles) {
+        const sourcePath = path.join(resolvedSourceDir, fileName);
+        const targetPath = path.join(targetDir, fileName);
+        fs.copyFileSync(sourcePath, targetPath);
+        copiedPaths.push(targetPath);
+
+        const checksumPath = `${targetPath}.sha256`;
+        fs.writeFileSync(checksumPath, `${sha256File(targetPath)}  ${fileName}\n`, 'utf8');
+        copiedPaths.push(checksumPath);
+
+        console.log(`✅ Mobile artifact staged: ${fileName}`);
+    }
+
+    return copiedPaths;
+}
+
+function selectLatestMobileArtifacts(fileNames) {
+    const latestCode = Math.max(...fileNames.map(extractAndroidVersionCode).filter(Number.isFinite));
+    if (!Number.isFinite(latestCode)) return fileNames;
+    return fileNames.filter(name => extractAndroidVersionCode(name) === latestCode);
+}
+
+function extractAndroidVersionCode(fileName) {
+    const match = String(fileName).match(/-code([0-9]+)-/);
+    return match ? Number.parseInt(match[1], 10) : Number.NaN;
+}
+
+function sha256File(filePath) {
+    const hash = crypto.createHash('sha256');
+    hash.update(fs.readFileSync(filePath));
+    return hash.digest('hex');
+}
+
+async function maybePromptRelease(version, zipPaths, mobileArtifactPaths = []) {
     if (!process.stdout.isTTY) {
         console.log('ℹ️  Non-interactive terminal detected; skipping release prompt.');
         return;
     }
-    if (!zipPaths.length) {
-        console.log('ℹ️  No ZIPs produced; skipping release prompt.');
+    const releaseAssetPaths = [...zipPaths, ...mobileArtifactPaths];
+    if (!releaseAssetPaths.length) {
+        console.log('ℹ️  No release assets produced; skipping release prompt.');
         return;
     }
 
@@ -226,7 +316,8 @@ async function maybePromptRelease(version, zipPaths) {
     const body = buildReleaseBody({
         version,
         section: changelogInfo?.section,
-        previousVersion: changelogInfo?.previousVersion
+        previousVersion: changelogInfo?.previousVersion,
+        mobileArtifactPaths
     });
     const releaseTitle = buildReleaseTitle({
         version,
@@ -246,8 +337,8 @@ async function maybePromptRelease(version, zipPaths) {
             return;
         }
 
-        for (const zipPath of zipPaths) {
-            await uploadReleaseAsset(token, uploadUrl, zipPath);
+        for (const assetPath of releaseAssetPaths) {
+            await uploadReleaseAsset(token, uploadUrl, assetPath);
         }
 
         console.log('🚀 Release published successfully.');
@@ -294,7 +385,7 @@ function buildReleaseTitle({ version }) {
     return `FilterTube v${version}`;
 }
 
-function buildReleaseBody({ version, section, previousVersion }) {
+function buildReleaseBody({ version, section, previousVersion, mobileArtifactPaths = [] }) {
     const tag = `v${version}`;
     const compareFrom = previousVersion ? `v${previousVersion}` : null;
     const compareLine = compareFrom
@@ -303,10 +394,42 @@ function buildReleaseBody({ version, section, previousVersion }) {
 
     const assetLink = (browser) =>
         `https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/download/${tag}/filtertube-${browser}-v${version}.zip`;
+    const releaseAssetLink = (fileName) =>
+        `https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/download/${tag}/${encodeURIComponent(fileName)}`;
 
     const whatsNew = section
         ? `## What's New in v${version}\n\n${section.trim()}`
         : `## What's New in v${version}\n\n- Release details unavailable (ensure CHANGELOG.md has a "## Version ${version}" section).`;
+
+    const androidApkNames = mobileArtifactPaths
+        .map(assetPath => path.basename(assetPath))
+        .filter(name => name.endsWith('.apk'));
+    const androidApk = androidApkNames.find(name => name.includes('-release.')) || androidApkNames[0];
+    const androidAab = mobileArtifactPaths
+        .map(assetPath => path.basename(assetPath))
+        .find(name => name.endsWith('.aab'));
+
+    const mobileSection = mobileArtifactPaths.length
+        ? [
+            '',
+            '### Android phone/tablet',
+            androidApk
+                ? `**${androidApk.includes('-debug.') ? 'QA debug APK' : 'Direct APK'}:** [${androidApk}](${releaseAssetLink(androidApk)})`
+                : '**Direct APK:** Not attached in this release.',
+            androidApk
+                ? `**Checksum:** [${androidApk}.sha256](${releaseAssetLink(`${androidApk}.sha256`)})`
+                : '',
+            androidAab
+                ? `**Play/App bundle artifact:** [${androidAab}](${releaseAssetLink(androidAab)})`
+                : '',
+            '',
+            'The APK is for direct installs on Android devices, including GrapheneOS and other non-Play setups. The AAB is for store upload workflows, not normal sideloading.',
+        ].filter(Boolean)
+        : [
+            '',
+            '### Android phone/tablet',
+            'Android builds are distributed through Play testing and will be linked from https://filtertube.in/downloads when a public APK is attached to this release.',
+        ];
 
     return [
         whatsNew,
@@ -348,6 +471,7 @@ function buildReleaseBody({ version, section, previousVersion }) {
         '3. Enable **Developer mode**.',
         '4. Click **Load unpacked**.',
         '5. Select the extracted folder.',
+        ...mobileSection,
         '',
         '---',
         '',
@@ -392,7 +516,7 @@ function uploadReleaseAsset(token, uploadUrlTemplate, filePath) {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'User-Agent': `${REPO_NAME}-release-script`,
-                'Content-Type': 'application/zip',
+                'Content-Type': contentTypeForAsset(fileName),
                 'Content-Length': stat.size
             }
         };
@@ -413,6 +537,14 @@ function uploadReleaseAsset(token, uploadUrlTemplate, filePath) {
         req.on('error', reject);
         fs.createReadStream(filePath).pipe(req);
     });
+}
+
+function contentTypeForAsset(fileName) {
+    const lower = fileName.toLowerCase();
+    if (lower.endsWith('.zip')) return 'application/zip';
+    if (lower.endsWith('.apk')) return 'application/vnd.android.package-archive';
+    if (lower.endsWith('.sha256') || lower.endsWith('.txt')) return 'text/plain; charset=utf-8';
+    return 'application/octet-stream';
 }
 
 function httpRequest(options, payload) {
@@ -450,6 +582,19 @@ function promptYesNo(question) {
         rl.question(question, answer => {
             rl.close();
             resolve(answer.trim().toLowerCase() === 'y');
+        });
+    });
+}
+
+function promptText(question) {
+    return new Promise(resolve => {
+        const rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout
+        });
+        rl.question(question, answer => {
+            rl.close();
+            resolve(answer);
         });
     });
 }

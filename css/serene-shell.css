@@ -980,6 +980,307 @@ html[data-theme="dark"] .btn-secondary:hover {
     padding-top: 0;
 }
 
+.dashboard-app-release {
+    display: grid;
+    grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+    gap: 1rem;
+    align-items: stretch;
+    padding: clamp(0.85rem, 1.25vw, 1rem);
+    border-radius: 1.55rem;
+    border: 1px solid var(--ft-color-sem-neutral-border);
+    background:
+        radial-gradient(circle at 85% 0%, rgba(255, 255, 255, 0.42), transparent 32%),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.32));
+    box-shadow:
+        inset 0 1px 0 var(--ft-color-inset-line),
+        var(--ft-shadow-diffuse);
+}
+
+.dashboard-app-release__copy {
+    display: grid;
+    align-content: center;
+    gap: 0.58rem;
+    min-width: 0;
+    padding: 0.15rem 0.25rem;
+}
+
+.dashboard-app-release__title {
+    margin: 0;
+    max-width: 16ch;
+    font-family: var(--ft-font-family-display);
+    font-size: clamp(1.35rem, 2.1vw, 2rem);
+    line-height: 1;
+    letter-spacing: -0.045em;
+    color: var(--ft-color-text-primary);
+}
+
+.dashboard-app-release__body {
+    margin: 0;
+    max-width: 58ch;
+    font-size: 0.88rem;
+    line-height: 1.65;
+    color: var(--ft-color-text-secondary);
+}
+
+.dashboard-app-release__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(19rem, 1fr));
+    gap: 0.75rem;
+}
+
+.dashboard-app-card {
+    --dashboard-app-accent: var(--ft-color-brand-secondary);
+    --dashboard-app-cta-bg: rgba(89, 121, 104, 0.14);
+    --dashboard-app-cta-text: #2f6f48;
+    position: relative;
+    isolation: isolate;
+    display: block;
+    min-height: 17rem;
+    overflow: hidden;
+    padding: clamp(1.2rem, 2vw, 1.55rem);
+    border-radius: 1.5rem;
+    border: 1px solid color-mix(in srgb, var(--dashboard-app-accent) 30%, var(--ft-color-sem-neutral-border));
+    background:
+        linear-gradient(90deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.92) 45%, rgba(255, 255, 255, 0.54) 100%),
+        radial-gradient(circle at 85% 24%, color-mix(in srgb, var(--dashboard-app-accent) 24%, transparent), transparent 36%),
+        rgba(255, 255, 255, 0.72);
+    color: var(--ft-color-text-primary);
+    text-decoration: none;
+    box-shadow: 0 24px 48px rgba(60, 42, 33, 0.11);
+    transition:
+        transform 340ms cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 340ms ease,
+        border-color 340ms ease;
+}
+
+.dashboard-app-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background:
+        linear-gradient(90deg, rgba(255, 255, 255, 0.99), rgba(255, 255, 255, 0.84) 48%, rgba(255, 255, 255, 0.22)),
+        radial-gradient(circle at 92% 10%, color-mix(in srgb, var(--dashboard-app-accent) 18%, transparent), transparent 34%);
+    pointer-events: none;
+}
+
+.dashboard-app-card::after {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    right: 0.75rem;
+    top: 1rem;
+    width: min(43%, 13rem);
+    height: calc(100% - 2rem);
+    border-radius: 2.4rem;
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.04)),
+        color-mix(in srgb, var(--dashboard-app-accent) 16%, transparent);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+    transform: rotate(-6deg);
+    opacity: 0.62;
+    pointer-events: none;
+}
+
+.dashboard-app-card:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(in srgb, var(--dashboard-app-accent) 48%, var(--ft-color-sem-neutral-border));
+    box-shadow: 0 30px 58px rgba(60, 42, 33, 0.16);
+}
+
+.dashboard-app-card:active {
+    transform: translateY(-1px) scale(0.99);
+}
+
+.dashboard-app-card--android {
+    --dashboard-app-accent: #4f8c68;
+    --dashboard-app-cta-bg: rgba(86, 148, 106, 0.15);
+    --dashboard-app-cta-text: #2f7a4c;
+}
+
+.dashboard-app-card--ios {
+    --dashboard-app-accent: #4d79aa;
+    --dashboard-app-cta-bg: rgba(77, 121, 170, 0.15);
+    --dashboard-app-cta-text: #3e6fa4;
+}
+
+.dashboard-app-card__content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    min-height: calc(17rem - clamp(2.4rem, 4vw, 3.1rem));
+    width: min(58%, 23rem);
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.dashboard-app-card__kicker {
+    margin-bottom: 0.45rem;
+    font-size: 0.66rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--dashboard-app-accent);
+}
+
+.dashboard-app-card strong {
+    display: block;
+    max-width: 13.5ch;
+    font-family: var(--ft-font-family-display);
+    font-size: clamp(1.55rem, 2.2vw, 2.15rem);
+    line-height: 0.95;
+    letter-spacing: -0.055em;
+    color: var(--ft-color-text-primary);
+}
+
+.dashboard-app-card__body {
+    display: block;
+    max-width: 34ch;
+    margin-top: 0.78rem;
+    font-size: 0.88rem;
+    line-height: 1.62;
+    color: var(--ft-color-text-secondary);
+}
+
+.dashboard-app-card__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.56rem;
+    min-height: 2.7rem;
+    margin-top: 1.25rem;
+    padding: 0.45rem 1.1rem 0.45rem 0.48rem;
+    border-radius: 999px;
+    background: var(--dashboard-app-cta-bg);
+    color: var(--dashboard-app-cta-text);
+    font-size: 0.84rem;
+    font-weight: 800;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.58);
+}
+
+.dashboard-app-card__cta-icon {
+    display: inline-flex;
+    width: 1.85rem;
+    height: 1.85rem;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.54);
+}
+
+.dashboard-app-card__cta-icon img {
+    width: 1.9rem;
+    height: 1.9rem;
+    object-fit: cover;
+    object-position: center;
+}
+
+.dashboard-app-card__art {
+    position: absolute;
+    z-index: 1;
+    right: 0.75rem;
+    top: 1rem;
+    display: block;
+    width: min(43%, 13rem);
+    height: calc(100% - 2rem);
+    overflow: hidden;
+    border-radius: 2.4rem;
+    transform: rotate(-6deg);
+    pointer-events: none;
+}
+
+.dashboard-app-card__art img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: drop-shadow(0 28px 42px rgba(39, 48, 35, 0.2));
+}
+
+.dashboard-app-card--android .dashboard-app-card__art img {
+    object-position: 58% 52%;
+    transform: scale(1.22);
+}
+
+.dashboard-app-card--ios .dashboard-app-card__art {
+    transform: rotate(-6deg);
+}
+
+.dashboard-app-card--ios .dashboard-app-card__art img {
+    object-position: 50% 50%;
+    transform: scale(1.08);
+}
+
+.dashboard-app-card--ios .dashboard-app-card__art img {
+    filter: drop-shadow(0 28px 42px rgba(36, 50, 70, 0.18));
+}
+
+html[data-theme="dark"] .dashboard-app-release {
+    background:
+        radial-gradient(circle at 85% 0%, rgba(255, 255, 255, 0.08), transparent 32%),
+        linear-gradient(135deg, rgba(18, 24, 33, 0.92), rgba(18, 24, 33, 0.76));
+}
+
+html[data-theme="dark"] .dashboard-app-card {
+    background:
+        linear-gradient(90deg, rgba(18, 24, 33, 0.97) 0%, rgba(18, 24, 33, 0.9) 48%, rgba(18, 24, 33, 0.5) 100%),
+        radial-gradient(circle at 82% 22%, color-mix(in srgb, var(--dashboard-app-accent) 22%, transparent), transparent 34%),
+        rgba(18, 24, 33, 0.9);
+    box-shadow: 0 26px 58px rgba(0, 0, 0, 0.3);
+}
+
+html[data-theme="dark"] .dashboard-app-card::before {
+    background:
+        linear-gradient(90deg, rgba(18, 24, 33, 0.98), rgba(18, 24, 33, 0.86) 45%, rgba(18, 24, 33, 0.3)),
+        radial-gradient(circle at 92% 10%, color-mix(in srgb, var(--dashboard-app-accent) 16%, transparent), transparent 34%);
+}
+
+html[data-theme="dark"] .dashboard-app-card__cta {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+html[data-theme="dark"] .dashboard-app-card__cta-icon {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 980px) {
+    .dashboard-app-release {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-app-release__title {
+        max-width: 20ch;
+    }
+}
+
+@media (max-width: 640px) {
+    .dashboard-app-release__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-app-card {
+        min-height: 15rem;
+    }
+
+    .dashboard-app-card__content {
+        min-height: calc(15rem - 2.4rem);
+        width: min(62%, 24rem);
+    }
+
+    .dashboard-app-card strong {
+        font-size: clamp(1.35rem, 8vw, 1.85rem);
+    }
+
+    .dashboard-app-card__body {
+        font-size: 0.82rem;
+    }
+
+    .dashboard-app-card__art {
+        width: min(39%, 10rem);
+    }
+}
+
 .dashboard-actions {
     display: grid;
     gap: 1.2rem;

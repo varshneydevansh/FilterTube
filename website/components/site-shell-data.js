@@ -5,7 +5,7 @@ export const navigationLinks = [
   { label: "Why", href: "/#story" },
   { label: "Platforms", href: "/#platforms" },
   { label: "System", href: "/#system" },
-  { label: "Download", href: "/#download" },
+  { label: "Downloads", href: "/downloads" },
 ];
 
 export const platformSlugs = [

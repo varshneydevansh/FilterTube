@@ -8,7 +8,7 @@ import {
   demoVideoHref,
   detailPages,
   docsHref,
-  extensionInstallHref,
+  downloadsHref,
   featuredRouteSlugs,
   githubHref,
   heroVideoUrl,
@@ -195,8 +195,8 @@ export default function HomePage() {
                   Live now
                 </span>
                 <span className="text-pretty">
-                  Extensions are available today. Dedicated mobile, iPad, and TV
-                  apps are being shaped next.
+                  Extensions are available today. Android phone/tablet is in
+                  testing, with iOS and TV following as separate store paths.
                 </span>
               </div>
 
@@ -624,12 +624,12 @@ export default function HomePage() {
                     Download and watch
                   </p>
                   <h2 className="mt-5 max-w-[12ch] font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-6xl md:leading-[0.98]">
-                    Available now on desktop, with more on the way.
+                    Desktop today. Android testing next to it.
                   </h2>
                   <p className="mt-5 max-w-[58ch] text-base leading-8 text-[var(--color-muted)]">
-                    Use FilterTube today on desktop browsers, watch the live
-                    product demo, or read the public docs while the dedicated
-                    app family continues to take shape.
+                    Use FilterTube today on desktop browsers, follow Android
+                    phone/tablet release builds, or read the public docs while
+                    iOS, iPad, and TV stay on their own store tracks.
                   </p>
                   <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                     <ActionLink external href={demoVideoHref}>
@@ -640,8 +640,8 @@ export default function HomePage() {
                     </ActionLink>
                   </div>
                   <div className="mt-4 flex flex-wrap gap-3">
-                    <ActionLink external href={githubHref} variant="secondary">
-                      View the GitHub repo
+                    <ActionLink href={downloadsHref} variant="secondary">
+                      Open downloads
                     </ActionLink>
                   </div>
                 </div>

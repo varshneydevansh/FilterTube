@@ -25,6 +25,7 @@ export const docsHref =
   "https://github.com/varshneydevansh/FilterTube/tree/master/docs";
 
 export const githubHref = "https://github.com/varshneydevansh/FilterTube";
+export const downloadsHref = "/downloads";
 
 export const browserLinks = [
   {
@@ -69,6 +70,7 @@ export const featuredRouteSlugs = ["mobile", "tv", "kids", "ml-ai"];
 
 export const footerLinks = {
   product: [
+    { label: "Downloads", href: downloadsHref },
     { label: "Desktop browsers", href: extensionInstallHref, external: true },
     { label: "Mobile", href: "/mobile" },
     { label: "TV", href: "/tv" },
@@ -91,7 +93,7 @@ export const footerLinks = {
 export const homeStoryNotes = [
   "Built because a parent asked for keyword blocking on YouTube Kids and never got a real answer.",
   "Designed to keep filtering local, explainable, and calm instead of turning safety into another opaque cloud product.",
-  "Available now on desktop browsers, with mobile, iPad, TV, and local intelligence plans already taking shape.",
+  "Available now on desktop browsers, with Android phone/tablet testing active and iOS, iPad, TV, and local intelligence paths moving separately.",
 ];
 
 export const homeCapabilityCards = [
@@ -138,7 +140,7 @@ export const homeCapabilityCards = [
     title:
       "The product is expanding into dedicated apps without losing the calm system already live today.",
     description:
-      "Mobile, iPad, TV, and local ML plans belong to one serene system instead of feeling like disconnected product experiments.",
+      "Android phone/tablet, iOS, iPad, TV, and local ML plans belong to one serene system instead of feeling like disconnected product experiments.",
     points: [
       "Phone and tablet apps become the trusted control layer for rules, profiles, and activity.",
       "TV builds prioritize shared-screen confidence, while local intelligence stays privacy-first and explicit.",
@@ -184,7 +186,7 @@ export const homeFaqItems = [
   {
     question: "Will mobile and TV replace FilterTube on desktop?",
     answer:
-      "No. FilterTube already works today on desktop browsers, and the upcoming apps extend that same control system across more screens.",
+      "No. FilterTube already works today on desktop browsers. The app releases extend that same control system across more screens.",
   },
   {
     question: "Why is Shorts filtering highlighted so often?",
@@ -274,20 +276,20 @@ export const detailPages = {
     slug: "mobile",
     icon: DeviceMobile,
     tone: "sage",
-    status: "In progress",
+    status: "In testing",
     eyebrow: "Dedicated apps",
     navTitle: "Mobile overview",
     routeSummary:
-      "A calm overview of the upcoming iPhone, iPad, and Android app family.",
+      "A calm overview of the iPhone, iPad, and Android app family.",
     titleLead: "A calm FilterTube companion for",
     titleDisplay: "phones and tablets",
     description:
       "The mobile family starts as a protected control center: fast rule changes, profile switching, recent interventions, and clear status without turning the experience into a dense settings wall.",
     chips: ["Signal Rail", "One-thumb controls", "Local-first trust"],
     primaryCta: {
-      label: "Get FilterTube on desktop",
-      href: extensionInstallHref,
-      external: true,
+      label: "Open downloads",
+      href: downloadsHref,
+      external: false,
     },
     secondaryCta: {
       label: "Watch FilterTube working",
@@ -341,7 +343,7 @@ export const detailPages = {
     slug: "ios",
     icon: DeviceMobile,
     tone: "pearl",
-    status: "Planned",
+    status: "Final release testing",
     eyebrow: "iPhone app",
     navTitle: "iPhone",
     routeSummary:
@@ -357,9 +359,15 @@ export const detailPages = {
       external: false,
     },
     secondaryCta: {
-      label: "Get FilterTube on desktop",
-      href: extensionInstallHref,
-      external: true,
+      label: "Open downloads",
+      href: downloadsHref,
+      external: false,
+    },
+    heroVideo: {
+      src: "/videos/ios/ios_hero_slow_540.mp4",
+      label: "iPhone app preview",
+      caption:
+        "A short native iPhone preview for the current release-testing build.",
     },
     previewLabel: "iPhone intent",
     previewTitle: "Fast status, shallow depth, and one-thumb rule changes.",
@@ -408,7 +416,7 @@ export const detailPages = {
     slug: "ipados",
     icon: MonitorPlay,
     tone: "sky",
-    status: "Planned",
+    status: "Final release testing",
     eyebrow: "iPad app",
     navTitle: "iPadOS",
     routeSummary:
@@ -477,25 +485,25 @@ export const detailPages = {
     slug: "android",
     icon: DeviceMobile,
     tone: "forest",
-    status: "Planned",
+    status: "Final release testing",
     eyebrow: "Android app",
     navTitle: "Android",
     routeSummary:
-      "A flexible Android app for rules, profiles, and protected browsing.",
+      "A flexible Android app for rules, profiles, protected browsing, YouTube Main, and public YouTube Kids access.",
     titleLead: "A flexible FilterTube companion for",
     titleDisplay: "Android devices",
     description:
-      "The Android app balances direct control, profile switching, recent interventions, and a path toward protected browsing without feeling chaotic.",
+      "The Android app balances direct control, profile switching, recent interventions, YouTube Main filtering, public YouTube Kids access, and Nanah sync without feeling chaotic.",
     chips: ["Flexible layout", "Quick rules", "Protected sessions"],
     primaryCta: {
-      label: "See the mobile overview",
-      href: "/mobile",
+      label: "Open downloads",
+      href: downloadsHref,
       external: false,
     },
     secondaryCta: {
-      label: "Get FilterTube on desktop",
-      href: extensionInstallHref,
-      external: true,
+      label: "See the mobile overview",
+      href: "/mobile",
+      external: false,
     },
     previewLabel: "Android intent",
     previewTitle: "Utility and calm can coexist on Android.",
