@@ -851,3 +851,21 @@ Installed Chrome unpacked path parity boundary - 2026-05-31:
   negative fixture proof, live smoke acceptance, release/public-claim use, and
   broad audit completion remain `NO-GO`. Runtime behavior changed by this
   addendum: no.
+
+Store feedback engagement/end-screen readiness boundary - 2026-05-31:
+  docs/audit/FILTERTUBE_ENGAGEMENT_BUDGET_CURRENT_BEHAVIOR_2026-05-19.md
+  docs/audit/FILTERTUBE_WATCH_ENDSCREEN_AUTHORITY_CURRENT_BEHAVIOR_2026-05-19.md
+  docs/audit/FILTERTUBE_DIRECT_WATCH_CARD_AUTHORITY_CURRENT_BEHAVIOR_2026-05-19.md
+  docs/audit/FILTERTUBE_COMPACT_AUTOPLAY_AUTHORITY_CURRENT_BEHAVIOR_2026-05-19.md
+  This addendum pulls user/store feedback about recommendation degradation and
+  end-screen video-wall leaks into the global implementation gate. It does not
+  prove YouTube ranking causality. It pins the source-backed boundary that
+  direct and nested `endScreenVideoRenderer` JSON rows use `BASE_VIDEO_RULES`,
+  while `compactAutoplayRenderer`, endpoint-only `autoplayVideo`/`nextButtonVideo`
+  / `previousButtonVideo`, direct watch-card child rows, player DOM wall/card
+  overlays, direct identity fetches, synthetic playlist/player clicks, media
+  pause/stop paths, and recommendation-observable side effects still lack one
+  shared authority. End-screen behavior changes, recommendation side-effect
+  pruning, JSON-first promotion, whitelist/cache optimization, DOM fallback
+  pruning, release/public-claim use, and broad audit completion remain
+  `NO-GO`. Runtime behavior changed by this addendum: no.

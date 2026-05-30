@@ -258,6 +258,25 @@ changes, engagement-side-effect pruning, JSON-first promotion, whitelist
 optimization, release/public-claim use, and broad-audit completion remain
 `NO-GO`; runtime behavior changed by this continuation: no.
 
+2026-05-31 store-feedback readiness gate linkage:
+`docs/audit/FILTERTUBE_IMPLEMENTATION_READINESS_GATE_2026-05-18.md` now pulls
+the same user/store feedback risk into the global implementation gate. The gate
+links `docs/audit/FILTERTUBE_ENGAGEMENT_BUDGET_CURRENT_BEHAVIOR_2026-05-19.md`,
+`docs/audit/FILTERTUBE_WATCH_ENDSCREEN_AUTHORITY_CURRENT_BEHAVIOR_2026-05-19.md`,
+`docs/audit/FILTERTUBE_DIRECT_WATCH_CARD_AUTHORITY_CURRENT_BEHAVIOR_2026-05-19.md`,
+and
+`docs/audit/FILTERTUBE_COMPACT_AUTOPLAY_AUTHORITY_CURRENT_BEHAVIOR_2026-05-19.md`.
+This keeps the distinction explicit: direct and nested
+`endScreenVideoRenderer` JSON rows are source-supported, but
+`compactAutoplayRenderer`, endpoint-only `autoplayVideo`/`nextButtonVideo`/
+`previousButtonVideo`, direct watch-card child rows, player DOM wall/card
+overlays, direct identity fetches, synthetic playlist/player clicks, media
+pause/stop paths, and recommendation-observable side effects still lack one
+shared authority. End-screen behavior changes, recommendation side-effect
+pruning, JSON-first promotion, whitelist/cache optimization, DOM fallback
+pruning, release/public-claim use, and broad-audit completion remain `NO-GO`;
+runtime behavior changed by this linkage: no.
+
 2026-05-30 watch recommendation renderer topology continuation:
 `docs/audit/FILTERTUBE_DIRECT_WATCH_CARD_AUTHORITY_CURRENT_BEHAVIOR_2026-05-19.md`
 and

@@ -4443,6 +4443,7 @@ test('audit_completion_gap_register_pins_identity_waterfall_over_old_four_step_s
 test('audit_completion_gap_register_blocks_implementation_categories', () => {
   const source = doc();
   const releaseRegression = read(releaseRegressionPath);
+  const readinessGate = read('docs/audit/FILTERTUBE_IMPLEMENTATION_READINESS_GATE_2026-05-18.md');
 
   for (const blocker of [
     'Changing JSON filtering behavior',
@@ -4512,6 +4513,17 @@ test('audit_completion_gap_register_blocks_implementation_categories', () => {
   assert.match(source, /compact\/autoplay\s+renderers and player DOM wall\/card overlays remain under-proven/);
   assert.match(source, /observable\s+fetch\/click\/scroll\/pause\/stop paths still lack shared owner, route, rule,\s+user-action, dedupe, and max-per-navigation budgets/);
   assert.match(source, /End-screen behavior\s+changes, engagement-side-effect pruning, JSON-first promotion, whitelist\s+optimization, release\/public-claim use, and broad-audit completion remain\s+`NO-GO`/);
+  assert.match(source, /2026-05-31 store-feedback readiness gate linkage/);
+  assert.ok(source.includes('docs/audit/FILTERTUBE_IMPLEMENTATION_READINESS_GATE_2026-05-18.md'));
+  assert.ok(source.includes('docs/audit/FILTERTUBE_ENGAGEMENT_BUDGET_CURRENT_BEHAVIOR_2026-05-19.md'));
+  assert.ok(source.includes('docs/audit/FILTERTUBE_WATCH_ENDSCREEN_AUTHORITY_CURRENT_BEHAVIOR_2026-05-19.md'));
+  assert.ok(source.includes('docs/audit/FILTERTUBE_DIRECT_WATCH_CARD_AUTHORITY_CURRENT_BEHAVIOR_2026-05-19.md'));
+  assert.ok(source.includes('docs/audit/FILTERTUBE_COMPACT_AUTOPLAY_AUTHORITY_CURRENT_BEHAVIOR_2026-05-19.md'));
+  assert.match(source, /direct and nested\s+`endScreenVideoRenderer` JSON rows are source-supported, but\s+`compactAutoplayRenderer`, endpoint-only `autoplayVideo`\/`nextButtonVideo`\/\s+`previousButtonVideo`, direct watch-card child rows, player DOM wall\/card\s+overlays, direct identity fetches, synthetic playlist\/player clicks, media\s+pause\/stop paths, and recommendation-observable side effects still lack one\s+shared authority/);
+  assert.match(source, /End-screen behavior changes, recommendation side-effect\s+pruning, JSON-first promotion, whitelist\/cache optimization, DOM fallback\s+pruning, release\/public-claim use, and broad-audit completion remain `NO-GO`/);
+  assert.match(source, /runtime behavior changed by this linkage: no/);
+  assert.match(readinessGate, /Store feedback engagement\/end-screen readiness boundary - 2026-05-31/);
+  assert.match(readinessGate, /user\/store feedback about recommendation degradation and\s+end-screen video-wall leaks into the global implementation gate/);
   assert.match(source, /2026-05-30 watch recommendation renderer topology continuation/);
   assert.match(source, /direct watch-card, compact autoplay, lockup, and end-screen\s+recommendation paths into one audit-only topology/);
   assert.match(source, /`compactVideoRenderer`, `watchCardCompactVideoRenderer`,\s+`endScreenVideoRenderer`, `lockupViewModel`, and the\s+`universalWatchCardRenderer` title\/channel wrapper/);

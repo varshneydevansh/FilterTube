@@ -86,6 +86,10 @@ function assertReadinessGateLinksCurrentYouTubeSpaHotTimerAudit() {
   const jsonPathAuthority = read('docs/audit/FILTERTUBE_JSON_PATH_AUTHORITY_CURRENT_BEHAVIOR_2026-05-19.md');
   const diagnosticPolicy = read('docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md');
   const installedChromePath = read('docs/audit/FILTERTUBE_INSTALLED_CHROME_UNPACKED_PATH_PARITY_CURRENT_BEHAVIOR_2026-05-30.md');
+  const engagementBudget = read('docs/audit/FILTERTUBE_ENGAGEMENT_BUDGET_CURRENT_BEHAVIOR_2026-05-19.md');
+  const watchEndscreen = read('docs/audit/FILTERTUBE_WATCH_ENDSCREEN_AUTHORITY_CURRENT_BEHAVIOR_2026-05-19.md');
+  const directWatchCard = read('docs/audit/FILTERTUBE_DIRECT_WATCH_CARD_AUTHORITY_CURRENT_BEHAVIOR_2026-05-19.md');
+  const compactAutoplay = read('docs/audit/FILTERTUBE_COMPACT_AUTOPLAY_AUTHORITY_CURRENT_BEHAVIOR_2026-05-19.md');
 
   assert.match(doc, /YouTube SPA Runtime Optimization Boundary - 2026-05-30/);
   assert.match(doc, /This addendum pulls the current lag-relevant lifecycle audit into the global\s+implementation gate/);
@@ -180,6 +184,15 @@ function assertReadinessGateLinksCurrentYouTubeSpaHotTimerAudit() {
   assert.match(doc, /no CRX-style copy under `Default\/Extensions`, Default-profile local extension\s+storage presence, service worker version `3\.3\.1`, and `incognito: null`/);
   assert.match(doc, /Default-profile source-path owner question is `GO_PATH`, while\s+already-open visible-tab injected byte freshness, incognito runtime\s+availability, stale open-tab cache cleanup, live `Kully B & Gussy G - Topic`\s+negative fixture proof, live smoke acceptance, release\/public-claim use, and\s+broad audit completion remain `NO-GO`/);
   assert.match(doc, /Runtime behavior changed by this\s+addendum: no/);
+  assert.match(doc, /Store feedback engagement\/end-screen readiness boundary - 2026-05-31/);
+  assert.ok(doc.includes('docs/audit/FILTERTUBE_ENGAGEMENT_BUDGET_CURRENT_BEHAVIOR_2026-05-19.md'));
+  assert.ok(doc.includes('docs/audit/FILTERTUBE_WATCH_ENDSCREEN_AUTHORITY_CURRENT_BEHAVIOR_2026-05-19.md'));
+  assert.ok(doc.includes('docs/audit/FILTERTUBE_DIRECT_WATCH_CARD_AUTHORITY_CURRENT_BEHAVIOR_2026-05-19.md'));
+  assert.ok(doc.includes('docs/audit/FILTERTUBE_COMPACT_AUTOPLAY_AUTHORITY_CURRENT_BEHAVIOR_2026-05-19.md'));
+  assert.match(doc, /user\/store feedback about recommendation degradation and\s+end-screen video-wall leaks into the global implementation gate/);
+  assert.match(doc, /It does not\s+prove YouTube ranking causality/);
+  assert.match(doc, /direct and nested `endScreenVideoRenderer` JSON rows use `BASE_VIDEO_RULES`,\s+while `compactAutoplayRenderer`, endpoint-only `autoplayVideo`\/`nextButtonVideo`\s+\/ `previousButtonVideo`, direct watch-card child rows, player DOM wall\/card\s+overlays, direct identity fetches, synthetic playlist\/player clicks, media\s+pause\/stop paths, and recommendation-observable side effects still lack one\s+shared authority/);
+  assert.match(doc, /End-screen behavior changes, recommendation side-effect\s+pruning, JSON-first promotion, whitelist\/cache optimization, DOM fallback\s+pruning, release\/public-claim use, and broad audit completion remain\s+`NO-GO`/);
 
   for (const phrase of [
     '33 YouTube SPA immediate/short hot timer rows',
@@ -251,6 +264,18 @@ function assertReadinessGateLinksCurrentYouTubeSpaHotTimerAudit() {
   assert.match(installedChromePath, /live_kully_gussy_negative_fixture/);
   assert.match(installedChromePath, /GO_PATH/);
   assert.match(installedChromePath, /NO_GO_VISIBLE_TAB/);
+  assert.match(engagementBudget, /This does not prove YouTube recommendation behavior/);
+  assert.match(engagementBudget, /Mozilla review feedback is now pinned as an audit input/);
+  assert.match(engagementBudget, /Direct `endScreenVideoRenderer` filtering is source-supported,\s+but player DOM\s+video walls, compact\/autoplay variants, current-watch skip logic, playlist guard\s+clicks, direct identity fetches, and media pause\/stop paths still lack one\s+shared owner\/budget contract/);
+  assert.match(watchEndscreen, /The store feedback that blocked videos can reappear in the end-screen video\s+wall remains a valid product risk/);
+  assert.match(watchEndscreen, /Direct and nested `endScreenVideoRenderer` JSON rows are supported by\s+`BASE_VIDEO_RULES`/);
+  assert.match(watchEndscreen, /`compactAutoplayRenderer` still has no direct JSON rule/);
+  assert.match(watchEndscreen, /Rendered player DOM video-wall and end-card overlays are broad CSS toggle\s+targets, not per-card blocklist or whitelist decisions/);
+  assert.match(watchEndscreen, /per-card decision \+ sibling-visible \+ no-engagement proof/);
+  assert.match(directWatchCard, /watchRecommendationRendererAuthority/);
+  assert.match(directWatchCard, /sibling-visible proof, and no-rule work budget/);
+  assert.match(compactAutoplay, /`compactAutoplayRenderer` is not covered by direct JSON filtering today/);
+  assert.match(compactAutoplay, /has no committed extracted capture fixture/);
 }
 
 test('current product source does not yet define the future authority control points', () => {
