@@ -475,3 +475,64 @@ runtime behavior changed by this addendum: yes, content_bridge-installed isolate
 release/public-claim proof from this addendum: NO-GO
 broad audit completion from this addendum: NO-GO
 ```
+
+## Production Console Gate Load-Order Addendum - 2026-05-30
+
+This addendum records the load-order boundary for the remaining routine
+`console.log`, `console.debug`, and `console.info` surface after the production
+console gate patch. It is audit-only and makes no runtime change. The goal is
+to prove whether the remaining routine diagnostic tokens can still execute on
+YouTube hot paths with debug disabled.
+
+```text
+background.js
+  -> installFilterTubeBackgroundConsoleGate()
+  -> later background log/debug/info calls are gated
+
+manifest isolated content scripts
+  -> identity/menu/dom helpers/extractors have no routine log/debug/info calls
+  -> dom_fallback installs installFilterTubeRoutineConsoleGate()
+  -> later isolated helpers/content_bridge log/debug/info calls are gated
+  -> content_bridge installs a backup log/debug gate before message listener/init
+
+MAIN world
+  -> seed/filter_logic/injector routine logs are internally debug-gated
+  -> warn/error remain active for failures
+
+legacy layout
+  -> js/layout.js has routine logs but has 0 active manifest load/exposure refs
+```
+
+```mermaid
+flowchart TD
+  A["background starts"] --> B["Background log/debug/info gate"]
+  C["isolated content script list"] --> D["pre-gate files have no routine console output"]
+  D --> E["dom_fallback routine console gate"]
+  E --> F["later isolated helper and bridge output gated"]
+  F --> G["content_bridge backup log/debug gate"]
+  H["MAIN-world seed/filter/injector"] --> I["internal debug gates"]
+  J["js/layout.js"] --> K["manifest-inactive package burden"]
+```
+
+| Load-order row | Current proof | Risk boundary |
+| --- | --- | --- |
+| `production_console_gate_background` | `js/background.js` installs `installFilterTubeBackgroundConsoleGate()` before the first active routine `log/debug/info` token. | Background warn/error remain active; service-worker logs are not YouTube DOM work. |
+| `production_console_gate_isolated_manifest_order` | All four active manifests load `js/content/dom_fallback.js` before `js/content/block_channel.js`, `js/content/bridge_settings.js`, `js/content/handle_resolver.js`, `js/content/collab_dialog.js`, and `js/content_bridge.js` in the isolated list. | If a future manifest reorders or injects helpers before `dom_fallback`, routine logs can reappear before the gate. |
+| `production_console_gate_isolated_pre_gate_silence` | The isolated files before `dom_fallback` have 0 active routine `console.log`, `console.debug`, or `console.info` tokens. | This does not cover `console.warn` or `console.error`, by design. |
+| `production_console_gate_content_bridge_backup` | `js/content_bridge.js` installs its backup gate before `window.addEventListener('message', ...)` and `initialize()`. | The backup gate is redundant with `dom_fallback`; it is not a filtering decision authority. |
+| `production_console_gate_main_world` | `js/seed.js`, `js/filter_logic.js`, and `js/injector.js` routine logs are debug-gated in their own MAIN-world code paths. | MAIN-world console is not overridden globally, so future unconditional logs there remain a risk. |
+| `production_console_gate_legacy_layout` | `js/layout.js` still has 4 routine logs, but active manifests have 0 `js/layout.js` refs and 0 web-accessible exposure refs. | It remains package/code-burden until deleted or given release-cleanup authority. |
+| `production_console_gate_extension_ui` | `js/popup.js` and `js/tab-view.js` each have 1 routine log outside YouTube page content scripts. | These are dashboard/popup diagnostics, not YouTube SPA scroll/click hot-path work. |
+| `production_console_gate_open_risks` | Current gates are source-order proof, not a release metric artifact. | Live installed-tab byte freshness, production console sampling, and route/mode budgets remain `NO-GO`. |
+
+```text
+active manifests checked: 4
+selected routine log/debug/info token rows: 210
+background routine log/debug/info token rows: 62
+content_bridge routine log/debug/info token rows: 126
+isolated pre-dom_fallback routine log/debug/info token rows: 0
+active manifest js/layout.js refs: 0
+runtime behavior changed by load-order addendum: no
+production console load-order release proof: NO-GO
+broad audit completion from load-order addendum: NO-GO
+```

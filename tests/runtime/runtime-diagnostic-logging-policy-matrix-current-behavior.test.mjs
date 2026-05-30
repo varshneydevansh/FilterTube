@@ -125,6 +125,29 @@ const expectedDiagnosticSourceFlowRows = {
   ]
 };
 
+const activeManifestFiles = [
+  'manifest.json',
+  'manifest.chrome.json',
+  'manifest.firefox.json',
+  'manifest.opera.json'
+];
+
+const routineConsoleSourceFiles = [
+  'js/background.js',
+  'js/content/dom_fallback.js',
+  'js/content_bridge.js',
+  'js/seed.js',
+  'js/filter_logic.js',
+  'js/injector.js',
+  'js/layout.js',
+  'js/popup.js',
+  'js/tab-view.js',
+  'js/content/bridge_settings.js',
+  'js/content/handle_resolver.js',
+  'js/content/collab_dialog.js',
+  'js/content/block_channel.js'
+];
+
 function read(file) {
   return fs.readFileSync(path.join(repoRoot, file), 'utf8');
 }
@@ -153,6 +176,27 @@ function consoleCounts(file) {
   }
   counts.total = Object.values(counts).reduce((sum, value) => sum + value, 0);
   return counts;
+}
+
+function routineConsoleSites(file) {
+  const out = [];
+  read(file).split(/\r?\n/).forEach((line, index) => {
+    if (line.trim().startsWith('//')) return;
+    if (/console\.(log|debug|info)\s*\(|console\[['"](?:log|debug|info)['"]\]/.test(line)) {
+      out.push(index + 1);
+    }
+  });
+  return out;
+}
+
+function lineNumberForToken(source, token) {
+  const index = source.split(/\r?\n/).findIndex((line) => line.includes(token));
+  assert.notEqual(index, -1, `missing token ${token}`);
+  return index + 1;
+}
+
+function manifestJson(file) {
+  return JSON.parse(read(file));
 }
 
 function scopedSource() {
@@ -253,6 +297,115 @@ function assertContentBridgeProductionConsoleGateAddendum(doc) {
   }
 }
 
+function assertProductionConsoleGateLoadOrderAddendum(doc) {
+  assert.match(doc, /Production Console Gate Load-Order Addendum - 2026-05-30/);
+  assert.match(doc, /It is audit-only and makes no runtime change/);
+  assert.match(doc, /manifest isolated content scripts/);
+  assert.match(doc, /MAIN-world seed\/filter\/injector/);
+  assert.match(doc, /legacy layout/);
+  assert.match(doc, /flowchart TD/);
+  assert.match(doc, /active manifests checked: 4/);
+  assert.match(doc, /selected routine log\/debug\/info token rows: 210/);
+  assert.match(doc, /background routine log\/debug\/info token rows: 62/);
+  assert.match(doc, /content_bridge routine log\/debug\/info token rows: 126/);
+  assert.match(doc, /isolated pre-dom_fallback routine log\/debug\/info token rows: 0/);
+  assert.match(doc, /active manifest js\/layout\.js refs: 0/);
+  assert.match(doc, /runtime behavior changed by load-order addendum: no/);
+  assert.match(doc, /production console load-order release proof: NO-GO/);
+  assert.match(doc, /broad audit completion from load-order addendum: NO-GO/);
+
+  for (const row of [
+    'production_console_gate_background',
+    'production_console_gate_isolated_manifest_order',
+    'production_console_gate_isolated_pre_gate_silence',
+    'production_console_gate_content_bridge_backup',
+    'production_console_gate_main_world',
+    'production_console_gate_legacy_layout',
+    'production_console_gate_extension_ui',
+    'production_console_gate_open_risks'
+  ]) {
+    assert.match(doc, new RegExp(`\\| \`${row}\` \\|`), `missing production load-order row ${row}`);
+  }
+
+  const routineTotal = routineConsoleSourceFiles
+    .map((file) => routineConsoleSites(file).length)
+    .reduce((sum, value) => sum + value, 0);
+  assert.equal(routineTotal, 210);
+  assert.equal(routineConsoleSites('js/background.js').length, 62);
+  assert.equal(routineConsoleSites('js/content_bridge.js').length, 126);
+
+  const background = read('js/background.js');
+  assert.ok(
+    lineNumberForToken(background, 'installFilterTubeBackgroundConsoleGate();') < routineConsoleSites('js/background.js')[0],
+    'background console gate must install before routine background log/debug/info tokens'
+  );
+  assert.match(background, /console\.log = \(\.\.\.args\) => \{ if \(isEnabled\(\)\) originalLog\(\.\.\.args\); \}/);
+  assert.match(background, /console\.debug = \(\.\.\.args\) => \{ if \(isEnabled\(\)\) originalDebug\(\.\.\.args\); \}/);
+  assert.doesNotMatch(background, /console\.warn =/);
+  assert.doesNotMatch(background, /console\.error =/);
+
+  const domFallback = read('js/content/dom_fallback.js');
+  assert.ok(
+    lineNumberForToken(domFallback, 'installFilterTubeRoutineConsoleGate();') < routineConsoleSites('js/content/dom_fallback.js')[0],
+    'dom_fallback routine console gate must install before routine DOM fallback log/debug/info tokens'
+  );
+  assert.match(domFallback, /if \(originalLog\) console\.log = \(\.\.\.args\) => \{ if \(isEnabled\(\)\) originalLog\(\.\.\.args\); \}/);
+  assert.match(domFallback, /if \(originalInfo\) console\.info = \(\.\.\.args\) => \{ if \(isEnabled\(\)\) originalInfo\(\.\.\.args\); \}/);
+  assert.match(domFallback, /if \(originalDebug\) console\.debug = \(\.\.\.args\) => \{ if \(isEnabled\(\)\) originalDebug\(\.\.\.args\); \}/);
+  assert.doesNotMatch(domFallback, /console\.warn =/);
+  assert.doesNotMatch(domFallback, /console\.error =/);
+
+  const contentBridge = read('js/content_bridge.js');
+  assert.ok(
+    lineNumberForToken(contentBridge, 'installFilterTubeProductionConsoleGate();') < lineNumberForToken(contentBridge, "window.addEventListener('message'"),
+    'content_bridge backup gate must install before bridge message listener'
+  );
+  assert.ok(
+    lineNumberForToken(contentBridge, 'installFilterTubeProductionConsoleGate();') < lineNumberForToken(contentBridge, 'setTimeout(() => initialize(), 50);'),
+    'content_bridge backup gate must install before initialize timer'
+  );
+  assert.match(contentBridge, /console\['log'\] = function filterTubeProductionLogGate/);
+  assert.match(contentBridge, /console\['debug'\] = function filterTubeProductionDebugGate/);
+  assert.doesNotMatch(contentBridge, /console\['warn'\]\s*=/);
+  assert.doesNotMatch(contentBridge, /console\['error'\]\s*=/);
+
+  let preGateRoutineConsoleSites = 0;
+  let layoutRefs = 0;
+  for (const manifestFile of activeManifestFiles) {
+    const manifestText = read(manifestFile);
+    const manifest = manifestJson(manifestFile);
+    layoutRefs += (manifestText.match(/js\/layout\.js/g) || []).length;
+    for (const entry of manifest.content_scripts || []) {
+      if (!entry.js?.includes('js/content/dom_fallback.js')) continue;
+      const domIndex = entry.js.indexOf('js/content/dom_fallback.js');
+      assert.equal(domIndex, 4, `${manifestFile} dom_fallback isolated order drifted`);
+      assert.ok(entry.js.indexOf('js/content/block_channel.js') > domIndex);
+      assert.ok(entry.js.indexOf('js/content/bridge_settings.js') > domIndex);
+      assert.ok(entry.js.indexOf('js/content/handle_resolver.js') > domIndex);
+      assert.ok(entry.js.indexOf('js/content/collab_dialog.js') > domIndex);
+      assert.ok(entry.js.indexOf('js/content_bridge.js') > domIndex);
+      for (const file of entry.js.slice(0, domIndex)) {
+        preGateRoutineConsoleSites += routineConsoleSites(file).length;
+      }
+    }
+  }
+  assert.equal(preGateRoutineConsoleSites, 0);
+  assert.equal(layoutRefs, 0);
+
+  assert.deepEqual(routineConsoleSites('js/seed.js'), [11, 33, 153]);
+  assert.match(read('js/seed.js'), /if \(filterTubeSeedDebugEnabled\) \{\s*console\.log\('FilterTube: seed\.js initializing \(MAIN world\)'\);/s);
+  assert.match(read('js/seed.js'), /function seedDebugLog\(message, \.\.\.args\) \{\s*if \(!isSeedDebugEnabled\(\)\) return;/s);
+  assert.deepEqual(routineConsoleSites('js/filter_logic.js'), [11, 1566, 1581]);
+  assert.match(read('js/filter_logic.js'), /if \(level === 'log' && !window\.__filtertubeDebug\) \{\s*return;/s);
+  assert.match(read('js/filter_logic.js'), /if \(enabled\) \{\s*console\.log\(`FilterTube \(Filter\):`, message, \.\.\.args\);/s);
+  assert.deepEqual(routineConsoleSites('js/injector.js'), [97]);
+  assert.match(read('js/injector.js'), /if \(window\.__filtertubeDebug \|\| document\.documentElement\?\.getAttribute\('data-filtertube-debug'\) === 'true'\) \{\s*console\.debug\('FilterTube \(Injector\): Already initialized, skipping'\);/s);
+
+  assert.equal(routineConsoleSites('js/layout.js').length, 4);
+  assert.equal(routineConsoleSites('js/popup.js').length, 1);
+  assert.equal(routineConsoleSites('js/tab-view.js').length, 1);
+}
+
 test('runtime diagnostic logging policy matrix is audit-only and source pinned', () => {
   const doc = read(docPath);
 
@@ -267,6 +420,7 @@ test('runtime diagnostic logging policy matrix is audit-only and source pinned',
   assertDiagnosticSourceFlowAddendum(doc);
   assertDiagnosticLoggingConvergenceBoundary(doc);
   assertContentBridgeProductionConsoleGateAddendum(doc);
+  assertProductionConsoleGateLoadOrderAddendum(doc);
 
   for (const [file, [expectedLines, expectedBytes, expectedHash]] of Object.entries(sourceFingerprints)) {
     const source = read(file);
