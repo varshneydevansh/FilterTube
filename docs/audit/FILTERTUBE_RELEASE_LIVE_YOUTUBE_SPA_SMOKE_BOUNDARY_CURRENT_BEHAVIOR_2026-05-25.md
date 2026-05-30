@@ -98,6 +98,7 @@ runner smoke-slice readiness can pass without release readiness: yes
 runner release readiness without installed byte parity: NO-GO
 runner output accepted as release proof now: NO-GO
 template accepted as release proof now: NO-GO
+installed Chrome CDP preflight status: unavailable on 2026-05-31
 runtime behavior changed: no
 ```
 
@@ -114,6 +115,27 @@ runtime behavior changed: no
 | `FT-LIVE-RUNNER-08-output-artifact-schema` | `run-live-smoke.mjs:653`, `run-live-smoke.mjs:655`, `run-live-smoke.mjs:657`, `run-live-smoke.mjs:658`, `run-live-smoke.mjs:669`, `run-live-smoke.mjs:670`, `run-live-smoke.mjs:671`, `run-live-smoke.mjs:689`, `run-live-smoke.mjs:693`, `run-live-smoke.mjs:694`, `run-live-smoke.mjs:695` | The runner writes a dated JSON artifact with row statuses, route sequence, stall timing text, false-hide/leak summary, smoke-slice readiness, release readiness, installed-byte-parity verdict, and console summary. | Contract defined; no dated JSON result committed. |
 | `FT-LIVE-RUNNER-09-installed-byte-parity-gate` | `run-live-smoke.mjs:2`, `run-live-smoke.mjs:224`, `run-live-smoke.mjs:232`, `run-live-smoke.mjs:256`, `run-live-smoke.mjs:262`, `run-live-smoke.mjs:266`, `run-live-smoke.mjs:273`, `run-live-smoke.mjs:274`, `run-live-smoke.mjs:275`, `run-live-smoke.mjs:287`, `run-live-smoke.mjs:288`, `run-live-smoke.mjs:652`, `run-live-smoke.mjs:658`, `run-live-smoke.mjs:673`, `run-live-smoke.mjs:681`, `run-live-smoke.mjs:682`, `template.json:26`, `template.json:59`, `template.json:104`, `template.json:106` | The runner now records source hashes and the installed-byte-parity packet fields separately from route smoke. It may report `GO-FOR-THIS-SMOKE-SLICE`, but `releaseReadiness` remains `NO-GO` unless installed byte parity passes. | Contract hardened; installed byte parity remains missing. |
 | `FT-LIVE-RUNNER-10-template-non-evidence-guard` | `template.json:2`, `template.json:3`, `template.json:4`, `template.json:5`, `template.json:6`, `template.json:26`, `template.json:62`, `template.json:100`, `template.json:104`, `template.json:105`, `template.json:106`, `template.json:107`, `template.json:108` | The template is explicitly `template-not-executed`; all required rows are `missing`, installed byte parity is `NO-GO`, and every template/missing/failure/byte-parity-missing path keeps readiness at `NO-GO`. | Contract defined; template is not release evidence. |
+
+## Installed Chrome CDP Preflight - 2026-05-31
+
+The runner still requires a CDP endpoint for the same installed Chrome session
+that carries the user-visible FilterTube extension. A read-only preflight in the
+current desktop session found Chrome running, but
+`http://127.0.0.1:9222/json/version` and `/json/list` were unavailable. The
+runner was therefore not executed, no storage was seeded, and no live smoke
+artifact was written.
+
+```text
+installed Chrome CDP preflight rows: 4
+Chrome running process observed: yes
+CDP endpoint checked: http://127.0.0.1:9222/json/version
+CDP endpoint status: unavailable
+live smoke runner executed: no
+executed live smoke result artifacts committed: 0
+installed Chrome CDP preflight accepted as live smoke proof: NO-GO
+release readiness from CDP preflight: NO-GO
+runtime behavior changed: no
+```
 
 ASCII flow:
 

@@ -193,6 +193,11 @@ test('release live YouTube SPA smoke remains a separate missing release gate', (
   assert.match(smokeDoc, /runner smoke-slice readiness can pass without release readiness: yes/);
   assert.match(smokeDoc, /runner release readiness without installed byte parity: NO-GO/);
   assert.match(smokeDoc, /template accepted as release proof now: NO-GO/);
+  assert.match(smokeDoc, /Installed Chrome CDP Preflight - 2026-05-31/);
+  assert.match(smokeDoc, /installed Chrome CDP preflight status: unavailable on 2026-05-31/);
+  assert.match(smokeDoc, /installed Chrome CDP preflight rows: 4/);
+  assert.match(smokeDoc, /CDP endpoint status: unavailable/);
+  assert.match(smokeDoc, /installed Chrome CDP preflight accepted as live smoke proof: NO-GO/);
   assert.match(smokeDoc, /CDP base \+ target list/);
   assert.match(smokeDoc, /flowchart TD/);
   assert.match(smokeDoc, /Still not broad release authority without installed-byte parity and route-mode packets/);

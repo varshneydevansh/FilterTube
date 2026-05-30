@@ -71,6 +71,7 @@ extension reload timestamp authority: NO-GO
 automation profile substitution authority: NO-GO
 incognito runtime availability authority: NO-GO
 connected Chrome profile parity probe: NOT-PARITY
+installed Chrome CDP preflight: UNAVAILABLE
 live smoke acceptance from this gate: NO-GO
 runtime behavior changed: no
 not completion proof for whitelist/cache SPA release readiness
@@ -165,6 +166,34 @@ accept user-visible screenshots as content-script byte proof now: NO-GO
 accept scratch/private Chrome profile as substitute proof now: NO-GO
 continue proof-backed audit: GO
 ```
+
+## 2026-05-31 Installed Chrome CDP Preflight Addendum
+
+This addendum records a read-only attempt to prepare the live YouTube SPA smoke
+runner against the user's already-open installed Chrome session. Chrome was
+running, but the runner's default CDP endpoint was not exposed, so no tab was
+claimed, no extension storage was changed, and no live smoke artifact was
+created.
+
+```text
+installed Chrome CDP preflight rows: 4
+Chrome running process observed: yes
+CDP endpoint checked: http://127.0.0.1:9222/json/version
+CDP endpoint status: unavailable
+live smoke runner executed: no
+executed live smoke artifacts committed: 0
+installed Chrome CDP preflight accepted as live smoke proof: NO-GO
+runtime behavior changed: no
+```
+
+Installed Chrome CDP preflight rows:
+
+| Row | Observation | Release consequence |
+| --- | --- | --- |
+| `FT-WLCACHE-CDP-PREFLIGHT-00-scope` | The preflight only checked whether the live runner could attach to `http://127.0.0.1:9222`; it did not open a new Chrome profile or mutate extension storage. | Orientation only; not a smoke run. |
+| `FT-WLCACHE-CDP-PREFLIGHT-01-running-chrome` | `Google Chrome` processes were present in the current desktop session. | Chrome being open is necessary but not sufficient for CDP-backed tab proof. |
+| `FT-WLCACHE-CDP-PREFLIGHT-02-endpoint` | `curl -s http://127.0.0.1:9222/json/version` and `/json/list` exited with connection failure. | The existing runner cannot attach to the visible installed-profile tab from this session. |
+| `FT-WLCACHE-CDP-PREFLIGHT-03-consequence` | No dated result JSON or screenshot directory was created under `docs/audit/artifacts/release-live-youtube-spa-smoke/`. | Live installed-tab byte parity and route smoke remain `NO-GO`. |
 
 ## Route Sequence And List-Mode Matrix Gate Addendum
 

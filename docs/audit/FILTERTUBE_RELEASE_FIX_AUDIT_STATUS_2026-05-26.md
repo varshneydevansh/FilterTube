@@ -914,6 +914,8 @@ focused metric foundation inline draft coverage gate verifier after 2026-05-29 c
 combined metric-foundation inline artifact chain plus coverage gate verifier after 2026-05-29 continuation: 61/61 pass, audit-only with no extension runtime behavior change
 focused artifact commit readiness inline draft blocker verifier after 2026-05-29 continuation: 6/6 pass, audit-only with no extension runtime behavior change
 combined metric-foundation inline artifact chain plus coverage gate plus artifact commit readiness verifier after 2026-05-29 continuation: 67/67 pass, audit-only with no extension runtime behavior change
+full runtime audit after 2026-05-31 lag/log/Topic committed state check: 4671/4671 pass, 0 fail, 86.4s, no uncommitted runtime behavior change
+installed Chrome CDP preflight for live SPA smoke on 2026-05-31: Chrome running, 127.0.0.1:9222 unavailable, live smoke runner not executed, no live smoke artifact committed, release proof remains NO-GO
 git diff --check: pass
 runtime behavior changed by documentation ledger: no
 ```

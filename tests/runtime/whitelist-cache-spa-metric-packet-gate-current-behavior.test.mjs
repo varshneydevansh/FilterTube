@@ -1474,6 +1474,7 @@ test('whitelist/cache SPA metric packet gate is audit-only and source-backed', (
   assert.match(doc, /active YouTube tab content-script byte authority: NO-GO/);
   assert.match(doc, /extension reload timestamp authority: NO-GO/);
   assert.match(doc, /connected Chrome profile parity probe: NOT-PARITY/);
+  assert.match(doc, /installed Chrome CDP preflight: UNAVAILABLE/);
   assert.match(doc, /live smoke acceptance from this gate: NO-GO/);
   assert.match(doc, /2026-05-30 Connected Chrome Profile Probe Addendum/);
   assert.match(doc, /connected Chrome profile parity probe rows: 5/);
@@ -1482,6 +1483,11 @@ test('whitelist/cache SPA metric packet gate is audit-only and source-backed', (
   assert.match(doc, /connected open-tab matches for FilterTube or YouTube: 0/);
   assert.match(doc, /connected Chrome profile accepted as installed-byte parity: NO-GO/);
   assert.match(doc, /new Chrome profile\/window opened for this probe: no/);
+  assert.match(doc, /2026-05-31 Installed Chrome CDP Preflight Addendum/);
+  assert.match(doc, /installed Chrome CDP preflight rows: 4/);
+  assert.match(doc, /Chrome running process observed: yes/);
+  assert.match(doc, /CDP endpoint status: unavailable/);
+  assert.match(doc, /installed Chrome CDP preflight accepted as live smoke proof: NO-GO/);
   assert.match(doc, /selected packet rows: FT-WLCACHE-SPA-PACKET-02-route-sequence, FT-WLCACHE-SPA-PACKET-03-list-modes/);
   assert.match(doc, /route sequence rows required: 6/);
   assert.match(doc, /list-mode states required: 6/);
@@ -2972,6 +2978,7 @@ test('metric packet gate preserves optimization and JSON-first approval absence'
   assert.match(doc, /accept missing relevant tabs as active YouTube tab proof now: NO-GO/);
   assert.match(doc, /accept user-visible screenshots as content-script byte proof now: NO-GO/);
   assert.match(doc, /accept scratch\/private Chrome profile as substitute proof now: NO-GO/);
+  assert.match(doc, /installed Chrome CDP preflight accepted as live smoke proof: NO-GO/);
   assert.match(doc, /accept runner smokeSliceReadiness as release proof without byte parity now: NO-GO/);
   assert.match(doc, /accept stale already-open YouTube tabs for release smoke now: NO-GO/);
   assert.match(doc, /approve whitelist\/cache optimization from this gate now: NO-GO/);
