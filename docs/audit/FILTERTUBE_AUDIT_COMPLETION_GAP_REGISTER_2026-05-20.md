@@ -3855,6 +3855,24 @@ promotion, whitelist/cache optimization, JSON-first first-class promotion,
 release/public-claim use, and broad-audit completion remain `NO-GO`; runtime
 behavior changed by this continuation: no.
 
+2026-05-31 production console gate coverage reconciliation:
+`docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md`,
+`docs/audit/FILTERTUBE_IMPLEMENTATION_READINESS_GATE_2026-05-18.md`, and
+`tests/runtime/runtime-diagnostic-logging-policy-matrix-current-behavior.test.mjs`
+extend the gap register from diagnostic logging convergence into exact
+production-console gate owner coverage without approving logging cleanup or
+changing product runtime behavior. The reconciliation pins 3 runtime console
+gate owner files (`js/background.js`, `js/content/dom_fallback.js`, and
+`js/content_bridge.js`), background `log/debug/info` gating, isolated-world DOM
+fallback `log/debug/info` gating, content-bridge backup `log/debug` gating,
+no `warn/error` suppression, no MAIN-world global console override, no
+extension-UI cleanup approval, no live installed-tab console sampling proof,
+and no release/public-claim proof. Diagnostic logging cleanup, diagnostic
+metric replacement, privacy/redaction promotion, route/mode console budgets,
+whitelist/cache optimization, JSON-first first-class promotion,
+release/public-claim use, and broad-audit completion remain `NO-GO`; runtime
+behavior changed by this reconciliation: no.
+
 2026-05-30 whitelist/cache live evidence result artifact contract
 continuation:
 `docs/audit/FILTERTUBE_WHITELIST_CACHE_SPA_AFFECTED_CALLABLE_PROOF_BOUNDARY_CURRENT_BEHAVIOR_2026-05-30.md`

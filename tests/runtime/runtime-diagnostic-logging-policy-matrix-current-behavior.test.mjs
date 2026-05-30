@@ -585,11 +585,11 @@ test('runtime diagnostic logging matrix is linked from audit ledgers and runtime
     assert.match(artifact, /implementation-ready diagnostic\s+logging\s+convergence\s+rows\s+0|0\s+implementation-ready diagnostic\s+logging\s+convergence\s+rows/);
   }
 
-  for (const artifact of [objectiveLedger, activeGoal]) {
-    assert.match(artifact, /2026-05-31 production console gate coverage reconciliation/);
-    assert.match(artifact, /3 runtime console gate owner\s+files|3 runtime console gate owner files/);
+  for (const artifact of [objectiveLedger, activeGoal, readinessGate, gapRegister]) {
+    assert.match(artifact, /2026-05-31 production console gate coverage reconciliation|Production console gate coverage reconciliation - 2026-05-31/);
+    assert.match(artifact, /3 runtime console\s+gate owner\s+files/);
     assert.match(artifact, /no MAIN-world global console\s+override|no MAIN-world global console override/);
-    assert.match(artifact, /no live installed-tab console\s+sampling proof|no live installed-tab console sampling proof/);
+    assert.match(artifact, /no live installed-tab console\s+sampling\s+proof/);
   }
 
   assert.match(runtimeResults, /tests 4457/);

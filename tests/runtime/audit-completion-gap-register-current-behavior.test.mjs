@@ -4649,7 +4649,16 @@ test('audit completion gap register records content-filter route surface converg
   assert.match(source, /joins console\s+inventory, hot runtime file cost, level split, relay\/direct console paths,\s+identity privacy exposure, JSON decision diagnostics, no-work logging budget/);
   assert.match(source, /Diagnostic logging cleanup, diagnostic metric replacement, privacy\/redaction\s+promotion, whitelist\/cache optimization, JSON-first first-class promotion,\s+release\/public-claim use, and broad-audit completion remain `NO-GO`/);
   assert.match(source, /runtime\s+behavior changed by this continuation: no/);
+  assert.match(source, /2026-05-31 production console gate coverage reconciliation/);
+  assert.match(source, /extend the gap register from diagnostic logging convergence into exact\s+production-console gate owner coverage/);
+  assert.match(source, /pins 3 runtime console\s+gate owner files \(`js\/background\.js`, `js\/content\/dom_fallback\.js`, and\s+`js\/content_bridge\.js`\)/);
+  assert.match(source, /background `log\/debug\/info` gating, isolated-world DOM\s+fallback `log\/debug\/info` gating, content-bridge backup `log\/debug` gating/);
+  assert.match(source, /no `warn\/error` suppression, no MAIN-world global console override, no\s+extension-UI cleanup approval, no live installed-tab console sampling proof/);
+  assert.match(source, /route\/mode console budgets,\s+whitelist\/cache optimization, JSON-first first-class promotion,\s+release\/public-claim use, and broad-audit completion remain `NO-GO`/);
+  assert.match(source, /runtime\s+behavior changed by this reconciliation: no/);
   assert.match(diagnosticDoc, /Diagnostic Logging Convergence Boundary - 2026-05-30/);
+  assert.match(diagnosticDoc, /Production Console Gate Coverage Reconciliation - 2026-05-31/);
   assert.match(diagnosticDoc, /implementation-ready diagnostic logging convergence rows: 0/);
   assert.match(readinessDoc, /Diagnostic logging convergence boundary - 2026-05-30/);
+  assert.match(readinessDoc, /Production console gate coverage reconciliation - 2026-05-31/);
 });

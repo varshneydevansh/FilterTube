@@ -820,3 +820,19 @@ Diagnostic logging convergence boundary - 2026-05-30:
   promotion, whitelist/cache optimization, JSON-first promotion, release
   claims, and `diagnosticLoggingConvergenceAuthority` implementation at
   `NO-GO`.
+
+Production console gate coverage reconciliation - 2026-05-31:
+  docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md
+  tests/runtime/runtime-diagnostic-logging-policy-matrix-current-behavior.test.mjs
+  This addendum reconciles the current source-order production console gates
+  with the broader diagnostic logging policy blocker. It pins 3 runtime console
+  gate owner files (`js/background.js`, `js/content/dom_fallback.js`, and
+  `js/content_bridge.js`), background `log/debug/info` gating, isolated-world
+  DOM fallback `log/debug/info` gating, content-bridge backup `log/debug`
+  gating, no `warn/error` suppression, no MAIN-world global console override,
+  no extension-UI cleanup approval, no live installed-tab console sampling
+  proof, and no release/public-claim proof. It keeps diagnostic logging
+  cleanup, diagnostic metric replacement, privacy/redaction promotion,
+  route/mode console budgets, whitelist/cache optimization, JSON-first
+  promotion, release claims, and `diagnosticLoggingConvergenceAuthority`
+  implementation at `NO-GO`.

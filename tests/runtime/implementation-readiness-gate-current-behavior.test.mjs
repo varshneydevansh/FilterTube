@@ -168,6 +168,11 @@ function assertReadinessGateLinksCurrentYouTubeSpaHotTimerAudit() {
   assert.match(doc, /This addendum joins console inventory, diagnostic source-flow rows, debug\s+gate and relay ownership, direct console paths, identity\/import privacy\s+exposure, JSON decision diagnostics, build\/release diagnostics, metric\s+replacement blockers, and missing runtime authority symbols into one\s+audit-only convergence boundary/);
   assert.match(doc, /It pins 10 diagnostic logging convergence\s+rows, 21 diagnostic logging policy source files, 418 active console\s+callsites, 9 diagnostic source-flow rows, 0 implementation-ready diagnostic\s+logging convergence rows/);
   assert.match(doc, /keeps logging cleanup, diagnostic metric replacement, privacy\/redaction\s+promotion, whitelist\/cache optimization, JSON-first promotion, release\s+claims, and `diagnosticLoggingConvergenceAuthority` implementation at\s+`NO-GO`/);
+  assert.match(doc, /Production console gate coverage reconciliation - 2026-05-31/);
+  assert.match(doc, /pins 3 runtime console\s+gate owner files \(`js\/background\.js`, `js\/content\/dom_fallback\.js`, and\s+`js\/content_bridge\.js`\)/);
+  assert.match(doc, /background `log\/debug\/info` gating, isolated-world\s+DOM fallback `log\/debug\/info` gating, content-bridge backup `log\/debug`\s+gating/);
+  assert.match(doc, /no `warn\/error` suppression, no MAIN-world global console override,\s+no extension-UI cleanup approval, no live installed-tab console sampling\s+proof, and no release\/public-claim proof/);
+  assert.match(doc, /route\/mode console budgets, whitelist\/cache optimization, JSON-first\s+promotion, release claims, and `diagnosticLoggingConvergenceAuthority`\s+implementation at `NO-GO`/);
 
   for (const phrase of [
     '33 YouTube SPA immediate/short hot timer rows',
