@@ -83,7 +83,7 @@ test('tracked source still has no shared lifecycle or side-effect owner registry
     .toString('utf8')
     .trim()
     .split('\n')
-    .filter(Boolean);
+    .filter((file) => file && !file.startsWith('docs/audit/') && !file.startsWith('tests/'));
   const combined = files.map(source).join('\n');
   assert.doesNotMatch(
     combined,

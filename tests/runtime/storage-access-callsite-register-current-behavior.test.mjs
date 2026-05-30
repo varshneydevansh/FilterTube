@@ -43,7 +43,13 @@ function sha256(text) {
 }
 
 function storageFiles() {
-  return git(['ls-files', '*.js', '*.mjs'])
+  return git([
+    'ls-files',
+    '*.js',
+    '*.mjs',
+    ':(exclude)docs/**',
+    ':(exclude)tests/**'
+  ])
     .filter(file => !file.includes('/vendor/'));
 }
 

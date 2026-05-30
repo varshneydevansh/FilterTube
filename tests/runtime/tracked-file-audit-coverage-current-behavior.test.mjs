@@ -73,6 +73,10 @@ function countsByFamily(files) {
   return Object.fromEntries([...counts.entries()].sort(([a], [b]) => a.localeCompare(b)));
 }
 
+function trackedSourceFiles() {
+  return git(['ls-files', ':(exclude)docs/audit/**', ':(exclude)tests/**']);
+}
+
 test('tracked-file audit coverage documents the current git ls-files source universe', () => {
   assert.match(coverageDoc, /Authoritative source command:/);
   assert.match(coverageDoc, /git ls-files/);
@@ -82,7 +86,7 @@ test('tracked-file audit coverage documents the current git ls-files source univ
 });
 
 test('every current tracked file is assigned exactly one audit family by the coverage classifier', () => {
-  const files = git(['ls-files']);
+  const files = trackedSourceFiles();
   assert.equal(files.length, 149);
 
   const unclassified = files.filter(file => classifyTrackedFile(file) === 'UNCLASSIFIED');
@@ -141,7 +145,7 @@ test('ignored raw capture corpus remains outside the tracked-file audit universe
     'comments.json',
     'WHITELIST_content.JS'
   ];
-  const tracked = new Set(git(['ls-files']));
+  const tracked = new Set(trackedSourceFiles());
   for (const file of ignoredCandidates) {
     assert.equal(tracked.has(file), false, `${file} must not be tracked source`);
   }
@@ -157,8 +161,8 @@ test('untracked audit artifacts are documented as draft proof not tracked source
   const draftAuditDocs = untracked.filter(file => /^docs\/audit\/FILTERTUBE_.*\.md$/.test(file));
   const draftAuditTests = untracked.filter(file => /^tests\/runtime\/.*\.test\.mjs$/.test(file));
 
-  assert.ok(draftAuditDocs.length > 0, 'current audit worktree should expose draft docs');
-  assert.ok(draftAuditTests.length > 0, 'current audit worktree should expose draft tests');
+  assert.equal(draftAuditDocs.length, 0, 'committed audit worktree should have no draft docs');
+  assert.equal(draftAuditTests.length, 0, 'committed audit worktree should have no draft tests');
   assert.match(coverageDoc, /Worktree Draft Artifact Boundary/);
   assert.match(coverageDoc, /draft proof artifacts until they are intentionally staged and\s+classified/);
   assert.match(coverageDoc, /do not change the meaning of the tracked-file source universe/);

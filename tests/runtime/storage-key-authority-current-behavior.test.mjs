@@ -133,7 +133,13 @@ function assertStorageCacheConvergenceBoundary(doc) {
 }
 
 function storageAccessCounts() {
-  const files = git(['ls-files', '*.js', '*.mjs'])
+  const files = git([
+    'ls-files',
+    '*.js',
+    '*.mjs',
+    ':(exclude)docs/**',
+    ':(exclude)tests/**'
+  ])
     .filter(file => !file.includes('/vendor/'));
   const patterns = [
     /storage\.local\.get/g,

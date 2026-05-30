@@ -109,8 +109,8 @@ are calculated from the exact current file bytes.
 | `scripts/build-extension-ui.mjs` | 50 | 1188 | `6326362ebf90f448ccdbf68945b3fb522b7b215edaf9b3e28589a4e166239cf3` |
 | `scripts/build-nanah-vendor.mjs` | 65 | 1818 | `dae8d3ef29c4cd44b0bf975090e9d53f3bb05b523355f5038930fc03b27e921c` |
 | `scripts/sync-native-runtime.mjs` | 34 | 1070 | `4f46c13bf6099092193712790d231ff4809b00b1b0061d04af71ac3ba6bf21c6` |
-| `tests/runtime/first-optimization-source-owner-approval-boundary-current-behavior.test.mjs` | 297 | 12983 | `35194c30fda1c12de3206fe0f6482ba123f27b75132af296139d5407764a7152` |
-| `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_SOURCE_OWNER_APPROVAL_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | 254 | 16411 | `709b903d8d5d6bf1c013a9596f28f1f1b4488115191cb7a4381685a76f4936ef` |
+| `tests/runtime/first-optimization-source-owner-approval-boundary-current-behavior.test.mjs` | 297 | 12983 | `ffc710941c0c9c5ec079105250f2028e2d0a51a5060c311df9aeebb55fb8e6ae` |
+| `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_SOURCE_OWNER_APPROVAL_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | 254 | 16411 | `053dd412a40a7b39e2528977f88415c516555343b397f105173acf2261c8268f` |
 
 ## Current Fingerprint Decision
 
@@ -143,9 +143,9 @@ pins:
 
 ```text
 method semantic proof gap files covered: 63
-method semantic proof gap lexical callables covered: 5469
+method semantic proof gap lexical callables covered: 5473
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5469
+lexical callables requiring semantic proof before behavior changes: 5473
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

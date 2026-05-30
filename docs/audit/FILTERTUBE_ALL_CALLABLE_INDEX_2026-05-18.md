@@ -21,9 +21,9 @@ optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 63
-method semantic proof gap lexical callables covered: 5469
+method semantic proof gap lexical callables covered: 5473
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5469
+lexical callables requiring semantic proof before behavior changes: 5473
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
@@ -68,12 +68,12 @@ changes remain blocked by the implementation gate.
 
 ```text
 tracked JS/JSX/MJS files: 63
-repo-wide lexical callables: 5469
+repo-wide lexical callables: 5473
 ```
 
 | Family | Files | Lexical callables | Boundary |
 | --- | ---: | ---: | --- |
-| Hot page/background runtime | 9 | 3069 | Already has detailed first-pass hot runtime table in `FILTERTUBE_FUNCTION_COVERAGE_2026-05-17.md`. |
+| Hot page/background runtime | 9 | 3073 | Already has detailed first-pass hot runtime table in `FILTERTUBE_FUNCTION_COVERAGE_2026-05-17.md`. |
 | Content helper runtime | 8 | 303 | First-pass helper surface audit exists, but behavior fixtures remain incomplete. |
 | UI/settings runtime | 10 | 1563 | First-pass UI/settings audit exists, but action-level fixtures remain incomplete. |
 | Generated/quarantined UI | 6 | 147 | Generated source/output and `js/layout.js`; freshness and quarantine checks required. |
@@ -98,7 +98,7 @@ repo-wide lexical callables: 5469
 | `js/content/handle_resolver.js` | Hot page/background runtime | 22 | hot runtime mapped |
 | `js/content/menu.js` | Content helper runtime | 3 | helper counted |
 | `js/content/release_notes_prompt.js` | Content helper runtime | 12 | helper counted |
-| `js/content_bridge.js` | Hot page/background runtime | 1194 | hot runtime mapped |
+| `js/content_bridge.js` | Hot page/background runtime | 1198 | hot runtime mapped |
 | `js/content_controls_catalog.js` | UI/settings runtime | 3 | UI/settings counted |
 | `js/filter_logic.js` | Hot page/background runtime | 298 | hot runtime mapped |
 | `js/injector.js` | Hot page/background runtime | 314 | hot runtime mapped |
@@ -152,7 +152,7 @@ repo-wide lexical callables: 5469
 ## High-Impact Scale Findings
 
 1. **`js/content_bridge.js` is the largest callable surface.**
-   The broad parser finds 1,194 callable forms in this file. That reinforces
+   The broad parser finds 1,198 callable forms in this file. That reinforces
    the earlier split-authority finding: content bridge is too large to treat as
    one behavior surface.
 
@@ -162,7 +162,7 @@ repo-wide lexical callables: 5469
    app-card flows.
 
 3. **The hot runtime is not the whole product.**
-   Hot runtime has 3,069 lexical callables, but UI/settings, content helpers,
+   Hot runtime has 3,073 lexical callables, but UI/settings, content helpers,
    generated shell, vendor, build scripts, and website add another 2,400
    lexical callable forms.
 
@@ -198,5 +198,5 @@ That fixture pins:
 
 - all tracked JS/JSX/MJS files are listed,
 - documented callable counts match current lexical source,
-- documented family totals sum to 5,469,
+- documented family totals sum to 5,473,
 - no ignored raw captures or generated package output are part of this index.

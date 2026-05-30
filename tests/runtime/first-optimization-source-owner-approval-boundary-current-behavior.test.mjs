@@ -200,9 +200,9 @@ test('source-owner approval rows counts and field names stay pinned', () => {
   assert.match(doc, /runtime collector insertion points approved: 0/);
   assert.match(doc, /implementation-ready source-owner approval rows: 0/);
   assert.match(doc, /method semantic proof gap files covered: 63/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5469/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5473/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5469/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5473/);
   assert.match(doc, /expected runtime audit tests: 4457/);
   assert.match(doc, /expected runtime audit pass: 4457/);
   assert.match(doc, /expected runtime audit fail: 0/);
@@ -247,7 +247,7 @@ test('source-owner approval boundary is backed by current source-owner and colle
   assert.match(collectorApproval, /implementation-ready collector approval rows: 0/);
   assert.match(collectorApproval, /method semantic proof gap files covered: 63/);
   assert.match(methodGap, /files with lexical accounting: 63/);
-  assert.match(methodGap, /repo-wide lexical callables: 5469/);
+  assert.match(methodGap, /repo-wide lexical callables: 5473/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
   assert.match(collectorInsertion, /runtime collector insertion points approved: 0/);
   assert.match(collectorInsertion, /collector rows implementation-ready: 0/);

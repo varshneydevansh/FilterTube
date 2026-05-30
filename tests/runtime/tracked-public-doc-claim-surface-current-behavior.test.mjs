@@ -78,7 +78,7 @@ function countRegex(source, pattern) {
 }
 
 function trackedDocs() {
-  return execSync("git ls-files 'docs/*.md'", { cwd: repoRoot, encoding: 'utf8' })
+  return execSync("git ls-files 'docs/*.md' ':(exclude)docs/audit/**'", { cwd: repoRoot, encoding: 'utf8' })
     .trim()
     .split('\n')
     .filter(Boolean)

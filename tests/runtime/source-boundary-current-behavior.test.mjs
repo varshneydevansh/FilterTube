@@ -94,8 +94,6 @@ test('generated build output and dependency caches are ignored and untracked', (
 });
 
 test('current nonignored untracked files are audit artifacts only', () => {
-  assert.ok(untrackedNonIgnoredFiles.length > 0, 'the current audit pass should have nonignored proof artifacts before commit');
-
   for (const file of untrackedNonIgnoredFiles) {
     assert.match(
       file,

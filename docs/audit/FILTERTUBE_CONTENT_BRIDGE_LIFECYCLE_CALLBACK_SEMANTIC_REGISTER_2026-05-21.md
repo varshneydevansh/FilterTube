@@ -142,8 +142,8 @@ source-derived from exact lifecycle-register patterns
 | 13344 | `setTimeout` | `globalBootstrap` | `setTimeout(() => {` |
 | 13467 | `addEventListener` | `globalBootstrap` | `checkbox.addEventListener('click', (e) => {` |
 | 13474 | `addEventListener` | `globalBootstrap` | `checkbox.addEventListener('change', (e) => {` |
-| 13531 | `addEventListener` | `globalBootstrap` | `window.addEventListener('message', handleMainWorldMessages, false);` |
-| 13533 | `setTimeout` | `globalBootstrap` | `setTimeout(() => initialize(), 50);` |
+| 13567 | `addEventListener` | `globalBootstrap` | `window.addEventListener('message', handleMainWorldMessages, false);` |
+| 13569 | `setTimeout` | `globalBootstrap` | `setTimeout(() => initialize(), 50);` |
 ## Cross-Feature Risk Shape
 
 ```text
@@ -208,9 +208,9 @@ can support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 63
-method semantic proof gap lexical callables covered: 5469
+method semantic proof gap lexical callables covered: 5473
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5469
+lexical callables requiring semantic proof before behavior changes: 5473
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

@@ -192,9 +192,9 @@ test('JSON-first no-work and endpoint readiness docs carry the method proof gap 
 
   for (const token of [
     'tracked JS/JSX/MJS files: 63',
-    'repo-wide lexical callables: 5469',
+    'repo-wide lexical callables: 5473',
     'files with complete per-callable semantic proof: 0',
-    'lexical callables requiring semantic proof before behavior changes: 5469',
+    'lexical callables requiring semantic proof before behavior changes: 5473',
     'runtime behavior changed: no'
   ]) {
     assert.ok(gap.includes(token), `method gap index missing token ${token}`);
@@ -206,9 +206,9 @@ test('JSON-first no-work and endpoint readiness docs carry the method proof gap 
     for (const token of [
       methodGapPath,
       'method semantic proof gap files covered: 63',
-      'method semantic proof gap lexical callables covered: 5469',
+      'method semantic proof gap lexical callables covered: 5473',
       'files with complete per-callable semantic proof: 0',
-      'lexical callables requiring semantic proof before behavior changes: 5469',
+      'lexical callables requiring semantic proof before behavior changes: 5473',
       'affected callable semantic proof: NO-GO',
       'runtime behavior changed: no',
       'JSON-first promotion',

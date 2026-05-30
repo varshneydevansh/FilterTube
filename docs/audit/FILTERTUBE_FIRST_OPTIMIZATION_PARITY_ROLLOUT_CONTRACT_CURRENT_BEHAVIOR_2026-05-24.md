@@ -40,7 +40,7 @@ structured data in the packet.
 | Input | Current proof used |
 | --- | --- |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_DIAGNOSTIC_PRIVACY_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md` | Defines the future `diagnostic-privacy.json` shape, but proves 0 diagnostic privacy files and 0 runtime collector approvals exist. |
-| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 63 JS/JSX/MJS files and 5,469 lexical callables still lack complete per-callable semantic proof before behavior changes. |
+| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 63 JS/JSX/MJS files and 5,473 lexical callables still lack complete per-callable semantic proof before behavior changes. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_SIDE_EFFECT_BUDGET_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md` | Defines the future `side-effect-budget.json` shape, but proves 0 side-effect budget files and 0 runtime collector approvals exist. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_NO_WORK_PRESERVATION_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md` | Defines the future `no-work-preservation.json` shape, but proves 0 no-work preservation files and 0 runtime collector approvals exist. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_FIXTURE_PROVENANCE_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md` | Defines the future `fixture-provenance.json` shape, but proves 0 fixture provenance files and 0 runtime collector approvals exist. |
@@ -92,9 +92,9 @@ collector parity rollout rows covered: 12
 evidence parity rollout rows covered: 2
 parity and release boundary source docs covered: 8
 method semantic proof gap files covered: 63
-method semantic proof gap lexical callables covered: 5469
+method semantic proof gap lexical callables covered: 5473
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5469
+lexical callables requiring semantic proof before behavior changes: 5473
 inline parity rollout JSON sections covered: 12
 inline parity rollout artifact promotion decision: NO-GO
 parity rollout draft closure rows: 12
@@ -115,7 +115,7 @@ collector readiness families linked by parity closure: 5
 evidence parity rollout rows linked by parity closure: 2
 parity and release boundary source docs linked by parity closure: 8
 method semantic proof gap files linked by parity closure: 63
-lexical callables linked by parity closure: 5469
+lexical callables linked by parity closure: 5473
 runtime parity rollout closure approvals: 0
 implementation-ready parity rollout closure rows: 0
 parity rollout draft closure: PARITY-ROLLOUT-CHAIN-CLOSED
@@ -427,7 +427,7 @@ bind this parity rollout contract to the missing collector parity rollout
 approval layer without creating `parity-rollout.json`. The addendum pins 12
 collector parity rollout approval boundary rows, 12 parity rollout contract
 rows covered, 12 collector parity rollout rows covered, 63 method semantic
-proof gap files covered, 5,469 lexical callables still requiring semantic
+proof gap files covered, 5,473 lexical callables still requiring semantic
 proof, 0 files with complete per-callable semantic proof, 0 committed parity
 rollout files, 0 runtime collector parity rollout approvals, 0
 implementation-ready collector parity rollout approval rows, expected runtime

@@ -210,9 +210,9 @@ surface can support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 63
-method semantic proof gap lexical callables covered: 5469
+method semantic proof gap lexical callables covered: 5473
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5469
+lexical callables requiring semantic proof before behavior changes: 5473
 affected callable semantic proof: NO-GO
 runtime behavior changed: yes; collaborator dialog lifecycle is lazy while semantic proof remains incomplete
 ```

@@ -11,9 +11,9 @@ toward method-level semantic proof. The repo-wide callable index already pins
 
 ```text
 source file: js/content_bridge.js
-lexical callable forms: 1194
-top-level function declarations: 189
-unique top-level function names: 188
+lexical callable forms: 1198
+top-level function declarations: 190
+unique top-level function names: 189
 duplicate top-level name: injectCollaboratorPlaceholderMenu at lines 599 and 7845
 semantic groups: 14
 ```
@@ -42,7 +42,7 @@ or mutation behavior.
 | `ytInitialAndBackgroundResolvers` | 5 | `ytInitialData` search, background watch/Shorts identity requests, direct watch/Shorts fetch fallback, and visible Shorts/playlist enrichment. | Network authority, credentials/origin policy, resolver reason, cache budget, post-action fanout, and negative sender proof. |
 | `cardIdentityExtraction` | 3 | Monolithic card identity extraction for normal, watch, Shorts, playlist, comments, Kids, and YTM-like surfaces. | Route/surface split, source confidence, video-id-only boundary, low-confidence display text, and negative sibling proof. |
 | `menuInjectionAndActionBinding` | 6 | FilterTube menu injection, handler binding, icon/title/placeholder construction, old/new menu insertion, blocked-state check, and blocked marker writes. | Menu action authority, whitelist/hidden gate parity, duplicate insertion, lock/session, and spoofed click proof. |
-| `clickedHideAndRuleMutation` | 17 | Clicked-content hide target resolution, blocked element sync, channel block click, direct add-channel message, Filter All checkbox mutation, and Topic menu demotion guard. | Exact target, restore owner, list-mode target, background message contract, stats/media policy, and rollback proof. |
+| `clickedHideAndRuleMutation` | 18 | Clicked-content hide target resolution, blocked element sync, channel block click, direct add-channel message, Filter All checkbox mutation, Topic menu demotion guard, and production log/debug console gating. | Exact target, restore owner, list-mode target, background message contract, stats/media policy, production diagnostics policy, and rollback proof. |
 
 ## Source-Derived Top-Level Function Inventory
 
@@ -237,6 +237,7 @@ or mutation behavior.
 | 13375 | `addChannelDirectly` | async function | `clickedHideAndRuleMutation` |
 | 13434 | `addFilterAllContentCheckbox` | function | `clickedHideAndRuleMutation` |
 | 13500 | `contentBridgeAmpersandTopicSingleChannelMenuGuard` | function | `clickedHideAndRuleMutation` |
+| 13543 | `installFilterTubeProductionConsoleGate` | function | `clickedHideAndRuleMutation` |
 
 ## Cross-Feature Risk Shape
 
@@ -396,9 +397,9 @@ can support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 63
-method semantic proof gap lexical callables covered: 5469
+method semantic proof gap lexical callables covered: 5473
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5469
+lexical callables requiring semantic proof before behavior changes: 5473
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

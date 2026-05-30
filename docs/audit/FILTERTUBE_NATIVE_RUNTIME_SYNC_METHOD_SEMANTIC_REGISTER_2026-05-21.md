@@ -68,8 +68,8 @@ runtime behavior changed: no
 ## App Boundary Snapshot
 
 ```text
-public repo HEAD: 3696c340630a05a81e8eae209589399d4e838553
-app repo HEAD: b33e98d5b0c52cb728fb3720d34a01ba987ef649
+public repo HEAD: 7f0e66641aa576fb264085baf59949244ea32291
+app repo HEAD: cfc651cd4294e528c2c371778d7698ce82e94a71
 app sync script line count: 1758
 app sync script bytes: 76587
 app sync script sha256: d48bdc271f707f0f960ac8a6b0d2712a602fb6c84a8c2bf2e0a138d112f9ba8e
@@ -147,14 +147,14 @@ Current repository state observed for this workspace:
 
 ```text
 public repo path: /Users/devanshvarshney/FilterTube
-public repo HEAD: 3696c340630a05a81e8eae209589399d4e838553
+public repo HEAD: 7f0e66641aa576fb264085baf59949244ea32291
 public repo dirty status rows: 29
 public repo has docs/audit untracked row: yes
 public repo has tests untracked row: yes
 app repo path: /Users/devanshvarshney/FilterTubeApp
 app repo branch: native_owned_main_surface_p2
-app repo HEAD: b33e98d5b0c52cb728fb3720d34a01ba987ef649
-app repo dirty status rows observed in snapshot: 44
+app repo HEAD: cfc651cd4294e528c2c371778d7698ce82e94a71
+app repo dirty status rows observed in snapshot: 46
 ```
 
 App dirty files observed in this snapshot after prior sync-related work:
@@ -166,6 +166,7 @@ app dirty file: apps/android/app/src/main/assets/filtertube_runtime_full.js
 app dirty file: apps/android/app/src/main/java/com/filtertube/app/AppLaunchRouter.kt
 app dirty file: apps/android/app/src/main/java/com/filtertube/app/LauncherActivity.kt
 app dirty file: apps/android/app/src/main/java/com/filtertube/app/ManagedWebViewActivity.kt
+app dirty file: apps/android/app/src/main/java/com/filtertube/app/NativeOwnedMainPlaybackBridgeFallback.kt
 app dirty file: apps/android/app/src/main/java/com/filtertube/app/NativeOwnedPreviewEntryPoint.kt
 app dirty file: apps/android/app/src/main/java/com/filtertube/app/ProfileViewingAccess.kt
 app dirty file: apps/android/app/src/main/java/com/filtertube/app/ViewingLaunchCoordinator.kt
@@ -173,6 +174,7 @@ app dirty file: apps/android/app/src/main/java/com/filtertube/app/ViewingSpaceCh
 app dirty file: apps/android/app/src/main/java/com/filtertube/app/ViewingTargetAccessUiState.kt
 app dirty file: apps/android/app/src/main/java/com/filtertube/app/ViewingTargetLaunchPolicy.kt
 app dirty file: apps/android/app/src/test/java/com/filtertube/app/AppLaunchRouterTest.kt
+app dirty file: apps/android/app/src/test/java/com/filtertube/app/NativeOwnedMainPlaybackBridgeFallbackTest.kt
 app dirty file: apps/android/app/src/test/java/com/filtertube/app/NativeOwnedPreviewEntryPointTest.kt
 app dirty file: apps/android/app/src/test/java/com/filtertube/app/ProfileViewingAccessTest.kt
 app dirty file: apps/android/app/src/test/java/com/filtertube/app/ViewingSpaceChooserPolicyTest.kt
@@ -398,9 +400,9 @@ can support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 63
-method semantic proof gap lexical callables covered: 5469
+method semantic proof gap lexical callables covered: 5473
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5469
+lexical callables requiring semantic proof before behavior changes: 5473
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

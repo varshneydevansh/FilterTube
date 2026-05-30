@@ -116,7 +116,8 @@ function lineOfAfter(file, afterNeedle, needle) {
 }
 
 function enumerateLifecycleInstances() {
-  const files = git(['ls-files', '*.js', '*.jsx', '*.mjs']);
+  const files = git(['ls-files', '*.js', '*.jsx', '*.mjs'])
+    .filter((file) => !file.startsWith('docs/audit/') && !file.startsWith('tests/'));
   const rows = [];
 
   for (const file of files) {
@@ -769,7 +770,8 @@ function classifyObserverObserveOption(optionSource) {
 }
 
 function enumerateObserverObserveRows() {
-  const files = git(['ls-files', '*.js', '*.jsx', '*.mjs']);
+  const files = git(['ls-files', '*.js', '*.jsx', '*.mjs'])
+    .filter((file) => !file.startsWith('docs/audit/') && !file.startsWith('tests/'));
   const observeRows = [];
 
   for (const file of files) {
@@ -904,7 +906,8 @@ function classifyObserverDisconnectReceiver(receiverSource) {
 }
 
 function enumerateObserverDisconnectRows() {
-  const files = git(['ls-files', '*.js', '*.jsx', '*.mjs']);
+  const files = git(['ls-files', '*.js', '*.jsx', '*.mjs'])
+    .filter((file) => !file.startsWith('docs/audit/') && !file.startsWith('tests/'));
   const disconnectRows = [];
 
   for (const file of files) {
@@ -950,7 +953,8 @@ function classifyObserverUnobserveReceiver(receiverSource) {
 }
 
 function enumerateObserverUnobserveRows() {
-  const files = git(['ls-files', '*.js', '*.jsx', '*.mjs']);
+  const files = git(['ls-files', '*.js', '*.jsx', '*.mjs'])
+    .filter((file) => !file.startsWith('docs/audit/') && !file.startsWith('tests/'));
   const unobserveRows = [];
 
   for (const file of files) {
@@ -4606,7 +4610,10 @@ test('lifecycle instance hot files remain pinned before cleanup work', () => {
 });
 
 test('tracked source still has no shared lifecycle registry implementation', () => {
-  const combined = git(['ls-files', '*.js', '*.jsx', '*.mjs']).map(read).join('\n');
+  const combined = git(['ls-files', '*.js', '*.jsx', '*.mjs'])
+    .filter((file) => !file.startsWith('docs/audit/') && !file.startsWith('tests/'))
+    .map(read)
+    .join('\n');
 
   assert.doesNotMatch(
     combined,
@@ -5143,6 +5150,7 @@ function assertRuntimeLifecycleConvergenceBoundary() {
   const doc = read(registerPath);
   const readiness = read('docs/audit/FILTERTUBE_IMPLEMENTATION_READINESS_GATE_2026-05-18.md');
   const productSource = git(['ls-files', '*.js', '*.jsx', '*.mjs'])
+    .filter(file => !file.startsWith('docs/audit/'))
     .filter(file => !file.startsWith('tests/'))
     .filter(file => !file.startsWith('js/vendor/'))
     .map(read)

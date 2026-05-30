@@ -197,7 +197,7 @@ runtime behavior changed: no
 | Source file | Line count | Bytes | SHA-256 | Current role |
 | --- | ---: | ---: | --- | --- |
 | `js/filter_logic.js` | 3499 | 165151 | `4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641` | JSON decision, map producers, whitelist branch. |
-| `js/content_bridge.js` | 13571 | 601694 | `1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3` | right-rail observer, visible-card prefetch, content cache, pending refresh, message branches. |
+| `js/content_bridge.js` | 13572 | 601694 | `1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3` | right-rail observer, visible-card prefetch, content cache, pending refresh, message branches. |
 | `js/content/bridge_settings.js` | 652 | 26462 | `c7828acd09941f4559e47b31ea57d184ef9367ae4964598e865b8a196934e75b` | storage refresh fanout and forced reprocess coalescing. |
 | `js/background.js` | 6314 | 284710 | `46442f904cf18c3fa8345e71f608171edcf277207a420136a78a195c3b7c57eb` | background map cache updates and compiled settings assembly. |
 | `js/content/dom_fallback.js` | 4839 | 228332 | `2129fcc16f8ad1420a6cb44905ddcd0b68d5511f3b647e2db100c0d67d492aef` | rendered-card fallback pass and whitelist-pending recheck. |
@@ -998,7 +998,7 @@ Required future affected-callable semantic gap binding shape:
   "runtimeBehaviorChanged": false,
   "methodGapTotals": {
     "filesCovered": 63,
-    "lexicalCallablesCovered": 5469,
+    "lexicalCallablesCovered": 5473,
     "filesWithCompletePerCallableSemanticProof": 0,
     "requiredSemanticProofFields": 8
   },
@@ -1014,7 +1014,7 @@ Required future affected-callable semantic gap binding shape:
       "id": "FT-WLCACHE-SEMANTIC-GAP-01-content-bridge",
       "file": "js/content_bridge.js",
       "family": "Hot page/background runtime",
-      "lexicalCallables": 1194,
+      "lexicalCallables": 1198,
       "semanticStatus": "semantic proof incomplete"
     },
     {
@@ -1107,7 +1107,7 @@ Required future affected-callable semantic gap binding shape:
 | Row | Method gap source | Current blocker | Current state |
 | --- | --- | --- | --- |
 | `FT-WLCACHE-SEMANTIC-GAP-00-filter-logic` | `js/filter_logic.js` / Hot page/background runtime / 298 lexical callables | JSON traversal, harvest/map mutation, block decision, recursion, and no-rule budget proof remain incomplete. | Gap-bound only; semantic proof `NO-GO`. |
-| `FT-WLCACHE-SEMANTIC-GAP-01-content-bridge` | `js/content_bridge.js` / Hot page/background runtime / 1194 lexical callables | Content bridge caller graph, menu/quick action authority, lifecycle callback ownership, and identity confidence proof remain incomplete. | Gap-bound only; semantic proof `NO-GO`. |
+| `FT-WLCACHE-SEMANTIC-GAP-01-content-bridge` | `js/content_bridge.js` / Hot page/background runtime / 1198 lexical callables | Content bridge caller graph, menu/quick action authority, lifecycle callback ownership, and identity confidence proof remain incomplete. | Gap-bound only; semantic proof `NO-GO`. |
 | `FT-WLCACHE-SEMANTIC-GAP-02-bridge-settings` | `js/content/bridge_settings.js` / Hot page/background runtime / 65 lexical callables | Settings relay/import/storage listener authority and caller-class proof remain incomplete. | Gap-bound only; semantic proof `NO-GO`. |
 | `FT-WLCACHE-SEMANTIC-GAP-03-background` | `js/background.js` / Hot page/background runtime / 440 lexical callables | Message, mutation, resolver, storage, stats, and script-injection branches still need per-action authority. | Gap-bound only; semantic proof `NO-GO`. |
 | `FT-WLCACHE-SEMANTIC-GAP-04-dom-fallback` | `js/content/dom_fallback.js` / Hot page/background runtime / 418 lexical callables | Hide/restore, selector target, playlist/player side effect, and no-work proof remain incomplete. | Gap-bound only; semantic proof `NO-GO`. |
@@ -1253,7 +1253,7 @@ Required future affected-callable semantic file-field matrix shape:
     {
       "id": "FT-WLCACHE-SEMANTIC-MATRIX-01-content-bridge",
       "file": "js/content_bridge.js",
-      "lexicalCallables": 1194,
+      "lexicalCallables": 1198,
       "fileFieldCellsRequired": 8,
       "approvedFileFieldCells": 0
     },

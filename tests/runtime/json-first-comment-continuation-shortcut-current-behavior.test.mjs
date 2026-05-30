@@ -186,10 +186,10 @@ test('JSON-first comment continuation shortcut is audit-only and source pinned',
   assert.match(text, /runtime behavior changed: no/);
   assert.match(text, /not completion proof for JSON-first comment continuation authority/);
 
-  assert.match(methodGap, /repo-wide lexical callables: 5469/);
+  assert.match(methodGap, /repo-wide lexical callables: 5473/);
   assert.match(methodGap, /files with lexical accounting: 63/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5469/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5473/);
 
   assert.equal(commentFamilyDocs.length, 18);
   for (const familyDocPath of commentFamilyDocs) {
@@ -197,9 +197,9 @@ test('JSON-first comment continuation shortcut is audit-only and source pinned',
     assert.ok(familyDoc.includes(methodGapPath), `${familyDocPath} should cite method semantic proof gap index`);
     assert.match(familyDoc, /## Method Semantic Proof Gap Boundary/);
     assert.match(familyDoc, /method semantic proof gap files covered: 63/);
-    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5469/);
+    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5473/);
     assert.match(familyDoc, /files with complete per-callable semantic proof: 0/);
-    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5469/);
+    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5473/);
     assert.match(familyDoc, /affected callable semantic proof: NO-GO/);
     assert.match(familyDoc, /runtime behavior changed: (?:no|yes)/);
     assert.match(familyDoc, /do not approve runtime\s+optimization/);

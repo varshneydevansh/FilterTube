@@ -40,7 +40,7 @@ collectors.
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_ARTIFACT_PATH_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Reserves the metric-foundation artifact root and files while proving 0 foundation metric artifacts exist. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_COLLECTOR_APPROVAL_AUTHORITY_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Keeps runtime metric collector approvals at 0. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_COLLECTOR_INSERTION_GATE_CURRENT_BEHAVIOR_2026-05-24.md` | Keeps runtime collector insertion points approved at 0. |
-| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Keeps 63 tracked JS/JSX/MJS files and 5,469 lexical callables outside complete per-callable semantic proof. |
+| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Keeps 63 tracked JS/JSX/MJS files and 5,473 lexical callables outside complete per-callable semantic proof. |
 
 ## Current Counts
 
@@ -65,9 +65,9 @@ implementation-ready draft readiness rows: 0
 inline draft JSON sections covered: 12
 inline draft JSON artifact promotion decision: NO-GO
 method semantic proof gap files covered: 63
-method semantic proof gap lexical callables covered: 5469
+method semantic proof gap lexical callables covered: 5473
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5469
+lexical callables requiring semantic proof before behavior changes: 5473
 draft artifact promotion decision: NO-GO
 source-owner draft closure rows: 12
 source-owner draft rows linked by closure: 12
@@ -89,7 +89,7 @@ not completion proof for source owner map authority
 
 | Draft row id | Future map section | Current source evidence | Missing proof before promotion |
 | --- | --- | --- | --- |
-| `FT-SOURCE-OWNER-MAP-DRAFT-00-map-identity` | Map identity, packet binding, affected callable proof binding. | `FT-SOURCE-OWNER-MAP-00-map-identity`, `FT-SOURCE-LOCUS-CALLABLE-00-settings-scope`, method gap count 5,469. | Committed packet manifest, affected callable IDs, complete semantic proof status, artifact verification output. |
+| `FT-SOURCE-OWNER-MAP-DRAFT-00-map-identity` | Map identity, packet binding, affected callable proof binding. | `FT-SOURCE-OWNER-MAP-00-map-identity`, `FT-SOURCE-LOCUS-CALLABLE-00-settings-scope`, method gap count 5,473. | Committed packet manifest, affected callable IDs, complete semantic proof status, artifact verification output. |
 | `FT-SOURCE-OWNER-MAP-DRAFT-01-artifact-binding` | Artifact path binding. | Reserved path `docs/audit/artifacts/first-optimization/metric-foundation/source-owner-map.json`, path boundary rows covered 10. | Actual artifact root creation approval, packet manifest, metric sample, source-owner map, and verification output. |
 | `FT-SOURCE-OWNER-MAP-DRAFT-02-source-locus-catalog` | Runtime source locus catalog and callable owner proof. | 12 source-locus callable rows, 38 line anchors, 14 runtime source files, 16 fingerprints. | Per-callable owner proof, approved owner claims, freshness check after source edits. |
 | `FT-SOURCE-OWNER-MAP-DRAFT-03-collector-insertion-owner` | Collector insertion ownership. | Collector approval boundary and insertion gate both prove 0 runtime approvals. | Approved insertion points, teardown owners, disabled/no-rule preservation, side-effect budget. |
@@ -214,7 +214,7 @@ Source-owner draft closure rows:
 
 | Closure row | Draft row | Inline map section | Upstream proof link | Current state |
 | --- | --- | --- | --- | --- |
-| `FT-SOURCE-OWNER-DRAFT-CLOSURE-00-map-identity` | `FT-SOURCE-OWNER-MAP-DRAFT-00-map-identity` | `mapIdentity` | `FT-SOURCE-OWNER-MAP-00-map-identity`; method gap count 5,469. | Chain linked; packet manifest and complete semantic callable proof missing. |
+| `FT-SOURCE-OWNER-DRAFT-CLOSURE-00-map-identity` | `FT-SOURCE-OWNER-MAP-DRAFT-00-map-identity` | `mapIdentity` | `FT-SOURCE-OWNER-MAP-00-map-identity`; method gap count 5,473. | Chain linked; packet manifest and complete semantic callable proof missing. |
 | `FT-SOURCE-OWNER-DRAFT-CLOSURE-01-artifact-binding` | `FT-SOURCE-OWNER-MAP-DRAFT-01-artifact-binding` | `artifactBinding` | Reserved `source-owner-map.json` path and metric artifact path boundary. | Chain linked; artifact root creation and artifact promotion remain blocked. |
 | `FT-SOURCE-OWNER-DRAFT-CLOSURE-02-source-locus-catalog` | `FT-SOURCE-OWNER-MAP-DRAFT-02-source-locus-catalog` | `sourceLocusCatalog` | 12 source-locus callable rows, 38 line anchors, 14 runtime files, 16 fingerprints. | Chain linked; per-callable owner approval and post-edit freshness proof missing. |
 | `FT-SOURCE-OWNER-DRAFT-CLOSURE-03-collector-insertion-owner` | `FT-SOURCE-OWNER-MAP-DRAFT-03-collector-insertion-owner` | `collectorInsertionOwner` | Collector approval boundary and insertion gate prove 0 runtime approvals. | Chain linked; approved insertion points and teardown owners missing. |

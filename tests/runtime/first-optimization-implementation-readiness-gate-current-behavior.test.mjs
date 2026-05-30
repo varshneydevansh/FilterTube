@@ -92,9 +92,9 @@ test('first optimization implementation readiness gate is audit-only and source-
   assert.match(doc, /Runtime first optimization approval exists: no/);
   assert.match(doc, /Implementation-ready first optimization rows: 0/);
   assert.match(doc, /method\/callable boundary is now explicit/);
-  assert.match(doc, /63 tracked\s+JS\/JSX\/MJS files, 5,469 lexical callables/);
+  assert.match(doc, /63 tracked\s+JS\/JSX\/MJS files, 5,473 lexical callables/);
   assert.match(doc, /0 files with complete per-callable\s+semantic proof/);
-  assert.match(doc, /5,469 callables requiring semantic proof/);
+  assert.match(doc, /5,473 callables requiring semantic proof/);
   assert.match(doc, /not completion proof for first optimization implementation readiness/);
 
   for (const sourceDoc of Object.values(sourceDocs)) {
@@ -125,7 +125,7 @@ test('first optimization implementation readiness rows counts and coverage stay 
   assert.match(doc, /collector fixture provenance rows covered: 12/);
   assert.match(doc, /collector parity rollout rows covered: 12/);
   assert.match(doc, /method semantic proof gap files covered: 63/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5469/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5473/);
   assert.match(doc, /complete per-callable semantic proof files covered: 0/);
   assert.match(doc, /5 route\/surface-specific\s+per-file metric artifact contract docs covered/);
   assert.match(doc, /5 route\/surface-specific\s+per-file metric artifact contract tests covered/);
@@ -171,9 +171,9 @@ test('first optimization implementation readiness gate is backed by all current 
   assert.match(fixtureProvenance, /collector fixture provenance rows implementation-ready: 0/);
   assert.match(parityRollout, /collector parity rollout rows implementation-ready: 0/);
   assert.match(methodSemanticGap, /tracked JS\/JSX\/MJS files: 63/);
-  assert.match(methodSemanticGap, /repo-wide lexical callables: 5469/);
+  assert.match(methodSemanticGap, /repo-wide lexical callables: 5473/);
   assert.match(methodSemanticGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodSemanticGap, /lexical callables requiring semantic proof before behavior changes: 5469/);
+  assert.match(methodSemanticGap, /lexical callables requiring semantic proof before behavior changes: 5473/);
 });
 
 test('current source anchors still show implementation readiness risks before a first optimization patch', () => {

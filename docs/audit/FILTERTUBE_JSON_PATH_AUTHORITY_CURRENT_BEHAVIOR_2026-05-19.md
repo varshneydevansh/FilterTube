@@ -262,7 +262,7 @@ Source inputs:
 | `json_path_convergence_executable_rule_paths` | Current `FILTER_RULES` resolves to 440 effective runtime path rows, 174 effective unique path literals, 177 renderer-field pairs, and 0 bracket-index path rows. | Runtime path inventory can be mistaken for every documented JSON path. |
 | `json_path_convergence_field_effect_gap` | 11 rule fields, 9 consumer methods, 20 method-field consumer pairs, and 63 `rules.<field>` references are known, but field availability is not effect authority. | Fields such as `videoId`, `viewCount`, category, or collaborator identity can trigger the wrong effect class. |
 | `json_path_convergence_json_first_promotion_gate` | The JSON-first readiness gate keeps 13 promotion rows blocked across syntax, renderer ownership, field effects, route/surface, list mode, identity, mutation, network/no-work, fixtures, parity, native, and optimization budget. | JSON can become first-class before route/mode/side-effect/no-work parity is proved. |
-| `json_path_convergence_method_dependency` | 63 tracked JS/JSX/MJS files and 5,469 lexical callables still have 0 complete per-callable semantic proof files. | A JSON path fix can alter unproved parser, mutation, cache, hide, restore, fetch, or teardown behavior. |
+| `json_path_convergence_method_dependency` | 63 tracked JS/JSX/MJS files and 5,473 lexical callables still have 0 complete per-callable semantic proof files. | A JSON path fix can alter unproved parser, mutation, cache, hide, restore, fetch, or teardown behavior. |
 | `json_path_convergence_authority_absence` | `jsonPathAuthority`, `rulePathManifest`, `jsonPathProvenance`, `jsonRuntimeCoverageAuthority`, `rendererFieldCoverageClass`, `jsonFieldEffectAuthority`, `jsonSectionCoverageDecision`, `documentedJsonSectionAuthority`, `jsonFirstFilterReadinessGate`, `jsonFirstPathSyntaxManifest`, and `jsonFirstOptimizationBudget` are absent from product runtime source. | Product source has no shared authority that can certify JSON path coverage or first-class promotion. |
 
 ```text
@@ -370,9 +370,9 @@ optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 63
-method semantic proof gap lexical callables covered: 5469
+method semantic proof gap lexical callables covered: 5473
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5469
+lexical callables requiring semantic proof before behavior changes: 5473
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

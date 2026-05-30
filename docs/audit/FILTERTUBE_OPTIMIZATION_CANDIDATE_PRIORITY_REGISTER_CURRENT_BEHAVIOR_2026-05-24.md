@@ -142,8 +142,8 @@ optimization order still does not change.
 
 ```text
 latest historical 4663 full runtime proof: 4663/4663 pass, 0 fail, 83.213s
-current generated runtime-test declaration count: 4667
-current full runtime proof for generated 4667 declaration set after audit-drift repair: GO
+current generated runtime-test declaration count: 4671
+current full runtime proof for generated 4671 declaration set after audit-drift repair: GO
 affected callable packet rows: 12
 affected source files covered: 8
 transport no-work source evidence rows: 8
@@ -169,7 +169,7 @@ ASCII flow:
 ```text
 current source/runtime proof
   -> latest recorded 4663/4663 runtime suite proof
-  -> current 4667 generated declaration drift
+  -> current 4671 generated declaration drift
   -> affected whitelist/cache callable packet
   -> live installed-profile evidence blocker
   -> future measured route/mode work-budget artifact
@@ -180,7 +180,7 @@ Mermaid flow:
 
 ```mermaid
 flowchart TD
-  A["Latest recorded 4663 runtime proof"] --> B["Current 4667 generated declaration drift"]
+  A["Latest recorded 4663 runtime proof"] --> B["Current 4671 generated declaration drift"]
   B --> C["Affected whitelist/cache callable packet"]
   C --> D["Live installed-profile evidence blocker"]
   D --> E["Future route/mode work-budget artifact"]
@@ -306,9 +306,9 @@ support runtime optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 63
-method semantic proof gap lexical callables covered: 5469
+method semantic proof gap lexical callables covered: 5473
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5469
+lexical callables requiring semantic proof before behavior changes: 5473
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

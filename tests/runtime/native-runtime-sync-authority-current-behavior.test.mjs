@@ -83,10 +83,10 @@ test('native runtime sync audit documents sync model and future gate', () => {
   assert.match(doc, /\| Direct manifest copies \| `\/Users\/devanshvarshney\/FilterTubeApp\/tools\/runtime-sync-manifest\.json` \|/);
   assert.match(doc, /\| Android\/iOS build boundary \| `\/Users\/devanshvarshney\/FilterTubeApp\/docs\/app\/TECHNICAL_RUNTIME\.md` \|/);
 
-  assert.match(methodGap, /repo-wide lexical callables: 5469/);
+  assert.match(methodGap, /repo-wide lexical callables: 5473/);
   assert.match(methodGap, /files with lexical accounting: 63/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5469/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5473/);
 
   assert.equal(nativeSyncFamilyDocs.length, 5);
   for (const familyDocPath of nativeSyncFamilyDocs) {
@@ -94,9 +94,9 @@ test('native runtime sync audit documents sync model and future gate', () => {
     assert.ok(familyDoc.includes(methodGapPath), `${familyDocPath} should cite method semantic proof gap index`);
     assert.match(familyDoc, /## Method Semantic Proof Gap Boundary/);
     assert.match(familyDoc, /method semantic proof gap files covered: 63/);
-    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5469/);
+    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5473/);
     assert.match(familyDoc, /files with complete per-callable semantic proof: 0/);
-    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5469/);
+    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5473/);
     assert.match(familyDoc, /affected callable semantic proof: NO-GO/);
     assert.match(familyDoc, /runtime behavior changed: no/);
     assert.match(familyDoc, /do not approve runtime\s+optimization/);
@@ -159,10 +159,10 @@ test('generated main runtime assets are large app outputs and not byte-identical
   const androidPath = path.join(appRoot, 'apps/android/app/src/main/assets/filtertube_runtime_full.js');
   const iosPath = path.join(appRoot, 'apps/ios/FilterTube/Resources/filtertube_runtime_full.js');
 
-  assert.equal(fs.statSync(androidPath).size, 1573129);
-  assert.equal(fs.statSync(iosPath).size, 1571466);
-  assert.equal(sha256(androidPath), '3ec4dab1e748a4294cc73f5ae21ce01513aa8e74483239ae29c0c63d8ca82c07');
-  assert.equal(sha256(iosPath), '53f9aa6ee4ad8dd527c0bfbcf333f6e2b02afaaa344325de229c07d98fd96311');
+  assert.equal(fs.statSync(androidPath).size, 1574364);
+  assert.equal(fs.statSync(iosPath).size, 1572701);
+  assert.equal(sha256(androidPath), 'df82c9ddfc77bbed1025741222d0468e55c760e3376a2cedc5fc45bc651787c6');
+  assert.equal(sha256(iosPath), 'f146e2284af6429c8a30c87406ae30dce6e69003f64e9082aa459194df81fae2');
   assert.notEqual(sha256(androidPath), sha256(iosPath));
   assert.match(read(auditDocPath), /Generated app runtime assets are not source authority/);
 });

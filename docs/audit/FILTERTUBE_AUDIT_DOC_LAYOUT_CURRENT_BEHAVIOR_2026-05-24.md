@@ -20,9 +20,9 @@ optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 63
-method semantic proof gap lexical callables covered: 5469
+method semantic proof gap lexical callables covered: 5473
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5469
+lexical callables requiring semantic proof before behavior changes: 5473
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
@@ -35,7 +35,7 @@ The current boundary is:
 
 ```text
 current root FilterTube audit docs: 0
-current docs/audit FilterTube audit docs: 543
+current docs/audit FilterTube audit docs: 544
 root-level FilterTube audit doc placement: NO-GO
 new audit artifact placement: docs/audit
 runtime behavior changed: no

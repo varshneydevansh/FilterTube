@@ -190,9 +190,9 @@ test('JSON-first route/surface fixture artifact commit rows counts and fields st
   assert.match(doc, /fixture mode classes covered: 8/);
   assert.match(doc, /fixture evidence classes covered: 14/);
   assert.match(doc, /method semantic proof gap files covered: 63/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5469/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5473/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5469/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5473/);
   assert.match(doc, /committed route\/surface fixture packet files: 0/);
   assert.match(doc, /runtime JSON-first fixture packet approvals: 0/);
   assert.match(doc, /runtime route\/surface metric artifact approvals: 0/);
@@ -239,7 +239,7 @@ test('JSON-first route/surface fixture artifact commit readiness is backed by cu
   assert.match(fixtureProvenanceContract, /Committed fixture provenance files: 0/);
   assert.match(jsonFirstImplementation, /method semantic proof gap files covered: 63/);
   assert.match(methodGap, /files with lexical accounting: 63/);
-  assert.match(methodGap, /repo-wide lexical callables: 5469/);
+  assert.match(methodGap, /repo-wide lexical callables: 5473/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
   assert.match(implementationReadiness, /implementation-ready first optimization rows: 0/);
 });

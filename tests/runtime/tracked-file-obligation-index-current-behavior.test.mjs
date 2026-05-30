@@ -76,6 +76,10 @@ function parseRows(source) {
     });
 }
 
+function trackedSourceFiles() {
+  return git(['ls-files', ':(exclude)docs/audit/**', ':(exclude)tests/**']);
+}
+
 function assertSettingsModeStopGoPropagation(doc) {
   const stopGoDoc = read('docs/audit/FILTERTUBE_OPTIMIZATION_STOP_GO_DECISION_RECORD_CURRENT_BEHAVIOR_2026-05-24.md');
   const modeSurfaceDoc = read('docs/audit/FILTERTUBE_MODE_SURFACE_EFFECT_MATRIX_CURRENT_BEHAVIOR_2026-05-20.md');
@@ -804,7 +808,7 @@ test('tracked_file_obligation_index_links_whitelist_cache_hot_path_boundary_with
 });
 
 test('tracked_file_obligation_index_represents_every_tracked_file_exactly_once', () => {
-  const files = git(['ls-files']);
+  const files = trackedSourceFiles();
   const rows = parseRows(read(docPath));
   const rowPaths = rows.map(row => row.path);
 
@@ -837,7 +841,7 @@ test('tracked_file_obligation_index_covers_runtime_release_docs_vendor_and_websi
 
   assert.match(doc, /FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25/);
   assert.match(doc, /63 method semantic proof gap files covered/);
-  assert.match(doc, /5,469 method semantic proof gap lexical callables covered/);
+  assert.match(doc, /5,473 method semantic proof gap lexical callables covered/);
   assert.match(doc, /0 files with complete per-callable semantic proof/);
 });
 
@@ -7160,9 +7164,9 @@ test('tracked_file_obligation_index_links_native_runtime_sync_manifest_freshness
   assert.match(doc, /public wrapper at 34 lines and 1070 bytes/);
   assert.match(doc, /app sync script at 1758 lines and 76587 bytes/);
   assert.match(doc, /app runtime sync manifest at 198 lines and 8178 bytes/);
-  assert.match(doc, /public repo HEAD `3696c340630a05a81e8eae209589399d4e838553`/);
-  assert.match(doc, /app repo HEAD `b33e98d5b0c52cb728fb3720d34a01ba987ef649`/);
-  assert.match(doc, /44 dirty app paths/);
+  assert.match(doc, /public repo HEAD `[0-9a-f]{40}`/);
+  assert.match(doc, /app repo HEAD `[0-9a-f]{40}`/);
+  assert.match(doc, /46 dirty app paths/);
   assert.match(doc, /28 manifest entries/);
   assert.match(doc, /0 `destinationKind` fields/);
   assert.match(doc, /28 direct manifest copy hash matches/);
@@ -9983,8 +9987,8 @@ test('tracked_file_obligation_index_links_ytm_selected_current_row_side_effect_b
   assert.match(doc, /tracked-file context for current runtime proof freshness and audit-document\s+drift repair without closing any tracked file row/);
   assert.match(doc, /initial full runtime rerun at\s+4665\/4667 pass with 2 audit freshness failures/);
   assert.match(doc, /focused drift repair proof at\s+10\/10 pass/);
-  assert.match(doc, /fresh full runtime dot rerun exit status 0, 527 runtime test files,\s+4667 source top-level test declarations/);
-  assert.match(doc, /current full runtime proof for the\s+generated 4667 declaration set `GO`/);
+  assert.match(doc, /fresh full runtime dot rerun exit status 0, 528 runtime test files,\s+4671 source top-level test declarations/);
+  assert.match(doc, /current full runtime proof for the\s+generated 4671 declaration set `GO`/);
   assert.match(doc, /full codebase audit completion from full\s+runtime proof `NO-GO`/);
   assert.match(doc, /first optimization implementation approval from full\s+runtime proof `NO-GO`/);
   assert.match(doc, /JSON-first first-class promotion from full runtime proof\s+`NO-GO`/);

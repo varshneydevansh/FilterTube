@@ -804,7 +804,7 @@ const affectedCallableSemanticFiles = [
     id: 'FT-WLCACHE-SEMANTIC-GAP-01-content-bridge',
     file: 'js/content_bridge.js',
     family: 'Hot page/background runtime',
-    lexicalCallables: 1194,
+    lexicalCallables: 1198,
     semanticStatus: 'semantic proof incomplete'
   },
   {
@@ -2091,7 +2091,7 @@ test('packet rows, live smoke rows, and diagrams remain explicit', () => {
   assert.equal(affectedCallableSemanticGapContract.runtimeBehaviorChanged, false);
   assert.deepEqual(affectedCallableSemanticGapContract.methodGapTotals, {
     filesCovered: 63,
-    lexicalCallablesCovered: 5469,
+    lexicalCallablesCovered: 5473,
     filesWithCompletePerCallableSemanticProof: 0,
     requiredSemanticProofFields: 8
   });
@@ -2405,9 +2405,9 @@ test('packet rows, live smoke rows, and diagrams remain explicit', () => {
 
   const methodGapDoc = read(methodSemanticGapPath);
   assert.match(methodGapDoc, /method semantic proof gap files covered: 63/);
-  assert.match(methodGapDoc, /method semantic proof gap lexical callables covered: 5469/);
+  assert.match(methodGapDoc, /method semantic proof gap lexical callables covered: 5473/);
   assert.match(methodGapDoc, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGapDoc, /lexical callables requiring semantic proof before behavior changes: 5469/);
+  assert.match(methodGapDoc, /lexical callables requiring semantic proof before behavior changes: 5473/);
   assert.match(methodGapDoc, /affected callable semantic proof: NO-GO/);
   for (const row of affectedCallableSemanticFiles) {
     const methodGapRow = methodSemanticGapRow(methodGapDoc, row.file);

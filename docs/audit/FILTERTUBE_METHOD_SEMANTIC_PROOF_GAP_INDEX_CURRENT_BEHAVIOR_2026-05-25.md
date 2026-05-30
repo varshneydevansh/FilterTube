@@ -27,9 +27,9 @@ optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 63
-method semantic proof gap lexical callables covered: 5469
+method semantic proof gap lexical callables covered: 5473
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5469
+lexical callables requiring semantic proof before behavior changes: 5473
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
@@ -42,10 +42,10 @@ changes, or whitelist behavior changes.
 
 ```text
 tracked JS/JSX/MJS files: 63
-repo-wide lexical callables: 5469
+repo-wide lexical callables: 5473
 files with lexical accounting: 63
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5469
+lexical callables requiring semantic proof before behavior changes: 5473
 required semantic proof fields: 8
 selected release hot-path semantic triage rows: 13
 selected visual-writer semantic triage rows: 8
@@ -97,10 +97,10 @@ Source inputs:
 
 | Convergence row | Current source-backed finding | Risk if treated as implementation-ready now |
 | --- | --- | --- |
-| `method_convergence_repo_census` | 63 tracked JS/JSX/MJS files and 5,469 lexical callables are visible to the audit. | Visibility can be mistaken for behavior proof. |
-| `method_convergence_zero_complete_files` | 0 files have complete per-callable semantic proof; 5,469 lexical callables still require proof before behavior changes. | A behavior patch can touch an unproved callable path while tests only cover a selected slice. |
+| `method_convergence_repo_census` | 63 tracked JS/JSX/MJS files and 5,473 lexical callables are visible to the audit. | Visibility can be mistaken for behavior proof. |
+| `method_convergence_zero_complete_files` | 0 files have complete per-callable semantic proof; 5,473 lexical callables still require proof before behavior changes. | A behavior patch can touch an unproved callable path while tests only cover a selected slice. |
 | `method_convergence_family_weight` | 7 families are represented: hot page/background runtime, content helper runtime, UI/settings runtime, generated/quarantined UI, vendor bundles, build/sync scripts, and website routes/components/config. | Runtime, build, vendor, website, and generated-output methods need different proof types and cannot share one cleanup assumption. |
-| `method_convergence_hot_runtime_dominance` | Hot page/background runtime owns 3,069 lexical callables, including 1,194 in `content_bridge.js`, 440 in `background.js`, and 418 in `dom_fallback.js`. | YouTube lag and false-hide regressions are concentrated in hot files with many interacting callables. |
+| `method_convergence_hot_runtime_dominance` | Hot page/background runtime owns 3,073 lexical callables, including 1,198 in `content_bridge.js`, 440 in `background.js`, and 418 in `dom_fallback.js`. | YouTube lag and false-hide regressions are concentrated in hot files with many interacting callables. |
 | `method_convergence_selected_triage_not_closure` | 149 selected semantic triage rows cover release hot paths, visual writers, collaborator cache/writer/menu guards, native dropdowns, JSON active-work predicates, content/category fields, mutation persistence, DOM fallback traversal, content-bridge lifecycle, background cache refresh, and quick-block lifecycle. | Selected hot-path proof can hide the fact that repo-wide semantic closure is still 0 files. |
 | `method_convergence_required_field_gate` | 8 semantic fields are required: owner/source, trigger/caller, settings/profile/list-mode inputs, route/surface, side effects, active/no-rule/disabled behavior, teardown/idempotence, and positive/negative fixtures. | Missing any field weakens reliability, no-work, false-hide, leak, or rollback proof. |
 | `method_convergence_parser_visibility_debt` | 4 closure candidates were rejected, including native sync, content menu, website zero-count routes, and build/website parser divergence with 108 broad-parser rows versus 82 route-parser rows. | Parser counts can be mistaken for callable absence or semantic closure. |
@@ -111,8 +111,8 @@ Source inputs:
 ```text
 63 tracked JS/JSX/MJS files
         |
-        +--> 5,469 lexical callables
-        |       +--> 3,069 hot page/background runtime
+        +--> 5,473 lexical callables
+        |       +--> 3,073 hot page/background runtime
         |       +--> 2,400 UI, helper, generated, vendor, build, website
         |
         +--> 149 selected semantic triage rows
@@ -129,8 +129,8 @@ parity, rollback, native/release, and public-claim boundaries.
 
 ```mermaid
 flowchart TD
-  A["63 tracked JS/JSX/MJS files"] --> B["5,469 lexical callables"]
-  B --> C["3,069 hot page/background runtime callables"]
+  A["63 tracked JS/JSX/MJS files"] --> B["5,473 lexical callables"]
+  B --> C["3,073 hot page/background runtime callables"]
   B --> D["2,400 UI, helper, generated, vendor, build, website callables"]
   A --> E["149 selected semantic triage rows"]
   A --> F["4 rejected closure candidates"]
@@ -196,7 +196,7 @@ have all of these fields pinned:
 
 | Family | Files | Lexical callables | Semantic status |
 | --- | ---: | ---: | --- |
-| Hot page/background runtime | 9 | 3069 | `semantic proof incomplete` |
+| Hot page/background runtime | 9 | 3073 | `semantic proof incomplete` |
 | Content helper runtime | 8 | 303 | `semantic proof incomplete` |
 | UI/settings runtime | 10 | 1563 | `semantic proof incomplete` |
 | Generated/quarantined UI | 6 | 147 | `semantic proof incomplete` |
@@ -221,7 +221,7 @@ have all of these fields pinned:
 | `js/content/handle_resolver.js` | Hot page/background runtime | 22 | `semantic proof incomplete` | Resolver fetch budget, cache source, identity confidence, and route negative proof remain incomplete. |
 | `js/content/menu.js` | Content helper runtime | 3 | `semantic proof incomplete` | Menu CSS/bootstrap ownership and non-matching surface proof remain incomplete. |
 | `js/content/release_notes_prompt.js` | Content helper runtime | 12 | `semantic proof incomplete` | Release overlay eligibility, acknowledgement, navigation, and spoofing proof remain incomplete. |
-| `js/content_bridge.js` | Hot page/background runtime | 1194 | `semantic proof incomplete` | Content bridge caller graph, menu/quick action authority, lifecycle callback ownership, and identity confidence proof remain incomplete. |
+| `js/content_bridge.js` | Hot page/background runtime | 1198 | `semantic proof incomplete` | Content bridge caller graph, menu/quick action authority, lifecycle callback ownership, and identity confidence proof remain incomplete. |
 | `js/content_controls_catalog.js` | UI/settings runtime | 3 | `semantic proof incomplete` | Content-control catalog ownership, settings parity, and row-action fixture proof remain incomplete. |
 | `js/filter_logic.js` | Hot page/background runtime | 298 | `semantic proof incomplete` | JSON traversal, harvest/map mutation, block decision, recursion, and no-rule budget proof remain incomplete. |
 | `js/injector.js` | Hot page/background runtime | 314 | `semantic proof incomplete` | Main-world message dispatch, settings capability, and injection idempotence proof remain incomplete. |
@@ -478,7 +478,7 @@ lifecycle pruning or JSON-first promotion.
 | `content_bridge_queueWhitelistPendingHide_pending_timer` | `js/content_bridge.js:6170` | Whitelist pending-hide candidate queue owner. Inputs are mutation records, list mode, route exclusions, candidate cap, and pending-hide timer. | Skips quiet mode, non-whitelist, root/search/channels/watch routes, caps candidates at 160, then schedules a short pending-hide timer. | Pending hide can write visual state before identity resolves; route and restore authority remain incomplete. |
 | `content_bridge_refreshDOMFallbackMutationObserver_active_gate` | `js/content_bridge.js:6440` | Content-bridge DOM fallback observer refresh owner. Inputs are active fallback lifecycle predicate, body/document target, observer active state, and DOMContentLoaded fallback. | Disconnects when no fallback work exists, observes body/document while active, schedules immediate fallback, and exposes `window.FilterTube_refreshDOMFallbackObserver`. | Active/no-work gate is pinned, but observer teardown and no-rule lifecycle budget are not complete. |
 | `content_bridge_ensureFallbackMenuButtons_lifecycle_scan` | `js/content_bridge.js:6489` | Fallback menu button lifecycle owner. Inputs are eager-scan predicate, mutation records, hover/focus/click/scroll events, queued scan roots, and warmup interval. | Can observe body, schedule visible/root scans through frame/timer pairs, install pointer/focus/click/scroll/navigate listeners, and run a bounded warmup interval when eager scanning is active. | This is a release-lag hotspot; cleanup and parity with native menu action gates remain incomplete. |
-| `content_bridge_tail_message_listener_initialize_timer` | `js/content_bridge.js:13531` | Content-bridge page lifetime entrypoint. Inputs are window message events and a fixed startup timer. | Installs `window.addEventListener('message', handleMainWorldMessages, false)` and schedules `initialize()` after 50 ms. | Startup listener/timer teardown and duplicate-load authority remain absent. |
+| `content_bridge_tail_message_listener_initialize_timer` | `js/content_bridge.js:13567` | Content-bridge page lifetime entrypoint. Inputs are window message events and a fixed startup timer. | Installs `window.addEventListener('message', handleMainWorldMessages, false)` and schedules `initialize()` after 50 ms. | Startup listener/timer teardown and duplicate-load authority remain absent. |
 
 Current content-bridge runtime lifecycle semantic status after this addendum:
 
@@ -754,7 +754,7 @@ triage rows as complete per-callable authority.
 ```text
 current-source method gap freshness date: 2026-05-30
 tracked JS/JSX/MJS files still covered: 63
-repo-wide lexical callables still requiring semantic proof: 5469
+repo-wide lexical callables still requiring semantic proof: 5473
 files with complete per-callable semantic proof: 0
 latest full runtime proof: 4663/4663 pass, 0 fail, 83.213s
 method semantic completion from freshness rerun: NO-GO

@@ -27,9 +27,9 @@ Required verification output path: docs/audit/artifacts/first-optimization/metri
 Source-locus parity release verification boundary rows: 12
 Current parity release verification anchors covered: 68
 Method semantic proof gap files covered: 63
-Method semantic proof gap lexical callables covered: 5469
+Method semantic proof gap lexical callables covered: 5473
 Files with complete per-callable semantic proof: 0
-Lexical callables requiring semantic proof before behavior changes: 5469
+Lexical callables requiring semantic proof before behavior changes: 5473
 Runtime source-owner approvals: 0
 Runtime metric collector approvals: 0
 Runtime rollback approvals: 0
@@ -60,7 +60,7 @@ freshness proof.
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_VERIFICATION_OUTPUT_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md` | Defines the future `verification-output.tap` shape, but proves 0 committed verification output files and 0 implementation-ready rows. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_ROLLBACK_UNCLAIMED_SURFACE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Proves rollback and unclaimed-surface authority remains absent. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_COLLECTOR_PARITY_ROLLOUT_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Maps collector parity rollout risks, but proves 0 runtime collector parity rollout proofs approved. |
-| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 63 files and 5,469 lexical callables are still only lexically indexed, with 0 files carrying complete per-callable semantic proof. |
+| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 63 files and 5,473 lexical callables are still only lexically indexed, with 0 files carrying complete per-callable semantic proof. |
 | `docs/audit/FILTERTUBE_NATIVE_RUNTIME_SYNC_AUTHORITY_AUDIT_2026-05-18.md` | Proves native generated runtime outputs are not source authority without freshness gates. |
 | `docs/audit/FILTERTUBE_RELEASE_PACKAGE_PARITY_AUDIT_2026-05-18.md` | Proves browser release ZIPs lack a committed release package parity manifest. |
 | `docs/audit/FILTERTUBE_PUBLIC_RELEASE_CLAIM_BOUNDARY_CURRENT_BEHAVIOR_2026-05-19.md` | Proves public claims require exact artifact, checksum, signing, version, store URL, and platform proof. |
@@ -88,9 +88,9 @@ release/native/public boundary source docs covered: 8
 current parity release verification anchors covered: 68
 parity release verification risk classes covered: 8
 method semantic proof gap files covered: 63
-method semantic proof gap lexical callables covered: 5469
+method semantic proof gap lexical callables covered: 5473
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5469
+lexical callables requiring semantic proof before behavior changes: 5473
 committed parity rollout files: 0
 committed verification output files: 0
 committed diagnostic privacy files: 0
@@ -362,7 +362,7 @@ bind this source-locus parity, release, and verification classification to the
 missing collector parity rollout approval layer. The addendum pins 12 collector
 parity rollout approval boundary rows, 12 source-locus parity release
 verification rows covered, 68 current parity release verification anchors
-covered, 63 method semantic proof gap files covered, 5,469 lexical callables
+covered, 63 method semantic proof gap files covered, 5,473 lexical callables
 still requiring semantic proof, 0 files with complete per-callable semantic
 proof, 0 runtime source-owner approvals, 0 runtime metric collector approvals,
 0 runtime rollback approvals, 0 runtime unclaimed-surface approvals, 0

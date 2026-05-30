@@ -215,9 +215,9 @@ test('side-effect budget contract rows counts and field names stay pinned', () =
   assert.match(doc, /collector fixture provenance rows covered: 12/);
   assert.match(doc, /collector parity rollout rows covered: 12/);
   assert.match(doc, /method semantic proof gap files covered: 63/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5469/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5473/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5469/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5473/);
   assert.match(doc, /inline side-effect budget JSON sections covered: 12/);
   assert.match(doc, /inline side-effect budget artifact promotion decision: NO-GO/);
   assert.match(doc, /side-effect budget draft closure rows: 12/);
@@ -234,7 +234,7 @@ test('side-effect budget contract rows counts and field names stay pinned', () =
   assert.match(doc, /metric source-owner rows linked by side-effect closure: 12/);
   assert.match(doc, /collector readiness families linked by side-effect closure: 5/);
   assert.match(doc, /method semantic proof gap files linked by side-effect closure: 63/);
-  assert.match(doc, /lexical callables linked by side-effect closure: 5469/);
+  assert.match(doc, /lexical callables linked by side-effect closure: 5473/);
   assert.match(doc, /runtime side-effect budget closure approvals: 0/);
   assert.match(doc, /implementation-ready side-effect budget closure rows: 0/);
   assert.match(doc, /side-effect budget draft closure: SIDE-EFFECT-BUDGET-CHAIN-CLOSED/);
@@ -322,9 +322,9 @@ test('side-effect budget contract is backed by current no-work fixture owner sam
   assert.match(fixtureProvenance, /collector fixture provenance rows implementation-ready: 0/);
   assert.match(parityRollout, /collector parity rollout rows implementation-ready: 0/);
   assert.match(methodGap, /tracked JS\/JSX\/MJS files: 63/);
-  assert.match(methodGap, /repo-wide lexical callables: 5469/);
+  assert.match(methodGap, /repo-wide lexical callables: 5473/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5469/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5473/);
 });
 
 test('side-effect budget authority symbols are absent from product runtime source', () => {

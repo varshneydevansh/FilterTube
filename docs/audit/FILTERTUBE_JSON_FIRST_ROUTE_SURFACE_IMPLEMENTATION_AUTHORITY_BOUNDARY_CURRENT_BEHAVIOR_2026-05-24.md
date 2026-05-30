@@ -23,9 +23,9 @@ Route/surface effect classes covered: 9
 Route/surface metric obligations covered: 12
 Runtime JSON-first route/surface approvals: 0
 Method semantic proof gap files covered: 63
-Method semantic proof gap lexical callables covered: 5469
+Method semantic proof gap lexical callables covered: 5473
 Files with complete per-callable semantic proof: 0
-Lexical callables requiring semantic proof before behavior changes: 5469
+Lexical callables requiring semantic proof before behavior changes: 5473
 Implementation-ready JSON-first route/surface rows: 0
 ```
 
@@ -43,7 +43,7 @@ implementation approval.
 | `docs/audit/FILTERTUBE_JSON_FIRST_LIST_MODE_MATRIX_BOUNDARY_CURRENT_BEHAVIOR_2026-05-22.md` | Disabled, empty blocklist, empty whitelist, conflicts, unknown mode, and comments remain split. |
 | `docs/audit/FILTERTUBE_JSON_FIRST_WHITELIST_DECISION_IDENTITY_BOUNDARY_CURRENT_BEHAVIOR_2026-05-22.md` | Whitelist identity decisions depend on route, renderer class, and sparse identity state. |
 | `docs/audit/FILTERTUBE_CANDIDATE_OBLIGATION_BINDING_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | Candidate bindings reference all 12 route/surface obligations but 0 bindings are implementation-ready. |
-| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 63 tracked JS/JSX/MJS files still have 5469 lexical callables requiring per-callable semantic proof before behavior changes. |
+| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 63 tracked JS/JSX/MJS files still have 5473 lexical callables requiring per-callable semantic proof before behavior changes. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_IMPLEMENTATION_READINESS_GATE_CURRENT_BEHAVIOR_2026-05-24.md` | First optimization implementation remains NO-GO. |
 | `docs/audit/FILTERTUBE_RUNTIME_FIXTURE_RESULTS_2026-05-17.md` | Runtime proof is tracked by the audit harness, not as route/surface implementation authority. |
 
@@ -62,9 +62,9 @@ JSON-first whitelist decision states covered: 7
 candidate-obligation binding rows covered: 10
 first optimization implementation readiness rows covered: 14
 method semantic proof gap files covered: 63
-method semantic proof gap lexical callables covered: 5469
+method semantic proof gap lexical callables covered: 5473
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5469
+lexical callables requiring semantic proof before behavior changes: 5473
 runtime JSON-first route/surface approvals: 0
 runtime route/surface metric artifacts: 0
 runtime JSON-first implementation approvals: 0

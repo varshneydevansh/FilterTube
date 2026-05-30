@@ -346,7 +346,7 @@ boundary rows, 12 source-locus no-work rows covered, 12 collector no-work
 preservation rows covered, 12 no-work preservation contract rows covered, 0
 runtime source-owner approvals, 0 runtime metric collector approvals, 0
 runtime collector insertion points approved, 0 runtime collector no-work
-proofs approved, 63 method semantic proof gap files covered, 5,469 lexical
+proofs approved, 63 method semantic proof gap files covered, 5,473 lexical
 callables still requiring semantic proof, 0 files with complete per-callable
 semantic proof, 0 committed no-work preservation files, 0 implementation-ready
 collector no-work approval rows, expected runtime audit tests: 4457, expected

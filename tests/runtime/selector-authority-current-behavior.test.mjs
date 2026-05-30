@@ -19,7 +19,14 @@ function git(args) {
 }
 
 function trackedProductJs() {
-  return git(['ls-files', '*.js', '*.jsx', '*.mjs'])
+  return git([
+    'ls-files',
+    '*.js',
+    '*.jsx',
+    '*.mjs',
+    ':(exclude)docs/**',
+    ':(exclude)tests/**'
+  ])
     .filter(file => !file.startsWith('js/vendor/'));
 }
 

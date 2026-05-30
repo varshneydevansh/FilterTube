@@ -51,7 +51,7 @@ explicit release/public-claim limits, and affected callable semantic proof.
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_DIAGNOSTIC_PRIVACY_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md` | Defines the future `diagnostic-privacy.json` shape and proves 0 committed diagnostic privacy files. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_PARITY_ROLLOUT_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md` | Defines the future `parity-rollout.json` shape and proves 0 committed parity rollout files. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_VERIFICATION_OUTPUT_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md` | Defines the future `verification-output.tap` shape and proves 0 committed verification output files. |
-| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 63 JS/JSX/MJS files and 5,469 lexical callables still lack complete per-callable semantic proof before behavior changes. |
+| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 63 JS/JSX/MJS files and 5,473 lexical callables still lack complete per-callable semantic proof before behavior changes. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_ARTIFACT_FOUNDATION_PACKET_CURRENT_BEHAVIOR_2026-05-24.md` | 12 foundation packet rows exist, but 0 committed artifacts and 0 runtime collectors are approved. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_ARTIFACT_SCHEMA_CURRENT_BEHAVIOR_2026-05-24.md` | 12 metric schema rows define field groups the contract set must preserve. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_SOURCE_OWNER_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 12 source-owner rows map current runtime owners, but 0 owner rows are implementation-ready. |
@@ -123,9 +123,9 @@ collector side-effect rows covered: 12
 collector fixture provenance rows covered: 12
 collector parity rollout rows covered: 12
 method semantic proof gap files covered: 63
-method semantic proof gap lexical callables covered: 5469
+method semantic proof gap lexical callables covered: 5473
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5469
+lexical callables requiring semantic proof before behavior changes: 5473
 expected runtime audit tests: 4457
 expected runtime audit pass: 4457
 expected runtime audit fail: 0
@@ -145,7 +145,7 @@ runtime count:
 
 ```text
 legacy metric contract expected tests: 4457
-current generated runtime test declarations: 4667
+current generated runtime test declarations: 4671
 latest full runtime pass count observed: 4663
 latest full runtime pass freshness: 2026-05-30 full runtime rerun covers 4663 generated declarations before 4 later audit-only content-filter declarations
 count reconciliation status for metric foundation: BLOCKED
@@ -154,7 +154,7 @@ runtime behavior changed by this addendum: no
 
 The legacy `4457` rows are historical metric-contract snapshot evidence, not
 current full-suite proof or optimization approval. The current generated
-runtime test provenance index records `4667` source top-level test declarations.
+runtime test provenance index records `4671` source top-level test declarations.
 The latest full runtime audit evidence records a current `4663/4663` pass, so
 full-suite freshness no longer covers the current generated declaration count.
 Until the contract rows and ledgers are reconciled as one scoped audit packet,
@@ -171,7 +171,7 @@ expected runtime audit tests: 4457
 current generated test provenance index
         |
         v
-source top-level test declarations counted: 4667
+source top-level test declarations counted: 4671
         |
         v
 metric-foundation contract count is stale for completion proof
@@ -180,7 +180,7 @@ metric-foundation contract count is stale for completion proof
 ```mermaid
 flowchart TD
   A["Metric foundation legacy contract rows"] --> B["4457 expected runtime audit tests"]
-  C["Runtime test provenance index"] --> D["4667 source top-level test declarations"]
+  C["Runtime test provenance index"] --> D["4671 source top-level test declarations"]
   E["Latest full runtime command"] --> F["latest recorded 4663 pass / 0 fail"]
   B --> G{"May this prove current optimization readiness?"}
   D --> G
@@ -191,7 +191,7 @@ flowchart TD
 | Evidence | Artifact | Count | Current interpretation |
 | --- | --- | --- | --- |
 | Legacy metric contract rows | This contract gate and upstream first-optimization gates. | `4457` expected tests, `4457` expected pass. | Historical contract snapshot only. |
-| Runtime test provenance index | `docs/audit/FILTERTUBE_RUNTIME_TEST_FILE_PROVENANCE_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | `4667` source top-level test declarations. | Current generated runtime-test declaration count. |
+| Runtime test provenance index | `docs/audit/FILTERTUBE_RUNTIME_TEST_FILE_PROVENANCE_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | `4671` source top-level test declarations. | Current generated runtime-test declaration count. |
 | Full runtime command evidence | `node --test --test-reporter=tap tests/runtime/*.test.mjs` | Current `4663/4663` pass, `0` fail, `83.213s`. | Latest local full-suite pass evidence after the 2026-05-30 freshness rerun; it predates the four later audit-only content-filter convergence declarations. |
 | Metric foundation readiness | This addendum. | Count reconciliation status: `BLOCKED`. | No optimization or artifact authority until the count boundary is reconciled. |
 

@@ -113,7 +113,7 @@ function currentPackageScripts() {
 
 function trackedSearchCorpus() {
   const files = git(['ls-files', 'build.js', 'package.json', 'manifest*.json', 'js/*.js', 'js/**/*.js', 'src/**/*.js', 'src/**/*.jsx', 'scripts/*.mjs', 'docs/*.md'])
-    .filter((file) => !file.startsWith('tests/'));
+    .filter((file) => !file.startsWith('tests/') && !file.startsWith('docs/audit/'));
   return files.map((file) => read(file)).join('\n');
 }
 
@@ -271,7 +271,7 @@ test('build script register keeps future build authorities absent and method gap
 
   assert.ok(text.includes(methodGapPath));
   assert.match(text, /method semantic proof gap files covered: 63/);
-  assert.match(text, /method semantic proof gap lexical callables covered: 5469/);
+  assert.match(text, /method semantic proof gap lexical callables covered: 5473/);
   assert.match(text, /files with complete per-callable semantic proof: 0/);
   assert.match(text, /affected callable semantic proof: NO-GO/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);

@@ -137,12 +137,12 @@ const expectedFingerprints = {
   'tests/runtime/first-optimization-source-owner-approval-boundary-current-behavior.test.mjs': {
     lines: 297,
     bytes: 12983,
-    hash: '35194c30fda1c12de3206fe0f6482ba123f27b75132af296139d5407764a7152'
+    hash: 'ffc710941c0c9c5ec079105250f2028e2d0a51a5060c311df9aeebb55fb8e6ae'
   },
   'docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_SOURCE_OWNER_APPROVAL_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md': {
     lines: 254,
     bytes: 16411,
-    hash: '709b903d8d5d6bf1c013a9596f28f1f1b4488115191cb7a4381685a76f4936ef'
+    hash: '053dd412a40a7b39e2528977f88415c516555343b397f105173acf2261c8268f'
   }
 };
 

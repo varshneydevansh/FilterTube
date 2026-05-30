@@ -115,7 +115,7 @@ js/content_bridge.js:12706:window.postMessage:collaboratorInfoRequestToMainWorld
 js/content_bridge.js:13388:runtime.sendMessage:addChannelPersistentRuntimeMutation
 js/content_bridge.js:13413:runtime.sendMessage:autoBackupScheduleRuntimeRequest
 js/content_bridge.js:13479:runtime.sendMessage:filterAllToggleRuntimeMutation
-js/content_bridge.js:13531:window.addEventListener(message):contentBridgeMainWorldMessageReceiver
+js/content_bridge.js:13567:window.addEventListener(message):contentBridgeMainWorldMessageReceiver
 js/filter_logic.js:30:window.postMessage:filterLogicChannelMapBatch
 js/filter_logic.js:71:window.postMessage:filterLogicVideoChannelMapBatch
 js/filter_logic.js:132:window.postMessage:filterLogicVideoMetaMapBatch
@@ -327,9 +327,9 @@ support runtime optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 63
-method semantic proof gap lexical callables covered: 5469
+method semantic proof gap lexical callables covered: 5473
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5469
+lexical callables requiring semantic proof before behavior changes: 5473
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```

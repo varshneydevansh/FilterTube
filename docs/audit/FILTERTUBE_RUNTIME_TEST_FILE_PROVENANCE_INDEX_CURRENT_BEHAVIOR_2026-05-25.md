@@ -12,9 +12,9 @@ optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 63
-method semantic proof gap lexical callables covered: 5469
+method semantic proof gap lexical callables covered: 5473
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5469
+lexical callables requiring semantic proof before behavior changes: 5473
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
@@ -29,10 +29,10 @@ changes, or whitelist behavior changes.
 source directory: tests/runtime
 file selector: top-level *.test.mjs files
 runtime results ledger: docs/audit/FILTERTUBE_RUNTIME_FIXTURE_RESULTS_2026-05-17.md
-top-level runtime test files: 527
-indexed runtime test rows: 527
-source top-level test declarations counted: 4667
-runtime results exact backticked test-path rows: 527
+top-level runtime test files: 528
+indexed runtime test rows: 528
+source top-level test declarations counted: 4671
+runtime results exact backticked test-path rows: 528
 runtime results missing exact backticked test-path rows: 0
 ```
 
@@ -45,8 +45,8 @@ current-behavior rerun after audit-document drift repair:
 initial full runtime rerun result: 4665/4667 pass, 2 fail
 focused drift repair proof: 10/10 pass
 fresh full runtime command: node --test --test-reporter=dot tests/runtime/*.test.mjs
-fresh full runtime exit status for 4667 declaration set: 0
-current full runtime proof for generated 4667 declaration set: GO
+fresh full runtime exit status for 4671 declaration set: 0
+current full runtime proof for generated 4671 declaration set: GO
 runtime behavior changed: no
 ```
 
@@ -116,6 +116,7 @@ Future optimization work should cite this index for complete runtime-test file e
 | 49 | `tests/runtime/content-bridge-menu-blocked-state-list-shape-current-behavior.test.mjs` | 11 | `yes` | menu blocked-state list-shape audit is audit-only and source pinned |
 | 50 | `tests/runtime/content-bridge-menu-injection-action-boundary-current-behavior.test.mjs` | 9 | `yes` | content bridge menu injection action audit is audit-only and source pinned |
 | 51 | `tests/runtime/content-bridge-prefetch-identity-lifecycle-boundary-current-behavior.test.mjs` | 6 | `yes` | content bridge prefetch identity lifecycle audit is audit-only and source pinned |
+| 528 | `tests/runtime/content-bridge-production-console-gate-current-behavior.test.mjs` | 4 | `yes` | content bridge production console gate audit is audit-only and proves log/debug gating load order |
 | 52 | `tests/runtime/content-bridge-selector-semantic-register-current-behavior.test.mjs` | 5 | `yes` | content bridge selector semantic register is audit-only and scoped to current behavior |
 | 53 | `tests/runtime/content-bridge-startup-timing-boundary-current-behavior.test.mjs` | 10 | `yes` | content bridge startup timing audit is audit-only and source counted |
 | 54 | `tests/runtime/content-bridge-top-level-method-semantic-register-current-behavior.test.mjs` | 6 | `yes` | content bridge top-level method register is audit-only and not nested callable completion |

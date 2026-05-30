@@ -56,7 +56,14 @@ function searchPayload() {
 }
 
 function networkPrimitiveCounts() {
-  const files = git(['ls-files', '*.js', '*.mjs', '*.jsx'])
+  const files = git([
+    'ls-files',
+    '*.js',
+    '*.mjs',
+    '*.jsx',
+    ':(exclude)docs/**',
+    ':(exclude)tests/**'
+  ])
     .filter(file => !file.includes('/vendor/'));
   const patterns = {
     fetch: /\bfetch\s*\(/g,

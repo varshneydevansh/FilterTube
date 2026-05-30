@@ -134,7 +134,14 @@ function pageResidentLifecycleStats(file) {
 }
 
 function aggregate() {
-  const files = git(['ls-files', '*.js', '*.jsx', '*.mjs']);
+  const files = git([
+    'ls-files',
+    '*.js',
+    '*.jsx',
+    '*.mjs',
+    ':(exclude)docs/**',
+    ':(exclude)tests/**'
+  ]);
   const totals = Object.fromEntries(Object.keys(PATTERNS).map(name => [name, 0]));
   const families = {};
   const perFile = {};

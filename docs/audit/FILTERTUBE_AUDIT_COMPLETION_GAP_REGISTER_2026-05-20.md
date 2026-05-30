@@ -62,7 +62,7 @@ the file and lifecycle rows without changing their completion status:
 - `docs/audit/FILTERTUBE_AUDIT_DOC_LAYOUT_CURRENT_BEHAVIOR_2026-05-24.md`
   and `tests/runtime/audit-doc-layout-current-behavior.test.mjs` prove the
   current audit corpus placement boundary: 0 root-level `FILTERTUBE_*.md`
-  files under plain `docs/`, 543 `docs/audit/FILTERTUBE_*.md` files,
+  files under plain `docs/`, 544 `docs/audit/FILTERTUBE_*.md` files,
   root-level FilterTube audit doc placement `NO-GO`, and new audit artifact
   placement under `docs/audit`.
 - `docs/audit/FILTERTUBE_REPO_LIFECYCLE_PRIMITIVE_COVERAGE_2026-05-18.md`
@@ -82,9 +82,9 @@ optimization readiness.
 The method/callable audit now has an explicit repo-wide semantic gap index:
 
 - `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md`
-  records 63 tracked JS/JSX/MJS files, 5,469 lexical callables, 63 files with
+  records 63 tracked JS/JSX/MJS files, 5,473 lexical callables, 63 files with
   lexical accounting, 0 files with complete per-callable semantic proof, and
-  5,469 lexical callables still requiring semantic proof before behavior
+  5,473 lexical callables still requiring semantic proof before behavior
   changes.
 - `tests/runtime/all-callable-index-current-behavior.test.mjs` proves that the
   gap index matches the current tracked source file list, callable counts,
@@ -484,18 +484,18 @@ The runtime fixture results ledger now records its own index-completeness gap,
 and a generated companion index provides complete file-level enumeration:
 
 - `docs/audit/FILTERTUBE_RUNTIME_FIXTURE_RESULTS_2026-05-17.md` reports 527
-  top-level `tests/runtime/*.test.mjs` files, 527 exact backticked test-path
+  top-level `tests/runtime/*.test.mjs` files, 528 exact backticked test-path
   entries in that ledger, and 0 top-level runtime test files without exact
   backticked entries there.
 - `docs/audit/FILTERTUBE_RUNTIME_TEST_FILE_PROVENANCE_INDEX_CURRENT_BEHAVIOR_2026-05-25.md`
-  provides 527 runtime test file rows, 4667 source top-level test declarations,
+  provides 528 runtime test file rows, 4671 source top-level test declarations,
   527 `yes` rows for exact runtime-results entries, and 0 `no` rows for
   files missing exact runtime-results entries.
 - `tests/runtime/audit-completion-gap-register-current-behavior.test.mjs`
   computes those counts from the current worktree and proves the ledger, the
   generated index, and this register agree.
 - The generated index now has no missing exact runtime-results rows:
-  0 of 527 rows remain `no`, and the missing family priority table records
+  0 of 528 rows remain `no`, and the missing family priority table records
   `None remaining` 0. This closes the runtime fixture ledger file-level provenance gap before optimization work.
 - The generated index keeps exact-row-complete prefix-family snapshots for
   `tests/runtime/json*.test.mjs` files,
@@ -560,7 +560,7 @@ The first-optimization metric foundation gate now has a separate runtime-count
 reconciliation blocker. This top-level completion register treats that blocker
 as central audit evidence: old metric contract rows that still say `4457`
 cannot prove current full-suite coverage after the runtime test index moved to
-`4667` source top-level declarations.
+`4671` source top-level declarations.
 
 ```text
 legacy first-optimization metric contract count
@@ -572,7 +572,7 @@ expected runtime audit tests: 4457
 current runtime test provenance index
         |
         v
-source top-level test declarations counted: 4667
+source top-level test declarations counted: 4671
         |
         v
 latest full runtime evidence: stale after current source count changed
@@ -584,7 +584,7 @@ count-reconciled optimization readiness: NO-GO
 ```mermaid
 flowchart TD
   A["Legacy metric contract rows"] --> B["4457 expected tests"]
-  C["Generated runtime test provenance index"] --> D["4667 source test declarations"]
+  C["Generated runtime test provenance index"] --> D["4671 source test declarations"]
   E["Latest full runtime suite"] --> F["stale after current source count changed"]
   B --> G{"Does this prove current completion?"}
   D --> G
@@ -595,7 +595,7 @@ flowchart TD
 | Reconciliation evidence | Artifact | Current count | Completion effect |
 | --- | --- | --- | --- |
 | Legacy first-optimization metric contract rows | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_FOUNDATION_CONTRACT_COVERAGE_GATE_CURRENT_BEHAVIOR_2026-05-24.md` | `4457` expected tests and `4457` expected pass. | Historical snapshot only; not current full-suite proof. |
-| Generated runtime test provenance | `docs/audit/FILTERTUBE_RUNTIME_TEST_FILE_PROVENANCE_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | `4667` source top-level test declarations. | Current file-level runtime-test declaration count. |
+| Generated runtime test provenance | `docs/audit/FILTERTUBE_RUNTIME_TEST_FILE_PROVENANCE_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | `4671` source top-level test declarations. | Current file-level runtime-test declaration count. |
 | Latest full runtime evidence | `node --test --test-reporter=tap tests/runtime/*.test.mjs`; recorded in `docs/audit/FILTERTUBE_RELEASE_REGRESSION_LAG_AND_BLOCKLIST_FIX_2026-05-26.md` | Current `4663/4663` pass, `0` fail, `83.213s`. | Latest full-suite assertion proof after the 3 lifecycle-convergence proof tests were added; it predates the 4 later content-filter convergence proof declarations. |
 | Completion decision | This register. | Count reconciliation status: `BLOCKED`. | No first-optimization, JSON-first promotion, whitelist optimization, or broad audit completion approval. |
 
@@ -604,7 +604,7 @@ Current count reconciliation boundary:
 ```text
 count-reconciliation proof slices: 3
 legacy metric contract expected tests: 4457
-current generated runtime test declarations: 4667
+current generated runtime test declarations: 4671
 latest full runtime pass count observed: 4663
 latest full runtime pass freshness: 2026-05-30 full runtime rerun covers 4663 generated declarations before 4 later audit-only content-filter declarations
 first-optimization count reconciliation status: BLOCKED
@@ -638,7 +638,7 @@ excluding this register and its verifier found the following footprint:
 ```text
 census scope: docs/audit markdown plus tests/runtime modules
 census exclusions: this gap register and its verifier
-census files scanned: 1072
+census files scanned: 1074
 legacy runtime-count token 4457 occurrences: 1230
 legacy runtime-count token 4457 files: 167
 current runtime-count token 4660 occurrences: 11
@@ -661,11 +661,11 @@ Interpretation:
 
 | Census item | Current value | Completion effect |
 | --- | ---: | --- |
-| Files scanned outside this self-referential register/verifier | 1072 | Wide enough to quantify audit-surface drift without self-counting this addendum. |
+| Files scanned outside this self-referential register/verifier | 1074 | Wide enough to quantify audit-surface drift without self-counting this addendum. |
 | Legacy `4457` occurrences | 1230 | The stale expected-test count is broad historical contract wording, not current completion proof. |
 | Files containing legacy `4457` | 167 | Future count reconciliation is a multi-document audit cleanup, not a single-row fix. |
-| Current `4660` occurrences | 67 | Recalculated after the fresh 2026-05-30 full runtime rerun matched the current generated declaration count. |
-| Files containing current `4660` | 13 | Recalculated after the fresh 2026-05-30 full runtime rerun matched the current generated declaration count. |
+| Current `4660` occurrences | 11 | Recalculated after the fresh 2026-05-30 full runtime rerun matched the current generated declaration count. |
+| Files containing current `4660` | 4 | Recalculated after the fresh 2026-05-30 full runtime rerun matched the current generated declaration count. |
 
 This census intentionally does not rewrite historical first-optimization
 contract rows. It records the burden before any optimization or JSON-first
@@ -817,7 +817,7 @@ flowchart TD
 | Network JSON no-work | `docs/audit/FILTERTUBE_NETWORK_FETCH_XHR_CALLSITE_REGISTER_CURRENT_BEHAVIOR_2026-05-22.md` | 9 | Seed and injector now avoid clone, parse, replay, and queue work when JSON filtering is inactive or empty. | No central network authority, and JSON-first filtering is not promoted to a complete first-class behavior model. |
 | DOM selector hot path | `docs/audit/FILTERTUBE_DOM_SELECTOR_INSTANCE_REGISTER_2026-05-18.md` | 12 | Quick-block overlay/card/sweep selectors, dropdown repair/close selectors, menu activation/discovery selectors, whitelist pending intake, and fallback menu intake are pinned. | No central selector authority, and every selector family still needs surface, route, target, restore, and sibling-visible proof. |
 | Cross-feature hot path | `docs/audit/FILTERTUBE_CROSS_FEATURE_AUTHORITY_MATRIX_2026-05-18.md` | 5 | Visible blocklist refresh, empty blocklist no-JSON work, whitelist pending-hide budget, quick-block/menu mode boundary, and Topic byline identity boundary are pinned together. | No `crossFeatureRuntimeAuthority`, and end-to-end cross-feature records are incomplete outside this release path. |
-| Method semantic triage | `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | 13 | The specific hot-path callables touched by the lag, stale keyword, native menu, quick-block, and Topic byline fixes have owner/trigger/input/side-effect/no-work boundaries recorded. | Repo-wide callable proof remains incomplete: 5,469 lexical callables still require semantic proof before broad behavior changes. |
+| Method semantic triage | `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | 13 | The specific hot-path callables touched by the lag, stale keyword, native menu, quick-block, and Topic byline fixes have owner/trigger/input/side-effect/no-work boundaries recorded. | Repo-wide callable proof remains incomplete: 5,473 lexical callables still require semantic proof before broad behavior changes. |
 
 Behavior-change checkpoint from the current source:
 
@@ -1916,8 +1916,8 @@ and runtime behavior changes at `NO-GO`.
 2026-05-30 content-filter convergence proof-test drift:
 
 ```text
-current source top-level test declarations counted: 4667
-current runtime source declaration phrase: 4667 source top-level test declarations
+current source top-level test declarations counted: 4671
+current runtime source declaration phrase: 4671 source top-level test declarations
 new declarations since previous full runtime proof: 4
 latest full runtime proof after lifecycle convergence additions: 4663/4663 pass, 0 fail, 83.213s
 content-filter convergence proof-test freshness: focused rerun required before using this slice
@@ -1928,7 +1928,7 @@ The four added declarations are audit-only proof tests for the content-filter
 route/surface convergence, active-goal continuation, audit-completion gap, and
 objective-coverage ledger rows. They update the generated provenance index to
 the current source count but do not convert the earlier 4663-test full-suite
-proof into current full-suite proof for the larger 4667-test source set.
+proof into current full-suite proof for the larger 4671-test source set.
 
 2026-05-30 full runtime freshness closure after audit-drift repair:
 
@@ -1940,9 +1940,9 @@ drift repair documents: docs/audit/FILTERTUBE_NATIVE_RUNTIME_SYNC_METHOD_SEMANTI
 focused drift repair proof: 10/10 pass
 fresh full runtime command: node --test --test-reporter=dot tests/runtime/*.test.mjs
 fresh full runtime exit status for current source set: 0
-current runtime test files: 527
-current source top-level test declarations counted: 4667
-current full runtime proof for generated 4667 declaration set: GO
+current runtime test files: 528
+current source top-level test declarations counted: 4671
+current full runtime proof for generated 4671 declaration set: GO
 full codebase audit completion from full runtime proof: NO-GO
 first optimization implementation approval from full runtime proof: NO-GO
 JSON-first first-class promotion from full runtime proof: NO-GO
@@ -1953,7 +1953,7 @@ runtime behavior changed by this continuation: no
 
 ```mermaid
 flowchart TD
-  A["4667 declaration source set"] --> B["Initial full runtime rerun"]
+  A["4671 declaration source set"] --> B["Initial full runtime rerun"]
   B --> C["2 audit-doc freshness failures"]
   C --> D["Repair native sync HEAD and truth-claim line refs"]
   D --> E["Focused drift repair proof: 10/10 pass"]
@@ -2391,9 +2391,9 @@ support runtime optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 63
-method semantic proof gap lexical callables covered: 5469
+method semantic proof gap lexical callables covered: 5473
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5469
+lexical callables requiring semantic proof before behavior changes: 5473
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
@@ -2700,7 +2700,7 @@ The same sample now closes the metric-sample documentation chain: 12 closure
 rows link all 12 sample rows, 12 inline metric sample JSON sections, 12
 manifest contract rows, 10 artifact path boundary rows, 12 foundation packet
 rows, 12 metric schema rows, 12 metric source-owner rows, 5 collector
-readiness families, 63 method semantic proof gap files, and 5,469 lexical
+readiness families, 63 method semantic proof gap files, and 5,473 lexical
 callables, while keeping runtime metric sample closure approvals 0,
 implementation-ready metric sample closure rows 0, metric sample draft closure
 `METRIC-SAMPLE-CHAIN-CLOSED`, and metric sample implementation readiness from
@@ -2728,7 +2728,7 @@ inline fixture provenance JSON sections, 12 source owner map contract rows, 12
 metric sample contract rows, 12 manifest contract rows, 10 artifact path
 boundary rows, 12 foundation packet rows, 12 metric schema rows, 12 metric
 source-owner rows, 5 collector readiness families, 63 method semantic proof
-gap files, and 5,469 lexical callables, while keeping runtime fixture
+gap files, and 5,473 lexical callables, while keeping runtime fixture
 provenance closure approvals 0, implementation-ready fixture provenance
 closure rows 0, fixture provenance draft closure
 `FIXTURE-PROVENANCE-CHAIN-CLOSED`, and fixture provenance implementation
@@ -2756,7 +2756,7 @@ inline no-work preservation JSON sections, 12 fixture provenance contract
 rows, 12 source owner map contract rows, 12 metric sample contract rows, 12
 manifest contract rows, 10 artifact path boundary rows, 12 foundation packet
 rows, 12 metric schema rows, 12 metric source-owner rows, 5 collector
-readiness families, 63 method semantic proof gap files, and 5,469 lexical
+readiness families, 63 method semantic proof gap files, and 5,473 lexical
 callables, while keeping runtime no-work preservation closure approvals 0,
 implementation-ready no-work preservation closure rows 0, no-work preservation
 draft closure `NO-WORK-PRESERVATION-CHAIN-CLOSED`, and no-work preservation
@@ -2785,7 +2785,7 @@ rows, 12 fixture provenance contract rows, 12 source owner map contract rows,
 12 metric sample contract rows, 12 manifest contract rows, 10 artifact path
 boundary rows, 12 foundation packet rows, 12 metric schema rows, 12 metric
 source-owner rows, 5 collector readiness families, 63 method semantic proof
-gap files, and 5,469 lexical callables, while keeping runtime side-effect
+gap files, and 5,473 lexical callables, while keeping runtime side-effect
 budget closure approvals 0, implementation-ready side-effect budget closure
 rows 0, side-effect budget draft closure
 `SIDE-EFFECT-BUDGET-CHAIN-CLOSED`, and side-effect budget implementation
@@ -2817,7 +2817,7 @@ source owner map contract rows, 12 metric sample contract rows, 12 manifest
 contract rows, 10 artifact path boundary rows, 12 foundation packet rows, 12
 metric schema rows, 12 metric source-owner rows, 5 collector readiness
 families, 21 diagnostic logging policy source files, 418 active console
-callsites, 63 method semantic proof gap files, and 5,469 lexical callables,
+callsites, 63 method semantic proof gap files, and 5,473 lexical callables,
 while keeping runtime diagnostic privacy closure approvals 0,
 implementation-ready diagnostic privacy closure rows 0, diagnostic privacy
 draft closure `DIAGNOSTIC-PRIVACY-CHAIN-CLOSED`, and diagnostic privacy
@@ -2848,7 +2848,7 @@ provenance contract rows, 12 source owner map contract rows, 12 metric sample
 contract rows, 12 manifest contract rows, 10 artifact path boundary rows, 12
 foundation packet rows, 12 metric schema rows, 12 metric source-owner rows, 5
 collector readiness families, 2 evidence parity rollout rows, 8 parity and
-release boundary source docs, 63 method semantic proof gap files, and 5,469
+release boundary source docs, 63 method semantic proof gap files, and 5,473
 lexical callables, while keeping runtime parity rollout closure approvals 0,
 implementation-ready parity rollout closure rows 0, parity rollout draft
 closure `PARITY-ROLLOUT-CHAIN-CLOSED`, and parity rollout implementation
@@ -2880,7 +2880,7 @@ no-work preservation contract rows, 12 fixture provenance contract rows, 12
 source owner map contract rows, 12 metric sample contract rows, 12 manifest
 contract rows, 10 artifact path boundary rows, 12 foundation packet rows, 12
 metric schema rows, 12 metric source-owner rows, 5 collector readiness
-families, 63 method semantic proof gap files, 5,469 lexical callables, 4,457
+families, 63 method semantic proof gap files, 5,473 lexical callables, 4,457
 expected runtime audit tests, 4,457 expected runtime audit passes, and 0
 expected runtime audit failures, while keeping runtime verification output
 closure approvals 0, persisted verification output closure approvals 0,

@@ -20,9 +20,9 @@ The current boundary is:
 Reserved route/surface metric artifact root: docs/audit/artifacts/json-first/route-surface-metric-artifact/
 Reserved route/surface metric artifact files covered: 5
 Method semantic proof gap files covered: 63
-Method semantic proof gap lexical callables covered: 5469
+Method semantic proof gap lexical callables covered: 5473
 Files with complete per-callable semantic proof: 0
-Lexical callables requiring semantic proof before behavior changes: 5469
+Lexical callables requiring semantic proof before behavior changes: 5473
 Committed route/surface metric artifact files: 0
 Runtime route/surface metric artifact approval exists: no
 Runtime metric collector approval exists: no
@@ -56,7 +56,7 @@ limits, raw-capture exclusion, and public-claim limits.
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_COLLECTOR_NO_WORK_PRESERVATION_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | Maps no-work preservation obligations while proving 0 runtime collector no-work proofs approved. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_COLLECTOR_SIDE_EFFECT_BUDGET_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | Maps collector side-effect budgets while proving 0 runtime collector side-effect budgets approved. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_COLLECTOR_FIXTURE_PROVENANCE_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | Maps collector fixture provenance while proving 0 runtime collector fixture packets approved. |
-| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 63 files and 5,469 lexical callables are still only lexically indexed, with 0 files carrying complete per-callable semantic proof. |
+| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 63 files and 5,473 lexical callables are still only lexically indexed, with 0 files carrying complete per-callable semantic proof. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_IMPLEMENTATION_READINESS_GATE_CURRENT_BEHAVIOR_2026-05-24.md` | Keeps first optimization implementation at NO-GO. |
 | `docs/audit/FILTERTUBE_OPTIMIZATION_STOP_GO_DECISION_RECORD_CURRENT_BEHAVIOR_2026-05-24.md` | Keeps stop-now JSON-first and whitelist optimization at NO-GO. |
 | `docs/audit/FILTERTUBE_RUNTIME_FIXTURE_RESULTS_2026-05-17.md` | Runtime proof is tracked in the audit harness, not as committed route/surface metric artifact files. |
@@ -85,9 +85,9 @@ reserved future metric artifact roots covered: 1
 reserved future metric artifact files covered: 5
 related first-optimization foundation sample paths covered: 1
 method semantic proof gap files covered: 63
-method semantic proof gap lexical callables covered: 5469
+method semantic proof gap lexical callables covered: 5473
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5469
+lexical callables requiring semantic proof before behavior changes: 5473
 metric artifact path boundary rows covered: 6
 metric artifact approval boundary rows covered: 12
 route/surface metric obligations covered: 12
@@ -211,7 +211,7 @@ coverage. The addendum pins 10 JSON-first route/surface metric artifact
 contract coverage rows, 10 metric artifact commit readiness rows covered, 5
 reserved future metric artifact files, 5 source metric foundation contract docs
 referenced, 5 route/surface-specific per-file metric artifact contracts
-covered, 63 method semantic proof gap files covered, 5,469 method semantic
+covered, 63 method semantic proof gap files covered, 5,473 method semantic
 proof gap lexical callables covered, 0 files with complete per-callable
 semantic proof, 0 committed route/surface metric artifact files, 0 runtime
 route/surface metric artifact approvals, 0 runtime metric collector approvals,
@@ -226,7 +226,7 @@ and
 keep this commit-readiness gate blocked while the route/surface metric sample
 is only contracted, not committed. The addendum pins 12 JSON-first
 route/surface metric sample contract rows, 10 metric artifact commit readiness
-rows covered, 63 method semantic proof gap files covered, 5,469 method
+rows covered, 63 method semantic proof gap files covered, 5,473 method
 semantic proof gap lexical callables covered, 0 files with complete
 per-callable semantic proof, 0 committed route/surface metric sample files, 0
 committed route/surface metric artifact files, 0 runtime route/surface metric
@@ -243,7 +243,7 @@ and
 keep this commit-readiness gate blocked while the route/surface no-work budget
 is only contracted, not committed. The addendum pins 12 JSON-first
 route/surface metric no-work budget contract rows, 10 metric artifact commit
-readiness rows covered, 63 method semantic proof gap files covered, 5,469
+readiness rows covered, 63 method semantic proof gap files covered, 5,473
 method semantic proof gap lexical callables covered, 0 files with complete
 per-callable semantic proof, 0 committed route/surface metric no-work budget
 files, 0 committed route/surface metric artifact files, 0 runtime
@@ -262,7 +262,7 @@ keep this commit-readiness gate blocked while the route/surface side-effect
 budget is only contracted, not committed. The addendum pins 12 JSON-first
 route/surface metric side-effect budget contract rows, 10 metric artifact
 commit readiness rows covered, 63 method semantic proof gap files covered,
-5,469 method semantic proof gap lexical callables covered, 0 files with
+5,473 method semantic proof gap lexical callables covered, 0 files with
 complete per-callable semantic proof, 0 committed route/surface metric
 side-effect budget files, 0 committed route/surface metric artifact files, 0
 runtime route/surface metric side-effect budget approvals, 0 runtime
@@ -280,7 +280,7 @@ keep this commit-readiness gate blocked while the route/surface fixture
 provenance packet is only contracted, not committed. The addendum pins 12
 JSON-first route/surface metric fixture provenance contract rows, 10 metric
 artifact commit readiness rows covered, 63 method semantic proof gap files
-covered, 5,469 method semantic proof gap lexical callables covered, 0 files
+covered, 5,473 method semantic proof gap lexical callables covered, 0 files
 with complete per-callable semantic proof, 0 committed route/surface metric
 fixture provenance files, 0 committed route/surface metric artifact files, 0
 runtime route/surface metric fixture provenance approvals, 0 runtime
@@ -298,7 +298,7 @@ keep this commit-readiness gate blocked while the route/surface verification
 output is only contracted, not committed. The addendum pins 12 JSON-first
 route/surface metric verification output contract rows, 10 metric artifact
 commit readiness rows covered, 63 method semantic proof gap files covered,
-5,469 method semantic proof gap lexical callables covered, 0 files with
+5,473 method semantic proof gap lexical callables covered, 0 files with
 complete per-callable semantic proof, 0 committed route/surface metric
 verification output files, 0 committed route/surface metric artifact files, 0
 runtime route/surface metric verification output approvals, 0 runtime

@@ -29,9 +29,9 @@ Runtime route/surface metric no-work budget approval exists: no
 Runtime route/surface metric artifact approval exists: no
 Runtime metric collector approval exists: no
 Method semantic proof gap files covered: 63
-Method semantic proof gap lexical callables covered: 5469
+Method semantic proof gap lexical callables covered: 5473
 Files with complete per-callable semantic proof: 0
-Lexical callables requiring semantic proof before behavior changes: 5469
+Lexical callables requiring semantic proof before behavior changes: 5473
 Implementation-ready JSON-first route/surface metric no-work budget contract rows: 0
 ```
 
@@ -66,7 +66,7 @@ release/public claim scope.
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_COLLECTOR_FIXTURE_PROVENANCE_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | Maps collector fixture provenance while proving 0 runtime collector fixture packets approved. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_SOURCE_LOCUS_NO_WORK_OWNERSHIP_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Maps no-work source-locus ownership while proving 0 implementation-ready source-locus no-work rows. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_COLLECTOR_NO_WORK_APPROVAL_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Proves no-work contracts and matrices are not runtime no-work approval. |
-| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 63 tracked JS/JSX/MJS files still have 5469 lexical callables requiring per-callable semantic proof before behavior changes. |
+| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 63 tracked JS/JSX/MJS files still have 5473 lexical callables requiring per-callable semantic proof before behavior changes. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_IMPLEMENTATION_READINESS_GATE_CURRENT_BEHAVIOR_2026-05-24.md` | Keeps first optimization implementation at NO-GO. |
 | `docs/audit/FILTERTUBE_RUNTIME_FIXTURE_RESULTS_2026-05-17.md` | Runtime proof is tracked in the audit harness, not as a committed route/surface metric no-work artifact. |
 
@@ -94,9 +94,9 @@ metric collector fixture provenance rows covered: 12
 source-locus no-work rows covered: 12
 collector no-work approval rows covered: 12
 method semantic proof gap files covered: 63
-method semantic proof gap lexical callables covered: 5469
+method semantic proof gap lexical callables covered: 5473
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5469
+lexical callables requiring semantic proof before behavior changes: 5473
 committed route/surface metric no-work budget files: 0
 committed route/surface metric artifact files: 0
 committed first-optimization foundation no-work preservation files: 0

@@ -6,6 +6,7 @@ import assert from 'node:assert/strict';
 
 const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_CURRENT_DIRTY_WORKTREE_AUDIT_BOUNDARY_CURRENT_BEHAVIOR_2026-05-23.md';
+const releaseLagCommit = '9816c34';
 
 const expectedNumstatRows = [
   ['README.md', 44, 26, 'public documentation claim surface'],
@@ -95,7 +96,14 @@ test('current dirty worktree boundary doc is audit-only and keeps implementation
 
 test('tracked dirty numstat matches the audited current worktree boundary', () => {
   const doc = read(docPath);
-  const rows = parseNumstat(gitLines(['diff', '--numstat', '--', ...expectedNumstatRows.map(([file]) => file)]));
+  const rows = parseNumstat(gitLines([
+    'show',
+    '--numstat',
+    '--format=',
+    releaseLagCommit,
+    '--',
+    ...expectedNumstatRows.map(([file]) => file)
+  ]));
 
   assert.deepEqual(rows, expectedNumstatRows.map(([file, additions, deletions]) => [file, additions, deletions]));
   assert.equal(rows.length, 27);
@@ -112,7 +120,7 @@ test('tracked dirty numstat matches the audited current worktree boundary', () =
 test('state manager tracked diff includes main profile alias normalization boundary', () => {
   const doc = read(docPath);
   const stateManager = read('js/state_manager.js');
-  const diff = gitRaw(['diff', '--unified=0', '--', 'js/state_manager.js']);
+  const diff = gitRaw(['show', '--unified=0', '--format=', releaseLagCommit, '--', 'js/state_manager.js']);
   const changedLines = diff.split('\n').filter(line => /^[+-]/.test(line) && !/^(---|\+\+\+)/.test(line));
   const addedLines = changedLines.filter(line => line.startsWith('+'));
   const removedLines = changedLines.filter(line => line.startsWith('-'));
@@ -142,7 +150,7 @@ test('state manager tracked diff includes main profile alias normalization bound
 test('package script diff only adds the runtime audit command', () => {
   const doc = read(docPath);
   const pkg = readJson('package.json');
-  const diff = gitRaw(['diff', '--unified=0', '--', 'package.json']);
+  const diff = gitRaw(['show', '--unified=0', '--format=', releaseLagCommit, '--', 'package.json']);
   const changedLines = diff.split('\n').filter(line => /^[+-]/.test(line) && !/^(---|\+\+\+)/.test(line));
   const addedLines = changedLines.filter(line => line.startsWith('+'));
   const removedLines = changedLines.filter(line => line.startsWith('-'));

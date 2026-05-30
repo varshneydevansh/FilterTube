@@ -44,9 +44,9 @@ test('renderer and source coverage docs carry the method proof gap blocker', () 
 
   for (const phrase of [
     'tracked JS/JSX/MJS files: 63',
-    'repo-wide lexical callables: 5469',
+    'repo-wide lexical callables: 5473',
     'files with complete per-callable semantic proof: 0',
-    'lexical callables requiring semantic proof before behavior changes: 5469',
+    'lexical callables requiring semantic proof before behavior changes: 5473',
     'optimization work and a first-class JSON\nfilter model remain blocked',
     'runtime behavior changed: no'
   ]) {
@@ -56,7 +56,7 @@ test('renderer and source coverage docs carry the method proof gap blocker', () 
   for (const docPath of rendererSourceReadinessDocs) {
     const doc = source(docPath);
     assert.ok(doc.includes(methodGapPath), `${docPath} must cite method semantic gap source`);
-    assert.ok(doc.includes('method semantic proof gap lexical callables covered: 5469'), `${docPath} must pin callable gap count`);
+    assert.ok(doc.includes('method semantic proof gap lexical callables covered: 5473'), `${docPath} must pin callable gap count`);
     assert.ok(doc.includes('affected callable semantic proof: NO-GO'), `${docPath} must keep behavior-change blocker`);
     assert.ok(doc.includes('runtime behavior changed: no'), `${docPath} must preserve audit-only boundary`);
   }

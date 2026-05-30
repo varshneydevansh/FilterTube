@@ -215,9 +215,9 @@ test('JSON-first route/surface metric sample contract is audit-only and source-b
   assert.match(doc, /Runtime route\/surface metric artifact approval exists: no/);
   assert.match(doc, /Runtime metric collector approval exists: no/);
   assert.match(doc, /Method semantic proof gap files covered: 63/);
-  assert.match(doc, /Method semantic proof gap lexical callables covered: 5469/);
+  assert.match(doc, /Method semantic proof gap lexical callables covered: 5473/);
   assert.match(doc, /Files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /Lexical callables requiring semantic proof before behavior changes: 5469/);
+  assert.match(doc, /Lexical callables requiring semantic proof before behavior changes: 5473/);
   assert.match(doc, /Implementation-ready JSON-first route\/surface metric sample contract rows: 0/);
   assert.match(doc, /not completion proof for JSON-first route\/surface metric sample authority/);
 
@@ -250,9 +250,9 @@ test('JSON-first route/surface metric sample rows counts and fields stay pinned'
   assert.match(doc, /metric collector side-effect rows covered: 12/);
   assert.match(doc, /metric collector fixture provenance rows covered: 12/);
   assert.match(doc, /method semantic proof gap files covered: 63/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5469/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5473/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5469/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5473/);
   assert.match(doc, /committed route\/surface metric sample files: 0/);
   assert.match(doc, /committed route\/surface metric artifact files: 0/);
   assert.match(doc, /committed first-optimization foundation metric sample files: 0/);
@@ -318,7 +318,7 @@ test('JSON-first route/surface metric sample contract is backed by current NO-GO
   assert.match(collectorSideEffect, /runtime collector side-effect budgets approved: 0/);
   assert.match(collectorFixture, /runtime collector fixture packets approved: 0/);
   assert.match(methodGap, /files with lexical accounting: 63/);
-  assert.match(methodGap, /repo-wide lexical callables: 5469/);
+  assert.match(methodGap, /repo-wide lexical callables: 5473/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
   assert.match(implementationReadiness, /implementation-ready first optimization rows: 0/);
 });

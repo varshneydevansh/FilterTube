@@ -1618,9 +1618,9 @@ function assertReleaseHotPathProofStackAddendum(source) {
   assert.match(source, /focused drift repair proof: 10\/10 pass/);
   assert.match(source, /fresh full runtime command: node --test --test-reporter=dot tests\/runtime\/\*\.test\.mjs/);
   assert.match(source, /fresh full runtime exit status for current source set: 0/);
-  assert.match(source, /current runtime test files: 527/);
-  assert.match(source, /current source top-level test declarations counted: 4667/);
-  assert.match(source, /current full runtime proof for generated 4667 declaration set: GO/);
+  assert.match(source, /current runtime test files: 528/);
+  assert.match(source, /current source top-level test declarations counted: 4671/);
+  assert.match(source, /current full runtime proof for generated 4671 declaration set: GO/);
   assert.match(source, /full codebase audit completion from full runtime proof: NO-GO/);
   assert.match(source, /first optimization implementation approval from full runtime proof: NO-GO/);
   assert.match(source, /JSON-first first-class promotion from full runtime proof: NO-GO/);
@@ -2414,11 +2414,11 @@ function assertRuntimeCountReconciliationAddendum(source) {
 
   assert.match(source, /Runtime Count Reconciliation Authority Addendum - 2026-05-27/);
   assert.match(source, /old metric contract rows that still say `4457`/);
-  assert.match(source, /runtime test index moved to\s+`4667` source top-level declarations/);
+  assert.match(source, /runtime test index moved to\s+`4671` source top-level declarations/);
   assert.match(source, /count-reconciled optimization readiness: NO-GO/);
   assert.match(source, /count-reconciliation proof slices: 3/);
   assert.match(source, /legacy metric contract expected tests: 4457/);
-  assert.match(source, /current generated runtime test declarations: 4667/);
+  assert.match(source, /current generated runtime test declarations: 4671/);
   assert.match(source, /latest full runtime pass count observed: 4663/);
   assert.match(source, /latest full runtime pass freshness: 2026-05-30 full runtime rerun covers 4663 generated declarations before 4 later audit-only content-filter declarations/);
   assert.match(source, /first-optimization count reconciliation status: BLOCKED/);
@@ -2443,7 +2443,7 @@ function assertRuntimeCountReconciliationAddendum(source) {
 
   assert.match(metricGate, /Runtime Count Reconciliation Addendum - 2026-05-27/);
   assert.match(metricGate, /legacy metric contract expected tests: 4457/);
-  assert.match(metricGate, /current generated runtime test declarations: 4667/);
+  assert.match(metricGate, /current generated runtime test declarations: 4671/);
   assert.match(metricGate, /latest full runtime pass count observed: 4663/);
   assert.match(metricGate, /latest full runtime pass freshness: 2026-05-30 full runtime rerun covers 4663 generated declarations before 4 later audit-only content-filter declarations/);
   assert.match(metricGate, /count reconciliation status for metric foundation: BLOCKED/);
@@ -2471,11 +2471,11 @@ function assertRuntimeCountReconciliationAddendum(source) {
   assert.match(metricGate, /accept coverage closure as JSON-first runtime behavior approval now: NO-GO/);
   assert.match(metricGate, /accept coverage closure as whitelist optimization approval now: NO-GO/);
   assert.match(metricGate, /accept coverage closure as release\/public-claim approval now: NO-GO/);
-  assert.match(runtimeTestIndex, /source top-level test declarations counted: 4667/);
+  assert.match(runtimeTestIndex, /source top-level test declarations counted: 4671/);
   assert.match(releaseRegression, /node --test --test-reporter=tap tests\/runtime\/\*\.test\.mjs/);
   assert.match(releaseRegression, /stored TAP output: \/private\/tmp\/filtertube-runtime-full-after-lifecycle-convergence\.tap/);
   assert.match(releaseRegression, /full runtime proof result: 4663\/4663 pass, 0 fail, 83\.213s/);
-  assert.equal(sourceStats.declarations, 4667);
+  assert.equal(sourceStats.declarations, 4671);
 
   assert.match(source, /Runtime Count Drift Census Addendum - 2026-05-27/);
   assert.match(source, /census exclusions: this gap register and its verifier/);
@@ -2496,12 +2496,12 @@ function assertRuntimeCountReconciliationAddendum(source) {
   assert.match(source, /Keep optimization, JSON-first promotion, whitelist changes, and broad audit completion blocked/);
   assert.match(runtimeResults, /Historical 2026-05-17 ledger snapshot:/);
   assert.match(runtimeResults, /historical snapshot count above: 4457/);
-  assert.match(runtimeResults, /current generated source top-level declarations: 4667/);
+  assert.match(runtimeResults, /current generated source top-level declarations: 4671/);
   assert.match(runtimeResults, /latest full runtime pass evidence: current 4663\/4663 pass, 0 fail, 83\.213s/);
   assert.match(runtimeResults, /stored TAP output: \/private\/tmp\/filtertube-runtime-full-after-lifecycle-convergence\.tap/);
   assert.match(runtimeResults, /runtime-results ledger completion authority: NO-GO/);
 
-  assert.equal(driftStats.scannedFiles, 1072);
+  assert.equal(driftStats.scannedFiles, 1074);
   assert.equal(driftStats.legacy.occurrences, 1230);
   assert.equal(driftStats.legacy.fileCount, 167);
   assert.equal(driftStats.current.occurrences, 11);
@@ -2707,7 +2707,7 @@ function assertSourceOwnerMapDraftReadinessClosure(source) {
   assert.match(draft, /source-owner approval rows covered: 12/);
   assert.match(draft, /inline draft JSON sections covered: 12/);
   assert.match(draft, /inline draft JSON artifact promotion decision: NO-GO/);
-  assert.match(draft, /method semantic proof gap lexical callables covered: 5469/);
+  assert.match(draft, /method semantic proof gap lexical callables covered: 5473/);
   assert.match(draft, /files with complete per-callable semantic proof: 0/);
   assert.match(draft, /source-owner draft closure rows: 12/);
   assert.match(draft, /source-owner draft rows linked by closure: 12/);
@@ -2804,7 +2804,7 @@ function assertMetricSampleDraftClosure(source) {
   assert.match(source, /reserved\s+`docs\/audit\/artifacts\/first-optimization\/metric-foundation\/metric-sample\.json`\s+file is absent/);
   assert.match(source, /Metric sample artifact promotion, collector insertion,\s+JSON-first runtime behavior changes, whitelist optimization/);
   assert.match(source, /closes the metric-sample documentation chain/);
-  assert.match(source, /12 closure\s+rows link all 12 sample rows, 12 inline metric sample JSON sections, 12\s+manifest contract rows, 10 artifact path boundary rows, 12 foundation packet\s+rows, 12 metric schema rows, 12 metric source-owner rows, 5 collector\s+readiness families, 63 method semantic proof gap files, and 5,469 lexical\s+callables/);
+  assert.match(source, /12 closure\s+rows link all 12 sample rows, 12 inline metric sample JSON sections, 12\s+manifest contract rows, 10 artifact path boundary rows, 12 foundation packet\s+rows, 12 metric schema rows, 12 metric source-owner rows, 5 collector\s+readiness families, 63 method semantic proof gap files, and 5,473 lexical\s+callables/);
   assert.match(source, /runtime metric sample closure approvals 0,\s+implementation-ready metric sample closure rows 0/);
   assert.match(source, /metric sample draft closure\s+`METRIC-SAMPLE-CHAIN-CLOSED`/);
   assert.match(source, /metric sample implementation readiness from\s+closure `NO-GO`/);
@@ -2826,9 +2826,9 @@ function assertMetricSampleDraftClosure(source) {
   assert.match(sample, /collector fixture provenance rows covered: 12/);
   assert.match(sample, /collector parity rollout rows covered: 12/);
   assert.match(sample, /method semantic proof gap files covered: 63/);
-  assert.match(sample, /method semantic proof gap lexical callables covered: 5469/);
+  assert.match(sample, /method semantic proof gap lexical callables covered: 5473/);
   assert.match(sample, /files with complete per-callable semantic proof: 0/);
-  assert.match(sample, /lexical callables requiring semantic proof before behavior changes: 5469/);
+  assert.match(sample, /lexical callables requiring semantic proof before behavior changes: 5473/);
   assert.match(sample, /inline metric sample JSON sections covered: 12/);
   assert.match(sample, /inline metric sample artifact promotion decision: NO-GO/);
   assert.match(sample, /metric sample draft closure rows: 12/);
@@ -2841,7 +2841,7 @@ function assertMetricSampleDraftClosure(source) {
   assert.match(sample, /metric source-owner rows linked by sample closure: 12/);
   assert.match(sample, /collector readiness families linked by sample closure: 5/);
   assert.match(sample, /method semantic proof gap files linked by sample closure: 63/);
-  assert.match(sample, /lexical callables linked by sample closure: 5469/);
+  assert.match(sample, /lexical callables linked by sample closure: 5473/);
   assert.match(sample, /runtime metric sample closure approvals: 0/);
   assert.match(sample, /implementation-ready metric sample closure rows: 0/);
   assert.match(sample, /metric sample draft closure: METRIC-SAMPLE-CHAIN-CLOSED/);
@@ -2873,7 +2873,7 @@ function assertFixtureProvenanceDraftClosure(source) {
   assert.match(source, /reserved\s+`docs\/audit\/artifacts\/first-optimization\/metric-foundation\/fixture-provenance\.json`\s+file is absent/);
   assert.match(source, /Fixture provenance artifact promotion, collector insertion,\s+JSON-first runtime behavior changes, whitelist optimization/);
   assert.match(source, /closes the fixture-provenance\s+documentation chain/);
-  assert.match(source, /12 closure rows link all 12 fixture provenance rows, 12\s+inline fixture provenance JSON sections, 12 source owner map contract rows, 12\s+metric sample contract rows, 12 manifest contract rows, 10 artifact path\s+boundary rows, 12 foundation packet rows, 12 metric schema rows, 12 metric\s+source-owner rows, 5 collector readiness families, 63 method semantic proof\s+gap files, and 5,469 lexical callables/);
+  assert.match(source, /12 closure rows link all 12 fixture provenance rows, 12\s+inline fixture provenance JSON sections, 12 source owner map contract rows, 12\s+metric sample contract rows, 12 manifest contract rows, 10 artifact path\s+boundary rows, 12 foundation packet rows, 12 metric schema rows, 12 metric\s+source-owner rows, 5 collector readiness families, 63 method semantic proof\s+gap files, and 5,473 lexical callables/);
   assert.match(source, /runtime fixture\s+provenance closure approvals 0, implementation-ready fixture provenance\s+closure rows 0/);
   assert.match(source, /fixture provenance draft closure\s+`FIXTURE-PROVENANCE-CHAIN-CLOSED`/);
   assert.match(source, /fixture provenance implementation\s+readiness from closure `NO-GO`/);
@@ -2897,9 +2897,9 @@ function assertFixtureProvenanceDraftClosure(source) {
   assert.match(fixture, /collector fixture provenance rows covered: 12/);
   assert.match(fixture, /collector parity rollout rows covered: 12/);
   assert.match(fixture, /method semantic proof gap files covered: 63/);
-  assert.match(fixture, /method semantic proof gap lexical callables covered: 5469/);
+  assert.match(fixture, /method semantic proof gap lexical callables covered: 5473/);
   assert.match(fixture, /files with complete per-callable semantic proof: 0/);
-  assert.match(fixture, /lexical callables requiring semantic proof before behavior changes: 5469/);
+  assert.match(fixture, /lexical callables requiring semantic proof before behavior changes: 5473/);
   assert.match(fixture, /inline fixture provenance JSON sections covered: 12/);
   assert.match(fixture, /inline fixture provenance artifact promotion decision: NO-GO/);
   assert.match(fixture, /fixture provenance draft closure rows: 12/);
@@ -2914,7 +2914,7 @@ function assertFixtureProvenanceDraftClosure(source) {
   assert.match(fixture, /metric source-owner rows linked by fixture closure: 12/);
   assert.match(fixture, /collector readiness families linked by fixture closure: 5/);
   assert.match(fixture, /method semantic proof gap files linked by fixture closure: 63/);
-  assert.match(fixture, /lexical callables linked by fixture closure: 5469/);
+  assert.match(fixture, /lexical callables linked by fixture closure: 5473/);
   assert.match(fixture, /runtime fixture provenance closure approvals: 0/);
   assert.match(fixture, /implementation-ready fixture provenance closure rows: 0/);
   assert.match(fixture, /fixture provenance draft closure: FIXTURE-PROVENANCE-CHAIN-CLOSED/);
@@ -2946,7 +2946,7 @@ function assertNoWorkPreservationDraftClosure(source) {
   assert.match(source, /reserved\s+`docs\/audit\/artifacts\/first-optimization\/metric-foundation\/no-work-preservation\.json`\s+file is absent/);
   assert.match(source, /No-work preservation artifact promotion, collector insertion,\s+JSON-first runtime behavior changes, whitelist optimization/);
   assert.match(source, /closes the no-work preservation\s+documentation chain/);
-  assert.match(source, /12 closure rows link all 12 no-work preservation rows, 12\s+inline no-work preservation JSON sections, 12 fixture provenance contract\s+rows, 12 source owner map contract rows, 12 metric sample contract rows, 12\s+manifest contract rows, 10 artifact path boundary rows, 12 foundation packet\s+rows, 12 metric schema rows, 12 metric source-owner rows, 5 collector\s+readiness families, 63 method semantic proof gap files, and 5,469 lexical\s+callables/);
+  assert.match(source, /12 closure rows link all 12 no-work preservation rows, 12\s+inline no-work preservation JSON sections, 12 fixture provenance contract\s+rows, 12 source owner map contract rows, 12 metric sample contract rows, 12\s+manifest contract rows, 10 artifact path boundary rows, 12 foundation packet\s+rows, 12 metric schema rows, 12 metric source-owner rows, 5 collector\s+readiness families, 63 method semantic proof gap files, and 5,473 lexical\s+callables/);
   assert.match(source, /runtime no-work preservation closure approvals 0,\s+implementation-ready no-work preservation closure rows 0/);
   assert.match(source, /no-work preservation\s+draft closure `NO-WORK-PRESERVATION-CHAIN-CLOSED`/);
   assert.match(source, /no-work preservation\s+implementation readiness from closure `NO-GO`/);
@@ -2971,9 +2971,9 @@ function assertNoWorkPreservationDraftClosure(source) {
   assert.match(noWork, /collector fixture provenance rows covered: 12/);
   assert.match(noWork, /collector parity rollout rows covered: 12/);
   assert.match(noWork, /method semantic proof gap files covered: 63/);
-  assert.match(noWork, /method semantic proof gap lexical callables covered: 5469/);
+  assert.match(noWork, /method semantic proof gap lexical callables covered: 5473/);
   assert.match(noWork, /files with complete per-callable semantic proof: 0/);
-  assert.match(noWork, /lexical callables requiring semantic proof before behavior changes: 5469/);
+  assert.match(noWork, /lexical callables requiring semantic proof before behavior changes: 5473/);
   assert.match(noWork, /inline no-work preservation JSON sections covered: 12/);
   assert.match(noWork, /inline no-work preservation artifact promotion decision: NO-GO/);
   assert.match(noWork, /no-work preservation draft closure rows: 12/);
@@ -2989,7 +2989,7 @@ function assertNoWorkPreservationDraftClosure(source) {
   assert.match(noWork, /metric source-owner rows linked by no-work closure: 12/);
   assert.match(noWork, /collector readiness families linked by no-work closure: 5/);
   assert.match(noWork, /method semantic proof gap files linked by no-work closure: 63/);
-  assert.match(noWork, /lexical callables linked by no-work closure: 5469/);
+  assert.match(noWork, /lexical callables linked by no-work closure: 5473/);
   assert.match(noWork, /runtime no-work preservation closure approvals: 0/);
   assert.match(noWork, /implementation-ready no-work preservation closure rows: 0/);
   assert.match(noWork, /no-work preservation draft closure: NO-WORK-PRESERVATION-CHAIN-CLOSED/);
@@ -3021,7 +3021,7 @@ function assertSideEffectBudgetDraftClosure(source) {
   assert.match(source, /reserved\s+`docs\/audit\/artifacts\/first-optimization\/metric-foundation\/side-effect-budget\.json`\s+file is absent/);
   assert.match(source, /Side-effect budget artifact promotion, collector insertion,\s+JSON-first runtime behavior changes, whitelist optimization/);
   assert.match(source, /closes the side-effect budget\s+documentation chain/);
-  assert.match(source, /12 closure rows link all 12 side-effect budget rows, 12\s+inline side-effect budget JSON sections, 12 no-work preservation contract\s+rows, 12 fixture provenance contract rows, 12 source owner map contract rows,\s+12 metric sample contract rows, 12 manifest contract rows, 10 artifact path\s+boundary rows, 12 foundation packet rows, 12 metric schema rows, 12 metric\s+source-owner rows, 5 collector readiness families, 63 method semantic proof\s+gap files, and 5,469 lexical callables/);
+  assert.match(source, /12 closure rows link all 12 side-effect budget rows, 12\s+inline side-effect budget JSON sections, 12 no-work preservation contract\s+rows, 12 fixture provenance contract rows, 12 source owner map contract rows,\s+12 metric sample contract rows, 12 manifest contract rows, 10 artifact path\s+boundary rows, 12 foundation packet rows, 12 metric schema rows, 12 metric\s+source-owner rows, 5 collector readiness families, 63 method semantic proof\s+gap files, and 5,473 lexical callables/);
   assert.match(source, /runtime side-effect\s+budget closure approvals 0, implementation-ready side-effect budget closure\s+rows 0/);
   assert.match(source, /side-effect budget draft closure\s+`SIDE-EFFECT-BUDGET-CHAIN-CLOSED`/);
   assert.match(source, /side-effect budget implementation\s+readiness from closure `NO-GO`/);
@@ -3047,9 +3047,9 @@ function assertSideEffectBudgetDraftClosure(source) {
   assert.match(sideEffect, /collector fixture provenance rows covered: 12/);
   assert.match(sideEffect, /collector parity rollout rows covered: 12/);
   assert.match(sideEffect, /method semantic proof gap files covered: 63/);
-  assert.match(sideEffect, /method semantic proof gap lexical callables covered: 5469/);
+  assert.match(sideEffect, /method semantic proof gap lexical callables covered: 5473/);
   assert.match(sideEffect, /files with complete per-callable semantic proof: 0/);
-  assert.match(sideEffect, /lexical callables requiring semantic proof before behavior changes: 5469/);
+  assert.match(sideEffect, /lexical callables requiring semantic proof before behavior changes: 5473/);
   assert.match(sideEffect, /inline side-effect budget JSON sections covered: 12/);
   assert.match(sideEffect, /inline side-effect budget artifact promotion decision: NO-GO/);
   assert.match(sideEffect, /side-effect budget draft closure rows: 12/);
@@ -3066,7 +3066,7 @@ function assertSideEffectBudgetDraftClosure(source) {
   assert.match(sideEffect, /metric source-owner rows linked by side-effect closure: 12/);
   assert.match(sideEffect, /collector readiness families linked by side-effect closure: 5/);
   assert.match(sideEffect, /method semantic proof gap files linked by side-effect closure: 63/);
-  assert.match(sideEffect, /lexical callables linked by side-effect closure: 5469/);
+  assert.match(sideEffect, /lexical callables linked by side-effect closure: 5473/);
   assert.match(sideEffect, /runtime side-effect budget closure approvals: 0/);
   assert.match(sideEffect, /implementation-ready side-effect budget closure rows: 0/);
   assert.match(sideEffect, /side-effect budget draft closure: SIDE-EFFECT-BUDGET-CHAIN-CLOSED/);
@@ -3098,7 +3098,7 @@ function assertDiagnosticPrivacyDraftClosure(source) {
   assert.match(source, /reserved\s+`docs\/audit\/artifacts\/first-optimization\/metric-foundation\/diagnostic-privacy\.json`\s+file is absent/);
   assert.match(source, /Diagnostic privacy artifact promotion, collector insertion,\s+diagnostic logging removal, JSON-first runtime behavior changes, whitelist/);
   assert.match(source, /closes the diagnostic privacy\s+documentation chain/);
-  assert.match(source, /12 closure rows link all 12 diagnostic privacy rows, 12\s+inline diagnostic privacy JSON sections, 12 side-effect budget contract rows,\s+12 no-work preservation contract rows, 12 fixture provenance contract rows, 12\s+source owner map contract rows, 12 metric sample contract rows, 12 manifest\s+contract rows, 10 artifact path boundary rows, 12 foundation packet rows, 12\s+metric schema rows, 12 metric source-owner rows, 5 collector readiness\s+families, 21 diagnostic logging policy source files, 418 active console\s+callsites, 63 method semantic proof gap files, and 5,469 lexical callables/);
+  assert.match(source, /12 closure rows link all 12 diagnostic privacy rows, 12\s+inline diagnostic privacy JSON sections, 12 side-effect budget contract rows,\s+12 no-work preservation contract rows, 12 fixture provenance contract rows, 12\s+source owner map contract rows, 12 metric sample contract rows, 12 manifest\s+contract rows, 10 artifact path boundary rows, 12 foundation packet rows, 12\s+metric schema rows, 12 metric source-owner rows, 5 collector readiness\s+families, 21 diagnostic logging policy source files, 418 active console\s+callsites, 63 method semantic proof gap files, and 5,473 lexical callables/);
   assert.match(source, /runtime diagnostic privacy closure approvals 0,\s+implementation-ready diagnostic privacy closure rows 0/);
   assert.match(source, /diagnostic privacy\s+draft closure `DIAGNOSTIC-PRIVACY-CHAIN-CLOSED`/);
   assert.match(source, /diagnostic privacy\s+implementation readiness from closure `NO-GO`/);
@@ -3132,9 +3132,9 @@ function assertDiagnosticPrivacyDraftClosure(source) {
   assert.match(diagnostic, /console\.debug callsites covered: 24/);
   assert.match(diagnostic, /console\.info callsites covered: 0/);
   assert.match(diagnostic, /method semantic proof gap files covered: 63/);
-  assert.match(diagnostic, /method semantic proof gap lexical callables covered: 5469/);
+  assert.match(diagnostic, /method semantic proof gap lexical callables covered: 5473/);
   assert.match(diagnostic, /files with complete per-callable semantic proof: 0/);
-  assert.match(diagnostic, /lexical callables requiring semantic proof before behavior changes: 5469/);
+  assert.match(diagnostic, /lexical callables requiring semantic proof before behavior changes: 5473/);
   assert.match(diagnostic, /inline diagnostic privacy JSON sections covered: 12/);
   assert.match(diagnostic, /inline diagnostic privacy artifact promotion decision: NO-GO/);
   assert.match(diagnostic, /diagnostic privacy draft closure rows: 12/);
@@ -3154,7 +3154,7 @@ function assertDiagnosticPrivacyDraftClosure(source) {
   assert.match(diagnostic, /diagnostic logging policy source files linked by diagnostic closure: 21/);
   assert.match(diagnostic, /active console callsites linked by diagnostic closure: 418/);
   assert.match(diagnostic, /method semantic proof gap files linked by diagnostic closure: 63/);
-  assert.match(diagnostic, /lexical callables linked by diagnostic closure: 5469/);
+  assert.match(diagnostic, /lexical callables linked by diagnostic closure: 5473/);
   assert.match(diagnostic, /runtime diagnostic privacy closure approvals: 0/);
   assert.match(diagnostic, /implementation-ready diagnostic privacy closure rows: 0/);
   assert.match(diagnostic, /diagnostic privacy draft closure: DIAGNOSTIC-PRIVACY-CHAIN-CLOSED/);
@@ -3188,7 +3188,7 @@ function assertParityRolloutDraftClosure(source) {
   assert.match(source, /reserved\s+`docs\/audit\/artifacts\/first-optimization\/metric-foundation\/parity-rollout\.json`\s+file is absent/);
   assert.match(source, /Parity rollout artifact promotion, collector insertion,\s+JSON-first runtime behavior changes, whitelist optimization, native sync/);
   assert.match(source, /closes the parity rollout documentation\s+chain/);
-  assert.match(source, /12 closure rows link all 12 parity rollout rows, 12 inline parity\s+rollout JSON sections, 12 diagnostic privacy contract rows, 12 side-effect\s+budget contract rows, 12 no-work preservation contract rows, 12 fixture\s+provenance contract rows, 12 source owner map contract rows, 12 metric sample\s+contract rows, 12 manifest contract rows, 10 artifact path boundary rows, 12\s+foundation packet rows, 12 metric schema rows, 12 metric source-owner rows, 5\s+collector readiness families, 2 evidence parity rollout rows, 8 parity and\s+release boundary source docs, 63 method semantic proof gap files, and 5,469\s+lexical callables/);
+  assert.match(source, /12 closure rows link all 12 parity rollout rows, 12 inline parity\s+rollout JSON sections, 12 diagnostic privacy contract rows, 12 side-effect\s+budget contract rows, 12 no-work preservation contract rows, 12 fixture\s+provenance contract rows, 12 source owner map contract rows, 12 metric sample\s+contract rows, 12 manifest contract rows, 10 artifact path boundary rows, 12\s+foundation packet rows, 12 metric schema rows, 12 metric source-owner rows, 5\s+collector readiness families, 2 evidence parity rollout rows, 8 parity and\s+release boundary source docs, 63 method semantic proof gap files, and 5,473\s+lexical callables/);
   assert.match(source, /runtime parity rollout closure approvals 0,\s+implementation-ready parity rollout closure rows 0/);
   assert.match(source, /parity rollout draft\s+closure `PARITY-ROLLOUT-CHAIN-CLOSED`/);
   assert.match(source, /parity rollout implementation\s+readiness from closure `NO-GO`/);
@@ -3218,9 +3218,9 @@ function assertParityRolloutDraftClosure(source) {
   assert.match(parity, /evidence parity rollout rows covered: 2/);
   assert.match(parity, /parity and release boundary source docs covered: 8/);
   assert.match(parity, /method semantic proof gap files covered: 63/);
-  assert.match(parity, /method semantic proof gap lexical callables covered: 5469/);
+  assert.match(parity, /method semantic proof gap lexical callables covered: 5473/);
   assert.match(parity, /files with complete per-callable semantic proof: 0/);
-  assert.match(parity, /lexical callables requiring semantic proof before behavior changes: 5469/);
+  assert.match(parity, /lexical callables requiring semantic proof before behavior changes: 5473/);
   assert.match(parity, /inline parity rollout JSON sections covered: 12/);
   assert.match(parity, /inline parity rollout artifact promotion decision: NO-GO/);
   assert.match(parity, /parity rollout draft closure rows: 12/);
@@ -3241,7 +3241,7 @@ function assertParityRolloutDraftClosure(source) {
   assert.match(parity, /evidence parity rollout rows linked by parity closure: 2/);
   assert.match(parity, /parity and release boundary source docs linked by parity closure: 8/);
   assert.match(parity, /method semantic proof gap files linked by parity closure: 63/);
-  assert.match(parity, /lexical callables linked by parity closure: 5469/);
+  assert.match(parity, /lexical callables linked by parity closure: 5473/);
   assert.match(parity, /runtime parity rollout closure approvals: 0/);
   assert.match(parity, /implementation-ready parity rollout closure rows: 0/);
   assert.match(parity, /parity rollout draft closure: PARITY-ROLLOUT-CHAIN-CLOSED/);
@@ -3278,7 +3278,7 @@ function assertVerificationOutputDraftClosure(source) {
   assert.match(source, /reserved\s+`docs\/audit\/artifacts\/first-optimization\/metric-foundation\/verification-output\.tap`\s+file is absent/);
   assert.match(source, /Verification output persistence, artifact promotion, collector\s+insertion, JSON-first runtime behavior changes, whitelist optimization, native\s+sync, release packages, public claim use/);
   assert.match(source, /closes the verification output\s+documentation chain/);
-  assert.match(source, /12 closure rows link all 12 verification output rows, 12\s+inline verification output JSON sections, 12 parity rollout contract rows, 12\s+diagnostic privacy contract rows, 12 side-effect budget contract rows, 12\s+no-work preservation contract rows, 12 fixture provenance contract rows, 12\s+source owner map contract rows, 12 metric sample contract rows, 12 manifest\s+contract rows, 10 artifact path boundary rows, 12 foundation packet rows, 12\s+metric schema rows, 12 metric source-owner rows, 5 collector readiness\s+families, 63 method semantic proof gap files, 5,469 lexical callables, 4,457\s+expected runtime audit tests, 4,457 expected runtime audit passes, and 0\s+expected runtime audit failures/);
+  assert.match(source, /12 closure rows link all 12 verification output rows, 12\s+inline verification output JSON sections, 12 parity rollout contract rows, 12\s+diagnostic privacy contract rows, 12 side-effect budget contract rows, 12\s+no-work preservation contract rows, 12 fixture provenance contract rows, 12\s+source owner map contract rows, 12 metric sample contract rows, 12 manifest\s+contract rows, 10 artifact path boundary rows, 12 foundation packet rows, 12\s+metric schema rows, 12 metric source-owner rows, 5 collector readiness\s+families, 63 method semantic proof gap files, 5,473 lexical callables, 4,457\s+expected runtime audit tests, 4,457 expected runtime audit passes, and 0\s+expected runtime audit failures/);
   assert.match(source, /runtime verification output\s+closure approvals 0, persisted verification output closure approvals 0/);
   assert.match(source, /verification output\s+draft closure `VERIFICATION-OUTPUT-CHAIN-CLOSED`/);
   assert.match(source, /verification output\s+implementation readiness from closure `NO-GO`/);
@@ -3307,9 +3307,9 @@ function assertVerificationOutputDraftClosure(source) {
   assert.match(verification, /collector fixture provenance rows covered: 12/);
   assert.match(verification, /collector parity rollout rows covered: 12/);
   assert.match(verification, /method semantic proof gap files covered: 63/);
-  assert.match(verification, /method semantic proof gap lexical callables covered: 5469/);
+  assert.match(verification, /method semantic proof gap lexical callables covered: 5473/);
   assert.match(verification, /files with complete per-callable semantic proof: 0/);
-  assert.match(verification, /lexical callables requiring semantic proof before behavior changes: 5469/);
+  assert.match(verification, /lexical callables requiring semantic proof before behavior changes: 5473/);
   assert.match(verification, /expected runtime audit tests: 4457/);
   assert.match(verification, /expected runtime audit pass: 4457/);
   assert.match(verification, /expected runtime audit fail: 0/);
@@ -3332,7 +3332,7 @@ function assertVerificationOutputDraftClosure(source) {
   assert.match(verification, /metric source-owner rows linked by verification closure: 12/);
   assert.match(verification, /collector readiness families linked by verification closure: 5/);
   assert.match(verification, /method semantic proof gap files linked by verification closure: 63/);
-  assert.match(verification, /lexical callables linked by verification closure: 5469/);
+  assert.match(verification, /lexical callables linked by verification closure: 5473/);
   assert.match(verification, /runtime fixture result count rows linked by verification closure: 3/);
   assert.match(verification, /runtime verification output closure approvals: 0/);
   assert.match(verification, /persisted verification output closure approvals: 0/);
@@ -4337,24 +4337,24 @@ test('audit_completion_gap_register_lists_required_evidence_classes', () => {
     assert.match(text, /Browser Runtime-Test Exact Row Backfill/);
     assert.match(text, /Remaining Tail Runtime-Test Exact Row Backfill/);
     assert.match(text, /top-level `tests\/runtime\/\*\.test\.mjs` files/);
-    assert.match(text, /527/);
-    assert.match(text, /527 exact backticked test-path/);
+    assert.match(text, /528/);
+    assert.match(text, /528 exact backticked test-path/);
     assert.match(text, /0 top-level runtime test files without exact backticked entries/);
-    assert.match(text, /generated per-test provenance rows: 527/);
-    assert.match(text, /source top-level test declarations counted by generated index: 4667/);
+    assert.match(text, /generated per-test provenance rows: 528/);
+    assert.match(text, /source top-level test declarations counted by generated index: 4671/);
     assert.match(text, /complete semantic\s+coverage evidence/);
   }
   assert.match(runtimeTestIndex, /Status: audit-only generated current-behavior index/);
-  assert.match(runtimeTestIndex, /top-level runtime test files: 527/);
-  assert.match(runtimeTestIndex, /indexed runtime test rows: 527/);
-  assert.match(runtimeTestIndex, /source top-level test declarations counted: 4667/);
+  assert.match(runtimeTestIndex, /top-level runtime test files: 528/);
+  assert.match(runtimeTestIndex, /indexed runtime test rows: 528/);
+  assert.match(runtimeTestIndex, /source top-level test declarations counted: 4671/);
   assert.match(runtimeTestIndex, /Full Runtime Freshness Boundary - 2026-05-30/);
   assert.match(runtimeTestIndex, /initial full runtime rerun result: 4665\/4667 pass, 2 fail/);
   assert.match(runtimeTestIndex, /focused drift repair proof: 10\/10 pass/);
   assert.match(runtimeTestIndex, /fresh full runtime command: node --test --test-reporter=dot tests\/runtime\/\*\.test\.mjs/);
-  assert.match(runtimeTestIndex, /fresh full runtime exit status for 4667 declaration set: 0/);
-  assert.match(runtimeTestIndex, /current full runtime proof for generated 4667 declaration set: GO/);
-  assert.match(runtimeTestIndex, /runtime results exact backticked test-path rows: 527/);
+  assert.match(runtimeTestIndex, /fresh full runtime exit status for 4671 declaration set: 0/);
+  assert.match(runtimeTestIndex, /current full runtime proof for generated 4671 declaration set: GO/);
+  assert.match(runtimeTestIndex, /runtime results exact backticked test-path rows: 528/);
   assert.match(runtimeTestIndex, /runtime results missing exact backticked test-path rows: 0/);
   assert.match(runtimeTestIndex, /This is file-level provenance proof only/);
   assert.match(runtimeTestIndex, /Missing Runtime Results Row Priority Snapshot/);

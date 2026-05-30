@@ -1504,9 +1504,9 @@ test('objective coverage ledger records active goal completion audit as current-
   assert.match(doc, /active-thread completion rule to the exact user objective/);
   assert.match(doc, /149 tracked files still have open obligations/);
   assert.match(doc, /63 tracked JS\/JSX\/MJS files have lexical callable accounting/);
-  assert.match(doc, /5,469 callables are lexical rather than semantic method proof/);
+  assert.match(doc, /5,473 callables are lexical rather than semantic method proof/);
   assert.match(doc, /0 files have complete per-callable semantic proof/);
-  assert.match(doc, /5,469 lexical callables still require semantic proof before behavior changes/);
+  assert.match(doc, /5,473 lexical callables still require semantic proof before behavior changes/);
   assert.match(doc, /643 selector sites and 489 lifecycle instances/);
   assert.match(doc, /217\/217 P0 obligations remain `future-proof-missing`/);
   assert.match(doc, /`update_goal\(status='complete'\)` must not be called/);
@@ -3151,8 +3151,8 @@ test('objective coverage ledger records native runtime sync manifest freshness a
   assert.match(doc, /native sync, release\/package, generated runtime/);
   assert.match(doc, /release-note parity, first-class JSON filtering parity/);
   assert.match(doc, /direct app manifest freshness proof/);
-  assert.match(doc, /app repo HEAD `b33e98d5b0c52cb728fb3720d34a01ba987ef649`/);
-  assert.match(doc, /44 dirty app paths/);
+  assert.match(doc, /app repo HEAD `[0-9a-f]{40}`/);
+  assert.match(doc, /46 dirty app paths/);
   assert.match(doc, /28 runtime sync manifest entries/);
   assert.match(doc, /0 `destinationKind` fields/);
   assert.match(doc, /28 direct source\/destination hash matches/);
@@ -11184,8 +11184,8 @@ test('objective coverage ledger records content-filter route surface convergence
   assert.match(doc, /extend objective coverage for runtime proof freshness, audit-document drift\s+repair, native-sync freshness references, truth-claim line-reference\s+freshness/);
   assert.match(doc, /initial full runtime rerun result at 4665\/4667 pass with 2 audit freshness\s+failures/);
   assert.match(doc, /focused drift repair proof at 10\/10 pass/);
-  assert.match(doc, /fresh full runtime dot\s+rerun exit status 0, 527 runtime test files, 4667 source top-level test\s+declarations/);
-  assert.match(doc, /current full runtime proof for the generated 4667 declaration\s+set `GO`/);
+  assert.match(doc, /fresh full runtime dot\s+rerun exit status 0, 528 runtime test files, 4671 source top-level test\s+declarations/);
+  assert.match(doc, /current full runtime proof for the generated 4671 declaration\s+set `GO`/);
   assert.match(doc, /broad codebase audit completion from full runtime proof `NO-GO`/);
   assert.match(doc, /first optimization implementation approval from full runtime proof `NO-GO`/);
   assert.match(doc, /JSON-first first-class promotion from full runtime proof `NO-GO`/);

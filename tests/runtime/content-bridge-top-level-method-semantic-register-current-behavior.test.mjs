@@ -125,10 +125,10 @@ test('content bridge top-level method register is audit-only and not nested call
   assert.match(source, /Status: audit-only proof/);
   assert.match(source, /This is not an implementation patch/);
   assert.match(source, /Runtime behavior is unchanged/);
-  assert.equal(currentCallableCount, 1194);
+  assert.equal(currentCallableCount, 1198);
   assert.match(source, new RegExp(`lexical callable forms: ${currentCallableCount}`));
-  assert.match(source, /top-level function declarations: 189/);
-  assert.match(source, /unique top-level function names: 188/);
+  assert.match(source, /top-level function declarations: 190/);
+  assert.match(source, /unique top-level function names: 189/);
   assert.match(source, /duplicate top-level name: injectCollaboratorPlaceholderMenu at lines 599 and 7845/);
   assert.match(source, /This is not completion proof for every nested callback/);
   assert.match(source, /Duplicate Function Runtime Binding Addendum - 2026-05-29/);
@@ -141,10 +141,10 @@ test('content bridge top-level method register is audit-only and not nested call
 test('content bridge semantic family docs carry the method semantic proof gap blocker', () => {
   const methodGap = read(methodGapPath);
 
-  assert.match(methodGap, /repo-wide lexical callables: 5469/);
+  assert.match(methodGap, /repo-wide lexical callables: 5473/);
   assert.match(methodGap, /files with lexical accounting: 63/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5469/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5473/);
 
   assert.equal(contentBridgeSemanticFamilyDocs.length, 9);
   for (const familyDocPath of contentBridgeSemanticFamilyDocs) {
@@ -152,9 +152,9 @@ test('content bridge semantic family docs carry the method semantic proof gap bl
     assert.ok(familyDoc.includes(methodGapPath), `${familyDocPath} should cite method semantic proof gap index`);
     assert.match(familyDoc, /## Method Semantic Proof Gap Boundary/);
     assert.match(familyDoc, /method semantic proof gap files covered: 63/);
-    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5469/);
+    assert.match(familyDoc, /method semantic proof gap lexical callables covered: 5473/);
     assert.match(familyDoc, /files with complete per-callable semantic proof: 0/);
-    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5469/);
+    assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5473/);
     assert.match(familyDoc, /affected callable semantic proof: NO-GO/);
     if (familyDocPath === narrowRuntimeChangeDoc) {
       assert.match(familyDoc, /runtime behavior changed: yes, duplicate right-rail timer fanout and no-op stamp reruns only/);
@@ -173,8 +173,8 @@ test('content bridge top-level method register accounts for every current top-le
     .map((row) => row.name)
     .filter((name, index, names) => names.indexOf(name) !== index);
 
-  assert.equal(rows.length, 189);
-  assert.equal(uniqueNames.size, 188);
+  assert.equal(rows.length, 190);
+  assert.equal(uniqueNames.size, 189);
   assert.deepEqual([...new Set(duplicateNames)], ['injectCollaboratorPlaceholderMenu']);
 
   for (const row of rows) {
@@ -210,7 +210,7 @@ test('content bridge top-level method register preserves semantic group counts a
     ['ytInitialAndBackgroundResolvers', 5],
     ['cardIdentityExtraction', 3],
     ['menuInjectionAndActionBinding', 6],
-    ['clickedHideAndRuleMutation', 17]
+    ['clickedHideAndRuleMutation', 18]
   ]);
 
   assert.deepEqual(counts, expectedCounts);

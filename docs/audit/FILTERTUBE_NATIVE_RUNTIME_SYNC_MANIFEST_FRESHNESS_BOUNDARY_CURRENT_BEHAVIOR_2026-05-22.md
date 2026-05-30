@@ -23,9 +23,9 @@ changes.
 ## Current Manifest And Copy Facts
 
 ```text
-public repo HEAD: 3696c340630a05a81e8eae209589399d4e838553
-app repo HEAD: b33e98d5b0c52cb728fb3720d34a01ba987ef649
-app dirty tracked paths: 44
+public repo HEAD: 7f0e66641aa576fb264085baf59949244ea32291
+app repo HEAD: cfc651cd4294e528c2c371778d7698ce82e94a71
+app dirty tracked paths: 46
 app dirty paths:
 - apps/android/app/src/debug/java/com/filtertube/app/DebugNativeOwnedKidsActivity.kt
 - apps/android/app/src/main/assets/filtertube_nanah/nanah_sync_adapter.js
@@ -33,6 +33,7 @@ app dirty paths:
 - apps/android/app/src/main/java/com/filtertube/app/AppLaunchRouter.kt
 - apps/android/app/src/main/java/com/filtertube/app/LauncherActivity.kt
 - apps/android/app/src/main/java/com/filtertube/app/ManagedWebViewActivity.kt
+- apps/android/app/src/main/java/com/filtertube/app/NativeOwnedMainPlaybackBridgeFallback.kt
 - apps/android/app/src/main/java/com/filtertube/app/NativeOwnedPreviewEntryPoint.kt
 - apps/android/app/src/main/java/com/filtertube/app/ProfileViewingAccess.kt
 - apps/android/app/src/main/java/com/filtertube/app/ViewingLaunchCoordinator.kt
@@ -40,6 +41,7 @@ app dirty paths:
 - apps/android/app/src/main/java/com/filtertube/app/ViewingTargetAccessUiState.kt
 - apps/android/app/src/main/java/com/filtertube/app/ViewingTargetLaunchPolicy.kt
 - apps/android/app/src/test/java/com/filtertube/app/AppLaunchRouterTest.kt
+- apps/android/app/src/test/java/com/filtertube/app/NativeOwnedMainPlaybackBridgeFallbackTest.kt
 - apps/android/app/src/test/java/com/filtertube/app/NativeOwnedPreviewEntryPointTest.kt
 - apps/android/app/src/test/java/com/filtertube/app/ProfileViewingAccessTest.kt
 - apps/android/app/src/test/java/com/filtertube/app/ViewingSpaceChooserPolicyTest.kt
@@ -105,9 +107,9 @@ Manifest destination roots:
 
 | Artifact | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `apps/android/app/src/main/assets/filtertube_runtime_full.js` | 35711 | 1573129 | `3ec4dab1e748a4294cc73f5ae21ce01513aa8e74483239ae29c0c63d8ca82c07` |
+| `apps/android/app/src/main/assets/filtertube_runtime_full.js` | 35747 | 1574364 | `df82c9ddfc77bbed1025741222d0468e55c760e3376a2cedc5fc45bc651787c6` |
 | `apps/android/app/src/main/assets/filtertube_kids_runtime.js` | 370 | 13153 | `05b47e2310222a68ba5356cbf6dca24b507aa225bfbe6e971c2a4819d647b711` |
-| `apps/ios/FilterTube/Resources/filtertube_runtime_full.js` | 35710 | 1571466 | `53f9aa6ee4ad8dd527c0bfbcf333f6e2b02afaaa344325de229c07d98fd96311` |
+| `apps/ios/FilterTube/Resources/filtertube_runtime_full.js` | 35746 | 1572701 | `f146e2284af6429c8a30c87406ae30dce6e69003f64e9082aa459194df81fae2` |
 | `apps/ios/FilterTube/Resources/filtertube_kids_runtime.js` | 575 | 20835 | `3f279f275bf93cca6385df6c8d0422a51c533c26cbd29ddd5d9ea5655efc7340` |
 | `apps/android/app/src/main/assets/filtertube_nanah_engine.html` | 875 | 34907 | `e63d29f43a5c94790a665bfda985071b26b530dd7b532cdb66f0cd3d27a1a93e` |
 | `apps/ios/FilterTube/Resources/filtertube_nanah_engine.html` | 875 | 34899 | `84df57dacdaaf394e47864cc7a70ed5185e7547b693afbe69a363811f787112d` |
@@ -213,9 +215,9 @@ can support runtime optimization. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 63
-method semantic proof gap lexical callables covered: 5469
+method semantic proof gap lexical callables covered: 5473
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5469
+lexical callables requiring semantic proof before behavior changes: 5473
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
