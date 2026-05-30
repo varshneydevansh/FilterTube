@@ -251,9 +251,9 @@ test('JSON-first video meta category parity audit is audit-only and source pinne
   assert.equal(lineCount(domFallback), 4838);
   assert.equal(Buffer.byteLength(domFallback), 228332);
   assert.equal(sha256('js/content/dom_fallback.js'), '2129fcc16f8ad1420a6cb44905ddcd0b68d5511f3b647e2db100c0d67d492aef');
-  assert.equal(lineCount(contentBridge), 13535);
-  assert.equal(Buffer.byteLength(contentBridge), 600459);
-  assert.equal(sha256('js/content_bridge.js'), '31e7234c6a4055bffb0b800bac43cf3dd1c496cb08d1d57d391ea027941277e9');
+  assert.equal(lineCount(contentBridge), 13571);
+  assert.equal(Buffer.byteLength(contentBridge), 601694);
+  assert.equal(sha256('js/content_bridge.js'), '1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3');
   assert.match(text, /video-meta category parity source files: 3/);
 });
 

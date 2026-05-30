@@ -2058,6 +2058,26 @@ timing authority, and `update_goal(status='complete')` remain `NO-GO`.
 Runtime behavior changed by this continuation: no; the broad audit remains
 active.
 
+## Content Bridge Production Console Gate Continuation
+
+2026-05-30 content bridge production console gate continuation:
+`docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md`
+now records the runtime logging addendum, and
+`tests/runtime/content-bridge-production-console-gate-current-behavior.test.mjs`
+proves the gate behavior. The slice captures native `log`/`debug`, installs
+one isolated-world gate in `js/content_bridge.js`, suppresses bridge
+`console.log`/`console.debug` when debug is disabled, allows those levels when
+debug is enabled, and preserves `console.warn`/`console.error`. The manifest
+still loads `js/content/dom_fallback.js` first, so this is a redundant
+content-bridge-installed isolated-world guard, not a filtering decision change.
+It keeps the active goal aligned with YouTube SPA performance, diagnostic
+privacy, no-work budgets, menu/comment responsiveness, blocking/whitelist
+safety, and release readiness. Runtime behavior changed by this continuation:
+yes, content-bridge-installed isolated-world log/debug gate only. Live
+installed-tab proof, release/public-claim use, diagnostic metric replacement,
+and `update_goal(status='complete')` remain `NO-GO`; the broad audit remains
+active.
+
 ## Installed Chrome Unpacked Path Parity Continuation
 
 2026-05-30 installed Chrome unpacked path parity continuation:

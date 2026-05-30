@@ -303,7 +303,7 @@ test('JSON-first video meta content parity audit is audit-only and source pinned
   const hashes = {
     'js/filter_logic.js': '4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641',
     'js/content/dom_fallback.js': '2129fcc16f8ad1420a6cb44905ddcd0b68d5511f3b647e2db100c0d67d492aef',
-    'js/content_bridge.js': '31e7234c6a4055bffb0b800bac43cf3dd1c496cb08d1d57d391ea027941277e9'
+    'js/content_bridge.js': '1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3'
   };
 
   assert.match(text, /Status: audit-only current-behavior register/);
@@ -323,8 +323,8 @@ test('JSON-first video meta content parity audit is audit-only and source pinned
   assert.equal(Buffer.byteLength(read('js/filter_logic.js')), 165151);
   assert.equal(lineCount(read('js/content/dom_fallback.js')), 4838);
   assert.equal(Buffer.byteLength(read('js/content/dom_fallback.js')), 228332);
-  assert.equal(lineCount(read('js/content_bridge.js')), 13535);
-  assert.equal(Buffer.byteLength(read('js/content_bridge.js')), 600459);
+  assert.equal(lineCount(read('js/content_bridge.js')), 13571);
+  assert.equal(Buffer.byteLength(read('js/content_bridge.js')), 601694);
   for (const [file, hash] of Object.entries(hashes)) {
     assert.equal(sha256(file), hash);
     assert.match(text, new RegExp(hash));

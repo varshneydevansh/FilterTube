@@ -19,9 +19,9 @@ authority, or first-class JSON filtering gate.
   - Bytes: 4741
   - sha256: `d1b84cf4c43ec5ff5cdc3bd607d8f3d3bf448c12829780b0d05fb9fc14fb5d3e`
 - `js/content_bridge.js`
-  - Lines: 13535
-  - Bytes: 600459
-  - sha256: `31e7234c6a4055bffb0b800bac43cf3dd1c496cb08d1d57d391ea027941277e9`
+  - Lines: 13571
+  - Bytes: 601694
+  - sha256: `1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3`
 
 Related proof already present:
 
@@ -37,8 +37,8 @@ Related proof already present:
 content bridge startup timing source files: 2
 bridge_injection lines: 127
 bridge_injection bytes: 4741
-content_bridge lines: 13535
-content_bridge bytes: 600459
+content_bridge lines: 13571
+content_bridge bytes: 601694
 fallback block lines: 23
 fallback block bytes: 904
 injectMainWorldScripts block lines: 46

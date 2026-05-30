@@ -32,7 +32,7 @@ decisions.
 
 | Artifact | Lines | Bytes | SHA-256 | Role |
 | --- | ---: | ---: | --- | --- |
-| `js/content_bridge.js` | 13535 | 600459 | `31e7234c6a4055bffb0b800bac43cf3dd1c496cb08d1d57d391ea027941277e9` | Builds collaborator lookup options from partial DOM/metadata evidence. |
+| `js/content_bridge.js` | 13571 | 601694 | `1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3` | Builds collaborator lookup options from partial DOM/metadata evidence. |
 | `js/injector.js` | 3593 | 155830 | `634041581ec84db2edd4f07d46f4bfb9d3a7d97036a0fb83db7739856bdc3e04` | Builds expected matchers and searches main-world snapshots for collaborators. |
 | `js/filter_logic.js` | 3498 | 165151 | `4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641` | JSON filtering and candidate decision owner. |
 | `tests/runtime/fixtures/captures/ytm-show-sheet-collab-video-with-context-renderer.json` | 104 | 3818 | `e23da0992cec33040ce286d767c002a9171543dc07c5f5983cc505265fbaabfc` | Reduced YTM showSheet roster fixture. |

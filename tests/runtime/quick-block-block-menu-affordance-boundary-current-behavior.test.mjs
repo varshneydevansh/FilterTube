@@ -214,7 +214,7 @@ test('quick-block/block-menu affordance audit is audit-only and source pinned', 
   assert.ok(doc.includes(`| \`js/content/bridge_settings.js\` | 651 | 26462 | \`${sha256('js/content/bridge_settings.js')}\` |`));
   assert.ok(doc.includes(`| \`js/state_manager.js\` | 2491 | 99780 | \`${sha256('js/state_manager.js')}\` |`));
   assert.ok(doc.includes(`| \`js/content/block_channel.js\` | 3175 | 127396 | \`${sha256('js/content/block_channel.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/content_bridge.js\` | 13535 | 600459 | \`${sha256('js/content_bridge.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/content_bridge.js\` | 13571 | 601694 | \`${sha256('js/content_bridge.js')}\` |`));
 
   for (const token of [
     'Collaborator Grammar Action Handoff Addendum - 2026-05-27',

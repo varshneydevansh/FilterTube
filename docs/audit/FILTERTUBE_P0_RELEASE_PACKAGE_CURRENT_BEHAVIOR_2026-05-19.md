@@ -352,7 +352,7 @@ Default Local Extension Settings directory exists: yes
 Default packed Extensions directory for this id exists: no
 workspace manifest.json sha256: 96eb5e5c8733ecdfa9d3eb447d51a3bfc2c4743a80b1fde1f12d71bd46d1c8e4
 workspace package.json sha256: cd24685d1fb4940c1a67f12ce143bc1466200a299a82dbfa6f553b99e24ae23f
-workspace js/content_bridge.js sha256: 31e7234c6a4055bffb0b800bac43cf3dd1c496cb08d1d57d391ea027941277e9
+workspace js/content_bridge.js sha256: 1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3
 workspace content_bridge ampersand Topic fix token present: yes
 ```
 

@@ -1,8 +1,11 @@
 # FilterTube Runtime Diagnostic Logging Policy Matrix Current Behavior - 2026-05-24
 
-Status: audit-only current-behavior proof slice. Runtime behavior is unchanged.
-This is not an implementation patch, logging patch, privacy patch, performance
-patch, debug-mode patch, build patch, whitelist patch, or JSON-first promotion.
+Status: current-behavior proof slice with a production console-gate addendum.
+The original 2026-05-24 inventory was audit-only and changed no runtime
+behavior. The 2026-05-30 addendum adds a `content_bridge.js` bootstrap gate
+for isolated content-script-world `console.log` and `console.debug` calls; it
+is not a whitelist patch, JSON-first promotion, collector patch, or
+release-claim proof.
 
 ## Purpose
 
@@ -34,7 +37,7 @@ and website code. Lines whose trimmed text begins with `//` are excluded.
 | `js/content/dom_extractors.js` | 1102 | 45149 | `3f88d18789847d50bed8a515dcd44e969db43bd19b343c38d5c3ea32b6ec6237` |
 | `js/content/dom_fallback.js` | 4838 | 228332 | `2129fcc16f8ad1420a6cb44905ddcd0b68d5511f3b647e2db100c0d67d492aef` |
 | `js/content/handle_resolver.js` | 282 | 9785 | `67cc877a0a97e4c4c5aaf5a0d1c37c15000af5238f8f37d7c5dc6efee27e34ff` |
-| `js/content_bridge.js` | 13535 | 600459 | `31e7234c6a4055bffb0b800bac43cf3dd1c496cb08d1d57d391ea027941277e9` |
+| `js/content_bridge.js` | 13571 | 601694 | `1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3` |
 | `js/filter_logic.js` | 3498 | 165151 | `4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641` |
 | `js/injector.js` | 3593 | 155830 | `634041581ec84db2edd4f07d46f4bfb9d3a7d97036a0fb83db7739856bdc3e04` |
 | `js/io_manager.js` | 2030 | 96914 | `d04bfd75d061ee405c1dfa4cab8c9d0fa6a2f072d046add33e4b6782b1f58a21` |
@@ -58,7 +61,8 @@ console.warn callsites: 123
 console.error callsites: 68
 console.debug callsites: 24
 console.info callsites: 0
-runtime behavior changed: no
+runtime behavior changed by original 2026-05-24 inventory: no
+runtime behavior changed by 2026-05-30 content bridge console gate: yes
 not completion proof for diagnostic logging policy authority
 ```
 
@@ -420,4 +424,54 @@ diagnosticLoggingConvergenceReport
 diagnosticLogWorkBudget
 diagnosticMetricReplacementAuthority
 diagnosticPrivacyRedactionAuthority
+```
+
+## Content Bridge Production Console Gate Addendum - 2026-05-30
+
+This addendum records the targeted production logging change made after the
+YouTube SPA lag fix. The gate is installed from `js/content_bridge.js` and
+guards isolated content-script-world `console.log` and `console.debug` calls
+unless `window.__filtertubeDebug` is true or `data-filtertube-debug="true"` is
+present. The manifest-loaded `js/content/dom_fallback.js` routine gate already
+runs before `content_bridge.js`; this addendum keeps the content bridge
+bootstrap quiet even if that earlier routine gate is bypassed or overwritten.
+It intentionally does not gate `console.warn` or `console.error`.
+
+```text
+content_bridge.js startup
+  -> capture native log/debug functions
+  -> install isolated-world log/debug gate once
+  -> debug disabled: log/debug return before native console work
+  -> debug enabled: log/debug pass through to captured native console
+  -> warn/error remain native
+```
+
+```mermaid
+flowchart TD
+  A["content_bridge.js loads"] --> B["Capture native log/debug"]
+  B --> C["Install one isolated-world gate"]
+  C --> D{"Debug enabled?"}
+  D -->|No| E["Drop log/debug before native console work"]
+  D -->|Yes| F["Forward log/debug to captured console"]
+  C --> G["warn/error unchanged"]
+```
+
+| Gate row | Current behavior | Regression boundary |
+| --- | --- | --- |
+| `content_bridge_console_gate_scope` | Installed from `js/content_bridge.js` in the isolated content-script world after its top-level bootstrap runs. | Does not override page-world `seed.js`, `injector.js`, `filter_logic.js`, or YouTube page console. |
+| `content_bridge_console_gate_levels` | Gates `console.log` and `console.debug` dynamically through `isFilterTubeDebugEnabled()`. | Leaves `console.warn` and `console.error` available for unexpected failures. |
+| `content_bridge_console_gate_idempotency` | Uses `window.__filtertubeContentBridgeConsoleGateInstalled` to avoid repeated installation on duplicate content-script execution. | Duplicate SPA/script injection does not stack wrappers. |
+| `content_bridge_console_gate_debug_escape` | Debug can be enabled through `window.__filtertubeDebug` or the document `data-filtertube-debug` attribute. | Developer diagnostics remain available after reload/debug flag setup. |
+| `content_bridge_console_gate_behavior_surface` | Blocks production console output cost from bridge extraction, menu, collaborator, fallback, and immediate-hide log/debug paths. | Does not change blocklist, whitelist, quick-block, channel identity, JSON filtering, or hidden-state decisions. |
+
+```text
+production console gate source file: js/content_bridge.js
+production console gate test file: tests/runtime/content-bridge-production-console-gate-current-behavior.test.mjs
+content_bridge production log/debug gate: GO
+warn/error suppression: NO
+page-world console override: NO
+blocking/whitelist behavior change intended: NO
+runtime behavior changed by this addendum: yes, content_bridge-installed isolated-world log/debug gate only
+release/public-claim proof from this addendum: NO-GO
+broad audit completion from this addendum: NO-GO
 ```

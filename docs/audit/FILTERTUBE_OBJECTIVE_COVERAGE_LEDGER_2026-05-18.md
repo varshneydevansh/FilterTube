@@ -3566,3 +3566,21 @@ freshness, incognito runtime availability, stale open-tab cleanup, live
 `Kully B & Gussy G - Topic` negative fixture proof, release/public-claim use,
 and broad goal completion remain `NO-GO`. Runtime behavior changed by this
 continuation: no, and continued audit remains `GO`.
+
+2026-05-30 content bridge production console gate continuation:
+`docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md`
+and
+`tests/runtime/content-bridge-production-console-gate-current-behavior.test.mjs`
+extend objective coverage for the production logging performance risk called
+out during the release-lag investigation. `js/content_bridge.js` now captures
+native `log`/`debug`, installs one isolated-world gate, drops bridge
+`console.log`/`console.debug` work when debug is disabled, dynamically allows
+those levels when `window.__filtertubeDebug` or `data-filtertube-debug="true"`
+is set, and leaves `console.warn`/`console.error` untouched. The manifest still
+loads `js/content/dom_fallback.js` first, so this is a redundant
+content-bridge-installed isolated-world guard for production diagnostic cost.
+The scoped gate does not change blocklist, whitelist, quick-block, channel
+identity, JSON filtering, or hidden-state decisions. Runtime behavior changed
+by this continuation: yes, content-bridge-installed isolated-world log/debug
+gate only. Release/public claim use, live installed-tab proof, and broad goal
+completion remain `NO-GO`; continued audit remains `GO`.

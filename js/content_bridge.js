@@ -13528,6 +13528,42 @@ function contentBridgeAmpersandTopicSingleChannelMenuGuard(channelInfo, videoCar
     }
 }
 
+const filterTubeRawConsole = (() => {
+    try {
+        if (typeof console !== 'object' || !console) return {};
+        return {
+            log: typeof console['log'] === 'function' ? console['log'].bind(console) : null,
+            debug: typeof console['debug'] === 'function' ? console['debug'].bind(console) : null
+        };
+    } catch (e) {
+        return {};
+    }
+})();
+
+function installFilterTubeProductionConsoleGate() {
+    try {
+        if (typeof console !== 'object' || !console) return;
+        if (window.__filtertubeContentBridgeConsoleGateInstalled === true) return;
+        window.__filtertubeContentBridgeConsoleGateInstalled = true;
+
+        if (filterTubeRawConsole.log) {
+            console['log'] = function filterTubeProductionLogGate(...args) {
+                if (!isFilterTubeDebugEnabled()) return;
+                filterTubeRawConsole.log(...args);
+            };
+        }
+        if (filterTubeRawConsole.debug) {
+            console['debug'] = function filterTubeProductionDebugGate(...args) {
+                if (!isFilterTubeDebugEnabled()) return;
+                filterTubeRawConsole.debug(...args);
+            };
+        }
+    } catch (e) {
+    }
+}
+
+installFilterTubeProductionConsoleGate();
+
 window.addEventListener('message', handleMainWorldMessages, false);
 
 setTimeout(() => initialize(), 50);

@@ -10,7 +10,7 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_CONTENT_BRIDGE_MENU_ACTION_LIST_TARGET_CURRENT_BEHAVIOR_2026-05-23.md';
 
 const sourceFingerprints = {
-  'js/content_bridge.js': [13535, 600459, '31e7234c6a4055bffb0b800bac43cf3dd1c496cb08d1d57d391ea027941277e9']
+  'js/content_bridge.js': [13571, 601694, '1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3']
 };
 
 const blockSpecs = {
@@ -74,7 +74,7 @@ const renderMenuEntriesSpec = {
 const ampersandTopicMenuGuardSpec = {
   file: 'js/content_bridge.js',
   start: 'function contentBridgeAmpersandTopicSingleChannelMenuGuard',
-  end: "window.addEventListener('message'",
+  end: 'const filterTubeRawConsole',
   startLine: 13500,
   lines: 31,
   bytes: 1223,

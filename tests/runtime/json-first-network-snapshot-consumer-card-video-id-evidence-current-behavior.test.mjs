@@ -279,7 +279,7 @@ function loadBridgeStampRuntime() {
 test('JSON-first network snapshot consumer card video-id evidence audit is audit-only and source pinned', () => {
   const text = doc();
   const domHash = '3f88d18789847d50bed8a515dcd44e969db43bd19b343c38d5c3ea32b6ec6237';
-  const bridgeHash = '31e7234c6a4055bffb0b800bac43cf3dd1c496cb08d1d57d391ea027941277e9';
+  const bridgeHash = '1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3';
 
   assert.match(text, /Status: audit-only current-behavior register/);
   assert.match(text, /Runtime behavior is unchanged/);
@@ -287,8 +287,8 @@ test('JSON-first network snapshot consumer card video-id evidence audit is audit
   assert.equal(lineCount(read('js/content/dom_extractors.js')), 1102);
   assert.equal(Buffer.byteLength(read('js/content/dom_extractors.js')), 45149);
   assert.equal(sha256('js/content/dom_extractors.js'), domHash);
-  assert.equal(lineCount(read('js/content_bridge.js')), 13535);
-  assert.equal(Buffer.byteLength(read('js/content_bridge.js')), 600459);
+  assert.equal(lineCount(read('js/content_bridge.js')), 13571);
+  assert.equal(Buffer.byteLength(read('js/content_bridge.js')), 601694);
   assert.equal(sha256('js/content_bridge.js'), bridgeHash);
   assert.match(text, new RegExp(domHash));
   assert.match(text, new RegExp(bridgeHash));

@@ -197,7 +197,7 @@ runtime behavior changed: no
 | Source file | Line count | Bytes | SHA-256 | Current role |
 | --- | ---: | ---: | --- | --- |
 | `js/filter_logic.js` | 3499 | 165151 | `4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641` | JSON decision, map producers, whitelist branch. |
-| `js/content_bridge.js` | 13536 | 600459 | `31e7234c6a4055bffb0b800bac43cf3dd1c496cb08d1d57d391ea027941277e9` | right-rail observer, visible-card prefetch, content cache, pending refresh, message branches. |
+| `js/content_bridge.js` | 13571 | 601694 | `1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3` | right-rail observer, visible-card prefetch, content cache, pending refresh, message branches. |
 | `js/content/bridge_settings.js` | 652 | 26462 | `c7828acd09941f4559e47b31ea57d184ef9367ae4964598e865b8a196934e75b` | storage refresh fanout and forced reprocess coalescing. |
 | `js/background.js` | 6314 | 284710 | `46442f904cf18c3fa8345e71f608171edcf277207a420136a78a195c3b7c57eb` | background map cache updates and compiled settings assembly. |
 | `js/content/dom_fallback.js` | 4839 | 228332 | `2129fcc16f8ad1420a6cb44905ddcd0b68d5511f3b647e2db100c0d67d492aef` | rendered-card fallback pass and whitelist-pending recheck. |

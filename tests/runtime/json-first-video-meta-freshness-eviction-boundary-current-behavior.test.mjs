@@ -351,9 +351,9 @@ test('JSON-first video meta freshness eviction audit is audit-only and source pi
   const text = doc();
   const sources = {
     'js/content_bridge.js': {
-      lines: 13535,
-      bytes: 600459,
-      hash: '31e7234c6a4055bffb0b800bac43cf3dd1c496cb08d1d57d391ea027941277e9'
+      lines: 13571,
+      bytes: 601694,
+      hash: '1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3'
     },
     'js/background.js': {
       lines: 6313,

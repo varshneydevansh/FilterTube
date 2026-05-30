@@ -287,7 +287,7 @@ test('JSON-first network snapshot consumer effect boundary audit is audit-only a
   const injector = read('js/injector.js');
   const bridge = read('js/content_bridge.js');
   const injectorHash = '634041581ec84db2edd4f07d46f4bfb9d3a7d97036a0fb83db7739856bdc3e04';
-  const bridgeHash = '31e7234c6a4055bffb0b800bac43cf3dd1c496cb08d1d57d391ea027941277e9';
+  const bridgeHash = '1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3';
 
   assert.match(text, /Status: audit-only current-behavior register/);
   assert.match(text, /Runtime behavior is unchanged/);
@@ -301,10 +301,10 @@ test('JSON-first network snapshot consumer effect boundary audit is audit-only a
   assert.equal(sha256('js/injector.js'), injectorHash);
   assert.match(text, new RegExp(`\\| \`js/injector\\.js\` \\| 3593 \\| 155830 \\| \`${injectorHash}\` \\|`));
 
-  assert.equal(lineCount(bridge), 13535);
-  assert.equal(Buffer.byteLength(bridge), 600459);
+  assert.equal(lineCount(bridge), 13571);
+  assert.equal(Buffer.byteLength(bridge), 601694);
   assert.equal(sha256('js/content_bridge.js'), bridgeHash);
-  assert.match(text, new RegExp(`\\| \`js/content_bridge\\.js\` \\| 13535 \\| 600459 \\| \`${bridgeHash}\` \\|`));
+  assert.match(text, new RegExp(`\\| \`js/content_bridge\\.js\` \\| 13571 \\| 601694 \\| \`${bridgeHash}\` \\|`));
 });
 
 test('consumer effect boundary source rows and current counts are pinned', () => {

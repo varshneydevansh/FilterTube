@@ -16,7 +16,7 @@ const sourceFingerprints = {
   'js/content/dom_extractors.js': [1102, 45149, '3f88d18789847d50bed8a515dcd44e969db43bd19b343c38d5c3ea32b6ec6237'],
   'js/content/dom_fallback.js': [4838, 228332, '2129fcc16f8ad1420a6cb44905ddcd0b68d5511f3b647e2db100c0d67d492aef'],
   'js/content/handle_resolver.js': [282, 9785, '67cc877a0a97e4c4c5aaf5a0d1c37c15000af5238f8f37d7c5dc6efee27e34ff'],
-  'js/content_bridge.js': [13535, 600459, '31e7234c6a4055bffb0b800bac43cf3dd1c496cb08d1d57d391ea027941277e9'],
+  'js/content_bridge.js': [13571, 601694, '1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3'],
   'js/filter_logic.js': [3498, 165151, '4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641'],
   'js/injector.js': [3593, 155830, '634041581ec84db2edd4f07d46f4bfb9d3a7d97036a0fb83db7739856bdc3e04'],
   'js/io_manager.js': [2030, 96914, 'd04bfd75d061ee405c1dfa4cab8c9d0fa6a2f072d046add33e4b6782b1f58a21'],
@@ -228,18 +228,45 @@ function assertDiagnosticLoggingConvergenceBoundary(doc) {
   }
 }
 
+function assertContentBridgeProductionConsoleGateAddendum(doc) {
+  assert.match(doc, /Content Bridge Production Console Gate Addendum - 2026-05-30/);
+  assert.match(doc, /gate is installed from `js\/content_bridge\.js` and\s+guards isolated content-script-world `console\.log` and `console\.debug` calls/);
+  assert.match(doc, /`js\/content\/dom_fallback\.js` routine gate already\s+runs before `content_bridge\.js`/);
+  assert.match(doc, /intentionally does not gate `console\.warn` or `console\.error`/);
+  assert.match(doc, /flowchart TD/);
+  assert.match(doc, /content_bridge production log\/debug gate: GO/);
+  assert.match(doc, /warn\/error suppression: NO/);
+  assert.match(doc, /page-world console override: NO/);
+  assert.match(doc, /blocking\/whitelist behavior change intended: NO/);
+  assert.match(doc, /runtime behavior changed by this addendum: yes, content_bridge-installed isolated-world log\/debug gate only/);
+  assert.match(doc, /release\/public-claim proof from this addendum: NO-GO/);
+  assert.match(doc, /broad audit completion from this addendum: NO-GO/);
+
+  for (const row of [
+    'content_bridge_console_gate_scope',
+    'content_bridge_console_gate_levels',
+    'content_bridge_console_gate_idempotency',
+    'content_bridge_console_gate_debug_escape',
+    'content_bridge_console_gate_behavior_surface'
+  ]) {
+    assert.match(doc, new RegExp(`\\| \`${row}\` \\|`), `missing production console gate row ${row}`);
+  }
+}
+
 test('runtime diagnostic logging policy matrix is audit-only and source pinned', () => {
   const doc = read(docPath);
 
-  assert.match(doc, /Status: audit-only current-behavior proof slice/);
-  assert.match(doc, /Runtime behavior is unchanged/);
-  assert.match(doc, /not an implementation patch, logging patch, privacy patch/);
+  assert.match(doc, /Status: current-behavior proof slice with a production console-gate addendum/);
+  assert.match(doc, /The original 2026-05-24 inventory was audit-only and changed no runtime\s+behavior/);
+  assert.match(doc, /2026-05-30 addendum adds a `content_bridge\.js` bootstrap gate\s+for isolated content-script-world `console\.log` and `console\.debug` calls/);
   assert.match(doc, /diagnostic logging policy matrix source files: 21/);
   assert.match(doc, /active console callsites: 418/);
-  assert.match(doc, /runtime behavior changed: no/);
+  assert.match(doc, /runtime behavior changed by original 2026-05-24 inventory: no/);
+  assert.match(doc, /runtime behavior changed by 2026-05-30 content bridge console gate: yes/);
   assert.match(doc, /not completion proof for diagnostic logging policy authority/);
   assertDiagnosticSourceFlowAddendum(doc);
   assertDiagnosticLoggingConvergenceBoundary(doc);
+  assertContentBridgeProductionConsoleGateAddendum(doc);
 
   for (const [file, [expectedLines, expectedBytes, expectedHash]] of Object.entries(sourceFingerprints)) {
     const source = read(file);
