@@ -291,6 +291,58 @@ empty desktop eager sweep approval: NO-GO
 runtime behavior changed by this correction: no
 ```
 
+## Home/Shorts Quick-Cross Placement Preflight - 2026-05-31
+
+This preflight is audit-only. It narrows the user-visible "quick cross missing
+on Home/Shorts" concern to the current source gates without approving selector,
+placement, hover, observer, or sweep changes.
+
+Current source does not make desktop quick-cross controls always visible on
+startup. Desktop Home/Search/Shorts placement is hover/focus/pointer-recovery
+driven after the SPA drag optimization removed broad eager sweeps. Mobile/coarse
+YouTube surfaces still use the eager visible-sweep path and set
+`data-filtertube-quick-force="true"` after a host is ensured.
+
+```text
+Home or Shorts card
+  -> target detection can start from nested /shorts anchor or inner host
+  -> host promotion tries the outer rich item or lockup host
+  -> duplicate parent-card guard rejects nested duplicate controls
+  -> visual anchor must be renderable, not display: contents
+  -> desktop cross appears through hover/focus/pointer recovery
+  -> live Home/Shorts placement proof remains missing
+```
+
+```mermaid
+flowchart TD
+  A["Nested Home/Shorts target"] --> B["findQuickBlockCardFromTarget"]
+  B --> C["resolveQuickBlockHost"]
+  C --> D["resolveOutermostShortsQuickBlockHost"]
+  D --> E["duplicate parent-card guard"]
+  E --> F["resolveQuickBlockAnchor"]
+  F --> G["hover/focus/pointer recovery creates or shows cross"]
+  G --> H["live Home/Shorts placement proof still NO-GO"]
+```
+
+| Preflight row | Source pins | Current behavior | Missing proof before behavior changes |
+| --- | --- | --- | --- |
+| `home_shorts_target_detection` | `js/content/block_channel.js:500-546`; `js/content/block_channel.js:1089-1204` | Shorts cards can be detected from `shorts-lockup-view-model`, reel tags, `.shortsLockupViewModelHost`, `.reel-item-endpoint`, or `a[href*="/shorts/"]`. | Live Home and Shorts samples proving the first visible card target resolves to the intended host. |
+| `home_shorts_outer_host_promotion` | `js/content/block_channel.js:550-567`; `js/content/block_channel.js:1788-1802` | Nested Shorts hosts can be promoted outward before the duplicate parent-card guard runs. | Installed-tab proof that current Home/Shorts markup still promotes to the visible card and not an inner invisible node. |
+| `home_shorts_visual_anchor` | `js/content/block_channel.js:600-701`; `js/content/block_channel.js:1828-1836` | The wrapper is attached to a renderable anchor; `display: contents` candidates are rejected. | Screenshot/pixel or DOM-rect proof that the wrapper is visible and not clipped or hidden by page overlays. |
+| `desktop_hover_lazy_placement` | `js/content/block_channel.js:1979-2275` | Desktop startup/navigation/mutation do not run eager full-document sweeps; placement is driven by pointerenter, focus, hover intent, and target-gated pointermove recovery. | Positive first-hover fixture for Home and Shorts plus negative no-work fixture for ordinary mousemove. |
+| `mobile_force_visible_placement` | `js/content/block_channel.js:1814-1822`; `js/content/block_channel.js:1979-2275` | Mobile/coarse surfaces can force the ensured control visible and still use bounded eager scans. | Mobile/YTM/Shorts placement fixture proving forced visibility without broad desktop work. |
+| `release_gate` | this audit slice; `docs/audit/FILTERTUBE_VISIBLE_INSTALLED_TAB_BYTE_PARITY_PREFLIGHT_CURRENT_BEHAVIOR_2026-05-31.md` | Current source has placement guards, but no installed visible-tab byte parity or live Home/Shorts placement packet. | Live installed-tab byte proof, Home/Shorts placement trace, route/list-mode profile matrix, and rollback/no-work metrics. |
+
+```text
+Home/Shorts quick-cross placement preflight rows: 6
+Home/Shorts source target promotion status: PRESENT_SOURCE
+desktop Home/Shorts always-visible startup status: NOT_CURRENT_BEHAVIOR
+mobile/coarse force-visible status: PRESENT_SOURCE
+live installed Home/Shorts placement proof: NO-GO
+quick-block placement behavior-change approval: NO-GO
+runtime behavior changed by this preflight: no
+```
+
 ## Missing Future Proof
 
 No product runtime symbol exists yet for:
@@ -310,6 +362,8 @@ No product runtime symbol exists yet for:
 - `quickBlockLifecycleNoWorkBudgetReport`
 - `quickBlockLifecycleNegativeFixturePacket`
 - `quickBlockLifecyclePlacementParityProof`
+- `quickBlockHomeShortsPlacementParityReport`
+- `quickBlockHomeShortsLivePlacementTrace`
 - `quickBlockLifecycleRollbackReport`
 
 This slice does not close the audit rows for quick-block lifecycle ownership, teardown, timer budgets, observer budgets, hover policy, viewport RAF budget, post-action DOM fallback rerun budget, native overlay pause policy, whitelist-mode no-work policy, fixture provenance, or first-class quick-block lifecycle authority gates.

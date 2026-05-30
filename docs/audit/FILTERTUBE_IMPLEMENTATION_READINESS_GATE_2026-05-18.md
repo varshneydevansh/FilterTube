@@ -160,6 +160,27 @@ runtime JSON-first promotion approval: NO-GO
 runtime behavior changed by this addendum: no
 ```
 
+## Home/Shorts Quick-Block Placement Preflight - 2026-05-31
+
+`docs/audit/FILTERTUBE_QUICK_BLOCK_HOVER_LIFECYCLE_TIMER_BOUNDARY_CURRENT_BEHAVIOR_2026-05-23.md`
+now carries a Home/Shorts placement preflight for the missing quick-cross risk.
+It pins 6 placement rows: nested Shorts target detection, outer-host promotion,
+renderable anchor selection, desktop hover-lazy placement, mobile/coarse
+force-visible placement, and release gating. Current source can promote nested
+`/shorts/` targets to outer Home/Shorts hosts and avoid duplicate nested
+controls, but desktop startup/navigation/mutation no longer run eager
+full-document sweeps. A desktop quick-cross is therefore hover/focus/pointer
+recovery behavior today, not an always-visible startup guarantee.
+
+```text
+Home/Shorts quick-cross placement preflight rows: 6
+desktop Home/Shorts always-visible startup status: NOT_CURRENT_BEHAVIOR
+mobile/coarse force-visible status: PRESENT_SOURCE
+live installed Home/Shorts placement proof: NO-GO
+quick-block placement behavior-change approval: NO-GO
+runtime behavior changed by this preflight: no
+```
+
 ## Minimum Gate Before First Behavior Patch
 
 The first behavior patch should not land until these runnable fixture families

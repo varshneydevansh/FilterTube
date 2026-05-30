@@ -192,6 +192,15 @@ The method/callable audit now has an explicit repo-wide semantic gap index:
   observer, button DOM, fallback action, optimistic-hide, DOM fallback rerun,
   negative no-work, and metric artifact proof requirements while keeping
   implementation-ready rows and runtime approvals at 0.
+- The 2026-05-31 Home/Shorts quick-cross placement preflight in
+  `docs/audit/FILTERTUBE_QUICK_BLOCK_HOVER_LIFECYCLE_TIMER_BOUNDARY_CURRENT_BEHAVIOR_2026-05-23.md`
+  narrows the missing quick-cross concern to 6 source-pinned placement rows:
+  nested Shorts target detection, outer-host promotion, renderable anchor
+  selection, desktop hover-lazy placement, mobile/coarse force-visible
+  placement, and release gating. It records that desktop Home/Shorts quick-cross
+  display is hover/focus/pointer-recovery behavior today, not an always-visible
+  startup guarantee, while live installed Home/Shorts placement proof and
+  placement behavior-change approval remain `NO-GO`.
 - The 2026-05-29 fallback menu action report contract continuation in
   `docs/audit/FILTERTUBE_FALLBACK_MENU_ACTION_GATE_CURRENT_BEHAVIOR_2026-05-19.md`
   turns the fallback scanner, popover, and `performBlock()` gap into 12 required

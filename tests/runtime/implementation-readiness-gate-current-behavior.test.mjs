@@ -85,6 +85,7 @@ function assertReadinessGateLinksCurrentYouTubeSpaHotTimerAudit() {
   const methodSemanticGap = read('docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md');
   const jsonPathAuthority = read('docs/audit/FILTERTUBE_JSON_PATH_AUTHORITY_CURRENT_BEHAVIOR_2026-05-19.md');
   const diagnosticPolicy = read('docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md');
+  const quickBlockHover = read('docs/audit/FILTERTUBE_QUICK_BLOCK_HOVER_LIFECYCLE_TIMER_BOUNDARY_CURRENT_BEHAVIOR_2026-05-23.md');
   const installedChromePath = read('docs/audit/FILTERTUBE_INSTALLED_CHROME_UNPACKED_PATH_PARITY_CURRENT_BEHAVIOR_2026-05-30.md');
   const visibleInstalledTabParity = read('docs/audit/FILTERTUBE_VISIBLE_INSTALLED_TAB_BYTE_PARITY_PREFLIGHT_CURRENT_BEHAVIOR_2026-05-31.md');
   const engagementBudget = read('docs/audit/FILTERTUBE_ENGAGEMENT_BUDGET_CURRENT_BEHAVIOR_2026-05-19.md');
@@ -105,6 +106,16 @@ function assertReadinessGateLinksCurrentYouTubeSpaHotTimerAudit() {
   assert.match(doc, /runtime whitelist cache optimization approval: NO-GO/);
   assert.match(doc, /runtime JSON-first promotion approval: NO-GO/);
   assert.match(doc, /runtime behavior changed by this addendum: no/);
+  assert.match(doc, /Home\/Shorts Quick-Block Placement Preflight - 2026-05-31/);
+  assert.match(doc, /now carries a Home\/Shorts placement preflight for the missing quick-cross risk/);
+  assert.match(doc, /pins 6 placement rows: nested Shorts target detection, outer-host promotion,\s+renderable anchor selection, desktop hover-lazy placement, mobile\/coarse\s+force-visible placement, and release gating/);
+  assert.match(doc, /desktop startup\/navigation\/mutation no longer run eager\s+full-document sweeps/);
+  assert.match(doc, /desktop Home\/Shorts always-visible startup status: NOT_CURRENT_BEHAVIOR/);
+  assert.match(doc, /live installed Home\/Shorts placement proof: NO-GO/);
+  assert.match(doc, /quick-block placement behavior-change approval: NO-GO/);
+  assert.match(quickBlockHover, /Home\/Shorts Quick-Cross Placement Preflight - 2026-05-31/);
+  assert.match(quickBlockHover, /Home\/Shorts quick-cross placement preflight rows: 6/);
+  assert.match(quickBlockHover, /runtime behavior changed by this preflight: no/);
   assert.match(doc, /Watch\/player route convergence boundary - 2026-05-30/);
   assert.ok(doc.includes('docs/audit/FILTERTUBE_WATCH_PLAYER_CONTROL_AUTHORITY_AUDIT_2026-05-18.md'));
   assert.ok(doc.includes('tests/runtime/watch-player-control-authority-current-behavior.test.mjs'));

@@ -1113,6 +1113,11 @@ function assertReleaseHotPathProofStackAddendum(source) {
   assert.match(source, /fallback mutation ingress,\s+optimistic hide writes, button wrap\/listener insertion/);
   assert.match(source, /missing quick-cross, Shorts\/Home placement, and\s+no-work desktop lag risk/);
   assert.match(source, /quick-block\s+availability optimization, selector\/anchor rewrites, and mutation\/optimistic\s+hide behavior changes at `NO-GO`/);
+  assert.match(source, /2026-05-31 Home\/Shorts quick-cross placement preflight/);
+  assert.match(source, /6 source-pinned placement rows/);
+  assert.match(source, /nested Shorts target detection, outer-host promotion, renderable anchor\s+selection, desktop hover-lazy placement, mobile\/coarse force-visible\s+placement, and release gating/);
+  assert.match(source, /desktop Home\/Shorts quick-cross\s+display is hover\/focus\/pointer-recovery behavior today, not an always-visible\s+startup guarantee/);
+  assert.match(source, /live installed Home\/Shorts placement proof and\s+placement behavior-change approval remain `NO-GO`/);
   assert.match(source, /2026-05-30 method semantic convergence continuation/);
   assert.ok(source.includes('docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md'));
   assert.ok(source.includes('docs/audit/FILTERTUBE_IMPLEMENTATION_READINESS_GATE_2026-05-18.md'));

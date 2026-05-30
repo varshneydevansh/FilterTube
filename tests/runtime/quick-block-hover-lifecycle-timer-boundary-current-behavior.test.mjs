@@ -423,6 +423,38 @@ class FakeElement {
   }
 }
 
+function assertHomeShortsQuickCrossPlacementPreflight(text) {
+  assert.match(text, /Home\/Shorts Quick-Cross Placement Preflight - 2026-05-31/);
+  assert.match(text, /quick cross missing\s+on Home\/Shorts/);
+  assert.match(text, /Desktop Home\/Search\/Shorts placement is hover\/focus\/pointer-recovery\s+driven/);
+  assert.match(text, /Mobile\/coarse\s+YouTube surfaces still use the eager visible-sweep path/);
+  assert.match(text, /Home\/Shorts quick-cross placement preflight rows: 6/);
+  assert.match(text, /Home\/Shorts source target promotion status: PRESENT_SOURCE/);
+  assert.match(text, /desktop Home\/Shorts always-visible startup status: NOT_CURRENT_BEHAVIOR/);
+  assert.match(text, /mobile\/coarse force-visible status: PRESENT_SOURCE/);
+  assert.match(text, /live installed Home\/Shorts placement proof: NO-GO/);
+  assert.match(text, /quick-block placement behavior-change approval: NO-GO/);
+  assert.match(text, /runtime behavior changed by this preflight: no/);
+
+  for (const row of [
+    'home_shorts_target_detection',
+    'home_shorts_outer_host_promotion',
+    'home_shorts_visual_anchor',
+    'desktop_hover_lazy_placement',
+    'mobile_force_visible_placement',
+    'release_gate'
+  ]) {
+    assert.ok(text.includes(`| \`${row}\` |`), `missing Home/Shorts preflight row ${row}`);
+  }
+
+  for (const token of [
+    'quickBlockHomeShortsPlacementParityReport',
+    'quickBlockHomeShortsLivePlacementTrace'
+  ]) {
+    assert.match(text, new RegExp(`\\\`${escapeRegExp(token)}\\\``));
+  }
+}
+
 class QuickBlockDomNode extends FakeElement {
   constructor(tagName = 'div', { classNames = [], attrs = {} } = {}) {
     super(tagName);
@@ -623,6 +655,7 @@ test('quick-block lifecycle audit is audit-only and source pinned', () => {
   assert.match(text, /quick-block hover lifecycle timer source\/effect blocks: 12/);
   assert.match(text, /descendant `\/shorts\/` anchor or `\.shortsLockupViewModelHost` inner render node to the outer `ytd-rich-item-renderer`/);
   assertQuickBlockLifecycleReportContract(text);
+  assertHomeShortsQuickCrossPlacementPreflight(text);
 
   for (const [file, [expectedLines, expectedBytes, expectedHash]] of Object.entries(sourceFingerprints)) {
     const source = read(file);
@@ -858,17 +891,36 @@ test('quick-block empty desktop first-rule lifecycle correction is source-pinned
 });
 
 test('quick-block button guards and fallback DOM rerun fanout stay source-derived', () => {
+  const source = read('js/content/block_channel.js');
   const ensure = blockMetric(blockSpecs.quickBlockEnsureButton).block;
   const wrap = blockMetric(blockSpecs.quickBlockWrapHoverEvents).block;
   const action = blockMetric(blockSpecs.quickBlockActionFallback).block;
+  const targetFastPath = blockMetric(blockSpecs.quickBlockCardTargetFastPath).block;
+  const setup = blockMetric(blockSpecs.quickBlockObserverSetup).block;
+  const viewportPruning = blockMetric(blockSpecs.quickBlockViewportPruning).block;
 
   assert.match(ensure, /const resolvedHostCard = resolveQuickBlockHost\(card\)/);
   assert.match(ensure, /const hostCard = resolveOutermostShortsQuickBlockHost\(resolvedHostCard\)/);
   assert.match(ensure, /const parentCard = hostCard\.parentElement\?\.closest\?\.\(QUICK_BLOCK_CARD_SELECTORS\)/);
   assert.match(ensure, /if \(parentCard && parentCard !== hostCard\) return/);
+  assert.match(ensure, /const shouldForceVisible = isMobileYouTubeSurface\(\)/);
+  assert.match(ensure, /hostCard\.setAttribute\('data-filtertube-quick-force', 'true'\)/);
+  assert.match(ensure, /const anchor = resolveQuickBlockAnchor\(hostCard\) \|\| hostCard/);
   assert.match(ensure, /data-filtertube-quick-events/);
   assert.match(ensure, /data-filtertube-quick-anchor-events/);
   assert.match(wrap, /data-filtertube-quick-wrap-events/);
+  assert.match(source, /a\[href\*="\/shorts\/"\]/);
+  assert.match(source, /function resolveQuickBlockHost\(node\)/);
+  assert.match(source, /shortsNode\.closest\?\.\('ytd-rich-item-renderer'\)/);
+  assert.match(source, /function resolveQuickBlockAnchor\(hostCard\)/);
+  assert.match(source, /style\.display === 'contents'/);
+  assert.match(targetFastPath, /function findQuickBlockCardFromTarget\(target, maxDepth = 18\)/);
+  assert.match(source, /function resolveOutermostShortsQuickBlockHost\(hostCard\)/);
+  assert.match(viewportPruning, /function scheduleQuickBlockHoverIntent\(card, event\)/);
+  assert.match(setup, /document\.addEventListener\('pointerenter'/);
+  assert.match(setup, /scheduleQuickBlockHoverIntent\(card, event\)/);
+  assert.match(setup, /if \(shouldEagerQuickBlockSweep\(\)\) \{[\s\S]*new MutationObserver/);
+  assert.match(setup, /if \(shouldEagerQuickBlockSweep\(\)\) \{[\s\S]*scheduleQuickBlockSweep\(document\)/);
   assert.match(ensure, /trigger\.addEventListener\('click'/);
   assert.match(ensure, /requestAnimationFrame\(\(\) =>/);
   assert.match(action, /data-busy/);
