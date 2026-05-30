@@ -1,0 +1,74 @@
+{
+  "provenance": {
+    "source": "logs.json",
+    "rendererType": "richItemRenderer",
+    "extractedPath": "contents.twoColumnBrowseResultsRenderer.tabs.0.tabRenderer.content.richGridRenderer.contents.0.richItemRenderer.content.lockupViewModel",
+    "fixtureKind": "json",
+    "surface": "Main desktop home rich-grid Mix lockup",
+    "route": "home"
+  },
+  "renderer": {
+    "content": {
+      "lockupViewModel": {
+        "contentImage": {
+          "collectionThumbnailViewModel": {
+            "primaryThumbnail": {
+              "thumbnailViewModel": {
+                "overlays": [
+                  {
+                    "thumbnailOverlayBadgeViewModel": {
+                      "thumbnailBadges": [
+                        {
+                          "thumbnailBadgeViewModel": {
+                            "text": "Mix"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "metadata": {
+          "lockupMetadataViewModel": {
+            "title": {
+              "content": "Mix - Shakira, Ed Sheeran, Beele - Hips Don't Lie (Anniversary Version)"
+            },
+            "metadata": {
+              "contentMetadataViewModel": {
+                "metadataRows": [
+                  {
+                    "metadataParts": [
+                      {
+                        "text": {
+                          "content": "Beele, Ovy On The Drums, Ed Sheeran and more"
+                        }
+                      }
+                    ]
+                  }
+                ],
+                "delimiter": " * "
+              }
+            }
+          }
+        },
+        "contentId": "RD41ZY18JqI2A",
+        "contentType": "LOCKUP_CONTENT_TYPE_PLAYLIST",
+        "rendererContext": {
+          "commandContext": {
+            "onTap": {
+              "innertubeCommand": {
+                "watchEndpoint": {
+                  "videoId": "41ZY18JqI2A",
+                  "playlistId": "RD41ZY18JqI2A"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

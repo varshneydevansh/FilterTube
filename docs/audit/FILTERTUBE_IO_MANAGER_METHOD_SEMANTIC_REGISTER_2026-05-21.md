@@ -1,0 +1,263 @@
+# FilterTube IO Manager Method Semantic Register - Current Behavior - 2026-05-21
+
+Status: audit-only current-behavior register. Runtime behavior is unchanged.
+
+This register promotes `js/io_manager.js` from broad import/export and backup
+callable accounting to a source-derived method inventory. It covers the shared
+`FilterTubeIO` helper surface that serializes FilterTube v3 backups, translates
+legacy BlockTube data, migrates and sanitizes V4 profile state, verifies PIN
+guards, encrypts/decrypts backup containers, restores optional Nanah trusted
+state, writes storage, creates downloads through the runtime downloads API, and
+schedules automatic backups.
+
+This is not completion proof for every import strategy, profile migration path,
+PIN/auth mode, legacy-to-V4 mapping, Nanah trust restore, backup download
+lifecycle, stale alias preservation, list-mode transfer, storage error path,
+runtime downloads cleanup, backup rotation, or import/export UI interaction. It
+is a current-behavior boundary before IO, backup, profile migration, encryption,
+download, storage, Nanah restore, or import/export behavior changes.
+
+## Source-Derived Summary
+
+```text
+source file: js/io_manager.js
+line count: 2030
+named declarations: 53
+IIFE-scoped function declarations: 47
+plain function declarations: 31
+async function declarations: 16
+local const arrow helper declarations: 6
+public FilterTubeIO entries: 11
+semantic method groups: 12
+storage key constants: 4
+readStorage occurrences: 5
+writeStorage occurrences: 8
+STORAGE_NAMESPACE.get calls: 1
+STORAGE_NAMESPACE.set calls: 1
+chrome.runtime.lastError reads: 1
+runtimeAPI.downloads.download calls: 2
+downloadWithRuntimeApi occurrences: 3
+runtimeAPI.downloads.search calls: 1
+runtimeAPI.downloads.erase calls: 2
+URL.createObjectURL calls: 2
+URL.revokeObjectURL calls: 1
+Blob constructor calls: 2
+setTimeout calls: 2
+clearTimeout calls: 1
+setInterval calls: 0
+addEventListener calls: 0
+querySelector calls: 0
+document.createElement calls: 0
+FilterTubeSettings references: 5
+FilterTubeSecurity references: 3
+runtime behavior changed: no
+```
+
+## Method Group Counts
+
+```text
+autoBackupDownloadRotation: 6
+downloadRuntimeHelpers: 3
+encryptedAndNanahState: 3
+exportSerialization: 2
+importFormatParsing: 3
+importMergeAndPersistence: 1
+keywordChannelNormalization: 10
+legacyProfileDerivationAndV3Persistence: 5
+primitiveDefensiveHelpers: 7
+profileScopeAndSecurity: 4
+profilesV4MigrationAndSanitization: 7
+storageAccessWrappers: 2
+```
+
+## Semantic Group Summary
+
+| Semantic group | Declarations | Current owner/effect shape | Missing proof before behavior changes |
+| --- | ---: | --- | --- |
+| `primitiveDefensiveHelpers` | 7 | Supplies timestamp, object/array/string/bool/number/list-mode coercion used by import, export, profile, and backup flows. | Caller-specific fallback policy, malformed input fixtures, and proof that fallback defaults do not widen hide/leak state. |
+| `downloadRuntimeHelpers` | 3 | Wraps Chrome/Firefox download APIs, normalizes callback/promise results, and schedules blob URL revocation. | Download lifecycle budget, blob cleanup proof, Firefox/Chrome parity, and failure-path user notification contract. |
+| `keywordChannelNormalization` | 10 | Sanitizes keyword/channel rows, parses channel-derived keyword sources, dedupes imports, preserves collaboration metadata, mirrors Main blocklist aliases, and merges string/video/subscription lists. | Duplicate policy, channel identity confidence, collaboration fixture proof, stale alias interaction, and false-hide negative fixtures. |
+| `profileScopeAndSecurity` | 4 | Resolves full versus active export/import scope and checks local or incoming master PIN verifiers through `FilterTubeSecurity`. | Scope permission contract, PIN retry/error policy, active child profile fixture, and auth bypass negative tests. |
+| `legacyProfileDerivationAndV3Persistence` | 5 | Derives V3 profile snapshots from V4 active profiles and reads/writes `ftProfilesV3` through storage wrappers. | V3/V4 parity matrix, list-mode transfer proof, whitelist preservation proof, and legacy write rollback policy. |
+| `storageAccessWrappers` | 2 | Wraps `chrome.storage.local.get/set`, swallows read exceptions, and reports write callback errors. | Storage error taxonomy, retry/rollback policy, browser API parity, and revision-aware write authority. |
+| `profilesV4MigrationAndSanitization` | 7 | Validates V4 containers, migrates missing V4 from legacy storage, repairs profile type/parent metadata, and sanitizes Main/Kids profile rows. | Profile graph invariant proof, child/parent negative fixtures, read-path write budget, and import merge/replace parity. |
+| `importFormatParsing` | 3 | Detects FilterTube v3 versus BlockTube input, translates BlockTube arrays, and normalizes incoming V3/V4 backup payloads. | Unsupported-format fixtures, comments/exact legacy policy, raw payload provenance, and renderer/runtime parity proof. |
+| `exportSerialization` | 2 | Builds v3 export JSON and scopes full/profile exports from current settings plus V3/V4 profile state. | Export schema manifest, active profile proof, sensitive field policy, and stale alias exclusion/inclusion contract. |
+| `importMergeAndPersistence` | 1 | Applies merge/replace imports across visible settings, V3 profile state, V4 active/target profile state, channel maps, theme, and optional Nanah trusted state. | Atomic mutation plan, rollback policy, target profile proof, list-mode transfer proof, and cross-feature side-effect budget. |
+| `encryptedAndNanahState` | 3 | Adds optional Nanah trusted state to full encrypted backups, encrypts/decrypts JSON through `FilterTubeSecurity`, and delegates decrypted import. | Encryption container schema, password error contract, Nanah restore permission policy, and trusted-link dedupe fixtures. |
+| `autoBackupDownloadRotation` | 6 | Builds automatic backup payloads, probes download directory, writes JSON blobs through downloads API, rotates download records, and debounces backup scheduling. | Backup schedule authority, timer teardown, download-file deletion proof, trigger classification, rotation filesystem proof, and performance budget. |
+
+## Current Method Inventory
+
+| Source line | Kind | Method or function | Semantic group |
+| ---: | --- | --- | --- |
+| 23 | `function` | `nowTs` | `primitiveDefensiveHelpers` |
+| 28 | `function` | `safeArray` | `primitiveDefensiveHelpers` |
+| 32 | `function` | `parsePackedChannelKeywordSource` | `keywordChannelNormalization` |
+| 40 | `function` | `safeObject` | `primitiveDefensiveHelpers` |
+| 44 | `function` | `normalizeString` | `primitiveDefensiveHelpers` |
+| 48 | `function` | `revokeDownloadBlobUrlLater` | `downloadRuntimeHelpers` |
+| 58 | `function` | `downloadWithRuntimeApi` | `downloadRuntimeHelpers` |
+| 66 | `const arrow` | `finish` | `downloadRuntimeHelpers` |
+| 105 | `function` | `normalizeBool` | `primitiveDefensiveHelpers` |
+| 109 | `function` | `normalizeNumber` | `primitiveDefensiveHelpers` |
+| 113 | `function` | `normalizeListMode` | `primitiveDefensiveHelpers` |
+| 124 | `function` | `keywordKey` | `keywordChannelNormalization` |
+| 136 | `function` | `sanitizeKeywordEntry` | `keywordChannelNormalization` |
+| 182 | `function` | `resolveProfileScope` | `profileScopeAndSecurity` |
+| 190 | `function` | `extractMasterPinVerifier` | `profileScopeAndSecurity` |
+| 199 | `async function` | `verifyPinAgainstVerifier` | `profileScopeAndSecurity` |
+| 207 | `async function` | `requirePinOrThrow` | `profileScopeAndSecurity` |
+| 214 | `function` | `deriveProfilesV3FromV4` | `legacyProfileDerivationAndV3Persistence` |
+| 223 | `const arrow` | `sanitizeChannels` | `legacyProfileDerivationAndV3Persistence` |
+| 226 | `const arrow` | `sanitizeKeywords` | `legacyProfileDerivationAndV3Persistence` |
+| 256 | `function` | `channelKey` | `keywordChannelNormalization` |
+| 267 | `function` | `mergeChannelEntries` | `keywordChannelNormalization` |
+| 321 | `function` | `sanitizeChannelEntry` | `keywordChannelNormalization` |
+| 409 | `async function` | `readStorage` | `storageAccessWrappers` |
+| 421 | `async function` | `writeStorage` | `storageAccessWrappers` |
+| 439 | `async function` | `loadProfilesV3` | `legacyProfileDerivationAndV3Persistence` |
+| 470 | `async function` | `saveProfilesV3` | `legacyProfileDerivationAndV3Persistence` |
+| 477 | `function` | `isValidProfilesV4` | `profilesV4MigrationAndSanitization` |
+| 490 | `function` | `buildDefaultProfilesV4FromLegacyStorage` | `profilesV4MigrationAndSanitization` |
+| 561 | `async function` | `loadProfilesV4` | `profilesV4MigrationAndSanitization` |
+| 620 | `async function` | `saveProfilesV4` | `profilesV4MigrationAndSanitization` |
+| 627 | `function` | `sanitizeProfilesV4` | `profilesV4MigrationAndSanitization` |
+| 640 | `const arrow` | `sanitizeMainKeywords` | `profilesV4MigrationAndSanitization` |
+| 646 | `const arrow` | `sanitizeMainChannels` | `profilesV4MigrationAndSanitization` |
+| 726 | `function` | `mergeKeywordLists` | `keywordChannelNormalization` |
+| 758 | `function` | `mergeChannelLists` | `keywordChannelNormalization` |
+| 781 | `function` | `normalizeMainProfileAliasFields` | `keywordChannelNormalization` |
+| 800 | `function` | `mergeStringList` | `keywordChannelNormalization` |
+| 818 | `function` | `detectFormat` | `importFormatParsing` |
+| 834 | `function` | `parseBlockTube` | `importFormatParsing` |
+| 932 | `function` | `buildV3Export` | `exportSerialization` |
+| 1026 | `function` | `normalizeNanahBackupState` | `encryptedAndNanahState` |
+| 1045 | `function` | `normalizeIncomingV3` | `importFormatParsing` |
+| 1146 | `async function` | `exportV3` | `exportSerialization` |
+| 1241 | `async function` | `importV3` | `importMergeAndPersistence` |
+| 1729 | `async function` | `exportV3Encrypted` | `encryptedAndNanahState` |
+| 1759 | `async function` | `importV3Encrypted` | `encryptedAndNanahState` |
+| 1782 | `async function` | `createAutoBackup` | `autoBackupDownloadRotation` |
+| 1839 | `const arrow` | `safePart` | `autoBackupDownloadRotation` |
+| 1875 | `async function` | `getBackupDirectory` | `autoBackupDownloadRotation` |
+| 1922 | `async function` | `saveBackupFile` | `autoBackupDownloadRotation` |
+| 1956 | `async function` | `rotateBackups` | `autoBackupDownloadRotation` |
+| 1996 | `function` | `scheduleAutoBackup` | `autoBackupDownloadRotation` |
+
+## Current Public API
+
+```text
+exportV3
+exportV3Encrypted
+importV3
+importV3Encrypted
+loadProfilesV3
+saveProfilesV3
+loadProfilesV4
+saveProfilesV4
+createAutoBackup
+scheduleAutoBackup
+rotateBackups
+```
+
+## Current Side-Effect Surface
+
+```text
+storage keys: ftProfilesV3, ftProfilesV4, ftNanahTrustedLinks, ftNanahDeviceId
+storage wrappers: readStorage, writeStorage
+settings API dependency: FilterTubeSettings.loadSettings, FilterTubeSettings.saveSettings, FilterTubeSettings.setThemePreference
+security API dependency: FilterTubeSecurity.verifyPin, FilterTubeSecurity.encryptJson, FilterTubeSecurity.decryptJson
+download API dependency: runtimeAPI.downloads.download, runtimeAPI.downloads.search, runtimeAPI.downloads.erase
+timer effects: setTimeout for blob URL revocation and debounced scheduleAutoBackup
+blob effects: URL.createObjectURL, URL.revokeObjectURL, Blob
+profile migration effects: buildDefaultProfilesV4FromLegacyStorage, sanitizeProfilesV4, deriveProfilesV3FromV4
+import persistence effects: SettingsAPI.saveSettings, saveProfilesV3, saveProfilesV4, writeStorage(channelMap), writeStorage(Nanah state)
+backup persistence effects: saveBackupFile, rotateBackups, runtime downloads erase records
+```
+
+## Future Proof Fields
+
+Each row must eventually be backed by a source line, fixture, and observed
+runtime effect before an IO behavior change can claim semantic coverage:
+
+```text
+methodReference
+sourceLine
+semanticGroup
+callerUi
+exportScope
+importScope
+targetProfileId
+activeProfileId
+strategy
+authPinPolicy
+localMasterPinEffect
+incomingMasterPinEffect
+storageKeysRead
+storageKeysWritten
+legacyProfileShape
+v4ProfileShape
+profileSanitizationEffect
+settingsSaveEffect
+v3WriteEffect
+v4WriteEffect
+channelMapWriteEffect
+nanahTrustedStateEffect
+encryptedPayloadEffect
+downloadApiEffect
+blobUrlLifecycleEffect
+backupRotationEffect
+backupScheduleTimerEffect
+runtimeErrorPolicy
+migrationModePolicy
+whitelistPreservationPolicy
+listModePolicy
+positiveFixture
+negativePinFixture
+negativeFormatFixture
+negativeProfileFixture
+negativeDownloadFixture
+performanceBudget
+fixtureProvenance
+```
+
+## Missing Runtime Authorities
+
+These names intentionally do not exist in runtime source yet. They name the
+contracts that would be needed before implementation changes can be treated as
+covered:
+
+```text
+ioManagerMethodAuthority
+ioManagerProfileMigrationReport
+ioManagerImportMutationPlan
+ioManagerExportScopeContract
+ioManagerPinAuthContract
+ioManagerEncryptedBackupContract
+ioManagerNanahRestorePolicy
+ioManagerDownloadLifecycleBudget
+ioManagerAutoBackupScheduleAuthority
+ioManagerBackupRotationReport
+ioManagerStorageWriteEffectReport
+ioManagerFixtureProvenance
+```
+
+## Method Semantic Proof Gap Boundary
+
+`docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md`
+is a required source input before this method semantic register can support
+runtime optimization or JSON-first promotion. Current proof pins:
+
+```text
+method semantic proof gap files covered: 63
+method semantic proof gap lexical callables covered: 5469
+files with complete per-callable semantic proof: 0
+lexical callables requiring semantic proof before behavior changes: 5469
+affected callable semantic proof: NO-GO
+runtime behavior changed: no
+```
+
+These counts are audit-only blockers. They do not approve runtime
+optimization, JSON-first behavior, method deletion, method merging, lifecycle
+cleanup, no-work changes, or whitelist behavior changes.

@@ -26,6 +26,14 @@ let collabDialogObserverInitialized = false;
 let pendingCollaboratorRefresh = false;
 let collabTriggerListenersAttached = false;
 
+function hasPendingCollabCards() {
+    try {
+        return window.pendingCollabCards instanceof Map && window.pendingCollabCards.size > 0;
+    } catch (e) {
+        return false;
+    }
+}
+
 function scheduleCollaboratorRefresh() {
     if (pendingCollaboratorRefresh) return;
     pendingCollaboratorRefresh = true;
@@ -49,6 +57,7 @@ function queuePendingDialogTrigger(card) {
     if (!key || !window.pendingCollabCards?.has(key)) return;
 
     window.pendingCollabDialogTrigger = { key, timestamp: Date.now() };
+    ensureCollabDialogObserver();
     if (pendingCollabDialogTriggerTimeoutId) {
         clearTimeout(pendingCollabDialogTriggerTimeoutId);
     }
@@ -77,6 +86,16 @@ function ensureCollabTriggerListeners() {
     collabTriggerListenersAttached = true;
     document.addEventListener('click', handlePotentialCollabTrigger, true);
     document.addEventListener('keydown', handlePotentialCollabTriggerKeydown, true);
+}
+
+function removeCollabTriggerListeners() {
+    if (!collabTriggerListenersAttached) return;
+    collabTriggerListenersAttached = false;
+    try {
+        document.removeEventListener('click', handlePotentialCollabTrigger, true);
+        document.removeEventListener('keydown', handlePotentialCollabTriggerKeydown, true);
+    } catch (e) {
+    }
 }
 
 function resolveCollabEntryForDialog(collaborators) {
@@ -202,6 +221,7 @@ function applyCollaboratorsToCard(entry, collaborators) {
     }
 
     window.pendingCollabCards.delete(entry.key);
+    refreshCollabDialogRuntime();
     broadcastCollabDialogData({
         entry,
         collaborators: sanitizedCollaborators,
@@ -304,7 +324,8 @@ function handleCollaborationDialog(dialogNode) {
 }
 
 function ensureCollabDialogObserver() {
-    if (collabDialogObserverInitialized) return;
+    if (!hasPendingCollabCards()) return false;
+    if (collabDialogObserverInitialized) return true;
     collabDialogObserverInitialized = true;
 
     collabDialogObserver = new MutationObserver(mutations => {
@@ -323,22 +344,50 @@ function ensureCollabDialogObserver() {
         }
     });
 
-    collabDialogObserver.observe(document.documentElement || document.body, {
+    const target = document.documentElement || document.body;
+    if (!target) {
+        collabDialogObserverInitialized = false;
+        collabDialogObserver = null;
+        return false;
+    }
+
+    collabDialogObserver.observe(target, {
         childList: true,
         subtree: true
     });
+    return true;
+}
+
+function disconnectCollabDialogObserver() {
+    collabDialogObserverInitialized = false;
+    try {
+        collabDialogObserver?.disconnect?.();
+    } catch (e) {
+    }
+    collabDialogObserver = null;
+}
+
+function refreshCollabDialogRuntime() {
+    if (hasPendingCollabCards()) {
+        ensureCollabTriggerListeners();
+        ensureCollabDialogObserver();
+        return true;
+    }
+    removeCollabTriggerListeners();
+    disconnectCollabDialogObserver();
+    return false;
 }
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
-    ensureCollabTriggerListeners();
-    ensureCollabDialogObserver();
+    refreshCollabDialogRuntime();
 });
 
 // Export for content_bridge.js
 window.collabDialogModule = {
     ensureCollabDialogObserver,
     ensureCollabTriggerListeners,
+    refreshCollabDialogRuntime,
     scheduleCollaboratorRefresh,
     applyCollaboratorsToCard
 };

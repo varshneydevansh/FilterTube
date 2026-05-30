@@ -1,0 +1,252 @@
+# FilterTube Root Package Metadata Script Surface - Current Behavior - 2026-05-21
+
+Status: audit-only proof. Runtime behavior is unchanged. This is not an
+implementation patch.
+
+## Purpose
+
+This slice records the current root project metadata surface before any
+optimization, release, dependency, JSON-first, or cleanup implementation work.
+It covers the tracked root metadata family:
+
+```text
+.gitignore
+CHANGELOG.md
+LICENSE
+README.md
+channel-identity-watch-mix-collab-recovery-plan.md
+package.json
+package-lock.json
+```
+
+These files do not directly hide YouTube content, but they decide how engineers
+build, audit, package, describe, and reason about the runtime. They therefore
+affect reliability and code-burden risk, and they can make optimization or
+first-class JSON filter work look safer than the runtime proof actually allows.
+
+## File Fingerprints
+
+Current tracked root metadata inventory: 7 files, 2,903 newline counts, and
+129,612 bytes.
+
+| File | Newline count | Bytes | SHA-256 |
+|---|---:|---:|---|
+| `.gitignore` | 153 | 2,197 | `c90a7834297cf0a7b65493f41a21947fd5d85d1e14740b902cb3a3664028e3ca` |
+| `CHANGELOG.md` | 554 | 36,175 | `2453fd9347d8eb357be65bf1a9a9e00f97f2e36ea02073c155c46e1015c17553` |
+| `LICENSE` | 21 | 1,073 | `d0739cbb6232b0fb9ea59347feaf412bab5042768aa02856b16af24bb35e9d9d` |
+| `README.md` | 406 | 22,852 | `2acc8bec7148bb5a11294b87ef673813e642d44c48f6885781fdae45d37e719d` |
+| `channel-identity-watch-mix-collab-recovery-plan.md` | 262 | 16,023 | `01f82169b06d3752e318b20b956c8a4284ae80166686e5c40aeee66c957d108a` |
+| `package.json` | 46 | 1,376 | `cd24685d1fb4940c1a67f12ce143bc1466200a299a82dbfa6f553b99e24ae23f` |
+| `package-lock.json` | 1,461 | 49,916 | `4882aa83fdbd0b3e150d4df5d32b3c02f3597cd64fe7193b9efbef3183832cef` |
+
+Any release, package, or optimization claim that uses these files should cite
+the exact current file state or an updated fingerprint.
+
+## Package Script Surface
+
+`package.json` currently declares package version `3.3.1`, license `MIT`,
+repository `git+https://github.com/varshneydevansh/FilterTube.git`, homepage
+`https://github.com/varshneydevansh/FilterTube`, 2 runtime dependencies, 3
+development dependencies, and 12 scripts.
+
+Current scripts:
+
+```text
+build:nanah-vendor -> node scripts/build-nanah-vendor.mjs
+build:ui -> node scripts/build-extension-ui.mjs
+dev -> node build.js
+build -> node build.js
+build:chrome -> node build.js chrome
+build:firefox -> node build.js firefox
+build:opera -> node build.js opera
+sync:native-runtime -> node scripts/sync-native-runtime.mjs
+audit:runtime -> node --test tests/runtime/*.test.mjs
+dev:chrome -> cp manifest.chrome.json manifest.json
+dev:firefox -> cp manifest.firefox.json manifest.json
+dev:opera -> cp manifest.opera.json manifest.json
+```
+
+Current package metadata does not declare `private`, `engines`,
+`packageManager`, or a conventional `test` script. The audit command exists as
+`audit:runtime`; contributors who run `npm test` get no project-owned test path
+from this file. The browser dev shortcuts still mutate tracked `manifest.json`
+by copying a browser variant over it.
+
+Risk classification:
+
+| Risk | Current behavior | Missing gate |
+|---|---|---|
+| Release drift | `package.json`, `package-lock.json`, README badges, browser manifests, and changelog currently point at `3.3.1`; `data/release_notes.json` is separately staged at `3.3.2` in the asset/data audit. | `rootReleaseClaimGate` linking package version, manifest versions, changelog section, README badge, release notes row, website copy, and package artifact. |
+| Audit discoverability | `audit:runtime` exists, but `test` is absent. | `packageScriptExecutionGate` for release and local verification commands. |
+| Dev manifest mutation | `dev:chrome`, `dev:firefox`, and `dev:opera` overwrite tracked `manifest.json`. | Dirty-worktree and manifest-parity gate before release or implementation review. |
+| Native parity | `sync:native-runtime` delegates to a sibling app repo; normal `npm run build` does not invoke it. | Runtime sync freshness and app-boundary proof before claiming extension/app parity. |
+
+## Lockfile Surface
+
+`package-lock.json` is lockfile version 3 with 112 `packages` entries, including
+the root package, 111 non-root packages, and 0 top-level `dependencies` entries.
+All non-root package entries currently have an integrity value.
+
+License counts across non-root package entries:
+
+```text
+MIT: 92
+ISC: 16
+Apache-2.0: 2
+BSD-3-Clause: 1
+```
+
+Two locked packages currently carry deprecation metadata:
+
+```text
+node_modules/glob: Glob versions prior to v9 are no longer supported
+node_modules/inflight: This module is not supported, and leaks memory...
+```
+
+The `inflight` deprecation is a code-burden and dependency-health signal, not a
+runtime observer leak inside FilterTube product code. It should still block any
+claim that the package graph has been dependency-reviewed or optimized.
+
+Missing gate: no `packageLockReproducibilityReport` exists yet to connect
+package install, Node/npm version, dependency license/deprecation review,
+vendor-bundle freshness, generated UI freshness, and release ZIP contents.
+
+## Public Root Documents
+
+`README.md` is public release copy. It currently displays version `3.3.1`,
+license `MIT`, total line count `113.3k`, JavaScript line count `72.3k`, and
+links the download hub `https://filtertube.in/downloads`.
+
+Current README claims relevant to optimization and JSON-first filtering:
+
+- Large blocked-channel lists filter faster because JSON payloads use indexed
+  channel matching instead of scanning every saved channel per renderer.
+- JSON-backed surfaces can filter before paint when YouTube exposes needed
+  fields.
+- Channel identity is preferred from intercepted JSON and learned maps, while
+  bounded fallback resolvers remain for weak targets.
+- Current audit work is tightening no-rule, route, lifecycle, and resolver
+  budgets.
+
+`CHANGELOG.md` currently starts with `## Version 3.3.1`; `README.md` also links
+to it as the detailed change history. `LICENSE` is the MIT license file.
+
+`build.js` packages only these root common files into browser release outputs:
+
+```text
+README.md
+CHANGELOG.md
+LICENSE
+```
+
+The historical planning file
+`channel-identity-watch-mix-collab-recovery-plan.md` is tracked, but it is not
+copied by `build.js` as a browser package common file and is not referenced by
+browser manifests. Its JSON-first wording is useful audit context only until
+runtime fixtures and gates prove the exact behavior.
+
+Missing gate: no `rootDocClaimParityReport` exists yet to prove public copy,
+changelog, package metadata, release notes, website claims, package artifacts,
+and runtime behavior describe the same shipped state.
+
+## Gitignore Evidence Boundary
+
+`.gitignore` excludes build output (`build/`, `dist/`, `release-artifacts/`,
+`mobile-artifacts/`, `*.zip`, `*.apk`, `*.aab`, `website/.next/`) and many local
+raw evidence captures such as `logs.json`, `comments.json`, `YT_MAIN.json`,
+`YTM.json`, `YT_KIDS.json`, `get_watch?prettyPrint=false.json`, and
+`watcher-collab-watchlist-spa-fix-plan.md`.
+
+The file also documents commented-out lockfile ignore lines:
+
+```text
+# package-lock.json
+# yarn.lock
+```
+
+Current behavior is that `package-lock.json` remains tracked and is not ignored.
+Several raw JSON/HTML/text captures exist locally and are ignored; they are
+evidence inputs, not product source, package inputs, or first-class runtime
+filters.
+
+Missing gate: no `rootGitignoreEvidenceBoundary` exists yet to promote a raw
+capture into a reduced fixture with provenance, route, endpoint, expected
+positive/negative behavior, side-effect policy, and deletion readiness.
+
+## JSON-First And Optimization Boundary
+
+The active audit is intentionally finding optimization locations before
+implementation. Existing JSON-first audit slices already pin that optimization
+is blocked until a first-class JSON filter contract records path syntax,
+renderer ownership, field effect, route/surface, list mode, identity confidence,
+mutation effect, no-work budget, fixture provenance, DOM parity, native parity,
+and rollback/restore proof.
+
+This root metadata slice adds the outer boundary around that work:
+
+- README and changelog copy can claim JSON-first direction or performance
+  improvements before every runtime path is proven.
+- `package.json` can expose audit scripts, build scripts, and native sync
+  wrappers, but it does not itself prove runtime behavior.
+- `.gitignore` keeps many JSON captures out of tracked source; those captures
+  must become reduced fixtures before they can drive first-class filter changes.
+- `channel-identity-watch-mix-collab-recovery-plan.md` says JSON engine
+  filtering should be restored first, but it remains a plan until runtime proof
+  exists.
+
+Missing gate: no `rootJsonFirstClaimGate` exists yet to connect public copy,
+planning copy, package scripts, captured JSON fixtures, runtime rule paths,
+and current-behavior tests before promoting more JSON paths as first-class
+filters.
+
+## Current Missing Authority Symbols
+
+No product source currently defines:
+
+```text
+rootPackageMetadataAuthority
+packageScriptExecutionGate
+packageLockReproducibilityReport
+rootDocClaimParityReport
+rootGitignoreEvidenceBoundary
+rootReleaseClaimGate
+rootJsonFirstClaimGate
+rootMetadataDeletionReadinessReport
+```
+
+## Non-Completion Boundary
+
+This register does not close root-project-metadata tracked-file obligations.
+Before optimizing, deleting, rewriting, packaging, or claiming first-class JSON
+filter behavior through this metadata surface, future work still needs:
+
+- package script execution proof for release, audit, generated UI, vendor, and
+  native-sync paths;
+- dependency reproducibility, license, deprecation, and generated-bundle
+  freshness proof;
+- public claim parity across README, changelog, release notes, website,
+  manifests, and built artifacts;
+- reduced JSON fixture provenance for ignored capture files;
+- dirty-worktree and browser manifest parity gates for dev shortcut scripts;
+- explicit JSON-first promotion gates before runtime code changes.
+
+## Method Semantic Proof Gap Boundary
+
+`docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md`
+is a required source input before this static/generated/asset package surface
+can support runtime optimization. Current proof pins:
+
+```text
+method semantic proof gap files covered: 63
+method semantic proof gap lexical callables covered: 5469
+files with complete per-callable semantic proof: 0
+lexical callables requiring semantic proof before behavior changes: 5469
+affected callable semantic proof: NO-GO
+runtime behavior changed: no
+```
+
+These counts are audit-only blockers. They do not approve runtime
+optimization, JSON-first behavior, asset optimization, generated-output
+cleanup, package pruning, CSS activation/deletion, whitelist behavior, metric
+collectors, artifact creation, native sync, release package changes, or public
+claims.

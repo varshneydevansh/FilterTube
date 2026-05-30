@@ -512,33 +512,75 @@ function sendSettingsToMainWorld(settings) {
         ensureSeedReadyListener();
         scheduleSeedRetry();
     }
+
+    refreshRuntimeObserversAfterSettingsUpdate();
 }
 
 let pendingStorageRefreshTimer = 0;
 let lastStorageRefreshTs = 0;
+let pendingStorageRefreshForceReprocess = false;
 const MIN_STORAGE_REFRESH_INTERVAL_MS = 250;
 
+function refreshRuntimeObserversAfterSettingsUpdate() {
+    try {
+        if (typeof refreshFilterTubeRuntimeObservers === 'function') {
+            refreshFilterTubeRuntimeObservers();
+            return;
+        }
+    } catch (e) {
+    }
+    try {
+        if (typeof window.FilterTube_refreshRuntimeObservers === 'function') {
+            window.FilterTube_refreshRuntimeObservers();
+            return;
+        }
+    } catch (e) {
+    }
+    try {
+        if (typeof window.FilterTube_refreshQuickBlockAvailability === 'function') {
+            window.FilterTube_refreshQuickBlockAvailability({ force: true });
+        }
+    } catch (e) {
+    }
+    try {
+        if (typeof window.FilterTube_refreshDOMFallbackObserver === 'function') {
+            window.FilterTube_refreshDOMFallbackObserver();
+        }
+    } catch (e) {
+    }
+    try {
+        if (typeof schedulePrefetchScan === 'function') schedulePrefetchScan();
+    } catch (e) {
+    }
+}
+
 function scheduleSettingsRefreshFromStorage({ forceReprocess = true } = {}) {
+    const shouldForceReprocess = forceReprocess === true;
     const now = Date.now();
     const elapsed = now - lastStorageRefreshTs;
     if (elapsed >= MIN_STORAGE_REFRESH_INTERVAL_MS && !pendingStorageRefreshTimer) {
         lastStorageRefreshTs = now;
         requestSettingsFromBackground({ forceRefresh: true }).then(result => {
             if (result?.success) {
-                applyDOMFallback(result.settings, { forceReprocess: forceReprocess === true });
+                applyDOMFallback(result.settings, { forceReprocess: shouldForceReprocess });
+                refreshRuntimeObserversAfterSettingsUpdate();
             }
         });
         return;
     }
 
+    pendingStorageRefreshForceReprocess = pendingStorageRefreshForceReprocess || shouldForceReprocess;
     if (pendingStorageRefreshTimer) return;
     const delay = Math.max(0, MIN_STORAGE_REFRESH_INTERVAL_MS - elapsed);
     pendingStorageRefreshTimer = setTimeout(() => {
         pendingStorageRefreshTimer = 0;
+        const forcePendingReprocess = pendingStorageRefreshForceReprocess === true;
+        pendingStorageRefreshForceReprocess = false;
         lastStorageRefreshTs = Date.now();
         requestSettingsFromBackground({ forceRefresh: true }).then(result => {
             if (result?.success) {
-                applyDOMFallback(result.settings, { forceReprocess: forceReprocess === true });
+                applyDOMFallback(result.settings, { forceReprocess: forcePendingReprocess });
+                refreshRuntimeObserversAfterSettingsUpdate();
             }
         });
     }, delay);

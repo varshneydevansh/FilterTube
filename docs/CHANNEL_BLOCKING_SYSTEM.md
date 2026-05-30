@@ -85,18 +85,57 @@ The system maintains two bidirectional lookup maps in local storage:
 - All worlds call into the helpers in `js/shared/identity.js` to normalize canonicalBaseUrl strings into predictable keys (`c/<slug>` or `user/<slug>`, percent-decoding as needed).
 - `background.js:fetchChannelInfo()` now fetches `/c/<slug>` or `/user/<slug>` directly and records the resulting UC ID back into `channelMap`.
 - `content_bridge.js` and `filter_logic.js` both consult `channelMap` before falling back to network, so DOM-only custom URL cards still hide immediately once a mapping is learned.
-- Prefetch (section 5.4) persists any newly learned mapping into `videoChannelMap`, so future encounters are zero-network even on poor connections.
+- Prefetch (section 5.4) persists any newly learned mapping into `videoChannelMap`, so future encounters can often resolve from the local map before any fallback resolver is considered.
 
 ---
 
 ## 3. Data Sources for Channel Info (Where IDs/Handles Come From)
 
-FilterTube uses a **proactive, XHR-first** strategy to extract channel identity before rendering, minimizing network calls and ensuring instant blocking. The waterfall priority is:
+FilterTube uses a **JSON-first identity strategy**: intercepted YouTubei/`ytInitial*`
+payloads are preferred when they expose stable channel identity. This can reduce
+resolver latency and avoid some background fetches, but it is not a guarantee
+that identity exists before DOM render, that every card is complete at first
+paint, or that every route can avoid a fallback resolver.
+
+The practical waterfall priority is:
 
 1. **XHR JSON interception** (Main World)
 2. **`ytInitial*` snapshots** (Main World)
-3. **DOM extraction** (Isolated World)
-4. **Network fetch** (Background, rare fallback)
+3. **Harvested learned maps** (`channelMap`, `videoChannelMap`, `videoMetaMap`)
+4. **DOM extraction** (Isolated World, visible-card fallback/enrichment)
+5. **Network fetch / resolver enrichment** (Background, last-resort resolver
+   and post-action enrichment layer)
+
+The important distinction is that XHR/JSON is the preferred source tier, not
+the only authority and not automatic permission to hide, fetch, mutate, stamp,
+or persist. JSON/player payloads are often converted into learned maps first,
+then later DOM and menu paths use `videoId` as a join key. On watch, Shorts,
+playlist, Kids, and some YouTube Music surfaces, the DOM can expose only a video
+id or weak display text, so a channel-accurate decision must join that id to
+JSON/player/map data or use the background resolver/enrichment layer when the
+current target still lacks usable identity. That layer is not proof of exact
+clicked-target scope by itself: current successful channel blocks can also
+trigger visible Shorts and playlist-row enrichment for rows missing
+`videoChannelMap` identity. Any
+documentation or implementation change that claims "instant," "before render," or "zero network" must first prove that claim for the specific profile, mode, route, renderer family, source tier, and allowed side effect. The same proof
+requirement applies to "no work" claims, because an empty visible list can
+still leave harvesting, observers, fetch hooks, map writes, or fallback scans
+active today.
+
+Current behavior still lacks a shared `modeSurfaceEffectAuthority`, so every
+optimization must keep source confidence separate from effect permission:
+
+```text
+source tier says: where identity came from
+mode/surface says: whether that identity may hide, allow, restore, fetch,
+                   write learned maps, count stats, or do no work
+```
+
+For the route-by-route version of this boundary, use
+`docs/audit/FILTERTUBE_ROUTE_IDENTITY_DECISION_INDEX_2026-05-20.md`. That index maps
+Main home/search, watch, Shorts, watch rail/end screen, playlists/Mix, Kids,
+YTM, collaborator surfaces, posts, and comments to separate decision classes
+instead of treating this waterfall as one global behavior rule.
 
 ### 3.1 XHR JSON interception (Main World) – Primary source
 
@@ -140,10 +179,13 @@ When XHR snapshots are unavailable, we fall back to:
 
 ### 3.4 Network fetch (Background) – Last resort
 
-Only used when:
-- No identity found in XHR/ytInitial*/DOM
+Used when:
+- No identity found in XHR/ytInitial*/learned maps/DOM for a target that still
+  needs a channel decision
 - Manual channel addition via popup
 - Post-block enrichment for missing fields
+- Current successful-block follow-up enrichment for visible Shorts and playlist
+  rows that do not yet have `videoChannelMap` identity
 
 Fetch strategies:
 - **Watch page**: `/watch?v=<videoId>` (parse ytInitialData/meta)
@@ -151,7 +193,13 @@ Fetch strategies:
 - **Channel about**: `/@handle/about` (404-aware)
 - **Custom URLs**: `/c/<slug>` or `/user/<slug>` (legacy support)
 
-**Kids safety**: All network fetches are skipped on Kids surfaces (`skipNetwork: true`).
+**Kids boundary**: DOM/page-context handle resolution can request `skipNetwork: true`, but that does not mean every Kids identity path is network-free. The background has a Kids watch identity fallback after stored/session/pending checks when a Kids watch surface only provides a video id. Treat Kids network behavior as a last-resort resolver that must be governed by a future `identityFetchAuthority`, not as a blanket zero-network guarantee.
+
+**Work-budget boundary**: this layer is not only about correctness. Current
+source can also do follow-up work after a successful block, including visible
+Shorts and playlist-row enrichment beyond the clicked target. Future
+optimization must separate exact-target identity repair from page-wide
+post-action fanout with an explicit `identityWorkBudget`.
 
 ### 3.5 Caching layers & persistence
 - **`videoChannelMap`**: `videoId -> UC ID` mappings for persistence (Shorts/Watch)
@@ -192,16 +240,16 @@ HTML GET → XHR JSON (/youtubei/v1/next, /browse, /player)
     Content Script (isolated world)
         - Receives messages
         - Stamps cards with data-filtertube-*
-        - Updates 3-dot menus instantly
+        - Updates 3-dot menus instantly when enough identity is already known
         ↓
     DOM (visible UI)
         - Cards appear pre-stamped
-        - No network calls needed for blocking
+        - No network calls needed for blocking when JSON/maps/DOM already prove identity
         ↓
-    Network (rare fallback)
-        - Only if JSON lacked identity
+    Network (last-resort fallback)
+        - Only if JSON/player/maps/DOM lacked enough identity
         - Uses Shorts/Watch/About fetches
-        - Kids surfaces avoid this entirely
+        - Kids watch uses stored/session/pending identity first and may fall back to a Kids watch resolver
 ```
 
 ### 4.2 Cross-world messaging
@@ -215,7 +263,7 @@ HTML GET → XHR JSON (/youtubei/v1/next, /browse, /player)
 - `FilterTube_RequestChannelInfo`: `{videoId, expectedHandle?, expectedName?}`
 - `FilterTube_RequestCollaborators`: `{videoId}`
 
-### 4.3 Instant stamping
+### 4.3 Fast stamping when identity is proven
 
 When `FilterTube_UpdateVideoChannelMap` arrives:
 - `content_bridge.js` stamps all matching cards:
@@ -225,12 +273,16 @@ When `FilterTube_UpdateVideoChannelMap` arrives:
       stampChannelIdentity(card, { id: channelId });
   }
   ```
-- 3-dot menus show correct names immediately
-- No "Fetching…" delay (proactive XHR interception provides instant identity)
+- 3-dot menus can use the stamped identity without a background fetch when the
+  UC ID, handle, or trusted learned map is already known.
+- Weak targets can still show a loading/fetching state, route through a
+  watch/Shorts/Kids resolver, or fail if the current JSON/maps/DOM/fallback
+  path cannot prove stable channel identity.
 
 ### 4.4 Collaboration detection
 
-Two paths, both proactive:
+Two paths, both source-confidence inputs. Neither path by itself proves that
+every visible card has complete identity before render:
 
 **1) XHR JSON (`filter_logic.js`)**:
 - `avatarStackViewModel.avatars[]` → extract UC/handle/customUrl/name
@@ -243,7 +295,10 @@ Two paths, both proactive:
 - Query `data-filtertube-collaborators` attributes
 - Fall back to main-world `searchYtInitialDataForVideoChannel`
 
-Result: Multi-channel menus appear instantly on watch/home/search.
+Result: Multi-channel menus can appear quickly on watch/home/search when the
+collaborator roster is already present in JSON, cached state, or trusted DOM
+attributes. Collapsed or delayed rosters still require the collaborator dialog
+or sheet recovery path.
 
 Authoritative roster precedence:
 
@@ -525,11 +580,11 @@ async function handleKidsNativeBlock(blockType = 'video', options = {}) {
 #### Background Enrichment Logic (Last Resort)
 
 ```javascript
-// Background enrichment - rarely needed thanks to proactive XHR
+// Background enrichment - fallback after JSON/maps/DOM checks
 if (needsEnrichment && enrichedInfo?.videoId) {
     // Route to appropriate fetch handler (last resort)
     if (isKidsUrl) {
-        // Kids: skip network, rely on intercepted JSON only
+        // Kids watch: use the guarded Kids watch resolver after cache/map checks
         enrichedInfo = await performKidsWatchIdentityFetch(videoId);
     } else if (enrichedInfo.fetchStrategy === 'shorts') {
         enrichedInfo = await fetchChannelFromShortsUrl(videoId, null, { allowDirectFetch: false });
@@ -541,10 +596,12 @@ if (needsEnrichment && enrichedInfo?.videoId) {
 }
 ```
 
-**Current behavior note**: enrichment is now **rare** thanks to proactive XHR interception.
+**Current behavior note**: enrichment is a fallback after JSON snapshots,
+learned maps, and DOM context fail to prove enough identity, but it is not
+globally budgeted by one authority yet.
 
 - If `fetchStrategy === "mainworld"`, we search `ytInitialData` snapshots.
-- Network fetches are avoided on Kids (`allowDirectFetch: false`).
+- Page-context direct network fetches can be avoided on Kids, but the background Kids watch resolver can still run after cache/map checks.
 - Handle → UC ID resolution uses the persisted `channelMap` first.
 
 #### Label update (upgrade placeholders):
@@ -584,8 +641,8 @@ After persisting, `schedulePostBlockEnrichment` may run to fill missing metadata
 
 ## 5. Filtering/Hiding Strategies (Why Different Surfaces Differ)
 
-### 5.1 Data interception (Main World) - Zero Flash
-- `seed.js` intercepts YouTube JSON before render via `fetch` and `XMLHttpRequest` hooks.
+### 5.1 Data interception (Main World) - Early JSON filtering
+- `seed.js` intercepts supported YouTube JSON before render via `fetch` and `XMLHttpRequest` hooks when the endpoint is in scope and the payload exposes enough data.
 - `filter_logic.js` applies blocking rules based on current mode:
   - **Blocklist Mode**: Remove items matching blocked channels/keywords
   - **Whitelist Mode (v3.2.5)**: Remove items NOT matching whitelisted channels/keywords
@@ -624,7 +681,8 @@ DOM fallback must be careful about:
 
 ### 5.4 3-Dot Menu Label Resolution (v3.2.1)
 
-The 3-dot menu now intelligently upgrades placeholder labels to real channel names using proactive XHR data:
+The 3-dot menu can upgrade placeholder labels to real channel names when JSON
+snapshots, learned maps, or stamped DOM already prove enough identity:
 
 #### Placeholder detection:
 ```javascript
@@ -826,7 +884,7 @@ This section answers:
 
 - **3-dot menu / collaboration status (v3.2.1)**
   - The watch page reuses the same collaborator roster cache as Home/Search, so any card with ≥2 collaborators immediately renders per-channel menu rows (plus "Block All") with accurate names/handles.
-  - Shorts tiles opened inside the watch shell may mark `fetchStrategy: 'shorts'`; when identity is not already known via proactive XHR interception or `videoChannelMap`, we can fall back to `/shorts/<id>` fetch (and then `fetchChannelFromWatchUrl`) to guarantee a canonical UC ID.
+  - Shorts tiles opened inside the watch shell may mark `fetchStrategy: 'shorts'`; when identity is not already known via JSON snapshots or `videoChannelMap`, we can fall back to `/shorts/<id>` fetch (and then `fetchChannelFromWatchUrl`) to attempt canonical UC ID resolution.
   - In many cases, the UC ID is already known by the time the menu opens because FilterTube harvests ownership from `ytInitialPlayerResponse` and `/youtubei/v1/player` payloads and persists `videoId -> UC...` into `videoChannelMap`.
   - Non-collaboration rows still show the generic “Block Channel” label because the synchronous DOM scrape rarely includes the channel name. Follow-up work is tracked to probe `ytd-watch-metadata`/`ytd-video-owner-renderer` synchronously so we can display names everywhere.
 

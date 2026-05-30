@@ -2,7 +2,7 @@
 //
 // DOM fallback filtering pipeline used by `js/content_bridge.js`.
 // Loaded as an Isolated World content script before `content_bridge.js`.
-
+installFilterTubeRoutineConsoleGate();
 const CHANNEL_ONLY_TAGS = new Set([]);
 
 const compiledKeywordRegexCache = new WeakMap();
@@ -1992,7 +1992,7 @@ function hasActiveDOMFallbackWork(settings) {
         const categoryFilters = settings.categoryFilters && typeof settings.categoryFilters === 'object'
             ? settings.categoryFilters
             : null;
-        return categoryFilters?.enabled === true;
+        return categoryFilters?.enabled === true && hasList(categoryFilters.selected);
     } catch (e) {
         return true;
     }
@@ -4812,4 +4812,27 @@ function shouldHideContent(title, channel, settings, options = {}) {
     }
 
     return false;
+}
+
+function installFilterTubeRoutineConsoleGate() {
+    try {
+        if (globalThis.__filterTubeRoutineConsoleGateInstalled) return;
+        const originalLog = typeof console?.log === 'function' ? console.log.bind(console) : null;
+        const originalInfo = typeof console?.info === 'function' ? console.info.bind(console) : null;
+        const originalDebug = typeof console?.debug === 'function' ? console.debug.bind(console) : null;
+        const isEnabled = () => {
+            try {
+                return globalThis.__filtertubeDebug === true
+                    || document.documentElement?.getAttribute('data-filtertube-debug') === 'true';
+            } catch (e) {
+                return globalThis.__filtertubeDebug === true;
+            }
+        };
+
+        if (originalLog) console.log = (...args) => { if (isEnabled()) originalLog(...args); };
+        if (originalInfo) console.info = (...args) => { if (isEnabled()) originalInfo(...args); };
+        if (originalDebug) console.debug = (...args) => { if (isEnabled()) originalDebug(...args); };
+        globalThis.__filterTubeRoutineConsoleGateInstalled = true;
+    } catch (e) {
+    }
 }

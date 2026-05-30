@@ -1,5 +1,13 @@
 # Technical Documentation (v3.3.0 Filtering, Recovery & UI Shell Notes)
 
+> Current-behavior boundary (2026-05-19): this page is a broad technical
+> overview and contains some historical release-note wording. For exact runtime
+> authority, use the dated `FILTERTUBE_*_CURRENT_BEHAVIOR_2026-05-19.md` audit
+> files and `tests/runtime/*.test.mjs`. In particular, "JSON-first" does not
+> mean "JSON-only"; Kids/watch/Shorts/channel fallback resolvers, learned maps,
+> nullable DOM extraction, and failure states are still part of the current
+> implementation.
+
 ## Overview
 
 FilterTube v3.3.0 builds on the earlier performance and whitelist-mode work with watch-page SPA recovery hardening, Mix/watch fallback-menu fixes, stronger collaboration roster recovery, cross-browser subscribed-channels import hardening, and smaller UX controls around backups and menu injection. This technical documentation covers the filtering logic, identity recovery behavior, mode switching, and user experience enhancements.
@@ -343,7 +351,7 @@ The importer now leans more heavily on real page-driven `/feed/channels` growth 
 
 - Edge often materializes more rows through active page expansion.
 - Chrome may expose the same continuation chain later or less eagerly.
-- Synthetic continuation replay is still useful, but it is no longer treated as the only source of truth.
+- Synthetic continuation replay is still useful, but it is only one importer input. Real page growth, recent browse-response harvesting, and explicit browse requests must remain separately measured before changing import behavior.
 
 ### Request profile behavior
 
@@ -808,23 +816,27 @@ filterTubeItem.className = `style-scope ${rendererScope} filtertube-block-channe
 - **Bottom Sheet Support**: Handles mobile bottom-sheet containers
 - **Touch-Friendly**: Maintains proper touch interactions on mobile devices
 
-### Debug Gated Logging System
+### Production-Quiet Logging System
 
-All console output is now gated behind a debug flag to reduce production noise:
+Routine console output is muted in production for the YouTube runtime. The
+background/service-worker context and isolated content-script context gate
+`console.log`, `console.info`, and `console.debug` behind explicit debug mode,
+while `console.warn` and
+`console.error` remain available for real failures. Main-world scripts avoid
+patching YouTube's global console and instead route their own logs through
+debug-gated helpers.
 
 ```javascript
-const debugLog = (...args) => {
+const isEnabled = () => {
     try {
-        if (window.__filtertubeDebug) {
-            console.log(...args);
-        }
+        return window.__filtertubeDebug === true
+            || document.documentElement?.getAttribute('data-filtertube-debug') === 'true';
     } catch (e) {
-        // Silent fail if debug flag not available
+        return false;
     }
 };
 
-// Usage throughout codebase
-if (window.__filtertubeDebug) {
+if (isEnabled()) {
     console.log('FilterTube: Detailed operation info');
 }
 ```
@@ -832,9 +844,9 @@ if (window.__filtertubeDebug) {
 **Debug Benefits:**
 
 - **Clean Production**: No console spam for regular users
-- **Full Debug Info**: Developers can enable with `window.__filtertubeDebug = true`
-- **Performance**: Reduced console overhead in production
-- **Selective Logging**: Only important errors show without debug flag
+- **Full Debug Info**: Developers can enable with `window.__filtertubeDebug = true` or `data-filtertube-debug="true"`
+- **Performance**: Reduced console overhead during YouTube SPA churn and menu/observer hot paths
+- **Selective Logging**: Warnings and errors still show without debug mode
 
 ### Scroll Preservation During Filtering
 
@@ -986,7 +998,7 @@ function getCompiledChannelFilterIndex(settings) {
 
 - Eliminates repeated regex compilation (expensive operation)
 - Fast O(1) lookups for channel filtering
-- Reduces CPU usage by 60-80% during filtering operations
+- Reduces repeated CPU work during filtering operations. Earlier docs used 60-80% CPU-reduction language; treat that as a historical estimate until a route/device/rule-state measurement artifact exists.
 
 ### Batched Storage Updates
 
@@ -1013,7 +1025,7 @@ function scheduleChannelMapFlush() {
 
 **Benefits:**
 
-- Reduces storage operations by 70-90%
+- Reduces storage operations through batching. Earlier docs used 70-90% I/O-reduction language; treat that as a historical estimate until measured.
 - Prevents storage contention during rapid updates
 - Maintains data consistency with batched writes
 
@@ -1269,18 +1281,18 @@ const sanitizePersistedChannelName = (value) => {
 
 ### Proactive System Impact
 
-- **Enrichment is now rare** thanks to proactive XHR interception
-- **Kids zero-network mode** works entirely from intercepted JSON
+- **Enrichment is reduced** when proactive XHR interception or learned maps already contain enough identity
+- **Kids scoped network boundary** prefers intercepted JSON and learned maps, while explicit Kids watch resolver code still exists for video-id-only fallback paths
 - **Handle → UC ID resolution** uses persisted `channelMap` first
-- **Network fetches are avoided** on Kids (`allowDirectFetch: false`)
+- **Proactive Kids prefetches are avoided** on Kids (`allowDirectFetch: false`); explicit resolver requests still require their own route and cache/map proof
 - **Main world searches** use `ytInitialData` snapshots when needed
 
 ### Performance Characteristics
 
-- **Zero-delay blocking** - 3-dot menus show correct names instantly
+- **Fast blocking on proven identity** - 3-dot menus show correct names quickly when JSON/maps/DOM already have enough identity
 - **Reduced API calls** - most identity comes from intercepted JSON
-- **Better cache hit rates** - shared data across all surfaces
-- **Reliable Kids operation** - works even when Kids blocks external requests
+- **Better cache hit rates** - shared data across many surfaces, with route-specific gaps still requiring proof
+- **Safer Kids operation** - avoids proactive Kids network work where current data is enough, but does not claim a global zero-network guarantee
 
 ## 1. Data Interception: `ytInitialData` Hook
 
@@ -1304,7 +1316,7 @@ sequenceDiagram
     Engine->>Engine: Removes Blocked Videos
     Engine->>Hook: Returns Clean List
     Hook->>Page: Delivers Safe Content
-    Page->>Page: Renders (Zero Flash)
+    Page->>Page: Renders after JSON-backed filtering when enough data exists
 ```
 
 ## 2. Data Interception: Fetch Hook
@@ -1688,7 +1700,7 @@ sequenceDiagram
 **Current behavior note:** as of v3.2.1, Shorts identity is increasingly learned *without explicit Shorts-page fetching* because:
 
 - `seed.js` intercepts `ytInitialPlayerResponse` and `/youtubei/v1/player`, and `filter_logic.js` harvests `videoId -> UC...` into `videoChannelMap`.
-- Proactive XHR interception provides most channel identity before rendering.
+- Proactive XHR interception provides much of the channel identity early, but not every route exposes complete metadata before DOM render.
 - Many cards now expose `/channel/UC...` anchors directly, allowing isolated-world extraction to return `id` immediately.
 
 ### 12.1 2026-05-03 Shorts block resolver checkpoint
@@ -1774,10 +1786,10 @@ graph TD
 ## 6. Centralized State Management
 
 **Motivation:**
-With multiple UIs (Popup, Tab View) and background processes, keeping settings in sync is critical. `StateManager` acts as the single source of truth.
+With multiple UIs (Popup, Tab View) and background processes, keeping settings in sync is critical. `StateManager` is the shared UI-facing coordinator for popup and tab-view state. It is not the sole runtime owner for background compilation, storage caches, Nanah/import writes, stats, content-script learned maps, or page-runtime refresh side effects.
 
 **How it works:**
-*   **Single Source**: All components read/write settings via `StateManager`.
+*   **Shared UI State**: Popup and tab-view flows read/write settings through `StateManager`.
 *   **Broadcasting**: When settings change in one place, `StateManager` notifies all other parts of the extension.
 *   **Consistency**: Ensures that if you add a filter in the Tab View, the Popup updates instantly.
 
@@ -1987,7 +1999,7 @@ The exact latency depends on which fallback path is needed (cache/main-world/net
                    v
 +-----------------------------------+
 | 3. Fetch Canonical ID (Robustness)| <--- "The 1-sec Safety Check"
-| -> Resolve to unique UC ID        |      (Ensures Zero Leakage)
+| -> Resolve to unique UC ID        |      (Reduces cross-surface leakage when proven)
 +-----------------------------------+
                    |
                    v

@@ -1,0 +1,60 @@
+{
+  "provenance": {
+    "source": "playlist.json",
+    "rendererType": "compactRadioRenderer",
+    "extractedPath": "first balanced object.compactRadioRenderer",
+    "fixtureKind": "json",
+    "surface": "Main generated Mix/radio playlist card",
+    "route": "watch/mix"
+  },
+  "renderer": {
+    "playlistId": "RDEPo5wWmKEaI",
+    "title": {
+      "runs": [
+        {
+          "text": "Mix - Pitbull - Give Me Everything ft. Ne-Yo, Afrojack, Nayer"
+        }
+      ]
+    },
+    "navigationEndpoint": {
+      "watchEndpoint": {
+        "videoId": "EPo5wWmKEaI",
+        "playlistId": "RDEPo5wWmKEaI"
+      }
+    },
+    "secondaryNavigationEndpoint": {
+      "watchEndpoint": {
+        "videoId": "t4H_Zoh7G5A",
+        "playlistId": "RDEPo5wWmKEaI"
+      }
+    },
+    "shortBylineText": {
+      "runs": [
+        {
+          "text": "YouTube"
+        }
+      ]
+    },
+    "longBylineText": {
+      "runs": [
+        {
+          "text": "YouTube"
+        }
+      ]
+    },
+    "videoCountText": {
+      "runs": [
+        {
+          "text": "50+ videos"
+        }
+      ]
+    },
+    "videoCountShortText": {
+      "runs": [
+        {
+          "text": "50+"
+        }
+      ]
+    }
+  }
+}

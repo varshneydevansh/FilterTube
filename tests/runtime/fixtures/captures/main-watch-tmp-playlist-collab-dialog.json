@@ -1,0 +1,263 @@
+{
+  "provenance": {
+    "source": "tmp.json",
+    "sourceSha256": "4ffc80cf815c461a0251ca491431b392671e0569268b39e1c22c1ff833a56529",
+    "sourceBytes": 10241427,
+    "sourceLines": 81428,
+    "rawShape": "mixed var ytInitialData assignment plus get_watch array",
+    "arrayStartLine": 28512,
+    "arrayBytes": 6048291,
+    "fixtureKind": "json",
+    "surface": "Main desktop watch playlist panel collaborator dialog",
+    "route": "watch",
+    "rootPath": "get_watch array[1].watchNextResponse.contents.twoColumnWatchNextResults.playlist.playlist.contents[0..1]",
+    "rendererType": "watchNextResponse",
+    "rendererTypes": [
+      "playlistPanelVideoRenderer",
+      "showDialogCommand",
+      "listItemViewModel"
+    ],
+    "omittedRawFields": "thumbnails, menus, tracking, playback URLs, unrelated playlist rows, autoplay, end-screen, and browse shell fields"
+  },
+  "watchNextResponse": {
+    "contents": {
+      "twoColumnWatchNextResults": {
+        "playlist": {
+          "playlist": {
+            "title": "Mix - Shakira, Ed Sheeran, Beele - Hips Don't Lie (Anniversary Version)",
+            "contents": [
+              {
+                "playlistPanelVideoRenderer": {
+                  "videoId": "41ZY18JqI2A",
+                  "selected": true,
+                  "title": {
+                    "simpleText": "Shakira, Ed Sheeran, Beele - Hips Don't Lie (Anniversary Version)"
+                  },
+                  "shortBylineText": {
+                    "runs": [
+                      {
+                        "text": "Shakira and 2 more",
+                        "navigationEndpoint": {
+                          "showDialogCommand": {
+                            "panelLoadingStrategy": {
+                              "inlineContent": {
+                                "dialogViewModel": {
+                                  "header": {
+                                    "dialogHeaderViewModel": {
+                                      "headline": {
+                                        "content": "Collaborators"
+                                      }
+                                    }
+                                  },
+                                  "customContent": {
+                                    "listViewModel": {
+                                      "listItems": [
+                                        {
+                                          "listItemViewModel": {
+                                            "title": {
+                                              "content": "shakiraVEVO",
+                                              "commandRuns": [
+                                                {
+                                                  "startIndex": 0,
+                                                  "length": 11,
+                                                  "onTap": {
+                                                    "innertubeCommand": {
+                                                      "commandMetadata": {
+                                                        "webCommandMetadata": {
+                                                          "url": "/@shakiraVEVO",
+                                                          "webPageType": "WEB_PAGE_TYPE_CHANNEL",
+                                                          "apiUrl": "/youtubei/v1/browse"
+                                                        }
+                                                      },
+                                                      "browseEndpoint": {
+                                                        "browseId": "UCGnjeahCJW1AF34HBmQTJ-Q",
+                                                        "canonicalBaseUrl": "/@shakiraVEVO"
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              ]
+                                            },
+                                            "subtitle": {
+                                              "content": "@shakiraVEVO - 4.99 crore subscribers"
+                                            },
+                                            "rendererContext": {
+                                              "commandContext": {
+                                                "onTap": {
+                                                  "innertubeCommand": {
+                                                    "commandMetadata": {
+                                                      "webCommandMetadata": {
+                                                        "url": "/channel/UCYLNGLIzMhRTi6ZOLjAPSmw",
+                                                        "webPageType": "WEB_PAGE_TYPE_CHANNEL",
+                                                        "apiUrl": "/youtubei/v1/browse"
+                                                      }
+                                                    },
+                                                    "browseEndpoint": {
+                                                      "browseId": "UCYLNGLIzMhRTi6ZOLjAPSmw"
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "listItemViewModel": {
+                                            "title": {
+                                              "content": "Spotify"
+                                            },
+                                            "subtitle": {
+                                              "content": "@Spotify - 22.5 lakh subscribers"
+                                            },
+                                            "rendererContext": {
+                                              "commandContext": {
+                                                "onTap": {
+                                                  "innertubeCommand": {
+                                                    "commandMetadata": {
+                                                      "webCommandMetadata": {
+                                                        "url": "/channel/UCRMqQWxCWE0VMvtUElm-rEA",
+                                                        "webPageType": "WEB_PAGE_TYPE_CHANNEL",
+                                                        "apiUrl": "/youtubei/v1/browse"
+                                                      }
+                                                    },
+                                                    "browseEndpoint": {
+                                                      "browseId": "UCRMqQWxCWE0VMvtUElm-rEA"
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "listItemViewModel": {
+                                            "title": {
+                                              "content": "Beele"
+                                            },
+                                            "subtitle": {
+                                              "content": "@beele - 23.9 lakh subscribers"
+                                            },
+                                            "rendererContext": {
+                                              "commandContext": {
+                                                "onTap": {
+                                                  "innertubeCommand": {
+                                                    "commandMetadata": {
+                                                      "webCommandMetadata": {
+                                                        "url": "/channel/UCYAQgXVSRzUeNo34-RJOWUw",
+                                                        "webPageType": "WEB_PAGE_TYPE_CHANNEL",
+                                                        "apiUrl": "/youtubei/v1/browse"
+                                                      }
+                                                    },
+                                                    "browseEndpoint": {
+                                                      "browseId": "UCYAQgXVSRzUeNo34-RJOWUw"
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "longBylineText": {
+                    "runs": [
+                      {
+                        "text": "Shakira and 2 more",
+                        "navigationEndpoint": {
+                          "showDialogCommand": {
+                            "panelLoadingStrategy": {
+                              "inlineContent": {
+                                "dialogViewModel": {
+                                  "customContent": {
+                                    "listViewModel": {
+                                      "listItems": []
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "navigationEndpoint": {
+                    "watchEndpoint": {
+                      "videoId": "41ZY18JqI2A",
+                      "playlistId": "RD41ZY18JqI2A",
+                      "index": 0
+                    }
+                  },
+                  "lengthText": {
+                    "simpleText": "3:37"
+                  }
+                }
+              },
+              {
+                "playlistPanelVideoRenderer": {
+                  "videoId": "TUVcZfQe-Kw",
+                  "selected": false,
+                  "title": {
+                    "simpleText": "Dua Lipa - Levitating Featuring DaBaby (Official Music Video)"
+                  },
+                  "shortBylineText": {
+                    "runs": [
+                      {
+                        "text": "Dua Lipa",
+                        "navigationEndpoint": {
+                          "commandMetadata": {
+                            "webCommandMetadata": {
+                              "url": "/channel/UC-J-KZfRV8c13fOCkhXdLiQ",
+                              "webPageType": "WEB_PAGE_TYPE_CHANNEL",
+                              "apiUrl": "/youtubei/v1/browse"
+                            }
+                          },
+                          "browseEndpoint": {
+                            "browseId": "UC-J-KZfRV8c13fOCkhXdLiQ",
+                            "canonicalBaseUrl": "/channel/UC-J-KZfRV8c13fOCkhXdLiQ"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "longBylineText": {
+                    "runs": [
+                      {
+                        "text": "Dua Lipa",
+                        "navigationEndpoint": {
+                          "browseEndpoint": {
+                            "browseId": "UC-J-KZfRV8c13fOCkhXdLiQ",
+                            "canonicalBaseUrl": "/channel/UC-J-KZfRV8c13fOCkhXdLiQ"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "navigationEndpoint": {
+                    "watchEndpoint": {
+                      "videoId": "TUVcZfQe-Kw",
+                      "playlistId": "RD41ZY18JqI2A",
+                      "index": 1
+                    }
+                  },
+                  "lengthText": {
+                    "simpleText": "3:51"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

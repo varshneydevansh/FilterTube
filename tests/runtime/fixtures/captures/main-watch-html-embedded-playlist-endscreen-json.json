@@ -1,0 +1,215 @@
+{
+  "provenance": {
+    "source": "YT_MAIN_WATCH.html",
+    "sourceSha256": "3d6de64dc55e211790c1b555d90420fb6bdb47104cb7c38cb903a3dbc966160c",
+    "sourceBytes": 7873780,
+    "sourceLines": 69613,
+    "rawShape": "HTML with embedded ytInitialData assignments",
+    "rootPath": "ytInitialData[1]",
+    "fixtureKind": "json",
+    "surface": "Main desktop watch HTML embedded watch-next JSON",
+    "route": "watch",
+    "rendererType": "watchHtmlEmbeddedPlaylistEndScreenJson",
+    "rendererTypes": [
+      "playlistPanelVideoRenderer",
+      "endScreenVideoRenderer"
+    ],
+    "ytInitialDataSpan": {
+      "assignmentIndex": 1,
+      "braceStart": 4505651,
+      "braceEnd": 7857979,
+      "extractedBytes": 3356005,
+      "fragmentSha256": "62961f85f1ca83bbe70cdc8e5424bb3751b1e7f9d18ed6c63308e12ca9f06cd9"
+    },
+    "playlistPanelPaths": [
+      "ytInitialData[1].contents.twoColumnWatchNextResults.playlist.playlist.contents.2.playlistPanelVideoRenderer",
+      "ytInitialData[1].contents.twoColumnWatchNextResults.playlist.playlist.contents.9.playlistPanelVideoRenderer"
+    ],
+    "endScreenPaths": [
+      "ytInitialData[1].playerOverlays.playerOverlayRenderer.endScreen.watchNextEndScreenRenderer.results.1.endScreenVideoRenderer",
+      "ytInitialData[1].playerOverlays.playerOverlayRenderer.endScreen.watchNextEndScreenRenderer.results.3.endScreenVideoRenderer"
+    ],
+    "omittedRawFields": "topbar, engagement panels, thumbnails, tracking, playback/init URLs, menus, framework updates, remaining playlist siblings, remaining end-screen siblings, and rendered DOM"
+  },
+  "captureFixtureTraceability": {
+    "rawSourceCapture": "YT_MAIN_WATCH.html",
+    "minimalFixturePath": "tests/runtime/fixtures/captures/main-watch-html-embedded-playlist-endscreen-json.json",
+    "fixtureKind": "json",
+    "sourceSurface": "Main desktop watch HTML embedded JSON",
+    "route": "watch",
+    "rendererPathOrDomSelector": "ytInitialData[1].contents.twoColumnWatchNextResults.playlist.playlist.contents[*].playlistPanelVideoRenderer + ytInitialData[1].playerOverlays.playerOverlayRenderer.endScreen.watchNextEndScreenRenderer.results[*].endScreenVideoRenderer",
+    "settingsMode": "no-rule, blocklist keyword/channel, whitelist channel",
+    "expectedDecision": "JSON playlist and end-screen rows filter by existing renderer rules; rendered player DOM wall remains unproven",
+    "sideEffects": "FilterTube_UpdateChannelMap for @TronLegacyScore and FilterTube_UpdateVideoChannelMap for four reduced video rows",
+    "negativeSiblingVisibleFixture": "nonmatching playlist/end-screen siblings stay visible in blocklist mode; whitelist removes unsupported siblings by current fail-closed behavior",
+    "releaseInputAllowed": false
+  },
+  "ytInitialData": {
+    "contents": {
+      "twoColumnWatchNextResults": {
+        "playlist": {
+          "playlist": {
+            "contents": [
+              {
+                "playlistPanelVideoRenderer": {
+                  "videoId": "pcbnucHE3gU",
+                  "title": {
+                    "simpleText": "NYUSHA \u2014 AMORE (official music video)"
+                  },
+                  "shortBylineText": {
+                    "runs": [
+                      {
+                        "text": "NYUSHA MUSIC",
+                        "navigationEndpoint": {
+                          "commandMetadata": {
+                            "webCommandMetadata": {
+                              "url": "/channel/UCm9VWKAFz0aXpuEHPHMae7w",
+                              "webPageType": "WEB_PAGE_TYPE_CHANNEL"
+                            }
+                          },
+                          "browseEndpoint": {
+                            "browseId": "UCm9VWKAFz0aXpuEHPHMae7w",
+                            "canonicalBaseUrl": "/channel/UCm9VWKAFz0aXpuEHPHMae7w"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "navigationEndpoint": {
+                    "watchEndpoint": {
+                      "videoId": "pcbnucHE3gU"
+                    }
+                  },
+                  "lengthText": {
+                    "simpleText": "2:53"
+                  }
+                }
+              },
+              {
+                "playlistPanelVideoRenderer": {
+                  "videoId": "1U6WY_z8Vu8",
+                  "title": {
+                    "simpleText": "Angelina Jordan - Love Don't Let Me Go (Visualizer)"
+                  },
+                  "shortBylineText": {
+                    "runs": [
+                      {
+                        "text": "Angelina Jordan Official",
+                        "navigationEndpoint": {
+                          "commandMetadata": {
+                            "webCommandMetadata": {
+                              "url": "/channel/UC1Pwa4nFvIPbtYVLcBGDpjA",
+                              "webPageType": "WEB_PAGE_TYPE_CHANNEL"
+                            }
+                          },
+                          "browseEndpoint": {
+                            "browseId": "UC1Pwa4nFvIPbtYVLcBGDpjA",
+                            "canonicalBaseUrl": "/channel/UC1Pwa4nFvIPbtYVLcBGDpjA"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "navigationEndpoint": {
+                    "watchEndpoint": {
+                      "videoId": "1U6WY_z8Vu8"
+                    }
+                  },
+                  "lengthText": {
+                    "simpleText": "3:20"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "playerOverlays": {
+      "playerOverlayRenderer": {
+        "endScreen": {
+          "watchNextEndScreenRenderer": {
+            "results": [
+              {
+                "endScreenVideoRenderer": {
+                  "videoId": "84kbG2ExdZs",
+                  "title": {
+                    "simpleText": "NYUSHA / \u041d\u042e\u0428\u0410 - \u0426\u0443\u043d\u0430\u043c\u0438 (Official clip HD2K)"
+                  },
+                  "shortBylineText": {
+                    "runs": [
+                      {
+                        "text": "NYUSHA MUSIC",
+                        "navigationEndpoint": {
+                          "commandMetadata": {
+                            "webCommandMetadata": {
+                              "url": "/channel/UCm9VWKAFz0aXpuEHPHMae7w",
+                              "webPageType": "WEB_PAGE_TYPE_CHANNEL"
+                            }
+                          },
+                          "browseEndpoint": {
+                            "browseId": "UCm9VWKAFz0aXpuEHPHMae7w",
+                            "canonicalBaseUrl": "/channel/UCm9VWKAFz0aXpuEHPHMae7w"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "navigationEndpoint": {
+                    "watchEndpoint": {
+                      "videoId": "84kbG2ExdZs"
+                    }
+                  },
+                  "lengthText": {
+                    "simpleText": "4:26"
+                  },
+                  "publishedTimeText": {
+                    "simpleText": "11 years ago"
+                  }
+                }
+              },
+              {
+                "endScreenVideoRenderer": {
+                  "videoId": "8Li0Tyeqlc4",
+                  "title": {
+                    "simpleText": "Tron Legacy - Daft Punk - The Suite"
+                  },
+                  "shortBylineText": {
+                    "runs": [
+                      {
+                        "text": "Tron Legacy",
+                        "navigationEndpoint": {
+                          "commandMetadata": {
+                            "webCommandMetadata": {
+                              "url": "/@TronLegacyScore",
+                              "webPageType": "WEB_PAGE_TYPE_CHANNEL"
+                            }
+                          },
+                          "browseEndpoint": {
+                            "browseId": "UCVZ2A50--jZieMK_qyMd1Yw",
+                            "canonicalBaseUrl": "/@TronLegacyScore"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "navigationEndpoint": {
+                    "watchEndpoint": {
+                      "videoId": "8Li0Tyeqlc4"
+                    }
+                  },
+                  "lengthText": {
+                    "simpleText": "18:32"
+                  },
+                  "publishedTimeText": {
+                    "simpleText": "11 years ago"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,235 @@
+{
+  "provenance": {
+    "source": "ytkids_browse?alt=json.json",
+    "rawContainer": "malformed direct JSON with request/log prelude plus balanced JSON fragments",
+    "fragmentIndex": 4,
+    "fragmentStartLine": 688,
+    "fragmentBytes": 423123,
+    "rendererType": "compactVideoRenderer",
+    "ownerRailRendererType": "kidsSlimOwnerRenderer",
+    "extractedBlockIndex": 2,
+    "siblingBlockIndex": 3,
+    "extractedPath": "contents.kidsLibraryRenderer.anchors.1.anchoredSectionRenderer.content.sectionListRenderer.contents.0.itemSectionRenderer.contents.2.compactVideoRenderer",
+    "siblingPath": "contents.kidsLibraryRenderer.anchors.1.anchoredSectionRenderer.content.sectionListRenderer.contents.0.itemSectionRenderer.contents.3.compactVideoRenderer",
+    "ownerRailPath": "contents.kidsLibraryRenderer.anchors.0.anchoredSectionRenderer.content.sectionListRenderer.contents.0.itemSectionRenderer.contents",
+    "reduction": "Two adjacent compactVideoRenderer siblings from the parseable Kids browse fragment, plus two kidsSlimOwnerRenderer rail entries proving owner rail pass-through under blocklist and whitelist decisions."
+  },
+  "response": {
+    "responseContext": {
+      "serviceTrackingParams": [
+        {
+          "service": "GFEEDBACK",
+          "params": [
+            {
+              "key": "browse_id",
+              "value": "FEkids_wia"
+            },
+            {
+              "key": "logged_in",
+              "value": "1"
+            }
+          ]
+        }
+      ],
+      "maxAgeSeconds": 300
+    },
+    "contents": {
+      "kidsLibraryRenderer": {
+        "title": {
+          "runs": [
+            {
+              "text": "Watch it again"
+            }
+          ]
+        },
+        "anchors": [
+          {
+            "anchoredSectionRenderer": {
+              "content": {
+                "sectionListRenderer": {
+                  "contents": [
+                    {
+                      "itemSectionRenderer": {
+                        "contents": [
+                          {
+                            "kidsSlimOwnerRenderer": {
+                              "title": {
+                                "runs": [
+                                  {
+                                    "text": "Thomas & Friends UK",
+                                    "navigationEndpoint": {
+                                      "browseEndpoint": {
+                                        "browseId": "UCo5AoxvDzhX1Gua_aU2Rr6w"
+                                      }
+                                    }
+                                  }
+                                ]
+                              },
+                              "navigationEndpoint": {
+                                "browseEndpoint": {
+                                  "browseId": "UCo5AoxvDzhX1Gua_aU2Rr6w",
+                                  "canonicalBaseUrl": "/@thomasandfriends_uk"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "kidsSlimOwnerRenderer": {
+                              "title": {
+                                "runs": [
+                                  {
+                                    "text": "Little Learners",
+                                    "navigationEndpoint": {
+                                      "browseEndpoint": {
+                                        "browseId": "UCw0Mbalwv25Zk756uAONAmg"
+                                      }
+                                    }
+                                  }
+                                ]
+                              },
+                              "navigationEndpoint": {
+                                "browseEndpoint": {
+                                  "browseId": "UCw0Mbalwv25Zk756uAONAmg",
+                                  "canonicalBaseUrl": "/@Little-Learners-Channel"
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "anchoredSectionRenderer": {
+              "content": {
+                "sectionListRenderer": {
+                  "contents": [
+                    {
+                      "itemSectionRenderer": {
+                        "contents": [
+                          {
+                            "compactVideoRenderer": {
+                              "videoId": "Gh-XKNuvvC4",
+                              "title": {
+                                "runs": [
+                                  {
+                                    "text": "Learning With Blippi At Kinderland Indoor Playground For Kids | Educational Videos For Toddlers"
+                                  }
+                                ]
+                              },
+                              "longBylineText": {
+                                "runs": [
+                                  {
+                                    "text": "Blippi - Educational Videos for Kids",
+                                    "navigationEndpoint": {
+                                      "browseEndpoint": {
+                                        "browseId": "UC5PYHgAzJ1wLEidB58SK6Xw",
+                                        "canonicalBaseUrl": "/@Blippi"
+                                      }
+                                    }
+                                  }
+                                ]
+                              },
+                              "shortBylineText": {
+                                "runs": [
+                                  {
+                                    "text": "Blippi - Educational Videos for Kids",
+                                    "navigationEndpoint": {
+                                      "browseEndpoint": {
+                                        "browseId": "UC5PYHgAzJ1wLEidB58SK6Xw",
+                                        "canonicalBaseUrl": "/@Blippi"
+                                      }
+                                    }
+                                  }
+                                ]
+                              },
+                              "menu": {
+                                "menuRenderer": {
+                                  "items": [
+                                    {
+                                      "menuServiceItemRenderer": {
+                                        "icon": {
+                                          "iconType": "KIDS_BLOCK"
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              },
+                              "kidsVideoOwnerExtension": {
+                                "externalChannelId": "UC5PYHgAzJ1wLEidB58SK6Xw"
+                              }
+                            }
+                          },
+                          {
+                            "compactVideoRenderer": {
+                              "videoId": "G-xKXHAWPYU",
+                              "title": {
+                                "runs": [
+                                  {
+                                    "text": "Blippi Makes Chocolate At The Chocolate Factory | Blippi Educational Videos for Kids"
+                                  }
+                                ]
+                              },
+                              "longBylineText": {
+                                "runs": [
+                                  {
+                                    "text": "Little Learners",
+                                    "navigationEndpoint": {
+                                      "browseEndpoint": {
+                                        "browseId": "UCw0Mbalwv25Zk756uAONAmg",
+                                        "canonicalBaseUrl": "/@Little-Learners-Channel"
+                                      }
+                                    }
+                                  }
+                                ]
+                              },
+                              "shortBylineText": {
+                                "runs": [
+                                  {
+                                    "text": "Little Learners",
+                                    "navigationEndpoint": {
+                                      "browseEndpoint": {
+                                        "browseId": "UCw0Mbalwv25Zk756uAONAmg",
+                                        "canonicalBaseUrl": "/@Little-Learners-Channel"
+                                      }
+                                    }
+                                  }
+                                ]
+                              },
+                              "menu": {
+                                "menuRenderer": {
+                                  "items": [
+                                    {
+                                      "menuServiceItemRenderer": {
+                                        "icon": {
+                                          "iconType": "KIDS_BLOCK"
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              },
+                              "kidsVideoOwnerExtension": {
+                                "externalChannelId": "UCw0Mbalwv25Zk756uAONAmg"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "trackingParams": "CAAQhGciEwiT7Lax8KuTAxVuLrcAHdvSEHU="
+  }
+}

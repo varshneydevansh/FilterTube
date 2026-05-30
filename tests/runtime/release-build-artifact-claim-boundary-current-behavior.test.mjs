@@ -1,0 +1,208 @@
+import crypto from 'node:crypto';
+import fs from 'node:fs';
+import path from 'node:path';
+import test from 'node:test';
+import assert from 'node:assert/strict';
+
+const repoRoot = process.cwd();
+const docPath = 'docs/audit/FILTERTUBE_RELEASE_BUILD_ARTIFACT_CLAIM_BOUNDARY_CURRENT_BEHAVIOR_2026-05-22.md';
+
+const sourceRows = [
+  ['build.js', 686, 24689, 'f6778ce29f1d7f520a66ab689f8c1a2999e5887ffa8c53bd5039f4976b2671b6'],
+  ['package.json', 46, 1376, 'cd24685d1fb4940c1a67f12ce143bc1466200a299a82dbfa6f553b99e24ae23f'],
+  ['README.md', 406, 22852, '2acc8bec7148bb5a11294b87ef673813e642d44c48f6885781fdae45d37e719d'],
+  ['CHANGELOG.md', 554, 36175, '2453fd9347d8eb357be65bf1a9a9e00f97f2e36ea02073c155c46e1015c17553'],
+  ['manifest.json', 87, 2470, '96eb5e5c8733ecdfa9d3eb447d51a3bfc2c4743a80b1fde1f12d71bd46d1c8e4'],
+  ['manifest.chrome.json', 87, 2470, '96eb5e5c8733ecdfa9d3eb447d51a3bfc2c4743a80b1fde1f12d71bd46d1c8e4'],
+  ['manifest.firefox.json', 74, 1994, '5d7175c23dbce4f9e86b0db0f34b1ae61bb465a9725ff37fc7069a45d4ceac5c'],
+  ['manifest.opera.json', 88, 2475, 'f76d4a48b51fc5da65492347ce3f7cb31ebff057afd2185573176991e7d1d4b7'],
+  ['data/release_notes.json', 316, 23047, 'c9c860f17dae9f9f9e8d1536d3c0de72dd3b6bd917fc8d7fc725047adc421862'],
+];
+
+const blockRows = [
+  ['buildConfig', 'const ALL_BROWSER_TARGETS', '// Stronger filter function', 28, 38, 1476],
+  ['mainBuildFlow', 'async function main()', 'function ensureCollabDialogScriptOrder', 80, 79, 2790],
+  ['manifestOrderRepair', 'function ensureCollabDialogScriptOrder', 'function createZip', 159, 22, 858],
+  ['createZip', 'function createZip', 'async function maybeCollectMobileArtifacts', 181, 33, 981],
+  ['mobileArtifacts', 'async function maybeCollectMobileArtifacts', 'function selectLatestMobileArtifacts', 214, 61, 2331],
+  ['mobileSelectionChecksum', 'function selectLatestMobileArtifacts', 'async function maybePromptRelease', 275, 17, 625],
+  ['releasePromptPublish', 'async function maybePromptRelease', 'function extractLatestChangelogEntry', 292, 58, 1805],
+  ['releaseBody', 'function buildReleaseBody', 'function createGitHubRelease', 388, 94, 4166],
+  ['githubReleaseCreate', 'function createGitHubRelease', 'function uploadReleaseAsset', 482, 25, 699],
+  ['githubAssetUpload', 'function uploadReleaseAsset', 'function contentTypeForAsset', 507, 35, 1350],
+  ['readmeBadges', 'async function updateReadmeBadges', 'function shouldCountInTotalLoC', 602, 63, 2355],
+];
+
+function filePath(file) {
+  return path.join(repoRoot, file);
+}
+
+function read(file) {
+  return fs.readFileSync(filePath(file), 'utf8');
+}
+
+function readBuffer(file) {
+  return fs.readFileSync(filePath(file));
+}
+
+function readJson(file) {
+  return JSON.parse(read(file));
+}
+
+function doc() {
+  return read(docPath);
+}
+
+function sha256(file) {
+  return crypto.createHash('sha256').update(readBuffer(file)).digest('hex');
+}
+
+function lineCount(text) {
+  return text.split(/\r?\n/).length - (text.endsWith('\n') ? 1 : 0);
+}
+
+function sourceLineOf(text, offset) {
+  return text.slice(0, offset).split(/\r?\n/).length;
+}
+
+function countLiteral(text, token) {
+  return text.split(token).length - 1;
+}
+
+function escapeRegExp(text) {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+test('release build artifact claim boundary is audit-only and fingerprint pinned', () => {
+  const text = doc();
+
+  assert.match(text, /Status: audit-only current-behavior proof/);
+  assert.match(text, /Runtime behavior is unchanged/);
+  assert.match(text, /codebase inspection/);
+  assert.match(text, /future optimization locations and first-class JSON filter blockers/);
+  assert.match(text, /release build artifact boundary source files: 9/);
+  assert.match(text, /release build artifact source\/effect blocks: 11/);
+  assert.match(text, /runtime behavior changed: no/);
+
+  for (const [file, expectedLines, expectedBytes, expectedHash] of sourceRows) {
+    const source = read(file);
+    assert.equal(lineCount(source), expectedLines, `${file} line count drifted`);
+    assert.equal(fs.statSync(filePath(file)).size, expectedBytes, `${file} byte count drifted`);
+    assert.equal(sha256(file), expectedHash, `${file} hash drifted`);
+    assert.match(
+      text,
+      new RegExp(`\\| \`${escapeRegExp(file)}\` \\| ${expectedLines} \\| ${expectedBytes} \\| \`${expectedHash}\` \\|`)
+    );
+  }
+});
+
+test('release build artifact claim boundary pins build source and effect blocks', () => {
+  const text = doc();
+  const build = read('build.js');
+
+  for (const [name, startNeedle, endNeedle, expectedStartLine, expectedLines, expectedBytes] of blockRows) {
+    const start = build.indexOf(startNeedle);
+    assert.notEqual(start, -1, `missing block start ${name}`);
+    const end = build.indexOf(endNeedle, start + startNeedle.length);
+    assert.notEqual(end, -1, `missing block end ${name}`);
+    const block = build.slice(start, end);
+
+    assert.equal(sourceLineOf(build, start), expectedStartLine, `${name} start line drifted`);
+    assert.equal(lineCount(block), expectedLines, `${name} line count drifted`);
+    assert.equal(Buffer.byteLength(block), expectedBytes, `${name} byte count drifted`);
+    assert.match(
+      text,
+      new RegExp(`\\| \`${name}\` \\| ${expectedStartLine} \\| ${expectedLines} \\| ${expectedBytes} \\|`)
+    );
+  }
+});
+
+test('release build artifact claim boundary records package versions scripts and public README claims', () => {
+  const text = doc();
+  const pkg = readJson('package.json');
+  const readme = read('README.md');
+  const releases = readJson('data/release_notes.json');
+  const releaseVersions = releases.filter((entry) => entry && typeof entry.version === 'string').map((entry) => entry.version);
+
+  assert.equal(pkg.version, '3.3.1');
+  assert.equal(pkg.scripts.build, 'node build.js');
+  assert.equal(pkg.scripts['build:chrome'], 'node build.js chrome');
+  assert.equal(pkg.scripts['build:firefox'], 'node build.js firefox');
+  assert.equal(pkg.scripts['build:opera'], 'node build.js opera');
+
+  for (const manifestFile of ['manifest.json', 'manifest.chrome.json', 'manifest.firefox.json', 'manifest.opera.json']) {
+    assert.equal(readJson(manifestFile).version, '3.3.1', `${manifestFile} version drifted`);
+  }
+
+  assert.equal(releases.length, 24);
+  assert.equal(releaseVersions.length, 23);
+  assert.equal(releaseVersions[0], '3.3.2');
+  assert.equal(releaseVersions[1], '3.3.1');
+
+  assert.match(readme, /filtertube\.in\/downloads/);
+  assert.match(readme, /Large blocked-channel lists filter faster/);
+  assert.match(readme, /JSON-backed surfaces can be filtered before paint/);
+  assert.match(readme, /Current audit work is tightening no-rule, route, lifecycle, and resolver budgets/);
+
+  assert.match(text, /browser package version: 3\.3\.1/);
+  assert.match(text, /package\.json version: 3\.3\.1/);
+  assert.match(text, /staged newest release-note version: 3\.3\.2/);
+  assert.match(text, /release note data entries: 24/);
+  assert.match(text, /release note version rows: 23/);
+  assert.match(text, /README public copy currently claims/);
+});
+
+test('release build artifact claim boundary records current package and release mechanics', () => {
+  const text = doc();
+  const build = read('build.js');
+  const createIndex = build.indexOf('const release = await createGitHubRelease');
+  const uploadIndex = build.indexOf('for (const assetPath of releaseAssetPaths)');
+
+  assert.match(build, /const COMMON_DIRS = \['js', 'css', 'html', 'icons', 'data', 'assets'\];/);
+  assert.match(build, /const COMMON_FILES = \['README\.md', 'CHANGELOG\.md', 'LICENSE'\];/);
+  assert.match(build, /execSync\('node scripts\/build-extension-ui\.mjs', \{ stdio: 'inherit' \}\)/);
+  assert.match(build, /await updateReadmeBadges\(VERSION\)/);
+  assert.match(build, /archive\.glob\('\*\*\/\*'/);
+  assert.match(build, /MOBILE_ARTIFACT_FILE_RE = \/\^FilterTube-mobile-tablet-v/);
+  assert.match(build, /sha256File\(targetPath\)/);
+  assert.match(build, /draft:\s*false/);
+  assert.match(build, /prerelease:\s*false/);
+  assert.ok(createIndex !== -1 && uploadIndex !== -1 && createIndex < uploadIndex);
+
+  assert.match(text, /package source directories: js, css, html, icons, data, assets/);
+  assert.match(text, /package common files: README\.md, CHANGELOG\.md, LICENSE/);
+  assert.match(text, /browser ZIP checksum writer: absent/);
+  assert.match(text, /release package manifest: absent/);
+  assert.match(text, /public claim manifest: absent/);
+  assert.match(text, /artifact manifest: absent/);
+  assert.match(text, /public release rollback\/delete path: absent/);
+});
+
+test('release build artifact claim boundary keeps future authority gates missing', () => {
+  const text = doc();
+  const build = read('build.js');
+  const combinedSource = [
+    build,
+    read('package.json'),
+    read('README.md'),
+    read('manifest.json'),
+    read('manifest.chrome.json'),
+    read('manifest.firefox.json'),
+    read('manifest.opera.json'),
+  ].join('\n');
+
+  assert.equal(countLiteral(combinedSource, 'releasePackageManifest'), 0);
+  assert.equal(countLiteral(combinedSource, 'publicClaimManifest'), 0);
+  assert.equal(countLiteral(combinedSource, 'artifactManifest'), 0);
+  assert.equal(/rollback|delete release|method:\s*'DELETE'/i.test(build), false);
+  assert.equal(/filtertube-\$\{browser\}-v\$\{version\}\.zip\.sha256|zip.*sha256|sha256.*zip/i.test(build), false);
+
+  assert.match(text, /Release copy constructs browser ZIP links and optional Android links from naming conventions, not from verified uploaded assets/);
+  assert.match(text, /First-class JSON filter risk is public-copy drift/);
+  assert.match(text, /No `releaseBuildArtifactClaimContract`, `releasePackageManifestAuthority`,/);
+  assert.match(text, /`releaseReadmeMutationGate`, `releaseDraftFirstGate`,/);
+  assert.match(text, /`releaseAssetUploadRollbackPlan`, `releaseMobileArtifactClaimGate`,/);
+  assert.match(text, /`releaseZipChecksumManifest`, `releaseGeneratedUiFreshnessGate`,/);
+  assert.match(text, /`releaseBrowserManifestParityReport`, `releasePublicClaimFixtureProvenance`, or/);
+  assert.match(text, /`releaseFirstClassJsonClaimGate` exists/);
+});

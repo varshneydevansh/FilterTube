@@ -915,15 +915,23 @@
                             categoryFilters: effectiveCategoryFilters
                         };
 
+                        const existingMain = safeObject(activeProfile.main);
+                        const mainMode = existingMain.mode === 'whitelist' ? 'whitelist' : 'blocklist';
+                        const nextMainProfile = {
+                            ...existingMain,
+                            channels: sanitizedChannels,
+                            keywords: sanitizedKeywords
+                        };
+                        if (mainMode === 'blocklist') {
+                            nextMainProfile.blockedChannels = sanitizedChannels;
+                            nextMainProfile.blockedKeywords = sanitizedKeywords;
+                        }
+
                         profiles[activeId] = {
                             ...activeProfile,
                             name: typeof activeProfile.name === 'string' ? activeProfile.name : 'Default',
                             settings: nextSettings,
-                            main: {
-                                ...safeObject(activeProfile.main),
-                                channels: sanitizedChannels,
-                                keywords: sanitizedKeywords
-                            },
+                            main: nextMainProfile,
                             kids: {
                                 ...existingKids,
                                 mode: (typeof existingKids.mode === 'string' && existingKids.mode === 'whitelist') ? 'whitelist' : 'blocklist',

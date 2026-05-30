@@ -1,10 +1,19 @@
 # Network Request Pipeline Documentation (v3.3.0)
 
+> Current-behavior boundary (2026-05-19): this page contains historical
+> v3.2.x/v3.3.0 design notes and some intentionally broad performance language.
+> Treat it as context, not as implementation truth. The current proof-backed
+> source of truth is `docs/audit/FILTERTUBE_IDENTITY_INFORMATION_WATERFALL_CURRENT_BEHAVIOR_2026-05-19.md`
+> plus `docs/audit/FILTERTUBE_REFERENCE_DOC_CLAIM_DRIFT_CURRENT_BEHAVIOR_2026-05-19.md`.
+> In current source, identity is JSON-first, not JSON-complete: learned maps,
+> DOM extraction, and background watch/Shorts/Kids/channel resolvers still exist
+> for weak or video-id-only surfaces.
+
 ## Overview
 
-FilterTube v3.2.5 implements a **proactive, XHR-first** network request pipeline that intercepts YouTube's JSON responses to extract channel identity before rendering. This eliminates network latency for most operations and enables instant blocking across all surfaces.
+FilterTube v3.2.5 introduced a **JSON-aware identity pipeline** that intercepts YouTube's JSON responses to extract channel identity as early as the payload exposes enough identity. This reduces resolver latency on many surfaces, but it is still a source-confidence layer rather than a guarantee of pre-render identity or instant blocking across every route. Some watch, Shorts, playlist, Kids, and weak menu targets still need learned maps, DOM enrichment, or a background resolver.
 
-**Performance Enhancement (v3.2.1):** The pipeline now includes advanced async processing with main thread yielding, eliminating UI lag during heavy filtering operations. Compiled regex caching and batched storage updates reduce CPU usage by 60-80% and I/O operations by 70-90%.
+**Historical performance note (v3.2.1):** The pipeline includes async processing, main-thread yielding, compiled regex caching, batched storage updates, and production-quiet routine logging to reduce CPU, console, and I/O pressure. Earlier notes used "eliminating UI lag", "60-80%" CPU, and "70-90%" I/O language; those are historical estimates, not current proof. Current performance claims require a `performanceClaimAuthority` measurement for the exact route, browser/device, rule-state, and sample.
 
 **Channel Stamping Enhancements (v3.2.5):** Improved DOM stamping with mode-aware data attributes and enhanced channel ID visibility for homepage Shorts and other surfaces.
 
@@ -22,15 +31,15 @@ FilterTube v3.2.5 implements a **proactive, XHR-first** network request pipeline
 ├─────────────────────────────────────────────────────────────┤
 │  Content Scripts (Isolated World)                           │
 │  ├── Message Handling (content_bridge.js)                   │
-│  ├── Instant DOM Stamping (data-filtertube-*)               │
+│  ├── DOM Stamping (data-filtertube-* when identity is known)│
 │  ├── 3-dot Menu Updates                                     │
-│  └── Fallback Network Requests (rare)                       │
+│  └── Fallback Network Requests (scoped resolver path)       │
 ├─────────────────────────────────────────────────────────────┤
 │  Background Script (Service Worker)                         │
 │  ├── Channel Persistence                                    │
 │  ├── Post-block Enrichment                                  │
 │  ├── Rate Limiting                                          │
-│  └── Kids Zero-Network Mode                                 │
+│  └── Kids scoped resolver boundary                          │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -84,14 +93,14 @@ sequenceDiagram
     Filter->>Filter: harvest UC ID, handle, name, logo
     Filter->>Main: postMessage(FilterTube_UpdateVideoChannelMap)
     Main->>Isolated: postMessage(FilterTube_UpdateVideoChannelMap)
-    Isolated->>DOM: stampChannelIdentity()
-    DOM->>DOM: 3-dot menu shows correct name instantly
+    Isolated->>DOM: stampChannelIdentity() when enough identity is known
+    DOM->>DOM: 3-dot menu can render proven channel identity
 ```
 
 **Key changes in v3.2.1:**
-- **No network requests** for identity in most cases
-- **Instant UI updates**—no "Fetching..." delays
-- **Zero-network Kids mode**—works entirely from XHR data
+- **Fewer identity fetches** when JSON, snapshots, or learned maps already contain enough channel identity
+- **Faster UI updates** when 3-dot/menu targets have stamped or mapped identity before the user opens the action
+- **Kids network boundary**: Kids paths prefer page/JSON/map identity, but source still contains a background Kids watch resolver for video-id-only cases
 
 ### 2. Request Types (Priority Order)
 
@@ -266,10 +275,12 @@ const ogImage = extractMeta('og:image');
 const ogUrl = extractMeta('og:url');
 ```
     
-    #### 6. Kids Zero-Network Prefetch
+    #### 6. Kids Scoped Prefetch Boundary
 
 ```javascript
-// Kids: do NOT prefetch via network. Rely on Network JSON interception
+// Kids prefetch path: avoid proactive network work and prefer already-known
+// JSON/map/DOM identity. Separate explicit Kids watch resolver code still
+// exists for video-id-only action paths after cache/map checks.
 async function prefetchIdentityForCard({ videoId, card }) {
     if (isKidsHost) {
         // Extract from XHR-intercepted data only
@@ -295,9 +306,9 @@ async function prefetchIdentityForCard({ videoId, card }) {
 ```
 
 **Kids-specific features:**
-- **Zero-network operation** - no fetch requests for Kids
-- **XHR-only identity** - relies entirely on intercepted JSON
-- **DOM extraction fallback** - uses stamped attributes when available
+- **Network-minimizing operation** - Kids surfaces prefer intercepted JSON, snapshots, learned maps, and stamped attributes before resolver work
+- **JSON-first identity** - relies on intercepted JSON when it carries enough identity, but it is not JSON-only
+- **DOM extraction fallback** - uses stamped attributes when available; weak video-id-only watch targets can still need the background Kids watch resolver
 
 ### 3. Enhanced Channel Stamping (v3.2.3)
 
@@ -1038,4 +1049,4 @@ describe('Channel Resolution Integration', () => {
 - Identify optimization opportunities
 - Monitor cache effectiveness
 
-This network request pipeline ensures reliable channel identity resolution across all YouTube surfaces while maintaining high performance and robust error handling.
+This network request pipeline improves channel identity resolution across supported YouTube surfaces while preserving explicit fallback paths for weak or video-id-only cases. It should be treated as a performance and reliability layer, not as a global guarantee that every surface is complete before first paint.

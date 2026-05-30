@@ -1,0 +1,185 @@
+{
+  "provenance": {
+    "source": "YT_MAIN_UPNEXT_FEED_WATCHPAGE2.json",
+    "sourceSha256": "3916ffe4978ebaed0397d9f45d090541545f126ba4153dedfbecb9859d9ec8e8",
+    "sourceBytes": 863854,
+    "sourceLines": 20079,
+    "rawShape": "claim-prefaced prose plus balanced youtubei next JSON fragment",
+    "fragmentIndex": 0,
+    "fragmentStartLine": 63,
+    "fragmentBytes": 857711,
+    "rootPath": "top-level parsed fragment",
+    "endpointPath": "onResponseReceivedEndpoints.0.appendContinuationItemsAction",
+    "targetId": "watch-next-feed",
+    "rendererType": "watchNextFeedClaimPrefacedLockupViewModel",
+    "rendererTypes": [
+      "lockupViewModel",
+      "reelShelfRenderer",
+      "continuationItemRenderer"
+    ],
+    "extractedPath": "onResponseReceivedEndpoints.0.appendContinuationItemsAction.continuationItems.0.lockupViewModel",
+    "siblingPath": "onResponseReceivedEndpoints.0.appendContinuationItemsAction.continuationItems.1.lockupViewModel",
+    "fixtureKind": "json",
+    "surface": "Main desktop watch late-loaded up-next feed",
+    "route": "watch"
+  },
+  "response": {
+    "onResponseReceivedEndpoints": [
+      {
+        "appendContinuationItemsAction": {
+          "targetId": "watch-next-feed",
+          "continuationItems": [
+            {
+              "lockupViewModel": {
+                "contentId": "AM6n0J6ZXNo",
+                "contentType": "LOCKUP_CONTENT_TYPE_VIDEO",
+                "metadata": {
+                  "lockupMetadataViewModel": {
+                    "title": {
+                      "content": "Tron: Legacy - Ultimate Action Suite | Daft Punk"
+                    },
+                    "metadata": {
+                      "contentMetadataViewModel": {
+                        "metadataRows": [
+                          {
+                            "metadataParts": [
+                              {
+                                "text": {
+                                  "content": "SuiteSound Music"
+                                }
+                              }
+                            ]
+                          },
+                          {
+                            "metadataParts": [
+                              {
+                                "text": {
+                                  "content": "7.2 lakh views"
+                                }
+                              },
+                              {
+                                "text": {
+                                  "content": "3 years ago"
+                                }
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    },
+                    "image": {
+                      "decoratedAvatarViewModel": {
+                        "rendererContext": {
+                          "commandContext": {
+                            "onTap": {
+                              "innertubeCommand": {
+                                "browseEndpoint": {
+                                  "browseId": "UCkAQ2Y2bRUI4Cqyj5pc9wJQ",
+                                  "canonicalBaseUrl": "/@SuiteSound_Music"
+                                },
+                                "commandMetadata": {
+                                  "webCommandMetadata": {
+                                    "url": "/@SuiteSound_Music"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "rendererContext": {
+                  "commandContext": {
+                    "onTap": {
+                      "innertubeCommand": {
+                        "watchEndpoint": {
+                          "videoId": "AM6n0J6ZXNo"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "lockupViewModel": {
+                "contentId": "rI2gQ7K4F8g",
+                "contentType": "LOCKUP_CONTENT_TYPE_VIDEO",
+                "metadata": {
+                  "lockupMetadataViewModel": {
+                    "title": {
+                      "content": "NYUSHA с живым концертом на Авторадио (2024)"
+                    },
+                    "metadata": {
+                      "contentMetadataViewModel": {
+                        "metadataRows": [
+                          {
+                            "metadataParts": [
+                              {
+                                "text": {
+                                  "content": "Авторадио"
+                                }
+                              }
+                            ]
+                          },
+                          {
+                            "metadataParts": [
+                              {
+                                "text": {
+                                  "content": "43K views"
+                                }
+                              },
+                              {
+                                "text": {
+                                  "content": "1 year ago"
+                                }
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    },
+                    "image": {
+                      "decoratedAvatarViewModel": {
+                        "rendererContext": {
+                          "commandContext": {
+                            "onTap": {
+                              "innertubeCommand": {
+                                "browseEndpoint": {
+                                  "browseId": "UC9D_41XZiozyLLeRKVQIBmQ",
+                                  "canonicalBaseUrl": "/@AvtoradioMoscow"
+                                },
+                                "commandMetadata": {
+                                  "webCommandMetadata": {
+                                    "url": "/@AvtoradioMoscow"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "rendererContext": {
+                  "commandContext": {
+                    "onTap": {
+                      "innertubeCommand": {
+                        "watchEndpoint": {
+                          "videoId": "rI2gQ7K4F8g"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

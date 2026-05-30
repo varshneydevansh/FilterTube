@@ -1,0 +1,151 @@
+{
+  "provenance": {
+    "source": "YT_MAIN_UPNEXT_FEED_WATCHPAGE.json",
+    "sourceSha256": "3732b657182676a97adfa527d19c6f32408ba90509dc8221504a3658db13b6d2",
+    "sourceBytes": 852491,
+    "sourceLines": 19918,
+    "rawShape": "prose plus balanced youtubei next JSON fragment",
+    "fragmentIndex": 1,
+    "fragmentStartLine": 139,
+    "fragmentBytes": 840530,
+    "rootPath": "top-level parsed fragment",
+    "endpointPath": "onResponseReceivedEndpoints.0.appendContinuationItemsAction",
+    "targetId": "watch-next-feed",
+    "rendererType": "watchNextFeedLockupViewModel",
+    "rendererTypes": [
+      "lockupViewModel",
+      "reelShelfRenderer",
+      "continuationItemRenderer"
+    ],
+    "extractedPath": "onResponseReceivedEndpoints.0.appendContinuationItemsAction.continuationItems.0.lockupViewModel",
+    "siblingPath": "onResponseReceivedEndpoints.0.appendContinuationItemsAction.continuationItems.1.lockupViewModel",
+    "fixtureKind": "json",
+    "surface": "Main desktop watch late-loaded up-next feed",
+    "route": "watch"
+  },
+  "response": {
+    "onResponseReceivedEndpoints": [
+      {
+        "appendContinuationItemsAction": {
+          "targetId": "watch-next-feed",
+          "continuationItems": [
+            {
+              "lockupViewModel": {
+                "contentId": "rI2gQ7K4F8g",
+                "contentType": "LOCKUP_CONTENT_TYPE_VIDEO",
+                "metadata": {
+                  "lockupMetadataViewModel": {
+                    "title": {
+                      "content": "NYUSHA с живым концертом на Авторадио (2024)"
+                    },
+                    "metadata": {
+                      "contentMetadataViewModel": {
+                        "metadataRows": [
+                          {
+                            "metadataParts": [
+                              {
+                                "text": {
+                                  "content": "Авторадио"
+                                }
+                              }
+                            ]
+                          },
+                          {
+                            "metadataParts": [
+                              {
+                                "text": {
+                                  "content": "1M views"
+                                }
+                              },
+                              {
+                                "text": {
+                                  "content": "1 year ago"
+                                }
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    },
+                    "image": {
+                      "decoratedAvatarViewModel": {
+                        "rendererContext": {
+                          "commandContext": {
+                            "onTap": {
+                              "innertubeCommand": {
+                                "browseEndpoint": {
+                                  "browseId": "UC9D_41XZiozyLLeRKVQIBmQ",
+                                  "canonicalBaseUrl": "/@AvtoradioMoscow"
+                                },
+                                "commandMetadata": {
+                                  "webCommandMetadata": {
+                                    "url": "/@AvtoradioMoscow"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "rendererContext": {
+                  "commandContext": {
+                    "onTap": {
+                      "innertubeCommand": {
+                        "watchEndpoint": {
+                          "videoId": "rI2gQ7K4F8g"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "lockupViewModel": {
+                "contentId": "RDGMEM0s70dY0AfCwh3LqQ-Bv1xg",
+                "contentType": "LOCKUP_CONTENT_TYPE_PLAYLIST",
+                "metadata": {
+                  "lockupMetadataViewModel": {
+                    "title": {
+                      "content": "Mix – K-pop"
+                    },
+                    "metadata": {
+                      "contentMetadataViewModel": {
+                        "metadataRows": [
+                          {
+                            "metadataParts": [
+                              {
+                                "text": {
+                                  "content": "BTS, BLACKPINK, j-hope and more"
+                                }
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                "rendererContext": {
+                  "commandContext": {
+                    "onTap": {
+                      "innertubeCommand": {
+                        "watchEndpoint": {
+                          "videoId": "IHNzOHi8sJs",
+                          "playlistId": "RDGMEM0s70dY0AfCwh3LqQ-Bv1xg"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

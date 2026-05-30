@@ -1,0 +1,190 @@
+{
+  "provenance": {
+    "source": "YT_KIDS.json",
+    "rendererType": "compactVideoRenderer",
+    "extractedBlockIndex": 0,
+    "extractedPath": "contents.kidsHomeScreenRenderer.anchors.0.anchoredSectionRenderer.content.sectionListRenderer.contents.0.itemSectionRenderer.contents.0.compactVideoRenderer"
+  },
+  "renderer": {
+    "videoId": "6m25h6hvEGw",
+    "thumbnail": {
+      "thumbnails": [
+        {
+          "url": "https://i.ytimg.com/vi/6m25h6hvEGw/hqdefault.jpg?sqp=-oaymwEWCKgBEF5IWvKriqkDCQgBFQAAiEIYAQ==&rs=AOn4CLBGMrmhk8BYkcmx-LUCxvsdABFysw",
+          "width": 168,
+          "height": 94
+        },
+        {
+          "url": "https://i.ytimg.com/vi/6m25h6hvEGw/hqdefault.jpg?sqp=-oaymwEWCMQBEG5IWvKriqkDCQgBFQAAiEIYAQ==&rs=AOn4CLD96G7bXWKiuSCm2MIavnMVrFHlsg",
+          "width": 196,
+          "height": 110
+        },
+        {
+          "url": "https://i.ytimg.com/vi/6m25h6hvEGw/hqdefault.jpg?sqp=-oaymwEXCPYBEIoBSFryq4qpAwkIARUAAIhCGAE=&rs=AOn4CLB-fKD6T89qCvASWFcohhxphZBPrA",
+          "width": 246,
+          "height": 138
+        },
+        {
+          "url": "https://i.ytimg.com/vi/6m25h6hvEGw/hqdefault.jpg?sqp=-oaymwEXCNACELwBSFryq4qpAwkIARUAAIhCGAE=&rs=AOn4CLAUa3L0Z5NG9ZWVXD728eYgnSQVmA",
+          "width": 336,
+          "height": 188
+        }
+      ]
+    },
+    "title": {
+      "runs": [
+        {
+          "text": "Titipo Hindi Episode l सीजन 1 #7 मैनी में कुछ ख़ास है l टीटीपो टीटीपो हिंदी l Show for Kids"
+        }
+      ],
+      "accessibility": {
+        "accessibilityData": {
+          "label": "Titipo Hindi Episode l सीजन 1 #7 मैनी में कुछ ख़ास है l टीटीपो टीटीपो हिंदी l Show for Kids by Titipo Titipo Hindi टिटिपो द लिटिल ट्रेन हिंदी 39,32,112 views 4 years ago 33 minutes"
+        }
+      }
+    },
+    "longBylineText": {
+      "runs": [
+        {
+          "text": "Titipo Titipo Hindi टिटिपो द लिटिल ट्रेन हिंदी",
+          "navigationEndpoint": {
+            "clickTrackingParams": "CIYBEKQwGAAiEwi48MiLupSSAxUaLrcAHQ-1PWoyC0ZFa2lkc19ob21lygEEUbmRbQ==",
+            "browseEndpoint": {
+              "browseId": "UCRxdo0UD_OU2a2ACG7LZHtA",
+              "canonicalBaseUrl": "/@TitipoTitipo_IND"
+            }
+          }
+        }
+      ]
+    },
+    "publishedTimeText": {
+      "runs": [
+        {
+          "text": "4 years ago"
+        }
+      ]
+    },
+    "viewCountText": {
+      "runs": [
+        {
+          "text": "39,32,112 views"
+        }
+      ]
+    },
+    "lengthText": {
+      "runs": [
+        {
+          "text": "33:11"
+        }
+      ],
+      "accessibility": {
+        "accessibilityData": {
+          "label": "33 minutes, 11 seconds"
+        }
+      }
+    },
+    "navigationEndpoint": {
+      "clickTrackingParams": "CIYBEKQwGAAiEwi48MiLupSSAxUaLrcAHQ-1PWoyC0ZFa2lkc19ob21lWgtGRWtpZHNfaG9tZZoBBhCEZxieAcoBBFG5kW0=",
+      "watchEndpoint": {
+        "videoId": "6m25h6hvEGw",
+        "playerParams": "0gcJCYcKAYcqIYzv"
+      }
+    },
+    "shortBylineText": {
+      "runs": [
+        {
+          "text": "Titipo Titipo Hindi टिटिपो द लिटिल ट्रेन हिंदी",
+          "navigationEndpoint": {
+            "clickTrackingParams": "CIYBEKQwGAAiEwi48MiLupSSAxUaLrcAHQ-1PWoyC0ZFa2lkc19ob21lygEEUbmRbQ==",
+            "browseEndpoint": {
+              "browseId": "UCRxdo0UD_OU2a2ACG7LZHtA",
+              "canonicalBaseUrl": "/@TitipoTitipo_IND"
+            }
+          }
+        }
+      ]
+    },
+    "channelThumbnail": {
+      "thumbnails": [
+        {
+          "url": "https://yt3.ggpht.com/ytc/AIdro_njsYEWbdVcsNQiXEvHkXYwdNYZZOsy6LxLpd4OsxFkMA=s68-c-k-c0x00ffffff-no-rj",
+          "width": 68,
+          "height": 68
+        }
+      ]
+    },
+    "trackingParams": "CIYBEKQwGAAiEwi48MiLupSSAxUaLrcAHQ-1PWpA7KC8w_qw7rbqAQ==",
+    "shortViewCountText": {
+      "runs": [
+        {
+          "text": "39 lakh views"
+        }
+      ],
+      "accessibility": {
+        "accessibilityData": {
+          "label": "39 lakh views"
+        }
+      }
+    },
+    "menu": {
+      "menuRenderer": {
+        "items": [
+          {
+            "menuServiceItemRenderer": {
+              "text": {
+                "runs": [
+                  {
+                    "text": "Block this video"
+                  }
+                ]
+              },
+              "icon": {
+                "iconType": "KIDS_BLOCK"
+              },
+              "serviceEndpoint": {
+                "clickTrackingParams": "CIcBEOnVARgBIhMIuPDIi7qUkgMVGi63AB0PtT1qygEEUbmRbQ==",
+                "updateKidsBlacklistEndpoint": {
+                  "items": [
+                    {
+                      "encryptedVideoId": "6m25h6hvEGw",
+                      "action": "BLOCKLIST_ACTION_BLOCK"
+                    }
+                  ]
+                }
+              },
+              "trackingParams": "CIcBEOnVARgBIhMIuPDIi7qUkgMVGi63AB0PtT1q"
+            }
+          }
+        ],
+        "trackingParams": "CIYBEKQwGAAiEwi48MiLupSSAxUaLrcAHQ-1PWo=",
+        "accessibility": {
+          "accessibilityData": {
+            "label": "Action menu"
+          }
+        }
+      }
+    },
+    "accessibility": {
+      "accessibilityData": {
+        "label": "Titipo Hindi Episode l सीजन 1 #7 मैनी में कुछ ख़ास है l टीटीपो टीटीपो हिंदी l Show for Kids – 33 minutes – Go to channel – Titipo Titipo Hindi टिटिपो द लिटिल ट्रेन हिंदी - 39 lakh views - 4 years ago – play video"
+      }
+    },
+    "richThumbnail": {
+      "movingThumbnailRenderer": {
+        "movingThumbnailDetails": {
+          "thumbnails": [
+            {
+              "url": "https://i.ytimg.com/an_webp/6m25h6hvEGw/mqdefault_6s.webp?du=3000&sqp=CMzcscsG&rs=AOn4CLAQtq9N3XuLQugHdNv6cup_wqV-NA",
+              "width": 320,
+              "height": 180
+            }
+          ],
+          "logAsMovingThumbnail": true
+        }
+      }
+    },
+    "kidsVideoOwnerExtension": {
+      "externalChannelId": "UCRxdo0UD_OU2a2ACG7LZHtA"
+    }
+  }
+}

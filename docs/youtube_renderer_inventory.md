@@ -9,7 +9,7 @@ This document tracks which YouTube renderers/selectors FilterTube currently targ
 - **Topic Channel Support**: Added special handling for auto-generated YouTube topic channels
 - **Post-Block Enrichment**: Added background enrichment system for incomplete channel data
 - **Kids Video Enhancement**: Added `kidsVideoOwnerExtension` and `externalChannelId` support
-- **Performance Optimizations**: Async DOM processing with main thread yielding eliminates UI lag (60-80% CPU reduction, 70-90% I/O reduction)
+- **Performance Optimizations**: Async DOM processing with main-thread yielding and batched writes were added to reduce lag, CPU pressure, and I/O. Earlier notes used 60-80% CPU and 70-90% I/O reduction language; those are historical estimates, not current measured proof.
 
 ## Home Feed
 
@@ -53,7 +53,7 @@ This document tracks which YouTube renderers/selectors FilterTube currently targ
 | `chipCloudChipRenderer` | Individual chips | ✅ **NEW** | @js/filter_logic.js#372 |
 | `secondarySearchContainerRenderer` | Search container | ✅ **NEW** | @js/filter_logic.js#388 |
 
-### **NEW v3.2.1: Proactive Network Snapshot System**
+### **NEW v3.2.1: JSON Snapshot Identity System**
 
 | Network Endpoint | Data Source | Purpose | Status |
 | --- | --- | --- | --- |
@@ -63,7 +63,7 @@ This document tracks which YouTube renderers/selectors FilterTube currently targ
 
 **Multi-Source Channel Resolution:**
 ```javascript
-// Enhanced search across all proactive sources
+// Search across JSON snapshots and page globals when those sources expose identity
 const roots = [
     window.filterTube?.lastYtNextResponse,      // Playlist data
     window.filterTube?.lastYtBrowseResponse,    // Channel data  
@@ -723,7 +723,7 @@ Notes:
 
 | Feature | Implementation Status | Key Files |
 | --- | --- | --- |
-| **Proactive Network Interception** | ✅ Complete | `js/seed.js#stashNetworkSnapshot`, `js/injector.js` |
+| **Network Snapshot Interception** | ✅ Complete | `js/seed.js#stashNetworkSnapshot`, `js/injector.js` |
 | **Avatar Stack Collaboration Detection** | ✅ Complete | `js/injector.js#extractFromAvatarStackViewModel`, `js/filter_logic.js` |
 | **Topic Channel Support** | ✅ Complete | `js/render_engine.js#isTopicChannel`, `js/background.js` |
 | **Post-Block Enrichment** | ✅ Complete | `js/background.js#schedulePostBlockEnrichment` |
@@ -733,10 +733,10 @@ Notes:
 
 ### 🎯 v3.2.1 Architecture Impact
 
-- **Zero-Network Operation**: Most channel identity now resolved from stashed snapshots
+- **Reduced Network Use**: Most channel identity should resolve from stashed snapshots or learned maps when those sources expose enough identity; weak watch, Shorts, Kids, playlist, and menu targets can still require bounded fallback resolvers.
 - **Improved Collaboration Detection**: Avatar stacks provide better collaborator extraction
 - **Better Error Recovery**: Multiple fallback strategies for channel resolution
-- **Enhanced Performance**: Reduced network calls through proactive data stashing
+- **Resolver Reduction Boundary**: Snapshot stashing can reduce resolver calls when payloads expose enough identity; current behavior still needs route-specific proof for weak watch, Shorts, Kids, playlist, menu, and collaborator targets.
 - **Topic Channel Awareness**: Special handling for auto-generated YouTube channels
 
 ### 📋 Tags Still Under Investigation

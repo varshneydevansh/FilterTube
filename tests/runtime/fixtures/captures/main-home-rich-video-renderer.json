@@ -1,0 +1,92 @@
+{
+  "provenance": {
+    "source": "logs.json",
+    "rendererType": "richItemRenderer",
+    "extractedPath": "contents.twoColumnBrowseResultsRenderer.tabs.0.tabRenderer.content.richGridRenderer.contents.1.richItemRenderer.content.videoRenderer",
+    "fixtureKind": "json",
+    "surface": "Main desktop home rich-grid video card",
+    "route": "home"
+  },
+  "renderer": {
+    "content": {
+      "videoRenderer": {
+        "videoId": "bggFTyMzd9E",
+        "title": {
+          "runs": [
+            {
+              "text": "Holi 2026: Madhya Pradesh के Ujjain में साधु-संतों ने खेली होली, भक्तों ने लिया आशीर्वाद #aajtak"
+            }
+          ],
+          "accessibility": {
+            "accessibilityData": {
+              "label": "Holi 2026: Madhya Pradesh के Ujjain में साधु-संतों ने खेली होली, भक्तों ने लिया आशीर्वाद #aajtak 25 seconds"
+            }
+          }
+        },
+        "descriptionSnippet": {
+          "runs": [
+            {
+              "text": "Holi 2026: Madhya Pradesh के Ujjain में साधु-संतों ने खेली होली, भक्तों ने लिया आशीर्वाद\n\n#aajtak #aajtakdig..."
+            }
+          ]
+        },
+        "longBylineText": {
+          "runs": [
+            {
+              "text": "Aaj Tak",
+              "navigationEndpoint": {
+                "browseEndpoint": {
+                  "browseId": "UCt4t-jeY85JegMlZ-E5UWtA",
+                  "canonicalBaseUrl": "/@aajtak"
+                }
+              }
+            }
+          ]
+        },
+        "ownerText": {
+          "runs": [
+            {
+              "text": "Aaj Tak",
+              "navigationEndpoint": {
+                "browseEndpoint": {
+                  "browseId": "UCt4t-jeY85JegMlZ-E5UWtA",
+                  "canonicalBaseUrl": "/@aajtak"
+                }
+              }
+            }
+          ]
+        },
+        "shortBylineText": {
+          "runs": [
+            {
+              "text": "Aaj Tak",
+              "navigationEndpoint": {
+                "browseEndpoint": {
+                  "browseId": "UCt4t-jeY85JegMlZ-E5UWtA",
+                  "canonicalBaseUrl": "/@aajtak"
+                }
+              }
+            }
+          ]
+        },
+        "publishedTimeText": {
+          "simpleText": "9 minutes ago"
+        },
+        "lengthText": {
+          "simpleText": "0:25"
+        },
+        "viewCountText": {
+          "simpleText": "438 views"
+        },
+        "shortViewCountText": {
+          "simpleText": "438 views"
+        },
+        "navigationEndpoint": {
+          "watchEndpoint": {
+            "videoId": "bggFTyMzd9E"
+          }
+        }
+      }
+    }
+  }
+}

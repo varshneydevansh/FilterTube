@@ -9,7 +9,7 @@
  * - Opening the dashboard tab in response to CTA clicks from the content banner
  * - (Plus the long-standing storage + messaging plumbing below)
  */
-
+installFilterTubeBackgroundConsoleGate();
 
 // Load shared identity helpers in MV3 service worker environments (Chrome/Opera).
 // Firefox MV3 can also load `js/shared/identity.js` via manifest ordering.
@@ -2057,10 +2057,11 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
             const v4KeywordEntries = shouldUseKidsProfile
                 ? (Array.isArray(activeKids.blockedKeywords) ? activeKids.blockedKeywords : null)
                 : (() => {
-                    // V4 schema uses 'blockedKeywords' for blocklist mode, fallback to 'keywords' for migration
-                    const mainKeywords = Array.isArray(activeMain.blockedKeywords) 
-                        ? activeMain.blockedKeywords 
-                        : (Array.isArray(activeMain.keywords) ? activeMain.keywords : null);
+                    // Main profile blocklist keywords are written by the dashboard/popup under
+                    // `keywords`; `blockedKeywords` is kept as a migration/schema alias.
+                    const mainKeywords = Array.isArray(activeMain.keywords)
+                        ? activeMain.keywords
+                        : (Array.isArray(activeMain.blockedKeywords) ? activeMain.blockedKeywords : null);
                     if (!syncKidsToMain || mainModeFromV4 !== 'blocklist' || kidsModeFromV4 !== 'blocklist') return mainKeywords;
                     const kidsBlockedKeywords = Array.isArray(activeKids.blockedKeywords) ? activeKids.blockedKeywords : [];
                     if (!mainKeywords && kidsBlockedKeywords.length) return kidsBlockedKeywords;
@@ -2213,10 +2214,11 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
             const storedChannels = shouldUseKidsProfile
                 ? effectiveKidsChannels
                 : (() => {
-                    // V4 schema uses 'blockedChannels' for blocklist mode, fallback to 'channels' for migration
-                    const mainChannels = Array.isArray(activeMain.blockedChannels) 
-                        ? activeMain.blockedChannels 
-                        : (Array.isArray(activeMain.channels) ? activeMain.channels : items.filterChannels);
+                    // Main profile blocklist channels are written by the dashboard/popup under
+                    // `channels`; `blockedChannels` is kept as a migration/schema alias.
+                    const mainChannels = Array.isArray(activeMain.channels)
+                        ? activeMain.channels
+                        : (Array.isArray(activeMain.blockedChannels) ? activeMain.blockedChannels : items.filterChannels);
                     if (!syncKidsToMain) return mainChannels;
                     if (mainModeFromV4 !== 'blocklist') return mainChannels;
                     if (kidsModeFromV4 !== 'blocklist') return mainChannels;
@@ -3423,10 +3425,14 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
 
                 const blockedChannels = Array.isArray(nextMain.channels)
                     ? nextMain.channels
-                    : (Array.isArray(storage.filterChannels) ? storage.filterChannels : []);
+                    : (Array.isArray(nextMain.blockedChannels)
+                        ? nextMain.blockedChannels
+                        : (Array.isArray(storage.filterChannels) ? storage.filterChannels : []));
                 const blockedKeywords = Array.isArray(nextMain.keywords)
                     ? nextMain.keywords
-                    : (Array.isArray(storage.uiKeywords) ? storage.uiKeywords : []);
+                    : (Array.isArray(nextMain.blockedKeywords)
+                        ? nextMain.blockedKeywords
+                        : (Array.isArray(storage.uiKeywords) ? storage.uiKeywords : []));
                 const whitelistChannels = Array.isArray(nextMain.whitelistChannels) ? nextMain.whitelistChannels : [];
                 const whitelistKeywords = Array.isArray(nextMain.whitelistKeywords) ? nextMain.whitelistKeywords : [];
 
@@ -3438,6 +3444,8 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
 
                 nextMain.channels = [];
                 nextMain.keywords = [];
+                nextMain.blockedChannels = [];
+                nextMain.blockedKeywords = [];
             };
 
             if (requestedMode === 'whitelist') {
@@ -3880,14 +3888,20 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
             } else {
                 const whitelistChannels = Array.isArray(nextMain.whitelistChannels) ? nextMain.whitelistChannels : [];
                 const whitelistKeywords = Array.isArray(nextMain.whitelistKeywords) ? nextMain.whitelistKeywords : [];
-                const blockedChannels = Array.isArray(nextMain.channels) ? nextMain.channels : [];
-                const blockedKeywords = Array.isArray(nextMain.keywords) ? nextMain.keywords : [];
+                const blockedChannels = Array.isArray(nextMain.channels)
+                    ? nextMain.channels
+                    : (Array.isArray(nextMain.blockedChannels) ? nextMain.blockedChannels : []);
+                const blockedKeywords = Array.isArray(nextMain.keywords)
+                    ? nextMain.keywords
+                    : (Array.isArray(nextMain.blockedKeywords) ? nextMain.blockedKeywords : []);
 
                 nextMain.channels = dedupeChannels([...blockedChannels, ...whitelistChannels]);
                 nextMain.keywords = dedupeKeywordList([
                     ...sanitizeKeywordList(blockedKeywords),
                     ...sanitizeKeywordList(whitelistKeywords)
                 ]);
+                nextMain.blockedChannels = nextMain.channels;
+                nextMain.blockedKeywords = nextMain.keywords;
                 nextMain.whitelistChannels = [];
                 nextMain.whitelistKeywords = [];
                 nextMain.mode = 'blocklist';
@@ -4379,21 +4393,33 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
 
         return true; // Keep message channel open for async response
     } else if (request.action === "FilterTube_ApplySettings" && request.settings) {
-        // Forward compiled settings to all relevant tabs for immediate application.
-        // request.profile should be passed from the UI (popup/tab-view) to avoid cross-domain leaks.
+        // Treat UI-pushed settings as an invalidation signal; runtime truth must
+        // come from the background compiler so list mode, maps, and aliases stay in sync.
         const targetProfile = request.profile === 'kids' ? 'kids' : 'main';
         const urlPattern = targetProfile === 'kids' ? ["*://*.youtubekids.com/*"] : ["*://*.youtube.com/*"];
+        const syntheticSender = {
+            tab: {
+                url: targetProfile === 'kids'
+                    ? 'https://www.youtubekids.com/'
+                    : 'https://www.youtube.com/'
+            }
+        };
 
-        // Update cache
-        compiledSettingsCache[targetProfile] = request.settings;
+        compiledSettingsCache[targetProfile] = null;
 
-        browserAPI.tabs.query({ url: urlPattern }, tabs => {
-            tabs.forEach(tab => {
-                sendMessageToTabQuietly(tab.id, { action: 'FilterTube_ApplySettings', settings: request.settings });
+        getCompiledSettings(syntheticSender, targetProfile, true).then(compiledSettings => {
+            browserAPI.tabs.query({ url: urlPattern }, tabs => {
+                tabs.forEach(tab => {
+                    sendMessageToTabQuietly(tab.id, { action: 'FilterTube_ApplySettings', settings: compiledSettings });
+                });
             });
+            sendResponse({ acknowledged: true, profile: targetProfile });
+        }).catch(error => {
+            compiledSettingsCache[targetProfile] = null;
+            console.error("FilterTube Background: Failed to recompile settings for apply broadcast:", error);
+            sendResponse({ acknowledged: false, error: error?.message || "Failed to recompile settings." });
         });
-        sendResponse({ acknowledged: true });
-        return false;
+        return true;
     } else if (request.action === "updateChannelMap") {
         enqueueChannelMapMappings(request.mappings);
         return false; // No response needed
@@ -6268,3 +6294,20 @@ async function handleToggleChannelFilterAll(channelId, value) {
 }
 
 console.log(`FilterTube Background ${IS_FIREFOX ? 'Script' : 'Service Worker'} loaded and ready to serve filtered content.`);
+
+function installFilterTubeBackgroundConsoleGate() {
+    try {
+        if (globalThis.__filterTubeBackgroundConsoleGateInstalled) return;
+        const originalLog = typeof console?.log === 'function' ? console.log.bind(console) : null;
+        const originalInfo = typeof console?.info === 'function' ? console.info.bind(console) : null;
+        const originalDebug = typeof console?.debug === 'function' ? console.debug.bind(console) : null;
+        const isEnabled = () => globalThis.__filtertubeDebug === true
+            || globalThis.FILTERTUBE_DEBUG_LOGS === true;
+
+        if (originalLog) console.log = (...args) => { if (isEnabled()) originalLog(...args); };
+        if (originalInfo) console.info = (...args) => { if (isEnabled()) originalInfo(...args); };
+        if (originalDebug) console.debug = (...args) => { if (isEnabled()) originalDebug(...args); };
+        globalThis.__filterTubeBackgroundConsoleGateInstalled = true;
+    } catch (e) {
+    }
+}

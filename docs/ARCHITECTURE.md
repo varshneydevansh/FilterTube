@@ -2,7 +2,7 @@
 
 ## Overview
 
-FilterTube v3.3.1 builds on the proactive channel identity system with performance optimizations, watch-page SPA recovery hardening, stronger collaboration recovery, category filtering, a newer extension shell layer, and enhanced cross-browser support. This architecture documentation covers high-level design, filtering modes, recovery behavior, memory management, and cross-browser compatibility.
+FilterTube v3.3.1 builds on the JSON-aware channel identity layer with watch-page SPA recovery hardening, stronger collaboration recovery, category filtering, a newer extension shell layer, and enhanced cross-browser support. This architecture documentation covers high-level design, filtering modes, recovery behavior, memory management, and cross-browser compatibility. JSON/network snapshots are preferred identity sources when YouTube exposes stable fields, but they are not a guarantee of before-render identity, zero fallback resolver work, or permission to hide content without route/mode/source-confidence proof.
 
 ## Nanah / Accounts & Sync architecture (desktop checkpoint)
 
@@ -326,7 +326,7 @@ graph TD
     F --> G
     
     G --> H[Multi-Source Identity Resolution]
-    H --> I[Instant Channel Names]
+    H --> I[Proven/Mapped Channel Names]
     I --> J[3-dot Menu Blocking]
     
     J --> K[Background Post-Block Enrichment]
@@ -335,7 +335,7 @@ graph TD
     G --> M[DOM Fallback Layer]
     M --> N[Async Processing w/ Yielding]
     N --> O[Compiled Caching System]
-    O --> P[Responsive UI - No Lag]
+    O --> P[Reduced-Lag UI Intent]
     
     style N fill:#2196f3
     style O fill:#2196f3
@@ -427,7 +427,7 @@ sequenceDiagram
     Main->>Filter: Process & extract channels
     Filter->>Isolated: Channel identity via postMessage
     Isolated->>DOM: Stamp channel attributes
-    DOM->>DOM: Instant 3-dot menu names
+    DOM->>DOM: Proven 3-dot menu names
     
     Note over DOM: User clicks "Block channel"
     DOM->>Isolated: handleBlockChannelClick()
@@ -872,11 +872,15 @@ chrome.tabs.sendMessage(tabId, {
 });
 ```
 
-## Performance Architecture (v3.2.1 Performance Optimizations)
+## Performance Architecture (v3.2.1+ Performance Optimizations)
 
-### Lag-Free Processing System
+### Reduced-Work Processing System
 
-FilterTube v3.2.1 introduces major performance optimizations that eliminate user-perceived lag through:
+FilterTube v3.2.1 introduced async DOM processing, compiled caches, and storage
+batching. The current lag-fix work keeps those ideas but treats "lag-free" as a
+measured claim, not a blanket guarantee: no-work gates, route/mode checks,
+quiet production logging, and source-confidence boundaries must prove that hot
+paths stay asleep when there are no useful rules.
 
 ```mermaid
 graph TD
@@ -935,25 +939,30 @@ graph TD
 
 3. **Batched Storage Updates**
    - Channel map updates batched with 250ms flush intervals
-   - Reduces storage I/O operations by 70-90%
+   - Reduces storage I/O operations; earlier notes used 70-90% reduction language, which is a historical estimate until measured
    - Prevents storage contention during rapid updates
 
 4. **Debounced Settings Refresh**
    - Settings updates throttled to prevent excessive DOM reprocessing
    - Minimum 250ms intervals between refresh operations
 
+5. **Production-Quiet Routine Logging**
+   - Background/service-worker and isolated content-script contexts mute routine `console.log`, `console.info`, and `console.debug` unless debug mode is enabled
+   - Warnings/errors remain visible for real failures
+   - Main-world scripts use debug-gated helpers instead of patching YouTube's page console
+
 ### Browser Performance Characteristics
 
 **Chromium-based Browsers (Chrome, Edge, Opera):**
-- ✅ Excellent performance - lag virtually eliminated
-- ✅ Async yielding highly effective
-- ✅ Storage batching provides maximum efficiency
+- Strongest optimization path in current source
+- Async yielding and storage batching are expected to help most on Chromium
+- Route/device/rule-state performance claims still require measured artifacts
 
 **Firefox-based Browsers:**
-- ⚠️ Good improvements but less dramatic
-- ⚠️ Async yielding some effectiveness but needs tuning
-- ⚠️ Storage operations may need different batching strategy
-- 🔧 Ongoing optimization work required
+- Improvements depend more heavily on route and profile state
+- Async yielding helps, but route-specific tuning is still expected
+- Storage operations may need different batching strategy
+- Ongoing optimization work required
 
 ```mermaid
 graph LR
@@ -1262,7 +1271,7 @@ graph TD
     subgraph "Background (Service Worker)"
         Persist[Channel Persistence<br/>channelMap/videoChannelMap]
         Enrich[schedulePostBlockEnrichment<br/>Rate Limited]
-        Kids[Zero-Network Mode<br/>Kids Safety]
+        Kids[Network-Minimized Mode<br/>Kids Safety]
     end
 
     YouTube[YouTube XHR] -->|JSON Response| Seed
@@ -1509,10 +1518,10 @@ sequenceDiagram
     BG->>BG: Persist in filterChannels + channelMap
     BG->>CB: Broadcast Settings Change
 
-    Note over DF,FL: Phase 2: Instant Hiding
+    Note over DF,FL: Phase 2: Scoped Optimistic Hide
     DF->>DF: extractShortsVideoId()
     DF-->>BG: Query videoChannelMap
-    DF->>DF: hide element (Zero Flash)
+    DF->>DF: hide clicked/proven element
 
     Note over CB,YT: Phase 3: Enrichment
     CB->>CB: enrichVisibleShortsWithChannelInfo()
@@ -1523,11 +1532,17 @@ sequenceDiagram
     BG-->>CB: All Tabs: Sync refreshed settings
 ```
 
-This hybrid path keeps **Zero-Flash** guarantees for Shorts even when metadata is missing: the DOM fallback hides immediately while the async canonical resolution finishes and broadcasts via `background.js`.
+Earlier notes called this a **Zero-Flash** path. Current audit wording is
+narrower: Shorts can use scoped optimistic hides and already-learned
+`videoId -> UC...` joins, but a global zero-flash guarantee is not proven when
+metadata is missing. Missing or delayed owner identity still needs route,
+mode, source-confidence, no-work, sibling-visible, and restore proof before any
+implementation may treat the hide as complete authority.
 
 ### Watch-page playlists (panel rows + no-flash Next/Prev)
 
-Watch pages with `list=...` require additional guarantees beyond feed/search filtering:
+Watch pages with `list=...` require additional proof surfaces beyond
+feed/search filtering:
 
 1. **Playlist panel deterministic hiding**: playlist panel row elements are prioritized for prefetch observers, allowing the extension to learn `videoChannelMap[videoId] -> UC ID` for playlist items even when the DOM lacks full channel identity.
 2. **Navigation guard**: when Next/Prev selects a blocked channel, the watch page auto-skips to the next allowed item without a visible playback flash.
@@ -1550,7 +1565,7 @@ To ensure that a newly learned identity (e.g., resolving a `c/Name` to a UC ID) 
                                                                           v
 +-----------------------+      +-----------------------+      +-----------+-----------+
 |   6. All Other Tabs   |      |  5. Settings Broadcast|      |  4. recompileSettings |
-|   (Instant Update)    | <=== | Background sends      | <=== | storage.onChanged     |
+|  (Broadcast Update)   | <=== | Background sends      | <=== | storage.onChanged     |
 | DOM Fallback re-runs  |      | FilterTube_Refreshed  |      | detects map update    |
 | with new mappings     |      | to all tabs           |      |                       |
 +-----------------------+      +-----------------------+      +-----------------------+

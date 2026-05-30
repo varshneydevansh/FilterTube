@@ -5,7 +5,7 @@ This document is an *operator playbook* for answering:
 - Which layer is responsible for hiding content in each YouTube surface?
 - Which data source(s) are used to resolve a channel's identity (UC ID + @handle)?
 - What to check when blocking fails (especially `/@handle/about` returning 404).
-- **NEW in v3.2.1+**: How performance optimizations eliminate lag and improve responsiveness.
+- **NEW in v3.2.1+**: How performance optimizations reduce lag and improve responsiveness, without claiming every route/device is lag-free.
 - **NEW in v3.2.5**: How **whitelist mode** inverts filtering logic.
 
 ## 1) The Three Layers (Who Does What)
@@ -19,7 +19,7 @@ This document is an *operator playbook* for answering:
 - **Strengths**
   - Earliest filtering.
   - **NEW v3.2.1**: Proactive channel identity via XHR interception.
-  - **NEW v3.2.5**: Zero-flash **whitelist** filtering.
+  - **NEW v3.2.5**: Best-effort pre-render **whitelist** filtering when intercepted JSON carries the needed fields.
   - Best for feed/search/watch data responses.
 - **Limits**
   - Not every surface routes through a convenient JSON response.
@@ -36,12 +36,12 @@ This document is an *operator playbook* for answering:
   - **NEW v3.2.5**: Enforces **whitelist mode** on dynamically loaded content.
 - **Limits**
   - Can only hide *after* elements exist.
-  - **MAJOR IMPROVEMENT v3.2.1+**: Converted to async processing with main thread yielding for lag-free operation.
+  - **MAJOR IMPROVEMENT v3.2.1+**: Converted to async processing with main thread yielding to reduce blocking work. This is an optimization intent, not proof of lag-free operation on every route/device.
 - **Performance Optimizations**
   - **Async Processing**: `applyDOMFallback()` now yields to main thread every 30-60 elements
   - **Run State Management**: Prevents overlapping executions, queues subsequent calls
   - **Compiled Caching**: Regex and channel filter indexes cached for O(1) lookups
-  - **Browser Impact**: Near-zero lag in Chromium, significant improvement in Firefox
+  - **Browser Impact**: Historical reports described near-zero lag in Chromium and significant improvement in Firefox, but those are not current measured proof without route/device/rule-state artifacts.
 - **Whitelist Mode Behavior (v3.2.5)**
   - Hides content not matching whitelist channels/keywords
   - Respects same performance optimizations as blocklist mode
@@ -69,10 +69,10 @@ This document is an *operator playbook* for answering:
 ## Performance Characteristics by Browser
 
 ### Chromium-based Browsers (Chrome, Edge, Opera)
-- ✅ **Excellent Performance**: Lag virtually eliminated
-- ✅ **Async Yielding**: Highly effective at preventing UI freezing
-- ✅ **Storage Batching**: Maximum efficiency (70-90% I/O reduction)
-- ✅ **Overall Impact**: 90%+ reduction in perceived lag
+- ✅ **Optimization intent**: Async yielding and batching reduce main-thread and storage pressure.
+- ✅ **Async Yielding**: Designed to reduce UI freezing during large DOM passes.
+- ✅ **Storage Batching**: Historical estimates described 70-90% I/O reduction, but this is not current proof without a measurement artifact.
+- ✅ **Overall Impact**: Earlier notes described 90%+ perceived-lag reduction; treat that as a historical estimate until `performanceClaimAuthority` metrics exist.
 
 ### Firefox-based Browsers
 - ⚠️ **Good Improvements**: Significant lag reduction but not as dramatic
@@ -139,9 +139,9 @@ async function applyDOMFallback(settings, options = {}) {
 
 ### Key Performance Benefits
 
-1. **No UI Freezing**: Main thread yielding prevents browser lockup during heavy filtering
+1. **Reduced UI Freezing Risk**: Main thread yielding is intended to reduce browser lockup during heavy filtering
 2. **Responsive UX**: Users can scroll/click while filtering is processing
-3. **Efficient Caching**: Compiled regex and channel indexes reduce CPU usage by 60-80%
+3. **Efficient Caching**: Compiled regex and channel indexes reduce repeated work. Earlier docs used 60-80% CPU-reduction language; that is a historical estimate, not current measured proof.
 4. **Batched Updates**: Storage operations minimized through intelligent batching
 5. **Debounced Refresh**: Settings updates throttled to prevent excessive reprocessing
 
@@ -624,7 +624,10 @@ When it doesn’t, it typically falls into one of these buckets:
 - Popup/tab UI uses `StateManager.addChannel()`.
 - That delegates to background via `chrome.runtime.sendMessage({ action: 'addChannelPersistent', input })`.
 - UI list rendering uses stored `filterChannels` data for `name`/`logo`.
-- There is **no proactive enrichment loop** that refreshes `name/logo` by calling `fetchChannelDetails`.
+- The UI list does not run a passive, page-wide enrichment loop just because the popup/tab is open.
+- Current background behavior does have a **rate-limited post-block enrichment** path after a successful block when stored identity is incomplete. That path can complete `name`, `logo`, aliases, or related IDs and can call the same channel-detail resolver family used by user-action fallback paths.
+- Treat the source waterfall (`XHR JSON -> ytInitial* -> learned maps -> DOM -> bounded background resolver`) as an identity priority order, not as permission to hide, write, fetch, or rescan. Each effect still needs route/profile/mode/source proof.
+- Future cleanup should centralize this under explicit `identityResolverAuthority`, `postActionIdentityFanoutBudget`, and `networkFetchReasonAuthority` boundaries before deleting fallbacks or adding new fetch/rescan work.
 
 ### 8.2 Important guardrail
 - **Manual add must never persist an unresolved handle as the `id`.**

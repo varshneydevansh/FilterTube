@@ -1,0 +1,90 @@
+{
+  "provenance": {
+    "source": "strange_ytInitialData.json",
+    "rendererType": "compactChannelRenderer",
+    "extractedPath": "contents.sectionListRenderer.contents[1].itemSectionRenderer.contents[1].compactChannelRenderer",
+    "fixtureKind": "json",
+    "surface": "Main mobile search channel result card",
+    "route": "search",
+    "rawContainer": "var ytInitialData string literal with escaped JSON; not direct JSON"
+  },
+  "renderer": {
+    "channelId": "UCm9VWKAFz0aXpuEHPHMae7w",
+    "displayName": {
+      "runs": [
+        {
+          "text": "NYUSHA MUSIC"
+        }
+      ]
+    },
+    "subscriberCountText": {
+      "runs": [
+        {
+          "text": "@NYUSHAmusic"
+        }
+      ]
+    },
+    "navigationEndpoint": {
+      "commandMetadata": {
+        "webCommandMetadata": {
+          "url": "/@NYUSHAmusic",
+          "webPageType": "WEB_PAGE_TYPE_CHANNEL",
+          "rootVe": 3611,
+          "apiUrl": "/youtubei/v1/browse"
+        }
+      },
+      "browseEndpoint": {
+        "browseId": "UCm9VWKAFz0aXpuEHPHMae7w",
+        "canonicalBaseUrl": "/@NYUSHAmusic"
+      }
+    },
+    "title": {
+      "runs": [
+        {
+          "text": "NYUSHA MUSIC"
+        }
+      ]
+    },
+    "subscribeButton": {
+      "subscribeButtonRenderer": {
+        "buttonText": {
+          "runs": [
+            {
+              "text": "Subscribed"
+            }
+          ]
+        },
+        "subscribed": true,
+        "enabled": true,
+        "type": "FREE",
+        "channelId": "UCm9VWKAFz0aXpuEHPHMae7w",
+        "showPreferences": false,
+        "subscribedButtonText": {
+          "runs": [
+            {
+              "text": "Subscribed"
+            }
+          ]
+        },
+        "unsubscribedButtonText": {
+          "runs": [
+            {
+              "text": "Subscribe"
+            }
+          ]
+        }
+      }
+    },
+    "ownerBadges": [
+      {
+        "metadataBadgeRenderer": {
+          "icon": {
+            "iconType": "AUDIO_BADGE"
+          },
+          "style": "BADGE_STYLE_TYPE_VERIFIED_ARTIST",
+          "tooltip": "Official Artist Channel"
+        }
+      }
+    ]
+  }
+}

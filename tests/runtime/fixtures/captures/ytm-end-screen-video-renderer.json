@@ -1,0 +1,142 @@
+{
+  "provenance": {
+    "source": "YTM-XHR.json",
+    "rendererType": "endScreenVideoRenderer",
+    "extractedBlockIndex": 4,
+    "extractedPath": "watchNextResponse.playerOverlays.playerOverlayRenderer.endScreen.watchNextEndScreenRenderer.results.0.endScreenVideoRenderer"
+  },
+  "renderer": {
+    "videoId": "Kw3935PH01E",
+    "thumbnail": {
+      "thumbnails": [
+        {
+          "url": "https://i.ytimg.com/vi/Kw3935PH01E/default.jpg",
+          "width": 120,
+          "height": 90
+        },
+        {
+          "url": "https://i.ytimg.com/vi/Kw3935PH01E/mqdefault.jpg",
+          "width": 320,
+          "height": 180
+        },
+        {
+          "url": "https://i.ytimg.com/vi/Kw3935PH01E/hqdefault.jpg",
+          "width": 480,
+          "height": 360
+        },
+        {
+          "url": "https://i.ytimg.com/vi/Kw3935PH01E/sddefault.jpg",
+          "width": 640,
+          "height": 480
+        },
+        {
+          "url": "https://i.ytimg.com/vi/Kw3935PH01E/hq720.jpg?sqp=-oaymwEcCK4FEIIDSEbyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLACkz39hAYZtWif_bqCgEkmnEeamg",
+          "width": 686,
+          "height": 386
+        }
+      ]
+    },
+    "title": {
+      "runs": [
+        {
+          "text": "Shakira - Zoo (From \"Zootopia 2\") Official Music Video"
+        }
+      ],
+      "accessibility": {
+        "accessibilityData": {
+          "label": "Shakira - Zoo (From \"Zootopia 2\") Official Music Video by DisneyMusicVEVO 13,14,50,954 views 2 months ago 3 minutes, 18 seconds"
+        }
+      }
+    },
+    "shortBylineText": {
+      "runs": [
+        {
+          "text": "DisneyMusicVEVO",
+          "navigationEndpoint": {
+            "clickTrackingParams": "CH4QvU4YACITCOK5r9XoyZIDFf6bSwUdaJIT7MoBBIZVeiY=",
+            "commandMetadata": {
+              "webCommandMetadata": {
+                "url": "/@DisneyMusicVEVO",
+                "webPageType": "WEB_PAGE_TYPE_CHANNEL",
+                "rootVe": 3611,
+                "apiUrl": "/youtubei/v1/browse"
+              }
+            },
+            "browseEndpoint": {
+              "browseId": "UCgwv23FVv3lqh567yagXfNg",
+              "canonicalBaseUrl": "/@DisneyMusicVEVO"
+            }
+          }
+        }
+      ]
+    },
+    "lengthText": {
+      "runs": [
+        {
+          "text": "3:18"
+        }
+      ],
+      "accessibility": {
+        "accessibilityData": {
+          "label": "3 minutes, 18 seconds"
+        }
+      }
+    },
+    "lengthInSeconds": 198,
+    "navigationEndpoint": {
+      "clickTrackingParams": "CH4QvU4YACITCOK5r9XoyZIDFf6bSwUdaJIT7DIJZW5kc2NyZWVuSIjeu4vw1eKcCZoBBQgCEPgdygEEhlV6Jg==",
+      "commandMetadata": {
+        "webCommandMetadata": {
+          "url": "/watch?v=Kw3935PH01E",
+          "webPageType": "WEB_PAGE_TYPE_WATCH",
+          "rootVe": 3832
+        }
+      },
+      "watchEndpoint": {
+        "videoId": "Kw3935PH01E"
+      }
+    },
+    "trackingParams": "CH4QvU4YACITCOK5r9XoyZIDFf6bSwUdaJIT7A==",
+    "shortViewCountText": {
+      "runs": [
+        {
+          "text": "13 crore views"
+        }
+      ],
+      "accessibility": {
+        "accessibilityData": {
+          "label": "13 crore views"
+        }
+      }
+    },
+    "publishedTimeText": {
+      "runs": [
+        {
+          "text": "2 months ago"
+        }
+      ]
+    },
+    "thumbnailOverlays": [
+      {
+        "thumbnailOverlayTimeStatusRenderer": {
+          "text": {
+            "runs": [
+              {
+                "text": "3:18"
+              }
+            ],
+            "accessibility": {
+              "accessibilityData": {
+                "label": "3 minutes, 18 seconds"
+              }
+            }
+          },
+          "style": "DEFAULT",
+          "icon": {
+            "iconType": "MUSIC"
+          }
+        }
+      }
+    ]
+  }
+}

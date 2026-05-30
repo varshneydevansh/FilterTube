@@ -1,0 +1,376 @@
+{
+  "provenance": {
+    "source": "YT_MAIN_UPNEXT_FEED_WATCHPAGE3.json",
+    "sourceSha256": "cd7bea15c5bc0b5dbac5ef78d9f8046de8153a83d4adb44ce2961c41c1062b1a",
+    "sourceBytes": 6000015,
+    "sourceLines": 56516,
+    "rawShape": "prose plus var ytInitialData assignment",
+    "rootPath": "ytInitialData",
+    "fixtureKind": "json",
+    "surface": "Main desktop watch up-next feed embedded ytInitialData",
+    "route": "watch",
+    "rendererType": "watchpage3AutoplayPreviousEndpoint",
+    "rendererTypes": [
+      "playlistPanelVideoRenderer",
+      "autoplayVideo",
+      "nextButtonVideo",
+      "previousButtonVideo",
+      "endScreenVideoRenderer"
+    ],
+    "ytInitialDataSpan": {
+      "assignmentStart": 23,
+      "braceStart": 43,
+      "braceEnd": 5942993,
+      "extractedBytes": 5945215
+    },
+    "playlistPanelPaths": [
+      "ytInitialData.contents.twoColumnWatchNextResults.playlist.playlist.contents.2.playlistPanelVideoRenderer",
+      "ytInitialData.contents.twoColumnWatchNextResults.playlist.playlist.contents.3.playlistPanelVideoRenderer",
+      "ytInitialData.contents.twoColumnWatchNextResults.playlist.playlist.contents.4.playlistPanelVideoRenderer"
+    ],
+    "autoplayPaths": [
+      "ytInitialData.contents.twoColumnWatchNextResults.autoplay.autoplay.sets.0.autoplayVideo",
+      "ytInitialData.contents.twoColumnWatchNextResults.autoplay.autoplay.sets.0.nextButtonVideo",
+      "ytInitialData.contents.twoColumnWatchNextResults.autoplay.autoplay.sets.0.previousButtonVideo",
+      "ytInitialData.contents.twoColumnWatchNextResults.autoplay.autoplay.modifiedSets.0.autoplayVideo",
+      "ytInitialData.contents.twoColumnWatchNextResults.autoplay.autoplay.modifiedSets.0.nextButtonVideo",
+      "ytInitialData.contents.twoColumnWatchNextResults.autoplay.autoplay.modifiedSets.0.previousButtonVideo"
+    ],
+    "endScreenPaths": [
+      "ytInitialData.playerOverlays.playerOverlayRenderer.endScreen.watchNextEndScreenRenderer.results.0.endScreenVideoRenderer",
+      "ytInitialData.playerOverlays.playerOverlayRenderer.endScreen.watchNextEndScreenRenderer.results.1.endScreenVideoRenderer"
+    ],
+    "omittedRawFields": "thumbnails, tracking details outside command endpoints, playback URLs, menus, remaining playlist siblings, remaining end-screen siblings, engagement panels, topbar, visual effects, microformat, and framework updates"
+  },
+  "ytInitialData": {
+    "contents": {
+      "twoColumnWatchNextResults": {
+        "playlist": {
+          "playlist": {
+            "contents": [
+              {
+                "playlistPanelVideoRenderer": {
+                  "videoId": "TSHg9Kg_ciM",
+                  "title": {
+                    "simpleText": "Westworld - Main Theme (extended)"
+                  },
+                  "shortBylineText": {
+                    "runs": [
+                      {
+                        "text": "Punisher",
+                        "navigationEndpoint": {
+                          "commandMetadata": {
+                            "webCommandMetadata": {
+                              "url": "/@Punisher4xe",
+                              "webPageType": "WEB_PAGE_TYPE_CHANNEL"
+                            }
+                          },
+                          "browseEndpoint": {
+                            "browseId": "UCdIuLHQyQiwqud2WpTgdCkg",
+                            "canonicalBaseUrl": "/@Punisher4xe"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "navigationEndpoint": {
+                    "watchEndpoint": {
+                      "videoId": "TSHg9Kg_ciM",
+                      "playlistId": "RDMM",
+                      "index": 2
+                    }
+                  },
+                  "lengthText": {
+                    "simpleText": "3:13"
+                  }
+                }
+              },
+              {
+                "playlistPanelVideoRenderer": {
+                  "videoId": "mqgEYRtWMJU",
+                  "title": {
+                    "simpleText": "The Son of Flynn (From \"TRON: Legacy\"/Score)"
+                  },
+                  "shortBylineText": {
+                    "runs": [
+                      {
+                        "text": "Daft Punk",
+                        "navigationEndpoint": {
+                          "commandMetadata": {
+                            "webCommandMetadata": {
+                              "url": "/channel/UC_kRDKYrUlrbtrSiyu5Tflg",
+                              "webPageType": "WEB_PAGE_TYPE_CHANNEL"
+                            }
+                          },
+                          "browseEndpoint": {
+                            "browseId": "UC_kRDKYrUlrbtrSiyu5Tflg",
+                            "canonicalBaseUrl": "/channel/UC_kRDKYrUlrbtrSiyu5Tflg"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "navigationEndpoint": {
+                    "watchEndpoint": {
+                      "videoId": "mqgEYRtWMJU",
+                      "playlistId": "RDMM",
+                      "index": 3
+                    }
+                  },
+                  "lengthText": {
+                    "simpleText": "1:36"
+                  }
+                }
+              },
+              {
+                "playlistPanelVideoRenderer": {
+                  "videoId": "UrAhnndvrSU",
+                  "title": {
+                    "simpleText": "You Are The Jumpmaster"
+                  },
+                  "shortBylineText": {
+                    "runs": [
+                      {
+                        "text": "Stephen Barton - Topic",
+                        "navigationEndpoint": {
+                          "commandMetadata": {
+                            "webCommandMetadata": {
+                              "url": "/channel/UCUhkVZeSoGkZefR7sDRQB5Q",
+                              "webPageType": "WEB_PAGE_TYPE_CHANNEL"
+                            }
+                          },
+                          "browseEndpoint": {
+                            "browseId": "UCUhkVZeSoGkZefR7sDRQB5Q",
+                            "canonicalBaseUrl": "/channel/UCUhkVZeSoGkZefR7sDRQB5Q"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "navigationEndpoint": {
+                    "watchEndpoint": {
+                      "videoId": "UrAhnndvrSU",
+                      "playlistId": "RDMM",
+                      "index": 4
+                    }
+                  },
+                  "lengthText": {
+                    "simpleText": "2:08"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "autoplay": {
+          "autoplay": {
+            "sets": [
+              {
+                "mode": "NORMAL",
+                "autoplayVideo": {
+                  "commandMetadata": {
+                    "webCommandMetadata": {
+                      "url": "/watch?v=UrAhnndvrSU&list=RDMM&index=5&pp=QAFIAQ%3D%3D",
+                      "webPageType": "WEB_PAGE_TYPE_WATCH",
+                      "rootVe": 3832
+                    }
+                  },
+                  "watchEndpoint": {
+                    "videoId": "UrAhnndvrSU",
+                    "playlistId": "RDMM",
+                    "index": 4,
+                    "params": "EAEYATgBYgttcWdFWVJ0V01KVWgD2gECCAE%3D",
+                    "playerParams": "QAFIAQ%3D%3D",
+                    "watchEndpointSupportedPrefetchConfig": {
+                      "prefetchHintConfig": {
+                        "prefetchPriority": 0,
+                        "playbackRelativeSecondsPrefetchCondition": -3
+                      }
+                    }
+                  }
+                },
+                "nextButtonVideo": {
+                  "commandMetadata": {
+                    "webCommandMetadata": {
+                      "url": "/watch?v=UrAhnndvrSU&list=RDMM&index=5&pp=0gcJCaMCnhUGBSbi",
+                      "webPageType": "WEB_PAGE_TYPE_WATCH",
+                      "rootVe": 3832
+                    }
+                  },
+                  "watchEndpoint": {
+                    "videoId": "UrAhnndvrSU",
+                    "playlistId": "RDMM",
+                    "index": 4,
+                    "params": "EAIYATgBYgttcWdFWVJ0V01KVWgD",
+                    "playerParams": "0gcJCaMCnhUGBSbi"
+                  }
+                },
+                "previousButtonVideo": {
+                  "commandMetadata": {
+                    "webCommandMetadata": {
+                      "url": "/watch?v=TSHg9Kg_ciM&list=RDMM&index=3",
+                      "webPageType": "WEB_PAGE_TYPE_WATCH",
+                      "rootVe": 3832
+                    }
+                  },
+                  "watchEndpoint": {
+                    "videoId": "TSHg9Kg_ciM",
+                    "playlistId": "RDMM",
+                    "index": 2,
+                    "params": "EAMYATgBYgttcWdFWVJ0V01KVWgD"
+                  }
+                }
+              }
+            ],
+            "modifiedSets": [
+              {
+                "autoplayVideo": {
+                  "commandMetadata": {
+                    "webCommandMetadata": {
+                      "url": "/playlist?list=RDMM&playnext=1&index=5",
+                      "webPageType": "WEB_PAGE_TYPE_WATCH",
+                      "rootVe": 3832
+                    }
+                  },
+                  "watchPlaylistEndpoint": {
+                    "playlistId": "RDMM",
+                    "index": 4,
+                    "params": "EAEYATgBYgttcWdFWVJ0V01KVWgD2gECCAE%3D"
+                  }
+                },
+                "nextButtonVideo": {
+                  "commandMetadata": {
+                    "webCommandMetadata": {
+                      "url": "/playlist?list=RDMM&playnext=1&index=5",
+                      "webPageType": "WEB_PAGE_TYPE_WATCH",
+                      "rootVe": 3832
+                    }
+                  },
+                  "watchPlaylistEndpoint": {
+                    "playlistId": "RDMM",
+                    "index": 4,
+                    "params": "EAIYATgBYgttcWdFWVJ0V01KVWgD"
+                  }
+                },
+                "previousButtonVideo": {
+                  "commandMetadata": {
+                    "webCommandMetadata": {
+                      "url": "/playlist?list=RDMM&playnext=1&index=3",
+                      "webPageType": "WEB_PAGE_TYPE_WATCH",
+                      "rootVe": 3832
+                    }
+                  },
+                  "watchPlaylistEndpoint": {
+                    "playlistId": "RDMM",
+                    "index": 2,
+                    "params": "EAMYATgBYgttcWdFWVJ0V01KVWgD"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "currentVideoEndpoint": {
+      "commandMetadata": {
+        "webCommandMetadata": {
+          "url": "/watch?v=mqgEYRtWMJU&list=RDMM&index=4",
+          "webPageType": "WEB_PAGE_TYPE_WATCH",
+          "rootVe": 3832
+        }
+      },
+      "watchEndpoint": {
+        "videoId": "mqgEYRtWMJU",
+        "playlistId": "RDMM",
+        "index": 3
+      }
+    },
+    "playerOverlays": {
+      "playerOverlayRenderer": {
+        "endScreen": {
+          "watchNextEndScreenRenderer": {
+            "results": [
+              {
+                "endScreenVideoRenderer": {
+                  "videoId": "Xq0joZ24D9Y",
+                  "title": {
+                    "simpleText": "Apex Legends: Main Theme"
+                  },
+                  "shortBylineText": {
+                    "runs": [
+                      {
+                        "text": "Stephen Barton - Topic",
+                        "navigationEndpoint": {
+                          "commandMetadata": {
+                            "webCommandMetadata": {
+                              "url": "/channel/UCUhkVZeSoGkZefR7sDRQB5Q",
+                              "webPageType": "WEB_PAGE_TYPE_CHANNEL"
+                            }
+                          },
+                          "browseEndpoint": {
+                            "browseId": "UCUhkVZeSoGkZefR7sDRQB5Q",
+                            "canonicalBaseUrl": "/channel/UCUhkVZeSoGkZefR7sDRQB5Q"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "navigationEndpoint": {
+                    "watchEndpoint": {
+                      "videoId": "Xq0joZ24D9Y"
+                    }
+                  },
+                  "lengthText": {
+                    "simpleText": "2:41"
+                  },
+                  "publishedTimeText": {
+                    "simpleText": "6 years ago"
+                  }
+                }
+              },
+              {
+                "endScreenVideoRenderer": {
+                  "videoId": "8Li0Tyeqlc4",
+                  "title": {
+                    "simpleText": "Tron Legacy - Daft Punk - The Suite"
+                  },
+                  "shortBylineText": {
+                    "runs": [
+                      {
+                        "text": "Tron Legacy",
+                        "navigationEndpoint": {
+                          "commandMetadata": {
+                            "webCommandMetadata": {
+                              "url": "/@TronLegacyScore",
+                              "webPageType": "WEB_PAGE_TYPE_CHANNEL"
+                            }
+                          },
+                          "browseEndpoint": {
+                            "browseId": "UCVZ2A50--jZieMK_qyMd1Yw",
+                            "canonicalBaseUrl": "/@TronLegacyScore"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "navigationEndpoint": {
+                    "watchEndpoint": {
+                      "videoId": "8Li0Tyeqlc4"
+                    }
+                  },
+                  "lengthText": {
+                    "simpleText": "18:32"
+                  },
+                  "publishedTimeText": {
+                    "simpleText": "11 years ago"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

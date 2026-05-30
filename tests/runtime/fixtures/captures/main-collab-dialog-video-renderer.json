@@ -1,0 +1,469 @@
+{
+  "provenance": {
+    "source": "collab.json",
+    "rendererType": "videoRenderer",
+    "extractedPath": "contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents.0.itemSectionRenderer.contents.0.videoRenderer"
+  },
+  "renderer": {
+    "videoId": "41ZY18JqI2A",
+    "title": {
+      "runs": [
+        {
+          "text": "Shakira, Ed Sheeran, Beéle - Hips Don't Lie (Anniversary Version)"
+        }
+      ],
+      "accessibility": {
+        "accessibilityData": {
+          "label": "Shakira, Ed Sheeran, Beéle - Hips Don't Lie (Anniversary Version) 3 minutes, 37 seconds"
+        }
+      }
+    },
+    "shortBylineText": {
+      "runs": [
+        {
+          "text": "Shakira and 2 more",
+          "navigationEndpoint": {
+            "clickTrackingParams": "CKAEENwwGAAiEwiLuefMkrqRAxXf3kwCHVsiKJvKAQTOql7m",
+            "commandMetadata": {
+              "interactionLoggingCommandMetadata": {
+                "screenVisualElement": {
+                  "uiType": 269990
+                }
+              }
+            },
+            "showDialogCommand": {
+              "panelLoadingStrategy": {
+                "inlineContent": {
+                  "dialogViewModel": {
+                    "header": {
+                      "dialogHeaderViewModel": {
+                        "headline": {
+                          "content": "Collaborators"
+                        }
+                      }
+                    },
+                    "customContent": {
+                      "listViewModel": {
+                        "listItems": [
+                          {
+                            "listItemViewModel": {
+                              "title": {
+                                "content": "shakiraVEVO",
+                                "commandRuns": [
+                                  {
+                                    "startIndex": 0,
+                                    "length": 11,
+                                    "onTap": {
+                                      "innertubeCommand": {
+                                        "clickTrackingParams": "CKAEENwwGAAiEwiLuefMkrqRAxXf3kwCHVsiKJvKAQTOql7m",
+                                        "commandMetadata": {
+                                          "webCommandMetadata": {
+                                            "url": "/@shakiraVEVO",
+                                            "webPageType": "WEB_PAGE_TYPE_CHANNEL",
+                                            "rootVe": 3611,
+                                            "apiUrl": "/youtubei/v1/browse"
+                                          }
+                                        },
+                                        "browseEndpoint": {
+                                          "browseId": "UCGnjeahCJW1AF34HBmQTJ-Q",
+                                          "canonicalBaseUrl": "/@shakiraVEVO"
+                                        }
+                                      }
+                                    }
+                                  }
+                                ],
+                                "styleRuns": [
+                                  {
+                                    "startIndex": 0,
+                                    "length": 11
+                                  },
+                                  {
+                                    "fontColor": 4294967295
+                                  },
+                                  {
+                                    "weightLabel": "FONT_WEIGHT_BOLD"
+                                  },
+                                  {
+                                    "startIndex": 11,
+                                    "styleRunExtensions": {
+                                      "styleRunColorMapExtension": {
+                                        "colorMap": [
+                                          {
+                                            "key": "USER_INTERFACE_THEME_DARK",
+                                            "value": 4289374890
+                                          },
+                                          {
+                                            "key": "USER_INTERFACE_THEME_LIGHT",
+                                            "value": 4284786208
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  }
+                                ],
+                                "attachmentRuns": [
+                                  {
+                                    "startIndex": 11,
+                                    "length": 0,
+                                    "element": {
+                                      "type": {
+                                        "imageType": {
+                                          "image": {
+                                            "sources": [
+                                              {
+                                                "clientResource": {
+                                                  "imageName": "AUDIO_BADGE"
+                                                },
+                                                "width": 14,
+                                                "height": 14
+                                              }
+                                            ]
+                                          }
+                                        }
+                                      },
+                                      "properties": {
+                                        "layoutProperties": {
+                                          "height": {
+                                            "value": 14,
+                                            "unit": "DIMENSION_UNIT_POINT"
+                                          },
+                                          "width": {
+                                            "value": 14,
+                                            "unit": "DIMENSION_UNIT_POINT"
+                                          },
+                                          "margin": {
+                                            "left": {
+                                              "value": 4,
+                                              "unit": "DIMENSION_UNIT_POINT"
+                                            }
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "alignment": "ALIGNMENT_VERTICAL_CENTER"
+                                  }
+                                ]
+                              },
+                              "subtitle": {
+                                "content": "‎⁨@Shakira⁩ • ⁨1.82 crore subscribers⁩"
+                              },
+                              "trailingImage": {
+                                "sources": [
+                                  {
+                                    "clientResource": {
+                                      "imageName": "yt-sys-icons:chevron_right"
+                                    }
+                                  }
+                                ]
+                              },
+                              "leadingAccessory": {
+                                "avatarViewModel": {
+                                  "image": {
+                                    "sources": [
+                                      {
+                                        "url": "https://yt3.ggpht.com/aFFxy2m2TB9dOJJEduJKEyAYsr79uE3ypQZLg-Jbc4TXlxsfCFoe7Ly3E3ou5sTPbglNiTyiKw=s88-c-k-c0x00ffffff-no-rj"
+                                      }
+                                    ],
+                                    "processor": {
+                                      "borderImageProcessor": {
+                                        "circular": true
+                                      }
+                                    }
+                                  },
+                                  "accessibilityText": "shakiraVEVO. Go to channel.",
+                                  "avatarImageSize": "AVATAR_SIZE_M"
+                                }
+                              },
+                              "rendererContext": {
+                                "accessibilityContext": {
+                                  "label": "shakiraVEVO - 1.82 crore subscribers. Go to channel"
+                                },
+                                "commandContext": {
+                                  "onTap": {
+                                    "innertubeCommand": {
+                                      "clickTrackingParams": "CKAEENwwGAAiEwiLuefMkrqRAxXf3kwCHVsiKJvKAQTOql7m",
+                                      "commandMetadata": {
+                                        "webCommandMetadata": {
+                                          "url": "/channel/UCGnjeahCJW1AF34HBmQTJ-Q",
+                                          "webPageType": "WEB_PAGE_TYPE_CHANNEL",
+                                          "rootVe": 3611,
+                                          "apiUrl": "/youtubei/v1/browse"
+                                        }
+                                      },
+                                      "browseEndpoint": {
+                                        "browseId": "UCGnjeahCJW1AF34HBmQTJ-Q"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "listItemViewModel": {
+                              "title": {
+                                "content": "Spotify",
+                                "styleRuns": [
+                                  {
+                                    "fontColor": 4294967295
+                                  },
+                                  {
+                                    "weightLabel": "FONT_WEIGHT_BOLD"
+                                  },
+                                  {
+                                    "startIndex": 7,
+                                    "styleRunExtensions": {
+                                      "styleRunColorMapExtension": {
+                                        "colorMap": [
+                                          {
+                                            "key": "USER_INTERFACE_THEME_DARK",
+                                            "value": 4289374890
+                                          },
+                                          {
+                                            "key": "USER_INTERFACE_THEME_LIGHT",
+                                            "value": 4284786208
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  }
+                                ],
+                                "attachmentRuns": [
+                                  {
+                                    "startIndex": 7,
+                                    "length": 0,
+                                    "element": {
+                                      "type": {
+                                        "imageType": {
+                                          "image": {
+                                            "sources": [
+                                              {
+                                                "clientResource": {
+                                                  "imageName": "CHECK_CIRCLE_FILLED"
+                                                },
+                                                "width": 14,
+                                                "height": 14
+                                              }
+                                            ]
+                                          }
+                                        }
+                                      },
+                                      "properties": {
+                                        "layoutProperties": {
+                                          "height": {
+                                            "value": 14,
+                                            "unit": "DIMENSION_UNIT_POINT"
+                                          },
+                                          "width": {
+                                            "value": 14,
+                                            "unit": "DIMENSION_UNIT_POINT"
+                                          },
+                                          "margin": {
+                                            "left": {
+                                              "value": 4,
+                                              "unit": "DIMENSION_UNIT_POINT"
+                                            }
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "alignment": "ALIGNMENT_VERTICAL_CENTER"
+                                  }
+                                ]
+                              },
+                              "subtitle": {
+                                "content": "‎⁨@Spotify⁩ • ⁨21.9 lakh subscribers⁩"
+                              },
+                              "trailingImage": {
+                                "sources": [
+                                  {
+                                    "clientResource": {
+                                      "imageName": "yt-sys-icons:chevron_right"
+                                    }
+                                  }
+                                ]
+                              },
+                              "leadingAccessory": {
+                                "avatarViewModel": {
+                                  "image": {
+                                    "sources": [
+                                      {
+                                        "url": "https://yt3.ggpht.com/UMGZZMPQkM3kGtyW4jNE1GtpSrydfNJdbG1UyWTp5zeqUYc6-rton70Imm7B11RulRRuK521NQ=s88-c-k-c0x00ffffff-no-rj"
+                                      }
+                                    ],
+                                    "processor": {
+                                      "borderImageProcessor": {
+                                        "circular": true
+                                      }
+                                    }
+                                  },
+                                  "accessibilityText": "Spotify. Go to channel.",
+                                  "avatarImageSize": "AVATAR_SIZE_M"
+                                }
+                              },
+                              "rendererContext": {
+                                "accessibilityContext": {
+                                  "label": "Spotify - 21.9 lakh subscribers. Go to channel"
+                                },
+                                "commandContext": {
+                                  "onTap": {
+                                    "innertubeCommand": {
+                                      "clickTrackingParams": "CKAEENwwGAAiEwiLuefMkrqRAxXf3kwCHVsiKJvKAQTOql7m",
+                                      "commandMetadata": {
+                                        "webCommandMetadata": {
+                                          "url": "/channel/UCRMqQWxCWE0VMvtUElm-rEA",
+                                          "webPageType": "WEB_PAGE_TYPE_CHANNEL",
+                                          "rootVe": 3611,
+                                          "apiUrl": "/youtubei/v1/browse"
+                                        }
+                                      },
+                                      "browseEndpoint": {
+                                        "browseId": "UCRMqQWxCWE0VMvtUElm-rEA"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "listItemViewModel": {
+                              "title": {
+                                "content": "Beéle",
+                                "styleRuns": [
+                                  {
+                                    "fontColor": 4294967295
+                                  },
+                                  {
+                                    "weightLabel": "FONT_WEIGHT_BOLD"
+                                  },
+                                  {
+                                    "startIndex": 5,
+                                    "styleRunExtensions": {
+                                      "styleRunColorMapExtension": {
+                                        "colorMap": [
+                                          {
+                                            "key": "USER_INTERFACE_THEME_DARK",
+                                            "value": 4289374890
+                                          },
+                                          {
+                                            "key": "USER_INTERFACE_THEME_LIGHT",
+                                            "value": 4284786208
+                                          }
+                                        ]
+                                      }
+                                    }
+                                  }
+                                ],
+                                "attachmentRuns": [
+                                  {
+                                    "startIndex": 5,
+                                    "length": 0,
+                                    "element": {
+                                      "type": {
+                                        "imageType": {
+                                          "image": {
+                                            "sources": [
+                                              {
+                                                "clientResource": {
+                                                  "imageName": "AUDIO_BADGE"
+                                                },
+                                                "width": 14,
+                                                "height": 14
+                                              }
+                                            ]
+                                          }
+                                        }
+                                      },
+                                      "properties": {
+                                        "layoutProperties": {
+                                          "height": {
+                                            "value": 14,
+                                            "unit": "DIMENSION_UNIT_POINT"
+                                          },
+                                          "width": {
+                                            "value": 14,
+                                            "unit": "DIMENSION_UNIT_POINT"
+                                          },
+                                          "margin": {
+                                            "left": {
+                                              "value": 4,
+                                              "unit": "DIMENSION_UNIT_POINT"
+                                            }
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "alignment": "ALIGNMENT_VERTICAL_CENTER"
+                                  }
+                                ]
+                              },
+                              "subtitle": {
+                                "content": "‎⁨@beele⁩ • ⁨22.5 lakh subscribers⁩"
+                              },
+                              "trailingImage": {
+                                "sources": [
+                                  {
+                                    "clientResource": {
+                                      "imageName": "yt-sys-icons:chevron_right"
+                                    }
+                                  }
+                                ]
+                              },
+                              "leadingAccessory": {
+                                "avatarViewModel": {
+                                  "image": {
+                                    "sources": [
+                                      {
+                                        "url": "https://yt3.ggpht.com/DHj3Q-q2Qlz95Iqb5CwlZlNxPrjDgZUrAsdALuwh3jXI0TKRmvAnVPEnI8psTRHh584XP36h=s88-c-k-c0x00ffffff-no-rj"
+                                      }
+                                    ],
+                                    "processor": {
+                                      "borderImageProcessor": {
+                                        "circular": true
+                                      }
+                                    }
+                                  },
+                                  "accessibilityText": "Beéle. Go to channel.",
+                                  "avatarImageSize": "AVATAR_SIZE_M"
+                                }
+                              },
+                              "rendererContext": {
+                                "accessibilityContext": {
+                                  "label": "Beéle - 22.5 lakh subscribers. Go to channel"
+                                },
+                                "commandContext": {
+                                  "onTap": {
+                                    "innertubeCommand": {
+                                      "clickTrackingParams": "CKAEENwwGAAiEwiLuefMkrqRAxXf3kwCHVsiKJvKAQTOql7m",
+                                      "commandMetadata": {
+                                        "webCommandMetadata": {
+                                          "url": "/channel/UCYAQgXVSRzUeNo34-RJOWUw",
+                                          "webPageType": "WEB_PAGE_TYPE_CHANNEL",
+                                          "rootVe": 3611,
+                                          "apiUrl": "/youtubei/v1/browse"
+                                        }
+                                      },
+                                      "browseEndpoint": {
+                                        "browseId": "UCYAQgXVSRzUeNo34-RJOWUw"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                "screenVe": 269990
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

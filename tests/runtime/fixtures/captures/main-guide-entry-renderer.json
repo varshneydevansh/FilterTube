@@ -1,0 +1,49 @@
+{
+  "provenance": {
+    "source": "guide?prettyPrint=false.json",
+    "rendererType": "guideEntryRenderer",
+    "extractedPath": "items.1.guideSubscriptionsSectionRenderer.items.1.guideEntryRenderer",
+    "fixtureKind": "json",
+    "surface": "Main desktop guide subscription channel entry",
+    "route": "guide"
+  },
+  "renderer": {
+    "navigationEndpoint": {
+      "commandMetadata": {
+        "webCommandMetadata": {
+          "url": "/@DrJango1",
+          "webPageType": "WEB_PAGE_TYPE_CHANNEL",
+          "apiUrl": "/youtubei/v1/browse"
+        }
+      },
+      "browseEndpoint": {
+        "browseId": "UC4REwc30LXHzKSkpqSwhR-Q",
+        "canonicalBaseUrl": "/@DrJango1"
+      }
+    },
+    "thumbnail": {
+      "thumbnails": [
+        {
+          "url": "https://yt3.ggpht.com/HArksUvWMaQxow7jb6Yct1rnFnUUJuq5dmSMDmsZtZfDNoMm7RZhCjWtGeSc2kw_3idcUExdyPM=s88-c-k-c0x00ffffff-no-rj"
+        }
+      ]
+    },
+    "badges": {
+      "liveBroadcasting": false
+    },
+    "formattedTitle": {
+      "simpleText": "DrGameria"
+    },
+    "accessibility": {
+      "accessibilityData": {
+        "label": "DrGameria. New content available."
+      }
+    },
+    "entryData": {
+      "guideEntryData": {
+        "guideEntryId": "UC4REwc30LXHzKSkpqSwhR-Q"
+      }
+    },
+    "presentationStyle": "GUIDE_ENTRY_PRESENTATION_STYLE_NEW_CONTENT"
+  }
+}

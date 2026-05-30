@@ -1,0 +1,423 @@
+# FilterTube Runtime Diagnostic Logging Policy Matrix Current Behavior - 2026-05-24
+
+Status: audit-only current-behavior proof slice. Runtime behavior is unchanged.
+This is not an implementation patch, logging patch, privacy patch, performance
+patch, debug-mode patch, build patch, whitelist patch, or JSON-first promotion.
+
+## Purpose
+
+This slice records the current diagnostic logging surface before optimization
+or JSON-first changes. The source has many `console.*` callsites across page
+runtime, background identity repair, import/export, dashboard, and build
+scripts, but no first-class log policy tying each callsite to debug mode,
+privacy class, route, profile, list mode, user action, or metric artifact.
+
+This matters because future optimization work can move cost between seed JSON
+processing, DOM fallback, network repair, storage writes, and diagnostics. It
+also matters for JSON-first filtering because identity and collaborator logs can
+include channel IDs, handles, names, profile targets, request URLs, and import
+summaries before a structured privacy/performance policy exists.
+
+## Source Scope
+
+The matrix covers active `console.*` callsites in tracked JS/MJS source,
+excluding tests, vendor bundles, generated UI shell output, generated source,
+and website code. Lines whose trimmed text begins with `//` are excluded.
+
+| Source file | Lines | Bytes | SHA-256 |
+| --- | ---: | ---: | --- |
+| `build.js` | 686 | 24689 | `f6778ce29f1d7f520a66ab689f8c1a2999e5887ffa8c53bd5039f4976b2671b6` |
+| `js/background.js` | 6313 | 284710 | `46442f904cf18c3fa8345e71f608171edcf277207a420136a78a195c3b7c57eb` |
+| `js/content/block_channel.js` | 3175 | 127396 | `1b6fffa249a746c01686df0d6a05dc4b770a6f0c5ded08b78a7043c11e9cdd83` |
+| `js/content/bridge_settings.js` | 651 | 26462 | `c7828acd09941f4559e47b31ea57d184ef9367ae4964598e865b8a196934e75b` |
+| `js/content/collab_dialog.js` | 393 | 14623 | `dc34bba556b310da8b7516d106e9d67addea59d8a707a02f21607ac97af1f72a` |
+| `js/content/dom_extractors.js` | 1102 | 45149 | `3f88d18789847d50bed8a515dcd44e969db43bd19b343c38d5c3ea32b6ec6237` |
+| `js/content/dom_fallback.js` | 4838 | 228332 | `2129fcc16f8ad1420a6cb44905ddcd0b68d5511f3b647e2db100c0d67d492aef` |
+| `js/content/handle_resolver.js` | 282 | 9785 | `67cc877a0a97e4c4c5aaf5a0d1c37c15000af5238f8f37d7c5dc6efee27e34ff` |
+| `js/content_bridge.js` | 13535 | 600459 | `31e7234c6a4055bffb0b800bac43cf3dd1c496cb08d1d57d391ea027941277e9` |
+| `js/filter_logic.js` | 3498 | 165151 | `4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641` |
+| `js/injector.js` | 3593 | 155830 | `634041581ec84db2edd4f07d46f4bfb9d3a7d97036a0fb83db7739856bdc3e04` |
+| `js/io_manager.js` | 2030 | 96914 | `d04bfd75d061ee405c1dfa4cab8c9d0fa6a2f072d046add33e4b6782b1f58a21` |
+| `js/layout.js` | 680 | 30604 | `48831ccdc2d62c75818d9c6a153d7bfacec9d7be9f2408485f74b1a7c13c57c7` |
+| `js/popup.js` | 1841 | 75587 | `cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a` |
+| `js/seed.js` | 1136 | 50026 | `a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d` |
+| `js/settings_shared.js` | 1181 | 57535 | `9710ebb445ba11cc45fc98aced765d298226a8cd4a003600e106f908abc2162c` |
+| `js/state_manager.js` | 2491 | 99780 | `509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6` |
+| `js/tab-view.js` | 11617 | 526763 | `1b7f621d48d16247aecc4c7ee57cbc3db9efd3e597e6f0a4fc188228470648f7` |
+| `scripts/build-extension-ui.mjs` | 50 | 1188 | `6326362ebf90f448ccdbf68945b3fb522b7b215edaf9b3e28589a4e166239cf3` |
+| `scripts/build-nanah-vendor.mjs` | 65 | 1818 | `dae8d3ef29c4cd44b0bf975090e9d53f3bb05b523355f5038930fc03b27e921c` |
+| `scripts/sync-native-runtime.mjs` | 34 | 1070 | `4f46c13bf6099092193712790d231ff4809b00b1b0061d04af71ac3ba6bf21c6` |
+
+## Current Counts
+
+```text
+diagnostic logging policy matrix source files: 21
+active console callsites: 418
+console.log callsites: 203
+console.warn callsites: 123
+console.error callsites: 68
+console.debug callsites: 24
+console.info callsites: 0
+runtime behavior changed: no
+not completion proof for diagnostic logging policy authority
+```
+
+## Console Callsite Matrix
+
+| File | `log` | `warn` | `error` | `debug` | `info` | Total |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `build.js` | 14 | 5 | 8 | 0 | 0 | 27 |
+| `js/background.js` | 49 | 28 | 12 | 13 | 0 | 102 |
+| `js/content/block_channel.js` | 1 | 3 | 5 | 0 | 0 | 9 |
+| `js/content/bridge_settings.js` | 3 | 3 | 0 | 0 | 0 | 6 |
+| `js/content/collab_dialog.js` | 1 | 3 | 0 | 0 | 0 | 4 |
+| `js/content/dom_extractors.js` | 0 | 0 | 1 | 0 | 0 | 1 |
+| `js/content/dom_fallback.js` | 2 | 1 | 0 | 0 | 0 | 3 |
+| `js/content/handle_resolver.js` | 2 | 3 | 0 | 0 | 0 | 5 |
+| `js/content_bridge.js` | 114 | 46 | 14 | 8 | 0 | 182 |
+| `js/filter_logic.js` | 2 | 5 | 2 | 1 | 0 | 10 |
+| `js/injector.js` | 0 | 0 | 0 | 1 | 0 | 1 |
+| `js/io_manager.js` | 3 | 5 | 0 | 0 | 0 | 8 |
+| `js/layout.js` | 4 | 0 | 0 | 0 | 0 | 4 |
+| `js/popup.js` | 1 | 1 | 0 | 0 | 0 | 2 |
+| `js/seed.js` | 2 | 0 | 0 | 1 | 0 | 3 |
+| `js/settings_shared.js` | 0 | 1 | 0 | 0 | 0 | 1 |
+| `js/state_manager.js` | 3 | 14 | 3 | 0 | 0 | 20 |
+| `js/tab-view.js` | 1 | 5 | 14 | 0 | 0 | 20 |
+| `scripts/build-extension-ui.mjs` | 0 | 0 | 2 | 0 | 0 | 2 |
+| `scripts/build-nanah-vendor.mjs` | 0 | 0 | 2 | 0 | 0 | 2 |
+| `scripts/sync-native-runtime.mjs` | 1 | 0 | 5 | 0 | 0 | 6 |
+| **Total** | **203** | **123** | **68** | **24** | **0** | **418** |
+
+## Owner Family Totals
+
+| Owner family | Current console callsites |
+| --- | ---: |
+| `page-runtime-core` | 196 |
+| `background-storage-state` | 131 |
+| `build-release-sync-scripts` | 37 |
+| `content-helper` | 28 |
+| `extension-ui` | 22 |
+| `quarantined-legacy` | 4 |
+
+## Current Behavior Boundaries
+
+| Boundary | Current behavior | Missing proof before optimization |
+| --- | --- | --- |
+| Page runtime extraction | `js/content_bridge.js` logs extraction, collaborator, menu, fallback, and block action paths, including channel IDs, handles, names, and video IDs. | Debug/privacy policy by route, surface, user action, profile, list mode, and identity confidence. |
+| Background identity repair | `js/background.js` logs compiled settings, channel fetch/parse, resolver, add-channel, identity, import, and storage paths. | Log redaction policy plus fetch/identity reason report before network optimization. |
+| JSON filter engine | `js/filter_logic.js` has guarded debug logging plus warning/error paths for regex reconstruction, harvest, and map update failures. | Structured metric/report output separate from console diagnostics. |
+| Seed interception | `js/seed.js` logs initialization and debug stats when debug is enabled. | Route/endpoint metric artifacts instead of console-only diagnostics. |
+| Import/export/sync | `js/io_manager.js`, `js/tab-view.js`, and sync scripts log backup, import, Nanah, and native sync failures. | Machine-readable failure reports and payload privacy classes. |
+| Build/release scripts | `build.js` and build scripts log release, badge, artifact, and upload steps. | Release artifact manifest and CI-readable build report. |
+
+## Risk Boundary
+
+- Reliability: log-only diagnostics are not durable evidence and cannot prove
+  that optimization or JSON-first changes improved route behavior.
+- False-hide/leak: identity logs can include UC IDs, handles, names, custom URLs,
+  collaborator data, request URLs, and block inputs without a first-class privacy
+  class or redaction policy.
+- Performance: high-volume `console.log` paths in page runtime and background
+  repair are not tied to a debug/metric budget, so console output can become
+  accidental work while measuring JSON-first changes.
+- Code burden: diagnostic policy is scattered across page runtime, background,
+  filter engine, UI, import/export, and build scripts instead of one owner model.
+
+## Future Proof Fields
+
+```text
+diagnosticLogPolicyReport
+logOwner
+logReason
+logLevel
+debugGate
+privacyClass
+redactionPolicy
+route
+surface
+profileType
+listMode
+userActionReason
+networkReason
+storageReason
+metricReplacement
+samplePayloadClass
+consoleBudget
+machineReadableArtifact
+fixtureProvenance
+```
+
+## First Optimization Metric Artifact Foundation Packet Addendum
+
+First optimization metric artifact foundation packet addendum:
+`docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_ARTIFACT_FOUNDATION_PACKET_CURRENT_BEHAVIOR_2026-05-24.md`
+and
+`tests/runtime/first-optimization-metric-artifact-foundation-packet-current-behavior.test.mjs`
+define the audit-only packet for selected
+`FT-BIND-00-metric-artifact-foundation`. The addendum pins 12 foundation packet
+rows, 0 committed foundation metric artifacts, 0 runtime metric collectors
+approved, and 0 implementation-ready foundation packet rows. It does not
+approve instrumentation or runtime behavior changes.
+
+## Missing Runtime Authority Symbols
+
+No product runtime source currently defines:
+
+```text
+diagnosticLoggingPolicyMatrixContract
+diagnosticLogPolicyReport
+diagnosticLogDecision
+diagnosticLogPrivacyClassReport
+diagnosticLogRedactionPolicy
+diagnosticLogNoWorkBudget
+diagnosticLogMetricArtifact
+diagnosticLogFixtureProvenance
+diagnosticLogJsonFirstGate
+diagnosticLogReleaseGate
+diagnosticLoggingSourceFlowReport
+diagnosticLogRouteSurfaceMatrix
+diagnosticConsoleBudgetReport
+diagnosticMetricReplacementPlan
+```
+
+## Verification
+
+Current proof command:
+
+```bash
+node --test tests/runtime/runtime-diagnostic-logging-policy-matrix-current-behavior.test.mjs --test-reporter=spec
+```
+
+This matrix is not a completion claim. It records source-derived diagnostic
+logging callsites and keeps logging, privacy, performance, and JSON-first
+optimization policy gaps explicit.
+
+## First Optimization Metric Collector Side-Effect Budget Matrix Addendum
+
+First optimization metric collector side-effect budget matrix addendum:
+`docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_COLLECTOR_SIDE_EFFECT_BUDGET_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md`
+and
+`tests/runtime/first-optimization-metric-collector-side-effect-budget-matrix-current-behavior.test.mjs`
+maps current diagnostic logging gaps to collector side-effect budget rows. The
+addendum pins 12 collector side-effect budget rows, 12 collector no-work
+preservation rows covered, 12 collector insertion rows covered, 7 evidence
+side-effect rows covered, 12 required work-budget fields covered, 12
+route/surface obligations covered, 0 runtime collector side-effect budgets
+approved, and 0 implementation-ready side-effect rows. It keeps diagnostic
+measurement blocked until console, privacy, redaction, debug-gate, metric
+replacement, artifact, and rollout budgets are explicit.
+
+## First Optimization Diagnostic Privacy Contract Addendum
+
+First optimization diagnostic privacy contract addendum:
+`docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_DIAGNOSTIC_PRIVACY_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md`
+and
+`tests/runtime/first-optimization-diagnostic-privacy-contract-current-behavior.test.mjs`
+turn this diagnostic logging matrix into the future `diagnostic-privacy.json`
+contract without creating the packet or collector. The addendum pins 12
+diagnostic privacy contract rows, 1 reserved diagnostic privacy path covered, 0
+committed diagnostic privacy files, 0 runtime metric collector approvals, and 0
+implementation-ready diagnostic privacy contract rows. It keeps logging,
+privacy, redaction, no-work, metric replacement, artifact, fixture, and rollout
+proof blocked until they are structured as audit evidence under `docs/audit`.
+
+## First Optimization Source-Locus Diagnostic Privacy Ownership Boundary Addendum
+
+First optimization source-locus diagnostic privacy ownership boundary addendum:
+`docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_SOURCE_LOCUS_DIAGNOSTIC_PRIVACY_OWNERSHIP_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md`
+and
+`tests/runtime/first-optimization-source-locus-diagnostic-privacy-ownership-boundary-current-behavior.test.mjs`
+maps this logging matrix into current source-locus diagnostic privacy ownership
+without approving logging removal, runtime collectors, metric artifacts, or
+optimization behavior. The addendum pins 12 source-locus diagnostic privacy
+boundary rows, 12 diagnostic privacy contract rows covered, 21 diagnostic
+logging policy source files covered, 418 active console callsites covered, 203
+console.log callsites covered, 123 console.warn callsites covered, 68
+console.error callsites covered, 24 console.debug callsites covered, 0
+console.info callsites covered, 196 page-runtime-core callsites covered, 131
+background-storage-state callsites covered, 35 current diagnostic privacy
+anchors covered, 0 committed diagnostic privacy files, 0 runtime source-owner
+approvals, 0 runtime metric collector approvals, 0 implementation-ready
+source-locus diagnostic privacy rows, expected runtime audit tests: 4457,
+expected runtime audit pass: 4457, and expected runtime audit fail 0. It keeps
+diagnostic logging, privacy, redaction, metric replacement, and release/public
+claim use blocked until source-locus diagnostic privacy ownership is approved
+as a scoped packet.
+
+## Method Semantic Proof Gap Boundary
+
+`docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md`
+is a required source input before this audit slice can support runtime
+optimization or JSON-first promotion. Current proof pins:
+
+```text
+method semantic proof gap files covered: 63
+method semantic proof gap lexical callables covered: 5469
+files with complete per-callable semantic proof: 0
+lexical callables requiring semantic proof before behavior changes: 5469
+affected callable semantic proof: NO-GO
+runtime behavior changed: no
+```
+
+These counts are audit-only blockers. They do not approve runtime optimization,
+JSON-first behavior, method deletion, method merging, lifecycle cleanup, no-work
+changes, or whitelist behavior changes.
+
+## Runtime Diagnostic Source-Flow Addendum - 2026-05-27
+
+This addendum records how current runtime diagnostics move through page-world,
+isolated-world, background, dashboard, import/export, and build surfaces before
+any logging cleanup or metric collector work. It is audit-only and does not
+change runtime behavior.
+
+```text
+page main world
+  seed.js debug gate -> console.log -> FilterTube_SeedToBridge_Log
+  injector.js postLog -> console[level] -> FilterTube_InjectorToBridge_Log
+  filter_logic.js postLogToBridge/_log -> console[level] -> FilterTube_FilterLogicToBridge_Log
+        |
+        v
+isolated content bridge
+  collaborator/channel/menu/identity diagnostics -> direct console.*
+        |
+        v
+background/service worker
+  compiled settings, identity repair, import progress, release prompts -> direct console.*
+        |
+        v
+extension UI and import/export
+  dashboard/export/import/backup diagnostics -> direct console.*
+        |
+        v
+build and sync scripts
+  release artifact/build/native-sync diagnostics -> direct console.*
+        |
+        v
+missing first-class policy
+  no log owner, reason, route, surface, profile, list-mode, privacy class,
+  redaction, no-work budget, or metric-replacement artifact
+```
+
+```mermaid
+flowchart TD
+  A["seed.js page-world debug gate"] --> B["console + SeedToBridge_Log relay"]
+  C["injector.js postLog"] --> D["console[level] + InjectorToBridge_Log relay"]
+  E["filter_logic.js postLogToBridge/_log"] --> F["console[level] + FilterLogicToBridge_Log relay"]
+  B --> G["content_bridge.js isolated-world request/response handlers"]
+  D --> G
+  F --> G
+  G --> H["content_bridge.js menu, fallback, extraction, identity diagnostics"]
+  H --> I["background.js compiled settings, import progress, identity repair diagnostics"]
+  I --> J["io_manager.js and tab-view.js import/export/backup diagnostics"]
+  J --> K["build.js and scripts release/build diagnostics"]
+  K --> L["No first-class diagnostic policy artifact"]
+  L --> M["Optimization and JSON-first diagnostic cleanup remain NO-GO"]
+```
+
+| Flow row | Source owner | Current diagnostic path | Missing authority before cleanup/metrics |
+| --- | --- | --- | --- |
+| `diagnostic_flow_seed_gate_and_relay` | `js/seed.js:25-33`, `js/seed.js:139-168`, `js/seed.js:253-260`, `js/seed.js:983-1014` | Main-world seed logging is debug-gated, sequence-numbered, and relayed through `FilterTube_SeedToBridge_Log`; no-work JSON pass-through and settings replay decisions are console-only when debug is enabled. | Route/endpoint privacy class, endpoint work reason, payload-size budget, and metric artifact replacement. |
+| `diagnostic_flow_injector_postlog_relay` | `js/injector.js:105-130`, `js/injector.js:1925-2047`, `js/injector.js:3382-3495` | `postLog()` suppresses `log` without `window.__filtertubeDebug`, keeps warn/error paths, relays through `FilterTube_InjectorToBridge_Log`, and reports settings, collaborator/channel lookups, seed connection, and queue processing. | Sender/receiver owner, route/surface reason, collaboration identity redaction, retry budget, and metric replacement. |
+| `diagnostic_flow_filter_logic_engine` | `js/filter_logic.js:19-44`, `js/filter_logic.js:1557-1586`, `js/filter_logic.js:3434-3496` | `postLogToBridge()` and engine `_log()` split debug-gated engine diagnostics from direct warn/error paths for regex reconstruction, harvest, map writes, and renderer filtering. | Renderer privacy class, rule-decision metric, harvest/mutation split report, and structured JSON-first decision artifact. |
+| `diagnostic_flow_bridge_request_response` | `js/content_bridge.js:5424-5524`, `js/content_bridge.js:5780-5986` | Isolated-world bridge logs collaborator/channel request timeouts, sent requests, responses, custom URL mapping persistence, and DOM stamping effects directly to console. | Same-window message owner, request reason, identity payload redaction, pending-request budget, and stale-card negative proof. |
+| `diagnostic_flow_bridge_menu_identity` | `js/content_bridge.js:7303-7452`, `js/content_bridge.js:10010-10630`, `js/content_bridge.js:12237-13151` | Menu fallback, extraction, collaborator blocking, watch/Shorts recovery, and immediate-hide diagnostics are direct console paths on user-action hot flows. | Menu action reason, route/surface/list-mode budget, channel/collaborator privacy class, outside-click parity, and no-work proof. |
+| `diagnostic_flow_background_settings_identity` | `js/background.js:2555-2620`, `js/background.js:2666-3267` | Background logs compiled settings, install/update prompts, watch/Shorts/Kids identity fetch failures, subscription import progress, and settings compilation requests. | Background log owner, profile/list-mode redaction, identity-network reason, credential policy link, and storage/write metric artifact. |
+| `diagnostic_flow_import_export_backup` | `js/io_manager.js:1670-1987`, `js/tab-view.js:9100-9350` | Import/export, encrypted backup, auto-backup, download fallback, and backup-rotation diagnostics are direct console paths in user-data workflows. | Payload privacy class, encrypted/unencrypted backup redaction, trusted Nanah state policy, and machine-readable import/export report. |
+| `diagnostic_flow_content_helper_menu` | `js/content/block_channel.js:7-14`, `js/content/block_channel.js:1744-2858`, `js/content/block_channel.js:3130-3130` | Quick-block/menu helper has one debug-gated wrapper plus warn/error paths for quick action, dropdown handling, Kids native block messages, and injection failure. | Menu helper owner, native dropdown state policy, Kids action reason, and route/surface no-work budget. |
+| `diagnostic_flow_build_release_scripts` | `build.js:75-190`, `build.js:529-682`, `scripts/build-extension-ui.mjs:47-48`, `scripts/build-nanah-vendor.mjs:62-63`, `scripts/sync-native-runtime.mjs:12-30` | Build/release/native-sync scripts write human console output for artifact creation, badge updates, release publishing, and sync failures. | CI-readable release artifact manifest, build log policy, native sync parity report, and upload/release provenance artifact. |
+
+```text
+current diagnostic source-flow rows: 9
+ASCII diagnostic source-flow diagram: present
+Mermaid diagnostic source-flow diagram: present
+diagnostic source-flow proof: PARTIAL
+runtime diagnostic policy approvals: 0
+implementation-ready diagnostic rows: 0
+runtime behavior changed by this addendum: no
+```
+
+This keeps diagnostic cleanup blocked for the same reason as JSON-first and
+whitelist optimization: console output is still local behavior, not a
+structured owner decision. Future optimization can remove, downgrade, sample,
+or replace logs only after a diagnostic policy packet names the exact owner,
+route, surface, profile, list mode, user-action reason, privacy class,
+redaction rule, no-work budget, metric replacement, fixture provenance, and
+release rollback boundary.
+
+## Diagnostic Logging Convergence Boundary - 2026-05-30
+
+This convergence boundary joins the console callsite inventory, diagnostic
+source-flow rows, debug-gated relay paths, direct console paths, identity and
+import privacy exposure, JSON decision diagnostics, build/release diagnostics,
+future diagnostic privacy contract, metric replacement blockers, and missing
+authority symbols into one audit-only gate for future optimization work.
+
+```text
+console inventory
+  21 source files, 418 active console callsites
+        |
+        v
+diagnostic source flow
+  9 current flow rows across seed, injector, filter logic, bridge, background,
+  import/export, quick/menu helpers, and build scripts
+        |
+        v
+privacy and metric gaps
+  identity data, collaborator data, import/export payload context, route/mode
+  reasons, and JSON decisions remain console-local
+        |
+        v
+implementation gate
+  diagnostic cleanup, metric replacement, whitelist/cache optimization,
+  JSON-first promotion, and release claims remain NO-GO
+```
+
+```mermaid
+flowchart TD
+  A["Console inventory"] --> B["Diagnostic source-flow rows"]
+  B --> C["Debug gates and relay paths"]
+  B --> D["Direct console paths"]
+  C --> E["Privacy class and redaction gap"]
+  D --> E
+  E --> F["No-work and metric-replacement gap"]
+  F --> G["Implementation readiness gate"]
+  G --> H["Runtime diagnostic cleanup remains NO-GO"]
+```
+
+| Convergence row | Current evidence | Missing authority before behavior changes |
+| --- | --- | --- |
+| `diagnostic_convergence_inventory` | 21 scoped source files and 418 active `console.*` callsites are source-counted. | Approved inventory owner and update policy for release-critical diagnostics. |
+| `diagnostic_convergence_hot_runtime_files` | `js/content_bridge.js` has 182 callsites and `js/background.js` has 102 callsites. | Hot-file console budget tied to route, surface, list mode, and user action. |
+| `diagnostic_convergence_level_split` | Current levels are 203 `log`, 123 `warn`, 68 `error`, 24 `debug`, and 0 `info`. | Level policy that separates debug-only cost from warning/error evidence. |
+| `diagnostic_convergence_source_flow` | 9 source-flow rows map seed, injector, filter logic, bridge, background, import/export, quick/menu, and build scripts. | One owner decision report spanning relay paths and direct console paths. |
+| `diagnostic_convergence_identity_privacy` | Bridge/background logs can include channel IDs, handles, names, URLs, collaborator data, and profile/list context. | Privacy class and redaction proof before metric or release use. |
+| `diagnostic_convergence_json_decision` | Seed, injector, and filter logic diagnostics describe JSON admission, replay, renderer decisions, and whitelist filtering. | JSON-first metric replacement report instead of console-only evidence. |
+| `diagnostic_convergence_no_work_budget` | No-work states can still reach diagnostic paths through local owners. | Disabled/empty-rule/list-mode no-work budget that includes logging cost. |
+| `diagnostic_convergence_release_build` | Build, sync, and release scripts use human console output for artifact status and failures. | CI-readable release/build provenance report. |
+| `diagnostic_convergence_metric_foundation` | First optimization diagnostic privacy and collector-side-effect docs reserve future proof shape without approving collectors. | Committed metric artifacts, fixture provenance, side-effect budgets, and rollout proof. |
+| `diagnostic_convergence_authority_absence` | Product source lacks first-class diagnostic convergence authority symbols. | Approved authority packet before log removal, sampling, suppression, or metric replacement. |
+
+```text
+diagnostic logging convergence rows: 10
+diagnostic logging policy source files covered by convergence: 21
+active console callsites covered by convergence: 418
+diagnostic source-flow rows covered by convergence: 9
+implementation-ready diagnostic logging convergence rows: 0
+runtime diagnostic logging convergence approvals: 0
+diagnostic logging cleanup approval: NO-GO
+diagnostic metric replacement approval: NO-GO
+diagnostic privacy/redaction approval: NO-GO
+diagnostic logging convergence authority product source symbol: absent
+runtime behavior changed by this convergence boundary: no
+```
+
+Future runtime authority symbols remain absent from scoped product source:
+
+```text
+diagnosticLoggingConvergenceAuthority
+diagnosticLoggingConvergenceReport
+diagnosticLogWorkBudget
+diagnosticMetricReplacementAuthority
+diagnosticPrivacyRedactionAuthority
+```

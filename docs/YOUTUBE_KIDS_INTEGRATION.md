@@ -2,7 +2,17 @@
 
 ## Overview
 
-FilterTube v3.2.5 provides **zero-network** integration with YouTube Kids, relying entirely on proactive XHR interception to extract channel identity without any network requests. This ensures reliable blocking on YouTube Kids where traditional network fetching often fails.
+FilterTube v3.2.5 supports YouTube Kids with a **JSON-first, fallback-aware**
+identity path. Intercepted Kids browse/watch payloads are preferred when they
+expose stable channel identity, and learned maps are reused when possible. This
+is not a zero-network guarantee: current behavior still has a scoped background
+Kids watch resolver for video-id-only cases after stored/session/pending checks
+fail.
+
+Current behavior boundary: Kids filtering must be treated as route-specific.
+Browse/search cards can often be handled from Kids JSON or visible DOM data,
+while watch/player surfaces may expose only a video id until a player payload,
+learned map, or scoped resolver provides channel identity.
 
 **Whitelist Mode Support:** YouTube Kids now supports whitelist mode for granular content control, allowing parents to specify exactly which channels and content are allowed.
 
@@ -107,7 +117,7 @@ function renderKidsListModeControls() {
 }
 ```
 
-## Zero-Network Architecture (v3.2.1)
+## JSON-First Kids Identity Architecture (v3.2.1)
 
 ### Proactive Channel Identity on Kids
 
@@ -235,7 +245,7 @@ async function handleKidsNativeBlock(blockType = 'video', options = {}) {
 
 ## Architecture
 
-### Zero-Network Design
+### Network-Minimized Design
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -244,7 +254,7 @@ async function handleKidsNativeBlock(blockType = 'video', options = {}) {
 │  Main World (Page Context)                                          │
 │  ├── XHR Interception (/youtubei/v1/*)                              │
 │  ├── Snapshot Stashing (lastYt*Response)                            │
-│  └── Channel Extraction (no network)                                │
+│  └── Channel Extraction (no proactive page-context fetch)            │
 ├─────────────────────────────────────────────────────────────────────┤
 │  Isolated World (Extension)                                         │
 │  ├── Message Handling (content_bridge.js)                           │
@@ -254,17 +264,25 @@ async function handleKidsNativeBlock(blockType = 'video', options = {}) {
 │  Background Script (Service Worker)                                 │
 │  ├── Profile Detection (URL-based)                                  │
 │  ├── Kids Native Message Handler                                    │
+│  ├── Scoped Kids watch resolver after cache/map checks              │
 │  └── Settings Compilation (per-profile)                             │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-### Key Principle: No Network Fetches
+### Key Principle: JSON-first, Resolver-aware Kids Identity
 
-All channel identity on YouTube Kids comes from:
+Most Kids browse/search channel identity should come from:
 
 1. **XHR JSON interception** – `/youtubei/v1/next`, `/youtubei/v1/browse`
 2. **DOM extraction** – When available in page markup
-3. **Never from network fetches** – `skipNetwork: true` enforced everywhere
+3. **Learned maps** – `channelMap` / `videoChannelMap` when prior payloads
+   connected the video id to a channel id
+
+That is not a global zero-network guarantee. Watch/player surfaces can expose
+only a video id, and the background has a scoped Kids watch resolver after
+stored/session/pending checks. Treat Kids network behavior as a route-specific
+last resort governed by the future identity-fetch authority, not as a blanket
+"never fetch" rule.
 
 ### Profile Detection
 
@@ -277,7 +295,7 @@ function isKidsUrl(url) {
 const targetProfile = isKidsUrl(senderUrl) ? 'kids' : 'main';
 ```
 
-## Zero-Network Identity Resolution
+## Resolver-Aware Identity Resolution
 
 ### Proactive Channel Extraction
 
@@ -319,7 +337,7 @@ function handleMainWorldMessages(event) {
 }
 ```
 
-## Native Blocking Flow (Zero-Network)
+## Native Blocking Flow (Network-Minimized)
 
 ### Event Detection
 
@@ -343,9 +361,10 @@ document.addEventListener('DOMNodeInserted', (e) => {
 }, true);
 ```
 
-### Context Capture (Enhanced for Zero-Network)
+### Context Capture (JSON-first, fallback-aware)
 
-When a block action is detected, FilterTube captures context without any network fetches:
+When a block action is detected, FilterTube captures visible context without
+proactive page-context network fetches:
 
 ```javascript
 function captureKidsMenuContext(menuButton) {
@@ -383,7 +402,7 @@ function captureKidsMenuContext(menuButton) {
                          extractVideoIdFromCard(card) || '';
     }
 
-    // Fallback to page context (no network fetch)
+    // Fallback to page context without direct page-context network fetch.
     const isWatch = location.pathname.startsWith('/watch');
     if (isWatch && !context.videoId) {
         const params = new URLSearchParams(location.search);
@@ -393,7 +412,8 @@ function captureKidsMenuContext(menuButton) {
         }
     }
     
-    // Never trigger network fetches on Kids
+    // Do not trigger direct page-context network fetches here. Unresolved
+    // watch/video-id-only cases must go through the explicit background policy.
     return context;
 }
     }

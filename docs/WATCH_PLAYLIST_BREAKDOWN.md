@@ -4,7 +4,7 @@
 
 - Ensure all videos from blocked channels stay hidden inside the watch-page playlist panel (`/watch?v=...&list=...`) even after hard refresh and SPA navigation.
 - Ensure Next/Prev/autoplay never lands on a blocked playlist item (no visible playback flash).
-- **NEW v3.2.1**: Leverage proactive XHR interception for instant channel identity resolution.
+- **NEW v3.2.1**: Leverage proactive XHR interception for early channel identity resolution when watch/playlist payloads expose enough metadata.
 - **2026-04-28 quick-cross refresh**: A playlist quick-cross block now pushes the clicked row's `videoId -> UC...` mapping into compiled settings before the debounced storage flush completes, preserves video context during post-block enrichment, and sweeps visible playlist rows through the background watch resolver so same-channel rows can hide immediately.
 - **2026-04-28 follow-up**: Optimistically hidden playlist rows are restamped after the background add returns, so the clicked row keeps the confirmed `UC...` plus any recovered alternate identity (`@handle` or custom URL) instead of temporarily restoring or showing `Not fetched`. The background watch resolver no longer short-circuits on a bare `videoChannelMap` hit unless an alternate identity is already known; it uses the stored UC as fallback while still trying to enrich handle/custom URL metadata.
 - **2026-04-28 desktop playlist-panel follow-up**: Desktop watch playlist rows (`ytd-playlist-panel-video-renderer` / wrapper rows) now enter the same watch-like recovery path as mobile playlist rows. FilterTube reads the row `#byline` before the generic single-channel fallback, warms collaborator menus from bylines such as `Channel A and Channel B`, excludes Mix rows through the existing Mix guard, and routes bare-UC menu/quick-cross blocks through `watch:<videoId>` so alternate IDs can be recovered before persistence.
@@ -86,12 +86,12 @@ function searchYtInitialDataForVideoChannel(videoId, expectations = {}) {
 }
 ```
 
-### 4.3 Zero-Network Playlist Identity
+### 4.3 Playlist Identity Without Unnecessary Network Work
 
 - **Playlist data interception**: Watch page playlist requests are captured and stashed
-- **Instant channel resolution**: Channel identity extracted from stashed playlist JSON
+- **Early channel resolution**: Channel identity is extracted from stashed playlist JSON when those payloads include usable owner metadata
 - **Reduced prefetch needs**: Most playlist items now have channel identity without network requests
-- **Better cache hit rates**: Shared playlist data across all watch page interactions
+- **Better cache hit rates**: Shared playlist data across watch page interactions, with resolver fallback still required for weak or video-id-only rows
 
 ## **NEW v3.2.1: Enhanced Error Handling for Playlists**
 

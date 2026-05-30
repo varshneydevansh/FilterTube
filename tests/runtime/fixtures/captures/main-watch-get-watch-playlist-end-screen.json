@@ -1,0 +1,183 @@
+{
+  "provenance": {
+    "source": "get_watch?prettyPrint=false.json",
+    "sourceSha256": "578230df9dc00dfebc8ac0ec4cc1ec2f796abf7cf4584c9e4ece67856fdf90e0",
+    "sourceBytes": 5046178,
+    "sourceLines": 46562,
+    "rawShape": "direct JSON array",
+    "rootPath": "1.watchNextResponse",
+    "fixtureKind": "json",
+    "surface": "Main desktop watch playlist panel and end screen",
+    "route": "watch",
+    "rendererType": "watchNextResponse",
+    "rendererTypes": [
+      "playlistPanelVideoRenderer",
+      "endScreenVideoRenderer"
+    ],
+    "playlistPanelPaths": [
+      "1.watchNextResponse.contents.twoColumnWatchNextResults.playlist.playlist.contents.1.playlistPanelVideoRenderer",
+      "1.watchNextResponse.contents.twoColumnWatchNextResults.playlist.playlist.contents.2.playlistPanelVideoRenderer"
+    ],
+    "endScreenPaths": [
+      "1.watchNextResponse.playerOverlays.playerOverlayRenderer.endScreen.watchNextEndScreenRenderer.results.1.endScreenVideoRenderer",
+      "1.watchNextResponse.playerOverlays.playerOverlayRenderer.endScreen.watchNextEndScreenRenderer.results.2.endScreenVideoRenderer"
+    ],
+    "omittedRawFields": "menus, thumbnails, tracking, ad/player telemetry, and unrelated watch response siblings"
+  },
+  "watchNextResponse": {
+    "playlist": {
+      "contents": [
+        {
+          "playlistPanelVideoRenderer": {
+            "videoId": "TUVcZfQe-Kw",
+            "title": {
+              "simpleText": "Dua Lipa - Levitating Featuring DaBaby (Official Music Video)"
+            },
+            "shortBylineText": {
+              "runs": [
+                {
+                  "text": "Dua Lipa",
+                  "navigationEndpoint": {
+                    "commandMetadata": {
+                      "webCommandMetadata": {
+                        "url": "/channel/UC-J-KZfRV8c13fOCkhXdLiQ",
+                        "webPageType": "WEB_PAGE_TYPE_CHANNEL"
+                      }
+                    },
+                    "browseEndpoint": {
+                      "browseId": "UC-J-KZfRV8c13fOCkhXdLiQ",
+                      "canonicalBaseUrl": "/channel/UC-J-KZfRV8c13fOCkhXdLiQ"
+                    }
+                  }
+                }
+              ]
+            },
+            "navigationEndpoint": {
+              "watchEndpoint": {
+                "videoId": "TUVcZfQe-Kw"
+              }
+            },
+            "lengthText": {
+              "simpleText": "3:51"
+            }
+          }
+        },
+        {
+          "playlistPanelVideoRenderer": {
+            "videoId": "eVli-tstM5E",
+            "title": {
+              "simpleText": "Sabrina Carpenter - Espresso"
+            },
+            "shortBylineText": {
+              "runs": [
+                {
+                  "text": "Sabrina Carpenter",
+                  "navigationEndpoint": {
+                    "commandMetadata": {
+                      "webCommandMetadata": {
+                        "url": "/channel/UCPKWE1H6xhxwPlqUlKgHb_w",
+                        "webPageType": "WEB_PAGE_TYPE_CHANNEL"
+                      }
+                    },
+                    "browseEndpoint": {
+                      "browseId": "UCPKWE1H6xhxwPlqUlKgHb_w",
+                      "canonicalBaseUrl": "/channel/UCPKWE1H6xhxwPlqUlKgHb_w"
+                    }
+                  }
+                }
+              ]
+            },
+            "navigationEndpoint": {
+              "watchEndpoint": {
+                "videoId": "eVli-tstM5E"
+              }
+            },
+            "lengthText": {
+              "simpleText": "3:21"
+            }
+          }
+        }
+      ]
+    },
+    "endScreen": {
+      "results": [
+        {
+          "endScreenVideoRenderer": {
+            "videoId": "W3sBr9f0Il0",
+            "title": {
+              "simpleText": "20 Greatest Opera Arias"
+            },
+            "shortBylineText": {
+              "runs": [
+                {
+                  "text": "Classical At Home",
+                  "navigationEndpoint": {
+                    "commandMetadata": {
+                      "webCommandMetadata": {
+                        "url": "/@ClassicalAtHome",
+                        "webPageType": "WEB_PAGE_TYPE_CHANNEL"
+                      }
+                    },
+                    "browseEndpoint": {
+                      "browseId": "UCXZBlY5to9iJRM3xPyHRwng",
+                      "canonicalBaseUrl": "/@ClassicalAtHome"
+                    }
+                  }
+                }
+              ]
+            },
+            "navigationEndpoint": {
+              "watchEndpoint": {
+                "videoId": "W3sBr9f0Il0"
+              }
+            },
+            "lengthText": {
+              "simpleText": "1:27:50"
+            },
+            "publishedTimeText": {
+              "simpleText": "1 year ago"
+            }
+          }
+        },
+        {
+          "endScreenVideoRenderer": {
+            "videoId": "NrNejxB91bA",
+            "title": {
+              "simpleText": "Pirates of the Caribbean EPIC MUSIC - Best of 1 Hour"
+            },
+            "shortBylineText": {
+              "runs": [
+                {
+                  "text": "Pierre T. Music",
+                  "navigationEndpoint": {
+                    "commandMetadata": {
+                      "webCommandMetadata": {
+                        "url": "/channel/UC7ZkJ5hZv6v0b-OfC2r68BA",
+                        "webPageType": "WEB_PAGE_TYPE_CHANNEL"
+                      }
+                    },
+                    "browseEndpoint": {
+                      "browseId": "UC7ZkJ5hZv6v0b-OfC2r68BA",
+                      "canonicalBaseUrl": "/channel/UC7ZkJ5hZv6v0b-OfC2r68BA"
+                    }
+                  }
+                }
+              ]
+            },
+            "navigationEndpoint": {
+              "watchEndpoint": {
+                "videoId": "NrNejxB91bA"
+              }
+            },
+            "lengthText": {
+              "simpleText": "1:00:09"
+            },
+            "publishedTimeText": {
+              "simpleText": "2 years ago"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

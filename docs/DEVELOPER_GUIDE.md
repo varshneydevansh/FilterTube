@@ -390,7 +390,7 @@ This enables verbose logging in:
 
 1. **Surface Coverage**: Test all YouTube surfaces (Home, Search, Watch, Shorts)
 2. **Network Conditions**: Test with slow/failed network
-3. **Kids Mode**: Test zero-network behavior
+3. **Kids Mode**: Test JSON-first behavior plus bounded fallback resolver behavior
 4. **Edge Cases**: Test empty data, malformed JSON
 
 ### Regression Testing
@@ -414,11 +414,15 @@ if (channelInfo.id && channelInfo.handle) {
 
 ### 2. Not Handling Kids Mode
 
-Remember to skip network fetches on Kids:
+Do not assume Kids is globally zero-network. Prefer JSON/page data, learned
+maps, and DOM first, and avoid proactive page-context fetches from Kids UI
+paths. If a Kids watch/player route only exposes a video id, current behavior
+can still use the scoped background Kids watch resolver after cache/map checks.
 
 ```javascript
 if (isKidsHost) {
-    // Use only XHR data, no network fetches
+    // Prefer already-known identity first; route unresolved watch/video-id-only
+    // cases through the explicit background resolver policy.
     return extractFromSnapshots(videoId);
 }
 ```

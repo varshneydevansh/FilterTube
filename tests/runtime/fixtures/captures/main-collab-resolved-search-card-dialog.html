@@ -1,0 +1,94 @@
+<!--
+  Reduced from ignored raw capture: collab.html
+  Surface: Main search collaboration DOM after FilterTube mutation
+  Proof boundary: resolved collaborator IDs, pending blocked state, avatar stack,
+  dialog roster links, and action-menu markup coexist on one captured card.
+  Runtime behavior is unchanged.
+-->
+<section data-raw-capture="collab.html" data-raw-heading="4 collab card from search page">
+  <ytd-video-renderer
+    class="style-scope ytd-item-section-renderer"
+    bigger-thumbs-style="BIG"
+    lockup="true"
+    is-search=""
+    data-filtertube-video-id="d95J8yzvjbQ"
+    data-filtertube-collaborators='[{"name":"Google DeepMind","handle":"@googledeepmind","id":"UCP7jMXSY2xbc3KCAE0MHQ-A"},{"name":"The Thinking Game Film","handle":"@thethinkinggamefilm","id":"UC0SOuDkpL6qpIF1o4wRhqRQ"},{"name":"ROCO Films","handle":"@rocofilms","id":"UCDf32-QfUZUiQZSSb1av4lw"},{"name":"Reel As Dirt","handle":"@reelasdirtofficial","id":"UCfBq6V0LDqDp2V37R1xfKUA"}]'
+    data-filtertube-processed="true"
+    data-filtertube-unique-id="d95J8yzvjbQ"
+    data-filtertube-duration="5048"
+    data-filtertube-blocked-channel-id="UCP7jMXSY2xbc3KCAE0MHQ-A"
+    data-filtertube-blocked-channel-handle="@googledeepmind"
+    data-filtertube-blocked-channel-name="Google DeepMind"
+    data-filtertube-blocked-state="pending"
+    data-filtertube-expected-collaborators="4"
+    data-filtertube-collab-state="resolved"
+  >
+    <a
+      id="thumbnail"
+      href="/watch?v=d95J8yzvjbQ"
+      data-filtertube-channel-handle="@googledeepmind"
+    ></a>
+    <a
+      id="video-title"
+      title="The Thinking Game | Full documentary | Tribeca Film Festival official selection"
+      href="/watch?v=d95J8yzvjbQ"
+    >
+      The Thinking Game | Full documentary | Tribeca Film Festival official selection
+    </a>
+    <div id="attributed-channel-name">
+      <span>Google DeepMind and 3 more</span>
+    </div>
+    <a
+      id="channel-thumbnail"
+      href="/@googledeepmind"
+      aria-label="Go to channel"
+      hidden=""
+    ></a>
+    <div id="avatar">
+      <yt-avatar-stack-view-model
+        class="yt-avatar-stack-view-model style-scope ytd-video-renderer yt-avatar-stack-view-model--tappable"
+        tabindex="0"
+        role="link"
+        aria-label="Collaboration channels"
+      >
+        <div class="yt-avatar-stack-view-model__avatars">
+          <avatar-view-model data-collaborator="googledeepmind"></avatar-view-model>
+          <avatar-view-model data-collaborator="thethinkinggamefilm"></avatar-view-model>
+          <avatar-view-model data-collaborator="rocofilms"></avatar-view-model>
+          <avatar-view-model data-collaborator="reelasdirtofficial"></avatar-view-model>
+        </div>
+      </yt-avatar-stack-view-model>
+    </div>
+    <div id="menu">
+      <ytd-menu-renderer menu-active="">
+        <button id="button" aria-label="Action menu"></button>
+      </ytd-menu-renderer>
+    </div>
+  </ytd-video-renderer>
+
+  <ytd-popup-container data-raw-heading="collab card of 4 channel Collab">
+    <tp-yt-paper-dialog role="dialog" aria-modal="true">
+      <yt-dialog-header-view-model>
+        <h2><span role="text">Collaborators</span></h2>
+      </yt-dialog-header-view-model>
+      <yt-list-view-model role="list">
+        <yt-list-item-view-model role="listitem" aria-label="Google DeepMind - 7.39 lakh subscribers. Go to channel">
+          <a href="/channel/UCP7jMXSY2xbc3KCAE0MHQ-A">Google DeepMind</a>
+          <span role="text">@googledeepmind - 7.39 lakh subscribers</span>
+        </yt-list-item-view-model>
+        <yt-list-item-view-model role="listitem" aria-label="The Thinking Game Film - 37.9K subscribers. Go to channel">
+          <a href="/channel/UC0SOuDkpL6qpIF1o4wRhqRQ">The Thinking Game Film</a>
+          <span role="text">@TheThinkingGameFilm - 37.9K subscribers</span>
+        </yt-list-item-view-model>
+        <yt-list-item-view-model role="listitem" aria-label="ROCO Films - 1.23K subscribers. Go to channel">
+          <a href="/channel/UCDf32-QfUZUiQZSSb1av4lw">ROCO Films</a>
+          <span role="text">@ROCOFilms - 1.23K subscribers</span>
+        </yt-list-item-view-model>
+        <yt-list-item-view-model role="listitem" aria-label="Reel As Dirt - 702 subscribers. Go to channel">
+          <a href="/channel/UCfBq6V0LDqDp2V37R1xfKUA">Reel As Dirt</a>
+          <span role="text">@reelasdirtofficial - 702 subscribers</span>
+        </yt-list-item-view-model>
+      </yt-list-view-model>
+    </tp-yt-paper-dialog>
+  </ytd-popup-container>
+</section>

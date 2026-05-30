@@ -1,0 +1,85 @@
+{
+  "provenance": {
+    "source": "strange_ytInitialData.json",
+    "rendererType": "searchRefinementCardRenderer",
+    "extractedPath": "contents.sectionListRenderer.contents[].itemSectionRenderer.contents[].horizontalCardListRenderer.cards[].searchRefinementCardRenderer",
+    "fixtureKind": "json",
+    "surface": "Main mobile search refinement album card",
+    "route": "search"
+  },
+  "renderer": {
+    "query": {
+      "runs": [
+        {
+          "text": "Solaris Es"
+        }
+      ]
+    },
+    "searchEndpoint": {
+      "commandMetadata": {
+        "webCommandMetadata": {
+          "url": "/playlist?list=OLAK5uy_nTVbEFZIQVr5xnvka7ZwGGylVWlZjwPnk&playnext=1&index=1",
+          "webPageType": "WEB_PAGE_TYPE_WATCH",
+          "rootVe": 3832
+        }
+      },
+      "watchPlaylistEndpoint": {
+        "playlistId": "OLAK5uy_nTVbEFZIQVr5xnvka7ZwGGylVWlZjwPnk",
+        "params": "OAI%3D"
+      }
+    },
+    "searchRefinementCardRendererStyle": {
+      "value": "CARD_RENDERER_STYLE_TYPE_ALBUM_CARD"
+    },
+    "bylineText": {
+      "runs": [
+        {
+          "text": "Nyusha",
+          "navigationEndpoint": {
+            "commandMetadata": {
+              "webCommandMetadata": {
+                "url": "/channel/UCm9VWKAFz0aXpuEHPHMae7w",
+                "webPageType": "WEB_PAGE_TYPE_CHANNEL",
+                "rootVe": 3611,
+                "apiUrl": "/youtubei/v1/browse"
+              }
+            },
+            "browseEndpoint": {
+              "browseId": "UCm9VWKAFz0aXpuEHPHMae7w",
+              "canonicalBaseUrl": "/channel/UCm9VWKAFz0aXpuEHPHMae7w"
+            }
+          }
+        },
+        {
+          "text": " - "
+        },
+        {
+          "text": "Album",
+          "navigationEndpoint": {
+            "commandMetadata": {
+              "webCommandMetadata": {
+                "url": "/channel/UCm9VWKAFz0aXpuEHPHMae7w",
+                "webPageType": "WEB_PAGE_TYPE_CHANNEL",
+                "rootVe": 3611,
+                "apiUrl": "/youtubei/v1/browse"
+              }
+            },
+            "browseEndpoint": {
+              "browseId": "UCm9VWKAFz0aXpuEHPHMae7w",
+              "canonicalBaseUrl": "/channel/UCm9VWKAFz0aXpuEHPHMae7w"
+            }
+          }
+        }
+      ]
+    },
+    "thumbnail": {
+      "thumbnails": [
+        {
+          "url": "https://i9.ytimg.com/s_p/OLAK5uy_nTVbEFZIQVr5xnvka7ZwGGylVWlZjwPnk/mqdefault.jpg",
+          "width": 100,
+          "height": 100
+        }
+      ]
+    }
+  }
+}

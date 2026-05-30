@@ -24,6 +24,7 @@ const handledKidsBlockActions = new Set(); // Set of "videoId" or "channelId" re
  * Map: dropdown -> {videoCardId, isProcessing}
  */
 const injectedDropdowns = new WeakMap();
+const scheduledDropdownInjections = new WeakSet();
 
 const isWhitelistModeActive = () => {
     try {
@@ -80,10 +81,24 @@ const dropdownVisibilityObservers = new WeakMap();
 let quickBlockStylesInjected = false;
 let quickBlockObserverStarted = false;
 let quickBlockSweepTimer = 0;
-let quickBlockPeriodicTimer = 0;
+const quickBlockSweepRoots = new Set();
 let quickBlockViewportUpdateScheduled = false;
+let quickBlockHostVisibilityObserver = null;
+const quickBlockViewportHosts = new Set();
+let quickBlockSurfaceStateCache = { ts: 0, path: '', searchOpen: false, overlayOpen: false };
+let quickBlockOcclusionCache = { ts: 0, key: '', top: 0, bottomTop: Number.POSITIVE_INFINITY };
+const QUICK_BLOCK_SURFACE_STATE_CACHE_MS = 120;
+const QUICK_BLOCK_OCCLUSION_CACHE_MS = 250;
 const QUICK_BLOCK_HOVER_STICKY_MS = 1200;
 const QUICK_BLOCK_LEAVE_STICKY_MS = 700;
+const QUICK_BLOCK_POINTER_RECOVERY_ARM_MS = 1800;
+const QUICK_BLOCK_VIEWPORT_HOST_LIMIT = 80;
+const QUICK_BLOCK_VIEWPORT_REFRESH_HOST_LIMIT = 32;
+const QUICK_BLOCK_DESKTOP_HOVER_INTENT_MS = 180;
+let quickBlockPointerRecoveryArmedUntil = 0;
+let quickBlockPointerRecoveryArmer = null;
+let quickBlockHoverIntentTimer = 0;
+let quickBlockHoverIntentCard = null;
 const FT_DROPDOWN_SELECTORS = 'tp-yt-iron-dropdown, ytm-menu-popup-renderer, bottom-sheet-container, div.menu-content[role="dialog"]';
 const FT_YOUTUBE_OVERLAY_SELECTORS = [
     FT_DROPDOWN_SELECTORS,
@@ -219,13 +234,221 @@ const isYouTubeOverlaySurfaceOpen = () => {
     }
 };
 
-const syncQuickBlockSurfaceState = () => {
+function invalidateQuickBlockSurfaceStateCache() {
+    quickBlockSurfaceStateCache.ts = 0;
+}
+
+function invalidateQuickBlockOcclusionCache() {
+    quickBlockOcclusionCache.ts = 0;
+    quickBlockOcclusionCache.key = '';
+}
+
+function getQuickBlockSurfaceState(options = {}) {
     try {
-        document.documentElement.toggleAttribute('data-filtertube-search-surface-open', isMobileSearchSurfaceOpen());
-        document.documentElement.toggleAttribute('data-filtertube-youtube-overlay-open', isYouTubeOverlaySurfaceOpen());
+        const now = Date.now();
+        const path = `${location?.hostname || ''}${location?.pathname || ''}${location?.search || ''}`;
+        if (
+            options?.force !== true
+            && quickBlockSurfaceStateCache.path === path
+            && now - quickBlockSurfaceStateCache.ts < QUICK_BLOCK_SURFACE_STATE_CACHE_MS
+        ) {
+            return quickBlockSurfaceStateCache;
+        }
+        quickBlockSurfaceStateCache = {
+            ts: now,
+            path,
+            searchOpen: isMobileSearchSurfaceOpen(),
+            overlayOpen: isYouTubeOverlaySurfaceOpen()
+        };
+        return quickBlockSurfaceStateCache;
+    } catch (e) {
+        return {
+            ts: 0,
+            path: '',
+            searchOpen: isMobileSearchSurfaceOpen(),
+            overlayOpen: isYouTubeOverlaySurfaceOpen()
+        };
+    }
+}
+
+const syncQuickBlockSurfaceState = (options = {}) => {
+    try {
+        const state = getQuickBlockSurfaceState(options);
+        document.documentElement.toggleAttribute('data-filtertube-search-surface-open', state.searchOpen);
+        document.documentElement.toggleAttribute('data-filtertube-youtube-overlay-open', state.overlayOpen);
     } catch (e) {
     }
 };
+
+function getQuickBlockViewportOcclusionBounds(options = {}) {
+    try {
+        const now = Date.now();
+        const viewportWidth = window.innerWidth || document.documentElement?.clientWidth || 0;
+        const viewportHeight = window.innerHeight || document.documentElement?.clientHeight || 0;
+        const key = `${location?.hostname || ''}${location?.pathname || ''}:${viewportWidth}x${viewportHeight}`;
+        if (
+            options?.force !== true
+            && quickBlockOcclusionCache.key === key
+            && now - quickBlockOcclusionCache.ts < QUICK_BLOCK_OCCLUSION_CACHE_MS
+        ) {
+            return quickBlockOcclusionCache;
+        }
+        quickBlockOcclusionCache = {
+            ts: now,
+            key,
+            top: getQuickBlockTopOcclusionPx(),
+            bottomTop: getQuickBlockBottomOcclusionTopPx()
+        };
+        return quickBlockOcclusionCache;
+    } catch (e) {
+        return quickBlockOcclusionCache?.ts
+            ? quickBlockOcclusionCache
+            : { ts: 0, key: '', top: 0, bottomTop: Number.POSITIVE_INFINITY };
+    }
+}
+
+function untrackQuickBlockViewportHost(hostCard) {
+    try {
+        quickBlockViewportHosts.delete(hostCard);
+        if (quickBlockHostVisibilityObserver && hostCard instanceof Element) {
+            try {
+                quickBlockHostVisibilityObserver.unobserve(hostCard);
+            } catch (e) {
+            }
+            try {
+                hostCard.removeAttribute('data-filtertube-quick-viewport-observed');
+            } catch (e) {
+            }
+        }
+    } catch (e) {
+    }
+}
+
+function pruneQuickBlockViewportHosts() {
+    try {
+        for (const host of Array.from(quickBlockViewportHosts)) {
+            if (!(host instanceof Element) || host.isConnected === false) {
+                untrackQuickBlockViewportHost(host);
+            }
+        }
+
+        if (quickBlockViewportHosts.size <= QUICK_BLOCK_VIEWPORT_HOST_LIMIT) return;
+
+        for (const host of Array.from(quickBlockViewportHosts)) {
+            if (quickBlockViewportHosts.size <= QUICK_BLOCK_VIEWPORT_HOST_LIMIT) break;
+            if (!(host instanceof Element)) {
+                untrackQuickBlockViewportHost(host);
+                continue;
+            }
+            const active = host.getAttribute?.('data-filtertube-quick-hover') === 'true'
+                || host.hasAttribute?.('data-filtertube-quick-sticky');
+            if (!active && !isQuickBlockHostNearViewport(host, 1400)) {
+                untrackQuickBlockViewportHost(host);
+            }
+        }
+    } catch (e) {
+    }
+}
+
+function shouldRefreshQuickBlockRuntimeState() {
+    pruneQuickBlockViewportHosts();
+    return shouldEagerQuickBlockSweep() || quickBlockViewportHosts.size > 0;
+}
+
+function refreshQuickBlockRuntimeState(options = {}) {
+    if (!isQuickBlockEnabled()) return;
+    if (!quickBlockObserverStarted) {
+        setupQuickBlockObserver();
+        return;
+    }
+    if (!shouldRefreshQuickBlockRuntimeState()) return;
+    syncQuickBlockSurfaceState(options);
+    scheduleQuickBlockViewportRefresh();
+}
+
+function refreshQuickBlockAvailability(options = {}) {
+    if (!isQuickBlockEnabled()) {
+        cancelQuickBlockHoverIntent();
+        removeQuickBlockButtons();
+        return false;
+    }
+    if (!quickBlockObserverStarted) {
+        return setupQuickBlockObserver();
+    }
+    refreshQuickBlockRuntimeState(options);
+    if (shouldEagerQuickBlockSweep()) {
+        scheduleQuickBlockSweep(document);
+    }
+    return true;
+}
+
+try {
+    window.FilterTube_refreshQuickBlockAvailability = refreshQuickBlockAvailability;
+} catch (e) {
+}
+
+function armQuickBlockPointerRecovery() {
+    quickBlockPointerRecoveryArmedUntil = Date.now() + QUICK_BLOCK_POINTER_RECOVERY_ARM_MS;
+    try {
+        if (typeof quickBlockPointerRecoveryArmer === 'function') {
+            quickBlockPointerRecoveryArmer();
+        }
+    } catch (e) {
+    }
+}
+
+function cancelQuickBlockHoverIntent() {
+    try {
+        if (quickBlockHoverIntentTimer) {
+            clearTimeout(quickBlockHoverIntentTimer);
+            quickBlockHoverIntentTimer = 0;
+        }
+        quickBlockHoverIntentCard = null;
+    } catch (e) {
+    }
+}
+
+function scheduleQuickBlockHoverIntent(card, event) {
+    try {
+        if (!card || !(card instanceof Element)) return;
+        if (quickBlockHoverIntentCard === card && quickBlockHoverIntentTimer) return;
+        cancelQuickBlockHoverIntent();
+
+        const isMobile = isMobileYouTubeSurface();
+        const delayMs = isMobile ? 0 : QUICK_BLOCK_DESKTOP_HOVER_INTENT_MS;
+        const pointerX = Number(event?.clientX);
+        const pointerY = Number(event?.clientY);
+        quickBlockHoverIntentCard = card;
+
+        quickBlockHoverIntentTimer = setTimeout(() => {
+            const targetCard = quickBlockHoverIntentCard;
+            quickBlockHoverIntentTimer = 0;
+            quickBlockHoverIntentCard = null;
+
+            if (!targetCard || !(targetCard instanceof Element) || targetCard.isConnected === false) return;
+            if (!isQuickBlockEnabled()) return;
+            if (!isMobile) {
+                let stillTargeted = false;
+                try {
+                    stillTargeted = targetCard.matches(':hover')
+                        || targetCard.contains(document.activeElement)
+                        || (
+                            Number.isFinite(pointerX)
+                            && Number.isFinite(pointerY)
+                            && pointInsideQuickBlockHost(targetCard, pointerX, pointerY, 8)
+                        );
+                } catch (e) {
+                    stillTargeted = false;
+                }
+                if (!stillTargeted) return;
+            }
+
+            armQuickBlockPointerRecovery();
+            ensureQuickBlockButton(targetCard);
+        }, delayMs);
+    } catch (e) {
+    }
+}
 
 const isMobileWatchNextQuickBlockHost = (hostCard) => {
     if (!hostCard || !(hostCard instanceof Element)) return false;
@@ -300,11 +523,12 @@ function resolveQuickBlockHost(node) {
             '.shortsLockupViewModelHost, .reel-item-endpoint, a[href*="/shorts/"]'
         );
     if (shortsNode instanceof Element) {
-        return node.closest(
-            'ytd-rich-item-renderer, ytd-reel-item-renderer, ytd-video-renderer, ytd-grid-video-renderer, ' +
-            'yt-lockup-view-model, ytm-rich-item-renderer, ytm-reel-item-renderer, ' +
-            '.ytGridShelfViewModelGridShelfItem, .shortsLockupViewModelHost'
-        ) || node;
+        return shortsNode.closest?.('ytd-rich-item-renderer')
+            || shortsNode.closest?.('ytd-reel-item-renderer, ytd-reel-video-renderer, ytm-reel-item-renderer')
+            || shortsNode.closest?.('.ytGridShelfViewModelGridShelfItem')
+            || shortsNode.closest?.('yt-lockup-view-model, ytm-lockup-view-model')
+            || shortsNode.closest?.('.shortsLockupViewModelHost, ytd-shorts-lockup-view-model, ytm-shorts-lockup-view-model, ytm-shorts-lockup-view-model-v2')
+            || node;
     }
     if (
         tag === 'yt-lockup-view-model' ||
@@ -321,6 +545,23 @@ function resolveQuickBlockHost(node) {
         return node.closest('ytd-rich-item-renderer') || node;
     }
     return node;
+}
+
+function resolveOutermostShortsQuickBlockHost(hostCard) {
+    if (!hostCard || !(hostCard instanceof Element) || !isShortsQuickBlockCard(hostCard)) return hostCard;
+    let current = hostCard;
+    let depth = 0;
+    try {
+        while (depth < 8) {
+            const parentCard = current.parentElement?.closest?.(QUICK_BLOCK_CARD_SELECTORS);
+            if (!(parentCard instanceof Element) || parentCard === current) break;
+            if (!isShortsQuickBlockCard(parentCard)) break;
+            current = parentCard;
+            depth += 1;
+        }
+    } catch (e) {
+    }
+    return current;
 }
 
 function resolveQuickBlockHideTarget(videoCard) {
@@ -660,8 +901,9 @@ function updateQuickBlockViewportStateForHost(hostCard) {
         const rect = boundsEl?.getBoundingClientRect?.();
         const wrapRect = hostCard.querySelector?.('.filtertube-quick-block-wrap')?.getBoundingClientRect?.();
         const viewportHeight = window.innerHeight || document.documentElement?.clientHeight || 0;
-        const topOcclusion = getQuickBlockTopOcclusionPx();
-        const bottomOcclusionTop = getQuickBlockBottomOcclusionTopPx();
+        const occlusion = getQuickBlockViewportOcclusionBounds();
+        const topOcclusion = occlusion.top;
+        const bottomOcclusionTop = occlusion.bottomTop;
         hidden = !rect
             || rect.width <= 0
             || rect.height <= 0
@@ -680,16 +922,98 @@ function updateQuickBlockViewportStateForHost(hostCard) {
     return !hidden;
 }
 
+function isQuickBlockHostNearViewport(hostCard, margin = 900) {
+    try {
+        const boundsEl = getQuickBlockBoundsElement(hostCard);
+        const rect = boundsEl?.getBoundingClientRect?.();
+        if (!rect) return false;
+        const viewportHeight = window.innerHeight || document.documentElement?.clientHeight || 0;
+        const viewportWidth = window.innerWidth || document.documentElement?.clientWidth || 0;
+        return rect.bottom >= -margin
+            && rect.top <= viewportHeight + margin
+            && rect.right >= -200
+            && rect.left <= viewportWidth + 200;
+    } catch (e) {
+        return true;
+    }
+}
+
+function ensureQuickBlockHostVisibilityObserver() {
+    if (quickBlockHostVisibilityObserver) return quickBlockHostVisibilityObserver;
+    if (typeof IntersectionObserver !== 'function') return null;
+    quickBlockHostVisibilityObserver = new IntersectionObserver((entries) => {
+        for (const entry of entries || []) {
+            const target = entry?.target;
+            if (!(target instanceof Element)) continue;
+            if (!target.isConnected) {
+                quickBlockViewportHosts.delete(target);
+                continue;
+            }
+            if (entry.isIntersecting) {
+                quickBlockViewportHosts.add(target);
+            } else {
+                quickBlockViewportHosts.delete(target);
+            }
+            updateQuickBlockViewportStateForHost(target);
+        }
+    }, {
+        root: null,
+        rootMargin: '900px 200px 900px 200px',
+        threshold: 0
+    });
+    return quickBlockHostVisibilityObserver;
+}
+
+function trackQuickBlockViewportHost(hostCard) {
+    if (!hostCard || !(hostCard instanceof Element)) return;
+    const observer = ensureQuickBlockHostVisibilityObserver();
+    if (isQuickBlockHostNearViewport(hostCard)) {
+        quickBlockViewportHosts.add(hostCard);
+    }
+    if (observer && !hostCard.hasAttribute('data-filtertube-quick-viewport-observed')) {
+        try {
+            observer.observe(hostCard);
+            hostCard.setAttribute('data-filtertube-quick-viewport-observed', 'true');
+        } catch (e) {
+        }
+    }
+}
+
 function scheduleQuickBlockViewportRefresh() {
+    if (!isQuickBlockEnabled()) return;
+    pruneQuickBlockViewportHosts();
+    if (quickBlockViewportHosts.size === 0 && typeof IntersectionObserver === 'function') return;
     if (quickBlockViewportUpdateScheduled) return;
     quickBlockViewportUpdateScheduled = true;
     requestAnimationFrame(() => {
         quickBlockViewportUpdateScheduled = false;
+        if (!isQuickBlockEnabled()) return;
         syncQuickBlockSurfaceState();
         try {
-            document.querySelectorAll('.filtertube-quick-block-host').forEach((host) => {
-                updateQuickBlockViewportStateForHost(host);
-            });
+            const observer = typeof ensureQuickBlockHostVisibilityObserver === 'function'
+                ? ensureQuickBlockHostVisibilityObserver()
+                : null;
+            let hosts = observer
+                ? Array.from(quickBlockViewportHosts)
+                : [];
+            if (!observer || hosts.length === 0) {
+                hosts = Array.from(document.querySelectorAll('.filtertube-quick-block-host'));
+            }
+            let updatedHostCount = 0;
+            for (const host of hosts) {
+                if (!(host instanceof Element) || host.isConnected === false) {
+                    quickBlockViewportHosts.delete(host);
+                    continue;
+                }
+                const nearViewport = typeof isQuickBlockHostNearViewport === 'function'
+                    ? isQuickBlockHostNearViewport(host, 1200)
+                    : true;
+                if (!observer || nearViewport || host.hasAttribute('data-filtertube-quick-hover') || host.hasAttribute('data-filtertube-quick-sticky')) {
+                    updateQuickBlockViewportStateForHost(host);
+                    updatedHostCount += 1;
+                    if (updatedHostCount >= QUICK_BLOCK_VIEWPORT_REFRESH_HOST_LIMIT) break;
+                }
+            }
         } catch (e) {
         }
     });
@@ -698,7 +1022,10 @@ function scheduleQuickBlockViewportRefresh() {
 function setQuickBlockHoverStateForHost(hostCard, active, stickyMs = 0) {
     if (!hostCard || !(hostCard instanceof Element)) return;
 
-    if (isMobileSearchSurfaceOpen() || isYouTubeOverlaySurfaceOpen() || !updateQuickBlockViewportStateForHost(hostCard)) {
+    const surfaceState = typeof getQuickBlockSurfaceState === 'function'
+        ? getQuickBlockSurfaceState()
+        : { searchOpen: isMobileSearchSurfaceOpen(), overlayOpen: isYouTubeOverlaySurfaceOpen() };
+    if (surfaceState.searchOpen || surfaceState.overlayOpen || !updateQuickBlockViewportStateForHost(hostCard)) {
         try {
             hostCard.removeAttribute('data-filtertube-quick-hover');
             hostCard.removeAttribute('data-filtertube-quick-sticky');
@@ -805,23 +1132,172 @@ const QUICK_BLOCK_CARD_SELECTORS = [
     'ytk-compact-playlist-renderer'
 ].join(', ');
 
+const QUICK_BLOCK_CARD_TAGS = new Set([
+    'yt-official-card-view-model',
+    'ytd-rich-item-renderer',
+    'ytd-rich-grid-media',
+    'ytd-video-renderer',
+    'ytd-grid-video-renderer',
+    'ytd-compact-video-renderer',
+    'ytd-watch-card-compact-video-renderer',
+    'ytd-watch-card-hero-video-renderer',
+    'ytd-watch-card-rhs-panel-video-renderer',
+    'ytd-playlist-video-renderer',
+    'ytd-playlist-renderer',
+    'ytd-grid-playlist-renderer',
+    'ytd-compact-playlist-renderer',
+    'ytd-playlist-panel-video-renderer',
+    'ytd-playlist-panel-video-wrapper-renderer',
+    'ytd-radio-renderer',
+    'ytd-compact-radio-renderer',
+    'ytd-reel-item-renderer',
+    'ytd-reel-video-renderer',
+    'ytd-shorts-lockup-view-model',
+    'yt-lockup-view-model',
+    'yt-lockup-metadata-view-model',
+    'ytm-rich-item-renderer',
+    'ytm-compact-video-renderer',
+    'ytm-video-with-context-renderer',
+    'ytm-compact-playlist-renderer',
+    'ytm-playlist-video-renderer',
+    'ytm-playlist-panel-video-renderer',
+    'ytm-channel-renderer',
+    'ytm-compact-channel-renderer',
+    'ytm-universal-watch-card-renderer',
+    'ytm-reel-item-renderer',
+    'ytm-radio-renderer',
+    'ytm-compact-radio-renderer',
+    'ytm-lockup-view-model',
+    'ytm-shorts-lockup-view-model',
+    'ytm-shorts-lockup-view-model-v2',
+    'ytk-video-renderer',
+    'ytk-grid-video-renderer',
+    'ytk-compact-video-renderer',
+    'ytk-compact-playlist-renderer'
+]);
+const QUICK_BLOCK_CARD_CLASS_NAMES = [
+    'shortsLockupViewModelHost',
+    'ytGridShelfViewModelGridShelfItem'
+];
+
+function findQuickBlockCardFromTarget(target, maxDepth = 18) {
+    try {
+        if (!(target instanceof Element)) return null;
+        const closestCard = target.closest?.(QUICK_BLOCK_CARD_SELECTORS);
+        if (closestCard instanceof Element) return closestCard;
+
+        let node = target;
+        let depth = 0;
+        while (node && node instanceof Element && depth < maxDepth) {
+            const tagName = (node.tagName || '').toLowerCase();
+            if (QUICK_BLOCK_CARD_TAGS.has(tagName)) return node;
+            for (const className of QUICK_BLOCK_CARD_CLASS_NAMES) {
+                if (node.classList?.contains(className)) return node;
+            }
+            node = node.parentElement;
+            depth += 1;
+        }
+    } catch (e) {
+    }
+    return null;
+}
+
 const isQuickBlockEnabled = () => {
     try {
-        return !!currentSettings
-            && typeof currentSettings === 'object'
-            && currentSettings.showQuickBlockButton === true
-            && currentSettings.listMode !== 'whitelist';
+        if (
+            !currentSettings
+            || typeof currentSettings !== 'object'
+            || currentSettings.enabled === false
+            || currentSettings.showQuickBlockButton !== true
+            || currentSettings.listMode === 'whitelist'
+        ) {
+            return false;
+        }
+        // Quick-block is the entry point for creating the first channel rule.
+        // Keep desktop work hover-lazy instead of disabling the affordance when lists are empty.
+        return true;
     } catch (e) {
         return false;
     }
 };
+
+function hasActiveQuickBlockRuleContext(settings) {
+    try {
+        if (!settings || typeof settings !== 'object') return false;
+        if (settings.enabled === false) return false;
+        if (settings.listMode === 'whitelist') return false;
+
+        const hasList = (value) => Array.isArray(value) && value.length > 0;
+        if (
+            hasList(settings.filterKeywords) ||
+            hasList(settings.filterChannels) ||
+            hasList(settings.filterKeywordsComments)
+        ) {
+            return true;
+        }
+
+        const booleanFilterKeys = [
+            'hideAllComments',
+            'hideAllShorts',
+            'hideShorts',
+            'hideComments',
+            'filterComments',
+            'hideHomeFeed',
+            'hideSponsoredCards',
+            'hideWatchPlaylistPanel',
+            'hidePlaylistCards',
+            'hideMembersOnly',
+            'hideMixPlaylists',
+            'hideVideoSidebar',
+            'hideRecommended',
+            'hideLiveChat',
+            'hideVideoInfo',
+            'hideVideoButtonsBar',
+            'hideAskButton',
+            'hideVideoChannelRow',
+            'hideVideoDescription',
+            'hideMerchTicketsOffers',
+            'hideEndscreenVideowall',
+            'hideEndscreenCards',
+            'hideTopHeader',
+            'hideNotificationBell',
+            'hideExploreTrending',
+            'hideMoreFromYouTube',
+            'hideSubscriptions',
+            'hideSearchShelves'
+        ];
+        if (booleanFilterKeys.some(key => settings[key] === true)) return true;
+
+        const contentFilters = settings.contentFilters && typeof settings.contentFilters === 'object'
+            ? settings.contentFilters
+            : null;
+        if (
+            contentFilters?.duration?.enabled === true ||
+            contentFilters?.uploadDate?.enabled === true ||
+            contentFilters?.uppercase?.enabled === true
+        ) {
+            return true;
+        }
+
+        const categoryFilters = settings.categoryFilters && typeof settings.categoryFilters === 'object'
+            ? settings.categoryFilters
+            : null;
+        return categoryFilters?.enabled === true && hasList(categoryFilters.selected);
+    } catch (e) {
+        return false;
+    }
+}
+
+function shouldEagerQuickBlockSweep() {
+    return isMobileYouTubeSurface();
+}
 
 function ensureQuickBlockStyles() {
     if (quickBlockStylesInjected) return;
     const mobileSurface = isMobileYouTubeSurface();
     try {
         document.documentElement.toggleAttribute('data-filtertube-mobile-surface', mobileSurface);
-        syncQuickBlockSurfaceState();
+        if (mobileSurface) syncQuickBlockSurfaceState();
     } catch (e) {
     }
     const style = document.createElement('style');
@@ -930,6 +1406,7 @@ function ensureQuickBlockStyles() {
 }
 
 function removeQuickBlockButtons() {
+    quickBlockViewportHosts.clear();
     document.querySelectorAll('.filtertube-quick-block-wrap').forEach((el) => {
         try {
             el.remove();
@@ -950,9 +1427,33 @@ function createSyntheticQuickBlockMenuItem(label = 'Block') {
 
 function collectQuickBlockCollaborators(base = {}, videoCard = null) {
     const candidates = [];
+    const skipAmpersandTopicNameOnlyRoster = (collaborators) => {
+        try {
+            if (!videoCard || typeof isAmpersandTopicNameOnlyCollaboratorState !== 'function') return false;
+            if (!isAmpersandTopicNameOnlyCollaboratorState(videoCard, collaborators)) return false;
+            if (typeof clearAmpersandTopicCollaboratorState === 'function') {
+                const videoId = (
+                    base?.videoId ||
+                    videoCard.getAttribute?.('data-filtertube-video-id') ||
+                    (typeof extractVideoIdFromCard === 'function' ? extractVideoIdFromCard(videoCard) : '') ||
+                    (typeof ensureVideoIdForCard === 'function' ? ensureVideoIdForCard(videoCard) : '') ||
+                    ''
+                );
+                clearAmpersandTopicCollaboratorState(videoCard, videoId);
+            }
+            return true;
+        } catch (e) {
+            return false;
+        }
+    };
+    const pushCollaboratorList = (collaborators) => {
+        if (!Array.isArray(collaborators) || collaborators.length === 0) return;
+        if (skipAmpersandTopicNameOnlyRoster(collaborators)) return;
+        candidates.push(...collaborators.filter(Boolean));
+    };
 
     if (Array.isArray(base?.allCollaborators)) {
-        candidates.push(...base.allCollaborators.filter(Boolean));
+        pushCollaboratorList(base.allCollaborators);
     }
 
     if (base?.id && /^UC[\w-]{22}$/i.test(String(base.id).trim())) {
@@ -963,7 +1464,7 @@ function collectQuickBlockCollaborators(base = {}, videoCard = null) {
         try {
             const fromDom = extractCollaboratorMetadataFromElement(videoCard);
             if (Array.isArray(fromDom) && fromDom.length > 0) {
-                candidates.push(...fromDom.filter(Boolean));
+                pushCollaboratorList(fromDom);
             }
         } catch (e) {
         }
@@ -1288,7 +1789,8 @@ function ensureQuickBlockButton(card) {
     if (!card || !(card instanceof Element)) return;
     if (isPostLikeQuickBlockCard(card)) return;
 
-    const hostCard = resolveQuickBlockHost(card);
+    const resolvedHostCard = resolveQuickBlockHost(card);
+    const hostCard = resolveOutermostShortsQuickBlockHost(resolvedHostCard);
     if (!hostCard) return;
     const parentCard = hostCard.parentElement?.closest?.(QUICK_BLOCK_CARD_SELECTORS);
     if (parentCard && parentCard !== hostCard) return;
@@ -1307,6 +1809,7 @@ function ensureQuickBlockButton(card) {
     if (hostCard.closest(`${FT_DROPDOWN_SELECTORS}, ytd-menu-popup-renderer`)) return;
 
     hostCard.classList.add('filtertube-quick-block-host');
+    trackQuickBlockViewportHost(hostCard);
     try {
         const shouldForceVisible = isMobileYouTubeSurface();
         if (shouldForceVisible) {
@@ -1444,57 +1947,83 @@ function sweepQuickBlockButtons(root = document) {
 }
 
 function scheduleQuickBlockSweep(root = document) {
+    try {
+        if (!root || root === document || root === document.body || root === document.documentElement) {
+            quickBlockSweepRoots.clear();
+            quickBlockSweepRoots.add(document);
+        } else if (root instanceof Element) {
+            quickBlockSweepRoots.add(root);
+        }
+    } catch (e) {
+        quickBlockSweepRoots.clear();
+        quickBlockSweepRoots.add(document);
+    }
     if (quickBlockSweepTimer) return;
     quickBlockSweepTimer = setTimeout(() => {
         quickBlockSweepTimer = 0;
-        sweepQuickBlockButtons(root);
+        const roots = quickBlockSweepRoots.size > 0 ? Array.from(quickBlockSweepRoots) : [document];
+        quickBlockSweepRoots.clear();
+        if (roots.includes(document)) {
+            sweepQuickBlockButtons(document);
+            return;
+        }
+        roots.forEach(scanRoot => {
+            try {
+                sweepQuickBlockButtons(scanRoot);
+            } catch (e) {
+            }
+        });
     }, 80);
 }
 
 function setupQuickBlockObserver() {
-    if (quickBlockObserverStarted) return;
+    if (quickBlockObserverStarted) return true;
+    if (!isQuickBlockEnabled()) return false;
     quickBlockObserverStarted = true;
     ensureQuickBlockStyles();
 
     const boot = () => {
-        syncQuickBlockSurfaceState();
-        scheduleQuickBlockSweep(document);
+        if (shouldEagerQuickBlockSweep()) {
+            syncQuickBlockSurfaceState({ force: true });
+            scheduleQuickBlockSweep(document);
+        }
 
         document.addEventListener('focusin', () => {
-            syncQuickBlockSurfaceState();
-            scheduleQuickBlockViewportRefresh();
+            refreshQuickBlockRuntimeState({ force: true });
         }, true);
         document.addEventListener('focusout', () => {
             setTimeout(() => {
-                syncQuickBlockSurfaceState();
-                scheduleQuickBlockViewportRefresh();
+                refreshQuickBlockRuntimeState({ force: true });
             }, 0);
         }, true);
         document.addEventListener('input', () => {
-            syncQuickBlockSurfaceState();
-            scheduleQuickBlockViewportRefresh();
+            refreshQuickBlockRuntimeState({ force: true });
         }, true);
         document.addEventListener('click', () => {
+            invalidateQuickBlockSurfaceStateCache();
             setTimeout(() => {
-                syncQuickBlockSurfaceState();
-                scheduleQuickBlockViewportRefresh();
+                refreshQuickBlockRuntimeState({ force: true });
             }, 0);
         }, true);
         document.addEventListener('scroll', () => {
-            scheduleQuickBlockViewportRefresh();
+            if (shouldRefreshQuickBlockRuntimeState()) scheduleQuickBlockViewportRefresh();
         }, { passive: true, capture: true });
         window.addEventListener('resize', () => {
-            scheduleQuickBlockViewportRefresh();
+            invalidateQuickBlockSurfaceStateCache();
+            invalidateQuickBlockOcclusionCache();
+            refreshQuickBlockRuntimeState({ force: true });
         }, { passive: true });
         window.addEventListener('orientationchange', () => {
-            scheduleQuickBlockViewportRefresh();
+            invalidateQuickBlockSurfaceStateCache();
+            invalidateQuickBlockOcclusionCache();
+            refreshQuickBlockRuntimeState({ force: true });
         }, { passive: true });
 
         document.addEventListener('pointerenter', (event) => {
             if (!isQuickBlockEnabled()) return;
-            const card = event?.target?.closest?.(QUICK_BLOCK_CARD_SELECTORS);
+            const card = findQuickBlockCardFromTarget(event?.target);
             if (card) {
-                ensureQuickBlockButton(card);
+                scheduleQuickBlockHoverIntent(card, event);
             }
         }, true);
 
@@ -1504,15 +2033,72 @@ function setupQuickBlockObserver() {
         // This eliminates the "1st hover bad, 2nd better, 3rd stable" pattern.
         if (!isMobileYouTubeSurface() && isHoverCapableDesktopSurface()) {
             let lastHost = null;
+            let lastTarget = null;
+            let lastTargetHost = null;
             let pending = false;
             let lastX = 0;
             let lastY = 0;
+            let pointerMoveListening = false;
+            let pointerMoveStopTimer = 0;
 
             const clearLast = () => {
                 if (lastHost) {
                     setQuickBlockHoverStateForHost(lastHost, false, QUICK_BLOCK_LEAVE_STICKY_MS);
                     lastHost = null;
                 }
+            };
+
+            let onPointerMove = null;
+            const stopPointerMoveRecovery = () => {
+                if (pointerMoveStopTimer) {
+                    clearTimeout(pointerMoveStopTimer);
+                    pointerMoveStopTimer = 0;
+                }
+                if (!pointerMoveListening) return;
+                try {
+                    document.removeEventListener('pointermove', onPointerMove, { capture: true });
+                } catch (e) {
+                }
+                pointerMoveListening = false;
+                pending = false;
+                lastTarget = null;
+                lastTargetHost = null;
+            };
+
+            const schedulePointerMoveRecoveryStop = () => {
+                if (pointerMoveStopTimer) clearTimeout(pointerMoveStopTimer);
+                pointerMoveStopTimer = setTimeout(() => {
+                    pointerMoveStopTimer = 0;
+                    if (lastHost || Date.now() <= quickBlockPointerRecoveryArmedUntil) {
+                        schedulePointerMoveRecoveryStop();
+                        return;
+                    }
+                    stopPointerMoveRecovery();
+                }, QUICK_BLOCK_POINTER_RECOVERY_ARM_MS + 50);
+            };
+
+            const pickHostFromTarget = (target) => {
+                try {
+                    if (!(target instanceof Element)) return null;
+                    const quickWrap = target.closest?.('.filtertube-quick-block-wrap');
+                    const hostFromWrap = quickWrap?.__filtertubeQuickHost instanceof Element
+                        ? quickWrap.__filtertubeQuickHost
+                        : null;
+                    if (hostFromWrap) return hostFromWrap;
+                    if (target.closest?.(FT_DROPDOWN_SELECTORS)) return null;
+                    const candidate = findQuickBlockCardFromTarget(target);
+                    if (!candidate || isPostLikeQuickBlockCard(candidate)) return null;
+                    return resolveQuickBlockHost(candidate);
+                } catch (e) {
+                    return null;
+                }
+            };
+
+            const getHostFromCachedTarget = (target) => {
+                if (target === lastTarget) return lastTargetHost;
+                lastTarget = target;
+                lastTargetHost = pickHostFromTarget(target);
+                return lastTargetHost;
             };
 
             const pickHostFromPoint = (x, y) => {
@@ -1535,9 +2121,12 @@ function setupQuickBlockObserver() {
                 } catch (e) {
                 }
                 try {
-                    const hosts = document.querySelectorAll('.filtertube-quick-block-host');
+                    const hosts = quickBlockViewportHosts.size > 0
+                        ? Array.from(quickBlockViewportHosts)
+                        : Array.from(document.querySelectorAll('.filtertube-quick-block-host'));
                     for (const host of hosts) {
                         if (!(host instanceof Element)) continue;
+                        if (typeof isQuickBlockHostNearViewport === 'function' && !isQuickBlockHostNearViewport(host, 1200)) continue;
                         if (isPostLikeQuickBlockCard(host)) continue;
                         if (pointInsideQuickBlockHost(host, x, y, 3)) return host;
                     }
@@ -1552,11 +2141,12 @@ function setupQuickBlockObserver() {
                     clearLast();
                     return;
                 }
-                if (isMobileSearchSurfaceOpen() || isYouTubeOverlaySurfaceOpen()) {
+                const surfaceState = getQuickBlockSurfaceState();
+                if (surfaceState.searchOpen || surfaceState.overlayOpen) {
                     clearLast();
                     return;
                 }
-                let host = pickHostFromPoint(lastX, lastY);
+                let host = lastTargetHost || getHostFromCachedTarget(lastTarget) || pickHostFromPoint(lastX, lastY);
                 if (!host && lastHost) {
                     if (pointInsideQuickBlockHost(lastHost, lastX, lastY, 3)) {
                         host = lastHost;
@@ -1587,9 +2177,14 @@ function setupQuickBlockObserver() {
                 }
             };
 
-            document.addEventListener('pointermove', (event) => {
+            onPointerMove = (event) => {
                 try {
                     if (!event || (event.pointerType && event.pointerType !== 'mouse')) return;
+                    if (!isQuickBlockEnabled()) return;
+                    if (!lastHost && Date.now() > quickBlockPointerRecoveryArmedUntil) return;
+                    const target = event.target instanceof Element ? event.target : null;
+                    const targetHost = getHostFromCachedTarget(target);
+                    if (!lastHost && !targetHost) return;
                     lastX = event.clientX;
                     lastY = event.clientY;
                     if (pending) return;
@@ -1597,62 +2192,101 @@ function setupQuickBlockObserver() {
                     requestAnimationFrame(tick);
                 } catch (e) {
                 }
-            }, { passive: true, capture: true });
+            };
+
+            quickBlockPointerRecoveryArmer = () => {
+                if (!isQuickBlockEnabled()) return;
+                if (!pointerMoveListening) {
+                    try {
+                        document.addEventListener('pointermove', onPointerMove, { passive: true, capture: true });
+                        pointerMoveListening = true;
+                    } catch (e) {
+                    }
+                }
+                schedulePointerMoveRecoveryStop();
+            };
 
             document.addEventListener('mouseleave', () => {
                 clearLast();
+                if (Date.now() > quickBlockPointerRecoveryArmedUntil) {
+                    stopPointerMoveRecovery();
+                }
             }, { passive: true, capture: true });
         }
 
-        const observer = new MutationObserver((mutations) => {
+        if (shouldEagerQuickBlockSweep()) {
+            const observer = new MutationObserver((mutations) => {
+                if (!isQuickBlockEnabled()) {
+                    removeQuickBlockButtons();
+                    return;
+                }
+                syncQuickBlockSurfaceState();
+                const targetCards = new Set();
+                const scanRoots = new Set();
+                for (const mutation of mutations) {
+                    try {
+                        const target = mutation.target;
+                        if (target instanceof Element) {
+                            const closestCard = target.matches?.(QUICK_BLOCK_CARD_SELECTORS)
+                                ? target
+                                : target.closest?.(QUICK_BLOCK_CARD_SELECTORS);
+                            if (closestCard) {
+                                targetCards.add(closestCard);
+                            }
+                        }
+                    } catch (e) {
+                    }
+                    for (const node of mutation.addedNodes) {
+                        if (!(node instanceof Element)) continue;
+                        if (node.matches?.(QUICK_BLOCK_CARD_SELECTORS)) {
+                            targetCards.add(node);
+                        } else {
+                            scanRoots.add(node);
+                        }
+                    }
+                    for (const node of mutation.removedNodes) {
+                        if (!(node instanceof Element)) continue;
+                        if (node.classList?.contains('filtertube-quick-block-wrap')) {
+                            const hostFromWrap = node.__filtertubeQuickHost instanceof Element ? node.__filtertubeQuickHost : null;
+                            const host = hostFromWrap || (mutation.target instanceof Element
+                                ? (mutation.target.matches?.(QUICK_BLOCK_CARD_SELECTORS)
+                                    ? mutation.target
+                                    : mutation.target.closest?.(QUICK_BLOCK_CARD_SELECTORS))
+                                : null);
+                            if (host) targetCards.add(host);
+                        }
+                    }
+                }
+                targetCards.forEach(card => {
+                    try {
+                        ensureQuickBlockButton(card);
+                    } catch (e) {
+                    }
+                });
+                scanRoots.forEach(root => {
+                    try {
+                        scheduleQuickBlockSweep(root);
+                    } catch (e) {
+                    }
+                });
+            });
+
+            observer.observe(document.body, { childList: true, subtree: true });
+        }
+
+        document.addEventListener('yt-navigate-finish', () => {
+            invalidateQuickBlockSurfaceStateCache();
+            invalidateQuickBlockOcclusionCache();
+            cancelQuickBlockHoverIntent();
             if (!isQuickBlockEnabled()) {
                 removeQuickBlockButtons();
                 return;
             }
-            for (const mutation of mutations) {
-                syncQuickBlockSurfaceState();
-                try {
-                    const target = mutation.target;
-                    if (target instanceof Element) {
-                        const closestCard = target.matches?.(QUICK_BLOCK_CARD_SELECTORS)
-                            ? target
-                            : target.closest?.(QUICK_BLOCK_CARD_SELECTORS);
-                        if (closestCard) {
-                            ensureQuickBlockButton(closestCard);
-                        }
-                    }
-                } catch (e) {
-                }
-                for (const node of mutation.addedNodes) {
-                    if (!(node instanceof Element)) continue;
-                    if (node.matches?.(QUICK_BLOCK_CARD_SELECTORS)) {
-                        ensureQuickBlockButton(node);
-                    } else {
-                        scheduleQuickBlockSweep(node);
-                    }
-                }
-                for (const node of mutation.removedNodes) {
-                    if (!(node instanceof Element)) continue;
-                    if (node.classList?.contains('filtertube-quick-block-wrap')) {
-                        const hostFromWrap = node.__filtertubeQuickHost instanceof Element ? node.__filtertubeQuickHost : null;
-                        const host = hostFromWrap || (mutation.target instanceof Element
-                            ? (mutation.target.matches?.(QUICK_BLOCK_CARD_SELECTORS)
-                                ? mutation.target
-                                : mutation.target.closest?.(QUICK_BLOCK_CARD_SELECTORS))
-                            : null);
-                        if (host) ensureQuickBlockButton(host);
-                    }
-                }
+            refreshQuickBlockRuntimeState({ force: true });
+            if (shouldEagerQuickBlockSweep()) {
+                scheduleQuickBlockSweep(document);
             }
         });
-
-        observer.observe(document.body, { childList: true, subtree: true });
-
-        if (!quickBlockPeriodicTimer) {
-            quickBlockPeriodicTimer = window.setInterval(() => {
-                sweepQuickBlockButtons(document);
-            }, 1800);
-        }
     };
 
     if (document.body) {
@@ -1661,6 +2295,7 @@ function setupQuickBlockObserver() {
         window.addEventListener('DOMContentLoaded', boot, { once: true });
     }
 
+    return true;
 }
 
 /**
@@ -1672,25 +2307,62 @@ function setupMenuObserver() {
         return;
     }
 
+    const menuButtonSelector = [
+        'button[aria-label*="More"]',
+        'button[aria-label*="Action"]',
+        'button[aria-label*="menu"]',
+        'yt-icon-button.dropdown-trigger',
+        'yt-icon-button#button.dropdown-trigger',
+        '.shortsLockupViewModelHostOutsideMetadataMenu button',
+        'ytd-menu-renderer button',
+        '#menu button[aria-label]',
+        'ytd-reel-item-renderer button[aria-label*="More"]',
+        'ytd-reel-video-renderer button[aria-label*="More"]',
+        'ytm-menu-renderer button',
+        'ytm-bottom-sheet-renderer button'
+    ].join(', ');
+
+    const repairFilterTubeHiddenDropdownState = (dropdown) => {
+        if (!(dropdown instanceof Element)) return;
+        try {
+            const candidates = [dropdown];
+            try {
+                dropdown.querySelectorAll?.('ytd-menu-popup-renderer, ytm-menu-popup-renderer, bottom-sheet-container, div.menu-content[role="dialog"]').forEach(el => {
+                    candidates.push(el);
+                });
+            } catch (e) {
+            }
+
+            candidates.forEach(el => {
+                try {
+                    const forceHidden = el.getAttribute('data-filtertube-force-hidden') === 'true';
+                    if (!forceHidden) return;
+                    if (el.style.display === 'none') {
+                        el.style.display = '';
+                    }
+                    if (el.getAttribute('aria-hidden') === 'true') {
+                        el.removeAttribute('aria-hidden');
+                    }
+                    el.removeAttribute('hidden');
+                    el.removeAttribute('data-filtertube-force-hidden');
+                } catch (e) {
+                }
+            });
+        } catch (e) {
+        }
+    };
+
     // Track clicks on 3-dot buttons (comprehensive selectors for all YouTube contexts)
     document.addEventListener('click', (e) => {
-        const menuButton = e.target.closest(
-            'button[aria-label*="More"], ' +
-            'button[aria-label*="Action"], ' +
-            'button[aria-label*="menu"], ' +
-            'yt-icon-button.dropdown-trigger, ' +
-            'yt-icon-button#button.dropdown-trigger, ' +
-            '.shortsLockupViewModelHostOutsideMetadataMenu button, ' +
-            'ytd-menu-renderer button, ' +
-            '#menu button[aria-label], ' +
-            'ytd-reel-item-renderer button[aria-label*="More"], ' +
-            'ytd-reel-video-renderer button[aria-label*="More"], ' +
-            'ytm-menu-renderer button, ' +
-            'ytm-bottom-sheet-renderer button'
+        const target = e?.target instanceof Element ? e.target : null;
+        if (!target) return;
+        const menuButton = target.closest(
+            menuButtonSelector
         );
         if (menuButton) {
             lastClickedMenuButton = menuButton;
             blockChannelDebugLog('FilterTube: 3-dot button clicked, button:', menuButton.getAttribute('aria-label'));
+            armDropdownDiscoveryObserver();
 
             // Also try to find and inject immediately into existing dropdown
             setTimeout(() => {
@@ -1713,9 +2385,7 @@ function setupMenuObserver() {
                 }
                 const isVisible = !hiddenAttr && styleVisible;
                 if (isVisible) {
-                    handleDropdownAppeared(dropdown).catch(err => {
-                        console.error('FilterTube: Error in handleDropdownAppeared:', err);
-                    });
+                    scheduleDropdownInjection(dropdown);
                 } else {
                     if (injectedDropdowns.has(dropdown)) {
                         injectedDropdowns.delete(dropdown);
@@ -1731,58 +2401,186 @@ function setupMenuObserver() {
         }
     }
 
+    const isDropdownVisible = (dropdown) => {
+        try {
+            const hiddenAttr = dropdown.getAttribute('aria-hidden') === 'true' || dropdown.hasAttribute('hidden');
+            let styleVisible = true;
+            try {
+                const style = window.getComputedStyle(dropdown);
+                styleVisible = style.display !== 'none' && style.visibility !== 'hidden';
+            } catch (e) {
+                styleVisible = dropdown.style.display !== 'none';
+            }
+            return !hiddenAttr && styleVisible;
+        } catch (e) {
+            return false;
+        }
+    };
+
+    const scheduleDropdownInjection = (dropdown) => {
+        if (!(dropdown instanceof Element)) return;
+        if (scheduledDropdownInjections.has(dropdown) || processingDropdowns.has(dropdown)) return;
+        scheduledDropdownInjections.add(dropdown);
+
+        const run = () => {
+            scheduledDropdownInjections.delete(dropdown);
+            try {
+                if (dropdown.isConnected === false || !isDropdownVisible(dropdown)) return;
+                blockChannelDebugLog('FilterTube: Dropdown ready for deferred injection');
+                handleDropdownAppeared(dropdown).catch(err => {
+                    console.error('FilterTube: Error in handleDropdownAppeared:', err);
+                });
+            } catch (e) {
+            }
+        };
+
+        try {
+            if (typeof requestAnimationFrame === 'function') {
+                requestAnimationFrame(() => setTimeout(run, 0));
+                return;
+            }
+        } catch (e) {
+        }
+        setTimeout(run, 0);
+    };
+
+    const handleCandidateDropdown = (dropdown) => {
+        if (!(dropdown instanceof Element)) return;
+        try {
+            ensureDropdownVisibilityObserver(dropdown);
+            if (isDropdownVisible(dropdown)) {
+                blockChannelDebugLog('FilterTube: Dropdown added to DOM');
+                scheduleDropdownInjection(dropdown);
+            }
+        } catch (e) {
+        }
+    };
+
+    const scanExistingDropdowns = () => {
+        try {
+            document.querySelectorAll(FT_DROPDOWN_SELECTORS).forEach(dropdown => {
+                repairFilterTubeHiddenDropdownState(dropdown);
+                handleCandidateDropdown(dropdown);
+            });
+        } catch (e) {
+        }
+    };
+
+    const closeFilterTubeInjectedDropdownsOnOutsidePointer = (event) => {
+        try {
+            const target = event?.target instanceof Element ? event.target : null;
+            if (target?.closest?.(menuButtonSelector)) return;
+
+            let eventPath = [];
+            try {
+                eventPath = typeof event?.composedPath === 'function' ? event.composedPath() : [];
+            } catch (e) {
+                eventPath = [];
+            }
+
+            document.querySelectorAll(FT_DROPDOWN_SELECTORS).forEach(dropdown => {
+                try {
+                    if (!(dropdown instanceof Element)) return;
+                    if (!dropdown.querySelector?.('.filtertube-block-channel-item')) return;
+                    if (!isDropdownVisible(dropdown)) return;
+                    if (target && (dropdown.contains(target) || eventPath.includes(dropdown))) return;
+                    if (typeof forceCloseDropdown === 'function') {
+                        forceCloseDropdown(dropdown);
+                    } else {
+                        dropdown.dispatchEvent(new KeyboardEvent('keydown', {
+                            key: 'Escape',
+                            code: 'Escape',
+                            keyCode: 27,
+                            which: 27,
+                            bubbles: true,
+                            cancelable: true
+                        }));
+                    }
+                    if (injectedDropdowns.has(dropdown)) {
+                        injectedDropdowns.delete(dropdown);
+                    }
+                } catch (e) {
+                }
+            });
+        } catch (e) {
+        }
+    };
+
+    document.addEventListener(
+        typeof PointerEvent === 'function' ? 'pointerdown' : 'mousedown',
+        closeFilterTubeInjectedDropdownsOnOutsidePointer,
+        true
+    );
+
+    let dropdownDiscoveryObserver = null;
+    let dropdownDiscoveryActive = false;
+    let dropdownDiscoveryStopTimer = 0;
+
+    const stopDropdownDiscoveryObserver = () => {
+        dropdownDiscoveryActive = false;
+        if (dropdownDiscoveryStopTimer) {
+            clearTimeout(dropdownDiscoveryStopTimer);
+            dropdownDiscoveryStopTimer = 0;
+        }
+        try {
+            dropdownDiscoveryObserver?.disconnect?.();
+        } catch (e) {
+        }
+    };
+
+    const armDropdownDiscoveryObserver = () => {
+        if (!document.body) return;
+        scanExistingDropdowns();
+        if (!dropdownDiscoveryObserver) {
+            dropdownDiscoveryObserver = new MutationObserver((mutations) => {
+                if (!dropdownDiscoveryActive) return;
+                for (const mutation of mutations) {
+                    // Check for new nodes
+                    for (const node of mutation.addedNodes) {
+                        if (node.nodeType !== 1) continue;
+
+                        if (node.matches?.(FT_DROPDOWN_SELECTORS)) {
+                            handleCandidateDropdown(node);
+                        }
+                        try {
+                            node.querySelectorAll?.(FT_DROPDOWN_SELECTORS).forEach(handleCandidateDropdown);
+                        } catch (e) {
+                        }
+                    }
+                }
+            });
+        }
+        if (!dropdownDiscoveryActive) {
+            try {
+                dropdownDiscoveryObserver.observe(document.body, {
+                    childList: true,
+                    subtree: true
+                });
+                dropdownDiscoveryActive = true;
+            } catch (e) {
+                dropdownDiscoveryActive = false;
+            }
+        }
+        if (dropdownDiscoveryStopTimer) clearTimeout(dropdownDiscoveryStopTimer);
+        dropdownDiscoveryStopTimer = setTimeout(stopDropdownDiscoveryObserver, 2500);
+    };
+
+    document.addEventListener('keydown', (e) => {
+        try {
+            if (e.key !== 'Enter' && e.key !== ' ') return;
+            const target = e.target instanceof Element ? e.target : null;
+            if (!target?.closest?.(menuButtonSelector)) return;
+            armDropdownDiscoveryObserver();
+        } catch (err) {
+        }
+    }, true);
+
     // Wait for document.body to be ready
     const startObserver = () => {
         if (!document.body) {
             setTimeout(startObserver, 100);
             return;
         }
-
-        try {
-            document.querySelectorAll(FT_DROPDOWN_SELECTORS).forEach(dd => ensureDropdownVisibilityObserver(dd));
-        } catch (e) {
-        }
-
-        // Observe dropdown menus appearing (childList for new nodes)
-        const observer = new MutationObserver((mutations) => {
-            for (const mutation of mutations) {
-                // Check for new nodes
-                for (const node of mutation.addedNodes) {
-                    if (node.nodeType !== 1) continue;
-
-                    const dropdown = node.matches?.(FT_DROPDOWN_SELECTORS)
-                        ? node
-                        : node.querySelector?.(FT_DROPDOWN_SELECTORS);
-
-                    if (dropdown) {
-                        ensureDropdownVisibilityObserver(dropdown);
-                        const hiddenAttr = dropdown.getAttribute('aria-hidden') === 'true' || dropdown.hasAttribute('hidden');
-                        let styleVisible = true;
-                        try {
-                            const style = window.getComputedStyle(dropdown);
-                            styleVisible = style.display !== 'none' && style.visibility !== 'hidden';
-                        } catch (e) {
-                            styleVisible = dropdown.style.display !== 'none';
-                        }
-                        const isVisible = !hiddenAttr && styleVisible;
-
-                        if (isVisible) {
-                            blockChannelDebugLog('FilterTube: Dropdown added to DOM');
-                            // Call async function without awaiting (fire and forget)
-                            handleDropdownAppeared(dropdown).catch(err => {
-                                console.error('FilterTube: Error in handleDropdownAppeared:', err);
-                            });
-                        }
-                    }
-                }
-
-            }
-        });
-
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true
-        });
 
         blockChannelDebugLog('FilterTube: Menu observer started');
     };
@@ -2079,10 +2877,12 @@ function tryInjectIntoVisibleDropdown() {
 
         if (isVisible) {
             blockChannelDebugLog('FilterTube: Found visible dropdown');
-            // Call async function without awaiting (fire and forget)
-            handleDropdownAppeared(dropdown).catch(err => {
-                console.error('FilterTube: Error in handleDropdownAppeared:', err);
-            });
+            try {
+                handleDropdownAppeared(dropdown).catch(err => {
+                    console.error('FilterTube: Error in handleDropdownAppeared:', err);
+                });
+            } catch (e) {
+            }
             break; // Only inject into first visible one
         }
     }
@@ -2295,8 +3095,21 @@ async function handleDropdownAppearedInternal(dropdown) {
                 for (const node of mutation.removedNodes) {
                     if (node === videoCard || node.contains(videoCard)) {
                         blockChannelDebugLog('FilterTube: Video card removed, closing dropdown');
-                        dropdown.style.display = 'none';
-                        dropdown.setAttribute('aria-hidden', 'true');
+                        if (typeof forceCloseDropdown === 'function') {
+                            forceCloseDropdown(dropdown);
+                        } else {
+                            try {
+                                dropdown.dispatchEvent(new KeyboardEvent('keydown', {
+                                    key: 'Escape',
+                                    code: 'Escape',
+                                    keyCode: 27,
+                                    which: 27,
+                                    bubbles: true,
+                                    cancelable: true
+                                }));
+                            } catch (e) {
+                            }
+                        }
                         observer.disconnect();
                     }
                 }

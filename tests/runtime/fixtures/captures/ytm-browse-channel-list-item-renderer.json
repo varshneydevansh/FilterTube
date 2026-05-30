@@ -1,0 +1,160 @@
+{
+  "provenance": {
+    "source": "ytm_browse?prettyPrint=false.json",
+    "sourceSha256": "4444c7dcb6b6a884846a19169bed286f1019cd7275a6d1292392b1c1de95bdf8",
+    "sourceBytes": 3005515,
+    "sourceLines": 52334,
+    "rawShape": "direct JSON object",
+    "rootPath": "contents.singleColumnBrowseResultsRenderer.tabs.0.tabRenderer.content.sectionListRenderer.contents.0.shelfRenderer.content.verticalListRenderer.items",
+    "rendererType": "channelListItemRenderer",
+    "rendererCount": 983,
+    "selectedRendererIndexes": [
+      0,
+      1
+    ],
+    "selectedRendererStartLines": [
+      95,
+      146
+    ],
+    "surface": "YTM mobile browse channels",
+    "route": "browse FEchannels",
+    "clientName": "MWEB"
+  },
+  "response": {
+    "contents": {
+      "singleColumnBrowseResultsRenderer": {
+        "tabs": [
+          {
+            "tabRenderer": {
+              "content": {
+                "sectionListRenderer": {
+                  "contents": [
+                    {
+                      "shelfRenderer": {
+                        "title": {
+                          "runs": [
+                            {
+                              "text": "All channels"
+                            }
+                          ]
+                        },
+                        "content": {
+                          "verticalListRenderer": {
+                            "items": [
+                              {
+                                "channelListItemRenderer": {
+                                  "title": {
+                                    "runs": [
+                                      {
+                                        "text": "Kshatriya Dharma"
+                                      }
+                                    ]
+                                  },
+                                  "thumbnail": {
+                                    "thumbnails": [
+                                      {
+                                        "url": "//yt3.googleusercontent.com/5sQ7cECgeA_MhwaBg54wrDBUSYdg_Y-9hojL0_nyg-QqncZLsE10eTpeCsutOL9PhMiTt_O3FA=s48-c-k-c0x00ffffff-no-rj-mo",
+                                        "width": 48,
+                                        "height": 48
+                                      },
+                                      {
+                                        "url": "//yt3.googleusercontent.com/5sQ7cECgeA_MhwaBg54wrDBUSYdg_Y-9hojL0_nyg-QqncZLsE10eTpeCsutOL9PhMiTt_O3FA=s88-c-k-c0x00ffffff-no-rj-mo",
+                                        "width": 88,
+                                        "height": 88
+                                      },
+                                      {
+                                        "url": "//yt3.googleusercontent.com/5sQ7cECgeA_MhwaBg54wrDBUSYdg_Y-9hojL0_nyg-QqncZLsE10eTpeCsutOL9PhMiTt_O3FA=s176-c-k-c0x00ffffff-no-rj-mo",
+                                        "width": 176,
+                                        "height": 176
+                                      }
+                                    ]
+                                  },
+                                  "navigationEndpoint": {
+                                    "clickTrackingParams": "COEHEN5ZGAAiEwiav--jg6yTAxUkLbcAHcDiD9zKAQS7jUeA",
+                                    "commandMetadata": {
+                                      "webCommandMetadata": {
+                                        "url": "/@KshatriyaDharma",
+                                        "webPageType": "WEB_PAGE_TYPE_CHANNEL",
+                                        "rootVe": 3611,
+                                        "apiUrl": "/youtubei/v1/browse"
+                                      }
+                                    },
+                                    "browseEndpoint": {
+                                      "browseId": "UCBvMrvqRUpaHHvQt7M0cIuQ",
+                                      "canonicalBaseUrl": "/@KshatriyaDharma"
+                                    }
+                                  },
+                                  "trackingParams": "COEHEN5ZGAAiEwiav--jg6yTAxUkLbcAHcDiD9w=",
+                                  "presentationStyle": {
+                                    "style": "NONE"
+                                  },
+                                  "channelId": "UCBvMrvqRUpaHHvQt7M0cIuQ",
+                                  "timestampMs": "1773925481494"
+                                }
+                              },
+                              {
+                                "channelListItemRenderer": {
+                                  "title": {
+                                    "runs": [
+                                      {
+                                        "text": "*NSYNC"
+                                      }
+                                    ]
+                                  },
+                                  "thumbnail": {
+                                    "thumbnails": [
+                                      {
+                                        "url": "https://yt3.googleusercontent.com/jadN8UjIAh3zsRkq-1MXLgWOFzoE2UTVkrnZyRYcRAbn_4GqocZKXpdugI-TQHe5RZmVxvI5=s48-c-k-c0x00ffffff-no-rj-mo",
+                                        "width": 48,
+                                        "height": 48
+                                      },
+                                      {
+                                        "url": "https://yt3.googleusercontent.com/jadN8UjIAh3zsRkq-1MXLgWOFzoE2UTVkrnZyRYcRAbn_4GqocZKXpdugI-TQHe5RZmVxvI5=s88-c-k-c0x00ffffff-no-rj-mo",
+                                        "width": 88,
+                                        "height": 88
+                                      },
+                                      {
+                                        "url": "https://yt3.googleusercontent.com/jadN8UjIAh3zsRkq-1MXLgWOFzoE2UTVkrnZyRYcRAbn_4GqocZKXpdugI-TQHe5RZmVxvI5=s176-c-k-c0x00ffffff-no-rj-mo",
+                                        "width": 176,
+                                        "height": 176
+                                      }
+                                    ]
+                                  },
+                                  "navigationEndpoint": {
+                                    "clickTrackingParams": "COAHEN5ZGAEiEwiav--jg6yTAxUkLbcAHcDiD9zKAQS7jUeA",
+                                    "commandMetadata": {
+                                      "webCommandMetadata": {
+                                        "url": "/@OfficialNSYNC",
+                                        "webPageType": "WEB_PAGE_TYPE_CHANNEL",
+                                        "rootVe": 3611,
+                                        "apiUrl": "/youtubei/v1/browse"
+                                      }
+                                    },
+                                    "browseEndpoint": {
+                                      "browseId": "UCjkyfFH-MWZhasolgds05EA",
+                                      "canonicalBaseUrl": "/@OfficialNSYNC"
+                                    }
+                                  },
+                                  "trackingParams": "COAHEN5ZGAEiEwiav--jg6yTAxUkLbcAHcDiD9w=",
+                                  "presentationStyle": {
+                                    "style": "NONE"
+                                  },
+                                  "channelId": "UCjkyfFH-MWZhasolgds05EA",
+                                  "timestampMs": "1773925481494"
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

@@ -105,7 +105,7 @@ FilterTube/
 **Purpose:** Core extension logic, storage management, API calls, message handling
 **New Performance Features:**
 - **Channel Map Caching**: `ensureChannelMapCache()`, `enqueueChannelMapUpdate()`, `enqueueChannelMapMappings()`
-- **Batched Storage Updates**: 250ms flush intervals reduce I/O by 70-90%
+- **Batched Storage Updates**: 250ms flush intervals reduce storage churn. Earlier notes used 70-90% I/O-reduction language; treat that as a historical estimate until measured.
 - **Storage Optimization**: Prevents storage contention during rapid updates
 
 ### `js/content/dom_fallback.js` - **MAJOR OVERHAUL v3.2.1+**
@@ -167,7 +167,7 @@ FilterTube/
 **Purpose:** Canonical import/export engine. Normalizes channel/keyword entries, merges imports (UC IDs, @handles, `c/slug`), adapts BlockTube/plaintext formats, canonicalizes Android/app packed channel keyword source strings, and emits the versioned portable schema consumed by future sync tooling.
 
 **Context:** UI Contexts (Popup, Tab View)
-**Purpose:** The Single Source of Truth for application state.
+**Purpose:** Shared UI-facing state coordinator for popup and tab-view flows. Background compilation, storage caches, Nanah/import writes, stats, content-script learned maps, and page-runtime refresh still have separate authority paths.
 | Function | Description |
 | :--- | :--- |
 | `loadSettings()` | Loads settings from storage and initializes state. |

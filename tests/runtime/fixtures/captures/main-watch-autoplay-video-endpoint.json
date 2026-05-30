@@ -1,0 +1,146 @@
+{
+  "provenance": {
+    "source": "get_watch?prettyPrint=false.json",
+    "sourceSha256": "578230df9dc00dfebc8ac0ec4cc1ec2f796abf7cf4584c9e4ece67856fdf90e0",
+    "sourceBytes": 5046178,
+    "sourceLines": 46562,
+    "rawShape": "direct JSON array",
+    "rootPath": "1.watchNextResponse.contents.twoColumnWatchNextResults",
+    "fixtureKind": "json",
+    "surface": "Main desktop watch autoplay endpoint",
+    "route": "watch",
+    "rendererType": "watchAutoplayEndpoint",
+    "rendererTypes": [
+      "playlistPanelVideoRenderer",
+      "autoplayVideo",
+      "nextButtonVideo"
+    ],
+    "playlistPanelPath": "1.watchNextResponse.contents.twoColumnWatchNextResults.playlist.playlist.contents.1.playlistPanelVideoRenderer",
+    "autoplayPaths": [
+      "1.watchNextResponse.contents.twoColumnWatchNextResults.autoplay.autoplay.sets.0.autoplayVideo",
+      "1.watchNextResponse.contents.twoColumnWatchNextResults.autoplay.autoplay.sets.0.nextButtonVideo",
+      "1.watchNextResponse.contents.twoColumnWatchNextResults.autoplay.autoplay.modifiedSets.0.autoplayVideo",
+      "1.watchNextResponse.contents.twoColumnWatchNextResults.autoplay.autoplay.modifiedSets.0.nextButtonVideo"
+    ],
+    "omittedRawFields": "thumbnails, tracking details outside endpoints, playback URLs, playlist siblings, end-screen siblings, and unrelated watch response siblings"
+  },
+  "watchNextResponse": {
+    "playlist": {
+      "contents": [
+        {
+          "playlistPanelVideoRenderer": {
+            "videoId": "TUVcZfQe-Kw",
+            "title": {
+              "simpleText": "Dua Lipa - Levitating Featuring DaBaby (Official Music Video)"
+            },
+            "shortBylineText": {
+              "runs": [
+                {
+                  "text": "Dua Lipa",
+                  "navigationEndpoint": {
+                    "commandMetadata": {
+                      "webCommandMetadata": {
+                        "url": "/channel/UC-J-KZfRV8c13fOCkhXdLiQ",
+                        "webPageType": "WEB_PAGE_TYPE_CHANNEL"
+                      }
+                    },
+                    "browseEndpoint": {
+                      "browseId": "UC-J-KZfRV8c13fOCkhXdLiQ",
+                      "canonicalBaseUrl": "/channel/UC-J-KZfRV8c13fOCkhXdLiQ"
+                    }
+                  }
+                }
+              ]
+            },
+            "navigationEndpoint": {
+              "watchEndpoint": {
+                "videoId": "TUVcZfQe-Kw"
+              }
+            },
+            "lengthText": {
+              "simpleText": "3:51"
+            }
+          }
+        }
+      ]
+    },
+    "autoplay": {
+      "autoplay": {
+        "sets": [
+          {
+            "mode": "NORMAL",
+            "autoplayVideo": {
+              "commandMetadata": {
+                "webCommandMetadata": {
+                  "url": "/watch?v=TUVcZfQe-Kw&list=RD41ZY18JqI2A&index=2&pp=QAFIAQ%3D%3D",
+                  "webPageType": "WEB_PAGE_TYPE_WATCH",
+                  "rootVe": 3832
+                }
+              },
+              "watchEndpoint": {
+                "videoId": "TUVcZfQe-Kw",
+                "playlistId": "RD41ZY18JqI2A",
+                "index": 1,
+                "params": "EAEYATgBYgs0MVpZMThKcUkyQWgA2gECCAE%3D",
+                "playerParams": "QAFIAQ%3D%3D",
+                "watchEndpointSupportedPrefetchConfig": {
+                  "prefetchHintConfig": {
+                    "prefetchPriority": 0,
+                    "playbackRelativeSecondsPrefetchCondition": -3
+                  }
+                }
+              }
+            },
+            "nextButtonVideo": {
+              "commandMetadata": {
+                "webCommandMetadata": {
+                  "url": "/watch?v=TUVcZfQe-Kw&list=RD41ZY18JqI2A&index=2",
+                  "webPageType": "WEB_PAGE_TYPE_WATCH",
+                  "rootVe": 3832
+                }
+              },
+              "watchEndpoint": {
+                "videoId": "TUVcZfQe-Kw",
+                "playlistId": "RD41ZY18JqI2A",
+                "index": 1,
+                "params": "EAIYATgBYgs0MVpZMThKcUkyQWgA"
+              }
+            }
+          }
+        ],
+        "modifiedSets": [
+          {
+            "autoplayVideo": {
+              "commandMetadata": {
+                "webCommandMetadata": {
+                  "url": "/playlist?list=RD41ZY18JqI2A&playnext=1&index=2",
+                  "webPageType": "WEB_PAGE_TYPE_WATCH",
+                  "rootVe": 3832
+                }
+              },
+              "watchPlaylistEndpoint": {
+                "playlistId": "RD41ZY18JqI2A",
+                "index": 1,
+                "params": "EAEYATgBYgs0MVpZMThKcUkyQWgA2gECCAE%3D"
+              }
+            },
+            "nextButtonVideo": {
+              "commandMetadata": {
+                "webCommandMetadata": {
+                  "url": "/playlist?list=RD41ZY18JqI2A&playnext=1&index=2",
+                  "webPageType": "WEB_PAGE_TYPE_WATCH",
+                  "rootVe": 3832
+                }
+              },
+              "watchPlaylistEndpoint": {
+                "playlistId": "RD41ZY18JqI2A",
+                "index": 1,
+                "params": "EAIYATgBYgs0MVpZMThKcUkyQWgA"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

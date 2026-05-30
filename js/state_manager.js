@@ -2,8 +2,8 @@
  * FilterTube State Manager
  * Centralized state management and business logic for popup and tab-view
  * 
- * This module provides a single source of truth for all state operations,
- * eliminating duplicated logic across different UI contexts.
+ * Shared UI-facing coordinator for popup/tab-view; background compile, caches,
+ * imports/Nanah, stats, content maps, and runtime refresh have separate owners.
  */
 
 const StateManager = (() => {
@@ -1074,6 +1074,28 @@ const StateManager = (() => {
         }
     }
 
+    function normalizeMainProfileAliasFields(main) {
+        const out = { ...(main && typeof main === 'object' && !Array.isArray(main) ? main : {}) };
+        const mode = out.mode === 'whitelist' ? 'whitelist' : 'blocklist';
+        out.mode = mode;
+        out.channels = Array.isArray(out.channels)
+            ? out.channels
+            : (Array.isArray(out.blockedChannels) ? out.blockedChannels : []);
+        out.keywords = Array.isArray(out.keywords)
+            ? out.keywords
+            : (Array.isArray(out.blockedKeywords) ? out.blockedKeywords : []);
+        out.whitelistChannels = Array.isArray(out.whitelistChannels) ? out.whitelistChannels : [];
+        out.whitelistKeywords = Array.isArray(out.whitelistKeywords) ? out.whitelistKeywords : [];
+        if (mode === 'blocklist') {
+            out.blockedChannels = out.channels;
+            out.blockedKeywords = out.keywords;
+        } else {
+            out.blockedChannels = [];
+            out.blockedKeywords = [];
+        }
+        return out;
+    }
+
     async function persistMainProfiles(nextMain) {
         const io = window.FilterTubeIO || {};
         const canV3 = !!(io && typeof io.saveProfilesV3 === 'function' && typeof io.loadProfilesV3 === 'function');
@@ -1124,11 +1146,11 @@ const StateManager = (() => {
 
                 profiles[activeId] = {
                     ...activeProfile,
-                    main: {
+                    main: normalizeMainProfileAliasFields({
                         ...(activeProfile.main || {}),
                         ...nextMain,
                         mode: (typeof nextMain?.mode === 'string') ? nextMain.mode : (activeProfile.main || {}).mode
-                    }
+                    })
                 };
 
                 const nextProfiles = {

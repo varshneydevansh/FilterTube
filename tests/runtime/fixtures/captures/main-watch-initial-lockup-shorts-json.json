@@ -1,0 +1,296 @@
+{
+  "provenance": {
+    "source": "YT_MAIN.json",
+    "sourceSha256": "64c7861ff6baa76816082479f5bdda591faef3e72e2510e6da80866cba1c3357",
+    "sourceBytes": 4951099,
+    "sourceLines": 50481,
+    "fragmentIndex": 0,
+    "fragmentStartLine": 1,
+    "fragmentBytes": 4826868,
+    "fragmentSha256": "9598bbddb384791ba7553cc98e54f0154fd76a7346a78e5b360eca0f69768fed",
+    "fixtureKind": "json",
+    "surface": "Main desktop watch initial data",
+    "route": "watch",
+    "rendererType": "watchInitialLockupAndShortsJson",
+    "extractedPath": "contents.twoColumnWatchNextResults.secondaryResults.secondaryResults.results.1.itemSectionRenderer.contents and engagementPanels.5.engagementPanelSectionListRenderer.content.structuredDescriptionContentRenderer.items.3.reelShelfRenderer.items"
+  },
+  "captureFixtureTraceability": {
+    "rawSourceCapture": "YT_MAIN.json",
+    "minimalFixturePath": "tests/runtime/fixtures/captures/main-watch-initial-lockup-shorts-json.json",
+    "fixtureKind": "json",
+    "sourceSurface": "Main desktop watch initial data",
+    "route": "watch",
+    "rendererPathOrDomSelector": "lockupViewModel and shortsLockupViewModel",
+    "settingsMode": "disabled | blocklist | whitelist | hideAllShorts",
+    "expectedDecision": "pass-through | hide | preserve shell | remove shorts",
+    "sideEffects": "channel map write | video-channel map write",
+    "negativeSiblingVisibleFixture": "non-matching lockup sibling and continuation item remain present",
+    "releaseInputAllowed": false
+  },
+  "response": {
+    "contents": {
+      "twoColumnWatchNextResults": {
+        "secondaryResults": {
+          "secondaryResults": {
+            "results": [
+              {
+                "itemSectionRenderer": {
+                  "contents": [
+                    {
+                      "lockupViewModel": {
+                        "contentId": "8Li0Tyeqlc4",
+                        "contentType": "LOCKUP_CONTENT_TYPE_VIDEO",
+                        "metadata": {
+                          "lockupMetadataViewModel": {
+                            "title": {
+                              "content": "Tron Legacy - Daft Punk - The Suite"
+                            },
+                            "image": {
+                              "decoratedAvatarViewModel": {
+                                "rendererContext": {
+                                  "commandContext": {
+                                    "onTap": {
+                                      "innertubeCommand": {
+                                        "browseEndpoint": {
+                                          "browseId": "UCVZ2A50--jZieMK_qyMd1Yw",
+                                          "canonicalBaseUrl": "/@TronLegacyScore"
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            "metadata": {
+                              "contentMetadataViewModel": {
+                                "metadataRows": [
+                                  {
+                                    "metadataParts": [
+                                      {
+                                        "text": {
+                                          "content": "Tron Legacy"
+                                        }
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "metadataParts": [
+                                      {
+                                        "text": {
+                                          "content": "15 lakh views"
+                                        }
+                                      },
+                                      {
+                                        "text": {
+                                          "content": "11 years ago"
+                                        }
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        },
+                        "rendererContext": {
+                          "commandContext": {
+                            "onTap": {
+                              "innertubeCommand": {
+                                "watchEndpoint": {
+                                  "videoId": "8Li0Tyeqlc4"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "lockupViewModel": {
+                        "contentId": "6IQUsbxUyYw",
+                        "contentType": "LOCKUP_CONTENT_TYPE_VIDEO",
+                        "metadata": {
+                          "lockupMetadataViewModel": {
+                            "title": {
+                              "content": "BTS Stage Ultra Compilation KBS Music Bank, KBS Song Festival"
+                            },
+                            "image": {
+                              "decoratedAvatarViewModel": {
+                                "rendererContext": {
+                                  "commandContext": {
+                                    "onTap": {
+                                      "innertubeCommand": {
+                                        "browseEndpoint": {
+                                          "browseId": "UCgqMjKxRWAKUvgYqgomighw",
+                                          "canonicalBaseUrl": "/@kbs_cheongju_official"
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            "metadata": {
+                              "contentMetadataViewModel": {
+                                "metadataRows": [
+                                  {
+                                    "metadataParts": [
+                                      {
+                                        "text": {
+                                          "content": "KBS Chungbuk"
+                                        }
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "metadataParts": [
+                                      {
+                                        "text": {
+                                          "content": "3.7 crore views"
+                                        }
+                                      },
+                                      {
+                                        "text": {
+                                          "content": "3 years ago"
+                                        }
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        },
+                        "rendererContext": {
+                          "commandContext": {
+                            "onTap": {
+                              "innertubeCommand": {
+                                "watchEndpoint": {
+                                  "videoId": "6IQUsbxUyYw"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "lockupViewModel": {
+                        "contentId": "RDGMEM0s70dY0AfCwh3LqQ-Bv1xg",
+                        "contentType": "LOCKUP_CONTENT_TYPE_PLAYLIST",
+                        "metadata": {
+                          "lockupMetadataViewModel": {
+                            "title": {
+                              "content": "Mix - K-pop"
+                            },
+                            "metadata": {
+                              "contentMetadataViewModel": {
+                                "metadataRows": [
+                                  {
+                                    "metadataParts": [
+                                      {
+                                        "text": {
+                                          "content": "BTS, Jimin, BLACKPINK and more"
+                                        }
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            }
+                          }
+                        },
+                        "rendererContext": {
+                          "commandContext": {
+                            "onTap": {
+                              "innertubeCommand": {
+                                "watchEndpoint": {
+                                  "playlistId": "RDGMEM0s70dY0AfCwh3LqQ-Bv1xg"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "continuationItemRenderer": {
+                        "trigger": "CONTINUATION_TRIGGER_ON_ITEM_SHOWN",
+                        "continuationEndpoint": {
+                          "continuationCommand": {
+                            "token": "reduced-watch-continuation-token"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "engagementPanels": [
+      {
+        "engagementPanelSectionListRenderer": {
+          "content": {
+            "structuredDescriptionContentRenderer": {
+              "items": [
+                {
+                  "reelShelfRenderer": {
+                    "title": {
+                      "runs": [
+                        {
+                          "text": "Shorts remixing this video"
+                        }
+                      ]
+                    },
+                    "items": [
+                      {
+                        "shortsLockupViewModel": {
+                          "entityId": "shorts-shelf-item-_NsY2tXTveU",
+                          "accessibilityText": "Prepared a Big Tasty better than McDonald's | How to make a tasty burger at home, 13 crore views - play Short",
+                          "onTap": {
+                            "innertubeCommand": {
+                              "reelWatchEndpoint": {
+                                "videoId": "_NsY2tXTveU"
+                              }
+                            }
+                          },
+                          "overlayMetadata": {
+                            "primaryText": {
+                              "content": "Prepared a Big Tasty better than McDonald's | How to make a tasty burger at home"
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "shortsLockupViewModel": {
+                          "entityId": "shorts-shelf-item-lJ4Ty2Xos08",
+                          "accessibilityText": "the most FUN WATERMELON project, 9.3 crore views - play Short",
+                          "onTap": {
+                            "innertubeCommand": {
+                              "reelWatchEndpoint": {
+                                "videoId": "lJ4Ty2Xos08"
+                              }
+                            }
+                          },
+                          "overlayMetadata": {
+                            "primaryText": {
+                              "content": "the most FUN WATERMELON project"
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}

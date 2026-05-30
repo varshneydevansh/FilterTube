@@ -1,0 +1,84 @@
+<!--
+Reduced from ignored raw capture: YTM-DOM.html
+Surface: YouTube Music search DOM video card
+Purpose: Preserve one minimal YTM DOM selector guardrail. This fixture proves a
+YTM video card can expose a canonical /channel/UC... owner link, a video id,
+the native ytm-menu-renderer action menu, and FilterTube quick-block anchoring
+inside the same card. It is evidence only; it is not release/runtime input.
+-->
+<ytm-video-with-context-renderer
+  class="item adaptive-feed-item filtertube-quick-block-host filtertube-quick-block-anchor"
+  data-filtertube-quick-force="true"
+  data-filtertube-quick-events="true">
+  <ytm-media-item>
+    <a
+      href="/watch?v=nUwTnJ8yFXY&amp;pp=ygUKbGl0dGxlIGJpZw%3D%3D"
+      class="media-item-thumbnail-container"
+      aria-haspopup="false"
+      aria-hidden="true">
+      <ytm-thumbnail-cover class="video-thumbnail-container-large center not-rendered-from-rich-item rounded-thumbnail">
+        <img
+          alt=""
+          class="ytCoreImageHost cover video-thumbnail-img ytCoreImageFillParentHeight ytCoreImageFillParentWidth ytCoreImageContentModeScaleAspectFill ytCoreImageLoaded"
+          src="https://i.ytimg.com/vi_webp/nUwTnJ8yFXY/mqdefault.webp">
+        <ytm-thumbnail-overlay-time-status-renderer class="videoThumbnailGroupTimeStatus" data-style="DEFAULT">
+          <badge-shape class="yt-badge-shape yt-badge-shape--thumbnail-default yt-badge-shape--thumbnail-badge yt-badge-shape--typography">
+            <div class="yt-badge-shape__text">3:10</div>
+          </badge-shape>
+        </ytm-thumbnail-overlay-time-status-renderer>
+      </ytm-thumbnail-cover>
+    </a>
+    <div class="details">
+      <div class="media-channel">
+        <ytm-channel-thumbnail-with-link-renderer class="YtmChannelThumbnailWithLinkRendererHost">
+          <a href="/channel/UCu7TZ_ATWgjgD9IrNLdnYDA" aria-haspopup="false">
+            <ytm-profile-icon class="ytProfileIconHost YtmChannelThumbnailWithLinkRendererIcon">
+              <img
+                alt="Go to channel Little Big"
+                class="ytProfileIconImage"
+                src="https://yt3.ggpht.com/KMPPqo0s20TZ3_7R4hpxPF_cfG9CjU_gQRZL1VItoK2N-bPBpf1VWJ96qiyVc5LuTUnpSo3qQA=s88-c-k-c0x00ffffff-no-rj">
+            </ytm-profile-icon>
+          </a>
+        </ytm-channel-thumbnail-with-link-renderer>
+        <a
+          href="/watch?v=nUwTnJ8yFXY&amp;pp=ygUKbGl0dGxlIGJpZw%3D%3D"
+          class="media-item-extra-endpoint"
+          aria-haspopup="false"
+          aria-hidden="true"></a>
+      </div>
+      <div class="media-item-info cbox" no-channel-avatar="false">
+        <div class="media-item-metadata">
+          <a href="/watch?v=nUwTnJ8yFXY&amp;pp=ygUKbGl0dGxlIGJpZw%3D%3D" aria-haspopup="false">
+            <h3 class="media-item-headline">
+              <span
+                class="yt-core-attributed-string"
+                aria-label="LITTLE BIG - TACOS (Official Music Video) by Little Big 24,16,62,162 views 5 years ago 3 minutes, 10 seconds"
+                role="text">LITTLE BIG - TACOS (Official Music Video)</span>
+            </h3>
+            <ytm-badge-and-byline-renderer class="YtmBadgeAndBylineRendererHost" data-is-all-badges="">
+              <span class="YtmBadgeAndBylineRendererItemByline small-text" dir="auto" aria-hidden="true">
+                <span class="yt-core-attributed-string">Little Big</span>
+              </span>
+              <span class="YtmBadgeAndBylineRendererSeparator" aria-hidden="true">•</span>
+              <span class="YtmBadgeAndBylineRendererItemByline small-text" dir="auto" aria-hidden="true">
+                <span class="yt-core-attributed-string" aria-label="24 crore views" role="text">24 crore views</span>
+              </span>
+            </ytm-badge-and-byline-renderer>
+          </a>
+        </div>
+        <ytm-menu-renderer class="media-item-menu">
+          <ytm-menu>
+            <button class="icon-button" aria-label="Action menu" aria-haspopup="true"></button>
+          </ytm-menu>
+        </ytm-menu-renderer>
+      </div>
+    </div>
+  </ytm-media-item>
+  <div class="filtertube-quick-block-wrap" data-open="false">
+    <button
+      class="filtertube-quick-block-btn"
+      type="button"
+      aria-label="Quick block all channels on this card"
+      title="Quick block all channels on this card">x</button>
+  </div>
+</ytm-video-with-context-renderer>

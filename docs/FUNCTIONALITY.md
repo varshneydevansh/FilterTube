@@ -78,7 +78,10 @@ The next release-facing checkpoint is staged in `data/release_notes.json` instea
 
 - **Blocklist Mode (Default)**: Traditional filtering - hide content matching blocked channels/keywords
 - **Whitelist Mode (v3.2.5)**: Hide all content except content matching whitelisted channels/keywords
-- **Video Filtering**: Filters videos by title keywords before rendering
+- **Video Filtering**: Filters videos by title keywords through JSON-first and
+  DOM fallback paths when the current route exposes enough text/identity; this
+  is not a blanket guarantee that every YouTube renderer is filtered before
+  first paint.
 - **Channel Filtering**: Blocks/allows content from specific channels using @handles, channel IDs, or channel names
 - **Comments Filtering**: Removes comment sections entirely when hideAllComments is enabled
 - **Shorts Filtering**: Blocks YouTube Shorts content when hideAllShorts is enabled
@@ -291,7 +294,7 @@ YouTube JSON Data → FilterTubeEngine.processData() → Filtered Data → YouTu
 - Popup search bars (keywords/channels/content controls) now align to full row width; add buttons sit beside matching-sized inputs.
 - Content control rows in popup hide descriptions for compactness; tab view keeps descriptions as title-only tooltips (hover the title text).
 - Pills/chips: Exact = whole-term matching; Comment is opt-in per keyword and makes that keyword also match comment text; Filter All creates a linked channel-derived Exact keyword from channel state. C/E round chips mirror popup pills.
-- Proactive XHR interception provides instant channel names in 3-dot menus, eliminating "Fetching..." delays.
+- Proactive XHR interception reduces "Fetching..." delays in 3-dot menus when channel identity was already harvested, mapped, or stamped; weak targets can still enter resolver or failure paths.
 - Badges match row tinting: green = From Channel, brown = From Comments, yellow = Collaboration rows, pink = From Kids.
 - If the active profile is PIN-protected and still locked, the popup header `Enabled / Disabled` control is read-only and cannot pause filtering until the profile is unlocked.
 - Semantic ML is a disabled/future surface until runtime matching is implemented; it should not be presented as an active filter.

@@ -112,6 +112,24 @@
         return Array.from(seen.values());
     }
 
+    function normalizeMainProfileAliasFields(main) {
+        const out = { ...safeObject(main) };
+        const mode = normalizeString(out.mode) === 'whitelist' ? 'whitelist' : 'blocklist';
+        out.mode = mode;
+        out.channels = safeArray(out.channels);
+        out.keywords = safeArray(out.keywords);
+        out.whitelistChannels = safeArray(out.whitelistChannels);
+        out.whitelistKeywords = safeArray(out.whitelistKeywords);
+        if (mode === 'blocklist') {
+            out.blockedChannels = out.channels;
+            out.blockedKeywords = out.keywords;
+        } else {
+            out.blockedChannels = [];
+            out.blockedKeywords = [];
+        }
+        return out;
+    }
+
     function cloneJson(value) {
         return JSON.parse(JSON.stringify(value));
     }
@@ -192,23 +210,25 @@
 
         if (scope === 'main') {
             const currentMain = safeObject(activeProfile.main);
-            const nextMain = {
+            const incomingChannels = Array.isArray(data.channels) ? data.channels : data.blockedChannels;
+            const incomingKeywords = Array.isArray(data.keywords) ? data.keywords : data.blockedKeywords;
+            const nextMain = normalizeMainProfileAliasFields({
                 ...currentMain,
                 ...data,
                 mode: normalizeString(data.mode) === 'whitelist' ? 'whitelist' : (currentMain.mode === 'whitelist' ? 'whitelist' : 'blocklist'),
                 channels: replace
-                    ? safeArray(data.channels)
-                    : mergeChannelLists(currentMain.channels, data.channels),
+                    ? safeArray(incomingChannels)
+                    : mergeChannelLists(currentMain.channels, incomingChannels),
                 keywords: replace
-                    ? normalizeKeywordList(data.keywords)
-                    : mergeKeywordLists(currentMain.keywords, data.keywords),
+                    ? normalizeKeywordList(incomingKeywords)
+                    : mergeKeywordLists(currentMain.keywords, incomingKeywords),
                 whitelistChannels: replace
                     ? safeArray(data.whitelistChannels)
                     : mergeChannelLists(currentMain.whitelistChannels, data.whitelistChannels),
                 whitelistKeywords: replace
                     ? normalizeKeywordList(data.whitelistKeywords)
                     : mergeKeywordLists(currentMain.whitelistKeywords, data.whitelistKeywords)
-            };
+            });
 
             profiles[resolvedTargetProfileId] = {
                 ...activeProfile,

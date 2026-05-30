@@ -1,0 +1,184 @@
+{
+  "provenance": {
+    "source": "YTM.json",
+    "sourceSha256": "9eacd68076c85f2c0eb218ddafbd543d631dfc26ac6f761f4611bc7eb0991e8d",
+    "sourceBytes": 1312137,
+    "sourceLogicalLines": 17335,
+    "sourceNewlineCount": 17334,
+    "rawShape": "mixed direct JSON fragments plus prose separators",
+    "rootPath": "standalone fragments 3-5",
+    "fixtureKind": "json",
+    "surface": "YTM mobile watch playlist panel JSON",
+    "route": "watch",
+    "rendererType": "ytmWatchPlaylistPanelJsonFragments",
+    "rendererTypes": [
+      "playlistPanelVideoRenderer"
+    ],
+    "fragmentStartLines": [
+      16070,
+      16284,
+      16498
+    ],
+    "selectedRendererIndexes": [
+      0,
+      1,
+      2
+    ],
+    "selectedRendererVideoIds": [
+      "1U6WY_z8Vu8",
+      "xRQnJyP77tY",
+      "75NRE2KB8jc"
+    ],
+    "domVisibleSiblingVideoId": "75NRE2KB8jc",
+    "domSelectedHiddenVideoIdMissingFromJson": "NLDFEkIvcbc",
+    "omittedRawFields": "thumbnails, tracking params, color palettes, menus, raw non-ASCII title text, and unrelated JSON fragments"
+  },
+  "response": {
+    "contents": [
+      {
+        "playlistPanelVideoRenderer": {
+          "videoId": "1U6WY_z8Vu8",
+          "selected": false,
+          "title": {
+            "runs": [
+              {
+                "text": "Angelina Jordan - Love Don't Let Me Go (Visualizer)"
+              }
+            ]
+          },
+          "shortBylineText": {
+            "runs": [
+              {
+                "text": "Angelina Jordan Official",
+                "navigationEndpoint": {
+                  "commandMetadata": {
+                    "webCommandMetadata": {
+                      "url": "/channel/UC1Pwa4nFvIPbtYVLcBGDpjA",
+                      "webPageType": "WEB_PAGE_TYPE_CHANNEL",
+                      "rootVe": 3611,
+                      "apiUrl": "/youtubei/v1/browse"
+                    }
+                  },
+                  "browseEndpoint": {
+                    "browseId": "UC1Pwa4nFvIPbtYVLcBGDpjA",
+                    "canonicalBaseUrl": "/channel/UC1Pwa4nFvIPbtYVLcBGDpjA"
+                  }
+                }
+              }
+            ]
+          },
+          "navigationEndpoint": {
+            "watchEndpoint": {
+              "videoId": "1U6WY_z8Vu8",
+              "playlistId": "RD7SAX2P1vXDc",
+              "index": 9
+            }
+          },
+          "lengthText": {
+            "runs": [
+              {
+                "text": "3:28"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "playlistPanelVideoRenderer": {
+          "videoId": "xRQnJyP77tY",
+          "selected": false,
+          "title": {
+            "runs": [
+              {
+                "text": "AC/DC - Shoot To Thrill (Iron Man 2 Version)"
+              }
+            ]
+          },
+          "shortBylineText": {
+            "runs": [
+              {
+                "text": "AC/DC",
+                "navigationEndpoint": {
+                  "commandMetadata": {
+                    "webCommandMetadata": {
+                      "url": "/channel/UCB0JSO6d5ysH2Mmqz5I9rIw",
+                      "webPageType": "WEB_PAGE_TYPE_CHANNEL",
+                      "rootVe": 3611,
+                      "apiUrl": "/youtubei/v1/browse"
+                    }
+                  },
+                  "browseEndpoint": {
+                    "browseId": "UCB0JSO6d5ysH2Mmqz5I9rIw",
+                    "canonicalBaseUrl": "/channel/UCB0JSO6d5ysH2Mmqz5I9rIw"
+                  }
+                }
+              }
+            ]
+          },
+          "navigationEndpoint": {
+            "watchEndpoint": {
+              "videoId": "xRQnJyP77tY",
+              "playlistId": "RD7SAX2P1vXDc",
+              "index": 10
+            }
+          },
+          "lengthText": {
+            "runs": [
+              {
+                "text": "3:28"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "playlistPanelVideoRenderer": {
+          "videoId": "75NRE2KB8jc",
+          "selected": false,
+          "title": {
+            "runs": [
+              {
+                "text": "Nyusha - Zanovo (Mood Video)"
+              }
+            ]
+          },
+          "shortBylineText": {
+            "runs": [
+              {
+                "text": "NYUSHA MUSIC",
+                "navigationEndpoint": {
+                  "commandMetadata": {
+                    "webCommandMetadata": {
+                      "url": "/channel/UCm9VWKAFz0aXpuEHPHMae7w",
+                      "webPageType": "WEB_PAGE_TYPE_CHANNEL",
+                      "rootVe": 3611,
+                      "apiUrl": "/youtubei/v1/browse"
+                    }
+                  },
+                  "browseEndpoint": {
+                    "browseId": "UCm9VWKAFz0aXpuEHPHMae7w",
+                    "canonicalBaseUrl": "/channel/UCm9VWKAFz0aXpuEHPHMae7w"
+                  }
+                }
+              }
+            ]
+          },
+          "navigationEndpoint": {
+            "watchEndpoint": {
+              "videoId": "75NRE2KB8jc",
+              "playlistId": "RD7SAX2P1vXDc",
+              "index": 11
+            }
+          },
+          "lengthText": {
+            "runs": [
+              {
+                "text": "3:35"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

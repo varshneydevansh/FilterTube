@@ -2,9 +2,9 @@
 
 ## Overview
 
-FilterTube shifted from a **reactive** (on-demand) to a **proactive** channel identity strategy. Instead of waiting for a 3-dot menu click to fetch channel details, we now intercept YouTube's XHR JSON responses, extract channel identity immediately, and broadcast it across worlds. This enables instant blocking and eliminates network latency for most operations.
+FilterTube shifted from a **reactive** (on-demand) to a **proactive** channel identity strategy. Instead of waiting for every 3-dot menu click to fetch channel details, we intercept YouTube's XHR JSON responses, extract channel identity when the payload exposes it, and broadcast it across worlds. This enables fast blocking on many cards and reduces network latency for most operations, while still preserving fallback resolvers for video-id-only or weak-identity surfaces.
 
-**Performance Enhancement (v3.2.1):** The proactive system now leverages compiled caching and async processing, reducing CPU usage by 60-80% and eliminating UI lag during heavy filtering operations. Batched storage updates minimize I/O overhead by 70-90%.
+**Historical performance note (v3.2.1):** Compiled caching, async processing, and batched storage updates were added to reduce CPU and I/O pressure. Earlier release notes used "60-80%" CPU, "70-90%" I/O, and "eliminating UI lag" language; those are historical estimates, not current proof. Any concrete performance claim now requires a `performanceClaimAuthority` measurement with route, browser/device, rule-state, sample-size, and artifact evidence.
 
 **Channel Stamping Improvements (v3.2.5):** Enhanced DOM stamping with mode-aware data attributes and improved channel ID visibility on homepage Shorts and other surfaces.
 
@@ -17,14 +17,14 @@ FilterTube shifted from a **reactive** (on-demand) to a **proactive** channel id
 - **Kids unreliability**: Network fetches often failed on YouTube Kids
 
 ### Proactive benefits (v3.2.1)
-- **Zero-delay blocking**: 3-dot menus show correct channel names instantly
+- **Fast blocking on proven identity**: 3-dot menus can show correct channel names instantly when JSON/maps/DOM already provide enough identity
 - **Network reduction**: Most identity comes from intercepted JSON, not page fetches
-- **Consistent UI**: All surfaces get the same rich metadata (name, handle, logo, UC ID)
-- **Kids safety**: Zero-network design works reliably on YouTube Kids
+- **More consistent UI**: Surfaces can share harvested metadata (name, handle, logo, UC ID) through learned maps, but not every surface exposes all fields immediately
+- **Kids safety goal**: JSON and learned-map identity should avoid network work on YouTube Kids whenever possible. Current behavior still includes a background Kids watch fallback after stored/session/pending identity checks when a Kids watch surface only exposes a video id.
 
 ## Network Snapshot Stashing (v3.2.1)
 
-FilterTube v3.2.1 implements a comprehensive network snapshot stashing system that captures and caches YouTube's JSON responses for instant channel identity extraction.
+FilterTube v3.2.1 implements a comprehensive network snapshot stashing system that captures and caches YouTube's JSON responses for early channel identity extraction when the response contains the required fields.
 
 ### Snapshot Architecture
 
@@ -110,9 +110,10 @@ function searchYtInitialDataForVideoChannel(videoId, expectations = {}) {
 **Resolution priority:**
 1. **Stashed network responses** (most recent, highest reliability)
 2. **Page globals** (ytInitialData, ytInitialPlayerResponse)
-3. **Fallback fetch** (watch/shorts pages)
-4. **OG meta extraction** (HTML parsing)
-5. **DOM extraction** (data attributes)
+3. **Learned maps** (`channelMap`, `videoChannelMap`, `videoMetaMap`)
+4. **DOM extraction** (data attributes and visible-card context)
+5. **Fallback fetch** (watch/shorts/Kids/channel pages after cache/map checks)
+6. **OG/meta extraction** (HTML parsing inside fetched fallback documents)
 
 ## Architecture Diagram
 
@@ -135,7 +136,7 @@ sequenceDiagram
     Main->>Isolated: postMessage(FilterTube_UpdateVideoChannelMap)
     Isolated->>Isolated: stampChannelIdentity()
     Isolated->>DOM: set data-filtertube-*
-    DOM->>DOM: 3-dot menu shows correct name instantly
+    DOM->>DOM: 3-dot menu uses stamped identity when available
 ```
 
 ## Waterfall Flow (ASCII)
@@ -163,19 +164,21 @@ sequenceDiagram
    ↓
 7. Isolated World stamps DOM cards with data-filtertube-*
    ↓
-8. 3-dot menus render instantly with correct names
+8. 3-dot menus render from stamped identity when enough UC/handle/name data is
+   already known
    ↓
-9. Network fetch only if JSON lacked identity (rare)
+9. Background resolver only if JSON/player/maps/DOM lacked enough identity for the active action
 ```
 
 ## Data Sources by Priority
 
 | Priority | Source | World | What we get | When it's used |
 |----------|--------|-------|-------------|----------------|
-| 1 | XHR JSON interception | Main | UC ID, handle, name, logo, collaborators | Always (primary) |
-| 2 | ytInitial* snapshots | Main | Same as above, but from page globals | Fallback |
-| 3 | DOM extraction | Isolated | Best-effort from visible elements | Rare |
-| 4 | Network fetch | Background | Full page scrape (last resort) | Very rare |
+| 1 | XHR JSON interception | Main | UC ID, handle, name, logo, collaborators when present in the payload | Preferred first evidence tier for endpoint data, not proof that every visible card is complete before render |
+| 2 | ytInitial* snapshots | Main | Same classes of identity when present in page globals | Secondary page-global evidence tier when endpoint snapshots are absent or incomplete |
+| 3 | Learned maps | Background + content | `channelMap`, `videoChannelMap`, `videoMetaMap` persisted from previous JSON/player/DOM proof | First-class bridge between JSON and later DOM/menu actions |
+| 4 | DOM extraction | Isolated | Best-effort from visible elements | Visible-card fallback/enrichment |
+| 5 | Network fetch | Background | Watch/Shorts/Kids/channel page resolver after cache/map checks | Last resort; not globally budgeted yet |
 
 ## Cross-World Messaging Protocol
 
@@ -225,29 +228,32 @@ window.postMessage({
 - **XHR source**: `/youtubei/v1/browse` and `/youtubei/v1/next`
 - **Extraction**: `lockupViewModel` → UC ID, handle, name, logo
 - **Collaborations**: `avatarStackViewModel` + `showDialogCommand`
-- **Result**: Instant multi-channel menus, no "Fetching..." delays
+- **Result**: Fast multi-channel menus when the roster is present in
+  JSON/maps/DOM; otherwise the menu can still enter a resolver/failure path.
 
 ### Search Results
 - **XHR source**: `/youtubei/v1/search`
 - **Extraction**: `videoRenderer` → full channel metadata
 - **Collaborations**: Same as Home
-- **Result**: Search results appear pre-stamped
+- **Result**: Search results can be stamped early when the search payload carries complete renderer identity; unresolved or delayed rows still use the normal waterfall.
 
 ### Watch Page (Right Rail)
 - **XHR source**: `/youtubei/v1/next` (up next feed)
 - **Extraction**: `lockupViewModel` in watch-next-feed
 - **Collaborations**: Full collaborator lists from XHR
-- **Result**: Watch page collaborators load instantly
+- **Result**: Watch page collaborators load quickly when the `/next` payload
+  exposes the roster; hidden or delayed sheet/dialog rosters still require
+  recovery.
 
 ### Shorts Shelf
 - **XHR source**: `/youtubei/v1/next` and `/youtubei/v1/reel`
 - **Extraction**: `reelWatchEndpoint` + owner fields
-- **Result**: Shorts cards show correct names without page fetch
+- **Result**: Shorts cards use learned video-id mappings when available; video-id-only Shorts can still need player/map/resolver proof before channel-accurate blocking.
 
 ### YouTube Kids
-- **XHR source**: Same endpoints, but Kids-specific payloads
-- **Network policy**: `skipNetwork: true` everywhere
-- **Result**: Zero-network blocking works reliably
+- **XHR source**: Same endpoint family, but Kids-specific payloads and renderer owner extensions
+- **Network policy**: prefer Kids JSON/maps and page-context `skipNetwork` paths, with a guarded background Kids watch fallback after cache/map checks
+- **Result**: Kids blocking should avoid network when current data proves identity, but zero-network behavior is not guaranteed by current source
 
 ## Implementation Details
 
@@ -286,7 +292,7 @@ _extractChannelInfo(item, rules) {
 }
 ```
 
-### 3. Instant Stamping (`content_bridge.js`)
+### 3. Fast Stamping When Identity Is Proven (`content_bridge.js`)
 
 ```javascript
 function handleMainWorldMessages(event) {
@@ -296,7 +302,7 @@ function handleMainWorldMessages(event) {
         for (const entry of payload) {
             const { videoId, channelId } = entry;
             
-            // Stamp all matching cards immediately
+            // Stamp all matching cards after a trusted video -> channel map arrives
             const cards = document.querySelectorAll(
                 `[data-filtertube-video-id="${videoId}"]`
             );
@@ -502,7 +508,7 @@ graph TD
 
 ## Enhanced Fallback Strategies (v3.2.1)
 
-The proactive system includes comprehensive fallback strategies to ensure channel identity is always resolved, even when primary sources fail.
+The proactive system includes fallback strategies to improve identity resolution when primary sources fail. These paths can still return null, `not_found`, or failure when YouTube does not expose enough reliable identity.
 
 ### OG Meta Tag Extraction
 
@@ -601,7 +607,7 @@ if (!channelInfo.success && effectiveVideoId) {
 - Primary identity comes from XHR interception
 - Multiple snapshot sources available
 - Enhanced error handling and CORS support
-- **Blocking**: Works instantly via UC ID
+- **Blocking**: Works instantly when a stable UC ID or trusted alias/map is already known
 
 ## Fallback Scenarios
 
@@ -613,7 +619,7 @@ if (!channelInfo.success && effectiveVideoId) {
 ### Fallback strategy
 1. Check `ytInitialData` snapshots
 2. Extract from DOM (best-effort)
-3. Network fetch (last resort, skipped on Kids)
+3. Network fetch (last resort; Kids watch still has a guarded background fallback after cache/map checks)
 
 ## Performance Impact
 
@@ -623,9 +629,9 @@ if (!channelInfo.success && effectiveVideoId) {
 - Inconsistent UI states
 
 ### After (Proactive)
-- 0-1 network requests per blocked channel
-- <50ms menu updates (instant)
-- Consistent UI across surfaces
+- Usually fewer network requests per blocked channel because JSON/maps are checked first
+- Fast menu updates when identity was already harvested or stamped
+- More consistent UI across surfaces, with route-specific fallback behavior where identity is incomplete
 
 ## Debugging
 
@@ -640,7 +646,7 @@ FilterTube: Stamped 3 cards with videoId=abc123
 ### Common issues
 - **Missing collaborator data**: Check if `avatarStackViewModel` extraction needs updates
 - **Stale card attributes**: Verify `resetCardIdentityIfStale` is running
-- **Network spam**: Ensure `skipNetwork: true` on Kids
+- **Network spam**: Confirm whether the path is page-context `skipNetwork`, background Kids watch fallback, handle repair, post-block enrichment, or another resolver before changing behavior
 
 ## Future Enhancements
 
@@ -659,7 +665,8 @@ FilterTube: Stamped 3 cards with videoId=abc123
 ### From v3.1.7 to v3.2.1
 - No breaking changes to storage format
 - Existing `channelMap` and `videoChannelMap` remain compatible
-- UI behavior is now instant instead of delayed
+- UI behavior is faster on proven identity, but weak or video-id-only surfaces
+  can still need resolver work before a stable channel rule is saved.
 
 ### Developer impact
 - Add new XHR endpoints to `stashNetworkSnapshot()` if needed

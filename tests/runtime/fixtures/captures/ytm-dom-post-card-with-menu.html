@@ -1,0 +1,74 @@
+<!--
+Source: YTM-DOM.html
+Reduced fixture: mobile YouTube Music/Home-style community post card with native action menu.
+Purpose: prove post/backstage DOM menu boundaries before changing FilterTube post menu insertion.
+-->
+<ytm-rich-section-renderer style="--rich-section-dismissal-margin: 16px;">
+  <div class="rich-section-content">
+    <ytm-backstage-post-thread-renderer class="ytmBackstagePostThreadRendererHost">
+      <ytm-backstage-post-renderer class="ytmBackstagePostRendererHost">
+        <yt-post-header class="ytPostHeaderHost">
+          <a href="/@MajorAlex" aria-haspopup="false">
+            <ytm-profile-icon class="ytProfileIconHost ytPostHeaderHostAuthorThumbnail">
+              <img
+                alt=""
+                class="ytProfileIconImage"
+                src="//yt3.googleusercontent.com/aRmipfpbqwiLUMdwoAZtQVgTCPlRovcyrxMn-UvxkkPBfCKBuAdanmBP4116SlNjLHAmhPF-=s32-c-k-c0x00ffffff-no-rj-mo">
+            </ytm-profile-icon>
+          </a>
+          <a href="/@MajorAlex" class="ytPostHeaderHostHeaderAuthor" aria-haspopup="false">
+            <div class="ytPostHeaderHostAuthorText">
+              <span class="yt-core-attributed-string yt-core-attributed-string--white-space-pre-wrap yt-core-attributed-string--link-inherit-color">
+                <a
+                  class="yt-core-attributed-string__link yt-core-attributed-string__link--call-to-action-color yt-core-attributed-string--link-inherit-color"
+                  tabindex="0"
+                  href="/@MajorAlex"
+                  force-new-state="true">Major Alex</a>
+              </span>
+            </div>
+            <div class="ytPostHeaderHostPublishedTimeText">
+              <span class="yt-core-attributed-string yt-core-attributed-string--white-space-pre-wrap yt-core-attributed-string--link-inherit-color">
+                <a
+                  class="yt-core-attributed-string__link yt-core-attributed-string__link--call-to-action-color yt-core-attributed-string--link-inherit-color"
+                  tabindex="0"
+                  href="/post/UgkxP4-pkY-qukYP5m8oOWMIRwgfR5AwGCEM"
+                  force-new-state="true">1 day ago</a>
+              </span>
+            </div>
+          </a>
+          <div class="ytPostHeaderHostActionMenu">
+            <ytm-bottom-sheet-renderer>
+              <button
+                class="yt-spec-button-shape-next yt-spec-button-shape-next--text yt-spec-button-shape-next--mono yt-spec-button-shape-next--size-l yt-spec-button-shape-next--icon-button"
+                title=""
+                aria-label="Action menu">
+                <div aria-hidden="true" class="yt-spec-button-shape-next__icon">
+                  <c3-icon fill-icon="false" style="width: 24px; height: 24px;">
+                    <span class="yt-icon-shape ytSpecIconShapeHost">
+                      <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" focusable="false" aria-hidden="true">
+                        <path d="M12 4a2 2 0 100 4 2 2 0 000-4Zm0 6a2 2 0 100 4 2 2 0 000-4Zm0 6a2 2 0 100 4 2 2 0 000-4Z"></path>
+                      </svg>
+                    </span>
+                  </c3-icon>
+                </div>
+              </button>
+            </ytm-bottom-sheet-renderer>
+          </div>
+        </yt-post-header>
+        <div class="ytmBackstagePostRendererHostContentText">
+          <truncated-text class="yt-truncated-text yt-truncated-text--large-text yt-truncated-text--primary-text">
+            <truncated-text-content class="yt-truncated-text__truncated-text-content">
+              <span class="yt-core-attributed-string yt-core-attributed-string--white-space-pre-wrap" role="text">Guess Who was that Dude with Epstein?</span>
+            </truncated-text-content>
+          </truncated-text>
+        </div>
+        <ytm-backstage-image-renderer class="ytmBackstageImageRendererHost ytmBackstagePostRendererHostSingleImageAttachment ytmBackstageImageRendererHostPostImageContainerCropped">
+          <img
+            alt=""
+            class="ytCoreImageHost ytmBackstageImageRendererHostPostImage ytCoreImageFillParentHeight ytCoreImageFillParentWidth ytCoreImageContentModeScaleToFill ytCoreImageLoaded"
+            src="https://yt3.ggpht.com/Lgy9dywRQxPBVIxxenVK54k4XCWcHZdPz_9wJHMd8tlr9i57Y3z98zNatSob4M22wggI01d6qjYDPlg=s2048-rw-nd-v1">
+        </ytm-backstage-image-renderer>
+      </ytm-backstage-post-renderer>
+    </ytm-backstage-post-thread-renderer>
+  </div>
+</ytm-rich-section-renderer>

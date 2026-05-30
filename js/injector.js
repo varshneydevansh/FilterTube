@@ -145,6 +145,49 @@
     // Cache for collaboration data from filter_logic.js
     var collaboratorCache = new Map(); // videoId -> collaborators array
 
+    function hasList(value) {
+        return Array.isArray(value) && value.length > 0;
+    }
+
+    function hasEnabledContentFilters(settings) {
+        return Boolean(
+            settings
+            && settings.contentFilters
+            && (
+                settings.contentFilters.duration?.enabled === true
+                || settings.contentFilters.uploadDate?.enabled === true
+                || settings.contentFilters.uppercase?.enabled === true
+            )
+        );
+    }
+
+    function hasSelectedCategoryFilters(settings) {
+        return Boolean(
+            settings?.categoryFilters?.enabled === true
+            && hasList(settings.categoryFilters.selected)
+        );
+    }
+
+    function hasActiveJsonFilterRules(settings) {
+        return Boolean(
+            settings
+            && (
+                hasList(settings.filterKeywords)
+                || hasList(settings.filterChannels)
+                || hasList(settings.filterKeywordsComments)
+                || settings.hideAllComments === true
+                || settings.hideAllShorts === true
+                || hasSelectedCategoryFilters(settings)
+            )
+        );
+    }
+
+    function hasNetworkJsonWork(settings) {
+        if (!settings || settings.enabled === false) return false;
+        if (settings.listMode === 'whitelist') return true;
+        return hasEnabledContentFilters(settings) || hasActiveJsonFilterRules(settings);
+    }
+
     const HANDLE_TERMINATOR_REGEX = /[\/\s?#"'<>\u2022\u00B7]/;
     function extractRawHandle(value) {
         const sharedExtractRawHandle = window.FilterTubeIdentity?.extractRawHandle;
@@ -1228,7 +1271,7 @@
 
     function logSubscriptionsImport(stage, payload = {}) {
         try {
-            console.log('FilterTube Subscriptions Import:', {
+            postLog('log', 'FilterTube Subscriptions Import:', {
                 stage,
                 ...payload
             });
@@ -1894,6 +1937,10 @@
             updateSeedSettings();
 
             // Process any queued data
+            if (!hasNetworkJsonWork(currentSettings)) {
+                initialDataQueue = [];
+                return;
+            }
             processInitialDataQueue();
         }
 
@@ -2914,7 +2961,7 @@
                         if (canonicalBaseUrl) {
                             const handle = extractRawHandle(canonicalBaseUrl) || null;
                             if (handle) {
-                                console.log('FilterTube: Found channel in ytInitialData (deep search):', { handle, id: browseId });
+                                postLog('log', 'Found channel in ytInitialData (deep search):', { handle, id: browseId });
                                 const candidate = mergeChannelCandidates({ handle, id: browseId, name }, sheetCandidate);
                                 if (!hasExpectations || matchesExpectations(candidate)) {
                                     return candidate;
@@ -3362,6 +3409,10 @@
         }
 
         try {
+            if (!hasNetworkJsonWork(currentSettings)) {
+                postLog('log', `No active JSON work for ${dataName}; passing through injector hook`);
+                return data;
+            }
             postLog('log', `Processing ${dataName} with FilterTubeEngine`);
             const result = window.FilterTubeEngine.processData(data, currentSettings, dataName);
             postLog('log', `${dataName} processed successfully`);
@@ -3376,6 +3427,12 @@
     function processInitialDataQueue() {
         if (!settingsReceived || !window.FilterTubeEngine) {
             postLog('log', `Queue processing delayed - Settings: ${settingsReceived}, Engine: ${!!window.FilterTubeEngine}`);
+            return;
+        }
+
+        if (!hasNetworkJsonWork(currentSettings)) {
+            initialDataQueue = [];
+            postLog('log', 'No active JSON work; cleared queued injector data');
             return;
         }
 

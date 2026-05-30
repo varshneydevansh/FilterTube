@@ -1,0 +1,203 @@
+{
+  "provenance": {
+    "source": "yt_kids_latest.json",
+    "rendererType": "compactVideoRenderer",
+    "extractedBlockIndex": 0,
+    "extractedPath": "contents.kidsHomeScreenRenderer.anchors.0.anchoredSectionRenderer.content.sectionListRenderer.contents.0.itemSectionRenderer.contents.0.compactVideoRenderer",
+    "siblingBlockIndex": 1,
+    "siblingPath": "contents.kidsHomeScreenRenderer.anchors.0.anchoredSectionRenderer.content.sectionListRenderer.contents.0.itemSectionRenderer.contents.1.compactVideoRenderer",
+    "reduction": "Two adjacent Kids public-web compactVideoRenderer siblings with video ids, byline browse ids, KIDS_BLOCK menu endpoints, and kidsVideoOwnerExtension owner ids."
+  },
+  "response": {
+    "contents": {
+      "kidsHomeScreenRenderer": {
+        "anchors": [
+          {
+            "anchoredSectionRenderer": {
+              "title": "Recommended",
+              "content": {
+                "sectionListRenderer": {
+                  "contents": [
+                    {
+                      "itemSectionRenderer": {
+                        "contents": [
+                          {
+                            "compactVideoRenderer": {
+                              "videoId": "nGKm7EQ09rE",
+                              "title": {
+                                "runs": [
+                                  {
+                                    "text": "Make Way For Noddy Ep4 Noddy has a Visitor"
+                                  }
+                                ]
+                              },
+                              "longBylineText": {
+                                "runs": [
+                                  {
+                                    "text": "Noddy Official (English)",
+                                    "navigationEndpoint": {
+                                      "browseEndpoint": {
+                                        "browseId": "UCO0vPDAqN7BTK9kNAeP3sKw",
+                                        "canonicalBaseUrl": "/@Noddy"
+                                      }
+                                    }
+                                  }
+                                ]
+                              },
+                              "shortBylineText": {
+                                "runs": [
+                                  {
+                                    "text": "Noddy Official (English)",
+                                    "navigationEndpoint": {
+                                      "browseEndpoint": {
+                                        "browseId": "UCO0vPDAqN7BTK9kNAeP3sKw",
+                                        "canonicalBaseUrl": "/@Noddy"
+                                      }
+                                    }
+                                  }
+                                ]
+                              },
+                              "lengthText": {
+                                "runs": [
+                                  {
+                                    "text": "11:26"
+                                  }
+                                ]
+                              },
+                              "navigationEndpoint": {
+                                "watchEndpoint": {
+                                  "videoId": "nGKm7EQ09rE",
+                                  "startTimeSeconds": 23
+                                }
+                              },
+                              "menu": {
+                                "menuRenderer": {
+                                  "items": [
+                                    {
+                                      "menuServiceItemRenderer": {
+                                        "text": {
+                                          "runs": [
+                                            {
+                                              "text": "Block this video"
+                                            }
+                                          ]
+                                        },
+                                        "icon": {
+                                          "iconType": "KIDS_BLOCK"
+                                        },
+                                        "serviceEndpoint": {
+                                          "updateKidsBlacklistEndpoint": {
+                                            "items": [
+                                              {
+                                                "encryptedVideoId": "nGKm7EQ09rE",
+                                                "action": "BLOCKLIST_ACTION_BLOCK"
+                                              }
+                                            ]
+                                          }
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              },
+                              "kidsVideoOwnerExtension": {
+                                "externalChannelId": "UCO0vPDAqN7BTK9kNAeP3sKw"
+                              }
+                            }
+                          },
+                          {
+                            "compactVideoRenderer": {
+                              "videoId": "HgwlTY7M4og",
+                              "title": {
+                                "runs": [
+                                  {
+                                    "text": "Car Bike Game: McQueen and Indian Tractor"
+                                  }
+                                ]
+                              },
+                              "longBylineText": {
+                                "runs": [
+                                  {
+                                    "text": "MYLTIMYLT",
+                                    "navigationEndpoint": {
+                                      "browseEndpoint": {
+                                        "browseId": "UChhs18W6Mp4MSB3FskumnXw",
+                                        "canonicalBaseUrl": "/@myltimylt"
+                                      }
+                                    }
+                                  }
+                                ]
+                              },
+                              "shortBylineText": {
+                                "runs": [
+                                  {
+                                    "text": "MYLTIMYLT",
+                                    "navigationEndpoint": {
+                                      "browseEndpoint": {
+                                        "browseId": "UChhs18W6Mp4MSB3FskumnXw",
+                                        "canonicalBaseUrl": "/@myltimylt"
+                                      }
+                                    }
+                                  }
+                                ]
+                              },
+                              "lengthText": {
+                                "runs": [
+                                  {
+                                    "text": "7:48"
+                                  }
+                                ]
+                              },
+                              "navigationEndpoint": {
+                                "watchEndpoint": {
+                                  "videoId": "HgwlTY7M4og"
+                                }
+                              },
+                              "menu": {
+                                "menuRenderer": {
+                                  "items": [
+                                    {
+                                      "menuServiceItemRenderer": {
+                                        "text": {
+                                          "runs": [
+                                            {
+                                              "text": "Block this video"
+                                            }
+                                          ]
+                                        },
+                                        "icon": {
+                                          "iconType": "KIDS_BLOCK"
+                                        },
+                                        "serviceEndpoint": {
+                                          "updateKidsBlacklistEndpoint": {
+                                            "items": [
+                                              {
+                                                "encryptedVideoId": "HgwlTY7M4og",
+                                                "action": "BLOCKLIST_ACTION_BLOCK"
+                                              }
+                                            ]
+                                          }
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              },
+                              "kidsVideoOwnerExtension": {
+                                "externalChannelId": "UChhs18W6Mp4MSB3FskumnXw"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,165 @@
+{
+  "provenance": {
+    "source": "YT_MAIN_NEXT.json",
+    "sourceSha256": "8efea8f6fb83ad38847b12e05b07b04a00a4d8bd39e9046b562eb5522701f7bc",
+    "sourceBytes": 4218389,
+    "sourceLines": 53976,
+    "rawShape": "direct JSON /youtubei/v1/next reloadContinuationItemsCommand comment response",
+    "rootPath": "onResponseReceivedEndpoints",
+    "rendererType": "reloadModernCommentThreadRenderer",
+    "rendererTypes": [
+      "commentsHeaderRenderer",
+      "commentThreadRenderer",
+      "commentViewModel",
+      "continuationItemRenderer"
+    ],
+    "extractedPaths": [
+      "onResponseReceivedEndpoints[0].reloadContinuationItemsCommand.continuationItems[0].commentsHeaderRenderer",
+      "onResponseReceivedEndpoints[1].reloadContinuationItemsCommand.continuationItems[0].commentThreadRenderer",
+      "onResponseReceivedEndpoints[1].reloadContinuationItemsCommand.continuationItems[1].commentThreadRenderer",
+      "onResponseReceivedEndpoints[1].reloadContinuationItemsCommand.continuationItems[20].continuationItemRenderer"
+    ],
+    "releaseInputAllowed": false
+  },
+  "response": {
+    "responseContext": {
+      "serviceTrackingParams": [
+        {
+          "service": "CSI",
+          "params": [
+            {
+              "key": "c",
+              "value": "WEB"
+            }
+          ]
+        }
+      ]
+    },
+    "onResponseReceivedEndpoints": [
+      {
+        "clickTrackingParams": "CJQDEJPkBxgAIhMIgoix86GVkgMValadCR0NiC-2",
+        "reloadContinuationItemsCommand": {
+          "targetId": "comments-section",
+          "continuationItems": [
+            {
+              "commentsHeaderRenderer": {
+                "countText": {
+                  "runs": [
+                    {
+                      "text": "32,58,782"
+                    },
+                    {
+                      "text": " Comments"
+                    }
+                  ]
+                },
+                "sortMenu": {
+                  "sortFilterSubMenuRenderer": {
+                    "title": "Sort by"
+                  }
+                },
+                "trackingParams": "CJMDEMF1IhMIgoix86GVkgMValadCR0NiC-2"
+              }
+            }
+          ],
+          "slot": "RELOAD_CONTINUATION_SLOT_HEADER"
+        }
+      },
+      {
+        "clickTrackingParams": "CJIDEJPkBxgBIhMIgoix86GVkgMValadCR0NiC-2",
+        "reloadContinuationItemsCommand": {
+          "targetId": "comments-section",
+          "continuationItems": [
+            {
+              "commentThreadRenderer": {
+                "replies": {
+                  "commentRepliesRenderer": {
+                    "targetId": "comment-replies-item-UgzDXgm-fr-N5JK99f14AaABAg",
+                    "viewReplies": {
+                      "buttonRenderer": {
+                        "text": {
+                          "runs": [
+                            {
+                              "text": "122 replies"
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                },
+                "trackingParams": "CIoDEMJ1GMMCIhMIgoix86GVkgMValadCR0NiC-2",
+                "renderingPriority": "RENDERING_PRIORITY_UNKNOWN",
+                "isModeratedElqComment": false,
+                "commentViewModel": {
+                  "commentViewModel": {
+                    "commentKey": "EhpVZ3pEWGdtLWZyLU41Sks5OWYxNEFhQUJBZyAoKAE%3D",
+                    "commentId": "UgzDXgm-fr-N5JK99f14AaABAg",
+                    "allowProfileCard": true,
+                    "inlineRepliesKey": "empty_inline_replies"
+                  }
+                },
+                "loggingDirectives": {
+                  "trackingParams": "CIoDEMJ1GMMCIhMIgoix86GVkgMValadCR0NiC-2"
+                }
+              }
+            },
+            {
+              "commentThreadRenderer": {
+                "replies": {
+                  "commentRepliesRenderer": {
+                    "targetId": "comment-replies-item-UgyyyK520KB5LXsiteR4AaABAg",
+                    "viewReplies": {
+                      "buttonRenderer": {
+                        "text": {
+                          "runs": [
+                            {
+                              "text": "12 replies"
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                },
+                "trackingParams": "CIUDEMJ1GMQCIhMIgoix86GVkgMValadCR0NiC-2",
+                "renderingPriority": "RENDERING_PRIORITY_UNKNOWN",
+                "isModeratedElqComment": false,
+                "commentViewModel": {
+                  "commentViewModel": {
+                    "commentKey": "EhpVZ3l5eUs1MjBLQjVMWHNpdGVSNEFhQUJBZyAoKAE%3D",
+                    "commentId": "UgyyyK520KB5LXsiteR4AaABAg",
+                    "allowProfileCard": true,
+                    "inlineRepliesKey": "empty_inline_replies"
+                  }
+                },
+                "loggingDirectives": {
+                  "trackingParams": "CIUDEMJ1GMQCIhMIgoix86GVkgMValadCR0NiC-2"
+                }
+              }
+            },
+            {
+              "continuationItemRenderer": {
+                "trigger": "CONTINUATION_TRIGGER_ON_ITEM_SHOWN",
+                "continuationEndpoint": {
+                  "clickTrackingParams": "CAAQg2ciEwiCiLHzoZWSAxVqVp0JHQ2IL7bKAQTOql7m",
+                  "commandMetadata": {
+                    "webCommandMetadata": {
+                      "sendPost": true,
+                      "apiUrl": "/youtubei/v1/next"
+                    }
+                  },
+                  "continuationCommand": {
+                    "token": "Eg0SC0lITnpPSGk4c0pzGAYy6AIKvgJnZXRfcmFua2VkX3N0cmVhbXM",
+                    "request": "CONTINUATION_REQUEST_TYPE_WATCH_NEXT"
+                  }
+                }
+              }
+            }
+          ],
+          "slot": "RELOAD_CONTINUATION_SLOT_BODY"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,159 @@
+{
+  "provenance": {
+    "source": "YT_MAIN.json",
+    "sourceSha256": "64c7861ff6baa76816082479f5bdda591faef3e72e2510e6da80866cba1c3357",
+    "sourceBytes": 4951099,
+    "sourceLines": 50481,
+    "fragmentIndex": 1,
+    "fragmentStartLine": 47533,
+    "fragmentBytes": 124193,
+    "fragmentSha256": "a54a51cc0624c21ea56f442b11166200be7c0345ab4d027ddad3d860855d7c73",
+    "fixtureKind": "json",
+    "surface": "Main desktop watch player metadata fragment",
+    "route": "watch",
+    "rendererType": "watchPlayerMetadataFragment",
+    "extractedPath": "videoDetails, microformat.playerMicroformatRenderer, cards.cardCollectionRenderer.cards, endscreen.endscreenRenderer.elements"
+  },
+  "captureFixtureTraceability": {
+    "rawSourceCapture": "YT_MAIN.json",
+    "minimalFixturePath": "tests/runtime/fixtures/captures/main-watch-player-fragment-metadata.json",
+    "fixtureKind": "json",
+    "sourceSurface": "Main desktop watch player metadata fragment",
+    "route": "watch",
+    "rendererPathOrDomSelector": "videoDetails | microformat.playerMicroformatRenderer | endscreenElementRenderer",
+    "settingsMode": "disabled | blocklist | whitelist",
+    "expectedDecision": "metadata harvest | pass-through | no renderer removal",
+    "sideEffects": "channel map write | video-channel map write | video-meta map write",
+    "negativeSiblingVisibleFixture": "card and endscreen element siblings remain present",
+    "releaseInputAllowed": false
+  },
+  "response": {
+    "playabilityStatus": {
+      "status": "OK",
+      "playableInEmbed": true
+    },
+    "videoDetails": {
+      "videoId": "WMweEpGlu_U",
+      "title": "BTS (방탄소년단) 'Butter' Official MV",
+      "lengthSeconds": "183",
+      "keywords": [
+        "BTS",
+        "BANGTAN",
+        "Butter"
+      ],
+      "channelId": "UC3IZKseVpdzPSBaWxBxundA",
+      "author": "HYBE LABELS",
+      "shortDescription": "BTS (방탄소년단) 'Butter' Official MV #BTS #Butter",
+      "isLiveContent": false
+    },
+    "microformat": {
+      "playerMicroformatRenderer": {
+        "title": {
+          "simpleText": "BTS (방탄소년단) 'Butter' Official MV"
+        },
+        "description": {
+          "simpleText": "BTS (방탄소년단) 'Butter' Official MV #BTS #Butter"
+        },
+        "lengthSeconds": "183",
+        "ownerProfileUrl": "http://www.youtube.com/@HYBELABELS",
+        "externalChannelId": "UC3IZKseVpdzPSBaWxBxundA",
+        "ownerChannelName": "HYBE LABELS",
+        "category": "Music",
+        "publishDate": "2021-05-20T20:46:13-07:00",
+        "uploadDate": "2021-05-20T20:46:13-07:00",
+        "externalVideoId": "WMweEpGlu_U",
+        "canonicalUrl": "https://www.youtube.com/watch?v=WMweEpGlu_U"
+      }
+    },
+    "cards": {
+      "cardCollectionRenderer": {
+        "cards": [
+          {
+            "cardRenderer": {
+              "teaser": {
+                "simpleCardTeaserRenderer": {
+                  "message": {
+                    "simpleText": "View corrections"
+                  },
+                  "prominent": true,
+                  "onTapCommand": {
+                    "changeEngagementPanelVisibilityAction": {
+                      "targetId": "engagement-panel-error-corrections",
+                      "visibility": "ENGAGEMENT_PANEL_VISIBILITY_EXPANDED"
+                    }
+                  }
+                }
+              },
+              "cueRanges": [
+                {
+                  "startCardActiveMs": "0",
+                  "endCardActiveMs": "182000"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "endscreen": {
+      "endscreenRenderer": {
+        "elements": [
+          {
+            "endscreenElementRenderer": {
+              "style": "VIDEO",
+              "title": {
+                "simpleText": "BTS (방탄소년단) 'Permission to Dance' Official MV"
+              },
+              "endpoint": {
+                "commandMetadata": {
+                  "webCommandMetadata": {
+                    "url": "/watch?v=CuklIb9d3fI",
+                    "webPageType": "WEB_PAGE_TYPE_WATCH"
+                  }
+                },
+                "watchEndpoint": {
+                  "videoId": "CuklIb9d3fI"
+                }
+              },
+              "metadata": {
+                "simpleText": "70,33,72,343 views"
+              }
+            }
+          },
+          {
+            "endscreenElementRenderer": {
+              "style": "VIDEO",
+              "title": {
+                "simpleText": "ENHYPEN (엔하이픈) 'Knife' Official MV"
+              },
+              "endpoint": {
+                "commandMetadata": {
+                  "webCommandMetadata": {
+                    "url": "/watch?v=R6e4tBWxIxE",
+                    "webPageType": "WEB_PAGE_TYPE_WATCH"
+                  }
+                },
+                "watchEndpoint": {
+                  "videoId": "R6e4tBWxIxE"
+                }
+              },
+              "metadata": {
+                "simpleText": "2,36,24,345 views"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "frameworkUpdates": {
+      "entityBatchUpdate": {
+        "mutations": [
+          {
+            "entityKey": "offlineability:WMweEpGlu_U",
+            "type": "ENTITY_MUTATION_TYPE_REPLACE"
+          }
+        ]
+      }
+    }
+  }
+}

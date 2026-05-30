@@ -1,0 +1,181 @@
+{
+  "provenance": {
+    "source": "playlist.json",
+    "sourceSha256": "f5766312bdddcceb20ecd2a4b54045843dfab89108b75c2f5bc8a0ee368d4ce5",
+    "sourceBytes": 165443,
+    "sourceLines": 3609,
+    "fragmentIndex": 1,
+    "fragmentStartLine": 288,
+    "fragmentBytes": 148701,
+    "fragmentSha256": "e0798e02cc864bed06899c5c6ab94a3900c6050c7baa494edc14d7822b5aa72a",
+    "fixtureKind": "json",
+    "surface": "Main desktop playlist/Mix player metadata fragment",
+    "route": "watch/mix",
+    "rendererType": "playlistPlayerMetadataFragment",
+    "extractedPath": "var ytInitialPlayerResponse.videoDetails | microformat.playerMicroformatRenderer | cards | endscreen.endscreenRenderer.elements"
+  },
+  "captureFixtureTraceability": {
+    "rawSourceCapture": "playlist.json",
+    "minimalFixturePath": "tests/runtime/fixtures/captures/playlist-json-player-metadata.json",
+    "fixtureKind": "json",
+    "sourceSurface": "Main desktop playlist/Mix player metadata fragment",
+    "route": "watch/mix",
+    "rendererPathOrDomSelector": "videoDetails | microformat.playerMicroformatRenderer | endscreenElementRenderer",
+    "settingsMode": "disabled | blocklist | whitelist",
+    "expectedDecision": "metadata harvest | pass-through | no playlist creator decision",
+    "sideEffects": "channel map write | video-channel map write | video-meta map write",
+    "negativeSiblingVisibleFixture": "channel, playlist, and video endscreen elements remain present",
+    "releaseInputAllowed": false
+  },
+  "response": {
+    "playabilityStatus": {
+      "status": "OK",
+      "playableInEmbed": true
+    },
+    "videoDetails": {
+      "videoId": "Pkh8UtuejGw",
+      "title": "Shawn Mendes, Camila Cabello - Se\u00f1orita",
+      "lengthSeconds": "205",
+      "keywords": [
+        "Shawn",
+        "Mendes",
+        "Camila",
+        "Cabello",
+        "Se\u00f1orita"
+      ],
+      "channelId": "UC4-TgOSMJHn-LtY4zCzbQhw",
+      "author": "ShawnMendesVEVO",
+      "shortDescription": "Music video by Shawn Mendes, Camila Cabello performing Se\u00f1orita.",
+      "isLiveContent": false
+    },
+    "microformat": {
+      "playerMicroformatRenderer": {
+        "embed": {
+          "iframeUrl": "https://www.youtube.com/embed/Pkh8UtuejGw?list=RDUc8KFRqO3IM"
+        },
+        "title": {
+          "simpleText": "Shawn Mendes, Camila Cabello - Se\u00f1orita"
+        },
+        "lengthSeconds": "206",
+        "ownerProfileUrl": "http://www.youtube.com/@shawnmendesvevo",
+        "externalChannelId": "UC4-TgOSMJHn-LtY4zCzbQhw",
+        "ownerChannelName": "ShawnMendesVEVO",
+        "category": "Music",
+        "publishDate": "2019-06-20T20:57:42-07:00",
+        "uploadDate": "2019-06-20T20:57:42-07:00",
+        "externalVideoId": "Pkh8UtuejGw",
+        "canonicalUrl": "https://www.youtube.com/watch?v=Pkh8UtuejGw"
+      }
+    },
+    "cards": {
+      "cardCollectionRenderer": {
+        "cards": [
+          {
+            "cardRenderer": {
+              "teaser": {
+                "simpleCardTeaserRenderer": {
+                  "message": {
+                    "simpleText": "View corrections"
+                  },
+                  "prominent": true
+                }
+              },
+              "cueRanges": [
+                {
+                  "startCardActiveMs": "0",
+                  "endCardActiveMs": "5000"
+                }
+              ]
+            }
+          }
+        ],
+        "headerText": {
+          "simpleText": "From ShawnMendesVEVO"
+        }
+      }
+    },
+    "endscreen": {
+      "endscreenRenderer": {
+        "elements": [
+          {
+            "endscreenElementRenderer": {
+              "style": "CHANNEL",
+              "title": {
+                "simpleText": "ShawnMendesVEVO"
+              },
+              "endpoint": {
+                "commandMetadata": {
+                  "webCommandMetadata": {
+                    "url": "/channel/UC4-TgOSMJHn-LtY4zCzbQhw",
+                    "webPageType": "WEB_PAGE_TYPE_CHANNEL"
+                  }
+                },
+                "browseEndpoint": {
+                  "browseId": "UC4-TgOSMJHn-LtY4zCzbQhw"
+                }
+              },
+              "metadata": {
+                "simpleText": "Shawn Mendes on Vevo - Official Music Videos, Live Performances, Interviews and more..."
+              }
+            }
+          },
+          {
+            "endscreenElementRenderer": {
+              "style": "PLAYLIST",
+              "title": {
+                "simpleText": "Vevo DSCVR Artists To Watch 2026"
+              },
+              "endpoint": {
+                "commandMetadata": {
+                  "webCommandMetadata": {
+                    "url": "/watch?v=NujWQcMiANI&list=PL9tY0BWXOZFsnSMMkPPFh5PVpFcDr-fY0",
+                    "webPageType": "WEB_PAGE_TYPE_WATCH"
+                  }
+                },
+                "watchEndpoint": {
+                  "videoId": "NujWQcMiANI",
+                  "playlistId": "PL9tY0BWXOZFsnSMMkPPFh5PVpFcDr-fY0"
+                }
+              },
+              "metadata": {
+                "simpleText": "Playlist"
+              }
+            }
+          },
+          {
+            "endscreenElementRenderer": {
+              "style": "VIDEO",
+              "title": {
+                "simpleText": "Shawn Mendes - Heart of Gold (Live From The 2024 MTV EMAs)"
+              },
+              "endpoint": {
+                "commandMetadata": {
+                  "webCommandMetadata": {
+                    "url": "/watch?v=ndEKoTLIuco",
+                    "webPageType": "WEB_PAGE_TYPE_WATCH"
+                  }
+                },
+                "watchEndpoint": {
+                  "videoId": "ndEKoTLIuco"
+                }
+              },
+              "metadata": {
+                "simpleText": "Live performance"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "frameworkUpdates": {
+      "entityBatchUpdate": {
+        "mutations": [
+          {
+            "entityKey": "offlineability:Pkh8UtuejGw",
+            "type": "ENTITY_MUTATION_TYPE_REPLACE"
+          }
+        ]
+      }
+    }
+  }
+}

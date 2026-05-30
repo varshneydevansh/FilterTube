@@ -1,0 +1,104 @@
+{
+  "provenance": {
+    "source": "YTM-XHR.json",
+    "rendererType": "videoWithContextRenderer",
+    "extractedPath": "onResponseReceivedEndpoints.0.appendContinuationItemsAction.continuationItems.3.videoWithContextRenderer",
+    "reason": "minimal showSheetCommand collaborator roster with multiple UC browse IDs"
+  },
+  "renderer": {
+    "videoId": "capture-show-sheet-collab",
+    "headline": {
+      "runs": [
+        {
+          "text": "Shakira, Ed Sheeran, Beele - Hips Don't Lie (Anniversary Version)"
+        }
+      ]
+    },
+    "shortBylineText": {
+      "runs": [
+        {
+          "text": "Shakira and 2 more",
+          "navigationEndpoint": {
+            "showSheetCommand": {
+              "panelLoadingStrategy": {
+                "inlineContent": {
+                  "sheetViewModel": {
+                    "content": {
+                      "listViewModel": {
+                        "listItems": [
+                          {
+                            "listItemViewModel": {
+                              "title": {
+                                "content": "shakiraVEVO"
+                              },
+                              "rendererContext": {
+                                "commandContext": {
+                                  "onTap": {
+                                    "innertubeCommand": {
+                                      "browseEndpoint": {
+                                        "browseId": "UCGnjeahCJW1AF34HBmQTJ-Q",
+                                        "canonicalBaseUrl": "/@shakiraVEVO"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "listItemViewModel": {
+                              "title": {
+                                "content": "Spotify"
+                              },
+                              "rendererContext": {
+                                "commandContext": {
+                                  "onTap": {
+                                    "innertubeCommand": {
+                                      "browseEndpoint": {
+                                        "browseId": "UCYLNGLIzMhRTi6ZOLjAPSmw",
+                                        "canonicalBaseUrl": "/@spotify"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "listItemViewModel": {
+                              "title": {
+                                "content": "Beele"
+                              },
+                              "rendererContext": {
+                                "commandContext": {
+                                  "onTap": {
+                                    "innertubeCommand": {
+                                      "browseEndpoint": {
+                                        "browseId": "UCRMqQWxCWE0VMvtUElm-rEA",
+                                        "canonicalBaseUrl": "/@beele"
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "lengthText": {
+      "simpleText": "3:37"
+    },
+    "shortViewCountText": {
+      "simpleText": "4,44,13,898 views"
+    }
+  }
+}

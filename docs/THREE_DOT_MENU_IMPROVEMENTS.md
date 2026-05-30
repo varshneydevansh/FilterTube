@@ -1,5 +1,16 @@
 # 3-Dot Menu Improvements Documentation (v3.3.0)
 
+> Current-behavior boundary (2026-05-19): this page is a feature-history and
+> design note. Some older sections below still use absolute phrases such as
+> always-successful DOM extraction, zero-delay blocking, or measured network
+> timing. Treat those as claims that require current source/fixture proof. The
+> current proof-backed boundary is in
+> `docs/audit/FILTERTUBE_REFERENCE_DOC_CLAIM_DRIFT_CURRENT_BEHAVIOR_2026-05-19.md`
+> and `docs/audit/FILTERTUBE_IDENTITY_INFORMATION_WATERFALL_CURRENT_BEHAVIOR_2026-05-19.md`.
+> Current menu behavior can use JSON/maps/DOM quickly when identity is known,
+> but weak watch, Shorts, playlist, Kids, or YTM targets can still escalate to
+> fallback resolvers or fail when YouTube does not expose stable identity.
+
 ## Overview
 
 FilterTube v3.2.1 introduced the main 3-dot menu improvement pass across YouTube Main and YouTube Kids. The current v3.3.0 state extends that behavior across watch-page SPA rows, YTM and YTD watch-like lockups, Mix-like playlist rows, and the custom fallback 3-dot popover so channel names and block actions stay reliable even when row identity starts weak.
@@ -448,7 +459,7 @@ function scheduleLabelUpdate(dropdown, channelInfo) {
 
 ```
 Label Update Flow
-├── DOM Extraction (always succeeds)
+├── DOM Extraction (visible-card best effort; can return null/needsFetch)
 ├── Background Fetch (may fail)
 │   ├── Timeout: 5 seconds
 │   ├── 404: Channel not found
@@ -532,11 +543,13 @@ console.log('FilterTube: Updated menu label:', {
 
 ### Performance Metrics
 
-Track label resolution performance:
-- **DOM extraction time**: < 5ms
-- **Network fetch time**: < 2000ms (95th percentile)
-- **Label update time**: < 10ms
-- **Cache hit rate**: > 80% for repeated channels
+Track label resolution performance as future targets, not current measured proof:
+- **DOM extraction time target / historical estimate**: < 5ms
+- **Network fetch time target / historical estimate**: < 2000ms (95th percentile)
+- **Label update time target / historical estimate**: < 10ms
+- **Cache hit rate target / historical estimate**: > 80% for repeated channels
+
+These numbers require a future `performanceClaimAuthority` measurement with route, browser/device, rule-state, sample-size, and artifact evidence before they can be used as release proof.
 
 ## Future Enhancements
 
@@ -566,7 +579,7 @@ Users upgrading to v3.2.1 will see:
 - Immediate improvement in Mix/playlist label accuracy
 - Better Shorts channel name resolution
 - More consistent behavior across all surfaces
-- Zero-delay blocking thanks to proactive XHR interception
+- Faster blocking when proactive XHR interception, learned maps, or stamped DOM already prove identity
 - No breaking changes to existing blocks
 
 Users on the later v3.2.8-era follow-up path also get:

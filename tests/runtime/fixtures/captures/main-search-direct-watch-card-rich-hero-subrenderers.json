@@ -1,0 +1,228 @@
+{
+  "provenance": {
+    "source": "strange_ytInitialData.json",
+    "rendererType": "directWatchCardRichHeaderHeroSubrenderers",
+    "extractedPath": "contents.sectionListRenderer.contents[0].universalWatchCardRenderer.{header.watchCardRichHeaderRenderer,callToAction.watchCardHeroVideoRenderer}",
+    "fixtureKind": "json",
+    "surface": "Main mobile search hero watch card",
+    "route": "search",
+    "rawContainer": "var ytInitialData string literal with escaped JSON; not direct JSON",
+    "directRootObservedInSource": false,
+    "directAdmissionPurpose": "Present real nested watch-card child renderer objects as direct top-level renderer keys to pin the current direct-rule gap."
+  },
+  "directItems": [
+    {
+      "watchCardRichHeaderRenderer": {
+        "title": {
+          "runs": [
+            {
+              "text": "Nyusha"
+            }
+          ]
+        },
+        "titleNavigationEndpoint": {
+          "commandMetadata": {
+            "webCommandMetadata": {
+              "url": "/channel/UCm9VWKAFz0aXpuEHPHMae7w",
+              "webPageType": "WEB_PAGE_TYPE_CHANNEL",
+              "rootVe": 3611,
+              "apiUrl": "/youtubei/v1/browse"
+            }
+          },
+          "browseEndpoint": {
+            "browseId": "UCm9VWKAFz0aXpuEHPHMae7w"
+          }
+        },
+        "subtitle": {
+          "runs": [
+            {
+              "text": "@NYUSHAmusic"
+            }
+          ]
+        },
+        "avatar": {
+          "thumbnails": [
+            {
+              "url": "https://yt3.ggpht.com/v1U9tjodERDGTO-A6DjNPvRQpDmhgr6vwRQZm3kh-P8GYSyeVhcO-Y2Vi-LTamLfh0XWdV-hZQ=s176-c-k-c0x00ffffff-no-rj",
+              "width": 40,
+              "height": 40
+            }
+          ]
+        },
+        "style": "WATCH_CARD_RICH_HEADER_RENDERER_STYLE_LEFT_AVATAR"
+      }
+    },
+    {
+      "watchCardHeroVideoRenderer": {
+        "navigationEndpoint": {
+          "commandMetadata": {
+            "webCommandMetadata": {
+              "url": "/watch?v=XuHro6TjXww&list=RDEMgF031uDlRkNZ1d0qT2a8QA&start_radio=1",
+              "webPageType": "WEB_PAGE_TYPE_WATCH",
+              "rootVe": 3832
+            }
+          },
+          "watchEndpoint": {
+            "videoId": "XuHro6TjXww",
+            "playlistId": "RDEMgF031uDlRkNZ1d0qT2a8QA",
+            "params": "OALAAQE%3D"
+          }
+        },
+        "callToActionButton": {
+          "callToActionButtonRenderer": {
+            "label": {
+              "runs": [
+                {
+                  "text": "YouTube Mix"
+                }
+              ]
+            },
+            "icon": {
+              "iconType": "PLAY_ARROW"
+            },
+            "style": "CALL_TO_ACTION_BUTTON_RENDERER_STYLE_OPAQUE_BLACK"
+          }
+        },
+        "heroImage": {
+          "collageHeroImageRenderer": {
+            "topRightThumbnail": {
+              "thumbnails": [
+                {
+                  "url": "https://i.ytimg.com/vi/XuHro6TjXww/hqdefault.jpg",
+                  "width": 480,
+                  "height": 360
+                }
+              ]
+            },
+            "bottomRightThumbnail": {
+              "thumbnails": [
+                {
+                  "url": "https://i.ytimg.com/vi/75NRE2KB8jc/hqdefault.jpg",
+                  "width": 480,
+                  "height": 360
+                }
+              ]
+            }
+          }
+        },
+        "accessibility": {
+          "accessibilityData": {
+            "label": "YouTube Mix"
+          }
+        }
+      }
+    }
+  ],
+  "wrapperControl": {
+    "universalWatchCardRenderer": {
+      "header": {
+        "watchCardRichHeaderRenderer": {
+          "title": {
+            "runs": [
+              {
+                "text": "Nyusha"
+              }
+            ]
+          },
+          "titleNavigationEndpoint": {
+            "commandMetadata": {
+              "webCommandMetadata": {
+                "url": "/channel/UCm9VWKAFz0aXpuEHPHMae7w",
+                "webPageType": "WEB_PAGE_TYPE_CHANNEL",
+                "rootVe": 3611,
+                "apiUrl": "/youtubei/v1/browse"
+              }
+            },
+            "browseEndpoint": {
+              "browseId": "UCm9VWKAFz0aXpuEHPHMae7w"
+            }
+          },
+          "subtitle": {
+            "runs": [
+              {
+                "text": "@NYUSHAmusic"
+              }
+            ]
+          },
+          "avatar": {
+            "thumbnails": [
+              {
+                "url": "https://yt3.ggpht.com/v1U9tjodERDGTO-A6DjNPvRQpDmhgr6vwRQZm3kh-P8GYSyeVhcO-Y2Vi-LTamLfh0XWdV-hZQ=s176-c-k-c0x00ffffff-no-rj",
+                "width": 40,
+                "height": 40
+              }
+            ]
+          },
+          "style": "WATCH_CARD_RICH_HEADER_RENDERER_STYLE_LEFT_AVATAR"
+        }
+      },
+      "callToAction": {
+        "watchCardHeroVideoRenderer": {
+          "navigationEndpoint": {
+            "commandMetadata": {
+              "webCommandMetadata": {
+                "url": "/watch?v=XuHro6TjXww&list=RDEMgF031uDlRkNZ1d0qT2a8QA&start_radio=1",
+                "webPageType": "WEB_PAGE_TYPE_WATCH",
+                "rootVe": 3832
+              }
+            },
+            "watchEndpoint": {
+              "videoId": "XuHro6TjXww",
+              "playlistId": "RDEMgF031uDlRkNZ1d0qT2a8QA",
+              "params": "OALAAQE%3D"
+            }
+          },
+          "callToActionButton": {
+            "callToActionButtonRenderer": {
+              "label": {
+                "runs": [
+                  {
+                    "text": "YouTube Mix"
+                  }
+                ]
+              },
+              "icon": {
+                "iconType": "PLAY_ARROW"
+              },
+              "style": "CALL_TO_ACTION_BUTTON_RENDERER_STYLE_OPAQUE_BLACK"
+            }
+          },
+          "heroImage": {
+            "collageHeroImageRenderer": {
+              "topRightThumbnail": {
+                "thumbnails": [
+                  {
+                    "url": "https://i.ytimg.com/vi/XuHro6TjXww/hqdefault.jpg",
+                    "width": 480,
+                    "height": 360
+                  }
+                ]
+              },
+              "bottomRightThumbnail": {
+                "thumbnails": [
+                  {
+                    "url": "https://i.ytimg.com/vi/75NRE2KB8jc/hqdefault.jpg",
+                    "width": 480,
+                    "height": 360
+                  }
+                ]
+              }
+            }
+          },
+          "accessibility": {
+            "accessibilityData": {
+              "label": "YouTube Mix"
+            }
+          }
+        }
+      },
+      "collapsedLabel": {
+        "runs": [
+          {
+            "text": "Show more"
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "provenance": {
+    "source": "reel_item_watch?prettyPrint=False.JSON",
+    "rendererType": "reelPlayerOverlayRenderer",
+    "extractedBlockIndex": 0,
+    "extractedPath": "overlay.reelPlayerOverlayRenderer"
+  },
+  "renderer": {
+    "reelPlayerHeaderSupportedRenderers": {
+      "reelPlayerHeaderRenderer": {
+        "timestampText": {
+          "runs": [
+            {
+              "text": "1 year ago"
+            }
+          ]
+        },
+        "accessibility": {
+          "accessibilityData": {
+            "label": "Show the world what it can do @ElectricRevolution 1 year ago"
+          }
+        }
+      }
+    },
+    "metapanel": {
+      "reelMetapanelViewModel": {
+        "metadataItems": [
+          {
+            "reelChannelBarViewModel": {
+              "decoratedAvatarViewModel": {
+                "decoratedAvatarViewModel": {
+                  "avatar": {
+                    "avatarViewModel": {
+                      "image": {
+                        "sources": [
+                          {
+                            "url": "https://yt3.ggpht.com/wR3nkqSZSlXRPdIlYd13p4-1S2eXSd7pcRkHPSafaXcM8HCRJG0bq9AClaAEMK3LQlVBKvpU=s48-c-k-c0x00ffffff-no-rj"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "rendererContext": {
+                    "commandContext": {
+                      "onTap": {
+                        "innertubeCommand": {
+                          "commandMetadata": {
+                            "webCommandMetadata": {
+                              "url": "/@ElectricRevolution/shorts",
+                              "webPageType": "WEB_PAGE_TYPE_CHANNEL",
+                              "apiUrl": "/youtubei/v1/browse"
+                            }
+                          },
+                          "browseEndpoint": {
+                            "browseId": "UC-6YsZ1GcOMIehkb8eHioUQ",
+                            "canonicalBaseUrl": "/@ElectricRevolution/shorts"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "channelName": {
+                "content": "@ElectricRevolution",
+                "commandRuns": [
+                  {
+                    "startIndex": 0,
+                    "length": 19,
+                    "onTap": {
+                      "innertubeCommand": {
+                        "commandMetadata": {
+                          "webCommandMetadata": {
+                            "url": "/@ElectricRevolution/shorts",
+                            "webPageType": "WEB_PAGE_TYPE_CHANNEL",
+                            "apiUrl": "/youtubei/v1/browse"
+                          }
+                        },
+                        "browseEndpoint": {
+                          "browseId": "UC-6YsZ1GcOMIehkb8eHioUQ",
+                          "canonicalBaseUrl": "/@ElectricRevolution/shorts"
+                        }
+                      }
+                    }
+                  }
+                ]
+              },
+              "subscribeButtonViewModel": {
+                "subscribeButtonViewModel": {
+                  "subscribeButtonContent": {
+                    "buttonText": "Subscribe",
+                    "accessibilityText": "Subscribe to @ElectricRevolution.",
+                    "subscribeEndpoint": {
+                      "channelIds": [
+                        "UC-6YsZ1GcOMIehkb8eHioUQ"
+                      ]
+                    }
+                  },
+                  "channelId": "UC-6YsZ1GcOMIehkb8eHioUQ"
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

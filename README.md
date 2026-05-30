@@ -3,7 +3,7 @@
   <h1>FilterTube</h1>
   <p>Peace of Mind for your Digital Space</p>
   
-  [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/varshneydevansh/FilterTube) ![Version](https://img.shields.io/badge/version-3.3.1-blue.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg) ![Lines of Code](https://img.shields.io/badge/total%20lines-110.8k-brightgreen.svg) ![JavaScript LoC](https://img.shields.io/badge/javascript-70.4k%20lines-yellow.svg) ![Top Language](https://img.shields.io/github/languages/top/varshneydevansh/FilterTube?color=f1e05a) ![Repo Size](https://img.shields.io/github/repo-size/varshneydevansh/FilterTube?color=orange)
+  [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/varshneydevansh/FilterTube) ![Version](https://img.shields.io/badge/version-3.3.1-blue.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg) ![Lines of Code](https://img.shields.io/badge/total%20lines-113.3k-brightgreen.svg) ![JavaScript LoC](https://img.shields.io/badge/javascript-72.3k%20lines-yellow.svg) ![Top Language](https://img.shields.io/github/languages/top/varshneydevansh/FilterTube?color=f1e05a) ![Repo Size](https://img.shields.io/github/repo-size/varshneydevansh/FilterTube?color=orange)
   
 </div>
 
@@ -103,7 +103,7 @@ Docs:
 - **Hide Shorts**: Optional toggle to remove every Shorts shelf and player hand-off.
 - **Smart Matching**: Choose partial or whole-word matching to stay strict or flexible.
 - **Shelf & Playlist Cleanup**: Refilters shelves and playlists so blocked creators stay gone even after navigation.
-- **Quick Block Cross (v3.2.7)**: One-tap hover cross on cards to block instantly (enabled by default, can be disabled).
+- **Quick Block Cross (v3.2.7)**: One-tap hover cross on cards for fast blocking from the page (enabled by default, can be disabled).
 - **3-Dot Menu Toggle (v3.3.0)**: The FilterTube item inside YouTube's native 3-dot menu can be disabled independently of Quick Block.
 - **Content-Based Filters (v3.2.6)**: 
   - Filter by video duration (longer/shorter/between specific lengths)
@@ -138,25 +138,28 @@ Docs:
 
 ### Performance & Privacy
 
-- **Zero Flash**: Filters content *before* it renders on screen using proactive XHR interception.
-- **Instant Blocking**: 3-dot menus show correct channel names immediately—no "Fetching..." delays.
+- **Early Filtering**: JSON-backed surfaces can be filtered before paint when YouTube exposes the needed fields; DOM fallback handles surfaces that arrive later or with weaker data.
+- **Fast Menu Blocking**: 3-dot menus can show proven channel names immediately when JSON, learned maps, or DOM already provide enough identity; weak targets may still use a resolver.
 - **Collaboration-Aware Menus (v3.3.0)**: Watch-page collaboration rows, Mix/watch recovery paths, and watch-side lockups can now upgrade to the full collaborator roster in the 3-dot UI.
 - **Large Blocklist Matching (v3.3.1)**: Channel checks use shared set-backed indexes for UC IDs, handles, custom URLs, and strict fallback names so 200+ saved channels do not create renderer-by-renderer scan costs.
-- **Network Reduction**: Most channel identity comes from intercepted JSON, not page fetches.
-- **100% Private**: No data leaves your browser. No analytics. No tracking.
+- **Quiet Production Runtime**: Routine `console.log` / `console.debug` output is muted outside explicit debug mode, keeping YouTube hot paths from paying logging overhead during normal browsing.
+- **Network Reduction**: Channel identity is preferred from intercepted JSON and learned maps; bounded fallback resolvers remain for weak watch, Shorts, Kids, playlist, and menu targets.
+- **Local-First Privacy**: Extension rules and settings stay in browser storage. The extension does not run a FilterTube account service, extension analytics, or ad-tracking profile.
 - **Modern UI/UX (v3.2.6)**: Clean typography, refined components, enhanced dark mode, and Kids Mode theming.
 
-### Proactive Channel Identity (v3.2.2)
+### JSON-First Channel Identity (v3.2.2+)
 
-FilterTube now uses a **proactive, XHR-first** strategy to extract channel identity before rendering, enhanced with lag-free performance optimizations and improved user experience:
+FilterTube prefers intercepted YouTube JSON and `ytInitial*` payloads when they
+expose stable channel identity, then carries that identity through learned maps,
+DOM extraction, and bounded fallback resolvers when a route exposes only weak
+surface data:
 
-- **XHR Interception**: Captures YouTube's JSON responses (`/youtubei/v1/next`, `/browse`, `/player`)
-- **Instant Stamping**: Broadcasts channel info across worlds to stamp DOM cards immediately
-- **Zero-Network Kids**: YouTube Kids works entirely without network fetches
-- **Smart Enrichment**: Post-block enrichment fills missing metadata at a controlled rate
-- **Optimistic UI**: Content hides instantly when blocked, with automatic restoration if needed
-- **Mobile Support**: Enhanced 3-dot menu injection for YouTube mobile with proper renderer handling
-- **Smooth Rendering**: Large channel lists render efficiently using idle scheduling and batching
+- **YouTubei capture**: Reads supported `/youtubei/v1/next`, `/browse`, and `/player` payloads when YouTube provides useful identity.
+- **Learned maps**: Reuses `channelMap`, `videoChannelMap`, and `videoMetaMap` so later DOM/menu paths can join a visible video id back to a stronger source.
+- **DOM fallback**: Uses visible-card extraction only as a lower-confidence fallback or enrichment layer.
+- **Bounded resolver**: Keeps background identity fetches as a last-resort path for watch, Shorts, Kids, playlist, or weak menu targets that do not expose enough identity locally.
+- **Mobile support**: Enhanced 3-dot menu insertion for YouTube mobile with route-specific renderer handling.
+- **Performance direction**: Current audit work is tightening no-rule, route, lifecycle, and resolver budgets so filtering stays precise without waking unnecessary work.
 
 Learn more in [Proactive Channel Identity](docs/PROACTIVE_CHANNEL_IDENTITY.md).
 
@@ -165,7 +168,7 @@ Learn more in [Proactive Channel Identity](docs/PROACTIVE_CHANNEL_IDENTITY.md).
 - **Help Page (Dashboard)**: In the new tab UI, a dedicated Help section explains every feature, import/export flow, and troubleshooting tip.
 - **Technical Docs**:
   - [Channel Blocking System](docs/CHANNEL_BLOCKING_SYSTEM.md) – Architecture and data flow
-  - [Proactive Channel Identity](docs/PROACTIVE_CHANNEL_IDENTITY.md) – XHR interception and instant stamping
+  - [Proactive Channel Identity](docs/PROACTIVE_CHANNEL_IDENTITY.md) – JSON-first identity harvesting, learned maps, DOM fallback, and bounded resolvers
   - [Developer Guide](docs/DEVELOPER_GUIDE.md) – Extending FilterTube for new YouTube features
   - [Architecture](docs/ARCHITECTURE.md) – System design and cross-world messaging
   - [Release Notes Data](data/release_notes.json) – packaged What's New entries for release-facing changes
@@ -232,20 +235,28 @@ If you want to contribute or build from source:
 
 ## How It Works
 
-FilterTube filters unwanted content **before** it appears on your screen, giving you a clean YouTube experience.
+FilterTube filters unwanted content as early as supported YouTube surfaces expose
+enough data, then uses DOM fallback for content that appears later or arrives
+with weaker identity.
 
 Under the hood, FilterTube also maintains lightweight identity caches:
 
 - `channelMap`: `@handle` / `c/<slug>` / `user/<slug>` ↔ `UC...`
 - `videoChannelMap`: `videoId` → `UC...`
 
-On both **YouTube Main** and **YouTube Kids**, FilterTube can often learn the canonical channel ID **without extra page fetches** by harvesting ownership data from the same JSON payloads YouTube already loads (notably `ytInitialPlayerResponse` and `/youtubei/v1/player`). Once learned, Shorts and Watch surfaces can resolve identity instantly on the next encounter.
+On both **YouTube Main** and **YouTube Kids**, FilterTube can often learn the
+canonical channel ID **without extra page fetches** by harvesting ownership data
+from the same JSON payloads YouTube already loads (notably
+`ytInitialPlayerResponse` and `/youtubei/v1/player`). Once learned, Shorts and
+Watch surfaces can often resolve identity from the local map on later
+encounters. Some route-specific surfaces still need DOM enrichment or a bounded
+background resolver when the page exposes only a video id or weak display text.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  YouTube loads video data                                   │
 │          ↓                                                  │
-│  FilterTube intercepts the data BEFORE it renders           │
+│  FilterTube reads supported JSON when it has enough fields  │
 │          ↓                                                  │
 │  Checks against your keywords & channels                    │
 │          ↓                                                  │
@@ -260,13 +271,13 @@ On both **YouTube Main** and **YouTube Kids**, FilterTube can often learn the ca
 
 ### What Makes FilterTube Different
 
-**Lightning Fast** - Filters content before YouTube renders it, so you never see unwanted videos flash on screen
+**Fast on proven data** - JSON-backed cards can be filtered early, while later DOM insertions are handled by fallback scans
 
-**100% Private** - Everything happens in your browser. No data is sent to external servers.
+**Local-first privacy** - Extension rules and profiles stay in browser storage; there is no FilterTube account dashboard or extension analytics pipeline
 
 **Comprehensive** - Filters videos, shorts, playlists, channels, comments, and more across all YouTube pages
 
-**Reliable** - Uses a two-layer system: intercepts YouTube's data first, then monitors the page as backup
+**Reliable by layers** - Uses JSON-first data, learned maps, DOM fallback, and bounded resolvers for surfaces that do not expose enough identity immediately
 
 ### Future Features (Coming Soon)
 
@@ -279,13 +290,17 @@ On both **YouTube Main** and **YouTube Kids**, FilterTube can often learn the ca
 We believe in privacy by design.
 *   **Storage**: To save your settings locally.
 *   **Active Tab**: To scan the YouTube page you are viewing.
-*   **No External Requests**: FilterTube does not talk to any servers other than YouTube (for the content you requested).
+*   **Local-first runtime**: rules and profiles are stored locally. YouTube and YouTube Kids pages still load their normal services, and weak identity targets may use bounded YouTube resolver requests when current JSON/maps/DOM are insufficient.
 
 ## 🎬 Shorts Blocking Experience
 
 FilterTube uses a robust hybrid blocking mechanism for YouTube Shorts.
 
-**Current behavior (v3.1.8):** Shorts blocking is often **near-instant** because FilterTube learns `videoId → UC...` mappings from intercepted YouTube JSON and persists them. This makes Shorts behave much more like regular videos on Home/Search.
+**Current behavior:** Shorts blocking is fastest when FilterTube already has a
+stable `videoId -> UC...` mapping from intercepted YouTube JSON, player data,
+or a learned map. Some Shorts surfaces still expose only `/shorts/VIDEO_ID` at
+first, so that video id is treated as a join key until a stronger owner source
+is available.
 
 ```ascii
 [User Clicks "Block"]
@@ -305,12 +320,15 @@ FilterTube uses a robust hybrid blocking mechanism for YouTube Shorts.
 ```
 
 - **Robust Verification**: We resolve to a canonical `UC...` channel ID whenever possible so blocking applies across Shorts + long-form + posts.
-- **Zero Leakage**: By resolving the canonical ID, we ensure that blocking a Short also blocks the channel's long-form videos and posts.
+- **Canonical Blocking**: When the canonical channel ID is resolved, blocking a Short also applies to that channel's long-form videos and posts.
 - **Smart Layouts**: Automatically adjusts the grid to prevent awkward blank spaces.
 
 > [!NOTE]
 > **What if the channel ID isn't available yet?**
-> In rare cases where the card does not expose a `UC...` link and the mapping is not yet learned from intercepted JSON, FilterTube falls back to a slower network-based resolution (e.g., fetching a watch/shorts page) to guarantee correctness.
+> When the card does not expose a `UC...` link and no learned mapping is
+> available yet, FilterTube may use a bounded watch/Shorts resolver. That path is
+> slower, route-specific, and still needs the same source-confidence and
+> side-effect proof as the rest of the identity waterfall.
 
 ## Support
 

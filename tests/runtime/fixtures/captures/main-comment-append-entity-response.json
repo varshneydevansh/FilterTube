@@ -1,0 +1,96 @@
+{
+  "provenance": {
+    "source": "YT_MAIN_NEXT_RESPONSE_COMMENT.json",
+    "rendererType": "commentThreadRenderer",
+    "endpointFamily": "/youtubei/v1/next",
+    "extractedPath": "onResponseReceivedEndpoints.0.appendContinuationItemsAction.continuationItems.0.commentThreadRenderer + frameworkUpdates.entityBatchUpdate.mutations.0.commentEntityPayload",
+    "surface": "Main watch comments append continuation"
+  },
+  "response": {
+    "onResponseReceivedEndpoints": [
+      {
+        "appendContinuationItemsAction": {
+          "continuationItems": [
+            {
+              "commentThreadRenderer": {
+                "replies": {
+                  "commentRepliesRenderer": {
+                    "targetId": "comment-replies-item-UgwgXxVmGlKJMaSDMu54AaABAg",
+                    "viewReplies": {
+                      "buttonRenderer": {
+                        "text": {
+                          "runs": [
+                            {
+                              "text": "5 replies"
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                },
+                "renderingPriority": "RENDERING_PRIORITY_UNKNOWN",
+                "isModeratedElqComment": false,
+                "commentViewModel": {
+                  "commentViewModel": {
+                    "commentKey": "EhpVZ3dnWHhWbUdsS0pNYVNETXU1NEFhQUJBZyAoKAE%3D",
+                    "commentId": "UgwgXxVmGlKJMaSDMu54AaABAg",
+                    "allowProfileCard": true,
+                    "inlineRepliesKey": "empty_inline_replies"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "frameworkUpdates": {
+      "entityBatchUpdate": {
+        "mutations": [
+          {
+            "entityKey": "EhpVZ3dnWHhWbUdsS0pNYVNETXU1NEFhQUJBZyAoKAE%3D",
+            "type": "ENTITY_MUTATION_TYPE_REPLACE",
+            "payload": {
+              "commentEntityPayload": {
+                "key": "EhpVZ3dnWHhWbUdsS0pNYVNETXU1NEFhQUJBZyAoKAE%3D",
+                "properties": {
+                  "commentId": "UgwgXxVmGlKJMaSDMu54AaABAg",
+                  "content": {
+                    "content": "Let's admit it, We all got surprised during YOONGI'S part."
+                  },
+                  "publishedTime": "4 years ago",
+                  "replyLevel": 0,
+                  "authorButtonA11y": "@miguelsantiagocalderonmore9380"
+                },
+                "author": {
+                  "channelId": "UCUooqKoZc3DF4KlktYF_vzQ",
+                  "displayName": "@miguelsantiagocalderonmore9380",
+                  "isVerified": false,
+                  "isCurrentUser": false,
+                  "isCreator": false,
+                  "isArtist": false,
+                  "channelPageEndpoint": {
+                    "innertubeCommand": {
+                      "commandMetadata": {
+                        "webCommandMetadata": {
+                          "url": "/@miguelsantiagocalderonmore9380",
+                          "webPageType": "WEB_PAGE_TYPE_CHANNEL",
+                          "apiUrl": "/youtubei/v1/browse"
+                        }
+                      },
+                      "browseEndpoint": {
+                        "browseId": "UCUooqKoZc3DF4KlktYF_vzQ",
+                        "canonicalBaseUrl": "/@miguelsantiagocalderonmore9380"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

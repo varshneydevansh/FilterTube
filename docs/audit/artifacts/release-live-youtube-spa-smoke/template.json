@@ -1,0 +1,110 @@
+{
+  "artifactType": "filtertube-release-live-youtube-spa-smoke",
+  "schemaVersion": 2,
+  "status": "template-not-executed",
+  "smokeSliceReadiness": "NO-GO",
+  "releaseReadiness": "NO-GO",
+  "runtimeBehaviorChanged": false,
+  "boundaryDoc": "docs/audit/FILTERTUBE_RELEASE_LIVE_YOUTUBE_SPA_SMOKE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-25.md",
+  "relatedAutomatedProof": [
+    "tests/runtime/right-rail-whitelist-observer-current-behavior.test.mjs",
+    "tests/runtime/whitelist-cache-hot-path-boundary-current-behavior.test.mjs",
+    "tests/runtime/whitelist-optimization-readiness-gap-matrix-current-behavior.test.mjs"
+  ],
+  "recordingFields": {
+    "browserNameVersion": "",
+    "extensionBuildSourcePath": "",
+    "profileListModeSettings": "",
+    "whitelistEntriesUsed": [],
+    "routeSequence": [],
+    "observedStallOrNoStall": "",
+    "observedFalseHideLeakResult": "",
+    "consoleErrorSummary": "",
+    "manualTimestamp": "",
+    "testerInitials": ""
+  },
+  "installedByteParity": {
+    "packet_id": "FT-WLCACHE-SPA-PACKET-01-installed-profile-bytes",
+    "workspace_revision_or_hash": "",
+    "tester_initials": "",
+    "manual_timestamp": "",
+    "chrome_profile_label": "",
+    "chrome_user_data_dir": "",
+    "extension_id": "",
+    "extension_path": "",
+    "manifest_version": "",
+    "service_worker_version": "",
+    "active_tab_url": "",
+    "content_script_marker_or_hash": "",
+    "extension_reload_timestamp": "",
+    "tab_reload_timestamp": "",
+    "browser_name_version": "",
+    "source_hashes": {},
+    "content_script_files": [],
+    "missing_fields": [
+      "workspace_revision_or_hash",
+      "tester_initials",
+      "manual_timestamp",
+      "chrome_profile_label",
+      "chrome_user_data_dir",
+      "extension_id",
+      "extension_path",
+      "manifest_version",
+      "service_worker_version",
+      "active_tab_url",
+      "content_script_marker_or_hash",
+      "extension_reload_timestamp",
+      "tab_reload_timestamp"
+    ],
+    "verdict": "NO-GO",
+    "reason": "Template is not executed; installed visible-tab byte parity is missing."
+  },
+  "requiredRows": [
+    {
+      "id": "FT-LIVE-SPA-00-home-to-search",
+      "routeAction": "Start on YouTube Home in whitelist mode, navigate to a search results page without full reload.",
+      "requiredObservation": "No long visible stall, no repeated forced refresh loop, expected non-allowed cards hidden only after intended identity decision.",
+      "status": "missing"
+    },
+    {
+      "id": "FT-LIVE-SPA-01-search-to-channel",
+      "routeAction": "From search, open a channel page through normal YouTube SPA navigation.",
+      "requiredObservation": "Channel content remains usable; whitelist behavior does not hide channel scaffolding while identity hydrates.",
+      "status": "missing"
+    },
+    {
+      "id": "FT-LIVE-SPA-02-channel-to-watch",
+      "routeAction": "Open a video from the channel page.",
+      "requiredObservation": "Player, title, owner row, metadata, and watch controls remain visible as expected; right-rail does not leak or false-hide due to stale timers.",
+      "status": "missing"
+    },
+    {
+      "id": "FT-LIVE-SPA-03-watch-to-home",
+      "routeAction": "Navigate away from watch to Home using YouTube navigation.",
+      "requiredObservation": "No stale delayed watch-route timer forces a broad reprocess after the route changes.",
+      "status": "missing"
+    },
+    {
+      "id": "FT-LIVE-SPA-04-watch-rail-scroll",
+      "routeAction": "Scroll the watch page right rail and observe recommendation hydration.",
+      "requiredObservation": "No runaway mutation/timer fanout; allowed/non-allowed recommendations match whitelist expectations.",
+      "status": "missing"
+    },
+    {
+      "id": "FT-LIVE-SPA-05-cache-repeat-navigation",
+      "routeAction": "Repeat Home/Search/Watch navigation after learned-map rows have been populated.",
+      "requiredObservation": "Duplicate learned rows do not visibly slow later navigation or trigger repeated DOM flicker.",
+      "status": "missing"
+    }
+  ],
+  "completionRules": {
+    "allRecordingFieldsRequired": true,
+    "allRowsMustPass": true,
+    "consoleErrorsMustBeClassified": true,
+    "installedByteParityMustPass": true,
+    "releaseReadinessWhenTemplate": "NO-GO",
+    "releaseReadinessWhenByteParityMissing": "NO-GO",
+    "releaseReadinessWhenAnyRowMissing": "NO-GO",
+    "releaseReadinessWhenAnyRowFailed": "NO-GO"
+  }
+}

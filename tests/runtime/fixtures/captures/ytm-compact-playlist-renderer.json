@@ -1,0 +1,373 @@
+{
+  "provenance": {
+    "source": "YTM.json",
+    "rendererType": "compactPlaylistRenderer",
+    "extractedBlockIndex": 2,
+    "extractedPath": "onResponseReceivedEndpoints.0.appendContinuationItemsAction.continuationItems.8.compactPlaylistRenderer"
+  },
+  "renderer": {
+    "playlistId": "PLQu4efLw66leHfsIx1g8jCwfeJAMpOtNj",
+    "thumbnail": {
+      "thumbnails": [
+        {
+          "url": "https://i.ytimg.com/vi/EPo5wWmKEaI/default.jpg",
+          "width": 120,
+          "height": 90
+        },
+        {
+          "url": "https://i.ytimg.com/vi/EPo5wWmKEaI/mqdefault.jpg",
+          "width": 320,
+          "height": 180
+        },
+        {
+          "url": "https://i.ytimg.com/vi/EPo5wWmKEaI/hqdefault.jpg",
+          "width": 480,
+          "height": 360
+        }
+      ],
+      "sampledThumbnailColor": {
+        "red": 72,
+        "green": 79,
+        "blue": 89
+      },
+      "darkColorPalette": {
+        "section2Color": 2698547,
+        "iconInactiveColor": 7898003,
+        "iconDisabledColor": 4738905
+      },
+      "vibrantColorPalette": {
+        "iconInactiveColor": 8161433
+      }
+    },
+    "title": {
+      "runs": [
+        {
+          "text": "Mix danc pop"
+        }
+      ]
+    },
+    "shortBylineText": {
+      "runs": [
+        {
+          "text": "Fabrizzio Andres Olguin Olguin",
+          "navigationEndpoint": {
+            "clickTrackingParams": "CBYQojAYCSITCIzw24Tq25IDFbCIrAIdAUU9CTIHcmVsbGlzdMoBBIZVeiY=",
+            "commandMetadata": {
+              "webCommandMetadata": {
+                "url": "/@fabrizzioandresolguinolgui5752",
+                "webPageType": "WEB_PAGE_TYPE_CHANNEL",
+                "rootVe": 3611,
+                "apiUrl": "/youtubei/v1/browse"
+              }
+            },
+            "browseEndpoint": {
+              "browseId": "UCvjXCedQa9pCEMzeLKMc20A",
+              "canonicalBaseUrl": "/@fabrizzioandresolguinolgui5752"
+            }
+          }
+        },
+        {
+          "text": " · "
+        },
+        {
+          "text": "Playlist",
+          "navigationEndpoint": {
+            "clickTrackingParams": "CBYQojAYCSITCIzw24Tq25IDFbCIrAIdAUU9CTIHcmVsbGlzdMoBBIZVeiY=",
+            "commandMetadata": {
+              "webCommandMetadata": {
+                "url": "/@fabrizzioandresolguinolgui5752",
+                "webPageType": "WEB_PAGE_TYPE_CHANNEL",
+                "rootVe": 3611,
+                "apiUrl": "/youtubei/v1/browse"
+              }
+            },
+            "browseEndpoint": {
+              "browseId": "UCvjXCedQa9pCEMzeLKMc20A",
+              "canonicalBaseUrl": "/@fabrizzioandresolguinolgui5752"
+            }
+          }
+        }
+      ]
+    },
+    "videoCountText": {
+      "runs": [
+        {
+          "text": "21"
+        },
+        {
+          "text": " videos"
+        }
+      ]
+    },
+    "navigationEndpoint": {
+      "clickTrackingParams": "CBYQojAYCSITCIzw24Tq25IDFbCIrAIdAUU9CTIHcmVsbGlzdMoBBIZVeiY=",
+      "commandMetadata": {
+        "webCommandMetadata": {
+          "url": "/playlist?list=PLQu4efLw66leHfsIx1g8jCwfeJAMpOtNj",
+          "webPageType": "WEB_PAGE_TYPE_PLAYLIST",
+          "rootVe": 5754,
+          "apiUrl": "/youtubei/v1/browse"
+        }
+      },
+      "browseEndpoint": {
+        "browseId": "VLPLQu4efLw66leHfsIx1g8jCwfeJAMpOtNj"
+      }
+    },
+    "videoCountShortText": {
+      "runs": [
+        {
+          "text": "21"
+        }
+      ]
+    },
+    "trackingParams": "CBYQojAYCSITCIzw24Tq25IDFbCIrAIdAUU9CQ==",
+    "sidebarThumbnails": [
+      {
+        "thumbnails": [
+          {
+            "url": "https://i.ytimg.com/vi/tg00YEETFzg/default.jpg",
+            "width": 43,
+            "height": 20
+          }
+        ]
+      },
+      {
+        "thumbnails": [
+          {
+            "url": "https://i.ytimg.com/vi/kYtGl1dX5qI/default.jpg",
+            "width": 43,
+            "height": 20
+          }
+        ]
+      },
+      {
+        "thumbnails": [
+          {
+            "url": "https://i.ytimg.com/vi/3OnnDqH6Wj8/default.jpg",
+            "width": 43,
+            "height": 20
+          }
+        ]
+      },
+      {
+        "thumbnails": [
+          {
+            "url": "https://i.ytimg.com/vi/bpOR_HuHRNs/default.jpg",
+            "width": 43,
+            "height": 20
+          }
+        ]
+      }
+    ],
+    "thumbnailText": {
+      "runs": [
+        {
+          "text": "21",
+          "bold": true
+        },
+        {
+          "text": " videos"
+        }
+      ]
+    },
+    "menu": {
+      "menuRenderer": {
+        "items": [
+          {
+            "menuServiceItemRenderer": {
+              "text": {
+                "runs": [
+                  {
+                    "text": "Not interested"
+                  }
+                ]
+              },
+              "icon": {
+                "iconType": "NOT_INTERESTED"
+              },
+              "serviceEndpoint": {
+                "clickTrackingParams": "CBYQojAYCSITCIzw24Tq25IDFbCIrAIdAUU9CcoBBIZVeiY=",
+                "commandMetadata": {
+                  "webCommandMetadata": {
+                    "sendPost": true,
+                    "apiUrl": "/youtubei/v1/feedback"
+                  }
+                },
+                "feedbackEndpoint": {
+                  "feedbackToken": "AB9zfpIiIfojVNc3SgH07Q1JCXL7Znv_zjwN9CDMl8tAIa14SB0RkEw5vRaVJMVLOoWJdKQ3IY9qzwwmfJ_Y59kxnbaDpzwszng7oGm_UMUVdgoZ_nlEfWefyysw1twjvzb-vhLyR6M-yeqnRU8Nq28JwUCNXM0_wunIAAVZ_O3SwNDoNzlCEDg",
+                  "uiActions": {
+                    "hideEnclosingContainer": true
+                  },
+                  "actions": [
+                    {
+                      "clickTrackingParams": "CBYQojAYCSITCIzw24Tq25IDFbCIrAIdAUU9CcoBBIZVeiY=",
+                      "replaceEnclosingAction": {
+                        "item": {
+                          "notificationTextRenderer": {
+                            "successResponseText": {
+                              "runs": [
+                                {
+                                  "text": "Playlist removed"
+                                }
+                              ]
+                            },
+                            "trackingParams": "CBgQyscDIhMIjPDbhOrbkgMVsIisAh0BRT0J"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              },
+              "trackingParams": "CBYQojAYCSITCIzw24Tq25IDFbCIrAIdAUU9CQ=="
+            }
+          },
+          {
+            "menuNavigationItemRenderer": {
+              "text": {
+                "runs": [
+                  {
+                    "text": "Share"
+                  }
+                ]
+              },
+              "icon": {
+                "iconType": "SHARE"
+              },
+              "navigationEndpoint": {
+                "clickTrackingParams": "CBYQojAYCSITCIzw24Tq25IDFbCIrAIdAUU9CcoBBIZVeiY=",
+                "commandMetadata": {
+                  "webCommandMetadata": {
+                    "ignoreNavigation": true
+                  }
+                },
+                "shareEntityEndpoint": {
+                  "serializedShareEntity": "EiJQTFF1NGVmTHc2NmxlSGZzSXgxZzhqQ3dmZUpBTXBPdE5q",
+                  "sharePanelType": "SHARE_PANEL_TYPE_UNIFIED_SHARE_PANEL"
+                }
+              },
+              "trackingParams": "CBYQojAYCSITCIzw24Tq25IDFbCIrAIdAUU9CQ=="
+            }
+          }
+        ],
+        "trackingParams": "CBYQojAYCSITCIzw24Tq25IDFbCIrAIdAUU9CQ==",
+        "accessibility": {
+          "accessibilityData": {
+            "label": "Action menu"
+          }
+        }
+      }
+    },
+    "shareUrl": "https://www.youtube.com/playlist?list=PLQu4efLw66leHfsIx1g8jCwfeJAMpOtNj",
+    "thumbnailRenderer": {
+      "playlistVideoThumbnailRenderer": {
+        "thumbnail": {
+          "thumbnails": [
+            {
+              "url": "https://i.ytimg.com/vi/EPo5wWmKEaI/default.jpg",
+              "width": 120,
+              "height": 90
+            },
+            {
+              "url": "https://i.ytimg.com/vi/EPo5wWmKEaI/mqdefault.jpg",
+              "width": 320,
+              "height": 180
+            },
+            {
+              "url": "https://i.ytimg.com/vi/EPo5wWmKEaI/hqdefault.jpg",
+              "width": 480,
+              "height": 360
+            }
+          ],
+          "sampledThumbnailColor": {
+            "red": 72,
+            "green": 79,
+            "blue": 89
+          },
+          "darkColorPalette": {
+            "section2Color": 2698547,
+            "iconInactiveColor": 7898003,
+            "iconDisabledColor": 4738905
+          },
+          "vibrantColorPalette": {
+            "iconInactiveColor": 8161433
+          }
+        },
+        "trackingParams": "CBcQy-wJIhMIjPDbhOrbkgMVsIisAh0BRT0J"
+      }
+    },
+    "longBylineText": {
+      "runs": [
+        {
+          "text": "Fabrizzio Andres Olguin Olguin",
+          "navigationEndpoint": {
+            "clickTrackingParams": "CBYQojAYCSITCIzw24Tq25IDFbCIrAIdAUU9CTIHcmVsbGlzdMoBBIZVeiY=",
+            "commandMetadata": {
+              "webCommandMetadata": {
+                "url": "/@fabrizzioandresolguinolgui5752",
+                "webPageType": "WEB_PAGE_TYPE_CHANNEL",
+                "rootVe": 3611,
+                "apiUrl": "/youtubei/v1/browse"
+              }
+            },
+            "browseEndpoint": {
+              "browseId": "UCvjXCedQa9pCEMzeLKMc20A",
+              "canonicalBaseUrl": "/@fabrizzioandresolguinolgui5752"
+            }
+          }
+        },
+        {
+          "text": " · "
+        },
+        {
+          "text": "Playlist",
+          "navigationEndpoint": {
+            "clickTrackingParams": "CBYQojAYCSITCIzw24Tq25IDFbCIrAIdAUU9CTIHcmVsbGlzdMoBBIZVeiY=",
+            "commandMetadata": {
+              "webCommandMetadata": {
+                "url": "/@fabrizzioandresolguinolgui5752",
+                "webPageType": "WEB_PAGE_TYPE_CHANNEL",
+                "rootVe": 3611,
+                "apiUrl": "/youtubei/v1/browse"
+              }
+            },
+            "browseEndpoint": {
+              "browseId": "UCvjXCedQa9pCEMzeLKMc20A",
+              "canonicalBaseUrl": "/@fabrizzioandresolguinolgui5752"
+            }
+          }
+        }
+      ]
+    },
+    "thumbnailOverlays": [
+      {
+        "thumbnailOverlaySidePanelRenderer": {
+          "text": {
+            "runs": [
+              {
+                "text": "21"
+              }
+            ]
+          },
+          "icon": {
+            "iconType": "PLAYLISTS"
+          }
+        }
+      },
+      {
+        "thumbnailOverlayBottomPanelRenderer": {
+          "text": {
+            "runs": [
+              {
+                "text": "21 videos"
+              }
+            ]
+          },
+          "icon": {
+            "iconType": "PLAYLISTS"
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "provenance": {
+    "source": "YT_MAIN_next?prettyPrint.json",
+    "rendererType": "commentThreadRenderer",
+    "extractedBlockIndex": 0,
+    "extractedPath": "onResponseReceivedEndpoints.0.appendContinuationItemsAction.continuationItems.0.commentThreadRenderer"
+  },
+  "renderer": {
+    "trackingParams": "CO0CEMJ1GMECIhMI1YOi_7KVkgMVZoa5BR2IOzKA",
+    "renderingPriority": "RENDERING_PRIORITY_UNKNOWN",
+    "isModeratedElqComment": false,
+    "commentViewModel": {
+      "commentViewModel": {
+        "commentKey": "EhpVZ3dEdmFhcVNUV0JBZWw0U1JCNEFhQUJBZyAoKAE%3D",
+        "sharedKey": "EgAgKygB",
+        "toolbarStateKey": "EhpVZ3dEdmFhcVNUV0JBZWw0U1JCNEFhQUJBZyAsKAE%3D",
+        "toolbarSurfaceKey": "Eh1VZ3dEdmFhcVNUV0JBZWw0U1JCNEFhQUJBZy8xMiBGKAE%3D",
+        "commentId": "UgwDvaaqSTWBAel4SRB4AaABAg",
+        "commentSurfaceKey": "Eh1VZ3dEdmFhcVNUV0JBZWw0U1JCNEFhQUJBZy8xMiBPKAE%3D",
+        "allowProfileCard": true,
+        "sharedSurfaceKey": "EhVWSUVXSU5HX0NPTlRFWFRfV0FUQ0gg9AIoAQ%3D%3D",
+        "inlineRepliesKey": "empty_inline_replies",
+        "rendererContext": {
+          "loggingContext": {
+            "loggingDirectives": {
+              "trackingParams": "CO4CELZ1IhMI1YOi_7KVkgMVZoa5BR2IOzKA",
+              "visibility": {
+                "types": "12"
+              },
+              "attentionLogging": "ATTENTION_LOGGING_BASIC"
+            }
+          }
+        }
+      }
+    },
+    "loggingDirectives": {
+      "trackingParams": "CO0CEMJ1GMECIhMI1YOi_7KVkgMVZoa5BR2IOzKA",
+      "visibility": {
+        "types": "12"
+      }
+    }
+  }
+}

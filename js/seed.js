@@ -194,6 +194,72 @@
         }
     }
 
+    function hasList(value) {
+        return Array.isArray(value) && value.length > 0;
+    }
+
+    function hasEnabledContentFilters(settings) {
+        return Boolean(
+            settings
+            && settings.contentFilters
+            && (
+                settings.contentFilters.duration?.enabled === true
+                || settings.contentFilters.uploadDate?.enabled === true
+                || settings.contentFilters.uppercase?.enabled === true
+            )
+        );
+    }
+
+    function hasSelectedCategoryFilters(settings) {
+        return Boolean(
+            settings?.categoryFilters?.enabled === true
+            && hasList(settings.categoryFilters.selected)
+        );
+    }
+
+    function hasActiveJsonFilterRules(settings) {
+        return Boolean(
+            settings
+            && (
+                hasList(settings.filterKeywords)
+                || hasList(settings.filterChannels)
+                || hasList(settings.filterKeywordsComments)
+                || settings.hideAllComments === true
+                || settings.hideAllShorts === true
+                || hasSelectedCategoryFilters(settings)
+            )
+        );
+    }
+
+    function hasNetworkJsonWork(settings) {
+        if (!settings || settings.enabled === false) return false;
+        if (settings.listMode === 'whitelist') return true;
+        return hasEnabledContentFilters(settings) || hasActiveJsonFilterRules(settings);
+    }
+
+    function shouldCaptureRawSnapshot() {
+        return Boolean(cachedSettings && hasNetworkJsonWork(cachedSettings));
+    }
+
+    function getDebugPayloadSize(data) {
+        if (!isSeedDebugEnabled()) return 0;
+        try {
+            return data ? JSON.stringify(data).length : 0;
+        } catch (e) {
+            return 0;
+        }
+    }
+
+    function shouldBypassYouTubeiNetworkResponse(dataName) {
+        if (!cachedSettings) {
+            seedDebugLog(`⏭️ Passing through ${dataName} before JSON parse (settings not loaded)`);
+            return true;
+        }
+        if (hasNetworkJsonWork(cachedSettings)) return false;
+        seedDebugLog(`⏭️ Passing through ${dataName} before JSON parse (no active JSON work)`);
+        return true;
+    }
+
     function shouldSkipEngineProcessing(data, dataName) {
         if (!data || !dataName) return false;
 
@@ -201,27 +267,8 @@
         const isSearchResultsPath = path.startsWith('/results');
         const isChannelPath = /^(\/(?:@|channel\/|c\/))/i.test(path);
         const mode = (cachedSettings && cachedSettings.listMode === 'whitelist') ? 'whitelist' : 'blocklist';
-
-        const hasEnabledContentFilters = Boolean(
-            cachedSettings
-            && cachedSettings.contentFilters
-            && (
-                cachedSettings.contentFilters.duration?.enabled
-                || cachedSettings.contentFilters.uploadDate?.enabled
-                || cachedSettings.contentFilters.uppercase?.enabled
-            )
-        );
-        const hasActiveJsonFilterRules = Boolean(
-            cachedSettings
-            && (
-                (Array.isArray(cachedSettings.filterKeywords) && cachedSettings.filterKeywords.length > 0)
-                || (Array.isArray(cachedSettings.filterChannels) && cachedSettings.filterChannels.length > 0)
-                || (Array.isArray(cachedSettings.filterKeywordsComments) && cachedSettings.filterKeywordsComments.length > 0)
-                || cachedSettings.hideAllComments === true
-                || cachedSettings.hideAllShorts === true
-                || cachedSettings.categoryFilters?.enabled === true
-            )
-        );
+        const activeContentFilters = hasEnabledContentFilters(cachedSettings);
+        const activeJsonFilterRules = hasActiveJsonFilterRules(cachedSettings);
 
         const searchActionCollections = data.onResponseReceivedCommands || data.onResponseReceivedActions || data.onResponseReceivedEndpoints;
         const hasSearchLayout = Boolean(
@@ -264,7 +311,7 @@
                 if (mode !== 'whitelist') {
                     // Keep the old fast path only when there are no active rules. Once a
                     // blocklist rule exists, JSON filtering must run before YouTube paints.
-                    if (!hasEnabledContentFilters && !hasActiveJsonFilterRules) {
+                    if (!activeContentFilters && !activeJsonFilterRules) {
                         seedDebugLog(`⏭️ Skipping engine processing for ${dataName} (search results) to allow DOM-based restore`);
                         return true;
                     }
@@ -287,7 +334,7 @@
             );
 
             if (channelIndicators && isChannelDataName) {
-                if (mode !== 'whitelist' && !hasEnabledContentFilters && !hasActiveJsonFilterRules) {
+                if (mode !== 'whitelist' && !activeContentFilters && !activeJsonFilterRules) {
                     seedDebugLog(`⏭️ Skipping engine processing for ${dataName} (channel page) to allow DOM-based restore`);
                     return true;
                 }
@@ -301,9 +348,9 @@
         if (!isOnHomeFeed) return false;
 
         // Apply deterministic content filters JSON-first on home feed to prevent flash.
-        if (hasEnabledContentFilters) return false;
+        if (activeContentFilters) return false;
         if (mode === 'whitelist') return false;
-        if (hasActiveJsonFilterRules) return false;
+        if (activeJsonFilterRules) return false;
 
         const actionCollections = data.onResponseReceivedActions || data.onResponseReceivedEndpoints;
         if (!Array.isArray(actionCollections)) return false;
@@ -352,7 +399,12 @@
         
         if (!cachedSettings) {
             seedDebugLog(`⚠️ No settings available for processing ${dataName}, queueing`);
-            pendingDataQueue.push({ data: data, name: dataName, timestamp: Date.now() });
+            queueForLater('settings-missing');
+            return data; // Return unmodified data
+        }
+
+        if (!hasNetworkJsonWork(cachedSettings)) {
+            seedDebugLog(`⏭️ No active JSON work for ${dataName}, passing through without engine processing`);
             return data; // Return unmodified data
         }
 
@@ -508,12 +560,12 @@
         // Check if data already exists and process it immediately
         if (originalYtInitialData && typeof originalYtInitialData === 'object') {
             seedDebugLog("🎯 ytInitialData already exists, processing immediately");
-            rawYtInitialData = cloneData(originalYtInitialData);
+            rawYtInitialData = shouldCaptureRawSnapshot() ? cloneData(originalYtInitialData) : null;
             const processed = processWithEngine(originalYtInitialData, 'ytInitialData-existing');
             window.ytInitialData = processed;
             if (window.filterTube) {
                 window.filterTube.lastYtInitialData = processed;
-                window.filterTube.rawYtInitialData = cloneData(rawYtInitialData);
+                window.filterTube.rawYtInitialData = rawYtInitialData ? cloneData(rawYtInitialData) : null;
             }
         }
 
@@ -529,16 +581,20 @@
                         return originalYtInitialData;
                     },
                     set: function(newValue) {
-                        seedDebugLog('🎯 ytInitialData intercepted via setter');
-                        seedDebugLog('Data keys:', newValue ? Object.keys(newValue) : 'null');
-                        seedDebugLog('Data size:', newValue ? JSON.stringify(newValue).length : 0, 'chars');
+                        if (isSeedDebugEnabled()) {
+                            seedDebugLog('🎯 ytInitialData intercepted via setter');
+                            seedDebugLog('Data keys:', newValue ? Object.keys(newValue) : 'null');
+                            seedDebugLog('Data size:', getDebugPayloadSize(newValue), 'chars');
+                        }
                         
+                        rawYtInitialData = shouldCaptureRawSnapshot() ? cloneData(newValue) : null;
                         const processed = processWithEngine(newValue, 'ytInitialData');
                         originalYtInitialData = processed;
                         
                         // Update global reference
                         if (window.filterTube) {
                             window.filterTube.lastYtInitialData = processed;
+                            window.filterTube.rawYtInitialData = rawYtInitialData ? cloneData(rawYtInitialData) : null;
                         }
                     }
                 });
@@ -553,12 +609,12 @@
         // Check if data already exists and process it immediately
         if (originalYtInitialPlayerResponse && typeof originalYtInitialPlayerResponse === 'object') {
             seedDebugLog("🎯 ytInitialPlayerResponse already exists, processing immediately");
-            rawYtInitialPlayerResponse = cloneData(originalYtInitialPlayerResponse);
+            rawYtInitialPlayerResponse = shouldCaptureRawSnapshot() ? cloneData(originalYtInitialPlayerResponse) : null;
             const processed = processWithEngine(originalYtInitialPlayerResponse, 'ytInitialPlayerResponse-existing');
             window.ytInitialPlayerResponse = processed;
             if (window.filterTube) {
                 window.filterTube.lastYtInitialPlayerResponse = processed;
-                window.filterTube.rawYtInitialPlayerResponse = cloneData(rawYtInitialPlayerResponse);
+                window.filterTube.rawYtInitialPlayerResponse = rawYtInitialPlayerResponse ? cloneData(rawYtInitialPlayerResponse) : null;
             }
         }
 
@@ -574,16 +630,20 @@
                         return originalYtInitialPlayerResponse;
                     },
                     set: function(newValue) {
-                        seedDebugLog('🎯 ytInitialPlayerResponse intercepted via setter');
-                        seedDebugLog('Data keys:', newValue ? Object.keys(newValue) : 'null');
-                        seedDebugLog('Data size:', newValue ? JSON.stringify(newValue).length : 0, 'chars');
+                        if (isSeedDebugEnabled()) {
+                            seedDebugLog('🎯 ytInitialPlayerResponse intercepted via setter');
+                            seedDebugLog('Data keys:', newValue ? Object.keys(newValue) : 'null');
+                            seedDebugLog('Data size:', getDebugPayloadSize(newValue), 'chars');
+                        }
                         
+                        rawYtInitialPlayerResponse = shouldCaptureRawSnapshot() ? cloneData(newValue) : null;
                         const processed = processWithEngine(newValue, 'ytInitialPlayerResponse');
                         originalYtInitialPlayerResponse = processed;
                         
                         // Update global reference
                         if (window.filterTube) {
                             window.filterTube.lastYtInitialPlayerResponse = processed;
+                            window.filterTube.rawYtInitialPlayerResponse = rawYtInitialPlayerResponse ? cloneData(rawYtInitialPlayerResponse) : null;
                         }
                     }
                 });
@@ -630,12 +690,17 @@
                 return originalFetch.apply(this, arguments);
             }
 
+            const dataName = `fetch:${getPathname(urlStr)}`;
+            if (shouldBypassYouTubeiNetworkResponse(dataName)) {
+                return originalFetch.apply(this, arguments);
+            }
+
             return originalFetch.apply(this, arguments).then(response => {
                 if (!response.ok) return response;
-                
+
                 return response.clone().json().then(jsonData => {
                     // Special handling for comment requests when hideAllComments is enabled
-                    if (url.includes('/youtubei/v1/next') && cachedSettings?.hideAllComments) {
+                    if (urlStr.includes('/youtubei/v1/next') && cachedSettings?.hideAllComments) {
                         // Check if this is a comment continuation request
                         const isCommentRequest = jsonData?.onResponseReceivedEndpoints?.some(endpoint => 
                             endpoint?.appendContinuationItemsAction?.continuationItems?.some(item => 
@@ -672,7 +737,7 @@
                     }
                     
                     // Normal processing for non-comment or non-hideAllComments requests
-                    const processed = processWithEngine(jsonData, `fetch:${getPathname(urlStr)}`);
+                    const processed = processWithEngine(jsonData, dataName);
                     return new Response(JSON.stringify(processed), {
                         status: response.status,
                         statusText: response.statusText,
@@ -756,6 +821,13 @@
                     const status = Number(xhr.status || 0);
                     if (status && status >= 400) return;
 
+                    const urlStr = typeof xhr.__filtertube_url === 'string' ? xhr.__filtertube_url : String(xhr.__filtertube_url || '');
+                    const dataName = `xhr:${getPathname(urlStr)}`;
+                    if (shouldBypassYouTubeiNetworkResponse(dataName)) {
+                        xhr.__filtertube_responseProcessed = true;
+                        return;
+                    }
+
                     const responseType = xhr.responseType || '';
                     let jsonData = null;
 
@@ -776,8 +848,7 @@
                         return;
                     }
 
-                    const urlStr = typeof xhr.__filtertube_url === 'string' ? xhr.__filtertube_url : String(xhr.__filtertube_url || '');
-                    const processed = processWithEngine(jsonData, `xhr:${getPathname(urlStr)}`);
+                    const processed = processWithEngine(jsonData, dataName);
                     if (!processed || typeof processed !== 'object') return;
 
                     xhr.__filtertube_modifiedResponse = processed;
@@ -854,7 +925,12 @@
                 try {
                     this.__filtertube_url = url;
                     const urlStr = typeof url === 'string' ? url : String(url || '');
-                    this.__filtertube_shouldProcessXhr = Boolean(urlStr && xhrEndpoints.some(endpoint => urlStr.includes(endpoint)));
+                    const dataName = `xhr:${getPathname(urlStr)}`;
+                    this.__filtertube_shouldProcessXhr = Boolean(
+                        urlStr
+                        && xhrEndpoints.some(endpoint => urlStr.includes(endpoint))
+                        && !shouldBypassYouTubeiNetworkResponse(dataName)
+                    );
                     this.__filtertube_responseProcessed = false;
                 } catch (e) {
                 }
@@ -865,7 +941,12 @@
                 try {
                     const rawUrl = this.__filtertube_url;
                     const urlStr = typeof rawUrl === 'string' ? rawUrl : String(rawUrl || '');
-                    if (urlStr && xhrEndpoints.some(endpoint => urlStr.includes(endpoint))) {
+                    const dataName = `xhr:${getPathname(urlStr)}`;
+                    if (
+                        urlStr
+                        && xhrEndpoints.some(endpoint => urlStr.includes(endpoint))
+                        && !shouldBypassYouTubeiNetworkResponse(dataName)
+                    ) {
                         this.__filtertube_shouldProcessXhr = true;
                         this.__filtertube_responseProcessed = false;
                         const xhr = this;
@@ -917,7 +998,25 @@
             }
         } catch (e) {
         }
+
+        if (!hasNetworkJsonWork(cachedSettings)) {
+            pendingDataQueue = [];
+            rawYtInitialData = null;
+            rawYtInitialPlayerResponse = null;
+            try {
+                if (window.filterTube && typeof window.filterTube === 'object') {
+                    window.filterTube.rawYtInitialData = null;
+                    window.filterTube.rawYtInitialPlayerResponse = null;
+                }
+            } catch (e) {
+            }
+            seedDebugLog('⏭️ Settings update has no active JSON work; cleared queued seed data without replay');
+            return;
+        }
         
+        let replayedInitialData = false;
+        let replayedPlayerResponse = false;
+
         // Process any queued data
         if (pendingDataQueue.length > 0) {
             seedDebugLog(`🔄 Processing ${pendingDataQueue.length} queued data items`);
@@ -932,11 +1031,13 @@
                 
                 // Update the appropriate global variable
                 if (item.name.includes('ytInitialData')) {
+                    replayedInitialData = true;
                     window.ytInitialData = processed;
                     if (window.filterTube) {
                         window.filterTube.lastYtInitialData = processed;
                     }
                 } else if (item.name.includes('ytInitialPlayerResponse')) {
+                    replayedPlayerResponse = true;
                     window.ytInitialPlayerResponse = processed;
                     if (window.filterTube) {
                         window.filterTube.lastYtInitialPlayerResponse = processed;
@@ -949,16 +1050,24 @@
         
         // Reprocess existing data if available (for settings changes)
         if (window.filterTube) {
-            const sourceInitialData = rawYtInitialData ? cloneData(rawYtInitialData) : (window.filterTube.rawYtInitialData ? cloneData(window.filterTube.rawYtInitialData) : null);
-            if (sourceInitialData) {
+            const sourceInitialData = rawYtInitialData
+                ? cloneData(rawYtInitialData)
+                : (window.filterTube.rawYtInitialData
+                    ? cloneData(window.filterTube.rawYtInitialData)
+                    : (window.filterTube.lastYtInitialData ? cloneData(window.filterTube.lastYtInitialData) : null));
+            if (sourceInitialData && !replayedInitialData) {
                 seedDebugLog('🔄 Reprocessing stored ytInitialData snapshot with new settings');
                 const reprocessed = processWithEngine(sourceInitialData, 'ytInitialData-reprocess');
                 window.ytInitialData = reprocessed;
                 window.filterTube.lastYtInitialData = reprocessed;
             }
 
-            const sourcePlayerResponse = rawYtInitialPlayerResponse ? cloneData(rawYtInitialPlayerResponse) : (window.filterTube.rawYtInitialPlayerResponse ? cloneData(window.filterTube.rawYtInitialPlayerResponse) : null);
-            if (sourcePlayerResponse) {
+            const sourcePlayerResponse = rawYtInitialPlayerResponse
+                ? cloneData(rawYtInitialPlayerResponse)
+                : (window.filterTube.rawYtInitialPlayerResponse
+                    ? cloneData(window.filterTube.rawYtInitialPlayerResponse)
+                    : (window.filterTube.lastYtInitialPlayerResponse ? cloneData(window.filterTube.lastYtInitialPlayerResponse) : null));
+            if (sourcePlayerResponse && !replayedPlayerResponse) {
                 seedDebugLog('🔄 Reprocessing stored ytInitialPlayerResponse snapshot with new settings');
                 const reprocessed = processWithEngine(sourcePlayerResponse, 'ytInitialPlayerResponse-reprocess');
                 window.ytInitialPlayerResponse = reprocessed;

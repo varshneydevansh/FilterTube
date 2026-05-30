@@ -1,0 +1,181 @@
+# FilterTube Manifest Permission Feature Map Boundary - 2026-05-22
+
+Status: audit-only current-behavior proof. Runtime behavior is unchanged.
+This is not an implementation patch, manifest patch, build-validation patch,
+trusted-sender patch, permission-pruning patch, host-scope patch, or
+optimization patch.
+
+## Scope
+
+This slice maps the current browser manifest permission declarations to the
+runtime feature owners that consume those permissions: storage, tabs,
+scripting, downloads, active tab access, host permissions, content-script
+matches, web-accessible resource matches, and build-time manifest validation.
+
+It extends the open manifest/permission, tracked-file, runtime lifecycle,
+message trust, external navigation, release/static/native, storage/cache,
+settings-mode, reliability, false-hide/leak, performance, code-burden,
+cross-feature, JSON-first filter readiness, source/evidence, and
+implementation-change rows. It keeps the implementation gate closed.
+
+## Method Semantic Proof Gap Boundary
+
+`docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md`
+is a required source input before this audit slice can support runtime
+optimization or JSON-first promotion. Current proof pins:
+
+```text
+method semantic proof gap files covered: 63
+method semantic proof gap lexical callables covered: 5469
+files with complete per-callable semantic proof: 0
+lexical callables requiring semantic proof before behavior changes: 5469
+affected callable semantic proof: NO-GO
+runtime behavior changed: no
+```
+
+These counts are audit-only blockers. They do not approve runtime optimization,
+JSON-first behavior, method deletion, method merging, lifecycle cleanup, no-work
+changes, or whitelist behavior changes.
+
+## Source Fingerprints
+
+| Source file | Lines | Bytes | SHA-256 |
+| --- | ---: | ---: | --- |
+| `manifest.json` | 87 | 2470 | `96eb5e5c8733ecdfa9d3eb447d51a3bfc2c4743a80b1fde1f12d71bd46d1c8e4` |
+| `manifest.chrome.json` | 87 | 2470 | `96eb5e5c8733ecdfa9d3eb447d51a3bfc2c4743a80b1fde1f12d71bd46d1c8e4` |
+| `manifest.firefox.json` | 74 | 1994 | `5d7175c23dbce4f9e86b0db0f34b1ae61bb465a9725ff37fc7069a45d4ceac5c` |
+| `manifest.opera.json` | 88 | 2475 | `f76d4a48b51fc5da65492347ce3f7cb31ebff057afd2185573176991e7d1d4b7` |
+| `js/background.js` | 6313 | 284710 | `46442f904cf18c3fa8345e71f608171edcf277207a420136a78a195c3b7c57eb` |
+| `js/io_manager.js` | 2030 | 96914 | `d04bfd75d061ee405c1dfa4cab8c9d0fa6a2f072d046add33e4b6782b1f58a21` |
+| `js/tab-view.js` | 11617 | 526763 | `1b7f621d48d16247aecc4c7ee57cbc3db9efd3e597e6f0a4fc188228470648f7` |
+| `js/popup.js` | 1841 | 75587 | `cb2b30a8d22b08cbd538fdce4ae195b006405d0ceb02a91d92ed53c877aa402a` |
+| `js/state_manager.js` | 2491 | 99780 | `509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6` |
+| `js/content/bridge_injection.js` | 127 | 4741 | `d1b84cf4c43ec5ff5cdc3bd607d8f3d3bf448c12829780b0d05fb9fc14fb5d3e` |
+| `js/content/bridge_settings.js` | 651 | 26462 | `c7828acd09941f4559e47b31ea57d184ef9367ae4964598e865b8a196934e75b` |
+| `js/content_bridge.js` | 13535 | 600459 | `31e7234c6a4055bffb0b800bac43cf3dd1c496cb08d1d57d391ea027941277e9` |
+| `js/settings_shared.js` | 1181 | 57535 | `9710ebb445ba11cc45fc98aced765d298226a8cd4a003600e106f908abc2162c` |
+| `js/content/handle_resolver.js` | 282 | 9785 | `67cc877a0a97e4c4c5aaf5a0d1c37c15000af5238f8f37d7c5dc6efee27e34ff` |
+| `build.js` | 686 | 24689 | `f6778ce29f1d7f520a66ab689f8c1a2999e5887ffa8c53bd5039f4976b2671b6` |
+
+## Permission Feature Map
+
+Manifest permission feature-map source/effect blocks: 8.
+
+| Boundary | Current behavior | Risk before permission or optimization changes |
+| --- | --- | --- |
+| Manifest declarations | All four manifests declare exactly `storage`, `activeTab`, `scripting`, `tabs`, and `downloads`. | Permission removal or browser-specific drift can break unrelated features because there is no per-feature owner report. |
+| Host permissions | All four manifests host-permit `*.youtube.com`, `*.youtube-nocookie.com`, and `*.youtubekids.com`. | `youtube-nocookie.com` is host-permitted but no content script or web-accessible resource match covers it, so host permission is broader than active runtime coverage. |
+| Storage consumers | Runtime permission API callsites span background, StateManager, shared settings, content bridge, content bridge settings, handle resolver, IO, and tab-view storage paths. | Settings, profiles, stats, maps, cache invalidation, import/export, and content repair share one manifest permission without a feature owner matrix. |
+| Tabs consumers | Background, popup, tab-view, and StateManager use tabs query, create, update, and sendMessage APIs. | Prompt injection, refresh propagation, dashboard/open-tab behavior, and active YouTube tab detection share one permission without sender-class ownership. |
+| Scripting consumers | Background injects first-run/update prompts, MAIN-world scripts, and subscription import bridge files; bridge injection requests scripting-backed injection when not Firefox. | MAIN/ISOLATED injection policy is split between manifest load order, content bridge requesters, and background message handlers. |
+| Downloads consumers | Background, IO manager, and tab-view use downloads API flows for auto-backup, manual backup/export, cleanup/rotation, and fallback handling. | Backup retention and user exports share permission with no download owner report or retention policy artifact. |
+| `activeTab` declaration | `activeTab` appears in all four manifests and has 0 product runtime callsite tokens in the scanned source set. | The declaration may be intended for implicit tab/scripting affordances, but current code has no named active-tab use report. |
+| Build validation | `build.js` calls `ensureCollabDialogScriptOrder()` but has no manifest permission, host, web-resource, or world validator. | Package builds can copy permission drift unless future validation gates reject it before release. |
+
+## Selected Counts
+
+- Runtime permission consumer source files: 10.
+- Broad runtime permission API tokens in those files: 145.
+- Manifest `activeTab` tokens: 4.
+- Product runtime `activeTab` tokens in scanned source files: 0.
+- Runtime `storage` API tokens: 56.
+- Runtime `storage.local.get` tokens: 18.
+- Runtime `storage.local.set` tokens: 28.
+- Runtime `storage.onChanged` tokens: 4.
+- Runtime `tabs` API tokens: 61.
+- Runtime `tabs.query` tokens: 17.
+- Runtime `tabs.sendMessage` tokens: 5.
+- Runtime `tabs.create` tokens: 10.
+- Runtime `tabs.update` tokens: 1.
+- Runtime `scripting.executeScript` tokens: 9.
+- Runtime `downloads` API tokens: 17.
+- Runtime `downloads.download` tokens: 8.
+- Runtime `downloads.search` tokens: 3.
+- Runtime `downloads.erase` tokens: 3.
+- Build `ensureCollabDialogScriptOrder` tokens: 2.
+- Build `validateManifestPermissions` tokens: 0.
+- Runtime manifest permission feature-map fixtures: 7.
+
+## Current Behavior
+
+The current permission set is consistent across browser manifests, but the
+runtime feature owners are not first-class:
+
+- `storage` backs settings/profile persistence, compiled cache refresh,
+  statistics, channel maps, content identity repair, import/export, and
+  bridge-driven settings updates.
+- `tabs` backs active YouTube tab lookup, popup/dashboard navigation, tab
+  refresh propagation, tab messaging, and open-tab reuse.
+- `scripting` backs prompt injection, MAIN-world script injection, and
+  subscription import bridge injection.
+- `downloads` backs auto-backup, backup rotation, encrypted/plain exports,
+  manual file saves, and browser-specific download fallbacks.
+- `activeTab` is declared in manifests but is not represented by a named
+  product runtime callsite in the scanned sources.
+- Host permissions include `youtube-nocookie.com`, but content scripts and
+  web-accessible resources match only `*.youtube.com` and
+  `*.youtubekids.com`.
+- Build validation currently repairs collaboration dialog script order only;
+  it does not reject permission, host, web-accessible resource, or content
+  script world drift.
+
+## Runtime Fixture Results
+
+- All four manifests still declare the same five permission strings.
+- All four manifests still declare the same three host permission patterns.
+- Content-script and web-accessible resource matches still exclude
+  `youtube-nocookie.com`.
+- Runtime source contains 10 files with storage/tabs/scripting/downloads API
+  callsites.
+- Runtime source contains no `activeTab` token outside manifests.
+- Runtime source has storage, tabs, scripting, and downloads consumers in
+  multiple feature families rather than one permission feature map.
+- Product source still lacks manifest permission feature-map authority symbols.
+
+## Risks
+
+- Reliability: permission declarations are shared by prompt injection, backup,
+  dashboard navigation, storage migration, content settings, and profile/cache
+  refresh without a checked owner map.
+- False-hide/leak: host and scripting drift can create surfaces that are
+  permitted but not actively filtered, or actively injected without clear
+  sender-class proof.
+- Performance: tabs, scripting, storage, and downloads work can be triggered by
+  unrelated feature flows without a no-work budget tied to permission use.
+- Code burden: browser manifests, build packaging, background handlers, content
+  bridges, popup, tab-view, IO, and StateManager each carry permission-specific
+  assumptions that future cleanup must reconcile.
+
+## Future Proof Required Before Behavior Changes
+
+Before pruning permissions, changing host patterns, changing content-script
+matches, changing MAIN/ISOLATED injection, moving backup/download behavior,
+or optimizing tab/storage work, add fixture-backed reports for:
+
+```text
+manifestPermissionFeatureMapContract
+manifestPermissionFeatureOwnerReport
+manifestStoragePermissionOwnerReport
+manifestTabsPermissionOwnerReport
+manifestScriptingPermissionOwnerReport
+manifestDownloadsPermissionOwnerReport
+manifestActiveTabPermissionUseReport
+manifestHostPermissionScopeReport
+manifestPermissionTrustedSenderMatrix
+manifestPermissionBuildValidationReport
+manifestPermissionFixtureProvenance
+manifestPermissionMetricArtifact
+```
+
+No `manifestPermissionFeatureMapContract`,
+`manifestPermissionFeatureOwnerReport`,
+`manifestStoragePermissionOwnerReport`,
+`manifestTabsPermissionOwnerReport`,
+`manifestScriptingPermissionOwnerReport`,
+`manifestDownloadsPermissionOwnerReport`,
+`manifestActiveTabPermissionUseReport`,
+`manifestHostPermissionScopeReport`,
+`manifestPermissionTrustedSenderMatrix`,
+`manifestPermissionBuildValidationReport`,
+`manifestPermissionFixtureProvenance`, or
+`manifestPermissionMetricArtifact` exists in product runtime source yet.

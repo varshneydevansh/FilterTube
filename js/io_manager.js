@@ -679,14 +679,14 @@
                     allowKidsViewing: settings.allowKidsViewing !== false,
                     syncKidsToMain: !!settings.syncKidsToMain
                 },
-                main: {
+                main: normalizeMainProfileAliasFields({
                     ...main,
                     mode: main.mode === 'whitelist' ? 'whitelist' : 'blocklist',
-                    channels: sanitizeMainChannels(main.channels),
-                    keywords: sanitizeMainKeywords(main.keywords),
+                    channels: sanitizeMainChannels(Object.prototype.hasOwnProperty.call(main, 'channels') ? main.channels : main.blockedChannels),
+                    keywords: sanitizeMainKeywords(Object.prototype.hasOwnProperty.call(main, 'keywords') ? main.keywords : main.blockedKeywords),
                     whitelistChannels: sanitizeMainChannels(main.whitelistChannels),
                     whitelistKeywords: sanitizeMainKeywords(main.whitelistKeywords)
-                },
+                }),
                 kids: {
                     ...kids,
                     mode: kids.mode === 'whitelist' ? 'whitelist' : 'blocklist',
@@ -776,6 +776,24 @@
         }
 
         return Array.from(map.values());
+    }
+
+    function normalizeMainProfileAliasFields(main) {
+        const out = { ...safeObject(main) };
+        const mode = normalizeListMode(out.mode, 'blocklist');
+        out.mode = mode;
+        out.channels = safeArray(out.channels);
+        out.keywords = safeArray(out.keywords);
+        out.whitelistChannels = safeArray(out.whitelistChannels);
+        out.whitelistKeywords = safeArray(out.whitelistKeywords);
+        if (mode === 'blocklist') {
+            out.blockedChannels = out.channels;
+            out.blockedKeywords = out.keywords;
+        } else {
+            out.blockedChannels = [];
+            out.blockedKeywords = [];
+        }
+        return out;
     }
 
     /** Simple case-insensitive merge helper for plain string lists. */
@@ -1319,24 +1337,25 @@
         }
 
         const incomingV4Settings = incomingProfileForImport ? safeObject(incomingProfileForImport.settings) : null;
+        const incomingMainForImport = incomingProfileForImport ? safeObject(incomingProfileForImport.main) : null;
 
-        const v4MainChannels = incomingProfileForImport
-            ? safeArray(safeObject(incomingProfileForImport.main).channels).map(ch => sanitizeChannelEntry(ch, { source: 'import' })).filter(Boolean)
+        const v4MainChannels = incomingMainForImport
+            ? safeArray(Object.prototype.hasOwnProperty.call(incomingMainForImport, 'channels') ? incomingMainForImport.channels : incomingMainForImport.blockedChannels).map(ch => sanitizeChannelEntry(ch, { source: 'import' })).filter(Boolean)
             : null;
-        const v4MainKeywords = incomingProfileForImport
-            ? safeArray(safeObject(incomingProfileForImport.main).keywords).map(kw => sanitizeKeywordEntry(kw, { source: kw?.source || 'import' })).filter(Boolean)
+        const v4MainKeywords = incomingMainForImport
+            ? safeArray(Object.prototype.hasOwnProperty.call(incomingMainForImport, 'keywords') ? incomingMainForImport.keywords : incomingMainForImport.blockedKeywords).map(kw => sanitizeKeywordEntry(kw, { source: kw?.source || 'import' })).filter(Boolean)
             : null;
 
-        const v4MainMode = incomingProfileForImport
-            ? normalizeListMode(safeObject(incomingProfileForImport.main).mode, 'blocklist')
+        const v4MainMode = incomingMainForImport
+            ? normalizeListMode(incomingMainForImport.mode, 'blocklist')
             : normalizeListMode(parsed.profilesV3?.main?.mode, 'blocklist');
 
-        const v4MainWhitelistChannels = incomingProfileForImport
-            ? safeArray(safeObject(incomingProfileForImport.main).whitelistChannels).map(ch => sanitizeChannelEntry(ch, { source: 'import' })).filter(Boolean)
+        const v4MainWhitelistChannels = incomingMainForImport
+            ? safeArray(incomingMainForImport.whitelistChannels).map(ch => sanitizeChannelEntry(ch, { source: 'import' })).filter(Boolean)
             : safeArray(parsed.profilesV3?.main?.whitelistedChannels).map(ch => sanitizeChannelEntry(ch, { source: 'import' })).filter(Boolean);
 
-        const v4MainWhitelistKeywords = incomingProfileForImport
-            ? safeArray(safeObject(incomingProfileForImport.main).whitelistKeywords).map(kw => sanitizeKeywordEntry(kw, { source: kw?.source || 'import' })).filter(Boolean)
+        const v4MainWhitelistKeywords = incomingMainForImport
+            ? safeArray(incomingMainForImport.whitelistKeywords).map(kw => sanitizeKeywordEntry(kw, { source: kw?.source || 'import' })).filter(Boolean)
             : safeArray(parsed.profilesV3?.main?.whitelistedKeywords).map(kw => sanitizeKeywordEntry(kw, { source: kw?.source || 'import' })).filter(Boolean);
 
         const v4KidsBlockedChannels = incomingProfileForImport
@@ -1504,7 +1523,10 @@
                             const incProfile = safeObject(incProfileRaw);
                             const existingProfile = safeObject(mergedProfiles[profileId]);
                             if (!existingProfile || Object.keys(existingProfile).length === 0) {
-                                mergedProfiles[profileId] = incProfile;
+                                mergedProfiles[profileId] = {
+                                    ...incProfile,
+                                    main: normalizeMainProfileAliasFields(safeObject(incProfile.main))
+                                };
                                 continue;
                             }
                             const existingMain = safeObject(existingProfile.main);
@@ -1518,7 +1540,7 @@
                                     ...safeObject(existingProfile.settings),
                                     ...safeObject(incProfile.settings)
                                 },
-                                main: {
+                                main: normalizeMainProfileAliasFields({
                                     ...existingMain,
                                     ...incMain,
                                     channels: mergeChannelLists(existingMain.channels, incMain.channels),
@@ -1526,7 +1548,7 @@
                                     mode: normalizeListMode(incMain.mode, normalizeListMode(existingMain.mode, 'blocklist')),
                                     whitelistChannels: mergeChannelLists(existingMain.whitelistChannels, incMain.whitelistChannels),
                                     whitelistKeywords: mergeKeywordLists(existingMain.whitelistKeywords, incMain.whitelistKeywords)
-                                },
+                                }),
                                 kids: {
                                     ...existingKids,
                                     ...incKids,
@@ -1626,14 +1648,14 @@
                     ...safeObject(incomingV4Settings),
                     syncKidsToMain: !!incomingApplyKidsRulesOnMain
                 },
-                main: {
+                main: normalizeMainProfileAliasFields({
                     ...targetMain,
                     mode: normalizeListMode(v4MainMode, normalizeListMode(targetMain.mode, 'blocklist')),
                     channels: targetNextChannels,
                     keywords: targetNextKeywords,
                     whitelistChannels: safeArray(desiredMainWhitelistChannels),
                     whitelistKeywords: safeArray(desiredMainWhitelistKeywords)
-                },
+                }),
                 kids: {
                     ...targetKids,
                     mode: normalizeListMode(v4KidsMode, normalizeListMode(targetKids.mode, 'blocklist')),
