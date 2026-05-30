@@ -168,6 +168,35 @@ flowchart TD
 
 Still not broad release authority without installed-byte parity and route-mode packets.
 
+## Connected Chrome Tab Inventory Recheck - 2026-05-31
+
+After the CDP preflight, a separate read-only connected-Chrome inventory was
+available. It proved browser communication, but did not expose a relevant
+YouTube, YouTube Kids, FilterTube dashboard, or installed extension tab to use
+as the live smoke target. No tab was claimed or mutated, and raw unrelated tab
+titles/URLs were not committed.
+
+```text
+connected Chrome inventory endpoint reachable: yes
+connected open top-level tabs observed: 45
+connected relevant YouTube/FilterTube tabs observed: 0
+tab claimed or mutated by connector recheck: no
+raw tab titles or URLs committed: no
+live smoke runner executed after connector recheck: no
+installed-byte parity artifact written: no
+production console runtime sample collected: no
+release readiness from connector recheck: NO-GO
+runtime behavior changed by connector recheck: no
+```
+
+| Row | Connector observation | Smoke consequence |
+| --- | --- | --- |
+| `FT-LIVE-CONNECTOR-00-communication` | The connected Chrome endpoint returned an open-tab inventory. | Communication exists, but no route row ran. |
+| `FT-LIVE-CONNECTOR-01-target-absence` | The relevant target count was zero. | The six live SPA rows could not be sampled. |
+| `FT-LIVE-CONNECTOR-02-no-mutation` | No claim, navigation, reload, storage seed, or script probe was performed. | The recheck is privacy-preserving orientation only. |
+| `FT-LIVE-CONNECTOR-03-byte-parity-gap` | No active tab marker, content-script hash, service-worker hash, or reload timestamp was collected. | Installed-byte parity remains missing. |
+| `FT-LIVE-CONNECTOR-04-console-gap` | No active tab was available for console sampling. | Production console runtime sampling remains missing. |
+
 ## Explicit Non-Claim
 
 The current automated suite is allowed to support the narrow runtime fixes, but

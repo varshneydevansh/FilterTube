@@ -903,6 +903,18 @@ Visible installed-tab byte parity preflight boundary - 2026-05-31:
   release/public-claim use, and broad audit completion remain `NO-GO`.
   Runtime behavior changed by this addendum: no.
 
+Connected Chrome tab inventory recheck boundary - 2026-05-31:
+  docs/audit/FILTERTUBE_VISIBLE_INSTALLED_TAB_BYTE_PARITY_PREFLIGHT_CURRENT_BEHAVIOR_2026-05-31.md
+  docs/audit/FILTERTUBE_RELEASE_LIVE_YOUTUBE_SPA_SMOKE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-25.md
+  docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md
+  This addendum records that the Chrome connector was reachable and returned a
+  read-only tab inventory, but exposed 0 relevant YouTube/FilterTube tabs out
+  of 45 open top-level tabs. It committed no raw unrelated tab titles/URLs and
+  did not claim, navigate, reload, or mutate a tab. The recheck proves
+  communication only; visible-tab byte parity, live SPA route rows, production
+  console runtime sampling, release/public-claim use, and broad audit
+  completion remain `NO-GO`. Runtime behavior changed by this addendum: no.
+
 Store feedback engagement/end-screen readiness boundary - 2026-05-31:
   docs/audit/FILTERTUBE_ENGAGEMENT_BUDGET_CURRENT_BEHAVIOR_2026-05-19.md
   docs/audit/FILTERTUBE_WATCH_ENDSCREEN_AUTHORITY_CURRENT_BEHAVIOR_2026-05-19.md

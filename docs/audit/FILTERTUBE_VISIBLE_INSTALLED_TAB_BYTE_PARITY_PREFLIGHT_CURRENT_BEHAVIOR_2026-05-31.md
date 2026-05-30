@@ -73,6 +73,33 @@ one field keeps the release/use claim at `NO-GO`.
 | `automation_profile_substitution_guard` | Existing docs distinguish Default Chrome from automation Chrome, but no visible-tab report is committed. | `NO_GO_VISIBLE_TAB` |
 | `release_claim_use` | Path parity alone cannot support release/public behavior claims. | `NO_GO_RELEASE` |
 
+## Connected Chrome Tab Inventory Recheck - 2026-05-31
+
+This recheck used the connected Chrome tab inventory only. It did not claim a
+tab, navigate, reload, seed extension storage, inspect page storage, or commit
+raw tab titles/URLs. The result is useful as a blocker update, not as byte
+parity proof.
+
+```text
+connected Chrome endpoint reachable: yes
+connected open top-level tabs observed: 45
+connected relevant YouTube/FilterTube tabs observed: 0
+raw tab titles or URLs committed: no
+tab claimed or mutated: no
+live smoke runner executed: no
+visible-tab byte parity from connector recheck: NO-GO
+production console sampling from connector recheck: NO-GO
+runtime behavior changed by connector recheck: no
+```
+
+| Recheck row | Observation | Release consequence |
+| --- | --- | --- |
+| `visible_tab_recheck_connection` | The connected Chrome endpoint returned a tab inventory. | Browser communication exists, but it is not itself installed-byte evidence. |
+| `visible_tab_recheck_relevant_tabs` | Zero open top-level tabs matched YouTube, YouTube Kids, FilterTube dashboard, or the installed extension URL. | No target page existed for content-script marker, hash, reload timestamp, or console sampling. |
+| `visible_tab_recheck_privacy` | Raw unrelated tab titles/URLs were intentionally not committed. | The audit preserves privacy while recording the blocker count. |
+| `visible_tab_recheck_non_mutation` | No tab was claimed, navigated, reloaded, or changed. | The recheck cannot alter product behavior or prove runtime parity. |
+| `visible_tab_recheck_release_gate` | No active YouTube document, service worker reload timestamp, MAIN/ISOLATED marker, or content-script hash was collected. | Release/public claims and live console sampling remain `NO-GO`. |
+
 ## Flow Boundary
 
 ```text

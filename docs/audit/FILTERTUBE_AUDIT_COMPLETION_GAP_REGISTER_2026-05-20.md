@@ -3953,6 +3953,21 @@ freshness, stale open-tab proof, incognito availability, release/public-claim
 use, and broad-audit completion remain `NO-GO`; runtime behavior changed by
 this preflight: no.
 
+2026-05-31 connected Chrome tab inventory recheck boundary:
+`docs/audit/FILTERTUBE_VISIBLE_INSTALLED_TAB_BYTE_PARITY_PREFLIGHT_CURRENT_BEHAVIOR_2026-05-31.md`,
+`docs/audit/FILTERTUBE_RELEASE_LIVE_YOUTUBE_SPA_SMOKE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-25.md`,
+`docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md`,
+and `docs/audit/FILTERTUBE_IMPLEMENTATION_READINESS_GATE_2026-05-18.md`
+record a read-only connected-Chrome inventory recheck. The connector was
+reachable and reported 45 open top-level tabs, but 0 relevant
+YouTube/FilterTube targets. The audit committed no raw unrelated tab titles or
+URLs, claimed no tab, performed no navigation/reload/storage mutation, ran no
+live smoke runner, wrote no installed-byte artifact, and collected no
+production console runtime sample. This narrows the live blocker without
+closing it: visible installed-tab byte parity, six-row SPA smoke, console
+sampling, release/public-claim use, and broad-audit completion remain
+`NO-GO`; runtime behavior changed by this recheck: no.
+
 2026-05-30 whitelist/cache live evidence result artifact contract
 continuation:
 `docs/audit/FILTERTUBE_WHITELIST_CACHE_SPA_AFFECTED_CALLABLE_PROOF_BOUNDARY_CURRENT_BEHAVIOR_2026-05-30.md`

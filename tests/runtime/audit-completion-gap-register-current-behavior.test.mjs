@@ -4685,6 +4685,7 @@ test('audit completion gap register records content-filter route surface converg
   assert.match(diagnosticDoc, /Diagnostic Logging Convergence Boundary - 2026-05-30/);
   assert.match(diagnosticDoc, /Production Console Gate Coverage Reconciliation - 2026-05-31/);
   assert.match(diagnosticDoc, /Production Console Residual Hot-Path Preflight - 2026-05-31/);
+  assert.match(diagnosticDoc, /Connected Chrome Console Sampling Precondition Recheck - 2026-05-31/);
   assert.match(diagnosticDoc, /implementation-ready diagnostic logging convergence rows: 0/);
   assert.match(readinessDoc, /Diagnostic logging convergence boundary - 2026-05-30/);
   assert.match(readinessDoc, /Production console gate coverage reconciliation - 2026-05-31/);
@@ -4725,4 +4726,16 @@ test('audit completion gap register records content-filter route surface converg
   assert.match(visibleInstalledTabParity, /release\/use claim remains NO-GO/);
   assert.match(visibleInstalledTabParity, /automation-profile exclusion/);
   assert.match(readinessDoc, /Visible installed-tab byte parity preflight boundary - 2026-05-31/);
+  assert.match(source, /2026-05-31 connected Chrome tab inventory recheck boundary/);
+  assert.ok(source.includes('docs/audit/FILTERTUBE_RELEASE_LIVE_YOUTUBE_SPA_SMOKE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-25.md'));
+  assert.match(source, /record a read-only connected-Chrome inventory recheck/);
+  assert.match(source, /reachable and reported 45 open top-level tabs, but 0 relevant\s+YouTube\/FilterTube targets/);
+  assert.match(source, /committed no raw unrelated tab titles or\s+URLs, claimed no tab, performed no navigation\/reload\/storage mutation/);
+  assert.match(source, /ran no\s+live smoke runner, wrote no installed-byte artifact, and collected no\s+production console runtime sample/);
+  assert.match(source, /visible installed-tab byte parity, six-row SPA smoke, console\s+sampling, release\/public-claim use, and broad-audit completion remain\s+`NO-GO`/);
+  assert.match(source, /runtime behavior changed by this recheck: no/);
+  assert.match(visibleInstalledTabParity, /Connected Chrome Tab Inventory Recheck - 2026-05-31/);
+  assert.match(visibleInstalledTabParity, /connected open top-level tabs observed: 45/);
+  assert.match(visibleInstalledTabParity, /connected relevant YouTube\/FilterTube tabs observed: 0/);
+  assert.match(readinessDoc, /Connected Chrome tab inventory recheck boundary - 2026-05-31/);
 });

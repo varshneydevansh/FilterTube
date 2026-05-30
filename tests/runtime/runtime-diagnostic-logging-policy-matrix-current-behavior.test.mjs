@@ -516,6 +516,22 @@ function assertProductionConsoleResidualHotPathPreflight(doc) {
   assert.equal(extensionUiLayoutRows, 6);
 }
 
+function assertConnectedChromeConsoleSamplingPreconditionRecheck(doc) {
+  assert.match(doc, /Connected Chrome Console Sampling Precondition Recheck - 2026-05-31/);
+  assert.match(doc, /Chrome connector was reachable/);
+  assert.match(doc, /connected Chrome endpoint reachable: yes/);
+  assert.match(doc, /connected open top-level tabs observed: 45/);
+  assert.match(doc, /connected relevant YouTube\/FilterTube tabs observed: 0/);
+  assert.match(doc, /tab claimed for console sampling: no/);
+  assert.match(doc, /raw tab titles or URLs committed: no/);
+  assert.match(doc, /production console runtime sample collected: no/);
+  assert.match(doc, /diagnostic console release sampling artifact written: no/);
+  assert.match(doc, /live installed-tab console sampling proof: NO-GO/);
+  assert.match(doc, /diagnostic logging cleanup approval from connector recheck: NO-GO/);
+  assert.match(doc, /runtime behavior changed by connector recheck: no/);
+  assert.match(doc, /no\s+relevant live target available through the connected inventory/);
+}
+
 test('runtime diagnostic logging policy matrix is audit-only and source pinned', () => {
   const doc = read(docPath);
 
@@ -533,6 +549,7 @@ test('runtime diagnostic logging policy matrix is audit-only and source pinned',
   assertProductionConsoleGateLoadOrderAddendum(doc);
   assertProductionConsoleGateCoverageReconciliation(doc);
   assertProductionConsoleResidualHotPathPreflight(doc);
+  assertConnectedChromeConsoleSamplingPreconditionRecheck(doc);
 
   for (const [file, [expectedLines, expectedBytes, expectedHash]] of Object.entries(sourceFingerprints)) {
     const source = read(file);

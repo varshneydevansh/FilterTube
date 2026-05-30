@@ -201,6 +201,16 @@ test('release live YouTube SPA smoke remains a separate missing release gate', (
   assert.match(smokeDoc, /CDP base \+ target list/);
   assert.match(smokeDoc, /flowchart TD/);
   assert.match(smokeDoc, /Still not broad release authority without installed-byte parity and route-mode packets/);
+  assert.match(smokeDoc, /Connected Chrome Tab Inventory Recheck - 2026-05-31/);
+  assert.match(smokeDoc, /connected Chrome inventory endpoint reachable: yes/);
+  assert.match(smokeDoc, /connected open top-level tabs observed: 45/);
+  assert.match(smokeDoc, /connected relevant YouTube\/FilterTube tabs observed: 0/);
+  assert.match(smokeDoc, /tab claimed or mutated by connector recheck: no/);
+  assert.match(smokeDoc, /raw tab titles or URLs committed: no/);
+  assert.match(smokeDoc, /live smoke runner executed after connector recheck: no/);
+  assert.match(smokeDoc, /installed-byte parity artifact written: no/);
+  assert.match(smokeDoc, /production console runtime sample collected: no/);
+  assert.match(smokeDoc, /release readiness from connector recheck: NO-GO/);
 
   for (const row of [
     'FT-LIVE-SPA-00-home-to-search',
@@ -211,6 +221,16 @@ test('release live YouTube SPA smoke remains a separate missing release gate', (
     'FT-LIVE-SPA-05-cache-repeat-navigation'
   ]) {
     assert.ok(smokeDoc.includes(row), `missing live smoke row ${row}`);
+  }
+
+  for (const row of [
+    'FT-LIVE-CONNECTOR-00-communication',
+    'FT-LIVE-CONNECTOR-01-target-absence',
+    'FT-LIVE-CONNECTOR-02-no-mutation',
+    'FT-LIVE-CONNECTOR-03-byte-parity-gap',
+    'FT-LIVE-CONNECTOR-04-console-gap'
+  ]) {
+    assert.ok(smokeDoc.includes(row), `missing live connector row ${row}`);
   }
 
   for (const row of [

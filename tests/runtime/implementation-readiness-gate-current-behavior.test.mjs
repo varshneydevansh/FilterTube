@@ -224,6 +224,18 @@ function assertReadinessGateLinksCurrentYouTubeSpaHotTimerAudit() {
   assert.match(visibleInstalledTabParity, /Path owner: GO_PATH/);
   assert.match(visibleInstalledTabParity, /NO_GO_VISIBLE_TAB/);
   assert.match(visibleInstalledTabParity, /NO_GO_RELOAD/);
+  assert.match(visibleInstalledTabParity, /Connected Chrome Tab Inventory Recheck - 2026-05-31/);
+  assert.match(visibleInstalledTabParity, /connected Chrome endpoint reachable: yes/);
+  assert.match(visibleInstalledTabParity, /connected open top-level tabs observed: 45/);
+  assert.match(visibleInstalledTabParity, /connected relevant YouTube\/FilterTube tabs observed: 0/);
+  assert.match(visibleInstalledTabParity, /raw tab titles or URLs committed: no/);
+  assert.match(visibleInstalledTabParity, /tab claimed or mutated: no/);
+  assert.match(visibleInstalledTabParity, /visible-tab byte parity from connector recheck: NO-GO/);
+  assert.match(visibleInstalledTabParity, /production console sampling from connector recheck: NO-GO/);
+  assert.match(doc, /Connected Chrome tab inventory recheck boundary - 2026-05-31/);
+  assert.match(doc, /returned a\s+read-only tab inventory, but exposed 0 relevant YouTube\/FilterTube tabs out\s+of 45 open top-level tabs/);
+  assert.match(doc, /committed no raw unrelated tab titles\/URLs/);
+  assert.match(doc, /visible-tab byte parity, live SPA route rows, production\s+console runtime sampling, release\/public-claim use, and broad audit\s+completion remain `NO-GO`/);
   assert.match(doc, /Store feedback engagement\/end-screen readiness boundary - 2026-05-31/);
   assert.ok(doc.includes('docs/audit/FILTERTUBE_ENGAGEMENT_BUDGET_CURRENT_BEHAVIOR_2026-05-19.md'));
   assert.ok(doc.includes('docs/audit/FILTERTUBE_WATCH_ENDSCREEN_AUTHORITY_CURRENT_BEHAVIOR_2026-05-19.md'));

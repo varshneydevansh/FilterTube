@@ -682,3 +682,28 @@ live installed-tab console sampling proof: NO-GO
 diagnostic logging cleanup approval from residual preflight: NO-GO
 runtime behavior changed by this preflight: no
 ```
+
+## Connected Chrome Console Sampling Precondition Recheck - 2026-05-31
+
+The Chrome connector was reachable, but the read-only tab inventory exposed no
+YouTube, YouTube Kids, FilterTube dashboard, or installed extension tab to use
+for runtime console sampling. No tab was claimed, no page was reloaded, and no
+raw unrelated tab titles/URLs were committed.
+
+```text
+connected Chrome endpoint reachable: yes
+connected open top-level tabs observed: 45
+connected relevant YouTube/FilterTube tabs observed: 0
+tab claimed for console sampling: no
+raw tab titles or URLs committed: no
+production console runtime sample collected: no
+diagnostic console release sampling artifact written: no
+live installed-tab console sampling proof: NO-GO
+diagnostic logging cleanup approval from connector recheck: NO-GO
+runtime behavior changed by connector recheck: no
+```
+
+This recheck narrows the blocker from "browser connector unknown" to "no
+relevant live target available through the connected inventory." It still does
+not prove that production YouTube tabs are quiet with debug disabled, and it
+does not approve removal of diagnostic calls.
