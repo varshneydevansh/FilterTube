@@ -4623,6 +4623,7 @@ test('audit completion gap register records content-filter route surface converg
   const noWorkDoc = read(contentFilterRouteSurfaceNoWorkBudgetPath);
   const readinessDoc = read('docs/audit/FILTERTUBE_IMPLEMENTATION_READINESS_GATE_2026-05-18.md');
   const diagnosticDoc = read('docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md');
+  const installedDoc = read('docs/audit/FILTERTUBE_INSTALLED_CHROME_UNPACKED_PATH_PARITY_CURRENT_BEHAVIOR_2026-05-30.md');
 
   assert.match(source, /2026-05-30 content-filter route\/surface convergence continuation/);
   assert.ok(source.includes(contentFilterFieldEffectRouteSurfacePath));
@@ -4661,4 +4662,26 @@ test('audit completion gap register records content-filter route surface converg
   assert.match(diagnosticDoc, /implementation-ready diagnostic logging convergence rows: 0/);
   assert.match(readinessDoc, /Diagnostic logging convergence boundary - 2026-05-30/);
   assert.match(readinessDoc, /Production console gate coverage reconciliation - 2026-05-31/);
+  assert.match(source, /2026-05-31 installed Chrome unpacked path parity gate linkage/);
+  assert.ok(source.includes('docs/audit/FILTERTUBE_INSTALLED_CHROME_UNPACKED_PATH_PARITY_CURRENT_BEHAVIOR_2026-05-30.md'));
+  assert.ok(source.includes('docs/audit/FILTERTUBE_IMPLEMENTATION_READINESS_GATE_2026-05-18.md'));
+  assert.match(source, /extend the gap register from installed-profile evidence into the global\s+implementation gate without treating path ownership as live injected-byte\s+proof/);
+  assert.match(source, /pins extension id `gkgjigdfdccckblmglboobikfcpeelio`,\s+Chrome Default profile source path `\/Users\/devanshvarshney\/FilterTube`,\s+matching workspace root/);
+  assert.match(source, /no CRX-style copy under `Default\/Extensions`,\s+Default-profile local extension storage presence, service worker version\s+`3\.3\.1`, and `incognito: null`/);
+  assert.match(source, /Default-profile source-path owner status is\s+`GO_PATH`, but already-open visible-tab injected byte freshness, incognito\s+runtime availability, stale open-tab cache cleanup, live `Kully B & Gussy G -\s+Topic` negative fixture proof, live smoke acceptance, release\/public-claim use,\s+and broad-audit completion remain `NO-GO`/);
+  assert.match(source, /runtime behavior changed by this\s+linkage: no/);
+
+  assert.match(installedDoc, /Status: audit-only current-state proof\. Runtime behavior changed: no/);
+  assert.match(installedDoc, /"path": "\/Users\/devanshvarshney\/FilterTube"/);
+  assert.match(installedDoc, /"from_webstore": false/);
+  assert.match(installedDoc, /"version": "3\.3\.1"/);
+  assert.match(installedDoc, /"incognito": null/);
+  assert.match(installedDoc, /installed_default_profile_unpacked_path/);
+  assert.match(installedDoc, /workspace_path_match/);
+  assert.match(installedDoc, /packed_copy_exclusion/);
+  assert.match(installedDoc, /default_profile_storage_presence/);
+  assert.match(installedDoc, /NO_GO_INCOGNITO/);
+  assert.match(installedDoc, /NO_GO_VISIBLE_TAB/);
+  assert.match(installedDoc, /NO_GO_LIVE_FIXTURE/);
+  assert.match(readinessDoc, /Installed Chrome unpacked path parity boundary - 2026-05-31/);
 });

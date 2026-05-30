@@ -3873,6 +3873,22 @@ whitelist/cache optimization, JSON-first first-class promotion,
 release/public-claim use, and broad-audit completion remain `NO-GO`; runtime
 behavior changed by this reconciliation: no.
 
+2026-05-31 installed Chrome unpacked path parity gate linkage:
+`docs/audit/FILTERTUBE_INSTALLED_CHROME_UNPACKED_PATH_PARITY_CURRENT_BEHAVIOR_2026-05-30.md`
+and `docs/audit/FILTERTUBE_IMPLEMENTATION_READINESS_GATE_2026-05-18.md`
+extend the gap register from installed-profile evidence into the global
+implementation gate without treating path ownership as live injected-byte
+proof. The linkage pins extension id `gkgjigdfdccckblmglboobikfcpeelio`,
+Chrome Default profile source path `/Users/devanshvarshney/FilterTube`,
+matching workspace root, no CRX-style copy under `Default/Extensions`,
+Default-profile local extension storage presence, service worker version
+`3.3.1`, and `incognito: null`. Default-profile source-path owner status is
+`GO_PATH`, but already-open visible-tab injected byte freshness, incognito
+runtime availability, stale open-tab cache cleanup, live `Kully B & Gussy G -
+Topic` negative fixture proof, live smoke acceptance, release/public-claim use,
+and broad-audit completion remain `NO-GO`; runtime behavior changed by this
+linkage: no.
+
 2026-05-30 whitelist/cache live evidence result artifact contract
 continuation:
 `docs/audit/FILTERTUBE_WHITELIST_CACHE_SPA_AFFECTED_CALLABLE_PROOF_BOUNDARY_CURRENT_BEHAVIOR_2026-05-30.md`

@@ -836,3 +836,18 @@ Production console gate coverage reconciliation - 2026-05-31:
   route/mode console budgets, whitelist/cache optimization, JSON-first
   promotion, release claims, and `diagnosticLoggingConvergenceAuthority`
   implementation at `NO-GO`.
+
+Installed Chrome unpacked path parity boundary - 2026-05-31:
+  docs/audit/FILTERTUBE_INSTALLED_CHROME_UNPACKED_PATH_PARITY_CURRENT_BEHAVIOR_2026-05-30.md
+  This addendum pulls Default-profile unpacked path parity into the global
+  implementation gate without approving release or live-smoke validation.
+  It pins extension id `gkgjigdfdccckblmglboobikfcpeelio`, Chrome Default
+  profile path `/Users/devanshvarshney/FilterTube`, matching workspace root,
+  no CRX-style copy under `Default/Extensions`, Default-profile local extension
+  storage presence, service worker version `3.3.1`, and `incognito: null`.
+  The narrow Default-profile source-path owner question is `GO_PATH`, while
+  already-open visible-tab injected byte freshness, incognito runtime
+  availability, stale open-tab cache cleanup, live `Kully B & Gussy G - Topic`
+  negative fixture proof, live smoke acceptance, release/public-claim use, and
+  broad audit completion remain `NO-GO`. Runtime behavior changed by this
+  addendum: no.

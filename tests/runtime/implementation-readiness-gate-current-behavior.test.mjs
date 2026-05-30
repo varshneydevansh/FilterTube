@@ -85,6 +85,7 @@ function assertReadinessGateLinksCurrentYouTubeSpaHotTimerAudit() {
   const methodSemanticGap = read('docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md');
   const jsonPathAuthority = read('docs/audit/FILTERTUBE_JSON_PATH_AUTHORITY_CURRENT_BEHAVIOR_2026-05-19.md');
   const diagnosticPolicy = read('docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md');
+  const installedChromePath = read('docs/audit/FILTERTUBE_INSTALLED_CHROME_UNPACKED_PATH_PARITY_CURRENT_BEHAVIOR_2026-05-30.md');
 
   assert.match(doc, /YouTube SPA Runtime Optimization Boundary - 2026-05-30/);
   assert.match(doc, /This addendum pulls the current lag-relevant lifecycle audit into the global\s+implementation gate/);
@@ -173,6 +174,12 @@ function assertReadinessGateLinksCurrentYouTubeSpaHotTimerAudit() {
   assert.match(doc, /background `log\/debug\/info` gating, isolated-world\s+DOM fallback `log\/debug\/info` gating, content-bridge backup `log\/debug`\s+gating/);
   assert.match(doc, /no `warn\/error` suppression, no MAIN-world global console override,\s+no extension-UI cleanup approval, no live installed-tab console sampling\s+proof, and no release\/public-claim proof/);
   assert.match(doc, /route\/mode console budgets, whitelist\/cache optimization, JSON-first\s+promotion, release claims, and `diagnosticLoggingConvergenceAuthority`\s+implementation at `NO-GO`/);
+  assert.match(doc, /Installed Chrome unpacked path parity boundary - 2026-05-31/);
+  assert.ok(doc.includes('docs/audit/FILTERTUBE_INSTALLED_CHROME_UNPACKED_PATH_PARITY_CURRENT_BEHAVIOR_2026-05-30.md'));
+  assert.match(doc, /pins extension id `gkgjigdfdccckblmglboobikfcpeelio`, Chrome Default\s+profile path `\/Users\/devanshvarshney\/FilterTube`, matching workspace root/);
+  assert.match(doc, /no CRX-style copy under `Default\/Extensions`, Default-profile local extension\s+storage presence, service worker version `3\.3\.1`, and `incognito: null`/);
+  assert.match(doc, /Default-profile source-path owner question is `GO_PATH`, while\s+already-open visible-tab injected byte freshness, incognito runtime\s+availability, stale open-tab cache cleanup, live `Kully B & Gussy G - Topic`\s+negative fixture proof, live smoke acceptance, release\/public-claim use, and\s+broad audit completion remain `NO-GO`/);
+  assert.match(doc, /Runtime behavior changed by this\s+addendum: no/);
 
   for (const phrase of [
     '33 YouTube SPA immediate/short hot timer rows',
@@ -236,6 +243,14 @@ function assertReadinessGateLinksCurrentYouTubeSpaHotTimerAudit() {
   assert.match(diagnosticPolicy, /implementation-ready diagnostic logging convergence rows: 0/);
   assert.match(diagnosticPolicy, /diagnostic logging cleanup approval: NO-GO/);
   assert.match(diagnosticPolicy, /diagnosticLoggingConvergenceAuthority/);
+  assert.match(installedChromePath, /installed_default_profile_unpacked_path/);
+  assert.match(installedChromePath, /Chrome Default profile extension metadata points\s+`gkgjigdfdccckblmglboobikfcpeelio` at `\/Users\/devanshvarshney\/FilterTube`/);
+  assert.match(installedChromePath, /workspace_path_match/);
+  assert.match(installedChromePath, /incognito_runtime_availability/);
+  assert.match(installedChromePath, /already_open_tab_injected_byte_parity/);
+  assert.match(installedChromePath, /live_kully_gussy_negative_fixture/);
+  assert.match(installedChromePath, /GO_PATH/);
+  assert.match(installedChromePath, /NO_GO_VISIBLE_TAB/);
 }
 
 test('current product source does not yet define the future authority control points', () => {
