@@ -29,6 +29,19 @@ test('settings mode matrix explicitly refuses completion or behavior readiness',
   assert.match(doc, /not-ready-for-behavior-change/);
   assert.match(doc, /This is not an implementation patch/);
   assert.match(doc, /root HTML\/JSON\/TXT captures listed in `.gitignore` are still evidence\s+inputs only/i);
+  assert.match(doc, /Settings Mode Current-Source Convergence Boundary - 2026-05-31/);
+  assert.match(doc, /settings-mode convergence rows: 10/);
+  assert.match(doc, /settings-mode dimensions covered by this matrix: 28/);
+  assert.match(doc, /future settings fixture gates named: 14/);
+  assert.match(doc, /implementation-ready settings convergence rows: 0/);
+  assert.match(doc, /first-class settings-mode runtime authority in product source: absent/);
+  assert.match(doc, /runtime behavior changed by this addendum: no/);
+  assert.match(doc, /settings-mode implementation approval: NO-GO/);
+  assert.match(doc, /whitelist\/cache optimization approval: NO-GO/);
+  assert.match(doc, /JSON-first first-class promotion: NO-GO/);
+  assert.match(doc, /release\/public-claim use: NO-GO/);
+  assert.match(doc, /ASCII flow:/);
+  assert.match(doc, /Mermaid flow:/);
 });
 
 test('settings mode matrix covers the required mode dimensions', () => {
@@ -141,6 +154,11 @@ test('current source still proves key settings-mode split-authority risks', () =
   const domFallback = read('js/content/dom_fallback.js');
   const quickBlock = read('js/content/block_channel.js');
   const bridge = read('js/content_bridge.js');
+  const bridgeSettings = read('js/content/bridge_settings.js');
+  const settingsShared = read('js/settings_shared.js');
+  const stateManager = read('js/state_manager.js');
+  const nanah = read('js/nanah_sync_adapter.js');
+  const matrixDoc = matrix();
 
   const setListMode = sliceBetween(
     background,
@@ -176,6 +194,53 @@ test('current source still proves key settings-mode split-authority risks', () =
   assert.match(fallbackMenu, /window\.addEventListener\('scroll'/);
   assert.match(fallbackMenu, /const warmupTimer = setInterval/);
   assert.doesNotMatch(fallbackMenu, /showBlockMenuItem/);
+
+  for (const rowId of [
+    'settings_mode_dimension_inventory',
+    'settings_mode_visible_alias_boundary',
+    'settings_mode_list_mode_mutation_boundary',
+    'settings_mode_endpoint_admission_boundary',
+    'settings_mode_dom_fallback_predicate_boundary',
+    'settings_mode_affordance_lifecycle_boundary',
+    'settings_mode_content_predicate_boundary',
+    'settings_mode_profile_sync_import_boundary',
+    'settings_mode_refresh_cache_boundary',
+    'settings_mode_authority_absence_boundary'
+  ]) {
+    assert.ok(matrixDoc.includes(`| \`${rowId}\` |`), `missing settings convergence row ${rowId}`);
+  }
+
+  assert.match(background, /async function getCompiledSettings/);
+  assert.match(settingsShared, /const FT_PROFILES_V4_KEY = 'ftProfilesV4'/);
+  assert.match(settingsShared, /function saveSettings\(options = \{\}\)/);
+  assert.match(stateManager, /async function saveSettings\(\{ broadcast = true, profile = 'main' \} = \{\}\)/);
+  assert.match(stateManager, /syncKidsToMain/);
+  assert.match(nanah, /FilterTubeNanahAdapter/);
+  assert.match(bridgeSettings, /function scheduleSettingsRefreshFromStorage\(\{ forceReprocess = true \} = \{\}\) \{/);
+
+  const productSource = [
+    background,
+    seed,
+    domFallback,
+    quickBlock,
+    bridge,
+    bridgeSettings,
+    settingsShared,
+    stateManager,
+    nanah
+  ].join('\n');
+  for (const missingAuthority of [
+    'settingsModeRuntimeAuthority',
+    'settingsModeEffectReport',
+    'listModeMutationContract',
+    'compiledRuleStateAuthority',
+    'settingsModeNoWorkBudget',
+    'settingsModeCrossFeatureAuthority',
+    'settingsModeFixtureAuthority'
+  ]) {
+    assert.ok(matrixDoc.includes(missingAuthority), `matrix missing absent authority ${missingAuthority}`);
+    assert.doesNotMatch(productSource, new RegExp(`\\b${missingAuthority}\\b`));
+  }
 });
 
 test('settings mode matrix names future fixture gates before behavior changes', () => {

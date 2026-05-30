@@ -2058,6 +2058,32 @@ timing authority, and `update_goal(status='complete')` remain `NO-GO`.
 Runtime behavior changed by this continuation: no; the broad audit remains
 active.
 
+## Settings And Cross-Feature Convergence Continuation
+
+2026-05-31 settings/cross-feature convergence continuation:
+`docs/audit/FILTERTUBE_SETTINGS_MODE_COVERAGE_MATRIX_2026-05-18.md`,
+`docs/audit/FILTERTUBE_CROSS_FEATURE_AUTHORITY_MATRIX_2026-05-18.md`,
+`tests/runtime/settings-mode-coverage-matrix-current-behavior.test.mjs`, and
+`tests/runtime/cross-feature-authority-matrix-current-behavior.test.mjs` now
+join the settings-mode and cross-feature interaction proof gaps into
+current-source convergence boundaries without changing runtime behavior. The
+settings slice pins 10 settings-mode convergence rows, 28 settings-mode
+dimensions, 14 future settings fixture gates, 0 implementation-ready settings
+convergence rows, and source absence for `settingsModeRuntimeAuthority`,
+`settingsModeEffectReport`, `listModeMutationContract`,
+`compiledRuleStateAuthority`, `settingsModeNoWorkBudget`,
+`settingsModeCrossFeatureAuthority`, and `settingsModeFixtureAuthority`. The
+cross-feature slice pins 10 cross-feature convergence rows, 7 authority
+families, 17 feature rows, 19 primary source files, 0 implementation-ready
+cross-feature convergence rows, and source absence for
+`crossFeatureRuntimeAuthority`, `crossFeatureEffectBudget`,
+`unifiedFeatureAuthority`, `featureInteractionDecision`, and
+`releaseClaimAuthority`. Runtime behavior changed by this continuation: no.
+Settings-mode implementation approval, cross-feature implementation approval,
+whitelist/cache optimization, JSON-first first-class promotion,
+release/public-claim use, and `update_goal(status='complete')` remain
+`NO-GO`; the broad audit remains active.
+
 ## Content Bridge Production Console Gate Continuation
 
 2026-05-30 content bridge production console gate continuation:

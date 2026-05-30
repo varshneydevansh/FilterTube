@@ -188,3 +188,75 @@ These counts are audit-only blockers. They do not approve runtime
 optimization, JSON-first behavior, whitelist behavior, settings-mode behavior,
 metric collectors, artifact creation, native sync, release package changes, or
 public claims.
+
+## Settings Mode Current-Source Convergence Boundary - 2026-05-31
+
+This continuation joins the split settings-mode coverage rows into one
+current-source convergence boundary. It is audit-only. It does not approve a
+settings rewrite, list-mode migration, empty-state shortcut, lifecycle pruning,
+JSON-first promotion, whitelist/cache optimization, release claim, or public
+claim.
+
+| Convergence row | Current source/evidence pins | Current proof meaning | Boundary held open |
+| --- | --- | --- | --- |
+| `settings_mode_dimension_inventory` | This matrix; `docs/audit/FILTERTUBE_OBJECTIVE_COVERAGE_LEDGER_2026-05-18.md`; `tests/runtime/settings-mode-coverage-matrix-current-behavior.test.mjs` | The audit names 28 mode dimensions and 14 future fixture gates, but dimensions are not behavior approvals. | Each mode still needs positive, negative, route, surface, mutation, lifecycle, and no-work proof. |
+| `settings_mode_visible_alias_boundary` | `js/background.js` `getCompiledSettings`; `js/settings_shared.js` `saveSettings`; `js/state_manager.js` `saveSettings` | Current source has visible canonical rows plus legacy aliases, and background/runtime/UI writers do not collapse them into one authoritative report. | Visible UI rows alone cannot prove runtime blocklist/whitelist truth. |
+| `settings_mode_list_mode_mutation_boundary` | `js/background.js` `FilterTube_SetListMode`; `docs/audit/FILTERTUBE_LIST_MODE_TRANSITION_PERSISTENCE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-22.md` | List-mode transition code still carries destructive movement, cache invalidation, backup, and tab-refresh effects in one branch family. | `copyBlocklist`, rollback, revision, and actor/target proof are still required before migration work. |
+| `settings_mode_endpoint_admission_boundary` | `js/seed.js` `shouldBypassYouTubeiNetworkResponse`; `js/seed.js` `shouldSkipEngineProcessing` | Network JSON work now has cheap active-work gates, but endpoint admission remains source-local instead of one shared settings-mode authority. | Disabled, empty blocklist, empty whitelist, comments, `/next`, `/player`, `/guide`, Kids, and YTM still need route counters. |
+| `settings_mode_dom_fallback_predicate_boundary` | `js/content/dom_fallback.js` `hasActiveDOMFallbackWork`; `docs/audit/FILTERTUBE_DOM_FALLBACK_RUN_STATE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-22.md` | DOM fallback has its own active predicate; whitelist mode and raw content-control booleans can admit work outside endpoint policy. | DOM selector pruning and whitelist pending-hide changes need independent no-work and sibling-visible proof. |
+| `settings_mode_affordance_lifecycle_boundary` | `js/content/block_channel.js` `setupQuickBlockObserver`; `js/content_bridge.js` `ensureFallbackMenuButtons` | Quick-block and fallback-menu lifecycles are gated locally and not by a single settings-mode action authority. | 3-dot, quick cross, fallback popover, playlist, posts, Kids, and Shorts need shared action/lifecycle proof. |
+| `settings_mode_content_predicate_boundary` | `docs/audit/FILTERTUBE_CONTENT_FILTER_FIELD_EFFECT_ROUTE_SURFACE_MATRIX_CURRENT_BEHAVIOR_2026-05-29.md`; `js/seed.js`; `js/content/dom_fallback.js` | Category/date/duration settings can differ between field availability, active-work admission, and hide decision effects. | Blank/zero/empty content-control predicates still need inactive compiled-state and false-hide proof. |
+| `settings_mode_profile_sync_import_boundary` | `js/settings_shared.js` `ftProfilesV4`; `js/state_manager.js` `syncKidsToMain`; `js/io_manager.js`; `js/nanah_sync_adapter.js` | V4 profiles, Kids-to-Main sync, import, backup, and Nanah apply remain separate mutation paths. | Target profile, lock/session, list mode, backup/revision, and runtime refresh proof remain required. |
+| `settings_mode_refresh_cache_boundary` | `js/content/bridge_settings.js` `scheduleSettingsRefreshFromStorage`; `js/background.js` storage/cache invalidation paths | Settings refresh can carry map-only or forced reprocess semantics, while background compile/cache invalidation has its own key set. | Cache optimization needs producer/consumer dirty-key parity and visible-card reprocess evidence per mode. |
+| `settings_mode_authority_absence_boundary` | Product JS source absence for `settingsModeRuntimeAuthority`, `settingsModeEffectReport`, `listModeMutationContract`, `compiledRuleStateAuthority`, `settingsModeNoWorkBudget`, `settingsModeCrossFeatureAuthority`, and `settingsModeFixtureAuthority` | The current codebase still lacks a first-class settings-mode authority object/report. | Behavior changes remain `NO-GO` until the missing authority is replaced by fixture-backed proof or implemented deliberately. |
+
+Current settings convergence status:
+
+```text
+settings-mode convergence rows: 10
+settings-mode dimensions covered by this matrix: 28
+future settings fixture gates named: 14
+implementation-ready settings convergence rows: 0
+first-class settings-mode runtime authority in product source: absent
+runtime behavior changed by this addendum: no
+settings-mode implementation approval: NO-GO
+whitelist/cache optimization approval: NO-GO
+JSON-first first-class promotion: NO-GO
+release/public-claim use: NO-GO
+```
+
+ASCII flow:
+
+```text
+UI/profile/list intent
+    |
+    v
+V4 profile rows + legacy aliases + import/Nanah writes
+    |
+    v
+background compile/cache + content refresh
+    |
+    +--> seed endpoint admission
+    +--> DOM fallback predicate
+    +--> quick/menu lifecycle and action gates
+    |
+    v
+visible hide/restore, map writes, stats, backups, release claims
+```
+
+Mermaid flow:
+
+```mermaid
+flowchart TD
+    A["UI/profile/list intent"] --> B["V4 profile rows plus legacy aliases"]
+    B --> C["Background compile and cache"]
+    B --> D["Import, backup, and Nanah mutation paths"]
+    C --> E["Seed endpoint admission"]
+    C --> F["DOM fallback active predicate"]
+    C --> G["Quick/menu lifecycle gates"]
+    E --> H["Hide, pass-through, or map side effects"]
+    F --> H
+    G --> H
+    D --> C
+    H --> I["No single settings-mode authority yet"]
+```

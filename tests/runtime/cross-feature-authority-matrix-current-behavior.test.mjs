@@ -119,7 +119,80 @@ test('cross-feature authority matrix covers every current high-level authority f
   ]);
   assertReleaseHotPathCrossFeatureAddendum(doc);
   assertAmpersandTopicSingleChannelBoundary(doc);
+  assertCrossFeatureConvergenceBoundary(doc);
 });
+
+function assertCrossFeatureConvergenceBoundary(doc) {
+  assert.match(doc, /Cross-Feature Current-Source Convergence Boundary - 2026-05-31/);
+  assert.match(doc, /cross-feature convergence rows: 10/);
+  assert.match(doc, /authority families covered: 7/);
+  assert.match(doc, /feature rows covered: 17/);
+  assert.match(doc, /primary source files covered by this matrix: 19/);
+  assert.match(doc, /implementation-ready cross-feature convergence rows: 0/);
+  assert.match(doc, /first-class cross-feature runtime authority in product source: absent/);
+  assert.match(doc, /runtime behavior changed by this addendum: no/);
+  assert.match(doc, /cross-feature implementation approval: NO-GO/);
+  assert.match(doc, /JSON-first first-class promotion: NO-GO/);
+  assert.match(doc, /whitelist\/cache optimization approval: NO-GO/);
+  assert.match(doc, /release\/public-claim use: NO-GO/);
+  assert.match(doc, /ASCII flow:/);
+  assert.match(doc, /Mermaid flow:/);
+
+  for (const rowId of [
+    'cross_feature_authority_family_inventory',
+    'cross_feature_release_hot_path_boundary',
+    'cross_feature_settings_json_dom_chain',
+    'cross_feature_identity_collaborator_chain',
+    'cross_feature_affordance_action_chain',
+    'cross_feature_storage_cache_refresh_chain',
+    'cross_feature_comments_watch_player_chain',
+    'cross_feature_stats_engagement_claim_chain',
+    'cross_feature_static_release_native_chain',
+    'cross_feature_authority_absence_boundary'
+  ]) {
+    assert.ok(doc.includes(`| \`${rowId}\` |`), `missing cross-feature convergence row ${rowId}`);
+  }
+
+  assertIncludesAll(doc, [
+    'js/shared/identity.js',
+    'js/content/dom_extractors.js',
+    'js/content/handle_resolver.js',
+    'js/content/bridge_settings.js',
+    'docs/audit/FILTERTUBE_SETTINGS_MODE_COVERAGE_MATRIX_2026-05-18.md',
+    'docs/audit/FILTERTUBE_SETTINGS_REFRESH_DIRTY_KEY_PRODUCER_CONSUMER_JOIN_MATRIX_CURRENT_BEHAVIOR_2026-05-29.md',
+    'docs/audit/FILTERTUBE_QUICK_BLOCK_BLOCK_MENU_AFFORDANCE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-22.md'
+  ]);
+
+  const productSource = [
+    'js/background.js',
+    'js/settings_shared.js',
+    'js/state_manager.js',
+    'js/seed.js',
+    'js/filter_logic.js',
+    'js/content/dom_fallback.js',
+    'js/content/block_channel.js',
+    'js/content/menu.js',
+    'js/content_bridge.js',
+    'js/content/bridge_settings.js',
+    'js/shared/identity.js',
+    'js/content/dom_extractors.js',
+    'js/content/handle_resolver.js',
+    'js/nanah_sync_adapter.js',
+    'js/io_manager.js',
+    'build.js'
+  ].map(read).join('\n');
+
+  for (const missingAuthority of [
+    'crossFeatureRuntimeAuthority',
+    'crossFeatureEffectBudget',
+    'unifiedFeatureAuthority',
+    'featureInteractionDecision',
+    'releaseClaimAuthority'
+  ]) {
+    assert.ok(doc.includes(missingAuthority), `matrix missing absent authority ${missingAuthority}`);
+    assert.doesNotMatch(productSource, new RegExp(`\\b${missingAuthority}\\b`));
+  }
+}
 
 function assertReleaseHotPathCrossFeatureAddendum(doc) {
   assert.match(doc, /Release Hot-Path Cross-Feature Addendum - 2026-05-27/);

@@ -166,3 +166,74 @@ runtime behavior changed: no
 These counts are audit-only blockers. They do not approve runtime optimization,
 JSON-first behavior, method deletion, method merging, lifecycle cleanup, no-work
 changes, or whitelist behavior changes.
+
+## Cross-Feature Current-Source Convergence Boundary - 2026-05-31
+
+This continuation joins the broad cross-feature rows into one current-source
+convergence boundary. It is audit-only. It does not approve a cross-feature
+runtime rewrite, JSON-first promotion, selector cleanup, settings-mode change,
+metric collection, release package change, or public claim.
+
+| Convergence row | Current source/evidence pins | Current proof meaning | Boundary held open |
+| --- | --- | --- | --- |
+| `cross_feature_authority_family_inventory` | This matrix; `tests/runtime/cross-feature-authority-matrix-current-behavior.test.mjs` | The audit names 7 authority families and 17 feature rows. | A mapped family is not an executable behavior authority. |
+| `cross_feature_release_hot_path_boundary` | Release hot-path addendum above; `js/background.js`; `js/content/bridge_settings.js`; `js/seed.js`; `js/injector.js`; `js/content_bridge.js`; `js/content/block_channel.js` | The lag/blocklist/menu/Topic fixes are source-pinned and local. | They do not become broad optimization or release-performance proof. |
+| `cross_feature_settings_json_dom_chain` | `js/background.js` `getCompiledSettings`; `js/seed.js`; `js/content/dom_fallback.js`; `docs/audit/FILTERTUBE_SETTINGS_MODE_COVERAGE_MATRIX_2026-05-18.md` | Settings mode can affect JSON interception, DOM fallback, and action gates through separate local predicates. | One settings-mode report must still connect mode, profile, aliases, route, JSON, DOM, and mutation effects. |
+| `cross_feature_identity_collaborator_chain` | `js/shared/identity.js`; `js/content/dom_extractors.js`; `js/content/handle_resolver.js`; `js/content_bridge.js`; `js/filter_logic.js`; `js/background.js` | UC IDs, handles, custom URLs, names, maps, collaborators, and resolver fallbacks are split across authority families. | Blocklist/whitelist identity changes still need confidence, provenance, stale-state, and false-hide/leak fixtures. |
+| `cross_feature_affordance_action_chain` | `js/content/block_channel.js`; `js/content/menu.js`; `js/content_bridge.js`; `docs/audit/FILTERTUBE_QUICK_BLOCK_BLOCK_MENU_AFFORDANCE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-22.md` | Quick cross, native menu, fallback menu, playlist, Shorts, Kids, and posts have different lifecycle and action gates. | One affordance action contract is still missing. |
+| `cross_feature_storage_cache_refresh_chain` | `js/background.js`; `js/settings_shared.js`; `js/state_manager.js`; `js/content/bridge_settings.js`; `docs/audit/FILTERTUBE_SETTINGS_REFRESH_DIRTY_KEY_PRODUCER_CONSUMER_JOIN_MATRIX_CURRENT_BEHAVIOR_2026-05-29.md` | Storage writes, compiled caches, dirty keys, refresh messages, and forced reprocesses are not one revisioned contract. | Runtime cache optimization remains blocked until producer/consumer parity and visible reprocess evidence exist. |
+| `cross_feature_comments_watch_player_chain` | `js/seed.js`; `js/filter_logic.js`; `js/content/dom_fallback.js`; watch/player/comment audit addenda | Comments, `/next`, `/player`, watch rails, end-screens, playlist panels, and current-playback side effects cross endpoint, renderer, DOM, and player state. | JSON-first promotion and DOM pruning remain blocked by route/surface fixture gaps. |
+| `cross_feature_stats_engagement_claim_chain` | `js/background.js` `recordTimeSaved`; stats/time-saved and engagement-budget audits | Hidden/time-saved metrics can be affected by false hides, restore gaps, and media side effects. | Public performance/engagement claims need metric artifacts and false-hide exclusions. |
+| `cross_feature_static_release_native_chain` | `build.js`; `scripts/*.mjs`; `website/`; native sync docs; `data/release_notes.json` | Release, website, native sync, and public copy are downstream of runtime behavior proof, not substitutes for it. | Release/public-claim use stays blocked without artifact, native parity, rollback, and claim evidence. |
+| `cross_feature_authority_absence_boundary` | Product source absence for `crossFeatureRuntimeAuthority`, `crossFeatureEffectBudget`, `unifiedFeatureAuthority`, `featureInteractionDecision`, and `releaseClaimAuthority` | The product runtime still lacks a central cross-feature authority/report object. | Cross-feature behavior changes need fixture-backed proof or a deliberately implemented authority layer. |
+
+Current cross-feature convergence status:
+
+```text
+cross-feature convergence rows: 10
+authority families covered: 7
+feature rows covered: 17
+primary source files covered by this matrix: 19
+implementation-ready cross-feature convergence rows: 0
+first-class cross-feature runtime authority in product source: absent
+runtime behavior changed by this addendum: no
+cross-feature implementation approval: NO-GO
+JSON-first first-class promotion: NO-GO
+whitelist/cache optimization approval: NO-GO
+release/public-claim use: NO-GO
+```
+
+ASCII flow:
+
+```text
+one user-visible action
+    |
+    +--> settings/profile/list mutation
+    +--> endpoint JSON parsing or pass-through
+    +--> DOM fallback hide/restore
+    +--> quick/native/fallback menu action
+    +--> learned identity/map/cache writes
+    +--> stats, backup, sync, release claims
+    |
+    v
+current state: mapped cross-feature paths, no central runtime authority
+```
+
+Mermaid flow:
+
+```mermaid
+flowchart TD
+    A["User-visible action"] --> B["Settings/profile/list mutation"]
+    A --> C["Endpoint JSON path"]
+    A --> D["DOM fallback path"]
+    A --> E["Quick/native/fallback affordance"]
+    B --> F["Compiled cache and refresh"]
+    C --> G["Renderer decision or map harvest"]
+    D --> H["Hide/restore and selector effects"]
+    E --> I["Background mutation and backup"]
+    F --> J["Stats, sync, release claims"]
+    G --> J
+    H --> J
+    I --> J
+    J --> K["No central cross-feature runtime authority yet"]
+```
