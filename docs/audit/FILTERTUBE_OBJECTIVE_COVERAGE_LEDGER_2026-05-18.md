@@ -3552,3 +3552,17 @@ JSON-first first-class promotion from full runtime proof `NO-GO`,
 whitelist/cache optimization from full runtime proof `NO-GO`,
 release/public-claim use from full runtime proof `NO-GO`, runtime behavior
 changed by this continuation: no, and continued audit remains `GO`.
+
+2026-05-30 installed Chrome unpacked path parity continuation:
+`docs/audit/FILTERTUBE_INSTALLED_CHROME_UNPACKED_PATH_PARITY_CURRENT_BEHAVIOR_2026-05-30.md`
+extends objective coverage for installed-profile evidence. Chrome Default
+Secure Preferences show extension ID `gkgjigdfdccckblmglboobikfcpeelio` is
+unpacked from `/Users/devanshvarshney/FilterTube`; the workspace root is the
+same path; there is no CRX-style copy under `Default/Extensions` for the ID;
+local extension storage exists; service worker version is `3.3.1`; and
+`incognito` is `null`. The installed source-path owner question moves to
+`GO_PATH` for the Default profile. Already-open visible-tab injected byte
+freshness, incognito runtime availability, stale open-tab cleanup, live
+`Kully B & Gussy G - Topic` negative fixture proof, release/public-claim use,
+and broad goal completion remain `NO-GO`. Runtime behavior changed by this
+continuation: no, and continued audit remains `GO`.

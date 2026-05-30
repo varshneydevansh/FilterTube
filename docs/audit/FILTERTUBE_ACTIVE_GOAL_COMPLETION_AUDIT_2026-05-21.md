@@ -2058,6 +2058,27 @@ timing authority, and `update_goal(status='complete')` remain `NO-GO`.
 Runtime behavior changed by this continuation: no; the broad audit remains
 active.
 
+## Installed Chrome Unpacked Path Parity Continuation
+
+2026-05-30 installed Chrome unpacked path parity continuation:
+`docs/audit/FILTERTUBE_INSTALLED_CHROME_UNPACKED_PATH_PARITY_CURRENT_BEHAVIOR_2026-05-30.md`
+records Chrome Default profile Secure Preferences evidence for
+`gkgjigdfdccckblmglboobikfcpeelio`. The extension entry has
+`path: /Users/devanshvarshney/FilterTube`, `from_webstore: false`,
+`location: 4`, service worker version `3.3.1`, and
+`has_started_service_worker: true`; `git rev-parse --show-toplevel` returns
+the same `/Users/devanshvarshney/FilterTube` path; no CRX-style copy exists
+under `Default/Extensions/gkgjigdfdccckblmglboobikfcpeelio`; Default-profile
+local extension storage exists for the ID. This changes the narrow installed
+source-path owner status to `GO_PATH` for the Default profile. It does not
+prove already-open YouTube tab injected byte freshness after workspace edits,
+and Secure Preferences reports `incognito: null`, so incognito runtime
+availability remains `NO-GO`. Runtime behavior changed by this continuation:
+no. Installed visible-tab injected byte parity, stale open-tab cache cleanup,
+live `Kully B & Gussy G - Topic` negative fixture proof, incognito runtime
+availability, release/public-claim use, and `update_goal(status='complete')`
+remain `NO-GO`; the broad audit remains active.
+
 ## Whitelist Cache Live Evidence Result Artifact Continuation
 
 2026-05-30 whitelist/cache live evidence result artifact contract
