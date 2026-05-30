@@ -852,6 +852,20 @@ Installed Chrome unpacked path parity boundary - 2026-05-31:
   broad audit completion remain `NO-GO`. Runtime behavior changed by this
   addendum: no.
 
+Visible installed-tab byte parity preflight boundary - 2026-05-31:
+  docs/audit/FILTERTUBE_VISIBLE_INSTALLED_TAB_BYTE_PARITY_PREFLIGHT_CURRENT_BEHAVIOR_2026-05-31.md
+  This addendum makes the remaining installed-tab byte/reload proof a
+  first-class release gate instead of letting Default-profile path parity stand
+  in for active visible-tab runtime proof. It pins the Chrome runtime parity
+  set to 17 unique files: service worker `js/background.js`, MAIN declarative
+  `js/seed.js`, the ISOLATED content-script chain, and MAIN web-accessible
+  resources `js/injector.js`, `js/filter_logic.js`, `js/seed.js`, and
+  `js/shared/identity.js`. Installed path ownership remains `GO_PATH`, while
+  visible-tab byte hashes or runtime markers, service-worker reload timestamp,
+  stale open-tab status, incognito availability, automation-profile exclusion,
+  release/public-claim use, and broad audit completion remain `NO-GO`.
+  Runtime behavior changed by this addendum: no.
+
 Store feedback engagement/end-screen readiness boundary - 2026-05-31:
   docs/audit/FILTERTUBE_ENGAGEMENT_BUDGET_CURRENT_BEHAVIOR_2026-05-19.md
   docs/audit/FILTERTUBE_WATCH_ENDSCREEN_AUTHORITY_CURRENT_BEHAVIOR_2026-05-19.md

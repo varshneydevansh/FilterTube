@@ -62,7 +62,7 @@ the file and lifecycle rows without changing their completion status:
 - `docs/audit/FILTERTUBE_AUDIT_DOC_LAYOUT_CURRENT_BEHAVIOR_2026-05-24.md`
   and `tests/runtime/audit-doc-layout-current-behavior.test.mjs` prove the
   current audit corpus placement boundary: 0 root-level `FILTERTUBE_*.md`
-  files under plain `docs/`, 544 `docs/audit/FILTERTUBE_*.md` files,
+  files under plain `docs/`, 545 `docs/audit/FILTERTUBE_*.md` files,
   root-level FilterTube audit doc placement `NO-GO`, and new audit artifact
   placement under `docs/audit`.
 - `docs/audit/FILTERTUBE_REPO_LIFECYCLE_PRIMITIVE_COVERAGE_2026-05-18.md`
@@ -657,7 +657,7 @@ excluding this register and its verifier found the following footprint:
 ```text
 census scope: docs/audit markdown plus tests/runtime modules
 census exclusions: this gap register and its verifier
-census files scanned: 1074
+census files scanned: 1075
 legacy runtime-count token 4457 occurrences: 1230
 legacy runtime-count token 4457 files: 167
 current runtime-count token 4660 occurrences: 11
@@ -680,7 +680,7 @@ Interpretation:
 
 | Census item | Current value | Completion effect |
 | --- | ---: | --- |
-| Files scanned outside this self-referential register/verifier | 1074 | Wide enough to quantify audit-surface drift without self-counting this addendum. |
+| Files scanned outside this self-referential register/verifier | 1075 | Wide enough to quantify audit-surface drift without self-counting this addendum. |
 | Legacy `4457` occurrences | 1230 | The stale expected-test count is broad historical contract wording, not current completion proof. |
 | Files containing legacy `4457` | 167 | Future count reconciliation is a multi-document audit cleanup, not a single-row fix. |
 | Current `4660` occurrences | 11 | Recalculated after the fresh 2026-05-30 full runtime rerun matched the current generated declaration count. |
@@ -3907,6 +3907,24 @@ runtime availability, stale open-tab cache cleanup, live `Kully B & Gussy G -
 Topic` negative fixture proof, live smoke acceptance, release/public-claim use,
 and broad-audit completion remain `NO-GO`; runtime behavior changed by this
 linkage: no.
+
+2026-05-31 visible installed-tab byte parity preflight boundary:
+`docs/audit/FILTERTUBE_VISIBLE_INSTALLED_TAB_BYTE_PARITY_PREFLIGHT_CURRENT_BEHAVIOR_2026-05-31.md`
+and `docs/audit/FILTERTUBE_IMPLEMENTATION_READINESS_GATE_2026-05-18.md`
+extend the gap register from installed path ownership into the exact
+visible-tab byte/reload evidence contract without approving live-smoke,
+release, or runtime behavior changes. The preflight pins the Chrome runtime
+parity set to 17 unique files across service worker, MAIN declarative content
+script, ISOLATED declarative content scripts, and MAIN web-accessible/injected
+resources. It requires future evidence for Default-profile target ownership,
+active YouTube URL, extension id/path/version, `js/background.js` service
+worker hash, every content/runtime entrypoint hash or equivalent marker,
+MAIN/ISOLATED runtime injection markers, reload timestamp, stale open-tab
+status, incognito split, and automation-profile exclusion. Installed path
+ownership remains `GO_PATH`, but visible-tab byte parity, service-worker reload
+freshness, stale open-tab proof, incognito availability, release/public-claim
+use, and broad-audit completion remain `NO-GO`; runtime behavior changed by
+this preflight: no.
 
 2026-05-30 whitelist/cache live evidence result artifact contract
 continuation:

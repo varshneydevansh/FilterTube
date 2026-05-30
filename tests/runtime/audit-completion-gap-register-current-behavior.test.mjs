@@ -2501,7 +2501,7 @@ function assertRuntimeCountReconciliationAddendum(source) {
   assert.match(runtimeResults, /stored TAP output: \/private\/tmp\/filtertube-runtime-full-after-lifecycle-convergence\.tap/);
   assert.match(runtimeResults, /runtime-results ledger completion authority: NO-GO/);
 
-  assert.equal(driftStats.scannedFiles, 1074);
+  assert.equal(driftStats.scannedFiles, 1075);
   assert.equal(driftStats.legacy.occurrences, 1230);
   assert.equal(driftStats.legacy.fileCount, 167);
   assert.equal(driftStats.current.occurrences, 11);
@@ -4636,6 +4636,7 @@ test('audit completion gap register records content-filter route surface converg
   const readinessDoc = read('docs/audit/FILTERTUBE_IMPLEMENTATION_READINESS_GATE_2026-05-18.md');
   const diagnosticDoc = read('docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md');
   const installedDoc = read('docs/audit/FILTERTUBE_INSTALLED_CHROME_UNPACKED_PATH_PARITY_CURRENT_BEHAVIOR_2026-05-30.md');
+  const visibleInstalledTabParity = read('docs/audit/FILTERTUBE_VISIBLE_INSTALLED_TAB_BYTE_PARITY_PREFLIGHT_CURRENT_BEHAVIOR_2026-05-31.md');
 
   assert.match(source, /2026-05-30 content-filter route\/surface convergence continuation/);
   assert.ok(source.includes(contentFilterFieldEffectRouteSurfacePath));
@@ -4696,4 +4697,18 @@ test('audit completion gap register records content-filter route surface converg
   assert.match(installedDoc, /NO_GO_VISIBLE_TAB/);
   assert.match(installedDoc, /NO_GO_LIVE_FIXTURE/);
   assert.match(readinessDoc, /Installed Chrome unpacked path parity boundary - 2026-05-31/);
+  assert.match(source, /2026-05-31 visible installed-tab byte parity preflight boundary/);
+  assert.ok(source.includes('docs/audit/FILTERTUBE_VISIBLE_INSTALLED_TAB_BYTE_PARITY_PREFLIGHT_CURRENT_BEHAVIOR_2026-05-31.md'));
+  assert.match(source, /extend the gap register from installed path ownership into the exact\s+visible-tab byte\/reload evidence contract/);
+  assert.match(source, /pins the Chrome runtime\s+parity set to 17 unique files across service worker, MAIN declarative content\s+script, ISOLATED declarative content scripts, and MAIN web-accessible\/injected\s+resources/);
+  assert.match(source, /requires future evidence for Default-profile target ownership,\s+active YouTube URL, extension id\/path\/version, `js\/background\.js` service\s+worker hash, every content\/runtime entrypoint hash or equivalent marker/);
+  assert.match(source, /MAIN\/ISOLATED runtime injection markers, reload timestamp, stale open-tab\s+status, incognito split, and automation-profile exclusion/);
+  assert.match(source, /Installed path\s+ownership remains `GO_PATH`, but visible-tab byte parity, service-worker reload\s+freshness, stale open-tab proof, incognito availability, release\/public-claim\s+use, and broad-audit completion remain `NO-GO`/);
+  assert.match(source, /runtime behavior changed by\s+this preflight: no/);
+  assert.match(visibleInstalledTabParity, /Default Secure Preferences path proof/);
+  assert.match(visibleInstalledTabParity, /manifest runtime parity set known/);
+  assert.match(visibleInstalledTabParity, /visible tab still needs active bytes and reload timestamp/);
+  assert.match(visibleInstalledTabParity, /release\/use claim remains NO-GO/);
+  assert.match(visibleInstalledTabParity, /automation-profile exclusion/);
+  assert.match(readinessDoc, /Visible installed-tab byte parity preflight boundary - 2026-05-31/);
 });

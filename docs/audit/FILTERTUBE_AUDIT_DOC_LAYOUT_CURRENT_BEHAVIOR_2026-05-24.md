@@ -35,7 +35,7 @@ The current boundary is:
 
 ```text
 current root FilterTube audit docs: 0
-current docs/audit FilterTube audit docs: 544
+current docs/audit FilterTube audit docs: 545
 root-level FilterTube audit doc placement: NO-GO
 new audit artifact placement: docs/audit
 runtime behavior changed: no
