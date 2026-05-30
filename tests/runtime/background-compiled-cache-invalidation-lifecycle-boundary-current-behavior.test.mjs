@@ -36,9 +36,9 @@ const backgroundSettingsStorageFamilyDocs = [
 ];
 
 const sourceFingerprint = {
-  lines: 6313,
-  bytes: 284710,
-  hash: '46442f904cf18c3fa8345e71f608171edcf277207a420136a78a195c3b7c57eb'
+  lines: 6320,
+  bytes: 285103,
+  hash: '77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad'
 };
 
 const functionStart = 'async function getCompiledSettings(sender = null, profileType = null, forceRefresh = false) {';
@@ -280,7 +280,11 @@ test('background compiled cache invalidation doc records audit-only boundary', (
     assert.match(familyDoc, /files with complete per-callable semantic proof: 0/);
     assert.match(familyDoc, /lexical callables requiring semantic proof before behavior changes: 5473/);
     assert.match(familyDoc, /affected callable semantic proof: NO-GO/);
-    assert.match(familyDoc, /runtime behavior changed: no/);
+    if (familyDocPath.includes('BACKGROUND_ADD_FILTERED_CHANNEL_LIST_TARGET')) {
+      assert.match(familyDoc, /runtime behavior changed: yes, scoped to secondary addFilteredChannel list target and matching backup trigger/);
+    } else {
+      assert.match(familyDoc, /runtime behavior changed: no/);
+    }
     assert.match(familyDoc, /do not approve runtime\s+optimization/);
   }
 });

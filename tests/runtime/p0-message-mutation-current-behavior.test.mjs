@@ -257,7 +257,8 @@ test('content script addFilteredChannel and Nanah scoped apply lack future autho
   );
 
   assert.match(secondaryAdd, /handleAddFilteredChannel\(/);
-  assert.doesNotMatch(secondaryAdd, /message\.listType/);
+  assert.match(secondaryAdd, /const targetListType = message\.listType === 'whitelist' \? 'whitelist' : 'blocklist'/);
+  assert.match(secondaryAdd, /handleAddFilteredChannel\([\s\S]*targetListType/);
   assert.doesNotMatch(secondaryAdd, /isTrustedUiSender|allowedYoutubeContentScript|ruleMutationAuthority|mutationReport/);
 
   assert.match(secondaryToggle, /handleToggleChannelFilterAll\(message\.channelId, message\.value\)/);

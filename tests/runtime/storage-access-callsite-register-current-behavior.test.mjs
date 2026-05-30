@@ -9,7 +9,7 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_STORAGE_ACCESS_CALLSITE_REGISTER_CURRENT_BEHAVIOR_2026-05-21.md';
 
 const sourceFingerprints = {
-  'js/background.js': [6313, 284710, '46442f904cf18c3fa8345e71f608171edcf277207a420136a78a195c3b7c57eb'],
+  'js/background.js': [6320, 285103, '77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad'],
   'js/content/bridge_settings.js': [651, 26462, 'c7828acd09941f4559e47b31ea57d184ef9367ae4964598e865b8a196934e75b'],
   'js/content/handle_resolver.js': [282, 9785, '67cc877a0a97e4c4c5aaf5a0d1c37c15000af5238f8f37d7c5dc6efee27e34ff'],
   'js/content_bridge.js': [13571, 601694, '1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3'],
@@ -147,8 +147,8 @@ function assertStorageCacheWritePressureSnapshot(text) {
     ['videoChannelMapFlushWrite', 'js/background.js', 1604, 'local.set'],
     ['videoMetaMapFlushWrite', 'js/background.js', 1626, 'local.set'],
     ['backgroundChannelMapDirectWrite', 'js/background.js', 4332, 'local.set'],
-    ['addChannelCustomUrlMapWrite', 'js/background.js', 6034, 'local.set'],
-    ['addChannelHandleMapWrite', 'js/background.js', 6059, 'local.set'],
+    ['addChannelCustomUrlMapWrite', 'js/background.js', 6041, 'local.set'],
+    ['addChannelHandleMapWrite', 'js/background.js', 6066, 'local.set'],
     ['subscriptionImportChannelMapWrite', 'js/content_bridge.js', 5933, 'local.set'],
     ['nanahChannelMapMergeWrite', 'js/io_manager.js', 1688, 'writeStorage']
   ];

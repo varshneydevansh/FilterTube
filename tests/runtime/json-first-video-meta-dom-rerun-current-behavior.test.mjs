@@ -254,7 +254,7 @@ test('JSON-first video meta DOM rerun audit is audit-only and source pinned', ()
   const hashes = {
     'js/content_bridge.js': '1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3',
     'js/content/dom_fallback.js': '2129fcc16f8ad1420a6cb44905ddcd0b68d5511f3b647e2db100c0d67d492aef',
-    'js/background.js': '46442f904cf18c3fa8345e71f608171edcf277207a420136a78a195c3b7c57eb'
+    'js/background.js': '77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad'
   };
 
   assert.match(text, /Status: current-behavior register with a narrow no-op DOM work fix/);
@@ -264,8 +264,8 @@ test('JSON-first video meta DOM rerun audit is audit-only and source pinned', ()
   assert.equal(Buffer.byteLength(read('js/content_bridge.js')), 601694);
   assert.equal(lineCount(read('js/content/dom_fallback.js')), 4838);
   assert.equal(Buffer.byteLength(read('js/content/dom_fallback.js')), 228332);
-  assert.equal(lineCount(read('js/background.js')), 6313);
-  assert.equal(Buffer.byteLength(read('js/background.js')), 284710);
+  assert.equal(lineCount(read('js/background.js')), 6320);
+  assert.equal(Buffer.byteLength(read('js/background.js')), 285103);
   for (const [file, hash] of Object.entries(hashes)) {
     assert.equal(sha256(file), hash);
     assert.match(text, new RegExp(hash));

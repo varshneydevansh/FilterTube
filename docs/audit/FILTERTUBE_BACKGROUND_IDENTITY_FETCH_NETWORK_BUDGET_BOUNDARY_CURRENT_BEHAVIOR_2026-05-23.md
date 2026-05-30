@@ -20,7 +20,7 @@ background identity fetch network budget source/effect blocks: 13
 
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/background.js` | 6313 | 284710 | `46442f904cf18c3fa8345e71f608171edcf277207a420136a78a195c3b7c57eb` |
+| `js/background.js` | 6320 | 285103 | `77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad` |
 | `js/content_bridge.js` | 13571 | 601694 | `1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3` |
 | `js/content/handle_resolver.js` | 282 | 9785 | `67cc877a0a97e4c4c5aaf5a0d1c37c15000af5238f8f37d7c5dc6efee27e34ff` |
 | `js/content/dom_fallback.js` | 4838 | 228332 | `2129fcc16f8ad1420a6cb44905ddcd0b68d5511f3b647e2db100c0d67d492aef` |
@@ -34,7 +34,7 @@ background identity fetch network budget source/effect blocks: 13
 - background performWatchIdentityFetch block: line 3074, 93 lines, 3584 bytes
 - background fetchShorts/fetchWatch action branch block: line 3975, 7 lines, 272 bytes
 - background fetchChannelDetails branch block: line 4463, 12 lines, 607 bytes
-- background fetchChannelInfo block: line 4558, 744 lines, 32110 bytes
+- background fetchChannelInfo block: line 4558, 751 lines, 32503 bytes
 - content_bridge fetchWatchIdentityFromBackground block: line 8451, 56 lines, 2118 bytes
 - content_bridge fetchChannelFromShortsUrl block: line 8634, 69 lines, 2661 bytes
 - content_bridge fetchChannelFromShortsUrlDirect block: line 8703, 124 lines, 6367 bytes

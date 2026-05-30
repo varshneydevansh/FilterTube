@@ -10,7 +10,7 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_BACKGROUND_ADD_FILTERED_CHANNEL_LIST_TARGET_CURRENT_BEHAVIOR_2026-05-23.md';
 
 const sourceFingerprints = {
-  'js/background.js': [6313, 284710, '46442f904cf18c3fa8345e71f608171edcf277207a420136a78a195c3b7c57eb']
+  'js/background.js': [6320, 285103, '77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad']
 };
 
 const blockSpecs = {
@@ -19,15 +19,15 @@ const blockSpecs = {
     start: "if (message.type === 'addFilteredChannel')",
     end: "if (message.type === 'toggleChannelFilterAll')",
     startLine: 5244,
-    lines: 32,
-    bytes: 1186,
-    hash: '68b592ef1b1365757100285ab9e7c3589727600f0b2be908466b992fb59c00f9'
+    lines: 39,
+    bytes: 1579,
+    hash: 'f681057e88e4c6aef657464bca124f8d3ae4d59f4d11ca5f05e1135dcf1615f2'
   },
   backgroundHandleAddFilteredChannelFull: {
     file: 'js/background.js',
     start: 'async function handleAddFilteredChannel(input, filterAll = false',
     end: '/**\n * Handle toggling Filter All Content for a channel',
-    startLine: 5302,
+    startLine: 5309,
     lines: 893,
     bytes: 45226,
     hash: 'e69e660d0af0dd0d523932f733a5de04108cbfb69ef99a155be4466a7527ce25'
@@ -36,7 +36,7 @@ const blockSpecs = {
     file: 'js/background.js',
     start: 'async function handleAddFilteredChannel(input, filterAll = false',
     end: '// Prefer canonical UC IDs via channelMap when available',
-    startLine: 5302,
+    startLine: 5309,
     lines: 158,
     bytes: 6464,
     hash: '60f9b6d40d808f02f822e74a0a9f967844a1d1ef4c956e911ad2ee5265891b80'
@@ -45,7 +45,7 @@ const blockSpecs = {
     file: 'js/background.js',
     start: '// Prefer canonical UC IDs via channelMap when available',
     end: '// Check if channel already exists; if so, upgrade instead of rejecting.',
-    startLine: 5459,
+    startLine: 5466,
     lines: 358,
     bytes: 19385,
     hash: 'dc7ccd71be5cb375ac50245617889449621246504390a4a0162c59c3cef6740d'
@@ -54,7 +54,7 @@ const blockSpecs = {
     file: 'js/background.js',
     start: '// Check if channel already exists; if so, upgrade instead of rejecting.',
     end: 'if (didMutateChannelList && Object.keys(storageWritePayload).length > 0) {',
-    startLine: 5816,
+    startLine: 5823,
     lines: 352,
     bytes: 18483,
     hash: '0f2661d0a32990528ebf6704aa4cfb90cab8f55dcf4567e37852910704966027'
@@ -63,7 +63,7 @@ const blockSpecs = {
     file: 'js/background.js',
     start: 'if (didMutateChannelList && Object.keys(storageWritePayload).length > 0) {',
     end: '/**\n * Handle toggling Filter All Content for a channel',
-    startLine: 6167,
+    startLine: 6174,
     lines: 28,
     bytes: 894,
     hash: 'ba67796a03d083bf072ac4ef971365f165f0c836dd2eae56c64912729a45be66'
@@ -74,12 +74,12 @@ const selectedCounts = {
   isTrustedUiSender: 0,
   isProfileSessionAuthorized: 0,
   handleAddFilteredChannel: 2,
-  listType: 2,
-  targetListType: 14,
-  blocklist: 9,
-  whitelist: 36,
-  'message.listType': 0,
-  'message.profile': 2,
+  listType: 3,
+  targetListType: 17,
+  blocklist: 10,
+  whitelist: 41,
+  'message.listType': 1,
+  'message.profile': 1,
   'message.videoId': 1,
   filterAll: 12,
   collaborationWith: 16,
@@ -220,9 +220,8 @@ function loadReceiverRuntime() {
 test('background addFilteredChannel list-target audit is audit-only and source pinned', () => {
   const audit = doc();
 
-  assert.match(audit, /Status: audit-only current-behavior proof/);
-  assert.match(audit, /Runtime behavior is unchanged/);
-  assert.match(audit, /not an implementation patch/);
+  assert.match(audit, /Status: implementation-backed current-behavior proof/);
+  assert.match(audit, /2026-05-31 receiver list-target fix/);
   assert.match(audit, /background rule-mutation authority/);
   for (const [file, [lines, bytes, hash]] of Object.entries(sourceFingerprints)) {
     const source = read(file);
@@ -266,7 +265,7 @@ test('background addFilteredChannel missing future symbols remain absent from pr
   }
 });
 
-test('secondary addFilteredChannel receiver does not forward message.listType to helper', async () => {
+test('secondary addFilteredChannel receiver forwards message.listType to helper and backup trigger', async () => {
   const runtime = loadReceiverRuntime();
   const returned = runtime.runReceiver({
     type: 'addFilteredChannel',
@@ -309,10 +308,11 @@ test('secondary addFilteredChannel receiver does not forward message.listType to
       source: 'playlist_fallback_menu'
     },
     'kids',
-    'abcdefghijk'
+    'abcdefghijk',
+    'whitelist'
   ]);
-  assert.equal(runtime.__helperCalls[0].length, 7);
-  assert.deepEqual(runtime.__backups, ['kids_channel_added']);
+  assert.equal(runtime.__helperCalls[0].length, 8);
+  assert.deepEqual(runtime.__backups, ['kids_whitelist_channel_added']);
   assert.equal(runtime.__responses[0].success, true);
 });
 
@@ -330,6 +330,7 @@ test('secondary addFilteredChannel receiver defaults missing profile to main bac
   assert.equal(runtime.__helperCalls.length, 1);
   assert.equal(runtime.__helperCalls[0][5], 'main');
   assert.equal(runtime.__helperCalls[0][6], '');
+  assert.equal(runtime.__helperCalls[0][7], 'blocklist');
   assert.deepEqual(runtime.__backups, ['channel_added']);
 });
 
@@ -387,10 +388,10 @@ test('handleAddFilteredChannel commit invalidates both compiled caches and queue
 test('background addFilteredChannel audit doc records list-target behavior and open gates', () => {
   const audit = doc();
 
-  assert.match(audit, /does not pass `message\.listType` into the helper/);
-  assert.match(audit, /A caller may include `listType: 'whitelist'`, but the receiver drops it/);
+  assert.match(audit, /normalizes `message\.listType` and passes the effective list target into the helper/);
+  assert.match(audit, /A caller may include `listType: 'whitelist'`, and the receiver now forwards `'whitelist'`/);
   assert.match(audit, /declares `listType = 'blocklist'`/);
-  assert.match(audit, /defaults to blocklist unless another background action calls the helper directly with `'whitelist'`/);
+  assert.match(audit, /defaults to blocklist only when the message omits `listType` or provides an unsupported value/);
   assert.match(audit, /For Main blocklist it writes V4 `main\.channels`/);
   assert.match(audit, /For Main whitelist it writes V4 `main\.whitelistChannels`/);
   assert.match(audit, /For Kids blocklist it writes V4 `kids\.blockedChannels`/);
@@ -398,7 +399,7 @@ test('background addFilteredChannel audit doc records list-target behavior and o
   assert.match(audit, /query Kids tabs and send `FilterTube_RefreshNow`/);
   assert.match(audit, /null both compiled settings caches/);
   assert.match(audit, /scheduleAutoBackupInBackground\(\)/);
-  assert.match(audit, /helper can target whitelist, but this receiver only reaches the helper's default blocklist path/);
+  assert.match(audit, /the secondary receiver and helper now agree on blocklist versus whitelist target/);
   assert.match(audit, /background add-filtered-channel contracts/);
   assert.match(audit, /list-type forwarding policies/);
   assert.match(audit, /profile target reports/);

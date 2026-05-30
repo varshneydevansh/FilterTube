@@ -136,8 +136,9 @@ test('background source still proves selected action side effects and split guar
   assert.match(primary, /const action = request\?\.action \|\| request\?\.type/);
   assert.match(secondary, /if \(!message\?\.type\) return false/);
   assert.match(secondary, /message\.type === 'addFilteredChannel'/);
-  assert.match(secondary, /handleAddFilteredChannel\([\s\S]*message\.profile \|\| 'main'[\s\S]*message\.videoId \|\| ''/);
-  assert.doesNotMatch(secondary, /message\.listType/);
+  assert.match(secondary, /const targetProfile = message\.profile \|\| 'main'/);
+  assert.match(secondary, /const targetListType = message\.listType === 'whitelist' \? 'whitelist' : 'blocklist'/);
+  assert.match(secondary, /handleAddFilteredChannel\([\s\S]*targetProfile[\s\S]*message\.videoId \|\| ''[\s\S]*targetListType/);
 
   assert.match(applySettings, /compiledSettingsCache\[targetProfile\] = null/);
   assert.match(applySettings, /getCompiledSettings\(syntheticSender, targetProfile, true\)/);

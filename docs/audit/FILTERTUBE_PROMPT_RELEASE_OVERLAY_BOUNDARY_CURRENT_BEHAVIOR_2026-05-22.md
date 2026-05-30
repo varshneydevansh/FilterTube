@@ -47,7 +47,7 @@ release-note data file, and the dashboard renderer.
 | `data/release_notes.json` | 316 | 23,047 | `c9c860f17dae9f9f9e8d1536d3c0de72dd3b6bd917fc8d7fc725047adc421862` |
 | `js/content/first_run_prompt.js` | 190 | 7,453 | `5672d9060d29b08550ecfc3add54245212a5094ee5137f025b6f788f12e50409` |
 | `js/content/release_notes_prompt.js` | 250 | 9,866 | `30b624cbbda1004f354f98dbf3b4513f8ebc298adecbceb4358782f248f80474` |
-| `js/background.js` | 6,313 | 284,710 | `46442f904cf18c3fa8345e71f608171edcf277207a420136a78a195c3b7c57eb` |
+| `js/background.js` | 6,320 | 285,103 | `77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad` |
 | `js/tab-view.js` | 11,617 | 526,763 | `1b7f621d48d16247aecc4c7ee57cbc3db9efd3e597e6f0a4fc188228470648f7` |
 
 ## Source/Effect Blocks

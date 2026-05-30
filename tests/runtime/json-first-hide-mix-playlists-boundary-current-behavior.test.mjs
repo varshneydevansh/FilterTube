@@ -270,7 +270,7 @@ test('JSON-first hideMixPlaylists boundary audit is audit-only and source pinned
   assert.ok(doc.includes(`| \`js/filter_logic.js\` | 3498 | 165151 | \`${sha256('js/filter_logic.js')}\` |`));
   assert.ok(doc.includes(`| \`js/seed.js\` | 1136 | 50026 | \`${sha256('js/seed.js')}\` |`));
   assert.ok(doc.includes(`| \`js/content/dom_fallback.js\` | 4838 | 228332 | \`${sha256('js/content/dom_fallback.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/background.js\` | 6313 | 284710 | \`${sha256('js/background.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/background.js\` | 6320 | 285103 | \`${sha256('js/background.js')}\` |`));
 });
 
 test('hideMixPlaylists source counts remain pinned', () => {

@@ -1,6 +1,7 @@
 # FilterTube Single Channel Rule Mutation Persistence Boundary Current Behavior - 2026-05-22
 
-Status: current-behavior proof slice. This is not an implementation patch.
+Status: current-behavior proof slice. Updated after the 2026-05-31 receiver
+fix that forwards explicit secondary `addFilteredChannel` list targets.
 
 This slice narrows the single-channel allow/block mutation boundary after the
 batch whitelist import and list-mode transition slices. It covers the paths that
@@ -14,7 +15,7 @@ and whether a later JSON decision sees a blocklist or whitelist row.
 
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/background.js` | 6313 | 284710 | `46442f904cf18c3fa8345e71f608171edcf277207a420136a78a195c3b7c57eb` |
+| `js/background.js` | 6320 | 285103 | `77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad` |
 | `js/state_manager.js` | 2491 | 99780 | `509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6` |
 | `js/content_bridge.js` | 13571 | 601694 | `1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3` |
 
@@ -30,7 +31,7 @@ background addWhitelistChannelPersistent block: 40 lines, 1329 bytes
 background FilterTube_KidsWhitelistChannel block: 54 lines, 2107 bytes
 background FilterTube_KidsBlockChannel block: 43 lines, 1769 bytes
 background addChannelPersistent action block: 287 lines, 13345 bytes
-background secondary addFilteredChannel receiver block: 32 lines, 1186 bytes
+background secondary addFilteredChannel receiver block: 39 lines, 1579 bytes
 background handleAddFilteredChannel block: 894 lines, 45226 bytes
 content_bridge addChannelDirectly block: 55 lines, 2662 bytes
 
@@ -55,7 +56,7 @@ selected background mutation tokens:
   enqueueChannelMapUpdate: 2
   enqueueVideoChannelMapUpdate: 1
   schedulePostBlockEnrichment: 1
-  targetListType: 14
+  targetListType: 17
   whitelistChannels: 12
   blockedChannels: 8
   filterChannels: 7
@@ -73,7 +74,7 @@ main_whitelist_single_add_is_trusted_sender_gated_but_not_session_locked
 kids_whitelist_single_add_is_trusted_sender_gated_but_not_session_locked
 kids_block_single_add_uses_background_helper_without_trusted_sender_gate
 legacy_addChannelPersistent_uses_separate_inline_persistence_path
-secondary_addFilteredChannel_defaults_to_blocklist_list_type
+secondary_addFilteredChannel_forwards_explicit_list_type
 handle_add_filtered_channel_writes_v4_v3_root_maps_and_cache_invalidation
 content_bridge_addChannelDirectly_schedules_a_second_backup_request_after_success
 ```
@@ -88,7 +89,7 @@ content_bridge_addChannelDirectly_schedules_a_second_backup_request_after_succes
 | Kids whitelist single add | `FilterTube_KidsWhitelistChannel` checks `isTrustedUiSender(sender)`, builds input from channel identity or `watch:<videoId>`, calls the helper with profile `kids` and list type `whitelist`, and schedules `kids_whitelist_channel_added`. | Same runtime test. | It is sender-gated but still not profile-session gated in the pinned block. |
 | Kids block single add | `FilterTube_KidsBlockChannel` calls `handleAddFilteredChannel(..., 'kids', rawVideoId)` and relies on the helper default `listType = 'blocklist'`. The pinned block has no local `isTrustedUiSender(sender)` token. | Same runtime test. | Kids block and Kids whitelist do not share the same sender policy. |
 | Legacy Main block add | `addChannelPersistent` is a separate inline background implementation. It normalizes input, reads root storage, fetches channel info, writes `filterChannels`, may write V4, may write `channelMap`, schedules `channel_added`, and does not call `handleAddFilteredChannel()`. | Same runtime test. | Main blocklist single-add behavior is not the same code path as whitelist, Kids, or content quick-block additions. |
-| Content quick-block add | `content_bridge.addChannelDirectly()` sends `type: 'addFilteredChannel'` with profile inferred from hostname. The secondary background receiver passes no list type argument, so `handleAddFilteredChannel()` defaults to blocklist. | Same runtime test. | Content quick-block cannot currently request whitelist list type through this receiver. |
+| Content quick-block add | `content_bridge.addChannelDirectly()` sends `type: 'addFilteredChannel'` with profile inferred from hostname. The secondary background receiver now normalizes `message.listType` and forwards explicit `whitelist` requests to `handleAddFilteredChannel()`; callers that omit `listType` still default to blocklist. | Same runtime test. | Content quick-block remains blocklist-shaped today, but the receiver no longer drops an explicit list target from list-aware callers. |
 | Shared helper persistence | `handleAddFilteredChannel()` normalizes URL/handle/UC/custom URL input, can call channel page fetch and watch/Shorts/Kids identity fetches, updates channel/video maps, writes V4, V3, root blocklist mirrors, or whitelist rows depending on `profile` and `targetListType`, invalidates both compiled caches, and may schedule post-block enrichment. | Same runtime test. | This helper mixes network identity repair, schema writes, cache invalidation, and future enrichment; optimization changes need side-effect budgets. |
 | Backup duplication | The secondary background receiver schedules backup after success, and `content_bridge.addChannelDirectly()` can also send `FilterTube_ScheduleAutoBackup` after the same success response. | Same runtime test. | Backup scheduling is not owned by one mutation report, so side-effect counts can drift. |
 
@@ -117,7 +118,7 @@ singleChannelRuleMutationMetricArtifact
 Single-channel rule mutation persistence is proof-pinned.
 Main, Kids, content quick-block, and legacy background additions do not share one mutation path.
 Trusted sender and profile-session gates are inconsistent across sibling single-row channel additions.
-Runtime behavior remains unchanged.
+Runtime behavior changed by the 2026-05-31 receiver fix: explicit addFilteredChannel listType is now forwarded.
 ```
 
 ## Menu And Quick-Block Rule Mutation Ingress Snapshot - 2026-05-27
@@ -179,7 +180,7 @@ flowchart TD
 | Dashboard Main remove | `js/state_manager.js:1856-1869` | In whitelist mode mutates `whitelistChannels`, persists Main profiles, requests refresh, and schedules backup. | Shared add/remove rule mutation authority with rollback and no-op proof. |
 | Background Main whitelist add | `js/background.js:3518-3544` | Calls shared helper with profile `main` and list type `whitelist`, then schedules `whitelist_channel_added` backup. | Session/actor/list-target proof and backup dedupe. |
 | Background legacy block add | `js/background.js:4205-4372` | Separate inline path reads storage, fetches channel details, writes channel map/V4/root mirrors, and schedules `channel_added`. | Parity proof before replacing with the shared helper. |
-| Shared helper storage/cache fanout | `js/background.js:5302-6185` | Handles input normalization, identity repair, map writes, V4/V3/root writes, both compiled-cache invalidations, and post-block enrichment. | Rule mutation side-effect budget and revisioned storage/cache report. |
+| Shared helper storage/cache fanout | `js/background.js:5309-6192` | Handles input normalization, identity repair, map writes, V4/V3/root writes, both compiled-cache invalidations, and post-block enrichment. | Rule mutation side-effect budget and revisioned storage/cache report. |
 
 Current rule mutation ingress decision:
 

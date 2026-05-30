@@ -225,7 +225,7 @@ test('script injection and subscription bridge actions currently use caller supp
   assert.doesNotMatch(bridgeBlock, /sender\.tab\.id|sender\.tab\.url|tabs\.get|tabs\.query|youtube\.com\/feed\/channels|isTrustedUiSender/);
 });
 
-test('second addFilteredChannel listener currently omits listType and owns backup side effects', () => {
+test('second addFilteredChannel listener forwards listType and owns backup side effects', () => {
   const source = read('js/background.js');
   const block = sliceBetween(
     source,
@@ -234,9 +234,10 @@ test('second addFilteredChannel listener currently omits listType and owns backu
   );
 
   assert.doesNotMatch(block, /isTrustedUiSender/);
-  assert.doesNotMatch(block, /message\.listType/);
+  assert.match(block, /message\.listType === 'whitelist'/);
   assert.match(block, /handleAddFilteredChannel\(/);
-  assert.match(block, /scheduleAutoBackupInBackground\(\(message\.profile === 'kids'\) \? 'kids_channel_added' : 'channel_added'\)/);
+  assert.match(block, /const backupTrigger = targetListType === 'whitelist'/);
+  assert.match(block, /scheduleAutoBackupInBackground\(backupTrigger\)/);
 });
 
 test('ignored root capture files are evidence inputs and not background source authority', () => {

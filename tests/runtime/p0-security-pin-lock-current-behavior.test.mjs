@@ -114,7 +114,8 @@ test('content_script_rejects_add_filtered_channel_without_ui_owner is not satisf
 
   assert.match(block, /handleAddFilteredChannel\(/);
   assert.match(block, /message\.profile \|\| 'main'/);
-  assert.match(block, /scheduleAutoBackupInBackground\(\(message\.profile === 'kids'\) \? 'kids_channel_added' : 'channel_added'\)/);
+  assert.match(block, /const backupTrigger = targetListType === 'whitelist'/);
+  assert.match(block, /scheduleAutoBackupInBackground\(backupTrigger\)/);
   assert.doesNotMatch(block, /isTrustedUiSender|isAllowedYoutubeContentScript|isProfileSessionAuthorized|profile_locked|securityLockAuthority/);
 });
 

@@ -207,7 +207,8 @@ test('content-script channel add and background channel add can both schedule ba
   assert.match(bridgeBlock, /triggerType: 'channel_added'/);
 
   assert.match(backgroundBlock, /handleAddFilteredChannel/);
-  assert.match(backgroundBlock, /scheduleAutoBackupInBackground\(\(message\.profile === 'kids'\) \? 'kids_channel_added' : 'channel_added'\)/);
+  assert.match(backgroundBlock, /const backupTrigger = targetListType === 'whitelist'/);
+  assert.match(backgroundBlock, /scheduleAutoBackupInBackground\(backupTrigger\)/);
 });
 
 test('auto-backup policy UI writes V4 profile settings directly then schedules another backup', () => {

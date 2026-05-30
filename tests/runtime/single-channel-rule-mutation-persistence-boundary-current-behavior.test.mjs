@@ -140,7 +140,7 @@ function assertMenuQuickRuleMutationIngressSnapshot(doc) {
     '| Dashboard Main remove | `js/state_manager.js:1856-1869` |',
     '| Background Main whitelist add | `js/background.js:3518-3544` |',
     '| Background legacy block add | `js/background.js:4205-4372` |',
-    '| Shared helper storage/cache fanout | `js/background.js:5302-6185` |'
+    '| Shared helper storage/cache fanout | `js/background.js:5309-6192` |'
   ]) {
     assert.ok(doc.includes(row), `missing ingress snapshot row ${row}`);
   }
@@ -171,17 +171,17 @@ test('single-channel rule mutation persistence audit document records current bo
   const doc = read(auditDocPath);
 
   for (const marker of [
-    'Status: current-behavior proof slice. This is not an implementation patch.',
+    'Status: current-behavior proof slice. Updated after the 2026-05-31 receiver',
     '3 single-channel rule mutation persistence source files',
     '9 source/effect blocks',
     'state_manager_add_channel_chooses_background_action_from_main_mode',
     'state_manager_add_kids_channel_chooses_background_action_from_kids_mode',
     'main_whitelist_single_add_is_trusted_sender_gated_but_not_session_locked',
     'kids_block_single_add_uses_background_helper_without_trusted_sender_gate',
-    'secondary_addFilteredChannel_defaults_to_blocklist_list_type',
+    'secondary_addFilteredChannel_forwards_explicit_list_type',
     'content_bridge_addChannelDirectly_schedules_a_second_backup_request_after_success',
     'Main, Kids, content quick-block, and legacy background additions do not share one mutation path.',
-    'Runtime behavior remains unchanged.'
+    'Runtime behavior changed by the 2026-05-31 receiver fix: explicit addFilteredChannel listType is now forwarded.'
   ]) {
     assert.ok(doc.includes(marker), `missing marker: ${marker}`);
   }
@@ -192,7 +192,7 @@ test('single-channel rule mutation persistence audit document records current bo
 test('single-channel rule mutation source fingerprints stay pinned', () => {
   const doc = read(auditDocPath);
   const expected = [
-    ['js/background.js', 6313, 284710, '46442f904cf18c3fa8345e71f608171edcf277207a420136a78a195c3b7c57eb'],
+    ['js/background.js', 6320, 285103, '77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad'],
     ['js/state_manager.js', 2491, 99780, '509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6'],
     ['js/content_bridge.js', 13571, 601694, '1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3']
   ];
@@ -216,7 +216,7 @@ test('single-channel rule mutation source/effect block metrics stay pinned in th
     backgroundKidsWhitelistChannel: ['background FilterTube_KidsWhitelistChannel block', 54, 2107],
     backgroundKidsBlockChannel: ['background FilterTube_KidsBlockChannel block', 43, 1769],
     backgroundAddChannelPersistentAction: ['background addChannelPersistent action block', 287, 13345],
-    backgroundSecondaryAddFilteredChannel: ['background secondary addFilteredChannel receiver block', 32, 1186],
+    backgroundSecondaryAddFilteredChannel: ['background secondary addFilteredChannel receiver block', 39, 1579],
     backgroundHandleAddFilteredChannel: ['background handleAddFilteredChannel block', 894, 45226],
     contentBridgeAddChannelDirectly: ['content_bridge addChannelDirectly block', 55, 2662]
   };
@@ -261,13 +261,15 @@ test('single-channel background sender and lock gates remain split across siblin
   }
 });
 
-test('single-channel list target routing is inferred by action shape and helper defaults', () => {
+test('single-channel list target routing forwards explicit secondary addFilteredChannel listType', () => {
   const currentBlocks = blocks();
 
   assert.match(currentBlocks.backgroundAddWhitelistChannelPersistent, /handleAddFilteredChannel\(\s*input,\s*false,\s*null,\s*null,\s*\{ source: 'user' \},\s*'main',\s*'',\s*'whitelist'\s*\)/);
   assert.match(currentBlocks.backgroundKidsWhitelistChannel, /handleAddFilteredChannel\([\s\S]*'kids',\s*rawVideoId,\s*'whitelist'\s*\)/);
   assert.match(currentBlocks.backgroundKidsBlockChannel, /handleAddFilteredChannel\([\s\S]*'kids',\s*rawVideoId\s*\)/);
-  assert.match(currentBlocks.backgroundSecondaryAddFilteredChannel, /handleAddFilteredChannel\([\s\S]*message\.profile \|\| 'main',\s*message\.videoId \|\| ''\s*\)/);
+  assert.match(currentBlocks.backgroundSecondaryAddFilteredChannel, /const targetProfile = message\.profile \|\| 'main'/);
+  assert.match(currentBlocks.backgroundSecondaryAddFilteredChannel, /const targetListType = message\.listType === 'whitelist' \? 'whitelist' : 'blocklist'/);
+  assert.match(currentBlocks.backgroundSecondaryAddFilteredChannel, /handleAddFilteredChannel\([\s\S]*targetProfile,\s*message\.videoId \|\| '',\s*targetListType\s*\)/);
   assert.match(currentBlocks.backgroundHandleAddFilteredChannel, /listType = 'blocklist'/);
   assert.match(currentBlocks.backgroundHandleAddFilteredChannel, /const targetListType = listType === 'whitelist' \? 'whitelist' : 'blocklist'/);
 });
@@ -344,7 +346,7 @@ test('selected background mutation token counts stay pinned', () => {
     enqueueChannelMapUpdate: 2,
     enqueueVideoChannelMapUpdate: 1,
     schedulePostBlockEnrichment: 1,
-    targetListType: 14,
+    targetListType: 17,
     whitelistChannels: 12,
     blockedChannels: 8,
     filterChannels: 7,

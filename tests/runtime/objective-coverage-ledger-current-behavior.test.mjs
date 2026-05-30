@@ -10252,8 +10252,8 @@ test('objective coverage ledger records background addFilteredChannel list-targe
   assert.match(doc, /background receiver\/helper proof/);
   assert.match(doc, /1 background addFilteredChannel source file/);
   assert.match(doc, /6 source\/effect blocks/);
-  assert.match(doc, /32 receiver lines/);
-  assert.match(doc, /1186 receiver bytes/);
+  assert.match(doc, /39 receiver lines/);
+  assert.match(doc, /1579 receiver bytes/);
   assert.match(doc, /893 helper lines/);
   assert.match(doc, /45226 helper bytes/);
   assert.match(doc, /158 helper signature\/input lines/);
@@ -10265,17 +10265,17 @@ test('objective coverage ledger records background addFilteredChannel list-targe
   assert.match(doc, /28 commit\/return lines/);
   assert.match(doc, /894 commit\/return bytes/);
   assert.match(doc, /selected background addFilteredChannel token counts/);
-  assert.match(doc, /selected zero sender\/list-forwarding token counts/);
+  assert.match(doc, /selected sender\/list-forwarding token counts/);
   assert.match(doc, /11 runtime background addFilteredChannel list-target fixtures/);
-  assert.match(doc, /does not forward `message\.listType`/);
+  assert.match(doc, /forwards input, filter-all, collaborator metadata, profile, video id, and normalized list type/);
   assert.match(doc, /declares `listType = 'blocklist'`/);
-  assert.match(doc, /caller-provided whitelist list type is dropped by this receiver/);
+  assert.match(doc, /caller-provided whitelist list type reaches the helper/);
   assert.match(doc, /Main blocklist writes V4 `main\.channels`/);
   assert.match(doc, /Main whitelist writes V4 `main\.whitelistChannels`/);
   assert.match(doc, /Kids blocklist and whitelist write their matching V4\/V3 lists/);
   assert.match(doc, /identity repair can read channel maps, fetch watch\/Shorts\/Kids identity/);
   assert.match(doc, /null both compiled caches/);
-  assert.match(doc, /schedule `channel_added` or `kids_channel_added` backups/);
+  assert.match(doc, /schedule list-target channel-add backups/);
   assert.match(doc, /No `backgroundAddFilteredChannelListTargetContract`, `backgroundAddFilteredChannelReceiverReport`, `backgroundAddFilteredChannelSenderPolicy`, `backgroundAddFilteredChannelListTypeForwardingPolicy`, `backgroundAddFilteredChannelProfileTargetReport`, `backgroundAddFilteredChannelStorageWriteReport`, `backgroundAddFilteredChannelCacheInvalidationReport`, `backgroundAddFilteredChannelBackupPolicy`, `backgroundAddFilteredChannelIdentityRepairBudget`, or `backgroundAddFilteredChannelFixtureProvenance` exists/);
 });
 
@@ -10364,8 +10364,8 @@ test('objective coverage ledger records addFilteredChannel Filter All comments d
   assert.match(doc, /8 source\/effect blocks/);
   assert.match(doc, /54 content direct-add lines/);
   assert.match(doc, /2662 content direct-add bytes/);
-  assert.match(doc, /32 background receiver lines/);
-  assert.match(doc, /1186 receiver bytes/);
+  assert.match(doc, /39 background receiver lines/);
+  assert.match(doc, /1579 receiver bytes/);
   assert.match(doc, /2 helper signature lines/);
   assert.match(doc, /204 helper signature bytes/);
   assert.match(doc, /21 existing-channel update lines/);
@@ -10383,7 +10383,7 @@ test('objective coverage ledger records addFilteredChannel Filter All comments d
   assert.match(doc, /11 runtime addFilteredChannel Filter All comments default fixtures/);
   assert.match(doc, /content `addChannelDirectly\(\)` sends `filterAll` and no `filterAllComments`/);
   assert.match(doc, /YouTube Kids hostnames still omit `filterAllComments`/);
-  assert.match(doc, /secondary background receiver drops caller-provided `filterAllComments`, forwards seven helper arguments/);
+  assert.match(doc, /secondary background receiver drops caller-provided `filterAllComments`, forwards eight helper arguments/);
   assert.match(doc, /helper signature has no comments-scope parameter/);
   assert.match(doc, /new channel rows store `filterAll: filterAll` without `filterAllComments`/);
   assert.match(doc, /existing channel rows can enable `filterAll` while preserving any existing `filterAllComments`/);

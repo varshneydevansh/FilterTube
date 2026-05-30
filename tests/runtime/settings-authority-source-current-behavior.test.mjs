@@ -120,13 +120,14 @@ test('background currently has two separate channel-add implementations', () => 
   assert.match(legacyBlock, /browserAPI\.storage\.local\.set\(writePayload, resolve\)/);
   assert.match(legacyBlock, /scheduleAutoBackupInBackground\('channel_added'\)/);
   assert.match(messageBlock, /handleAddFilteredChannel\(/);
-  assert.match(messageBlock, /scheduleAutoBackupInBackground\(\(message\.profile === 'kids'\) \? 'kids_channel_added' : 'channel_added'\)/);
+  assert.match(messageBlock, /const backupTrigger = targetListType === 'whitelist'/);
+  assert.match(messageBlock, /scheduleAutoBackupInBackground\(backupTrigger\)/);
   assert.match(helperBlock, /const targetListType = listType === 'whitelist' \? 'whitelist' : 'blocklist';/);
   assert.match(helperBlock, /storageWritePayload\[FT_PROFILES_V4_KEY\]/);
   assert.match(helperBlock, /storageWritePayload\.filterChannels = channels;/);
 });
 
-test('addFilteredChannel message path currently does not forward listType to handleAddFilteredChannel', () => {
+test('addFilteredChannel message path forwards normalized listType to handleAddFilteredChannel', () => {
   const text = source('js/background.js');
   const block = sliceBetween(
     text,
@@ -134,8 +135,8 @@ test('addFilteredChannel message path currently does not forward listType to han
     "if (message.type === 'toggleChannelFilterAll')"
   );
 
-  assert.match(block, /message\.profile \|\| 'main',\s*message\.videoId \|\| ''\s*\)/);
-  assert.doesNotMatch(block, /message\.listType/);
+  assert.match(block, /const targetListType = message\.listType === 'whitelist' \? 'whitelist' : 'blocklist';/);
+  assert.match(block, /targetProfile,\s*message\.videoId \|\| '',\s*targetListType\s*\)/);
 });
 
 test('settings compilation currently merges Kids whitelist into Main whitelist when syncKidsToMain and modes match', () => {

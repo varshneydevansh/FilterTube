@@ -43,10 +43,10 @@ The companion runtime test executes current source slices from
 
 ```text
 source file: js/background.js
-source split lines: 6314
-source wc -l: 6313
-source bytes: 284710
-source sha256: 46442f904cf18c3fa8345e71f608171edcf277207a420136a78a195c3b7c57eb
+source split lines: 6321
+source wc -l: 6320
+source bytes: 285103
+source sha256: 77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad
 broad lexical callable matches: 440
 top-level function declarations: 76
 plain function declarations: 63
@@ -172,9 +172,9 @@ subscriptionImportAndSenderNormalization: 11
 | 3074 | `async function` | `performWatchIdentityFetch` | `identityResolverNetwork` |
 | 4529 | `function` | `extractCustomUrlFromPath` | `identityResolverNetwork` |
 | 4558 | `async function` | `fetchChannelInfo` | `identityResolverNetwork` |
-| 5302 | `async function` | `handleAddFilteredChannel` | `ruleMutationAndChannelPersistence` |
-| 6201 | `async function` | `handleToggleChannelFilterAll` | `ruleMutationAndChannelPersistence` |
-| 6298 | `function` | `installFilterTubeBackgroundConsoleGate` | `defensiveHelpersAndMessaging` |
+| 5309 | `async function` | `handleAddFilteredChannel` | `ruleMutationAndChannelPersistence` |
+| 6208 | `async function` | `handleToggleChannelFilterAll` | `ruleMutationAndChannelPersistence` |
+| 6305 | `function` | `installFilterTubeBackgroundConsoleGate` | `defensiveHelpersAndMessaging` |
 
 ## Current Behavior Boundaries
 

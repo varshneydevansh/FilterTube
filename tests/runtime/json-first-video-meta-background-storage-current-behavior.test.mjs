@@ -185,10 +185,10 @@ test('JSON-first video meta background storage audit is audit-only and source pi
   assert.match(text, /Status: audit-only current-behavior register/);
   assert.match(text, /Runtime behavior is unchanged/);
   assert.match(text, /not an implementation patch, optimization patch, storage patch/);
-  assert.equal(lineCount(source), 6313);
-  assert.equal(Buffer.byteLength(source), 284710);
-  assert.equal(sha256('js/background.js'), '46442f904cf18c3fa8345e71f608171edcf277207a420136a78a195c3b7c57eb');
-  assert.match(text, /46442f904cf18c3fa8345e71f608171edcf277207a420136a78a195c3b7c57eb/);
+  assert.equal(lineCount(source), 6320);
+  assert.equal(Buffer.byteLength(source), 285103);
+  assert.equal(sha256('js/background.js'), '77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad');
+  assert.match(text, /77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad/);
   assert.match(text, /video-meta background storage source files: 1/);
 });
 

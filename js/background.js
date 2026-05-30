@@ -5242,6 +5242,9 @@ browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
 
     if (message.type === 'addFilteredChannel') {
+        const targetProfile = message.profile || 'main';
+        const targetListType = message.listType === 'whitelist' ? 'whitelist' : 'blocklist';
+
         handleAddFilteredChannel(
             message.input,
             message.filterAll,
@@ -5258,12 +5261,16 @@ browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 customUrl: message.customUrl,
                 source: message.source || null
             },
-            message.profile || 'main',
-            message.videoId || ''
+            targetProfile,
+            message.videoId || '',
+            targetListType
         ).then(result => {
             try {
                 if (result && result.success) {
-                    scheduleAutoBackupInBackground((message.profile === 'kids') ? 'kids_channel_added' : 'channel_added');
+                    const backupTrigger = targetListType === 'whitelist'
+                        ? (targetProfile === 'kids' ? 'kids_whitelist_channel_added' : 'whitelist_channel_added')
+                        : (targetProfile === 'kids' ? 'kids_channel_added' : 'channel_added');
+                    scheduleAutoBackupInBackground(backupTrigger);
                 }
             } catch (e) {
             }

@@ -24,7 +24,7 @@ runtime addFilteredChannel Filter All comments default fixtures: 11
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
 | `js/content_bridge.js` | 13571 | 601694 | `1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3` |
-| `js/background.js` | 6313 | 284710 | `46442f904cf18c3fa8345e71f608171edcf277207a420136a78a195c3b7c57eb` |
+| `js/background.js` | 6320 | 285103 | `77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad` |
 | `js/state_manager.js` | 2491 | 99780 | `509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6` |
 | `js/settings_shared.js` | 1181 | 57535 | `9710ebb445ba11cc45fc98aced765d298226a8cd4a003600e106f908abc2162c` |
 
@@ -33,10 +33,10 @@ runtime addFilteredChannel Filter All comments default fixtures: 11
 | Block | Anchor | Lines | Bytes | SHA-256 |
 | --- | --- | ---: | ---: | --- |
 | `contentBridgeAddChannelDirectly` | `js/content_bridge.js:13375` | 54 | 2662 | `4eb280573a5611b695c8284a8e6b85d17b2a97c459143a3054d02374cdf7c2ca` |
-| `backgroundAddFilteredChannelReceiver` | `js/background.js:5244` | 32 | 1186 | `68b592ef1b1365757100285ab9e7c3589727600f0b2be908466b992fb59c00f9` |
-| `backgroundHandleAddFilteredChannelSignature` | `js/background.js:5302` | 2 | 204 | `ce94174aa1b2f302e1e89a75b463271aa13d1c95f62cb89ee34364fb9c3ab603` |
-| `backgroundExistingChannelUpdate` | `js/background.js:5945` | 21 | 1247 | `9ac97ce884e9c319e0267a60bbbacbdb26b0a3ea6f1f0cca416615ad234e96dd` |
-| `backgroundNewChannelObject` | `js/background.js:5995` | 20 | 1081 | `5fa1776809d1d10187ead655c7b8a566c15935b2667f95e8cd5f7875c28f4be4` |
+| `backgroundAddFilteredChannelReceiver` | `js/background.js:5244` | 39 | 1579 | `f681057e88e4c6aef657464bca124f8d3ae4d59f4d11ca5f05e1135dcf1615f2` |
+| `backgroundHandleAddFilteredChannelSignature` | `js/background.js:5309` | 2 | 204 | `ce94174aa1b2f302e1e89a75b463271aa13d1c95f62cb89ee34364fb9c3ab603` |
+| `backgroundExistingChannelUpdate` | `js/background.js:5952` | 21 | 1247 | `9ac97ce884e9c319e0267a60bbbacbdb26b0a3ea6f1f0cca416615ad234e96dd` |
+| `backgroundNewChannelObject` | `js/background.js:6002` | 20 | 1081 | `5fa1776809d1d10187ead655c7b8a566c15935b2667f95e8cd5f7875c28f4be4` |
 | `backgroundChannelDerivedKeywordHelpersAndSync` | `js/background.js:1172` | 106 | 3482 | `22f1f880c4b67f0b366020641f94e988d19a4e0312b073c20048c4f2bcd0a455` |
 | `stateManagerChannelEnrichmentMessage` | `js/state_manager.js:665` | 12 | 460 | `1f802c946742b856d5c4f6aea62777de9e1e3fcebae08085d632259d1bac0132` |
 | `settingsSharedSyncFilterAllKeywords` | `js/settings_shared.js:412` | 72 | 2967 | `ce4e49c6055252ab9a6db6a30be91ddfb50efead1c1ef76bf736c38717febd25` |
@@ -56,12 +56,14 @@ runtime addFilteredChannel Filter All comments default fixtures: 11
 | `syncStoredMainKeywordsWithChannels` | 1 |
 | `syncFilterAllKeywords` | 1 |
 | `filterKeywordsComments` | 0 |
-| `profile` | 7 |
-| `listType` | 1 |
+| `profile` | 6 |
+| `listType` | 2 |
 | `metadata` | 18 |
 | `comment_filter_toggled` | 0 |
-| `channel_added` | 4 |
+| `channel_added` | 6 |
 | `kids_channel_added` | 1 |
+| `whitelist_channel_added` | 2 |
+| `kids_whitelist_channel_added` | 1 |
 | `scheduleAutoBackupInBackground` | 1 |
 | `FilterTube_ScheduleAutoBackup` | 1 |
 | `browserAPI_BRIDGE.runtime.sendMessage` | 2 |
@@ -76,14 +78,14 @@ runtime addFilteredChannel Filter All comments default fixtures: 11
 | Boundary | Current behavior | Missing proof before implementation |
 | --- | --- | --- |
 | Content direct add payload | Content `addChannelDirectly()` forwards `filterAll` but does not forward `filterAllComments`, even if metadata contains a `filterAllComments` field. It derives `profile` from the hostname and schedules `FilterTube_ScheduleAutoBackup` after a successful background response. | A content payload contract naming all mutable row fields, profile/list target, backup ownership, and comments-scope defaults. |
-| Secondary background receiver | The `addFilteredChannel` receiver forwards input, `filterAll`, collaboration metadata, profile, and video id to `handleAddFilteredChannel()`. It does not read `message.filterAllComments`, does not pass comments scope into metadata, and calls the helper with seven arguments, leaving the helper `listType` default. | A receiver report that includes sender, profile, list target, comments-scope, and backup scheduling policy. |
+| Secondary background receiver | The `addFilteredChannel` receiver forwards input, `filterAll`, collaboration metadata, profile, video id, and normalized list target to `handleAddFilteredChannel()`. It does not read `message.filterAllComments` and does not pass comments scope into metadata. | A receiver report that includes sender, profile, list target, comments-scope, and backup scheduling policy. |
 | Helper signature | `handleAddFilteredChannel(input, filterAll = false, ..., listType = 'blocklist')` has no `filterAllComments` parameter. | A helper contract proving whether comments scope should be part of initial channel creation, only post-create mutation, or unsupported in this path. |
 | New channel rows | The new channel object stores `filterAll: filterAll` without a `filterAllComments` field. A channel added with Filter All enabled therefore carries no explicit comment-scope decision. | A default comments policy for new Main/Kids blocklist and whitelist rows. |
 | Existing channel rows | Existing rows are spread into `updated`; setting incoming `filterAll` can flip `updated.filterAll = true`, but there is no incoming comments-scope merge. Existing rows preserve whatever `filterAllComments` they already had. | A merge policy covering whether a direct add should preserve, clear, or set comments scope when upgrading a row. |
 | Background compiler default | `syncStoredMainKeywordsWithChannels()` emits channel-derived keywords only for `filterAll === true`, carries `filterAllComments` into `comments` when present, and defaults missing `filterAllComments` to `comments: true`. | A compiler report tying add-time defaults to JSON comment effects and route/surface fixtures. |
 | Shared compiler default | `settings_shared.syncFilterAllKeywords()` mirrors the same default: missing `filterAllComments` compiles as `comments: true`, while explicit `false` remains muted. | Shared/background parity proof before changing JSON-first comment filtering or add-channel payloads. |
 | StateManager enrichment | StateManager channel-name enrichment messages send `type: 'addFilteredChannel'` with `filterAll: false` and no comments-scope field. | A background enrichment policy proving this silent path cannot change comments behavior or leak a default into JSON filtering unexpectedly. |
-| Backup triggers | Content can schedule `channel_added` after background success; the background receiver can also schedule `channel_added` or `kids_channel_added`. No trigger distinguishes comment-scope defaults. | Backup/revision policy for add-time comments-scope changes if they become first-class. |
+| Backup triggers | Content can schedule `channel_added` after background success; the background receiver schedules blocklist or whitelist channel-add triggers from the normalized profile/list target. No trigger distinguishes comment-scope defaults. | Backup/revision policy for add-time comments-scope changes if they become first-class. |
 | JSON comment provenance | Neither the payload nor stored new row records whether comment scope was intentionally enabled. JSON comment filtering later only receives compiled comment regexes. | A JSON comment provenance report that carries add-time source, row id, profile, list mode, and comments-scope decision. |
 
 ## Runtime Proof
@@ -95,8 +97,8 @@ The runtime guard proves:
 2. YouTube Kids hostnames switch the payload profile to `kids` while still
    omitting `filterAllComments`.
 3. The secondary background receiver drops `filterAllComments` even when the
-   caller sends it, forwards seven helper arguments, and schedules Kids backup
-   from `message.profile`.
+   caller sends it, forwards eight helper arguments including list target, and
+   schedules backup from normalized profile/list target.
 4. The helper signature has `listType = 'blocklist'` and no comments-scope
    parameter.
 5. The new channel object stores `filterAll: filterAll` and no

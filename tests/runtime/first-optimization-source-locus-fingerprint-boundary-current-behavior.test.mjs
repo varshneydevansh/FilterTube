@@ -95,9 +95,9 @@ const expectedFingerprints = {
     hash: '67cc877a0a97e4c4c5aaf5a0d1c37c15000af5238f8f37d7c5dc6efee27e34ff'
   },
   'js/background.js': {
-    lines: 6313,
-    bytes: 284710,
-    hash: '46442f904cf18c3fa8345e71f608171edcf277207a420136a78a195c3b7c57eb'
+    lines: 6320,
+    bytes: 285103,
+    hash: '77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad'
   },
   'js/state_manager.js': {
     lines: 2491,

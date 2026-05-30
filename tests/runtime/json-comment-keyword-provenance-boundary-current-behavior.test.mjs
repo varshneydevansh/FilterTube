@@ -13,7 +13,7 @@ const docPath = 'docs/audit/FILTERTUBE_JSON_COMMENT_KEYWORD_PROVENANCE_BOUNDARY_
 const sourceFingerprints = {
   'js/filter_logic.js': [3498, 165151, '4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641'],
   'js/settings_shared.js': [1181, 57535, '9710ebb445ba11cc45fc98aced765d298226a8cd4a003600e106f908abc2162c'],
-  'js/background.js': [6313, 284710, '46442f904cf18c3fa8345e71f608171edcf277207a420136a78a195c3b7c57eb']
+  'js/background.js': [6320, 285103, '77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad']
 };
 
 const blockSpecs = {

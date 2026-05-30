@@ -1228,7 +1228,7 @@ function assertReleaseHotPathProofStackAddendum(source) {
   assert.match(singleChannelMutationDoc, /flowchart TD/);
   assert.match(singleChannelMutationDoc, /\| Quick-cross enabled gate \| `js\/content\/block_channel\.js:1205-1222` \|/);
   assert.match(singleChannelMutationDoc, /\| 3-dot menu injected gate \| `js\/content_bridge\.js:10517-10529` \|/);
-  assert.match(singleChannelMutationDoc, /\| Shared helper storage\/cache fanout \| `js\/background\.js:5302-6185` \|/);
+  assert.match(singleChannelMutationDoc, /\| Shared helper storage\/cache fanout \| `js\/background\.js:5309-6192` \|/);
 
   const menuObserverDoc = read('docs/audit/FILTERTUBE_MENU_OBSERVER_KIDS_PASSIVE_LIFECYCLE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-23.md');
   assert.match(source, /Native Dropdown Open-Close Owner Flow Addendum - 2026-05-27/);

@@ -108,8 +108,10 @@ test('rule_mutation_report_exists_for_background_add_filtered_channel is not sat
   assert.doesNotMatch(persistent, /ruleMutationAuthority|mutationReport|listTarget|compiledSettingsRevision/);
 
   assert.match(secondary, /handleAddFilteredChannel\(/);
-  assert.match(secondary, /message\.profile \|\| 'main'/);
-  assert.doesNotMatch(secondary, /isTrustedUiSender\(sender\)|message\.listType|allowedYoutubeContentScript|ruleMutationAuthority|mutationReport/);
+  assert.match(secondary, /const targetProfile = message\.profile \|\| 'main'/);
+  assert.match(secondary, /const targetListType = message\.listType === 'whitelist' \? 'whitelist' : 'blocklist'/);
+  assert.match(secondary, /targetProfile,\s*message\.videoId \|\| '',\s*targetListType/);
+  assert.doesNotMatch(secondary, /isTrustedUiSender\(sender\)|allowedYoutubeContentScript|ruleMutationAuthority|mutationReport/);
 });
 
 test('rule_mutation_report_exists_for_kids_block_and_whitelist is not satisfied today', () => {

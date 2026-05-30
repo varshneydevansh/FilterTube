@@ -252,9 +252,9 @@ test('JSON-first video meta merge schema audit is audit-only and source pinned',
       hash: '1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3'
     },
     'js/background.js': {
-      lines: 6313,
-      bytes: 284710,
-      hash: '46442f904cf18c3fa8345e71f608171edcf277207a420136a78a195c3b7c57eb'
+      lines: 6320,
+      bytes: 285103,
+      hash: '77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad'
     },
     'js/filter_logic.js': {
       lines: 3498,

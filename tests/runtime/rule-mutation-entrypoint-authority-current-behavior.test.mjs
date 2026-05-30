@@ -206,7 +206,8 @@ test('background currently has guarded UI writers and unguarded content-script s
   assert.doesNotMatch(kidsBlock, /isTrustedUiSender\(sender\)/);
   assert.match(kidsBlock, /handleAddFilteredChannel\(/);
   assert.doesNotMatch(secondaryAdd, /isTrustedUiSender\(sender\)/);
-  assert.doesNotMatch(secondaryAdd, /message\.listType/);
+  assert.match(secondaryAdd, /const targetListType = message\.listType === 'whitelist' \? 'whitelist' : 'blocklist'/);
+  assert.match(secondaryAdd, /targetProfile,\s*message\.videoId \|\| '',\s*targetListType/);
   assert.match(secondaryAdd, /handleAddFilteredChannel\(/);
   assert.doesNotMatch(secondaryToggle, /isTrustedUiSender\(sender\)/);
   assert.match(secondaryToggle, /handleToggleChannelFilterAll/);

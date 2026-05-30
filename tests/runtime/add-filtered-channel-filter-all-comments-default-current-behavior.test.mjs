@@ -11,7 +11,7 @@ const docPath = 'docs/audit/FILTERTUBE_ADD_FILTERED_CHANNEL_FILTER_ALL_COMMENTS_
 
 const sourceFingerprints = {
   'js/content_bridge.js': [13571, 601694, '1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3'],
-  'js/background.js': [6313, 284710, '46442f904cf18c3fa8345e71f608171edcf277207a420136a78a195c3b7c57eb'],
+  'js/background.js': [6320, 285103, '77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad'],
   'js/state_manager.js': [2491, 99780, '509c559e35989c13cdded17c01eeaca8115addcd3848dbcda41514422e5bc7b6'],
   'js/settings_shared.js': [1181, 57535, '9710ebb445ba11cc45fc98aced765d298226a8cd4a003600e106f908abc2162c']
 };
@@ -31,15 +31,15 @@ const blockSpecs = {
     start: "if (message.type === 'addFilteredChannel')",
     end: "if (message.type === 'toggleChannelFilterAll')",
     startLine: 5244,
-    lines: 32,
-    bytes: 1186,
-    hash: '68b592ef1b1365757100285ab9e7c3589727600f0b2be908466b992fb59c00f9'
+    lines: 39,
+    bytes: 1579,
+    hash: 'f681057e88e4c6aef657464bca124f8d3ae4d59f4d11ca5f05e1135dcf1615f2'
   },
   backgroundHandleAddFilteredChannelSignature: {
     file: 'js/background.js',
     start: 'async function handleAddFilteredChannel(input, filterAll = false',
     end: '        const isHandleLike = (value) => {',
-    startLine: 5302,
+    startLine: 5309,
     lines: 2,
     bytes: 204,
     hash: 'ce94174aa1b2f302e1e89a75b463271aa13d1c95f62cb89ee34364fb9c3ab603'
@@ -48,7 +48,7 @@ const blockSpecs = {
     file: 'js/background.js',
     start: 'const updated = {\n                ...existing,',
     end: '            if (Array.isArray(collaborationWith) && collaborationWith.length > 0) {',
-    startLine: 5945,
+    startLine: 5952,
     lines: 21,
     bytes: 1247,
     hash: '9ac97ce884e9c319e0267a60bbbacbdb26b0a3ea6f1f0cca416615ad234e96dd'
@@ -57,7 +57,7 @@ const blockSpecs = {
     file: 'js/background.js',
     start: 'const newChannel = {\n                id: channelInfo.id,',
     end: '            channels.unshift(newChannel);',
-    startLine: 5995,
+    startLine: 6002,
     lines: 20,
     bytes: 1081,
     hash: '5fa1776809d1d10187ead655c7b8a566c15935b2667f95e8cd5f7875c28f4be4'
@@ -103,12 +103,14 @@ const selectedCounts = {
   syncStoredMainKeywordsWithChannels: 1,
   syncFilterAllKeywords: 1,
   filterKeywordsComments: 0,
-  profile: 7,
-  listType: 1,
+  profile: 6,
+  listType: 2,
   metadata: 18,
   comment_filter_toggled: 0,
-  channel_added: 4,
+  channel_added: 6,
   kids_channel_added: 1,
+  whitelist_channel_added: 2,
+  kids_whitelist_channel_added: 1,
   scheduleAutoBackupInBackground: 1,
   FilterTube_ScheduleAutoBackup: 1,
   'browserAPI_BRIDGE.runtime.sendMessage': 2,
@@ -428,10 +430,11 @@ test('background addFilteredChannel receiver drops filterAllComments before help
       source: 'playlist_fallback_menu'
     },
     'kids',
-    'lmnopqrstuv'
+    'lmnopqrstuv',
+    'whitelist'
   ]);
-  assert.equal(runtime.__helperCalls[0].length, 7);
-  assert.deepEqual(runtime.__backups, ['kids_channel_added']);
+  assert.equal(runtime.__helperCalls[0].length, 8);
+  assert.deepEqual(runtime.__backups, ['kids_whitelist_channel_added']);
 });
 
 test('background new-channel object stores filterAll but has no filterAllComments field', () => {
