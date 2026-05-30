@@ -858,6 +858,22 @@ Production console gate coverage reconciliation - 2026-05-31:
   promotion, release claims, and `diagnosticLoggingConvergenceAuthority`
   implementation at `NO-GO`.
 
+Production console residual hot-path preflight - 2026-05-31:
+  docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md
+  tests/runtime/runtime-diagnostic-logging-policy-matrix-current-behavior.test.mjs
+  This addendum separates textual console callsites from execution-time
+  production console work. It pins 7 residual preflight rows, 210 selected
+  routine `log/debug/info` token rows, 126 textual content-bridge routine rows
+  before the backup gate install, 1 content-bridge top-level executed routine
+  row before that backup gate, 124 content-bridge function-body rows that run
+  through post-install entrypoints, 62 background routine rows behind the
+  startup gate, 135 manifest-isolated routine rows behind the `dom_fallback`
+  gate, 7 MAIN-world local-debug rows, and 6 extension-UI/inactive-layout rows
+  outside the YouTube hot path. It keeps live installed-tab console sampling,
+  route/mode console budgets, release cleanup, whitelist/cache optimization,
+  JSON-first promotion, release claims, and
+  `diagnosticLoggingConvergenceAuthority` implementation at `NO-GO`.
+
 Installed Chrome unpacked path parity boundary - 2026-05-31:
   docs/audit/FILTERTUBE_INSTALLED_CHROME_UNPACKED_PATH_PARITY_CURRENT_BEHAVIOR_2026-05-30.md
   This addendum pulls Default-profile unpacked path parity into the global

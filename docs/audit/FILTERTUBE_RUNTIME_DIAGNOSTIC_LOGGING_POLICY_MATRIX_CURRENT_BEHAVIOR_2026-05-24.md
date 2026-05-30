@@ -424,6 +424,10 @@ diagnosticLoggingConvergenceReport
 diagnosticLogWorkBudget
 diagnosticMetricReplacementAuthority
 diagnosticPrivacyRedactionAuthority
+diagnosticConsoleResidualHotPathReport
+diagnosticProductionConsoleRuntimeSample
+diagnosticConsoleReleaseSamplingArtifact
+diagnosticConsoleResidualOwnerBudget
 ```
 
 ## Content Bridge Production Console Gate Addendum - 2026-05-30
@@ -605,4 +609,76 @@ live installed-tab console sampling proof: NO-GO
 runtime behavior changed by this reconciliation: no
 diagnostic logging cleanup approval: NO-GO
 broad audit completion from this reconciliation: NO-GO
+```
+
+## Production Console Residual Hot-Path Preflight - 2026-05-31
+
+This preflight is audit-only. It separates textual `console.log`/`console.debug`/
+`console.info` callsites from execution-time console work after the production
+gate changes, so future cleanup does not mistake function-body definitions for
+pre-gate runtime output.
+
+Current source still has many routine diagnostic tokens, but the YouTube SPA
+hot-path residual is narrower than the raw count:
+
+```text
+background/service worker
+  -> startup console gate installs before 62 routine background log/debug/info rows
+
+isolated YouTube content scripts
+  -> dom_fallback console gate installs first in active manifest order
+  -> content helper routine rows and content_bridge routine rows share that gate
+  -> content_bridge backup gate installs before message listener and initialize timer
+  -> content_bridge top-level executed startup log is locally debug-gated
+
+MAIN world
+  -> seed/filter_logic/injector routine rows rely on local debug gates
+  -> no global MAIN-world console override exists
+
+extension UI / inactive layout
+  -> routine rows are outside the YouTube page hot path
+  -> still release/code-burden debt
+```
+
+```mermaid
+flowchart TD
+  A["Textual routine console tokens"] --> B["Background startup gate"]
+  A --> C["Isolated dom_fallback shared gate"]
+  C --> D["content_bridge backup gate before listener/init"]
+  D --> E["Function-body logs execute after gate"]
+  C --> F["One top-level content_bridge startup log"]
+  F --> G["Local debug check"]
+  A --> H["MAIN-world local debug gates"]
+  A --> I["Extension UI and inactive layout"]
+  B --> J["No live installed sampling yet"]
+  E --> J
+  H --> J
+  I --> J
+```
+
+| Residual row | Source pins | Current behavior | Missing proof before release cleanup |
+| --- | --- | --- | --- |
+| `production_console_residual_bridge_preface` | `js/content_bridge.js:11-29`; `js/content_bridge.js:13543-13569` | `content_bridge.js` has 126 textual routine rows before the backup gate install, but only one top-level executed routine log before that gate and it is locally debug-gated; the helper definition also checks debug before logging. | Live installed-tab proof that debug-disabled startup emits no content-bridge log/debug output. |
+| `production_console_residual_bridge_function_bodies` | `js/content_bridge.js:702-13495`; `js/content_bridge.js:13565-13569` | The remaining 124 content-bridge routine rows are function-body diagnostics; the backup gate installs before `message` listener registration and the `initialize()` timer. | Route/profile/list-mode sampling proving menu, collaborator, fallback, quick-block, and identity paths stay quiet with debug disabled. |
+| `production_console_residual_background_gate` | `js/background.js:12`; `js/background.js:1770-6303`; `js/background.js:6305-6318` | The background console gate is invoked at startup before 62 routine background `log/debug/info` rows. | Service-worker sample showing routine logs stay suppressed while warnings/errors still surface. |
+| `production_console_residual_isolated_shared_gate` | `js/content/dom_fallback.js:5`; active manifest isolated script order; `js/content/dom_fallback.js:4559-4706` | Active manifests load `dom_fallback` before helper and bridge scripts, so 135 manifest-isolated routine rows are behind the shared isolated console gate. | Installed manifest/order byte proof plus live YouTube page sampling after reload. |
+| `production_console_residual_main_world_local_debug` | `js/seed.js:11-153`; `js/filter_logic.js:11-1581`; `js/injector.js:97` | MAIN-world code has 7 routine rows behind local debug checks, but no global MAIN-world console override. | Endpoint/route fixture proving no unconditional MAIN-world routine log is added before JSON-first promotion. |
+| `production_console_residual_non_hotpath_ui_layout` | `js/popup.js:1544`; `js/tab-view.js:8959`; `js/layout.js:71-483` | Popup/tab-view routine rows are extension UI diagnostics, and `layout.js` routine rows are not active-manifest loaded. | Release cleanup decision for UI diagnostics and inactive layout package burden. |
+| `production_console_residual_release_gate` | this addendum; coverage reconciliation above | Static source proof is not a production console sampling artifact. | `diagnosticProductionConsoleRuntimeSample`, route/mode console budget, installed-byte freshness, rollback packet, and release/public-claim approval. |
+
+```text
+production console residual preflight rows: 7
+selected routine log/debug/info token rows: 210
+content_bridge textual routine rows before backup install: 126
+content_bridge top-level executed routine rows before backup install: 1
+content_bridge debug helper routine definition rows: 1
+content_bridge post-gate function-body routine rows: 124
+background routine log/debug/info rows behind startup gate: 62
+manifest-isolated routine rows behind dom_fallback gate: 135
+MAIN-world local-debug routine rows: 7
+extension UI/layout routine rows outside YouTube hot path: 6
+warn/error suppression: NO
+live installed-tab console sampling proof: NO-GO
+diagnostic logging cleanup approval from residual preflight: NO-GO
+runtime behavior changed by this preflight: no
 ```

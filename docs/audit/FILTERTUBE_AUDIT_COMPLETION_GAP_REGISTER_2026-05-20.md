@@ -3901,6 +3901,24 @@ whitelist/cache optimization, JSON-first first-class promotion,
 release/public-claim use, and broad-audit completion remain `NO-GO`; runtime
 behavior changed by this reconciliation: no.
 
+2026-05-31 production console residual hot-path preflight:
+`docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md`,
+`docs/audit/FILTERTUBE_IMPLEMENTATION_READINESS_GATE_2026-05-18.md`, and
+`tests/runtime/runtime-diagnostic-logging-policy-matrix-current-behavior.test.mjs`
+extend the gap register from source-order gate owner coverage into a residual
+hot-path preflight that separates textual console callsites from execution-time
+production console work. The preflight pins 7 residual rows, 210 selected
+routine `log/debug/info` token rows, 126 textual content-bridge routine rows
+before backup gate installation, 1 content-bridge top-level executed routine
+row before that backup gate, 124 content-bridge function-body rows that execute
+through post-install entrypoints, 62 background routine rows behind the startup
+gate, 135 manifest-isolated routine rows behind the `dom_fallback` gate, 7
+MAIN-world local-debug rows, and 6 extension-UI/inactive-layout rows outside
+the YouTube hot path. Live installed-tab console sampling, route/mode console
+budgets, release cleanup, whitelist/cache optimization, JSON-first first-class
+promotion, release/public-claim use, and broad-audit completion remain
+`NO-GO`; runtime behavior changed by this preflight: no.
+
 2026-05-31 installed Chrome unpacked path parity gate linkage:
 `docs/audit/FILTERTUBE_INSTALLED_CHROME_UNPACKED_PATH_PARITY_CURRENT_BEHAVIOR_2026-05-30.md`
 and `docs/audit/FILTERTUBE_IMPLEMENTATION_READINESS_GATE_2026-05-18.md`

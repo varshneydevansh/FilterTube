@@ -190,6 +190,12 @@ function assertReadinessGateLinksCurrentYouTubeSpaHotTimerAudit() {
   assert.match(doc, /background `log\/debug\/info` gating, isolated-world\s+DOM fallback `log\/debug\/info` gating, content-bridge backup `log\/debug`\s+gating/);
   assert.match(doc, /no `warn\/error` suppression, no MAIN-world global console override,\s+no extension-UI cleanup approval, no live installed-tab console sampling\s+proof, and no release\/public-claim proof/);
   assert.match(doc, /route\/mode console budgets, whitelist\/cache optimization, JSON-first\s+promotion, release claims, and `diagnosticLoggingConvergenceAuthority`\s+implementation at `NO-GO`/);
+  assert.match(doc, /Production console residual hot-path preflight - 2026-05-31/);
+  assert.match(doc, /separates textual console callsites from execution-time\s+production console work/);
+  assert.match(doc, /pins 7 residual preflight rows, 210 selected\s+routine `log\/debug\/info` token rows, 126 textual content-bridge routine rows/);
+  assert.match(doc, /1 content-bridge top-level executed routine\s+row before that backup gate, 124 content-bridge function-body rows that run\s+through post-install entrypoints/);
+  assert.match(doc, /62 background routine rows behind the\s+startup gate, 135 manifest-isolated routine rows behind the `dom_fallback`\s+gate, 7 MAIN-world local-debug rows, and 6 extension-UI\/inactive-layout rows/);
+  assert.match(doc, /keeps live installed-tab console sampling,\s+route\/mode console budgets, release cleanup, whitelist\/cache optimization,\s+JSON-first promotion, release claims, and\s+`diagnosticLoggingConvergenceAuthority` implementation at `NO-GO`/);
   assert.match(doc, /Installed Chrome unpacked path parity boundary - 2026-05-31/);
   assert.ok(doc.includes('docs/audit/FILTERTUBE_INSTALLED_CHROME_UNPACKED_PATH_PARITY_CURRENT_BEHAVIOR_2026-05-30.md'));
   assert.match(doc, /pins extension id `gkgjigdfdccckblmglboobikfcpeelio`, Chrome Default\s+profile path `\/Users\/devanshvarshney\/FilterTube`, matching workspace root/);

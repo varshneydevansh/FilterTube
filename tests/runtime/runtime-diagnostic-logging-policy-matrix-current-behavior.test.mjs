@@ -74,7 +74,11 @@ const futureAuthorityTokens = [
   'diagnosticLoggingConvergenceReport',
   'diagnosticLogWorkBudget',
   'diagnosticMetricReplacementAuthority',
-  'diagnosticPrivacyRedactionAuthority'
+  'diagnosticPrivacyRedactionAuthority',
+  'diagnosticConsoleResidualHotPathReport',
+  'diagnosticProductionConsoleRuntimeSample',
+  'diagnosticConsoleReleaseSamplingArtifact',
+  'diagnosticConsoleResidualOwnerBudget'
 ];
 
 const expectedDiagnosticSourceFlowRows = {
@@ -440,6 +444,78 @@ function assertProductionConsoleGateCoverageReconciliation(doc) {
   }
 }
 
+function assertProductionConsoleResidualHotPathPreflight(doc) {
+  assert.match(doc, /Production Console Residual Hot-Path Preflight - 2026-05-31/);
+  assert.match(doc, /separates textual `console\.log`\/`console\.debug`\/\s+`console\.info` callsites from execution-time console work/);
+  assert.match(doc, /does not mistake function-body definitions for\s+pre-gate runtime output/);
+  assert.match(doc, /flowchart TD/);
+  assert.match(doc, /production console residual preflight rows: 7/);
+  assert.match(doc, /selected routine log\/debug\/info token rows: 210/);
+  assert.match(doc, /content_bridge textual routine rows before backup install: 126/);
+  assert.match(doc, /content_bridge top-level executed routine rows before backup install: 1/);
+  assert.match(doc, /content_bridge debug helper routine definition rows: 1/);
+  assert.match(doc, /content_bridge post-gate function-body routine rows: 124/);
+  assert.match(doc, /background routine log\/debug\/info rows behind startup gate: 62/);
+  assert.match(doc, /manifest-isolated routine rows behind dom_fallback gate: 135/);
+  assert.match(doc, /MAIN-world local-debug routine rows: 7/);
+  assert.match(doc, /extension UI\/layout routine rows outside YouTube hot path: 6/);
+  assert.match(doc, /live installed-tab console sampling proof: NO-GO/);
+  assert.match(doc, /diagnostic logging cleanup approval from residual preflight: NO-GO/);
+  assert.match(doc, /runtime behavior changed by this preflight: no/);
+
+  for (const row of [
+    'production_console_residual_bridge_preface',
+    'production_console_residual_bridge_function_bodies',
+    'production_console_residual_background_gate',
+    'production_console_residual_isolated_shared_gate',
+    'production_console_residual_main_world_local_debug',
+    'production_console_residual_non_hotpath_ui_layout',
+    'production_console_residual_release_gate'
+  ]) {
+    assert.match(doc, new RegExp(`\\| \`${row}\` \\|`), `missing residual hot-path row ${row}`);
+  }
+
+  const contentBridge = read('js/content_bridge.js');
+  const backupInstallLine = lineNumberForToken(contentBridge, 'installFilterTubeProductionConsoleGate();');
+  const bridgeSites = routineConsoleSites('js/content_bridge.js');
+  assert.equal(bridgeSites.length, 126);
+  assert.equal(bridgeSites.filter((line) => line < backupInstallLine).length, 126);
+  assert.deepEqual(bridgeSites.filter((line) => line < 55), [13, 28]);
+  assert.equal(bridgeSites.filter((line) => line > 55 && line < backupInstallLine).length, 124);
+  assert.match(contentBridge, /function filterTubeDebugLog\(\.\.\.args\) \{\s*if \(!isFilterTubeDebugEnabled\(\)\) return;\s*console\.log\('FilterTube:', \.\.\.args\);/s);
+  assert.match(contentBridge, /if \(isFilterTubeDebugEnabled\(\)\) \{\s*console\.log\("FilterTube: content_bridge\.js loaded \(Isolated World\)"\);/s);
+  assert.ok(backupInstallLine < lineNumberForToken(contentBridge, "window.addEventListener('message'"));
+  assert.ok(backupInstallLine < lineNumberForToken(contentBridge, 'setTimeout(() => initialize(), 50);'));
+
+  assert.equal(routineConsoleSites('js/background.js').length, 62);
+  assert.equal(lineNumberForToken(read('js/background.js'), 'installFilterTubeBackgroundConsoleGate();'), 12);
+  assert.equal(routineConsoleSites('js/background.js')[0], 1770);
+
+  const isolatedGateFiles = new Set();
+  for (const manifestFile of activeManifestFiles) {
+    const manifest = manifestJson(manifestFile);
+    for (const entry of manifest.content_scripts || []) {
+      if (!entry.js?.includes('js/content/dom_fallback.js')) continue;
+      const domIndex = entry.js.indexOf('js/content/dom_fallback.js');
+      for (const file of entry.js.slice(domIndex)) isolatedGateFiles.add(file);
+    }
+  }
+  const isolatedRoutineRows = [...isolatedGateFiles]
+    .map((file) => routineConsoleSites(file).length)
+    .reduce((sum, value) => sum + value, 0);
+  assert.equal(isolatedRoutineRows, 135);
+
+  const mainWorldRoutineRows = ['js/seed.js', 'js/filter_logic.js', 'js/injector.js']
+    .map((file) => routineConsoleSites(file).length)
+    .reduce((sum, value) => sum + value, 0);
+  assert.equal(mainWorldRoutineRows, 7);
+
+  const extensionUiLayoutRows = ['js/popup.js', 'js/tab-view.js', 'js/layout.js']
+    .map((file) => routineConsoleSites(file).length)
+    .reduce((sum, value) => sum + value, 0);
+  assert.equal(extensionUiLayoutRows, 6);
+}
+
 test('runtime diagnostic logging policy matrix is audit-only and source pinned', () => {
   const doc = read(docPath);
 
@@ -456,6 +532,7 @@ test('runtime diagnostic logging policy matrix is audit-only and source pinned',
   assertContentBridgeProductionConsoleGateAddendum(doc);
   assertProductionConsoleGateLoadOrderAddendum(doc);
   assertProductionConsoleGateCoverageReconciliation(doc);
+  assertProductionConsoleResidualHotPathPreflight(doc);
 
   for (const [file, [expectedLines, expectedBytes, expectedHash]] of Object.entries(sourceFingerprints)) {
     const source = read(file);
@@ -590,6 +667,16 @@ test('runtime diagnostic logging matrix is linked from audit ledgers and runtime
     assert.match(artifact, /3 runtime console\s+gate owner\s+files/);
     assert.match(artifact, /no MAIN-world global console\s+override|no MAIN-world global console override/);
     assert.match(artifact, /no live installed-tab console\s+sampling\s+proof/);
+  }
+
+  for (const artifact of [readinessGate, gapRegister]) {
+    assert.match(artifact, /2026-05-31 production console residual hot-path preflight|Production console residual hot-path preflight - 2026-05-31/);
+    assert.match(artifact, /7 residual (?:preflight )?rows/);
+    assert.match(artifact, /210 selected\s+routine `log\/debug\/info` token rows/);
+    assert.match(artifact, /126 textual content-bridge routine rows/);
+    assert.match(artifact, /1 content-bridge top-level executed routine\s+row/);
+    assert.match(artifact, /135 manifest-isolated routine rows behind the `dom_fallback`\s+gate/);
+    assert.match(artifact, /live installed-tab console sampling/);
   }
 
   assert.match(runtimeResults, /tests 4457/);
