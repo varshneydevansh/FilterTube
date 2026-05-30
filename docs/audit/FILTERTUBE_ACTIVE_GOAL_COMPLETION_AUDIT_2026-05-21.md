@@ -2188,6 +2188,21 @@ JSON-first promotion, release/public-claim use, and
 `update_goal(status='complete')` remain `NO-GO`. Runtime behavior changed by
 this continuation: no; the broad audit remains active.
 
+2026-05-31 production console gate coverage reconciliation:
+`docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md`
+and `tests/runtime/runtime-diagnostic-logging-policy-matrix-current-behavior.test.mjs`
+clarify the current production-console state without changing runtime behavior.
+The source-order proof now explicitly records 3 runtime console gate owner
+files: `js/background.js`, `js/content/dom_fallback.js`, and
+`js/content_bridge.js`. It pins background `log/debug/info` gating,
+isolated-world DOM fallback `log/debug/info` gating, content-bridge backup
+`log/debug` gating, no `warn/error` suppression, no MAIN-world global console
+override, no extension-UI cleanup approval, no live installed-tab console
+sampling proof, and no release/public-claim proof. Diagnostic logging cleanup,
+diagnostic metric replacement, privacy/redaction promotion, route/mode console
+budgets, whitelist/cache optimization, JSON-first promotion, release/public
+claim use, and `update_goal(status='complete')` remain `NO-GO`.
+
 ## Watch/Player Route Convergence Continuation
 
 2026-05-30 watch/player route convergence continuation:

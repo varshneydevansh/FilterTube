@@ -2369,6 +2369,20 @@ replacement approval `NO-GO`, diagnostic privacy/redaction approval `NO-GO`,
 runtime behavior changed by this continuation: no, and continued audit remains
 `GO`.
 
+2026-05-31 production console gate coverage reconciliation:
+`docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md`
+and `tests/runtime/runtime-diagnostic-logging-policy-matrix-current-behavior.test.mjs`
+extend objective coverage for production console gating, diagnostic logging,
+performance-risk, privacy, no-work budgets, release evidence, code-burden, and
+implementation-change rows without changing product runtime behavior. The
+reconciliation pins 3 runtime console gate owner files
+(`js/background.js`, `js/content/dom_fallback.js`, and `js/content_bridge.js`),
+background `log/debug/info` gating, isolated-world DOM fallback
+`log/debug/info` gating, content-bridge backup `log/debug` gating, no
+`warn/error` suppression, no MAIN-world global console override, no extension
+UI cleanup approval, no live installed-tab console sampling proof, diagnostic
+logging cleanup approval `NO-GO`, and continued audit remains `GO`.
+
 ## Event Listener Target Continuation
 
 2026-05-28 listener-target continuation:

@@ -406,6 +406,40 @@ function assertProductionConsoleGateLoadOrderAddendum(doc) {
   assert.equal(routineConsoleSites('js/tab-view.js').length, 1);
 }
 
+function assertProductionConsoleGateCoverageReconciliation(doc) {
+  assert.match(doc, /Production Console Gate Coverage Reconciliation - 2026-05-31/);
+  assert.match(doc, /Current source has three runtime gate owners/);
+  assert.match(doc, /runtime console gate owner files: 3/);
+  assert.match(doc, /background gate levels: log\/debug\/info/);
+  assert.match(doc, /dom_fallback routine gate levels: log\/debug\/info/);
+  assert.match(doc, /content_bridge backup gate levels: log\/debug/);
+  assert.match(doc, /warn\/error suppression: NO/);
+  assert.match(doc, /MAIN-world global console override: NO/);
+  assert.match(doc, /live installed-tab console sampling proof: NO-GO/);
+  assert.match(doc, /runtime behavior changed by this reconciliation: no/);
+  assert.match(doc, /diagnostic logging cleanup approval: NO-GO/);
+
+  for (const row of [
+    'production_console_gate_coverage_background',
+    'production_console_gate_coverage_dom_fallback',
+    'production_console_gate_coverage_content_bridge',
+    'production_console_gate_coverage_main_world',
+    'production_console_gate_coverage_extension_ui',
+    'production_console_gate_coverage_release_gap'
+  ]) {
+    assert.match(doc, new RegExp(`\\| \`${row}\` \\|`), `missing coverage reconciliation row ${row}`);
+  }
+
+  const gateOwners = [
+    ['js/background.js', 'function installFilterTubeBackgroundConsoleGate()'],
+    ['js/content/dom_fallback.js', 'function installFilterTubeRoutineConsoleGate()'],
+    ['js/content_bridge.js', 'function installFilterTubeProductionConsoleGate()']
+  ];
+  for (const [file, token] of gateOwners) {
+    assert.match(read(file), new RegExp(escapeRegExp(token)), `${file} missing gate owner ${token}`);
+  }
+}
+
 test('runtime diagnostic logging policy matrix is audit-only and source pinned', () => {
   const doc = read(docPath);
 
@@ -421,6 +455,7 @@ test('runtime diagnostic logging policy matrix is audit-only and source pinned',
   assertDiagnosticLoggingConvergenceBoundary(doc);
   assertContentBridgeProductionConsoleGateAddendum(doc);
   assertProductionConsoleGateLoadOrderAddendum(doc);
+  assertProductionConsoleGateCoverageReconciliation(doc);
 
   for (const [file, [expectedLines, expectedBytes, expectedHash]] of Object.entries(sourceFingerprints)) {
     const source = read(file);
@@ -548,6 +583,13 @@ test('runtime diagnostic logging matrix is linked from audit ledgers and runtime
     assert.match(artifact, /418 active console\s+callsites/);
     assert.match(artifact, /9 diagnostic\s+source-flow\s+rows/);
     assert.match(artifact, /implementation-ready diagnostic\s+logging\s+convergence\s+rows\s+0|0\s+implementation-ready diagnostic\s+logging\s+convergence\s+rows/);
+  }
+
+  for (const artifact of [objectiveLedger, activeGoal]) {
+    assert.match(artifact, /2026-05-31 production console gate coverage reconciliation/);
+    assert.match(artifact, /3 runtime console gate owner\s+files|3 runtime console gate owner files/);
+    assert.match(artifact, /no MAIN-world global console\s+override|no MAIN-world global console override/);
+    assert.match(artifact, /no live installed-tab console\s+sampling proof|no live installed-tab console sampling proof/);
   }
 
   assert.match(runtimeResults, /tests 4457/);

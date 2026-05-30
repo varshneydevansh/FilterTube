@@ -536,3 +536,73 @@ runtime behavior changed by load-order addendum: no
 production console load-order release proof: NO-GO
 broad audit completion from load-order addendum: NO-GO
 ```
+
+## Production Console Gate Coverage Reconciliation - 2026-05-31
+
+This addendum reconciles the earlier content-bridge-specific patch note with
+the current source-order proof. The production console state is not "only
+content_bridge is gated." Current source has three runtime gate owners:
+`background.js`, `js/content/dom_fallback.js`, and `js/content_bridge.js`.
+Those gates suppress routine production `log`/`debug`/`info` work on the
+covered hot paths while preserving `warn`/`error`.
+
+This is still not full diagnostic logging cleanup. MAIN-world scripts, extension
+UI, build/release scripts, and failure diagnostics remain separate policy
+surfaces, and there is still no first-class diagnostic logging authority,
+privacy/redaction report, route/surface console budget, live installed-tab
+sampling artifact, or release proof.
+
+```text
+background/service worker
+  -> installFilterTubeBackgroundConsoleGate()
+  -> gates background log/debug/info
+  -> warn/error remain active
+
+isolated YouTube content scripts
+  -> js/content/dom_fallback.js installs installFilterTubeRoutineConsoleGate()
+  -> gates later isolated log/debug/info across shared isolated console
+  -> js/content_bridge.js installs backup log/debug gate
+  -> warn/error remain active
+
+MAIN world and extension UI
+  -> seed/filter/injector use local debug gates for selected routine output
+  -> popup/tab-view/build scripts remain outside YouTube SPA hot-path gates
+  -> future unconditional logs remain diagnostic-policy debt
+```
+
+```mermaid
+flowchart TD
+  A["Background service worker"] --> B["background log/debug/info gate"]
+  C["Isolated content scripts"] --> D["dom_fallback routine gate"]
+  D --> E["later isolated helper output gated"]
+  E --> F["content_bridge backup log/debug gate"]
+  G["MAIN-world scripts"] --> H["local debug gates only"]
+  I["Extension UI and build scripts"] --> J["outside YouTube SPA hot path"]
+  B --> K["No release metric artifact yet"]
+  F --> K
+  H --> K
+  J --> K
+```
+
+| Coverage row | Current source-backed status | Remaining risk |
+| --- | --- | --- |
+| `production_console_gate_coverage_background` | `js/background.js` installs `installFilterTubeBackgroundConsoleGate()` at startup before selected routine background `log/debug/info` rows. | Background warnings/errors still emit by design, and there is no service-worker route/profile console budget. |
+| `production_console_gate_coverage_dom_fallback` | `js/content/dom_fallback.js` installs `installFilterTubeRoutineConsoleGate()` before later isolated content helpers and bridge code. | This relies on manifest order staying stable and does not govern MAIN-world scripts. |
+| `production_console_gate_coverage_content_bridge` | `js/content_bridge.js` installs a backup `log/debug` gate before bridge message/listener/init work. | Backup gate is not a diagnostic policy authority and does not suppress warn/error. |
+| `production_console_gate_coverage_main_world` | `js/seed.js`, `js/filter_logic.js`, and `js/injector.js` keep selected routine output behind local debug checks. | MAIN-world console is not globally wrapped; future unconditional logs can bypass this proof. |
+| `production_console_gate_coverage_extension_ui` | `js/popup.js`, `js/tab-view.js`, `build.js`, and scripts are outside the YouTube SPA content hot path. | They remain release/build/UI diagnostic policy debt. |
+| `production_console_gate_coverage_release_gap` | Current proof is static source-order plus VM slice tests. | Live installed-tab console sampling, byte freshness, route/mode budgets, and release/public-claim use remain `NO-GO`. |
+
+```text
+runtime console gate owner files: 3
+background gate levels: log/debug/info
+dom_fallback routine gate levels: log/debug/info
+content_bridge backup gate levels: log/debug
+warn/error suppression: NO
+MAIN-world global console override: NO
+extension UI console cleanup approval: NO-GO
+live installed-tab console sampling proof: NO-GO
+runtime behavior changed by this reconciliation: no
+diagnostic logging cleanup approval: NO-GO
+broad audit completion from this reconciliation: NO-GO
+```
