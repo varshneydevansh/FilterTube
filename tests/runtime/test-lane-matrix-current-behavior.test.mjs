@@ -257,6 +257,8 @@ test('changed-lane runner is wired to the classifier and sequential lane executi
   assert.match(runner, /lane === '--run-changed' \|\| lane === 'run-changed'/);
   assert.match(runner, /const result = classifyPaths\(changedPathsFromGit\(\)\)/);
   assert.match(runner, /if \(result\.unmatched\.length\) process\.exit\(2\)/);
+  assert.match(runner, /MANUAL_YOUTUBE_SMOKE_LANE_REASONS/);
+  assert.match(runner, /Manual YouTube smoke required when user-facing/);
   assert.match(runner, /function runAuditDrift\(\)/);
   assert.match(runner, /runNode\(\['scripts\/audit-proof-drift\.mjs', '--lane-owned'\]\)/);
   assert.match(runner, /console\.log\('\\n==> Running test:audit-drift'\)/);
@@ -267,6 +269,7 @@ test('changed-lane runner is wired to the classifier and sequential lane executi
   assert.match(matrix, /fails on any unclassified\s+changed path/);
   assert.match(matrix, /runs the\s+lane-owned audit proof drift guard/);
   assert.match(matrix, /runs the required lanes sequentially in\s+matrix order/);
+  assert.match(matrix, /prints a manual YouTube\s+smoke advisory/);
 });
 
 test('changed-lane path collection includes untracked nonignored files', () => {
@@ -291,6 +294,29 @@ test('changed-lane path collection includes untracked nonignored files', () => {
   ]);
   assert.deepEqual(result.lanes, ['json', 'performance', 'smoke']);
   assert.deepEqual(result.unmatched, []);
+});
+
+test('classifier output surfaces manual YouTube smoke for user-facing runtime lanes', () => {
+  const runtime = spawnSync(process.execPath, ['scripts/run-test-lane.mjs', '--classify', 'js/seed.js'], {
+    cwd: repoRoot,
+    encoding: 'utf8'
+  });
+
+  assert.equal(runtime.status, 0, runtime.stderr);
+  assert.match(runtime.stdout, /Required lane commands:/);
+  assert.match(runtime.stdout, /npm run test:json/);
+  assert.match(runtime.stdout, /npm run test:performance/);
+  assert.match(runtime.stdout, /Manual YouTube smoke required when user-facing:/);
+  assert.match(runtime.stdout, /test:json: JSON-first filtering/);
+  assert.match(runtime.stdout, /test:performance: empty-rule\/no-work/);
+
+  const releaseOnly = spawnSync(process.execPath, ['scripts/run-test-lane.mjs', '--classify', 'README.md'], {
+    cwd: repoRoot,
+    encoding: 'utf8'
+  });
+
+  assert.equal(releaseOnly.status, 0, releaseOnly.stderr);
+  assert.doesNotMatch(releaseOnly.stdout, /Manual YouTube smoke required when user-facing:/);
 });
 
 test('smoke lane keeps release confidence broad but bounded', () => {

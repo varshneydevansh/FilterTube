@@ -7,6 +7,16 @@ import { spawnSync } from 'node:child_process';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
+const MANUAL_YOUTUBE_SMOKE_LANE_REASONS = Object.freeze({
+  whitelist: 'whitelist-only leaks, Shorts, watch/end-screen, Kids/YTM allow behavior',
+  blocking: 'keyword/channel/comment hiding and blocklist false-hide/leak behavior',
+  json: 'JSON-first filtering, network interception, and SPA response mutation',
+  dom: 'DOM fallback hiding/restores and recycled YouTube nodes',
+  menu: '3-dot menus, quick-block, collaborator actions, and native dropdown state',
+  performance: 'empty-rule/no-work and repeated YouTube SPA navigation responsiveness',
+  settings: 'profile/mode/storage changes reprocessing already-rendered cards'
+});
+
 export const LANES = Object.freeze({
   release: {
     description: 'Build, package, release docs, public claims, and artifact boundaries.',
@@ -607,6 +617,20 @@ function printClassification(result) {
     for (const lane of result.lanes) console.log(`  npm run test:${lane}`);
   } else {
     console.log('Required lane commands: none');
+  }
+
+  const manualSmokeReasons = [];
+  for (const lane of result.lanes) {
+    if (Object.hasOwn(MANUAL_YOUTUBE_SMOKE_LANE_REASONS, lane)) {
+      manualSmokeReasons.push([lane, MANUAL_YOUTUBE_SMOKE_LANE_REASONS[lane]]);
+    }
+  }
+
+  if (manualSmokeReasons.length) {
+    console.log('\nManual YouTube smoke required when user-facing:');
+    for (const [lane, reason] of manualSmokeReasons) {
+      console.log(`  test:${lane}: ${reason}`);
+    }
   }
 
   if (result.classifications.length) {

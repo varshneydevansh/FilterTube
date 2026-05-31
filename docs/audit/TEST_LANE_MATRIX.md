@@ -75,6 +75,11 @@ matrix order. Use it when a logical change has already been made and you want
 the focused proof lane set to execute without manually copying commands from
 `lanes:changed`.
 
+For user-facing runtime lanes, the classifier also prints a manual YouTube
+smoke advisory. That keeps the installed-extension handoff visible beside the
+automated lane commands without pretending automated fixtures can prove live
+YouTube SPA smoothness, browser profile state, or native menu rendering.
+
 ## Auxiliary Guards
 
 These commands do not replace the feature lanes. They catch workflow drift in
