@@ -259,6 +259,9 @@ test('changed-lane runner is wired to the classifier and sequential lane executi
   assert.match(runner, /if \(result\.unmatched\.length\) process\.exit\(2\)/);
   assert.match(runner, /MANUAL_YOUTUBE_SMOKE_LANE_REASONS/);
   assert.match(runner, /Manual YouTube smoke required when user-facing/);
+  assert.match(runner, /AUDIT_PROOF_PATH_PATTERN/);
+  assert.match(runner, /Audit proof update expected before commit/);
+  assert.match(runner, /Audit proof files in this change/);
   assert.match(runner, /function runAuditDrift\(\)/);
   assert.match(runner, /runNode\(\['scripts\/audit-proof-drift\.mjs', '--lane-owned'\]\)/);
   assert.match(runner, /console\.log\('\\n==> Running test:audit-drift'\)/);
@@ -270,6 +273,7 @@ test('changed-lane runner is wired to the classifier and sequential lane executi
   assert.match(matrix, /runs the\s+lane-owned audit proof drift guard/);
   assert.match(matrix, /runs the required lanes sequentially in\s+matrix order/);
   assert.match(matrix, /prints a manual YouTube\s+smoke advisory/);
+  assert.match(matrix, /reports whether a changed\s+`docs\/audit\/` proof file is present/);
 });
 
 test('changed-lane path collection includes untracked nonignored files', () => {
@@ -309,6 +313,9 @@ test('classifier output surfaces manual YouTube smoke for user-facing runtime la
   assert.match(runtime.stdout, /Manual YouTube smoke required when user-facing:/);
   assert.match(runtime.stdout, /test:json: JSON-first filtering/);
   assert.match(runtime.stdout, /test:performance: empty-rule\/no-work/);
+  assert.match(runtime.stdout, /Audit proof update expected before commit:/);
+  assert.match(runtime.stdout, /Add or update a relevant docs\/audit\/ proof file for:/);
+  assert.match(runtime.stdout, /- js\/seed\.js/);
 
   const releaseOnly = spawnSync(process.execPath, ['scripts/run-test-lane.mjs', '--classify', 'README.md'], {
     cwd: repoRoot,
@@ -317,6 +324,18 @@ test('classifier output surfaces manual YouTube smoke for user-facing runtime la
 
   assert.equal(releaseOnly.status, 0, releaseOnly.stderr);
   assert.doesNotMatch(releaseOnly.stdout, /Manual YouTube smoke required when user-facing:/);
+});
+
+test('classifier output recognizes changed audit proof files', () => {
+  const proof = spawnSync(process.execPath, ['scripts/run-test-lane.mjs', '--classify', 'docs/audit/TEST_LANE_MATRIX.md'], {
+    cwd: repoRoot,
+    encoding: 'utf8'
+  });
+
+  assert.equal(proof.status, 0, proof.stderr);
+  assert.match(proof.stdout, /Audit proof files in this change:/);
+  assert.match(proof.stdout, /docs\/audit\/TEST_LANE_MATRIX\.md/);
+  assert.doesNotMatch(proof.stdout, /Audit proof update expected before commit:/);
 });
 
 test('smoke lane keeps release confidence broad but bounded', () => {

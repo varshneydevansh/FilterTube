@@ -80,6 +80,11 @@ smoke advisory. That keeps the installed-extension handoff visible beside the
 automated lane commands without pretending automated fixtures can prove live
 YouTube SPA smoothness, browser profile state, or native menu rendering.
 
+For proof discipline, the classifier also reports whether a changed
+`docs/audit/` proof file is present. If source, release, asset, or product-doc
+paths changed without a matching audit proof file in the same logical change,
+it prints an audit-proof reminder before the matched-path details.
+
 ## Auxiliary Guards
 
 These commands do not replace the feature lanes. They catch workflow drift in

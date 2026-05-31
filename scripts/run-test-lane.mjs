@@ -17,6 +17,9 @@ const MANUAL_YOUTUBE_SMOKE_LANE_REASONS = Object.freeze({
   settings: 'profile/mode/storage changes reprocessing already-rendered cards'
 });
 
+const AUDIT_PROOF_PATH_PATTERN = /^docs\/audit\//;
+const RUNTIME_TEST_PROOF_PATH_PATTERN = /^tests\/runtime\/.*\.test\.mjs$/;
+
 export const LANES = Object.freeze({
   release: {
     description: 'Build, package, release docs, public claims, and artifact boundaries.',
@@ -631,6 +634,25 @@ function printClassification(result) {
     for (const [lane, reason] of manualSmokeReasons) {
       console.log(`  test:${lane}: ${reason}`);
     }
+  }
+
+  const auditProofFiles = [];
+  const proofRelevantFiles = [];
+  for (const entry of result.classifications) {
+    if (AUDIT_PROOF_PATH_PATTERN.test(entry.file)) {
+      auditProofFiles.push(entry.file);
+    } else if (!RUNTIME_TEST_PROOF_PATH_PATTERN.test(entry.file)) {
+      proofRelevantFiles.push(entry.file);
+    }
+  }
+
+  if (auditProofFiles.length) {
+    console.log('\nAudit proof files in this change:');
+    for (const file of auditProofFiles) console.log(`  ${file}`);
+  } else if (proofRelevantFiles.length) {
+    console.log('\nAudit proof update expected before commit:');
+    console.log('  Add or update a relevant docs/audit/ proof file for:');
+    for (const file of proofRelevantFiles) console.log(`  - ${file}`);
   }
 
   if (result.classifications.length) {
