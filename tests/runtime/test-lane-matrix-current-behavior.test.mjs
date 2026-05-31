@@ -124,7 +124,7 @@ test('test lane matrix maps high-risk source files to expected lanes', () => {
     { files: ['js/content/collab_dialog.js'], lanes: ['test:whitelist', 'test:blocking', 'test:menu', 'test:performance'] },
     { files: ['js/content/dom_helpers.js', 'js/content/dom_state.js'], lanes: ['test:whitelist', 'test:blocking', 'test:dom', 'test:performance'] },
     { files: ['js/content/first_run_prompt.js', 'js/content/release_notes_prompt.js'], lanes: ['test:release', 'test:settings', 'test:smoke'] },
-    { files: ['js/content_bridge.js'], lanes: ['test:menu', 'test:settings', 'test:blocking'] },
+    { files: ['js/content_bridge.js'], lanes: ['test:whitelist', 'test:blocking', 'test:json', 'test:dom', 'test:menu', 'test:performance', 'test:settings'] },
     { files: ['js/background.js'], lanes: ['test:release', 'test:whitelist', 'test:blocking', 'test:json', 'test:performance', 'test:settings'] },
     { files: ['js/content_controls_catalog.js'], lanes: ['test:whitelist', 'test:blocking', 'test:json', 'test:dom', 'test:menu', 'test:performance', 'test:settings'] },
     { files: ['js/popup.js', 'js/tab-view.js', 'js/render_engine.js', 'js/ui_components.js'], lanes: ['test:release', 'test:whitelist', 'test:blocking', 'test:menu', 'test:settings', 'test:smoke'] },
