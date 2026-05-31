@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowRight, ArrowUpRight, Play } from "@phosphor-icons/react/ssr";
 
 import { BrowserLogoRail } from "@/components/browser-logo-rail";
+import { HeroVideo } from "@/components/hero-video";
 import { ActionLink, Panel, SectionHeading } from "@/components/marketing-ui";
 import { Reveal } from "@/components/reveal";
 import {
@@ -59,6 +60,7 @@ function FeaturedPlatformCard({ page, span }) {
     <Link
       className={`group ft-shell block h-full rounded-[2rem] p-2 ring-1 ring-[color:var(--color-line)] shadow-[var(--shadow-diffuse)] transition duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-1 ${span}`}
       href={`/${page.slug}`}
+      prefetch
     >
       <div
         className={`ft-inset relative h-full overflow-hidden rounded-[calc(2rem-0.5rem)] p-6 md:p-7 ${tone.surface}`}
@@ -134,6 +136,7 @@ function ShortcutCard({ page }) {
     <Link
       className="group ft-shell block h-full rounded-[1.6rem] p-2 ring-1 ring-[color:var(--color-line)] transition duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5"
       href={`/${page.slug}`}
+      prefetch
     >
       <div
         className={`ft-inset relative h-full overflow-hidden rounded-[calc(1.6rem-0.5rem)] p-5 ${tone.surface}`}
@@ -174,16 +177,7 @@ export default function HomePage() {
   return (
     <>
       <section className="relative min-h-[100dvh] overflow-hidden px-4 pb-12 pt-28 md:px-6 md:pb-20 md:pt-36">
-        <video
-          aria-hidden="true"
-          autoPlay
-          className="absolute inset-0 h-full w-full object-cover"
-          loop
-          muted
-          playsInline
-          preload="auto"
-          src={heroVideoUrl}
-        />
+        <HeroVideo src={heroVideoUrl} />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.18),transparent_28%),linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02)_30%,rgba(18,16,20,0.12)_100%)]" />
         <div className="absolute inset-x-0 bottom-0 h-28 bg-[linear-gradient(180deg,transparent,rgba(11,14,18,0.08))]" />
 
@@ -434,6 +428,7 @@ export default function HomePage() {
                   <Link
                     className="ft-shell-strong inline-flex min-h-11 items-center gap-2 rounded-full border border-[color:var(--color-line)] px-4 py-2 text-sm font-medium text-[var(--color-ink)] transition duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 hover:border-[color:var(--color-accent)] hover:text-[var(--color-accent)]"
                     href="/mobile"
+                    prefetch
                   >
                     Start with the mobile overview
                     <ArrowUpRight aria-hidden="true" size={16} weight="light" />

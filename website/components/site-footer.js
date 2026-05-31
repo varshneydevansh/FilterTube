@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { ArrowUpRight } from "@phosphor-icons/react/ssr";
 
+import { FooterSignalArt } from "@/components/footer-signal-art";
 import { ActionLink } from "@/components/marketing-ui";
-import { ScenicIllustration } from "@/components/scenic-illustration";
 import {
   downloadsHref,
   extensionInstallHref,
@@ -108,11 +108,7 @@ export function SiteFooter() {
           </div>
 
           <div className="relative border-t border-[color:var(--color-line)]">
-            <ScenicIllustration
-              className="h-[18rem] rounded-none md:h-[22rem] lg:h-[24rem]"
-              footer
-              variant="footer"
-            />
+            <FooterSignalArt />
             <div className="absolute inset-x-0 bottom-0 flex flex-col gap-3 px-6 pb-5 pt-10 md:px-8 lg:flex-row lg:items-end lg:justify-between lg:px-10">
               <div className="rounded-full border border-white/14 bg-[rgba(9,14,22,0.36)] px-4 py-2 text-[0.72rem] uppercase tracking-[0.22em] text-white/78 backdrop-blur-md">
                 Serene by design. Not affiliated with Google or YouTube.
