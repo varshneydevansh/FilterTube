@@ -118,6 +118,16 @@ function watchPayload(rows = [compactAutoplay(), endScreenVideo()]) {
   return { elements: rows };
 }
 
+function autoplayEndpointSet() {
+  return {
+    sets: [{
+      autoplayVideo: { watchEndpoint: { videoId: 'autoend0001' } },
+      nextButtonVideo: { watchEndpoint: { videoId: 'autoend0002' } },
+      previousButtonVideo: { watchEndpoint: { videoId: 'autoend0003' } }
+    }]
+  };
+}
+
 function sourceBlocks() {
   const filterLogic = read('js/filter_logic.js');
   const seed = read('js/seed.js');
@@ -205,9 +215,9 @@ test('JSON-first disableAutoplay/disableAnnotations boundary audit is audit-only
   assert.match(doc, /Runtime behavior is unchanged/);
   assert.match(doc, /not an implementation patch,\s+optimization patch, autoplay patch/);
   assert.match(doc, /disableAutoplay\/disableAnnotations boundary source files: 6/);
-  assert.match(doc, /runtime disableAutoplay\/disableAnnotations fixtures: 6/);
+  assert.match(doc, /runtime disableAutoplay\/disableAnnotations fixtures: 7/);
 
-  assert.ok(doc.includes(`| \`js/filter_logic.js\` | 3498 | 165151 | \`${sha256('js/filter_logic.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/filter_logic.js\` | 3652 | 172174 | \`${sha256('js/filter_logic.js')}\` |`));
   assert.ok(doc.includes(`| \`js/seed.js\` | 1136 | 50026 | \`${sha256('js/seed.js')}\` |`));
   assert.ok(doc.includes(`| \`js/content/dom_fallback.js\` | 4838 | 228332 | \`${sha256('js/content/dom_fallback.js')}\` |`));
   assert.ok(doc.includes(`| \`js/background.js\` | 6320 | 285103 | \`${sha256('js/background.js')}\` |`));
@@ -239,7 +249,7 @@ test('disableAutoplay/disableAnnotations source counts remain pinned', () => {
     assert.match(doc, new RegExp(`${label} bytes: ${expectedBytes}`));
   }
 
-  assert.equal(countLiteral(blocks.filterLogic, 'disableAutoplay'), 0);
+  assert.equal(countLiteral(blocks.filterLogic, 'disableAutoplay'), 1);
   assert.equal(countLiteral(blocks.filterLogic, 'disableAnnotations'), 0);
   assert.equal(countLiteral(blocks.seed, 'disableAutoplay'), 0);
   assert.equal(countLiteral(blocks.seed, 'disableAnnotations'), 0);
@@ -258,7 +268,7 @@ test('disableAutoplay/disableAnnotations source counts remain pinned', () => {
   assert.equal(countLiteral(blocks.domAnnotationsCssRules, '.annotation'), 1);
   assert.equal(countLiteral(blocks.domAnnotationsCssRules, '.iv-branding'), 1);
 
-  assert.match(doc, /filter_logic total disableAutoplay tokens: 0/);
+  assert.match(doc, /filter_logic total disableAutoplay tokens: 1/);
   assert.match(doc, /filter_logic total disableAnnotations tokens: 0/);
   assert.match(doc, /seed total disableAutoplay tokens: 0/);
   assert.match(doc, /seed total disableAnnotations tokens: 0/);
@@ -304,6 +314,14 @@ test('ordinary keyword rules can remove supported end-screen JSON while compact 
   assert.equal(result.elements[1].endScreenVideoRenderer.videoId, 'END3');
 });
 
+test('disableAutoplay removes watch autoplay endpoint sets during active JSON processing', () => {
+  assert.deepEqual(run(autoplayEndpointSet(), {
+    disableAutoplay: true
+  }), {
+    sets: []
+  });
+});
+
 test('watch next disableAutoplay and disableAnnotations bypass JSON engine work without a disable decision', async () => {
   const payload = watchPayload();
   const runtime = loadSeedRuntime({
@@ -327,7 +345,9 @@ test('source proof pins DOM-owned player controls refresh omission and missing a
   const blocks = sourceBlocks();
   const runtime = productRuntimeSource();
 
-  assert.doesNotMatch(blocks.filterLogic, /disableAutoplay/);
+  assert.match(blocks.filterLogic, /disableAutoplay/);
+  assert.match(blocks.filterLogic, /AUTOPLAY_ENDPOINT_KEYS/);
+  assert.match(blocks.filterLogic, /_shouldDropAutoplayEndpointSet/);
   assert.doesNotMatch(blocks.filterLogic, /disableAnnotations/);
   assert.doesNotMatch(blocks.filterLogic, /compactAutoplayRenderer/);
   assert.match(blocks.filterSharedVideoRendererRules, /endScreenVideoRenderer/);
@@ -353,7 +373,8 @@ test('source proof pins DOM-owned player controls refresh omission and missing a
   assert.match(blocks.bridgeRefreshKeys, /'disableAnnotations'/);
   assert.match(doc, /Background storage-change invalidation does not include either setting today/);
   assert.match(doc, /Seed JSON active-work detection does not include `disableAutoplay` or `disableAnnotations`/);
-  assert.match(doc, /Compact autoplay and supported end-screen JSON rows pass through unchanged when\s+only `disableAutoplay` and `disableAnnotations` are enabled/);
+  assert.match(doc, /Watch autoplay endpoint sets are removed during active JSON processing when\s+`disableAutoplay` is enabled/);
+  assert.match(doc, /Compact autoplay and supported end-screen JSON renderer rows pass through unchanged\s+when only `disableAutoplay` and `disableAnnotations` are enabled/);
   assert.match(doc, /Ordinary keyword rules can remove a matching supported `endScreenVideoRenderer`/);
   assert.match(doc, /`\/youtubei\/v1\/next` now bypasses `processData` with only both disable\s+controls enabled/);
   assert.match(doc, /DOM fallback owns `button\[data-tooltip-target-id="ytp-autonav-toggle-button"\]`/);

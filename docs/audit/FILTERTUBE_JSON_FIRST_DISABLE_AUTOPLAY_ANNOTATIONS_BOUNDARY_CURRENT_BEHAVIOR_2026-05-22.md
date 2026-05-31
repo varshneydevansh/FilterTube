@@ -9,9 +9,10 @@ cache patch, or JSON renderer expansion.
 This slice promotes the watch/player control audit into `disableAutoplay` and
 `disableAnnotations` proof. It pins the current code path where both settings
 are compiled and refreshed, the DOM fallback owns the visible player-control
-hiding, watch JSON still enters the engine without a first-class
-autoplay/annotations decision, and compact autoplay JSON remains outside direct
-renderer coverage.
+hiding, watch JSON still bypasses seed processing when only these player-control
+settings are enabled, `disableAutoplay` can drop watch autoplay endpoint sets
+during an already-active JSON pass, and compact autoplay JSON remains outside
+direct renderer coverage.
 
 ## Boundary Source Files
 
@@ -74,7 +75,7 @@ content bridge storage refresh keys block lines: 44
 
 content bridge storage refresh keys block bytes: 1263
 
-filter_logic total disableAutoplay tokens: 0
+filter_logic total disableAutoplay tokens: 1
 
 filter_logic total disableAnnotations tokens: 0
 
@@ -110,13 +111,13 @@ DOM fallback annotations CSS block .annotation token: 1
 
 DOM fallback annotations CSS block .iv-branding token: 1
 
-runtime disableAutoplay/disableAnnotations fixtures: 6
+runtime disableAutoplay/disableAnnotations fixtures: 7
 
 ## Current Behavior Matrix
 
 | Boundary | Current behavior | Missing proof before implementation |
 | --- | --- | --- |
-| JSON autoplay decision | `js/filter_logic.js` has no `disableAutoplay` token and no `compactAutoplayRenderer` rule. Compact autoplay JSON passes through unchanged when only `disableAutoplay` and `disableAnnotations` are enabled. | A player autoplay contract that separates compact autoplay JSON, player autonav controls, end-screen autoplay overlays, playlist auto-advance behavior, and ordinary recommendation rows. |
+| JSON autoplay decision | `js/filter_logic.js` now has a direct `disableAutoplay` hook in `_shouldDropAutoplayEndpointSet`, so watch autoplay endpoint sets are removed during an already-active JSON pass. `compactAutoplayRenderer` still has no direct renderer rule, and compact autoplay/end-screen renderer rows pass through unchanged when only `disableAutoplay` and `disableAnnotations` are enabled. | A player autoplay contract that separates compact autoplay JSON, player autonav controls, end-screen autoplay overlays, playlist auto-advance behavior, and ordinary recommendation rows. |
 | JSON annotations decision | `js/filter_logic.js` has no `disableAnnotations` token. Annotation control is visible DOM CSS only today. | A player annotations contract that defines whether annotations are DOM-only, JSON-controlled, or mixed by route/player surface. |
 | Ordinary JSON filtering interaction | Ordinary keyword rules can remove supported `endScreenVideoRenderer` rows while unsupported `compactAutoplayRenderer` rows remain. This removal is not owned by either disable control. | A renderer inventory policy that proves compact autoplay, direct end-screen, player overlays, watch-card rows, and sibling visibility independently. |
 | Seed active JSON work | Seed JSON active-work detection does not include `disableAutoplay` or `disableAnnotations`. `/youtubei/v1/next` now bypasses `processData` with only these two settings enabled. | A route no-work budget that proves when `/next`, `/player`, `/browse`, `/search`, and initial watch data may parse/stringify, harvest only, mutate, or pass through for player-control-only settings. |
@@ -127,25 +128,30 @@ runtime disableAutoplay/disableAnnotations fixtures: 6
 
 ## Runtime Proof
 
-Compact autoplay and supported end-screen JSON rows pass through unchanged when
-only `disableAutoplay` and `disableAnnotations` are enabled.
+Compact autoplay and supported end-screen JSON renderer rows pass through unchanged
+when only `disableAutoplay` and `disableAnnotations` are enabled.
+
+Watch autoplay endpoint sets are removed during active JSON processing when
+`disableAutoplay` is enabled.
 
 `/youtubei/v1/next` now bypasses `processData` with only `disableAutoplay` and
 `disableAnnotations` enabled.
 
 The runtime fixture proves:
 
-1. Compact autoplay JSON and supported end-screen JSON rows pass through
+1. Compact autoplay JSON and supported end-screen JSON renderer rows pass through
    unchanged when only `disableAutoplay` and `disableAnnotations` are enabled.
 2. Ordinary keyword rules can remove a matching supported `endScreenVideoRenderer`
    row while a matching `compactAutoplayRenderer` row remains.
-3. `/youtubei/v1/next` now bypasses `processData` with only both disable
+3. Watch autoplay endpoint sets are removed during active JSON processing when
+   `disableAutoplay` is enabled.
+4. `/youtubei/v1/next` now bypasses `processData` with only both disable
    controls enabled.
-4. `filter_logic.js` and seed active JSON rules have no disable-autoplay or
-   disable-annotations decision.
-5. Background reads and compiles both settings but storage-change invalidation
+5. `filter_logic.js` has a disable-autoplay endpoint-set decision while seed
+   active JSON rules and `disableAnnotations` still have no JSON decision.
+6. Background reads and compiles both settings but storage-change invalidation
    omits both.
-6. DOM fallback owns `button[data-tooltip-target-id="ytp-autonav-toggle-button"]`,
+7. DOM fallback owns `button[data-tooltip-target-id="ytp-autonav-toggle-button"]`,
    `.autonav-endscreen`, `.annotation`, and `.iv-branding`.
 
 ## Non-Completion Boundary

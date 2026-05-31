@@ -166,6 +166,19 @@ test('smoke lane keeps release confidence broad but bounded', () => {
   assert.ok(LANES.smoke.checks.includes('build.js'));
 });
 
+test('whitelist lane explicitly owns end-screen boundary proof', () => {
+  const whitelist = LANES.whitelist.tests.join('\n');
+  const matrix = read(matrixPath);
+
+  assert.match(whitelist, /main-watch-autoplay-video-endpoint-current-behavior/);
+  assert.match(whitelist, /json-first-hide-endscreen-videowall-boundary-current-behavior/);
+  assert.match(whitelist, /json-first-hide-endscreen-cards-boundary-current-behavior/);
+  assert.match(whitelist, /json-first-disable-autoplay-annotations-boundary-current-behavior/);
+  assert.match(whitelist, /player-endscreen-dom-cleanup-boundary-current-behavior/);
+  assert.match(matrix, /Whitelist-only leaks, pending hides, Shorts\/watch\/end-screen\/Kids\/YTM allow behavior/);
+  assert.match(matrix, /The whitelist lane explicitly owns end-screen videowall, card, autoplay, and player DOM boundary tests/);
+});
+
 test('manual YouTube smoke handoff covers visible release-critical behavior', () => {
   const matrix = read(matrixPath);
   const requiredTerms = [

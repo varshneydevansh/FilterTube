@@ -28,7 +28,7 @@ that runner so npm commands and lane contents share one source of truth.
 | Lane | Command | Primary purpose |
 |---|---|---|
 | release | `npm run test:release` | Build/package/release docs, browser manifests, public claims, and artifact boundaries. |
-| whitelist | `npm run test:whitelist` | Whitelist-only leaks, pending hides, Shorts/watch/Kids/YTM allow behavior, and SPA cache boundaries. |
+| whitelist | `npm run test:whitelist` | Whitelist-only leaks, pending hides, Shorts/watch/end-screen/Kids/YTM allow behavior, and SPA cache boundaries. |
 | blocking | `npm run test:blocking` | Keyword, channel, comment, blocklist, list-target, and hide-decision behavior. |
 | json | `npm run test:json` | JSON-first filtering, network interception, response mutation, endpoint admission, and list-mode gates. |
 | dom | `npm run test:dom` | DOM fallback selectors, hide/restore state, cleanup passes, recycled nodes, and route cleanup. |
@@ -49,7 +49,7 @@ goal requirements as follows:
 | Turn confirmed risks into focused fixtures/tests | Each lane points to focused `tests/runtime/*current-behavior.test.mjs` fixtures for the matching risk family. |
 | Create `docs/audit/TEST_LANE_MATRIX.md` | This file is the human-readable matrix; `tests/runtime/test-lane-matrix-current-behavior.test.mjs` pins it. |
 | Define required lanes by touched area | `scripts/run-test-lane.mjs` is the executable classifier; `npm run lanes:changed` and `npm run test:changed` use it. |
-| Preserve blocklist, whitelist, keyword/channel blocking, Shorts, end screens, quick-block, 3-dot menus, JSON-first, DOM fallback, no-rule performance, SPA navigation, settings, and release packaging | The lane table, manual-smoke handoff, and file-to-lane matrix name each surface and bind it to focused tests or live-smoke rows. |
+| Preserve blocklist, whitelist, keyword/channel blocking, Shorts, end screens, quick-block, 3-dot menus, JSON-first, DOM fallback, no-rule performance, SPA navigation, settings, and release packaging | The lane table, manual-smoke handoff, and file-to-lane matrix name each surface and bind it to focused tests or live-smoke rows. The whitelist lane explicitly owns end-screen videowall, card, autoplay, and player DOM boundary tests so allow-mode changes cannot skip issue-57-style proof. |
 | Commit only with passing lane | The change flow requires lane execution before commit; `npm run test:changed` is the default proof command for a dirty logical change. |
 
 ## Executable Classification

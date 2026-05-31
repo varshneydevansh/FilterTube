@@ -28,7 +28,7 @@ export const LANES = Object.freeze({
     ]
   },
   whitelist: {
-    description: 'Whitelist-only mode, pending hides, allow-list leaks, Shorts, watch, Kids, and YTM allow behavior.',
+    description: 'Whitelist-only mode, pending hides, allow-list leaks, Shorts, watch, end-screen, Kids, and YTM allow behavior.',
     tests: [
       'tests/runtime/json-first-whitelist-decision-identity-boundary-current-behavior.test.mjs',
       'tests/runtime/content-bridge-whitelist-pending-refresh-boundary-current-behavior.test.mjs',
@@ -40,6 +40,10 @@ export const LANES = Object.freeze({
       'tests/runtime/batch-whitelist-import-persistence-boundary-current-behavior.test.mjs',
       'tests/runtime/main-upnext-feed-watchpage2-claim-prefaced-lockup-continuation-current-behavior.test.mjs',
       'tests/runtime/main-watch-autoplay-video-endpoint-current-behavior.test.mjs',
+      'tests/runtime/json-first-hide-endscreen-videowall-boundary-current-behavior.test.mjs',
+      'tests/runtime/json-first-hide-endscreen-cards-boundary-current-behavior.test.mjs',
+      'tests/runtime/json-first-disable-autoplay-annotations-boundary-current-behavior.test.mjs',
+      'tests/runtime/player-endscreen-dom-cleanup-boundary-current-behavior.test.mjs',
       'tests/runtime/kids-latest-json-owner-extension-fixture-boundary-current-behavior.test.mjs',
       'tests/runtime/ytm-watch-player-whitelist-selected-row-mode-boundary-current-behavior.test.mjs'
     ]
