@@ -69,11 +69,12 @@ requiring explicit classification instead of silently falling back to
 `test:smoke`.
 
 `npm run test:changed` uses the same classifier, includes tracked modifications
-and nonignored untracked files, fails on any unclassified changed path, runs the
-lane-owned audit proof drift guard, then runs the required lanes sequentially in
-matrix order. Use it when a logical change has already been made and you want
-the focused proof lane set to execute without manually copying commands from
-`lanes:changed`.
+and nonignored untracked files, fails on any unclassified changed path, fails
+when source, release, asset, or product-doc paths changed without a matching
+`docs/audit/` proof file, runs the lane-owned audit proof drift guard, then runs
+the required lanes sequentially in matrix order. Use it when a logical change
+has already been made and you want the focused proof lane set to execute
+without manually copying commands from `lanes:changed`.
 
 For user-facing runtime lanes, the classifier also prints a manual YouTube
 smoke advisory. That keeps the installed-extension handoff visible beside the
@@ -83,7 +84,8 @@ YouTube SPA smoothness, browser profile state, or native menu rendering.
 For proof discipline, the classifier also reports whether a changed
 `docs/audit/` proof file is present. If source, release, asset, or product-doc
 paths changed without a matching audit proof file in the same logical change,
-it prints an audit-proof reminder before the matched-path details.
+it prints an audit-proof reminder before the matched-path details; in
+`npm run test:changed`, that condition is a hard failure before any lane runs.
 
 For runtime source changes, the classifier also prints a fixture-proof reminder
 for the affected runtime lanes. This is intentionally phrased as

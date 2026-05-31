@@ -583,6 +583,24 @@ export function validateLaneFiles() {
   return missing;
 }
 
+export function auditProofRequirement(result) {
+  const auditProofFiles = [];
+  const proofRelevantFiles = [];
+  for (const entry of result.classifications) {
+    if (AUDIT_PROOF_PATH_PATTERN.test(entry.file)) {
+      auditProofFiles.push(entry.file);
+    } else if (!RUNTIME_TEST_PROOF_PATH_PATTERN.test(entry.file)) {
+      proofRelevantFiles.push(entry.file);
+    }
+  }
+
+  return {
+    auditProofFiles,
+    proofRelevantFiles,
+    missing: proofRelevantFiles.length > 0 && auditProofFiles.length === 0
+  };
+}
+
 function gitLines(args) {
   const result = spawnSync('git', args, {
     cwd: repoRoot,
@@ -663,15 +681,7 @@ function printClassification(result) {
     }
   }
 
-  const auditProofFiles = [];
-  const proofRelevantFiles = [];
-  for (const entry of result.classifications) {
-    if (AUDIT_PROOF_PATH_PATTERN.test(entry.file)) {
-      auditProofFiles.push(entry.file);
-    } else if (!RUNTIME_TEST_PROOF_PATH_PATTERN.test(entry.file)) {
-      proofRelevantFiles.push(entry.file);
-    }
-  }
+  const { auditProofFiles, proofRelevantFiles, missing } = auditProofRequirement(result);
 
   if (auditProofFiles.length) {
     console.log('\nAudit proof files in this change:');
@@ -680,6 +690,9 @@ function printClassification(result) {
     console.log('\nAudit proof update expected before commit:');
     console.log('  Add or update a relevant docs/audit/ proof file for:');
     for (const file of proofRelevantFiles) console.log(`  - ${file}`);
+    if (missing) {
+      console.log('  test:changed will fail until this logical change includes docs/audit proof.');
+    }
   }
 
   const runtimeFixtureReasons = [];
@@ -741,6 +754,8 @@ function main() {
     const result = classifyPaths(changedPathsFromGit());
     printClassification(result);
     if (result.unmatched.length) process.exit(2);
+    const auditProof = auditProofRequirement(result);
+    if (auditProof.missing) process.exit(3);
     if (!result.lanes.length) {
       console.log('\nNo changed lanes to run.');
       process.exit(0);

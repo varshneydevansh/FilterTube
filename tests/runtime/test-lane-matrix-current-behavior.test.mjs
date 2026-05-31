@@ -6,6 +6,7 @@ import assert from 'node:assert/strict';
 import {
   FILE_LANE_RULES,
   LANES,
+  auditProofRequirement,
   changedPathsFromGit,
   classifyPaths,
   laneNames,
@@ -298,8 +299,10 @@ test('changed-lane runner is wired to the classifier and sequential lane executi
   assert.match(runner, /RUNTIME_FIXTURE_LANE_REASONS/);
   assert.match(runner, /Runtime fixture proof expected when behavior changes/);
   assert.match(runner, /AUDIT_PROOF_PATH_PATTERN/);
+  assert.match(runner, /function auditProofRequirement\(result\)/);
   assert.match(runner, /Audit proof update expected before commit/);
   assert.match(runner, /Audit proof files in this change/);
+  assert.match(runner, /if \(auditProof\.missing\) process\.exit\(3\)/);
   assert.match(runner, /function runAuditDrift\(\)/);
   assert.match(runner, /runNode\(\['scripts\/audit-proof-drift\.mjs', '--lane-owned'\]\)/);
   assert.match(runner, /console\.log\('\\n==> Running test:audit-drift'\)/);
@@ -309,9 +312,10 @@ test('changed-lane runner is wired to the classifier and sequential lane executi
   assert.match(runner, /process\.exit\(runLane\(lane\)\)/);
   assert.match(matrix, /fails on any unclassified\s+changed path/);
   assert.match(matrix, /runs the\s+lane-owned audit proof drift guard/);
-  assert.match(matrix, /runs the required lanes sequentially in\s+matrix order/);
+  assert.match(matrix, /runs\s+the required lanes sequentially in\s+matrix order/);
   assert.match(matrix, /prints a manual YouTube\s+smoke advisory/);
   assert.match(matrix, /reports whether a changed\s+`docs\/audit\/` proof file is present/);
+  assert.match(matrix, /fails\s+when source, release, asset, or product-doc paths changed without a matching\s+`docs\/audit\/` proof file/);
   assert.match(matrix, /prints a fixture-proof reminder\s+for the affected runtime lanes/);
 });
 
@@ -380,6 +384,30 @@ test('classifier output recognizes changed audit proof files', () => {
   assert.match(proof.stdout, /docs\/audit\/TEST_LANE_MATRIX\.md/);
   assert.doesNotMatch(proof.stdout, /Audit proof update expected before commit:/);
   assert.doesNotMatch(proof.stdout, /Runtime fixture proof expected when behavior changes:/);
+});
+
+test('changed-lane audit proof gate distinguishes proof-only and product changes', () => {
+  const sourceOnly = auditProofRequirement(classifyPaths(['js/seed.js']));
+  assert.deepEqual(sourceOnly.auditProofFiles, []);
+  assert.deepEqual(sourceOnly.proofRelevantFiles, ['js/seed.js']);
+  assert.equal(sourceOnly.missing, true);
+
+  const sourceWithProof = auditProofRequirement(classifyPaths([
+    'js/seed.js',
+    'docs/audit/FILTERTUBE_TEST_LANE_PROOF_GATE_2026-06-01.md'
+  ]));
+  assert.deepEqual(sourceWithProof.auditProofFiles, [
+    'docs/audit/FILTERTUBE_TEST_LANE_PROOF_GATE_2026-06-01.md'
+  ]);
+  assert.deepEqual(sourceWithProof.proofRelevantFiles, ['js/seed.js']);
+  assert.equal(sourceWithProof.missing, false);
+
+  const testOnly = auditProofRequirement(classifyPaths([
+    'tests/runtime/test-lane-matrix-current-behavior.test.mjs'
+  ]));
+  assert.deepEqual(testOnly.auditProofFiles, []);
+  assert.deepEqual(testOnly.proofRelevantFiles, []);
+  assert.equal(testOnly.missing, false);
 });
 
 test('smoke lane keeps release confidence broad but bounded', () => {
