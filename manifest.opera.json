@@ -44,6 +44,7 @@
             ],
             "js": [
                 "js/shared/identity.js",
+                "js/content/dom_state.js",
                 "js/content/menu.js",
                 "js/content/dom_helpers.js",
                 "js/content/dom_extractors.js",
