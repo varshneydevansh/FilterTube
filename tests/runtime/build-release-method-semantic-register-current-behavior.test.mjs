@@ -43,7 +43,15 @@ function groupForName(name) {
   if (['filterFunc', 'main', 'ensureCollabDialogScriptOrder', 'createZip'].includes(name)) {
     return 'buildPackageAssembly';
   }
-  if (['maybeCollectMobileArtifacts', 'selectLatestMobileArtifacts', 'extractAndroidVersionCode', 'sha256File'].includes(name)) {
+  if ([
+    'maybeCollectMobileArtifacts',
+    'resolveDefaultMobileArtifactsDir',
+    'parseMobileArtifactName',
+    'summarizeMobileArtifacts',
+    'selectLatestMobileArtifacts',
+    'extractAndroidVersionCode',
+    'sha256File'
+  ].includes(name)) {
     return 'buildMobileArtifactStaging';
   }
   if (['maybePromptRelease', 'extractLatestChangelogEntry', 'deriveSubtitle', 'buildReleaseTitle', 'buildReleaseBody', 'assetLink', 'releaseAssetLink'].includes(name)) {
@@ -109,15 +117,15 @@ test('build release method semantic register is audit-only and source scoped', (
   assert.match(text, /Status: audit-only current-behavior register/);
   assert.match(text, /Runtime behavior is unchanged/);
   assert.match(text, /source file: build\.js/);
-  assert.equal(sourceLineCount(build), 686);
-  assert.match(text, /line count: 686/);
-  assert.match(text, /named method\/helper\/callback declarations in scope: 25/);
-  assert.match(text, /plain function declarations: 17/);
+  assert.equal(sourceLineCount(build), 728);
+  assert.match(text, /line count: 728/);
+  assert.match(text, /named method\/helper\/callback declarations in scope: 28/);
+  assert.match(text, /plain function declarations: 20/);
   assert.match(text, /async function declarations: 4/);
   assert.match(text, /const arrow helper\/callback declarations: 4/);
   assert.match(text, /semantic method groups: 6/);
-  assert.match(text, /arrow token sites: 37/);
-  assert.match(text, /callback-like sites: 35/);
+  assert.match(text, /arrow token sites: 42/);
+  assert.match(text, /callback-like sites: 40/);
   assert.match(text, /runtime behavior changed: no/);
   assert.match(text, /not completion proof for package manifest authority/);
 });
@@ -126,16 +134,16 @@ test('build release register accounts for every current method row', () => {
   const text = doc();
   const rows = methodRows();
 
-  assert.equal(rows.length, 25);
+  assert.equal(rows.length, 28);
   assert.deepEqual(countBy(rows, 'kind'), {
     asyncFunction: 4,
     constArrow: 4,
-    function: 17
+    function: 20
   });
   assert.deepEqual(countBy(rows, 'group'), {
     buildGitHubReleaseTransport: 4,
     buildInteractivePromptHelpers: 2,
-    buildMobileArtifactStaging: 4,
+    buildMobileArtifactStaging: 7,
     buildPackageAssembly: 4,
     buildReadmeBadgeAndLocMutation: 4,
     buildReleasePromptAndBody: 7

@@ -277,9 +277,9 @@ function currentLocalDistPackageSnapshotStats() {
       webAccessibleResourceRefs: webAccessibleResources.flatMap(resource => resource.resources || []).length,
       sourceBackedFiles: sourceBackedFiles.length,
       byteIdenticalSourceBackedFiles: byteIdenticalSourceBackedFiles.length,
-      zipPath: `dist/filtertube-${browser}-v3.3.1.zip`,
-      zipBytes: fileSize(`dist/filtertube-${browser}-v3.3.1.zip`),
-      zipSha256: sha256(`dist/filtertube-${browser}-v3.3.1.zip`)
+      zipPath: `dist/filtertube-${browser}-v3.3.2.zip`,
+      zipBytes: fileSize(`dist/filtertube-${browser}-v3.3.2.zip`),
+      zipSha256: sha256(`dist/filtertube-${browser}-v3.3.2.zip`)
     });
   }
 
@@ -294,14 +294,14 @@ function currentLocalDistPackageSnapshotStats() {
 function assertBrowserManifestReferenceClosureAddendum(doc) {
   const stats = manifestReferenceClosureStats();
   const expected = new Map([
-    ['manifest.json', { references: 28, unique: 23 }],
-    ['manifest.chrome.json', { references: 28, unique: 23 }],
-    ['manifest.firefox.json', { references: 28, unique: 23 }],
-    ['manifest.opera.json', { references: 27, unique: 22 }]
+    ['manifest.json', { references: 29, unique: 24 }],
+    ['manifest.chrome.json', { references: 29, unique: 24 }],
+    ['manifest.firefox.json', { references: 29, unique: 24 }],
+    ['manifest.opera.json', { references: 28, unique: 23 }]
   ]);
 
   assert.match(doc, /Browser Manifest Package Reference Closure Addendum - 2026-05-27/);
-  assert.match(doc, /combined unique referenced paths across browser manifests: 23/);
+  assert.match(doc, /combined unique referenced paths across browser manifests: 24/);
   assert.match(doc, /unresolved manifest file references: 0/);
   assert.match(doc, /manifest referenced roots outside COMMON_DIRS: 0/);
   assert.match(doc, /manifest content-script CSS references: 0/);
@@ -318,7 +318,7 @@ function assertBrowserManifestReferenceClosureAddendum(doc) {
       `${file} manifest reference row missing from doc`
     );
   }
-  assert.equal(stats.combinedUnique.size, 23);
+  assert.equal(stats.combinedUnique.size, 24);
   assert.deepEqual(stats.missing, []);
   assert.deepEqual(stats.outsideCopiedRoots, []);
   assert.equal(stats.contentScriptCssRefs, 0);
@@ -332,10 +332,10 @@ function assertBrowserManifestReferenceClosureAddendum(doc) {
 function assertBrowserManifestPermissionAndResourceValidationSnapshot(doc) {
   const stats = manifestPermissionResourceValidationStats();
   const expected = new Map([
-    ['manifest.json', { contentScriptEntries: 2, contentScriptJsRefs: 14, explicitWorlds: ['MAIN', 'ISOLATED'], webAccessibleResourceRefs: 5 }],
-    ['manifest.chrome.json', { contentScriptEntries: 2, contentScriptJsRefs: 14, explicitWorlds: ['MAIN', 'ISOLATED'], webAccessibleResourceRefs: 5 }],
-    ['manifest.firefox.json', { contentScriptEntries: 1, contentScriptJsRefs: 13, explicitWorlds: [], webAccessibleResourceRefs: 5 }],
-    ['manifest.opera.json', { contentScriptEntries: 2, contentScriptJsRefs: 14, explicitWorlds: [], webAccessibleResourceRefs: 4 }]
+    ['manifest.json', { contentScriptEntries: 2, contentScriptJsRefs: 15, explicitWorlds: ['MAIN', 'ISOLATED'], webAccessibleResourceRefs: 5 }],
+    ['manifest.chrome.json', { contentScriptEntries: 2, contentScriptJsRefs: 15, explicitWorlds: ['MAIN', 'ISOLATED'], webAccessibleResourceRefs: 5 }],
+    ['manifest.firefox.json', { contentScriptEntries: 1, contentScriptJsRefs: 14, explicitWorlds: [], webAccessibleResourceRefs: 5 }],
+    ['manifest.opera.json', { contentScriptEntries: 2, contentScriptJsRefs: 15, explicitWorlds: [], webAccessibleResourceRefs: 4 }]
   ]);
 
   assert.match(doc, /Browser Manifest Permission And Resource Validation Snapshot - 2026-05-27/);
@@ -390,48 +390,48 @@ function assertCurrentLocalDistPackageSnapshot(doc) {
     data: 1,
     html: 3,
     icons: 7,
-    js: 32,
+    js: 33,
     manifest: 1,
     'top-level-common': 3
   };
   const expectedBrowserStats = new Map([
     ['chrome', {
-      manifestBytes: 2470,
-      manifestSha256: '96eb5e5c8733ecdfa9d3eb447d51a3bfc2c4743a80b1fde1f12d71bd46d1c8e4',
+      manifestBytes: 2513,
+      manifestSha256: '282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734',
       contentScriptEntries: 2,
-      contentScriptJsRefs: 14,
+      contentScriptJsRefs: 15,
       webAccessibleResourceRefs: 5,
-      zipBytes: 8681016,
-      zipSha256: '98e90fcae64fbe8edc3597fa4808359e1cba6b1411bd855e60e0bf3c069361d0'
+      zipBytes: 8688743,
+      zipSha256: '8e0be875c5e4223eee1c123eb0ca037bbc7b6ea21ce77caf4ff28fb7f5a62703'
     }],
     ['firefox', {
-      manifestBytes: 2560,
-      manifestSha256: '2221afbc831ea1b5d90f76cd3f1590022dcc92d3c5d992dd163a5d46844b0e72',
+      manifestBytes: 2603,
+      manifestSha256: 'a1773c9e0acc1c2029cb6aef4757a282aa0ec8d89759be65ea975ff237d00bb0',
       contentScriptEntries: 1,
-      contentScriptJsRefs: 13,
+      contentScriptJsRefs: 14,
       webAccessibleResourceRefs: 5,
-      zipBytes: 8681075,
-      zipSha256: 'f0dd7d53ad62c9716a975d299326ab84f01fa4c88dac2042d89a4d91d11a8630'
+      zipBytes: 8688802,
+      zipSha256: '4dce4c99b06f0f12ac9b1234bcc931ca1cb461d117c59fcfb329ae8240e846ba'
     }],
     ['opera', {
-      manifestBytes: 2475,
-      manifestSha256: 'f76d4a48b51fc5da65492347ce3f7cb31ebff057afd2185573176991e7d1d4b7',
+      manifestBytes: 2518,
+      manifestSha256: '0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b',
       contentScriptEntries: 2,
-      contentScriptJsRefs: 14,
+      contentScriptJsRefs: 15,
       webAccessibleResourceRefs: 4,
-      zipBytes: 8681019,
-      zipSha256: '4b1a53f931e2019163a7fc6f400dd168465350fcf0813055887a7140c3651ce5'
+      zipBytes: 8688745,
+      zipSha256: '9bb534fdcc9ab842c9364dbff340ec929fbc688214b7f55ac861a564b8730222'
     }]
   ]);
 
   assert.match(doc, /Current Local Dist Package Snapshot - 2026-05-27/);
   assert.match(doc, /dist snapshot source: existing ignored local dist tree/);
   assert.match(doc, /browser staged directories: 3/);
-  assert.match(doc, /browser staged files per directory: 58/);
+  assert.match(doc, /browser staged files per directory: 59/);
   assert.match(doc, /dist zip artifacts: 3/);
-  assert.match(doc, /total dist files including zips: 178/);
-  assert.match(doc, /source-backed staged files per browser excluding manifest: 57/);
-  assert.match(doc, /byte-identical source-backed staged files per browser excluding manifest: 50/);
+  assert.match(doc, /total dist files including zips: 184/);
+  assert.match(doc, /source-backed staged files per browser excluding manifest: 58/);
+  assert.match(doc, /byte-identical source-backed staged files per browser excluding manifest: 58/);
   assert.match(doc, /committed package manifest: absent/);
   assert.match(doc, /zip checksum manifest: absent/);
   assert.match(doc, /reproducible build proof: absent/);
@@ -440,27 +440,27 @@ function assertCurrentLocalDistPackageSnapshot(doc) {
   assert.match(doc, /flowchart TD/);
   assert.match(doc, /Release package parity authority remains NO-GO/);
   assert.match(doc, /local dist snapshot proof: PARTIAL/);
-  assert.match(doc, /source-backed staged byte parity: no/);
+  assert.match(doc, /source-backed staged byte parity: yes/);
   assert.match(doc, /zip checksum snapshot: yes/);
   assert.match(doc, /committed release package manifest authority: NO-GO/);
   assert.match(doc, /reproducible package build authority: NO-GO/);
   assert.match(doc, /loaded-browser package\/runtime parity authority: NO-GO/);
 
-  assert.equal(stats.distFiles.length, 178);
+  assert.equal(stats.distFiles.length, 184);
   assert.deepEqual(stats.zipFiles, [
-    'dist/filtertube-chrome-v3.3.1.zip',
-    'dist/filtertube-firefox-v3.3.1.zip',
-    'dist/filtertube-opera-v3.3.1.zip'
+    'dist/filtertube-chrome-v3.3.2.zip',
+    'dist/filtertube-firefox-v3.3.2.zip',
+    'dist/filtertube-opera-v3.3.2.zip'
   ]);
 
   for (const browser of distBrowserTargets) {
     assert.deepEqual(stats.groupCountsByBrowser.get(browser), expectedGroupCounts);
     const actual = stats.browserStats.get(browser);
     const expected = expectedBrowserStats.get(browser);
-    assert.equal(actual.stagedFiles, 58);
-    assert.equal(actual.version, '3.3.1');
-    assert.equal(actual.sourceBackedFiles, 57);
-    assert.equal(actual.byteIdenticalSourceBackedFiles, 50);
+    assert.equal(actual.stagedFiles, 59);
+    assert.equal(actual.version, '3.3.2');
+    assert.equal(actual.sourceBackedFiles, 58);
+    assert.equal(actual.byteIdenticalSourceBackedFiles, 58);
     assert.equal(actual.manifestBytes, expected.manifestBytes);
     assert.equal(actual.manifestSha256, expected.manifestSha256);
     assert.equal(actual.contentScriptEntries, expected.contentScriptEntries);
@@ -469,7 +469,7 @@ function assertCurrentLocalDistPackageSnapshot(doc) {
     assert.equal(actual.zipBytes, expected.zipBytes);
     assert.equal(actual.zipSha256, expected.zipSha256);
     assert.ok(
-      doc.includes(`| \`${browser}\` | 58 | ${expected.manifestBytes} | \`${expected.manifestSha256}\` | \`3.3.1\` | ${expected.contentScriptEntries} | ${expected.contentScriptJsRefs} | ${expected.webAccessibleResourceRefs} | ${expected.zipBytes} | \`${expected.zipSha256}\` |`),
+      doc.includes(`| \`${browser}\` | 59 | ${expected.manifestBytes} | \`${expected.manifestSha256}\` | \`3.3.2\` | ${expected.contentScriptEntries} | ${expected.contentScriptJsRefs} | ${expected.webAccessibleResourceRefs} | ${expected.zipBytes} | \`${expected.zipSha256}\` |`),
       `${browser} dist snapshot row missing from doc`
     );
   }
@@ -486,10 +486,10 @@ function assertInstalledRuntimeProvenanceSnapshot(doc) {
   assert.match(doc, /flowchart TD/);
   assert.match(doc, /Installed Chrome runtime/);
   assert.match(doc, /\| Package command\/version surface \| `package\.json:3-18` \|/);
-  assert.match(doc, /\| Default Chrome manifest load order \| `manifest\.json:1-87`, `manifest\.json:42-55` \|/);
-  assert.match(doc, /\| Build package roots and manifest copy \| `build\.js:27-31`, `build\.js:80-156` \|/);
-  assert.match(doc, /\| Manifest order repair \| `build\.js:159-179` \|/);
-  assert.match(doc, /\| ZIP\/release output \| `build\.js:181-190`, `build\.js:602-658` \|/);
+  assert.match(doc, /\| Default Chrome manifest load order \| `manifest\.json:1-88`, `manifest\.json:42-56` \|/);
+  assert.match(doc, /\| Build package roots and manifest copy \| `build\.js:29-33`, `build\.js:82-158` \|/);
+  assert.match(doc, /\| Manifest order repair \| `build\.js:161-181` \|/);
+  assert.match(doc, /\| ZIP\/release output \| `build\.js:183-192`, `build\.js:644-700` \|/);
   assert.match(doc, /\| Current Topic ampersand and bare-`and` source proof \| `js\/content_bridge\.js:2759-2814`, `js\/content_bridge\.js:4784-4812`, `js\/content_bridge\.js:4902-4928`, `tests\/runtime\/content-bridge-collaborator-identity-promotion-handoff-current-behavior\.test\.mjs:510-544` \|/);
   assert.match(doc, /Kully B & Gussy G - Topic/);
   assert.match(doc, /installed extension provenance authority: NO-GO/);
@@ -602,9 +602,9 @@ function assertInstalledRuntimeProvenanceSnapshot(doc) {
   assert.match(doc, /Automation proof cannot replace visible-tab proof/);
   assert.match(doc, /runtime behavior changed by this boundary: no/);
 
-  assert.match(read('package.json'), /"version": "3\.3\.1"/);
+  assert.match(read('package.json'), /"version": "3\.3\.2"/);
   assert.match(read('package.json'), /"build:chrome": "node build\.js chrome"/);
-  assert.match(read('manifest.json'), /"version": "3\.3\.1"/);
+  assert.match(read('manifest.json'), /"version": "3\.3\.2"/);
   assert.match(read('manifest.json'), /"js\/content\/collab_dialog\.js"[\s\S]*"js\/content_bridge\.js"/);
   assert.equal(read('manifest.json'), read('manifest.chrome.json'));
   assert.match(read('build.js'), /const COMMON_DIRS = \['js', 'css', 'html', 'icons', 'data', 'assets'\]/);

@@ -1,6 +1,6 @@
 # Android public distribution
 
-Last updated: May 16, 2026.
+Last updated: May 31, 2026.
 
 This document tracks the public Android distribution plan for FilterTube phone/tablet builds while the native app repository remains private.
 
@@ -29,21 +29,28 @@ Do not ship unfinished Android TV behavior inside the phone/tablet Play or APK r
 
 The public `build.js` script can attach Android phone/tablet artifacts to the same GitHub release as the browser ZIPs.
 
-Recommended artifact source directory:
+Recommended artifact source directory for the v3.3.2 release candidate:
+
+```text
+/Users/devanshvarshney/FilterTubeApp/release-artifacts/android-mobile-tablet/
+```
+
+The public release script also keeps the older local fallback directory available for manual staging:
 
 ```text
 release-artifacts/mobile/
 ```
 
-Accepted mobile artifact names:
+Current v3.3.2 mobile/tablet artifact pair:
 
 ```text
-FilterTube-mobile-tablet-v3.3.2-code30312-release.apk
-FilterTube-mobile-tablet-v3.3.2-code30312-release.aab
 FilterTube-mobile-tablet-v3.3.2-code30312-debug.apk
+FilterTube-mobile-tablet-v3.3.2-code30312-release.aab
 ```
 
-The release script copies matching files into `dist/mobile/` and creates a `.sha256` file for each copied artifact. By default, it selects only the highest `codeNNNN` build in the artifact directory so older QA builds are not accidentally uploaded. Use `--all-mobile-artifacts` only when you intentionally want every matching file attached.
+The sibling app artifact directory currently contains no signed release APK for this candidate. The debug APK can be attached only as a clearly marked QA/direct-device validation artifact. The release AAB is the store upload artifact, not a sideload install file.
+
+The release script copies matching files into `dist/mobile/` and creates a `.sha256` file for each copied artifact. By default, it selects only files matching the current extension/package version and the highest `codeNNNN` build in the artifact directory, so older `code30310`/`code30311` QA builds are not accidentally uploaded for v3.3.2. Use `--all-mobile-artifacts` only when you intentionally want every matching file for the current version attached.
 
 These generated artifacts are intentionally ignored by git.
 
@@ -51,6 +58,7 @@ Run examples:
 
 ```bash
 node build.js --mobile-artifacts=release-artifacts/mobile
+FILTERTUBE_MOBILE_ARTIFACTS_DIR=/Users/devanshvarshney/FilterTubeApp/release-artifacts/android-mobile-tablet npm run build
 FILTERTUBE_MOBILE_ARTIFACTS_DIR=/Users/devanshvarshney/FilterTubeApp/release-artifacts/android-mobile-tablet node build.js
 FILTERTUBE_MOBILE_ARTIFACTS_DIR=/Users/devanshvarshney/FilterTubeApp/release-artifacts/android-mobile-tablet node build.js --all-mobile-artifacts
 ```
@@ -69,6 +77,8 @@ Before linking a public APK from `filtertube.in/downloads`:
 - Confirm Android TV / Leanback launcher behavior is not exposed in the phone/tablet APK.
 - Confirm Google Play automatic installer protection does not block non-Play direct installs.
 - Install the exact GitHub APK on a clean Android device or emulator before announcing it.
+
+For v3.3.2, this public APK checklist is not satisfied yet because only the QA debug APK and release AAB are present. Treat the debug APK as QA-only unless a signed release APK is produced before publication.
 
 ## What not to publish
 

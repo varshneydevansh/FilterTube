@@ -21,14 +21,14 @@ README badge, manifest transformation, or public download claim changes.
 
 ```text
 source file: build.js
-line count: 686
-named method/helper/callback declarations in scope: 25
-plain function declarations: 17
+line count: 728
+named method/helper/callback declarations in scope: 28
+plain function declarations: 20
 async function declarations: 4
 const arrow helper/callback declarations: 4
 semantic method groups: 6
-arrow token sites: 37
-callback-like sites: 35
+arrow token sites: 42
+callback-like sites: 40
 fs.copySync references: 3
 fs.readJsonSync references: 1
 fs.writeJsonSync references: 1
@@ -37,14 +37,14 @@ fs.ensureDirSync references: 1
 fs.copyFileSync references: 1
 fs.writeFileSync references: 2
 fs.readFileSync references: 4
-fs.existsSync references: 8
+fs.existsSync references: 9
 fs.rmSync references: 2
 fs.mkdirSync references: 2
-fs.statSync references: 2
+fs.statSync references: 3
 fs.readdirSync references: 1
 fs.createReadStream references: 1
 path.join references: 9
-path.resolve references: 1
+path.resolve references: 3
 path.basename references: 5
 path.extname references: 2
 execSync references: 3
@@ -56,7 +56,7 @@ process.env references: 2
 process.stdout.isTTY references: 2
 process.exitCode references: 1
 console.log references: 14
-console.warn references: 5
+console.warn references: 6
 console.error references: 8
 await expressions: 9
 new Promise references: 5
@@ -85,7 +85,7 @@ manifest.json references: 2
 collab_dialog.js references: 1
 content_bridge.js references: 1
 dist references: 12
-release-artifacts references: 1
+release-artifacts references: 2
 filtertube-${browser}-v${version}.zip references: 2
 .sha256 references: 4
 .apk references: 2
@@ -106,7 +106,7 @@ runtime behavior changed: no
 
 ```text
 buildPackageAssembly: 4
-buildMobileArtifactStaging: 4
+buildMobileArtifactStaging: 7
 buildReleasePromptAndBody: 7
 buildGitHubReleaseTransport: 4
 buildInteractivePromptHelpers: 2
@@ -118,7 +118,7 @@ buildReadmeBadgeAndLocMutation: 4
 | Semantic group | Declarations | Current owner/effect shape | Missing proof before behavior changes |
 | --- | ---: | --- | --- |
 | `buildPackageAssembly` | 4 | Runs generated UI shell build, mutates README badges, optionally cleans `dist`, copies broad source directories/files, repairs only collaborator-before-bridge manifest order, and zips browser targets. | Explicit package manifest, source family classification, quarantine proof, manifest parity checks, and dry-run no-mutation mode. |
-| `buildMobileArtifactStaging` | 4 | Reads mobile artifact CLI/env/prompt input, filters APK/AAB names by regex, selects latest Android versionCode unless all artifacts are requested, copies artifacts to `dist/mobile`, and writes `.sha256` files. | Package name proof, signing fingerprint proof, release-channel proof, artifact manifest, website CTA gate, and stale artifact negative fixtures. |
+| `buildMobileArtifactStaging` | 7 | Reads mobile artifact CLI/env/prompt input, filters APK/AAB names by regex and package version, prefers the sibling app artifact directory with local fallback, selects latest Android versionCode unless all artifacts are requested, warns on missing APK/AAB pairs, copies artifacts to `dist/mobile`, and writes `.sha256` files. | Package name proof, signing fingerprint proof, release-channel proof, artifact manifest, website CTA gate, and stale artifact negative fixtures. |
 | `buildReleasePromptAndBody` | 7 | In interactive terminals, asks whether to publish, requires `GITHUB_TOKEN`, builds changelog-derived release copy and GitHub asset links, and includes mobile artifact links when attached. | Release claim manifest, link-to-asset verification, changelog schema proof, public-claim owner, and draft-first release plan. |
 | `buildGitHubReleaseTransport` | 4 | Creates a public non-draft GitHub release, uploads assets one by one with content-type selection, and wraps HTTPS request/response parsing. | Draft-first publish flow, all-assets-uploaded verification, rollback/failure handling, status-code fixtures, and GitHub API provenance. |
 | `buildInteractivePromptHelpers` | 2 | Uses readline prompts for yes/no and free-text input. | CI/non-interactive release authority, prompt timeout/cancel handling, and scripted dry-run coverage. |
@@ -128,31 +128,34 @@ buildReadmeBadgeAndLocMutation: 4
 
 | Source line | Kind | Method or function | Semantic group |
 | ---: | --- | --- | --- |
-| 67 | `constArrow` | `filterFunc` | `buildPackageAssembly` |
-| 80 | `asyncFunction` | `main` | `buildPackageAssembly` |
-| 159 | `function` | `ensureCollabDialogScriptOrder` | `buildPackageAssembly` |
-| 181 | `function` | `createZip` | `buildPackageAssembly` |
-| 214 | `asyncFunction` | `maybeCollectMobileArtifacts` | `buildMobileArtifactStaging` |
-| 275 | `function` | `selectLatestMobileArtifacts` | `buildMobileArtifactStaging` |
-| 281 | `function` | `extractAndroidVersionCode` | `buildMobileArtifactStaging` |
-| 286 | `function` | `sha256File` | `buildMobileArtifactStaging` |
-| 292 | `asyncFunction` | `maybePromptRelease` | `buildReleasePromptAndBody` |
-| 350 | `function` | `extractLatestChangelogEntry` | `buildReleasePromptAndBody` |
-| 375 | `function` | `deriveSubtitle` | `buildReleasePromptAndBody` |
-| 384 | `function` | `buildReleaseTitle` | `buildReleasePromptAndBody` |
-| 388 | `function` | `buildReleaseBody` | `buildReleasePromptAndBody` |
-| 395 | `constArrow` | `assetLink` | `buildReleasePromptAndBody` |
-| 397 | `constArrow` | `releaseAssetLink` | `buildReleasePromptAndBody` |
-| 482 | `function` | `createGitHubRelease` | `buildGitHubReleaseTransport` |
-| 507 | `function` | `uploadReleaseAsset` | `buildGitHubReleaseTransport` |
-| 542 | `function` | `contentTypeForAsset` | `buildGitHubReleaseTransport` |
-| 550 | `function` | `httpRequest` | `buildGitHubReleaseTransport` |
-| 576 | `function` | `promptYesNo` | `buildInteractivePromptHelpers` |
-| 589 | `function` | `promptText` | `buildInteractivePromptHelpers` |
-| 602 | `asyncFunction` | `updateReadmeBadges` | `buildReadmeBadgeAndLocMutation` |
-| 621 | `constArrow` | `formatLoC` | `buildReadmeBadgeAndLocMutation` |
-| 665 | `function` | `shouldCountInTotalLoC` | `buildReadmeBadgeAndLocMutation` |
-| 671 | `function` | `sumFileLines` | `buildReadmeBadgeAndLocMutation` |
+| 69 | `constArrow` | `filterFunc` | `buildPackageAssembly` |
+| 82 | `asyncFunction` | `main` | `buildPackageAssembly` |
+| 161 | `function` | `ensureCollabDialogScriptOrder` | `buildPackageAssembly` |
+| 183 | `function` | `createZip` | `buildPackageAssembly` |
+| 216 | `asyncFunction` | `maybeCollectMobileArtifacts` | `buildMobileArtifactStaging` |
+| 283 | `function` | `resolveDefaultMobileArtifactsDir` | `buildMobileArtifactStaging` |
+| 292 | `function` | `parseMobileArtifactName` | `buildMobileArtifactStaging` |
+| 303 | `function` | `summarizeMobileArtifacts` | `buildMobileArtifactStaging` |
+| 314 | `function` | `selectLatestMobileArtifacts` | `buildMobileArtifactStaging` |
+| 320 | `function` | `extractAndroidVersionCode` | `buildMobileArtifactStaging` |
+| 324 | `function` | `sha256File` | `buildMobileArtifactStaging` |
+| 330 | `asyncFunction` | `maybePromptRelease` | `buildReleasePromptAndBody` |
+| 388 | `function` | `extractLatestChangelogEntry` | `buildReleasePromptAndBody` |
+| 413 | `function` | `deriveSubtitle` | `buildReleasePromptAndBody` |
+| 422 | `function` | `buildReleaseTitle` | `buildReleasePromptAndBody` |
+| 426 | `function` | `buildReleaseBody` | `buildReleasePromptAndBody` |
+| 433 | `constArrow` | `assetLink` | `buildReleasePromptAndBody` |
+| 435 | `constArrow` | `releaseAssetLink` | `buildReleasePromptAndBody` |
+| 524 | `function` | `createGitHubRelease` | `buildGitHubReleaseTransport` |
+| 549 | `function` | `uploadReleaseAsset` | `buildGitHubReleaseTransport` |
+| 584 | `function` | `contentTypeForAsset` | `buildGitHubReleaseTransport` |
+| 592 | `function` | `httpRequest` | `buildGitHubReleaseTransport` |
+| 618 | `function` | `promptYesNo` | `buildInteractivePromptHelpers` |
+| 631 | `function` | `promptText` | `buildInteractivePromptHelpers` |
+| 644 | `asyncFunction` | `updateReadmeBadges` | `buildReadmeBadgeAndLocMutation` |
+| 663 | `constArrow` | `formatLoC` | `buildReadmeBadgeAndLocMutation` |
+| 707 | `function` | `shouldCountInTotalLoC` | `buildReadmeBadgeAndLocMutation` |
+| 713 | `function` | `sumFileLines` | `buildReadmeBadgeAndLocMutation` |
 
 ## Current Entrypoints And Dependencies
 
@@ -171,7 +174,7 @@ manifest output path: dist/<browser>/manifest.json
 manifest repair scope: collab_dialog.js before content_bridge.js only
 zip output path: dist/filtertube-${browser}-v${version}.zip
 zip ignore patterns: .DS_Store, __MACOSX, ._*, Thumbs.db
-mobile artifact default source: release-artifacts/mobile
+mobile artifact default source: sibling ../FilterTubeApp/release-artifacts/android-mobile-tablet when present, otherwise release-artifacts/mobile
 mobile artifact staging target: dist/mobile
 mobile checksum path: <artifact>.sha256
 release prompt skip: non-interactive terminal or no release assets
@@ -197,8 +200,9 @@ package roots are broad directories, not only manifest-referenced files
 build copies css and html directories even when some files are quarantined or empty
 manifest validation is limited to read/write success and collaborator script order
 ZIP creation is archive-glob based and does not emit a checksum manifest
-mobile artifact collection is opt-in by CLI/env/prompt and filename regex only
+mobile artifact collection is opt-in by CLI/env/prompt, filename regex, and current package version
 latest mobile artifact selection is versionCode-based when --all-mobile-artifacts is absent
+mobile artifact staging warns when the selected versionCode lacks either APK or AAB output
 mobile checksum files are staged but not bound to signing fingerprint or package name proof
 non-interactive terminal skips release prompt and has no CI publish path
 GitHub release is created as public before asset uploads start

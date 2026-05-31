@@ -8,29 +8,32 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_RELEASE_BUILD_ARTIFACT_CLAIM_BOUNDARY_CURRENT_BEHAVIOR_2026-05-22.md';
 
 const sourceRows = [
-  ['build.js', 686, 24689, 'f6778ce29f1d7f520a66ab689f8c1a2999e5887ffa8c53bd5039f4976b2671b6'],
-  ['package.json', 46, 1376, 'cd24685d1fb4940c1a67f12ce143bc1466200a299a82dbfa6f553b99e24ae23f'],
-  ['README.md', 416, 24330, '8435890aa3fc5bb10fb9206353978a53b4b1847809ce9ca3ffbb4f7bfecac9ac'],
-  ['CHANGELOG.md', 591, 40157, '71949d5506a2e9acd27b7f1a1578edef49b06dc578314293863d425d32251bd5'],
-  ['manifest.json', 88, 2513, 'c39c38d4e389f17803b1915c2d2d0673c60dd87e68a9301fac4faad14bfd31e1'],
-  ['manifest.chrome.json', 88, 2513, 'c39c38d4e389f17803b1915c2d2d0673c60dd87e68a9301fac4faad14bfd31e1'],
-  ['manifest.firefox.json', 75, 2029, '89e2f70a5f6bb34356ebed2f4ad357213a28a2872cfaebeff2474e702a98719d'],
-  ['manifest.opera.json', 89, 2518, 'ef0fa857517710853e82942bdb05bc14c9f2e2202b49775fd6e6a59a27e77017'],
-  ['data/release_notes.json', 316, 23039, 'e012f6c071fffa67958f55544ecae9bbb26e7ec91edd2066df4d06a62de69962'],
+  ['build.js', 728, 26641, '7ef8a2fd6796ec6758d7724544469a623d7c2d9407247a12b482e1f55cdc243b'],
+  ['package.json', 46, 1376, '226f558856bf0f91d52bdbaced50020d035c1b2835ea86db2e420ada8fd1bd8e'],
+  ['README.md', 401, 22476, 'adceb2e174debe044c06998d32e8661a20d0cdab81eb66792bcf697e2bf7459c'],
+  ['CHANGELOG.md', 591, 40124, 'e22a87ce7eeb88d171587d4b0f4676881a2c3081a7fbf15978d7e8d8582cdfdd'],
+  ['manifest.json', 88, 2513, '282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734'],
+  ['manifest.chrome.json', 88, 2513, '282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734'],
+  ['manifest.firefox.json', 75, 2029, 'c84368c9db6a4900bb6ff055b66a645a88176d3533e307eee0dcb8d230fae2bb'],
+  ['manifest.opera.json', 89, 2518, '0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b'],
+  ['data/release_notes.json', 317, 23020, 'a8d59b18e9bffd1c828538ee58b3b8e9be7c641fea3ff064220311485a3b1c6b'],
 ];
 
 const blockRows = [
-  ['buildConfig', 'const ALL_BROWSER_TARGETS', '// Stronger filter function', 28, 38, 1476],
-  ['mainBuildFlow', 'async function main()', 'function ensureCollabDialogScriptOrder', 80, 79, 2790],
-  ['manifestOrderRepair', 'function ensureCollabDialogScriptOrder', 'function createZip', 159, 22, 858],
-  ['createZip', 'function createZip', 'async function maybeCollectMobileArtifacts', 181, 33, 981],
-  ['mobileArtifacts', 'async function maybeCollectMobileArtifacts', 'function selectLatestMobileArtifacts', 214, 61, 2331],
-  ['mobileSelectionChecksum', 'function selectLatestMobileArtifacts', 'async function maybePromptRelease', 275, 17, 625],
-  ['releasePromptPublish', 'async function maybePromptRelease', 'function extractLatestChangelogEntry', 292, 58, 1805],
-  ['releaseBody', 'function buildReleaseBody', 'function createGitHubRelease', 388, 94, 4166],
-  ['githubReleaseCreate', 'function createGitHubRelease', 'function uploadReleaseAsset', 482, 25, 699],
-  ['githubAssetUpload', 'function uploadReleaseAsset', 'function contentTypeForAsset', 507, 35, 1350],
-  ['readmeBadges', 'async function updateReadmeBadges', 'function shouldCountInTotalLoC', 602, 63, 2355],
+  ['buildConfig', 'const ALL_BROWSER_TARGETS', '// Stronger filter function', 28, 40, 1688],
+  ['mainBuildFlow', 'async function main()', 'function ensureCollabDialogScriptOrder', 82, 79, 2790],
+  ['manifestOrderRepair', 'function ensureCollabDialogScriptOrder', 'function createZip', 161, 22, 858],
+  ['createZip', 'function createZip', 'async function maybeCollectMobileArtifacts', 183, 33, 981],
+  ['mobileArtifacts', 'async function maybeCollectMobileArtifacts', 'function resolveDefaultMobileArtifactsDir', 216, 67, 2760],
+  ['mobileArtifactDefaults', 'function resolveDefaultMobileArtifactsDir', 'function parseMobileArtifactName', 283, 9, 376],
+  ['mobileArtifactParsing', 'function parseMobileArtifactName', 'function summarizeMobileArtifacts', 292, 11, 291],
+  ['mobileArtifactSummary', 'function summarizeMobileArtifacts', 'function selectLatestMobileArtifacts', 303, 11, 376],
+  ['mobileSelectionChecksum', 'function selectLatestMobileArtifacts', 'async function maybePromptRelease', 314, 16, 568],
+  ['releasePromptPublish', 'async function maybePromptRelease', 'function extractLatestChangelogEntry', 330, 58, 1805],
+  ['releaseBody', 'function buildReleaseBody', 'function createGitHubRelease', 426, 98, 4491],
+  ['githubReleaseCreate', 'function createGitHubRelease', 'function uploadReleaseAsset', 524, 25, 699],
+  ['githubAssetUpload', 'function uploadReleaseAsset', 'function contentTypeForAsset', 549, 35, 1350],
+  ['readmeBadges', 'async function updateReadmeBadges', 'function shouldCountInTotalLoC', 644, 63, 2355],
 ];
 
 function filePath(file) {
@@ -81,7 +84,7 @@ test('release build artifact claim boundary is audit-only and fingerprint pinned
   assert.match(text, /codebase inspection/);
   assert.match(text, /future optimization locations and first-class JSON filter blockers/);
   assert.match(text, /release build artifact boundary source files: 9/);
-  assert.match(text, /release build artifact source\/effect blocks: 11/);
+  assert.match(text, /release build artifact source\/effect blocks: 14/);
   assert.match(text, /runtime behavior changed: no/);
 
   for (const [file, expectedLines, expectedBytes, expectedHash] of sourceRows) {
@@ -124,14 +127,14 @@ test('release build artifact claim boundary records package versions scripts and
   const releases = readJson('data/release_notes.json');
   const releaseVersions = releases.filter((entry) => entry && typeof entry.version === 'string').map((entry) => entry.version);
 
-  assert.equal(pkg.version, '3.3.1');
+  assert.equal(pkg.version, '3.3.2');
   assert.equal(pkg.scripts.build, 'node build.js');
   assert.equal(pkg.scripts['build:chrome'], 'node build.js chrome');
   assert.equal(pkg.scripts['build:firefox'], 'node build.js firefox');
   assert.equal(pkg.scripts['build:opera'], 'node build.js opera');
 
   for (const manifestFile of ['manifest.json', 'manifest.chrome.json', 'manifest.firefox.json', 'manifest.opera.json']) {
-    assert.equal(readJson(manifestFile).version, '3.3.1', `${manifestFile} version drifted`);
+    assert.equal(readJson(manifestFile).version, '3.3.2', `${manifestFile} version drifted`);
   }
 
   assert.equal(releases.length, 24);
@@ -140,13 +143,14 @@ test('release build artifact claim boundary records package versions scripts and
   assert.equal(releaseVersions[1], '3.3.1');
 
   assert.match(readme, /filtertube\.in\/downloads/);
-  assert.match(readme, /Large blocked-channel lists filter faster/);
+  assert.match(readme, /Large Blocklist Matching \(v3\.3\.1\)/);
+  assert.match(readme, /200\+ saved channels do not create renderer-by-renderer scan costs/);
   assert.match(readme, /JSON-backed surfaces can be filtered before paint/);
   assert.match(readme, /Current audit work is tightening no-rule, route, lifecycle, and resolver budgets/);
 
-  assert.match(text, /browser package version: 3\.3\.1/);
-  assert.match(text, /package\.json version: 3\.3\.1/);
-  assert.match(text, /staged newest release-note version: 3\.3\.2/);
+  assert.match(text, /browser package version: 3\.3\.2/);
+  assert.match(text, /package\.json version: 3\.3\.2/);
+  assert.match(text, /newest release-note version: 3\.3\.2/);
   assert.match(text, /release note data entries: 24/);
   assert.match(text, /release note version rows: 23/);
   assert.match(text, /README public copy currently claims/);

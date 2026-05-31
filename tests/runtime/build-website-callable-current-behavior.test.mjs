@@ -39,7 +39,7 @@ const accountedFiles = [
 ];
 
 const expectedCounts = new Map([
-  ['build.js', 25],
+  ['build.js', 28],
   ['scripts/build-extension-ui.mjs', 2],
   ['scripts/build-nanah-vendor.mjs', 4],
   ['scripts/sync-native-runtime.mjs', 0],
@@ -106,7 +106,15 @@ function groupForBuildMethod(name) {
   if (name === 'main') return 'packageBuildOrchestration';
   if (name === 'ensureCollabDialogScriptOrder') return 'manifestRewriteSurface';
   if (name === 'createZip') return 'zipArtifactCreation';
-  if (['maybeCollectMobileArtifacts', 'selectLatestMobileArtifacts', 'extractAndroidVersionCode', 'sha256File'].includes(name)) return 'mobileArtifactStaging';
+  if ([
+    'maybeCollectMobileArtifacts',
+    'resolveDefaultMobileArtifactsDir',
+    'parseMobileArtifactName',
+    'summarizeMobileArtifacts',
+    'selectLatestMobileArtifacts',
+    'extractAndroidVersionCode',
+    'sha256File'
+  ].includes(name)) return 'mobileArtifactStaging';
   if (['extractLatestChangelogEntry', 'deriveSubtitle', 'buildReleaseTitle', 'buildReleaseBody', 'assetLink', 'releaseAssetLink'].includes(name)) return 'releaseBodyGeneration';
   if (['maybePromptRelease', 'createGitHubRelease', 'uploadReleaseAsset', 'contentTypeForAsset', 'httpRequest'].includes(name)) return 'releasePublication';
   if (['promptYesNo', 'promptText'].includes(name)) return 'interactivePromptSurface';
@@ -172,7 +180,7 @@ test('build/website callable audit accounts for every current build and website 
   assert.match(buildSemanticDoc, /This is not completion proof/);
   assert.match(auditDoc, /Build Script Method Semantic Addendum - 2026-05-27/);
   assert.match(auditDoc, /FILTERTUBE_BUILD_SCRIPT_METHOD_SEMANTIC_REGISTER_2026-05-27\.md/);
-  assert.match(auditDoc, /25 lexical callable rows across 9 semantic method groups/);
+  assert.match(auditDoc, /28 lexical callable rows across 9 semantic method groups/);
 });
 
 test('build/website callable counts match the current lexical source surface', () => {
@@ -183,24 +191,24 @@ test('build/website callable counts match the current lexical source surface', (
     assert.equal(count, expectedCounts.get(file), `${file} callable count drifted`);
   }
 
-  assert.equal(total, 82);
-  assert.match(auditDoc, /\| Total \| 26 \| 82 \|/);
+  assert.equal(total, 85);
+  assert.match(auditDoc, /\| Total \| 26 \| 85 \|/);
 
   const build = read('build.js');
   const buildRows = buildMethodRows();
-  assert.equal(lineCount(build), 686);
-  assert.equal(Buffer.byteLength(build), 24689);
-  assert.equal(lexicalCallableCount(build), 25);
-  assert.equal(buildRows.length, 25);
+  assert.equal(lineCount(build), 728);
+  assert.equal(Buffer.byteLength(build), 26641);
+  assert.equal(lexicalCallableCount(build), 28);
+  assert.equal(buildRows.length, 28);
   assert.deepEqual(countBy(buildRows, 'kind'), {
     arrowFunction: 4,
     asyncFunction: 4,
-    function: 17
+    function: 20
   });
   assert.deepEqual(countBy(buildRows, 'group'), {
     interactivePromptSurface: 2,
     manifestRewriteSurface: 1,
-    mobileArtifactStaging: 4,
+    mobileArtifactStaging: 7,
     packageBuildOrchestration: 1,
     packageCopySurface: 1,
     readmeBadgeMutation: 4,
@@ -271,10 +279,10 @@ test('build/website audit pins high-risk release and public claim patterns to cu
     assert.match(auditDoc, new RegExp(escapeRegex(finding)));
   }
 
-  assert.match(buildSemanticDoc, /build script line count: 686/);
-  assert.match(buildSemanticDoc, /build script bytes: 24689/);
-  assert.match(buildSemanticDoc, /lexical callable rows in this semantic slice: 25/);
-  assert.match(buildSemanticDoc, /plain function declarations: 17/);
+  assert.match(buildSemanticDoc, /build script line count: 728/);
+  assert.match(buildSemanticDoc, /build script bytes: 26641/);
+  assert.match(buildSemanticDoc, /lexical callable rows in this semantic slice: 28/);
+  assert.match(buildSemanticDoc, /plain function declarations: 20/);
   assert.match(buildSemanticDoc, /async function declarations: 4/);
   assert.match(buildSemanticDoc, /arrow callable rows: 4/);
   assert.match(buildSemanticDoc, /semantic method groups: 9/);

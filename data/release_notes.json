@@ -4,9 +4,9 @@
   },
   {
     "version": "3.3.2",
-    "headline": "Upcoming: mobile/tablet app MVP, smoother YouTube, and safer whitelist",
-    "summary": "Prepared release notes for the next checkpoint without bumping the packaged extension version yet: the public app release surface is ready for Android phone/tablet final testing and iOS/iPad status, the extension dashboard now points to those app paths, YouTube SPA work is quieter when there are no active rules, and whitelist/end-screen correctness fixes are staged for release.",
-    "bannerSummary": "Mobile/tablet app release surfaces, smoother YouTube runtime behavior, production-quiet logs, and whitelist/end-screen leak fixes are staged for the next release.",
+    "headline": "Mobile/tablet app MVP, smoother YouTube, and safer whitelist",
+    "summary": "The public app release surface is ready for Android phone/tablet final testing and iOS/iPad status, the extension dashboard now points to those app paths, YouTube SPA work is quieter when there are no active rules, and whitelist/end-screen correctness fixes are included in this release.",
+    "bannerSummary": "Mobile/tablet app release surfaces, smoother YouTube runtime behavior, production-quiet logs, and whitelist/end-screen leak fixes are included in this release.",
     "highlights": [
       "The website downloads hub and extension dashboard now expose the Android phone/tablet final-testing path and the iOS/iPad TestFlight/App Store status path.",
       "Android phone/tablet release setup is documented around the shared FilterTube runtime, YouTube Main, public YouTube Kids access, profiles, PIN rules, and Nanah sync.",
@@ -15,7 +15,8 @@
       "Whitelist release fixes cover Shorts creator fallback, list-target forwarding, and compact autoplay/watch-next endpoint filtering for end-screen controls.",
       "FilterTube DOM state attributes were hardened to reduce broad visible `data-filtertube-*` fingerprints while preserving necessary runtime state.",
       "Nanah/import paths preserve channel-derived Filter All keyword ownership between extension and native app payloads, including row color, source-badge metadata, and pairing context."
-    ]
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.2"
   },
   {
     "version": "3.3.1",

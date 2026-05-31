@@ -26,25 +26,25 @@ first-class JSON filter work look safer than the runtime proof actually allows.
 
 ## File Fingerprints
 
-Current tracked root metadata inventory: 7 files, 2,950 newline counts, and
-135,072 bytes.
+Current tracked root metadata inventory: 7 files, 2,935 newline counts, and
+133,185 bytes.
 
 | File | Newline count | Bytes | SHA-256 |
 |---|---:|---:|---|
 | `.gitignore` | 153 | 2,197 | `c90a7834297cf0a7b65493f41a21947fd5d85d1e14740b902cb3a3664028e3ca` |
-| `CHANGELOG.md` | 591 | 40,157 | `71949d5506a2e9acd27b7f1a1578edef49b06dc578314293863d425d32251bd5` |
+| `CHANGELOG.md` | 591 | 40,124 | `e22a87ce7eeb88d171587d4b0f4676881a2c3081a7fbf15978d7e8d8582cdfdd` |
 | `LICENSE` | 21 | 1,073 | `d0739cbb6232b0fb9ea59347feaf412bab5042768aa02856b16af24bb35e9d9d` |
-| `README.md` | 416 | 24,330 | `8435890aa3fc5bb10fb9206353978a53b4b1847809ce9ca3ffbb4f7bfecac9ac` |
+| `README.md` | 401 | 22,476 | `adceb2e174debe044c06998d32e8661a20d0cdab81eb66792bcf697e2bf7459c` |
 | `channel-identity-watch-mix-collab-recovery-plan.md` | 262 | 16,023 | `01f82169b06d3752e318b20b956c8a4284ae80166686e5c40aeee66c957d108a` |
-| `package.json` | 46 | 1,376 | `cd24685d1fb4940c1a67f12ce143bc1466200a299a82dbfa6f553b99e24ae23f` |
-| `package-lock.json` | 1,461 | 49,916 | `4882aa83fdbd0b3e150d4df5d32b3c02f3597cd64fe7193b9efbef3183832cef` |
+| `package.json` | 46 | 1,376 | `226f558856bf0f91d52bdbaced50020d035c1b2835ea86db2e420ada8fd1bd8e` |
+| `package-lock.json` | 1,461 | 49,916 | `f52d6482693be9cd4edacdc1f1491b4d2cda796522bfd0e4dcf86e0c879ad974` |
 
 Any release, package, or optimization claim that uses these files should cite
 the exact current file state or an updated fingerprint.
 
 ## Package Script Surface
 
-`package.json` currently declares package version `3.3.1`, license `MIT`,
+`package.json` currently declares package version `3.3.2`, license `MIT`,
 repository `git+https://github.com/varshneydevansh/FilterTube.git`, homepage
 `https://github.com/varshneydevansh/FilterTube`, 2 runtime dependencies, 3
 development dependencies, and 12 scripts.
@@ -76,7 +76,7 @@ Risk classification:
 
 | Risk | Current behavior | Missing gate |
 |---|---|---|
-| Release drift | `package.json`, `package-lock.json`, README badges, browser manifests, and changelog currently point at `3.3.1`; `data/release_notes.json` is separately staged at `3.3.2` in the asset/data audit. | `rootReleaseClaimGate` linking package version, manifest versions, changelog section, README badge, release notes row, website copy, and package artifact. |
+| Release drift | `package.json`, `package-lock.json`, README badges, browser manifests, changelog, and release notes currently point at `3.3.2`; app-store/direct APK availability still depends on artifact proof. | `rootReleaseClaimGate` linking package version, manifest versions, changelog section, README badge, release notes row, website copy, and package artifact. |
 | Audit discoverability | `audit:runtime` exists, but `test` is absent. | `packageScriptExecutionGate` for release and local verification commands. |
 | Dev manifest mutation | `dev:chrome`, `dev:firefox`, and `dev:opera` overwrite tracked `manifest.json`. | Dirty-worktree and manifest-parity gate before release or implementation review. |
 | Native parity | `sync:native-runtime` delegates to a sibling app repo; normal `npm run build` does not invoke it. | Runtime sync freshness and app-boundary proof before claiming extension/app parity. |
@@ -113,14 +113,14 @@ vendor-bundle freshness, generated UI freshness, and release ZIP contents.
 
 ## Public Root Documents
 
-`README.md` is public release copy. It currently displays version `3.3.1`,
-license `MIT`, total line count `113.3k`, JavaScript line count `72.3k`, and
+`README.md` is public release copy. It currently displays version `3.3.2`,
+license `MIT`, total line count `502.5k`, JavaScript line count `73.2k`, and
 links the download hub `https://filtertube.in/downloads`.
 
 Current README claims relevant to optimization and JSON-first filtering:
 
-- Large blocked-channel lists filter faster because JSON payloads use indexed
-  channel matching instead of scanning every saved channel per renderer.
+- Large Blocklist Matching uses shared set-backed indexes so 200+ saved
+  channels do not create renderer-by-renderer scan costs.
 - JSON-backed surfaces can filter before paint when YouTube exposes needed
   fields.
 - Channel identity is preferred from intercepted JSON and learned maps, while

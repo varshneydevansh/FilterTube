@@ -95,18 +95,19 @@ test('release script can stage checksums but has no public claim manifest or sig
   assert.doesNotMatch(build, /\bapkAabPairGate\b/);
 });
 
-test('release notes are staged ahead of package and browser manifest versions', () => {
+test('release notes align with package and browser manifest versions', () => {
   const packageJson = readJson('package.json');
   const releaseNotes = readJson('data/release_notes.json');
 
-  assert.equal(packageJson.version, '3.3.1');
+  assert.equal(packageJson.version, '3.3.2');
   for (const manifest of ['manifest.json', 'manifest.chrome.json', 'manifest.firefox.json', 'manifest.opera.json']) {
-    assert.equal(readJson(manifest).version, '3.3.1', `${manifest} should remain 3.3.1 today`);
+    assert.equal(readJson(manifest).version, packageJson.version, `${manifest} should match package version today`);
   }
 
   assert.equal(releaseNotes[1].version, '3.3.2');
-  assert.match(releaseNotes[1].headline, /Upcoming:/);
-  assert.match(releaseNotes[1].summary, /Prepared release notes/);
+  assert.doesNotMatch(releaseNotes[1].headline, /Upcoming:/);
+  assert.match(releaseNotes[1].summary, /included in this release/);
+  assert.equal(releaseNotes[1].detailsUrl, 'https://github.com/varshneydevansh/FilterTube/releases/tag/v3.3.2');
 });
 
 test('public release and android distribution docs require direct apk proof before claim', () => {

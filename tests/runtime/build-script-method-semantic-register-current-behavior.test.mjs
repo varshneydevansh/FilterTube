@@ -17,6 +17,9 @@ const methodGroups = new Map([
   ['ensureCollabDialogScriptOrder', 'manifestRewriteSurface'],
   ['createZip', 'zipArtifactCreation'],
   ['maybeCollectMobileArtifacts', 'mobileArtifactStaging'],
+  ['resolveDefaultMobileArtifactsDir', 'mobileArtifactStaging'],
+  ['parseMobileArtifactName', 'mobileArtifactStaging'],
+  ['summarizeMobileArtifacts', 'mobileArtifactStaging'],
   ['selectLatestMobileArtifacts', 'mobileArtifactStaging'],
   ['extractAndroidVersionCode', 'mobileArtifactStaging'],
   ['sha256File', 'mobileArtifactStaging'],
@@ -137,12 +140,12 @@ test('build script method semantic register is audit-only and source fingerprint
   assert.match(text, /runtime behavior changed: no/);
   assert.match(text, /build behavior changed: no/);
 
-  assert.equal(sourceLineCount(), 686);
-  assert.equal(readBuffer(sourcePath).byteLength, 24689);
-  assert.equal(sha256(sourcePath), 'f6778ce29f1d7f520a66ab689f8c1a2999e5887ffa8c53bd5039f4976b2671b6');
-  assert.match(text, /build script line count: 686/);
-  assert.match(text, /build script bytes: 24689/);
-  assert.match(text, /build script sha256: f6778ce29f1d7f520a66ab689f8c1a2999e5887ffa8c53bd5039f4976b2671b6/);
+  assert.equal(sourceLineCount(), 728);
+  assert.equal(readBuffer(sourcePath).byteLength, 26641);
+  assert.equal(sha256(sourcePath), '7ef8a2fd6796ec6758d7724544469a623d7c2d9407247a12b482e1f55cdc243b');
+  assert.match(text, /build script line count: 728/);
+  assert.match(text, /build script bytes: 26641/);
+  assert.match(text, /build script sha256: 7ef8a2fd6796ec6758d7724544469a623d7c2d9407247a12b482e1f55cdc243b/);
   assert.equal(countLiteral(source, 'main().catch'), 1);
   assert.match(text, /npm script entrypoint: npm run build -> node build\.js/);
 });
@@ -151,16 +154,16 @@ test('build script register accounts for every current semantic method row', () 
   const text = doc();
   const rows = methodRows();
 
-  assert.equal(rows.length, 25);
+  assert.equal(rows.length, 28);
   assert.deepEqual(countBy(rows, 'kind'), {
     arrowFunction: 4,
     asyncFunction: 4,
-    function: 17
+    function: 20
   });
   assert.deepEqual(countBy(rows, 'group'), {
     interactivePromptSurface: 2,
     manifestRewriteSurface: 1,
-    mobileArtifactStaging: 4,
+    mobileArtifactStaging: 7,
     packageBuildOrchestration: 1,
     packageCopySurface: 1,
     readmeBadgeMutation: 4,
@@ -169,8 +172,8 @@ test('build script register accounts for every current semantic method row', () 
     zipArtifactCreation: 1
   });
 
-  assert.match(text, /lexical callable rows in this semantic slice: 25/);
-  assert.match(text, /plain function declarations: 17/);
+  assert.match(text, /lexical callable rows in this semantic slice: 28/);
+  assert.match(text, /plain function declarations: 20/);
   assert.match(text, /async function declarations: 4/);
   assert.match(text, /arrow callable rows: 4/);
   assert.match(text, /semantic method groups: 9/);
@@ -182,7 +185,7 @@ test('build script register pins current side-effect and release-publication tok
   const source = read(sourcePath);
 
   const pairs = [
-    ['arrow token sites in build script', countRegex(source, /=>/g), 37],
+    ['arrow token sites in build script', countRegex(source, /=>/g), 42],
     ['require calls', countRegex(source, /\brequire\(/g), 8],
     ['await expressions', countRegex(source, /\bawait\b/g), 9],
     ['execSync occurrences', countLiteral(source, 'execSync'), 3],
@@ -196,7 +199,7 @@ test('build script register pins current side-effect and release-publication tok
     ['process.stdout.isTTY occurrences', countLiteral(source, 'process.stdout.isTTY'), 2],
     ['draft false occurrences', countLiteral(source, 'draft: false'), 1],
     ['MOBILE_ARTIFACT_FILE_RE occurrences', countLiteral(source, 'MOBILE_ARTIFACT_FILE_RE'), 3],
-    ['console callsites', countRegex(source, /\bconsole\./g), 27]
+    ['console callsites', countRegex(source, /\bconsole\./g), 28]
   ];
 
   for (const [label, actual, expected] of pairs) {

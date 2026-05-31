@@ -31,7 +31,9 @@ const COMMON_DIRS = ['js', 'css', 'html', 'icons', 'data', 'assets'];
 const COMMON_FILES = ['README.md', 'CHANGELOG.md', 'LICENSE'];
 const REPO_OWNER = 'varshneydevansh';
 const REPO_NAME = 'FilterTube';
-const MOBILE_ARTIFACT_FILE_RE = /^FilterTube-mobile-tablet-v[0-9][A-Za-z0-9._-]*-code[0-9]+-(?:release|debug)\.(?:apk|aab)$/;
+const MOBILE_ARTIFACT_FILE_RE = /^FilterTube-mobile-tablet-v([0-9][A-Za-z0-9._-]*)-code([0-9]+)-(release|debug)\.(apk|aab)$/;
+const LOCAL_MOBILE_ARTIFACTS_DIR = path.join('release-artifacts', 'mobile');
+const SIBLING_APP_MOBILE_ARTIFACTS_DIR = path.resolve(__dirname, '..', 'FilterTubeApp', 'release-artifacts', 'android-mobile-tablet');
 const TEXT_LOC_EXTENSIONS = new Set([
     '.js',
     '.jsx',
@@ -212,7 +214,7 @@ function createZip(browser, sourceDir, version) {
 }
 
 async function maybeCollectMobileArtifacts(version) {
-    const defaultDir = path.join('release-artifacts', 'mobile');
+    const defaultDir = resolveDefaultMobileArtifactsDir();
     let sourceDir = mobileArtifactsDirFromArg || mobileArtifactsDirFromEnv;
 
     if (!sourceDir && mobileArtifactsRequested) {
@@ -236,10 +238,11 @@ async function maybeCollectMobileArtifacts(version) {
 
     const matchedSourceFiles = fs.readdirSync(resolvedSourceDir)
         .filter(name => MOBILE_ARTIFACT_FILE_RE.test(name))
+        .filter(name => parseMobileArtifactName(name)?.version === version)
         .sort();
 
     if (!matchedSourceFiles.length) {
-        console.warn(`⚠️  No mobile artifacts matched ${MOBILE_ARTIFACT_FILE_RE} in ${resolvedSourceDir}`);
+        console.warn(`⚠️  No mobile artifacts matched FilterTube mobile/tablet v${version} in ${resolvedSourceDir}`);
         return [];
     }
 
@@ -249,7 +252,12 @@ async function maybeCollectMobileArtifacts(version) {
 
     if (sourceFiles.length !== matchedSourceFiles.length) {
         const latestCode = extractAndroidVersionCode(sourceFiles[0]);
-        console.log(`ℹ️  Mobile artifacts: selected latest versionCode ${latestCode}. Use --all-mobile-artifacts to attach every matching file.`);
+        console.log(`ℹ️  Mobile artifacts: selected v${version} latest versionCode ${latestCode}. Use --all-mobile-artifacts to attach every matching file for this version.`);
+    }
+
+    const selectedArtifactSummary = summarizeMobileArtifacts(sourceFiles);
+    if (!selectedArtifactSummary.hasApk || !selectedArtifactSummary.hasAab) {
+        console.warn(`⚠️  Mobile artifacts for v${version} code${selectedArtifactSummary.latestCode || 'unknown'} do not include both APK and AAB files.`);
     }
 
     const targetDir = path.join('dist', 'mobile');
@@ -272,6 +280,37 @@ async function maybeCollectMobileArtifacts(version) {
     return copiedPaths;
 }
 
+function resolveDefaultMobileArtifactsDir() {
+    const candidates = [SIBLING_APP_MOBILE_ARTIFACTS_DIR, LOCAL_MOBILE_ARTIFACTS_DIR];
+    const existing = candidates.find(candidate => {
+        const resolved = path.resolve(candidate);
+        return fs.existsSync(resolved) && fs.statSync(resolved).isDirectory();
+    });
+    return existing || LOCAL_MOBILE_ARTIFACTS_DIR;
+}
+
+function parseMobileArtifactName(fileName) {
+    const match = String(fileName).match(MOBILE_ARTIFACT_FILE_RE);
+    if (!match) return null;
+    return {
+        version: match[1],
+        code: Number.parseInt(match[2], 10),
+        variant: match[3],
+        extension: match[4]
+    };
+}
+
+function summarizeMobileArtifacts(fileNames) {
+    const parsed = fileNames
+        .map(parseMobileArtifactName)
+        .filter(Boolean);
+    return {
+        latestCode: Math.max(...parsed.map(item => item.code).filter(Number.isFinite)),
+        hasApk: parsed.some(item => item.extension === 'apk'),
+        hasAab: parsed.some(item => item.extension === 'aab')
+    };
+}
+
 function selectLatestMobileArtifacts(fileNames) {
     const latestCode = Math.max(...fileNames.map(extractAndroidVersionCode).filter(Number.isFinite));
     if (!Number.isFinite(latestCode)) return fileNames;
@@ -279,8 +318,7 @@ function selectLatestMobileArtifacts(fileNames) {
 }
 
 function extractAndroidVersionCode(fileName) {
-    const match = String(fileName).match(/-code([0-9]+)-/);
-    return match ? Number.parseInt(match[1], 10) : Number.NaN;
+    return parseMobileArtifactName(fileName)?.code ?? Number.NaN;
 }
 
 function sha256File(filePath) {
@@ -405,16 +443,20 @@ function buildReleaseBody({ version, section, previousVersion, mobileArtifactPat
         .map(assetPath => path.basename(assetPath))
         .filter(name => name.endsWith('.apk'));
     const androidApk = androidApkNames.find(name => name.includes('-release.')) || androidApkNames[0];
+    const androidApkIsDebug = Boolean(androidApk && androidApk.includes('-debug.'));
     const androidAab = mobileArtifactPaths
         .map(assetPath => path.basename(assetPath))
         .find(name => name.endsWith('.aab'));
+    const androidInstallNote = androidApkIsDebug
+        ? 'The debug APK is attached for QA/direct device validation and must stay clearly marked as QA-only. The AAB is for store upload workflows, not normal sideloading.'
+        : 'The APK is for direct installs on Android devices, including GrapheneOS and other non-Play setups. The AAB is for store upload workflows, not normal sideloading.';
 
     const mobileSection = mobileArtifactPaths.length
         ? [
             '',
             '### Android phone/tablet',
             androidApk
-                ? `**${androidApk.includes('-debug.') ? 'QA debug APK' : 'Direct APK'}:** [${androidApk}](${releaseAssetLink(androidApk)})`
+                ? `**${androidApkIsDebug ? 'QA debug APK' : 'Direct APK'}:** [${androidApk}](${releaseAssetLink(androidApk)})`
                 : '**Direct APK:** Not attached in this release.',
             androidApk
                 ? `**Checksum:** [${androidApk}.sha256](${releaseAssetLink(`${androidApk}.sha256`)})`
@@ -423,7 +465,7 @@ function buildReleaseBody({ version, section, previousVersion, mobileArtifactPat
                 ? `**Play/App bundle artifact:** [${androidAab}](${releaseAssetLink(androidAab)})`
                 : '',
             '',
-            'The APK is for direct installs on Android devices, including GrapheneOS and other non-Play setups. The AAB is for store upload workflows, not normal sideloading.',
+            androidInstallNote,
         ].filter(Boolean)
         : [
             '',

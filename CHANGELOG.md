@@ -1,6 +1,6 @@
 # Changelog
 
-## Version 3.3.2 (Unreleased / Release Candidate)
+## Version 3.3.2
 
 ### Mobile / Tablet App MVP Release Surface
 

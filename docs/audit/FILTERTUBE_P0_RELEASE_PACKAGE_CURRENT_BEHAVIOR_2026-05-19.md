@@ -66,11 +66,11 @@ flowchart TD
 
 | Boundary | Source pins | Current behavior | Missing proof gate |
 | --- | --- | --- | --- |
-| Package command/version surface | `package.json:3-18` | Package and browser manifests currently advertise version `3.3.1`; build/dev commands are script aliases, and `dev:chrome` mutates tracked `manifest.json` by copying `manifest.chrome.json`. | One command provenance record for local dev, release build, native sync, and installed-browser test runs. |
-| Default Chrome manifest load order | `manifest.json:1-87`, `manifest.json:42-55` | Chrome loads `js/seed.js` in MAIN world and loads the isolated helper stack with `js/content/collab_dialog.js` before `js/content_bridge.js`. | Installed runtime proof that the loaded extension uses this manifest and has been reloaded after source edits. |
-| Build package roots and manifest copy | `build.js:27-31`, `build.js:80-156` | Build copies broad `js`, `css`, `html`, `icons`, `data`, and `assets` roots plus README/CHANGELOG/LICENSE, then writes the browser-specific manifest as `dist/<browser>/manifest.json`. | Package manifest with per-file hashes, source family, manifest reference state, quarantine state, and active runtime classification. |
-| Manifest order repair | `build.js:159-179` | Package build repairs only `js/content/collab_dialog.js` before `js/content_bridge.js` when writing the target manifest. | Full content-script order, world, host, permission, and resource validation report. |
-| ZIP/release output | `build.js:181-190`, `build.js:602-658` | ZIP name is version-derived, and normal build mutates README badges before packaging. | Reproducible package checksum, dirty-worktree gate, and release artifact attestation. |
+| Package command/version surface | `package.json:3-18` | Package and browser manifests currently advertise version `3.3.2`; build/dev commands are script aliases, and `dev:chrome` mutates tracked `manifest.json` by copying `manifest.chrome.json`. | One command provenance record for local dev, release build, native sync, and installed-browser test runs. |
+| Default Chrome manifest load order | `manifest.json:1-88`, `manifest.json:42-56` | Chrome loads `js/seed.js` in MAIN world and loads the isolated helper stack with `js/content/collab_dialog.js` before `js/content_bridge.js`. | Installed runtime proof that the loaded extension uses this manifest and has been reloaded after source edits. |
+| Build package roots and manifest copy | `build.js:29-33`, `build.js:82-158` | Build copies broad `js`, `css`, `html`, `icons`, `data`, and `assets` roots plus README/CHANGELOG/LICENSE, then writes the browser-specific manifest as `dist/<browser>/manifest.json`. | Package manifest with per-file hashes, source family, manifest reference state, quarantine state, and active runtime classification. |
+| Manifest order repair | `build.js:161-181` | Package build repairs only `js/content/collab_dialog.js` before `js/content_bridge.js` when writing the target manifest. | Full content-script order, world, host, permission, and resource validation report. |
+| ZIP/release output | `build.js:183-192`, `build.js:644-700` | ZIP name is version-derived, and normal build mutates README badges before packaging. | Reproducible package checksum, dirty-worktree gate, and release artifact attestation. |
 | Current Topic ampersand and bare-`and` source proof | `js/content_bridge.js:2759-2814`, `js/content_bridge.js:4784-4812`, `js/content_bridge.js:4902-4928`, `tests/runtime/content-bridge-collaborator-identity-promotion-handoff-current-behavior.test.mjs:510-544` | Workspace source no longer splits plain `&`, and the 2026-05-28 separator evidence gate keeps no-evidence single-channel `and` names such as `Law and Crime Network` out of collaborator warmup while preserving evidence-backed true collaborator rows. | Browser-loaded-runtime proof when a manual installed extension still shows older collaborator attrs. |
 
 Current interpretation for the `Kully B & Gussy G - Topic` case:
@@ -350,8 +350,8 @@ Default/Secure Preferences extension settings object present: yes
 stored extension/service-worker version: 3.3.1
 Default Local Extension Settings directory exists: yes
 Default packed Extensions directory for this id exists: no
-workspace manifest.json sha256: 96eb5e5c8733ecdfa9d3eb447d51a3bfc2c4743a80b1fde1f12d71bd46d1c8e4
-workspace package.json sha256: cd24685d1fb4940c1a67f12ce143bc1466200a299a82dbfa6f553b99e24ae23f
+workspace manifest.json sha256: 282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734
+workspace package.json sha256: 226f558856bf0f91d52bdbaced50020d035c1b2835ea86db2e420ada8fd1bd8e
 workspace js/content_bridge.js sha256: 1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3
 workspace content_bridge ampersand Topic fix token present: yes
 ```
@@ -522,7 +522,7 @@ that `build.js` validates those references before writing `dist/*/manifest.json`
 ```text
 package copied directory roots: js, css, html, icons, data, assets
 browser manifests checked: 4
-combined unique referenced paths across browser manifests: 23
+combined unique referenced paths across browser manifests: 24
 unresolved manifest file references: 0
 manifest referenced roots outside COMMON_DIRS: 0
 manifest content-script CSS references: 0
@@ -532,10 +532,10 @@ runtime behavior changed by this addendum: no
 
 | Manifest | File references | Unique referenced paths | Missing paths | Current package closure |
 | --- | ---: | ---: | ---: | --- |
-| `manifest.json` | 28 | 23 | 0 | All referenced files exist under copied package roots. |
-| `manifest.chrome.json` | 28 | 23 | 0 | Same as default Chrome manifest. |
-| `manifest.firefox.json` | 28 | 23 | 0 | Background script shape differs, but referenced files exist under copied package roots. |
-| `manifest.opera.json` | 27 | 22 | 0 | Omits `icons/file.svg` from web-accessible resources, but all referenced files exist under copied package roots. |
+| `manifest.json` | 29 | 24 | 0 | All referenced files exist under copied package roots. |
+| `manifest.chrome.json` | 29 | 24 | 0 | Same as default Chrome manifest. |
+| `manifest.firefox.json` | 29 | 24 | 0 | Background script shape differs, but referenced files exist under copied package roots. |
+| `manifest.opera.json` | 28 | 23 | 0 | Omits `icons/file.svg` from web-accessible resources, but all referenced files exist under copied package roots. |
 
 Current referenced package roots:
 
@@ -602,10 +602,10 @@ runtime behavior changed by this addendum: no
 
 | Manifest | Content script entries | Content script JS refs | Explicit worlds | WAR resource refs | Host-only `youtube-nocookie.com` gap |
 | --- | ---: | ---: | --- | ---: | --- |
-| `manifest.json` | 2 | 14 | `MAIN`, `ISOLATED` | 5 | yes |
-| `manifest.chrome.json` | 2 | 14 | `MAIN`, `ISOLATED` | 5 | yes |
-| `manifest.firefox.json` | 1 | 13 | none | 5 | yes |
-| `manifest.opera.json` | 2 | 14 | none | 4 | yes |
+| `manifest.json` | 2 | 15 | `MAIN`, `ISOLATED` | 5 | yes |
+| `manifest.chrome.json` | 2 | 15 | `MAIN`, `ISOLATED` | 5 | yes |
+| `manifest.firefox.json` | 1 | 14 | none | 5 | yes |
+| `manifest.opera.json` | 2 | 15 | none | 4 | yes |
 
 Current policy snapshot:
 
@@ -668,11 +668,11 @@ authority, and no runtime source was changed.
 ```text
 dist snapshot source: existing ignored local dist tree
 browser staged directories: 3
-browser staged files per directory: 58
+browser staged files per directory: 59
 dist zip artifacts: 3
-total dist files including zips: 178
-source-backed staged files per browser excluding manifest: 57
-byte-identical source-backed staged files per browser excluding manifest: 50
+total dist files including zips: 184
+source-backed staged files per browser excluding manifest: 58
+byte-identical source-backed staged files per browser excluding manifest: 58
 committed package manifest: absent
 zip checksum manifest: absent
 reproducible build proof: absent
@@ -690,22 +690,22 @@ Per-browser staged group counts are currently identical:
 | `data` | 1 |
 | `html` | 3 |
 | `icons` | 7 |
-| `js` | 32 |
+| `js` | 33 |
 
 Current local package artifact rows:
 
 | Target | Staged files | Manifest bytes | Manifest sha256 | Version | Content script entries | Content script JS refs | WAR refs | ZIP bytes | ZIP sha256 |
 | --- | ---: | ---: | --- | --- | ---: | ---: | ---: | ---: | --- |
-| `chrome` | 58 | 2470 | `96eb5e5c8733ecdfa9d3eb447d51a3bfc2c4743a80b1fde1f12d71bd46d1c8e4` | `3.3.1` | 2 | 14 | 5 | 8681016 | `98e90fcae64fbe8edc3597fa4808359e1cba6b1411bd855e60e0bf3c069361d0` |
-| `firefox` | 58 | 2560 | `2221afbc831ea1b5d90f76cd3f1590022dcc92d3c5d992dd163a5d46844b0e72` | `3.3.1` | 1 | 13 | 5 | 8681075 | `f0dd7d53ad62c9716a975d299326ab84f01fa4c88dac2042d89a4d91d11a8630` |
-| `opera` | 58 | 2475 | `f76d4a48b51fc5da65492347ce3f7cb31ebff057afd2185573176991e7d1d4b7` | `3.3.1` | 2 | 14 | 4 | 8681019 | `4b1a53f931e2019163a7fc6f400dd168465350fcf0813055887a7140c3651ce5` |
+| `chrome` | 59 | 2513 | `282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734` | `3.3.2` | 2 | 15 | 5 | 8688743 | `8e0be875c5e4223eee1c123eb0ca037bbc7b6ea21ce77caf4ff28fb7f5a62703` |
+| `firefox` | 59 | 2603 | `a1773c9e0acc1c2029cb6aef4757a282aa0ec8d89759be65ea975ff237d00bb0` | `3.3.2` | 1 | 14 | 5 | 8688802 | `4dce4c99b06f0f12ac9b1234bcc931ca1cb461d117c59fcfb329ae8240e846ba` |
+| `opera` | 59 | 2518 | `0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b` | `3.3.2` | 2 | 15 | 4 | 8688745 | `9bb534fdcc9ab842c9364dbff340ec929fbc688214b7f55ac861a564b8730222` |
 
 ASCII boundary:
 
 ```text
 workspace source paths
   -> existing ignored dist/<browser>/ staged copy
-  -> existing ignored dist/filtertube-<browser>-v3.3.1.zip
+  -> existing ignored dist/filtertube-<browser>-v3.3.2.zip
   -> local hash snapshot only
   -> no committed package manifest
   -> no clean rebuild attestation
@@ -715,7 +715,7 @@ workspace source paths
 ```mermaid
 flowchart TD
   A["Workspace source paths"] --> B["Existing ignored dist browser directories"]
-  B --> C["50 source-backed staged files match source per browser"]
+  B --> C["58 source-backed staged files match source per browser"]
   B --> D["dist browser manifest.json files"]
   B --> E["Existing local ZIP files"]
   C --> F["Local snapshot proof only"]
@@ -738,7 +738,7 @@ loaded-browser byte proof.
 
 ```text
 local dist snapshot proof: PARTIAL
-source-backed staged byte parity: no
+source-backed staged byte parity: yes
 zip checksum snapshot: yes
 committed release package manifest authority: NO-GO
 reproducible package build authority: NO-GO

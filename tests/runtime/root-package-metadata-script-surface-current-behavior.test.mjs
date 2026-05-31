@@ -9,12 +9,12 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_ROOT_PACKAGE_METADATA_SCRIPT_SURFACE_CURRENT_BEHAVIOR_2026-05-21.md';
 const rootMetadataRows = [
   ['.gitignore', 153, 2197, 'c90a7834297cf0a7b65493f41a21947fd5d85d1e14740b902cb3a3664028e3ca'],
-  ['CHANGELOG.md', 591, 40157, '71949d5506a2e9acd27b7f1a1578edef49b06dc578314293863d425d32251bd5'],
+  ['CHANGELOG.md', 591, 40124, 'e22a87ce7eeb88d171587d4b0f4676881a2c3081a7fbf15978d7e8d8582cdfdd'],
   ['LICENSE', 21, 1073, 'd0739cbb6232b0fb9ea59347feaf412bab5042768aa02856b16af24bb35e9d9d'],
-  ['README.md', 416, 24330, '8435890aa3fc5bb10fb9206353978a53b4b1847809ce9ca3ffbb4f7bfecac9ac'],
+  ['README.md', 401, 22476, 'adceb2e174debe044c06998d32e8661a20d0cdab81eb66792bcf697e2bf7459c'],
   ['channel-identity-watch-mix-collab-recovery-plan.md', 262, 16023, '01f82169b06d3752e318b20b956c8a4284ae80166686e5c40aeee66c957d108a'],
-  ['package.json', 46, 1376, 'cd24685d1fb4940c1a67f12ce143bc1466200a299a82dbfa6f553b99e24ae23f'],
-  ['package-lock.json', 1461, 49916, '4882aa83fdbd0b3e150d4df5d32b3c02f3597cd64fe7193b9efbef3183832cef'],
+  ['package.json', 46, 1376, '226f558856bf0f91d52bdbaced50020d035c1b2835ea86db2e420ada8fd1bd8e'],
+  ['package-lock.json', 1461, 49916, 'f52d6482693be9cd4edacdc1f1491b4d2cda796522bfd0e4dcf86e0c879ad974'],
 ];
 
 function filePath(file) {
@@ -91,9 +91,9 @@ test('root package metadata script surface doc is audit-only and fingerprint pin
   assert.match(doc, /optimization, release, dependency, JSON-first, or cleanup implementation work/);
   assert.deepEqual(trackedRootMetadata.sort(), rootMetadataRows.map(([file]) => file).sort());
 
-  assert.equal(rootMetadataRows.reduce((sum, [, lines]) => sum + lines, 0), 2950);
-  assert.equal(rootMetadataRows.reduce((sum, [, , bytes]) => sum + bytes, 0), 135072);
-  assert.match(doc, /7 files, 2,950 newline counts, and\s+135,072 bytes/);
+  assert.equal(rootMetadataRows.reduce((sum, [, lines]) => sum + lines, 0), 2935);
+  assert.equal(rootMetadataRows.reduce((sum, [, , bytes]) => sum + bytes, 0), 133185);
+  assert.match(doc, /7 files, 2,935 newline counts, and\s+133,185 bytes/);
 
   for (const [file, lines, bytes, hash] of rootMetadataRows) {
     assert.equal(newlineCount(file), lines, `${file} newline count drifted`);
@@ -109,7 +109,7 @@ test('package scripts and dependency metadata are pinned before release or optim
   const doc = read(docPath);
 
   assert.equal(pkg.name, 'filtertube');
-  assert.equal(pkg.version, '3.3.1');
+  assert.equal(pkg.version, '3.3.2');
   assert.equal(pkg.license, 'MIT');
   assert.equal(pkg.repository.url, 'git+https://github.com/varshneydevansh/FilterTube.git');
   assert.equal(pkg.homepage, 'https://github.com/varshneydevansh/FilterTube');
@@ -163,7 +163,7 @@ test('package lock reproducibility surface records package count integrity licen
   }
 
   assert.equal(lock.name, 'filtertube');
-  assert.equal(lock.version, '3.3.1');
+  assert.equal(lock.version, '3.3.2');
   assert.equal(lock.lockfileVersion, 3);
   assert.equal(Object.keys(lock.packages).length, 112);
   assert.equal(nonRootPackages.length, 111);
@@ -202,12 +202,13 @@ test('root public docs expose release and JSON-first claims that still need pari
   const build = read('build.js');
   const doc = read(docPath);
 
-  assert.match(readme, /version-3\.3\.1-blue\.svg/);
+  assert.match(readme, /version-3\.3\.2-blue\.svg/);
   assert.match(readme, /license-MIT-green\.svg/);
-  assert.match(readme, /total%20lines-113\.3k-brightgreen\.svg/);
-  assert.match(readme, /javascript-72\.3k%20lines-yellow\.svg/);
+  assert.match(readme, /total%20lines-502\.5k-brightgreen\.svg/);
+  assert.match(readme, /javascript-73\.2k%20lines-yellow\.svg/);
   assert.match(readme, /filtertube\.in\/downloads/);
-  assert.match(readme, /Large blocked-channel lists filter faster/);
+  assert.match(readme, /Large Blocklist Matching \(v3\.3\.1\)/);
+  assert.match(readme, /200\+ saved channels do not create renderer-by-renderer scan costs/);
   assert.match(readme, /JSON-backed surfaces can be filtered before paint/);
   assert.match(readme, /Current audit work is tightening no-rule, route, lifecycle, and resolver budgets/);
   assert.equal(changelog.startsWith('# Changelog\n\n## Version 3.3.2'), true);

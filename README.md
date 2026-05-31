@@ -3,7 +3,7 @@
   <h1>FilterTube</h1>
   <p>Peace of Mind for your Digital Space</p>
   
-  [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/varshneydevansh/FilterTube) ![Version](https://img.shields.io/badge/version-3.3.1-blue.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg) ![Lines of Code](https://img.shields.io/badge/total%20lines-113.3k-brightgreen.svg) ![JavaScript LoC](https://img.shields.io/badge/javascript-72.3k%20lines-yellow.svg) ![Top Language](https://img.shields.io/github/languages/top/varshneydevansh/FilterTube?color=f1e05a) ![Repo Size](https://img.shields.io/github/repo-size/varshneydevansh/FilterTube?color=orange)
+  [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/varshneydevansh/FilterTube) ![Version](https://img.shields.io/badge/version-3.3.2-blue.svg) ![License](https://img.shields.io/badge/license-MIT-green.svg) ![Lines of Code](https://img.shields.io/badge/total%20lines-502.5k-brightgreen.svg) ![JavaScript LoC](https://img.shields.io/badge/javascript-73.2k%20lines-yellow.svg) ![Top Language](https://img.shields.io/github/languages/top/varshneydevansh/FilterTube?color=f1e05a) ![Repo Size](https://img.shields.io/github/repo-size/varshneydevansh/FilterTube?color=orange)
   
 </div>
 
@@ -15,7 +15,7 @@ The public website now also acts as the download hub for browser releases, Andro
 
 👉 **[filtertube.in/downloads](https://filtertube.in/downloads)**
 
-## Release Candidate After v3.3.1 (May 31, 2026)
+## What's New in v3.3.2
 
 - **Mobile/tablet app MVP release surfaces are now wired into the public product path**: the website downloads hub and extension dashboard cards point users toward Android phone/tablet testing and iOS/iPad status without mixing TV into the same release.
 - **Android phone/tablet is in final release testing and release setup** with the shared FilterTube runtime, YouTube Main, public YouTube Kids access, profiles, PIN rules, and Nanah sync as the MVP contract.
@@ -24,21 +24,6 @@ The public website now also acts as the download hub for browser releases, Andro
 - **Production console output is quiet by default** so routine `console.log`, `console.info`, and `console.debug` calls do not add overhead to YouTube hot paths unless explicit debug mode is enabled.
 - **Whitelist release blockers were tightened**: Shorts creator fallback, watch autoplay endpoint filtering, list-target forwarding, and DOM state hardening are documented for the post-v3.3.1 release candidate.
 - **Post-April-12 documentation validation now lives under `docs/audit/`** so the release proof stays separate from core product docs.
-
-## What's New in v3.3.1
-
-- **Collaboration blocking is now much more complete on watch surfaces**: watch right rail, playlist rows, and watch-like lockups can recover full collaborator rosters and refresh the active 3-dot menu.
-- **Mix cards and real collaborations are separated more safely**: plain names containing `&` or `and` no longer become fake collaboration menus without explicit collaborator signals.
-- **Subscribed-channel import is more resilient across browsers**: the importer now relies more on real `/feed/channels` page growth and recent page browse responses.
-- **Channel Management rows can link directly to channel pages** using the best available identifier.
-- **The injected 3-dot block menu item can now be disabled** independently of Quick Block.
-- **Firefox/Waterfox export is more dependable** for both plain and encrypted JSON thanks to a safer manual-download fallback path.
-- **Fresh installs follow your browser/OS theme** until you manually pick light or dark.
-- **The dashboard sidebar stays usable on short desktop windows** with a scrollable navigation list.
-- **Large blocked-channel lists filter faster** because YouTube JSON payloads now use indexed channel matching instead of scanning every saved channel per renderer.
-- **Nanah app/extension sync preserves channel-derived keywords** so rows imported from Android/other Nanah clients keep their `Filter All` source metadata, row tint, and source badges instead of degrading into plain user keywords.
-- **Nanah pairing codes use the human-safe alphabet** `ABCDEFGHJKMNPQRSTUVWXYZ23456789`, matching the upstream Nanah runtime and avoiding ambiguous `I/L/O/0/1` entry drift.
-- **Next release notes are staged in `data/release_notes.json`** rather than date-stamped docs, so the dashboard What's New feed remains the release-facing source.
 
 ## Nanah Device Trust & Sync
 

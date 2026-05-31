@@ -116,20 +116,21 @@ FILTERTUBE_MOBILE_ARTIFACTS_DIR=/Users/devanshvarshney/FilterTubeApp/release-art
 The script will:
 
 - build extension ZIPs
-- stage the newest matching Android phone/tablet versionCode into `dist/mobile/`
+- stage the newest matching Android phone/tablet version and versionCode into `dist/mobile/`
 - generate `.sha256` checksums
 - ask whether to publish a GitHub release
 - attach extension ZIPs, Android artifacts, and checksum files when publishing
 
 Use `--all-mobile-artifacts` only for a special diagnostic release that intentionally needs multiple Android version codes attached.
 
-Accepted Android artifact names:
+Current v3.3.2 Android artifact pair from `/Users/devanshvarshney/FilterTubeApp/release-artifacts/android-mobile-tablet/`:
 
 ```text
-FilterTube-mobile-tablet-v3.3.2-code30312-release.apk
-FilterTube-mobile-tablet-v3.3.2-code30312-release.aab
 FilterTube-mobile-tablet-v3.3.2-code30312-debug.apk
+FilterTube-mobile-tablet-v3.3.2-code30312-release.aab
 ```
+
+The release script filters by the current package version and then selects the highest `codeNNNN` artifacts, so older `code30310`/`code30311` files in the app artifact directory are not attached to the v3.3.2 release. There is no signed release APK in the current app artifact directory; if the debug APK is attached, it must be described as QA-only/direct-device validation.
 
 If the release is extension-only, do not provide `FILTERTUBE_MOBILE_ARTIFACTS_DIR` and decline the mobile artifact prompt.
 

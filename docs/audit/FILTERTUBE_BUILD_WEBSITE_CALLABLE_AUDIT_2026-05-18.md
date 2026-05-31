@@ -18,16 +18,16 @@ surfaces even when they do not contain callables.
 
 | Family | Files | Lexical callables | Public authority |
 | --- | ---: | ---: | --- |
-| Build and sync scripts | 4 | 31 | Extension ZIPs, generated UI shell, vendor Nanah/QR bundles, native app runtime sync, GitHub release body/assets |
+| Build and sync scripts | 4 | 34 | Extension ZIPs, generated UI shell, vendor Nanah/QR bundles, native app runtime sync, GitHub release body/assets |
 | Website app routes | 9 | 19 | Public metadata, downloads page, privacy/terms policy, sitemap, robots, platform detail pages |
 | Website components | 13 | 32 | Public platform copy, browser links, footer/header/navigation, theme/scene runtime, animation/reveal behavior |
-| Total | 26 | 82 | Public release and website truth boundary |
+| Total | 26 | 85 | Public release and website truth boundary |
 
 ## Accounted Files
 
 | File | Count | Important callable / surface |
 | --- | ---: | --- |
-| `build.js` | 25 | `main`, `maybeCollectMobileArtifacts`, `buildReleaseBody`, `createGitHubRelease`, `uploadReleaseAsset`, `updateReadmeBadges` |
+| `build.js` | 28 | `main`, `maybeCollectMobileArtifacts`, `resolveDefaultMobileArtifactsDir`, `parseMobileArtifactName`, `summarizeMobileArtifacts`, `buildReleaseBody`, `createGitHubRelease`, `uploadReleaseAsset`, `updateReadmeBadges` |
 | `scripts/build-extension-ui.mjs` | 2 | `ensureOutputDirectories`, `bundleAll` |
 | `scripts/build-nanah-vendor.mjs` | 4 | `buildQrcodeBundle`, `buildNanahBundle`, `main` |
 | `scripts/sync-native-runtime.mjs` | 0 | top-level native repo sync authority |
@@ -58,12 +58,12 @@ surfaces even when they do not contain callables.
 
 | Surface | Current authority | Proof | Risk |
 | --- | --- | --- | --- |
-| Extension package contents | `build.js` copies `js`, `css`, `html`, `icons`, `data`, and `assets`, then writes browser-specific `manifest.json` and zips each target. | `build.js:30`, `106`, `120`, `131`, `145`, `181` | Release ZIP content is broad; quarantined or generated files must stay classified before packaging. |
-| Generated UI shell freshness | Normal `build.js` invokes `node scripts/build-extension-ui.mjs`; that script writes `js/ui-shell/popup-shell.js` and `js/ui-shell/tab-view-decor.js`. | `build.js:80`, `scripts/build-extension-ui.mjs:8`, `23`, `28` | Generated shell files should not be hand-audited as source truth unless freshness is proven. |
-| README mutation during build | `build.js` always calls `updateReadmeBadges(VERSION)`, then rewrites `README.md`. | `build.js:84`, `602`, `636`, `657` | A normal package build mutates public docs, so release automation can create unrelated dirty changes or publish badge-only drift. |
-| Mobile artifact staging | Android artifacts are opt-in via CLI/env/prompt, filtered by filename, copied to `dist/mobile`, and checksummed. | `build.js:34`, `55`, `214`, `237`, `255`, `262`, `265` | Good checksum baseline, but no release manifest proves signing fingerprint, Play/internal state, or website CTA readiness. |
-| GitHub release creation | The script creates a non-draft, non-prerelease GitHub release before uploading assets. | `build.js:327`, `340`, `482`, `487`, `507` | If asset upload fails after release creation, users can see a public release missing ZIP/APK/checksum assets. |
-| Non-interactive release path | Non-TTY builds skip release publishing instead of offering dry-run/CI publish semantics. | `build.js:292` | CI cannot currently be the release authority without another wrapper. |
+| Extension package contents | `build.js` copies `js`, `css`, `html`, `icons`, `data`, and `assets`, then writes browser-specific `manifest.json` and zips each target. | `build.js:30`, `108`, `122`, `133`, `147`, `183` | Release ZIP content is broad; quarantined or generated files must stay classified before packaging. |
+| Generated UI shell freshness | Normal `build.js` invokes `node scripts/build-extension-ui.mjs`; that script writes `js/ui-shell/popup-shell.js` and `js/ui-shell/tab-view-decor.js`. | `build.js:82`, `scripts/build-extension-ui.mjs:8`, `23`, `28` | Generated shell files should not be hand-audited as source truth unless freshness is proven. |
+| README mutation during build | `build.js` always calls `updateReadmeBadges(VERSION)`, then rewrites `README.md`. | `build.js:86`, `644`, `678`, `699` | A normal package build mutates public docs, so release automation can create unrelated dirty changes or publish badge-only drift. |
+| Mobile artifact staging | Android artifacts are opt-in via CLI/env/prompt, filtered by filename and current package version, copied to `dist/mobile`, and checksummed. | `build.js:34`, `56`, `216`, `239`, `257`, `264`, `267`, `283`, `292`, `303` | Good checksum baseline and safer version selection, but no release manifest proves signing fingerprint, Play/internal state, or website CTA readiness. |
+| GitHub release creation | The script creates a non-draft, non-prerelease GitHub release before uploading assets. | `build.js:365`, `378`, `524`, `529`, `549` | If asset upload fails after release creation, users can see a public release missing ZIP/APK/checksum assets. |
+| Non-interactive release path | Non-TTY builds skip release publishing instead of offering dry-run/CI publish semantics. | `build.js:330` | CI cannot currently be the release authority without another wrapper. |
 | Vendor Nanah bundle | `scripts/build-nanah-vendor.mjs` resolves `../nanah` and exposes merged Core/Client on `window.FilterTubeNanah`. | `scripts/build-nanah-vendor.mjs:9`, `30`, `33`, `38`, `50` | The public repo does not prove the committed vendor bundle matches the intended Nanah source revision. |
 | Native app runtime sync | `scripts/sync-native-runtime.mjs` delegates to a sibling/private app repo script via `FILTERTUBE_APP_REPO` or `../FilterTubeApp`. | `scripts/sync-native-runtime.mjs:6`, `9`, `21` | Native apps can ship stale extension runtime if this sync is not run and hash-verified before app release. |
 | Website analytics | `RootLayout` imports and renders Vercel Analytics on the website only. | `website/app/layout.js:7`, `125`; `website/app/privacy/page.js:667` | Privacy copy must keep saying website-only; extension/app manifests must not imply analytics runtime. |
@@ -208,7 +208,7 @@ tests/runtime/build-website-callable-current-behavior.test.mjs
 They pin:
 
 - 26 accounted build/website files.
-- 82 lexical build/website callables.
+- 85 lexical build/website callables.
 - public surfaces for release scripts, vendor/native sync, website app routes,
   website components, and public claim data.
 - high-risk source patterns for README mutation, non-atomic GitHub release,
@@ -220,7 +220,7 @@ They pin:
 
 `docs/audit/FILTERTUBE_BUILD_SCRIPT_METHOD_SEMANTIC_REGISTER_2026-05-27.md`
 extends this broad build/website callable audit for `build.js` specifically.
-It pins 25 lexical callable rows across 9 semantic method groups: package copy,
+It pins 28 lexical callable rows across 9 semantic method groups: package copy,
 build orchestration, manifest rewrite, ZIP artifact creation, mobile artifact
 staging, release body generation, release publication, interactive prompts, and
 README badge mutation.
