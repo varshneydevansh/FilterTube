@@ -20,6 +20,7 @@ export const LANES = Object.freeze({
       'tests/runtime/public-release-claim-boundary-current-behavior.test.mjs',
       'tests/runtime/p0-release-package-current-behavior.test.mjs',
       'tests/runtime/release-build-artifact-claim-boundary-current-behavior.test.mjs',
+      'tests/runtime/release-live-youtube-spa-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/release-live-youtube-spa-smoke-boundary-current-behavior.test.mjs',
       'tests/runtime/release-notes-json-version-gate-boundary-current-behavior.test.mjs',
       'tests/runtime/release-package-parity-current-behavior.test.mjs',
@@ -168,6 +169,7 @@ export const LANES = Object.freeze({
       'tests/runtime/quick-block-block-menu-affordance-boundary-current-behavior.test.mjs',
       'tests/runtime/empty-install-performance-current-behavior.test.mjs',
       'tests/runtime/public-release-surface-current-behavior.test.mjs',
+      'tests/runtime/release-live-youtube-spa-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/release-live-youtube-spa-smoke-boundary-current-behavior.test.mjs',
       'tests/runtime/audit-runtime-backlog-current-behavior.test.mjs',
       'tests/runtime/test-lane-matrix-current-behavior.test.mjs'
@@ -249,6 +251,11 @@ export const FILE_LANE_RULES = Object.freeze([
   {
     id: 'lane-workflow-surface',
     patterns: [/^scripts\/(?:run-test-lane|audit-proof-drift)\.mjs$/, /^docs\/audit\/TEST_LANE_MATRIX\.md$/],
+    lanes: ['release', 'smoke']
+  },
+  {
+    id: 'live-smoke-artifact-surface',
+    patterns: [/^docs\/audit\/artifacts\/release-live-youtube-spa-smoke\/.*\.(?:json|mjs)$/],
     lanes: ['release', 'smoke']
   },
   {

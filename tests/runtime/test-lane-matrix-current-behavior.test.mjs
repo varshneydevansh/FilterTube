@@ -69,6 +69,7 @@ test('test lane matrix defines every required lane and npm script', () => {
   assert.match(matrix, /docs\/audit\/FILTERTUBE_RELEASE_LIVE_YOUTUBE_SPA_SMOKE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-25\.md/);
   assert.match(matrix, /docs\/audit\/artifacts\/release-live-youtube-spa-smoke\/template\.json/);
   assert.match(matrix, /docs\/audit\/artifacts\/release-live-youtube-spa-smoke\/run-live-smoke\.mjs/);
+  assert.match(matrix, /docs\/audit\/artifacts\/release-live-youtube-spa-smoke\/verify-live-smoke-artifact\.mjs/);
   assert.match(driftScript, /args\.has\('--lane-owned'\) && args\.has\('--all'\)/);
 
   for (const term of resumedGoalTerms) {
@@ -87,7 +88,8 @@ test('test lane matrix maps high-risk source files to expected lanes', () => {
     ['js/content_bridge.js', ['test:menu', 'test:settings']],
     ['js/background.js', ['test:settings', 'test:blocking']],
     ['manifest*.json', ['test:release']],
-    ['README.md', ['test:release', 'test:smoke']]
+    ['README.md', ['test:release', 'test:smoke']],
+    ['docs/audit/artifacts/release-live-youtube-spa-smoke/*.{json,mjs}', ['test:release', 'test:smoke']]
   ];
 
   for (const [file, lanes] of requiredMappings) {
@@ -121,6 +123,11 @@ test('executable classifier maps high-risk paths to required lanes', () => {
   const packageSurface = classifyPaths(['package.json', 'website/components/footer-signal-art.js']);
   assert.deepEqual(packageSurface.lanes, ['release', 'smoke']);
   assert.deepEqual(packageSurface.unmatched, []);
+
+  const liveSmokeArtifact = classifyPaths(['docs/audit/artifacts/release-live-youtube-spa-smoke/verify-live-smoke-artifact.mjs']);
+  assert.deepEqual(liveSmokeArtifact.lanes, ['release', 'smoke']);
+  assert.deepEqual(liveSmokeArtifact.unmatched, []);
+  assert.equal(liveSmokeArtifact.classifications[0].matched[0].id, 'live-smoke-artifact-surface');
 });
 
 test('executable classifier inherits lanes from lane-owned tests and rejects unknown paths', () => {
@@ -194,6 +201,8 @@ test('manual YouTube smoke handoff covers visible release-critical behavior', ()
     'JSON-first and DOM fallback',
     'settings/profile/storage',
     'release packaging',
+    'verify-live-smoke-artifact.mjs',
+    'installedByteParity.verdict=GO',
     'That test does not claim the manual smoke has passed'
   ];
   const requiredRows = [

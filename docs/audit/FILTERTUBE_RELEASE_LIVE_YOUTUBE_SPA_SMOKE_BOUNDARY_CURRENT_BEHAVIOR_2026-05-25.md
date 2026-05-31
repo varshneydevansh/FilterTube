@@ -20,6 +20,7 @@ full runtime audit suite status: pass in local node runtime
 live YouTube SPA smoke status: missing
 live smoke evidence template: docs/audit/artifacts/release-live-youtube-spa-smoke/template.json
 live smoke runner contract rows: 11
+live smoke artifact verifier status: defined
 runner/template source anchors covered: 52
 executed live smoke result artifacts committed: 0
 release readiness from this slice: NO-GO until live smoke is recorded
@@ -101,6 +102,18 @@ template accepted as release proof now: NO-GO
 installed Chrome CDP preflight status: unavailable on 2026-05-31
 runtime behavior changed: no
 ```
+
+The verifier at
+`docs/audit/artifacts/release-live-youtube-spa-smoke/verify-live-smoke-artifact.mjs`
+defines the acceptance gate for future dated artifacts:
+
+```bash
+node docs/audit/artifacts/release-live-youtube-spa-smoke/verify-live-smoke-artifact.mjs docs/audit/artifacts/release-live-youtube-spa-smoke/<artifact>.json
+```
+
+A dated artifact is not release-ready until this verifier returns zero errors.
+The verifier rejects the template, failed/missing route rows, console issues,
+blank recording fields, stale row order, and missing installed byte parity.
 
 | Row | Source anchors | Contract meaning | Current release status |
 | --- | --- | --- | --- |

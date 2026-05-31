@@ -102,6 +102,8 @@ The release smoke contract is pinned here:
 docs/audit/FILTERTUBE_RELEASE_LIVE_YOUTUBE_SPA_SMOKE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-25.md
 docs/audit/artifacts/release-live-youtube-spa-smoke/template.json
 docs/audit/artifacts/release-live-youtube-spa-smoke/run-live-smoke.mjs
+docs/audit/artifacts/release-live-youtube-spa-smoke/verify-live-smoke-artifact.mjs
+tests/runtime/release-live-youtube-spa-smoke-artifact-verifier-current-behavior.test.mjs
 ```
 
 Required live SPA rows:
@@ -134,6 +136,17 @@ The `test:release` and `test:smoke` lanes keep this handoff visible by running
 That test does not claim the manual smoke has passed; it prevents the template,
 runner, and missing-live-proof boundary from silently disappearing.
 
+When a dated live-smoke artifact is produced, verify it before using it as
+release evidence:
+
+```bash
+node docs/audit/artifacts/release-live-youtube-spa-smoke/verify-live-smoke-artifact.mjs docs/audit/artifacts/release-live-youtube-spa-smoke/<artifact>.json
+```
+
+The verifier requires every live SPA row to pass, a clean console summary, all
+recording fields, and `installedByteParity.verdict=GO`. The template and any
+artifact with missing byte parity remain `NO-GO`.
+
 ## File-To-Lane Matrix
 
 | Touched area | Required lane(s) | Notes |
@@ -152,6 +165,7 @@ runner, and missing-live-proof boundary from silently disappearing.
 | `js/shared/identity.js`, `js/content/dom_extractors.js`, `js/content/handle_resolver.js` | `test:blocking`, `test:menu`, `test:whitelist` | Covers identity confidence, collaborators, menu labels, channel matching, and stale identity risk. |
 | `manifest*.json`, `build.js`, `scripts/build-*.mjs` | `test:release` | Covers package content, manifests, generated UI shell, release claims, and artifact behavior. |
 | `README.md`, `CHANGELOG.md`, `data/release_notes.json` | `test:release`, `test:smoke` | Covers public release claims, packaged release notes, and changelog/version drift. |
+| `docs/audit/artifacts/release-live-youtube-spa-smoke/*.{json,mjs}` | `test:release`, `test:smoke` | Covers live-smoke templates, runners, verifiers, and future dated smoke artifacts. |
 | `html/*.html`, `css/*.css`, `js/ui-shell/*.js`, `src/extension-shell/*.jsx` | `test:release`, affected UI/runtime lane | Add manual dashboard/popup smoke when the extension UI changes. |
 | YouTube surface fixtures under `tests/runtime/fixtures/` | Lane that owns the fixture plus `test:smoke` if release-relevant | Fixture changes must state which behavior changed and whether old behavior remains intentional. |
 

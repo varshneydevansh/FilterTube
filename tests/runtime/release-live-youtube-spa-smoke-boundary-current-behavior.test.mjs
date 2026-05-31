@@ -8,8 +8,10 @@ const repoRoot = process.cwd();
 const boundaryDocPath = 'docs/audit/FILTERTUBE_RELEASE_LIVE_YOUTUBE_SPA_SMOKE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-25.md';
 const templatePath = 'docs/audit/artifacts/release-live-youtube-spa-smoke/template.json';
 const runnerPath = 'docs/audit/artifacts/release-live-youtube-spa-smoke/run-live-smoke.mjs';
+const verifierPath = 'docs/audit/artifacts/release-live-youtube-spa-smoke/verify-live-smoke-artifact.mjs';
 const matrixPath = 'docs/audit/TEST_LANE_MATRIX.md';
 const liveSmokeTestPath = 'tests/runtime/release-live-youtube-spa-smoke-boundary-current-behavior.test.mjs';
+const verifierTestPath = 'tests/runtime/release-live-youtube-spa-smoke-artifact-verifier-current-behavior.test.mjs';
 
 const requiredRows = [
   'FT-LIVE-SPA-00-home-to-search',
@@ -33,14 +35,19 @@ test('release and smoke lanes keep the live YouTube SPA smoke boundary visible',
 
   assert.ok(LANES.release.tests.includes(liveSmokeTestPath));
   assert.ok(LANES.smoke.tests.includes(liveSmokeTestPath));
+  assert.ok(LANES.release.tests.includes(verifierTestPath));
+  assert.ok(LANES.smoke.tests.includes(verifierTestPath));
 
   assert.ok(matrix.includes(boundaryDocPath));
   assert.ok(matrix.includes(templatePath));
   assert.ok(matrix.includes(runnerPath));
+  assert.ok(matrix.includes(verifierPath));
   assert.ok(matrix.includes(liveSmokeTestPath));
+  assert.ok(matrix.includes(verifierTestPath));
   assert.match(matrix, /Manual YouTube Smoke Handoff/);
   assert.match(matrix, /Automated lanes prove source and fixture contracts/);
   assert.match(matrix, /That test does not claim the manual smoke has passed/);
+  assert.match(matrix, /installedByteParity\.verdict=GO/);
 });
 
 test('manual smoke handoff covers the release-critical visible behavior set', () => {
@@ -75,6 +82,8 @@ test('live smoke boundary remains explicit that current release smoke is missing
   assert.match(doc, /release readiness from this slice: NO-GO until live smoke is recorded/);
   assert.match(doc, /runner output accepted as release proof now: NO-GO/);
   assert.match(doc, /template accepted as release proof now: NO-GO/);
+  assert.match(doc, /live smoke artifact verifier status: defined/);
+  assert.match(doc, /A dated artifact is not release-ready until this verifier returns zero errors/);
   assert.match(doc, /live YouTube SPA smoke complete: NO/);
   assert.match(doc, /release package ready because runtime tests pass: NO/);
   assert.match(doc, /public performance claim ready: NO/);
@@ -120,5 +129,8 @@ test('live smoke runner contract writes a dated artifact but no executed artifac
   assert.match(runner, /releaseReadiness: smokeSliceReadiness === 'GO-FOR-THIS-SMOKE-SLICE' && installedByteParity\.verdict === 'GO' \?/);
   assert.match(runner, /const artifactPath = path\.join\(artifactRoot, `\$\{runId\}\.json`\)/);
   assert.match(runner, /fs\.writeFileSync\(artifactPath, `\$\{JSON\.stringify\(artifact, null, 2\)\}\\n`\)/);
+  assert.match(read(verifierPath), /export function validateLiveSmokeArtifact/);
+  assert.match(read(verifierPath), /releaseReadiness must be GO-FOR-RELEASE-SMOKE/);
+  assert.match(read(verifierPath), /installedByteParity\.verdict must be GO/);
   assert.deepEqual(executedArtifacts, []);
 });
