@@ -130,6 +130,7 @@ test('test lane matrix maps high-risk source files to expected lanes', () => {
     { files: ['js/popup.js', 'js/tab-view.js', 'js/render_engine.js', 'js/ui_components.js'], lanes: ['test:release', 'test:whitelist', 'test:blocking', 'test:menu', 'test:settings', 'test:smoke'] },
     { files: ['js/nanah_sync_adapter.js', 'js/security_manager.js'], lanes: ['test:release', 'test:settings', 'test:smoke'] },
     { files: ['js/layout.js'], lanes: ['test:release', 'test:dom', 'test:smoke'] },
+    { files: ['js/shared/identity.js', 'js/content/dom_extractors.js', 'js/content/handle_resolver.js'], lanes: ['test:whitelist', 'test:blocking', 'test:menu'] },
     { files: ['js/vendor/*.bundle.js'], lanes: ['test:release', 'test:settings', 'test:smoke'] },
     { files: ['manifest*.json'], lanes: ['test:release'] },
     { files: ['README.md', 'CHANGELOG.md', 'data/release_notes.json'], lanes: ['test:release', 'test:smoke'] },
