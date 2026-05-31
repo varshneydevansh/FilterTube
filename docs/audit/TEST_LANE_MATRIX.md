@@ -120,7 +120,7 @@ the surface connected to a focused lane.
 | blocklist behavior | `test:blocking` keeps `filter-engine-current-behavior` and `main-profile-blocklist-keyword-alias-current-behavior` in lane. |
 | whitelist behavior | `test:whitelist` keeps `json-first-whitelist-decision-identity-boundary` and `content-bridge-whitelist-pending-refresh-boundary` in lane. |
 | keyword/channel blocking | `test:blocking` keeps `json-first-keyword-match-boundary` and `json-first-channel-match-boundary` in lane. |
-| Shorts behavior | `test:whitelist` keeps `main-watch-initial-lockup-shorts-json-current-behavior` in lane for watch/Shorts allow-mode proof. |
+| Shorts behavior | `test:whitelist` keeps `main-watch-initial-lockup-shorts-json-current-behavior`, `main-watch-initial-shorts-owner-absent-boundary-current-behavior`, `json-first-hide-all-shorts-boundary-current-behavior`, and `shorts-dom-cleanup-boundary-current-behavior` in lane for watch/Shorts allow-mode, owner-absent, Hide Shorts, and DOM cleanup proof. |
 | end screens | `test:whitelist` keeps end-screen videowall, card, autoplay, and player DOM cleanup tests in lane. |
 | quick-block and 3-dot menus | `test:menu` keeps `quick-block-block-menu-affordance-boundary`, `native-dropdown-close-state`, and `content-bridge-collaborator-identity-promotion-handoff` in lane. |
 | JSON-first filtering | `test:json` keeps seed/network, readiness, snapshot, list-mode, and response-mutation tests in lane. |
@@ -129,6 +129,18 @@ the surface connected to a focused lane.
 | SPA navigation | `test:performance` keeps whitelist-cache SPA metric and route-surface no-work tests in lane; live SPA rows remain in manual smoke. |
 | settings | `test:settings` keeps settings-mode, refresh fanout, compiled-cache, import/export, and state-manager tests in lane. |
 | release packaging | `test:release` keeps package parity, public release surface, live-smoke boundary, and artifact claim tests in lane. |
+
+## User-Reported Regression Anchors
+
+These anchors keep known release-critical user reports tied to proof lanes
+without claiming that automated fixtures replace manual YouTube validation.
+
+| Report anchor | Required automated proof | Manual proof boundary |
+|---|---|---|
+| Issue #55: whitelist leaks after SPA/cache reuse | `test:whitelist` owns `json-first-whitelist-decision-identity-boundary`, `content-bridge-whitelist-pending-refresh-boundary`, `right-rail-whitelist-observer`, and `whitelist-cache-spa-metric-packet-gate`. | Repeat Home/Search/Watch/right-rail SPA navigation in whitelist-only mode and confirm non-whitelisted cards do not reappear. |
+| Issue #56: Shorts hidden on whitelisted channels while Hide Shorts is disabled | `test:whitelist` owns watch-initial Shorts, owner-absent Shorts, JSON `hideAllShorts`, and Shorts DOM cleanup fixtures. | Visit a whitelisted channel Shorts tab with Hide Shorts disabled and confirm Shorts render instead of a permanent spinner. |
+| Issue #57: end-screen videowall/cards/autoplay panel leak in whitelist mode | `test:whitelist` owns `json-first-hide-endscreen-videowall`, `json-first-hide-endscreen-cards`, `json-first-disable-autoplay-annotations`, and `player-endscreen-dom-cleanup` fixtures. | Let a whitelisted video end and confirm the configured end-screen and autoplay controls match settings. |
+| Issue #59: public `data-filtertube-*` DOM fingerprint risk | `test:dom` owns `dom-state-virtual-attributes-current-behavior`; `test:json` and `test:dom` own stale marker cleanup boundaries. | Inspect live rendered cards for necessary visible markers only and verify recycled nodes do not keep stale identifiers. |
 
 ## Manual YouTube Smoke Handoff
 

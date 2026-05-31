@@ -471,6 +471,9 @@ test('whitelist lane explicitly owns end-screen boundary proof', () => {
   const matrix = read(matrixPath);
 
   assert.match(whitelist, /main-watch-initial-lockup-shorts-json-current-behavior/);
+  assert.match(whitelist, /main-watch-initial-shorts-owner-absent-boundary-current-behavior/);
+  assert.match(whitelist, /json-first-hide-all-shorts-boundary-current-behavior/);
+  assert.match(whitelist, /shorts-dom-cleanup-boundary-current-behavior/);
   assert.match(whitelist, /main-watch-autoplay-video-endpoint-current-behavior/);
   assert.match(whitelist, /json-first-hide-endscreen-videowall-boundary-current-behavior/);
   assert.match(whitelist, /json-first-hide-endscreen-cards-boundary-current-behavior/);
@@ -501,7 +504,12 @@ test('goal safety surfaces stay bound to focused lane proof tests', () => {
     {
       surface: 'Shorts behavior',
       lane: 'whitelist',
-      tests: [/main-watch-initial-lockup-shorts-json-current-behavior/]
+      tests: [
+        /main-watch-initial-lockup-shorts-json-current-behavior/,
+        /main-watch-initial-shorts-owner-absent-boundary-current-behavior/,
+        /json-first-hide-all-shorts-boundary-current-behavior/,
+        /shorts-dom-cleanup-boundary-current-behavior/
+      ]
     },
     {
       surface: 'end screens',
@@ -562,6 +570,56 @@ test('goal safety surfaces stay bound to focused lane proof tests', () => {
       );
     }
   }
+});
+
+test('user-reported regression anchors stay bound to proof lanes', () => {
+  const matrix = read(matrixPath);
+
+  const issue55 = [
+    'Issue #55: whitelist leaks after SPA/cache reuse',
+    'json-first-whitelist-decision-identity-boundary',
+    'content-bridge-whitelist-pending-refresh-boundary',
+    'right-rail-whitelist-observer',
+    'whitelist-cache-spa-metric-packet-gate'
+  ];
+  const issue56 = [
+    'Issue #56: Shorts hidden on whitelisted channels while Hide Shorts is disabled',
+    'main-watch-initial-lockup-shorts-json-current-behavior',
+    'main-watch-initial-shorts-owner-absent-boundary-current-behavior',
+    'json-first-hide-all-shorts-boundary-current-behavior',
+    'shorts-dom-cleanup-boundary-current-behavior'
+  ];
+  const issue57 = [
+    'Issue #57: end-screen videowall/cards/autoplay panel leak in whitelist mode',
+    'json-first-hide-endscreen-videowall',
+    'json-first-hide-endscreen-cards',
+    'json-first-disable-autoplay-annotations',
+    'player-endscreen-dom-cleanup'
+  ];
+  const issue59 = [
+    'Issue #59: public `data-filtertube-*` DOM fingerprint risk',
+    'dom-state-virtual-attributes-current-behavior',
+    'stale marker cleanup'
+  ];
+
+  assert.match(matrix, /User-Reported Regression Anchors/);
+
+  for (const term of [...issue55, ...issue56, ...issue57, ...issue59]) {
+    assert.ok(matrix.includes(term), `regression anchor missing ${term}`);
+  }
+
+  assert.ok(
+    LANES.whitelist.tests.some(testPath => /main-watch-initial-shorts-owner-absent-boundary/.test(testPath)),
+    'issue #56 owner-absent Shorts proof must stay in whitelist lane'
+  );
+  assert.ok(
+    LANES.whitelist.tests.some(testPath => /json-first-hide-all-shorts-boundary/.test(testPath)),
+    'issue #56 Hide Shorts proof must stay in whitelist lane'
+  );
+  assert.ok(
+    LANES.dom.tests.some(testPath => /dom-state-virtual-attributes/.test(testPath)),
+    'issue #59 DOM fingerprint proof must stay in DOM lane'
+  );
 });
 
 test('menu lane owns collaborator identity promotion handoff proof', () => {
