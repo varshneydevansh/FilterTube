@@ -17,7 +17,7 @@ const sourceFingerprints = {
   'js/content/dom_fallback.js': [4838, 228332, '2129fcc16f8ad1420a6cb44905ddcd0b68d5511f3b647e2db100c0d67d492aef'],
   'js/content/handle_resolver.js': [282, 9785, '67cc877a0a97e4c4c5aaf5a0d1c37c15000af5238f8f37d7c5dc6efee27e34ff'],
   'js/content_bridge.js': [13571, 601694, '1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3'],
-  'js/filter_logic.js': [3498, 165151, '4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641'],
+  'js/filter_logic.js': [3652, 172174, '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5'],
   'js/injector.js': [3593, 155830, '634041581ec84db2edd4f07d46f4bfb9d3a7d97036a0fb83db7739856bdc3e04'],
   'js/io_manager.js': [2030, 96914, 'd04bfd75d061ee405c1dfa4cab8c9d0fa6a2f072d046add33e4b6782b1f58a21'],
   'js/layout.js': [680, 30604, '48831ccdc2d62c75818d9c6a153d7bfacec9d7be9f2408485f74b1a7c13c57c7'],
@@ -95,8 +95,8 @@ const expectedDiagnosticSourceFlowRows = {
   ],
   diagnostic_flow_filter_logic_engine: [
     '`js/filter_logic.js:19-44`',
-    '`js/filter_logic.js:1557-1586`',
-    '`js/filter_logic.js:3434-3496`'
+    '`js/filter_logic.js:1566-1595`',
+    '`js/filter_logic.js:3588-3650`'
   ],
   diagnostic_flow_bridge_request_response: [
     '`js/content_bridge.js:5424-5524`',
@@ -382,7 +382,7 @@ function assertProductionConsoleGateLoadOrderAddendum(doc) {
     for (const entry of manifest.content_scripts || []) {
       if (!entry.js?.includes('js/content/dom_fallback.js')) continue;
       const domIndex = entry.js.indexOf('js/content/dom_fallback.js');
-      assert.equal(domIndex, 4, `${manifestFile} dom_fallback isolated order drifted`);
+      assert.equal(domIndex, 5, `${manifestFile} dom_fallback isolated order drifted`);
       assert.ok(entry.js.indexOf('js/content/block_channel.js') > domIndex);
       assert.ok(entry.js.indexOf('js/content/bridge_settings.js') > domIndex);
       assert.ok(entry.js.indexOf('js/content/handle_resolver.js') > domIndex);
@@ -399,7 +399,7 @@ function assertProductionConsoleGateLoadOrderAddendum(doc) {
   assert.deepEqual(routineConsoleSites('js/seed.js'), [11, 33, 153]);
   assert.match(read('js/seed.js'), /if \(filterTubeSeedDebugEnabled\) \{\s*console\.log\('FilterTube: seed\.js initializing \(MAIN world\)'\);/s);
   assert.match(read('js/seed.js'), /function seedDebugLog\(message, \.\.\.args\) \{\s*if \(!isSeedDebugEnabled\(\)\) return;/s);
-  assert.deepEqual(routineConsoleSites('js/filter_logic.js'), [11, 1566, 1581]);
+  assert.deepEqual(routineConsoleSites('js/filter_logic.js'), [11, 1575, 1590]);
   assert.match(read('js/filter_logic.js'), /if \(level === 'log' && !window\.__filtertubeDebug\) \{\s*return;/s);
   assert.match(read('js/filter_logic.js'), /if \(enabled\) \{\s*console\.log\(`FilterTube \(Filter\):`, message, \.\.\.args\);/s);
   assert.deepEqual(routineConsoleSites('js/injector.js'), [97]);
