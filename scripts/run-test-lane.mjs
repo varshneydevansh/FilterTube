@@ -227,7 +227,7 @@ export const FILE_LANE_RULES = Object.freeze([
   {
     id: 'quick-block-menu-runtime',
     patterns: [/^js\/content\/block_channel\.js$/],
-    lanes: ['menu', 'performance']
+    lanes: ['menu', 'blocking', 'performance']
   },
   {
     id: 'content-menu-runtime',

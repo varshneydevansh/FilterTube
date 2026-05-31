@@ -196,7 +196,7 @@ artifact with missing byte parity remain `NO-GO`.
 | `js/injector.js` | `test:json`, `test:whitelist`, `test:performance` | Covers main-world JSON lookup, settings application, pending queues, and whitelist JSON work. |
 | `js/filter_logic.js` | `test:json`, `test:blocking`, affected content lane | Add `test:whitelist` when allow-list behavior changes and `test:performance` when active-work gates change. |
 | `js/content/dom_fallback.js` | `test:dom`, `test:blocking`, `test:performance` | Covers DOM hides/restores, route cleanup, no-rule work, and false-hide/leak risk. |
-| `js/content/block_channel.js` | `test:menu`, `test:performance` | Covers native 3-dot menus, quick-block affordances, outside-click close, and menu observer/timer budgets. |
+| `js/content/block_channel.js` | `test:menu`, `test:blocking`, `test:performance` | Covers native 3-dot menus, quick-block affordances, quick-block/Kids native block mutations, outside-click close, and menu observer/timer budgets. |
 | `js/content/menu.js` | `test:menu` | Covers injected menu styles/classes and menu item surface behavior. |
 | `js/content/bridge_injection.js` | `test:release`, `test:json`, `test:performance`, `test:settings` | Covers content-script load/injection order, main-world script injection, settings bootstrap, and startup/no-work risk. |
 | `js/content/collab_dialog.js` | `test:whitelist`, `test:blocking`, `test:menu`, `test:performance` | Covers collaborator identity collection, dialog/menu propagation, block/allow decisions, and observer/listener budgets. |

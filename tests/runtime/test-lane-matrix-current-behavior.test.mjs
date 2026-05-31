@@ -118,7 +118,7 @@ test('test lane matrix maps high-risk source files to expected lanes', () => {
     { files: ['js/seed.js'], lanes: ['test:json', 'test:performance'] },
     { files: ['js/injector.js'], lanes: ['test:json', 'test:whitelist', 'test:performance'] },
     { files: ['js/content/dom_fallback.js'], lanes: ['test:dom', 'test:blocking', 'test:performance'] },
-    { files: ['js/content/block_channel.js'], lanes: ['test:menu', 'test:performance'] },
+    { files: ['js/content/block_channel.js'], lanes: ['test:menu', 'test:blocking', 'test:performance'] },
     { files: ['js/content/bridge_injection.js'], lanes: ['test:release', 'test:json', 'test:performance', 'test:settings'] },
     { files: ['js/content/collab_dialog.js'], lanes: ['test:whitelist', 'test:blocking', 'test:menu', 'test:performance'] },
     { files: ['js/content/dom_helpers.js', 'js/content/dom_state.js'], lanes: ['test:whitelist', 'test:blocking', 'test:dom', 'test:performance'] },
@@ -231,6 +231,7 @@ test('executable classifier maps high-risk paths to required lanes', () => {
   assert.equal(rootDoc.classifications[0].matched[0].id, 'root-product-doc-surface');
 
   assert.deepEqual(classifyPaths(['js/content/bridge_injection.js']).lanes, ['release', 'json', 'performance', 'settings']);
+  assert.deepEqual(classifyPaths(['js/content/block_channel.js']).lanes, ['blocking', 'menu', 'performance']);
   assert.deepEqual(classifyPaths(['js/content/collab_dialog.js']).lanes, ['whitelist', 'blocking', 'menu', 'performance']);
   assert.deepEqual(classifyPaths(['js/content/dom_state.js']).lanes, ['whitelist', 'blocking', 'dom', 'performance']);
   assert.deepEqual(classifyPaths(['js/content/first_run_prompt.js']).lanes, ['release', 'settings', 'smoke']);
