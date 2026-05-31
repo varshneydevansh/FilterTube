@@ -122,7 +122,7 @@ the surface connected to a focused lane.
 | keyword/channel blocking | `test:blocking` keeps `json-first-keyword-match-boundary` and `json-first-channel-match-boundary` in lane. |
 | Shorts behavior | `test:whitelist` keeps `main-watch-initial-lockup-shorts-json-current-behavior` in lane for watch/Shorts allow-mode proof. |
 | end screens | `test:whitelist` keeps end-screen videowall, card, autoplay, and player DOM cleanup tests in lane. |
-| quick-block and 3-dot menus | `test:menu` keeps `quick-block-block-menu-affordance-boundary` and `native-dropdown-close-state` in lane. |
+| quick-block and 3-dot menus | `test:menu` keeps `quick-block-block-menu-affordance-boundary`, `native-dropdown-close-state`, and `content-bridge-collaborator-identity-promotion-handoff` in lane. |
 | JSON-first filtering | `test:json` keeps seed/network, readiness, snapshot, list-mode, and response-mutation tests in lane. |
 | DOM fallback | `test:dom` keeps DOM fallback selector, run-state cleanup, virtual-attribute, and route cleanup tests in lane. |
 | no-rule performance | `test:performance` keeps empty-install, no-work, active-rule, and route-surface budget tests in lane. |
@@ -202,7 +202,7 @@ artifact with missing byte parity remain `NO-GO`.
 | `js/content/collab_dialog.js` | `test:whitelist`, `test:blocking`, `test:menu`, `test:performance` | Covers collaborator identity collection, dialog/menu propagation, block/allow decisions, and observer/listener budgets. |
 | `js/content/dom_helpers.js`, `js/content/dom_state.js` | `test:whitelist`, `test:blocking`, `test:dom`, `test:performance` | Covers hide/restore helpers, virtual DOM attributes, selector state, recycled-node cleanup, and no-rule DOM side effects. |
 | `js/content/first_run_prompt.js`, `js/content/release_notes_prompt.js` | `test:release`, `test:settings`, `test:smoke` | Covers manifest-loaded prompt UI, release-note payload handling, background message actions, and visible installed-extension handoff. |
-| `js/content_bridge.js` | `test:menu`, `test:settings`, affected runtime lane | Add `test:whitelist`, `test:dom`, `test:json`, or `test:performance` depending on touched branch. |
+| `js/content_bridge.js` | `test:menu`, `test:settings`, affected runtime lane | The menu lane owns collaborator identity promotion handoff proof, including the ampersand Topic guard; add `test:whitelist`, `test:dom`, `test:json`, or `test:performance` depending on touched branch. |
 | `js/content/bridge_settings.js` | `test:settings`, `test:json`, `test:performance` | Covers cross-context settings fanout, seed updates, dirty-key refresh, and force reprocess behavior. |
 | `js/background.js` | `test:settings`, `test:blocking`, affected runtime lane | Covers compiled settings, profile/list-mode mutation, block actions, cache invalidation, and message authority. |
 | `js/settings_shared.js` | `test:settings`, `test:blocking`, `test:whitelist` | Covers canonical settings shape, aliases, legacy migration, and list-mode compilation. |

@@ -470,7 +470,11 @@ test('goal safety surfaces stay bound to focused lane proof tests', () => {
     {
       surface: 'quick-block and 3-dot menus',
       lane: 'menu',
-      tests: [/quick-block-block-menu-affordance-boundary/, /native-dropdown-close-state/]
+      tests: [
+        /quick-block-block-menu-affordance-boundary/,
+        /native-dropdown-close-state/,
+        /content-bridge-collaborator-identity-promotion-handoff/
+      ]
     },
     {
       surface: 'JSON-first filtering',
@@ -517,6 +521,18 @@ test('goal safety surfaces stay bound to focused lane proof tests', () => {
       );
     }
   }
+});
+
+test('menu lane owns collaborator identity promotion handoff proof', () => {
+  const matrix = read(matrixPath);
+  const menu = LANES.menu.tests.join('\n');
+
+  assert.match(menu, /content-bridge-collaborator-identity-promotion-handoff-current-behavior/);
+  assert.match(menu, /quick-block-block-menu-affordance-boundary-current-behavior/);
+  assert.match(menu, /native-dropdown-close-state-current-behavior/);
+  assert.match(matrix, /content-bridge-collaborator-identity-promotion-handoff/);
+  assert.match(matrix, /ampersand Topic guard/);
+  assert.match(matrix, /collaborator identity promotion handoff proof/);
 });
 
 test('manual YouTube smoke handoff covers visible release-critical behavior', () => {

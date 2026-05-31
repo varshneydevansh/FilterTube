@@ -137,6 +137,7 @@ export const LANES = Object.freeze({
       'tests/runtime/content-bridge-menu-action-list-target-current-behavior.test.mjs',
       'tests/runtime/content-bridge-menu-blocked-state-list-shape-current-behavior.test.mjs',
       'tests/runtime/content-bridge-menu-injection-action-boundary-current-behavior.test.mjs',
+      'tests/runtime/content-bridge-collaborator-identity-promotion-handoff-current-behavior.test.mjs',
       'tests/runtime/collab-dialog-lifecycle-current-behavior.test.mjs',
       'tests/runtime/main-collab-resolved-search-card-dialog-current-behavior.test.mjs',
       'tests/runtime/ytm-show-sheet-collaborator-roster-current-behavior.test.mjs'

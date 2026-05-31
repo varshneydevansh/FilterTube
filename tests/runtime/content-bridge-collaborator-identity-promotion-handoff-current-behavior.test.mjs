@@ -954,6 +954,10 @@ test('collaborator identity promotion audit doc records runtime fixture behavior
   assert.match(text, /pure-read promotion policy/);
   assert.match(text, /cache-write reports/);
   assert.match(text, /first-class collaborator promotion gates/);
+  assert.match(text, /Change-Safety Lane Binding Addendum - 2026-06-01/);
+  assert.match(text, /menu lane collaborator identity promotion handoff proof: PRESENT/);
+  assert.match(text, /menu lane ampersand Topic guard proof: PRESENT/);
+  assert.match(text, /runtime behavior changed by lane binding: no/);
 
   const runtime = productRuntimeSource();
   const contentBridgeSource = read('js/content_bridge.js');

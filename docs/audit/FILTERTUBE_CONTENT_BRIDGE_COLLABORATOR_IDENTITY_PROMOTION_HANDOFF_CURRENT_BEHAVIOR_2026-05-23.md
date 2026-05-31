@@ -1062,3 +1062,19 @@ optimization, JSON-first behavior, menu action behavior, dialog lifecycle
 behavior, injector behavior, quick-block behavior, whitelist behavior, metric
 collectors, artifact creation, native sync, release package changes, or public
 claims.
+
+## Change-Safety Lane Binding Addendum - 2026-06-01
+
+The focused collaborator identity promotion proof is now a first-class
+`test:menu` lane member. This is a lane-binding change only: runtime behavior is
+unchanged, but future menu, quick-block, collaborator, and `content_bridge`
+changes that run `npm run test:menu` now execute the ampersand Topic regression
+fixtures in `tests/runtime/content-bridge-collaborator-identity-promotion-handoff-current-behavior.test.mjs`.
+
+Current lane-binding status:
+
+```text
+menu lane collaborator identity promotion handoff proof: PRESENT
+menu lane ampersand Topic guard proof: PRESENT
+runtime behavior changed by lane binding: no
+```
