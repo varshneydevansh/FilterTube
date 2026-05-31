@@ -194,7 +194,7 @@ artifact with missing byte parity remain `NO-GO`.
 |---|---|---|
 | `js/seed.js` | `test:json`, `test:performance` | Covers fetch/XHR interception, no-work gates, response clone/parse work, and JSON replay behavior. |
 | `js/injector.js` | `test:json`, `test:whitelist`, `test:performance` | Covers main-world JSON lookup, settings application, pending queues, and whitelist JSON work. |
-| `js/filter_logic.js` | `test:json`, `test:blocking`, affected content lane | Add `test:whitelist` when allow-list behavior changes and `test:performance` when active-work gates change. |
+| `js/filter_logic.js` | `test:json`, `test:blocking`, `test:whitelist`, `test:performance` | Covers core renderer decisions, list-mode fail-close/allow behavior, keyword/channel/comment blocking, Shorts/end-screen JSON behavior, content-filter predicates, and active-work/no-work boundaries. |
 | `js/content/dom_fallback.js` | `test:dom`, `test:blocking`, `test:performance` | Covers DOM hides/restores, route cleanup, no-rule work, and false-hide/leak risk. |
 | `js/content/block_channel.js` | `test:menu`, `test:blocking`, `test:performance` | Covers native 3-dot menus, quick-block affordances, quick-block/Kids native block mutations, outside-click close, and menu observer/timer budgets. |
 | `js/content/menu.js` | `test:menu` | Covers injected menu styles/classes and menu item surface behavior. |
