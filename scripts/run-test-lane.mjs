@@ -222,7 +222,7 @@ export const FILE_LANE_RULES = Object.freeze([
   {
     id: 'dom-fallback-runtime',
     patterns: [/^js\/content\/dom_fallback\.js$/],
-    lanes: ['dom', 'blocking', 'performance']
+    lanes: ['whitelist', 'dom', 'blocking', 'performance']
   },
   {
     id: 'quick-block-menu-runtime',
