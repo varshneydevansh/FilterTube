@@ -107,6 +107,27 @@ The current broad-suite backlog is pinned in
 `tests/runtime/audit-runtime-backlog-current-behavior.test.mjs` keeps that
 boundary visible in `test:smoke`.
 
+## Named Safety Surface Coverage
+
+These rows bind the explicit goal surfaces to lane-owned proof tests. They are
+not the only tests for each surface; they are the minimum sentinels that keep
+the surface connected to a focused lane.
+
+| Goal safety surface | Lane-owned sentinel proof |
+|---|---|
+| blocklist behavior | `test:blocking` keeps `filter-engine-current-behavior` and `main-profile-blocklist-keyword-alias-current-behavior` in lane. |
+| whitelist behavior | `test:whitelist` keeps `json-first-whitelist-decision-identity-boundary` and `content-bridge-whitelist-pending-refresh-boundary` in lane. |
+| keyword/channel blocking | `test:blocking` keeps `json-first-keyword-match-boundary` and `json-first-channel-match-boundary` in lane. |
+| Shorts behavior | `test:whitelist` keeps `main-watch-initial-lockup-shorts-json-current-behavior` in lane for watch/Shorts allow-mode proof. |
+| end screens | `test:whitelist` keeps end-screen videowall, card, autoplay, and player DOM cleanup tests in lane. |
+| quick-block and 3-dot menus | `test:menu` keeps `quick-block-block-menu-affordance-boundary` and `native-dropdown-close-state` in lane. |
+| JSON-first filtering | `test:json` keeps seed/network, readiness, snapshot, list-mode, and response-mutation tests in lane. |
+| DOM fallback | `test:dom` keeps DOM fallback selector, run-state cleanup, virtual-attribute, and route cleanup tests in lane. |
+| no-rule performance | `test:performance` keeps empty-install, no-work, active-rule, and route-surface budget tests in lane. |
+| SPA navigation | `test:performance` keeps whitelist-cache SPA metric and route-surface no-work tests in lane; live SPA rows remain in manual smoke. |
+| settings | `test:settings` keeps settings-mode, refresh fanout, compiled-cache, import/export, and state-manager tests in lane. |
+| release packaging | `test:release` keeps package parity, public release surface, live-smoke boundary, and artifact claim tests in lane. |
+
 ## Manual YouTube Smoke Handoff
 
 Automated lanes prove source and fixture contracts. User-facing changes still

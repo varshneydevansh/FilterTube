@@ -365,6 +365,7 @@ test('whitelist lane explicitly owns end-screen boundary proof', () => {
   const whitelist = LANES.whitelist.tests.join('\n');
   const matrix = read(matrixPath);
 
+  assert.match(whitelist, /main-watch-initial-lockup-shorts-json-current-behavior/);
   assert.match(whitelist, /main-watch-autoplay-video-endpoint-current-behavior/);
   assert.match(whitelist, /json-first-hide-endscreen-videowall-boundary-current-behavior/);
   assert.match(whitelist, /json-first-hide-endscreen-cards-boundary-current-behavior/);
@@ -372,6 +373,86 @@ test('whitelist lane explicitly owns end-screen boundary proof', () => {
   assert.match(whitelist, /player-endscreen-dom-cleanup-boundary-current-behavior/);
   assert.match(matrix, /Whitelist-only leaks, pending hides, Shorts\/watch\/end-screen\/Kids\/YTM allow behavior/);
   assert.match(matrix, /The whitelist lane explicitly owns end-screen videowall, card, autoplay, and player DOM boundary tests/);
+});
+
+test('goal safety surfaces stay bound to focused lane proof tests', () => {
+  const matrix = read(matrixPath);
+  const surfaceCoverage = [
+    {
+      surface: 'blocklist behavior',
+      lane: 'blocking',
+      tests: [/filter-engine-current-behavior/, /main-profile-blocklist-keyword-alias-current-behavior/]
+    },
+    {
+      surface: 'whitelist behavior',
+      lane: 'whitelist',
+      tests: [/json-first-whitelist-decision-identity-boundary/, /content-bridge-whitelist-pending-refresh-boundary/]
+    },
+    {
+      surface: 'keyword/channel blocking',
+      lane: 'blocking',
+      tests: [/json-first-keyword-match-boundary/, /json-first-channel-match-boundary/]
+    },
+    {
+      surface: 'Shorts behavior',
+      lane: 'whitelist',
+      tests: [/main-watch-initial-lockup-shorts-json-current-behavior/]
+    },
+    {
+      surface: 'end screens',
+      lane: 'whitelist',
+      tests: [/json-first-hide-endscreen-videowall-boundary/, /json-first-hide-endscreen-cards-boundary/, /main-watch-autoplay-video-endpoint/, /player-endscreen-dom-cleanup-boundary/]
+    },
+    {
+      surface: 'quick-block and 3-dot menus',
+      lane: 'menu',
+      tests: [/quick-block-block-menu-affordance-boundary/, /native-dropdown-close-state/]
+    },
+    {
+      surface: 'JSON-first filtering',
+      lane: 'json',
+      tests: [/seed-network-current-behavior/, /json-first-response-mutation-contract/]
+    },
+    {
+      surface: 'DOM fallback',
+      lane: 'dom',
+      tests: [/dom-fallback-selector-semantic-register/, /dom-state-virtual-attributes/]
+    },
+    {
+      surface: 'no-rule performance',
+      lane: 'performance',
+      tests: [/empty-install-performance-current-behavior/, /p0-no-work-current-behavior/]
+    },
+    {
+      surface: 'SPA navigation',
+      lane: 'performance',
+      tests: [/whitelist-cache-spa-metric-packet-gate/, /content-filter-route-surface-no-work-budget/]
+    },
+    {
+      surface: 'settings',
+      lane: 'settings',
+      tests: [/settings-mode-coverage-matrix/, /compiled-settings-profile-list-mode-assembly/]
+    },
+    {
+      surface: 'release packaging',
+      lane: 'release',
+      tests: [/p0-release-package-current-behavior/, /release-package-parity-current-behavior/]
+    }
+  ];
+
+  assert.match(matrix, /Named Safety Surface Coverage/);
+
+  for (const { surface, lane, tests } of surfaceCoverage) {
+    assert.ok(matrix.includes(surface), `matrix missing safety surface ${surface}`);
+    assert.ok(matrix.includes(`test:${lane}`), `matrix missing lane ${lane} for ${surface}`);
+
+    for (const pattern of tests) {
+      assert.ok(
+        LANES[lane].tests.some((testPath) => pattern.test(testPath)),
+        `${surface} is not bound to ${lane} proof ${pattern}`
+      );
+    }
+  }
 });
 
 test('manual YouTube smoke handoff covers visible release-critical behavior', () => {

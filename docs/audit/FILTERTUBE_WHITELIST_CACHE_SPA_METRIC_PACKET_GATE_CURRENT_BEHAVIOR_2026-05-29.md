@@ -42,6 +42,7 @@ not completion proof for whitelist/cache optimization
 | `docs/audit/FILTERTUBE_RELEASE_LIVE_YOUTUBE_SPA_SMOKE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-25.md` | Defines the six live SPA rows that must be recorded before release readiness is claimed. |
 | `docs/audit/artifacts/release-live-youtube-spa-smoke/template.json` | Provides the non-executed live smoke artifact template; all rows remain `missing`. |
 | `docs/audit/artifacts/release-live-youtube-spa-smoke/run-live-smoke.mjs` | Defines the CDP runner that can generate a dated live smoke artifact when run against the real installed Chrome profile. |
+| `docs/audit/artifacts/release-live-youtube-spa-smoke/verify-live-smoke-artifact.mjs` | Defines the artifact verifier; this is tooling, not an executed live smoke result. |
 | `docs/audit/FILTERTUBE_JSON_FIRST_ROUTE_SURFACE_METRIC_ARTIFACT_CONTRACT_COVERAGE_GATE_CURRENT_BEHAVIOR_2026-05-24.md` | Confirms per-file route/surface metric contracts exist for all five reserved artifact files while committed artifacts remain absent. |
 | `docs/audit/FILTERTUBE_JSON_FIRST_ROUTE_SURFACE_METRIC_ARTIFACT_APPROVAL_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Proves route/surface metric artifact approval is still absent. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_PATCH_EVIDENCE_PACKET_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md` | Defines the broader first optimization evidence packet and keeps first optimization implementation at NO-GO. |
@@ -762,8 +763,9 @@ FT-LIVE-SPA-04-watch-rail-scroll
 FT-LIVE-SPA-05-cache-repeat-navigation
 ```
 
-The current directory only contains `template.json` and `run-live-smoke.mjs`;
-that is contract/tooling, not execution proof.
+The current directory only contains `template.json`, `run-live-smoke.mjs`, and
+`verify-live-smoke-artifact.mjs`; that is contract/tooling, not execution
+proof.
 
 ## Behavior Invariants To Preserve
 

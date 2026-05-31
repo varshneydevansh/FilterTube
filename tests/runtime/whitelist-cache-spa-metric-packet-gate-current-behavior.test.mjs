@@ -11,6 +11,7 @@ const methodSemanticGapPath = 'docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_I
 const liveSmokeRoot = 'docs/audit/artifacts/release-live-youtube-spa-smoke';
 const liveSmokeTemplatePath = `${liveSmokeRoot}/template.json`;
 const liveSmokeRunnerPath = `${liveSmokeRoot}/run-live-smoke.mjs`;
+const liveSmokeVerifierPath = `${liveSmokeRoot}/verify-live-smoke-artifact.mjs`;
 
 const sourceDocs = [
   'docs/audit/FILTERTUBE_YOUTUBE_LAG_COMMIT_ATTRIBUTION_2026-05-26.md',
@@ -20,6 +21,7 @@ const sourceDocs = [
   'docs/audit/FILTERTUBE_RELEASE_LIVE_YOUTUBE_SPA_SMOKE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-25.md',
   liveSmokeTemplatePath,
   liveSmokeRunnerPath,
+  liveSmokeVerifierPath,
   'docs/audit/FILTERTUBE_JSON_FIRST_ROUTE_SURFACE_METRIC_ARTIFACT_CONTRACT_COVERAGE_GATE_CURRENT_BEHAVIOR_2026-05-24.md',
   'docs/audit/FILTERTUBE_JSON_FIRST_ROUTE_SURFACE_METRIC_ARTIFACT_APPROVAL_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md',
   'docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_PATCH_EVIDENCE_PACKET_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md',
@@ -2632,7 +2634,7 @@ test('live smoke template is still non-executed and no result artifact is presen
   assert.deepEqual(template.requiredRows.map(row => row.id), liveSmokeRows);
   assert.deepEqual([...new Set(template.requiredRows.map(row => row.status))], ['missing']);
   assert.equal(resultJsonFiles.length, 0, `unexpected executed live smoke artifacts: ${resultJsonFiles.join(', ')}`);
-  assert.deepEqual(artifactFiles, [liveSmokeRunnerPath, liveSmokeTemplatePath]);
+  assert.deepEqual(artifactFiles, [liveSmokeRunnerPath, liveSmokeTemplatePath, liveSmokeVerifierPath]);
 
   for (const row of liveSmokeRows) {
     assert.ok(runner.includes(row), `runner missing ${row}`);
@@ -2649,7 +2651,7 @@ test('live smoke template is still non-executed and no result artifact is presen
   assert.match(runner, /releaseReadiness: smokeSliceReadiness === 'GO-FOR-THIS-SMOKE-SLICE' && installedByteParity\.verdict === 'GO' \? 'GO-FOR-RELEASE-SMOKE' : 'NO-GO'/);
   assert.match(runner, /installedByteParityMustPass: true/);
   assert.match(runner, /releaseReadinessWhenByteParityMissing: 'NO-GO'/);
-  assert.match(doc, /The current directory only contains `template\.json` and `run-live-smoke\.mjs`/);
+  assert.match(doc, /The current directory only contains `template\.json`,\s+`run-live-smoke\.mjs`, and\s+`verify-live-smoke-artifact\.mjs`; that is contract\/tooling, not execution\s+proof/);
 });
 
 test('required route/surface metric artifacts are reserved but absent', () => {
