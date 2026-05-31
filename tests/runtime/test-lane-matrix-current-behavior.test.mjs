@@ -257,11 +257,16 @@ test('changed-lane runner is wired to the classifier and sequential lane executi
   assert.match(runner, /lane === '--run-changed' \|\| lane === 'run-changed'/);
   assert.match(runner, /const result = classifyPaths\(changedPathsFromGit\(\)\)/);
   assert.match(runner, /if \(result\.unmatched\.length\) process\.exit\(2\)/);
+  assert.match(runner, /function runAuditDrift\(\)/);
+  assert.match(runner, /runNode\(\['scripts\/audit-proof-drift\.mjs', '--lane-owned'\]\)/);
+  assert.match(runner, /console\.log\('\\n==> Running test:audit-drift'\)/);
+  assert.match(runner, /const driftStatus = runAuditDrift\(\)/);
   assert.match(runner, /for \(const changedLane of result\.lanes\)/);
   assert.match(runner, /runLane\(changedLane\)/);
   assert.match(runner, /process\.exit\(runLane\(lane\)\)/);
   assert.match(matrix, /fails on any unclassified\s+changed path/);
-  assert.match(matrix, /runs the required lanes sequentially in matrix order/);
+  assert.match(matrix, /runs the\s+lane-owned audit proof drift guard/);
+  assert.match(matrix, /runs the required lanes sequentially in\s+matrix order/);
 });
 
 test('changed-lane path collection includes untracked nonignored files', () => {

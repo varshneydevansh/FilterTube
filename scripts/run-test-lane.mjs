@@ -592,6 +592,10 @@ function runLane(lane) {
   return runNode(['--test', ...config.tests]);
 }
 
+function runAuditDrift() {
+  return runNode(['scripts/audit-proof-drift.mjs', '--lane-owned']);
+}
+
 function printClassification(result) {
   if (!result.classifications.length && !result.unmatched.length) {
     console.log('No changed paths to classify.');
@@ -652,6 +656,10 @@ function main() {
       console.log('\nNo changed lanes to run.');
       process.exit(0);
     }
+
+    console.log('\n==> Running test:audit-drift');
+    const driftStatus = runAuditDrift();
+    if (driftStatus !== 0) process.exit(driftStatus);
 
     for (const changedLane of result.lanes) {
       console.log(`\n==> Running test:${changedLane}`);

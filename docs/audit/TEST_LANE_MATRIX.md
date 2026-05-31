@@ -69,10 +69,11 @@ requiring explicit classification instead of silently falling back to
 `test:smoke`.
 
 `npm run test:changed` uses the same classifier, includes tracked modifications
-and nonignored untracked files, fails on any unclassified changed path, then
-runs the required lanes sequentially in matrix order. Use it when a logical
-change has already been made and you want the focused proof lane set to execute
-without manually copying commands from `lanes:changed`.
+and nonignored untracked files, fails on any unclassified changed path, runs the
+lane-owned audit proof drift guard, then runs the required lanes sequentially in
+matrix order. Use it when a logical change has already been made and you want
+the focused proof lane set to execute without manually copying commands from
+`lanes:changed`.
 
 ## Auxiliary Guards
 
@@ -81,7 +82,7 @@ the audit system itself.
 
 | Guard | Command | Purpose |
 |---|---|---|
-| lane-owned audit proof drift | `npm run test:audit-drift` | Fails when a lane-owned test or proof doc still cites a stale whole-file source fingerprint. |
+| lane-owned audit proof drift | `npm run test:audit-drift` | Fails when a lane-owned test or proof doc still cites a stale whole-file source fingerprint. This guard also runs inside `npm run test:changed` before focused lanes. |
 | full audit proof drift inventory | `node scripts/audit-proof-drift.mjs --all --report-only` | Reports stale whole-file fingerprints in older audit files/tests that are not yet lane-owned. This is a backlog inventory, not a release blocker. |
 | full historical runtime audit | `npm run audit:runtime` | Runs every historical runtime/current-boundary audit test. This is the broad backlog suite, not the default per-change release lane. |
 
