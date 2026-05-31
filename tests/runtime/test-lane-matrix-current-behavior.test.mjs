@@ -125,7 +125,10 @@ test('test lane matrix maps high-risk source files to expected lanes', () => {
     { files: ['js/content/dom_helpers.js', 'js/content/dom_state.js'], lanes: ['test:whitelist', 'test:blocking', 'test:dom', 'test:performance'] },
     { files: ['js/content/first_run_prompt.js', 'js/content/release_notes_prompt.js'], lanes: ['test:release', 'test:settings', 'test:smoke'] },
     { files: ['js/content_bridge.js'], lanes: ['test:whitelist', 'test:blocking', 'test:json', 'test:dom', 'test:menu', 'test:performance', 'test:settings'] },
+    { files: ['js/content/bridge_settings.js'], lanes: ['test:json', 'test:performance', 'test:settings'] },
     { files: ['js/background.js'], lanes: ['test:release', 'test:whitelist', 'test:blocking', 'test:json', 'test:performance', 'test:settings'] },
+    { files: ['js/settings_shared.js'], lanes: ['test:whitelist', 'test:blocking', 'test:settings'] },
+    { files: ['js/state_manager.js', 'js/io_manager.js'], lanes: ['test:settings'] },
     { files: ['js/content_controls_catalog.js'], lanes: ['test:whitelist', 'test:blocking', 'test:json', 'test:dom', 'test:menu', 'test:performance', 'test:settings'] },
     { files: ['js/popup.js', 'js/tab-view.js', 'js/render_engine.js', 'js/ui_components.js'], lanes: ['test:release', 'test:whitelist', 'test:blocking', 'test:menu', 'test:settings', 'test:smoke'] },
     { files: ['js/nanah_sync_adapter.js', 'js/security_manager.js'], lanes: ['test:release', 'test:settings', 'test:smoke'] },
@@ -239,7 +242,10 @@ test('executable classifier maps high-risk paths to required lanes', () => {
   assert.deepEqual(classifyPaths(['js/content/dom_state.js']).lanes, ['whitelist', 'blocking', 'dom', 'performance']);
   assert.deepEqual(classifyPaths(['js/content/first_run_prompt.js']).lanes, ['release', 'settings', 'smoke']);
   assert.deepEqual(classifyPaths(['js/filter_logic.js']).lanes, ['whitelist', 'blocking', 'json', 'performance']);
+  assert.deepEqual(classifyPaths(['js/content/bridge_settings.js']).lanes, ['json', 'performance', 'settings']);
   assert.deepEqual(classifyPaths(['js/background.js']).lanes, ['release', 'whitelist', 'blocking', 'json', 'performance', 'settings']);
+  assert.deepEqual(classifyPaths(['js/settings_shared.js']).lanes, ['whitelist', 'blocking', 'settings']);
+  assert.deepEqual(classifyPaths(['js/state_manager.js', 'js/io_manager.js']).lanes, ['settings']);
   assert.deepEqual(classifyPaths(['js/content_controls_catalog.js']).lanes, ['whitelist', 'blocking', 'json', 'dom', 'menu', 'performance', 'settings']);
   assert.deepEqual(classifyPaths(['js/tab-view.js']).lanes, ['release', 'whitelist', 'blocking', 'menu', 'settings', 'smoke']);
   assert.deepEqual(classifyPaths(['js/layout.js']).lanes, ['release', 'dom', 'smoke']);
