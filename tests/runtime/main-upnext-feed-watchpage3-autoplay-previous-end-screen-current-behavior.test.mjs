@@ -159,15 +159,21 @@ function endScreenIds(output) {
 }
 
 function autoplayWatchIds(output) {
-  return plain(watchNext(output).autoplay.autoplay.sets.map((entry) => entry.autoplayVideo.watchEndpoint.videoId));
+  return plain(watchNext(output).autoplay.autoplay.sets
+    .map((entry) => entry.autoplayVideo?.watchEndpoint?.videoId)
+    .filter(Boolean));
 }
 
 function nextButtonWatchIds(output) {
-  return plain(watchNext(output).autoplay.autoplay.sets.map((entry) => entry.nextButtonVideo.watchEndpoint.videoId));
+  return plain(watchNext(output).autoplay.autoplay.sets
+    .map((entry) => entry.nextButtonVideo?.watchEndpoint?.videoId)
+    .filter(Boolean));
 }
 
 function previousButtonWatchIds(output) {
-  return plain(watchNext(output).autoplay.autoplay.sets.map((entry) => entry.previousButtonVideo.watchEndpoint.videoId));
+  return plain(watchNext(output).autoplay.autoplay.sets
+    .map((entry) => entry.previousButtonVideo?.watchEndpoint?.videoId)
+    .filter(Boolean));
 }
 
 function modifiedPlaylistIds(output) {
@@ -218,7 +224,7 @@ test('watchpage3 audit doc and reduced fixture provenance are pinned', () => {
 
   assert.ok(doc.includes('main-upnext-feed-watchpage3-autoplay-previous-end-screen.json'));
   assert.ok(doc.includes('cd7bea15c5bc0b5dbac5ef78d9f8046de8153a83d4adb44ce2961c41c1062b1a'));
-  assert.ok(doc.includes('previousButtonVideo endpoint remains'));
+  assert.ok(doc.includes('previousButtonVideo` is removed'));
 });
 
 test('raw watchpage3 capture is an embedded ytInitialData container with previous endpoint evidence', () => {
@@ -303,29 +309,29 @@ test('endpoint-only autoplay and previous-button objects pass through without ma
   assert.deepEqual(plain(harness.messages), []);
 });
 
-test('blocklist channel removes matching playlist and end-screen rows while endpoint autoplay remains', () => {
+test('blocklist channel removes matching playlist, end-screen rows, and matching autoplay endpoints', () => {
   const { output } = runFixture({
     filterChannels: [{ id: 'UCUhkVZeSoGkZefR7sDRQB5Q' }]
   });
 
   assert.deepEqual(playlistIds(output), ['TSHg9Kg_ciM', 'mqgEYRtWMJU']);
   assert.deepEqual(endScreenIds(output), ['8Li0Tyeqlc4']);
-  assert.deepEqual(autoplayWatchIds(output), ['UrAhnndvrSU']);
-  assert.deepEqual(nextButtonWatchIds(output), ['UrAhnndvrSU']);
+  assert.deepEqual(autoplayWatchIds(output), []);
+  assert.deepEqual(nextButtonWatchIds(output), []);
   assert.deepEqual(previousButtonWatchIds(output), ['TSHg9Kg_ciM']);
 });
 
-test('blocklist previous row removes visible playlist sibling while previous endpoint remains', () => {
+test('blocklist previous row removes visible playlist sibling and previous endpoint', () => {
   const { output } = runFixture({
     filterChannels: [{ id: 'UCdIuLHQyQiwqud2WpTgdCkg' }]
   });
 
   assert.deepEqual(playlistIds(output), ['mqgEYRtWMJU', 'UrAhnndvrSU']);
   assert.deepEqual(endScreenIds(output), ['Xq0joZ24D9Y', '8Li0Tyeqlc4']);
-  assert.deepEqual(previousButtonWatchIds(output), ['TSHg9Kg_ciM']);
+  assert.deepEqual(previousButtonWatchIds(output), []);
 });
 
-test('whitelist nonmatch removes supported rows while endpoint-only watch controls remain', () => {
+test('whitelist nonmatch removes supported rows and endpoint-only watch controls', () => {
   const { output } = runFixture({
     listMode: 'whitelist',
     whitelistChannels: [{ id: 'UC-does-not-match' }]
@@ -333,12 +339,10 @@ test('whitelist nonmatch removes supported rows while endpoint-only watch contro
 
   assert.deepEqual(playlistIds(output), []);
   assert.deepEqual(endScreenIds(output), []);
-  assert.deepEqual(autoplayWatchIds(output), ['UrAhnndvrSU']);
-  assert.deepEqual(nextButtonWatchIds(output), ['UrAhnndvrSU']);
-  assert.deepEqual(previousButtonWatchIds(output), ['TSHg9Kg_ciM']);
+  assert.deepEqual(plain(watchNext(output).autoplay.autoplay.sets), []);
 });
 
-test('whitelist match preserves supported Stephen Barton rows but endpoint policy is still implicit', () => {
+test('whitelist match preserves supported Stephen Barton rows and allowed endpoints only', () => {
   const { output } = runFixture({
     listMode: 'whitelist',
     whitelistChannels: [{ id: 'UCUhkVZeSoGkZefR7sDRQB5Q' }]
@@ -348,7 +352,7 @@ test('whitelist match preserves supported Stephen Barton rows but endpoint polic
   assert.deepEqual(endScreenIds(output), ['Xq0joZ24D9Y']);
   assert.deepEqual(autoplayWatchIds(output), ['UrAhnndvrSU']);
   assert.deepEqual(nextButtonWatchIds(output), ['UrAhnndvrSU']);
-  assert.deepEqual(previousButtonWatchIds(output), ['TSHg9Kg_ciM']);
+  assert.deepEqual(previousButtonWatchIds(output), []);
 });
 
 test('blocklist keyword proves row authority but not autoplay endpoint authority', () => {
@@ -362,18 +366,30 @@ test('blocklist keyword proves row authority but not autoplay endpoint authority
   assert.deepEqual(nextButtonWatchIds(output), ['UrAhnndvrSU']);
 });
 
-test('product source still has no direct previous/autoplay endpoint renderer authority today', () => {
+test('end-screen settings remove watch autoplay endpoint sets directly', () => {
+  const cardsRun = runFixture({ hideEndscreenCards: true });
+  const videowallRun = runFixture({ hideEndscreenVideowall: true });
+
+  assert.deepEqual(plain(watchNext(cardsRun.output).autoplay.autoplay.sets), []);
+  assert.deepEqual(plain(watchNext(cardsRun.output).autoplay.autoplay.modifiedSets), []);
+  assert.deepEqual(plain(watchNext(videowallRun.output).autoplay.autoplay.sets), []);
+  assert.deepEqual(plain(watchNext(videowallRun.output).autoplay.autoplay.modifiedSets), []);
+});
+
+test('product source now has direct previous/autoplay endpoint authority outside renderer rules', () => {
   const filter = read('js/filter_logic.js');
   const directRules = sliceBetween(filter, 'const FILTER_RULES = {', 'videoWithContextRenderer: {');
-  const nestedKeys = sliceBetween(filter, 'const knownKeys = [', '];');
+  const autoplayEndpointMethods = sliceBetween(filter, '_extractAutoplayEndpointVideoId(endpoint) {', '        _regexMatches(regex, text) {');
 
   for (const token of ['autoplayVideo', 'nextButtonVideo', 'previousButtonVideo', 'compactAutoplayRenderer']) {
     assert.doesNotMatch(directRules, new RegExp(token));
-    assert.doesNotMatch(nestedKeys, new RegExp(token));
+  }
+  for (const token of ['autoplayVideo', 'nextButtonVideo', 'previousButtonVideo']) {
+    assert.match(filter, new RegExp(token));
   }
 });
 
-test('future watchpage3 endpoint authority remains absent from product runtime source', () => {
+test('future watchpage3 endpoint reporting symbols remain absent from product runtime source', () => {
   const runtime = productRuntimeSource();
   const doc = read(docPath);
 

@@ -1,8 +1,8 @@
 # FilterTube JSON-First Hide Endscreen Videowall Boundary Current Behavior - 2026-05-22
 
-Status: audit-only current-behavior proof slice. Runtime behavior is unchanged;
-this is not an implementation patch, optimization patch, end-screen videowall
-patch, watch-route policy patch, DOM fallback patch, settings schema patch, or
+Status: release-fix proof slice. Runtime behavior changed on 2026-05-31 for
+watch autoplay endpoint sets during active JSON filtering. This is not an
+unrelated optimization patch, DOM fallback patch, settings schema patch, or
 selector cleanup patch.
 
 This slice promotes the JSON-first feature audit into
@@ -17,7 +17,7 @@ endpoint behavior.
 
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/filter_logic.js` | 3498 | 165151 | `4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641` |
+| `js/filter_logic.js` | 3652 | 172174 | `953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5` |
 | `js/seed.js` | 1136 | 50026 | `a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d` |
 | `js/content/dom_fallback.js` | 4838 | 228332 | `2129fcc16f8ad1420a6cb44905ddcd0b68d5511f3b647e2db100c0d67d492aef` |
 | `js/background.js` | 6320 | 285103 | `77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad` |
@@ -82,7 +82,7 @@ content bridge storage refresh keys block lines: 44
 
 content bridge storage refresh keys block bytes: 1263
 
-filter_logic total hideEndscreenVideowall tokens: 0
+filter_logic total hideEndscreenVideowall tokens: 1
 
 seed total hideEndscreenVideowall tokens: 0
 
@@ -102,16 +102,16 @@ DOM fallback endscreen-videowall CSS block #movie_player .ytp-endscreen-content 
 
 DOM fallback endscreen-videowall CSS block #movie_player .ytp-fullscreen-grid-stills-container tokens: 1
 
-runtime hideEndscreenVideowall fixtures: 7
+runtime hideEndscreenVideowall fixtures: 8
 
 ## Current Behavior Matrix
 
 | Boundary | Current behavior | Missing proof before implementation changes |
 | --- | --- | --- |
-| JSON end-screen renderer decision | `js/filter_logic.js` has no `hideEndscreenVideowall` token. Direct and nested `endScreenVideoRenderer` rows are covered by ordinary shared video rules, category allowlists, content allowlists, and nested unwrap keys; `compactAutoplayRenderer` is not covered by those direct allowlists today. | A `hideEndscreenVideowall` contract that separates direct JSON `endScreenVideoRenderer` filtering from player overlay videowall hiding, compact autoplay gaps, and sibling-visible behavior. |
-| Feature toggle interaction | `hideEndscreenVideowall` does not drive JSON renderer filtering. Ordinary keyword/channel/list-mode rules can still remove supported `endScreenVideoRenderer` rows independently of the feature toggle. | A player-overlay interaction report proving whether the visible videowall, end-screen cards, compact autoplay, and JSON end-screen renderers should share a decision authority. |
+| JSON end-screen renderer decision | `js/filter_logic.js` now has direct `hideEndscreenVideowall` authority for watch autoplay endpoint sets. Direct and nested `endScreenVideoRenderer` rows are still covered by ordinary shared video rules, category allowlists, content allowlists, and nested unwrap keys; `compactAutoplayRenderer` is not covered by those direct allowlists today. | A follow-up renderer inventory proving whether `compactAutoplayRenderer` should share the same endpoint-set authority. |
+| Feature toggle interaction | `hideEndscreenVideowall` can remove watch autoplay endpoint sets during an already-running JSON pass. Ordinary keyword/channel/list-mode rules can still remove supported `endScreenVideoRenderer` rows independently of the feature toggle. | A player-overlay interaction report proving visible videowall, end-screen cards, compact autoplay, and JSON end-screen renderers across real watch captures. |
 | Whitelist mode | Empty whitelist mode can remove direct supported `endScreenVideoRenderer` rows, while unsupported `compactAutoplayRenderer` rows can pass through. The DOM videowall CSS block is not gated by `listMode !== 'whitelist'`. | A whitelist-mode report proving supported and unsupported end-screen renderer behavior, player overlay visibility, and allow-mode false-hide/leak boundaries. |
-| Seed active JSON work | Seed JSON active-work detection does not include `hideEndscreenVideowall`. `/youtubei/v1/next` now bypasses `processData` with only `hideEndscreenVideowall` enabled because the no-active-JSON-work gate passes through before JSON parse. | A watch-route no-work budget that proves when `/next` may parse/stringify, harvest only, mutate, or pass through. |
+| Seed active JSON work | Seed JSON active-work detection still does not include `hideEndscreenVideowall`. `/youtubei/v1/next` still bypasses `processData` with only `hideEndscreenVideowall` enabled because the no-active-JSON-work gate passes through before JSON parse. When whitelist/blocklist work already activates JSON filtering, endpoint-set removal runs inside `filter_logic.js`. | A watch-route no-work budget that proves when `/next` may parse/stringify, harvest only, mutate, or pass through. |
 | DOM fallback | DOM fallback owns the visible player videowall hide with `#movie_player .ytp-endscreen-content` and `#movie_player .ytp-fullscreen-grid-stills-container`. | A JSON/DOM parity report for player end-screen videowall DOM, direct JSON end-screen rows, compact autoplay, and end-screen cards. |
 | Background compile and invalidation | Background storage reads and compiles `hideEndscreenVideowall`. Background storage-change invalidation does not include `hideEndscreenVideowall` today. | A cache invalidation report that either adds the dependency or explicitly classifies it as DOM-only with a bounded refresh path. |
 | Content bridge refresh | `js/content/bridge_settings.js` includes `hideEndscreenVideowall` in its storage refresh key list. This can refresh active content scripts but does not make the background compiler invalidation list complete. | A settings parity report across background, content bridge, shared settings, StateManager, and UI save paths. |
@@ -119,7 +119,10 @@ runtime hideEndscreenVideowall fixtures: 7
 
 ## Runtime Fixtures
 
-Watch end-screen JSON rows pass through unchanged when only
+Watch end-screen renderer rows still pass through unchanged when only
+`hideEndscreenVideowall` is enabled.
+
+Watch autoplay endpoint sets are removed during active JSON processing when
 `hideEndscreenVideowall` is enabled.
 
 `/youtubei/v1/next` now bypasses `processData` with only
@@ -127,20 +130,22 @@ Watch end-screen JSON rows pass through unchanged when only
 
 1. JSON `endScreenVideoRenderer` and `compactAutoplayRenderer` rows pass
    through unchanged when only `hideEndscreenVideowall` is enabled.
-2. Ordinary keyword rules can remove a matching `endScreenVideoRenderer` row
+2. Watch autoplay endpoint sets are removed during an active JSON pass when
+   `hideEndscreenVideowall` is enabled.
+3. Ordinary keyword rules can remove a matching `endScreenVideoRenderer` row
    while a matching `compactAutoplayRenderer` row remains because that renderer
    has no direct JSON rule today.
-3. Empty whitelist mode can remove supported `endScreenVideoRenderer` rows
+4. Empty whitelist mode can remove supported `endScreenVideoRenderer` rows
    while `compactAutoplayRenderer` remains even when `hideEndscreenVideowall`
    is enabled.
-4. `/youtubei/v1/next` now bypasses `processData` with only
+5. `/youtubei/v1/next` now bypasses `processData` with only
    `hideEndscreenVideowall` enabled.
-5. That same watch-next fixture performs no harvest-only skip for
+6. That same watch-next fixture performs no harvest-only skip for
    `hideEndscreenVideowall`.
-6. The DOM selector block proves the visible videowall hide is owned by broad
+7. The DOM selector block proves the visible videowall hide is owned by broad
    `#movie_player` CSS selectors, not per-card JSON or ordinary card DOM
    selector authority.
-7. Product runtime source still lacks the first-class endscreen videowall
+8. Product runtime source still lacks the first-class endscreen videowall
    authority symbols listed below.
 
 ## Risk Notes
@@ -151,9 +156,10 @@ Watch end-screen JSON rows pass through unchanged when only
 - False-hide risk: whitelist mode can fail closed for supported end-screen JSON
   rows while unsupported compact autoplay rows pass through, and the visible
   player-overlay CSS block is independent of that JSON decision.
-- Performance risk: watch-next fetches can still parse, traverse, and stringify
-  JSON with only `hideEndscreenVideowall` enabled even though there is no
-  `hideEndscreenVideowall` JSON decision.
+- Performance risk: the no-active-JSON gate still avoids parse/traverse work
+  when only `hideEndscreenVideowall` is enabled. When another rule already
+  activates JSON filtering, endpoint-set removal adds bounded object-key checks
+  rather than an additional network pass.
 - Code-burden risk: background compile, background invalidation, content bridge
   refresh, shared settings, seed active-work, JSON renderer rules, category and
   content allowlists, nested unwrap, and DOM player-overlay selectors all
@@ -180,17 +186,17 @@ yet.
 
 This file and
 `tests/runtime/json-first-hide-endscreen-videowall-boundary-current-behavior.test.mjs`
-only pin current behavior. They do not authorize deleting DOM selectors,
-changing `/youtubei/v1/next` processing, adding JSON mutations, changing
-whitelist end-screen behavior, changing background cache invalidation, adding
-`compactAutoplayRenderer` rules, or merging player controls into a shared
-authority without follow-up implementation proof.
+pin the #57 endpoint-set release fix. They do not authorize deleting DOM
+selectors, adding `compactAutoplayRenderer` rules, changing background cache
+invalidation, or merging player controls into a broader shared authority
+without follow-up implementation proof.
 
 ## Method Semantic Proof Gap Boundary
 
 `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md`
 is a required source input before this watch/player/end-screen surface can
-support runtime optimization. Current proof pins:
+support runtime optimization. Current proof has been consumed for this #57
+endpoint-set fix slice and now pins:
 
 ```text
 method semantic proof gap files covered: 63
@@ -198,7 +204,7 @@ method semantic proof gap lexical callables covered: 5473
 files with complete per-callable semantic proof: 0
 lexical callables requiring semantic proof before behavior changes: 5473
 affected callable semantic proof: NO-GO
-runtime behavior changed: no
+runtime behavior changed: yes, 2026-05-31
 ```
 
 These counts are audit-only blockers. They do not approve runtime

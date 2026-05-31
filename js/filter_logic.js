@@ -46,6 +46,15 @@
     const pendingVideoChannelUpdates = [];
     const seenVideoChannelUpdates = new Map();
     let pendingVideoChannelFlush = null;
+    const AUTOPLAY_ENDPOINT_KEYS = new Set(['autoplayVideo', 'nextButtonVideo', 'previousButtonVideo']);
+    function hasAutoplayEndpointKey(obj) {
+        if (!obj || typeof obj !== 'object') return false;
+        for (const key of AUTOPLAY_ENDPOINT_KEYS) {
+            if (obj[key] && typeof obj[key] === 'object') return true;
+        }
+        return false;
+    }
+
     function queueVideoChannelMapping(videoId, channelId) {
         if (!videoId || typeof videoId !== 'string' || !/^[a-zA-Z0-9_-]{11}$/.test(videoId)) return;
         if (!channelId || typeof channelId !== 'string' || !channelId.startsWith('UC')) return;
@@ -1804,6 +1813,129 @@
             ].filter(Boolean).join(' ').trim();
         }
 
+        _extractAutoplayEndpointVideoId(endpoint) {
+            const candidates = [
+                endpoint?.watchEndpoint?.videoId,
+                endpoint?.command?.watchEndpoint?.videoId,
+                endpoint?.innertubeCommand?.watchEndpoint?.videoId
+            ];
+            for (const candidate of candidates) {
+                if (typeof candidate === 'string' && /^[a-zA-Z0-9_-]{11}$/.test(candidate)) {
+                    return candidate;
+                }
+            }
+            return '';
+        }
+
+        _autoplayEndpointCandidate(endpoint, endpointKey = '') {
+            const videoId = this._extractAutoplayEndpointVideoId(endpoint);
+            const mappedChannelId = videoId && this.settings.videoChannelMap
+                ? this.settings.videoChannelMap[videoId]
+                : '';
+            const channel = mappedChannelId && typeof mappedChannelId === 'string'
+                ? { name: '', id: mappedChannelId, handle: '', customUrl: '', logo: '' }
+                : this._emptyChannelInfo();
+
+            return {
+                rendererType: endpointKey || 'autoplayEndpoint',
+                wrapperRendererType: 'watchAutoplaySet',
+                surface: 'watch-autoplay-endpoint',
+                videoId,
+                playlistId: endpoint?.watchEndpoint?.playlistId || endpoint?.watchPlaylistEndpoint?.playlistId || '',
+                title: '',
+                description: '',
+                tags: [],
+                metadataText: '',
+                durationText: '',
+                publishedTimeText: '',
+                viewCountText: '',
+                channel,
+                collaborators: [channel],
+                isMix: false,
+                isShort: false,
+                isPlaylist: false,
+                isComment: false,
+                isStructural: false
+            };
+        }
+
+        _shouldBlockAutoplayEndpoint(endpoint, endpointKey = '') {
+            if (!endpoint || typeof endpoint !== 'object') return false;
+            const candidate = this._autoplayEndpointCandidate(endpoint, endpointKey);
+            const videoId = candidate.videoId;
+            if (!videoId) return false;
+
+            const listMode = (this.settings.listMode === 'whitelist') ? 'whitelist' : 'blocklist';
+            const collaborators = candidate.collaborators;
+
+            if (listMode === 'whitelist') {
+                const whitelistChannels = Array.isArray(this.settings.whitelistChannels) ? this.settings.whitelistChannels : [];
+                const whitelistKeywords = Array.isArray(this.settings.whitelistKeywords) ? this.settings.whitelistKeywords : [];
+                const hasChannelRules = whitelistChannels.length > 0;
+                const hasKeywordRules = whitelistKeywords.length > 0;
+
+                if (!hasChannelRules && !hasKeywordRules) {
+                    this._logWhitelistDecision('block:autoplay_endpoint_no_whitelist_rules', { endpointKey, videoId });
+                    return true;
+                }
+
+                if (hasChannelRules) {
+                    for (const collaborator of collaborators) {
+                        if (collaborator && (collaborator.id || collaborator.handle || collaborator.customUrl || collaborator.name)) {
+                            if (this._matchesAnyChannel(collaborator, whitelistChannels, this.whitelistChannelIndex)) {
+                                this._logWhitelistDecision('allow:autoplay_endpoint_matched_channel', {
+                                    endpointKey,
+                                    videoId,
+                                    matched: collaborator.id || collaborator.handle || collaborator.customUrl || collaborator.name || ''
+                                });
+                                return false;
+                            }
+                        }
+                    }
+                }
+
+                if (hasKeywordRules) {
+                    const textToSearch = this._candidateSearchText(candidate);
+                    for (const keywordRegex of whitelistKeywords) {
+                        if (this._regexMatches(keywordRegex, textToSearch)) {
+                            this._logWhitelistDecision('allow:autoplay_endpoint_matched_keyword', {
+                                endpointKey,
+                                videoId,
+                                keyword: keywordRegex.source
+                            });
+                            return false;
+                        }
+                    }
+                }
+
+                this._logWhitelistDecision('block:autoplay_endpoint_no_match', { endpointKey, videoId });
+                return true;
+            }
+
+            if (Array.isArray(this.settings.filterChannels) && this.settings.filterChannels.length > 0) {
+                for (const collaborator of collaborators) {
+                    if (collaborator && (collaborator.id || collaborator.handle || collaborator.customUrl || collaborator.name)) {
+                        if (this._matchesAnyChannel(collaborator, this.settings.filterChannels, this.filterChannelIndex)) {
+                            this._log(`🚫 Blocking autoplay endpoint ${endpointKey}: ${videoId}`);
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        _shouldDropAutoplayEndpointSet(obj) {
+            if (!hasAutoplayEndpointKey(obj)) return false;
+
+            if (this.settings.hideEndscreenVideowall || this.settings.hideEndscreenCards || this.settings.disableAutoplay) {
+                this._log('🚫 Removing watch autoplay endpoint set due to player end-screen/autoplay setting');
+                return true;
+            }
+            return false;
+        }
+
         _regexMatches(regex, text) {
             if (!regex || !text) return false;
             try {
@@ -3410,6 +3542,14 @@
                 return filtered;
             }
 
+            const isAutoplayEndpointSet = hasAutoplayEndpointKey(obj);
+
+            if (isAutoplayEndpointSet && this._shouldDropAutoplayEndpointSet(obj)) {
+                this.blockedCount++;
+                this._log(`✂️ Removed watch autoplay endpoint set at ${path}`);
+                return null;
+            }
+
             // Handle objects - check if this object should be filtered
             const rendererTypes = Object.keys(obj).filter(key => key.endsWith('Renderer') || key.endsWith('ViewModel'));
 
@@ -3424,10 +3564,19 @@
             // Recursively process all properties
             const result = {};
             for (const [key, value] of Object.entries(obj)) {
+                if (AUTOPLAY_ENDPOINT_KEYS.has(key) && this._shouldBlockAutoplayEndpoint(value, key)) {
+                    this.blockedCount++;
+                    this._log(`✂️ Removed ${key} endpoint at ${path}.${key}`);
+                    continue;
+                }
                 const filteredValue = this.filter(value, `${path}.${key}`);
                 if (filteredValue !== null) {
                     result[key] = filteredValue;
                 }
+            }
+
+            if (isAutoplayEndpointSet && !hasAutoplayEndpointKey(result)) {
+                return null;
             }
 
             return result;

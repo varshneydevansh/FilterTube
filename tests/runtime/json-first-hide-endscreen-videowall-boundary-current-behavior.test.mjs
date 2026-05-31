@@ -132,6 +132,16 @@ function endScreenPayload(rows = [endScreenVideo(), compactAutoplay()]) {
   return { elements: rows };
 }
 
+function autoplayEndpointSet() {
+  return {
+    sets: [{
+      autoplayVideo: { watchEndpoint: { videoId: 'wallcard001' } },
+      nextButtonVideo: { watchEndpoint: { videoId: 'wallcard002' } },
+      previousButtonVideo: { watchEndpoint: { videoId: 'wallcard003' } }
+    }]
+  };
+}
+
 function sourceBlocks() {
   const filterLogic = read('js/filter_logic.js');
   const seed = read('js/seed.js');
@@ -224,16 +234,16 @@ function sourceBlocks() {
   };
 }
 
-test('JSON-first hideEndscreenVideowall boundary audit is audit-only and source pinned', () => {
+test('JSON-first hideEndscreenVideowall boundary audit is release-fix proof and source pinned', () => {
   const doc = read(docPath);
 
-  assert.match(doc, /Status: audit-only current-behavior proof slice/);
-  assert.match(doc, /Runtime behavior is unchanged/);
-  assert.match(doc, /not an implementation patch, optimization patch, end-screen videowall/);
+  assert.match(doc, /Status: release-fix proof slice/);
+  assert.match(doc, /Runtime behavior changed on 2026-05-31/);
+  assert.match(doc, /not an\s+unrelated optimization patch, DOM fallback patch/);
   assert.match(doc, /hideEndscreenVideowall boundary source files: 6/);
-  assert.match(doc, /runtime hideEndscreenVideowall fixtures: 7/);
+  assert.match(doc, /runtime hideEndscreenVideowall fixtures: 8/);
 
-  assert.ok(doc.includes(`| \`js/filter_logic.js\` | 3498 | 165151 | \`${sha256('js/filter_logic.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/filter_logic.js\` | 3652 | 172174 | \`${sha256('js/filter_logic.js')}\` |`));
   assert.ok(doc.includes(`| \`js/seed.js\` | 1136 | 50026 | \`${sha256('js/seed.js')}\` |`));
   assert.ok(doc.includes(`| \`js/content/dom_fallback.js\` | 4838 | 228332 | \`${sha256('js/content/dom_fallback.js')}\` |`));
   assert.ok(doc.includes(`| \`js/background.js\` | 6320 | 285103 | \`${sha256('js/background.js')}\` |`));
@@ -272,7 +282,7 @@ test('hideEndscreenVideowall source counts remain pinned', () => {
   assert.equal(lineCount(blocks.bridgeRefreshKeys), 44);
   assert.equal(Buffer.byteLength(blocks.bridgeRefreshKeys), 1263);
 
-  assert.equal(countLiteral(blocks.filterLogic, 'hideEndscreenVideowall'), 0);
+  assert.equal(countLiteral(blocks.filterLogic, 'hideEndscreenVideowall'), 1);
   assert.equal(countLiteral(blocks.seed, 'hideEndscreenVideowall'), 0);
   assert.equal(countLiteral(blocks.domFallback, 'hideEndscreenVideowall'), 2);
   assert.equal(countLiteral(blocks.background, 'hideEndscreenVideowall'), 12);
@@ -295,7 +305,7 @@ test('hideEndscreenVideowall source counts remain pinned', () => {
   assert.match(doc, /DOM fallback endscreen-videowall CSS rules block bytes: 253/);
   assert.match(doc, /settings_shared build compiled settings block lines: 64/);
   assert.match(doc, /settings_shared build compiled settings block bytes: 2438/);
-  assert.match(doc, /filter_logic total hideEndscreenVideowall tokens: 0/);
+  assert.match(doc, /filter_logic total hideEndscreenVideowall tokens: 1/);
   assert.match(doc, /seed total hideEndscreenVideowall tokens: 0/);
   assert.match(doc, /DOM fallback total hideEndscreenVideowall tokens: 2/);
   assert.match(doc, /background total hideEndscreenVideowall tokens: 12/);
@@ -309,6 +319,14 @@ test('hideEndscreenVideowall does not remove JSON end-screen renderer rows in fi
   const payload = endScreenPayload();
 
   assert.deepEqual(run(payload, { hideEndscreenVideowall: true }), plain(payload));
+});
+
+test('hideEndscreenVideowall removes watch autoplay endpoint sets during active JSON processing', () => {
+  const payload = autoplayEndpointSet();
+
+  assert.deepEqual(run(payload, { hideEndscreenVideowall: true }), {
+    sets: []
+  });
 });
 
 test('ordinary keyword rules remove supported endScreenVideoRenderer while compactAutoplayRenderer remains a gap', () => {
@@ -362,7 +380,9 @@ test('source proof pins player-overlay CSS hide split refresh omission and missi
   const blocks = sourceBlocks();
   const runtimeSource = productRuntimeSource();
 
-  assert.doesNotMatch(blocks.filterLogic, /hideEndscreenVideowall/);
+  assert.match(blocks.filterLogic, /hideEndscreenVideowall/);
+  assert.match(blocks.filterLogic, /AUTOPLAY_ENDPOINT_KEYS/);
+  assert.match(blocks.filterLogic, /_shouldDropAutoplayEndpointSet/);
   assert.doesNotMatch(blocks.seed, /hideEndscreenVideowall/);
   assert.match(blocks.filterSharedVideoRendererRules, /endScreenVideoRenderer: BASE_VIDEO_RULES/);
   assert.doesNotMatch(blocks.filterSharedVideoRendererRules, /compactAutoplayRenderer/);
@@ -386,8 +406,9 @@ test('source proof pins player-overlay CSS hide split refresh omission and missi
   assert.match(blocks.sharedBuildCompiledSettings, /hideEndscreenVideowall: !!hideEndscreenVideowall/);
   assert.match(blocks.bridgeRefreshKeys, /'hideEndscreenVideowall'/);
   assert.match(doc, /Background storage-change invalidation does not include `hideEndscreenVideowall` today/);
-  assert.match(doc, /Seed JSON active-work detection does not include `hideEndscreenVideowall`/);
-  assert.match(doc, /Watch end-screen JSON rows pass through unchanged when only\s+`hideEndscreenVideowall` is enabled/);
+  assert.match(doc, /Seed JSON active-work detection still does not include `hideEndscreenVideowall`/);
+  assert.match(doc, /Watch end-screen renderer rows still pass through unchanged when only\s+`hideEndscreenVideowall` is enabled/);
+  assert.match(doc, /Watch autoplay endpoint sets are removed during active JSON processing when\s+`hideEndscreenVideowall` is enabled/);
   assert.match(doc, /`\/youtubei\/v1\/next` now bypasses `processData` with only\s+`hideEndscreenVideowall` enabled/);
   assert.match(doc, /DOM fallback owns the visible player videowall hide with `#movie_player \.ytp-endscreen-content` and `#movie_player \.ytp-fullscreen-grid-stills-container`/);
   assert.match(doc, /`compactAutoplayRenderer` is not covered by those direct allowlists today/);
