@@ -309,6 +309,11 @@ export const FILE_LANE_RULES = Object.freeze([
     lanes: ['release', 'smoke']
   },
   {
+    id: 'product-doc-surface',
+    patterns: [/^docs\/(?!audit\/)[^/]+\.md$/],
+    lanes: ['release', 'smoke']
+  },
+  {
     id: 'extension-ui-surface',
     patterns: [/^html\/.*\.html$/, /^css\/.*\.css$/, /^js\/ui-shell\/.*\.js$/, /^src\/extension-shell\//],
     lanes: ['release', 'smoke']

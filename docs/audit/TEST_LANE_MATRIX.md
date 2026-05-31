@@ -173,6 +173,7 @@ artifact with missing byte parity remain `NO-GO`.
 | `js/shared/identity.js`, `js/content/dom_extractors.js`, `js/content/handle_resolver.js` | `test:blocking`, `test:menu`, `test:whitelist` | Covers identity confidence, collaborators, menu labels, channel matching, and stale identity risk. |
 | `manifest*.json`, `build.js`, `scripts/build-*.mjs` | `test:release` | Covers package content, manifests, generated UI shell, release claims, and artifact behavior. |
 | `README.md`, `CHANGELOG.md`, `data/release_notes.json` | `test:release`, `test:smoke` | Covers public release claims, packaged release notes, and changelog/version drift. |
+| `docs/*.md` outside `docs/audit/` | `test:release`, `test:smoke` | Covers product docs, release-facing architecture/behavior claims, and the audit-doc boundary that keeps proof files inside `docs/audit/`. |
 | `docs/audit/artifacts/release-live-youtube-spa-smoke/*.{json,mjs}` | `test:release`, `test:smoke` | Covers live-smoke templates, runners, verifiers, and future dated smoke artifacts. |
 | `html/*.html`, `css/*.css`, `js/ui-shell/*.js`, `src/extension-shell/*.jsx` | `test:release`, affected UI/runtime lane | Add manual dashboard/popup smoke when the extension UI changes. |
 | `js/vendor/*.bundle.js` | `test:release`, `test:settings`, `test:smoke` | Covers vendored Nanah/QR bundles, dashboard load order, sync UI behavior, package contents, and bundle provenance. |

@@ -47,6 +47,13 @@ function collectJsFiles(dir = 'js') {
   return out.sort();
 }
 
+function collectTopLevelProductDocFiles() {
+  return fs.readdirSync(path.join(repoRoot, 'docs'), { withFileTypes: true })
+    .filter(entry => entry.isFile() && entry.name.endsWith('.md'))
+    .map(entry => `docs/${entry.name}`)
+    .sort();
+}
+
 test('test lane matrix defines every required lane and npm script', () => {
   const pkg = readJson('package.json');
   const matrix = read(matrixPath);
@@ -112,6 +119,7 @@ test('test lane matrix maps high-risk source files to expected lanes', () => {
     { files: ['js/vendor/*.bundle.js'], lanes: ['test:release', 'test:settings', 'test:smoke'] },
     { files: ['manifest*.json'], lanes: ['test:release'] },
     { files: ['README.md'], lanes: ['test:release', 'test:smoke'] },
+    { files: ['docs/*.md'], lanes: ['test:release', 'test:smoke'] },
     { files: ['docs/audit/artifacts/release-live-youtube-spa-smoke/*.{json,mjs}'], lanes: ['test:release', 'test:smoke'] }
   ];
 
@@ -152,6 +160,11 @@ test('executable classifier maps high-risk paths to required lanes', () => {
   assert.deepEqual(liveSmokeArtifact.unmatched, []);
   assert.equal(liveSmokeArtifact.classifications[0].matched[0].id, 'live-smoke-artifact-surface');
 
+  const productDoc = classifyPaths(['docs/ARCHITECTURE.md']);
+  assert.deepEqual(productDoc.lanes, ['release', 'smoke']);
+  assert.deepEqual(productDoc.unmatched, []);
+  assert.equal(productDoc.classifications[0].matched[0].id, 'product-doc-surface');
+
   assert.deepEqual(classifyPaths(['js/content/bridge_injection.js']).lanes, ['release', 'json', 'performance', 'settings']);
   assert.deepEqual(classifyPaths(['js/content/collab_dialog.js']).lanes, ['whitelist', 'blocking', 'menu', 'performance']);
   assert.deepEqual(classifyPaths(['js/content/dom_state.js']).lanes, ['whitelist', 'blocking', 'dom', 'performance']);
@@ -178,6 +191,15 @@ test('executable classifier covers every current JavaScript source file', () => 
   const result = classifyPaths(jsFiles);
 
   assert.ok(jsFiles.length >= 30);
+  assert.deepEqual(result.unmatched, []);
+});
+
+test('executable classifier covers every top-level product documentation file', () => {
+  const productDocs = collectTopLevelProductDocFiles();
+  const result = classifyPaths(productDocs);
+
+  assert.ok(productDocs.length >= 30);
+  assert.deepEqual(result.lanes, ['release', 'smoke']);
   assert.deepEqual(result.unmatched, []);
 });
 
