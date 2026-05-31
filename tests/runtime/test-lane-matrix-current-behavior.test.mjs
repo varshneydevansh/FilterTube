@@ -37,6 +37,14 @@ test('test lane matrix defines every required lane and npm script', () => {
   const pkg = readJson('package.json');
   const matrix = read(matrixPath);
   const driftScript = read('scripts/audit-proof-drift.mjs');
+  const resumedGoalTerms = [
+    'FilterTube Change-Safety Audit and Test Lanes',
+    'Keep audit proof files inside `docs/audit/`',
+    'Turn confirmed risks into focused fixtures/tests',
+    'Create `docs/audit/TEST_LANE_MATRIX.md`',
+    'Define required lanes by touched area',
+    'Commit only with passing lane'
+  ];
 
   assert.deepEqual(laneNames().sort(), requiredLanes.toSorted());
   assert.equal(validateLaneFiles().length, 0);
@@ -62,6 +70,10 @@ test('test lane matrix defines every required lane and npm script', () => {
   assert.match(matrix, /docs\/audit\/artifacts\/release-live-youtube-spa-smoke\/template\.json/);
   assert.match(matrix, /docs\/audit\/artifacts\/release-live-youtube-spa-smoke\/run-live-smoke\.mjs/);
   assert.match(driftScript, /args\.has\('--lane-owned'\) && args\.has\('--all'\)/);
+
+  for (const term of resumedGoalTerms) {
+    assert.ok(matrix.includes(term), `resumed goal coverage missing ${term}`);
+  }
 });
 
 test('test lane matrix maps high-risk source files to expected lanes', () => {
@@ -157,6 +169,9 @@ test('smoke lane keeps release confidence broad but bounded', () => {
 test('manual YouTube smoke handoff covers visible release-critical behavior', () => {
   const matrix = read(matrixPath);
   const requiredTerms = [
+    'blocklist',
+    'whitelist',
+    'keyword/channel blocking',
     'no-rule/no-work performance',
     'blocklist keyword/channel hiding',
     'whitelist-only mode',
