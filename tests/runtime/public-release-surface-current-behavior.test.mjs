@@ -107,12 +107,17 @@ test('release publishing currently creates a public release before asset uploads
 
 test('website home and browser-logo surfaces currently carry public performance and remote-request risks', () => {
   const home = read('website/app/page.js');
+  const heroVideo = read('website/components/hero-video.js');
   const routeContent = read('website/components/route-content.js');
   const logoRail = read('website/components/browser-logo-rail.js');
 
-  assert.match(home, /<video/);
-  assert.match(home, /preload="auto"/);
-  assert.match(home, /src=\{heroVideoUrl\}/);
+  assert.match(home, /import \{ HeroVideo \}/);
+  assert.match(home, /<HeroVideo src=\{heroVideoUrl\} \/>/);
+  assert.match(heroVideo, /<video/);
+  assert.match(heroVideo, /preload="metadata"/);
+  assert.match(heroVideo, /IntersectionObserver/);
+  assert.match(heroVideo, /prefers-reduced-motion: reduce/);
+  assert.match(routeContent, /heroVideoUrl = "\/videos\/homepage\/day\/homepage_hero_day\.mp4"/);
 
   assert.match(routeContent, /cdnjs\.cloudflare\.com\/ajax\/libs\/browser-logos/);
   assert.match(logoRail, /src=\{browser\.logo\}/);

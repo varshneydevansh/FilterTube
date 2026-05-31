@@ -54,11 +54,11 @@ test('JSON-first filter readiness gate is audit-only and links current proof lay
   assert.match(doc, /This is not implementation readiness/);
   assert.match(doc, /documented\s+JSON path, a `FILTER_RULES` path, or a consumed `rules\.<field>` value/);
   assert.match(doc, /first-class JSON filter behavior/);
-  assert.match(doc, /js\/filter_logic\.js` \| 3,498 lines, 165,151 bytes/);
+  assert.match(doc, /js\/filter_logic\.js` \| 3,652 lines, 172,174 bytes/);
   assert.match(doc, /js\/seed\.js` \| 1,136 lines, 50,026 bytes/);
-  assert.equal(lineCount(filterLogic), 3498);
-  assert.equal(Buffer.byteLength(filterLogic), 165151);
-  assert.equal(sha256('js/filter_logic.js'), '4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641');
+  assert.equal(lineCount(filterLogic), 3652);
+  assert.equal(Buffer.byteLength(filterLogic), 172174);
+  assert.equal(sha256('js/filter_logic.js'), '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5');
   assert.equal(lineCount(seed), 1136);
   assert.equal(Buffer.byteLength(seed), 50026);
   assert.equal(sha256('js/seed.js'), 'a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d');
@@ -218,7 +218,7 @@ test('JSON-first readiness gate links the implementation locus register without 
     'js/filter_logic.js:154',
     'js/filter_logic.js:426',
     'js/filter_logic.js:2126',
-    'js/filter_logic.js:3434',
+    'js/filter_logic.js:3588',
     'js/content_bridge.js:1788',
     'js/content_bridge.js:5932',
     'js/content_bridge.js:6333',
@@ -226,7 +226,7 @@ test('JSON-first readiness gate links the implementation locus register without 
     'js/content/dom_fallback.js:2487',
     'js/content/block_channel.js:1205',
     'js/content/block_channel.js:1979',
-    'js/content/block_channel.js:3172'
+    'js/content/block_channel.js:3174'
   ]) {
     assert.ok(doc.includes(`\`${anchor}\``), `missing source anchor ${anchor}`);
   }

@@ -23,7 +23,7 @@ fixture-provenance, DOM-parity, and native-parity decision.
 
 | Source | Current fingerprint |
 | --- | --- |
-| `js/filter_logic.js` | 3,498 lines, 165,151 bytes, sha256 `4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641` |
+| `js/filter_logic.js` | 3,652 lines, 172,174 bytes, sha256 `953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5` |
 | `js/seed.js` | 1,136 lines, 50,026 bytes, sha256 `a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d` |
 | Path authority | `docs/audit/FILTERTUBE_JSON_PATH_AUTHORITY_CURRENT_BEHAVIOR_2026-05-19.md` |
 | Runtime gap register | `docs/audit/FILTERTUBE_JSON_RUNTIME_COVERAGE_GAP_REGISTER_2026-05-20.md` |
@@ -161,11 +161,11 @@ and
 extend this gate from blocked promotion rows into exact source loci. The current
 source anchors are `js/seed.js:263`, `js/seed.js:383`, `js/seed.js:666`,
 `js/seed.js:757`, `js/filter_logic.js:154`, `js/filter_logic.js:426`,
-`js/filter_logic.js:2126`, `js/filter_logic.js:3434`,
+`js/filter_logic.js:2126`, `js/filter_logic.js:3588`,
 `js/content_bridge.js:1788`, `js/content_bridge.js:5932`,
 `js/content_bridge.js:6333`, `js/content/dom_fallback.js:1933`,
 `js/content/dom_fallback.js:2487`, `js/content/block_channel.js:1205`,
-`js/content/block_channel.js:1979`, and `js/content/block_channel.js:3172`.
+`js/content/block_channel.js:1979`, and `js/content/block_channel.js:3174`.
 This does not approve implementation work; it records where future
 `jsonFirstSourceLocusDecision`, `jsonFirstEndpointDecision`,
 `jsonFirstActiveRuleReport`, `jsonFirstTransportBudget`,

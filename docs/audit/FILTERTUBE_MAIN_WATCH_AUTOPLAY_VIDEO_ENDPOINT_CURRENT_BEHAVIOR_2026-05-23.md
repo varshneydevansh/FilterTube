@@ -48,8 +48,8 @@ the same video.
 | --- | --- | --- | --- |
 | No active rules | Passes through unchanged. | Pass through unchanged. | Baseline shape preserved. |
 | Blocklist keyword `Dua` | Matching `playlistPanelVideoRenderer` is removed. | Matching `autoplayVideo` and `nextButtonVideo` still point to `TUVcZfQe-Kw`. | Leak: the next-play endpoint can survive after the visible supported row is removed. |
-| Blocklist channel `UC-J-KZfRV8c13fOCkhXdLiQ` | Matching `playlistPanelVideoRenderer` is removed. | Matching `autoplayVideo` and `nextButtonVideo` still point to `TUVcZfQe-Kw`. | Leak: endpoint-only autoplay has no title/channel rule authority today. |
-| Whitelist nonmatch | Supported playlist row is removed by fail-closed whitelist mode. | Autoplay endpoints still point to `TUVcZfQe-Kw`. | Allow-mode leak: endpoint-only autoplay survives the nonmatching whitelist decision. |
+| Blocklist channel `UC-J-KZfRV8c13fOCkhXdLiQ` | Matching `playlistPanelVideoRenderer` is removed. | Matching `autoplayVideo` and `nextButtonVideo` are removed. | Channel-rule autoplay endpoint leak is covered in this reduced fixture. |
+| Whitelist nonmatch | Supported playlist row is removed by fail-closed whitelist mode. | Matching `autoplayVideo` and `nextButtonVideo` are removed. | Allow-mode autoplay endpoint leak is covered in this reduced fixture. |
 | Whitelist match | Supported playlist row remains. | Autoplay endpoints remain. | No false hide in the reduced fixture, but the endpoint still lacks explicit allow authority. |
 
 The full reduced fixture queues one `FilterTube_UpdateVideoChannelMap` message
@@ -75,9 +75,9 @@ player toggle and `.autonav-endscreen`. It does not mutate the JSON
 
 This does not close the broader compact-autoplay or watch autoplay audit row.
 It proves the raw capture uses endpoint objects rather than
-`compactAutoplayRenderer`, and it proves those endpoint objects currently
-survive blocklist and whitelist filtering when the matching supported playlist
-row is removed.
+`compactAutoplayRenderer`, and it proves channel-rule and whitelist nonmatch
+filtering can remove matching endpoint objects when the matching supported
+playlist row is removed.
 
 Still required before optimization or behavior changes:
 

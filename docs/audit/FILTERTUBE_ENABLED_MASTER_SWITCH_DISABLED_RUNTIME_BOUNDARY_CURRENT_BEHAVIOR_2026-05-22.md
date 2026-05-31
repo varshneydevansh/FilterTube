@@ -61,7 +61,7 @@ changes, or whitelist behavior changes.
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
 | `js/seed.js` | 1,136 | 50,026 | `a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d` |
-| `js/filter_logic.js` | 3,498 | 165,151 | `4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641` |
+| `js/filter_logic.js` | 3,652 | 172,174 | `953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5` |
 | `js/content/dom_fallback.js` | 4,838 | 228,332 | `2129fcc16f8ad1420a6cb44905ddcd0b68d5511f3b647e2db100c0d67d492aef` |
 | `js/background.js` | 6,320 | 285,103 | `77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad` |
 | `js/settings_shared.js` | 1,181 | 57,535 | `9710ebb445ba11cc45fc98aced765d298226a8cd4a003600e106f908abc2162c` |
@@ -76,7 +76,7 @@ changes, or whitelist behavior changes.
 | `seedFetchBypassDecision` | `js/seed.js:693` | 5 | 202 | Fetch computes the YouTubei `dataName` and returns the original fetch promise before attaching body parsing when `shouldBypassYouTubeiNetworkResponse(dataName)` is true. |
 | `seedFetchBodyRewrite` | `js/seed.js:701` | 45 | 2,750 | Active JSON-work fetch responses call `response.clone().json()`, then later call `processWithEngine()`, then rebuild a `Response` with `JSON.stringify(processed)`. |
 | `seedXhrDisabledGuard` | `js/seed.js:813` | 8 | 394 | XHR response processing returns before status/body parsing when `cachedSettings.enabled === false`. |
-| `engineHarvestBeforeDisabled` | `js/filter_logic.js:3434` | 20 | 826 | `processData()` calls `_harvestChannelData(data)` before the `this.settings.enabled === false` mutation skip. |
+| `engineHarvestBeforeDisabled` | `js/filter_logic.js:3588` | 20 | 826 | `processData()` calls `_harvestChannelData(data)` before the `this.settings.enabled === false` mutation skip. |
 | `domActiveWorkPredicate` | `js/content/dom_fallback.js:1933` | 68 | 2,333 | DOM fallback active-work detection returns false for `enabled:false`, but true for whitelist mode, non-empty lists, true boolean toggles, content filters, or enabled category filters with selected categories. |
 | `domDisabledCleanupGate` | `js/content/dom_fallback.js:2304` | 21 | 959 | `applyDOMFallback()` clears content-control CSS and restores previously hidden/pending elements before returning on `effectiveSettings.enabled === false`. |
 | `backgroundEnabledFromV4` | `js/background.js:285` | 10 | 359 | Background compilation resolves `enabledFromV4` from profile settings, falling back to legacy `items.enabled !== false`. |

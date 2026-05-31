@@ -86,7 +86,7 @@ function assertJsonFirstOwnerBudgetLedger(doc) {
   for (const row of [
     /\| Seed transport admission \| `js\/seed\.js:220-260`, `js\/seed\.js:383-430`, `js\/seed\.js:1002-1014` \|/,
     /\| Injector transport admission \| `js\/injector\.js:171-188`, `js\/injector\.js:1940-1944`, `js\/injector\.js:3405-3437` \|/,
-    /\| JSON renderer owner \| `js\/filter_logic\.js:426-520`, `js\/filter_logic\.js:1698-2112`, `js\/filter_logic\.js:3434-3479` \|/,
+    /\| JSON renderer owner \| `js\/filter_logic\.js:435-529`, `js\/filter_logic\.js:1721-2261`, `js\/filter_logic\.js:3588-3619` \|/,
     /\| DOM fallback owner \| `js\/content\/dom_fallback\.js:1933-1999`, `js\/content\/dom_fallback\.js:2035-2088`, `js\/content\/dom_fallback\.js:4547-4752` \|/,
     /\| Bridge\/action owner \| `js\/content_bridge\.js:6014-6037`, `js\/content\/block_channel\.js:1205-1222` \|/,
     /\| Release proof owner \| `docs\/audit\/FILTERTUBE_RELEASE_REGRESSION_LAG_AND_BLOCKLIST_FIX_2026-05-26\.md` \|/
@@ -161,7 +161,7 @@ test('JSON-first no-work optimization crosswalk is audit-only and source-pinned'
 
   for (const [file, lines, bytes, hash] of [
     ['js/seed.js', 1136, 50026, 'a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d'],
-    ['js/filter_logic.js', 3498, 165151, '4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641'],
+    ['js/filter_logic.js', 3652, 172174, '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5'],
     ['js/content_bridge.js', 13571, 601694, '1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3'],
     ['js/content/dom_fallback.js', 4838, 228332, '2129fcc16f8ad1420a6cb44905ddcd0b68d5511f3b647e2db100c0d67d492aef'],
     ['js/content/block_channel.js', 3175, 127396, '1b6fffa249a746c01686df0d6a05dc4b770a6f0c5ded08b78a7043c11e9cdd83']

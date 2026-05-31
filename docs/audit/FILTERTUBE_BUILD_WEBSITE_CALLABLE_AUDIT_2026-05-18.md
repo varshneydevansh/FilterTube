@@ -18,18 +18,20 @@ surfaces even when they do not contain callables.
 
 | Family | Files | Lexical callables | Public authority |
 | --- | ---: | ---: | --- |
-| Build and sync scripts | 4 | 34 | Extension ZIPs, generated UI shell, vendor Nanah/QR bundles, native app runtime sync, GitHub release body/assets |
+| Build and sync scripts | 6 | 59 | Extension ZIPs, generated UI shell, vendor Nanah/QR bundles, native app runtime sync, GitHub release body/assets, focused test-lane runner, lane-owned audit proof drift guard |
 | Website app routes | 9 | 19 | Public metadata, downloads page, privacy/terms policy, sitemap, robots, platform detail pages |
-| Website components | 13 | 32 | Public platform copy, browser links, footer/header/navigation, theme/scene runtime, animation/reveal behavior |
-| Total | 26 | 85 | Public release and website truth boundary |
+| Website components | 15 | 54 | Public platform copy, browser links, footer/header/navigation, theme/scene runtime, animation/reveal behavior, hero media control |
+| Total | 30 | 132 | Public release and website truth boundary |
 
 ## Accounted Files
 
 | File | Count | Important callable / surface |
 | --- | ---: | --- |
 | `build.js` | 28 | `main`, `maybeCollectMobileArtifacts`, `resolveDefaultMobileArtifactsDir`, `parseMobileArtifactName`, `summarizeMobileArtifacts`, `buildReleaseBody`, `createGitHubRelease`, `uploadReleaseAsset`, `updateReadmeBadges` |
+| `scripts/audit-proof-drift.mjs` | 12 | `currentSourceProofs`, `laneOwnedProofFiles`, `defaultAuditProofFiles`, `collectProofDrift`, `main` |
 | `scripts/build-extension-ui.mjs` | 2 | `ensureOutputDirectories`, `bundleAll` |
 | `scripts/build-nanah-vendor.mjs` | 4 | `buildQrcodeBundle`, `buildNanahBundle`, `main` |
+| `scripts/run-test-lane.mjs` | 13 | `classifyPaths`, `laneNames`, `validateLaneFiles`, `runNode`, `runLane`, `printClassification`, `printList`, `main` |
 | `scripts/sync-native-runtime.mjs` | 0 | top-level native repo sync authority |
 | `website/app/[slug]/page.js` | 3 | `generateStaticParams`, `generateMetadata`, `DetailPage` |
 | `website/app/downloads/page.js` | 3 | `ExternalTextLink`, `DownloadCard`, `DownloadsPage` |
@@ -41,6 +43,8 @@ surfaces even when they do not contain callables.
 | `website/app/sitemap.js` | 1 | `sitemap` |
 | `website/app/terms/page.js` | 1 | `TermsPage` |
 | `website/components/browser-logo-rail.js` | 1 | `BrowserLogoRail` |
+| `website/components/footer-signal-art.js` | 20 | canvas footer signal helpers, recommendation-card drawing, and lifecycle closures |
+| `website/components/hero-video.js` | 2 | `HeroVideo`, effect-managed playback / visibility observer |
 | `website/components/marketing-ui.js` | 5 | `Panel`, `SectionHeading`, `StatPill`, `ActionInner`, `ActionLink` |
 | `website/components/reveal.js` | 1 | `Reveal` |
 | `website/components/route-content.js` | 0 | platform/product/download/browser public data |
@@ -69,7 +73,7 @@ surfaces even when they do not contain callables.
 | Website analytics | `RootLayout` imports and renders Vercel Analytics on the website only. | `website/app/layout.js:7`, `125`; `website/app/privacy/page.js:667` | Privacy copy must keep saying website-only; extension/app manifests must not imply analytics runtime. |
 | Website direct APK CTA | Downloads page links "Direct APK releases" to the latest GitHub release while the same page says signed APK/checksum should be attached when ready. | `website/app/downloads/page.js:20`, `54`, `91`, `231`, `351` | The CTA can be reachable before a signed APK/checksum/fingerprint manifest exists. |
 | Third-party logo CDN | Browser logos are remote CDN URLs rendered as normal `<img>` elements. | `website/components/route-content.js:35`, `41`, `47`, `53`, `59`, `65`; `website/components/browser-logo-rail.js:37` | Website privacy should mention third-party asset requests or the logos should be local. |
-| Hero video preload | Homepage hero video uses `preload="auto"` and autoplays full-screen background media. | `website/app/page.js:176`, `184`; `website/components/route-content.js:20` | Mobile/low-end visitors may download heavy media before reading content; use metadata/controlled responsive sources if needed. |
+| Hero video preload | Homepage delegates to `HeroVideo`; the component uses `preload="metadata"`, IntersectionObserver playback, visibility pause, and reduced-motion pause. | `website/app/page.js:5`, `180`; `website/components/hero-video.js:18`, `28`, `31`, `42`, `55`; `website/components/route-content.js:20` | This reduces the old eager preload risk, but the route still ships a large hero media surface that needs route/render and device budget proof before making performance claims. |
 | Platform status copy | Platform detail data says Android/iOS are in final release testing and TV is a separate path. | `website/components/route-content.js:346`, `488`, `699`; `website/app/downloads/page.js:215` | Public status copy needs artifact/store proof before changing from testing to available. |
 | Sitemap freshness | Sitemap uses a static `lastModified` date for all routes. | `website/app/sitemap.js:3`, `8` | Public route freshness can drift from real website changes. |
 
@@ -207,8 +211,8 @@ tests/runtime/build-website-callable-current-behavior.test.mjs
 
 They pin:
 
-- 26 accounted build/website files.
-- 85 lexical build/website callables.
+- 30 accounted build/website files.
+- 132 lexical build/website callables.
 - public surfaces for release scripts, vendor/native sync, website app routes,
   website components, and public claim data.
 - high-risk source patterns for README mutation, non-atomic GitHub release,

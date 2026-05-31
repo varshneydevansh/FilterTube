@@ -24,7 +24,7 @@ no-work, DOM parity, native parity, and metric proof.
 | Source | Current fingerprint |
 | --- | --- |
 | `js/seed.js` | 1,136 lines, 50,026 bytes, sha256 `a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d` |
-| `js/filter_logic.js` | 3,498 lines, 165,151 bytes, sha256 `4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641` |
+| `js/filter_logic.js` | 3,652 lines, 172,174 bytes, sha256 `953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5` |
 | `js/content_bridge.js` | 13,571 lines, 601,694 bytes, sha256 `1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3` |
 | `js/content/dom_fallback.js` | 4,838 lines, 228,332 bytes, sha256 `2129fcc16f8ad1420a6cb44905ddcd0b68d5511f3b647e2db100c0d67d492aef` |
 | `js/content/block_channel.js` | 3,175 lines, 127,396 bytes, sha256 `1b6fffa249a746c01686df0d6a05dc4b770a6f0c5ded08b78a7043c11e9cdd83` |

@@ -81,19 +81,19 @@ test('release notes JSON data shape and package version boundary remain pinned',
   const packageVersion = readJson('package.json').version;
   const keySet = [...new Set(releaseNotes.flatMap((entry) => Object.keys(entry)))].sort();
 
-  assert.equal(releaseText.split('\n').length, 317);
-  assert.equal(releaseBytes.length, 23039);
-  assert.equal(sha256(releaseBytes), 'e012f6c071fffa67958f55544ecae9bbb26e7ec91edd2066df4d06a62de69962');
+  assert.equal(releaseText.split('\n').length, 318);
+  assert.equal(releaseBytes.length, 23020);
+  assert.equal(sha256(releaseBytes), 'a8d59b18e9bffd1c828538ee58b3b8e9be7c641fea3ff064220311485a3b1c6b');
   assert.equal(releaseNotes.length, 24);
   assert.equal(releaseNotes.filter((entry) => entry._comment).length, 1);
   assert.equal(versionRows.length, 23);
   assert.deepEqual(keySet, ['_comment', 'bannerSummary', 'detailsUrl', 'headline', 'highlights', 'summary', 'version']);
 
   assert.equal(versionRows[0].version, '3.3.2');
-  assert.equal(packageVersion, '3.3.1');
+  assert.equal(packageVersion, '3.3.2');
   assert.ok(versionRows.some((entry) => entry.version === packageVersion), 'current package version needs a release-note entry');
-  assert.deepEqual(versionRows.filter((entry) => !entry.detailsUrl).map((entry) => entry.version), ['3.3.2']);
-  assert.equal(versionRows.filter((entry) => /releases\/tag\//.test(entry.detailsUrl || '')).length, 19);
+  assert.deepEqual(versionRows.filter((entry) => !entry.detailsUrl).map((entry) => entry.version), []);
+  assert.equal(versionRows.filter((entry) => /releases\/tag\//.test(entry.detailsUrl || '')).length, 20);
   assert.equal(versionRows.filter((entry) => /\/commit\//.test(entry.detailsUrl || '')).length, 3);
   assert.equal(versionRows.filter((entry) => typeof entry.bannerSummary === 'string' && entry.bannerSummary.trim()).length, 18);
   assert.equal(versionRows.filter((entry) => typeof entry.headline === 'string' && entry.headline.trim()).length, 23);
@@ -102,7 +102,7 @@ test('release notes JSON data shape and package version boundary remain pinned',
   assert.equal(versionRows.reduce((total, entry) => total + entry.highlights.length, 0), 110);
   assert.equal(Math.min(...versionRows.map((entry) => entry.highlights.length)), 3);
   assert.equal(Math.max(...versionRows.map((entry) => entry.highlights.length)), 9);
-  assert.equal(count(releaseText, /detailsUrl/g), 22);
+  assert.equal(count(releaseText, /detailsUrl/g), 23);
 
   for (const manifest of ['manifest.json', 'manifest.chrome.json', 'manifest.firefox.json', 'manifest.opera.json']) {
     assert.equal(readJson(manifest).version, packageVersion, `${manifest} version drifted from package.json`);
@@ -110,12 +110,12 @@ test('release notes JSON data shape and package version boundary remain pinned',
 
   const audit = doc();
   for (const expected of [
-    '317 lines, 23,039 bytes',
+    '318 split lines, 23,020 bytes',
     '24 array rows, 1 comment row, and 23 version rows',
     'newest version row is `3.3.2`',
-    'only version row without `detailsUrl`',
-    'Version `3.3.1` exists in the JSON',
-    '19 version rows use GitHub release-tag URLs',
+    'all 23 version rows have `detailsUrl`',
+    'Version `3.3.2` exists in the JSON',
+    '20 version rows use GitHub release-tag URLs',
     '3 use GitHub commit URLs',
     '110 total highlight strings',
   ]) {

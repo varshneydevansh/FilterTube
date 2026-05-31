@@ -22,7 +22,7 @@ identity is missing.
 | Source | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
 | `yt_kids_latest.json` | 11409 | 604928 | `7c74f1a0d7b3d0196de53fefed88aa3d2f3e6560acdb5a590752021e38cb6596` |
-| `js/filter_logic.js` | 3498 | 165151 | `4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641` |
+| `js/filter_logic.js` | 3652 | 172174 | `953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5` |
 | `tests/runtime/fixtures/captures/kids-latest-compact-video-owner-extension.json` | 203 | 9321 | `7eb63cd3d1d27b837e286df7eebadac79e3b2bd62ca8ac33ad2b99ee55034529` |
 
 Related proof layers:
@@ -55,7 +55,7 @@ video map fallback decision block lines: 13
 video map fallback decision block bytes: 556
 filter_logic kidsVideoOwnerExtension tokens: 2
 filter_logic compactVideoRenderer tokens: 9
-filter_logic videoChannelMap tokens: 8
+filter_logic videoChannelMap tokens: 10
 filter_logic FilterTube_UpdateVideoChannelMap tokens: 1
 runtime Kids latest owner extension fixtures: 6
 runtime behavior changed: no

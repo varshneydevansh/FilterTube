@@ -19,7 +19,7 @@ and whitelist mode still parse and rebuild the response.
 | Source | Current shape | Count / fingerprint |
 | --- | --- | --- |
 | `strange_ytInitialData.json` | `var ytInitialData = '...'` string literal with escaped JSON; not direct JSON. | 141 lines; 244,201 bytes; sha256 `01e6010a3f46041c3bcb3b6b399e871b5aa2fc28a0f234eca237226162b476b7`. |
-| `js/filter_logic.js` | Existing runtime rule owner; not changed in this slice. | 3,498 lines; 165,151 bytes; sha256 `4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641`. |
+| `js/filter_logic.js` | Existing runtime rule owner; not changed in this slice. | 3,652 lines; 172,174 bytes; sha256 `953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5`. |
 
 Raw token counts in `strange_ytInitialData.json`:
 

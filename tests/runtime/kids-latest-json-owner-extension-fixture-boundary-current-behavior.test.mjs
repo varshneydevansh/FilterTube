@@ -151,9 +151,9 @@ test('Kids latest JSON owner extension fixture audit is audit-only and source pi
   assert.equal(lineCount(raw), 11409);
   assert.equal(Buffer.byteLength(raw), 604928);
   assert.equal(sha256('yt_kids_latest.json'), '7c74f1a0d7b3d0196de53fefed88aa3d2f3e6560acdb5a590752021e38cb6596');
-  assert.equal(lineCount(filterLogic), 3498);
-  assert.equal(Buffer.byteLength(filterLogic), 165151);
-  assert.equal(sha256('js/filter_logic.js'), '4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641');
+  assert.equal(lineCount(filterLogic), 3652);
+  assert.equal(Buffer.byteLength(filterLogic), 172174);
+  assert.equal(sha256('js/filter_logic.js'), '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5');
   assert.equal(lineCount(fixture), 203);
   assert.equal(Buffer.byteLength(fixture), 9321);
   assert.equal(sha256(fixturePath), '7eb63cd3d1d27b837e286df7eebadac79e3b2bd62ca8ac33ad2b99ee55034529');
@@ -202,7 +202,7 @@ test('Kids latest owner-extension source counts stay pinned', () => {
   for (const [literal, expected] of [
     ['kidsVideoOwnerExtension', 2],
     ['compactVideoRenderer', 9],
-    ['videoChannelMap', 8],
+    ['videoChannelMap', 10],
     ['FilterTube_UpdateVideoChannelMap', 1]
   ]) {
     assert.equal(countLiteral(filterLogic, literal), expected, `${literal} count drifted`);

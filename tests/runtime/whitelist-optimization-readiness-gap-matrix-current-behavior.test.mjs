@@ -163,7 +163,7 @@ test('whitelist readiness matrix is backed by list-mode identity pending and sur
   assert.match(whitelistIdentity, /block:no_whitelist_rules/);
   assert.match(whitelistIdentity, /block:unresolved_identity/);
   assert.match(whitelistIdentity, /allow:creator_page_whitelisted/);
-  assert.match(whitelistIdentity, /Comment renderers bypass this non-comment whitelist branch/);
+  assert.match(whitelistIdentity, /Comment renderers bypass this\s+non-comment whitelist branch/);
 
   assert.match(pendingRefresh, /temporary false-hide state/);
   assert.match(pendingRefresh, /bounded candidate array capped at 160/);

@@ -27,7 +27,7 @@ channel/keyword/comment checks do not block.
 
 | Source | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/filter_logic.js` | 3498 | 165151 | `4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641` |
+| `js/filter_logic.js` | 3652 | 172174 | `953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5` |
 
 Related proof layers:
 
@@ -43,16 +43,16 @@ Related proof layers:
 ```text
 block decision/effect boundary source files: 1
 block decision/effect source/effect blocks: 9
-filter_logic _shouldBlock block lines: 301
-filter_logic _shouldBlock block bytes: 15380
+filter_logic _shouldBlock block lines: 306
+filter_logic _shouldBlock block bytes: 15523
 collaboration cache block lines: 17
 collaboration cache block bytes: 786
 Shorts decision block lines: 6
 Shorts decision block bytes: 328
 route exception block lines: 15
 route exception block bytes: 460
-whitelist decision block lines: 105
-whitelist decision block bytes: 5392
+whitelist decision block lines: 110
+whitelist decision block bytes: 5535
 channel decision block lines: 17
 channel decision block bytes: 1090
 keyword decision block lines: 21

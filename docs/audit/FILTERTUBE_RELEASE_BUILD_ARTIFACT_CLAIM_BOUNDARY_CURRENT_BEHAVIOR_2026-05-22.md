@@ -16,8 +16,8 @@ changes.
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
 | `build.js` | 728 | 26641 | `7ef8a2fd6796ec6758d7724544469a623d7c2d9407247a12b482e1f55cdc243b` |
-| `package.json` | 46 | 1376 | `226f558856bf0f91d52bdbaced50020d035c1b2835ea86db2e420ada8fd1bd8e` |
-| `README.md` | 401 | 22476 | `adceb2e174debe044c06998d32e8661a20d0cdab81eb66792bcf697e2bf7459c` |
+| `package.json` | 58 | 2134 | `b4cc73d9128bda3643ff15557bdb06d0bda38f6840e63bbf2ea8117e6fc96a0c` |
+| `README.md` | 401 | 22476 | `4559dac6d9b6a2e9d94aed4c1cb10a384c2f7c51ad09f37bab00a983e78605fb` |
 | `CHANGELOG.md` | 591 | 40124 | `e22a87ce7eeb88d171587d4b0f4676881a2c3081a7fbf15978d7e8d8582cdfdd` |
 | `manifest.json` | 88 | 2513 | `282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734` |
 | `manifest.chrome.json` | 88 | 2513 | `282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734` |

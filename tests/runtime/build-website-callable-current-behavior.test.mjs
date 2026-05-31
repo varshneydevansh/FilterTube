@@ -11,8 +11,10 @@ const buildSemanticDoc = fs.readFileSync(buildSemanticDocPath, 'utf8');
 
 const accountedFiles = [
   'build.js',
+  'scripts/audit-proof-drift.mjs',
   'scripts/build-extension-ui.mjs',
   'scripts/build-nanah-vendor.mjs',
+  'scripts/run-test-lane.mjs',
   'scripts/sync-native-runtime.mjs',
   'website/app/[slug]/page.js',
   'website/app/downloads/page.js',
@@ -24,6 +26,8 @@ const accountedFiles = [
   'website/app/sitemap.js',
   'website/app/terms/page.js',
   'website/components/browser-logo-rail.js',
+  'website/components/footer-signal-art.js',
+  'website/components/hero-video.js',
   'website/components/marketing-ui.js',
   'website/components/reveal.js',
   'website/components/route-content.js',
@@ -40,8 +44,10 @@ const accountedFiles = [
 
 const expectedCounts = new Map([
   ['build.js', 28],
+  ['scripts/audit-proof-drift.mjs', 12],
   ['scripts/build-extension-ui.mjs', 2],
   ['scripts/build-nanah-vendor.mjs', 4],
+  ['scripts/run-test-lane.mjs', 13],
   ['scripts/sync-native-runtime.mjs', 0],
   ['website/app/[slug]/page.js', 3],
   ['website/app/downloads/page.js', 3],
@@ -53,6 +59,8 @@ const expectedCounts = new Map([
   ['website/app/sitemap.js', 1],
   ['website/app/terms/page.js', 1],
   ['website/components/browser-logo-rail.js', 1],
+  ['website/components/footer-signal-art.js', 20],
+  ['website/components/hero-video.js', 2],
   ['website/components/marketing-ui.js', 5],
   ['website/components/reveal.js', 1],
   ['website/components/route-content.js', 0],
@@ -191,8 +199,8 @@ test('build/website callable counts match the current lexical source surface', (
     assert.equal(count, expectedCounts.get(file), `${file} callable count drifted`);
   }
 
-  assert.equal(total, 85);
-  assert.match(auditDoc, /\| Total \| 26 \| 85 \|/);
+  assert.equal(total, 132);
+  assert.match(auditDoc, /\| Total \| 30 \| 132 \|/);
 
   const build = read('build.js');
   const buildRows = buildMethodRows();
@@ -261,8 +269,10 @@ test('build/website audit pins high-risk release and public claim patterns to cu
   assert.match(routeContent, /cdnjs\.cloudflare\.com\/ajax\/libs\/browser-logos/);
   assert.match(browserRail, /src=\{browser\.logo\}/);
 
-  assert.match(home, /preload="auto"/);
-  assert.match(home, /src=\{heroVideoUrl\}/);
+  const heroVideo = read('website/components/hero-video.js');
+  assert.match(home, /<HeroVideo src=\{heroVideoUrl\} \/>/);
+  assert.match(heroVideo, /preload="metadata"/);
+  assert.match(heroVideo, /IntersectionObserver/);
 
   assert.match(sitemap, /lastModified: "2026-05-16"/);
 

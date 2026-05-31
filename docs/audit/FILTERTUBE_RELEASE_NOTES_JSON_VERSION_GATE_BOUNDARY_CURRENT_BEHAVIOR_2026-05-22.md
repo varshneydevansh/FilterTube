@@ -28,14 +28,14 @@ needed before JSON can become a first-class filter contract.
 
 | Surface | Current evidence |
 | --- | --- |
-| Release notes JSON | `data/release_notes.json` has 317 lines, 23,039 bytes, sha256 `e012f6c071fffa67958f55544ecae9bbb26e7ec91edd2066df4d06a62de69962`, 24 array rows, 1 comment row, and 23 version rows. |
+| Release notes JSON | `data/release_notes.json` has 318 split lines, 23,020 bytes, sha256 `a8d59b18e9bffd1c828538ee58b3b8e9be7c641fea3ff064220311485a3b1c6b`, 24 array rows, 1 comment row, and 23 version rows. |
 | JSON schema shape | Current top-level keys are `_comment`, `bannerSummary`, `detailsUrl`, `headline`, `highlights`, `summary`, and `version`. All 23 version rows have `headline`, `summary`, and `highlights` arrays. 18 version rows have `bannerSummary`. |
 | Highlight data | The 23 version rows contain 110 total highlight strings. Per row, the current minimum is 3 and the maximum is 9. |
-| Packaged version | `package.json`, `manifest.json`, `manifest.chrome.json`, `manifest.firefox.json`, and `manifest.opera.json` are all `3.3.1`. |
-| Staged newest row | The newest version row is `3.3.2`, which is ahead of the packaged extension/browser version and is the only version row without `detailsUrl`. |
-| Current packaged row | Version `3.3.1` exists in the JSON and has a GitHub release-tag `detailsUrl`. |
-| Details URL mix | 19 version rows use GitHub release-tag URLs, 3 use GitHub commit URLs, and 1 staged row has no URL. |
-| Manifest prompt load | All 4 browser manifests load `js/content/release_notes_prompt.js`; indexes are 11 for default/Chrome/Opera and 10 for Firefox. |
+| Packaged version | `package.json`, `manifest.json`, `manifest.chrome.json`, `manifest.firefox.json`, and `manifest.opera.json` are all `3.3.2`. |
+| Current newest row | The newest version row is `3.3.2`, matching the packaged extension/browser version, and all 23 version rows have `detailsUrl`. |
+| Current packaged row | Version `3.3.2` exists in the JSON and has a GitHub release-tag `detailsUrl`. |
+| Details URL mix | 20 version rows use GitHub release-tag URLs and 3 use GitHub commit URLs. |
+| Manifest prompt load | All 4 browser manifests load `js/content/release_notes_prompt.js`; indexes are 12 for default/Chrome/Opera and 11 for Firefox. |
 
 ## Runtime Consumers
 
@@ -50,17 +50,17 @@ needed before JSON can become a first-class filter contract.
 
 Selected token counts:
 
-- `data/release_notes.json`: 22 `detailsUrl` tokens.
+- `data/release_notes.json`: 23 `detailsUrl` tokens.
 - `js/background.js`: 2 `data/release_notes.json` tokens, 5 `releaseNotesSeenVersion` tokens, 8 `releaseNotesPayload` tokens, and one token each for `FilterTube_ReleaseNotesCheck`, `FilterTube_ReleaseNotesAck`, and `FilterTube_OpenWhatsNew`.
 - `js/tab-view.js`: 3 `data/release_notes.json` tokens, 2 `detailsUrl` tokens, and 1 selected `fetch(` token.
 - `js/content/release_notes_prompt.js`: one token each for `FilterTube_ReleaseNotesCheck`, `FilterTube_ReleaseNotesAck`, `FilterTube_OpenWhatsNew`, `addEventListener`, and `setTimeout`.
 
 ## Current Risks
 
-1. Release-note JSON can stage a future top row while the package and manifests
-   remain on the previous version. The dashboard renders every valid version row,
-   so the staged `3.3.2` row can appear before the packaged `3.3.1` row even
-   though the update prompt payload is built from `CURRENT_VERSION`.
+1. Release-note JSON can carry a current top row with a release-tag
+   `detailsUrl` before artifact publication has been independently verified.
+   The dashboard renders every valid version row, so version parity and release
+   URL presence are not enough by themselves to prove artifact availability.
 2. The JSON schema is conventional rather than authority-backed. No runtime
    schema report enforces required fields, `detailsUrl` policy, sorted order,
    changelog URL class, or packaged-version parity before release artifacts are

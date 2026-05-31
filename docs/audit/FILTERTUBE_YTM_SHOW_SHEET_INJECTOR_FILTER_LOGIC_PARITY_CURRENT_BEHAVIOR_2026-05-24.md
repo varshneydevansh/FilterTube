@@ -20,7 +20,7 @@ but not first-class JSON filtering authority.
 | Artifact | Lines | Bytes | SHA-256 | Role |
 | --- | ---: | ---: | --- | --- |
 | `js/injector.js` | 3593 | 155830 | `634041581ec84db2edd4f07d46f4bfb9d3a7d97036a0fb83db7739856bdc3e04` | Main-world snapshot/collaborator extraction and lookup owner. |
-| `js/filter_logic.js` | 3498 | 165151 | `4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641` | JSON filtering and candidate decision owner. |
+| `js/filter_logic.js` | 3652 | 172174 | `953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5` | JSON filtering and candidate decision owner. |
 | `tests/runtime/fixtures/captures/ytm-show-sheet-collab-video-with-context-renderer.json` | 104 | 3818 | `e23da0992cec33040ce286d767c002a9171543dc07c5f5983cc505265fbaabfc` | Reduced YTM showSheet roster fixture. |
 
 Relevant token counts:

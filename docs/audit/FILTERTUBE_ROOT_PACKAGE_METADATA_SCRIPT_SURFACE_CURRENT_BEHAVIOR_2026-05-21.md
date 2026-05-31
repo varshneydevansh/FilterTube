@@ -26,17 +26,17 @@ first-class JSON filter work look safer than the runtime proof actually allows.
 
 ## File Fingerprints
 
-Current tracked root metadata inventory: 7 files, 2,935 newline counts, and
-133,185 bytes.
+Current tracked root metadata inventory: 7 files, 2,947 newline counts, and
+133,943 bytes.
 
 | File | Newline count | Bytes | SHA-256 |
 |---|---:|---:|---|
 | `.gitignore` | 153 | 2,197 | `c90a7834297cf0a7b65493f41a21947fd5d85d1e14740b902cb3a3664028e3ca` |
 | `CHANGELOG.md` | 591 | 40,124 | `e22a87ce7eeb88d171587d4b0f4676881a2c3081a7fbf15978d7e8d8582cdfdd` |
 | `LICENSE` | 21 | 1,073 | `d0739cbb6232b0fb9ea59347feaf412bab5042768aa02856b16af24bb35e9d9d` |
-| `README.md` | 401 | 22,476 | `adceb2e174debe044c06998d32e8661a20d0cdab81eb66792bcf697e2bf7459c` |
+| `README.md` | 401 | 22,476 | `4559dac6d9b6a2e9d94aed4c1cb10a384c2f7c51ad09f37bab00a983e78605fb` |
 | `channel-identity-watch-mix-collab-recovery-plan.md` | 262 | 16,023 | `01f82169b06d3752e318b20b956c8a4284ae80166686e5c40aeee66c957d108a` |
-| `package.json` | 46 | 1,376 | `226f558856bf0f91d52bdbaced50020d035c1b2835ea86db2e420ada8fd1bd8e` |
+| `package.json` | 58 | 2,134 | `b4cc73d9128bda3643ff15557bdb06d0bda38f6840e63bbf2ea8117e6fc96a0c` |
 | `package-lock.json` | 1,461 | 49,916 | `f52d6482693be9cd4edacdc1f1491b4d2cda796522bfd0e4dcf86e0c879ad974` |
 
 Any release, package, or optimization claim that uses these files should cite
@@ -47,7 +47,7 @@ the exact current file state or an updated fingerprint.
 `package.json` currently declares package version `3.3.2`, license `MIT`,
 repository `git+https://github.com/varshneydevansh/FilterTube.git`, homepage
 `https://github.com/varshneydevansh/FilterTube`, 2 runtime dependencies, 3
-development dependencies, and 12 scripts.
+development dependencies, and 24 scripts.
 
 Current scripts:
 
@@ -61,6 +61,18 @@ build:firefox -> node build.js firefox
 build:opera -> node build.js opera
 sync:native-runtime -> node scripts/sync-native-runtime.mjs
 audit:runtime -> node --test tests/runtime/*.test.mjs
+test:release -> node scripts/run-test-lane.mjs release
+test:whitelist -> node scripts/run-test-lane.mjs whitelist
+test:blocking -> node scripts/run-test-lane.mjs blocking
+test:json -> node scripts/run-test-lane.mjs json
+test:dom -> node scripts/run-test-lane.mjs dom
+test:menu -> node scripts/run-test-lane.mjs menu
+test:performance -> node scripts/run-test-lane.mjs performance
+test:settings -> node scripts/run-test-lane.mjs settings
+test:smoke -> node scripts/run-test-lane.mjs smoke
+lanes:changed -> node scripts/run-test-lane.mjs --changed
+test:changed -> node scripts/run-test-lane.mjs --run-changed
+test:audit-drift -> node scripts/audit-proof-drift.mjs --lane-owned
 dev:chrome -> cp manifest.chrome.json manifest.json
 dev:firefox -> cp manifest.firefox.json manifest.json
 dev:opera -> cp manifest.opera.json manifest.json
@@ -68,16 +80,19 @@ dev:opera -> cp manifest.opera.json manifest.json
 
 Current package metadata does not declare `private`, `engines`,
 `packageManager`, or a conventional `test` script. The audit command exists as
-`audit:runtime`; contributors who run `npm test` get no project-owned test path
-from this file. The browser dev shortcuts still mutate tracked `manifest.json`
-by copying a browser variant over it.
+`audit:runtime`; focused `test:*` lanes now call `scripts/run-test-lane.mjs`.
+`lanes:changed` classifies current dirty paths into required focused lanes,
+and `test:changed` runs those classified lanes sequentially.
+Contributors who run `npm test` still get no conventional project-owned test
+path from this file. The browser dev shortcuts still mutate tracked
+`manifest.json` by copying a browser variant over it.
 
 Risk classification:
 
 | Risk | Current behavior | Missing gate |
 |---|---|---|
 | Release drift | `package.json`, `package-lock.json`, README badges, browser manifests, changelog, and release notes currently point at `3.3.2`; app-store/direct APK availability still depends on artifact proof. | `rootReleaseClaimGate` linking package version, manifest versions, changelog section, README badge, release notes row, website copy, and package artifact. |
-| Audit discoverability | `audit:runtime` exists, but `test` is absent. | `packageScriptExecutionGate` for release and local verification commands. |
+| Audit discoverability | `audit:runtime`, focused `test:*` lanes, `lanes:changed`, and `test:changed` exist, but a conventional `test` alias is absent. | `packageScriptExecutionGate` for release and local verification commands. |
 | Dev manifest mutation | `dev:chrome`, `dev:firefox`, and `dev:opera` overwrite tracked `manifest.json`. | Dirty-worktree and manifest-parity gate before release or implementation review. |
 | Native parity | `sync:native-runtime` delegates to a sibling app repo; normal `npm run build` does not invoke it. | Runtime sync freshness and app-boundary proof before claiming extension/app parity. |
 
@@ -114,7 +129,7 @@ vendor-bundle freshness, generated UI freshness, and release ZIP contents.
 ## Public Root Documents
 
 `README.md` is public release copy. It currently displays version `3.3.2`,
-license `MIT`, total line count `502.5k`, JavaScript line count `73.2k`, and
+license `MIT`, total line count `503.2k`, JavaScript line count `73.8k`, and
 links the download hub `https://filtertube.in/downloads`.
 
 Current README claims relevant to optimization and JSON-first filtering:

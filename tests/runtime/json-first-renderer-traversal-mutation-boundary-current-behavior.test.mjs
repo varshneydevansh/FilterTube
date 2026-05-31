@@ -96,7 +96,7 @@ test('JSON-first renderer traversal mutation boundary audit is audit-only and so
   assert.match(doc, /not completion proof for JSON-first renderer traversal or mutation authority/);
 
   for (const [file, lines, bytes, hash] of [
-    ['js/filter_logic.js', 3498, 165151, '4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641'],
+    ['js/filter_logic.js', 3652, 172174, '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5'],
     ['js/seed.js', 1136, 50026, 'a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d']
   ]) {
     const source = read(file);

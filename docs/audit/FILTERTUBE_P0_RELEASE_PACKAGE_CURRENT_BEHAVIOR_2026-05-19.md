@@ -351,7 +351,7 @@ stored extension/service-worker version: 3.3.1
 Default Local Extension Settings directory exists: yes
 Default packed Extensions directory for this id exists: no
 workspace manifest.json sha256: 282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734
-workspace package.json sha256: 226f558856bf0f91d52bdbaced50020d035c1b2835ea86db2e420ada8fd1bd8e
+workspace package.json sha256: b4cc73d9128bda3643ff15557bdb06d0bda38f6840e63bbf2ea8117e6fc96a0c
 workspace js/content_bridge.js sha256: 1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3
 workspace content_bridge ampersand Topic fix token present: yes
 ```
@@ -670,7 +670,7 @@ dist snapshot source: existing ignored local dist tree
 browser staged directories: 3
 browser staged files per directory: 59
 dist zip artifacts: 3
-total dist files including zips: 184
+total dist files including zips: 180
 source-backed staged files per browser excluding manifest: 58
 byte-identical source-backed staged files per browser excluding manifest: 58
 committed package manifest: absent
@@ -696,9 +696,9 @@ Current local package artifact rows:
 
 | Target | Staged files | Manifest bytes | Manifest sha256 | Version | Content script entries | Content script JS refs | WAR refs | ZIP bytes | ZIP sha256 |
 | --- | ---: | ---: | --- | --- | ---: | ---: | ---: | ---: | --- |
-| `chrome` | 59 | 2513 | `282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734` | `3.3.2` | 2 | 15 | 5 | 8688743 | `8e0be875c5e4223eee1c123eb0ca037bbc7b6ea21ce77caf4ff28fb7f5a62703` |
-| `firefox` | 59 | 2603 | `a1773c9e0acc1c2029cb6aef4757a282aa0ec8d89759be65ea975ff237d00bb0` | `3.3.2` | 1 | 14 | 5 | 8688802 | `4dce4c99b06f0f12ac9b1234bcc931ca1cb461d117c59fcfb329ae8240e846ba` |
-| `opera` | 59 | 2518 | `0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b` | `3.3.2` | 2 | 15 | 4 | 8688745 | `9bb534fdcc9ab842c9364dbff340ec929fbc688214b7f55ac861a564b8730222` |
+| `chrome` | 59 | 2513 | `282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734` | `3.3.2` | 2 | 15 | 5 | 8688743 | `844a3ef1530ed1787e0911d43707e2b5ab687e83930edf7332c534c69e9ff898` |
+| `firefox` | 59 | 2603 | `a1773c9e0acc1c2029cb6aef4757a282aa0ec8d89759be65ea975ff237d00bb0` | `3.3.2` | 1 | 14 | 5 | 8688802 | `b39728fdec2292f7d54c839a383dae44142357ac0b8a0ffe056ee19078c51217` |
+| `opera` | 59 | 2518 | `0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b` | `3.3.2` | 2 | 15 | 4 | 8688745 | `d1a70a71f376cbfd19670563b2e384f252879d10a62b8972768cebd63479fae1` |
 
 ASCII boundary:
 

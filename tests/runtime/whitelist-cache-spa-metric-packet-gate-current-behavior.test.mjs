@@ -1184,10 +1184,10 @@ const routeModeCallableFields = [
 ];
 
 const affectedCallableAnchorChecks = [
-  ['js/filter_logic.js', 49, 'function queueVideoChannelMapping(videoId, channelId) {'],
-  ['js/filter_logic.js', 85, 'function queueVideoMetaMapping(videoId, meta) {'],
-  ['js/filter_logic.js', 1825, '_shouldBlock(item, rendererType) {'],
-  ['js/filter_logic.js', 1933, "if (listMode === 'whitelist' && !isCommentRenderer) {"],
+  ['js/filter_logic.js', 58, 'function queueVideoChannelMapping(videoId, channelId) {'],
+  ['js/filter_logic.js', 94, 'function queueVideoMetaMapping(videoId, meta) {'],
+  ['js/filter_logic.js', 1957, '_shouldBlock(item, rendererType) {'],
+  ['js/filter_logic.js', 2065, "if (listMode === 'whitelist' && !isCommentRenderer) {"],
   ['js/content_bridge.js', 1217, 'function installRightRailWhitelistObserver() {'],
   ['js/content_bridge.js', 1225, 'const runWhitelistRefreshPass = () => {'],
   ['js/content_bridge.js', 1391, 'async function prefetchIdentityForCard({ videoId, card }) {'],

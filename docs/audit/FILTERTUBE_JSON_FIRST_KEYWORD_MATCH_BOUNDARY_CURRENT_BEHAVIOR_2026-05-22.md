@@ -13,7 +13,7 @@ and DOM fallback matching before any first-class JSON filter authority is added.
 
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/filter_logic.js` | 3498 | 165151 | `4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641` |
+| `js/filter_logic.js` | 3652 | 172174 | `953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5` |
 | `js/settings_shared.js` | 1181 | 57535 | `9710ebb445ba11cc45fc98aced765d298226a8cd4a003600e106f908abc2162c` |
 | `js/background.js` | 6320 | 285103 | `77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad` |
 | `js/content/dom_fallback.js` | 4838 | 228332 | `2129fcc16f8ad1420a6cb44905ddcd0b68d5511f3b647e2db100c0d67d492aef` |
@@ -43,7 +43,7 @@ background comments keyword fallback block lines: 35
 background comments keyword fallback block bytes: 1961
 DOM fallback matchesKeyword block lines: 36
 DOM fallback matchesKeyword block bytes: 1278
-filter_logic total _regexMatches tokens: 7
+filter_logic total _regexMatches tokens: 8
 filter_logic total filterKeywordsComments tokens: 2
 settings_shared compileKeywords tokens: 4
 background compileKeywordEntries tokens: 4

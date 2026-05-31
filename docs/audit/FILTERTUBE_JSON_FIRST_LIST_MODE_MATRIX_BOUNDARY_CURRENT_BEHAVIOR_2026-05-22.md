@@ -28,7 +28,7 @@ allow/block decision contract exists.
 
 | Source | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/filter_logic.js` | 3498 | 165151 | `4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641` |
+| `js/filter_logic.js` | 3652 | 172174 | `953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5` |
 
 Related proof layers:
 
@@ -43,12 +43,12 @@ Related proof layers:
 
 ```text
 list-mode matrix boundary source files: 1
-filter_logic _shouldBlock block lines: 301
-filter_logic _shouldBlock block bytes: 15380
+filter_logic _shouldBlock block lines: 306
+filter_logic _shouldBlock block bytes: 15523
 list-mode setup block lines: 5
 list-mode setup block bytes: 368
-whitelist decision branch lines: 105
-whitelist decision branch bytes: 5392
+whitelist decision branch lines: 110
+whitelist decision branch bytes: 5535
 blocklist decision tail lines: 85
 blocklist decision tail bytes: 4702
 processData block lines: 32

@@ -40,7 +40,7 @@ through the existing `reelItemRenderer.headline.simpleText` rule.
 | --- | ---: | ---: | --- | --- |
 | `reel_item_watch?prettyPrint=False.JSON` | 1971 | 149486 | `cc8befaef3cf44c893f3809af34cdc1c798a3b855e0aacfd9b2034381f0b1026` | Ignored raw active Shorts/reel overlay evidence. |
 | `tests/runtime/fixtures/captures/main-reel-player-overlay-renderer.json` | 108 | 3706 | `99452336bec6d1be5a2242b9c3cefe06061fe980c256ac675fc721cb6a2a648e` | Reduced active overlay owner fixture. |
-| `js/filter_logic.js` | 3498 | 165151 | `4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641` | JSON filtering and direct renderer rule owner. |
+| `js/filter_logic.js` | 3652 | 172174 | `953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5` | JSON filtering and direct renderer rule owner. |
 
 ## Current Field Matrix
 

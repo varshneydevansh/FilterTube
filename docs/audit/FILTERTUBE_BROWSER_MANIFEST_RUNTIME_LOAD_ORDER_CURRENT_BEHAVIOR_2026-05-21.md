@@ -33,14 +33,14 @@ changes, or whitelist behavior changes.
 
 ## Manifest File Fingerprints
 
-The tracked manifest surface has 4 files, 336 newline counts, and 9,409 bytes:
+The tracked manifest surface has 4 files, 340 newline counts, and 9,573 bytes:
 
 | Path | Lines | Bytes | SHA-256 | Current package role |
 | --- | ---: | ---: | --- | --- |
-| `manifest.json` | 87 | 2,470 | `96eb5e5c8733ecdfa9d3eb447d51a3bfc2c4743a80b1fde1f12d71bd46d1c8e4` | Default/unpacked Chromium-style manifest |
-| `manifest.chrome.json` | 87 | 2,470 | `96eb5e5c8733ecdfa9d3eb447d51a3bfc2c4743a80b1fde1f12d71bd46d1c8e4` | Build input for Chrome/Edge/Brave ZIP |
-| `manifest.firefox.json` | 74 | 1,994 | `5d7175c23dbce4f9e86b0db0f34b1ae61bb465a9725ff37fc7069a45d4ceac5c` | Build input for Firefox ZIP |
-| `manifest.opera.json` | 88 | 2,475 | `f76d4a48b51fc5da65492347ce3f7cb31ebff057afd2185573176991e7d1d4b7` | Build input for Opera ZIP |
+| `manifest.json` | 88 | 2,513 | `282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734` | Default/unpacked Chromium-style manifest |
+| `manifest.chrome.json` | 88 | 2,513 | `282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734` | Build input for Chrome/Edge/Brave ZIP |
+| `manifest.firefox.json` | 75 | 2,029 | `c84368c9db6a4900bb6ff055b66a645a88176d3533e307eee0dcb8d230fae2bb` | Build input for Firefox ZIP |
+| `manifest.opera.json` | 89 | 2,518 | `0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b` | Build input for Opera ZIP |
 
 `manifest.json` and `manifest.chrome.json` are byte-identical today. The build
 script does not read `manifest.json` for browser ZIP creation; it reads
@@ -51,7 +51,7 @@ script does not read `manifest.json` for browser ZIP creation; it reads
 All four manifests currently share:
 
 - `manifest_version: 3`
-- `version: 3.3.1`
+- `version: 3.3.2`
 - permissions: `storage`, `activeTab`, `scripting`, `tabs`, `downloads`
 - host permissions: `*://*.youtube.com/*`,
   `*://*.youtube-nocookie.com/*`, `*://*.youtubekids.com/*`
@@ -74,15 +74,16 @@ not active filtering coverage proof.
 
 | Manifest | Background owner | Content-script entries | Page-runtime seed path | Isolated/helper stack | Web-accessible resources |
 | --- | --- | ---: | --- | --- | --- |
-| `manifest.json` | MV3 `service_worker: js/background.js` | 2 | first entry: `js/seed.js`, `world: MAIN`, `document_start` | second entry: 13 scripts, `world: ISOLATED`, `document_start` | `js/injector.js`, `js/filter_logic.js`, `js/seed.js`, `js/shared/identity.js`, `icons/file.svg` |
-| `manifest.chrome.json` | MV3 `service_worker: js/background.js` | 2 | first entry: `js/seed.js`, `world: MAIN`, `document_start` | second entry: 13 scripts, `world: ISOLATED`, `document_start` | same as default |
-| `manifest.firefox.json` | `background.scripts`: `js/shared/identity.js`, `js/background.js` | 1 | no manifest MAIN-world seed; fallback injection pushes `seed` in `js/content/bridge_injection.js` | one 13-script stack with no `world` field, `document_start` | same as default |
-| `manifest.opera.json` | MV3 `service_worker: js/background.js` | 2 | first entry: `js/seed.js`, no explicit `world`, `document_start` | second entry: 13 scripts, no explicit `world`, `document_start` | runtime JS resources only; no `icons/file.svg` |
+| `manifest.json` | MV3 `service_worker: js/background.js` | 2 | first entry: `js/seed.js`, `world: MAIN`, `document_start` | second entry: 14 scripts, `world: ISOLATED`, `document_start` | `js/injector.js`, `js/filter_logic.js`, `js/seed.js`, `js/shared/identity.js`, `icons/file.svg` |
+| `manifest.chrome.json` | MV3 `service_worker: js/background.js` | 2 | first entry: `js/seed.js`, `world: MAIN`, `document_start` | second entry: 14 scripts, `world: ISOLATED`, `document_start` | same as default |
+| `manifest.firefox.json` | `background.scripts`: `js/shared/identity.js`, `js/background.js` | 1 | no manifest MAIN-world seed; fallback injection pushes `seed` in `js/content/bridge_injection.js` | one 14-script stack with no `world` field, `document_start` | same as default |
+| `manifest.opera.json` | MV3 `service_worker: js/background.js` | 2 | first entry: `js/seed.js`, no explicit `world`, `document_start` | second entry: 14 scripts, no explicit `world`, `document_start` | runtime JS resources only; no `icons/file.svg` |
 
 The shared helper stack order is:
 
 ```text
 js/shared/identity.js
+js/content/dom_state.js
 js/content/menu.js
 js/content/dom_helpers.js
 js/content/dom_extractors.js
@@ -97,8 +98,8 @@ js/content/first_run_prompt.js
 js/content_bridge.js
 ```
 
-Current source has 55 content-script file references across all manifests and
-14 unique content-script files. All referenced content-script files are tracked.
+Current source has 59 content-script file references across all manifests and
+15 unique content-script files. All referenced content-script files are tracked.
 No manifest declares `content_scripts.css`.
 
 ## Firefox And Opera Runtime Split

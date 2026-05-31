@@ -174,7 +174,7 @@ function sourceBlocks() {
     candidateSearch: sliceBetween(
       filterLogic,
       '        _candidateSearchText(candidate) {',
-      '        _regexMatches(regex, text) {'
+      '        _extractAutoplayEndpointVideoId(endpoint) {'
     ),
     regexMatches: sliceBetween(
       filterLogic,
@@ -183,8 +183,8 @@ function sourceBlocks() {
     ),
     whitelistKeyword: sliceBetween(
       filterLogic,
-      '                if (hasKeywordRules) {\n                    const textToSearch = this._candidateSearchText(candidate);',
-      '                if (hasChannelRules && !hasStableChannelIdentity'
+      "                if (hasKeywordRules) {\n                    const textToSearch = this._candidateSearchText(candidate);\n                    for (const keywordRegex of whitelistKeywords) {\n                        if (this._regexMatches(keywordRegex, textToSearch)) {\n                            this._logWhitelistDecision('allow:matched_keyword'",
+      '                const shouldTryCreatorPageFallback = hasChannelRules && !hasStableChannelIdentity && ('
     ),
     blockKeyword: sliceBetween(
       filterLogic,
@@ -228,7 +228,7 @@ test('JSON-first keyword match boundary audit is audit-only and source pinned', 
   assert.match(doc, /keyword match boundary source files: 4/);
   assert.match(doc, /runtime keyword match fixtures: 8/);
 
-  assert.ok(doc.includes(`| \`js/filter_logic.js\` | 3498 | 165151 | \`${sha256('js/filter_logic.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/filter_logic.js\` | 3652 | 172174 | \`${sha256('js/filter_logic.js')}\` |`));
   assert.ok(doc.includes(`| \`js/settings_shared.js\` | 1181 | 57535 | \`${sha256('js/settings_shared.js')}\` |`));
   assert.ok(doc.includes(`| \`js/background.js\` | 6320 | 285103 | \`${sha256('js/background.js')}\` |`));
   assert.ok(doc.includes(`| \`js/content/dom_fallback.js\` | 4838 | 228332 | \`${sha256('js/content/dom_fallback.js')}\` |`));
@@ -257,13 +257,13 @@ test('keyword match boundary source counts remain pinned', () => {
     assert.match(doc, new RegExp(`${label} bytes: ${expectedBytes}`));
   }
 
-  assert.equal(countLiteral(blocks.filterLogic, '_regexMatches'), 7);
+  assert.equal(countLiteral(blocks.filterLogic, '_regexMatches'), 8);
   assert.equal(countLiteral(blocks.filterLogic, 'filterKeywordsComments'), 2);
   assert.equal(countLiteral(blocks.settingsShared, 'compileKeywords'), 4);
   assert.equal(countLiteral(blocks.background, 'compileKeywordEntries'), 4);
   assert.equal(countLiteral(blocks.domFallback, 'matchesKeyword'), 4);
 
-  assert.match(doc, /filter_logic total _regexMatches tokens: 7/);
+  assert.match(doc, /filter_logic total _regexMatches tokens: 8/);
   assert.match(doc, /filter_logic total filterKeywordsComments tokens: 2/);
   assert.match(doc, /settings_shared compileKeywords tokens: 4/);
   assert.match(doc, /background compileKeywordEntries tokens: 4/);

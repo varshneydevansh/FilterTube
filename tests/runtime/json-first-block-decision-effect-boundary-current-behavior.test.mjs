@@ -215,9 +215,9 @@ test('JSON-first block decision effect boundary audit is audit-only and source p
   assert.match(doc, /not completion proof for JSON-first block decision or effect authority/);
 
   const source = read('js/filter_logic.js');
-  assert.equal(lineCount(source), 3498);
-  assert.equal(Buffer.byteLength(source), 165151);
-  assert.equal(sha256('js/filter_logic.js'), '4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641');
+  assert.equal(lineCount(source), 3652);
+  assert.equal(Buffer.byteLength(source), 172174);
+  assert.equal(sha256('js/filter_logic.js'), '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5');
   assert.ok(doc.includes('`js/filter_logic.js`'));
 
   for (const artifact of [
@@ -246,16 +246,16 @@ test('block decision source counts remain pinned', () => {
   const commentBlock = sliceBetween(filterLogic, '            // Comment filtering', '            // Content filters (duration, upload date) - applied after channel/keyword filtering');
   const contentCategoryBlock = sliceBetween(filterLogic, '            // Content filters (duration, upload date) - applied after channel/keyword filtering', '            return false;\n        }\n\n        _checkCategoryFilters');
 
-  assert.equal(lineCount(shouldBlockBlock), 301);
-  assert.equal(Buffer.byteLength(shouldBlockBlock), 15380);
+  assert.equal(lineCount(shouldBlockBlock), 306);
+  assert.equal(Buffer.byteLength(shouldBlockBlock), 15523);
   assert.equal(lineCount(collaborationCacheBlock), 17);
   assert.equal(Buffer.byteLength(collaborationCacheBlock), 786);
   assert.equal(lineCount(shortsBlock), 6);
   assert.equal(Buffer.byteLength(shortsBlock), 328);
   assert.equal(lineCount(routeBlock), 15);
   assert.equal(Buffer.byteLength(routeBlock), 460);
-  assert.equal(lineCount(whitelistBlock), 105);
-  assert.equal(Buffer.byteLength(whitelistBlock), 5392);
+  assert.equal(lineCount(whitelistBlock), 110);
+  assert.equal(Buffer.byteLength(whitelistBlock), 5535);
   assert.equal(lineCount(channelBlock), 17);
   assert.equal(Buffer.byteLength(channelBlock), 1090);
   assert.equal(lineCount(keywordBlock), 21);
@@ -286,11 +286,11 @@ test('block decision source counts remain pinned', () => {
 
   for (const phrase of [
     'block decision/effect source/effect blocks: 9',
-    'filter_logic _shouldBlock block lines: 301',
+    'filter_logic _shouldBlock block lines: 306',
     'collaboration cache block lines: 17',
     'Shorts decision block lines: 6',
     'route exception block lines: 15',
-    'whitelist decision block lines: 105',
+    'whitelist decision block lines: 110',
     'runtime block decision/effect fixtures: 6'
   ]) {
     assert.ok(doc.includes(phrase), `missing count phrase ${phrase}`);

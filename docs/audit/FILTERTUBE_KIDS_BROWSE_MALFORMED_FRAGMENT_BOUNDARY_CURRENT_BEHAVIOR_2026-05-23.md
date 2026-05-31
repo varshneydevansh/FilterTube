@@ -22,7 +22,7 @@ and remains visible in both blocklist and whitelist decisions.
 | Source | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
 | `ytkids_browse?alt=json.json` | 8630 | 446776 | `fdadb983bbb5fa2e19b81c29bde860a0019c4a171bee00b36e42ae25adc3f240` |
-| `js/filter_logic.js` | 3498 | 165151 | `4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641` |
+| `js/filter_logic.js` | 3652 | 172174 | `953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5` |
 | `tests/runtime/fixtures/captures/kids-browse-malformed-fragment-compact-video.json` | 235 | 9959 | `40f84c7de6a385a111bf55aa23179e170f0e1a274cc96ae4cc092203ba8f954f` |
 
 Related proof layers:

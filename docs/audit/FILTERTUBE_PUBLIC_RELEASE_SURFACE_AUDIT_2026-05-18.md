@@ -7,12 +7,13 @@ from runtime behavior. It is audit evidence only.
 
 | Surface | Current behavior | Risk |
 | --- | --- | --- |
-| Package and manifests | `package.json`, root manifest, Chrome manifest, Firefox manifest, and Opera manifest are all `3.3.1`. | Low version drift for the packaged extension today. |
-| Release notes data | `data/release_notes.json` is sorted with a comment row first, then a staged `3.3.2` entry while the packaged extension remains `3.3.1`. | Dashboard/banner copy can describe upcoming work before the manifest package is bumped. |
+| Package and manifests | `package.json`, root manifest, Chrome manifest, Firefox manifest, and Opera manifest are all `3.3.2`. | Low version drift for the packaged extension today. |
+| Release notes data | `data/release_notes.json` has a `3.3.2` top release entry aligned with the packaged extension version. | Dashboard/banner copy is version-aligned; future release-note edits still need package/version proof. |
 | README privacy copy | README now scopes privacy language to local-first extension storage, no FilterTube account service, no extension analytics, and bounded YouTube resolver requests for weak identity targets. | This is safer than the old broad "No data leaves your browser" / "No External Requests" wording, but it still needs release/store privacy parity proof before public claim expansion. |
 | Website privacy page | The privacy page scopes Vercel Web Analytics to `filtertube.in` and says it is not in the extension or native apps. | This is the more precise wording and should become the public wording source. |
 | Downloads page | The Android card links "Direct APK releases" to GitHub latest release while the same page says direct APK distribution should happen when a signed APK and checksum are attached. | Users can be sent to a release page before an APK/checksum is actually attached. |
 | Build script | `build.js` updates README badges, packages browser zips, can stage Android artifacts with `.sha256`, and prompts for GitHub release publishing in interactive terminals. | CI/release reproducibility is weak unless README mutation and release publishing are split or run in dry-run mode. |
+| Homepage hero media | The homepage delegates media to `HeroVideo`, which uses `preload="metadata"`, IntersectionObserver playback, visibility pause, and reduced-motion pause. | The old eager preload risk is reduced, but large route media still needs device/render budget proof. |
 
 ## Required Follow-Up Proof Before Publishing Claims
 

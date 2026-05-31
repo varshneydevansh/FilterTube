@@ -32,7 +32,7 @@ const jsonNoWorkReadinessDocs = [
 
 const sourceFingerprints = [
   ['js/seed.js', 1136, 50026, 'a9d86cd973b998ffbd58faf316ca679267ce7267af36969683f32b760f49054d'],
-  ['js/filter_logic.js', 3498, 165151, '4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641'],
+  ['js/filter_logic.js', 3652, 172174, '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5'],
   ['js/content/dom_fallback.js', 4838, 228332, '2129fcc16f8ad1420a6cb44905ddcd0b68d5511f3b647e2db100c0d67d492aef'],
   ['js/content/block_channel.js', 3175, 127396, '1b6fffa249a746c01686df0d6a05dc4b770a6f0c5ded08b78a7043c11e9cdd83'],
   ['js/content_bridge.js', 13571, 601694, '1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3']
@@ -284,7 +284,7 @@ test('JSON-first active work source anchors and predicate mismatches remain pinn
     ['js/seed.js', 'function processWithEngine(data, dataName) {', 383, seed],
     ['js/seed.js', 'function setupFetchInterception() {', 666, seed],
     ['js/seed.js', 'function setupXhrInterception() {', 757, seed],
-    ['js/filter_logic.js', "processData(data, dataName = 'unknown') {", 3434, filterLogic],
+    ['js/filter_logic.js', "processData(data, dataName = 'unknown') {", 3588, filterLogic],
     ['js/content/dom_fallback.js', 'function hasActiveDOMFallbackWork(settings) {', 1933, domFallback],
     ['js/content/dom_fallback.js', 'if (!categoryRaw && videoId && typeof scheduleVideoMetaFetch ===', 2487, domFallback],
     ['js/content_bridge.js', 'async function initializeDOMFallback(settings) {', 6088, bridge],
@@ -297,7 +297,7 @@ test('JSON-first active work source anchors and predicate mismatches remain pinn
     assert.equal(lineOf(source, needle), expectedLine, `${file} anchor moved: ${needle}`);
     assert.ok(text.includes(`\`${file}:${expectedLine}\``), `doc should cite ${file}:${expectedLine}`);
   }
-  assert.ok(text.includes('`js/content/block_channel.js:3172`'), 'doc should cite fixed quick-block startup timer');
+  assert.ok(text.includes('`js/content/block_channel.js:3174`'), 'doc should cite fixed quick-block startup timer');
 
   const helperBlock = sliceBetween(seed, 'function hasEnabledContentFilters(settings) {', 'function shouldCaptureRawSnapshot() {');
   for (const token of [
@@ -463,7 +463,7 @@ test('JSON-first active work source anchors and predicate mismatches remain pinn
     /\| DOM fallback lifecycle work \| `js\/content\/dom_fallback\.js:1933-1999`, `js\/content\/dom_fallback\.js:2035-2088`, `js\/content_bridge\.js:6356-6365` \|/,
     /\| Quick-block action and rule context \| `js\/content\/block_channel\.js:1205-1289`, `js\/content\/block_channel\.js:1979-2028` \|/,
     /\| Native\/fallback menu action gate \| `js\/content_bridge\.js:10673-10685` \|/,
-    /\| Filter engine mutation gate \| `js\/filter_logic\.js:1825-2112`, `js\/filter_logic\.js:3434-3479` \|/
+    /\| Filter engine mutation gate \| `js\/filter_logic\.js:1957-2261`, `js\/filter_logic\.js:3588-3619` \|/
   ]) {
     assert.match(text, row);
   }

@@ -219,9 +219,9 @@ test('JSON-first list-mode matrix audit is audit-only and source pinned', () => 
   assertListModeRuntimeInvariantSnapshot(doc);
 
   const source = read('js/filter_logic.js');
-  assert.equal(lineCount(source), 3498);
-  assert.equal(Buffer.byteLength(source), 165151);
-  assert.equal(sha256('js/filter_logic.js'), '4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641');
+  assert.equal(lineCount(source), 3652);
+  assert.equal(Buffer.byteLength(source), 172174);
+  assert.equal(sha256('js/filter_logic.js'), '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5');
   assert.ok(doc.includes('`js/filter_logic.js`'));
 
   for (const artifact of [
@@ -260,7 +260,7 @@ test('list-mode matrix source counts remain pinned', () => {
 
   const shouldBlockBlock = sliceBetween(filterLogic, '_shouldBlock(item, rendererType) {', '        _checkCategoryFilters(item, rules, rendererType) {');
   const listModeSetup = sliceBetween(
-    filterLogic,
+    shouldBlockBlock,
     "            const listMode = (this.settings.listMode === 'whitelist') ? 'whitelist' : 'blocklist';",
     '            const title = candidate.title;'
   );
@@ -277,12 +277,12 @@ test('list-mode matrix source counts remain pinned', () => {
     '            // 2. THEN FILTER'
   );
 
-  assert.equal(lineCount(shouldBlockBlock), 301);
-  assert.equal(Buffer.byteLength(shouldBlockBlock), 15380);
+  assert.equal(lineCount(shouldBlockBlock), 306);
+  assert.equal(Buffer.byteLength(shouldBlockBlock), 15523);
   assert.equal(lineCount(listModeSetup), 5);
   assert.equal(Buffer.byteLength(listModeSetup), 368);
-  assert.equal(lineCount(whitelistBlock), 105);
-  assert.equal(Buffer.byteLength(whitelistBlock), 5392);
+  assert.equal(lineCount(whitelistBlock), 110);
+  assert.equal(Buffer.byteLength(whitelistBlock), 5535);
   assert.equal(lineCount(blocklistTail), 85);
   assert.equal(Buffer.byteLength(blocklistTail), 4702);
   assert.equal(lineCount(processDataBlock), 32);
@@ -323,9 +323,9 @@ test('list-mode matrix source counts remain pinned', () => {
 
   for (const phrase of [
     'list-mode matrix boundary source files: 1',
-    'filter_logic _shouldBlock block lines: 301',
+    'filter_logic _shouldBlock block lines: 306',
     'list-mode setup block lines: 5',
-    'whitelist decision branch lines: 105',
+    'whitelist decision branch lines: 110',
     'blocklist decision tail lines: 85',
     'processData block lines: 32',
     'enabled skip block lines: 7',

@@ -13,7 +13,7 @@ This is not completion proof for watch-surface authority. It proves one claim-pr
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
 | `YT_MAIN_UPNEXT_FEED_WATCHPAGE2.json` | 20079 | 863854 | `3916ffe4978ebaed0397d9f45d090541545f126ba4153dedfbecb9859d9ec8e8` |
-| `js/filter_logic.js` | 3498 | 165151 | `4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641` |
+| `js/filter_logic.js` | 3652 | 172174 | `953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5` |
 | `tests/runtime/fixtures/captures/main-upnext-feed-watchpage2-claim-prefaced-lockup-continuation.json` | 185 | 6857 | `3d327389d733d5e775cb81680de70925dfecf8c27cbb26508029776cfe856f74` |
 
 ## Current Counts

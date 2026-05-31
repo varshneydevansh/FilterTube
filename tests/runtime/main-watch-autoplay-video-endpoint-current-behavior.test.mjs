@@ -194,25 +194,25 @@ test('blocklist keyword removes supported playlist row while autoplay endpoint s
   assert.deepEqual(nextButtonWatchIds(output), ['TUVcZfQe-Kw']);
 });
 
-test('blocklist channel removes supported playlist row while autoplay endpoint still points to same video', () => {
+test('blocklist channel removes supported playlist row and matching autoplay endpoint', () => {
   const { output } = runFixture({
     filterChannels: [{ id: 'UC-J-KZfRV8c13fOCkhXdLiQ' }]
   });
 
   assert.deepEqual(playlistIds(output), []);
-  assert.deepEqual(autoplayWatchIds(output), ['TUVcZfQe-Kw']);
-  assert.deepEqual(nextButtonWatchIds(output), ['TUVcZfQe-Kw']);
+  assert.deepEqual(autoplayWatchIds(output), []);
+  assert.deepEqual(nextButtonWatchIds(output), []);
 });
 
-test('whitelist nonmatch removes supported playlist row while endpoint-only autoplay remains', () => {
+test('whitelist nonmatch removes supported playlist row and matching autoplay endpoint', () => {
   const { output } = runFixture({
     listMode: 'whitelist',
     whitelistChannels: [{ id: 'UC-does-not-match' }]
   });
 
   assert.deepEqual(playlistIds(output), []);
-  assert.deepEqual(autoplayWatchIds(output), ['TUVcZfQe-Kw']);
-  assert.deepEqual(nextButtonWatchIds(output), ['TUVcZfQe-Kw']);
+  assert.deepEqual(autoplayWatchIds(output), []);
+  assert.deepEqual(nextButtonWatchIds(output), []);
 });
 
 test('whitelist match preserves playlist row but endpoint autoplay still lacks explicit allow authority', () => {

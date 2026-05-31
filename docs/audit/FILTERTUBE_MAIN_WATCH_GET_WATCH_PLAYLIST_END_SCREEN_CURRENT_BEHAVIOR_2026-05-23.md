@@ -15,7 +15,7 @@ remain unextracted.
 | --- | --- | --- |
 | `get_watch?prettyPrint=false.json` | Valid direct JSON array with two top-level entries; `1.watchNextResponse` contains the selected watch response. | 46,562 lines; 5,046,178 bytes; sha256 `578230df9dc00dfebc8ac0ec4cc1ec2f796abf7cf4584c9e4ece67856fdf90e0`. |
 | `watchpage.json` | Markdown prelude plus `var ytInitialData = { ... };`, not direct JSON. The embedded object is `FEwhat_to_watch`, not a clean watch/next capture. | 32,116 lines; 4,572,676 bytes; sha256 `baf8a78adbbc5509c3ab50e4a26131ba294293771b89666498f34324cbd82ab3`. |
-| `js/filter_logic.js` | Existing runtime rule owner; not changed in this slice. | 3,498 lines; 165,151 bytes; sha256 `4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641`. |
+| `js/filter_logic.js` | Existing runtime rule owner; not changed in this slice. | 3,652 lines; 172,174 bytes; sha256 `953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5`. |
 
 ## Reduced Fixture
 

@@ -196,7 +196,7 @@ runtime behavior changed: no
 
 | Source file | Line count | Bytes | SHA-256 | Current role |
 | --- | ---: | ---: | --- | --- |
-| `js/filter_logic.js` | 3499 | 165151 | `4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641` | JSON decision, map producers, whitelist branch. |
+| `js/filter_logic.js` | 3653 | 172174 | `953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5` | JSON decision, map producers, whitelist branch. |
 | `js/content_bridge.js` | 13572 | 601694 | `1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3` | right-rail observer, visible-card prefetch, content cache, pending refresh, message branches. |
 | `js/content/bridge_settings.js` | 652 | 26462 | `c7828acd09941f4559e47b31ea57d184ef9367ae4964598e865b8a196934e75b` | storage refresh fanout and forced reprocess coalescing. |
 | `js/background.js` | 6321 | 285103 | `77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad` | background map cache updates and compiled settings assembly. |
@@ -209,8 +209,8 @@ runtime behavior changed: no
 
 | Row | Callable or branch anchors | Current optimization risk | Current state |
 | --- | --- | --- | --- |
-| `FT-WLCACHE-AFFECTED-00-filter-map-producers` | `js/filter_logic.js:49` `queueVideoChannelMapping`; `js/filter_logic.js:85` `queueVideoMetaMapping` | These producers enqueue learned video/channel and metadata side effects from JSON decisions. Skipping them without proof can break later channel blocking, whitelist identity resolution, and metadata content filters. | Anchor-only proof; implementation readiness `NO-GO`. |
-| `FT-WLCACHE-AFFECTED-01-filter-whitelist-decision` | `js/filter_logic.js:1825` `_shouldBlock`; `js/filter_logic.js:1933` whitelist branch | This is the central list-mode decision path. Any pruning must preserve blocklist hide, whitelist allow-only, comment exemption, scaffolding preservation, and collaborator identity semantics. | Anchor-only proof; implementation readiness `NO-GO`. |
+| `FT-WLCACHE-AFFECTED-00-filter-map-producers` | `js/filter_logic.js:58` `queueVideoChannelMapping`; `js/filter_logic.js:94` `queueVideoMetaMapping` | These producers enqueue learned video/channel and metadata side effects from JSON decisions. Skipping them without proof can break later channel blocking, whitelist identity resolution, and metadata content filters. | Anchor-only proof; implementation readiness `NO-GO`. |
+| `FT-WLCACHE-AFFECTED-01-filter-whitelist-decision` | `js/filter_logic.js:1957` `_shouldBlock`; `js/filter_logic.js:2065` whitelist branch | This is the central list-mode decision path. Any pruning must preserve blocklist hide, whitelist allow-only, comment exemption, scaffolding preservation, and collaborator identity semantics. | Anchor-only proof; implementation readiness `NO-GO`. |
 | `FT-WLCACHE-AFFECTED-02-right-rail-whitelist-refresh` | `js/content_bridge.js:1217` `installRightRailWhitelistObserver`; `js/content_bridge.js:1225` `runWhitelistRefreshPass` | The watch/right-rail SPA refresh path can become a lag source if it schedules fallback work on routes or modes that do not need pending whitelist processing. | Anchor-only proof; implementation readiness `NO-GO`. |
 | `FT-WLCACHE-AFFECTED-03-visible-card-identity-prefetch` | `js/content_bridge.js:1391` `prefetchIdentityForCard`; `js/content/handle_resolver.js:149` `fetchIdForHandle` | Visible-card identity prefetch can improve whitelist correctness but can also add network/cache work during SPA scroll and hydration. | Anchor-only proof; implementation readiness `NO-GO`. |
 | `FT-WLCACHE-AFFECTED-04-video-channel-content-cache` | `js/content_bridge.js:1638` `persistVideoChannelMapping`; `js/content_bridge.js:5851` `FilterTube_UpdateVideoChannelMap` message branch | Channel-map persistence and DOM stamping can trigger fallback reruns. Optimizing it must preserve learned channel blocking and avoid duplicate rerun churn. | Anchor-only proof; implementation readiness `NO-GO`. |

@@ -402,7 +402,7 @@ function assertCurrentLocalDistPackageSnapshot(doc) {
       contentScriptJsRefs: 15,
       webAccessibleResourceRefs: 5,
       zipBytes: 8688743,
-      zipSha256: '8e0be875c5e4223eee1c123eb0ca037bbc7b6ea21ce77caf4ff28fb7f5a62703'
+      zipSha256: '844a3ef1530ed1787e0911d43707e2b5ab687e83930edf7332c534c69e9ff898'
     }],
     ['firefox', {
       manifestBytes: 2603,
@@ -411,7 +411,7 @@ function assertCurrentLocalDistPackageSnapshot(doc) {
       contentScriptJsRefs: 14,
       webAccessibleResourceRefs: 5,
       zipBytes: 8688802,
-      zipSha256: '4dce4c99b06f0f12ac9b1234bcc931ca1cb461d117c59fcfb329ae8240e846ba'
+      zipSha256: 'b39728fdec2292f7d54c839a383dae44142357ac0b8a0ffe056ee19078c51217'
     }],
     ['opera', {
       manifestBytes: 2518,
@@ -420,7 +420,7 @@ function assertCurrentLocalDistPackageSnapshot(doc) {
       contentScriptJsRefs: 15,
       webAccessibleResourceRefs: 4,
       zipBytes: 8688745,
-      zipSha256: '9bb534fdcc9ab842c9364dbff340ec929fbc688214b7f55ac861a564b8730222'
+      zipSha256: 'd1a70a71f376cbfd19670563b2e384f252879d10a62b8972768cebd63479fae1'
     }]
   ]);
 
@@ -429,7 +429,7 @@ function assertCurrentLocalDistPackageSnapshot(doc) {
   assert.match(doc, /browser staged directories: 3/);
   assert.match(doc, /browser staged files per directory: 59/);
   assert.match(doc, /dist zip artifacts: 3/);
-  assert.match(doc, /total dist files including zips: 184/);
+  assert.match(doc, /total dist files including zips: 180/);
   assert.match(doc, /source-backed staged files per browser excluding manifest: 58/);
   assert.match(doc, /byte-identical source-backed staged files per browser excluding manifest: 58/);
   assert.match(doc, /committed package manifest: absent/);
@@ -446,7 +446,7 @@ function assertCurrentLocalDistPackageSnapshot(doc) {
   assert.match(doc, /reproducible package build authority: NO-GO/);
   assert.match(doc, /loaded-browser package\/runtime parity authority: NO-GO/);
 
-  assert.equal(stats.distFiles.length, 184);
+  assert.equal(stats.distFiles.length, 180);
   assert.deepEqual(stats.zipFiles, [
     'dist/filtertube-chrome-v3.3.2.zip',
     'dist/filtertube-firefox-v3.3.2.zip',

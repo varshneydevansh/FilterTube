@@ -28,7 +28,7 @@ identity is not present.
 
 | Source | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/filter_logic.js` | 3498 | 165151 | `4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641` |
+| `js/filter_logic.js` | 3652 | 172174 | `953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5` |
 | `js/shared/identity.js` | 808 | 30599 | `41f26baf0eef27994666430e2b8b490c893eed90abd67f47d562926d94155958` |
 
 Related proof layers:
