@@ -161,9 +161,9 @@ test('JSON-first whitelist decision identity audit is audit-only and source pinn
   assert.match(doc, /not completion proof for JSON-first whitelist decision authority/);
 
   const source = read('js/filter_logic.js');
-  assert.equal(lineCount(source), 3503);
-  assert.equal(Buffer.byteLength(source), 165294);
-  assert.equal(sha256('js/filter_logic.js'), '611c3856bbc046ba503603b18bc138e7bf766f5db85a412c2b276b9f34825212');
+  assert.equal(lineCount(source), 3652);
+  assert.equal(Buffer.byteLength(source), 172174);
+  assert.equal(sha256('js/filter_logic.js'), '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5');
   assert.ok(doc.includes('`js/filter_logic.js`'));
 
   for (const artifact of [
@@ -184,11 +184,11 @@ test('whitelist decision source counts remain pinned', () => {
 
   const shouldBlockBlock = sliceBetween(filterLogic, '_shouldBlock(item, rendererType) {', '        _checkCategoryFilters(item, rules, rendererType) {');
   const whitelistBlock = sliceBetween(filterLogic, "            if (listMode === 'whitelist' && !isCommentRenderer) {", '            // Channel filtering with comprehensive matching');
-  const noRuleBlock = sliceBetween(filterLogic, '                if (!hasChannelRules && !hasKeywordRules) {', '                if (hasChannelRules) {');
-  const channelLoop = sliceBetween(filterLogic, '                if (hasChannelRules) {', '                if (hasKeywordRules) {');
-  const keywordLoop = sliceBetween(filterLogic, '                if (hasKeywordRules) {', '                const shouldTryCreatorPageFallback = hasChannelRules');
-  const unresolvedBlock = sliceBetween(filterLogic, '                const shouldTryCreatorPageFallback = hasChannelRules', "                this._logWhitelistDecision('block:no_whitelist_match',");
-  const noMatchTail = sliceBetween(filterLogic, "                this._logWhitelistDecision('block:no_whitelist_match',", '            }\n\n            // Channel filtering with comprehensive matching');
+  const noRuleBlock = sliceBetween(whitelistBlock, '                if (!hasChannelRules && !hasKeywordRules) {', '                if (hasChannelRules) {');
+  const channelLoop = sliceBetween(whitelistBlock, '                if (hasChannelRules) {', '                if (hasKeywordRules) {');
+  const keywordLoop = sliceBetween(whitelistBlock, '                if (hasKeywordRules) {', '                const shouldTryCreatorPageFallback = hasChannelRules');
+  const unresolvedBlock = sliceBetween(whitelistBlock, '                const shouldTryCreatorPageFallback = hasChannelRules', "                this._logWhitelistDecision('block:no_whitelist_match',");
+  const noMatchTail = sliceBetween(whitelistBlock, "                this._logWhitelistDecision('block:no_whitelist_match',", '            }\n');
 
   assert.equal(lineCount(shouldBlockBlock), 306);
   assert.equal(Buffer.byteLength(shouldBlockBlock), 15523);

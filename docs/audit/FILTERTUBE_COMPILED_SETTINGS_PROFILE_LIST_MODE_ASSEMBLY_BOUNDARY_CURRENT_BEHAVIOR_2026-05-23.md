@@ -4,7 +4,13 @@ Date: 2026-05-23
 
 Status: audit-only current-behavior boundary.
 
-Runtime behavior is unchanged for background compilation, Kids/main profile selection, whitelist/list-mode behavior, bridge normalization, JSON filtering, DOM fallback, and filter logic. This is not an implementation patch for that boundary; the 2026-05-26 quick-block startup retry only changes observer availability after settings delivery.
+Compiled-settings assembly behavior is unchanged for background compilation,
+Kids/main profile selection, whitelist/list-mode selection, and bridge
+normalization. Source pins were refreshed after the 2026-05-31 release fixes
+added whitelist Shorts fallback and watch autoplay endpoint leak handling in
+filter logic. This is not an implementation patch for that boundary; the
+2026-05-26 quick-block startup retry only changes observer availability after
+settings delivery.
 
 ## Boundary
 
@@ -22,7 +28,7 @@ This is narrower than the compiled-settings field register and the list-mode mat
 | --- | ---: | ---: | --- |
 | `js/background.js` | 6,320 | 285,103 | `77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad` |
 | `js/content/bridge_settings.js` | 651 | 26,462 | `c7828acd09941f4559e47b31ea57d184ef9367ae4964598e865b8a196934e75b` |
-| `js/filter_logic.js` | 3,498 | 165,151 | `4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641` |
+| `js/filter_logic.js` | 3,652 | 172,174 | `953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5` |
 
 compiled settings profile/list-mode assembly source files pinned: 3
 
@@ -34,8 +40,8 @@ compiled settings profile/list-mode assembly source files pinned: 3
 | `backgroundWhitelistChannelCompiler` | `js/background.js:2149` | 2,149 | 65 | 3,878 | `433527aec588525d8f3747ce7ffe20b1d2d78905c6812a6fcf6703bbee507322` |
 | `bridgeNormalizeSettingsForHost` | `js/content/bridge_settings.js:322` | 322 | 31 | 1,404 | `5f05ac1dba540e69103fe5725ad258d203f03e72762a1cc887d8c70e847988ac` |
 | `bridgeRequestProfileGate` | `js/content/bridge_settings.js:379` | 379 | 36 | 1,758 | `713d4c00573258982f7dbf77cc451307b24a421ad8916fed859445df88fdadb8` |
-| `filterProcessSettings` | `js/filter_logic.js:938` | 938 | 125 | 6,348 | `666c5725170dcd5eb01aa66cbfd27e64d33fa0ae937d1c5553665b4ede149e0f` |
-| `filterListModeIdentityAdmission` | `js/filter_logic.js:1706` | 1,706 | 145 | 7,062 | `33b7bb414b7eb887a12cd14b6d1f0f69c8de7672a9854907ff83bf4384771032` |
+| `filterProcessSettings` | `js/filter_logic.js:947` | 947 | 125 | 6,348 | `666c5725170dcd5eb01aa66cbfd27e64d33fa0ae937d1c5553665b4ede149e0f` |
+| `filterListModeIdentityAdmission` | `js/filter_logic.js:1715` | 1,715 | 268 | 12,855 | `3de047cd70f0734c2bdcf6ae481d23a3c78fe08f3aa280c2f59680cad04761af` |
 
 compiled settings profile/list-mode assembly source/effect blocks pinned: 6
 
@@ -59,8 +65,8 @@ Counts below are over the pinned source/effect blocks, not whole files.
 | `forceRefresh: true` | 1 |
 | `normalizeSettingsForHost` | 3 |
 | `listMode: 'blocklist'` | 2 |
-| `settings.whitelistKeywords` | 5 |
-| `settings.whitelistChannels` | 7 |
+| `settings.whitelistKeywords` | 7 |
+| `settings.whitelistChannels` | 9 |
 | `processed.whitelistKeywords` | 1 |
 | `processed.whitelistChannels` | 1 |
 | `new RegExp` | 2 |
@@ -92,7 +98,7 @@ Selected missing policy/report tokens over pinned blocks:
 
 `filterProcessSettings`: filter logic starts with blocklist defaults, spreads incoming settings over those defaults, rebuilds serialized blocklist and whitelist keyword patterns into RegExp objects, normalizes blocklist and whitelist channel `id`, `handle`, and `name` fields to lowercase, and carries `videoMetaMap` only when it is an object.
 
-`filterListModeIdentityAdmission`: filter logic treats only exact `listMode === 'whitelist'` as whitelist mode, asks for channel identity when blocklist channel rules exist or whitelist channel rules exist in whitelist mode, and passes `extractChannelIdentity: needsChannelIdentity` into candidate extraction.
+`filterListModeIdentityAdmission`: filter logic treats only exact `listMode === 'whitelist'` as whitelist mode, asks for channel identity when blocklist channel rules exist or whitelist channel rules exist in whitelist mode, passes `extractChannelIdentity: needsChannelIdentity` into candidate extraction, and now also contains the watch-autoplay endpoint candidate path added for the 2026-05-31 leak fix.
 
 ## Runtime Fixtures
 

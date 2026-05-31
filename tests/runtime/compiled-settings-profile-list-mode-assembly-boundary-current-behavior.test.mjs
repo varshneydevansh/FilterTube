@@ -13,7 +13,7 @@ const docPath = 'docs/audit/FILTERTUBE_COMPILED_SETTINGS_PROFILE_LIST_MODE_ASSEM
 const sourceFingerprints = {
   'js/background.js': [6320, 285103, '77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad'],
   'js/content/bridge_settings.js': [651, 26462, 'c7828acd09941f4559e47b31ea57d184ef9367ae4964598e865b8a196934e75b'],
-  'js/filter_logic.js': [3498, 165151, '4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641']
+  'js/filter_logic.js': [3652, 172174, '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5']
 };
 
 const blockSpecs = {
@@ -59,7 +59,7 @@ const blockSpecs = {
     file: 'js/filter_logic.js',
     start: '        _processSettings(settings) {',
     end: '        /**\n         * Harvest channel ID/Handle mappings from YouTube data',
-    startLine: 938,
+    startLine: 947,
     lines: 125,
     bytes: 6348,
     hash: '666c5725170dcd5eb01aa66cbfd27e64d33fa0ae937d1c5553665b4ede149e0f'
@@ -68,10 +68,10 @@ const blockSpecs = {
     file: 'js/filter_logic.js',
     start: "        _hasChannelPolicyRules(listMode = '') {",
     end: '            const title = candidate.title;',
-    startLine: 1706,
-    lines: 145,
-    bytes: 7062,
-    hash: '33b7bb414b7eb887a12cd14b6d1f0f69c8de7672a9854907ff83bf4384771032'
+    startLine: 1715,
+    lines: 268,
+    bytes: 12855,
+    hash: '3de047cd70f0734c2bdcf6ae481d23a3c78fe08f3aa280c2f59680cad04761af'
   }
 };
 
@@ -90,8 +90,8 @@ const selectedCounts = {
   'forceRefresh: true': 1,
   normalizeSettingsForHost: 3,
   "listMode: 'blocklist'": 2,
-  'settings.whitelistKeywords': 5,
-  'settings.whitelistChannels': 7,
+  'settings.whitelistKeywords': 7,
+  'settings.whitelistChannels': 9,
   'processed.whitelistKeywords': 1,
   'processed.whitelistChannels': 1,
   'new RegExp': 2,
@@ -232,7 +232,7 @@ test('compiled settings profile/list-mode assembly doc is audit-only and source 
   const text = doc();
 
   assert.match(text, /Status: audit-only current-behavior boundary/);
-  assert.match(text, /Runtime behavior is unchanged/);
+  assert.match(text, /Compiled-settings assembly behavior is unchanged/);
   assert.match(text, /not an implementation patch/);
   assert.match(text, /compiled settings profile\/list-mode assembly source files pinned: 3/);
   assert.match(text, /compiled settings profile\/list-mode assembly source\/effect blocks pinned: 6/);

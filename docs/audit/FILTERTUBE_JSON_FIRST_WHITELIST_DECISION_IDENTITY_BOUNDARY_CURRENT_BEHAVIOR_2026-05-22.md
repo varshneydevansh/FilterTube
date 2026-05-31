@@ -1,9 +1,10 @@
 # FilterTube JSON-First Whitelist Decision Identity Boundary - Current Behavior - 2026-05-22
 
 Status: release-fix evidence register. Runtime behavior changed on 2026-05-31
-for the whitelisted channel Shorts page path only. This is not a broad
-optimization patch, simultaneous allow/block migration, renderer expansion,
-settings-mode change, or permission to alter unrelated JSON filtering.
+for the whitelisted channel Shorts page path and the watch autoplay endpoint
+leak path. This is not a broad optimization patch, simultaneous allow/block
+migration, renderer expansion, settings-mode change, or permission to alter
+unrelated JSON filtering.
 
 ## Purpose
 
@@ -28,7 +29,7 @@ non-comment whitelist branch.
 
 | Source | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/filter_logic.js` | 3503 | 165294 | `611c3856bbc046ba503603b18bc138e7bf766f5db85a412c2b276b9f34825212` |
+| `js/filter_logic.js` | 3652 | 172174 | `953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5` |
 
 Related proof layers:
 
@@ -78,7 +79,7 @@ whitelist branch return false tokens: 5
 whitelist branch return true tokens: 3
 whitelist branch shouldTryCreatorPageFallback tokens: 2
 runtime whitelist identity fixtures: 7
-runtime behavior changed: yes, for whitelisted creator Shorts pages with hideAllShorts disabled
+runtime behavior changed: yes, for whitelisted creator Shorts pages with hideAllShorts disabled and watch autoplay endpoint leaks
 not completion proof for JSON-first whitelist decision authority
 ```
 
