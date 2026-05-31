@@ -146,7 +146,12 @@ test('test lane matrix maps high-risk source files to expected lanes', () => {
     { files: ['assets/images/*', 'icons/*', 'design/design_tokens.json'], lanes: ['test:release', 'test:smoke'] },
     { files: ['scripts/compress-video.swift', 'scripts/sync-native-runtime.mjs'], lanes: ['test:release', 'test:smoke'] },
     { files: ['tests/runtime/harness/load-filter-engine.mjs'], lanes: ['test:whitelist', 'test:blocking', 'test:json', 'test:dom', 'test:menu', 'test:performance', 'test:settings', 'test:smoke'] },
-    { files: ['tests/runtime/harness/load-seed-runtime.mjs'], lanes: ['test:whitelist', 'test:json', 'test:performance', 'test:smoke'] }
+    { files: ['tests/runtime/harness/load-seed-runtime.mjs'], lanes: ['test:whitelist', 'test:json', 'test:performance', 'test:smoke'] },
+    { files: ['tests/runtime/fixtures/**/*.json'], lanes: ['test:json', 'test:smoke'] },
+    { files: ['tests/runtime/fixtures/**/*.html'], lanes: ['test:dom', 'test:smoke'] },
+    { files: ['fixture names containing `collab`, `dialog`, or `show-sheet`'], lanes: ['test:whitelist', 'test:blocking', 'test:menu'] },
+    { files: ['fixture names containing `comment`, `channel`, or `keyword`'], lanes: ['test:blocking'] },
+    { files: ['fixture names containing `kids`, `shorts`, `watch`, `upnext`, `endscreen`, `autoplay`, `playlist`, or `ytm`'], lanes: ['test:whitelist'] }
   ];
 
   for (const { files, lanes } of requiredMappings) {
@@ -257,6 +262,10 @@ test('executable classifier maps high-risk paths to required lanes', () => {
   assert.deepEqual(classifyPaths(['docs/audit/artifacts/empty-install-idle-probe.mjs']).lanes, ['performance', 'smoke']);
   assert.deepEqual(classifyPaths(['tests/runtime/harness/load-filter-engine.mjs']).lanes, ['whitelist', 'blocking', 'json', 'dom', 'menu', 'performance', 'settings', 'smoke']);
   assert.deepEqual(classifyPaths(['tests/runtime/harness/load-seed-runtime.mjs']).lanes, ['whitelist', 'json', 'performance', 'smoke']);
+  assert.deepEqual(classifyPaths(['tests/runtime/fixtures/captures/main-watch-initial-lockup-shorts-json.json']).lanes, ['whitelist', 'json', 'smoke']);
+  assert.deepEqual(classifyPaths(['tests/runtime/fixtures/captures/main-collab-resolved-search-card-dialog.html']).lanes, ['whitelist', 'blocking', 'dom', 'menu', 'smoke']);
+  assert.deepEqual(classifyPaths(['tests/runtime/fixtures/captures/main-comment-thread-renderer.json']).lanes, ['blocking', 'json', 'smoke']);
+  assert.deepEqual(classifyPaths(['tests/runtime/fixtures/captures/ytm-dom-video-card-with-menu.html']).lanes, ['whitelist', 'dom', 'menu', 'smoke']);
 });
 
 test('executable classifier inherits lanes from lane-owned tests and rejects unknown paths', () => {

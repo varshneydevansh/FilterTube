@@ -226,7 +226,12 @@ artifact with missing byte parity remain `NO-GO`.
 | `scripts/compress-video.swift`, `scripts/sync-native-runtime.mjs` | `test:release`, `test:smoke` | Covers media compression and native-runtime sync helpers that can affect release assets and extension/app parity. |
 | `tests/runtime/harness/load-filter-engine.mjs` | `test:whitelist`, `test:blocking`, `test:json`, `test:dom`, `test:menu`, `test:performance`, `test:settings`, `test:smoke` | Covers the shared filter-engine harness used by runtime decision, identity, menu, settings, and boundary fixtures. |
 | `tests/runtime/harness/load-seed-runtime.mjs` | `test:whitelist`, `test:json`, `test:performance`, `test:smoke` | Covers the shared seed/network harness used by JSON-first, whitelist end-screen, and no-work performance fixtures. |
-| YouTube surface fixtures under `tests/runtime/fixtures/` | Lane that owns the fixture plus `test:smoke` if release-relevant | Fixture changes must state which behavior changed and whether old behavior remains intentional. |
+| `tests/runtime/fixtures/**/*.json` | `test:json`, `test:smoke` | Covers captured YouTube JSON payloads that feed JSON-first renderer, endpoint, continuation, and response-mutation fixtures. |
+| `tests/runtime/fixtures/**/*.html` | `test:dom`, `test:smoke` | Covers captured YouTube DOM fragments that feed DOM fallback, selector, cleanup, and recycled-node fixtures. |
+| fixture names containing `collab`, `dialog`, or `show-sheet` | `test:whitelist`, `test:blocking`, `test:menu` | Covers collaborator identity fixtures that affect allow/block decisions and injected/native menu labels. |
+| fixture names containing `comment`, `channel`, or `keyword` | `test:blocking` | Covers blocking fixtures for comment, channel, keyword, guide, post, and list-target behavior. |
+| fixture names containing `kids`, `shorts`, `watch`, `upnext`, `endscreen`, `autoplay`, `playlist`, or `ytm` | `test:whitelist` | Covers allow-mode fixtures for Kids, Shorts, watch, right-rail/up-next, end-screen, autoplay, playlist, and YouTube Music surfaces. |
+| other YouTube surface fixtures under `tests/runtime/fixtures/` | `test:smoke` | Fixture changes must state which behavior changed and whether old behavior remains intentional; add a focused classifier row when a fixture belongs to a runtime lane not covered above. |
 
 The executable mapping in `scripts/run-test-lane.mjs` is the source of truth.
 This table is the human-readable review copy.

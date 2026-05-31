@@ -495,6 +495,36 @@ export const FILE_LANE_RULES = Object.freeze([
     lanes: ['whitelist', 'json', 'performance', 'smoke']
   },
   {
+    id: 'youtube-json-fixture-surface',
+    patterns: [/^tests\/runtime\/fixtures\/.*\.json$/],
+    lanes: ['json', 'smoke']
+  },
+  {
+    id: 'youtube-dom-fixture-surface',
+    patterns: [/^tests\/runtime\/fixtures\/.*\.html$/],
+    lanes: ['dom', 'smoke']
+  },
+  {
+    id: 'youtube-whitelist-fixture-surface',
+    patterns: [/^tests\/runtime\/fixtures\/.*(?:whitelist|allow|kids|shorts|watch|upnext|endscreen|autoplay|playlist|ytm).*$/i],
+    lanes: ['whitelist']
+  },
+  {
+    id: 'youtube-blocking-fixture-surface',
+    patterns: [/^tests\/runtime\/fixtures\/.*(?:block|keyword|channel|comment|guide|post).*$/i],
+    lanes: ['blocking']
+  },
+  {
+    id: 'youtube-collaborator-fixture-surface',
+    patterns: [/^tests\/runtime\/fixtures\/.*(?:collab|dialog|show-sheet).*$/i],
+    lanes: ['whitelist', 'blocking', 'menu']
+  },
+  {
+    id: 'youtube-menu-fixture-surface',
+    patterns: [/^tests\/runtime\/fixtures\/.*(?:menu|quick|bottom-sheet).*$/i],
+    lanes: ['menu']
+  },
+  {
     id: 'youtube-fixture-surface',
     patterns: [/^tests\/runtime\/fixtures\//],
     lanes: ['smoke']
