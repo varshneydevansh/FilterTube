@@ -259,6 +259,8 @@ test('changed-lane runner is wired to the classifier and sequential lane executi
   assert.match(runner, /if \(result\.unmatched\.length\) process\.exit\(2\)/);
   assert.match(runner, /MANUAL_YOUTUBE_SMOKE_LANE_REASONS/);
   assert.match(runner, /Manual YouTube smoke required when user-facing/);
+  assert.match(runner, /RUNTIME_FIXTURE_LANE_REASONS/);
+  assert.match(runner, /Runtime fixture proof expected when behavior changes/);
   assert.match(runner, /AUDIT_PROOF_PATH_PATTERN/);
   assert.match(runner, /Audit proof update expected before commit/);
   assert.match(runner, /Audit proof files in this change/);
@@ -274,6 +276,7 @@ test('changed-lane runner is wired to the classifier and sequential lane executi
   assert.match(matrix, /runs the required lanes sequentially in\s+matrix order/);
   assert.match(matrix, /prints a manual YouTube\s+smoke advisory/);
   assert.match(matrix, /reports whether a changed\s+`docs\/audit\/` proof file is present/);
+  assert.match(matrix, /prints a fixture-proof reminder\s+for the affected runtime lanes/);
 });
 
 test('changed-lane path collection includes untracked nonignored files', () => {
@@ -316,6 +319,9 @@ test('classifier output surfaces manual YouTube smoke for user-facing runtime la
   assert.match(runtime.stdout, /Audit proof update expected before commit:/);
   assert.match(runtime.stdout, /Add or update a relevant docs\/audit\/ proof file for:/);
   assert.match(runtime.stdout, /- js\/seed\.js/);
+  assert.match(runtime.stdout, /Runtime fixture proof expected when behavior changes:/);
+  assert.match(runtime.stdout, /test:json: JSON renderer, endpoint, response, or no-work fixtures/);
+  assert.match(runtime.stdout, /test:performance: empty-rule\/no-work, SPA, timer, observer, or cache fixtures/);
 
   const releaseOnly = spawnSync(process.execPath, ['scripts/run-test-lane.mjs', '--classify', 'README.md'], {
     cwd: repoRoot,
@@ -324,6 +330,7 @@ test('classifier output surfaces manual YouTube smoke for user-facing runtime la
 
   assert.equal(releaseOnly.status, 0, releaseOnly.stderr);
   assert.doesNotMatch(releaseOnly.stdout, /Manual YouTube smoke required when user-facing:/);
+  assert.doesNotMatch(releaseOnly.stdout, /Runtime fixture proof expected when behavior changes:/);
 });
 
 test('classifier output recognizes changed audit proof files', () => {
@@ -336,6 +343,7 @@ test('classifier output recognizes changed audit proof files', () => {
   assert.match(proof.stdout, /Audit proof files in this change:/);
   assert.match(proof.stdout, /docs\/audit\/TEST_LANE_MATRIX\.md/);
   assert.doesNotMatch(proof.stdout, /Audit proof update expected before commit:/);
+  assert.doesNotMatch(proof.stdout, /Runtime fixture proof expected when behavior changes:/);
 });
 
 test('smoke lane keeps release confidence broad but bounded', () => {

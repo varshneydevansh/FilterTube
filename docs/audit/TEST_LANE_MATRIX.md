@@ -85,6 +85,12 @@ For proof discipline, the classifier also reports whether a changed
 paths changed without a matching audit proof file in the same logical change,
 it prints an audit-proof reminder before the matched-path details.
 
+For runtime source changes, the classifier also prints a fixture-proof reminder
+for the affected runtime lanes. This is intentionally phrased as
+`when behavior changes`: source-only refactors can satisfy it with unchanged
+fixtures plus a passing lane, while behavior changes should add or update the
+focused fixture/test that proves the new contract.
+
 ## Auxiliary Guards
 
 These commands do not replace the feature lanes. They catch workflow drift in

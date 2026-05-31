@@ -17,6 +17,16 @@ const MANUAL_YOUTUBE_SMOKE_LANE_REASONS = Object.freeze({
   settings: 'profile/mode/storage changes reprocessing already-rendered cards'
 });
 
+const RUNTIME_FIXTURE_LANE_REASONS = Object.freeze({
+  whitelist: 'whitelist allow/leak fixtures for touched YouTube surfaces',
+  blocking: 'keyword/channel/comment hide-decision fixtures',
+  json: 'JSON renderer, endpoint, response, or no-work fixtures',
+  dom: 'DOM selector, cleanup, restore, or recycled-node fixtures',
+  menu: '3-dot menu, quick-block, collaborator, or native dropdown fixtures',
+  performance: 'empty-rule/no-work, SPA, timer, observer, or cache fixtures',
+  settings: 'profile, storage, import/export, or compiled-mode fixtures'
+});
+
 const AUDIT_PROOF_PATH_PATTERN = /^docs\/audit\//;
 const RUNTIME_TEST_PROOF_PATH_PATTERN = /^tests\/runtime\/.*\.test\.mjs$/;
 
@@ -653,6 +663,22 @@ function printClassification(result) {
     console.log('\nAudit proof update expected before commit:');
     console.log('  Add or update a relevant docs/audit/ proof file for:');
     for (const file of proofRelevantFiles) console.log(`  - ${file}`);
+  }
+
+  const runtimeFixtureReasons = [];
+  if (proofRelevantFiles.length) {
+    for (const lane of result.lanes) {
+      if (Object.hasOwn(RUNTIME_FIXTURE_LANE_REASONS, lane)) {
+        runtimeFixtureReasons.push([lane, RUNTIME_FIXTURE_LANE_REASONS[lane]]);
+      }
+    }
+  }
+
+  if (runtimeFixtureReasons.length) {
+    console.log('\nRuntime fixture proof expected when behavior changes:');
+    for (const [lane, reason] of runtimeFixtureReasons) {
+      console.log(`  test:${lane}: ${reason}`);
+    }
   }
 
   if (result.classifications.length) {
