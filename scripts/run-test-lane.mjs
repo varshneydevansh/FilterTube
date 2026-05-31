@@ -267,7 +267,7 @@ export const FILE_LANE_RULES = Object.freeze([
   {
     id: 'background-runtime',
     patterns: [/^js\/background\.js$/],
-    lanes: ['settings', 'blocking', 'json']
+    lanes: ['release', 'whitelist', 'blocking', 'json', 'performance', 'settings']
   },
   {
     id: 'shared-settings-runtime',
