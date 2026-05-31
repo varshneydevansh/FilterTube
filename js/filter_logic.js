@@ -1998,7 +1998,12 @@
                     }
                 }
 
-                if (hasChannelRules && !hasStableChannelIdentity && !hasNameSignal && !isShortsLikeRenderer) {
+                const shouldTryCreatorPageFallback = hasChannelRules && !hasStableChannelIdentity && (
+                    !hasNameSignal ||
+                    isShortsLikeRenderer
+                );
+
+                if (shouldTryCreatorPageFallback) {
                     try {
                         const path = document.location?.pathname || '';
                         const isCreatorPage = /^\/(@[^/]+|channel\/UC[\w-]{22}|c\/[^/]+|user\/[^/]+)(?:\/|$)/i.test(path);

@@ -106,6 +106,20 @@ function identitylessVideoRenderer(overrides = {}) {
   };
 }
 
+function shortsLockupViewModel(overrides = {}) {
+  return {
+    onTap: {
+      innertubeCommand: {
+        reelWatchEndpoint: {
+          videoId: 'shortwl0001'
+        }
+      }
+    },
+    accessibilityText: 'Whitelisted creator short',
+    ...overrides
+  };
+}
+
 function commentRenderer(overrides = {}) {
   return {
     authorText: { simpleText: 'Comment Author' },
@@ -141,15 +155,15 @@ function runWithPageChannelMeta(data, overrides = {}, pageChannelMeta = {}, opti
 test('JSON-first whitelist decision identity audit is audit-only and source pinned', () => {
   const doc = read(docPath);
 
-  assert.match(doc, /Status: audit-only current-behavior register/);
-  assert.match(doc, /Runtime behavior is unchanged/);
-  assert.match(doc, /This is not an implementation patch/);
+  assert.match(doc, /Status: release-fix evidence register/);
+  assert.match(doc, /Runtime behavior changed on 2026-05-31/);
+  assert.match(doc, /not a broad\s+optimization patch/);
   assert.match(doc, /not completion proof for JSON-first whitelist decision authority/);
 
   const source = read('js/filter_logic.js');
-  assert.equal(lineCount(source), 3498);
-  assert.equal(Buffer.byteLength(source), 165151);
-  assert.equal(sha256('js/filter_logic.js'), '4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641');
+  assert.equal(lineCount(source), 3503);
+  assert.equal(Buffer.byteLength(source), 165294);
+  assert.equal(sha256('js/filter_logic.js'), '611c3856bbc046ba503603b18bc138e7bf766f5db85a412c2b276b9f34825212');
   assert.ok(doc.includes('`js/filter_logic.js`'));
 
   for (const artifact of [
@@ -172,22 +186,22 @@ test('whitelist decision source counts remain pinned', () => {
   const whitelistBlock = sliceBetween(filterLogic, "            if (listMode === 'whitelist' && !isCommentRenderer) {", '            // Channel filtering with comprehensive matching');
   const noRuleBlock = sliceBetween(filterLogic, '                if (!hasChannelRules && !hasKeywordRules) {', '                if (hasChannelRules) {');
   const channelLoop = sliceBetween(filterLogic, '                if (hasChannelRules) {', '                if (hasKeywordRules) {');
-  const keywordLoop = sliceBetween(filterLogic, '                if (hasKeywordRules) {', '                if (hasChannelRules && !hasStableChannelIdentity && !hasNameSignal && !isShortsLikeRenderer) {');
-  const unresolvedBlock = sliceBetween(filterLogic, '                if (hasChannelRules && !hasStableChannelIdentity && !hasNameSignal && !isShortsLikeRenderer) {', "                this._logWhitelistDecision('block:no_whitelist_match',");
+  const keywordLoop = sliceBetween(filterLogic, '                if (hasKeywordRules) {', '                const shouldTryCreatorPageFallback = hasChannelRules');
+  const unresolvedBlock = sliceBetween(filterLogic, '                const shouldTryCreatorPageFallback = hasChannelRules', "                this._logWhitelistDecision('block:no_whitelist_match',");
   const noMatchTail = sliceBetween(filterLogic, "                this._logWhitelistDecision('block:no_whitelist_match',", '            }\n\n            // Channel filtering with comprehensive matching');
 
-  assert.equal(lineCount(shouldBlockBlock), 301);
-  assert.equal(Buffer.byteLength(shouldBlockBlock), 15380);
-  assert.equal(lineCount(whitelistBlock), 105);
-  assert.equal(Buffer.byteLength(whitelistBlock), 5392);
+  assert.equal(lineCount(shouldBlockBlock), 306);
+  assert.equal(Buffer.byteLength(shouldBlockBlock), 15523);
+  assert.equal(lineCount(whitelistBlock), 110);
+  assert.equal(Buffer.byteLength(whitelistBlock), 5535);
   assert.equal(lineCount(noRuleBlock), 9);
   assert.equal(Buffer.byteLength(noRuleBlock), 327);
   assert.equal(lineCount(channelLoop), 17);
   assert.equal(Buffer.byteLength(channelLoop), 961);
   assert.equal(lineCount(keywordLoop), 15);
   assert.equal(Buffer.byteLength(keywordLoop), 687);
-  assert.equal(lineCount(unresolvedBlock), 27);
-  assert.equal(Buffer.byteLength(unresolvedBlock), 1379);
+  assert.equal(lineCount(unresolvedBlock), 32);
+  assert.equal(Buffer.byteLength(unresolvedBlock), 1522);
   assert.equal(lineCount(noMatchTail), 8);
   assert.equal(Buffer.byteLength(noMatchTail), 288);
 
@@ -210,20 +224,21 @@ test('whitelist decision source counts remain pinned', () => {
     ['pageChannelMeta', 3],
     ['isCreatorPage', 2],
     ['return false', 5],
-    ['return true', 3]
+    ['return true', 3],
+    ['shouldTryCreatorPageFallback', 2]
   ]) {
     assert.equal(countLiteral(whitelistBlock, literal), expected, `${literal} count changed`);
   }
 
   for (const phrase of [
     'whitelist decision identity boundary source files: 1',
-    'filter_logic _shouldBlock block lines: 301',
-    'whitelist decision branch lines: 105',
+    'filter_logic _shouldBlock block lines: 306',
+    'whitelist decision branch lines: 110',
     'whitelist no-rule block lines: 9',
     'whitelist channel loop lines: 17',
     'whitelist keyword loop lines: 15',
-    'whitelist unresolved/page fallback lines: 27',
-    'runtime whitelist identity fixtures: 6'
+    'whitelist unresolved/page fallback lines: 32',
+    'runtime whitelist identity fixtures: 7'
   ]) {
     assert.ok(doc.includes(phrase), `missing count phrase ${phrase}`);
   }
@@ -282,6 +297,38 @@ test('creator page fallback requires pageChannelMeta before allowing identityles
   assert.deepEqual(plain(withoutPageMeta.result), { contents: [] });
   assert.equal(withPageMeta.result.contents.length, 1);
   assert.equal(withPageMeta.result.contents[0].videoRenderer.videoId, 'noid0000001');
+});
+
+test('whitelisted channel Shorts page preserves Shorts when hideAllShorts is disabled', () => {
+  const data = payload('shortsLockupViewModel', shortsLockupViewModel());
+  const whitelist = {
+    listMode: 'whitelist',
+    whitelistChannels: [{ id: 'UCpagecreator000000000000' }],
+    hideAllShorts: false
+  };
+
+  const withoutPageMeta = run(data, whitelist, { pathname: '/@pagecreator/shorts' });
+  const withPageMeta = runWithPageChannelMeta(data, whitelist, {
+    id: 'UCpagecreator000000000000',
+    handle: '@pagecreator',
+    name: 'Page Creator'
+  }, { pathname: '/@pagecreator/shorts' });
+  const hideAllShorts = runWithPageChannelMeta(data, {
+    ...whitelist,
+    hideAllShorts: true
+  }, {
+    id: 'UCpagecreator000000000000',
+    handle: '@pagecreator',
+    name: 'Page Creator'
+  }, { pathname: '/@pagecreator/shorts' });
+
+  assert.deepEqual(plain(withoutPageMeta.result), { contents: [] });
+  assert.equal(withPageMeta.result.contents.length, 1);
+  assert.equal(
+    withPageMeta.result.contents[0].shortsLockupViewModel.onTap.innertubeCommand.reelWatchEndpoint.videoId,
+    'shortwl0001'
+  );
+  assert.deepEqual(plain(hideAllShorts.result), { contents: [] });
 });
 
 test('channel-rule whitelist blocks unresolved identity when creator fallback is unavailable', () => {

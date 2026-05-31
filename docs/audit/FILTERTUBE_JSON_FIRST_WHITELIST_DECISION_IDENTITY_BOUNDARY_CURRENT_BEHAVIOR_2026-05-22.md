@@ -1,9 +1,9 @@
 # FilterTube JSON-First Whitelist Decision Identity Boundary - Current Behavior - 2026-05-22
 
-Status: audit-only current-behavior register. Runtime behavior is unchanged.
-This is not an implementation patch, optimization patch, whitelist behavior
-change, simultaneous allow/block migration, renderer expansion, settings-mode
-change, or permission to alter JSON filtering.
+Status: release-fix evidence register. Runtime behavior changed on 2026-05-31
+for the whitelisted channel Shorts page path only. This is not a broad
+optimization patch, simultaneous allow/block migration, renderer expansion,
+settings-mode change, or permission to alter unrelated JSON filtering.
 
 ## Purpose
 
@@ -18,16 +18,17 @@ The current boundary is:
 ```text
 non-comment whitelist mode fail-closes when no whitelist rules exist, permits
 container and watch-scaffolding renderers, allows matching channels or matching
-whitelist keywords, can fall back to pageChannelMeta on creator routes, blocks
-unresolved identity when channel rules exist, and otherwise blocks no-match
-items. Comment renderers bypass this non-comment whitelist branch.
+whitelist keywords, can fall back to pageChannelMeta on creator routes
+including Shorts-like renderer cards, blocks unresolved identity when channel
+rules exist, and otherwise blocks no-match items. Comment renderers bypass this
+non-comment whitelist branch.
 ```
 
 ## Source Scope
 
 | Source | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `js/filter_logic.js` | 3498 | 165151 | `4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641` |
+| `js/filter_logic.js` | 3503 | 165294 | `611c3856bbc046ba503603b18bc138e7bf766f5db85a412c2b276b9f34825212` |
 
 Related proof layers:
 
@@ -42,18 +43,18 @@ Related proof layers:
 
 ```text
 whitelist decision identity boundary source files: 1
-filter_logic _shouldBlock block lines: 301
-filter_logic _shouldBlock block bytes: 15380
-whitelist decision branch lines: 105
-whitelist decision branch bytes: 5392
+filter_logic _shouldBlock block lines: 306
+filter_logic _shouldBlock block bytes: 15523
+whitelist decision branch lines: 110
+whitelist decision branch bytes: 5535
 whitelist no-rule block lines: 9
 whitelist no-rule block bytes: 327
 whitelist channel loop lines: 17
 whitelist channel loop bytes: 961
 whitelist keyword loop lines: 15
 whitelist keyword loop bytes: 687
-whitelist unresolved/page fallback lines: 27
-whitelist unresolved/page fallback bytes: 1379
+whitelist unresolved/page fallback lines: 32
+whitelist unresolved/page fallback bytes: 1522
 whitelist no-match tail lines: 8
 whitelist no-match tail bytes: 288
 whitelist branch _logWhitelistDecision tokens: 6
@@ -75,8 +76,9 @@ whitelist branch pageChannelMeta tokens: 3
 whitelist branch isCreatorPage tokens: 2
 whitelist branch return false tokens: 5
 whitelist branch return true tokens: 3
-runtime whitelist identity fixtures: 6
-runtime behavior changed: no
+whitelist branch shouldTryCreatorPageFallback tokens: 2
+runtime whitelist identity fixtures: 7
+runtime behavior changed: yes, for whitelisted creator Shorts pages with hideAllShorts disabled
 not completion proof for JSON-first whitelist decision authority
 ```
 
@@ -87,8 +89,8 @@ not completion proof for JSON-first whitelist decision authority
 | No whitelist rows | When both channel and keyword whitelist arrays are empty, non-comment JSON renderers return `true` and are removed. | Empty whitelist product decision with route, renderer, profile, and user-facing mode proof. |
 | Channel allow | If any collaborator or channel identity matches `whitelistChannels`, the item returns `false`. | Channel allow report with accepted field, confidence, learned-map use, and rejected sibling evidence. |
 | Keyword allow | If `whitelistKeywords` exists and the candidate search text matches, the item returns `false`. | Keyword allow report with title/description/metadata source, exactness policy, and no-channel fallback decision. |
-| Creator-page fallback | With channel rules but no stable item identity or name, creator routes can allow through `pageChannelMeta` when it matches the whitelist. | Creator-page identity provenance and stale-page metadata decision. |
-| Unresolved identity | With channel rules, no stable identity, no name signal, and a non-Shorts renderer, the item fail-closes as `block:unresolved_identity`. | Pending identity policy with fetch/observer budget, restore proof, and stale-marker cleanup. |
+| Creator-page fallback | With channel rules but no stable item identity, creator routes can allow through `pageChannelMeta` when it matches the whitelist. Shorts-like renderers also try this fallback so whitelisted channel Shorts tabs do not empty out while `hideAllShorts` is disabled. | Creator-page identity provenance and stale-page metadata decision. |
+| Unresolved identity | With channel rules, no stable identity, and no usable creator-page fallback, the item fail-closes as `block:unresolved_identity`. | Pending identity policy with fetch/observer budget, restore proof, and stale-marker cleanup. |
 | No match | If none of the channel, keyword, or creator fallback checks allow the item, the branch returns `true` as `block:no_whitelist_match`. | Structured no-match reason with route/surface/list-mode and sibling-visible proof. |
 | Comment bypass | `isCommentRenderer` skips the non-comment whitelist branch, so comments are governed by hide-all, comment keywords, and author-channel checks. | Comment whitelist policy deciding whether comments should fail-closed, pass through, or use author identity. |
 
@@ -106,6 +108,11 @@ by a whitelist keyword match and removed when the keyword does not match.
 The creator-page fallback fixture proves a creator route still blocks without
 `pageChannelMeta`, then allows the same identityless renderer when
 `pageChannelMeta` matches the whitelist row.
+
+The whitelisted channel Shorts fixture proves a `shortsLockupViewModel` on a
+creator Shorts route still blocks without page identity, remains visible when
+`pageChannelMeta` matches the whitelist row and `hideAllShorts` is disabled,
+and is removed when `hideAllShorts` is enabled.
 
 The unresolved identity fixture proves channel-rule whitelist mode removes a
 non-Shorts video renderer that has no stable channel identity and no name
