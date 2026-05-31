@@ -314,6 +314,16 @@ export const FILE_LANE_RULES = Object.freeze([
     lanes: ['blocking', 'menu', 'whitelist']
   },
   {
+    id: 'extension-ui-build-helper-surface',
+    patterns: [/^scripts\/build-extension-ui\.mjs$/],
+    lanes: ['release', 'settings', 'smoke']
+  },
+  {
+    id: 'vendor-sync-build-helper-surface',
+    patterns: [/^scripts\/build-nanah-vendor\.mjs$/],
+    lanes: ['release', 'settings', 'smoke']
+  },
+  {
     id: 'release-build-surface',
     patterns: [/^manifest(?:\.[a-z]+)?\.json$/, /^build\.js$/, /^scripts\/build-.*\.mjs$/],
     lanes: ['release']

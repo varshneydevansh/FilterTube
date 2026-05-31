@@ -135,6 +135,7 @@ test('test lane matrix maps high-risk source files to expected lanes', () => {
     { files: ['js/layout.js'], lanes: ['test:release', 'test:dom', 'test:smoke'] },
     { files: ['js/shared/identity.js', 'js/content/dom_extractors.js', 'js/content/handle_resolver.js'], lanes: ['test:whitelist', 'test:blocking', 'test:menu'] },
     { files: ['js/vendor/*.bundle.js'], lanes: ['test:release', 'test:settings', 'test:smoke'] },
+    { files: ['scripts/build-extension-ui.mjs', 'scripts/build-nanah-vendor.mjs'], lanes: ['test:release', 'test:settings', 'test:smoke'] },
     { files: ['manifest*.json'], lanes: ['test:release'] },
     { files: ['README.md', 'CHANGELOG.md', 'data/release_notes.json'], lanes: ['test:release', 'test:smoke'] },
     { files: ['LICENSE', 'root `*.md`'], lanes: ['test:release', 'test:smoke'] },
@@ -257,6 +258,23 @@ test('executable classifier maps high-risk paths to required lanes', () => {
   assert.deepEqual(classifyPaths(['js/layout.js']).lanes, ['release', 'dom', 'smoke']);
   assert.deepEqual(classifyPaths(['css/content.css', 'css/filter.css', 'css/layout.css']).lanes, ['release', 'dom', 'smoke']);
   assert.deepEqual(classifyPaths(['js/vendor/nanah.bundle.js']).lanes, ['release', 'settings', 'smoke']);
+
+  const uiBuildHelper = classifyPaths(['scripts/build-extension-ui.mjs']);
+  assert.deepEqual(uiBuildHelper.lanes, ['release', 'settings', 'smoke']);
+  assert.deepEqual(uiBuildHelper.unmatched, []);
+  assert.equal(
+    uiBuildHelper.classifications[0].matched.some(match => match.id === 'extension-ui-build-helper-surface'),
+    true
+  );
+
+  const vendorBuildHelper = classifyPaths(['scripts/build-nanah-vendor.mjs']);
+  assert.deepEqual(vendorBuildHelper.lanes, ['release', 'settings', 'smoke']);
+  assert.deepEqual(vendorBuildHelper.unmatched, []);
+  assert.equal(
+    vendorBuildHelper.classifications[0].matched.some(match => match.id === 'vendor-sync-build-helper-surface'),
+    true
+  );
+
   assert.deepEqual(classifyPaths(['assets/images/homepage_hero_day.mp4']).lanes, ['release', 'smoke']);
   assert.deepEqual(classifyPaths(['icons/icon-128.png']).lanes, ['release', 'smoke']);
   assert.deepEqual(classifyPaths(['design/design_tokens.json']).lanes, ['release', 'smoke']);
