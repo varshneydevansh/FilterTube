@@ -157,16 +157,25 @@ artifact with missing byte parity remain `NO-GO`.
 | `js/content/dom_fallback.js` | `test:dom`, `test:blocking`, `test:performance` | Covers DOM hides/restores, route cleanup, no-rule work, and false-hide/leak risk. |
 | `js/content/block_channel.js` | `test:menu`, `test:performance` | Covers native 3-dot menus, quick-block affordances, outside-click close, and menu observer/timer budgets. |
 | `js/content/menu.js` | `test:menu` | Covers injected menu styles/classes and menu item surface behavior. |
+| `js/content/bridge_injection.js` | `test:release`, `test:json`, `test:performance`, `test:settings` | Covers content-script load/injection order, main-world script injection, settings bootstrap, and startup/no-work risk. |
+| `js/content/collab_dialog.js` | `test:whitelist`, `test:blocking`, `test:menu`, `test:performance` | Covers collaborator identity collection, dialog/menu propagation, block/allow decisions, and observer/listener budgets. |
+| `js/content/dom_helpers.js`, `js/content/dom_state.js` | `test:whitelist`, `test:blocking`, `test:dom`, `test:performance` | Covers hide/restore helpers, virtual DOM attributes, selector state, recycled-node cleanup, and no-rule DOM side effects. |
+| `js/content/first_run_prompt.js`, `js/content/release_notes_prompt.js` | `test:release`, `test:settings`, `test:smoke` | Covers manifest-loaded prompt UI, release-note payload handling, background message actions, and visible installed-extension handoff. |
 | `js/content_bridge.js` | `test:menu`, `test:settings`, affected runtime lane | Add `test:whitelist`, `test:dom`, `test:json`, or `test:performance` depending on touched branch. |
 | `js/content/bridge_settings.js` | `test:settings`, `test:json`, `test:performance` | Covers cross-context settings fanout, seed updates, dirty-key refresh, and force reprocess behavior. |
 | `js/background.js` | `test:settings`, `test:blocking`, affected runtime lane | Covers compiled settings, profile/list-mode mutation, block actions, cache invalidation, and message authority. |
 | `js/settings_shared.js` | `test:settings`, `test:blocking`, `test:whitelist` | Covers canonical settings shape, aliases, legacy migration, and list-mode compilation. |
 | `js/state_manager.js`, `js/io_manager.js` | `test:settings` | Covers persistence, import/export, backups, profile mutation, and storage refresh behavior. |
+| `js/content_controls_catalog.js` | `test:whitelist`, `test:blocking`, `test:json`, `test:dom`, `test:menu`, `test:performance`, `test:settings` | Covers content-control keys that activate JSON, DOM, menu affordance, settings, and no-work behavior. |
+| `js/popup.js`, `js/tab-view.js`, `js/render_engine.js`, `js/ui_components.js` | `test:release`, `test:whitelist`, `test:blocking`, `test:menu`, `test:settings`, `test:smoke` | Covers dashboard/popup UI, visible list authority, profile/list-mode mutation, content-control toggles, and release-facing UI claims. |
+| `js/nanah_sync_adapter.js`, `js/security_manager.js` | `test:release`, `test:settings`, `test:smoke` | Covers Nanah sync payloads, profile-scoped import/export, PIN/encrypted payload helpers, and package/release parity. |
+| `js/layout.js` | `test:release`, `test:dom`, `test:smoke` | Covers the quarantined legacy layout file, package burden, manifest-inactive status, and DOM/layout selector claims. |
 | `js/shared/identity.js`, `js/content/dom_extractors.js`, `js/content/handle_resolver.js` | `test:blocking`, `test:menu`, `test:whitelist` | Covers identity confidence, collaborators, menu labels, channel matching, and stale identity risk. |
 | `manifest*.json`, `build.js`, `scripts/build-*.mjs` | `test:release` | Covers package content, manifests, generated UI shell, release claims, and artifact behavior. |
 | `README.md`, `CHANGELOG.md`, `data/release_notes.json` | `test:release`, `test:smoke` | Covers public release claims, packaged release notes, and changelog/version drift. |
 | `docs/audit/artifacts/release-live-youtube-spa-smoke/*.{json,mjs}` | `test:release`, `test:smoke` | Covers live-smoke templates, runners, verifiers, and future dated smoke artifacts. |
 | `html/*.html`, `css/*.css`, `js/ui-shell/*.js`, `src/extension-shell/*.jsx` | `test:release`, affected UI/runtime lane | Add manual dashboard/popup smoke when the extension UI changes. |
+| `js/vendor/*.bundle.js` | `test:release`, `test:settings`, `test:smoke` | Covers vendored Nanah/QR bundles, dashboard load order, sync UI behavior, package contents, and bundle provenance. |
 | YouTube surface fixtures under `tests/runtime/fixtures/` | Lane that owns the fixture plus `test:smoke` if release-relevant | Fixture changes must state which behavior changed and whether old behavior remains intentional. |
 
 The executable mapping in `scripts/run-test-lane.mjs` is the source of truth.

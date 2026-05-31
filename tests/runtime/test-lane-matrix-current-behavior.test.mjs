@@ -33,6 +33,20 @@ function readJson(file) {
   return JSON.parse(read(file));
 }
 
+function collectJsFiles(dir = 'js') {
+  const root = path.join(repoRoot, dir);
+  const out = [];
+  for (const entry of fs.readdirSync(root, { withFileTypes: true })) {
+    const rel = path.join(dir, entry.name).replaceAll(path.sep, '/');
+    if (entry.isDirectory()) {
+      out.push(...collectJsFiles(rel));
+    } else if (entry.isFile() && rel.endsWith('.js')) {
+      out.push(rel);
+    }
+  }
+  return out.sort();
+}
+
 test('test lane matrix defines every required lane and npm script', () => {
   const pkg = readJson('package.json');
   const matrix = read(matrixPath);
@@ -81,20 +95,29 @@ test('test lane matrix maps high-risk source files to expected lanes', () => {
   const matrix = read(matrixPath);
 
   const requiredMappings = [
-    ['js/seed.js', ['test:json', 'test:performance']],
-    ['js/injector.js', ['test:json', 'test:whitelist', 'test:performance']],
-    ['js/content/dom_fallback.js', ['test:dom', 'test:blocking', 'test:performance']],
-    ['js/content/block_channel.js', ['test:menu', 'test:performance']],
-    ['js/content_bridge.js', ['test:menu', 'test:settings']],
-    ['js/background.js', ['test:settings', 'test:blocking']],
-    ['manifest*.json', ['test:release']],
-    ['README.md', ['test:release', 'test:smoke']],
-    ['docs/audit/artifacts/release-live-youtube-spa-smoke/*.{json,mjs}', ['test:release', 'test:smoke']]
+    { files: ['js/seed.js'], lanes: ['test:json', 'test:performance'] },
+    { files: ['js/injector.js'], lanes: ['test:json', 'test:whitelist', 'test:performance'] },
+    { files: ['js/content/dom_fallback.js'], lanes: ['test:dom', 'test:blocking', 'test:performance'] },
+    { files: ['js/content/block_channel.js'], lanes: ['test:menu', 'test:performance'] },
+    { files: ['js/content/bridge_injection.js'], lanes: ['test:release', 'test:json', 'test:performance', 'test:settings'] },
+    { files: ['js/content/collab_dialog.js'], lanes: ['test:whitelist', 'test:blocking', 'test:menu', 'test:performance'] },
+    { files: ['js/content/dom_helpers.js', 'js/content/dom_state.js'], lanes: ['test:whitelist', 'test:blocking', 'test:dom', 'test:performance'] },
+    { files: ['js/content/first_run_prompt.js', 'js/content/release_notes_prompt.js'], lanes: ['test:release', 'test:settings', 'test:smoke'] },
+    { files: ['js/content_bridge.js'], lanes: ['test:menu', 'test:settings'] },
+    { files: ['js/background.js'], lanes: ['test:settings', 'test:blocking'] },
+    { files: ['js/content_controls_catalog.js'], lanes: ['test:whitelist', 'test:blocking', 'test:json', 'test:dom', 'test:menu', 'test:performance', 'test:settings'] },
+    { files: ['js/popup.js', 'js/tab-view.js', 'js/render_engine.js', 'js/ui_components.js'], lanes: ['test:release', 'test:whitelist', 'test:blocking', 'test:menu', 'test:settings', 'test:smoke'] },
+    { files: ['js/nanah_sync_adapter.js', 'js/security_manager.js'], lanes: ['test:release', 'test:settings', 'test:smoke'] },
+    { files: ['js/layout.js'], lanes: ['test:release', 'test:dom', 'test:smoke'] },
+    { files: ['js/vendor/*.bundle.js'], lanes: ['test:release', 'test:settings', 'test:smoke'] },
+    { files: ['manifest*.json'], lanes: ['test:release'] },
+    { files: ['README.md'], lanes: ['test:release', 'test:smoke'] },
+    { files: ['docs/audit/artifacts/release-live-youtube-spa-smoke/*.{json,mjs}'], lanes: ['test:release', 'test:smoke'] }
   ];
 
-  for (const [file, lanes] of requiredMappings) {
-    const row = matrix.split('\n').find(line => line.startsWith('|') && line.includes(file));
-    assert.ok(row, `${file} mapping missing`);
+  for (const { files, lanes } of requiredMappings) {
+    const row = matrix.split('\n').find(line => line.startsWith('|') && files.every(file => line.includes(file)));
+    assert.ok(row, `${files.join(', ')} mapping missing`);
     for (const lane of lanes) {
       assert.match(row, new RegExp(lane.replace(':', ':')));
     }
@@ -102,7 +125,7 @@ test('test lane matrix maps high-risk source files to expected lanes', () => {
 });
 
 test('executable classifier maps high-risk paths to required lanes', () => {
-  assert.ok(FILE_LANE_RULES.length >= 30);
+  assert.ok(FILE_LANE_RULES.length >= 40);
 
   const seed = classifyPaths(['js/seed.js']);
   assert.deepEqual(seed.lanes, ['json', 'performance']);
@@ -128,6 +151,15 @@ test('executable classifier maps high-risk paths to required lanes', () => {
   assert.deepEqual(liveSmokeArtifact.lanes, ['release', 'smoke']);
   assert.deepEqual(liveSmokeArtifact.unmatched, []);
   assert.equal(liveSmokeArtifact.classifications[0].matched[0].id, 'live-smoke-artifact-surface');
+
+  assert.deepEqual(classifyPaths(['js/content/bridge_injection.js']).lanes, ['release', 'json', 'performance', 'settings']);
+  assert.deepEqual(classifyPaths(['js/content/collab_dialog.js']).lanes, ['whitelist', 'blocking', 'menu', 'performance']);
+  assert.deepEqual(classifyPaths(['js/content/dom_state.js']).lanes, ['whitelist', 'blocking', 'dom', 'performance']);
+  assert.deepEqual(classifyPaths(['js/content/first_run_prompt.js']).lanes, ['release', 'settings', 'smoke']);
+  assert.deepEqual(classifyPaths(['js/content_controls_catalog.js']).lanes, ['whitelist', 'blocking', 'json', 'dom', 'menu', 'performance', 'settings']);
+  assert.deepEqual(classifyPaths(['js/tab-view.js']).lanes, ['release', 'whitelist', 'blocking', 'menu', 'settings', 'smoke']);
+  assert.deepEqual(classifyPaths(['js/layout.js']).lanes, ['release', 'dom', 'smoke']);
+  assert.deepEqual(classifyPaths(['js/vendor/nanah.bundle.js']).lanes, ['release', 'settings', 'smoke']);
 });
 
 test('executable classifier inherits lanes from lane-owned tests and rejects unknown paths', () => {
@@ -139,6 +171,14 @@ test('executable classifier inherits lanes from lane-owned tests and rejects unk
   const unknown = classifyPaths(['tools/new-unclassified-helper.js']);
   assert.deepEqual(unknown.lanes, []);
   assert.deepEqual(unknown.unmatched, ['tools/new-unclassified-helper.js']);
+});
+
+test('executable classifier covers every current JavaScript source file', () => {
+  const jsFiles = collectJsFiles();
+  const result = classifyPaths(jsFiles);
+
+  assert.ok(jsFiles.length >= 30);
+  assert.deepEqual(result.unmatched, []);
 });
 
 test('changed-lane runner is wired to the classifier and sequential lane execution', () => {

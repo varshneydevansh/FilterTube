@@ -209,6 +209,26 @@ export const FILE_LANE_RULES = Object.freeze([
     lanes: ['menu']
   },
   {
+    id: 'content-bridge-injection-runtime',
+    patterns: [/^js\/content\/bridge_injection\.js$/],
+    lanes: ['release', 'json', 'performance', 'settings']
+  },
+  {
+    id: 'collab-dialog-runtime',
+    patterns: [/^js\/content\/collab_dialog\.js$/],
+    lanes: ['whitelist', 'blocking', 'menu', 'performance']
+  },
+  {
+    id: 'dom-helper-state-runtime',
+    patterns: [/^js\/content\/(?:dom_helpers|dom_state)\.js$/],
+    lanes: ['whitelist', 'blocking', 'dom', 'performance']
+  },
+  {
+    id: 'prompt-overlay-runtime',
+    patterns: [/^js\/content\/(?:first_run_prompt|release_notes_prompt)\.js$/],
+    lanes: ['release', 'settings', 'smoke']
+  },
+  {
     id: 'content-bridge-runtime',
     patterns: [/^js\/content_bridge\.js$/],
     lanes: ['menu', 'settings', 'json', 'dom', 'whitelist', 'performance']
@@ -232,6 +252,31 @@ export const FILE_LANE_RULES = Object.freeze([
     id: 'state-io-runtime',
     patterns: [/^js\/(?:state_manager|io_manager)\.js$/],
     lanes: ['settings']
+  },
+  {
+    id: 'extension-ui-runtime',
+    patterns: [/^js\/(?:popup|tab-view|render_engine|ui_components)\.js$/],
+    lanes: ['release', 'whitelist', 'blocking', 'menu', 'settings', 'smoke']
+  },
+  {
+    id: 'content-controls-catalog-runtime',
+    patterns: [/^js\/content_controls_catalog\.js$/],
+    lanes: ['whitelist', 'blocking', 'json', 'dom', 'menu', 'performance', 'settings']
+  },
+  {
+    id: 'nanah-sync-runtime',
+    patterns: [/^js\/nanah_sync_adapter\.js$/],
+    lanes: ['release', 'settings', 'smoke']
+  },
+  {
+    id: 'security-crypto-runtime',
+    patterns: [/^js\/security_manager\.js$/],
+    lanes: ['release', 'settings', 'smoke']
+  },
+  {
+    id: 'legacy-layout-quarantine',
+    patterns: [/^js\/layout\.js$/],
+    lanes: ['release', 'dom', 'smoke']
   },
   {
     id: 'identity-runtime',
@@ -267,6 +312,11 @@ export const FILE_LANE_RULES = Object.freeze([
     id: 'extension-ui-surface',
     patterns: [/^html\/.*\.html$/, /^css\/.*\.css$/, /^js\/ui-shell\/.*\.js$/, /^src\/extension-shell\//],
     lanes: ['release', 'smoke']
+  },
+  {
+    id: 'vendor-bundle-surface',
+    patterns: [/^js\/vendor\/.*\.bundle\.js$/],
+    lanes: ['release', 'settings', 'smoke']
   },
   {
     id: 'website-public-surface',
