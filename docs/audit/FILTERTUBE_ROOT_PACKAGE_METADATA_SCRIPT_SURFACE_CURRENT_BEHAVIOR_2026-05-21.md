@@ -26,15 +26,15 @@ first-class JSON filter work look safer than the runtime proof actually allows.
 
 ## File Fingerprints
 
-Current tracked root metadata inventory: 7 files, 2,903 newline counts, and
-129,612 bytes.
+Current tracked root metadata inventory: 7 files, 2,950 newline counts, and
+135,072 bytes.
 
 | File | Newline count | Bytes | SHA-256 |
 |---|---:|---:|---|
 | `.gitignore` | 153 | 2,197 | `c90a7834297cf0a7b65493f41a21947fd5d85d1e14740b902cb3a3664028e3ca` |
-| `CHANGELOG.md` | 554 | 36,175 | `2453fd9347d8eb357be65bf1a9a9e00f97f2e36ea02073c155c46e1015c17553` |
+| `CHANGELOG.md` | 591 | 40,157 | `71949d5506a2e9acd27b7f1a1578edef49b06dc578314293863d425d32251bd5` |
 | `LICENSE` | 21 | 1,073 | `d0739cbb6232b0fb9ea59347feaf412bab5042768aa02856b16af24bb35e9d9d` |
-| `README.md` | 406 | 22,852 | `2acc8bec7148bb5a11294b87ef673813e642d44c48f6885781fdae45d37e719d` |
+| `README.md` | 416 | 24,330 | `8435890aa3fc5bb10fb9206353978a53b4b1847809ce9ca3ffbb4f7bfecac9ac` |
 | `channel-identity-watch-mix-collab-recovery-plan.md` | 262 | 16,023 | `01f82169b06d3752e318b20b956c8a4284ae80166686e5c40aeee66c957d108a` |
 | `package.json` | 46 | 1,376 | `cd24685d1fb4940c1a67f12ce143bc1466200a299a82dbfa6f553b99e24ae23f` |
 | `package-lock.json` | 1,461 | 49,916 | `4882aa83fdbd0b3e150d4df5d32b3c02f3597cd64fe7193b9efbef3183832cef` |
@@ -128,7 +128,7 @@ Current README claims relevant to optimization and JSON-first filtering:
 - Current audit work is tightening no-rule, route, lifecycle, and resolver
   budgets.
 
-`CHANGELOG.md` currently starts with `## Version 3.3.1`; `README.md` also links
+`CHANGELOG.md` currently starts with `## Version 3.3.2`; `README.md` also links
 to it as the detailed change history. `LICENSE` is the MIT license file.
 
 `build.js` packages only these root common files into browser release outputs:

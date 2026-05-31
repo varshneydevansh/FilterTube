@@ -15,6 +15,16 @@ The public website now also acts as the download hub for browser releases, Andro
 
 👉 **[filtertube.in/downloads](https://filtertube.in/downloads)**
 
+## Release Candidate After v3.3.1 (May 31, 2026)
+
+- **Mobile/tablet app MVP release surfaces are now wired into the public product path**: the website downloads hub and extension dashboard cards point users toward Android phone/tablet testing and iOS/iPad status without mixing TV into the same release.
+- **Android phone/tablet is in final release testing and release setup** with the shared FilterTube runtime, YouTube Main, public YouTube Kids access, profiles, PIN rules, and Nanah sync as the MVP contract.
+- **iOS and iPad remain in final release testing** through the separate TestFlight/App Store path; Android TV and Fire TV are documented as future separate app packages.
+- **YouTube SPA lag was reduced by doing less work when there is no active rule work**: JSON clone/parse/replay, DOM fallback scans, quick-block observers, whitelist pending passes, and fallback menu warmups now have stricter route/mode/rule gates.
+- **Production console output is quiet by default** so routine `console.log`, `console.info`, and `console.debug` calls do not add overhead to YouTube hot paths unless explicit debug mode is enabled.
+- **Whitelist release blockers were tightened**: Shorts creator fallback, watch autoplay endpoint filtering, list-target forwarding, and DOM state hardening are documented for the post-v3.3.1 release candidate.
+- **Post-April-12 documentation validation now lives under `docs/audit/`** so the release proof stays separate from core product docs.
+
 ## What's New in v3.3.1
 
 - **Collaboration blocking is now much more complete on watch surfaces**: watch right rail, playlist rows, and watch-like lockups can recover full collaborator rosters and refresh the active 3-dot menu.

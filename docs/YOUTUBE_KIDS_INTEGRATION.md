@@ -1,4 +1,4 @@
-# YouTube Kids Integration Documentation (v3.2.5)
+# YouTube Kids Integration Documentation
 
 ## Overview
 
@@ -15,6 +15,13 @@ while watch/player surfaces may expose only a video id until a player payload,
 learned map, or scoped resolver provides channel identity.
 
 **Whitelist Mode Support:** YouTube Kids now supports whitelist mode for granular content control, allowing parents to specify exactly which channels and content are allowed.
+
+## 2026-05-31 Kids/App Release Boundary
+
+- Kids profile behavior is part of the Android phone/tablet MVP contract through public YouTube Kids access, profiles, PIN rules, and Nanah sync.
+- Kids watch surfaces should not inherit Main watch playlist pause/skip side effects in whitelist mode.
+- Child profiles remain receive-only for sync from the child surface; parent/account profiles manage child Main/Kids rules from parent-owned surfaces.
+- Native app packages must consume Kids runtime fixes through the extension-to-app runtime sync path before release packaging.
 
 ## Whitelist Mode for Kids (v3.2.5)
 

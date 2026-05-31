@@ -1,16 +1,26 @@
-# Technical Documentation (v3.3.0 Filtering, Recovery & UI Shell Notes)
+# Technical Documentation (Filtering, Recovery, App Release, And UI Shell Notes)
 
-> Current-behavior boundary (2026-05-19): this page is a broad technical
+> Current-behavior boundary (2026-05-31): this page is a broad technical
 > overview and contains some historical release-note wording. For exact runtime
 > authority, use the dated `FILTERTUBE_*_CURRENT_BEHAVIOR_2026-05-19.md` audit
-> files and `tests/runtime/*.test.mjs`. In particular, "JSON-first" does not
+> files, the 2026-05-31 release-fix audit files, and `tests/runtime/*.test.mjs`. In particular, "JSON-first" does not
 > mean "JSON-only"; Kids/watch/Shorts/channel fallback resolvers, learned maps,
 > nullable DOM extraction, and failure states are still part of the current
 > implementation.
 
 ## Overview
 
-FilterTube v3.3.0 builds on the earlier performance and whitelist-mode work with watch-page SPA recovery hardening, Mix/watch fallback-menu fixes, stronger collaboration roster recovery, cross-browser subscribed-channels import hardening, and smaller UX controls around backups and menu injection. This technical documentation covers the filtering logic, identity recovery behavior, mode switching, and user experience enhancements.
+FilterTube builds on the earlier performance and whitelist-mode work with watch-page SPA recovery hardening, Mix/watch fallback-menu fixes, stronger collaboration roster recovery, cross-browser subscribed-channels import hardening, app-release surface preparation, and smaller UX controls around backups and menu injection. This technical documentation covers the filtering logic, identity recovery behavior, mode switching, release-candidate runtime gates, and user experience enhancements.
+
+## 2026-05-31 Release Candidate Runtime Snapshot
+
+- No-rule and inactive-rule states now skip more JSON clone/parse/replay, DOM fallback, quick-block, fallback-menu, and whitelist-pending work before YouTube SPA navigation can accumulate cost.
+- Whitelist mode keeps the fail-closed posture, but pending-hide work is gated by route/mode/source confidence and batched outside mutation callbacks.
+- Watch/end-screen controls now also filter compact autoplay/watch-next endpoint data when end-screen card and videowall settings are enabled.
+- Whitelist Shorts creator fallback uses page context to avoid false-hiding allowed channel Shorts when card identity arrives late.
+- Production routine logs are gated behind explicit debug mode in extension-owned contexts; warnings and errors remain visible.
+- Broad externally visible `data-filtertube-*` state has been reduced or hardened where runtime code can keep state scoped instead.
+- Native app release sync must consume these fixes from the extension source before Android/iOS packaging.
 
 ## Collaboration roster checkpoint (2026-04-28)
 

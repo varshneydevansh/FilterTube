@@ -1,4 +1,4 @@
-# YouTube Renderer Inventory (v3.3.0 follow-up)
+# YouTube Renderer Inventory
 
 This document tracks which YouTube renderers/selectors FilterTube currently targets and how the latest DOM samples map to them.
 
@@ -10,6 +10,7 @@ This document tracks which YouTube renderers/selectors FilterTube currently targ
 - **Post-Block Enrichment**: Added background enrichment system for incomplete channel data
 - **Kids Video Enhancement**: Added `kidsVideoOwnerExtension` and `externalChannelId` support
 - **Performance Optimizations**: Async DOM processing with main-thread yielding and batched writes were added to reduce lag, CPU pressure, and I/O. Earlier notes used 60-80% CPU and 70-90% I/O reduction language; those are historical estimates, not current measured proof.
+- **2026-05-31 release candidate**: no-rule work gates, compact autoplay/watch-next filtering, whitelist Shorts creator fallback, production console gating, and DOM state hardening are tracked in `docs/audit/FILTERTUBE_POST_APRIL_12_RELEASE_DOC_VALIDATION_2026-05-31.md`.
 
 ## Home Feed
 

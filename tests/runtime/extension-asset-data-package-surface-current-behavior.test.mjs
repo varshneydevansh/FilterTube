@@ -41,7 +41,7 @@ const assetRows = [
   ['icons/icon-32.png', 1396, '5e7b427aed06912c51fce9982bbbccc5b51b570f3c038c703f39d4816cbe75bf', { width: 32, height: 32 }],
   ['icons/icon-48.png', 1650, '87c4199c7734d686f875b5086a6e7d7979667cfd09b8291cbb480bb703870a53', { width: 48, height: 48 }],
   ['icons/icon-64.png', 2833, 'da1f8d1e10a4a9f2a81a81dae309b1c431de24040650243386a725a33e72de88', { width: 64, height: 64 }],
-  ['data/release_notes.json', 23047, 'c9c860f17dae9f9f9e8d1536d3c0de72dd3b6bd917fc8d7fc725047adc421862', null],
+  ['data/release_notes.json', 23039, 'e012f6c071fffa67958f55544ecae9bbb26e7ec91edd2066df4d06a62de69962', null],
   ['design/design_tokens.json', 1902, '57bada64f3690a22fedea5f07aadc029e129f971465f8c66baab4a005984b3f0', null],
 ];
 
@@ -108,9 +108,9 @@ test('extension asset data package surface doc is audit-only and fingerprint pin
   assert.match(doc, /Runtime behavior is unchanged/);
   assert.match(doc, /This is not an\s+implementation patch/);
   assert.match(doc, /asset optimization, package cleanup, release approval, or\s+design-token migration/);
-  assert.match(doc, /12 files and 8,372,067 bytes/);
+  assert.match(doc, /12 files and 8,372,059 bytes/);
   assert.equal(assetRows.length, 12);
-  assert.equal(totalBytes, 8372067);
+  assert.equal(totalBytes, 8372059);
 
   assert.equal(assetRows.filter(([file]) => file.startsWith('assets/images/')).reduce((sum, [file]) => sum + bytes(file), 0), 8327776);
   assert.equal(assetRows.filter(([file]) => file.startsWith('icons/')).reduce((sum, [file]) => sum + bytes(file), 0), 19342);

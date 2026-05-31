@@ -15,29 +15,29 @@ const jsonReferenceDocs = [
 ];
 const expectedRows = [
   ['docs/ANDROID_PUBLIC_DISTRIBUTION.md', 91, 4545, 'c4ae25ab8038caa3effe34b973eedd3832bb3543b4fa73113a25bb8938c2fce2'],
-  ['docs/APP_RELEASE_AND_RUNTIME_SYNC_WORKFLOW.md', 156, 5797, 'c4831186eb625020d557681392b52ba605132c07537a2561e296cbf082a880d1'],
-  ['docs/ARCHITECTURE.md', 1714, 71575, 'd47fab9c67fbbcac58580cab13da0da2feb5c118a380cdfc237855c1a957e882'],
-  ['docs/CHANNEL_BLOCKING_SYSTEM.md', 1106, 48770, 'ce42fcd17dc8f8bb35b484b7bb979028c4bac7f83aa152324c1c7027ea0b251a'],
-  ['docs/CODEMAP.md', 265, 19634, '4ccca1a4629a19889e78760974ad5aeb5754dbc9e0fd47e1821da9b4394899a8'],
-  ['docs/CONTENT_HIDING_PLAYBOOK.md', 658, 34262, 'b81e15f9d62c3e2e76b13c8b2fe5fa47a1586885208893dd9c3af0d109b597d3'],
+  ['docs/APP_RELEASE_AND_RUNTIME_SYNC_WORKFLOW.md', 173, 6691, '15dfa4c585061c21a34df271c1f3390cca7776a0b9435661858f025c2d2834d0'],
+  ['docs/ARCHITECTURE.md', 1738, 72837, '63da6f0edae079a1730f7b6790ba3183cdd8ba8511633d4eba5b7e5d29e6b448'],
+  ['docs/CHANNEL_BLOCKING_SYSTEM.md', 1113, 49350, '61b5ef34d05dd9e722468629151499167f491adf67dea4a39561dc413456c845'],
+  ['docs/CODEMAP.md', 277, 21006, '6c4fc1586083d62c5a2d91bfe51048a193050422e6fa82c0cdc1901fdb969dfc'],
+  ['docs/CONTENT_HIDING_PLAYBOOK.md', 680, 35315, 'a57b703ae626f58911fb37f898cd166c880899359c80734a29f11763d31ed3e9'],
   ['docs/DATA_PORTABILITY_SYNC_WHITELIST_PLAN.md', 621, 20500, 'bcc435a2d18ab9587b7e69e76851f9759dd972bcb12f6484d5ed6cb19f001fd8'],
-  ['docs/DEVELOPER_GUIDE.md', 536, 15150, '9d8e05d19135625379b691b9aaddefb312fccb6e13d2d14c5ec4e4d63ce552c5'],
-  ['docs/FUNCTIONALITY.md', 872, 45044, 'cf9cbe10dc8333ca5404fa950d2cef39a7906cecc0f8025c7be56eaddb95bf1e'],
+  ['docs/DEVELOPER_GUIDE.md', 546, 15805, 'f790737e4e8f6b8d0544c072b5caa0448f4f3ac194c519033f05f7e348af9dbb'],
+  ['docs/FUNCTIONALITY.md', 881, 45960, '8b4608a0874c4b925b11f1d425692fb9ecc031b14bb4474cbeb3ea6da74b0f60'],
   ['docs/LEGACY_CHANNELS.md', 40, 2056, '53d12f59900027c06e2cc5d599f6f488885ad284a046fb18059e21370ec029de'],
-  ['docs/MOBILE_APP_HANDOFF_CONTEXT.md', 200, 5965, 'b9b9d182d76e113682c09574842ddddcc33712cb4650b15005d0358c9b6c0c73'],
+  ['docs/MOBILE_APP_HANDOFF_CONTEXT.md', 221, 6991, 'da2659310107397e03f3d30f604302304b344cd711dc3a809c1ea24bb9e832b5'],
   ['docs/NANAH_MANAGED_LINK_QA.md', 147, 4092, '3b83b2380c851da49852c1cc6a009aac0174866e12d445fdb86a96164cc90422'],
   ['docs/NANAH_P2P_PROJECT_PLAN.md', 456, 13431, 'bf1566eafbe7c68ab133d56a48e49ae404cd1d7f03da04ba3831d62b5db6b19f'],
   ['docs/NANAH_POST_IMPLEMENTATION_CONCERNS_TRACKER.md', 169, 17134, '54ae9a8d973609ccc8ac0ea3611c9caffe1af9c6d262978b3da160d7a798e078'],
   ['docs/NANAH_USER_GUIDE.md', 208, 5493, '3f13761a36c502da128e53450334b855b881a0e5009d99607fa19b4d60dc1ed7'],
-  ['docs/NETWORK_REQUEST_PIPELINE.md', 1052, 35212, 'a7643d9dd513e0865f2816e639dd481113e2b671fe35eac22268bd1f95d9a40b'],
-  ['docs/PROACTIVE_CHANNEL_IDENTITY.md', 674, 24303, '8c99c2ad84817b9d47dde9156a476b6883091b3b828cdf5fac89aa4b6415ed96'],
+  ['docs/NETWORK_REQUEST_PIPELINE.md', 1067, 36009, '1868caad4f29a05f17d784eed352d1b231ae358e576d02c19a4d3987f97ca5a5'],
+  ['docs/PROACTIVE_CHANNEL_IDENTITY.md', 684, 25024, '88e2d2ac6935b8fe623dcc776ac9ac25e94a758196b0c527adceb6c6aa7d0d41'],
   ['docs/PROFILES_PIN_MODEL.md', 613, 26872, '31c3645a3d2829ca61cc51a9ca341ab7b05b634141594a7cab81dc75466c8082'],
   ['docs/SUBSCRIBED_CHANNELS_IMPORT.md', 291, 10550, 'afe276f3964bc9ba9991ae71c21066219bc740f8ee478902f3d3cb3cb23d295c'],
-  ['docs/TECHNICAL.md', 2163, 87928, '3518c7d72339d7162e681ce2277ea54dd76f601bba692a4b133b95f02aeb58f9'],
-  ['docs/THREE_DOT_MENU_IMPROVEMENTS.md', 597, 24571, 'bc97c3fe73b678b649846fb7ce442c9e8cdd8d3141516f39b0ae248f18d46324'],
-  ['docs/WATCH_PLAYLIST_BREAKDOWN.md', 549, 36711, 'd032dc823b5d9bdc0a142191eca17838ec11cfaf7b42203aae2d007838dd4698'],
-  ['docs/WEBSITE_APP_RELEASE_SURFACE_CHANGELOG.md', 125, 5319, '431164028d05d829d959ddd8676b03587660abadd23d3a4b60e2834dae9a02e3'],
-  ['docs/YOUTUBE_KIDS_INTEGRATION.md', 774, 28403, 'c752ec50fd8afdb689ec04e54fcefa6ceb5500d472f20d669ed88c08637de057'],
+  ['docs/TECHNICAL.md', 2173, 89075, '9060a8d98bce4ffb4e682aaaef886482e028b0aeea25f86bc48f8e14839371c9'],
+  ['docs/THREE_DOT_MENU_IMPROVEMENTS.md', 605, 25117, 'cfce8072c7b827f96ceaa8812c7196efd364b295481ead3b055ed1cab5b785c6'],
+  ['docs/WATCH_PLAYLIST_BREAKDOWN.md', 550, 36988, '5f849eb9fc7bda3f54dc350d6aafe958fedccd43c9dafd1dc1eb2ffb18cfa804'],
+  ['docs/WEBSITE_APP_RELEASE_SURFACE_CHANGELOG.md', 156, 6939, '216eb966bfebc8a6024f39d8ca30e0a5a8898e37c7dff4c5e1646cf6fb5b46d9'],
+  ['docs/YOUTUBE_KIDS_INTEGRATION.md', 781, 28964, '25e1326cb069e5728b81a74177005139e57659152dcf66f0a559976fa0f77476'],
   ['docs/collab_three_dot_ui_google_aistudio.md', 397, 28346, 'af45e120882611e93a04340fc7c004c984e2a571b65b1f3d3c79abf8bd53b94a'],
   ['docs/filtertube-scenic-media-prompt-brief.md', 316, 13328, 'c9d6cc852c3ba749e14ba09fad4fbad2b1fbe9e99c6d05ac28f75ce91ce38497'],
   ['docs/filtertube-serene-website-platform-expansion-plan.md', 500, 27547, 'ea957de2d3e171a7dd3caf8f7b7c9683cbd631d2f7a2c2adcc89ef5a6ed8fcd5'],
@@ -149,11 +149,11 @@ test('tracked public doc claim surface is audit-only and fingerprint pinned', ()
     totalBytes += expectedBytes;
   }
 
-  assert.equal(totalNewlines, 16072);
-  assert.equal(totalBytes, 693919);
+  assert.equal(totalNewlines, 16276);
+  assert.equal(totalBytes, 707346);
   assert.match(doc, /29 tracked product\/public docs/);
-  assert.match(doc, /16,072 newline counts/);
-  assert.match(doc, /693,919 bytes/);
+  assert.match(doc, /16,276 newline counts/);
+  assert.match(doc, /707,346 bytes/);
   assert.match(doc, /Excluded because they already have a focused JSON-reference audit/);
 });
 
@@ -176,15 +176,15 @@ test('tracked public docs keep structure and claim-token counts pinned', () => {
   );
 
   assert.equal(structure.h1, 29);
-  assert.equal(structure.h2, 376);
-  assert.equal(structure.h3, 676);
-  assert.equal(structure.inline, 3099);
-  assert.equal(structure.absolute, 144);
-  assert.equal(structure.fileRefs, 291);
+  assert.equal(structure.h2, 388);
+  assert.equal(structure.h3, 681);
+  assert.equal(structure.inline, 3136);
+  assert.equal(structure.absolute, 146);
+  assert.equal(structure.fileRefs, 306);
 
   const tokenTotals = [
-    ['s/t phrase', count(combined, authorityPhrase), 11],
-    ['complete', count(combined, 'complete'), 41],
+    ['s/t phrase', count(combined, authorityPhrase), 12],
+    ['complete', count(combined, 'complete'), 42],
     ['implemented', count(combined, 'implemented'), 7],
     ['guarantee', count(combined, 'guarantee'), 14],
     ['always', count(combined, 'always'), 22],
@@ -193,11 +193,11 @@ test('tracked public docs keep structure and claim-token counts pinned', () => {
     ['instant', count(combined, 'instant'), 25],
     ['performance', count(combined, 'performance'), 34],
     ['optimization', count(combined, 'optimization'), 13],
-    ['runtime', count(combined, 'runtime'), 108],
-    ['release', count(combined, 'release'), 93],
-    ['native', count(combined, 'native'), 108],
-    ['sync', count(combined, 'sync'), 183],
-    ['JSON-first', count(combined, 'JSON-first'), 9],
+    ['runtime', count(combined, 'runtime'), 129],
+    ['release', count(combined, 'release'), 146],
+    ['native', count(combined, 'native'), 118],
+    ['sync', count(combined, 'sync'), 201],
+    ['JSON-first', count(combined, 'JSON-first'), 12],
     ['first-class', count(combined, 'first-class'), 4],
     ['authority', count(combined, 'authority'), 27],
     ['manifest', count(combined, 'manifest'), 4],
@@ -213,11 +213,11 @@ test('tracked public docs keep structure and claim-token counts pinned', () => {
   }
 
   assert.match(doc, /H1 headings: 29/);
-  assert.match(doc, /H2 headings: 376/);
-  assert.match(doc, /H3 headings: 676/);
-  assert.match(doc, /Inline-code spans: 3,099/);
-  assert.match(doc, /Absolute local path strings: 144/);
-  assert.match(doc, /File-reference tokens for product\/build\/site paths: 291/);
+  assert.match(doc, /H2 headings: 388/);
+  assert.match(doc, /H3 headings: 681/);
+  assert.match(doc, /Inline-code spans: 3,136/);
+  assert.match(doc, /Absolute local path strings: 146/);
+  assert.match(doc, /File-reference tokens for product\/build\/site paths: 306/);
 });
 
 test('tracked public docs remain documentation claims rather than runtime or package authority', () => {
@@ -234,7 +234,7 @@ test('tracked public docs remain documentation claims rather than runtime or pac
     }
   }
 
-  assert.equal(files.length, 236);
+  assert.equal(files.length, 237);
   assert.deepEqual(references, [
     ['website/assets/videos/README.md', 'docs/filtertube-scenic-media-prompt-brief.md'],
   ]);

@@ -4,17 +4,17 @@
   },
   {
     "version": "3.3.2",
-    "headline": "Upcoming: watch identity, Nanah sync, and app parity cleanup",
-    "summary": "Prepared release notes for the next checkpoint without bumping the packaged extension version yet: watch/player playlist identity is more reliable, first-save channel rows preserve real names and alternate IDs, Nanah app sync keeps channel-derived keyword ownership, and several UI/performance regressions are guarded.",
-    "bannerSummary": "Watch identity repairs, safer first-save channel rows, Nanah app-sync metadata preservation, and UI/performance regression guards are staged for the next release.",
+    "headline": "Upcoming: mobile/tablet app MVP, smoother YouTube, and safer whitelist",
+    "summary": "Prepared release notes for the next checkpoint without bumping the packaged extension version yet: the public app release surface is ready for Android phone/tablet final testing and iOS/iPad status, the extension dashboard now points to those app paths, YouTube SPA work is quieter when there are no active rules, and whitelist/end-screen correctness fixes are staged for release.",
+    "bannerSummary": "Mobile/tablet app release surfaces, smoother YouTube runtime behavior, production-quiet logs, and whitelist/end-screen leak fixes are staged for the next release.",
     "highlights": [
-      "Watch/player playlist blocks keep stored video-to-channel mappings authoritative while still recovering handles, custom URLs, names, and logos when YouTube exposes them later.",
-      "First-save channel rows no longer treat a bare @handle as a complete display name, reducing backup snapshots with temporary handle-as-name rows.",
-      "Search SPA collaborator recovery keeps recent YouTube search response snapshots so collaborator menus can still upgrade after watch-to-search navigation.",
-      "Tablet Shorts cards and mobile watch-page Shorts tiles now use a Shorts-specific `shorts:<videoId>` resolver path, so 3-dot blocks and Quick Cross blocks recover the correct channel instead of failing through the watch resolver.",
-      "Nanah/import paths preserve channel-derived Filter All keyword ownership between extension and native app payloads, including row color and source-badge metadata.",
-      "Quick Block hover controls clip against sticky YouTube chrome and keep their hover state across preview overlays without punching into top UI.",
-      "Firefox/Waterfox manual export, system-theme first paint, short-height sidebar scrolling, large-blocklist indexed matching, duplicate init debug gating, and channel-row no-redraw behavior are part of this checkpoint."
+      "The website downloads hub and extension dashboard now expose the Android phone/tablet final-testing path and the iOS/iPad TestFlight/App Store status path.",
+      "Android phone/tablet release setup is documented around the shared FilterTube runtime, YouTube Main, public YouTube Kids access, profiles, PIN rules, and Nanah sync.",
+      "YouTube SPA performance work now skips more JSON clone/parse/replay, DOM fallback, quick-block, fallback-menu, and whitelist-pending work when there are no active rules or no route need.",
+      "Production extension contexts gate routine console logging behind explicit debug mode so normal browsing does not pay console overhead on YouTube hot paths.",
+      "Whitelist release fixes cover Shorts creator fallback, list-target forwarding, and compact autoplay/watch-next endpoint filtering for end-screen controls.",
+      "FilterTube DOM state attributes were hardened to reduce broad visible `data-filtertube-*` fingerprints while preserving necessary runtime state.",
+      "Nanah/import paths preserve channel-derived Filter All keyword ownership between extension and native app payloads, including row color, source-badge metadata, and pairing context."
     ]
   },
   {

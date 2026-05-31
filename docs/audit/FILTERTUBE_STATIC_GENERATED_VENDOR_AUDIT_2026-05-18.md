@@ -46,7 +46,7 @@ ship with the extension or feed public UI behavior:
 | `js/ui-shell/tab-view-decor.js` | 18,289 | 323 | Generated dashboard decor shell. |
 | `js/vendor/nanah.bundle.js` | 27,692 | 876 | Nanah global bundle. |
 | `js/vendor/qrcode.bundle.js` | 66,965 | 2,085 | QR code global bundle. |
-| `data/release_notes.json` | 23,047 | 316 | Release-note copy data. |
+| `data/release_notes.json` | 23,039 | 316 | Release-note copy data. |
 
 ## Extension HTML Load Order
 

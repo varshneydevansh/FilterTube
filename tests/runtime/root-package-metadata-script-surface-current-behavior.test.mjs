@@ -9,9 +9,9 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_ROOT_PACKAGE_METADATA_SCRIPT_SURFACE_CURRENT_BEHAVIOR_2026-05-21.md';
 const rootMetadataRows = [
   ['.gitignore', 153, 2197, 'c90a7834297cf0a7b65493f41a21947fd5d85d1e14740b902cb3a3664028e3ca'],
-  ['CHANGELOG.md', 554, 36175, '2453fd9347d8eb357be65bf1a9a9e00f97f2e36ea02073c155c46e1015c17553'],
+  ['CHANGELOG.md', 591, 40157, '71949d5506a2e9acd27b7f1a1578edef49b06dc578314293863d425d32251bd5'],
   ['LICENSE', 21, 1073, 'd0739cbb6232b0fb9ea59347feaf412bab5042768aa02856b16af24bb35e9d9d'],
-  ['README.md', 406, 22852, '2acc8bec7148bb5a11294b87ef673813e642d44c48f6885781fdae45d37e719d'],
+  ['README.md', 416, 24330, '8435890aa3fc5bb10fb9206353978a53b4b1847809ce9ca3ffbb4f7bfecac9ac'],
   ['channel-identity-watch-mix-collab-recovery-plan.md', 262, 16023, '01f82169b06d3752e318b20b956c8a4284ae80166686e5c40aeee66c957d108a'],
   ['package.json', 46, 1376, 'cd24685d1fb4940c1a67f12ce143bc1466200a299a82dbfa6f553b99e24ae23f'],
   ['package-lock.json', 1461, 49916, '4882aa83fdbd0b3e150d4df5d32b3c02f3597cd64fe7193b9efbef3183832cef'],
@@ -91,9 +91,9 @@ test('root package metadata script surface doc is audit-only and fingerprint pin
   assert.match(doc, /optimization, release, dependency, JSON-first, or cleanup implementation work/);
   assert.deepEqual(trackedRootMetadata.sort(), rootMetadataRows.map(([file]) => file).sort());
 
-  assert.equal(rootMetadataRows.reduce((sum, [, lines]) => sum + lines, 0), 2903);
-  assert.equal(rootMetadataRows.reduce((sum, [, , bytes]) => sum + bytes, 0), 129612);
-  assert.match(doc, /7 files, 2,903 newline counts, and\s+129,612 bytes/);
+  assert.equal(rootMetadataRows.reduce((sum, [, lines]) => sum + lines, 0), 2950);
+  assert.equal(rootMetadataRows.reduce((sum, [, , bytes]) => sum + bytes, 0), 135072);
+  assert.match(doc, /7 files, 2,950 newline counts, and\s+135,072 bytes/);
 
   for (const [file, lines, bytes, hash] of rootMetadataRows) {
     assert.equal(newlineCount(file), lines, `${file} newline count drifted`);
@@ -210,7 +210,7 @@ test('root public docs expose release and JSON-first claims that still need pari
   assert.match(readme, /Large blocked-channel lists filter faster/);
   assert.match(readme, /JSON-backed surfaces can be filtered before paint/);
   assert.match(readme, /Current audit work is tightening no-rule, route, lifecycle, and resolver budgets/);
-  assert.equal(changelog.startsWith('# Changelog\n\n## Version 3.3.1'), true);
+  assert.equal(changelog.startsWith('# Changelog\n\n## Version 3.3.2'), true);
   assert.match(license, /MIT License/);
   assert.match(license, /THE SOFTWARE IS PROVIDED "AS IS"/);
 
@@ -219,7 +219,7 @@ test('root public docs expose release and JSON-first claims that still need pari
   assert.doesNotMatch(build, /package-lock\.json/);
 
   assert.match(doc, /README\.md` is public release copy/);
-  assert.match(doc, /`CHANGELOG\.md` currently starts with `## Version 3\.3\.1`/);
+  assert.match(doc, /`CHANGELOG\.md` currently starts with `## Version 3\.3\.2`/);
   assert.match(doc, /The historical planning file\s+`channel-identity-watch-mix-collab-recovery-plan\.md` is tracked/);
   assert.match(doc, /`rootDocClaimParityReport`/);
 });

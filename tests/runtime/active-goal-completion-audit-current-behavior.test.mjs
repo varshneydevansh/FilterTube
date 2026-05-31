@@ -9019,8 +9019,8 @@ test('active goal completion audit records release notes JSON version gate witho
   assert.match(source, /tests\/runtime\/release-notes-json-version-gate-boundary-current-behavior\.test\.mjs/);
   assert.match(source, /direct release-note JSON version-gate proof/);
   assert.match(source, /`data\/release_notes\.json` at 317 lines/);
-  assert.match(source, /23,047 bytes/);
-  assert.match(source, /sha256 `c9c860f17dae9f9f9e8d1536d3c0de72dd3b6bd917fc8d7fc725047adc421862`/);
+  assert.match(source, /23,039 bytes/);
+  assert.match(source, /sha256 `e012f6c071fffa67958f55544ecae9bbb26e7ec91edd2066df4d06a62de69962`/);
   assert.match(source, /24 array rows/);
   assert.match(source, /1 comment row/);
   assert.match(source, /23 version rows/);

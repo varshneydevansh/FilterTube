@@ -1,5 +1,42 @@
 # Changelog
 
+## Version 3.3.2 (Unreleased / Release Candidate)
+
+### Mobile / Tablet App MVP Release Surface
+
+- **App MVP release path finalized in the public repo**: `filtertube.in/downloads`, the website platform pages, release tooling, and the extension dashboard now point to the same browser, Android phone/tablet, and iOS/iPad release surface.
+- **Android phone/tablet release setup**: public copy now describes Android as in final testing/release setup with YouTube Main, public YouTube Kids access, profiles, PIN rules, and Nanah sync.
+- **iOS/iPad release setup**: public copy now separates the TestFlight/App Store path from Android and keeps Android TV / Fire TV out of the mobile/tablet release scope.
+- **Extension dashboard app cards**: the dashboard control center now includes Android and iPhone/iPad status cards that route users to the downloads/status hub.
+- **Release artifacts**: `build.js` can stage Android APK/AAB artifacts and `.sha256` checksums beside browser ZIPs when the release is cross-platform.
+
+### YouTube Runtime Performance
+
+- **Reduced no-rule work**: empty or inactive rule states now skip more JSON clone/parse/replay work, DOM fallback scans, quick-block sweeps, fallback menu warmups, and whitelist pending work.
+- **Whitelist pending throttles**: pending-card rechecks are coalesced, batched outside mutation callbacks, capped, and trimmed to the relevant pending cards.
+- **Overlay-aware observers**: fallback menu and quick-block work now backs off while native YouTube menus/overlays are open.
+- **Production console gate**: routine `console.log`, `console.info`, and `console.debug` output is muted in production extension contexts unless explicit FilterTube debug mode is enabled.
+- **Installed-profile parity gates**: release audits now track the difference between private automation Chrome and the real installed user Chrome profile so manual smoke tests run against the extension users actually have installed.
+
+### Whitelist / Blocklist Correctness
+
+- **Whitelist Shorts creator fallback**: whitelisted channel Shorts can use creator-page context when direct card identity is delayed, reducing false hides on allowed channel Shorts tabs.
+- **Watch autoplay endpoint leaks**: compact autoplay/watch-next JSON endpoints are filtered when end-screen card/videowall controls are enabled, including whitelisted-channel watch sessions.
+- **List-target forwarding**: `addFilteredChannel` now preserves blocklist/whitelist target intent across background paths so UI actions write to the expected list.
+- **DOM state hardening**: runtime state moved away from broad stable `data-filtertube-*` signatures where possible, reducing externally visible extension fingerprints while preserving necessary local state.
+
+### Profiles, Kids, And Nanah
+
+- **Managed child authority**: child receive-only sync, parent-managed child rule editing, global child edit mode, and locked-profile prompts are now aligned across dashboard surfaces.
+- **Nanah app metadata**: extension/native payloads preserve channel-derived `Filter All` keyword ownership, row tint, source badges, and pairing metadata across sync/import paths.
+- **Kids whitelist guard**: Kids watch surfaces avoid playlist/watch pause side effects in whitelist mode while still honoring allowed content policy.
+
+### Documentation
+
+- **Post-April-12 validation register**: `docs/audit/FILTERTUBE_POST_APRIL_12_RELEASE_DOC_VALIDATION_2026-05-31.md` records every commit after the April 12 release baseline and maps code-only commits to current documentation coverage.
+- **Release-facing docs refreshed**: README, release notes JSON, app release workflow docs, website/app release changelog, architecture, technical notes, functionality, and codemap now describe the May 31 release candidate state.
+- **Known limitation**: Android phone/tablet and iOS/iPad should be described as final testing/release setup until public store/direct links are live. Android TV / Fire TV remain future separate app work.
+
 ## Version 3.3.1
 
 ### Whitelist Home & Watch Stability

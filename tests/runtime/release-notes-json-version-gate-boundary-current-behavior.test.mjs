@@ -82,8 +82,8 @@ test('release notes JSON data shape and package version boundary remain pinned',
   const keySet = [...new Set(releaseNotes.flatMap((entry) => Object.keys(entry)))].sort();
 
   assert.equal(releaseText.split('\n').length, 317);
-  assert.equal(releaseBytes.length, 23047);
-  assert.equal(sha256(releaseBytes), 'c9c860f17dae9f9f9e8d1536d3c0de72dd3b6bd917fc8d7fc725047adc421862');
+  assert.equal(releaseBytes.length, 23039);
+  assert.equal(sha256(releaseBytes), 'e012f6c071fffa67958f55544ecae9bbb26e7ec91edd2066df4d06a62de69962');
   assert.equal(releaseNotes.length, 24);
   assert.equal(releaseNotes.filter((entry) => entry._comment).length, 1);
   assert.equal(versionRows.length, 23);
@@ -110,7 +110,7 @@ test('release notes JSON data shape and package version boundary remain pinned',
 
   const audit = doc();
   for (const expected of [
-    '317 lines, 23,047 bytes',
+    '317 lines, 23,039 bytes',
     '24 array rows, 1 comment row, and 23 version rows',
     'newest version row is `3.3.2`',
     'only version row without `detailsUrl`',
@@ -258,10 +258,10 @@ test('dashboard and prompt release-note consumers remain pinned to current JSON 
   assert.equal(count(prompt, /setTimeout/g), 1);
 
   for (const [manifest, expectedIndex] of [
-    ['manifest.json', 11],
-    ['manifest.chrome.json', 11],
-    ['manifest.firefox.json', 10],
-    ['manifest.opera.json', 11],
+    ['manifest.json', 12],
+    ['manifest.chrome.json', 12],
+    ['manifest.firefox.json', 11],
+    ['manifest.opera.json', 12],
   ]) {
     const scripts = readJson(manifest).content_scripts.flatMap((entry) => entry.js || []);
     assert.equal(scripts.includes('js/content/release_notes_prompt.js'), true, `${manifest} missing release prompt`);

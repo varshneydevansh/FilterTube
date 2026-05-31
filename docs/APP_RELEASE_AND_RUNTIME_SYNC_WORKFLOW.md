@@ -1,6 +1,6 @@
 # App release and runtime sync workflow
 
-Last updated: May 17, 2026.
+Last updated: May 31, 2026.
 
 This document is the release-order checklist for shipping FilterTube extension and native app updates together without losing the extension as the source of truth.
 
@@ -20,6 +20,13 @@ The public `FilterTube` repository remains the release hub:
 
 Website, dashboard, and release-surface changes from the current app release push are tracked in [Website and app release surface changelog](WEBSITE_APP_RELEASE_SURFACE_CHANGELOG.md).
 
+The May 31 release-candidate documentation pass keeps this boundary explicit:
+
+- Android phone/tablet is in final release testing / release setup until public Play Store or direct public links exist.
+- iOS/iPad is in final release testing through the separate TestFlight/App Store path.
+- Android TV / Fire TV are not part of the mobile/tablet MVP release and remain future separate packages.
+- Runtime lag and correctness fixes must land in the extension first, then sync into the private native app repo before app packaging.
+
 The private `FilterTubeApp` repository remains the native implementation workspace:
 
 - Android app shell
@@ -38,6 +45,16 @@ The private `FilterTubeApp` repository remains the native implementation workspa
 6. Copy or point the public release script at the Android artifact directory.
 7. Build public extension ZIPs and optionally attach Android artifacts to the same GitHub release.
 8. Update `filtertube.in/downloads` links/store labels when real channels become available.
+
+```mermaid
+flowchart TD
+    A["Extension runtime fix"] --> B["Extension tests and manual YouTube smoke"]
+    B --> C["Public docs and release notes"]
+    C --> D["Sync runtime into FilterTubeApp"]
+    D --> E["Android WebView and iOS WKWebView smoke"]
+    E --> F["Build native artifacts"]
+    F --> G["Attach public artifacts/checksums when links are ready"]
+```
 
 ## Runtime sync command
 

@@ -1,4 +1,4 @@
-# Channel Blocking System (v3.3.0)
+# Channel Blocking System
 
 ## 0. Goal & Non-Goals
 
@@ -14,6 +14,13 @@ FilterTube must be able to:
 - Provide accurate channel names in 3-dot menus, upgrading from UC IDs/handles to human-readable names.
 - Recover full collaborator rosters on watch-like surfaces when YouTube hides them behind a dialog/sheet instead of exposing them directly in the byline.
 - Support mode switching with list migration (blocklist ↔ whitelist).
+
+### 2026-05-31 release-candidate boundary
+
+- Channel add/block actions must preserve the requested list target (`blocklist` vs `whitelist`) across UI, content script, and background paths.
+- Whitelist Shorts creator-page fallback may use trusted page context to keep allowed channel Shorts visible while card identity hydrates.
+- Watch autoplay/end-screen endpoint filtering participates in channel/content hiding when end-screen settings are enabled.
+- Runtime DOM state should avoid broad externally visible FilterTube-specific attributes unless a feature needs that DOM-visible state.
 
 ### Non-goals (for this doc)
 

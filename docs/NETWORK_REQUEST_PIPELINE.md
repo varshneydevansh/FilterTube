@@ -1,10 +1,11 @@
-# Network Request Pipeline Documentation (v3.3.0)
+# Network Request Pipeline Documentation
 
-> Current-behavior boundary (2026-05-19): this page contains historical
+> Current-behavior boundary (2026-05-31): this page contains historical
 > v3.2.x/v3.3.0 design notes and some intentionally broad performance language.
 > Treat it as context, not as implementation truth. The current proof-backed
 > source of truth is `docs/audit/FILTERTUBE_IDENTITY_INFORMATION_WATERFALL_CURRENT_BEHAVIOR_2026-05-19.md`
-> plus `docs/audit/FILTERTUBE_REFERENCE_DOC_CLAIM_DRIFT_CURRENT_BEHAVIOR_2026-05-19.md`.
+> plus `docs/audit/FILTERTUBE_REFERENCE_DOC_CLAIM_DRIFT_CURRENT_BEHAVIOR_2026-05-19.md`
+> and the 2026-05-31 release-fix audit files.
 > In current source, identity is JSON-first, not JSON-complete: learned maps,
 > DOM extraction, and background watch/Shorts/Kids/channel resolvers still exist
 > for weak or video-id-only surfaces.
@@ -12,6 +13,20 @@
 ## Overview
 
 FilterTube v3.2.5 introduced a **JSON-aware identity pipeline** that intercepts YouTube's JSON responses to extract channel identity as early as the payload exposes enough identity. This reduces resolver latency on many surfaces, but it is still a source-confidence layer rather than a guarantee of pre-render identity or instant blocking across every route. Some watch, Shorts, playlist, Kids, and weak menu targets still need learned maps, DOM enrichment, or a background resolver.
+
+## 2026-05-31 Release-Candidate Network Boundary
+
+The May 31 runtime work tightened when the network/JSON path is allowed to spend CPU:
+
+```text
+YouTube JSON candidate
+  -> is extension enabled?
+  -> are there active blocklist/whitelist/content-control rules for this route?
+  -> does the response carry a renderer/endpoint FilterTube can filter safely?
+  -> clone, parse, filter, and replay only after those gates pass
+```
+
+This keeps JSON-first filtering as the preferred path without replaying large YouTube snapshots for empty installs, inactive rules, excluded routes, or settings states that cannot use the response. Compact watch-next/autoplay endpoint filtering is part of the end-screen control path when the relevant end-screen settings are enabled.
 
 **Historical performance note (v3.2.1):** The pipeline includes async processing, main-thread yielding, compiled regex caching, batched storage updates, and production-quiet routine logging to reduce CPU, console, and I/O pressure. Earlier notes used "eliminating UI lag", "60-80%" CPU, and "70-90%" I/O language; those are historical estimates, not current proof. Current performance claims require a `performanceClaimAuthority` measurement for the exact route, browser/device, rule-state, and sample.
 

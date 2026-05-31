@@ -1,8 +1,18 @@
-# Developer Guide (v3.2.5)
+# Developer Guide
 
 ## Overview
 
-This guide helps developers understand and extend FilterTube's proactive channel identity system and whitelist mode functionality. It covers how to add support for new YouTube endpoints, renderer types, collaboration patterns, and dual filtering modes.
+This guide helps developers understand and extend FilterTube's proactive channel identity system, whitelist mode functionality, and release-candidate runtime boundaries. It covers how to add support for new YouTube endpoints, renderer types, collaboration patterns, dual filtering modes, and app/runtime sync changes.
+
+## 2026-05-31 Development Boundary
+
+Before adding new filtering, app-release, or runtime-sync behavior:
+
+- prove the route/mode/settings state actually needs JSON, DOM, quick-block, fallback-menu, or whitelist-pending work before scheduling it
+- keep production logs behind explicit debug mode
+- preserve blocklist/whitelist target intent across content-script and background APIs
+- update `data/release_notes.json`, `CHANGELOG.md`, and a focused `docs/audit/` note when a release-facing behavior changes
+- sync native app runtime from extension source instead of hand-editing generated app assets
 
 ## Core Concepts
 

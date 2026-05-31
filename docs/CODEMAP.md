@@ -1,6 +1,6 @@
-# FilterTube v3.2.7 Code Map (Performance & Category Filtering)
+# FilterTube Code Map (Runtime, App Release, And Documentation Checkpoints)
 
-This document provides a detailed reference of the key files and functions in the FilterTube v3.2.7 codebase with performance optimizations, category filtering, and enhanced cross-browser support.
+This document provides a detailed reference of the key files and functions in the FilterTube codebase with runtime filtering, performance optimizations, category filtering, app-release surfaces, and enhanced cross-browser support.
 
 ## New in v3.2.7
 
@@ -15,6 +15,18 @@ This document provides a detailed reference of the key files and functions in th
 - **System Theme Default**: Missing `ftThemePreference` resolves through `prefers-color-scheme`, while explicit user toggles still persist `light` or `dark`.
 - **Short-Height Dashboard Nav**: Sidebar brand/footer stay fixed while `.nav-list` scrolls, keeping every tab reachable on small desktop heights.
 - **Large Blocklist Matching**: Shared channel-filter indexes let the JSON filter and DOM fallback match UC IDs, handles, custom URLs, and strict names with set lookups instead of scanning every saved channel.
+- **Post-v3.3.1 Release Candidate**: Public app release surfaces, no-rule YouTube work gates, production console gating, whitelist Shorts fallback, watch autoplay endpoint filtering, and DOM state hardening are covered by the May 31 documentation validation register.
+
+## 2026-05-31 Release Candidate Documentation Checkpoint
+
+The commit-by-commit documentation validation for all work after the April 12 release baseline lives in [FILTERTUBE_POST_APRIL_12_RELEASE_DOC_VALIDATION_2026-05-31.md](/Users/devanshvarshney/FilterTube/docs/audit/FILTERTUBE_POST_APRIL_12_RELEASE_DOC_VALIDATION_2026-05-31.md).
+
+Key source areas for the release candidate:
+
+- `html/tab-view.html`, `css/tab-view.css`, `js/tab-view.js`: dashboard app cards and release-surface navigation.
+- `website/` and `build.js`: downloads hub, app release copy, optional APK/AAB attachment, and checksum staging.
+- `js/seed.js`, `js/injector.js`, `js/content_bridge.js`, `js/content/dom_fallback.js`, `js/content/block_channel.js`: YouTube SPA lag reduction, JSON/DOM no-work gates, quick-block/fallback-menu throttles, and production console gate behavior.
+- `js/background.js`, `js/settings_shared.js`, `js/io_manager.js`, `js/nanah_sync_adapter.js`: list-target forwarding, whitelist persistence, Nanah/app metadata preservation, and import/sync convergence.
 
 ## 2026-04-28 Mobile/App Upstream Checkpoint
 

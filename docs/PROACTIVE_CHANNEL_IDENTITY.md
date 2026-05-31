@@ -1,4 +1,4 @@
-# Proactive Channel Identity System (v3.2.5)
+# Proactive Channel Identity System
 
 ## Overview
 
@@ -7,6 +7,16 @@ FilterTube shifted from a **reactive** (on-demand) to a **proactive** channel id
 **Historical performance note (v3.2.1):** Compiled caching, async processing, and batched storage updates were added to reduce CPU and I/O pressure. Earlier release notes used "60-80%" CPU, "70-90%" I/O, and "eliminating UI lag" language; those are historical estimates, not current proof. Any concrete performance claim now requires a `performanceClaimAuthority` measurement with route, browser/device, rule-state, sample-size, and artifact evidence.
 
 **Channel Stamping Improvements (v3.2.5):** Enhanced DOM stamping with mode-aware data attributes and improved channel ID visibility on homepage Shorts and other surfaces.
+
+## 2026-05-31 Identity Runtime Boundary
+
+The proactive path is now explicitly gated by work need:
+
+- do not clone/parse/replay large YouTube JSON payloads when the extension is disabled, no active rules exist, or the route/settings state cannot use the response
+- keep JSON-first as the preferred identity source, but preserve learned maps, DOM extraction, Shorts/watch/Kids resolvers, and failure states for weak surfaces
+- reduce broad DOM-visible `data-filtertube-*` state where scoped runtime storage is enough
+- keep compact autoplay/watch-next endpoint filtering under end-screen control settings
+- treat native app runtime sync as downstream of this extension source, not as a separate hand-edited identity implementation
 
 ## Why We Changed
 

@@ -1,8 +1,32 @@
-# Architecture Documentation (v3.3.1)
+# Architecture Documentation
 
 ## Overview
 
-FilterTube v3.3.1 builds on the JSON-aware channel identity layer with watch-page SPA recovery hardening, stronger collaboration recovery, category filtering, a newer extension shell layer, and enhanced cross-browser support. This architecture documentation covers high-level design, filtering modes, recovery behavior, memory management, and cross-browser compatibility. JSON/network snapshots are preferred identity sources when YouTube exposes stable fields, but they are not a guarantee of before-render identity, zero fallback resolver work, or permission to hide content without route/mode/source-confidence proof.
+FilterTube builds on the JSON-aware channel identity layer with watch-page SPA recovery hardening, stronger collaboration recovery, category filtering, a newer extension shell layer, app-release surfaces, and enhanced cross-browser support. This architecture documentation covers high-level design, filtering modes, recovery behavior, memory management, release/runtime sync, and cross-browser compatibility. JSON/network snapshots are preferred identity sources when YouTube exposes stable fields, but they are not a guarantee of before-render identity, zero fallback resolver work, or permission to hide content without route/mode/source-confidence proof.
+
+## 2026-05-31 release architecture checkpoint
+
+The post-April-12 release candidate has two linked architecture tracks:
+
+1. **Runtime correctness and cost control**
+   - YouTube SPA hot paths must prove active rule work before JSON replay, DOM fallback scans, quick-block work, fallback menu warmups, or whitelist pending passes run.
+   - Whitelist mode remains restrictive, but route/mode/source-confidence gates prevent broad player, Home, Watch, Shorts, and overlay regressions.
+   - Production logging is an explicit debug feature, not a default runtime behavior.
+2. **Mobile/tablet app release surface**
+   - The public repo owns website/downloads, release notes, dashboard app cards, extension ZIPs, optional Android artifacts/checksums, and runtime source of truth.
+   - The private app repo owns native Android/iOS shells and consumes synced extension runtime code before app packaging.
+
+```mermaid
+flowchart TD
+    A["Extension runtime source"] --> B["Browser extension package"]
+    A --> C["Runtime sync into private native app repo"]
+    B --> D["filtertube.in/downloads"]
+    C --> E["Android phone/tablet app"]
+    C --> F["iOS/iPad app"]
+    D --> G["Release notes and dashboard app cards"]
+    E --> G
+    F --> G
+```
 
 ## Nanah / Accounts & Sync architecture (desktop checkpoint)
 

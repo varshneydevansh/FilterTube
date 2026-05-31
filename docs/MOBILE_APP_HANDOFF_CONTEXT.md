@@ -138,6 +138,27 @@ That checkpoint records the runtime and UI/UX behavior that was upstreamed for t
 
 The mobile app should consume these through synced runtime and native UI parity work, not through hand-edited generated runtime copies.
 
+## 2026-05-31 release-candidate checkpoint
+
+The public repo now treats the first mobile/tablet app MVP release surface as a release-candidate headline, with the native app implementation still living in the private repo.
+
+Current public positioning:
+
+- Android phone/tablet: final release testing / release setup
+- iOS/iPad: final release testing through the separate TestFlight/App Store path
+- Android TV / Fire TV: future separate app packages, not part of the current mobile/tablet MVP
+
+Runtime fixes that should be synced before native packaging:
+
+- no-rule YouTube work gates for JSON, DOM fallback, quick-block, fallback menu, and whitelist pending paths
+- production console log gating
+- whitelist Shorts creator fallback
+- watch autoplay/end-screen endpoint filtering
+- `addFilteredChannel` list-target forwarding
+- DOM state attribute hardening
+
+Reference: [post-April-12 release documentation validation](/Users/devanshvarshney/FilterTube/docs/audit/FILTERTUBE_POST_APRIL_12_RELEASE_DOC_VALIDATION_2026-05-31.md).
+
 ## Shared vs non-shared code
 
 Good shared candidates:

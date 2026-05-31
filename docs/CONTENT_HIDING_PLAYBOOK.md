@@ -8,6 +8,28 @@ This document is an *operator playbook* for answering:
 - **NEW in v3.2.1+**: How performance optimizations reduce lag and improve responsiveness, without claiming every route/device is lag-free.
 - **NEW in v3.2.5**: How **whitelist mode** inverts filtering logic.
 
+## 2026-05-31 release-candidate hiding boundary
+
+The current release-candidate rule is: FilterTube should hide what the user asked it to hide or allow only what the whitelist allows, but it should not keep YouTube busy when no useful rule work exists.
+
+Current hot-path gates:
+
+```text
+Settings / route / mode update
+  -> compile effective rules
+  -> if no active work: skip JSON replay, DOM fallback scans, quick-block sweeps
+  -> if active work: run route-scoped JSON-first filtering
+  -> DOM fallback handles rendered/recycled cards with bounded retries
+  -> whitelist pending work only runs for scoped pending cards
+```
+
+Important May 31 fixes:
+
+- Whitelist Shorts creator fallback keeps allowed channel Shorts visible when card identity arrives late.
+- Watch autoplay/end-screen endpoint filtering applies to compact watch-next data when end-screen settings are enabled.
+- `addFilteredChannel` preserves the intended blocklist/whitelist target.
+- DOM state is hardened so broad FilterTube fingerprints are not used as the default storage surface.
+
 ## 1) The Three Layers (Who Does What)
 
 ### 1.1 Engine (Main World): `seed.js` + `filter_logic.js`

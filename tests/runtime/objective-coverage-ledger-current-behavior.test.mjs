@@ -8771,8 +8771,8 @@ test('objective coverage ledger records release notes JSON version gate boundary
   assert.match(doc, /direct release-note JSON version-gate proof/);
   assert.match(doc, /without opening the implementation gate/);
   assert.match(doc, /`data\/release_notes\.json` at 317 lines/);
-  assert.match(doc, /23,047 bytes/);
-  assert.match(doc, /sha256 `c9c860f17dae9f9f9e8d1536d3c0de72dd3b6bd917fc8d7fc725047adc421862`/);
+  assert.match(doc, /23,039 bytes/);
+  assert.match(doc, /sha256 `e012f6c071fffa67958f55544ecae9bbb26e7ec91edd2066df4d06a62de69962`/);
   assert.match(doc, /24 array rows/);
   assert.match(doc, /1 comment row/);
   assert.match(doc, /23 version rows/);

@@ -13,13 +13,13 @@ for `assets/images/*`, `icons/*`, `data/release_notes.json`, and
 
 ## Tracked Asset/Data Surface
 
-The tracked extension asset/data surface has 12 files and 8,372,067 bytes:
+The tracked extension asset/data surface has 12 files and 8,372,059 bytes:
 
 | Family | Files | Bytes | Current package role |
 | --- | ---: | ---: | --- |
 | `assets/images` | 3 | 8,327,776 | Copied wholesale by `build.js`; popup/dashboard ambient video and app-release artwork |
 | `icons` | 7 | 19,342 | Copied wholesale by `build.js`; browser manifest icons plus one web-accessible menu asset |
-| `data` | 1 | 23,047 | Copied wholesale by `build.js`; release-note data loaded by background and dashboard |
+| `data` | 1 | 23,039 | Copied wholesale by `build.js`; release-note data loaded by background and dashboard |
 | `design` | 1 | 1,902 | Tracked design input; not copied by `build.js` current `COMMON_DIRS` |
 
 Current file fingerprints:
@@ -36,7 +36,7 @@ Current file fingerprints:
 | `icons/icon-32.png` | 1,396 | PNG 32x32 | `5e7b427aed06912c51fce9982bbbccc5b51b570f3c038c703f39d4816cbe75bf` |
 | `icons/icon-48.png` | 1,650 | PNG 48x48 | `87c4199c7734d686f875b5086a6e7d7979667cfd09b8291cbb480bb703870a53` |
 | `icons/icon-64.png` | 2,833 | PNG 64x64 | `da1f8d1e10a4a9f2a81a81dae309b1c431de24040650243386a725a33e72de88` |
-| `data/release_notes.json` | 23,047 | 24 JSON rows: 1 comment row plus 23 version rows | `c9c860f17dae9f9f9e8d1536d3c0de72dd3b6bd917fc8d7fc725047adc421862` |
+| `data/release_notes.json` | 23,039 | 24 JSON rows: 1 comment row plus 23 version rows | `e012f6c071fffa67958f55544ecae9bbb26e7ec91edd2066df4d06a62de69962` |
 | `design/design_tokens.json` | 1,902 | 6 color groups plus typography, spacing, radiuses, shadows | `57bada64f3690a22fedea5f07aadc029e129f971465f8c66baab4a005984b3f0` |
 
 ## Build And Manifest Inclusion

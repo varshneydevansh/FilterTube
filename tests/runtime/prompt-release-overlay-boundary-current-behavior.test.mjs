@@ -8,12 +8,12 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_PROMPT_RELEASE_OVERLAY_BOUNDARY_CURRENT_BEHAVIOR_2026-05-22.md';
 
 const sourceFingerprints = {
-  'manifest.json': [87, 2470, '96eb5e5c8733ecdfa9d3eb447d51a3bfc2c4743a80b1fde1f12d71bd46d1c8e4'],
-  'manifest.chrome.json': [87, 2470, '96eb5e5c8733ecdfa9d3eb447d51a3bfc2c4743a80b1fde1f12d71bd46d1c8e4'],
-  'manifest.firefox.json': [74, 1994, '5d7175c23dbce4f9e86b0db0f34b1ae61bb465a9725ff37fc7069a45d4ceac5c'],
-  'manifest.opera.json': [88, 2475, 'f76d4a48b51fc5da65492347ce3f7cb31ebff057afd2185573176991e7d1d4b7'],
+  'manifest.json': [88, 2513, 'c39c38d4e389f17803b1915c2d2d0673c60dd87e68a9301fac4faad14bfd31e1'],
+  'manifest.chrome.json': [88, 2513, 'c39c38d4e389f17803b1915c2d2d0673c60dd87e68a9301fac4faad14bfd31e1'],
+  'manifest.firefox.json': [75, 2029, '89e2f70a5f6bb34356ebed2f4ad357213a28a2872cfaebeff2474e702a98719d'],
+  'manifest.opera.json': [89, 2518, 'ef0fa857517710853e82942bdb05bc14c9f2e2202b49775fd6e6a59a27e77017'],
   'package.json': [46, 1376, 'cd24685d1fb4940c1a67f12ce143bc1466200a299a82dbfa6f553b99e24ae23f'],
-  'data/release_notes.json': [316, 23047, 'c9c860f17dae9f9f9e8d1536d3c0de72dd3b6bd917fc8d7fc725047adc421862'],
+  'data/release_notes.json': [316, 23039, 'e012f6c071fffa67958f55544ecae9bbb26e7ec91edd2066df4d06a62de69962'],
   'js/content/first_run_prompt.js': [190, 7453, '5672d9060d29b08550ecfc3add54245212a5094ee5137f025b6f788f12e50409'],
   'js/content/release_notes_prompt.js': [250, 9866, '30b624cbbda1004f354f98dbf3b4513f8ebc298adecbceb4358782f248f80474'],
   'js/background.js': [6320, 285103, '77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad'],

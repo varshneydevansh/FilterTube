@@ -69,7 +69,7 @@ const sourceRows = [
   [wrapperPath, 34, 1070, '4f46c13bf6099092193712790d231ff4809b00b1b0061d04af71ac3ba6bf21c6'],
   [appSyncScriptPath, 1758, 76587, 'd48bdc271f707f0f960ac8a6b0d2712a602fb6c84a8c2bf2e0a138d112f9ba8e'],
   [appManifestPath, 198, 8178, 'e899e29d946270865750b8f6415c298a92da6b4e1917367b6a174afe2a0c6583'],
-  [publicReleaseNotesPath, 316, 23047, 'c9c860f17dae9f9f9e8d1536d3c0de72dd3b6bd917fc8d7fc725047adc421862'],
+  [publicReleaseNotesPath, 316, 23039, 'e012f6c071fffa67958f55544ecae9bbb26e7ec91edd2066df4d06a62de69962'],
   [androidReleaseNotesPath, 301, 21095, '911628cbd7f6354c58aa82064f3ef1f29cda3904a87e3ea263534600a0880737'],
   [iosReleaseNotesPath, 301, 21095, '911628cbd7f6354c58aa82064f3ef1f29cda3904a87e3ea263534600a0880737'],
 ];

@@ -1,8 +1,39 @@
 # Website and app release surface changelog
 
-Last updated: May 17, 2026.
+Last updated: May 31, 2026.
 
 This document records the public website, extension dashboard, and release-script changes made while preparing the Android phone/tablet, iOS, and iPad release surfaces. It is intentionally limited to the public `FilterTube` repository; native app implementation details remain in the private app repository.
+
+## May 31, 2026 validation checkpoint
+
+### Release positioning
+
+- The post-April-12 documentation validation keeps the mobile/tablet app work as the release headline for the next public checkpoint.
+- Android phone/tablet is described as final release testing / release setup, not as publicly shipped until the real store or direct public links are live.
+- iOS/iPad is described as final release testing through the separate TestFlight/App Store path.
+- Android TV / Fire TV remain future separate app work and should not be bundled into the mobile/tablet MVP announcement.
+
+### Product surface contract
+
+```text
+Extension dashboard cards
+  -> filtertube.in/downloads
+      -> Browser extension release links
+      -> Android phone/tablet testing and artifact path
+      -> iOS/iPad TestFlight/App Store status
+      -> Future TV/store links only when separate packages exist
+```
+
+### Runtime dependency
+
+- The app release copy now explicitly depends on the shared runtime stability work completed after May 17: no-rule YouTube work gates, production console quieting, whitelist Shorts fallback, watch autoplay endpoint filtering, and DOM state hardening.
+- Public app claims should remain about the MVP contract: YouTube Main, public YouTube Kids access, profiles, PIN rules, and Nanah sync. Native implementation details remain in the private app repo.
+
+### Documentation pointers
+
+- Release validation register: `docs/audit/FILTERTUBE_POST_APRIL_12_RELEASE_DOC_VALIDATION_2026-05-31.md`
+- Runtime sync workflow: `docs/APP_RELEASE_AND_RUNTIME_SYNC_WORKFLOW.md`
+- Public release notes source: `data/release_notes.json`
 
 ## May 17, 2026 checkpoint
 

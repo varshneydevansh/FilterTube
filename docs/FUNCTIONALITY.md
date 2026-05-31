@@ -1,8 +1,8 @@
-# FilterTube v3.3.0 - Current Functionality Documentation
+# FilterTube Current Functionality Documentation
 
 ## Overview
 
-FilterTube v3.3.0 implements a **hybrid filtering system** with dual filtering modes:
+FilterTube implements a **hybrid filtering system** with dual filtering modes:
 
 - A primary **data interception layer** removes blocked items from YouTube JSON responses before render when possible.
 - A secondary **DOM fallback layer** hides/restores already-rendered elements for SPA navigation, DOM recycling, and edge cases.
@@ -10,6 +10,15 @@ FilterTube v3.3.0 implements a **hybrid filtering system** with dual filtering m
 - **Category Filtering**: Filter videos by YouTube category (e.g., Music, Gaming, Education) (v3.2.7).
 
 It also now includes `Accounts & Sync`, powered by Nanah, for device-to-device settings transfer.
+
+## 2026-05-31 Release-Candidate Functionality Snapshot
+
+- The extension dashboard now advertises the mobile/tablet app MVP release surface through Android and iPhone/iPad cards that point to the public downloads/status hub.
+- Android phone/tablet is documented as final release testing / release setup with YouTube Main, public YouTube Kids access, profiles, PIN rules, and Nanah sync.
+- iOS/iPad is documented as final release testing through a separate TestFlight/App Store path; Android TV / Fire TV remain future separate app packages.
+- YouTube runtime work now has stricter no-work gates for empty/inactive rule states, reducing JSON, DOM fallback, quick-block, fallback menu, and whitelist pending work during SPA navigation.
+- Whitelist correctness fixes cover Shorts creator context, watch autoplay/end-screen endpoint filtering, and list-target forwarding across background channel-add paths.
+- Production console output is quiet by default outside explicit debug mode.
 
 ## Nanah / Accounts & Sync functionality
 
@@ -70,7 +79,7 @@ That means:
 
 ## Upcoming Release-Note Checkpoint
 
-The next release-facing checkpoint is staged in `data/release_notes.json` instead of date-stamped changelog files. It consolidates the watch/player playlist identity repair, handle/name first-save cleanup, SPA search collaborator recovery, quick-block hover clipping, Firefox export fallback, system-theme default, sidebar-height fix, large-blocklist indexed matching, duplicate-init debug gating, and Nanah app-sync metadata preservation.
+The next release-facing checkpoint is staged in `data/release_notes.json` instead of date-stamped changelog files. It consolidates the mobile/tablet app MVP release surface, Android/iOS final-testing status, YouTube SPA no-work gates, production console gating, whitelist Shorts fallback, compact autoplay/end-screen filtering, DOM state hardening, and Nanah app-sync metadata preservation.
 
 ## Core Filtering Capabilities
 

@@ -1,12 +1,13 @@
-# 3-Dot Menu Improvements Documentation (v3.3.0)
+# 3-Dot Menu Improvements Documentation
 
-> Current-behavior boundary (2026-05-19): this page is a feature-history and
+> Current-behavior boundary (2026-05-31): this page is a feature-history and
 > design note. Some older sections below still use absolute phrases such as
 > always-successful DOM extraction, zero-delay blocking, or measured network
 > timing. Treat those as claims that require current source/fixture proof. The
 > current proof-backed boundary is in
 > `docs/audit/FILTERTUBE_REFERENCE_DOC_CLAIM_DRIFT_CURRENT_BEHAVIOR_2026-05-19.md`
-> and `docs/audit/FILTERTUBE_IDENTITY_INFORMATION_WATERFALL_CURRENT_BEHAVIOR_2026-05-19.md`.
+> and `docs/audit/FILTERTUBE_IDENTITY_INFORMATION_WATERFALL_CURRENT_BEHAVIOR_2026-05-19.md`,
+> plus the May 31 release-fix audit files.
 > Current menu behavior can use JSON/maps/DOM quickly when identity is known,
 > but weak watch, Shorts, playlist, Kids, or YTM targets can still escalate to
 > fallback resolvers or fail when YouTube does not expose stable identity.
@@ -14,6 +15,13 @@
 ## Overview
 
 FilterTube v3.2.1 introduced the main 3-dot menu improvement pass across YouTube Main and YouTube Kids. The current v3.3.0 state extends that behavior across watch-page SPA rows, YTM and YTD watch-like lockups, Mix-like playlist rows, and the custom fallback 3-dot popover so channel names and block actions stay reliable even when row identity starts weak.
+
+## 2026-05-31 Release-Candidate Menu Notes
+
+- Fallback menu warmups and scroll rescans are throttled and skip work under native YouTube overlays.
+- FilterTube close handling must not poison YouTube's reusable native menu nodes; menu visibility state should stay scoped to FilterTube-owned UI.
+- Production menu diagnostics use explicit debug mode instead of routine console output.
+- `addFilteredChannel` menu actions preserve the intended blocklist/whitelist target when routed through background persistence.
 
 ## Problem Statement
 

@@ -28,7 +28,7 @@ needed before JSON can become a first-class filter contract.
 
 | Surface | Current evidence |
 | --- | --- |
-| Release notes JSON | `data/release_notes.json` has 317 lines, 23,047 bytes, sha256 `c9c860f17dae9f9f9e8d1536d3c0de72dd3b6bd917fc8d7fc725047adc421862`, 24 array rows, 1 comment row, and 23 version rows. |
+| Release notes JSON | `data/release_notes.json` has 317 lines, 23,039 bytes, sha256 `e012f6c071fffa67958f55544ecae9bbb26e7ec91edd2066df4d06a62de69962`, 24 array rows, 1 comment row, and 23 version rows. |
 | JSON schema shape | Current top-level keys are `_comment`, `bannerSummary`, `detailsUrl`, `headline`, `highlights`, `summary`, and `version`. All 23 version rows have `headline`, `summary`, and `highlights` arrays. 18 version rows have `bannerSummary`. |
 | Highlight data | The 23 version rows contain 110 total highlight strings. Per row, the current minimum is 3 and the maximum is 9. |
 | Packaged version | `package.json`, `manifest.json`, `manifest.chrome.json`, `manifest.firefox.json`, and `manifest.opera.json` are all `3.3.1`. |

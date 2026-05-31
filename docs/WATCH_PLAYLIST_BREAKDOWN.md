@@ -1,4 +1,4 @@
-# Watch Playlist – Current Implementation (v3.2.1)
+# Watch Playlist Current Implementation
 
 ## Goal
 
@@ -9,6 +9,7 @@
 - **2026-04-28 follow-up**: Optimistically hidden playlist rows are restamped after the background add returns, so the clicked row keeps the confirmed `UC...` plus any recovered alternate identity (`@handle` or custom URL) instead of temporarily restoring or showing `Not fetched`. The background watch resolver no longer short-circuits on a bare `videoChannelMap` hit unless an alternate identity is already known; it uses the stored UC as fallback while still trying to enrich handle/custom URL metadata.
 - **2026-04-28 desktop playlist-panel follow-up**: Desktop watch playlist rows (`ytd-playlist-panel-video-renderer` / wrapper rows) now enter the same watch-like recovery path as mobile playlist rows. FilterTube reads the row `#byline` before the generic single-channel fallback, warms collaborator menus from bylines such as `Channel A and Channel B`, excludes Mix rows through the existing Mix guard, and routes bare-UC menu/quick-cross blocks through `watch:<videoId>` so alternate IDs can be recovered before persistence.
 - **2026-04-29 alternate-ID repair**: Watch/player playlist rows that already have a `videoId -> UC...` mapping now keep that stored UC as the authoritative channel ID while still enriching `@handle` / custom URL. If a later watch fetch returns a conflicting owner, the stored playlist mapping wins and only safe display metadata is merged. The skip-fetch save path also preserves menu-supplied display handles so Channel Management does not fall back to `Not fetched` when the menu already knew an alternate ID.
+- **2026-05-31 release-candidate boundary**: whitelist mode does not drive current-watch owner blocking, playlist skip/redirect, or next/previous click guards. End-screen/autoplay controls instead filter compact watch-next/autoplay endpoint data when those end-screen settings are enabled.
 
 
 ## How it works now
