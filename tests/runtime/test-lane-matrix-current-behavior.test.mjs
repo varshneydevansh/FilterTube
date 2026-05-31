@@ -130,11 +130,12 @@ test('test lane matrix maps high-risk source files to expected lanes', () => {
     { files: ['js/layout.js'], lanes: ['test:release', 'test:dom', 'test:smoke'] },
     { files: ['js/vendor/*.bundle.js'], lanes: ['test:release', 'test:settings', 'test:smoke'] },
     { files: ['manifest*.json'], lanes: ['test:release'] },
-    { files: ['README.md'], lanes: ['test:release', 'test:smoke'] },
+    { files: ['README.md', 'CHANGELOG.md', 'data/release_notes.json'], lanes: ['test:release', 'test:smoke'] },
     { files: ['LICENSE', 'root `*.md`'], lanes: ['test:release', 'test:smoke'] },
     { files: ['docs/*.md'], lanes: ['test:release', 'test:smoke'] },
     { files: ['docs/audit/artifacts/release-live-youtube-spa-smoke/*.{json,mjs}'], lanes: ['test:release', 'test:smoke'] },
     { files: ['docs/audit/artifacts/empty-install-idle-probe.mjs'], lanes: ['test:performance', 'test:smoke'] },
+    { files: ['html/popup.html', 'css/popup.css', 'js/ui-shell/popup-shell.js', 'src/extension-shell/popup.jsx'], lanes: ['test:release', 'test:settings', 'test:smoke'] },
     { files: ['assets/images/*', 'icons/*', 'design/design_tokens.json'], lanes: ['test:release', 'test:smoke'] },
     { files: ['scripts/compress-video.swift', 'scripts/sync-native-runtime.mjs'], lanes: ['test:release', 'test:smoke'] },
     { files: ['tests/runtime/harness/load-filter-engine.mjs'], lanes: ['test:whitelist', 'test:blocking', 'test:json', 'test:dom', 'test:menu', 'test:performance', 'test:settings', 'test:smoke'] },
@@ -172,6 +173,32 @@ test('executable classifier maps high-risk paths to required lanes', () => {
   const packageSurface = classifyPaths(['package.json', 'website/components/footer-signal-art.js']);
   assert.deepEqual(packageSurface.lanes, ['release', 'smoke']);
   assert.deepEqual(packageSurface.unmatched, []);
+
+  const releaseCopy = classifyPaths(['build.js', 'CHANGELOG.md', 'data/release_notes.json']);
+  assert.deepEqual(releaseCopy.lanes, ['release', 'smoke']);
+  assert.deepEqual(releaseCopy.unmatched, []);
+
+  const popupShell = classifyPaths([
+    'html/popup.html',
+    'css/popup.css',
+    'js/ui-shell/popup-shell.js',
+    'src/extension-shell/popup.jsx'
+  ]);
+  assert.deepEqual(popupShell.lanes, ['release', 'settings', 'smoke']);
+  assert.deepEqual(popupShell.unmatched, []);
+  for (const classification of popupShell.classifications) {
+    assert.ok(
+      classification.matched.some(match => match.id === 'extension-popup-shell-surface'),
+      `${classification.file} should be classified as popup settings shell`
+    );
+  }
+
+  const decorativeShell = classifyPaths([
+    'src/extension-shell/tab-view-decor.jsx',
+    'src/extension-shell/shared/runtime.js'
+  ]);
+  assert.deepEqual(decorativeShell.lanes, ['release', 'smoke']);
+  assert.deepEqual(decorativeShell.unmatched, []);
 
   const liveSmokeArtifact = classifyPaths(['docs/audit/artifacts/release-live-youtube-spa-smoke/verify-live-smoke-artifact.mjs']);
   assert.deepEqual(liveSmokeArtifact.lanes, ['release', 'smoke']);

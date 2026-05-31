@@ -354,6 +354,16 @@ export const FILE_LANE_RULES = Object.freeze([
     lanes: ['release', 'smoke']
   },
   {
+    id: 'extension-popup-shell-surface',
+    patterns: [
+      /^html\/popup\.html$/,
+      /^css\/popup\.css$/,
+      /^js\/ui-shell\/popup-shell\.js$/,
+      /^src\/extension-shell\/popup\.jsx$/
+    ],
+    lanes: ['release', 'settings', 'smoke']
+  },
+  {
     id: 'extension-ui-surface',
     patterns: [/^html\/.*\.html$/, /^css\/.*\.css$/, /^js\/ui-shell\/.*\.js$/, /^src\/extension-shell\//],
     lanes: ['release', 'smoke']
