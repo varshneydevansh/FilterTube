@@ -6,6 +6,7 @@ import assert from 'node:assert/strict';
 import {
   FILE_LANE_RULES,
   LANES,
+  changedPathsFromGit,
   classifyPaths,
   laneNames,
   validateLaneFiles
@@ -249,17 +250,42 @@ test('changed-lane runner is wired to the classifier and sequential lane executi
   const runner = read('scripts/run-test-lane.mjs');
   const matrix = read(matrixPath);
 
-  assert.match(runner, /gitLines\(\['diff', '--name-only', 'HEAD', '--'\]\)/);
+  assert.match(runner, /gitLineReader\(\['diff', '--name-only', 'HEAD', '--'\]\)/);
+  assert.match(runner, /gitLineReader\(\['ls-files', '--others', '--exclude-standard'\]\)/);
   assert.doesNotMatch(runner, /--diff-filter=ACMRTUXB/);
   assert.match(runner, /if \(result\.signal\) return 1/);
   assert.match(runner, /lane === '--run-changed' \|\| lane === 'run-changed'/);
-  assert.match(runner, /const result = classifyPaths\(changedPaths\(\)\)/);
+  assert.match(runner, /const result = classifyPaths\(changedPathsFromGit\(\)\)/);
   assert.match(runner, /if \(result\.unmatched\.length\) process\.exit\(2\)/);
   assert.match(runner, /for \(const changedLane of result\.lanes\)/);
   assert.match(runner, /runLane\(changedLane\)/);
   assert.match(runner, /process\.exit\(runLane\(lane\)\)/);
   assert.match(matrix, /fails on any unclassified\s+changed path/);
   assert.match(matrix, /runs the required lanes sequentially in matrix order/);
+});
+
+test('changed-lane path collection includes untracked nonignored files', () => {
+  const calls = [];
+  const changedPaths = changedPathsFromGit(args => {
+    calls.push(args);
+    if (args[0] === 'diff') return ['js/seed.js'];
+    if (args[0] === 'ls-files') {
+      return ['docs/audit/FILTERTUBE_LANE_CHANGED_PROBE_2026-06-01.md'];
+    }
+    return [];
+  });
+  const result = classifyPaths(changedPaths);
+
+  assert.deepEqual(calls, [
+    ['diff', '--name-only', 'HEAD', '--'],
+    ['ls-files', '--others', '--exclude-standard']
+  ]);
+  assert.deepEqual(changedPaths, [
+    'js/seed.js',
+    'docs/audit/FILTERTUBE_LANE_CHANGED_PROBE_2026-06-01.md'
+  ]);
+  assert.deepEqual(result.lanes, ['json', 'performance', 'smoke']);
+  assert.deepEqual(result.unmatched, []);
 });
 
 test('smoke lane keeps release confidence broad but bounded', () => {

@@ -68,10 +68,11 @@ classified by filename families, and unknown product paths are reported as
 requiring explicit classification instead of silently falling back to
 `test:smoke`.
 
-`npm run test:changed` uses the same classifier, fails on any unclassified
-changed path, then runs the required lanes sequentially in matrix order. Use it
-when a logical change has already been made and you want the focused proof lane
-set to execute without manually copying commands from `lanes:changed`.
+`npm run test:changed` uses the same classifier, includes tracked modifications
+and nonignored untracked files, fails on any unclassified changed path, then
+runs the required lanes sequentially in matrix order. Use it when a logical
+change has already been made and you want the focused proof lane set to execute
+without manually copying commands from `lanes:changed`.
 
 ## Auxiliary Guards
 

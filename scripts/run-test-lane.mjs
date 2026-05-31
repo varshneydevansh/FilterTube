@@ -552,10 +552,10 @@ function gitLines(args) {
   return result.stdout.split(/\r?\n/).filter(Boolean);
 }
 
-function changedPaths() {
+export function changedPathsFromGit(gitLineReader = gitLines) {
   return [
-    ...gitLines(['diff', '--name-only', 'HEAD', '--']),
-    ...gitLines(['ls-files', '--others', '--exclude-standard'])
+    ...gitLineReader(['diff', '--name-only', 'HEAD', '--']),
+    ...gitLineReader(['ls-files', '--others', '--exclude-standard'])
   ];
 }
 
@@ -639,13 +639,13 @@ function main() {
   }
 
   if (lane === '--changed' || lane === 'changed') {
-    const result = classifyPaths(changedPaths());
+    const result = classifyPaths(changedPathsFromGit());
     printClassification(result);
     process.exit(result.unmatched.length ? 2 : 0);
   }
 
   if (lane === '--run-changed' || lane === 'run-changed') {
-    const result = classifyPaths(changedPaths());
+    const result = classifyPaths(changedPathsFromGit());
     printClassification(result);
     if (result.unmatched.length) process.exit(2);
     if (!result.lanes.length) {
