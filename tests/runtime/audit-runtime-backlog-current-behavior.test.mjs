@@ -19,9 +19,9 @@ test('audit runtime backlog remains explicit and outside release-lane completion
 
   assert.match(doc, /Status: broad audit backlog, not a release-lane gate/);
   assert.match(doc, /node --test --test-reporter=tap tests\/runtime\/\*\.test\.mjs > \/tmp\/filtertube-runtime\.tap 2>&1/);
-  assert.match(doc, /tests: 4694/);
-  assert.match(doc, /pass: 4533/);
-  assert.match(doc, /fail: 161/);
+  assert.match(doc, /tests: 4704/);
+  assert.match(doc, /pass: 4547/);
+  assert.match(doc, /fail: 157/);
   assert.match(doc, /The focused release lanes are the per-change proof system/);
   assert.match(doc, /not clean enough to be treated as a release blocker today/);
 
