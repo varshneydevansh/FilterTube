@@ -173,10 +173,16 @@ artifact with missing byte parity remain `NO-GO`.
 | `js/shared/identity.js`, `js/content/dom_extractors.js`, `js/content/handle_resolver.js` | `test:blocking`, `test:menu`, `test:whitelist` | Covers identity confidence, collaborators, menu labels, channel matching, and stale identity risk. |
 | `manifest*.json`, `build.js`, `scripts/build-*.mjs` | `test:release` | Covers package content, manifests, generated UI shell, release claims, and artifact behavior. |
 | `README.md`, `CHANGELOG.md`, `data/release_notes.json` | `test:release`, `test:smoke` | Covers public release claims, packaged release notes, and changelog/version drift. |
+| `LICENSE`, root `*.md` | `test:release`, `test:smoke` | Covers root legal text and top-level planning/recovery docs that can affect release review context or public project claims. |
 | `docs/*.md` outside `docs/audit/` | `test:release`, `test:smoke` | Covers product docs, release-facing architecture/behavior claims, and the audit-doc boundary that keeps proof files inside `docs/audit/`. |
 | `docs/audit/artifacts/release-live-youtube-spa-smoke/*.{json,mjs}` | `test:release`, `test:smoke` | Covers live-smoke templates, runners, verifiers, and future dated smoke artifacts. |
+| `docs/audit/artifacts/empty-install-idle-probe.mjs` | `test:performance`, `test:smoke` | Covers the no-rule/no-work idle observer probe used as performance evidence. |
 | `html/*.html`, `css/*.css`, `js/ui-shell/*.js`, `src/extension-shell/*.jsx` | `test:release`, affected UI/runtime lane | Add manual dashboard/popup smoke when the extension UI changes. |
+| `assets/images/*`, `icons/*`, `design/design_tokens.json` | `test:release`, `test:smoke` | Covers packaged images, extension icons, dashboard artwork, and shared design tokens. |
 | `js/vendor/*.bundle.js` | `test:release`, `test:settings`, `test:smoke` | Covers vendored Nanah/QR bundles, dashboard load order, sync UI behavior, package contents, and bundle provenance. |
+| `scripts/compress-video.swift`, `scripts/sync-native-runtime.mjs` | `test:release`, `test:smoke` | Covers media compression and native-runtime sync helpers that can affect release assets and extension/app parity. |
+| `tests/runtime/harness/load-filter-engine.mjs` | `test:whitelist`, `test:blocking`, `test:json`, `test:dom`, `test:menu`, `test:performance`, `test:settings`, `test:smoke` | Covers the shared filter-engine harness used by runtime decision, identity, menu, settings, and boundary fixtures. |
+| `tests/runtime/harness/load-seed-runtime.mjs` | `test:whitelist`, `test:json`, `test:performance`, `test:smoke` | Covers the shared seed/network harness used by JSON-first, whitelist end-screen, and no-work performance fixtures. |
 | YouTube surface fixtures under `tests/runtime/fixtures/` | Lane that owns the fixture plus `test:smoke` if release-relevant | Fixture changes must state which behavior changed and whether old behavior remains intentional. |
 
 The executable mapping in `scripts/run-test-lane.mjs` is the source of truth.

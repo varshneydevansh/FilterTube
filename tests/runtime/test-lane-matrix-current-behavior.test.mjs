@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
@@ -52,6 +53,16 @@ function collectTopLevelProductDocFiles() {
     .filter(entry => entry.isFile() && entry.name.endsWith('.md'))
     .map(entry => `docs/${entry.name}`)
     .sort();
+}
+
+function collectTrackedFiles() {
+  const result = spawnSync('git', ['ls-files'], {
+    cwd: repoRoot,
+    encoding: 'utf8'
+  });
+
+  assert.equal(result.status, 0, result.stderr || 'git ls-files failed');
+  return result.stdout.split(/\r?\n/).filter(Boolean).sort();
 }
 
 test('test lane matrix defines every required lane and npm script', () => {
@@ -119,8 +130,14 @@ test('test lane matrix maps high-risk source files to expected lanes', () => {
     { files: ['js/vendor/*.bundle.js'], lanes: ['test:release', 'test:settings', 'test:smoke'] },
     { files: ['manifest*.json'], lanes: ['test:release'] },
     { files: ['README.md'], lanes: ['test:release', 'test:smoke'] },
+    { files: ['LICENSE', 'root `*.md`'], lanes: ['test:release', 'test:smoke'] },
     { files: ['docs/*.md'], lanes: ['test:release', 'test:smoke'] },
-    { files: ['docs/audit/artifacts/release-live-youtube-spa-smoke/*.{json,mjs}'], lanes: ['test:release', 'test:smoke'] }
+    { files: ['docs/audit/artifacts/release-live-youtube-spa-smoke/*.{json,mjs}'], lanes: ['test:release', 'test:smoke'] },
+    { files: ['docs/audit/artifacts/empty-install-idle-probe.mjs'], lanes: ['test:performance', 'test:smoke'] },
+    { files: ['assets/images/*', 'icons/*', 'design/design_tokens.json'], lanes: ['test:release', 'test:smoke'] },
+    { files: ['scripts/compress-video.swift', 'scripts/sync-native-runtime.mjs'], lanes: ['test:release', 'test:smoke'] },
+    { files: ['tests/runtime/harness/load-filter-engine.mjs'], lanes: ['test:whitelist', 'test:blocking', 'test:json', 'test:dom', 'test:menu', 'test:performance', 'test:settings', 'test:smoke'] },
+    { files: ['tests/runtime/harness/load-seed-runtime.mjs'], lanes: ['test:whitelist', 'test:json', 'test:performance', 'test:smoke'] }
   ];
 
   for (const { files, lanes } of requiredMappings) {
@@ -165,6 +182,16 @@ test('executable classifier maps high-risk paths to required lanes', () => {
   assert.deepEqual(productDoc.unmatched, []);
   assert.equal(productDoc.classifications[0].matched[0].id, 'product-doc-surface');
 
+  const license = classifyPaths(['LICENSE']);
+  assert.deepEqual(license.lanes, ['release', 'smoke']);
+  assert.deepEqual(license.unmatched, []);
+  assert.equal(license.classifications[0].matched[0].id, 'root-legal-doc-surface');
+
+  const rootDoc = classifyPaths(['channel-identity-watch-mix-collab-recovery-plan.md']);
+  assert.deepEqual(rootDoc.lanes, ['release', 'smoke']);
+  assert.deepEqual(rootDoc.unmatched, []);
+  assert.equal(rootDoc.classifications[0].matched[0].id, 'root-product-doc-surface');
+
   assert.deepEqual(classifyPaths(['js/content/bridge_injection.js']).lanes, ['release', 'json', 'performance', 'settings']);
   assert.deepEqual(classifyPaths(['js/content/collab_dialog.js']).lanes, ['whitelist', 'blocking', 'menu', 'performance']);
   assert.deepEqual(classifyPaths(['js/content/dom_state.js']).lanes, ['whitelist', 'blocking', 'dom', 'performance']);
@@ -173,6 +200,13 @@ test('executable classifier maps high-risk paths to required lanes', () => {
   assert.deepEqual(classifyPaths(['js/tab-view.js']).lanes, ['release', 'whitelist', 'blocking', 'menu', 'settings', 'smoke']);
   assert.deepEqual(classifyPaths(['js/layout.js']).lanes, ['release', 'dom', 'smoke']);
   assert.deepEqual(classifyPaths(['js/vendor/nanah.bundle.js']).lanes, ['release', 'settings', 'smoke']);
+  assert.deepEqual(classifyPaths(['assets/images/homepage_hero_day.mp4']).lanes, ['release', 'smoke']);
+  assert.deepEqual(classifyPaths(['icons/icon-128.png']).lanes, ['release', 'smoke']);
+  assert.deepEqual(classifyPaths(['design/design_tokens.json']).lanes, ['release', 'smoke']);
+  assert.deepEqual(classifyPaths(['scripts/sync-native-runtime.mjs']).lanes, ['release', 'smoke']);
+  assert.deepEqual(classifyPaths(['docs/audit/artifacts/empty-install-idle-probe.mjs']).lanes, ['performance', 'smoke']);
+  assert.deepEqual(classifyPaths(['tests/runtime/harness/load-filter-engine.mjs']).lanes, ['whitelist', 'blocking', 'json', 'dom', 'menu', 'performance', 'settings', 'smoke']);
+  assert.deepEqual(classifyPaths(['tests/runtime/harness/load-seed-runtime.mjs']).lanes, ['whitelist', 'json', 'performance', 'smoke']);
 });
 
 test('executable classifier inherits lanes from lane-owned tests and rejects unknown paths', () => {
@@ -200,6 +234,14 @@ test('executable classifier covers every top-level product documentation file', 
 
   assert.ok(productDocs.length >= 30);
   assert.deepEqual(result.lanes, ['release', 'smoke']);
+  assert.deepEqual(result.unmatched, []);
+});
+
+test('executable classifier covers every tracked repository file', () => {
+  const trackedFiles = collectTrackedFiles();
+  const result = classifyPaths(trackedFiles);
+
+  assert.ok(trackedFiles.length >= 1200);
   assert.deepEqual(result.unmatched, []);
 });
 

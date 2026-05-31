@@ -294,6 +294,16 @@ export const FILE_LANE_RULES = Object.freeze([
     lanes: ['release', 'smoke']
   },
   {
+    id: 'root-legal-doc-surface',
+    patterns: [/^LICENSE$/],
+    lanes: ['release', 'smoke']
+  },
+  {
+    id: 'root-product-doc-surface',
+    patterns: [/^(?!README\.md$|CHANGELOG\.md$)[^/]+\.md$/],
+    lanes: ['release', 'smoke']
+  },
+  {
     id: 'lane-workflow-surface',
     patterns: [/^scripts\/(?:run-test-lane|audit-proof-drift)\.mjs$/, /^docs\/audit\/TEST_LANE_MATRIX\.md$/],
     lanes: ['release', 'smoke']
@@ -302,6 +312,11 @@ export const FILE_LANE_RULES = Object.freeze([
     id: 'live-smoke-artifact-surface',
     patterns: [/^docs\/audit\/artifacts\/release-live-youtube-spa-smoke\/.*\.(?:json|mjs)$/],
     lanes: ['release', 'smoke']
+  },
+  {
+    id: 'audit-performance-artifact-surface',
+    patterns: [/^docs\/audit\/artifacts\/empty-install-idle-probe\.mjs$/],
+    lanes: ['performance', 'smoke']
   },
   {
     id: 'public-release-copy',
@@ -319,9 +334,24 @@ export const FILE_LANE_RULES = Object.freeze([
     lanes: ['release', 'smoke']
   },
   {
+    id: 'extension-static-asset-surface',
+    patterns: [/^assets\/.*\.(?:png|mp4)$/, /^icons\/.*\.(?:png|svg)$/],
+    lanes: ['release', 'smoke']
+  },
+  {
+    id: 'design-token-surface',
+    patterns: [/^design\/.*\.json$/],
+    lanes: ['release', 'smoke']
+  },
+  {
     id: 'vendor-bundle-surface',
     patterns: [/^js\/vendor\/.*\.bundle\.js$/],
     lanes: ['release', 'settings', 'smoke']
+  },
+  {
+    id: 'release-helper-script-surface',
+    patterns: [/^scripts\/(?:compress-video\.swift|sync-native-runtime\.mjs)$/],
+    lanes: ['release', 'smoke']
   },
   {
     id: 'website-public-surface',
@@ -412,6 +442,16 @@ export const FILE_LANE_RULES = Object.freeze([
     id: 'runtime-settings-test',
     patterns: [/^tests\/runtime\/.*(?:setting|profile|storage|import|export|sync|compiled).*\.test\.mjs$/i],
     lanes: ['settings']
+  },
+  {
+    id: 'runtime-filter-engine-harness',
+    patterns: [/^tests\/runtime\/harness\/load-filter-engine\.mjs$/],
+    lanes: ['whitelist', 'blocking', 'json', 'dom', 'menu', 'performance', 'settings', 'smoke']
+  },
+  {
+    id: 'runtime-seed-harness',
+    patterns: [/^tests\/runtime\/harness\/load-seed-runtime\.mjs$/],
+    lanes: ['whitelist', 'json', 'performance', 'smoke']
   },
   {
     id: 'youtube-fixture-surface',
