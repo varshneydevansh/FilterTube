@@ -136,6 +136,7 @@ test('test lane matrix maps high-risk source files to expected lanes', () => {
     { files: ['docs/audit/artifacts/release-live-youtube-spa-smoke/*.{json,mjs}'], lanes: ['test:release', 'test:smoke'] },
     { files: ['docs/audit/artifacts/empty-install-idle-probe.mjs'], lanes: ['test:performance', 'test:smoke'] },
     { files: ['html/popup.html', 'css/popup.css', 'js/ui-shell/popup-shell.js', 'src/extension-shell/popup.jsx'], lanes: ['test:release', 'test:settings', 'test:smoke'] },
+    { files: ['html/tab-view.html'], lanes: ['test:release', 'test:settings', 'test:smoke'] },
     { files: ['assets/images/*', 'icons/*', 'design/design_tokens.json'], lanes: ['test:release', 'test:smoke'] },
     { files: ['scripts/compress-video.swift', 'scripts/sync-native-runtime.mjs'], lanes: ['test:release', 'test:smoke'] },
     { files: ['tests/runtime/harness/load-filter-engine.mjs'], lanes: ['test:whitelist', 'test:blocking', 'test:json', 'test:dom', 'test:menu', 'test:performance', 'test:settings', 'test:smoke'] },
@@ -192,6 +193,14 @@ test('executable classifier maps high-risk paths to required lanes', () => {
       `${classification.file} should be classified as popup settings shell`
     );
   }
+
+  const tabViewShell = classifyPaths(['html/tab-view.html']);
+  assert.deepEqual(tabViewShell.lanes, ['release', 'settings', 'smoke']);
+  assert.deepEqual(tabViewShell.unmatched, []);
+  assert.equal(
+    tabViewShell.classifications[0].matched.some(match => match.id === 'extension-tab-view-settings-shell-surface'),
+    true
+  );
 
   const decorativeShell = classifyPaths([
     'src/extension-shell/tab-view-decor.jsx',

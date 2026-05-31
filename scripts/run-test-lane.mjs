@@ -364,6 +364,11 @@ export const FILE_LANE_RULES = Object.freeze([
     lanes: ['release', 'settings', 'smoke']
   },
   {
+    id: 'extension-tab-view-settings-shell-surface',
+    patterns: [/^html\/tab-view\.html$/],
+    lanes: ['release', 'settings', 'smoke']
+  },
+  {
     id: 'extension-ui-surface',
     patterns: [/^html\/.*\.html$/, /^css\/.*\.css$/, /^js\/ui-shell\/.*\.js$/, /^src\/extension-shell\//],
     lanes: ['release', 'smoke']
