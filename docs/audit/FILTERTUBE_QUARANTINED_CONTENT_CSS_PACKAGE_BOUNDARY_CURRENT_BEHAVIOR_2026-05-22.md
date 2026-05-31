@@ -48,7 +48,7 @@ selected [hidden] selectors: 0
 ```text
 active manifest files checked: 4
 active manifest content_script entries checked: 7
-active manifest content script JS refs checked: 55
+active manifest content script JS refs checked: 59
 active manifest content script CSS refs checked: 0
 active manifest web_accessible_resources entries checked: 4
 active manifest web-accessible resource refs checked: 19
@@ -57,7 +57,7 @@ active manifest quarantined CSS web-accessible refs: 0
 
 dist manifest files checked: 3
 dist manifest content_script entries checked: 5
-dist manifest content script JS refs checked: 41
+dist manifest content script JS refs checked: 44
 dist manifest content script CSS refs checked: 0
 dist manifest web_accessible_resources entries checked: 3
 dist manifest web-accessible resource refs checked: 14

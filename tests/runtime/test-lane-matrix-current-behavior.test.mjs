@@ -143,6 +143,7 @@ test('test lane matrix maps high-risk source files to expected lanes', () => {
     { files: ['docs/audit/artifacts/empty-install-idle-probe.mjs'], lanes: ['test:performance', 'test:smoke'] },
     { files: ['html/popup.html', 'css/popup.css', 'js/ui-shell/popup-shell.js', 'src/extension-shell/popup.jsx'], lanes: ['test:release', 'test:settings', 'test:smoke'] },
     { files: ['html/tab-view.html'], lanes: ['test:release', 'test:settings', 'test:smoke'] },
+    { files: ['css/content.css', 'css/filter.css', 'css/layout.css'], lanes: ['test:release', 'test:dom', 'test:smoke'] },
     { files: ['assets/images/*', 'icons/*', 'design/design_tokens.json'], lanes: ['test:release', 'test:smoke'] },
     { files: ['scripts/compress-video.swift', 'scripts/sync-native-runtime.mjs'], lanes: ['test:release', 'test:smoke'] },
     { files: ['tests/runtime/harness/load-filter-engine.mjs'], lanes: ['test:whitelist', 'test:blocking', 'test:json', 'test:dom', 'test:menu', 'test:performance', 'test:settings', 'test:smoke'] },
@@ -254,6 +255,7 @@ test('executable classifier maps high-risk paths to required lanes', () => {
   assert.deepEqual(classifyPaths(['js/content_controls_catalog.js']).lanes, ['whitelist', 'blocking', 'json', 'dom', 'menu', 'performance', 'settings']);
   assert.deepEqual(classifyPaths(['js/tab-view.js']).lanes, ['release', 'whitelist', 'blocking', 'menu', 'settings', 'smoke']);
   assert.deepEqual(classifyPaths(['js/layout.js']).lanes, ['release', 'dom', 'smoke']);
+  assert.deepEqual(classifyPaths(['css/content.css', 'css/filter.css', 'css/layout.css']).lanes, ['release', 'dom', 'smoke']);
   assert.deepEqual(classifyPaths(['js/vendor/nanah.bundle.js']).lanes, ['release', 'settings', 'smoke']);
   assert.deepEqual(classifyPaths(['assets/images/homepage_hero_day.mp4']).lanes, ['release', 'smoke']);
   assert.deepEqual(classifyPaths(['icons/icon-128.png']).lanes, ['release', 'smoke']);
@@ -505,7 +507,7 @@ test('goal safety surfaces stay bound to focused lane proof tests', () => {
     {
       surface: 'DOM fallback',
       lane: 'dom',
-      tests: [/dom-fallback-selector-semantic-register/, /dom-state-virtual-attributes/]
+      tests: [/dom-fallback-selector-semantic-register/, /css-style-hide-authority/, /quarantined-content-css-package-boundary/, /dom-state-virtual-attributes/]
     },
     {
       surface: 'no-rule performance',
@@ -525,7 +527,7 @@ test('goal safety surfaces stay bound to focused lane proof tests', () => {
     {
       surface: 'release packaging',
       lane: 'release',
-      tests: [/p0-release-package-current-behavior/, /release-package-parity-current-behavior/]
+      tests: [/p0-release-package-current-behavior/, /release-package-parity-current-behavior/, /quarantined-content-css-package-boundary/]
     }
   ];
 

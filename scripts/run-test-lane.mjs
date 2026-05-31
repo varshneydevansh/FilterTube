@@ -39,9 +39,11 @@ export const LANES = Object.freeze({
       'tests/runtime/build-script-method-semantic-register-current-behavior.test.mjs',
       'tests/runtime/build-website-callable-current-behavior.test.mjs',
       'tests/runtime/browser-manifest-runtime-load-order-current-behavior.test.mjs',
+      'tests/runtime/css-load-style-surface-current-behavior.test.mjs',
       'tests/runtime/public-release-surface-current-behavior.test.mjs',
       'tests/runtime/public-release-claim-boundary-current-behavior.test.mjs',
       'tests/runtime/p0-release-package-current-behavior.test.mjs',
+      'tests/runtime/quarantined-content-css-package-boundary-current-behavior.test.mjs',
       'tests/runtime/release-build-artifact-claim-boundary-current-behavior.test.mjs',
       'tests/runtime/release-live-youtube-spa-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/release-live-youtube-spa-smoke-boundary-current-behavior.test.mjs',
@@ -114,12 +116,14 @@ export const LANES = Object.freeze({
       'tests/runtime/dom-fallback-method-semantic-register-current-behavior.test.mjs',
       'tests/runtime/dom-fallback-selector-semantic-register-current-behavior.test.mjs',
       'tests/runtime/dom-fallback-run-state-visibility-cleanup-boundary-current-behavior.test.mjs',
+      'tests/runtime/css-style-hide-authority-current-behavior.test.mjs',
       'tests/runtime/dom-hide-side-effect-current-behavior.test.mjs',
       'tests/runtime/dom-broad-hide-boundary-current-behavior.test.mjs',
       'tests/runtime/dom-state-virtual-attributes-current-behavior.test.mjs',
       'tests/runtime/dom-target-source-current-behavior.test.mjs',
       'tests/runtime/comments-dom-cleanup-boundary-current-behavior.test.mjs',
       'tests/runtime/home-feed-dom-cleanup-boundary-current-behavior.test.mjs',
+      'tests/runtime/quarantined-content-css-package-boundary-current-behavior.test.mjs',
       'tests/runtime/shorts-dom-cleanup-boundary-current-behavior.test.mjs',
       'tests/runtime/player-endscreen-dom-cleanup-boundary-current-behavior.test.mjs',
       'tests/runtime/watch-playlist-panel-dom-cleanup-boundary-current-behavior.test.mjs'
@@ -368,6 +372,11 @@ export const FILE_LANE_RULES = Object.freeze([
     id: 'extension-tab-view-settings-shell-surface',
     patterns: [/^html\/tab-view\.html$/],
     lanes: ['release', 'settings', 'smoke']
+  },
+  {
+    id: 'quarantined-content-css-surface',
+    patterns: [/^css\/(?:content|filter|layout)\.css$/],
+    lanes: ['release', 'dom', 'smoke']
   },
   {
     id: 'extension-ui-surface',

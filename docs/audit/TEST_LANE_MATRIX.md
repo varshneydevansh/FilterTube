@@ -124,7 +124,7 @@ the surface connected to a focused lane.
 | end screens | `test:whitelist` keeps end-screen videowall, card, autoplay, and player DOM cleanup tests in lane. |
 | quick-block and 3-dot menus | `test:menu` keeps `quick-block-block-menu-affordance-boundary`, `native-dropdown-close-state`, and `content-bridge-collaborator-identity-promotion-handoff` in lane. |
 | JSON-first filtering | `test:json` keeps seed/network, readiness, snapshot, list-mode, and response-mutation tests in lane. |
-| DOM fallback | `test:dom` keeps DOM fallback selector, run-state cleanup, virtual-attribute, and route cleanup tests in lane. |
+| DOM fallback | `test:dom` keeps DOM fallback selector, CSS hide authority, quarantined content CSS package boundary, run-state cleanup, virtual-attribute, and route cleanup tests in lane. |
 | no-rule performance | `test:performance` keeps empty-install, no-work, active-rule, and route-surface budget tests in lane. |
 | SPA navigation | `test:performance` keeps whitelist-cache SPA metric and route-surface no-work tests in lane; live SPA rows remain in manual smoke. |
 | settings | `test:settings` keeps settings-mode, refresh fanout, compiled-cache, import/export, and state-manager tests in lane. |
@@ -220,6 +220,7 @@ artifact with missing byte parity remain `NO-GO`.
 | `docs/audit/artifacts/empty-install-idle-probe.mjs` | `test:performance`, `test:smoke` | Covers the no-rule/no-work idle observer probe used as performance evidence. |
 | `html/popup.html`, `css/popup.css`, `js/ui-shell/popup-shell.js`, `src/extension-shell/popup.jsx` | `test:release`, `test:settings`, `test:smoke` | Covers the popup shell that carries enabled/profile/list-mode and filter-tab controls before `js/popup.js` wires behavior. Add manual popup smoke when this surface changes. |
 | `html/tab-view.html` | `test:release`, `test:settings`, `test:smoke` | Covers the dashboard shell that carries profile/list-mode, import/export, backup, Accounts & Sync, and Nanah settings markup before `js/tab-view.js` wires behavior. Add manual dashboard smoke when this surface changes. |
+| `css/content.css`, `css/filter.css`, `css/layout.css` | `test:release`, `test:dom`, `test:smoke` | Covers packaged-but-quarantined content CSS, old `filter-tube-visible` reveal selectors, accidental manifest activation false-hide risk, and dist package parity. |
 | other `html/*.html`, `css/*.css`, `js/ui-shell/*.js`, `src/extension-shell/*.jsx` | `test:release`, affected UI/runtime lane | Add manual dashboard/popup smoke when the extension UI changes; use the popup or tab-view shell rows above when settings controls are touched. |
 | `assets/images/*`, `icons/*`, `design/design_tokens.json` | `test:release`, `test:smoke` | Covers packaged images, extension icons, dashboard artwork, and shared design tokens. |
 | `js/vendor/*.bundle.js` | `test:release`, `test:settings`, `test:smoke` | Covers vendored Nanah/QR bundles, dashboard load order, sync UI behavior, package contents, and bundle provenance. |
