@@ -257,7 +257,7 @@ export const FILE_LANE_RULES = Object.freeze([
   {
     id: 'content-bridge-runtime',
     patterns: [/^js\/content_bridge\.js$/],
-    lanes: ['menu', 'settings', 'json', 'dom', 'whitelist', 'performance']
+    lanes: ['menu', 'settings', 'blocking', 'json', 'dom', 'whitelist', 'performance']
   },
   {
     id: 'bridge-settings-runtime',
