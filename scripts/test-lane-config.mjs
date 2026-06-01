@@ -477,6 +477,16 @@ export const FILE_LANE_RULES = Object.freeze([
     lanes: ['whitelist', 'blocking', 'menu']
   },
   {
+    id: 'audit-page-lifecycle-proof-doc',
+    patterns: [/^docs\/audit\/.*(?:CONTENT_BRIDGE_LIFECYCLE|CONTENT_BRIDGE_STARTUP_TIMING|EMPTY_INSTALL_IDLE_OBSERVER|LIFECYCLE_EFFECT|LIFECYCLE_INSTANCE|LIFECYCLE_OWNER|LIFECYCLE_TEARDOWN|PAGE_RUNTIME_LIFECYCLE|P0_LIFECYCLE|SELECTOR_LIFECYCLE).*\.md$/i],
+    lanes: ['dom', 'performance']
+  },
+  {
+    id: 'audit-seed-startup-proof-doc',
+    patterns: [/^docs\/audit\/.*(?:DOCUMENT_START_ZERO_FLASH|SEED_PAGE_GLOBAL_PATCH_TEARDOWN).*\.md$/i],
+    lanes: ['json', 'performance']
+  },
+  {
     id: 'audit-performance-proof-doc',
     patterns: [/^docs\/audit\/.*(?:PERFORMANCE|NO_WORK|CACHE|SPA|LAG|ACTIVE_WORK|ACTIVE_RULE|DISABLED_RUNTIME|MASTER_SWITCH|DIAGNOSTIC|LOGGING|CONSOLE).*\.md$/i],
     lanes: ['performance']
