@@ -2,6 +2,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 
@@ -209,6 +210,31 @@ export function newChangedPaths(initialPaths, currentPaths) {
   ].filter(pathName => !initial.has(pathName)).sort();
 }
 
+function snapshotFileContent(file) {
+  const fullPath = path.join(repoRoot, file);
+  if (!fs.existsSync(fullPath)) return 'missing';
+  const stat = fs.statSync(fullPath);
+  if (!stat.isFile()) return `non-file:${stat.mode}:${stat.size}`;
+  return crypto.createHash('sha256').update(fs.readFileSync(fullPath)).digest('hex');
+}
+
+export function changedPathContentSnapshot(paths, snapshotReader = snapshotFileContent) {
+  const snapshot = new Map();
+  for (const pathName of paths) {
+    const file = normalizePath(String(pathName || '').trim());
+    if (file) snapshot.set(file, snapshotReader(file));
+  }
+  return snapshot;
+}
+
+export function changedPathsWithSnapshotDrift(snapshot, snapshotReader = snapshotFileContent) {
+  const drifted = [];
+  for (const [file, before] of snapshot.entries()) {
+    if (snapshotReader(file) !== before) drifted.push(file);
+  }
+  return drifted.sort();
+}
+
 function runNode(args) {
   const result = spawnSync(process.execPath, args, {
     cwd: repoRoot,
@@ -388,6 +414,7 @@ function main() {
 
   if (lane === '--run-changed' || lane === 'run-changed') {
     const initialChangedPaths = changedPathsFromGit();
+    const initialChangedSnapshot = changedPathContentSnapshot(initialChangedPaths);
     const result = classifyPaths(initialChangedPaths);
     printClassification(result);
     if (result.unmatched.length) process.exit(2);
@@ -409,6 +436,13 @@ function main() {
       console.log(`\n==> Running test:${changedLane}`);
       const status = runLane(changedLane);
       if (status !== 0) process.exit(status);
+    }
+
+    const modifiedInitialPaths = changedPathsWithSnapshotDrift(initialChangedSnapshot);
+    if (modifiedInitialPaths.length) {
+      console.error('\ntest:changed modified initially changed paths:');
+      for (const file of modifiedInitialPaths) console.error(`- ${file}`);
+      process.exit(7);
     }
 
     const extraDirtyPaths = newChangedPaths(initialChangedPaths, changedPathsFromGit());

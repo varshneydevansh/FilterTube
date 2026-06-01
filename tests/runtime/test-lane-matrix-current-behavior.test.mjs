@@ -7,7 +7,9 @@ import {
   FILE_LANE_RULES,
   LANES,
   auditProofRequirement,
+  changedPathContentSnapshot,
   changedPathsFromGit,
+  changedPathsWithSnapshotDrift,
   classifyPaths,
   laneNames,
   newChangedPaths,
@@ -595,7 +597,11 @@ test('changed-lane runner is wired to the classifier and sequential lane executi
   assert.match(runner, /if \(result\.signal\) return 1/);
   assert.match(runner, /lane === '--run-changed' \|\| lane === 'run-changed'/);
   assert.match(runner, /const initialChangedPaths = changedPathsFromGit\(\)/);
+  assert.match(runner, /const initialChangedSnapshot = changedPathContentSnapshot\(initialChangedPaths\)/);
   assert.match(runner, /const result = classifyPaths\(initialChangedPaths\)/);
+  assert.match(runner, /const modifiedInitialPaths = changedPathsWithSnapshotDrift\(initialChangedSnapshot\)/);
+  assert.match(runner, /test:changed modified initially changed paths/);
+  assert.match(runner, /process\.exit\(7\)/);
   assert.match(runner, /const extraDirtyPaths = newChangedPaths\(initialChangedPaths, changedPathsFromGit\(\)\)/);
   assert.match(runner, /test:changed left additional dirty paths/);
   assert.match(runner, /process\.exit\(5\)/);
@@ -636,6 +642,8 @@ test('changed-lane runner is wired to the classifier and sequential lane executi
   assert.match(matrix, /runs the\s+lane-owned audit\s+proof drift guard/);
   assert.match(matrix, /runs\s+the required lanes sequentially in\s+matrix order/);
   assert.match(matrix, /fails if focused lane execution leaves additional\s+tracked or unignored dirty paths/);
+  assert.match(matrix, /lane execution mutates any initially changed file after classification/);
+  assert.match(matrix, /build\/test helpers that rewrite the same\s+files being committed/);
   assert.match(matrix, /prints a manual YouTube\s+smoke advisory/);
   assert.match(
     matrix,
@@ -690,6 +698,22 @@ test('changed-lane dirty path guard reports only additional tracked or unignored
     'docs/audit/FILTERTUBE_EXTRA_PROOF_2026-06-01.md',
     'tests/runtime/test-lane-matrix-current-behavior.test.mjs'
   ]);
+});
+
+test('changed-lane dirty path guard reports initially changed path mutation', () => {
+  const snapshot = changedPathContentSnapshot(
+    ['js/seed.js', './docs/audit/TEST_LANE_MATRIX.md', '', 'js/seed.js'],
+    file => `before:${file}`
+  );
+
+  const drifted = changedPathsWithSnapshotDrift(snapshot, file => (
+    file === 'docs/audit/TEST_LANE_MATRIX.md'
+      ? `after:${file}`
+      : `before:${file}`
+  ));
+
+  assert.deepEqual([...snapshot.keys()], ['js/seed.js', 'docs/audit/TEST_LANE_MATRIX.md']);
+  assert.deepEqual(drifted, ['docs/audit/TEST_LANE_MATRIX.md']);
 });
 
 test('classifier output surfaces manual YouTube smoke for user-facing runtime and release lanes', () => {
