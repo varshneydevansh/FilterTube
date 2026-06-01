@@ -13,18 +13,20 @@ node --test --test-reporter=tap tests/runtime/*.test.mjs > /tmp/filtertube-runti
 
 ```text
 tests: 4737
-pass: 4668
-fail: 69
-duration_ms: 196042.122125
+pass: 4670
+fail: 67
+duration_ms: 58187.127542
 ```
 
-This refresh reduces the pinned broad-suite failure count from the previous
-76 failures to 69 failures after refreshing release-note/package-version proof
-for the `3.3.2` release alignment. The earlier broad refresh reduced the suite
-from 115 failures to 76 failures after refreshing stale method semantic proof gap
-counts from 5,673 to 5,681 lexical callables. The broad suite is not clean enough
-to be used as a release gate, but the current baseline is narrower and more
-useful for retiring backlog slices.
+This refresh reduces the pinned broad-suite failure count from 69 failures to
+67 failures after retiring the stale function-coverage source backlog row and
+the stale `compress-video` package/build boundary row. The previous broad
+refresh reduced the suite from 76 failures to 69 failures after refreshing
+release-note/package-version proof for the `3.3.2` release alignment. The
+earlier broad refresh reduced the suite from 115 failures to 76 failures after
+refreshing stale method semantic proof gap counts from 5,673 to 5,681 lexical
+callables. The broad suite is not clean enough to be used as a release gate, but
+the current baseline is narrower and more useful for retiring backlog slices.
 
 ## Boundary
 
@@ -41,16 +43,16 @@ node scripts/audit-proof-drift.mjs --all --report-only
 
 ## Failure Clusters
 
-Current failing subtests are spread across 54 runtime test files. A lightweight
-name-based parse of `/tmp/filtertube-runtime-current-after-release-proof-refresh.tap` gives this
+Current failing subtests are spread across 52 runtime test files. A lightweight
+name-based parse of `/tmp/filtertube-runtime-current-after-source-and-compress-proof-refresh.tap` gives this
 non-exclusive family snapshot:
 
 | Family | Current failing subtests |
 |---|---:|
-| generated/release/package/docs surfaces | 43 |
+| generated/release/package/docs surfaces | 42 |
 | source-locus/optimization/index contracts | 12 |
 | JSON/video-meta/path/reference | 19 |
-| website/public-doc/source inventory | 15 |
+| website/public-doc/source inventory | 14 |
 | settings/content-control/DOM lifecycle | 9 |
 | native/Nanah/Kids/YTM | 8 |
 
@@ -60,6 +62,12 @@ current lexical callables and 0 complete per-callable semantic proof files.
 The previous release-note/package-version drift rows are also retired from this
 snapshot: package metadata, browser manifests, and `data/release_notes.json`
 now align on `3.3.2`.
+The previous function-coverage source backlog row is retired from this snapshot:
+every current product-owned JS/JSX/MJS source file is either cited in the hot
+function map or listed as callable backlog. The previous `compress-video`
+package/build boundary row is also retired: release/build/website media callers
+remain absent while the test-lane classifier mention is recognized as workflow
+classification, not package integration.
 
 | Cluster | Examples | Current meaning |
 |---|---|---|

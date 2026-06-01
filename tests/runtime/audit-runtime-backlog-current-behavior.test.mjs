@@ -20,13 +20,16 @@ test('audit runtime backlog remains explicit and outside release-lane completion
   assert.match(doc, /Status: broad audit backlog, not a release-lane gate/);
   assert.match(doc, /node --test --test-reporter=tap tests\/runtime\/\*\.test\.mjs > \/tmp\/filtertube-runtime\.tap 2>&1/);
   assert.match(doc, /tests: 4737/);
-  assert.match(doc, /pass: 4668/);
-  assert.match(doc, /fail: 69/);
-  assert.match(doc, /duration_ms: 196042\.122125/);
-  assert.match(doc, /previous\s+76 failures to 69 failures/);
+  assert.match(doc, /pass: 4670/);
+  assert.match(doc, /fail: 67/);
+  assert.match(doc, /duration_ms: 58187\.127542/);
+  assert.match(doc, /69 failures to\s+67 failures/);
+  assert.match(doc, /function-coverage source backlog row/);
+  assert.match(doc, /stale `compress-video` package\/build boundary row/);
+  assert.match(doc, /from 76 failures to 69 failures/);
   assert.match(doc, /release-note\/package-version proof/);
   assert.match(doc, /from 115 failures to 76 failures/);
-  assert.match(doc, /refreshing stale method semantic proof gap\s+counts from 5,673 to 5,681 lexical callables/);
+  assert.match(doc, /stale method semantic proof gap counts from 5,673 to 5,681 lexical\s+callables/);
   assert.match(doc, /not clean enough\s+to be used as a release gate/);
   assert.match(doc, /node scripts\/audit-proof-drift\.mjs --all --report-only/);
   assert.match(doc, /no stale source fingerprint proof rows/);
@@ -112,20 +115,25 @@ test('audit runtime backlog names the broad failure clusters that still require 
 test('audit runtime backlog pins the current broad-suite failure family snapshot', () => {
   const doc = read(backlogPath);
   const expectedRows = [
-    ['generated/release/package/docs surfaces', '43'],
+    ['generated/release/package/docs surfaces', '42'],
     ['source-locus/optimization/index contracts', '12'],
     ['JSON/video-meta/path/reference', '19'],
-    ['website/public-doc/source inventory', '15'],
+    ['website/public-doc/source inventory', '14'],
     ['settings/content-control/DOM lifecycle', '9'],
     ['native/Nanah/Kids/YTM', '8']
   ];
 
-  assert.match(doc, /Current failing subtests are spread across 54 runtime test files/);
+  assert.match(doc, /Current failing subtests are spread across 52 runtime test files/);
+  assert.match(doc, /filtertube-runtime-current-after-source-and-compress-proof-refresh\.tap/);
   assert.match(doc, /non-exclusive family snapshot/);
   assert.match(doc, /previous method-proof\/family blocker row is now retired/);
   assert.match(doc, /direct method semantic proof lane passes with 5,681\s+current lexical callables/);
   assert.match(doc, /previous release-note\/package-version drift rows are also retired/);
   assert.match(doc, /now align on `3\.3\.2`/);
+  assert.match(doc, /previous function-coverage source backlog row is retired/);
+  assert.match(doc, /every current product-owned JS\/JSX\/MJS source file is either cited/);
+  assert.match(doc, /previous `compress-video`\s+package\/build boundary row is also retired/);
+  assert.match(doc, /test-lane classifier mention is recognized as workflow\s+classification/);
 
   for (const [family, count] of expectedRows) {
     assert.match(doc, new RegExp(`\\| ${family.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} \\| ${count} \\|`));
