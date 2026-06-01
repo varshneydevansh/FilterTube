@@ -80,10 +80,12 @@ test('audit runtime backlog names the broad failure clusters that still require 
       'of-truth-claim-register`, `settings-refresh-cross-context-consumer-boundary`')
   );
   assert.match(doc, /have been refreshed and promoted into `test:settings`/);
+  assert.match(doc, /settings-refresh-key-parity-register`/);
+  assert.match(doc, /settings-refresh-dirty-key-producer-consumer-join-matrix`/);
   assert.match(doc, /settings-refresh-optimization-readiness-boundary`/);
   assert.match(doc, /settings-refresh-optimization-candidate-binding-matrix`/);
   assert.match(doc, /settings-refresh-optimization-candidate-evidence-packet-contract`/);
-  assert.match(doc, /remaining rows are settings-refresh dirty-key join\/key-parity ledger cleanup/);
+  assert.match(doc, /remaining settings rows are older broad-ledger references, not unpromoted settings-refresh lane proof/);
   assert.match(doc, /direct-hide-writer-register` has been refreshed and promoted into `test:dom`/);
   assert.match(doc, /dom-selector-instance-register` has been refreshed for `js\/content\/dom_state\.js` selector patch sites and promoted into `test:dom`/);
   assert.match(doc, /lifecycle-instance-register` and `repo-lifecycle-primitive-coverage` have been refreshed for website component lifecycle drift and promoted into `test:performance`/);

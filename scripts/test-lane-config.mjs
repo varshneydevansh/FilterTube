@@ -234,6 +234,8 @@ export const LANES = Object.freeze({
       'tests/runtime/settings-refresh-cross-context-consumer-boundary-current-behavior.test.mjs',
       'tests/runtime/settings-refresh-dirty-key-producer-matrix-current-behavior.test.mjs',
       'tests/runtime/settings-refresh-dirty-key-consumer-matrix-current-behavior.test.mjs',
+      'tests/runtime/settings-refresh-key-parity-register-current-behavior.test.mjs',
+      'tests/runtime/settings-refresh-dirty-key-producer-consumer-join-matrix-current-behavior.test.mjs',
       'tests/runtime/settings-refresh-optimization-readiness-boundary-current-behavior.test.mjs',
       'tests/runtime/settings-refresh-optimization-candidate-binding-matrix-current-behavior.test.mjs',
       'tests/runtime/settings-refresh-optimization-candidate-evidence-packet-contract-current-behavior.test.mjs',
