@@ -11,6 +11,15 @@ function read(file) {
   return fs.readFileSync(path.join(repoRoot, file), 'utf8');
 }
 
+function sectionBetween(source, start, end) {
+  const startIndex = source.indexOf(start);
+  const endIndex = source.indexOf(end, startIndex);
+
+  assert.notEqual(startIndex, -1, `missing section start ${start}`);
+  assert.notEqual(endIndex, -1, `missing section end ${end}`);
+  return source.slice(startIndex, endIndex);
+}
+
 test('smoke lane keeps release confidence broad but bounded', () => {
   const smoke = LANES.smoke.tests.join('\n');
 
@@ -254,4 +263,31 @@ test('manual YouTube smoke handoff covers visible release-critical behavior', ()
   for (const row of requiredRows) {
     assert.ok(matrix.includes(row), `manual smoke handoff missing ${row}`);
   }
+});
+
+test('done criteria keep the active change-safety objective release gates intact', () => {
+  const matrix = read(matrixPath);
+  const doneCriteria = sectionBetween(matrix, '## Done Criteria', '## Current Boundary');
+  const requiredCriteria = [
+    'A change is not release-ready until:',
+    '- the relevant lane command passes;',
+    '- `npm run test:audit-drift` passes when lane-owned source fingerprints changed;',
+    '- a fixture or runtime test proves any behavior change;',
+    '- the relevant proof doc under `docs/audit/` is updated;',
+    '- visible YouTube behavior gets a manual smoke pass when user-facing;',
+    '- blocklist and whitelist behavior remain intact;',
+    '- empty-rule and SPA navigation paths remain snappy;',
+    '- unrelated docs/product files are not dirtied.',
+    '`tests/runtime/test-lane-visible-safety-current-behavior.test.mjs` pins these',
+    'done criteria in `test:smoke`'
+  ];
+
+  for (const criterion of requiredCriteria) {
+    assert.ok(doneCriteria.includes(criterion), `Done Criteria missing ${criterion}`);
+  }
+
+  assert.ok(
+    LANES.smoke.tests.includes('tests/runtime/test-lane-visible-safety-current-behavior.test.mjs'),
+    'Done Criteria guard must stay in test:smoke'
+  );
 });

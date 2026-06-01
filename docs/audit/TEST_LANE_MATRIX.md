@@ -301,6 +301,10 @@ A change is not release-ready until:
 - empty-rule and SPA navigation paths remain snappy;
 - unrelated docs/product files are not dirtied.
 
+`tests/runtime/test-lane-visible-safety-current-behavior.test.mjs` pins these
+done criteria in `test:smoke` so the active objective cannot be weakened by
+editing this checklist without a focused regression failure.
+
 ## Current Boundary
 
 This matrix defines the lane workflow and pins the npm commands. It does not
