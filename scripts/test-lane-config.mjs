@@ -225,6 +225,7 @@ export const LANES = Object.freeze({
       'tests/runtime/settings-refresh-dirty-key-producer-matrix-current-behavior.test.mjs',
       'tests/runtime/settings-refresh-dirty-key-consumer-matrix-current-behavior.test.mjs',
       'tests/runtime/compiled-settings-field-register-current-behavior.test.mjs',
+      'tests/runtime/content-control-alias-mutation-boundary-current-behavior.test.mjs',
       'tests/runtime/compiled-settings-profile-list-mode-assembly-boundary-current-behavior.test.mjs',
       'tests/runtime/compiled-cache-authority-current-behavior.test.mjs',
       'tests/runtime/compiler-parity-current-behavior.test.mjs',
@@ -570,7 +571,7 @@ export const FILE_LANE_RULES = Object.freeze([
   },
   {
     id: 'audit-settings-proof-doc',
-    patterns: [/^docs\/audit\/.*(?:SETTING|PROFILE|STORAGE|IMPORT|EXPORT|SYNC|COMPILED|BACKUP|NANAH).*\.md$/i],
+    patterns: [/^docs\/audit\/.*(?:SETTING|PROFILE|STORAGE|IMPORT|EXPORT|SYNC|COMPILED|BACKUP|NANAH|ALIAS).*\.md$/i],
     lanes: ['settings']
   },
   {
@@ -620,7 +621,7 @@ export const FILE_LANE_RULES = Object.freeze([
   },
   {
     id: 'runtime-settings-test',
-    patterns: [/^tests\/runtime\/.*(?:setting|profile|storage|import|export|sync|compiled).*\.test\.mjs$/i],
+    patterns: [/^tests\/runtime\/.*(?:setting|profile|storage|import|export|sync|compiled|alias).*\.test\.mjs$/i],
     lanes: ['settings']
   },
   {

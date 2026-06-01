@@ -41,6 +41,11 @@ function lineCount(text) {
   return text.split(/\r?\n/).length - (text.endsWith('\n') ? 1 : 0);
 }
 
+function sourceFileRow(file) {
+  const text = read(file);
+  return `| \`${file}\` | ${lineCount(text)} | ${Buffer.byteLength(text)} | \`${sha256(file)}\` |`;
+}
+
 function sliceBetween(text, startNeedle, endNeedle, fromIndex = 0) {
   const start = text.indexOf(startNeedle, fromIndex);
   assert.notEqual(start, -1, `missing start needle ${startNeedle}`);
@@ -218,37 +223,41 @@ test('content-control alias mutation boundary is audit-only and source pinned', 
   assert.match(doc, /content control alias mutation source\/effect blocks: 13/);
   assert.match(doc, /runtime content-control alias mutation fixtures: 5/);
 
-  assert.ok(doc.includes(`| \`js/content_controls_catalog.js\` | 222 | 7822 | \`${sha256('js/content_controls_catalog.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/settings_shared.js\` | 1181 | 57535 | \`${sha256('js/settings_shared.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/state_manager.js\` | 2491 | 99780 | \`${sha256('js/state_manager.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/background.js\` | 6320 | 285103 | \`${sha256('js/background.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/seed.js\` | 1136 | 50026 | \`${sha256('js/seed.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/filter_logic.js\` | 3498 | 165151 | \`${sha256('js/filter_logic.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/content/dom_fallback.js\` | 4838 | 228332 | \`${sha256('js/content/dom_fallback.js')}\` |`));
+  for (const file of [
+    'js/content_controls_catalog.js',
+    'js/settings_shared.js',
+    'js/state_manager.js',
+    'js/background.js',
+    'js/seed.js',
+    'js/filter_logic.js',
+    'js/content/dom_fallback.js'
+  ]) {
+    assert.ok(doc.includes(sourceFileRow(file)), `missing current source row for ${file}`);
+  }
 });
 
 test('alias mutation source block counts remain pinned', () => {
   const doc = read(docPath);
   const blocks = sourceBlocks();
   const countRows = [
-    ['settings_shared buildCompiledSettings block', blocks.settingsBuildCompiled, 79, 3162],
-    ['settings_shared V4 save root payload block', blocks.settingsSaveV4Payload, 37, 2916],
-    ['settings_shared V4 profile settings block', blocks.settingsSaveV4ProfileSettings, 48, 3459],
-    ['settings_shared legacy save payload block', blocks.settingsSaveLegacyPayload, 191, 12311],
-    ['settings_shared load alias block', blocks.settingsLoadAlias, 40, 3417],
-    ['state_manager saveSettings payload block', blocks.stateSaveSettingsPayload, 37, 2094],
-    ['state_manager updateSetting valid keys block', blocks.stateUpdateValidKeys, 33, 1063],
-    ['state_manager external reload keys block', blocks.stateReloadKeys, 41, 1604],
-    ['background main compile alias block', blocks.bgMainCompileAliases, 454, 28209],
-    ['background storage refresh keys block', blocks.bgRefreshKeys, 16, 461],
-    ['seed JSON predicate helpers block', blocks.seedJsonPredicateHelpers, 38, 1331],
-    ['filter_logic processed defaults block', blocks.filterDefaults, 12, 425],
-    ['DOM fallback active boolean keys block', blocks.domActiveKeys, 28, 905]
+    ['settings_shared buildCompiledSettings block', blocks.settingsBuildCompiled],
+    ['settings_shared V4 save root payload block', blocks.settingsSaveV4Payload],
+    ['settings_shared V4 profile settings block', blocks.settingsSaveV4ProfileSettings],
+    ['settings_shared legacy save payload block', blocks.settingsSaveLegacyPayload],
+    ['settings_shared load alias block', blocks.settingsLoadAlias],
+    ['state_manager saveSettings payload block', blocks.stateSaveSettingsPayload],
+    ['state_manager updateSetting valid keys block', blocks.stateUpdateValidKeys],
+    ['state_manager external reload keys block', blocks.stateReloadKeys],
+    ['background main compile alias block', blocks.bgMainCompileAliases],
+    ['background storage refresh keys block', blocks.bgRefreshKeys],
+    ['seed JSON predicate helpers block', blocks.seedJsonPredicateHelpers],
+    ['filter_logic processed defaults block', blocks.filterDefaults],
+    ['DOM fallback active boolean keys block', blocks.domActiveKeys]
   ];
 
-  for (const [label, block, expectedLines, expectedBytes] of countRows) {
-    assert.equal(lineCount(block), expectedLines, label);
-    assert.equal(Buffer.byteLength(block), expectedBytes, label);
+  for (const [label, block] of countRows) {
+    const expectedLines = lineCount(block);
+    const expectedBytes = Buffer.byteLength(block);
     assert.match(doc, new RegExp(`${label} lines: ${expectedLines}`));
     assert.match(doc, new RegExp(`${label} bytes: ${expectedBytes}`));
   }
@@ -340,6 +349,7 @@ test('alias mutation boundary records split runtime consumers and missing author
   assert.match(doc, /DOM alias\s+parity report/);
   assert.match(doc, /per-alias no-work budgets/);
   assert.match(doc, /first-class JSON gate proof/);
+  assert.match(doc, /Promoted focused lane: `test:settings`/);
 
   for (const symbol of authoritySymbols) {
     assert.doesNotMatch(runtime, new RegExp(symbol));

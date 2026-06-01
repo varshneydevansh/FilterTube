@@ -149,3 +149,12 @@ No `contentControlAliasMutationContract`,
 `contentControlJsonSettingFieldManifest`, `contentControlDomAliasParityReport`,
 `contentControlAliasNoWorkBudget`, `contentControlAliasFixtureProvenance`, or
 `contentControlAliasFirstClassJsonGate` exists in product runtime source yet.
+
+## 2026-06-01 Lane Promotion
+
+Promoted focused lane: `test:settings`.
+
+This promotion keeps alias storage, profile compile, background compile, and
+legacy root/profile key behavior inside the settings lane. It is still
+audit-only and does not approve alias migration, cache invalidation changes,
+JSON-first promotion, DOM fallback changes, or no-work optimization.
