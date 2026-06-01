@@ -67,7 +67,7 @@ const blockSpecs = {
     file: 'js/filter_logic.js',
     start: "if (rendererType.includes('comment') || rendererType.includes('Comment'))",
     end: '            // Content filters (duration, upload date)',
-    startLine: 2077,
+    startLine: 2214,
     lines: 33,
     bytes: 1902,
     hash: '690889872bba60727d30a9544c2f3340e6df04631d970064869f641c4589a43d'

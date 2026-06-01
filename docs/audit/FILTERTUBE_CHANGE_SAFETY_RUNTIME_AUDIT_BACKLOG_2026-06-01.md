@@ -13,19 +13,24 @@ node --test --test-reporter=tap tests/runtime/*.test.mjs > /tmp/filtertube-runti
 
 ```text
 tests: 4737
-pass: 4704
-fail: 33
-duration_ms: 37662.8535
+pass: 4705
+fail: 32
+duration_ms: 35671.83925
 ```
 
-This refresh reduces the pinned broad-suite failure count from 34 failures to
-33 failures after retiring the stale legacy layout quarantine package manifest
-count rows: the package-boundary proof now expects the current active and dist
-content-script JS reference totals while keeping `js/layout.js` absent from
-active manifest loads, dist manifest loads, web-accessible resources, popup
-HTML, dashboard HTML, and non-doc runtime callers. The previous refresh reduced
-the suite from 36 failures to
-34 failures after retiring the stale Kids browse malformed-fragment source
+This refresh reduces the pinned broad-suite failure count from 33 failures to
+32 failures after retiring the stale Main Filter All comments source anchor row:
+the Main Filter All comments proof now expects the current
+`js/filter_logic.js:2214` decision block location while the block hash, byte
+count, line count, token counts, storage behavior, and missing future authority
+symbols remain unchanged. The previous refresh reduced the suite from
+34 failures to 33 failures after retiring the stale legacy layout quarantine
+package manifest count rows: the package-boundary proof now expects the current
+active and dist content-script JS reference totals while keeping `js/layout.js`
+absent from active manifest loads, dist manifest loads, web-accessible
+resources, popup HTML, dashboard HTML, and non-doc runtime callers. The previous
+refresh reduced the suite from 36 failures to 34 failures after retiring the
+stale Kids browse malformed-fragment source
 fingerprint and token-count rows: the Kids malformed browse proof now expects
 the current `js/filter_logic.js` line count, byte count, hash, and
 `videoChannelMap` token count already visible in source while keeping Kids owner
@@ -189,8 +194,8 @@ node scripts/audit-proof-drift.mjs --all --report-only
 
 ## Failure Clusters
 
-Current failing subtests are spread across 23 runtime test files. A lightweight
-name-based parse of `/tmp/filtertube-runtime-current-after-legacy-layout-quarantine-refresh.tap` gives this
+Current failing subtests are spread across 22 runtime test files. A lightweight
+name-based parse of `/tmp/filtertube-runtime-current-after-main-filter-all-comments-refresh.tap` gives this
 non-exclusive family snapshot:
 
 | Family | Current failing subtests |
@@ -199,9 +204,13 @@ non-exclusive family snapshot:
 | source-locus/optimization/index contracts | 1 |
 | JSON/video-meta/path/reference | 2 |
 | website/public-doc/source inventory | 10 |
-| settings/content-control/DOM lifecycle | 8 |
+| settings/content-control/DOM lifecycle | 7 |
 | native/Nanah/Kids/YTM | 6 |
 
+The previous Main Filter All comments scope source-anchor row is now retired
+from the broad failure snapshot: the proof lane now matches the moved
+`filterLogicCommentDecision` block anchor while preserving the source hash,
+effect fixtures, token counts, and audit-only authority gap.
 The previous legacy layout quarantine package row is now retired from the broad
 failure snapshot: the proof lane now matches current manifest content-script JS
 reference totals while preserving the load/exposure invariant that `js/layout.js`

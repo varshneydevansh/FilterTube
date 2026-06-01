@@ -20,13 +20,17 @@ test('audit runtime backlog remains explicit and outside release-lane completion
   assert.match(doc, /Status: broad audit backlog, not a release-lane gate/);
   assert.match(doc, /node --test --test-reporter=tap tests\/runtime\/\*\.test\.mjs > \/tmp\/filtertube-runtime\.tap 2>&1/);
   assert.match(doc, /tests: 4737/);
-  assert.match(doc, /pass: 4704/);
-  assert.match(doc, /fail: 33/);
-  assert.match(doc, /duration_ms: 37662\.8535/);
+  assert.match(doc, /pass: 4705/);
+  assert.match(doc, /fail: 32/);
+  assert.match(doc, /duration_ms: 35671\.83925/);
+  assert.match(doc, /33\s+failures\s+to\s+32\s+failures/);
+  assert.match(doc, /Main Filter All comments source anchor row/);
+  assert.match(doc, /current\s+`js\/filter_logic\.js:2214` decision block location/);
+  assert.match(doc, /block hash, byte\s+count, line count, token counts, storage behavior, and missing future authority\s+symbols remain unchanged/);
   assert.match(doc, /34\s+failures\s+to\s+33\s+failures/);
-  assert.match(doc, /legacy layout quarantine package manifest\s+count rows/);
-  assert.match(doc, /package-boundary proof now expects the current active and dist\s+content-script JS reference totals/);
-  assert.match(doc, /`js\/layout\.js` absent from\s+active manifest loads, dist manifest loads, web-accessible resources, popup\s+HTML, dashboard HTML, and non-doc runtime callers/);
+  assert.match(doc, /legacy layout quarantine\s+package manifest\s+count rows/);
+  assert.match(doc, /package-boundary proof now expects the current\s+active and dist content-script JS reference totals/);
+  assert.match(doc, /`js\/layout\.js`\s+absent from active manifest loads, dist manifest loads, web-accessible\s+resources, popup HTML, dashboard HTML, and non-doc runtime callers/);
   assert.match(doc, /36\s+failures\s+to\s+34\s+failures/);
   assert.match(doc, /Kids browse malformed-fragment source\s+fingerprint and token-count rows/);
   assert.match(doc, /Kids malformed browse proof now expects\s+the current `js\/filter_logic\.js` line count, byte count, hash, and\s+`videoChannelMap` token count/);
@@ -245,13 +249,16 @@ test('audit runtime backlog pins the current broad-suite failure family snapshot
     ['source-locus/optimization/index contracts', '1'],
     ['JSON/video-meta/path/reference', '2'],
     ['website/public-doc/source inventory', '10'],
-    ['settings/content-control/DOM lifecycle', '8'],
+    ['settings/content-control/DOM lifecycle', '7'],
     ['native/Nanah/Kids/YTM', '6']
   ];
 
-  assert.match(doc, /Current failing subtests are spread across 23 runtime test files/);
-  assert.match(doc, /filtertube-runtime-current-after-legacy-layout-quarantine-refresh\.tap/);
+  assert.match(doc, /Current failing subtests are spread across 22 runtime test files/);
+  assert.match(doc, /filtertube-runtime-current-after-main-filter-all-comments-refresh\.tap/);
   assert.match(doc, /non-exclusive family snapshot/);
+  assert.match(doc, /previous Main Filter All comments scope source-anchor row is now retired/);
+  assert.match(doc, /moved\s+`filterLogicCommentDecision` block anchor/);
+  assert.match(doc, /source hash,\s+effect fixtures, token counts, and audit-only authority gap/);
   assert.match(doc, /previous legacy layout quarantine package row is now retired/);
   assert.match(doc, /current manifest content-script JS\s+reference totals/);
   assert.match(doc, /`js\/layout\.js`\s+is packaged but inactive and not web-accessible/);

@@ -38,7 +38,7 @@ runtime Main Filter All comments scope fixtures: 10
 | `renderEngineFindChannelByRef` | `js/render_engine.js:1222` | 16 | 669 | `99f016287c15dc172db5d82e74739ee0059a7490e855ac302409fd733c851701` |
 | `settingsSharedSyncFilterAllKeywords` | `js/settings_shared.js:412` | 72 | 2967 | `ce4e49c6055252ab9a6db6a30be91ddfb50efead1c1ef76bf736c38717febd25` |
 | `backgroundSyncStoredMainKeywordsWithChannels` | `js/background.js:1196` | 82 | 2534 | `11ab05bc86763b098b430c9545feefdcab8efa58b4fa59ff7770717bdf081a3d` |
-| `filterLogicCommentDecision` | `js/filter_logic.js:2077` | 33 | 1902 | `690889872bba60727d30a9544c2f3340e6df04631d970064869f641c4589a43d` |
+| `filterLogicCommentDecision` | `js/filter_logic.js:2214` | 33 | 1902 | `690889872bba60727d30a9544c2f3340e6df04631d970064869f641c4589a43d` |
 
 ## Selected Token Counts
 
