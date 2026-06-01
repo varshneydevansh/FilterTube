@@ -190,6 +190,11 @@ test('goal safety surfaces stay bound to focused lane proof tests', () => {
       tests: [/code-burden-declutter-boundary/]
     },
     {
+      surface: 'source-locus optimization proof',
+      lane: 'performance',
+      tests: [/first-optimization-source-locus-callable-anchor-boundary/]
+    },
+    {
       surface: 'repo-wide callable/method census',
       lane: 'smoke',
       tests: [/all-callable-index-current-behavior/]

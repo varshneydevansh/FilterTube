@@ -998,7 +998,7 @@ Required future affected-callable semantic gap binding shape:
   "runtimeBehaviorChanged": false,
   "methodGapTotals": {
     "filesCovered": 69,
-    "lexicalCallablesCovered": 5673,
+    "lexicalCallablesCovered": 5681,
     "filesWithCompletePerCallableSemanticProof": 0,
     "requiredSemanticProofFields": 8
   },

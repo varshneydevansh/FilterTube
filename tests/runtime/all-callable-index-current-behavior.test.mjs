@@ -916,7 +916,7 @@ test('all-callable index documents semantic method proof boundary', () => {
   );
   assert.match(releaseRegressionDoc, /2026-05-28 Documentation Ledger Confirmation/);
   assert.match(releaseRegressionDoc, /content-filter validity, route\/surface, and value-normalization gaps pinned/);
-  assert.match(releaseRegressionDoc, /callable proof gap ledgers reconciled to 5,673 lexical callables/);
+  assert.match(releaseRegressionDoc, /callable proof gap ledgers reconciled to 5,681 lexical callables/);
   assert.match(releaseRegressionDoc, /Callable proof gap count reconciliation/);
   assert.match(releaseRegressionDoc, /```mermaid\nflowchart TD/);
 });

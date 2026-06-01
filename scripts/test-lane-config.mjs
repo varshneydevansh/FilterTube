@@ -83,6 +83,7 @@ export const LANES = Object.freeze({
       'tests/runtime/page-message-trust-current-behavior.test.mjs',
       'tests/runtime/startup-injection-readiness-current-behavior.test.mjs',
       'tests/runtime/test-lane-matrix-current-behavior.test.mjs',
+      'tests/runtime/test-lane-classifier-workflow-current-behavior.test.mjs',
       'tests/runtime/test-lane-workflow-large-file-release-current-behavior.test.mjs'
     ]
   },
@@ -218,6 +219,7 @@ export const LANES = Object.freeze({
       'tests/runtime/repo-lifecycle-primitive-coverage-current-behavior.test.mjs',
       'tests/runtime/runtime-diagnostic-logging-policy-matrix-current-behavior.test.mjs',
       'tests/runtime/code-burden-declutter-boundary-current-behavior.test.mjs',
+      'tests/runtime/first-optimization-source-locus-callable-anchor-boundary-current-behavior.test.mjs',
       'tests/runtime/test-lane-workflow-large-file-release-current-behavior.test.mjs',
       'tests/runtime/p0-no-work-current-behavior.test.mjs'
     ]
@@ -275,6 +277,7 @@ export const LANES = Object.freeze({
       'tests/runtime/audit-runtime-backlog-current-behavior.test.mjs',
       'tests/runtime/test-lane-visible-safety-current-behavior.test.mjs',
       'tests/runtime/test-lane-matrix-current-behavior.test.mjs',
+      'tests/runtime/test-lane-classifier-workflow-current-behavior.test.mjs',
       'tests/runtime/test-lane-workflow-large-file-release-current-behavior.test.mjs'
     ]
   }
@@ -582,6 +585,11 @@ export const FILE_LANE_RULES = Object.freeze([
     lanes: ['performance']
   },
   {
+    id: 'audit-source-locus-proof-doc',
+    patterns: [/^docs\/audit\/.*SOURCE_LOCUS.*\.md$/i],
+    lanes: ['performance']
+  },
+  {
     id: 'audit-settings-proof-doc',
     patterns: [/^docs\/audit\/.*(?:SETTING|PROFILE|STORAGE|IMPORT|EXPORT|SYNC|COMPILED|BACKUP|NANAH|ALIAS).*\.md$/i],
     lanes: ['settings']
@@ -634,6 +642,11 @@ export const FILE_LANE_RULES = Object.freeze([
   {
     id: 'runtime-code-burden-test',
     patterns: [/^tests\/runtime\/.*(?:code-burden|declutter|large-file|structural-burden).*\.test\.mjs$/i],
+    lanes: ['performance']
+  },
+  {
+    id: 'runtime-source-locus-test',
+    patterns: [/^tests\/runtime\/.*source-locus.*\.test\.mjs$/i],
     lanes: ['performance']
   },
   {

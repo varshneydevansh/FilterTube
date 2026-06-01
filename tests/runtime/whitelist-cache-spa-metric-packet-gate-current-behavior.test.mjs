@@ -2099,7 +2099,7 @@ test('packet rows, live smoke rows, and diagrams remain explicit', () => {
   assert.equal(affectedCallableSemanticGapContract.runtimeBehaviorChanged, false);
   assert.deepEqual(affectedCallableSemanticGapContract.methodGapTotals, {
     filesCovered: 69,
-    lexicalCallablesCovered: 5673,
+    lexicalCallablesCovered: 5681,
     filesWithCompletePerCallableSemanticProof: 0,
     requiredSemanticProofFields: 8
   });
@@ -2413,9 +2413,9 @@ test('packet rows, live smoke rows, and diagrams remain explicit', () => {
 
   const methodGapDoc = read(methodSemanticGapPath);
   assert.match(methodGapDoc, /method semantic proof gap files covered: 69/);
-  assert.match(methodGapDoc, /method semantic proof gap lexical callables covered: 5673/);
+  assert.match(methodGapDoc, /method semantic proof gap lexical callables covered: 5681/);
   assert.match(methodGapDoc, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGapDoc, /lexical callables requiring semantic proof before behavior changes: 5673/);
+  assert.match(methodGapDoc, /lexical callables requiring semantic proof before behavior changes: 5681/);
   assert.match(methodGapDoc, /affected callable semantic proof: NO-GO/);
   for (const row of affectedCallableSemanticFiles) {
     const methodGapRow = methodSemanticGapRow(methodGapDoc, row.file);

@@ -7,12 +7,14 @@ import { LANES, classifyPaths } from '../../scripts/run-test-lane.mjs';
 const repoRoot = process.cwd();
 const matrixPath = 'docs/audit/TEST_LANE_MATRIX.md';
 const self = 'tests/runtime/test-lane-workflow-large-file-release-current-behavior.test.mjs';
+const classifierWorkflow = 'tests/runtime/test-lane-classifier-workflow-current-behavior.test.mjs';
 const workflowLineLimit = 1000;
 const workflowFiles = Object.freeze([
   'scripts/run-test-lane.mjs',
   'scripts/test-lane-config.mjs',
   'scripts/audit-proof-drift.mjs',
   'tests/runtime/test-lane-matrix-current-behavior.test.mjs',
+  classifierWorkflow,
   self
 ]);
 
@@ -39,8 +41,11 @@ test('lane workflow large-file guard runs in release, performance, and smoke lan
   assert.ok(LANES.release.tests.includes(self));
   assert.ok(LANES.performance.tests.includes(self));
   assert.ok(LANES.smoke.tests.includes(self));
+  assert.ok(LANES.release.tests.includes(classifierWorkflow));
+  assert.ok(LANES.smoke.tests.includes(classifierWorkflow));
 
   const classification = classifyPaths([self]);
+  const workflowClassification = classifyPaths([classifierWorkflow]);
 
   assert.deepEqual(classification.unmatched, []);
   assert.ok(classification.lanes.includes('release'));
@@ -48,6 +53,12 @@ test('lane workflow large-file guard runs in release, performance, and smoke lan
   assert.ok(classification.lanes.includes('smoke'));
   assert.ok(
     classification.classifications[0].matched.some(match => match.id === 'runtime-code-burden-test')
+  );
+
+  assert.deepEqual(workflowClassification.unmatched, []);
+  assert.deepEqual(workflowClassification.lanes, ['release', 'smoke']);
+  assert.ok(
+    workflowClassification.classifications[0].matched.some(match => match.id === 'lane-owned-test-or-check')
   );
 });
 
