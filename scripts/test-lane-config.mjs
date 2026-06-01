@@ -225,6 +225,7 @@ export const LANES = Object.freeze({
       'tests/runtime/release-live-youtube-spa-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/release-live-youtube-spa-smoke-boundary-current-behavior.test.mjs',
       'tests/runtime/audit-runtime-backlog-current-behavior.test.mjs',
+      'tests/runtime/test-lane-visible-safety-current-behavior.test.mjs',
       'tests/runtime/test-lane-matrix-current-behavior.test.mjs'
     ]
   }
