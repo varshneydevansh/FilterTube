@@ -174,6 +174,7 @@ the surface connected to a focused lane.
 | no-rule performance | `test:performance` keeps empty-install, no-work, active-rule, content-control active-work, lifecycle primitive/register proof, diagnostic logging policy, and route-surface budget tests in lane. |
 | SPA navigation | `test:performance` keeps whitelist-cache SPA metric and route-surface no-work tests in lane; live SPA rows remain in manual smoke. |
 | code-burden growth | `test:performance` keeps the code-burden declutter boundary in lane, including the 1000-line product-owned source guard and near-threshold file list. |
+| repo-wide callable/method census | `test:smoke` keeps `all-callable-index-current-behavior` in lane so broad callable count drift, method semantic proof-gap counts, and generated/build/test-lane callable deltas stay visible before release. |
 | settings | `test:settings` keeps settings-mode, compiled-settings field/register proof, content-control alias mutation, refresh fanout, compiled-cache, import/export, and state-manager tests in lane. |
 | release packaging | `test:release` keeps package parity, public release surface, audit proof directory boundary, live-smoke boundary, and artifact claim tests in lane. |
 
@@ -281,6 +282,7 @@ or uncovered required lanes remain `NO-GO`.
 | `js/nanah_sync_adapter.js`, `js/security_manager.js` | `test:release`, `test:settings`, `test:smoke` | Covers Nanah sync payloads, profile-scoped import/export, PIN/encrypted payload helpers, and package/release parity. |
 | `js/layout.js` | `test:release`, `test:dom`, `test:smoke` | Covers the quarantined legacy layout file, package burden, manifest-inactive status, and DOM/layout selector claims. |
 | `js/shared/identity.js`, `js/content/dom_extractors.js`, `js/content/handle_resolver.js` | `test:whitelist`, `test:blocking`, `test:menu` | Covers identity confidence, collaborators, menu labels, channel matching, and stale identity risk. |
+| release-notes JSON version-gate audit docs under `docs/audit/` | `test:release`, `test:smoke` | Release-notes JSON is a packaged data/version surface; it does not require the runtime JSON-first filtering lane unless seed/network/filtering files are touched too. |
 | identity, resolver, handle, or waterfall audit docs under `docs/audit/` | `test:whitelist`, `test:blocking`, `test:menu`, `test:smoke` | Covers audit proof for channel identity, learned identity, resolver escalation, stale identity, and identity waterfall behavior that can affect allow/block decisions and injected/native menu labels. |
 | alias, list-mode, or row-list-mode audit docs under `docs/audit/` | `test:whitelist`, `test:blocking`, `test:settings`, `test:smoke` | Covers proof for visible-list authority, stale aliases, mode transitions, and allow/block state migration that can produce leaks or false hides. |
 | backup or Nanah audit docs under `docs/audit/` | `test:settings`, `test:smoke` | Covers proof for import/export, encrypted backup, trusted-device restore, sync payloads, profile scope, and storage side effects. |

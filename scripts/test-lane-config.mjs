@@ -271,6 +271,7 @@ export const LANES = Object.freeze({
       'tests/runtime/release-audit-proof-directory-boundary-current-behavior.test.mjs',
       'tests/runtime/release-live-youtube-spa-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/release-live-youtube-spa-smoke-boundary-current-behavior.test.mjs',
+      'tests/runtime/all-callable-index-current-behavior.test.mjs',
       'tests/runtime/audit-runtime-backlog-current-behavior.test.mjs',
       'tests/runtime/test-lane-visible-safety-current-behavior.test.mjs',
       'tests/runtime/test-lane-matrix-current-behavior.test.mjs',
@@ -507,7 +508,7 @@ export const FILE_LANE_RULES = Object.freeze([
   },
   {
     id: 'audit-json-proof-doc',
-    patterns: [/^docs\/audit\/.*(?:JSON|YTM|YOUTUBE_MUSIC|INJECTOR).*\.md$/i],
+    patterns: [/^docs\/audit\/(?!.*RELEASE_NOTES_JSON).*(?:JSON|YTM|YOUTUBE_MUSIC|INJECTOR).*\.md$/i],
     lanes: ['json']
   },
   {

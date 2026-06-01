@@ -21,9 +21,9 @@ optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5673
+method semantic proof gap lexical callables covered: 5681
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5673
+lexical callables requiring semantic proof before behavior changes: 5681
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
@@ -68,7 +68,7 @@ changes remain blocked by the implementation gate.
 
 ```text
 tracked JS/JSX/MJS files: 69
-repo-wide lexical callables: 5673
+repo-wide lexical callables: 5681
 ```
 
 | Family | Files | Lexical callables | Boundary |
@@ -78,15 +78,15 @@ repo-wide lexical callables: 5673
 | UI/settings runtime | 10 | 1563 | First-pass UI/settings audit exists, but action-level fixtures remain incomplete. |
 | Generated/quarantined UI | 6 | 147 | Generated source/output and `js/layout.js`; freshness and quarantine checks required. |
 | Vendor bundles | 2 | 279 | API/provenance boundary, not product-owned method behavior. |
-| Build/sync scripts | 4 | 56 | Release/package/native-sync behavior; separate release fixtures required. |
-| Audit/test lane scripts | 3 | 72 | Change-safety classifier, drift guard, and lane runner proof; workflow behavior, not product runtime. |
+| Build/sync scripts | 4 | 58 | Release/package/native-sync behavior; separate release fixtures required. |
+| Audit/test lane scripts | 3 | 78 | Change-safety classifier, drift guard, and lane runner proof; workflow behavior, not product runtime. |
 | Website routes/components/config | 26 | 123 | Public website callable surface; public-claim and asset-budget fixtures required. |
 
 ## File-Level Index
 
 | File | Family | Lexical callables | Audit status |
 | --- | --- | ---: | --- |
-| `build.js` | Build/sync scripts | 49 | release-audited first pass |
+| `build.js` | Build/sync scripts | 51 | release-audited first pass |
 | `js/background.js` | Hot page/background runtime | 440 | hot runtime mapped |
 | `js/content/block_channel.js` | Hot page/background runtime | 226 | hot runtime mapped |
 | `js/content/bridge_injection.js` | Content helper runtime | 12 | helper counted |
@@ -123,7 +123,7 @@ repo-wide lexical callables: 5673
 | `scripts/audit-proof-drift.mjs` | Audit/test lane scripts | 19 | audit lane counted |
 | `scripts/build-extension-ui.mjs` | Build/sync scripts | 2 | build/website counted |
 | `scripts/build-nanah-vendor.mjs` | Build/sync scripts | 4 | build/website counted |
-| `scripts/run-test-lane.mjs` | Audit/test lane scripts | 53 | audit lane counted |
+| `scripts/run-test-lane.mjs` | Audit/test lane scripts | 59 | audit lane counted |
 | `scripts/sync-native-runtime.mjs` | Build/sync scripts | 1 | build/website counted |
 | `scripts/test-lane-config.mjs` | Audit/test lane scripts | 0 | audit lane counted |
 | `src/extension-shell/popup.jsx` | Generated/quarantined UI | 3 | generated source boundary |
@@ -170,7 +170,7 @@ repo-wide lexical callables: 5673
 
 3. **The hot runtime is not the whole product.**
    Hot runtime has 3,088 lexical callables, but UI/settings, content helpers,
-   generated shell, vendor, build scripts, and website add another 2,585
+   generated shell, vendor, build scripts, and website add another 2,593
    lexical callable forms.
 
 4. **Vendor and generated files must stay explicitly bounded.**
@@ -205,5 +205,5 @@ That fixture pins:
 
 - all tracked JS/JSX/MJS files are listed,
 - documented callable counts match current lexical source,
-- documented family totals sum to 5,673,
+- documented family totals sum to 5,681,
 - no ignored raw captures or generated package output are part of this index.
