@@ -12,11 +12,16 @@ node --test --test-reporter=tap tests/runtime/*.test.mjs > /tmp/filtertube-runti
 ## Result
 
 ```text
-tests: 4731
-pass: 4580
-fail: 151
-duration_ms: 65745.598292
+tests: 4736
+pass: 4621
+fail: 115
+duration_ms: 72417.493667
 ```
+
+This refresh reduces the pinned broad-suite failure count from the previous
+151 failures to 115 failures. The broad suite is still not clean enough to be
+used as a release gate, but the current baseline is narrower and more useful
+for retiring backlog slices.
 
 ## Boundary
 
@@ -32,6 +37,19 @@ node scripts/audit-proof-drift.mjs --all --report-only
 ```
 
 ## Failure Clusters
+
+Current failing subtests are spread across 93 runtime test files. A lightweight
+name-based parse of `/tmp/filtertube-runtime-current.tap` gives this
+non-exclusive family snapshot:
+
+| Family | Current failing subtests |
+|---|---:|
+| JSON/video-meta/path/reference | 37 |
+| generated/release/package/docs surfaces | 35 |
+| source-locus/optimization contracts | 23 |
+| method-proof/family blockers | 14 |
+| settings/content-control/DOM lifecycle | 11 |
+| native/Nanah/Kids/YTM | 8 |
 
 | Cluster | Examples | Current meaning |
 |---|---|---|

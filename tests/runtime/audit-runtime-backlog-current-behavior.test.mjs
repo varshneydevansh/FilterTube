@@ -19,10 +19,12 @@ test('audit runtime backlog remains explicit and outside release-lane completion
 
   assert.match(doc, /Status: broad audit backlog, not a release-lane gate/);
   assert.match(doc, /node --test --test-reporter=tap tests\/runtime\/\*\.test\.mjs > \/tmp\/filtertube-runtime\.tap 2>&1/);
-  assert.match(doc, /tests: 4731/);
-  assert.match(doc, /pass: 4580/);
-  assert.match(doc, /fail: 151/);
-  assert.match(doc, /duration_ms: 65745\.598292/);
+  assert.match(doc, /tests: 4736/);
+  assert.match(doc, /pass: 4621/);
+  assert.match(doc, /fail: 115/);
+  assert.match(doc, /duration_ms: 72417\.493667/);
+  assert.match(doc, /previous\s+151 failures to 115 failures/);
+  assert.match(doc, /not clean enough to be\s+used as a release gate/);
   assert.match(doc, /node scripts\/audit-proof-drift\.mjs --all --report-only/);
   assert.match(doc, /no stale source fingerprint proof rows/);
   assert.match(doc, /The focused release lanes are the per-change proof system/);
@@ -102,6 +104,25 @@ test('audit runtime backlog names the broad failure clusters that still require 
   assert.match(doc, /shorts-reel-overlay-owner-authority-boundary` has been refreshed and promoted into `test:whitelist`, `test:blocking`, and `test:json`/);
   assert.match(doc, /youtube-music-surface-identity-boundary` has been refreshed and promoted into `test:whitelist` and `test:json`/);
   assert.match(doc, /ytm-show-sheet-injector-filter-logic-parity` and `ytm-show-sheet-enrichment-handoff` have been refreshed and promoted into `test:json`/);
+});
+
+test('audit runtime backlog pins the current broad-suite failure family snapshot', () => {
+  const doc = read(backlogPath);
+  const expectedRows = [
+    ['JSON/video-meta/path/reference', '37'],
+    ['generated/release/package/docs surfaces', '35'],
+    ['source-locus/optimization contracts', '23'],
+    ['method-proof/family blockers', '14'],
+    ['settings/content-control/DOM lifecycle', '11'],
+    ['native/Nanah/Kids/YTM', '8']
+  ];
+
+  assert.match(doc, /Current failing subtests are spread across 93 runtime test files/);
+  assert.match(doc, /non-exclusive family snapshot/);
+
+  for (const [family, count] of expectedRows) {
+    assert.match(doc, new RegExp(`\\| ${family.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} \\| ${count} \\|`));
+  }
 });
 
 test('smoke lane keeps the broad audit backlog boundary visible', () => {
