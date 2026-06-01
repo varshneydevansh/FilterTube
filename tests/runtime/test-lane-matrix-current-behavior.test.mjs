@@ -164,6 +164,7 @@ test('test lane matrix maps high-risk source files to expected lanes', () => {
     { files: ['alias, list-mode, or row-list-mode audit docs under `docs/audit/`'], lanes: ['test:whitelist', 'test:blocking', 'test:settings', 'test:smoke'] },
     { files: ['backup or Nanah audit docs under `docs/audit/`'], lanes: ['test:settings', 'test:smoke'] },
     { files: ['renderer, watch, search, Shorts, end-screen, autoplay, playlist, or Kids browse audit docs under `docs/audit/`'], lanes: ['test:whitelist', 'test:blocking', 'test:json', 'test:dom', 'test:smoke'] },
+    { files: ['menu, quick-block, collaborator, or dropdown audit docs under `docs/audit/`'], lanes: ['test:menu', 'test:smoke'] },
     { files: ['filter-logic method, direct renderer, rule-field, or rule-path audit docs under `docs/audit/`'], lanes: ['test:whitelist', 'test:blocking', 'test:json', 'test:dom', 'test:performance', 'test:smoke'] },
     { files: ['network, fetch, XHR, or credential audit docs under `docs/audit/`'], lanes: ['test:json', 'test:performance', 'test:smoke'] },
     { files: ['main-world message, injection, trust, or startup-injection audit docs under `docs/audit/`'], lanes: ['test:release', 'test:json', 'test:settings', 'test:smoke'] },
@@ -305,6 +306,33 @@ test('executable classifier maps high-risk paths to required lanes', () => {
     'docs/audit/FILTERTUBE_MAIN_WATCH_INITIAL_SHORTS_OWNER_ABSENT_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md',
     'docs/audit/FILTERTUBE_RENDERER_AUTHORITY_GAP_AUDIT_2026-05-18.md'
   ]).lanes, ['whitelist', 'blocking', 'json', 'dom', 'smoke']);
+  const menuAuditDoc = classifyPaths([
+    'docs/audit/FILTERTUBE_CONTENT_BRIDGE_MENU_ACTION_LIST_TARGET_CURRENT_BEHAVIOR_2026-05-23.md',
+    'docs/audit/FILTERTUBE_COLLAB_DIALOG_METHOD_SEMANTIC_REGISTER_2026-05-21.md',
+    'docs/audit/FILTERTUBE_CONTENT_MENU_METHOD_SEMANTIC_REGISTER_2026-05-21.md'
+  ]);
+  assert.deepEqual(menuAuditDoc.lanes, ['menu', 'smoke']);
+  assert.deepEqual(menuAuditDoc.unmatched, []);
+  for (const classification of menuAuditDoc.classifications) {
+    assert.equal(
+      classification.matched.some(match => match.id === 'audit-menu-proof-doc'),
+      true,
+      `${classification.file} should be classified as menu proof`
+    );
+  }
+  const collaboratorIdentityMenuAuditDoc = classifyPaths([
+    'docs/audit/FILTERTUBE_CONTENT_BRIDGE_COLLABORATOR_IDENTITY_PROMOTION_HANDOFF_CURRENT_BEHAVIOR_2026-05-23.md'
+  ]);
+  assert.deepEqual(collaboratorIdentityMenuAuditDoc.lanes, ['whitelist', 'blocking', 'menu', 'smoke']);
+  assert.deepEqual(collaboratorIdentityMenuAuditDoc.unmatched, []);
+  assert.equal(
+    collaboratorIdentityMenuAuditDoc.classifications[0].matched.some(match => match.id === 'audit-menu-proof-doc'),
+    true
+  );
+  assert.equal(
+    collaboratorIdentityMenuAuditDoc.classifications[0].matched.some(match => match.id === 'audit-identity-proof-doc'),
+    true
+  );
   const filterLogicAuditDoc = classifyPaths([
     'docs/audit/FILTERTUBE_FILTER_LOGIC_METHOD_SEMANTIC_REGISTER_2026-05-21.md',
     'docs/audit/FILTERTUBE_FILTER_LOGIC_DIRECT_RENDERER_RULE_SEMANTIC_REGISTER_2026-05-21.md',
