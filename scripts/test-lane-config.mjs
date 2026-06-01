@@ -488,6 +488,11 @@ export const FILE_LANE_RULES = Object.freeze([
     lanes: ['whitelist', 'blocking', 'json', 'dom']
   },
   {
+    id: 'audit-network-transport-proof-doc',
+    patterns: [/^docs\/audit\/.*(?:NETWORK|FETCH|XHR|CREDENTIAL).*\.md$/i],
+    lanes: ['json', 'performance']
+  },
+  {
     id: 'audit-page-lifecycle-proof-doc',
     patterns: [/^docs\/audit\/.*(?:CONTENT_BRIDGE_LIFECYCLE|CONTENT_BRIDGE_STARTUP_TIMING|EMPTY_INSTALL_IDLE_OBSERVER|LIFECYCLE_EFFECT|LIFECYCLE_INSTANCE|LIFECYCLE_OWNER|LIFECYCLE_TEARDOWN|PAGE_RUNTIME_LIFECYCLE|P0_LIFECYCLE|SELECTOR_LIFECYCLE).*\.md$/i],
     lanes: ['dom', 'performance']

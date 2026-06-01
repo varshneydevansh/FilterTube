@@ -164,6 +164,7 @@ test('test lane matrix maps high-risk source files to expected lanes', () => {
     { files: ['alias, list-mode, or row-list-mode audit docs under `docs/audit/`'], lanes: ['test:whitelist', 'test:blocking', 'test:settings', 'test:smoke'] },
     { files: ['backup or Nanah audit docs under `docs/audit/`'], lanes: ['test:settings', 'test:smoke'] },
     { files: ['renderer, watch, search, Shorts, end-screen, autoplay, playlist, or Kids browse audit docs under `docs/audit/`'], lanes: ['test:whitelist', 'test:blocking', 'test:json', 'test:dom', 'test:smoke'] },
+    { files: ['network, fetch, XHR, or credential audit docs under `docs/audit/`'], lanes: ['test:json', 'test:performance', 'test:smoke'] },
     { files: ['page-runtime lifecycle, observer, teardown, or selector lifecycle audit docs under `docs/audit/`'], lanes: ['test:dom', 'test:performance', 'test:smoke'] },
     { files: ['document-start or seed page-global patch audit docs under `docs/audit/`'], lanes: ['test:json', 'test:performance', 'test:smoke'] },
     { files: ['js/vendor/*.bundle.js'], lanes: ['test:release', 'test:settings', 'test:smoke'] },
@@ -246,7 +247,7 @@ test('executable classifier maps high-risk paths to required lanes', () => {
     'docs/audit/FILTERTUBE_HANDLE_RESOLVER_METHOD_SEMANTIC_REGISTER_2026-05-21.md',
     'docs/audit/FILTERTUBE_BACKGROUND_IDENTITY_FETCH_NETWORK_BUDGET_BOUNDARY_CURRENT_BEHAVIOR_2026-05-23.md'
   ]);
-  assert.deepEqual(identityAuditDoc.lanes, ['whitelist', 'blocking', 'menu', 'smoke']);
+  assert.deepEqual(identityAuditDoc.lanes, ['whitelist', 'blocking', 'json', 'menu', 'performance', 'smoke']);
   assert.deepEqual(identityAuditDoc.unmatched, []);
   for (const classification of identityAuditDoc.classifications) {
     assert.equal(
@@ -264,6 +265,11 @@ test('executable classifier maps high-risk paths to required lanes', () => {
   assert.deepEqual(classifyPaths([
     'docs/audit/FILTERTUBE_DOCUMENT_START_ZERO_FLASH_BOUNDARY_2026-05-21.md',
     'docs/audit/FILTERTUBE_SEED_PAGE_GLOBAL_PATCH_TEARDOWN_BOUNDARY_CURRENT_BEHAVIOR_2026-05-23.md'
+  ]).lanes, ['json', 'performance', 'smoke']);
+  assert.deepEqual(classifyPaths([
+    'docs/audit/FILTERTUBE_NETWORK_AUTHORITY_AUDIT_2026-05-18.md',
+    'docs/audit/FILTERTUBE_NETWORK_CREDENTIAL_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md',
+    'docs/audit/FILTERTUBE_NETWORK_FETCH_XHR_CALLSITE_REGISTER_CURRENT_BEHAVIOR_2026-05-22.md'
   ]).lanes, ['json', 'performance', 'smoke']);
   assert.deepEqual(classifyPaths([
     'docs/audit/FILTERTUBE_STALE_ALIAS_FALSE_HIDE_CHAIN_2026-05-20.md',
