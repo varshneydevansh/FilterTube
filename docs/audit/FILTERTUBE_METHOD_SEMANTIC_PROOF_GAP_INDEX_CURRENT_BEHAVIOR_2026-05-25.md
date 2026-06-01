@@ -26,10 +26,10 @@ is the current source input before this audit slice can support runtime
 optimization or JSON-first promotion. Current proof pins:
 
 ```text
-method semantic proof gap files covered: 63
-method semantic proof gap lexical callables covered: 5473
+method semantic proof gap files covered: 69
+method semantic proof gap lexical callables covered: 5673
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5473
+lexical callables requiring semantic proof before behavior changes: 5673
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
@@ -41,11 +41,11 @@ changes, or whitelist behavior changes.
 ## Current Proof State
 
 ```text
-tracked JS/JSX/MJS files: 63
-repo-wide lexical callables: 5473
-files with lexical accounting: 63
+tracked JS/JSX/MJS files: 69
+repo-wide lexical callables: 5673
+files with lexical accounting: 69
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5473
+lexical callables requiring semantic proof before behavior changes: 5673
 required semantic proof fields: 8
 selected release hot-path semantic triage rows: 13
 selected visual-writer semantic triage rows: 8
@@ -68,7 +68,7 @@ closure rejection reason: content-menu VM and source proof exists, but CSS scope
 rejected closure candidate: website app zero-count default-export row cluster
 closure rejection reason: broad-parser zero rows are not callable-free proof; current website source contains default-export route functions and still lacks route render, public-claim, deploy, accessibility, and release freshness proof
 rejected closure candidate: build/website cross-parser count convergence
-closure rejection reason: repo-wide broad parser and build/website route parser intentionally count different lexical shapes; current build/sync plus website/config broad total is 108 while build/website audit total is 82, so parser agreement and complete semantic proof remain absent
+closure rejection reason: repo-wide broad parser and build/website route parser intentionally count different lexical shapes; current build/sync plus website/config broad total is 179 while build/website audit total is 107, so parser agreement and complete semantic proof remain absent
 runtime behavior changed: no
 ```
 
@@ -97,23 +97,23 @@ Source inputs:
 
 | Convergence row | Current source-backed finding | Risk if treated as implementation-ready now |
 | --- | --- | --- |
-| `method_convergence_repo_census` | 63 tracked JS/JSX/MJS files and 5,473 lexical callables are visible to the audit. | Visibility can be mistaken for behavior proof. |
-| `method_convergence_zero_complete_files` | 0 files have complete per-callable semantic proof; 5,473 lexical callables still require proof before behavior changes. | A behavior patch can touch an unproved callable path while tests only cover a selected slice. |
-| `method_convergence_family_weight` | 7 families are represented: hot page/background runtime, content helper runtime, UI/settings runtime, generated/quarantined UI, vendor bundles, build/sync scripts, and website routes/components/config. | Runtime, build, vendor, website, and generated-output methods need different proof types and cannot share one cleanup assumption. |
-| `method_convergence_hot_runtime_dominance` | Hot page/background runtime owns 3,073 lexical callables, including 1,198 in `content_bridge.js`, 440 in `background.js`, and 418 in `dom_fallback.js`. | YouTube lag and false-hide regressions are concentrated in hot files with many interacting callables. |
+| `method_convergence_repo_census` | 69 tracked JS/JSX/MJS files and 5,673 lexical callables are visible to the audit. | Visibility can be mistaken for behavior proof. |
+| `method_convergence_zero_complete_files` | 0 files have complete per-callable semantic proof; 5,673 lexical callables still require proof before behavior changes. | A behavior patch can touch an unproved callable path while tests only cover a selected slice. |
+| `method_convergence_family_weight` | 8 families are represented: hot page/background runtime, content helper runtime, UI/settings runtime, generated/quarantined UI, vendor bundles, build/sync scripts, and website routes/components/config. | Runtime, build, vendor, website, and generated-output methods need different proof types and cannot share one cleanup assumption. |
+| `method_convergence_hot_runtime_dominance` | Hot page/background runtime owns 3,088 lexical callables, including 1,198 in `content_bridge.js`, 440 in `background.js`, and 418 in `dom_fallback.js`. | YouTube lag and false-hide regressions are concentrated in hot files with many interacting callables. |
 | `method_convergence_selected_triage_not_closure` | 149 selected semantic triage rows cover release hot paths, visual writers, collaborator cache/writer/menu guards, native dropdowns, JSON active-work predicates, content/category fields, mutation persistence, DOM fallback traversal, content-bridge lifecycle, background cache refresh, and quick-block lifecycle. | Selected hot-path proof can hide the fact that repo-wide semantic closure is still 0 files. |
 | `method_convergence_required_field_gate` | 8 semantic fields are required: owner/source, trigger/caller, settings/profile/list-mode inputs, route/surface, side effects, active/no-rule/disabled behavior, teardown/idempotence, and positive/negative fixtures. | Missing any field weakens reliability, no-work, false-hide, leak, or rollback proof. |
-| `method_convergence_parser_visibility_debt` | 4 closure candidates were rejected, including native sync, content menu, website zero-count routes, and build/website parser divergence with 108 broad-parser rows versus 82 route-parser rows. | Parser counts can be mistaken for callable absence or semantic closure. |
+| `method_convergence_parser_visibility_debt` | 4 closure candidates were rejected, including native sync, content menu, website zero-count routes, and build/website parser divergence with 179 broad-parser rows versus 107 route-parser rows. | Parser counts can be mistaken for callable absence or semantic closure. |
 | `method_convergence_affected_callable_packet_gap` | The whitelist/cache affected-callable chain names exact callable rows but still has 0 runtime affected-callable semantic approvals and 0 committed semantic evidence artifacts. | A lag optimization can be justified from source anchors without live route/mode callable budget proof. |
 | `method_convergence_json_first_blocker` | JSON-first implementation authority still depends on affected-callable semantic proof, route/surface fixture packets, metric artifacts, DOM parity, native/release proof, and rollback proof. | JSON fields can become first-class before the methods that parse, mutate, hide, restore, cache, or fetch are proved. |
 | `method_convergence_authority_absence` | `methodSemanticCoverageComplete`, `callableBehaviorProofReady`, `behaviorPatchMayProceed`, `methodSemanticAuthority`, `callableEffectReport`, `callableNoWorkBudget`, and `callableTeardownRegistry` are absent from product runtime source. | Product source has no shared authority that can certify broad method safety. |
 
 ```text
-63 tracked JS/JSX/MJS files
+69 tracked JS/JSX/MJS files
         |
-        +--> 5,473 lexical callables
-        |       +--> 3,073 hot page/background runtime
-        |       +--> 2,400 UI, helper, generated, vendor, build, website
+        +--> 5,673 lexical callables
+        |       +--> 3,088 hot page/background runtime
+        |       +--> 2,585 UI, helper, generated, vendor, build, audit-lane, website
         |
         +--> 149 selected semantic triage rows
         +--> 4 rejected closure candidates
@@ -129,9 +129,9 @@ parity, rollback, native/release, and public-claim boundaries.
 
 ```mermaid
 flowchart TD
-  A["63 tracked JS/JSX/MJS files"] --> B["5,473 lexical callables"]
-  B --> C["3,073 hot page/background runtime callables"]
-  B --> D["2,400 UI, helper, generated, vendor, build, website callables"]
+  A["69 tracked JS/JSX/MJS files"] --> B["5,673 lexical callables"]
+  B --> C["3,088 hot page/background runtime callables"]
+  B --> D["2,585 UI, helper, generated, vendor, build, audit-lane, website callables"]
   A --> E["149 selected semantic triage rows"]
   A --> F["4 rejected closure candidates"]
   C --> G["0 complete per-callable proof files"]
@@ -196,19 +196,20 @@ have all of these fields pinned:
 
 | Family | Files | Lexical callables | Semantic status |
 | --- | ---: | ---: | --- |
-| Hot page/background runtime | 9 | 3073 | `semantic proof incomplete` |
-| Content helper runtime | 8 | 303 | `semantic proof incomplete` |
+| Hot page/background runtime | 9 | 3088 | `semantic proof incomplete` |
+| Content helper runtime | 9 | 345 | `semantic proof incomplete` |
 | UI/settings runtime | 10 | 1563 | `semantic proof incomplete` |
 | Generated/quarantined UI | 6 | 147 | `semantic proof incomplete` |
 | Vendor bundles | 2 | 279 | `semantic proof incomplete` |
-| Build/sync scripts | 4 | 52 | `semantic proof incomplete` |
-| Website routes/components/config | 24 | 56 | `semantic proof incomplete` |
+| Build/sync scripts | 4 | 56 | `semantic proof incomplete` |
+| Audit/test lane scripts | 3 | 72 | `semantic proof incomplete` |
+| Website routes/components/config | 26 | 123 | `semantic proof incomplete` |
 
 ## File Gap Index
 
 | File | Family | Lexical callables | Semantic status | Blocker before behavior changes |
 | --- | --- | ---: | --- | --- |
-| `build.js` | Build/sync scripts | 45 | `semantic proof incomplete` | Release/package/publication method authority and rollback proof are incomplete. |
+| `build.js` | Build/sync scripts | 49 | `semantic proof incomplete` | Release/package/publication method authority and rollback proof are incomplete. |
 | `js/background.js` | Hot page/background runtime | 440 | `semantic proof incomplete` | Message, mutation, resolver, storage, stats, and script-injection branches still need per-action authority. |
 | `js/content/block_channel.js` | Hot page/background runtime | 226 | `semantic proof incomplete` | Quick-block lifecycle, affordance, identity, and no-rule budget proof remain incomplete. |
 | `js/content/bridge_injection.js` | Content helper runtime | 12 | `semantic proof incomplete` | Main-world bridge bootstrap, message ownership, and failure/idempotence proof remain incomplete. |
@@ -217,13 +218,14 @@ have all of these fields pinned:
 | `js/content/dom_extractors.js` | Content helper runtime | 114 | `semantic proof incomplete` | DOM identity extraction confidence, cache freshness, and recycled-node restore proof remain incomplete. |
 | `js/content/dom_fallback.js` | Hot page/background runtime | 418 | `semantic proof incomplete` | Hide/restore, selector target, playlist/player side effect, and no-work proof remain incomplete. |
 | `js/content/dom_helpers.js` | Content helper runtime | 21 | `semantic proof incomplete` | Visual writer ownership, restore semantics, and sibling-visible proof remain incomplete. |
+| `js/content/dom_state.js` | Content helper runtime | 42 | `semantic proof incomplete` | Virtual DOM state ownership, attribute compatibility, recycled-node cleanup, and public-fingerprint proof remain incomplete. |
 | `js/content/first_run_prompt.js` | Content helper runtime | 7 | `semantic proof incomplete` | Prompt queue, acknowledgement, sender class, URL, and viewport proof remain incomplete. |
 | `js/content/handle_resolver.js` | Hot page/background runtime | 22 | `semantic proof incomplete` | Resolver fetch budget, cache source, identity confidence, and route negative proof remain incomplete. |
 | `js/content/menu.js` | Content helper runtime | 3 | `semantic proof incomplete` | Menu CSS/bootstrap ownership and non-matching surface proof remain incomplete. |
 | `js/content/release_notes_prompt.js` | Content helper runtime | 12 | `semantic proof incomplete` | Release overlay eligibility, acknowledgement, navigation, and spoofing proof remain incomplete. |
 | `js/content_bridge.js` | Hot page/background runtime | 1198 | `semantic proof incomplete` | Content bridge caller graph, menu/quick action authority, lifecycle callback ownership, and identity confidence proof remain incomplete. |
 | `js/content_controls_catalog.js` | UI/settings runtime | 3 | `semantic proof incomplete` | Content-control catalog ownership, settings parity, and row-action fixture proof remain incomplete. |
-| `js/filter_logic.js` | Hot page/background runtime | 298 | `semantic proof incomplete` | JSON traversal, harvest/map mutation, block decision, recursion, and no-rule budget proof remain incomplete. |
+| `js/filter_logic.js` | Hot page/background runtime | 313 | `semantic proof incomplete` | JSON traversal, harvest/map mutation, block decision, recursion, and no-rule budget proof remain incomplete. |
 | `js/injector.js` | Hot page/background runtime | 314 | `semantic proof incomplete` | Main-world message dispatch, settings capability, and injection idempotence proof remain incomplete. |
 | `js/io_manager.js` | UI/settings runtime | 115 | `semantic proof incomplete` | Import/export target-profile, trusted envelope, mutation report, and rollback proof remain incomplete. |
 | `js/layout.js` | Generated/quarantined UI | 52 | `semantic proof incomplete` | Packaged-but-inactive legacy layout quarantine, selector target, and deletion readiness proof remain incomplete. |
@@ -241,9 +243,12 @@ have all of these fields pinned:
 | `js/ui_components.js` | UI/settings runtime | 64 | `semantic proof incomplete` | Modal/portal lifecycle, row controls, and DOM ownership proof remain incomplete. |
 | `js/vendor/nanah.bundle.js` | Vendor bundles | 107 | `semantic proof incomplete` | Vendor source revision, global API, hash provenance, and package freshness proof remain incomplete. |
 | `js/vendor/qrcode.bundle.js` | Vendor bundles | 172 | `semantic proof incomplete` | QR package version, global API, hash provenance, and package freshness proof remain incomplete. |
+| `scripts/audit-proof-drift.mjs` | Audit/test lane scripts | 19 | `semantic proof incomplete` | Audit drift source-fingerprint scope, lane ownership, and stale-proof negative fixtures remain incomplete. |
 | `scripts/build-extension-ui.mjs` | Build/sync scripts | 2 | `semantic proof incomplete` | UI shell build freshness, stale-output, and failure contract proof remain incomplete. |
 | `scripts/build-nanah-vendor.mjs` | Build/sync scripts | 4 | `semantic proof incomplete` | Vendor build source/version/hash and stale-output proof remain incomplete. |
+| `scripts/run-test-lane.mjs` | Audit/test lane scripts | 53 | `semantic proof incomplete` | Changed-path classification, audit-proof relevance, manual-smoke handoff, and dirty-path guard proof remain incomplete. |
 | `scripts/sync-native-runtime.mjs` | Build/sync scripts | 1 | `semantic proof incomplete` | Native app repo contract, manifest freshness, and status propagation proof remain incomplete. |
+| `scripts/test-lane-config.mjs` | Audit/test lane scripts | 0 | `semantic proof incomplete` | Lane ownership taxonomy, future file-family drift, and unclassified-path negative proof remain incomplete. |
 | `src/extension-shell/popup.jsx` | Generated/quarantined UI | 3 | `semantic proof incomplete` | Authoring-to-generated popup parity and package freshness proof remain incomplete. |
 | `src/extension-shell/shared/runtime.js` | Generated/quarantined UI | 7 | `semantic proof incomplete` | Shared shell runtime source/output parity and mount failure proof remain incomplete. |
 | `src/extension-shell/tab-view-decor.jsx` | Generated/quarantined UI | 2 | `semantic proof incomplete` | Authoring-to-generated dashboard decor parity and package freshness proof remain incomplete. |
@@ -257,6 +262,8 @@ have all of these fields pinned:
 | `website/app/sitemap.js` | Website routes/components/config | 0 | `semantic proof incomplete` | Sitemap route coverage and stale-page proof remain incomplete. |
 | `website/app/terms/page.js` | Website routes/components/config | 0 | `semantic proof incomplete` | Terms/public claim parity proof remains incomplete. |
 | `website/components/browser-logo-rail.js` | Website routes/components/config | 1 | `semantic proof incomplete` | Browser support claim and asset proof remain incomplete. |
+| `website/components/footer-signal-art.js` | Website routes/components/config | 63 | `semantic proof incomplete` | Footer visual scene render budget, accessibility, reduced-motion, and public-claim proof remain incomplete. |
+| `website/components/hero-video.js` | Website routes/components/config | 4 | `semantic proof incomplete` | Hero media loading, fallback, privacy, asset budget, and release freshness proof remain incomplete. |
 | `website/components/marketing-ui.js` | Website routes/components/config | 6 | `semantic proof incomplete` | Marketing component public-claim and asset-budget proof remain incomplete. |
 | `website/components/reveal.js` | Website routes/components/config | 1 | `semantic proof incomplete` | Client reveal lifecycle and no-JS/visibility proof remain incomplete. |
 | `website/components/route-content.js` | Website routes/components/config | 0 | `semantic proof incomplete` | Route content ownership and public-claim parity proof remain incomplete. |
@@ -329,7 +336,7 @@ audit-only and do not approve predicate merging or runtime optimization.
 | `bridge_needsIdentityPrefetchWork_non_json_branch` | `js/content_bridge.js:1012` | Content bridge identity prefetch predicate. Inputs are enabled state, list mode, and channel filter list. | Returns true for whitelist mode or channel rows even when JSON mutation is not the only reason to wake work. | Identity prefetch must remain separate from JSON mutation ownership. |
 | `bridge_needsMainWorldRuntimeWork_admission` | `js/content_bridge.js:1056` | Isolated-world bridge MAIN-world runtime admission predicate. Inputs are enabled state, list mode, bridge content-filter predicate, and bridge JSON-rule predicate. | Returns false for disabled/missing settings, true for whitelist, and otherwise mirrors active content/JSON branches; errors fail active. | MAIN-world work remains split from seed/injector transport predicates. |
 | `bridge_ensureMainWorldRuntimeForSettings_injection_gate` | `js/content_bridge.js:1067` | Bridge script injection gate after settings refresh. Inputs are settings, `needsMainWorldRuntimeWork()`, `injectMainWorldScripts`, and settings sender availability. | Returns false without active MAIN-world work or injector function; active path injects scripts and forwards settings. | This proves lazy injection boundary, not JSON-first implementation authority. |
-| `filter_logic_processData_harvest_then_mutate` | `js/filter_logic.js:3434` | Filter engine global `processData()` method. Inputs are data, dataName, current engine settings, and renderer traversal. | Harvests channel identity before the disabled kill-switch, returns unmodified when disabled, otherwise traverses/mutates and records blocked count/timing diagnostics. | Harvest and mutation are intentionally coupled today; future JSON-first authority needs separate passive-learning and mutation budgets. |
+| `filter_logic_processData_harvest_then_mutate` | `js/filter_logic.js:3588` | Filter engine global `processData()` method. Inputs are data, dataName, current engine settings, and renderer traversal. | Harvests channel identity before the disabled kill-switch, returns unmodified when disabled, otherwise traverses/mutates and records blocked count/timing diagnostics. | Harvest and mutation are intentionally coupled today; future JSON-first authority needs separate passive-learning and mutation budgets. |
 
 Current JSON active-work semantic status after this addendum:
 
@@ -753,10 +760,10 @@ triage rows as complete per-callable authority.
 
 ```text
 current-source method gap freshness date: 2026-05-30
-tracked JS/JSX/MJS files still covered: 63
-repo-wide lexical callables still requiring semantic proof: 5473
+tracked JS/JSX/MJS files still covered: 69
+repo-wide lexical callables still requiring semantic proof: 5673
 files with complete per-callable semantic proof: 0
-latest full runtime proof: 4663/4663 pass, 0 fail, 83.213s
+latest full runtime proof: broad audit backlog 4719 tests, 4571 pass, 148 fail
 method semantic completion from freshness rerun: NO-GO
 optimization approval from method freshness rerun: NO-GO
 JSON-first first-class promotion from method freshness rerun: NO-GO
@@ -865,10 +872,10 @@ is complete semantic method proof.
 Current source-derived parser divergence:
 
 ```text
-build/sync plus website/config files compared: 28
-repo-wide broad parser total for compared files: 108
-build/website route parser total for compared files: 82
-net broad-minus-build/website delta: 26
+build/sync plus website/config files compared: 30
+repo-wide broad parser total for compared files: 179
+build/website route parser total for compared files: 107
+net broad-minus-build/website delta: 72
 parser agreement as completion proof: NO-GO
 runtime behavior changed: no
 ```
@@ -877,10 +884,12 @@ Representative current rows:
 
 | File | Broad parser | Build/website parser | Divergence meaning |
 | --- | ---: | ---: | --- |
-| `build.js` | 45 | 25 | Broad parser includes extra shorthand/control-flow-like forms; build semantic register covers 25 current build rows. |
+| `build.js` | 49 | 28 | Broad parser includes extra shorthand/control-flow-like forms; build semantic register covers current build rows. |
 | `scripts/sync-native-runtime.mjs` | 1 | 0 | Broad parser catches a non-callable/control-flow-like artifact; native sync proof is still rejected separately. |
 | `website/app/layout.js` | 0 | 1 | Build/website parser sees `export default function RootLayout(...)`; broad parser misses this default-export shape. |
 | `website/app/robots.js` | 0 | 1 | Build/website parser sees the Next.js route function; broad parser zero is not callable-free proof. |
+| `website/components/footer-signal-art.js` | 63 | 20 | Broad parser catches animation helper/object-method forms that the route-oriented parser treats as render-support internals. |
+| `website/components/hero-video.js` | 4 | 2 | Both parsers see the media component, but the broad parser also catches nested helper forms. |
 | `website/components/scene-controller.js` | 10 | 5 | Broad parser catches more nested/control-flow-like forms than the build/website route parser. |
 
 ```text

@@ -20,10 +20,10 @@ is a required source input before this audit slice can support runtime
 optimization or JSON-first promotion. Current proof pins:
 
 ```text
-method semantic proof gap files covered: 63
-method semantic proof gap lexical callables covered: 5473
+method semantic proof gap files covered: 69
+method semantic proof gap lexical callables covered: 5673
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5473
+lexical callables requiring semantic proof before behavior changes: 5673
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
@@ -67,25 +67,26 @@ changes remain blocked by the implementation gate.
 ## Summary
 
 ```text
-tracked JS/JSX/MJS files: 63
-repo-wide lexical callables: 5473
+tracked JS/JSX/MJS files: 69
+repo-wide lexical callables: 5673
 ```
 
 | Family | Files | Lexical callables | Boundary |
 | --- | ---: | ---: | --- |
-| Hot page/background runtime | 9 | 3073 | Already has detailed first-pass hot runtime table in `FILTERTUBE_FUNCTION_COVERAGE_2026-05-17.md`. |
-| Content helper runtime | 8 | 303 | First-pass helper surface audit exists, but behavior fixtures remain incomplete. |
+| Hot page/background runtime | 9 | 3088 | Already has detailed first-pass hot runtime table in `FILTERTUBE_FUNCTION_COVERAGE_2026-05-17.md`. |
+| Content helper runtime | 9 | 345 | First-pass helper surface audit exists, but behavior fixtures remain incomplete. |
 | UI/settings runtime | 10 | 1563 | First-pass UI/settings audit exists, but action-level fixtures remain incomplete. |
 | Generated/quarantined UI | 6 | 147 | Generated source/output and `js/layout.js`; freshness and quarantine checks required. |
 | Vendor bundles | 2 | 279 | API/provenance boundary, not product-owned method behavior. |
-| Build/sync scripts | 4 | 52 | Release/package/native-sync behavior; separate release fixtures required. |
-| Website routes/components/config | 24 | 56 | Public website callable surface; public-claim and asset-budget fixtures required. |
+| Build/sync scripts | 4 | 56 | Release/package/native-sync behavior; separate release fixtures required. |
+| Audit/test lane scripts | 3 | 72 | Change-safety classifier, drift guard, and lane runner proof; workflow behavior, not product runtime. |
+| Website routes/components/config | 26 | 123 | Public website callable surface; public-claim and asset-budget fixtures required. |
 
 ## File-Level Index
 
 | File | Family | Lexical callables | Audit status |
 | --- | --- | ---: | --- |
-| `build.js` | Build/sync scripts | 45 | release-audited first pass |
+| `build.js` | Build/sync scripts | 49 | release-audited first pass |
 | `js/background.js` | Hot page/background runtime | 440 | hot runtime mapped |
 | `js/content/block_channel.js` | Hot page/background runtime | 226 | hot runtime mapped |
 | `js/content/bridge_injection.js` | Content helper runtime | 12 | helper counted |
@@ -94,13 +95,14 @@ repo-wide lexical callables: 5473
 | `js/content/dom_extractors.js` | Content helper runtime | 114 | helper counted |
 | `js/content/dom_fallback.js` | Hot page/background runtime | 418 | hot runtime mapped |
 | `js/content/dom_helpers.js` | Content helper runtime | 21 | helper counted |
+| `js/content/dom_state.js` | Content helper runtime | 42 | helper counted |
 | `js/content/first_run_prompt.js` | Content helper runtime | 7 | helper counted |
 | `js/content/handle_resolver.js` | Hot page/background runtime | 22 | hot runtime mapped |
 | `js/content/menu.js` | Content helper runtime | 3 | helper counted |
 | `js/content/release_notes_prompt.js` | Content helper runtime | 12 | helper counted |
 | `js/content_bridge.js` | Hot page/background runtime | 1198 | hot runtime mapped |
 | `js/content_controls_catalog.js` | UI/settings runtime | 3 | UI/settings counted |
-| `js/filter_logic.js` | Hot page/background runtime | 298 | hot runtime mapped |
+| `js/filter_logic.js` | Hot page/background runtime | 313 | hot runtime mapped |
 | `js/injector.js` | Hot page/background runtime | 314 | hot runtime mapped |
 | `js/io_manager.js` | UI/settings runtime | 115 | UI/settings counted |
 | `js/layout.js` | Generated/quarantined UI | 52 | quarantined/generated boundary |
@@ -118,9 +120,12 @@ repo-wide lexical callables: 5473
 | `js/ui_components.js` | UI/settings runtime | 64 | UI/settings counted |
 | `js/vendor/nanah.bundle.js` | Vendor bundles | 107 | vendor API/provenance boundary |
 | `js/vendor/qrcode.bundle.js` | Vendor bundles | 172 | vendor API/provenance boundary |
+| `scripts/audit-proof-drift.mjs` | Audit/test lane scripts | 19 | audit lane counted |
 | `scripts/build-extension-ui.mjs` | Build/sync scripts | 2 | build/website counted |
 | `scripts/build-nanah-vendor.mjs` | Build/sync scripts | 4 | build/website counted |
+| `scripts/run-test-lane.mjs` | Audit/test lane scripts | 53 | audit lane counted |
 | `scripts/sync-native-runtime.mjs` | Build/sync scripts | 1 | build/website counted |
+| `scripts/test-lane-config.mjs` | Audit/test lane scripts | 0 | audit lane counted |
 | `src/extension-shell/popup.jsx` | Generated/quarantined UI | 3 | generated source boundary |
 | `src/extension-shell/shared/runtime.js` | Generated/quarantined UI | 7 | generated source boundary |
 | `src/extension-shell/tab-view-decor.jsx` | Generated/quarantined UI | 2 | generated source boundary |
@@ -134,6 +139,8 @@ repo-wide lexical callables: 5473
 | `website/app/sitemap.js` | Website routes/components/config | 0 | website counted |
 | `website/app/terms/page.js` | Website routes/components/config | 0 | website counted |
 | `website/components/browser-logo-rail.js` | Website routes/components/config | 1 | website counted |
+| `website/components/footer-signal-art.js` | Website routes/components/config | 63 | website counted |
+| `website/components/hero-video.js` | Website routes/components/config | 4 | website counted |
 | `website/components/marketing-ui.js` | Website routes/components/config | 6 | website counted |
 | `website/components/reveal.js` | Website routes/components/config | 1 | website counted |
 | `website/components/route-content.js` | Website routes/components/config | 0 | website counted |
@@ -162,8 +169,8 @@ repo-wide lexical callables: 5473
    app-card flows.
 
 3. **The hot runtime is not the whole product.**
-   Hot runtime has 3,073 lexical callables, but UI/settings, content helpers,
-   generated shell, vendor, build scripts, and website add another 2,400
+   Hot runtime has 3,088 lexical callables, but UI/settings, content helpers,
+   generated shell, vendor, build scripts, and website add another 2,585
    lexical callable forms.
 
 4. **Vendor and generated files must stay explicitly bounded.**
@@ -172,7 +179,7 @@ repo-wide lexical callables: 5473
    product-logic ownership claims.
 
 5. **Website files are small but public-facing.**
-   Only 56 lexical callable forms are in the website surface, but they control
+   Only 123 lexical callable forms are in the website surface, but they control
    public privacy, download, platform, analytics, and release-state claims.
 
 ## Required Follow-Up
@@ -198,5 +205,5 @@ That fixture pins:
 
 - all tracked JS/JSX/MJS files are listed,
 - documented callable counts match current lexical source,
-- documented family totals sum to 5,473,
+- documented family totals sum to 5,673,
 - no ignored raw captures or generated package output are part of this index.

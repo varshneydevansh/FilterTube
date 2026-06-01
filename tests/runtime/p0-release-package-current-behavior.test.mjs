@@ -684,10 +684,10 @@ test('P0 release package audit documents blocked verdict and all named gates', (
     assert.ok(doc.includes(phrase), `missing ${phrase}`);
   }
 
-  assert.match(methodGap, /repo-wide lexical callables: 5473/);
-  assert.match(methodGap, /files with lexical accounting: 63/);
+  assert.match(methodGap, /repo-wide lexical callables: 5673/);
+  assert.match(methodGap, /files with lexical accounting: 69/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5473/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5673/);
 
   assert.equal(releasePackageFamilyDocs.length, 9);
   for (const familyDocPath of releasePackageFamilyDocs) {
