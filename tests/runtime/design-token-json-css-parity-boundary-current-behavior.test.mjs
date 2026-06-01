@@ -357,18 +357,23 @@ test('design token HTML load and package boundaries remain explicit', () => {
   assert.equal(read('html/troubleshoot.html'), '');
 
   assert.deepEqual(blockMetrics(buildConfig), {
-    lines: 24,
-    bytes: 692,
-    sha256: '05511234c87ef92f45a9cab210b2353018c662c1924bf02ce89a20522b391135',
+    lines: 26,
+    bytes: 904,
+    sha256: '97fffd62025057cdfe51ab5a8a71b4dd41a71524617cf35eb791d1583f336fde',
   });
   assert.match(buildConfig, /const COMMON_DIRS = \['js', 'css', 'html', 'icons', 'data', 'assets'\]/);
+  assert.match(buildConfig, /MOBILE_ARTIFACT_FILE_RE/);
+  assert.match(buildConfig, /TEXT_LOC_EXTENSIONS/);
   assert.doesNotMatch(buildConfig, /design/);
   assert.equal(/design\/design_tokens\.json/.test(read('build.js')), false);
   assert.deepEqual(Object.entries(packageScripts).filter(([key, value]) => /design|token/i.test(`${key} ${value}`)), []);
 
   const audit = doc();
+  assert.match(audit, /26 lines, 904 bytes/);
+  assert.match(audit, /97fffd62025057cdfe51ab5a8a71b4dd41a71524617cf35eb791d1583f336fde/);
   assert.match(audit, /`html\/popup\.html` and `html\/tab-view\.html` both load `\.\.\/css\/design_tokens\.css`/);
   assert.match(audit, /`build\.js` copies the `css` directory, but not the `design` directory/);
+  assert.match(audit, /mobile artifact constants and text-file extension sets/);
   assert.match(audit, /has no script whose name or command mentions design tokens/);
 });
 

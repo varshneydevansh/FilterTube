@@ -13,18 +13,22 @@ node --test --test-reporter=tap tests/runtime/*.test.mjs > /tmp/filtertube-runti
 
 ```text
 tests: 4737
-pass: 4672
-fail: 65
-duration_ms: 52951.702959
+pass: 4673
+fail: 64
+duration_ms: 57006.4755
 ```
 
-This refresh reduces the pinned broad-suite failure count from 66 failures to
-65 failures after retiring the stale current-dirty worktree package-version row:
-the historical `9816c34` package diff still only adds `audit:runtime`, while the
-current checkout package version is `3.3.2`. The previous broad refresh reduced
-the suite from 67 failures to 66 failures after retiring the stale content-filter
-field semantics contract dependency on the older compiled/settings
-field-register row count. Earlier broad refreshes reduced the suite from 69
+This refresh reduces the pinned broad-suite failure count from 65 failures to
+64 failures after retiring the stale design-token build-configuration boundary
+row: the selected `build.js` configuration block now includes release mobile
+artifact constants and text-file extension sets, while the design-token JSON
+still remains outside the package-copy and script-generation path. The previous
+refresh reduced the suite from 66 failures to 65 failures after retiring the
+stale current-dirty worktree package-version row: the historical `9816c34`
+package diff still only adds `audit:runtime`, while the current checkout package
+version is `3.3.2`. Earlier broad refreshes reduced the suite from 67 failures
+to 66 failures after retiring the stale content-filter field semantics contract
+dependency on the older compiled/settings field-register row count, from 69
 failures to 67 failures after retiring the stale function-coverage source
 backlog row and the stale `compress-video` package/build boundary row, from 76
 failures to 69 failures after refreshing release-note/package-version proof for
@@ -48,13 +52,13 @@ node scripts/audit-proof-drift.mjs --all --report-only
 
 ## Failure Clusters
 
-Current failing subtests are spread across 50 runtime test files. A lightweight
-name-based parse of `/tmp/filtertube-runtime-current-after-current-dirty-package-version-refresh.tap` gives this
+Current failing subtests are spread across 49 runtime test files. A lightweight
+name-based parse of `/tmp/filtertube-runtime-current-after-design-token-build-config-refresh.tap` gives this
 non-exclusive family snapshot:
 
 | Family | Current failing subtests |
 |---|---:|
-| generated/release/package/docs surfaces | 41 |
+| generated/release/package/docs surfaces | 40 |
 | source-locus/optimization/index contracts | 12 |
 | JSON/video-meta/path/reference | 19 |
 | website/public-doc/source inventory | 14 |
@@ -80,6 +84,10 @@ baseline.
 The previous current-dirty package-script row is retired: the audit now
 separates the `9816c34` one-line `audit:runtime` script diff from the later
 `3.3.2` package version bump.
+The previous design-token build-configuration row is retired: the design-token
+boundary now pins the current release mobile artifact constants and text-file
+extension sets in `build.js` while preserving the no-generator/no-package-copy
+boundary for `design/design_tokens.json`.
 
 | Cluster | Examples | Current meaning |
 |---|---|---|
