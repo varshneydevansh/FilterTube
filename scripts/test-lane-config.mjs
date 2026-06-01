@@ -110,6 +110,7 @@ export const LANES = Object.freeze({
       'tests/runtime/json-first-disable-autoplay-annotations-boundary-current-behavior.test.mjs',
       'tests/runtime/player-endscreen-dom-cleanup-boundary-current-behavior.test.mjs',
       'tests/runtime/kids-latest-json-owner-extension-fixture-boundary-current-behavior.test.mjs',
+      'tests/runtime/youtube-music-surface-identity-boundary-current-behavior.test.mjs',
       'tests/runtime/ytm-watch-player-whitelist-selected-row-mode-boundary-current-behavior.test.mjs'
     ]
   },
@@ -181,6 +182,7 @@ export const LANES = Object.freeze({
       'tests/runtime/json-first-hide-video-info-boundary-current-behavior.test.mjs',
       'tests/runtime/json-first-hide-video-sidebar-boundary-current-behavior.test.mjs',
       'tests/runtime/json-first-hide-watch-playlist-panel-boundary-current-behavior.test.mjs',
+      'tests/runtime/youtube-music-surface-identity-boundary-current-behavior.test.mjs',
       'tests/runtime/ytm-show-sheet-injector-filter-logic-parity-current-behavior.test.mjs',
       'tests/runtime/ytm-show-sheet-enrichment-handoff-current-behavior.test.mjs',
       'tests/runtime/bridge-injection-method-semantic-register-current-behavior.test.mjs',

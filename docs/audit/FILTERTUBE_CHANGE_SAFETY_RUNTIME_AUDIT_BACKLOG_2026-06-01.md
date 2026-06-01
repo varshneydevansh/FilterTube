@@ -13,9 +13,9 @@ node --test --test-reporter=tap tests/runtime/*.test.mjs > /tmp/filtertube-runti
 
 ```text
 tests: 4731
-pass: 4570
-fail: 161
-duration_ms: 41531.622
+pass: 4571
+fail: 160
+duration_ms: 34582.853041
 ```
 
 ## Boundary
@@ -43,7 +43,7 @@ node scripts/audit-proof-drift.mjs --all --report-only
 | JSON comment continuation and provenance registers | comment author/channel provenance, keyword provenance, entity payload provenance, structural wrapper cleanup, collection-root/command-shape/sibling continuation parity, continuation shortcut counts | Comment JSON proof rows have been refreshed and promoted into `test:json`; author/channel and keyword provenance are also promoted into `test:blocking`. Remaining broad-ledger failures in this family are older completion/obligation references, not unpromoted focused comment JSON proof. |
 | JSON content-control hide boundary registers | hideAllComments, hideAskButton, hideHomeFeed, hideMixPlaylists, hideVideoInfo, hideWatchPlaylistPanel, and related boundaries | `content-control-json-first-boundary-index` plus the JSON-first content-control hide boundary set have been refreshed and promoted into `test:json`; remaining content-control surfaces are either already owned by whitelist/menu lanes or belong to older broad ledgers outside this hide-control batch. |
 | JSON-first renderer, reference, metric, and video-meta registers | candidate extraction, implementation locus, metric artifact gate, reference docs, renderer traversal, video-meta parity/fetch/merge docs | JSON-first proof is still split across older NO-GO gates and focused lane tests. |
-| YTM and YouTube Music parity slices | YTM showSheet enrichment, YTM injector/filter-logic parity, playlist selected-row parity | `ytm-show-sheet-injector-filter-logic-parity` and `ytm-show-sheet-enrichment-handoff` have been refreshed and promoted into `test:json`; remaining YTM proof slices are still partial and should be refreshed in focused whitelist/JSON/menu batches. |
+| YTM and YouTube Music parity slices | YouTube Music surface identity, YTM showSheet enrichment, YTM injector/filter-logic parity, playlist selected-row parity | `youtube-music-surface-identity-boundary` has been refreshed and promoted into `test:whitelist` and `test:json`; `ytm-show-sheet-injector-filter-logic-parity` and `ytm-show-sheet-enrichment-handoff` have been refreshed and promoted into `test:json`; remaining YTM proof slices are still partial and should be refreshed in focused whitelist/JSON/menu batches. |
 
 ## Release Lane Decision
 

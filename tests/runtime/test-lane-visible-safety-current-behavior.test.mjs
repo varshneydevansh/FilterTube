@@ -118,7 +118,11 @@ test('goal safety surfaces stay bound to focused lane proof tests', () => {
     {
       surface: 'whitelist behavior',
       lane: 'whitelist',
-      tests: [/json-first-whitelist-decision-identity-boundary/, /content-bridge-whitelist-pending-refresh-boundary/]
+      tests: [
+        /json-first-whitelist-decision-identity-boundary/,
+        /content-bridge-whitelist-pending-refresh-boundary/,
+        /youtube-music-surface-identity-boundary-current-behavior/
+      ]
     },
     {
       surface: 'keyword/channel blocking',
@@ -174,6 +178,7 @@ test('goal safety surfaces stay bound to focused lane proof tests', () => {
         /json-first-hide-mix-playlists-boundary-current-behavior/,
         /json-first-hide-video-info-boundary-current-behavior/,
         /json-first-hide-watch-playlist-panel-boundary-current-behavior/,
+        /youtube-music-surface-identity-boundary-current-behavior/,
         /ytm-show-sheet-injector-filter-logic-parity-current-behavior/,
         /ytm-show-sheet-enrichment-handoff-current-behavior/
       ]
