@@ -2621,6 +2621,8 @@ test('live smoke template is still non-executed and no result artifact is presen
   assert.equal(template.status, 'template-not-executed');
   assert.equal(template.smokeSliceReadiness, 'NO-GO');
   assert.equal(template.releaseReadiness, 'NO-GO');
+  assert.deepEqual(template.changeContext.requiredLanes, []);
+  assert.deepEqual(template.changeContext.automatedLaneEvidence, []);
   assert.equal(template.installedByteParity.packet_id, 'FT-WLCACHE-SPA-PACKET-01-installed-profile-bytes');
   assert.equal(template.installedByteParity.verdict, 'NO-GO');
   for (const field of installedByteParityFields) {
@@ -2630,7 +2632,9 @@ test('live smoke template is still non-executed and no result artifact is presen
     );
   }
   assert.equal(template.completionRules.installedByteParityMustPass, true);
+  assert.equal(template.completionRules.automatedLaneEvidenceMustPass, true);
   assert.equal(template.completionRules.releaseReadinessWhenByteParityMissing, 'NO-GO');
+  assert.equal(template.completionRules.releaseReadinessWhenAutomatedLaneEvidenceMissing, 'NO-GO');
   assert.deepEqual(template.requiredRows.map(row => row.id), liveSmokeRows);
   assert.deepEqual([...new Set(template.requiredRows.map(row => row.status))], ['missing']);
   assert.equal(resultJsonFiles.length, 0, `unexpected executed live smoke artifacts: ${resultJsonFiles.join(', ')}`);
@@ -2648,9 +2652,12 @@ test('live smoke template is still non-executed and no result artifact is presen
   assert.match(runner, /extension_reload_timestamp: process\.env\.FILTERTUBE_EXTENSION_RELOAD_TIMESTAMP \|\| ''/);
   assert.match(runner, /tab_reload_timestamp: process\.env\.FILTERTUBE_TAB_RELOAD_TIMESTAMP \|\| ''/);
   assert.match(runner, /const smokeSliceReadiness = allRowsPassed && consoleIssues\.length === 0 \? 'GO-FOR-THIS-SMOKE-SLICE' : 'NO-GO'/);
-  assert.match(runner, /releaseReadiness: smokeSliceReadiness === 'GO-FOR-THIS-SMOKE-SLICE' && installedByteParity\.verdict === 'GO' \? 'GO-FOR-RELEASE-SMOKE' : 'NO-GO'/);
+  assert.match(runner, /const changeContext = buildChangeContext\(\)/);
+  assert.match(runner, /releaseReadiness: smokeSliceReadiness === 'GO-FOR-THIS-SMOKE-SLICE' && installedByteParity\.verdict === 'GO' && changeContextReady \? 'GO-FOR-RELEASE-SMOKE' : 'NO-GO'/);
   assert.match(runner, /installedByteParityMustPass: true/);
+  assert.match(runner, /automatedLaneEvidenceMustPass: true/);
   assert.match(runner, /releaseReadinessWhenByteParityMissing: 'NO-GO'/);
+  assert.match(runner, /releaseReadinessWhenAutomatedLaneEvidenceMissing: 'NO-GO'/);
   assert.match(doc, /The current directory only contains `template\.json`,\s+`run-live-smoke\.mjs`, and\s+`verify-live-smoke-artifact\.mjs`; that is contract\/tooling, not execution\s+proof/);
 });
 

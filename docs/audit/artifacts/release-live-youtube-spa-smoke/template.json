@@ -5,6 +5,11 @@
   "smokeSliceReadiness": "NO-GO",
   "releaseReadiness": "NO-GO",
   "runtimeBehaviorChanged": false,
+  "changeContext": {
+    "logicalChangeType": "",
+    "requiredLanes": [],
+    "automatedLaneEvidence": []
+  },
   "boundaryDoc": "docs/audit/FILTERTUBE_RELEASE_LIVE_YOUTUBE_SPA_SMOKE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-25.md",
   "relatedAutomatedProof": [
     "tests/runtime/right-rail-whitelist-observer-current-behavior.test.mjs",
@@ -102,8 +107,10 @@
     "allRowsMustPass": true,
     "consoleErrorsMustBeClassified": true,
     "installedByteParityMustPass": true,
+    "automatedLaneEvidenceMustPass": true,
     "releaseReadinessWhenTemplate": "NO-GO",
     "releaseReadinessWhenByteParityMissing": "NO-GO",
+    "releaseReadinessWhenAutomatedLaneEvidenceMissing": "NO-GO",
     "releaseReadinessWhenAnyRowMissing": "NO-GO",
     "releaseReadinessWhenAnyRowFailed": "NO-GO"
   }

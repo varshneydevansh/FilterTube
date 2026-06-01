@@ -65,10 +65,13 @@ selected packet row: FT-WLCACHE-SPA-PACKET-01-installed-profile-bytes
 installed byte parity gate rows: 12
 required installed byte parity fields: 14
 runner installed byte parity schema: PRESENT
+runner automated lane evidence schema: PRESENT
 runner smoke-slice readiness without byte parity: NONRELEASE_ONLY
+runner smoke-slice readiness without automated lane evidence: NONRELEASE_ONLY
 visible Default profile workspace path proof: PARTIAL
 active YouTube tab content-script byte authority: NO-GO
 extension reload timestamp authority: NO-GO
+automated lane evidence authority: NO-GO
 automation profile substitution authority: NO-GO
 incognito runtime availability authority: NO-GO
 connected Chrome profile parity probe: NOT-PARITY
@@ -122,6 +125,7 @@ accept Default Secure Preferences as active-tab parity proof now: NO-GO
 accept automation CDP profile proof as visible-tab proof now: NO-GO
 accept live smoke template as executed proof now: NO-GO
 accept runner smokeSliceReadiness as release proof without byte parity now: NO-GO
+accept runner smokeSliceReadiness as release proof without automated lane evidence now: NO-GO
 accept incognito test without incognito runtime proof now: NO-GO
 accept stale already-open YouTube tabs for release smoke now: NO-GO
 approve whitelist/cache SPA live smoke from this gate now: NO-GO
@@ -766,6 +770,9 @@ FT-LIVE-SPA-05-cache-repeat-navigation
 The current directory only contains `template.json`, `run-live-smoke.mjs`, and
 `verify-live-smoke-artifact.mjs`; that is contract/tooling, not execution
 proof.
+The dated artifact must also include `changeContext.requiredLanes` and passed
+`changeContext.automatedLaneEvidence`; live route rows alone are still
+nonrelease proof.
 
 ## Behavior Invariants To Preserve
 

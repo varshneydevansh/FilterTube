@@ -53,6 +53,8 @@ test('release and smoke lanes keep the live YouTube SPA smoke boundary visible',
   assert.match(matrix, /Automated lanes prove source and fixture contracts/);
   assert.match(matrix, /That test does not claim the manual smoke has passed/);
   assert.match(matrix, /installedByteParity\.verdict=GO/);
+  assert.match(matrix, /changeContext/);
+  assert.match(matrix, /automated lane evidence/);
 });
 
 test('manual smoke handoff covers the release-critical visible behavior set', () => {
@@ -107,6 +109,8 @@ test('live smoke template is non-executed and cannot satisfy release readiness',
   assert.equal(template.smokeSliceReadiness, 'NO-GO');
   assert.equal(template.releaseReadiness, 'NO-GO');
   assert.equal(template.runtimeBehaviorChanged, false);
+  assert.deepEqual(template.changeContext.requiredLanes, []);
+  assert.deepEqual(template.changeContext.automatedLaneEvidence, []);
   assert.equal(template.boundaryDoc, boundaryDocPath);
   assert.equal(template.installedByteParity.verdict, 'NO-GO');
   assert.equal(template.installedByteParity.reason, 'Template is not executed; installed visible-tab byte parity is missing.');
@@ -117,8 +121,10 @@ test('live smoke template is non-executed and cannot satisfy release readiness',
   assert.equal(template.completionRules.allRowsMustPass, true);
   assert.equal(template.completionRules.consoleErrorsMustBeClassified, true);
   assert.equal(template.completionRules.installedByteParityMustPass, true);
+  assert.equal(template.completionRules.automatedLaneEvidenceMustPass, true);
   assert.equal(template.completionRules.releaseReadinessWhenTemplate, 'NO-GO');
   assert.equal(template.completionRules.releaseReadinessWhenByteParityMissing, 'NO-GO');
+  assert.equal(template.completionRules.releaseReadinessWhenAutomatedLaneEvidenceMissing, 'NO-GO');
   assert.equal(template.completionRules.releaseReadinessWhenAnyRowMissing, 'NO-GO');
 });
 
@@ -131,11 +137,13 @@ test('live smoke runner contract writes a dated artifact but no executed artifac
   assert.match(runner, /artifactType: 'filtertube-release-live-youtube-spa-smoke'/);
   assert.match(runner, /boundaryDoc: 'docs\/audit\/FILTERTUBE_RELEASE_LIVE_YOUTUBE_SPA_SMOKE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-25\.md'/);
   assert.match(runner, /const smokeSliceReadiness = allRowsPassed && consoleIssues\.length === 0 \?/);
-  assert.match(runner, /releaseReadiness: smokeSliceReadiness === 'GO-FOR-THIS-SMOKE-SLICE' && installedByteParity\.verdict === 'GO' \?/);
+  assert.match(runner, /const changeContext = buildChangeContext\(\)/);
+  assert.match(runner, /releaseReadiness: smokeSliceReadiness === 'GO-FOR-THIS-SMOKE-SLICE' && installedByteParity\.verdict === 'GO' && changeContextReady \?/);
   assert.match(runner, /const artifactPath = path\.join\(artifactRoot, `\$\{runId\}\.json`\)/);
   assert.match(runner, /fs\.writeFileSync\(artifactPath, `\$\{JSON\.stringify\(artifact, null, 2\)\}\\n`\)/);
   assert.match(read(verifierPath), /export function validateLiveSmokeArtifact/);
   assert.match(read(verifierPath), /releaseReadiness must be GO-FOR-RELEASE-SMOKE/);
   assert.match(read(verifierPath), /installedByteParity\.verdict must be GO/);
+  assert.match(read(verifierPath), /changeContext\.automatedLaneEvidence/);
   assert.deepEqual(executedArtifacts, []);
 });

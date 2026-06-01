@@ -59,6 +59,15 @@ function validArtifact() {
     runtimeBehaviorChanged: false,
     generatedAt,
     boundaryDoc: LIVE_SMOKE_BOUNDARY_DOC,
+    changeContext: {
+      logicalChangeType: 'runtime hot-path change',
+      requiredLanes: ['json', 'dom', 'performance', 'whitelist', 'blocking'],
+      automatedLaneEvidence: [{
+        command: 'npm run test:changed',
+        status: 'passed',
+        summary: 'release and smoke focused lanes passed before live smoke'
+      }]
+    },
     browserNameVersion: 'Chrome/136.0.0.0',
     extensionId: 'gkgjigdfdccckblmglboobikfcpeelio',
     extensionBuildSourcePath: repoRoot,
@@ -141,6 +150,9 @@ test('verifier rejects the non-executed template and missing byte parity', () =>
   assert.ok(errors.includes('status must be executed'));
   assert.ok(errors.includes('smokeSliceReadiness must be GO-FOR-THIS-SMOKE-SLICE'));
   assert.ok(errors.includes('releaseReadiness must be GO-FOR-RELEASE-SMOKE'));
+  assert.ok(errors.includes('changeContext.logicalChangeType is required'));
+  assert.ok(errors.includes('changeContext.requiredLanes must list required test lanes'));
+  assert.ok(errors.includes('changeContext.automatedLaneEvidence must contain at least one passed lane command'));
   assert.ok(errors.includes('installedByteParity.verdict must be GO'));
   assert.ok(errors.includes('artifact.routeSequence must exactly match the required live SPA row order'));
   assert.ok(errors.includes('FT-LIVE-SPA-00-home-to-search.status must be passed'));
@@ -178,6 +190,26 @@ test('verifier rejects incomplete installed byte parity contracts', () => {
   assert.ok(errors.includes('installedByteParity.missing_fields must be an array'));
   assert.ok(errors.includes('installedByteParity.source_hashes must not be empty'));
   assert.ok(errors.includes('installedByteParity.content_script_files must list installed content scripts'));
+});
+
+test('verifier rejects missing or failed automated lane evidence', () => {
+  const missing = validArtifact();
+  missing.changeContext.requiredLanes = [];
+  missing.changeContext.automatedLaneEvidence = [];
+
+  const failed = validArtifact();
+  failed.changeContext.automatedLaneEvidence = [{
+    command: 'npm run test:changed',
+    status: 'failed',
+    summary: 'release lane failed'
+  }];
+
+  const missingErrors = validateLiveSmokeArtifact(missing);
+  const failedErrors = validateLiveSmokeArtifact(failed);
+
+  assert.ok(missingErrors.includes('changeContext.requiredLanes must list required test lanes'));
+  assert.ok(missingErrors.includes('changeContext.automatedLaneEvidence must contain at least one passed lane command'));
+  assert.ok(failedErrors.includes('changeContext.automatedLaneEvidence[0].status must be passed'));
 });
 
 test('verifier CLI exits nonzero for template and zero for complete artifact', () => {

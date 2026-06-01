@@ -44,11 +44,21 @@ const REQUIRED_BYTE_PARITY_FIELDS = Object.freeze([
   'browser_name_version'
 ]);
 
+const REQUIRED_LANE_EVIDENCE_FIELDS = Object.freeze([
+  'command',
+  'status',
+  'summary'
+]);
+
 function isBlank(value) {
   if (value === null || value === undefined) return true;
   if (typeof value === 'string') return value.trim() === '';
   if (Array.isArray(value)) return value.length === 0;
   return false;
+}
+
+function isPlainObject(value) {
+  return !!value && typeof value === 'object' && !Array.isArray(value);
 }
 
 function sameItems(actual, expected) {
@@ -63,6 +73,39 @@ function addMissingFieldErrors(errors, source, fields, prefix) {
   }
 }
 
+function validateChangeContext(errors, changeContext) {
+  if (!isPlainObject(changeContext)) {
+    errors.push('changeContext must be an object');
+    return;
+  }
+
+  if (isBlank(changeContext.logicalChangeType)) errors.push('changeContext.logicalChangeType is required');
+  if (!Array.isArray(changeContext.requiredLanes) || changeContext.requiredLanes.length === 0) {
+    errors.push('changeContext.requiredLanes must list required test lanes');
+  } else {
+    changeContext.requiredLanes.forEach((lane, index) => {
+      if (isBlank(lane)) errors.push(`changeContext.requiredLanes[${index}] is required`);
+    });
+  }
+
+  const evidenceRows = changeContext.automatedLaneEvidence;
+  if (!Array.isArray(evidenceRows) || evidenceRows.length === 0) {
+    errors.push('changeContext.automatedLaneEvidence must contain at least one passed lane command');
+    return;
+  }
+
+  evidenceRows.forEach((evidence, index) => {
+    if (!isPlainObject(evidence)) {
+      errors.push(`changeContext.automatedLaneEvidence[${index}] must be an object`);
+      return;
+    }
+    addMissingFieldErrors(errors, evidence, REQUIRED_LANE_EVIDENCE_FIELDS, `changeContext.automatedLaneEvidence[${index}]`);
+    if (evidence.status !== 'passed') {
+      errors.push(`changeContext.automatedLaneEvidence[${index}].status must be passed`);
+    }
+  });
+}
+
 export function validateLiveSmokeArtifact(artifact) {
   const errors = [];
   if (!artifact || typeof artifact !== 'object' || Array.isArray(artifact)) {
@@ -75,6 +118,7 @@ export function validateLiveSmokeArtifact(artifact) {
   if (artifact.boundaryDoc !== LIVE_SMOKE_BOUNDARY_DOC) errors.push(`boundaryDoc must be ${LIVE_SMOKE_BOUNDARY_DOC}`);
   if (artifact.smokeSliceReadiness !== 'GO-FOR-THIS-SMOKE-SLICE') errors.push('smokeSliceReadiness must be GO-FOR-THIS-SMOKE-SLICE');
   if (artifact.releaseReadiness !== 'GO-FOR-RELEASE-SMOKE') errors.push('releaseReadiness must be GO-FOR-RELEASE-SMOKE');
+  validateChangeContext(errors, artifact.changeContext);
 
   addMissingFieldErrors(errors, artifact, REQUIRED_RECORDING_FIELDS, 'artifact');
   if (!Array.isArray(artifact.whitelistEntriesUsed) || artifact.whitelistEntriesUsed.length === 0) {

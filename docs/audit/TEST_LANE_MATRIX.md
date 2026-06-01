@@ -235,8 +235,9 @@ node docs/audit/artifacts/release-live-youtube-spa-smoke/verify-live-smoke-artif
 ```
 
 The verifier requires every live SPA row to pass, a clean console summary, all
-recording fields, and `installedByteParity.verdict=GO`. The template and any
-artifact with missing byte parity remain `NO-GO`.
+recording fields, `changeContext` with passed automated lane evidence, and
+`installedByteParity.verdict=GO`. The template and any artifact with missing
+byte parity or missing lane evidence remain `NO-GO`.
 
 ## File-To-Lane Matrix
 

@@ -229,6 +229,37 @@ function sha256FileIfPresent(filePath) {
   }
 }
 
+function envList(name) {
+  return (process.env[name] || '')
+    .split(',')
+    .map(value => value.trim())
+    .filter(Boolean);
+}
+
+function buildChangeContext() {
+  const command = process.env.FILTERTUBE_AUTOMATED_PROOF_COMMAND || '';
+  const status = process.env.FILTERTUBE_AUTOMATED_PROOF_STATUS || '';
+  const summary = process.env.FILTERTUBE_AUTOMATED_PROOF_SUMMARY || '';
+  const evidence = command || status || summary
+    ? [{ command, status, summary }]
+    : [];
+
+  return {
+    logicalChangeType: process.env.FILTERTUBE_LOGICAL_CHANGE_TYPE || '',
+    requiredLanes: envList('FILTERTUBE_REQUIRED_LANES'),
+    automatedLaneEvidence: evidence
+  };
+}
+
+function isReleaseReadyChangeContext(changeContext) {
+  return !!changeContext.logicalChangeType
+    && changeContext.requiredLanes.length > 0
+    && changeContext.automatedLaneEvidence.length > 0
+    && changeContext.automatedLaneEvidence.every(evidence => (
+      evidence.command && evidence.status === 'passed' && evidence.summary
+    ));
+}
+
 function sourceHashSnapshot() {
   const manifest = readJsonIfPresent(path.join(extensionPath, 'manifest.json')) || {};
   const contentScriptFiles = Array.from(new Set((manifest.content_scripts || []).flatMap(entry => [
@@ -650,13 +681,16 @@ async function main() {
   const generatedAt = new Date().toISOString();
   const smokeSliceReadiness = allRowsPassed && consoleIssues.length === 0 ? 'GO-FOR-THIS-SMOKE-SLICE' : 'NO-GO';
   const installedByteParity = buildInstalledByteParity({ browserVersion, storageSetup, rows, generatedAt });
+  const changeContext = buildChangeContext();
+  const changeContextReady = isReleaseReadyChangeContext(changeContext);
   const artifact = {
     artifactType: 'filtertube-release-live-youtube-spa-smoke',
     schemaVersion: 2,
     status: allRowsPassed ? 'executed' : 'executed-with-failures',
     smokeSliceReadiness,
-    releaseReadiness: smokeSliceReadiness === 'GO-FOR-THIS-SMOKE-SLICE' && installedByteParity.verdict === 'GO' ? 'GO-FOR-RELEASE-SMOKE' : 'NO-GO',
+    releaseReadiness: smokeSliceReadiness === 'GO-FOR-THIS-SMOKE-SLICE' && installedByteParity.verdict === 'GO' && changeContextReady ? 'GO-FOR-RELEASE-SMOKE' : 'NO-GO',
     runtimeBehaviorChanged: false,
+    changeContext,
     generatedAt,
     boundaryDoc: 'docs/audit/FILTERTUBE_RELEASE_LIVE_YOUTUBE_SPA_SMOKE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-25.md',
     browserNameVersion: browserVersion.Browser,
@@ -679,7 +713,9 @@ async function main() {
       allRowsMustPass: true,
       consoleErrorsMustBeClassified: true,
       installedByteParityMustPass: true,
+      automatedLaneEvidenceMustPass: true,
       releaseReadinessWhenByteParityMissing: 'NO-GO',
+      releaseReadinessWhenAutomatedLaneEvidenceMissing: 'NO-GO',
       releaseReadinessWhenAnyRowMissing: 'NO-GO',
       releaseReadinessWhenAnyRowFailed: 'NO-GO'
     }
@@ -693,6 +729,7 @@ async function main() {
     smokeSliceReadiness: artifact.smokeSliceReadiness,
     releaseReadiness: artifact.releaseReadiness,
     installedByteParity: artifact.installedByteParity.verdict,
+    changeContext: changeContextReady ? 'GO' : 'NO-GO',
     rowStatuses: rows.map(row => [row.id, row.status]),
     consoleIssues: consoleIssues.length
   }, null, 2));
