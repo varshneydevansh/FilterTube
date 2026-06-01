@@ -20,14 +20,19 @@ test('audit runtime backlog remains explicit and outside release-lane completion
   assert.match(doc, /Status: broad audit backlog, not a release-lane gate/);
   assert.match(doc, /node --test --test-reporter=tap tests\/runtime\/\*\.test\.mjs > \/tmp\/filtertube-runtime\.tap 2>&1/);
   assert.match(doc, /tests: 4737/);
-  assert.match(doc, /pass: 4692/);
-  assert.match(doc, /fail: 45/);
-  assert.match(doc, /duration_ms: 43680\.628083/);
+  assert.match(doc, /pass: 4693/);
+  assert.match(doc, /fail: 44/);
+  assert.match(doc, /duration_ms: 48452\.025959/);
+  assert.match(doc, /45 failures\s+to\s+44\s+failures/);
+  assert.match(doc, /JSON-first video-meta category parity\s+source pin row/);
+  assert.match(doc, /category parity proof test now expects the current\s+`js\/filter_logic\.js` line count, byte count, and hash/);
+  assert.match(doc, /category decision fixture behavior remains unchanged/);
+  assert.match(doc, /first-class video-meta category parity authority remains absent/);
   assert.match(doc, /46 failures\s+to\s+45\s+failures/);
   assert.match(doc, /JSON-first uppercase title boundary source\s+pin row/);
   assert.match(doc, /current\s+`js\/filter_logic\.js` line count, byte count, and hash/);
-  assert.match(doc, /runtime uppercase-title fixture behavior remains unchanged/);
-  assert.match(doc, /first-class uppercase-title authority remains absent/);
+  assert.match(doc, /runtime uppercase-title fixture\s+behavior remains unchanged/);
+  assert.match(doc, /first-class uppercase-title authority remains\s+absent/);
   assert.match(doc, /47 failures\s+to\s+46\s+failures/);
   assert.match(doc, /JSON-first route\/surface metric artifact\s+contract coverage ledger row/);
   assert.match(doc, /objective coverage ledger now matches the\s+active-goal and tracked-file ledgers at\s+69 method semantic proof gap files covered/);
@@ -191,14 +196,14 @@ test('audit runtime backlog pins the current broad-suite failure family snapshot
   const expectedRows = [
     ['generated/release/package/docs surfaces', '34'],
     ['source-locus/optimization/index contracts', '4'],
-    ['JSON/video-meta/path/reference', '13'],
+    ['JSON/video-meta/path/reference', '12'],
     ['website/public-doc/source inventory', '14'],
     ['settings/content-control/DOM lifecycle', '8'],
     ['native/Nanah/Kids/YTM', '8']
   ];
 
-  assert.match(doc, /Current failing subtests are spread across 34 runtime test files/);
-  assert.match(doc, /filtertube-runtime-current-after-uppercase-title-boundary-refresh\.tap/);
+  assert.match(doc, /Current failing subtests are spread across 33 runtime test files/);
+  assert.match(doc, /filtertube-runtime-current-after-video-meta-category-parity-refresh\.tap/);
   assert.match(doc, /non-exclusive family snapshot/);
   assert.match(doc, /previous method-proof\/family blocker row is now retired/);
   assert.match(doc, /direct method semantic proof lane passes with 5,681\s+current lexical callables/);
@@ -251,6 +256,10 @@ test('audit runtime backlog pins the current broad-suite failure family snapshot
   assert.match(doc, /uppercase-title proof test now matches the current `js\/filter_logic\.js`\s+fingerprint/);
   assert.match(doc, /runtime uppercase-title\s+fixture behavior remains unchanged/);
   assert.match(doc, /first-class uppercase-title authority\s+remains explicitly absent/);
+  assert.match(doc, /previous JSON-first video-meta category parity row is retired/);
+  assert.match(doc, /category\s+parity proof test now matches the current `js\/filter_logic\.js` fingerprint/);
+  assert.match(doc, /category decision fixture behavior\s+remains unchanged/);
+  assert.match(doc, /first-class video-meta category parity authority remains\s+explicitly absent/);
   assert.match(doc, /previous JSON-first metric artifact gate rows are retired/);
   assert.match(doc, /metric proof\s+now pins current performance-claim and no-work crosswalk hashes/);
   assert.match(doc, /current\s+`js\/filter_logic\.js` `processData\(\)` anchor/);

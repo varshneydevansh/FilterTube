@@ -13,18 +13,24 @@ node --test --test-reporter=tap tests/runtime/*.test.mjs > /tmp/filtertube-runti
 
 ```text
 tests: 4737
-pass: 4692
-fail: 45
-duration_ms: 43680.628083
+pass: 4693
+fail: 44
+duration_ms: 48452.025959
 ```
 
-This refresh reduces the pinned broad-suite failure count from 46 failures to
-45 failures after retiring the stale JSON-first uppercase title boundary source
-pin row: the uppercase-title proof test now expects the current
+This refresh reduces the pinned broad-suite failure count from 45 failures to
+44 failures after retiring the stale JSON-first video-meta category parity
+source pin row: the category parity proof test now expects the current
 `js/filter_logic.js` line count, byte count, and hash already recorded in the
-audit doc while runtime uppercase-title fixture behavior remains unchanged and
-first-class uppercase-title authority remains absent. The previous refresh
-reduced the suite from 47 failures to 46 failures after retiring the stale
+audit doc while category decision fixture behavior remains unchanged and
+first-class video-meta category parity authority remains absent. The previous
+refresh reduced the suite from 46 failures to 45 failures after retiring the
+stale JSON-first uppercase title boundary source pin row: the uppercase-title
+proof test now expects the current `js/filter_logic.js` line count, byte count,
+and hash already recorded in the audit doc while runtime uppercase-title fixture
+behavior remains unchanged and first-class uppercase-title authority remains
+absent. The previous refresh reduced the suite from 47 failures to 46 failures
+after retiring the stale
 JSON-first route/surface metric artifact contract coverage ledger row: the
 objective coverage ledger now matches the active-goal and tracked-file ledgers at
 69 method semantic proof gap files covered, while route/surface metric artifacts,
@@ -121,15 +127,15 @@ node scripts/audit-proof-drift.mjs --all --report-only
 
 ## Failure Clusters
 
-Current failing subtests are spread across 34 runtime test files. A lightweight
-name-based parse of `/tmp/filtertube-runtime-current-after-uppercase-title-boundary-refresh.tap` gives this
+Current failing subtests are spread across 33 runtime test files. A lightweight
+name-based parse of `/tmp/filtertube-runtime-current-after-video-meta-category-parity-refresh.tap` gives this
 non-exclusive family snapshot:
 
 | Family | Current failing subtests |
 |---|---:|
 | generated/release/package/docs surfaces | 34 |
 | source-locus/optimization/index contracts | 4 |
-| JSON/video-meta/path/reference | 13 |
+| JSON/video-meta/path/reference | 12 |
 | website/public-doc/source inventory | 14 |
 | settings/content-control/DOM lifecycle | 8 |
 | native/Nanah/Kids/YTM | 8 |
@@ -203,6 +209,11 @@ uppercase-title proof test now matches the current `js/filter_logic.js`
 fingerprint already present in the audit doc while runtime uppercase-title
 fixture behavior remains unchanged and first-class uppercase-title authority
 remains explicitly absent.
+The previous JSON-first video-meta category parity row is retired: the category
+parity proof test now matches the current `js/filter_logic.js` fingerprint
+already present in the audit doc while category decision fixture behavior
+remains unchanged and first-class video-meta category parity authority remains
+explicitly absent.
 The previous JSON-first metric artifact gate rows are retired: the metric proof
 now pins current performance-claim and no-work crosswalk hashes plus the current
 `js/filter_logic.js` `processData()` anchor while metric artifact authority

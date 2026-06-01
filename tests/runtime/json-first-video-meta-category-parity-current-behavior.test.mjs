@@ -245,9 +245,9 @@ test('JSON-first video meta category parity audit is audit-only and source pinne
   assert.match(text, /Status: audit-only current-behavior register/);
   assert.match(text, /Runtime behavior is unchanged/);
   assert.match(text, /not an implementation patch, optimization patch, category-filter patch/);
-  assert.equal(lineCount(filterLogic), 3498);
-  assert.equal(Buffer.byteLength(filterLogic), 165151);
-  assert.equal(sha256('js/filter_logic.js'), '4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641');
+  assert.equal(lineCount(filterLogic), 3652);
+  assert.equal(Buffer.byteLength(filterLogic), 172174);
+  assert.equal(sha256('js/filter_logic.js'), '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5');
   assert.equal(lineCount(domFallback), 4838);
   assert.equal(Buffer.byteLength(domFallback), 228332);
   assert.equal(sha256('js/content/dom_fallback.js'), '2129fcc16f8ad1420a6cb44905ddcd0b68d5511f3b647e2db100c0d67d492aef');
