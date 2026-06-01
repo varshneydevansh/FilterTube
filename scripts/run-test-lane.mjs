@@ -29,6 +29,7 @@ const RUNTIME_FIXTURE_LANE_REASONS = Object.freeze({
 
 const AUDIT_PROOF_PATH_PATTERN = /^docs\/audit\//;
 const RUNTIME_TEST_PROOF_PATH_PATTERN = /^tests\/runtime\/.*\.test\.mjs$/;
+const NON_PROOF_LANE = 'smoke';
 
 export const LANES = Object.freeze({
   release: {
@@ -645,18 +646,39 @@ export function validateLaneFiles() {
 export function auditProofRequirement(result) {
   const auditProofFiles = [];
   const proofRelevantFiles = [];
+  const auditProofLanes = new Set();
+  const proofRelevantLanes = new Set();
+
   for (const entry of result.classifications) {
+    const entryLanes = entry.matched
+      .flatMap(rule => rule.lanes)
+      .filter(lane => lane !== NON_PROOF_LANE);
+
     if (AUDIT_PROOF_PATH_PATTERN.test(entry.file)) {
       auditProofFiles.push(entry.file);
+      for (const lane of entryLanes) auditProofLanes.add(lane);
     } else if (!RUNTIME_TEST_PROOF_PATH_PATTERN.test(entry.file)) {
       proofRelevantFiles.push(entry.file);
+      for (const lane of entryLanes) proofRelevantLanes.add(lane);
     }
   }
+
+  const sharedProofLanes = orderedLanes(
+    [...proofRelevantLanes].filter(lane => auditProofLanes.has(lane))
+  );
 
   return {
     auditProofFiles,
     proofRelevantFiles,
-    missing: proofRelevantFiles.length > 0 && auditProofFiles.length === 0
+    auditProofLanes: orderedLanes(auditProofLanes),
+    proofRelevantLanes: orderedLanes(proofRelevantLanes),
+    sharedProofLanes,
+    missing: proofRelevantFiles.length > 0 && auditProofFiles.length === 0,
+    irrelevant:
+      proofRelevantFiles.length > 0 &&
+      auditProofFiles.length > 0 &&
+      proofRelevantLanes.size > 0 &&
+      sharedProofLanes.length === 0
   };
 }
 
@@ -684,6 +706,10 @@ function runNode(args) {
   if (typeof result.status === 'number') return result.status;
   if (result.signal) return 1;
   return 1;
+}
+
+function formatLaneList(lanes) {
+  return lanes.length ? lanes.map(lane => `test:${lane}`).join(', ') : 'none';
 }
 
 function runLane(lane) {
@@ -740,11 +766,29 @@ function printClassification(result) {
     }
   }
 
-  const { auditProofFiles, proofRelevantFiles, missing } = auditProofRequirement(result);
+  const {
+    auditProofFiles,
+    proofRelevantFiles,
+    proofRelevantLanes,
+    auditProofLanes,
+    sharedProofLanes,
+    missing,
+    irrelevant
+  } = auditProofRequirement(result);
 
   if (auditProofFiles.length) {
     console.log('\nAudit proof files in this change:');
     for (const file of auditProofFiles) console.log(`  ${file}`);
+    if (proofRelevantFiles.length) {
+      if (sharedProofLanes.length) {
+        console.log(`  Shared proof lane(s): ${formatLaneList(sharedProofLanes)}`);
+      } else if (irrelevant) {
+        console.log('  Audit proof relevance mismatch:');
+        console.log(`    touched lane(s): ${formatLaneList(proofRelevantLanes)}`);
+        console.log(`    proof lane(s): ${formatLaneList(auditProofLanes)}`);
+        console.log('    test:changed will fail until docs/audit proof shares a non-smoke lane with the touched files.');
+      }
+    }
   } else if (proofRelevantFiles.length) {
     console.log('\nAudit proof update expected before commit:');
     console.log('  Add or update a relevant docs/audit/ proof file for:');
@@ -815,6 +859,7 @@ function main() {
     if (result.unmatched.length) process.exit(2);
     const auditProof = auditProofRequirement(result);
     if (auditProof.missing) process.exit(3);
+    if (auditProof.irrelevant) process.exit(4);
     if (!result.lanes.length) {
       console.log('\nNo changed lanes to run.');
       process.exit(0);

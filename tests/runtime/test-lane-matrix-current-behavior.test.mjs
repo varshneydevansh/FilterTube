@@ -343,7 +343,11 @@ test('changed-lane runner is wired to the classifier and sequential lane executi
   assert.match(runner, /function auditProofRequirement\(result\)/);
   assert.match(runner, /Audit proof update expected before commit/);
   assert.match(runner, /Audit proof files in this change/);
+  assert.match(runner, /Audit proof relevance mismatch/);
+  assert.match(runner, /sharedProofLanes/);
+  assert.match(runner, /function formatLaneList\(lanes\)/);
   assert.match(runner, /if \(auditProof\.missing\) process\.exit\(3\)/);
+  assert.match(runner, /if \(auditProof\.irrelevant\) process\.exit\(4\)/);
   assert.match(runner, /function runAuditDrift\(\)/);
   assert.match(runner, /runNode\(\['scripts\/audit-proof-drift\.mjs', '--lane-owned'\]\)/);
   assert.match(runner, /console\.log\('\\n==> Running test:audit-drift'\)/);
@@ -352,11 +356,12 @@ test('changed-lane runner is wired to the classifier and sequential lane executi
   assert.match(runner, /runLane\(changedLane\)/);
   assert.match(runner, /process\.exit\(runLane\(lane\)\)/);
   assert.match(matrix, /fails on any unclassified\s+changed path/);
-  assert.match(matrix, /runs the\s+lane-owned audit proof drift guard/);
+  assert.match(matrix, /runs the\s+lane-owned audit\s+proof drift guard/);
   assert.match(matrix, /runs\s+the required lanes sequentially in\s+matrix order/);
   assert.match(matrix, /prints a manual YouTube\s+smoke advisory/);
   assert.match(matrix, /reports whether a changed\s+`docs\/audit\/` proof file is present/);
   assert.match(matrix, /fails\s+when source, release, asset, or product-doc paths changed without a matching\s+`docs\/audit\/` proof file/);
+  assert.match(matrix, /fails when changed\s+`docs\/audit\/` proof does not share\s+at least one non-smoke lane/);
   assert.match(matrix, /prints a fixture-proof reminder\s+for the affected runtime lanes/);
 });
 
@@ -425,30 +430,86 @@ test('classifier output recognizes changed audit proof files', () => {
   assert.match(proof.stdout, /docs\/audit\/TEST_LANE_MATRIX\.md/);
   assert.doesNotMatch(proof.stdout, /Audit proof update expected before commit:/);
   assert.doesNotMatch(proof.stdout, /Runtime fixture proof expected when behavior changes:/);
+
+  const mismatchedProof = spawnSync(process.execPath, [
+    'scripts/run-test-lane.mjs',
+    '--classify',
+    'js/seed.js',
+    'docs/audit/FILTERTUBE_KEYWORD_BLOCKING_BOUNDARY_2026-06-01.md'
+  ], {
+    cwd: repoRoot,
+    encoding: 'utf8'
+  });
+
+  assert.equal(mismatchedProof.status, 0, mismatchedProof.stderr);
+  assert.match(mismatchedProof.stdout, /Audit proof relevance mismatch:/);
+  assert.match(mismatchedProof.stdout, /touched lane\(s\): test:json, test:performance/);
+  assert.match(mismatchedProof.stdout, /proof lane\(s\): test:blocking/);
+  assert.match(mismatchedProof.stdout, /test:changed will fail until docs\/audit proof shares a non-smoke lane/);
 });
 
 test('changed-lane audit proof gate distinguishes proof-only and product changes', () => {
   const sourceOnly = auditProofRequirement(classifyPaths(['js/seed.js']));
   assert.deepEqual(sourceOnly.auditProofFiles, []);
   assert.deepEqual(sourceOnly.proofRelevantFiles, ['js/seed.js']);
+  assert.deepEqual(sourceOnly.auditProofLanes, []);
+  assert.deepEqual(sourceOnly.proofRelevantLanes, ['json', 'performance']);
+  assert.deepEqual(sourceOnly.sharedProofLanes, []);
   assert.equal(sourceOnly.missing, true);
+  assert.equal(sourceOnly.irrelevant, false);
 
   const sourceWithProof = auditProofRequirement(classifyPaths([
     'js/seed.js',
-    'docs/audit/FILTERTUBE_TEST_LANE_PROOF_GATE_2026-06-01.md'
+    'docs/audit/FILTERTUBE_JSON_TEST_LANE_PROOF_GATE_2026-06-01.md'
   ]));
   assert.deepEqual(sourceWithProof.auditProofFiles, [
-    'docs/audit/FILTERTUBE_TEST_LANE_PROOF_GATE_2026-06-01.md'
+    'docs/audit/FILTERTUBE_JSON_TEST_LANE_PROOF_GATE_2026-06-01.md'
   ]);
   assert.deepEqual(sourceWithProof.proofRelevantFiles, ['js/seed.js']);
+  assert.deepEqual(sourceWithProof.auditProofLanes, ['json']);
+  assert.deepEqual(sourceWithProof.proofRelevantLanes, ['json', 'performance']);
+  assert.deepEqual(sourceWithProof.sharedProofLanes, ['json']);
   assert.equal(sourceWithProof.missing, false);
+  assert.equal(sourceWithProof.irrelevant, false);
+
+  const sourceWithIrrelevantProof = auditProofRequirement(classifyPaths([
+    'js/seed.js',
+    'docs/audit/FILTERTUBE_KEYWORD_BLOCKING_BOUNDARY_2026-06-01.md'
+  ]));
+  assert.deepEqual(sourceWithIrrelevantProof.auditProofFiles, [
+    'docs/audit/FILTERTUBE_KEYWORD_BLOCKING_BOUNDARY_2026-06-01.md'
+  ]);
+  assert.deepEqual(sourceWithIrrelevantProof.proofRelevantFiles, ['js/seed.js']);
+  assert.deepEqual(sourceWithIrrelevantProof.auditProofLanes, ['blocking']);
+  assert.deepEqual(sourceWithIrrelevantProof.proofRelevantLanes, ['json', 'performance']);
+  assert.deepEqual(sourceWithIrrelevantProof.sharedProofLanes, []);
+  assert.equal(sourceWithIrrelevantProof.missing, false);
+  assert.equal(sourceWithIrrelevantProof.irrelevant, true);
+
+  const sourceWithGenericProof = auditProofRequirement(classifyPaths([
+    'js/seed.js',
+    'docs/audit/FILTERTUBE_GENERAL_NOTE_2026-06-01.md'
+  ]));
+  assert.deepEqual(sourceWithGenericProof.auditProofFiles, [
+    'docs/audit/FILTERTUBE_GENERAL_NOTE_2026-06-01.md'
+  ]);
+  assert.deepEqual(sourceWithGenericProof.proofRelevantFiles, ['js/seed.js']);
+  assert.deepEqual(sourceWithGenericProof.auditProofLanes, []);
+  assert.deepEqual(sourceWithGenericProof.proofRelevantLanes, ['json', 'performance']);
+  assert.deepEqual(sourceWithGenericProof.sharedProofLanes, []);
+  assert.equal(sourceWithGenericProof.missing, false);
+  assert.equal(sourceWithGenericProof.irrelevant, true);
 
   const testOnly = auditProofRequirement(classifyPaths([
     'tests/runtime/test-lane-matrix-current-behavior.test.mjs'
   ]));
   assert.deepEqual(testOnly.auditProofFiles, []);
   assert.deepEqual(testOnly.proofRelevantFiles, []);
+  assert.deepEqual(testOnly.auditProofLanes, []);
+  assert.deepEqual(testOnly.proofRelevantLanes, []);
+  assert.deepEqual(testOnly.sharedProofLanes, []);
   assert.equal(testOnly.missing, false);
+  assert.equal(testOnly.irrelevant, false);
 });
 
 test('smoke lane keeps release confidence broad but bounded', () => {
