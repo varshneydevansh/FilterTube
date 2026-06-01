@@ -99,6 +99,24 @@ function providerLoadOrderRows() {
   });
 }
 
+function manifestDocPositionRows(doc) {
+  const rows = new Map();
+  const manifestPositionRowPattern =
+    /^\| `([^`]+)` \| [^|]+ \| (\d+) \| (\d+) \| (\d+) \| [^|]+ \|$/;
+
+  for (const line of doc.split(/\r?\n/)) {
+    const match = line.match(manifestPositionRowPattern);
+    if (!match) continue;
+    rows.set(match[1], {
+      helperIndex: Number(match[2]),
+      extractorIndex: Number(match[3]),
+      bridgeIndex: Number(match[4])
+    });
+  }
+
+  return rows;
+}
+
 function directDisplayNoneRefs() {
   const refs = [];
   const directDisplayPattern = /style\.display\s*=\s*['"]none['"]|style\.setProperty\(['"]display['"],\s*['"]none['"]/;
@@ -325,15 +343,23 @@ test('direct hide writer register is backed by current source snippets for each 
   assert.match(immediate, /containerToHide\.style\.display = 'none'/);
 
   const loadOrderRows = providerLoadOrderRows();
+  const docPositionRows = manifestDocPositionRows(doc);
   assert.equal(loadOrderRows.length, 4);
+  assert.equal(docPositionRows.size, 4);
   assert.equal(loadOrderRows.filter((row) => row.helperIndex < row.extractorIndex).length, 4);
   assert.equal(loadOrderRows.filter((row) => row.extractorIndex < row.bridgeIndex).length, 4);
   assert.equal(loadOrderRows.filter((row) => row.helperIndex < row.bridgeIndex).length, 4);
 
   for (const row of loadOrderRows) {
-    assert.equal(row.helperIndex, 2, `${row.file} helper index drifted`);
-    assert.equal(row.extractorIndex, 3, `${row.file} extractor index drifted`);
-    assert.equal(row.bridgeIndex, 12, `${row.file} bridge index drifted`);
+    assert.deepEqual(
+      docPositionRows.get(row.file),
+      {
+        helperIndex: row.helperIndex,
+        extractorIndex: row.extractorIndex,
+        bridgeIndex: row.bridgeIndex
+      },
+      `${row.file} manifest helper stack index docs drifted`
+    );
     assert.ok(doc.includes(`| \`${row.file}\` |`), `doc missing manifest row ${row.file}`);
   }
 

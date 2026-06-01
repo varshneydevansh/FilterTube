@@ -154,7 +154,12 @@ test('goal safety surfaces stay bound to focused lane proof tests', () => {
     {
       surface: 'DOM fallback',
       lane: 'dom',
-      tests: [/dom-fallback-selector-semantic-register/, /css-style-hide-authority/, /quarantined-content-css-package-boundary/, /dom-state-virtual-attributes/]
+      tests: [/dom-fallback-selector-semantic-register/, /css-style-hide-authority/, /direct-hide-writer-register/, /quarantined-content-css-package-boundary/, /dom-state-virtual-attributes/]
+    },
+    {
+      surface: 'direct hide writers',
+      lane: 'dom',
+      tests: [/direct-hide-writer-register-current-behavior/]
     },
     {
       surface: 'no-rule performance',

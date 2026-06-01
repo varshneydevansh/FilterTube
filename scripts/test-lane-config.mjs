@@ -162,6 +162,7 @@ export const LANES = Object.freeze({
       'tests/runtime/dom-fallback-run-state-visibility-cleanup-boundary-current-behavior.test.mjs',
       'tests/runtime/css-style-hide-authority-current-behavior.test.mjs',
       'tests/runtime/dom-hide-side-effect-current-behavior.test.mjs',
+      'tests/runtime/direct-hide-writer-register-current-behavior.test.mjs',
       'tests/runtime/dom-broad-hide-boundary-current-behavior.test.mjs',
       'tests/runtime/dom-state-virtual-attributes-current-behavior.test.mjs',
       'tests/runtime/dom-target-source-current-behavior.test.mjs',
@@ -510,6 +511,11 @@ export const FILE_LANE_RULES = Object.freeze([
     lanes: ['dom']
   },
   {
+    id: 'audit-visual-hide-proof-doc',
+    patterns: [/^docs\/audit\/.*(?:DIRECT_HIDE|HIDE_RESTORE|DOM_HIDE|BROAD_HIDE|CSS_STYLE_HIDE|VISIBILITY_CLEANUP|P0_HIDE_RESTORE).*\.md$/i],
+    lanes: ['dom']
+  },
+  {
     id: 'audit-menu-proof-doc',
     patterns: [/^docs\/audit\/.*(?:MENU|QUICK|COLLAB|DROPDOWN).*\.md$/i],
     lanes: ['menu']
@@ -602,6 +608,11 @@ export const FILE_LANE_RULES = Object.freeze([
   {
     id: 'runtime-dom-test',
     patterns: [/^tests\/runtime\/.*dom.*\.test\.mjs$/i],
+    lanes: ['dom']
+  },
+  {
+    id: 'runtime-visual-hide-test',
+    patterns: [/^tests\/runtime\/.*(?:direct-hide|hide-restore|dom-hide|broad-hide|css-style-hide|visibility-cleanup).*\.test\.mjs$/i],
     lanes: ['dom']
   },
   {

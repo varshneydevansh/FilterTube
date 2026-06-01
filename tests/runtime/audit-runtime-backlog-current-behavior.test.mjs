@@ -71,6 +71,7 @@ test('audit runtime backlog names the broad failure clusters that still require 
   assert.match(doc, /compiled-settings-field-register` has been refreshed and promoted into `test:settings`/);
   assert.match(doc, /content-control-active-work-matrix` has been refreshed and promoted into `test:performance`/);
   assert.match(doc, /content-control-alias-mutation-boundary` has been refreshed and promoted into `test:settings`/);
+  assert.match(doc, /direct-hide-writer-register` has been refreshed and promoted into `test:dom`/);
 });
 
 test('smoke lane keeps the broad audit backlog boundary visible', () => {

@@ -191,6 +191,7 @@ test('test lane matrix maps high-risk source files to expected lanes', () => {
     { files: ['main-world message, injection, trust, or startup-injection audit docs under `docs/audit/`'], lanes: ['test:release', 'test:json', 'test:settings', 'test:smoke'] },
     { files: ['generic message action, sender, side-effect, transport, or mutation audit docs under `docs/audit/`'], lanes: ['test:settings', 'test:smoke'] },
     { files: ['page-runtime lifecycle, observer, teardown, or selector lifecycle audit docs under `docs/audit/`'], lanes: ['test:dom', 'test:performance', 'test:smoke'] },
+    { files: ['visual hide, hide-restore, direct-hide, broad-hide, CSS hide, or visibility-cleanup audit docs/tests under `docs/audit/` or `tests/runtime/`'], lanes: ['test:dom', 'test:smoke'] },
     { files: ['document-start or seed page-global patch audit docs under `docs/audit/`'], lanes: ['test:json', 'test:performance', 'test:smoke'] },
     { files: ['js/vendor/*.bundle.js'], lanes: ['test:release', 'test:settings', 'test:smoke'] },
     { files: ['scripts/build-extension-ui.mjs', 'scripts/build-nanah-vendor.mjs'], lanes: ['test:release', 'test:settings', 'test:smoke'] },
@@ -303,6 +304,14 @@ test('executable classifier maps high-risk paths to required lanes', () => {
     'docs/audit/FILTERTUBE_PAGE_RUNTIME_LIFECYCLE_AUTHORITY_AUDIT_2026-05-18.md',
     'docs/audit/FILTERTUBE_SELECTOR_LIFECYCLE_INVENTORY_2026-05-17.md'
   ]).lanes, ['dom', 'performance', 'smoke']);
+  const visualHideProof = classifyPaths([
+    'docs/audit/FILTERTUBE_DIRECT_HIDE_WRITER_REGISTER_2026-05-20.md',
+    'tests/runtime/direct-hide-writer-register-current-behavior.test.mjs'
+  ]);
+  assert.deepEqual(visualHideProof.lanes, ['dom', 'smoke']);
+  assert.deepEqual(visualHideProof.unmatched, []);
+  assert.equal(visualHideProof.classifications[0].matched.some(match => match.id === 'audit-visual-hide-proof-doc'), true);
+  assert.equal(visualHideProof.classifications[1].matched.some(match => match.id === 'runtime-visual-hide-test'), true);
   assert.deepEqual(classifyPaths([
     'docs/audit/FILTERTUBE_DOCUMENT_START_ZERO_FLASH_BOUNDARY_2026-05-21.md',
     'docs/audit/FILTERTUBE_SEED_PAGE_GLOBAL_PATCH_TEARDOWN_BOUNDARY_CURRENT_BEHAVIOR_2026-05-23.md'

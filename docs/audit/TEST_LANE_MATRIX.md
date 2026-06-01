@@ -169,7 +169,8 @@ the surface connected to a focused lane.
 | end screens | `test:whitelist` keeps end-screen videowall, card, autoplay, and player DOM cleanup tests in lane. |
 | quick-block and 3-dot menus | `test:menu` keeps `quick-block-block-menu-affordance-boundary`, `native-dropdown-close-state`, and `content-bridge-collaborator-identity-promotion-handoff` in lane. |
 | JSON-first filtering | `test:json` keeps seed/network, readiness, snapshot, list-mode, and response-mutation tests in lane. |
-| DOM fallback | `test:dom` keeps DOM fallback selector, CSS hide authority, quarantined content CSS package boundary, run-state cleanup, virtual-attribute, and route cleanup tests in lane. |
+| DOM fallback | `test:dom` keeps DOM fallback selector, CSS hide authority, direct hide writer, quarantined content CSS package boundary, run-state cleanup, virtual-attribute, and route cleanup tests in lane. |
+| direct hide writers | `test:dom` keeps `direct-hide-writer-register-current-behavior` in lane so visual writer/source-order drift stays tied to DOM false-hide proof. |
 | no-rule performance | `test:performance` keeps empty-install, no-work, active-rule, content-control active-work, diagnostic logging policy, and route-surface budget tests in lane. |
 | SPA navigation | `test:performance` keeps whitelist-cache SPA metric and route-surface no-work tests in lane; live SPA rows remain in manual smoke. |
 | code-burden growth | `test:performance` keeps the code-burden declutter boundary in lane, including the 1000-line product-owned source guard and near-threshold file list. |
@@ -290,6 +291,7 @@ or uncovered required lanes remain `NO-GO`.
 | main-world message, injection, trust, or startup-injection audit docs under `docs/audit/` | `test:release`, `test:json`, `test:settings`, `test:smoke` | Covers proof for content-script/page-script trust, main-world message dispatch, injection readiness, and cross-context settings handoff. Match `trust` as a filename token so trusted-state backup docs stay in the settings lane. |
 | generic message action, sender, side-effect, transport, or mutation audit docs under `docs/audit/` | `test:settings`, `test:smoke` | Covers proof for background message actions, sender classes, message-triggered state mutation, transport callsites, and settings/storage fanout. |
 | page-runtime lifecycle, observer, teardown, or selector lifecycle audit docs under `docs/audit/` | `test:dom`, `test:performance`, `test:smoke` | Covers proof for observers, listeners, timers, selector lifecycle, teardown ownership, and no-rule lifecycle budgets that affect lag and DOM fallback recovery. |
+| visual hide, hide-restore, direct-hide, broad-hide, CSS hide, or visibility-cleanup audit docs/tests under `docs/audit/` or `tests/runtime/` | `test:dom`, `test:smoke` | Covers proof for split visual writers, shared helper side effects, restore ownership, parent/shelf false-hide risk, and recycled-node cleanup. |
 | document-start or seed page-global patch audit docs under `docs/audit/` | `test:json`, `test:performance`, `test:smoke` | Covers proof for seed startup, page-global fetch/XHR patch lifetime, zero-flash limits, and no-work JSON pass-through budgets. |
 | `manifest*.json`, `build.js`, other `scripts/build-*.mjs` | `test:release` | Covers package content, manifests, generated release artifacts, release claims, and artifact behavior. |
 | `README.md`, `CHANGELOG.md`, `data/release_notes.json` | `test:release`, `test:smoke` | Covers public release claims, packaged release notes, and changelog/version drift. |

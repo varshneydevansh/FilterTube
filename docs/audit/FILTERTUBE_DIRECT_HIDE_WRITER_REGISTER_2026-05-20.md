@@ -152,6 +152,22 @@ The manifest stack proves `extractVideoDuration()` is declared after
 script has run. Therefore load order is a current source fact, not permission to
 change hide timing, stats/media coupling, or early lifecycle callbacks.
 
+## Lane Promotion Addendum - 2026-06-01
+
+The executable proof now compares the manifest helper-stack table above against
+the live browser manifests instead of pinning a second hardcoded index set in
+the test file. Current source still loads `dom_helpers.js`,
+`dom_extractors.js`, and `content_bridge.js` at positions `3`, `4`, and `13`
+in all four manifests.
+
+This register is now owned by `test:dom` through
+`tests/runtime/direct-hide-writer-register-current-behavior.test.mjs`,
+`scripts/test-lane-config.mjs`, and `docs/audit/TEST_LANE_MATRIX.md`.
+Runtime behavior is unchanged. This only promotes the existing visual-writer
+proof into the focused DOM lane so future visual hide/restore, broad-hide,
+CSS hide, or visibility-cleanup changes cannot skip the direct writer source
+order check.
+
 Current missing-provider behavior is source-order dependent:
 
 | Scenario | Current result | Risk |
