@@ -100,6 +100,14 @@ test('test lane matrix defines every required lane and npm script', () => {
   assert.equal(pkg.scripts['test:changed'], 'node scripts/run-test-lane.mjs --run-changed');
   assert.equal(pkg.scripts.test, 'node scripts/run-test-lane.mjs smoke');
   assert.equal(pkg.scripts['audit:runtime'], 'node --test tests/runtime/*.test.mjs');
+  assert.equal(
+    pkg.scripts['smoke:youtube'],
+    'node docs/audit/artifacts/release-live-youtube-spa-smoke/run-live-smoke.mjs'
+  );
+  assert.equal(
+    pkg.scripts['smoke:youtube:verify'],
+    'node docs/audit/artifacts/release-live-youtube-spa-smoke/verify-live-smoke-artifact.mjs'
+  );
   assert.match(runner, /from '\.\/test-lane-config\.mjs'/);
   assert.match(driftScript, /from '\.\/test-lane-config\.mjs'/);
   assert.match(config, /export const LANES = Object\.freeze/);
@@ -107,6 +115,11 @@ test('test lane matrix defines every required lane and npm script', () => {
   assert.match(matrix, /npm run test:audit-drift/);
   assert.match(matrix, /npm run lanes:changed/);
   assert.match(matrix, /npm run test:changed/);
+  assert.match(matrix, /npm run smoke:youtube/);
+  assert.match(
+    matrix,
+    /npm run smoke:youtube:verify -- docs\/audit\/artifacts\/release-live-youtube-spa-smoke\/<artifact>\.json/
+  );
   assert.match(matrix, /Plain `npm test` runs the same bounded smoke lane as `npm run test:smoke`/);
   assert.match(matrix, /logical changes should still use `npm run test:changed`/);
   assert.match(matrix, /npm run audit:runtime/);
