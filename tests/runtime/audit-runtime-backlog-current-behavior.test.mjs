@@ -20,19 +20,24 @@ test('audit runtime backlog remains explicit and outside release-lane completion
   assert.match(doc, /Status: broad audit backlog, not a release-lane gate/);
   assert.match(doc, /node --test --test-reporter=tap tests\/runtime\/\*\.test\.mjs > \/tmp\/filtertube-runtime\.tap 2>&1/);
   assert.match(doc, /tests: 4737/);
-  assert.match(doc, /pass: 4697/);
-  assert.match(doc, /fail: 40/);
-  assert.match(doc, /duration_ms: 40863\.867083/);
+  assert.match(doc, /pass: 4698/);
+  assert.match(doc, /fail: 39/);
+  assert.match(doc, /duration_ms: 57988\.49775/);
+  assert.match(doc, /40\s+failures\s+to\s+39\s+failures/);
+  assert.match(doc, /JSON-first video-meta no-work budget source\s+pin row/);
+  assert.match(doc, /no-work budget proof test now expects the current\s+`js\/filter_logic\.js` line count, byte count, and hash/);
+  assert.match(doc, /scheduler, duplicate, DOM upload-date\/duration callsite fixtures\s+remain unchanged/);
+  assert.match(doc, /first-class video-meta no-work budget authority remains\s+absent/);
   assert.match(doc, /41\s+failures\s+to\s+40\s+failures/);
   assert.match(doc, /JSON-first video-meta merge schema source\s+pin row/);
-  assert.match(doc, /merge-schema proof test now expects the current\s+`js\/filter_logic\.js` line count, byte count, and hash/);
-  assert.match(doc, /partial metadata merge and category forwarding fixtures remain\s+unchanged/);
-  assert.match(doc, /first-class video-meta merge schema authority remains absent/);
+  assert.match(doc, /merge-schema proof test now expects the current\s+`js\/filter_logic\.js` line count,\s+byte count, and hash/);
+  assert.match(doc, /partial metadata\s+merge and category forwarding fixtures remain unchanged/);
+  assert.match(doc, /first-class\s+video-meta merge schema authority remains absent/);
   assert.match(doc, /42\s+failures\s+to\s+41\s+failures/);
-  assert.match(doc, /JSON-first video-meta freshness eviction\s+source pin row/);
-  assert.match(doc, /freshness-eviction proof test now expects the current `js\/filter_logic\.js` line\s+count, byte count, and hash/);
-  assert.match(doc, /persistence, scheduling, background storage, and queue fixtures\s+remain unchanged/);
-  assert.match(doc, /first-class video-meta freshness eviction authority remains\s+absent/);
+  assert.match(doc, /JSON-first\s+video-meta freshness eviction source pin row/);
+  assert.match(doc, /freshness-eviction proof test\s+now expects the current `js\/filter_logic\.js` line count, byte count, and hash/);
+  assert.match(doc, /persistence, scheduling, background\s+storage, and queue fixtures\s+remain unchanged/);
+  assert.match(doc, /first-class video-meta\s+freshness eviction authority remains\s+absent/);
   assert.match(doc, /43\s+failures\s+to\s+42\s+failures/);
   assert.match(doc, /JSON-first video-meta fetch policy source\s+pin row/);
   assert.match(doc, /fetch policy proof test now expects the current `js\/filter_logic\.js` line count,\s+byte count, and hash/);
@@ -216,14 +221,14 @@ test('audit runtime backlog pins the current broad-suite failure family snapshot
   const expectedRows = [
     ['generated/release/package/docs surfaces', '34'],
     ['source-locus/optimization/index contracts', '4'],
-    ['JSON/video-meta/path/reference', '8'],
+    ['JSON/video-meta/path/reference', '7'],
     ['website/public-doc/source inventory', '14'],
     ['settings/content-control/DOM lifecycle', '8'],
     ['native/Nanah/Kids/YTM', '8']
   ];
 
-  assert.match(doc, /Current failing subtests are spread across 29 runtime test files/);
-  assert.match(doc, /filtertube-runtime-current-after-video-meta-merge-schema-refresh\.tap/);
+  assert.match(doc, /Current failing subtests are spread across 28 runtime test files/);
+  assert.match(doc, /filtertube-runtime-current-after-video-meta-no-work-budget-refresh\.tap/);
   assert.match(doc, /non-exclusive family snapshot/);
   assert.match(doc, /previous method-proof\/family blocker row is now retired/);
   assert.match(doc, /direct method semantic proof lane passes with 5,681\s+current lexical callables/);
@@ -296,6 +301,10 @@ test('audit runtime backlog pins the current broad-suite failure family snapshot
   assert.match(doc, /merge-schema\s+proof test now matches the current `js\/filter_logic\.js` fingerprint/);
   assert.match(doc, /partial metadata merge and category forwarding\s+fixtures remain unchanged/);
   assert.match(doc, /first-class video-meta merge schema authority\s+remains explicitly absent/);
+  assert.match(doc, /previous JSON-first video-meta no-work budget row is retired/);
+  assert.match(doc, /no-work\s+budget proof test now matches the current `js\/filter_logic\.js` fingerprint/);
+  assert.match(doc, /scheduler, duplicate,\s+DOM upload-date\/duration callsite fixtures remain unchanged/);
+  assert.match(doc, /first-class\s+video-meta no-work budget authority remains explicitly absent/);
   assert.match(doc, /previous JSON-first metric artifact gate rows are retired/);
   assert.match(doc, /metric proof\s+now pins current performance-claim and no-work crosswalk hashes/);
   assert.match(doc, /current\s+`js\/filter_logic\.js` `processData\(\)` anchor/);

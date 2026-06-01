@@ -13,24 +13,30 @@ node --test --test-reporter=tap tests/runtime/*.test.mjs > /tmp/filtertube-runti
 
 ```text
 tests: 4737
-pass: 4697
-fail: 40
-duration_ms: 40863.867083
+pass: 4698
+fail: 39
+duration_ms: 57988.49775
 ```
 
-This refresh reduces the pinned broad-suite failure count from 41 failures to
-40 failures after retiring the stale JSON-first video-meta merge schema source
-pin row: the merge-schema proof test now expects the current
+This refresh reduces the pinned broad-suite failure count from 40 failures to
+39 failures after retiring the stale JSON-first video-meta no-work budget source
+pin row: the no-work budget proof test now expects the current
 `js/filter_logic.js` line count, byte count, and hash already recorded in the
-audit doc while partial metadata merge and category forwarding fixtures remain
-unchanged and first-class video-meta merge schema authority remains absent. The
-previous refresh reduced the suite from 42 failures to 41 failures after retiring
-the stale JSON-first video-meta freshness eviction source pin row: the
-freshness-eviction proof test now expects the current `js/filter_logic.js` line
-count, byte count, and hash already recorded in the
-audit doc while persistence, scheduling, background storage, and queue fixtures
-remain unchanged and first-class video-meta freshness eviction authority remains
-absent. The previous refresh reduced the suite from 43 failures to 42 failures
+audit doc while scheduler, duplicate, DOM upload-date/duration callsite fixtures
+remain unchanged and first-class video-meta no-work budget authority remains
+absent. The previous refresh reduced the suite from 41 failures to 40 failures
+after retiring the stale JSON-first video-meta merge schema source pin row: the
+merge-schema proof test now expects the current `js/filter_logic.js` line count,
+byte count, and hash already recorded in the audit doc while partial metadata
+merge and category forwarding fixtures remain unchanged and first-class
+video-meta merge schema authority remains absent. The previous refresh reduced
+the suite from 42 failures to 41 failures after retiring the stale JSON-first
+video-meta freshness eviction source pin row: the freshness-eviction proof test
+now expects the current `js/filter_logic.js` line count, byte count, and hash
+already recorded in the audit doc while persistence, scheduling, background
+storage, and queue fixtures remain unchanged and first-class video-meta
+freshness eviction authority remains absent. The previous refresh reduced the
+suite from 43 failures to 42 failures
 after retiring the stale JSON-first video-meta fetch policy source pin row: the
 fetch policy proof test now expects the current `js/filter_logic.js` line count,
 byte count, and hash already recorded in the
@@ -151,15 +157,15 @@ node scripts/audit-proof-drift.mjs --all --report-only
 
 ## Failure Clusters
 
-Current failing subtests are spread across 29 runtime test files. A lightweight
-name-based parse of `/tmp/filtertube-runtime-current-after-video-meta-merge-schema-refresh.tap` gives this
+Current failing subtests are spread across 28 runtime test files. A lightweight
+name-based parse of `/tmp/filtertube-runtime-current-after-video-meta-no-work-budget-refresh.tap` gives this
 non-exclusive family snapshot:
 
 | Family | Current failing subtests |
 |---|---:|
 | generated/release/package/docs surfaces | 34 |
 | source-locus/optimization/index contracts | 4 |
-| JSON/video-meta/path/reference | 8 |
+| JSON/video-meta/path/reference | 7 |
 | website/public-doc/source inventory | 14 |
 | settings/content-control/DOM lifecycle | 8 |
 | native/Nanah/Kids/YTM | 8 |
@@ -258,6 +264,11 @@ proof test now matches the current `js/filter_logic.js` fingerprint already
 present in the audit doc while partial metadata merge and category forwarding
 fixtures remain unchanged and first-class video-meta merge schema authority
 remains explicitly absent.
+The previous JSON-first video-meta no-work budget row is retired: the no-work
+budget proof test now matches the current `js/filter_logic.js` fingerprint
+already present in the audit doc while scheduler, duplicate,
+DOM upload-date/duration callsite fixtures remain unchanged and first-class
+video-meta no-work budget authority remains explicitly absent.
 The previous JSON-first metric artifact gate rows are retired: the metric proof
 now pins current performance-claim and no-work crosswalk hashes plus the current
 `js/filter_logic.js` `processData()` anchor while metric artifact authority
