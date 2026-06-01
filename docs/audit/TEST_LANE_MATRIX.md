@@ -92,6 +92,9 @@ when source, release, asset, or product-doc paths changed without a matching
 `docs/audit/` proof file, fails when changed `docs/audit/` proof does not share
 at least one non-smoke lane with the touched files, runs the lane-owned audit
 proof drift guard, then runs the required lanes sequentially in matrix order.
+Changed-path discovery is fail-closed: if Git cannot report tracked or
+untracked paths, the runner exits nonzero instead of treating the workspace as
+clean.
 After the lanes pass, it fails if focused lane execution leaves additional
 tracked or unignored dirty paths beyond the logical change that was classified,
 or if lane execution mutates any initially changed file after classification.

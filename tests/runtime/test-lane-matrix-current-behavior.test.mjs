@@ -11,6 +11,7 @@ import {
   changedPathsFromGit,
   changedPathsWithSnapshotDrift,
   classifyPaths,
+  gitLines,
   laneNames,
   newChangedPaths,
   runtimeFixtureRequirement,
@@ -593,6 +594,10 @@ test('changed-lane runner is wired to the classifier and sequential lane executi
   assert.match(config, /run-test-lane\|test-lane-config\|audit-proof-drift/);
   assert.match(runner, /gitLineReader\(\['diff', '--name-only', 'HEAD', '--'\]\)/);
   assert.match(runner, /gitLineReader\(\['ls-files', '--others', '--exclude-standard'\]\)/);
+  assert.match(runner, /throw new Error\(`git \$\{args\.join\(' '\)\} failed/);
+  assert.match(runner, /console\.error\(error instanceof Error \? error\.message : String\(error\)\)/);
+  assert.match(runner, /process\.exit\(8\)/);
+  assert.doesNotMatch(runner, /if \(result\.status !== 0\) return \[\]/);
   assert.doesNotMatch(runner, /--diff-filter=ACMRTUXB/);
   assert.match(runner, /if \(result\.signal\) return 1/);
   assert.match(runner, /lane === '--run-changed' \|\| lane === 'run-changed'/);
@@ -641,6 +646,8 @@ test('changed-lane runner is wired to the classifier and sequential lane executi
   assert.match(matrix, /fails on any unclassified\s+changed path/);
   assert.match(matrix, /runs the\s+lane-owned audit\s+proof drift guard/);
   assert.match(matrix, /runs\s+the required lanes sequentially in\s+matrix order/);
+  assert.match(matrix, /Changed-path discovery is fail-closed/);
+  assert.match(matrix, /instead of treating the workspace as\s+clean/);
   assert.match(matrix, /fails if focused lane execution leaves additional\s+tracked or unignored dirty paths/);
   assert.match(matrix, /lane execution mutates any initially changed file after classification/);
   assert.match(matrix, /build\/test helpers that rewrite the same\s+files being committed/);
@@ -680,6 +687,17 @@ test('changed-lane path collection includes untracked nonignored files', () => {
   ]);
   assert.deepEqual(result.lanes, ['json', 'performance', 'smoke']);
   assert.deepEqual(result.unmatched, []);
+});
+
+test('changed-lane path collection fails closed on git discovery errors', () => {
+  assert.throws(
+    () => gitLines(['diff', '--name-only', 'HEAD', '--'], () => ({
+      status: 128,
+      stderr: 'fatal: not a git repository\n',
+      stdout: ''
+    })),
+    /git diff --name-only HEAD -- failed: fatal: not a git repository/
+  );
 });
 
 test('changed-lane dirty path guard reports only additional tracked or unignored paths', () => {

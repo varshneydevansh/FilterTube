@@ -185,12 +185,15 @@ export function runtimeFixtureRequirement(result) {
   };
 }
 
-function gitLines(args) {
-  const result = spawnSync('git', args, {
+export function gitLines(args, spawn = spawnSync) {
+  const result = spawn('git', args, {
     cwd: repoRoot,
     encoding: 'utf8'
   });
-  if (result.status !== 0) return [];
+  if (result.status !== 0) {
+    const detail = String(result.stderr || result.error?.message || '').trim();
+    throw new Error(`git ${args.join(' ')} failed${detail ? `: ${detail}` : ''}`);
+  }
   return result.stdout.split(/\r?\n/).filter(Boolean);
 }
 
@@ -464,5 +467,10 @@ function main() {
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  main();
+  try {
+    main();
+  } catch (error) {
+    console.error(error instanceof Error ? error.message : String(error));
+    process.exit(8);
+  }
 }
