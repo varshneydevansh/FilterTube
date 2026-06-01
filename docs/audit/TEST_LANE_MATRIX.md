@@ -170,7 +170,7 @@ the surface connected to a focused lane.
 | quick-block and 3-dot menus | `test:menu` keeps `quick-block-block-menu-affordance-boundary`, `native-dropdown-close-state`, and `content-bridge-collaborator-identity-promotion-handoff` in lane. |
 | JSON-first filtering | `test:json` keeps seed/network, readiness, snapshot, list-mode, and response-mutation tests in lane. |
 | DOM fallback | `test:dom` keeps DOM fallback selector, CSS hide authority, quarantined content CSS package boundary, run-state cleanup, virtual-attribute, and route cleanup tests in lane. |
-| no-rule performance | `test:performance` keeps empty-install, no-work, active-rule, diagnostic logging policy, and route-surface budget tests in lane. |
+| no-rule performance | `test:performance` keeps empty-install, no-work, active-rule, content-control active-work, diagnostic logging policy, and route-surface budget tests in lane. |
 | SPA navigation | `test:performance` keeps whitelist-cache SPA metric and route-surface no-work tests in lane; live SPA rows remain in manual smoke. |
 | code-burden growth | `test:performance` keeps the code-burden declutter boundary in lane, including the 1000-line product-owned source guard and near-threshold file list. |
 | settings | `test:settings` keeps settings-mode, compiled-settings field/register proof, refresh fanout, compiled-cache, import/export, and state-manager tests in lane. |

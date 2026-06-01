@@ -200,6 +200,7 @@ export const LANES = Object.freeze({
       'tests/runtime/visible-empty-runtime-active-current-behavior.test.mjs',
       'tests/runtime/enabled-master-switch-disabled-runtime-boundary-current-behavior.test.mjs',
       'tests/runtime/active-rule-authority-current-behavior.test.mjs',
+      'tests/runtime/content-control-active-work-matrix-current-behavior.test.mjs',
       'tests/runtime/content-filter-route-surface-no-work-budget-current-behavior.test.mjs',
       'tests/runtime/json-first-no-work-optimization-crosswalk-current-behavior.test.mjs',
       'tests/runtime/whitelist-pending-intake-no-work-contract-current-behavior.test.mjs',

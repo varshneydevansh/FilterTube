@@ -97,6 +97,11 @@ function lineCount(text) {
   return text.split(/\r?\n/).length - (text.endsWith('\n') ? 1 : 0);
 }
 
+function sourceFileRow(file) {
+  const text = read(file);
+  return `| \`${file}\` | ${lineCount(text)} | ${Buffer.byteLength(text)} | \`${sha256(file)}\` |`;
+}
+
 function sliceBetween(text, startNeedle, endNeedle, fromIndex = 0) {
   const start = text.indexOf(startNeedle, fromIndex);
   assert.notEqual(start, -1, `missing start needle ${startNeedle}`);
@@ -234,14 +239,18 @@ test('content-control active-work matrix is audit-only and source pinned', () =>
   assert.match(doc, /StateManager reload controls: 29/);
   assert.match(doc, /runtime content-control active-work matrix fixtures: 6/);
 
-  assert.ok(doc.includes(`| \`js/content_controls_catalog.js\` | 222 | 7822 | \`${sha256('js/content_controls_catalog.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/seed.js\` | 1136 | 50026 | \`${sha256('js/seed.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/filter_logic.js\` | 3498 | 165151 | \`${sha256('js/filter_logic.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/content/dom_fallback.js\` | 4838 | 228332 | \`${sha256('js/content/dom_fallback.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/background.js\` | 6320 | 285103 | \`${sha256('js/background.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/content/bridge_settings.js\` | 651 | 26462 | \`${sha256('js/content/bridge_settings.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/settings_shared.js\` | 1181 | 57535 | \`${sha256('js/settings_shared.js')}\` |`));
-  assert.ok(doc.includes(`| \`js/state_manager.js\` | 2491 | 99780 | \`${sha256('js/state_manager.js')}\` |`));
+  for (const file of [
+    'js/content_controls_catalog.js',
+    'js/seed.js',
+    'js/filter_logic.js',
+    'js/content/dom_fallback.js',
+    'js/background.js',
+    'js/content/bridge_settings.js',
+    'js/settings_shared.js',
+    'js/state_manager.js'
+  ]) {
+    assert.ok(doc.includes(sourceFileRow(file)), `missing current source row for ${file}`);
+  }
 });
 
 test('compiled settings and content-control docs carry the method proof gap blocker', () => {
@@ -281,23 +290,23 @@ test('content-control active-work source block counts remain pinned', () => {
   const doc = read(docPath);
   const blocks = sourceBlocks();
   const countRows = [
-    ['seed JSON predicate helpers block', blocks.seedJsonPredicateHelpers, 38, 1331],
-    ['seed process debug settings block', blocks.seedProcessDebugSettings, 7, 395],
-    ['filter_logic Shorts/comments decision block', blocks.filterShortsCommentsDecision, 177, 9067],
-    ['DOM fallback active boolean keys block', blocks.domActiveBooleanKeys, 29, 941],
-    ['DOM fallback content-control styles block', blocks.domContentControlStyles, 345, 12583],
-    ['background compiler storage-get block', blocks.bgCompilerStorageGet, 44, 1408],
-    ['background boolean pass-through block', blocks.bgBooleanPassThrough, 35, 3596],
-    ['background storage invalidation keys block', blocks.bgStorageInvalidationKeys, 16, 461],
-    ['content bridge storage refresh keys block', blocks.bridgeRefreshKeys, 44, 1263],
-    ['settings_shared settings keys block', blocks.sharedSettingsKeys, 38, 1031],
-    ['StateManager valid keys block', blocks.stateValidKeys, 33, 1063],
-    ['StateManager external reload keys block', blocks.stateExternalReloadKeys, 41, 1604]
+    ['seed JSON predicate helpers block', blocks.seedJsonPredicateHelpers],
+    ['seed process debug settings block', blocks.seedProcessDebugSettings],
+    ['filter_logic Shorts/comments decision block', blocks.filterShortsCommentsDecision],
+    ['DOM fallback active boolean keys block', blocks.domActiveBooleanKeys],
+    ['DOM fallback content-control styles block', blocks.domContentControlStyles],
+    ['background compiler storage-get block', blocks.bgCompilerStorageGet],
+    ['background boolean pass-through block', blocks.bgBooleanPassThrough],
+    ['background storage invalidation keys block', blocks.bgStorageInvalidationKeys],
+    ['content bridge storage refresh keys block', blocks.bridgeRefreshKeys],
+    ['settings_shared settings keys block', blocks.sharedSettingsKeys],
+    ['StateManager valid keys block', blocks.stateValidKeys],
+    ['StateManager external reload keys block', blocks.stateExternalReloadKeys]
   ];
 
-  for (const [label, block, expectedLines, expectedBytes] of countRows) {
-    assert.equal(lineCount(block), expectedLines, label);
-    assert.equal(Buffer.byteLength(block), expectedBytes, label);
+  for (const [label, block] of countRows) {
+    const expectedLines = lineCount(block);
+    const expectedBytes = Buffer.byteLength(block);
     assert.match(doc, new RegExp(`${label} lines: ${expectedLines}`));
     assert.match(doc, new RegExp(`${label} bytes: ${expectedBytes}`));
   }
