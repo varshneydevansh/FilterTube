@@ -13,12 +13,18 @@ node --test --test-reporter=tap tests/runtime/*.test.mjs > /tmp/filtertube-runti
 
 ```text
 tests: 4737
-pass: 4707
-fail: 30
-duration_ms: 77406.878
+pass: 4708
+fail: 29
+duration_ms: 74250.065667
 ```
 
-This refresh reduces the pinned broad-suite failure count from 31 failures to
+This refresh reduces the pinned broad-suite failure count from 30 failures to
+29 failures after retiring the stale Nanah vendor runtime session dashboard HTML
+fingerprint row: the Nanah session lifecycle proof now expects the current
+`html/tab-view.html` hash while line count, byte count, Nanah vendor transport
+blocks, dashboard Nanah consumer blocks, crypto/listener/chunking primitive
+counts, and missing future session authority remain unchanged. The previous
+refresh reduced the pinned broad-suite failure count from 31 failures to
 30 failures after retiring the stale manifest permission feature-map source
 fingerprint row: the feature-map proof now expects the current browser manifest
 fingerprints and current `build.js` fingerprint while keeping permission
@@ -206,8 +212,8 @@ node scripts/audit-proof-drift.mjs --all --report-only
 
 ## Failure Clusters
 
-Current failing subtests are spread across 20 runtime test files. A lightweight
-name-based parse of `/tmp/filtertube-runtime-current-after-manifest-feature-map-refresh.tap` gives this
+Current failing subtests are spread across 19 runtime test files. A lightweight
+name-based parse of `/tmp/filtertube-runtime-current-after-nanah-session-refresh.tap` gives this
 non-exclusive family snapshot:
 
 | Family | Current failing subtests |
@@ -219,6 +225,11 @@ non-exclusive family snapshot:
 | settings/content-control/DOM lifecycle | 7 |
 | native/Nanah/Kids/YTM | 6 |
 
+The previous Nanah vendor runtime session dashboard fingerprint row is now
+retired from the broad failure snapshot: `html/tab-view.html` now matches the
+current dashboard shell hash in the Nanah session lifecycle proof while Nanah
+transport, crypto/listener/chunking, dashboard consumer, JSON-filter separation,
+and future authority gaps remain pinned.
 The previous manifest permission feature-map fingerprint row is now retired from
 the broad failure snapshot: manifest and `build.js` source fingerprints now
 match the current release/build baseline while permission declarations, host

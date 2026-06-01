@@ -20,9 +20,13 @@ test('audit runtime backlog remains explicit and outside release-lane completion
   assert.match(doc, /Status: broad audit backlog, not a release-lane gate/);
   assert.match(doc, /node --test --test-reporter=tap tests\/runtime\/\*\.test\.mjs > \/tmp\/filtertube-runtime\.tap 2>&1/);
   assert.match(doc, /tests: 4737/);
-  assert.match(doc, /pass: 4707/);
-  assert.match(doc, /fail: 30/);
-  assert.match(doc, /duration_ms: 77406\.878/);
+  assert.match(doc, /pass: 4708/);
+  assert.match(doc, /fail: 29/);
+  assert.match(doc, /duration_ms: 74250\.065667/);
+  assert.match(doc, /30\s+failures\s+to\s+29\s+failures/);
+  assert.match(doc, /Nanah vendor runtime session dashboard HTML\s+fingerprint row/);
+  assert.match(doc, /current\s+`html\/tab-view\.html` hash/);
+  assert.match(doc, /line count, byte count, Nanah vendor transport\s+blocks, dashboard Nanah consumer blocks, crypto\/listener\/chunking primitive\s+counts, and missing future session authority remain unchanged/);
   assert.match(doc, /31\s+failures\s+to\s+30\s+failures/);
   assert.match(doc, /manifest permission feature-map source\s+fingerprint row/);
   assert.match(doc, /current browser manifest\s+fingerprints and current `build\.js` fingerprint/);
@@ -261,9 +265,12 @@ test('audit runtime backlog pins the current broad-suite failure family snapshot
     ['native/Nanah/Kids/YTM', '6']
   ];
 
-  assert.match(doc, /Current failing subtests are spread across 20 runtime test files/);
-  assert.match(doc, /filtertube-runtime-current-after-manifest-feature-map-refresh\.tap/);
+  assert.match(doc, /Current failing subtests are spread across 19 runtime test files/);
+  assert.match(doc, /filtertube-runtime-current-after-nanah-session-refresh\.tap/);
   assert.match(doc, /non-exclusive family snapshot/);
+  assert.match(doc, /previous Nanah vendor runtime session dashboard fingerprint row is now\s+retired/);
+  assert.match(doc, /`html\/tab-view\.html` now matches the\s+current dashboard shell hash/);
+  assert.match(doc, /Nanah\s+transport, crypto\/listener\/chunking, dashboard consumer, JSON-filter separation,\s+and future authority gaps remain pinned/);
   assert.match(doc, /previous manifest permission feature-map fingerprint row is now retired/);
   assert.match(doc, /manifest and `build\.js` source fingerprints now\s+match the current release\/build baseline/);
   assert.match(doc, /permission declarations, host\s+scope, runtime consumer counts, `activeTab` absence, and missing feature-map\s+authority remain pinned/);
