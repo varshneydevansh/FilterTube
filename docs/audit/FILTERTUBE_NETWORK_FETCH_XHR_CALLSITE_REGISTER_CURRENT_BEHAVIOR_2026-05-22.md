@@ -18,7 +18,7 @@ subscription import, release-note loading, or first-class JSON filtering.
 ## Source Boundary
 
 ```text
-tracked product JS/JSX/MJS files scanned: 61
+tracked product JS/JSX/MJS files scanned: 67
 tracked product files with network fetch/XHR rows: 6
 network fetch/XHR rows: 29
 request primitive rows: 16

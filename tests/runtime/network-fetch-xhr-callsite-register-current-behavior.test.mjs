@@ -130,7 +130,7 @@ test('network fetch/xhr callsite register is audit-only and source pinned', () =
 
   assert.match(text, /Status: audit-only current-behavior register/);
   assert.match(text, /Runtime behavior is unchanged/);
-  assert.match(text, /tracked product JS\/JSX\/MJS files scanned: 61/);
+  assert.match(text, /tracked product JS\/JSX\/MJS files scanned: 67/);
   assert.match(text, /tracked product files with network fetch\/XHR rows: 6/);
   assert.match(text, /network fetch\/XHR rows: 29/);
   assert.match(text, /request primitive rows: 16/);
@@ -483,7 +483,7 @@ test('network fetch/xhr callsite counts remain source-derived', () => {
   const rows = networkRows();
   const text = doc();
 
-  assert.equal(productScriptFiles().length, 61);
+  assert.equal(productScriptFiles().length, 67);
   assert.equal(rows.length, 29);
   assert.deepEqual(countBy(rows, 'operation'), {
     XMLHttpRequest: 1,

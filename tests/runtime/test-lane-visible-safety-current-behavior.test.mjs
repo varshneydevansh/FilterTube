@@ -180,6 +180,7 @@ test('goal safety surfaces stay bound to focused lane proof tests', () => {
         /json-first-hide-mix-playlists-boundary-current-behavior/,
         /json-first-hide-video-info-boundary-current-behavior/,
         /json-first-hide-watch-playlist-panel-boundary-current-behavior/,
+        /network-fetch-xhr-callsite-register-current-behavior/,
         /shorts-reel-overlay-owner-authority-boundary-current-behavior/,
         /youtube-music-surface-identity-boundary-current-behavior/,
         /ytm-show-sheet-injector-filter-logic-parity-current-behavior/,
@@ -202,6 +203,7 @@ test('goal safety surfaces stay bound to focused lane proof tests', () => {
       tests: [
         /empty-install-performance-current-behavior/,
         /content-control-active-work-matrix-current-behavior/,
+        /network-fetch-xhr-callsite-register-current-behavior/,
         /lifecycle-instance-register-current-behavior/,
         /repo-lifecycle-primitive-coverage-current-behavior/,
         /runtime-diagnostic-logging-policy-matrix-current-behavior/,
