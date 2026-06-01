@@ -100,6 +100,7 @@ test('test lane matrix defines every required lane and npm script', () => {
   assert.equal(pkg.scripts['test:changed'], 'node scripts/run-test-lane.mjs --run-changed');
   assert.equal(pkg.scripts['audit:runtime'], 'node --test tests/runtime/*.test.mjs');
   assert.match(runner, /from '\.\/test-lane-config\.mjs'/);
+  assert.match(driftScript, /from '\.\/test-lane-config\.mjs'/);
   assert.match(config, /export const LANES = Object\.freeze/);
   assert.match(config, /export const FILE_LANE_RULES = Object\.freeze/);
   assert.match(matrix, /npm run test:audit-drift/);
@@ -897,6 +898,7 @@ test('lane-owned audit proof fingerprints do not silently drift', () => {
 
   assert.ok(files.includes('tests/runtime/test-lane-matrix-current-behavior.test.mjs'));
   assert.ok(files.includes('scripts/audit-proof-drift.mjs'));
+  assert.ok(files.includes('scripts/test-lane-config.mjs'));
   assert.deepEqual(drift, []);
   assert.match(matrix, /full audit proof drift inventory/);
   assert.match(matrix, /4704` tests ran, `4547` passed, and `157` failed/);

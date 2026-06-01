@@ -4,7 +4,7 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { LANES } from './run-test-lane.mjs';
+import { LANES } from './test-lane-config.mjs';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -72,6 +72,7 @@ export function laneOwnedProofFiles() {
   const files = new Set([
     'package.json',
     'scripts/run-test-lane.mjs',
+    'scripts/test-lane-config.mjs',
     'scripts/audit-proof-drift.mjs',
     'docs/audit/TEST_LANE_MATRIX.md',
     'tests/runtime/test-lane-matrix-current-behavior.test.mjs'

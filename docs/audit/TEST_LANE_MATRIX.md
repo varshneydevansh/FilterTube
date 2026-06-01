@@ -116,7 +116,7 @@ the audit system itself.
 
 | Guard | Command | Purpose |
 |---|---|---|
-| lane-owned audit proof drift | `npm run test:audit-drift` | Fails when a lane-owned test or proof doc still cites a stale whole-file source fingerprint. This guard also runs inside `npm run test:changed` before focused lanes. |
+| lane-owned audit proof drift | `npm run test:audit-drift` | Fails when a lane-owned test or proof doc still cites a stale whole-file source fingerprint. Its lane-owned scope includes `scripts/test-lane-config.mjs` directly, and this guard also runs inside `npm run test:changed` before focused lanes. |
 | full audit proof drift inventory | `node scripts/audit-proof-drift.mjs --all --report-only` | Reports stale whole-file fingerprints in older audit files/tests that are not yet lane-owned. This is a backlog inventory, not a release blocker. |
 | full historical runtime audit | `npm run audit:runtime` | Runs every historical runtime/current-boundary audit test. This is the broad backlog suite, not the default per-change release lane. |
 
