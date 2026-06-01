@@ -457,9 +457,13 @@ test('smoke lane keeps release confidence broad but bounded', () => {
   assert.match(smoke, /active-rule-authority-current-behavior/);
   assert.match(smoke, /filter-engine-current-behavior/);
   assert.match(smoke, /main-profile-blocklist-keyword-alias-current-behavior/);
+  assert.match(smoke, /json-first-whitelist-decision-identity-boundary-current-behavior/);
+  assert.match(smoke, /content-bridge-whitelist-pending-refresh-boundary-current-behavior/);
+  assert.match(smoke, /main-watch-autoplay-video-endpoint-current-behavior/);
   assert.match(smoke, /storage-refresh-force-reprocess-coalescing-current-behavior/);
   assert.match(smoke, /native-dropdown-close-state-current-behavior/);
   assert.match(smoke, /quick-block-block-menu-affordance-boundary-current-behavior/);
+  assert.match(smoke, /dom-state-virtual-attributes-current-behavior/);
   assert.match(smoke, /empty-install-performance-current-behavior/);
   assert.match(smoke, /public-release-surface-current-behavior/);
   assert.match(smoke, /release-live-youtube-spa-smoke-boundary-current-behavior/);
@@ -619,6 +623,22 @@ test('user-reported regression anchors stay bound to proof lanes', () => {
   assert.ok(
     LANES.dom.tests.some(testPath => /dom-state-virtual-attributes/.test(testPath)),
     'issue #59 DOM fingerprint proof must stay in DOM lane'
+  );
+  assert.ok(
+    LANES.smoke.tests.some(testPath => /json-first-whitelist-decision-identity-boundary/.test(testPath)),
+    'issue #55/#56 whitelist identity sentinel must stay in smoke lane'
+  );
+  assert.ok(
+    LANES.smoke.tests.some(testPath => /content-bridge-whitelist-pending-refresh-boundary/.test(testPath)),
+    'issue #55 pending refresh sentinel must stay in smoke lane'
+  );
+  assert.ok(
+    LANES.smoke.tests.some(testPath => /main-watch-autoplay-video-endpoint/.test(testPath)),
+    'issue #57 autoplay endpoint sentinel must stay in smoke lane'
+  );
+  assert.ok(
+    LANES.smoke.tests.some(testPath => /dom-state-virtual-attributes/.test(testPath)),
+    'issue #59 virtual attribute sentinel must stay in smoke lane'
   );
 });
 
