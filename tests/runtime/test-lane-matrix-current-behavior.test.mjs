@@ -271,6 +271,14 @@ test('executable classifier maps high-risk paths to required lanes', () => {
     'docs/audit/FILTERTUBE_NETWORK_CREDENTIAL_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md',
     'docs/audit/FILTERTUBE_NETWORK_FETCH_XHR_CALLSITE_REGISTER_CURRENT_BEHAVIOR_2026-05-22.md'
   ]).lanes, ['json', 'performance', 'smoke']);
+  const messageDispatchDoc = classifyPaths([
+    'docs/audit/FILTERTUBE_CONTENT_BRIDGE_MAIN_WORLD_MESSAGE_DISPATCH_BOUNDARY_CURRENT_BEHAVIOR_2026-05-23.md'
+  ]);
+  assert.equal(
+    messageDispatchDoc.classifications[0].matched.some(match => match.id === 'audit-performance-proof-doc'),
+    false,
+    'DISPATCH must not be classified as SPA performance proof by substring match'
+  );
   assert.deepEqual(classifyPaths([
     'docs/audit/FILTERTUBE_STALE_ALIAS_FALSE_HIDE_CHAIN_2026-05-20.md',
     'docs/audit/FILTERTUBE_LIST_MODE_TRANSITION_PERSISTENCE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-22.md'
