@@ -57,7 +57,7 @@ remains open.
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_COLLECTOR_SIDE_EFFECT_BUDGET_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 12 side-effect rows exist; 0 side-effect budgets are approved. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_COLLECTOR_FIXTURE_PROVENANCE_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 12 fixture provenance rows exist; 0 fixture packets are approved. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_COLLECTOR_PARITY_ROLLOUT_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | 12 parity/rollout rows exist; 0 parity rollout proofs are approved. |
-| `docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 21 diagnostic source files and 418 active `console.*` callsites are pinned, but no first-class diagnostic privacy authority exists. |
+| `docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 21 diagnostic source files and 419 active `console.*` callsites are pinned, but no first-class diagnostic privacy authority exists. |
 
 ## Current Counts
 
@@ -228,7 +228,7 @@ Diagnostic privacy closure rows:
 | --- | --- | --- | --- | --- |
 | `FT-DIAGNOSTIC-PRIVACY-CLOSURE-00-packet-binding` | `FT-DIAGNOSTIC-PRIVACY-00-packet-binding` | `packetBinding` | Side-effect budget, no-work preservation, metric sample, packet manifest, foundation packet, candidate, obligation, and method semantic proof rows. | Chain linked; committed diagnostic privacy artifact and complete callable semantic proof missing. |
 | `FT-DIAGNOSTIC-PRIVACY-CLOSURE-01-artifact-binding` | `FT-DIAGNOSTIC-PRIVACY-01-artifact-binding` | `artifactBinding` | Artifact path boundary, packet manifest, metric sample, side-effect, diagnostic privacy, and verification output paths. | Chain linked; artifact root creation and artifact file promotion remain blocked. |
-| `FT-DIAGNOSTIC-PRIVACY-CLOSURE-02-console-inventory` | `FT-DIAGNOSTIC-PRIVACY-02-console-inventory` | `consoleInventory` | Diagnostic logging policy rows for 21 source files and 418 active console callsites. | Chain linked; runtime diagnostic privacy authority and machine-readable diagnostic artifact missing. |
+| `FT-DIAGNOSTIC-PRIVACY-CLOSURE-02-console-inventory` | `FT-DIAGNOSTIC-PRIVACY-02-console-inventory` | `consoleInventory` | Diagnostic logging policy rows for 21 source files and 419 active console callsites. | Chain linked; runtime diagnostic privacy authority and machine-readable diagnostic artifact missing. |
 | `FT-DIAGNOSTIC-PRIVACY-CLOSURE-03-owner-reason-scope` | `FT-DIAGNOSTIC-PRIVACY-03-owner-reason-scope` | `ownerReasonScope` | Log owner, callable proof, route, surface, profile, list-mode, user-action, network, and storage reason rows. | Chain linked; approved log owner/reason scope and callable proof missing. |
 | `FT-DIAGNOSTIC-PRIVACY-CLOSURE-04-privacy-class` | `FT-DIAGNOSTIC-PRIVACY-04-privacy-class` | `privacyClass` | Identity, import, URL, profile, channel id, handle, and collaborator payload policy rows. | Chain linked; committed payload privacy classification and leak fixture missing. |
 | `FT-DIAGNOSTIC-PRIVACY-CLOSURE-05-redaction-policy` | `FT-DIAGNOSTIC-PRIVACY-05-redaction-policy` | `redactionPolicy` | Redacted field, negative leak fixture, channel id, handle, URL, and import summary redaction rows. | Chain linked; redaction proof and negative leak fixture missing. |
@@ -401,7 +401,7 @@ bind this diagnostic privacy contract to source-locus ownership without
 creating `diagnostic-privacy.json`, artifacts, runtime collectors, logging
 removal changes, or optimization behavior. The addendum pins 12 source-locus
 diagnostic privacy boundary rows, 12 diagnostic privacy contract rows covered,
-21 diagnostic logging policy source files covered, 418 active console
+21 diagnostic logging policy source files covered, 419 active console
 callsites covered, 35 current diagnostic privacy anchors covered, 0 committed
 diagnostic privacy files, 0 runtime source-owner approvals, 0 runtime metric
 collector approvals, 0 implementation-ready source-locus diagnostic privacy
@@ -420,7 +420,7 @@ prove the future `diagnostic-privacy.json` contract is not runtime diagnostic
 privacy approval. The addendum pins 12 collector diagnostic privacy approval
 boundary rows, 12 diagnostic privacy contract rows covered, 12 source-locus
 diagnostic privacy rows covered, 21 diagnostic logging policy source files
-covered, 418 active console callsites covered, 63 method semantic proof gap
+covered, 419 active console callsites covered, 63 method semantic proof gap
 files covered, 5,473 lexical callables still requiring semantic proof, 0 files
 with complete per-callable semantic proof, 0 runtime source-owner approvals, 0
 runtime metric collector approvals, 0 runtime collector insertion points

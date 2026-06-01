@@ -32,7 +32,7 @@ Implementation-ready collector insertion rows: 0
 | `docs/audit/FILTERTUBE_CANDIDATE_OBLIGATION_BINDING_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 10 binding rows, 0 metric-backed bindings, and 0 implementation-ready bindings. |
 | `docs/audit/FILTERTUBE_P0_OPTIMIZATION_ROUTE_SURFACE_METRIC_FIXTURE_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 12 route/surface metric fixture obligations define the disabled, empty, active, whitelist, lifecycle, and diagnostic scenarios to preserve. |
 | `docs/audit/FILTERTUBE_P0_OPTIMIZATION_METRIC_WORK_DECISION_AUTHORITY_CURRENT_BEHAVIOR_2026-05-24.md` | 6 P0 authority rows remain missing before optimization or collector work. |
-| `docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 418 active console callsites remain source-scattered without one privacy or metric-replacement policy. |
+| `docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 419 active console callsites remain source-scattered without one privacy or metric-replacement policy. |
 | `docs/audit/FILTERTUBE_P0_NO_WORK_CURRENT_BEHAVIOR_2026-05-18.md` | No-work fixtures currently pin clone, parse, stringify, harvest, and processData work that future counters must not accidentally preserve or increase. |
 
 ## Current Counts

@@ -33,7 +33,7 @@ that runner so npm commands and lane contents share one source of truth.
 | json | `npm run test:json` | JSON-first filtering, network interception, response mutation, endpoint admission, and list-mode gates. |
 | dom | `npm run test:dom` | DOM fallback selectors, hide/restore state, cleanup passes, recycled nodes, and route cleanup. |
 | menu | `npm run test:menu` | 3-dot menu, quick-block, collaborator menus, native dropdown close state, and affordance gates. |
-| performance | `npm run test:performance` | Empty/no-rule work budgets, disabled mode, active-rule gates, SPA lag guards, and identity work budgets. |
+| performance | `npm run test:performance` | Empty/no-rule work budgets, disabled mode, active-rule gates, SPA lag guards, identity work budgets, and production console logging gates. |
 | settings | `npm run test:settings` | Settings compile, profiles, storage refresh, migrations, import/export, backups, and sync boundaries. |
 | smoke | `npm run test:smoke` | Small release confidence lane for common lag, blocking, menu, and release-surface regressions. |
 
@@ -125,7 +125,7 @@ the surface connected to a focused lane.
 | quick-block and 3-dot menus | `test:menu` keeps `quick-block-block-menu-affordance-boundary`, `native-dropdown-close-state`, and `content-bridge-collaborator-identity-promotion-handoff` in lane. |
 | JSON-first filtering | `test:json` keeps seed/network, readiness, snapshot, list-mode, and response-mutation tests in lane. |
 | DOM fallback | `test:dom` keeps DOM fallback selector, CSS hide authority, quarantined content CSS package boundary, run-state cleanup, virtual-attribute, and route cleanup tests in lane. |
-| no-rule performance | `test:performance` keeps empty-install, no-work, active-rule, and route-surface budget tests in lane. |
+| no-rule performance | `test:performance` keeps empty-install, no-work, active-rule, diagnostic logging policy, and route-surface budget tests in lane. |
 | SPA navigation | `test:performance` keeps whitelist-cache SPA metric and route-surface no-work tests in lane; live SPA rows remain in manual smoke. |
 | settings | `test:settings` keeps settings-mode, refresh fanout, compiled-cache, import/export, and state-manager tests in lane. |
 | release packaging | `test:release` keeps package parity, public release surface, live-smoke boundary, and artifact claim tests in lane. |
@@ -174,7 +174,7 @@ Manual smoke scope by touched behavior:
 
 | Touched behavior | Manual smoke observation |
 |---|---|
-| no-rule/no-work performance | Empty blocklist and whitelist: Home, Search, Watch, Shorts, and repeated SPA navigation stay snappy; no visible forced-refresh loop; production console has no unclassified severe FilterTube errors. |
+| no-rule/no-work performance | Empty blocklist and whitelist: Home, Search, Watch, Shorts, and repeated SPA navigation stay snappy; no visible forced-refresh loop; production routine console logging stays gated unless debug is enabled and has no unclassified severe FilterTube errors. |
 | blocklist keyword/channel hiding | Temporary keyword and channel rules hide matching Home/Search/Watch/right-rail cards after the expected identity decision; unrelated cards remain visible. |
 | whitelist-only mode | Allowed channel cards remain usable; non-whitelisted Home/Search/Watch/right-rail cards do not leak after SPA navigation or cache reuse. |
 | Shorts behavior | Shorts remain visible when the Shorts hide setting is disabled, including whitelisted channel Shorts tabs. |

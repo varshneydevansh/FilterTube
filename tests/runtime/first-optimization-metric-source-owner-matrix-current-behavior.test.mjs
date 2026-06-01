@@ -153,7 +153,7 @@ test('first optimization metric source-owner matrix is backed by current metric 
   assert.match(routeSurfaceMetric, /parseCount/);
   assert.match(routeSurfaceMetric, /diagnosticLogCount/);
 
-  assert.match(diagnostic, /active console callsites: 418/);
+  assert.match(diagnostic, /active console callsites: 419/);
   assert.match(credential, /fetch callsites with explicit credentials: 11/);
 });
 

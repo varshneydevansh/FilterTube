@@ -32,7 +32,7 @@ Implementation-ready collector side-effect rows: 0
 | `docs/audit/FILTERTUBE_P0_OPTIMIZATION_ROUTE_SURFACE_METRIC_FIXTURE_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 12 route/surface metric fixture obligations define parse, listener, observer, timer, network, storage, hide, restore, and diagnostic side-effect columns. |
 | `docs/audit/FILTERTUBE_JSON_FIRST_ACTIVE_WORK_PREDICATE_REGISTER_CURRENT_BEHAVIOR_2026-05-22.md` | Endpoint, engine, DOM fallback, fallback menu, quick-block, and category metadata active-work predicates remain separate. |
 | `docs/audit/FILTERTUBE_NETWORK_CREDENTIAL_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 13 scoped product fetch callsites, 11 explicit credential options, and 0 first-class credential policy authority. |
-| `docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 418 active console callsites remain source-scattered without one diagnostic privacy, redaction, or metric-replacement policy. |
+| `docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 419 active console callsites remain source-scattered without one diagnostic privacy, redaction, or metric-replacement policy. |
 | `docs/audit/FILTERTUBE_P0_OPTIMIZATION_METRIC_WORK_DECISION_AUTHORITY_CURRENT_BEHAVIOR_2026-05-24.md` | 6 P0 authority rows remain missing, including lifecycle owner work decision and diagnostic measurement policy. |
 
 ## Current Counts

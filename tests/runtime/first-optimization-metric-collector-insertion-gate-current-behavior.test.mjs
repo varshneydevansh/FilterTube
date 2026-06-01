@@ -177,7 +177,7 @@ test('first optimization metric collector insertion gate is backed by current me
   assert.match(p0Gate, /P0 rows with metric artifact authority: 0/);
   assert.match(p0Gate, /P0 rows with unified work decision authority: 0/);
 
-  assert.match(diagnostic, /active console callsites: 418/);
+  assert.match(diagnostic, /active console callsites: 419/);
   assert.match(noWork, /P0 no-work family is green for seed network pass-through fixtures/);
   assert.match(noWork, /Runtime behavior changed on 2026-05-26/);
 });

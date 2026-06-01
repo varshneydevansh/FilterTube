@@ -191,7 +191,7 @@ test('first optimization collector side-effect matrix is backed by current side-
   assert.match(network, /product fetch callsites in scoped files: 13/);
   assert.match(network, /fetch callsites with explicit credentials: 11/);
 
-  assert.match(diagnostic, /active console callsites: 418/);
+  assert.match(diagnostic, /active console callsites: 419/);
   assert.match(p0Gate, /P0 rows with unified work decision authority: 0/);
 });
 

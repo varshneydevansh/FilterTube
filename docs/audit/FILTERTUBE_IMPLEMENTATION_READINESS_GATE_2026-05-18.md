@@ -834,7 +834,7 @@ Diagnostic logging convergence boundary - 2026-05-30:
   exposure, JSON decision diagnostics, build/release diagnostics, metric
   replacement blockers, and missing runtime authority symbols into one
   audit-only convergence boundary. It pins 10 diagnostic logging convergence
-  rows, 21 diagnostic logging policy source files, 418 active console
+  rows, 21 diagnostic logging policy source files, 419 active console
   callsites, 9 diagnostic source-flow rows, 0 implementation-ready diagnostic
   logging convergence rows, source-derived ASCII and Mermaid diagrams, and
   keeps logging cleanup, diagnostic metric replacement, privacy/redaction

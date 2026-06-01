@@ -183,7 +183,7 @@ function assertReadinessGateLinksCurrentYouTubeSpaHotTimerAudit() {
   assert.ok(doc.includes('docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md'));
   assert.ok(doc.includes('tests/runtime/runtime-diagnostic-logging-policy-matrix-current-behavior.test.mjs'));
   assert.match(doc, /This addendum joins console inventory, diagnostic source-flow rows, debug\s+gate and relay ownership, direct console paths, identity\/import privacy\s+exposure, JSON decision diagnostics, build\/release diagnostics, metric\s+replacement blockers, and missing runtime authority symbols into one\s+audit-only convergence boundary/);
-  assert.match(doc, /It pins 10 diagnostic logging convergence\s+rows, 21 diagnostic logging policy source files, 418 active console\s+callsites, 9 diagnostic source-flow rows, 0 implementation-ready diagnostic\s+logging convergence rows/);
+  assert.match(doc, /It pins 10 diagnostic logging convergence\s+rows, 21 diagnostic logging policy source files, 419 active console\s+callsites, 9 diagnostic source-flow rows, 0 implementation-ready diagnostic\s+logging convergence rows/);
   assert.match(doc, /keeps logging cleanup, diagnostic metric replacement, privacy\/redaction\s+promotion, whitelist\/cache optimization, JSON-first promotion, release\s+claims, and `diagnosticLoggingConvergenceAuthority` implementation at\s+`NO-GO`/);
   assert.match(doc, /Production console gate coverage reconciliation - 2026-05-31/);
   assert.match(doc, /pins 3 runtime console\s+gate owner files \(`js\/background\.js`, `js\/content\/dom_fallback\.js`, and\s+`js\/content_bridge\.js`\)/);

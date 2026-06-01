@@ -2844,7 +2844,7 @@ inline diagnostic privacy JSON sections, 12 side-effect budget contract rows,
 source owner map contract rows, 12 metric sample contract rows, 12 manifest
 contract rows, 10 artifact path boundary rows, 12 foundation packet rows, 12
 metric schema rows, 12 metric source-owner rows, 5 collector readiness
-families, 21 diagnostic logging policy source files, 418 active console
+families, 21 diagnostic logging policy source files, 419 active console
 callsites, 63 method semantic proof gap files, and 5,473 lexical callables,
 while keeping runtime diagnostic privacy closure approvals 0,
 implementation-ready diagnostic privacy closure rows 0, diagnostic privacy
@@ -3872,7 +3872,7 @@ extend the gap register from diagnostic source-flow proof into one audit-only
 diagnostic logging convergence boundary without approving logging cleanup,
 metric replacement, runtime collectors, or product runtime changes. The
 continuation pins 10 diagnostic logging convergence rows, 21 diagnostic
-logging policy source files, 418 active console callsites, 9 diagnostic
+logging policy source files, 419 active console callsites, 9 diagnostic
 source-flow rows, source-derived ASCII/Mermaid convergence diagrams, and 0
 implementation-ready diagnostic logging convergence rows. It joins console
 inventory, hot runtime file cost, level split, relay/direct console paths,

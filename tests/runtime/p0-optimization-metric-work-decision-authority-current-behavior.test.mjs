@@ -118,7 +118,7 @@ test('P0 authority rows are backed by existing priority metric active-work list-
   assert.match(listMode, /empty whitelist mode removes the same renderer/);
   assert.match(listMode, /unknown `listMode` falls back to blocklist/);
 
-  assert.match(diagnostic, /active console callsites: 418/);
+  assert.match(diagnostic, /active console callsites: 419/);
   assert.match(diagnostic, /console\.log callsites: 203/);
   assert.match(diagnostic, /console\.warn callsites: 123/);
 });

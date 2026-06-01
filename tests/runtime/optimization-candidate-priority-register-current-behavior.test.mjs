@@ -283,7 +283,7 @@ test('optimization rows are backed by current source anchors and diagnostic coun
 
   assert.match(metric, /performance\.now callsites: 0/);
   assert.match(metric, /Date\.now callsites: 82/);
-  assert.match(diagnostic, /active console callsites: 418/);
+  assert.match(diagnostic, /active console callsites: 419/);
   assert.match(diagnostic, /\| `js\/content_bridge\.js` \| 114 \| 46 \| 14 \| 8 \| 0 \| 182 \|/);
   assert.match(diagnostic, /\| `js\/background\.js` \| 49 \| 28 \| 12 \| 13 \| 0 \| 102 \|/);
 });

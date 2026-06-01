@@ -29,7 +29,7 @@ and website code. Lines whose trimmed text begins with `//` are excluded.
 
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `build.js` | 686 | 24689 | `f6778ce29f1d7f520a66ab689f8c1a2999e5887ffa8c53bd5039f4976b2671b6` |
+| `build.js` | 728 | 26641 | `7ef8a2fd6796ec6758d7724544469a623d7c2d9407247a12b482e1f55cdc243b` |
 | `js/background.js` | 6320 | 285103 | `77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad` |
 | `js/content/block_channel.js` | 3175 | 127396 | `1b6fffa249a746c01686df0d6a05dc4b770a6f0c5ded08b78a7043c11e9cdd83` |
 | `js/content/bridge_settings.js` | 651 | 26462 | `c7828acd09941f4559e47b31ea57d184ef9367ae4964598e865b8a196934e75b` |
@@ -55,9 +55,9 @@ and website code. Lines whose trimmed text begins with `//` are excluded.
 
 ```text
 diagnostic logging policy matrix source files: 21
-active console callsites: 418
+active console callsites: 419
 console.log callsites: 203
-console.warn callsites: 123
+console.warn callsites: 124
 console.error callsites: 68
 console.debug callsites: 24
 console.info callsites: 0
@@ -66,11 +66,26 @@ runtime behavior changed by 2026-05-30 content bridge console gate: yes
 not completion proof for diagnostic logging policy authority
 ```
 
+## Build Warning Rebaseline - 2026-06-01
+
+The current-source inventory was rebaselined after the release artifact helper
+grew one additional `console.warn` path in `build.js`. This is build/release
+script output, not YouTube page runtime work. It changes the diagnostic
+inventory from 418 to 419 active `console.*` callsites and the warning count
+from 123 to 124.
+
+```text
+runtime behavior changed by build warning rebaseline: no
+YouTube SPA console quiet behavior changed: no
+production console gate status: unchanged
+diagnostic logging cleanup approval: NO-GO
+```
+
 ## Console Callsite Matrix
 
 | File | `log` | `warn` | `error` | `debug` | `info` | Total |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| `build.js` | 14 | 5 | 8 | 0 | 0 | 27 |
+| `build.js` | 14 | 6 | 8 | 0 | 0 | 28 |
 | `js/background.js` | 49 | 28 | 12 | 13 | 0 | 102 |
 | `js/content/block_channel.js` | 1 | 3 | 5 | 0 | 0 | 9 |
 | `js/content/bridge_settings.js` | 3 | 3 | 0 | 0 | 0 | 6 |
@@ -91,7 +106,7 @@ not completion proof for diagnostic logging policy authority
 | `scripts/build-extension-ui.mjs` | 0 | 0 | 2 | 0 | 0 | 2 |
 | `scripts/build-nanah-vendor.mjs` | 0 | 0 | 2 | 0 | 0 | 2 |
 | `scripts/sync-native-runtime.mjs` | 1 | 0 | 5 | 0 | 0 | 6 |
-| **Total** | **203** | **123** | **68** | **24** | **0** | **418** |
+| **Total** | **203** | **124** | **68** | **24** | **0** | **419** |
 
 ## Owner Family Totals
 
@@ -99,7 +114,7 @@ not completion proof for diagnostic logging policy authority
 | --- | ---: |
 | `page-runtime-core` | 196 |
 | `background-storage-state` | 131 |
-| `build-release-sync-scripts` | 37 |
+| `build-release-sync-scripts` | 38 |
 | `content-helper` | 28 |
 | `extension-ui` | 22 |
 | `quarantined-legacy` | 4 |
@@ -236,8 +251,8 @@ maps this logging matrix into current source-locus diagnostic privacy ownership
 without approving logging removal, runtime collectors, metric artifacts, or
 optimization behavior. The addendum pins 12 source-locus diagnostic privacy
 boundary rows, 12 diagnostic privacy contract rows covered, 21 diagnostic
-logging policy source files covered, 418 active console callsites covered, 203
-console.log callsites covered, 123 console.warn callsites covered, 68
+logging policy source files covered, 419 active console callsites covered, 203
+console.log callsites covered, 124 console.warn callsites covered, 68
 console.error callsites covered, 24 console.debug callsites covered, 0
 console.info callsites covered, 196 page-runtime-core callsites covered, 131
 background-storage-state callsites covered, 35 current diagnostic privacy
@@ -359,7 +374,7 @@ authority symbols into one audit-only gate for future optimization work.
 
 ```text
 console inventory
-  21 source files, 418 active console callsites
+  21 source files, 419 active console callsites
         |
         v
 diagnostic source flow
@@ -391,9 +406,9 @@ flowchart TD
 
 | Convergence row | Current evidence | Missing authority before behavior changes |
 | --- | --- | --- |
-| `diagnostic_convergence_inventory` | 21 scoped source files and 418 active `console.*` callsites are source-counted. | Approved inventory owner and update policy for release-critical diagnostics. |
+| `diagnostic_convergence_inventory` | 21 scoped source files and 419 active `console.*` callsites are source-counted. | Approved inventory owner and update policy for release-critical diagnostics. |
 | `diagnostic_convergence_hot_runtime_files` | `js/content_bridge.js` has 182 callsites and `js/background.js` has 102 callsites. | Hot-file console budget tied to route, surface, list mode, and user action. |
-| `diagnostic_convergence_level_split` | Current levels are 203 `log`, 123 `warn`, 68 `error`, 24 `debug`, and 0 `info`. | Level policy that separates debug-only cost from warning/error evidence. |
+| `diagnostic_convergence_level_split` | Current levels are 203 `log`, 124 `warn`, 68 `error`, 24 `debug`, and 0 `info`. | Level policy that separates debug-only cost from warning/error evidence. |
 | `diagnostic_convergence_source_flow` | 9 source-flow rows map seed, injector, filter logic, bridge, background, import/export, quick/menu, and build scripts. | One owner decision report spanning relay paths and direct console paths. |
 | `diagnostic_convergence_identity_privacy` | Bridge/background logs can include channel IDs, handles, names, URLs, collaborator data, and profile/list context. | Privacy class and redaction proof before metric or release use. |
 | `diagnostic_convergence_json_decision` | Seed, injector, and filter logic diagnostics describe JSON admission, replay, renderer decisions, and whitelist filtering. | JSON-first metric replacement report instead of console-only evidence. |
@@ -405,7 +420,7 @@ flowchart TD
 ```text
 diagnostic logging convergence rows: 10
 diagnostic logging policy source files covered by convergence: 21
-active console callsites covered by convergence: 418
+active console callsites covered by convergence: 419
 diagnostic source-flow rows covered by convergence: 9
 implementation-ready diagnostic logging convergence rows: 0
 runtime diagnostic logging convergence approvals: 0

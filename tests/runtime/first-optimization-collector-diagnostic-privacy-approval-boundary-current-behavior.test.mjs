@@ -206,7 +206,7 @@ test('collector diagnostic privacy approval is backed by current NO-GO gates', (
   assert.match(diagnosticPrivacy, /implementation-ready diagnostic privacy contract rows: 0/);
   assert.match(sourceLocusDiagnostic, /implementation-ready source-locus diagnostic privacy rows: 0/);
   assert.match(sourceLocusDiagnostic, /commit diagnostic-privacy\.json now: NO-GO/);
-  assert.match(loggingPolicy, /active console callsites: 418/);
+  assert.match(loggingPolicy, /active console callsites: 419/);
   assert.match(loggingPolicy, /not completion proof for diagnostic logging policy authority/);
   assert.match(collectorFixtureApproval, /runtime collector fixture provenance approval now: NO-GO/);
   assert.match(collectorFixtureApproval, /method semantic proof gap files covered: 63/);

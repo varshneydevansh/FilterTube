@@ -12282,7 +12282,7 @@ test('active goal completion audit records content-filter route surface converge
   assert.ok(source.includes('docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md'));
   assert.ok(source.includes('tests/runtime/runtime-diagnostic-logging-policy-matrix-current-behavior.test.mjs'));
   assert.match(source, /pins 10 diagnostic logging convergence rows across console\s+inventory, hot runtime files, level split, source flow, identity privacy, JSON\s+decision diagnostics, no-work logging budget, release\/build diagnostics,\s+metric-foundation handoff, and authority absence/);
-  assert.match(source, /21 diagnostic\s+logging policy source files, 418 active console callsites, 9 diagnostic\s+source-flow rows/);
+  assert.match(source, /21 diagnostic\s+logging policy source files, 419 active console callsites, 9 diagnostic\s+source-flow rows/);
   assert.match(source, /0\s+implementation-ready diagnostic logging convergence rows/);
   assert.match(source, /source absence\s+for `diagnosticLoggingConvergenceAuthority`,\s+`diagnosticLoggingConvergenceReport`, `diagnosticLogWorkBudget`,\s+`diagnosticMetricReplacementAuthority`, and\s+`diagnosticPrivacyRedactionAuthority`/);
   assert.match(source, /Diagnostic logging cleanup, diagnostic\s+metric replacement, privacy\/redaction promotion, whitelist\/cache optimization,\s+JSON-first promotion, release\/public-claim use, and\s+`update_goal\(status='complete'\)` remain `NO-GO`/);

@@ -273,7 +273,7 @@ covered, 12 source-locus fingerprint rows covered, 12 source-locus teardown
 rows covered, 12 source-locus no-work rows covered, 12 source-locus
 side-effect rows covered, 12 source-locus fixture provenance rows covered, 12
 diagnostic privacy contract rows covered, 21 diagnostic logging policy source
-files covered, 418 active console callsites covered, 196 page-runtime-core
+files covered, 419 active console callsites covered, 196 page-runtime-core
 callsites covered, 131 background-storage-state callsites covered, 35 current
 diagnostic privacy anchors covered, 0 committed diagnostic privacy files, 0
 runtime source-owner approvals, 0 runtime metric collector approvals, 0 runtime

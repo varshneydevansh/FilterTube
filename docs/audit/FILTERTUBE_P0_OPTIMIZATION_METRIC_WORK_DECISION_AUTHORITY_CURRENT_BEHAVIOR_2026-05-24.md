@@ -28,7 +28,7 @@ fixtures, side effects, and metric artifacts.
 | `docs/audit/FILTERTUBE_JSON_FIRST_METRIC_ARTIFACT_GATE_CURRENT_BEHAVIOR_2026-05-22.md` | Runtime scope has 0 `performance.now()` callsites, 0 `console.time()` callsites, 82 `Date.now()` callsites, 82 `setTimeout` callsites, and no first-class metric artifact report. |
 | `docs/audit/FILTERTUBE_JSON_FIRST_ACTIVE_WORK_PREDICATE_REGISTER_CURRENT_BEHAVIOR_2026-05-22.md` | Seed, filter engine, DOM fallback, fallback menu, quick-block, and category metadata use separate active-work predicates. |
 | `docs/audit/FILTERTUBE_JSON_FIRST_LIST_MODE_MATRIX_BOUNDARY_CURRENT_BEHAVIOR_2026-05-22.md` | Disabled mode harvests first, empty blocklist preserves, empty whitelist fail-closes, unknown mode falls back to blocklist, and conflicts are mode-local. |
-| `docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 418 active `console.*` callsites exist without a first-class diagnostic privacy, redaction, no-work, or metric-replacement policy. |
+| `docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 419 active `console.*` callsites exist without a first-class diagnostic privacy, redaction, no-work, or metric-replacement policy. |
 
 ## Current Counts
 
@@ -51,7 +51,7 @@ not completion proof for optimization authority
 | Harvest versus mutation decision | `processData()` harvests before the disabled skip; seed skip branches can call `harvestOnly()`. | Removing harvest can break learned identity and menu actions; preserving it blindly keeps disabled/no-rule cost. | `jsonFirstHarvestMutationDecision` separating disabled, no-rule harvest, map-write provenance, and mutation-free pass-through. |
 | List-mode and whitelist work decision | Empty blocklist, empty whitelist, unknown mode, blocklist-with-whitelist rows, and whitelist-with-blocklist rows have distinct current behavior. | Recent whitelist optimization cannot be safe while empty whitelist false-hide, dormant block rows, and conflict precedence are local branch behavior. | `jsonFirstListModeWorkDecision` with empty blocklist, empty whitelist, unknown mode, conflict, comments, and simultaneous allow/block policies. |
 | Lifecycle owner work decision | DOM fallback, fallback menu, quick-block, category metadata, prefetch, and pending whitelist work have separate predicates and timers. | JSON-first endpoint savings can be erased by page-resident observers/listeners/timers or by deleting sparse-surface fallback work too early. | `jsonFirstLifecycleWorkDecision` with DOM/menu/quick/category owner budgets, pause policy, teardown policy, and DOM parity fixtures. |
-| Diagnostic measurement policy | 418 active console callsites include page-runtime, background identity repair, JSON filter, import/export, and build/release diagnostics. | Console diagnostics can distort optimization measurements and expose identity/import data while metrics are being collected. | `jsonFirstDiagnosticMeasurementPolicy` with debug gates, privacy class, redaction, console budget, and metric replacement report. |
+| Diagnostic measurement policy | 419 active console callsites include page-runtime, background identity repair, JSON filter, import/export, and build/release diagnostics. | Console diagnostics can distort optimization measurements and expose identity/import data while metrics are being collected. | `jsonFirstDiagnosticMeasurementPolicy` with debug gates, privacy class, redaction, console budget, and metric replacement report. |
 
 ## Minimum Future Report Shape
 

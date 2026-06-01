@@ -220,7 +220,7 @@ test('first optimization metric artifact schema is backed by current gate docume
 
   assert.match(p0Gate, /Metric artifact authority/);
   assert.match(p0Gate, /P0 rows with metric artifact authority: 0/);
-  assert.match(diagnostic, /active console callsites: 418/);
+  assert.match(diagnostic, /active console callsites: 419/);
   assert.match(performanceClaim, /historical performance claims|claim boundary/i);
 });
 

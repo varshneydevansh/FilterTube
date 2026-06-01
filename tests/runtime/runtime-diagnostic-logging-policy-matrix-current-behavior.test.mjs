@@ -8,7 +8,7 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md';
 
 const sourceFingerprints = {
-  'build.js': [686, 24689, 'f6778ce29f1d7f520a66ab689f8c1a2999e5887ffa8c53bd5039f4976b2671b6'],
+  'build.js': [728, 26641, '7ef8a2fd6796ec6758d7724544469a623d7c2d9407247a12b482e1f55cdc243b'],
   'js/background.js': [6320, 285103, '77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad'],
   'js/content/block_channel.js': [3175, 127396, '1b6fffa249a746c01686df0d6a05dc4b770a6f0c5ded08b78a7043c11e9cdd83'],
   'js/content/bridge_settings.js': [651, 26462, 'c7828acd09941f4559e47b31ea57d184ef9367ae4964598e865b8a196934e75b'],
@@ -32,7 +32,7 @@ const sourceFingerprints = {
 };
 
 const expectedConsoleRows = {
-  'build.js': { log: 14, warn: 5, error: 8, debug: 0, info: 0, total: 27 },
+  'build.js': { log: 14, warn: 6, error: 8, debug: 0, info: 0, total: 28 },
   'js/background.js': { log: 49, warn: 28, error: 12, debug: 13, info: 0, total: 102 },
   'js/content/block_channel.js': { log: 1, warn: 3, error: 5, debug: 0, info: 0, total: 9 },
   'js/content/bridge_settings.js': { log: 3, warn: 3, error: 0, debug: 0, info: 0, total: 6 },
@@ -250,7 +250,7 @@ function assertDiagnosticLoggingConvergenceBoundary(doc) {
   assert.match(doc, /flowchart TD/);
   assert.match(doc, /diagnostic logging convergence rows: 10/);
   assert.match(doc, /diagnostic logging policy source files covered by convergence: 21/);
-  assert.match(doc, /active console callsites covered by convergence: 418/);
+  assert.match(doc, /active console callsites covered by convergence: 419/);
   assert.match(doc, /diagnostic source-flow rows covered by convergence: 9/);
   assert.match(doc, /implementation-ready diagnostic logging convergence rows: 0/);
   assert.match(doc, /runtime diagnostic logging convergence approvals: 0/);
@@ -539,7 +539,7 @@ test('runtime diagnostic logging policy matrix is audit-only and source pinned',
   assert.match(doc, /The original 2026-05-24 inventory was audit-only and changed no runtime\s+behavior/);
   assert.match(doc, /2026-05-30 addendum adds a `content_bridge\.js` bootstrap gate\s+for isolated content-script-world `console\.log` and `console\.debug` calls/);
   assert.match(doc, /diagnostic logging policy matrix source files: 21/);
-  assert.match(doc, /active console callsites: 418/);
+  assert.match(doc, /active console callsites: 419/);
   assert.match(doc, /runtime behavior changed by original 2026-05-24 inventory: no/);
   assert.match(doc, /runtime behavior changed by 2026-05-30 content bridge console gate: yes/);
   assert.match(doc, /not completion proof for diagnostic logging policy authority/);
@@ -577,9 +577,9 @@ test('active console callsite counts stay source-derived', () => {
     );
   }
 
-  assert.deepEqual(totals, { log: 203, warn: 123, error: 68, debug: 24, info: 0, total: 418 });
+  assert.deepEqual(totals, { log: 203, warn: 124, error: 68, debug: 24, info: 0, total: 419 });
   assert.match(doc, /console\.log callsites: 203/);
-  assert.match(doc, /console\.warn callsites: 123/);
+  assert.match(doc, /console\.warn callsites: 124/);
   assert.match(doc, /console\.error callsites: 68/);
   assert.match(doc, /console\.debug callsites: 24/);
   assert.match(doc, /console\.info callsites: 0/);
@@ -595,7 +595,7 @@ test('diagnostic owner family totals and hot files remain pinned', () => {
   }
 
   assert.deepEqual(familyTotals, {
-    'build-release-sync-scripts': 37,
+    'build-release-sync-scripts': 38,
     'background-storage-state': 131,
     'content-helper': 28,
     'page-runtime-core': 196,
@@ -608,7 +608,7 @@ test('diagnostic owner family totals and hot files remain pinned', () => {
   for (const phrase of [
     '| `page-runtime-core` | 196 |',
     '| `background-storage-state` | 131 |',
-    '| `build-release-sync-scripts` | 37 |',
+    '| `build-release-sync-scripts` | 38 |',
     '| `content-helper` | 28 |',
     '| `extension-ui` | 22 |',
     '| `quarantined-legacy` | 4 |'
@@ -674,7 +674,7 @@ test('runtime diagnostic logging matrix is linked from audit ledgers and runtime
   for (const artifact of [objectiveLedger, activeGoal, readinessGate, gapRegister]) {
     assert.match(artifact, /diagnostic logging convergence/i);
     assert.match(artifact, /10 diagnostic logging convergence\s+rows/);
-    assert.match(artifact, /418 active console\s+callsites/);
+    assert.match(artifact, /419 active console\s+callsites/);
     assert.match(artifact, /9 diagnostic\s+source-flow\s+rows/);
     assert.match(artifact, /implementation-ready diagnostic\s+logging\s+convergence\s+rows\s+0|0\s+implementation-ready diagnostic\s+logging\s+convergence\s+rows/);
   }

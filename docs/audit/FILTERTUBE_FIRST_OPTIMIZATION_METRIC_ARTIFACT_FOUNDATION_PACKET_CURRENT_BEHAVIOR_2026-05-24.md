@@ -50,7 +50,7 @@ teardown/idempotence, and fixtures.
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_COLLECTOR_FIXTURE_PROVENANCE_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 12 fixture provenance rows exist; 0 fixture packets are approved. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_COLLECTOR_PARITY_ROLLOUT_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | 12 parity/rollout rows exist; 0 parity rollout proofs are approved. |
 | `docs/audit/FILTERTUBE_P0_OPTIMIZATION_ROUTE_SURFACE_METRIC_FIXTURE_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 12 route/surface obligations define the route, endpoint, list-mode, and side-effect columns a packet must cover. |
-| `docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 418 active console callsites exist without one diagnostic privacy, redaction, or metric replacement policy. |
+| `docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 419 active console callsites exist without one diagnostic privacy, redaction, or metric replacement policy. |
 
 ## Current Counts
 

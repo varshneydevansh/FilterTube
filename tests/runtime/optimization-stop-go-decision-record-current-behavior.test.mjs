@@ -307,7 +307,7 @@ test('optimization stop go decision is backed by current dirty priority P0 and m
   assert.match(routeSurfaceMetric, /implementation-ready route\/surface optimization rows: 0/);
   assert.match(routeSurfaceMetric, /FT-METRIC-06-empty-whitelist-main-json/);
 
-  assert.match(diagnostic, /active console callsites: 418/);
+  assert.match(diagnostic, /active console callsites: 419/);
 });
 
 test('optimization stop go decision is backed by JSON-first readiness and settings-mode blockers', () => {

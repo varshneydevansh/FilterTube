@@ -354,7 +354,7 @@ test('diagnostic privacy contract is backed by current side-effect no-work fixtu
   assert.match(fixtureProvenance, /collector fixture provenance rows implementation-ready: 0/);
   assert.match(parityRollout, /collector parity rollout rows implementation-ready: 0/);
   assert.match(diagnosticLoggingPolicy, /diagnostic logging policy matrix source files: 21/);
-  assert.match(diagnosticLoggingPolicy, /active console callsites: 418/);
+  assert.match(diagnosticLoggingPolicy, /active console callsites: 419/);
   assert.match(diagnosticLoggingPolicy, /console\.log callsites: 203/);
   assert.match(diagnosticLoggingPolicy, /not completion proof for diagnostic logging policy authority/);
   assert.match(methodGap, /tracked JS\/JSX\/MJS files: 63/);

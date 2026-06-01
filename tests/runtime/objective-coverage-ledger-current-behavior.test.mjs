@@ -11170,7 +11170,7 @@ test('objective coverage ledger records content-filter route surface convergence
   assert.ok(doc.includes('docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md'));
   assert.ok(doc.includes('tests/runtime/runtime-diagnostic-logging-policy-matrix-current-behavior.test.mjs'));
   assert.match(doc, /extend objective coverage for diagnostic logging, performance-risk, privacy,\s+JSON-first optimization, whitelist\/cache optimization, no-work budgets,\s+release\/build evidence, metric replacement, reliability, false-hide\/leak/);
-  assert.match(doc, /pins\s+10 diagnostic logging convergence rows, 21 diagnostic logging policy source\s+files, 418 active console callsites, 9 diagnostic source-flow rows/);
+  assert.match(doc, /pins\s+10 diagnostic logging convergence rows, 21 diagnostic logging policy source\s+files, 419 active console callsites, 9 diagnostic source-flow rows/);
   assert.match(doc, /runtime diagnostic logging\s+convergence approvals 0, implementation-ready diagnostic logging convergence\s+rows 0/);
   assert.match(doc, /diagnostic logging cleanup approval `NO-GO`, diagnostic metric\s+replacement approval `NO-GO`, diagnostic privacy\/redaction approval `NO-GO`/);
   assert.match(doc, /runtime behavior changed by this continuation: no, and continued audit remains\s+`GO`/);

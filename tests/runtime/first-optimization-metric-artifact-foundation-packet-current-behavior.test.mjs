@@ -155,7 +155,7 @@ test('metric artifact foundation packet is backed by current first optimization 
   assert.match(fixtureProvenance, /collector fixture provenance rows implementation-ready: 0/);
   assert.match(parityRollout, /collector parity rollout rows implementation-ready: 0/);
   assert.match(routeSurfaceMetric, /P0 route\/surface metric fixture obligations: 12/);
-  assert.match(diagnosticLogging, /active console callsites: 418/);
+  assert.match(diagnosticLogging, /active console callsites: 419/);
   assert.match(methodGap, /tracked JS\/JSX\/MJS files: 63/);
   assert.match(methodGap, /repo-wide lexical callables: 5473/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);

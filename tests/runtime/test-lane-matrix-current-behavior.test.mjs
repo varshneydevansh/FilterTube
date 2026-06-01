@@ -465,6 +465,7 @@ test('smoke lane keeps release confidence broad but bounded', () => {
   assert.match(smoke, /quick-block-block-menu-affordance-boundary-current-behavior/);
   assert.match(smoke, /dom-state-virtual-attributes-current-behavior/);
   assert.match(smoke, /empty-install-performance-current-behavior/);
+  assert.match(smoke, /runtime-diagnostic-logging-policy-matrix-current-behavior/);
   assert.match(smoke, /public-release-surface-current-behavior/);
   assert.match(smoke, /release-live-youtube-spa-smoke-boundary-current-behavior/);
   assert.ok(LANES.smoke.checks.includes('build.js'));
@@ -542,7 +543,11 @@ test('goal safety surfaces stay bound to focused lane proof tests', () => {
     {
       surface: 'no-rule performance',
       lane: 'performance',
-      tests: [/empty-install-performance-current-behavior/, /p0-no-work-current-behavior/]
+      tests: [
+        /empty-install-performance-current-behavior/,
+        /runtime-diagnostic-logging-policy-matrix-current-behavior/,
+        /p0-no-work-current-behavior/
+      ]
     },
     {
       surface: 'SPA navigation',

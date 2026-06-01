@@ -60,7 +60,7 @@ rollback, and public-claim limits.
 | --- | --- |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_DIAGNOSTIC_PRIVACY_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md` | Defines the future `diagnostic-privacy.json` contract while proving 0 committed diagnostic privacy files and 0 implementation-ready diagnostic privacy rows. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_SOURCE_LOCUS_DIAGNOSTIC_PRIVACY_OWNERSHIP_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Classifies current diagnostic privacy anchors while proving 0 implementation-ready source-locus diagnostic privacy rows. |
-| `docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | Pins 21 diagnostic source files and 418 active console callsites without first-class diagnostic privacy authority. |
+| `docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | Pins 21 diagnostic source files and 419 active console callsites without first-class diagnostic privacy authority. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_COLLECTOR_FIXTURE_PROVENANCE_APPROVAL_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Proves fixture provenance approval remains absent and cannot be inferred from fixture matrices or contracts. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_COLLECTOR_SIDE_EFFECT_APPROVAL_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Proves side-effect approval remains absent and cannot be inferred from side-effect matrices or contracts. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_COLLECTOR_NO_WORK_APPROVAL_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Proves no-work approval remains absent and cannot be inferred from no-work matrices or contracts. |

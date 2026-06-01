@@ -206,7 +206,7 @@ test('candidate obligation binding matrix is backed by current source docs', () 
 
   assert.match(activeWork, /current predicate anchors: 11/);
   assert.match(activeWork, /interceptor endpoint entries per set: 5/);
-  assert.match(diagnostic, /active console callsites: 418/);
+  assert.match(diagnostic, /active console callsites: 419/);
 });
 
 test('candidate obligation source anchors still show split ownership before implementation', () => {

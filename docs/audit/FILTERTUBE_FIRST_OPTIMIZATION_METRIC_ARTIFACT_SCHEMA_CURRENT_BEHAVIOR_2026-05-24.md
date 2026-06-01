@@ -31,7 +31,7 @@ Implementation-ready metric artifacts: 0
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_PATCH_EVIDENCE_PACKET_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md` | `FT-EVIDENCE-02-metric-artifact` is mandatory before a first optimization patch can change runtime behavior. |
 | `docs/audit/FILTERTUBE_P0_OPTIMIZATION_ROUTE_SURFACE_METRIC_FIXTURE_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 12 route/surface metric fixture obligations define the required route, endpoint, settings-mode, and side-effect columns. |
 | `docs/audit/FILTERTUBE_P0_OPTIMIZATION_METRIC_WORK_DECISION_AUTHORITY_CURRENT_BEHAVIOR_2026-05-24.md` | P0 metric artifact authority and work-decision authority remain missing. |
-| `docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | Diagnostic logging has 418 active console callsites but no privacy/redaction/metric replacement policy. |
+| `docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | Diagnostic logging has 419 active console callsites but no privacy/redaction/metric replacement policy. |
 | `docs/audit/FILTERTUBE_PERFORMANCE_CLAIM_EVIDENCE_BOUNDARY_2026-05-20.md` | Historical performance claims remain claim-boundary evidence, not route/sample/device measurements. |
 
 ## Current Counts

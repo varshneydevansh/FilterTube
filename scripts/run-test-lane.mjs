@@ -167,6 +167,7 @@ export const LANES = Object.freeze({
       'tests/runtime/xhr-no-work-boundary-current-behavior.test.mjs',
       'tests/runtime/performance-claim-evidence-boundary-current-behavior.test.mjs',
       'tests/runtime/identity-work-budget-current-behavior.test.mjs',
+      'tests/runtime/runtime-diagnostic-logging-policy-matrix-current-behavior.test.mjs',
       'tests/runtime/p0-no-work-current-behavior.test.mjs'
     ]
   },
@@ -205,6 +206,7 @@ export const LANES = Object.freeze({
       'tests/runtime/quick-block-block-menu-affordance-boundary-current-behavior.test.mjs',
       'tests/runtime/dom-state-virtual-attributes-current-behavior.test.mjs',
       'tests/runtime/empty-install-performance-current-behavior.test.mjs',
+      'tests/runtime/runtime-diagnostic-logging-policy-matrix-current-behavior.test.mjs',
       'tests/runtime/public-release-surface-current-behavior.test.mjs',
       'tests/runtime/release-live-youtube-spa-smoke-artifact-verifier-current-behavior.test.mjs',
       'tests/runtime/release-live-youtube-spa-smoke-boundary-current-behavior.test.mjs',

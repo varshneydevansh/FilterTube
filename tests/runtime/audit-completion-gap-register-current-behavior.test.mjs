@@ -3103,7 +3103,7 @@ function assertDiagnosticPrivacyDraftClosure(source) {
   assert.match(source, /reserved\s+`docs\/audit\/artifacts\/first-optimization\/metric-foundation\/diagnostic-privacy\.json`\s+file is absent/);
   assert.match(source, /Diagnostic privacy artifact promotion, collector insertion,\s+diagnostic logging removal, JSON-first runtime behavior changes, whitelist/);
   assert.match(source, /closes the diagnostic privacy\s+documentation chain/);
-  assert.match(source, /12 closure rows link all 12 diagnostic privacy rows, 12\s+inline diagnostic privacy JSON sections, 12 side-effect budget contract rows,\s+12 no-work preservation contract rows, 12 fixture provenance contract rows, 12\s+source owner map contract rows, 12 metric sample contract rows, 12 manifest\s+contract rows, 10 artifact path boundary rows, 12 foundation packet rows, 12\s+metric schema rows, 12 metric source-owner rows, 5 collector readiness\s+families, 21 diagnostic logging policy source files, 418 active console\s+callsites, 63 method semantic proof gap files, and 5,473 lexical callables/);
+  assert.match(source, /12 closure rows link all 12 diagnostic privacy rows, 12\s+inline diagnostic privacy JSON sections, 12 side-effect budget contract rows,\s+12 no-work preservation contract rows, 12 fixture provenance contract rows, 12\s+source owner map contract rows, 12 metric sample contract rows, 12 manifest\s+contract rows, 10 artifact path boundary rows, 12 foundation packet rows, 12\s+metric schema rows, 12 metric source-owner rows, 5 collector readiness\s+families, 21 diagnostic logging policy source files, 419 active console\s+callsites, 63 method semantic proof gap files, and 5,473 lexical callables/);
   assert.match(source, /runtime diagnostic privacy closure approvals 0,\s+implementation-ready diagnostic privacy closure rows 0/);
   assert.match(source, /diagnostic privacy\s+draft closure `DIAGNOSTIC-PRIVACY-CHAIN-CLOSED`/);
   assert.match(source, /diagnostic privacy\s+implementation readiness from closure `NO-GO`/);
@@ -4663,7 +4663,7 @@ test('audit completion gap register records content-filter route surface converg
   assert.ok(source.includes('docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md'));
   assert.ok(source.includes('tests/runtime/runtime-diagnostic-logging-policy-matrix-current-behavior.test.mjs'));
   assert.match(source, /extend the gap register from diagnostic source-flow proof into one audit-only\s+diagnostic logging convergence boundary/);
-  assert.match(source, /pins 10 diagnostic logging convergence rows, 21 diagnostic\s+logging policy source files, 418 active console callsites, 9 diagnostic\s+source-flow rows/);
+  assert.match(source, /pins 10 diagnostic logging convergence rows, 21 diagnostic\s+logging policy source files, 419 active console callsites, 9 diagnostic\s+source-flow rows/);
   assert.match(source, /source-derived ASCII\/Mermaid convergence diagrams, and 0\s+implementation-ready diagnostic logging convergence rows/);
   assert.match(source, /joins console\s+inventory, hot runtime file cost, level split, relay\/direct console paths,\s+identity privacy exposure, JSON decision diagnostics, no-work logging budget/);
   assert.match(source, /Diagnostic logging cleanup, diagnostic metric replacement, privacy\/redaction\s+promotion, whitelist\/cache optimization, JSON-first first-class promotion,\s+release\/public-claim use, and broad-audit completion remain `NO-GO`/);

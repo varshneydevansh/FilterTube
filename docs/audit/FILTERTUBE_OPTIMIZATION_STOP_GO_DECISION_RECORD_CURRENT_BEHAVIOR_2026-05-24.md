@@ -39,7 +39,7 @@ fixtures, and one work-decision authority before behavior changes.
 | `docs/audit/FILTERTUBE_JSON_FIRST_FILTER_READINESS_GATE_CURRENT_BEHAVIOR_2026-05-21.md` | JSON-first promotion rows remain blocked; documented JSON paths are not permission to mutate or prune fallback work. |
 | `docs/audit/FILTERTUBE_SETTINGS_MODE_COVERAGE_MATRIX_2026-05-18.md` | Empty whitelist, empty blocklist, disabled mode, content empty values, menu/quick lifecycle, and route modes remain not-ready-for-behavior-change or partial. |
 | `docs/audit/FILTERTUBE_MODE_SURFACE_EFFECT_MATRIX_CURRENT_BEHAVIOR_2026-05-20.md` | Settings mode, rule state, feature flags, route, surface, source tier, and allowed effects are separate decision inputs. |
-| `docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 418 active console callsites remain without a first-class diagnostic measurement policy. |
+| `docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 419 active console callsites remain without a first-class diagnostic measurement policy. |
 
 ## Current Counts
 
