@@ -477,6 +477,11 @@ export const FILE_LANE_RULES = Object.freeze([
     lanes: ['whitelist', 'blocking', 'menu']
   },
   {
+    id: 'audit-list-state-proof-doc',
+    patterns: [/^docs\/audit\/.*(?:ALIAS|LIST_MODE|ROW_LIST_MODE).*\.md$/i],
+    lanes: ['whitelist', 'blocking', 'settings']
+  },
+  {
     id: 'audit-page-lifecycle-proof-doc',
     patterns: [/^docs\/audit\/.*(?:CONTENT_BRIDGE_LIFECYCLE|CONTENT_BRIDGE_STARTUP_TIMING|EMPTY_INSTALL_IDLE_OBSERVER|LIFECYCLE_EFFECT|LIFECYCLE_INSTANCE|LIFECYCLE_OWNER|LIFECYCLE_TEARDOWN|PAGE_RUNTIME_LIFECYCLE|P0_LIFECYCLE|SELECTOR_LIFECYCLE).*\.md$/i],
     lanes: ['dom', 'performance']
@@ -493,7 +498,7 @@ export const FILE_LANE_RULES = Object.freeze([
   },
   {
     id: 'audit-settings-proof-doc',
-    patterns: [/^docs\/audit\/.*(?:SETTING|PROFILE|STORAGE|IMPORT|EXPORT|SYNC|COMPILED).*\.md$/i],
+    patterns: [/^docs\/audit\/.*(?:SETTING|PROFILE|STORAGE|IMPORT|EXPORT|SYNC|COMPILED|BACKUP|NANAH).*\.md$/i],
     lanes: ['settings']
   },
   {

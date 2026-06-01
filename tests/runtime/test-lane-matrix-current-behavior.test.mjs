@@ -161,6 +161,8 @@ test('test lane matrix maps high-risk source files to expected lanes', () => {
     { files: ['js/layout.js'], lanes: ['test:release', 'test:dom', 'test:smoke'] },
     { files: ['js/shared/identity.js', 'js/content/dom_extractors.js', 'js/content/handle_resolver.js'], lanes: ['test:whitelist', 'test:blocking', 'test:menu'] },
     { files: ['identity, resolver, handle, or waterfall audit docs under `docs/audit/`'], lanes: ['test:whitelist', 'test:blocking', 'test:menu', 'test:smoke'] },
+    { files: ['alias, list-mode, or row-list-mode audit docs under `docs/audit/`'], lanes: ['test:whitelist', 'test:blocking', 'test:settings', 'test:smoke'] },
+    { files: ['backup or Nanah audit docs under `docs/audit/`'], lanes: ['test:settings', 'test:smoke'] },
     { files: ['page-runtime lifecycle, observer, teardown, or selector lifecycle audit docs under `docs/audit/`'], lanes: ['test:dom', 'test:performance', 'test:smoke'] },
     { files: ['document-start or seed page-global patch audit docs under `docs/audit/`'], lanes: ['test:json', 'test:performance', 'test:smoke'] },
     { files: ['js/vendor/*.bundle.js'], lanes: ['test:release', 'test:settings', 'test:smoke'] },
@@ -262,6 +264,13 @@ test('executable classifier maps high-risk paths to required lanes', () => {
     'docs/audit/FILTERTUBE_DOCUMENT_START_ZERO_FLASH_BOUNDARY_2026-05-21.md',
     'docs/audit/FILTERTUBE_SEED_PAGE_GLOBAL_PATCH_TEARDOWN_BOUNDARY_CURRENT_BEHAVIOR_2026-05-23.md'
   ]).lanes, ['json', 'performance', 'smoke']);
+  assert.deepEqual(classifyPaths([
+    'docs/audit/FILTERTUBE_STALE_ALIAS_FALSE_HIDE_CHAIN_2026-05-20.md',
+    'docs/audit/FILTERTUBE_LIST_MODE_TRANSITION_PERSISTENCE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-22.md'
+  ]).lanes, ['whitelist', 'blocking', 'settings', 'smoke']);
+  assert.deepEqual(classifyPaths([
+    'docs/audit/FILTERTUBE_BACKUP_NANAH_TRUSTED_STATE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-22.md'
+  ]).lanes, ['settings', 'smoke']);
 
   const packageSurface = classifyPaths(['package.json', 'website/components/footer-signal-art.js']);
   assert.deepEqual(packageSurface.lanes, ['release', 'smoke']);
