@@ -20,17 +20,22 @@ test('audit runtime backlog remains explicit and outside release-lane completion
   assert.match(doc, /Status: broad audit backlog, not a release-lane gate/);
   assert.match(doc, /node --test --test-reporter=tap tests\/runtime\/\*\.test\.mjs > \/tmp\/filtertube-runtime\.tap 2>&1/);
   assert.match(doc, /tests: 4737/);
-  assert.match(doc, /pass: 4699/);
-  assert.match(doc, /fail: 38/);
-  assert.match(doc, /duration_ms: 59836\.327541/);
+  assert.match(doc, /pass: 4700/);
+  assert.match(doc, /fail: 37/);
+  assert.match(doc, /duration_ms: 39322\.8045/);
+  assert.match(doc, /38\s+failures\s+to\s+37\s+failures/);
+  assert.match(doc, /JSON-first video-meta revision boundary\s+source pin row/);
+  assert.match(doc, /revision-boundary proof test now expects the current\s+`js\/filter_logic\.js` line count, byte count, and hash/);
+  assert.match(doc, /content persistence, filter-logic queueing, background compiled\s+cache patching, and unpartitioned metadata-map fixtures remain unchanged/);
+  assert.match(doc, /first-class video-meta revision authority remains absent/);
   assert.match(doc, /39\s+failures\s+to\s+38\s+failures/);
   assert.match(doc, /JSON-first video-meta profile\/surface source\s+pin row/);
-  assert.match(doc, /profile\/surface proof test now expects the current\s+`js\/filter_logic\.js` line count, byte count, and hash/);
-  assert.match(doc, /content-side persistence, Kids-host scheduling, background cache\s+patching, filter-logic consumption, and DOM category fixtures remain unchanged/);
-  assert.match(doc, /first-class video-meta profile\/surface authority remains absent/);
+  assert.match(doc, /profile\/surface proof\s+test now expects the current `js\/filter_logic\.js` line count, byte count, and\s+hash/);
+  assert.match(doc, /content-side persistence, Kids-host\s+scheduling, background cache patching, filter-logic consumption, and DOM category\s+fixtures remain unchanged/);
+  assert.match(doc, /first-class video-meta profile\/surface authority\s+remains absent/);
   assert.match(doc, /40\s+failures\s+to\s+39\s+failures/);
-  assert.match(doc, /JSON-first video-meta no-work budget source\s+pin row/);
-  assert.match(doc, /no-work budget\s+proof test now expects the current\s+`js\/filter_logic\.js` line count, byte count,\s+and hash/);
+  assert.match(doc, /JSON-first video-meta no-work budget source\s+pin\s+row/);
+  assert.match(doc, /no-work budget\s+proof test now expects the current\s+`js\/filter_logic\.js`\s+line count, byte count, and\s+hash/);
   assert.match(doc, /scheduler, duplicate,\s+DOM upload-date\/duration callsite fixtures\s+remain unchanged/);
   assert.match(doc, /first-class\s+video-meta no-work budget authority remains\s+absent/);
   assert.match(doc, /41\s+failures\s+to\s+40\s+failures/);
@@ -226,14 +231,14 @@ test('audit runtime backlog pins the current broad-suite failure family snapshot
   const expectedRows = [
     ['generated/release/package/docs surfaces', '34'],
     ['source-locus/optimization/index contracts', '4'],
-    ['JSON/video-meta/path/reference', '6'],
+    ['JSON/video-meta/path/reference', '5'],
     ['website/public-doc/source inventory', '14'],
     ['settings/content-control/DOM lifecycle', '8'],
     ['native/Nanah/Kids/YTM', '8']
   ];
 
-  assert.match(doc, /Current failing subtests are spread across 27 runtime test files/);
-  assert.match(doc, /filtertube-runtime-current-after-video-meta-profile-surface-refresh\.tap/);
+  assert.match(doc, /Current failing subtests are spread across 26 runtime test files/);
+  assert.match(doc, /filtertube-runtime-current-after-video-meta-revision-refresh\.tap/);
   assert.match(doc, /non-exclusive family snapshot/);
   assert.match(doc, /previous method-proof\/family blocker row is now retired/);
   assert.match(doc, /direct method semantic proof lane passes with 5,681\s+current lexical callables/);
@@ -314,6 +319,10 @@ test('audit runtime backlog pins the current broad-suite failure family snapshot
   assert.match(doc, /profile\/surface proof test now matches the current `js\/filter_logic\.js`\s+fingerprint/);
   assert.match(doc, /content-side persistence,\s+Kids-host scheduling, background cache patching, filter-logic consumption, and\s+DOM category fixtures remain unchanged/);
   assert.match(doc, /first-class video-meta profile\/surface\s+authority remains explicitly absent/);
+  assert.match(doc, /previous JSON-first video-meta revision boundary row is retired/);
+  assert.match(doc, /revision-boundary proof test now matches the current `js\/filter_logic\.js`\s+fingerprint/);
+  assert.match(doc, /content persistence,\s+filter-logic queueing, background compiled cache patching, and unpartitioned\s+metadata-map fixtures remain unchanged/);
+  assert.match(doc, /first-class video-meta revision\s+authority remains explicitly absent/);
   assert.match(doc, /previous JSON-first metric artifact gate rows are retired/);
   assert.match(doc, /metric proof\s+now pins current performance-claim and no-work crosswalk hashes/);
   assert.match(doc, /current\s+`js\/filter_logic\.js` `processData\(\)` anchor/);

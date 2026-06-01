@@ -13,24 +13,31 @@ node --test --test-reporter=tap tests/runtime/*.test.mjs > /tmp/filtertube-runti
 
 ```text
 tests: 4737
-pass: 4699
-fail: 38
-duration_ms: 59836.327541
+pass: 4700
+fail: 37
+duration_ms: 39322.8045
 ```
 
-This refresh reduces the pinned broad-suite failure count from 39 failures to
-38 failures after retiring the stale JSON-first video-meta profile/surface source
-pin row: the profile/surface proof test now expects the current
+This refresh reduces the pinned broad-suite failure count from 38 failures to
+37 failures after retiring the stale JSON-first video-meta revision boundary
+source pin row: the revision-boundary proof test now expects the current
 `js/filter_logic.js` line count, byte count, and hash already recorded in the
-audit doc while content-side persistence, Kids-host scheduling, background cache
-patching, filter-logic consumption, and DOM category fixtures remain unchanged
-and first-class video-meta profile/surface authority remains absent. The previous
-refresh reduced the suite from 40 failures to 39 failures after retiring the
-stale JSON-first video-meta no-work budget source pin row: the no-work budget
-proof test now expects the current `js/filter_logic.js` line count, byte count,
-and hash already recorded in the audit doc while scheduler, duplicate,
-DOM upload-date/duration callsite fixtures remain unchanged and first-class
-video-meta no-work budget authority remains absent. The previous refresh reduced
+audit doc while content persistence, filter-logic queueing, background compiled
+cache patching, and unpartitioned metadata-map fixtures remain unchanged and
+first-class video-meta revision authority remains absent. The previous refresh
+reduced the suite from 39 failures to 38 failures after retiring the stale
+JSON-first video-meta profile/surface source pin row: the profile/surface proof
+test now expects the current `js/filter_logic.js` line count, byte count, and
+hash already recorded in the audit doc while content-side persistence, Kids-host
+scheduling, background cache patching, filter-logic consumption, and DOM category
+fixtures remain unchanged and first-class video-meta profile/surface authority
+remains absent. The previous refresh reduced the suite from 40 failures to 39
+failures after retiring the stale JSON-first video-meta no-work budget source pin
+row: the no-work budget proof test now expects the current `js/filter_logic.js`
+line count, byte count, and hash already recorded in the audit doc while
+scheduler, duplicate, DOM upload-date/duration callsite fixtures remain
+unchanged and first-class video-meta no-work budget authority remains absent. The
+previous refresh reduced
 the suite from 41 failures to 40 failures
 after retiring the stale JSON-first video-meta merge schema source pin row: the
 merge-schema proof test now expects the current `js/filter_logic.js` line count,
@@ -164,15 +171,15 @@ node scripts/audit-proof-drift.mjs --all --report-only
 
 ## Failure Clusters
 
-Current failing subtests are spread across 27 runtime test files. A lightweight
-name-based parse of `/tmp/filtertube-runtime-current-after-video-meta-profile-surface-refresh.tap` gives this
+Current failing subtests are spread across 26 runtime test files. A lightweight
+name-based parse of `/tmp/filtertube-runtime-current-after-video-meta-revision-refresh.tap` gives this
 non-exclusive family snapshot:
 
 | Family | Current failing subtests |
 |---|---:|
 | generated/release/package/docs surfaces | 34 |
 | source-locus/optimization/index contracts | 4 |
-| JSON/video-meta/path/reference | 6 |
+| JSON/video-meta/path/reference | 5 |
 | website/public-doc/source inventory | 14 |
 | settings/content-control/DOM lifecycle | 8 |
 | native/Nanah/Kids/YTM | 8 |
@@ -281,6 +288,12 @@ profile/surface proof test now matches the current `js/filter_logic.js`
 fingerprint already present in the audit doc while content-side persistence,
 Kids-host scheduling, background cache patching, filter-logic consumption, and
 DOM category fixtures remain unchanged and first-class video-meta profile/surface
+authority remains explicitly absent.
+The previous JSON-first video-meta revision boundary row is retired: the
+revision-boundary proof test now matches the current `js/filter_logic.js`
+fingerprint already present in the audit doc while content persistence,
+filter-logic queueing, background compiled cache patching, and unpartitioned
+metadata-map fixtures remain unchanged and first-class video-meta revision
 authority remains explicitly absent.
 The previous JSON-first metric artifact gate rows are retired: the metric proof
 now pins current performance-claim and no-work crosswalk hashes plus the current
