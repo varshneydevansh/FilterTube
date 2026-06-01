@@ -13,19 +13,23 @@ node --test --test-reporter=tap tests/runtime/*.test.mjs > /tmp/filtertube-runti
 
 ```text
 tests: 4737
-pass: 4676
-fail: 61
-duration_ms: 51659.283125
+pass: 4677
+fail: 60
+duration_ms: 49397.187916
 ```
 
-This refresh reduces the pinned broad-suite failure count from 62 failures to
-61 failures after retiring the stale first optimization collector verification
-output approval objective-ledger row: the objective coverage ledger now pins
-the current 69 method semantic proof gap file count for that approval boundary,
-matching the active-goal and tracked-file ledgers while keeping collector
-verification output approval at NO-GO. The previous refresh reduced the suite
-from 63 failures to 62 failures after retiring the stale external navigation
-surface boundary row:
+This refresh reduces the pinned broad-suite failure count from 61 failures to
+60 failures after retiring the stale source-locus diagnostic privacy anchor row:
+the source-locus diagnostic privacy proof now points at the current diagnostic
+logging matrix owner-family rows and current `js/filter_logic.js` console line
+anchors while keeping diagnostic privacy approval at NO-GO. The previous refresh
+reduced the suite from 62 failures to 61 failures after retiring the stale first
+optimization collector verification output approval objective-ledger row: the
+objective coverage ledger now pins the current 69 method semantic proof gap file
+count for that approval boundary, matching the active-goal and tracked-file
+ledgers while keeping collector verification output approval at NO-GO. The
+previous refresh reduced the suite from 63 failures to 62 failures after
+retiring the stale external navigation surface boundary row:
 `html/tab-view.html`, `website/components/site-footer.js`,
 `website/app/page.js`, and `website/app/downloads/page.js` now pin current
 source fingerprints while selected navigation primitive counts and split
@@ -63,14 +67,14 @@ node scripts/audit-proof-drift.mjs --all --report-only
 
 ## Failure Clusters
 
-Current failing subtests are spread across 46 runtime test files. A lightweight
-name-based parse of `/tmp/filtertube-runtime-current-after-collector-verification-output-refresh.tap` gives this
+Current failing subtests are spread across 45 runtime test files. A lightweight
+name-based parse of `/tmp/filtertube-runtime-current-after-source-locus-diagnostic-privacy-refresh.tap` gives this
 non-exclusive family snapshot:
 
 | Family | Current failing subtests |
 |---|---:|
 | generated/release/package/docs surfaces | 38 |
-| source-locus/optimization/index contracts | 11 |
+| source-locus/optimization/index contracts | 10 |
 | JSON/video-meta/path/reference | 19 |
 | website/public-doc/source inventory | 14 |
 | settings/content-control/DOM lifecycle | 8 |
@@ -110,6 +114,10 @@ behavior as current state.
 The previous collector verification output approval row is retired: the
 objective coverage ledger now matches the 69-file method semantic proof gap
 count already present in adjacent ledgers, while collector verification output
+approval remains explicitly absent.
+The previous source-locus diagnostic privacy row is retired: the diagnostic
+privacy ownership proof now uses current diagnostic logging matrix line anchors
+and current `js/filter_logic.js` console anchor lines while diagnostic privacy
 approval remains explicitly absent.
 
 | Cluster | Examples | Current meaning |

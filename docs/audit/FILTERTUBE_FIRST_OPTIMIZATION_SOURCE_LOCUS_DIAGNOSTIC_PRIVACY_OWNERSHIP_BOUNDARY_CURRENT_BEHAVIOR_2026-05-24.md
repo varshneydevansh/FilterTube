@@ -161,16 +161,16 @@ release-public-claim-scope
 | `docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 61 | `console.error callsites: 68` |
 | `docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 62 | `console.debug callsites: 24` |
 | `docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 63 | `console.info callsites: 0` |
-| `docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 100 | `` `page-runtime-core` | 196 `` |
-| `docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 101 | `` `background-storage-state` | 131 `` |
-| `docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 111 | `Page runtime extraction` |
-| `docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 112 | `Background identity repair` |
-| `docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 113 | `JSON filter engine` |
+| `docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 117 | `` `page-runtime-core` | 196 `` |
+| `docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 118 | `` `background-storage-state` | 131 `` |
+| `docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 128 | `Page runtime extraction` |
+| `docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 129 | `Background identity repair` |
+| `docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md` | 130 | `JSON filter engine` |
 | `js/seed.js` | 33 | `FilterTube: seed.js initializing (MAIN world)` |
 | `js/seed.js` | 157 | `window.postMessage({` |
-| `js/filter_logic.js` | 1566 | `console.log(`FilterTube (Filter):`, message, ...args);` |
-| `js/filter_logic.js` | 1581 | `console.log('FilterTube Whitelist (JSON):', {` |
-| `js/filter_logic.js` | 3444 | `console.warn('FilterTube: Harvesting failed', e);` |
+| `js/filter_logic.js` | 1575 | `console.log(`FilterTube (Filter):`, message, ...args);` |
+| `js/filter_logic.js` | 1590 | `console.log('FilterTube Whitelist (JSON):', {` |
+| `js/filter_logic.js` | 3598 | `console.warn('FilterTube: Harvesting failed', e);` |
 | `js/content/dom_fallback.js` | 4559 | `console.log('FilterTube Whitelist (DOM):', {` |
 | `js/background.js` | 3236 | `console.log('FilterTube Subscriptions Import:', {` |
 | `js/background.js` | 3254 | `FilterTube Background: Received getCompiledSettings message` |
