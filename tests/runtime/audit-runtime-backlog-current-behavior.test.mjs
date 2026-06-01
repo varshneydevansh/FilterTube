@@ -20,27 +20,29 @@ test('audit runtime backlog remains explicit and outside release-lane completion
   assert.match(doc, /Status: broad audit backlog, not a release-lane gate/);
   assert.match(doc, /node --test --test-reporter=tap tests\/runtime\/\*\.test\.mjs > \/tmp\/filtertube-runtime\.tap 2>&1/);
   assert.match(doc, /tests: 4737/);
-  assert.match(doc, /pass: 4673/);
-  assert.match(doc, /fail: 64/);
-  assert.match(doc, /duration_ms: 57006\.4755/);
+  assert.match(doc, /pass: 4674/);
+  assert.match(doc, /fail: 63/);
+  assert.match(doc, /duration_ms: 47603\.511958/);
+  assert.match(doc, /64 failures to\s+63 failures/);
+  assert.match(doc, /extension UI CSS page-state boundary\s+row/);
+  assert.match(doc, /same-size dashboard loader shell hash/);
+  assert.match(doc, /generated shell versus hand-owned UI\s+runtime state split remain unchanged/);
   assert.match(doc, /65 failures to\s+64 failures/);
-  assert.match(doc, /design-token build-configuration boundary\s+row/);
+  assert.match(doc, /design-token\s+build-configuration boundary\s+row/);
   assert.match(doc, /release mobile\s+artifact constants and text-file extension sets/);
-  assert.match(doc, /design-token JSON\s+still remains outside the package-copy and script-generation path/);
-  assert.match(doc, /66 failures to\s+65 failures/);
-  assert.match(doc, /current-dirty worktree package-version row/);
-  assert.match(doc, /historical `9816c34`\s+package diff still only adds `audit:runtime`/);
-  assert.match(doc, /current checkout package\s+version is `3\.3\.2`/);
+  assert.match(doc, /design-token JSON\s+still remains outside the package-copy and\s+script-generation path/);
+  assert.match(doc, /66\s+failures to\s+65 failures/);
+  assert.match(doc, /current-dirty worktree\s+package-version row/);
   assert.match(doc, /67 failures\s+to 66 failures/);
   assert.match(doc, /content-filter field semantics contract/);
   assert.match(doc, /compiled\/settings\s+field-register row count/);
   assert.match(doc, /69\s+failures to 67 failures/);
   assert.match(doc, /function-coverage source backlog row/);
-  assert.match(doc, /stale `compress-video`\s+package\/build boundary row/);
+  assert.match(doc, /stale\s+`compress-video`\s+package\/build boundary row/);
   assert.match(doc, /76\s+failures to 69 failures/);
   assert.match(doc, /release-note\/package-version proof/);
   assert.match(doc, /115 failures to 76 failures/);
-  assert.match(doc, /stale method semantic proof gap counts from 5,673 to 5,681 lexical\s+callables/);
+  assert.match(doc, /stale method\s+semantic proof gap counts from 5,673 to 5,681 lexical callables/);
   assert.match(doc, /not clean enough\s+to be used as a release gate/);
   assert.match(doc, /node scripts\/audit-proof-drift\.mjs --all --report-only/);
   assert.match(doc, /no stale source fingerprint proof rows/);
@@ -126,7 +128,7 @@ test('audit runtime backlog names the broad failure clusters that still require 
 test('audit runtime backlog pins the current broad-suite failure family snapshot', () => {
   const doc = read(backlogPath);
   const expectedRows = [
-    ['generated/release/package/docs surfaces', '40'],
+    ['generated/release/package/docs surfaces', '39'],
     ['source-locus/optimization/index contracts', '12'],
     ['JSON/video-meta/path/reference', '19'],
     ['website/public-doc/source inventory', '14'],
@@ -134,8 +136,8 @@ test('audit runtime backlog pins the current broad-suite failure family snapshot
     ['native/Nanah/Kids/YTM', '8']
   ];
 
-  assert.match(doc, /Current failing subtests are spread across 49 runtime test files/);
-  assert.match(doc, /filtertube-runtime-current-after-design-token-build-config-refresh\.tap/);
+  assert.match(doc, /Current failing subtests are spread across 48 runtime test files/);
+  assert.match(doc, /filtertube-runtime-current-after-extension-ui-css-page-state-refresh\.tap/);
   assert.match(doc, /non-exclusive family snapshot/);
   assert.match(doc, /previous method-proof\/family blocker row is now retired/);
   assert.match(doc, /direct method semantic proof lane passes with 5,681\s+current lexical callables/);
@@ -151,6 +153,9 @@ test('audit runtime backlog pins the current broad-suite failure family snapshot
   assert.match(doc, /`9816c34` one-line `audit:runtime` script diff/);
   assert.match(doc, /previous design-token build-configuration row is retired/);
   assert.match(doc, /no-generator\/no-package-copy\s+boundary for `design\/design_tokens\.json`/);
+  assert.match(doc, /previous extension UI CSS page-state row is retired/);
+  assert.match(doc, /same-size dashboard shell hash now matches current source/);
+  assert.match(doc, /CSS loader order plus generated-shell\/runtime\s+state-token separation/);
 
   for (const [family, count] of expectedRows) {
     assert.match(doc, new RegExp(`\\| ${family.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} \\| ${count} \\|`));

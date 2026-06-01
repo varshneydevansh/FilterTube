@@ -30,7 +30,7 @@ covered by the CSS load/style surface and style-hide authority audits.
 | `css/tab-view.css` | active dashboard CSS | 2,834 | 68,789 | `e328965f44468e90cca22bb11b25103b1821ed2037775fbe312e2025c241c7c9` |
 | `css/serene-shell.css` | active generated-shell CSS | 3,357 | 86,093 | `92dddf7925091481ab5364b1bd9c67ff65a8435854c2753ee5f0de1c14098228` |
 | `html/popup.html` | popup loader shell | 31 | 1,213 | `c5e03a38b2737dbd01e2cd0c243b37754936e2e349e9d2275b195350159aea31` |
-| `html/tab-view.html` | dashboard loader shell | 1,577 | 133,585 | `e33ef1e0d1f2c3d607cb58c3275137df54c1c82ed06cf5cd03c053690fedb0b6` |
+| `html/tab-view.html` | dashboard loader shell | 1,577 | 133,585 | `d11914a138ab29fb764a6aede4921c4d491bacaad83ecd44f8d7392758ece3e1` |
 | `src/extension-shell/popup.jsx` | popup generated-shell source | 113 | 3,864 | `3a3772e7d77f8466fea609a80c1d4f09873e47022aee17f3b8b09858397b298c` |
 | `src/extension-shell/tab-view-decor.jsx` | dashboard ambient-shell source | 34 | 1,101 | `354cd36fa62b215a415e88b8b0c84bd43725196613766d6af921eac44d1f63f1` |
 | `src/extension-shell/shared/runtime.js` | shell environment source | 52 | 1,462 | `d54cc87b8f48736df6ca063fa79e37b2439b580710746e215e8b428fc7207ec8` |

@@ -13,29 +13,32 @@ node --test --test-reporter=tap tests/runtime/*.test.mjs > /tmp/filtertube-runti
 
 ```text
 tests: 4737
-pass: 4673
-fail: 64
-duration_ms: 57006.4755
+pass: 4674
+fail: 63
+duration_ms: 47603.511958
 ```
 
-This refresh reduces the pinned broad-suite failure count from 65 failures to
-64 failures after retiring the stale design-token build-configuration boundary
-row: the selected `build.js` configuration block now includes release mobile
-artifact constants and text-file extension sets, while the design-token JSON
-still remains outside the package-copy and script-generation path. The previous
-refresh reduced the suite from 66 failures to 65 failures after retiring the
-stale current-dirty worktree package-version row: the historical `9816c34`
-package diff still only adds `audit:runtime`, while the current checkout package
-version is `3.3.2`. Earlier broad refreshes reduced the suite from 67 failures
-to 66 failures after retiring the stale content-filter field semantics contract
-dependency on the older compiled/settings field-register row count, from 69
-failures to 67 failures after retiring the stale function-coverage source
-backlog row and the stale `compress-video` package/build boundary row, from 76
-failures to 69 failures after refreshing release-note/package-version proof for
-the `3.3.2` release alignment, and from 115 failures to 76 failures after
-refreshing stale method semantic proof gap counts from 5,673 to 5,681 lexical
-callables. The broad suite is not clean enough to be used as a release gate, but
-the current baseline is narrower and more useful for retiring backlog slices.
+This refresh reduces the pinned broad-suite failure count from 64 failures to
+63 failures after retiring the stale extension UI CSS page-state boundary row:
+`html/tab-view.html` now pins the current same-size dashboard loader shell hash,
+while popup/tab-view loader order and the generated shell versus hand-owned UI
+runtime state split remain unchanged. The previous refresh reduced the suite
+from 65 failures to 64 failures after retiring the stale design-token
+build-configuration boundary row: the selected `build.js` configuration block
+now includes release mobile artifact constants and text-file extension sets,
+while the design-token JSON still remains outside the package-copy and
+script-generation path. Earlier broad refreshes reduced the suite from 66
+failures to 65 failures after retiring the stale current-dirty worktree
+package-version row, from 67 failures to 66 failures after retiring the stale
+content-filter field semantics contract dependency on the older
+compiled/settings field-register row count, from 69 failures to 67 failures
+after retiring the stale function-coverage source backlog row and the stale
+`compress-video` package/build boundary row, from 76 failures to 69 failures
+after refreshing release-note/package-version proof for the `3.3.2` release
+alignment, and from 115 failures to 76 failures after refreshing stale method
+semantic proof gap counts from 5,673 to 5,681 lexical callables. The broad suite
+is not clean enough to be used as a release gate, but the current baseline is
+narrower and more useful for retiring backlog slices.
 
 ## Boundary
 
@@ -52,13 +55,13 @@ node scripts/audit-proof-drift.mjs --all --report-only
 
 ## Failure Clusters
 
-Current failing subtests are spread across 49 runtime test files. A lightweight
-name-based parse of `/tmp/filtertube-runtime-current-after-design-token-build-config-refresh.tap` gives this
+Current failing subtests are spread across 48 runtime test files. A lightweight
+name-based parse of `/tmp/filtertube-runtime-current-after-extension-ui-css-page-state-refresh.tap` gives this
 non-exclusive family snapshot:
 
 | Family | Current failing subtests |
 |---|---:|
-| generated/release/package/docs surfaces | 40 |
+| generated/release/package/docs surfaces | 39 |
 | source-locus/optimization/index contracts | 12 |
 | JSON/video-meta/path/reference | 19 |
 | website/public-doc/source inventory | 14 |
@@ -88,6 +91,10 @@ The previous design-token build-configuration row is retired: the design-token
 boundary now pins the current release mobile artifact constants and text-file
 extension sets in `build.js` while preserving the no-generator/no-package-copy
 boundary for `design/design_tokens.json`.
+The previous extension UI CSS page-state row is retired: the selected
+`html/tab-view.html` same-size dashboard shell hash now matches current source,
+and the proof still preserves CSS loader order plus generated-shell/runtime
+state-token separation.
 
 | Cluster | Examples | Current meaning |
 |---|---|---|
