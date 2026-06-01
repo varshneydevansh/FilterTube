@@ -131,7 +131,8 @@ test('goal safety surfaces stay bound to focused lane proof tests', () => {
         /json-first-keyword-match-boundary/,
         /json-first-channel-match-boundary/,
         /json-comment-author-channel-provenance-boundary/,
-        /json-comment-keyword-provenance-boundary/
+        /json-comment-keyword-provenance-boundary/,
+        /shorts-reel-overlay-owner-authority-boundary-current-behavior/
       ]
     },
     {
@@ -141,7 +142,8 @@ test('goal safety surfaces stay bound to focused lane proof tests', () => {
         /main-watch-initial-lockup-shorts-json-current-behavior/,
         /main-watch-initial-shorts-owner-absent-boundary-current-behavior/,
         /json-first-hide-all-shorts-boundary-current-behavior/,
-        /shorts-dom-cleanup-boundary-current-behavior/
+        /shorts-dom-cleanup-boundary-current-behavior/,
+        /shorts-reel-overlay-owner-authority-boundary-current-behavior/
       ]
     },
     {
@@ -178,6 +180,7 @@ test('goal safety surfaces stay bound to focused lane proof tests', () => {
         /json-first-hide-mix-playlists-boundary-current-behavior/,
         /json-first-hide-video-info-boundary-current-behavior/,
         /json-first-hide-watch-playlist-panel-boundary-current-behavior/,
+        /shorts-reel-overlay-owner-authority-boundary-current-behavior/,
         /youtube-music-surface-identity-boundary-current-behavior/,
         /ytm-show-sheet-injector-filter-logic-parity-current-behavior/,
         /ytm-show-sheet-enrichment-handoff-current-behavior/

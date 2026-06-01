@@ -104,6 +104,7 @@ export const LANES = Object.freeze({
       'tests/runtime/main-watch-initial-shorts-owner-absent-boundary-current-behavior.test.mjs',
       'tests/runtime/json-first-hide-all-shorts-boundary-current-behavior.test.mjs',
       'tests/runtime/shorts-dom-cleanup-boundary-current-behavior.test.mjs',
+      'tests/runtime/shorts-reel-overlay-owner-authority-boundary-current-behavior.test.mjs',
       'tests/runtime/main-watch-autoplay-video-endpoint-current-behavior.test.mjs',
       'tests/runtime/json-first-hide-endscreen-videowall-boundary-current-behavior.test.mjs',
       'tests/runtime/json-first-hide-endscreen-cards-boundary-current-behavior.test.mjs',
@@ -131,6 +132,7 @@ export const LANES = Object.freeze({
       'tests/runtime/filter-all-toggle-list-target-current-behavior.test.mjs',
       'tests/runtime/add-filtered-channel-filter-all-comments-default-current-behavior.test.mjs',
       'tests/runtime/single-channel-rule-mutation-persistence-boundary-current-behavior.test.mjs',
+      'tests/runtime/shorts-reel-overlay-owner-authority-boundary-current-behavior.test.mjs',
       'tests/runtime/hide-decision-pipeline-current-behavior.test.mjs'
     ]
   },
@@ -182,6 +184,7 @@ export const LANES = Object.freeze({
       'tests/runtime/json-first-hide-video-info-boundary-current-behavior.test.mjs',
       'tests/runtime/json-first-hide-video-sidebar-boundary-current-behavior.test.mjs',
       'tests/runtime/json-first-hide-watch-playlist-panel-boundary-current-behavior.test.mjs',
+      'tests/runtime/shorts-reel-overlay-owner-authority-boundary-current-behavior.test.mjs',
       'tests/runtime/youtube-music-surface-identity-boundary-current-behavior.test.mjs',
       'tests/runtime/ytm-show-sheet-injector-filter-logic-parity-current-behavior.test.mjs',
       'tests/runtime/ytm-show-sheet-enrichment-handoff-current-behavior.test.mjs',

@@ -20,9 +20,9 @@ test('audit runtime backlog remains explicit and outside release-lane completion
   assert.match(doc, /Status: broad audit backlog, not a release-lane gate/);
   assert.match(doc, /node --test --test-reporter=tap tests\/runtime\/\*\.test\.mjs > \/tmp\/filtertube-runtime\.tap 2>&1/);
   assert.match(doc, /tests: 4731/);
-  assert.match(doc, /pass: 4571/);
-  assert.match(doc, /fail: 160/);
-  assert.match(doc, /duration_ms: 34582\.853041/);
+  assert.match(doc, /pass: 4572/);
+  assert.match(doc, /fail: 159/);
+  assert.match(doc, /duration_ms: 34364\.68075/);
   assert.match(doc, /node scripts\/audit-proof-drift\.mjs --all --report-only/);
   assert.match(doc, /no stale source fingerprint proof rows/);
   assert.match(doc, /The focused release lanes are the per-change proof system/);
@@ -94,6 +94,7 @@ test('audit runtime backlog names the broad failure clusters that still require 
   assert.match(doc, /author\/channel and keyword provenance are also promoted into `test:blocking`/);
   assert.match(doc, /Remaining broad-ledger failures in this family are older completion\/obligation references/);
   assert.match(doc, /content-control-json-first-boundary-index` plus the JSON-first content-control hide boundary set have been refreshed and promoted into `test:json`/);
+  assert.match(doc, /shorts-reel-overlay-owner-authority-boundary` has been refreshed and promoted into `test:whitelist`, `test:blocking`, and `test:json`/);
   assert.match(doc, /youtube-music-surface-identity-boundary` has been refreshed and promoted into `test:whitelist` and `test:json`/);
   assert.match(doc, /ytm-show-sheet-injector-filter-logic-parity` and `ytm-show-sheet-enrichment-handoff` have been refreshed and promoted into `test:json`/);
 });

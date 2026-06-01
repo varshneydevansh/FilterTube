@@ -13,9 +13,9 @@ node --test --test-reporter=tap tests/runtime/*.test.mjs > /tmp/filtertube-runti
 
 ```text
 tests: 4731
-pass: 4571
-fail: 160
-duration_ms: 34582.853041
+pass: 4572
+fail: 159
+duration_ms: 34364.68075
 ```
 
 ## Boundary
@@ -42,7 +42,7 @@ node scripts/audit-proof-drift.mjs --all --report-only
 | DOM selector, hide, and lifecycle registers | JSON content-control DOM hide boundary rows, tab-view lifecycle selector boundary, Shorts overlay owner proof | `direct-hide-writer-register` has been refreshed and promoted into `test:dom`; `dom-selector-instance-register` has been refreshed for `js/content/dom_state.js` selector patch sites and promoted into `test:dom`; `lifecycle-instance-register` and `repo-lifecycle-primitive-coverage` have been refreshed for website component lifecycle drift and promoted into `test:performance`; remaining lifecycle selector rows belong in smaller DOM batches. |
 | JSON comment continuation and provenance registers | comment author/channel provenance, keyword provenance, entity payload provenance, structural wrapper cleanup, collection-root/command-shape/sibling continuation parity, continuation shortcut counts | Comment JSON proof rows have been refreshed and promoted into `test:json`; author/channel and keyword provenance are also promoted into `test:blocking`. Remaining broad-ledger failures in this family are older completion/obligation references, not unpromoted focused comment JSON proof. |
 | JSON content-control hide boundary registers | hideAllComments, hideAskButton, hideHomeFeed, hideMixPlaylists, hideVideoInfo, hideWatchPlaylistPanel, and related boundaries | `content-control-json-first-boundary-index` plus the JSON-first content-control hide boundary set have been refreshed and promoted into `test:json`; remaining content-control surfaces are either already owned by whitelist/menu lanes or belong to older broad ledgers outside this hide-control batch. |
-| JSON-first renderer, reference, metric, and video-meta registers | candidate extraction, implementation locus, metric artifact gate, reference docs, renderer traversal, video-meta parity/fetch/merge docs | JSON-first proof is still split across older NO-GO gates and focused lane tests. |
+| JSON-first renderer, reference, metric, and video-meta registers | candidate extraction, implementation locus, metric artifact gate, reference docs, renderer traversal, video-meta parity/fetch/merge docs | `shorts-reel-overlay-owner-authority-boundary` has been refreshed and promoted into `test:whitelist`, `test:blocking`, and `test:json`; remaining JSON-first proof is still split across older NO-GO gates and focused lane tests. |
 | YTM and YouTube Music parity slices | YouTube Music surface identity, YTM showSheet enrichment, YTM injector/filter-logic parity, playlist selected-row parity | `youtube-music-surface-identity-boundary` has been refreshed and promoted into `test:whitelist` and `test:json`; `ytm-show-sheet-injector-filter-logic-parity` and `ytm-show-sheet-enrichment-handoff` have been refreshed and promoted into `test:json`; remaining YTM proof slices are still partial and should be refreshed in focused whitelist/JSON/menu batches. |
 
 ## Release Lane Decision
