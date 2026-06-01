@@ -10,6 +10,7 @@ import {
   changedPathsFromGit,
   classifyPaths,
   laneNames,
+  runtimeFixtureRequirement,
   validateLaneFiles
 } from '../../scripts/run-test-lane.mjs';
 import { collectProofDrift, laneOwnedProofFiles } from '../../scripts/audit-proof-drift.mjs';
@@ -338,6 +339,10 @@ test('changed-lane runner is wired to the classifier and sequential lane executi
   assert.match(runner, /MANUAL_YOUTUBE_SMOKE_LANE_REASONS/);
   assert.match(runner, /Manual YouTube smoke required when user-facing/);
   assert.match(runner, /RUNTIME_FIXTURE_LANE_REASONS/);
+  assert.match(runner, /function runtimeFixtureRequirement\(result\)/);
+  assert.match(runner, /Runtime fixture\/test proof files in this change/);
+  assert.match(runner, /Runtime fixture\/test proof relevance mismatch/);
+  assert.match(runner, /sharedRuntimeProofLanes/);
   assert.match(runner, /Runtime fixture proof expected when behavior changes/);
   assert.match(runner, /AUDIT_PROOF_PATH_PATTERN/);
   assert.match(runner, /function auditProofRequirement\(result\)/);
@@ -363,6 +368,7 @@ test('changed-lane runner is wired to the classifier and sequential lane executi
   assert.match(matrix, /fails\s+when source, release, asset, or product-doc paths changed without a matching\s+`docs\/audit\/` proof file/);
   assert.match(matrix, /fails when changed\s+`docs\/audit\/` proof does not share\s+at least one non-smoke lane/);
   assert.match(matrix, /prints a fixture-proof reminder\s+for the affected runtime lanes/);
+  assert.match(matrix, /reports whether changed runtime fixture\/test files share\s+at least one touched runtime lane/);
 });
 
 test('changed-lane path collection includes untracked nonignored files', () => {
@@ -408,6 +414,7 @@ test('classifier output surfaces manual YouTube smoke for user-facing runtime la
   assert.match(runtime.stdout, /Runtime fixture proof expected when behavior changes:/);
   assert.match(runtime.stdout, /test:json: JSON renderer, endpoint, response, or no-work fixtures/);
   assert.match(runtime.stdout, /test:performance: empty-rule\/no-work, SPA, timer, observer, or cache fixtures/);
+  assert.match(runtime.stdout, /No runtime fixture\/test proof file changed/);
 
   const releaseOnly = spawnSync(process.execPath, ['scripts/run-test-lane.mjs', '--classify', 'README.md'], {
     cwd: repoRoot,
@@ -417,6 +424,40 @@ test('classifier output surfaces manual YouTube smoke for user-facing runtime la
   assert.equal(releaseOnly.status, 0, releaseOnly.stderr);
   assert.doesNotMatch(releaseOnly.stdout, /Manual YouTube smoke required when user-facing:/);
   assert.doesNotMatch(releaseOnly.stdout, /Runtime fixture proof expected when behavior changes:/);
+});
+
+test('classifier output surfaces runtime fixture proof lane relevance', () => {
+  const matchingProof = spawnSync(process.execPath, [
+    'scripts/run-test-lane.mjs',
+    '--classify',
+    'js/seed.js',
+    'tests/runtime/seed-network-current-behavior.test.mjs'
+  ], {
+    cwd: repoRoot,
+    encoding: 'utf8'
+  });
+
+  assert.equal(matchingProof.status, 0, matchingProof.stderr);
+  assert.match(matchingProof.stdout, /Runtime fixture\/test proof files in this change:/);
+  assert.match(matchingProof.stdout, /tests\/runtime\/seed-network-current-behavior\.test\.mjs/);
+  assert.match(matchingProof.stdout, /Shared runtime proof lane\(s\): test:json/);
+  assert.doesNotMatch(matchingProof.stdout, /Runtime fixture\/test proof relevance mismatch:/);
+
+  const mismatchedProof = spawnSync(process.execPath, [
+    'scripts/run-test-lane.mjs',
+    '--classify',
+    'js/seed.js',
+    'tests/runtime/filter-engine-current-behavior.test.mjs'
+  ], {
+    cwd: repoRoot,
+    encoding: 'utf8'
+  });
+
+  assert.equal(mismatchedProof.status, 0, mismatchedProof.stderr);
+  assert.match(mismatchedProof.stdout, /Runtime fixture\/test proof relevance mismatch:/);
+  assert.match(mismatchedProof.stdout, /touched runtime lane\(s\): test:json, test:performance/);
+  assert.match(mismatchedProof.stdout, /proof runtime lane\(s\): test:blocking/);
+  assert.match(mismatchedProof.stdout, /behavior changes should update a fixture\/test that shares a touched runtime lane/);
 });
 
 test('classifier output recognizes changed audit proof files', () => {
@@ -510,6 +551,54 @@ test('changed-lane audit proof gate distinguishes proof-only and product changes
   assert.deepEqual(testOnly.sharedProofLanes, []);
   assert.equal(testOnly.missing, false);
   assert.equal(testOnly.irrelevant, false);
+});
+
+test('runtime fixture proof gate distinguishes missing matching and unrelated proof', () => {
+  const sourceOnly = runtimeFixtureRequirement(classifyPaths(['js/seed.js']));
+  assert.deepEqual(sourceOnly.runtimeRelevantFiles, ['js/seed.js']);
+  assert.deepEqual(sourceOnly.runtimeProofFiles, []);
+  assert.deepEqual(sourceOnly.runtimeRelevantLanes, ['json', 'performance']);
+  assert.deepEqual(sourceOnly.runtimeProofLanes, []);
+  assert.deepEqual(sourceOnly.sharedRuntimeProofLanes, []);
+  assert.equal(sourceOnly.missing, true);
+  assert.equal(sourceOnly.irrelevant, false);
+
+  const sourceWithProof = runtimeFixtureRequirement(classifyPaths([
+    'js/seed.js',
+    'tests/runtime/seed-network-current-behavior.test.mjs'
+  ]));
+  assert.deepEqual(sourceWithProof.runtimeRelevantFiles, ['js/seed.js']);
+  assert.deepEqual(sourceWithProof.runtimeProofFiles, [
+    'tests/runtime/seed-network-current-behavior.test.mjs'
+  ]);
+  assert.deepEqual(sourceWithProof.runtimeRelevantLanes, ['json', 'performance']);
+  assert.deepEqual(sourceWithProof.runtimeProofLanes, ['json']);
+  assert.deepEqual(sourceWithProof.sharedRuntimeProofLanes, ['json']);
+  assert.equal(sourceWithProof.missing, false);
+  assert.equal(sourceWithProof.irrelevant, false);
+
+  const sourceWithUnrelatedProof = runtimeFixtureRequirement(classifyPaths([
+    'js/seed.js',
+    'tests/runtime/filter-engine-current-behavior.test.mjs'
+  ]));
+  assert.deepEqual(sourceWithUnrelatedProof.runtimeRelevantFiles, ['js/seed.js']);
+  assert.deepEqual(sourceWithUnrelatedProof.runtimeProofFiles, [
+    'tests/runtime/filter-engine-current-behavior.test.mjs'
+  ]);
+  assert.deepEqual(sourceWithUnrelatedProof.runtimeRelevantLanes, ['json', 'performance']);
+  assert.deepEqual(sourceWithUnrelatedProof.runtimeProofLanes, ['blocking']);
+  assert.deepEqual(sourceWithUnrelatedProof.sharedRuntimeProofLanes, []);
+  assert.equal(sourceWithUnrelatedProof.missing, false);
+  assert.equal(sourceWithUnrelatedProof.irrelevant, true);
+
+  const releaseOnly = runtimeFixtureRequirement(classifyPaths(['README.md']));
+  assert.deepEqual(releaseOnly.runtimeRelevantFiles, []);
+  assert.deepEqual(releaseOnly.runtimeProofFiles, []);
+  assert.deepEqual(releaseOnly.runtimeRelevantLanes, []);
+  assert.deepEqual(releaseOnly.runtimeProofLanes, []);
+  assert.deepEqual(releaseOnly.sharedRuntimeProofLanes, []);
+  assert.equal(releaseOnly.missing, false);
+  assert.equal(releaseOnly.irrelevant, false);
 });
 
 test('smoke lane keeps release confidence broad but bounded', () => {

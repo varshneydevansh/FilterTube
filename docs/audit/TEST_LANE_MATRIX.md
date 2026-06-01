@@ -98,6 +98,10 @@ for the affected runtime lanes. This is intentionally phrased as
 `when behavior changes`: source-only refactors can satisfy it with unchanged
 fixtures plus a passing lane, while behavior changes should add or update the
 focused fixture/test that proves the new contract.
+The classifier also reports whether changed runtime fixture/test files share
+at least one touched runtime lane. That relevance report is not a hard
+`test:changed` failure because a behavior-neutral refactor can be proven by
+existing fixtures, but it makes unrelated fixture churn visible before commit.
 
 ## Auxiliary Guards
 

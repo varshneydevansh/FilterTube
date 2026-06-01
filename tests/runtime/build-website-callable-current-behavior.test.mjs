@@ -47,7 +47,7 @@ const expectedCounts = new Map([
   ['scripts/audit-proof-drift.mjs', 12],
   ['scripts/build-extension-ui.mjs', 2],
   ['scripts/build-nanah-vendor.mjs', 4],
-  ['scripts/run-test-lane.mjs', 16],
+  ['scripts/run-test-lane.mjs', 17],
   ['scripts/sync-native-runtime.mjs', 0],
   ['website/app/[slug]/page.js', 3],
   ['website/app/downloads/page.js', 3],
@@ -199,9 +199,9 @@ test('build/website callable counts match the current lexical source surface', (
     assert.equal(count, expectedCounts.get(file), `${file} callable count drifted`);
   }
 
-  assert.equal(total, 135);
-  assert.match(auditDoc, /\| Build and sync scripts \| 6 \| 62 \|/);
-  assert.match(auditDoc, /\| Total \| 30 \| 135 \|/);
+  assert.equal(total, 136);
+  assert.match(auditDoc, /\| Build and sync scripts \| 6 \| 63 \|/);
+  assert.match(auditDoc, /\| Total \| 30 \| 136 \|/);
 
   const build = read('build.js');
   const buildRows = buildMethodRows();

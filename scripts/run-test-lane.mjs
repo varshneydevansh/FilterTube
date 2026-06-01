@@ -29,6 +29,7 @@ const RUNTIME_FIXTURE_LANE_REASONS = Object.freeze({
 
 const AUDIT_PROOF_PATH_PATTERN = /^docs\/audit\//;
 const RUNTIME_TEST_PROOF_PATH_PATTERN = /^tests\/runtime\/.*\.test\.mjs$/;
+const RUNTIME_FIXTURE_PROOF_PATH_PATTERN = /^tests\/runtime\/(?:fixtures\/|harness\/|.*\.test\.mjs$)/;
 const NON_PROOF_LANE = 'smoke';
 
 export const LANES = Object.freeze({
@@ -682,6 +683,47 @@ export function auditProofRequirement(result) {
   };
 }
 
+export function runtimeFixtureRequirement(result) {
+  const runtimeRelevantFiles = [];
+  const runtimeProofFiles = [];
+  const runtimeRelevantLanes = new Set();
+  const runtimeProofLanes = new Set();
+
+  for (const entry of result.classifications) {
+    const entryLanes = entry.matched
+      .flatMap(rule => rule.lanes)
+      .filter(lane => Object.hasOwn(RUNTIME_FIXTURE_LANE_REASONS, lane));
+
+    if (!entryLanes.length) continue;
+
+    if (RUNTIME_FIXTURE_PROOF_PATH_PATTERN.test(entry.file)) {
+      runtimeProofFiles.push(entry.file);
+      for (const lane of entryLanes) runtimeProofLanes.add(lane);
+    } else if (!AUDIT_PROOF_PATH_PATTERN.test(entry.file)) {
+      runtimeRelevantFiles.push(entry.file);
+      for (const lane of entryLanes) runtimeRelevantLanes.add(lane);
+    }
+  }
+
+  const sharedRuntimeProofLanes = orderedLanes(
+    [...runtimeRelevantLanes].filter(lane => runtimeProofLanes.has(lane))
+  );
+
+  return {
+    runtimeRelevantFiles,
+    runtimeProofFiles,
+    runtimeRelevantLanes: orderedLanes(runtimeRelevantLanes),
+    runtimeProofLanes: orderedLanes(runtimeProofLanes),
+    sharedRuntimeProofLanes,
+    missing: runtimeRelevantFiles.length > 0 && runtimeProofFiles.length === 0,
+    irrelevant:
+      runtimeRelevantFiles.length > 0 &&
+      runtimeProofFiles.length > 0 &&
+      runtimeRelevantLanes.size > 0 &&
+      sharedRuntimeProofLanes.length === 0
+  };
+}
+
 function gitLines(args) {
   const result = spawnSync('git', args, {
     cwd: repoRoot,
@@ -798,11 +840,23 @@ function printClassification(result) {
     }
   }
 
+  const runtimeFixture = runtimeFixtureRequirement(result);
   const runtimeFixtureReasons = [];
-  if (proofRelevantFiles.length) {
-    for (const lane of result.lanes) {
-      if (Object.hasOwn(RUNTIME_FIXTURE_LANE_REASONS, lane)) {
-        runtimeFixtureReasons.push([lane, RUNTIME_FIXTURE_LANE_REASONS[lane]]);
+  for (const lane of runtimeFixture.runtimeRelevantLanes) {
+    runtimeFixtureReasons.push([lane, RUNTIME_FIXTURE_LANE_REASONS[lane]]);
+  }
+
+  if (runtimeFixture.runtimeProofFiles.length) {
+    console.log('\nRuntime fixture/test proof files in this change:');
+    for (const file of runtimeFixture.runtimeProofFiles) console.log(`  ${file}`);
+    if (runtimeFixture.runtimeRelevantFiles.length) {
+      if (runtimeFixture.sharedRuntimeProofLanes.length) {
+        console.log(`  Shared runtime proof lane(s): ${formatLaneList(runtimeFixture.sharedRuntimeProofLanes)}`);
+      } else if (runtimeFixture.irrelevant) {
+        console.log('  Runtime fixture/test proof relevance mismatch:');
+        console.log(`    touched runtime lane(s): ${formatLaneList(runtimeFixture.runtimeRelevantLanes)}`);
+        console.log(`    proof runtime lane(s): ${formatLaneList(runtimeFixture.runtimeProofLanes)}`);
+        console.log('    behavior changes should update a fixture/test that shares a touched runtime lane.');
       }
     }
   }
@@ -811,6 +865,9 @@ function printClassification(result) {
     console.log('\nRuntime fixture proof expected when behavior changes:');
     for (const [lane, reason] of runtimeFixtureReasons) {
       console.log(`  test:${lane}: ${reason}`);
+    }
+    if (runtimeFixture.missing) {
+      console.log('  No runtime fixture/test proof file changed; refactor-only changes must be covered by the passing lane.');
     }
   }
 
