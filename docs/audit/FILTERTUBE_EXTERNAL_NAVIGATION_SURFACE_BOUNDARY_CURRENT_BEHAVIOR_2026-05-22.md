@@ -48,15 +48,15 @@ changes, or whitelist behavior changes.
 | `js/tab-view.js` | 11617 | 526763 | `1b7f621d48d16247aecc4c7ee57cbc3db9efd3e597e6f0a4fc188228470648f7` |
 | `js/content/release_notes_prompt.js` | 250 | 9866 | `30b624cbbda1004f354f98dbf3b4513f8ebc298adecbceb4358782f248f80474` |
 | `html/popup.html` | 31 | 1213 | `c5e03a38b2737dbd01e2cd0c243b37754936e2e349e9d2275b195350159aea31` |
-| `html/tab-view.html` | 1577 | 133585 | `e33ef1e0d1f2c3d607cb58c3275137df54c1c82ed06cf5cd03c053690fedb0b6` |
+| `html/tab-view.html` | 1577 | 133585 | `d11914a138ab29fb764a6aede4921c4d491bacaad83ecd44f8d7392758ece3e1` |
 | `website/components/marketing-ui.js` | 89 | 3155 | `f16f6e72b9761b09dc65e2fcd69f786e30b893afba76118401577254d8160302` |
 | `website/components/site-header.js` | 186 | 7700 | `6ffe1ff1815300d7e9f407c27bebe7bff14e2e6c1a794ce5290b9c0eb8c6f734` |
-| `website/components/site-footer.js` | 135 | 6073 | `c7e344060916fa91cd8f597d661626ef82298032ce7615c777b8d5c61954a4f8` |
+| `website/components/site-footer.js` | 131 | 5926 | `627ef370918b75bb7066c84c640ddb6a659a5ef2137101fdc24251d0b65a412a` |
 | `website/components/browser-logo-rail.js` | 64 | 2681 | `2c6cf5821cc1120adfae0204e37336e69c2e90a2db603afe558b68188fc4652b` |
 | `website/components/scenic-detail-page.js` | 332 | 14521 | `2c8fcc51be06adc875c7496f478f6b61022d2ae8235216714f988ab8a5c27701` |
 | `website/components/site-shell-data.js` | 21 | 473 | `28a1ac9ce4806438149720a36b7e4c586dd09f99142ebc63e1c863afcbd145d0` |
-| `website/app/page.js` | 661 | 31825 | `f396b57a6b5a4e83a3546957df084c9e71c63b35d4e8ba28adb85784c5f93f05` |
-| `website/app/downloads/page.js` | 364 | 14976 | `946b20660d8633edda3d0ff1723e3c9229b66f03139eb28930647e9acf123eba` |
+| `website/app/page.js` | 656 | 31731 | `40d595f905284d11a3fcab3600955dd6c1432b6874c502202bdc9e047acaa7a4` |
+| `website/app/downloads/page.js` | 373 | 15729 | `5b520ccf1fc879a02b7d6c67bd29bd49705aa00208110d693a20cd169cae801e` |
 | `website/app/privacy/page.js` | 819 | 35232 | `41e818a2f2f8bf9da3daa81e2e7b25863951b9090ce19f8a6aaec353af6f0cb9` |
 
 ## Source And Effect Blocks

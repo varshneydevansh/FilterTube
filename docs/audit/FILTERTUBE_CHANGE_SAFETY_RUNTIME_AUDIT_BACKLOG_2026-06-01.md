@@ -13,22 +13,24 @@ node --test --test-reporter=tap tests/runtime/*.test.mjs > /tmp/filtertube-runti
 
 ```text
 tests: 4737
-pass: 4674
-fail: 63
-duration_ms: 47603.511958
+pass: 4675
+fail: 62
+duration_ms: 51329.251833
 ```
 
-This refresh reduces the pinned broad-suite failure count from 64 failures to
-63 failures after retiring the stale extension UI CSS page-state boundary row:
-`html/tab-view.html` now pins the current same-size dashboard loader shell hash,
-while popup/tab-view loader order and the generated shell versus hand-owned UI
-runtime state split remain unchanged. The previous refresh reduced the suite
-from 65 failures to 64 failures after retiring the stale design-token
-build-configuration boundary row: the selected `build.js` configuration block
-now includes release mobile artifact constants and text-file extension sets,
-while the design-token JSON still remains outside the package-copy and
-script-generation path. Earlier broad refreshes reduced the suite from 66
-failures to 65 failures after retiring the stale current-dirty worktree
+This refresh reduces the pinned broad-suite failure count from 63 failures to
+62 failures after retiring the stale external navigation surface boundary row:
+`html/tab-view.html`, `website/components/site-footer.js`,
+`website/app/page.js`, and `website/app/downloads/page.js` now pin current
+source fingerprints while selected navigation primitive counts and split
+extension/website navigation policy proof remain unchanged. The previous refresh
+reduced the suite from 64 failures to 63 failures after retiring the stale
+extension UI CSS page-state boundary row: `html/tab-view.html` now pins the
+current same-size dashboard loader shell hash, while popup/tab-view loader order
+and the generated shell versus hand-owned UI runtime state split remain
+unchanged. Earlier broad refreshes reduced the suite from 65 failures to 64
+failures after retiring the stale design-token build-configuration boundary row,
+from 66 failures to 65 failures after retiring the stale current-dirty worktree
 package-version row, from 67 failures to 66 failures after retiring the stale
 content-filter field semantics contract dependency on the older
 compiled/settings field-register row count, from 69 failures to 67 failures
@@ -55,13 +57,13 @@ node scripts/audit-proof-drift.mjs --all --report-only
 
 ## Failure Clusters
 
-Current failing subtests are spread across 48 runtime test files. A lightweight
-name-based parse of `/tmp/filtertube-runtime-current-after-extension-ui-css-page-state-refresh.tap` gives this
+Current failing subtests are spread across 47 runtime test files. A lightweight
+name-based parse of `/tmp/filtertube-runtime-current-after-external-navigation-surface-refresh.tap` gives this
 non-exclusive family snapshot:
 
 | Family | Current failing subtests |
 |---|---:|
-| generated/release/package/docs surfaces | 39 |
+| generated/release/package/docs surfaces | 38 |
 | source-locus/optimization/index contracts | 12 |
 | JSON/video-meta/path/reference | 19 |
 | website/public-doc/source inventory | 14 |
@@ -95,6 +97,10 @@ The previous extension UI CSS page-state row is retired: the selected
 `html/tab-view.html` same-size dashboard shell hash now matches current source,
 and the proof still preserves CSS loader order plus generated-shell/runtime
 state-token separation.
+The previous external navigation surface row is retired: selected extension,
+website component, and website route fingerprints now match current source while
+the proof still preserves uneven static-link policy and split navigation-owner
+behavior as current state.
 
 | Cluster | Examples | Current meaning |
 |---|---|---|

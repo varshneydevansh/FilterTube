@@ -20,17 +20,20 @@ test('audit runtime backlog remains explicit and outside release-lane completion
   assert.match(doc, /Status: broad audit backlog, not a release-lane gate/);
   assert.match(doc, /node --test --test-reporter=tap tests\/runtime\/\*\.test\.mjs > \/tmp\/filtertube-runtime\.tap 2>&1/);
   assert.match(doc, /tests: 4737/);
-  assert.match(doc, /pass: 4674/);
-  assert.match(doc, /fail: 63/);
-  assert.match(doc, /duration_ms: 47603\.511958/);
+  assert.match(doc, /pass: 4675/);
+  assert.match(doc, /fail: 62/);
+  assert.match(doc, /duration_ms: 51329\.251833/);
+  assert.match(doc, /63 failures to\s+62 failures/);
+  assert.match(doc, /external navigation surface boundary row/);
+  assert.match(doc, /website\/components\/site-footer\.js/);
+  assert.match(doc, /website\/app\/downloads\/page\.js/);
+  assert.match(doc, /selected navigation primitive counts and split\s+extension\/website navigation policy proof remain unchanged/);
   assert.match(doc, /64 failures to\s+63 failures/);
   assert.match(doc, /extension UI CSS page-state boundary\s+row/);
   assert.match(doc, /same-size dashboard loader shell hash/);
-  assert.match(doc, /generated shell versus hand-owned UI\s+runtime state split remain unchanged/);
-  assert.match(doc, /65 failures to\s+64 failures/);
-  assert.match(doc, /design-token\s+build-configuration boundary\s+row/);
-  assert.match(doc, /release mobile\s+artifact constants and text-file extension sets/);
-  assert.match(doc, /design-token JSON\s+still remains outside the package-copy and\s+script-generation path/);
+  assert.match(doc, /generated shell versus hand-owned UI\s+runtime state split remain\s+unchanged/);
+  assert.match(doc, /65\s+failures to\s+64\s+failures/);
+  assert.match(doc, /design-token build-configuration boundary row/);
   assert.match(doc, /66\s+failures to\s+65 failures/);
   assert.match(doc, /current-dirty worktree\s+package-version row/);
   assert.match(doc, /67 failures\s+to 66 failures/);
@@ -128,7 +131,7 @@ test('audit runtime backlog names the broad failure clusters that still require 
 test('audit runtime backlog pins the current broad-suite failure family snapshot', () => {
   const doc = read(backlogPath);
   const expectedRows = [
-    ['generated/release/package/docs surfaces', '39'],
+    ['generated/release/package/docs surfaces', '38'],
     ['source-locus/optimization/index contracts', '12'],
     ['JSON/video-meta/path/reference', '19'],
     ['website/public-doc/source inventory', '14'],
@@ -136,8 +139,8 @@ test('audit runtime backlog pins the current broad-suite failure family snapshot
     ['native/Nanah/Kids/YTM', '8']
   ];
 
-  assert.match(doc, /Current failing subtests are spread across 48 runtime test files/);
-  assert.match(doc, /filtertube-runtime-current-after-extension-ui-css-page-state-refresh\.tap/);
+  assert.match(doc, /Current failing subtests are spread across 47 runtime test files/);
+  assert.match(doc, /filtertube-runtime-current-after-external-navigation-surface-refresh\.tap/);
   assert.match(doc, /non-exclusive family snapshot/);
   assert.match(doc, /previous method-proof\/family blocker row is now retired/);
   assert.match(doc, /direct method semantic proof lane passes with 5,681\s+current lexical callables/);
@@ -156,6 +159,9 @@ test('audit runtime backlog pins the current broad-suite failure family snapshot
   assert.match(doc, /previous extension UI CSS page-state row is retired/);
   assert.match(doc, /same-size dashboard shell hash now matches current source/);
   assert.match(doc, /CSS loader order plus generated-shell\/runtime\s+state-token separation/);
+  assert.match(doc, /previous external navigation surface row is retired/);
+  assert.match(doc, /selected extension,\s+website component, and website route fingerprints now match current source/);
+  assert.match(doc, /uneven static-link policy and split navigation-owner\s+behavior as current state/);
 
   for (const [family, count] of expectedRows) {
     assert.match(doc, new RegExp(`\\| ${family.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} \\| ${count} \\|`));
