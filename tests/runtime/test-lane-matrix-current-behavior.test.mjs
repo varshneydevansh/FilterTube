@@ -165,6 +165,8 @@ test('test lane matrix maps high-risk source files to expected lanes', () => {
     { files: ['backup or Nanah audit docs under `docs/audit/`'], lanes: ['test:settings', 'test:smoke'] },
     { files: ['renderer, watch, search, Shorts, end-screen, autoplay, playlist, or Kids browse audit docs under `docs/audit/`'], lanes: ['test:whitelist', 'test:blocking', 'test:json', 'test:dom', 'test:smoke'] },
     { files: ['network, fetch, XHR, or credential audit docs under `docs/audit/`'], lanes: ['test:json', 'test:performance', 'test:smoke'] },
+    { files: ['main-world message, injection, trust, or startup-injection audit docs under `docs/audit/`'], lanes: ['test:release', 'test:json', 'test:settings', 'test:smoke'] },
+    { files: ['generic message action, sender, side-effect, transport, or mutation audit docs under `docs/audit/`'], lanes: ['test:settings', 'test:smoke'] },
     { files: ['page-runtime lifecycle, observer, teardown, or selector lifecycle audit docs under `docs/audit/`'], lanes: ['test:dom', 'test:performance', 'test:smoke'] },
     { files: ['document-start or seed page-global patch audit docs under `docs/audit/`'], lanes: ['test:json', 'test:performance', 'test:smoke'] },
     { files: ['js/vendor/*.bundle.js'], lanes: ['test:release', 'test:settings', 'test:smoke'] },
@@ -274,11 +276,22 @@ test('executable classifier maps high-risk paths to required lanes', () => {
   const messageDispatchDoc = classifyPaths([
     'docs/audit/FILTERTUBE_CONTENT_BRIDGE_MAIN_WORLD_MESSAGE_DISPATCH_BOUNDARY_CURRENT_BEHAVIOR_2026-05-23.md'
   ]);
+  assert.deepEqual(messageDispatchDoc.lanes, ['release', 'json', 'settings', 'smoke']);
   assert.equal(
     messageDispatchDoc.classifications[0].matched.some(match => match.id === 'audit-performance-proof-doc'),
     false,
     'DISPATCH must not be classified as SPA performance proof by substring match'
   );
+  assert.deepEqual(classifyPaths([
+    'docs/audit/FILTERTUBE_BACKGROUND_SCRIPT_INJECTION_TRUST_BOUNDARY_CURRENT_BEHAVIOR_2026-05-23.md',
+    'docs/audit/FILTERTUBE_PAGE_MESSAGE_TRUST_AUDIT_2026-05-18.md',
+    'docs/audit/FILTERTUBE_STARTUP_INJECTION_READINESS_CURRENT_BEHAVIOR_2026-05-19.md'
+  ]).lanes, ['release', 'json', 'settings', 'smoke']);
+  assert.deepEqual(classifyPaths([
+    'docs/audit/FILTERTUBE_BACKGROUND_MESSAGE_ACTION_SEMANTIC_REGISTER_2026-05-21.md',
+    'docs/audit/FILTERTUBE_MESSAGE_SIDE_EFFECT_REGISTER_2026-05-18.md',
+    'docs/audit/FILTERTUBE_P0_MESSAGE_MUTATION_CURRENT_BEHAVIOR_2026-05-19.md'
+  ]).lanes, ['settings', 'smoke']);
   assert.deepEqual(classifyPaths([
     'docs/audit/FILTERTUBE_STALE_ALIAS_FALSE_HIDE_CHAIN_2026-05-20.md',
     'docs/audit/FILTERTUBE_LIST_MODE_TRANSITION_PERSISTENCE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-22.md'

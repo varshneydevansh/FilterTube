@@ -18,7 +18,7 @@ injection changes, map-write changes, stats/backup changes, or DOM rerun changes
 ## Source Boundary
 
 ```text
-tracked product JS/JSX/MJS files scanned: 61
+tracked product JS/JSX/MJS files scanned: 67
 tracked product files with message transport rows: 14
 message transport rows: 64
 runtime.onMessage.addListener rows: 4
@@ -117,11 +117,11 @@ js/content_bridge.js:13413:runtime.sendMessage:autoBackupScheduleRuntimeRequest
 js/content_bridge.js:13479:runtime.sendMessage:filterAllToggleRuntimeMutation
 js/content_bridge.js:13567:window.addEventListener(message):contentBridgeMainWorldMessageReceiver
 js/filter_logic.js:30:window.postMessage:filterLogicChannelMapBatch
-js/filter_logic.js:71:window.postMessage:filterLogicVideoChannelMapBatch
-js/filter_logic.js:132:window.postMessage:filterLogicVideoMetaMapBatch
-js/filter_logic.js:1502:window.postMessage:filterLogicVideoMetaMapBatch
-js/filter_logic.js:1543:window.postMessage:filterLogicVideoMetaMapBatch
-js/filter_logic.js:1898:window.postMessage:filterLogicCollaboratorCache
+js/filter_logic.js:80:window.postMessage:filterLogicVideoChannelMapBatch
+js/filter_logic.js:141:window.postMessage:filterLogicVideoMetaMapBatch
+js/filter_logic.js:1511:window.postMessage:filterLogicVideoMetaMapBatch
+js/filter_logic.js:1552:window.postMessage:filterLogicVideoMetaMapBatch
+js/filter_logic.js:2030:window.postMessage:filterLogicCollaboratorCache
 js/injector.js:12:window.postMessage:subscriptionImportProgressResponse
 js/injector.js:53:window.postMessage:subscriptionImportFinalResponse
 js/injector.js:72:window.addEventListener(message):subscriptionImportMainWorldReceiver

@@ -63,6 +63,10 @@ export const LANES = Object.freeze({
       'tests/runtime/release-notes-json-version-gate-boundary-current-behavior.test.mjs',
       'tests/runtime/release-package-parity-current-behavior.test.mjs',
       'tests/runtime/root-package-metadata-script-surface-current-behavior.test.mjs',
+      'tests/runtime/background-script-injection-trust-boundary-current-behavior.test.mjs',
+      'tests/runtime/bridge-injection-method-semantic-register-current-behavior.test.mjs',
+      'tests/runtime/page-message-trust-current-behavior.test.mjs',
+      'tests/runtime/startup-injection-readiness-current-behavior.test.mjs',
       'tests/runtime/test-lane-matrix-current-behavior.test.mjs'
     ]
   },
@@ -123,7 +127,11 @@ export const LANES = Object.freeze({
       'tests/runtime/json-first-network-snapshot-consumer-traversal-budget-current-behavior.test.mjs',
       'tests/runtime/json-first-list-mode-matrix-boundary-current-behavior.test.mjs',
       'tests/runtime/json-first-response-mutation-contract-current-behavior.test.mjs',
-      'tests/runtime/json-first-whitelist-decision-identity-boundary-current-behavior.test.mjs'
+      'tests/runtime/json-first-whitelist-decision-identity-boundary-current-behavior.test.mjs',
+      'tests/runtime/bridge-injection-method-semantic-register-current-behavior.test.mjs',
+      'tests/runtime/content-bridge-main-world-message-dispatch-boundary-current-behavior.test.mjs',
+      'tests/runtime/injector-main-world-message-dispatch-boundary-current-behavior.test.mjs',
+      'tests/runtime/startup-injection-readiness-current-behavior.test.mjs'
     ]
   },
   dom: {
@@ -201,7 +209,14 @@ export const LANES = Object.freeze({
       'tests/runtime/list-mode-transition-persistence-boundary-current-behavior.test.mjs',
       'tests/runtime/import-export-nanah-authority-current-behavior.test.mjs',
       'tests/runtime/backup-export-authority-current-behavior.test.mjs',
-      'tests/runtime/io-manager-method-semantic-register-current-behavior.test.mjs'
+      'tests/runtime/io-manager-method-semantic-register-current-behavior.test.mjs',
+      'tests/runtime/background-message-action-semantic-register-current-behavior.test.mjs',
+      'tests/runtime/background-message-authority-current-behavior.test.mjs',
+      'tests/runtime/content-bridge-main-world-message-dispatch-boundary-current-behavior.test.mjs',
+      'tests/runtime/message-sender-class-matrix-current-behavior.test.mjs',
+      'tests/runtime/message-side-effect-register-current-behavior.test.mjs',
+      'tests/runtime/message-transport-callsite-register-current-behavior.test.mjs',
+      'tests/runtime/p0-message-mutation-current-behavior.test.mjs'
     ]
   },
   smoke: {
@@ -491,6 +506,16 @@ export const FILE_LANE_RULES = Object.freeze([
     id: 'audit-network-transport-proof-doc',
     patterns: [/^docs\/audit\/.*(?:NETWORK|FETCH|XHR|CREDENTIAL).*\.md$/i],
     lanes: ['json', 'performance']
+  },
+  {
+    id: 'audit-message-trust-injection-proof-doc',
+    patterns: [/^docs\/audit\/.*(?:_|\/)(?:MAIN_WORLD_MESSAGE|INJECTION|TRUST|STARTUP_INJECTION)(?:_|\.md$)/i],
+    lanes: ['release', 'json', 'settings']
+  },
+  {
+    id: 'audit-message-state-proof-doc',
+    patterns: [/^docs\/audit\/.*MESSAGE.*\.md$/i],
+    lanes: ['settings']
   },
   {
     id: 'audit-page-lifecycle-proof-doc',

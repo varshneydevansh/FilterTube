@@ -163,7 +163,7 @@ test('message transport callsite register is audit-only and source pinned', () =
 
   assert.match(text, /Status: audit-only current-behavior register/);
   assert.match(text, /Runtime behavior is unchanged/);
-  assert.match(text, /tracked product JS\/JSX\/MJS files scanned: 61/);
+  assert.match(text, /tracked product JS\/JSX\/MJS files scanned: 67/);
   assert.match(text, /tracked product files with message transport rows: 14/);
   assert.match(text, /message transport rows: 64/);
   assert.match(text, /runtime.onMessage.addListener rows: 4/);
@@ -191,7 +191,7 @@ test('message transport callsite counts remain source-derived', () => {
   const rows = transportRows();
   const text = doc();
 
-  assert.equal(productScriptFiles().length, 61);
+  assert.equal(productScriptFiles().length, 67);
   assert.equal(rows.length, 64);
   assert.deepEqual(countBy(rows, 'operation'), {
     'runtime.onMessage.addListener': 4,
