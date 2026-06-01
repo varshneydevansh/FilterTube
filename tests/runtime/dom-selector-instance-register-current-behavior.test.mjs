@@ -143,7 +143,8 @@ function classifySourceFamily(file) {
     'js/content/dom_extractors.js',
     'js/content/collab_dialog.js',
     'js/injector.js',
-    'js/content/dom_helpers.js'
+    'js/content/dom_helpers.js',
+    'js/content/dom_state.js'
   ].includes(file)) return 'page-runtime';
   if (['js/tab-view.js', 'js/popup.js', 'js/ui_components.js'].includes(file)) return 'extension-ui';
   if (file === 'js/layout.js') return 'legacy-layout';
@@ -289,15 +290,15 @@ test('DOM selector instance register enumerates current API sites and literal dy
   const dynamicRows = rows.filter(row => !row.isStaticLiteral);
   const uniqueStatic = new Set(staticRows.map(row => row.selector));
 
-  assert.equal(rows.length, 646);
+  assert.equal(rows.length, 649);
   assert.equal(staticRows.length, 579);
-  assert.equal(dynamicRows.length, 67);
+  assert.equal(dynamicRows.length, 70);
   assert.equal(uniqueStatic.size, 374);
   assert.deepEqual(countBy(rows, 'api'), {
     closest: 96,
     matches: 6,
     querySelector: 399,
-    querySelectorAll: 145
+    querySelectorAll: 148
   });
   assert.deepEqual(countBy(staticRows, 'api'), {
     closest: 93,
@@ -329,14 +330,14 @@ test('selector source-family totals match the current register doc', () => {
   assert.deepEqual(countStaticDynamic(rows, 'sourceFamily'), {
     'extension-ui': { sites: 90, static: 90, dynamic: 0, unique: 42 },
     'legacy-layout': { sites: 63, static: 63, dynamic: 0, unique: 52 },
-    'page-runtime': { sites: 493, static: 426, dynamic: 67, unique: 286 }
+    'page-runtime': { sites: 496, static: 426, dynamic: 70, unique: 286 }
   });
 
   for (const phrase of [
-    '| `page-runtime` | 493 | 426 | 67 | 286 |',
+    '| `page-runtime` | 496 | 426 | 70 | 286 |',
     '| `extension-ui` | 90 | 90 | 0 | 42 |',
     '| `legacy-layout` | 63 | 63 | 0 | 52 |',
-    '| **Total** | **646** | **579** | **67** |'
+    '| **Total** | **649** | **579** | **70** |'
   ]) {
     assert.ok(doc.includes(phrase), `missing doc phrase ${phrase}`);
   }
@@ -354,6 +355,7 @@ test('selector hot-file totals match the source-derived register', () => {
       'js/content/dom_extractors.js': { sites: 27, static: 23, dynamic: 4, unique: 21 },
       'js/content/dom_fallback.js': { sites: 161, static: 150, dynamic: 11, unique: 118 },
       'js/content/dom_helpers.js': { sites: 3, static: 2, dynamic: 1, unique: 2 },
+      'js/content/dom_state.js': { sites: 3, static: 0, dynamic: 3, unique: 0 },
       'js/content_bridge.js': { sites: 246, static: 208, dynamic: 38, unique: 137 },
       'js/injector.js': { sites: 6, static: 5, dynamic: 1, unique: 5 },
       'js/layout.js': { sites: 63, static: 63, dynamic: 0, unique: 52 },

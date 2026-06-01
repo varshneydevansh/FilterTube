@@ -159,6 +159,7 @@ export const LANES = Object.freeze({
       ...FILTER_LOGIC_AUDIT_PROOF_TESTS,
       'tests/runtime/dom-fallback-method-semantic-register-current-behavior.test.mjs',
       'tests/runtime/dom-fallback-selector-semantic-register-current-behavior.test.mjs',
+      'tests/runtime/dom-selector-instance-register-current-behavior.test.mjs',
       'tests/runtime/dom-fallback-run-state-visibility-cleanup-boundary-current-behavior.test.mjs',
       'tests/runtime/css-style-hide-authority-current-behavior.test.mjs',
       'tests/runtime/dom-hide-side-effect-current-behavior.test.mjs',

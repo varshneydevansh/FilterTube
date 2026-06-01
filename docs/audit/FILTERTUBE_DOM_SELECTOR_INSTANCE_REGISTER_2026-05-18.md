@@ -27,14 +27,14 @@ safe, or complete for every YouTube renderer.
 
 | Selector API | Current call sites | Static literal args | Dynamic/non-literal args |
 | --- | ---: | ---: | ---: |
-| `querySelectorAll()` | 145 | 106 | 39 |
+| `querySelectorAll()` | 148 | 106 | 42 |
 | `querySelector()` | 399 | 375 | 24 |
 | `closest()` | 96 | 93 | 3 |
 | `matches()` | 6 | 5 | 1 |
-| **Total** | **646** | **579** | **67** |
+| **Total** | **649** | **579** | **70** |
 
 The 579 static literal argument sites contain 374 unique literal selector
-strings. The 67 dynamic selector expressions include constants and assembled
+strings. The 70 dynamic selector expressions include constants and assembled
 selectors such as `VIDEO_CARD_SELECTORS`, `QUICK_BLOCK_CARD_SELECTORS`,
 `FT_DROPDOWN_SELECTORS`, `linkSelectors`, `selectors.join(',')`, and template
 selectors using runtime ids.
@@ -43,7 +43,7 @@ selectors using runtime ids.
 
 | Source family | Selector API sites | Static literal args | Dynamic/non-literal args | Unique static selector literals |
 | --- | ---: | ---: | ---: | ---: |
-| `page-runtime` | 493 | 426 | 67 | 286 |
+| `page-runtime` | 496 | 426 | 70 | 286 |
 | `extension-ui` | 90 | 90 | 0 | 42 |
 | `legacy-layout` | 63 | 63 | 0 | 52 |
 
@@ -62,6 +62,7 @@ selectors using runtime ids.
 | `js/injector.js` | 6 | 5 | 1 | Page-world subscription/import helper selectors. |
 | `js/ui_components.js` | 6 | 6 | 0 | Shared extension UI selectors. |
 | `js/content/dom_helpers.js` | 3 | 2 | 1 | Shared hide/container helper selector input. |
+| `js/content/dom_state.js` | 3 | 0 | 3 | Virtual attribute selector patch wrappers forward caller-provided selectors through patched `querySelector()` methods. |
 
 ## Dynamic Selector Families
 
@@ -71,7 +72,26 @@ selectors using runtime ids.
 | Dropdown/menu constants | `FT_DROPDOWN_SELECTORS`, `nativeMenuSelector` | Normal and fallback menu paths do not share one action gate today. |
 | Joined selector arrays | `selectors.join(',')`, `linkSelectors`, `shortsSelectors`, `playlistSelectors` | Route-specific selector sets are assembled locally, not through one selector authority. |
 | Runtime id templates | ``[data-filtertube-video-id="${videoId}"]`` and collaboration-group selectors | Correctness depends on the runtime id source, ownership, escaping, and stale-node cleanup. |
-| Caller-provided selector variables | `selector`, `sel`, `hiddenSelector`, `childSelector` | These need caller/source ownership proof before broad cleanup or reuse. |
+| Caller-provided selector variables | `selector`, `sel`, `hiddenSelector`, `childSelector` | These need caller/source ownership proof before broad cleanup, virtual selector patching, or reuse. |
+
+## DOM State Selector Patch Addendum - 2026-06-01
+
+`js/content/dom_state.js` adds three page-runtime dynamic selector API sites to
+the source register. They are the patched `querySelector()` wrappers for
+Element, Document, and DocumentFragment, and each forwards the caller-provided
+`selector` argument into `querySelectorAll(selector)[0]`.
+
+```text
+js/content/dom_state.js:363:querySelectorAll
+js/content/dom_state.js:374:querySelectorAll
+js/content/dom_state.js:386:querySelectorAll
+runtime behavior changed by this addendum: no
+selector behavior change approval from this addendum: NO-GO
+```
+
+The selector count changes from 646 to 649, while static selector literals stay
+at 579. The additional sites are dynamic page-runtime selector patch surfaces,
+not new hide or allow decisions.
 
 ## Content Bridge Selector Semantic Addendum
 
@@ -150,10 +170,10 @@ runtime behavior changed by this addendum: no
 
 | Finding | Evidence | Risk |
 | --- | --- | --- |
-| Selector authority is not centralized. | 646 selector API call sites across 11 non-vendor tracked files and no product `selectorAuthority` token. | A cleanup can narrow one selector path while another broad path still targets the same DOM. |
-| Page runtime dominates selector risk. | Page-runtime owns 493 of 646 selector API sites and all 67 dynamic selector expressions. | Empty-install lag, false hides, and route drift are mostly page-runtime selector risks. |
+| Selector authority is not centralized. | 649 selector API call sites across 12 non-vendor tracked files and no product `selectorAuthority` token. | A cleanup can narrow one selector path while another broad path still targets the same DOM. |
+| Page runtime dominates selector risk. | Page-runtime owns 496 of 649 selector API sites and all 70 dynamic selector expressions. | Empty-install lag, false hides, and route drift are mostly page-runtime selector risks. |
 | Static selector literals are numerous. | 579 literal selector-argument sites and 374 unique literal selector strings. | A broad edit needs a source-derived register, not manual memory of a few constants. |
-| Dynamic selectors need ownership proof. | 66 sites use constants, joined arrays, runtime templates, or caller-provided selector variables. | These cannot be proven safe by static literal review alone. |
+| Dynamic selectors need ownership proof. | 70 sites use constants, joined arrays, runtime templates, virtual selector wrappers, or caller-provided selector variables. | These cannot be proven safe by static literal review alone. |
 | Inventory docs remain evidence maps. | `docs/youtube_renderer_inventory.md`, `docs/json_paths_encyclopedia.md`, and ignored root captures inform fixtures but are not selector authority. | A documented DOM tag is not proof that current runtime selects it safely. |
 
 ## Required Selector Instance Contract

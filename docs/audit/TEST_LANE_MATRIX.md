@@ -169,7 +169,7 @@ the surface connected to a focused lane.
 | end screens | `test:whitelist` keeps end-screen videowall, card, autoplay, and player DOM cleanup tests in lane. |
 | quick-block and 3-dot menus | `test:menu` keeps `quick-block-block-menu-affordance-boundary`, `native-dropdown-close-state`, and `content-bridge-collaborator-identity-promotion-handoff` in lane. |
 | JSON-first filtering | `test:json` keeps seed/network, readiness, snapshot, list-mode, and response-mutation tests in lane. |
-| DOM fallback | `test:dom` keeps DOM fallback selector, CSS hide authority, direct hide writer, quarantined content CSS package boundary, run-state cleanup, virtual-attribute, and route cleanup tests in lane. |
+| DOM fallback | `test:dom` keeps DOM selector instance, DOM fallback selector, CSS hide authority, direct hide writer, quarantined content CSS package boundary, run-state cleanup, virtual-attribute, and route cleanup tests in lane. |
 | direct hide writers | `test:dom` keeps `direct-hide-writer-register-current-behavior` in lane so visual writer/source-order drift stays tied to DOM false-hide proof. |
 | no-rule performance | `test:performance` keeps empty-install, no-work, active-rule, content-control active-work, diagnostic logging policy, and route-surface budget tests in lane. |
 | SPA navigation | `test:performance` keeps whitelist-cache SPA metric and route-surface no-work tests in lane; live SPA rows remain in manual smoke. |
