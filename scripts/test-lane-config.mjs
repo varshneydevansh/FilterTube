@@ -2,6 +2,7 @@
 // Keep this file declarative; execution belongs in the runner.
 
 export const MANUAL_YOUTUBE_SMOKE_LANE_REASONS = Object.freeze({
+  release: 'release packaging, public claims, installed-extension parity, and artifact handoff behavior',
   whitelist: 'whitelist-only leaks, Shorts, watch/end-screen, Kids/YTM allow behavior',
   blocking: 'keyword/channel/comment hiding and blocklist false-hide/leak behavior',
   json: 'JSON-first filtering, network interception, and SPA response mutation',

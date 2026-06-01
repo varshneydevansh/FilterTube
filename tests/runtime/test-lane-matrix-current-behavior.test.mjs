@@ -435,7 +435,7 @@ test('changed-lane dirty path guard reports only additional tracked or unignored
   ]);
 });
 
-test('classifier output surfaces manual YouTube smoke for user-facing runtime lanes', () => {
+test('classifier output surfaces manual YouTube smoke for user-facing runtime and release lanes', () => {
   const runtime = spawnSync(process.execPath, ['scripts/run-test-lane.mjs', '--classify', 'js/seed.js'], {
     cwd: repoRoot,
     encoding: 'utf8'
@@ -467,7 +467,9 @@ test('classifier output surfaces manual YouTube smoke for user-facing runtime la
   });
 
   assert.equal(releaseOnly.status, 0, releaseOnly.stderr);
-  assert.doesNotMatch(releaseOnly.stdout, /Manual YouTube smoke required when user-facing:/);
+  assert.match(releaseOnly.stdout, /Manual YouTube smoke required when user-facing:/);
+  assert.match(releaseOnly.stdout, /test:release: release packaging, public claims, installed-extension parity, and artifact handoff behavior/);
+  assert.match(releaseOnly.stdout, /Live smoke artifact handoff:/);
   assert.doesNotMatch(releaseOnly.stdout, /Runtime fixture proof expected when behavior changes:/);
 });
 
