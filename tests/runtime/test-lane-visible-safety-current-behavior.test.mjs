@@ -152,7 +152,8 @@ test('goal safety surfaces stay bound to focused lane proof tests', () => {
       tests: [
         /seed-network-current-behavior/,
         /json-first-response-mutation-contract/,
-        /ytm-show-sheet-injector-filter-logic-parity-current-behavior/
+        /ytm-show-sheet-injector-filter-logic-parity-current-behavior/,
+        /ytm-show-sheet-enrichment-handoff-current-behavior/
       ]
     },
     {

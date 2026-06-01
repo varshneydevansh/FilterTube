@@ -13,9 +13,9 @@ node --test --test-reporter=tap tests/runtime/*.test.mjs > /tmp/filtertube-runti
 
 ```text
 tests: 4731
-pass: 4609
-fail: 122
-duration_ms: 40876.452166
+pass: 4610
+fail: 121
+duration_ms: 35290.977291
 ```
 
 ## Boundary
@@ -43,7 +43,7 @@ node scripts/audit-proof-drift.mjs --all --report-only
 | JSON comment continuation and provenance registers | comment author/channel provenance, keyword provenance, structural wrapper cleanup, continuation shortcut counts | Comment JSON proof rows need focused JSON/blocking refresh before they can be broad gates. |
 | JSON content-control hide boundary registers | hideAllComments, hideAskButton, hideHomeFeed, hideMixPlaylists, hideVideoInfo, hideWatchPlaylistPanel, and related boundaries | Many older JSON content-control boundary docs still pin stale source counts or anchors. |
 | JSON-first renderer, reference, metric, and video-meta registers | candidate extraction, implementation locus, metric artifact gate, reference docs, renderer traversal, video-meta parity/fetch/merge docs | JSON-first proof is still split across older NO-GO gates and focused lane tests. |
-| YTM and YouTube Music parity slices | YTM showSheet enrichment, YTM injector/filter-logic parity, playlist selected-row parity | `ytm-show-sheet-injector-filter-logic-parity` has been refreshed and promoted into `test:json`; remaining YTM proof slices are still partial and should be refreshed in focused whitelist/JSON/menu batches. |
+| YTM and YouTube Music parity slices | YTM showSheet enrichment, YTM injector/filter-logic parity, playlist selected-row parity | `ytm-show-sheet-injector-filter-logic-parity` and `ytm-show-sheet-enrichment-handoff` have been refreshed and promoted into `test:json`; remaining YTM proof slices are still partial and should be refreshed in focused whitelist/JSON/menu batches. |
 
 ## Release Lane Decision
 

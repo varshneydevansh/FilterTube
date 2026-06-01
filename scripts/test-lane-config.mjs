@@ -148,6 +148,7 @@ export const LANES = Object.freeze({
       'tests/runtime/json-first-response-mutation-contract-current-behavior.test.mjs',
       'tests/runtime/json-first-whitelist-decision-identity-boundary-current-behavior.test.mjs',
       'tests/runtime/ytm-show-sheet-injector-filter-logic-parity-current-behavior.test.mjs',
+      'tests/runtime/ytm-show-sheet-enrichment-handoff-current-behavior.test.mjs',
       'tests/runtime/bridge-injection-method-semantic-register-current-behavior.test.mjs',
       'tests/runtime/content-bridge-main-world-message-dispatch-boundary-current-behavior.test.mjs',
       'tests/runtime/injector-main-world-message-dispatch-boundary-current-behavior.test.mjs',

@@ -20,9 +20,9 @@ test('audit runtime backlog remains explicit and outside release-lane completion
   assert.match(doc, /Status: broad audit backlog, not a release-lane gate/);
   assert.match(doc, /node --test --test-reporter=tap tests\/runtime\/\*\.test\.mjs > \/tmp\/filtertube-runtime\.tap 2>&1/);
   assert.match(doc, /tests: 4731/);
-  assert.match(doc, /pass: 4609/);
-  assert.match(doc, /fail: 122/);
-  assert.match(doc, /duration_ms: 40876\.452166/);
+  assert.match(doc, /pass: 4610/);
+  assert.match(doc, /fail: 121/);
+  assert.match(doc, /duration_ms: 35290\.977291/);
   assert.match(doc, /node scripts\/audit-proof-drift\.mjs --all --report-only/);
   assert.match(doc, /no stale source fingerprint proof rows/);
   assert.match(doc, /The focused release lanes are the per-change proof system/);
@@ -76,7 +76,7 @@ test('audit runtime backlog names the broad failure clusters that still require 
   assert.match(doc, /dom-selector-instance-register` has been refreshed for `js\/content\/dom_state\.js` selector patch sites and promoted into `test:dom`/);
   assert.match(doc, /lifecycle-instance-register` and `repo-lifecycle-primitive-coverage` have been refreshed for website component lifecycle drift and promoted into `test:performance`/);
   assert.match(doc, /remaining lifecycle selector and JSON content-control hide rows belong in smaller DOM\/JSON batches/);
-  assert.match(doc, /ytm-show-sheet-injector-filter-logic-parity` has been refreshed and promoted into `test:json`/);
+  assert.match(doc, /ytm-show-sheet-injector-filter-logic-parity` and `ytm-show-sheet-enrichment-handoff` have been refreshed and promoted into `test:json`/);
 });
 
 test('smoke lane keeps the broad audit backlog boundary visible', () => {

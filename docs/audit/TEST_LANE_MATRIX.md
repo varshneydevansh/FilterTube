@@ -168,7 +168,7 @@ the surface connected to a focused lane.
 | Shorts behavior | `test:whitelist` keeps `main-watch-initial-lockup-shorts-json-current-behavior`, `main-watch-initial-shorts-owner-absent-boundary-current-behavior`, `json-first-hide-all-shorts-boundary-current-behavior`, and `shorts-dom-cleanup-boundary-current-behavior` in lane for watch/Shorts allow-mode, owner-absent, Hide Shorts, and DOM cleanup proof. |
 | end screens | `test:whitelist` keeps end-screen videowall, card, autoplay, and player DOM cleanup tests in lane. |
 | quick-block and 3-dot menus | `test:menu` keeps `quick-block-block-menu-affordance-boundary`, `native-dropdown-close-state`, and `content-bridge-collaborator-identity-promotion-handoff` in lane. |
-| JSON-first filtering | `test:json` keeps seed/network, readiness, snapshot, list-mode, response-mutation, and YTM showSheet collaborator parity tests in lane. |
+| JSON-first filtering | `test:json` keeps seed/network, readiness, snapshot, list-mode, response-mutation, and YTM showSheet collaborator parity/enrichment tests in lane. |
 | DOM fallback | `test:dom` keeps DOM selector instance, DOM fallback selector, CSS hide authority, direct hide writer, quarantined content CSS package boundary, run-state cleanup, virtual-attribute, and route cleanup tests in lane. |
 | direct hide writers | `test:dom` keeps `direct-hide-writer-register-current-behavior` in lane so visual writer/source-order drift stays tied to DOM false-hide proof. |
 | no-rule performance | `test:performance` keeps empty-install, no-work, active-rule, content-control active-work, lifecycle primitive/register proof, diagnostic logging policy, and route-surface budget tests in lane. |
@@ -363,7 +363,7 @@ YouTube parity. Missing future work should add or refine lane tests instead of
 expanding manual-only release checks.
 
 The 2026-06-01 full historical runtime audit currently remains backlog evidence:
-`4731` tests ran, `4609` passed, and `122` failed in the latest sampled TAP
+`4731` tests ran, `4610` passed, and `121` failed in the latest sampled TAP
 run. The failing rows are mostly stale current-boundary snapshots for
 callable/source-locus indexes, goal ledgers, generated/package artifacts,
 settings source/effect and claim registers, DOM selector/lifecycle inventories,
