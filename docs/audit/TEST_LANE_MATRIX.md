@@ -357,10 +357,13 @@ YouTube parity. Missing future work should add or refine lane tests instead of
 expanding manual-only release checks.
 
 The 2026-06-01 full historical runtime audit currently remains backlog evidence:
-`4719` tests ran, `4491` passed, and `228` failed. The failing rows are mostly
-stale current-boundary snapshots for source fingerprints, method-gap counts,
-generated counters, website build artifacts, version/package metadata,
-optimization gate docs, native/runtime mirrors, YouTube Music/YTM provenance,
-and large inventory registers outside the focused lane set. The focused lanes and
-`test:audit-drift` are the change-safety gates; `audit:runtime` is the
-inventory to retire or refresh in smaller proof batches.
+`4727` tests ran, `4591` passed, and `136` failed in the latest sampled TAP
+run. The failing rows are mostly stale current-boundary snapshots for
+callable/source-locus indexes, goal ledgers, generated/package artifacts,
+settings and content-control registers, DOM selector/lifecycle inventories,
+JSON comment/provenance registers, JSON content-control hide boundaries,
+JSON-first metric/reference/video-meta docs, and YTM parity slices outside the
+focused lane set. The all-scope source fingerprint drift inventory is clean, so
+the focused lanes and `test:audit-drift` remain the change-safety gates while
+`audit:runtime` stays the inventory to retire or refresh in smaller proof
+batches.

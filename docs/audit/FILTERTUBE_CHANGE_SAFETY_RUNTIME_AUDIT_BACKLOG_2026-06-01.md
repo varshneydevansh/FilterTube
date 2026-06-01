@@ -12,9 +12,10 @@ node --test --test-reporter=tap tests/runtime/*.test.mjs > /tmp/filtertube-runti
 ## Result
 
 ```text
-tests: 4719
-pass: 4491
-fail: 228
+tests: 4727
+pass: 4591
+fail: 136
+duration_ms: 40287.160708
 ```
 
 ## Boundary
@@ -23,18 +24,26 @@ The focused release lanes are the per-change proof system. The broad
 `audit:runtime` suite is older current-boundary inventory and is still useful,
 but it is not clean enough to be treated as a release blocker today.
 
+Adjacent fingerprint proof is now cleaner than the broad suite result. This
+command currently reports no stale source fingerprint proof rows:
+
+```bash
+node scripts/audit-proof-drift.mjs --all --report-only
+```
+
 ## Failure Clusters
 
 | Cluster | Examples | Current meaning |
 |---|---|---|
-| Source fingerprint and method-gap drift | `js/filter_logic.js`, `html/tab-view.html`, `manifest.json`, `data/release_notes.json`, older method-gap assertions for `63` files / `5473` callables | Existing proof rows need refresh after recent release, lag-fix, and callable-index work. |
-| Generated/local artifact drift | `dist/*v3.3.1.zip`, `website/.next/BUILD_ID`, native runtime mirrors | Local build output and native/app mirror snapshots are stale relative to the working tree. |
-| Inventory counter drift | callable, lifecycle, selector, network, message-transport, website render graph registers | Repo-wide registers need regenerated proof before they can be used as broad gates. |
-| Website route surface drift | `website/components/footer-signal-art.js`, `website/components/hero-video.js`, downloads page, website client lifecycle counts | Website/dashboard release-copy work changed the route/component surface. |
-| Version/package drift | package/manifests now target `3.3.2` while older tests still pin `3.3.1` boundaries | Release-candidate bump invalidated older staged-version assertions. |
-| Optimization and route-surface gate drift | first optimization collector/contract gates, JSON-first route-surface fixture and metric gates | Older NO-GO proof gates still point at stale upstream counts, source anchors, or artifact prerequisites. |
-| Native/runtime mirror drift | Nanah/native runtime mirror freshness, generated main runtime assets, broad extension source mirror drift | Mirror freshness proof remains useful but is not current enough to serve as a release blocker. |
-| YouTube Music and YTM provenance drift | YouTube Music surface identity, YTM showSheet enrichment, YTM injector/filter-logic parity | YTM proof slices remain partial and several current-source fingerprints need refresh. |
+| Callable, source-locus, and index drift | all-callable index counts, source-locus anchors, route component callable/render primitive counts | Repo-wide callable/source-locus registers need regenerated proof before they can become broad gates. |
+| Audit goal and completion ledgers | audit completion gap register, collector verification output, JSON route/surface contract coverage links | Older goal ledgers still point at stale broad-suite counts or prerequisite gates. |
+| Docs/audit boundary, packaging, and generated artifacts | audit markdown boundary, `compress-video`, design tokens, release notes, external navigation, generated main runtime assets, dist/website generated output | Release and generated-output proof remains useful, but several broad inventory rows need refresh. |
+| Settings and content-control registers | compiled settings fields, content-control active-work matrix, content-control alias mutation | Settings/control registers need refreshed source/effect rows before serving as broad proof. |
+| DOM selector, hide, and lifecycle registers | direct hide writers, DOM selector instance register, lifecycle primitive inventories, tab-view lifecycle selector boundary | DOM/lifecycle inventories have current-source drift that belongs in smaller DOM/performance batches. |
+| JSON comment continuation and provenance registers | comment author/channel provenance, keyword provenance, structural wrapper cleanup, continuation shortcut counts | Comment JSON proof rows need focused JSON/blocking refresh before they can be broad gates. |
+| JSON content-control hide boundary registers | hideAllComments, hideAskButton, hideHomeFeed, hideMixPlaylists, hideVideoInfo, hideWatchPlaylistPanel, and related boundaries | Many older JSON content-control boundary docs still pin stale source counts or anchors. |
+| JSON-first renderer, reference, metric, and video-meta registers | candidate extraction, implementation locus, metric artifact gate, reference docs, renderer traversal, video-meta parity/fetch/merge docs | JSON-first proof is still split across older NO-GO gates and focused lane tests. |
+| YTM and YouTube Music parity slices | YTM showSheet enrichment, YTM injector/filter-logic parity, playlist selected-row parity | YTM proof slices remain partial and should be refreshed in focused whitelist/JSON/menu batches. |
 
 ## Release Lane Decision
 

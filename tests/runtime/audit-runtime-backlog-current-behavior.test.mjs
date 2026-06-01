@@ -19,29 +19,33 @@ test('audit runtime backlog remains explicit and outside release-lane completion
 
   assert.match(doc, /Status: broad audit backlog, not a release-lane gate/);
   assert.match(doc, /node --test --test-reporter=tap tests\/runtime\/\*\.test\.mjs > \/tmp\/filtertube-runtime\.tap 2>&1/);
-  assert.match(doc, /tests: 4719/);
-  assert.match(doc, /pass: 4491/);
-  assert.match(doc, /fail: 228/);
+  assert.match(doc, /tests: 4727/);
+  assert.match(doc, /pass: 4591/);
+  assert.match(doc, /fail: 136/);
+  assert.match(doc, /duration_ms: 40287\.160708/);
+  assert.match(doc, /node scripts\/audit-proof-drift\.mjs --all --report-only/);
+  assert.match(doc, /no stale source fingerprint proof rows/);
   assert.match(doc, /The focused release lanes are the per-change proof system/);
   assert.match(doc, /not clean enough to be treated as a release blocker today/);
 
   assert.match(matrix, new RegExp(backlogPath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
   assert.match(matrix, /full historical runtime audit/);
   assert.match(matrix, /broad backlog suite, not the default per-change release lane/);
-  assert.match(matrix, /audit:runtime` is the\s+inventory to retire or refresh/);
+  assert.match(matrix, /audit:runtime` stays the inventory to retire or refresh/);
 });
 
 test('audit runtime backlog names the broad failure clusters that still require smaller proof batches', () => {
   const doc = read(backlogPath);
   const requiredClusters = [
-    'Source fingerprint and method-gap drift',
-    'Generated/local artifact drift',
-    'Inventory counter drift',
-    'Website route surface drift',
-    'Version/package drift',
-    'Optimization and route-surface gate drift',
-    'Native/runtime mirror drift',
-    'YouTube Music and YTM provenance drift'
+    'Callable, source-locus, and index drift',
+    'Audit goal and completion ledgers',
+    'Docs/audit boundary, packaging, and generated artifacts',
+    'Settings and content-control registers',
+    'DOM selector, hide, and lifecycle registers',
+    'JSON comment continuation and provenance registers',
+    'JSON content-control hide boundary registers',
+    'JSON-first renderer, reference, metric, and video-meta registers',
+    'YTM and YouTube Music parity slices'
   ];
   const requiredLanes = [
     'test:release',

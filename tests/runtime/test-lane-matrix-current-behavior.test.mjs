@@ -947,6 +947,7 @@ test('lane-owned audit proof fingerprints do not silently drift', () => {
   assert.ok(files.includes('scripts/test-lane-config.mjs'));
   assert.deepEqual(drift, []);
   assert.match(matrix, /full audit proof drift inventory/);
-  assert.match(matrix, /4719` tests ran, `4491` passed, and `228` failed/);
-  assert.match(matrix, /audit:runtime` is the\s+inventory to retire or refresh/);
+  assert.match(matrix, /4727` tests ran, `4591` passed, and `136` failed/);
+  assert.match(matrix, /all-scope source fingerprint drift inventory is clean/);
+  assert.match(matrix, /audit:runtime` stays the inventory to retire or refresh/);
 });
