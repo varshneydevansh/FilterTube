@@ -67,6 +67,9 @@ test('audit runtime backlog names the broad failure clusters that still require 
   for (const lane of requiredLanes) {
     assert.ok(doc.includes(lane), `missing focused lane decision: ${lane}`);
   }
+
+  assert.match(doc, /compiled-settings-field-register` has been refreshed and promoted into `test:settings`/);
+  assert.match(doc, /remaining content-control registers still need refreshed source\/effect rows/);
 });
 
 test('smoke lane keeps the broad audit backlog boundary visible', () => {

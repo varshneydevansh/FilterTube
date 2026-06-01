@@ -19,19 +19,19 @@ settings relays, or first-class JSON filtering.
 
 ```text
 tracked product files scanned for compiled/settings fields: 6
-raw compiled/settings field rows: 296
-unique file-field-operation rows: 145
+raw compiled/settings field rows: 309
+unique file-field-operation rows: 148
 raw cachedSettingsRead rows: 12
 raw compiledAssign rows: 54
 raw currentSettingsRead rows: 56
 raw processedAssign rows: 7
-raw settingsRead rows: 131
+raw settingsRead rows: 144
 raw sharedCompiledReturn rows: 36
 unique cachedSettingsRead rows: 7
 unique compiledAssign rows: 44
 unique currentSettingsRead rows: 6
 unique processedAssign rows: 7
-unique settingsRead rows: 45
+unique settingsRead rows: 48
 unique sharedCompiledReturn rows: 36
 runtime behavior changed: no
 ```
@@ -66,7 +66,7 @@ js/content/bridge_settings.js
 | `js/background.js` | 50 |
 | `js/content/bridge_settings.js` | 4 |
 | `js/content_bridge.js` | 16 |
-| `js/filter_logic.js` | 23 |
+| `js/filter_logic.js` | 26 |
 | `js/seed.js` | 16 |
 | `js/settings_shared.js` | 36 |
 
@@ -77,7 +77,7 @@ cachedSettingsRead (7): enabled,filterChannels,filterKeywords,hideAllComments,hi
 compiledAssign (44): categoryFilters,channelMap,contentFilters,disableAnnotations,disableAutoplay,enabled,filterChannels,filterComments,filterKeywords,filterKeywordsComments,hideAllComments,hideAllShorts,hideAskButton,hideEndscreenCards,hideEndscreenVideowall,hideExploreTrending,hideHomeFeed,hideLiveChat,hideMembersOnly,hideMerchTicketsOffers,hideMixPlaylists,hideMoreFromYouTube,hideNotificationBell,hidePlaylistCards,hideRecommended,hideSearchShelves,hideSponsoredCards,hideSubscriptions,hideTopHeader,hideVideoButtonsBar,hideVideoChannelRow,hideVideoDescription,hideVideoInfo,hideVideoSidebar,hideWatchPlaylistPanel,listMode,profileType,showBlockMenuItem,showQuickBlockButton,useExactWordMatching,videoChannelMap,videoMetaMap,whitelistChannels,whitelistKeywords
 currentSettingsRead (6): channelMap,filterChannels,listMode,showBlockMenuItem,videoChannelMap,videoMetaMap
 processedAssign (7): categoryFilters,contentFilters,filterChannels,filterKeywords,videoMetaMap,whitelistChannels,whitelistKeywords
-settingsRead (45 rows; 23 fields): autoBackupEnabled,autoBackupFormat,autoBackupMode,categoryFilters,channelMap,contentFilters,enabled,filterChannels,filterComments,filterKeywords,filterKeywordsComments,ftProfilesV4,hideAllComments,hideAllShorts,hideComments,listMode,minWordLength,mode,profileType,videoChannelMap,videoMetaMap,whitelistChannels,whitelistKeywords
+settingsRead (48 rows; 26 fields): autoBackupEnabled,autoBackupFormat,autoBackupMode,categoryFilters,channelMap,contentFilters,disableAutoplay,enabled,filterChannels,filterComments,filterKeywords,filterKeywordsComments,ftProfilesV4,hideAllComments,hideAllShorts,hideComments,hideEndscreenCards,hideEndscreenVideowall,listMode,minWordLength,mode,profileType,videoChannelMap,videoMetaMap,whitelistChannels,whitelistKeywords
 sharedCompiledReturn (36): categoryFilters,contentFilters,disableAnnotations,disableAutoplay,enabled,filterChannels,filterComments,filterKeywords,filterKeywordsComments,hideAllComments,hideAllShorts,hideAskButton,hideEndscreenCards,hideEndscreenVideowall,hideExploreTrending,hideHomeFeed,hideLiveChat,hideMembersOnly,hideMerchTicketsOffers,hideMixPlaylists,hideMoreFromYouTube,hideNotificationBell,hidePlaylistCards,hideRecommended,hideSearchShelves,hideSponsoredCards,hideSubscriptions,hideTopHeader,hideVideoButtonsBar,hideVideoChannelRow,hideVideoDescription,hideVideoInfo,hideVideoSidebar,hideWatchPlaylistPanel,showBlockMenuItem,showQuickBlockButton
 ```
 
@@ -154,13 +154,13 @@ js/content_bridge.js:416:currentSettingsRead:filterChannels:5
 js/content_bridge.js:1218:currentSettingsRead:listMode:7
 js/content_bridge.js:1654:currentSettingsRead:videoMetaMap:11
 js/content_bridge.js:10678:currentSettingsRead:showBlockMenuItem:1
-js/filter_logic.js:968:processedAssign:contentFilters:1
-js/filter_logic.js:986:processedAssign:categoryFilters:1
-js/filter_logic.js:998:processedAssign:filterKeywords:1
-js/filter_logic.js:1012:processedAssign:whitelistKeywords:1
-js/filter_logic.js:1027:processedAssign:filterChannels:1
-js/filter_logic.js:1043:processedAssign:whitelistChannels:1
-js/filter_logic.js:1056:processedAssign:videoMetaMap:1
+js/filter_logic.js:977:processedAssign:contentFilters:1
+js/filter_logic.js:995:processedAssign:categoryFilters:1
+js/filter_logic.js:1007:processedAssign:filterKeywords:1
+js/filter_logic.js:1021:processedAssign:whitelistKeywords:1
+js/filter_logic.js:1036:processedAssign:filterChannels:1
+js/filter_logic.js:1052:processedAssign:whitelistChannels:1
+js/filter_logic.js:1065:processedAssign:videoMetaMap:1
 js/background.js:788:settingsRead:autoBackupEnabled:1
 js/background.js:811:settingsRead:ftProfilesV4:1
 js/background.js:814:settingsRead:autoBackupFormat:2
@@ -181,22 +181,25 @@ js/content/bridge_settings.js:295:settingsRead:profileType:4
 js/content/bridge_settings.js:329:settingsRead:listMode:1
 js/content/bridge_settings.js:332:settingsRead:whitelistChannels:2
 js/content/bridge_settings.js:333:settingsRead:whitelistKeywords:2
-js/filter_logic.js:848:settingsRead:channelMap:10
-js/filter_logic.js:849:settingsRead:filterChannels:10
-js/filter_logic.js:850:settingsRead:whitelistChannels:8
-js/filter_logic.js:964:settingsRead:contentFilters:5
-js/filter_logic.js:983:settingsRead:categoryFilters:5
-js/filter_logic.js:997:settingsRead:filterKeywords:6
-js/filter_logic.js:1011:settingsRead:whitelistKeywords:5
-js/filter_logic.js:1056:settingsRead:videoMetaMap:17
-js/filter_logic.js:1376:settingsRead:videoChannelMap:7
-js/filter_logic.js:1572:settingsRead:listMode:2
-js/filter_logic.js:1913:settingsRead:hideAllShorts:1
-js/filter_logic.js:2078:settingsRead:hideAllComments:1
-js/filter_logic.js:2085:settingsRead:filterKeywordsComments:2
-js/filter_logic.js:2862:settingsRead:mode:1
-js/filter_logic.js:2863:settingsRead:minWordLength:1
-js/filter_logic.js:3449:settingsRead:enabled:2
+js/filter_logic.js:857:settingsRead:channelMap:10
+js/filter_logic.js:858:settingsRead:filterChannels:13
+js/filter_logic.js:859:settingsRead:whitelistChannels:10
+js/filter_logic.js:973:settingsRead:contentFilters:5
+js/filter_logic.js:992:settingsRead:categoryFilters:5
+js/filter_logic.js:1006:settingsRead:filterKeywords:6
+js/filter_logic.js:1020:settingsRead:whitelistKeywords:7
+js/filter_logic.js:1065:settingsRead:videoMetaMap:17
+js/filter_logic.js:1385:settingsRead:videoChannelMap:9
+js/filter_logic.js:1581:settingsRead:listMode:3
+js/filter_logic.js:1932:settingsRead:disableAutoplay:1
+js/filter_logic.js:1932:settingsRead:hideEndscreenCards:1
+js/filter_logic.js:1932:settingsRead:hideEndscreenVideowall:1
+js/filter_logic.js:2045:settingsRead:hideAllShorts:1
+js/filter_logic.js:2215:settingsRead:hideAllComments:1
+js/filter_logic.js:2222:settingsRead:filterKeywordsComments:2
+js/filter_logic.js:2999:settingsRead:mode:1
+js/filter_logic.js:3000:settingsRead:minWordLength:1
+js/filter_logic.js:3603:settingsRead:enabled:2
 js/seed.js:204:settingsRead:contentFilters:4
 js/seed.js:215:settingsRead:categoryFilters:2
 js/seed.js:224:settingsRead:filterKeywords:1

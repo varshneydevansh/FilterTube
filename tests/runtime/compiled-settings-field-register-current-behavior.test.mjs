@@ -30,154 +30,6 @@ const sourceFingerprints = {
   'js/content/bridge_settings.js': [651, 26462, 'c7828acd09941f4559e47b31ea57d184ef9367ae4964598e865b8a196934e75b']
 };
 
-const expectedUniqueRows = [
-  'js/seed.js:269:cachedSettingsRead:listMode:2',
-  'js/seed.js:411:cachedSettingsRead:enabled:3',
-  'js/seed.js:439:cachedSettingsRead:profileType:1',
-  'js/seed.js:441:cachedSettingsRead:filterKeywords:1',
-  'js/seed.js:442:cachedSettingsRead:filterChannels:1',
-  'js/seed.js:443:cachedSettingsRead:hideAllComments:3',
-  'js/seed.js:444:cachedSettingsRead:hideAllShorts:1',
-  'js/background.js:1894:compiledAssign:filterKeywords:6',
-  'js/background.js:1930:compiledAssign:filterKeywordsComments:6',
-  'js/background.js:1990:compiledAssign:listMode:1',
-  'js/background.js:1991:compiledAssign:profileType:1',
-  'js/background.js:2011:compiledAssign:whitelistKeywords:1',
-  'js/background.js:2212:compiledAssign:whitelistChannels:1',
-  'js/background.js:2330:compiledAssign:filterChannels:1',
-  'js/background.js:2411:compiledAssign:channelMap:1',
-  'js/background.js:2424:compiledAssign:videoChannelMap:1',
-  'js/background.js:2427:compiledAssign:videoMetaMap:1',
-  'js/background.js:2477:compiledAssign:enabled:1',
-  'js/background.js:2478:compiledAssign:hideAllComments:1',
-  'js/background.js:2479:compiledAssign:filterComments:1',
-  'js/background.js:2480:compiledAssign:useExactWordMatching:1',
-  'js/background.js:2481:compiledAssign:hideAllShorts:1',
-  'js/background.js:2482:compiledAssign:hideHomeFeed:1',
-  'js/background.js:2483:compiledAssign:hideSponsoredCards:1',
-  'js/background.js:2484:compiledAssign:hideWatchPlaylistPanel:1',
-  'js/background.js:2485:compiledAssign:hidePlaylistCards:1',
-  'js/background.js:2486:compiledAssign:hideMembersOnly:1',
-  'js/background.js:2487:compiledAssign:hideMixPlaylists:1',
-  'js/background.js:2488:compiledAssign:hideVideoSidebar:1',
-  'js/background.js:2489:compiledAssign:hideRecommended:1',
-  'js/background.js:2490:compiledAssign:hideLiveChat:1',
-  'js/background.js:2491:compiledAssign:hideVideoInfo:1',
-  'js/background.js:2492:compiledAssign:hideVideoButtonsBar:1',
-  'js/background.js:2493:compiledAssign:hideAskButton:1',
-  'js/background.js:2494:compiledAssign:hideVideoChannelRow:1',
-  'js/background.js:2495:compiledAssign:hideVideoDescription:1',
-  'js/background.js:2496:compiledAssign:hideMerchTicketsOffers:1',
-  'js/background.js:2497:compiledAssign:hideEndscreenVideowall:1',
-  'js/background.js:2498:compiledAssign:hideEndscreenCards:1',
-  'js/background.js:2499:compiledAssign:disableAutoplay:1',
-  'js/background.js:2500:compiledAssign:disableAnnotations:1',
-  'js/background.js:2501:compiledAssign:hideTopHeader:1',
-  'js/background.js:2502:compiledAssign:hideNotificationBell:1',
-  'js/background.js:2503:compiledAssign:hideExploreTrending:1',
-  'js/background.js:2504:compiledAssign:hideMoreFromYouTube:1',
-  'js/background.js:2505:compiledAssign:hideSubscriptions:1',
-  'js/background.js:2506:compiledAssign:showQuickBlockButton:1',
-  'js/background.js:2507:compiledAssign:showBlockMenuItem:1',
-  'js/background.js:2508:compiledAssign:hideSearchShelves:1',
-  'js/background.js:2527:compiledAssign:contentFilters:1',
-  'js/background.js:2549:compiledAssign:categoryFilters:1',
-  'js/content_bridge.js:254:currentSettingsRead:channelMap:8',
-  'js/content_bridge.js:283:currentSettingsRead:videoChannelMap:24',
-  'js/content_bridge.js:416:currentSettingsRead:filterChannels:5',
-  'js/content_bridge.js:1218:currentSettingsRead:listMode:7',
-  'js/content_bridge.js:1654:currentSettingsRead:videoMetaMap:11',
-  'js/content_bridge.js:10678:currentSettingsRead:showBlockMenuItem:1',
-  'js/filter_logic.js:968:processedAssign:contentFilters:1',
-  'js/filter_logic.js:986:processedAssign:categoryFilters:1',
-  'js/filter_logic.js:998:processedAssign:filterKeywords:1',
-  'js/filter_logic.js:1012:processedAssign:whitelistKeywords:1',
-  'js/filter_logic.js:1027:processedAssign:filterChannels:1',
-  'js/filter_logic.js:1043:processedAssign:whitelistChannels:1',
-  'js/filter_logic.js:1056:processedAssign:videoMetaMap:1',
-  'js/background.js:788:settingsRead:autoBackupEnabled:1',
-  'js/background.js:811:settingsRead:ftProfilesV4:1',
-  'js/background.js:814:settingsRead:autoBackupFormat:2',
-  'js/background.js:839:settingsRead:autoBackupMode:2',
-  'js/background.js:1080:settingsRead:filterComments:1',
-  'js/background.js:1080:settingsRead:hideComments:1',
-  'js/content_bridge.js:1015:settingsRead:enabled:2',
-  'js/content_bridge.js:1016:settingsRead:listMode:2',
-  'js/content_bridge.js:1017:settingsRead:filterChannels:2',
-  'js/content_bridge.js:1026:settingsRead:contentFilters:4',
-  'js/content_bridge.js:1037:settingsRead:categoryFilters:2',
-  'js/content_bridge.js:1046:settingsRead:filterKeywords:1',
-  'js/content_bridge.js:1048:settingsRead:filterKeywordsComments:1',
-  'js/content_bridge.js:1049:settingsRead:hideAllComments:1',
-  'js/content_bridge.js:1050:settingsRead:hideAllShorts:1',
-  'js/content_bridge.js:8327:settingsRead:videoChannelMap:2',
-  'js/content/bridge_settings.js:295:settingsRead:profileType:4',
-  'js/content/bridge_settings.js:329:settingsRead:listMode:1',
-  'js/content/bridge_settings.js:332:settingsRead:whitelistChannels:2',
-  'js/content/bridge_settings.js:333:settingsRead:whitelistKeywords:2',
-  'js/filter_logic.js:848:settingsRead:channelMap:10',
-  'js/filter_logic.js:849:settingsRead:filterChannels:10',
-  'js/filter_logic.js:850:settingsRead:whitelistChannels:8',
-  'js/filter_logic.js:964:settingsRead:contentFilters:5',
-  'js/filter_logic.js:983:settingsRead:categoryFilters:5',
-  'js/filter_logic.js:997:settingsRead:filterKeywords:6',
-  'js/filter_logic.js:1011:settingsRead:whitelistKeywords:5',
-  'js/filter_logic.js:1056:settingsRead:videoMetaMap:17',
-  'js/filter_logic.js:1376:settingsRead:videoChannelMap:7',
-  'js/filter_logic.js:1572:settingsRead:listMode:2',
-  'js/filter_logic.js:1913:settingsRead:hideAllShorts:1',
-  'js/filter_logic.js:2078:settingsRead:hideAllComments:1',
-  'js/filter_logic.js:2085:settingsRead:filterKeywordsComments:2',
-  'js/filter_logic.js:2862:settingsRead:mode:1',
-  'js/filter_logic.js:2863:settingsRead:minWordLength:1',
-  'js/filter_logic.js:3449:settingsRead:enabled:2',
-  'js/seed.js:204:settingsRead:contentFilters:4',
-  'js/seed.js:215:settingsRead:categoryFilters:2',
-  'js/seed.js:224:settingsRead:filterKeywords:1',
-  'js/seed.js:225:settingsRead:filterChannels:1',
-  'js/seed.js:226:settingsRead:filterKeywordsComments:1',
-  'js/seed.js:227:settingsRead:hideAllComments:1',
-  'js/seed.js:228:settingsRead:hideAllShorts:1',
-  'js/seed.js:235:settingsRead:enabled:1',
-  'js/seed.js:236:settingsRead:listMode:1',
-  'js/settings_shared.js:525:sharedCompiledReturn:enabled:1',
-  'js/settings_shared.js:526:sharedCompiledReturn:filterKeywords:1',
-  'js/settings_shared.js:527:sharedCompiledReturn:filterKeywordsComments:1',
-  'js/settings_shared.js:528:sharedCompiledReturn:filterChannels:1',
-  'js/settings_shared.js:529:sharedCompiledReturn:hideAllShorts:1',
-  'js/settings_shared.js:530:sharedCompiledReturn:hideAllComments:1',
-  'js/settings_shared.js:531:sharedCompiledReturn:filterComments:1',
-  'js/settings_shared.js:532:sharedCompiledReturn:hideHomeFeed:1',
-  'js/settings_shared.js:533:sharedCompiledReturn:hideSponsoredCards:1',
-  'js/settings_shared.js:534:sharedCompiledReturn:hideWatchPlaylistPanel:1',
-  'js/settings_shared.js:535:sharedCompiledReturn:hidePlaylistCards:1',
-  'js/settings_shared.js:536:sharedCompiledReturn:hideMembersOnly:1',
-  'js/settings_shared.js:537:sharedCompiledReturn:hideMixPlaylists:1',
-  'js/settings_shared.js:538:sharedCompiledReturn:hideVideoSidebar:1',
-  'js/settings_shared.js:539:sharedCompiledReturn:hideRecommended:1',
-  'js/settings_shared.js:540:sharedCompiledReturn:hideLiveChat:1',
-  'js/settings_shared.js:541:sharedCompiledReturn:hideVideoInfo:1',
-  'js/settings_shared.js:542:sharedCompiledReturn:hideVideoButtonsBar:1',
-  'js/settings_shared.js:543:sharedCompiledReturn:hideAskButton:1',
-  'js/settings_shared.js:544:sharedCompiledReturn:hideVideoChannelRow:1',
-  'js/settings_shared.js:545:sharedCompiledReturn:hideVideoDescription:1',
-  'js/settings_shared.js:546:sharedCompiledReturn:hideMerchTicketsOffers:1',
-  'js/settings_shared.js:547:sharedCompiledReturn:hideEndscreenVideowall:1',
-  'js/settings_shared.js:548:sharedCompiledReturn:hideEndscreenCards:1',
-  'js/settings_shared.js:549:sharedCompiledReturn:disableAutoplay:1',
-  'js/settings_shared.js:550:sharedCompiledReturn:disableAnnotations:1',
-  'js/settings_shared.js:551:sharedCompiledReturn:hideTopHeader:1',
-  'js/settings_shared.js:552:sharedCompiledReturn:hideNotificationBell:1',
-  'js/settings_shared.js:553:sharedCompiledReturn:hideExploreTrending:1',
-  'js/settings_shared.js:554:sharedCompiledReturn:hideMoreFromYouTube:1',
-  'js/settings_shared.js:555:sharedCompiledReturn:hideSubscriptions:1',
-  'js/settings_shared.js:556:sharedCompiledReturn:showQuickBlockButton:1',
-  'js/settings_shared.js:557:sharedCompiledReturn:showBlockMenuItem:1',
-  'js/settings_shared.js:558:sharedCompiledReturn:hideSearchShelves:1',
-  'js/settings_shared.js:559:sharedCompiledReturn:contentFilters:1',
-  'js/settings_shared.js:560:sharedCompiledReturn:categoryFilters:1'
-];
-
 function read(file) {
   return fs.readFileSync(path.join(repoRoot, file), 'utf8');
 }
@@ -287,14 +139,23 @@ function fieldsByOperation(rows) {
   );
 }
 
+function uniqueRowsFromDoc(text) {
+  const section = sliceBetween(text, '## Unique Field Rows', '## Current Behavior Boundaries');
+  return section
+    .split(/\r?\n/)
+    .map(line => line.trim())
+    .filter(line => /^js\/.*:\d+:[A-Za-z]+:[A-Za-z0-9_]+:\d+$/.test(line));
+}
+
 test('compiled settings field register is audit-only and source pinned', () => {
   const text = doc();
+  const { rawRows, uniqueRows } = uniqueFieldRows();
 
   assert.match(text, /Status: audit-only current-behavior register/);
   assert.match(text, /Runtime behavior is unchanged/);
   assert.match(text, /tracked product files scanned for compiled\/settings fields: 6/);
-  assert.match(text, /raw compiled\/settings field rows: 296/);
-  assert.match(text, /unique file-field-operation rows: 145/);
+  assert.match(text, new RegExp(`raw compiled/settings field rows: ${rawRows.length}`));
+  assert.match(text, new RegExp(`unique file-field-operation rows: ${uniqueRows.length}`));
   assert.match(text, /runtime behavior changed: no/);
   assert.match(text, /not completion proof for settings authority/);
   assert.match(text, /first-class JSON filtering/);
@@ -314,15 +175,16 @@ test('compiled settings field register is audit-only and source pinned', () => {
 test('compiled settings field register counts and rows remain source-derived', () => {
   const { rawRows, uniqueRows } = uniqueFieldRows();
   const text = doc();
+  const actualRows = uniqueRows.map(row => `${row.file}:${row.line}:${row.operation}:${row.field}:${row.count}`);
 
-  assert.equal(rawRows.length, 296);
-  assert.equal(uniqueRows.length, 145);
+  assert.equal(rawRows.length, 309);
+  assert.equal(uniqueRows.length, 148);
   assert.deepEqual(countBy(rawRows, 'operation'), {
     cachedSettingsRead: 12,
     compiledAssign: 54,
     currentSettingsRead: 56,
     processedAssign: 7,
-    settingsRead: 131,
+    settingsRead: 144,
     sharedCompiledReturn: 36
   });
   assert.deepEqual(countBy(uniqueRows, 'operation'), {
@@ -330,23 +192,19 @@ test('compiled settings field register counts and rows remain source-derived', (
     compiledAssign: 44,
     currentSettingsRead: 6,
     processedAssign: 7,
-    settingsRead: 45,
+    settingsRead: 48,
     sharedCompiledReturn: 36
   });
   assert.deepEqual(countBy(uniqueRows, 'file'), {
     'js/background.js': 50,
     'js/content/bridge_settings.js': 4,
     'js/content_bridge.js': 16,
-    'js/filter_logic.js': 23,
+    'js/filter_logic.js': 26,
     'js/seed.js': 16,
     'js/settings_shared.js': 36
   });
 
-  const actualRows = uniqueRows.map(row => `${row.file}:${row.line}:${row.operation}:${row.field}:${row.count}`);
-  assert.deepEqual(actualRows, expectedUniqueRows);
-  for (const row of expectedUniqueRows) {
-    assert.ok(text.includes(row), `missing compiled settings row ${row}`);
-  }
+  assert.deepEqual(uniqueRowsFromDoc(text), actualRows);
 });
 
 test('compiled settings field register records compiler parity and consumer boundaries', () => {

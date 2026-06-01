@@ -173,7 +173,7 @@ the surface connected to a focused lane.
 | no-rule performance | `test:performance` keeps empty-install, no-work, active-rule, diagnostic logging policy, and route-surface budget tests in lane. |
 | SPA navigation | `test:performance` keeps whitelist-cache SPA metric and route-surface no-work tests in lane; live SPA rows remain in manual smoke. |
 | code-burden growth | `test:performance` keeps the code-burden declutter boundary in lane, including the 1000-line product-owned source guard and near-threshold file list. |
-| settings | `test:settings` keeps settings-mode, refresh fanout, compiled-cache, import/export, and state-manager tests in lane. |
+| settings | `test:settings` keeps settings-mode, compiled-settings field/register proof, refresh fanout, compiled-cache, import/export, and state-manager tests in lane. |
 | release packaging | `test:release` keeps package parity, public release surface, audit proof directory boundary, live-smoke boundary, and artifact claim tests in lane. |
 
 ## User-Reported Regression Anchors

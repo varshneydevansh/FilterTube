@@ -223,6 +223,7 @@ export const LANES = Object.freeze({
       'tests/runtime/settings-refresh-fanout-current-behavior.test.mjs',
       'tests/runtime/settings-refresh-dirty-key-producer-matrix-current-behavior.test.mjs',
       'tests/runtime/settings-refresh-dirty-key-consumer-matrix-current-behavior.test.mjs',
+      'tests/runtime/compiled-settings-field-register-current-behavior.test.mjs',
       'tests/runtime/compiled-settings-profile-list-mode-assembly-boundary-current-behavior.test.mjs',
       'tests/runtime/compiled-cache-authority-current-behavior.test.mjs',
       'tests/runtime/compiler-parity-current-behavior.test.mjs',

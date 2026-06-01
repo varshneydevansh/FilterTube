@@ -173,7 +173,7 @@ test('goal safety surfaces stay bound to focused lane proof tests', () => {
     {
       surface: 'settings',
       lane: 'settings',
-      tests: [/settings-mode-coverage-matrix/, /compiled-settings-profile-list-mode-assembly/]
+      tests: [/settings-mode-coverage-matrix/, /compiled-settings-field-register/, /compiled-settings-profile-list-mode-assembly/]
     },
     {
       surface: 'release packaging',
