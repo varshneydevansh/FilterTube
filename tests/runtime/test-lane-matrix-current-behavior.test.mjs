@@ -181,6 +181,7 @@ test('test lane matrix maps high-risk source files to expected lanes', () => {
     { files: ['js/nanah_sync_adapter.js', 'js/security_manager.js'], lanes: ['test:release', 'test:settings', 'test:smoke'] },
     { files: ['js/layout.js'], lanes: ['test:release', 'test:dom', 'test:smoke'] },
     { files: ['js/shared/identity.js', 'js/content/dom_extractors.js', 'js/content/handle_resolver.js'], lanes: ['test:whitelist', 'test:blocking', 'test:menu'] },
+    { files: ['release-notes JSON version-gate audit docs under `docs/audit/`'], lanes: ['test:release', 'test:smoke'] },
     { files: ['identity, resolver, handle, or waterfall audit docs under `docs/audit/`'], lanes: ['test:whitelist', 'test:blocking', 'test:menu', 'test:smoke'] },
     { files: ['alias, list-mode, or row-list-mode audit docs under `docs/audit/`'], lanes: ['test:whitelist', 'test:blocking', 'test:settings', 'test:smoke'] },
     { files: ['backup or Nanah audit docs under `docs/audit/`'], lanes: ['test:settings', 'test:smoke'] },
@@ -244,6 +245,17 @@ test('executable classifier maps high-risk paths to required lanes', () => {
   const auditDoc = classifyPaths(['docs/audit/FILTERTUBE_JSON_FIRST_HIDE_HOME_FEED_BOUNDARY_CURRENT_BEHAVIOR_2026-05-22.md']);
   assert.deepEqual(auditDoc.lanes, ['json', 'smoke']);
   assert.deepEqual(auditDoc.unmatched, []);
+
+  const releaseNotesJsonAuditDoc = classifyPaths([
+    'docs/audit/FILTERTUBE_RELEASE_NOTES_JSON_VERSION_GATE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-22.md'
+  ]);
+  assert.deepEqual(releaseNotesJsonAuditDoc.lanes, ['release', 'smoke']);
+  assert.deepEqual(releaseNotesJsonAuditDoc.unmatched, []);
+  assert.equal(
+    releaseNotesJsonAuditDoc.classifications[0].matched.some(match => match.id === 'audit-json-proof-doc'),
+    false,
+    'release-notes JSON data proof must not require the runtime JSON-first filtering lane'
+  );
 
   const diagnosticAuditDoc = classifyPaths([
     'docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md'
