@@ -69,7 +69,7 @@ not been acknowledged.
 | `prompt_ack_rejects_wrong_sender_class` | Not satisfied | `FilterTube_ReleaseNotesAck` and `FilterTube_FirstRunComplete` write storage without the trusted UI sender guard or prompt-instance capability. |
 | `whats_new_url_is_allowlisted` | Not satisfied | `FilterTube_OpenWhatsNew` opens `request.url || WHATS_NEW_PAGE_URL`; release prompt sends `targetLink`. |
 | `prompt_overlay_fits_mobile_viewport` | Partial, not authority-backed | Both prompts have a `max-width: 600px` CSS fallback, but no safe-area, visual viewport, top chrome, arrow, or one-at-a-time overlay proof. |
-| `current_manifest_version_has_release_note_entry` | Locally satisfied today | Current manifest/package version `3.3.1` is present in `data/release_notes.json`, while `3.3.2` is staged ahead of the package version. |
+| `current_manifest_version_has_release_note_entry` | Locally satisfied today | Current manifest/package version `3.3.2` is present as the first version row in `data/release_notes.json`. |
 
 ## Required Future Authority
 

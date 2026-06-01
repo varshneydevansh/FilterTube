@@ -24,7 +24,7 @@ ship with the extension or feed public UI behavior:
 | Generated UI shell source | `src/extension-shell/popup.jsx`, `src/extension-shell/tab-view-decor.jsx`, `src/extension-shell/shared/runtime.js` | Real source inputs for `scripts/build-extension-ui.mjs`; must be tracked with generated outputs. |
 | Generated UI shell output | `js/ui-shell/popup-shell.js`, `js/ui-shell/tab-view-decor.js` | Browser IIFEs loaded by popup/dashboard pages. |
 | Vendor bundles | `js/vendor/nanah.bundle.js`, `js/vendor/qrcode.bundle.js` | API-boundary/global-surface proof, not product-owned line-by-line behavior. |
-| Release note data | `data/release_notes.json` | Dashboard and prompt copy source; staged version drift is pinned elsewhere. |
+| Release note data | `data/release_notes.json` | Dashboard and prompt copy source; current package-version parity is pinned elsewhere. |
 | Static app/brand/media assets | `icons/*`, `assets/images/*`, `website/public/brand/logo.png`, `website/public/videos/*` | Packaged/public asset burden; checksums and size budgets still needed before release gates. |
 
 ## Current Size Snapshot
@@ -46,7 +46,7 @@ ship with the extension or feed public UI behavior:
 | `js/ui-shell/tab-view-decor.js` | 18,289 | 323 | Generated dashboard decor shell. |
 | `js/vendor/nanah.bundle.js` | 27,692 | 876 | Nanah global bundle. |
 | `js/vendor/qrcode.bundle.js` | 66,965 | 2,085 | QR code global bundle. |
-| `data/release_notes.json` | 23,039 | 316 | Release-note copy data. |
+| `data/release_notes.json` | 23,020 | 317 | Release-note copy data. |
 
 ## Extension HTML Load Order
 

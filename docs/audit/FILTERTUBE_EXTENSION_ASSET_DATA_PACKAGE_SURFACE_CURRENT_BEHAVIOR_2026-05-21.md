@@ -13,13 +13,13 @@ for `assets/images/*`, `icons/*`, `data/release_notes.json`, and
 
 ## Tracked Asset/Data Surface
 
-The tracked extension asset/data surface has 12 files and 8,372,059 bytes:
+The tracked extension asset/data surface has 12 files and 8,372,040 bytes:
 
 | Family | Files | Bytes | Current package role |
 | --- | ---: | ---: | --- |
 | `assets/images` | 3 | 8,327,776 | Copied wholesale by `build.js`; popup/dashboard ambient video and app-release artwork |
 | `icons` | 7 | 19,342 | Copied wholesale by `build.js`; browser manifest icons plus one web-accessible menu asset |
-| `data` | 1 | 23,039 | Copied wholesale by `build.js`; release-note data loaded by background and dashboard |
+| `data` | 1 | 23,020 | Copied wholesale by `build.js`; release-note data loaded by background and dashboard |
 | `design` | 1 | 1,902 | Tracked design input; not copied by `build.js` current `COMMON_DIRS` |
 
 Current file fingerprints:
@@ -36,7 +36,7 @@ Current file fingerprints:
 | `icons/icon-32.png` | 1,396 | PNG 32x32 | `5e7b427aed06912c51fce9982bbbccc5b51b570f3c038c703f39d4816cbe75bf` |
 | `icons/icon-48.png` | 1,650 | PNG 48x48 | `87c4199c7734d686f875b5086a6e7d7979667cfd09b8291cbb480bb703870a53` |
 | `icons/icon-64.png` | 2,833 | PNG 64x64 | `da1f8d1e10a4a9f2a81a81dae309b1c431de24040650243386a725a33e72de88` |
-| `data/release_notes.json` | 23,039 | 24 JSON rows: 1 comment row plus 23 version rows | `e012f6c071fffa67958f55544ecae9bbb26e7ec91edd2066df4d06a62de69962` |
+| `data/release_notes.json` | 23,020 | 24 JSON rows: 1 comment row plus 23 version rows | `a8d59b18e9bffd1c828538ee58b3b8e9be7c641fea3ff064220311485a3b1c6b` |
 | `design/design_tokens.json` | 1,902 | 6 color groups plus typography, spacing, radiuses, shadows | `57bada64f3690a22fedea5f07aadc029e129f971465f8c66baab4a005984b3f0` |
 
 ## Build And Manifest Inclusion
@@ -93,9 +93,9 @@ manifest exists today.
 ## Release Notes Data
 
 `data/release_notes.json` currently has one comment row and 23 version rows.
-The first version row is staged `3.3.2`, while `package.json` and all four
-browser manifests currently remain `3.3.1`. The current package version
-`3.3.1` does have a matching release-note entry.
+The first version row is current `3.3.2`, matching `package.json` and all four
+browser manifests. The current package version has a matching release-note
+entry and every version row has a `detailsUrl`.
 
 Runtime consumers:
 
@@ -146,8 +146,8 @@ CSS variables, extension UI, website UI, and generated shell output.
    UI consumers still need a complete reference scan and package artifact proof.
 5. `icons/file.svg` has browser web-accessible drift: default, Chrome, and
    Firefox expose it; Opera does not.
-6. Release notes can show staged `3.3.2` copy while package/browser versions are
-   `3.3.1`. This may be intentional staging, but it still needs an explicit
+6. Release notes, package metadata, and browser manifests are aligned on
+   `3.3.2` today. Future staged-copy edits still need an explicit
    release-version gate before publication.
 7. Design token JSON and CSS token values currently diverge. Cleanup or token
    migration is blocked until a design-token parity report exists.
@@ -171,7 +171,7 @@ No product source currently implements:
 
 This register does not close tracked-file obligations. It pins current package
 copying, file fingerprints, manifest references, UI consumers, release-note
-version drift, and design-token input drift. Before optimizing assets, deleting
+version parity, and design-token input drift. Before optimizing assets, deleting
 manifest-inactive icons, changing release-note behavior, relying on mobile app
 artwork in public copy, moving media into website/app bundles, or migrating
 design tokens, future work still needs package artifact proof, byte and startup

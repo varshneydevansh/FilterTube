@@ -41,7 +41,7 @@ const assetRows = [
   ['icons/icon-32.png', 1396, '5e7b427aed06912c51fce9982bbbccc5b51b570f3c038c703f39d4816cbe75bf', { width: 32, height: 32 }],
   ['icons/icon-48.png', 1650, '87c4199c7734d686f875b5086a6e7d7979667cfd09b8291cbb480bb703870a53', { width: 48, height: 48 }],
   ['icons/icon-64.png', 2833, 'da1f8d1e10a4a9f2a81a81dae309b1c431de24040650243386a725a33e72de88', { width: 64, height: 64 }],
-  ['data/release_notes.json', 23039, 'e012f6c071fffa67958f55544ecae9bbb26e7ec91edd2066df4d06a62de69962', null],
+  ['data/release_notes.json', 23020, 'a8d59b18e9bffd1c828538ee58b3b8e9be7c641fea3ff064220311485a3b1c6b', null],
   ['design/design_tokens.json', 1902, '57bada64f3690a22fedea5f07aadc029e129f971465f8c66baab4a005984b3f0', null],
 ];
 
@@ -108,9 +108,9 @@ test('extension asset data package surface doc is audit-only and fingerprint pin
   assert.match(doc, /Runtime behavior is unchanged/);
   assert.match(doc, /This is not an\s+implementation patch/);
   assert.match(doc, /asset optimization, package cleanup, release approval, or\s+design-token migration/);
-  assert.match(doc, /12 files and 8,372,059 bytes/);
+  assert.match(doc, /12 files and 8,372,040 bytes/);
   assert.equal(assetRows.length, 12);
-  assert.equal(totalBytes, 8372059);
+  assert.equal(totalBytes, 8372040);
 
   assert.equal(assetRows.filter(([file]) => file.startsWith('assets/images/')).reduce((sum, [file]) => sum + bytes(file), 0), 8327776);
   assert.equal(assetRows.filter(([file]) => file.startsWith('icons/')).reduce((sum, [file]) => sum + bytes(file), 0), 19342);
@@ -217,7 +217,7 @@ test('extension UI asset consumers are source-derived and lack optimization auth
   assert.match(doc, /large app PNGs are loaded directly; no thumbnail or responsive derivative\s+manifest exists today/);
 });
 
-test('release notes data is staged ahead of package version and loaded as packaged data', () => {
+test('release notes data matches package version and loads as packaged data', () => {
   const releaseNotes = readJson('data/release_notes.json');
   const versionRows = releaseNotes.filter((row) => row && row.version);
   const versions = versionRows.map((row) => row.version);
@@ -228,10 +228,10 @@ test('release notes data is staged ahead of package version and loaded as packag
   assert.equal(releaseNotes.filter((row) => row && row._comment).length, 1);
   assert.equal(versionRows.length, 23);
   assert.equal(versions[0], '3.3.2');
-  assert.equal(packageVersion, '3.3.1');
+  assert.equal(packageVersion, '3.3.2');
   assert.ok(versions.includes(packageVersion));
-  assert.equal(versionRows.filter((row) => row.detailsUrl).length, 22);
-  assert.deepEqual(versionRows.filter((row) => !row.detailsUrl).map((row) => row.version), ['3.3.2']);
+  assert.equal(versionRows.filter((row) => row.detailsUrl).length, 23);
+  assert.deepEqual(versionRows.filter((row) => !row.detailsUrl).map((row) => row.version), []);
   assert.equal(versionRows.every((row) => Array.isArray(row.highlights)), true);
 
   for (const manifestFile of manifestFiles) {
@@ -245,7 +245,7 @@ test('release notes data is staged ahead of package version and loaded as packag
   assert.match(tabView, /runtimeAPI\.runtime\.getURL\('data\/release_notes\.json'\)/);
   assert.match(tabView, /: 'data\/release_notes\.json'/);
 
-  assert.match(doc, /first version row is staged `3\.3\.2`, while `package\.json` and all four\s+browser manifests currently remain `3\.3\.1`/);
+  assert.match(doc, /first version row is current `3\.3\.2`, matching `package\.json` and all four\s+browser manifests/);
   assert.match(doc, /native runtime sync\s+audit already records that the current app runtime manifest excludes\s+`data\/release_notes\.json`/);
 });
 

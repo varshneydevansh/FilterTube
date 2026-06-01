@@ -13,13 +13,15 @@ node --test --test-reporter=tap tests/runtime/*.test.mjs > /tmp/filtertube-runti
 
 ```text
 tests: 4737
-pass: 4661
-fail: 76
-duration_ms: 52657.735375
+pass: 4668
+fail: 69
+duration_ms: 196042.122125
 ```
 
 This refresh reduces the pinned broad-suite failure count from the previous
-115 failures to 76 failures after refreshing stale method semantic proof gap
+76 failures to 69 failures after refreshing release-note/package-version proof
+for the `3.3.2` release alignment. The earlier broad refresh reduced the suite
+from 115 failures to 76 failures after refreshing stale method semantic proof gap
 counts from 5,673 to 5,681 lexical callables. The broad suite is not clean enough
 to be used as a release gate, but the current baseline is narrower and more
 useful for retiring backlog slices.
@@ -39,22 +41,25 @@ node scripts/audit-proof-drift.mjs --all --report-only
 
 ## Failure Clusters
 
-Current failing subtests are spread across 59 runtime test files. A lightweight
-name-based parse of `/tmp/filtertube-runtime-current.tap` gives this
+Current failing subtests are spread across 54 runtime test files. A lightweight
+name-based parse of `/tmp/filtertube-runtime-current-after-release-proof-refresh.tap` gives this
 non-exclusive family snapshot:
 
 | Family | Current failing subtests |
 |---|---:|
-| generated/release/package/docs surfaces | 44 |
-| source-locus/optimization/index contracts | 32 |
-| JSON/video-meta/path/reference | 21 |
-| website/public-doc/source inventory | 16 |
-| settings/content-control/DOM lifecycle | 10 |
+| generated/release/package/docs surfaces | 43 |
+| source-locus/optimization/index contracts | 12 |
+| JSON/video-meta/path/reference | 19 |
+| website/public-doc/source inventory | 15 |
+| settings/content-control/DOM lifecycle | 9 |
 | native/Nanah/Kids/YTM | 8 |
 
 The previous method-proof/family blocker row is now retired from the broad
 failure snapshot: the direct method semantic proof lane passes with 5,681
 current lexical callables and 0 complete per-callable semantic proof files.
+The previous release-note/package-version drift rows are also retired from this
+snapshot: package metadata, browser manifests, and `data/release_notes.json`
+now align on `3.3.2`.
 
 | Cluster | Examples | Current meaning |
 |---|---|---|

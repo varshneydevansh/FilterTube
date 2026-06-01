@@ -129,15 +129,15 @@ test('generated shell source and generated output share markers but have no comm
   assert.match(auditDoc, /Generated UI Shell Boundary/);
 });
 
-test('vendor globals, staged release notes, and browser resource parity are pinned', () => {
+test('vendor globals, current release notes, and browser resource parity are pinned', () => {
   assert.match(read('js/vendor/nanah.bundle.js'), /window\.FilterTubeNanah/);
   assert.match(read('js/vendor/qrcode.bundle.js'), /var FilterTubeQrCode\s*=/);
 
   const releaseNotes = readJson('data/release_notes.json');
   const firstReleaseNote = releaseNotes.find(entry => entry && entry.version);
   assert.equal(firstReleaseNote.version, '3.3.2');
-  assert.match(firstReleaseNote.headline, /^Upcoming:/);
-  assert.equal(readJson('package.json').version, '3.3.1');
+  assert.equal(firstReleaseNote.headline, 'Mobile/tablet app MVP, smoother YouTube, and safer whitelist');
+  assert.equal(readJson('package.json').version, '3.3.2');
 
   assert.ok(webAccessibleResources('manifest.json').includes('icons/file.svg'));
   assert.ok(webAccessibleResources('manifest.chrome.json').includes('icons/file.svg'));

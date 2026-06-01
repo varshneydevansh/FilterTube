@@ -188,10 +188,9 @@ test('current_manifest_version_has_release_note_entry is locally satisfied today
     .filter(entry => entry && typeof entry.version === 'string')
     .map(entry => entry.version);
 
-  assert.equal(packageVersion, '3.3.1');
+  assert.equal(packageVersion, '3.3.2');
   assert.deepEqual([...new Set(manifestVersions)], [packageVersion]);
   assert.ok(releaseNoteVersions.includes(packageVersion));
-  assert.ok(releaseNoteVersions.includes('3.3.2'));
   assert.equal(releaseNoteVersions[0], '3.3.2');
 });
 
