@@ -12,10 +12,10 @@ node --test --test-reporter=tap tests/runtime/*.test.mjs > /tmp/filtertube-runti
 ## Result
 
 ```text
-tests: 4727
-pass: 4591
-fail: 136
-duration_ms: 40287.160708
+tests: 4731
+pass: 4608
+fail: 123
+duration_ms: 40608.003583
 ```
 
 ## Boundary
@@ -38,8 +38,8 @@ node scripts/audit-proof-drift.mjs --all --report-only
 | Callable, source-locus, and index drift | all-callable index counts, source-locus anchors, route component callable/render primitive counts | Repo-wide callable/source-locus registers need regenerated proof before they can become broad gates. |
 | Audit goal and completion ledgers | audit completion gap register, collector verification output, JSON route/surface contract coverage links | Older goal ledgers still point at stale broad-suite counts or prerequisite gates. |
 | Docs/audit boundary, packaging, and generated artifacts | audit markdown boundary, `compress-video`, design tokens, release notes, external navigation, generated main runtime assets, dist/website generated output | Release and generated-output proof remains useful, but several broad inventory rows need refresh. |
-| Settings and content-control registers | compiled settings fields, content-control active-work matrix, content-control alias mutation | `compiled-settings-field-register` has been refreshed and promoted into `test:settings`; `content-control-active-work-matrix` has been refreshed and promoted into `test:performance`; `content-control-alias-mutation-boundary` has been refreshed and promoted into `test:settings`. |
-| DOM selector, hide, and lifecycle registers | lifecycle primitive inventories, tab-view lifecycle selector boundary | `direct-hide-writer-register` has been refreshed and promoted into `test:dom`; `dom-selector-instance-register` has been refreshed for `js/content/dom_state.js` selector patch sites and promoted into `test:dom`; `lifecycle-instance-register` and `repo-lifecycle-primitive-coverage` have been refreshed for website component lifecycle drift and promoted into `test:performance`; remaining lifecycle selector boundary work belongs in smaller DOM/performance batches. |
+| Settings and content-control registers | settings mode source/effect, settings refresh cross-context consumer rows, source-of-truth claim register | `compiled-settings-field-register` has been refreshed and promoted into `test:settings`; `content-control-active-work-matrix` has been refreshed and promoted into `test:performance`; `content-control-alias-mutation-boundary` has been refreshed and promoted into `test:settings`; remaining rows are narrower source/effect and claim-register refreshes. |
+| DOM selector, hide, and lifecycle registers | JSON content-control DOM hide boundary rows, tab-view lifecycle selector boundary, Shorts overlay owner proof | `direct-hide-writer-register` has been refreshed and promoted into `test:dom`; `dom-selector-instance-register` has been refreshed for `js/content/dom_state.js` selector patch sites and promoted into `test:dom`; `lifecycle-instance-register` and `repo-lifecycle-primitive-coverage` have been refreshed for website component lifecycle drift and promoted into `test:performance`; remaining lifecycle selector and JSON content-control hide rows belong in smaller DOM/JSON batches. |
 | JSON comment continuation and provenance registers | comment author/channel provenance, keyword provenance, structural wrapper cleanup, continuation shortcut counts | Comment JSON proof rows need focused JSON/blocking refresh before they can be broad gates. |
 | JSON content-control hide boundary registers | hideAllComments, hideAskButton, hideHomeFeed, hideMixPlaylists, hideVideoInfo, hideWatchPlaylistPanel, and related boundaries | Many older JSON content-control boundary docs still pin stale source counts or anchors. |
 | JSON-first renderer, reference, metric, and video-meta registers | candidate extraction, implementation locus, metric artifact gate, reference docs, renderer traversal, video-meta parity/fetch/merge docs | JSON-first proof is still split across older NO-GO gates and focused lane tests. |

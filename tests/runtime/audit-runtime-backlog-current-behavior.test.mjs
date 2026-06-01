@@ -19,10 +19,10 @@ test('audit runtime backlog remains explicit and outside release-lane completion
 
   assert.match(doc, /Status: broad audit backlog, not a release-lane gate/);
   assert.match(doc, /node --test --test-reporter=tap tests\/runtime\/\*\.test\.mjs > \/tmp\/filtertube-runtime\.tap 2>&1/);
-  assert.match(doc, /tests: 4727/);
-  assert.match(doc, /pass: 4591/);
-  assert.match(doc, /fail: 136/);
-  assert.match(doc, /duration_ms: 40287\.160708/);
+  assert.match(doc, /tests: 4731/);
+  assert.match(doc, /pass: 4608/);
+  assert.match(doc, /fail: 123/);
+  assert.match(doc, /duration_ms: 40608\.003583/);
   assert.match(doc, /node scripts\/audit-proof-drift\.mjs --all --report-only/);
   assert.match(doc, /no stale source fingerprint proof rows/);
   assert.match(doc, /The focused release lanes are the per-change proof system/);
@@ -71,9 +71,11 @@ test('audit runtime backlog names the broad failure clusters that still require 
   assert.match(doc, /compiled-settings-field-register` has been refreshed and promoted into `test:settings`/);
   assert.match(doc, /content-control-active-work-matrix` has been refreshed and promoted into `test:performance`/);
   assert.match(doc, /content-control-alias-mutation-boundary` has been refreshed and promoted into `test:settings`/);
+  assert.match(doc, /remaining rows are narrower source\/effect and claim-register refreshes/);
   assert.match(doc, /direct-hide-writer-register` has been refreshed and promoted into `test:dom`/);
   assert.match(doc, /dom-selector-instance-register` has been refreshed for `js\/content\/dom_state\.js` selector patch sites and promoted into `test:dom`/);
   assert.match(doc, /lifecycle-instance-register` and `repo-lifecycle-primitive-coverage` have been refreshed for website component lifecycle drift and promoted into `test:performance`/);
+  assert.match(doc, /remaining lifecycle selector and JSON content-control hide rows belong in smaller DOM\/JSON batches/);
 });
 
 test('smoke lane keeps the broad audit backlog boundary visible', () => {
