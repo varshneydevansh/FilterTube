@@ -186,10 +186,10 @@ scripts/sync-native-runtime.mjs
 | `js/seed.js` | 819 | `if (cachedSettings.enabled === false) return` |
 | `js/seed.js` | 843 | `jsonData = JSON.parse(trimmed)` |
 | `js/seed.js` | 863 | `Object.defineProperty(xhr, 'response'` |
-| `js/filter_logic.js` | 3442 | `this._harvestChannelData(data)` |
-| `js/filter_logic.js` | 3444 | `console.warn('FilterTube: Harvesting failed', e)` |
-| `js/filter_logic.js` | 3449 | `if (this.settings.enabled === false)` |
-| `js/filter_logic.js` | 3459 | `const filtered = this.filter(data)` |
+| `js/filter_logic.js` | 3596 | `this._harvestChannelData(data)` |
+| `js/filter_logic.js` | 3598 | `console.warn('FilterTube: Harvesting failed', e)` |
+| `js/filter_logic.js` | 3603 | `if (this.settings.enabled === false)` |
+| `js/filter_logic.js` | 3613 | `const filtered = this.filter(data)` |
 | `js/content/dom_fallback.js` | 1933 | `function hasActiveDOMFallbackWork(settings)` |
 | `js/content/dom_fallback.js` | 2035 | `async function applyDOMFallback(settings, options = {})` |
 | `js/content/dom_fallback.js` | 2304 | `if (effectiveSettings.enabled === false)` |
@@ -220,10 +220,10 @@ scripts/sync-native-runtime.mjs
 | `js/content_bridge.js` | 12216 | `prevHiddenAttr: element.getAttribute('data-filtertube-hidden')` |
 | `js/content_bridge.js` | 12229 | `element.classList.add('filtertube-hidden')` |
 | `js/seed.js` | 153 | ``console.log(`[${seedDebugSequence}] FilterTube (Seed):`, message, ...args)`` |
-| `js/filter_logic.js` | 1581 | `console.log('FilterTube Whitelist (JSON):'` |
+| `js/filter_logic.js` | 1590 | `console.log('FilterTube Whitelist (JSON):'` |
 | `js/content/dom_fallback.js` | 4559 | `console.log('FilterTube Whitelist (DOM):'` |
-| `build.js` | 82 | `execSync('node scripts/build-extension-ui.mjs', { stdio: 'inherit' })` |
-| `build.js` | 184 | `const zipPath = path.join('dist', zipName)` |
+| `build.js` | 84 | `execSync('node scripts/build-extension-ui.mjs', { stdio: 'inherit' })` |
+| `build.js` | 186 | `const zipPath = path.join('dist', zipName)` |
 | `scripts/sync-native-runtime.mjs` | 21 | `const result = spawnSync(process.execPath, [syncScript]` |
 
 ## Current No-Work Decision

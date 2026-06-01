@@ -13,14 +13,19 @@ node --test --test-reporter=tap tests/runtime/*.test.mjs > /tmp/filtertube-runti
 
 ```text
 tests: 4737
-pass: 4678
-fail: 59
-duration_ms: 55514.073708
+pass: 4679
+fail: 58
+duration_ms: 94481.945667
 ```
 
-This refresh reduces the pinned broad-suite failure count from 60 failures to
-59 failures after retiring the stale source-locus fingerprint fixture row: the
-fingerprint proof now pins current bytes, lines, and hashes for
+This refresh reduces the pinned broad-suite failure count from 59 failures to
+58 failures after retiring the stale source-locus no-work anchor row: the
+no-work ownership proof now points at the current `js/filter_logic.js` harvest,
+disabled, filter, and JSON whitelist console lines plus the current `build.js`
+UI-shell and zip artifact lines while source-locus no-work approval remains at
+NO-GO. The previous refresh reduced the suite from 60 failures to 59 failures
+after retiring the stale source-locus fingerprint fixture row: the fingerprint
+proof now pins current bytes, lines, and hashes for
 `js/filter_logic.js`, `build.js`, and the source-owner proof doc/test while
 source-owner approval remains at NO-GO. The previous refresh reduced the suite
 from 61 failures to 60 failures after retiring the stale source-locus diagnostic
@@ -72,14 +77,14 @@ node scripts/audit-proof-drift.mjs --all --report-only
 
 ## Failure Clusters
 
-Current failing subtests are spread across 44 runtime test files. A lightweight
-name-based parse of `/tmp/filtertube-runtime-current-after-source-locus-fingerprint-refresh.tap` gives this
+Current failing subtests are spread across 43 runtime test files. A lightweight
+name-based parse of `/tmp/filtertube-runtime-current-after-source-locus-no-work-refresh.tap` gives this
 non-exclusive family snapshot:
 
 | Family | Current failing subtests |
 |---|---:|
 | generated/release/package/docs surfaces | 38 |
-| source-locus/optimization/index contracts | 9 |
+| source-locus/optimization/index contracts | 8 |
 | JSON/video-meta/path/reference | 19 |
 | website/public-doc/source inventory | 14 |
 | settings/content-control/DOM lifecycle | 8 |
@@ -128,6 +133,9 @@ The previous source-locus fingerprint row is retired: the fingerprint boundary
 now pins current source bytes, line counts, and SHA-256 hashes for the changed
 filter/build/source-owner proof files while source-owner approval remains
 explicitly absent.
+The previous source-locus no-work row is retired: the no-work ownership proof
+now uses current `js/filter_logic.js` and `build.js` line anchors while
+source-locus no-work approval remains explicitly absent.
 
 | Cluster | Examples | Current meaning |
 |---|---|---|

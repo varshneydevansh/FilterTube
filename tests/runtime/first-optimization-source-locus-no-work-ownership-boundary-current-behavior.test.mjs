@@ -132,10 +132,10 @@ const anchorChecks = [
   { file: 'js/seed.js', line: 819, needle: 'if (cachedSettings.enabled === false) return' },
   { file: 'js/seed.js', line: 843, needle: 'jsonData = JSON.parse(trimmed)' },
   { file: 'js/seed.js', line: 863, needle: "Object.defineProperty(xhr, 'response'" },
-  { file: 'js/filter_logic.js', line: 3442, needle: 'this._harvestChannelData(data)' },
-  { file: 'js/filter_logic.js', line: 3444, needle: "console.warn('FilterTube: Harvesting failed', e)" },
-  { file: 'js/filter_logic.js', line: 3449, needle: 'if (this.settings.enabled === false)' },
-  { file: 'js/filter_logic.js', line: 3459, needle: 'const filtered = this.filter(data)' },
+  { file: 'js/filter_logic.js', line: 3596, needle: 'this._harvestChannelData(data)' },
+  { file: 'js/filter_logic.js', line: 3598, needle: "console.warn('FilterTube: Harvesting failed', e)" },
+  { file: 'js/filter_logic.js', line: 3603, needle: 'if (this.settings.enabled === false)' },
+  { file: 'js/filter_logic.js', line: 3613, needle: 'const filtered = this.filter(data)' },
   { file: 'js/content/dom_fallback.js', line: 1933, needle: 'function hasActiveDOMFallbackWork(settings)' },
   { file: 'js/content/dom_fallback.js', line: 2035, needle: 'async function applyDOMFallback(settings, options = {})' },
   { file: 'js/content/dom_fallback.js', line: 2304, needle: 'if (effectiveSettings.enabled === false)' },
@@ -166,10 +166,10 @@ const anchorChecks = [
   { file: 'js/content_bridge.js', line: 12216, needle: "prevHiddenAttr: element.getAttribute('data-filtertube-hidden')" },
   { file: 'js/content_bridge.js', line: 12229, needle: "element.classList.add('filtertube-hidden')" },
   { file: 'js/seed.js', line: 153, needle: 'FilterTube (Seed):' },
-  { file: 'js/filter_logic.js', line: 1581, needle: "console.log('FilterTube Whitelist (JSON):'" },
+  { file: 'js/filter_logic.js', line: 1590, needle: "console.log('FilterTube Whitelist (JSON):'" },
   { file: 'js/content/dom_fallback.js', line: 4559, needle: "console.log('FilterTube Whitelist (DOM):'" },
-  { file: 'build.js', line: 82, needle: "execSync('node scripts/build-extension-ui.mjs', { stdio: 'inherit' })" },
-  { file: 'build.js', line: 184, needle: "const zipPath = path.join('dist', zipName)" },
+  { file: 'build.js', line: 84, needle: "execSync('node scripts/build-extension-ui.mjs', { stdio: 'inherit' })" },
+  { file: 'build.js', line: 186, needle: "const zipPath = path.join('dist', zipName)" },
   { file: 'scripts/sync-native-runtime.mjs', line: 21, needle: 'const result = spawnSync(process.execPath, [syncScript]' }
 ];
 
