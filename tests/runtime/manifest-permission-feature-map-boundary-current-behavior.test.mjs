@@ -56,10 +56,10 @@ const expectedHostPermissions = [
 const activeMatches = ['*://*.youtube.com/*', '*://*.youtubekids.com/*'];
 
 const expectedFingerprints = new Map([
-  ['manifest.json', [87, 2470, '96eb5e5c8733ecdfa9d3eb447d51a3bfc2c4743a80b1fde1f12d71bd46d1c8e4']],
-  ['manifest.chrome.json', [87, 2470, '96eb5e5c8733ecdfa9d3eb447d51a3bfc2c4743a80b1fde1f12d71bd46d1c8e4']],
-  ['manifest.firefox.json', [74, 1994, '5d7175c23dbce4f9e86b0db0f34b1ae61bb465a9725ff37fc7069a45d4ceac5c']],
-  ['manifest.opera.json', [88, 2475, 'f76d4a48b51fc5da65492347ce3f7cb31ebff057afd2185573176991e7d1d4b7']],
+  ['manifest.json', [88, 2513, '282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734']],
+  ['manifest.chrome.json', [88, 2513, '282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734']],
+  ['manifest.firefox.json', [75, 2029, 'c84368c9db6a4900bb6ff055b66a645a88176d3533e307eee0dcb8d230fae2bb']],
+  ['manifest.opera.json', [89, 2518, '0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b']],
   ['js/background.js', [6320, 285103, '77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad']],
   ['js/io_manager.js', [2030, 96914, 'd04bfd75d061ee405c1dfa4cab8c9d0fa6a2f072d046add33e4b6782b1f58a21']],
   ['js/tab-view.js', [11617, 526763, '1b7f621d48d16247aecc4c7ee57cbc3db9efd3e597e6f0a4fc188228470648f7']],
@@ -70,7 +70,7 @@ const expectedFingerprints = new Map([
   ['js/content_bridge.js', [13571, 601694, '1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3']],
   ['js/settings_shared.js', [1181, 57535, '9710ebb445ba11cc45fc98aced765d298226a8cd4a003600e106f908abc2162c']],
   ['js/content/handle_resolver.js', [282, 9785, '67cc877a0a97e4c4c5aaf5a0d1c37c15000af5238f8f37d7c5dc6efee27e34ff']],
-  ['build.js', [686, 24689, 'f6778ce29f1d7f520a66ab689f8c1a2999e5887ffa8c53bd5039f4976b2671b6']],
+  ['build.js', [740, 26978, 'c8485cb2600aad89f44015cd7e49ebe4746ebcc35c91c1ff2bf29aec2f087a04']],
 ]);
 
 const permissionRegexes = {

@@ -20,9 +20,13 @@ test('audit runtime backlog remains explicit and outside release-lane completion
   assert.match(doc, /Status: broad audit backlog, not a release-lane gate/);
   assert.match(doc, /node --test --test-reporter=tap tests\/runtime\/\*\.test\.mjs > \/tmp\/filtertube-runtime\.tap 2>&1/);
   assert.match(doc, /tests: 4737/);
-  assert.match(doc, /pass: 4706/);
-  assert.match(doc, /fail: 31/);
-  assert.match(doc, /duration_ms: 35825\.974959/);
+  assert.match(doc, /pass: 4707/);
+  assert.match(doc, /fail: 30/);
+  assert.match(doc, /duration_ms: 77406\.878/);
+  assert.match(doc, /31\s+failures\s+to\s+30\s+failures/);
+  assert.match(doc, /manifest permission feature-map source\s+fingerprint row/);
+  assert.match(doc, /current browser manifest\s+fingerprints and current `build\.js` fingerprint/);
+  assert.match(doc, /permission\s+declarations, host declarations, content-script matches, web-accessible resource\s+matches, runtime permission consumer counts, `activeTab` absence, and missing\s+build validation authority unchanged/);
   assert.match(doc, /32\s+failures\s+to\s+31\s+failures/);
   assert.match(doc, /manifest version baseline row/);
   assert.match(doc, /all browser manifests to declare\s+`3\.3\.2`/);
@@ -249,7 +253,7 @@ test('audit runtime backlog names the broad failure clusters that still require 
 test('audit runtime backlog pins the current broad-suite failure family snapshot', () => {
   const doc = read(backlogPath);
   const expectedRows = [
-    ['generated/release/package/docs surfaces', '20'],
+    ['generated/release/package/docs surfaces', '19'],
     ['source-locus/optimization/index contracts', '1'],
     ['JSON/video-meta/path/reference', '2'],
     ['website/public-doc/source inventory', '10'],
@@ -257,9 +261,12 @@ test('audit runtime backlog pins the current broad-suite failure family snapshot
     ['native/Nanah/Kids/YTM', '6']
   ];
 
-  assert.match(doc, /Current failing subtests are spread across 21 runtime test files/);
-  assert.match(doc, /filtertube-runtime-current-after-manifest-permission-version-refresh\.tap/);
+  assert.match(doc, /Current failing subtests are spread across 20 runtime test files/);
+  assert.match(doc, /filtertube-runtime-current-after-manifest-feature-map-refresh\.tap/);
   assert.match(doc, /non-exclusive family snapshot/);
+  assert.match(doc, /previous manifest permission feature-map fingerprint row is now retired/);
+  assert.match(doc, /manifest and `build\.js` source fingerprints now\s+match the current release\/build baseline/);
+  assert.match(doc, /permission declarations, host\s+scope, runtime consumer counts, `activeTab` absence, and missing feature-map\s+authority remain pinned/);
   assert.match(doc, /previous manifest permission authority version row is now retired/);
   assert.match(doc, /current `3\.3\.2`\s+release baseline/);
   assert.match(doc, /permission, host, world,\s+web-accessible, and build-order invariants remain pinned/);

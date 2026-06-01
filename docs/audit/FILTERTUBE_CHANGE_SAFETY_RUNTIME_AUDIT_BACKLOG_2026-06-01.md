@@ -13,13 +13,20 @@ node --test --test-reporter=tap tests/runtime/*.test.mjs > /tmp/filtertube-runti
 
 ```text
 tests: 4737
-pass: 4706
-fail: 31
-duration_ms: 35825.974959
+pass: 4707
+fail: 30
+duration_ms: 77406.878
 ```
 
-This refresh reduces the pinned broad-suite failure count from 32 failures to
-31 failures after retiring the stale manifest version baseline row: the
+This refresh reduces the pinned broad-suite failure count from 31 failures to
+30 failures after retiring the stale manifest permission feature-map source
+fingerprint row: the feature-map proof now expects the current browser manifest
+fingerprints and current `build.js` fingerprint while keeping permission
+declarations, host declarations, content-script matches, web-accessible resource
+matches, runtime permission consumer counts, `activeTab` absence, and missing
+build validation authority unchanged. The previous refresh reduced the pinned
+broad-suite failure count from 32 failures to 31 failures after retiring the
+stale manifest version baseline row: the
 manifest-permission authority proof now expects all browser manifests to declare
 `3.3.2` and records that baseline in the manifest authority audit while keeping
 permissions, host permissions, world declarations, web-accessible resource
@@ -199,19 +206,24 @@ node scripts/audit-proof-drift.mjs --all --report-only
 
 ## Failure Clusters
 
-Current failing subtests are spread across 21 runtime test files. A lightweight
-name-based parse of `/tmp/filtertube-runtime-current-after-manifest-permission-version-refresh.tap` gives this
+Current failing subtests are spread across 20 runtime test files. A lightweight
+name-based parse of `/tmp/filtertube-runtime-current-after-manifest-feature-map-refresh.tap` gives this
 non-exclusive family snapshot:
 
 | Family | Current failing subtests |
 |---|---:|
-| generated/release/package/docs surfaces | 20 |
+| generated/release/package/docs surfaces | 19 |
 | source-locus/optimization/index contracts | 1 |
 | JSON/video-meta/path/reference | 2 |
 | website/public-doc/source inventory | 10 |
 | settings/content-control/DOM lifecycle | 7 |
 | native/Nanah/Kids/YTM | 6 |
 
+The previous manifest permission feature-map fingerprint row is now retired from
+the broad failure snapshot: manifest and `build.js` source fingerprints now
+match the current release/build baseline while permission declarations, host
+scope, runtime consumer counts, `activeTab` absence, and missing feature-map
+authority remain pinned.
 The previous manifest permission authority version row is now retired from the
 broad failure snapshot: all browser manifests now match the current `3.3.2`
 release baseline in the proof lane while the permission, host, world,
