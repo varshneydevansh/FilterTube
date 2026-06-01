@@ -93,9 +93,9 @@ test('generated local output dependency surface doc is audit-only and scoped to 
 test('ignored generated output and dependency cache footprints are pinned', () => {
   const doc = read(docPath);
   const expected = {
-    dist: { files: 178, bytes: 61356521, ignore: /\.gitignore:6:dist\// },
+    dist: { files: 180, bytes: 61493319, ignore: /\.gitignore:6:dist\// },
     node_modules: { files: 956, bytes: 26325623, ignore: /\.gitignore:2:node_modules\// },
-    'website/.next': { files: 2288, bytes: 346208509, ignore: /\.gitignore:12:website\/\.next\// },
+    'website/.next': { files: 2468, bytes: 388755617, ignore: /\.gitignore:12:website\/\.next\// },
     'website/.vercel': { files: 291, bytes: 29815128, ignore: /website\/\.gitignore:1:\.vercel/ },
     'website/node_modules': { files: 18619, bytes: 325539259, ignore: /\.gitignore:2:node_modules\// },
   };
@@ -124,28 +124,28 @@ test('dist package trees and zip artifacts are current local output not package 
     data: 1,
     html: 3,
     icons: 7,
-    js: 32,
+    js: 33,
     'manifest.json': 1,
   };
   const expectedBrowsers = {
     chrome: {
-      bytes: 11769056,
-      manifestHash: '96eb5e5c8733ecdfa9d3eb447d51a3bfc2c4743a80b1fde1f12d71bd46d1c8e4',
+      bytes: 11808978,
+      manifestHash: '282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734',
     },
     firefox: {
-      bytes: 11769146,
-      manifestHash: '2221afbc831ea1b5d90f76cd3f1590022dcc92d3c5d992dd163a5d46844b0e72',
+      bytes: 11809068,
+      manifestHash: 'a1773c9e0acc1c2029cb6aef4757a282aa0ec8d89759be65ea975ff237d00bb0',
     },
     opera: {
-      bytes: 11769061,
-      manifestHash: 'f76d4a48b51fc5da65492347ce3f7cb31ebff057afd2185573176991e7d1d4b7',
+      bytes: 11808983,
+      manifestHash: '0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b',
     },
   };
 
   for (const [browser, info] of Object.entries(expectedBrowsers)) {
     const dir = `dist/${browser}`;
     const files = walk(dir);
-    assert.equal(files.length, 58);
+    assert.equal(files.length, 59);
     assert.equal(totalBytes(files), info.bytes);
     assert.deepEqual(topLevelBreakdown(files, filePath(dir)), expectedBreakdown);
     assert.equal(sha256(`${dir}/manifest.json`), info.manifestHash);
@@ -154,9 +154,9 @@ test('dist package trees and zip artifacts are current local output not package 
   }
 
   for (const [zip, bytes, hash] of [
-    ['dist/filtertube-chrome-v3.3.1.zip', 8681016, '98e90fcae64fbe8edc3597fa4808359e1cba6b1411bd855e60e0bf3c069361d0'],
-    ['dist/filtertube-firefox-v3.3.1.zip', 8681075, 'f0dd7d53ad62c9716a975d299326ab84f01fa4c88dac2042d89a4d91d11a8630'],
-    ['dist/filtertube-opera-v3.3.1.zip', 8681019, '4b1a53f931e2019163a7fc6f400dd168465350fcf0813055887a7140c3651ce5'],
+    ['dist/filtertube-chrome-v3.3.2.zip', 8688743, '844a3ef1530ed1787e0911d43707e2b5ab687e83930edf7332c534c69e9ff898'],
+    ['dist/filtertube-firefox-v3.3.2.zip', 8688802, 'b39728fdec2292f7d54c839a383dae44142357ac0b8a0ffe056ee19078c51217'],
+    ['dist/filtertube-opera-v3.3.2.zip', 8688745, 'd1a70a71f376cbfd19670563b2e384f252879d10a62b8972768cebd63479fae1'],
   ]) {
     assert.equal(byteCount(zip), bytes, `${zip} size drifted`);
     assert.equal(sha256(zip), hash, `${zip} hash drifted`);
@@ -176,9 +176,9 @@ test('website next and vercel generated artifacts are ignored local build eviden
   const doc = read(docPath);
 
   for (const [file, bytes, hash] of [
-    ['website/.next/BUILD_ID', 21, '8d244758baeadb7aae3f8c29e219e701ee8c393ae4f08f02c5b9abf7fab4e32f'],
+    ['website/.next/BUILD_ID', 21, '4c389801947d6972b7054c5a9255350fd52d2a6d698328a05d2f8765c0006389'],
     ['website/.next/routes-manifest.json', 2587, 'b23a2794a00d1493a1680bf76d595212116c761ee0c6b7b265d279730c5da9d0'],
-    ['website/.next/prerender-manifest.json', 12680, '927d8e902155d2eb9731e0bb2ce0bdc7562a0389b974adde26833efb1468b5eb'],
+    ['website/.next/prerender-manifest.json', 12680, '96a18ed5ddc1c7cdd0ee51f240e277875a0c9a6d07e956d9a7e5946874f1b309'],
     ['website/.vercel/project.json', 369, '056ce6a7ea8449fb9e28d91b2164152ad5e91912a91adbfb97a8a5639d91eb5f'],
     ['website/.vercel/output/config.json', 6050, 'ac5af2611c3ae7d01e654208ffa5f184ee3cb90f40899a093932b8b510d918c6'],
   ]) {

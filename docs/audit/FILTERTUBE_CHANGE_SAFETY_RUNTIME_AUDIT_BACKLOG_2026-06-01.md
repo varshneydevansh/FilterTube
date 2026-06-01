@@ -13,13 +13,17 @@ node --test --test-reporter=tap tests/runtime/*.test.mjs > /tmp/filtertube-runti
 
 ```text
 tests: 4737
-pass: 4682
-fail: 55
-duration_ms: 87826.425917
+pass: 4685
+fail: 52
+duration_ms: 73047.012833
 ```
 
-This refresh reduces the pinned broad-suite failure count from 56 failures to
-55 failures after retiring the stale source-locus teardown anchor row: the
+This refresh reduces the pinned broad-suite failure count from 55 failures to
+52 failures after retiring the stale generated local output dependency surface
+rows: the proof now points at the current ignored `dist` v3.3.2 package output
+and current `website/.next` local build fingerprints while generated output
+remains non-authoritative. The previous refresh reduced the suite from 56
+failures to 55 failures after retiring the stale source-locus teardown anchor row: the
 teardown proof now points at the current `js/filter_logic.js` video-channel and
 video-meta flush timer lines while source-locus teardown approval remains at
 NO-GO. The previous refresh reduced the suite from 57 failures to 56 failures
@@ -91,13 +95,13 @@ node scripts/audit-proof-drift.mjs --all --report-only
 
 ## Failure Clusters
 
-Current failing subtests are spread across 40 runtime test files. A lightweight
-name-based parse of `/tmp/filtertube-runtime-current-after-source-locus-teardown-refresh.tap` gives this
+Current failing subtests are spread across 39 runtime test files. A lightweight
+name-based parse of `/tmp/filtertube-runtime-current-after-generated-local-output-refresh.tap` gives this
 non-exclusive family snapshot:
 
 | Family | Current failing subtests |
 |---|---:|
-| generated/release/package/docs surfaces | 38 |
+| generated/release/package/docs surfaces | 35 |
 | source-locus/optimization/index contracts | 5 |
 | JSON/video-meta/path/reference | 19 |
 | website/public-doc/source inventory | 14 |
@@ -159,6 +163,10 @@ side-effect budget approval remains explicitly absent.
 The previous source-locus teardown row is retired: the teardown ownership proof
 now uses current `js/filter_logic.js` video-channel and video-meta timer line
 anchors while source-locus teardown approval remains explicitly absent.
+The previous generated local output dependency surface rows are retired: the
+proof now pins the current ignored `dist` v3.3.2 ZIP/package tree snapshot and
+current `website/.next` local build fingerprints while preserving the
+non-authority boundary for generated output and dependency caches.
 
 | Cluster | Examples | Current meaning |
 |---|---|---|

@@ -30,9 +30,9 @@ mess, but they do not close product-runtime proof obligations.
 
 | Local path | Git boundary | Current files | Current bytes | Current role |
 | --- | --- | ---: | ---: | --- |
-| `dist` | ignored by `.gitignore:6:dist/` | 178 | 61,356,521 | Browser package trees plus ZIPs from a previous build, plus one local `.DS_Store` filesystem artifact. |
+| `dist` | ignored by `.gitignore:6:dist/` | 180 | 61,493,319 | Browser package trees plus ZIPs from the current local v3.3.2 extension build. |
 | `node_modules` | ignored by `.gitignore:2:node_modules/` | 956 | 26,325,623 | Root npm dependency install cache. |
-| `website/.next` | ignored by `.gitignore:12:website/.next/` | 2,288 | 346,208,509 | Next.js build/dev output and cache. |
+| `website/.next` | ignored by `.gitignore:12:website/.next/` | 2,468 | 388,755,617 | Next.js build/dev output and cache. |
 | `website/.vercel` | ignored by `website/.gitignore:1:.vercel` | 291 | 29,815,128 | Local Vercel project/output metadata. |
 | `website/node_modules` | ignored by `.gitignore:2:node_modules/` | 18,619 | 325,539,259 | Website npm dependency install cache. |
 
@@ -49,12 +49,12 @@ ZIP archives:
 dist/chrome
 dist/firefox
 dist/opera
-dist/filtertube-chrome-v3.3.1.zip
-dist/filtertube-firefox-v3.3.1.zip
-dist/filtertube-opera-v3.3.1.zip
+dist/filtertube-chrome-v3.3.2.zip
+dist/filtertube-firefox-v3.3.2.zip
+dist/filtertube-opera-v3.3.2.zip
 ```
 
-Each browser package directory currently has 58 files with this top-level
+Each browser package directory currently has 59 files with this top-level
 breakdown:
 
 ```text
@@ -66,7 +66,7 @@ css: 8
 data: 1
 html: 3
 icons: 7
-js: 32
+js: 33
 manifest.json: 1
 ```
 
@@ -74,17 +74,17 @@ Current browser package sizes and manifest hashes:
 
 | Browser output | Files | Bytes | Manifest SHA-256 |
 | --- | ---: | ---: | --- |
-| `dist/chrome` | 58 | 11,769,056 | `96eb5e5c8733ecdfa9d3eb447d51a3bfc2c4743a80b1fde1f12d71bd46d1c8e4` |
-| `dist/firefox` | 58 | 11,769,146 | `2221afbc831ea1b5d90f76cd3f1590022dcc92d3c5d992dd163a5d46844b0e72` |
-| `dist/opera` | 58 | 11,769,061 | `f76d4a48b51fc5da65492347ce3f7cb31ebff057afd2185573176991e7d1d4b7` |
+| `dist/chrome` | 59 | 11,808,978 | `282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734` |
+| `dist/firefox` | 59 | 11,809,068 | `a1773c9e0acc1c2029cb6aef4757a282aa0ec8d89759be65ea975ff237d00bb0` |
+| `dist/opera` | 59 | 11,808,983 | `0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b` |
 
 Current ZIP artifacts:
 
 | ZIP path | Bytes | SHA-256 |
 | --- | ---: | --- |
-| `dist/filtertube-chrome-v3.3.1.zip` | 8,681,016 | `98e90fcae64fbe8edc3597fa4808359e1cba6b1411bd855e60e0bf3c069361d0` |
-| `dist/filtertube-firefox-v3.3.1.zip` | 8,681,075 | `f0dd7d53ad62c9716a975d299326ab84f01fa4c88dac2042d89a4d91d11a8630` |
-| `dist/filtertube-opera-v3.3.1.zip` | 8,681,019 | `4b1a53f931e2019163a7fc6f400dd168465350fcf0813055887a7140c3651ce5` |
+| `dist/filtertube-chrome-v3.3.2.zip` | 8,688,743 | `844a3ef1530ed1787e0911d43707e2b5ab687e83930edf7332c534c69e9ff898` |
+| `dist/filtertube-firefox-v3.3.2.zip` | 8,688,802 | `b39728fdec2292f7d54c839a383dae44142357ac0b8a0ffe056ee19078c51217` |
+| `dist/filtertube-opera-v3.3.2.zip` | 8,688,745 | `d1a70a71f376cbfd19670563b2e384f252879d10a62b8972768cebd63479fae1` |
 
 The package tree is broad because `build.js` copies:
 
@@ -108,9 +108,9 @@ The website has both Next.js and Vercel local outputs:
 
 | Artifact | Bytes | SHA-256 |
 | --- | ---: | --- |
-| `website/.next/BUILD_ID` | 21 | `8d244758baeadb7aae3f8c29e219e701ee8c393ae4f08f02c5b9abf7fab4e32f` |
+| `website/.next/BUILD_ID` | 21 | `4c389801947d6972b7054c5a9255350fd52d2a6d698328a05d2f8765c0006389` |
 | `website/.next/routes-manifest.json` | 2,587 | `b23a2794a00d1493a1680bf76d595212116c761ee0c6b7b265d279730c5da9d0` |
-| `website/.next/prerender-manifest.json` | 12,680 | `927d8e902155d2eb9731e0bb2ce0bdc7562a0389b974adde26833efb1468b5eb` |
+| `website/.next/prerender-manifest.json` | 12,680 | `96a18ed5ddc1c7cdd0ee51f240e277875a0c9a6d07e956d9a7e5946874f1b309` |
 | `website/.vercel/project.json` | 369 | `056ce6a7ea8449fb9e28d91b2164152ad5e91912a91adbfb97a8a5639d91eb5f` |
 | `website/.vercel/output/config.json` | 6,050 | `ac5af2611c3ae7d01e654208ffa5f184ee3cb90f40899a093932b8b510d918c6` |
 
