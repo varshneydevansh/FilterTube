@@ -13,17 +13,22 @@ node --test --test-reporter=tap tests/runtime/*.test.mjs > /tmp/filtertube-runti
 
 ```text
 tests: 4737
-pass: 4705
-fail: 32
-duration_ms: 35671.83925
+pass: 4706
+fail: 31
+duration_ms: 35825.974959
 ```
 
-This refresh reduces the pinned broad-suite failure count from 33 failures to
-32 failures after retiring the stale Main Filter All comments source anchor row:
-the Main Filter All comments proof now expects the current
-`js/filter_logic.js:2214` decision block location while the block hash, byte
-count, line count, token counts, storage behavior, and missing future authority
-symbols remain unchanged. The previous refresh reduced the suite from
+This refresh reduces the pinned broad-suite failure count from 32 failures to
+31 failures after retiring the stale manifest version baseline row: the
+manifest-permission authority proof now expects all browser manifests to declare
+`3.3.2` and records that baseline in the manifest authority audit while keeping
+permissions, host permissions, world declarations, web-accessible resource
+parity, and build-script guard behavior unchanged. The previous refresh reduced
+the suite from 33 failures to 32 failures after retiring the stale Main Filter
+All comments source anchor row: the Main Filter All comments proof now expects
+the current `js/filter_logic.js:2214` decision block location while the block
+hash, byte count, line count, token counts, storage behavior, and missing future
+authority symbols remain unchanged. The previous refresh reduced the suite from
 34 failures to 33 failures after retiring the stale legacy layout quarantine
 package manifest count rows: the package-boundary proof now expects the current
 active and dist content-script JS reference totals while keeping `js/layout.js`
@@ -194,19 +199,23 @@ node scripts/audit-proof-drift.mjs --all --report-only
 
 ## Failure Clusters
 
-Current failing subtests are spread across 22 runtime test files. A lightweight
-name-based parse of `/tmp/filtertube-runtime-current-after-main-filter-all-comments-refresh.tap` gives this
+Current failing subtests are spread across 21 runtime test files. A lightweight
+name-based parse of `/tmp/filtertube-runtime-current-after-manifest-permission-version-refresh.tap` gives this
 non-exclusive family snapshot:
 
 | Family | Current failing subtests |
 |---|---:|
-| generated/release/package/docs surfaces | 21 |
+| generated/release/package/docs surfaces | 20 |
 | source-locus/optimization/index contracts | 1 |
 | JSON/video-meta/path/reference | 2 |
 | website/public-doc/source inventory | 10 |
 | settings/content-control/DOM lifecycle | 7 |
 | native/Nanah/Kids/YTM | 6 |
 
+The previous manifest permission authority version row is now retired from the
+broad failure snapshot: all browser manifests now match the current `3.3.2`
+release baseline in the proof lane while the permission, host, world,
+web-accessible, and build-order invariants remain pinned.
 The previous Main Filter All comments scope source-anchor row is now retired
 from the broad failure snapshot: the proof lane now matches the moved
 `filterLogicCommentDecision` block anchor while preserving the source hash,

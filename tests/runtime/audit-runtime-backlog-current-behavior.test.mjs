@@ -20,13 +20,17 @@ test('audit runtime backlog remains explicit and outside release-lane completion
   assert.match(doc, /Status: broad audit backlog, not a release-lane gate/);
   assert.match(doc, /node --test --test-reporter=tap tests\/runtime\/\*\.test\.mjs > \/tmp\/filtertube-runtime\.tap 2>&1/);
   assert.match(doc, /tests: 4737/);
-  assert.match(doc, /pass: 4705/);
-  assert.match(doc, /fail: 32/);
-  assert.match(doc, /duration_ms: 35671\.83925/);
+  assert.match(doc, /pass: 4706/);
+  assert.match(doc, /fail: 31/);
+  assert.match(doc, /duration_ms: 35825\.974959/);
+  assert.match(doc, /32\s+failures\s+to\s+31\s+failures/);
+  assert.match(doc, /manifest version baseline row/);
+  assert.match(doc, /all browser manifests to declare\s+`3\.3\.2`/);
+  assert.match(doc, /permissions, host permissions, world declarations, web-accessible resource\s+parity, and build-script guard behavior unchanged/);
   assert.match(doc, /33\s+failures\s+to\s+32\s+failures/);
-  assert.match(doc, /Main Filter All comments source anchor row/);
+  assert.match(doc, /Main Filter\s+All comments source anchor row/);
   assert.match(doc, /current\s+`js\/filter_logic\.js:2214` decision block location/);
-  assert.match(doc, /block hash, byte\s+count, line count, token counts, storage behavior, and missing future authority\s+symbols remain unchanged/);
+  assert.match(doc, /block\s+hash, byte count, line count, token counts, storage behavior, and missing future\s+authority symbols remain unchanged/);
   assert.match(doc, /34\s+failures\s+to\s+33\s+failures/);
   assert.match(doc, /legacy layout quarantine\s+package manifest\s+count rows/);
   assert.match(doc, /package-boundary proof now expects the current\s+active and dist content-script JS reference totals/);
@@ -245,7 +249,7 @@ test('audit runtime backlog names the broad failure clusters that still require 
 test('audit runtime backlog pins the current broad-suite failure family snapshot', () => {
   const doc = read(backlogPath);
   const expectedRows = [
-    ['generated/release/package/docs surfaces', '21'],
+    ['generated/release/package/docs surfaces', '20'],
     ['source-locus/optimization/index contracts', '1'],
     ['JSON/video-meta/path/reference', '2'],
     ['website/public-doc/source inventory', '10'],
@@ -253,9 +257,12 @@ test('audit runtime backlog pins the current broad-suite failure family snapshot
     ['native/Nanah/Kids/YTM', '6']
   ];
 
-  assert.match(doc, /Current failing subtests are spread across 22 runtime test files/);
-  assert.match(doc, /filtertube-runtime-current-after-main-filter-all-comments-refresh\.tap/);
+  assert.match(doc, /Current failing subtests are spread across 21 runtime test files/);
+  assert.match(doc, /filtertube-runtime-current-after-manifest-permission-version-refresh\.tap/);
   assert.match(doc, /non-exclusive family snapshot/);
+  assert.match(doc, /previous manifest permission authority version row is now retired/);
+  assert.match(doc, /current `3\.3\.2`\s+release baseline/);
+  assert.match(doc, /permission, host, world,\s+web-accessible, and build-order invariants remain pinned/);
   assert.match(doc, /previous Main Filter All comments scope source-anchor row is now retired/);
   assert.match(doc, /moved\s+`filterLogicCommentDecision` block anchor/);
   assert.match(doc, /source hash,\s+effect fixtures, token counts, and audit-only authority gap/);
