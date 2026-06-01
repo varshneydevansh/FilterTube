@@ -8,12 +8,12 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_PROMPT_RELEASE_OVERLAY_BOUNDARY_CURRENT_BEHAVIOR_2026-05-22.md';
 
 const sourceFingerprints = {
-  'manifest.json': [88, 2513, 'c39c38d4e389f17803b1915c2d2d0673c60dd87e68a9301fac4faad14bfd31e1'],
-  'manifest.chrome.json': [88, 2513, 'c39c38d4e389f17803b1915c2d2d0673c60dd87e68a9301fac4faad14bfd31e1'],
-  'manifest.firefox.json': [75, 2029, '89e2f70a5f6bb34356ebed2f4ad357213a28a2872cfaebeff2474e702a98719d'],
-  'manifest.opera.json': [89, 2518, 'ef0fa857517710853e82942bdb05bc14c9f2e2202b49775fd6e6a59a27e77017'],
-  'package.json': [46, 1376, 'cd24685d1fb4940c1a67f12ce143bc1466200a299a82dbfa6f553b99e24ae23f'],
-  'data/release_notes.json': [316, 23039, 'e012f6c071fffa67958f55544ecae9bbb26e7ec91edd2066df4d06a62de69962'],
+  'manifest.json': [88, 2513, '282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734'],
+  'manifest.chrome.json': [88, 2513, '282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734'],
+  'manifest.firefox.json': [75, 2029, 'c84368c9db6a4900bb6ff055b66a645a88176d3533e307eee0dcb8d230fae2bb'],
+  'manifest.opera.json': [89, 2518, '0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b'],
+  'package.json': [61, 2405, '36053d322780ce787de403be574cc400936ef2a994b4c8eca62561154fe81aec'],
+  'data/release_notes.json': [317, 23020, 'a8d59b18e9bffd1c828538ee58b3b8e9be7c641fea3ff064220311485a3b1c6b'],
   'js/content/first_run_prompt.js': [190, 7453, '5672d9060d29b08550ecfc3add54245212a5094ee5137f025b6f788f12e50409'],
   'js/content/release_notes_prompt.js': [250, 9866, '30b624cbbda1004f354f98dbf3b4513f8ebc298adecbceb4358782f248f80474'],
   'js/background.js': [6320, 285103, '77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad'],
@@ -186,7 +186,7 @@ test('prompt release overlay boundary is audit-only and source pinned', () => {
   assert.match(text, /release note data entries \| 24/);
   assert.match(text, /release note version rows \| 23/);
   assert.match(text, /staged newest release-note version \| 3\.3\.2/);
-  assert.match(text, /packaged extension\/browser version \| 3\.3\.1/);
+  assert.match(text, /packaged extension\/browser version \| 3\.3\.2/);
   assert.match(text, /runtime implementation changed \| no/);
 
   for (const [file, [expectedLines, expectedBytes, expectedHash]] of Object.entries(sourceFingerprints)) {
@@ -322,10 +322,10 @@ test('release-note data and dashboard render stay version-gated only by local fi
   assert.equal(releaseNotes.length, 24);
   assert.equal(versionRows.length, 23);
   assert.equal(versionRows[0].version, '3.3.2');
-  assert.equal(packageVersion, '3.3.1');
-  assert.deepEqual([...new Set(manifestVersions)], ['3.3.1']);
+  assert.equal(packageVersion, '3.3.2');
+  assert.deepEqual([...new Set(manifestVersions)], ['3.3.2']);
   assert.ok(versionRows.some(note => note.version === packageVersion));
-  assert.equal(versionRows.filter(note => note.detailsUrl).length, 22);
+  assert.equal(versionRows.filter(note => note.detailsUrl).length, 23);
   assert.equal(versionRows.filter(note => note.bannerSummary).length, 18);
   assert.equal(versionRows.filter(note => Array.isArray(note.highlights)).length, 23);
 

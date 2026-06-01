@@ -32,19 +32,19 @@ release-note data file, and the dashboard renderer.
 | release note data entries | 24 |
 | release note version rows | 23 |
 | staged newest release-note version | 3.3.2 |
-| packaged extension/browser version | 3.3.1 |
+| packaged extension/browser version | 3.3.2 |
 | runtime implementation changed | no |
 
 ## Source Fingerprints
 
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `manifest.json` | 88 | 2,513 | `c39c38d4e389f17803b1915c2d2d0673c60dd87e68a9301fac4faad14bfd31e1` |
-| `manifest.chrome.json` | 88 | 2,513 | `c39c38d4e389f17803b1915c2d2d0673c60dd87e68a9301fac4faad14bfd31e1` |
-| `manifest.firefox.json` | 75 | 2,029 | `89e2f70a5f6bb34356ebed2f4ad357213a28a2872cfaebeff2474e702a98719d` |
-| `manifest.opera.json` | 89 | 2,518 | `ef0fa857517710853e82942bdb05bc14c9f2e2202b49775fd6e6a59a27e77017` |
-| `package.json` | 46 | 1,376 | `cd24685d1fb4940c1a67f12ce143bc1466200a299a82dbfa6f553b99e24ae23f` |
-| `data/release_notes.json` | 316 | 23,039 | `e012f6c071fffa67958f55544ecae9bbb26e7ec91edd2066df4d06a62de69962` |
+| `manifest.json` | 88 | 2,513 | `282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734` |
+| `manifest.chrome.json` | 88 | 2,513 | `282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734` |
+| `manifest.firefox.json` | 75 | 2,029 | `c84368c9db6a4900bb6ff055b66a645a88176d3533e307eee0dcb8d230fae2bb` |
+| `manifest.opera.json` | 89 | 2,518 | `0f0b77df312bf8b45a40e652bd7fc4ee4af270945b4e38e9353ebfdc1caf1e2b` |
+| `package.json` | 61 | 2,405 | `36053d322780ce787de403be574cc400936ef2a994b4c8eca62561154fe81aec` |
+| `data/release_notes.json` | 317 | 23,020 | `a8d59b18e9bffd1c828538ee58b3b8e9be7c641fea3ff064220311485a3b1c6b` |
 | `js/content/first_run_prompt.js` | 190 | 7,453 | `5672d9060d29b08550ecfc3add54245212a5094ee5137f025b6f788f12e50409` |
 | `js/content/release_notes_prompt.js` | 250 | 9,866 | `30b624cbbda1004f354f98dbf3b4513f8ebc298adecbceb4358782f248f80474` |
 | `js/background.js` | 6,320 | 285,103 | `77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad` |
@@ -78,7 +78,7 @@ release-note data file, and the dashboard renderer.
 | Release ack | `FilterTube_ReleaseNotesAck` writes `releaseNotesSeenVersion` and clears `releaseNotesPayload` without a prompt-owner or trusted sender-class gate. | spoofable acknowledgement |
 | First-run complete | `FilterTube_FirstRunComplete` writes `firstRunRefreshNeeded: false` without a prompt-owner or trusted sender-class gate. | spoofable acknowledgement |
 | What's New open | `FilterTube_OpenWhatsNew` uses `request?.url || WHATS_NEW_PAGE_URL` and passes it directly to `tabs.create`; the content script can fall back to `window.open` or `location.href`. | URL policy drift, external navigation risk |
-| Release-note data | `data/release_notes.json` has a staged `3.3.2` row while package and browser manifests remain `3.3.1`; dashboard marks the package version current. | public-claim/version drift |
+| Release-note data | `data/release_notes.json`, package metadata, and browser manifests all start at `3.3.2`; dashboard marks the package version current. | public-claim/version drift |
 | Dashboard render | The dashboard renders `detailsUrl` as `_blank` links and consumes the same packaged JSON as the release banner. | release claim coupling |
 
 ## Optimization And JSON-First Boundary

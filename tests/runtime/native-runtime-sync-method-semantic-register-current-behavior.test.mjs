@@ -199,8 +199,8 @@ test('native runtime sync method register is audit-only and source scoped', () =
   assert.match(text, /public wrapper line count: 34/);
   assert.match(text, /public wrapper bytes: 1070/);
   assert.match(text, new RegExp(`public wrapper sha256: ${sha256(wrapperPath)}`));
-  assert.match(text, /package line count: 46/);
-  assert.match(text, /package bytes: 1376/);
+  assert.match(text, /package line count: 61/);
+  assert.match(text, /package bytes: 2405/);
   assert.match(text, new RegExp(`package sha256: ${sha256(packagePath)}`));
   assert.match(text, /runtime behavior changed: no/);
   assert.doesNotMatch(wrapper, /nativeSyncWrapperMethodAuthority/);

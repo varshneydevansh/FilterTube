@@ -3457,10 +3457,10 @@ test('objective coverage ledger records root package metadata script surface as 
   assert.match(doc, /without opening the implementation gate/);
   assert.match(doc, /`.gitignore`, `CHANGELOG\.md`, `LICENSE`, `README\.md`, `channel-identity-watch-mix-collab-recovery-plan\.md`, `package\.json`, and `package-lock\.json`/);
   assert.match(doc, /7 tracked root metadata files/);
-  assert.match(doc, /2,902 newline counts/);
-  assert.match(doc, /129,416 bytes/);
-  assert.match(doc, /12 package scripts including `audit:runtime`/);
-  assert.match(doc, /no conventional `test` script/);
+  assert.match(doc, /2,950 newline counts/);
+  assert.match(doc, /134,214 bytes/);
+  assert.match(doc, /27 package scripts including `test` and `audit:runtime`/);
+  assert.match(doc, /`npm test` smoke-lane entrypoint/);
   assert.match(doc, /no `private`\/`engines`\/`packageManager`/);
   assert.match(doc, /2 runtime dependencies/);
   assert.match(doc, /3 development dependencies/);
@@ -3468,7 +3468,7 @@ test('objective coverage ledger records root package metadata script surface as 
   assert.match(doc, /all non-root lockfile entries carrying integrity values/);
   assert.match(doc, /two deprecated locked packages/);
   assert.match(doc, /README JSON-first\/performance claims/);
-  assert.match(doc, /changelog top version `3\.3\.1`/);
+  assert.match(doc, /changelog top version `3\.3\.2`/);
   assert.match(doc, /release packaging of only `README\.md`, `CHANGELOG\.md`, and `LICENSE`/);
   assert.match(doc, /ignored local JSON\/HTML\/text captures/);
   assert.match(doc, /tracked `package-lock\.json`/);
@@ -8851,7 +8851,7 @@ test('objective coverage ledger records package lock script optional dependency 
   assert.match(doc, /tests\/runtime\/package-lock-script-optional-dependency-boundary-current-behavior\.test\.mjs/);
   assert.match(doc, /without opening the implementation gate/);
   assert.match(doc, /direct lockfile script\/optional dependency proof/);
-  assert.match(doc, /`package\.json` at 46 lines/);
+  assert.match(doc, /`package\.json` at 61 lines/);
   assert.match(doc, /`package-lock\.json` at 1,461 lines/);
   assert.match(doc, /`website\/package\.json` at 23 lines/);
   assert.match(doc, /`website\/package-lock\.json` at 1,678 lines/);

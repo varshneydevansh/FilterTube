@@ -23,9 +23,9 @@ public wrapper line count: 34
 public wrapper bytes: 1070
 public wrapper sha256: 4f46c13bf6099092193712790d231ff4809b00b1b0061d04af71ac3ba6bf21c6
 package file: package.json
-package line count: 46
-package bytes: 1376
-package sha256: cd24685d1fb4940c1a67f12ce143bc1466200a299a82dbfa6f553b99e24ae23f
+package line count: 61
+package bytes: 2405
+package sha256: 36053d322780ce787de403be574cc400936ef2a994b4c8eca62561154fe81aec
 package script: sync:native-runtime -> node scripts/sync-native-runtime.mjs
 normal build invokes public wrapper: no
 default app repo: ../FilterTubeApp

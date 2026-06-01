@@ -27,8 +27,8 @@ lock behavior and the proof still missing before dependency or packaging work.
 
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `package.json` | 46 | 1,376 | `cd24685d1fb4940c1a67f12ce143bc1466200a299a82dbfa6f553b99e24ae23f` |
-| `package-lock.json` | 1,461 | 49,916 | `4882aa83fdbd0b3e150d4df5d32b3c02f3597cd64fe7193b9efbef3183832cef` |
+| `package.json` | 61 | 2,405 | `36053d322780ce787de403be574cc400936ef2a994b4c8eca62561154fe81aec` |
+| `package-lock.json` | 1,461 | 49,916 | `f52d6482693be9cd4edacdc1f1491b4d2cda796522bfd0e4dcf86e0c879ad974` |
 | `website/package.json` | 23 | 477 | `881918c3694fca755065dd9e29cb24613fa35af162c174dd8e68bf273ac62351` |
 | `website/package-lock.json` | 1,678 | 55,337 | `468e8779d0c2826fb258a783ffe88a735b3269964c23ad510ae3118ac17b6b10` |
 
@@ -37,19 +37,19 @@ lock behavior and the proof still missing before dependency or packaging work.
 `package.json` currently declares:
 
 - name: `filtertube`
-- version: `3.3.1`
-- 12 scripts
+- version: `3.3.2`
+- 27 scripts
 - 2 direct runtime dependencies: `preact`, `qrcode`
 - 3 direct development dependencies: `archiver`, `esbuild`, `fs-extra`
 - no `private`, `engines`, or `packageManager` field
-- no conventional `test` script; audit execution is `audit:runtime`
+- conventional `test` script: `node scripts/run-test-lane.mjs smoke`; full historical audit execution is `audit:runtime`
 
 `package-lock.json` currently pins:
 
 - lockfileVersion: 3
 - total `packages` entries: 112
 - non-root package entries: 111
-- root package name/version: `filtertube` / `3.3.1`
+- root package name/version: `filtertube` / `3.3.2`
 - root dependency keys matching `package.json`: `preact`, `qrcode`
 - root devDependency keys matching `package.json`: `archiver`, `esbuild`, `fs-extra`
 - non-root package entries with missing `integrity`: 0

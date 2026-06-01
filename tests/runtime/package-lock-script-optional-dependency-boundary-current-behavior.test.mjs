@@ -114,14 +114,14 @@ test('package lock script optional dependency boundary doc is audit-only', () =>
 test('package JSON and lockfile fingerprints remain pinned', () => {
   const expected = {
     'package.json': {
-      lines: 46,
-      bytes: 1376,
-      sha256: 'cd24685d1fb4940c1a67f12ce143bc1466200a299a82dbfa6f553b99e24ae23f',
+      lines: 61,
+      bytes: 2405,
+      sha256: '36053d322780ce787de403be574cc400936ef2a994b4c8eca62561154fe81aec',
     },
     'package-lock.json': {
       lines: 1461,
       bytes: 49916,
-      sha256: '4882aa83fdbd0b3e150d4df5d32b3c02f3597cd64fe7193b9efbef3183832cef',
+      sha256: 'f52d6482693be9cd4edacdc1f1491b4d2cda796522bfd0e4dcf86e0c879ad974',
     },
     'website/package.json': {
       lines: 23,
@@ -140,7 +140,7 @@ test('package JSON and lockfile fingerprints remain pinned', () => {
   }
 
   const source = doc();
-  assert.match(source, /`package\.json` \| 46 \| 1,376/);
+  assert.match(source, /`package\.json` \| 61 \| 2,405/);
   assert.match(source, /`package-lock\.json` \| 1,461 \| 49,916/);
   assert.match(source, /`website\/package\.json` \| 23 \| 477/);
   assert.match(source, /`website\/package-lock\.json` \| 1,678 \| 55,337/);
@@ -151,21 +151,21 @@ test('root package lock JSON paths and lifecycle markers remain pinned', () => {
   const summary = summarizeLock('package-lock.json');
 
   assert.equal(pkg.name, 'filtertube');
-  assert.equal(pkg.version, '3.3.1');
-  assert.equal(Object.keys(pkg.scripts).length, 12);
+  assert.equal(pkg.version, '3.3.2');
+  assert.equal(Object.keys(pkg.scripts).length, 27);
   assert.deepEqual(Object.keys(pkg.dependencies), ['preact', 'qrcode']);
   assert.deepEqual(Object.keys(pkg.devDependencies), ['archiver', 'esbuild', 'fs-extra']);
   assert.equal(pkg.private, undefined);
   assert.equal(pkg.engines, undefined);
   assert.equal(pkg.packageManager, undefined);
-  assert.equal(pkg.scripts.test, undefined);
+  assert.equal(pkg.scripts.test, 'node scripts/run-test-lane.mjs smoke');
   assert.equal(pkg.scripts['audit:runtime'], 'node --test tests/runtime/*.test.mjs');
 
   assert.equal(summary.lockfileVersion, 3);
   assert.equal(summary.packages, 112);
   assert.equal(summary.nonRoot, 111);
   assert.equal(summary.root.name, 'filtertube');
-  assert.equal(summary.root.version, '3.3.1');
+  assert.equal(summary.root.version, '3.3.2');
   assert.deepEqual(summary.root.dependencies, pkg.dependencies);
   assert.deepEqual(summary.root.devDependencies, pkg.devDependencies);
   assert.deepEqual(summary.hasInstallScript, ['node_modules/esbuild']);

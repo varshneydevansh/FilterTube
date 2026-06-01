@@ -13,7 +13,7 @@ const rootMetadataRows = [
   ['LICENSE', 21, 1073, 'd0739cbb6232b0fb9ea59347feaf412bab5042768aa02856b16af24bb35e9d9d'],
   ['README.md', 401, 22476, '4559dac6d9b6a2e9d94aed4c1cb10a384c2f7c51ad09f37bab00a983e78605fb'],
   ['channel-identity-watch-mix-collab-recovery-plan.md', 262, 16023, '01f82169b06d3752e318b20b956c8a4284ae80166686e5c40aeee66c957d108a'],
-  ['package.json', 60, 2353, 'da3439cf47be88a13a075a641fe49adb0bf40475c836512f0775521d3fec8f2f'],
+  ['package.json', 61, 2405, '36053d322780ce787de403be574cc400936ef2a994b4c8eca62561154fe81aec'],
   ['package-lock.json', 1461, 49916, 'f52d6482693be9cd4edacdc1f1491b4d2cda796522bfd0e4dcf86e0c879ad974'],
 ];
 
@@ -91,9 +91,9 @@ test('root package metadata script surface doc is audit-only and fingerprint pin
   assert.match(doc, /optimization, release, dependency, JSON-first, or cleanup implementation work/);
   assert.deepEqual(trackedRootMetadata.sort(), rootMetadataRows.map(([file]) => file).sort());
 
-  assert.equal(rootMetadataRows.reduce((sum, [, lines]) => sum + lines, 0), 2949);
-  assert.equal(rootMetadataRows.reduce((sum, [, , bytes]) => sum + bytes, 0), 134162);
-  assert.match(doc, /7 files, 2,949 newline counts, and\s+134,162 bytes/);
+  assert.equal(rootMetadataRows.reduce((sum, [, lines]) => sum + lines, 0), 2950);
+  assert.equal(rootMetadataRows.reduce((sum, [, , bytes]) => sum + bytes, 0), 134214);
+  assert.match(doc, /7 files, 2,950 newline counts, and\s+134,214 bytes/);
 
   for (const [file, lines, bytes, hash] of rootMetadataRows) {
     assert.equal(newlineCount(file), lines, `${file} newline count drifted`);
@@ -122,6 +122,7 @@ test('package scripts and dependency metadata are pinned before release or optim
     'build:firefox',
     'build:opera',
     'sync:native-runtime',
+    'test',
     'audit:runtime',
     'test:release',
     'test:whitelist',
@@ -141,7 +142,8 @@ test('package scripts and dependency metadata are pinned before release or optim
     'dev:firefox',
     'dev:opera',
   ]);
-  assert.equal(Object.keys(pkg.scripts).length, 26);
+  assert.equal(Object.keys(pkg.scripts).length, 27);
+  assert.equal(pkg.scripts.test, 'node scripts/run-test-lane.mjs smoke');
   assert.equal(pkg.scripts['audit:runtime'], 'node --test tests/runtime/*.test.mjs');
   assert.equal(pkg.scripts['test:release'], 'node scripts/run-test-lane.mjs release');
   assert.equal(pkg.scripts['test:smoke'], 'node scripts/run-test-lane.mjs smoke');
@@ -150,7 +152,6 @@ test('package scripts and dependency metadata are pinned before release or optim
   assert.equal(pkg.scripts['test:audit-drift'], 'node scripts/audit-proof-drift.mjs --lane-owned');
   assert.equal(pkg.scripts['smoke:youtube'], 'node docs/audit/artifacts/release-live-youtube-spa-smoke/run-live-smoke.mjs');
   assert.equal(pkg.scripts['smoke:youtube:verify'], 'node docs/audit/artifacts/release-live-youtube-spa-smoke/verify-live-smoke-artifact.mjs');
-  assert.equal(pkg.scripts.test, undefined);
   assert.equal(Object.hasOwn(pkg, 'private'), false);
   assert.equal(Object.hasOwn(pkg, 'engines'), false);
   assert.equal(Object.hasOwn(pkg, 'packageManager'), false);
@@ -164,7 +165,8 @@ test('package scripts and dependency metadata are pinned before release or optim
     'fs-extra': '^11.1.1',
   });
 
-  assert.match(doc, /26 scripts/);
+  assert.match(doc, /27 scripts/);
+  assert.match(doc, /test -> node scripts\/run-test-lane\.mjs smoke/);
   assert.match(doc, /test:release -> node scripts\/run-test-lane\.mjs release/);
   assert.match(doc, /test:smoke -> node scripts\/run-test-lane\.mjs smoke/);
   assert.match(doc, /lanes:changed -> node scripts\/run-test-lane\.mjs --changed/);
@@ -172,8 +174,9 @@ test('package scripts and dependency metadata are pinned before release or optim
   assert.match(doc, /test:audit-drift -> node scripts\/audit-proof-drift\.mjs --lane-owned/);
   assert.match(doc, /smoke:youtube -> node docs\/audit\/artifacts\/release-live-youtube-spa-smoke\/run-live-smoke\.mjs/);
   assert.match(doc, /smoke:youtube:verify -> node docs\/audit\/artifacts\/release-live-youtube-spa-smoke\/verify-live-smoke-artifact\.mjs/);
-  assert.match(doc, /`test:changed` runs those classified lanes sequentially/);
-  assert.match(doc, /does not declare `private`, `engines`,\s+`packageManager`, or a conventional `test` script/);
+  assert.match(doc, /`test:changed`\s+runs those classified lanes sequentially/);
+  assert.match(doc, /does not declare `private`, `engines`,\s+or `packageManager`/);
+  assert.match(doc, /`npm test`\s+now runs the\s+smoke lane/);
   assert.match(doc, /browser dev shortcuts still mutate tracked\s+`manifest\.json`/);
   assert.match(doc, /`packageScriptExecutionGate`/);
 });

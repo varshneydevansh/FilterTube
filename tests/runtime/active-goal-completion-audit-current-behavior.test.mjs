@@ -2969,11 +2969,11 @@ test('active goal completion audit records root package metadata script surface 
   assert.match(source, /every-file, release\/package, public claim, dependency, performance, code-burden, JSON-first claim/);
   assert.match(source, /root project metadata/);
   assert.match(source, /7 tracked root metadata files/);
-  assert.match(source, /2,902 newline counts/);
-  assert.match(source, /129,416 bytes/);
-  assert.match(source, /`package\.json` version `3\.3\.1`/);
-  assert.match(source, /12 package scripts including `audit:runtime`/);
-  assert.match(source, /no conventional `test` script/);
+  assert.match(source, /2,950 newline counts/);
+  assert.match(source, /134,214 bytes/);
+  assert.match(source, /`package\.json` version `3\.3\.2`/);
+  assert.match(source, /27 package scripts including `test` and `audit:runtime`/);
+  assert.match(source, /`npm test` smoke-lane entrypoint/);
   assert.match(source, /no `private`\/`engines`\/`packageManager` declarations/);
   assert.match(source, /2 runtime dependencies/);
   assert.match(source, /3 development dependencies/);
@@ -2981,7 +2981,7 @@ test('active goal completion audit records root package metadata script surface 
   assert.match(source, /all non-root lockfile entries carrying integrity values/);
   assert.match(source, /two deprecated locked packages \(`glob` and `inflight`\)/);
   assert.match(source, /README version\/license\/line-count\/download\/JSON-first claims/);
-  assert.match(source, /changelog top version `3\.3\.1`/);
+  assert.match(source, /changelog top version `3\.3\.2`/);
   assert.match(source, /build packaging of only `README\.md`, `CHANGELOG\.md`, and `LICENSE`/);
   assert.match(source, /ignored local raw JSON evidence captures/);
   assert.match(source, /tracked `package-lock\.json`/);
@@ -9096,7 +9096,7 @@ test('active goal completion audit records package lock script optional dependen
   assert.match(source, /docs\/audit\/FILTERTUBE_PACKAGE_LOCK_SCRIPT_OPTIONAL_DEPENDENCY_BOUNDARY_CURRENT_BEHAVIOR_2026-05-22\.md/);
   assert.match(source, /tests\/runtime\/package-lock-script-optional-dependency-boundary-current-behavior\.test\.mjs/);
   assert.match(source, /direct lockfile script\/optional dependency proof/);
-  assert.match(source, /`package\.json` at 46 lines/);
+  assert.match(source, /`package\.json` at 61 lines/);
   assert.match(source, /`package-lock\.json` at 1,461 lines/);
   assert.match(source, /`website\/package\.json` at 23 lines/);
   assert.match(source, /`website\/package-lock\.json` at 1,678 lines/);

@@ -16,7 +16,7 @@ changes.
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
 | `build.js` | 728 | 26641 | `7ef8a2fd6796ec6758d7724544469a623d7c2d9407247a12b482e1f55cdc243b` |
-| `package.json` | 60 | 2353 | `da3439cf47be88a13a075a641fe49adb0bf40475c836512f0775521d3fec8f2f` |
+| `package.json` | 61 | 2405 | `36053d322780ce787de403be574cc400936ef2a994b4c8eca62561154fe81aec` |
 | `README.md` | 401 | 22476 | `4559dac6d9b6a2e9d94aed4c1cb10a384c2f7c51ad09f37bab00a983e78605fb` |
 | `CHANGELOG.md` | 591 | 40124 | `e22a87ce7eeb88d171587d4b0f4676881a2c3081a7fbf15978d7e8d8582cdfdd` |
 | `manifest.json` | 88 | 2513 | `282bbf5f84819af6af4edcab1c7a21f16c1f6f50501492226c1065125c287734` |

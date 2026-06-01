@@ -107,9 +107,9 @@ Current artifact hashes:
 | `scripts/build-nanah-vendor.mjs` | Vendor build entrypoint | `dae8d3ef29c4cd44b0bf975090e9d53f3bb05b523355f5038930fc03b27e921c` |
 | `js/vendor/nanah.bundle.js` | Tracked generated Nanah bundle | `11c43c120c58ed4de81d2b1d341efd488d1bd6792d49ce5fdc9220aacf6e07ca` |
 | `js/vendor/qrcode.bundle.js` | Tracked generated QR bundle | `4b48f69259b91b2c9ff6bdc2be2f96ab9855aa4fb96bc684a81bcd76d8c3ca75` |
-| `package.json` | Package script/dependency source | `cd24685d1fb4940c1a67f12ce143bc1466200a299a82dbfa6f553b99e24ae23f` |
-| `package-lock.json` | Dependency lock source | `4882aa83fdbd0b3e150d4df5d32b3c02f3597cd64fe7193b9efbef3183832cef` |
-| `html/tab-view.html` | Dashboard load surface | `e33ef1e0d1f2c3d607cb58c3275137df54c1c82ed06cf5cd03c053690fedb0b6` |
+| `package.json` | Package script/dependency source | `36053d322780ce787de403be574cc400936ef2a994b4c8eca62561154fe81aec` |
+| `package-lock.json` | Dependency lock source | `f52d6482693be9cd4edacdc1f1491b4d2cda796522bfd0e4dcf86e0c879ad974` |
+| `html/tab-view.html` | Dashboard load surface | `d11914a138ab29fb764a6aede4921c4d491bacaad83ecd44f8d7392758ece3e1` |
 | `js/nanah_sync_adapter.js` | Nanah envelope adapter consumer | `8094261e6fb9fa72a86e6e79e8614bf18b93134f54dcca7327114b5410447824` |
 | `js/tab-view.js` | Nanah UI/session consumer | `1b7f621d48d16247aecc4c7ee57cbc3db9efd3e597e6f0a4fc188228470648f7` |
 
@@ -162,7 +162,7 @@ runtime behavior changed: no
 scripts/build-nanah-vendor.mjs: 65 lines, 1818 bytes
 js/vendor/nanah.bundle.js: 876 lines, 27692 bytes
 js/vendor/qrcode.bundle.js: 2085 lines, 66965 bytes
-package.json: 46 lines, 1376 bytes
+package.json: 61 lines, 2405 bytes
 package-lock.json: 1461 lines, 49916 bytes
 html/tab-view.html: 1577 lines, 133585 bytes
 ```

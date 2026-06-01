@@ -254,7 +254,7 @@ test('Nanah vendor build register pins script counts hashes and generated output
     'scripts/build-nanah-vendor.mjs': [65, 1818],
     'js/vendor/nanah.bundle.js': [876, 27692],
     'js/vendor/qrcode.bundle.js': [2085, 66965],
-    'package.json': [46, 1376],
+    'package.json': [61, 2405],
     'package-lock.json': [1461, 49916],
     'html/tab-view.html': [1577, 133585]
   })) {
