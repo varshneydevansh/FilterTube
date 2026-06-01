@@ -25,6 +25,9 @@ FilterTube change
 The lane definitions live in `scripts/test-lane-config.mjs`; package scripts
 call `scripts/run-test-lane.mjs` so npm commands and lane contents share one
 source of truth while execution stays separate from the declarative matrix.
+Plain `npm test` runs the same bounded smoke lane as `npm run test:smoke`;
+logical changes should still use `npm run test:changed` so touched files are
+classified before lanes run.
 
 | Lane | Command | Primary purpose |
 |---|---|---|

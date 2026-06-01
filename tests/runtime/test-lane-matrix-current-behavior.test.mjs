@@ -98,6 +98,7 @@ test('test lane matrix defines every required lane and npm script', () => {
   assert.equal(pkg.scripts['test:audit-drift'], 'node scripts/audit-proof-drift.mjs --lane-owned');
   assert.equal(pkg.scripts['lanes:changed'], 'node scripts/run-test-lane.mjs --changed');
   assert.equal(pkg.scripts['test:changed'], 'node scripts/run-test-lane.mjs --run-changed');
+  assert.equal(pkg.scripts.test, 'node scripts/run-test-lane.mjs smoke');
   assert.equal(pkg.scripts['audit:runtime'], 'node --test tests/runtime/*.test.mjs');
   assert.match(runner, /from '\.\/test-lane-config\.mjs'/);
   assert.match(driftScript, /from '\.\/test-lane-config\.mjs'/);
@@ -106,6 +107,8 @@ test('test lane matrix defines every required lane and npm script', () => {
   assert.match(matrix, /npm run test:audit-drift/);
   assert.match(matrix, /npm run lanes:changed/);
   assert.match(matrix, /npm run test:changed/);
+  assert.match(matrix, /Plain `npm test` runs the same bounded smoke lane as `npm run test:smoke`/);
+  assert.match(matrix, /logical changes should still use `npm run test:changed`/);
   assert.match(matrix, /npm run audit:runtime/);
   assert.match(matrix, /scripts\/test-lane-config\.mjs/);
   assert.match(matrix, /execution stays separate from the declarative matrix/);
