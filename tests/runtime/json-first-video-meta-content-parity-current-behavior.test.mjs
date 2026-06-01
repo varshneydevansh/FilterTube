@@ -301,7 +301,7 @@ function loadPendingMarkerRuntime({ nowMs = 1700000000000 } = {}) {
 test('JSON-first video meta content parity audit is audit-only and source pinned', () => {
   const text = doc();
   const hashes = {
-    'js/filter_logic.js': '4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641',
+    'js/filter_logic.js': '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5',
     'js/content/dom_fallback.js': '2129fcc16f8ad1420a6cb44905ddcd0b68d5511f3b647e2db100c0d67d492aef',
     'js/content_bridge.js': '1dafb0bf979d391d2a3be827700e39114bc02b839cd26ddc8635a1127a0327b3'
   };
@@ -319,8 +319,8 @@ test('JSON-first video meta content parity audit is audit-only and source pinned
   assert.match(text, /active-work value validation owner: absent/);
   assert.match(text, /DOM metadata fetch validity report: absent/);
   assert.match(text, /flowchart TD/);
-  assert.equal(lineCount(read('js/filter_logic.js')), 3498);
-  assert.equal(Buffer.byteLength(read('js/filter_logic.js')), 165151);
+  assert.equal(lineCount(read('js/filter_logic.js')), 3652);
+  assert.equal(Buffer.byteLength(read('js/filter_logic.js')), 172174);
   assert.equal(lineCount(read('js/content/dom_fallback.js')), 4838);
   assert.equal(Buffer.byteLength(read('js/content/dom_fallback.js')), 228332);
   assert.equal(lineCount(read('js/content_bridge.js')), 13571);

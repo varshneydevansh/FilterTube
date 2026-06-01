@@ -20,14 +20,19 @@ test('audit runtime backlog remains explicit and outside release-lane completion
   assert.match(doc, /Status: broad audit backlog, not a release-lane gate/);
   assert.match(doc, /node --test --test-reporter=tap tests\/runtime\/\*\.test\.mjs > \/tmp\/filtertube-runtime\.tap 2>&1/);
   assert.match(doc, /tests: 4737/);
-  assert.match(doc, /pass: 4693/);
-  assert.match(doc, /fail: 44/);
-  assert.match(doc, /duration_ms: 48452\.025959/);
+  assert.match(doc, /pass: 4694/);
+  assert.match(doc, /fail: 43/);
+  assert.match(doc, /duration_ms: 65026\.712375/);
+  assert.match(doc, /44 failures\s+to\s+43\s+failures/);
+  assert.match(doc, /JSON-first video-meta content parity source\s+pin row/);
+  assert.match(doc, /content parity proof test now expects the current\s+`js\/filter_logic\.js` line count, byte count, and hash/);
+  assert.match(doc, /content decision fixture behavior remains unchanged/);
+  assert.match(doc, /first-class video-meta content parity authority remains absent/);
   assert.match(doc, /45 failures\s+to\s+44\s+failures/);
   assert.match(doc, /JSON-first video-meta category parity\s+source pin row/);
-  assert.match(doc, /category parity proof test now expects the current\s+`js\/filter_logic\.js` line count, byte count, and hash/);
-  assert.match(doc, /category decision fixture behavior remains unchanged/);
-  assert.match(doc, /first-class video-meta category parity authority remains absent/);
+  assert.match(doc, /category parity\s+proof test now expects the current `js\/filter_logic\.js` line count, byte count,\s+and hash/);
+  assert.match(doc, /category decision fixture\s+behavior remains unchanged/);
+  assert.match(doc, /first-class video-meta category parity authority\s+remains absent/);
   assert.match(doc, /46 failures\s+to\s+45\s+failures/);
   assert.match(doc, /JSON-first uppercase title boundary source\s+pin row/);
   assert.match(doc, /current\s+`js\/filter_logic\.js` line count, byte count, and hash/);
@@ -196,14 +201,14 @@ test('audit runtime backlog pins the current broad-suite failure family snapshot
   const expectedRows = [
     ['generated/release/package/docs surfaces', '34'],
     ['source-locus/optimization/index contracts', '4'],
-    ['JSON/video-meta/path/reference', '12'],
+    ['JSON/video-meta/path/reference', '11'],
     ['website/public-doc/source inventory', '14'],
     ['settings/content-control/DOM lifecycle', '8'],
     ['native/Nanah/Kids/YTM', '8']
   ];
 
-  assert.match(doc, /Current failing subtests are spread across 33 runtime test files/);
-  assert.match(doc, /filtertube-runtime-current-after-video-meta-category-parity-refresh\.tap/);
+  assert.match(doc, /Current failing subtests are spread across 32 runtime test files/);
+  assert.match(doc, /filtertube-runtime-current-after-video-meta-content-parity-refresh\.tap/);
   assert.match(doc, /non-exclusive family snapshot/);
   assert.match(doc, /previous method-proof\/family blocker row is now retired/);
   assert.match(doc, /direct method semantic proof lane passes with 5,681\s+current lexical callables/);
@@ -260,6 +265,10 @@ test('audit runtime backlog pins the current broad-suite failure family snapshot
   assert.match(doc, /category\s+parity proof test now matches the current `js\/filter_logic\.js` fingerprint/);
   assert.match(doc, /category decision fixture behavior\s+remains unchanged/);
   assert.match(doc, /first-class video-meta category parity authority remains\s+explicitly absent/);
+  assert.match(doc, /previous JSON-first video-meta content parity row is retired/);
+  assert.match(doc, /content\s+parity proof test now matches the current `js\/filter_logic\.js` fingerprint/);
+  assert.match(doc, /content decision fixture behavior remains\s+unchanged/);
+  assert.match(doc, /first-class video-meta content parity authority remains explicitly\s+absent/);
   assert.match(doc, /previous JSON-first metric artifact gate rows are retired/);
   assert.match(doc, /metric proof\s+now pins current performance-claim and no-work crosswalk hashes/);
   assert.match(doc, /current\s+`js\/filter_logic\.js` `processData\(\)` anchor/);
