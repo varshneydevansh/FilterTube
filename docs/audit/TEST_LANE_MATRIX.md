@@ -70,6 +70,13 @@ goal requirements as follows:
 | Preserve blocklist, whitelist, keyword/channel blocking, Shorts, end screens, quick-block, 3-dot menus, JSON-first, DOM fallback, no-rule performance, SPA navigation, settings, and release packaging | The lane table, manual-smoke handoff, and file-to-lane matrix name each surface and bind it to focused tests or live-smoke rows. The whitelist lane explicitly owns end-screen videowall, card, autoplay, and player DOM boundary tests so allow-mode changes cannot skip issue-57-style proof. |
 | Commit only with passing lane | The change flow requires lane execution before commit; `npm run test:changed` is the default proof command for a dirty logical change. |
 
+`docs/audit/FILTERTUBE_CHANGE_SAFETY_GOAL_REQUIREMENT_AUDIT_2026-06-01.md`
+is the compact requirement-by-requirement audit for this active goal. Its
+smoke-lane sentinel,
+`tests/runtime/change-safety-goal-requirement-audit-current-behavior.test.mjs`,
+keeps the workflow proof separate from broad runtime-audit completion and live
+YouTube parity claims.
+
 ## Executable Classification
 
 Use the classifier before picking tests manually:
@@ -148,6 +155,7 @@ the audit system itself.
 | lane workflow file-size guard | `npm run test:release`, `npm run test:performance`, `npm run test:smoke` | Keeps workflow-owned lane files below 1000 lines. Matrix proof and changed-lane runner proof are split; if either file approaches the boundary, split the matrix or runner proof before adding more assertions. |
 | full audit proof drift inventory | `node scripts/audit-proof-drift.mjs --all --report-only` | Reports stale whole-file fingerprints in older audit files/tests that are not yet lane-owned. This is a backlog inventory, not a release blocker. |
 | full historical runtime audit | `npm run audit:runtime` | Runs every historical runtime/current-boundary audit test. This is the broad backlog suite, not the default per-change release lane. |
+| change-safety goal requirement audit | `npm run test:smoke` | Keeps the active goal requirements, proof owners, manual-smoke boundary, and broad-backlog boundary explicit in one compact workflow proof. |
 
 The current broad-suite backlog is pinned in
 `docs/audit/FILTERTUBE_CHANGE_SAFETY_RUNTIME_AUDIT_BACKLOG_2026-06-01.md`.

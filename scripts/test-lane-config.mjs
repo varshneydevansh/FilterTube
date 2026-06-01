@@ -328,6 +328,7 @@ export const LANES = Object.freeze({
       'tests/runtime/all-callable-index-current-behavior.test.mjs',
       'tests/runtime/audit-runtime-backlog-current-behavior.test.mjs',
       'tests/runtime/source-of-truth-claim-register-current-behavior.test.mjs',
+      'tests/runtime/change-safety-goal-requirement-audit-current-behavior.test.mjs',
       'tests/runtime/test-lane-visible-safety-current-behavior.test.mjs',
       'tests/runtime/test-lane-matrix-current-behavior.test.mjs',
       'tests/runtime/test-lane-classifier-workflow-current-behavior.test.mjs',
