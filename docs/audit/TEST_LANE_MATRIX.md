@@ -89,9 +89,10 @@ prints a manual YouTube smoke advisory. That keeps the installed-extension
 handoff visible beside the automated lane commands without pretending automated
 fixtures can prove live YouTube SPA smoothness, browser profile state, package
 parity, or native menu rendering.
-The advisory includes the structured live-smoke template, verifier command,
-and required SPA row ids so the manual handoff produces a verifiable artifact
-instead of an unstructured note.
+The advisory includes the npm runner command, npm verifier command, structured
+live-smoke template, lower-level verifier command, and required SPA row ids so
+the manual handoff produces a verifiable artifact instead of an unstructured
+note.
 
 For proof discipline, the classifier also reports whether a changed
 `docs/audit/` proof file is present. If source, release, asset, or product-doc

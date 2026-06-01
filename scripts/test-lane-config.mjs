@@ -13,6 +13,9 @@ export const MANUAL_YOUTUBE_SMOKE_LANE_REASONS = Object.freeze({
 });
 
 export const LIVE_SMOKE_ARTIFACT_TEMPLATE = 'docs/audit/artifacts/release-live-youtube-spa-smoke/template.json';
+export const LIVE_SMOKE_RUNNER_COMMAND = 'npm run smoke:youtube';
+export const LIVE_SMOKE_VERIFY_COMMAND =
+  'npm run smoke:youtube:verify -- docs/audit/artifacts/release-live-youtube-spa-smoke/<artifact>.json';
 export const LIVE_SMOKE_ARTIFACT_VERIFIER =
   'node docs/audit/artifacts/release-live-youtube-spa-smoke/verify-live-smoke-artifact.mjs docs/audit/artifacts/release-live-youtube-spa-smoke/<artifact>.json';
 export const LIVE_SMOKE_REQUIRED_ROWS = Object.freeze([

@@ -11,7 +11,9 @@ import {
   LANES,
   LIVE_SMOKE_ARTIFACT_TEMPLATE,
   LIVE_SMOKE_ARTIFACT_VERIFIER,
+  LIVE_SMOKE_RUNNER_COMMAND,
   LIVE_SMOKE_REQUIRED_ROWS,
+  LIVE_SMOKE_VERIFY_COMMAND,
   MANUAL_YOUTUBE_SMOKE_LANE_REASONS,
   NON_PROOF_LANE,
   RUNTIME_FIXTURE_LANE_REASONS,
@@ -273,6 +275,8 @@ function printClassification(result) {
       console.log(`  test:${lane}: ${reason}`);
     }
     console.log('  Live smoke artifact handoff:');
+    console.log(`    runner: ${LIVE_SMOKE_RUNNER_COMMAND}`);
+    console.log(`    verify: ${LIVE_SMOKE_VERIFY_COMMAND}`);
     console.log(`    template: ${LIVE_SMOKE_ARTIFACT_TEMPLATE}`);
     console.log(`    verifier: ${LIVE_SMOKE_ARTIFACT_VERIFIER}`);
     console.log(`    required rows: ${LIVE_SMOKE_REQUIRED_ROWS.join(', ')}`);

@@ -371,6 +371,8 @@ test('changed-lane runner is wired to the classifier and sequential lane executi
   assert.match(runner, /MANUAL_YOUTUBE_SMOKE_LANE_REASONS/);
   assert.match(runner, /Manual YouTube smoke required when user-facing/);
   assert.match(runner, /LIVE_SMOKE_ARTIFACT_TEMPLATE/);
+  assert.match(runner, /LIVE_SMOKE_RUNNER_COMMAND/);
+  assert.match(runner, /LIVE_SMOKE_VERIFY_COMMAND/);
   assert.match(runner, /LIVE_SMOKE_ARTIFACT_VERIFIER/);
   assert.match(runner, /LIVE_SMOKE_REQUIRED_ROWS/);
   assert.match(runner, /Live smoke artifact handoff/);
@@ -401,7 +403,10 @@ test('changed-lane runner is wired to the classifier and sequential lane executi
   assert.match(matrix, /runs\s+the required lanes sequentially in\s+matrix order/);
   assert.match(matrix, /fails if focused lane execution leaves additional\s+tracked or unignored dirty paths/);
   assert.match(matrix, /prints a manual YouTube\s+smoke advisory/);
-  assert.match(matrix, /includes the structured live-smoke template, verifier command,\s+and required SPA row ids/);
+  assert.match(
+    matrix,
+    /includes the npm runner command, npm verifier command, structured\s+live-smoke template, lower-level verifier command, and required SPA row ids/
+  );
   assert.match(matrix, /reports whether a changed\s+`docs\/audit\/` proof file is present/);
   assert.match(matrix, /fails\s+when source, release, asset, or product-doc paths changed without a matching\s+`docs\/audit\/` proof file/);
   assert.match(matrix, /fails when changed\s+`docs\/audit\/` proof does not share\s+at least one non-smoke lane/);
@@ -465,6 +470,11 @@ test('classifier output surfaces manual YouTube smoke for user-facing runtime an
   assert.match(runtime.stdout, /test:json: JSON-first filtering/);
   assert.match(runtime.stdout, /test:performance: empty-rule\/no-work/);
   assert.match(runtime.stdout, /Live smoke artifact handoff:/);
+  assert.match(runtime.stdout, /runner: npm run smoke:youtube/);
+  assert.match(
+    runtime.stdout,
+    /verify: npm run smoke:youtube:verify -- docs\/audit\/artifacts\/release-live-youtube-spa-smoke\/<artifact>\.json/
+  );
   assert.match(runtime.stdout, /template: docs\/audit\/artifacts\/release-live-youtube-spa-smoke\/template\.json/);
   assert.match(runtime.stdout, /verifier: node docs\/audit\/artifacts\/release-live-youtube-spa-smoke\/verify-live-smoke-artifact\.mjs docs\/audit\/artifacts\/release-live-youtube-spa-smoke\/<artifact>\.json/);
   assert.match(runtime.stdout, /FT-LIVE-SPA-00-home-to-search/);
@@ -486,6 +496,8 @@ test('classifier output surfaces manual YouTube smoke for user-facing runtime an
   assert.match(releaseOnly.stdout, /Manual YouTube smoke required when user-facing:/);
   assert.match(releaseOnly.stdout, /test:release: release packaging, public claims, installed-extension parity, and artifact handoff behavior/);
   assert.match(releaseOnly.stdout, /Live smoke artifact handoff:/);
+  assert.match(releaseOnly.stdout, /runner: npm run smoke:youtube/);
+  assert.match(releaseOnly.stdout, /verify: npm run smoke:youtube:verify/);
   assert.doesNotMatch(releaseOnly.stdout, /Runtime fixture proof expected when behavior changes:/);
 });
 
