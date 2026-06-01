@@ -118,6 +118,17 @@ The verifier rejects the template, failed/missing route rows, console issues,
 blank recording fields, stale row order, missing automated lane evidence, and
 missing installed byte parity.
 
+The runner reads the automated lane proof for `changeContext` from these
+environment variables before `npm run smoke:youtube`:
+
+```text
+FILTERTUBE_LOGICAL_CHANGE_TYPE
+FILTERTUBE_REQUIRED_LANES
+FILTERTUBE_AUTOMATED_PROOF_COMMAND
+FILTERTUBE_AUTOMATED_PROOF_STATUS=passed
+FILTERTUBE_AUTOMATED_PROOF_SUMMARY
+```
+
 | Row | Source anchors | Contract meaning | Current release status |
 | --- | --- | --- | --- |
 | `FT-LIVE-RUNNER-00-cdp-binding` | `run-live-smoke.mjs:9`, `run-live-smoke.mjs:26`, `run-live-smoke.mjs:49`, `run-live-smoke.mjs:367`, `run-live-smoke.mjs:368`, `run-live-smoke.mjs:369` | The run binds to `FILTERTUBE_CDP_BASE` or `http://127.0.0.1:9222`, fetches CDP version/target lists, and opens a WebSocket client. | Contract defined; no visible-tab proof recorded. |

@@ -55,6 +55,11 @@ test('release and smoke lanes keep the live YouTube SPA smoke boundary visible',
   assert.match(matrix, /installedByteParity\.verdict=GO/);
   assert.match(matrix, /changeContext/);
   assert.match(matrix, /automated lane evidence/);
+  assert.match(matrix, /FILTERTUBE_LOGICAL_CHANGE_TYPE="runtime hot-path change"/);
+  assert.match(matrix, /FILTERTUBE_REQUIRED_LANES="test:json,test:performance"/);
+  assert.match(matrix, /FILTERTUBE_AUTOMATED_PROOF_COMMAND="npm run test:changed"/);
+  assert.match(matrix, /FILTERTUBE_AUTOMATED_PROOF_STATUS="passed"/);
+  assert.match(matrix, /FILTERTUBE_AUTOMATED_PROOF_SUMMARY="test:changed passed for the classified lanes"/);
 });
 
 test('manual smoke handoff covers the release-critical visible behavior set', () => {
@@ -88,6 +93,11 @@ test('live smoke boundary remains explicit that current release smoke is missing
   assert.match(doc, /executed live smoke result artifacts committed: 0/);
   assert.match(doc, /release readiness from this slice: NO-GO until live smoke is recorded/);
   assert.match(doc, /runner output accepted as release proof now: NO-GO/);
+  assert.match(doc, /FILTERTUBE_LOGICAL_CHANGE_TYPE/);
+  assert.match(doc, /FILTERTUBE_REQUIRED_LANES/);
+  assert.match(doc, /FILTERTUBE_AUTOMATED_PROOF_COMMAND/);
+  assert.match(doc, /FILTERTUBE_AUTOMATED_PROOF_STATUS=passed/);
+  assert.match(doc, /FILTERTUBE_AUTOMATED_PROOF_SUMMARY/);
   assert.match(doc, /template accepted as release proof now: NO-GO/);
   assert.match(doc, /live smoke artifact verifier status: defined/);
   assert.match(doc, /A dated artifact is not release-ready until this verifier returns zero errors/);

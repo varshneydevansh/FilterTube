@@ -18,6 +18,13 @@ export const LIVE_SMOKE_VERIFY_COMMAND =
   'npm run smoke:youtube:verify -- docs/audit/artifacts/release-live-youtube-spa-smoke/<artifact>.json';
 export const LIVE_SMOKE_ARTIFACT_VERIFIER =
   'node docs/audit/artifacts/release-live-youtube-spa-smoke/verify-live-smoke-artifact.mjs docs/audit/artifacts/release-live-youtube-spa-smoke/<artifact>.json';
+export const LIVE_SMOKE_CHANGE_CONTEXT_ENV = Object.freeze([
+  'FILTERTUBE_LOGICAL_CHANGE_TYPE',
+  'FILTERTUBE_REQUIRED_LANES',
+  'FILTERTUBE_AUTOMATED_PROOF_COMMAND',
+  'FILTERTUBE_AUTOMATED_PROOF_STATUS=passed',
+  'FILTERTUBE_AUTOMATED_PROOF_SUMMARY'
+]);
 export const LIVE_SMOKE_REQUIRED_ROWS = Object.freeze([
   'FT-LIVE-SPA-00-home-to-search',
   'FT-LIVE-SPA-01-search-to-channel',

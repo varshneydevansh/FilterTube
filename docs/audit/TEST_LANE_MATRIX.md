@@ -229,6 +229,11 @@ When a dated live-smoke artifact is produced, verify it before using it as
 release evidence:
 
 ```bash
+FILTERTUBE_LOGICAL_CHANGE_TYPE="runtime hot-path change" \
+FILTERTUBE_REQUIRED_LANES="test:json,test:performance" \
+FILTERTUBE_AUTOMATED_PROOF_COMMAND="npm run test:changed" \
+FILTERTUBE_AUTOMATED_PROOF_STATUS="passed" \
+FILTERTUBE_AUTOMATED_PROOF_SUMMARY="test:changed passed for the classified lanes" \
 npm run smoke:youtube
 npm run smoke:youtube:verify -- docs/audit/artifacts/release-live-youtube-spa-smoke/<artifact>.json
 node docs/audit/artifacts/release-live-youtube-spa-smoke/verify-live-smoke-artifact.mjs docs/audit/artifacts/release-live-youtube-spa-smoke/<artifact>.json

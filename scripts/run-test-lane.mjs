@@ -11,6 +11,7 @@ import {
   LANES,
   LIVE_SMOKE_ARTIFACT_TEMPLATE,
   LIVE_SMOKE_ARTIFACT_VERIFIER,
+  LIVE_SMOKE_CHANGE_CONTEXT_ENV,
   LIVE_SMOKE_RUNNER_COMMAND,
   LIVE_SMOKE_REQUIRED_ROWS,
   LIVE_SMOKE_VERIFY_COMMAND,
@@ -279,6 +280,7 @@ function printClassification(result) {
     console.log(`    verify: ${LIVE_SMOKE_VERIFY_COMMAND}`);
     console.log(`    template: ${LIVE_SMOKE_ARTIFACT_TEMPLATE}`);
     console.log(`    verifier: ${LIVE_SMOKE_ARTIFACT_VERIFIER}`);
+    console.log(`    changeContext env: ${LIVE_SMOKE_CHANGE_CONTEXT_ENV.join(', ')}`);
     console.log(`    required rows: ${LIVE_SMOKE_REQUIRED_ROWS.join(', ')}`);
   }
 
