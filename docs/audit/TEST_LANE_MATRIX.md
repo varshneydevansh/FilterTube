@@ -288,6 +288,22 @@ The executable mapping in `scripts/test-lane-config.mjs` and
 `scripts/run-test-lane.mjs` is the source of truth.
 This table is the human-readable review copy.
 
+## Objective Matrix Examples
+
+These rows pin the concrete examples from the active goal. The executable
+classifier may require broader lanes than the short example when a file is a
+cross-feature hub, but it must include at least these lanes.
+
+| Goal example | Minimum required lane(s) | Current executable mapping |
+|---|---|---|
+| `js/seed.js` | `test:json`, `test:performance` | `seed-json-runtime` |
+| `js/injector.js` | `test:json`, `test:whitelist` | `injector-main-world-json`; also keeps `test:performance` for no-work gates. |
+| `js/content/dom_fallback.js` | `test:dom`, `test:blocking` | `dom-fallback-runtime`; also keeps whitelist/performance proof. |
+| `js/content_bridge.js` | `test:menu`, `test:settings`, affected runtime lane | `content-bridge-runtime`; expands to whitelist, blocking, JSON, DOM, menu, performance, and settings because the bridge owns cross-context runtime handoff. |
+| `js/background.js` | `test:settings`, `test:blocking` | `background-runtime`; also keeps release, whitelist, JSON, and performance proof. |
+| `manifest*.json`, `build.js` | `test:release` | `release-build-surface` |
+| `README.md`, `data/release_notes.json` | `test:release` | `public-release-copy`; also keeps `test:smoke` for public release claim drift. |
+
 ## Done Criteria
 
 A change is not release-ready until:

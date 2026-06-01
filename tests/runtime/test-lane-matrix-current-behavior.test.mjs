@@ -69,6 +69,18 @@ function collectTrackedFiles() {
   return result.stdout.split(/\r?\n/).filter(Boolean).sort();
 }
 
+function assertClassifiedLanesInclude(files, expectedLanes) {
+  const result = classifyPaths(files);
+
+  assert.deepEqual(result.unmatched, [], `${files.join(', ')} should be classified`);
+  for (const lane of expectedLanes) {
+    assert.ok(
+      result.lanes.includes(lane),
+      `${files.join(', ')} should include test:${lane}; got ${result.lanes.map(item => `test:${item}`).join(', ')}`
+    );
+  }
+}
+
 test('test lane matrix defines every required lane and npm script', () => {
   const pkg = readJson('package.json');
   const matrix = read(matrixPath);
@@ -467,6 +479,65 @@ test('executable classifier maps high-risk paths to required lanes', () => {
   assert.deepEqual(classifyPaths(['tests/runtime/fixtures/captures/main-collab-resolved-search-card-dialog.html']).lanes, ['whitelist', 'blocking', 'dom', 'menu', 'smoke']);
   assert.deepEqual(classifyPaths(['tests/runtime/fixtures/captures/main-comment-thread-renderer.json']).lanes, ['blocking', 'json', 'smoke']);
   assert.deepEqual(classifyPaths(['tests/runtime/fixtures/captures/ytm-dom-video-card-with-menu.html']).lanes, ['whitelist', 'dom', 'menu', 'smoke']);
+});
+
+test('resumed goal matrix examples stay executable', () => {
+  const matrix = read(matrixPath);
+  const examples = [
+    {
+      label: '`js/seed.js`',
+      files: ['js/seed.js'],
+      lanes: ['json', 'performance'],
+      rule: 'seed-json-runtime'
+    },
+    {
+      label: '`js/injector.js`',
+      files: ['js/injector.js'],
+      lanes: ['json', 'whitelist'],
+      rule: 'injector-main-world-json'
+    },
+    {
+      label: '`js/content/dom_fallback.js`',
+      files: ['js/content/dom_fallback.js'],
+      lanes: ['dom', 'blocking'],
+      rule: 'dom-fallback-runtime'
+    },
+    {
+      label: '`js/content_bridge.js`',
+      files: ['js/content_bridge.js'],
+      lanes: ['menu', 'settings', 'whitelist', 'blocking', 'json', 'dom', 'performance'],
+      rule: 'content-bridge-runtime'
+    },
+    {
+      label: '`js/background.js`',
+      files: ['js/background.js'],
+      lanes: ['settings', 'blocking'],
+      rule: 'background-runtime'
+    },
+    {
+      label: '`manifest*.json`, `build.js`',
+      files: ['manifest.chrome.json', 'build.js'],
+      lanes: ['release'],
+      rule: 'release-build-surface'
+    },
+    {
+      label: '`README.md`, `data/release_notes.json`',
+      files: ['README.md', 'data/release_notes.json'],
+      lanes: ['release'],
+      rule: 'public-release-copy'
+    }
+  ];
+
+  assert.match(matrix, /Objective Matrix Examples/);
+  assert.match(matrix, /concrete examples from the active goal/);
+  assert.match(matrix, /it must include at least these lanes/);
+  assert.match(matrix, /affected runtime lane/);
+
+  for (const example of examples) {
+    assert.ok(matrix.includes(example.label), `matrix missing objective example ${example.label}`);
+    assert.ok(matrix.includes(example.rule), `matrix missing classifier rule ${example.rule}`);
+    assertClassifiedLanesInclude(example.files, example.lanes);
+  }
 });
 
 test('executable classifier inherits lanes from lane-owned tests and rejects unknown paths', () => {
