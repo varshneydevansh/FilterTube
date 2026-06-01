@@ -13,18 +13,25 @@ node --test --test-reporter=tap tests/runtime/*.test.mjs > /tmp/filtertube-runti
 
 ```text
 tests: 4737
-pass: 4698
-fail: 39
-duration_ms: 57988.49775
+pass: 4699
+fail: 38
+duration_ms: 59836.327541
 ```
 
-This refresh reduces the pinned broad-suite failure count from 40 failures to
-39 failures after retiring the stale JSON-first video-meta no-work budget source
-pin row: the no-work budget proof test now expects the current
+This refresh reduces the pinned broad-suite failure count from 39 failures to
+38 failures after retiring the stale JSON-first video-meta profile/surface source
+pin row: the profile/surface proof test now expects the current
 `js/filter_logic.js` line count, byte count, and hash already recorded in the
-audit doc while scheduler, duplicate, DOM upload-date/duration callsite fixtures
-remain unchanged and first-class video-meta no-work budget authority remains
-absent. The previous refresh reduced the suite from 41 failures to 40 failures
+audit doc while content-side persistence, Kids-host scheduling, background cache
+patching, filter-logic consumption, and DOM category fixtures remain unchanged
+and first-class video-meta profile/surface authority remains absent. The previous
+refresh reduced the suite from 40 failures to 39 failures after retiring the
+stale JSON-first video-meta no-work budget source pin row: the no-work budget
+proof test now expects the current `js/filter_logic.js` line count, byte count,
+and hash already recorded in the audit doc while scheduler, duplicate,
+DOM upload-date/duration callsite fixtures remain unchanged and first-class
+video-meta no-work budget authority remains absent. The previous refresh reduced
+the suite from 41 failures to 40 failures
 after retiring the stale JSON-first video-meta merge schema source pin row: the
 merge-schema proof test now expects the current `js/filter_logic.js` line count,
 byte count, and hash already recorded in the audit doc while partial metadata
@@ -157,15 +164,15 @@ node scripts/audit-proof-drift.mjs --all --report-only
 
 ## Failure Clusters
 
-Current failing subtests are spread across 28 runtime test files. A lightweight
-name-based parse of `/tmp/filtertube-runtime-current-after-video-meta-no-work-budget-refresh.tap` gives this
+Current failing subtests are spread across 27 runtime test files. A lightweight
+name-based parse of `/tmp/filtertube-runtime-current-after-video-meta-profile-surface-refresh.tap` gives this
 non-exclusive family snapshot:
 
 | Family | Current failing subtests |
 |---|---:|
 | generated/release/package/docs surfaces | 34 |
 | source-locus/optimization/index contracts | 4 |
-| JSON/video-meta/path/reference | 7 |
+| JSON/video-meta/path/reference | 6 |
 | website/public-doc/source inventory | 14 |
 | settings/content-control/DOM lifecycle | 8 |
 | native/Nanah/Kids/YTM | 8 |
@@ -269,6 +276,12 @@ budget proof test now matches the current `js/filter_logic.js` fingerprint
 already present in the audit doc while scheduler, duplicate,
 DOM upload-date/duration callsite fixtures remain unchanged and first-class
 video-meta no-work budget authority remains explicitly absent.
+The previous JSON-first video-meta profile/surface row is retired: the
+profile/surface proof test now matches the current `js/filter_logic.js`
+fingerprint already present in the audit doc while content-side persistence,
+Kids-host scheduling, background cache patching, filter-logic consumption, and
+DOM category fixtures remain unchanged and first-class video-meta profile/surface
+authority remains explicitly absent.
 The previous JSON-first metric artifact gate rows are retired: the metric proof
 now pins current performance-claim and no-work crosswalk hashes plus the current
 `js/filter_logic.js` `processData()` anchor while metric artifact authority
