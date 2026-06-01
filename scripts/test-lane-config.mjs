@@ -201,6 +201,7 @@ export const LANES = Object.freeze({
       'tests/runtime/performance-claim-evidence-boundary-current-behavior.test.mjs',
       'tests/runtime/identity-work-budget-current-behavior.test.mjs',
       'tests/runtime/runtime-diagnostic-logging-policy-matrix-current-behavior.test.mjs',
+      'tests/runtime/code-burden-declutter-boundary-current-behavior.test.mjs',
       'tests/runtime/p0-no-work-current-behavior.test.mjs'
     ]
   },
@@ -550,6 +551,11 @@ export const FILE_LANE_RULES = Object.freeze([
     lanes: ['performance']
   },
   {
+    id: 'audit-code-burden-proof-doc',
+    patterns: [/^docs\/audit\/.*(?:CODE_BURDEN|DECLUTTER|STRUCTURAL_BURDEN|LARGE_FILE|LARGE_SOURCE).*\.md$/i],
+    lanes: ['performance']
+  },
+  {
     id: 'audit-settings-proof-doc',
     patterns: [/^docs\/audit\/.*(?:SETTING|PROFILE|STORAGE|IMPORT|EXPORT|SYNC|COMPILED|BACKUP|NANAH).*\.md$/i],
     lanes: ['settings']
@@ -592,6 +598,11 @@ export const FILE_LANE_RULES = Object.freeze([
   {
     id: 'runtime-performance-test',
     patterns: [/^tests\/runtime\/.*(?:performance|no-work|cache|spa|active-work).*\.test\.mjs$/i],
+    lanes: ['performance']
+  },
+  {
+    id: 'runtime-code-burden-test',
+    patterns: [/^tests\/runtime\/.*(?:code-burden|declutter|large-file|structural-burden).*\.test\.mjs$/i],
     lanes: ['performance']
   },
   {

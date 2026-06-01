@@ -180,6 +180,7 @@ test('test lane matrix maps high-risk source files to expected lanes', () => {
     { files: ['docs/audit/artifacts/release-live-youtube-spa-smoke/*.{json,mjs}'], lanes: ['test:release', 'test:smoke'] },
     { files: ['docs/audit/artifacts/empty-install-idle-probe.mjs'], lanes: ['test:performance', 'test:smoke'] },
     { files: ['diagnostic, logging, console, no-work, cache, SPA, lag, active-work, active-rule, disabled-runtime, master-switch, or performance audit docs under `docs/audit/`'], lanes: ['test:performance', 'test:smoke'] },
+    { files: ['code-burden, declutter, structural-burden, large-file, or large-source audit docs/tests under `docs/audit/` or `tests/runtime/`'], lanes: ['test:performance', 'test:smoke'] },
     { files: ['html/popup.html', 'css/popup.css', 'js/ui-shell/popup-shell.js', 'src/extension-shell/popup.jsx'], lanes: ['test:release', 'test:settings', 'test:smoke'] },
     { files: ['html/tab-view.html'], lanes: ['test:release', 'test:settings', 'test:smoke'] },
     { files: ['css/content.css', 'css/filter.css', 'css/layout.css'], lanes: ['test:release', 'test:dom', 'test:smoke'] },
@@ -245,6 +246,21 @@ test('executable classifier maps high-risk paths to required lanes', () => {
       `${classification.file} should be classified as performance proof`
     );
   }
+
+  const codeBurdenProof = classifyPaths([
+    'docs/audit/FILTERTUBE_CODE_BURDEN_DECLUTTER_BOUNDARY_CURRENT_BEHAVIOR_2026-05-19.md',
+    'tests/runtime/code-burden-declutter-boundary-current-behavior.test.mjs'
+  ]);
+  assert.deepEqual(codeBurdenProof.lanes, ['performance', 'smoke']);
+  assert.deepEqual(codeBurdenProof.unmatched, []);
+  assert.equal(
+    codeBurdenProof.classifications[0].matched.some(match => match.id === 'audit-code-burden-proof-doc'),
+    true
+  );
+  assert.equal(
+    codeBurdenProof.classifications[1].matched.some(match => match.id === 'runtime-code-burden-test'),
+    true
+  );
 
   const identityAuditDoc = classifyPaths([
     'docs/audit/FILTERTUBE_IDENTITY_INFORMATION_WATERFALL_CURRENT_BEHAVIOR_2026-05-19.md',

@@ -33,6 +33,32 @@ const futureStructuralTokens = [
   'runtimeStructuralOwnerMapApproval'
 ];
 
+const largeProductOwnedSourceFiles = [
+  'js/content_bridge.js',
+  'js/tab-view.js',
+  'js/background.js',
+  'js/content/dom_fallback.js',
+  'js/filter_logic.js',
+  'js/injector.js',
+  'js/content/block_channel.js',
+  'js/state_manager.js',
+  'js/io_manager.js',
+  'js/popup.js',
+  'js/render_engine.js',
+  'js/settings_shared.js',
+  'js/seed.js',
+  'js/content/dom_extractors.js'
+];
+
+const nearThresholdProductOwnedSourceFiles = [
+  'js/ui_components.js',
+  'website/components/route-content.js'
+];
+
+const largeVendorBundleFiles = [
+  'js/vendor/qrcode.bundle.js'
+];
+
 function read(file) {
   return fs.readFileSync(path.join(repoRoot, file), 'utf8');
 }
@@ -44,6 +70,44 @@ function readJson(file) {
 function lineCount(file) {
   const content = read(file);
   return content.split('\n').length - (content.endsWith('\n') ? 1 : 0);
+}
+
+function walkSource(dir) {
+  const absolute = path.join(repoRoot, dir);
+  if (!fs.existsSync(absolute)) return [];
+
+  const out = [];
+  for (const entry of fs.readdirSync(absolute, { withFileTypes: true })) {
+    const relative = path.join(dir, entry.name).replaceAll(path.sep, '/');
+    if (entry.isDirectory()) {
+      out.push(...walkSource(relative));
+    } else if (entry.isFile() && /\.(?:js|jsx|mjs)$/.test(entry.name)) {
+      out.push(relative);
+    }
+  }
+  return out;
+}
+
+function productOwnedSourceFiles() {
+  return [
+    ...walkSource('js'),
+    ...walkSource('src'),
+    ...walkSource('scripts'),
+    ...walkSource('website/app'),
+    ...walkSource('website/components')
+  ]
+    .filter(file => !file.startsWith('js/vendor/'))
+    .filter(file => !file.startsWith('js/ui-shell/'))
+    .sort();
+}
+
+function sourceFilesBetween(minLines, maxLines = Infinity) {
+  return productOwnedSourceFiles()
+    .filter(file => {
+      const lines = lineCount(file);
+      return lines >= minLines && lines <= maxLines;
+    })
+    .sort((a, b) => lineCount(b) - lineCount(a) || a.localeCompare(b));
 }
 
 function productSource() {
@@ -240,5 +304,36 @@ test('runtime duplicate-looking paths are explicitly blocked from deletion until
   for (const token of futureStructuralTokens) {
     assert.match(doc, new RegExp(`\\b${token}\\b`), `missing future token ${token}`);
     assert.doesNotMatch(source, new RegExp(`\\b${token}\\b`), `runtime unexpectedly defines ${token}`);
+  }
+});
+
+test('large product-owned source files are guarded before new spaghetti growth', () => {
+  const doc = read(docPath);
+
+  assert.deepEqual(sourceFilesBetween(1000), largeProductOwnedSourceFiles);
+  assert.deepEqual(sourceFilesBetween(900, 999), nearThresholdProductOwnedSourceFiles);
+  assert.deepEqual(
+    walkSource('js/vendor').filter(file => lineCount(file) >= 1000).sort(),
+    largeVendorBundleFiles
+  );
+
+  assert.match(doc, /Large-File Growth Guard Addendum - 2026-06-01/);
+  assert.match(doc, /large product-owned JS\/JSX\/MJS files at or above 1000 lines guarded: 14/);
+  assert.match(doc, /near-threshold product-owned JS\/JSX\/MJS files from 900 to 999 lines guarded: 2/);
+  assert.match(doc, /large vendor bundle files recorded separately: 1/);
+  assert.match(doc, /new product-owned file crossing 1000 lines without proof: NO-GO/);
+  assert.match(doc, /existing large-file growth without owner or decomposition proof: NO-GO/);
+  assert.match(doc, /runtime behavior changed: no/);
+
+  for (const file of largeProductOwnedSourceFiles) {
+    assert.ok(doc.includes(`| \`${file}\` | ${lineCount(file)} |`), file);
+  }
+
+  for (const file of nearThresholdProductOwnedSourceFiles) {
+    assert.ok(doc.includes(`| \`${file}\` | ${lineCount(file)} |`), file);
+  }
+
+  for (const file of largeVendorBundleFiles) {
+    assert.ok(doc.includes(`| \`${file}\` | ${lineCount(file)} |`), file);
   }
 });

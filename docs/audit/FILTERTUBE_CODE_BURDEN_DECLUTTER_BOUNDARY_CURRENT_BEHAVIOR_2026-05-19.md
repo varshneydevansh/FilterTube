@@ -165,6 +165,67 @@ runtime metric collector insertion: NO-GO
 continue proof-backed audit: GO
 ```
 
+## Large-File Growth Guard Addendum - 2026-06-01
+
+Status: audit-only guard. Runtime behavior is unchanged. This is not a
+decomposition patch, runtime cleanup patch, JSON-first patch, whitelist patch,
+performance optimization, generated-output patch, vendor patch, or release
+package patch.
+
+This addendum turns the strict code-quality rule into an executable boundary:
+new product-owned source files must not silently cross 1000 lines, and existing
+large files must not keep growing without owner, fixture, and decomposition
+proof.
+
+Current guard counts:
+
+```text
+large product-owned JS/JSX/MJS files at or above 1000 lines guarded: 14
+near-threshold product-owned JS/JSX/MJS files from 900 to 999 lines guarded: 2
+large vendor bundle files recorded separately: 1
+new product-owned file crossing 1000 lines without proof: NO-GO
+existing large-file growth without owner or decomposition proof: NO-GO
+runtime behavior changed: no
+```
+
+Large product-owned source files:
+
+| File | Current lines | Boundary |
+| --- | ---: | --- |
+| `js/content_bridge.js` | 13571 | Giant cross-context hub. Any growth needs source-owner proof and focused runtime fixtures. |
+| `js/tab-view.js` | 11617 | Dashboard/settings UI surface. Any growth needs UI/state owner proof and release smoke. |
+| `js/background.js` | 6320 | Background storage/message/profile authority. Any growth needs mutation and settings proof. |
+| `js/content/dom_fallback.js` | 4838 | DOM fallback selector/hide/restore authority. Any growth needs DOM/no-work proof. |
+| `js/filter_logic.js` | 3652 | JSON renderer rule and decision engine. Any growth needs rule/path proof. |
+| `js/injector.js` | 3593 | Main-world JSON interception and page bridge. Any growth needs JSON/no-work proof. |
+| `js/content/block_channel.js` | 3175 | Quick-block/native menu/Kids action surface. Any growth needs menu/action lifecycle proof. |
+| `js/state_manager.js` | 2491 | Settings persistence and profile mutation surface. Any growth needs storage proof. |
+| `js/io_manager.js` | 2030 | Import/export and backup surface. Any growth needs payload and migration proof. |
+| `js/popup.js` | 1841 | Popup settings/action UI. Any growth needs settings UI proof and popup smoke. |
+| `js/render_engine.js` | 1389 | Dashboard renderer helper. Any growth needs release UI proof. |
+| `js/settings_shared.js` | 1181 | Canonical settings compiler and migration surface. Any growth needs mode/list proof. |
+| `js/seed.js` | 1136 | Transport interception and JSON active-work gate. Any growth needs JSON/no-work proof. |
+| `js/content/dom_extractors.js` | 1102 | DOM identity extraction surface. Any growth needs identity false-hide/leak proof. |
+
+Near-threshold product-owned source files:
+
+| File | Current lines | Boundary |
+| --- | ---: | --- |
+| `js/ui_components.js` | 998 | One small edit can cross 1000 lines; split or add proof before growth. |
+| `website/components/route-content.js` | 903 | Website route copy/components are close enough to require review before broadening. |
+
+Large vendor bundle files recorded separately:
+
+| File | Current lines | Boundary |
+| --- | ---: | --- |
+| `js/vendor/qrcode.bundle.js` | 2085 | Vendor provenance surface, not product-owned logic. Do not line-edit; update provenance/package proof instead. |
+
+This guard does not require immediate decomposition. It blocks invisible growth:
+if a new product-owned `js`, `jsx`, or `mjs` file reaches 1000 lines, or a
+near-threshold file crosses the threshold, the code-burden proof and matching
+test must be updated in the same logical change and the reviewer should ask
+whether a smaller module boundary is available first.
+
 No product runtime source currently defines:
 
 ```text
