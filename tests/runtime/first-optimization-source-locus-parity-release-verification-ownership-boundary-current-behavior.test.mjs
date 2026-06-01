@@ -191,9 +191,9 @@ const anchorChecks = [
   { file: sourceDocs.runtimeResults, line: 16, needle: 'tests 4457' },
   { file: sourceDocs.runtimeResults, line: 17, needle: 'pass 4457' },
   { file: sourceDocs.runtimeResults, line: 18, needle: 'fail 0' },
-  { file: 'build.js', line: 82, needle: "execSync('node scripts/build-extension-ui.mjs', { stdio: 'inherit' });" },
-  { file: 'build.js', line: 145, needle: 'const zipPath = await createZip(browser, targetDir, versionForZip);' },
-  { file: 'build.js', line: 155, needle: 'const mobileArtifactPaths = await maybeCollectMobileArtifacts(VERSION);' },
+  { file: 'build.js', line: 84, needle: "execSync('node scripts/build-extension-ui.mjs', { stdio: 'inherit' });" },
+  { file: 'build.js', line: 147, needle: 'const zipPath = await createZip(browser, targetDir, versionForZip);' },
+  { file: 'build.js', line: 157, needle: 'const mobileArtifactPaths = await maybeCollectMobileArtifacts(VERSION);' },
   { file: 'scripts/build-extension-ui.mjs', line: 23, needle: 'async function bundleAll()' },
   { file: 'scripts/build-nanah-vendor.mjs', line: 18, needle: 'await esbuild.build({' },
   { file: 'scripts/sync-native-runtime.mjs', line: 21, needle: 'const result = spawnSync(process.execPath, [syncScript], {' }

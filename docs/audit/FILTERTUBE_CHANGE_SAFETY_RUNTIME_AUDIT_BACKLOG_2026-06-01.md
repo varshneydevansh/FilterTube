@@ -13,13 +13,18 @@ node --test --test-reporter=tap tests/runtime/*.test.mjs > /tmp/filtertube-runti
 
 ```text
 tests: 4737
-pass: 4679
-fail: 58
-duration_ms: 94481.945667
+pass: 4680
+fail: 57
+duration_ms: 74379.597834
 ```
 
-This refresh reduces the pinned broad-suite failure count from 59 failures to
-58 failures after retiring the stale source-locus no-work anchor row: the
+This refresh reduces the pinned broad-suite failure count from 58 failures to
+57 failures after retiring the stale source-locus parity/release verification
+anchor row: the parity/release proof now points at the current `build.js`
+UI-shell, zip artifact, and mobile artifact collection lines while parity,
+release, and verification approval remains at NO-GO. The previous refresh
+reduced the suite from 59 failures to 58 failures after retiring the stale
+source-locus no-work anchor row: the
 no-work ownership proof now points at the current `js/filter_logic.js` harvest,
 disabled, filter, and JSON whitelist console lines plus the current `build.js`
 UI-shell and zip artifact lines while source-locus no-work approval remains at
@@ -77,14 +82,14 @@ node scripts/audit-proof-drift.mjs --all --report-only
 
 ## Failure Clusters
 
-Current failing subtests are spread across 43 runtime test files. A lightweight
-name-based parse of `/tmp/filtertube-runtime-current-after-source-locus-no-work-refresh.tap` gives this
+Current failing subtests are spread across 42 runtime test files. A lightweight
+name-based parse of `/tmp/filtertube-runtime-current-after-source-locus-parity-release-refresh.tap` gives this
 non-exclusive family snapshot:
 
 | Family | Current failing subtests |
 |---|---:|
 | generated/release/package/docs surfaces | 38 |
-| source-locus/optimization/index contracts | 8 |
+| source-locus/optimization/index contracts | 7 |
 | JSON/video-meta/path/reference | 19 |
 | website/public-doc/source inventory | 14 |
 | settings/content-control/DOM lifecycle | 8 |
@@ -136,6 +141,9 @@ explicitly absent.
 The previous source-locus no-work row is retired: the no-work ownership proof
 now uses current `js/filter_logic.js` and `build.js` line anchors while
 source-locus no-work approval remains explicitly absent.
+The previous source-locus parity/release verification row is retired: the
+parity/release ownership proof now uses current `build.js` line anchors while
+parity, release, and verification approval remains explicitly absent.
 
 | Cluster | Examples | Current meaning |
 |---|---|---|

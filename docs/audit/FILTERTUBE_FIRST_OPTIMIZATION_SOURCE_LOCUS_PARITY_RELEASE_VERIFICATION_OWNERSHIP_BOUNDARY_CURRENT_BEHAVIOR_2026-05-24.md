@@ -258,9 +258,9 @@ diagnostic-performance-claim-scope
 | `docs/audit/FILTERTUBE_RUNTIME_FIXTURE_RESULTS_2026-05-17.md` | 16 | `tests 4457` |
 | `docs/audit/FILTERTUBE_RUNTIME_FIXTURE_RESULTS_2026-05-17.md` | 17 | `pass 4457` |
 | `docs/audit/FILTERTUBE_RUNTIME_FIXTURE_RESULTS_2026-05-17.md` | 18 | `fail 0` |
-| `build.js` | 82 | `execSync('node scripts/build-extension-ui.mjs', { stdio: 'inherit' });` |
-| `build.js` | 145 | `const zipPath = await createZip(browser, targetDir, versionForZip);` |
-| `build.js` | 155 | `const mobileArtifactPaths = await maybeCollectMobileArtifacts(VERSION);` |
+| `build.js` | 84 | `execSync('node scripts/build-extension-ui.mjs', { stdio: 'inherit' });` |
+| `build.js` | 147 | `const zipPath = await createZip(browser, targetDir, versionForZip);` |
+| `build.js` | 157 | `const mobileArtifactPaths = await maybeCollectMobileArtifacts(VERSION);` |
 | `scripts/build-extension-ui.mjs` | 23 | `async function bundleAll()` |
 | `scripts/build-nanah-vendor.mjs` | 18 | `await esbuild.build({` |
 | `scripts/sync-native-runtime.mjs` | 21 | `const result = spawnSync(process.execPath, [syncScript], {` |
