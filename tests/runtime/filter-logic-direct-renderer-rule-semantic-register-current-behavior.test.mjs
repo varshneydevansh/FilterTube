@@ -128,7 +128,7 @@ function groupForRule(entry) {
     'richShelfRenderer'
   ].includes(entry.name)) return 'structuralContainerAndChipRules';
   if (
-    (entry.name === 'gridVideoRenderer' && entry.line === 604) ||
+    (entry.name === 'gridVideoRenderer' && entry.valueShape === 'objectLiteral') ||
     ['playlistRenderer', 'gridPlaylistRenderer'].includes(entry.name)
   ) return 'playlistAndGridSpecificRules';
   if (['radioRenderer', 'compactRadioRenderer', 'ticketShelfRenderer', 'podcastRenderer'].includes(entry.name)) return 'mixRadioPodcastAndTicketRules';
@@ -242,7 +242,7 @@ test('filter logic direct renderer rule register is audit-only and scoped to cur
   assert.match(text, /rule object: FILTER_RULES/);
   assert.match(text, /direct rule declarations: 45/);
   assert.match(text, /unique direct rule names: 44/);
-  assert.match(text, /duplicate direct rule name: gridVideoRenderer at lines 431 and 604/);
+  assert.match(text, /duplicate direct rule name: gridVideoRenderer at lines 440 and 613/);
   assert.match(text, /BASE_VIDEO_RULES alias declarations: 7/);
   assert.match(text, /object literal rule declarations: 38/);
   assert.match(text, /semantic rule groups: 11/);

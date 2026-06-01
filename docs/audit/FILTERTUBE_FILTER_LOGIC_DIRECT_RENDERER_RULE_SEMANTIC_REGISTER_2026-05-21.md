@@ -13,7 +13,7 @@ source file: js/filter_logic.js
 rule object: FILTER_RULES
 direct rule declarations: 45
 unique direct rule names: 44
-duplicate direct rule name: gridVideoRenderer at lines 431 and 604
+duplicate direct rule name: gridVideoRenderer at lines 440 and 613
 BASE_VIDEO_RULES alias declarations: 7
 object literal rule declarations: 38
 semantic rule groups: 11
@@ -48,51 +48,51 @@ source-derived from top-level FILTER_RULES property declarations
 
 | Line | Renderer key | Semantic rule group | Value shape |
 | ---: | --- | --- | --- |
-| 429 | `videoRenderer` | `baseVideoSharedRules` | `BASE_VIDEO_RULES` |
-| 430 | `compactVideoRenderer` | `baseVideoSharedRules` | `BASE_VIDEO_RULES` |
-| 431 | `gridVideoRenderer` | `baseVideoSharedRules` | `BASE_VIDEO_RULES` |
-| 432 | `playlistVideoRenderer` | `baseVideoSharedRules` | `BASE_VIDEO_RULES` |
-| 433 | `playlistPanelVideoRenderer` | `baseVideoSharedRules` | `BASE_VIDEO_RULES` |
-| 434 | `watchCardCompactVideoRenderer` | `baseVideoSharedRules` | `BASE_VIDEO_RULES` |
-| 435 | `endScreenVideoRenderer` | `baseVideoSharedRules` | `BASE_VIDEO_RULES` |
-| 436 | `videoWithContextRenderer` | `channelContextAndLockupRules` | `objectLiteral` |
-| 469 | `richItemRenderer` | `structuralContainerAndChipRules` | `objectLiteral` |
-| 486 | `shelfRenderer` | `structuralContainerAndChipRules` | `objectLiteral` |
-| 489 | `lockupViewModel` | `channelContextAndLockupRules` | `objectLiteral` |
-| 518 | `videoPrimaryInfoRenderer` | `watchAndScaffoldingRules` | `objectLiteral` |
-| 521 | `videoSecondaryInfoRenderer` | `watchAndScaffoldingRules` | `objectLiteral` |
-| 528 | `universalWatchCardRenderer` | `watchAndScaffoldingRules` | `objectLiteral` |
-| 568 | `relatedChipCloudRenderer` | `structuralContainerAndChipRules` | `objectLiteral` |
-| 572 | `chipCloudRenderer` | `structuralContainerAndChipRules` | `objectLiteral` |
-| 575 | `chipCloudChipRenderer` | `structuralContainerAndChipRules` | `objectLiteral` |
-| 591 | `secondarySearchContainerRenderer` | `watchAndScaffoldingRules` | `objectLiteral` |
-| 597 | `richGridMedia` | `structuralContainerAndChipRules` | `objectLiteral` |
-| 604 | `gridVideoRenderer` | `playlistAndGridSpecificRules` | `objectLiteral` |
-| 613 | `playlistRenderer` | `playlistAndGridSpecificRules` | `objectLiteral` |
-| 640 | `gridPlaylistRenderer` | `playlistAndGridSpecificRules` | `objectLiteral` |
-| 673 | `radioRenderer` | `mixRadioPodcastAndTicketRules` | `objectLiteral` |
-| 682 | `compactRadioRenderer` | `mixRadioPodcastAndTicketRules` | `objectLiteral` |
-| 690 | `ticketShelfRenderer` | `mixRadioPodcastAndTicketRules` | `objectLiteral` |
-| 693 | `podcastRenderer` | `mixRadioPodcastAndTicketRules` | `objectLiteral` |
-| 706 | `richShelfRenderer` | `structuralContainerAndChipRules` | `objectLiteral` |
-| 712 | `channelVideoPlayerRenderer` | `watchAndScaffoldingRules` | `objectLiteral` |
-| 716 | `channelRenderer` | `channelSurfaceRules` | `objectLiteral` |
-| 721 | `gridChannelRenderer` | `channelSurfaceRules` | `objectLiteral` |
-| 726 | `backstagePostThreadRenderer` | `backstagePostRules` | `objectLiteral` |
-| 733 | `backstagePostRenderer` | `backstagePostRules` | `objectLiteral` |
-| 740 | `backstagePollRenderer` | `backstagePostRules` | `objectLiteral` |
-| 749 | `backstageQuizRenderer` | `backstagePostRules` | `objectLiteral` |
-| 761 | `notificationRenderer` | `notificationAndOverlayRules` | `objectLiteral` |
-| 778 | `commentVideoThumbnailHeaderRenderer` | `notificationAndOverlayRules` | `objectLiteral` |
-| 796 | `thumbnailOverlayPlaybackStatusRenderer` | `notificationAndOverlayRules` | `objectLiteral` |
-| 799 | `thumbnailOverlayTimeStatusRenderer` | `notificationAndOverlayRules` | `objectLiteral` |
-| 802 | `thumbnailOverlayResumePlaybackRenderer` | `notificationAndOverlayRules` | `objectLiteral` |
-| 805 | `thumbnailOverlayNowPlayingRenderer` | `notificationAndOverlayRules` | `objectLiteral` |
-| 811 | `reelItemRenderer` | `shortsAndReelRules` | `objectLiteral` |
-| 816 | `shortsLockupViewModel` | `shortsAndReelRules` | `objectLiteral` |
-| 820 | `shortsLockupViewModelV2` | `shortsAndReelRules` | `objectLiteral` |
-| 827 | `commentRenderer` | `commentRules` | `objectLiteral` |
-| 832 | `commentThreadRenderer` | `commentRules` | `objectLiteral` |
+| 438 | `videoRenderer` | `baseVideoSharedRules` | `BASE_VIDEO_RULES` |
+| 439 | `compactVideoRenderer` | `baseVideoSharedRules` | `BASE_VIDEO_RULES` |
+| 440 | `gridVideoRenderer` | `baseVideoSharedRules` | `BASE_VIDEO_RULES` |
+| 441 | `playlistVideoRenderer` | `baseVideoSharedRules` | `BASE_VIDEO_RULES` |
+| 442 | `playlistPanelVideoRenderer` | `baseVideoSharedRules` | `BASE_VIDEO_RULES` |
+| 443 | `watchCardCompactVideoRenderer` | `baseVideoSharedRules` | `BASE_VIDEO_RULES` |
+| 444 | `endScreenVideoRenderer` | `baseVideoSharedRules` | `BASE_VIDEO_RULES` |
+| 445 | `videoWithContextRenderer` | `channelContextAndLockupRules` | `objectLiteral` |
+| 478 | `richItemRenderer` | `structuralContainerAndChipRules` | `objectLiteral` |
+| 495 | `shelfRenderer` | `structuralContainerAndChipRules` | `objectLiteral` |
+| 498 | `lockupViewModel` | `channelContextAndLockupRules` | `objectLiteral` |
+| 527 | `videoPrimaryInfoRenderer` | `watchAndScaffoldingRules` | `objectLiteral` |
+| 530 | `videoSecondaryInfoRenderer` | `watchAndScaffoldingRules` | `objectLiteral` |
+| 537 | `universalWatchCardRenderer` | `watchAndScaffoldingRules` | `objectLiteral` |
+| 577 | `relatedChipCloudRenderer` | `structuralContainerAndChipRules` | `objectLiteral` |
+| 581 | `chipCloudRenderer` | `structuralContainerAndChipRules` | `objectLiteral` |
+| 584 | `chipCloudChipRenderer` | `structuralContainerAndChipRules` | `objectLiteral` |
+| 600 | `secondarySearchContainerRenderer` | `watchAndScaffoldingRules` | `objectLiteral` |
+| 606 | `richGridMedia` | `structuralContainerAndChipRules` | `objectLiteral` |
+| 613 | `gridVideoRenderer` | `playlistAndGridSpecificRules` | `objectLiteral` |
+| 622 | `playlistRenderer` | `playlistAndGridSpecificRules` | `objectLiteral` |
+| 649 | `gridPlaylistRenderer` | `playlistAndGridSpecificRules` | `objectLiteral` |
+| 682 | `radioRenderer` | `mixRadioPodcastAndTicketRules` | `objectLiteral` |
+| 691 | `compactRadioRenderer` | `mixRadioPodcastAndTicketRules` | `objectLiteral` |
+| 699 | `ticketShelfRenderer` | `mixRadioPodcastAndTicketRules` | `objectLiteral` |
+| 702 | `podcastRenderer` | `mixRadioPodcastAndTicketRules` | `objectLiteral` |
+| 715 | `richShelfRenderer` | `structuralContainerAndChipRules` | `objectLiteral` |
+| 721 | `channelVideoPlayerRenderer` | `watchAndScaffoldingRules` | `objectLiteral` |
+| 725 | `channelRenderer` | `channelSurfaceRules` | `objectLiteral` |
+| 730 | `gridChannelRenderer` | `channelSurfaceRules` | `objectLiteral` |
+| 735 | `backstagePostThreadRenderer` | `backstagePostRules` | `objectLiteral` |
+| 742 | `backstagePostRenderer` | `backstagePostRules` | `objectLiteral` |
+| 749 | `backstagePollRenderer` | `backstagePostRules` | `objectLiteral` |
+| 758 | `backstageQuizRenderer` | `backstagePostRules` | `objectLiteral` |
+| 770 | `notificationRenderer` | `notificationAndOverlayRules` | `objectLiteral` |
+| 787 | `commentVideoThumbnailHeaderRenderer` | `notificationAndOverlayRules` | `objectLiteral` |
+| 805 | `thumbnailOverlayPlaybackStatusRenderer` | `notificationAndOverlayRules` | `objectLiteral` |
+| 808 | `thumbnailOverlayTimeStatusRenderer` | `notificationAndOverlayRules` | `objectLiteral` |
+| 811 | `thumbnailOverlayResumePlaybackRenderer` | `notificationAndOverlayRules` | `objectLiteral` |
+| 814 | `thumbnailOverlayNowPlayingRenderer` | `notificationAndOverlayRules` | `objectLiteral` |
+| 820 | `reelItemRenderer` | `shortsAndReelRules` | `objectLiteral` |
+| 825 | `shortsLockupViewModel` | `shortsAndReelRules` | `objectLiteral` |
+| 829 | `shortsLockupViewModelV2` | `shortsAndReelRules` | `objectLiteral` |
+| 836 | `commentRenderer` | `commentRules` | `objectLiteral` |
+| 841 | `commentThreadRenderer` | `commentRules` | `objectLiteral` |
 
 ## Current Direct-Rule Boundary
 
@@ -108,7 +108,7 @@ The current source still proves several boundaries:
 
 | Boundary | Current source evidence | Audit consequence |
 | --- | --- | --- |
-| Duplicate source key | `gridVideoRenderer` appears at lines 431 and 604. | Source declarations and effective runtime keys must be audited separately. |
+| Duplicate source key | `gridVideoRenderer` appears at lines 440 and 613. | Source declarations and effective runtime keys must be audited separately. |
 | Base alias reuse | Seven entries point at `BASE_VIDEO_RULES`. | Shared video behavior does not prove per-renderer field completeness. |
 | Partial Shorts rules | `shortsLockupViewModel` and `shortsLockupViewModelV2` read video/title style fields but not all documented owner fields. | Shorts owner identity remains partial/direct-rule-partial. |
 | Collaborator split | `_extractChannelInfo()` scans `showDialogCommand`, while documented `showSheetCommand.sheetViewModel` remains outside direct extraction. | A direct `videoWithContextRenderer` rule does not prove modern collaborator roster authority. |

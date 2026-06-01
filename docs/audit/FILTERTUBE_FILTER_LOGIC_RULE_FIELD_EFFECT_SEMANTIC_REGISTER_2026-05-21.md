@@ -17,9 +17,9 @@ filtering authority.
 
 ```text
 source file: js/filter_logic.js
-source line count: 3498
-source bytes: 165151
-source sha256: 4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641
+source line count: 3652
+source bytes: 172174
+source sha256: 953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5
 upstream path register: docs/audit/FILTERTUBE_FILTER_LOGIC_RULE_PATH_SEMANTIC_REGISTER_2026-05-21.md
 rule fields with runtime consumers: 11
 consumer methods with rules.<field> references: 9

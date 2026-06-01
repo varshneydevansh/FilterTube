@@ -16,9 +16,9 @@ changing no-rule work, or treating documented JSON fields as runtime behavior.
 
 ```text
 source file: js/filter_logic.js
-source line count: 3498
-source bytes: 165151
-source sha256: 4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641
+source line count: 3652
+source bytes: 172174
+source sha256: 953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5
 path owner object: FILTER_RULES
 shared alias object: BASE_VIDEO_RULES
 BASE_VIDEO_RULES field rows: 9
@@ -68,7 +68,7 @@ runtime behavior changed: no
 ## Duplicate And Syntax Boundary
 
 ```text
-gridVideoRenderer is declared twice in source: BASE_VIDEO_RULES at line 431 and an object literal at line 604
+gridVideoRenderer is declared twice in source: BASE_VIDEO_RULES at line 440 and an object literal at line 613
 JavaScript object semantics keep the later gridVideoRenderer object literal as the effective runtime key
 source FILTER_RULES path rows before duplicate override: 467
 effective runtime path rows after duplicate override: 440
@@ -83,240 +83,240 @@ docs/json_paths_encyclopedia.md uses documented field text, but runtime/build so
 
 | Path | Renderer count | Source line samples |
 | --- | ---: | --- |
-| `authorEndpoint.browseEndpoint.canonicalBaseUrl` | 1 | 738 |
-| `channelThumbnail.channelThumbnailWithLinkRenderer.navigationEndpoint.browseEndpoint.canonicalBaseUrl` | 1 | 448 |
-| `channelThumbnailSupportedRenderers.channelThumbnailWithLinkRenderer.navigationEndpoint.browseEndpoint.canonicalBaseUrl` | 1 | 792 |
-| `header.watchCardRichHeaderRenderer.subtitle.navigationEndpoint.browseEndpoint.canonicalBaseUrl` | 1 | 558 |
-| `header.watchCardRichHeaderRenderer.subtitle.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl` | 1 | 559 |
-| `header.watchCardRichHeaderRenderer.subtitle.runs.0.text` | 1 | 557 |
-| `longBylineText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl` | 8 | 380, 449, 656 |
-| `metadata.lockupMetadataViewModel.image.decoratedAvatarViewModel.rendererContext.commandContext.onTap.innertubeCommand.browseEndpoint.canonicalBaseUrl` | 1 | 498 |
-| `metadata.lockupMetadataViewModel.image.decoratedAvatarViewModel.rendererContext.commandContext.onTap.innertubeCommand.commandMetadata.webCommandMetadata.url` | 1 | 499 |
-| `navigationEndpoint.browseEndpoint.canonicalBaseUrl` | 5 | 585, 719, 724 |
-| `navigationEndpoint.commandMetadata.webCommandMetadata.url` | 2 | 586, 775 |
-| `ownerText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl` | 7 | 381, 450 |
-| `post.backstagePostRenderer.authorEndpoint.browseEndpoint.canonicalBaseUrl` | 1 | 731 |
-| `publisherMetadata.navigationEndpoint.browseEndpoint.canonicalBaseUrl` | 1 | 703 |
-| `shortBylineText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl` | 9 | 379, 447, 624 |
-| `text.runs` | 1 | 588 |
-| `text.simpleText` | 1 | 587 |
-| `watchCardRichHeaderRenderer.subtitle.navigationEndpoint.browseEndpoint.canonicalBaseUrl` | 1 | 560 |
-| `watchCardRichHeaderRenderer.subtitle.navigationEndpoint.commandMetadata.webCommandMetadata.url` | 1 | 562 |
-| `watchCardRichHeaderRenderer.subtitle.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl` | 1 | 561 |
-| `watchCardRichHeaderRenderer.subtitle.runs.0.navigationEndpoint.commandMetadata.webCommandMetadata.url` | 1 | 563 |
-| `watchCardRichHeaderRenderer.title.navigationEndpoint.browseEndpoint.canonicalBaseUrl` | 1 | 564 |
-| `watchCardRichHeaderRenderer.title.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl` | 1 | 565 |
+| `authorEndpoint.browseEndpoint.canonicalBaseUrl` | 1 | 747 |
+| `channelThumbnail.channelThumbnailWithLinkRenderer.navigationEndpoint.browseEndpoint.canonicalBaseUrl` | 1 | 457 |
+| `channelThumbnailSupportedRenderers.channelThumbnailWithLinkRenderer.navigationEndpoint.browseEndpoint.canonicalBaseUrl` | 1 | 801 |
+| `header.watchCardRichHeaderRenderer.subtitle.navigationEndpoint.browseEndpoint.canonicalBaseUrl` | 1 | 567 |
+| `header.watchCardRichHeaderRenderer.subtitle.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl` | 1 | 568 |
+| `header.watchCardRichHeaderRenderer.subtitle.runs.0.text` | 1 | 566 |
+| `longBylineText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl` | 8 | 389, 458, 665 |
+| `metadata.lockupMetadataViewModel.image.decoratedAvatarViewModel.rendererContext.commandContext.onTap.innertubeCommand.browseEndpoint.canonicalBaseUrl` | 1 | 507 |
+| `metadata.lockupMetadataViewModel.image.decoratedAvatarViewModel.rendererContext.commandContext.onTap.innertubeCommand.commandMetadata.webCommandMetadata.url` | 1 | 508 |
+| `navigationEndpoint.browseEndpoint.canonicalBaseUrl` | 5 | 594, 728, 733 |
+| `navigationEndpoint.commandMetadata.webCommandMetadata.url` | 2 | 595, 784 |
+| `ownerText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl` | 7 | 390, 459 |
+| `post.backstagePostRenderer.authorEndpoint.browseEndpoint.canonicalBaseUrl` | 1 | 740 |
+| `publisherMetadata.navigationEndpoint.browseEndpoint.canonicalBaseUrl` | 1 | 712 |
+| `shortBylineText.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl` | 9 | 388, 456, 633 |
+| `text.runs` | 1 | 597 |
+| `text.simpleText` | 1 | 596 |
+| `watchCardRichHeaderRenderer.subtitle.navigationEndpoint.browseEndpoint.canonicalBaseUrl` | 1 | 569 |
+| `watchCardRichHeaderRenderer.subtitle.navigationEndpoint.commandMetadata.webCommandMetadata.url` | 1 | 571 |
+| `watchCardRichHeaderRenderer.subtitle.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl` | 1 | 570 |
+| `watchCardRichHeaderRenderer.subtitle.runs.0.navigationEndpoint.commandMetadata.webCommandMetadata.url` | 1 | 572 |
+| `watchCardRichHeaderRenderer.title.navigationEndpoint.browseEndpoint.canonicalBaseUrl` | 1 | 573 |
+| `watchCardRichHeaderRenderer.title.runs.0.navigationEndpoint.browseEndpoint.canonicalBaseUrl` | 1 | 574 |
 
 ### `channelId` - 21 unique effective paths
 
 | Path | Renderer count | Source line samples |
 | --- | ---: | --- |
-| `authorEndpoint.browseEndpoint.browseId` | 2 | 737, 828 |
-| `channelId` | 2 | 717, 722 |
-| `channelThumbnail.channelThumbnailWithLinkRenderer.navigationEndpoint.browseEndpoint.browseId` | 1 | 442 |
-| `channelThumbnailSupportedRenderers.channelThumbnailWithLinkRenderer.navigationEndpoint.browseEndpoint.browseId` | 1 | 788 |
-| `content.videoRenderer.shortBylineText.runs.0.navigationEndpoint.browseEndpoint.browseId` | 1 | 474 |
-| `feedbackButton.buttonRenderer.navigationEndpoint.browseEndpoint.browseId` | 1 | 771 |
-| `header.watchCardRichHeaderRenderer.subtitle.navigationEndpoint.browseEndpoint.browseId` | 1 | 549 |
-| `header.watchCardRichHeaderRenderer.subtitle.runs.0.navigationEndpoint.browseEndpoint.browseId` | 1 | 550 |
-| `header.watchCardRichHeaderRenderer.titleNavigationEndpoint.browseEndpoint.browseId` | 1 | 548 |
-| `longBylineText.runs.0.navigationEndpoint.browseEndpoint.browseId` | 8 | 375, 443, 652 |
-| `metadata.lockupMetadataViewModel.image.decoratedAvatarViewModel.rendererContext.commandContext.onTap.innertubeCommand.browseEndpoint.browseId` | 1 | 496 |
-| `navigationEndpoint.browseEndpoint.browseId` | 3 | 583, 770, 789 |
-| `owner.videoOwnerRenderer.navigationEndpoint.browseEndpoint.browseId` | 1 | 522 |
-| `ownerText.runs.0.navigationEndpoint.browseEndpoint.browseId` | 7 | 376, 444 |
-| `post.backstagePostRenderer.authorEndpoint.browseEndpoint.browseId` | 1 | 730 |
-| `publisherMetadata.navigationEndpoint.browseEndpoint.browseId` | 1 | 701 |
-| `shortBylineText.runs.0.navigationEndpoint.browseEndpoint.browseId` | 11 | 374, 441, 602 |
-| `watchCardRichHeaderRenderer.subtitle.navigationEndpoint.browseEndpoint.browseId` | 1 | 551 |
-| `watchCardRichHeaderRenderer.subtitle.runs.0.navigationEndpoint.browseEndpoint.browseId` | 1 | 552 |
-| `watchCardRichHeaderRenderer.title.navigationEndpoint.browseEndpoint.browseId` | 1 | 553 |
-| `watchCardRichHeaderRenderer.title.runs.0.navigationEndpoint.browseEndpoint.browseId` | 1 | 554 |
+| `authorEndpoint.browseEndpoint.browseId` | 2 | 746, 837 |
+| `channelId` | 2 | 726, 731 |
+| `channelThumbnail.channelThumbnailWithLinkRenderer.navigationEndpoint.browseEndpoint.browseId` | 1 | 451 |
+| `channelThumbnailSupportedRenderers.channelThumbnailWithLinkRenderer.navigationEndpoint.browseEndpoint.browseId` | 1 | 797 |
+| `content.videoRenderer.shortBylineText.runs.0.navigationEndpoint.browseEndpoint.browseId` | 1 | 483 |
+| `feedbackButton.buttonRenderer.navigationEndpoint.browseEndpoint.browseId` | 1 | 780 |
+| `header.watchCardRichHeaderRenderer.subtitle.navigationEndpoint.browseEndpoint.browseId` | 1 | 558 |
+| `header.watchCardRichHeaderRenderer.subtitle.runs.0.navigationEndpoint.browseEndpoint.browseId` | 1 | 559 |
+| `header.watchCardRichHeaderRenderer.titleNavigationEndpoint.browseEndpoint.browseId` | 1 | 557 |
+| `longBylineText.runs.0.navigationEndpoint.browseEndpoint.browseId` | 8 | 384, 452, 661 |
+| `metadata.lockupMetadataViewModel.image.decoratedAvatarViewModel.rendererContext.commandContext.onTap.innertubeCommand.browseEndpoint.browseId` | 1 | 505 |
+| `navigationEndpoint.browseEndpoint.browseId` | 3 | 592, 779, 798 |
+| `owner.videoOwnerRenderer.navigationEndpoint.browseEndpoint.browseId` | 1 | 531 |
+| `ownerText.runs.0.navigationEndpoint.browseEndpoint.browseId` | 7 | 385, 453 |
+| `post.backstagePostRenderer.authorEndpoint.browseEndpoint.browseId` | 1 | 739 |
+| `publisherMetadata.navigationEndpoint.browseEndpoint.browseId` | 1 | 710 |
+| `shortBylineText.runs.0.navigationEndpoint.browseEndpoint.browseId` | 11 | 383, 450, 611 |
+| `watchCardRichHeaderRenderer.subtitle.navigationEndpoint.browseEndpoint.browseId` | 1 | 560 |
+| `watchCardRichHeaderRenderer.subtitle.runs.0.navigationEndpoint.browseEndpoint.browseId` | 1 | 561 |
+| `watchCardRichHeaderRenderer.title.navigationEndpoint.browseEndpoint.browseId` | 1 | 562 |
+| `watchCardRichHeaderRenderer.title.runs.0.navigationEndpoint.browseEndpoint.browseId` | 1 | 563 |
 
 ### `channelName` - 26 unique effective paths
 
 | Path | Renderer count | Source line samples |
 | --- | ---: | --- |
-| `authorText.simpleText` | 2 | 736, 829 |
-| `channelName.runs` | 1 | 785 |
-| `channelName.simpleText` | 1 | 784 |
-| `channelTitle.runs` | 1 | 783 |
-| `channelTitle.simpleText` | 1 | 782 |
-| `collapseStateButton.toggleButtonRenderer.defaultText.simpleText` | 1 | 767 |
-| `content.videoRenderer.longBylineText.runs` | 1 | 473 |
-| `content.videoRenderer.shortBylineText.runs` | 1 | 473 |
-| `displayName.simpleText` | 1 | 718 |
-| `header.watchCardRichHeaderRenderer.subtitle.runs` | 1 | 542 |
-| `header.watchCardRichHeaderRenderer.subtitle.simpleText` | 1 | 543 |
-| `longBylineText.runs` | 10 | 372, 439, 600 |
-| `metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.0.metadataParts.0.text.content` | 1 | 495 |
-| `navigationEndpoint.browseEndpoint.browseId` | 1 | 580 |
-| `navigationEndpoint.browseEndpoint.canonicalBaseUrl` | 2 | 579, 765 |
-| `navigationEndpoint.commandMetadata.webCommandMetadata.url` | 2 | 581, 766 |
-| `navigationEndpoint.reelWatchEndpoint.overlay.reelPlayerOverlayRenderer.reelPlayerHeaderSupportedRenderers.reelPlayerHeaderRenderer.channelTitleText.simpleText` | 1 | 814 |
-| `owner.videoOwnerRenderer.title.runs` | 1 | 523 |
-| `ownerText.runs` | 7 | 372, 439 |
-| `post.backstagePostRenderer.authorText.simpleText` | 1 | 729 |
-| `publisherMetadata.publisherName.runs` | 1 | 698 |
-| `publisherMetadata.publisherName.simpleText` | 1 | 697 |
-| `shortBylineText.runs` | 11 | 372, 439, 600 |
-| `title.simpleText` | 2 | 718, 723 |
-| `watchCardRichHeaderRenderer.subtitle.runs` | 1 | 544 |
-| `watchCardRichHeaderRenderer.subtitle.simpleText` | 1 | 545 |
+| `authorText.simpleText` | 2 | 745, 838 |
+| `channelName.runs` | 1 | 794 |
+| `channelName.simpleText` | 1 | 793 |
+| `channelTitle.runs` | 1 | 792 |
+| `channelTitle.simpleText` | 1 | 791 |
+| `collapseStateButton.toggleButtonRenderer.defaultText.simpleText` | 1 | 776 |
+| `content.videoRenderer.longBylineText.runs` | 1 | 482 |
+| `content.videoRenderer.shortBylineText.runs` | 1 | 482 |
+| `displayName.simpleText` | 1 | 727 |
+| `header.watchCardRichHeaderRenderer.subtitle.runs` | 1 | 551 |
+| `header.watchCardRichHeaderRenderer.subtitle.simpleText` | 1 | 552 |
+| `longBylineText.runs` | 10 | 381, 448, 609 |
+| `metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.0.metadataParts.0.text.content` | 1 | 504 |
+| `navigationEndpoint.browseEndpoint.browseId` | 1 | 589 |
+| `navigationEndpoint.browseEndpoint.canonicalBaseUrl` | 2 | 588, 774 |
+| `navigationEndpoint.commandMetadata.webCommandMetadata.url` | 2 | 590, 775 |
+| `navigationEndpoint.reelWatchEndpoint.overlay.reelPlayerOverlayRenderer.reelPlayerHeaderSupportedRenderers.reelPlayerHeaderRenderer.channelTitleText.simpleText` | 1 | 823 |
+| `owner.videoOwnerRenderer.title.runs` | 1 | 532 |
+| `ownerText.runs` | 7 | 381, 448 |
+| `post.backstagePostRenderer.authorText.simpleText` | 1 | 738 |
+| `publisherMetadata.publisherName.runs` | 1 | 707 |
+| `publisherMetadata.publisherName.simpleText` | 1 | 706 |
+| `shortBylineText.runs` | 11 | 381, 448, 609 |
+| `title.simpleText` | 2 | 727, 732 |
+| `watchCardRichHeaderRenderer.subtitle.runs` | 1 | 553 |
+| `watchCardRichHeaderRenderer.subtitle.simpleText` | 1 | 554 |
 
 ### `commentText` - 2 unique effective paths
 
 | Path | Renderer count | Source line samples |
 | --- | ---: | --- |
-| `contentText.runs` | 1 | 830 |
-| `contentText.simpleText` | 1 | 830 |
+| `contentText.runs` | 1 | 839 |
+| `contentText.simpleText` | 1 | 839 |
 
 ### `description` - 31 unique effective paths
 
 | Path | Renderer count | Source line samples |
 | --- | ---: | --- |
-| `backstageAttachment.captionText.runs` | 1 | 735 |
-| `choices.0.choiceText.runs` | 1 | 744 |
-| `choices.0.choiceText.simpleText` | 1 | 743 |
-| `choices.1.choiceText.runs` | 1 | 746 |
-| `choices.1.choiceText.simpleText` | 1 | 745 |
-| `description.runs` | 1 | 695 |
-| `description.simpleText` | 1 | 695 |
-| `descriptionSnippet.runs` | 8 | 384, 453, 601 |
-| `descriptionSnippet.simpleText` | 8 | 385, 454, 601 |
-| `detailedMetadataSnippets.0.snippetText.runs` | 6 | 386 |
-| `detailedMetadataSnippets.0.snippetText.simpleText` | 6 | 387 |
-| `expandedContentText.runs` | 1 | 735 |
-| `expandedContentText.simpleText` | 1 | 735 |
-| `longBylineText.runs` | 2 | 680, 688 |
-| `longMessage.runs` | 1 | 763 |
-| `longMessage.simpleText` | 1 | 763 |
-| `options.0.text.runs` | 1 | 753 |
-| `options.0.text.simpleText` | 1 | 752 |
-| `options.1.text.runs` | 1 | 755 |
-| `options.1.text.simpleText` | 1 | 754 |
-| `post.backstagePostRenderer.backstageAttachment.captionText.runs` | 1 | 728 |
-| `post.backstagePostRenderer.expandedContentText.runs` | 1 | 728 |
-| `resumePlaybackRenderer.accessibility.accessibilityData.label` | 1 | 803 |
-| `secondaryText.runs` | 1 | 577 |
-| `secondaryText.simpleText` | 1 | 577 |
-| `sentTimeText.simpleText` | 1 | 763 |
-| `shortBylineText.runs` | 2 | 680, 688 |
-| `subtitle.runs` | 3 | 570, 695, 780 |
-| `subtitle.simpleText` | 3 | 570, 695, 780 |
-| `videoCountShortText.runs` | 2 | 680, 688 |
-| `videoCountText.runs` | 2 | 680, 688 |
+| `backstageAttachment.captionText.runs` | 1 | 744 |
+| `choices.0.choiceText.runs` | 1 | 753 |
+| `choices.0.choiceText.simpleText` | 1 | 752 |
+| `choices.1.choiceText.runs` | 1 | 755 |
+| `choices.1.choiceText.simpleText` | 1 | 754 |
+| `description.runs` | 1 | 704 |
+| `description.simpleText` | 1 | 704 |
+| `descriptionSnippet.runs` | 8 | 393, 462, 610 |
+| `descriptionSnippet.simpleText` | 8 | 394, 463, 610 |
+| `detailedMetadataSnippets.0.snippetText.runs` | 6 | 395 |
+| `detailedMetadataSnippets.0.snippetText.simpleText` | 6 | 396 |
+| `expandedContentText.runs` | 1 | 744 |
+| `expandedContentText.simpleText` | 1 | 744 |
+| `longBylineText.runs` | 2 | 689, 697 |
+| `longMessage.runs` | 1 | 772 |
+| `longMessage.simpleText` | 1 | 772 |
+| `options.0.text.runs` | 1 | 762 |
+| `options.0.text.simpleText` | 1 | 761 |
+| `options.1.text.runs` | 1 | 764 |
+| `options.1.text.simpleText` | 1 | 763 |
+| `post.backstagePostRenderer.backstageAttachment.captionText.runs` | 1 | 737 |
+| `post.backstagePostRenderer.expandedContentText.runs` | 1 | 737 |
+| `resumePlaybackRenderer.accessibility.accessibilityData.label` | 1 | 812 |
+| `secondaryText.runs` | 1 | 586 |
+| `secondaryText.simpleText` | 1 | 586 |
+| `sentTimeText.simpleText` | 1 | 772 |
+| `shortBylineText.runs` | 2 | 689, 697 |
+| `subtitle.runs` | 3 | 579, 704, 789 |
+| `subtitle.simpleText` | 3 | 579, 704, 789 |
+| `videoCountShortText.runs` | 2 | 689, 697 |
+| `videoCountText.runs` | 2 | 689, 697 |
 
 ### `duration` - 18 unique effective paths
 
 | Path | Renderer count | Source line samples |
 | --- | ---: | --- |
-| `content.videoRenderer.lengthText.runs.0.text` | 1 | 479 |
-| `content.videoRenderer.lengthText.simpleText` | 1 | 478 |
-| `content.videoRenderer.thumbnailOverlays.0.thumbnailOverlayTimeStatusRenderer.text.runs.0.text` | 1 | 477 |
-| `content.videoRenderer.thumbnailOverlays.0.thumbnailOverlayTimeStatusRenderer.text.simpleText` | 1 | 476 |
-| `contentImage.collectionThumbnailViewModel.primaryThumbnail.thumbnailViewModel.overlays.0.thumbnailBottomOverlayViewModel.badges.0.thumbnailBadgeViewModel.text` | 1 | 507 |
-| `contentImage.collectionThumbnailViewModel.primaryThumbnail.thumbnailViewModel.overlays.0.thumbnailOverlayBadgeViewModel.thumbnailBadges.0.thumbnailBadgeViewModel.text` | 1 | 506 |
-| `contentImage.primaryThumbnail.thumbnailViewModel.overlays.0.thumbnailOverlayBadgeViewModel.thumbnailBadges.0.thumbnailBadgeViewModel.text` | 1 | 508 |
-| `contentImage.thumbnailViewModel.overlays.0.thumbnailBottomOverlayViewModel.badges.0.thumbnailBadgeViewModel.text` | 1 | 505 |
-| `contentImage.thumbnailViewModel.overlays.0.thumbnailOverlayBadgeViewModel.thumbnailBadges.0.thumbnailBadgeViewModel.text` | 1 | 503 |
-| `contentImage.thumbnailViewModel.overlays.0.thumbnailOverlayBadgeViewModel.thumbnailBadgeViewModel.text` | 1 | 504 |
-| `lengthText.runs.0.text` | 9 | 393, 458, 627 |
-| `lengthText.simpleText` | 9 | 392, 457, 626 |
-| `thumbnailOverlays.0.thumbnailOverlayTimeStatusRenderer.text.runs.0.text` | 6 | 391 |
-| `thumbnailOverlays.0.thumbnailOverlayTimeStatusRenderer.text.simpleText` | 6 | 390 |
-| `videos.0.childVideoRenderer.lengthText.runs.0.text` | 2 | 629, 662 |
-| `videos.0.childVideoRenderer.lengthText.simpleText` | 2 | 628, 661 |
-| `videos.0.playlistVideoRenderer.lengthText.runs.0.text` | 2 | 631, 664 |
-| `videos.0.playlistVideoRenderer.lengthText.simpleText` | 2 | 630, 663 |
+| `content.videoRenderer.lengthText.runs.0.text` | 1 | 488 |
+| `content.videoRenderer.lengthText.simpleText` | 1 | 487 |
+| `content.videoRenderer.thumbnailOverlays.0.thumbnailOverlayTimeStatusRenderer.text.runs.0.text` | 1 | 486 |
+| `content.videoRenderer.thumbnailOverlays.0.thumbnailOverlayTimeStatusRenderer.text.simpleText` | 1 | 485 |
+| `contentImage.collectionThumbnailViewModel.primaryThumbnail.thumbnailViewModel.overlays.0.thumbnailBottomOverlayViewModel.badges.0.thumbnailBadgeViewModel.text` | 1 | 516 |
+| `contentImage.collectionThumbnailViewModel.primaryThumbnail.thumbnailViewModel.overlays.0.thumbnailOverlayBadgeViewModel.thumbnailBadges.0.thumbnailBadgeViewModel.text` | 1 | 515 |
+| `contentImage.primaryThumbnail.thumbnailViewModel.overlays.0.thumbnailOverlayBadgeViewModel.thumbnailBadges.0.thumbnailBadgeViewModel.text` | 1 | 517 |
+| `contentImage.thumbnailViewModel.overlays.0.thumbnailBottomOverlayViewModel.badges.0.thumbnailBadgeViewModel.text` | 1 | 514 |
+| `contentImage.thumbnailViewModel.overlays.0.thumbnailOverlayBadgeViewModel.thumbnailBadges.0.thumbnailBadgeViewModel.text` | 1 | 512 |
+| `contentImage.thumbnailViewModel.overlays.0.thumbnailOverlayBadgeViewModel.thumbnailBadgeViewModel.text` | 1 | 513 |
+| `lengthText.runs.0.text` | 9 | 402, 467, 636 |
+| `lengthText.simpleText` | 9 | 401, 466, 635 |
+| `thumbnailOverlays.0.thumbnailOverlayTimeStatusRenderer.text.runs.0.text` | 6 | 400 |
+| `thumbnailOverlays.0.thumbnailOverlayTimeStatusRenderer.text.simpleText` | 6 | 399 |
+| `videos.0.childVideoRenderer.lengthText.runs.0.text` | 2 | 638, 671 |
+| `videos.0.childVideoRenderer.lengthText.simpleText` | 2 | 637, 670 |
+| `videos.0.playlistVideoRenderer.lengthText.runs.0.text` | 2 | 640, 673 |
+| `videos.0.playlistVideoRenderer.lengthText.simpleText` | 2 | 639, 672 |
 
 ### `metadataRows` - 3 unique effective paths
 
 | Path | Renderer count | Source line samples |
 | --- | ---: | --- |
-| `decoratedMetadataRows.rows` | 1 | 704 |
-| `metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows` | 1 | 501 |
-| `metadataRows` | 1 | 704 |
+| `decoratedMetadataRows.rows` | 1 | 713 |
+| `metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows` | 1 | 510 |
+| `metadataRows` | 1 | 713 |
 
 ### `publishedTime` - 12 unique effective paths
 
 | Path | Renderer count | Source line samples |
 | --- | ---: | --- |
-| `content.videoRenderer.publishedTimeText.runs.0.text` | 1 | 483 |
-| `content.videoRenderer.publishedTimeText.simpleText` | 1 | 482 |
-| `metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.0.metadataParts.1.text.content` | 1 | 511 |
-| `metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.1.metadataParts.0.text.content` | 1 | 512 |
-| `publishedTimeText.runs.0.text` | 7 | 397, 462 |
-| `publishedTimeText.simpleText` | 7 | 396, 461 |
-| `videoInfo.runs.0.text` | 6 | 398 |
-| `videoInfo.runs.2.text` | 6 | 399 |
-| `videos.0.childVideoRenderer.publishedTimeText.runs.0.text` | 2 | 635, 668 |
-| `videos.0.childVideoRenderer.publishedTimeText.simpleText` | 2 | 634, 667 |
-| `videos.0.playlistVideoRenderer.publishedTimeText.runs.0.text` | 2 | 637, 670 |
-| `videos.0.playlistVideoRenderer.publishedTimeText.simpleText` | 2 | 636, 669 |
+| `content.videoRenderer.publishedTimeText.runs.0.text` | 1 | 492 |
+| `content.videoRenderer.publishedTimeText.simpleText` | 1 | 491 |
+| `metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.0.metadataParts.1.text.content` | 1 | 520 |
+| `metadata.lockupMetadataViewModel.metadata.contentMetadataViewModel.metadataRows.1.metadataParts.0.text.content` | 1 | 521 |
+| `publishedTimeText.runs.0.text` | 7 | 406, 471 |
+| `publishedTimeText.simpleText` | 7 | 405, 470 |
+| `videoInfo.runs.0.text` | 6 | 407 |
+| `videoInfo.runs.2.text` | 6 | 408 |
+| `videos.0.childVideoRenderer.publishedTimeText.runs.0.text` | 2 | 644, 677 |
+| `videos.0.childVideoRenderer.publishedTimeText.simpleText` | 2 | 643, 676 |
+| `videos.0.playlistVideoRenderer.publishedTimeText.runs.0.text` | 2 | 646, 679 |
+| `videos.0.playlistVideoRenderer.publishedTimeText.simpleText` | 2 | 645, 678 |
 
 ### `title` - 31 unique effective paths
 
 | Path | Renderer count | Source line samples |
 | --- | ---: | --- |
-| `accessibilityText` | 3 | 494, 818, 822 |
-| `callToAction.watchCardHeroVideoRenderer.callToActionButton.callToActionButtonRenderer.label.runs` | 1 | 538 |
-| `callToAction.watchCardHeroVideoRenderer.callToActionButton.callToActionButtonRenderer.label.simpleText` | 1 | 539 |
-| `chipText.runs` | 1 | 576 |
-| `chipText.simpleText` | 1 | 576 |
-| `content.videoRenderer.title.runs` | 1 | 472 |
-| `content.videoRenderer.title.simpleText` | 1 | 472 |
-| `contentText.runs` | 1 | 734 |
-| `contentText.simpleText` | 1 | 734 |
-| `header.shelfHeaderRenderer.title.simpleText` | 1 | 487 |
-| `header.ticketShelfHeaderRenderer.title.simpleText` | 1 | 691 |
-| `header.watchCardRichHeaderRenderer.title.runs` | 1 | 534 |
-| `header.watchCardRichHeaderRenderer.title.simpleText` | 1 | 535 |
-| `headline.runs` | 3 | 438, 599, 779 |
-| `headline.simpleText` | 4 | 438, 599, 779 |
-| `metadata.lockupMetadataViewModel.title.content` | 1 | 494 |
-| `pollQuestion.runs` | 1 | 741 |
-| `pollQuestion.simpleText` | 1 | 741 |
-| `post.backstagePostRenderer.contentText.runs` | 1 | 727 |
-| `post.backstagePostRenderer.contentText.simpleText` | 1 | 727 |
-| `quizQuestion.runs` | 1 | 750 |
-| `quizQuestion.simpleText` | 1 | 750 |
-| `shortMessage.runs` | 1 | 762 |
-| `shortMessage.simpleText` | 1 | 762 |
-| `text.runs` | 4 | 576, 797, 800 |
-| `text.simpleText` | 4 | 576, 797, 800 |
-| `title` | 6 | 371 |
-| `title.runs` | 19 | 371, 519, 569 |
-| `title.simpleText` | 20 | 371, 519, 569 |
-| `watchCardRichHeaderRenderer.title.runs` | 1 | 536 |
-| `watchCardRichHeaderRenderer.title.simpleText` | 1 | 537 |
+| `accessibilityText` | 3 | 503, 827, 831 |
+| `callToAction.watchCardHeroVideoRenderer.callToActionButton.callToActionButtonRenderer.label.runs` | 1 | 547 |
+| `callToAction.watchCardHeroVideoRenderer.callToActionButton.callToActionButtonRenderer.label.simpleText` | 1 | 548 |
+| `chipText.runs` | 1 | 585 |
+| `chipText.simpleText` | 1 | 585 |
+| `content.videoRenderer.title.runs` | 1 | 481 |
+| `content.videoRenderer.title.simpleText` | 1 | 481 |
+| `contentText.runs` | 1 | 743 |
+| `contentText.simpleText` | 1 | 743 |
+| `header.shelfHeaderRenderer.title.simpleText` | 1 | 496 |
+| `header.ticketShelfHeaderRenderer.title.simpleText` | 1 | 700 |
+| `header.watchCardRichHeaderRenderer.title.runs` | 1 | 543 |
+| `header.watchCardRichHeaderRenderer.title.simpleText` | 1 | 544 |
+| `headline.runs` | 3 | 447, 608, 788 |
+| `headline.simpleText` | 4 | 447, 608, 788 |
+| `metadata.lockupMetadataViewModel.title.content` | 1 | 503 |
+| `pollQuestion.runs` | 1 | 750 |
+| `pollQuestion.simpleText` | 1 | 750 |
+| `post.backstagePostRenderer.contentText.runs` | 1 | 736 |
+| `post.backstagePostRenderer.contentText.simpleText` | 1 | 736 |
+| `quizQuestion.runs` | 1 | 759 |
+| `quizQuestion.simpleText` | 1 | 759 |
+| `shortMessage.runs` | 1 | 771 |
+| `shortMessage.simpleText` | 1 | 771 |
+| `text.runs` | 4 | 585, 806, 809 |
+| `text.simpleText` | 4 | 585, 806, 809 |
+| `title` | 6 | 380 |
+| `title.runs` | 19 | 380, 528, 578 |
+| `title.simpleText` | 20 | 380, 528, 578 |
+| `watchCardRichHeaderRenderer.title.runs` | 1 | 545 |
+| `watchCardRichHeaderRenderer.title.simpleText` | 1 | 546 |
 
 ### `videoId` - 14 unique effective paths
 
 | Path | Renderer count | Source line samples |
 | --- | ---: | --- |
-| `callToAction.watchCardHeroVideoRenderer.watchEndpoint.videoId` | 1 | 531 |
-| `content.videoRenderer.videoId` | 1 | 471 |
-| `contentId` | 1 | 492 |
-| `inlinePlaybackEndpoint.watchEndpoint.videoId` | 2 | 437, 676 |
-| `navigationEndpoint.watchEndpoint.videoId` | 4 | 615, 642, 675 |
-| `onTap.innertubeCommand.reelWatchEndpoint.videoId` | 2 | 817, 821 |
-| `rendererContext.commandContext.onTap.innertubeCommand.watchEndpoint.videoId` | 1 | 491 |
-| `secondaryNavigationEndpoint.watchEndpoint.videoId` | 2 | 677, 685 |
-| `videoId` | 11 | 370, 437, 598 |
-| `videos.0.childVideoRenderer.navigationEndpoint.watchEndpoint.videoId` | 2 | 617, 644 |
-| `videos.0.childVideoRenderer.videoId` | 2 | 616, 643 |
-| `videos.0.playlistVideoRenderer.navigationEndpoint.watchEndpoint.videoId` | 2 | 619, 646 |
-| `videos.0.playlistVideoRenderer.videoId` | 2 | 618, 645 |
-| `watchCardRichHeaderRenderer.navigationEndpoint.videoId` | 1 | 530 |
+| `callToAction.watchCardHeroVideoRenderer.watchEndpoint.videoId` | 1 | 540 |
+| `content.videoRenderer.videoId` | 1 | 480 |
+| `contentId` | 1 | 501 |
+| `inlinePlaybackEndpoint.watchEndpoint.videoId` | 2 | 446, 685 |
+| `navigationEndpoint.watchEndpoint.videoId` | 4 | 624, 651, 684 |
+| `onTap.innertubeCommand.reelWatchEndpoint.videoId` | 2 | 826, 830 |
+| `rendererContext.commandContext.onTap.innertubeCommand.watchEndpoint.videoId` | 1 | 500 |
+| `secondaryNavigationEndpoint.watchEndpoint.videoId` | 2 | 686, 694 |
+| `videoId` | 11 | 379, 446, 607 |
+| `videos.0.childVideoRenderer.navigationEndpoint.watchEndpoint.videoId` | 2 | 626, 653 |
+| `videos.0.childVideoRenderer.videoId` | 2 | 625, 652 |
+| `videos.0.playlistVideoRenderer.navigationEndpoint.watchEndpoint.videoId` | 2 | 628, 655 |
+| `videos.0.playlistVideoRenderer.videoId` | 2 | 627, 654 |
+| `watchCardRichHeaderRenderer.navigationEndpoint.videoId` | 1 | 539 |
 
 ### `viewCount` - 3 unique effective paths
 
 | Path | Renderer count | Source line samples |
 | --- | ---: | --- |
-| `shortViewCountText.runs.0.text` | 1 | 464 |
-| `shortViewCountText.simpleText` | 7 | 401, 464 |
-| `viewCountText.simpleText` | 6 | 401 |
+| `shortViewCountText.runs.0.text` | 1 | 473 |
+| `shortViewCountText.simpleText` | 7 | 410, 473 |
+| `viewCountText.simpleText` | 6 | 410 |
 
 ## Current Behavior Boundaries
 

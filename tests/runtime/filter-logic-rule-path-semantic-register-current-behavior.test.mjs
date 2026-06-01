@@ -381,10 +381,10 @@ test('filter logic rule path register is audit-only and source scoped', () => {
   assert.match(text, /source file: js\/filter_logic\.js/);
   assert.match(text, /path owner object: FILTER_RULES/);
   assert.match(text, /shared alias object: BASE_VIDEO_RULES/);
-  assert.equal(sourceLineCount(source), 3498);
-  assert.equal(fs.statSync(path.join(repoRoot, sourcePath)).size, 165151);
-  assert.match(text, /source line count: 3498/);
-  assert.match(text, /source bytes: 165151/);
+  assert.equal(sourceLineCount(source), 3652);
+  assert.equal(fs.statSync(path.join(repoRoot, sourcePath)).size, 172174);
+  assert.match(text, /source line count: 3652/);
+  assert.match(text, /source bytes: 172174/);
   assert.match(text, new RegExp(`source sha256: ${sha256(sourcePath)}`));
 });
 
@@ -488,8 +488,8 @@ test('filter logic rule path register pins duplicate syntax documentation and fu
 
   for (const token of [
     'gridVideoRenderer is declared twice in source',
-    'BASE_VIDEO_RULES at line 431',
-    'object literal at line 604',
+    'BASE_VIDEO_RULES at line 440',
+    'object literal at line 613',
     'source FILTER_RULES path rows before duplicate override: 467',
     'effective runtime path rows after duplicate override: 440',
     'all current runtime paths use dot-index syntax',

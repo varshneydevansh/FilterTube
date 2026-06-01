@@ -141,6 +141,13 @@ function findBalancedBlock(source, startNeedle) {
 function groupForMethod(row) {
   const name = row.name;
   if (['postLogToBridge', 'queueVideoChannelMapping', 'queueVideoMetaMapping'].includes(name)) return 'debugBridgeAndBatchQueues';
+  if ([
+    'hasAutoplayEndpointKey',
+    '_extractAutoplayEndpointVideoId',
+    '_autoplayEndpointCandidate',
+    '_shouldBlockAutoplayEndpoint',
+    '_shouldDropAutoplayEndpointSet'
+  ].includes(name)) return 'autoplayEndpointFiltering';
   if (['getByPath', 'flattenText', 'getTextFromPaths', 'flattenMetadataRow', 'flattenMetadataRowsContainer', 'getMetadataRowsText'].includes(name)) return 'pathTextAndMetadataHelpers';
   if (['normalizeChannelHandle', 'findHandleInValue', 'extractChannelHandleFromPaths'].includes(name)) return 'channelHandleExtractionHelpers';
   if (['constructor', '_processSettings', '_buildChannelFilterIndex'].includes(name)) return 'constructionAndSettings';
@@ -307,30 +314,30 @@ test('filter logic method semantic register is audit-only and scoped to current 
   assert.match(text, /Status: audit-only current-behavior register/);
   assert.match(text, /Runtime behavior is unchanged/);
   assert.match(text, /source file: js\/filter_logic\.js/);
-  assert.match(text, /split source lines: 3499/);
-  assert.match(text, /wc line count: 3498/);
-  assert.match(text, /source bytes: 165151/);
-  assert.match(text, /source sha256: 4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641/);
+  assert.match(text, /split source lines: 3653/);
+  assert.match(text, /wc line count: 3652/);
+  assert.match(text, /source bytes: 172174/);
+  assert.match(text, /source sha256: 953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5/);
   assert.match(text, /source object\/class: YouTubeDataFilter/);
   assert.match(text, /global interface: window\.FilterTubeEngine/);
-  assert.match(text, /method and entrypoint rows: 55/);
-  assert.match(text, /top-level helper function declarations: 12/);
-  assert.match(text, /YouTubeDataFilter class methods: 41/);
+  assert.match(text, /method and entrypoint rows: 60/);
+  assert.match(text, /top-level helper function declarations: 13/);
+  assert.match(text, /YouTubeDataFilter class methods: 45/);
   assert.match(text, /FilterTubeEngine global interface functions: 2/);
-  assert.match(text, /semantic method groups: 11/);
-  assert.match(text, /repo-wide broad parser lexical callable matches: 298/);
-  assert.match(text, /broad parser declaration\/inventory matches: 68/);
-  assert.match(text, /semantic method rows promoted: 55/);
+  assert.match(text, /semantic method groups: 12/);
+  assert.match(text, /repo-wide broad parser lexical callable matches: 313/);
+  assert.match(text, /broad parser declaration\/inventory matches: 73/);
+  assert.match(text, /semantic method rows promoted: 60/);
   assert.match(text, /local callable tokens held below method authority: 13/);
-  assert.match(text, /control-flow lexical artifacts: 230/);
+  assert.match(text, /control-flow lexical artifacts: 240/);
   assert.match(text, /file-local executable proof probes: 7/);
   assert.match(text, /global method proof count promoted: 0/);
   assert.match(text, /not completion proof for every nested local callback/);
 
   assert.deepEqual(sourceStats(sourcePath), {
-    bytes: 165151,
-    sha256: '4159fd729e04a82fc54bf39a79b179872205df841e1c6fe067f81ffcf1d11641',
-    splitLines: 3499
+    bytes: 172174,
+    sha256: '953ef0f14970e6cfbc11215fe9eaa078ced34f001908e1c6d5903a8fd2d9a1f5',
+    splitLines: 3653
   });
 });
 
@@ -360,13 +367,14 @@ test('filter logic JSON decision family docs carry the method semantic proof gap
 test('filter logic method semantic register accounts for every current method and entrypoint row', () => {
   const rows = methodRows();
 
-  assert.equal(rows.length, 55);
+  assert.equal(rows.length, 60);
   assert.deepEqual(countBy(rows, 'scope'), {
-    classMethod: 41,
+    classMethod: 45,
     globalInterfaceFunction: 2,
-    topLevelFunction: 12
+    topLevelFunction: 13
   });
   assert.deepEqual(countBy(rows, 'group'), {
+    autoplayEndpointFiltering: 5,
     blockDecisionPipeline: 4,
     candidateAndRendererUnwrap: 8,
     channelHandleExtractionHelpers: 3,
@@ -396,27 +404,27 @@ test('filter logic broad lexical reconciliation separates method rows from contr
   const broadRows = broadCallableRows();
   const artifacts = broadRows.filter(name => !acceptedNames.has(name));
 
-  assert.equal(broadRows.length, 298);
-  assert.equal(rows.length, 55);
+  assert.equal(broadRows.length, 313);
+  assert.equal(rows.length, 60);
   assert.equal(localRows.length, 13);
-  assert.equal(rows.length + localRows.length, 68);
-  assert.equal(artifacts.length, 230);
+  assert.equal(rows.length + localRows.length, 73);
+  assert.equal(artifacts.length, 240);
   assert.deepEqual(countByName(artifacts), {
-    for: 54,
-    if: 176
+    for: 59,
+    if: 181
   });
 
   for (const token of [
     '## Lexical Callable Reconciliation',
-    'js/filter_logic.js broad callable matches: 298',
-    'accepted top-level helper function rows: 12',
-    'accepted YouTubeDataFilter class method rows: 41',
+    'js/filter_logic.js broad callable matches: 313',
+    'accepted top-level helper function rows: 13',
+    'accepted YouTubeDataFilter class method rows: 45',
     'accepted FilterTubeEngine global interface function rows: 2',
     'accepted local arrow callable tokens: 13',
-    'accepted declaration/inventory rows total: 68',
-    'rejected control-flow artifacts total: 230',
-    'rejected if artifacts: 176',
-    'rejected for artifacts: 54',
+    'accepted declaration/inventory rows total: 73',
+    'rejected control-flow artifacts total: 240',
+    'rejected if artifacts: 181',
+    'rejected for artifacts: 59',
     'runtime behavior changed: no'
   ]) {
     assert.ok(text.includes(token), `missing lexical reconciliation token ${token}`);
