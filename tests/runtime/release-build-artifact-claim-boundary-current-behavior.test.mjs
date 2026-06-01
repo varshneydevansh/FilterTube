@@ -1,6 +1,7 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
+import vm from 'node:vm';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
@@ -8,7 +9,7 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_RELEASE_BUILD_ARTIFACT_CLAIM_BOUNDARY_CURRENT_BEHAVIOR_2026-05-22.md';
 
 const sourceRows = [
-  ['build.js', 728, 26641, '7ef8a2fd6796ec6758d7724544469a623d7c2d9407247a12b482e1f55cdc243b'],
+  ['build.js', 740, 26978, 'c8485cb2600aad89f44015cd7e49ebe4746ebcc35c91c1ff2bf29aec2f087a04'],
   ['package.json', 61, 2405, '36053d322780ce787de403be574cc400936ef2a994b4c8eca62561154fe81aec'],
   ['README.md', 401, 22476, '4559dac6d9b6a2e9d94aed4c1cb10a384c2f7c51ad09f37bab00a983e78605fb'],
   ['CHANGELOG.md', 591, 40124, 'e22a87ce7eeb88d171587d4b0f4676881a2c3081a7fbf15978d7e8d8582cdfdd'],
@@ -24,16 +25,17 @@ const blockRows = [
   ['mainBuildFlow', 'async function main()', 'function ensureCollabDialogScriptOrder', 82, 79, 2790],
   ['manifestOrderRepair', 'function ensureCollabDialogScriptOrder', 'function createZip', 161, 22, 858],
   ['createZip', 'function createZip', 'async function maybeCollectMobileArtifacts', 183, 33, 981],
-  ['mobileArtifacts', 'async function maybeCollectMobileArtifacts', 'function resolveDefaultMobileArtifactsDir', 216, 67, 2760],
-  ['mobileArtifactDefaults', 'function resolveDefaultMobileArtifactsDir', 'function parseMobileArtifactName', 283, 9, 376],
-  ['mobileArtifactParsing', 'function parseMobileArtifactName', 'function summarizeMobileArtifacts', 292, 11, 291],
-  ['mobileArtifactSummary', 'function summarizeMobileArtifacts', 'function selectLatestMobileArtifacts', 303, 11, 376],
-  ['mobileSelectionChecksum', 'function selectLatestMobileArtifacts', 'async function maybePromptRelease', 314, 16, 568],
-  ['releasePromptPublish', 'async function maybePromptRelease', 'function extractLatestChangelogEntry', 330, 58, 1805],
-  ['releaseBody', 'function buildReleaseBody', 'function createGitHubRelease', 426, 98, 4491],
-  ['githubReleaseCreate', 'function createGitHubRelease', 'function uploadReleaseAsset', 524, 25, 699],
-  ['githubAssetUpload', 'function uploadReleaseAsset', 'function contentTypeForAsset', 549, 35, 1350],
-  ['readmeBadges', 'async function updateReadmeBadges', 'function shouldCountInTotalLoC', 644, 63, 2355],
+  ['mobileArtifacts', 'async function maybeCollectMobileArtifacts', 'function resolveMobileArtifactPromptDir', 216, 67, 2783],
+  ['mobileArtifactPromptDir', 'function resolveMobileArtifactPromptDir', 'function resolveDefaultMobileArtifactsDir', 283, 12, 314],
+  ['mobileArtifactDefaults', 'function resolveDefaultMobileArtifactsDir', 'function parseMobileArtifactName', 295, 9, 376],
+  ['mobileArtifactParsing', 'function parseMobileArtifactName', 'function summarizeMobileArtifacts', 304, 11, 291],
+  ['mobileArtifactSummary', 'function summarizeMobileArtifacts', 'function selectLatestMobileArtifacts', 315, 11, 376],
+  ['mobileSelectionChecksum', 'function selectLatestMobileArtifacts', 'async function maybePromptRelease', 326, 16, 568],
+  ['releasePromptPublish', 'async function maybePromptRelease', 'function extractLatestChangelogEntry', 342, 58, 1805],
+  ['releaseBody', 'function buildReleaseBody', 'function createGitHubRelease', 438, 98, 4491],
+  ['githubReleaseCreate', 'function createGitHubRelease', 'function uploadReleaseAsset', 536, 25, 699],
+  ['githubAssetUpload', 'function uploadReleaseAsset', 'function contentTypeForAsset', 561, 35, 1350],
+  ['readmeBadges', 'async function updateReadmeBadges', 'function shouldCountInTotalLoC', 656, 63, 2355],
 ];
 
 function filePath(file) {
@@ -76,15 +78,32 @@ function escapeRegExp(text) {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+function loadResolveMobileArtifactPromptDir() {
+  const build = read('build.js');
+  const startNeedle = 'function resolveMobileArtifactPromptDir(answer, defaultDir) {';
+  const endNeedle = 'function resolveDefaultMobileArtifactsDir';
+  const start = build.indexOf(startNeedle);
+  const end = build.indexOf(endNeedle, start + startNeedle.length);
+  assert.notEqual(start, -1, `missing ${startNeedle}`);
+  assert.notEqual(end, -1, `missing ${endNeedle}`);
+
+  const context = {};
+  vm.createContext(context);
+  vm.runInContext(`${build.slice(start, end)}\nthis.resolveMobileArtifactPromptDir = resolveMobileArtifactPromptDir;`, context);
+  return context.resolveMobileArtifactPromptDir;
+}
+
 test('release build artifact claim boundary is audit-only and fingerprint pinned', () => {
   const text = doc();
 
-  assert.match(text, /Status: audit-only current-behavior proof/);
-  assert.match(text, /Runtime behavior is unchanged/);
+  assert.match(text, /Status: current-behavior proof with a 2026-06-01 build prompt guard addendum/);
+  assert.match(text, /Extension runtime behavior is unchanged/);
+  assert.match(text, /release build prompt behavior changed/);
   assert.match(text, /codebase inspection/);
   assert.match(text, /future optimization locations and first-class JSON filter blockers/);
   assert.match(text, /release build artifact boundary source files: 9/);
-  assert.match(text, /release build artifact source\/effect blocks: 14/);
+  assert.match(text, /release build artifact source\/effect blocks: 15/);
+  assert.match(text, /build prompt behavior changed: yes/);
   assert.match(text, /runtime behavior changed: no/);
 
   for (const [file, expectedLines, expectedBytes, expectedHash] of sourceRows) {
@@ -168,6 +187,7 @@ test('release build artifact claim boundary records current package and release 
   assert.match(build, /await updateReadmeBadges\(VERSION\)/);
   assert.match(build, /archive\.glob\('\*\*\/\*'/);
   assert.match(build, /MOBILE_ARTIFACT_FILE_RE = \/\^FilterTube-mobile-tablet-v/);
+  assert.match(build, /resolveMobileArtifactPromptDir\(sourceDir, defaultDir\)/);
   assert.match(build, /sha256File\(targetPath\)/);
   assert.match(build, /draft:\s*false/);
   assert.match(build, /prerelease:\s*false/);
@@ -179,7 +199,22 @@ test('release build artifact claim boundary records current package and release 
   assert.match(text, /release package manifest: absent/);
   assert.match(text, /public claim manifest: absent/);
   assert.match(text, /artifact manifest: absent/);
+  assert.match(text, /mobile artifact prompt y\/default input: default directory/);
   assert.match(text, /public release rollback\/delete path: absent/);
+});
+
+test('release mobile artifact prompt input treats yes-like directory answers as default', () => {
+  const resolvePromptDir = loadResolveMobileArtifactPromptDir();
+  const defaultDir = '/Users/devanshvarshney/FilterTubeApp/release-artifacts/android-mobile-tablet';
+
+  assert.equal(resolvePromptDir('', defaultDir), defaultDir);
+  assert.equal(resolvePromptDir('   ', defaultDir), defaultDir);
+  assert.equal(resolvePromptDir('y', defaultDir), defaultDir);
+  assert.equal(resolvePromptDir('Y', defaultDir), defaultDir);
+  assert.equal(resolvePromptDir('yes', defaultDir), defaultDir);
+  assert.equal(resolvePromptDir('default', defaultDir), defaultDir);
+  assert.equal(resolvePromptDir('/tmp/filtertube-artifacts', defaultDir), '/tmp/filtertube-artifacts');
+  assert.equal(resolvePromptDir('release-artifacts/mobile', defaultDir), 'release-artifacts/mobile');
 });
 
 test('release build artifact claim boundary keeps future authority gates missing', () => {

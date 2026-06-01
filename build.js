@@ -225,7 +225,7 @@ async function maybeCollectMobileArtifacts(version) {
         const include = await promptYesNo(`📱 Attach Android mobile/tablet APK/AAB artifacts to release v${version}? (y/N): `);
         if (!include) return [];
         sourceDir = await promptText(`   Artifact directory [${defaultDir}]: `);
-        sourceDir = sourceDir.trim() || defaultDir;
+        sourceDir = resolveMobileArtifactPromptDir(sourceDir, defaultDir);
     }
 
     if (!sourceDir) return [];
@@ -278,6 +278,18 @@ async function maybeCollectMobileArtifacts(version) {
     }
 
     return copiedPaths;
+}
+
+function resolveMobileArtifactPromptDir(answer, defaultDir) {
+    const trimmed = String(answer || '').trim();
+    if (!trimmed) return defaultDir;
+
+    const lower = trimmed.toLowerCase();
+    if (lower === 'y' || lower === 'yes' || lower === 'default') {
+        return defaultDir;
+    }
+
+    return trimmed;
 }
 
 function resolveDefaultMobileArtifactsDir() {

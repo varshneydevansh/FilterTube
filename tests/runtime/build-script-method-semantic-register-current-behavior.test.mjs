@@ -17,6 +17,7 @@ const methodGroups = new Map([
   ['ensureCollabDialogScriptOrder', 'manifestRewriteSurface'],
   ['createZip', 'zipArtifactCreation'],
   ['maybeCollectMobileArtifacts', 'mobileArtifactStaging'],
+  ['resolveMobileArtifactPromptDir', 'mobileArtifactStaging'],
   ['resolveDefaultMobileArtifactsDir', 'mobileArtifactStaging'],
   ['parseMobileArtifactName', 'mobileArtifactStaging'],
   ['summarizeMobileArtifacts', 'mobileArtifactStaging'],
@@ -133,19 +134,20 @@ test('build script method semantic register is audit-only and source fingerprint
   const text = doc();
   const source = read(sourcePath);
 
-  assert.match(text, /Status: audit-only current-behavior register/);
-  assert.match(text, /Runtime and build behavior are\s+unchanged/);
+  assert.match(text, /Status: current-behavior register with a 2026-06-01 build prompt guard/);
+  assert.match(text, /Extension runtime behavior is unchanged/);
+  assert.match(text, /build prompt behavior changed/);
   assert.match(text, /source-derived method semantic slice/);
   assert.match(text, /not completion proof for release package safety/);
   assert.match(text, /runtime behavior changed: no/);
-  assert.match(text, /build behavior changed: no/);
+  assert.match(text, /build behavior changed: yes/);
 
-  assert.equal(sourceLineCount(), 728);
-  assert.equal(readBuffer(sourcePath).byteLength, 26641);
-  assert.equal(sha256(sourcePath), '7ef8a2fd6796ec6758d7724544469a623d7c2d9407247a12b482e1f55cdc243b');
-  assert.match(text, /build script line count: 728/);
-  assert.match(text, /build script bytes: 26641/);
-  assert.match(text, /build script sha256: 7ef8a2fd6796ec6758d7724544469a623d7c2d9407247a12b482e1f55cdc243b/);
+  assert.equal(sourceLineCount(), 740);
+  assert.equal(readBuffer(sourcePath).byteLength, 26978);
+  assert.equal(sha256(sourcePath), 'c8485cb2600aad89f44015cd7e49ebe4746ebcc35c91c1ff2bf29aec2f087a04');
+  assert.match(text, /build script line count: 740/);
+  assert.match(text, /build script bytes: 26978/);
+  assert.match(text, /build script sha256: c8485cb2600aad89f44015cd7e49ebe4746ebcc35c91c1ff2bf29aec2f087a04/);
   assert.equal(countLiteral(source, 'main().catch'), 1);
   assert.match(text, /npm script entrypoint: npm run build -> node build\.js/);
 });
@@ -154,16 +156,16 @@ test('build script register accounts for every current semantic method row', () 
   const text = doc();
   const rows = methodRows();
 
-  assert.equal(rows.length, 28);
+  assert.equal(rows.length, 29);
   assert.deepEqual(countBy(rows, 'kind'), {
     arrowFunction: 4,
     asyncFunction: 4,
-    function: 20
+    function: 21
   });
   assert.deepEqual(countBy(rows, 'group'), {
     interactivePromptSurface: 2,
     manifestRewriteSurface: 1,
-    mobileArtifactStaging: 7,
+    mobileArtifactStaging: 8,
     packageBuildOrchestration: 1,
     packageCopySurface: 1,
     readmeBadgeMutation: 4,
@@ -172,8 +174,8 @@ test('build script register accounts for every current semantic method row', () 
     zipArtifactCreation: 1
   });
 
-  assert.match(text, /lexical callable rows in this semantic slice: 28/);
-  assert.match(text, /plain function declarations: 20/);
+  assert.match(text, /lexical callable rows in this semantic slice: 29/);
+  assert.match(text, /plain function declarations: 21/);
   assert.match(text, /async function declarations: 4/);
   assert.match(text, /arrow callable rows: 4/);
   assert.match(text, /semantic method groups: 9/);

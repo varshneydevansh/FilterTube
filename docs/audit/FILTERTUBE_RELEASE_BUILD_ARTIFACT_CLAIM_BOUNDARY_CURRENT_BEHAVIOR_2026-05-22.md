@@ -1,6 +1,7 @@
 # FilterTube Release Build Artifact Claim Boundary - Current Behavior - 2026-05-22
 
-Status: audit-only current-behavior proof. Runtime behavior is unchanged.
+Status: current-behavior proof with a 2026-06-01 build prompt guard addendum.
+Extension runtime behavior is unchanged; release build prompt behavior changed.
 
 This slice ties together build/package output, release publication, README
 public copy, browser manifest versions, staged release-note data, mobile
@@ -15,7 +16,7 @@ changes.
 
 | File | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `build.js` | 728 | 26641 | `7ef8a2fd6796ec6758d7724544469a623d7c2d9407247a12b482e1f55cdc243b` |
+| `build.js` | 740 | 26978 | `c8485cb2600aad89f44015cd7e49ebe4746ebcc35c91c1ff2bf29aec2f087a04` |
 | `package.json` | 61 | 2405 | `36053d322780ce787de403be574cc400936ef2a994b4c8eca62561154fe81aec` |
 | `README.md` | 401 | 22476 | `4559dac6d9b6a2e9d94aed4c1cb10a384c2f7c51ad09f37bab00a983e78605fb` |
 | `CHANGELOG.md` | 591 | 40124 | `e22a87ce7eeb88d171587d4b0f4676881a2c3081a7fbf15978d7e8d8582cdfdd` |
@@ -33,22 +34,23 @@ changes.
 | `mainBuildFlow` | 82 | 79 | 2790 | Normal build regenerates extension UI shells, mutates README badges, optionally cleans `dist`, copies broad package roots, writes browser manifest output, creates ZIPs, and then enters optional mobile/release paths. |
 | `manifestOrderRepair` | 161 | 22 | 858 | Manifest repair only enforces `js/content/collab_dialog.js` before `js/content_bridge.js`; it does not validate permissions, hosts, web-accessible resources, versions, or JSON-first startup readiness. |
 | `createZip` | 183 | 33 | 981 | ZIP creation archives all target-directory files except OS junk and does not emit a browser ZIP checksum or package manifest. |
-| `mobileArtifacts` | 216 | 67 | 2760 | Android APK/AAB staging is opt-in through CLI/env/prompt, filters by filename regex and package version, copies artifacts into `dist/mobile`, and writes per-file `.sha256` outputs. |
-| `mobileArtifactDefaults` | 283 | 9 | 376 | Default mobile artifact source prefers the sibling app repo artifact directory when present, with local `release-artifacts/mobile` as fallback. |
-| `mobileArtifactParsing` | 292 | 11 | 291 | Mobile artifact filenames are parsed into version, versionCode, variant, and extension fields. |
-| `mobileArtifactSummary` | 303 | 11 | 376 | Selected mobile artifacts are summarized for APK/AAB pair warnings. |
-| `mobileSelectionChecksum` | 314 | 16 | 568 | Latest mobile artifact selection is Android versionCode based, and checksum calculation reads the staged artifact bytes. |
-| `releasePromptPublish` | 330 | 58 | 1805 | Interactive release publication requires `GITHUB_TOKEN`, creates release body/title text, creates the GitHub release, then uploads assets sequentially. |
-| `releaseBody` | 426 | 98 | 4491 | Release copy constructs browser ZIP links and optional Android links from naming conventions, not from verified uploaded assets. |
-| `githubReleaseCreate` | 524 | 25 | 699 | GitHub release creation posts `draft: false` and `prerelease: false`. |
-| `githubAssetUpload` | 549 | 35 | 1350 | Asset upload is sequential after public release creation; upload failure rejects without a rollback/delete path. |
-| `readmeBadges` | 644 | 63 | 2355 | README badge mutation uses `git ls-files`, counts text-like and JavaScript files, rewrites version/LoC badges, and treats failures as warnings. |
+| `mobileArtifacts` | 216 | 67 | 2783 | Android APK/AAB staging is opt-in through CLI/env/prompt, filters by filename regex and package version, copies artifacts into `dist/mobile`, and writes per-file `.sha256` outputs. |
+| `mobileArtifactPromptDir` | 283 | 12 | 314 | The interactive artifact directory answer now treats blank, `y`, `yes`, and `default` as the displayed default directory instead of a literal relative path. |
+| `mobileArtifactDefaults` | 295 | 9 | 376 | Default mobile artifact source prefers the sibling app repo artifact directory when present, with local `release-artifacts/mobile` as fallback. |
+| `mobileArtifactParsing` | 304 | 11 | 291 | Mobile artifact filenames are parsed into version, versionCode, variant, and extension fields. |
+| `mobileArtifactSummary` | 315 | 11 | 376 | Selected mobile artifacts are summarized for APK/AAB pair warnings. |
+| `mobileSelectionChecksum` | 326 | 16 | 568 | Latest mobile artifact selection is Android versionCode based, and checksum calculation reads the staged artifact bytes. |
+| `releasePromptPublish` | 342 | 58 | 1805 | Interactive release publication requires `GITHUB_TOKEN`, creates release body/title text, creates the GitHub release, then uploads assets sequentially. |
+| `releaseBody` | 438 | 98 | 4491 | Release copy constructs browser ZIP links and optional Android links from naming conventions, not from verified uploaded assets. |
+| `githubReleaseCreate` | 536 | 25 | 699 | GitHub release creation posts `draft: false` and `prerelease: false`. |
+| `githubAssetUpload` | 561 | 35 | 1350 | Asset upload is sequential after public release creation; upload failure rejects without a rollback/delete path. |
+| `readmeBadges` | 656 | 63 | 2355 | README badge mutation uses `git ls-files`, counts text-like and JavaScript files, rewrites version/LoC badges, and treats failures as warnings. |
 
 ## Current Cross-Surface Facts
 
 ```text
 release build artifact boundary source files: 9
-release build artifact source/effect blocks: 14
+release build artifact source/effect blocks: 15
 browser package version: 3.3.2
 package.json version: 3.3.2
 newest release-note version: 3.3.2
@@ -61,7 +63,9 @@ browser ZIP checksum writer: absent
 release package manifest: absent
 public claim manifest: absent
 artifact manifest: absent
+mobile artifact prompt y/default input: default directory
 public release rollback/delete path: absent
+build prompt behavior changed: yes
 runtime behavior changed: no
 ```
 

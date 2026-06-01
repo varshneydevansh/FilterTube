@@ -8,7 +8,7 @@ const repoRoot = process.cwd();
 const docPath = 'docs/audit/FILTERTUBE_RUNTIME_DIAGNOSTIC_LOGGING_POLICY_MATRIX_CURRENT_BEHAVIOR_2026-05-24.md';
 
 const sourceFingerprints = {
-  'build.js': [728, 26641, '7ef8a2fd6796ec6758d7724544469a623d7c2d9407247a12b482e1f55cdc243b'],
+  'build.js': [740, 26978, 'c8485cb2600aad89f44015cd7e49ebe4746ebcc35c91c1ff2bf29aec2f087a04'],
   'js/background.js': [6320, 285103, '77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad'],
   'js/content/block_channel.js': [3175, 127396, '1b6fffa249a746c01686df0d6a05dc4b770a6f0c5ded08b78a7043c11e9cdd83'],
   'js/content/bridge_settings.js': [651, 26462, 'c7828acd09941f4559e47b31ea57d184ef9367ae4964598e865b8a196934e75b'],
@@ -122,7 +122,7 @@ const expectedDiagnosticSourceFlowRows = {
   ],
   diagnostic_flow_build_release_scripts: [
     '`build.js:75-190`',
-    '`build.js:529-682`',
+    '`build.js:536-716`',
     '`scripts/build-extension-ui.mjs:47-48`',
     '`scripts/build-nanah-vendor.mjs:62-63`',
     '`scripts/sync-native-runtime.mjs:12-30`'

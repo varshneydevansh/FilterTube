@@ -44,7 +44,7 @@ const accountedFiles = [
 ];
 
 const expectedCounts = new Map([
-  ['build.js', 28],
+  ['build.js', 29],
   ['scripts/audit-proof-drift.mjs', 12],
   ['scripts/build-extension-ui.mjs', 2],
   ['scripts/build-nanah-vendor.mjs', 4],
@@ -118,6 +118,7 @@ function groupForBuildMethod(name) {
   if (name === 'createZip') return 'zipArtifactCreation';
   if ([
     'maybeCollectMobileArtifacts',
+    'resolveMobileArtifactPromptDir',
     'resolveDefaultMobileArtifactsDir',
     'parseMobileArtifactName',
     'summarizeMobileArtifacts',
@@ -184,13 +185,14 @@ test('build/website callable audit accounts for every current build and website 
     assert.match(auditDoc, new RegExp(`\\\`${escapeRegex(file)}\\\``), `${file} must be cited in the build/website audit`);
   }
 
-  assert.match(buildSemanticDoc, /Status: audit-only current-behavior register/);
-  assert.match(buildSemanticDoc, /Runtime and build behavior are\s+unchanged/);
+  assert.match(buildSemanticDoc, /Status: current-behavior register with a 2026-06-01 build prompt guard\s+addendum/);
+  assert.match(buildSemanticDoc, /Extension runtime behavior is unchanged/);
+  assert.match(buildSemanticDoc, /build prompt behavior changed/);
   assert.match(buildSemanticDoc, /build script: build\.js/);
   assert.match(buildSemanticDoc, /This is not completion proof/);
   assert.match(auditDoc, /Build Script Method Semantic Addendum - 2026-05-27/);
   assert.match(auditDoc, /FILTERTUBE_BUILD_SCRIPT_METHOD_SEMANTIC_REGISTER_2026-05-27\.md/);
-  assert.match(auditDoc, /28 lexical callable rows across 9 semantic method groups/);
+  assert.match(auditDoc, /29 lexical callable rows across 9 semantic method groups/);
 });
 
 test('build/website callable counts match the current lexical source surface', () => {
@@ -201,25 +203,25 @@ test('build/website callable counts match the current lexical source surface', (
     assert.equal(count, expectedCounts.get(file), `${file} callable count drifted`);
   }
 
-  assert.equal(total, 137);
-  assert.match(auditDoc, /\| Build and sync scripts \| 7 \| 64 \|/);
-  assert.match(auditDoc, /\| Total \| 31 \| 137 \|/);
+  assert.equal(total, 138);
+  assert.match(auditDoc, /\| Build and sync scripts \| 7 \| 65 \|/);
+  assert.match(auditDoc, /\| Total \| 31 \| 138 \|/);
 
   const build = read('build.js');
   const buildRows = buildMethodRows();
-  assert.equal(lineCount(build), 728);
-  assert.equal(Buffer.byteLength(build), 26641);
-  assert.equal(lexicalCallableCount(build), 28);
-  assert.equal(buildRows.length, 28);
+  assert.equal(lineCount(build), 740);
+  assert.equal(Buffer.byteLength(build), 26978);
+  assert.equal(lexicalCallableCount(build), 29);
+  assert.equal(buildRows.length, 29);
   assert.deepEqual(countBy(buildRows, 'kind'), {
     arrowFunction: 4,
     asyncFunction: 4,
-    function: 20
+    function: 21
   });
   assert.deepEqual(countBy(buildRows, 'group'), {
     interactivePromptSurface: 2,
     manifestRewriteSurface: 1,
-    mobileArtifactStaging: 7,
+    mobileArtifactStaging: 8,
     packageBuildOrchestration: 1,
     packageCopySurface: 1,
     readmeBadgeMutation: 4,
@@ -292,10 +294,10 @@ test('build/website audit pins high-risk release and public claim patterns to cu
     assert.match(auditDoc, new RegExp(escapeRegex(finding)));
   }
 
-  assert.match(buildSemanticDoc, /build script line count: 728/);
-  assert.match(buildSemanticDoc, /build script bytes: 26641/);
-  assert.match(buildSemanticDoc, /lexical callable rows in this semantic slice: 28/);
-  assert.match(buildSemanticDoc, /plain function declarations: 20/);
+  assert.match(buildSemanticDoc, /build script line count: 740/);
+  assert.match(buildSemanticDoc, /build script bytes: 26978/);
+  assert.match(buildSemanticDoc, /lexical callable rows in this semantic slice: 29/);
+  assert.match(buildSemanticDoc, /plain function declarations: 21/);
   assert.match(buildSemanticDoc, /async function declarations: 4/);
   assert.match(buildSemanticDoc, /arrow callable rows: 4/);
   assert.match(buildSemanticDoc, /semantic method groups: 9/);

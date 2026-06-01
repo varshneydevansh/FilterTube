@@ -29,7 +29,7 @@ and website code. Lines whose trimmed text begins with `//` are excluded.
 
 | Source file | Lines | Bytes | SHA-256 |
 | --- | ---: | ---: | --- |
-| `build.js` | 728 | 26641 | `7ef8a2fd6796ec6758d7724544469a623d7c2d9407247a12b482e1f55cdc243b` |
+| `build.js` | 740 | 26978 | `c8485cb2600aad89f44015cd7e49ebe4746ebcc35c91c1ff2bf29aec2f087a04` |
 | `js/background.js` | 6320 | 285103 | `77628ab6dde775f3e2e30746974169e5f685e80172f449639fd845817b1c71ad` |
 | `js/content/block_channel.js` | 3175 | 127396 | `1b6fffa249a746c01686df0d6a05dc4b770a6f0c5ded08b78a7043c11e9cdd83` |
 | `js/content/bridge_settings.js` | 651 | 26462 | `c7828acd09941f4559e47b31ea57d184ef9367ae4964598e865b8a196934e75b` |
@@ -66,13 +66,15 @@ runtime behavior changed by 2026-05-30 content bridge console gate: yes
 not completion proof for diagnostic logging policy authority
 ```
 
-## Build Warning Rebaseline - 2026-06-01
+## Build Release Rebaseline - 2026-06-01
 
 The current-source inventory was rebaselined after the release artifact helper
-grew one additional `console.warn` path in `build.js`. This is build/release
-script output, not YouTube page runtime work. It changes the diagnostic
-inventory from 418 to 419 active `console.*` callsites and the warning count
-from 123 to 124.
+grew one additional `console.warn` path in `build.js`. It was rebaselined again
+after the mobile artifact directory prompt gained a default-input guard. The
+prompt guard adds no `console.*` callsites. This is build/release script output,
+not YouTube page runtime work. The release artifact helper changed the
+diagnostic inventory from 418 to 419 active `console.*` callsites and the
+warning count from 123 to 124; the prompt guard keeps those counts unchanged.
 
 ```text
 runtime behavior changed by build warning rebaseline: no
@@ -344,7 +346,7 @@ flowchart TD
 | `diagnostic_flow_background_settings_identity` | `js/background.js:2555-2620`, `js/background.js:2666-3267` | Background logs compiled settings, install/update prompts, watch/Shorts/Kids identity fetch failures, subscription import progress, and settings compilation requests. | Background log owner, profile/list-mode redaction, identity-network reason, credential policy link, and storage/write metric artifact. |
 | `diagnostic_flow_import_export_backup` | `js/io_manager.js:1670-1987`, `js/tab-view.js:9100-9350` | Import/export, encrypted backup, auto-backup, download fallback, and backup-rotation diagnostics are direct console paths in user-data workflows. | Payload privacy class, encrypted/unencrypted backup redaction, trusted Nanah state policy, and machine-readable import/export report. |
 | `diagnostic_flow_content_helper_menu` | `js/content/block_channel.js:7-14`, `js/content/block_channel.js:1744-2858`, `js/content/block_channel.js:3130-3130` | Quick-block/menu helper has one debug-gated wrapper plus warn/error paths for quick action, dropdown handling, Kids native block messages, and injection failure. | Menu helper owner, native dropdown state policy, Kids action reason, and route/surface no-work budget. |
-| `diagnostic_flow_build_release_scripts` | `build.js:75-190`, `build.js:529-682`, `scripts/build-extension-ui.mjs:47-48`, `scripts/build-nanah-vendor.mjs:62-63`, `scripts/sync-native-runtime.mjs:12-30` | Build/release/native-sync scripts write human console output for artifact creation, badge updates, release publishing, and sync failures. | CI-readable release artifact manifest, build log policy, native sync parity report, and upload/release provenance artifact. |
+| `diagnostic_flow_build_release_scripts` | `build.js:75-190`, `build.js:536-716`, `scripts/build-extension-ui.mjs:47-48`, `scripts/build-nanah-vendor.mjs:62-63`, `scripts/sync-native-runtime.mjs:12-30` | Build/release/native-sync scripts write human console output for artifact creation, badge updates, release publishing, and sync failures. | CI-readable release artifact manifest, build log policy, native sync parity report, and upload/release provenance artifact. |
 
 ```text
 current diagnostic source-flow rows: 9

@@ -1,6 +1,8 @@
 # FilterTube Build Release Method Semantic Register - Current Behavior - 2026-05-21
 
-Status: audit-only current-behavior register. Runtime behavior is unchanged.
+Status: current-behavior register with a 2026-06-01 build prompt guard
+addendum. Extension runtime behavior is unchanged; build prompt behavior
+changed.
 
 This register promotes `build.js` from representative build/release callable
 tokens to a source-derived method inventory. It covers extension UI shell
@@ -21,9 +23,9 @@ README badge, manifest transformation, or public download claim changes.
 
 ```text
 source file: build.js
-line count: 728
-named method/helper/callback declarations in scope: 28
-plain function declarations: 20
+line count: 740
+named method/helper/callback declarations in scope: 29
+plain function declarations: 21
 async function declarations: 4
 const arrow helper/callback declarations: 4
 semantic method groups: 6
@@ -100,13 +102,14 @@ MutationObserver references: 0
 fetch calls: 0
 new Error calls: 2
 runtime behavior changed: no
+build prompt behavior changed: yes
 ```
 
 ## Method Group Counts
 
 ```text
 buildPackageAssembly: 4
-buildMobileArtifactStaging: 7
+buildMobileArtifactStaging: 8
 buildReleasePromptAndBody: 7
 buildGitHubReleaseTransport: 4
 buildInteractivePromptHelpers: 2
@@ -118,7 +121,7 @@ buildReadmeBadgeAndLocMutation: 4
 | Semantic group | Declarations | Current owner/effect shape | Missing proof before behavior changes |
 | --- | ---: | --- | --- |
 | `buildPackageAssembly` | 4 | Runs generated UI shell build, mutates README badges, optionally cleans `dist`, copies broad source directories/files, repairs only collaborator-before-bridge manifest order, and zips browser targets. | Explicit package manifest, source family classification, quarantine proof, manifest parity checks, and dry-run no-mutation mode. |
-| `buildMobileArtifactStaging` | 7 | Reads mobile artifact CLI/env/prompt input, filters APK/AAB names by regex and package version, prefers the sibling app artifact directory with local fallback, selects latest Android versionCode unless all artifacts are requested, warns on missing APK/AAB pairs, copies artifacts to `dist/mobile`, and writes `.sha256` files. | Package name proof, signing fingerprint proof, release-channel proof, artifact manifest, website CTA gate, and stale artifact negative fixtures. |
+| `buildMobileArtifactStaging` | 8 | Reads mobile artifact CLI/env/prompt input, treats blank/y/yes/default directory-prompt answers as the displayed default, filters APK/AAB names by regex and package version, prefers the sibling app artifact directory with local fallback, selects latest Android versionCode unless all artifacts are requested, warns on missing APK/AAB pairs, copies artifacts to `dist/mobile`, and writes `.sha256` files. | Package name proof, signing fingerprint proof, release-channel proof, artifact manifest, website CTA gate, and stale artifact negative fixtures. |
 | `buildReleasePromptAndBody` | 7 | In interactive terminals, asks whether to publish, requires `GITHUB_TOKEN`, builds changelog-derived release copy and GitHub asset links, and includes mobile artifact links when attached. | Release claim manifest, link-to-asset verification, changelog schema proof, public-claim owner, and draft-first release plan. |
 | `buildGitHubReleaseTransport` | 4 | Creates a public non-draft GitHub release, uploads assets one by one with content-type selection, and wraps HTTPS request/response parsing. | Draft-first publish flow, all-assets-uploaded verification, rollback/failure handling, status-code fixtures, and GitHub API provenance. |
 | `buildInteractivePromptHelpers` | 2 | Uses readline prompts for yes/no and free-text input. | CI/non-interactive release authority, prompt timeout/cancel handling, and scripted dry-run coverage. |
@@ -133,29 +136,30 @@ buildReadmeBadgeAndLocMutation: 4
 | 161 | `function` | `ensureCollabDialogScriptOrder` | `buildPackageAssembly` |
 | 183 | `function` | `createZip` | `buildPackageAssembly` |
 | 216 | `asyncFunction` | `maybeCollectMobileArtifacts` | `buildMobileArtifactStaging` |
-| 283 | `function` | `resolveDefaultMobileArtifactsDir` | `buildMobileArtifactStaging` |
-| 292 | `function` | `parseMobileArtifactName` | `buildMobileArtifactStaging` |
-| 303 | `function` | `summarizeMobileArtifacts` | `buildMobileArtifactStaging` |
-| 314 | `function` | `selectLatestMobileArtifacts` | `buildMobileArtifactStaging` |
-| 320 | `function` | `extractAndroidVersionCode` | `buildMobileArtifactStaging` |
-| 324 | `function` | `sha256File` | `buildMobileArtifactStaging` |
-| 330 | `asyncFunction` | `maybePromptRelease` | `buildReleasePromptAndBody` |
-| 388 | `function` | `extractLatestChangelogEntry` | `buildReleasePromptAndBody` |
-| 413 | `function` | `deriveSubtitle` | `buildReleasePromptAndBody` |
-| 422 | `function` | `buildReleaseTitle` | `buildReleasePromptAndBody` |
-| 426 | `function` | `buildReleaseBody` | `buildReleasePromptAndBody` |
-| 433 | `constArrow` | `assetLink` | `buildReleasePromptAndBody` |
-| 435 | `constArrow` | `releaseAssetLink` | `buildReleasePromptAndBody` |
-| 524 | `function` | `createGitHubRelease` | `buildGitHubReleaseTransport` |
-| 549 | `function` | `uploadReleaseAsset` | `buildGitHubReleaseTransport` |
-| 584 | `function` | `contentTypeForAsset` | `buildGitHubReleaseTransport` |
-| 592 | `function` | `httpRequest` | `buildGitHubReleaseTransport` |
-| 618 | `function` | `promptYesNo` | `buildInteractivePromptHelpers` |
-| 631 | `function` | `promptText` | `buildInteractivePromptHelpers` |
-| 644 | `asyncFunction` | `updateReadmeBadges` | `buildReadmeBadgeAndLocMutation` |
-| 663 | `constArrow` | `formatLoC` | `buildReadmeBadgeAndLocMutation` |
-| 707 | `function` | `shouldCountInTotalLoC` | `buildReadmeBadgeAndLocMutation` |
-| 713 | `function` | `sumFileLines` | `buildReadmeBadgeAndLocMutation` |
+| 283 | `function` | `resolveMobileArtifactPromptDir` | `buildMobileArtifactStaging` |
+| 295 | `function` | `resolveDefaultMobileArtifactsDir` | `buildMobileArtifactStaging` |
+| 304 | `function` | `parseMobileArtifactName` | `buildMobileArtifactStaging` |
+| 315 | `function` | `summarizeMobileArtifacts` | `buildMobileArtifactStaging` |
+| 326 | `function` | `selectLatestMobileArtifacts` | `buildMobileArtifactStaging` |
+| 332 | `function` | `extractAndroidVersionCode` | `buildMobileArtifactStaging` |
+| 336 | `function` | `sha256File` | `buildMobileArtifactStaging` |
+| 342 | `asyncFunction` | `maybePromptRelease` | `buildReleasePromptAndBody` |
+| 400 | `function` | `extractLatestChangelogEntry` | `buildReleasePromptAndBody` |
+| 425 | `function` | `deriveSubtitle` | `buildReleasePromptAndBody` |
+| 434 | `function` | `buildReleaseTitle` | `buildReleasePromptAndBody` |
+| 438 | `function` | `buildReleaseBody` | `buildReleasePromptAndBody` |
+| 445 | `constArrow` | `assetLink` | `buildReleasePromptAndBody` |
+| 447 | `constArrow` | `releaseAssetLink` | `buildReleasePromptAndBody` |
+| 536 | `function` | `createGitHubRelease` | `buildGitHubReleaseTransport` |
+| 561 | `function` | `uploadReleaseAsset` | `buildGitHubReleaseTransport` |
+| 596 | `function` | `contentTypeForAsset` | `buildGitHubReleaseTransport` |
+| 604 | `function` | `httpRequest` | `buildGitHubReleaseTransport` |
+| 630 | `function` | `promptYesNo` | `buildInteractivePromptHelpers` |
+| 643 | `function` | `promptText` | `buildInteractivePromptHelpers` |
+| 656 | `asyncFunction` | `updateReadmeBadges` | `buildReadmeBadgeAndLocMutation` |
+| 675 | `constArrow` | `formatLoC` | `buildReadmeBadgeAndLocMutation` |
+| 719 | `function` | `shouldCountInTotalLoC` | `buildReadmeBadgeAndLocMutation` |
+| 725 | `function` | `sumFileLines` | `buildReadmeBadgeAndLocMutation` |
 
 ## Current Entrypoints And Dependencies
 
@@ -164,6 +168,7 @@ npm script entrypoints: npm run build, build:chrome, build:firefox, build:opera
 CLI target selection: first argv value in chrome/firefox/opera
 mobile artifact CLI flags: --mobile-artifacts, --mobile-artifacts=..., --all-mobile-artifacts
 mobile artifact env var: FILTERTUBE_MOBILE_ARTIFACTS_DIR
+mobile artifact prompt directory answers treated as default: blank, y, yes, default
 generated UI shell build: execSync('node scripts/build-extension-ui.mjs', { stdio: 'inherit' })
 README mutation path: updateReadmeBadges(VERSION) before package copying
 full build clean: removes dist only when no target browser is selected
@@ -189,6 +194,7 @@ explicit package manifest: absent
 release claim manifest: absent
 draft-first release flow: absent
 runtime behavior changed: no
+build prompt behavior changed: yes
 ```
 
 ## Current Behavior Boundaries
@@ -201,6 +207,7 @@ build copies css and html directories even when some files are quarantined or em
 manifest validation is limited to read/write success and collaborator script order
 ZIP creation is archive-glob based and does not emit a checksum manifest
 mobile artifact collection is opt-in by CLI/env/prompt, filename regex, and current package version
+mobile artifact directory prompt treats blank, y, yes, and default as the displayed default directory
 latest mobile artifact selection is versionCode-based when --all-mobile-artifacts is absent
 mobile artifact staging warns when the selected versionCode lacks either APK or AAB output
 mobile checksum files are staged but not bound to signing fingerprint or package name proof
