@@ -164,6 +164,7 @@ test('test lane matrix maps high-risk source files to expected lanes', () => {
     { files: ['alias, list-mode, or row-list-mode audit docs under `docs/audit/`'], lanes: ['test:whitelist', 'test:blocking', 'test:settings', 'test:smoke'] },
     { files: ['backup or Nanah audit docs under `docs/audit/`'], lanes: ['test:settings', 'test:smoke'] },
     { files: ['renderer, watch, search, Shorts, end-screen, autoplay, playlist, or Kids browse audit docs under `docs/audit/`'], lanes: ['test:whitelist', 'test:blocking', 'test:json', 'test:dom', 'test:smoke'] },
+    { files: ['filter-logic method, direct renderer, rule-field, or rule-path audit docs under `docs/audit/`'], lanes: ['test:whitelist', 'test:blocking', 'test:json', 'test:dom', 'test:performance', 'test:smoke'] },
     { files: ['network, fetch, XHR, or credential audit docs under `docs/audit/`'], lanes: ['test:json', 'test:performance', 'test:smoke'] },
     { files: ['main-world message, injection, trust, or startup-injection audit docs under `docs/audit/`'], lanes: ['test:release', 'test:json', 'test:settings', 'test:smoke'] },
     { files: ['generic message action, sender, side-effect, transport, or mutation audit docs under `docs/audit/`'], lanes: ['test:settings', 'test:smoke'] },
@@ -304,6 +305,21 @@ test('executable classifier maps high-risk paths to required lanes', () => {
     'docs/audit/FILTERTUBE_MAIN_WATCH_INITIAL_SHORTS_OWNER_ABSENT_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md',
     'docs/audit/FILTERTUBE_RENDERER_AUTHORITY_GAP_AUDIT_2026-05-18.md'
   ]).lanes, ['whitelist', 'blocking', 'json', 'dom', 'smoke']);
+  const filterLogicAuditDoc = classifyPaths([
+    'docs/audit/FILTERTUBE_FILTER_LOGIC_METHOD_SEMANTIC_REGISTER_2026-05-21.md',
+    'docs/audit/FILTERTUBE_FILTER_LOGIC_DIRECT_RENDERER_RULE_SEMANTIC_REGISTER_2026-05-21.md',
+    'docs/audit/FILTERTUBE_FILTER_LOGIC_RULE_FIELD_EFFECT_SEMANTIC_REGISTER_2026-05-21.md',
+    'docs/audit/FILTERTUBE_FILTER_LOGIC_RULE_PATH_SEMANTIC_REGISTER_2026-05-21.md'
+  ]);
+  assert.deepEqual(filterLogicAuditDoc.lanes, ['whitelist', 'blocking', 'json', 'dom', 'performance', 'smoke']);
+  assert.deepEqual(filterLogicAuditDoc.unmatched, []);
+  for (const classification of filterLogicAuditDoc.classifications) {
+    assert.equal(
+      classification.matched.some(match => match.id === 'audit-filter-logic-rule-proof-doc'),
+      true,
+      `${classification.file} should be classified as filter-logic rule proof`
+    );
+  }
 
   const packageSurface = classifyPaths(['package.json', 'website/components/footer-signal-art.js']);
   assert.deepEqual(packageSurface.lanes, ['release', 'smoke']);

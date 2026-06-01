@@ -42,6 +42,13 @@ export const RUNTIME_TEST_PROOF_PATH_PATTERN = /^tests\/runtime\/.*\.test\.mjs$/
 export const RUNTIME_FIXTURE_PROOF_PATH_PATTERN = /^tests\/runtime\/(?:fixtures\/|harness\/|.*\.test\.mjs$)/;
 export const NON_PROOF_LANE = 'smoke';
 
+const FILTER_LOGIC_AUDIT_PROOF_TESTS = Object.freeze([
+  'tests/runtime/filter-logic-direct-renderer-rule-semantic-register-current-behavior.test.mjs',
+  'tests/runtime/filter-logic-method-semantic-register-current-behavior.test.mjs',
+  'tests/runtime/filter-logic-rule-field-effect-semantic-register-current-behavior.test.mjs',
+  'tests/runtime/filter-logic-rule-path-semantic-register-current-behavior.test.mjs'
+]);
+
 export const LANES = Object.freeze({
   release: {
     description: 'Build, package, release docs, public claims, and artifact boundaries.',
@@ -73,6 +80,7 @@ export const LANES = Object.freeze({
   whitelist: {
     description: 'Whitelist-only mode, pending hides, allow-list leaks, Shorts, watch, end-screen, Kids, and YTM allow behavior.',
     tests: [
+      ...FILTER_LOGIC_AUDIT_PROOF_TESTS,
       'tests/runtime/json-first-whitelist-decision-identity-boundary-current-behavior.test.mjs',
       'tests/runtime/content-bridge-whitelist-pending-refresh-boundary-current-behavior.test.mjs',
       'tests/runtime/whitelist-pending-intake-no-work-contract-current-behavior.test.mjs',
@@ -98,6 +106,7 @@ export const LANES = Object.freeze({
   blocking: {
     description: 'Keyword, channel, comment, blocklist, list-target, and hide-decision behavior.',
     tests: [
+      ...FILTER_LOGIC_AUDIT_PROOF_TESTS,
       'tests/runtime/filter-engine-current-behavior.test.mjs',
       'tests/runtime/keyword-match-authority-current-behavior.test.mjs',
       'tests/runtime/p0-keyword-match-current-behavior.test.mjs',
@@ -115,6 +124,7 @@ export const LANES = Object.freeze({
   json: {
     description: 'JSON-first filtering, network interception, response mutation, list mode, and endpoint work gates.',
     tests: [
+      ...FILTER_LOGIC_AUDIT_PROOF_TESTS,
       'tests/runtime/seed-network-current-behavior.test.mjs',
       'tests/runtime/seed-fetch-no-work-list-mode-boundary-current-behavior.test.mjs',
       'tests/runtime/seed-xhr-no-work-list-mode-boundary-current-behavior.test.mjs',
@@ -137,6 +147,7 @@ export const LANES = Object.freeze({
   dom: {
     description: 'DOM fallback selectors, hide/restore state, cleanup passes, and recycled node behavior.',
     tests: [
+      ...FILTER_LOGIC_AUDIT_PROOF_TESTS,
       'tests/runtime/dom-fallback-method-semantic-register-current-behavior.test.mjs',
       'tests/runtime/dom-fallback-selector-semantic-register-current-behavior.test.mjs',
       'tests/runtime/dom-fallback-run-state-visibility-cleanup-boundary-current-behavior.test.mjs',
@@ -174,6 +185,7 @@ export const LANES = Object.freeze({
   performance: {
     description: 'No-rule/no-work budgets, SPA lag guards, disabled mode, active-rule gates, and identity work budgets.',
     tests: [
+      ...FILTER_LOGIC_AUDIT_PROOF_TESTS,
       'tests/runtime/empty-install-idle-observer-budget-current-behavior.test.mjs',
       'tests/runtime/empty-install-performance-current-behavior.test.mjs',
       'tests/runtime/visible-empty-runtime-active-current-behavior.test.mjs',
@@ -501,6 +513,11 @@ export const FILE_LANE_RULES = Object.freeze([
     id: 'audit-renderer-surface-proof-doc',
     patterns: [/^docs\/audit\/.*(?:RENDERER|LOCKUP|WATCH|UPNEXT|SEARCH|SHORTS|ENDSCREEN|END_SCREEN|AUTOPLAY|PLAYER|PLAYLIST|KIDS_BROWSE|CARD).*\.md$/i],
     lanes: ['whitelist', 'blocking', 'json', 'dom']
+  },
+  {
+    id: 'audit-filter-logic-rule-proof-doc',
+    patterns: [/^docs\/audit\/.*FILTER_LOGIC_(?:METHOD_SEMANTIC_REGISTER|RULE_FIELD_EFFECT_SEMANTIC_REGISTER|RULE_PATH_SEMANTIC_REGISTER|DIRECT_RENDERER_RULE_SEMANTIC_REGISTER).*\.md$/i],
+    lanes: ['whitelist', 'blocking', 'json', 'dom', 'performance']
   },
   {
     id: 'audit-network-transport-proof-doc',
