@@ -44,8 +44,8 @@ function assertListenerOptionShapeContinuation(doc) {
   assert.match(doc, /2026-05-28 listener-option shape continuation/);
   assert.ok(doc.includes('docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md'));
   assert.match(doc, /ASCII plus Mermaid listener option diagrams/);
-  assert.match(doc, /source-derived split for all\s+288 `addEventListener` installs/);
-  assert.match(doc, /232 omitted-option listeners, 23\s+boolean capture listeners, 30 object-option listeners, 1 explicit bubble\s+listener, and 2 generated expression\/identifier option listeners/);
+  assert.match(doc, /source-derived split for all\s+292 `addEventListener` installs/);
+  assert.match(doc, /236 omitted-option listeners, 23\s+boolean capture listeners, 30 object-option listeners, 1 explicit bubble\s+listener, and 2 generated expression\/identifier option listeners/);
   assert.match(doc, /without\s+changing product runtime behavior/);
   assert.match(doc, /Listener option cleanup, lifecycle pruning,\s+and release\/public-claim use remain `NO-GO`; continued audit remains `GO`/);
   assert.match(lifecycleDoc, /Event Listener Option Shape Addendum - 2026-05-28/);
@@ -59,8 +59,8 @@ function assertListenerEventTypeContinuation(doc) {
   assert.match(doc, /2026-05-28 listener-event type continuation/);
   assert.ok(doc.includes('docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md'));
   assert.match(doc, /ASCII plus Mermaid listener event diagrams/);
-  assert.match(doc, /source-derived split for all\s+288 `addEventListener` installs/);
-  assert.match(doc, /114 click listeners, 55 change\s+listeners, 20 input listeners, 14 keydown listeners, 8 `DOMContentLoaded`\s+listeners, 1 `ended` media listener, 72 other literal event listeners, 4\s+non-literal event expressions, and 0 missing event arguments/);
+  assert.match(doc, /source-derived split for all\s+292 `addEventListener` installs/);
+  assert.match(doc, /114 click listeners, 57 change\s+listeners, 20 input listeners, 14 keydown listeners, 8 `DOMContentLoaded`\s+listeners, 1 `ended` media listener, 74 other literal event listeners, 4\s+non-literal event expressions, and 0 missing event arguments/);
   assert.match(doc, /without\s+changing product runtime behavior/);
   assert.match(doc, /Listener event cleanup, lifecycle pruning, media\s+side-effect authority, and release\/public-claim use remain `NO-GO`; continued\s+audit remains `GO`/);
   assert.match(lifecycleDoc, /Event Listener Event-Type Addendum - 2026-05-28/);
@@ -74,8 +74,8 @@ function assertListenerTargetContinuation(doc) {
   assert.match(doc, /2026-05-28 listener-target continuation/);
   assert.ok(doc.includes('docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md'));
   assert.match(doc, /ASCII plus Mermaid listener target diagrams/);
-  assert.match(doc, /source-derived split for all\s+288 `addEventListener` installs/);
-  assert.match(doc, /203 local element targets, 17\s+optional local element targets, 39 document targets, 19 window targets, 8\s+vendor transport targets, and 2 generated shell targets/);
+  assert.match(doc, /source-derived split for all\s+292 `addEventListener` installs/);
+  assert.match(doc, /205 local element targets, 17\s+optional local element targets, 41 document targets, 19 window targets, 8\s+vendor transport targets, and 2 generated shell targets/);
   assert.match(doc, /without changing product runtime behavior/);
   assert.match(doc, /Listener target cleanup, lifecycle pruning, generated-output parity, vendor\s+session authority, and release\/public-claim use remain `NO-GO`; continued\s+audit remains `GO`/);
   assert.match(lifecycleDoc, /Event Listener Target Addendum - 2026-05-28/);
@@ -89,8 +89,8 @@ function assertListenerEventTargetMatrixContinuation(doc) {
   assert.match(doc, /2026-05-28 listener event-target matrix continuation/);
   assert.ok(doc.includes('docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md'));
   assert.match(doc, /ASCII plus Mermaid listener event-target diagrams/);
-  assert.match(doc, /source-derived joined\s+matrix for all 288 `addEventListener` installs/);
-  assert.match(doc, /10 document click\s+pairs, 7 document `DOMContentLoaded` pairs, 3 document keydown pairs, 4\s+document pointer\/mouse pairs, 4 window message pairs, 2 window route pairs, 9\s+window scroll\/resize\/orientation pairs, 1 window storage\/visibility pair, 104\s+local click pairs, 68 local change\/input\/keydown pairs, 8 vendor transport\s+lifecycle pairs, and 2 generated shell nonliteral pairs/);
+  assert.match(doc, /source-derived joined\s+matrix for all 292 `addEventListener` installs/);
+  assert.match(doc, /10 document click\s+pairs, 7 document `DOMContentLoaded` pairs, 3 document keydown pairs, 4\s+document pointer\/mouse pairs, 4 window message pairs, 2 window route pairs, 9\s+window scroll\/resize\/orientation pairs, 1 window storage\/visibility pair, 104\s+local click pairs, 70 local change\/input\/keydown pairs, 8 vendor transport\s+lifecycle pairs, and 2 generated shell nonliteral pairs/);
   assert.match(doc, /without changing product runtime behavior/);
   assert.match(doc, /Listener event-target cleanup, lifecycle pruning, route-teardown authority,\s+native\/menu timing authority, and release\/public-claim use remain `NO-GO`;\s+continued audit remains `GO`/);
   assert.match(lifecycleDoc, /Event Listener Event-Target Matrix Addendum - 2026-05-28/);
@@ -134,8 +134,8 @@ function assertListenerCallbackIdentityContinuation(doc) {
   assert.match(doc, /2026-05-28 listener-callback identity continuation/);
   assert.ok(doc.includes('docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md'));
   assert.match(doc, /ASCII plus Mermaid listener-callback diagrams/);
-  assert.match(doc, /source-derived split for\s+all 288 current tracked `addEventListener` callback arguments/);
-  assert.match(doc, /252\s+inline arrow callbacks, 33 identifier callback references, 1 member callback\s+reference, 2 generated expression callbacks, 74 content-runtime callbacks, 201\s+extension UI\/background callbacks, 2 generated-output callbacks, 8\s+vendor-bundle callbacks, and 3 website-component callbacks/);
+  assert.match(doc, /source-derived split for\s+all 292 current tracked `addEventListener` callback arguments/);
+  assert.match(doc, /252\s+inline arrow callbacks, 37 identifier callback references, 1 member callback\s+reference, 2 generated expression callbacks, 74 content-runtime callbacks, 201\s+extension UI\/background callbacks, 2 generated-output callbacks, 8\s+vendor-bundle callbacks, and 3 website-component callbacks/);
   assert.match(doc, /without changing product runtime behavior/);
   assert.match(doc, /Listener callback cleanup, lifecycle pruning,\s+route-teardown authority, native\/menu timing authority, and release\/public-claim\s+use remain `NO-GO`; continued audit remains `GO`/);
   assert.match(lifecycleDoc, /Event Listener Callback Identity Addendum - 2026-05-28/);
@@ -149,8 +149,8 @@ function assertListenerAddRemoveParityContinuation(doc) {
   assert.match(doc, /2026-05-28 listener add\/remove parity continuation/);
   assert.ok(doc.includes('docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md'));
   assert.match(doc, /ASCII plus Mermaid listener add\/remove parity diagrams/);
-  assert.match(doc, /source-derived\s+join for all 288 tracked `addEventListener` installs and 9 tracked\s+`removeEventListener` teardowns/);
-  assert.match(doc, /279 install-minus-remove delta,\s+9 capture-equivalent remove pairs, 8 exact option-shape remove pairs, 1\s+capture-equivalent option-shape mismatch pair, 0 remove rows without a\s+capture-equivalent add pair, 51 page-global listener installs without explicit\s+remove, 252 inline listener installs without remove handle, 70 content-runtime\s+add\/remove delta, 201 extension UI\/background delta, 0 generated-output delta,\s+8 vendor-bundle delta, 0 website-component delta, 5 document listener removes,\s+2 window listener removes, and 2 generated shell listener removes/);
+  assert.match(doc, /source-derived\s+join for all 292 tracked `addEventListener` installs and 9 tracked\s+`removeEventListener` teardowns/);
+  assert.match(doc, /279 install-minus-remove delta,\s+13 capture-equivalent remove pairs, 12 exact option-shape remove pairs, 1\s+capture-equivalent option-shape mismatch pair, 0 remove rows without a\s+capture-equivalent add pair, 51 page-global listener installs without explicit\s+remove, 252 inline listener installs without remove handle, 70 content-runtime\s+add\/remove delta, 201 extension UI\/background delta, 0 generated-output delta,\s+8 vendor-bundle delta, 0 website-component delta, 7 document listener removes,\s+2 window listener removes, and 2 generated shell listener removes/);
   assert.match(doc, /without changing product runtime behavior/);
   assert.match(doc, /Listener add\/remove cleanup, lifecycle pruning, route-teardown authority,\s+native\/menu timing authority, and release\/public-claim use remain `NO-GO`;\s+continued audit remains `GO`/);
   assert.match(lifecycleDoc, /Event Listener Add\/Remove Parity Addendum - 2026-05-28/);
@@ -1504,9 +1504,9 @@ test('objective coverage ledger records active goal completion audit as current-
   assert.match(doc, /active-thread completion rule to the exact user objective/);
   assert.match(doc, /149 tracked files still have open obligations/);
   assert.match(doc, /69 tracked JS\/JSX\/MJS files have lexical callable accounting/);
-  assert.match(doc, /5,673 callables are lexical rather than semantic method proof/);
+  assert.match(doc, /5,681 callables are lexical rather than semantic method proof/);
   assert.match(doc, /0 files have complete per-callable semantic proof/);
-  assert.match(doc, /5,673 lexical callables still require semantic proof before behavior changes/);
+  assert.match(doc, /5,681 lexical callables still require semantic proof before behavior changes/);
   assert.match(doc, /643 selector sites and 489 lifecycle instances/);
   assert.match(doc, /217\/217 P0 obligations remain `future-proof-missing`/);
   assert.match(doc, /`update_goal\(status='complete'\)` must not be called/);
@@ -11184,8 +11184,8 @@ test('objective coverage ledger records content-filter route surface convergence
   assert.match(doc, /extend objective coverage for runtime proof freshness, audit-document drift\s+repair, native-sync freshness references, truth-claim line-reference\s+freshness/);
   assert.match(doc, /initial full runtime rerun result at 4665\/4667 pass with 2 audit freshness\s+failures/);
   assert.match(doc, /focused drift repair proof at 10\/10 pass/);
-  assert.match(doc, /current broad\s+runtime backlog boundary for 534 runtime test files and 4719 source top-level\s+test declarations: 4491 pass, 228 fail/);
-  assert.match(doc, /current broad runtime proof for the\s+generated 4719 declaration set `NO-GO`/);
+  assert.match(doc, /current broad\s+runtime backlog boundary for 537 runtime test files and 4731 source top-level\s+test declarations: 4580 pass, 151 fail/);
+  assert.match(doc, /current broad runtime proof for the\s+generated 4731 declaration set `NO-GO`/);
   assert.match(doc, /broad codebase audit completion from\s+full runtime proof `NO-GO`/);
   assert.match(doc, /first optimization implementation approval from full runtime proof `NO-GO`/);
   assert.match(doc, /JSON-first first-class promotion from full runtime proof `NO-GO`/);

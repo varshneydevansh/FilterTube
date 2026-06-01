@@ -116,9 +116,9 @@ test('metric artifact foundation packet rows counts and coverage stay pinned', (
   assert.match(doc, /route\/surface obligations covered: 12/);
   assert.match(doc, /diagnostic logging policy rows covered: 8/);
   assert.match(doc, /method semantic proof gap files covered: 69/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5673/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5681/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5673/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5681/);
   assert.match(doc, /required foundation metric artifact packet exists: no/);
   assert.match(doc, /committed foundation metric artifacts: 0/);
   assert.match(doc, /runtime metric collectors approved: 0/);
@@ -157,9 +157,9 @@ test('metric artifact foundation packet is backed by current first optimization 
   assert.match(routeSurfaceMetric, /P0 route\/surface metric fixture obligations: 12/);
   assert.match(diagnosticLogging, /active console callsites: 419/);
   assert.match(methodGap, /tracked JS\/JSX\/MJS files: 69/);
-  assert.match(methodGap, /repo-wide lexical callables: 5673/);
+  assert.match(methodGap, /repo-wide lexical callables: 5681/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5673/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5681/);
 });
 
 test('current source anchors still show packet field owners before collector approval', () => {

@@ -22,16 +22,16 @@ Current count interpretation:
 
 ```text
 historical snapshot count above: 4457
-current generated source top-level declarations: 4719
+current generated source top-level declarations: 4731
 latest historical full runtime pass evidence: current 4663/4663 pass, 0 fail, 83.213s from 2026-05-30 full runtime rerun
-current broad runtime proof: 4719 tests, 4491 pass, 228 fail
+current broad runtime proof: 4731 tests, 4580 pass, 151 fail
 stored TAP output: /private/tmp/filtertube-runtime-full-after-lifecycle-convergence.tap
 runtime-results ledger completion authority: NO-GO
 ```
 
 The current source count includes later audit-only declarations beyond the
 earlier 4663-test lifecycle-convergence run. The latest broad runtime audit
-snapshot is not a completion proof because 228 rows still fail.
+snapshot is not a completion proof because 151 rows still fail.
 
 The historical snapshot is retained because May 24 metric contract rows still
 use it as expected-result evidence. It is not current full-suite proof,
@@ -2673,12 +2673,12 @@ the latest runtime test files. It does not assert broad runtime completion or
 change product runtime behavior.
 
 ```text
-top-level runtime test files: 534
-534 exact backticked test-path entries in this runtime fixture results file
+top-level runtime test files: 537
+537 exact backticked test-path entries in this runtime fixture results file
 0 top-level runtime test files without exact backticked entries
-generated per-test provenance rows: 534
-source top-level test declarations counted by generated index: 4719
-current broad runtime proof: 4719 tests, 4491 pass, 228 fail
+generated per-test provenance rows: 537
+source top-level test declarations counted by generated index: 4731
+current broad runtime proof: 4731 tests, 4580 pass, 151 fail
 runtime-results ledger completion authority: NO-GO
 ```
 
@@ -2687,4 +2687,7 @@ runtime-results ledger completion authority: NO-GO
 - `tests/runtime/release-audit-proof-directory-boundary-current-behavior.test.mjs`
 - `tests/runtime/release-live-youtube-spa-smoke-artifact-verifier-current-behavior.test.mjs`
 - `tests/runtime/release-live-youtube-spa-smoke-boundary-current-behavior.test.mjs`
+- `tests/runtime/test-lane-classifier-workflow-current-behavior.test.mjs`
 - `tests/runtime/test-lane-matrix-current-behavior.test.mjs`
+- `tests/runtime/test-lane-visible-safety-current-behavior.test.mjs`
+- `tests/runtime/test-lane-workflow-large-file-release-current-behavior.test.mjs`

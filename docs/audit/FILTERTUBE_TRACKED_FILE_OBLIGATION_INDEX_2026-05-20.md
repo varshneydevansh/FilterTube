@@ -1306,7 +1306,7 @@ The continuation adds current-behavior proof for open lifecycle,
 observer/listener/timer, menu/quick-block, dashboard/popup, vendor/generated
 freshness, performance, reliability, false-hide/leak, code-burden,
 cross-feature, and source/evidence rows in tracked JS/JSX/MJS files. It pins
-288 `addEventListener` option rows, 232 omitted-option listeners, 23 boolean
+292 `addEventListener` option rows, 232 omitted-option listeners, 23 boolean
 capture listeners, 30 object-option listeners, 1 explicit bubble listener, and
 2 generated expression/identifier option listeners. It keeps listener option
 cleanup authority, lifecycle pruning authority, route-teardown authority, and
@@ -1989,9 +1989,9 @@ The continuation adds current-behavior proof for open lifecycle,
 observer/listener/timer, menu/quick-block, dashboard/popup, vendor/generated
 freshness, media engagement, route events, performance, reliability,
 false-hide/leak, code-burden, cross-feature, and source/evidence rows in
-tracked JS/JSX/MJS files. It pins 288 `addEventListener` event rows, 114 click
-listeners, 55 change listeners, 20 input listeners, 14 keydown listeners, 8
-`DOMContentLoaded` listeners, 1 `ended` media listener, 72 other literal event
+tracked JS/JSX/MJS files. It pins 292 `addEventListener` event rows, 114 click
+listeners, 57 change listeners, 20 input listeners, 14 keydown listeners, 8
+`DOMContentLoaded` listeners, 1 `ended` media listener, 74 other literal event
 listeners, 4 non-literal event expressions, and 0 missing event arguments. It
 keeps listener event cleanup authority, lifecycle pruning authority,
 route-teardown authority, media side-effect authority, and release/public-claim
@@ -2007,8 +2007,8 @@ row. The continuation adds current-behavior proof for open lifecycle,
 observer/listener/timer, menu/quick-block, dashboard/popup, vendor/generated
 freshness, document/window page-global listeners, performance, reliability,
 false-hide/leak, code-burden, cross-feature, and source/evidence rows in
-tracked JS/JSX/MJS files. It pins 288 `addEventListener` target rows, 203 local
-element targets, 17 optional local element targets, 39 document targets, 19
+tracked JS/JSX/MJS files. It pins 292 `addEventListener` target rows, 205 local
+element targets, 17 optional local element targets, 41 document targets, 19
 window targets, 8 vendor transport targets, and 2 generated shell targets. It
 keeps listener target cleanup authority, lifecycle pruning authority,
 route-teardown authority, generated-output parity, vendor session authority,
@@ -2026,11 +2026,11 @@ observer/listener/timer, menu/quick-block, dashboard/popup, native-menu
 document click handling, SPA route listeners, storage/message trust,
 vendor/generated freshness, performance, reliability, false-hide/leak,
 code-burden, cross-feature, and source/evidence rows in tracked JS/JSX/MJS
-files. It pins 288 `addEventListener` event-target matrix rows, 10 document
+files. It pins 292 `addEventListener` event-target matrix rows, 10 document
 click pairs, 7 document `DOMContentLoaded` pairs, 3 document keydown pairs, 4
 document pointer/mouse pairs, 4 window message pairs, 2 window route pairs, 9
 window scroll/resize/orientation pairs, 1 window storage/visibility pair, 104
-local click pairs, 68 local change/input/keydown pairs, 8 vendor transport
+local click pairs, 70 local change/input/keydown pairs, 8 vendor transport
 lifecycle pairs, and 2 generated shell nonliteral pairs. It keeps listener
 event-target cleanup authority, lifecycle pruning authority, route-teardown
 authority, native/menu timing authority, generated-output parity, vendor
@@ -2272,8 +2272,8 @@ closure-capture proof, native menu behavior, quick-block/menu timing, SPA route
 work, settings/list-mode predicates, generated shell freshness, vendor
 transport, no-work budget, performance, reliability, false-hide/leak,
 code-burden, cross-feature, and source/evidence rows in tracked JS/JSX/MJS
-files. It pins 288 `addEventListener` callback rows, 252 inline arrow listener
-callbacks, 33 identifier listener callbacks, 1 member-reference listener
+files. It pins 292 `addEventListener` callback rows, 252 inline arrow listener
+callbacks, 37 identifier listener callbacks, 1 member-reference listener
 callback, 2 generated expression listener callbacks, 0 missing callback
 arguments, 74 content-runtime callbacks, 201 extension UI/background
 callbacks, 2 generated-output callbacks, 8 vendor-bundle callbacks, and 3
@@ -2365,16 +2365,16 @@ observer/listener/timer/frame, listener teardown, page-lifetime listeners,
 quick-block pointermove recovery, native menu behavior, SPA route work,
 generated shell freshness, vendor transport, no-work budget, performance,
 reliability, false-hide/leak, code-burden, cross-feature, and source/evidence
-rows in tracked JS/JSX/MJS files. It pins 288 `addEventListener` install rows,
-9 `removeEventListener` teardown rows, a 279 install-minus-remove delta, 9
-capture-equivalent listener remove pairs, 8 exact option-shape listener remove
+rows in tracked JS/JSX/MJS files. It pins 292 `addEventListener` install rows,
+13 `removeEventListener` teardown rows, a 279 install-minus-remove delta, 13
+capture-equivalent listener remove pairs, 12 exact option-shape listener remove
 pairs, 1 capture-equivalent option-shape mismatch listener pair, 0 listener
 remove rows without a capture-equivalent add pair, 51 page-global listener
 installs without explicit remove, 252 inline listener installs without remove
 handle, 70 content-runtime listener add/remove delta, 201 extension
 UI/background listener add/remove delta, 0 generated-output listener
 add/remove delta, 8 vendor-bundle listener add/remove delta, 0
-website-component listener add/remove delta, 5 document listener removes, 2
+website-component listener add/remove delta, 7 document listener removes, 2
 window listener removes, and 2 generated shell listener removes. It keeps
 listener add/remove cleanup authority, lifecycle pruning authority,
 route-teardown authority, native/menu timing authority, and release/public-claim
@@ -2517,9 +2517,9 @@ whitelist/cache optimization readiness, JSON-first promotion readiness,
 release/public-claim limits, and goal-completion authority rows in tracked
 audit docs and runtime tests. It pins the initial full runtime rerun at
 4665/4667 pass with 2 audit freshness failures, focused drift repair proof at
-10/10 pass, current broad runtime backlog boundary for 534 runtime test files,
-4719 source top-level test declarations, 4491 pass, and 228 fail, current broad
-runtime proof for the generated 4719 declaration set `NO-GO`, full codebase
+10/10 pass, current broad runtime backlog boundary for 537 runtime test files,
+4731 source top-level test declarations, 4580 pass, and 151 fail, current broad
+runtime proof for the generated 4731 declaration set `NO-GO`, full codebase
 audit completion from full runtime proof `NO-GO`, first optimization
 implementation approval from full runtime proof `NO-GO`, JSON-first first-class
 promotion from full runtime proof `NO-GO`, whitelist/cache optimization from

@@ -33,9 +33,9 @@ Runtime rollback approval exists: no
 Runtime unclaimed-surface approval exists: no
 Implementation-ready artifact commit rows: 0
 Method semantic proof gap files covered: 69
-Method semantic proof gap lexical callables covered: 5673
+Method semantic proof gap lexical callables covered: 5681
 Files with complete per-callable semantic proof: 0
-Lexical callables requiring semantic proof before behavior changes: 5673
+Lexical callables requiring semantic proof before behavior changes: 5681
 ```
 
 This is an artifact commit readiness gate, not an artifact packet. It prevents
@@ -54,7 +54,7 @@ limits, public-claim limits, and affected callable semantic proof.
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_ARTIFACT_FOUNDATION_PACKET_CURRENT_BEHAVIOR_2026-05-24.md` | Defines the selected foundation packet, but proves the required foundation metric artifact packet does not exist. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_FOUNDATION_CONTRACT_COVERAGE_GATE_CURRENT_BEHAVIOR_2026-05-24.md` | Proves 9 reserved artifact files, 9 matching contract docs, 9 matching contract tests, 9 inline draft sources, 108 inline draft sections, 9 `NO-GO` artifact-promotion decisions, and 0 committed artifact files. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_ROLLBACK_UNCLAIMED_SURFACE_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Proves rollback and unclaimed-surface authority remains separate with 0 runtime rollback approvals and 0 runtime unclaimed-surface approvals. |
-| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 69 files and 5,673 lexical callables are still only lexically indexed, with 0 files carrying complete per-callable semantic proof. |
+| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 69 files and 5,681 lexical callables are still only lexically indexed, with 0 files carrying complete per-callable semantic proof. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_VERIFICATION_OUTPUT_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md` | Defines the future `verification-output.tap` shape, but proves 0 persisted verification output files. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_PARITY_ROLLOUT_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md` | Defines the future `parity-rollout.json` shape, but proves 0 committed parity rollout files. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_DIAGNOSTIC_PRIVACY_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md` | Defines the future `diagnostic-privacy.json` shape, but proves 0 committed diagnostic privacy files. |
@@ -124,9 +124,9 @@ foundation packet rows covered: 12
 artifact path boundary rows covered: 10
 implementation readiness rows covered: 14
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5673
+method semantic proof gap lexical callables covered: 5681
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5673
+lexical callables requiring semantic proof before behavior changes: 5681
 expected runtime audit tests: 4457
 expected runtime audit pass: 4457
 expected runtime audit fail: 0

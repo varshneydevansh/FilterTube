@@ -2324,7 +2324,7 @@ pruning, and release/public-claim use remain `NO-GO`; continued audit remains
 2026-05-28 listener-option shape continuation:
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now adds
 ASCII plus Mermaid listener option diagrams and a source-derived split for all
-288 `addEventListener` installs. It records 232 omitted-option listeners, 23
+292 `addEventListener` installs. It records 236 omitted-option listeners, 23
 boolean capture listeners, 30 object-option listeners, 1 explicit bubble
 listener, and 2 generated expression/identifier option listeners. This extends
 objective coverage for runtime listeners, menu/scroll ordering, passive-event
@@ -2338,9 +2338,9 @@ and release/public-claim use remain `NO-GO`; continued audit remains `GO`.
 2026-05-28 listener-event type continuation:
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now adds
 ASCII plus Mermaid listener event diagrams and a source-derived split for all
-288 `addEventListener` installs. It records 114 click listeners, 55 change
+292 `addEventListener` installs. It records 114 click listeners, 57 change
 listeners, 20 input listeners, 14 keydown listeners, 8 `DOMContentLoaded`
-listeners, 1 `ended` media listener, 72 other literal event listeners, 4
+listeners, 1 `ended` media listener, 74 other literal event listeners, 4
 non-literal event expressions, and 0 missing event arguments. This extends
 objective coverage for runtime listeners, native menu interference, SPA route
 events, media engagement side effects, dashboard/popup mutations,
@@ -2387,8 +2387,8 @@ logging cleanup approval `NO-GO`, and continued audit remains `GO`.
 2026-05-28 listener-target continuation:
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now adds
 ASCII plus Mermaid listener target diagrams and a source-derived split for all
-288 `addEventListener` installs. It records 203 local element targets, 17
-optional local element targets, 39 document targets, 19 window targets, 8
+292 `addEventListener` installs. It records 205 local element targets, 17
+optional local element targets, 41 document targets, 19 window targets, 8
 vendor transport targets, and 2 generated shell targets. This extends objective
 coverage for runtime listeners, target ownership, native menu interference,
 page-global document/window work, dashboard/popup element bindings, vendor
@@ -2404,11 +2404,11 @@ audit remains `GO`.
 2026-05-28 listener event-target matrix continuation:
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now adds
 ASCII plus Mermaid listener event-target diagrams and a source-derived joined
-matrix for all 288 `addEventListener` installs. It records 10 document click
+matrix for all 292 `addEventListener` installs. It records 10 document click
 pairs, 7 document `DOMContentLoaded` pairs, 3 document keydown pairs, 4
 document pointer/mouse pairs, 4 window message pairs, 2 window route pairs, 9
 window scroll/resize/orientation pairs, 1 window storage/visibility pair, 104
-local click pairs, 68 local change/input/keydown pairs, 8 vendor transport
+local click pairs, 70 local change/input/keydown pairs, 8 vendor transport
 lifecycle pairs, and 2 generated shell nonliteral pairs. This extends
 objective coverage for runtime listeners, native menu interference, SPA route
 work, storage/message trust, dashboard/popup mutations, vendor session
@@ -2635,8 +2635,8 @@ release/public-claim use remain `NO-GO`; continued audit remains `GO`.
 2026-05-28 listener-callback identity continuation:
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now adds
 ASCII plus Mermaid listener-callback diagrams and a source-derived split for
-all 288 current tracked `addEventListener` callback arguments. It records 252
-inline arrow callbacks, 33 identifier callback references, 1 member callback
+all 292 current tracked `addEventListener` callback arguments. It records 252
+inline arrow callbacks, 37 identifier callback references, 1 member callback
 reference, 2 generated expression callbacks, 74 content-runtime callbacks, 201
 extension UI/background callbacks, 2 generated-output callbacks, 8
 vendor-bundle callbacks, and 3 website-component callbacks. This extends
@@ -2720,14 +2720,14 @@ continued audit remains `GO`.
 2026-05-28 listener add/remove parity continuation:
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now adds
 ASCII plus Mermaid listener add/remove parity diagrams and a source-derived
-join for all 288 tracked `addEventListener` installs and 9 tracked
+join for all 292 tracked `addEventListener` installs and 9 tracked
 `removeEventListener` teardowns. It records a 279 install-minus-remove delta,
-9 capture-equivalent remove pairs, 8 exact option-shape remove pairs, 1
+13 capture-equivalent remove pairs, 12 exact option-shape remove pairs, 1
 capture-equivalent option-shape mismatch pair, 0 remove rows without a
 capture-equivalent add pair, 51 page-global listener installs without explicit
 remove, 252 inline listener installs without remove handle, 70 content-runtime
 add/remove delta, 201 extension UI/background delta, 0 generated-output delta,
-8 vendor-bundle delta, 0 website-component delta, 5 document listener removes,
+8 vendor-bundle delta, 0 website-component delta, 7 document listener removes,
 2 window listener removes, and 2 generated shell listener removes. This
 extends objective coverage for listener teardown, page-lifetime listener
 cleanup, quick-block pointermove recovery, native menu behavior, SPA route
@@ -3559,9 +3559,9 @@ promotion gates, whitelist/cache optimization gates, and goal-completion
 authority without changing product runtime behavior. The continuation pins the
 initial full runtime rerun result at 4665/4667 pass with 2 audit freshness
 failures, focused drift repair proof at 10/10 pass, and the current broad
-runtime backlog boundary for 534 runtime test files and 4719 source top-level
-test declarations: 4491 pass, 228 fail, current broad runtime proof for the
-generated 4719 declaration set `NO-GO`, broad codebase audit completion from
+runtime backlog boundary for 537 runtime test files and 4731 source top-level
+test declarations: 4580 pass, 151 fail, current broad runtime proof for the
+generated 4731 declaration set `NO-GO`, broad codebase audit completion from
 full runtime proof `NO-GO`,
 first optimization implementation approval from full runtime proof `NO-GO`,
 JSON-first first-class promotion from full runtime proof `NO-GO`,

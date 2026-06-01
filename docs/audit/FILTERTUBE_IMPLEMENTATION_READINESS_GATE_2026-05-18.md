@@ -817,8 +817,8 @@ Runtime lifecycle convergence boundary - 2026-05-30:
   mode/surface observer budgets, teardown/effect-budget gaps, menu/overlay
   timing, method/JSON dependencies, and missing runtime authority symbols into
   one audit-only convergence boundary. It pins 10 runtime lifecycle convergence
-  rows, 0 implementation-ready runtime lifecycle convergence rows, 510 tracked
-  lifecycle primitive instances, 460 install-or-schedule rows, 50 explicit
+  rows, 0 implementation-ready runtime lifecycle convergence rows, 524 tracked
+  lifecycle primitive instances, 469 install-or-schedule rows, 55 explicit
   teardown rows, 16 hot YouTube SPA lifecycle owner rows, 33 YouTube SPA
   immediate/short hot timer rows, source-derived ASCII and Mermaid diagrams,
   and keeps observer/listener/timer/frame cleanup, route teardown,

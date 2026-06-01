@@ -1096,7 +1096,7 @@ and
 add the second per-file route/surface fixture artifact contract to the active
 goal completion audit without claiming completion. This current-behavior slice
 pins 12 JSON-first route/surface fixture sample contract rows, 1 reserved
-sample path, 69 method semantic proof gap files covered, 5,673 method
+sample path, 69 method semantic proof gap files covered, 5,681 method
 semantic proof gap lexical callables covered, 0 files with complete
 per-callable semantic proof, 0 committed route/surface fixture sample files, 0 runtime
 JSON-first fixture sample approvals, 0 runtime route/surface metric artifact
@@ -1132,7 +1132,7 @@ add collector/source-locus closure proof to the active goal completion audit
 without claiming completion. This current-behavior slice pins 12 collector
 source-locus closure rows, 12 collector approval authority rows covered, 12
 source-locus implementation authority rows covered, 12 source-owner approval
-rows covered, 69 method semantic proof gap files covered, 5,673 lexical
+rows covered, 69 method semantic proof gap files covered, 5,681 lexical
 callables still requiring semantic proof, 0 files with complete per-callable
 semantic proof, 0 runtime source-owner approvals, 0 runtime metric collector
 approvals, 0 runtime collector insertion points approved, 0 committed metric
@@ -1148,7 +1148,7 @@ and
 add the third per-file route/surface fixture artifact contract to the active
 goal completion audit without claiming completion. This current-behavior slice
 pins 12 JSON-first route/surface fixture provenance artifact contract rows, 1
-reserved provenance path, 69 method semantic proof gap files covered, 5,673
+reserved provenance path, 69 method semantic proof gap files covered, 5,681
 method semantic proof gap lexical callables covered, 0 files with complete
 per-callable semantic proof, 0 committed route/surface fixture provenance
 artifact files, 0 runtime JSON-first fixture provenance approvals, 0 runtime
@@ -1165,7 +1165,7 @@ and
 add the fourth per-file route/surface fixture artifact contract to the active
 goal completion audit without claiming completion. This current-behavior slice
 pins 12 JSON-first route/surface fixture parity report contract rows, 1
-reserved parity report path, 69 method semantic proof gap files covered, 5,673
+reserved parity report path, 69 method semantic proof gap files covered, 5,681
 method semantic proof gap lexical callables covered, 0 files with complete
 per-callable semantic proof, 0 committed route/surface fixture parity report
 files, 0 runtime JSON-first fixture parity report approvals, 0 runtime
@@ -1225,7 +1225,7 @@ covered, 0 runtime source-owner approvals, 0 runtime metric collector
 approvals, 0 runtime collector insertion points approved, 0 runtime collector
 no-work proofs approved, 0 runtime collector side-effect budgets approved, 0
 committed side-effect budget files, 0 implementation-ready collector
-side-effect approval rows, 69 method semantic proof gap files covered, 5,673
+side-effect approval rows, 69 method semantic proof gap files covered, 5,681
 lexical callables still requiring semantic proof, 0 files with complete
 per-callable semantic proof, expected runtime audit tests: 4457, expected
 runtime audit pass: 4457, and expected runtime audit fail 0. The broad audit
@@ -1262,7 +1262,7 @@ current-behavior slice pins 12 collector diagnostic privacy approval boundary
 rows, 12 diagnostic privacy contract rows covered, 12 source-locus diagnostic
 privacy rows covered, 21 diagnostic logging policy source files covered, 419
 active console callsites covered, 12 collector fixture provenance approval
-rows covered, 69 method semantic proof gap files covered, 5,673 lexical
+rows covered, 69 method semantic proof gap files covered, 5,681 lexical
 callables still requiring semantic proof, 0 files with complete per-callable
 semantic proof, 0 runtime source-owner approvals, 0 runtime metric collector
 approvals, 0 runtime collector fixture packets approved, 0 runtime collector
@@ -1340,7 +1340,7 @@ slice pins 10 JSON-first route/surface metric artifact contract coverage rows,
 5 source metric foundation contract docs referenced, 5 source metric foundation
 contract tests referenced, 5 route/surface-specific per-file metric artifact
 contract docs covered, 5 route/surface-specific per-file metric artifact
-contract tests covered, 69 method semantic proof gap files covered, 5,673
+contract tests covered, 69 method semantic proof gap files covered, 5,681
 method semantic proof gap lexical callables covered, 0 files with complete
 per-callable semantic proof, 0 committed route/surface metric artifact files,
 0 runtime route/surface metric artifact approvals, 0 runtime metric collector
@@ -1425,7 +1425,7 @@ move the active audit into route/surface metric artifact path absence without
 claiming completion. This current-behavior slice pins 6 JSON-first
 route/surface metric artifact path rows, 1 reserved future metric artifact
 root, 5 reserved future metric artifact files, 1 related first-optimization
-foundation sample path, 69 method semantic proof gap files covered, 5,673
+foundation sample path, 69 method semantic proof gap files covered, 5,681
 method semantic proof gap lexical callables covered, 0 files with complete
 per-callable semantic proof, 0 committed route/surface metric artifact files,
 0 runtime route/surface metric artifact approvals, 0 runtime metric collector
@@ -1509,7 +1509,7 @@ move the active audit from collector verification output approval absence into
 collector rollback/unclaimed approval absence without claiming completion. This
 current-behavior slice pins 12 collector rollback/unclaimed approval boundary
 rows, 12 rollback/unclaimed rows covered, 12 collector verification output
-approval rows covered, 69 method semantic proof gap files covered, 5,673
+approval rows covered, 69 method semantic proof gap files covered, 5,681
 method semantic proof gap lexical callables covered, 0 files with complete
 per-callable semantic proof, 0 runtime rollback approvals, 0 runtime
 unclaimed-surface approvals, 0 runtime collector rollback/unclaimed approvals,
@@ -1528,7 +1528,7 @@ collector verification output approval absence without claiming completion.
 This current-behavior slice pins 12 collector verification output approval
 boundary rows, 12 verification output contract rows covered, 12 collector
 parity rollout approval rows covered, 12 source-locus parity release
-verification rows covered, 69 method semantic proof gap files covered, 5,673
+verification rows covered, 69 method semantic proof gap files covered, 5,681
 lexical callables still requiring semantic proof, 0 files with complete
 per-callable semantic proof, 0 runtime source-owner approvals, 0 runtime
 metric collector approvals, 0 runtime collector verification output approvals,
@@ -1786,8 +1786,8 @@ release/public-claim use, and `update_goal(status='complete')` remain `NO-GO`.
 
 2026-05-28 listener-option shape continuation:
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now records
-the third-argument option shape for all 288 current `addEventListener` installs.
-The slice pins 232 omitted-option listeners, 23 boolean capture listeners, 30
+the third-argument option shape for all 292 current `addEventListener` installs.
+The slice pins 236 omitted-option listeners, 23 boolean capture listeners, 30
 object-option listeners, 1 explicit bubble listener, and 2 generated
 expression/identifier option listeners with ASCII and Mermaid flow diagrams. It
 keeps the active goal aligned with listener ordering, passive scroll/menu
@@ -1801,9 +1801,9 @@ this continuation: no; the broad audit remains active.
 
 2026-05-28 listener-event type continuation:
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now records
-the first-argument event type for all 288 current `addEventListener` installs.
-The slice pins 114 click listeners, 55 change listeners, 20 input listeners, 14
-keydown listeners, 8 `DOMContentLoaded` listeners, 1 `ended` media listener, 72
+the first-argument event type for all 292 current `addEventListener` installs.
+The slice pins 114 click listeners, 57 change listeners, 20 input listeners, 14
+keydown listeners, 8 `DOMContentLoaded` listeners, 1 `ended` media listener, 74
 other literal event listeners, 4 non-literal event expressions, and 0 missing
 event arguments with ASCII and Mermaid flow diagrams. It keeps the active goal
 aligned with listener targets, native YouTube menus, media engagement, SPA
@@ -1817,8 +1817,8 @@ this continuation: no; the broad audit remains active.
 
 2026-05-28 listener-target continuation:
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now records
-the receiver/target expression for all 288 current `addEventListener` installs.
-The slice pins 203 local element targets, 17 optional local element targets, 39
+the receiver/target expression for all 292 current `addEventListener` installs.
+The slice pins 205 local element targets, 17 optional local element targets, 41
 document targets, 19 window targets, 8 vendor transport targets, and 2
 generated shell targets with ASCII and Mermaid flow diagrams. It keeps the
 active goal aligned with listener ownership, native YouTube menus, page-global
@@ -1833,11 +1833,11 @@ this continuation: no; the broad audit remains active.
 
 2026-05-28 listener event-target matrix continuation:
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now joins
-event type and target expression for all 288 current `addEventListener`
+event type and target expression for all 292 current `addEventListener`
 installs. The slice pins 10 document click pairs, 7 document `DOMContentLoaded`
 pairs, 3 document keydown pairs, 4 document pointer/mouse pairs, 4 window
 message pairs, 2 window route pairs, 9 window scroll/resize/orientation pairs,
-1 window storage/visibility pair, 104 local click pairs, 68 local
+1 window storage/visibility pair, 104 local click pairs, 70 local
 change/input/keydown pairs, 8 vendor transport lifecycle pairs, and 2
 generated shell nonliteral pairs with ASCII and Mermaid flow diagrams. It keeps
 the active goal aligned with native menu reliability, SPA route work,
@@ -1852,11 +1852,11 @@ this continuation: no; the broad audit remains active.
 
 2026-05-28 observer-observe target continuation:
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now records
-the target expression for all 17 current tracked `.observe(...)` activation
+the target expression for all 21 current tracked `.observe(...)` activation
 calls. The slice pins 4 card/row observe targets, 3 `document.body` observe
 targets, 4 dropdown observe targets, 3 generic target expressions, 2
-panel/rail observe targets, and 1 select observe target with ASCII and Mermaid
-flow diagrams. It keeps the active goal aligned with runtime observers,
+panel/rail observe targets, 1 select observe target, and 4 other website
+targets with ASCII and Mermaid flow diagrams. It keeps the active goal aligned with runtime observers,
 native YouTube dropdown/menu timing, quick-block viewport work, DOM fallback
 mutation work, right-rail/playlist whitelist work, dashboard UI component
 lifecycle, no-work budgets, performance, false-hide/leak, code-burden, and
@@ -1869,13 +1869,14 @@ behavior changed by this continuation: no; the broad audit remains active.
 
 2026-05-28 observer observe option-shape continuation:
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now records
-the option shape for all 17 current tracked `.observe(...)` activation calls.
+the option shape for all 21 current tracked `.observe(...)` activation calls.
 The slice pins 9 `childList + subtree` observer option rows, 1 `childList`-only
-option row, 2 no-option visibility observer rows, 5 attribute-filter observer
+option row, 5 no-option visibility/website observer rows, 5 attribute-filter observer
 rows, 2 style/hidden attribute filter rows, 1 `aria-hidden` attribute filter
 row, 1 `disabled` attribute filter row, 1 collaborator identity attribute
-filter row, 16 content-runtime observer observe option rows, and 1 extension
-UI/background observer observe option row with ASCII and Mermaid flow diagrams.
+filter row, 16 content-runtime observer observe option rows, 1 extension
+UI/background observer observe option row, and 4 website component observer
+observe option rows with ASCII and Mermaid flow diagrams.
 It keeps the active goal aligned with runtime observers, YouTube SPA lag risk,
 native YouTube dropdown/menu timing, quick-block visibility, DOM fallback
 mutation work, right-rail/playlist whitelist work, collaborator identity,
@@ -1890,11 +1891,12 @@ this continuation: no; the broad audit remains active.
 
 2026-05-28 observer-disconnect continuation:
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now records
-all 10 current tracked observer `.disconnect()` and optional-chain
-`.disconnect?.()` invocations. The slice pins 5 local `observer` variable
+all 14 current tracked observer `.disconnect()` and optional-chain
+`.disconnect?.()` invocations. The slice pins 6 local `observer` variable
 disconnects, 2 dropdown close observer disconnects, 1 dropdown discovery
-observer disconnect, 1 collaborator dialog observer disconnect, and 1 playlist
-fallback row observer state disconnect with ASCII and Mermaid flow diagrams. It
+observer disconnect, 1 collaborator dialog observer disconnect, 1 playlist
+fallback row observer state disconnect, and 3 other website observer
+disconnects with ASCII and Mermaid flow diagrams. It
 keeps the active goal aligned with observer teardown, native YouTube
 dropdown/menu timing, collaborator dialog lifecycle, playlist fallback popover
 lifecycle, DOM fallback mutation teardown, prefetch/whitelist route reattach
@@ -1908,14 +1910,15 @@ by this continuation: no; the broad audit remains active.
 
 2026-05-28 observer observe/release parity continuation:
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now records
-the current observe/release parity for all 17 tracked observer `.observe(...)`
-activation rows and 11 release rows. The slice pins 10 `.disconnect(...)` or
+the current observe/release parity for all 21 tracked observer `.observe(...)`
+activation rows and 15 release rows. The slice pins 14 `.disconnect(...)` or
 `.disconnect?.(...)` release rows, 1 `.unobserve(...)` release row, a 6
-observe-minus-release delta, 10 local `observer` observe rows, 2 local `obs`
-observe rows, 5 exact named observer observe rows, 4 exact named observer
+observe-minus-release delta, 11 local `observer` observe rows, 2 local `obs`
+observe rows, 8 exact named observer observe rows, 7 exact named observer
 observe rows with release, 1 exact named observer observe row without release,
 1 `prefetchObserver.observe(card)` row without release, 5 content-runtime
-observe/release delta, and 1 extension UI/background observe/release delta
+observe/release delta, 1 extension UI/background observe/release delta, and 0
+website component observe/release delta
 with ASCII and Mermaid flow diagrams. It keeps the active goal aligned with
 observer teardown, YouTube SPA lag risk, native menu/dropdown timing,
 quick-block viewport work, collaborator dialog lifecycle, prefetch/whitelist
@@ -1930,15 +1933,15 @@ audit remains active.
 
 2026-05-28 observer constructor/observe type parity continuation:
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now records
-the current constructor/observe type parity for all 17 observer constructor
-rows and all 17 tracked observer `.observe(...)` activation rows. The slice
-pins 15 `MutationObserver` constructor rows, 2 `IntersectionObserver`
-constructor rows, 15 mutation observer observe rows, 2 intersection observer
-observe rows, 0 overall constructor-minus-observe delta, 0 mutation observer
-constructor-minus-observe delta, 0 intersection observer
+the current constructor/observe type parity for all 20 observer constructor
+rows and all 21 tracked observer `.observe(...)` activation rows. The slice
+pins 16 `MutationObserver` constructor rows, 4 `IntersectionObserver`
+constructor rows, 19 mutation observer observe rows, 2 intersection observer
+observe rows, -1 overall constructor-minus-observe delta, -3 mutation observer
+constructor-minus-observe delta, 2 intersection observer
 constructor-minus-observe delta, 0 content-runtime constructor/observe delta,
-and 0 extension UI/background constructor/observe delta with ASCII and Mermaid
-flow diagrams. It keeps the active goal aligned with observer type ownership,
+0 extension UI/background constructor/observe delta, and -1 website component
+constructor/observe delta with ASCII and Mermaid flow diagrams. It keeps the active goal aligned with observer type ownership,
 YouTube SPA lag risk, native menu/dropdown timing, quick-block visibility,
 prefetch identity, whitelist observation, dashboard UI component lifecycle,
 no-work budgets, performance, false-hide/leak, code-burden, and cross-feature
@@ -1951,13 +1954,14 @@ by this continuation: no; the broad audit remains active.
 
 2026-05-28 observer constructor callback identity continuation:
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now records
-the current callback argument shape for all 17 observer constructors. The slice
-pins 17 inline arrow observer constructor callbacks, 0 identifier observer
+the current callback argument shape for all 20 observer constructors. The slice
+pins 20 inline arrow observer constructor callbacks, 0 identifier observer
 constructor callbacks, 0 missing observer constructor callbacks, 9 observer
 callbacks with a `mutations` parameter, 2 observer callbacks with an `entries`
-parameter, 6 observer callbacks with no parameter, 16 content-runtime observer
-constructor callbacks, and 1 extension UI/background observer constructor
-callback with ASCII and Mermaid flow diagrams. It keeps the active goal aligned
+parameter, 7 observer callbacks with no parameter, 2 other callback-parameter
+shapes, 16 content-runtime observer constructor callbacks, 1 extension
+UI/background observer constructor callback, and 3 website component observer
+constructor callbacks with ASCII and Mermaid flow diagrams. It keeps the active goal aligned
 with observer callback ownership, YouTube SPA lag risk, native menu/dropdown
 timing, quick-block visibility, prefetch identity, whitelist observation,
 dashboard UI component lifecycle, wake-frequency proof, no-work budgets,
@@ -2037,15 +2041,15 @@ behavior changed by this continuation: no; the broad audit remains active.
 
 2026-05-28 explicit-teardown handle continuation:
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now records
-the handle or target expression shape for all 50 current tracked
+the handle or target expression shape for all 55 current tracked
 `removeEventListener`, `clearTimeout`, `clearInterval`, and
-`cancelAnimationFrame` rows. The slice pins 9 `removeEventListener` rows, 34
-`clearTimeout` rows, 4 `clearInterval` rows, 3 `cancelAnimationFrame` rows, 5
+`cancelAnimationFrame` rows. The slice pins 13 `removeEventListener` rows, 34
+`clearTimeout` rows, 4 `clearInterval` rows, 4 `cancelAnimationFrame` rows, 7
 listener document targets, 2 listener window targets, 2 generated shell
-listener targets, 12 local timeout id handles, 14 named timeout state handles,
+listener targets, 2 other listener targets, 12 local timeout id handles, 14 named timeout state handles,
 8 property-held timeout handles, 2 engine-check interval handles, 1 warmup
 interval handle, 1 dashboard rotation interval handle, 2 profile dropdown
-frame handles, and 1 generic position frame handle with ASCII and Mermaid flow
+frame handles, 1 generic position frame handle, and 1 other frame handle with ASCII and Mermaid flow
 diagrams. It keeps the active goal aligned with explicit lifecycle teardown,
 listener removal parity, timer clear ownership, interval clear ownership,
 animation-frame cancellation, generated shell freshness, stale-route policy,
@@ -2365,12 +2369,12 @@ this continuation: no; the broad audit remains active.
 and
 `tests/runtime/optimization-candidate-priority-register-current-behavior.test.mjs`
 now bind the optimization work-order register to the latest recorded 4663/4663
-historical runtime proof, the current 4719 generated declaration count, the
+historical runtime proof, the current 4731 generated declaration count, the
 June 1 broad runtime backlog boundary, and the May 30 whitelist/cache live-profile blocker
 map without changing runtime behavior. The continuation pins latest historical
 4663 full runtime proof: 4663/4663 pass, 0 fail, 83.213s; current generated
-runtime-test declaration count: 4719; current broad runtime proof for generated
-4719 declaration set: `NO-GO` (4491/4719 pass, 228 fail); affected callable
+runtime-test declaration count: 4731; current broad runtime proof for generated
+4731 declaration set: `NO-GO` (4580/4731 pass, 151 fail); affected callable
 packet rows: 12; affected source files covered: 8; transport no-work source
 evidence rows: 8; live evidence execution blocker rows: 8; connected Chrome
 profile inventory acceptance: `NO-GO`;
@@ -3096,11 +3100,11 @@ initial post-drift full runtime rerun returned 4665/4667 pass, 2 fail; the two
 failures were audit-document freshness failures for the native runtime sync app
 HEAD fingerprint and truth-claim register exact line references. The
 focused drift repair proof passed 10/10 tests. The later broad runtime audit
-command is `npm run audit:runtime`, and the snapshot records the current 534
-runtime test files and 4719 source top-level test declarations as 4491 pass and
-228 fail.
+command is `npm run audit:runtime`, and the snapshot records the current 537
+runtime test files and 4731 source top-level test declarations as 4580 pass and
+151 fail.
 
-This makes current broad runtime proof for generated 4719 declaration set:
+This makes current broad runtime proof for generated 4731 declaration set:
 `NO-GO`. It keeps full codebase audit completion from full runtime proof:
 `NO-GO`, first optimization implementation approval from full runtime proof:
 `NO-GO`, JSON-first first-class promotion from full runtime proof: `NO-GO`,
@@ -3121,10 +3125,10 @@ and
 now bind historical first-optimization `4457` expected-test rows to the current
 generated runtime-test provenance count without treating either count as broad
 completion proof. The continuation pins legacy metric contract expected tests:
-4457, current generated runtime test declarations: 4719, latest historical
+4457, current generated runtime test declarations: 4731, latest historical
 4663 full runtime proof result: 4663/4663 pass, 0 fail, 83.213s, current broad
-runtime proof for generated 4719 declaration set:
-NO-GO, runtime test file rows: 534, runtime results missing exact backticked
+runtime proof for generated 4731 declaration set:
+NO-GO, runtime test file rows: 537, runtime results missing exact backticked
 test-path rows: 0, legacy runtime-count token 4457 occurrences: 1230, legacy
 runtime-count token 4457 files: 167, current runtime-count token 4660
 occurrences: 11, current runtime-count token 4660 files: 4, count freshness
@@ -3132,8 +3136,8 @@ reconciliation status: CURRENT-BROAD-BACKLOG-RECORDED, runtime count
 reconciliation as optimization authority: NO-GO, first optimization
 implementation approval from count rows: NO-GO, full codebase audit completion
 from count reconciliation: NO-GO, and runtime behavior changed: no. Old `4457`
-rows remain dated historical contract evidence only; the current 4719 broad
-runtime backlog records 4491 pass and 228 fail, so it does not prove semantic
+rows remain dated historical contract evidence only; the current 4731 broad
+runtime backlog records 4580 pass and 151 fail, so it does not prove semantic
 coverage, JSON-first promotion, whitelist/cache optimization, metric collector
 insertion, artifact commit readiness, release/public-claim use, or
 `update_goal(status='complete')`.
@@ -3163,7 +3167,7 @@ evidence to 4660 at that time. Later lifecycle-convergence proof tests moved
 generated runtime-test declaration evidence to 4663, and the full runtime suite
 was refreshed to current 4663/4663 pass, 0 fail, 83.213s. Later content-filter
 convergence proof tests moved generated runtime-test declaration evidence to 4671; the later broad runtime backlog boundary now tracks
-the current 4719 declaration set as 4491 pass and 228 fail. This revalidates source
+the current 4731 declaration set as 4580 pass and 151 fail. This revalidates source
 boundary/surface/source-of-truth, tracked-file coverage and obligations,
 objective coverage, P0 obligation index/status, function and callable coverage,
 method semantic register, feature source dependencies, candidate obligation
@@ -3283,8 +3287,8 @@ across primitive census, listener surface, observer surface, timer/frame
 surface, hot YouTube SPA owners, mode/surface budget, teardown/effect budget,
 menu/overlay timing, method/JSON dependency, and authority absence. It also
 pins source-derived ASCII and Mermaid diagrams, 0 implementation-ready runtime
-lifecycle convergence rows, 510 tracked lifecycle primitive instances, 460
-install-or-schedule rows, 50 explicit teardown rows, 16 hot YouTube SPA
+lifecycle convergence rows, 524 tracked lifecycle primitive instances, 469
+install-or-schedule rows, 55 explicit teardown rows, 16 hot YouTube SPA
 lifecycle owner rows, 33 YouTube SPA immediate/short hot timer rows, and
 source absence for `lifecycleEffectBudget`, `lifecycleOwnerDecision`,
 `routeSurfaceLifecycleScope`, `fullscreenPauseAuthority`,
@@ -3345,12 +3349,14 @@ remains active.
 
 2026-05-28 website component lifecycle boundary continuation:
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now records
-source-derived lifecycle boundary evidence for all 9 current website component
-lifecycle rows. The slice pins 4 install-or-schedule rows, 5
-explicit-teardown rows, 3 website component `addEventListener` rows, 3 website
+source-derived lifecycle boundary evidence for all 23 current website component
+lifecycle rows. The slice pins 13 install-or-schedule rows, 10
+explicit-teardown rows, 7 website component `addEventListener` rows, 7 website
 component `removeEventListener` rows, 1 website component `setTimeout` row, 2
-website component `clearTimeout` rows, 2 website lifecycle source files, 5
-scene scheduler lifecycle rows, 4 theme sync lifecycle rows, 2 scene scheduler
+website component `clearTimeout` rows, 2 website component
+`requestAnimationFrame` rows, 1 website component `cancelAnimationFrame` row, 4
+website lifecycle source files, 14 website other lifecycle rows, 5 scene
+scheduler lifecycle rows, 4 theme sync lifecycle rows, 2 scene scheduler
 install-or-schedule rows, 3 scene scheduler explicit-teardown rows, 2 theme
 sync install-or-schedule rows, and 2 theme sync explicit-teardown rows with
 ASCII and Mermaid flow diagrams. It keeps the active goal aligned with website
@@ -3366,8 +3372,8 @@ this continuation: no; the broad audit remains active.
 
 2026-05-28 listener-callback identity continuation:
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now records
-the callback argument shape for all 288 current tracked `addEventListener`
-installs. The slice pins 252 inline arrow callbacks, 33 identifier callback
+the callback argument shape for all 292 current tracked `addEventListener`
+installs. The slice pins 252 inline arrow callbacks, 37 identifier callback
 references, 1 member callback reference, 2 generated expression callbacks, 74
 content-runtime callbacks, 201 extension UI/background callbacks, 2
 generated-output callbacks, 8 vendor-bundle callbacks, and 3 website-component
@@ -3385,15 +3391,15 @@ this continuation: no; the broad audit remains active.
 
 2026-05-28 listener add/remove parity continuation:
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now records
-the current add/remove parity for all 288 tracked `addEventListener` installs
-and 9 tracked `removeEventListener` teardowns. The slice pins a 279
-install-minus-remove delta, 9 capture-equivalent remove pairs, 8 exact
+the current add/remove parity for all 292 tracked `addEventListener` installs
+and 13 tracked `removeEventListener` teardowns. The slice pins a 279
+install-minus-remove delta, 13 capture-equivalent remove pairs, 12 exact
 option-shape remove pairs, 1 capture-equivalent option-shape mismatch pair, 0
 remove rows without a capture-equivalent add pair, 51 page-global listener
 installs without explicit remove, 252 inline listener installs without remove
 handle, 70 content-runtime add/remove delta, 201 extension UI/background
 delta, 0 generated-output delta, 8 vendor-bundle delta, 0 website-component
-delta, 5 document listener removes, 2 window listener removes, and 2 generated
+delta, 7 document listener removes, 2 window listener removes, and 2 generated
 shell listener removes with ASCII and Mermaid flow diagrams. It keeps the
 active goal aligned with listener teardown, page-lifetime listeners,
 quick-block pointermove recovery, native menu behavior, SPA route work,
@@ -3475,13 +3481,14 @@ this continuation: no; the broad audit remains active.
 
 2026-05-28 animation-frame schedule continuation:
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now records
-the callback or handle shape for all 29 current tracked `requestAnimationFrame`
+the callback or handle shape for all 31 current tracked `requestAnimationFrame`
 schedules. The slice pins 2 assigned positioning frame handles, 15 inline
-anonymous frame callbacks, 5 identifier callback frames, 5 inline
+anonymous frame callbacks, 7 identifier callback frames, 5 inline
 `scrollIntoView` frames, 2 inline timeout-hop frames, 13 content-runtime frame
-schedules, 16 extension UI/background frame schedules, 1 `positionRaf`
-assignment, and 1 `profileDropdownPositionRaf` assignment with ASCII and
-Mermaid flow diagrams. It keeps the active goal aligned with frame scheduling,
+schedules, 16 extension UI/background frame schedules, 2 website component
+frame schedules, 1 `positionRaf` assignment, and 1
+`profileDropdownPositionRaf` assignment with ASCII and Mermaid flow diagrams.
+It keeps the active goal aligned with frame scheduling,
 dashboard scroll timing, profile dropdown positioning, quick-block/menu frame
 timing, fallback scan cadence, timer-hop work, no-work budgets, performance,
 false-hide/leak, code-burden, and cross-feature proof requirements. Animation
@@ -3494,17 +3501,18 @@ audit remains active.
 
 2026-05-28 animation-frame schedule/cancel parity continuation:
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now joins all
-29 current tracked `requestAnimationFrame` schedule rows and 3 current
+31 current tracked `requestAnimationFrame` schedule rows and 4 current
 `cancelAnimationFrame` rows by direct lexical handle where one exists. The
-slice pins a 26 frame schedule-minus-cancel delta, 27 frame schedules without
+slice pins a 27 frame schedule-minus-cancel delta, 29 frame schedules without
 assigned handles, 2 frame schedules with assigned handles, 3
-`cancelAnimationFrame` rows with direct schedule handles, 0
+`cancelAnimationFrame` rows with direct schedule handles, 1
 `cancelAnimationFrame` rows without direct schedule handles, 2 handled frame
 schedule rows with cancel handles, 0 handled frame schedule rows without cancel
 handles, 0 distinct scheduled frame handles without cancel, 13 content-runtime
 frame schedule/cancel delta, 13 extension UI/background frame schedule/cancel
 delta, 1 `positionRaf` cancel row, and 2 `profileDropdownPositionRaf` cancel
-rows with ASCII and Mermaid flow diagrams. It keeps the active goal aligned
+rows plus 1 `frameId` website cancel row with ASCII and Mermaid flow diagrams.
+It keeps the active goal aligned
 with frame lifecycle, unretained one-shot frame scheduling, profile dropdown
 positioning, shared UI positioning, fallback scan cadence, quick-block/menu
 frame timing, no-work budgets, performance, false-hide/leak, code-burden, and

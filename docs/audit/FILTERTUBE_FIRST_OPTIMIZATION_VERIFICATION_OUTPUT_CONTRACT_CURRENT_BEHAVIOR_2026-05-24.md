@@ -39,7 +39,7 @@ repo-wide method semantic proof status for those callables.
 | Input | Current proof used |
 | --- | --- |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_PARITY_ROLLOUT_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md` | Defines the future `parity-rollout.json` shape and verification row, but proves 0 parity rollout files and 0 runtime collector approvals exist. |
-| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 69 JS/JSX/MJS files and 5,673 lexical callables still lack complete per-callable semantic proof before behavior changes. |
+| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 69 JS/JSX/MJS files and 5,681 lexical callables still lack complete per-callable semantic proof before behavior changes. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_DIAGNOSTIC_PRIVACY_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md` | Defines the future `diagnostic-privacy.json` shape and verification row, but proves 0 diagnostic privacy files and 0 runtime collector approvals exist. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_SIDE_EFFECT_BUDGET_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md` | Defines the future `side-effect-budget.json` shape and verification row, but proves 0 side-effect budget files and 0 runtime collector approvals exist. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_NO_WORK_PRESERVATION_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md` | Defines the future `no-work-preservation.json` shape and verification row, but proves 0 no-work preservation files and 0 runtime collector approvals exist. |
@@ -84,9 +84,9 @@ collector side-effect rows covered: 12
 collector fixture provenance rows covered: 12
 collector parity rollout rows covered: 12
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5673
+method semantic proof gap lexical callables covered: 5681
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5673
+lexical callables requiring semantic proof before behavior changes: 5681
 expected runtime audit tests: 4457
 expected runtime audit pass: 4457
 expected runtime audit fail: 0
@@ -109,7 +109,7 @@ metric schema rows linked by verification closure: 12
 metric source-owner rows linked by verification closure: 12
 collector readiness families linked by verification closure: 5
 method semantic proof gap files linked by verification closure: 69
-lexical callables linked by verification closure: 5673
+lexical callables linked by verification closure: 5681
 runtime fixture result count rows linked by verification closure: 3
 runtime verification output closure approvals: 0
 persisted verification output closure approvals: 0
@@ -427,7 +427,7 @@ and
 prove this verification output contract is not runtime verification output
 approval. The addendum pins 12 collector verification output approval boundary
 rows, 12 verification output contract rows covered, 12 collector parity rollout
-approval rows covered, 69 method semantic proof gap files covered, 5,673
+approval rows covered, 69 method semantic proof gap files covered, 5,681
 lexical callables still requiring semantic proof, 0 files with complete
 per-callable semantic proof, 0 committed verification output files, 0 runtime
 collector verification output approvals, 0 implementation-ready collector

@@ -29,10 +29,10 @@ changes, or whitelist behavior changes.
 source directory: tests/runtime
 file selector: top-level *.test.mjs files
 runtime results ledger: docs/audit/FILTERTUBE_RUNTIME_FIXTURE_RESULTS_2026-05-17.md
-top-level runtime test files: 534
-indexed runtime test rows: 534
-source top-level test declarations counted: 4719
-runtime results exact backticked test-path rows: 534
+top-level runtime test files: 537
+indexed runtime test rows: 537
+source top-level test declarations counted: 4731
+runtime results exact backticked test-path rows: 537
 runtime results missing exact backticked test-path rows: 0
 ```
 
@@ -44,11 +44,11 @@ backlog, not a completion proof. The latest broad audit snapshot is recorded in
 
 ```text
 latest broad runtime audit command: npm run audit:runtime
-latest broad runtime audit tests: 4719
-latest broad runtime audit pass: 4491
-latest broad runtime audit fail: 228
-fresh full runtime exit status for 4719 declaration set: nonzero
-current full runtime proof for generated 4719 declaration set: NO-GO
+latest broad runtime audit tests: 4731
+latest broad runtime audit pass: 4580
+latest broad runtime audit fail: 151
+fresh full runtime exit status for 4731 declaration set: nonzero
+current full runtime proof for generated 4731 declaration set: NO-GO
 runtime behavior changed: no
 ```
 
@@ -98,7 +98,7 @@ Future optimization work should cite this index for complete runtime-test file e
 | 30 | `tests/runtime/candidate-obligation-binding-matrix-current-behavior.test.mjs` | 6 | `yes` | candidate obligation binding matrix is audit-only and source-backed |
 | 31 | `tests/runtime/capture-corpus-current-behavior.test.mjs` | 6 | `yes` | ignored raw capture corpus is explicitly excluded from release source |
 | 32 | `tests/runtime/capture-fixture-traceability-current-behavior.test.mjs` | 5 | `yes` | capture traceability doc matches the current ignored capture corpus counts |
-| 33 | `tests/runtime/code-burden-declutter-boundary-current-behavior.test.mjs` | 7 | `yes` | code-burden declutter boundary is audit-only and blocks cleanup without proof |
+| 33 | `tests/runtime/code-burden-declutter-boundary-current-behavior.test.mjs` | 8 | `yes` | code-burden declutter boundary is audit-only and blocks cleanup without proof |
 | 34 | `tests/runtime/collab-dialog-lifecycle-current-behavior.test.mjs` | 8 | `yes` | collab dialog lifecycle audit documents current behavior and future gate |
 | 35 | `tests/runtime/collab-dialog-method-semantic-register-current-behavior.test.mjs` | 7 | `yes` | collab dialog method semantic register is audit-only and scoped to current behavior |
 | 36 | `tests/runtime/comments-dom-cleanup-boundary-current-behavior.test.mjs` | 9 | `yes` | comments DOM cleanup boundary audit is audit-only and source pinned |
@@ -488,8 +488,8 @@ Future optimization work should cite this index for complete runtime-test file e
 | 420 | `tests/runtime/recommended-dom-cleanup-boundary-current-behavior.test.mjs` | 6 | `yes` | recommended DOM cleanup boundary audit is audit-only and source pinned |
 | 421 | `tests/runtime/reference-doc-claim-drift-current-behavior.test.mjs` | 8 | `yes` | reference_doc_claim_drift_register_documents_current_scope |
 | 422 | `tests/runtime/release-audit-proof-directory-boundary-current-behavior.test.mjs` | 3 | `yes` | release audit proof directory boundary is documented and lane-owned |
-| 423 | `tests/runtime/release-build-artifact-claim-boundary-current-behavior.test.mjs` | 5 | `yes` | release build artifact claim boundary is audit-only and fingerprint pinned |
-| 424 | `tests/runtime/release-live-youtube-spa-smoke-artifact-verifier-current-behavior.test.mjs` | 7 | `yes` | live smoke artifact verifier is wired into release and smoke lane proof |
+| 423 | `tests/runtime/release-build-artifact-claim-boundary-current-behavior.test.mjs` | 6 | `yes` | release build artifact claim boundary is audit-only and fingerprint pinned |
+| 424 | `tests/runtime/release-live-youtube-spa-smoke-artifact-verifier-current-behavior.test.mjs` | 9 | `yes` | live smoke artifact verifier is wired into release and smoke lane proof |
 | 425 | `tests/runtime/release-live-youtube-spa-smoke-boundary-current-behavior.test.mjs` | 5 | `yes` | release and smoke lanes keep the live YouTube SPA smoke boundary visible |
 | 426 | `tests/runtime/release-notes-json-version-gate-boundary-current-behavior.test.mjs` | 5 | `yes` | release notes JSON version gate doc is audit-only and scoped to current behavior |
 | 427 | `tests/runtime/release-package-parity-current-behavior.test.mjs` | 8 | `yes` | release package parity audit documents package roots and future gate |
@@ -559,48 +559,50 @@ Future optimization work should cite this index for complete runtime-test file e
 | 491 | `tests/runtime/synthetic-event-action-register-current-behavior.test.mjs` | 5 | `yes` | synthetic event/action register is audit-only and keeps runtime unchanged |
 | 492 | `tests/runtime/tab-view-lifecycle-selector-boundary-current-behavior.test.mjs` | 6 | `yes` | tab-view lifecycle selector boundary audit is audit-only and source pinned |
 | 493 | `tests/runtime/tab-view-method-semantic-register-current-behavior.test.mjs` | 12 | `yes` | tab-view method semantic register is audit-only and scoped to current behavior |
-| 494 | `tests/runtime/test-lane-matrix-current-behavior.test.mjs` | 22 | `yes` | test lane matrix defines every required lane and npm script |
-| 495 | `tests/runtime/tracked-file-audit-coverage-current-behavior.test.mjs` | 6 | `yes` | tracked-file audit coverage documents the current git ls-files source universe |
-| 496 | `tests/runtime/tracked-file-obligation-index-current-behavior.test.mjs` | 208 | `yes` | tracked_file_obligation_index_is_audit_only_and_keeps_completion_open |
-| 497 | `tests/runtime/tracked-public-doc-claim-surface-current-behavior.test.mjs` | 5 | `yes` | tracked public doc claim surface is audit-only and fingerprint pinned |
-| 498 | `tests/runtime/ui-components-method-semantic-register-current-behavior.test.mjs` | 7 | `yes` | UI components method semantic register is audit-only and scoped to current behavior |
-| 499 | `tests/runtime/ui-components-portal-lifecycle-boundary-current-behavior.test.mjs` | 6 | `yes` | ui components portal lifecycle doc records audit-only boundary |
-| 500 | `tests/runtime/ui-row-list-mode-authority-current-behavior.test.mjs` | 12 | `yes` | UI row list-mode audit documents current row authority and future contract |
-| 501 | `tests/runtime/ui-settings-callable-current-behavior.test.mjs` | 3 | `yes` | UI/settings callable audit accounts for every current UI settings source file |
-| 502 | `tests/runtime/unified-mutation-contract-current-behavior.test.mjs` | 6 | `yes` | unified mutation contract audit documents required future fields and current split owners |
-| 503 | `tests/runtime/video-info-dom-cleanup-boundary-current-behavior.test.mjs` | 6 | `yes` | video-info DOM cleanup boundary audit is audit-only and source pinned |
-| 504 | `tests/runtime/video-sidebar-dom-cleanup-boundary-current-behavior.test.mjs` | 6 | `yes` | video sidebar DOM cleanup boundary audit is audit-only and source pinned |
-| 505 | `tests/runtime/visible-empty-runtime-active-current-behavior.test.mjs` | 9 | `yes` | visible-empty runtime-active audit documents split visible and compiled rule authority |
-| 506 | `tests/runtime/watch-endscreen-authority-current-behavior.test.mjs` | 5 | `yes` | watch end-screen audit documents supported JSON path and remaining DOM gaps |
-| 507 | `tests/runtime/watch-player-control-authority-current-behavior.test.mjs` | 9 | `yes` | watch/player control audit documents split authority and future contract |
-| 508 | `tests/runtime/watch-playlist-panel-dom-cleanup-boundary-current-behavior.test.mjs` | 6 | `yes` | watch playlist panel DOM cleanup boundary audit is audit-only and source pinned |
-| 509 | `tests/runtime/watchpage-embedded-post-renderer-current-behavior.test.mjs` | 8 | `yes` | watchpage.json is a Markdown plus embedded ytInitialData container, not direct JSON |
-| 510 | `tests/runtime/website-client-lifecycle-surface-current-behavior.test.mjs` | 6 | `yes` | website client lifecycle surface doc is audit-only and source pinned |
-| 511 | `tests/runtime/website-dynamic-route-method-semantic-register-current-behavior.test.mjs` | 4 | `yes` | website dynamic route method semantic register is audit-only and source pinned |
-| 512 | `tests/runtime/website-package-config-dependency-surface-current-behavior.test.mjs` | 6 | `yes` | website package config dependency surface doc is audit-only and fingerprint pinned |
-| 513 | `tests/runtime/website-remote-request-privacy-performance-boundary-current-behavior.test.mjs` | 5 | `yes` | website remote request privacy performance boundary doc is audit-only |
-| 514 | `tests/runtime/website-route-asset-surface-current-behavior.test.mjs` | 6 | `yes` | website route asset surface doc is audit-only and source pinned |
-| 515 | `tests/runtime/website-route-build-smoke-artifact-boundary-current-behavior.test.mjs` | 4 | `yes` | website route build smoke artifact boundary is audit-only and source pinned |
-| 516 | `tests/runtime/website-route-component-render-graph-current-behavior.test.mjs` | 7 | `yes` | website route component render graph doc is audit-only and source pinned |
-| 517 | `tests/runtime/whitelist-cache-hot-path-boundary-current-behavior.test.mjs` | 5 | `yes` | whitelist cache hot-path boundary records narrow dedupe and source pins |
-| 518 | `tests/runtime/whitelist-cache-spa-metric-packet-gate-current-behavior.test.mjs` | 5 | `yes` | whitelist/cache SPA metric packet gate is audit-only and source-backed |
-| 519 | `tests/runtime/whitelist-optimization-readiness-gap-matrix-current-behavior.test.mjs` | 6 | `yes` | whitelist optimization readiness gap matrix is audit-only and source-backed |
-| 520 | `tests/runtime/whitelist-pending-intake-no-work-contract-current-behavior.test.mjs` | 6 | `yes` | whitelist pending intake no-work contract is audit-only and source-backed |
-| 521 | `tests/runtime/xhr-comment-continuation-parity-boundary-current-behavior.test.mjs` | 9 | `yes` | XHR comment continuation parity slice is audit-only and source pinned |
-| 522 | `tests/runtime/xhr-no-work-boundary-current-behavior.test.mjs` | 6 | `yes` | XHR no-work boundary audit documents current behavior and future counters |
-| 523 | `tests/runtime/youtube-music-surface-identity-boundary-current-behavior.test.mjs` | 7 | `yes` | YouTube Music surface identity boundary audit is audit-only and source pinned |
-| 524 | `tests/runtime/ytm-browse-channel-list-item-current-behavior.test.mjs` | 8 | `yes` | YTM browse channel-list audit doc and fixture provenance are pinned |
-| 525 | `tests/runtime/ytm-compact-playlist-creator-authority-boundary-current-behavior.test.mjs` | 9 | `yes` | YTM compact playlist creator authority doc and fixture provenance are pinned |
-| 526 | `tests/runtime/ytm-logs-playlist-bottom-sheet-stale-identity-current-behavior.test.mjs` | 6 | `yes` | YTM logs playlist bottom-sheet stale identity doc and fixture provenance are pinned |
-| 527 | `tests/runtime/ytm-show-sheet-collaborator-roster-current-behavior.test.mjs` | 8 | `yes` | YTM showSheet collaborator audit doc and fixture provenance are pinned |
-| 528 | `tests/runtime/ytm-show-sheet-enrichment-handoff-current-behavior.test.mjs` | 5 | `yes` | YTM showSheet enrichment handoff doc and source facts are pinned |
-| 529 | `tests/runtime/ytm-show-sheet-injector-filter-logic-parity-current-behavior.test.mjs` | 7 | `yes` | YTM showSheet injector/filter-logic parity doc and source facts are pinned |
-| 530 | `tests/runtime/ytm-watch-player-dom-current-behavior.test.mjs` | 6 | `yes` | raw YTM watch/player DOM capture metadata and token counts are pinned |
-| 531 | `tests/runtime/ytm-watch-player-observer-timer-budget-current-behavior.test.mjs` | 6 | `yes` | YTM watch/player observer timer budget doc is audit-only and metric pinned |
-| 532 | `tests/runtime/ytm-watch-player-selected-row-side-effect-boundary-current-behavior.test.mjs` | 6 | `yes` | YTM selected-row side-effect boundary audit doc is audit-only and source pinned |
-| 533 | `tests/runtime/ytm-watch-player-whitelist-selected-row-mode-boundary-current-behavior.test.mjs` | 7 | `yes` | YTM whitelist selected-row mode audit doc is audit-only and source pinned |
-| 534 | `tests/runtime/ytm-watch-playlist-panel-json-parity-current-behavior.test.mjs` | 6 | `yes` | YTM watch playlist-panel JSON parity doc and reduced fixture are pinned |
-
+| 494 | `tests/runtime/test-lane-classifier-workflow-current-behavior.test.mjs` | 11 | `yes` | changed-lane runner is wired to the classifier and sequential lane execution |
+| 495 | `tests/runtime/test-lane-matrix-current-behavior.test.mjs` | 8 | `yes` | test lane matrix defines every required lane and npm script |
+| 496 | `tests/runtime/test-lane-visible-safety-current-behavior.test.mjs` | 8 | `yes` | smoke lane keeps release confidence broad but bounded |
+| 497 | `tests/runtime/test-lane-workflow-large-file-release-current-behavior.test.mjs` | 3 | `yes` | lane workflow files split before crossing the 1000-line boundary |
+| 498 | `tests/runtime/tracked-file-audit-coverage-current-behavior.test.mjs` | 6 | `yes` | tracked-file audit coverage documents the current git ls-files source universe |
+| 499 | `tests/runtime/tracked-file-obligation-index-current-behavior.test.mjs` | 208 | `yes` | tracked_file_obligation_index_is_audit_only_and_keeps_completion_open |
+| 500 | `tests/runtime/tracked-public-doc-claim-surface-current-behavior.test.mjs` | 5 | `yes` | tracked public doc claim surface is audit-only and fingerprint pinned |
+| 501 | `tests/runtime/ui-components-method-semantic-register-current-behavior.test.mjs` | 7 | `yes` | UI components method semantic register is audit-only and scoped to current behavior |
+| 502 | `tests/runtime/ui-components-portal-lifecycle-boundary-current-behavior.test.mjs` | 6 | `yes` | ui components portal lifecycle doc records audit-only boundary |
+| 503 | `tests/runtime/ui-row-list-mode-authority-current-behavior.test.mjs` | 12 | `yes` | UI row list-mode audit documents current row authority and future contract |
+| 504 | `tests/runtime/ui-settings-callable-current-behavior.test.mjs` | 3 | `yes` | UI/settings callable audit accounts for every current UI settings source file |
+| 505 | `tests/runtime/unified-mutation-contract-current-behavior.test.mjs` | 6 | `yes` | unified mutation contract audit documents required future fields and current split owners |
+| 506 | `tests/runtime/video-info-dom-cleanup-boundary-current-behavior.test.mjs` | 6 | `yes` | video-info DOM cleanup boundary audit is audit-only and source pinned |
+| 507 | `tests/runtime/video-sidebar-dom-cleanup-boundary-current-behavior.test.mjs` | 6 | `yes` | video sidebar DOM cleanup boundary audit is audit-only and source pinned |
+| 508 | `tests/runtime/visible-empty-runtime-active-current-behavior.test.mjs` | 9 | `yes` | visible-empty runtime-active audit documents split visible and compiled rule authority |
+| 509 | `tests/runtime/watch-endscreen-authority-current-behavior.test.mjs` | 5 | `yes` | watch end-screen audit documents supported JSON path and remaining DOM gaps |
+| 510 | `tests/runtime/watch-player-control-authority-current-behavior.test.mjs` | 9 | `yes` | watch/player control audit documents split authority and future contract |
+| 511 | `tests/runtime/watch-playlist-panel-dom-cleanup-boundary-current-behavior.test.mjs` | 6 | `yes` | watch playlist panel DOM cleanup boundary audit is audit-only and source pinned |
+| 512 | `tests/runtime/watchpage-embedded-post-renderer-current-behavior.test.mjs` | 8 | `yes` | watchpage.json is a Markdown plus embedded ytInitialData container, not direct JSON |
+| 513 | `tests/runtime/website-client-lifecycle-surface-current-behavior.test.mjs` | 6 | `yes` | website client lifecycle surface doc is audit-only and source pinned |
+| 514 | `tests/runtime/website-dynamic-route-method-semantic-register-current-behavior.test.mjs` | 4 | `yes` | website dynamic route method semantic register is audit-only and source pinned |
+| 515 | `tests/runtime/website-package-config-dependency-surface-current-behavior.test.mjs` | 6 | `yes` | website package config dependency surface doc is audit-only and fingerprint pinned |
+| 516 | `tests/runtime/website-remote-request-privacy-performance-boundary-current-behavior.test.mjs` | 5 | `yes` | website remote request privacy performance boundary doc is audit-only |
+| 517 | `tests/runtime/website-route-asset-surface-current-behavior.test.mjs` | 6 | `yes` | website route asset surface doc is audit-only and source pinned |
+| 518 | `tests/runtime/website-route-build-smoke-artifact-boundary-current-behavior.test.mjs` | 4 | `yes` | website route build smoke artifact boundary is audit-only and source pinned |
+| 519 | `tests/runtime/website-route-component-render-graph-current-behavior.test.mjs` | 7 | `yes` | website route component render graph doc is audit-only and source pinned |
+| 520 | `tests/runtime/whitelist-cache-hot-path-boundary-current-behavior.test.mjs` | 5 | `yes` | whitelist cache hot-path boundary records narrow dedupe and source pins |
+| 521 | `tests/runtime/whitelist-cache-spa-metric-packet-gate-current-behavior.test.mjs` | 5 | `yes` | whitelist/cache SPA metric packet gate is audit-only and source-backed |
+| 522 | `tests/runtime/whitelist-optimization-readiness-gap-matrix-current-behavior.test.mjs` | 6 | `yes` | whitelist optimization readiness gap matrix is audit-only and source-backed |
+| 523 | `tests/runtime/whitelist-pending-intake-no-work-contract-current-behavior.test.mjs` | 6 | `yes` | whitelist pending intake no-work contract is audit-only and source-backed |
+| 524 | `tests/runtime/xhr-comment-continuation-parity-boundary-current-behavior.test.mjs` | 9 | `yes` | XHR comment continuation parity slice is audit-only and source pinned |
+| 525 | `tests/runtime/xhr-no-work-boundary-current-behavior.test.mjs` | 6 | `yes` | XHR no-work boundary audit documents current behavior and future counters |
+| 526 | `tests/runtime/youtube-music-surface-identity-boundary-current-behavior.test.mjs` | 7 | `yes` | YouTube Music surface identity boundary audit is audit-only and source pinned |
+| 527 | `tests/runtime/ytm-browse-channel-list-item-current-behavior.test.mjs` | 8 | `yes` | YTM browse channel-list audit doc and fixture provenance are pinned |
+| 528 | `tests/runtime/ytm-compact-playlist-creator-authority-boundary-current-behavior.test.mjs` | 9 | `yes` | YTM compact playlist creator authority doc and fixture provenance are pinned |
+| 529 | `tests/runtime/ytm-logs-playlist-bottom-sheet-stale-identity-current-behavior.test.mjs` | 6 | `yes` | YTM logs playlist bottom-sheet stale identity doc and fixture provenance are pinned |
+| 530 | `tests/runtime/ytm-show-sheet-collaborator-roster-current-behavior.test.mjs` | 8 | `yes` | YTM showSheet collaborator audit doc and fixture provenance are pinned |
+| 531 | `tests/runtime/ytm-show-sheet-enrichment-handoff-current-behavior.test.mjs` | 5 | `yes` | YTM showSheet enrichment handoff doc and source facts are pinned |
+| 532 | `tests/runtime/ytm-show-sheet-injector-filter-logic-parity-current-behavior.test.mjs` | 7 | `yes` | YTM showSheet injector/filter-logic parity doc and source facts are pinned |
+| 533 | `tests/runtime/ytm-watch-player-dom-current-behavior.test.mjs` | 6 | `yes` | raw YTM watch/player DOM capture metadata and token counts are pinned |
+| 534 | `tests/runtime/ytm-watch-player-observer-timer-budget-current-behavior.test.mjs` | 6 | `yes` | YTM watch/player observer timer budget doc is audit-only and metric pinned |
+| 535 | `tests/runtime/ytm-watch-player-selected-row-side-effect-boundary-current-behavior.test.mjs` | 6 | `yes` | YTM selected-row side-effect boundary audit doc is audit-only and source pinned |
+| 536 | `tests/runtime/ytm-watch-player-whitelist-selected-row-mode-boundary-current-behavior.test.mjs` | 7 | `yes` | YTM whitelist selected-row mode audit doc is audit-only and source pinned |
+| 537 | `tests/runtime/ytm-watch-playlist-panel-json-parity-current-behavior.test.mjs` | 6 | `yes` | YTM watch playlist-panel JSON parity doc and reduced fixture are pinned |
 ## Quick Block Runtime-Test Family Snapshot
 
 The rows above contain 3 `tests/runtime/quick*.test.mjs` files with 24 source top-level test declarations: 3 have exact runtime-results ledger entries and 0 do not.
@@ -983,7 +985,7 @@ This snapshot is file-level audit provenance only. It does not approve runtime o
 
 ## Remaining Tail Runtime-Test Family Snapshot
 
-The rows above contain 181 runtime test files with 1556 source top-level test declarations: 181 have exact runtime-results ledger entries and 0 do not.
+The rows above contain 185 runtime test files with 1586 source top-level test declarations: 185 have exact runtime-results ledger entries and 0 do not.
 
 | Remaining tail runtime-test family | Files | Source top-level tests | Exact runtime-results rows | Missing exact runtime-results rows |
 | --- | ---: | ---: | ---: | ---: |
@@ -1149,6 +1151,7 @@ The rows above contain 181 runtime test files with 1556 source top-level test de
 | Subscription Import Request Lifecycle Boundary | 1 | 8 | 1 | 0 |
 | Surface Information Availability | 1 | 7 | 1 | 0 |
 | Synthetic Event Action Register | 1 | 5 | 1 | 0 |
+| Test Lane Workflow | 4 | 30 | 4 | 0 |
 | Unified Mutation Contract | 1 | 6 | 1 | 0 |
 | Visible Empty Runtime Active | 1 | 9 | 1 | 0 |
 | Whitelist Cache Hot Path Boundary | 1 | 5 | 1 | 0 |

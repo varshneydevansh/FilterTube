@@ -43,7 +43,7 @@ method semantic proof status.
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_VERIFICATION_OUTPUT_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md` | Defines rollback and unclaimed-surface fields for future verification output, but proves 0 persisted verification output files. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_PARITY_ROLLOUT_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md` | Defines measured/unclaimed parity rollout fields, but proves 0 parity rollout files and 0 rollout approvals. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_DIAGNOSTIC_PRIVACY_CONTRACT_CURRENT_BEHAVIOR_2026-05-24.md` | Requires diagnostic privacy and performance claim scope before rollout claims. |
-| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 69 JS/JSX/MJS files and 5,673 lexical callables still lack complete per-callable semantic proof before behavior changes. |
+| `docs/audit/FILTERTUBE_METHOD_SEMANTIC_PROOF_GAP_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | Proves 69 JS/JSX/MJS files and 5,681 lexical callables still lack complete per-callable semantic proof before behavior changes. |
 | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_COLLECTOR_PARITY_ROLLOUT_BOUNDARY_CURRENT_BEHAVIOR_2026-05-24.md` | Maps first-collector parity rollout risks, but proves 0 runtime collector parity rollout proofs approved. |
 | `docs/audit/FILTERTUBE_JSON_DOM_INVENTORY_TRUTH_AUDIT_2026-05-18.md` | Inventory rows remain route/surface evidence until executable fixtures, sibling proof, native sync proof, release proof, and public claim proof exist. |
 | `docs/audit/FILTERTUBE_NATIVE_RUNTIME_SYNC_AUTHORITY_AUDIT_2026-05-18.md` | Extension-side metric evidence remains separate from app sync, generated assets, native parity, release packages, and public claims. |
@@ -71,9 +71,9 @@ runtime unclaimed-surface approvals: 0
 runtime metric collector approvals: 0
 implementation-ready rollback/unclaimed rows: 0
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5673
+method semantic proof gap lexical callables covered: 5681
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5673
+lexical callables requiring semantic proof before behavior changes: 5681
 expected runtime audit tests: 4457
 expected runtime audit pass: 4457
 expected runtime audit fail: 0
@@ -219,7 +219,7 @@ bind rollback and unclaimed-surface blockers to the missing collector
 verification output approval layer. The addendum pins 12 collector verification
 output approval boundary rows, 12 rollback/unclaimed rows covered, 12
 verification output contract rows covered, 69 method semantic proof gap files
-covered, 5,673 lexical callables still requiring semantic proof, 0 files with
+covered, 5,681 lexical callables still requiring semantic proof, 0 files with
 complete per-callable semantic proof, 0 runtime rollback approvals, 0 runtime
 unclaimed-surface approvals, 0 runtime collector verification output
 approvals, 0 committed verification output files, 0 implementation-ready
@@ -235,7 +235,7 @@ prove this rollback/unclaimed boundary is not runtime rollback or
 unclaimed-surface approval. The addendum pins 12 collector rollback/unclaimed
 approval boundary rows, 12 rollback/unclaimed rows covered, 12 collector
 verification output approval rows covered, 69 method semantic proof gap files
-covered, 5,673 lexical callables still requiring semantic proof, 0 files with
+covered, 5,681 lexical callables still requiring semantic proof, 0 files with
 complete per-callable semantic proof, 0 runtime rollback approvals, 0 runtime
 unclaimed-surface approvals, 0 runtime collector rollback/unclaimed approvals,
 0 committed rollback/unclaimed artifacts, 0 implementation-ready collector

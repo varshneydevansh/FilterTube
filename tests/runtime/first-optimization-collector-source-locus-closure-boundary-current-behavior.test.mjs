@@ -172,9 +172,9 @@ test('collector source-locus closure rows counts and fields stay pinned', () => 
   assert.match(doc, /committed metric foundation artifact files: 0/);
   assert.match(doc, /implementation-ready collector source-locus closure rows: 0/);
   assert.match(doc, /method semantic proof gap files covered: 69/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5673/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5681/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5673/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5681/);
   assert.match(doc, /expected runtime audit tests: 4457/);
   assert.match(doc, /expected runtime audit pass: 4457/);
   assert.match(doc, /expected runtime audit fail: 0/);
@@ -206,7 +206,7 @@ test('collector source-locus closure is backed by source-locus and collector NO-
   assert.match(sourceOwnerApproval, /runtime source-owner approvals: 0/);
   assert.match(sourceOwnerApproval, /method semantic proof gap files covered: 69/);
   assert.match(methodGap, /files with lexical accounting: 69/);
-  assert.match(methodGap, /repo-wide lexical callables: 5673/);
+  assert.match(methodGap, /repo-wide lexical callables: 5681/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
   assert.match(sourceLocusCallable, /implementation-ready source-locus callable rows: 0/);
   assert.match(sourceLocusTeardown, /implementation-ready source-locus teardown rows: 0/);

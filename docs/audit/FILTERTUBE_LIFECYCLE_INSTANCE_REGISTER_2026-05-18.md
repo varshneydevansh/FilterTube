@@ -646,9 +646,9 @@ Mermaid listener add/remove parity flow diagram: present
 
 ```mermaid
 flowchart TD
-  A["288 addEventListener installs"] --> B["9 removeEventListener rows"]
-  B --> C["9 capture-equivalent add/remove pairs"]
-  B --> D["8 exact option-shape pairs"]
+  A["292 addEventListener installs"] --> B["13 removeEventListener rows"]
+  B --> C["13 capture-equivalent add/remove pairs"]
+  B --> D["12 exact option-shape pairs"]
   B --> E["1 capture-equivalent option-shape mismatch"]
   B --> F["0 orphan remove rows"]
   A --> G["279 install-minus-remove delta"]

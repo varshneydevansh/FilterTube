@@ -348,9 +348,9 @@ test('metric foundation contract coverage rows counts and field names stay pinne
   assert.match(doc, /collector fixture provenance rows covered: 12/);
   assert.match(doc, /collector parity rollout rows covered: 12/);
   assert.match(doc, /method semantic proof gap files covered: 69/);
-  assert.match(doc, /method semantic proof gap lexical callables covered: 5673/);
+  assert.match(doc, /method semantic proof gap lexical callables covered: 5681/);
   assert.match(doc, /files with complete per-callable semantic proof: 0/);
-  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5673/);
+  assert.match(doc, /lexical callables requiring semantic proof before behavior changes: 5681/);
   assert.match(doc, /expected runtime audit tests: 4457/);
   assert.match(doc, /expected runtime audit pass: 4457/);
   assert.match(doc, /expected runtime audit fail: 0/);
@@ -368,16 +368,16 @@ test('metric foundation contract coverage rows counts and field names stay pinne
   assert.match(doc, /metric foundation artifact readiness from closure: NO-GO/);
   assert.match(doc, /## Runtime Count Reconciliation Addendum - 2026-05-27/);
   assert.match(doc, /legacy metric contract expected tests: 4457/);
-  assert.match(doc, /current generated runtime test declarations: 4719/);
+  assert.match(doc, /current generated runtime test declarations: 4731/);
   assert.match(doc, /latest historical full runtime pass count observed: 4663/);
-  assert.match(doc, /current broad runtime audit snapshot: 4719 tests, 4491 pass, 228 fail/);
-  assert.match(doc, /current broad runtime proof for generated 4719 declaration set: NO-GO/);
+  assert.match(doc, /current broad runtime audit snapshot: 4731 tests, 4580 pass, 151 fail/);
+  assert.match(doc, /current broad runtime proof for generated 4731 declaration set: NO-GO/);
   assert.match(doc, /count reconciliation status for metric foundation: BLOCKED/);
   assert.match(doc, /runtime behavior changed by this addendum: no/);
   assert.match(doc, /legacy `4457` rows are historical metric-contract snapshot evidence/);
   assert.match(doc, /not\s+current full-suite proof or optimization approval/);
   assert.ok(doc.includes(runtimeTestProvenanceIndexPath));
-  assert.equal(sourceTopLevelRuntimeTestDeclarationsFromIndex(), 4719);
+  assert.equal(sourceTopLevelRuntimeTestDeclarationsFromIndex(), 4731);
 
   for (const field of requiredCoverageFields) {
     assert.ok(doc.includes(field), `missing contract coverage field ${field}`);
@@ -421,15 +421,15 @@ test('metric foundation contract coverage is backed by every artifact contract a
   assert.match(fixtureProvenance, /collector fixture provenance rows implementation-ready: 0/);
   assert.match(parityRollout, /collector parity rollout rows implementation-ready: 0/);
   assert.match(methodGap, /tracked JS\/JSX\/MJS files: 69/);
-  assert.match(methodGap, /repo-wide lexical callables: 5673/);
+  assert.match(methodGap, /repo-wide lexical callables: 5681/);
   assert.match(methodGap, /files with complete per-callable semantic proof: 0/);
-  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5673/);
+  assert.match(methodGap, /lexical callables requiring semantic proof before behavior changes: 5681/);
   assert.match(runtimeResults, /Historical 2026-05-17 ledger snapshot:[\s\S]*tests 4457/);
   assert.match(runtimeResults, /Historical 2026-05-17 ledger snapshot:[\s\S]*pass 4457/);
   assert.match(runtimeResults, /fail 0/);
-  assert.match(runtimeResults, /current generated source top-level declarations: 4719/);
+  assert.match(runtimeResults, /current generated source top-level declarations: 4731/);
   assert.match(runtimeResults, /latest historical full runtime pass evidence: current 4663\/4663 pass, 0 fail, 83\.213s/);
-  assert.match(runtimeResults, /current broad runtime proof: 4719 tests, 4491 pass, 228 fail/);
+  assert.match(runtimeResults, /current broad runtime proof: 4731 tests, 4580 pass, 151 fail/);
   assert.match(runtimeResults, /stored TAP output: \/private\/tmp\/filtertube-runtime-full-after-lifecycle-convergence\.tap/);
   assert.match(runtimeResults, /runtime-results ledger completion authority: NO-GO/);
 
@@ -512,7 +512,7 @@ test('metric foundation contract coverage gate is linked from audit ledgers and 
   }
 
   assert.match(runtimeResults, /Historical 2026-05-17 ledger snapshot:[\s\S]*tests 4457/);
-  assert.match(runtimeResults, /current generated source top-level declarations: 4719/);
+  assert.match(runtimeResults, /current generated source top-level declarations: 4731/);
   assert.match(runtimeResults, /runtime-results ledger completion authority: NO-GO/);
   assert.match(runtimeResults, /First optimization metric foundation contract coverage gate addendum:[\s\S]*69 method semantic proof gap files covered/);
   assert.match(activeGoal, /First optimization metric foundation contract coverage gate addendum:[\s\S]*69 method semantic proof gap files covered/);

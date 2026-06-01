@@ -512,19 +512,19 @@ unauthorized sender.
 The runtime fixture results ledger now records its own index-completeness gap,
 and a generated companion index provides complete file-level enumeration:
 
-- `docs/audit/FILTERTUBE_RUNTIME_FIXTURE_RESULTS_2026-05-17.md` reports 534
-  current top-level `tests/runtime/*.test.mjs` files, 534 exact backticked test-path
+- `docs/audit/FILTERTUBE_RUNTIME_FIXTURE_RESULTS_2026-05-17.md` reports 537
+  current top-level `tests/runtime/*.test.mjs` files, 537 exact backticked test-path
   entries in that ledger, and 0 top-level runtime test files without exact
   backticked entries there.
 - `docs/audit/FILTERTUBE_RUNTIME_TEST_FILE_PROVENANCE_INDEX_CURRENT_BEHAVIOR_2026-05-25.md`
-  provides 534 runtime test file rows, 4719 source top-level test declarations,
-  534 `yes` rows for exact runtime-results entries, and 0 `no` rows for
+  provides 537 runtime test file rows, 4731 source top-level test declarations,
+  537 `yes` rows for exact runtime-results entries, and 0 `no` rows for
   files missing exact runtime-results entries.
 - `tests/runtime/audit-completion-gap-register-current-behavior.test.mjs`
   computes those counts from the current worktree and proves the ledger, the
   generated index, and this register agree.
 - The generated index now has no missing exact runtime-results rows:
-  0 of 534 rows remain `no`, and the missing family priority table records
+  0 of 537 rows remain `no`, and the missing family priority table records
   `None remaining` 0. This closes the runtime fixture ledger file-level provenance gap before optimization work.
 - The generated index keeps exact-row-complete prefix-family snapshots for
   `tests/runtime/json*.test.mjs` files,
@@ -589,7 +589,7 @@ The first-optimization metric foundation gate now has a separate runtime-count
 reconciliation blocker. This top-level completion register treats that blocker
 as central audit evidence: old metric contract rows that still say `4457`
 cannot prove current full-suite coverage after the runtime test index moved to
-`4719` source top-level declarations.
+`4731` source top-level declarations.
 
 ```text
 legacy first-optimization metric contract count
@@ -601,7 +601,7 @@ expected runtime audit tests: 4457
 current runtime test provenance index
         |
         v
-source top-level test declarations counted: 4719
+source top-level test declarations counted: 4731
         |
         v
 latest full runtime evidence: stale after current source count changed
@@ -613,7 +613,7 @@ count-reconciled optimization readiness: NO-GO
 ```mermaid
 flowchart TD
   A["Legacy metric contract rows"] --> B["4457 expected tests"]
-  C["Generated runtime test provenance index"] --> D["4719 source test declarations"]
+  C["Generated runtime test provenance index"] --> D["4731 source test declarations"]
   E["Latest full runtime suite"] --> F["stale after current source count changed"]
   B --> G{"Does this prove current completion?"}
   D --> G
@@ -624,8 +624,8 @@ flowchart TD
 | Reconciliation evidence | Artifact | Current count | Completion effect |
 | --- | --- | --- | --- |
 | Legacy first-optimization metric contract rows | `docs/audit/FILTERTUBE_FIRST_OPTIMIZATION_METRIC_FOUNDATION_CONTRACT_COVERAGE_GATE_CURRENT_BEHAVIOR_2026-05-24.md` | `4457` expected tests and `4457` expected pass. | Historical snapshot only; not current full-suite proof. |
-| Generated runtime test provenance | `docs/audit/FILTERTUBE_RUNTIME_TEST_FILE_PROVENANCE_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | `4719` source top-level test declarations. | Current file-level runtime-test declaration count. |
-| Latest historical full runtime evidence | `node --test --test-reporter=tap tests/runtime/*.test.mjs`; recorded in `docs/audit/FILTERTUBE_RELEASE_REGRESSION_LAG_AND_BLOCKLIST_FIX_2026-05-26.md` | Current `4663/4663` pass, `0` fail, `83.213s`. | Latest historical full-suite assertion proof after the 3 lifecycle-convergence proof tests were added; the current broad 4719-test audit remains `NO-GO`. |
+| Generated runtime test provenance | `docs/audit/FILTERTUBE_RUNTIME_TEST_FILE_PROVENANCE_INDEX_CURRENT_BEHAVIOR_2026-05-25.md` | `4731` source top-level test declarations. | Current file-level runtime-test declaration count. |
+| Latest historical full runtime evidence | `node --test --test-reporter=tap tests/runtime/*.test.mjs`; recorded in `docs/audit/FILTERTUBE_RELEASE_REGRESSION_LAG_AND_BLOCKLIST_FIX_2026-05-26.md` | Current `4663/4663` pass, `0` fail, `83.213s`. | Latest historical full-suite assertion proof after the 3 lifecycle-convergence proof tests were added; the current broad 4731-test audit remains `NO-GO`. |
 | Completion decision | This register. | Count reconciliation status: `BLOCKED`. | No first-optimization, JSON-first promotion, whitelist optimization, or broad audit completion approval. |
 
 Current count reconciliation boundary:
@@ -633,7 +633,7 @@ Current count reconciliation boundary:
 ```text
 count-reconciliation proof slices: 3
 legacy metric contract expected tests: 4457
-current generated runtime test declarations: 4719
+current generated runtime test declarations: 4731
 latest historical full runtime pass count observed: 4663
 latest historical full runtime pass freshness: 2026-05-30 full runtime rerun covers 4663 generated declarations before later audit-only declarations expanded the source count
 first-optimization count reconciliation status: BLOCKED
@@ -667,7 +667,7 @@ excluding this register and its verifier found the following footprint:
 ```text
 census scope: docs/audit markdown plus tests/runtime modules
 census exclusions: this gap register and its verifier
-census files scanned: 1087
+census files scanned: 1090
 legacy runtime-count token 4457 occurrences: 1230
 legacy runtime-count token 4457 files: 167
 current runtime-count token 4660 occurrences: 11
@@ -690,7 +690,7 @@ Interpretation:
 
 | Census item | Current value | Completion effect |
 | --- | ---: | --- |
-| Files scanned outside this self-referential register/verifier | 1087 | Wide enough to quantify audit-surface drift without self-counting this addendum. |
+| Files scanned outside this self-referential register/verifier | 1090 | Wide enough to quantify audit-surface drift without self-counting this addendum. |
 | Legacy `4457` occurrences | 1230 | The stale expected-test count is broad historical contract wording, not current completion proof. |
 | Files containing legacy `4457` | 167 | Future count reconciliation is a multi-document audit cleanup, not a single-row fix. |
 | Current `4660` occurrences | 11 | Recalculated after the fresh 2026-05-30 full runtime rerun matched the current generated declaration count. |
@@ -1140,8 +1140,8 @@ negative fixture status.
 
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now carries a
 source-derived install/teardown imbalance addendum with ASCII and Mermaid flow
-diagrams. It classifies all 510 lifecycle instances into 460 install/schedule
-sites and 50 explicit teardown/clear/cancel sites, with source-family splits for
+diagrams. It classifies all 524 lifecycle instances into 469 install/schedule
+sites and 55 explicit teardown/clear/cancel sites, with source-family splits for
 content runtime, extension UI/background, vendor bundles, generated output, and
 website components.
 
@@ -1156,7 +1156,7 @@ proof, page-lifetime reason, and negative no-work fixture status.
 
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now carries a
 source-derived event-listener option-shape addendum with ASCII and Mermaid flow
-diagrams. It classifies all 288 current `addEventListener` installs into 232
+diagrams. It classifies all 292 current `addEventListener` installs into 236
 omitted-option listeners, 23 boolean capture listeners, 30 object-option
 listeners, 1 explicit bubble listener, and 2 generated expression/identifier
 option listeners.
@@ -1171,9 +1171,9 @@ positive/negative fixtures.
 
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now carries a
 source-derived event-listener event-type addendum with ASCII and Mermaid flow
-diagrams. It classifies all 288 current `addEventListener` installs into 114
-click listeners, 55 change listeners, 20 input listeners, 14 keydown listeners,
-8 `DOMContentLoaded` listeners, 1 `ended` media listener, 72 other literal
+diagrams. It classifies all 292 current `addEventListener` installs into 114
+click listeners, 57 change listeners, 20 input listeners, 14 keydown listeners,
+8 `DOMContentLoaded` listeners, 1 `ended` media listener, 74 other literal
 event listeners, 4 non-literal event expressions, and 0 missing event
 arguments.
 
@@ -1187,8 +1187,8 @@ engagement side-effect status, teardown reason, and positive/negative fixtures.
 
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now carries a
 source-derived event-listener target addendum with ASCII and Mermaid flow
-diagrams. It classifies all 288 current `addEventListener` installs into 203
-local element targets, 17 optional local element targets, 39 document targets,
+diagrams. It classifies all 292 current `addEventListener` installs into 205
+local element targets, 17 optional local element targets, 41 document targets,
 19 window targets, 8 vendor transport targets, and 2 generated shell targets.
 
 This strengthens the listener ownership, native menu, page-global, generated
@@ -1202,11 +1202,11 @@ fixtures.
 
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now carries a
 source-derived event-target matrix addendum with ASCII and Mermaid flow
-diagrams. It joins all 288 `addEventListener` installs into target/event pairs,
+diagrams. It joins all 292 `addEventListener` installs into target/event pairs,
 including 10 document click pairs, 7 document `DOMContentLoaded` pairs, 3
 document keydown pairs, 4 document pointer/mouse pairs, 4 window message pairs,
 2 window route pairs, 9 window scroll/resize/orientation pairs, 1 window
-storage/visibility pair, 104 local click pairs, 68 local change/input/keydown
+storage/visibility pair, 104 local click pairs, 70 local change/input/keydown
 pairs, 8 vendor transport lifecycle pairs, and 2 generated shell nonliteral
 pairs.
 
@@ -1221,9 +1221,10 @@ positive/negative fixtures.
 
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now carries a
 source-derived observer observe target addendum with ASCII and Mermaid flow
-diagrams. It classifies all 17 current tracked `.observe(...)` activation calls
+diagrams. It classifies all 21 current tracked `.observe(...)` activation calls
 into 4 card/row targets, 3 `document.body` targets, 4 dropdown targets, 3
-generic target expressions, 2 panel/rail targets, and 1 select target.
+generic target expressions, 2 panel/rail targets, 1 select target, and 4 other
+website targets.
 
 This strengthens the runtime observer, native dropdown/menu, quick-block,
 DOM fallback, right-rail/playlist whitelist, dashboard UI component, and
@@ -1237,14 +1238,16 @@ and positive/negative fixtures.
 
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now carries a
 source-derived observer observe option-shape addendum with ASCII and Mermaid
-flow diagrams. It classifies all 17 current tracked `.observe(...)` activation
+flow diagrams. It classifies all 21 current tracked `.observe(...)` activation
 calls by option shape: 9 `childList + subtree` observers, 1 `childList`-only
-observer, 2 no-option visibility observers, and 5 attribute-filter observers.
+observer, 5 no-option visibility/website observers, and 5 attribute-filter
+observers.
 
 The same evidence pins 2 style/hidden attribute filters, 1 `aria-hidden`
 attribute filter, 1 `disabled` attribute filter, 1 collaborator identity
-attribute filter, 16 content-runtime observer observe option rows, and 1
-extension UI/background observer observe option row. This proves option shape
+attribute filter, 16 content-runtime observer observe option rows, 1
+extension UI/background observer observe option row, and 4 website component
+observer observe option rows. This proves option shape
 only; it does not prove wake-frequency safety, subtree necessity, or teardown
 authority.
 
@@ -1261,11 +1264,12 @@ fixtures.
 
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now carries a
 source-derived observer disconnect addendum with ASCII and Mermaid flow
-diagrams. It classifies all 10 current tracked observer `.disconnect()` and
-optional-chain `.disconnect?.()` invocations into 5 local `observer` variable
+diagrams. It classifies all 14 current tracked observer `.disconnect()` and
+optional-chain `.disconnect?.()` invocations into 6 local `observer` variable
 disconnects, 2 dropdown close observer disconnects, 1 dropdown discovery
-observer disconnect, 1 collaborator dialog observer disconnect, and 1 playlist
-fallback row observer state disconnect.
+observer disconnect, 1 collaborator dialog observer disconnect, 1 playlist
+fallback row observer state disconnect, and 3 other website observer
+disconnects.
 
 This strengthens the runtime observer teardown, native dropdown/menu,
 collaborator dialog, playlist fallback popover, DOM fallback mutation,
@@ -1279,17 +1283,17 @@ page-lifetime reason, no-work budget, and positive/negative fixtures.
 
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now carries a
 source-derived observer observe/release parity addendum with ASCII and Mermaid
-flow diagrams. It joins all 17 current tracked `.observe(...)` activation rows
-to 11 release rows: 10 `.disconnect(...)` or `.disconnect?.(...)` rows and 1
+flow diagrams. It joins all 21 current tracked `.observe(...)` activation rows
+to 15 release rows: 14 `.disconnect(...)` or `.disconnect?.(...)` rows and 1
 `.unobserve(...)` row. The current row-count delta is 6 observe rows over
 release rows.
 
-The same evidence pins 10 local `observer` observe rows, 2 local `obs` observe
-rows, 5 exact named observer observe rows, 4 exact named observer observe rows
+The same evidence pins 11 local `observer` observe rows, 2 local `obs` observe
+rows, 8 exact named observer observe rows, 7 exact named observer observe rows
 with release, 1 exact named observer observe row without release, 1
 `prefetchObserver.observe(card)` row without direct release, a content-runtime
 observe/release delta of 5, and an extension UI/background observe/release
-delta of 1.
+delta of 1 plus a website component observe/release delta of 0.
 
 This strengthens the runtime observer, YouTube SPA lag, menu/dropdown,
 quick-block, collaborator dialog, prefetch/whitelist, dashboard UI component,
@@ -1303,14 +1307,14 @@ positive/negative fixtures.
 
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now carries a
 source-derived observer constructor/observe type parity addendum with ASCII and
-Mermaid flow diagrams. It compares all 17 observer constructor rows to all 17
-`.observe(...)` activation rows by observer type: 15 `MutationObserver`
-constructor rows, 2 `IntersectionObserver` constructor rows, 15 mutation
+Mermaid flow diagrams. It compares all 20 observer constructor rows to all 21
+`.observe(...)` activation rows by observer type: 16 `MutationObserver`
+constructor rows, 4 `IntersectionObserver` constructor rows, 19 mutation
 observer observe rows, and 2 intersection observer observe rows.
 
-The current constructor-minus-observe delta is 0 overall, 0 for mutation
-observer rows, 0 for intersection observer rows, 0 for content-runtime rows,
-and 0 for extension UI/background rows. This proves count/type parity only; it
+The current constructor-minus-observe delta is -1 overall, -3 for mutation
+observer rows, 2 for intersection observer rows, 0 for content-runtime rows,
+0 for extension UI/background rows, and -1 for website component rows. This proves count/type parity only; it
 does not prove teardown authority or no-work safety for any observer owner.
 
 This strengthens the runtime observer, YouTube SPA lag, menu/dropdown,
@@ -1325,14 +1329,15 @@ and positive/negative fixtures.
 
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now carries a
 source-derived observer constructor callback identity addendum with ASCII and
-Mermaid flow diagrams. It classifies all 17 current `new MutationObserver(...)`
-and `new IntersectionObserver(...)` callback arguments into 17 inline arrow
+Mermaid flow diagrams. It classifies all 20 current `new MutationObserver(...)`
+and `new IntersectionObserver(...)` callback arguments into 20 inline arrow
 callbacks, 0 identifier callbacks, and 0 missing callbacks.
 
 The same evidence pins 9 observer callbacks with a `mutations` parameter, 2
-observer callbacks with an `entries` parameter, 6 observer callbacks with no
-parameter, 16 content-runtime observer constructor callbacks, and 1 extension
-UI/background observer constructor callback. This proves callback shape only;
+observer callbacks with an `entries` parameter, 7 observer callbacks with no
+parameter, 2 other callback-parameter shapes, 16 content-runtime observer
+constructor callbacks, 1 extension UI/background observer constructor callback,
+and 3 website component observer constructor callbacks. This proves callback shape only;
 it does not prove callback side-effect safety, wake frequency, or teardown
 authority.
 
@@ -1413,13 +1418,14 @@ scheduled side effect, native/menu impact, and positive/negative fixtures.
 
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now carries a
 source-derived explicit teardown handle addendum with ASCII and Mermaid flow
-diagrams. It classifies all 50 current explicit teardown rows into 9
-`removeEventListener` rows, 34 `clearTimeout` rows, 4 `clearInterval` rows, 3
-`cancelAnimationFrame` rows, 5 listener document targets, 2 listener window
-targets, 2 generated shell listener targets, 12 local timeout id handles, 14
+diagrams. It classifies all 55 current explicit teardown rows into 13
+`removeEventListener` rows, 34 `clearTimeout` rows, 4 `clearInterval` rows, 4
+`cancelAnimationFrame` rows, 7 listener document targets, 2 listener window
+targets, 2 generated shell listener targets, 2 other listener targets, 12 local timeout id handles, 14
 named timeout state handles, 8 property-held timeout handles, 2 engine-check
 interval handles, 1 warmup interval handle, 1 dashboard rotation interval
-handle, 2 profile dropdown frame handles, and 1 generic position frame handle.
+handle, 2 profile dropdown frame handles, 1 generic position frame handle, and
+1 other frame handle.
 
 This strengthens the listener teardown, timer clear, interval clear, frame
 cancel, generated shell freshness, stale-route, recycled-node, no-work budget,
@@ -1433,11 +1439,11 @@ stale-route policy, and positive/negative fixtures.
 
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now carries a
 source-derived listener callback identity addendum with ASCII and Mermaid flow
-diagrams. It classifies all 288 current `addEventListener` callback arguments
-into 252 inline arrow callbacks, 33 identifier callback references, 1 member
+diagrams. It classifies all 292 current `addEventListener` callback arguments
+into 252 inline arrow callbacks, 37 identifier callback references, 1 member
 callback reference, 2 generated expression callbacks, 74 content-runtime
 callbacks, 201 extension UI/background callbacks, 2 generated-output
-callbacks, 8 vendor-bundle callbacks, and 3 website-component callbacks.
+callbacks, 8 vendor-bundle callbacks, and 7 website-component callbacks.
 
 This strengthens the listener teardown, duplicate-install, closure-capture,
 native menu, quick-block/menu, SPA route, settings/list-mode, generated shell,
@@ -1451,15 +1457,15 @@ reason, duplicate-install proof, and positive/negative fixtures.
 
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now carries a
 source-derived listener add/remove parity addendum with ASCII and Mermaid flow
-diagrams. It joins all 288 current `addEventListener` install rows and 9
+diagrams. It joins all 292 current `addEventListener` install rows and 13
 current `removeEventListener` teardown rows by target, event, callback, and
-capture semantics. It records a 279 install-minus-remove delta, 9
-capture-equivalent remove pairs, 8 exact option-shape remove pairs, 1
+capture semantics. It records a 279 install-minus-remove delta, 13
+capture-equivalent remove pairs, 12 exact option-shape remove pairs, 1
 capture-equivalent option-shape mismatch pair, 0 remove rows without a
 capture-equivalent add pair, 51 page-global listener installs without explicit
 remove, 252 inline listener installs without remove handle, 70 content-runtime
 add/remove delta, 201 extension UI/background delta, 0 generated-output delta,
-8 vendor-bundle delta, 0 website-component delta, 5 document listener removes,
+8 vendor-bundle delta, 0 website-component delta, 7 document listener removes,
 2 window listener removes, and 2 generated shell listener removes.
 
 This strengthens listener teardown, duplicate-install, page-lifetime listener,
@@ -1475,7 +1481,7 @@ behavior, native menu impact, and positive/negative fixtures.
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now carries a
 source-derived content-runtime page-global listener boundary addendum with
 ASCII and Mermaid flow diagrams. It isolates all 42 current content-runtime
-`document`/`window` listener rows from the broader 288-listener inventory.
+`document`/`window` listener rows from the broader 292-listener inventory.
 
 The same evidence pins 32 document listener rows, 10 window listener rows, 8
 source files, 12 quick-block global rows, 3 native menu global rows, 1 Kids
@@ -1539,11 +1545,12 @@ impact, trust boundary, and page-lifetime or transient-remove justification.
 
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now carries a
 source-derived animation frame schedule addendum with ASCII and Mermaid flow
-diagrams. It classifies all 29 current `requestAnimationFrame` schedules into
-2 assigned positioning frame handles, 15 inline anonymous frame callbacks, 5
+diagrams. It classifies all 31 current `requestAnimationFrame` schedules into
+2 assigned positioning frame handles, 15 inline anonymous frame callbacks, 7
 identifier callback frames, 5 inline `scrollIntoView` frames, 2 inline timeout
 hop frames, 13 content-runtime frame schedules, 16 extension UI/background
-frame schedules, 1 `positionRaf` assignment, and 1
+frame schedules, 2 website component frame schedules, 1 `positionRaf`
+assignment, and 1
 `profileDropdownPositionRaf` assignment.
 
 This strengthens the frame scheduling, dashboard scroll timing, profile
@@ -1559,17 +1566,17 @@ stored, and positive/negative no-work fixtures.
 
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now carries a
 source-derived animation frame schedule/cancel parity addendum with ASCII and
-Mermaid flow diagrams. It joins all 29 current `requestAnimationFrame`
-schedule rows and 3 current `cancelAnimationFrame` rows by direct lexical
-handle where one exists. It records a 26 frame schedule-minus-cancel delta, 27
+Mermaid flow diagrams. It joins all 31 current `requestAnimationFrame`
+schedule rows and 4 current `cancelAnimationFrame` rows by direct lexical
+handle where one exists. It records a 27 frame schedule-minus-cancel delta, 29
 frame schedules without assigned handles, 2 frame schedules with assigned
-handles, 3 `cancelAnimationFrame` rows with direct schedule handles, 0
-`cancelAnimationFrame` rows without direct schedule handles, 2 handled frame
+handles, 3 `cancelAnimationFrame` rows with direct schedule handles, 1
+`cancelAnimationFrame` row without direct schedule handle, 2 handled frame
 schedule rows with cancel handles, 0 handled frame schedule rows without
 cancel handles, 0 distinct scheduled frame handles without cancel, 13
 content-runtime frame schedule/cancel delta, 13 extension UI/background frame
-schedule/cancel delta, 1 `positionRaf` cancel row, and 2
-`profileDropdownPositionRaf` cancel rows.
+schedule/cancel delta, 1 `positionRaf` cancel row, 2
+`profileDropdownPositionRaf` cancel rows, and 1 `frameId` website cancel row.
 
 This strengthens frame lifecycle, unretained one-shot frame scheduling,
 profile dropdown positioning, shared UI positioning, fallback scan cadence,
@@ -1632,15 +1639,18 @@ freshness fixtures.
 
 `docs/audit/FILTERTUBE_LIFECYCLE_INSTANCE_REGISTER_2026-05-18.md` now carries a
 source-derived website component lifecycle boundary addendum with ASCII and
-Mermaid flow diagrams. It classifies all 9 current website component lifecycle
-rows into 5 scene scheduler lifecycle rows and 4 theme sync lifecycle rows.
+Mermaid flow diagrams. It classifies all 23 current website component lifecycle
+rows into 14 website other lifecycle rows, 5 scene scheduler lifecycle rows,
+and 4 theme sync lifecycle rows.
 
-The same evidence pins 4 install-or-schedule rows, 5 explicit-teardown rows, 3
-website component `addEventListener` rows, 3 website component
+The same evidence pins 13 install-or-schedule rows, 10 explicit-teardown rows, 7
+website component `addEventListener` rows, 7 website component
 `removeEventListener` rows, 1 website component `setTimeout` row, 2 website
-component `clearTimeout` rows, 2 lifecycle source files, 2 scene scheduler
-install-or-schedule rows, 3 scene scheduler explicit-teardown rows, 2 theme
-sync install-or-schedule rows, and 2 theme sync explicit-teardown rows.
+component `clearTimeout` rows, 2 website component `requestAnimationFrame`
+rows, 1 website component `cancelAnimationFrame` row, 4 lifecycle source files,
+14 website other lifecycle rows, 2 scene scheduler install-or-schedule rows, 3
+scene scheduler explicit-teardown rows, 2 theme sync install-or-schedule rows,
+and 2 theme sync explicit-teardown rows.
 
 This strengthens website component, public-site lifecycle, route hydration,
 localStorage/theme sync, timer budget, deploy artifact, public-claim,
@@ -1945,8 +1955,8 @@ and runtime behavior changes at `NO-GO`.
 2026-05-30 content-filter convergence proof-test drift:
 
 ```text
-current source top-level test declarations counted: 4719
-current runtime source declaration phrase: 4719 source top-level test declarations
+current source top-level test declarations counted: 4731
+current runtime source declaration phrase: 4731 source top-level test declarations
 new declarations since previous full runtime proof: 4
 latest full runtime proof after lifecycle convergence additions: 4663/4663 pass, 0 fail, 83.213s
 content-filter convergence proof-test freshness: focused rerun required before using this slice
@@ -1957,7 +1967,7 @@ The four added declarations are audit-only proof tests for the content-filter
 route/surface convergence, active-goal continuation, audit-completion gap, and
 objective-coverage ledger rows. They update the generated provenance index to
 the current source count but do not convert the earlier 4663-test full-suite
-proof into current full-suite proof for the larger 4719-test source set.
+proof into current full-suite proof for the larger 4731-test source set.
 
 2026-05-30 full runtime freshness closure after audit-drift repair:
 
@@ -1969,10 +1979,10 @@ drift repair documents: docs/audit/FILTERTUBE_NATIVE_RUNTIME_SYNC_METHOD_SEMANTI
 focused drift repair proof: 10/10 pass
 fresh full runtime command: node --test --test-reporter=dot tests/runtime/*.test.mjs
 latest broad runtime audit command: npm run audit:runtime
-latest broad runtime audit result: 4719 tests, 4491 pass, 228 fail
-current runtime test files: 534
-current source top-level test declarations counted: 4719
-current broad runtime proof for generated 4719 declaration set: NO-GO
+latest broad runtime audit result: 4731 tests, 4580 pass, 151 fail
+current runtime test files: 537
+current source top-level test declarations counted: 4731
+current broad runtime proof for generated 4731 declaration set: NO-GO
 full codebase audit completion from full runtime proof: NO-GO
 first optimization implementation approval from full runtime proof: NO-GO
 JSON-first first-class promotion from full runtime proof: NO-GO
@@ -1983,8 +1993,8 @@ runtime behavior changed by this continuation: no
 
 ```mermaid
 flowchart TD
-  A["4719 declaration source set"] --> B["Broad runtime audit rerun"]
-  B --> C["4491 pass / 228 fail"]
+  A["4731 declaration source set"] --> B["Broad runtime audit rerun"]
+  B --> C["4580 pass / 151 fail"]
   C --> D["Runtime backlog remains open"]
   D --> E["Executable broad-audit freshness: NO-GO"]
   E --> F["Optimization, JSON-first, release, and completion gates stay NO-GO"]
@@ -2871,7 +2881,7 @@ provenance contract rows, 12 source owner map contract rows, 12 metric sample
 contract rows, 12 manifest contract rows, 10 artifact path boundary rows, 12
 foundation packet rows, 12 metric schema rows, 12 metric source-owner rows, 5
 collector readiness families, 2 evidence parity rollout rows, 8 parity and
-release boundary source docs, 69 method semantic proof gap files, and 5,673
+release boundary source docs, 69 method semantic proof gap files, and 5,681
 lexical callables, while keeping runtime parity rollout closure approvals 0,
 implementation-ready parity rollout closure rows 0, parity rollout draft
 closure `PARITY-ROLLOUT-CHAIN-CLOSED`, and parity rollout implementation
@@ -3738,8 +3748,8 @@ the lifecycle gap register from individual observer/listener/timer/frame slices
 into one audit-only convergence boundary without approving cleanup or changing
 product runtime behavior. The continuation pins 10 runtime lifecycle
 convergence rows, 0 implementation-ready runtime lifecycle convergence rows,
-510 tracked lifecycle primitive instances, 460 install-or-schedule rows,
-50 explicit teardown rows, 16 hot YouTube SPA lifecycle owner rows, 33
+524 tracked lifecycle primitive instances, 469 install-or-schedule rows,
+55 explicit teardown rows, 16 hot YouTube SPA lifecycle owner rows, 33
 YouTube SPA immediate/short hot timer rows, primitive/listener/observer/timer
 surface proof, mode/surface budget proof, teardown/effect-budget proof,
 menu/overlay timing proof, method/JSON dependency proof, authority absence

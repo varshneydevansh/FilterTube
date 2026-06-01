@@ -142,9 +142,9 @@ optimization order still does not change.
 
 ```text
 latest historical 4663 full runtime proof: 4663/4663 pass, 0 fail, 83.213s
-current generated runtime-test declaration count: 4719
-current broad runtime proof for generated 4719 declaration set: NO-GO
-current broad runtime audit snapshot: 4719 tests, 4491 pass, 228 fail
+current generated runtime-test declaration count: 4731
+current broad runtime proof for generated 4731 declaration set: NO-GO
+current broad runtime audit snapshot: 4731 tests, 4580 pass, 151 fail
 affected callable packet rows: 12
 affected source files covered: 8
 transport no-work source evidence rows: 8
@@ -170,7 +170,7 @@ ASCII flow:
 ```text
 current source/runtime proof
   -> latest recorded 4663/4663 runtime suite proof
-  -> current 4719 generated declaration set
+  -> current 4731 generated declaration set
   -> broad runtime backlog boundary
   -> affected whitelist/cache callable packet
   -> live installed-profile evidence blocker
@@ -182,7 +182,7 @@ Mermaid flow:
 
 ```mermaid
 flowchart TD
-  A["Latest recorded 4663 runtime proof"] --> B["Current 4719 generated declaration set"]
+  A["Latest recorded 4663 runtime proof"] --> B["Current 4731 generated declaration set"]
   B --> C["Broad runtime backlog boundary"]
   C --> D["Affected whitelist/cache callable packet"]
   D --> E["Live installed-profile evidence blocker"]
@@ -309,9 +309,9 @@ support runtime optimization or JSON-first promotion. Current proof pins:
 
 ```text
 method semantic proof gap files covered: 69
-method semantic proof gap lexical callables covered: 5673
+method semantic proof gap lexical callables covered: 5681
 files with complete per-callable semantic proof: 0
-lexical callables requiring semantic proof before behavior changes: 5673
+lexical callables requiring semantic proof before behavior changes: 5681
 affected callable semantic proof: NO-GO
 runtime behavior changed: no
 ```
