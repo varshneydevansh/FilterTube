@@ -267,7 +267,7 @@ test('JSON-first hideMixPlaylists boundary audit is audit-only and source pinned
   assert.match(doc, /hideMixPlaylists boundary source files: 4/);
   assert.match(doc, /runtime hideMixPlaylists fixtures: 6/);
 
-  assert.ok(doc.includes(`| \`js/filter_logic.js\` | 3498 | 165151 | \`${sha256('js/filter_logic.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/filter_logic.js\` | 3652 | 172174 | \`${sha256('js/filter_logic.js')}\` |`));
   assert.ok(doc.includes(`| \`js/seed.js\` | 1136 | 50026 | \`${sha256('js/seed.js')}\` |`));
   assert.ok(doc.includes(`| \`js/content/dom_fallback.js\` | 4838 | 228332 | \`${sha256('js/content/dom_fallback.js')}\` |`));
   assert.ok(doc.includes(`| \`js/background.js\` | 6320 | 285103 | \`${sha256('js/background.js')}\` |`));
@@ -303,10 +303,10 @@ test('hideMixPlaylists source counts remain pinned', () => {
   }
 
   assert.equal(countLiteral(blocks.filterLogic, 'hideMixPlaylists'), 0);
-  assert.equal(countLiteral(blocks.filterLogic, 'isMix'), 2);
+  assert.equal(countLiteral(blocks.filterLogic, 'isMix'), 3);
   assert.equal(countLiteral(blocks.filterLogic, 'radioRenderer'), 5);
   assert.equal(countLiteral(blocks.filterLogic, 'compactRadioRenderer'), 5);
-  assert.equal(countLiteral(blocks.filterLogic, 'playlistId'), 11);
+  assert.equal(countLiteral(blocks.filterLogic, 'playlistId'), 14);
   assert.equal(countLiteral(blocks.seed, 'hideMixPlaylists'), 0);
   assert.equal(countLiteral(blocks.domFallback, 'hideMixPlaylists'), 5);
   assert.equal(countLiteral(blocks.domFallback, 'isMix'), 2);
@@ -315,10 +315,10 @@ test('hideMixPlaylists source counts remain pinned', () => {
   assert.equal(countLiteral(blocks.background, 'hideMixPlaylists'), 12);
 
   assert.match(doc, /filter_logic total hideMixPlaylists tokens: 0/);
-  assert.match(doc, /filter_logic total isMix tokens: 2/);
+  assert.match(doc, /filter_logic total isMix tokens: 3/);
   assert.match(doc, /filter_logic total radioRenderer tokens: 5/);
   assert.match(doc, /filter_logic total compactRadioRenderer tokens: 5/);
-  assert.match(doc, /filter_logic total playlistId tokens: 11/);
+  assert.match(doc, /filter_logic total playlistId tokens: 14/);
   assert.match(doc, /seed total hideMixPlaylists tokens: 0/);
   assert.match(doc, /DOM fallback total hideMixPlaylists tokens: 5/);
   assert.match(doc, /DOM fallback total isMix tokens: 2/);

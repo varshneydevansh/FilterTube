@@ -30,8 +30,8 @@ filter_logic comment rules block lines: 9
 filter_logic comment rules block bytes: 380
 filter_logic candidate comment flag block lines: 1
 filter_logic candidate comment flag block bytes: 100
-filter_logic whitelist comment bypass block lines: 105
-filter_logic whitelist comment bypass block bytes: 5392
+filter_logic whitelist comment bypass block lines: 110
+filter_logic whitelist comment bypass block bytes: 5535
 filter_logic comment decision block lines: 34
 filter_logic comment decision block bytes: 1947
 seed active JSON rules block lines: 13

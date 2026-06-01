@@ -89,7 +89,8 @@ test('audit runtime backlog names the broad failure clusters that still require 
   assert.match(doc, /direct-hide-writer-register` has been refreshed and promoted into `test:dom`/);
   assert.match(doc, /dom-selector-instance-register` has been refreshed for `js\/content\/dom_state\.js` selector patch sites and promoted into `test:dom`/);
   assert.match(doc, /lifecycle-instance-register` and `repo-lifecycle-primitive-coverage` have been refreshed for website component lifecycle drift and promoted into `test:performance`/);
-  assert.match(doc, /remaining lifecycle selector and JSON content-control hide rows belong in smaller DOM\/JSON batches/);
+  assert.match(doc, /remaining lifecycle selector rows belong in smaller DOM batches/);
+  assert.match(doc, /content-control-json-first-boundary-index` plus the JSON-first content-control hide boundary set have been refreshed and promoted into `test:json`/);
   assert.match(doc, /ytm-show-sheet-injector-filter-logic-parity` and `ytm-show-sheet-enrichment-handoff` have been refreshed and promoted into `test:json`/);
 });
 

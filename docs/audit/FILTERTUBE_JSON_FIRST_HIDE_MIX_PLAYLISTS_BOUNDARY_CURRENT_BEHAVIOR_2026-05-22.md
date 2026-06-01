@@ -59,10 +59,10 @@ background boolean pass-through block bytes: 3596
 background storage refresh keys block lines: 16
 background storage refresh keys block bytes: 461
 filter_logic total hideMixPlaylists tokens: 0
-filter_logic total isMix tokens: 2
+filter_logic total isMix tokens: 3
 filter_logic total radioRenderer tokens: 5
 filter_logic total compactRadioRenderer tokens: 5
-filter_logic total playlistId tokens: 11
+filter_logic total playlistId tokens: 14
 seed total hideMixPlaylists tokens: 0
 DOM fallback total hideMixPlaylists tokens: 5
 DOM fallback total isMix tokens: 2

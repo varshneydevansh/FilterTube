@@ -281,7 +281,7 @@ test('JSON-first hideAllComments boundary audit is audit-only and source pinned'
   assert.match(doc, /hideAllComments boundary source files: 4/);
   assert.match(doc, /runtime hideAllComments fixtures: 7/);
 
-  assert.ok(doc.includes(`| \`js/filter_logic.js\` | 3498 | 165151 | \`${sha256('js/filter_logic.js')}\` |`));
+  assert.ok(doc.includes(`| \`js/filter_logic.js\` | 3652 | 172174 | \`${sha256('js/filter_logic.js')}\` |`));
   assert.ok(doc.includes(`| \`js/seed.js\` | 1136 | 50026 | \`${sha256('js/seed.js')}\` |`));
   assert.ok(doc.includes(`| \`js/content/dom_fallback.js\` | 4838 | 228332 | \`${sha256('js/content/dom_fallback.js')}\` |`));
   assert.ok(doc.includes(`| \`js/background.js\` | 6320 | 285103 | \`${sha256('js/background.js')}\` |`));
@@ -293,7 +293,7 @@ test('hideAllComments source counts remain pinned', () => {
   const countRows = [
     ['filter_logic comment rules block', blocks.filterCommentRules, 9, 380],
     ['filter_logic candidate comment flag block', blocks.filterCandidateCommentFlag, 1, 100],
-    ['filter_logic whitelist comment bypass block', blocks.filterWhitelistCommentBypass, 105, 5392],
+    ['filter_logic whitelist comment bypass block', blocks.filterWhitelistCommentBypass, 110, 5535],
     ['filter_logic comment decision block', blocks.filterCommentDecision, 34, 1947],
     ['seed active JSON rules block', blocks.seedActiveJsonRules, 13, 463],
     ['seed engine settings log block', blocks.seedEngineSettingsLog, 7, 394],
